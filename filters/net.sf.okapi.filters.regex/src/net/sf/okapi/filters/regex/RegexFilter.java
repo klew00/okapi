@@ -22,6 +22,8 @@ package net.sf.okapi.filters.regex;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +37,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -238,9 +241,16 @@ public class RegexFilter implements IFilter {
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
-		
-		BufferedReader reader = new BufferedReader(input.getReader());		
 		encoding = input.getEncoding();
+		
+		BufferedReader reader = null;		
+		try {
+			reader = new BufferedReader(new InputStreamReader(detector.getInputStream(), encoding));
+		}
+		catch ( UnsupportedEncodingException e ) {
+			throw new OkapiUnsupportedEncodingException(
+				String.format("The encoding '%s' is not supported.", encoding), e);
+		}
 		srcLang = input.getSourceLanguage();
 		trgLang = input.getTargetLanguage();
 		hasUTF8BOM = detector.hasUtf8Bom();

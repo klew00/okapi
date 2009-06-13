@@ -23,7 +23,7 @@ package net.sf.okapi.applications.rainbow.pipeline;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +53,7 @@ public class PipelineWrapper {
 
 	// Temporary class to create a list of available steps
 	private Map<String, StepInfo> buildStepList () {
-		Hashtable<String, StepInfo> map = new Hashtable<String, StepInfo>();
+		LinkedHashMap<String, StepInfo> map = new LinkedHashMap<String, StepInfo>();
 		peMapper = new ParametersEditorMapper();
 		try {
 //TODO: Replace by auto-discovery of plugins			

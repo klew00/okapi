@@ -188,9 +188,10 @@ public class DTDFilter implements IFilter {
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
 			input.setEncoding(detector.getEncoding());
+			encoding = detector.getEncoding();
+			//TODO: check if DTDParser is BOM-aware
 			DTDParser parser = new DTDParser(input.getReader());
 			
-			encoding = detector.getEncoding();
 			srcLang = input.getSourceLanguage();
 			hasUTF8BOM = detector.hasUtf8Bom();
 			lineBreak = detector.getNewlineType().toString();

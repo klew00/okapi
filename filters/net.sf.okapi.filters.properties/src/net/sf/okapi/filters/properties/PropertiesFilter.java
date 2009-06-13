@@ -22,6 +22,8 @@ package net.sf.okapi.filters.properties;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +38,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -193,9 +196,15 @@ public class PropertiesFilter implements IFilter {
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
-		
-		reader = new BufferedReader(input.getReader());
 		encoding = input.getEncoding();
+		
+		try {
+			reader = new BufferedReader(new InputStreamReader(detector.getInputStream(), encoding));
+		}
+		catch ( UnsupportedEncodingException e ) {
+			throw new OkapiUnsupportedEncodingException(
+				String.format("The encoding '%s' is not supported.", encoding), e);
+		}
 		srcLang = input.getSourceLanguage();
 		hasUTF8BOM = detector.hasUtf8Bom();
 		lineBreak = detector.getNewlineType().toString();

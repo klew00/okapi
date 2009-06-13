@@ -209,17 +209,17 @@ public class POFilter implements IFilter {
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
+		encoding = input.getEncoding();
 				
-		// Open the input stream (JEH cannot call setEncoding after getReader is called so use getStream instead)
+		// Open the input stream
 		try {
-			reader = new BufferedReader(new InputStreamReader(input.getStream(), input.getEncoding()));
+			reader = new BufferedReader(new InputStreamReader(detector.getInputStream(), input.getEncoding()));
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new OkapiUnsupportedEncodingException(
-				String.format("The encoding '%s' is not supported.", input.getEncoding()), e);
+				String.format("The encoding '%s' is not supported.", encoding), e);
 		}
 	
-		encoding = input.getEncoding();
 		srcLang = input.getSourceLanguage();
 		trgLang = input.getTargetLanguage();
 		hasUTF8BOM = detector.hasUtf8Bom();
