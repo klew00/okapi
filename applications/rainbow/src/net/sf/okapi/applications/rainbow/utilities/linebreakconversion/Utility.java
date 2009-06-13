@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,7 +30,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.CharBuffer;
 
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
 import net.sf.okapi.applications.rainbow.utilities.ISimpleUtility;
@@ -40,6 +39,8 @@ import net.sf.okapi.common.Util;
 
 public class Utility extends BaseUtility implements ISimpleUtility {
 
+	private static final int BUFFER_SIZE = 1024;
+	
 	private Parameters params;
 
 	public Utility () {
@@ -100,32 +101,36 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			Util.writeBOMIfNeeded(writer, (bis.getBOMSize()>0), encoding);
 			
 			// Set the variables
-			CharBuffer buffer = CharBuffer.allocate(1024);
+			char[] buf = new char[BUFFER_SIZE];
 			int length = 0;
-			int start = 0;
 			int i;
 			int done = 0;
 			
 			// Process the file
-			while ( (length = reader.read(buffer)) > 0 ) {
-				buffer.position(0);
+			while ( (length = reader.read(buf, 0, BUFFER_SIZE-1)) > 0 ) {
+				// Check if you need to read the next char to avoid splitting cases
+				if ( buf[length-1] == '\r'  ) {
+					int count = reader.read(buf, length, 1);
+					if ( count > -1 ) length++;
+				}
 				// Reset 'done' flag on second pass after it was set
 				if ( done == 1 ) done++; else done = 0;
 				// Replace line-breaks
+				int start = 0;
 				for ( i=0; i<length; i++ ) {
-					if ( buffer.charAt(i) == '\n') {
+					if ( buf[i] == '\n') {
 						if (( i != 0 ) || ( done == 0 )) {
-							writer.write(buffer.array(), start, i-start);
+							writer.write(buf, start, i-start);
 							writer.write(params.lineBreak);
 						}
 						start = i+1;
 					}
-					else if ( buffer.charAt(i) == '\r') {
-						writer.write(buffer.array(), start, i-start);
+					else if ( buf[i] == '\r') {
+						writer.write(buf, start, i-start);
 						writer.write(params.lineBreak);
 						// Check if it's a \r\n
 						if ( i+1 < length ) {
-							if ( buffer.charAt(i+1) == '\n' ) {
+							if ( buf[i+1] == '\n' ) {
 								i++; // Skip it
 							}
 						}
@@ -136,11 +141,10 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 				}
 				// Write out the remainder of the buffer
 				if ( length-start > 0 ) {
-					writer.write(buffer.array(), start, length-start);
+					writer.write(buf, start, length-start);
 				}
-				// Reset positions
-				start = 0;
 			}
+
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);

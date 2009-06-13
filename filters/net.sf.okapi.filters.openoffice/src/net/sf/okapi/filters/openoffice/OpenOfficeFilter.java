@@ -162,7 +162,6 @@ public class OpenOfficeFilter implements IFilter {
 		boolean generateSkeleton)
 	{
 		close();
-
 		docURI = input.getInputURI();
 		if ( docURI == null ) {
 			throw new OkapiBadFilterInputException("This filter supports only URI input.");
@@ -257,7 +256,7 @@ public class OpenOfficeFilter implements IFilter {
 		filter.close();
 		Event event;
 		try {
-			filter.open(new RawDocument(zipFile.getInputStream(entry), RawDocument.UNKOWN_ENCODING, srcLang));
+			filter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLang));
 			event = filter.next(); // START_DOCUMENT
 			filter.setContainerMimeType(internalMimeType);
 		}

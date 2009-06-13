@@ -41,7 +41,6 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -55,7 +54,6 @@ import org.codehaus.stax2.XMLInputFactory2;
 public class IDMLContentFilter implements IFilter {
 
 	private String srcLang;
-	private String encoding;
 	private String docName;
 	private XMLStreamReader reader;
 	private LinkedList<Event> queue;
@@ -168,9 +166,8 @@ public class IDMLContentFilter implements IFilter {
 		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 		fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 
-		// The encoding may be not set if it comes as a binary RawDocument
-		// Which is OK since XMLStreamReader does its own detection
 		try {
+			input.setEncoding("UTF-8"); // Force UTF-8 as the default encoding
 			reader = fact.createXMLStreamReader(input.getStream());
 		}
 		catch ( XMLStreamException e ) {
@@ -193,7 +190,7 @@ public class IDMLContentFilter implements IFilter {
 		startDoc.setName(docName);
 		//TODO: Fix the encoding as it is  not necessarily correct as the encoding is not retrieve from XMLStreamReader
 		// We should use reader.getEncoding() when it's set
-		startDoc.setEncoding(encoding, false); //TODO: UTF8BOM detection
+		startDoc.setEncoding("UTF-8", false); //TODO: UTF8BOM detection
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(params);
 		startDoc.setFilterWriter(createFilterWriter());
@@ -204,15 +201,15 @@ public class IDMLContentFilter implements IFilter {
 
 		// The XML declaration is not reported by the parser, so we need to
 		// create it as a document part when starting
-		skel = new GenericSkeleton();
-		startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
-		skel.append("<?xml version=\"1.0\" encoding=\"");
-		skel.addValuePlaceholder(startDoc, Property.ENCODING, "");
-		skel.append("\"?>");
+		//skel = new GenericSkeleton();
+		//startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
+		//skel.append("<?xml version=\"1.0\" encoding=\"");
+		//skel.addValuePlaceholder(startDoc, Property.ENCODING, "");
+		//skel.append("\"?>");
 		//skel.append("<?xml version=\"1.0\" "
 		//	+ ((reader.getEncoding()==null) ? "" : "encoding=\""+reader.getEncoding()+"\"")
 		//	+ "?>");
-		startDoc.setSkeleton(skel);
+		//startDoc.setSkeleton(skel);
 	}
 
 	private Event read () {
@@ -311,7 +308,13 @@ public class IDMLContentFilter implements IFilter {
 				case XMLStreamConstants.NOTATION_DECLARATION:
 				case XMLStreamConstants.ATTRIBUTE:
 					break;
+					
 				case XMLStreamConstants.START_DOCUMENT:
+					skel.append("<?xml version=\"1.0\" "
+						+ ((reader.getEncoding()==null) ? "" : "encoding=\""+reader.getEncoding()+"\"")
+						+ "?>");
+					break;
+					
 				case XMLStreamConstants.END_DOCUMENT:
 					break;
 				}

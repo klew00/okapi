@@ -152,7 +152,6 @@ public class IDMLFilter implements IFilter {
 		boolean generateSkeleton)
 	{
 		close();
-
 		docURI = input.getInputURI();
 		if ( docURI == null ) {
 			throw new OkapiBadFilterInputException("This filter supports only URI input.");
@@ -160,12 +159,14 @@ public class IDMLFilter implements IFilter {
 		nextAction = NextAction.OPENZIP;
 		queue = new LinkedList<Event>();
 		filter = new IDMLContentFilter();
+		filter.setParameters(params);
 
 		srcLang = input.getSourceLanguage();
 	}
 	
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
+		if ( filter != null ) filter.setParameters(params);
 	}
 
 	private Event openZipFile () {
@@ -215,10 +216,9 @@ public class IDMLFilter implements IFilter {
 	
 	private Event openSubDocument () {
 		filter.close(); // Make sure the previous is closed
-		filter.setParameters(params);
 		Event event;
 		try {
-			filter.open(new RawDocument(zipFile.getInputStream(entry), RawDocument.UNKOWN_ENCODING, srcLang));
+			filter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLang));
 			event = filter.next(); // START_DOCUMENT
 		}
 		catch (IOException e) {

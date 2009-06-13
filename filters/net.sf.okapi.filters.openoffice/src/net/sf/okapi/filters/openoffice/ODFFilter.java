@@ -189,8 +189,6 @@ public class ODFFilter implements IFilter {
 		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 		fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 
-		// The encoding may be not set if it comes as a binary RawDocument
-		// Which is OK since XMLStreamReader does its own detection
 		try {
 			input.setEncoding("UTF-8"); // Force UTF-8 as the default encoding
 			reader = fact.createXMLStreamReader(input.getStream());
