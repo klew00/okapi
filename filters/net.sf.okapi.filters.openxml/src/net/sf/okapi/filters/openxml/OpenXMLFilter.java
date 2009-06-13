@@ -32,6 +32,8 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -114,6 +116,15 @@ public class OpenXMLFilter implements IFilter {
 	private boolean bPreferenceTranslateWordAllStyles = true; // DWH 5-28-09 if false, exclude a given list
 	private boolean bPreferenceTranslateWordHidden = true; // DWH 5-28-09
 	private boolean bMinedHiddenStyles = true; // DWH 5-28-09
+	private boolean bPreferenceTranslateExcelExcludeColors = false;
+	  // DWH 6-12-09 don't translate text in Excel in some colors 
+	private boolean bPreferenceTranslateExcelExcludeCells = false;
+	  // DWH 6-12-09 don't translate text in Excel in some specified cells
+	private TreeSet<String> tsExcelExcludedColors; // DWH 6-12-09
+	private TreeSet<String> tsExcelExcludedStyles; // DWH 6-12-09 
+	private TreeSet<String> tsExcelExcludedCells; // DWH 6-12-09 
+	private int nExcelOriginalSharedStringCount; // DWH 6-12-09
+	private boolean bProcessedExcelSheets=true; // DWH 6-13-09 Excel options
 
 	public OpenXMLFilter () {
 		hsExcludeStyles = new HashSet(); // DWH 5-29-09
@@ -494,6 +505,18 @@ public class OpenXMLFilter implements IFilter {
 //			params = (Parameters)openXMLContentFilter.getParameters();
 			  // DWH 3-4-09 params for OpenXMLFilter
 			
+			if (nZipType==MSEXCEL &&
+					(bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells))
+				// DWH 6-13-09 Excel options
+			{
+				ExcelAnalyzer ea = new ExcelAnalyzer(zipFile);
+//				ea.analyzeExcelGetSheetSizes();
+				tsExcelExcludedColors = ea.analyzeExcelGetNonThemeColors(); // DWH 6-13-09 this should change when the UI is ready
+				tsExcelExcludedStyles = ea.analyzeExcelGetStylesOfExcludedColors(tsExcelExcludedColors);
+				nExcelOriginalSharedStringCount = ea.analyzeExcelGetSharedStringsCount();
+				openXMLContentFilter.initTmSharedStrings(nExcelOriginalSharedStringCount);
+				bProcessedExcelSheets = false;
+			}
 			if (nZipType==MSWORD && !bPreferenceTranslateWordHidden)
 				bMinedHiddenStyles = false; // DWH 5-28-09 so mine hidden styles first
 			entries = zipFile.entries();
@@ -536,6 +559,11 @@ public class OpenXMLFilter implements IFilter {
 		String sDocType; // DWH 2-26-09
 		int iCute; // DWH 2-26-09
 		boolean bInMainFile; // DWH 4-15-09
+		if (!entries.hasMoreElements() && !bProcessedExcelSheets) // DWH 6-13-09 Excel options
+		{ // this only happens if bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells
+			entries = zipFile.entries();  // after going through all the sheets, reset to go through the rest
+			bProcessedExcelSheets = true; // and indicate you have already gone through the sheets
+		}
 		while( entries.hasMoreElements() ) { // note that [Content_Types].xml is always first
 			entry = entries.nextElement();
 			sEntryName = entry.getName();
@@ -543,6 +571,24 @@ public class OpenXMLFilter implements IFilter {
 		    iCute = sDocType.lastIndexOf('.', sDocType.length()-1);
 		    if (iCute>0)
 			    sDocType = sDocType.substring(iCute+1);
+			if (nZipType==MSEXCEL)
+			{
+				openXMLContentFilter.setBPreferenceTranslateExcelExcludeColors(bPreferenceTranslateExcelExcludeCells);
+				if (bPreferenceTranslateExcelExcludeColors)
+					openXMLContentFilter.setTsExcelExcludedCells(tsExcelExcludedCells);
+				openXMLContentFilter.setBPreferenceTranslateExcelExcludeCells(bPreferenceTranslateExcelExcludeCells);
+				if (bPreferenceTranslateExcelExcludeCells)
+					openXMLContentFilter.setTsExcelExcludedStyles(tsExcelExcludedStyles);
+				if (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells)
+				{ // do we exclude comment text in colors?
+					if (!bProcessedExcelSheets && !sEntryName.equals("[Content_Types].xml") &&
+							!sDocType.equals("worksheet+xml"))
+						continue;
+					else if (bProcessedExcelSheets && (sEntryName.equals("[Content_Types].xml") ||
+													   sDocType.equals("worksheet+xml")))
+						continue;
+				}
+			}
 		    if (nZipType==MSWORD)
 		    {
 			    if (!bMinedHiddenStyles) // DWH 5-28-09 find styles for hidden text
@@ -550,14 +596,14 @@ public class OpenXMLFilter implements IFilter {
 			    	if (sDocType.equals("styles+xml"))
 			    	{
 			    		bMinedHiddenStyles = true;
-			    		entries = zipFile.entries(); // reset to go through all of them
+			    		entries = zipFile.entries(); // reset to go through all of them except styles and Content_Types
 			    	}
 			    	else if (!sEntryName.equals("[Content_Types].xml"))
-			    		continue;
+			    		continue;                    // save all but styles and Content_Types for 2nd go around
 			    }
 			    else if (!bPreferenceTranslateWordHidden &&
-			    		 (sEntryName.equals("[Content_Types].xml") ||
-			    		  sDocType.equals("styles+xml")))
+			    		 (sEntryName.equals("[Content_Types].xml") || // but don't do Content_Types
+			    		  sDocType.equals("styles+xml")))             // and styles a second time
 			    	continue;
 			          // DWH 5-29-09 these two files have already been added to the zip, so don't add them again
 		    }
@@ -592,7 +638,8 @@ public class OpenXMLFilter implements IFilter {
 		                    sDocType.equals("glossary+xml"))) ||
 		             (nZipType==MSEXCEL &&
 		            	   (sDocType.equals("sharedStrings+xml") ||
-		            	//  sDocType.equals("worksheet+xml") || DWH 5-15-09 sheetn.xml has number, formulas, nothing translatable
+		            	    (sDocType.equals("worksheet+xml") &&
+		            	      (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells)) ||
 		            	//	sDocType.equals("main+xml") || DWH 5-15-09 workbook.xml has nothing translatable
 		            		(sDocType.equals("comments+xml") && bPreferenceTranslateDocProperties) ||
 		                      // DWH 5-25-09 translate if translating comments

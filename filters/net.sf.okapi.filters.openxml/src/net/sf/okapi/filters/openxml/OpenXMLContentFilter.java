@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 //import java.util.TreeMap; // DWH 10-10-08
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +41,7 @@ import net.htmlparser.jericho.EndTag;
 //import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
 //import net.htmlparser.jericho.StartTagType;
+import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
@@ -134,6 +137,18 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private String sCurrentCharacterStyle = ""; // DWH 5-27-09
 	private String sCurrentParagraphStyle = ""; // DWH 5-27-09
 	private boolean bPreferenceTranslateWordHidden = true; // DWH 5-29-09
+	private boolean bPreferenceTranslateExcelExcludeColors = true;
+	  // DWH 6-12-09 don't translate text in Excel in some colors 
+	private boolean bPreferenceTranslateExcelExcludeCells = true;
+	  // DWH 6-12-09 don't translate text in Excel in some specified cells
+	private TreeSet<String> tsExcelExcludedStyles; // DWH 6-12-09 
+	private TreeSet<String> tsExcelExcludedCells; // DWH 6-12-09 
+	private TreeMap<Integer,ExcelSharedString> tmSharedStrings=null; // DWH 6-13-09
+	private boolean bInExcelSharedStringCell=false; // DWH 6-13-09
+	private boolean bExcludeTranslatingThisExcelCell=false; // DWH 6-13-09
+	private int nOriginalSharedStringCount=0; // DWH 6-13-09
+	private int nNextSharedStringCount=0; // DWH 6-13-09
+	private int nCurrentSharedString=-1; // DWH 6-13-09 if nonzero, text may be excluded from translation
 	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
@@ -695,7 +710,36 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			addToDocumentPart(txt);
 			return;
 		}
-
+		// check for need to modify index in Excel cell pointing to a shared string
+		if (bInExcelSharedStringCell)
+			// DWH 6-13-09 Excel options; true if in sheet cell pointing to a shared string
+			// only possible if (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells)
+			// and this cell is marked as containing a shared string
+		{
+			int nSharedStringNumber=-1;
+			try
+			{
+				nSharedStringNumber = new Integer(txt).intValue();
+			}
+			catch(Exception e) {};
+			if (nSharedStringNumber>=0 && nSharedStringNumber<nNextSharedStringCount)
+			{
+				ExcelSharedString ess = tmSharedStrings.get(nSharedStringNumber);
+				if (!ess.getBEncountered()) // first time this string seen in sheets
+				{
+					ess.setBEncountered(true);
+					ess.setBTranslatable(bExcludeTranslatingThisExcelCell);
+				}
+				else if (ess.getBTranslatable() != bExcludeTranslatingThisExcelCell)
+					// this shared string should be translated in some cells but not others
+				{
+					ExcelSharedString newess = // create twin with opposite translatable status
+						new ExcelSharedString(true,bExcludeTranslatingThisExcelCell,nSharedStringNumber,"");
+					tmSharedStrings.put(new Integer(nNextSharedStringCount),newess); // add twin to list
+					ess.setNIndex(nNextSharedStringCount++); // point current one to new twin
+				}
+			}
+		}
 		// check for ignorable whitespace and add it to the skeleton
 		// The Jericho html parser always pulls out the largest stretch of text
 		// so standalone whitespace should always be ignorable if we are not
@@ -721,6 +765,21 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 					if (bExcludeTextInRun || bExcludeTextInUnit || // DWH 5-29-09 don't treat as text if excluding text
 						    (filetype==MSEXCEL && txt!=null && txt.length()>0 && txt.charAt(0)=='='))
 						addToTextRun(txt); // DWH 5-13-09 don't treat Excel formula as text to be translated
+					else if (nCurrentSharedString>0 && nCurrentSharedString<nNextSharedStringCount)
+						// DWH 6-13-09 in Excel Shared Strings File, only if some shared strings excluded from translation
+					{
+						ExcelSharedString ess = tmSharedStrings.get(new Integer(nCurrentSharedString));
+						if (ess.getBTranslatable()) // if this sharedString is translatable, add as text
+						{
+							addTextRunToCurrentTextUnit(false); // adds a code for the preceding text run
+							bAfterText = true;
+							addToTextUnit(txt); // adds the text
+							trTextRun = new TextRun(); // then starts a new text run for a code after the text
+							bInTextRun = true;							
+						}
+						else
+							addToTextRun(txt); // if not translatable, add as part of code						
+					}
 					else
 					{
 						addTextRunToCurrentTextUnit(false); // adds a code for the preceding text run
@@ -793,6 +852,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		String sContentType; // DWH 2-26-09 for ContentType attribute in [Content_Types].xml
 		// if in excluded state everything is skeleton including text
 		String tempTagType; // DWH 5-7-09
+		String sTagElementType; // DWH 6-13-09
 		if (startTag==null) // DWH 4-14-09
 			return;
 		if (bInDeletion)
@@ -802,6 +862,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 		sTagName = startTag.getName(); // DWH 2-26-09
 		sTagString = startTag.toString(); // DWH 2-26-09
+		sTagElementType = getConfig().getElementType(sTagName); // DWH 6-13-09
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(sTagString);
 			// process these tag types to update parser state
@@ -823,36 +884,47 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
-				if (getConfig().getElementType(sTagName).equals("style"))
+				if (sTagElementType.equals("style")) // DWH 6-13-09
 					// DWH 5-27-09 to exclude hidden styles
 					sCurrentCharacterStyle = startTag.getAttributeValue("w:styleId");
-				else if (getConfig().getElementType(sTagName).equals("hidden"))
+				else if (sTagElementType.equals("hidden")) // DWH 6-13-09
 					// DWH 5-27-09 to exclude hidden styles
 				{
 					if (!sCurrentCharacterStyle.equals(""))
 						excludeStyle(sCurrentCharacterStyle);
 				}
+				else if (sTagElementType.equals("excell")) // DWH 6-13-09 cell in Excel sheet
+				{
+					if (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells)
+						bExcludeTranslatingThisExcelCell = evaluateSharedString(startTag);
+				}
+				else if (sTagElementType.equals("sharedstring")) // DWH 6-13-09 shared string in Excel
+					nCurrentSharedString++;
+				else if (sTagElementType.equals("count")) // DWH 6-13-09 shared string count in Excel
+				{
+					sTagString = newSharedStringCount(sTagString);
+				}
 				addToDocumentPart(sTagString);
 			}
 			else
 			{
-				if (getConfig().getElementType(sTagName).equals("rstyle")) // DWH 5-29-09 text run style
+				if (sTagElementType.equals("rstyle")) // DWH 6-13-09 text run style
 					// DWH 5-29-09 in a text unit, some styles shouldn't be translated
 				{
 					sCurrentCharacterStyle = startTag.getAttributeValue("w:val");
 					if (hsExcludeStyles.contains(sCurrentCharacterStyle))
 						bExcludeTextInRun = true;
 				}
-				else if (getConfig().getElementType(sTagName).equals("pstyle")) // DWH 5-29-09 text unit style
+				else if (sTagElementType.equals("pstyle")) // DWH 6-13-09 text unit style
 					// DWH 5-29-09 in a text unit, some styles shouldn't be translated
 				{
 					sCurrentParagraphStyle = startTag.getAttributeValue("w:val");
 					if (hsExcludeStyles.contains(sCurrentParagraphStyle))
 						bExcludeTextInUnit = true;
 				}
-				else if (getConfig().getElementType(sTagName).equals("hidden") &&
+				else if (sTagElementType.equals("hidden") &&
 						!bPreferenceTranslateWordHidden)
-							// DWH 5-29-09 to exclude hidden styles
+							// DWH 6-13-09 to exclude hidden styles
 				{
 					if (bInTextRun)
 						bExcludeTextInRun = true;
@@ -863,7 +935,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 					addToTextRun(startTag);
 				else // DWH 5-7-09
 				{
-					if (getConfig().getElementType(sTagName).equals("delete"))
+					if (sTagElementType.equals("delete")) // DWH 6-13-09
 						bInDeletion = true;
 					addToNonTextRun(startTag); // DWH 5-5-09
 				}
@@ -1003,13 +1075,15 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		String sTagName; // DWH 2-26-09
 		String sTagString; // DWH 4-14-09
 		String tempTagType; // DWH 5-5-09
+		String sTagElementType; // DWH 6-13-09
 		if (endTag==null) // DWH 4-14-09
 			return;
 		sTagName = endTag.getName(); // DWH 2-26-09
+		sTagElementType = getConfig().getElementType(sTagName); // DWH 6-13-09
 		if (bInDeletion)
 		{
 			addToNonTextRun(endTag);
-			if (getConfig().getElementType(sTagName).equals("delete"))
+			if (sTagElementType.equals("delete")) // DWH 6-13-09
 			{
 				bInDeletion = false;
 			}
@@ -1043,7 +1117,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 			else if (bInTextRun) // DWH 5-29-09
 				addToTextRun(endTag);
-			else if (getConfig().getElementType(sTagName).equals("delete")) // DWH 5-7-09
+			else if (sTagElementType.equals("delete")) // DWH 5-7-09 6-13-09
 			{
 				if (trNonTextRun!=null)
 					addNonTextRunToCurrentTextUnit();
@@ -1051,6 +1125,37 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				setTagType("d"); // DWH 5-7-09 type for current manufactured tag in text run, so tags will balance
 				addToTextUnit(TextFragment.TagType.CLOSING, sTagString, "d"); // DWH 5-7-09 adds as opening d
 				setTagType(tempTagType); // DWH 5-7-09  restore tag type to what AbstractBaseFilter expects
+			}
+			else if (sTagElementType.equals("excell")) // DWH 6-13-09 cell in Excel sheet
+			{
+				bInExcelSharedStringCell = false;
+				addToDocumentPart(sTagString);
+			}
+			else if (sTagElementType.equals("sharedstring")) // DWH 6-13-09 shared string in Excel
+			{
+				addToDocumentPart(sTagString);
+				if (nCurrentSharedString==nOriginalSharedStringCount) // this is the last original shared string
+				{
+					bExcludeTextInUnit = false; // DWH 5-29-09 only exclude text if specific circumstances occur
+					addNonTextRunToCurrentTextUnit(); // DWH 5-5-09 trNonTextRun should be null at this point
+					bBeforeFirstTextRun = true; // DWH 5-5-09 addNonTextRunToCurrentTextUnit sets it false
+					bInTextRun = false;
+					bBetweenTextMarkers = false;					
+					for(int i=nCurrentSharedString;i<nNextSharedStringCount;i++)
+					{
+						ExcelSharedString ess = tmSharedStrings.get(new Integer(i));
+						String txt = ess.getS();
+						if (ess.getBTranslatable())
+						{
+							startTextUnit(new GenericSkeleton("<si><t>"));
+							addToTextUnit(txt);
+							endTextUnit(new GenericSkeleton("</t></si>"));
+						}
+						else
+							addToDocumentPart("<si><t>"+txt+"</t></si>");
+					}
+					nCurrentSharedString = -1; // reset so other text will translate; see handleText
+				}
 			}
 			else
 				addToNonTextRun(endTag); // DWH 5-5-09
@@ -1086,7 +1191,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			else
 			{
 				addToTextRun(endTag);
-				if (getConfig().getElementType(sTagName).equals("insert")) // end of insertion </w:ins>
+				if (sTagElementType.equals("insert")) // DWH 6-13-09 end of insertion </w:ins>
 				{
 					bInInsertion = false;
 					addTextRunToCurrentTextUnit(true);
@@ -1470,6 +1575,35 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		if (sTyle!=null && !sTyle.equals(""))
 			hsExcludeStyles.add(sTyle);
 	}
+	private boolean evaluateSharedString(Tag tag) // DWH 6-13-09 Excel options
+	{
+		boolean bExcludeCell=false;
+		String sCell;
+		String sStyle;
+		for (Attribute attribute : tag.parseAttributes())
+		{
+			if (attribute.getName().equals("r"))
+			{
+				sCell = attribute.getValue();
+				if (bPreferenceTranslateExcelExcludeCells && tsExcelExcludedCells.contains(sCell))
+					bExcludeCell = true; // this cell has been specifically excluded
+			}
+			else if (attribute.getName().equals("s"))
+			{
+				sStyle = attribute.getValue();
+				if (bPreferenceTranslateExcelExcludeColors && tsExcelExcludedStyles.contains(sStyle))
+					bExcludeCell = true; // this style includes an excluded color
+			}
+			else if (attribute.getName().equals("t"))
+			{
+				bInExcelSharedStringCell = attribute.getValue().equals("s"); // global for handleText
+				  // true if this string is in sharedStrings.xml
+			}
+		}
+		if (!bInExcelSharedStringCell)
+			bExcludeCell = false; // only exclude the cell if the string is in sharedStrings.xml
+		return bExcludeCell;
+	}
 	public int getConfigurationType()
 	{
 		return configurationType;
@@ -1501,5 +1635,67 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public boolean getBPreferenceTranslateWordHidden()
 	{
 		return bPreferenceTranslateWordHidden;
+	}
+	public void setBPreferenceTranslateExcelExcludeColors(boolean bPreferenceTranslateExcelExcludeColors) // DWH 6-13-09 Excel options
+	{
+		this.bPreferenceTranslateExcelExcludeColors = bPreferenceTranslateExcelExcludeColors;
+	}
+	public boolean getBPreferenceTranslateExcelExcludeColors() // DWH 6-13-09 Excel options
+	{
+		return bPreferenceTranslateExcelExcludeColors;
+	}
+	public void setBPreferenceTranslateExcelExcludeCells(boolean bPreferenceTranslateExcelExcludeCells) // DWH 6-13-09 Excel options
+	{
+		this.bPreferenceTranslateExcelExcludeCells = bPreferenceTranslateExcelExcludeCells;
+	}
+	public boolean getBPreferenceTranslateExcelExcludeCells() // DWH 6-13-09 Excel options
+	{
+		return bPreferenceTranslateExcelExcludeCells;
+	}
+	public void setTsExcelExcludedStyles(TreeSet<String> tsExcelExcludedStyles) // DWH 6-13-09 Excel options
+	{
+		this.tsExcelExcludedStyles = tsExcelExcludedStyles;
+	}
+	public TreeSet<String> getTsExcelExcludedStyles() // DWH 6-13-09 Excel options
+	{
+		return tsExcelExcludedStyles;
+	}
+	public void setTsExcelExcludedCells(TreeSet<String> tsExcelExcludedCells) // DWH 6-13-09 Excel options
+	{
+		this.tsExcelExcludedCells = tsExcelExcludedCells;
+	}
+	public TreeSet<String> getTsExcelExcludedCells() // DWH 6-13-09 Excel options
+	{
+		return tsExcelExcludedCells;
+	}
+	protected void initTmSharedStrings(int nExcelOriginalSharedStringCount) // DWH 6-13-09 Excel options
+	{
+		this.nOriginalSharedStringCount = nExcelOriginalSharedStringCount; // DWH 6-13-09
+		this.nNextSharedStringCount = nExcelOriginalSharedStringCount; // next count to modify
+		tmSharedStrings = new TreeMap<Integer,ExcelSharedString>();
+		for(int i=0;i<nExcelOriginalSharedStringCount;i++)
+			tmSharedStrings.put(new Integer(i), new ExcelSharedString(false,true,i,""));
+		nCurrentSharedString = -1;
+	}
+	private String newSharedStringCount(String sTagString)
+	  // DWH 6-13-09 replaces count of sharedStrings in sst element in sharedStrings.xml in Excel
+	  // if some shared Strings are to be translated in some contexts but not others
+	{
+		String sNewTagString=sTagString,sOrigNum;
+		int nDx,nDx2;
+		nDx = sTagString.indexOf("count=");
+		if (nDx>-1)
+		{
+			nDx2 = sTagString.substring(nDx+7).indexOf('"');
+			if (nDx2>nDx)
+			{
+				sOrigNum = sTagString.substring(nDx+7,nDx2);
+				if (sOrigNum.equals(new Integer(nOriginalSharedStringCount).toString()))
+					sNewTagString = sTagString.substring(0,nDx+7) +
+									(new Integer(nNextSharedStringCount)).toString() +
+									sTagString.substring(nDx2); // replace old count with new one
+			}
+		}
+		return sNewTagString;
 	}
 }

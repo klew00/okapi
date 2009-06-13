@@ -34,49 +34,29 @@
 
 filetype:
   ruleTypes: [ATTRIBUTES_ONLY]
-  elementType: MSEXCEL
+  elementType: MSEXCELSTYLES
 
 # used in sheetn files
-#author:
-#  ruleTypes: [EXCLUDE]
-
-v:
-  ruleTypes: [TEXTUNIT]
-
-c:
-  ruleTypes: [INLINE]
-  elementType: excell
-
-# used in sharedString file
-sst:
-  ruleTypes: [INLINE]
-  elementType: count
-
-si:
-  ruleTypes: [INLINE]
-  elementType: sharedstring
-
-t:
-  ruleTypes: [TEXTUNIT]
-
-# used in comments file
-text:
-  ruleTypes: [TEXTUNIT]
-
-# used in workbook file
-#sheet:
-#  ruleTypes: [ATTRIBUTES_ONLY]
-#  translatableAttributes: [name]
-
-# next two used in table definition file
-table:
+dimension:
   ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
+  translatableAttributes: [ref]
 
-tablecolumn:
+# used in styles file
+dimension:
   ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
+  translatableAttributes: [rgb]
 
+fonts:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [count]
+
+xf:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [fontId]
+
+font:
+  ruleTypes: [INLINE]
+  elementType: font
 
 
 
