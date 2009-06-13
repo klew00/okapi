@@ -26,8 +26,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,8 +61,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * Implements the IFilter interface for PO files.
  */
 public class POFilter implements IFilter {
-	private static final Logger LOGGER = Logger.getLogger(POFilter.class.getName());
-	
+
 	private static final String DOMAIN_SEP = "::";
 	private static final String DOMAIN_NONE = "messages";
 	private static final String DOMAIN_DEFAULT = "default";
@@ -211,6 +208,7 @@ public class POFilter implements IFilter {
 		// Detect and remove BOM
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectAndRemoveBom();
+		input.setEncoding(detector.getEncoding());
 				
 		// Open the input stream (JEH cannot call setEncoding after getReader is called so use getStream instead)
 		try {

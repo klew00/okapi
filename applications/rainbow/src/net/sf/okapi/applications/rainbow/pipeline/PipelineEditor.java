@@ -203,7 +203,7 @@ public class PipelineEditor {
 		});
 		
 		btRemoveStep = new Button(shell, SWT.PUSH);
-		btRemoveStep.setText("Remove Step...");
+		btRemoveStep.setText("Remove Step");
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = width;
 		btRemoveStep.setLayoutData(gdTmp);

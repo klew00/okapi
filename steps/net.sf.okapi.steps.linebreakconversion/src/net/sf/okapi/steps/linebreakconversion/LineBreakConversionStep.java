@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.CharBuffer;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -39,6 +38,8 @@ import net.sf.okapi.common.resource.RawDocument;
 
 public class LineBreakConversionStep extends BasePipelineStep {
 
+	private static final int BUFFER_SIZE = 1024;
+	
 	private boolean isDone;
 	private Parameters params;
 
@@ -73,7 +74,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 	public boolean needsOutput (int inputIndex) {
 		return pipeline.isLastStep(this);
 	}
-	
+
 	@Override
 	protected void handleStartBatchItem (Event event) {
 		isDone = false;
@@ -90,7 +91,6 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rawDoc.getStream(), rawDoc.getEncoding());
 			detector.detectAndRemoveBom();
 			rawDoc.setEncoding(detector.getEncoding());
-			
 			reader = new BufferedReader(rawDoc.getReader());
 			
 			// Open the output
@@ -115,32 +115,36 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			Util.writeBOMIfNeeded(writer, detector.hasUtf8Bom(), rawDoc.getEncoding());
 			
 			// Set the variables
-			CharBuffer buffer = CharBuffer.allocate(1024);
+			char[] buf = new char[BUFFER_SIZE];
 			int length = 0;
-			int start = 0;
 			int i;
 			int done = 0;
 			
 			// Process the file
-			while ( (length = reader.read(buffer)) > 0 ) {
-				buffer.position(0);
+			while ( (length = reader.read(buf, 0, BUFFER_SIZE-1)) > 0 ) {
+				// Check if you need to read the next char to avoid splitting cases
+				if ( buf[length-1] == '\r'  ) {
+					int count = reader.read(buf, length, 1);
+					if ( count > -1 ) length++;
+				}
 				// Reset 'done' flag on second pass after it was set
 				if ( done == 1 ) done++; else done = 0;
 				// Replace line-breaks
+				int start = 0;
 				for ( i=0; i<length; i++ ) {
-					if ( buffer.charAt(i) == '\n') {
+					if ( buf[i] == '\n') {
 						if (( i != 0 ) || ( done == 0 )) {
-							writer.write(buffer.array(), start, i-start);
+							writer.write(buf, start, i-start);
 							writer.write(params.lineBreak);
 						}
 						start = i+1;
 					}
-					else if ( buffer.charAt(i) == '\r') {
-						writer.write(buffer.array(), start, i-start);
+					else if ( buf[i] == '\r') {
+						writer.write(buf, start, i-start);
 						writer.write(params.lineBreak);
 						// Check if it's a \r\n
 						if ( i+1 < length ) {
-							if ( buffer.charAt(i+1) == '\n' ) {
+							if ( buf[i+1] == '\n' ) {
 								i++; // Skip it
 							}
 						}
@@ -151,7 +155,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 				}
 				// Write out the remainder of the buffer
 				if ( length-start > 0 ) {
-					writer.write(buffer.array(), start, length-start);
+					writer.write(buf, start, length-start);
 				}
 			}
 			

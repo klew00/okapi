@@ -213,12 +213,13 @@ public class XMLFilter implements IFilter {
 
 		input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
-		detector.detectAndRemoveBom();
+		detector.detectAndRemoveBom(); // Make sure we skip possible BOM
 		input.setEncoding(detector.getEncoding());
 		
 		try {
-			// Make sure we skip possible BOM since the parser is not BOM-aware
-			doc = docBuilder.parse(new InputSource(input.getReader()));
+			InputSource is = new InputSource(input.getStream());
+			is.setEncoding(input.getEncoding());
+			doc = docBuilder.parse(is);
 		}
 		catch ( SAXException e ) {
 			throw new OkapiIOException("Error when parsing the document.", e);

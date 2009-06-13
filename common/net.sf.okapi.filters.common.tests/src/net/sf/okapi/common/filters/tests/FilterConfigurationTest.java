@@ -16,6 +16,7 @@ import static org.junit.Assert.*;
 public class FilterConfigurationTest {
 
 	private FilterConfiguration fc1;
+	private FilterConfiguration fc2;
 	
 	@Before
 	public void setUp () throws Exception {
@@ -24,6 +25,12 @@ public class FilterConfigurationTest {
 			"net.sf.okapi.filters.xml.XMLFilter",
 			"Config1",
 			"Description for Config1.");
+		fc2 = new FilterConfiguration("config2",
+			MimeTypeMapper.PROPERTIES_MIME_TYPE,
+			"net.sf.okapi.filters.xml.XMLFilter",
+			"Config2",
+			"Description for Config2.");
+		fc2.custom = true;
 	}
 	
 	@Test
@@ -47,12 +54,25 @@ public class FilterConfigurationTest {
 	@Test
 	public void clearConfigTest () {
 		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
+		fcm.addConfiguration(fc2);
 		fcm.addConfiguration(fc1);
-		FilterConfiguration res1 = fcm.getConfiguration(fc1.configId);
-		assertNotNull(res1);
+		assertNotNull(fcm.getConfiguration(fc1.configId));
+		assertNotNull(fcm.getConfiguration(fc2.configId));
 		fcm.clearConfigurations(false);
-		res1 = fcm.getConfiguration(fc1.configId);
-		assertNull(res1);
+		assertNull(fcm.getConfiguration(fc1.configId));
+		assertNull(fcm.getConfiguration(fc2.configId));
+	}
+
+	@Test
+	public void clearCustomConfigTest () {
+		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
+		fcm.addConfiguration(fc2); // Make sure custom is first
+		fcm.addConfiguration(fc1);
+		assertNotNull(fcm.getConfiguration(fc1.configId));
+		assertNotNull(fcm.getConfiguration(fc2.configId));
+		fcm.clearConfigurations(true);
+		assertNotNull(fcm.getConfiguration(fc1.configId));
+		assertNull(fcm.getConfiguration(fc2.configId));
 	}
 
 	@Test

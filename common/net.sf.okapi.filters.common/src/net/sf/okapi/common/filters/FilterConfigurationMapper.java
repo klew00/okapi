@@ -235,9 +235,12 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 
 	public void clearConfigurations (boolean customOnly) {
 		if ( customOnly ) {
-			for ( FilterConfiguration fc : configMap.values() ) {
-				if ( fc.custom ) {
-					configMap.remove(fc.configId);
+			Entry<String, FilterConfiguration> entry;
+			Iterator<Entry<String, FilterConfiguration>> iter = configMap.entrySet().iterator();
+			while ( iter.hasNext() ) {
+				entry = iter.next();
+				if ( entry.getValue().custom ) {
+					iter.remove();
 				}
 			}
 		}
