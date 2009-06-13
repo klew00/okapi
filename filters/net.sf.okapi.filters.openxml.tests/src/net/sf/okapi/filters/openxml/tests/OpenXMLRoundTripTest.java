@@ -78,8 +78,6 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("sample.pptx");
 		themfiles.add("sample.xlsx");
 		themfiles.add("sampleMore.xlsx");
-		themfiles.add("OpenXML_text_reference_document.docx");
-		themfiles.add("OpenXML_text_reference_v1_1.docx");
 		themfiles.add("OpenXML_text_reference_v1_2.docx");
 		themfiles.add("Mauris.docx");
 		themfiles.add("Hidden.docx");
