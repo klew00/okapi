@@ -27,7 +27,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -74,11 +73,11 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 
 	@Override
 	public boolean isDone () {
-		if ( !params.plainText ) {
-			return true;
-		}
-		else { // Expects RawDocument
+		if ( params.plainText ) { // Expects RawDocument
 			return isDone;
+		}
+		else { 
+			return true;
 		}
 	}
 	
@@ -94,7 +93,12 @@ public class SearchAndReplaceStep extends BasePipelineStep {
  
 	@Override
 	public boolean needsOutput (int inputIndex) {
-		return pipeline.isLastStep(this);
+		if ( params.plainText ) { // Expects RawDocument
+			return pipeline.isLastStep(this);
+		}
+		else {
+			return false;
+		}
 	}
 
 	
