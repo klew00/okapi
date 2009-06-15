@@ -351,10 +351,11 @@ public final class BOMNewlineEncodingDetector {
 	public void detectAndRemoveBom() {
 		try {
 			detectBomInternal();
-			if (hasBom()) {				
-				for (int i = 0; i < getBomSize(); i++) {
-					inputStream.read(); // read the byte to remove it
-				}				
+			if (hasBom()) {								
+					long skipped = inputStream.skip(getBomSize()); // skip bom bytes	
+					if (skipped != getBomSize()) {
+						throw new IOException("The number of bytes skipped is not equal to the expected BOM size");
+					}
 			}
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
@@ -392,7 +393,7 @@ public final class BOMNewlineEncodingDetector {
 					hasBom = true;
 					autodetected = true;
 					bomSize = 2;
-					return setEncoding(UTF_16, "UTF-16 big-endian Byte Order Mark (FE FF)");
+					return setEncoding(UTF_16BE, "UTF-16 big-endian Byte Order Mark (FE FF)");
 				}
 			} else if (b1 == 0xFF) {
 				if (b2 == 0xFE) {
@@ -400,19 +401,19 @@ public final class BOMNewlineEncodingDetector {
 						hasBom = true;
 						autodetected = true;
 						bomSize = 4;
-						return setEncoding(UTF_32, "UTF-32 little-endian Byte Order Mark (FF EE 00 00)");
+						return setEncoding(UTF_32LE, "UTF-32 little-endian Byte Order Mark (FF EE 00 00)");
 					}
 					hasBom = true;
 					autodetected = true;
 					bomSize = 2;
-					return setEncoding(UTF_16, "UTF-16 little-endian Byte Order Mark (FF EE)");
+					return setEncoding(UTF_16LE, "UTF-16 little-endian Byte Order Mark (FF EE)");
 				}
 			} else if (b1 == 0) {
 				if (b2 == 0 && b3 == 0xFE && b4 == 0xFF) {
 					hasBom = true;
 					autodetected = true;
 					bomSize = 4;
-					return setEncoding(UTF_32, "UTF-32 big-endian Byte Order Mark (00 00 FE FF)");
+					return setEncoding(UTF_32BE, "UTF-32 big-endian Byte Order Mark (00 00 FE FF)");
 				}
 			} else if (b1 == 0x0E) {
 				if (b2 == 0xFE && b3 == 0xFF) {

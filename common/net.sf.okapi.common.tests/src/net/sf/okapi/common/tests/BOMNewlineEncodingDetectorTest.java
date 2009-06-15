@@ -48,8 +48,8 @@ public class BOMNewlineEncodingDetectorTest {
 	
 	@Test
 	public void isDefinitve() throws IOException {
-		InputStream is = new ByteArrayInputStream(DEFINITIVE.getBytes("UTF-16"));
-		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(is, "UTF-16");
+		InputStream is = new ByteArrayInputStream(DEFINITIVE.getBytes("UTF-16LE"));
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(is, "UTF-16LE");
 		assertTrue(detector.isDifinitive());
 		
 		is = new ByteArrayInputStream(NON_DEFINITIVE.getBytes("UTF-8"));
@@ -67,6 +67,7 @@ public class BOMNewlineEncodingDetectorTest {
 		
 		is = new ByteArrayInputStream(NON_DEFINITIVE.getBytes("UTF-8"));
 		detector = new BOMNewlineEncodingDetector(is, "UTF-8");
+		detector.detectBom();
 		assertFalse(detector.hasBom());
 	}
 	
@@ -86,5 +87,16 @@ public class BOMNewlineEncodingDetectorTest {
 		detector.detectBom();
 		assertTrue(detector.hasBom());
 		assertTrue(detector.hasUtf7Bom());
+	}
+	
+	@Test
+	public void removeBom() throws IOException {
+		InputStream is = new ByteArrayInputStream(DEFINITIVE.getBytes("UTF-16LE"));
+		BOMNewlineEncodingDetector detector1 = new BOMNewlineEncodingDetector(is);
+		detector1.detectAndRemoveBom();
+		
+		BOMNewlineEncodingDetector detector2 = new BOMNewlineEncodingDetector(is);
+		detector2.detectBom();
+		assertFalse(detector2.hasBom());		
 	}
 }
