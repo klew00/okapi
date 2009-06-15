@@ -26,11 +26,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
@@ -149,8 +152,13 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		
 		try {
 			rawDoc = (RawDocument)event.getResource();
-			encoding = rawDoc.getEncoding();
-			reader = new BufferedReader(rawDoc.getReader());
+			
+			// Detect the BOM (and the encoding) if possible
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rawDoc.getStream(), rawDoc.getEncoding());
+			detector.detectAndRemoveBom();
+			encoding = detector.getEncoding();
+			// Create the reader from the BOM-aware stream, with the possibly new encoding
+			reader = new BufferedReader(new InputStreamReader(detector.getInputStream(), encoding));
 			
 	        char[] buf = new char[1024];
 	        int numRead=0;
@@ -195,13 +203,13 @@ public class SearchAndReplaceStep extends BasePipelineStep {
         	}
 			
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), encoding));
-			Util.writeBOMIfNeeded(writer, true, encoding);
+			Util.writeBOMIfNeeded(writer, detector.hasUtf8Bom(), encoding);
+
 			writer.write(result);
-			
 			writer.close();
-			reader.close();
 			
-			event.setResource(new RawDocument(outFile.toURI(),rawDoc.getEncoding(),rawDoc.getSourceLanguage(),rawDoc.getTargetLanguage()));
+			event.setResource(new RawDocument(outFile.toURI(), encoding,
+				rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
 		}
 		catch ( FileNotFoundException e ) {
 			throw new RuntimeException(e);

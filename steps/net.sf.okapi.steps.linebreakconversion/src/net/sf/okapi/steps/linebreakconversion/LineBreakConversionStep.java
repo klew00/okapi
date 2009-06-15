@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
@@ -91,7 +92,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rawDoc.getStream(), rawDoc.getEncoding());
 			detector.detectAndRemoveBom();
 			rawDoc.setEncoding(detector.getEncoding());
-			reader = new BufferedReader(rawDoc.getReader());
+			reader = new BufferedReader(new InputStreamReader(detector.getInputStream(), rawDoc.getEncoding()));
 			
 			// Open the output
 			File outFile;

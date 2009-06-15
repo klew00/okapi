@@ -131,7 +131,8 @@ public class XSLTransformStep extends BasePipelineStep {
 			}
 			
 			// Create the input source
-			Source xmlInput = new javax.xml.transform.stream.StreamSource(rawDoc.getReader());
+			// Use the stream, so the encoding auto-detection can be done
+			Source xmlInput = new javax.xml.transform.stream.StreamSource(rawDoc.getStream());
 			
 			// Create the output
 			File outFile;

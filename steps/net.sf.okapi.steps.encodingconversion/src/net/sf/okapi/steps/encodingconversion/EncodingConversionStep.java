@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -47,6 +48,7 @@ import net.sf.okapi.common.resource.RawDocument;
 public class EncodingConversionStep extends BasePipelineStep {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
+	private static final int MAXBUF = 1024;
 
 	private Parameters params;
 	private String outFormat;
@@ -99,7 +101,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 
 	@Override
 	protected void handleStartBatch (Event event) {
-		buffer = CharBuffer.allocate(1024);
+		buffer = CharBuffer.allocate(MAXBUF);
 		// Pre-compile the patterns for declaration detection
 		xmlEncDecl = Pattern.compile("((<\\?xml)(.*?)(encoding(\\s*?)=(\\s*?)(\\'|\\\")))", Pattern.DOTALL);
 		xmlDecl = Pattern.compile("((<\\?xml)(.*?)(version(\\s*?)=(\\s*?)(\\'|\\\")))", Pattern.DOTALL);
@@ -175,13 +177,25 @@ public class EncodingConversionStep extends BasePipelineStep {
 				isXML = ext.equalsIgnoreCase(".xml");
 			}
 			
-			// Try to auto-detect the encoding for HTML/XML
 			String outputEncoding = getContext().getOutputEncoding(0);
 			
-			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rawDoc.getStream(), rawDoc.getEncoding());
-			detector.detectAndRemoveBom();
-			rawDoc.setEncoding(detector.getEncoding());
+			//=== Try to detect the encoding
 			
+			InputStream is = rawDoc.getStream();
+			if ( is.markSupported() ) {
+				// First: guess from a possible BOM
+				BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(is, rawDoc.getEncoding());
+				detector.detectAndRemoveBom();
+				rawDoc.setEncoding(detector.getEncoding());
+				
+				// Then try to detect internal declaration
+				
+//				is.mark(MAXBUF);
+				
+				
+			}
+			
+			// Then try internal detection for XML/HTML type files
 			reader = new BufferedReader(rawDoc.getReader());
 			String inputEncoding = rawDoc.getEncoding();
 			reader.read(buffer);
@@ -191,7 +205,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			}
 			reader.close();
 
-			// Open the input document
+			// Open the input document 
 			//TODO: Where did we reset the reader - cann't call this twice unless we reset it
 			reader = new BufferedReader(rawDoc.getReader());
 			logger.info("Input encoding: " + inputEncoding);
