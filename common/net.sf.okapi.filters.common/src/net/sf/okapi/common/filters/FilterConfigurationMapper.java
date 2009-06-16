@@ -65,11 +65,11 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		catch ( ClassNotFoundException e ) {
 			throw new OkapiFilterCreationException("Cannot instantiate filter.", e);
 		}
-		// Get the available configurations for thsi filter
+		// Get the available configurations for this filter
 		List<FilterConfiguration> list = filter.getConfigurations();
 		// Add the configurations to the mapper
 		for ( FilterConfiguration config : list ) {
-			addConfiguration(config);
+			configMap.put(config.configId, config);
 		}
 	}
 
@@ -119,6 +119,40 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return filter;
 	}
 
+	public IParameters getParameters (FilterConfiguration config) {
+		return getParameters(config, null);
+	}
+	
+	public IParameters getParameters (FilterConfiguration config,
+		IFilter existingFilter)
+	{
+		if ( config.parameters == null ) return null; // Nothing to load
+		
+		IFilter filter = instantiateFilter(config, existingFilter);
+		IParameters params = filter.getParameters();
+		if ( params == null ) {
+			throw new RuntimeException(String.format(
+				"Cannot create default parameters for '%s'.", config.configId));
+		}
+		if ( config.custom ) {
+			params = getCustomParameters(config, filter);
+		}
+		else {
+			// Note that we cannot assume the parameters are the same
+			// if we re-used an existing filter, as we cannot compare the 
+			// configuration identifiers
+			URL url = filter.getClass().getResource(config.parameters);
+			try {
+				params.load(url.toURI(), false);
+			}
+			catch ( URISyntaxException e ) {
+				throw new RuntimeException(String.format(
+					"URI syntax error '%s'.", url.getPath()));
+			}
+		}
+		return params;
+	}
+	
 	@Override
 	public IParametersEditor createParametersEditor (String configId) {
 		return createParametersEditor(configId, null);
@@ -167,11 +201,27 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return configMap.get(configId);
 	}
 
-	public List<FilterConfiguration> getConfigurations (String mimeType) {
+	public Iterator<FilterConfiguration> getAllConfigurations () {
+		return configMap.values().iterator();
+	}
+	
+	public List<FilterConfiguration> getMimeConfigurations (String mimeType) {
 		ArrayList<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		for ( FilterConfiguration config : configMap.values() ) {
 			if ( config.mimeType != null ) {
 				if ( config.equals(mimeType) ) {
+					list.add(config);
+				}
+			}
+		}
+		return list;
+	}
+
+	public List<FilterConfiguration> getFilterConfigurations(String filterClass) {
+		ArrayList<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		for ( FilterConfiguration config : configMap.values() ) {
+			if ( config.filterClass != null ) {
+				if ( config.equals(filterClass) ) {
 					list.add(config);
 				}
 			}
@@ -231,6 +281,19 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		File file = new File(config.parameters);
 		params.load(file.toURI(), false);
 		return params;
+	}
+
+	public void deleteCustomParameters (FilterConfiguration config) {
+		// In this implementation we assume it is in the current directory
+		File file = new File(config.parameters);
+		file.delete();
+	}
+
+	public void saveCustomParameters (FilterConfiguration config,
+		IParameters params)
+	{
+		// In this implementation we assume it is in the current directory
+		params.save(config.parameters);
 	}
 
 	public void clearConfigurations (boolean customOnly) {

@@ -42,11 +42,11 @@ public class FormatManager {
 		pairs.put(".idml", "okf_idml");
 		pairs.put(".po", "okf_po");
 		pairs.put(".pot", "okf_po");
-		pairs.put(".docx", "okf_msoffice");
-		pairs.put(".docm", "okf_msoffice");
-		pairs.put(".dotm", "okf_msoffice");
-		pairs.put(".xlsx", "okf_msoffice");
-		pairs.put(".pptx", "okf_msoffice");
+		pairs.put(".docx", "okf_openxml");
+		pairs.put(".docm", "okf_openxml");
+		pairs.put(".dotm", "okf_openxml");
+		pairs.put(".xlsx", "okf_openxml");
+		pairs.put(".pptx", "okf_openxml");
 		pairs.put(".odt", "okf_openoffice");
 		pairs.put(".ott", "okf_openoffice");
 		pairs.put(".sxw", "okf_openoffice");

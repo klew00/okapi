@@ -9,12 +9,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -75,7 +77,15 @@ public class TmxFilterTest {
 		testDriver.setShowSkeleton(true);
 	}
 	
-	//--methods--
+	@Test
+	public void testDefaultInfo () {
+		assertNotNull(filter.getParameters());
+		assertNotNull(filter.getName());
+		List<FilterConfiguration> list = filter.getConfigurations();
+		assertNotNull(list);
+		assertTrue(list.size()>0);
+	}
+
 	@Test
 	public void testGetName() {
 		assertEquals("okf_tmx", filter.getName());

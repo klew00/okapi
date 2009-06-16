@@ -26,6 +26,7 @@ class FilterAccessItem {
 	public String name;
 	public String inputFilterClass;
 	public String editorClass;
+	public String parametersClass;
 	public String description;
 	
 	@Override

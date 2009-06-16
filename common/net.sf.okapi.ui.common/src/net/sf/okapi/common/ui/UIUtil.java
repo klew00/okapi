@@ -153,7 +153,7 @@ public class UIUtil {
 	}
 
 	/**
-	 * Ensures that a control using GridData layout has a given minimum with.
+	 * Ensures that a control using GridData layout has a given minimum width.
 	 * @param control the control to adjust.
 	 * @param minimumWidth the minimum width to use.
 	 */
@@ -187,4 +187,36 @@ public class UIUtil {
 		edField.selectAll();
 		edField.setFocus();
 	}
+
+	/**
+	 * Ensures that several controls using GridData layout have the same width
+	 * that is either the minimum provided or the greatest width needed.
+	 * @param minimumWidth the minimum width to use.
+	 * @param controls the list of controls to set.
+	 */
+	public static void setSameWidth (int minimumWidth,
+		Control... controls)
+	{
+		// Compute the width to use
+		int min = minimumWidth;
+		Rectangle rect;
+		for ( Control control : controls ) {
+			control.pack();
+			rect = control.getBounds();
+			if ( rect.width > min ) {
+				min = rect.width;
+			}
+		}
+		// Set the optimal width
+		GridData gdTmp;
+		for ( Control control : controls ) {
+			gdTmp = (GridData)control.getLayoutData();
+			if ( gdTmp == null ) {
+				gdTmp = new GridData();
+				control.setLayoutData(gdTmp);
+			}
+			gdTmp.widthHint = min;
+		}
+	}
+	
 }

@@ -177,7 +177,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			}
 			else {
 				try {
-					outFile = File.createTempFile("okptmp_", ".snr");
+					outFile = File.createTempFile("okp-snr_", ".tmp");
 				}
 				catch ( Throwable e ) {
 					throw new OkapiIOException("Cannot create temporary output.", e);

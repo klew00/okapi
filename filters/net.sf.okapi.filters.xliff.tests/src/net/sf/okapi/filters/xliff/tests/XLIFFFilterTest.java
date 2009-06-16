@@ -22,10 +22,12 @@ package net.sf.okapi.filters.xliff.tests;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
@@ -51,6 +53,15 @@ public class XLIFFFilterTest {
 	public void setUp() {
 		filter = new XLIFFFilter();
 		fmt = new GenericContent();
+	}
+
+	@Test
+	public void testDefaultInfo () {
+		assertNotNull(filter.getParameters());
+		assertNotNull(filter.getName());
+		List<FilterConfiguration> list = filter.getConfigurations();
+		assertNotNull(list);
+		assertTrue(list.size()>0);
 	}
 
 	@Test

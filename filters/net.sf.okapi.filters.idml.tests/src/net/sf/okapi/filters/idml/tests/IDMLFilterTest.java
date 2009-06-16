@@ -20,12 +20,15 @@
 
 package net.sf.okapi.filters.idml.tests;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.filters.idml.IDMLFilter;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
@@ -40,6 +43,15 @@ public class IDMLFilterTest {
 	@Before
 	public void setUp() {
 		filter = new IDMLFilter();
+	}
+
+	@Test
+	public void testDefaultInfo () {
+		assertNotNull(filter.getParameters());
+		assertNotNull(filter.getName());
+		List<FilterConfiguration> list = filter.getConfigurations();
+		assertNotNull(list);
+		assertTrue(list.size()>0);
 	}
 
 	@Test

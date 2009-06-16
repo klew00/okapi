@@ -21,13 +21,16 @@
 package net.sf.okapi.filters.po.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
@@ -52,6 +55,15 @@ public class POFilterTest {
 	@Before
 	public void setUp() {
 		filter = new POFilter();
+	}
+
+	@Test
+	public void testDefaultInfo () {
+		assertNotNull(filter.getParameters());
+		assertNotNull(filter.getName());
+		List<FilterConfiguration> list = filter.getConfigurations();
+		assertNotNull(list);
+		assertTrue(list.size()>0);
 	}
 
 	@Test

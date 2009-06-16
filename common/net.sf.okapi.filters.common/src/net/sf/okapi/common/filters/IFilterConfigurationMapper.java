@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.filters;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.IParameters;
@@ -156,12 +157,31 @@ public interface IFilterConfigurationMapper {
 	public FilterConfiguration getDefaultConfiguration (String mimeType);
 	
 	/**
+	 * Gets an iterator on all configurations objects for this mapper.
+	 * @return an iterator on all configurations for this mapper.
+	 */
+	public Iterator<FilterConfiguration> getAllConfigurations ();
+	
+	/**
 	 * Gets a list of all FilterConfiguration objects for a given MIME type.
 	 * @param mimeType mimeType MIME type to search for.
 	 * @return a list of all FilterConfiguration objects found for the
-	 * given MIME type (it may be empty).
+	 * given MIME type (the list may be empty).
 	 */
-	public List<FilterConfiguration> getConfigurations (String mimeType);
+	public List<FilterConfiguration> getMimeConfigurations (String mimeType);
+
+	/**
+	 * Gets a list of all FilterConfiguration objects for a given filter class.
+	 * @param filterClass the class name of the filter to search for.
+	 * @return a list of all FilterConfiguration objects found for the
+	 * given filter class name (the list may be empty).
+	 */
+	public List<FilterConfiguration> getFilterConfigurations (String filterClass);
+
+	public IParameters getParameters (FilterConfiguration config);
+	
+	public IParameters getParameters (FilterConfiguration config,
+		IFilter existingFilter);
 
 	/**
 	 * Gets the parameters for a given custom filter configuration.
@@ -196,5 +216,9 @@ public interface IFilterConfigurationMapper {
 	 * could not be created to load the parameters.
 	 */
 	public IParameters getCustomParameters (FilterConfiguration config);
+
+	public void saveCustomParameters (FilterConfiguration config, IParameters params);
 	
+	public void deleteCustomParameters (FilterConfiguration config);
+
 }

@@ -37,7 +37,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 
-public class FilterMapper extends FilterConfigurationMapper {
+public class FilterConfigMapper extends FilterConfigurationMapper {
 
 	private String paramsFolder;
 	
@@ -77,7 +77,9 @@ public class FilterMapper extends FilterConfigurationMapper {
 				
 				node = list.item(i).getAttributes().getNamedItem("editorClass");
 				if ( node != null ) item.editorClass = Util.getTextContent(node);
-				node = list.item(i).getAttributes().getNamedItem("editorClass");
+
+				node = list.item(i).getAttributes().getNamedItem("parametersClass");
+				if ( node != null ) item.parametersClass = Util.getTextContent(node);
 
 				node = list.item(i).getAttributes().getNamedItem("name");
 				if ( node != null ) item.name = Util.getTextContent(node);
@@ -86,7 +88,11 @@ public class FilterMapper extends FilterConfigurationMapper {
 				item.description = Util.getTextContent(list.item(i));
 
 				// Add the default configurations
-				this.addConfigurations(item.inputFilterClass);
+				addConfigurations(item.inputFilterClass);
+				// Add the editor, if possible
+				if (( item.editorClass != null ) && ( item.parametersClass != null )) {
+					addEditor(item.editorClass, item.parametersClass);
+				}
 			}
 		}
 		catch ( IOException e ) {

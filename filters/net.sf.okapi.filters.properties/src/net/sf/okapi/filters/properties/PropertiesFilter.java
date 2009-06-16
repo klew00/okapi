@@ -118,7 +118,7 @@ public class PropertiesFilter implements IFilter {
 		list.add(new FilterConfiguration(getName(),
 			MimeTypeMapper.PROPERTIES_MIME_TYPE,
 			getClass().getName(),
-			"Properties",
+			"Java Properties",
 			"Java properties files"));
 		return list;
 	}

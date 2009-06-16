@@ -20,32 +20,48 @@
 
 package net.sf.okapi.filters.mif.tests;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert; 
 
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.mif.MIFFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 
 public class MIFFilterTest {
 	
+	private MIFFilter filter;
+	
 	@Before
 	public void setUp() {
+		filter = new MIFFilter();
+	}
+
+	@Test
+	public void testDefaultInfo () {
+		//Not using parameters yet: assertNotNull(filter.getParameters());
+		assertNotNull(filter.getName());
+		List<FilterConfiguration> list = filter.getConfigurations();
+		assertNotNull(list);
+		assertTrue(list.size()>0);
 	}
 
 	@Test
 	public void runTest () {
 		FilterTestDriver testDriver;
-		MIFFilter filter = null;		
+				
 		try {
 			testDriver = new FilterTestDriver();
 			testDriver.setShowSkeleton(false);
 			testDriver.setDisplayLevel(0);
-			filter = new MIFFilter();
 			URL url = MIFFilterTest.class.getResource("/Test01.mif");
 			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();

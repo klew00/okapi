@@ -20,14 +20,20 @@
 
 package net.sf.okapi.filters.openoffice.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
+import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
 
@@ -37,12 +43,34 @@ import org.junit.Test;
 public class OpenOfficeFilterTest {
 
 	private OpenOfficeFilter filter;
+	private String root;
 
 	@Before
 	public void setUp() {
 		filter = new OpenOfficeFilter();
+		URL url = OpenOfficeFilterTest.class.getResource("/TestDocument01.odt_content.xml");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 
+	@Test
+	public void testDefaultInfo () {
+		assertNotNull(filter.getParameters());
+		assertNotNull(filter.getName());
+		List<FilterConfiguration> list = filter.getConfigurations();
+		assertNotNull(list);
+		assertTrue(list.size()>0);
+	}
+
+	@Test
+	public void testFirstTextUnit () {
+		TextUnit tu = FilterTestDriver.getTextUnit(filter,
+			new InputDocument(root+"TestDocument01.odt", null),
+			"UTF-8", "en", "en", 1);
+		assertNotNull(tu);
+		assertEquals("Heading 1", tu.getSource().toString());
+	}
+	
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {
 		// Read all files in the data directory

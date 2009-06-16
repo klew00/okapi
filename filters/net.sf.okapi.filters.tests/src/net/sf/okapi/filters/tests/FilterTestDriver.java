@@ -22,6 +22,7 @@ package net.sf.okapi.filters.tests;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,8 +30,10 @@ import java.util.Set;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Code;
@@ -38,6 +41,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -577,6 +581,50 @@ public class FilterTestDriver {
 		}
 		writer.close();
 		return tmp.toString();
+	}
+
+	public static TextUnit getTextUnit (IFilter filter,
+		InputDocument doc,
+		String defaultEncoding,
+		String srcLang,
+		String trgLang,
+		int tuNumber)
+	{
+		try {
+			// Load parameters if needed
+			if  (doc.paramFile == null  || doc.paramFile == "")  {
+				IParameters params = filter.getParameters();
+				if ( params != null ) params.reset();
+			}
+			else {
+				String root = Util.getDirectoryName(doc.path);
+				IParameters params = filter.getParameters();
+				if ( params != null ) params.load(Util.toURI(root+"/"+doc.paramFile), false);
+			}
+			
+			// Open the input
+			int num = 0;
+			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLang, trgLang));
+			// Process the document
+			Event event;
+			while ( filter.hasNext() ) {
+				event = filter.next();
+				switch ( event.getEventType() ) {
+				case TEXT_UNIT:
+					if ( ++num == tuNumber ) {
+						return (TextUnit)event.getResource();
+					}
+					break;
+				}
+			}
+		}
+		catch ( Throwable e ) {
+			System.err.println(e.getMessage());
+		}
+		finally {
+			if ( filter != null ) filter.close();
+		}
+		return null;
 	}
 
 	/**

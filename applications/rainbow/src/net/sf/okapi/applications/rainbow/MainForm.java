@@ -34,7 +34,8 @@ import java.util.logging.Logger;
 import net.sf.okapi.applications.rainbow.lib.EncodingItem;
 import net.sf.okapi.applications.rainbow.lib.EncodingManager;
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
-import net.sf.okapi.applications.rainbow.lib.FilterMapper;
+import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
+import net.sf.okapi.applications.rainbow.lib.FilterConfigMapperDialog;
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.lib.LanguageItem;
@@ -145,6 +146,7 @@ public class MainForm implements IParametersProvider {
 	private boolean inTargetEncSelection;
 	private Button chkUseCustomParametersFolder;
 	private Text edParamsFolder;
+	private boolean mapperNeedsUpdate;
 	private Button btGetParamsFolder; 
 	private TabItem tiInputList1;
 	private TabItem tiInputList2;
@@ -157,7 +159,7 @@ public class MainForm implements IParametersProvider {
 	private ResourceManager rm;
 	private FormatManager fm;
 	private FilterAccess fa;
-	private FilterMapper fcMapper;
+	private FilterConfigMapper fcMapper;
 	private EncodingManager em;
 	private PluginsAccess plugins;
 	private UtilityDriver ud;
@@ -259,6 +261,11 @@ public class MainForm implements IParametersProvider {
 		fa.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 		// Define default editor, if none, the fall back for .txt will be used.
 		fa.setDefaultEditor(config.getProperty("defaultEditor")); //$NON-NLS-1$
+		
+		fcMapper = new FilterConfigMapper();
+		// Get pre-defined configurations
+		fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
+		mapperNeedsUpdate = true;
 		
 		// Toolbar
 		createToolbar();
@@ -520,6 +527,16 @@ public class MainForm implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				showCharInfo();
+			}
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.filterconfigurations"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				filterConfigurations();
 			}
 		});
 
@@ -983,6 +1000,7 @@ public class MainForm implements IParametersProvider {
 				btGetParamsFolder.setEnabled(chkUseCustomParametersFolder.getSelection());
 				edParamsFolder.setEditable(chkUseCustomParametersFolder.getSelection());
 				edParamsFolder.setText(prj.getParametersFolder(chkUseCustomParametersFolder.getSelection(), true));
+				mapperNeedsUpdate = true;
             }
 		});
 	
@@ -1150,6 +1168,7 @@ public class MainForm implements IParametersProvider {
 			edParamsFolder.setText(dir);
 			edParamsFolder.selectAll();
 			edParamsFolder.setFocus();
+			mapperNeedsUpdate = true;
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -1160,8 +1179,9 @@ public class MainForm implements IParametersProvider {
 		try {
 			// Save any pending data
 			saveSurfaceData();
+			updateCustomConfigurations();
 			if ( wrapper == null ) {
-				createPipelineWrapper();
+				wrapper = new PipelineWrapper(fcMapper);
 			}
 			PipelineEditor dlg = new PipelineEditor();
 			if ( !dlg.edit(shell, wrapper.availableSteps, wrapper, null, null) ) {
@@ -1169,20 +1189,22 @@ public class MainForm implements IParametersProvider {
 			}
 			// Else: execute
 			startWaiting(Res.getString("MainForm.startWaiting"), true); //$NON-NLS-1$
-			
 			// Get the latest custom configurations
-			// Get the latest custom configurations
-			fcMapper.setParametersFolder(prj.getParametersFolder());
-			fcMapper.updateCustomConfigurations();
-
 			wrapper.execute(prj);
 		}
 		catch ( Exception e ) {
 			log.error(e.getMessage());
-			e.printStackTrace();
 		}
 		finally {
 			stopWaiting();
+		}
+	}
+
+	private void updateCustomConfigurations () {
+		if ( mapperNeedsUpdate ) {
+			fcMapper.setParametersFolder(prj.getParametersFolder());
+			fcMapper.updateCustomConfigurations();
+			mapperNeedsUpdate = false;
 		}
 	}
 	
@@ -1697,15 +1719,6 @@ public class MainForm implements IParametersProvider {
 		resetDisplay(-1);
 	}
 	
-	private void createPipelineWrapper () {
-		if ( fcMapper == null ) {
-			fcMapper = new FilterMapper();
-			// Get pre-defined configurations
-			fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
-		}
-		wrapper = new PipelineWrapper(fcMapper);
-	}
-	
 	private void openProject (String path) {
 		try {
 			if ( !canContinue() ) return;
@@ -1727,6 +1740,8 @@ public class MainForm implements IParametersProvider {
 			// Load it and update the UI
 			prj = new Project(lm);
 			prj.load(path);
+			mapperNeedsUpdate = true;
+
 			mruList.add(path);
 			updateMRU();
 			resetDisplay(-1);
@@ -1863,6 +1878,7 @@ public class MainForm implements IParametersProvider {
 					edParamsFolder.setText(root);
 					prj.setCustomParametersFolder(root);
 					prj.setUseCustomParametersFolder(true);
+					mapperNeedsUpdate = true;
 					resetDisplay(currentInput);
 				}
 				
@@ -2019,6 +2035,17 @@ public class MainForm implements IParametersProvider {
 		}
 		finally {
 			if ( dlg != null ) dlg.dispose();
+		}
+	}
+	
+	private void filterConfigurations () {
+		try {
+			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell);
+			updateCustomConfigurations();
+			dlg.showDialog(fcMapper);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 	
