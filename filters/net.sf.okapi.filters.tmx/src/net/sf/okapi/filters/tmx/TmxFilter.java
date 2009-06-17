@@ -79,6 +79,9 @@ public class TmxFilter implements IFilter {
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	
+	private boolean skipUtWarning;
+	
+	
 	public enum TuvXmlLang {UNDEFINED,SOURCE,TARGET,OTHER}
 	private TuvXmlLang tuvTrgType = TuvXmlLang.UNDEFINED;
 
@@ -89,9 +92,9 @@ public class TmxFilter implements IFilter {
 	public TmxFilter () {
 		params = new Parameters();
 		
-		rulesMap.put("<seg>", "<bpt><ept><it><ph><hi>");
-		rulesMap.put("<sub>", "<bpt><ept><it><ph><hi>");
-		rulesMap.put("<hi>", "<bpt><ept><it><ph><hi>");
+		rulesMap.put("<seg>", "<bpt><ept><it><ph><hi><ut>");
+		rulesMap.put("<sub>", "<bpt><ept><it><ph><hi><ut>");
+		rulesMap.put("<hi>", "<bpt><ept><it><ph><hi><ut>");
 		rulesMap.put("<bpt>","<sub>");
 		rulesMap.put("<ept>","<sub>");
 		rulesMap.put("<it>","<sub>");
@@ -259,6 +262,7 @@ public class TmxFilter implements IFilter {
 			otherId = 0;			
 			hasNext=true;
 			queue = new LinkedList<Event>();
+			skipUtWarning = false;
 			
 			//--attempt encoding detection--
 			//if(reader.getEncoding()!=null){
@@ -562,6 +566,11 @@ public class TmxFilter implements IFilter {
 					if(!isValidElement(elemStack.peek(),curLocalName,true)){
 						//--throws OkapiBadFilterInputException if not valid--
 					}
+					
+					if(curLocalName.equals("ut") && !skipUtWarning){
+						logger.warning("<ut> is been DEPRECATED in tmx 1.4.");
+						skipUtWarning=true;
+					}
 			
 					elemStack.push(curLocalName);
 					
@@ -569,7 +578,7 @@ public class TmxFilter implements IFilter {
 						if(curLocalName.equals("hi")){
 							String typeAttr = getTypeAttribute();
 							tc.append(TagType.OPENING, ((typeAttr!=null) ? typeAttr : "hi"),"<hi>");	
-						}else if(curLocalName.equals("ph") || curLocalName.equals("it")){
+						}else if(curLocalName.equals("ph") || curLocalName.equals("it") || curLocalName.equals("ut")){
 							appendCode(TagType.PLACEHOLDER, ++id, curLocalName, curLocalName, tc);
 						}else if(curLocalName.equals("bpt")){
 							appendCode(TagType.OPENING, ++id, curLocalName,"Xpt", tc);
@@ -737,6 +746,10 @@ public class TmxFilter implements IFilter {
 						//--throws OkapiBadFilterInputException if not valid--
 					}
 					
+					if(localName.equals("ut") && !skipUtWarning){
+						logger.warning("<ut> is been DEPRECATED in tmx 1.4.");
+						skipUtWarning=true;
+					}
 					elemStack.push(localName);
 
 					//--warn about subflow--

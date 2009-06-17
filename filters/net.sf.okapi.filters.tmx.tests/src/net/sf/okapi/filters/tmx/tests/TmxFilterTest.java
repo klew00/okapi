@@ -69,6 +69,17 @@ public class TmxFilterTest {
 		+ "<tuv xml:lang=\"it\"><seg>Buongiorno</seg></tuv>"
 		+ "</tu></body></tmx>\r";
 	
+	String utSnippetInSeg = "<?xml version=\"1.0\"?>\r"
+		+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello <ut>Ut Content</ut> Universe!</seg></tuv></tu></body></tmx>\r";
+
+	String utSnippetInSub = "<?xml version=\"1.0\"?>\r"
+		+ "<!-- document level comment --><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello <ph type=\"fnote\">Before Sub\"<sub>Hello <ut> ut content </ut> Subflow. </sub>After Sub</ph>Universe!</seg></tuv></tu></body></tmx>\r";
+
+	String utSnippetInHi = "<?xml version=\"1.0\"?>\r"
+		+ "<!-- document level comment --><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello <hi type=\"fnote\">Start hi <ut> ut content </ut> End hi.</hi>Universe!</seg></tuv></tu></body></tmx>\r";
+	
+	
+	
 	@Before
 	public void setUp() {
 		filter = new TmxFilter();
@@ -269,6 +280,24 @@ public class TmxFilterTest {
 		assertTrue(tu.hasTarget("fr"));
 		assertEquals("Salut", tu.getTarget("fr").toString());
 	}
+	
+	@Test
+	public void testUtInSeg () {
+		FilterTestDriver.getStartDocument(getEvents(utSnippetInSeg, "en-us","fr-fr"));
+	}
+
+	@Test
+	public void testUtInSub () {
+		FilterTestDriver.getStartDocument(getEvents(utSnippetInSub, "en-us","fr-fr"));
+	}
+
+	@Test
+	public void testUtInHi () {
+		FilterTestDriver.getStartDocument(getEvents(utSnippetInHi, "en-us","fr-fr"));
+	}
+
+		
+
 	
 /*	@Test
 	public void runTest () {

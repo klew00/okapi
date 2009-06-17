@@ -15,8 +15,8 @@
 <prop type="Txt::FileName">StringInfoForTest3.info</prop>
 <prop type="Txt::GroupName">APCCalibrateTimeoutAction0</prop>
 <prop type="Att::Test">TestValue</prop>
-<tuv xml:lang="en-us"><seg>Touch Retry to resume the procedure.</seg></tuv>
-<tuv xml:lang="de-de"><seg>Zur Fortsetzung des Verfahrens &apos;Wiederholen&apos; drücken.</seg></tuv>
+<tuv xml:lang="en-us"><seg>Touch Retry to <ut> ut content en</ut>resume the procedure.</seg></tuv>
+<tuv xml:lang="de-de"><seg>Zur Fortsetzung <ut> ut content de</ut>des Verfahrens &apos;Wiederholen&apos; drücken.</seg></tuv>
 </tu>
 <tu tuid="APCCalibrateTimeoutAction1">
 <prop type="Txt::FileName">StringInfoForTest3.info</prop>
