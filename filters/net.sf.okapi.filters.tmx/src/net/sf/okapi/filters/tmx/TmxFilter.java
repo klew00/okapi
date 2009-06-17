@@ -571,9 +571,8 @@ public class TmxFilter implements IFilter {
 						logger.warning("<ut> is been DEPRECATED in tmx 1.4.");
 						skipUtWarning=true;
 					}
-			
 					elemStack.push(curLocalName);
-					
+										
 					if(tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
 						if(curLocalName.equals("hi")){
 							String typeAttr = getTypeAttribute();
@@ -673,7 +672,6 @@ public class TmxFilter implements IFilter {
 					if(curLocalName.equalsIgnoreCase("tu")){
 						
 						tmxTu.parseEndElement(reader);
-						//System.out.println(tmxTu.toString());
 						
 						tuId = tmxTu.addPrimaryTextUnitEvent(tuId, params.processAllTargets, queue);
 						tuId = tmxTu.addDuplicateTextUnitEvents(tuId, params.processAllTargets, queue);
@@ -793,7 +791,7 @@ public class TmxFilter implements IFilter {
 					elemStack.pop();
 					
 					//--completed the original placeholder/code and back up to the <seg> level--
-					if ( tagName.equals(reader.getLocalName()) && (elemStack.peek().equals("seg"))) {
+					if ( tagName.equals(reader.getLocalName()) && ((elemStack.peek().equals("seg"))|| (elemStack.peek().equals("hi")) )) {
 
 						Code code = content.append(tagType, type, innerCode.toString(), id);
 						outerCode.append("</"+tagName+">");
