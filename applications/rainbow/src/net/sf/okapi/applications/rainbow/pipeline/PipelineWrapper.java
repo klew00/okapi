@@ -193,15 +193,19 @@ public class PipelineWrapper {
 			}
 			map.put(step.id, step);
 			
+
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.fullwidthconversion.FullWidthConversionStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(),
+				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
+				peMapper.addEditor("net.sf.okapi.steps.ui.fullwidthconversion.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
+			
 
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep").newInstance();

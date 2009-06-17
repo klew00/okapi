@@ -24,8 +24,8 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
-	protected boolean toHalfWidth;
-	protected boolean asciiOnly;
+	public boolean toHalfWidth;
+	public boolean asciiOnly;
 	
 	public Parameters () {
 		reset();

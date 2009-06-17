@@ -56,5 +56,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.xsltransform"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.segmentation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.table"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.fullwidthconversion"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
