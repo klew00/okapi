@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.lib;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,13 +41,15 @@ import net.sf.okapi.common.filters.IFilter;
 public class FilterConfigMapper extends FilterConfigurationMapper {
 
 	private String paramsFolder;
+	private ArrayList<FilterInfo> filters;
 	
 	/**
 	 * Loads the list of accessible filters.
 	 * The list is stored in an XML file of the following format:
 	 * <okapiFilters>
 	 *  <filter id="okf_regex"
-	 *   inputFilterClass="net.sf.okapi.filters.regex.Filter"
+	 *   inputFilterClass="net.sf.okapi.filters.regex.RegexFilter"
+	 *   parametersClass="net.sf.okapi.filters.regex.Parameters"
 	 *   editorClass="net.sf.okapi.filters.ui.regex.Editor"
 	 *  >Regular Expressions</filter>
 	 * </okapiFilters>
@@ -60,20 +63,24 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 			Document doc = Fact.newDocumentBuilder().parse(new File(p_sPath));
 			NodeList list = doc.getElementsByTagName("filter");
 			
-			// Clear all the data 
+			// Clear all the data
+			clearFilters();
 			clearEditors();
 			clearConfigurations(false);
 			
 			FilterAccessItem item;
+			FilterInfo info;
 			for ( int i=0; i<list.getLength(); i++ ) {
 				Node node = list.item(i).getAttributes().getNamedItem("id");
 				if ( node == null ) throw new RuntimeException("The attribute 'id' is missing.");
 				item = new FilterAccessItem();
 				item.id = Util.getTextContent(node);
-
+				info = new FilterInfo();
+				
 				node = list.item(i).getAttributes().getNamedItem("inputFilterClass");
 				if ( node == null ) throw new RuntimeException("The attribute 'inputFilterClass' is missing.");
 				item.inputFilterClass = Util.getTextContent(node);
+				info.filterClass = item.inputFilterClass;
 				
 				node = list.item(i).getAttributes().getNamedItem("editorClass");
 				if ( node != null ) item.editorClass = Util.getTextContent(node);
@@ -84,9 +91,13 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 				node = list.item(i).getAttributes().getNamedItem("name");
 				if ( node != null ) item.name = Util.getTextContent(node);
 				else item.name = item.id;
+				info.name = item.name;
 
 				item.description = Util.getTextContent(list.item(i));
+				info.description = item.description;
 
+				filters.add(info);
+				
 				// Add the default configurations
 				addConfigurations(item.inputFilterClass);
 				// Add the editor, if possible
@@ -104,6 +115,10 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 		catch ( SAXException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private void clearFilters () {
+		filters = new ArrayList<FilterInfo>();
 	}
 
 	public void setParametersFolder (String newFolder) {
@@ -147,8 +162,18 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 			addConfiguration(fc);
 		}
 	}
-	
 
+	public ArrayList<FilterInfo> getFilters () {
+		return filters;
+	}
+
+	public FilterInfo getFilterInfo (String filterClass) {
+		for ( FilterInfo info : filters ) {
+			if ( info.filterClass.equals(filterClass) ) return info;
+		}
+		return null;
+	}
+	
 	@Override
 	public IParameters getCustomParameters (FilterConfiguration config,
 		IFilter existingFilter)

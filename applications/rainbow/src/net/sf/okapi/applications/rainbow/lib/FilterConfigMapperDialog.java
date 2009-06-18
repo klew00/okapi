@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.lib;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsPanel;
 
@@ -40,8 +41,11 @@ public class FilterConfigMapperDialog {
 	private Shell shell;
 	private IFilterConfigurationMapper mapper;
 	private FilterConfigurationsPanel pnlConfigs;
+	private String result = null;
 
-	public FilterConfigMapperDialog (Shell parent) {
+	public FilterConfigMapperDialog (Shell parent,
+		boolean selectionMode)
+	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Filter Configurations");
 		UIUtil.inheritIcon(shell, parent);
@@ -54,18 +58,33 @@ public class FilterConfigMapperDialog {
 		// Dialog-level buttons
 		SelectionAdapter Actions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					//TODO: if ( help != null ) help.showTopic(this, "index", "inputDocProp.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					return;
 				}
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
+					result = pnlConfigs.getData(); 
+				}
 				shell.close();
 			};
 		};
-		ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, Actions, true);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
-		pnlActions.setLayoutData(gdTmp);
-		shell.setDefaultButton(pnlActions.btClose);
+		
+		if ( selectionMode ) {
+			OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, Actions, true, "Select");
+			pnlActions.btCancel.setText("Close");
+			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+			gdTmp.horizontalSpan = 2;
+			pnlActions.setLayoutData(gdTmp);
+			shell.setDefaultButton(pnlActions.btOK);
+		}
+		else {
+			ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, Actions, true);
+			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+			gdTmp.horizontalSpan = 2;
+			pnlActions.setLayoutData(gdTmp);
+			shell.setDefaultButton(pnlActions.btClose);
+		}
 		
 		shell.pack();
 		Rectangle Rect = shell.getBounds();
@@ -77,18 +96,17 @@ public class FilterConfigMapperDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
-	private void setData () {
-		pnlConfigs.setData(mapper);
-	}
-
-	public void showDialog (IFilterConfigurationMapper mapper) {
+	public String showDialog (IFilterConfigurationMapper mapper,
+		String configId)
+	{
 		this.mapper = mapper;
-		setData();
+		pnlConfigs.setData(mapper, configId);
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
+		return result;
 	}
 
 }

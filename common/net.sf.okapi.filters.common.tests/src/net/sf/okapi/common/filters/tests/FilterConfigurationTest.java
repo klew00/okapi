@@ -1,5 +1,7 @@
 package net.sf.okapi.common.filters.tests;
 
+import java.util.List;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.MimeTypeMapper;
@@ -49,6 +51,24 @@ public class FilterConfigurationTest {
 		FilterConfiguration cfg = fcm.getDefaultConfiguration("text/x-regex");
 		assertNotNull(cfg);
 		assertEquals("okf_regex", cfg.configId);
+	}
+
+	@Test
+	public void getFilterConfigTest () {
+		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
+		fcm.addConfiguration(fc1);
+		List<FilterConfiguration> list = fcm.getFilterConfigurations(fc1.filterClass);
+		assertNotNull(list);
+		assertEquals(1, list.size());
+	}
+
+	@Test
+	public void getMimeConfigTest () {
+		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
+		fcm.addConfiguration(fc1);
+		List<FilterConfiguration> list = fcm.getMimeConfigurations(fc1.mimeType);
+		assertNotNull(list);
+		assertEquals(1, list.size());
 	}
 
 	@Test

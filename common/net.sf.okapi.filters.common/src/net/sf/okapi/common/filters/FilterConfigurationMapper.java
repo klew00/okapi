@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
@@ -39,6 +40,8 @@ import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
  * Default implementation of the {@link IFilterConfigurationMapper} interface.
  */
 public class FilterConfigurationMapper extends ParametersEditorMapper implements IFilterConfigurationMapper {
+
+	private static final Logger LOGGER = Logger.getLogger(FilterConfigurationMapper.class.getName());
 
 	private LinkedHashMap<String, FilterConfiguration> configMap;
 	
@@ -67,8 +70,25 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		}
 		// Get the available configurations for this filter
 		List<FilterConfiguration> list = filter.getConfigurations();
+		if (( list == null ) || ( list.size() == 0 )) {
+			LOGGER.warning(String.format("No configuration provided for '%s'", filterClass));
+		}
 		// Add the configurations to the mapper
 		for ( FilterConfiguration config : list ) {
+			if ( config.filterClass == null ) {
+				LOGGER.warning(String.format("Configuration without filter class name in '%s'", config.toString()));
+				config.filterClass = filterClass;
+			}
+			if ( config.name == null ) {
+				LOGGER.warning(String.format("Configuration without name in '%s'", config.toString()));
+				config.name = config.toString();
+			}
+			if ( config.description == null ) {
+				if ( config.description == null ) {
+					LOGGER.warning(String.format("Configuration without description in '%s'", config.toString()));
+					config.description = config.toString();
+				}
+			}
 			configMap.put(config.configId, config);
 		}
 	}
@@ -209,7 +229,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		ArrayList<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		for ( FilterConfiguration config : configMap.values() ) {
 			if ( config.mimeType != null ) {
-				if ( config.equals(mimeType) ) {
+				if ( config.mimeType.equals(mimeType) ) {
 					list.add(config);
 				}
 			}
@@ -221,7 +241,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		ArrayList<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		for ( FilterConfiguration config : configMap.values() ) {
 			if ( config.filterClass != null ) {
-				if ( config.equals(filterClass) ) {
+				if ( config.filterClass.equals(filterClass) ) {
 					list.add(config);
 				}
 			}

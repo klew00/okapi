@@ -68,7 +68,7 @@
   
  <filter id="okf_plaintext"
   name="(BETA) Plain Text Filter"
-  inputFilterClass="net.sf.okapi.filters.plaintext.PlainTextFilter"
+  inputFilterClass="net.sf.okapi.filters.plaintext.base.BasePlainTextFilter"
  >Filter for plain text files.</filter>
   
  <filter id="okf_table"

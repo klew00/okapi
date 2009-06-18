@@ -1913,9 +1913,10 @@ public class MainForm implements IParametersProvider {
 				table.getItem(n).getText(0));
 
 			// Call the dialog
-			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, this, prj.getProjectFolder());
+			updateCustomConfigurations();
+			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, this, fcMapper, prj.getProjectFolder());
 			dlg.setData(inp.filterSettings, inp.sourceEncoding,
-				inp.targetEncoding, fa);
+				inp.targetEncoding, fa, fcMapper);
 			String[] aRes = dlg.showDialog();
 			if ( aRes == null ) return;
 
@@ -2040,9 +2041,9 @@ public class MainForm implements IParametersProvider {
 	
 	private void filterConfigurations () {
 		try {
-			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell);
+			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false);
 			updateCustomConfigurations();
-			dlg.showDialog(fcMapper);
+			dlg.showDialog(fcMapper, null);
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

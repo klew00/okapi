@@ -21,6 +21,8 @@
 package net.sf.okapi.applications.rainbow;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
+import net.sf.okapi.applications.rainbow.lib.FilterConfigSelectionPanel;
 import net.sf.okapi.applications.rainbow.lib.FilterSettingsPanel;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParametersProvider;
@@ -31,6 +33,7 @@ import net.sf.okapi.common.ui.UIUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -46,19 +49,21 @@ class InputPropertiesForm {
 	private Text edTrgEncoding;
 	private String[] results;
 	private OKCancelPanel pnlActions;
-	private FilterSettingsPanel pnlFilterSettings;
+//	private FilterSettingsPanel pnlFilterSettings;
+	private FilterConfigSelectionPanel pnlFilterConfigSelection;
 	private IHelp help;
 	private String oldData;
 
-	InputPropertiesForm (Shell p_Parent,
+	InputPropertiesForm (Shell parent,
 		IHelp helpParam,
 		IParametersProvider paramsProv,
+		FilterConfigMapper fcMapper,
 		String projectDir)
 	{
 		help = helpParam;
-		shell = new Shell(p_Parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText(Res.getString("INPROP_CAPTION")); //$NON-NLS-1$
-		UIUtil.inheritIcon(shell, p_Parent);
+		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 		
 		Group grpTmp = new Group(shell, SWT.NONE);
@@ -66,9 +71,14 @@ class InputPropertiesForm {
 		grpTmp.setLayout(new GridLayout(1, false));
 		grpTmp.setText(Res.getString("INPROP_GRPPARAMS")); //$NON-NLS-1$
 
-		pnlFilterSettings = new FilterSettingsPanel(grpTmp, help, SWT.NONE, paramsProv, projectDir);
+/*		pnlFilterSettings = new FilterSettingsPanel(grpTmp, help, SWT.NONE, paramsProv, projectDir);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		pnlFilterSettings.setLayoutData(gdTmp);
+*/		
+		pnlFilterConfigSelection = new FilterConfigSelectionPanel(grpTmp, help,
+			SWT.NONE, fcMapper, projectDir);
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		pnlFilterConfigSelection.setLayoutData(gdTmp);
 		
 		grpTmp = new Group(shell, SWT.NONE);
 		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -115,7 +125,10 @@ class InputPropertiesForm {
 		shell.pack();
 		Rectangle Rect = shell.getBounds();
 		shell.setMinimumSize(Rect.width, Rect.height);
-		Dialogs.centerWindow(shell, p_Parent);
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.y < 450 ) startSize.y = 450;
+		shell.setSize(startSize);
+		Dialogs.centerWindow(shell, parent);
 	}
 	
 	String[] showDialog () {
@@ -130,10 +143,12 @@ class InputPropertiesForm {
 	void setData (String filterSettings,
 		String sourceEncoding,
 		String targetEncoding,
-		FilterAccess p_FA)
+		FilterAccess p_FA,
+		FilterConfigMapper fcMapper)
 	{
 		oldData = filterSettings + sourceEncoding + targetEncoding;
-		pnlFilterSettings.setData(filterSettings, p_FA);
+//x		pnlFilterSettings.setData(filterSettings, p_FA);
+		pnlFilterConfigSelection.setData(filterSettings, fcMapper);
 		edSrcEncoding.setText(sourceEncoding);
 		edTrgEncoding.setText(targetEncoding);
 	}
@@ -141,7 +156,8 @@ class InputPropertiesForm {
 	private boolean saveData () {
 		try {
 			results = new String[4];
-			results[0] = pnlFilterSettings.getData();
+//x			results[0] = pnlFilterSettings.getData();
+			results[0] = pnlFilterConfigSelection.getData();
 			//TODO: Check if the parameters are still OK.
 			results[1] = edSrcEncoding.getText();
 			results[2] = edTrgEncoding.getText();
