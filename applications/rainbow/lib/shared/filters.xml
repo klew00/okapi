@@ -28,6 +28,8 @@
 <filter id="okf_openxml"
   name="(BETA) MS-Office 2007 Filter"
   inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
+  parametersClass="net.sf.okapi.filters.openxml.ConditionalParameters"
+  editorClass="net.sf.okapi.filters.ui.openxml.Editor"
  >Filter for Microsoft Office 2007 documents such as DOCX, XLSX, and PPTX.</filter>
  
  <filter id="okf_openxml"
