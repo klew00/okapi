@@ -29,10 +29,10 @@ package net.sf.okapi.filters.plaintext.spliced;
 public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	
 	/**
-	 * Char at the end of a line, signifying the line is continued on the next line (normally "\" or "_")<p>
+	 * Char at the end of a line, signifying the line is continued on the next line (normally "\" or "_"). Can be a custom string too.<p>
 	 * Default: \ (backslash)
 	 */
-	public char splicer = '\\'; 
+	public String splicer = "\\"; 
 	
 	/**
 	 * If in-line codes should be created for the dropped splicers and linebreaks of spliced lines
@@ -55,7 +55,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		super.reset();
 		
 		// All parameters are set to defaults here
-		splicer = '\\';
+		splicer = "\\";
 		createPlaceholders = true;
 	}
 
@@ -68,7 +68,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		buffer.fromString(data);
 		
 		// All parameters are retrieved here		
-		splicer = buffer.getString("splicer", "\\").charAt(0);
+		splicer = buffer.getString("splicer", "\\");
 		createPlaceholders = buffer.getBoolean("createPlaceholders", false);
 	}
 	
@@ -80,8 +80,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		super.toString(); // Will write to the same buffer
 		
 		// All parameters are set here
-		String st = "";
-		buffer.setString("splicer", st+= splicer);
+		buffer.setString("splicer", splicer);
 		buffer.setBoolean("createPlaceholders", createPlaceholders);
 		
 		return buffer.toString();

@@ -41,8 +41,24 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 public class CompoundFilter extends AbstractFilter {
 
 	private LinkedList<IFilter> subFilters = new LinkedList<IFilter>();
+	
 	private IFilter activeSubFilter = null;
+	
+	public IFilter getActiveSubFilter() {
 		
+		return activeSubFilter;
+	}
+
+	protected void setActiveSubFilter(IFilter activeSubFilter) {
+		
+		this.activeSubFilter = activeSubFilter;
+		
+		IParameters params = getParameters();
+		if (params instanceof CompoundParameters && activeSubFilter instanceof AbstractFilter)
+			((CompoundParameters) params).setActiveParameters(
+					((AbstractFilter) activeSubFilter).getParametersClassName());
+	}
+
 	protected boolean addSubFilter(Class<?> subFilterClass) {
 		
 		if (subFilters == null) return false;
@@ -69,7 +85,7 @@ public class CompoundFilter extends AbstractFilter {
 		}
 		
 		if (activeSubFilter == null)
-			activeSubFilter = curSubFilter;
+			activeSubFilter = curSubFilter; // The first non-empty registered one will become active
 				
 		return res;
 	}
@@ -81,6 +97,12 @@ public class CompoundFilter extends AbstractFilter {
 		
 		if (params == null && activeSubFilter != null)
 			activeSubFilter.setParameters(null);
+
+//		if (params instanceof CompoundFilterParameters) {
+//			
+//			((CompoundFilterParameters) params).filter = this;
+//			updateSubfilter();
+//		}
 	}
 	
 	public IParameters getActiveParameters() {
@@ -116,14 +138,16 @@ public class CompoundFilter extends AbstractFilter {
 		if (res && activeSubFilter != subFilter) {
 			
 			// Some finalization of the previous one might be needed
-			activeSubFilter = subFilter;
+			//activeSubFilter = subFilter;
+			
+			setActiveSubFilter(subFilter);
 		}
 		
 		return res;
 	}
 
 	/**
-	 * Finds the sub-filter, handling the given configuration.
+	 * Finds the sub-filter handling the given configuration.
 	 * @param configId configuration identifier
 	 * @return a sub-filter reference or null if the configuration is not supported by any sub-filter 
 	 */
@@ -148,6 +172,7 @@ public class CompoundFilter extends AbstractFilter {
 	 */
 	private IFilter findSubFilter(String filterClass) {
 		
+		if (Util.isEmpty(filterClass)) return null;
 		if (subFilters == null) return null;
 		
 		for (IFilter subFilter : subFilters) {
@@ -156,6 +181,22 @@ public class CompoundFilter extends AbstractFilter {
 			if (subFilter.getClass() == null) continue;
 			
 			if (subFilter.getClass().getName().equalsIgnoreCase(filterClass)) 
+				return subFilter;
+		}
+		
+		return null;
+	}
+	
+	private IFilter findSubFilterByParameters(String parametersClassName) {
+		
+		if (Util.isEmpty(parametersClassName)) return null;
+		if (subFilters == null) return null;		
+		
+		for (IFilter subFilter : subFilters) {
+
+			if (!(subFilter instanceof AbstractFilter)) continue;
+			
+			if (((AbstractFilter) subFilter).getParametersClassName().equalsIgnoreCase(parametersClassName)) 
 				return subFilter;
 		}
 		
@@ -194,12 +235,45 @@ public class CompoundFilter extends AbstractFilter {
 
 	public void open(RawDocument input) {
 		
+		updateSubfilter();
 		if (activeSubFilter != null) activeSubFilter.open(input);
 	}
 
 	public void open(RawDocument input, boolean generateSkeleton) {
 		
+		updateSubfilter();
 		if (activeSubFilter != null) activeSubFilter.open(input, generateSkeleton);		
 	}
+
+	private void updateSubfilter() {
+
+		IParameters params = getParameters();
+		
+		String className = "";
+		
+		if (params instanceof CompoundParameters)
+			className = ((CompoundParameters) params).getParametersClassName();
+		else
+			return;
+		
+		if (Util.isEmpty(className)) return;
+		
+		activeSubFilter = findSubFilterByParameters(className); // !!! not seveActiveSubFilter() to prevent a deadlock
+	}
+
+	@Override
+	public boolean notify(String notification, Object info) {
+		
+		if (super.notify(notification, info)) return true;
+		
+		if (notification.equalsIgnoreCase(Notification.PARAMETERS_CHANGED)) {
+			
+			updateSubfilter();
+			return true;
+		}
+		
+		return false;
+	}
+
 	
 }

@@ -109,6 +109,25 @@ public class TextUnitUtils {
 	}
 
 	/**
+	 * !!! Trailing spaces are not counted. 
+	 * @param textFragment
+	 * @param substr
+	 * @return
+	 */
+	public static boolean endsWith(TextFragment textFragment, String substr) {
+		
+		if (textFragment == null) return false;
+		if (Util.isEmpty(substr)) return false;
+		
+		String st = textFragment.getCodedText();
+		
+		int pos = TextFragment.indexOfLastNonWhitespace(st, -1, 0, true, true, true, true);
+		if (pos == -1) return false;
+		
+		return st.lastIndexOf(substr) == pos - substr.length() + 1;
+	}
+
+	/**
 	 * 
 	 * @param textFragment
 	 * @return
@@ -206,6 +225,6 @@ public class TextUnitUtils {
 		}
 		
 		return (GenericSkeleton) res;
-	}
+	}	
 	
 }

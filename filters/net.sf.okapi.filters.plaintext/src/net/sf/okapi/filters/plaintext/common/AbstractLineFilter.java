@@ -149,18 +149,18 @@ public class AbstractLineFilter extends AbstractFilter {
 		// To be implemented in descendant classes
 	}
 	
-	protected Object filter_notify(String notification, Object info) {
+	public boolean notify(String notification, Object info) {
 		// Can be overridden in descendant classes, but will the call of superclass filter_notify()
 		
-		if (notification == Notification.FILTER_LINE_BEFORE_PROCESSING) {
+		if (notification == FilterNotification.FILTER_LINE_BEFORE_PROCESSING) {
 			
 			if (lastResult == TextProcessingResult.DELAYED_DECISION) 
 				addLineBreak();
 			
-			return null;
+			return true; // Processed 
 		}
 		
-		return null;				
+		return false;				
 	}
 	
 	public boolean hasNext() {
@@ -181,7 +181,8 @@ public class AbstractLineFilter extends AbstractFilter {
 		if (input == null) throw new OkapiBadFilterInputException("RawDocument is not defined in open(RawDocument, boolean).");
 					
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
-		detector.detectBom();
+		//detector.detectBom();
+		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
 		encoding = detector.getEncoding();
 		srcLang = input.getSourceLanguage();

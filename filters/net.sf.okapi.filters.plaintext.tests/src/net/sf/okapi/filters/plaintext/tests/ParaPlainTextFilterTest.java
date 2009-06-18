@@ -161,6 +161,19 @@ public class ParaPlainTextFilterTest {
 		
 		TextUnitUtils.deleteLastChar(tcc5);
 		assertEquals("    12345  ", tcc5.getCodedText());
+		
+		//--------------------
+		TextContainer tcc6 = new TextContainer("123456_    ");
+		
+		assertTrue(TextUnitUtils.endsWith(tcc6, "_"));
+		assertTrue(TextUnitUtils.endsWith(tcc6, "6_"));
+		assertFalse(TextUnitUtils.endsWith(tcc6, "  "));
+		
+		TextContainer tcc7 = new TextContainer("123456<splicer>    ");
+		assertTrue(TextUnitUtils.endsWith(tcc7, "<splicer>"));
+		assertTrue(TextUnitUtils.endsWith(tcc7, "6<splicer>"));
+		assertFalse(TextUnitUtils.endsWith(tcc7, "  "));
+		
 	}
 	
 	@Test

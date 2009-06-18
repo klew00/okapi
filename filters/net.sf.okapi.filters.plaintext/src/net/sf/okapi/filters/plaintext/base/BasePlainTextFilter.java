@@ -20,17 +20,20 @@
 
 package net.sf.okapi.filters.plaintext.base;
 
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
+import net.sf.okapi.filters.plaintext.common.ListUtils;
 import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
 import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 
@@ -47,11 +50,14 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	public static final String FILTER_MIME				= MimeTypeMapper.PLAIN_TEXT_MIME_TYPE;	
 	public static final String FILTER_CONFIG			= "okf_plaintext";
 	
-	private Parameters params; // Base Plain Text Filter parameters	
+	private Parameters params; // Base Plain Text Filter parameters
+	private InlineCodeFinder codeFinder;
 		
 	public BasePlainTextFilter() {
 		
 		super();
+		
+		codeFinder = new InlineCodeFinder();
 		
 		setName(FILTER_NAME);
 		setMimeType(FILTER_MIME);
@@ -73,9 +79,15 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		super.filter_init();		// Have the ancestor initialize its part in params  
 		
 		// Initialization
-		if (params.useCodeFinder && params.codeFinder != null) {
-			params.codeFinder.addRule(params.regularExpressionForEmbeddedMarkup);
-			params.codeFinder.compile();						
+		if (params.useCodeFinder && codeFinder != null) {
+			
+			codeFinder.reset();
+			List<String> rules = ListUtils.stringAsList(params.codeFinderRules, "\n");
+			
+			for (String rule : rules)
+				codeFinder.addRule(rule);
+			
+			codeFinder.compile();
 		}
 	}
 	
@@ -111,12 +123,12 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		}
 		
 		// Automatically replace text fragments with in-line codes (based on regex rules of codeFinder)
-		if (params.useCodeFinder) {
+		if (params.useCodeFinder && codeFinder != null) {
 			
-			params.codeFinder.process(source);
+			codeFinder.process(source);
 			
 			for (String language : languages)
-				params.codeFinder.process(textUnit.getTargetContent(language));
+				codeFinder.process(textUnit.getTargetContent(language));
 		}
 		
 		sendEvent(EventType.TEXT_UNIT, textUnit);

@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.plaintext.common;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 import net.sf.okapi.common.BaseParameters;
@@ -32,52 +34,98 @@ import net.sf.okapi.common.IParameters;
  * @author Sergei Vasilyev
  */
 
-public class CompoundFilterParameters extends BaseParameters{
-		 
-	private LinkedList<IParameters> parameters = new LinkedList<IParameters>();
-	private IParameters activeParameters = null;
+public class CompoundParameters extends AbstractParameters{
 
-	public String parametersClass = "";
+	private String parametersClass = "";
+	private LinkedList<IParameters> parameters = new LinkedList<IParameters>();
+	private IParameters activeParameters = null;	
 	
-	public CompoundFilterParameters() {
+	public IParameters getActiveParameters() {
+		
+		return activeParameters;
+	}
+
+	protected void setActiveParameters(IParameters activeParameters) {
+		
+		this.activeParameters = activeParameters;
+	}
+
+	private String defParametersClass = "";
+	
+	public CompoundParameters() {
 		
 		super();
 		
 		reset();
-		toString(); 
-		
+		toString(); 		
 	}
 
+	@SuppressWarnings("unchecked")
 	protected boolean addParameters(Class<?> parametersClass) {
 		
 		if (parameters == null) return false;
 		boolean res = false;
 	
 		IParameters params = null;
+		BaseParameters bp = null;
 		
 		try {
-			res = parameters.add((IParameters)parametersClass.newInstance());
+			
+			if (!BaseParameters.class.isAssignableFrom(parametersClass)) return false;
+				
+			Constructor<BaseParameters> bpc;
+			try {
+				bpc = (Constructor<BaseParameters>) parametersClass.getConstructor(new Class[] {});			
+				if (bpc == null) return false;			
+										
+				bp = bpc.newInstance(new Object[] {});
+				
+			} catch (SecurityException e) {
+				
+				return false;
+				
+			} catch (NoSuchMethodException e) {
+				
+				return false;
+				
+			} catch (IllegalArgumentException e) {
+				
+				return false;
+				
+			} catch (InvocationTargetException e) {
+				
+				return false;				
+			}
+			
+			res = parameters.add(bp);
 			if (!res) return false;
 			
 			params = parameters.getLast();
 			if (params == null) return false;
 						
-		} catch (InstantiationException e) {
+		} catch (InstantiationException e2) {
 			
 			return false;
 			
-		} catch (IllegalAccessException e) {
+		} catch (IllegalAccessException e2) {
 			
 			return false;
 		}
 		
-		if (activeParameters == null)
-			activeParameters = params;
-				
+		if (activeParameters == null) {
+			
+			activeParameters = params;  // The first non-empty registered one will become active
+			
+			if (params == null) return false;
+			if (params.getClass() == null) return false;
+			
+			defParametersClass = params.getClass().getName();
+		}
+							
 		return res;
 	}
 
-	public boolean setActiveParameters(String parametersClass) {
+	protected boolean setActiveParameters(String parametersClass) {
 		
 		IParameters params = findParameters(parametersClass);
 		if (params == null) return false; 
@@ -86,7 +134,11 @@ public class CompoundFilterParameters extends BaseParameters{
 			
 			// Some finalization of the previous one might be needed
 			activeParameters = params;
+			this.parametersClass = parametersClass;
 		}
+		
+		if (owner != null)
+			owner.notify(Notification.PARAMETERS_CHANGED, parametersClass);
 		
 		return true;
 	}
@@ -109,7 +161,7 @@ public class CompoundFilterParameters extends BaseParameters{
 
 	public void reset() {
 		
-		parametersClass = "";
+		setParametersClassName(defParametersClass);
 	}
 	
 	public void fromString(String data) {
@@ -118,8 +170,8 @@ public class CompoundFilterParameters extends BaseParameters{
 		
 		buffer.fromString(data);
 		
-		parametersClass = buffer.getString("parametersClass", "");
-		setActiveParameters(parametersClass);
+		setParametersClassName(buffer.getString("parametersClass", defParametersClass));
+		setActiveParameters(getParametersClassName());
 		
 		// Load active parameters
 		if (activeParameters != null)			
@@ -128,20 +180,55 @@ public class CompoundFilterParameters extends BaseParameters{
 	
 	@Override
 	public String toString () {
-		
+				
 		buffer.reset();
-		
+
+		//!!! Do not change the sequence
+
 		// Store active parameters		
 		if (activeParameters != null)			
 			buffer.fromString(activeParameters.toString());
 		
 		if (activeParameters == null)
-			parametersClass = "";
+			setParametersClassName(defParametersClass);
 		else
-			parametersClass = activeParameters.getClass().getName(); 
-				
-		buffer.setString("parametersClass", parametersClass);				
-		
+			setParametersClassName(activeParameters.getClass().getName()); 
+
+		buffer.setString("parametersClass", getParametersClassName());
+
 		return buffer.toString();
 	}
+
+	protected void setParametersClassName(String parametersClass) {
+		
+		this.parametersClass = parametersClass;
+
+		setActiveParameters(parametersClass);		
+	}
+
+	public void setParametersClass(Class<?> parametersClass) {
+	
+		if (parametersClass == null) return;
+		setParametersClassName(parametersClass.getName());
+	}
+	
+	public String getParametersClassName() {
+		
+		return parametersClass;
+	}
+	
+	public Class<?> getParametersClass() {		
+		try {
+			return Class.forName(parametersClass);
+			
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
+	}
+
+	public LinkedList<IParameters> getParameters() {
+		
+		return parameters;
+	}
+	
 }

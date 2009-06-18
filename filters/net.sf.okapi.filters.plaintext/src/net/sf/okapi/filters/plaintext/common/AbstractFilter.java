@@ -36,11 +36,12 @@ import net.sf.okapi.common.filters.IFilter;
  * @author Sergei Vasilyev
  */
 
-public abstract class AbstractFilter implements IFilter {
+public abstract class AbstractFilter implements IFilter, INotifiable {
 
 	private String filterName;
 	private String mimeType;
 	private IParameters params;
+	private String parametersClassName;
 	List<FilterConfiguration> configList = new ArrayList<FilterConfiguration>();
 	
 	public AbstractFilter() {
@@ -56,6 +57,15 @@ public abstract class AbstractFilter implements IFilter {
 	public void setParameters(IParameters params) {
 		
 		this.params = (BaseParameters) params;
+		
+		if (params instanceof INotifiable)
+			((INotifiable) params).notify(Notification.PARAMETERS_SET_OWNER, this);
+		
+//		if (!Util.isEmpty(parametersClassName)) return; // This name is set by the first call from the filter's constructor
+		if (params == null) return;
+		if (params.getClass() == null) return;
+		
+		parametersClassName = params.getClass().getName();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -143,6 +153,15 @@ public abstract class AbstractFilter implements IFilter {
 		
 		return true;
 	}
+	
+	public String getParametersClassName() {
 		
+		return parametersClassName;
+	}
+
+	public boolean notify(String notification, Object info) {
+				
+		return false;		
+	}
 }
 

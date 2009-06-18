@@ -20,7 +20,7 @@
 
 package net.sf.okapi.filters.plaintext.regex;
 
-import net.sf.okapi.common.BaseParameters;
+import java.util.regex.Pattern;
 
 /**
  * Parameters of the Regex Plain Text Filter
@@ -29,8 +29,13 @@ import net.sf.okapi.common.BaseParameters;
  * @author Sergei Vasilyev  
  */
 
-public class Parameters extends BaseParameters {
+public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 			
+	public static final String	DEF_RULE = "^(.*?)$";
+	public static final int		DEF_GROUP = 1;
+	public static final String	DEF_SAMPLE = "Line 1\nLine 2\nLine 3\nLine 4";
+	public static final int		DEF_OPTIONS = Pattern.MULTILINE;
+	
 	/**
 	 * Java regex rule used to extract lines of text.<p>Default: "^(.*?)$". 
 	 */
@@ -45,6 +50,11 @@ public class Parameters extends BaseParameters {
 	 * Java regex options.<p>Default: Pattern.MULTILINE.
 	 */
 	public int regexOptions;
+	
+	/**
+	 * Sample text for the rule.
+	 */
+	public String sample;
 							
 //----------------------------------------------------------------------------------------------------------------------------	
 	
@@ -55,32 +65,42 @@ public class Parameters extends BaseParameters {
 		toString(); // fill the list
 	}
 
-	public void reset() {		
-		// All parameters are set to defaults here
-		rule = RegexPlainTextFilter.DEF_RULE;
-		sourceGroup = RegexPlainTextFilter.DEF_GROUP;		
-		regexOptions = RegexPlainTextFilter.DEF_OPTIONS; 
+	public void reset() {
+		
+		super.reset();
+		
+		// All parameters are set to defaults here		
+		rule = DEF_RULE;
+		sourceGroup = DEF_GROUP;		
+		regexOptions = DEF_OPTIONS;
+		sample = DEF_SAMPLE;
 	}
 
 	public void fromString(String data) {
 		reset();
 		
+		super.fromString(data);
+		
 		buffer.fromString(data);
 		
 		// All parameters are retrieved here
-		rule =  buffer.getString("rule", RegexPlainTextFilter.DEF_RULE);
-		sourceGroup = buffer.getInteger("sourceGroup", RegexPlainTextFilter.DEF_GROUP);		
-		regexOptions = buffer.getInteger("regexOptions", RegexPlainTextFilter.DEF_OPTIONS);
+		rule =  buffer.getString("rule", DEF_RULE);
+		sourceGroup = buffer.getInteger("sourceGroup", DEF_GROUP);		
+		regexOptions = buffer.getInteger("regexOptions", DEF_OPTIONS);
+		sample =  buffer.getString("sample", "");
 	}
 	
 	@Override
 	public String toString () {
 		buffer.reset();
 		
+		super.toString(); // Will write to the same buffer
+		
 		// All parameters are set here
 		buffer.setString("rule", rule);
 		buffer.setInteger("sourceGroup", sourceGroup);		
 		buffer.setInteger("regexOptions", regexOptions);
+		buffer.setString("sample", sample);
 		
 		return buffer.toString();
 	}

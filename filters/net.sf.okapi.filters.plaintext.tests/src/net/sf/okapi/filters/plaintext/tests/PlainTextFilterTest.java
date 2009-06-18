@@ -39,6 +39,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
@@ -46,6 +47,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -57,10 +59,14 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.plaintext.PlainTextFilter;
+import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 import net.sf.okapi.filters.plaintext.common.WrapMode;
-import net.sf.okapi.filters.plaintext.paragraphs.*;
+import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
+import net.sf.okapi.filters.plaintext.paragraphs.Parameters;
+import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;
+import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
@@ -408,7 +414,164 @@ public class PlainTextFilterTest {
 		assertNotNull(configs);
 		assertEquals(7, configs.size());
 	}
-	
+		
+	@Test
+	public void testSynchronization() {
+		
+		//------------------------
+		filter.setConfiguration(ParaPlainTextFilter.FILTER_CONFIG);
+		IParameters params2 = filter.getActiveParameters();
+		assertTrue(params2 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
+		assertTrue(params2 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
+		assertFalse(params2 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG);
+		IParameters params3 = filter.getActiveParameters();
+		assertTrue(params3 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		assertTrue(params3 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
+		assertFalse(params3 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
+		
+		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG);
+		IParameters params4 = filter.getActiveParameters();
+		assertTrue(params4 instanceof net.sf.okapi.filters.plaintext.regex.Parameters);
+		assertTrue(params4 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
+		assertFalse(params4 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		filter.setConfiguration(BasePlainTextFilter.FILTER_CONFIG);
+		IParameters params5 = filter.getActiveParameters();
+		assertTrue(params5 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
+		assertFalse(params5 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
+		
+		//-------------------------
+		net.sf.okapi.filters.plaintext.Parameters params = new net.sf.okapi.filters.plaintext.Parameters();
+		filter.setParameters(params);
+		
+		URL url = PlainTextFilterTest.class.getResource("/test_params1.fprm");
+		if (url == null) return;
+		
+		String root = Util.getDirectoryName(url.getPath());
+		
+		params.load(Util.toURI(root + "/test_params1.fprm"), false);
+
+		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+
+		IParameters params6 = filter.getActiveParameters();
+		assertTrue(params6 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		filter.close();
+		
+		params.load(Util.toURI(root + "/test_params2.fprm"), false);
+		
+		input = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		IParameters params7 = filter.getActiveParameters();
+		assertTrue(params7 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
+		filter.close();
+		
+		// W/o Open()		
+		params.load(Util.toURI(root + "/test_params1.fprm"), false);
+		
+		IParameters params8 = filter.getActiveParameters();
+		assertTrue(params8 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		IParameters params81 = params.getActiveParameters();
+		assertTrue(params81 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		String c = params.getParametersClassName();
+		assertEquals(c, "net.sf.okapi.filters.plaintext.spliced.Parameters");
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.base.Parameters"));
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.paragraphs.Parameters"));
+
+		IFilter filter1 = filter.getActiveSubFilter();
+		assertTrue(filter1 instanceof net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter);
+		
+		params.load(Util.toURI(root + "/test_params2.fprm"), false);
+		
+		IParameters params9 = filter.getActiveParameters();
+		assertTrue(params9 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
+		
+		IParameters params91 = params.getActiveParameters();
+		assertTrue(params91 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
+		
+		c = params.getParametersClassName();
+		assertEquals(c, "net.sf.okapi.filters.plaintext.paragraphs.Parameters");
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.base.Parameters"));
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.spliced.Parameters"));
+
+		filter1 = filter.getActiveSubFilter();
+		assertTrue(filter1 instanceof net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter);
+		
+		//-------------------------
+		filter.setConfiguration(ParaPlainTextFilter.FILTER_CONFIG);
+		IParameters params10 = params.getActiveParameters();
+		assertTrue(params10 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
+		assertTrue(params10 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
+		assertFalse(params10 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG);
+		IParameters params11 = params.getActiveParameters();
+		assertTrue(params11 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		assertTrue(params11 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
+		assertFalse(params11 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
+		
+		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG);
+		IParameters params12 = params.getActiveParameters();
+		assertTrue(params12 instanceof net.sf.okapi.filters.plaintext.regex.Parameters);
+		assertTrue(params12 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
+		assertFalse(params12 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		filter.setConfiguration(BasePlainTextFilter.FILTER_CONFIG);
+		IParameters params13 = params.getActiveParameters();
+		assertTrue(params13 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
+		assertFalse(params13 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
+		
+		//-------------------------
+		filter.setConfiguration(ParaPlainTextFilter.FILTER_CONFIG);
+		c = params.getParametersClassName();
+		assertEquals(c, "net.sf.okapi.filters.plaintext.paragraphs.Parameters");
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.base.Parameters"));
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.spliced.Parameters"));
+		
+		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG);
+		c = params.getParametersClassName();
+		assertEquals(c, "net.sf.okapi.filters.plaintext.spliced.Parameters");
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.base.Parameters"));
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.paragraphs.Parameters"));
+		
+		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG);
+		c = params.getParametersClassName();
+		assertEquals(c, "net.sf.okapi.filters.plaintext.regex.Parameters");
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.base.Parameters"));
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.spliced.Parameters"));
+		
+		filter.setConfiguration(BasePlainTextFilter.FILTER_CONFIG);
+		c = params.getParametersClassName();
+		assertEquals(c, "net.sf.okapi.filters.plaintext.base.Parameters");
+		assertFalse(c.equals("net.sf.okapi.filters.plaintext.paragraphs.Parameters"));
+		
+		//-------------------------
+				
+		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG);
+		filter1 = filter.getActiveSubFilter();
+		assertTrue(filter1 instanceof net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter);
+		
+		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG);
+		filter1 = filter.getActiveSubFilter();
+		assertTrue(filter1 instanceof net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter);
+
+		//-------------------------
+		params.setParametersClass(net.sf.okapi.filters.plaintext.spliced.Parameters.class);
+		
+		IParameters params15 = filter.getActiveParameters();
+		assertTrue(params15 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		c = params.getParametersClassName();
+		assertEquals(c, "net.sf.okapi.filters.plaintext.spliced.Parameters");
+		
+		IParameters params14 = params.getActiveParameters();
+		assertTrue(params14 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+	}
 	
 	@Test
 	public void testLineNumbers() {

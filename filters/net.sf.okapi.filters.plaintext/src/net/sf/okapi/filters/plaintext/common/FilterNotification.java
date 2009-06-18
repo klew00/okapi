@@ -18,26 +18,18 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext;
-
-import net.sf.okapi.filters.plaintext.common.CompoundParameters;
+package net.sf.okapi.filters.plaintext.common;
 
 /**
- * Plain Text Filter parameters 
+ * 
  * 
  * @version 0.1, 09.06.2009
  * @author Sergei Vasilyev
  */
 
-public class Parameters extends CompoundParameters {
+public class FilterNotification {
 
-	public Parameters() {
-		super();
-		
-		addParameters(net.sf.okapi.filters.plaintext.base.Parameters.class);
-		addParameters(net.sf.okapi.filters.plaintext.paragraphs.Parameters.class);
-		addParameters(net.sf.okapi.filters.plaintext.spliced.Parameters.class);
-		addParameters(net.sf.okapi.filters.plaintext.regex.Parameters.class);
-	}
+	public static final String FILTER_LINE_BEFORE_PROCESSING = "filter_line_before_processing";
+	public static final String FILTER_LINE_AFTER_PROCESSING = "filter_line_after_processing";
 	
 }

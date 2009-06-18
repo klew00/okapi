@@ -162,9 +162,9 @@ public class RegexPlainTextFilterTest {
 		Parameters params = new Parameters(); 
 		filter.setParameters(params);
 		
-		assertEquals(params.rule, RegexPlainTextFilter.DEF_RULE);
-		assertEquals(params.sourceGroup, RegexPlainTextFilter.DEF_GROUP);
-		assertEquals(params.regexOptions, RegexPlainTextFilter.DEF_OPTIONS);
+		assertEquals(params.rule, net.sf.okapi.filters.plaintext.regex.Parameters.DEF_RULE);
+		assertEquals(params.sourceGroup, net.sf.okapi.filters.plaintext.regex.Parameters.DEF_GROUP);
+		assertEquals(params.regexOptions, net.sf.okapi.filters.plaintext.regex.Parameters.DEF_OPTIONS);
 		
 		// Load filter parameters from a file, check if params have changed
 		URL paramsUrl = RegexPlainTextFilter.class.getResource("/test_params1.txt");

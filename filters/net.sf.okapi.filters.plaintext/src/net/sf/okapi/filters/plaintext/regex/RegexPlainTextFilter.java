@@ -21,20 +21,20 @@
 package net.sf.okapi.filters.plaintext.regex;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
-import net.sf.okapi.common.*;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
-import net.sf.okapi.common.filters.FilterConfiguration;
-import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
-//import net.sf.okapi.filters.regex.Parameters;
+import net.sf.okapi.filters.plaintext.common.AbstractFilter;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.regex.RegexFilter;
 import net.sf.okapi.filters.regex.Rule;
@@ -52,22 +52,45 @@ import net.sf.okapi.filters.regex.Rule;
  * @author Sergei Vasilyev  
  */
 
-public class RegexPlainTextFilter implements IFilter {
+public class RegexPlainTextFilter extends AbstractFilter {
 
 	public static final String FILTER_NAME		= "okf_plaintext";
 	public static final String FILTER_MIME		= MimeTypeMapper.PLAIN_TEXT_MIME_TYPE;	
 	public static final String FILTER_CONFIG	= "okf_plaintext_regex";
 		
-	public static final String DEF_RULE = "^(.*?)$";
-	public static final int DEF_GROUP = 1;
-	public static final int DEF_OPTIONS = Pattern.MULTILINE;
-	
-	
 	private RegexFilter regex;			// Regex aggregate
 	private Parameters params;			// Regex Plain Text Filter's parameters
 	private int lineNumber = 0;
 
-// PlainTextFilter	
+		
+	public RegexPlainTextFilter() {
+		
+		super();
+		
+		// Create the regex aggregate and its parameters 
+		regex = new RegexFilter(); 
+		setParameters(new Parameters());	// Regex Plain Text Filter parameters
+		
+		addConfiguration(true,
+				FILTER_CONFIG,
+				"Regex-Based Plain Text Filter",
+				"Plain Text Filter using regex-based linebreak search. Detects a wider randge of " + 
+				"linebreaks at the price of lower speed and extra memory usage.", 
+				"okf_plaintext_regex.fprm");
+		
+		net.sf.okapi.filters.regex.Parameters regexParams = new net.sf.okapi.filters.regex.Parameters();
+		regex.setParameters(regexParams);
+		
+		// Load the default line extraction rule from a file to regexParams
+		URL url = RegexPlainTextFilter.class.getResource("def_line_extraction_rule.fprm");
+		if (url == null) return;
+		
+		String root = Util.getDirectoryName(url.getPath());
+		
+		regexParams.load(Util.toURI(root + "/def_line_extraction_rule.fprm"), false);		
+	}
+
+
 	/**
 	 * Configures an internal line extractor. 
 	 * If you want to set a custom rule, call this method with a modified rule.<p> 
@@ -106,25 +129,6 @@ public class RegexPlainTextFilter implements IFilter {
 	public net.sf.okapi.filters.regex.Parameters getRegexParameters() {
 		
 		return _getRegexParams();
-	}
-
-	public RegexPlainTextFilter() {
-		
-		super();
-		
-		// Create the regex aggregate and its parameters 
-		regex = new RegexFilter(); 
-		
-		net.sf.okapi.filters.regex.Parameters regexParams = new net.sf.okapi.filters.regex.Parameters();
-		regex.setParameters(regexParams);
-		
-		// Load the default line extraction rule from a file to regexParams
-		URL url = RegexPlainTextFilter.class.getResource("def_line_extraction_rule.fprm");
-		if (url == null) return;
-		
-		String root = Util.getDirectoryName(url.getPath());
-		
-		regexParams.load(Util.toURI(root + "/def_line_extraction_rule.fprm"), false);		
 	}
 
 // IFilter	
@@ -211,6 +215,8 @@ public class RegexPlainTextFilter implements IFilter {
 
 	public void setParameters(IParameters params) {
 		
+		super.setParameters(params);
+		
 		if (params instanceof Parameters) {			// Also checks for null
 			this.params = (Parameters)params;
 			
@@ -219,20 +225,6 @@ public class RegexPlainTextFilter implements IFilter {
 		}
 	}
 	
-	public List<FilterConfiguration> getConfigurations() {
-		
-		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
-		list.add(new FilterConfiguration(				
-				FILTER_CONFIG,
-				getMimeType(),
-				getClass().getName(),
-				"Regex-Based Plain Text Filter",
-				"Plain Text Filter using regex-based linebreak search. Detects a wider randge of " + 
-				"linebreaks at the price of lower speed and extra memory usage.",
-				""));
-		
-		return list;
-	}
 
 // Helpers 
 	

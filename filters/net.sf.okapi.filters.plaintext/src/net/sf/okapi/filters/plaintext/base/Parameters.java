@@ -20,8 +20,8 @@
 
 package net.sf.okapi.filters.plaintext.base;
 
-import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.filters.InlineCodeFinder;
+import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 import net.sf.okapi.filters.plaintext.common.WrapMode;
 
 /**
@@ -31,22 +31,22 @@ import net.sf.okapi.filters.plaintext.common.WrapMode;
  * @author Sergei Vasilyev
  */
 
-public class Parameters extends BaseParameters {
-		
+public class Parameters extends AbstractParameters {
+	
 	public boolean unescapeSource = true;
 	public boolean trimLeft = true;
 	public boolean trimRight = false;
 	public boolean preserveWS = true;
 	public boolean useCodeFinder = false;
-	public String regularExpressionForEmbeddedMarkup = "";
+	public String codeFinderRules = "";	
+	public WrapMode wrapMode = WrapMode.NONE;
+	private InlineCodeFinder codeFinder;
 	
-	public WrapMode wrapMode = WrapMode.NONE;	
-	public InlineCodeFinder codeFinder;
-
 //----------------------------------------------------------------------------------------------------------------------------	
 	
 	public Parameters() {
 		super();
+		
 		codeFinder = new InlineCodeFinder();
 		
 		reset();
@@ -54,11 +54,6 @@ public class Parameters extends BaseParameters {
 	}
 
 	public void reset() {
-		codeFinder.reset();
-		
-		// Default in-line codes: special escaped-chars and printf-style variable
-		codeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
-		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
 		
 		// All parameters are set to defaults here
 		unescapeSource = true;
@@ -66,7 +61,16 @@ public class Parameters extends BaseParameters {
 		trimRight = false;
 		preserveWS = true;
 		useCodeFinder = false;
-		regularExpressionForEmbeddedMarkup = "";
+		
+		// Default in-line codes: special escaped-chars and printf-style variable
+		codeFinder.reset();
+		
+		// Default in-line codes: special escaped-chars and printf-style variable
+		codeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
+		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
+		
+		codeFinderRules = codeFinder.toString();
+			
 		wrapMode = WrapMode.NONE;
 	}
 
@@ -81,7 +85,7 @@ public class Parameters extends BaseParameters {
 		trimRight = buffer.getBoolean("trimRight", false);
 		preserveWS = buffer.getBoolean("preserveWS", true);
 		useCodeFinder = buffer.getBoolean("useCodeFinder", false);
-		regularExpressionForEmbeddedMarkup = buffer.getString("regularExpressionForEmbeddedMarkup", "");
+		codeFinderRules = buffer.getString("codeFinderRules", codeFinder.toString());
 //		wrapMode = WrapMode.class.getEnumConstants()[buffer.getInteger("wrapMode", WrapMode.NONE.ordinal())];
 		wrapMode = WrapMode.values()[buffer.getInteger("wrapMode", WrapMode.NONE.ordinal())];
 	}
@@ -96,7 +100,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("trimRight", trimRight);
 		buffer.setBoolean("preserveWS", preserveWS);
 		buffer.setBoolean("useCodeFinder", useCodeFinder);
-		buffer.setString("regularExpressionForEmbeddedMarkup", regularExpressionForEmbeddedMarkup);
+		buffer.setString("codeFinderRules", codeFinderRules);
 		buffer.setInteger("wrapMode", wrapMode.ordinal());
 		
 		return buffer.toString();

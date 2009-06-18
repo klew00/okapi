@@ -18,26 +18,32 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext;
+package net.sf.okapi.filters.plaintext.common;
 
-import net.sf.okapi.filters.plaintext.common.CompoundParameters;
+import net.sf.okapi.common.BaseParameters;
 
 /**
- * Plain Text Filter parameters 
  * 
- * @version 0.1, 09.06.2009
+ * 
+ * @version 0.1, 18.06.2009
  * @author Sergei Vasilyev
  */
 
-public class Parameters extends CompoundParameters {
+public abstract class AbstractParameters extends BaseParameters implements INotifiable {
 
-	public Parameters() {
-		super();
-		
-		addParameters(net.sf.okapi.filters.plaintext.base.Parameters.class);
-		addParameters(net.sf.okapi.filters.plaintext.paragraphs.Parameters.class);
-		addParameters(net.sf.okapi.filters.plaintext.spliced.Parameters.class);
-		addParameters(net.sf.okapi.filters.plaintext.regex.Parameters.class);
-	}
+	protected INotifiable owner = null;
 	
+	public boolean notify(String notification, Object info) {
+		
+		
+		if (notification.equalsIgnoreCase(Notification.PARAMETERS_SET_OWNER)) {
+			
+			if (info instanceof INotifiable)
+				owner = (INotifiable) info;
+			
+			return true;
+		}
+		return false;
+	}
 }
+

@@ -23,6 +23,7 @@ package net.sf.okapi.filters.plaintext.spliced;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -60,19 +61,19 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 				FILTER_CONFIG,
 				"Spliced Lines Filter",
 				"Extracts as one line the consecutive lines with a predefined splicer character at the end", 
-				null);
+				"okf_plaintext_spliced.fprm");
 		
 		addConfiguration(false, 
 				FILTER_CONFIG_UNDERLINE,
 				"Underline Spliced Lines Filter",
 				"Sliced line filter with the underline character (_) used as the splicer", 
-				null);
+				"okf_plaintext_spliced_underline.fprm");
 		
 		addConfiguration(false, 
 				FILTER_CONFIG_BACKSLASH,
 				"Backspace Spliced Lines Filter",
 				"Sliced line filter with the backspace character (\\) used as the splicer", 
-				null);
+				"okf_plaintext_spliced_backslash.fprm");
 	}
 	
 	@Override
@@ -95,7 +96,8 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 		if (lineContainer == null) return super.filter_exec(lineContainer);
 		if (splicedLines == null) return super.filter_exec(lineContainer);
 		
-		if (TextUnitUtils.getLastChar(lineContainer) == params.splicer) {		
+		//if (TextUnitUtils.getLastChar(lineContainer) == params.splicer) {
+		if (TextUnitUtils.endsWith(lineContainer, params.splicer)) {
 			
 			merging = true;
 			splicedLines.add(lineContainer);
@@ -138,21 +140,25 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 		
 		if (splicedLines == null) return false; 
 		if (splicedLines.isEmpty()) return false;
+		if (params == null) return false;
+		if (Util.isEmpty(params.splicer)) return false;
 						
 		TextContainer mergedLine = new TextContainer();
+		int len = params.splicer.length();
 		
 		for (TextContainer curLine : splicedLines) {
 			
 			//TextContainer curLine = splicedLines.poll();
 					
-			String s = "";
+//			String s = "";
 						
-			int pos = TextUnitUtils.lastIndexOf(curLine, s+= params.splicer);
+//			int pos = TextUnitUtils.lastIndexOf(curLine, s+= params.splicer);
+			int pos = TextUnitUtils.lastIndexOf(curLine, params.splicer);
 			if (pos > -1)
 				if (params.createPlaceholders) 
-					curLine.changeToCode(pos, pos + 1, TagType.PLACEHOLDER, "line splicer");
+					curLine.changeToCode(pos, pos + len, TagType.PLACEHOLDER, "line splicer");
 				else
-					curLine.remove(pos, pos + 1);
+					curLine.remove(pos, pos + len);
 			
 			if (mergedLine.isEmpty())  // Paragraph's first line
 				mergedLine.setProperty(curLine.getProperty(AbstractLineFilter.LINE_NUMBER));
