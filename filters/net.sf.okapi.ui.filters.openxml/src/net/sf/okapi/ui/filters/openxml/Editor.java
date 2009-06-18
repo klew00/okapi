@@ -163,6 +163,7 @@ public class Editor implements IParametersEditor, SelectionListener {
 				ed.listExcelColorsToExclude.add(sYmphony);
 			}
 		}
+		ed.btnExcludeExcelColumns.setSelection(params.bPreferenceTranslateExcelExcludeCells);
 		if (params.bPreferenceTranslateExcelExcludeCells &&
 			params.tsExcelExcludedCells!=null && !params.tsExcelExcludedCells.isEmpty())
 		{
@@ -241,37 +242,43 @@ public class Editor implements IParametersEditor, SelectionListener {
 			params.bPreferenceTranslateExcelExcludeColors = false;
 		
 		// Exclude text in certain columns in Excel in sheets 1, 2, or 3
-		params.bPreferenceTranslateExcelExcludeCells = false;
+		params.bPreferenceTranslateExcelExcludeCells = ed.btnExcludeExcelColumns.getSelection();
 		if (params.tsExcelExcludedCells==null)
 			params.tsExcelExcludedCells = new TreeSet<String>();
 		else
 			params.tsExcelExcludedCells.clear();
-		sArray = ed.listExcelSheet1ColumnsToExclude.getSelection(); // selected items
-		len = sArray.length;
-		if (len>0)
+		params.bPreferenceTranslateExcelExcludeCells = ed.btnExcludeExcelColumns.getSelection();
+		if (params.bPreferenceTranslateExcelExcludeCells)
+			params.tsExcelExcludedCells.clear();
+		else
 		{
-			params.bPreferenceTranslateExcelExcludeCells = true;
-			for(int i=0;i<len;i++)
-				for(int j=1;j<=MAXROW;j++)
-					params.tsExcelExcludedCells.add("1"+sArray[i]+j);
-		}
-		sArray = ed.listExcelSheet2ColumnsToExclude.getSelection(); // selected items
-		len = sArray.length;
-		if (len>0)
-		{
-			params.bPreferenceTranslateExcelExcludeCells = true;
-			for(int i=0;i<len;i++)
-				for(int j=1;j<=MAXROW;j++)
-					params.tsExcelExcludedCells.add("2"+sArray[i]+j);
-		}
-		sArray = ed.listExcelSheet3ColumnsToExclude.getSelection(); // selected items
-		len = sArray.length;
-		if (len>0)
-		{
-			params.bPreferenceTranslateExcelExcludeCells = true;
-			for(int i=0;i<len;i++)
-				for(int j=1;j<=MAXROW;j++)
-					params.tsExcelExcludedCells.add("3"+sArray[i]+j);
+			sArray = ed.listExcelSheet1ColumnsToExclude.getSelection(); // selected items
+			len = sArray.length;
+			if (len>0)
+			{
+				params.bPreferenceTranslateExcelExcludeCells = true;
+				for(int i=0;i<len;i++)
+					for(int j=1;j<=MAXROW;j++)
+						params.tsExcelExcludedCells.add("1"+sArray[i]+j);
+			}
+			sArray = ed.listExcelSheet2ColumnsToExclude.getSelection(); // selected items
+			len = sArray.length;
+			if (len>0)
+			{
+				params.bPreferenceTranslateExcelExcludeCells = true;
+				for(int i=0;i<len;i++)
+					for(int j=1;j<=MAXROW;j++)
+						params.tsExcelExcludedCells.add("2"+sArray[i]+j);
+			}
+			sArray = ed.listExcelSheet3ColumnsToExclude.getSelection(); // selected items
+			len = sArray.length;
+			if (len>0)
+			{
+				params.bPreferenceTranslateExcelExcludeCells = true;
+				for(int i=0;i<len;i++)
+					for(int j=1;j<=MAXROW;j++)
+						params.tsExcelExcludedCells.add("3"+sArray[i]+j);
+			}
 		}
 		return true;
 	}

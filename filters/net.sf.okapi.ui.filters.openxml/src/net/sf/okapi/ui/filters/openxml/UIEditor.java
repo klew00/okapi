@@ -34,6 +34,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 	protected Button btnTranslateHiddenText;
 	protected Button btnStylesFromDocument;
 	protected Button btnColorsFromDocument;
+	protected Button btnExcludeExcelColumns;
 	protected List listExcludedWordStyles;
 	protected List listExcelColorsToExclude;
 	protected List listExcelSheet1ColumnsToExclude;
@@ -229,13 +230,19 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						compositeExcelSheet1.setBounds(0, 51, 459, 45);
 						{
 							Label lblSheetColumns = new Label(compositeExcelSheet1, SWT.NONE);
-							lblSheetColumns.setBounds(162, 10, 154, 21);
+							lblSheetColumns.setBounds(162, 10, 142, 21);
 							lblSheetColumns.setText("Sheet 1 Columns to Exlude");
 						}
 						{
 							listExcelSheet1ColumnsToExclude = new List(compositeExcelSheet1, SWT.BORDER | SWT.MULTI);
 							listExcelSheet1ColumnsToExclude.setItems(new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AX", "AY", "AZ", "BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BX", "BY", "BZ", "CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CX", "CY", "CZ", "DA", "DB", "DC", "DD", "DE", "DF", "DG", "DH", "DI", "DJ", "DK", "DL", "DM", "DN", "DO", "DP", "DQ", "DR", "DS", "DT", "DU", "DV", "DX", "DY", "DZ", "EA", "EB", "EC", "ED", "EE", "EF", "EG", "EH", "EI", "EJ", "EK", "EL", "EM", "EN", "EO", "EP", "EQ", "ER", "ES", "ET", "EU", "EV", "EX", "EY", "EZ"});
 							listExcelSheet1ColumnsToExclude.setBounds(10, 0, 135, 45);
+						}
+						{
+							btnExcludeExcelColumns = new Button(compositeExcelSheet1, SWT.CHECK);
+							btnExcludeExcelColumns.setBounds(310, 10, 139, 16);
+							btnExcludeExcelColumns.setSelection(true);
+							btnExcludeExcelColumns.setText("Exclude Marked Columns");
 						}
 					}
 					{
