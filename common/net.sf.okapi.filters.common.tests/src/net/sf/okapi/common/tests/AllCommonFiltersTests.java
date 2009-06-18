@@ -37,6 +37,7 @@ import junit.framework.Test;
 	net.sf.okapi.common.filters.tests.FilterEventTest.class,
 	net.sf.okapi.common.filters.tests.FilterConfigurationTest.class,
 	net.sf.okapi.common.filterwriter.tests.GenericContentTest.class,
+	net.sf.okapi.common.filterwriter.tests.GenericFilterWriterTest.class,
 	net.sf.okapi.common.resource.tests.ResourcesTest.class,
 	net.sf.okapi.common.resource.tests.TextContainerTest.class,
 	net.sf.okapi.common.resource.tests.TextFragmentTest.class,
