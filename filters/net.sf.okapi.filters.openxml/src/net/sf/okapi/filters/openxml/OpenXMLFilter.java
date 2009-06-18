@@ -29,10 +29,8 @@ import java.io.PipedOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -99,7 +97,8 @@ public class OpenXMLFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private String srcLang;
 	private OpenXMLContentFilter openXMLContentFilter;
-	private Parameters params=null;
+	private IParameters params=null; // DWH 6-15-09 was net.sf.okapi.filters.markupfilter.Parameters
+	private ConditionalParameters cparams=null; // DWH 6-16-09
 	private int nZipType=MSWORD;
 	private int nFileType=MSWORD; // DWH 4-16-09
 	private Level nLogLevel=Level.FINE;
@@ -107,7 +106,6 @@ public class OpenXMLFilter implements IFilter {
 	private ITranslator translator=null;
 	private String sOutputLanguage="en-US";
 	private boolean canceled = false;
-	private HashSet hsExcludeStyles = null; // DWH 5-28-09 set of styles to exclude from translation
 	private boolean bPreferenceTranslateDocProperties = true;
 	private boolean bPreferenceTranslateComments = true;
 	private boolean bPreferenceTranslatePowerpointNotes = true; // DWH 5-26-09 preferences
@@ -120,14 +118,17 @@ public class OpenXMLFilter implements IFilter {
 	  // DWH 6-12-09 don't translate text in Excel in some colors 
 	private boolean bPreferenceTranslateExcelExcludeCells = false;
 	  // DWH 6-12-09 don't translate text in Excel in some specified cells
+	private TreeSet tsExcludeWordStyles = null; // DWH 5-28-09 set of styles to exclude from translation
 	private TreeSet<String> tsExcelExcludedColors; // DWH 6-12-09
-	private TreeSet<String> tsExcelExcludedStyles; // DWH 6-12-09 
+	private TreeSet<String> tsExcelExcludedStyles=null; // DWH 6-12-09 
 	private TreeSet<String> tsExcelExcludedCells; // DWH 6-12-09 
 	private int nExcelOriginalSharedStringCount; // DWH 6-12-09
 	private boolean bProcessedExcelSheets=true; // DWH 6-13-09 Excel options
 
 	public OpenXMLFilter () {
-		hsExcludeStyles = new HashSet(); // DWH 5-29-09
+		cparams = new ConditionalParameters(); // DWH 6-16-09
+		params = cparams; // DWH 6-16-09 conditional params can be set by user interface
+		readParams();
 	}
 	
 	/**
@@ -142,9 +143,32 @@ public class OpenXMLFilter implements IFilter {
 	public OpenXMLFilter(ITranslator translator, String sOutputLanguage) {
 		this.translator = translator;
 		this.sOutputLanguage = sOutputLanguage;
-		hsExcludeStyles = new HashSet(); // DWH 5-28-09
+		cparams = new ConditionalParameters(); // DWH 6-16-09
+		params = cparams; // DWH 6-16-09 conditional params can be set by user interface
+		readParams();
 	}
 
+	private void readParams()
+	{
+		try
+		{
+			ConditionalParameters ooparams=(ConditionalParameters) params;
+			bPreferenceTranslateDocProperties = ooparams.bPreferenceTranslateDocProperties;
+			bPreferenceTranslateComments = ooparams.bPreferenceTranslateComments;
+			bPreferenceTranslatePowerpointNotes = ooparams.bPreferenceTranslatePowerpointNotes;
+			bPreferenceTranslatePowerpointMasters = ooparams.bPreferenceTranslatePowerpointMasters;
+			bPreferenceTranslateWordHeadersFooters = ooparams.bPreferenceTranslateWordHeadersFooters;
+			bPreferenceTranslateWordAllStyles = ooparams.bPreferenceTranslateWordAllStyles;
+			bPreferenceTranslateWordHidden = ooparams.bPreferenceTranslateWordHidden;
+			bPreferenceTranslateExcelExcludeColors = ooparams.bPreferenceTranslateExcelExcludeColors;
+			bPreferenceTranslateExcelExcludeCells = ooparams.bPreferenceTranslateExcelExcludeCells;
+			tsExcelExcludedColors = ooparams.tsExcelExcludedColors;
+			tsExcelExcludedCells = ooparams.tsExcelExcludedCells;
+			tsExcludeWordStyles = ooparams.tsExcludeWordStyles;
+		}
+		catch(Exception e) {};
+	}
+	
 	/**
 	 * Closes the input zip file and completes the filter.
 	 */
@@ -456,7 +480,7 @@ public class OpenXMLFilter implements IFilter {
 	 * @param params IParameters object
 	 */
 	public void setParameters (IParameters params) {
-		this.params = (Parameters)params;
+		this.params = (IParameters)params; // DWH 6-25-09 was net.sf.okapi.filters.markupfilter.Parameters
 	}
 
 	/**
@@ -502,7 +526,7 @@ public class OpenXMLFilter implements IFilter {
 			}
 //			openXMLContentFilter.setUpConfig(nZipType);
 			  // DWH 3-4-09 sets Parameters inside OpenXMLContentFilter based on file type
-//			params = (Parameters)openXMLContentFilter.getParameters();
+//			params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
 			  // DWH 3-4-09 params for OpenXMLFilter
 			
 			if (nZipType==MSEXCEL &&
@@ -617,7 +641,8 @@ public class OpenXMLFilter implements IFilter {
 				LOGGER.log(Level.FINER,"\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (Parameters)openXMLContentFilter.getParameters();
+				params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
+					// DWH 6-15-09 fully specified Parameters
 				return openSubDocument(true);
 			}
 			else if ( sEntryName.equals("[Content_Types].xml") ||
@@ -658,14 +683,16 @@ public class OpenXMLFilter implements IFilter {
 				else
 					nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (Parameters)openXMLContentFilter.getParameters();
+				params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
+				  // DWH 6-15-09 fully specified Parameters
 				LOGGER.log(Level.FINER,"<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				return openSubDocument(false);
 			}
 			else {
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (Parameters)openXMLContentFilter.getParameters();
+				params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
+				  // DWH 6-15-09 fully specified Parameters
 				DocumentPart dp = new DocumentPart(entry.getName(), false);
 				ZipSkeleton skel = new ZipSkeleton(entry);
 				return new Event(EventType.DOCUMENT_PART, dp, skel);
@@ -691,7 +718,7 @@ public class OpenXMLFilter implements IFilter {
 		BufferedInputStream bis; // DWH 3-5-09
 		InputStream isInputStream;
 		openXMLContentFilter.close(); // Make sure the previous is closed
-		openXMLContentFilter.setParameters(params);
+		openXMLContentFilter.setParameters((net.sf.okapi.filters.markupfilter.Parameters)params);
 		//YS openXMLContentFilter.setOptions(srcLang, "UTF-8", true);
 		Event event;
 		try
@@ -724,7 +751,7 @@ public class OpenXMLFilter implements IFilter {
 			openXMLContentFilter.open(new RawDocument(bis, "UTF-8", srcLang)); // YS 4-7-09 // DWH 3-5-09
 			if (!bPreferenceTranslateWordHidden || !bPreferenceTranslateWordAllStyles)
 				  // DWH 5-28-09 list of styles to exclude
-				openXMLContentFilter.setHSExcludeStyles(hsExcludeStyles);
+				openXMLContentFilter.setTsExcludeWordStyles(tsExcludeWordStyles);
 			//			openXMLContentFilter.next(); // START
 			event = openXMLContentFilter.next(); // START_DOCUMENT
 			LOGGER.log(Level.FINEST,openXMLContentFilter.getParameters().toString());
@@ -777,7 +804,7 @@ public class OpenXMLFilter implements IFilter {
 	//				openXMLContentFilter.next();
 					// Change the END_DOCUMENT to END_SUBDOCUMENT
 					if (!bPreferenceTranslateWordHidden) // DWH 5-28-09 save mined styles
-						hsExcludeStyles = openXMLContentFilter.getHSExcludeStyles();
+						tsExcludeWordStyles = openXMLContentFilter.getTsExcludeWordStyles();
 					Ending ending = new Ending(String.valueOf(subDocId));
 					nextAction = NextAction.NEXTINZIP;
 					ZipSkeleton skel = new ZipSkeleton(

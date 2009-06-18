@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.Hashtable;
 //import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -131,7 +130,6 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private boolean bIgnoredPreRun = false; // DWH 4-10-09
 	private boolean bBeforeFirstTextRun = true; // DWH 4-15-09
 	private boolean bInMainFile = false; // DWH 4-15-09
-	private HashSet hsExcludeStyles = null; // DWH 5-27-09 set of styles to exclude from translation
 	private boolean bExcludeTextInRun = false; // DWH 5-27-09
 	private boolean bExcludeTextInUnit = false; // DWH 5-29-09
 	private String sCurrentCharacterStyle = ""; // DWH 5-27-09
@@ -141,6 +139,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	  // DWH 6-12-09 don't translate text in Excel in some colors 
 	private boolean bPreferenceTranslateExcelExcludeCells = true;
 	  // DWH 6-12-09 don't translate text in Excel in some specified cells
+	private TreeSet<String> tsExcludeWordStyles = null; // DWH 5-27-09 set of styles to exclude from translation
 	private TreeSet<String> tsExcelExcludedStyles; // DWH 6-12-09 
 	private TreeSet<String> tsExcelExcludedCells; // DWH 6-12-09 
 	private TreeMap<Integer,ExcelSharedString> tmSharedStrings=null; // DWH 6-13-09
@@ -154,7 +153,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		super(); // 1-6-09
 		setMimeType("text/xml");
 		setFilterWriter(createFilterWriter());
-		hsExcludeStyles = new HashSet<String>();
+		tsExcludeWordStyles = new TreeSet<String>();
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
@@ -912,14 +911,14 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 					// DWH 5-29-09 in a text unit, some styles shouldn't be translated
 				{
 					sCurrentCharacterStyle = startTag.getAttributeValue("w:val");
-					if (hsExcludeStyles.contains(sCurrentCharacterStyle))
+					if (tsExcludeWordStyles.contains(sCurrentCharacterStyle))
 						bExcludeTextInRun = true;
 				}
 				else if (sTagElementType.equals("pstyle")) // DWH 6-13-09 text unit style
 					// DWH 5-29-09 in a text unit, some styles shouldn't be translated
 				{
 					sCurrentParagraphStyle = startTag.getAttributeValue("w:val");
-					if (hsExcludeStyles.contains(sCurrentParagraphStyle))
+					if (tsExcludeWordStyles.contains(sCurrentParagraphStyle))
 						bExcludeTextInUnit = true;
 				}
 				else if (sTagElementType.equals("hidden") &&
@@ -1573,7 +1572,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public void excludeStyle(String sTyle) // DWH 5-27-09 to exclude selected styles or hidden text 
 	{
 		if (sTyle!=null && !sTyle.equals(""))
-			hsExcludeStyles.add(sTyle);
+			tsExcludeWordStyles.add(sTyle);
 	}
 	private boolean evaluateSharedString(Tag tag) // DWH 6-13-09 Excel options
 	{
@@ -1620,13 +1619,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	{
 		LOGGER = lgr;
 	}
-	public void setHSExcludeStyles(HashSet hsExcludeStyles)
+	public void setTsExcludeWordStyles(TreeSet tsExcludeWordStyles)
 	{
-		this.hsExcludeStyles = hsExcludeStyles;
+		this.tsExcludeWordStyles = tsExcludeWordStyles;
 	}
-	public HashSet getHSExcludeStyles()
+	public TreeSet getTsExcludeWordStyles()
 	{
-		return hsExcludeStyles;
+		return tsExcludeWordStyles;
 	}
 	public void setBPreferenceTranslateWordHidden(boolean bPreferenceTranslateWordHidden)
 	{
