@@ -54,6 +54,7 @@ public class RawDocument implements IResource {
 	public static final String UNKOWN_ENCODING = "null";
 
 	private Annotations annotations;
+	private String filterConfigId;
 	private String id;
 	private String encoding = UNKOWN_ENCODING;
 	private String srcLang;
@@ -386,5 +387,19 @@ public class RawDocument implements IResource {
 		}
 
 		this.encoding = encoding;
+	}
+
+	/**
+	 * @param filterConfigId the filterConfigId to set
+	 */
+	public void setFilterConfigId(String filterConfigId) {
+		this.filterConfigId = filterConfigId;
+	}
+
+	/**
+	 * @return the filterConfigId
+	 */
+	public String getFilterConfigId() {
+		return filterConfigId;
 	}
 }
