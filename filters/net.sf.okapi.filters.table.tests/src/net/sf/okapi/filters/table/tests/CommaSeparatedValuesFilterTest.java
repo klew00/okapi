@@ -188,78 +188,6 @@ public class CommaSeparatedValuesFilterTest {
 		filter.close();
 	}
 	
-//	@Test
-//	public void testParameters() {
-//		
-//		// Check if PlainTextFilter params are set for inherited fields
-//		Parameters params = (Parameters) filter.getParameters();
-//								
-//		assertEquals(params.columnWidths, "");
-//					
-//		// Check if defaults are set
-//		params = new Parameters();
-//		filter.setParameters(params);
-//		
-//		params.columnWidths = "";
-//		
-//		params = _getParameters();
-//				
-//		assertEquals("", params.columnWidths);
-//		
-//		// Load filter parameters from a file, check if params have changed
-//		URL paramsUrl = TableFilterTest.class.getResource("/test_params3.txt");
-//		assertNotNull(paramsUrl);  
-//		
-//		try {
-//			params.load(paramsUrl.toURI(), false);
-//		} catch (URISyntaxException e) {
-//		}
-//		
-//		
-//		assertEquals("19, 30, 21, 16, 15, 21, 20", params.columnWidths);
-//		
-//		// Save filter parameters to a file, load and check if params have changed
-//		paramsUrl = TableFilterTest.class.getResource("/test_params2.txt");
-//		assertNotNull(paramsUrl);
-//		
-//		params.save(paramsUrl.getPath());
-//		
-//		// Change params before loading them
-//		params = (Parameters) filter.getParameters();
-//		
-//		params.columnWidths = "1, 23, 30";
-//		
-//		params.load(Util.toURI(paramsUrl.getPath()), false);		
-//		assertEquals("19, 30, 21, 16, 15, 21, 20", params.columnWidths);
-//		
-//		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-//		filter.open(new RawDocument(input, "UTF-8", "en"));
-//		
-//		
-//		// Check if parameters type is controlled
-//		
-//		filter.setParameters(new net.sf.okapi.filters.plaintext.base.Parameters());
-//		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-//		try {
-//			filter.open(new RawDocument(input, "UTF-8", "en"));
-//			fail("OkapiBadFilterParametersException should've been trown");
-//		}
-//		catch (OkapiBadFilterParametersException e) {
-//		}
-//		
-//		filter.close();
-//	
-//		filter.setParameters(new net.sf.okapi.filters.table.csv.Parameters());
-//		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-//		try {
-//			filter.open(new RawDocument(input, "UTF-8", "en"));
-//		}
-//		catch (OkapiBadFilterParametersException e) {
-//			fail("OkapiBadFilterParametersException should NOT have been trown");
-//		}
-//			filter.close();
-//	}
-
 	@Test
 	public void testParameters() {
 		
@@ -271,8 +199,11 @@ public class CommaSeparatedValuesFilterTest {
 		assertEquals(params.trimRight, false);
 		assertEquals(params.preserveWS, true);
 		assertEquals(params.useCodeFinder, false);
-		assertEquals(params.regularExpressionForEmbeddedMarkup, "");
-					
+		assertEquals(				
+				"#v1\ncount.i=2\nrule0=%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]\n" +
+				"rule1=(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v\nsample=\nuseAllRulesWhenTesting.b=false", 
+				params.codeFinderRules);
+									
 		// Check if defaults are set
 		params = new Parameters();
 		filter.setParameters(params);
