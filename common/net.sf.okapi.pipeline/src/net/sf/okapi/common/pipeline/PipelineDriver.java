@@ -87,27 +87,23 @@ public class PipelineDriver implements IPipelineDriver {
 		batchItems.add(item);
 	}
 
-	public void addBatchItem (String filterConfig,
-		RawDocument... rawDocs)
+	public void addBatchItem (RawDocument... rawDocs)
 	{
 		BatchItemContext item = new BatchItemContext();
 		for ( RawDocument rawDoc : rawDocs ) {
 			DocumentData ddi = new DocumentData();
 			ddi.rawDocument = rawDoc;
-			ddi.filterConfigId = filterConfig;
 			item.add(ddi);
 		}
 		batchItems.add(item);
 	}
 	
 	public void addBatchItem (RawDocument rawDoc,
-		String filterConfig,
 		URI outputURI,
 		String outputEncoding)
 	{
 		DocumentData ddi = new DocumentData();
 		ddi.rawDocument = rawDoc;
-		ddi.filterConfigId = filterConfig;
 		ddi.outputURI = outputURI;
 		ddi.outputEncoding = outputEncoding;
 		BatchItemContext item = new BatchItemContext();
@@ -123,7 +119,7 @@ public class PipelineDriver implements IPipelineDriver {
 	{
 		DocumentData ddi = new DocumentData();
 		ddi.rawDocument = new RawDocument(inputURI, defaultEncoding, srcLang, trgLang);
-		ddi.filterConfigId = filterConfigId;
+		ddi.rawDocument.setFilterConfigId(filterConfigId);
 		BatchItemContext item = new BatchItemContext();
 		item.add(ddi);
 		batchItems.add(item);

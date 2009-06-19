@@ -178,10 +178,35 @@ public interface IFilterConfigurationMapper {
 	 */
 	public List<FilterConfiguration> getFilterConfigurations (String filterClass);
 
+	/**
+	 * Gets the parameters for a given configuration (predefined or custom).
+	 * @param config the configuration for which the parameters are requested.
+	 * @return the parameters object for the given configuration.
+	 * @See {@link #getCustomParameters(FilterConfiguration)}
+	 */
 	public IParameters getParameters (FilterConfiguration config);
 	
+	/**
+	 * Gets the parameters for a given configuration (predefined or custom).
+	 * @param config the configuration for which the parameters are requested.
+	 * @param existingFilter optional existing instance of the filter for the given
+	 * configuration. This argument can be null. If it not null, the provided filter
+	 * may be used to load the parameters (if it matches the appropriate class).
+	 * Providing this argument may allow the method to be more efficient by not 
+	 * creating a temporary filter to get an instance of the parameters to load. 
+	 * @return the parameters object for the given configuration.
+	 */
 	public IParameters getParameters (FilterConfiguration config,
 		IFilter existingFilter);
+	
+	/**
+	 * Creates a custom configuration object based on a give one.
+	 * The new configuration is <b>not</b> added to the current list.
+	 * @param baseConfig the base configuration from which to base the new one.
+	 * @return a new {@link FilterConfiguration} object set with some
+	 * default values. 
+	 */
+	public FilterConfiguration createCustomConfiguration (FilterConfiguration baseConfig);
 
 	/**
 	 * Gets the parameters for a given custom filter configuration.
@@ -190,7 +215,7 @@ public interface IFilterConfigurationMapper {
 	 * @param config the custom configuration for which the method should return the 
 	 * filter parameters.
 	 * @param existingFilter optional existing instance of the filter for the given
-	 * configuration. this argument can be null. If it not null, the provided filter
+	 * configuration. This argument can be null. If it not null, the provided filter
 	 * may be used to load the parameters (if it matches the appropriate class).
 	 * Providing this argument may allow the method to be more efficient by not 
 	 * creating a temporary filter to get an instance of the parameters to load. 

@@ -244,7 +244,7 @@ public class MainForm implements IParametersProvider {
 			public void shellActivated(ShellEvent event) {}
 			public void shellClosed(ShellEvent event) {
 				saveUserConfiguration();
-				if ( !canContinue() ) event.doit = false;
+				if ( !canContinue(false) ) event.doit = false;
 			}
 			public void shellDeactivated(ShellEvent event) {}
 			public void shellDeiconified(ShellEvent event) {}
@@ -1586,7 +1586,7 @@ public class MainForm implements IParametersProvider {
 		config.save(APPNAME, getClass().getPackage().getImplementationVersion());
 	}
 
-	private boolean canContinue () {
+	private boolean canContinue (boolean falseOnError) {
 		try {
 			saveSurfaceData();
 			if ( !prj.isModified ) return true;
@@ -1607,7 +1607,7 @@ public class MainForm implements IParametersProvider {
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
-			return false;
+			if ( falseOnError ) return false;
 		}
 		return true;
 	}
@@ -1710,7 +1710,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void createProject (boolean checkCanContinue ) {
 		if ( checkCanContinue ) {
-			if ( !canContinue() ) return;
+			if ( !canContinue(true) ) return;
 		}
 		
 		prj = new Project(lm);
@@ -1721,7 +1721,7 @@ public class MainForm implements IParametersProvider {
 	
 	private void openProject (String path) {
 		try {
-			if ( !canContinue() ) return;
+			if ( !canContinue(true) ) return;
 			if ( path == null ) {
 				String[] paths = Dialogs.browseFilenames(shell, Res.getString("MainForm.openProjectBrowsecaption"), false, null, //$NON-NLS-1$
 					Res.getString("MainForm.35"), "*.rnb\t*.*");  //$NON-NLS-1$//$NON-NLS-2$
@@ -1914,7 +1914,7 @@ public class MainForm implements IParametersProvider {
 
 			// Call the dialog
 			updateCustomConfigurations();
-			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, this, fcMapper, prj.getProjectFolder());
+			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, this, fcMapper, prj, prj.getProjectFolder());
 			dlg.setData(inp.filterSettings, inp.sourceEncoding,
 				inp.targetEncoding, fa, fcMapper);
 			String[] aRes = dlg.showDialog();
@@ -2041,7 +2041,8 @@ public class MainForm implements IParametersProvider {
 	
 	private void filterConfigurations () {
 		try {
-			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false);
+			saveSurfaceData();
+			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false, prj);
 			updateCustomConfigurations();
 			dlg.showDialog(fcMapper, null);
 		}

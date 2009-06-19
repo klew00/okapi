@@ -48,13 +48,10 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 	 * Creates a new BatchItemContext object and initializes it with a given
 	 * {@link RawDocument} and additional arguments.
 	 * @param rawDoc the {@link RawDocument} to use as the main input document.
-	 * @param filterConfigId the filter configuration ID for the input document
-	 * (can be null if not used).
 	 * @param outputURI the output URI of the input document (can be null if not used).
 	 * @param outputEncoding the output encoding (can be null if not used).
 	 */
 	public BatchItemContext (RawDocument rawDoc,
-		String filterConfigId,
 		URI outputURI,
 		String outputEncoding)
 	{
@@ -62,7 +59,6 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 		list = new ArrayList<DocumentData>(INITIAL_CAPACITY);
 		DocumentData ddi = new DocumentData();
 		ddi.rawDocument = rawDoc;
-		ddi.filterConfigId = filterConfigId;
 		ddi.outputURI = outputURI;
 		ddi.outputEncoding = outputEncoding;
 		list.add(ddi);
@@ -91,7 +87,7 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 		list = new ArrayList<DocumentData>(INITIAL_CAPACITY);
 		DocumentData ddi = new DocumentData();
 		ddi.rawDocument = new RawDocument(inputURI, defaultEncoding, sourceLanguage, targetLanguage);
-		ddi.filterConfigId = filterConfigId;
+		ddi.rawDocument.setFilterConfigId(filterConfigId);
 		ddi.outputURI = outputURI;
 		ddi.outputEncoding = outputEncoding;
 		list.add(ddi);
@@ -109,19 +105,15 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 	 * Adds a document to the list of inputs for this batch item 
 	 * using the provided arguments. 
 	 * @param rawDoc the {@link RawDocument} to use as the main input document.
-	 * @param filterConfigId the filter configuration ID for the input document
-	 * (can be null if not used).
 	 * @param outputURI the output URI of the input document (can be null if not used).
 	 * @param outputEncoding the output encoding (can be null if not used).
 	 */
 	public void add (RawDocument rawDoc,
-		String filterConfigId,
 		URI outputURI,
 		String outputEncoding)
 	{
 		DocumentData dd = new DocumentData();
 		dd.rawDocument = rawDoc;
-		dd.filterConfigId = filterConfigId;
 		dd.outputURI = outputURI;
 		dd.outputEncoding = outputEncoding;
 		list.add(dd);
@@ -129,7 +121,7 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 		
 	public String getFilterConfigurationId (int index) {
 		if ( list.size() <= index ) return null;
-		return list.get(index).filterConfigId;
+		return list.get(index).rawDocument.getFilterConfigId();
 	}
 	
 	public String getOutputEncoding (int index) {

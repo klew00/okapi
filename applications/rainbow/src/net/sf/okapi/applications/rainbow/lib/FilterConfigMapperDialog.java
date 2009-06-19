@@ -20,7 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
-import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -39,13 +39,17 @@ import org.eclipse.swt.widgets.Shell;
 public class FilterConfigMapperDialog {
 
 	private Shell shell;
-	private IFilterConfigurationMapper mapper;
 	private FilterConfigurationsPanel pnlConfigs;
+	private CustomConfigurationFolderPanel pnlParamsFolder;
+	private FilterConfigMapper mapper;
 	private String result = null;
+	private Project project;
 
 	public FilterConfigMapperDialog (Shell parent,
-		boolean selectionMode)
+		boolean selectionMode,
+		Project project)
 	{
+		this.project = project;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Filter Configurations");
 		UIUtil.inheritIcon(shell, parent);
@@ -54,6 +58,10 @@ public class FilterConfigMapperDialog {
 		pnlConfigs = new FilterConfigurationsPanel(shell, SWT.NONE);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		pnlConfigs.setLayoutData(gdTmp);
+		
+		pnlParamsFolder = new CustomConfigurationFolderPanel(shell, SWT.NONE, project, this);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		pnlParamsFolder.setLayoutData(gdTmp);
 		
 		// Dialog-level buttons
 		SelectionAdapter Actions = new SelectionAdapter() {
@@ -96,7 +104,7 @@ public class FilterConfigMapperDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
-	public String showDialog (IFilterConfigurationMapper mapper,
+	public String showDialog (FilterConfigMapper mapper,
 		String configId)
 	{
 		this.mapper = mapper;
@@ -107,6 +115,17 @@ public class FilterConfigMapperDialog {
 				shell.getDisplay().sleep();
 		}
 		return result;
+	}
+
+	/**
+	 * Updates the custom configurations mapper and the list.
+	 */
+	public void updateCustomConfigurations () {
+		// Re-load custom configurations
+		mapper.setParametersFolder(project.getParametersFolder());
+		mapper.updateCustomConfigurations();
+		// Update the display list and the selection
+		pnlConfigs.updateData();
 	}
 
 }

@@ -332,6 +332,7 @@ public class PipelineWrapper {
 		int f = -1;
 		URI outURI;
 		URI inpURI;
+		RawDocument rawDoc;
 		BatchItemContext bic;
 		int inputRequested = driver.inputCountRequested();
 		
@@ -340,11 +341,10 @@ public class PipelineWrapper {
 			// Set the data for the first input of the batch item
 			outURI = (new File(prj.buildTargetPath(0, item.relativePath))).toURI();
 			inpURI = (new File(prj.getInputRoot(0) + File.separator + item.relativePath)).toURI();
-			bic = new BatchItemContext(new RawDocument(
-					inpURI, prj.buildSourceEncoding(item),
-					prj.getSourceLanguage(), prj.getTargetLanguage()),
-				item.filterSettings,
-				outURI, prj.buildTargetEncoding(item));
+			rawDoc = new RawDocument(inpURI, prj.buildSourceEncoding(item),
+				prj.getSourceLanguage(), prj.getTargetLanguage());
+			rawDoc.setFilterConfigId(item.filterSettings);
+			bic = new BatchItemContext(rawDoc, outURI, prj.buildTargetEncoding(item));
 			
 			// Add input/output data from other input lists if requested
 			for ( int j=1; j<3; j++ ) {
@@ -357,11 +357,10 @@ public class PipelineWrapper {
 					// Input
 					outURI = (new File(prj.buildTargetPath(j, item2.relativePath))).toURI();
 					inpURI = (new File(prj.getInputRoot(j) + File.separator + item2.relativePath)).toURI();
-					bic.add(new RawDocument(
-							inpURI, prj.buildSourceEncoding(item),
-							prj.getSourceLanguage(), prj.getTargetLanguage()),
-						item2.filterSettings,
-						outURI, prj.buildTargetEncoding(item2));
+					rawDoc = new RawDocument(inpURI, prj.buildSourceEncoding(item),
+						prj.getSourceLanguage(), prj.getTargetLanguage());
+					rawDoc.setFilterConfigId(item2.filterSettings);
+					bic.add(rawDoc, outURI, prj.buildTargetEncoding(item2));
 				}
 				// Else: don't add anything
 				// The lists will return null and that is up to the utility to check.

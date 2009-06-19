@@ -86,20 +86,27 @@ public class FilterConfigurationsPanel extends Composite {
 	public void setData (IFilterConfigurationMapper mapper,
 		String configId)
 	{
+		// Set the mapper
 		this.mapper = mapper;
 		model.setMapper(mapper);
-		model.updateTable(0);
-
-		// Try to select the configuration
-		if ( configId != null ) { // try to get the index of the configuration
-			for ( int i=0; i<table.getItemCount(); i++ ) {
-				if ( configId.equals(
-					table.getItem(i).getText(FilterConfigurationsTableModel.ID_COLINDEX)) ) {
-					table.setSelection(i);
-					break;
-				}
-			}
+		// Update the list and the selection
+		model.updateTable(0, configId);
+		updateInfo();
+	}
+	
+	/**
+	 * Updates the list of the configurations. Tries to keep the current
+	 * selected configuration.
+	 */
+	public void updateData () {
+		// Get the current selection
+		int n = table.getSelectionIndex();
+		String configId = null;
+		if ( n > -1 ) {
+			configId = table.getItem(n).getText(FilterConfigurationsTableModel.ID_COLINDEX);
 		}
+		// Update the list and the selection
+		model.updateTable(0, configId);
 		updateInfo();
 	}
 	
@@ -271,7 +278,7 @@ public class FilterConfigurationsPanel extends Composite {
 			// Else: Do delete the item
 			mapper.deleteCustomParameters(config);
 			mapper.removeConfiguration(id);
-			model.updateTable(n);
+			model.updateTable(n, null);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);
@@ -282,8 +289,21 @@ public class FilterConfigurationsPanel extends Composite {
 		try {
 			int n = table.getSelectionIndex();
 			if ( n == -1 ) return;
-			//String id = table.getItem(n).getText(FilterConfigurationsTableModel.ID_COLINDEX);
-			//TODO: Creation
+			FilterConfiguration baseConfig = mapper.getConfiguration(
+				table.getItem(n).getText(FilterConfigurationsTableModel.ID_COLINDEX));
+			if ( baseConfig == null ) return;
+
+			FilterConfiguration newConfig = mapper.createCustomConfiguration(baseConfig);
+			if ( newConfig == null ) {
+				throw new Exception(String.format("Could not create new configuration based on '%s'",
+					baseConfig.configId));
+			}
+			
+			cachedFilter = mapper.createFilter(baseConfig.configId, cachedFilter);
+			IParametersEditor editor = mapper.createParametersEditor(baseConfig.configId, cachedFilter);
+			
+			//params.fromString(baseParams.toString());
+
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);

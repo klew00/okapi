@@ -84,25 +84,19 @@ public interface IPipelineDriver {
 
 	/**
 	 * Adds an item to this batch, using one or more RawDocument objects.
-	 * The added item will have as many input documents as provided. All of them
-	 * will be set to use the same filter configuration (the one provided). 
-	 * @param filterConfigId the filter configuration ID to use for these documents (may be null).
+	 * The added batch item will have as many input documents as provided. 
 	 * @param rawDocs one or more RawDocuments to include in this item.
 	 */
-	public void addBatchItem (String filterConfigId,
-		RawDocument... rawDocs);
+	public void addBatchItem (RawDocument... rawDocs);
 	
 	/**
 	 * Adds an item to this batch, using a RawDocument object. The added item
 	 * will have a single input document. 
 	 * @param rawDoc the RawDocument object from which to create an entry.
-	 * @param filterConfigId the filter configuration ID to use for this document
-	 * (can be null if not used).
 	 * @param outputURI path of the output document (can be null if no used)
 	 * @param outputEncoding encoding of the output  (can be null if no used)
 	 */
 	public void addBatchItem (RawDocument rawDoc,
-		String filterConfigId,
 		URI outputURI,
 		String outputEncoding);
 	

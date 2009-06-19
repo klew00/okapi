@@ -390,16 +390,19 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * @param filterConfigId the filterConfigId to set
+	 * Sets the identifier of the filter configuration to use with this document.
+	 * @param filterConfigId the filter configuration identifier to set.
 	 */
 	public void setFilterConfigId(String filterConfigId) {
 		this.filterConfigId = filterConfigId;
 	}
 
 	/**
-	 * @return the filterConfigId
+	 * Gets the identifier of the filter configuration to use with this document.
+	 * @return the the filter configuration identifier for this document, or null if none is set.
 	 */
 	public String getFilterConfigId() {
 		return filterConfigId;
 	}
+
 }

@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.lib;
 
 import java.util.ArrayList;
 
+import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -61,11 +62,13 @@ public class FilterConfigSelectionPanel extends Composite {
 	private BaseContext context;
 	private ArrayList<FilterInfo> filters;
 	private IFilter cachedFilter;
+	private Project project;
 	
 	public FilterConfigSelectionPanel (Composite p_Parent,
 		IHelp helpParam,
 		int p_nFlags,
 		FilterConfigMapper mapper,
+		Project project,
 		String projectDir)
 	{
 		super(p_Parent, SWT.NONE);
@@ -74,6 +77,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		context.setString("projDir", projectDir);
 		context.setObject("shell", getShell());
 		this.mapper = mapper;
+		this.project = project;
 		createContent();
 	}
 	
@@ -209,7 +213,7 @@ public class FilterConfigSelectionPanel extends Composite {
 			if ( n > -1 ) {
 				configId = lbConfigs.getItem(n);
 			}
-			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(getShell(), true);
+			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(getShell(), true, project);
 			configId = dlg.showDialog(mapper, configId);
 			if ( configId == null ) return; // No selection
 			setConfiguration(mapper.getConfiguration(configId));

@@ -38,6 +38,9 @@ import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 
 /**
  * Default implementation of the {@link IFilterConfigurationMapper} interface.
+ * In this implementation the custom configurations are stored as simple files in the file system
+ * of the machine and the value for {@link FilterConfiguration.parametersLocation} for a custom
+ * configuration is the path or filename of the parameters file.
  */
 public class FilterConfigurationMapper extends ParametersEditorMapper implements IFilterConfigurationMapper {
 
@@ -112,7 +115,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		IFilter filter = instantiateFilter(fc, existingFilter);
 		
 		// Always load the parameters (if there are parameters)
-		if ( fc.parameters != null ) {
+		if ( fc.parametersLocation != null ) {
 			IParameters params = filter.getParameters();
 			if ( params == null ) {
 				throw new RuntimeException(String.format(
@@ -125,7 +128,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 				// Note that we cannot assume the parameters are the same
 				// if we re-used an existing filter, as we cannot compare the 
 				// configuration identifiers
-				URL url = filter.getClass().getResource(fc.parameters);
+				URL url = filter.getClass().getResource(fc.parametersLocation);
 				try {
 					params.load(url.toURI(), false);
 				}
@@ -146,7 +149,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	public IParameters getParameters (FilterConfiguration config,
 		IFilter existingFilter)
 	{
-		if ( config.parameters == null ) return null; // Nothing to load
+		if ( config.parametersLocation == null ) return null; // Nothing to load
 		
 		IFilter filter = instantiateFilter(config, existingFilter);
 		IParameters params = filter.getParameters();
@@ -161,7 +164,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			// Note that we cannot assume the parameters are the same
 			// if we re-used an existing filter, as we cannot compare the 
 			// configuration identifiers
-			URL url = filter.getClass().getResource(config.parameters);
+			URL url = filter.getClass().getResource(config.parametersLocation);
 			try {
 				params.load(url.toURI(), false);
 			}
@@ -183,7 +186,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	{
 		FilterConfiguration fc = configMap.get(configId);
 		if ( fc == null ) return null;
-		if ( fc.parameters == null ) return null;
+		if ( fc.parametersLocation == null ) return null;
 
 		IFilter filter = instantiateFilter(fc, existingFilter);
 
@@ -298,14 +301,14 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 
 		// Load the provided parameter file
 		// In this implementation we assume it is in the current directory
-		File file = new File(config.parameters);
+		File file = new File(config.parametersLocation);
 		params.load(file.toURI(), false);
 		return params;
 	}
 
 	public void deleteCustomParameters (FilterConfiguration config) {
 		// In this implementation we assume it is in the current directory
-		File file = new File(config.parameters);
+		File file = new File(config.parametersLocation);
 		file.delete();
 	}
 
@@ -313,7 +316,26 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		IParameters params)
 	{
 		// In this implementation we assume it is in the current directory
-		params.save(config.parameters);
+		params.save(config.parametersLocation);
+	}
+
+	public FilterConfiguration createCustomConfiguration (FilterConfiguration baseConfig) {
+		// Create the new configuration and set its members as a copy of the base
+		FilterConfiguration newConfig = new FilterConfiguration();
+		newConfig.configId = String.format("copy-of-%s", baseConfig.configId);
+		newConfig.name = String.format("Copy of %s", baseConfig.name);
+		newConfig.custom = true;
+		newConfig.description = "";
+		newConfig.filterClass = baseConfig.filterClass;
+		newConfig.mimeType = baseConfig.mimeType;
+		newConfig.parametersLocation = newConfig.configId;
+		
+		// Instantiate a filter and set the new parameters based on the base ones
+		IFilter filter = instantiateFilter(baseConfig, null);
+		IParameters baseParams = getParameters(baseConfig, filter);
+		IParameters newParams = filter.getParameters();
+		newParams.fromString(baseParams.toString());
+		return newConfig;
 	}
 
 	public void clearConfigurations (boolean customOnly) {
@@ -331,7 +353,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			configMap.clear();
 		}
 	}
-
+	
 	/**
 	 * Instantiate a filter from a given configuration, trying to re-use an existing one.
 	 * @param config the configuration corresponding to the filter to load.

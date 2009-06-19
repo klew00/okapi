@@ -63,8 +63,8 @@ public class FilterRoundtripTest {
 		RawDocument rd = new RawDocument(
 			"<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>",
 			"en", "es");
-		driver.addBatchItem(rd, "okf_html",
-			(new File("genericOutput.txt")).toURI(), "UTF-16LE");
+		rd.setFilterConfigId("okf_html");
+		driver.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-16LE");
 		driver.processBatch();
 		assertEquals("spam",
 			getFirstTUSource(new RawDocument((new File("genericOutput.txt")).toURI(),
@@ -75,8 +75,8 @@ public class FilterRoundtripTest {
 	public void runPipelineFromStream() {
 		driver.clearItems();
 		RawDocument rd = new RawDocument("\nX\n\nY\n", "en", "fr");
-		driver.addBatchItem(rd, "okf_html",
-			(new File("genericOutput.txt")).toURI(), "UTF-8");
+		rd.setFilterConfigId("okf_html");
+		driver.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-8");
 		driver.processBatch();
 		assertEquals("X Y",
 			getFirstTUSource(new RawDocument((new File("genericOutput.txt")).toURI(),
@@ -89,15 +89,15 @@ public class FilterRoundtripTest {
 		// First pass
 		driver.clearItems();
 		RawDocument rd = new RawDocument(snippet, "en", "es");
-		driver.addBatchItem(rd, "okf_html",
-			(new File("output1.html")).toURI(), "UTF-8");
+		rd.setFilterConfigId("okf_html");
+		driver.addBatchItem(rd, (new File("output1.html")).toURI(), "UTF-8");
 		driver.processBatch();
 
 		// Second pass
 		driver.clearItems();
 		rd = new RawDocument((new File("output1.html")).toURI(), "UTF-8", "es", "en");
-		driver.addBatchItem(rd, "okf_html",
-			(new File("output2.html")).toURI(), "UTF-8");
+		rd.setFilterConfigId("okf_html");
+		driver.addBatchItem(rd, (new File("output2.html")).toURI(), "UTF-8");
 		driver.processBatch();
 		
 		// Check result

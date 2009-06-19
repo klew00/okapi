@@ -66,6 +66,7 @@ public class StepTestDriver {
 		}
 		sb.append("\"\n");
 		rawDoc = new RawDocument(sb.toString(), srcLang, trgLang);
+		rawDoc.setFilterConfigId("okf_po");
 	}
 	
 	/**
@@ -87,7 +88,7 @@ public class StepTestDriver {
 		driver.addStep(step);
 		captureStep.reset(); // Reset result
 		driver.addStep(captureStep);
-		driver.addBatchItem(rawDoc, "okf_po", null, null);
+		driver.addBatchItem(rawDoc, null, null);
 		driver.processBatch();
 	}
 

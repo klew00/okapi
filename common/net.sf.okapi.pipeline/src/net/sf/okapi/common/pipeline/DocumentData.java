@@ -27,7 +27,6 @@ import net.sf.okapi.common.resource.RawDocument;
 class DocumentData {
 
 	RawDocument rawDocument;
-	String filterConfigId;
 	URI outputURI;
 	String outputEncoding;
 

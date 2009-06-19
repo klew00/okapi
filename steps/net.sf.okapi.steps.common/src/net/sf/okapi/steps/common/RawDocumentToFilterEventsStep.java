@@ -93,7 +93,7 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 		// Initialize the filter on RAW_DOCUMENT
 		case RAW_DOCUMENT:
 			if ( !filterfromSetFilter ) {
-				// Filter is to be set from the configuration
+				// Filter is to be set from the batch item info
 				if ( Util.isEmpty(getContext().getFilterConfigurationId(0)) ) {
 					// No filter configuration provided: just pass it down
 					isDone = true;

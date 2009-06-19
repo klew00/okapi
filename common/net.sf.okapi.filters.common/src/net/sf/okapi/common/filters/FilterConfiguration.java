@@ -25,12 +25,36 @@ package net.sf.okapi.common.filters;
  */
 public class FilterConfiguration {
 
+	/**
+	 * Unique identifier for this configuration.
+	 */
 	public String configId;
+	/**
+	 * The full name of the class that implement the filter for this configuration. 
+	 */
 	public String filterClass;
-	public String parameters;
+	/**
+	 * The location of the parameters for this configuration. This should be the
+	 * name of the file where the configuration is stored in the package resource
+	 * for a pre-defined configurations; it can be null if the configuration is 
+	 * the default one, and it can be anything for a custom configuration.
+	 */
+	public String parametersLocation;
+	/**
+	 * Short localizable name for this configuration.
+	 */
 	public String name;
+	/**
+	 * Longer localizable description of for this configuration.
+	 */
 	public String description;
+	/**
+	 * Flag indicating if this configuration is custom or pre-defined.
+	 */
 	public boolean custom;
+	/**
+	 * MIME type for this configuration.
+	 */
 	public String mimeType;
 
 	/**
@@ -46,16 +70,16 @@ public class FilterConfiguration {
 	 * @param filterClass the filter class name.
 	 * @param name the localizable name of this configuration.
 	 * @param description the localizable description of this configuration. 
-	 * @param parameters the parameters for this configuration.
+	 * @param parametersLocation the location where the parameters for this configuration are stored.
 	 */
 	public FilterConfiguration (String configId,
 		String mimeType,
 		String filterClass,
 		String name,
 		String description,
-		String parameters)
+		String parametersLocation)
 	{
-		create(configId, mimeType, filterClass, name, description, parameters);
+		create(configId, mimeType, filterClass, name, description, parametersLocation);
 	}
 	
 	/**
@@ -74,20 +98,29 @@ public class FilterConfiguration {
 	{
 		create(configId, mimeType, filterClass, name, description, null);
 	}
-	
+
+	/**
+	 * Creates a FilterConfiguration object and initializes it.
+	 * @param configId the configuration identifier.
+	 * @param mimeType the MIME type associated with this configuration.
+	 * @param filterClass the filter class name.
+	 * @param name the localizable name of this configuration.
+	 * @param description the localizable description of this configuration. 
+	 * @param parametersLocation the location where the parameters for this configuration are stored.
+	 */
 	private void create (String configId,
 		String mimeType,
 		String filterClass,
 		String name,
 		String description,
-		String parameters)
+		String parametersLocation)
 	{
 		this.configId = configId;
 		this.mimeType = mimeType;
 		this.name = name;
 		this.description = description;
 		this.filterClass = filterClass;
-		this.parameters = parameters;
+		this.parametersLocation = parametersLocation;
 	}
 
 }

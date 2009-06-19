@@ -65,8 +65,9 @@ public class XsltPipelineTest {
 		driver.addStep(new FilterEventsWriterStep());
 
 		RawDocument rd = new RawDocument(inputXml.toURI(), "UTF-8", "en");
+		rd.setFilterConfigId("okf_xml");
 		File outFile = new File("output.xml");
-		driver.addBatchItem(rd, "okf_xml", outFile.toURI(), "UTF-8");
+		driver.addBatchItem(rd, outFile.toURI(), "UTF-8");
 		driver.processBatch();
 
 		// Read the result and compare

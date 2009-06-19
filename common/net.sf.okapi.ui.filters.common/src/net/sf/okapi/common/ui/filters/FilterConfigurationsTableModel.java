@@ -53,13 +53,32 @@ class FilterConfigurationsTableModel {
 		this.mapper = mapper;
 	}
 
-	void updateTable (int selection) {
+	/**
+	 * Refill the table with the configurations in the mapper.
+	 * The method also tries to select the provided configuration identifier.
+	 * @param selection index of the configuration to select (if selectedConfigId
+	 * is null or not found). If the value is out of range the last configuration
+	 * is selected. 
+	 * @param selectedConfigId identifier of the configuration to select, or zero
+	 * to select by index. If the configuration is not found, the index selection
+	 * is used instead.
+	 */
+	void updateTable (int selection,
+		String selectedConfigId)
+	{
 		table.removeAll();
 		if ( mapper == null ) return;
 		Iterator<FilterConfiguration> iter = mapper.getAllConfigurations();
 		FilterConfiguration config;
+		int i = 0;
 		while ( iter.hasNext() ) {
 			config = iter.next();
+			if ( selectedConfigId != null ) {
+				if ( selectedConfigId.equals(config.configId) ) {
+					selection = i;
+				}
+			}
+			i++;
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(ID_COLINDEX, config.configId);
 			item.setText(1, config.name);

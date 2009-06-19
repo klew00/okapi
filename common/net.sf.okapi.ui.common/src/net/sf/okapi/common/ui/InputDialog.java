@@ -50,8 +50,9 @@ public class InputDialog {
 	 * @param defaultInputText default input text (can be null).
 	 * @param helpFile path to the help file (can be null).
 	 * @param buttonOptions indicates if a browse button should be set:
-	 * @param multiline height hint in pixel if the field is to be multiline, -1 otherwise.
 	 * 0=none, 1=directory browser.
+	 * @param multiline height hint in pixel if the field is to be multiline,
+	 * -1 otherwise.
 	 */
 	public InputDialog (Shell parent,
 		String captionText,

@@ -41,8 +41,9 @@ public class EventsToRawDocumentStepTest {
 		eventToDoc = new FilterEventsToRawDocumentStep();
 		
 		eventToDoc.setPipeline(pipeline);
-		BatchItemContext bic = new BatchItemContext(
-			new RawDocument(htmlSnippet, "en"), "okf_html", null, "UTF-8");
+		RawDocument rawDoc = new RawDocument(htmlSnippet, "en");
+		rawDoc.setFilterConfigId("okf_html");
+		BatchItemContext bic = new BatchItemContext(rawDoc, null, "UTF-8");
 		pipeline.getContext().setBatchItemContext(bic);
 
 		htmlFilter.open(bic.getRawDocument(0));
@@ -67,8 +68,9 @@ public class EventsToRawDocumentStepTest {
 		pipeline.addStep(eventToDoc); 
 		
 		File tmpFile = File.createTempFile("FilterEventsToRawDocumentStepTest", ".tmp");
-		BatchItemContext bic = new BatchItemContext(
-			new RawDocument(htmlSnippet, "en"), "okf_html", tmpFile.toURI(), "UTF-8");
+		RawDocument rawDoc = new RawDocument(htmlSnippet, "en");
+		rawDoc.setFilterConfigId("okf_html");
+		BatchItemContext bic = new BatchItemContext(rawDoc, tmpFile.toURI(), "UTF-8");
 		pipeline.getContext().setBatchItemContext(bic);
 
 		htmlFilter.open(bic.getRawDocument(0));

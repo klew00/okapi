@@ -154,7 +154,7 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 			if ( filter == null ) continue;
 			
 			// Set the data
-			fc.parameters = fc.configId + FilterSettingsMarkers.PARAMETERS_FILEEXT;
+			fc.parametersLocation = fc.configId + FilterSettingsMarkers.PARAMETERS_FILEEXT;
 			fc.filterClass = filter.getClass().getName();
 			fc.mimeType = filter.getMimeType();
 			fc.description = "Configuration for "+fc.configId; // Temporary
@@ -189,7 +189,7 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 
 		// Load the provided parameter file
 		// In this implementation we assume it is in the current directory
-		File file = new File(paramsFolder + config.parameters);
+		File file = new File(paramsFolder + config.parametersLocation);
 		params.load(file.toURI(), false);
 		return params;
 	}
