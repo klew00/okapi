@@ -74,6 +74,13 @@ public interface IParameters {
 	public String getPath ();
 	
 	/**
+	 * Sets the full path of the file where the parameters are to be
+	 * saved to.
+	 * @param filePath the full path to set.
+	 */
+	public void setPath (String filePath);
+	
+	/**
 	 * Gets the boolean value for the given parameter name.
 	 * @param name the name of the boolean parameter to retrieve.
 	 * @return the value of the given parameter, or false if it is not defined.

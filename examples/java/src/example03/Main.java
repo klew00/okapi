@@ -48,9 +48,9 @@ public class Main {
 		driver.addStep(new FilterEventsWriterStep());
 
 		// Set the info for the input and output
-		driver.addBatchItem(
-			new RawDocument(inputXml.toURI(), "UTF-8", "en", "fr"),
-			"okf_xml", (new File("output.xml")).toURI(), "UTF-8");
+		RawDocument rawDoc = new RawDocument(inputXml.toURI(), "UTF-8", "en", "fr");
+		rawDoc.setFilterConfigId("okf_xml");
+		driver.addBatchItem(rawDoc, (new File("output.xml")).toURI(), "UTF-8");
 		
 		// Run the pipeline:
 		// (1) XSLT identity conversion step

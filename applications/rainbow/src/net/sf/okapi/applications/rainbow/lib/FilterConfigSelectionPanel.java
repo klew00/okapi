@@ -187,16 +187,16 @@ public class FilterConfigSelectionPanel extends Composite {
 					break;
 				}
 			}
+			if ( n == -1 ) {
+				// Warn that the configuration or filter was not found
+				Dialogs.showError(getShell(), String.format(
+					"The configuration '%s' or its filter could not be found.",
+					config.configId), null);
+			}
 		}
-
-		if ( n == -1 ) {
-			// Warn that the configuration or filter was not found
-			Dialogs.showError(getShell(), String.format(
-				"The configuration '%s' or its filter could not be found.",
-				config.configId), null);
-		}
+		
 		cbFilters.select((n>-1) ? n+1 : 0); // n+1 to correct for <None> at 0
-		fillConfigurations(0, config.configId);
+		fillConfigurations(0, (config==null) ? null : config.configId);
 	}
 	
 	@Override
@@ -274,7 +274,7 @@ public class FilterConfigSelectionPanel extends Composite {
 	}
 	
 	private void editConfiguration () {
-		//TODO
+		Dialogs.showError(getShell(), "Not implemented yet.", null);
 	}
 	
 	private void editOptions () {
@@ -306,6 +306,7 @@ public class FilterConfigSelectionPanel extends Composite {
 
 	private void createParameters () {
 		try {
+			Dialogs.showError(getShell(), "Not implemented yet.", null);
 /*			String filterSettings;
 			while ( true ) {
 				InputDialog dlg = new InputDialog(getShell(), "New Parameters",

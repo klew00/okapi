@@ -123,6 +123,10 @@ public class Parameters implements IParameters {
 	public String getPath () {
 		return path;
 	}
+	
+	public void setPath (String filePath) {
+		path = filePath;
+	}
 
 	public void load (URI inputURI,
 		boolean ignoreErrors)

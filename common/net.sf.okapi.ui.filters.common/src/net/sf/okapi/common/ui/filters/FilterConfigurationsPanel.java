@@ -24,6 +24,7 @@ import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -62,6 +63,7 @@ public class FilterConfigurationsPanel extends Composite {
 	private IFilterConfigurationMapper mapper;
 	private IFilter cachedFilter;
 	private IContext context;
+	private IFilterConfigurationInfoEditor configEditor;
 
 	/**
 	 * Creates a FilterConfigurationsPanel object for a given parent with a given style.
@@ -69,10 +71,33 @@ public class FilterConfigurationsPanel extends Composite {
 	 * @param style the style of the panel.
 	 */
 	public FilterConfigurationsPanel (Composite parent,
-		int style)
+		int style,
+		String filterConfigInfoDialogClass)
 	{
 		super(parent, style);
 		createContent();
+		// create the configuration info editor
+		if ( filterConfigInfoDialogClass == null ) {
+			configEditor = new FilterConfigurationInfoEditor();
+		}
+		else {
+			try {
+				configEditor = (IFilterConfigurationInfoEditor)Class.forName(filterConfigInfoDialogClass).newInstance();
+			}
+			catch ( InstantiationException e ) {
+				throw new OkapiEditorCreationException(String.format(
+					"Cannot create editor '%s'", filterConfigInfoDialogClass), e);
+			}
+			catch ( IllegalAccessException e ) {
+				throw new OkapiEditorCreationException(String.format(
+					"Cannot create editor '%s'", filterConfigInfoDialogClass), e);
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new OkapiEditorCreationException(String.format(
+					"Cannot create editor '%s'", filterConfigInfoDialogClass), e);
+			}
+		}
+		configEditor.create(getShell());
 		context = new BaseContext();
 		context.setObject("shell", getShell());
 	}
@@ -184,6 +209,11 @@ public class FilterConfigurationsPanel extends Composite {
 		
 		btEdit = new Button(this, SWT.PUSH);
 		btEdit.setText("Edit...");
+		btEdit.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editConfiguration();
+			};
+		});
 		
 		btCreate = new Button(this, SWT.PUSH);
 		btCreate.setText("Create...");
@@ -254,7 +284,11 @@ public class FilterConfigurationsPanel extends Composite {
 			Dialogs.showError(getShell(), e.getMessage(), null);
 		}
 	}
-	
+
+	private void editConfiguration () {
+		Dialogs.showError(getShell(), "Not implemented yet.", null);
+	}
+
 	private void deleteConfiguration () {
 		try {
 			int n = table.getSelectionIndex();
@@ -299,11 +333,22 @@ public class FilterConfigurationsPanel extends Composite {
 					baseConfig.configId));
 			}
 			
-			cachedFilter = mapper.createFilter(baseConfig.configId, cachedFilter);
-			IParametersEditor editor = mapper.createParametersEditor(baseConfig.configId, cachedFilter);
+			// Edit the configuration info
+			if ( !configEditor.showDialog(newConfig) ) return; // Canceled
 			
-			//params.fromString(baseParams.toString());
+			// Set the new parameters with the base ones
+			IParameters newParams = mapper.getParameters(baseConfig);
+			// Save the new configuration
+			mapper.saveCustomParameters(newConfig, newParams);
+			
+			// Add the new configuration
+			mapper.addConfiguration(newConfig);
+			// Update the list and the selection
+			model.updateTable(0, newConfig.configId);
+			updateInfo();
 
+			// And continue by editing the parameters for that configuration
+			editParameters();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);

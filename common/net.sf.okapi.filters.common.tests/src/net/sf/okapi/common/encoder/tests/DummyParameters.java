@@ -59,6 +59,10 @@ public class DummyParameters implements IParameters {
 		// Not needed for tests
 		return null;
 	}
+	
+	public void setPath (String filePath) {
+		// Not needed for tests
+	}
 
 	public String getString (String name) {
 		// Not needed for tests

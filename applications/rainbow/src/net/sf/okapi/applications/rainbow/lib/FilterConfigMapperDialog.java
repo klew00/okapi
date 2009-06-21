@@ -55,7 +55,7 @@ public class FilterConfigMapperDialog {
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 		
-		pnlConfigs = new FilterConfigurationsPanel(shell, SWT.NONE);
+		pnlConfigs = new FilterConfigurationsPanel(shell, SWT.NONE, null);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		pnlConfigs.setLayoutData(gdTmp);
 		

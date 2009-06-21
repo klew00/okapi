@@ -129,6 +129,24 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 	}
 	
 	/**
+	 * Splits a configuration identifier into a filter and 
+	 * @param configId
+	 * @return
+	 */
+	private String[] splitFilterFromConfiguration (String configId) {
+		String[] res = new String[2];
+		// Get the filter
+		int n  = configId.indexOf(FilterSettingsMarkers.PARAMETERSSEP);
+		if ( n == -1 ) { // Try first '-' then
+			n = configId.indexOf('-');
+			if ( n == -1 ) return null; // No way to know the filter 
+		}
+		res[0] = configId.substring(0, n);
+		res[1] = configId.substring(n);
+		return res;
+	}
+	
+	/**
 	 * Updates the custom configurations for this mapper. This should
 	 * be called if the parameters folder has changed.
 	 */
@@ -146,11 +164,13 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 			fc.configId = Util.getFilename(aRes[i], false);
 			
 			// Get the filter
-			String baseConfigId = fc.configId;
-			int n = baseConfigId.indexOf(FilterSettingsMarkers.PARAMETERSSEP);
-			if ( n == -1 ) continue;
-			baseConfigId = baseConfigId.substring(0, n);
-			filter = this.createFilter(baseConfigId, filter);
+			String[] res = splitFilterFromConfiguration(fc.configId);
+			if ( res == null ) { // Cannot found the filter in the ID
+				//TODO: Maybe a warning?
+				continue;
+			}
+			// Create the filter (this assumes the base-name is the default config ID)
+			filter = createFilter(res[0], filter);
 			if ( filter == null ) continue;
 			
 			// Set the data
@@ -173,7 +193,51 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 		}
 		return null;
 	}
-	
+
+	@Override
+	public void deleteCustomParameters (FilterConfiguration config) {
+		// In this implementation the file is stored in a given directory
+		File file = new File(paramsFolder + config.parametersLocation);
+		file.delete();
+	}
+
+	@Override
+	public void saveCustomParameters (FilterConfiguration config,
+		IParameters params)
+	{
+		// In this implementation the file is stored in a given directory
+		File file = new File(paramsFolder + config.parametersLocation);
+		params.save(file.getAbsolutePath());
+	}
+
+	@Override
+	public FilterConfiguration createCustomConfiguration (FilterConfiguration baseConfig) {
+		// Create the new configuration and set its members as a copy of the base
+		FilterConfiguration newConfig = new FilterConfiguration();
+		String[] res = splitFilterFromConfiguration(baseConfig.configId);
+		if ( res == null ) { // Cannot create the configuration because of ID 
+			return null;
+		}
+		
+		newConfig.custom = true;
+		newConfig.configId = String.format("%s%ccopy-of-%s",
+			res[0], FilterSettingsMarkers.PARAMETERSSEP, res[1]);
+		newConfig.name = String.format(newConfig.configId);
+		newConfig.description = "";
+		newConfig.filterClass = baseConfig.filterClass;
+		newConfig.mimeType = baseConfig.mimeType;
+		newConfig.parametersLocation = newConfig.configId + FilterSettingsMarkers.PARAMETERS_FILEEXT;
+		
+		// Instantiate a filter and set the new parameters based on the base ones
+		IFilter filter = instantiateFilter(baseConfig, null);
+		IParameters baseParams = getParameters(baseConfig, filter);
+		IParameters newParams = filter.getParameters();
+		newParams.fromString(baseParams.toString());
+		// Make sure to reset the path, the save function should set it
+		newParams.setPath(null);
+		return newConfig;
+	}
+
 	@Override
 	public IParameters getCustomParameters (FilterConfiguration config,
 		IFilter existingFilter)
@@ -188,7 +252,7 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 		}
 
 		// Load the provided parameter file
-		// In this implementation we assume it is in the current directory
+		// In this implementation the file is stored in a given directory
 		File file = new File(paramsFolder + config.parametersLocation);
 		params.load(file.toURI(), false);
 		return params;

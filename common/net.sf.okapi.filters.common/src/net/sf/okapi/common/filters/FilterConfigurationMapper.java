@@ -149,14 +149,16 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	public IParameters getParameters (FilterConfiguration config,
 		IFilter existingFilter)
 	{
-		if ( config.parametersLocation == null ) return null; // Nothing to load
-		
 		IFilter filter = instantiateFilter(config, existingFilter);
 		IParameters params = filter.getParameters();
 		if ( params == null ) {
 			throw new RuntimeException(String.format(
 				"Cannot create default parameters for '%s'.", config.configId));
 		}
+		if ( config.parametersLocation == null ) {
+			return params; // Default parameters for the null location
+		}
+		
 		if ( config.custom ) {
 			params = getCustomParameters(config, filter);
 		}
@@ -322,7 +324,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	public FilterConfiguration createCustomConfiguration (FilterConfiguration baseConfig) {
 		// Create the new configuration and set its members as a copy of the base
 		FilterConfiguration newConfig = new FilterConfiguration();
-		newConfig.configId = String.format("copy-of-%s", baseConfig.configId);
+		newConfig.configId = String.format("%s-Copy", baseConfig.configId);
 		newConfig.name = String.format("Copy of %s", baseConfig.name);
 		newConfig.custom = true;
 		newConfig.description = "";
@@ -335,6 +337,8 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		IParameters baseParams = getParameters(baseConfig, filter);
 		IParameters newParams = filter.getParameters();
 		newParams.fromString(baseParams.toString());
+		// Make sure to reset the path, the save function should set it
+		newParams.setPath(null);
 		return newConfig;
 	}
 
