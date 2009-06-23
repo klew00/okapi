@@ -499,7 +499,7 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 			Rule rule = rules.get(n);
 			String name = rule.getRuleName();
 			InputDialog dlg = new InputDialog(shell, Res.getString("Editor.renameRule"), //$NON-NLS-1$
-				Res.getString("Editor.newRuleName"), name, null, 0, -1); //$NON-NLS-1$
+				Res.getString("Editor.newRuleName"), name, null, 0, -1, -1); //$NON-NLS-1$
 			if ( (name = dlg.showDialog()) == null ) return;
 			rule.setRuleName(name);
 			lbRules.setItem(n, name);
@@ -516,7 +516,7 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 				// Get the name
 				String name = Res.getString("Editor.defaultRuleName"); //$NON-NLS-1$
 				InputDialog dlg = new InputDialog(shell, Res.getString("Editor.newRuleCaption"), //$NON-NLS-1$
-					Res.getString("Editor.newRuleLabel"), name, null, 0, -1); //$NON-NLS-1$
+					Res.getString("Editor.newRuleLabel"), name, null, 0, -1, -1); //$NON-NLS-1$
 				if ( (name = dlg.showDialog()) == null ) return;
 				rule = new Rule();
 				rule.setRuleName(name);

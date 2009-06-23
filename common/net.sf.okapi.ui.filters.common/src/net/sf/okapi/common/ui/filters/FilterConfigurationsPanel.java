@@ -29,6 +29,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
@@ -268,10 +269,19 @@ public class FilterConfigurationsPanel extends Composite {
 			cachedFilter = mapper.createFilter(config.configId, cachedFilter);
 			IParametersEditor editor = mapper.createParametersEditor(config.configId, cachedFilter);
 			IParameters params = mapper.getParameters(config, cachedFilter);
+	
 			// Call the editor
 			if ( editor == null ) {
-				//TODO
-				Dialogs.showError(getShell(), "Editing of filter parameters without editor is not implemented yet.", null);
+				// Properties-like editing
+				InputDialog dlg  = new InputDialog(getShell(),
+					"Filters Parameters ("+config.configId+")",
+					"Parameters:",
+					params.toString(), null, 0, 200, 600);
+				String data = dlg.showDialog();
+				if ( data == null ) return;
+				if ( !config.custom ) return; // Don't save pre-defined parameters
+				data = data.replace("\r\n", "\n");
+				params.fromString(data.replace("\r", "\n"));
 			}
 			else {
 				if ( !editor.edit(params, context) ) return;

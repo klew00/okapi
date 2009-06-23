@@ -53,6 +53,7 @@ public class InputDialog {
 	 * 0=none, 1=directory browser.
 	 * @param multiline height hint in pixel if the field is to be multiline,
 	 * -1 otherwise.
+	 * @param maximum width hint in pixel, or -1 to allow any size.
 	 */
 	public InputDialog (Shell parent,
 		String captionText,
@@ -60,7 +61,8 @@ public class InputDialog {
 		String defaultInputText,
 		String helpFile,
 		int buttonOptions,
-		int multiline)
+		int multiline,
+		int maxWidth)
 	{
 		help = helpFile;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -122,10 +124,13 @@ public class InputDialog {
 		shell.setDefaultButton(pnlActions.btOK);
 
 		shell.pack();
-		shell.setMinimumSize(shell.getSize());
-		Point startSize = shell.getMinimumSize();
-		if ( startSize.x < 450 ) startSize.x = 450;
-		shell.setSize(startSize);
+		Point size = shell.getSize();
+		if ( maxWidth > -1 ) {
+			if ( size.x > maxWidth ) size.x = maxWidth;
+		}
+		shell.setMinimumSize(size);
+		if ( size.x < 450 ) size.x = 450;
+		shell.setSize(size);
 		Dialogs.centerWindow(shell, parent);
 	}
 	

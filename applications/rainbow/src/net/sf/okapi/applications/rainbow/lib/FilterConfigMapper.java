@@ -128,8 +128,8 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 	
 	/**
 	 * Splits a configuration identifier into a filter and 
-	 * @param configId
-	 * @return
+	 * @param configId the configuration identifier to split.
+	 * @return an array of two strings: 0=filter, 1=parameter info (or null).
 	 */
 	private String[] splitFilterFromConfiguration (String configId) {
 		String[] res = new String[2];
@@ -137,7 +137,10 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 		int n  = configId.indexOf(FilterSettingsMarkers.PARAMETERSSEP);
 		if ( n == -1 ) { // Try first '-' then
 			n = configId.indexOf('-');
-			if ( n == -1 ) return null; // No way to know the filter 
+			if ( n == -1 ) {
+				res[0] = configId;
+				return res; // The filter is the configID (default case) 
+			}
 		}
 		res[0] = configId.substring(0, n);
 		res[1] = configId.substring(n);
@@ -218,8 +221,14 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 		}
 		
 		newConfig.custom = true;
-		newConfig.configId = String.format("%s%ccopy-of-%s",
-			res[0], FilterSettingsMarkers.PARAMETERSSEP, res[1]);
+		if ( res[1] == null ) {
+			newConfig.configId = String.format("%s%ccopy-of-default",
+				res[0], FilterSettingsMarkers.PARAMETERSSEP);
+		}
+		else {
+			newConfig.configId = String.format("%s%ccopy-of-%s",
+				res[0], FilterSettingsMarkers.PARAMETERSSEP, res[1]);
+		}
 		newConfig.name = String.format(newConfig.configId);
 		newConfig.description = "";
 		newConfig.filterClass = baseConfig.filterClass;

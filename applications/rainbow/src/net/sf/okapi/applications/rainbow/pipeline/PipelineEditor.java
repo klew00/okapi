@@ -397,19 +397,20 @@ public class PipelineEditor {
 					if ( !editor.edit(params, context) ) return; // Cancel
 					// Save the data
 					step.paramsData = params.toString();
+					return;
 				}
-				// Else: Fall thru to manual editing
+				// Else: Fall thru to Properties-like editing
 			}
-			else {
-				InputDialog dlg  = new InputDialog(shell,
-					"Step Options ("+step.name+")",
-					"Parameters:",
-					step.paramsData, null, 0, 200);
-				String data = dlg.showDialog();
-				if ( data == null ) return;
-				data = data.replace("\r\n", "\n");
-				step.paramsData = data.replace("\r", "\n");
-			}
+
+			// Properties-like editing
+			InputDialog dlg  = new InputDialog(shell,
+				"Step Options ("+step.name+")",
+				"Parameters:",
+				step.paramsData, null, 0, 200, 500);
+			String data = dlg.showDialog();
+			if ( data == null ) return;
+			data = data.replace("\r\n", "\n");
+			step.paramsData = data.replace("\r", "\n");
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

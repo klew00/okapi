@@ -59,5 +59,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.steps.fullwidthconversion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.openxml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.plaintext"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.table"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

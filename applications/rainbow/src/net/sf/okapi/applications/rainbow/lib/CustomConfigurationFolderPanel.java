@@ -101,7 +101,7 @@ public class CustomConfigurationFolderPanel extends Composite {
 				"Directory where the custom configurations are stored\n"
 					+ "(Leave empty to use the folder where the project file is saved)",
 				project.getParametersFolder(true, false),
-				null, 1, -1);
+				null, 1, -1, -1);
 			dlg.setAllowEmptyValue(true);
 			String newDir = dlg.showDialog();
 			if ( newDir == null ) return; // Canceled

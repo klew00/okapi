@@ -84,7 +84,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void create (Shell parent) {
-		shell.setText("OpenOffice/ODF Filter Parameters");
+		shell.setText("OpenDocument Filter Parameters");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;

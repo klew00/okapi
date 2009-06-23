@@ -58,7 +58,7 @@ public class Okapi_GUI_Tester {
 			
 			net.sf.okapi.ui.filters.plaintext.Editor.class.getName(),
 			net.sf.okapi.steps.ui.textmodification.ParametersEditor.class.getName(),
-			net.sf.okapi.ui.filters.openxml.Editor.class.getName(),			
+//			net.sf.okapi.ui.filters.openxml.Editor.class.getName(),			
 			net.sf.okapi.ui.filters.table.Editor.class.getName()  
 						
 // Commented, because package names differ from those of projects, and java cannot locate the classes			

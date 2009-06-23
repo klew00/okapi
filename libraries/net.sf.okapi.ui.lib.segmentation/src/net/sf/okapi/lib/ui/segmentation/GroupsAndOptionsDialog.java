@@ -493,7 +493,7 @@ public class GroupsAndOptionsDialog {
 		while ( true ) {
 			// Edit the name
 			InputDialog dlg = new InputDialog(shell, caption,
-				Res.getString("options.groupNameLabel"), name, null, 0, -1); //$NON-NLS-1$
+				Res.getString("options.groupNameLabel"), name, null, 0, -1, -1); //$NON-NLS-1$
 			if ( (name = dlg.showDialog()) == null ) return; // Cancel
 		
 			// Else:
