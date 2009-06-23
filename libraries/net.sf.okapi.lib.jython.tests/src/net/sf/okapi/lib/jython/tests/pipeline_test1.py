@@ -4,6 +4,9 @@ from net.sf.okapi.common.resource import TextUnit
 from net.sf.okapi.common.resource import RawDocument
 
 class Producer(BasePipelineStep):
+    def __init__(self):
+        self.eventCount = 0
+        
     def preprocess(self):
         self.eventCount = 0
         
@@ -24,7 +27,7 @@ class Consumer(BasePipelineStep):
 pipeline = Pipeline()
 pipeline.addStep(Producer())
 pipeline.addStep(Consumer())
-pipeline.process(RawDocument("", "UTF-8", "en"))
+pipeline.process(RawDocument("TEST", "UTF-8", "en"))
 
 
 
