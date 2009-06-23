@@ -64,7 +64,7 @@ public class FilterConfigurationsPanel extends Composite {
 	private IFilterConfigurationMapper mapper;
 	private IFilter cachedFilter;
 	private IContext context;
-	private IFilterConfigurationInfoEditor configEditor;
+	private String configEditorClass;
 
 	/**
 	 * Creates a FilterConfigurationsPanel object for a given parent with a given style.
@@ -78,28 +78,7 @@ public class FilterConfigurationsPanel extends Composite {
 	{
 		super(parent, style);
 		createContent();
-		// create the configuration info editor
-		if ( filterConfigInfoDialogClass == null ) {
-			configEditor = new FilterConfigurationInfoEditor();
-		}
-		else {
-			try {
-				configEditor = (IFilterConfigurationInfoEditor)Class.forName(filterConfigInfoDialogClass).newInstance();
-			}
-			catch ( InstantiationException e ) {
-				throw new OkapiEditorCreationException(String.format(
-					"Cannot create editor '%s'", filterConfigInfoDialogClass), e);
-			}
-			catch ( IllegalAccessException e ) {
-				throw new OkapiEditorCreationException(String.format(
-					"Cannot create editor '%s'", filterConfigInfoDialogClass), e);
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new OkapiEditorCreationException(String.format(
-					"Cannot create editor '%s'", filterConfigInfoDialogClass), e);
-			}
-		}
-		configEditor.create(getShell());
+		configEditorClass = filterConfigInfoDialogClass;
 
 		this.mapper = mapper;
 		model.setMapper(mapper);
@@ -345,7 +324,7 @@ public class FilterConfigurationsPanel extends Composite {
 			}
 			
 			// Edit the configuration info
-			if ( !configEditor.showDialog(newConfig) ) return; // Canceled
+			if ( !editConfigurationInfo(newConfig) ) return; // Canceled
 			
 			// Set the new parameters with the base ones
 			IParameters newParams = mapper.getParameters(baseConfig);
@@ -366,4 +345,33 @@ public class FilterConfigurationsPanel extends Composite {
 		}
 	}
 	
+	private boolean editConfigurationInfo (FilterConfiguration config) {
+		// Create the configuration info editor
+		IFilterConfigurationInfoEditor editor;
+		if ( configEditorClass == null ) {
+			// Use default, if none is provided
+			editor = new FilterConfigurationInfoEditor();
+		}
+		else {
+			try {
+				editor = (IFilterConfigurationInfoEditor)Class.forName(configEditorClass).newInstance();
+			}
+			catch ( InstantiationException e ) {
+				throw new OkapiEditorCreationException(String.format(
+					"Cannot create editor '%s'", configEditorClass), e);
+			}
+			catch ( IllegalAccessException e ) {
+				throw new OkapiEditorCreationException(String.format(
+					"Cannot create editor '%s'", configEditorClass), e);
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new OkapiEditorCreationException(String.format(
+					"Cannot create editor '%s'", configEditorClass), e);
+			}
+		}
+		
+		// Create and call it
+		editor.create(getShell());
+		return editor.showDialog(config);
+	}
 }

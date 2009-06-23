@@ -135,15 +135,29 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 		String[] res = new String[2];
 		// Get the filter
 		int n  = configId.indexOf(FilterSettingsMarkers.PARAMETERSSEP);
-		if ( n == -1 ) { // Try first '-' then
+		if ( n == -1 ) {
+			// Try '-' then
 			n = configId.indexOf('-');
 			if ( n == -1 ) {
-				res[0] = configId;
-				return res; // The filter is the configID (default case) 
+				// Try '_'
+				n = configId.indexOf('_');
+				if ( n == -1 ) {
+					res[0] = configId;
+					return res; // The filter is the configID (default case)
+				}
+				else { // Check for "okf_" case
+					if ( configId.substring(0, n).equals("okf") ) {
+						n = configId.indexOf('_', n+1);
+						if ( n == -1 ) {
+							res[0] = configId;
+							return res; // The filter is the configID (default case) 
+						}
+					}
+				}
 			}
 		}
 		res[0] = configId.substring(0, n);
-		res[1] = configId.substring(n);
+		res[1] = configId.substring(n+1);
 		return res;
 	}
 	
