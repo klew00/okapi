@@ -55,7 +55,7 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 		
 		super();		
 		setName(FILTER_NAME);
-		setParameters(new Parameters());	// Plain Text Filter parameters
+		setParameters(new Parameters());	// Para Plain Text Filter parameters
 
 		addConfiguration(true,
 				FILTER_CONFIG,

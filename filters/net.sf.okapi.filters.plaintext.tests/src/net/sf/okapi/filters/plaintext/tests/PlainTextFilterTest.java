@@ -423,6 +423,10 @@ public class PlainTextFilterTest {
 		assertEquals("okf_plaintext_spliced_backslash", fc.configId);
 		assertEquals("net.sf.okapi.filters.plaintext.PlainTextFilter", fc.filterClass);
 		assertEquals("okf_plaintext_spliced_backslash.fprm", fc.parametersLocation);
+		
+		IParameters params = filter.getParameters();
+		assertNotNull(params);
+		assertEquals("net.sf.okapi.filters.plaintext.Parameters", params.getClass().getName());
 	}
 		
 	@Test

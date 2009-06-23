@@ -24,6 +24,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.filters.plaintext.common.CompoundFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
+import net.sf.okapi.filters.plaintext.Parameters;
 import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;
 import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
 
@@ -49,6 +50,7 @@ public class PlainTextFilter extends CompoundFilter{
 		
 		setName(FILTER_NAME);
 		setMimeType(FILTER_MIME);
+		setParameters(new Parameters());	// Plain Text Filter parameters
 		
 		addSubFilter(BasePlainTextFilter.class);
 		addSubFilter(ParaPlainTextFilter.class);
