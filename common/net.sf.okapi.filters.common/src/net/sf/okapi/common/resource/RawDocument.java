@@ -182,7 +182,12 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Creates a Reader based on the current Stream.
+	 * Returns a Reader based on the current Stream returned from getStream().
+	 * <h3>WARNING:</h3> For CharSequence and URI inputs the Reader returned
+	 * will be recreated (<b>and more importantly reset</b>) for each call. For
+	 * InputStream input the same Reader is returned for each call and it is the
+	 * responsibility of the caller to reset it if needed.
+	 * <p>
 	 * 
 	 * @return a Reader
 	 */
@@ -190,7 +195,7 @@ public class RawDocument implements IResource {
 		if (getEncoding() == UNKOWN_ENCODING) {
 			throw new OkapiUnsupportedEncodingException("Encoding has not been set");
 		}
-		
+
 		Reader reader = null;
 		try {
 			reader = new InputStreamReader(getStream(), getEncoding());
@@ -206,9 +211,12 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Creates or returns an existing {@link InputStream} from the input for
-	 * this RawDocument. The stream is created from inputURI, inputStream or
-	 * inputCharSequence.
+	 * Returns an InputStream based on the current input. <h2>WARNING:</h2> For
+	 * CharSequence and URI inputs the stream returned will be recreated (<b>and
+	 * more importantly reset</b>) for each call. For InputStream input the same
+	 * stream is returned for each call and it is the responsibility of the
+	 * caller to reset it if needed.
+	 * <p>
 	 * 
 	 * @return the InputStream
 	 * 
@@ -390,19 +398,24 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Sets the identifier of the filter configuration to use with this document.
-	 * @param filterConfigId the filter configuration identifier to set.
+	 * Sets the identifier of the filter configuration to use with this
+	 * document.
+	 * 
+	 * @param filterConfigId
+	 *            the filter configuration identifier to set.
 	 */
 	public void setFilterConfigId(String filterConfigId) {
 		this.filterConfigId = filterConfigId;
 	}
 
 	/**
-	 * Gets the identifier of the filter configuration to use with this document.
-	 * @return the the filter configuration identifier for this document, or null if none is set.
+	 * Gets the identifier of the filter configuration to use with this
+	 * document.
+	 * 
+	 * @return the the filter configuration identifier for this document, or
+	 *         null if none is set.
 	 */
 	public String getFilterConfigId() {
 		return filterConfigId;
 	}
-
 }
