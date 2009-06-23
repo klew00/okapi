@@ -413,6 +413,16 @@ public class PlainTextFilterTest {
 		List<FilterConfiguration> configs = filter.getConfigurations();
 		assertNotNull(configs);
 		assertEquals(7, configs.size());
+		
+		FilterConfiguration fc = configs.get(0);
+		assertEquals("okf_plaintext", fc.configId);
+		assertEquals("net.sf.okapi.filters.plaintext.PlainTextFilter", fc.filterClass);
+		assertTrue(Util.isEmpty(fc.parametersLocation));
+		
+		fc = configs.get(5);
+		assertEquals("okf_plaintext_spliced_backslash", fc.configId);
+		assertEquals("net.sf.okapi.filters.plaintext.PlainTextFilter", fc.filterClass);
+		assertEquals("okf_plaintext_spliced_backslash.fprm", fc.parametersLocation);
 	}
 		
 	@Test

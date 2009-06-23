@@ -124,7 +124,7 @@ public abstract class AbstractFilter implements IFilter, INotifiable {
 			String configId,
 			String name,
 			String description,
-			String parameters) {
+			String parametersLocation) {
 		
 		if (configList == null) return false;
 		
@@ -134,7 +134,7 @@ public abstract class AbstractFilter implements IFilter, INotifiable {
 				configId,
 				getMimeType(),
 				getClass().getName(),
-				name, description, parameters));
+				name, description, parametersLocation));
 	}
 	
 	protected boolean addConfigurations(List<FilterConfiguration> configs) {
@@ -146,7 +146,16 @@ public abstract class AbstractFilter implements IFilter, INotifiable {
 	
 	public List<FilterConfiguration> getConfigurations () {
 		
-		return configList;
+		List<FilterConfiguration> res = new ArrayList<FilterConfiguration>();
+		
+		for (FilterConfiguration fc : configList) 
+			res.add(new FilterConfiguration(
+				fc.configId,
+				getMimeType(),
+				getClass().getName(),
+				fc.name, fc.description, fc.parametersLocation));
+		
+		return res;
 	}
 
 	public boolean setConfiguration(String configId) {
