@@ -21,8 +21,10 @@
 from java.io import File
 
 from net.sf.okapi.common.resource import RawDocument
-from net.sf.okapi.common.pipeline import Pipeline
+from net.sf.okapi.common.pipeline import Pipeline, PipelineContext, BatchItemContext, PipelineDriver
 from net.sf.okapi.steps.common import RawDocumentToFilterEventsStep, FilterEventsWriterStep
+
+from net.sf.okapi.common.filters import FilterConfigurationMapper
 
 from net.sf.okapi.filters.xml import XMLFilter
 from net.sf.okapi.filters.html import HtmlFilter
@@ -34,56 +36,62 @@ from PseudoTranslateStep import PseudoTranslateStep
 
 
 def runPipeline(input, filter, srcLang, trgLang, inputEncoding, outputEncoding, outputPath):
-    # Create the pipeline
-    pipeline = Pipeline()
+    # Create the mapper
+    fcMapper = FilterConfigurationMapper()
+    # Fill it with the default configurations of several filters
+    fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter")
+    fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter")
+    fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter")
+    fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter")
+    
+    # Create the driver
+    driver = PipelineDriver()
+    
+    # Set the filter configuration mapper
+    driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper)
         
-    # Create the filter step
-    inputStep = RawDocumentToFilterEventsStep(filter)
-    
-    # Add this step to the pipeline
-    pipeline.addStep(inputStep)
-    
-    # add processing steps
+    # Add the filter step to the pipeline
+    driver.addStep(RawDocumentToFilterEventsStep())
     #pipeline.addStep(PseudoTranslateStep(trgLang))
-    pipeline.addStep(UppercaseStep(trgLang))
-    
-    # Create the writer we will use
-    writer = filter.createFilterWriter()
-    
-    # Create the writer step (using the writer provider by our filter)
-    outputStep = FilterEventsWriterStep(writer)
-    
-    # Add this step to the pipeline
-    pipeline.addStep(outputStep)
+    driver.addStep(UppercaseStep(trgLang))    
+    driver.addStep(FilterEventsWriterStep())
 
-    # Sets the writer options and output
-    writer.setOptions(trgLang, outputEncoding)
-    writer.setOutput(outputPath)
-       
-    # Launch the execution
-    pipeline.process(RawDocument(input, inputEncoding, srcLang))
-    
-    # destroy the pipeline and finalize all steps
-    pipeline.destroy();
+    # Add the writer step to the pipeline
+    driver.addStep(FilterEventsWriterStep())
 
+    driver.addBatchItem(BatchItemContext(
+            input,
+            inputEncoding,
+            filter.getName(),
+            outputPath,
+            outputEncoding,
+            srcLang,
+            trgLang))
+        
+    driver.processBatch();   
+    
 if __name__ == '__main__':          
     # example using Java properties filter
     input = File("../myFile.properties").toURI()
+    output = File('../out.properties').toURI()
     print input
-    runPipeline(input, PropertiesFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.properties')
+    runPipeline(input, PropertiesFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', output)
     
     # example using HTML filter
     input = File("../myFile.html").toURI()
+    output = File('../out.html').toURI()
     print input
-    runPipeline(input, HtmlFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.html')
+    runPipeline(input, HtmlFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', output)
     
     # example using XML filter
     input = File("../myFile.xml").toURI()
+    output = File('../out.xml').toURI()
     print input
-    runPipeline(input, XMLFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.xml')
+    runPipeline(input, XMLFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', output)
            
     # example using OpenOffice filter
     input = File("../myFile.odt").toURI()
+    output = File('../out.odt').toURI()
     print input
-    runPipeline(input, OpenOfficeFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', '../out.odt')
+    runPipeline(input, OpenOfficeFilter(), 'en', 'fr', 'UTF-8', 'UTF-8', output)
     
