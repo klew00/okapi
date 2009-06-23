@@ -50,7 +50,8 @@ public class XMLWriter {
 	 * Creates a new XML document on disk.
 	 * @param path the full path of the document to create. If any directory in the
 	 * path does not exists yet it will be created automatically. The document is 
-	 * always written in UTF-8.
+	 * always written in UTF-8 and the type of line-breaks is the one of the 
+	 * platform where the application runs.
 	 */
 	public void create (String path) {
 		try {
@@ -182,12 +183,13 @@ public class XMLWriter {
 	}
 	
 	/**
-	 * Writes a chunk of raw XML.
-	 * @param xmlData the data to output. No escaping is performed.
+	 * Writes a chunk of raw XML (where line-breaks are assumed to be normalized to \n).
+	 * @param xmlData the data to output. No escaping is performed, but the line-breaks are
+	 * converted to the line-break type of the output.
 	 */
 	public void writeRawXML (String xmlData) {
 		closeStartTag();
-		writer.write(xmlData);
+		writer.write(xmlData.replace("\n", lineBreak));
 	}
 	
 	/**

@@ -44,14 +44,16 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 	private ArrayList<FilterInfo> filters;
 	
 	/**
-	 * Loads the list of accessible filters.
-	 * The list is stored in an XML file of the following format:
+	 * Loads the list of accessible filters and the list filters parameters editors.
+	 * The lists are stored in an XML file of the following format:
 	 * <okapiFilters>
 	 *  <filter id="okf_regex"
 	 *   inputFilterClass="net.sf.okapi.filters.regex.RegexFilter"
+	 *  >Regular Expressions</filter>
+	 *  <parametersEditor
 	 *   parametersClass="net.sf.okapi.filters.regex.Parameters"
 	 *   editorClass="net.sf.okapi.filters.ui.regex.Editor"
-	 *  >Regular Expressions</filter>
+	 *  />
 	 * </okapiFilters>
 	 * @param p_sPath Full path of the list file to load.
 	 */
@@ -61,50 +63,46 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
 			Document doc = Fact.newDocumentBuilder().parse(new File(p_sPath));
-			NodeList list = doc.getElementsByTagName("filter");
 			
 			// Clear all the data
 			clearFilters();
 			clearEditors();
 			clearConfigurations(false);
-			
-			FilterAccessItem item;
 			FilterInfo info;
+			String filterId;
+
+			NodeList list = doc.getElementsByTagName("filter");
 			for ( int i=0; i<list.getLength(); i++ ) {
 				Node node = list.item(i).getAttributes().getNamedItem("id");
-				if ( node == null ) throw new RuntimeException("The attribute 'id' is missing.");
-				item = new FilterAccessItem();
-				item.id = Util.getTextContent(node);
+				if ( node == null ) throw new RuntimeException("An attribute 'id' is missing.");
+				filterId = Util.getTextContent(node);
 				info = new FilterInfo();
 				
 				node = list.item(i).getAttributes().getNamedItem("inputFilterClass");
-				if ( node == null ) throw new RuntimeException("The attribute 'inputFilterClass' is missing.");
-				item.inputFilterClass = Util.getTextContent(node);
-				info.filterClass = item.inputFilterClass;
+				if ( node == null ) throw new RuntimeException("An attribute 'inputFilterClass' is missing.");
+				info.filterClass = Util.getTextContent(node);
 				
-				node = list.item(i).getAttributes().getNamedItem("editorClass");
-				if ( node != null ) item.editorClass = Util.getTextContent(node);
-
-				node = list.item(i).getAttributes().getNamedItem("parametersClass");
-				if ( node != null ) item.parametersClass = Util.getTextContent(node);
-
 				node = list.item(i).getAttributes().getNamedItem("name");
-				if ( node != null ) item.name = Util.getTextContent(node);
-				else item.name = item.id;
-				info.name = item.name;
+				if ( node != null ) info.name = Util.getTextContent(node);
+				else info.name = filterId;
 
-				item.description = Util.getTextContent(list.item(i));
-				info.description = item.description;
+				info.description = Util.getTextContent(list.item(i));
 
 				filters.add(info);
-				
 				// Add the default configurations
-				addConfigurations(item.inputFilterClass);
-				// Add the editor, if possible
-				if (( item.editorClass != null ) && ( item.parametersClass != null )) {
-					addEditor(item.editorClass, item.parametersClass);
-				}
+				addConfigurations(info.filterClass);
 			}
+			
+			list = doc.getElementsByTagName("parametersEditor");
+			for ( int i=0; i<list.getLength(); i++ ) {
+				Node nodeP = list.item(i).getAttributes().getNamedItem("parametersClass");
+				if ( nodeP == null ) throw new RuntimeException("An attribute 'parametersClass' is missing.");
+				Node nodeE = list.item(i).getAttributes().getNamedItem("editorClass");
+				if ( nodeE == null ) throw new RuntimeException("An attribute 'editorClass' is missing.");
+
+				addEditor(Util.getTextContent(nodeE),  Util.getTextContent(nodeP));
+			}
+			
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException(e);

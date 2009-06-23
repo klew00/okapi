@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Openoffice Filter UI
+Bundle-Name: OpenDocument Parameters Editor
 Bundle-SymbolicName: net.sf.okapi.ui.filters.openoffice
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.filters.ui.openoffice

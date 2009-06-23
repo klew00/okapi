@@ -47,15 +47,17 @@ public class FilterConfigMapperDialog {
 
 	public FilterConfigMapperDialog (Shell parent,
 		boolean selectionMode,
-		Project project)
+		Project project,
+		FilterConfigMapper mapper)
 	{
 		this.project = project;
+		this.mapper = mapper;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Filter Configurations");
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 		
-		pnlConfigs = new FilterConfigurationsPanel(shell, SWT.NONE, null);
+		pnlConfigs = new FilterConfigurationsPanel(shell, SWT.NONE, null, mapper);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		pnlConfigs.setLayoutData(gdTmp);
 		
@@ -72,7 +74,7 @@ public class FilterConfigMapperDialog {
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
-					result = pnlConfigs.getData(); 
+					result = pnlConfigs.getConfigurationId(); 
 				}
 				shell.close();
 			};
@@ -104,11 +106,8 @@ public class FilterConfigMapperDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
-	public String showDialog (FilterConfigMapper mapper,
-		String configId)
-	{
-		this.mapper = mapper;
-		pnlConfigs.setData(mapper, configId);
+	public String showDialog (String configId) {
+		pnlConfigs.setConfiguration(configId);
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )

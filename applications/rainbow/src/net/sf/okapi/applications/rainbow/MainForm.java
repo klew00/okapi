@@ -2042,9 +2042,9 @@ public class MainForm implements IParametersProvider {
 	private void filterConfigurations () {
 		try {
 			saveSurfaceData();
-			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false, prj);
+			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false, prj, fcMapper);
 			updateCustomConfigurations();
-			dlg.showDialog(fcMapper, null);
+			dlg.showDialog(null);
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

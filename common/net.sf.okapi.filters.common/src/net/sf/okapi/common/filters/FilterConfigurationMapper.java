@@ -63,13 +63,16 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			filter = (IFilter)Class.forName(filterClass).newInstance();
 		}
 		catch ( InstantiationException e ) {
-			throw new OkapiFilterCreationException("Cannot instantiate filter.", e);
+			throw new OkapiFilterCreationException(
+				String.format("Cannot instantiate the filter '%s'.", filterClass), e);
 		}
 		catch ( IllegalAccessException e ) {
-			throw new OkapiFilterCreationException("Cannot instantiate filter.", e);
+			throw new OkapiFilterCreationException(
+				String.format("Cannot instantiate the filter '%s'.", filterClass), e);
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new OkapiFilterCreationException("Cannot instantiate filter.", e);
+			throw new OkapiFilterCreationException(
+				String.format("Cannot instantiate the filter '%s'.", filterClass), e);
 		}
 		// Get the available configurations for this filter
 		List<FilterConfiguration> list = filter.getConfigurations();
@@ -188,7 +191,6 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	{
 		FilterConfiguration fc = configMap.get(configId);
 		if ( fc == null ) return null;
-		if ( fc.parametersLocation == null ) return null;
 
 		IFilter filter = instantiateFilter(fc, existingFilter);
 

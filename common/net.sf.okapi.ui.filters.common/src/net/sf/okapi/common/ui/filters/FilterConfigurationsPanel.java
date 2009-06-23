@@ -72,7 +72,8 @@ public class FilterConfigurationsPanel extends Composite {
 	 */
 	public FilterConfigurationsPanel (Composite parent,
 		int style,
-		String filterConfigInfoDialogClass)
+		String filterConfigInfoDialogClass,
+		IFilterConfigurationMapper mapper)
 	{
 		super(parent, style);
 		createContent();
@@ -98,6 +99,10 @@ public class FilterConfigurationsPanel extends Composite {
 			}
 		}
 		configEditor.create(getShell());
+
+		this.mapper = mapper;
+		model.setMapper(mapper);
+		
 		context = new BaseContext();
 		context.setObject("shell", getShell());
 	}
@@ -108,12 +113,8 @@ public class FilterConfigurationsPanel extends Composite {
 	 * @param configId the optional configuration identifier to select,
 	 * or null to select the first configuration in the list.
 	 */
-	public void setData (IFilterConfigurationMapper mapper,
-		String configId)
+	public void setConfiguration (String configId)
 	{
-		// Set the mapper
-		this.mapper = mapper;
-		model.setMapper(mapper);
 		// Update the list and the selection
 		model.updateTable(0, configId);
 		updateInfo();
@@ -140,8 +141,7 @@ public class FilterConfigurationsPanel extends Composite {
 	 * @return the configuration identifier of the current selection,
 	 * or null if there no configuration is selected.  
 	 */
-	@Override
-	public String getData () {
+	public String getConfigurationId () {
 		int n = table.getSelectionIndex();
 		if ( n == -1 ) return null;
 		return table.getItem(n).getText(FilterConfigurationsTableModel.ID_COLINDEX);
@@ -271,6 +271,7 @@ public class FilterConfigurationsPanel extends Composite {
 			// Call the editor
 			if ( editor == null ) {
 				//TODO
+				Dialogs.showError(getShell(), "Editing of filter parameters without editor is not implemented yet.", null);
 			}
 			else {
 				if ( !editor.edit(params, context) ) return;

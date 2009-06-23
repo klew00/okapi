@@ -9,15 +9,11 @@
  <filter id="okf_properties"
   name="Properties Files"
   inputFilterClass="net.sf.okapi.filters.properties.PropertiesFilter"
-  parametersClass="net.sf.okapi.filters.properties.Parameters"
-  editorClass="net.sf.okapi.filters.ui.properties.Editor"
  >Filter for Java and Java-like properties files.</filter>
   
  <filter id="okf_regex"
   name="Regex Filter"
   inputFilterClass="net.sf.okapi.filters.regex.RegexFilter"
-  parametersClass="net.sf.okapi.filters.regex.Parameters"
-  editorClass="net.sf.okapi.filters.ui.regex.Editor"
  >Filter for regular-expression parsing on text-based files.</filter>
   
  <filter id="okf_xliff"
@@ -28,8 +24,6 @@
 <filter id="okf_openxml"
   name="(BETA) MS-Office 2007 Filter"
   inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
-  parametersClass="net.sf.okapi.filters.openxml.ConditionalParameters"
-  editorClass="net.sf.okapi.filters.ui.openxml.Editor"
  >Filter for Microsoft Office 2007 documents such as DOCX, XLSX, and PPTX.</filter>
  
  <filter id="okf_openxml"
@@ -40,22 +34,16 @@
  <filter id="okf_odf"
   name="(BETA) ODF-Content Filter"
   inputFilterClass="net.sf.okapi.filters.openoffice.ODFFilter"
-  parametersClass="net.sf.okapi.filters.openoffice.Parameters"
-  editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
  >Filter for ODF-Content documents.</filter>
   
  <filter id="okf_openoffice"
   name="(BETA) OpenOffice Filter"
   inputFilterClass="net.sf.okapi.filters.openoffice.OpenOfficeFilter"
-  parametersClass="net.sf.okapi.filters.openoffice.Parameters"
-  editorClass="net.sf.okapi.filters.ui.openoffice.Editor"
  >Filter for OpenOffice.org documents such as ODT, ODS, ODG, and ODP files.</filter>
   
  <filter id="okf_po"
   name="(BETA) PO Filter"
   inputFilterClass="net.sf.okapi.filters.po.POFilter"
-  parametersClass="net.sf.okapi.filters.po.Parameters"
-  editorClass="net.sf.okapi.filters.ui.po.Editor"
  >Filter for Gettext Portable-Object (PO) files.</filter>
   
  <filter id="okf_xml"
@@ -70,7 +58,7 @@
   
  <filter id="okf_plaintext"
   name="(BETA) Plain Text Filter"
-  inputFilterClass="net.sf.okapi.filters.plaintext.base.BasePlainTextFilter"
+  inputFilterClass="net.sf.okapi.filters.plaintext.PlainTextFilter"
  >Filter for plain text files.</filter>
   
  <filter id="okf_table"
@@ -91,7 +79,6 @@
  <filter id="okf_tmx"
   name="(ALPHA) TMX Filter"
   inputFilterClass="net.sf.okapi.filters.tmx.TmxFilter"
-  parametersClass="net.sf.okapi.filters.tmx.Parameters"
  >Filter for Translation Memory eXchange (TMX) documents</filter>
   
  <filter id="okf_mif"
@@ -105,5 +92,25 @@
   inputFilterClass="net.sf.okapi.filters.rtf.RTFFilter"
  >Trados-RTF Filter</filter>
  -->
+
+ <parametersEditor
+  parametersClass="net.sf.okapi.filters.properties.Parameters"
+  editorClass="net.sf.okapi.filters.ui.properties.Editor" />
+  
+ <parametersEditor
+  parametersClass="net.sf.okapi.filters.regex.Parameters"
+  editorClass="net.sf.okapi.filters.ui.regex.Editor" />
  
+ <parametersEditor
+  parametersClass="net.sf.okapi.filters.openoffice.Parameters"
+  editorClass="net.sf.okapi.filters.ui.openoffice.Editor" />
+  
+ <parametersEditor
+  parametersClass="net.sf.okapi.filters.po.Parameters"
+  editorClass="net.sf.okapi.filters.ui.po.Editor" />
+
+ <parametersEditor
+  parametersClass="net.sf.okapi.filters.plaintext.paragraphs.Parameters"
+  editorClass="net.sf.okapi.ui.filters.plaintext.Editor" />
+
 </okapiFilters>

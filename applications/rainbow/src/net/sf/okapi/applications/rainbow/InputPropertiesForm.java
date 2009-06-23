@@ -149,7 +149,7 @@ class InputPropertiesForm {
 	{
 		oldData = filterSettings + sourceEncoding + targetEncoding;
 //x		pnlFilterSettings.setData(filterSettings, p_FA);
-		pnlFilterConfigSelection.setData(filterSettings, fcMapper);
+		pnlFilterConfigSelection.setConfigurationId(filterSettings);
 		edSrcEncoding.setText(sourceEncoding);
 		edTrgEncoding.setText(targetEncoding);
 	}
@@ -158,7 +158,7 @@ class InputPropertiesForm {
 		try {
 			results = new String[4];
 //x			results[0] = pnlFilterSettings.getData();
-			results[0] = pnlFilterConfigSelection.getData();
+			results[0] = pnlFilterConfigSelection.getConfigurationId();
 			//TODO: Check if the parameters are still OK.
 			results[1] = edSrcEncoding.getText();
 			results[2] = edTrgEncoding.getText();

@@ -156,18 +156,23 @@ public class FilterConfigSelectionPanel extends Composite {
 		btMore.setText("&More...");
 		btMore.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
-				allConfigurations();
+				editAllConfigurations();
 			}
 		});
 
 		UIUtil.setSameWidth(nWidth, btOptions, btEdit, btCreate, btDelete, btMore);
 	}
 	
-	public void setData (String configId,
-		FilterConfigMapper mapper)
-	{
+	public String getConfigurationId () {
+		int n = lbConfigs.getSelectionIndex();
+		if ( n < 1 ) return ""; // No configuration
+		else return lbConfigs.getItem(n);
+	}
+
+	public void setConfigurationId (String configId) {
 		// Fill the list of available filters
 		// Rely on order (index+1) because we cannot attach object to the items
+		cbFilters.removeAll();
 		cbFilters.add("<None>");
 		filters = mapper.getFilters();
 		for ( FilterInfo item : filters ) {
@@ -175,6 +180,13 @@ public class FilterConfigSelectionPanel extends Composite {
 		}
 		// Set the current filter
 		FilterConfiguration config = mapper.getConfiguration(configId);
+		if ( config == null ) {
+			// Warn no configuration was found (if we were expecting one)
+			if (( configId != null ) && ( configId.length()!=0 )) {
+				Dialogs.showError(getShell(),
+					String.format("The configuration for the identifier '%s' could not be found.", configId), null);
+			}
+		}
 		setConfiguration(config);
 	}
 
@@ -199,24 +211,21 @@ public class FilterConfigSelectionPanel extends Composite {
 		fillConfigurations(0, (config==null) ? null : config.configId);
 	}
 	
-	@Override
-	public String getData () {
-		int n = lbConfigs.getSelectionIndex();
-		if ( n < 1 ) return ""; // No configuration
-		else return lbConfigs.getItem(n);
-	}
-
-	private void allConfigurations () {
+	private void editAllConfigurations () {
 		try {
 			int n = lbConfigs.getSelectionIndex();
 			String configId = null;
 			if ( n > -1 ) {
 				configId = lbConfigs.getItem(n);
 			}
-			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(getShell(), true, project);
-			configId = dlg.showDialog(mapper, configId);
-			if ( configId == null ) return; // No selection
-			setConfiguration(mapper.getConfiguration(configId));
+			String oldConfigId = configId;
+			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(getShell(), true, project, mapper);
+			configId = dlg.showDialog(configId);
+			if ( configId == null ) { // Close without selection
+				configId = oldConfigId;
+			}
+			// Update the list of configuration with the new or old selection
+			setConfigurationId(configId);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);
@@ -254,7 +263,10 @@ public class FilterConfigSelectionPanel extends Composite {
 		// We should always have at least one configuration,
 		// otherwise there would be no filter
 		int n = cbFilters.getSelectionIndex();
-		if ( n < 1 ) return; // First is <None>
+		if ( n < 1 ) {
+			updateConfigurationInfo();
+			return; // First is <None>
+		}
 		n--; // Real index in filters list
 		java.util.List<FilterConfiguration> list = mapper.getFilterConfigurations(filters.get(n).filterClass);
 
@@ -269,7 +281,6 @@ public class FilterConfigSelectionPanel extends Composite {
 		}
 
 		lbConfigs.setSelection(index);
-		//lbConfigs.showSelection();
 		updateConfigurationInfo();
 	}
 	
@@ -279,7 +290,7 @@ public class FilterConfigSelectionPanel extends Composite {
 	
 	private void editOptions () {
 		try {
-			String configId = getData();
+			String configId = getConfigurationId();
 			if ( configId == null ) return;
 			FilterConfiguration config = mapper.getConfiguration(configId);
 			if ( config == null ) return;
@@ -290,6 +301,7 @@ public class FilterConfigSelectionPanel extends Composite {
 			// Call the editor
 			if ( editor == null ) {
 				//TODO
+				Dialogs.showError(getShell(), "Editing of filter parameters without editor is not implemented yet.", null);
 			}
 			else {
 				if ( !editor.edit(params, context) ) return;
@@ -358,7 +370,7 @@ public class FilterConfigSelectionPanel extends Composite {
 
 	private void deleteParameters () {
 		try {
-			String configId = getData();
+			String configId = getConfigurationId();
 			if ( configId == null ) return;
 			FilterConfiguration config = mapper.getConfiguration(configId);
 			if ( !config.custom ) return; // Cannot delete pre-defined configurations
