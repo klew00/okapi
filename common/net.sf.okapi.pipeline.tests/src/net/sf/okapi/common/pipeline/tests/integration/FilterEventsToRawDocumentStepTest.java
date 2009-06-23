@@ -1,7 +1,8 @@
-package net.sf.okapi.common.pipeline.tests;
+package net.sf.okapi.common.pipeline.tests.integration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringWriter;
 
 import net.sf.okapi.common.Event;
@@ -17,7 +18,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class EventsToRawDocumentStepTest {
+public class FilterEventsToRawDocumentStepTest {
 	private FilterEventsToRawDocumentStep eventToDoc;
 	private String htmlSnippet;
 	private HtmlFilter htmlFilter;
@@ -26,8 +27,7 @@ public class EventsToRawDocumentStepTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
-		htmlSnippet = "<p>This is a <i>test</i> snippet</p>";
-		pipeline = new Pipeline();
+		htmlSnippet = "<p>This is a <i>test</i> snippet</p>";		
 	}
 
 	@After
@@ -37,7 +37,8 @@ public class EventsToRawDocumentStepTest {
 
 	@Test
 	public void htmlEventsToRawDocument() throws IOException {
-		Event event = null;
+		Event event = null;		
+		pipeline = new Pipeline();
 		eventToDoc = new FilterEventsToRawDocumentStep();
 		
 		eventToDoc.setPipeline(pipeline);
@@ -46,7 +47,7 @@ public class EventsToRawDocumentStepTest {
 		BatchItemContext bic = new BatchItemContext(rawDoc, null, "UTF-8");
 		pipeline.getContext().setBatchItemContext(bic);
 
-		htmlFilter.open(bic.getRawDocument(0));
+		htmlFilter.open(rawDoc);
 		while ( htmlFilter.hasNext() ) {
 			event = eventToDoc.handleEvent(htmlFilter.next());
 		}
@@ -60,8 +61,8 @@ public class EventsToRawDocumentStepTest {
 
 	@Test
 	public void htmlEventsToRawDocumentWithUserURI() throws IOException {
+		pipeline = new Pipeline();
 		Event event = null;
-
 		eventToDoc = new FilterEventsToRawDocumentStep();
 		eventToDoc.setPipeline(pipeline);
 		// Make sure the step in in a pipeline to use the output file
@@ -73,12 +74,7 @@ public class EventsToRawDocumentStepTest {
 		BatchItemContext bic = new BatchItemContext(rawDoc, tmpFile.toURI(), "UTF-8");
 		pipeline.getContext().setBatchItemContext(bic);
 
-		htmlFilter.open(bic.getRawDocument(0));
-		while ( htmlFilter.hasNext() ) {
-			event = eventToDoc.handleEvent(htmlFilter.next());
-		}
-
-		htmlFilter.open(bic.getRawDocument(0));
+		htmlFilter.open(rawDoc);
 		while (htmlFilter.hasNext()) {
 			event = eventToDoc.handleEvent(htmlFilter.next());
 		}
@@ -88,14 +84,16 @@ public class EventsToRawDocumentStepTest {
 		// Get the EventsToRawDocumentStep output and compare it to our input
 		assertEquals(htmlSnippet, convertRawDocumentToString((RawDocument)event.getResource()));
 		eventToDoc.destroy();
-		pipeline = new Pipeline();
 	}
 
 	private String convertRawDocumentToString(RawDocument d) throws IOException {		
 		int c = -1;
 		StringWriter sw = new StringWriter();
-		while ((c = d.getReader().read()) != -1) {
-			sw.append((char) c);
+		Reader r = d.getReader(); 
+		while (true) {
+			c = r.read();			
+			if (c == -1) break;							
+			sw.append((char) c);			
 		}
 		d.getReader().close();
 		return sw.toString();

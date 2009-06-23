@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.pipeline.tests;
+package net.sf.okapi.common.pipeline.tests.integration;
 
 import static org.junit.Assert.assertEquals;
 
@@ -64,11 +64,11 @@ public class FilterRoundtripTest {
 			"<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>",
 			"en", "es");
 		rd.setFilterConfigId("okf_html");
-		driver.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-16LE");
+		driver.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-8");
 		driver.processBatch();
 		assertEquals("spam",
 			getFirstTUSource(new RawDocument((new File("genericOutput.txt")).toURI(),
-				"UTF-16LE", "es")));
+				"UTF-8", "es")));
 	}
 
 	@Test

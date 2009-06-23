@@ -10,7 +10,7 @@ import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 
 @RunWith(Suite.class)
-@SuiteClasses( { XsltPipelineTest.class })
+@SuiteClasses( { XsltPipelineTest.class, FilterEventsToRawDocumentStepTest.class, FilterRoundtripTest.class })
 public class AllPipelineIntegrationTests {
 
 	public static Test suite() {
