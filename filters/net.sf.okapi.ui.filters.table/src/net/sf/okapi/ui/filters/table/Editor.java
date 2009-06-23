@@ -38,6 +38,8 @@ public class Editor extends AbstractParametersEditor {
 	@Override
 	protected void createPages(TabFolder pageContainer) {
 		
+		addPage("Table", TableTab.class);
+		addPage("Columns", ColumnsTab.class);
 		addPage("Options", OptionsTab.class);
 	}
 
