@@ -9,6 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	net.sf.okapi.common.tests.AllTests.class,
 	net.sf.okapi.common.tests.AllCommonFiltersTests.class,
 	net.sf.okapi.steps.textmodification.tests.TextModificationStepTest.class,
+	net.sf.okapi.steps.tests.integration.MultistepPipelineTest.class,
 	net.sf.okapi.filters.html.tests.AllHtmlUnitTests.class,
 	net.sf.okapi.filters.html.tests.integration.ExtractionComparisionTest.class,
 	net.sf.okapi.filters.idml.tests.IDMLContentFilterTest.class,
