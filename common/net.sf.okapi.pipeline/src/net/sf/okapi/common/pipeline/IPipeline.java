@@ -118,4 +118,9 @@ public interface IPipeline {
 	 */
 	public void destroy();
 
+	/**
+	 * Remove all the {@link IPipelineStep}s from the pipeline. Also calls the
+	 * destroy() method on each step.
+	 */
+	public void clearSteps();
 }

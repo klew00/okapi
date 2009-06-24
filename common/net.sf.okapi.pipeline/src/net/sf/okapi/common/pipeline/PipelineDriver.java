@@ -143,5 +143,8 @@ public class PipelineDriver implements IPipelineDriver {
 			logger.info("\n-- Input (No path available)");
 		}
 	}
-	
+
+	public void clearSteps() {
+		pipeline.clearSteps();		
+	}
 }

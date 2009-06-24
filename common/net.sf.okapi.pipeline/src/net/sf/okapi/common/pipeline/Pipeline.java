@@ -200,5 +200,10 @@ public class Pipeline implements IPipeline {
 		if ( steps.size() == 0 ) return false;
 		return steps.getLast().equals(step);
 	}
-
+	
+	public void clearSteps() {
+		destroy();
+		steps.clear();
+		finishedSteps.clear();
+	}
 }
