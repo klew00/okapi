@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.EncodingItem;
 import net.sf.okapi.applications.rainbow.lib.EncodingManager;
-import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.lib.FilterConfigMapperDialog;
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
@@ -47,9 +46,7 @@ import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.BaseHelp;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
@@ -157,7 +154,6 @@ public class MainForm { //implements IParametersProvider {
 	private LanguageManager lm;
 	private ResourceManager rm;
 	private FormatManager fm;
-//x	private FilterAccess fa;
 	private FilterConfigMapper fcMapper;
 	private EncodingManager em;
 	private PluginsAccess plugins;
@@ -256,11 +252,6 @@ public class MainForm { //implements IParametersProvider {
 		setLogLevel();
 		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 
-//x		fa = new FilterAccess();
-//x		fa.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
-		// Define default editor, if none, the fall back for .txt will be used.
-//x		fa.setDefaultEditor(config.getProperty("defaultEditor")); //$NON-NLS-1$
-		
 		fcMapper = new FilterConfigMapper();
 		// Get pre-defined configurations
 		fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
@@ -1356,9 +1347,9 @@ public class MainForm { //implements IParametersProvider {
 			if ( utilityID == null ) return;
 			// Save any pending data
 			saveSurfaceData();
+			updateCustomConfigurations();
 			// Create the utility driver if needed
 			if ( ud == null ) {
-				updateCustomConfigurations();
 				ud = new UtilityDriver(log, fcMapper, plugins, help, true);
 			}
 			// Get the data for the utility and instantiate it

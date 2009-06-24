@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.packages.IReader;
@@ -54,7 +53,6 @@ public class Merger {
 
 	private Manifest manifest;
 	private IReader reader;
-//x	private FilterAccess fa;
 	private FilterConfigMapper mapper;
 	private IFilter inpFilter;
 	private IFilterWriter outFilter;
@@ -62,9 +60,7 @@ public class Merger {
 	private String trgLang;
 
 	public Merger () {
-//x		fa = new FilterAccess();
-
-		// Get the location of the class source
+//		// Get the location of the class source
 		File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
 	    String rootFolder = file.getAbsolutePath();
 	    // Remove the JAR file if running an installed version
@@ -74,7 +70,6 @@ public class Merger {
 		String sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
 
 		// Load the FilterAccess list
-//x		fa.loadList(sharedFolder + File.separator + "filters.xml");
 		mapper = new FilterConfigMapper();
 		mapper.loadList(sharedFolder + File.separator + "filters.xml");
 		// No need to load custom configuration because we are loading the parameters ourselves
@@ -184,7 +179,6 @@ public class Merger {
 			String paramsFile = manifest.getRoot() + File.separator + manifest.getOriginalLocation()
 				+ File.separator + String.format("%d.fprm", docId);
 			// Load the relevant filter
-//x			inpFilter = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter);
 			inpFilter = mapper.createFilter(item.getFilterID(), inpFilter);
 			IParameters params = inpFilter.getParameters();
 			File file = new File(paramsFile);

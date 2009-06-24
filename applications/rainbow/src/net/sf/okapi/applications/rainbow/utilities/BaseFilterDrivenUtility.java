@@ -50,9 +50,6 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 			
 			// Process as a filter-drive input
 			// Load the filter if needed
-//x			filter = fa.loadFilterFromFilterSettingsType1(paramsFolder,
-//x				getInputFilterSettings(0), filter);
-			
 			filter = mapper.createFilter(getInputFilterSettings(0), filter);
 	
 			// Setup the filter

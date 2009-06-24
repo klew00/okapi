@@ -236,8 +236,6 @@ public class Utility extends BaseFilterDrivenUtility {
     private void readTargetToDb () {
     	try {
 			// Initialize the filter for the target
-//x			trgFilter = fa.loadFilterFromFilterSettingsType1(paramsFolder,
-//x				getInputFilterSettings(1), trgFilter);
 			trgFilter = mapper.createFilter(getInputFilterSettings(1), trgFilter);
 			
 			// Open the file with the translations

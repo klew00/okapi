@@ -141,8 +141,6 @@ public class Utility extends BaseFilterDrivenUtility {
 
 	private void initializeData () {
 		// Initialize the filter to read the translation to compare
-//x		inputToCompare = fa.loadFilterFromFilterSettingsType1(paramsFolder,
-//x			getInputFilterSettings(1), inputToCompare);
 		inputToCompare = mapper.createFilter(getInputFilterSettings(1), inputToCompare);
 		
 		

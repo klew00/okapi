@@ -20,7 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
-import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;

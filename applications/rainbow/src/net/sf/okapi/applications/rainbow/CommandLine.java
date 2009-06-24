@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.widgets.Shell;
 
-import net.sf.okapi.applications.rainbow.lib.FilterAccess;
 import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
@@ -45,7 +44,6 @@ public class CommandLine {
 	private Project prj;
 	private Shell shell;
 	private UtilityDriver ud;
-//x	private FilterAccess fa;
 	private FilterConfigMapper mapper;
 	private PluginsAccess plugins;
 	private BatchLog log;
@@ -210,8 +208,6 @@ public class CommandLine {
 		
 		lm = new LanguageManager();
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$
-//x		fa = new FilterAccess();
-//x		fa.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 		
 		// Set up the filter configuration mapper
 		mapper = new FilterConfigMapper();
@@ -227,7 +223,6 @@ public class CommandLine {
 		if ( ud == null ) {
 			mapper.setParametersFolder(prj.getParametersFolder());
 			mapper.updateCustomConfigurations();
-//x			ud = new UtilityDriver(log, fa, mapper, plugins, help, false);
 			ud = new UtilityDriver(log, mapper, plugins, help, false);
 		}
 		
