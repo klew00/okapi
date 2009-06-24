@@ -43,7 +43,6 @@ import net.sf.okapi.filters.xml.XMLFilter;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class XMLFilterTest {
 
@@ -120,15 +119,16 @@ public class XMLFilterTest {
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
-	@Test
+	//TODO: Implement language handling
+/*	@Test
 	public void testOutputSimpleContent_WithLang () {
-//		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-//			+ "<doc xml:lang='en'>test</doc>";
-//		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-//			+ "<doc xml:lang='FR'>test</doc>";
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc xml:lang='en'>test</doc>";
+		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc xml:lang='FR'>test</doc>";
 		//TODO: Implement replacement of the lang value
 		//assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), snippet, "FR"));
-	}
+	}*/
 	
 	@Test
 	public void testOutputSupplementalChars () {
