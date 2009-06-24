@@ -20,7 +20,7 @@ import net.sf.okapi.filters.html.HtmlFilter;
 
 public class TestUtils {
 
-	public static String[] getTestFiles() throws URISyntaxException {
+	public static String[] getHtmlTestFiles() throws URISyntaxException {
 		// read all files in the test html directory
 		URL url = HtmlFullFileTest.class.getResource("/simpleTest.html");
 		File dir = new File(url.toURI()).getParentFile();

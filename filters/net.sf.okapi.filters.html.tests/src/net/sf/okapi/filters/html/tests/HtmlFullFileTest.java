@@ -21,7 +21,7 @@ public class HtmlFullFileTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();		
-		testFileList = TestUtils.getTestFiles();
+		testFileList = TestUtils.getHtmlTestFiles();
 	}
 
 	@After
