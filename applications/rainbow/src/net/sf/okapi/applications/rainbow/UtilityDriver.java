@@ -132,7 +132,7 @@ public class UtilityDriver implements CancelListener {
 					context.setObject("shell", shell);
 					context.setObject("help", help);
 					context.setString("projDir", prj.getProjectFolder());
-					if ( !editor.edit(utility.getParameters(), context) ) return false;
+					if ( !editor.edit(utility.getParameters(), false, context) ) return false;
 					// Save the parameters in memory
 					prj.setUtilityParameters(utility.getName(),
 						utility.getParameters().toString());

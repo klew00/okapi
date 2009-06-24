@@ -25,6 +25,7 @@ import java.net.URL;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
@@ -188,6 +189,32 @@ public class UIUtil {
 		edField.setFocus();
 	}
 
+	/**
+	 * Compute the minimum possible width for a button with two labels.
+	 * @param minimumWidth basic minimum size.
+	 * @param button button with the first text all. 
+	 * @param alternateText alternate text to replace original.
+	 * @return the new main minimum width.
+	 */
+	public static int getMinimumWidth (int minimumWidth,
+		Button button,
+		String alternateText)
+	{
+		int n = minimumWidth;
+		// Get first text size
+		button.pack();
+		Point size = button.getSize();
+		if ( size.x > n ) n = size.x;
+		String tmp = button.getText();
+		// Get second size
+		button.setText(alternateText);
+		button.pack();
+		size = button.getSize();
+		if ( size.x > n ) n = size.x;
+		button.setText(tmp);
+		return n;
+	}
+	
 	/**
 	 * Ensures that several controls using GridData layout have the same width
 	 * that is either the minimum provided or the greatest width needed.

@@ -152,6 +152,10 @@ public class InputDialog {
 		allowEmptyValue = value;
 	}
 
+	public void setReadOnly (boolean value) {
+		pnlActions.btOK.setEnabled(!value);
+	}
+
 	private void getFolder () {
 		try {
 			DirectoryDialog dlg = new DirectoryDialog(shell);

@@ -51,6 +51,7 @@ public class OptionsEditor implements IParametersEditor {
 	private IHelp help;
 
 	public boolean edit (IParameters params,
+		boolean readOnly,
 		IContext context)
 	{
 		help = (IHelp)context.getObject("help");
@@ -59,7 +60,7 @@ public class OptionsEditor implements IParametersEditor {
 		this.params = (Options)params;
 		try {
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-			create((Shell)context.getObject("shell"));
+			create((Shell)context.getObject("shell"), readOnly);
 			return showDialog();
 		}
 		catch ( Exception E ) {
@@ -77,7 +78,9 @@ public class OptionsEditor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell parent) {
+	private void create (Shell parent,
+		boolean readOnly)
+	{
 		shell.setText("XLIFF Package Options");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
@@ -130,7 +133,10 @@ public class OptionsEditor implements IParametersEditor {
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
-		shell.setDefaultButton(pnlActions.btOK);
+		pnlActions.btOK.setEnabled(!readOnly);
+		if ( !readOnly ) {
+			shell.setDefaultButton(pnlActions.btOK);
+		}
 
 		shell.pack();
 		Rectangle Rect = shell.getBounds();

@@ -394,7 +394,7 @@ public class PipelineEditor {
 					// Set it with the data from this step
 					params.fromString(step.paramsData);
 					// Edit the data
-					if ( !editor.edit(params, context) ) return; // Cancel
+					if ( !editor.edit(params, false, context) ) return; // Cancel
 					// Save the data
 					step.paramsData = params.toString();
 					return;

@@ -70,6 +70,7 @@ public class ParametersEditor implements IParametersEditor {
 	private IHelp help;
 
 	public boolean edit (IParameters params,
+		boolean readOnly,
 		IContext context)
 	{
 		boolean bRes = false;
@@ -78,7 +79,7 @@ public class ParametersEditor implements IParametersEditor {
 			help = (IHelp)context.getObject("help");
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-			create((Shell)context.getObject("shell"));
+			create((Shell)context.getObject("shell"), readOnly);
 			return showDialog();
 		}
 		catch ( Exception e ) {
@@ -96,7 +97,8 @@ public class ParametersEditor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell parent)
+	private void create (Shell parent,
+		boolean readOnly)
 	{
 		shell.setText("Encoding Conversion");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
@@ -224,7 +226,10 @@ public class ParametersEditor implements IParametersEditor {
 		};
 		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		shell.setDefaultButton(pnlActions.btOK);
+		pnlActions.btOK.setEnabled(!readOnly);
+		if ( !readOnly ) {
+			shell.setDefaultButton(pnlActions.btOK);
+		}
 
 		setData();
 		

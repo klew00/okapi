@@ -127,6 +127,7 @@ class InputPropertiesForm {
 		Rectangle Rect = shell.getBounds();
 		shell.setMinimumSize(Rect.width, Rect.height);
 		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 500 ) startSize.x = 500;
 		if ( startSize.y < 450 ) startSize.y = 450;
 		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);

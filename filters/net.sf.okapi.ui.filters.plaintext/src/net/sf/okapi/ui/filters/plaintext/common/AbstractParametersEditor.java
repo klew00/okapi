@@ -62,7 +62,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 	private TabFolder pageContainer;
 	private List<IParametersEditorPage> pages = null;
 	
-	public boolean edit(IParameters paramsObject, IContext context) {
+	public boolean edit(IParameters paramsObject, boolean readOnly, IContext context) {
 	
 		result = true;
 		if (context == null) return false;
@@ -89,7 +89,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 //						result = false;
 //					}
 //				}});
-			create(parent);			
+			create(parent, readOnly);			
 			if (!result) return  false;
 			
 			showDialog();			
@@ -106,8 +106,9 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		return result;
 	}
 
-	private void create (Shell p_Parent) {
-		
+	private void create (Shell p_Parent,
+		boolean readOnly)
+	{
 		shell.setText(getCaption());
 		
 		if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
@@ -152,7 +153,10 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
-		shell.setDefaultButton(pnlActions.btOK);
+		pnlActions.btOK.setEnabled(!readOnly);
+		if ( !readOnly ) {
+			shell.setDefaultButton(pnlActions.btOK);
+		}
 
 		shell.pack();
 		Rectangle Rect = shell.getBounds();

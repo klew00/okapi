@@ -54,7 +54,6 @@ public class FilterConfigSelectionPanel extends Composite {
 	private Combo cbFilters;
 	private Text edDescription;
 	private List lbConfigs;
-	private Button btOptions;
 	private Button btEdit;
 	private Button btCreate;
 	private Button btDelete;
@@ -82,14 +81,14 @@ public class FilterConfigSelectionPanel extends Composite {
 	}
 	
 	private void createContent () {
-		GridLayout layTmp = new GridLayout(5, false);
+		GridLayout layTmp = new GridLayout(4, false);
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		setLayout(layTmp);
 
 		cbFilters = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 5;
+		gdTmp.horizontalSpan = 4;
 		gdTmp.widthHint = 340;
 		cbFilters.setLayoutData(gdTmp);
 		cbFilters.setVisibleItemCount(15);
@@ -102,7 +101,7 @@ public class FilterConfigSelectionPanel extends Composite {
 
 		lbConfigs = new List(this, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 5;
+		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 60;
 		lbConfigs.setLayoutData(gdTmp);
 		lbConfigs.addSelectionListener(new SelectionAdapter() {
@@ -113,26 +112,18 @@ public class FilterConfigSelectionPanel extends Composite {
 
 		edDescription = new Text(this, SWT.BORDER | SWT.MULTI | SWT.WRAP);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 5;
+		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 60;
 		edDescription.setLayoutData(gdTmp);
 		edDescription.setEditable(false);
 		
 		int nWidth = 80;
 		
-		btOptions = new Button(this, SWT.PUSH);
-		btOptions.setText("&Options...");
-		btOptions.addSelectionListener(new SelectionAdapter () {
-			public void widgetSelected(SelectionEvent e) {
-				editOptions();
-			}
-		});
-
 		btEdit = new Button(this, SWT.PUSH);
 		btEdit.setText("&Edit...");
 		btEdit.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
-				editConfiguration();
+				editOptions();
 			}
 		});
 
@@ -160,7 +151,8 @@ public class FilterConfigSelectionPanel extends Composite {
 			}
 		});
 
-		UIUtil.setSameWidth(nWidth, btOptions, btEdit, btCreate, btDelete, btMore);
+		nWidth = UIUtil.getMinimumWidth(nWidth, btEdit, "&View...");
+		UIUtil.setSameWidth(nWidth, btEdit, btCreate, btDelete, btMore);
 	}
 	
 	public String getConfigurationId () {
@@ -238,7 +230,6 @@ public class FilterConfigSelectionPanel extends Composite {
 		if ( n > -1 ) configId = lbConfigs.getItem(n);
 		if (( configId == null ) || ( configId.length() == 0 )) {
 			edDescription.setText("");
-			btOptions.setEnabled(false);
 			btEdit.setEnabled(false);
 			btCreate.setEnabled(false);
 			btDelete.setEnabled(false);
@@ -246,8 +237,9 @@ public class FilterConfigSelectionPanel extends Composite {
 		else {
 			FilterConfiguration config = mapper.getConfiguration(configId);
 			edDescription.setText(config.name + "\n" + config.description);
-			btOptions.setEnabled(true);
-			btEdit.setEnabled(config.custom);
+			if ( config.custom ) btEdit.setText("&Edit...");
+			else btEdit.setText("&View...");
+			btEdit.setEnabled(true);
 			btCreate.setEnabled(true);
 			btDelete.setEnabled(config.custom);
 		}
@@ -284,10 +276,6 @@ public class FilterConfigSelectionPanel extends Composite {
 		updateConfigurationInfo();
 	}
 	
-	private void editConfiguration () {
-		Dialogs.showError(getShell(), "Not implemented yet.", null);
-	}
-	
 	private void editOptions () {
 		try {
 			String configId = getConfigurationId();
@@ -304,7 +292,7 @@ public class FilterConfigSelectionPanel extends Composite {
 				Dialogs.showError(getShell(), "Editing of filter parameters without editor is not implemented yet.", null);
 			}
 			else {
-				if ( !editor.edit(params, context) ) return;
+				if ( !editor.edit(params, !config.custom, context) ) return;
 			}
 			// Don't try to save pre-defined parameters
 			if ( !config.custom ) return;

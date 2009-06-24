@@ -32,12 +32,15 @@ public interface IParametersEditor {
 	 * (returns true), the parameters have been updated in p_Parameters to
 	 * reflect the changes. 
 	 * @param paramsObject the parameters to edit.
+	 * @param readOnly indicates if the editor is used just to view the parameters.
+	 * If true, the editor must return false.
 	 * @param context an implementation of the {@link IContext} interface that
 	 * holds caller-specific information.
 	 * @return true if the edit was successful, false if the user canceled or if 
-	 * an error occurred. 
+	 * an error occurred, or if the read-only mode is set. 
 	 */
 	public boolean edit (IParameters paramsObject,
+		boolean readOnly,
 		IContext context);
 	
 	/**

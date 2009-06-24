@@ -57,7 +57,6 @@ public class FilterConfigurationsPanel extends Composite {
 	private FilterConfigurationsTableModel model;
 	private Text edFilter;
 	private Text edDescription;
-	private Button btOptions;
 	private Button btEdit;
 	private Button btCreate;
 	private Button btDelete;
@@ -128,7 +127,7 @@ public class FilterConfigurationsPanel extends Composite {
 	}
 	
 	private void createContent () {
-		GridLayout layTmp = new GridLayout(4, false);
+		GridLayout layTmp = new GridLayout(3, false);
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		setLayout(layTmp);
@@ -137,7 +136,7 @@ public class FilterConfigurationsPanel extends Composite {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 3;
 		table.setLayoutData(gdTmp);
 		table.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
@@ -168,30 +167,22 @@ public class FilterConfigurationsPanel extends Composite {
 		
 		edFilter = new Text(this, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 3;
 		edFilter.setLayoutData(gdTmp);
 		edFilter.setEditable(false);
 	
 		edDescription = new Text(this, SWT.BORDER | SWT.WRAP | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 3;
 		gdTmp.heightHint = 40;
 		edDescription.setLayoutData(gdTmp);
 		edDescription.setEditable(false);
-		
-		btOptions = new Button(this, SWT.PUSH);
-		btOptions.setText("Options...");
-		btOptions.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				editParameters();
-			};
-		});
 		
 		btEdit = new Button(this, SWT.PUSH);
 		btEdit.setText("Edit...");
 		btEdit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				editConfiguration();
+				editParameters();
 			};
 		});
 		
@@ -211,7 +202,8 @@ public class FilterConfigurationsPanel extends Composite {
 			};
 		});
 		
-		UIUtil.setSameWidth(80, btOptions, btEdit, btCreate, btDelete);
+		int nWidth = UIUtil.getMinimumWidth(80, btEdit, "&View...");
+		UIUtil.setSameWidth(nWidth, btEdit, btCreate, btDelete);
 	}
 
 	private void updateInfo () {
@@ -222,8 +214,9 @@ public class FilterConfigurationsPanel extends Composite {
 			if ( config != null ) {
 				edFilter.setText(config.filterClass);
 				edDescription.setText(config.description);
-				btOptions.setEnabled(true); //config.parameters != null);
-				btEdit.setEnabled(config.custom);
+				btEdit.setEnabled(true);
+				if ( config.custom ) btEdit.setText("&Edit...");
+				else btEdit.setText("&View...");
 				btDelete.setEnabled(config.custom);
 				btCreate.setEnabled(true);
 				return;
@@ -233,7 +226,6 @@ public class FilterConfigurationsPanel extends Composite {
 		edFilter.setText("");
 		edDescription.setText("");
 		btEdit.setEnabled(false);
-		btOptions.setEnabled(false);
 		btCreate.setEnabled(false);
 		btDelete.setEnabled(false);
 	}
@@ -256,6 +248,7 @@ public class FilterConfigurationsPanel extends Composite {
 					"Filters Parameters ("+config.configId+")",
 					"Parameters:",
 					params.toString(), null, 0, 200, 600);
+				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
 				String data = dlg.showDialog();
 				if ( data == null ) return;
 				if ( !config.custom ) return; // Don't save pre-defined parameters
@@ -263,7 +256,7 @@ public class FilterConfigurationsPanel extends Composite {
 				params.fromString(data.replace("\r", "\n"));
 			}
 			else {
-				if ( !editor.edit(params, context) ) return;
+				if ( !editor.edit(params, !config.custom, context) ) return;
 			}
 			// Don't try to save pre-defined parameters
 			if ( !config.custom ) return;
@@ -273,10 +266,6 @@ public class FilterConfigurationsPanel extends Composite {
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);
 		}
-	}
-
-	private void editConfiguration () {
-		Dialogs.showError(getShell(), "Not implemented yet.", null);
 	}
 
 	private void deleteConfiguration () {

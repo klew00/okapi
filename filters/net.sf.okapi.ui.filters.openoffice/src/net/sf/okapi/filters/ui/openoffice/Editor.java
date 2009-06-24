@@ -51,21 +51,17 @@ public class Editor implements IParametersEditor {
 	private Parameters params;
 	private IHelp help;
 
-	/**
-	 * Invokes the editor for the openoffice filter parameters.
-	 * @param p_Options The option object of the action.
-	 * @param p_Object The SWT Shell object of the parent shell in the UI.
-	 */
-	public boolean edit (IParameters p_Options,
+	public boolean edit (IParameters options,
+		boolean readOnly,
 		IContext context)
 	{
 		help = (IHelp)context.getObject("help");
 		boolean bRes = false;
 		shell = null;
-		params = (Parameters)p_Options;
+		params = (Parameters)options;
 		try {
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-			create((Shell)context.getObject("shell"));
+			create((Shell)context.getObject("shell"), readOnly);
 			return showDialog();
 		}
 		catch ( Exception E ) {
@@ -83,7 +79,9 @@ public class Editor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell parent) {
+	private void create (Shell parent,
+		boolean readOnly)
+	{
 		shell.setText("OpenDocument Filter Parameters");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
@@ -131,7 +129,10 @@ public class Editor implements IParametersEditor {
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
-		shell.setDefaultButton(pnlActions.btOK);
+		pnlActions.btOK.setEnabled(!readOnly);
+		if ( !readOnly ) {
+			shell.setDefaultButton(pnlActions.btOK);
+		}
 
 		shell.pack();
 		Rectangle Rect = shell.getBounds();

@@ -94,6 +94,7 @@ public class Editor implements IParametersEditor, SelectionListener {
 		widgetSelected(e);		
 	}	
 	public boolean edit (IParameters p_Options,
+		boolean readOnly,
 		IContext context)
 	{
 		help = (IHelp)context.getObject("help");

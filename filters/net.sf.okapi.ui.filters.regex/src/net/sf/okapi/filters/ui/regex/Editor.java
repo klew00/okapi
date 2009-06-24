@@ -84,12 +84,8 @@ public class Editor implements IParametersEditor {
 	private IHelp help;
 	private Button chkOneLevelGroups;
 	
-	/**
-	 * Invokes the editor for the Properties filter parameters.
-	 * @param p_Options The option object of the action.
-	 * @param p_Object The SWT Shell object of the parent shell in the UI.
-	 */
 	public boolean edit (IParameters p_Options,
+		boolean readOnly,
 		IContext context)
 	{
 		boolean bRes = false;
@@ -105,7 +101,7 @@ public class Editor implements IParametersEditor {
 		
 		try {
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-			create((Shell)context.getObject("shell"));
+			create((Shell)context.getObject("shell"), readOnly);
 			return showDialog();
 		}
 		catch ( Exception E ) {
@@ -123,7 +119,9 @@ public class Editor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell p_Parent) {
+	private void create (Shell p_Parent,
+		boolean readOnly)
+	{
 		shell.setText(Res.getString("Editor.caption")); //$NON-NLS-1$
 		if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
 		GridLayout layTmp = new GridLayout();
@@ -386,7 +384,10 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, okCancelActions, true);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
-		shell.setDefaultButton(pnlActions.btOK);
+		pnlActions.btOK.setEnabled(!readOnly);
+		if ( !readOnly ) {
+			shell.setDefaultButton(pnlActions.btOK);
+		}
 
 		shell.pack();
 		Rectangle Rect = shell.getBounds();

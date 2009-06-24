@@ -322,7 +322,7 @@ public class FilterAccess {
 				}
 			}
 		}
-		else result = paramsEditor.edit(paramObject, context);
+		else result = paramsEditor.edit(paramObject, false, context);
 		return result;
 	}
 	

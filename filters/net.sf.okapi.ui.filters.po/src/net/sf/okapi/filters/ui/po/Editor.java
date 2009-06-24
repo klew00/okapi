@@ -59,12 +59,8 @@ public class Editor implements IParametersEditor {
 	private InlineCodeFinderPanel pnlCodeFinder;
 	private IHelp help;
 
-	/**
-	 * Invokes the editor for the PO filter parameters.
-	 * @param p_Options The option object of the action.
-	 * @param p_Object The SWT Shell object of the parent shell in the UI.
-	 */
 	public boolean edit (IParameters p_Options,
+		boolean readOnly,
 		IContext context)
 	{
 		help = (IHelp)context.getObject("help");
@@ -73,7 +69,7 @@ public class Editor implements IParametersEditor {
 		params = (Parameters)p_Options;
 		try {
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-			create((Shell)context.getObject("shell"));
+			create((Shell)context.getObject("shell"), readOnly);
 			return showDialog();
 		}
 		catch ( Exception E ) {
@@ -91,7 +87,9 @@ public class Editor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell p_Parent) {
+	private void create (Shell p_Parent,
+		boolean readOnly)
+	{
 		shell.setText(Res.getString("editorCaption"));
 		if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
 		GridLayout layTmp = new GridLayout();
@@ -221,7 +219,10 @@ public class Editor implements IParametersEditor {
 		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
-		shell.setDefaultButton(pnlActions.btOK);
+		pnlActions.btOK.setEnabled(!readOnly);
+		if ( !readOnly ) {
+			shell.setDefaultButton(pnlActions.btOK);
+		}
 
 		shell.pack();
 		Rectangle Rect = shell.getBounds();

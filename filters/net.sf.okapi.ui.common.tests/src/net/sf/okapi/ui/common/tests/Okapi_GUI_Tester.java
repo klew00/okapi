@@ -313,7 +313,7 @@ public class Okapi_GUI_Tester {
 		if (!Util.isEmpty(text.getText()))
 			params.load(Util.toURI(text.getText()), true);
 		
-		if (editor.edit(params, context)) {
+		if (editor.edit(params, false, context)) {
 			
 			text_1.setText(params.toString());
 		}
