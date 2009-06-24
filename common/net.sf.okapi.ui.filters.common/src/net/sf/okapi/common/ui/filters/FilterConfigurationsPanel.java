@@ -69,6 +69,9 @@ public class FilterConfigurationsPanel extends Composite {
 	 * Creates a FilterConfigurationsPanel object for a given parent with a given style.
 	 * @param parent the parent of the panel to create.
 	 * @param style the style of the panel.
+	 * @param filterConfigInfoDialogClass the calls name of the
+	 * {@link IFilterConfigurationInfoEditor} to use, or null to use the default.
+	 * @param mapper the {@link IFilterConfigurationMapper} mapper object to edit.
 	 */
 	public FilterConfigurationsPanel (Composite parent,
 		int style,
@@ -359,8 +362,8 @@ public class FilterConfigurationsPanel extends Composite {
 			}
 		}
 		
-		// Create and call it
+		// Create and call the dialog
 		editor.create(getShell());
-		return editor.showDialog(config);
+		return editor.showDialog(config, mapper);
 	}
 }

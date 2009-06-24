@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,7 +32,6 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.common.ui.filters.FilterConfigurationInfoEditor;
 import net.sf.okapi.common.ui.filters.IFilterConfigurationInfoEditor;
 
 import org.eclipse.swt.SWT;
@@ -392,10 +391,10 @@ public class FilterConfigSelectionPanel extends Composite {
 
 	private boolean editConfigurationInfo (FilterConfiguration config) {
 		// Create the configuration info editor
-		IFilterConfigurationInfoEditor editor = new FilterConfigurationInfoEditor();
-		// Create and call it
+		IFilterConfigurationInfoEditor editor = new FilterConfigInfoEditor(); //new FilterConfigurationInfoEditor();
+		// Create and call the dialog
 		editor.create(getShell());
-		return editor.showDialog(config);
+		return editor.showDialog(config, mapper);
 	}
 
 }

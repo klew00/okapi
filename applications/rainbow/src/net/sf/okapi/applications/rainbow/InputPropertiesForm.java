@@ -33,7 +33,6 @@ import net.sf.okapi.common.ui.UIUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -49,7 +48,6 @@ class InputPropertiesForm {
 	private Text edTrgEncoding;
 	private String[] results;
 	private OKCancelPanel pnlActions;
-//x	private FilterSettingsPanel pnlFilterSettings;
 	private FilterConfigSelectionPanel pnlFilterConfigSelection;
 	private IHelp help;
 	private String oldData;
@@ -72,10 +70,6 @@ class InputPropertiesForm {
 		grpTmp.setLayout(new GridLayout(1, false));
 		grpTmp.setText(Res.getString("INPROP_GRPPARAMS")); //$NON-NLS-1$
 
-//x		pnlFilterSettings = new FilterSettingsPanel(grpTmp, help, SWT.NONE, paramsProv, projectDir);
-//x		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-//x		pnlFilterSettings.setLayoutData(gdTmp);
-		
 		pnlFilterConfigSelection = new FilterConfigSelectionPanel(grpTmp, help,
 			SWT.NONE, fcMapper, project, projectDir);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
@@ -126,10 +120,9 @@ class InputPropertiesForm {
 		shell.pack();
 		Rectangle Rect = shell.getBounds();
 		shell.setMinimumSize(Rect.width, Rect.height);
-		Point startSize = shell.getMinimumSize();
-		if ( startSize.x < 500 ) startSize.x = 500;
-		if ( startSize.y < 450 ) startSize.y = 450;
-		shell.setSize(startSize);
+		if ( Rect.width < 500 ) Rect.width = 500;
+		if ( Rect.height < 450 ) Rect.height = 450;
+		shell.setSize(Rect.width, Rect.height);
 		Dialogs.centerWindow(shell, parent);
 	}
 	
@@ -149,7 +142,6 @@ class InputPropertiesForm {
 		FilterConfigMapper fcMapper)
 	{
 		oldData = filterSettings + sourceEncoding + targetEncoding;
-//x		pnlFilterSettings.setData(filterSettings, p_FA);
 		pnlFilterConfigSelection.setConfigurationId(filterSettings);
 		edSrcEncoding.setText(sourceEncoding);
 		edTrgEncoding.setText(targetEncoding);
@@ -158,7 +150,6 @@ class InputPropertiesForm {
 	private boolean saveData () {
 		try {
 			results = new String[4];
-//x			results[0] = pnlFilterSettings.getData();
 			results[0] = pnlFilterConfigSelection.getConfigurationId();
 			//TODO: Check if the parameters are still OK.
 			results[1] = edSrcEncoding.getText();

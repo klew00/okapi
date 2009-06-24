@@ -33,15 +33,23 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Dialog to define the options for the InlineCodeFinder object.
+ */
 public class InlineCodeFinderDialog {
 	
-	private Shell                 shell;
-	private String                help;
-	private OKCancelPanel         pnlActions;
+	private Shell shell;
+	private String help;
+	private OKCancelPanel pnlActions;
 	private InlineCodeFinderPanel pnlCodeFinder;
-	private String                result;
+	private String result;
 
-	
+	/**
+	 * Creates a new InlineCodeFinderDialog object.
+	 * @param parent the parent shell for this dialog.
+	 * @param captionText the caption of this dialog (can be null).
+	 * @param helpFile the path of the help file.
+	 */
 	public InlineCodeFinderDialog (Shell parent,
 		String captionText,
 		String helpFile)
@@ -85,7 +93,13 @@ public class InlineCodeFinderDialog {
 		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
 	}
-	
+
+	/**
+	 * Opens this dialog. Make sure to call {@link #setData(String)} before
+	 * opening the dialog.
+	 * @return true if the edit was successful, false if an error occurred or
+	 * if the user canceled the operation.
+	 */
 	public String showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -95,6 +109,10 @@ public class InlineCodeFinderDialog {
 		return result;
 	}
 
+	/**
+	 * Sets the rules to edit.
+	 * @param codeFinderRules the string storage of the rules to edit.
+	 */
 	public void setData (String codeFinderRules) {
 		pnlCodeFinder.setData(codeFinderRules);
 	}

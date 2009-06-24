@@ -39,7 +39,7 @@ import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 /**
  * Default implementation of the {@link IFilterConfigurationMapper} interface.
  * In this implementation the custom configurations are stored as simple files in the file system
- * of the machine and the value for {@link FilterConfiguration.parametersLocation} for a custom
+ * of the machine and the value for {@link FilterConfiguration#parametersLocation} for a custom
  * configuration is the path or filename of the parameters file.
  */
 public class FilterConfigurationMapper extends ParametersEditorMapper implements IFilterConfigurationMapper {

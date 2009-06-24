@@ -57,7 +57,8 @@ public class FilterConfigMapperDialog {
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 		
-		pnlConfigs = new FilterConfigurationsPanel(shell, SWT.NONE, null, mapper);
+		pnlConfigs = new FilterConfigurationsPanel(shell, SWT.NONE,
+			"net.sf.okapi.applications.rainbow.lib.FilterConfigInfoEditor", mapper);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		pnlConfigs.setLayoutData(gdTmp);
 		

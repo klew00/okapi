@@ -30,6 +30,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+/**
+ * Internal class used by FilterConfigurationPanel.
+ */
 class FilterConfigurationsTableModel {
 
 	static final int ID_COLINDEX = 0;

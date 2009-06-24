@@ -29,6 +29,17 @@ import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 
 /**
  * Common set of methods to manage filter configurations.
+ * <p>This interface allows you to add and remove filter configurations from a central
+ * place. You can instantiate the filter corresponding to a given configuration,
+ * as well as manipulate its parameters.
+ * <p>Classes that implements this interface should consider overriding the methods
+ * related to custom configurations to provide application-specific storage mechanism
+ * and naming convention. The methods related to custom configurations are, for example:
+ * {@link #createCustomConfiguration(FilterConfiguration)},
+ * {@link #deleteCustomParameters(FilterConfiguration)},
+ * {@link #getCustomParameters(FilterConfiguration)},
+ * {@link #getCustomParameters(FilterConfiguration, IFilter)}, and
+ * {@link #saveCustomParameters(FilterConfiguration, IParameters)}.
  */
 public interface IFilterConfigurationMapper {
 
@@ -59,8 +70,8 @@ public interface IFilterConfigurationMapper {
 
 	/**
 	 * Removes configuration mappings from this mapper.
-	 * @param customOnly true to clear only custom configuration, false to 
-	 * clear all configurations from this mapper.
+	 * @param customOnly true to clear only the custom configurations, false to 
+	 * clear all the configurations from this mapper.
 	 */
 	public void clearConfigurations (boolean customOnly);
 	
@@ -93,7 +104,7 @@ public interface IFilterConfigurationMapper {
 	 * instance is re-used, its parameters are always re-loaded.
 	 * Providing an existing instance of the requested filter may allow for better
 	 * efficiency.  
-	 * @return a new IFilter object (with its parameters loaded) for the given
+	 * @return a new {@link IFilter} object (with its parameters loaded) for the given
 	 * configuration identifier, or null if the object could not be created.
 	 * @throws OkapiFilterCreationException if the filter could not be created.
 	 */
@@ -104,7 +115,7 @@ public interface IFilterConfigurationMapper {
 	 * Creates an instance of the filter for a given configuration identifier
 	 * and loads its corresponding parameters.
 	 * @param configId the configuration identifier to use for look-up.
-	 * @return a new IFilter object (with its parameters loaded) for the given
+	 * @return a new {@link IFilter} object (with its parameters loaded) for the given
 	 * configuration identifier, or null if the object could not be created.
 	 * @throws OkapiFilterCreationException if the filter could not be created.
 	 */
@@ -182,7 +193,7 @@ public interface IFilterConfigurationMapper {
 	 * Gets the parameters for a given configuration (predefined or custom).
 	 * @param config the configuration for which the parameters are requested.
 	 * @return the parameters object for the given configuration.
-	 * @See {@link #getCustomParameters(FilterConfiguration)}
+	 * @see #getCustomParameters(FilterConfiguration)
 	 */
 	public IParameters getParameters (FilterConfiguration config);
 	
@@ -237,13 +248,28 @@ public interface IFilterConfigurationMapper {
 	 * @return the parameters for the given custom filter configuration, or null
 	 * if the parameters could not be provided, or if the corresponding filter does not have
 	 * parameters.
+	 * @see #getParameters(FilterConfiguration)
 	 * @throws OkapiFilterCreationException if the filter of the given configuration
 	 * could not be created to load the parameters.
 	 */
 	public IParameters getCustomParameters (FilterConfiguration config);
 
+	/**
+	 * Saves the parameters of a custom configuration. 
+	 * This method provides a way for this mapper to implements how it stores
+	 * custom filter parameters.
+	 * @param config the custom configuration for which to save the parameters.
+	 * @param params the parameters to save.
+	 */
 	public void saveCustomParameters (FilterConfiguration config, IParameters params);
 	
+	/**
+	 * Deletes the parameters of a custom configuration.
+	 * This method provides a way for this mapper to implements how it permanently 
+	 * delete custom filter parameters. The actual configuration is not removed
+	 * from this mapper, you must do it by calling {@link #removeConfiguration(String)}.
+	 * @param config the custom configuration for which to delete the parameters. 
+	 */
 	public void deleteCustomParameters (FilterConfiguration config);
 
 }

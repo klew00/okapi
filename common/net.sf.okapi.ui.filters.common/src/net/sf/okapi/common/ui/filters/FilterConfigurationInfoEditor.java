@@ -21,6 +21,7 @@
 package net.sf.okapi.common.ui.filters;
 
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
@@ -35,6 +36,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * Default implementation of the {@link IFilterConfigurationInfoEditor} interface.
+ */
 public class FilterConfigurationInfoEditor implements IFilterConfigurationInfoEditor {
 
 	private Shell shell;
@@ -45,8 +49,10 @@ public class FilterConfigurationInfoEditor implements IFilterConfigurationInfoEd
 	private Text edParametersLocation;
 	private boolean result;
 
+	/**
+	 * Default constructor, needed to instantiate the object from Class.fromName().
+	 */
 	public FilterConfigurationInfoEditor () {
-		// Default constructor needed for class instantiation
 	}
 
 	public void create (Shell parent) {
@@ -143,7 +149,10 @@ public class FilterConfigurationInfoEditor implements IFilterConfigurationInfoEd
 		return true;
 	}
 
-	public boolean showDialog (FilterConfiguration config) {
+	public boolean showDialog (FilterConfiguration config,
+		IFilterConfigurationMapper mapper)
+	{
+		//TODO: Perform a check that the entered identifier is not duplicated.
 		setData(config);
 		shell.open();
 		while ( !shell.isDisposed() ) {

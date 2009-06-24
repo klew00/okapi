@@ -21,13 +21,34 @@
 package net.sf.okapi.common.ui.filters;
 
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Dialog box to edit the information for a given configuration.
+ * This interface is used by the {@link FilterConfigurationsPanel} class to
+ * have an application-specific way to define the information for a given
+ * configuration, for example when creating a new one.
+ */
 public interface IFilterConfigurationInfoEditor {
 
+	/**
+	 * Creates the dialog box.
+	 * @param parent the parent shell of this dialog.
+	 */
 	public void create (Shell parent);
 	
-	public boolean showDialog (FilterConfiguration config);
+	/**
+	 * Calls the dialog box.
+	 * @param config the configuration to edit.
+	 * @param mapper the filter configuration mapper where this
+	 * configuration will be set. Having access to this mapper allows
+	 * for example to check for identifier duplication.
+	 * @return true if the edit was successful, false if an error
+	 * occurred or if the user canceled the operation.
+	 */
+	public boolean showDialog (FilterConfiguration config,
+		IFilterConfigurationMapper mapper);
 
 }
