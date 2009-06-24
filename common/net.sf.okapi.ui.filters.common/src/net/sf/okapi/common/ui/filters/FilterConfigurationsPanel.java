@@ -151,7 +151,7 @@ public class FilterConfigurationsPanel extends Composite {
 		});
 		table.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {
-				//editRule(false);
+				editParameters();
 			}
 			public void mouseDown(MouseEvent e) {}
 			public void mouseUp(MouseEvent e) {}

@@ -30,9 +30,14 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.filters.FilterConfigurationInfoEditor;
+import net.sf.okapi.common.ui.filters.IFilterConfigurationInfoEditor;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -109,6 +114,14 @@ public class FilterConfigSelectionPanel extends Composite {
 				updateConfigurationInfo();
             }
 		});
+		lbConfigs.addMouseListener(new MouseListener() {
+			public void mouseDoubleClick(MouseEvent e) {
+				editParameters();
+			}
+			public void mouseDown(MouseEvent e) {}
+			public void mouseUp(MouseEvent e) {}
+		});
+		
 
 		edDescription = new Text(this, SWT.BORDER | SWT.MULTI | SWT.WRAP);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -123,7 +136,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		btEdit.setText("&Edit...");
 		btEdit.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
-				editOptions();
+				editParameters();
 			}
 		});
 
@@ -131,7 +144,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		btCreate.setText("&Create...");
 		btCreate.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
-				createParameters();
+				createConfiguration();
 			}
 		});
 
@@ -139,7 +152,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		btDelete.setText("&Delete...");
 		btDelete.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
-				deleteParameters();
+				deleteConfiguration();
 			}
 		});
 
@@ -157,7 +170,7 @@ public class FilterConfigSelectionPanel extends Composite {
 	
 	public String getConfigurationId () {
 		int n = lbConfigs.getSelectionIndex();
-		if ( n < 1 ) return ""; // No configuration
+		if ( n < 0 ) return ""; // No configuration
 		else return lbConfigs.getItem(n);
 	}
 
@@ -276,20 +289,29 @@ public class FilterConfigSelectionPanel extends Composite {
 		updateConfigurationInfo();
 	}
 	
-	private void editOptions () {
+	private void editParameters () {
 		try {
 			String configId = getConfigurationId();
 			if ( configId == null ) return;
 			FilterConfiguration config = mapper.getConfiguration(configId);
 			if ( config == null ) return;
-
 			cachedFilter = mapper.createFilter(config.configId, cachedFilter);
 			IParametersEditor editor = mapper.createParametersEditor(config.configId, cachedFilter);
 			IParameters params = mapper.getParameters(config, cachedFilter);
+			
 			// Call the editor
 			if ( editor == null ) {
-				//TODO
-				Dialogs.showError(getShell(), "Editing of filter parameters without editor is not implemented yet.", null);
+				// Properties-like editing
+				InputDialog dlg  = new InputDialog(getShell(),
+					"Filters Parameters ("+config.configId+")",
+					"Parameters:",
+					params.toString(), null, 0, 200, 600);
+				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
+				String data = dlg.showDialog();
+				if ( data == null ) return;
+				if ( !config.custom ) return; // Don't save pre-defined parameters
+				data = data.replace("\r\n", "\n");
+				params.fromString(data.replace("\r", "\n"));
 			}
 			else {
 				if ( !editor.edit(params, !config.custom, context) ) return;
@@ -304,59 +326,42 @@ public class FilterConfigSelectionPanel extends Composite {
 		}
 	}
 
-	private void createParameters () {
+	private void createConfiguration () {
 		try {
-			Dialogs.showError(getShell(), "Not implemented yet.", null);
-/*			String filterSettings;
-			while ( true ) {
-				InputDialog dlg = new InputDialog(getShell(), "New Parameters",
-					"Name:", "myParameters", null, 0, -1);
-				String newName = dlg.showDialog();
-				if ( newName == null ) return;
-				filterSettings = getFilterId(cbFilters.getText()) + FilterSettingsMarkers.PARAMETERSSEP + newName;
-				boolean found = false;
-				for ( String item : cbParameters.getItems() ) {
-					if ( item.equalsIgnoreCase(filterSettings) ) {
-						found = true;
-						// Ask confirmation for overwriting
-						MessageBox confDlg = new MessageBox(getParent().getShell(),
-							SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-						confDlg.setMessage(String.format("The parameters file '%s' exists already.\n"
-							+"Do you want to overwrite it?", filterSettings));
-						confDlg.setText("Rainbow");
-						found = (confDlg.open()!=SWT.YES);
-					}
-				}
-				if ( !found ) break; // Name OK
+			String baseConfigId = getConfigurationId();
+			if ( baseConfigId == null ) return;
+			FilterConfiguration baseConfig = mapper.getConfiguration(baseConfigId);
+			if ( baseConfig == null ) return;
+
+			FilterConfiguration newConfig = mapper.createCustomConfiguration(baseConfig);
+			if ( newConfig == null ) {
+				throw new Exception(String.format("Could not create new configuration based on '%s'",
+					baseConfig.configId));
 			}
 			
-			// Get the components
-			String[] aRes = paramsProv.splitLocation(filterSettings);
+			// Edit the configuration info
+			if ( !editConfigurationInfo(newConfig) ) return; // Canceled
+			
+			// Set the new parameters with the base ones
+			IParameters newParams = mapper.getParameters(baseConfig);
+			// Save the new configuration
+			mapper.saveCustomParameters(newConfig, newParams);
+			
+			// Add the new configuration
+			mapper.addConfiguration(newConfig);
+			// Update the list and the selection
+			// Refresh the list of parameters
+			fillConfigurations(0, newConfig.configId);
 
-			// Create a default parameters object.
-			// We do this like this because the provider may be on the server side.
-			IParameters params = paramsProv.createParameters(filterSettings);
-			if ( params == null ) {
-				Dialogs.showError(getShell(), "Error when trying to create the parameters file.", null);
-				return;
-			}
-			// Now call the editor (from the client side)
-			context.setObject("shell", getParent().getShell());
-			if ( fa.editParameters(aRes[1], params, context, aRes[3]) ) {
-				// Save the data if needed
-				// We use the provider here to (to save on the server side)
-				paramsProv.save(filterSettings, params);
-				// Refresh the list of parameters and set the new one as the selected
-				paramsList = paramsProv.getParametersList();
-				fillParametersList(-1, filterSettings);
-			}
-*/		}
+			// And continue by editing the parameters for that configuration
+			editParameters();
+		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);
 		}
 	}
 
-	private void deleteParameters () {
+	private void deleteConfiguration () {
 		try {
 			String configId = getConfigurationId();
 			if ( configId == null ) return;
@@ -384,4 +389,13 @@ public class FilterConfigSelectionPanel extends Composite {
 			Dialogs.showError(getShell(), e.getMessage(), null);
 		}
 	}
+
+	private boolean editConfigurationInfo (FilterConfiguration config) {
+		// Create the configuration info editor
+		IFilterConfigurationInfoEditor editor = new FilterConfigurationInfoEditor();
+		// Create and call it
+		editor.create(getShell());
+		return editor.showDialog(config);
+	}
+
 }
