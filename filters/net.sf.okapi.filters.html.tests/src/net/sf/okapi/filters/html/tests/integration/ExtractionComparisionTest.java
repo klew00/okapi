@@ -24,7 +24,7 @@ public class ExtractionComparisionTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();		
-		testFileList = TestUtils.getTestFiles();
+		testFileList = TestUtils.getHtmlTestFiles();
 		
 		URL url = ExtractionComparisionTest.class.getResource("/324.html");
 		root = Util.getDirectoryName(url.getPath());
