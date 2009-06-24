@@ -46,12 +46,12 @@ public class FilterAccess {
 	private LinkedHashMap<String, FilterAccessItem> m_htFilters;
 	private String defaultEditor;
 	
-	/**
+	/*
 	 * Construct a filter settings string.
 	 * @param filterID Filter identifier (cannot be null nor empty).
 	 * @param paramsName Name of the parameters file (can be null or empty).
 	 * @return Filter settings string.
-	 */
+	 
 	static public String buildFilterSettingsType1 (String filterID,
 		String paramsName)
 	{
@@ -59,8 +59,8 @@ public class FilterAccess {
 		if (( paramsName != null ) && ( paramsName.length() > 0 ))
 			sTmp += (FilterSettingsMarkers.PARAMETERSSEP + paramsName);
 		return sTmp;
-	}
-
+	}*/
+	
 	/**
 	 * Splits a filter settings type 1 string into its different components, including
 	 * the full path of the parameters file.

@@ -141,8 +141,11 @@ public class Utility extends BaseFilterDrivenUtility {
 
 	private void initializeData () {
 		// Initialize the filter to read the translation to compare
-		inputToCompare = fa.loadFilterFromFilterSettingsType1(paramsFolder,
-			getInputFilterSettings(1), inputToCompare);
+//x		inputToCompare = fa.loadFilterFromFilterSettingsType1(paramsFolder,
+//x			getInputFilterSettings(1), inputToCompare);
+		inputToCompare = mapper.createFilter(getInputFilterSettings(1), inputToCompare);
+		
+		
 		File f = new File(getInputPath(1));
 		inputToCompare.open(new RawDocument(f.toURI(), getInputEncoding(1), srcLang, trgLang));
 			

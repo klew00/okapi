@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.utilities;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 
@@ -29,15 +30,7 @@ import net.sf.okapi.common.IParameters;
  */
 public interface IUtility {
 
-	/**
-	 * Sets the filter access information to use with the utility.
-	 * This allows utilities to re-use loaded filter access objects to instantiate
-	 * filters.
-	 * @param filterAccess The filter access object to use.
-	 * @param paramsFolder The parameters folder to use.
-	 */
-	public void setFilterAccess (FilterAccess filterAccess,
-		String paramsFolder);
+	public void setFilterAccess (FilterConfigMapper mapper);
 	
 	/**
 	 * Sets the context UI to use with the utility.

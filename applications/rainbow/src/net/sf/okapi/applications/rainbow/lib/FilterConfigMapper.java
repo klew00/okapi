@@ -44,6 +44,41 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 	private ArrayList<FilterInfo> filters;
 	
 	/**
+	 * Splits a configuration identifier into a filter and 
+	 * @param configId the configuration identifier to split.
+	 * @return an array of two strings: 0=filter (e.g. "okf_xml", 1=parameter info (or null).
+	 */
+	static public String[] splitFilterFromConfiguration (String configId) {
+		String[] res = new String[2];
+		// Get the filter
+		int n  = configId.indexOf(FilterSettingsMarkers.PARAMETERSSEP);
+		if ( n == -1 ) {
+			// Try '-' then
+			n = configId.indexOf('-');
+			if ( n == -1 ) {
+				// Try '_'
+				n = configId.indexOf('_');
+				if ( n == -1 ) {
+					res[0] = configId;
+					return res; // The filter is the configID (default case)
+				}
+				else { // Check for "okf_" case
+					if ( configId.substring(0, n).equals("okf") ) {
+						n = configId.indexOf('_', n+1);
+						if ( n == -1 ) {
+							res[0] = configId;
+							return res; // The filter is the configID (default case) 
+						}
+					}
+				}
+			}
+		}
+		res[0] = configId.substring(0, n);
+		res[1] = configId.substring(n+1);
+		return res;
+	}
+	
+	/**
 	 * Loads the list of accessible filters and the list filters parameters editors.
 	 * The lists are stored in an XML file of the following format:
 	 * <okapiFilters>
@@ -124,41 +159,6 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 		if ( !paramsFolder.endsWith(File.separator) ) {
 			paramsFolder += File.separator;
 		}
-	}
-	
-	/**
-	 * Splits a configuration identifier into a filter and 
-	 * @param configId the configuration identifier to split.
-	 * @return an array of two strings: 0=filter, 1=parameter info (or null).
-	 */
-	private String[] splitFilterFromConfiguration (String configId) {
-		String[] res = new String[2];
-		// Get the filter
-		int n  = configId.indexOf(FilterSettingsMarkers.PARAMETERSSEP);
-		if ( n == -1 ) {
-			// Try '-' then
-			n = configId.indexOf('-');
-			if ( n == -1 ) {
-				// Try '_'
-				n = configId.indexOf('_');
-				if ( n == -1 ) {
-					res[0] = configId;
-					return res; // The filter is the configID (default case)
-				}
-				else { // Check for "okf_" case
-					if ( configId.substring(0, n).equals("okf") ) {
-						n = configId.indexOf('_', n+1);
-						if ( n == -1 ) {
-							res[0] = configId;
-							return res; // The filter is the configID (default case) 
-						}
-					}
-				}
-			}
-		}
-		res[0] = configId.substring(0, n);
-		res[1] = configId.substring(n+1);
-		return res;
 	}
 	
 	/**

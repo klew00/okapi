@@ -30,12 +30,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
@@ -52,14 +54,15 @@ public class Merger {
 
 	private Manifest manifest;
 	private IReader reader;
-	private FilterAccess fa;
+//x	private FilterAccess fa;
+	private FilterConfigMapper mapper;
 	private IFilter inpFilter;
 	private IFilterWriter outFilter;
 	private RTFFilter rtfFilter;
 	private String trgLang;
 
 	public Merger () {
-		fa = new FilterAccess();
+//x		fa = new FilterAccess();
 
 		// Get the location of the class source
 		File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
@@ -71,7 +74,10 @@ public class Merger {
 		String sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
 
 		// Load the FilterAccess list
-		fa.loadList(sharedFolder + File.separator + "filters.xml");
+//x		fa.loadList(sharedFolder + File.separator + "filters.xml");
+		mapper = new FilterConfigMapper();
+		mapper.loadList(sharedFolder + File.separator + "filters.xml");
+		// No need to load custom configuration because we are loading the parameters ourselves
 	}
 
 	public void initialize (Manifest manifest) {
@@ -178,8 +184,12 @@ public class Merger {
 			String paramsFile = manifest.getRoot() + File.separator + manifest.getOriginalLocation()
 				+ File.separator + String.format("%d.fprm", docId);
 			// Load the relevant filter
-			inpFilter = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter);
-			
+//x			inpFilter = fa.loadFilter(item.getFilterID(), paramsFile, inpFilter);
+			inpFilter = mapper.createFilter(item.getFilterID(), inpFilter);
+			IParameters params = inpFilter.getParameters();
+			File file = new File(paramsFile);
+			params.load(file.toURI(), false);
+
 			reader.openDocument(fileToMerge, manifest.getSourceLanguage(), manifest.getTargetLanguage());
 			
 			// Initializes the input

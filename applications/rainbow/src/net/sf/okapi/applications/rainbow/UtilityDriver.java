@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
@@ -51,7 +52,8 @@ public class UtilityDriver implements CancelListener {
 	
 	private ILog log;
 	private Project prj;
-	private FilterAccess fa;
+//x	private FilterAccess fa;
+	private FilterConfigMapper mapper;
 	private IFilter filter;
 	private IUtility utility;
 	private IParametersEditor editor;
@@ -64,13 +66,15 @@ public class UtilityDriver implements CancelListener {
 	private BaseContext context;
 	
 	public UtilityDriver (ILog log,
-		FilterAccess fa,
+//x		FilterAccess fa,
+		FilterConfigMapper mapper,
 		PluginsAccess plugins,
 		IHelp help,
 		boolean canPrompt)
 	{
 		this.log = log;
-		this.fa = fa;
+//x		this.fa = fa;
+		this.mapper = mapper;
 		this.plugins = plugins;
 		this.help = help;
 		this.canPrompt = canPrompt;
@@ -159,7 +163,8 @@ public class UtilityDriver implements CancelListener {
 			stopProcess = false;
 
 			// Set the run-time parameters
-			utility.setFilterAccess(fa, prj.getParametersFolder());
+//x			utility.setFilterAccess(fa, prj.getParametersFolder(), mapper);
+			utility.setFilterAccess(mapper); //x null, prj.getParametersFolder(), mapper);
 			utility.setContextUI(shell, help, "rainbow="+Res.getString("VERSION"), //$NON-NLS-1$ //$NON-NLS-2$
 				prj.getProjectFolder(), canPrompt);
 			if ( utility.needsRoots() ) {

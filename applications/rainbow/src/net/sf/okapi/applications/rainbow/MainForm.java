@@ -48,7 +48,6 @@ import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IParametersProvider;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.AboutDialog;
@@ -103,7 +102,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class MainForm implements IParametersProvider {
+public class MainForm { //implements IParametersProvider {
 	
 	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
 	
@@ -158,7 +157,7 @@ public class MainForm implements IParametersProvider {
 	private LanguageManager lm;
 	private ResourceManager rm;
 	private FormatManager fm;
-	private FilterAccess fa;
+//x	private FilterAccess fa;
 	private FilterConfigMapper fcMapper;
 	private EncodingManager em;
 	private PluginsAccess plugins;
@@ -257,10 +256,10 @@ public class MainForm implements IParametersProvider {
 		setLogLevel();
 		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 
-		fa = new FilterAccess();
-		fa.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
+//x		fa = new FilterAccess();
+//x		fa.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 		// Define default editor, if none, the fall back for .txt will be used.
-		fa.setDefaultEditor(config.getProperty("defaultEditor")); //$NON-NLS-1$
+//x		fa.setDefaultEditor(config.getProperty("defaultEditor")); //$NON-NLS-1$
 		
 		fcMapper = new FilterConfigMapper();
 		// Get pre-defined configurations
@@ -1359,7 +1358,8 @@ public class MainForm implements IParametersProvider {
 			saveSurfaceData();
 			// Create the utility driver if needed
 			if ( ud == null ) {
-				ud = new UtilityDriver(log, fa, plugins, help, true);
+				updateCustomConfigurations();
+				ud = new UtilityDriver(log, fcMapper, plugins, help, true);
 			}
 			// Get the data for the utility and instantiate it
 			ud.setData(prj, utilityID);
@@ -1914,9 +1914,8 @@ public class MainForm implements IParametersProvider {
 
 			// Call the dialog
 			updateCustomConfigurations();
-			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, this, fcMapper, prj, prj.getProjectFolder());
-			dlg.setData(inp.filterSettings, inp.sourceEncoding,
-				inp.targetEncoding, fa, fcMapper);
+			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, fcMapper, prj, prj.getProjectFolder());
+			dlg.setData(inp.filterSettings, inp.sourceEncoding, inp.targetEncoding, fcMapper);
 			String[] aRes = dlg.showDialog();
 			if ( aRes == null ) return;
 
@@ -1952,7 +1951,7 @@ public class MainForm implements IParametersProvider {
 		}
 	}
 
-	public IParameters createParameters (String location)
+/*	public IParameters createParameters (String location)
 		throws Exception
 	{
 		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
@@ -1989,11 +1988,11 @@ public class MainForm implements IParametersProvider {
 	public String[] splitLocation (String location) {
 		return FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(), location);
 	}
-
+zzz
 	public String[] getParametersList () {
 		return FilterAccess.getParametersList(prj.getParametersFolder());
 	}
-
+*/
 	private void openDocument (int index) {
 		try {
 			if ( currentInput == -1 ) return;

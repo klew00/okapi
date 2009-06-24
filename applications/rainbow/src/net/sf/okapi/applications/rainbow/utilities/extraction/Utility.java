@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 import java.io.File;
 
 import net.sf.okapi.applications.rainbow.lib.FilterAccess;
+import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.Event;
@@ -197,10 +198,12 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 		String relativeInput = getInputPath(0).substring(inputRoot.length()+1);
 		String relativeOutput = getOutputPath(0).substring(outputRoot.length()+1);
-		String[] res = FilterAccess.splitFilterSettingsType1("", getInputFilterSettings(0));
+//x		String[] res = FilterAccess.splitFilterSettingsType1("", getInputFilterSettings(0));
+		String res[] = FilterConfigMapper.splitFilterFromConfiguration(getInputFilterSettings(0));
 		writer.createOutput(++id, relativeInput, relativeOutput,
 			getInputEncoding(0), getOutputEncoding(0),
-			res[1], resource.getFilterParameters());
+			res[0], resource.getFilterParameters());
+//x was res[1]		
     }
 	
     private void processTextUnit (TextUnit tu) {

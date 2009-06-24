@@ -215,12 +215,13 @@ public class XMLFilter implements IFilter {
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectBom();
 		encoding = detector.getEncoding();
-		// Workaround issue with XML Parser
+		//--Start workaround issue with XML Parser
 		// "UTF-16xx" are not handled as expected, using "UTF-16" alone 
 		// seems to resolve the issue.
-		if ( encoding.equals("UTF-16LE") ) encoding = "UTF-16";
-		if ( encoding.equals("UTF-16BE") ) encoding = "UTF-16";
-		// End workaround
+		if (( encoding.equals("UTF-16LE") ) || ( encoding.equals("UTF-16BE") )) {
+			encoding = "UTF-16";
+		}
+		//--End workaround
 		input.setEncoding(encoding);
 		
 		try {
