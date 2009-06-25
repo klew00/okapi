@@ -97,7 +97,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	@Override
 	public boolean needsOutput (int inputIndex) {
 		if ( params.plainText ) { // Expects RawDocument
-			return pipeline.isLastStep(this);
+			return getPipeline().isLastStep(this);
 		}
 		else {
 			return false;
@@ -171,7 +171,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	        
 			// Open the output
 			File outFile;
-			if ( pipeline.isLastStep(this) ) {
+			if ( getPipeline().isLastStep(this) ) {
 				outFile = new File(getContext().getOutputURI(0));
 				Util.createDirectories(outFile.getAbsolutePath());
 			}

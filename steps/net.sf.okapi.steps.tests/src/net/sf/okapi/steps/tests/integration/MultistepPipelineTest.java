@@ -11,6 +11,7 @@ import net.sf.okapi.common.pipeline.IPipelineDriver;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.RawDocumentWriterStep;
 import net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep;
@@ -82,6 +83,11 @@ public class MultistepPipelineTest {
 		rawDoc.setFilterConfigId("okf_xml");
 		driver.addBatchItem(rawDoc, getOutputUri("test04.xml"), "UTF-8");
 
+		assertTrue((new File(getOutputUri("test01.xml"))).exists());
+		assertTrue((new File(getOutputUri("test02.xml"))).exists());
+		assertTrue((new File(getOutputUri("test03.xml"))).exists());
+		assertTrue((new File(getOutputUri("test04.xml"))).exists());
+		
 		driver.processBatch();
 		driver.clearItems();
 		driver.clearSteps();
@@ -113,6 +119,35 @@ public class MultistepPipelineTest {
 		driver.clearSteps();
 	}
 
+	@Test
+	public void backAndForthPipeline() throws URISyntaxException {				
+		driver.addStep(new RawDocumentToFilterEventsStep());
+		driver.addStep(new FilterEventsToRawDocumentStep());
+		driver.addStep(new RawDocumentToFilterEventsStep());
+		
+		IPipelineStep searchReplaceStep = new SearchAndReplaceStep();
+		((net.sf.okapi.steps.searchandreplace.Parameters) searchReplaceStep.getParameters()).plainText = false;
+		((net.sf.okapi.steps.searchandreplace.Parameters) searchReplaceStep.getParameters()).addRule(new String[] { "true",
+				"Okapi Framework", "Big Foot" });
+		driver.addStep(searchReplaceStep);
+		
+		FindStringStep findStep = new FindStringStep("Big Foot");
+		driver.addStep(findStep);
+
+		// Set the info for the input and output
+		RawDocument rawDoc = new RawDocument(getUri("okapi_intro_test.html"), "UTF-8", "en", "fr");
+		rawDoc.setFilterConfigId("okf_html");
+		driver.addBatchItem(rawDoc, getOutputUri("okapi_intro_test.html"), "UTF-8");
+
+		driver.processBatch();		
+
+		assertTrue(findStep.isFound());
+		
+		driver.clearItems();
+		driver.clearSteps();
+	}
+	
+	
 	private URI getUri(String fileName) throws URISyntaxException {
 		URL url = MultistepPipelineTest.class.getResource("/" + fileName);
 		return url.toURI();

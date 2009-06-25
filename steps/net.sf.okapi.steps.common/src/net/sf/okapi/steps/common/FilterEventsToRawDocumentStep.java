@@ -65,7 +65,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 
 	@Override
 	public boolean needsOutput (int inputIndex) {
-		return pipeline.isLastStep(this);
+		return getPipeline().isLastStep(this);
 	}
 	
 	/**
@@ -121,7 +121,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		filterWriter = startDoc.getFilterWriter();
 		filterWriter.setOptions(language, encoding);
 		
-		if ( pipeline.isLastStep(this) ) {
+		if ( getPipeline().isLastStep(this) ) {
 			outputFile = new File(getContext().getOutputURI(0));
 			Util.createDirectories(outputFile.getAbsolutePath());
 		}

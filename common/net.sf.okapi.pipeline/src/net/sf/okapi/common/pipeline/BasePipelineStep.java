@@ -28,7 +28,8 @@ import net.sf.okapi.common.IParameters;
  */
 public abstract class BasePipelineStep implements IPipelineStep {
 
-	protected IPipeline pipeline;
+	private IPipeline pipeline;
+	private IParameters params;
 	
 	public void setPipeline (IPipeline pipeline) {
 		this.pipeline = pipeline;
@@ -48,10 +49,11 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	}
 
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	public void setParameters (IParameters params) {
+		this.params = params;
 	}
 
 	public boolean isDone() {

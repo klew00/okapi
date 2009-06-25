@@ -86,7 +86,7 @@ public class XSLTransformStep extends BasePipelineStep {
  
 	@Override
 	public boolean needsOutput (int inputIndex) {
-		return pipeline.isLastStep(this);
+		return getPipeline().isLastStep(this);
 	}
 	
 	@Override
@@ -136,7 +136,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			
 			// Create the output
 			File outFile;
-			if ( pipeline.isLastStep(this) ) {
+			if ( getPipeline().isLastStep(this) ) {
 				outFile = new File(getContext().getOutputURI(0));
 				Util.createDirectories(outFile.getAbsolutePath());
 			}
