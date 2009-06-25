@@ -27,6 +27,7 @@ import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -386,7 +387,13 @@ public class PipelineEditor {
 			
 			if ( step.paramsClass != null ) {
 				// Instantiate an editor object
-				IParametersEditor editor = wrapper.getEditorMapper().createParametersEditor(step.paramsClass);
+				IParametersEditor editor = null;
+				try { // Catch creation error so we can fall-back to default editor
+					editor = wrapper.getEditorMapper().createParametersEditor(step.paramsClass);
+				}
+				catch ( OkapiEditorCreationException e ) {
+					Dialogs.showError(shell, e.getMessage(), null);
+				}
 				if ( editor != null ) {
 					// Instantiate a Parameters object for this step
 					IParameters params = editor.createParameters();

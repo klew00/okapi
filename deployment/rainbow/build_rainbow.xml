@@ -81,8 +81,6 @@ Running on: ${os.name} ${os.arch}${line.separator}
 
 		<ant antfile="../shared/build_common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
-		<ant antfile="../shared/build_pipeline.xml" inheritAll="true"/>
-		<ant antfile="../shared/build_steps.common.xml" inheritAll="true"/>
 		
 		<ant antfile="../shared/build_filters.html.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.properties.xml" inheritAll="true"/>
@@ -102,6 +100,10 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<ant antfile="../shared/build_lib.segmentation.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_mt.google.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_tm.simpletm.xml" inheritAll="true"/>
+		
+		<ant antfile="../shared/build_pipeline.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_steps.common.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_steps.all.xml" inheritAll="true"/>
 
 		<ant antfile="../shared/build_ui.common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.common.xml" inheritAll="true"/>
