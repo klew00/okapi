@@ -24,6 +24,6 @@ public class CopySourceToTarget extends BasePipelineStep {
 	@Override
 	public void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
-		tu.createTarget(getParameters().targetLanguage, true, IResource.COPY_ALL);
+		tu.createTarget(getParameters().targetLanguage, false, IResource.COPY_ALL);
 	}	
 }
