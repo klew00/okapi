@@ -14,6 +14,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.RawDocumentWriterStep;
+import net.sf.okapi.steps.copysourcetotarget.CopySourceToTargetStep;
 import net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep;
 import net.sf.okapi.steps.xsltransform.XSLTransformStep;
 
@@ -147,6 +148,25 @@ public class MultistepPipelineTest {
 		driver.clearSteps();
 	}
 	
+	@Test
+	public void copySourceToTarget() throws URISyntaxException {			
+		driver.addStep(new RawDocumentToFilterEventsStep());
+		CopySourceToTargetStep copySourceToTargetStep = new CopySourceToTargetStep();
+		copySourceToTargetStep.getParameters().targetLanguage = "eu_ES";	
+		
+		// Set the info for the input and output
+		RawDocument rawDoc = new RawDocument(getUri("Test01.properties"), "UTF-8", "en");
+		rawDoc.setFilterConfigId("okf_properties");
+		driver.addBatchItem(rawDoc, getOutputUri("Test01.properties"), "UTF-8");
+		
+		rawDoc = new RawDocument(getUri("Test02.properties"), "UTF-8", "en");
+		rawDoc.setFilterConfigId("okf_properties");
+		driver.addBatchItem(rawDoc, getOutputUri("Test02.properties"), "UTF-8");
+		
+		rawDoc = new RawDocument(getUri("Test03.properties"), "UTF-8", "en");
+		rawDoc.setFilterConfigId("okf_properties");
+		driver.addBatchItem(rawDoc, getOutputUri("Test03.properties"), "UTF-8");
+	}
 	
 	private URI getUri(String fileName) throws URISyntaxException {
 		URL url = MultistepPipelineTest.class.getResource("/" + fileName);

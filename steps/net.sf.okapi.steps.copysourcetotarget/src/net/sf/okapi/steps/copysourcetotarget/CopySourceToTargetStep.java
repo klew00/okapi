@@ -1,12 +1,17 @@
 package net.sf.okapi.steps.copysourcetotarget;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.TextUnit;
 
-public class CopySourceToTarget extends BasePipelineStep {
-	Parameters params;
+public class CopySourceToTargetStep extends BasePipelineStep {
+	private Parameters params;
+	
+	public CopySourceToTargetStep() {
+		params = new Parameters();
+	}
 	
 	public String getDescription() {		
 		return "Copy the source segments to the specified target. Create the target if needed.";
@@ -17,8 +22,13 @@ public class CopySourceToTarget extends BasePipelineStep {
 	}
 	
 	@Override
+	public void setParameters(IParameters params) {
+		this.params = (Parameters)params;
+	}
+	
+	@Override
 	public Parameters getParameters() {
-		return (Parameters)super.getParameters();
+		return params;
 	}
 	
 	@Override
