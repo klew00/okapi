@@ -66,7 +66,6 @@ public class PipelineEditor {
 	private Button btMoveStepDown;
 	private Button btEditStep;
 	private Text edDescription;
-	private OKCancelPanel pnlActions;
 	private BaseContext context;
 	
 	public boolean edit (Shell parent,
@@ -117,7 +116,7 @@ public class PipelineEditor {
 
 	private void create (Shell parent) {
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Edit/Execute Pipeline");
+		shell.setText("Edit / Execute Pipeline");
 		UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout(2, false);
 		shell.setLayout(layTmp);
@@ -272,8 +271,8 @@ public class PipelineEditor {
 			};
 		};
 		
-		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true,
-			"Close", "Execute");
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE,
+			OKCancelActions, false, "Close", "Execute"); //TODO: Add help
 
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;

@@ -66,6 +66,7 @@ public class FilterConfigSelectionPanel extends Composite {
 	private ArrayList<FilterInfo> filters;
 	private IFilter cachedFilter;
 	private Project project;
+	private IHelp help;
 	
 	public FilterConfigSelectionPanel (Composite p_Parent,
 		IHelp helpParam,
@@ -76,6 +77,7 @@ public class FilterConfigSelectionPanel extends Composite {
 	{
 		super(p_Parent, SWT.NONE);
 		context = new BaseContext();
+		help = helpParam;
 		context.setObject("help", helpParam);
 		context.setString("projDir", projectDir);
 		context.setObject("shell", getShell());
@@ -223,7 +225,7 @@ public class FilterConfigSelectionPanel extends Composite {
 				configId = lbConfigs.getItem(n);
 			}
 			String oldConfigId = configId;
-			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(getShell(), true, project, mapper);
+			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(getShell(), true, project, mapper, help);
 			configId = dlg.showDialog(configId);
 			if ( configId == null ) { // Close without selection
 				configId = oldConfigId;

@@ -36,7 +36,7 @@
  <!-- Utilities menu -->
  <command name="utilities">&amp;Utilities</command>
  <command name="utilities.openOutputFolder" ctrl="1" key="L">&amp;Open Last Output Folder&#x9;Ctrl+L</command>
- <command name="utilities.pipeline" ctrl="1" key="P">Edit/Execute &amp;Pipeline... (BETA)&#x9;Ctrl+P</command>
+ <command name="utilities.pipeline" ctrl="1" key="P">Edit / Execute &amp;Pipeline... (BETA)&#x9;Ctrl+P</command>
   
  <!-- Tools menu -->
  <command name="tools">&amp;Tools</command>

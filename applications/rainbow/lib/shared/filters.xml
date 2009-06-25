@@ -117,28 +117,4 @@
   parametersClass="net.sf.okapi.filters.table.Parameters"
   editorClass="net.sf.okapi.ui.filters.table.Editor" />
 
-<!-- <parametersEditor
-  parametersClass="net.sf.okapi.filters.plaintext.base.Parameters"
-  editorClass="net.sf.okapi.ui.filters.plaintext.Editor" />
- <parametersEditor
-  parametersClass="net.sf.okapi.filters.plaintext.paragraphs.Parameters"
-  editorClass="net.sf.okapi.ui.filters.plaintext.Editor" />
- <parametersEditor
-  parametersClass="net.sf.okapi.filters.plaintext.spliced.Parameters"
-  editorClass="net.sf.okapi.ui.filters.plaintext.Editor" />
- <parametersEditor
-  parametersClass="net.sf.okapi.filters.plaintext.regex.Parameters"
-  editorClass="net.sf.okapi.ui.filters.plaintext.Editor" />
-
- <parametersEditor
-  parametersClass="net.sf.okapi.filters.table.base.Parameters"
-  editorClass="net.sf.okapi.ui.filters.table.Editor" />
- <parametersEditor
-  parametersClass="net.sf.okapi.filters.table.csv.Parameters"
-  editorClass="net.sf.okapi.ui.filters.table.Editor" />
- <parametersEditor
-  parametersClass="net.sf.okapi.filters.table.fwc.Parameters"
-  editorClass="net.sf.okapi.ui.filters.table.Editor" />
--->
- 
 </okapiFilters>

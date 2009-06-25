@@ -2032,7 +2032,8 @@ zzz
 	private void filterConfigurations () {
 		try {
 			saveSurfaceData();
-			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false, prj, fcMapper);
+			updateCustomConfigurations();
+			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false, prj, fcMapper, help);
 			updateCustomConfigurations();
 			dlg.showDialog(null);
 		}

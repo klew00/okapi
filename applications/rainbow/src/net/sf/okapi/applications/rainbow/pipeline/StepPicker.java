@@ -48,7 +48,6 @@ class StepPicker {
 	private Text edDescription;
 	private String result;
 	private ArrayList<StepInfo> availableSteps;
-	private OKCancelPanel pnlActions;
 	
 	public StepPicker (Shell parent,
 		Map<String, StepInfo> steps,
@@ -113,7 +112,8 @@ class StepPicker {
 				shell.close();
 			};
 		};
-		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE,
+			OKCancelActions, false); //TODO: Add help
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		//gdTmp.horizontalSpan = 2;
 		pnlActions.setLayoutData(gdTmp);

@@ -73,7 +73,7 @@ public class BaseHelp implements IHelp {
 		try {
 			UIUtil.start(new URL(path));
 		}
-		catch (MalformedURLException e) {
+		catch ( MalformedURLException e ) {
 			e.printStackTrace();
 		}
 	}

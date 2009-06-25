@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.lib;
 
 import net.sf.okapi.applications.rainbow.Project;
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -44,14 +45,17 @@ public class FilterConfigMapperDialog {
 	private FilterConfigMapper mapper;
 	private String result = null;
 	private Project project;
+	private IHelp help;
 
 	public FilterConfigMapperDialog (Shell parent,
 		boolean selectionMode,
 		Project project,
-		FilterConfigMapper mapper)
+		FilterConfigMapper mapper,
+		IHelp helpParam)
 	{
 		this.project = project;
 		this.mapper = mapper;
+		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Filter Configurations");
 		UIUtil.inheritIcon(shell, parent);
@@ -71,7 +75,7 @@ public class FilterConfigMapperDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					//TODO: if ( help != null ) help.showTopic(this, "index", "inputDocProp.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					if ( help != null ) help.showTopic(this, "../index", "lib/filterConfigurations.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -82,7 +86,7 @@ public class FilterConfigMapperDialog {
 		};
 		
 		if ( selectionMode ) {
-			OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, Actions, true, "Select");
+			OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, Actions, (help!=null), "Select");
 			pnlActions.btCancel.setText("Close");
 			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 			gdTmp.horizontalSpan = 2;
@@ -90,7 +94,7 @@ public class FilterConfigMapperDialog {
 			shell.setDefaultButton(pnlActions.btOK);
 		}
 		else {
-			ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, Actions, true);
+			ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, Actions, (help!=null));
 			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 			gdTmp.horizontalSpan = 2;
 			pnlActions.setLayoutData(gdTmp);
