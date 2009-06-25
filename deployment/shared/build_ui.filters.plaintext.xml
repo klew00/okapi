@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<project name="ui.filters.plaintext" default="ui.filters.plaintext"> 
+
+	<property name="proj_ui.filters.plaintext" value="../../filters/net.sf.okapi.ui.filters.plaintext"/> 
+	<property name="src_ui.filters.plaintext" value="${proj_ui.filters.plaintext}/src"/> 
+ 
+	<path id="mainClassPath_ui.filters.plaintext">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/swt.jar"/>
+	</path>
+	
+	<target name="ui.filters.plaintext"> 
+		<ant antfile="../shared/build_filters.po.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_ui.filters.common.xml" inheritAll="true"/>
+
+ 		<javac srcdir="${src_ui.filters.plaintext}" destdir="${tmp}" classpathref="mainClassPath_ui.filters.plaintext"/>
+
+		<copy todir="${tmp}">
+			<fileset dir="${src_ui.filters.plaintext}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>

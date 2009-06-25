@@ -64,8 +64,11 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		
 		<ant antfile="../shared/build_common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
-		<ant antfile="../shared/build_pipeline.xml" inheritAll="true"/>
-		<ant antfile="../shared/build_steps.common.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_lib.translation.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_mt.google.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_tm.opentran.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_tm.globalsight.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_lib.segmentation.xml" inheritAll="true"/>
 		
 		<ant antfile="../shared/build_filters.html.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.properties.xml" inheritAll="true"/>
@@ -78,24 +81,27 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<ant antfile="../shared/build_filters.openxml.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.rtf.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.tmx.xml" inheritAll="true"/>
+<!--not ready		<ant antfile="../shared/build_filters.mif.xml" inheritAll="true"/> -->
 		<ant antfile="../shared/build_filters.dtd.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.plaintext.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.table.xml" inheritAll="true"/>
-
-		<ant antfile="../shared/build_lib.translation.xml" inheritAll="true"/>
-		<ant antfile="../shared/build_mt.google.xml" inheritAll="true"/>
-		<ant antfile="../shared/build_tm.opentran.xml" inheritAll="true"/>
-		<ant antfile="../shared/build_tm.globalsight.xml" inheritAll="true"/>
 		
-		<ant antfile="../shared/build_lib.segmentation.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_pipeline.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_steps.common.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_steps.all.xml" inheritAll="true"/>
+
+		<!-- UI -->
 
 		<ant antfile="../shared/build_ui.common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.common.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_ui.lib.segmentation.xml" inheritAll="true"/>
 
 		<ant antfile="../shared/build_ui.filters.properties.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.po.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.openoffice.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.regex.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_ui.filters.plaintext.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_ui.filters.table.xml" inheritAll="true"/>
 
 		<!-- DO NOT CHANGE WHITESPACES IN ATTRIBUTE VALUE 
 		AND CHECK MANIFEST IN JAR IF YOU ADD/REMOVE JARs -->
@@ -118,7 +124,7 @@ jyaml-1.3.jar jericho-html-3.1-dev-5.jar dtdparser121.jar"/>
 		</copy>
 		<copy todir="${dist}/localweb" file="../../website/okapi.css"/>
 
-		<javadoc destdir="${dist}/localweb/javadoc">
+		<javadoc destdir="${dist}/localweb/javadoc" Encoding="UTF-8">
 			<packageset dir="../../common/net.sf.okapi.common/src" defaultexcludes="yes"/>
 			<packageset dir="../../common/net.sf.okapi.filters.common/src" defaultexcludes="yes"/>
 			<packageset dir="../../common/net.sf.okapi.pipeline/src" defaultexcludes="yes"/>
