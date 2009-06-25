@@ -23,6 +23,7 @@ package net.sf.okapi.ui.filters.openxml;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -34,7 +35,6 @@ import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.Excell;
 
 import org.eclipse.swt.SWT;
-
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.List;
@@ -56,14 +56,12 @@ import org.eclipse.swt.widgets.TabItem;
 
 public class Editor implements IParametersEditor, SelectionListener {
 	
-	private final int MAXROW=1000; // maximum row in excel to exclude from translation
 	private Shell shell;
 	private boolean result = false;
-	private Button chkExtractNotes;
-	private Button chkExtractReferences;
 	private ConditionalParameters params;
 	private IHelp help;
 	private UIEditor ed;
+	private BaseContext context;
 
 	/**
 	 * Invokes the editor for the openoffice filter parameters.
@@ -93,6 +91,10 @@ public class Editor implements IParametersEditor, SelectionListener {
 	public void widgetDefaultSelected(SelectionEvent e) { // DWH 6-17-09 because it has to be implemented
 		widgetSelected(e);		
 	}	
+	public boolean edit(IParameters paramsObject, IContext context) {
+		// TODO Auto-generated method stub
+		return edit(paramsObject,false,context);
+	}
 	public boolean edit (IParameters p_Options,
 		boolean readOnly,
 		IContext context)
@@ -164,16 +166,16 @@ public class Editor implements IParametersEditor, SelectionListener {
 				ed.listExcelColorsToExclude.add(sYmphony);
 			}
 		}
-		ed.btnExcludeExcelColumns.setSelection(params.bPreferenceTranslateExcelExcludeCells);
-		if (params.bPreferenceTranslateExcelExcludeCells &&
-			params.tsExcelExcludedCells!=null && !params.tsExcelExcludedCells.isEmpty())
+		ed.btnExcludeExcelColumns.setSelection(params.bPreferenceTranslateExcelExcludeColumns);
+		if (params.bPreferenceTranslateExcelExcludeColumns &&
+			params.tsExcelExcludedColumns!=null && !params.tsExcelExcludedColumns.isEmpty())
 		{
-			it = params.tsExcelExcludedCells.iterator();
+			it = params.tsExcelExcludedColumns.iterator();
 			while(it.hasNext())
 			{
 				sYmphony = (String)it.next();
 				eggshell = new Excell(sYmphony);
-				sDuraCell = eggshell.getColumn()+eggshell.getRow();
+				sDuraCell = eggshell.getColumn();
 				if (eggshell.getSheet().equals("1"))
 				{
 					ndx = ed.listExcelSheet1ColumnsToExclude.indexOf(sDuraCell);
@@ -197,12 +199,10 @@ public class Editor implements IParametersEditor, SelectionListener {
 	}
 	
 	private boolean saveData () {
-		Iterator it;
-		String sYmphony;
-		Excell eggshell;
-		String sDuraCell;
+		String sColor;
 		String sArray[];
-		int ndx,len;
+		String sRGB;
+		int len;
 		params.bPreferenceTranslateDocProperties = ed.btnTranslateDocumentProperties.getSelection() ;
 		params.bPreferenceTranslateComments = ed.btnTranslateComments.getSelection();
 		params.bPreferenceTranslateWordHeadersFooters = ed.btnTranslateHeadersAndFooters.getSelection();
@@ -237,50 +237,72 @@ public class Editor implements IParametersEditor, SelectionListener {
 		{
 			params.bPreferenceTranslateExcelExcludeColors = true;
 			for(int i=0;i<len;i++)
-				params.tsExcludeWordStyles.add(sArray[i]);
+			{
+				sColor = sArray[i];
+				sRGB = null;
+				if (sColor.equals("black"))
+					sRGB = "000000FF";
+				else if (sColor.equals("blue"))
+				{
+					sRGB = "FFFF000";
+					params.tsExcelExcludedColors.add("FF0070C0");
+				}
+				else if (sColor.equals("cyan"))
+					sRGB = "FF000000";
+				else if (sColor.equals("green"))
+					sRGB = "FF00FF00";
+				else if (sColor.equals("magenta"))
+					sRGB = "00FF0000";
+				else if (sColor.equals("red"))
+					sRGB = "00FFFF00";
+				else if (sColor.equals("white"))
+					sRGB = "00000000";
+				else if (sColor.equals("yellow"))
+					sRGB = "0000FF00";
+				if (sRGB!=null)
+					params.tsExcelExcludedColors.add(sRGB);
+			}
 		}
 		else
 			params.bPreferenceTranslateExcelExcludeColors = false;
 		
 		// Exclude text in certain columns in Excel in sheets 1, 2, or 3
-		params.bPreferenceTranslateExcelExcludeCells = ed.btnExcludeExcelColumns.getSelection();
-		if (params.tsExcelExcludedCells==null)
-			params.tsExcelExcludedCells = new TreeSet<String>();
+		params.bPreferenceTranslateExcelExcludeColumns = ed.btnExcludeExcelColumns.getSelection();
+		if (params.tsExcelExcludedColumns==null)
+			params.tsExcelExcludedColumns = new TreeSet<String>();
 		else
-			params.tsExcelExcludedCells.clear();
-		params.bPreferenceTranslateExcelExcludeCells = ed.btnExcludeExcelColumns.getSelection();
-		if (params.bPreferenceTranslateExcelExcludeCells)
-			params.tsExcelExcludedCells.clear();
-		else
+			params.tsExcelExcludedColumns.clear();
+		params.bPreferenceTranslateExcelExcludeColumns = ed.btnExcludeExcelColumns.getSelection();
+		if (params.bPreferenceTranslateExcelExcludeColumns)
 		{
 			sArray = ed.listExcelSheet1ColumnsToExclude.getSelection(); // selected items
 			len = sArray.length;
 			if (len>0)
 			{
-				params.bPreferenceTranslateExcelExcludeCells = true;
 				for(int i=0;i<len;i++)
-					for(int j=1;j<=MAXROW;j++)
-						params.tsExcelExcludedCells.add("1"+sArray[i]+j);
+					params.tsExcelExcludedColumns.add("1"+sArray[i]);
 			}
 			sArray = ed.listExcelSheet2ColumnsToExclude.getSelection(); // selected items
 			len = sArray.length;
 			if (len>0)
 			{
-				params.bPreferenceTranslateExcelExcludeCells = true;
 				for(int i=0;i<len;i++)
-					for(int j=1;j<=MAXROW;j++)
-						params.tsExcelExcludedCells.add("2"+sArray[i]+j);
+					params.tsExcelExcludedColumns.add("2"+sArray[i]);
 			}
 			sArray = ed.listExcelSheet3ColumnsToExclude.getSelection(); // selected items
 			len = sArray.length;
 			if (len>0)
 			{
-				params.bPreferenceTranslateExcelExcludeCells = true;
 				for(int i=0;i<len;i++)
-					for(int j=1;j<=MAXROW;j++)
-						params.tsExcelExcludedCells.add("3"+sArray[i]+j);
+					params.tsExcelExcludedColumns.add("3"+sArray[i]);
 			}
 		}
 		return true;
+	}
+	public ConditionalParameters getParametersFromUI(ConditionalParameters cparams)
+	{
+		context = new BaseContext();
+		edit(cparams,context);
+		return cparams;
 	}
 }
