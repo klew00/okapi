@@ -116,14 +116,15 @@ public class OpenXMLFilter implements IFilter {
 	private boolean bMinedHiddenStyles = true; // DWH 5-28-09
 	private boolean bPreferenceTranslateExcelExcludeColors = false;
 	  // DWH 6-12-09 don't translate text in Excel in some colors 
-	private boolean bPreferenceTranslateExcelExcludeCells = false;
-	  // DWH 6-12-09 don't translate text in Excel in some specified cells
+	private boolean bPreferenceTranslateExcelExcludeColumns = false;
+	  // DWH 6-12-09 don't translate text in Excel in some specified columns
 	private TreeSet tsExcludeWordStyles = null; // DWH 5-28-09 set of styles to exclude from translation
 	private TreeSet<String> tsExcelExcludedColors; // DWH 6-12-09
 	private TreeSet<String> tsExcelExcludedStyles=null; // DWH 6-12-09 
-	private TreeSet<String> tsExcelExcludedCells; // DWH 6-12-09 
+	private TreeSet<String> tsExcelExcludedColumns; // DWH 6-12-09 
 	private int nExcelOriginalSharedStringCount; // DWH 6-12-09
 	private boolean bProcessedExcelSheets=true; // DWH 6-13-09 Excel options
+	private String sCurrentExcelSheet=""; // DWH 6-25-09 current sheet number
 
 	public OpenXMLFilter () {
 		cparams = new ConditionalParameters(); // DWH 6-16-09
@@ -161,9 +162,9 @@ public class OpenXMLFilter implements IFilter {
 			bPreferenceTranslateWordAllStyles = ooparams.bPreferenceTranslateWordAllStyles;
 			bPreferenceTranslateWordHidden = ooparams.bPreferenceTranslateWordHidden;
 			bPreferenceTranslateExcelExcludeColors = ooparams.bPreferenceTranslateExcelExcludeColors;
-			bPreferenceTranslateExcelExcludeCells = ooparams.bPreferenceTranslateExcelExcludeCells;
+			bPreferenceTranslateExcelExcludeColumns = ooparams.bPreferenceTranslateExcelExcludeColumns;
 			tsExcelExcludedColors = ooparams.tsExcelExcludedColors;
-			tsExcelExcludedCells = ooparams.tsExcelExcludedCells;
+			tsExcelExcludedColumns = ooparams.tsExcelExcludedColumns;
 			tsExcludeWordStyles = ooparams.tsExcludeWordStyles;
 		}
 		catch(Exception e) {};
@@ -481,6 +482,7 @@ public class OpenXMLFilter implements IFilter {
 	 */
 	public void setParameters (IParameters params) {
 		this.params = (IParameters)params; // DWH 6-25-09 was net.sf.okapi.filters.markupfilter.Parameters
+		readParams(); // DWH 6-19-09
 	}
 
 	/**
@@ -530,13 +532,14 @@ public class OpenXMLFilter implements IFilter {
 			  // DWH 3-4-09 params for OpenXMLFilter
 			
 			if (nZipType==MSEXCEL &&
-					(bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells))
+					(bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeColumns))
 				// DWH 6-13-09 Excel options
 			{
 				ExcelAnalyzer ea = new ExcelAnalyzer(zipFile);
 //				ea.analyzeExcelGetSheetSizes();
-				tsExcelExcludedColors = ea.analyzeExcelGetNonThemeColors(); // DWH 6-13-09 this should change when the UI is ready
+//				tsExcelExcludedColors = ea.analyzeExcelGetNonThemeColors(); // DWH 6-13-09 this should change when the UI is ready
 				tsExcelExcludedStyles = ea.analyzeExcelGetStylesOfExcludedColors(tsExcelExcludedColors);
+				openXMLContentFilter.setTsExcelExcludedStyles(tsExcelExcludedStyles);
 				nExcelOriginalSharedStringCount = ea.analyzeExcelGetSharedStringsCount();
 				openXMLContentFilter.initTmSharedStrings(nExcelOriginalSharedStringCount);
 				bProcessedExcelSheets = false;
@@ -583,11 +586,6 @@ public class OpenXMLFilter implements IFilter {
 		String sDocType; // DWH 2-26-09
 		int iCute; // DWH 2-26-09
 		boolean bInMainFile; // DWH 4-15-09
-		if (!entries.hasMoreElements() && !bProcessedExcelSheets) // DWH 6-13-09 Excel options
-		{ // this only happens if bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells
-			entries = zipFile.entries();  // after going through all the sheets, reset to go through the rest
-			bProcessedExcelSheets = true; // and indicate you have already gone through the sheets
-		}
 		while( entries.hasMoreElements() ) { // note that [Content_Types].xml is always first
 			entry = entries.nextElement();
 			sEntryName = entry.getName();
@@ -597,20 +595,41 @@ public class OpenXMLFilter implements IFilter {
 			    sDocType = sDocType.substring(iCute+1);
 			if (nZipType==MSEXCEL)
 			{
-				openXMLContentFilter.setBPreferenceTranslateExcelExcludeColors(bPreferenceTranslateExcelExcludeCells);
+				openXMLContentFilter.setBPreferenceTranslateExcelExcludeColors(bPreferenceTranslateExcelExcludeColors);
+				openXMLContentFilter.setBPreferenceTranslateExcelExcludeColumns(bPreferenceTranslateExcelExcludeColumns);
 				if (bPreferenceTranslateExcelExcludeColors)
-					openXMLContentFilter.setTsExcelExcludedCells(tsExcelExcludedCells);
-				openXMLContentFilter.setBPreferenceTranslateExcelExcludeCells(bPreferenceTranslateExcelExcludeCells);
-				if (bPreferenceTranslateExcelExcludeCells)
 					openXMLContentFilter.setTsExcelExcludedStyles(tsExcelExcludedStyles);
-				if (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells)
+				if (bPreferenceTranslateExcelExcludeColumns)
+					openXMLContentFilter.setTsExcelExcludedColumns(tsExcelExcludedColumns);
+				if (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeColumns)
 				{ // do we exclude comment text in colors?
 					if (!bProcessedExcelSheets && !sEntryName.equals("[Content_Types].xml") &&
 							!sDocType.equals("worksheet+xml"))
+					{
+						resetExcel();
 						continue;
+					}
 					else if (bProcessedExcelSheets && (sEntryName.equals("[Content_Types].xml") ||
 													   sDocType.equals("worksheet+xml")))
 						continue;
+					if (sDocType.equals("worksheet+xml"))
+					{
+						iCute = sEntryName.indexOf(".xml");
+						if (iCute>-1)
+						{
+							sCurrentExcelSheet = sEntryName.substring(0,iCute); // DWH 6-25-09 current sheet number
+							iCute = sCurrentExcelSheet.indexOf("worksheets/sheet");
+							if (iCute>-1)
+							{
+								sCurrentExcelSheet = sCurrentExcelSheet.substring(iCute+16); // should leave only the number
+								openXMLContentFilter.setSCurrentExcelSheet(sCurrentExcelSheet);
+							}
+							else
+								openXMLContentFilter.setSCurrentExcelSheet("");
+						}
+						else
+							openXMLContentFilter.setSCurrentExcelSheet("");
+					}
 				}
 			}
 		    if (nZipType==MSWORD)
@@ -643,7 +662,9 @@ public class OpenXMLFilter implements IFilter {
 				openXMLContentFilter.setUpConfig(nFileType);
 				params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
 					// DWH 6-15-09 fully specified Parameters
-				return openSubDocument(true);
+				Event ually = openSubDocument(true); // DWH 6-25-09 save the event
+				resetExcel(); // DWH 6-25-09 if Excel and excluding colors or columns, start through zips again if done with worksheets
+				return ually; // DWH 6-25-09 now return the event
 			}
 			else if ( sEntryName.equals("[Content_Types].xml") ||
 				   (sEntryName.endsWith(".xml") &&
@@ -664,7 +685,7 @@ public class OpenXMLFilter implements IFilter {
 		             (nZipType==MSEXCEL &&
 		            	   (sDocType.equals("sharedStrings+xml") ||
 		            	    (sDocType.equals("worksheet+xml") &&
-		            	      (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells)) ||
+		            	      (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeColumns)) ||
 		            	//	sDocType.equals("main+xml") || DWH 5-15-09 workbook.xml has nothing translatable
 		            		(sDocType.equals("comments+xml") && bPreferenceTranslateDocProperties) ||
 		                      // DWH 5-25-09 translate if translating comments
@@ -686,7 +707,9 @@ public class OpenXMLFilter implements IFilter {
 				params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
 				LOGGER.log(Level.FINER,"<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
-				return openSubDocument(false);
+				Event ually = openSubDocument(false); // DWH 6-25-09 save the event
+				resetExcel(); // DWH 6-25-09 if Excel and excluding colors or columns, start through zips again if done with worksheets
+				return ually; // DWH 6-25-09 now return the event
 			}
 			else {
 				nFileType = nZipType;
@@ -695,7 +718,9 @@ public class OpenXMLFilter implements IFilter {
 				  // DWH 6-15-09 fully specified Parameters
 				DocumentPart dp = new DocumentPart(entry.getName(), false);
 				ZipSkeleton skel = new ZipSkeleton(entry);
-				return new Event(EventType.DOCUMENT_PART, dp, skel);
+				Event ually = new Event(EventType.DOCUMENT_PART, dp, skel); // DWH 6-25-09 save the event
+				resetExcel(); // DWH 6-25-09 if Excel and excluding colors or columns, start through zips again if done with worksheets
+				return ually; // DWH 6-25-09 now return the event
 			}
 		}
 
@@ -835,8 +860,17 @@ public class OpenXMLFilter implements IFilter {
 		return openXMLContentFilter;
 	}
 	/**
-	 * Cancels filter processing.  Not yet implemented.
+	 * In Excel, if some colors or columns are excluded, this checks to see that [Content_Types] and all worksheets have been processed,
+	 * then runs through the rest
 	 */
+	private void resetExcel()
+	{
+		if (!bProcessedExcelSheets && !entries.hasMoreElements()) // DWH 6-13-09 Excel options
+		{ // this only happens if bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeColumns
+			entries = zipFile.entries();  // after going through all the sheets, reset to go through the rest
+			bProcessedExcelSheets = true; // and indicate you have already gone through the sheets
+		}
+	}
 	public void cancel() {
 		// TODO Auto-generated method stub		
 	}

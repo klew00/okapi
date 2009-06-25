@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.Hashtable;
 //import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -135,19 +136,20 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private String sCurrentCharacterStyle = ""; // DWH 5-27-09
 	private String sCurrentParagraphStyle = ""; // DWH 5-27-09
 	private boolean bPreferenceTranslateWordHidden = true; // DWH 5-29-09
-	private boolean bPreferenceTranslateExcelExcludeColors = true;
+	private boolean bPreferenceTranslateExcelExcludeColors = false;
 	  // DWH 6-12-09 don't translate text in Excel in some colors 
-	private boolean bPreferenceTranslateExcelExcludeCells = true;
-	  // DWH 6-12-09 don't translate text in Excel in some specified cells
+	private boolean bPreferenceTranslateExcelExcludeColumns = false;
+	  // DWH 6-12-09 don't translate text in Excel in some specified columns
 	private TreeSet<String> tsExcludeWordStyles = null; // DWH 5-27-09 set of styles to exclude from translation
 	private TreeSet<String> tsExcelExcludedStyles; // DWH 6-12-09 
-	private TreeSet<String> tsExcelExcludedCells; // DWH 6-12-09 
+	private TreeSet<String> tsExcelExcludedColumns; // DWH 6-12-09 
 	private TreeMap<Integer,ExcelSharedString> tmSharedStrings=null; // DWH 6-13-09
 	private boolean bInExcelSharedStringCell=false; // DWH 6-13-09
 	private boolean bExcludeTranslatingThisExcelCell=false; // DWH 6-13-09
 	private int nOriginalSharedStringCount=0; // DWH 6-13-09
 	private int nNextSharedStringCount=0; // DWH 6-13-09
 	private int nCurrentSharedString=-1; // DWH 6-13-09 if nonzero, text may be excluded from translation
+	private String sCurrentExcelSheet=""; // DWH 6-25-09 current sheet number
 	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
@@ -697,8 +699,9 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		handleSomeText(txt,text.isWhiteSpace()); // DWH 5-14-09
 	}
 	
-	private void handleSomeText(String txt, boolean bWhiteSpace)
+	private void handleSomeText(String tixt, boolean bWhiteSpace) // DWH 6-25-09 tixt was txt
 	{
+		String txt=tixt; // DWH 6-25-09 added this so txt can be changed for Excel index to shared strings
 		if (bInDeletion) // DWH 5-8-09
 		{
 			addToNonTextRun(txt);
@@ -712,7 +715,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		// check for need to modify index in Excel cell pointing to a shared string
 		if (bInExcelSharedStringCell)
 			// DWH 6-13-09 Excel options; true if in sheet cell pointing to a shared string
-			// only possible if (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells)
+			// only possible if (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeColumns)
 			// and this cell is marked as containing a shared string
 		{
 			int nSharedStringNumber=-1;
@@ -727,15 +730,22 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				if (!ess.getBEncountered()) // first time this string seen in sheets
 				{
 					ess.setBEncountered(true);
-					ess.setBTranslatable(bExcludeTranslatingThisExcelCell);
+					ess.setBTranslatable(!bExcludeTranslatingThisExcelCell);
 				}
-				else if (ess.getBTranslatable() != bExcludeTranslatingThisExcelCell)
-					// this shared string should be translated in some cells but not others
+				else if (ess.getBTranslatable() != !bExcludeTranslatingThisExcelCell)
+					// this shared string should be translated in some columns but not others
 				{
-					ExcelSharedString newess = // create twin with opposite translatable status
-						new ExcelSharedString(true,bExcludeTranslatingThisExcelCell,nSharedStringNumber,"");
-					tmSharedStrings.put(new Integer(nNextSharedStringCount),newess); // add twin to list
-					ess.setNIndex(nNextSharedStringCount++); // point current one to new twin
+					int oppnum = ess.getNIndex();
+					if (oppnum > -1) // this already has a shared string elsewhere
+						txt = (new Integer(oppnum)).toString();
+					else
+					{
+						ExcelSharedString newess = // create twin with opposite translatable status
+							new ExcelSharedString(true,!bExcludeTranslatingThisExcelCell,nSharedStringNumber,"");
+						tmSharedStrings.put(new Integer(nNextSharedStringCount),newess); // add twin to list
+						txt = (new Integer(nNextSharedStringCount)).toString(); // DWH 6-25-09 !!! replace index to shared string with new one pointing to a copy
+						ess.setNIndex(nNextSharedStringCount++); // point current one to new twin
+					}
 				}
 			}
 		}
@@ -768,6 +778,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 						// DWH 6-13-09 in Excel Shared Strings File, only if some shared strings excluded from translation
 					{
 						ExcelSharedString ess = tmSharedStrings.get(new Integer(nCurrentSharedString));
+						ess.setS(txt);
+						int oppEssNum = ess.getNIndex();
+						if (oppEssNum>-1 && oppEssNum<nNextSharedStringCount)
+						{
+							ExcelSharedString oppess = tmSharedStrings.get(new Integer(oppEssNum));
+							oppess.setS(txt);
+						}
 						if (ess.getBTranslatable()) // if this sharedString is translatable, add as text
 						{
 							addTextRunToCurrentTextUnit(false); // adds a code for the preceding text run
@@ -894,7 +911,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				}
 				else if (sTagElementType.equals("excell")) // DWH 6-13-09 cell in Excel sheet
 				{
-					if (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeCells)
+					if (bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeColumns)
 						bExcludeTranslatingThisExcelCell = evaluateSharedString(startTag);
 				}
 				else if (sTagElementType.equals("sharedstring")) // DWH 6-13-09 shared string in Excel
@@ -911,14 +928,16 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 					// DWH 5-29-09 in a text unit, some styles shouldn't be translated
 				{
 					sCurrentCharacterStyle = startTag.getAttributeValue("w:val");
-					if (tsExcludeWordStyles.contains(sCurrentCharacterStyle))
+//					if (tsExcludeWordStyles.contains(sCurrentCharacterStyle))
+					if (containsAString(tsExcludeWordStyles,sCurrentCharacterStyle))
 						bExcludeTextInRun = true;
 				}
 				else if (sTagElementType.equals("pstyle")) // DWH 6-13-09 text unit style
 					// DWH 5-29-09 in a text unit, some styles shouldn't be translated
 				{
 					sCurrentParagraphStyle = startTag.getAttributeValue("w:val");
-					if (tsExcludeWordStyles.contains(sCurrentParagraphStyle))
+//					if (tsExcludeWordStyles.contains(sCurrentParagraphStyle))
+					if (containsAString(tsExcludeWordStyles,sCurrentParagraphStyle))
 						bExcludeTextInUnit = true;
 				}
 				else if (sTagElementType.equals("hidden") &&
@@ -1111,8 +1130,34 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		switch (getConfig().getMainRuleType(sTagName)) {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
-			if (canStartNewTextUnit()) {
+			if (canStartNewTextUnit())
+			{
 				addToDocumentPart(sTagString); // DWH 5-29-09
+				if (sTagElementType.equals("sharedstring")) // DWH 6-13-09 shared string in Excel
+				{
+					if (nCurrentSharedString==nOriginalSharedStringCount-1) // this is the last original shared string
+					{
+						bExcludeTextInUnit = false; // DWH 5-29-09 only exclude text if specific circumstances occur
+						addNonTextRunToCurrentTextUnit(); // DWH 5-5-09 trNonTextRun should be null at this point
+						bBeforeFirstTextRun = true; // DWH 5-5-09 addNonTextRunToCurrentTextUnit sets it false
+						bInTextRun = false;
+						bBetweenTextMarkers = false;					
+						for(int i=nCurrentSharedString+1;i<nNextSharedStringCount;i++)
+						{
+							ExcelSharedString ess = tmSharedStrings.get(new Integer(i));
+							String txt = ess.getS();
+							if (ess.getBTranslatable())
+							{
+								startTextUnit(new GenericSkeleton("<si><t>"));
+								addToTextUnit(txt);
+								endTextUnit(new GenericSkeleton("</t></si>"));
+							}
+							else
+								addToDocumentPart("<si><t>"+txt+"</t></si>");
+						}
+						nCurrentSharedString = -1; // reset so other text will translate; see handleText
+					}
+				}
 			}
 			else if (bInTextRun) // DWH 5-29-09
 				addToTextRun(endTag);
@@ -1129,32 +1174,6 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			{
 				bInExcelSharedStringCell = false;
 				addToDocumentPart(sTagString);
-			}
-			else if (sTagElementType.equals("sharedstring")) // DWH 6-13-09 shared string in Excel
-			{
-				addToDocumentPart(sTagString);
-				if (nCurrentSharedString==nOriginalSharedStringCount) // this is the last original shared string
-				{
-					bExcludeTextInUnit = false; // DWH 5-29-09 only exclude text if specific circumstances occur
-					addNonTextRunToCurrentTextUnit(); // DWH 5-5-09 trNonTextRun should be null at this point
-					bBeforeFirstTextRun = true; // DWH 5-5-09 addNonTextRunToCurrentTextUnit sets it false
-					bInTextRun = false;
-					bBetweenTextMarkers = false;					
-					for(int i=nCurrentSharedString;i<nNextSharedStringCount;i++)
-					{
-						ExcelSharedString ess = tmSharedStrings.get(new Integer(i));
-						String txt = ess.getS();
-						if (ess.getBTranslatable())
-						{
-							startTextUnit(new GenericSkeleton("<si><t>"));
-							addToTextUnit(txt);
-							endTextUnit(new GenericSkeleton("</t></si>"));
-						}
-						else
-							addToDocumentPart("<si><t>"+txt+"</t></si>");
-					}
-					nCurrentSharedString = -1; // reset so other text will translate; see handleText
-				}
 			}
 			else
 				addToNonTextRun(endTag); // DWH 5-5-09
@@ -1584,8 +1603,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			if (attribute.getName().equals("r"))
 			{
 				sCell = attribute.getValue();
-				if (bPreferenceTranslateExcelExcludeCells && tsExcelExcludedCells.contains(sCell))
-					bExcludeCell = true; // this cell has been specifically excluded
+				Excell eggshell = new Excell(sCell);
+				if (bPreferenceTranslateExcelExcludeColumns &&
+					((tsExcelExcludedColumns.contains(sCurrentExcelSheet+eggshell.getColumn())) || // matches excluded sheet and column
+					((new Integer(sCurrentExcelSheet).intValue())>3 && tsExcelExcludedColumns.contains("3"+eggshell.getColumn()))))
+					       // matches column on a sheet>3 
+						bExcludeCell = true; // this cell has been specifically excluded
 			}
 			else if (attribute.getName().equals("s"))
 			{
@@ -1643,13 +1666,21 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	{
 		return bPreferenceTranslateExcelExcludeColors;
 	}
-	public void setBPreferenceTranslateExcelExcludeCells(boolean bPreferenceTranslateExcelExcludeCells) // DWH 6-13-09 Excel options
+	public void setBPreferenceTranslateExcelExcludeColumns(boolean bPreferenceTranslateExcelExcludeColumns) // DWH 6-13-09 Excel options
 	{
-		this.bPreferenceTranslateExcelExcludeCells = bPreferenceTranslateExcelExcludeCells;
+		this.bPreferenceTranslateExcelExcludeColumns = bPreferenceTranslateExcelExcludeColumns;
 	}
-	public boolean getBPreferenceTranslateExcelExcludeCells() // DWH 6-13-09 Excel options
+	public boolean getBPreferenceTranslateExcelExcludeColumns() // DWH 6-13-09 Excel options
 	{
-		return bPreferenceTranslateExcelExcludeCells;
+		return bPreferenceTranslateExcelExcludeColumns;
+	}
+	public void setSCurrentExcelSheet(String sCurrentExcelSheet) // DWH 6-13-09 Excel options
+	{
+		this.sCurrentExcelSheet = sCurrentExcelSheet;
+	}
+	public String getSCurrentExcelSheet() // DWH 6-13-09 Excel options
+	{
+		return sCurrentExcelSheet;
 	}
 	public void setTsExcelExcludedStyles(TreeSet<String> tsExcelExcludedStyles) // DWH 6-13-09 Excel options
 	{
@@ -1659,13 +1690,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	{
 		return tsExcelExcludedStyles;
 	}
-	public void setTsExcelExcludedCells(TreeSet<String> tsExcelExcludedCells) // DWH 6-13-09 Excel options
+	public void setTsExcelExcludedColumns(TreeSet<String> tsExcelExcludedColumns) // DWH 6-13-09 Excel options
 	{
-		this.tsExcelExcludedCells = tsExcelExcludedCells;
+		this.tsExcelExcludedColumns = tsExcelExcludedColumns;
 	}
-	public TreeSet<String> getTsExcelExcludedCells() // DWH 6-13-09 Excel options
+	public TreeSet<String> gettsExcelExcludedColumns() // DWH 6-13-09 Excel options
 	{
-		return tsExcelExcludedCells;
+		return tsExcelExcludedColumns;
 	}
 	protected void initTmSharedStrings(int nExcelOriginalSharedStringCount) // DWH 6-13-09 Excel options
 	{
@@ -1673,7 +1704,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		this.nNextSharedStringCount = nExcelOriginalSharedStringCount; // next count to modify
 		tmSharedStrings = new TreeMap<Integer,ExcelSharedString>();
 		for(int i=0;i<nExcelOriginalSharedStringCount;i++)
-			tmSharedStrings.put(new Integer(i), new ExcelSharedString(false,true,i,""));
+			tmSharedStrings.put(new Integer(i), new ExcelSharedString(false,true,-1,""));
+		       // DWH 6-25-09 leave nIndex -1 unless a copy of a shared string is needed
 		nCurrentSharedString = -1;
 	}
 	private String newSharedStringCount(String sTagString)
@@ -1682,7 +1714,9 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	{
 		String sNewTagString=sTagString,sOrigNum;
 		int nDx,nDx2;
-		nDx = sTagString.indexOf("count=");
+		nDx = sTagString.indexOf("uniqueCount");
+		if (nDx==-1)
+			nDx = sTagString.indexOf("count=");
 		if (nDx>-1)
 		{
 			nDx2 = sTagString.substring(nDx+7).indexOf('"');
@@ -1696,5 +1730,20 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 		}
 		return sNewTagString;
+	}
+	private boolean containsAString(TreeSet ts, String s)
+	{
+		boolean rslt = false;
+		String ss;
+		for(Iterator it=ts.iterator(); it.hasNext();)
+		{
+			ss = (String)it.next();
+			if (s.equals(ss))
+			{
+				rslt = true;
+				break;
+			}
+		}
+		return rslt;
 	}
 }

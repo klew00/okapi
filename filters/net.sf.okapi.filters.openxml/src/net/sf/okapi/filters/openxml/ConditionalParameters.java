@@ -36,10 +36,10 @@ public class ConditionalParameters extends BaseParameters {
 	public boolean bPreferenceTranslateWordHidden; // Word Hidden text
 	public boolean bPreferenceTranslateExcelExcludeColors; // Excel exclude tsExcelExcludedColors
 	  // DWH 6-12-09 don't translate text in Excel in some colors 
-	public boolean bPreferenceTranslateExcelExcludeCells; // Excel exclude specific cells
+	public boolean bPreferenceTranslateExcelExcludeColumns; // Excel exclude specific cells
 	  // DWH 6-12-09 don't translate text in Excel in some specified cells
 	public TreeSet<String> tsExcelExcludedColors; // exclude if bPreferenceTranslateExcelExcludeColors
-	public TreeSet<String> tsExcelExcludedCells; // exclude if bPreferenceTranslateExcelExcludeCells 
+	public TreeSet<String> tsExcelExcludedColumns; // exclude if bPreferenceTranslateExcelExcludeCells 
 	public TreeSet<String> tsExcludeWordStyles; // exclude if !bPreferenceTranslateWordAllStyles
 	
 	public ConditionalParameters () {
@@ -56,9 +56,9 @@ public class ConditionalParameters extends BaseParameters {
 		bPreferenceTranslateWordAllStyles = true; // Word false to exclude tsExcludeWordStyles
 		bPreferenceTranslateWordHidden = true; // Word Hidden text
 		bPreferenceTranslateExcelExcludeColors = false; // Excel exclude tsExcelExcludedColors
-		bPreferenceTranslateExcelExcludeCells = false; // Excel exclude specific cells
+		bPreferenceTranslateExcelExcludeColumns = false; // Excel exclude specific cells
 		tsExcelExcludedColors = new TreeSet<String>(); // exclude if bPreferenceTranslateExcelExcludeColors
-		tsExcelExcludedCells = new TreeSet<String>(); // exclude if bPreferenceTranslateExcelExcludeCells 
+		tsExcelExcludedColumns = new TreeSet<String>(); // exclude if bPreferenceTranslateExcelExcludeCells 
 		tsExcludeWordStyles = new TreeSet<String>(); // exclude if !bPreferenceTranslateWordAllStyles
 	}
 
@@ -74,17 +74,17 @@ public class ConditionalParameters extends BaseParameters {
 		bPreferenceTranslateWordAllStyles = buffer.getBoolean("bPreferenceTranslateWordAllStyles", bPreferenceTranslateWordAllStyles);
 		bPreferenceTranslateWordHidden = buffer.getBoolean("bPreferenceTranslateWordHidden", bPreferenceTranslateWordHidden);
 		bPreferenceTranslateExcelExcludeColors = buffer.getBoolean("bPreferenceTranslateExcelExcludeColors", bPreferenceTranslateExcelExcludeColors);
-		bPreferenceTranslateExcelExcludeCells = buffer.getBoolean("bPreferenceTranslateExcelExcludeCells", bPreferenceTranslateExcelExcludeCells);
+		bPreferenceTranslateExcelExcludeColumns = buffer.getBoolean("bPreferenceTranslateExcelExcludeCells", bPreferenceTranslateExcelExcludeColumns);
 
 		tsExcelExcludedColors = new TreeSet<String>();
 		siz = buffer.getInteger("tsExcelExcludedColors");
 		for(i=0;i<siz;i++)
 			tsExcelExcludedColors.add(buffer.getString('#'+(new Integer(i)).toString(), "F1F2F3F4"));
 
-		tsExcelExcludedCells = new TreeSet<String>();
-		siz = buffer.getInteger("tsExcelExcludedCells");
+		tsExcelExcludedColumns = new TreeSet<String>();
+		siz = buffer.getInteger("tsExcelExcludedColumns");
 		for(i=0;i<siz;i++)
-			tsExcelExcludedCells.add(buffer.getString('#'+(new Integer(i)).toString(), "A1000"));
+			tsExcelExcludedColumns.add(buffer.getString('#'+(new Integer(i)).toString(), "A1000"));
 
 		tsExcludeWordStyles = new TreeSet<String>();
 		siz = buffer.getInteger("tsExcludeWordStyles");
@@ -106,7 +106,7 @@ public class ConditionalParameters extends BaseParameters {
 		buffer.setBoolean("bPreferenceTranslateWordAllStyles", bPreferenceTranslateWordAllStyles);
 		buffer.setBoolean("bPreferenceTranslateWordHidden", bPreferenceTranslateWordHidden);
 		buffer.setBoolean("bPreferenceTranslateExcelExcludeColors", bPreferenceTranslateExcelExcludeColors);
-		buffer.setBoolean("bPreferenceTranslateExcelExcludeCells", bPreferenceTranslateExcelExcludeCells);
+		buffer.setBoolean("bPreferenceTranslateExcelExcludeColumns", bPreferenceTranslateExcelExcludeColumns);
 
 		if (tsExcelExcludedColors==null)
 			siz = 0;
@@ -118,12 +118,12 @@ public class ConditionalParameters extends BaseParameters {
 			buffer.setString('#'+(new Integer(i)).toString(), (String)it.next());
 		}
 
-		if (tsExcelExcludedCells==null)
+		if (tsExcelExcludedColumns==null)
 			siz = 0;
 		else
-			siz = tsExcelExcludedCells.size();
-		buffer.setInteger("tsExcelExcludedCells", siz);
-		for(i=0,it=tsExcelExcludedCells.iterator();i<siz && it.hasNext();i++)
+			siz = tsExcelExcludedColumns.size();
+		buffer.setInteger("tsExcelExcludedColumns", siz);
+		for(i=0,it=tsExcelExcludedColumns.iterator();i<siz && it.hasNext();i++)
 		{
 			buffer.setString('#'+(new Integer(i)).toString(), (String)it.next());
 		}

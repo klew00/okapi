@@ -8,7 +8,8 @@ public class ExcelSharedString
 {
 	boolean bEncountered; // whether or not this shared string has been seen in sheets so far
 	boolean bTranslatable; // whether or not this shared string will be translated
-	int nIndex=0; // index of the shared string that has the opposite translation status
+	int nIndex=-1; // index of the shared string that has the opposite translation status
+	               // default -1 means there is no case where this string has the opposite bTranslatable status
 	String s; // the shared string
 
 	public ExcelSharedString(boolean bEncountered, boolean bTranslatable, int nIndex, String s)

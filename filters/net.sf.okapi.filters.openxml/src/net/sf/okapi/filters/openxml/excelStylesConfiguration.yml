@@ -31,7 +31,6 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-
 filetype:
   ruleTypes: [ATTRIBUTES_ONLY]
   elementType: MSEXCELSTYLES
@@ -42,7 +41,11 @@ dimension:
   translatableAttributes: [ref]
 
 # used in styles file
-dimension:
+cellxfs:
+  ruleTypes: [INLINE]
+# elementType: cellxfs
+
+color:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [rgb]
 
@@ -50,13 +53,10 @@ fonts:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [count]
 
+font:
+  ruleTypes: [INLINE]
+# elementType: font
+
 xf:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [fontId]
-
-font:
-  ruleTypes: [INLINE]
-  elementType: font
-
-
-

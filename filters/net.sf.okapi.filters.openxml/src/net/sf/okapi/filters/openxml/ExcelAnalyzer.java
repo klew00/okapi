@@ -27,7 +27,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -47,9 +49,11 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.StreamedSource;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.markupfilter.ExtractionRuleState;
 import net.sf.okapi.filters.markupfilter.Parameters;
 //import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class ExcelAnalyzer
@@ -68,6 +72,7 @@ public class ExcelAnalyzer
 	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
 	private StreamedSource document;
+	private RawDocument input;
 
 	public ExcelAnalyzer(URI zipURI)
 	{
@@ -107,6 +112,7 @@ public class ExcelAnalyzer
 				sEntryName = sEntryName.substring(iCute+1);
 			if (sEntryName.substring(0, 5).equals("sheet"))
 			{
+				nodeIterator = createNodeIterator(entry);			
 				while (nodeIterator.hasNext())
 				{
 					Segment segment = nodeIterator.next();
@@ -198,6 +204,7 @@ public class ExcelAnalyzer
 		String sEntryName;
 		String sColor;
 		int iCute;
+		TaggedFilterConfiguration tfc;
 		tsColors = new TreeSet<String>();
 		entries = zipFile.entries();
 		while( entries.hasMoreElements() )
@@ -209,13 +216,16 @@ public class ExcelAnalyzer
 				sEntryName = sEntryName.substring(iCute+1);
 			if (sEntryName.equals("styles.xml"))
 			{
+				nodeIterator = createNodeIterator(entry);
+				tfc = parameters.getTaggedConfig();
 				while (nodeIterator.hasNext())
 				{
 					Segment segment = nodeIterator.next();
 					if (segment instanceof Tag)
 					{
 						final Tag tag = (Tag) segment;
-						if (parameters.getTaggedConfig().getMainRuleType(tag.getName()).equals("ATTRIBUTES_ONLY"))
+//						if (parameters.getTaggedConfig().getMainRuleType(tag.getName()).equals("ATTRIBUTES_ONLY"))
+						if (tfc.getMainRuleType(tag.getName()) == RULE_TYPE.ATTRIBUTES_ONLY)
 						{
 							if (tag.getName().equals("color"))
 							{
@@ -240,12 +250,16 @@ public class ExcelAnalyzer
 	public TreeSet analyzeExcelGetStylesOfExcludedColors(TreeSet tsExcludedColors)
 	{
 		String sEntryName;
-		String sColor,sCount,sFontNum;
+		String sColor,sCount,sFontNum,sAttName;
 		int iCute,nFontTotal,nCurrentFont=0,nThisFont,nCurrentStyle=0;
+		TaggedFilterConfiguration tfc;
 		boolean bFonts[];
+		boolean bXfing=false;
 		TreeSet tsStyles;
-		tsColors = new TreeSet<String>();
 		tsStyles = new TreeSet<String>();
+		if (tsExcludedColors.size()==0)
+			return tsStyles;
+		tsColors = new TreeSet<String>();
 		entries = zipFile.entries();
 		RULE_TYPE rtRuleType;
 		String sTagName;
@@ -259,6 +273,8 @@ public class ExcelAnalyzer
 				sEntryName = sEntryName.substring(iCute+1);
 			if (sEntryName.equals("styles.xml"))
 			{
+				nodeIterator = createNodeIterator(entry);
+				tfc = parameters.getTaggedConfig();
 				while (nodeIterator.hasNext())
 				{
 					Segment segment = nodeIterator.next();
@@ -266,54 +282,76 @@ public class ExcelAnalyzer
 					{
 						final Tag tag = (Tag) segment;
 						sTagName = tag.getName();
-						rtRuleType = parameters.getTaggedConfig().getMainRuleType(sTagName);
-						if (rtRuleType.equals("ATTRIBUTES_ONLY"))
+						rtRuleType = tfc.getMainRuleType(sTagName);
+						if (tag.getTagType() == StartTagType.NORMAL ||
+												tag.getTagType() == StartTagType.UNREGISTERED)
+							// only if it's a start tag
 						{
-							if (sTagName.equals("color"))
+	//						if (parameters.getTaggedConfig().getMainRuleType(tag.getName()).equals("ATTRIBUTES_ONLY"))
+							if (rtRuleType == RULE_TYPE.ATTRIBUTES_ONLY)
 							{
-								for (Attribute attribute : tag.parseAttributes())
+								if (tag.getName().equals("color"))
 								{
-									if (attribute.getName().equals("rgb"))
+									for (Attribute attribute : tag.parseAttributes())
 									{
-										sColor = attribute.getValue();
-										if (tsExcludedColors.contains(sColor))
-											bFonts[nCurrentFont-1] = true; 
+										if (attribute.getName().equals("rgb"))
+										{
+											sColor = attribute.getValue();
+											if (tsExcludedColors.contains(sColor))
+												bFonts[nCurrentFont-1] = true; 
+										}
+									}
+								}
+								else if (sTagName.equals("fonts"))
+								{
+									for (Attribute attribute : tag.parseAttributes())
+									{
+										if (attribute.getName().equals("count"))
+										{
+											sCount = attribute.getValue();
+											nFontTotal = (new Integer(sCount)).intValue();
+											bFonts = new boolean[nFontTotal];
+											for(int i=0;i<nFontTotal;i++)
+												bFonts[i] = false;
+										}
+										nCurrentFont = 0;
+									}
+								}
+								else if (sTagName.equals("xf"))
+								{
+									if (bXfing)
+									{
+										nCurrentStyle++;
+										for (Attribute attribute : tag.parseAttributes())
+										{
+											sAttName = attribute.getName();
+											if (sAttName.equals("fontId"))
+											{
+												sFontNum = attribute.getValue();
+												nThisFont = (new Integer(sFontNum)).intValue();
+												if (bFonts[nThisFont])
+													tsStyles.add((String)(new Integer(nCurrentStyle-1)).toString());
+											}
+										}
 									}
 								}
 							}
-							else if (sTagName.equals("fonts"))
+							else if (rtRuleType == RULE_TYPE.INLINE_ELEMENT)
 							{
-								for (Attribute attribute : tag.parseAttributes())
-								{
-									if (attribute.getName().equals("count"))
-									{
-										sCount = attribute.getValue();
-										nFontTotal = (new Integer(sCount)).intValue();
-										bFonts = new boolean[nFontTotal];
-										for(int i=0;i<nFontTotal;i++)
-											bFonts[i] = false;
-									}
-								}
-							}
-							else if (sTagName.equals("xf"))
-							{
-								nCurrentStyle++;
-								for (Attribute attribute : tag.parseAttributes())
-								{
-									if (attribute.getName().equals("fontID"))
-									{
-										sFontNum = attribute.getValue();
-										nThisFont = (new Integer(sFontNum)).intValue();
-										if (bFonts[nThisFont-1])
-											tsStyles.add((new Integer(nCurrentStyle-1)).toString());
-									}
-								}
+								if (sTagName.equals("font"))
+									nCurrentFont++;
+								if (sTagName.equals("cellxfs"))
+									bXfing = true;
 							}
 						}
-						else if (rtRuleType.equals("INLINE"))
+						else if (tag.getTagType() == EndTagType.NORMAL ||
+								 tag.getTagType() == EndTagType.UNREGISTERED)
 						{
-							if (sTagName.equals("font"))
-								nCurrentFont++;
+							if (rtRuleType == RULE_TYPE.INLINE_ELEMENT)
+							{
+								if (sTagName.equals("cellxfs"))
+									bXfing = false;
+							}							
 						}
 					}
 				}
@@ -325,11 +363,13 @@ public class ExcelAnalyzer
 	}
 	public int analyzeExcelGetSharedStringsCount()
 	{
+		TaggedFilterConfiguration tfc;
+		RULE_TYPE rtRuleType;
 		String sEntryName;
+		String sTagName;
 		String sCount;
 		int iCute;
 		int rslt=0;
-		tsColors = new TreeSet<String>();
 		entries = zipFile.entries();
 		while( entries.hasMoreElements() )
 		{
@@ -340,14 +380,17 @@ public class ExcelAnalyzer
 				sEntryName = sEntryName.substring(iCute+1);
 			if (sEntryName.equals("sharedStrings.xml"))
 			{
-				setupXMLReader(entry);
+				setupSharedStringsReader(entry);
+				tfc = parameters.getTaggedConfig();
 				while (nodeIterator.hasNext())
 				{
 					Segment segment = nodeIterator.next();
 					if (segment instanceof Tag)
 					{
 						final Tag tag = (Tag) segment;
-						if (parameters.getTaggedConfig().getMainRuleType(tag.getName()).equals("INLINE"))
+						sTagName = tag.getName();
+						rtRuleType = tfc.getMainRuleType(sTagName);
+						if (rtRuleType == RULE_TYPE.INLINE_ELEMENT)
 						{
 							if (tag.getName().equals("sst"))
 							{
@@ -356,10 +399,17 @@ public class ExcelAnalyzer
 									if (attribute.getName().equals("count"))
 									{
 										sCount = attribute.getValue();
+										if (rslt==0) // keep uniqueCount if it was there
+											rslt = (new Integer(sCount)).intValue();
+									}
+									else if (attribute.getName().equals("uniqueCount"))
+									{
+										sCount = attribute.getValue();
 										rslt = (new Integer(sCount)).intValue();
-										break;
 									}
 								}
+								if (rslt>0)
+									break;
 							}
 						}
 					}
@@ -370,12 +420,13 @@ public class ExcelAnalyzer
 		}
 		return rslt;
 	}
-	private void setupXMLReader(ZipEntry entry)
+	private void setupSharedStringsReader(ZipEntry entry)
 	{
 		try
 		{
 			is = zipFile.getInputStream(entry);
-			parameters = new Parameters("/net/sf/okapi/filters/openxml/excelStylesConfiguration.yml");
+			URL urlConfig = OpenXMLContentFilter.class.getResource("/net/sf/okapi/filters/openxml/excelConfiguration.yml");
+			parameters = new Parameters(urlConfig);
 			ruleState = new ExtractionRuleState();
 			document = new StreamedSource(new InputStreamReader(is,"UTF-8"));
 			nodeIterator = document.iterator();
@@ -385,6 +436,21 @@ public class ExcelAnalyzer
 			LOGGER.log(Level.WARNING,"Error opening XML file within zipped Excel file.");
 			throw new OkapiIOException("Error opening XML file within zipped Excel file.");			
 		}
+	}
+	private Iterator<Segment> createNodeIterator(ZipEntry ntry)
+	{
+		try {			
+			URL urlConfig = OpenXMLContentFilter.class.getResource("/net/sf/okapi/filters/openxml/excelStylesConfiguration.yml"); // DWH 3-9-09
+			parameters = new Parameters(urlConfig);
+			ruleState = new ExtractionRuleState();
+			is = zipFile.getInputStream(ntry);
+			document = new StreamedSource(new InputStreamReader(is));
+		} catch (IOException e) {
+			OkapiIOException re = new OkapiIOException(e);
+			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);
+			throw new OkapiIOException("Filter could not open input stream"); // dies here, so return can't be null
+		}
+		return document.iterator();
 	}
 	private void closeInput()
 	{
