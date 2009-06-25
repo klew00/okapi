@@ -32,11 +32,14 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
+//import net.sf.okapi.ui.filters.openxml.Editor;
 
 import org.junit.Test;
 
@@ -60,6 +63,7 @@ public class OpenXMLRoundTripTest {
 
 	private static Logger LOGGER = Logger.getLogger(OpenXMLRoundTripTest.class.getName());
 	private boolean allGood=true;
+	private ConditionalParameters cparams; // DWH 6-18-09
 
 	@Test
 	public void runTest () {
@@ -67,6 +71,8 @@ public class OpenXMLRoundTripTest {
 //		LOGGER.setLevel(Level.FINER);
 //		LOGGER.setLevel(Level.FINEST);
 		LOGGER.addHandler(new LogHandlerSystemOut());
+		cparams = getParametersFromUserInterface();
+
 		ArrayList<String> themfiles = new ArrayList<String>();
 		zc = new ZipCompare();
 		themfiles.add("BoldWorld.docx");
@@ -78,11 +84,11 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("sample.pptx");
 		themfiles.add("sample.xlsx");
 		themfiles.add("sampleMore.xlsx");
+		themfiles.add("sampleMore.pptx");
 		themfiles.add("OpenXML_text_reference_v1_2.docx");
 		themfiles.add("Mauris.docx");
 		themfiles.add("Hidden.docx");
 //		themfiles.add("TestDako2.docx");
-		
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
@@ -107,6 +113,7 @@ public class OpenXMLRoundTripTest {
 		OpenXMLFilter filter = null;
 		BufferedInputStream bis;
 		boolean rtrued2;
+		final BaseContext context; // DWH 6-18-09
 		try {
 			if (bPeeking)
 			{
@@ -119,6 +126,9 @@ public class OpenXMLRoundTripTest {
 				filter = new OpenXMLFilter(new PigLatinTranslator(),"pl");
 			else
 				filter = new OpenXMLFilter();
+			
+			filter.setParameters(cparams);
+
 			filter.setOptions("en-US", "UTF-8", true);
 //			filter.setLogLevel(Level.FINEST);
 //			filter.setLogLevel(Level.FINE);
@@ -182,5 +192,12 @@ public class OpenXMLRoundTripTest {
 		finally {
 			if ( filter != null ) filter.close();
 		}
+	}
+	private ConditionalParameters getParametersFromUserInterface()
+	{
+		ConditionalParameters parms;
+//		parms = (new Editor()).getParametersFromUI(new ConditionalParameters());
+		parms = new ConditionalParameters();
+		return parms;
 	}
 }
