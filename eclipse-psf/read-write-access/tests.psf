@@ -37,11 +37,11 @@
 <item elementID="=net.sf.okapi.filters.html.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.steps.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.tmx.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.filters.rtf.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.common.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.rtf.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.properties.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/python" type="4"/>
 <item elementID="=net.sf.okapi.common.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/python" type="4"/>
 <item elementID="=net.sf.okapi.filters.plaintext.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.markupfilter.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.mif.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
