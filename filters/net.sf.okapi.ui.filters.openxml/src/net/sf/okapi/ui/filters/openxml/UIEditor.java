@@ -194,7 +194,8 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 							lblStyles.setText("Styles to Exclude");
 						}
 						{
-							listExcludedWordStyles = new List(compositeWordStyles, SWT.BORDER);
+							listExcludedWordStyles = new List(compositeWordStyles, SWT.BORDER | SWT.V_SCROLL);
+							listExcludedWordStyles.setItems(new String[] {"Emphasis", "Heading1", "Heading2", "Normal", "Title", "Strong", "Subtitle"});
 							listExcludedWordStyles.setBounds(10, 0, 156, 68);
 						}
 					}
@@ -220,7 +221,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 //							btnColorsFromDocument.setText("Colors from Document ...");
 //						}
 						{
-							listExcelColorsToExclude = new List(compositeExcelColors, SWT.BORDER | SWT.MULTI);
+							listExcelColorsToExclude = new List(compositeExcelColors, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 							listExcelColorsToExclude.setItems(new String[] {"black", "blue", "cyan", "green", "magenta", "red", "white", "yellow"});
 							listExcelColorsToExclude.setBounds(10, 0, 135, 45);
 						}
@@ -234,7 +235,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 							lblSheetColumns.setText("Sheet 1 Columns to Exlude");
 						}
 						{
-							listExcelSheet1ColumnsToExclude = new List(compositeExcelSheet1, SWT.BORDER | SWT.MULTI);
+							listExcelSheet1ColumnsToExclude = new List(compositeExcelSheet1, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 							listExcelSheet1ColumnsToExclude.setItems(new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AX", "AY", "AZ", "BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BX", "BY", "BZ", "CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CX", "CY", "CZ", "DA", "DB", "DC", "DD", "DE", "DF", "DG", "DH", "DI", "DJ", "DK", "DL", "DM", "DN", "DO", "DP", "DQ", "DR", "DS", "DT", "DU", "DV", "DX", "DY", "DZ", "EA", "EB", "EC", "ED", "EE", "EF", "EG", "EH", "EI", "EJ", "EK", "EL", "EM", "EN", "EO", "EP", "EQ", "ER", "ES", "ET", "EU", "EV", "EX", "EY", "EZ"});
 							listExcelSheet1ColumnsToExclude.setBounds(10, 0, 135, 45);
 						}
@@ -254,7 +255,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 							lblSheetColumns_1.setBounds(162, 24, 154, 21);
 						}
 						{
-							listExcelSheet2ColumnsToExclude = new List(compositeExcelSheet2, SWT.BORDER | SWT.MULTI);
+							listExcelSheet2ColumnsToExclude = new List(compositeExcelSheet2, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 							listExcelSheet2ColumnsToExclude.setItems(new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AX", "AY", "AZ", "BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BX", "BY", "BZ", "CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CX", "CY", "CZ", "DA", "DB", "DC", "DD", "DE", "DF", "DG", "DH", "DI", "DJ", "DK", "DL", "DM", "DN", "DO", "DP", "DQ", "DR", "DS", "DT", "DU", "DV", "DX", "DY", "DZ", "EA", "EB", "EC", "ED", "EE", "EF", "EG", "EH", "EI", "EJ", "EK", "EL", "EM", "EN", "EO", "EP", "EQ", "ER", "ES", "ET", "EU", "EV", "EX", "EY", "EZ"});
 							listExcelSheet2ColumnsToExclude.setBounds(10, 0, 135, 45);
 						}
@@ -268,7 +269,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 							lblSheetColumns_2.setBounds(162, 24, 287, 21);
 						}
 						{
-							listExcelSheet3ColumnsToExclude = new List(compositeExcelSheet3, SWT.BORDER | SWT.MULTI);
+							listExcelSheet3ColumnsToExclude = new List(compositeExcelSheet3, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 							listExcelSheet3ColumnsToExclude.setItems(new String[] {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AX", "AY", "AZ", "BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BX", "BY", "BZ", "CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CX", "CY", "CZ", "DA", "DB", "DC", "DD", "DE", "DF", "DG", "DH", "DI", "DJ", "DK", "DL", "DM", "DN", "DO", "DP", "DQ", "DR", "DS", "DT", "DU", "DV", "DX", "DY", "DZ", "EA", "EB", "EC", "ED", "EE", "EF", "EG", "EH", "EI", "EJ", "EK", "EL", "EM", "EN", "EO", "EP", "EQ", "ER", "ES", "ET", "EU", "EV", "EX", "EY", "EZ"});
 							listExcelSheet3ColumnsToExclude.setBounds(10, 0, 135, 45);
 						}
