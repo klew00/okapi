@@ -131,9 +131,8 @@ public class Parameters implements IParameters {
 	public void load (URI inputURI,
 		boolean ignoreErrors)
 	{
-		File f = new File(inputURI);
-		try {
-			doc = docBuilder.parse(f);
+		try { // Use inputURI.toString() to allow reading from JAR
+			doc = docBuilder.parse(inputURI.toString());
 		}
 		catch ( SAXException e ) {
 			throw new OkapiIOException(e);
@@ -142,7 +141,7 @@ public class Parameters implements IParameters {
 			throw new OkapiIOException(e);
 		} 
 		path = inputURI.getPath();
-		docURI = f.toURI();
+		docURI = inputURI;
 	}
 
 	public void reset () {

@@ -116,14 +116,15 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		
 		// Instantiate the filter (or re-use one)
 		IFilter filter = instantiateFilter(fc, existingFilter);
-		
+
+		IParameters params = filter.getParameters();
+		if ( params == null ) {
+			throw new RuntimeException(String.format(
+				"Cannot create default parameters for '%s'.", fc.configId));
+		}
+
 		// Always load the parameters (if there are parameters)
 		if ( fc.parametersLocation != null ) {
-			IParameters params = filter.getParameters();
-			if ( params == null ) {
-				throw new RuntimeException(String.format(
-					"Cannot create default parameters for '%s'.", fc.configId));
-			}
 			if ( fc.custom ) {
 				params = getCustomParameters(fc, filter);
 			}
@@ -141,6 +142,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 				}
 			}
 		}
+		else params.reset();
 		
 		return filter;
 	}
