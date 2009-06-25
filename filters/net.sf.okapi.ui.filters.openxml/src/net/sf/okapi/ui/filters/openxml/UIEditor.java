@@ -182,7 +182,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 					}
 					{
 						Composite compositeWordStyles = new Composite(composite, SWT.NONE);
-						compositeWordStyles.setLayoutData(new RowData(425, 67));
+						compositeWordStyles.setLayoutData(new RowData(292, 67));
 //						{
 //							btnStylesFromDocument = new Button(compositeWordStyles, SWT.NONE);
 //							btnStylesFromDocument.setBounds(269, 8, 146, 23);
@@ -221,7 +221,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 //						}
 						{
 							listExcelColorsToExclude = new List(compositeExcelColors, SWT.BORDER | SWT.MULTI);
-							listExcelColorsToExclude.setItems(new String[] {"black", "blue", "cyan", "dark grey", "grey", "green", "light gray", "magenta", "orange", "pink", "red", "white", "yellow"});
+							listExcelColorsToExclude.setItems(new String[] {"black", "blue", "cyan", "green", "magenta", "red", "white", "yellow"});
 							listExcelColorsToExclude.setBounds(10, 0, 135, 45);
 						}
 					}
@@ -230,7 +230,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						compositeExcelSheet1.setBounds(0, 51, 459, 45);
 						{
 							Label lblSheetColumns = new Label(compositeExcelSheet1, SWT.NONE);
-							lblSheetColumns.setBounds(162, 10, 142, 21);
+							lblSheetColumns.setBounds(162, 24, 135, 21);
 							lblSheetColumns.setText("Sheet 1 Columns to Exlude");
 						}
 						{
@@ -240,9 +240,9 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						}
 						{
 							btnExcludeExcelColumns = new Button(compositeExcelSheet1, SWT.CHECK);
-							btnExcludeExcelColumns.setBounds(310, 10, 139, 16);
+							btnExcludeExcelColumns.setBounds(162, 2, 212, 16);
 							btnExcludeExcelColumns.setSelection(true);
-							btnExcludeExcelColumns.setText("Exclude Marked Columns");
+							btnExcludeExcelColumns.setText("Exclude Marked Columns in Each Sheet");
 						}
 					}
 					{
@@ -251,7 +251,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						{
 							Label lblSheetColumns_1 = new Label(compositeExcelSheet2, SWT.NONE);
 							lblSheetColumns_1.setText("Sheet 2 Columns to Exlude");
-							lblSheetColumns_1.setBounds(162, 10, 154, 21);
+							lblSheetColumns_1.setBounds(162, 24, 154, 21);
 						}
 						{
 							listExcelSheet2ColumnsToExclude = new List(compositeExcelSheet2, SWT.BORDER | SWT.MULTI);
@@ -264,8 +264,8 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						compositeExcelSheet3.setBounds(0, 152, 459, 45);
 						{
 							Label lblSheetColumns_2 = new Label(compositeExcelSheet3, SWT.NONE);
-							lblSheetColumns_2.setText("Sheet 3 Columns to Exlude");
-							lblSheetColumns_2.setBounds(162, 10, 154, 21);
+							lblSheetColumns_2.setText("Sheets 3 (and higher) Columns to Exlude");
+							lblSheetColumns_2.setBounds(162, 24, 287, 21);
 						}
 						{
 							listExcelSheet3ColumnsToExclude = new List(compositeExcelSheet3, SWT.BORDER | SWT.MULTI);
