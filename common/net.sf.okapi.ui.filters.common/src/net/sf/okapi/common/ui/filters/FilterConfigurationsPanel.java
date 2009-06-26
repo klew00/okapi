@@ -295,6 +295,7 @@ public class FilterConfigurationsPanel extends Composite {
 			mapper.deleteCustomParameters(config);
 			mapper.removeConfiguration(id);
 			model.updateTable(n, null);
+			updateInfo();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);
