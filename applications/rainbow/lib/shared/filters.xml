@@ -24,13 +24,9 @@
 <filter id="okf_openxml"
   name="(BETA) MS-Office 2007 Filter"
   inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
+  editorClass="net.sf.okapi.ui.filters.openxml.Editor"
  >Filter for Microsoft Office 2007 documents such as DOCX, XLSX, and PPTX.</filter>
  
- <filter id="okf_openxml"
-  name="(BETA) OpenXML-Content Filter"
-  inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLContentFilter"
- >Filter for OpenXML-Content documents.</filter>
-  
  <filter id="okf_odf"
   name="(BETA) ODF-Content Filter"
   inputFilterClass="net.sf.okapi.filters.openoffice.ODFFilter"
