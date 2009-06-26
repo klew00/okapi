@@ -24,8 +24,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.okapi.common.IHelp;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * 
@@ -36,7 +43,9 @@ import org.eclipse.swt.widgets.Control;
 
 public class SWTUtils {
 
-//	public static final String SET_FOCUS = "SWT_SET_FOCUS";
+	public static final String GET_CAPTION = "SWT_GET_CAPTION";
+
+// Group enabling/disabling
 	
 	/**
 	 * Sets the enabled state for all of a Composite's child Controls,
@@ -65,7 +74,9 @@ public class SWTUtils {
 			excludes = new ArrayList<Control>();
 			excludes.add(container);
 		}
-											
+									
+		container.setEnabled(enabled);
+		
 	    Control[] children = container.getChildren();
 	    for (Control aChild : children) {
 	        if (!excludes.contains(aChild)) {
@@ -82,5 +93,125 @@ public class SWTUtils {
 		setAllEnabled(container, enabled, (Control[])null);
 	}
 	
-}
+// Input query
+	private static Object result = null;
+	
+	public static boolean inputQuery(Shell parent, String caption, String prompt, int initialValue, IHelp help) {
 
+		result = null;
+		
+		InputQueryDialog dlg = new InputQueryDialog();
+		boolean res = dlg.run(parent, InputQueryPageInt.class, caption, prompt, initialValue, help);
+		
+		if (res) result = dlg.getResult();		
+		return res;
+	}
+	
+	public static boolean inputQuery(Shell parent, String caption, String prompt, String initialValue, IHelp help) {
+		
+		result = null;
+		
+		InputQueryDialog dlg = new InputQueryDialog();
+		boolean res = dlg.run(parent, InputQueryPageString.class, caption, prompt, initialValue, help);
+		
+		if (res) result = dlg.getResult();		
+		return res;
+	}
+	
+	public static boolean inputQuery(Class<?> pageClass, Shell parent, String caption, Object initialData, IHelp help) {
+
+		result = null;
+		
+		InputQueryDialog dlg = new InputQueryDialog();
+		boolean res = dlg.run(parent, pageClass, caption, null, initialData, help);
+		
+		if (res) result = dlg.getResult();		
+		return res;
+	}
+
+	public static Object getResult() {
+		
+		return result;
+	}
+
+// Radio group
+	public static Button getRadioGroupSelection(Composite container) {
+		
+		if (container == null) return null;
+		
+	    for (Control aChild : container.getChildren())
+	    	if (aChild instanceof Composite) {
+                return getRadioGroupSelection((Composite) aChild);
+            }
+	    	else
+	    	if (aChild instanceof Button &&
+	    			Util2.checkFlag(((Button) aChild).getStyle(), SWT.RADIO) &&
+	    			((Button) aChild).getSelection())
+	    		return (Button) aChild;
+	    
+		return null;
+	}
+
+	public static void setRadioGroupSelection(Composite container, String selCaption) {
+		
+		if (container == null) return;
+		
+	    for (Control aChild : container.getChildren())
+	    	if (aChild instanceof Composite) {
+                setRadioGroupSelection((Composite) aChild, selCaption);
+            }
+	    	else
+	    	if (aChild instanceof Button &&	Util2.checkFlag(((Button) aChild).getStyle(), SWT.RADIO))
+	    		((Button) aChild).setSelection(((Button) aChild).getText().equalsIgnoreCase(selCaption));
+	}
+
+// Table	
+	public static String [] getText(TableItem item) {
+		
+		if (item == null) return null;
+		
+		Table table = item.getParent();
+		if (table == null) return null;
+		
+		int numCol = table.getColumnCount();
+		
+		String res [] = new String [numCol];
+		
+		for (int i = 0; i < numCol; i++)
+			res[i] = item.getText(i);
+		
+		return res;
+	}
+	
+	public static boolean checkRowIndex(Table table, int rowIndex) {
+		
+		if (table == null) return false;
+		
+		return rowIndex >= 0 && rowIndex < table.getItemCount();
+	}
+	
+	public static boolean checkColumnIndex(Table table, int colIndex) {
+		
+		if (table == null) return false;
+		
+		return colIndex >= 0 && colIndex < table.getColumnCount();
+	}
+	
+	public static int getColumnMaxValue(Table table, int colIndex) {
+				
+		if (table == null) return 0;
+		if (!checkColumnIndex(table, colIndex)) return 0;
+		
+		int res = 0;
+		
+		for (TableItem item : table.getItems()) {
+			
+			String st = item.getText(colIndex);
+			int val = Util2.strToInt(st, 0); 
+			if (val > res) res = val; 
+		}
+		
+		return res;
+	}
+		
+}

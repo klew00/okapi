@@ -61,12 +61,15 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 	private IHelp help;
 	private TabFolder pageContainer;
 	private List<IParametersEditorPage> pages = null;
+	boolean readOnly = false;
 	
 	public boolean edit(IParameters paramsObject, boolean readOnly, IContext context) {
 	
 		result = true;
 		if (context == null) return false;
 		if (paramsObject == null) return false;
+		
+		this.readOnly = readOnly;
 		
 		Shell parent = (Shell)context.getObject("shell"); 
 
@@ -89,16 +92,16 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 //						result = false;
 //					}
 //				}});
-			create(parent, readOnly);			
+			create(parent);			
 			if (!result) return  false;
 			
 			showDialog();			
 			if (!result) return  false;			
 		}
-		catch ( Exception E ) {
-			Dialogs.showError(parent, E.getLocalizedMessage(), null);
-			result = false;
-		}
+//		catch ( Exception E ) {
+//			Dialogs.showError(parent, E.getLocalizedMessage(), null);
+//			result = false;
+//		}
 		finally {
 			// Dispose of the shell, but not of the display
 			if (shell != null) shell.dispose();
@@ -106,9 +109,8 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		return result;
 	}
 
-	private void create (Shell p_Parent,
-		boolean readOnly)
-	{
+	private void create (Shell p_Parent) {
+		
 		shell.setText(getCaption());
 		
 		if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
@@ -153,14 +155,18 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
-		pnlActions.btOK.setEnabled(!readOnly);
-		if ( !readOnly ) {
-			shell.setDefaultButton(pnlActions.btOK);
-		}
+		shell.setDefaultButton(pnlActions.btOK);
 
 		shell.pack();
-		Rectangle Rect = shell.getBounds();
-		shell.setMinimumSize(Rect.width, Rect.height);
+		Rectangle minRect = shell.getBounds();
+		Rectangle startRect = shell.getBounds();
+				
+		if ( minRect.width > 500 ) minRect.width = 500;
+		if ( minRect.height > 400 ) minRect.height = 400;
+		
+		shell.setMinimumSize(minRect.width, minRect.height);
+		shell.setSize(startRect.width, startRect.height);		
+		
 		Dialogs.centerWindow(shell, p_Parent);
 	}
 	
@@ -171,8 +177,14 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		result = false; // To react to OK only
 		shell.open();
 		while ( !shell.isDisposed() ) {
-			if ( !shell.getDisplay().readAndDispatch() )
-				shell.getDisplay().sleep();
+			
+			try {
+				if ( !shell.getDisplay().readAndDispatch() )
+					shell.getDisplay().sleep();
+			}
+			catch ( Exception E ) {
+				Dialogs.showError(shell, E.getLocalizedMessage(), null);
+			}
 		}				
 	}
 
@@ -232,6 +244,12 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 	private boolean saveParameters() {
 		// Iterate through pages, store parameters
 		
+		if (readOnly) {
+			
+			Dialogs.showWarning(shell, "Editor in read-only mode, parameters are not saved.", null);
+			return false;
+		}
+		
 		for (IParametersEditorPage page : pages) {			
 			
 			if (page == null) return false;
@@ -244,7 +262,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 			if (page == null) return false;
 			if (!page.save(params)) { // Fills in parametersClass
 				
-				Dialogs.showError(shell, String.format("Error saving parameters from the %s page", getCaption(page)), null);
+				Dialogs.showError(shell, String.format("Error saving parameters from the %s page.", getCaption(page)), null);
 				return false;
 			}
 		}
@@ -259,7 +277,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 				
 				if (!page.save(activeParams)) {
 			
-					Dialogs.showError(shell, String.format("Error saving parameters from the %s page", getCaption(page)), null);
+					Dialogs.showError(shell, String.format("Error saving parameters from the %s page.", getCaption(page)), null);
 					return false; 
 				}
 			}
@@ -298,31 +316,37 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		} catch (InstantiationException e) {
 			
 			result = false;
+			e.printStackTrace();
 			return null;
 			
 		} catch (IllegalAccessException e) {
 			
 			result = false;
+			e.printStackTrace();
 			return null;
 			
 		} catch (SecurityException e) {
 			
 			result = false;
+			e.printStackTrace();
 			return null;
 			
 		} catch (NoSuchMethodException e) {
 			
 			result = false;
+			e.printStackTrace();
 			return null;
 			
 		} catch (IllegalArgumentException e) {
 			
 			result = false;
+			e.printStackTrace();
 			return null;
 			
 		} catch (InvocationTargetException e) {
 			
 			result = false;
+			e.printStackTrace();
 			return null;
 		}
 	}

@@ -34,6 +34,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.ui.filters.plaintext.common.IInputQueryPage;
+import net.sf.okapi.ui.filters.plaintext.common.InputQueryDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -42,8 +44,15 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * Okapi GUI tester application
@@ -55,17 +64,18 @@ import org.eclipse.swt.widgets.*;
 public class Okapi_GUI_Tester {
 
 	String[] GUI_CLASSES = new String[] {
-			
+
+			net.sf.okapi.ui.filters.table.Editor.class.getName(),
 			net.sf.okapi.ui.filters.plaintext.Editor.class.getName(),
-			net.sf.okapi.steps.ui.textmodification.ParametersEditor.class.getName(),
-//			net.sf.okapi.ui.filters.openxml.Editor.class.getName(),			
-			net.sf.okapi.ui.filters.table.Editor.class.getName()  
-						
-// Commented, because package names differ from those of projects, and java cannot locate the classes			
-//			, net.sf.okapi.ui.filters.openoffice.Editor.class.getName()
-//			, net.sf.okapi.ui.filters.po.Editor.class.getName()
-//			, net.sf.okapi.ui.filters.properties.Editor.class.getName()
-//			, net.sf.okapi.ui.filters.regex.Editor.class.getName()			
+			net.sf.okapi.steps.ui.textmodification.ParametersEditor.class.getName(),									
+			net.sf.okapi.ui.filters.plaintext.common.InputQueryPageInt.class.getName(),
+			net.sf.okapi.ui.filters.plaintext.common.InputQueryPageString.class.getName(),
+			net.sf.okapi.ui.filters.table.AddModifyColumnDefPage.class.getName(),					
+			net.sf.okapi.filters.ui.openoffice.Editor.class.getName(),
+			net.sf.okapi.filters.ui.po.Editor.class.getName(),
+			net.sf.okapi.filters.ui.properties.Editor.class.getName(),
+			net.sf.okapi.ui.filters.openxml.Editor.class.getName(),
+			net.sf.okapi.filters.ui.regex.Editor.class.getName()			
 		};
 
 	private Group grpParameters;
@@ -294,31 +304,42 @@ public class Okapi_GUI_Tester {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		IParametersEditor editor = null;
-		try {
-			editor = (IParametersEditor) c.newInstance();
-			
-		} catch (InstantiationException e) {
-			
-			e.printStackTrace();
-			
-		} catch (IllegalAccessException e) {
-			
-			e.printStackTrace();
-		}		
-		IContext context = new BaseContext();
-		context.setObject("shell", shell);
 		
-		params = editor.createParameters();
-		if (!Util.isEmpty(text.getText()))
-			params.load(Util.toURI(text.getText()), true);
 		
-		if (editor.edit(params, false, context)) {
+		if (IParametersEditor.class.isAssignableFrom(c)) {
 			
-			text_1.setText(params.toString());
+			IParametersEditor editor = null;
+			try {
+				editor = (IParametersEditor) c.newInstance();
+				
+			} catch (InstantiationException e) {
+				
+				e.printStackTrace();
+				
+			} catch (IllegalAccessException e) {
+				
+				e.printStackTrace();
+			}		
+			IContext context = new BaseContext();
+			context.setObject("shell", shell);
+			
+			params = editor.createParameters();
+			if (!Util.isEmpty(text.getText()))
+				params.load(Util.toURI(text.getText()), true);
+			
+			if (editor.edit(params, false, context)) {
+				
+				text_1.setText(params.toString());
+			}
+			else
+				params = null;
 		}
-		else
-			params = null;
+		else if (IInputQueryPage.class.isAssignableFrom(c)) {
+			
+			InputQueryDialog dlg = new InputQueryDialog();
+			dlg.run(shell, c, shell.getText(), "Input a value:", null, null);
+		}
+		
 	}
 	
 	private String fileAsString(String fileName) {

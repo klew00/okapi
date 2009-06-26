@@ -57,7 +57,6 @@ import org.eclipse.swt.widgets.Text;
 public class GeneralTab extends Composite implements IParametersEditorPage {
 	
 	private Group grpExtraction;
-	private Button btnExtractByParagraphs;
 	private Group grpSplicedLines;
 	private Label lblSplicer;
 	private Combo comboSplicer;
@@ -68,10 +67,8 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 	private Spinner edSource;
 	private Label lblTextUnitExtraction;
 	private Label lblSrcGroup;
-	private Button btnHasSplicedLines;
-	private Button btnUseRegularExpression;
-	private Composite composite;
-	private Composite composite_1;
+	private Button btnLines;
+	private Button btnUseRegex;
 	private Label lblSample;
 	private Composite composite_2;
 	private Text edSample;
@@ -82,8 +79,10 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 	private Button chkDotAll;
 	private Button chkIgnoreCase;
 	private Button chkMultiline;
-	@SuppressWarnings("unused")
-	private Composite composite_4;
+	private Button btnPara;
+	private Label label;
+	private FormData formData;
+	private FormData formData_2;
 
 	/**
 	 * Create the composite.
@@ -92,86 +91,117 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 	 */
 	public GeneralTab(Composite parent, int style) {
 		super(parent, SWT.NONE);
-		setLayout(new GridLayout(1, false));
+		setLayout(new GridLayout(2, false));
 		
 		busy = true;
 		
 		grpExtraction = new Group(this, SWT.NONE);
-		grpExtraction.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		grpExtraction.setLayout(new GridLayout(1, false));
-		grpExtraction.setText("Extraction");
+		grpExtraction.setLayout(new FormLayout());
+		grpExtraction.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		grpExtraction.setText("Extraction mode");
 		
-		composite = new Composite(grpExtraction, SWT.NONE);
-		composite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false, 1, 1));
+		btnPara = new Button(grpExtraction, SWT.RADIO);
+		{
+			formData = new FormData();
+			formData.left = new FormAttachment(0, 10);
+			formData.right = new FormAttachment(100, -10);
+			formData.top = new FormAttachment(0, 10);
+			formData.width = 189;
+			btnPara.setLayoutData(formData);
+		}
+		btnPara.setText("Extract by paragraphs");
 		
-		btnExtractByParagraphs = new Button(composite, SWT.CHECK);
-		btnExtractByParagraphs.setLocation(4, 4);
-		btnExtractByParagraphs.setSize(177, 16);
-		btnExtractByParagraphs.setText("Extract by paragraphs");
-		
-		btnHasSplicedLines = new Button(composite, SWT.CHECK);
-		btnHasSplicedLines.addSelectionListener(new SelectionAdapter() {
+		btnLines = new Button(grpExtraction, SWT.RADIO);
+		{
+			formData_2 = new FormData();
+			formData_2.left = new FormAttachment(0, 10);
+			formData_2.right = new FormAttachment(100, -10);
+			formData_2.top = new FormAttachment(btnPara, 6);
+			formData_2.width = 189;
+			btnLines.setLayoutData(formData_2);
+		}
+		btnLines.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				interop();
 			}
 		});
-		btnHasSplicedLines.setLocation(4, 23);
-		btnHasSplicedLines.setSize(181, 16);
-		btnHasSplicedLines.setText("Has spliced lines");
+		btnLines.setText("Extract by lines");
 		
-		btnUseRegularExpression = new Button(composite, SWT.CHECK);
-		btnUseRegularExpression.addSelectionListener(new SelectionAdapter() {
+		btnUseRegex = new Button(grpExtraction, SWT.RADIO);
+		{
+			FormData formData_1 = new FormData();
+			formData_1.left = new FormAttachment(btnPara, 0, SWT.LEFT);
+			formData_1.top = new FormAttachment(btnLines, 6);
+			formData_1.right = new FormAttachment(100, -10);
+			formData_1.width = 189;
+			btnUseRegex.setLayoutData(formData_1);
+		}
+		btnUseRegex.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				interop();
 			}
 		});
-		btnUseRegularExpression.setLocation(4, 43);
-		btnUseRegularExpression.setSize(181, 16);
-		btnUseRegularExpression.setText("Use regular expression");
+		btnUseRegex.setText("Extract with a rule");
 		
 		grpSplicedLines = new Group(this, SWT.NONE);
-		grpSplicedLines.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		grpSplicedLines.setLayout(new GridLayout(1, false));
+		grpSplicedLines.setLayout(new FormLayout());
+		grpSplicedLines.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		grpSplicedLines.setText("Spliced lines");
 		
-		composite_1 = new Composite(grpSplicedLines, SWT.NONE);
-		composite_1.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false, 1, 1));
-		
-		lblSplicer = new Label(composite_1, SWT.NONE);
-		lblSplicer.setLocation(10, 4);
-		lblSplicer.setSize(67, 13);
+		lblSplicer = new Label(grpSplicedLines, SWT.NONE);
+		{
+			FormData formData_1 = new FormData();
+			formData_1.top = new FormAttachment(0, 10);
+			formData_1.left = new FormAttachment(0, 10);
+			formData_1.width = 51;
+			lblSplicer.setLayoutData(formData_1);
+		}
 		lblSplicer.setAlignment(SWT.RIGHT);
 		lblSplicer.setText("Splicer:");
 		
-		comboSplicer = new Combo(composite_1, SWT.NONE);
+		comboSplicer = new Combo(grpSplicedLines, SWT.NONE);
+		{
+			FormData formData_1 = new FormData();
+			formData_1.top = new FormAttachment(lblSplicer, 0, SWT.TOP);
+			formData_1.left = new FormAttachment(lblSplicer, 6);
+			comboSplicer.setLayoutData(formData_1);
+		}
 		comboSplicer.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				interop();
 			}
 		});
-		comboSplicer.setLocation(81, 4);
-		comboSplicer.setSize(93, 21);
-		comboSplicer.setItems(new String[] {"\\", "_", "Custom"});
+		comboSplicer.setItems(new String[] {"None", "Backslash (\\)", "Underscore (_)", "Custom"});
 		//comboSplicer.setText(comboSplicer.getItem(0));
 		comboSplicer.select(0);
-		
-		btnCreateInlineCodes = new Button(composite_1, SWT.CHECK);
-		btnCreateInlineCodes.setLocation(205, 4);
-		btnCreateInlineCodes.setSize(234, 16);
-		btnCreateInlineCodes.setText("Create inline codes for splicers");
-		
-		textSplicer = new Text(composite_1, SWT.BORDER);
-		textSplicer.setLocation(81, 29);
-		textSplicer.setSize(93, 19);
-		composite_1.setTabList(new Control[]{comboSplicer, btnCreateInlineCodes, textSplicer});
+		//		composite_1.setTabList(new Control[]{comboSplicer, btnCreateInlineCodes, textSplicer});
+				
+				textSplicer = new Text(grpSplicedLines, SWT.BORDER);
+				{
+					FormData formData_1 = new FormData();
+					formData_1.right = new FormAttachment(comboSplicer, 0, SWT.RIGHT);
+					formData_1.top = new FormAttachment(comboSplicer, 6);
+					formData_1.left = new FormAttachment(comboSplicer, 0, SWT.LEFT);
+					textSplicer.setLayoutData(formData_1);
+				}
+				
+				btnCreateInlineCodes = new Button(grpSplicedLines, SWT.CHECK);
+				{
+					FormData formData_1 = new FormData();
+					formData_1.right = new FormAttachment(100, -10);
+					formData_1.top = new FormAttachment(textSplicer, 6);
+					formData_1.left = new FormAttachment(comboSplicer, 0, SWT.LEFT);
+					btnCreateInlineCodes.setLayoutData(formData_1);
+				}
+				btnCreateInlineCodes.setText("Create inline codes for splicers");
 		
 		grpRegex = new Group(this, SWT.NONE);
-		grpRegex.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		grpRegex.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		grpRegex.setLayout(new FormLayout());
-		grpRegex.setText("Regular expression");
+		grpRegex.setText("Extraction rule");
 		
 		composite_2 = new Composite(grpRegex, SWT.NONE);
-		composite_2.setLayout(new GridLayout(9, false));
+		composite_2.setLayout(new GridLayout(5, false));
 		FormData formData_4 = new FormData();
 		formData_4.top = new FormAttachment(0, 4);
 		formData_4.right = new FormAttachment(100);
@@ -179,13 +209,10 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 		formData_4.bottom = new FormAttachment(100, -4);
 		formData_4.width = 414;
 		composite_2.setLayoutData(formData_4);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
 		
 		lblTextUnitExtraction = new Label(composite_2, SWT.NONE);
 		lblTextUnitExtraction.setAlignment(SWT.RIGHT);
-		lblTextUnitExtraction.setText("Extraction rule:");
+		lblTextUnitExtraction.setText("Regular expression:");
 		
 		edExpression = new Text(composite_2, SWT.BORDER);
 		edExpression.addModifyListener(new ModifyListener() {
@@ -194,8 +221,9 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 			}
 		});
 		edExpression.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
+		
+		label = new Label(composite_2, SWT.NONE);
+		label.setText("    ");
 		
 		lblSrcGroup = new Label(composite_2, SWT.NONE);
 		lblSrcGroup.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
@@ -209,17 +237,10 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 			}
 		});
 		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
 		
 		lblSample = new Label(composite_2, SWT.NONE);
 		lblSample.setAlignment(SWT.RIGHT);
 		lblSample.setText("Sample:");
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
@@ -233,7 +254,6 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 		});
 		edSample.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		edSample.setText("");
-		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
 		
 		composite_3 = new Composite(composite_2, SWT.NONE);
@@ -265,19 +285,14 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 		});
 		chkMultiline.setText("Multi-line");
 		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
 		
 		edResult = new Text(composite_2, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 		edResult.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		edResult.setEditable(false);
 		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
-		
-		composite_4 = new Composite(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
-		composite_2.setTabList(new Control[]{edExpression, edSource, edSample, composite_3, edResult});
+//		composite_2.setTabList(new Control[]{edExpression, edSource, edSample, composite_3, edResult});
 		
 		busy = false;
 				
@@ -364,29 +379,29 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 
 	public void interop() {
 
-		boolean slEnabled = btnHasSplicedLines.getEnabled();
-		boolean slSelected = btnHasSplicedLines.getSelection();
+		boolean slEnabled = btnLines.getEnabled();
+		boolean slSelected = btnLines.getSelection();
 		
-		boolean reEnabled = btnUseRegularExpression.getEnabled();
-		boolean reSelected = btnUseRegularExpression.getSelection();
+		boolean reEnabled = btnUseRegex.getEnabled();
+		boolean reSelected = btnUseRegex.getSelection();
 				
 		if (slSelected) {
 			
 			SWTUtils.setAllEnabled(grpRegex, false);
 			SWTUtils.setAllEnabled(grpSplicedLines, true);
 
-			btnExtractByParagraphs.setSelection(false);
-			btnExtractByParagraphs.setEnabled(false);
+//			btnExtractByParagraphs.setSelection(false);
+//			btnExtractByParagraphs.setEnabled(false);
 			
-			btnUseRegularExpression.setSelection(false);
-			btnUseRegularExpression.setEnabled(false);
+			btnUseRegex.setSelection(false);
+			btnUseRegex.setEnabled(false);
 		} else {
 					
 			SWTUtils.setAllEnabled(grpSplicedLines, false);
 			
-			slEnabled = btnHasSplicedLines.getEnabled(); // Update state
-			if (slEnabled) btnExtractByParagraphs.setEnabled(true);
-			if (slEnabled) btnUseRegularExpression.setEnabled(true);
+			slEnabled = btnLines.getEnabled(); // Update state
+//			if (slEnabled) btnExtractByParagraphs.setEnabled(true);
+			if (slEnabled) btnUseRegex.setEnabled(true);
 		}
 		
 		if (reSelected) {
@@ -394,23 +409,23 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 			SWTUtils.setAllEnabled(grpRegex, true);
 			SWTUtils.setAllEnabled(grpSplicedLines, false);
 			
-			btnExtractByParagraphs.setSelection(false);
-			btnExtractByParagraphs.setEnabled(false);
+//			btnExtractByParagraphs.setSelection(false);
+//			btnExtractByParagraphs.setEnabled(false);
 			
-			btnHasSplicedLines.setSelection(false);
-			btnHasSplicedLines.setEnabled(false);			
+			btnLines.setSelection(false);
+			btnLines.setEnabled(false);			
 			
 			edExpression.setFocus();
 		} else {
 						
 			SWTUtils.setAllEnabled(grpRegex, false);
 			
-			reEnabled = btnUseRegularExpression.getEnabled(); // Update state
-			if (reEnabled) btnExtractByParagraphs.setEnabled(true);
-			if (reEnabled) btnHasSplicedLines.setEnabled(true);
+			reEnabled = btnUseRegex.getEnabled(); // Update state
+//			if (reEnabled) btnExtractByParagraphs.setEnabled(true);
+			if (reEnabled) btnLines.setEnabled(true);
 		}
 	
-		slEnabled = btnHasSplicedLines.getEnabled(); // Update state
+		slEnabled = btnLines.getEnabled(); // Update state
 		if (comboSplicer.getSelectionIndex() == 2 && slSelected) {
 							
 			textSplicer.setEnabled(true);
@@ -430,27 +445,27 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 				
 			if (c == net.sf.okapi.filters.plaintext.paragraphs.Parameters.class) {
 				
-				btnExtractByParagraphs.setSelection(true);
-				btnHasSplicedLines.setSelection(false);
-				btnUseRegularExpression.setSelection(false);
+				//btnExtractByParagraphs.setSelection(true);
+				btnLines.setSelection(false);
+				btnUseRegex.setSelection(false);
 			}
 			else if (c == net.sf.okapi.filters.plaintext.spliced.Parameters.class) {
 				
-				btnExtractByParagraphs.setSelection(false);
-				btnHasSplicedLines.setSelection(true);
-				btnUseRegularExpression.setSelection(false);
+				//btnExtractByParagraphs.setSelection(false);
+				btnLines.setSelection(true);
+				btnUseRegex.setSelection(false);
 			}		
 			else if (c == net.sf.okapi.filters.plaintext.regex.Parameters.class) {
 				
-				btnExtractByParagraphs.setSelection(false);
-				btnHasSplicedLines.setSelection(false);
-				btnUseRegularExpression.setSelection(true);
+				//btnExtractByParagraphs.setSelection(false);
+				btnLines.setSelection(false);
+				btnUseRegex.setSelection(true);
 			}			
 			else {
 				
-				btnExtractByParagraphs.setSelection(false);
-				btnHasSplicedLines.setSelection(false);
-				btnUseRegularExpression.setSelection(false);
+				//btnExtractByParagraphs.setSelection(false);
+				btnLines.setSelection(false);
+				btnUseRegex.setSelection(false);
 			}
 			
 		} 
@@ -459,7 +474,7 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 			net.sf.okapi.filters.plaintext.paragraphs.Parameters params =
 				(net.sf.okapi.filters.plaintext.paragraphs.Parameters) parameters;
 			
-			btnExtractByParagraphs.setSelection(params.extractParagraphs);
+			//btnExtractByParagraphs.setSelection(params.extractParagraphs);
 		}
 		else if (parameters instanceof net.sf.okapi.filters.plaintext.spliced.Parameters) {
 			
@@ -502,14 +517,14 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 			
 			CompoundParameters params = (CompoundParameters) parameters;
 			
-			if (btnHasSplicedLines.getSelection())
+			if (btnLines.getSelection())
 				params.setParametersClass(net.sf.okapi.filters.plaintext.spliced.Parameters.class);
 			
-			else if (btnUseRegularExpression.getSelection())
+			else if (btnUseRegex.getSelection())
 				params.setParametersClass(net.sf.okapi.filters.plaintext.regex.Parameters.class);
 			
-			else if (btnExtractByParagraphs.getSelection())
-				params.setParametersClass(net.sf.okapi.filters.plaintext.paragraphs.Parameters.class);
+//			else if (btnExtractByParagraphs.getSelection())
+//				params.setParametersClass(net.sf.okapi.filters.plaintext.paragraphs.Parameters.class);
 			
 			else
 				params.setParametersClass(net.sf.okapi.filters.plaintext.base.Parameters.class);
@@ -519,7 +534,7 @@ public class GeneralTab extends Composite implements IParametersEditorPage {
 			net.sf.okapi.filters.plaintext.paragraphs.Parameters params =
 				(net.sf.okapi.filters.plaintext.paragraphs.Parameters) parameters;
 			
-			params.extractParagraphs = btnExtractByParagraphs.getSelection();
+//			params.extractParagraphs = btnExtractByParagraphs.getSelection();
 		}
 		else if (parameters instanceof net.sf.okapi.filters.plaintext.spliced.Parameters) {
 			

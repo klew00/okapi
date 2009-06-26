@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.table;
 
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.filters.table.Parameters;
 import net.sf.okapi.filters.plaintext.common.CompoundFilter;
 import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
 import net.sf.okapi.filters.table.fwc.FixedWidthColumnsFilter;
@@ -44,7 +45,8 @@ public class TableFilter extends CompoundFilter {
 		super();
 		
 		setName(FILTER_NAME);
-		setMimeType(FILTER_MIME);		
+		setMimeType(FILTER_MIME);
+		setParameters(new Parameters());	// Table Filter parameters
 
 		addConfiguration(true, 
 				FILTER_CONFIG,

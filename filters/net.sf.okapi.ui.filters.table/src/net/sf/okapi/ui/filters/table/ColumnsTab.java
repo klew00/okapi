@@ -22,21 +22,30 @@ package net.sf.okapi.ui.filters.table;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.ui.filters.plaintext.common.IParametersEditorPage;
+import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
+import net.sf.okapi.ui.filters.plaintext.common.Util2;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * 
@@ -56,96 +65,150 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 	private TableColumn tblclmnEnd;
 	private Group grpExtractionMode;
 	private Group grpNumberOfColumns;
-	private Group grpColumnDefinitions;
-	private Composite composite;
-	private Composite composite_1;
-	private Button btnExtractByColumn;
-	private Button btnExtractFromAll;
-	private Button btnDoNotExtract;
-	private Button btnFixedNumber;
-	private Button btnDefinedByColumn;
-	private Button btnDefinedByValues;
-	private Spinner spinner;
-	private Label label;
-	private Group grpType;
-	private Label lblSourceIndex;
-	private Spinner spinner_1;
-	private Label lblDefaultIdSuffix;
-	private Text text;
-	private Label lblLanguage;
-	private Text text_1;
-	private Spinner spinner_2;
-	private Spinner spinner_3;
-	private Label lblEndPosition;
+	private Group colDefs;
+	private Button defs;
+	private Button all;
+	private Button fix;
+	private Button names;
+	private Button vals;
+	private Spinner num;
 	private Button btnAdd;
 	private Button btnRemove;
-	private Label lblSpacer;
+	private Button btnModify;
 	private Composite composite_2;
-	private Button btnSourceText;
-	private Button btnSourceId;
-	private Button btnTargetText;
-	private Button btnComment;
-	private Button btnRecordId;
+	private Label label_1;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public ColumnsTab(Composite parent, int style) {
+	public ColumnsTab(final Composite parent, int style) {
+		
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
 		
 		grpExtractionMode = new Group(this, SWT.NONE);
+		grpExtractionMode.setLayout(new FormLayout());
 		grpExtractionMode.setText("Extraction mode");
-		grpExtractionMode.setLayout(new GridLayout(1, false));
 		grpExtractionMode.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		
-		composite = new Composite(grpExtractionMode, SWT.NONE);
-		composite.setLayout(new GridLayout(1, false));
-		composite.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false, 1, 1));
+		defs = new Button(grpExtractionMode, SWT.RADIO);
+		defs.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				interop();
+			}
+		});
+		{
+			FormData formData = new FormData();
+			formData.right = new FormAttachment(100, -10);
+			formData.top = new FormAttachment(0, 10);
+			formData.left = new FormAttachment(0, 10);
+			defs.setLayoutData(formData);
+		}
+		defs.setText("Extract by column definitions");
 		
-		btnExtractByColumn = new Button(composite, SWT.RADIO);
-		btnExtractByColumn.setText("Extract by column definitions");
-		
-		btnExtractFromAll = new Button(composite, SWT.RADIO);
-		btnExtractFromAll.setText("Extract from all columns (create separate text units)");
-		
-		btnDoNotExtract = new Button(composite, SWT.RADIO);
-		btnDoNotExtract.setText("Do not extract from any column");
+		all = new Button(grpExtractionMode, SWT.RADIO);
+		all.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				interop();
+			}
+		});
+		{
+			FormData formData = new FormData();
+			formData.right = new FormAttachment(defs, 0, SWT.RIGHT);
+			formData.top = new FormAttachment(defs, 6);
+			formData.left = new FormAttachment(defs, 0, SWT.LEFT);
+			all.setLayoutData(formData);
+		}
+		all.setText("Extract from all columns (create separate text units)");
 		
 		grpNumberOfColumns = new Group(this, SWT.NONE);
+		grpNumberOfColumns.setLayout(new FormLayout());
 		grpNumberOfColumns.setText("Number of columns");
-		grpNumberOfColumns.setLayout(new GridLayout(1, false));
 		grpNumberOfColumns.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		
-		composite_1 = new Composite(grpNumberOfColumns, SWT.NONE);
-		composite_1.setLayout(new GridLayout(3, false));
-		composite_1.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false, 1, 1));
+		fix = new Button(grpNumberOfColumns, SWT.RADIO);
+		fix.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				interop();
+			}
+		});
+		{
+			FormData formData = new FormData();
+			formData.width = 157;
+			formData.top = new FormAttachment(0, 10);
+			formData.left = new FormAttachment(0, 10);
+			fix.setLayoutData(formData);
+		}
+		fix.setText("Fixed number of columns");
 		
-		btnFixedNumber = new Button(composite_1, SWT.RADIO);
-		btnFixedNumber.setText("Fixed number of columns");
+		num = new Spinner(grpNumberOfColumns, SWT.BORDER);
+		{
+			FormData formData = new FormData();
+			formData.top = new FormAttachment(fix, 0, SWT.TOP);
+			formData.left = new FormAttachment(fix, 10);
+			num.setLayoutData(formData);
+		}
+		num.setMinimum(1);
 		
-		label = new Label(composite_1, SWT.NONE);
-		label.setText("         ");
+		names = new Button(grpNumberOfColumns, SWT.RADIO);
+		names.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				interop();
+			}
+		});
+		{
+			FormData formData = new FormData();
+			formData.top = new FormAttachment(fix, 6);
+			formData.left = new FormAttachment(fix, 0, SWT.LEFT);
+			names.setLayoutData(formData);
+		}
+		names.setText("Defined by column names");
 		
-		spinner = new Spinner(composite_1, SWT.BORDER);
+		vals = new Button(grpNumberOfColumns, SWT.RADIO);
+		vals.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				interop();
+			}
+		});
+		{
+			FormData formData = new FormData();
+			formData.top = new FormAttachment(names, 6);
+			formData.left = new FormAttachment(fix, 0, SWT.LEFT);
+			vals.setLayoutData(formData);
+		}
+		vals.setText("Defined by values (may vary in different rows)");
 		
-		btnDefinedByColumn = new Button(composite_1, SWT.RADIO);
-		btnDefinedByColumn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-		btnDefinedByColumn.setText("Defined by column names");
+		colDefs = new Group(this, SWT.NONE);
+		colDefs.setText("Column definitions");
+		colDefs.setLayout(new GridLayout(2, false));
+		colDefs.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 2, 1));
 		
-		btnDefinedByValues = new Button(composite_1, SWT.RADIO);
-		btnDefinedByValues.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-		btnDefinedByValues.setText("Defined by values (may vary in different rows)");
-		
-		grpColumnDefinitions = new Group(this, SWT.NONE);
-		grpColumnDefinitions.setText("Column definitions");
-		grpColumnDefinitions.setLayout(new GridLayout(4, false));
-		grpColumnDefinitions.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 2, 1));
-		
-		table = new Table(grpColumnDefinitions, SWT.BORDER | SWT.FULL_SELECTION);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 10));
+		table = new Table(colDefs, SWT.BORDER | SWT.FULL_SELECTION);
+		table.addMouseListener(new MouseAdapter() {
+			public void mouseDoubleClick(MouseEvent e) {
+								
+				addModifyRow(table.getItem(new Point(e.x, e.y)));
+			}
+		});
+		table.addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				updateColumnWidths();
+			}			
+		});
+		table.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				interop();
+			}
+		});
+		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4));
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		
@@ -154,20 +217,20 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 		tblclmnColumn.setText("Column #");
 		
 		tblclmnType = new TableColumn(table, SWT.NONE);
-		tblclmnType.setWidth(118);
+		tblclmnType.setWidth(93);
 		tblclmnType.setText("Type");
 		
 		tblclmnSource = new TableColumn(table, SWT.NONE);
-		tblclmnSource.setWidth(83);
-		tblclmnSource.setText("Source Index");
+		tblclmnSource.setWidth(95);
+		tblclmnSource.setText("Source column");
 		
 		tblclmnLanguage = new TableColumn(table, SWT.NONE);
-		tblclmnLanguage.setWidth(117);
+		tblclmnLanguage.setWidth(84);
 		tblclmnLanguage.setText("Language");
 		
 		tblclmnSuffix = new TableColumn(table, SWT.NONE);
-		tblclmnSuffix.setWidth(106);
-		tblclmnSuffix.setText("Default ID Suffix");
+		tblclmnSuffix.setWidth(116);
+		tblclmnSuffix.setText("ID suffix");
 		
 		tblclmnStart = new TableColumn(table, SWT.NONE);
 		tblclmnStart.setWidth(47);
@@ -176,94 +239,99 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 		tblclmnEnd = new TableColumn(table, SWT.NONE);
 		tblclmnEnd.setWidth(47);
 		tblclmnEnd.setText("End");
-		new Label(grpColumnDefinitions, SWT.NONE);
 		
-		grpType = new Group(grpColumnDefinitions, SWT.NONE);
-		grpType.setLayout(new GridLayout(1, false));
-		grpType.setText("Type");
-		grpType.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
-		
-		composite_2 = new Composite(grpType, SWT.NONE);
+		composite_2 = new Composite(colDefs, SWT.NONE);
+		composite_2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		composite_2.setLayout(new GridLayout(1, false));
-		composite_2.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false, 1, 1));
 		
-		btnSourceText = new Button(composite_2, SWT.RADIO);
-		btnSourceText.setText("Source text");
+		btnAdd = new Button(composite_2, SWT.NONE);
+		btnAdd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnAdd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+							
+				addModifyRow(null);
+			}
+		});
+		btnAdd.setText("Add...");
 		
-		btnSourceId = new Button(composite_2, SWT.RADIO);
-		btnSourceId.setText("Source ID");
+		btnModify = new Button(composite_2, SWT.NONE);
+		btnModify.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnModify.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				addModifyRow(table.getItem(table.getSelectionIndex()));
+			}
+		});
+		btnModify.setText("Modify...");
 		
-		btnTargetText = new Button(composite_2, SWT.RADIO);
-		btnTargetText.setText("Target text");
-		
-		btnComment = new Button(composite_2, SWT.RADIO);
-		btnComment.setText("Comment");
-		
-		btnRecordId = new Button(composite_2, SWT.RADIO);
-		btnRecordId.setText("Record ID");
-		new Label(grpColumnDefinitions, SWT.NONE);
-		
-		lblSourceIndex = new Label(grpColumnDefinitions, SWT.NONE);
-		lblSourceIndex.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblSourceIndex.setText("Source index:");
-		
-		spinner_1 = new Spinner(grpColumnDefinitions, SWT.BORDER);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		
-		lblDefaultIdSuffix = new Label(grpColumnDefinitions, SWT.NONE);
-		lblDefaultIdSuffix.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblDefaultIdSuffix.setText("Default ID suffix:");
-		
-		text = new Text(grpColumnDefinitions, SWT.BORDER);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		
-		lblLanguage = new Label(grpColumnDefinitions, SWT.NONE);
-		lblLanguage.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblLanguage.setText("Language:");
-		
-		text_1 = new Text(grpColumnDefinitions, SWT.BORDER);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		Label lblStartPosition = new Label(grpColumnDefinitions, SWT.NONE);
-		lblStartPosition.setText("Start position:");
-		lblStartPosition.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		
-		spinner_2 = new Spinner(grpColumnDefinitions, SWT.BORDER);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		
-		lblEndPosition = new Label(grpColumnDefinitions, SWT.NONE);
-		lblEndPosition.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblEndPosition.setText("End position:");
-		
-		spinner_3 = new Spinner(grpColumnDefinitions, SWT.BORDER);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		
-		btnAdd = new Button(grpColumnDefinitions, SWT.NONE);
-		btnAdd.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, true, 1, 1));
-		btnAdd.setText("Add");
-		new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		
-		btnRemove = new Button(grpColumnDefinitions, SWT.NONE);
-		btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
+		btnRemove = new Button(composite_2, SWT.NONE);
+		btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnRemove.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				int index = table.getSelectionIndex();
+				table.remove(index);
+				
+				if (index > table.getItemCount() - 1) index = table.getItemCount() - 1;
+				if (index > -1)	table.select(index);
+				interop();
+			}
+		});
 		btnRemove.setText("Remove");
-		new Label(grpColumnDefinitions, SWT.NONE);
 		
-		lblSpacer = new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
-		new Label(grpColumnDefinitions, SWT.NONE);
+		label_1 = new Label(composite_2, SWT.NONE);
+		label_1.setText("                          ");
+		new Label(colDefs, SWT.NONE);
+		new Label(colDefs, SWT.NONE);
+		new Label(colDefs, SWT.NONE);		
+	}
+
+	protected void addModifyRow(TableItem item) {
+		
+		if (item == null) { // Add new item
+			table.setSelection(-1);
+			
+			if (SWTUtils.inputQuery(AddModifyColumnDefPage.class, getShell(), "Add column definition", 
+					new String[] {Util2.intToStr(SWTUtils.getColumnMaxValue(table, 0) + 1), "Source", "", "", "", "0", "0"}, 
+					null)) {
+				
+				item = new TableItem (table, SWT.NONE);
+				
+				item.setText((String []) SWTUtils.getResult());
+				table.select(table.indexOf(item));				
+			}
+			interop();  // Selection changes
+		}
+		else {
+			if (SWTUtils.inputQuery(AddModifyColumnDefPage.class, getShell(), "Modify column definition", 
+					SWTUtils.getText(item),
+					null)) {					
+				
+				item.setText((String []) SWTUtils.getResult());					
+				table.select(table.indexOf(item));
+				interop();
+			}
+		}
+	}
+
+	protected void updateColumnWidths() {
+		
+		double[] columnPoints = {1.3, 2, 1.5, 2, 3, 1, 1};
+		float pointsWidth = 0;
+		
+		for (int i = 0; i < table.getColumnCount(); i++)
+			pointsWidth += ((i < columnPoints.length - 1) ? columnPoints[i]: 1);
+			
+		float coeff = table.getClientArea().width / pointsWidth;
+		
+		for (int i = 0; i < table.getColumnCount(); i++)
+			table.getColumn(i).setWidth((int)(((i < columnPoints.length - 1) ? columnPoints[i]: 1) * coeff));
 		
 	}
 
 	@Override
 	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
+		// Disable the check that prevents sub-classing of SWT components
 	}
 
 	public boolean canClose(boolean isOK) {
@@ -272,8 +340,12 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 	}
 
 	public void interop() {
-		// TODO Auto-generated method stub
 		
+		SWTUtils.setAllEnabled(colDefs, defs.getSelection());
+		num.setEnabled(fix.getSelection());
+		
+		btnModify.setEnabled(table.getItemCount() > 0 && table.getSelectionIndex() != -1);
+		btnRemove.setEnabled(btnModify.getEnabled());			
 	}
 
 	public boolean load(IParameters parameters) {

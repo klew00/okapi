@@ -18,42 +18,23 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.table;
-
-import org.eclipse.swt.widgets.TabFolder;
-
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.ui.filters.plaintext.OptionsTab;
-import net.sf.okapi.ui.filters.plaintext.common.AbstractParametersEditor;
+package net.sf.okapi.ui.filters.plaintext.common;
 
 /**
  * 
  * 
- * @version 0.1, 19.06.2009
+ * @version 0.1, 23.06.2009
  * @author Sergei Vasilyev
  */
 
-public class Editor extends AbstractParametersEditor {
-
-	@Override
-	protected void createPages(TabFolder pageContainer) {
-		
-		addPage("Table", TableTab.class);
-		addPage("Columns", ColumnsTab.class);
-		addPage("Options", OptionsTab.class);
-	}
-
-	@Override
-	public IParameters createParameters() {
-		
-		return new net.sf.okapi.filters.table.Parameters();
-	}
-
-	@Override
-	protected String getCaption() {
-		
-		return "Table Filter Parameters";
-	}
-
+public interface IInputQueryPage {
+	
+	public void setPrompt(String prompt);
+	
+	public boolean load(Object data);
+	
+	public boolean save(Object data);
+	
+	public void interop();
 }
 

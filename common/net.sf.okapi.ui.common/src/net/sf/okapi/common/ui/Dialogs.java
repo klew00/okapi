@@ -155,5 +155,15 @@ public class Dialogs {
 		dlg.setText(Res.getString("dialogs.errorCaption")); //$NON-NLS-1$
 		dlg.open();
 	}
+	
+	static public void showWarning (Shell shell,
+			String message,
+			String details)
+		{
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING);
+			dlg.setMessage((message==null) ? "The warning is null." : message); //$NON-NLS-1$
+			dlg.setText(Res.getString("dialogs.warningCaption")); //$NON-NLS-1$
+			dlg.open();
+		}
 		
 }

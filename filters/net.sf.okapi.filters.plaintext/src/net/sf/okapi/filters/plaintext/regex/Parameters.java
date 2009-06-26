@@ -31,9 +31,10 @@ import java.util.regex.Pattern;
 
 public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 			
-	public static final String	DEF_RULE = "^(.*?)$";
-	public static final int		DEF_GROUP = 1;
-	public static final String	DEF_SAMPLE = "Line 1\nLine 2\nLine 3\nLine 4";
+	public static final String	DEF_RULE = "(^(?=.+))(.*?)$";
+	public static final int		DEF_GROUP = 2;
+	public static final String	DEF_SAMPLE = "\nThis is the first sentence. And this is the second one.\n" +	
+		"Second paragraph. Each one ends at the line-break.\n\nThird paragraph.\nAnd the last paragraph may have no line-break.";
 	public static final int		DEF_OPTIONS = Pattern.MULTILINE;
 	
 	/**

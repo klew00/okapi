@@ -118,7 +118,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	public int sendColumnsMode = SEND_COLUMNS_ALL;
 	
 	/**
-	 * Index (1-based) of the column containing an optional record ID (or a key), represented by the current row in the table. 
+	 * Index (1-based) of the column containing an optional record ID (or a key) of the current row in the table. 
 	 */
 	public int recordIdColumn = 0;
 	
@@ -140,8 +140,8 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	public String sourceIdColumns = "";
 
 	/**
-	 * If there is the mainIdColumn index, and a source ID for the given column is not specified in the sourceIdColumns,
-	 * then the source ID for that column is compiled of the value in mainIdColumn column, and the corresponding suffix in the
+	 * If there is the recordIdColumn index, and a source ID for the given column is not specified in the sourceIdColumns,
+	 * then the source ID for that column is compiled of the value in recordIdColumn column, and the corresponding suffix in the
 	 * sourceIdSuffixes. The source IDs become names of TU resources. 
 	 */
 	public String sourceIdSuffixes = "";

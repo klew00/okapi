@@ -1,5 +1,9 @@
 package net.sf.okapi.filters.plaintext.tests.common;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 
 import net.sf.okapi.common.Util;

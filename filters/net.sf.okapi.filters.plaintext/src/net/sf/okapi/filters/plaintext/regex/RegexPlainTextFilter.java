@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.plaintext.regex;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.sf.okapi.common.Event;
@@ -29,6 +30,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -83,13 +85,14 @@ public class RegexPlainTextFilter extends AbstractFilter {
 		
 		// Load the default line extraction rule from a file to regexParams
 		URL url = RegexPlainTextFilter.class.getResource("def_line_extraction_rule.fprm");
-		if (url == null) return;
-		
-		String root = Util.getDirectoryName(url.getPath());
-		
-		regexParams.load(Util.toURI(root + "/def_line_extraction_rule.fprm"), false);		
+        if (url == null) return;
+        try {
+                regexParams.load(url.toURI(), false);
+        }
+        catch (URISyntaxException e) {
+                throw new OkapiIllegalFilterOperationException(e);
+        } 
 	}
-
 
 	/**
 	 * Configures an internal line extractor. 

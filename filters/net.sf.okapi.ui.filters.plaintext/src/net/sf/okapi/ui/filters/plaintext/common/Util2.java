@@ -18,42 +18,37 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.table;
+package net.sf.okapi.ui.filters.plaintext.common;
 
-import org.eclipse.swt.widgets.TabFolder;
+import net.sf.okapi.common.Util;
 
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.ui.filters.plaintext.OptionsTab;
-import net.sf.okapi.ui.filters.plaintext.common.AbstractParametersEditor;
+public class Util2 {
 
-/**
- * 
- * 
- * @version 0.1, 19.06.2009
- * @author Sergei Vasilyev
- */
-
-public class Editor extends AbstractParametersEditor {
-
-	@Override
-	protected void createPages(TabFolder pageContainer) {
+// Conversion
+	public static String intToStr(int intValue) {
 		
-		addPage("Table", TableTab.class);
-		addPage("Columns", ColumnsTab.class);
-		addPage("Options", OptionsTab.class);
+		return String.valueOf(intValue);
+	}
+	
+	public static int strToInt(String stringValue, int intDefault) {
+	
+		if (Util.isEmpty(stringValue))
+			return intDefault;
+		
+		try {
+			return Integer.valueOf(stringValue);
+		}
+		catch (NumberFormatException e) {
+			
+			return intDefault; 
+		}
+		
 	}
 
-	@Override
-	public IParameters createParameters() {
+// Flags	
+	public static boolean checkFlag(int intValue, int flag) {
 		
-		return new net.sf.okapi.filters.table.Parameters();
+		return (intValue & flag) == flag;
 	}
-
-	@Override
-	protected String getCaption() {
-		
-		return "Table Filter Parameters";
-	}
-
+	
 }
-
