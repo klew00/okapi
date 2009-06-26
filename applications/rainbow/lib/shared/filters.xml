@@ -24,7 +24,6 @@
 <filter id="okf_openxml"
   name="(BETA) MS-Office 2007 Filter"
   inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
-  editorClass="net.sf.okapi.ui.filters.openxml.Editor"
  >Filter for Microsoft Office 2007 documents such as DOCX, XLSX, and PPTX.</filter>
  
  <filter id="okf_odf"
@@ -96,6 +95,10 @@
  <parametersEditor
   parametersClass="net.sf.okapi.filters.regex.Parameters"
   editorClass="net.sf.okapi.filters.ui.regex.Editor" />
+ 
+ <parametersEditor
+  parametersClass="net.sf.okapi.filters.openxml.Parameters"
+  editorClass="net.sf.okapi.ui.filters.openxml.Editor" />
  
  <parametersEditor
   parametersClass="net.sf.okapi.filters.openoffice.Parameters"
