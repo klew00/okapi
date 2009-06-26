@@ -12,6 +12,7 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
+import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.RawDocumentWriterStep;
 import net.sf.okapi.steps.copysourcetotarget.CopySourceToTargetStep;
@@ -84,12 +85,13 @@ public class MultistepPipelineTest {
 		rawDoc.setFilterConfigId("okf_xml");
 		driver.addBatchItem(rawDoc, getOutputUri("test04.xml"), "UTF-8");
 
+		driver.processBatch();
+		
 		assertTrue((new File(getOutputUri("test01.xml"))).exists());
 		assertTrue((new File(getOutputUri("test02.xml"))).exists());
 		assertTrue((new File(getOutputUri("test03.xml"))).exists());
 		assertTrue((new File(getOutputUri("test04.xml"))).exists());
-		
-		driver.processBatch();
+				
 		driver.clearItems();
 		driver.clearSteps();
 	}
@@ -149,11 +151,13 @@ public class MultistepPipelineTest {
 	}
 	
 	@Test
-	public void copySourceToTarget() throws URISyntaxException {			
+	public void copySourceToTargetPipeline() throws URISyntaxException {			
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		CopySourceToTargetStep copySourceToTargetStep = new CopySourceToTargetStep();
-		copySourceToTargetStep.getParameters().targetLanguage = "eu_ES";	
-		
+		copySourceToTargetStep.getParameters().targetLanguage = "eu_ES";
+		driver.addStep(copySourceToTargetStep);
+		driver.addStep(new FilterEventsWriterStep());
+						
 		// Set the info for the input and output
 		RawDocument rawDoc = new RawDocument(getUri("Test01.properties"), "UTF-8", "en");
 		rawDoc.setFilterConfigId("okf_properties");
@@ -166,6 +170,15 @@ public class MultistepPipelineTest {
 		rawDoc = new RawDocument(getUri("Test03.properties"), "UTF-8", "en");
 		rawDoc.setFilterConfigId("okf_properties");
 		driver.addBatchItem(rawDoc, getOutputUri("Test03.properties"), "UTF-8");
+		
+		driver.processBatch();	
+		
+		assertTrue((new File(getOutputUri("Test01.properties"))).exists());
+		assertTrue((new File(getOutputUri("Test02.propertiesl"))).exists());
+		assertTrue((new File(getOutputUri("Test03.properties"))).exists());
+
+		driver.clearItems();
+		driver.clearSteps();
 	}
 	
 	private URI getUri(String fileName) throws URISyntaxException {
@@ -174,8 +187,8 @@ public class MultistepPipelineTest {
 	}
 
 	private URI getOutputUri(String fileName) {
-		URL url = MultistepPipelineTest.class.getResource("/test01.xml");
-		String root = Util.getDirectoryName(url.getPath());
-		return new File(root + "/out_" + fileName).toURI();
+		File f = new File(Util.getTempDirectory() + "/fileName");
+		f.deleteOnExit();
+		return f.toURI();
 	}
 }

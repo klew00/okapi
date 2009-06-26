@@ -28,43 +28,48 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
- * Converts a {@link RawDocument} into filter events.
- * This class implements the {@link net.sf.okapi.common.pipeline.IPipelineStep}
- * interface for a step that takes a {@link RawDocument} and to generate its 
- * corresponding events either: a provided {@link IFilter} implementation, or
- * the filter configuration mapper accessible through the pipeline's context.
+ * Converts a {@link RawDocument} into filter events. This class implements the
+ * {@link net.sf.okapi.common.pipeline.IPipelineStep} interface for a step that
+ * takes a {@link RawDocument} and to generate its corresponding events either:
+ * a provided {@link IFilter} implementation, or the filter configuration mapper
+ * accessible through the pipeline's context.
+ * 
  * @see FilterEventsToRawDocumentStep
- * @see FilterEventsWriterStep 
+ * @see FilterEventsWriterStep
  */
 public class RawDocumentToFilterEventsStep extends BasePipelineStep {
-	
+
 	private IFilter filter;
 	private boolean filterfromSetFilter;
 	private boolean isDone;
 
 	/**
-	 * Creates a new RawDocumentToFilterEventsStep object.
-	 * This constructor is needed to be able to instantiate an object from newInstance()
+	 * Creates a new RawDocumentToFilterEventsStep object. This constructor is
+	 * needed to be able to instantiate an object from newInstance()
 	 */
-	public RawDocumentToFilterEventsStep () {
+	public RawDocumentToFilterEventsStep() {
 	}
-	
+
 	/**
 	 * Creates a new RawDocumentToFilterEventsStep object with a given filter.
 	 * Use this constructor to create an object that is using a filter set using
 	 * the one provided here, or using {@link #setFilter(IFilter)}, not using
 	 * the filter configuration mapper of the pipeline context.
-	 * @param filter the filter to set.
+	 * 
+	 * @param filter
+	 *            the filter to set.
 	 */
-	public RawDocumentToFilterEventsStep (IFilter filter) {
+	public RawDocumentToFilterEventsStep(IFilter filter) {
 		setFilter(filter);
 	}
-	
+
 	/**
 	 * Sets the filter for this RawDocumentToEventsStep object.
-	 * @param filter the filter to use.
+	 * 
+	 * @param filter
+	 *            the filter to use.
 	 */
-	public void setFilter (IFilter filter) {
+	public void setFilter(IFilter filter) {
 		filterfromSetFilter = true;
 		this.filter = filter;
 	}
@@ -72,14 +77,14 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	public String getName() {
 		return "RawDocument to Filter Events";
 	}
-	
-	public String getDescription () {
+
+	public String getDescription() {
 		return "Convert a RawDocument into filter events.";
 	}
-	
+
 	@Override
-	public Event handleEvent (Event event) {
-		switch ( event.getEventType() ) {
+	public Event handleEvent(Event event) {
+		switch (event.getEventType()) {
 		case START_BATCH:
 			isDone = true;
 			break;
@@ -89,39 +94,41 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 			// hasEvents to be set to true to prime things.
 			isDone = false;
 			return event;
-		
-		// Initialize the filter on RAW_DOCUMENT
+
+			// Initialize the filter on RAW_DOCUMENT
 		case RAW_DOCUMENT:
-			if ( !filterfromSetFilter ) {
+			if (!filterfromSetFilter) {
 				// Filter is to be set from the batch item info
-				if ( Util.isEmpty(getContext().getFilterConfigurationId(0)) ) {
+				if (Util.isEmpty(getContext().getFilterConfigurationId(0))) {
 					// No filter configuration provided: just pass it down
 					isDone = true;
 					return event;
 				}
 				// Else: Get the filter to use
 				filter = getContext().getFilterConfigurationMapper().createFilter(
-					getContext().getFilterConfigurationId(0), filter);
-				if ( filter == null ) {
+						getContext().getFilterConfigurationId(0), filter);
+				if (filter == null) {
 					throw new RuntimeException("Unsupported filter type.");
 				}
 			}
 			isDone = false;
 			// Open the document
-			filter.open((RawDocument)event.getResource());
+			filter.open((RawDocument) event.getResource());
 			// Return the first event from the filter
 			return filter.next();
 		}
 
-		if ( isDone ) {
+		if (isDone) {
 			return event;
-		}
-		else {
+		} else {
 			// Get events from the filter
-			Event e = filter.next();
-			if ( e.getEventType() == EventType.END_DOCUMENT) {
-				// END_DOCUMENT is the end of this raw document
-				isDone = true;
+			Event e = event;
+			if (filter != null) {
+				e = filter.next();
+				if (e.getEventType() == EventType.END_DOCUMENT) {
+					// END_DOCUMENT is the end of this raw document
+					isDone = true;
+				}
 			}
 			return e;
 		}
@@ -139,5 +146,5 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	public void cancel() {
 		filter.cancel();
 	}
-	
+
 }
