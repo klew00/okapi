@@ -107,16 +107,9 @@ public class Editor implements IParametersEditor, SelectionListener {
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 //			create((Shell)context.getObject("shell"));
 			ed = new UIEditor(shell,SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-//			ed.createContents(); // !!! DWH 6-17-09 have to create contents first so the buttons aren't null
-//			ed.btnCancel.addSelectionListener(this);
-//			ed.btnOk.addSelectionListener(this);
-//			ed.btnHelp.addSelectionListener(this);
-//			ed.btnStylesFromDocument.addSelectionListener(this);
-//			ed.btnColorsFromDocument.addSelectionListener(this);
-//			ed.open();
 			ed.open(this);
-//			setData();
-			return true;
+//			return true;
+			bRes = result; // DWH 6-26-09 result is set in widgetSelected above
 		}
 		catch ( Exception E ) {
 			Dialogs.showError(shell, E.getLocalizedMessage(), null);
