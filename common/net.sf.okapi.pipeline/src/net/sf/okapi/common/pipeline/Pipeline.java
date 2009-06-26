@@ -151,14 +151,15 @@ public class Pipeline implements IPipeline {
 		// process easier down the road if we use the pipeline again
 		for (IPipelineStep step : steps) {
 			finishedSteps.add(step);
-		}
+		}		
 		steps.clear();
-
+		
 		// Post-process for this batch-item
 		e = new Event(EventType.END_BATCH_ITEM);
-		for ( IPipelineStep step : steps ) {
+		for ( IPipelineStep step : finishedSteps ) {
 			step.handleEvent(e);
 		}
+		
 		return e;
 	}
 
