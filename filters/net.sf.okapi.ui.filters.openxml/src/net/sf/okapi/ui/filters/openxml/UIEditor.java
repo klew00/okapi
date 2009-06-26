@@ -195,7 +195,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						}
 						{
 							listExcludedWordStyles = new List(compositeWordStyles, SWT.BORDER | SWT.V_SCROLL);
-							listExcludedWordStyles.setItems(new String[] {"Emphasis", "Heading1", "Heading2", "Normal", "Title", "Strong", "Subtitle", "ExcludeCharacterStyle", "ExcludeParagraphStyle"});
+							listExcludedWordStyles.setItems(new String[] {"Emphasis", "ExcludeCharacterStyle", "ExcludeParagraphStyle", "Heading1", "Heading2", "Normal", "Title", "Strong", "Subtitle", "tw4winExternal"});
 							listExcludedWordStyles.setBounds(10, 0, 156, 68);
 						}
 					}
