@@ -77,6 +77,10 @@ public class CommaSeparatedValuesFilterTest {
 		
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
+		
+		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
+		String root2 = Util.getDirectoryName(url.getPath());
+		root2 = Util.getDirectoryName(root2) + "/data/";
 	}
 	
 	@Test
@@ -236,13 +240,16 @@ public class CommaSeparatedValuesFilterTest {
 		assertEquals(params.useCodeFinder, true);
 		
 		// Load filter parameters from a file, check if params have changed
-		URL paramsUrl = TableFilterTest.class.getResource("/test_params1.txt");
-		assertNotNull(paramsUrl);  
+//		URL paramsUrl = TableFilterTest.class.getResource("/test_params1.txt");
+//		assertNotNull(paramsUrl);  
 		
+
 		try {
-			params.load(paramsUrl.toURI(), false);
-		} catch (URISyntaxException e) {
-		}
+		String st = "file:" + _getFullFileName("test_params1.txt");
+		params.load(new URI(st), false);
+	} catch (URISyntaxException e) {
+	}
+
 		
 		assertEquals("2", params.fieldDelimiter);
 		assertEquals(params.columnNamesLineNum, 2);
@@ -255,7 +262,7 @@ public class CommaSeparatedValuesFilterTest {
 		assertEquals(params.useCodeFinder, false);
 		
 		// Save filter parameters to a file, load and check if params have changed
-		paramsUrl = TableFilterTest.class.getResource("/test_params2.txt");
+		URL paramsUrl = TableFilterTest.class.getResource("/test_params2.txt");
 		assertNotNull(paramsUrl);
 		
 		params.save(paramsUrl.getPath());
@@ -931,7 +938,7 @@ public class CommaSeparatedValuesFilterTest {
 	
 	// Helpers
 	private String _getFullFileName(String fileName) {
-		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
+		URL url = TableFilterTest.class.getResource("/csv_testb.txt");
 		String root = Util.getDirectoryName(url.getPath());
 		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
