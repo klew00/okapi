@@ -85,8 +85,8 @@ public class HtmlDetectBomTest {
 		BOMNewlineEncodingDetector bomDetector = new BOMNewlineEncodingDetector(htmlStream, "UTF-8");
 		bomDetector.detectAndRemoveBom();
 		
-		assertFalse(bomDetector.hasBom());
-		assertFalse(bomDetector.hasUtf8Bom());
+		assertTrue(bomDetector.hasBom());
+		assertTrue(bomDetector.hasUtf8Bom());
 		assertFalse(bomDetector.hasUtf7Bom());		
 		
 		htmlFilter.open(new RawDocument(htmlStream, bomDetector.getEncoding(), "en"));
