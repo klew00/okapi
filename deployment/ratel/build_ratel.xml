@@ -4,6 +4,9 @@
 	<!-- Get the version information to use from file -->
 	<property file="../shared/release.properties" />
 	<property name="ratelStamp" value="${ratelVersion}${releaseInfo}" />
+	<tstamp>
+	 <format property="TODAY" pattern="MMM-dd-yyyy"/>
+	</tstamp>
 	
 	<!-- Guess the platform if this build file is not called with the platform already set -->
 	<condition property="platform" value="win32-x86">
@@ -98,7 +101,11 @@ Running on: ${os.name} ${os.arch}${line.separator}
 			<fileset dir="data/examples" includes="**/*.txt"/>
 		</copy>
 
+		<copy todir="${dist}" file="../shared/changes.html"/>
+		<replace file="${dist}/changes.html" token="@date@" value="${TODAY}"/>
 		<copy todir="${dist}" file="data/readme.html"/>
+		<replace file="${dist}/readme.html" token="@version@" value="${ratelStamp}"/>
+		<replace file="${dist}/readme.html" token="@date@" value="${TODAY}"/>
 
 		<copy todir="${dist}/config">
 			<fileset dir="../shared/config" includes="**/*.srx"/>

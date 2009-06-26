@@ -4,6 +4,9 @@
 	<!-- Get the version information to use from file -->
 	<property file="../shared/release.properties" />
 	<property name="rainbowStamp" value="${rainbowVersion}${releaseInfo}" />
+	<tstamp>
+	 <format property="TODAY" pattern="MMM-dd-yyyy"/>
+	</tstamp>
 	
 	<!-- Guess the platform if this build file is not called with the platform already set -->
 	<condition property="platform" value="win32-x86">
@@ -156,7 +159,11 @@ jyaml-1.3.jar jericho-html-3.1-dev-5.jar dtdparser121.jar"/>
 			excludes="MANIFEST.MF"
   		/>
 
+		<copy todir="${dist}" file="../shared/changes.html"/>
+		<replace file="${dist}/changes.html" token="@date@" value="${TODAY}"/>
 		<copy todir="${dist}" file="data/readme.html"/>
+		<replace file="${dist}/readme.html" token="@version@" value="${rainbowStamp}"/>
+		<replace file="${dist}/readme.html" token="@date@" value="${TODAY}"/>
 
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
