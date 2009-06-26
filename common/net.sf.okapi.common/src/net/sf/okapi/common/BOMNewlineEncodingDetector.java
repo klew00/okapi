@@ -356,6 +356,9 @@ public final class BOMNewlineEncodingDetector {
 					if (skipped != getBomSize()) {
 						throw new IOException("The number of bytes skipped is not equal to the expected BOM size");
 					}
+                    hasUtf8Bom = false;
+					hasUtf7Bom = false;
+					hasBom = false;
 			}
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
