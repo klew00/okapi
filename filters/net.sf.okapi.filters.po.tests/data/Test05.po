@@ -51,3 +51,8 @@ msgid_plural "%d directories left"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "bslashes=\\\\"
+msgstr "bslashes=\\\\"
+
+msgid "quoted-bslash=\"\\\""
+msgstr "quoted-bslash=\"\\\""

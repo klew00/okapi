@@ -22,9 +22,13 @@ package net.sf.okapi.filters.xml;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -131,17 +135,44 @@ public class Parameters implements IParameters {
 	public void load (URI inputURI,
 		boolean ignoreErrors)
 	{
-		try { // Use inputURI.toString() to allow reading from JAR
-			doc = docBuilder.parse(inputURI.toString());
+		Reader sr = null;
+		try {
+			String tmp = inputURI.toString();
+			if ( tmp.startsWith("jar:") ) {
+				URL url = inputURI.toURL();
+//				sr = new InputStreamReader(
+//					new BufferedInputStream(url.openStream()), "UTF-8");
+//				doc = docBuilder.parse(new InputSource(sr));
+				doc = docBuilder.parse(url.openStream());
+						
+			}
+			else {
+				doc = docBuilder.parse(inputURI.toString());
+			}
+			path = inputURI.getPath();
+			docURI = inputURI;
+		}
+		catch ( MalformedURLException e ) {
+			throw new OkapiIOException(e);
+		}
+		catch ( UnsupportedEncodingException e ) {
 		}
 		catch ( SAXException e ) {
 			throw new OkapiIOException(e);
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException(e);
-		} 
-		path = inputURI.getPath();
-		docURI = inputURI;
+		}
+		finally {
+			if ( sr != null ) {
+				try {
+					sr.close();
+				} 
+				catch ( IOException e ) {
+					throw new OkapiIOException(e);
+				}
+			}
+		}
 	}
 
 	public void reset () {

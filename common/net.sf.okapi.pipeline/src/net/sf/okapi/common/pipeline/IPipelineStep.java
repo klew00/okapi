@@ -43,7 +43,7 @@ public interface IPipelineStep {
 	
 	/**
 	 * Gets the current parameters for this step.
-	 * @return the current parameters for this step.
+	 * @return the current parameters for this step or null if there are no parameters.
 	 */
 	public IParameters getParameters ();
 

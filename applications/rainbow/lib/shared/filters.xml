@@ -97,7 +97,7 @@
   editorClass="net.sf.okapi.filters.ui.regex.Editor" />
  
  <parametersEditor
-  parametersClass="net.sf.okapi.filters.openxml.Parameters"
+  parametersClass="net.sf.okapi.filters.openxml.ConditionalParameters"
   editorClass="net.sf.okapi.ui.filters.openxml.Editor" />
  
  <parametersEditor

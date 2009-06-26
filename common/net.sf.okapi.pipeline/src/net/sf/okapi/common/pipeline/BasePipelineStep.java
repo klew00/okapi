@@ -22,7 +22,6 @@ package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.exceptions.OkapiMustBeOverridden;
 
 /**
  * Abstract implementation of the {@link IPipelineStep} interface.
@@ -49,11 +48,11 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	}
 
 	public IParameters getParameters () {
-		throw new OkapiMustBeOverridden("getParameters must be overridden");		
+		return null;		
 	}
 
 	public void setParameters (IParameters params) {
-		throw new OkapiMustBeOverridden("setParameters must be overridden");	
+		// No parameters by default	
 	}
 
 	public boolean isDone() {
