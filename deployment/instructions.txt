@@ -1,14 +1,17 @@
 Deploying
 =========
 
+--- 0) Keep track of the changes between release in the Changes Log
+
+- trunk/deployment/shared/changes.html
+
+
 --- 1) Make sure all unit tests pass (manual for now)
 
 
 --- 2) Make sure the following files have the proper version and release numbers for this release:
 
 - trunk/deployment/shared/release.properties
-- trunk/website/updates.html
-- trunk/website/downloads.html
 
 
 --- 3) Make also sure the readme files are up-to-date:

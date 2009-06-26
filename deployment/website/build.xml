@@ -1,6 +1,7 @@
 <?xml version="1.0"?> 
 <project name="javadoc" default="all" basedir="."> 
 
+	<property file="../shared/release.properties" />
 	<property name="dist" value="dist"/>
  
 	<target name="all"> 
@@ -14,6 +15,10 @@
 				<exclude name="**/.*"/>
 			</fileset>
 		</copy>
+		<replace file="${dist}/downloads.html" token="@okapilibVersion@" value="${okapilibVersion}"/>
+		<replace file="${dist}/downloads.html" token="@rainbowVersion@" value="${rainbowVersion}"/>
+		<replace file="${dist}/downloads.html" token="@ratelVersion@" value="${ratelVersion}"/>
+		
 		
 		<copy todir="${dist}/help">
 			<fileset dir="../../help">
