@@ -81,6 +81,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("Escapades.docx");
 		themfiles.add("Addcomments.docx");
 		themfiles.add("sample.docx");
+		themfiles.add("styles.docx");
 		themfiles.add("sample.pptx");
 		themfiles.add("sample.xlsx");
 		themfiles.add("sampleMore.xlsx");
@@ -170,8 +171,8 @@ public class OpenXMLRoundTripTest {
 				event = filter.next();
 				if (event!=null)
 				{
-					if (event.getEventType()==EventType.START_SUBDOCUMENT) // DWH 4-16-09 was START_DOCUMENT
-						writer.setParameters(filter.getParameters());
+//					if (event.getEventType()==EventType.START_SUBDOCUMENT) // DWH 4-16-09 was START_DOCUMENT
+// 6-27-09				writer.setParameters(filter.getParameters());
 					writer.handleEvent(event);
 				}
 				else
