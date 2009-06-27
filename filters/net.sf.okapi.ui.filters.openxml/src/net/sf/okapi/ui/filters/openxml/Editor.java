@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class Editor implements IParametersEditor, SelectionListener {
 	
+	public final static int MSWORD=1;
 	private Shell shell;
 	private boolean result = false;
 	private ConditionalParameters params;
@@ -273,6 +274,7 @@ public class Editor implements IParametersEditor, SelectionListener {
 					params.tsExcelExcludedColumns.add("3"+sArray[i]);
 			}
 		}
+		params.nFileType = MSWORD; // DWH 6-27-09
 		return true;
 	}
 	public ConditionalParameters getParametersFromUI(ConditionalParameters cparams)
