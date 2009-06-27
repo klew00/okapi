@@ -29,30 +29,13 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.OKCancelPanel;
-import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.Excell;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Dialog;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 
 public class Editor implements IParametersEditor, SelectionListener {
 	

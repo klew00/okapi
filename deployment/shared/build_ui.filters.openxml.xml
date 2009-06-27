@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project name="ui.filters.openxml" default="ui.filters.openxml"> 
+
+	<property name="proj_ui.filters.openxml" value="../../filters/net.sf.okapi.ui.filters.openxml"/> 
+	<property name="src_ui.filters.openxml" value="${proj_ui.filters.openxml}/src"/> 
+ 
+	<path id="mainClassPath_ui.filters.openxml">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/swt.jar"/>
+		<pathelement location="${distlib}/swing2swt.jar"/>
+	</path>
+	
+	<target name="ui.filters.openxml"> 
+		<!-- those should be in a lib sub-directory normally -->
+		<copy file="${proj_ui.filters.openxml}/swing2swt.jar" todir="${distlib}"/>
+
+		<ant antfile="../shared/build_filters.openxml.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_ui.filters.common.xml" inheritAll="true"/>
+
+ 		<javac srcdir="${src_ui.filters.openxml}" destdir="${tmp}" classpathref="mainClassPath_ui.filters.openxml"/>
+
+		<copy todir="${tmp}">
+			<fileset dir="${src_ui.filters.openxml}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>
