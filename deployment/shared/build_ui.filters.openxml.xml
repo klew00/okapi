@@ -12,7 +12,7 @@
 	
 	<target name="ui.filters.openxml"> 
 		<!-- those should be in a lib sub-directory normally -->
-		<copy file="${proj_ui.filters.openxml}/swing2swt.jar" todir="${distlib}"/>
+		<copy file="${proj_ui.filters.openxml}/lib/swing2swt.jar" todir="${distlib}"/>
 
 		<ant antfile="../shared/build_filters.openxml.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.common.xml" inheritAll="true"/>
