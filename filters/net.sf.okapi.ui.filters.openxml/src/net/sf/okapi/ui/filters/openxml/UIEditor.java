@@ -161,13 +161,13 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 					tbtmGeneralOptions_1.setControl(composite);
 					{
 						btnTranslateDocumentProperties = new Button(composite, SWT.CHECK);
-						btnTranslateDocumentProperties.setLayoutData(new RowData(183, 16));
+						btnTranslateDocumentProperties.setLayoutData(new RowData(356, 16));
 						btnTranslateDocumentProperties.setSelection(true);
 						btnTranslateDocumentProperties.setText("Translate Document Properties");
 					}
 					{
 						btnTranslateComments = new Button(composite, SWT.CHECK);
-						btnTranslateComments.setLayoutData(new RowData(155, 16));
+						btnTranslateComments.setLayoutData(new RowData(343, 16));
 						btnTranslateComments.setSelection(true);
 						btnTranslateComments.setText("Translate Comments");
 					}
@@ -185,13 +185,13 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 					tbtmWordOptions.setControl(composite);
 					{
 						btnTranslateHeadersAndFooters = new Button(composite, SWT.CHECK);
-						btnTranslateHeadersAndFooters.setLayoutData(new RowData(194, 16));
+						btnTranslateHeadersAndFooters.setLayoutData(new RowData(290, 16));
 						btnTranslateHeadersAndFooters.setSelection(true);
 						btnTranslateHeadersAndFooters.setText("Translate Headers and Footers");
 					}
 					{
 						btnTranslateHiddenText = new Button(composite, SWT.CHECK);
-						btnTranslateHiddenText.setLayoutData(new RowData(189, 16));
+						btnTranslateHiddenText.setLayoutData(new RowData(291, 16));
 						btnTranslateHiddenText.setSelection(true);
 						btnTranslateHiddenText.setText("Translate Hidden Text");
 					}
@@ -205,7 +205,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 //						}
 						{
 							Label lblStyles = new Label(compositeWordStyles, SWT.NONE);
-							lblStyles.setBounds(172, 10, 89, 21);
+							lblStyles.setBounds(172, 10, 110, 21);
 							lblStyles.setText("Styles to Exclude");
 						}
 						{
@@ -227,7 +227,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						compositeExcelColors.setBounds(0, 0, 459, 45);
 						{
 							Label lblColorsToExclude = new Label(compositeExcelColors, SWT.NONE);
-							lblColorsToExclude.setBounds(161, 10, 91, 21);
+							lblColorsToExclude.setBounds(161, 10, 288, 21);
 							lblColorsToExclude.setText("Colors to Exclude");
 						}
 //						{
@@ -246,7 +246,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						compositeExcelSheet1.setBounds(0, 51, 459, 45);
 						{
 							Label lblSheetColumns = new Label(compositeExcelSheet1, SWT.NONE);
-							lblSheetColumns.setBounds(162, 24, 135, 21);
+							lblSheetColumns.setBounds(162, 24, 287, 21);
 							lblSheetColumns.setText("Sheet 1 Columns to Exlude");
 						}
 						{
@@ -256,7 +256,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						}
 						{
 							btnExcludeExcelColumns = new Button(compositeExcelSheet1, SWT.CHECK);
-							btnExcludeExcelColumns.setBounds(162, 2, 212, 16);
+							btnExcludeExcelColumns.setBounds(162, 2, 287, 16);
 							btnExcludeExcelColumns.setSelection(true);
 							btnExcludeExcelColumns.setText("Exclude Marked Columns in Each Sheet");
 						}
@@ -267,7 +267,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						{
 							Label lblSheetColumns_1 = new Label(compositeExcelSheet2, SWT.NONE);
 							lblSheetColumns_1.setText("Sheet 2 Columns to Exlude");
-							lblSheetColumns_1.setBounds(162, 24, 154, 21);
+							lblSheetColumns_1.setBounds(162, 24, 287, 21);
 						}
 						{
 							listExcelSheet2ColumnsToExclude = new List(compositeExcelSheet2, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
@@ -303,13 +303,13 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 					tbtmPowerpointOptions.setControl(composite);
 					{
 						btnTranslateNotes = new Button(composite, SWT.CHECK);
-						btnTranslateNotes.setLayoutData(new RowData(176, 16));
+						btnTranslateNotes.setLayoutData(new RowData(346, 16));
 						btnTranslateNotes.setSelection(true);
 						btnTranslateNotes.setText("Translate Notes");
 					}
 					{
 						btnTranslateMasters = new Button(composite, SWT.CHECK);
-						btnTranslateMasters.setLayoutData(new RowData(166, 16));
+						btnTranslateMasters.setLayoutData(new RowData(345, 16));
 						btnTranslateMasters.setSelection(true);
 						btnTranslateMasters.setText("Translate Masters");
 					}
