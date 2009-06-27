@@ -20,12 +20,15 @@
 
 package net.sf.okapi.common.resource;
 
+import net.sf.okapi.common.IParameters;
+
 /**
  * Resource associated with the filter event START_SUBDOCUMENT.
  */
 public class StartSubDocument extends BaseNameable {
 
 	private String parentId;
+	protected IParameters params;
 	
 	public StartSubDocument (String parentId) {
 		super();
@@ -48,4 +51,15 @@ public class StartSubDocument extends BaseNameable {
 		this.parentId = parentId;
 	}
 	
+	/**
+	 * Sets the parameters for this document.
+	 * @param params the object containing the parameters for this document.
+	 */
+	public void setFilterParameters (IParameters params) { // needed for OpenXMLContentFilter
+		this.params = params;
+	}
+
+	public IParameters getFilterParameters() {
+		return this.params;
+	}
 }
