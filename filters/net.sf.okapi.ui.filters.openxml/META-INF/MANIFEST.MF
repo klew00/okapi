@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Openxml Filter UI
 Bundle-SymbolicName: net.sf.okapi.ui.filters.openxml; singleton:=true
 Bundle-Version: 1.0.0
-Require-Bundle: org.eclipse.ui,
- net.sf.okapi.common;bundle-version="1.0.0",
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.ui.common;bundle-version="1.0.0",
  net.sf.okapi.filters.openxml;bundle-version="1.0.0",
  net.sf.okapi.filters.markupfilter;bundle-version="1.0.0",
