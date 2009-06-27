@@ -27,6 +27,7 @@ import net.sf.okapi.common.BaseParameters;
 
 public class ConditionalParameters extends BaseParameters {
 	
+	public final static int MSWORD=1;
 	public boolean bPreferenceTranslateDocProperties; // Word, Powerpoint, Excel Doc Properties
 	public boolean bPreferenceTranslateComments; // Word, Powerpoint, Excel Comments
 	public boolean bPreferenceTranslatePowerpointNotes; // Powerpoint Notes
@@ -41,6 +42,7 @@ public class ConditionalParameters extends BaseParameters {
 	public TreeSet<String> tsExcelExcludedColors; // exclude if bPreferenceTranslateExcelExcludeColors
 	public TreeSet<String> tsExcelExcludedColumns; // exclude if bPreferenceTranslateExcelExcludeCells 
 	public TreeSet<String> tsExcludeWordStyles; // exclude if !bPreferenceTranslateWordAllStyles
+	public int nFileType=MSWORD; // DWH 6-27-09
 	
 	public ConditionalParameters () {
 		reset();

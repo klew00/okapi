@@ -166,6 +166,8 @@ public class OpenXMLFilter implements IFilter {
 			tsExcelExcludedColors = ooparams.tsExcelExcludedColors;
 			tsExcelExcludedColumns = ooparams.tsExcelExcludedColumns;
 			tsExcludeWordStyles = ooparams.tsExcludeWordStyles;
+			nFileType = ooparams.nFileType; // DWH 6-27-09
+			cparams = ooparams; // DWH 6-27-09
 		}
 		catch(Exception e) {};
 	}
@@ -790,6 +792,8 @@ public class OpenXMLFilter implements IFilter {
 		// Change the START_DOCUMENT event to START_SUBDOCUMENT
 		StartSubDocument sd = new StartSubDocument(docId, String.valueOf(++subDocId));
 		sd.setName(entry.getName());
+		cparams.nFileType = nFileType; // DWH 6-27-09 record File Type for the OpenXMLContentSkeletonWriter
+		sd.setFilterParameters(cparams); // DWH 6-27-09 StartSubdocument will have conditional parameter info
 		nextAction = NextAction.NEXTINSUBDOC;
 		ZipSkeleton skel = new ZipSkeleton(
 			(GenericSkeleton)event.getResource().getSkeleton(), entry);

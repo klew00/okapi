@@ -308,8 +308,8 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		}
 		
 		// Instantiate the filter writer for that entry
-		//TODO: replace this by transparent call
 //		subDocWriter = new GenericFilterWriter(new GenericSkeletonWriter());
+/*	DWH 6-27-09 now cparams are included in the StartSubdocument
 		try // DWH 4-13-09 whole try/catch
 		{
 			sZipType = params.getTaggedConfig().getElementType("filetype");
@@ -327,6 +327,8 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 			nZipType = 0;
 			LOGGER.log(Level.WARNING,"Zip component is not a known file type.");
 		} // leave the zip type as 0 = unknown
+*/
+		nZipType = ((ConditionalParameters)res.getFilterParameters()).nFileType; // DWH 6-27-09
 		subDocWriter = new GenericFilterWriter(new OpenXMLContentSkeletonWriter(nZipType)); // DWH 4-8-09
 		subDocWriter.setOptions(outLang, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
