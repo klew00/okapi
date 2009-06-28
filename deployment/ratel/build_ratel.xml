@@ -72,7 +72,9 @@ Running on: ${os.name} ${os.arch}${line.separator}
 
 		<copy file="../../third-party/${platform}/swt.jar" todir="${distlib}"/>
 		
-		<ant antfile="../shared/build_ui.lib.segmentation.xml" inheritAll="true"/>
+		<!-- Use the _nojar special build to include the classes rather than
+		use the okapi-libui jar -->
+		<ant antfile="../shared/build_ui.lib.segmentation_nojar.xml" inheritAll="true"/>
 
  		<javac srcdir="${src_ratel}" destdir="${tmp}" classpathref="mainClassPath_ratel"/>
 		<copy todir="${tmp}">

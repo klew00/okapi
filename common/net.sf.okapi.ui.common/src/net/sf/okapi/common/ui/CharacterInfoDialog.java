@@ -38,6 +38,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * Dialog box for getting general information about a given Unicode character.
+ */
 public class CharacterInfoDialog {
 	
 	private Shell shell;
@@ -58,6 +61,12 @@ public class CharacterInfoDialog {
 		dispose();
 	}
 
+	/**
+	 * Creates a new CharacterInfoDialog object.
+	 * @param parent the parent Shell.
+	 * @param captionText the text of the caption.
+	 * @param helpParam the {@link IHelp} object to use with this dialog.
+	 */
 	public CharacterInfoDialog (Shell parent,
 		String captionText,
 		IHelp helpParam)
@@ -165,6 +174,9 @@ public class CharacterInfoDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	/**
+	 * Dispose of all internal resources.
+	 */
 	public void dispose () {
 		if ( sampleFont != null ) {
 			sampleFont.dispose();
@@ -305,6 +317,10 @@ public class CharacterInfoDialog {
 		settingCodePoint = false;
 	}
 		
+	/**
+	 * Calls the dialog.
+	 * @param codePoint the code point of the Unicode character to start with.
+	 */
 	public void showDialog (int codePoint) {
 		setCodePoint(codePoint);
 		shell.open();

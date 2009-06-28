@@ -29,6 +29,9 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Helpers methods to wrap commonly used dialog boxes.
+ */
 public class Dialogs {
 	/**
 	 * Browses for one or more files.
@@ -146,6 +149,12 @@ public class Dialogs {
 		target.setLocation(((x<0) ? 0 : x), ((y<0)? 0 : y));
 	}
 
+	/**
+	 * Shows a simple error dialog box.
+	 * @param shell the parent shell.
+	 * @param message the message to display.
+	 * @param details additional details information (may be null).
+	 */
 	static public void showError (Shell shell,
 		String message,
 		String details)
@@ -156,14 +165,20 @@ public class Dialogs {
 		dlg.open();
 	}
 	
+	/**
+	 * Shows a simple warning dialog box.
+	 * @param shell the parent shell.
+	 * @param message the message to display.
+	 * @param details additional details information (may be null).
+	 */
 	static public void showWarning (Shell shell,
-			String message,
-			String details)
-		{
-			MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING);
-			dlg.setMessage((message==null) ? "The warning is null." : message); //$NON-NLS-1$
-			dlg.setText(Res.getString("dialogs.warningCaption")); //$NON-NLS-1$
-			dlg.open();
-		}
+		String message,
+		String details)
+	{
+		MessageBox dlg = new MessageBox(shell, SWT.ICON_WARNING);
+		dlg.setMessage((message==null) ? "The warning is null." : message); //$NON-NLS-1$
+		dlg.setText(Res.getString("dialogs.warningCaption")); //$NON-NLS-1$
+		dlg.open();
+	}
 		
 }

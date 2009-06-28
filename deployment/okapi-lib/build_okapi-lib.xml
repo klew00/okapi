@@ -63,7 +63,6 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		</copy>
 
 		<ant antfile="../shared/build_third-party.stax-wstx.xml" inheritAll="true"/>
-		<copy file="../../third-party/${platform}/swt.jar" todir="${distlib}"/>
 		
 		<ant antfile="../shared/build_common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
@@ -93,7 +92,28 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<ant antfile="../shared/build_steps.common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_steps.all.xml" inheritAll="true"/>
 
+		<!-- DO NOT CHANGE WHITESPACES IN ATTRIBUTE VALUE 
+		AND CHECK MANIFEST IN JAR IF YOU ADD/REMOVE JARs -->
+		<manifest file="${tmp}/MANIFEST.MF">
+			<attribute name="Implementation-Title" value="${ant.project.name}"/>
+			<attribute name="Implementation-Version" value="${okapilibStamp}"/>
+			<attribute name="Class-Path" value="stax-api-1.0.1.jar wstx-lgpl-3.2.8.jar jyaml-1.3.jar jericho-html-3.1-dev-5.jar dtdparser121.jar"/>
+  		</manifest>
+
+		<jar jarfile="${distlib}/${ant.project.name}.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
+			excludes="MANIFEST.MF"
+  		/>
+
+
 		<!-- UI -->
+
+		<!-- Clean okapi-lib tmp folder -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+
+		<copy file="../../third-party/${platform}/swt.jar" todir="${distlib}"/>
 
 		<ant antfile="../shared/build_ui.common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.common.xml" inheritAll="true"/>
@@ -110,17 +130,17 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<!-- DO NOT CHANGE WHITESPACES IN ATTRIBUTE VALUE 
 		AND CHECK MANIFEST IN JAR IF YOU ADD/REMOVE JARs -->
 		<manifest file="${tmp}/MANIFEST.MF">
-			<attribute name="Implementation-Title" value="${ant.project.name}"/>
+			<attribute name="Implementation-Title" value="${ant.project.name}ui"/>
 			<attribute name="Implementation-Version" value="${okapilibStamp}"/>
-			<attribute name="Class-Path" value="swt.jar stax-api-1.0.1.jar wstx-lgpl-3.2.8.jar           
-jyaml-1.3.jar jericho-html-3.1-dev-5.jar dtdparser121.jar           
-swing2swt.jar"/>
+			<attribute name="Class-Path" value="swt.jar swing2swt.jar okapi-lib.jar"/>
   		</manifest>
-
-		<jar jarfile="${distlib}/${ant.project.name}.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
+		<jar jarfile="${distlib}/${ant.project.name}ui.jar" basedir="${tmp}" manifest="${tmp}/MANIFEST.MF"
 			excludes="MANIFEST.MF"
   		/>
 
+
+		<!-- Other parts -->
+		
 		<copy todir="${dist}/localweb/devguide">
 			<fileset dir="../../website/devguide">
 				<exclude name="**/_*"/>
@@ -134,6 +154,7 @@ swing2swt.jar"/>
 			<packageset dir="../../common/net.sf.okapi.filters.common/src" defaultexcludes="yes"/>
 			<packageset dir="../../common/net.sf.okapi.pipeline/src" defaultexcludes="yes"/>
 			<packageset dir="../../libraries/net.sf.okapi.lib.segmentation/src" defaultexcludes="yes"/>			
+			<packageset dir="../../libraries/net.sf.okapi.lib.translation/src" defaultexcludes="yes"/>			
 		</javadoc>
 
 		<copy todir="${dist}" file="../shared/changes.html"/>

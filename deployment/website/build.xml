@@ -34,6 +34,7 @@
 			<packageset dir="../../common/net.sf.okapi.pipeline/src" defaultexcludes="yes"/>
 			<packageset dir="../../steps/net.sf.okapi.steps.common/src" defaultexcludes="yes"/>
 			<packageset dir="../../libraries/net.sf.okapi.lib.segmentation/src" defaultexcludes="yes"/>			
+			<packageset dir="../../libraries/net.sf.okapi.lib.translation/src" defaultexcludes="yes"/>			
 		</javadoc>
 
 	</target>

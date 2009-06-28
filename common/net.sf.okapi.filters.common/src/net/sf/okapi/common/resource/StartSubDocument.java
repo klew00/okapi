@@ -52,14 +52,19 @@ public class StartSubDocument extends BaseNameable {
 	}
 	
 	/**
-	 * Sets the parameters for this document.
+	 * Gets the current parameters for this sub-document.
+	 * @return the object containing the parameters for this document.
+	 */
+	public IParameters getFilterParameters () {
+		return params;
+	}
+	
+	/**
+	 * Sets the parameters for this sub-document.
 	 * @param params the object containing the parameters for this document.
 	 */
-	public void setFilterParameters (IParameters params) { // needed for OpenXMLContentFilter
+	public void setFilterParameters (IParameters params) {
 		this.params = params;
 	}
 
-	public IParameters getFilterParameters() {
-		return this.params;
-	}
 }

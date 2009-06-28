@@ -7,10 +7,10 @@
 	<path id="mainClassPath_ui.filters.properties">
 		<pathelement location="${tmp}"/>
 		<pathelement location="${distlib}/swt.jar"/>
+		<pathelement location="${distlib}/okapi-lib.jar"/>
 	</path>
 	
 	<target name="ui.filters.properties"> 
-		<ant antfile="../shared/build_filters.properties.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.filters.common.xml" inheritAll="true"/>
 
  		<javac srcdir="${src_ui.filters.properties}" destdir="${tmp}" classpathref="mainClassPath_ui.filters.properties"/>

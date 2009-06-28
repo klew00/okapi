@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 
 /**
- * Provides a way to manage a listof most recently used files (MRU).
+ * Provides a way to manage a list of most recently used files (MRU).
  */
 public class MRUList {
 

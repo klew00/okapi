@@ -7,10 +7,10 @@
 	<path id="mainClassPath_ui.lib.segmentation">
 		<pathelement location="${tmp}"/>
 		<pathelement location="${distlib}/swt.jar"/>
+		<pathelement location="${distlib}/okapi-lib.jar"/>
 	</path>
 	
 	<target name="ui.lib.segmentation"> 
-		<ant antfile="../shared/build_lib.segmentation.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_ui.common.xml" inheritAll="true"/>
 		
  		<javac srcdir="${src_ui.lib.segmentation}" destdir="${tmp}" classpathref="mainClassPath_ui.lib.segmentation"/>

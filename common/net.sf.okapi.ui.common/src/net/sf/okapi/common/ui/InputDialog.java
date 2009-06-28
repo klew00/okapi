@@ -33,6 +33,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * Simple multi-purpose input dialog box.
+ */
 public class InputDialog {
 	
 	private Shell shell;
@@ -133,7 +136,11 @@ public class InputDialog {
 		shell.setSize(size);
 		Dialogs.centerWindow(shell, parent);
 	}
-	
+
+	/**
+	 * Calls the dialog.
+	 * @return the value entered by the user, or null if the operation was canceled.
+	 */
 	public String showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -143,15 +150,28 @@ public class InputDialog {
 		return result;
 	}
 
+	/**
+	 * Sets the default input value.
+	 * @param value the default input value.
+	 */
 	public void setInputValue (String value) {
 		if ( value == null ) edField.setText("");
 		else edField.setText(value);
 	}
 	
+	/**
+	 * Indicates whether or not this dialog should allow empty values.
+	 * @param value true to allow empty values, false otherwise.
+	 */
 	public void setAllowEmptyValue (boolean value) {
 		allowEmptyValue = value;
 	}
 
+	/**
+	 * Indicates whether or not the this dialog should be in read-only mode.
+	 * In read-only mode, the "OK" button is not enabled. 
+	 * @param value true for read-only mode, false otherwise.
+	 */
 	public void setReadOnly (boolean value) {
 		pnlActions.btOK.setEnabled(!value);
 	}
@@ -181,4 +201,5 @@ public class InputDialog {
 		}
 		return true;
 	}
+
 }

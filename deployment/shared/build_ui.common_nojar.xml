@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project name="ui.common_nojar" default="ui.common_nojar"> 
+
+	<property name="proj_ui.common_nojar" value="../../common/net.sf.okapi.ui.common"/> 
+	<property name="src_ui.common_nojar" value="${proj_ui.common_nojar}/src"/> 
+ 
+	<path id="mainClassPath_ui.common_nojar">
+		<pathelement location="${tmp}"/>
+		<pathelement location="${distlib}/swt.jar"/>
+	</path>
+	
+	<target name="ui.common_nojar"> 
+		<ant dir="." antfile="../shared/build_common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_ui.common_nojar}" destdir="${tmp}" classpathref="mainClassPath_ui.common_nojar"/>
+ 		
+		<copy todir="${tmp}">
+			<fileset dir="${src_ui.common_nojar}" excludes="**/*.java"/>
+		</copy>
+		
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/common">
+			<fileset dir="../../help/common" />
+		</copy>
+		
+	</target>
+
+</project>

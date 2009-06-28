@@ -62,7 +62,7 @@ public class Main {
 			
 			System.out.println("------------------------------------------------------------");
 			System.out.println("Example of querying a GlobalSight TM server");
-			System.out.println("You need to have access to one for this.");
+			System.out.println("You need to have access to a GlobalSight TM server for this.");
 			System.out.print("Do you want to continue (y or n + Enter)? ");
 			String tmp = scanner.nextLine();
 			if (( tmp.length() == 0 ) || (( tmp.charAt(0) != 'y') && ( tmp.charAt(0) != 'Y' ))) {

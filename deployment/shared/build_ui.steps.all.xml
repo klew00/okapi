@@ -6,6 +6,7 @@
 	<path id="mainClassPath_ui.steps.all">
 		<pathelement location="${tmp}"/>
 		<pathelement location="${distlib}/swt.jar"/>
+		<pathelement location="${distlib}/okapi-lib.jar"/>
 	</path>
 	
 	<target name="ui.steps.all">

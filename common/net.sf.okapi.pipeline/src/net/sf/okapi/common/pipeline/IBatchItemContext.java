@@ -27,12 +27,13 @@ import net.sf.okapi.common.resource.RawDocument;
 /**
  * Common set of methods for a pipeline batch item.
  * A batch item corresponds to the data provided by the caller application to
- * execute one process of all the steps of a pipeline. Most of the time a batch item
- * is composed of a single input file with possibly some output information if
- * some of the steps generate output for each batch item. Some steps require
- * more than one input document per batch item, for example a steps that align the 
- * content of two files will request two input per batch item: the source file and 
- * its corresponding translated file.
+ * execute one process of all the steps of a pipeline.
+ * <p>Most of the time a batch item is composed of a single input file with 
+ * possibly some output information if some of the steps generate output for 
+ * each batch item.
+ * <p>Some steps require more than one input document per batch item, for 
+ * example a steps that align the content of two files will request two inputs 
+ * per batch item: the source file and its corresponding translated file.
  */
 public interface IBatchItemContext {
 

@@ -25,8 +25,19 @@ package net.sf.okapi.lib.translation;
  */
 public class ResourceItem {
 	
+	/**
+	 * The query engine for this resource.
+	 */
 	public IQuery query;
+	
+	/**
+	 * A flags indicating if this resource is to be used or not.
+	 */
 	public boolean enabled;
+	
+	/**
+	 * the name of this resource.
+	 */
 	public String name;
 
 }

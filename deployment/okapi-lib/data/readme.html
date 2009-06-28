@@ -7,6 +7,7 @@
 <h1>Release Notes - Okapi Library @version@, @date@</h1>
 <ul>
 	<li><a href="#overview">Overview</a></li>
+	<li><a href="#JARDependencies">JAR Dependencies</a></li>
 	<li><a href="#SetupWindows">Windows Platform</a></li>
 	<li><a href="#SetupLinux">Linux Platforms</a></li>
 	<li><a href="#SetupMac">Macintosh Platform</a></li>
@@ -28,36 +29,108 @@ upcoming versions of the Okapi Library.</b></p>
 <p>This distribution contains the following:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table1">
 	<tr>
-		<td><code>lib</code></td>
-		<td>All the files needed to run the Okapi classes.</td>
+		<td align="left" valign="top"><code>lib</code></td>
+		<td>All the files needed to run the Okapi classes.
+		If you do not need any UI components, you can remove the following 
+		files: <code>okapi-libui.jar</code>, <code>swt.jar</code>, and <code>
+		swing2swt.jar</code>. See the <a href="#JARDependencies">JAR 
+		Dependencies</a> section for details.</td>
 	</tr>
 	<tr>
-		<td><code>help</code></td>
+		<td align="left" valign="top"><code>help</code></td>
 		<td>The help files that go with the several UI components provided with 
 		the library.</td>
 	</tr>
 	<tr>
-		<td><code>config</code></td>
-		<td>Default configuration files (e.g. segmentation rules, filters 
-		parameters, etc.)</td>
+		<td align="left" valign="top"><code>config</code></td>
+		<td>Some default configuration files (e.g. segmentation rules)</td>
 	</tr>
 	<tr>
-		<td><code>examples</code></td>
+		<td align="left" valign="top"><code>examples</code></td>
 		<td>A few examples on how to use the library, in Java and Python.</td>
 	</tr>
 	<tr>
-		<td><code>localweb/devguide</code></td>
+		<td align="left" valign="top"><code>localweb/devguide</code></td>
 		<td>The local copy of the <a href="localweb/devguide/index.html">Developer&#39;s 
 		Guide page for this release</a>.</td>
 	</tr>
 	<tr>
-		<td><code>localweb/javadoc</code></td>
+		<td align="left" valign="top"><code>localweb/javadoc</code></td>
 		<td>The local copy of the <a href="localweb/javadoc/index.html">JavaDoc pages for 
 		this release</a>.</td>
 	</tr>
 </table>
 <p>The latest version of these documents and of the library are always available 
 on-line, at the <a href="http://okapi.opentag.com/">Okapi Framework Web site</a>.</p>
+<hr>
+<h2><a name="JARDependencies"></a>JAR Dependencies</h2>
+<p>The following table shows which third-party JAR files are necessary 
+for which Okapi components.</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table2">
+	<tr>
+		<th align="left" valign="top">This third-party JAR</th>
+		<th align="left" valign="top">Is used by...</th>
+		<th align="left" valign="top">When using this Okapi component...</th>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>swt.jar</code></td>
+		<td align="left" valign="top"><code>okapi-libui.jar</code></td>
+		<td align="left" valign="top">any component of the Okapi UI.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>swing2swt.jar</code></td>
+		<td align="left" valign="top"><code>okapi-libui.jar</code></td>
+		<td align="left" valign="top"><code>net.sf.okapi.ui.filters.openxml</code></td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>dtdparser121.jar</code></td>
+		<td align="left" valign="top"><code>okapi-lib.jar</code></td>
+		<td align="left" valign="top"><code>net.sf.okapi.filters.dtd</code></td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>jericho-html-3.1-dev-5.jar</code><br>
+		and <code>jyaml-1.3.jar</code></td>
+		<td align="left" valign="top"><code>okapi-lib.jar</code></td>
+		<td align="left" valign="top"><code>net.sf.okapi.filters.html</code><br>
+		or <code>net.sf.okapi.filters.openxml</code></td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>stax-api-1.0.1.jar</code><br>
+		and <code>wstx-lgpl-3.2.8.jar</code></td>
+		<td align="left" valign="top"><code>okapi-lib.jar</code></td>
+		<td align="left" valign="top"><code>net.sf.okapi.filters.idml</code><br>
+		or <code>net.sf.okapi.filters.openoffice</code><br>
+		or <code>net.sf.okapi.filters.tmx</code><br>
+		or <code>net.sf.okapi.filters.xliff</code></td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>axis.jar</code><br>
+		and <code>wsdl4j-1.5.1.jar</code><br>
+		and <code>jaxrpc.jar</code><br>
+		and <code>commons-logging-1.0.4.jar</code><br>
+		and <code>commons-discovery-0.2.jar</code><br>
+		and <code>saaj.jar</code></td>
+		<td align="left" valign="top"><code>okapi-lib.jar</code></td>
+		<td align="left" valign="top"><code>net.sf.okapi.tm.globalsight</code></td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>xmlrpc-client-3.1.jar</code><br>
+		and <code>xmlrpc-common-3.1.jar</code><br>
+		and <code>ws-commons-util-1.0.2.jar</code></td>
+		<td align="left" valign="top"><code>okapi-lib.jar</code></td>
+		<td align="left" valign="top"><code>net.sf.okapi.tm.opentran</code></td>
+	</tr>
+</table>
+<p>If you are developing applications that use only some of the Okapi library&#39;s 
+components, you may remove some dependencies. For example:</p>
+<ul>
+	<li>If you use the XLIFF filter, you need: <code>okapi-lib.jar</code>, <code>
+	stax-api-1.0.1.jar</code>, and <code>wstx-lgpl-3.2.8.jar</code>.</li>
+	<li>If you use the DTD filter, you need: <code>okapi-lib.jar</code>, and
+	<code>dtdparser121.jar</code>.</li>
+	<li>If you use the Properties filter, you need:&nbsp; <code>okapi-lib.jar</code>.</li>
+	<li>Etc...</li>
+</ul>
 <hr>
 <h2><a name="SetupWindows"></a>Windows Platform</h2>
 <h3>Requirements</h3>

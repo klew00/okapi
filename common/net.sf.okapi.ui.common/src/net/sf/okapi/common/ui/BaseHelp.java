@@ -26,6 +26,9 @@ import java.net.URL;
 
 import net.sf.okapi.common.IHelp;
 
+/**
+ * Default implementation of the {@link IHelp} interface.
+ */
 public class BaseHelp implements IHelp {
 
 	private static final String PKGROOT = "net.sf.okapi.";
