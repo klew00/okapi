@@ -127,6 +127,8 @@ public class MultistepPipelineTest {
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		driver.addStep(new FilterEventsToRawDocumentStep());
 		driver.addStep(new RawDocumentToFilterEventsStep());
+		driver.addStep(new FilterEventsToRawDocumentStep());
+		driver.addStep(new RawDocumentToFilterEventsStep());
 		
 		IPipelineStep searchReplaceStep = new SearchAndReplaceStep();
 		((net.sf.okapi.steps.searchandreplace.Parameters) searchReplaceStep.getParameters()).plainText = false;
