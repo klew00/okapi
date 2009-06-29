@@ -3,6 +3,9 @@
 	<name>net.sf.okapi.lib.jython.tests</name>
 	<comment></comment>
 	<projects>
+		<project>net.sf.okapi.common</project>
+		<project>net.sf.okapi.lib.jython</project>
+		<project>net.sf.okapi.pipeline</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
