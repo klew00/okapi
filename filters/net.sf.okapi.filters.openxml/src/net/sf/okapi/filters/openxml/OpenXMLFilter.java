@@ -560,6 +560,7 @@ public class OpenXMLFilter implements IFilter {
 			startDoc.setLanguage(srcLang);
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setFilterWriter(createFilterWriter());
+			startDoc.setFilterParameters(getParameters());
 			startDoc.setLineBreak("\n");
 			ZipSkeleton skel = new ZipSkeleton(zipFile);
 			return new Event(EventType.START_DOCUMENT, startDoc, skel);
