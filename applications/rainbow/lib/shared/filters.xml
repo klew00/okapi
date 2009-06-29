@@ -21,7 +21,12 @@
   inputFilterClass="net.sf.okapi.filters.xliff.XLIFFFilter"
  >Filter for XML Localisation Interchange File Format (XLIFF) documents.</filter>
   
-<filter id="okf_openxml"
+ <filter id="okf_tmx"
+  name="(BETA) TMX Filter"
+  inputFilterClass="net.sf.okapi.filters.tmx.TmxFilter"
+ >Filter for Translation Memory eXchange (TMX) documents</filter>
+  
+ <filter id="okf_openxml"
   name="(BETA) MS-Office 2007 Filter"
   inputFilterClass="net.sf.okapi.filters.openxml.OpenXMLFilter"
  >Filter for Microsoft Office 2007 documents such as DOCX, XLSX, and PPTX.</filter>
@@ -46,11 +51,6 @@
   inputFilterClass="net.sf.okapi.filters.xml.XMLFilter"
  >Filter for XML documents. This filter supports the Internationalization Tag Set (ITS).</filter>
   
- <filter id="okf_dtd"
-  name="(BETA) DTD Filter"
-  inputFilterClass="net.sf.okapi.filters.dtd.DTDFilter"
- >Filter for DTD files.</filter>
-  
  <filter id="okf_plaintext"
   name="(BETA) Plain Text Filter"
   inputFilterClass="net.sf.okapi.filters.plaintext.PlainTextFilter"
@@ -60,6 +60,11 @@
   name="(BETA) Table Filter"
   inputFilterClass="net.sf.okapi.filters.table.TableFilter"
  >Filter for table-type files (tab-delimited, CSV, fixed-width tables, etc.)</filter>
+  
+ <filter id="okf_dtd"
+  name="(BETA) DTD Filter"
+  inputFilterClass="net.sf.okapi.filters.dtd.DTDFilter"
+ >Filter for DTD files.</filter>
   
  <filter id="okf_idml"
   name="(ALPHA) IDML Filter"
@@ -71,11 +76,6 @@
   inputFilterClass="net.sf.okapi.filters.idml.IDMLContentFilter"
  >Filter for IDML-Content documents.</filter>
 
- <filter id="okf_tmx"
-  name="(ALPHA) TMX Filter"
-  inputFilterClass="net.sf.okapi.filters.tmx.TmxFilter"
- >Filter for Translation Memory eXchange (TMX) documents</filter>
-  
  <filter id="okf_mif"
   name="(PRE-ALPHA-DON'T-EVEN-TRY) FrameMaker MIF Filter"
   inputFilterClass="net.sf.okapi.filters.mif.MIFFilter"
