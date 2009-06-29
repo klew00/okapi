@@ -20,8 +20,8 @@
 
 package net.sf.okapi.ui.filters.table;
 
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.ui.filters.plaintext.common.IParametersEditorPage;
+import net.sf.okapi.filters.plaintext.common.INotifiable;
+import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
 import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 import net.sf.okapi.ui.filters.plaintext.common.Util2;
 
@@ -42,10 +42,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * 
@@ -54,7 +56,7 @@ import org.eclipse.swt.widgets.TableItem;
  * @author Sergei Vasilyev
  */
 
-public class ColumnsTab extends Composite implements IParametersEditorPage {
+public class ColumnsTab extends Composite implements IDialogPage {
 	private Table table;
 	private TableColumn tblclmnColumn;
 	private TableColumn tblclmnType;
@@ -63,8 +65,8 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 	private TableColumn tblclmnLanguage;
 	private TableColumn tblclmnStart;
 	private TableColumn tblclmnEnd;
-	private Group grpExtractionMode;
-	private Group grpNumberOfColumns;
+	private Group extr;
+	private Group gnum;
 	private Group colDefs;
 	private Button defs;
 	private Button all;
@@ -88,107 +90,79 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
 		
-		grpExtractionMode = new Group(this, SWT.NONE);
-		grpExtractionMode.setLayout(new FormLayout());
-		grpExtractionMode.setText("Extraction mode");
-		grpExtractionMode.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		extr = new Group(this, SWT.NONE);
+		extr.setLayout(new GridLayout(1, false));
+		extr.setData("name", "extr");
+		extr.setText("Extraction mode");
+		extr.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		
-		defs = new Button(grpExtractionMode, SWT.RADIO);
+		defs = new Button(extr, SWT.RADIO);
+		defs.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		defs.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		{
-			FormData formData = new FormData();
-			formData.right = new FormAttachment(100, -10);
-			formData.top = new FormAttachment(0, 10);
-			formData.left = new FormAttachment(0, 10);
-			defs.setLayoutData(formData);
-		}
 		defs.setText("Extract by column definitions");
 		
-		all = new Button(grpExtractionMode, SWT.RADIO);
+		all = new Button(extr, SWT.RADIO);
+		all.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		all.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		{
-			FormData formData = new FormData();
-			formData.right = new FormAttachment(defs, 0, SWT.RIGHT);
-			formData.top = new FormAttachment(defs, 6);
-			formData.left = new FormAttachment(defs, 0, SWT.LEFT);
-			all.setLayoutData(formData);
-		}
 		all.setText("Extract from all columns (create separate text units)");
 		
-		grpNumberOfColumns = new Group(this, SWT.NONE);
-		grpNumberOfColumns.setLayout(new FormLayout());
-		grpNumberOfColumns.setText("Number of columns");
-		grpNumberOfColumns.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		gnum = new Group(this, SWT.NONE);
+		gnum.setLayout(new GridLayout(4, false));
+		gnum.setData("name", "gnum");
+		gnum.setText("Number of columns");
+		gnum.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		
-		fix = new Button(grpNumberOfColumns, SWT.RADIO);
+		fix = new Button(gnum, SWT.RADIO);
+		fix.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1, 1));
 		fix.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		{
-			FormData formData = new FormData();
-			formData.width = 157;
-			formData.top = new FormAttachment(0, 10);
-			formData.left = new FormAttachment(0, 10);
-			fix.setLayoutData(formData);
-		}
 		fix.setText("Fixed number of columns");
+		new Label(gnum, SWT.NONE);
+		new Label(gnum, SWT.NONE);
 		
-		num = new Spinner(grpNumberOfColumns, SWT.BORDER);
-		{
-			FormData formData = new FormData();
-			formData.top = new FormAttachment(fix, 0, SWT.TOP);
-			formData.left = new FormAttachment(fix, 10);
-			num.setLayoutData(formData);
-		}
+		num = new Spinner(gnum, SWT.BORDER);
+		num.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		num.setMinimum(1);
 		
-		names = new Button(grpNumberOfColumns, SWT.RADIO);
+		names = new Button(gnum, SWT.RADIO);
+		names.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 		names.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		{
-			FormData formData = new FormData();
-			formData.top = new FormAttachment(fix, 6);
-			formData.left = new FormAttachment(fix, 0, SWT.LEFT);
-			names.setLayoutData(formData);
-		}
 		names.setText("Defined by column names");
 		
-		vals = new Button(grpNumberOfColumns, SWT.RADIO);
+		vals = new Button(gnum, SWT.RADIO);
+		vals.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
 		vals.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		{
-			FormData formData = new FormData();
-			formData.top = new FormAttachment(names, 6);
-			formData.left = new FormAttachment(fix, 0, SWT.LEFT);
-			vals.setLayoutData(formData);
-		}
 		vals.setText("Defined by values (may vary in different rows)");
 		
 		colDefs = new Group(this, SWT.NONE);
+		colDefs.setData("name", "colDefs");
 		colDefs.setText("Column definitions");
 		colDefs.setLayout(new GridLayout(2, false));
-		colDefs.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 2, 1));
+		colDefs.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		
 		table = new Table(colDefs, SWT.BORDER | SWT.FULL_SELECTION);
 		table.addMouseListener(new MouseAdapter() {
@@ -205,7 +179,7 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4));
@@ -274,7 +248,7 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 				
 				if (index > table.getItemCount() - 1) index = table.getItemCount() - 1;
 				if (index > -1)	table.select(index);
-				interop();
+				interop(e.widget);
 			}
 		});
 		btnRemove.setText("Remove");
@@ -283,7 +257,7 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 		label_1.setText("                          ");
 		new Label(colDefs, SWT.NONE);
 		new Label(colDefs, SWT.NONE);
-		new Label(colDefs, SWT.NONE);		
+		new Label(colDefs, SWT.NONE);
 	}
 
 	protected void addModifyRow(TableItem item) {
@@ -300,7 +274,7 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 				item.setText((String []) SWTUtils.getResult());
 				table.select(table.indexOf(item));				
 			}
-			interop();  // Selection changes
+			interop(table);  // Selection changes
 		}
 		else {
 			if (SWTUtils.inputQuery(AddModifyColumnDefPage.class, getShell(), "Modify column definition", 
@@ -309,7 +283,7 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 				
 				item.setText((String []) SWTUtils.getResult());					
 				table.select(table.indexOf(item));
-				interop();
+				interop(table);
 			}
 		}
 	}
@@ -339,7 +313,7 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 		return true;
 	}
 
-	public void interop() {
+	public void interop(Widget speaker) {
 		
 		SWTUtils.setAllEnabled(colDefs, defs.getSelection());
 		num.setEnabled(fix.getSelection());
@@ -348,12 +322,12 @@ public class ColumnsTab extends Composite implements IParametersEditorPage {
 		btnRemove.setEnabled(btnModify.getEnabled());			
 	}
 
-	public boolean load(IParameters parameters) {
+	public boolean load(Object data) {
 		
 		return true;
 	}
 
-	public boolean save(IParameters parameters) {
+	public boolean save(Object data) {
 		
 		return true;
 	}

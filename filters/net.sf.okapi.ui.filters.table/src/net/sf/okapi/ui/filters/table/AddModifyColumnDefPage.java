@@ -33,6 +33,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
@@ -57,11 +58,11 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 	private Label lblSourceColumn;
 	private Label lblIdSuffix;
 	private Label label_2;
-	private Label lblStart;
-	private Label lblEnd;
+	private Label lstart;
+	private Label lend;
 	private Spinner srcIndex;
-	private Spinner startPos;
-	private Spinner endPos;
+	private Spinner start;
+	private Spinner end;
 	private Text suffix;
 	private Text language;
 
@@ -97,7 +98,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		typeSource.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
 		typeSource.setText("Source");
@@ -106,7 +107,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		typeSourceId.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
 		typeSourceId.setText("Source ID");
@@ -115,7 +116,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		typeTarget.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
 		typeTarget.setText("Target");
@@ -124,7 +125,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		typeComment.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
 		typeComment.setText("Comment");
@@ -133,7 +134,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		typeRecordId.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
 		typeRecordId.setText("Record ID");
@@ -160,19 +161,23 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		suffix = new Text(composite, SWT.BORDER);
 		suffix.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		
-		lblStart = new Label(composite, SWT.NONE);
-		lblStart.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblStart.setText("Start:");
+		lstart = new Label(composite, SWT.NONE);
+		lstart.setData("name", "lstart");
+		lstart.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lstart.setText("Start:");
 		
-		startPos = new Spinner(composite, SWT.BORDER);
-		startPos.setMinimum(1);
+		start = new Spinner(composite, SWT.BORDER);
+		start.setData("name", "start");
+		start.setMinimum(1);
 		
-		lblEnd = new Label(composite, SWT.NONE);
-		lblEnd.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblEnd.setText("End:");
+		lend = new Label(composite, SWT.NONE);
+		lend.setData("name", "lend");
+		lend.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lend.setText("End:");
 		
-		endPos = new Spinner(composite, SWT.BORDER);
-		endPos.setMinimum(1);
+		end = new Spinner(composite, SWT.BORDER);
+		end.setData("name", "end");
+		end.setMinimum(1);
 
 	}
 
@@ -193,8 +198,8 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		srcIndex.setSelection(Util2.strToInt(colDef[2], 0));		
 		language.setText(colDef[3]);
 		suffix.setText(colDef[4]);
-		startPos.setSelection(Util2.strToInt(colDef[5], 0));
-		endPos.setSelection(Util2.strToInt(colDef[6], 0));
+		start.setSelection(Util2.strToInt(colDef[5], 0));
+		end.setSelection(Util2.strToInt(colDef[6], 0));
 		
 		return true;
 	}
@@ -217,8 +222,8 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		colDef[2] = Util2.intToStr(srcIndex.getSelection());				
 		colDef[3] = language.getText();
 		colDef[4] = suffix.getText();
-		colDef[5] = Util2.intToStr(startPos.getSelection());
-		colDef[6] = Util2.intToStr(endPos.getSelection());
+		colDef[5] = Util2.intToStr(start.getSelection());
+		colDef[6] = Util2.intToStr(end.getSelection());
 		
 		return true;
 	}
@@ -227,7 +232,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		
 	}
 
-	public void interop() {
+	public void interop(Widget speaker) {
 		
 		if (typeSource.getSelection()) {
 		
@@ -290,6 +295,11 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 			suffix.setEnabled(false);
 		}
 			
+	}
+
+	public boolean canClose(boolean isOK) {
+
+		return true;
 	}
 }
 

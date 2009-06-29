@@ -20,8 +20,7 @@
 
 package net.sf.okapi.ui.filters.table;
 
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.ui.filters.plaintext.common.IParametersEditorPage;
+import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
 import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
 import org.eclipse.swt.widgets.Composite;
@@ -34,11 +33,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TypedEvent;
 
 /**
  * 
@@ -47,7 +49,7 @@ import org.eclipse.swt.events.SelectionEvent;
  * @author Sergei Vasilyev
  */
 
-public class TableTab extends Composite implements IParametersEditorPage {
+public class TableTab extends Composite implements IDialogPage, SelectionListener {
 	private Group grpTableType;
 	private Button btnCSV;
 	private Button btnTSV;
@@ -68,23 +70,13 @@ public class TableTab extends Composite implements IParametersEditorPage {
 	private Button allE;
 	private Button body;
 	private Group csvActions;
-	private FormData formData_1;
-	private FormData formData_2;
-	private FormData formData_3;
-	private FormData formData_4;
-	private FormData formData_5;
-	private FormData formData_12;
-	private FormData formData_13;
-	private FormData formData_14;
-	private FormData formData_15;
-	private FormData formData_16;
-	private FormData formData_17;
-	private FormData formData_9;
+//	private FormData formData_9;
 	private Text custDelim;
-	private Text qualifStart;
-	private Text qualifEnd;
+	private Text custQualif;
 	private Combo delim;
 	private Combo qualif;
+	private Label label_2;
+	private Label label_3;
 
 	/**
 	 * Create the composite.
@@ -96,71 +88,50 @@ public class TableTab extends Composite implements IParametersEditorPage {
 		setLayout(new GridLayout(3, false));
 		
 		grpTableType = new Group(this, SWT.NONE);
-		grpTableType.setLayout(new FormLayout());
+		grpTableType.setLayout(new GridLayout(1, false));
 		grpTableType.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 		grpTableType.setText("Table type");
 		
 		btnCSV = new Button(grpTableType, SWT.RADIO);
+		btnCSV.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnCSV.setData("name", "btnCSV");
 		btnCSV.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		{
-			formData_4 = new FormData();
-			formData_4.left = new FormAttachment(0, 10);
-			formData_4.width = 372;
-			btnCSV.setLayoutData(formData_4);
-		}
 		btnCSV.setText("CSV (Columns, separated by a comma, semicolon, etc.)                  ");
 		
 		btnTSV = new Button(grpTableType, SWT.RADIO);
+		btnTSV.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnTSV.setData("name", "btnTSV");
 		btnTSV.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		formData_4.right = new FormAttachment(btnTSV, 0, SWT.RIGHT);
-		formData_4.bottom = new FormAttachment(btnTSV, -6);
-		{
-			formData_5 = new FormData();
-			formData_5.left = new FormAttachment(0, 10);
-			formData_5.right = new FormAttachment(100, -10);
-			formData_5.top = new FormAttachment(0, 32);
-			btnTSV.setLayoutData(formData_5);
-		}
 		btnTSV.setText("TSV (Columns, separated by one or more tabs)");
 		
 		btnFWC = new Button(grpTableType, SWT.RADIO);
+		btnFWC.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnFWC.setData("name", "btnFWC");
 		btnFWC.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		{
-			FormData formData = new FormData();
-			formData.left = new FormAttachment(0, 10);
-			formData.right = new FormAttachment(100, -10);
-			formData.top = new FormAttachment(btnTSV, 6);
-			btnFWC.setLayoutData(formData);
-		}
 		btnFWC.setText("Fixed-width columns");
 		
 		grpTableProperties = new Group(this, SWT.NONE);
-		grpTableProperties.setLayout(new FormLayout());
+		grpTableProperties.setLayout(new GridLayout(2, false));
 		grpTableProperties.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		grpTableProperties.setText("Table properties");
 		
 		lblValuesStartAt = new Label(grpTableProperties, SWT.NONE);
-		{
-			formData_3 = new FormData();
-			formData_3.left = new FormAttachment(0, 10);
-			formData_3.width = 111;
-			lblValuesStartAt.setLayoutData(formData_3);
-		}
+		lblValuesStartAt.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lblValuesStartAt.setAlignment(SWT.RIGHT);
 		lblValuesStartAt.setText("Values start at line:");
 		
@@ -168,44 +139,23 @@ public class TableTab extends Composite implements IParametersEditorPage {
 		start.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		formData_3.right = new FormAttachment(start, -6);
-		formData_3.top = new FormAttachment(start, 0, SWT.TOP);
-		{
-			formData_1 = new FormData();
-			formData_1.top = new FormAttachment(0, 10);
-			formData_1.right = new FormAttachment(100, -10);
-			start.setLayoutData(formData_1);
-		}
 		start.setMinimum(1);
 		
 		lcols = new Label(grpTableProperties, SWT.NONE);
+		lcols.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		lcols.setAlignment(SWT.RIGHT);
-		{
-			formData_2 = new FormData();
-			formData_2.left = new FormAttachment(lblValuesStartAt, 0, SWT.LEFT);
-			formData_2.width = 186;
-			lcols.setLayoutData(formData_2);
-		}
 		lcols.setText("Line with column names (0 if none):");
 		
 		cols = new Spinner(grpTableProperties, SWT.BORDER);
 		cols.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		formData_2.top = new FormAttachment(cols, 0, SWT.TOP);
-		formData_2.right = new FormAttachment(cols, -6);
-		{
-			FormData formData = new FormData();
-			formData.top = new FormAttachment(start, 8);
-			formData.right = new FormAttachment(start, 0, SWT.RIGHT);
-			cols.setLayoutData(formData);
-		}
 		
 		csvOptions = new Group(this, SWT.NONE);
 		csvOptions.setLayout(new GridLayout(1, false));
@@ -226,7 +176,7 @@ public class TableTab extends Composite implements IParametersEditorPage {
 				delim.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						
-						interop();
+						interop(e.widget);
 						if (custDelim.getEnabled()) custDelim.setFocus();
 					}
 				});
@@ -255,8 +205,8 @@ public class TableTab extends Composite implements IParametersEditorPage {
 				qualif.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						
-						interop();
-						if (qualifStart.getEnabled()) qualifStart.setFocus();
+						interop(e.widget);
+						if (custQualif.getEnabled()) custQualif.setFocus();
 					}
 				});
 				qualif.setItems(new String[] {"Double-quote (\")", "Apostrophe (')", "None", "Custom"});
@@ -264,130 +214,81 @@ public class TableTab extends Composite implements IParametersEditorPage {
 				qualif.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 				qualif.select(0);
 			}
+			new Label(composite, SWT.NONE);
 			{
-				Label label_1 = new Label(composite, SWT.NONE);
-				label_1.setText("Start:");
-				label_1.setAlignment(SWT.RIGHT);
-				label_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-			}
-			{
-				qualifStart = new Text(composite, SWT.BORDER);
-				qualifStart.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-				qualifStart.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-			}
-			{
-				Label label_1 = new Label(composite, SWT.NONE);
-				label_1.setText("End:");
-				label_1.setAlignment(SWT.RIGHT);
-				label_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-			}
-			{
-				qualifEnd = new Text(composite, SWT.BORDER);
-				qualifEnd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-				qualifEnd.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+				custQualif = new Text(composite, SWT.BORDER);
+				custQualif.setData("name", "custQualif");
+				custQualif.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+				custQualif.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 			}
 		}
 		
 		csvActions = new Group(this, SWT.NONE);
-		csvActions.setLayout(new FormLayout());
+		csvActions.setLayout(new GridLayout(2, false));
 		csvActions.setText("CSV actions");
 		csvActions.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
 		removeQualif = new Button(csvActions, SWT.CHECK);
-		{
-			formData_12 = new FormData();
-			formData_12.left = new FormAttachment(0, 10);
-			formData_12.right = new FormAttachment(100, -10);
-			formData_12.top = new FormAttachment(0, 10);
-			removeQualif.setLayoutData(formData_12);
-		}
+		removeQualif.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
 		removeQualif.setText("Remove qualifiers");
 		
 		trim = new Button(csvActions, SWT.CHECK);
+		trim.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+		trim.setData("name", "trim");
 		trim.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		{
-			formData_13 = new FormData();
-			formData_13.left = new FormAttachment(removeQualif, 0, SWT.LEFT);
-			formData_13.top = new FormAttachment(removeQualif, 6);
-			formData_13.right = new FormAttachment(100, -10);
-			trim.setLayoutData(formData_13);
-		}
 		trim.setText("Trim values");
 		
+		label_2 = new Label(csvActions, SWT.NONE);
+		label_2.setData("name", "label_2");
+		label_2.setText("    ");
+		
 		nqualif = new Button(csvActions, SWT.RADIO);
-		{
-			formData_14 = new FormData();
-			formData_14.left = new FormAttachment(trim, 10, SWT.LEFT);
-			formData_14.top = new FormAttachment(trim, 6);
-			formData_14.right = new FormAttachment(100, -10);
-			nqualif.setLayoutData(formData_14);
-		}
+		nqualif.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		nqualif.setText("Only entries without qualifiers    ");
+		new Label(csvActions, SWT.NONE);
 		
 		allT = new Button(csvActions, SWT.RADIO);
-		{
-			FormData formData = new FormData();
-			formData.left = new FormAttachment(nqualif, 0, SWT.LEFT);
-			formData.top = new FormAttachment(0, 76);
-			formData.right = new FormAttachment(100, -10);
-			allT.setLayoutData(formData);
-		}
+		allT.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		allT.setText("All");
 		
 		extr = new Group(this, SWT.NONE);
-		extr.setLayout(new FormLayout());
+		extr.setLayout(new GridLayout(2, false));
 		extr.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		extr.setText("Extraction mode");
 		
 		header = new Button(extr, SWT.CHECK);
+		header.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+		header.setData("name", "header");
 		header.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				interop();
+				interop(e.widget);
 			}
 		});
-		{
-			formData_15 = new FormData();
-			formData_15.top = new FormAttachment(0, 10);
-			formData_15.left = new FormAttachment(0, 10);
-			formData_15.right = new FormAttachment(100, -10);
-			header.setLayoutData(formData_15);
-		}
 		header.setText("Extract header lines");
 		
+		label_3 = new Label(extr, SWT.NONE);
+		label_3.setData("name", "label_3");
+		label_3.setText("    ");
+		
 		names = new Button(extr, SWT.RADIO);
-		{
-			formData_16 = new FormData();
-			formData_16.left = new FormAttachment(header, 10, SWT.LEFT);
-			formData_16.top = new FormAttachment(header, 6);
-			formData_16.right = new FormAttachment(100, -10);
-			names.setLayoutData(formData_16);
-		}
+		names.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		names.setText("Column names only         ");
+		new Label(extr, SWT.NONE);
 		
 		allE = new Button(extr, SWT.RADIO);
-		{
-			formData_17 = new FormData();
-			formData_17.left = new FormAttachment(names, 0, SWT.LEFT);
-			formData_17.top = new FormAttachment(names, 6);
-			formData_17.right = new FormAttachment(100, -10);
-			allE.setLayoutData(formData_17);
-		}
+		allE.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		allE.setText("All");
 		
 		body = new Button(extr, SWT.CHECK);
-		{
-			FormData formData = new FormData();
-			formData.left = new FormAttachment(header, 0, SWT.LEFT);
-			formData.top = new FormAttachment(allE, 6);
-			formData.right = new FormAttachment(100, -10);
-			body.setLayoutData(formData);
-		}
+		body.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+		body.addSelectionListener(this);
+		body.setData("name", "body");
 		body.setText("Extract table data");
 
 	}
@@ -402,15 +303,14 @@ public class TableTab extends Composite implements IParametersEditorPage {
 		return true;
 	}
 
-	public void interop() {
+	public void interop(Widget speaker) {
 
 		SWTUtils.setAllEnabled(csvOptions, btnCSV.getSelection());
 		SWTUtils.setAllEnabled(csvActions, btnCSV.getSelection());
 		
 		custDelim.setEnabled(delim.getSelectionIndex() == 4);		
 		
-		qualifStart.setEnabled(qualif.getSelectionIndex() == 3);
-		qualifEnd.setEnabled(qualif.getSelectionIndex() == 3);		
+		custQualif.setEnabled(qualif.getSelectionIndex() == 3);
 		
 		boolean noQualif = qualif.getSelectionIndex() == 2;
 		boolean trimOn = trim.getSelection() && csvActions.getEnabled();
@@ -524,16 +424,37 @@ public class TableTab extends Composite implements IParametersEditorPage {
 			
 			names.setEnabled(headerOn);
 		}
+		
+		// Make sure main box and children are disabled together
+		SWTUtils.disableIfDisabled(names, header);
+		SWTUtils.disableIfDisabled(allE, header);
+		
+		
+		// Lock Extract table data enabled if no header
+		SWTUtils.selectIfDisabled(body, header);
+		
+		// Do not allow both boxes empty
+		if (body.getEnabled()) {
+			
+			if (! header.getSelection() && ! body.getSelection())
+				body.setSelection(true);
+		}
 	}
 
-	public boolean load(IParameters parameters) {
+	public boolean load(Object data) {
 
 		return true;
 	}
 
-	public boolean save(IParameters parameters) {
+	public boolean save(Object data) {
 
 		return true;
+	}
+	public void widgetDefaultSelected(SelectionEvent e) {
+	}
+	public void widgetSelected(SelectionEvent e) {
+		
+		interop(e.widget);
 	}
 }
 
