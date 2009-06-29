@@ -55,17 +55,50 @@ import java.util.List;
  */
 public class TextFragment implements Comparable<Object> {
 	
+	/**
+	 * Special character marker for a opening inline code.
+	 */
 	public static final int MARKER_OPENING  = 0xE101;
+	
+	/**
+	 * Special character marker for a closing inline code.
+	 */
 	public static final int MARKER_CLOSING  = 0xE102;
+	
+	/**
+	 * Special character marker for an isolated inline code.
+	 */
 	public static final int MARKER_ISOLATED = 0xE103;
+	
+	/**
+	 * Special character marker for a segment place-holder.
+	 */
 	public static final int MARKER_SEGMENT  = 0xE104;
+	
+	/**
+	 * Special value used as the base of inline code indices. 
+	 */
 	public static final int CHARBASE        = 0xE110;
 
+	/**
+	 * Marker for start of reference. 
+	 */
 	public static final String REFMARKER_START = "[#$";
+	
+	/**
+	 * Marker for end of reference.
+	 */
 	public static final String REFMARKER_END   = "]";
+	
+	/**
+	 * Marker for reference separator.
+	 */
 	public static final String REFMARKER_SEP   = "@%";
 
-	static public final String CODETYPE_SEGMENT  = "$seg$";
+	/**
+	 * Code type name for segment place-holder.
+	 */
+	public static final String CODETYPE_SEGMENT  = "$seg$";
 
 	/**
 	 * List of the types of tag usable for in-line codes.
@@ -77,9 +110,25 @@ public class TextFragment implements Comparable<Object> {
 		SEGMENTHOLDER
 	};
 	
+	/**
+	 * Coded text buffer of this fragment.
+	 */
 	protected StringBuilder text;
+	
+	/**
+	 * List of the inline codes for this fragment.  
+	 */
 	protected ArrayList<Code> codes;
+	
+	/**
+	 * Flag indicating if the opening/closing inline codes of this fragment
+	 * have been balanced or not. 
+	 */
 	protected boolean isBalanced;
+	
+	/**
+	 * Value of the last inline code ID in this fragment.
+	 */
 	protected int lastCodeID;
 
 	/**

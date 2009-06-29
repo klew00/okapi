@@ -27,10 +27,29 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 public class QueryResult implements Comparable<QueryResult> {
 
+	/**
+	 * Weight for this result.
+	 */
 	public int weight;
+	
+	/**
+	 * Score of this result (a value between 0 and 100).
+	 */
 	public int score;
+	
+	/**
+	 * Text of the source for this result.
+	 */
 	public TextFragment source;
+	
+	/**
+	 * Text of the target for this result.
+	 */
 	public TextFragment target;
+	
+	/**
+	 * ID of the connector that generated this result.
+	 */
 	public int connectorId;
 
 	/**

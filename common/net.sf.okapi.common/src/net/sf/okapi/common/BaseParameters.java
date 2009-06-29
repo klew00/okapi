@@ -37,10 +37,19 @@ import java.net.URL;
  */
 public abstract class BaseParameters implements IParameters {
 
-	protected String              path;
-	protected ParametersString    buffer;
+	/**
+	 * Current path of the parameter file.
+	 */
+	protected String path;
+	
+	/**
+	 * Buffer where the parameters are stored during conversion.
+	 */
+	protected ParametersString buffer;
 
-
+	/**
+	 * Creates a new BaseParameters object with a null path and an empty buffer.
+	 */
 	public BaseParameters () {
 		path = null;
 		buffer = new ParametersString();
