@@ -20,6 +20,8 @@
 
 package net.sf.okapi.ui.filters.openxml;
 
+import net.sf.okapi.common.ui.UIUtil;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
@@ -35,6 +37,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Control;
 
 public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 
@@ -145,6 +148,10 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 				});
 				btnCancel.setText("Cancel");
 			}
+			if ( UIUtil.getPlatformType() == UIUtil.PFTYPE_WIN )
+				compositeOKCancel.setTabList(new Control[]{btnOk, btnCancel, btnHelp});
+			else
+				compositeOKCancel.setTabList(new Control[]{btnCancel, btnOk, btnHelp});
 		}
 		{
 			TabFolder tabFolder = new TabFolder(shlOfficeFilter, SWT.NONE);
