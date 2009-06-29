@@ -137,6 +137,8 @@ public class ODFFilter implements IFilter {
 		toProtect.add("dc:creator");
 		toProtect.add("text:note-citation");
 
+		//TODO: Issue, protection not inherited by text:deletion, nor underlying p
+		// so deleted text gets out
 		toProtect.add("text:tracked-changes");
 
 		toProtect.add("text:title"); // Content is defined elsewhere

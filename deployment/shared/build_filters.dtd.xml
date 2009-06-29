@@ -20,6 +20,12 @@
 		<copy todir="${tmp}">
 			<fileset dir="${src_filters.dtd}" excludes="**/*.java"/>
 		</copy>
+
+		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/dtd">
+			<fileset dir="../../help/filters/ui/dtd" />
+		</copy>
+		
 	</target>
 
 </project>

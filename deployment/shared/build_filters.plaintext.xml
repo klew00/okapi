@@ -17,6 +17,9 @@
 		</copy>
 		
 		<copy file="../../help/help.css" todir="${dist}/help"/>
+		<copy todir="${dist}/help/filters/ui/plaintext">
+			<fileset dir="../../help/filters/ui/plaintext" />
+		</copy>
 
 	</target>
 

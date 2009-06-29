@@ -39,7 +39,7 @@ Username: same as for the shared documents
 Password: same as for the shared documents
 Start directory: okapi
 
-The structure in the okapi is the same as in trunk/website
+The structure in the okapi directory is the same as in trunk/website
 
 
 --- 8) Post a notification that a new release is available.
