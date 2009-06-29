@@ -112,7 +112,7 @@ public class OpenXMLFilter implements IFilter {
 	private boolean bPreferenceTranslatePowerpointMasters = true; // DWH 5-26-09 preferences
 	private boolean bPreferenceTranslateWordHeadersFooters = true; // DWH 5-26-09 preferences
 	private boolean bPreferenceTranslateWordAllStyles = true; // DWH 5-28-09 if false, exclude a given list
-	private boolean bPreferenceTranslateWordHidden = true; // DWH 5-28-09
+	private boolean bPreferenceTranslateWordHidden = false; // DWH 5-28-09
 	private boolean bMinedHiddenStyles = true; // DWH 5-28-09
 	private boolean bPreferenceTranslateExcelExcludeColors = false;
 	  // DWH 6-12-09 don't translate text in Excel in some colors 

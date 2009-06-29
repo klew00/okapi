@@ -135,7 +135,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private boolean bExcludeTextInUnit = false; // DWH 5-29-09
 	private String sCurrentCharacterStyle = ""; // DWH 5-27-09
 	private String sCurrentParagraphStyle = ""; // DWH 5-27-09
-	private boolean bPreferenceTranslateWordHidden = true; // DWH 5-29-09
+	private boolean bPreferenceTranslateWordHidden = false; // DWH 6-29-09
 	private boolean bPreferenceTranslateExcelExcludeColors = false;
 	  // DWH 6-12-09 don't translate text in Excel in some colors 
 	private boolean bPreferenceTranslateExcelExcludeColumns = false;

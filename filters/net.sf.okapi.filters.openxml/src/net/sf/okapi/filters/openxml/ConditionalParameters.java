@@ -56,7 +56,7 @@ public class ConditionalParameters extends BaseParameters {
 		bPreferenceTranslatePowerpointMasters = true; // Powerpoint Masters
 		bPreferenceTranslateWordHeadersFooters = true; // Word Headers and Footers
 		bPreferenceTranslateWordAllStyles = true; // Word false to exclude tsExcludeWordStyles
-		bPreferenceTranslateWordHidden = true; // Word Hidden text
+		bPreferenceTranslateWordHidden = false; // Word Hidden text
 		bPreferenceTranslateExcelExcludeColors = false; // Excel exclude tsExcelExcludedColors
 		bPreferenceTranslateExcelExcludeColumns = false; // Excel exclude specific cells
 		tsExcelExcludedColors = new TreeSet<String>(); // exclude if bPreferenceTranslateExcelExcludeColors
