@@ -59,7 +59,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		
 	/**
 	 * Number of the line (1-based) containing filed names (column captions).<p>
-	 * Default: 0 (auto-detect)
+	 * Default: 1
 	 */
 	public int columnNamesLineNum = 1;
 	

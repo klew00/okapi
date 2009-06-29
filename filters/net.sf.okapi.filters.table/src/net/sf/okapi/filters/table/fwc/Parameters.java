@@ -30,13 +30,23 @@ package net.sf.okapi.filters.table.fwc;
 public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 
 	/** 
-	 * Specifies positions of fixed-width table columns. The positions are x-coordinates, like the position of a char in a string.
+	 * Specifies start positions of fixed-width table columns. The positions are x-coordinates, like the position of a char in a string.
 	 * The difference is that columnStartPositions are 1-based.  
 	 * Can be represented by one of the following string types:
 	 *<li>"1" - position (1-based) where the column starts
 	 *<li>"1,2,5" - comma-delimited list (1-based) of starting positions of the table columns
 	 */
-	public String columnWidths = "";
+	//public String columnWidths = "";
+	public String columnStartPositions = "";
+	
+	/** 
+	 * Specifies end positions of fixed-width table columns. The positions are x-coordinates, like the position of a char in a string.
+	 * The difference is that columnEndPositions are 1-based.  
+	 * Can be represented by one of the following string types:
+	 *<li>"1" - position (1-based) where the column starts
+	 *<li>"1,2,5" - comma-delimited list (1-based) of starting positions of the table columns
+	 */
+	public String columnEndPositions = "";
 			
 //----------------------------------------------------------------------------------------------------------------------------	
 	
@@ -53,7 +63,9 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 		super.reset();
 		
 		// All parameters are set to defaults here
-		columnWidths = "";
+		//columnWidths = "";
+		columnStartPositions = "";
+		columnEndPositions = "";
 		trimMode = TRIM_ALL;  // To get rid of white-space padding in-between columns
 	}
 
@@ -66,7 +78,9 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 		buffer.fromString(data);
 		
 		// All parameters are retrieved here		
-		columnWidths = buffer.getString("columnWidths", "").trim(); // null is impossible, default is ""
+		//columnWidths = buffer.getString("columnWidths", "").trim(); // null is impossible, default is ""
+		columnStartPositions = buffer.getString("columnStartPositions", "").trim(); // null is impossible, default is ""
+		columnEndPositions = buffer.getString("columnEndPositions", "").trim(); // null is impossible, default is ""
 	}
 	
 	@Override
@@ -77,7 +91,9 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 		super.toString(); // Will write to the same buffer
 		
 		// All parameters are set here						
-		buffer.setString("columnWidths", columnWidths);
+		//buffer.setString("columnWidths", columnWidths);
+		buffer.setString("columnStartPositions", columnStartPositions);
+		buffer.setString("columnEndPositions", columnEndPositions);
 		
 		return buffer.toString();
 	}

@@ -44,7 +44,9 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 	public static String COLUMN_WIDTH	= "column_width";
 	
 	private Parameters params; // Fixed-Width Columns Filter parameters
-	protected List<Integer> columnWidths;
+	//protected List<Integer> columnWidths;
+	protected List<Integer> columnStartPositions;
+	protected List<Integer> columnEndPositions;
 	
 	public FixedWidthColumnsFilter() {
 
@@ -68,7 +70,9 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 		super.filter_init();
 		
 		// Initialization
-		columnWidths = ListUtils.stringAsIntList(params.columnWidths);
+		//columnWidths = ListUtils.stringAsIntList(params.columnWidths);
+		columnStartPositions = ListUtils.stringAsIntList(params.columnStartPositions);
+		columnEndPositions = ListUtils.stringAsIntList(params.columnEndPositions);
 	}
 
 	@Override
@@ -78,21 +82,39 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 		if (Util.isEmpty(line)) return TextProcessingResult.REJECTED;
 		
 		int pos = 0;
-		for (int i = 0; i < columnWidths.size(); i++) {
+		//for (int i = 0; i < columnWidths.size(); i++) {
+		int len = Math.min(columnStartPositions.size(), columnEndPositions.size());
+		for (int i = 0; i < len; i++) {
 			
-			int start = 0;
-			if (pos >= line.length())
-				start = line.length();
-			else				
-				start = pos;
+//			int start = 0;
+//			if (pos >= line.length())
+//				start = line.length();
+//			else				
+//				start = pos;
+//			
+//			pos += columnWidths.get(i);
+//			
+//			int end = 0;
+//			if (pos >= line.length())
+//				end = line.length();
+//			else				
+//				end = pos; 
+
+//			int start = columnStartPositions.get(i) - 1; // 0-base
+//			int end = columnEndPositions.get(i) - 1; // 0-base
 			
-			pos += columnWidths.get(i);
+			int start = columnStartPositions.get(i) - 1; // 0-base
 			
-			int end = 0;
-			if (pos >= line.length())
+			int end;
+			
+			if (i < len - 1)
+				end = columnStartPositions.get(i + 1) - 1; // 0-base
+			else
 				end = line.length();
-			else				
-				end = pos; 
+						
+			if (start >= end) continue;
+			if (start >= line.length()) continue;
+			if (end > line.length()) end = line.length(); 
 			
 			cells.add(line.substring(start, end));
 		}
@@ -107,12 +129,24 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 		if (tu == null) return false;
 		
 		int index = column - 1; 
-		if (!Util.checkIndex(index, columnWidths)) return false;
+		//if (!Util.checkIndex(index, columnWidths)) return false;
+		if (!Util.checkIndex(index, columnStartPositions)) return false;
+		if (!Util.checkIndex(index, columnEndPositions)) return false;
 		
-		int colWidth = columnWidths.get(index); 		
+		//int colWidth = columnWidths.get(index);
+		int colWidth = columnEndPositions.get(index) - columnStartPositions.get(index); 
+		
 		tu.setSourceProperty(new Property(COLUMN_WIDTH, String.valueOf(colWidth), true));
 		
-		return super.sendCell(tu, column, numColumns);
+		boolean res = super.sendCell(tu, column, numColumns);
+		
+//		if (column < numColumns) {
+//			
+//			String gap = " ";
+//			sendSkeletonCell(gap, getActiveSkeleton(), column, numColumns);
+//		}
+				
+		return res;
 	}
 	
 	

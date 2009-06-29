@@ -199,8 +199,8 @@ public class CommaSeparatedValuesFilterTest {
 		Parameters params = (Parameters) filter.getParameters();
 						
 		assertEquals(params.unescapeSource, true);
-		assertEquals(params.trimLeft, true);
-		assertEquals(params.trimRight, false);
+		assertEquals(params.trimLeading, false);
+		assertEquals(params.trimTrailing, false);
 		assertEquals(params.preserveWS, true);
 		assertEquals(params.useCodeFinder, false);
 		assertEquals(				

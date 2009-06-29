@@ -197,17 +197,23 @@ public class FixedWidthColumnsFilterTest {
 		// Check if PlainTextFilter params are set for inherited fields
 		Parameters params = (Parameters) filter.getParameters();
 								
-		assertEquals(params.columnWidths, "");
+		//assertEquals(params.columnWidths, "");
+		assertEquals(params.columnStartPositions, "");
+		assertEquals(params.columnEndPositions, "");
 					
 		// Check if defaults are set
 		params = new Parameters();
 		filter.setParameters(params);
 		
-		params.columnWidths = "";
+		//params.columnWidths = "";
+		params.columnStartPositions = "";
+		params.columnEndPositions = "";
 		
 		params = _getParameters();
 				
-		assertEquals("", params.columnWidths);
+		//assertEquals("", params.columnWidths);
+		assertEquals("", params.columnStartPositions);
+		assertEquals("", params.columnEndPositions);
 		
 		// Load filter parameters from a file, check if params have changed
 		URL paramsUrl = TableFilterTest.class.getResource("/test_params3.txt");
@@ -219,7 +225,9 @@ public class FixedWidthColumnsFilterTest {
 		}
 		
 		
-		assertEquals("19, 30, 21, 16, 15, 21, 20", params.columnWidths);
+		//assertEquals("19, 30, 21, 16, 15, 21, 20", params.columnWidths);
+		assertEquals("1, 20, 50, 71, 87, 102, 123, 144", params.columnStartPositions);
+		assertEquals("11, 32, 62, 83, 97, 112, 133, 151", params.columnEndPositions);
 		
 		// Save filter parameters to a file, load and check if params have changed
 		paramsUrl = TableFilterTest.class.getResource("/test_params2.txt");
@@ -230,10 +238,14 @@ public class FixedWidthColumnsFilterTest {
 		// Change params before loading them
 		params = (Parameters) filter.getParameters();
 		
-		params.columnWidths = "1, 23, 30";
+		//params.columnWidths = "1, 23, 30";
+		params.columnStartPositions = "1, 23, 30";
+		params.columnEndPositions = "10, 21, 40";
 		
 		params.load(Util.toURI(paramsUrl.getPath()), false);		
-		assertEquals("19, 30, 21, 16, 15, 21, 20", params.columnWidths);
+		// assertEquals("19, 30, 21, 16, 15, 21, 20", params.columnWidths);
+		assertEquals("1, 20, 50, 71, 87, 102, 123, 144", params.columnStartPositions);
+		assertEquals("11, 32, 62, 83, 97, 112, 133, 151", params.columnEndPositions);
 		
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		filter.open(new RawDocument(input, "UTF-8", "en"));
@@ -276,7 +288,9 @@ public class FixedWidthColumnsFilterTest {
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
 		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
-		params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
+		//params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
+		params.columnStartPositions = "1, 20, 50, 71, 87, 102, 123, 144";
+		params.columnEndPositions = "11, 32, 62, 83, 97, 112, 133, 151";
 		
 		params.sourceColumns = "4, 6";
 		params.sourceIdSuffixes = "_name, _descr";
@@ -321,7 +335,9 @@ public class FixedWidthColumnsFilterTest {
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
 		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
-		params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
+		//params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
+		params.columnStartPositions = "1, 20, 50, 71, 87, 102, 123, 144";
+		params.columnEndPositions = "11, 32, 62, 83, 97, 112, 133, 151";
 		
 		params.sourceColumns = "4, 6";
 		params.sourceIdSuffixes = "_name, _descr";
@@ -421,7 +437,8 @@ public class FixedWidthColumnsFilterTest {
 		_testEvent(EventType.TEXT_UNIT, "Value24", 3, 2, 4);
 		_testEvent(EventType.TEXT_UNIT, "Value25", 3, 2, 5);
 		_testEvent(EventType.TEXT_UNIT, "Value26", 3, 2, 6);
-		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 2, 7);			// Value28 is ignored
+		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 2, 7);			
+		_testEvent(EventType.TEXT_UNIT, "Value28", 3, 2, 8);
 		_testEvent(EventType.END_GROUP, null);
 		
 		_testEvent(EventType.START_GROUP, null);
@@ -460,7 +477,8 @@ public class FixedWidthColumnsFilterTest {
 		_testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4);
 		_testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5);
 		_testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6);
-		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7);			// Value28 is ignored
+		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7);
+		_testEvent(EventType.TEXT_UNIT, "Value28", 3, 1, 8);
 		_testEvent(EventType.END_GROUP, null);
 				
 		
@@ -474,15 +492,15 @@ public class FixedWidthColumnsFilterTest {
 				
 		_testEvent(EventType.START_DOCUMENT, null);
 					
-		//19, 30, 21, 16, 15, 21, 20
 		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1, 19);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2, 30);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3, 21);
-		_testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4, 16);
-		_testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5, 15);
-		_testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6, 21);
-		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7, 20);			// Value28 is ignored
+		_testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1, 10);
+		_testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2, 12);
+		_testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3, 12);
+		_testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4, 12);
+		_testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5, 10);
+		_testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6, 10);
+		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7, 10);			
+		_testEvent(EventType.TEXT_UNIT, "Value28", 3, 1, 8, 7);			
 		_testEvent(EventType.END_GROUP, null);
 		
 		filter.close();
@@ -512,7 +530,8 @@ public class FixedWidthColumnsFilterTest {
 		_testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4);
 		_testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5);
 		_testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6);
-		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7);			// Value28 is ignored
+		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7);			
+		_testEvent(EventType.TEXT_UNIT, "Value28", 3, 1, 8);
 		_testEvent(EventType.END_GROUP, null);
 		
 		filter.close();
@@ -817,7 +836,9 @@ public class FixedWidthColumnsFilterTest {
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
 		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
-		params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
+		//params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
+		params.columnStartPositions = "1, 20, 50, 71, 87, 102, 123, 144";
+		params.columnEndPositions = "11, 32, 62, 83, 97, 112, 133, 151";
 		
 		params.sourceColumns = "4, 6";
 		params.sourceIdSuffixes = "_name, _descr";

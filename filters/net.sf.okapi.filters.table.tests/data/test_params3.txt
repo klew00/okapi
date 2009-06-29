@@ -6,4 +6,5 @@ numColumns.i = -1
 sendHeaderMode.i = 1
 trimMode.i = 1	
 textQualifier =\"
-columnWidths =19, 30, 21, 16, 15, 21, 20
+columnStartPositions=1, 20, 50, 71, 87, 102, 123, 144
+columnEndPositions=11, 32, 62, 83, 97, 112, 133, 151

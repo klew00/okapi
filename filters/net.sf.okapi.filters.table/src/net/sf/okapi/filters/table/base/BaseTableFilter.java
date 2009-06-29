@@ -121,8 +121,8 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		
 		if (params.trimMode != Parameters.TRIM_NONE) {
 			
-			params.trimLeft = true;
-			params.trimRight = true;
+			params.trimLeading = true;
+			params.trimTrailing = true;
 		}
 		
 		rowNumber = 0;
@@ -357,9 +357,9 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					// Do not add to the TU's skeleton as it might be sent before or later
 					GenericSkeleton skel = new GenericSkeleton();
 					
-					TextUnitUtils.trimLeft(trg, skel);
+					TextUnitUtils.trimLeading(trg, skel);
 					skel.addContentPlaceholder(tu, language);
-					TextUnitUtils.trimRight(trg, skel);
+					TextUnitUtils.trimTrailing(trg, skel);
 					
 					sendSkeletonPart(skel);										
 					

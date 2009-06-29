@@ -42,6 +42,11 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	 * Default: " (quotation mark)
 	 */ 
 	public String textQualifier = "\"";
+	
+	/**
+	 * True if qualifiers should be dropped, and shouldn't go into the text units
+	 */
+	public boolean removeQualifiers = true; 
 
 	public Parameters() {
 		
@@ -58,6 +63,7 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 		// All parameters are set to defaults here
 		fieldDelimiter = ",";
 		textQualifier = "\"";
+		removeQualifiers = true;
 	}
 
 	public void fromString(String data) {
@@ -71,6 +77,7 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 		// All parameters are retrieved here		
 		fieldDelimiter = buffer.getString("fieldDelimiter", "").trim(); 
 		textQualifier = buffer.getString("textQualifier", "").trim();
+		removeQualifiers = buffer.getBoolean("removeQualifiers", true);
 	}
 	
 	@Override
@@ -83,6 +90,7 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 		// All parameters are set here						
 		buffer.setString("fieldDelimiter", fieldDelimiter);
 		buffer.setString("textQualifier", textQualifier);
+		buffer.setBoolean("removeQualifiers", removeQualifiers);
 		
 		return buffer.toString();
 	}
