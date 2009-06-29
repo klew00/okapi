@@ -71,9 +71,9 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 
 		addConfiguration(true, // Do not inherit configurations from Base Table Filter
 				FILTER_CONFIG,
-				"Comma-Separated Values",
+				"Table (Comma-Separated Values)",
 				"Comma-separated values, optional header with field names", 
-				null);
+				"okf_table_csv.fprm");
 		
 		setParameters(new Parameters());	// CSV Filter's parameters
 	}

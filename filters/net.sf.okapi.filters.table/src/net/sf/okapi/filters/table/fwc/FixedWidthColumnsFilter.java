@@ -55,9 +55,9 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 
 		addConfiguration(true, // Do not inherit configurations from Base Table Filter
 						FILTER_CONFIG,
-						"Fixed-Width Columns",
-						"Fixed-width columns table padded with white-spaces", 
-						null);
+						"Table (Fixed-Width Columns)",
+						"Fixed-width columns table padded with white-spaces.", 
+						"okf_table_fwc.fprm");
 		
 		setParameters(new Parameters());	// Fixed-Width Columns Filter parameters
 	}

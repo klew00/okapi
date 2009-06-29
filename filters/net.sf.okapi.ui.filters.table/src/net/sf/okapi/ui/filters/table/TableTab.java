@@ -20,6 +20,8 @@
 
 package net.sf.okapi.ui.filters.table;
 
+import net.sf.okapi.filters.plaintext.common.CompoundParameters;
+import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
 import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
@@ -50,6 +52,9 @@ import org.eclipse.swt.events.TypedEvent;
  */
 
 public class TableTab extends Composite implements IDialogPage, SelectionListener {
+	
+	private static String NONE_ID = "%%%^^^$$$nonenonenone$$$^^^%%%";
+	
 	private Group grpTableType;
 	private Button btnCSV;
 	private Button btnTSV;
@@ -443,15 +448,281 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 
 	public boolean load(Object data) {
 
+		if (data instanceof CompoundParameters) {
+			
+			CompoundParameters params = (CompoundParameters) data;
+			
+			Class<?> c = params.getParametersClass();
+				
+			if (c == net.sf.okapi.filters.table.csv.Parameters.class) {
+				
+				btnCSV.setSelection(true);
+				btnTSV.setSelection(false);
+				btnFWC.setSelection(false);
+			}
+			else if (c == net.sf.okapi.filters.table.tsv.Parameters.class) {
+				
+				btnCSV.setSelection(false);
+				btnTSV.setSelection(true);
+				btnFWC.setSelection(false);
+			}		
+			else if (c == net.sf.okapi.filters.table.fwc.Parameters.class) {
+				
+				btnCSV.setSelection(false);
+				btnTSV.setSelection(false);
+				btnFWC.setSelection(true);
+			}			
+			else {
+				
+				btnCSV.setSelection(true);
+				btnTSV.setSelection(false);
+				btnFWC.setSelection(false);
+			}
+			
+		} 
+		else {
+			if (data instanceof net.sf.okapi.filters.table.csv.Parameters) {
+			
+				net.sf.okapi.filters.table.csv.Parameters params =
+					(net.sf.okapi.filters.table.csv.Parameters) data;
+				
+				if (params.fieldDelimiter.equals(",")) {
+					delim.select(0);
+					custDelim.setText("");
+				}
+				else if (params.fieldDelimiter.equals(";")) {
+					delim.select(1);
+					custDelim.setText("");
+				}
+				else if (params.fieldDelimiter.equals("\t")) {
+					delim.select(2);
+					custDelim.setText("");
+				} 
+				else if (params.fieldDelimiter.equals(" ")) {
+					delim.select(3);
+					custDelim.setText("");
+				}
+				else {
+					delim.select(4);
+					custDelim.setText(params.fieldDelimiter);
+				}
+				
+				if (params.textQualifier.equals("\"")) {
+					qualif.select(0);
+					custQualif.setText("");
+				}
+				else if (params.textQualifier.equals("\'")) {
+					qualif.select(1);
+					custQualif.setText("");
+				}
+				else if (params.textQualifier.equals(NONE_ID)) {
+					qualif.select(2);
+					custQualif.setText("");
+				} 
+				else {
+					qualif.select(3);
+					custQualif.setText(params.textQualifier);
+				}
+				
+				removeQualif.setSelection(params.removeQualifiers);
+			}
+//			else if (data instanceof net.sf.okapi.filters.table.tsv.Parameters) {
+//				
+//				net.sf.okapi.filters.table.tsv.Parameters params =
+//					(net.sf.okapi.filters.table.tsv.Parameters) data;
+//							
+//			}
+//			else if (data instanceof net.sf.okapi.filters.table.fwc.Parameters) {
+//			
+//				net.sf.okapi.filters.table.fwc.Parameters params =
+//					(net.sf.okapi.filters.table.fwc.Parameters) data;
+//				
+//			}
+			
+			// Common part
+			
+			if (data instanceof net.sf.okapi.filters.table.base.Parameters) {
+				
+				net.sf.okapi.filters.table.base.Parameters params =
+					(net.sf.okapi.filters.table.base.Parameters) data;
+			
+				cols.setSelection(params.columnNamesLineNum);
+				start.setSelection(params.valuesStartLineNum);
+				
+				//-----------------------
+				
+				body.setSelection(params.sendColumnsMode != Parameters.SEND_COLUMNS_NONE);
+				
+				//-----------------------
+				if (params.sendHeaderMode == Parameters.SEND_HEADER_NONE) {
+					
+					header.setSelection(false);
+					names.setSelection(false);
+					allE.setSelection(false);
+				}
+									
+				else if (params.sendHeaderMode == Parameters.SEND_HEADER_COLUMN_NAMES_ONLY) {
+					
+					header.setEnabled(true);
+					header.setSelection(true);
+					names.setSelection(true);
+					allE.setSelection(false);
+				}
+									
+				else if (params.sendHeaderMode == Parameters.SEND_HEADER_ALL) {
+					
+					header.setEnabled(true);
+					header.setSelection(true);
+					names.setSelection(false);
+					allE.setSelection(true);
+				}
+				
+				//-----------------------
+				if (params.trimMode == Parameters.TRIM_NONQUALIFIED_ONLY) {
+					
+					trim.setEnabled(true);
+					trim.setSelection(true);
+					nqualif.setSelection(true);
+					allT.setSelection(false);
+				}
+				
+				else if (params.sendHeaderMode == Parameters.TRIM_ALL) {
+					
+					trim.setEnabled(true);
+					trim.setSelection(true);
+					nqualif.setSelection(false);
+					allT.setSelection(true);
+				}
+				
+				else if (params.sendHeaderMode == Parameters.TRIM_NONE) {
+					
+					trim.setSelection(false);
+					nqualif.setSelection(false);
+					allT.setSelection(false);
+				}				
+			}			
+		}
+
 		return true;
 	}
 
 	public boolean save(Object data) {
 
+		if (data instanceof CompoundParameters) {
+			
+			CompoundParameters params = (CompoundParameters) data;
+			
+			if (btnCSV.getSelection())
+				params.setParametersClass(net.sf.okapi.filters.table.csv.Parameters.class);
+
+			else if (btnTSV.getSelection()) 
+				params.setParametersClass(net.sf.okapi.filters.table.tsv.Parameters.class);
+			
+			else if (btnFWC.getSelection()) 
+				params.setParametersClass(net.sf.okapi.filters.table.fwc.Parameters.class);
+			
+			else
+				params.setParametersClass(net.sf.okapi.filters.table.base.Parameters.class);
+		} 		
+		else {
+			if (data instanceof net.sf.okapi.filters.table.csv.Parameters) {
+			
+				net.sf.okapi.filters.table.csv.Parameters params =
+					(net.sf.okapi.filters.table.csv.Parameters) data;
+				
+				switch (delim.getSelectionIndex()) {
+				
+				case 0:
+					params.fieldDelimiter = ",";
+					break;
+					
+				case 1:
+					params.fieldDelimiter = ";";
+					break;
+					
+				case 2:
+					params.fieldDelimiter = "\t";
+					break;
+			
+				case 3:
+					params.fieldDelimiter = " ";
+					break;				
+					
+				case 4:
+					params.fieldDelimiter = custDelim.getText();
+					break;
+				}
+				
+				switch (qualif.getSelectionIndex()) {
+				
+				case 0:
+					params.textQualifier = "\"";
+					break;
+					
+				case 1:
+					params.textQualifier = "\'";
+					break;
+					
+				case 2:					
+					params.textQualifier = NONE_ID;
+					break;
+			
+				case 3:
+					params.textQualifier = custQualif.getText();
+					break;				
+				}
+				
+				params.removeQualifiers = removeQualif.getSelection();				
+			}
+//			else if (data instanceof net.sf.okapi.filters.table.tsv.Parameters) {
+//				
+//				net.sf.okapi.filters.table.tsv.Parameters params =
+//					(net.sf.okapi.filters.table.tsv.Parameters) data;
+//						
+//			}
+//			else if (data instanceof net.sf.okapi.filters.table.fwc.Parameters) {
+//			
+//				net.sf.okapi.filters.table.fwc.Parameters params =
+//					(net.sf.okapi.filters.table.fwc.Parameters) data;
+//				
+//			}
+			
+			// Common part
+			
+			if (data instanceof net.sf.okapi.filters.table.base.Parameters) {
+				
+				net.sf.okapi.filters.table.base.Parameters params =
+					(net.sf.okapi.filters.table.base.Parameters) data;
+			
+				params.columnNamesLineNum = cols.getSelection();
+				params.valuesStartLineNum = start.getSelection();
+				
+				if (header.getSelection() && names.getSelection())
+					params.sendHeaderMode = Parameters.SEND_HEADER_COLUMN_NAMES_ONLY;
+				
+				else if (header.getSelection() && allE.getSelection())
+					params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+				
+				else
+					params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
+				
+				if (trim.getSelection() && nqualif.getSelection())
+					params.trimMode = Parameters.TRIM_NONQUALIFIED_ONLY;
+				
+				else if (trim.getSelection() && allT.getSelection())
+					params.sendHeaderMode = Parameters.TRIM_ALL;
+				
+				else
+					params.sendHeaderMode = Parameters.TRIM_NONE;
+			}
+		}
+
 		return true;
 	}
+		
 	public void widgetDefaultSelected(SelectionEvent e) {
 	}
+	
 	public void widgetSelected(SelectionEvent e) {
 		
 		interop(e.widget);

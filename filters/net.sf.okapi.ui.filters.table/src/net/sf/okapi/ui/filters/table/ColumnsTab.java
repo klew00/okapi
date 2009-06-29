@@ -21,6 +21,7 @@
 package net.sf.okapi.ui.filters.table;
 
 import net.sf.okapi.filters.plaintext.common.INotifiable;
+import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
 import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 import net.sf.okapi.ui.filters.plaintext.common.Util2;
@@ -324,10 +325,95 @@ public class ColumnsTab extends Composite implements IDialogPage {
 
 	public boolean load(Object data) {
 		
+		if (data instanceof net.sf.okapi.filters.table.fwc.Parameters) {
+		
+			net.sf.okapi.filters.table.fwc.Parameters params =
+				(net.sf.okapi.filters.table.fwc.Parameters) data;
+						
+		}
+		
+		// Common part
+		
+		if (data instanceof net.sf.okapi.filters.table.base.Parameters) {
+			
+			net.sf.okapi.filters.table.base.Parameters params =
+				(net.sf.okapi.filters.table.base.Parameters) data;
+		
+			num.setSelection(params.numColumns);
+			
+			//------------------
+			if (params.detectColumnsMode == Parameters.DETECT_COLUMNS_FIXED_NUMBER)
+				fix.setSelection(true);
+			
+			else if (params.detectColumnsMode == Parameters.DETECT_COLUMNS_COL_NAMES)
+				names.setSelection(true);
+			
+			else
+				vals.setSelection(true);
+			
+			//------------------
+			if (params.sendColumnsMode == Parameters.SEND_COLUMNS_LISTED) {
+				
+				defs.setSelection(true);
+				all.setSelection(false);
+			}
+			
+			else if (params.sendColumnsMode == Parameters.SEND_COLUMNS_ALL) {
+				
+				defs.setSelection(false);
+				all.setSelection(true);
+			}
+			
+			else {
+				
+				defs.setSelection(false);
+				all.setSelection(false);
+			}
+				
+		}
+		
+
 		return true;
 	}
 
 	public boolean save(Object data) {
+		
+		if (data instanceof net.sf.okapi.filters.table.fwc.Parameters) {
+			
+			net.sf.okapi.filters.table.fwc.Parameters params =
+				(net.sf.okapi.filters.table.fwc.Parameters) data;
+			
+		}
+		
+		// Common part
+		
+		if (data instanceof net.sf.okapi.filters.table.base.Parameters) {
+			
+			net.sf.okapi.filters.table.base.Parameters params =
+				(net.sf.okapi.filters.table.base.Parameters) data;
+		
+			params.numColumns = num.getSelection();
+		
+			// -----------------
+			if (fix.getSelection())
+				params.detectColumnsMode = Parameters.DETECT_COLUMNS_FIXED_NUMBER;
+			
+			else if (names.getSelection())
+				params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+			
+			else
+				params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+		
+			// -----------------
+			if (defs.getSelection())
+				params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+			
+			else if (all.getSelection())
+				params.sendColumnsMode = Parameters.SEND_COLUMNS_ALL;
+			
+			else 
+				params.sendColumnsMode = Parameters.SEND_COLUMNS_NONE;
+		}
 		
 		return true;
 	}

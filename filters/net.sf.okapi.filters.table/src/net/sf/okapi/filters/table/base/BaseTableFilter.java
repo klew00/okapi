@@ -85,11 +85,11 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		setName(FILTER_NAME);
 		setMimeType(FILTER_MIME);
 		
-		addConfiguration(true, // Do not inherit configurations from Base Plain Text
-				FILTER_CONFIG,
-				"Table Filter",
-				"Table-like files such as tab-delimited, CSV, fixed-width columns, etc.", 
-				null);
+//		addConfiguration(true, // Do not inherit configurations from Base Plain Text
+//				FILTER_CONFIG,
+//				"Table Filter",
+//				"Table-like files such as tab-delimited, CSV, fixed-width columns, etc.", 
+//				null);
 		
 		columnNames = new ArrayList<String>();
 		tuCache = new ArrayList<TextUnit>();
