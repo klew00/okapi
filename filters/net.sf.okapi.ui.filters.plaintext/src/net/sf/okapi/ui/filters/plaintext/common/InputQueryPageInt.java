@@ -21,6 +21,7 @@
 package net.sf.okapi.ui.filters.plaintext.common;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
@@ -38,7 +39,9 @@ public class InputQueryPageInt extends Composite implements IInputQueryPage {
 	private Composite composite;
 	private Label lblPrompt;
 	private Spinner spinner;
+	@SuppressWarnings("unused")
 	private Label label;
+	@SuppressWarnings("unused")
 	private Label label_1;
 
 	/**
@@ -94,9 +97,14 @@ public class InputQueryPageInt extends Composite implements IInputQueryPage {
 		lblPrompt.setText(prompt);
 	}
 
-	public void interop() {
+	public void interop(Widget speaker) {
 		
 		
+	}
+
+	public boolean canClose(boolean isOK) {
+		
+		return true;
 	}
 
 }

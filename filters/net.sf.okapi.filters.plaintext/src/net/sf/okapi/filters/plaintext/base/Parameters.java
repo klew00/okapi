@@ -34,8 +34,8 @@ import net.sf.okapi.filters.plaintext.common.WrapMode;
 public class Parameters extends AbstractParameters {
 	
 	public boolean unescapeSource = true;
-	public boolean trimLeft = true;
-	public boolean trimRight = false;
+	public boolean trimLeading = false;
+	public boolean trimTrailing = false;
 	public boolean preserveWS = true;
 	public boolean useCodeFinder = false;
 	public String codeFinderRules = "";	
@@ -57,8 +57,8 @@ public class Parameters extends AbstractParameters {
 		
 		// All parameters are set to defaults here
 		unescapeSource = true;
-		trimLeft = true;
-		trimRight = false;
+		trimLeading = false;
+		trimTrailing = false;
 		preserveWS = true;
 		useCodeFinder = false;
 		
@@ -81,8 +81,8 @@ public class Parameters extends AbstractParameters {
 		
 		// All parameters are retrieved here
 		unescapeSource = buffer.getBoolean("unescapeSource", true);
-		trimLeft = buffer.getBoolean("trimLeft", true);
-		trimRight = buffer.getBoolean("trimRight", false);
+		trimLeading = buffer.getBoolean("trimLeading", false);
+		trimTrailing = buffer.getBoolean("trimTrailing", false);
 		preserveWS = buffer.getBoolean("preserveWS", true);
 		useCodeFinder = buffer.getBoolean("useCodeFinder", false);
 		codeFinderRules = buffer.getString("codeFinderRules", codeFinder.toString());
@@ -96,8 +96,8 @@ public class Parameters extends AbstractParameters {
 		
 		// All parameters are set here
 		buffer.setBoolean("unescapeSource", unescapeSource);
-		buffer.setBoolean("trimLeft", trimLeft);
-		buffer.setBoolean("trimRight", trimRight);
+		buffer.setBoolean("trimLeading", trimLeading);
+		buffer.setBoolean("trimTrailing", trimTrailing);
 		buffer.setBoolean("preserveWS", preserveWS);
 		buffer.setBoolean("useCodeFinder", useCodeFinder);
 		buffer.setString("codeFinderRules", codeFinderRules);

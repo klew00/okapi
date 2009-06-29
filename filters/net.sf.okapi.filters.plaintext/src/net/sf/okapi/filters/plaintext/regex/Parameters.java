@@ -38,12 +38,12 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	public static final int		DEF_OPTIONS = Pattern.MULTILINE;
 	
 	/**
-	 * Java regex rule used to extract lines of text.<p>Default: "^(.*?)$". 
+	 * Java regex rule used to extract lines of text.<p>Default: "(^(?=.+))(.*?)$". 
 	 */
 	public String rule;
 	
 	/**
-	 * Java regex capturing group denoting text to be extracted.<p>Default: 1.
+	 * Java regex capturing group denoting text to be extracted.<p>Default: 2.
 	 */
 	public int sourceGroup;
 	

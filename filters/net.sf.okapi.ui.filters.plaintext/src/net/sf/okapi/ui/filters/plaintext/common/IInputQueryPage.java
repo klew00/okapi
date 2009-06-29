@@ -20,21 +20,7 @@
 
 package net.sf.okapi.ui.filters.plaintext.common;
 
-/**
- * 
- * 
- * @version 0.1, 23.06.2009
- * @author Sergei Vasilyev
- */
+public interface IInputQueryPage extends IDialogPage {
 
-public interface IInputQueryPage {
-	
 	public void setPrompt(String prompt);
-	
-	public boolean load(Object data);
-	
-	public boolean save(Object data);
-	
-	public void interop();
 }
-

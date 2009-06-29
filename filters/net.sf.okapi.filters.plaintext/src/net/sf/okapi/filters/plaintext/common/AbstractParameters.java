@@ -33,10 +33,10 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 
 	protected INotifiable owner = null;
 	
-	public boolean notify(String notification, Object info) {
+	public boolean exec(String command, Object info) {
 		
 		
-		if (notification.equalsIgnoreCase(Notification.PARAMETERS_SET_OWNER)) {
+		if (command.equalsIgnoreCase(Notification.PARAMETERS_SET_OWNER)) {
 			
 			if (info instanceof INotifiable)
 				owner = (INotifiable) info;

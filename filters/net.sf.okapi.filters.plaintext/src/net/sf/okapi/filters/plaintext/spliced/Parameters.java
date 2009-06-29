@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.plaintext.spliced;
 
+import net.sf.okapi.common.Util;
+
 /**
  * Spliced Lines Filter parameters
  * @version 0.1, 09.06.2009
@@ -67,8 +69,13 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		
 		buffer.fromString(data);
 		
-		// All parameters are retrieved here		
-		splicer = buffer.getString("splicer", "\\");
+		// All parameters are retrieved here
+		String st = buffer.getString("splicer", "\\");
+		if (Util.isEmpty(st))
+			splicer = "";
+		else
+			splicer = st.trim(); 
+				
 		createPlaceholders = buffer.getBoolean("createPlaceholders", false);
 	}
 	

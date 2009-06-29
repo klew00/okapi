@@ -138,7 +138,7 @@ public class CompoundParameters extends AbstractParameters{
 		}
 		
 		if (owner != null)
-			owner.notify(Notification.PARAMETERS_CHANGED, parametersClass);
+			owner.exec(Notification.PARAMETERS_CHANGED, parametersClass);
 		
 		return true;
 	}

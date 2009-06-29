@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -59,7 +60,7 @@ public abstract class AbstractFilter implements IFilter, INotifiable {
 		this.params = (BaseParameters) params;
 		
 		if (params instanceof INotifiable)
-			((INotifiable) params).notify(Notification.PARAMETERS_SET_OWNER, this);
+			((INotifiable) params).exec(Notification.PARAMETERS_SET_OWNER, this);
 		
 //		if (!Util.isEmpty(parametersClassName)) return; // This name is set by the first call from the filter's constructor
 		if (params == null) return;
@@ -144,6 +145,26 @@ public abstract class AbstractFilter implements IFilter, INotifiable {
 		return configList.addAll(configs);
 	}
 	
+	protected FilterConfiguration findConfiguration(String configId) {
+		
+		if (Util.isEmpty(configList)) return null;
+		
+		for (FilterConfiguration config : configList) {
+			
+			if (config == null) continue;
+			if (config.configId.equalsIgnoreCase(configId)) 
+				return config;
+		}
+		
+		return null;
+	}
+	
+	protected boolean removeConfiguration(String configId) {
+		
+		return configList.remove(findConfiguration(configId));
+	}
+			
+	
 	public List<FilterConfiguration> getConfigurations () {
 		
 		List<FilterConfiguration> res = new ArrayList<FilterConfiguration>();
@@ -168,7 +189,7 @@ public abstract class AbstractFilter implements IFilter, INotifiable {
 		return parametersClassName;
 	}
 
-	public boolean notify(String notification, Object info) {
+	public boolean exec(String command, Object info) {
 				
 		return false;		
 	}

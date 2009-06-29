@@ -11,11 +11,11 @@ package net.sf.okapi.filters.plaintext.common;
 public interface INotifiable {
 
 	/**
-	 * Sends a notification for the object to react
-	 * @param notification a string token identifying the notification
-	 * @param info notification-specific  object 
-	 * @return true if notification has been processed and doesn't need to be sent on
+	 * Sends a command for the object to react
+	 * @param command a string identifying the command
+	 * @param info command-specific  object 
+	 * @return true if command has been executed and doesn't need to be sent on
 	 */
-	boolean notify(String notification, Object info);
+	boolean exec(String command, Object info);
 	
 }

@@ -97,21 +97,21 @@ public class ParaPlainTextFilterTest {
 		
 		st = "  1234   ";
 		TextFragment tf = new TextFragment(st);
-		TextUnitUtils.trimLeft(tf, null);
+		TextUnitUtils.trimLeading(tf, null);
 		assertEquals("1234   ", tf.toString());
-		TextUnitUtils.trimRight(tf, null);
+		TextUnitUtils.trimTrailing(tf, null);
 		assertEquals("1234", tf.toString());
 		
 		st = "     ";
 		tf = new TextFragment(st);
-		TextUnitUtils.trimLeft(tf, null);
+		TextUnitUtils.trimLeading(tf, null);
 		assertEquals("", tf.toString());
-		TextUnitUtils.trimRight(tf, null);
+		TextUnitUtils.trimTrailing(tf, null);
 		assertEquals("", tf.toString());
 		
 		st = "     ";
 		tf = new TextFragment(st);
-		TextUnitUtils.trimRight(tf, null);
+		TextUnitUtils.trimTrailing(tf, null);
 		assertEquals("", tf.toString());
 		
 		TextFragment tc = new TextFragment("test");
@@ -132,7 +132,7 @@ public class ParaPlainTextFilterTest {
 		tcc.append("    123456  ");
 		
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnitUtils.trimLeft(tcc, skel);
+		TextUnitUtils.trimLeading(tcc, skel);
 		
 		assertEquals("123456  ", tcc.getCodedText());
 		assertEquals("    ", skel.toString());
@@ -143,7 +143,7 @@ public class ParaPlainTextFilterTest {
 		tcc2.append(c3);
 		
 		GenericSkeleton skel2 = new GenericSkeleton();
-		TextUnitUtils.trimRight(tcc2, skel2);
+		TextUnitUtils.trimTrailing(tcc2, skel2);
 		
 		assertEquals("    123456", tcc2.getCodedText());
 		assertEquals("  ", skel2.toString());
@@ -287,6 +287,7 @@ public class ParaPlainTextFilterTest {
 	public void testFiles() {
 		
 		params.extractParagraphs = false;
+		params.preserveWS = false;
 		
 		_testFile("BOM_MacUTF16withBOM2.txt", false);		
 		_testFile("cr.txt", false);

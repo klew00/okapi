@@ -36,7 +36,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.ui.filters.plaintext.common.IInputQueryPage;
 import net.sf.okapi.ui.filters.plaintext.common.InputQueryDialog;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -240,6 +239,7 @@ public class Okapi_GUI_Tester {
 		formData_5.top = new FormAttachment(btnClear, 4);
 		btnClear.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+//				SWTUtils.inputQuery(shell, "caption", "Input a value prompt:", 1, null);
 				text.setText("");
 				text_1.setText("");
 			}
@@ -324,8 +324,14 @@ public class Okapi_GUI_Tester {
 			context.setObject("shell", shell);
 			
 			params = editor.createParameters();
+			
 			if (!Util.isEmpty(text.getText()))
 				params.load(Util.toURI(text.getText()), true);
+			
+			else if (!Util.isEmpty(text_1.getText()))
+				params.fromString(text_1.getText());
+			
+			else Dialogs.showWarning(shell, "No parameters loaded, defaults used", null);
 			
 			if (editor.edit(params, false, context)) {
 				

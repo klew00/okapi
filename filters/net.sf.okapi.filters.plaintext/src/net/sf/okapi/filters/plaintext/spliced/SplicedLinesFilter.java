@@ -44,8 +44,9 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 	public static final String FILTER_NAME				= "okf_plaintext_spliced";
 	
 	public static final String FILTER_CONFIG			= "okf_plaintext_spliced";
-	public static final String FILTER_CONFIG_UNDERLINE	= "okf_plaintext_spliced_underline";
+	public static final String FILTER_CONFIG_UNDERSCORE	= "okf_plaintext_spliced_underscore";
 	public static final String FILTER_CONFIG_BACKSLASH	= "okf_plaintext_spliced_backslash";
+	public static final String FILTER_CONFIG_CUSTOM		= "okf_plaintext_spliced_custom";
 	
 	private Parameters params; 	
 	private List<TextContainer> splicedLines;
@@ -59,21 +60,27 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 
 		addConfiguration(true, 
 				FILTER_CONFIG,
-				"Spliced Lines Filter",
-				"Extracts as one line the consecutive lines with a predefined splicer character at the end", 
-				"okf_plaintext_spliced.fprm");
-		
-		addConfiguration(false, 
-				FILTER_CONFIG_UNDERLINE,
-				"Underline Spliced Lines Filter",
-				"Sliced line filter with the underline character (_) used as the splicer", 
-				"okf_plaintext_spliced_underline.fprm");
+				"Spliced Lines",
+				"Extracts as one line the consecutive lines with a predefined splicer character at the end.", 
+				"okf_plaintext_spliced.fprm"); // Default, the same as FILTER_CONFIG_BACKSLASH
 		
 		addConfiguration(false, 
 				FILTER_CONFIG_BACKSLASH,
-				"Backspace Spliced Lines Filter",
-				"Sliced line filter with the backspace character (\\) used as the splicer", 
+				"Spliced Lines (Backslash)",
+				"Sliced lines filter with the backslash character (\\) used as the splicer.", 
 				"okf_plaintext_spliced_backslash.fprm");
+
+		addConfiguration(false, 
+				FILTER_CONFIG_UNDERSCORE,
+				"Spliced Lines (Underscore)",
+				"Sliced lines filter with the underscore character (_) used as the splicer.", 
+				"okf_plaintext_spliced_underscore.fprm");
+		
+		addConfiguration(false, 
+				FILTER_CONFIG_CUSTOM,
+				"Spliced Lines (Custom)",
+				"Sliced lines filter with a user-defined splicer.", 
+				"okf_plaintext_spliced_custom.fprm");
 	}
 	
 	@Override

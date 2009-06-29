@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.Util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -45,7 +46,7 @@ public class SWTUtils {
 
 	public static final String GET_CAPTION = "SWT_GET_CAPTION";
 
-// Group enabling/disabling
+// Enabling/disabling
 	
 	/**
 	 * Sets the enabled state for all of a Composite's child Controls,
@@ -63,7 +64,7 @@ public class SWTUtils {
 	 *            to have a single widget enable/disable all of its siblings
 	 *            other than itself.
 	 */
-	public static void setAllEnabled(Composite container, boolean enabled,
+	public static void setAllEnabled(Composite container, boolean enabled, boolean clearSelection,
 	        Control... excludedControls) {
 
 		List<Control> excludes = null;
@@ -80,20 +81,85 @@ public class SWTUtils {
 	    Control[] children = container.getChildren();
 	    for (Control aChild : children) {
 	        if (!excludes.contains(aChild)) {
-	            aChild.setEnabled(enabled);
+	        	
+	        	if (clearSelection && aChild instanceof Button && !enabled)
+	        		((Button) aChild).setSelection(false); // Clear radio and check-boxes
+	        			            
 	            if (aChild instanceof Composite) {
-	                setAllEnabled((Composite) aChild, enabled);
+	                setAllEnabled((Composite) aChild, enabled, clearSelection, excludedControls);
 	            }
+	            else
+	            	aChild.setEnabled(enabled);
 	        }
 	    }
 	}
 	
+	public static void setAllEnabled(Composite container, boolean enabled, boolean clearSelection) {
+
+		setAllEnabled(container, enabled, clearSelection, (Control[])null);
+	}
+	
 	public static void setAllEnabled(Composite container, boolean enabled) {
 
-		setAllEnabled(container, enabled, (Control[])null);
+		setAllEnabled(container, enabled, false, (Control[])null);
+	}
+	
+	public static void setEnabled(Control control, boolean enabled) {
+		// Clears radio and check-boxes when they are disabled
+
+		if (control == null) return;
+		
+		if (control instanceof Composite)
+			setAllEnabled((Composite) control, enabled);
+		
+		if (control instanceof Button && !enabled)
+    		((Button) control).setSelection(false); 
+		
+		control.setEnabled(enabled);
+	}
+	
+	public static boolean getEnabled(Control control) {
+		
+		if (control == null) return false;
+		
+		return control.getEnabled();		
+	}
+	
+	public static boolean getDisabled(Control control) {
+				
+		return !getEnabled(control);		
+	}
+	
+// Selection / unselection
+
+	public static boolean getSelected(Control control) {
+	
+		if (!(control instanceof Button)) return false;
+		
+		return ((Button) control).getSelection();		
+	}
+	
+	public static boolean getNotSelected(Control control) {
+		
+		return !getSelected(control);		
+	}
+	
+	public static void setSelected(Control control, boolean selected) {
+		
+		if (!(control instanceof Button)) return;
+		
+		((Button) control).setSelection(selected);
+	}
+	
+	public static void setGrayed(Control control, boolean grayed) {
+		
+		if (!(control instanceof Button)) return;
+		
+		((Button) control).setGrayed(grayed);
 	}
 	
 // Input query
+	
 	private static Object result = null;
 	
 	public static boolean inputQuery(Shell parent, String caption, String prompt, int initialValue, IHelp help) {
@@ -121,7 +187,7 @@ public class SWTUtils {
 	public static boolean inputQuery(Class<?> pageClass, Shell parent, String caption, Object initialData, IHelp help) {
 
 		result = null;
-		
+				
 		InputQueryDialog dlg = new InputQueryDialog();
 		boolean res = dlg.run(parent, pageClass, caption, null, initialData, help);
 		
@@ -135,6 +201,7 @@ public class SWTUtils {
 	}
 
 // Radio group
+	
 	public static Button getRadioGroupSelection(Composite container) {
 		
 		if (container == null) return null;
@@ -166,6 +233,7 @@ public class SWTUtils {
 	}
 
 // Table	
+	
 	public static String [] getText(TableItem item) {
 		
 		if (item == null) return null;
@@ -213,5 +281,128 @@ public class SWTUtils {
 		
 		return res;
 	}
+
+// Search	
+	
+	public static Control findControl(Composite container, String controlName) {
+
+		if (container == null) return null;
+		if (Util.isEmpty(controlName)) return null;
 		
+	    for (Control aChild : container.getChildren()) {
+	    	
+	    	String name = (String) aChild.getData("name");
+    		
+    		if (!Util.isEmpty(name) && name.equalsIgnoreCase(controlName))
+	    		return aChild;
+    		
+    		if (aChild instanceof Composite) {
+	    		
+                Control res = findControl((Composite) aChild, controlName);
+                if (res == null) continue;
+                	
+                return res;
+            }    		
+	    }
+	    
+		return null;
+	}
+	
+// State correlation (all 16 options)	
+	
+	public static void enableIfSelected(Control target, Control source) {
+		
+		if (getSelected(source))
+			setEnabled(target, true);		
+	}
+	
+	public static void enableIfNotSelected(Control target, Control source) {
+		
+		if (!getSelected(source))
+			setEnabled(target, true);
+	}
+	
+	public static void disableIfSelected(Control target, Control source) {
+		
+		if (getSelected(source))
+			setEnabled(target, false);
+	}
+	
+	public static void disableIfNotSelected(Control target, Control source) {
+	
+		if (!getSelected(source))
+			setEnabled(target, false);
+	}
+
+	public static void selectIfSelected(Control target, Control source) {
+		
+		if (getSelected(source))
+			setSelected(target, true);
+	}
+	
+	public static void selectIfNotSelected(Control target, Control source) {
+		
+		if (!getSelected(source))
+			setSelected(target, true);
+	}
+	
+	public static void unselectIfSelected(Control target, Control source) {
+		
+		if (getSelected(source))
+			setSelected(target, false);
+	}
+	
+	public static void unselectIfNotSelected(Control target, Control source) {
+		
+		if (!getSelected(source))
+			setSelected(target, false);
+	}
+	
+	public static void selectIfEnabled(Control target, Control source) {
+		
+		if (getEnabled(source))
+			setSelected(target, true);
+	}
+	
+	public static void selectIfDisabled(Control target, Control source) {
+		
+		if (!getEnabled(source))
+			setSelected(target, true);
+	}
+	
+	public static void unselectIfEnabled(Control target, Control source) {
+		
+		if (getEnabled(source))
+			setSelected(target, false);
+	}
+	
+	public static void unselectIfDisabled(Control target, Control source) {
+		
+		if (!getEnabled(source))
+			setSelected(target, false);
+	}
+			
+	public static void enableIfEnabled(Control target, Control source) {
+		
+		if (getEnabled(source))
+			setEnabled(target, true);
+	}
+	
+	public static void enableIfDisabled(Control target, Control source) {
+		
+		if (!getEnabled(source))
+			setEnabled(target, true);
+	}
+	
+	public static void disableIfEnabled(Control target, Control source) {
+		
+		if (getEnabled(source))
+			setEnabled(target, false);
+	}
+	
+	public static void disableIfDisabled(Control target, Control source) {
+		
+		if (!getEnabled(source))
+			setEnabled(target, false);
+	}
 }

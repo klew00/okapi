@@ -1,7 +1,7 @@
 #v1
 unescapeSource.b=true
-trimLeft.b=false
-trimRight.b=false
+trimLeading.b=false
+trimTrailing.b=false
 preserveWS.b=true
 useCodeFinder.b=false
 codeFinderRules=#v1$0a$count.i=2$0a$rule0=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpn]$0a$rule1=(\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v$0a$sample=$0a$useAllRulesWhenTesting.b=false

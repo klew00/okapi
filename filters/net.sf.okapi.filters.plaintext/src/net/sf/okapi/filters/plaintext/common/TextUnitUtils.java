@@ -41,8 +41,8 @@ public class TextUnitUtils {
 	 * 
 	 * @param textFragment
 	 */
-	public static void trimLeft(TextFragment textFragment) {
-		trimLeft(textFragment, null);
+	public static void trimLeading(TextFragment textFragment) {
+		trimLeading(textFragment, null);
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public class TextUnitUtils {
 	 * @param textFragment
 	 * @param skel
 	 */
-	public static void trimLeft(TextFragment textFragment, GenericSkeleton skel) {
+	public static void trimLeading(TextFragment textFragment, GenericSkeleton skel) {
 		
 		if (textFragment == null) return;
 		String st = textFragment.getCodedText();
@@ -76,8 +76,8 @@ public class TextUnitUtils {
 	 * 
 	 * @param textFragment
 	 */
-	public static void trimRight(TextFragment textFragment) {
-		trimRight(textFragment, null);
+	public static void trimTrailing(TextFragment textFragment) {
+		trimTrailing(textFragment, null);
 	}
 	
 	/**
@@ -85,7 +85,7 @@ public class TextUnitUtils {
 	 * @param textFragment
 	 * @param skel
 	 */
-	public static void trimRight(TextFragment textFragment, GenericSkeleton skel) {
+	public static void trimTrailing(TextFragment textFragment, GenericSkeleton skel) {
 		
 		if (textFragment == null) return;
 		

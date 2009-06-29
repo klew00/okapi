@@ -220,7 +220,7 @@ public class RegexPlainTextFilterTest {
 	@Test
 	public void testNameAndMimeType() {
 		assertEquals(filter.getMimeType(), "text/plain");
-		assertEquals(filter.getName(), "okf_plaintext");
+		assertEquals(filter.getName(), "okf_plaintext_regex");
 		
 		// Read lines from a file, check mime types 
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");

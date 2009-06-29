@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.plaintext.common;
 
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.LinkedList;
 
 import net.sf.okapi.common.Event;
@@ -143,6 +145,28 @@ public class CompoundFilter extends AbstractFilter {
 			setActiveSubFilter(subFilter);
 		}
 		
+		// Load config from its config file
+		
+		FilterConfiguration config = findConfiguration(configId);
+		if (config == null) return res;
+		
+		IParameters params = getParameters();
+		
+		if (config.parametersLocation != null && params instanceof CompoundParameters) {
+			
+			URL url = this.getClass().getResource(config.parametersLocation);
+			try {
+				params.load(url.toURI(), false);
+			}
+			catch ( URISyntaxException e ) {
+				throw new RuntimeException(String.format(
+					"URI syntax error '%s'.", url.getPath()));
+			}			
+		}
+			
+		IParameters params2 = getActiveParameters();
+		params2.fromString(params.toString());
+		
 		return res;
 	}
 
@@ -262,11 +286,11 @@ public class CompoundFilter extends AbstractFilter {
 	}
 
 	@Override
-	public boolean notify(String notification, Object info) {
+	public boolean exec(String command, Object info) {
 		
-		if (super.notify(notification, info)) return true;
+		if (super.exec(command, info)) return true;
 		
-		if (notification.equalsIgnoreCase(Notification.PARAMETERS_CHANGED)) {
+		if (command.equalsIgnoreCase(Notification.PARAMETERS_CHANGED)) {
 			
 			updateSubfilter();
 			return true;

@@ -59,13 +59,13 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 
 		addConfiguration(true,
 				FILTER_CONFIG,
-				"Plain Text With Paragraphs",
+				"Plain Text (Paragraphs)",
 				"Text files. Text is extracted by paragraphs (groups of lines separated by 1 or more empty lines).", 
 				"okf_plaintext_paragraphs.fprm");
 		
 		addConfiguration(false,
 				FILTER_CONFIG_LINES,
-				"Plain Text With Line Paragraphs",
+				"Plain Text (Lines)",
 				"Text is extracted by lines (every line is considered a separate paragraph).", 
 				"okf_plaintext_paragraphs_lines.fprm");
 	}

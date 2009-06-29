@@ -56,6 +56,11 @@ public class PlainTextFilter extends CompoundFilter{
 		addSubFilter(ParaPlainTextFilter.class);
 		addSubFilter(SplicedLinesFilter.class);
 		addSubFilter(RegexPlainTextFilter.class);
+		
+		// Remove configs of sub-filters not needed in the parent compound filter
+		removeConfiguration(SplicedLinesFilter.FILTER_CONFIG);
+		removeConfiguration(ParaPlainTextFilter.FILTER_CONFIG_LINES);
+		removeConfiguration(RegexPlainTextFilter.FILTER_CONFIG);
 	}
 	
 }

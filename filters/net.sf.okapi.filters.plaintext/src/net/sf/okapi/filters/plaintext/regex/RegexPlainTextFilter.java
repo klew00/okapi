@@ -28,7 +28,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -56,9 +55,11 @@ import net.sf.okapi.filters.regex.Rule;
 
 public class RegexPlainTextFilter extends AbstractFilter {
 
-	public static final String FILTER_NAME		= "okf_plaintext";
-	public static final String FILTER_MIME		= MimeTypeMapper.PLAIN_TEXT_MIME_TYPE;	
-	public static final String FILTER_CONFIG	= "okf_plaintext_regex";
+	public static final String FILTER_NAME				= "okf_plaintext_regex";
+	public static final String FILTER_MIME				= MimeTypeMapper.PLAIN_TEXT_MIME_TYPE;	
+	public static final String FILTER_CONFIG			= "okf_plaintext_regex";
+	public static final String FILTER_CONFIG_LINES		= "okf_plaintext_regex_lines";
+	public static final String FILTER_CONFIG_PARAGRAPHS	= "okf_plaintext_regex_paragraphs";
 		
 	private RegexFilter regex;			// Regex aggregate
 	private Parameters params;			// Regex Plain Text Filter's parameters
@@ -75,10 +76,22 @@ public class RegexPlainTextFilter extends AbstractFilter {
 		
 		addConfiguration(true,
 				FILTER_CONFIG,
-				"Regex-Based Plain Text Filter",
-				"Plain Text Filter using regex-based linebreak search. Detects a wider randge of " + 
+				"Plain Text (Regex)",
+				"Plain Text Filter using regex-based linebreak search. Detects a wider range of " + 
 				"linebreaks at the price of lower speed and extra memory usage.", 
-				"okf_plaintext_regex.fprm");
+				"okf_plaintext_regex.fprm"); // Default, the same as FILTER_CONFIG_LINES
+		
+		addConfiguration(false,
+				FILTER_CONFIG_LINES,
+				"Plain Text (Regex, Line=Paragraph)",
+				"Plain Text Filter using regex-based linebreak search. Extracts by lines.", 
+				"okf_plaintext_regex_lines.fprm");
+		
+		addConfiguration(false,
+				FILTER_CONFIG_PARAGRAPHS,
+				"Plain Text (Regex, Block=Paragraph)",
+				"Plain Text Filter using regex-based linebreak search. Extracts by paragraphs.", 
+				"okf_plaintext_regex_paragraphs.fprm");
 		
 		net.sf.okapi.filters.regex.Parameters regexParams = new net.sf.okapi.filters.regex.Parameters();
 		regex.setParameters(regexParams);

@@ -26,6 +26,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * 
@@ -39,6 +40,7 @@ public class InputQueryPageString extends Composite implements IInputQueryPage  
 	private Label lblPrompt;
 	private Text text;
 	private Label label;
+	@SuppressWarnings("unused")
 	private Label label_1;
 
 	/**
@@ -96,8 +98,13 @@ public class InputQueryPageString extends Composite implements IInputQueryPage  
 		lblPrompt.setText(prompt);
 	}
 
-	public void interop() {
+	public void interop(Widget speaker) {
 		
+	}
+
+	public boolean canClose(boolean isOK) {
+
+		return true;
 	}
 
 }

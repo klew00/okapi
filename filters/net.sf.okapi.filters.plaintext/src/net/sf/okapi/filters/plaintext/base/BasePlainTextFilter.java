@@ -49,6 +49,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	public static final String FILTER_NAME				= "okf_plaintext";
 	public static final String FILTER_MIME				= MimeTypeMapper.PLAIN_TEXT_MIME_TYPE;	
 	public static final String FILTER_CONFIG			= "okf_plaintext";
+	public static final String FILTER_CONFIG_TRIM_TRAIL	= "okf_plaintext_trim_trail";
+	public static final String FILTER_CONFIG_TRIM_ALL	= "okf_plaintext_trim_all";
 	
 	private Parameters params; // Base Plain Text Filter parameters
 	private InlineCodeFinder codeFinder;
@@ -64,9 +66,21 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		
 		addConfiguration(true, 
 				FILTER_CONFIG,
-				"Plain Text Filter",
+				"Plain Text",
 				"Text files; ANSI, Unicode, UTF-8, UTF-16 are supported.", 
 				null);
+		
+		addConfiguration(false, 
+				FILTER_CONFIG_TRIM_TRAIL,
+				"Plain Text (Trim Trail)",
+				"Text files; ANSI, Unicode, UTF-8, UTF-16 are supported. Trailing spaces and tabs are removed from extracted lines.", 
+				"okf_plaintext_trim_trail.fprm");
+		
+		addConfiguration(false, 
+				FILTER_CONFIG_TRIM_ALL,
+				"Plain Text (Trim All)",
+				"Text files; ANSI, Unicode, UTF-8, UTF-16 are supported. Both leading and trailing spaces and tabs are removed from extracted lines.", 
+				"okf_plaintext_trim_all.fprm");
 		
 		setParameters(new Parameters());	// Base Plain Text Filter parameters
 	}
@@ -105,9 +119,9 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		
 		if (params.unescapeSource) _unescape(source);
 		
-		if (params.trimLeft) TextUnitUtils.trimLeft(source, skel);							
+		if (params.trimLeading) TextUnitUtils.trimLeading(source, skel);							
 		skel.addContentPlaceholder(textUnit);		
-		if (params.trimRight) TextUnitUtils.trimRight(source, skel);
+		if (params.trimTrailing) TextUnitUtils.trimTrailing(source, skel);
 		
 		Set<String> languages = textUnit.getTargetLanguages();
 

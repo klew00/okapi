@@ -32,6 +32,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.filters.plaintext.common.CompoundParameters;
+import net.sf.okapi.filters.plaintext.common.INotifiable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -40,9 +41,13 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * Abstract base class for parameters editors 
@@ -51,7 +56,7 @@ import org.eclipse.swt.widgets.TabItem;
  * @author Sergei Vasilyev
  */
 
-public abstract class AbstractParametersEditor implements IParametersEditor {
+public abstract class AbstractParametersEditor implements IParametersEditor, Listener, INotifiable {
 
 	private Shell shell;
 //	private Shell parent;
@@ -60,7 +65,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 	private IParameters params;
 	private IHelp help;
 	private TabFolder pageContainer;
-	private List<IParametersEditorPage> pages = null;
+	private List<IDialogPage> pages = null;
 	boolean readOnly = false;
 	
 	public boolean edit(IParameters paramsObject, boolean readOnly, IContext context) {
@@ -75,7 +80,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 
 		try {			
 			if (pages == null) 
-				pages = new ArrayList<IParametersEditorPage>();
+				pages = new ArrayList<IDialogPage>();
 			else
 				pages.clear();
 							
@@ -112,21 +117,51 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 	private void create (Shell p_Parent) {
 		
 		shell.setText(getCaption());
+		shell.setData("owner", this);
 		
 		if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
-		
+
+////--------------------------		
+//		
+//		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
+//		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+//		tfTmp.setLayoutData(gdTmp);
+//		
+//		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
+//		GridLayout layTmp = new GridLayout();
+//		cmpTmp.setLayout(layTmp);
+//		
+////		Button chkUseCodeFinder = new Button(cmpTmp, SWT.CHECK);
+////		chkUseCodeFinder.setText("Has inline codes as defined below:");
+////		chkUseCodeFinder.addSelectionListener(new SelectionAdapter() {
+////			public void widgetSelected(SelectionEvent e) {
+////				//updateInlineCodes();
+////			};
+////		});
+//		
+//		InlineCodeFinderPanel pnlCodeFinder = new InlineCodeFinderPanel(cmpTmp, SWT.NONE);
+//		pnlCodeFinder.setLayoutData(new GridData(GridData.FILL_BOTH));
+//		
+//		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+//		tiTmp.setText("Inline Codes");
+//		tiTmp.setControl(cmpTmp);
+//
+//		
+////--------------------------		
 		GridLayout layTmp = new GridLayout();		
 		layTmp.marginBottom = 0;
 		layTmp.verticalSpacing = 0;
 		shell.setLayout(layTmp);
 
 		pageContainer = new TabFolder(shell, SWT.NONE);
-		pageContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		//pageContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		pageContainer.setLayoutData(gdTmp);
 		
 		createPages(pageContainer);
 		if (!result) return;
 		
-		loadParameters();
+		//loadParameters();
 		// result = loadParameters();
 //		if (!result) return;
 		
@@ -153,10 +188,10 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 			};
 		};
 		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);
-
+						
 		shell.pack();
 		Rectangle minRect = shell.getBounds();
 		Rectangle startRect = shell.getBounds();
@@ -168,11 +203,193 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		shell.setSize(startRect.width, startRect.height);		
 		
 		Dialogs.centerWindow(shell, p_Parent);
+		
+		loadParameters();  //!!! Here to have the dialog be minimal size 
 	}
+
+//	private void create (Shell p_Parent)
+//		{
+//			shell.setText("EditorCaption");
+//			if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
+//			GridLayout layTmp = new GridLayout();
+//			layTmp.marginBottom = 0;
+//			layTmp.verticalSpacing = 0;
+//			shell.setLayout(layTmp);
+//
+//			TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
+//			GridData gdTmp = new GridData(GridData.FILL_BOTH);
+//			tfTmp.setLayoutData(gdTmp);
+//
+//			//--- Options tab
+//			
+//			Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
+//			layTmp = new GridLayout();
+//			cmpTmp.setLayout(layTmp);
+//			
+//			Group grpTmp = new Group(cmpTmp, SWT.NONE);
+//			layTmp = new GridLayout();
+//			grpTmp.setLayout(layTmp);
+//			grpTmp.setText("LodDirTitle");
+//			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+//			grpTmp.setLayoutData(gdTmp);
+////			pnlLD = new LDPanel(grpTmp, SWT.NONE);
+//			
+//			grpTmp = new Group(cmpTmp, SWT.NONE);
+//			layTmp = new GridLayout();
+//			grpTmp.setLayout(layTmp);
+//			grpTmp.setText("KeyCondTitle");
+//			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+//			grpTmp.setLayoutData(gdTmp);
+//			
+//			Button chkUseKeyFilter = new Button(grpTmp, SWT.CHECK);
+//			chkUseKeyFilter.setText("chkUseKeyFilter");
+//			chkUseKeyFilter.addSelectionListener(new SelectionAdapter() {
+////				public void widgetSelected(SelectionEvent e) {
+////					updateKeyFilter();
+////				};
+//			});
+//
+//			Button rdExtractOnlyMatchingKey = new Button(grpTmp, SWT.RADIO);
+//			rdExtractOnlyMatchingKey.setText("rdExtractOnlyMatchingKey");
+//			gdTmp = new GridData();
+//			gdTmp.horizontalIndent = 16;
+//			rdExtractOnlyMatchingKey.setLayoutData(gdTmp);
+//
+//			Button rdExcludeMatchingKey = new Button(grpTmp, SWT.RADIO);
+//			rdExcludeMatchingKey.setText("rdExcludeMatchingKey");
+//			rdExcludeMatchingKey.setLayoutData(gdTmp);
+//
+//			Text edKeyCondition = new Text(grpTmp, SWT.BORDER);
+//			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+//			gdTmp.horizontalIndent = 16;
+//			edKeyCondition.setLayoutData(gdTmp);
+//			
+//			Label label = new Label(grpTmp, SWT.WRAP);
+//			label.setText("KeyCondNote");
+//			gdTmp = new GridData(GridData.FILL_BOTH);
+//			gdTmp.horizontalIndent = 16;
+//			gdTmp.widthHint = 300;
+//			label.setLayoutData(gdTmp);
+//			
+//			Button chkExtraComments = new Button(cmpTmp, SWT.CHECK);
+//			chkExtraComments.setText("chkExtraComments");
+//
+//			Button chkCommentsAreNotes = new Button(cmpTmp, SWT.CHECK);
+//			chkCommentsAreNotes.setText("chkCommentsAreNotes");
+//			
+//			TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+//			tiTmp.setText("tabOptions");
+//			tiTmp.setControl(cmpTmp);
+//			
+//			//--- Inline tab
+//			
+//			cmpTmp = new Composite(tfTmp, SWT.NONE);
+//			layTmp = new GridLayout();
+//			cmpTmp.setLayout(layTmp);
+//			
+//			Button chkUseCodeFinder = new Button(cmpTmp, SWT.CHECK);
+//			chkUseCodeFinder.setText("Has inline codes as defined below:");
+//			chkUseCodeFinder.addSelectionListener(new SelectionAdapter() {
+//				public void widgetSelected(SelectionEvent e) {
+////					updateInlineCodes();
+//				};
+//			});
+//			
+//			InlineCodeFinderPanel pnlCodeFinder = new InlineCodeFinderPanel(cmpTmp, SWT.NONE);
+//			pnlCodeFinder.setLayoutData(new GridData(GridData.FILL_BOTH));
+//			
+//			tiTmp = new TabItem(tfTmp, SWT.NONE);
+//			tiTmp.setText("Inline Codes");
+//			tiTmp.setControl(cmpTmp);
+//
+//			
+//			InlineCodeFinder codeFinder = new InlineCodeFinder();
+//			// Default in-line codes: special escaped-chars and printf-style variable
+//			codeFinder.reset();
+//			
+//			// Default in-line codes: special escaped-chars and printf-style variable
+//			codeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
+//			codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
+//
+//			pnlCodeFinder.setData(codeFinder.toString());
+//			
+////			pnlCodeFinder.setData(
+////			"#v1\n" +
+////			"count.i=3\n" +
+////			"rule0=%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]\n" +
+////			"rule1=(\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v\n" +
+////			"rule2=\\{\\d.*?\\}\n" +
+////			"sample=%s, %d, {1}, \\n, \\r, \\t, etc.\n" +
+////			"useAllRulesWhenTesting.b=true");
+//			
+//			//updateInlineCodes();
+//			pnlCodeFinder.updateDisplay();
+//
+//			//--- Output tab
+//			
+//			cmpTmp = new Composite(tfTmp, SWT.NONE);
+//			layTmp = new GridLayout();
+//			cmpTmp.setLayout(layTmp);
+//			
+//			grpTmp = new Group(cmpTmp, SWT.NONE);
+//			layTmp = new GridLayout();
+//			grpTmp.setLayout(layTmp);
+//			grpTmp.setText("grpExtendedChars");
+//			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+//			grpTmp.setLayoutData(gdTmp);
+//
+//			Button chkEscapeExtendedChars = new Button(grpTmp, SWT.CHECK);
+//			chkEscapeExtendedChars.setText("chkEscapeExtendedChars");
+//			
+//			tiTmp = new TabItem(tfTmp, SWT.NONE);
+//			tiTmp.setText("tabOutput");
+//			tiTmp.setControl(cmpTmp);
+//			
+//			
+//			//--- Dialog-level buttons
+//
+//			SelectionAdapter OKCancelActions = new SelectionAdapter() {
+//				public void widgetSelected(SelectionEvent e) {
+//					result = false;
+//					if ( e.widget.getData().equals("h") ) {
+//						if ( help != null ) help.showTopic(this, "index");
+//						return;
+//					}
+//					if ( e.widget.getData().equals("o") ) {
+//						//if ( !saveData() ) return;
+//						result = true;
+//					}
+//					shell.close();
+//				};
+//			};
+//			pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+//			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+//			pnlActions.setLayoutData(gdTmp);
+//			pnlActions.btOK.setEnabled(!readOnly);
+//			if ( !readOnly ) {
+//				shell.setDefaultButton(pnlActions.btOK);
+//			}
+//
+//			shell.pack();
+//			Rectangle Rect = shell.getBounds();
+//			shell.setMinimumSize(Rect.width, Rect.height);
+//			Dialogs.centerWindow(shell, p_Parent);
+////			setData();
+//		}
+
 	
 	private void showDialog () {
 		
 		if (!result) return;
+		
+		for (IDialogPage page : pages) {			
+			
+			if (page == null) continue;
+			
+			page.interop(null);
+		}
+		
+		interop(null);
 		
 		result = false; // To react to OK only
 		shell.open();
@@ -197,14 +414,14 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 			List<IParameters> list = ((CompoundParameters) params).getParameters();
 			
 			for (IParameters parameters : list)
-				for (IParametersEditorPage page : pages)					
+				for (IDialogPage page : pages)					
 					page.load(parameters);
 		}
 		 
 		
 		// Iterate through pages, load parameters		
 		
-		for (IParametersEditorPage page : pages) {			
+		for (IDialogPage page : pages) {			
 			
 			if (page == null) return false;
 			
@@ -219,7 +436,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 			
 			IParameters activeParams = ((CompoundParameters) params).getActiveParameters(); 
 			
-			for (IParametersEditorPage page : pages) {			
+			for (IDialogPage page : pages) {			
 				
 				if (page == null) return false;
 				
@@ -231,12 +448,14 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 			}
 		}
 						
-		for (IParametersEditorPage page : pages) {			
+		for (IDialogPage page : pages) {			
 			
 			if (page == null) return false;
 			
-			page.interop();
+			page.interop(null);			
 		}
+		
+		interop(null);
 		
 		return true;		
 	}
@@ -250,14 +469,16 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 			return false;
 		}
 		
-		for (IParametersEditorPage page : pages) {			
+		for (IDialogPage page : pages) {			
 			
 			if (page == null) return false;
 			
-			page.interop();
+			page.interop(null);
 		}
 		
-		for (IParametersEditorPage page : pages) {			
+		interop(null);
+		
+		for (IDialogPage page : pages) {			
 			
 			if (page == null) return false;
 			if (!page.save(params)) { // Fills in parametersClass
@@ -271,7 +492,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 			
 			IParameters activeParams = ((CompoundParameters) params).getActiveParameters(); 
 			
-			for (IParametersEditorPage page : pages) {			
+			for (IDialogPage page : pages) {			
 				
 				if (page == null) return false;
 				
@@ -289,7 +510,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 	private boolean checkCanClose(boolean isOK) {		
 		// Iterate through pages, ask if the editor can be closed
 		
-		for (IParametersEditorPage page : pages) {			
+		for (IDialogPage page : pages) {			
 			
 			if (page == null) return false;
 			if (!page.canClose(isOK)) {
@@ -300,7 +521,40 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		}
 		return true;
 	}
-
+	
+	protected void addSpeaker(Control control) {
+		
+		addSpeaker(control, SWT.Selection);
+		// addSpeaker(widget, SWT.DefaultSelection);
+	}
+	
+	protected void addSpeaker(Control control, int eventType) {
+		
+		if (control == null) return;
+		
+		control.addListener(eventType, this);
+	}
+	
+	protected void addSpeaker(Class<?> pageClass, String controlName) {
+		
+		addSpeaker(SWTUtils.findControl(findPage(pageClass), controlName));		
+	}
+	
+	protected void addSpeaker(Class<?> pageClass, String controlName, int eventType) {
+		
+		addSpeaker(SWTUtils.findControl(findPage(pageClass), controlName), eventType);
+	}
+	
+	protected Control findControl(Class<?> pageClass, String controlName) {
+		
+		return SWTUtils.findControl(findPage(pageClass), controlName);
+	}
+	
+	protected Control findControl(Composite page, String controlName) {
+		
+		return SWTUtils.findControl(page, controlName);
+	}
+	
 	@SuppressWarnings("unchecked")
 	protected Composite addPage(String caption, Class<?> pageClass) {
 			
@@ -358,18 +612,34 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		
 		tabItem.setControl(page);
 		
-		if (page instanceof IParametersEditorPage) {
+		if (page instanceof IDialogPage) {
 
-			IParametersEditorPage ppg = (IParametersEditorPage) page;  
+			IDialogPage ppg = (IDialogPage) page;  
 			if (pages != null) pages.add(ppg);			
 		}
 		
 		return page;
 	}
 	
-	protected TabFolder getPageContainer() {return pageContainer;}
+	protected TabFolder getPageContainer() {
+		
+		return pageContainer;
+	}
 	
-	protected Composite getPage(Class<?> pageClass) {
+	protected Composite findPage(Class<?> pageClass) {
+		
+		for (IDialogPage page : pages) {
+			
+			if (page == null) continue;
+			
+			if (page.getClass() == pageClass && page instanceof Composite) 
+				return (Composite) page;
+		}
+		
+		return null;		
+	}
+
+	protected Composite findPageInTabs(Class<?> pageClass) {
 		
 		for (TabItem tabItem : pageContainer.getItems()) {
 			
@@ -379,8 +649,9 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		
 		return null;		
 	}
+
 	
-	protected Composite getPage(String caption) {
+	protected Composite findPageInTabs(String caption) {
 		
 		for (TabItem tabItem : pageContainer.getItems()) {
 			
@@ -393,8 +664,8 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		
 		return null;		
 	}
-	
-	protected TabItem findTab(IParametersEditorPage page) {
+		
+	protected TabItem findTab(IDialogPage page) {
 		
 		if (page instanceof Composite) 
 			return findTab((Composite) page);
@@ -414,7 +685,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 		return null;		
 	}
 	
-	protected String getCaption(IParametersEditorPage page) {
+	protected String getCaption(IDialogPage page) {
 		
 		if (!(page instanceof Composite)) return "";
 		
@@ -427,4 +698,58 @@ public abstract class AbstractParametersEditor implements IParametersEditor {
 	abstract public IParameters createParameters();
 	abstract protected String getCaption();
 	abstract protected void createPages(TabFolder pageContainer);
+	
+	public void handleEvent (Event event) {
+		
+		interop(event.widget);
+	}
+
+	protected void interop(Widget speaker) {		
+		// Can be overridden in a descendant editor class if interpage introp is required
+		
+	}
+	
+	protected void pageInterop(Class<?> pageClass, Widget speaker) {
+		
+		Composite page = findPage(pageClass);
+		
+		if (page instanceof IDialogPage)
+			((IDialogPage) page).interop(speaker);
+	}
+
+	public boolean exec(String command, Object info) {
+		
+		if (command.equalsIgnoreCase(AbstractBaseDialog.REGISTER_DIALOG_PAGE)) {
+
+			if (info instanceof IDialogPage) {
+					
+				boolean res = pages.add((IDialogPage) info);
+				
+				if (res) {
+					((IDialogPage) info).interop(null);
+					interop(null);
+				}
+				
+				return res;
+			}				
+		}
+		else if (command.equalsIgnoreCase(AbstractBaseDialog.UNREGISTER_DIALOG_PAGE)) {
+
+			if (info instanceof IDialogPage) {
+					
+				boolean res = pages.remove(info);
+				if (res) interop(null);
+				
+				return res;
+			}				
+		}
+					
+		return false;
+		
+	}
+	
+	protected Shell getShell() {
+		
+		return shell;
+	}
 }

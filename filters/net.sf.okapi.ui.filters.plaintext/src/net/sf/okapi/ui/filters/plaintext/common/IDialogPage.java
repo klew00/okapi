@@ -20,43 +20,43 @@
 
 package net.sf.okapi.ui.filters.plaintext.common;
 
-import net.sf.okapi.common.IParameters;
+import org.eclipse.swt.widgets.Widget;
 
 /**
- * Base interface for a parameters editor page 
  * 
- * @version 0.1, 13.06.2009
+ * 
+ * @version 0.1, 27.06.2009
  * @author Sergei Vasilyev
  */
 
-public interface IParametersEditorPage {
+public interface IDialogPage {
 
 	/**
-	 * Called by the parent editor when the page is attached. Implementation is expected to configure GUI controls after the parameters values.
-	 * @param parameters provided by the editor.
+	 * Called by the parent dialog when the page is attached. Implementation is expected to configure GUI controls after the value(s) of data.
+	 * @param data provided by the editor.
 	 * @return true if GUI controls were configured successfully 
 	 */
-	public boolean load(IParameters parameters);
+	public boolean load(Object data);
 	
 	/**
 	 * Provides a means for synchronization of the page's GUI controls. All integrity checks are performed in this method.
-	 * Event handlers of the controls affecting other controls should call this method. 
+	 * Event handlers of the controls affecting other controls should call this method.
+	 * @param speaker the widget firing the event. 
 	 */
-	public void interop();
+	public void interop(Widget speaker);
 	
 	/**
-	 * Called by the parent editor when it was closed with OK. Implementation is expected to set the given parameters according to
+	 * Called by the parent dialog when closed with OK. Implementation is expected to set the given data according to
 	 * the state of corresponding GUI controls.   
-	 * @param parameters
+	 * @param data
 	 * @return
 	 */
-	public boolean save(IParameters parameters);
-
+	public boolean save(Object data);
+	
 	/**
 	 * Checks if the page can be closed. Called by the editor when OK or Cancel were pressed.
 	 * @param isOK the editor is being closed with OK 
 	 * @return true if the page can be closed.
 	 */
 	public boolean canClose(boolean isOK);
-	
 }

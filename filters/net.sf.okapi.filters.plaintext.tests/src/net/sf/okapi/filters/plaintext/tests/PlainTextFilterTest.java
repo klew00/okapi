@@ -105,21 +105,21 @@ public class PlainTextFilterTest {
 		
 		st = "  1234   ";
 		TextFragment tf = new TextFragment(st);
-		TextUnitUtils.trimLeft(tf, null);
+		TextUnitUtils.trimLeading(tf, null);
 		assertEquals("1234   ", tf.toString());
-		TextUnitUtils.trimRight(tf, null);
+		TextUnitUtils.trimTrailing(tf, null);
 		assertEquals("1234", tf.toString());
 		
 		st = "     ";
 		tf = new TextFragment(st);
-		TextUnitUtils.trimLeft(tf, null);
+		TextUnitUtils.trimLeading(tf, null);
 		assertEquals("", tf.toString());
-		TextUnitUtils.trimRight(tf, null);
+		TextUnitUtils.trimTrailing(tf, null);
 		assertEquals("", tf.toString());
 		
 		st = "     ";
 		tf = new TextFragment(st);
-		TextUnitUtils.trimRight(tf, null);
+		TextUnitUtils.trimTrailing(tf, null);
 		assertEquals("", tf.toString());
 		
 		TextFragment tc = new TextFragment("test");
@@ -140,7 +140,7 @@ public class PlainTextFilterTest {
 		tcc.append("    123456  ");
 		
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnitUtils.trimLeft(tcc, skel);
+		TextUnitUtils.trimLeading(tcc, skel);
 		
 		assertEquals("123456  ", tcc.getCodedText());
 		assertEquals("    ", skel.toString());
@@ -151,7 +151,7 @@ public class PlainTextFilterTest {
 		tcc2.append(c3);
 		
 		GenericSkeleton skel2 = new GenericSkeleton();
-		TextUnitUtils.trimRight(tcc2, skel2);
+		TextUnitUtils.trimTrailing(tcc2, skel2);
 		
 		assertEquals("    123456", tcc2.getCodedText());
 		assertEquals("  ", skel2.toString());
@@ -280,14 +280,17 @@ public class PlainTextFilterTest {
 	
 	@Test
 	public void testFiles() {
-		_testFile("BOM_MacUTF16withBOM2.txt", false);		
-		_testFile("cr.txt", false);
+
+		filter.setConfiguration(BasePlainTextFilter.FILTER_CONFIG_TRIM_ALL);
+		
+//		_testFile("BOM_MacUTF16withBOM2.txt", false);		
+//		_testFile("cr.txt", false);
 		_testFile("crlf_start.txt", true);
-		_testFile("crlf_end.txt", true);
-		_testFile("crlf.txt", false);
-		_testFile("crlfcrlf_end.txt", true);
-		_testFile("crlfcrlf.txt", false);
-		_testFile("lf.txt", false);
+//		_testFile("crlf_end.txt", true);
+//		_testFile("crlf.txt", false);
+//		_testFile("crlfcrlf_end.txt", true);
+//		_testFile("crlfcrlf.txt", false);
+//		_testFile("lf.txt", false);
 	}
 				
 	@Test
@@ -412,14 +415,14 @@ public class PlainTextFilterTest {
 		
 		List<FilterConfiguration> configs = filter.getConfigurations();
 		assertNotNull(configs);
-		assertEquals(7, configs.size());
+		assertEquals(9, configs.size());
 		
 		FilterConfiguration fc = configs.get(0);
 		assertEquals("okf_plaintext", fc.configId);
 		assertEquals("net.sf.okapi.filters.plaintext.PlainTextFilter", fc.filterClass);
 		assertTrue(Util.isEmpty(fc.parametersLocation));
 		
-		fc = configs.get(5);
+		fc = configs.get(4);
 		assertEquals("okf_plaintext_spliced_backslash", fc.configId);
 		assertEquals("net.sf.okapi.filters.plaintext.PlainTextFilter", fc.filterClass);
 		assertEquals("okf_plaintext_spliced_backslash.fprm", fc.parametersLocation);
@@ -439,13 +442,13 @@ public class PlainTextFilterTest {
 		assertTrue(params2 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
 		assertFalse(params2 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
 		
-		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG);
+		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG_BACKSLASH);
 		IParameters params3 = filter.getActiveParameters();
 		assertTrue(params3 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
 		assertTrue(params3 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
 		assertFalse(params3 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
 		
-		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG);
+		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG_LINES);
 		IParameters params4 = filter.getActiveParameters();
 		assertTrue(params4 instanceof net.sf.okapi.filters.plaintext.regex.Parameters);
 		assertTrue(params4 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
@@ -523,13 +526,13 @@ public class PlainTextFilterTest {
 		assertTrue(params10 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
 		assertFalse(params10 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
 		
-		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG);
+		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG_BACKSLASH);
 		IParameters params11 = params.getActiveParameters();
 		assertTrue(params11 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
 		assertTrue(params11 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
 		assertFalse(params11 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
 		
-		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG);
+		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG_LINES);
 		IParameters params12 = params.getActiveParameters();
 		assertTrue(params12 instanceof net.sf.okapi.filters.plaintext.regex.Parameters);
 		assertTrue(params12 instanceof net.sf.okapi.filters.plaintext.base.Parameters);
@@ -547,13 +550,13 @@ public class PlainTextFilterTest {
 		assertFalse(c.equals("net.sf.okapi.filters.plaintext.base.Parameters"));
 		assertFalse(c.equals("net.sf.okapi.filters.plaintext.spliced.Parameters"));
 		
-		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG);
+		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG_BACKSLASH);
 		c = params.getParametersClassName();
 		assertEquals(c, "net.sf.okapi.filters.plaintext.spliced.Parameters");
 		assertFalse(c.equals("net.sf.okapi.filters.plaintext.base.Parameters"));
 		assertFalse(c.equals("net.sf.okapi.filters.plaintext.paragraphs.Parameters"));
 		
-		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG);
+		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG_LINES);
 		c = params.getParametersClassName();
 		assertEquals(c, "net.sf.okapi.filters.plaintext.regex.Parameters");
 		assertFalse(c.equals("net.sf.okapi.filters.plaintext.base.Parameters"));
@@ -566,11 +569,11 @@ public class PlainTextFilterTest {
 		
 		//-------------------------
 				
-		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG);
+		filter.setConfiguration(SplicedLinesFilter.FILTER_CONFIG_CUSTOM);
 		filter1 = filter.getActiveSubFilter();
 		assertTrue(filter1 instanceof net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter);
 		
-		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG);
+		filter.setConfiguration(RegexPlainTextFilter.FILTER_CONFIG_PARAGRAPHS);
 		filter1 = filter.getActiveSubFilter();
 		assertTrue(filter1 instanceof net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter);
 
