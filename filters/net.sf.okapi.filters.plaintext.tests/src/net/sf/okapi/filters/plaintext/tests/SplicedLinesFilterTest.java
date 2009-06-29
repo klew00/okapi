@@ -225,7 +225,7 @@ public class SplicedLinesFilterTest {
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
-			assertEquals(expectedLineNum, new Integer(st));
+			assertEquals(expectedLineNum, new Integer(st).intValue());
 			
 			break;
 			

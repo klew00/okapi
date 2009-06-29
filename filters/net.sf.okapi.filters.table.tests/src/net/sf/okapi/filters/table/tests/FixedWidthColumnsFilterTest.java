@@ -937,19 +937,19 @@ public class FixedWidthColumnsFilterTest {
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
-			assertEquals(expectedLineNum, new Integer(st));
+			assertEquals(expectedLineNum, new Integer(st).intValue());
 						
 			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
-			assertEquals(expRow, new Integer(st));
+			assertEquals(expRow, new Integer(st).intValue());
 			
 			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
-			assertEquals(expCol, new Integer(st));
+			assertEquals(expCol, new Integer(st).intValue());
 						
 			
 			break;
@@ -989,25 +989,25 @@ public class FixedWidthColumnsFilterTest {
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
-			assertEquals(expectedLineNum, new Integer(st));
+			assertEquals(expectedLineNum, new Integer(st).intValue());
 						
 			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
-			assertEquals(expRow, new Integer(st));
+			assertEquals(expRow, new Integer(st).intValue());
 			
 			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
-			assertEquals(expCol, new Integer(st));
+			assertEquals(expCol, new Integer(st).intValue());
 						
 			prop = ((TextUnit) res).getSourceProperty(FixedWidthColumnsFilter.COLUMN_WIDTH);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
-			assertEquals(expWidth, new Integer(st));
+			assertEquals(expWidth, new Integer(st).intValue());
 			
 			break;
 			
@@ -1046,13 +1046,13 @@ public class FixedWidthColumnsFilterTest {
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
-			assertEquals(expectedLineNum, new Integer(st));
+			assertEquals(expectedLineNum, new Integer(st).intValue());
 						
 			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
-			assertEquals(expRow, new Integer(st));
+			assertEquals(expRow, new Integer(st).intValue());
 												
 			break;
 			
@@ -1135,19 +1135,19 @@ public class FixedWidthColumnsFilterTest {
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
-			assertEquals(expectedLineNum, new Integer(st));
+			assertEquals(expectedLineNum, new Integer(st).intValue());
 						
 			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
-			assertEquals(expRow, new Integer(st));
+			assertEquals(expRow, new Integer(st).intValue());
 			
 			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
-			assertEquals(expCol, new Integer(st));
+			assertEquals(expCol, new Integer(st).intValue());
 			
 			break;
 			
