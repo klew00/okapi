@@ -20,6 +20,16 @@
 
 package net.sf.okapi.filters.openxml;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.URI;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -66,6 +76,7 @@ public class ConditionalParameters extends BaseParameters {
 
 	public void fromString (String data) {
 		int i,siz;
+		String sNummer;
 		reset();
 		buffer.fromString(data);
 		bPreferenceTranslateDocProperties = buffer.getBoolean("bPreferenceTranslateDocProperties", bPreferenceTranslateDocProperties);
@@ -76,22 +87,25 @@ public class ConditionalParameters extends BaseParameters {
 		bPreferenceTranslateWordAllStyles = buffer.getBoolean("bPreferenceTranslateWordAllStyles", bPreferenceTranslateWordAllStyles);
 		bPreferenceTranslateWordHidden = buffer.getBoolean("bPreferenceTranslateWordHidden", bPreferenceTranslateWordHidden);
 		bPreferenceTranslateExcelExcludeColors = buffer.getBoolean("bPreferenceTranslateExcelExcludeColors", bPreferenceTranslateExcelExcludeColors);
-		bPreferenceTranslateExcelExcludeColumns = buffer.getBoolean("bPreferenceTranslateExcelExcludeCells", bPreferenceTranslateExcelExcludeColumns);
+		bPreferenceTranslateExcelExcludeColumns = buffer.getBoolean("bPreferenceTranslateExcelExcludeColumns", bPreferenceTranslateExcelExcludeColumns);
 
 		tsExcelExcludedColors = new TreeSet<String>();
 		siz = buffer.getInteger("tsExcelExcludedColors");
 		for(i=0;i<siz;i++)
-			tsExcelExcludedColors.add(buffer.getString('#'+(new Integer(i)).toString(), "F1F2F3F4"));
+		{
+			sNummer = "zzz"+(new Integer(i)).toString();
+			tsExcelExcludedColors.add(buffer.getString(sNummer, "F1F2F3F4"));
+		}
 
 		tsExcelExcludedColumns = new TreeSet<String>();
 		siz = buffer.getInteger("tsExcelExcludedColumns");
 		for(i=0;i<siz;i++)
-			tsExcelExcludedColumns.add(buffer.getString('#'+(new Integer(i)).toString(), "A1000"));
+			tsExcelExcludedColumns.add(buffer.getString("zzz"+(new Integer(i)).toString(), "A1000"));
 
 		tsExcludeWordStyles = new TreeSet<String>();
 		siz = buffer.getInteger("tsExcludeWordStyles");
 		for(i=0;i<siz;i++)
-			tsExcludeWordStyles.add(buffer.getString('#'+(new Integer(i)).toString(), "zzzzz"));
+			tsExcludeWordStyles.add(buffer.getString("zzz"+(new Integer(i)).toString(), "zzzzz"));
 	}
 
 	@Override
@@ -117,7 +131,7 @@ public class ConditionalParameters extends BaseParameters {
 		buffer.setInteger("tsExcelExcludedColors", siz);
 		for(i=0,it=tsExcelExcludedColors.iterator();i<siz && it.hasNext();i++)
 		{
-			buffer.setString('#'+(new Integer(i)).toString(), (String)it.next());
+			buffer.setString("zzz"+(new Integer(i)).toString(), (String)it.next());
 		}
 
 		if (tsExcelExcludedColumns==null)
@@ -127,7 +141,7 @@ public class ConditionalParameters extends BaseParameters {
 		buffer.setInteger("tsExcelExcludedColumns", siz);
 		for(i=0,it=tsExcelExcludedColumns.iterator();i<siz && it.hasNext();i++)
 		{
-			buffer.setString('#'+(new Integer(i)).toString(), (String)it.next());
+			buffer.setString("zzz"+(new Integer(i)).toString(), (String)it.next());
 		}
 			
 		if (tsExcludeWordStyles==null)
@@ -137,9 +151,64 @@ public class ConditionalParameters extends BaseParameters {
 		buffer.setInteger("tsExcludeWordStyles", siz);
 		for(i=0,it=tsExcludeWordStyles.iterator();i<siz && it.hasNext();i++)
 		{
-			buffer.setString('#'+(new Integer(i)).toString(), (String)it.next());
+			buffer.setString("zzz"+(new Integer(i)).toString(), (String)it.next());
 		}
 			
 		return buffer.toString();
 	}
+
+	public void save (String newPath) {
+		Writer SW = null;
+		try {
+			// Save the fields on file
+			SW = new OutputStreamWriter(
+				new BufferedOutputStream(new FileOutputStream(newPath)),
+				"UTF-8");
+			SW.write(toString());
+			path = newPath;
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			if ( SW != null )
+				try { SW.close(); } catch ( IOException e ) {};
+		}
+	}
+
+	public void load (URI inputURI,
+			boolean p_bIgnoreErrors)
+		{
+			char[] aBuf;
+			try {
+				// Reset the parameters to their defaults
+				reset();
+				// Open the file. use a URL so we can do openStream() and load
+				// predefined files from JARs.
+				URL url = inputURI.toURL();
+				Reader SR = new InputStreamReader(
+					new BufferedInputStream(url.openStream()), "UTF-8");
+
+				// Read the file in one string
+				StringBuilder sbTmp = new StringBuilder(1024);
+				aBuf = new char[1024];
+				int nCount;
+				while ((nCount = SR.read(aBuf)) > -1) {
+					sbTmp.append(aBuf, 0, nCount);	
+				}
+				SR.close();
+				SR = null;
+
+				// Parse it
+				String tmp = sbTmp.toString().replace("\r\n", "\n");
+				fromString(tmp.replace("\r", "\n"));
+				path = inputURI.getPath();
+			}
+			catch ( IOException e ) {
+				if ( !p_bIgnoreErrors ) throw new RuntimeException(e);
+			}
+			finally {
+				aBuf = null;
+			}
+		}
 }
