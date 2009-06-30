@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: OkapiWorkbench; singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: okapiworkbench.Activator
+Bundle-Activator: net.sf.okapi.applications.workbench.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.sf.okapi.ui.filters.common;bundle-version="1.0.0",
@@ -14,4 +14,4 @@ Require-Bundle: org.eclipse.ui,
  net.sf.okapi.pipeline;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: okapiworkbench
+Export-Package: net.sf.okapi.applications.workbench

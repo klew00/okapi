@@ -8,7 +8,7 @@
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
-               class="okapiworkbench.Application">
+               class="net.sf.okapi.applications.workbench.Application">
          </run>
       </application>
    </extension>
@@ -16,7 +16,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             name="%perspective.name"
-            class="okapiworkbench.Perspective"
+            class="net.sf.okapi.applications.workbench.Perspective"
             id="OkapiWorkbench.perspective">
       </perspective>
    </extension>
@@ -24,7 +24,7 @@
          point="org.eclipse.ui.views">
       <view
             name="%view.name"
-            class="okapiworkbench.View"
+            class="net.sf.okapi.applications.workbench.View"
             id="OkapiWorkbench.view">
       </view>
    </extension>
