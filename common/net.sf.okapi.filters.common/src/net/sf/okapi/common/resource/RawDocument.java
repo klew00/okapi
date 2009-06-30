@@ -201,9 +201,8 @@ public class RawDocument implements IResource {
 			reader = new InputStreamReader(getStream(), getEncoding());
 			hasGetReaderBeenCalled = true;
 		} catch (UnsupportedEncodingException e) {
-			OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
-			LOGGER.log(Level.SEVERE, String.format("The encoding '%s' is not supported.", getEncoding()), re);
-			throw re;
+			throw new OkapiUnsupportedEncodingException(String.format("The encoding '%s' is not supported.",
+					getEncoding()), e);
 		}
 
 		hasGetReaderBeenCalled = true;
@@ -227,9 +226,8 @@ public class RawDocument implements IResource {
 			try {
 				aStream = new ByteArrayInputStream(inputCharSequence.toString().getBytes(getEncoding()));
 			} catch (UnsupportedEncodingException e) {
-				OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
-				LOGGER.log(Level.SEVERE, String.format("The encoding '%s' is not supported.", getEncoding()), re);
-				throw re;
+				throw new OkapiUnsupportedEncodingException(String.format("The encoding '%s' is not supported.",
+						getEncoding()), e);
 			}
 		} else if (getInputURI() != null) {
 			URL url = null;
@@ -237,20 +235,14 @@ public class RawDocument implements IResource {
 				url = getInputURI().toURL();
 				aStream = getInputURI().toURL().openStream();
 			} catch (IllegalArgumentException e) {
-				OkapiIOException re = new OkapiIOException(e);
-				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI must be absolute: "
-						+ ((url == null) ? "URL is null" : url.toString()), re);
-				throw re;
+				throw new OkapiIOException("Could not open the URI. The URI must be absolute: "
+						+ ((url == null) ? "URL is null" : url.toString()), e);
 			} catch (MalformedURLException e) {
-				OkapiIOException re = new OkapiIOException(e);
-				LOGGER.log(Level.SEVERE, "Could not open the URI. The URI may be malformed: "
-						+ ((url == null) ? "URL is null" : url.toString()), re);
-				throw re;
+				throw new OkapiIOException("Could not open the URI. The URI may be malformed: "
+						+ ((url == null) ? "URL is null" : url.toString()), e);
 			} catch (IOException e) {
-				OkapiIOException re = new OkapiIOException(e);
-				LOGGER.log(Level.SEVERE,
-						"Could not open the URL. The URL is OK but the input stream could not be opened", re);
-				throw re;
+				OkapiIOException re = new OkapiIOException(
+						"Could not open the URL. The URL is OK but the input stream could not be opened", e);
 			}
 		} else if (inputStream != null) {
 			if (aStream != null) {

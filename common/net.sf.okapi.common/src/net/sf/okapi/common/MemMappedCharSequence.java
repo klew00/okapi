@@ -133,9 +133,7 @@ public final class MemMappedCharSequence implements CharSequence {
 					lowercase);
 		} catch (UnsupportedEncodingException e) {
 			// UTF-16BE encoding should be supported on all Java VM's
-			OkapiUnsupportedEncodingException re = new OkapiUnsupportedEncodingException(e);
-			LOGGER.log(Level.SEVERE, "UTF-16BE encoding not supported", re);
-			throw re;
+			throw new OkapiUnsupportedEncodingException("UTF-16BE encoding not supported", e);
 		}
 	}
 
@@ -181,9 +179,7 @@ public final class MemMappedCharSequence implements CharSequence {
 		try {
 			createMemMappedCharBuffer(Channels.newChannel(inputSource.openStream()), encoding, lowercase);
 		} catch (IOException e) {
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Cannot open URL stream: " + inputSource.toString(), re);
-			throw re;
+			throw new OkapiIOException("Cannot open URL stream: " + inputSource.toString(), e);
 		}
 	}
 
@@ -222,13 +218,9 @@ public final class MemMappedCharSequence implements CharSequence {
 			}
 
 		} catch (FileNotFoundException e) {
-			OkapiFileNotFoundException re = new OkapiFileNotFoundException(e);
-			LOGGER.log(Level.SEVERE, "Cannot create memory mapped file", re);
-			throw re;
+			throw new OkapiFileNotFoundException("Cannot create memory mapped file", e);
 		} catch (IOException e) {
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Cannot create memory mapped file", re);
-			throw re;
+			throw new OkapiIOException("Cannot create memory mapped file", e);
 		} finally {
 			if (tempUTF16BEfile != null)
 				tempUTF16BEfile.deleteOnExit();
@@ -730,9 +722,7 @@ public final class MemMappedCharSequence implements CharSequence {
 			// decode input bytes to output chars, pass EOF flag
 			result = decoder.decode(bb, cb, eof);
 			if (result.isError()) {
-				RuntimeException e = new RuntimeException(result.toString());
-				LOGGER.log(Level.SEVERE, "Cannot map byte to char using charset: " + charset.displayName(), e);
-				throw e;
+				throw new RuntimeException("Cannot map byte to char using charset: " + charset.displayName());
 			}
 
 			// if output buffer is full, drain output
@@ -798,9 +788,7 @@ public final class MemMappedCharSequence implements CharSequence {
 					byteBuffer = null;
 					System.gc();
 				} catch (Exception e) {
-					OkapiIOException re = new OkapiIOException(e);
-					LOGGER.log(Level.SEVERE, "Cannot close memory mapped file", re);
-					throw re;
+					throw new OkapiIOException("Cannot close memory mapped file", e);
 				}
 				return null;
 			}

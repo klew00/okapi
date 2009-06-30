@@ -53,8 +53,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * BaseFilter provides a simplified API for filter writers and hides the low
- * level resource and skeleton API's ({@link net.sf.okapi.common.resource} and
- * {@link net.sf.okapi.common.skeleton}).
+ * level resource API.
  * <p>
  * The BaseFilter allows filter writers to think in terms of simple start and
  * end calls. For example, to produce a non-translatable {@link Event} you would
@@ -844,10 +843,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 		// String sourceString; // for testing to see if there is embedded text
 
 		if (!isCurrentTextUnit()) {
-			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
-					"Cannot end the TextUnit. TextUnit not found.");
-			LOGGER.log(Level.SEVERE, "Trying to end a TextUnit that does not exist.", e);
-			throw e;
+			throw new OkapiIllegalFilterOperationException("Trying to end a TextUnit that does not exist.");
 		}
 
 		/*
@@ -909,10 +905,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 */
 	protected void addToTextUnit(String text) {
 		if (!isCurrentTextUnit()) {
-			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
-					"Cannot add to the TextUnit. TextUnit not found.");
-			LOGGER.log(Level.SEVERE, "Trying to add text to a TextUnit that does not exist.", e);
-			throw e;
+			throw new OkapiIllegalFilterOperationException("Trying to add text to a TextUnit that does not exist.");
 		}
 
 		Event tempTextUnit = peekTempEvent();
@@ -935,10 +928,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 */
 	protected void addToTextUnit(TextFragment.TagType codeType, String literalCode, String codeName) {
 		if (!isCurrentTextUnit()) {
-			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
-					"Cannot add a Code to the TextUnit. TextUnit not found.");
-			LOGGER.log(Level.SEVERE, "Trying to add a Code to a TextUnit that does not exist.", e);
-			throw e;
+			throw new OkapiIllegalFilterOperationException("Trying to add a Code to a TextUnit that does not exist.");
 		}
 
 		Code code = new Code(codeType, codeName, literalCode);
@@ -986,10 +976,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentTextUnit()) {
-			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
-					"Cannot add Codes to the TextUnit. TextUnit not found.");
-			LOGGER.log(Level.SEVERE, "Trying to add Codes to a TextUnit that does not exist.", e);
-			throw e;
+			throw new OkapiIllegalFilterOperationException("Trying to add Codes to a TextUnit that does not exist.");
 		}
 
 		currentSkeleton = new GenericSkeleton();
@@ -1105,11 +1092,8 @@ public abstract class AbstractBaseFilter implements IFilter {
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentGroup()) {
-			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
-					"Cannot end current Group. StartGroup not found.");
-			LOGGER.log(Level.SEVERE, "Trying end a Group that does not exist. Can be cuased by unbalanced Group tags.",
-					e);
-			throw e;
+			throw new OkapiIllegalFilterOperationException(
+					"Trying end a Group that does not exist. Can be cuased by unbalanced Group tags.");
 		}
 
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) endMarker);
@@ -1134,10 +1118,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 */
 	private void startCode(Code code) {
 		if (!isCurrentTextUnit()) {
-			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
-					"Cannot add a Code to the TextUnit. TextUnit not found.");
-			LOGGER.log(Level.SEVERE, "Trying to add a Code to a TextUnit that does not exist.", e);
-			throw e;
+			throw new OkapiIllegalFilterOperationException("Trying to add a Code to a TextUnit that does not exist.");
 		}
 		currentCode = code;
 		currentCode.setType(currentTagType);
@@ -1148,10 +1129,7 @@ public abstract class AbstractBaseFilter implements IFilter {
 	 */
 	private void endCode() {
 		if (currentCode == null) {
-			OkapiIllegalFilterOperationException e = new OkapiIllegalFilterOperationException(
-					"Cannot end the current Code. Code not found.");
-			LOGGER.log(Level.SEVERE, "Trying to end a Code that does not exist. Did you call startCode?", e);
-			throw e;
+			throw new OkapiIllegalFilterOperationException("Trying to end a Code that does not exist. Did you call startCode?");
 		}
 
 		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();

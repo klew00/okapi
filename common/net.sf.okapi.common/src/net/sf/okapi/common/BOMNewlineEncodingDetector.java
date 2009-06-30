@@ -260,16 +260,12 @@ public final class BOMNewlineEncodingDetector {
 				}
 			}
 		} catch (IOException e) {
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "I/O Error getting newline type", re);
-			throw re;
+			throw new OkapiIOException("I/O Error getting newline type", e);			
 		} finally {
 			try {
 				inputStream.reset();
 			} catch (IOException e) {
-				OkapiIOException re = new OkapiIOException(e);
-				LOGGER.log(Level.SEVERE, "Could not reset the input stream to it's start position", re);
-				throw re;
+				throw new OkapiIOException("Could not reset the input stream to it's start position", e);
 			}
 		}
 
@@ -342,9 +338,7 @@ public final class BOMNewlineEncodingDetector {
 		try {
 			detectBomInternal();
 		} catch (IOException e) {
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Error detecting Byte Order Mark (BOM)", re);
-			throw re;
+			throw new OkapiIOException("Error detecting Byte Order Mark (BOM)", e);
 		}
 	}
 
@@ -358,9 +352,7 @@ public final class BOMNewlineEncodingDetector {
 					}                   
 			}
 		} catch (IOException e) {
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Error detecting Byte Order Mark (BOM)", re);
-			throw re;
+			throw new OkapiIOException("Error detecting Byte Order Mark (BOM)", e);
 		}
 	}
 
@@ -452,7 +444,7 @@ public final class BOMNewlineEncodingDetector {
 			hasBom = false;
 			bomSize = 0;
 
-			LOGGER.log(Level.FINEST, "BOM not found. Now trying to guess document encoding.");
+			LOGGER.log(Level.FINE, "BOM not found. Now trying to guess document encoding.");
 
 			/*
 			 * The best we can do is to provide an encoding that reflects the

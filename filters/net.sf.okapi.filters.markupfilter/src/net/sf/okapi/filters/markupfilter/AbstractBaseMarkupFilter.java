@@ -171,9 +171,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 				document.close();
 			}
 		} catch (IOException e) {			
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Could not close " + getClass().getSimpleName(), re);
-			throw re;
+			throw new OkapiIOException("Could not close " + getName(), e);
 		}
 		this.document = null; // help Java GC
 		LOGGER.log(Level.FINE, getName() + " has been closed");
@@ -197,9 +195,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			Source parsedInput = new Source(new ByteArrayInputStream(bytes, 0, i));
 			return parsedInput;
 		} catch (IOException e) {
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Could not reset the input stream to it's start position", re);
-			throw re;
+			throw new OkapiIOException("Could not reset the input stream to it's start position", e);
 		} finally {
 			try {
 				inputStream.reset();
@@ -257,11 +253,11 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 
 		if (detectedEncoding == null && getEncoding() != null) {
 			detectedEncoding = getEncoding();
-			LOGGER.log(Level.WARNING, String.format("Cannot auto-detect encoding. Using the default encoding (%s)",
+			LOGGER.log(Level.FINE, String.format("Cannot auto-detect encoding. Using the default encoding (%s)",
 					getEncoding()));
 		} else if (getEncoding() == null) {
 			detectedEncoding = parsedHeader.getEncoding(); // get best guess
-			LOGGER.log(Level.WARNING, String.format(
+			LOGGER.log(Level.FINE, String.format(
 					"Default encoding and detected encoding not found. Using best guess encoding (%s)",
 					detectedEncoding));
 		}
@@ -271,9 +267,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			setOptions(input.getSourceLanguage(), input.getTargetLanguage(), detectedEncoding, generateSkeleton);
 			document = new StreamedSource(input.getReader());
 		} catch (IOException e) {
-			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);
-			throw re;
+			throw new OkapiIOException("Filter could not open input stream", e);
 		}
 
 		startFilter();
