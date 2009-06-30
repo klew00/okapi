@@ -95,9 +95,9 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 		btnHelp.addSelectionListener(sl); // DWH 6-17-09 Editor is the listener
 //		ed.btnStylesFromDocument.addSelectionListener(this);
 //		ed.btnColorsFromDocument.addSelectionListener(this);
-		sl.setData(); // initialize the data
 		shlOfficeFilter.open();
 		shlOfficeFilter.layout();
+		sl.setData(); // initialize the data
 		Display display = getParent().getDisplay();
 		while (!shlOfficeFilter.isDisposed()) {
 			if (!display.readAndDispatch()) {

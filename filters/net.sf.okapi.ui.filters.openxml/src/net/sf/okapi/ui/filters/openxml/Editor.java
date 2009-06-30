@@ -114,6 +114,7 @@ public class Editor implements IParametersEditor, SelectionListener {
 	{
 		Iterator it;
 		String sYmphony;
+		String sRGB;
 		Excell eggshell;
 		String sDuraCell;
 		int ndx;
@@ -139,8 +140,28 @@ public class Editor implements IParametersEditor, SelectionListener {
 			it = params.tsExcelExcludedColors.iterator();
 			while(it.hasNext())
 			{
-				sYmphony = (String)it.next();
-				ed.listExcelColorsToExclude.add(sYmphony);
+				sRGB = (String)it.next();
+				if (sRGB.equals("000000FF"))
+					sRGB = "black";
+				else if (sRGB.equals("FFFF000"))
+					sRGB = "blue";
+				else if (sRGB.equals("FF0070C0"))
+					sRGB = "blue";
+				else if (sRGB.equals("FF000000"))
+					sRGB = "cyan";
+				else if (sRGB.equals("FF00FF00"))
+					sRGB = "green";
+				else if (sRGB.equals("00FF0000"))
+					sRGB = "magenta";
+				else if (sRGB.equals("00FFFF00"))
+					sRGB = "red";
+				else if (sRGB.equals("00000000"))
+					sRGB = "white";
+				else if (sRGB.equals("0000FF00"))
+					sRGB = "yellow";
+				ndx = ed.listExcelColorsToExclude.indexOf(sRGB);
+				if (ndx>-1)
+					ed.listExcelColorsToExclude.setSelection(ndx);
 			}
 		}
 		ed.btnExcludeExcelColumns.setSelection(params.bPreferenceTranslateExcelExcludeColumns);
