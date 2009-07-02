@@ -71,6 +71,12 @@
   inputFilterClass="net.sf.okapi.filters.idml.IDMLFilter"
  >Filter for Adobe In-Design Markup Language (IDML) documents.</filter>
   
+   <filter id="okf_ts"
+  name="(ALPHA) TS Filter"
+  inputFilterClass="net.sf.okapi.filters.ts.TsFilter"
+ >Filter for QT ts files.</filter>
+
+  
  <filter id="okf_idmlcontent"
   name="(ALPHA) IDML-Content Filter"
   inputFilterClass="net.sf.okapi.filters.idml.IDMLContentFilter"

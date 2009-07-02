@@ -228,6 +228,16 @@ public class PipelineWrapper {
 				peMapper.addEditor("net.sf.okapi.steps.ui.encodingconversion.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
+						
+			ps = (IPipelineStep)Class.forName(
+			 	"net.sf.okapi.steps.generatesimpletm.GenerateSimpleTmStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+			ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			map.put(step.id, step);
 
 		}
 		catch ( InstantiationException e ) {

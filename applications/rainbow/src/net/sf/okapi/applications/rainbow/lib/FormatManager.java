@@ -65,6 +65,7 @@ public class FormatManager {
 		pairs.put(".std", "okf_openoffice");
 		pairs.put(".sdlxliff", "okf_xliff");
 		pairs.put(".dtd", "okf_dtd");
+		pairs.put(".ts", "okf_ts");
 	}
 	
 	/**

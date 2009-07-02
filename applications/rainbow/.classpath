@@ -60,5 +60,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.openxml"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.plaintext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.table"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.generatesimpletm"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.ts"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
