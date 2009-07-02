@@ -22,7 +22,7 @@ package net.sf.okapi.filters.table;
 
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.filters.table.Parameters;
-import net.sf.okapi.filters.plaintext.common.CompoundFilter;
+import net.sf.okapi.filters.common.framework.CompoundFilter;
 import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
 import net.sf.okapi.filters.table.fwc.FixedWidthColumnsFilter;
 import net.sf.okapi.filters.table.tsv.TabSeparatedValuesFilter;

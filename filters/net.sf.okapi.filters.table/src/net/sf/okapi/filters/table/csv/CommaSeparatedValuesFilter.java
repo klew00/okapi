@@ -30,9 +30,9 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.plaintext.common.ListUtils;
-import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
-import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
+import net.sf.okapi.common.utils.ListUtils;
+import net.sf.okapi.filters.common.framework.TextProcessingResult;
+import net.sf.okapi.filters.common.utils.TextUnitUtils;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 
 /**

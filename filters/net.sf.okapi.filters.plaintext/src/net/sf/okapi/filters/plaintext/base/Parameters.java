@@ -21,8 +21,8 @@
 package net.sf.okapi.filters.plaintext.base;
 
 import net.sf.okapi.common.filters.InlineCodeFinder;
-import net.sf.okapi.filters.plaintext.common.AbstractParameters;
-import net.sf.okapi.filters.plaintext.common.WrapMode;
+import net.sf.okapi.filters.common.framework.AbstractParameters;
+import net.sf.okapi.filters.common.framework.WrapMode;
 
 /**
  * Base Plain Text Filter parameters

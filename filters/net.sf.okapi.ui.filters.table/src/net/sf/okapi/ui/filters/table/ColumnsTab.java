@@ -23,12 +23,12 @@ package net.sf.okapi.ui.filters.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.filters.plaintext.common.ListUtils;
+import net.sf.okapi.common.utils.ListUtils;
+import net.sf.okapi.common.utils.Util2;
 import net.sf.okapi.filters.table.base.Parameters;
-import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
-import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
-import net.sf.okapi.ui.filters.plaintext.common.Util2;
-import net.sf.okapi.ui.filters.table.common.TableAdapter;
+import net.sf.okapi.ui.common.dialogs.IDialogPage;
+import net.sf.okapi.ui.common.editors.TableAdapter;
+import net.sf.okapi.ui.common.utils.SWTUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;

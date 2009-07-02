@@ -18,16 +18,16 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.table.common;
+package net.sf.okapi.ui.common.editors;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.filters.plaintext.common.ListUtils;
-import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
-import net.sf.okapi.ui.filters.plaintext.common.Util2;
+import net.sf.okapi.common.utils.ListUtils;
+import net.sf.okapi.common.utils.Util2;
+import net.sf.okapi.ui.common.utils.SWTUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;

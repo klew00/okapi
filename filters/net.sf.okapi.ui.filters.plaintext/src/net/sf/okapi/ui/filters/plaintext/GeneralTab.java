@@ -23,9 +23,9 @@ package net.sf.okapi.ui.filters.plaintext;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.filters.plaintext.common.CompoundParameters;
-import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
-import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
+import net.sf.okapi.filters.common.framework.CompoundParameters;
+import net.sf.okapi.ui.common.dialogs.IDialogPage;
+import net.sf.okapi.ui.common.utils.SWTUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;

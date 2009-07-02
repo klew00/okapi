@@ -7,6 +7,8 @@ Export-Package: net.sf.okapi.common.encoder,
  net.sf.okapi.common.filters,
  net.sf.okapi.common.filterwriter,
  net.sf.okapi.common.resource,
- net.sf.okapi.common.skeleton
+ net.sf.okapi.common.skeleton,
+ net.sf.okapi.filters.common.framework,
+ net.sf.okapi.filters.common.utils
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

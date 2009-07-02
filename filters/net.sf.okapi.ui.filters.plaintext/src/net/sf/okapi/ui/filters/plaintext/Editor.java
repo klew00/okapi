@@ -21,7 +21,7 @@
 package net.sf.okapi.ui.filters.plaintext;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.ui.filters.plaintext.common.AbstractParametersEditor;
+import net.sf.okapi.ui.common.editors.AbstractParametersEditor;
 
 import org.eclipse.swt.widgets.TabFolder;
 

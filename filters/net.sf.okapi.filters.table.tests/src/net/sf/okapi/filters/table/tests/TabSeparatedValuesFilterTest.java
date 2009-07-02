@@ -44,7 +44,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
+import net.sf.okapi.filters.common.framework.AbstractLineFilter;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.filters.table.tsv.TabSeparatedValuesFilter;

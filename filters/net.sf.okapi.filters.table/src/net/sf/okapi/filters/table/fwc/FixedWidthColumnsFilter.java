@@ -26,9 +26,9 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.plaintext.common.ListUtils;
-import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
-import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
+import net.sf.okapi.common.utils.ListUtils;
+import net.sf.okapi.filters.common.framework.TextProcessingResult;
+import net.sf.okapi.filters.common.utils.TextUnitUtils;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 
 /**

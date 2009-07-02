@@ -34,8 +34,9 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.ui.filters.plaintext.common.IInputQueryPage;
-import net.sf.okapi.ui.filters.plaintext.common.InputQueryDialog;
+import net.sf.okapi.ui.common.dialogs.IInputQueryPage;
+import net.sf.okapi.ui.common.dialogs.InputQueryDialog;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -67,8 +68,8 @@ public class Okapi_GUI_Tester {
 			net.sf.okapi.ui.filters.table.Editor.class.getName(),
 			net.sf.okapi.ui.filters.plaintext.Editor.class.getName(),
 			net.sf.okapi.steps.ui.textmodification.ParametersEditor.class.getName(),									
-			net.sf.okapi.ui.filters.plaintext.common.InputQueryPageInt.class.getName(),
-			net.sf.okapi.ui.filters.plaintext.common.InputQueryPageString.class.getName(),
+			net.sf.okapi.ui.common.dialogs.InputQueryPageInt.class.getName(),
+			net.sf.okapi.ui.common.dialogs.InputQueryPageString.class.getName(),
 			net.sf.okapi.ui.filters.table.AddModifyColumnDefPage.class.getName(),					
 			net.sf.okapi.filters.ui.openoffice.Editor.class.getName(),
 			net.sf.okapi.filters.ui.po.Editor.class.getName(),

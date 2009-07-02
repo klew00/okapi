@@ -9,4 +9,4 @@ Require-Bundle: net.sf.okapi.filters.table;bundle-version="1.0.0",
  net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.filters.common;bundle-version="1.0.0",
  net.sf.okapi.filters.plaintext;bundle-version="1.0.0",
- org.junit4;bundle-version="4.5.0"
+ org.junit4;bundle-version="4.3.0"

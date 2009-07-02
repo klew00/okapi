@@ -20,7 +20,7 @@
 
 package net.sf.okapi.filters.table;
 
-import net.sf.okapi.filters.plaintext.common.CompoundParameters;
+import net.sf.okapi.filters.common.framework.CompoundParameters;
 
 /**
  * Table Filter parameters
