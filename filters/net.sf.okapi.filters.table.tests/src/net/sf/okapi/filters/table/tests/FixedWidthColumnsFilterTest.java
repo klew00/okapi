@@ -835,10 +835,11 @@ public class FixedWidthColumnsFilterTest {
 		params.valuesStartLineNum = 1;
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
-		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		//params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_ALL;
 		//params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
-		params.columnStartPositions = "1, 20, 50, 71, 87, 102, 123, 144";
-		params.columnEndPositions = "11, 32, 62, 83, 97, 112, 133, 151";
+		params.columnStartPositions	 = " 1, 20, 50, 71, 87, 102, 123, 144";
+		params.columnEndPositions	 = "11, 32, 62, 83, 97, 112, 133, 151";
 		
 		params.sourceColumns = "4, 6";
 		params.sourceIdSuffixes = "_name, _descr";
@@ -866,6 +867,47 @@ public class FixedWidthColumnsFilterTest {
 		assertEquals(expected, st);
 	}
 	
+	@Test
+	public void testSkeleton3 () {
+		String st = null;
+		String expected = null;
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		params.columnNamesLineNum = 0;
+		params.valuesStartLineNum = 1;
+		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+				
+		params.columnStartPositions	 = " 1, 20, 50, 71, 87, 102, 123, 144";
+		params.columnEndPositions	 = "11, 32, 62, 83, 97, 112, 133, 151";
+		
+		params.sourceColumns = "4, 6";
+		params.sourceIdSuffixes = "_name, _descr";
+		params.targetColumns = "     2,7   ";
+		params.targetLanguages = "ge-sw, it";
+		params.targetSourceRefs = "6, 4";
+		params.sourceIdColumns = "1, 3";
+		params.sourceIdSourceRefs = "4, 6";
+		params.commentColumns = "5";
+		params.commentSourceRefs = "4";
+		params.recordIdColumn = 8;
+		
+		try {
+			st = _getSkeleton(_getFullFileName("csv_testb.txt"));
+		} 
+		catch (UnsupportedEncodingException e) {
+		}	
+		System.out.println(String.format("Skeleton of %s\n---\n", "csv_testb.txt") + st + "\n----------");
+		
+		try {
+			expected = _streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_testb.txt"));			
+		} 
+		catch (IOException e) {
+		}
+		assertEquals(expected, st);
+	}
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory

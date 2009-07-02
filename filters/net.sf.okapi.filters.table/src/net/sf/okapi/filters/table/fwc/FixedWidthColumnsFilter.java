@@ -24,9 +24,11 @@ import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.plaintext.common.ListUtils;
 import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
+import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 
 /**
@@ -76,12 +78,15 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 	}
 
 	@Override
-	protected TextProcessingResult extractCells(List<String> cells, String line, long lineNum) {
+	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {
 		
 		if (cells == null) return TextProcessingResult.REJECTED;
+		if (lineContainer == null) return TextProcessingResult.REJECTED;
+		
+		String line = lineContainer.getCodedText();		
 		if (Util.isEmpty(line)) return TextProcessingResult.REJECTED;
 		
-		int pos = 0;
+//		int pos = 0;
 		//for (int i = 0; i < columnWidths.size(); i++) {
 		int len = Math.min(columnStartPositions.size(), columnEndPositions.size());
 		for (int i = 0; i < len; i++) {
@@ -100,30 +105,42 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 //			else				
 //				end = pos; 
 
-//			int start = columnStartPositions.get(i) - 1; // 0-base
-//			int end = columnEndPositions.get(i) - 1; // 0-base
-			
 			int start = columnStartPositions.get(i) - 1; // 0-base
+			int end = columnEndPositions.get(i) - 1; // 0-base
 			
-			int end;
-			
-			if (i < len - 1)
-				end = columnStartPositions.get(i + 1) - 1; // 0-base
-			else
-				end = line.length();
+//			int start = columnStartPositions.get(i) - 1; // 0-base
+//			
+//			int end;
+//			
+//			if (i < len - 1)
+//				end = columnStartPositions.get(i + 1) - 1; // 0-base
+//			else
+//				end = line.length();
 						
 			if (start >= end) continue;
 			if (start >= line.length()) continue;
 			if (end > line.length()) end = line.length(); 
 			
-			cells.add(line.substring(start, end));
+			int skelEnd;
+			if (i < len - 1)
+				skelEnd = columnStartPositions.get(i + 1) - 1; // start of next column
+			else
+				skelEnd = line.length();
+
+			if (skelEnd > line.length()) skelEnd = line.length();
+			
+			String srcPart = line.substring(start, end); // end is excluded
+			String skelPart = line.substring(end, skelEnd);
+			
+			TextUnit cell = TextUnitUtils.buildTU(srcPart, skelPart);
+			cells.add(cell);
 		}
 		
 		return TextProcessingResult.ACCEPTED;
 	}
 
 	@Override
-	protected boolean sendCell(TextUnit tu, int column, int numColumns) {
+	protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
 		// column is 1-based
 		
 		if (tu == null) return false;
@@ -138,17 +155,16 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 		
 		tu.setSourceProperty(new Property(COLUMN_WIDTH, String.valueOf(colWidth), true));
 		
-		boolean res = super.sendCell(tu, column, numColumns);
+		boolean res = super.sendSourceCell(tu, column, numColumns);
 		
 //		if (column < numColumns) {
 //			
-//			String gap = " ";
+//			String gap = new String();
+//			
 //			sendSkeletonCell(gap, getActiveSkeleton(), column, numColumns);
 //		}
-				
+//				
 		return res;
 	}
-	
-	
 	
 }

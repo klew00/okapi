@@ -21,14 +21,11 @@
 package net.sf.okapi.ui.filters.table;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.filters.plaintext.common.INotifiable;
 import net.sf.okapi.ui.filters.plaintext.OptionsTab;
 import net.sf.okapi.ui.filters.plaintext.common.AbstractParametersEditor;
 import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
-import org.eclipse.swt.events.TypedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TabFolder;
@@ -77,8 +74,8 @@ public class Editor extends AbstractParametersEditor {
 
 		// Find participants
 		
-		Control btnCSV = findControl(TableTab.class, "btnCSV");
-		Control btnTSV = findControl(TableTab.class, "btnTSV");
+//		Control btnCSV = findControl(TableTab.class, "btnCSV");
+//		Control btnTSV = findControl(TableTab.class, "btnTSV");
 		Control btnFWC = findControl(TableTab.class, "btnFWC");
 		
 		Control header = findControl(TableTab.class, "header");
@@ -91,6 +88,8 @@ public class Editor extends AbstractParametersEditor {
 		Control lend = findControl(AddModifyColumnDefPage.class, "lend");
 		
 		Composite columns = findPage(ColumnsTab.class);
+		Control all = findControl(ColumnsTab.class, "all");
+		Control defs = findControl(ColumnsTab.class, "defs");
 		
 		Control trim = findControl(TableTab.class, "trim");
 		Control allow = findControl(OptionsTab.class, "allow");
@@ -145,6 +144,11 @@ public class Editor extends AbstractParametersEditor {
 		
 		// Extract table data enable state affects the Columns page
 		SWTUtils.enableIfSelected(columns, body);
+		//SWTUtils.selectIfSelected(all, body);
+		
+		if (SWTUtils.getSelected(body) && !SWTUtils.getSelected(defs))
+			SWTUtils.setSelected(all, true);
+
 		SWTUtils.disableIfNotSelected(columns, body);
 		
 		if (SWTUtils.getEnabled(columns))

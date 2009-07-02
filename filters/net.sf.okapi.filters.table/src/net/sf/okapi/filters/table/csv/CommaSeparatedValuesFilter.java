@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -72,7 +73,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		addConfiguration(true, // Do not inherit configurations from Base Table Filter
 				FILTER_CONFIG,
 				"Table (Comma-Separated Values)",
-				"Comma-separated values, optional header with field names", 
+				"Comma-separated values, optional header with field names.", 
 				"okf_table_csv.fprm");
 		
 		setParameters(new Parameters());	// CSV Filter's parameters
@@ -95,14 +96,18 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	}
 
 	@Override
-	protected TextProcessingResult extractCells(List<String> cells, String line, long lineNum) {		
+	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {		
 		// Extract cells from the line, if no multi-line chunks, fill up the cells list, if there are, fill the chunk buffer.
 		// The cells is always an empty non-null list ready for addition
 		
 		if (cells == null) return TextProcessingResult.REJECTED;
+		if (lineContainer == null) return TextProcessingResult.REJECTED;
+		
+		String line = lineContainer.getCodedText();
+		
 		if (Util.isEmpty(line)) return TextProcessingResult.REJECTED;
 		
-		if (Util.isEmpty(params.fieldDelimiter)) return super.extractCells(cells, line, lineNum);		
+		if (Util.isEmpty(params.fieldDelimiter)) return super.extractCells(cells, lineContainer, lineNum);		
 		
 		// Split line into fields									
 		String[] chunks = line.split(params.fieldDelimiter);
@@ -149,7 +154,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	}
 
 	@Override
-	protected boolean sendCell(TextUnit tu, int column, int numColumns) {
+	protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
 		
 		if (tu == null) return false;
 		
@@ -213,7 +218,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		else
 			src.setCodedText(cell); // No line wrappers found 
 		
-		boolean res = super.sendCell(tu, column, numColumns);
+		boolean res = super.sendSourceCell(tu, column, numColumns);
 				
 		// Add field delimiter to skeleton
 		if (res && column < numColumns) { // For all columns but the last
@@ -225,7 +230,9 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	}
 
 	@Override
-	protected void sendSkeletonCell(String cell, GenericSkeleton skel, int column, int numColumns) {
+	protected boolean sendSkeletonCell(TextUnit cell0, GenericSkeleton skel, int column, int numColumns) {
+		
+		String cell = TextUnitUtils.getSourceText(cell0);
 		
 		if (column < numColumns) cell = cell + params.fieldDelimiter;
 		
@@ -242,6 +249,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		}
 		
 		skel.add(cell);
+		return true;
 	}
 	
 	@Override
@@ -364,13 +372,21 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 		// Transfer chunks to a temp buffer, process
 		
-		List<String> buf = ListUtils.moveItems(buffer, 0, index - 1);
+//		List<String> buf0 = ListUtils.moveItems(buffer, 0, index - 1);
 		
 //		List<String> buf = new ArrayList<String>();
 //		buf.addAll(buffer.subList(0, index));		
 //		buffer.subList(0, index).clear();
 		
 		addLineBreak(); // Insert a line break after the previous line
+		
+		List<TextUnit> buf = new ArrayList<TextUnit>();
+		
+		for (int i = 0; i < index; i++)			
+			buf.add(TextUnitUtils.buildTU(buffer.get(i)));
+		
+		buffer.subList(0, index).clear();
+		
 		processCells(buf, lineNum);
 	}
 	

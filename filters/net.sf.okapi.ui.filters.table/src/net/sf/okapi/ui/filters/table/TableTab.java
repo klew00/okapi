@@ -25,24 +25,20 @@ import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
 import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.TypedEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * 
@@ -706,14 +702,18 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 				else
 					params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
 				
+				
+				if (!body.getSelection())
+					params.sendColumnsMode = Parameters.SEND_COLUMNS_NONE;
+				
 				if (trim.getSelection() && nqualif.getSelection())
 					params.trimMode = Parameters.TRIM_NONQUALIFIED_ONLY;
 				
 				else if (trim.getSelection() && allT.getSelection())
-					params.sendHeaderMode = Parameters.TRIM_ALL;
+					params.trimMode = Parameters.TRIM_ALL;
 				
 				else
-					params.sendHeaderMode = Parameters.TRIM_NONE;
+					params.trimMode = Parameters.TRIM_NONE;
 			}
 		}
 

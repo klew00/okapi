@@ -68,7 +68,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	protected List<String> sourceIdSuffixes;
 	protected List<String> targetLanguages;
 
-	protected ArrayList<TextUnit> tuCache;
+//	protected ArrayList<TextUnit> tuCache;
 	
 	private int rowNumber = 0;
 	private boolean inHeaderArea = true;
@@ -92,7 +92,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 //				null);
 		
 		columnNames = new ArrayList<String>();
-		tuCache = new ArrayList<TextUnit>();
+//		tuCache = new ArrayList<TextUnit>();
 				
 		
 		setParameters(new Parameters());	// Base Table Filter parameters
@@ -164,11 +164,11 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		if (isHeaderLine) {
 			
 			lineContainer.setProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
-			return super.sendContent(lineContainer);
+			return super.sendAsSource(lineContainer);
 		}
 		
-		List<String> cells = new ArrayList<String>(); 
-		TextProcessingResult res = extractCells(cells, lineContainer.getCodedText(), lineNum);
+		List<TextUnit> cells = new ArrayList<TextUnit>(); 
+		TextProcessingResult res = extractCells(cells, lineContainer, lineNum);
 		
 		switch (res) {
 			case REJECTED:
@@ -182,7 +182,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		// res = ACCEPTED
 			
 		if (isColumnNames) inMultilineColumnNames = false;
-		if (Util.isEmpty(cells)) return super.sendContent(lineContainer); // No chunks, process the whole line
+		if (Util.isEmpty(cells)) return super.sendAsSource(lineContainer); // No chunks, process the whole line
 			
 		if (processCells(cells, lineNum))
 			return TextProcessingResult.ACCEPTED;
@@ -195,15 +195,15 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	 * @param line string containing separated cells
 	 * @return string array of cells
 	 */
-	protected TextProcessingResult extractCells(List<String> cells, String line, long lineNum) {		
+	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {		
 		// To be overridden in descendant classes
 		
-		if (cells != null) cells.add(line);
+		if (cells != null) cells.add(TextUnitUtils.buildTU(lineContainer));
 		
 		return TextProcessingResult.ACCEPTED; 
 	}
 
-	protected boolean processCells(List<String> cells, long lineNum) {
+	protected boolean processCells(List<TextUnit> cells, long lineNum) {
 		// Processes cells of one line
 		// To be called from descendants, least likely overridden
 
@@ -217,7 +217,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 						
 			if (cells.size() < params.numColumns)
 				for (int i = cells.size(); i < params.numColumns; i++)
-					cells.add("");
+					cells.add(TextUnitUtils.buildTU(""));
 
 			if (cells.size() > params.numColumns)
 				cells.subList(params.numColumns, cells.size()).clear();
@@ -225,11 +225,14 @@ public class BaseTableFilter extends BasePlainTextFilter {
 								
 		if (isColumnNames) {
 			
-			ListUtils.listTrimRight(cells);
+			columnNames.clear();
 			
-			columnNames.clear();			
-			columnNames.addAll(ListUtils.listTrimValues(cells));
-			
+			for (TextUnit tu : cells) {
+				
+				String st = TextUnitUtils.getSourceText(tu).trim();
+				columnNames.add(st);
+			}
+						
 			if (params.detectColumnsMode == Parameters.DETECT_COLUMNS_COL_NAMES)
 				params.numColumns = cells.size();
 		}
@@ -242,83 +245,86 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			
 			for (int i = 0; i < cells.size(); i++)	{
 								
-				String cell = cells.get(i);
+				TextUnit cell = cells.get(i);
 				int colNumber = i + 1;
 				
 				//if (Util.isEmpty(cell, true)) continue;
-				if (Util.isEmpty(cell, true)) {
+				if (TextUnitUtils.isEmpty(cell, true)) {  // only spaces, no translatable text
 					
 					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
 					continue;
 				}					
 								
-				TextUnit tu = new TextUnit("", cell);
-				if (tu == null) continue;
+//				TextUnit tu = new TextUnit("", cell);
+//				if (tu == null) continue;
 
-				tu.setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(lineNum), true));				
-				tu.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
-				tu.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
+				cell.setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(lineNum), true));				
+				cell.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
+				cell.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
 				
-				if (!sendCell(tu, colNumber, cells.size())) continue;
+				if (!sendSourceCell(cell, colNumber, cells.size())) continue;
 				tuSent = true;
 			}					
 		}
+		
 		// Send only listed cells (id, source, target, comment)
 		else if (sendListedMode) {
 		
-			if (tuCache == null) return false;			
-			tuCache.clear();
+//			if (tuCache == null) return false;			
+//			tuCache.clear();
 			
-			// Create text units for source cells			
-			for (int i = 0; i < cells.size(); i++)	{
-				
-				String cell = cells.get(i);
-				if (Util.isEmpty(cell, true)) {
-					
-					tuCache.add(null);
-					continue;
-				}
-			
-				int colNumber = i + 1;
-				if (isSource(colNumber)) {
-			
-					TextUnit tu = new TextUnit("", cell);
-					tuCache.add(tu);
-					
-					if (tu == null) continue;
-
-					tu.setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(lineNum), true));				
-					tu.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
-					tu.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
-				}
-				else
-					tuCache.add(null);
-			}
+//			// Create text units for source cells			
+//			for (int i = 0; i < cells.size(); i++)	{
+//				
+//				TextUnit cell = cells.get(i);
+//				if (TextUnitUtils.isEmpty(cell, true)) { // no translatable text, possibly spaces
+//					
+//					//tuCache.add(null);
+//					//tuCache.add(cell);
+//					continue;
+//				}
+//			
+//				int colNumber = i + 1;
+//				if (isSource(colNumber)) {
+//			
+//					//TextUnit tu = new TextUnit("", cell);
+//					//tuCache.add(cell);
+//					
+//					if (cell == null) continue;
+//
+//					cell.setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(lineNum), true));				
+//					cell.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
+//					cell.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
+//				}
+//				//else
+//					//tuCache.add(null);
+//					//tuCache.add(cell);
+//			}
 					
 			// Add content of other columns to the created sources
 			for (int i = 0; i < cells.size(); i++)	{
 				
-				String cell = cells.get(i); // Can be empty				
-				String trimmedCell = Util.trim(cell);
+				TextUnit cell = cells.get(i); // Can be empty				
+				String trimmedCell = Util.trim(TextUnitUtils.getSourceText(cell));
 				
 				int colNumber = i + 1;
-				boolean isRecognized = false;
+//				boolean isRecognized = false;
 				
 				if (isSourceId(colNumber)) {
 					
-					isRecognized = true;
-					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+//					isRecognized = true;
+//					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
 					
-					TextUnit tu = getSourceFromIdRef(colNumber);
+					TextUnit tu = getSourceFromIdRef(cells, colNumber);
 					if (tu == null) continue;										
 					
-					if (Util.isEmpty(cell, true)) {
+					if (TextUnitUtils.isEmpty(cell, true)) {
 
 						String recordID = ""; 
 						int index = params.recordIdColumn - 1;
 						
 						if (Util.checkIndex(index, cells))
-							recordID = cells.get(index);
+							recordID = TextUnitUtils.getSourceText(cells.get(index));
 						
 						if (recordID != null) recordID = recordID.trim();
 						
@@ -335,9 +341,105 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				
 				if (isTarget(colNumber)) {
 					
+//					isRecognized = true;
+					
+					TextUnit tu = getSourceFromTargetRef(cells, colNumber);
+					if (tu == null) {
+						
+//						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+						continue;
+					}
+					
+					String language = getLanguageFromTargetRef(colNumber);
+					if (Util.isEmpty(language)) {
+						
+//						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+						continue;
+					}
+					
+//					TextContainer trg = new TextContainer(TextUnitUtils.getSourceText(cell));					
+//					tu.setTarget(language, trg);
+					
+//					// Do not add to the TU's skeleton as it might be sent before or later
+//					GenericSkeleton skel = new GenericSkeleton();
+//					
+//					TextUnitUtils.trimLeading(trg, skel);
+//					skel.addContentPlaceholder(tu, language);
+//					TextUnitUtils.trimTrailing(trg, skel);
+//					
+//					sendSkeletonPart(skel);										
+					
+					//sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+//					sendTargetCell(cell, tu, getActiveSkeleton(), language, colNumber, cells.size());
+					
+					continue;
+				}
+				
+				if (isComment(colNumber)) {
+					
+//					isRecognized = true;
+//					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+					
+					TextUnit tu = getSourceFromCommentRef(cells, colNumber);
+					if (tu == null) continue;
+					if (Util.isEmpty(trimmedCell)) continue;
+					
+					tu.setProperty(new Property(Property.NOTE, trimmedCell));
+					
+					continue;
+				}
+				
+				if (isSource(colNumber)) {
+					
+//					isRecognized = true;
+					
+					if (cell == null) continue;
+
+					cell.setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(lineNum), true));				
+					cell.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
+					cell.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
+					
+//					TextUnit tu = getFromTuCache(i);
+//					if (tu == null) continue;
+					
+					// After sending a cell it's still accessible for modifications (the cell is not cloned for the queue), so no additional loop is needed
+					//if (!sendCell(tu, colNumber, cells.size())) {
+//					if (!sendSourceCell(cell, colNumber, cells.size())) {
+//						
+//						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+//						continue; 
+//					}
+//					tuSent = true;
+					
+					continue;
+				}
+				
+				// Unknown type goes to the skeleton 
+//				if (!isRecognized)
+//					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+			}
+			
+			// Send cells (OKAPI-A 7*)
+			for (int i = 0; i < cells.size(); i++)	{
+				
+				TextUnit cell = cells.get(i); // Can be empty
+				
+				int colNumber = i + 1;
+				boolean isRecognized = false;
+				
+				if (isSourceId(colNumber)) {
+					
+					isRecognized = true;
+					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+															
+					continue;
+				}
+				
+				if (isTarget(colNumber)) {
+					
 					isRecognized = true;
 					
-					TextUnit tu = getSourceFromTargetRef(colNumber);
+					TextUnit tu = getSourceFromTargetRef(cells, colNumber);
 					if (tu == null) {
 						
 						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
@@ -351,17 +453,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 						continue;
 					}
 					
-					TextContainer trg = new TextContainer(cell);					
-					tu.setTarget(language, trg);
-					
-					// Do not add to the TU's skeleton as it might be sent before or later
-					GenericSkeleton skel = new GenericSkeleton();
-					
-					TextUnitUtils.trimLeading(trg, skel);
-					skel.addContentPlaceholder(tu, language);
-					TextUnitUtils.trimTrailing(trg, skel);
-					
-					sendSkeletonPart(skel);										
+					sendTargetCell(cell, tu, getActiveSkeleton(), language, colNumber, cells.size());
 					
 					continue;
 				}
@@ -371,12 +463,6 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					isRecognized = true;
 					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
 					
-					TextUnit tu = getSourceFromCommentRef(colNumber);
-					if (tu == null) continue;
-					if (Util.isEmpty(trimmedCell)) continue;
-					
-					tu.setProperty(new Property(Property.NOTE, trimmedCell));
-					
 					continue;
 				}
 				
@@ -384,11 +470,9 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					
 					isRecognized = true;
 					
-					TextUnit tu = getFromTuCache(i);
-					if (tu == null) continue;
-					
-					// After sending a TU it's still accessible for modifications (TU is not cloned for the queue), so no additional loop is needed
-					if (!sendCell(tu, colNumber, cells.size())) {
+					if (cell == null) continue;
+
+					if (!sendSourceCell(cell, colNumber, cells.size())) {
 						
 						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
 						continue; 
@@ -426,38 +510,40 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	private boolean isTarget(int colNumber) {return (targetColumns == null) ? null : targetColumns.contains(colNumber);}
 	private boolean isComment(int colNumber) {return (commentColumns == null) ? null : commentColumns.contains(colNumber);}	
 
-	private TextUnit getSource(int colNum, List<Integer> columnsList, List<Integer> refList) {
+	private TextUnit getSource(List<TextUnit> cells, int colNum, List<Integer> columnsList, List<Integer> refList) {
 		
 		if (columnsList == null) return null;		
 		int index = columnsList.indexOf(colNum); 
 		
 		if (!Util.checkIndex(index, refList)) return null;
-		int ref = refList.get(index);
+		int ref = refList.get(index) - 1; // refList items are 1-based
 		
-		return getFromTuCache(--ref); // ref is 1-based
+		//return getFromTuCache(--ref); // ref is 1-based
+		if (!Util.checkIndex(ref, cells)) return null;
+		return cells.get(ref);
 	}
 	
-	private TextUnit getSourceFromTargetRef(int colNum) {
+	private TextUnit getSourceFromTargetRef(List<TextUnit> cells, int colNum) {
 
-		return getSource(colNum, targetColumns, targetSourceRefs);
+		return getSource(cells, colNum, targetColumns, targetSourceRefs);
 	}
 			
-	private TextUnit getSourceFromIdRef(int colNum) {
+	private TextUnit getSourceFromIdRef(List<TextUnit> cells, int colNum) {
 		
-		return getSource(colNum, sourceIdColumns, sourceIdSourceRefs);
+		return getSource(cells, colNum, sourceIdColumns, sourceIdSourceRefs);
 	}
 	
-	private TextUnit getSourceFromCommentRef(int colNum) {
+	private TextUnit getSourceFromCommentRef(List<TextUnit> cells, int colNum) {
 		
-		return getSource(colNum, commentColumns, commentSourceRefs);
+		return getSource(cells, colNum, commentColumns, commentSourceRefs);
 	}
 	
-	private TextUnit getFromTuCache(int cacheIndex) {
-		
-		if (!Util.checkIndex(cacheIndex, tuCache)) return null;
-		
-		return tuCache.get(cacheIndex);
-	}
+//	private TextUnit getFromTuCache(int cacheIndex) {
+//		
+//		if (!Util.checkIndex(cacheIndex, tuCache)) return null;
+//		
+//		return tuCache.get(cacheIndex);
+//	}
 	
 	private String getLanguageFromTargetRef(int colNum) {
 		
@@ -477,18 +563,37 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		return sourceIdSuffixes.get(index);
 	}
 
-	protected boolean sendCell(TextUnit tu, int column, int numColumns) {
+	protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
 		// Can be overridden in descendant classes
 		
-		return sendContent(tu) == TextProcessingResult.ACCEPTED;
+		return sendAsSource(tu) == TextProcessingResult.ACCEPTED;
 	}
 
-	protected void sendSkeletonCell(String cell, GenericSkeleton skel, int column, int numColumns) {
+	private boolean sendTargetCell(TextUnit target, TextUnit source,
+			GenericSkeleton skel, String language, int column, int numColumns) {
 		
-		if (skel == null) return;
-		if (Util.isEmpty(cell)) return;
+		return sendAsTarget(target, source, language, skel) == TextProcessingResult.ACCEPTED;
+	}
+
+	
+	protected boolean sendSkeletonCell(TextUnit cell, GenericSkeleton skel, int column, int numColumns) {
 		
-		skel.add(cell);
+//		if (skel == null) return;
+//		
+////		String st = TextUnitUtils.getSourceText(cell);
+//		
+//		// If the cell contained a skeleton, before we drop it, we need to transfer it to the skel
+//				
+////		GenericSkeleton skel2 = TextUnitUtils.getSkeleton(cell, true);
+////		skel.add(skel2);
+////		
+////		if (Util.isEmpty(st)) return; // strict empty, even no spaces allowed
+////		
+////		skel.add(st);
+//		
+//		skel.add(TextUnitUtils.convertToSkeleton(cell));
+		
+		return sendAsSkeleton(cell, skel) == TextProcessingResult.ACCEPTED;
 	}
 	
 	private void updateLineInfo(long lineNum) {

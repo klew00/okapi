@@ -20,30 +20,28 @@
 
 package net.sf.okapi.ui.filters.table;
 
-import net.sf.okapi.filters.plaintext.common.INotifiable;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.okapi.filters.plaintext.common.ListUtils;
 import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
 import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 import net.sf.okapi.ui.filters.plaintext.common.Util2;
+import net.sf.okapi.ui.filters.table.common.TableAdapter;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -58,6 +56,9 @@ import org.eclipse.swt.widgets.Widget;
  */
 
 public class ColumnsTab extends Composite implements IDialogPage {
+	
+	private double[] columnPoints = {1.6, 2, 2, 2, 3, 1, 1};
+	
 	private Table table;
 	private TableColumn tblclmnColumn;
 	private TableColumn tblclmnType;
@@ -78,8 +79,9 @@ public class ColumnsTab extends Composite implements IDialogPage {
 	private Button btnAdd;
 	private Button btnRemove;
 	private Button btnModify;
-	private Composite composite_2;
+	private Composite buttons;
 	private Label label_1;
+	private TableAdapter adapter;	
 
 	/**
 	 * Create the composite.
@@ -97,17 +99,8 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		extr.setText("Extraction mode");
 		extr.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		
-		defs = new Button(extr, SWT.RADIO);
-		defs.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		defs.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				
-				interop(e.widget);
-			}
-		});
-		defs.setText("Extract by column definitions");
-		
 		all = new Button(extr, SWT.RADIO);
+		all.setData("name", "all");
 		all.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		all.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -117,14 +110,45 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		});
 		all.setText("Extract from all columns (create separate text units)");
 		
+		defs = new Button(extr, SWT.RADIO);
+		defs.setData("name", "defs");
+		defs.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		defs.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				interop(e.widget);
+			}
+		});
+		defs.setText("Extract by column definitions");
+		
 		gnum = new Group(this, SWT.NONE);
 		gnum.setLayout(new GridLayout(4, false));
 		gnum.setData("name", "gnum");
 		gnum.setText("Number of columns");
 		gnum.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		
+		vals = new Button(gnum, SWT.RADIO);
+		vals.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
+		vals.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				interop(e.widget);
+			}
+		});
+		vals.setText("Defined by values (may vary in different rows)");
+		
+		names = new Button(gnum, SWT.RADIO);
+		names.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
+		names.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				
+				interop(e.widget);
+			}
+		});
+		names.setText("Defined by column names");
+		
 		fix = new Button(gnum, SWT.RADIO);
-		fix.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 1, 1));
+		fix.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 1));
 		fix.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
@@ -139,26 +163,6 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		num.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		num.setMinimum(1);
 		
-		names = new Button(gnum, SWT.RADIO);
-		names.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
-		names.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				
-				interop(e.widget);
-			}
-		});
-		names.setText("Defined by column names");
-		
-		vals = new Button(gnum, SWT.RADIO);
-		vals.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 4, 1));
-		vals.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				
-				interop(e.widget);
-			}
-		});
-		vals.setText("Defined by values (may vary in different rows)");
-		
 		colDefs = new Group(this, SWT.NONE);
 		colDefs.setData("name", "colDefs");
 		colDefs.setText("Column definitions");
@@ -166,17 +170,14 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		colDefs.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		
 		table = new Table(colDefs, SWT.BORDER | SWT.FULL_SELECTION);
+		
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent e) {
 								
 				addModifyRow(table.getItem(new Point(e.x, e.y)));
 			}
 		});
-		table.addControlListener(new ControlAdapter() {
-			public void controlResized(ControlEvent e) {
-				updateColumnWidths();
-			}			
-		});
+		
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
@@ -187,6 +188,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		
+		
 		tblclmnColumn = new TableColumn(table, SWT.RIGHT);
 		tblclmnColumn.setWidth(72);
 		tblclmnColumn.setText("Column #");
@@ -195,7 +197,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		tblclmnType.setWidth(93);
 		tblclmnType.setText("Type");
 		
-		tblclmnSource = new TableColumn(table, SWT.NONE);
+		tblclmnSource = new TableColumn(table, SWT.RIGHT);
 		tblclmnSource.setWidth(95);
 		tblclmnSource.setText("Source column");
 		
@@ -207,19 +209,24 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		tblclmnSuffix.setWidth(116);
 		tblclmnSuffix.setText("ID suffix");
 		
-		tblclmnStart = new TableColumn(table, SWT.NONE);
+		tblclmnStart = new TableColumn(table, SWT.RIGHT);
 		tblclmnStart.setWidth(47);
 		tblclmnStart.setText("Start");
 		
-		tblclmnEnd = new TableColumn(table, SWT.NONE);
+		tblclmnEnd = new TableColumn(table, SWT.RIGHT);
 		tblclmnEnd.setWidth(47);
 		tblclmnEnd.setText("End");
 		
-		composite_2 = new Composite(colDefs, SWT.NONE);
-		composite_2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		composite_2.setLayout(new GridLayout(1, false));
+		adapter = new TableAdapter(table);
+		adapter.setRelColumnWidths(columnPoints);
 		
-		btnAdd = new Button(composite_2, SWT.NONE);
+		buttons = new Composite(colDefs, SWT.NONE);
+		buttons.setData("name", "buttons");
+		buttons.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		buttons.setLayout(new GridLayout(1, false));
+		
+		btnAdd = new Button(buttons, SWT.NONE);
+		
 		btnAdd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -229,7 +236,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		});
 		btnAdd.setText("Add...");
 		
-		btnModify = new Button(composite_2, SWT.NONE);
+		btnModify = new Button(buttons, SWT.NONE);
 		btnModify.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnModify.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -239,22 +246,18 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		});
 		btnModify.setText("Modify...");
 		
-		btnRemove = new Button(composite_2, SWT.NONE);
+		btnRemove = new Button(buttons, SWT.NONE);
 		btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
-				int index = table.getSelectionIndex();
-				table.remove(index);
-				
-				if (index > table.getItemCount() - 1) index = table.getItemCount() - 1;
-				if (index > -1)	table.select(index);
+				adapter.removeSelected();
 				interop(e.widget);
 			}
 		});
 		btnRemove.setText("Remove");
 		
-		label_1 = new Label(composite_2, SWT.NONE);
+		label_1 = new Label(buttons, SWT.NONE);
 		label_1.setText("                          ");
 		new Label(colDefs, SWT.NONE);
 		new Label(colDefs, SWT.NONE);
@@ -263,45 +266,29 @@ public class ColumnsTab extends Composite implements IDialogPage {
 
 	protected void addModifyRow(TableItem item) {
 		
-		if (item == null) { // Add new item
-			table.setSelection(-1);
+		if (item == null) { // Add new item			
+			adapter.unselect();
 			
 			if (SWTUtils.inputQuery(AddModifyColumnDefPage.class, getShell(), "Add column definition", 
 					new String[] {Util2.intToStr(SWTUtils.getColumnMaxValue(table, 0) + 1), "Source", "", "", "", "0", "0"}, 
 					null)) {
 				
-				item = new TableItem (table, SWT.NONE);
-				
-				item.setText((String []) SWTUtils.getResult());
-				table.select(table.indexOf(item));				
+				adapter.addModifyRow((String []) SWTUtils.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
 			}
-			interop(table);  // Selection changes
+			else
+				adapter.restoreSelection();
 		}
 		else {
 			if (SWTUtils.inputQuery(AddModifyColumnDefPage.class, getShell(), "Modify column definition", 
 					SWTUtils.getText(item),
 					null)) {					
 				
-				item.setText((String []) SWTUtils.getResult());					
-				table.select(table.indexOf(item));
-				interop(table);
+				adapter.addModifyRow(item, (String []) SWTUtils.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
 			}
 		}
-	}
-
-	protected void updateColumnWidths() {
 		
-		double[] columnPoints = {1.3, 2, 1.5, 2, 3, 1, 1};
-		float pointsWidth = 0;
-		
-		for (int i = 0; i < table.getColumnCount(); i++)
-			pointsWidth += ((i < columnPoints.length - 1) ? columnPoints[i]: 1);
-			
-		float coeff = table.getClientArea().width / pointsWidth;
-		
-		for (int i = 0; i < table.getColumnCount(); i++)
-			table.getColumn(i).setWidth((int)(((i < columnPoints.length - 1) ? columnPoints[i]: 1) * coeff));
-		
+		adapter.sort(1);
+		interop(table);  // Selection changes
 	}
 
 	@Override
@@ -317,20 +304,14 @@ public class ColumnsTab extends Composite implements IDialogPage {
 	public void interop(Widget speaker) {
 		
 		SWTUtils.setAllEnabled(colDefs, defs.getSelection());
+		SWTUtils.setAllEnabled(buttons, defs.getSelection());
 		num.setEnabled(fix.getSelection());
 		
-		btnModify.setEnabled(table.getItemCount() > 0 && table.getSelectionIndex() != -1);
+		btnModify.setEnabled(buttons.getEnabled() && table.getItemCount() > 0 && table.getSelectionIndex() != -1);
 		btnRemove.setEnabled(btnModify.getEnabled());			
 	}
 
 	public boolean load(Object data) {
-		
-		if (data instanceof net.sf.okapi.filters.table.fwc.Parameters) {
-		
-			net.sf.okapi.filters.table.fwc.Parameters params =
-				(net.sf.okapi.filters.table.fwc.Parameters) data;
-						
-		}
 		
 		// Common part
 		
@@ -342,6 +323,8 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			num.setSelection(params.numColumns);
 			
 			//------------------
+			SWTUtils.unselectAll(gnum);
+			
 			if (params.detectColumnsMode == Parameters.DETECT_COLUMNS_FIXED_NUMBER)
 				fix.setSelection(true);
 			
@@ -352,6 +335,8 @@ public class ColumnsTab extends Composite implements IDialogPage {
 				vals.setSelection(true);
 			
 			//------------------
+			SWTUtils.unselectAll(extr);
+			
 			if (params.sendColumnsMode == Parameters.SEND_COLUMNS_LISTED) {
 				
 				defs.setSelection(true);
@@ -369,23 +354,87 @@ public class ColumnsTab extends Composite implements IDialogPage {
 				defs.setSelection(false);
 				all.setSelection(false);
 			}
-				
+		
+			// -----------------
+			
+			//adapter.clear();
+			
+			adapter.addRows(params.sourceColumns, 1);
+			adapter.addRows(params.targetColumns, 1);
+			adapter.addRows(params.targetSourceRefs, 1);
+			adapter.addRows(params.sourceIdColumns, 1);
+			adapter.addRows(params.sourceIdSourceRefs, 1);
+			adapter.addRows(params.commentColumns, 1);
+			adapter.addRows(params.commentSourceRefs, 1);
+			
+			if (params.recordIdColumn > 0)
+				adapter.addRow(params.recordIdColumn, 1);
+			
+			adapter.sort(1);
+						
+			List<String> sourceColumns = ListUtils.stringAsList(params.sourceColumns);	
+			List<String> sourceIdSuffixes = ListUtils.stringAsList(params.sourceIdSuffixes);
+			List<String> targetColumns = ListUtils.stringAsList(params.targetColumns);
+			List<String> targetLanguages = ListUtils.stringAsList(params.targetLanguages);
+			List<String> targetSourceRefs = ListUtils.stringAsList(params.targetSourceRefs);			
+			List<String> sourceIdColumns = ListUtils.stringAsList(params.sourceIdColumns);
+			List<String> sourceIdSourceRefs = ListUtils.stringAsList(params.sourceIdSourceRefs);
+			List<String> commentColumns = ListUtils.stringAsList(params.commentColumns);
+			List<String> commentSourceRefs = ListUtils.stringAsList(params.commentSourceRefs);
+					
+			// Types
+			for (int i = 0; i < sourceColumns.size(); i++)
+				adapter.setValue(adapter.findValue(sourceColumns.get(i), 1), 2, AddModifyColumnDefPage.TYPE_SOURCE);
+			
+			for (int i = 0; i < targetColumns.size(); i++)
+				adapter.setValue(adapter.findValue(targetColumns.get(i), 1), 2, AddModifyColumnDefPage.TYPE_TARGET);
+			
+			for (int i = 0; i < sourceIdColumns.size(); i++)
+				adapter.setValue(adapter.findValue(sourceIdColumns.get(i), 1), 2, AddModifyColumnDefPage.TYPE_SOURCE_ID); 
+			
+			for (int i = 0; i < commentColumns.size(); i++)
+				adapter.setValue(adapter.findValue(commentColumns.get(i), 1), 2, AddModifyColumnDefPage.TYPE_COMMENT);
+			
+			adapter.setValue(adapter.findValue(Util2.intToStr(params.recordIdColumn), 1), 2, AddModifyColumnDefPage.TYPE_RECORD_ID);
+			
+			// Refs
+			for (int i = 0; i < sourceIdSuffixes.size(); i++)
+				adapter.setValue(adapter.findValue(sourceColumns.get(i), 1), 5, sourceIdSuffixes.get(i));
+			
+			for (int i = 0; i < commentSourceRefs.size(); i++)
+				adapter.setValue(adapter.findValue(commentColumns.get(i), 1), 3, commentSourceRefs.get(i));
+			
+			for (int i = 0; i < sourceIdSourceRefs.size(); i++)
+				adapter.setValue(adapter.findValue(sourceIdColumns.get(i), 1), 3, sourceIdSourceRefs.get(i));
+			
+			for (int i = 0; i < targetSourceRefs.size(); i++)
+				adapter.setValue(adapter.findValue(targetColumns.get(i), 1), 3, targetSourceRefs.get(i));
+			
+			for (int i = 0; i < targetLanguages.size(); i++)
+				adapter.setValue(adapter.findValue(targetColumns.get(i), 1), 4, targetLanguages.get(i));
 		}
-		
 
-		return true;
-	}
-
-	public boolean save(Object data) {
-		
 		if (data instanceof net.sf.okapi.filters.table.fwc.Parameters) {
 			
 			net.sf.okapi.filters.table.fwc.Parameters params =
 				(net.sf.okapi.filters.table.fwc.Parameters) data;
-			
+						
+			List<String> columnStartPositions = ListUtils.stringAsList(params.columnStartPositions);	
+			List<String> columnEndPositions = ListUtils.stringAsList(params.columnEndPositions);
+
+			for (int i = 0; i < Math.min(columnStartPositions.size(), columnEndPositions.size()); i++) {
+				
+				adapter.setValue(i + 1, 6, columnStartPositions.get(i)); // the table rows are already created here  
+				adapter.setValue(i + 1, 7, columnEndPositions.get(i));
+			}
 		}
 		
-		// Common part
+		return true;
+	}
+
+	public boolean save(Object data) {
+
+// Common part
 		
 		if (data instanceof net.sf.okapi.filters.table.base.Parameters) {
 			
@@ -400,22 +449,86 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			
 			else if (names.getSelection())
 				params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
-			
-			else
-				params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
 		
 			// -----------------
-			if (defs.getSelection())
-				params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
-			
-			else if (all.getSelection())
+						
+			if (all.getEnabled() && !defs.getSelection())
 				params.sendColumnsMode = Parameters.SEND_COLUMNS_ALL;
 			
-			else 
-				params.sendColumnsMode = Parameters.SEND_COLUMNS_NONE;
+			else if ((defs.getSelection() && defs.getEnabled()))
+				params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+						
+			// -----------------
+			List<String> sourceColumns = new ArrayList<String>();	
+			List<String> sourceIdSuffixes = new ArrayList<String>();
+			List<String> targetColumns = new ArrayList<String>();
+			List<String> targetLanguages = new ArrayList<String>();
+			List<String> targetSourceRefs = new ArrayList<String>();			
+			List<String> sourceIdColumns = new ArrayList<String>();
+			List<String> sourceIdSourceRefs = new ArrayList<String>();
+			List<String> commentColumns = new ArrayList<String>();
+			List<String> commentSourceRefs = new ArrayList<String>();
+			
+			for (int i = 1; i <= adapter.getNumRows(); i++) {
+			
+				if (AddModifyColumnDefPage.TYPE_SOURCE.equalsIgnoreCase(adapter.getValue(i, 2))) {
+					
+					sourceColumns.add(adapter.getValue(i, 1));
+					sourceIdSuffixes.add(adapter.getValue(i, 5));
+				}
+					
+				else if (AddModifyColumnDefPage.TYPE_SOURCE_ID.equalsIgnoreCase(adapter.getValue(i, 2))) {
+					
+					sourceIdColumns.add(adapter.getValue(i, 1));
+					sourceIdSourceRefs.add(adapter.getValue(i, 3));
+				}
+				
+				else if (AddModifyColumnDefPage.TYPE_TARGET.equalsIgnoreCase(adapter.getValue(i, 2))) {
+				
+					targetColumns.add(adapter.getValue(i, 1));
+					targetSourceRefs.add(adapter.getValue(i, 3));
+					targetLanguages.add(adapter.getValue(i, 4));
+				}
+				
+				else if (AddModifyColumnDefPage.TYPE_COMMENT.equalsIgnoreCase(adapter.getValue(i, 2))) {
+					
+					commentColumns.add(adapter.getValue(i, 1));
+					commentSourceRefs.add(adapter.getValue(i, 3));
+				}
+					
+				else if (AddModifyColumnDefPage.TYPE_RECORD_ID.equalsIgnoreCase(adapter.getValue(i, 2)))
+					params.recordIdColumn = Util2.strToInt(adapter.getValue(i, 1), 0);					
+			}
+			
+			params.sourceColumns = ListUtils.listAsString(sourceColumns);
+			params.sourceIdSuffixes = ListUtils.listAsString(sourceIdSuffixes);
+			params.targetColumns = ListUtils.listAsString(targetColumns);
+			params.targetLanguages = ListUtils.listAsString(targetLanguages);
+			params.targetSourceRefs = ListUtils.listAsString(targetSourceRefs);
+			params.sourceIdColumns = ListUtils.listAsString(sourceIdColumns);
+			params.sourceIdSourceRefs = ListUtils.listAsString(sourceIdSourceRefs);
+			params.commentColumns = ListUtils.listAsString(commentColumns);
+			params.commentSourceRefs = ListUtils.listAsString(commentSourceRefs);
+		}
+		
+		if (data instanceof net.sf.okapi.filters.table.fwc.Parameters) {
+			
+			net.sf.okapi.filters.table.fwc.Parameters params =
+				(net.sf.okapi.filters.table.fwc.Parameters) data;
+		
+			List<String> columnStartPositions = new ArrayList<String>();
+			List<String> columnEndPositions = new ArrayList<String>();
+			
+			for (int i = 1; i <= adapter.getNumRows(); i++) {
+				
+				columnStartPositions.add(adapter.getValue(i, 6));
+				columnEndPositions.add(adapter.getValue(i, 7));
+			}
+			
+			params.columnStartPositions = ListUtils.listAsString(columnStartPositions);
+			params.columnEndPositions = ListUtils.listAsString(columnEndPositions);			
 		}
 		
 		return true;
 	}
 }
-

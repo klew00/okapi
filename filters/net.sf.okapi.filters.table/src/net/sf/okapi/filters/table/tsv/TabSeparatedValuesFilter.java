@@ -23,7 +23,10 @@ package net.sf.okapi.filters.table.tsv;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
+import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 
 /**
@@ -53,9 +56,12 @@ public class TabSeparatedValuesFilter  extends BaseTableFilter {
 	}
 
 	@Override
-	protected TextProcessingResult extractCells(List<String> cells, String line, long lineNum) {
+	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {
 		
 		if (cells == null) return TextProcessingResult.REJECTED;
+		if (lineContainer == null) return TextProcessingResult.REJECTED;
+		
+		String line = lineContainer.getCodedText();
 		if (Util.isEmpty(line)) return TextProcessingResult.REJECTED;
 		
 		int start = -1;
@@ -65,7 +71,7 @@ public class TabSeparatedValuesFilter  extends BaseTableFilter {
 						
 			if (start > -1 && line.charAt(i) == '\t') {
 				if (prevStart > -1)
-					cells.add(line.substring(prevStart, start));
+					cells.add(TextUnitUtils.buildTU(line.substring(prevStart, start)));
 				
 				prevStart = start;
 				start = -1;
@@ -80,10 +86,10 @@ public class TabSeparatedValuesFilter  extends BaseTableFilter {
 		if (start == -1) start = line.length();
 		
 		if (prevStart > -1 && start > -1)
-			cells.add(line.substring(prevStart, start));
+			cells.add(TextUnitUtils.buildTU(line.substring(prevStart, start)));
 		
 		if (start < line.length()) {
-			cells.add(line.substring(start, line.length()));
+			cells.add(TextUnitUtils.buildTU(line.substring(start, line.length())));
 		}
 		
 		return TextProcessingResult.ACCEPTED;

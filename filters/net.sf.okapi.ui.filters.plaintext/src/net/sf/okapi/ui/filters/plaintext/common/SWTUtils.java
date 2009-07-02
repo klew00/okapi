@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
@@ -148,6 +149,8 @@ public class SWTUtils {
 		
 		if (!(control instanceof Button)) return;
 		
+		unselectAll(control.getParent()); // SWT feature: several radio-buttons of the same group can get selected at the same time
+		
 		((Button) control).setSelection(selected);
 	}
 	
@@ -218,6 +221,22 @@ public class SWTUtils {
 	    
 		return null;
 	}
+	
+	public static void unselectAll(Composite container) {
+		
+		if (container == null) return;
+		
+	    for (Control aChild : container.getChildren())
+	    	if (aChild instanceof Composite) {
+                unselectAll((Composite) aChild);
+            }
+	    	else
+	    	if (aChild instanceof Button &&
+	    			Util2.checkFlag(((Button) aChild).getStyle(), SWT.RADIO))
+	    		((Button) aChild).setSelection(false);
+	    
+		return;
+	}
 
 	public static void setRadioGroupSelection(Composite container, String selCaption) {
 		
@@ -282,6 +301,19 @@ public class SWTUtils {
 		return res;
 	}
 
+	public static int getColumnIndex(TableColumn col) {
+		
+		if (col == null) return -1;
+		
+		Table table = col.getParent();
+		if (table == null) return -1;
+	
+		TableColumn[] cols = table.getColumns();
+		if (cols == null) return -1;
+		
+		return Arrays.asList(cols).indexOf(col);
+	}
+	
 // Search	
 	
 	public static Control findControl(Composite container, String controlName) {

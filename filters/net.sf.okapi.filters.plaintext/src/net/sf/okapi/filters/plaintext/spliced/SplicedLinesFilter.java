@@ -176,7 +176,7 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 			mergedLine.append(curLine);
 		}
 		
-		sendContent(mergedLine);
+		sendAsSource(mergedLine);
 		splicedLines.clear();
 				
 		return true;		

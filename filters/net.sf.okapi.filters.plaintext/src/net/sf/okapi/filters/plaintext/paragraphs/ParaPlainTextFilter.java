@@ -168,7 +168,7 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 			mergedLine.append(curLine);
 		}
 		
-		sendContent(mergedLine);
+		sendAsSource(mergedLine);
 		
 		if (addLinebreak) 
 			sendSkeletonPart(getLineBreak());

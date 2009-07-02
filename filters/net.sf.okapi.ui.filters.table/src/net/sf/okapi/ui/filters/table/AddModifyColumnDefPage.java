@@ -20,6 +20,8 @@
 
 package net.sf.okapi.ui.filters.table;
 
+import java.util.Arrays;
+
 import net.sf.okapi.ui.filters.plaintext.common.IInputQueryPage;
 import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 import net.sf.okapi.ui.filters.plaintext.common.Util2;
@@ -45,6 +47,13 @@ import org.eclipse.swt.events.SelectionEvent;
  */
 
 public class AddModifyColumnDefPage extends Composite implements IInputQueryPage {
+	
+	public static final String TYPE_SOURCE		 = "Source"; 
+	public static final String TYPE_SOURCE_ID	 = "Source ID";
+	public static final String TYPE_TARGET		 = "Target";
+	public static final String TYPE_COMMENT 	 = "Comment";
+	public static final String TYPE_RECORD_ID 	 = "Record ID";
+	
 	private Composite composite;
 	private Label lblColumnNumber;
 	private Spinner colNum;
@@ -65,6 +74,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 	private Spinner end;
 	private Text suffix;
 	private Text language;
+	private String[] colDef;
 
 	/**
 	 * Create the composite.
@@ -101,7 +111,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 				interop(e.widget);
 			}
 		});
-		typeSource.setText("Source");
+		typeSource.setText(TYPE_SOURCE);
 		
 		typeSourceId = new Button(composite_1, SWT.RADIO);
 		typeSourceId.addSelectionListener(new SelectionAdapter() {
@@ -110,7 +120,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 				interop(e.widget);
 			}
 		});
-		typeSourceId.setText("Source ID");
+		typeSourceId.setText(TYPE_SOURCE_ID);
 		
 		typeTarget = new Button(composite_1, SWT.RADIO);
 		typeTarget.addSelectionListener(new SelectionAdapter() {
@@ -119,7 +129,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 				interop(e.widget);
 			}
 		});
-		typeTarget.setText("Target");
+		typeTarget.setText(TYPE_TARGET);
 		
 		typeComment = new Button(composite_1, SWT.RADIO);
 		typeComment.addSelectionListener(new SelectionAdapter() {
@@ -128,7 +138,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 				interop(e.widget);
 			}
 		});
-		typeComment.setText("Comment");
+		typeComment.setText(TYPE_COMMENT);
 		
 		typeRecordId = new Button(composite_1, SWT.RADIO);
 		typeRecordId.addSelectionListener(new SelectionAdapter() {
@@ -137,7 +147,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 				interop(e.widget);
 			}
 		});
-		typeRecordId.setText("Record ID");
+		typeRecordId.setText(TYPE_RECORD_ID);
 		composite_1.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false, 1, 1));
 		
 		lblSourceColumn = new Label(composite, SWT.NONE);
@@ -168,6 +178,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		
 		start = new Spinner(composite, SWT.BORDER);
 		start.setData("name", "start");
+		start.setMaximum(1000);
 		start.setMinimum(1);
 		
 		lend = new Label(composite, SWT.NONE);
@@ -177,6 +188,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		
 		end = new Spinner(composite, SWT.BORDER);
 		end.setData("name", "end");
+		end.setMaximum(1000);
 		end.setMinimum(1);
 
 	}
@@ -190,7 +202,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 
 		if (!(data instanceof String[])) return false;
 		
-		String[] colDef = (String[]) data;
+		colDef = (String[]) data;
 		if (colDef.length != 7) return false; 
 		
 		colNum.setSelection(Util2.strToInt(colDef[0], 1));
@@ -211,6 +223,8 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		String[] colDef = (String[]) data;
 		if (colDef.length != 7) return false;
 		
+		Arrays.fill(colDef, "");
+		
 		colDef[0] = Util2.intToStr(colNum.getSelection());
 		
 		Button btn = SWTUtils.getRadioGroupSelection(typeGroup);
@@ -219,11 +233,20 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		else
 			colDef[1] = btn.getText();
 		
-		colDef[2] = Util2.intToStr(srcIndex.getSelection());				
-		colDef[3] = language.getText();
-		colDef[4] = suffix.getText();
-		colDef[5] = Util2.intToStr(start.getSelection());
-		colDef[6] = Util2.intToStr(end.getSelection());
+		if (srcIndex.isEnabled()) 
+			colDef[2] = Util2.intToStr(srcIndex.getSelection());
+		
+		if (language.isEnabled())
+			colDef[3] = language.getText();
+		
+		if (suffix.isEnabled())
+			colDef[4] = suffix.getText();
+		
+		if (start.isEnabled())
+			colDef[5] = Util2.intToStr(start.getSelection());
+		
+		if (end.isEnabled())
+			colDef[6] = Util2.intToStr(end.getSelection());
 		
 		return true;
 	}
@@ -243,13 +266,15 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 			language.setText("");
 			language.setEnabled(false);
 			
-			suffix.setText("");
+			//suffix.setText("");
+			suffix.setText(colDef[4]);
 			suffix.setEnabled(true);
 		} 
 		else if (typeSourceId.getSelection()) {
 			
 			srcIndex.setMinimum(1);
-			srcIndex.setSelection(1);
+			//srcIndex.setSelection(1);
+			srcIndex.setSelection(Util2.strToInt(colDef[2], 0));
 			srcIndex.setEnabled(true);
 			
 			language.setText("");
@@ -261,10 +286,12 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		else if (typeTarget.getSelection()) {
 		
 			srcIndex.setMinimum(1);
-			srcIndex.setSelection(1);
+			//srcIndex.setSelection(1);
+			srcIndex.setSelection(Util2.strToInt(colDef[2], 0));
 			srcIndex.setEnabled(true);
 			
-			language.setText("");
+			//language.setText("");
+			language.setText(colDef[3]);
 			language.setEnabled(true);
 			
 			suffix.setText("");
@@ -273,7 +300,8 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		else if (typeComment.getSelection()) {
 		
 			srcIndex.setMinimum(1);
-			srcIndex.setSelection(1);
+			//srcIndex.setSelection(1);
+			srcIndex.setSelection(Util2.strToInt(colDef[2], 0));
 			srcIndex.setEnabled(true);
 			
 			language.setText("");
@@ -294,7 +322,8 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 			suffix.setText("");
 			suffix.setEnabled(false);
 		}
-			
+
+		//load(data); // to restore initial fields
 	}
 
 	public boolean canClose(boolean isOK) {

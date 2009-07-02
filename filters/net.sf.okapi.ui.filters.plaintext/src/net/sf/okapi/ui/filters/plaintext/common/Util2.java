@@ -45,6 +45,16 @@ public class Util2 {
 		
 	}
 
+// Arrays
+	
+	public static <T> T get(T [] array, int index) {
+		
+		if (index >= 0 && index < array.length)
+			return array[index];
+		else
+			return null;
+	}
+	
 // Flags	
 	public static boolean checkFlag(int intValue, int flag) {
 		

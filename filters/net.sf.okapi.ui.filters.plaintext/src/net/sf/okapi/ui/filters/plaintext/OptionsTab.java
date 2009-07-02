@@ -24,6 +24,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
 import net.sf.okapi.filters.plaintext.common.WrapMode;
 import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
+import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -51,7 +52,7 @@ public class OptionsTab extends Composite implements IDialogPage {
 	private Group grpTextUnitProcessing;
 	private Group grpInlineCodes;
 	private Button inlines;
-	private Group grpMultilineTextUnits;
+	private Group multi;
 	private Button separate;
 	private Button unwrap;
 	private Button codes;
@@ -112,20 +113,21 @@ public class OptionsTab extends Composite implements IDialogPage {
 		convert.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
 		convert.setText("Convert \\t, \\n, \\\\, \\uXXXX into characters            ");
 		
-		grpMultilineTextUnits = new Group(this, SWT.NONE);
-		grpMultilineTextUnits.setLayout(new GridLayout(1, false));
-		grpMultilineTextUnits.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-		grpMultilineTextUnits.setText("Multi-line text units");
+		multi = new Group(this, SWT.NONE);
+		multi.setData("name", "multi");
+		multi.setLayout(new GridLayout(1, false));
+		multi.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		multi.setText("Multi-line text units");
 		
-		separate = new Button(grpMultilineTextUnits, SWT.RADIO);
+		separate = new Button(multi, SWT.RADIO);
 		separate.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		separate.setText("Separate lines with line-feeds (\\n)");
 		
-		unwrap = new Button(grpMultilineTextUnits, SWT.RADIO);
+		unwrap = new Button(multi, SWT.RADIO);
 		unwrap.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		unwrap.setText("Unwrap lines (replace line ends with spaces)         ");
 		
-		codes = new Button(grpMultilineTextUnits, SWT.RADIO);
+		codes = new Button(multi, SWT.RADIO);
 		codes.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		codes.setText("Create inline codes for line ends");
 
@@ -223,6 +225,8 @@ public class OptionsTab extends Composite implements IDialogPage {
 						
 			inlines.setSelection(params.useCodeFinder);
 			panel.setData(params.codeFinderRules);
+			
+			SWTUtils.unselectAll(multi);
 			
 			switch (params.wrapMode) {
 			

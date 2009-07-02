@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.plaintext.common;
 
+import java.util.List;
+
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Property;
@@ -127,6 +129,31 @@ public class TextUnitUtils {
 		return st.lastIndexOf(substr) == pos - substr.length() + 1;
 	}
 
+	public static boolean isEmpty(TextUnit textUnit) {
+		
+		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit)));
+	}
+	
+	public static boolean hasSource(TextUnit textUnit) {
+		
+		return !isEmpty(textUnit, true);
+	}
+	
+	public static boolean isEmpty(TextUnit textUnit, boolean ignoreWS) {
+		
+		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit), ignoreWS));
+	}
+	
+	public static String getSourceText(TextUnit textUnit) {
+		
+		if (textUnit == null) return "";
+		
+		TextFragment tf = textUnit.getSourceContent();
+		if (tf == null) return "";
+		
+		return tf.getCodedText();
+	}
+	
 	/**
 	 * 
 	 * @param textFragment
@@ -178,7 +205,36 @@ public class TextUnitUtils {
 		
 		return (textFragment == null || (textFragment != null && textFragment.isEmpty()));		
 	}
-
+	
+	public static TextUnit buildTU (TextContainer source) {
+			
+		return buildTU(null, "", source, null, "", "");
+	}
+	
+	public static TextUnit buildTU (String source) {
+		
+		return buildTU(new TextContainer(source));
+	}
+	
+	/**
+	 * @param srcPart
+	 * @param skelPart
+	 * @return
+	 */
+	public static TextUnit buildTU(String srcPart, String skelPart) {
+		
+		TextUnit res = buildTU(srcPart);
+		if (res == null) return null;
+		
+		GenericSkeleton skel = (GenericSkeleton) res.getSkeleton();
+		if (skel == null) return null;
+				
+		skel.addContentPlaceholder(res);
+		skel.append(skelPart);
+		
+		return res;
+	}	
+	
 	public static TextUnit buildTU(
 			TextUnit textUnit, 
 			String name, 
@@ -225,6 +281,47 @@ public class TextUnitUtils {
 		}
 		
 		return (GenericSkeleton) res;
-	}	
-	
+	}
+
+	/**
+	 * 
+	 * @param textUnit
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static GenericSkeleton convertToSkeleton(TextUnit textUnit) {
+		
+		if (textUnit == null) return null;
+		
+		GenericSkeleton skel = (GenericSkeleton) textUnit.getSkeleton();
+		
+		List<?> temp = skel.getParts();
+		List<Object> list = (List<Object>) temp;
+		
+		String tuRef = TextFragment.makeRefMarker("$self$");
+		String srcText = TextUnitUtils.getSourceText(textUnit);
+				
+		GenericSkeleton res = new GenericSkeleton();
+		
+		List<?> temp2 = res.getParts();
+		List<Object> list2 = (List<Object>) temp2;
+		
+		for (int i = 0; i < list.size(); i++) {
+			
+			Object obj = list.get(i);
+			if (obj == null) continue;
+			String st = obj.toString();
+			
+			if (Util.isEmpty(st)) continue;
+			if (st.equalsIgnoreCase(tuRef)) {
+				
+				res.add(srcText);
+				continue;
+			}
+			
+			list2.add(list.get(i));			
+		}
+		
+		return res;
+	}
 }

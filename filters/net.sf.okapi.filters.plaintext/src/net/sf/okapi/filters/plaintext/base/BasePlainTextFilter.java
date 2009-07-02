@@ -105,23 +105,123 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		}
 	}
 	
-	protected TextProcessingResult sendContent(TextUnit textUnit) {
-		
-		if (textUnit == null) return TextProcessingResult.REJECTED;
-		
-		TextContainer source = textUnit.getSource();
-		if (source == null) return TextProcessingResult.REJECTED;		
-		
-		GenericSkeleton skel = TextUnitUtils.forseSkeleton(textUnit);
-		
-		if (!checkTU(source)) return TextProcessingResult.REJECTED;
-		if (source.isEmpty()) return TextProcessingResult.REJECTED;
-		
-		if (params.unescapeSource) _unescape(source);
+	/**
+	 * @param textUnit
+	 * @param source
+	 * @param skel
+	 */
+	private void trimTU(TextUnit textUnit, TextContainer source, GenericSkeleton skel) {
 		
 		if (params.trimLeading) TextUnitUtils.trimLeading(source, skel);							
 		skel.addContentPlaceholder(textUnit);		
 		if (params.trimTrailing) TextUnitUtils.trimTrailing(source, skel);
+	}
+	
+	protected TextProcessingResult sendAsSource(TextUnit textUnit) {
+		
+		if (!processTextUnit(textUnit)) return TextProcessingResult.REJECTED;
+		
+		if (!TextUnitUtils.hasSource(textUnit)) return TextProcessingResult.REJECTED;
+		
+		sendEvent(EventType.TEXT_UNIT, textUnit);
+		
+		return TextProcessingResult.ACCEPTED;
+	}
+	
+	protected TextProcessingResult sendAsTarget(TextUnit target, TextUnit source, String language, GenericSkeleton parentSkeleton) {
+		
+		if (target == null) return TextProcessingResult.REJECTED;
+		if (source == null) return TextProcessingResult.REJECTED;
+		
+		if (parentSkeleton == null)
+			parentSkeleton = (GenericSkeleton) source.getSkeleton();
+		
+		if (!processTextUnit(target)) return TextProcessingResult.REJECTED;
+		
+		TextContainer trg = new TextContainer(TextUnitUtils.getSourceText(target));					
+		source.setTarget(language, trg);
+		
+		parentSkeleton.add(TextUnitUtils.convertToSkeleton(target));
+		
+		return TextProcessingResult.ACCEPTED;
+	}
+	
+	protected TextProcessingResult sendAsSkeleton(TextUnit textUnit, GenericSkeleton parentSkeleton) {
+		
+//		if (!processTextUnit(textUnit)) return TextProcessingResult.REJECTED;
+		
+		if (parentSkeleton == null)
+			parentSkeleton = (GenericSkeleton) textUnit.getSkeleton();
+		
+		if (parentSkeleton == null) return TextProcessingResult.REJECTED;
+		
+		parentSkeleton.add(TextUnitUtils.convertToSkeleton(textUnit));
+		return TextProcessingResult.ACCEPTED;
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean processTextUnit(TextUnit textUnit) {
+
+		if (textUnit == null) return false;
+		TextContainer source = textUnit.getSource();
+		if (source == null) return false;		
+		
+		GenericSkeleton skel = TextUnitUtils.forseSkeleton(textUnit);
+		
+		if (!checkTU(source)) return false;
+		if (source.isEmpty()) return false;
+		
+		if (params.unescapeSource) _unescape(source);
+		
+		//------------------------------
+		// The cell can already have something in the skeleton (for instance, a gap after the source)
+		
+		if (params.trimLeading || params.trimTrailing) {
+			
+			List<?> temp = skel.getParts();
+			List<Object> list = (List<Object>) temp;
+			
+			int index = -1;
+			String tuRef = TextFragment.makeRefMarker("$self$");
+			
+			for (int i = 0; i < list.size(); i++) {
+				
+				Object obj = list.get(i);
+				if (obj == null) continue;
+				String st = obj.toString();
+				
+				if (Util.isEmpty(st)) continue;
+				if (st.equalsIgnoreCase(tuRef)) {
+					index = i;
+					break;
+				}
+			}
+			
+			if (index > -1) { // tu ref was found in the skeleton
+				
+				List<Object> list2 = (List<Object>) ListUtils.moveItems(list); // clears the original list
+								
+				GenericSkeleton skel2 = new GenericSkeleton();				
+				trimTU(textUnit, source, skel2);
+			
+				for (int i = 0; i < list2.size(); i++) {
+					
+					if (i == index)						
+						skel.add(skel2);
+					else
+						list.add(list2.get(i));										
+				}				
+			}
+			else {		
+				trimTU(textUnit, source, skel);
+			}
+			
+		}
+		else {
+			trimTU(textUnit, source, skel);
+		}
+							
+		//------------------------------
 		
 		Set<String> languages = textUnit.getTargetLanguages();
 
@@ -145,16 +245,14 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 				codeFinder.process(textUnit.getTargetContent(language));
 		}
 		
-		sendEvent(EventType.TEXT_UNIT, textUnit);
-		
-		return TextProcessingResult.ACCEPTED;
+		return true;
 	}
-	
-	protected TextProcessingResult sendContent(TextContainer textContainer) {
+
+	protected TextProcessingResult sendAsSource(TextContainer textContainer) {
 		
 		if (textContainer == null) return TextProcessingResult.REJECTED;
 		
-		return sendContent(TextUnitUtils.buildTU(null, "", textContainer, null, "", ""));
+		return sendAsSource(TextUnitUtils.buildTU(null, "", textContainer, null, "", ""));
 	}
 	
 	protected boolean sendSkeletonPart(GenericSkeleton skelPart) {
@@ -190,7 +288,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	@Override
 	protected TextProcessingResult filter_exec(TextContainer lineContainer) {
 				
-		return sendContent(lineContainer);		
+		return sendAsSource(lineContainer);		
 	}
 	
 // Helpers	

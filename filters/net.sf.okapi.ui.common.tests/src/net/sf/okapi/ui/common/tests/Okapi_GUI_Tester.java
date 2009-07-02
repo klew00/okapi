@@ -325,11 +325,12 @@ public class Okapi_GUI_Tester {
 			
 			params = editor.createParameters();
 			
-			if (!Util.isEmpty(text.getText()))
-				params.load(Util.toURI(text.getText()), true);
 			
-			else if (!Util.isEmpty(text_1.getText()))
+			if (!Util.isEmpty(text_1.getText()))
 				params.fromString(text_1.getText());
+			
+			else if (!Util.isEmpty(text.getText()))
+				params.load(Util.toURI(text.getText()), true);
 			
 			else Dialogs.showWarning(shell, "No parameters loaded, defaults used", null);
 			

@@ -116,7 +116,7 @@ public class ListUtils {
 	 * Possible empty elements in the head and middle of the list remain if located before a non-empty element.
 	 * @param list the list to be trimmed
 	 */
-	public static void listTrimRight(List<String> list) {
+	public static void listTrimTrail(List<String> list) {
 	
 		if (list == null) return;
 
@@ -145,6 +145,11 @@ public class ListUtils {
 				res.add(st.trim());
 			
 		return res;
+	}
+	
+	public static String listAsString(List<String> list) {
+		
+		return listAsString(list, ",");
 	}
 	
 	public static String listAsString(List<String> list, String delimiter) {
@@ -200,6 +205,16 @@ public class ListUtils {
 		if (res == null) return null;
 		
 		buffer.subList(start, end + 1).clear();
+		
+		return res;
+	}
+	
+	public static <E> List<E> moveItems(List<E> buffer) {
+		
+		List<E> res = copyItems(buffer, 0, buffer.size() - 1);
+		if (res == null) return null;
+		
+		buffer.clear();
 		
 		return res;
 	}
