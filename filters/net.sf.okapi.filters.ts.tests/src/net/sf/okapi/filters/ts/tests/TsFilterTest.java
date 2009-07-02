@@ -89,15 +89,15 @@ public class TsFilterTest {
 		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us", null));
 	}
 	
-	@Test (expected=NullPointerException.class)
+/*	@Test (expected=NullPointerException.class)
 	public void testSourceLangEmpty() {
 		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "","fr-fr"));
-	}	
+	}*/	
 	
-	@Test (expected=NullPointerException.class)
+/*	@Test (expected=NullPointerException.class)
 	public void testTargetLangEmpty() {
 		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us",""));
-	}	
+	}*/	
 	
 	@Test
 	public void testInputStream() {
@@ -123,7 +123,7 @@ public class TsFilterTest {
 		System.out.println(FilterTestDriver.generateOutput(getEvents(simpleBilingualSnippet,"en-us","fr-fr"), simpleSnippet, "en"));
 	}*/	
 	
-	@Test
+	/*@Test
 	public void testStartDocument () {
 		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us","fr-fr"));
 		assertNotNull(sd);
@@ -132,15 +132,15 @@ public class TsFilterTest {
 		assertNotNull(sd.getMimeType());
 		assertNotNull(sd.getLanguage());
 		assertEquals("\r", sd.getLineBreak());
-	}
+	}*/
 	
-	@Test
+	/*@Test
 	public void testSimpleTransUnit () {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, "en-us","fr-fr"), 1);
 		assertNotNull(tu);
 		assertEquals("Hello World!", tu.getSource().toString());
 		assertEquals("tuid_1", tu.getName());
-	}
+	}*/
 	
 	
 	@Test
