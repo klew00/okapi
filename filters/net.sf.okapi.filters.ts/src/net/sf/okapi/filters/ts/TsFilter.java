@@ -48,8 +48,6 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -79,12 +77,11 @@ public class TsFilter implements IFilter {
 	boolean procCtxGrpName=false;
 	String procCtxGrpNameValue=null;
 	
-	boolean procMsg=false;
-	boolean procMsgSrc=false;
-	boolean procMsgTrans=false;
-	String procMsgTransValue =null;
-	TextUnit tu = null; 
+	TsMessage tMsg = null;
 	
+	public TsFilter(){
+		params = new Parameters();
+	}
 	
 	public void cancel() {
 		canceled = true;
@@ -118,7 +115,7 @@ public class TsFilter implements IFilter {
 			"text/x-ts",
 			getClass().getName(),
 			"TS",
-			"ts file"));
+			"Configuration for Qt Ts files."));
 		return list;
 	}
 
@@ -189,7 +186,7 @@ public class TsFilter implements IFilter {
 			detector.detectBom();
 			input.setEncoding(detector.getEncoding());
 			reader = fact.createXMLStreamReader(input.getReader());
-			
+						
 			encoding = input.getEncoding();
 			srcLang = input.getSourceLanguage();
 			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
@@ -248,8 +245,6 @@ public class TsFilter implements IFilter {
 	//--custom methods--
 	private boolean read () throws XMLStreamException {
 		
-
-		
 		skel = new GenericSkeleton();
 		int eventType;
 		
@@ -276,12 +271,9 @@ public class TsFilter implements IFilter {
 
 						procCtxGrp = false;
 					}
-					storeStartElement();
-
-					tu = new TextUnit(String.valueOf(++tuId));
-					procMsg = true;
 					
-					break;
+					tMsg = new TsMessage(trgLang,reader,queue, lineBreak);
+					return tMsg.processMessage(tuId);
 				}
 				
 				if (reader.getLocalName().equals("context")){
@@ -304,39 +296,11 @@ public class TsFilter implements IFilter {
 					}
 					break;
 				}
-				
-				//--
-				if (reader.getLocalName().equals("source")){
-					procMsgSrc = true;
-					storeStartElement();
-					break;
-				}
-				
-				if (reader.getLocalName().equals("translation")){
-					procMsgTrans = true;
-					storeStartElement();
-					break;
-				}
-				
-				
+
 				storeStartElement();
 				break;
 			case XMLStreamConstants.END_ELEMENT:
 
-				if (reader.getLocalName().equals("message")){
-					
-					tu.setSkeleton(skel);
-					tu.setMimeType("text/xml");
-					queue.add(new Event(EventType.TEXT_UNIT, tu));
-					
-					//--restart the skeleton--
-					skel = new GenericSkeleton();
-					
-					storeEndElement();
-					break;			
-				}
-				
-				
 				if (reader.getLocalName().equals("context")){
 					
 					//--restart the skeleton--
@@ -366,22 +330,6 @@ public class TsFilter implements IFilter {
 					break;
 				}
 
-				if (reader.getLocalName().equals("translation")){
-
-					if(procMsgTransValue!=null){
-						TextContainer tc = new TextContainer(procMsgTransValue);
-						tu.setTarget(trgLang, tc);
-					}
-					skel.addContentPlaceholder(tu, trgLang);
-					procMsgTrans = false;
-					
-				}
-				
-				if (reader.getLocalName().equals("source")){
-					procMsgSrc= false;
-				}
-				
-				
 				storeEndElement();
 				break;				
 				
@@ -392,19 +340,6 @@ public class TsFilter implements IFilter {
 			case XMLStreamConstants.CHARACTERS: //TODO: Check if it's ok to not check for unsupported chars
 				
 				String str = Util.escapeToXML(reader.getText(), 0, true, null);
-				
-				if(procMsgSrc){
-					TextContainer tc = new TextContainer(str);
-					tu.setSource(tc);
-					skel.addContentPlaceholder(tu);
-					break;
-				}
-				
-				if(procMsgTrans){
-					procMsgTransValue = str;
-					break;
-				}
-				
 				
 				if(procCtxGrp && procCtxGrpName){
 					procCtxGrpNameValue=str;
@@ -444,6 +379,7 @@ public class TsFilter implements IFilter {
 	}	
 
 	
+	
 	private void storeStartElement () {
 		String prefix = reader.getPrefix();
 		if (( prefix == null ) || ( prefix.length()==0 )) {
@@ -482,4 +418,8 @@ public class TsFilter implements IFilter {
 			skel.append("</"+ns+":"+reader.getLocalName()+">");
 		}
 	}
+	
+	
+
+	
 }
