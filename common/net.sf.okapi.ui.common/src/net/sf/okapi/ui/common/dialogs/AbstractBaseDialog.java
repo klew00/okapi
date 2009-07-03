@@ -24,9 +24,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import net.sf.okapi.common.IHelp;
-import net.sf.okapi.common.IParametersEditor;
-import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.framework.INotifiable;
+import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -51,6 +50,7 @@ public abstract class AbstractBaseDialog {
 	private Object data = null;
 	private IHelp help;
 	protected IDialogPage page;
+	protected Composite pageC;
 	private Class<?> pageClass;
 
 	protected int getStyle() {
@@ -89,8 +89,13 @@ public abstract class AbstractBaseDialog {
 			
 			if (cc == null) return;
 			
-			page = (IDialogPage) cc.newInstance(new Object[] {shell, SWT.BORDER});
-			if (page == null) return;
+			pageC = cc.newInstance(new Object[] {shell, SWT.BORDER});
+			if (pageC instanceof IDialogPage)
+				page = (IDialogPage) pageC;
+			else
+				page = null;
+			
+//			if (page == null) return;
 			
 			shell.addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent e) {
@@ -126,7 +131,7 @@ public abstract class AbstractBaseDialog {
 			return;
 			
 		} catch (IllegalArgumentException e) {
-			
+
 			result = false;
 			return;
 			
@@ -138,13 +143,13 @@ public abstract class AbstractBaseDialog {
 
 		result = true;
 		
-		((Composite) page).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		pageC.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
 		if (!result) return;
 		
 		init();
-		page.load(data);
-		page.interop(null);
+		if (page != null) page.load(data);
+		if (page != null) page.interop(null);
 		
 		//--- Dialog-level buttons
 
@@ -157,7 +162,7 @@ public abstract class AbstractBaseDialog {
 				} 
 				else if ( e.widget.getData().equals("o") ) { // OK
 					
-					result = page.save(data);
+					if (page != null) result = page.save(data);
 				}
 				else {  // Cancel
 					result = false;
@@ -179,8 +184,8 @@ public abstract class AbstractBaseDialog {
 		
 		try {
 			//if (parent.getClass().isAssignableFrom(this.getClass()));
-			if (parent instanceof INotifiable);
-			if (parent instanceof IParametersEditor);
+//			if (parent instanceof INotifiable);
+//			if (parent instanceof IParametersEditor);
 			// if (parent instanceof AbstractParametersEditor);
 			
 			this.parent = parent;
@@ -218,7 +223,7 @@ public abstract class AbstractBaseDialog {
 			
 			Object owner = parent.getData("owner");
 			
-			if (owner instanceof INotifiable)
+			if (owner instanceof INotifiable && page != null)
 				((INotifiable) owner).exec(REGISTER_DIALOG_PAGE, page);
 		}
 		

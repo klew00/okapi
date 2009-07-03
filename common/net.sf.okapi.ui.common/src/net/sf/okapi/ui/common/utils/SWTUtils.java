@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * 
@@ -440,5 +441,13 @@ public class SWTUtils {
 		
 		if (!getEnabled(source))
 			setEnabled(target, false);
+	}
+
+	public static void setText(Control control, String text) {
+		
+		if (control == null) return;
+		if (!(control instanceof Text)) return;
+		
+		((Text) control).setText(text);
 	}
 }

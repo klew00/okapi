@@ -65,6 +65,7 @@ public class Okapi_GUI_Tester {
 
 	String[] GUI_CLASSES = new String[] {
 
+			// swt_test.Editor.class.getName(),
 			net.sf.okapi.ui.filters.table.Editor.class.getName(),
 			net.sf.okapi.ui.filters.plaintext.Editor.class.getName(),
 			net.sf.okapi.steps.ui.textmodification.ParametersEditor.class.getName(),									
@@ -325,15 +326,19 @@ public class Okapi_GUI_Tester {
 			context.setObject("shell", shell);
 			
 			params = editor.createParameters();
+			if (params == null)
+				
+				Dialogs.showWarning(shell, "Parameters were not created.", null);
+			else {
 			
-			
-			if (!Util.isEmpty(text_1.getText()))
-				params.fromString(text_1.getText());
-			
-			else if (!Util.isEmpty(text.getText()))
-				params.load(Util.toURI(text.getText()), true);
-			
-			else Dialogs.showWarning(shell, "No parameters loaded, defaults used", null);
+				if (!Util.isEmpty(text_1.getText()))
+					params.fromString(text_1.getText());
+				
+				else if (!Util.isEmpty(text.getText()))
+					params.load(Util.toURI(text.getText()), true);
+				
+				else Dialogs.showWarning(shell, "No parameters loaded, defaults used.", null);
+			}
 			
 			if (editor.edit(params, false, context)) {
 				

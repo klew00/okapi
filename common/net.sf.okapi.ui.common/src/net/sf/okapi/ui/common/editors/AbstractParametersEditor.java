@@ -75,7 +75,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 	
 		result = true;
 		if (context == null) return false;
-		if (paramsObject == null) return false;
+		//if (paramsObject == null) return false;
 		
 		this.readOnly = readOnly;
 		
@@ -430,7 +430,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 			
 			if (!page.load(params)) {
 								
-				Dialogs.showError(shell, String.format("Error loading parameters to the %s page", getCaption(page)), null);
+				Dialogs.showError(shell, String.format("Error loading parameters to the %s page.", getCaption(page)), null);
 				return false; // The page unable to load params is invalid
 			}
 		}
@@ -445,7 +445,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 				
 				if (!page.load(activeParams)) {
 									
-					Dialogs.showError(shell, String.format("Error loading parameters to the %s page", getCaption(page)), null);
+					Dialogs.showError(shell, String.format("Error loading parameters to the %s page.", getCaption(page)), null);
 					return false; // The page unable to load params is invalid
 				}
 			}
@@ -701,16 +701,13 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 	abstract public IParameters createParameters();
 	abstract protected String getCaption();
 	abstract protected void createPages(TabFolder pageContainer);
+	abstract protected void interop(Widget speaker);
 	
 	public void handleEvent (Event event) {
 		
 		interop(event.widget);
 	}
-
-	protected void interop(Widget speaker) {		
-		// Can be overridden in a descendant editor class if interpage introp is required
-		
-	}
+	
 	
 	protected void pageInterop(Class<?> pageClass, Widget speaker) {
 		

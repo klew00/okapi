@@ -24,6 +24,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.ui.common.editors.AbstractParametersEditor;
 
 import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.Widget;
 
 
 /**
@@ -52,5 +53,10 @@ public class Editor extends AbstractParametersEditor {
 		
 		addPage("General", GeneralTab.class);
 		addPage("Options", OptionsTab.class);
+	}
+
+	@Override
+	protected void interop(Widget speaker) {
+		
 	}	
 }
