@@ -66,9 +66,9 @@ public class Okapi_GUI_Tester {
 	String[] GUI_CLASSES = new String[] {
 
 			// swt_test.Editor.class.getName(),
+			// net.sf.okapi.steps.ui.xsltransform.ParametersEditor.class.getName(),
 			net.sf.okapi.ui.filters.table.Editor.class.getName(),
 			net.sf.okapi.ui.filters.plaintext.Editor.class.getName(),
-			net.sf.okapi.steps.ui.textmodification.ParametersEditor.class.getName(),									
 			net.sf.okapi.ui.common.dialogs.InputQueryPageInt.class.getName(),
 			net.sf.okapi.ui.common.dialogs.InputQueryPageString.class.getName(),
 			net.sf.okapi.ui.filters.table.AddModifyColumnDefPage.class.getName(),					
@@ -76,7 +76,18 @@ public class Okapi_GUI_Tester {
 			net.sf.okapi.filters.ui.po.Editor.class.getName(),
 			net.sf.okapi.filters.ui.properties.Editor.class.getName(),
 			net.sf.okapi.ui.filters.openxml.Editor.class.getName(),
-			net.sf.okapi.filters.ui.regex.Editor.class.getName()			
+			net.sf.okapi.filters.ui.regex.Editor.class.getName(),
+			
+			net.sf.okapi.steps.ui.bomconversion.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.ui.charlisting.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.ui.encodingconversion.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.ui.linebreakconversion.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.ui.searchandreplace.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.ui.segmentation.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.ui.textmodification.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.ui.translationcomparison.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.ui.uriconversion.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.ui.fullwidthconversion.ParametersEditor.class.getName()
 		};
 
 	private Group grpParameters;
