@@ -236,13 +236,13 @@ public class RawDocument implements IResource {
 				aStream = getInputURI().toURL().openStream();
 			} catch (IllegalArgumentException e) {
 				throw new OkapiIOException("Could not open the URI. The URI must be absolute: "
-						+ ((url == null) ? "URL is null" : url.toString()), e);
+					+ ((url == null) ? "URL is null" : url.toString()), e);
 			} catch (MalformedURLException e) {
 				throw new OkapiIOException("Could not open the URI. The URI may be malformed: "
-						+ ((url == null) ? "URL is null" : url.toString()), e);
+					+ ((url == null) ? "URL is null" : url.toString()), e);
 			} catch (IOException e) {
-				OkapiIOException re = new OkapiIOException(
-						"Could not open the URL. The URL is OK but the input stream could not be opened", e);
+				throw new OkapiIOException(
+					"Could not open the URL. The URL is OK but the input stream could not be opened", e);
 			}
 		} else if (inputStream != null) {
 			if (aStream != null) {

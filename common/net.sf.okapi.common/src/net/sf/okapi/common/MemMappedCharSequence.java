@@ -1,4 +1,4 @@
-// Jericho HTML Parser - Java based library for analysing and manipulating HTML
+// Jericho HTML Parser - Java based library for analyzing and manipulating HTML
 // Version 3.0-beta1
 // Copyright (C) 2007 Martin Jericho
 // http://jerichohtml.sourceforge.net/
@@ -46,8 +46,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -77,12 +75,9 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
  */
 public final class MemMappedCharSequence implements CharSequence {
 	
-	private static final Logger LOGGER = Logger.getLogger(CharSequence.class.getName());
-	
 	private CharBuffer text;
 	private MappedByteBuffer byteBuffer;
 	private File tempUTF16BEfile;
-	
 
 	/**
 	 * A value to use as the <code>breakAtIndex</code> argument in certain

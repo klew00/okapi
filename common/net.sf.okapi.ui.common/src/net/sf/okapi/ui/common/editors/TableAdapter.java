@@ -25,8 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.utils.ListUtils;
-import net.sf.okapi.common.utils.Util2;
+import net.sf.okapi.common.ListUtils;
 import net.sf.okapi.ui.common.utils.SWTUtils;
 
 import org.eclipse.swt.SWT;
@@ -105,7 +104,7 @@ public class TableAdapter {
 	
 	public void addRow(int intValue, int columnNumber) {
 		
-		addRows(Util2.intToStr(intValue), columnNumber);
+		addRows(Util.intToStr(intValue), columnNumber);
 	}
 	
 	public void modifyRow(TableItem item, String[] rowData) {
@@ -137,7 +136,7 @@ public class TableAdapter {
 	public void addModifyRow(TableItem item, String[] rowData, int keyColNumber, int dupMode) {
 				
 		
-		String st = Util2.get(rowData, keyColNumber - 1);
+		String st = Util.get(rowData, keyColNumber - 1);
 		
 		TableItem item2 = findValue(st, keyColNumber);
 		
@@ -242,8 +241,8 @@ public class TableAdapter {
             TableItem t1 = (TableItem)arg0;
             TableItem t2 = (TableItem)arg1;
 
-            int v1 = Util2.strToInt(t1.getText(colIndex), 0);
-            int v2 = Util2.strToInt(t2.getText(colIndex), 0);
+            int v1 = Util.strToInt(t1.getText(colIndex), 0);
+            int v2 = Util.strToInt(t2.getText(colIndex), 0);
 
             return ((ascending && (v1 > v2)) || (!ascending && (v1 < v2)) ? 1: -1);
         }    

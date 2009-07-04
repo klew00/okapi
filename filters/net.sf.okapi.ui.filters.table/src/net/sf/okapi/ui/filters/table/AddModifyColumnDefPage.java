@@ -22,7 +22,7 @@ package net.sf.okapi.ui.filters.table;
 
 import java.util.Arrays;
 
-import net.sf.okapi.common.utils.Util2;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.ui.common.dialogs.IInputQueryPage;
 import net.sf.okapi.ui.common.utils.SWTUtils;
 
@@ -205,13 +205,13 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		colDef = (String[]) data;
 		if (colDef.length != 7) return false; 
 		
-		colNum.setSelection(Util2.strToInt(colDef[0], 1));
+		colNum.setSelection(Util.strToInt(colDef[0], 1));
 		SWTUtils.setRadioGroupSelection(typeGroup, colDef[1]);
-		srcIndex.setSelection(Util2.strToInt(colDef[2], 0));		
+		srcIndex.setSelection(Util.strToInt(colDef[2], 0));		
 		language.setText(colDef[3]);
 		suffix.setText(colDef[4]);
-		start.setSelection(Util2.strToInt(colDef[5], 0));
-		end.setSelection(Util2.strToInt(colDef[6], 0));
+		start.setSelection(Util.strToInt(colDef[5], 0));
+		end.setSelection(Util.strToInt(colDef[6], 0));
 		
 		return true;
 	}
@@ -225,7 +225,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		
 		Arrays.fill(colDef, "");
 		
-		colDef[0] = Util2.intToStr(colNum.getSelection());
+		colDef[0] = Util.intToStr(colNum.getSelection());
 		
 		Button btn = SWTUtils.getRadioGroupSelection(typeGroup);
 		if (btn == null) 
@@ -234,7 +234,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 			colDef[1] = btn.getText();
 		
 		if (srcIndex.isEnabled()) 
-			colDef[2] = Util2.intToStr(srcIndex.getSelection());
+			colDef[2] = Util.intToStr(srcIndex.getSelection());
 		
 		if (language.isEnabled())
 			colDef[3] = language.getText();
@@ -243,10 +243,10 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 			colDef[4] = suffix.getText();
 		
 		if (start.isEnabled())
-			colDef[5] = Util2.intToStr(start.getSelection());
+			colDef[5] = Util.intToStr(start.getSelection());
 		
 		if (end.isEnabled())
-			colDef[6] = Util2.intToStr(end.getSelection());
+			colDef[6] = Util.intToStr(end.getSelection());
 		
 		return true;
 	}
@@ -274,7 +274,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 			
 			srcIndex.setMinimum(1);
 			//srcIndex.setSelection(1);
-			srcIndex.setSelection(Util2.strToInt(colDef[2], 0));
+			srcIndex.setSelection(Util.strToInt(colDef[2], 0));
 			srcIndex.setEnabled(true);
 			
 			language.setText("");
@@ -287,7 +287,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		
 			srcIndex.setMinimum(1);
 			//srcIndex.setSelection(1);
-			srcIndex.setSelection(Util2.strToInt(colDef[2], 0));
+			srcIndex.setSelection(Util.strToInt(colDef[2], 0));
 			srcIndex.setEnabled(true);
 			
 			//language.setText("");
@@ -301,7 +301,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		
 			srcIndex.setMinimum(1);
 			//srcIndex.setSelection(1);
-			srcIndex.setSelection(Util2.strToInt(colDef[2], 0));
+			srcIndex.setSelection(Util.strToInt(colDef[2], 0));
 			srcIndex.setEnabled(true);
 			
 			language.setText("");

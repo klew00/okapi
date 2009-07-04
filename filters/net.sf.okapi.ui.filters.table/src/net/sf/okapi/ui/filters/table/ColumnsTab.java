@@ -23,8 +23,8 @@ package net.sf.okapi.ui.filters.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.utils.ListUtils;
-import net.sf.okapi.common.utils.Util2;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ListUtils;
 import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.ui.common.dialogs.IDialogPage;
 import net.sf.okapi.ui.common.editors.TableAdapter;
@@ -270,7 +270,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			adapter.unselect();
 			
 			if (SWTUtils.inputQuery(AddModifyColumnDefPage.class, getShell(), "Add column definition", 
-					new String[] {Util2.intToStr(SWTUtils.getColumnMaxValue(table, 0) + 1), "Source", "", "", "", "0", "0"}, 
+					new String[] {Util.intToStr(SWTUtils.getColumnMaxValue(table, 0) + 1), "Source", "", "", "", "0", "0"}, 
 					null)) {
 				
 				adapter.addModifyRow((String []) SWTUtils.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
@@ -395,7 +395,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			for (int i = 0; i < commentColumns.size(); i++)
 				adapter.setValue(adapter.findValue(commentColumns.get(i), 1), 2, AddModifyColumnDefPage.TYPE_COMMENT);
 			
-			adapter.setValue(adapter.findValue(Util2.intToStr(params.recordIdColumn), 1), 2, AddModifyColumnDefPage.TYPE_RECORD_ID);
+			adapter.setValue(adapter.findValue(Util.intToStr(params.recordIdColumn), 1), 2, AddModifyColumnDefPage.TYPE_RECORD_ID);
 			
 			// Refs
 			for (int i = 0; i < sourceIdSuffixes.size(); i++)
@@ -497,7 +497,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 				}
 					
 				else if (AddModifyColumnDefPage.TYPE_RECORD_ID.equalsIgnoreCase(adapter.getValue(i, 2)))
-					params.recordIdColumn = Util2.strToInt(adapter.getValue(i, 1), 0);					
+					params.recordIdColumn = Util.strToInt(adapter.getValue(i, 1), 0);					
 			}
 			
 			params.sourceColumns = ListUtils.listAsString(sourceColumns);

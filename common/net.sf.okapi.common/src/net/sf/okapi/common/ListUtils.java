@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.utils;
+package net.sf.okapi.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,12 +28,11 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 
 /**
+ * Collection of helper functions for manipulating lists.
  * 
- * 
- * @version 0.1, 09.06.2009
  * @author Sergei Vasilyev
+ * @version 0.1, 09.06.2009
  */
-
 public class ListUtils {
 	
 	/**
@@ -105,8 +104,6 @@ public class ListUtils {
 			else
 				res.add(Integer.valueOf(part.trim()));
 		}
-			
-		
 		if (sortList) Collections.sort(res);
 		return res;
 	}
@@ -158,7 +155,6 @@ public class ListUtils {
 		String res = "";
 		
 		for (int i = 0; i < list.size(); i++) {
-			
 			if (i > 0) 
 				res = res + delimiter + list.get(i);
 			else
@@ -192,8 +188,10 @@ public class ListUtils {
 			
 			res.addAll(buffer.subList(start, end + 1));		
 			
-		} catch (InstantiationException e) {		
+		} catch (InstantiationException e) {
+			//TODO: do something with the exception, or comment why it's swallowed
 		} catch (IllegalAccessException e) {
+			//TODO: do something with the exception, or comment why it's swallowed
 		}
 		
 		return res;

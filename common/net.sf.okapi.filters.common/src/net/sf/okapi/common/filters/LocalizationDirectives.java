@@ -32,13 +32,9 @@ public class LocalizationDirectives {
 	private Stack<Context> context;
 	
 	private class Context {
+
 		boolean isGroup;
 		boolean extract;
-		
-		Context () {
-			isGroup = true;
-			extract = true;
-		}
 		
 		Context (boolean isGroup,
 			boolean extract)

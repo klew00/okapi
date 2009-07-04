@@ -29,7 +29,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.ui.common.dialogs.InputQueryDialog;
 import net.sf.okapi.ui.common.dialogs.InputQueryPageInt;
 import net.sf.okapi.ui.common.dialogs.InputQueryPageString;
-import net.sf.okapi.common.utils.Util2;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -220,7 +219,7 @@ public class SWTUtils {
             }
 	    	else
 	    	if (aChild instanceof Button &&
-	    			Util2.checkFlag(((Button) aChild).getStyle(), SWT.RADIO) &&
+	    			Util.checkFlag(((Button) aChild).getStyle(), SWT.RADIO) &&
 	    			((Button) aChild).getSelection())
 	    		return (Button) aChild;
 	    
@@ -237,7 +236,7 @@ public class SWTUtils {
             }
 	    	else
 	    	if (aChild instanceof Button &&
-	    			Util2.checkFlag(((Button) aChild).getStyle(), SWT.RADIO))
+	    			Util.checkFlag(((Button) aChild).getStyle(), SWT.RADIO))
 	    		((Button) aChild).setSelection(false);
 	    
 		return;
@@ -252,7 +251,7 @@ public class SWTUtils {
                 setRadioGroupSelection((Composite) aChild, selCaption);
             }
 	    	else
-	    	if (aChild instanceof Button &&	Util2.checkFlag(((Button) aChild).getStyle(), SWT.RADIO))
+	    	if (aChild instanceof Button &&	Util.checkFlag(((Button) aChild).getStyle(), SWT.RADIO))
 	    		((Button) aChild).setSelection(((Button) aChild).getText().equalsIgnoreCase(selCaption));
 	}
 
@@ -299,7 +298,7 @@ public class SWTUtils {
 		for (TableItem item : table.getItems()) {
 			
 			String st = item.getText(colIndex);
-			int val = Util2.strToInt(st, 0); 
+			int val = Util.strToInt(st, 0); 
 			if (val > res) res = val; 
 		}
 		

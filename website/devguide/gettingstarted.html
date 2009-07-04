@@ -766,9 +766,13 @@ MARKER_CLOSING</code> and <code>MARKER_ISOLATED</code>. (There is also a <code>
 MARKER_SEGMENT</code> <a href="segmentation.html#segmentedContent">used in segmented entries</a>, but we will ignore this for 
 now).</p>
 <p>When a code with <code>TagType.OPENING</code> or <code>TagType.CLOSING</code> 
-are alone in a fragment, or otherwise separated from their corresponding closing 
+is alone in a fragment, or otherwise separated from its corresponding closing 
 or opening counterpart, the marker is not set to <code>MARKER_OPENING</code> or
-<code>MARKER_CLOSING</code>, but to <code>MARKER_ISOLATED</code>.</p>
+<code>MARKER_CLOSING</code>, but to <code>MARKER_ISOLATED</code>, but it <code>
+TagType</code> remains unchanged.</p>
+<p>For example, in the code below, the closing &quot;<code>&lt;/b&gt;</code>&quot; originally 
+set with a <code>MARKER_CLOSING</code>, is changed to a <code>MARKER_ISOLATED</code> 
+when the text is broken into two sentences in different fragments:</p>
 <pre>Normal: &quot;First <span style="background-color: #FFFF00">&lt;b&gt;</span>bold. Second one<span style="background-color: #00FF00">&lt;/b&gt;</span>.&quot;
  Coded: &quot;First <span style="background-color: #FFFF00"><b>\uE101</b>\uE110</span>bold. Second one<span style="background-color: #00FF00"><b>\uE102</b>\uE111</span>.&quot;
  Codes:  <span style="background-color: #FFFF00">0</span>={&quot;&lt;b&gt;&quot;,TagType.OPENING},

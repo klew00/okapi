@@ -810,6 +810,24 @@ public class TextFragment implements Comparable<Object> {
 		}
 		return -1;
 	}
+	
+	/**
+	 * Gets the index value for the closing in-line code (in the codes list)
+	 * with a given identifier.
+	 * @param id the identifier of the closing tag to look for.
+	 * @return the index of the found closing code, or -1 if none is found. 
+	 */
+	public int getIndexForClosing (int id) {
+		if ( codes == null ) return -1;
+		int i = 0;
+		for ( Code code : codes ) {
+			if (( code.tagType == TagType.CLOSING ) && ( code.id == id )) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
+	}
 
 	/**
 	 * Indicates if the fragment is empty (no text and no codes).

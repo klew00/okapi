@@ -32,7 +32,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.utils.ListUtils;
+import net.sf.okapi.common.ListUtils;
 import net.sf.okapi.filters.common.framework.AbstractLineFilter;
 import net.sf.okapi.filters.common.framework.TextProcessingResult;
 import net.sf.okapi.filters.common.utils.TextUnitUtils;
