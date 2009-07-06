@@ -19,6 +19,7 @@
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.table.tests,net.sf.okapi.filters.table.tests"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.tests,net.sf.okapi.filters.tests"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.tmx.tests,net.sf.okapi.filters.tmx.tests"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.ts.tests,net.sf.okapi.filters.ts.tests"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xliff.tests,net.sf.okapi.filters.xliff.tests"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xml.tests,net.sf.okapi.filters.xml.tests"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.lib.jython.tests,net.sf.okapi.lib.jython.tests"/>
@@ -29,7 +30,7 @@
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/examples/python,python"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/tests/TestSuite,TestSuite"/>
 </provider>
-<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Tests" name="Okapi-Tests">
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1246307329241_4" label="Okapi-Tests" name="Okapi-Tests">
 <item elementID="=net.sf.okapi.filters.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.lib.jython.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.table.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -37,11 +38,11 @@
 <item elementID="=net.sf.okapi.filters.html.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.steps.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.tmx.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.filters.common.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.rtf.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.common.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.properties.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.common.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/python" type="4"/>
+<item elementID="=net.sf.okapi.common.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.plaintext.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.markupfilter.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.mif.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -57,5 +58,6 @@
 <item elementID="=net.sf.okapi.filters.po.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.lib.segmentation.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.regex.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.ts.tests" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 </psf>
