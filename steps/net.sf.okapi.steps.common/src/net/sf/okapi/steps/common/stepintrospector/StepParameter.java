@@ -7,13 +7,13 @@ public class StepParameter {
 	private Object value;
 	private String description;
 	private String longDescription;
-	private ExternalParameterType type;
-	private String requiredStep;
-	private boolean stepConfigurationParameter;
+	private StepParameterAccessType accessType;
+	private StepParameterType type;
+	private String requiredStep;	
 
-	public StepParameter(String paramName, Object object) {
+	public StepParameter(String paramName, Object value) {
 		this.name = paramName;
-		this.value = object;
+		this.value = value;
 	}
 
 	/**
@@ -28,10 +28,6 @@ public class StepParameter {
 	 */
 	public Object getValue() {
 		return value;
-	}
-
-	public void setValue(Class<?> paramValue) {
-		this.value = paramValue;
 	}
 
 	public Type getJavaType() {
@@ -70,17 +66,17 @@ public class StepParameter {
 	}
 
 	/**
-	 * @param type the type to set
+	 * @param accessType the accessType to set
 	 */
-	public void setType(ExternalParameterType type) {
-		this.type = type;
+	public void setAccessType(StepParameterAccessType accessType) {
+		this.accessType = accessType;
 	}
 
 	/**
-	 * @return the type
+	 * @return the accessType
 	 */
-	public ExternalParameterType getType() {
-		return type;
+	public StepParameterAccessType getAccessType() {
+		return accessType;
 	}
 
 	/**
@@ -98,16 +94,16 @@ public class StepParameter {
 	}
 
 	/**
-	 * @param stepConfigurationParameter the stepConfigurationParameter to set
+	 * @param type the type to set
 	 */
-	public void setStepConfigurationParameter(boolean stepConfigurationParameter) {
-		this.stepConfigurationParameter = stepConfigurationParameter;
+	public void setType(StepParameterType type) {
+		this.type = type;
 	}
 
 	/**
-	 * @return the stepConfigurationParameter
+	 * @return the type
 	 */
-	public boolean isStepConfigurationParameter() {
-		return stepConfigurationParameter;
+	public StepParameterType getType() {
+		return type;
 	}
 }

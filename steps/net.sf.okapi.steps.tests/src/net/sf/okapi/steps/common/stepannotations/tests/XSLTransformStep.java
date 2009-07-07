@@ -20,21 +20,21 @@
 
 package net.sf.okapi.steps.common.stepannotations.tests;
 
-import net.sf.okapi.steps.common.stepintrospector.ExternalParameter;
-import net.sf.okapi.steps.common.stepintrospector.ExternalParameterType;
+import net.sf.okapi.steps.common.stepintrospector.StepExternalParameter;
+import net.sf.okapi.steps.common.stepintrospector.StepParameterAccessType;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class XSLTransformStep extends BasePipelineStep {
 	@SuppressWarnings("unused")
-	@ExternalParameter(description = "Path to the xslt file used by this step", 
+	@StepExternalParameter(description = "Path to the xslt file used by this step", 
 			longDescription = "The xslt path is provided by the external client")
 	private String xsltPath;
 
 	@SuppressWarnings("unused")
-	@ExternalParameter(description = "Path to the xslt error log file", 
+	@StepExternalParameter(description = "Path to the xslt error log file", 
 			longDescription = "The xslt error log path is provided by the external client", 
-			type = ExternalParameterType.WRITE_ONLY)
+			accessType = StepParameterAccessType.WRITE_ONLY)
 	private String errorLogPath;
 
 	public XSLTransformStep() {

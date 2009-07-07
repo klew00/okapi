@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import net.sf.okapi.steps.common.stepintrospector.ExternalParameterType;
+import net.sf.okapi.steps.common.stepintrospector.StepParameterAccessType;
 import net.sf.okapi.steps.common.stepintrospector.StepIntrospector;
 import net.sf.okapi.steps.common.stepintrospector.StepParameter;
+import net.sf.okapi.steps.common.stepintrospector.StepParameterType;
 
 import org.junit.After;
 import org.junit.Before;
@@ -28,18 +29,18 @@ public class StepAnnotationIntrospectorTest {
 		HashMap<String, StepParameter> parameters = StepIntrospector.getStepParameters(new XSLTransformStep());
 		
 		StepParameter p = parameters.get("xsltPath");
-		assertFalse(p.isStepConfigurationParameter());
+		assertTrue(p.getAccessType() == StepParameterAccessType.READ_ONLY);
+		assertTrue(p.getType() == StepParameterType.EXTERNAL);
 		assertTrue(p.getJavaType() == String.class);
 		assertNotNull(p.getRequiredStep());		
 		assertEquals("Path to the xslt file used by this step", p.getDescription());
-		assertEquals(ExternalParameterType.READ_ONLY, p.getType());
 		
 		p = parameters.get("errorLogPath");
-		assertFalse(p.isStepConfigurationParameter());
+		assertTrue(p.getAccessType() == StepParameterAccessType.WRITE_ONLY);
+		assertTrue(p.getType() == StepParameterType.EXTERNAL);
 		assertTrue(p.getJavaType() == String.class);
 		assertNotNull(p.getRequiredStep());
 		assertEquals("Path to the xslt error log file", p.getDescription());
-		assertEquals(ExternalParameterType.WRITE_ONLY, p.getType());
 	}
 	
 	@Test
@@ -47,37 +48,43 @@ public class StepAnnotationIntrospectorTest {
 		HashMap<String, StepParameter> parameters = StepIntrospector.getStepParameters(new SearchAndReplaceStep());
 		
 		StepParameter p = parameters.get("plainText");
-		assertTrue(p.isStepConfigurationParameter());
+		assertTrue(p.getAccessType() == StepParameterAccessType.READ_ONLY);
+		assertTrue(p.getType() == StepParameterType.STEP_CONFIGURATION);
 		assertTrue(p.getJavaType() == Boolean.class);
 		assertNull(p.getRequiredStep());
 		assertEquals("If true the input is a plain text file, not a filtered event", p.getDescription());
 		
 		p = parameters.get("regEx");
-		assertTrue(p.isStepConfigurationParameter());
+		assertTrue(p.getAccessType() == StepParameterAccessType.READ_ONLY);
+		assertTrue(p.getType() == StepParameterType.STEP_CONFIGURATION);
 		assertTrue(p.getJavaType() == String.class);
 		assertNull(p.getRequiredStep());
 		assertEquals("Java Regex used to search", p.getDescription());
 		
 		p = parameters.get("dotAll");
-		assertTrue(p.isStepConfigurationParameter());
+		assertTrue(p.getAccessType() == StepParameterAccessType.READ_ONLY);
+		assertTrue(p.getType() == StepParameterType.STEP_CONFIGURATION);
 		assertTrue(p.getJavaType() == Boolean.class);
 		assertNull(p.getRequiredStep());
 		assertEquals("?????", p.getDescription());
 		
 		p = parameters.get("ignoreCase");
-		assertTrue(p.isStepConfigurationParameter());
+		assertTrue(p.getAccessType() == StepParameterAccessType.READ_ONLY);
+		assertTrue(p.getType() == StepParameterType.STEP_CONFIGURATION);
 		assertTrue(p.getJavaType() == Boolean.class);
 		assertNull(p.getRequiredStep());
 		assertEquals("If true the search is case insensitive", p.getDescription());
 		
 		p = parameters.get("multiLine");
-		assertTrue(p.isStepConfigurationParameter());
+		assertTrue(p.getAccessType() == StepParameterAccessType.READ_ONLY);
+		assertTrue(p.getType() == StepParameterType.STEP_CONFIGURATION);
 		assertTrue(p.getJavaType() == Boolean.class);
 		assertNull(p.getRequiredStep());
 		assertEquals("Search across line boundries", p.getDescription());	
 		
 		p = parameters.get("rules");
-		assertTrue(p.isStepConfigurationParameter());
+		assertTrue(p.getAccessType() == StepParameterAccessType.READ_ONLY);
+		assertTrue(p.getType() == StepParameterType.STEP_CONFIGURATION);
 		// why can't I test this statically as below??
 		ArrayList<String[]> al = new ArrayList<String[]>();
 		assertTrue(p.getJavaType() == al.getClass());
