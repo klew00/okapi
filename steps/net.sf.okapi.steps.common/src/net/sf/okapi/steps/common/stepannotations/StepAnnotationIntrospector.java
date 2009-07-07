@@ -31,7 +31,7 @@ public final class StepAnnotationIntrospector {
 				}
 				try {
 					if (f.get(step) == null) {
-						throw new OkapiBadStepInputException("A step parameter must have a deafult value");
+						throw new OkapiBadStepInputException("A step parameter must have a default value");
 					}
 
 					StepParameter p = new StepParameter(f.getName(), f.get(step));
@@ -39,7 +39,7 @@ public final class StepAnnotationIntrospector {
 						ExternalParameter ep = f.getAnnotation(ExternalParameter.class);
 						p.setDescription(ep.description());
 						p.setLongDescription(ep.longDescription());
-						p.setRequiredStep(ep.requiredStep());
+						p.setRequiredSteps(ep.requiredSteps());
 						p.setType(ep.type());
 						p.setStepConfigurationParameter(false);
 					} else if (f.isAnnotationPresent(StepConfigurationParameter.class)) {
@@ -48,7 +48,7 @@ public final class StepAnnotationIntrospector {
 						p.setLongDescription(scp.longDescription());
 						p.setStepConfigurationParameter(true);
 					}
-					parameters.put(p.getParamName(), p);
+					parameters.put(p.getName(), p);
 				} catch (IllegalArgumentException e) {
 					throw new OkapiBadStepInputException("Step parameter does not exist: " + f.getName(), e);
 				} catch (IllegalAccessException e) {

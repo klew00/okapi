@@ -3,40 +3,40 @@ package net.sf.okapi.steps.common.stepannotations;
 import java.lang.reflect.Type;
 
 public class StepParameter {	 
-	private String paramName;
-	private Object paramValue;
+	private String name;
+	private Object value;
 	private String description;
 	private String longDescription;
 	private ExternalParameterType type;
-	private String requiredStep;
+	private String[] requiredSteps;
 	private boolean stepConfigurationParameter;
 
 	public StepParameter(String paramName, Object object) {
-		this.paramName = paramName;
-		this.paramValue = object;
+		this.name = paramName;
+		this.value = object;
 	}
 
 	/**
-	 * @return the paramName
+	 * @return the name
 	 */
-	public String getParamName() {
-		return paramName;
+	public String getName() {
+		return name;
 	}
 
 	/**
-	 * @return the paramValue
+	 * @return the value
 	 */
-	public Object getParamValue() {
-		return paramValue;
+	public Object getValue() {
+		return value;
 	}
 
-	public void setParamValue(Class<?> paramValue) {
-		this.paramValue = paramValue;
+	public void setValue(Class<?> paramValue) {
+		this.value = paramValue;
 	}
 
 	public Type getJavaType() {
-		if (paramValue != null) {
-			return paramValue.getClass();
+		if (value != null) {
+			return value.getClass();
 		}
 		return null;
 	}
@@ -86,15 +86,15 @@ public class StepParameter {
 	/**
 	 * @param requiredStep the requiredStep to set
 	 */
-	public void setRequiredStep(String requiredStep) {
-		this.requiredStep = requiredStep;
+	public void setRequiredSteps(String[] requiredSteps) {
+		this.requiredSteps = requiredSteps;
 	}
 
 	/**
 	 * @return the requiredStep
 	 */
-	public String getRequiredStep() {
-		return requiredStep;
+	public String[] getRequiredSteps() {
+		return requiredSteps;
 	}
 
 	/**

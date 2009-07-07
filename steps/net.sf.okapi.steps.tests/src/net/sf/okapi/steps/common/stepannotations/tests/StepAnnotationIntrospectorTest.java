@@ -29,18 +29,18 @@ public class StepAnnotationIntrospectorTest {
 		StepParameter p = parameters.get("xsltPath");
 		assertFalse(p.isStepConfigurationParameter());
 		assertTrue(p.getJavaType() == String.class);
-		assertNotNull(p.getRequiredStep());
-		assertEquals("", p.getRequiredStep());
+		assertNotNull(p.getRequiredSteps());
+		assertTrue(p.getRequiredSteps().length <= 0);
 		assertEquals("Path to the xslt file used by this step", p.getDescription());
-		assertEquals(ExternalParameterType.INPUT, p.getType());
+		assertEquals(ExternalParameterType.READ_ONLY, p.getType());
 		
 		p = parameters.get("errorLogPath");
 		assertFalse(p.isStepConfigurationParameter());
 		assertTrue(p.getJavaType() == String.class);
-		assertNotNull(p.getRequiredStep());
-		assertEquals("", p.getRequiredStep());
+		assertNotNull(p.getRequiredSteps());
+		assertTrue(p.getRequiredSteps().length <= 0);
 		assertEquals("Path to the xslt error log file", p.getDescription());
-		assertEquals(ExternalParameterType.OUTPUT, p.getType());
+		assertEquals(ExternalParameterType.WRITE_ONLY, p.getType());
 	}
 	
 	@Test
@@ -50,31 +50,31 @@ public class StepAnnotationIntrospectorTest {
 		StepParameter p = parameters.get("plainText");
 		assertTrue(p.isStepConfigurationParameter());
 		assertTrue(p.getJavaType() == Boolean.class);
-		assertEquals(null, p.getRequiredStep());
+		assertNull(p.getRequiredSteps());
 		assertEquals("If true the input is a plain text file, not a filtered event", p.getDescription());
 		
 		p = parameters.get("regEx");
 		assertTrue(p.isStepConfigurationParameter());
 		assertTrue(p.getJavaType() == String.class);
-		assertEquals(null, p.getRequiredStep());
+		assertNull(p.getRequiredSteps());
 		assertEquals("Java Regex used to search", p.getDescription());
 		
 		p = parameters.get("dotAll");
 		assertTrue(p.isStepConfigurationParameter());
 		assertTrue(p.getJavaType() == Boolean.class);
-		assertEquals(null, p.getRequiredStep());
+		assertNull(p.getRequiredSteps());
 		assertEquals("?????", p.getDescription());
 		
 		p = parameters.get("ignoreCase");
 		assertTrue(p.isStepConfigurationParameter());
 		assertTrue(p.getJavaType() == Boolean.class);
-		assertEquals(null, p.getRequiredStep());
+		assertNull(p.getRequiredSteps());
 		assertEquals("If true the search is case insensitive", p.getDescription());
 		
 		p = parameters.get("multiLine");
 		assertTrue(p.isStepConfigurationParameter());
 		assertTrue(p.getJavaType() == Boolean.class);
-		assertEquals(null, p.getRequiredStep());
+		assertNull(p.getRequiredSteps());
 		assertEquals("Search across line boundries", p.getDescription());	
 		
 		p = parameters.get("rules");
@@ -83,7 +83,7 @@ public class StepAnnotationIntrospectorTest {
 		ArrayList<String[]> al = new ArrayList<String[]>();
 		assertTrue(p.getJavaType() == al.getClass());
 		assertTrue(p.getJavaType() == ArrayList.class);
-		assertNull(p.getRequiredStep());
+		assertNull(p.getRequiredSteps());
 		assertEquals("List of rules", p.getDescription());						
 	}
 }

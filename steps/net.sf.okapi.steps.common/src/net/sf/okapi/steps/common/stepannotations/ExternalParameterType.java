@@ -1,3 +1,3 @@
 package net.sf.okapi.steps.common.stepannotations;
 
-public enum ExternalParameterType { INPUT, OUTPUT, INPUT_OUTPUT}
+public enum ExternalParameterType { READ_ONLY, WRITE_ONLY, READ_WRITE}
