@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.common.stepannotations.tests;
 
 import net.sf.okapi.steps.common.stepannotations.ExternalParameter;
+import net.sf.okapi.steps.common.stepannotations.ExternalParameterType;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
@@ -30,8 +31,15 @@ public class XSLTransformStep extends BasePipelineStep {
 			longDescription = "The xslt path is provided by the external client")
 	private String xsltPath;
 
+	@SuppressWarnings("unused")
+	@ExternalParameter(description = "Path to the xslt error log file", 
+			longDescription = "The xslt error log path is provided by the external client", 
+			type = ExternalParameterType.OUTPUT)
+	private String errorLogPath;
+
 	public XSLTransformStep() {
 		xsltPath = "";
+		errorLogPath = "";
 	}
 
 	@Override

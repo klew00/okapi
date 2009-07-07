@@ -25,6 +25,7 @@ public class StepAnnotationIntrospectorTest {
 	@Test
 	public void getAnnotationsFromXsltTransformStep() {
 		HashMap<String, StepParameter> parameters = StepAnnotationIntrospector.getStepParameters(new XSLTransformStep());
+		
 		StepParameter p = parameters.get("xsltPath");
 		assertFalse(p.isStepConfigurationParameter());
 		assertTrue(p.getJavaType() == String.class);
@@ -32,6 +33,14 @@ public class StepAnnotationIntrospectorTest {
 		assertEquals("", p.getRequiredStep());
 		assertEquals("Path to the xslt file used by this step", p.getDescription());
 		assertEquals(ExternalParameterType.INPUT, p.getType());
+		
+		p = parameters.get("errorLogPath");
+		assertFalse(p.isStepConfigurationParameter());
+		assertTrue(p.getJavaType() == String.class);
+		assertNotNull(p.getRequiredStep());
+		assertEquals("", p.getRequiredStep());
+		assertEquals("Path to the xslt error log file", p.getDescription());
+		assertEquals(ExternalParameterType.OUTPUT, p.getType());
 	}
 	
 	@Test
