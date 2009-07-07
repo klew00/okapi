@@ -30,6 +30,10 @@ public final class StepAnnotationIntrospector {
 							"A step parameter cannot have both ExternalParameter and StepConfigurationParameter annotations");
 				}
 				try {
+					if (f.get(step) == null) {
+						throw new OkapiBadStepInputException("A step parameter must have a deafult value");
+					}
+
 					StepParameter p = new StepParameter(f.getName(), f.get(step));
 					if (f.isAnnotationPresent(ExternalParameter.class)) {
 						ExternalParameter ep = f.getAnnotation(ExternalParameter.class);
