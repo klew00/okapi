@@ -1,19 +1,34 @@
 package net.sf.okapi.steps.common.stepannotations;
 
 import java.lang.reflect.Field;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
 
+import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 
 public final class StepAnnotationIntrospector {
 
-	public static List<StepParameter> getStepParameters(IPipelineStep step) {
-		List<StepParameter> parameters = new LinkedList<StepParameter>();
+	public static HashMap<String, StepParameter> getStepParameters(IPipelineStep step) {
+		HashMap<String, StepParameter> parameters = new HashMap<String, StepParameter>();
+
+		// get all the declared fields (skipping any inherited ones) of the
+		// object including protected and private
 		Field[] fields = step.getClass().getDeclaredFields();
+
+		// iterate over the fields and pull out the ones that have
+		// StepConfigurationParameter or ExternalParameter annotations
 		for (Field f : fields) {
-			if (f.isAnnotationPresent(ExternalParameter.class) || f.isAnnotationPresent(StepConfigurationParameter.class)) {
-				// each step parameters can only have one of these annotations
+			// if not set to true we cannot access private or protected fields
+			f.setAccessible(true);
+			if (f.isAnnotationPresent(ExternalParameter.class)
+					|| f.isAnnotationPresent(StepConfigurationParameter.class)) {
+				// a step parameter should only have one of these annotations,
+				// if it has more than one throw an exception
+				if (f.isAnnotationPresent(ExternalParameter.class)
+						&& f.isAnnotationPresent(StepConfigurationParameter.class)) {
+					throw new OkapiBadStepInputException(
+							"A step parameter cannot have both ExternalParameter and StepConfigurationParameter annotations");
+				}
 				try {
 					StepParameter p = new StepParameter(f.getName(), f.get(step));
 					if (f.isAnnotationPresent(ExternalParameter.class)) {
@@ -29,10 +44,11 @@ public final class StepAnnotationIntrospector {
 						p.setLongDescription(scp.longDescription());
 						p.setStepConfigurationParameter(true);
 					}
+					parameters.put(p.getParamName(), p);
 				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
+					throw new OkapiBadStepInputException("Step parameter does not exist: " + f.getName(), e);
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
+					throw new OkapiBadStepInputException("Error accessing step parameter: " + f.getName(), e);
 				}
 			}
 		}

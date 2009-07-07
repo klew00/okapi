@@ -7,4 +7,5 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.filters.common;bundle-version="1.0.0",
  net.sf.okapi.pipeline;bundle-version="1.0.0"
-Export-Package: net.sf.okapi.steps.common
+Export-Package: net.sf.okapi.steps.common,
+ net.sf.okapi.steps.common.stepannotations
