@@ -87,6 +87,7 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<ant antfile="../shared/build_filters.dtd.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.plaintext.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_filters.table.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_filters.ts.xml" inheritAll="true"/>
 		
 		<ant antfile="../shared/build_pipeline.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_steps.common.xml" inheritAll="true"/>
