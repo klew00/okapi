@@ -1,4 +1,4 @@
-package net.sf.okapi.steps.common.javaannotations;
+package net.sf.okapi.steps.common.stepannotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
