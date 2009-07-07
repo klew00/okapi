@@ -22,7 +22,7 @@ package net.sf.okapi.steps.common.stepannotations.tests;
 
 import java.util.ArrayList;
 
-import net.sf.okapi.steps.common.stepannotations.StepConfigurationParameter;
+import net.sf.okapi.steps.common.stepintrospector.StepConfigurationParameter;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;

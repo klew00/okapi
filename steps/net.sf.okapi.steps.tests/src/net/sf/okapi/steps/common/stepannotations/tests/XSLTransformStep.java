@@ -20,8 +20,8 @@
 
 package net.sf.okapi.steps.common.stepannotations.tests;
 
-import net.sf.okapi.steps.common.stepannotations.ExternalParameter;
-import net.sf.okapi.steps.common.stepannotations.ExternalParameterType;
+import net.sf.okapi.steps.common.stepintrospector.ExternalParameter;
+import net.sf.okapi.steps.common.stepintrospector.ExternalParameterType;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
