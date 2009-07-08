@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.common.stepannotations.tests;
+package net.sf.okapi.steps.common.stepintrospector.tests;
 
 import java.util.ArrayList;
 

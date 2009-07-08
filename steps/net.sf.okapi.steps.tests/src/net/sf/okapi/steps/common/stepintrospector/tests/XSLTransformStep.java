@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.common.stepannotations.tests;
+package net.sf.okapi.steps.common.stepintrospector.tests;
 
 import net.sf.okapi.steps.common.stepintrospector.StepExternalParameter;
 import net.sf.okapi.steps.common.stepintrospector.StepParameterAccessType;
@@ -34,7 +34,7 @@ public class XSLTransformStep extends BasePipelineStep {
 	@SuppressWarnings("unused")
 	@StepExternalParameter(description = "Path to the xslt error log file", 
 			longDescription = "The xslt error log path is provided by the external client", 
-			accessType = StepParameterAccessType.WRITE_ONLY)
+			accessType = StepParameterAccessType.OUTPUT_ONLY)
 	private String errorLogPath;
 
 	public XSLTransformStep() {
