@@ -233,6 +233,7 @@ public class AbstractLineFilter extends AbstractFilter {
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(getParameters());
+		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(getMimeType());
 		startDoc.setMimeType(getMimeType());
