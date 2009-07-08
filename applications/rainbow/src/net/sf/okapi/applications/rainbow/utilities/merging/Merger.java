@@ -60,7 +60,7 @@ public class Merger {
 	private String trgLang;
 
 	public Merger () {
-//		// Get the location of the class source
+		// Get the location of the class source
 		File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
 	    String rootFolder = file.getAbsolutePath();
 	    // Remove the JAR file if running an installed version

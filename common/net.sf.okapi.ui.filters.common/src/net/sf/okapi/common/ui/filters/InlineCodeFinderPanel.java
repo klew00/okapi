@@ -409,13 +409,27 @@ public class InlineCodeFinderPanel extends Composite {
 		btAdd.setEnabled(enabled);
 		if ( enabled ) {
 			updateDisplay();
+			// No dynamic
+			chkTestAllRules.setEnabled(true);
+			lbRules.setEnabled(true);
+			edExpression.setEnabled(true);
+			edResults.setEnabled(true);
+			edSample.setEnabled(true);
 		}
 		else {
+			if ( inEditMode() ) endEditMode(false);
 			btDiscard.setEnabled(false);
 			btRemove.setEnabled(false);
 			btMoveUp.setEnabled(false);
 			btMoveDown.setEnabled(false);
 			btModify.setEnabled(false);
+			// Non dynamic
+			chkTestAllRules.setEnabled(false);
+			lbRules.setEnabled(false);
+			edExpression.setEnabled(false);
+			edResults.setEnabled(false);
+			edSample.setEnabled(false);
 		}
 	}
+
 }

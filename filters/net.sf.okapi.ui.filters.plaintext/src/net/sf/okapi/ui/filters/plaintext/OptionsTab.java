@@ -174,7 +174,7 @@ public class OptionsTab extends Composite implements IDialogPage {
 //		//	panel.enable(false);
 
 		panel.enable(inlines.getSelection());
-		panel.updateDisplay();
+		//This re-enable some buttons: panel.updateDisplay();
 		
 //		if (btnProcessInlineCodes.getSelection())
 //			pnlCodeFinder.enable(true);
