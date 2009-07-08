@@ -50,7 +50,7 @@ public class GoogleMTConnector implements IQuery {
 	private static final String CLOSING_CODE = "</s>";
 	private static final int CLOSING_CODE_LENGTH = CLOSING_CODE.length();
 	private static final Pattern opening = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>");
-	private static final Pattern isolated = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)>");
+	private static final Pattern isolated = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
 	
 	private String srcLang;
 	private String trgLang;
@@ -58,7 +58,7 @@ public class GoogleMTConnector implements IQuery {
 	private QueryResult result;
 	private int current = -1;
 	private String hostId;
-	private boolean ajaxMode = false;
+	private boolean ajaxMode = true;
 	
 	public GoogleMTConnector () {
 		try {
@@ -106,17 +106,23 @@ public class GoogleMTConnector implements IQuery {
 		else return querySite(text);
 	}
 	
-	private int queryAjax (TextFragment text) {
+	private int queryAjax (TextFragment fragment) {
 		try {
+			// Check if there is actually text to translate
+			if ( !fragment.hasText(false) ) return 0;
 			// Convert the fragment to coded HTML
-			String qtext = toCodedHTML(text);
+			String qtext = toCodedHTML(fragment);
+			// To compile with Google TOS: no more than 5000 characters at a time
+			if ( qtext.length() > 5000 ) {
+				return 0; 
+			}
 			// Create the connection and query
 			URL url = new URL(addressAjax + String.format(baseQueryAjax,
 				URLEncoder.encode(qtext, "UTF-8"), srcLang, trgLang));
 			URLConnection conn = url.openConnection();
-			// To comply with TOS: Make sure we send a user-agent property
+			// To comply with Google TOS: Make sure we send a user-agent property
 			conn.setRequestProperty("User-Agent", getClass().getName());
-			// To comply with TOS: Make sure we send a referrer property
+			// To comply with Google TOS: Make sure we send a referrer property
 			conn.setRequestProperty("Referer", hostId); // With one 'r' for official RFC error
 
 			// Get the response
@@ -133,13 +139,13 @@ public class GoogleMTConnector implements IQuery {
 	        Matcher m = patternAjax.matcher(res.toString());
 	        if ( m.find() ) {
 				result = new QueryResult();
-				result.source = text;
-				if ( text.hasCode() ) {
-					result.target = new TextFragment(fromCodedHTML(m.group(1), text),
-						text.getCodes());
+				result.source = fragment;
+				if ( fragment.hasCode() ) {
+					result.target = new TextFragment(fromCodedHTML(m.group(1), fragment),
+						fragment.getCodes());
 				}
 				else {
-					result.target = new TextFragment(fromCodedHTML(m.group(1), text));
+					result.target = new TextFragment(fromCodedHTML(m.group(1), fragment));
 				}
 				result.score = 99;
 				current = 0;
