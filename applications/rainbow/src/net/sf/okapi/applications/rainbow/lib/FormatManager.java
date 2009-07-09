@@ -66,6 +66,8 @@ public class FormatManager {
 		pairs.put(".sdlxliff", "okf_xliff");
 		pairs.put(".dtd", "okf_dtd");
 		pairs.put(".ts", "okf_ts");
+		pairs.put(".txt", "okf_plaintext");
+		pairs.put(".srt", "okf_regex-srt");
 	}
 	
 	/**

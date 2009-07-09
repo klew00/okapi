@@ -9,8 +9,6 @@ These rules can also be used on simple .resx files that have just string entries
  <its:translateRule selector="//data[not(@type) and not(starts-with(@name, '&gt;'))]/value" translate="yes"/>
  <its:translateRule selector="//data[@mimetype]/value" translate="no"/>
  <its:translateRule selector="//data[substring(@name, string-length(@name) - string-length('.Name')+1)='.Name']/value" translate="no"/>
-
- <!-- Previous rule could be <its:translateRule selector="//data[ends-with(@name, '.Name')]/value" translate="no"/> if XPath 2.0 was supported in .NET 2.0 -->
  <its:translateRule selector="//data[@name='$this.Text']/value" translate="yes"/>
  
  <!-- Localization notes -->
