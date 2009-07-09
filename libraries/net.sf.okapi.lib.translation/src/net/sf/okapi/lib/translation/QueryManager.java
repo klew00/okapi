@@ -341,7 +341,7 @@ public class QueryManager {
 		if ( !tu.isTranslatable() ) return;
 		if ( tu.hasTarget(trgLang) ) return;
 		
-		TextContainer tc = tu.setTarget(trgLang, tu.getSource().clone());
+		TextContainer tc = tu.getSource().clone(); //tu.setTarget(trgLang, tu.getSource().clone());
 		ScoresAnnotation scores = new ScoresAnnotation();
 		QueryResult qr;
 		int count;
@@ -429,6 +429,7 @@ public class QueryManager {
 		// Set the scores only if there is something to report
 		if ( leveraged > 0 ) {
 			tc.setAnnotation(scores);
+			tu.setTarget(trgLang, tc);			
 		}
 	}
 	

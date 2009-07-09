@@ -8,63 +8,77 @@
 <h2>M2 to M3</h2>
 <p>The following list enumerates the most important changes in the Okapi Framework between this 
 build and the previous release (M2)</p>
-<p>Libraries:</p>
 <ul>
-	<li>The Google MT connector has been enhanced to have the inline codes taken 
+	<li>Filters:<ul>
+		<li>Added the TS Filter (beta) for Qt translation files.</li>
+		<li>Fixed handling of fuzzy flag for plural entries in the PO filter.</li>
+	</ul>
+	</li>
+	<li>Libraries:<ul>
+		<li>The Google MT connector has been enhanced to have the inline codes taken 
 	into account, not simply pushed to the end of the text.</li>
+	</ul>
+	</li>
+	<li>Rainbow:<ul>
+		<li>Improved handling of un-approved translations in TMX generated 
+		during a Translation package Creation.</li>
+	</ul>
+	</li>
 </ul>
 <h2>M1 to M2</h2>
 <p>The following list enumerates the most important changes in the Okapi Framework between this 
 build and the previous release (M1)</p>
-<p>Filters:</p>
 <ul>
-	<li>The DTD Filter has been added.</li>
-	<li>The PlainText Filter has been added.</li>
-	<li>The Table Filter has been added.</li>
-	<li>Several pre-defined filter configurations have been added or updated: 
+	<li>Filters:<ul>
+		<li>The DTD Filter has been added.</li>
+		<li>The PlainText Filter has been added.</li>
+		<li>The Table Filter has been added.</li>
+		<li>Several pre-defined filter configurations have been added or updated: 
 	Mozilla-RDF, XML Android Strings, XML Java properties, RESX, Monoligual PO, 
 	SRT (Sub-titles), plain-text lines, plain-text paragraphs, CSV, etc.</li>
-	<li>The OpenXML Filter (DOCX, PPTX, XSLX files) has been improved and now 
+		<li>The OpenXML Filter (DOCX, PPTX, XSLX files) has been improved and now 
 	provides much inline code simplification.</li>
-	<li>The definition of the parameters for the RegEx Filter have been modified 
+		<li>The definition of the parameters for the RegEx Filter have been modified 
 	to allow the support of target text, ID, etc. This new format is not 
 	compatible with the one of M1.</li>
-	<li>Other filters (HTML, Properties, XLIFF, TMX, PO, and OpenDocument 
+		<li>Other filters (HTML, Properties, XLIFF, TMX, PO, and OpenDocument 
 	filters) have been improved.</li>
-</ul>
-<p>Libraries:</p>
-<ul>
-	<li>A new TM connector to query remote GlobalSight TM servers has been 
+	</ul>
+	</li>
+	<li>Libraries:<ul>
+		<li>A new TM connector to query remote GlobalSight TM servers has been 
 	added. (See the Java Example05 of the okapi-lib distribution for an 
 	illustration on how to use this component).</li>
-	<li>A connector to query the remote OpenTran server has been added. (See the 
+		<li>A connector to query the remote OpenTran server has been added. (See the 
 	Java Example05 of the okapi-lib distribution for an illustration on how to 
 	use this component).</li>
-	<li>New <code>RawDocument</code> object model.</li>
-	<li>The events mechanism has been augmented to work with batch items in the 
+		<li>New <code>RawDocument</code> object model.</li>
+		<li>The events mechanism has been augmented to work with batch items in the 
 	pipeline.</li>
-	<li>The encoding detection and handling of BOM has been modified in most 
+		<li>The encoding detection and handling of BOM has been modified in most 
 	filters and utilities.</li>
-	<li>The pipeline mechanism has been extensively re-written.</li>
-	<li>Many steps for the pipeline have been created, they are experimental for 
+		<li>The pipeline mechanism has been extensively re-written.</li>
+		<li>Many steps for the pipeline have been created, they are experimental for 
 	now.</li>
-</ul>
-<p>Rainbow:</p>
-<ul>
-	<li>The selection of the filter settings is now done using the new filter 
+	</ul>
+	</li>
+	<li>Rainbow:<ul>
+		<li>The selection of the filter settings is now done using the new filter 
 	configuration mapping system integrated in the library.</li>
-	<li>An experimental interface for creating and executing pipelines has been 
+		<li>An experimental interface for creating and executing pipelines has been 
 	added (see Utilities &gt; Edit / Execute Pipeline)</li>
-	<li>The creation of OmegaT, XLIFF and RTF translation packages has been modified to handle 
+		<li>The creation of OmegaT, XLIFF and RTF translation packages has been modified to handle 
 	pre-segmentation and pre-leveraging.</li>
-	<li>
-	<p dir="ltr">Uses the latest libraries.</li>
-</ul>
-<p>Ratel:</p>
-<ul>
-	<li>Better preservation of comments in SRX files; and capability to add 
+		<li dir="ltr">
+		<p dir="ltr">Uses the latest libraries.</li>
+	</ul>
+	</li>
+	<li>Ratel:<ul>
+		<li>Better preservation of comments in SRX files; and capability to add 
 	comments from within Ratel.</li>
-	<li>Uses the latest libraries.</li>
+		<li>Uses the latest libraries.</li>
+	</ul>
+	</li>
 </ul>
 <p>&nbsp;</p>
 </body>

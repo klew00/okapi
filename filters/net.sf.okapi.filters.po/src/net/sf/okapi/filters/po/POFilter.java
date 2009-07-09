@@ -252,7 +252,7 @@ public class POFilter implements IFilter {
 		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(MimeTypeMapper.PO_MIME_TYPE);
-		startDoc.setMimeType(MimeTypeMapper.PO_MIME_TYPE);
+		startDoc.setMimeType(getMimeType());
 		startDoc.setMultilingual(params.bilingualMode);
 		return new Event(EventType.START_DOCUMENT, startDoc);
 	}
@@ -261,16 +261,17 @@ public class POFilter implements IFilter {
 		//boolean skip = false;
 		skel = new GenericSkeleton();
 		tu = null;
-		hasFuzzyFlag = false;
 
 		if ( pluralMode == 0 ) {
 			msgID = "";
 			locNote = "";
 			transNote = "";
 			references = "";
+			hasFuzzyFlag = false;
 		}
 		else if ( pluralMode == 2 ) { // Closing plural group?
 			// Reset the plural variables
+			hasFuzzyFlag = false;
 			pluralMode = 0;
 			msgIDPlural = "";
 			pluralCount = 0;
@@ -279,6 +280,12 @@ public class POFilter implements IFilter {
 			Ending ending = new Ending(String.valueOf(++otherId));
 			ending.setSkeleton(skel);
 			return new Event(EventType.END_GROUP, ending);
+		}
+		else if ( pluralMode == 1 ) { // Inside a plural group
+			if ( hasFuzzyFlag ) {
+				tu = new TextUnit(null); // Id is set after
+				tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
+			}
 		}
 
 		while ( true ) {
@@ -397,9 +404,19 @@ public class POFilter implements IFilter {
 				msgIDPlural = getQuotedString(true);
 				// Start a plural group
 				StartGroup startGroup = new StartGroup(null, String.valueOf(++otherId));
+				// Copy the text unit info to the group if needed
+				if ( tu != null ) {
+					Property prop = tu.getTargetProperty(trgLang, Property.APPROVED);
+					if ( prop != null ) {
+						startGroup.setTargetProperty(trgLang, prop);
+					}
+					// Make sure the skeleton placeholders point to the group not the text unit.
+					skel.changeSelfReferents(startGroup);
+				}
 				startGroup.setSkeleton(skel);
 				level++; // New level for next item
 				startGroup.setType("x-gettext-plurals");
+				startGroup.setMimeType(getMimeType());
 				return new Event(EventType.START_GROUP, startGroup);
 			}
 			
@@ -510,7 +527,7 @@ public class POFilter implements IFilter {
 		tu.setPreserveWhitespaces(true);
 		tu.setSkeleton(skel);
 		//TODO: Need to adjust for each format
-		tu.setMimeType(MimeTypeMapper.PO_MIME_TYPE);
+		tu.setMimeType(getMimeType());
 		
 		if ( locNote.length() > 0 ) {
 			tu.setProperty(new Property(Property.NOTE, locNote));

@@ -233,6 +233,19 @@ public class GenericSkeleton implements ISkeleton {
 	}
 	
 	/**
+	 * Updates all the self-references to use the given referent. 
+	 * @param newReferent the new referent to use.
+	 */
+	public void changeSelfReferents (INameable newReferent) {
+		String start = TextFragment.REFMARKER_START+"$self$";
+		for ( GenericSkeletonPart part : list ) {
+			if (( part.data != null ) && ( part.data.toString().startsWith(start) )) {
+				part.parent = newReferent;
+			}
+		}
+	}
+	
+	/**
 	 * Adds to this skeleton a reference to an existing resource send before the one to 
 	 * which this skeleton is attached to.
 	 * @param referent the resource to refer to.

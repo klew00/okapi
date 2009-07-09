@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
@@ -212,6 +213,33 @@ public class POFilterTest {
 	}
 		
 	@Test
+	public void testPluralEntryFuzzy () {
+		String snippet = makePluralEntryFuzzy();
+		// First TU
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 1);
+		assertNotNull(tu);
+		assertEquals("translation-singular", tu.getTarget("fr").toString());
+		Property prop = tu.getTargetProperty("fr", Property.APPROVED);
+		assertNotNull(prop);
+		assertEquals("no", prop.getValue());
+		assertEquals(MimeTypeMapper.PO_MIME_TYPE, tu.getMimeType());
+		// Second TU
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 2);
+		assertNotNull(tu);
+		assertEquals("translation-plural", tu.getTarget("fr").toString());
+		prop = tu.getTargetProperty("fr", Property.APPROVED);
+		assertNotNull(prop);
+		assertEquals("no", prop.getValue());
+	}
+		
+	@Test
+	public void testOuputPluralEntryFuzzy () {
+		String snippet = makePluralEntryFuzzy();
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
+		assertEquals(snippet, result);
+	}
+		
+	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		URL url = POFilterTest.class.getResource("/Test01.po");
@@ -254,6 +282,14 @@ public class POFilterTest {
 			+ "msgid_plural \"untranslated-plural\"\n"
 			+ "msgstr[0] \"\"\n"
 			+ "msgstr[1] \"\"\n";
+	}
+
+	private String makePluralEntryFuzzy () {
+		return "#, fuzzy\n"
+			+ "msgid \"untranslated-singular\"\n"
+			+ "msgid_plural \"untranslated-plural\"\n"
+			+ "msgstr[0] \"translation-singular\"\n"
+			+ "msgstr[1] \"translation-plural\"\n";
 	}
 
 }
