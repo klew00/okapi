@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.html;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,9 +52,8 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 public class HtmlFilter extends AbstractBaseMarkupFilter {
 
 	private static final Logger LOGGER = Logger.getLogger(HtmlFilter.class.getName());
-
-	private StringBuilder bufferedWhitespace;
-
+	private static final String DEFAULT_PARAMETERS = "defaultConfiguration.yml";
+	
 	/*
 	 * HTML whitespace space (U+0020) tab (U+0009) form feed (U+000C) line feed
 	 * (U+000A) carriage return (U+000D) zero-width space (U+200B) (IE6 does not
@@ -62,12 +62,14 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 	private static final String HTML_WHITESPACE_REGEX = "[ \t\r\n\f\u200B]+";
 	private static final Pattern HTML_WHITESPACE_PATTERN = Pattern.compile(HTML_WHITESPACE_REGEX);
 
+	private StringBuilder bufferedWhitespace;
+
 	public HtmlFilter() {
 		super();
 		bufferedWhitespace = new StringBuilder();
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
-		setDefaultConfig(HtmlFilter.class.getResource("defaultConfiguration.yml"));
+		setDefaultConfig(HtmlFilter.class.getResource(DEFAULT_PARAMETERS));
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
@@ -77,7 +79,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			getClass().getName(),
 			"HTML/XHTML",
 			"HTML and XHTML documents",
-			"defaultConfiguration.yml"));
+			DEFAULT_PARAMETERS));
 		return list;
 	}
 
@@ -548,4 +550,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		return false;
 	}
 
+	public static URL getDefaultParameters() {
+		return HtmlFilter.class.getResource(DEFAULT_PARAMETERS);
+	}
 }

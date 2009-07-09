@@ -60,7 +60,6 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString() {
 		return taggedConfig.toString();
-
 	}
 
 	/*
@@ -77,7 +76,7 @@ public class Parameters extends BaseParameters {
 	}
 
 	/**
-	 * @param groovyFilterConfiguration
+	 * @param Filter Configuration
 	 */
 	public void setTaggedConfig(TaggedFilterConfiguration taggedConfig) {
 		this.taggedConfig = taggedConfig;
