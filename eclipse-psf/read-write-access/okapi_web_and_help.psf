@@ -2,6 +2,7 @@
 <psf version="2.0">
 <provider id="org.tigris.subversion.subclipse.core.svnnature">
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/deployment,Deployment"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/eclipse-psf,Eclipse PSF Files"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/help,help"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/website,Website"/>
 </provider>

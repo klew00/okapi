@@ -2,12 +2,12 @@
 <psf version="2.0">
 <provider id="org.tigris.subversion.subclipse.core.svnnature">
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.common,net.sf.okapi.common"/>
+<project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.abstractmarkup,net.sf.okapi.filters.abstractmarkup"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.filters.common,net.sf.okapi.filters.common"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.dtd,net.sf.okapi.filters.dtd"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.html,net.sf.okapi.filters.html"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.idml,net.sf.okapi.filters.idml"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.javascript,net.sf.okapi.filters.javascript"/>
-<project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.markupfilter,net.sf.okapi.filters.markupfilter"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.mif,net.sf.okapi.filters.mif"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.openoffice,net.sf.okapi.filters.openoffice"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.openxml,net.sf.okapi.filters.openxml"/>
@@ -18,11 +18,12 @@
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.rtf,net.sf.okapi.filters.rtf"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.table,net.sf.okapi.filters.table"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.tmx,net.sf.okapi.filters.tmx"/>
+<project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.ts,net.sf.okapi.filters.ts"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xliff,net.sf.okapi.filters.xliff"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xml,net.sf.okapi.filters.xml"/>
 <project reference="0.9.3,http://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.pipeline,net.sf.okapi.pipeline"/>
 </provider>
-<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" label="Okapi-Filters" name="Okapi-Filters">
+<workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1246307329241_1" label="Okapi-Filters" name="Okapi-Filters">
 <item elementID="=net.sf.okapi.filters.idml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.mif" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.dtd" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -35,7 +36,8 @@
 <item elementID="=net.sf.okapi.filters.html" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.plaintext" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.table" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.filters.markupfilter" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.ts" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.filters.abstractmarkup" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.javascript" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.xliff" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.openoffice" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
