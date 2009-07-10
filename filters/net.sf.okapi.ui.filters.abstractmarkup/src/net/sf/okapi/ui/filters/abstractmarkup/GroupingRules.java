@@ -1,20 +1,19 @@
-package net.sf.okapi.ui.filters.markup;
+package net.sf.okapi.ui.filters.abstractmarkup;
 
 import net.sf.okapi.ui.common.dialogs.IDialogPage;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
 
-public class TagExclusionRules extends Composite implements IDialogPage {
+public class GroupingRules extends Composite implements IDialogPage {
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public TagExclusionRules(Composite parent, int style) {
+	public GroupingRules(Composite parent, int style) {
 		super(parent, style);
-
 	}
 
 	@Override

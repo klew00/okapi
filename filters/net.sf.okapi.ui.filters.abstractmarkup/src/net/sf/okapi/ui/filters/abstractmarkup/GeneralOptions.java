@@ -1,4 +1,4 @@
-package net.sf.okapi.ui.filters.markup;
+package net.sf.okapi.ui.filters.abstractmarkup;
 
 import net.sf.okapi.ui.common.dialogs.IDialogPage;
 

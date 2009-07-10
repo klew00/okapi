@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.markup;
+package net.sf.okapi.ui.filters.abstractmarkup;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.ui.common.editors.AbstractParametersEditor;

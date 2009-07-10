@@ -1,19 +1,21 @@
-package net.sf.okapi.ui.filters.markup;
+package net.sf.okapi.ui.filters.abstractmarkup;
 
 import net.sf.okapi.ui.common.dialogs.IDialogPage;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.swt.layout.GridLayout;
 
-public class PreserveWhitespaceRules extends Composite implements IDialogPage {
+public class AttributeRules extends Composite implements IDialogPage {
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public PreserveWhitespaceRules(Composite parent, int style) {
+	public AttributeRules(Composite parent, int style) {
 		super(parent, style);
+		setLayout(new GridLayout(1, false));
 
 	}
 
@@ -22,7 +24,7 @@ public class PreserveWhitespaceRules extends Composite implements IDialogPage {
 		// Disable the check that prevents subclassing of SWT components
 	}
 
-	public boolean canClose(boolean isOK) {		
+	public boolean canClose(boolean isOK) {
 		return true;
 	}
 

@@ -1,19 +1,20 @@
-package net.sf.okapi.ui.filters.markup;
+package net.sf.okapi.ui.filters.abstractmarkup;
 
 import net.sf.okapi.ui.common.dialogs.IDialogPage;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
 
-public class GroupingRules extends Composite implements IDialogPage {
+public class EmbeddableTagRules extends Composite implements IDialogPage {
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public GroupingRules(Composite parent, int style) {
+	public EmbeddableTagRules(Composite parent, int style) {
 		super(parent, style);
+
 	}
 
 	@Override
@@ -21,7 +22,7 @@ public class GroupingRules extends Composite implements IDialogPage {
 		// Disable the check that prevents subclassing of SWT components
 	}
 
-	public boolean canClose(boolean isOK) {		
+	public boolean canClose(boolean isOK) {	
 		return true;
 	}
 
