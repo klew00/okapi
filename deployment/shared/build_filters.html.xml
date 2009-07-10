@@ -11,7 +11,7 @@
 	</path>
 	
 	<target name="filters.html">
-		<ant antfile="../shared/build_filters.markupfilter.xml" inheritAll="true"/>
+		<ant antfile="../shared/build_filters.abstractmarkup.xml" inheritAll="true"/>
  		<javac srcdir="${src_filters.html}" destdir="${tmp}" classpathref="mainClassPath_filters.html"/>
  		
 		<copy todir="${tmp}">
