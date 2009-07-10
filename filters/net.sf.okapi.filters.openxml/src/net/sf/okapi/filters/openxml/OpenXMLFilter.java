@@ -56,7 +56,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
-import net.sf.okapi.filters.markupfilter.Parameters;
+import net.sf.okapi.filters.abstractmarkup.Parameters;
 
 /**
  * <p>Filters Microsoft Office Word, Excel, and Powerpoint Documents.
@@ -97,7 +97,7 @@ public class OpenXMLFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private String srcLang;
 	private OpenXMLContentFilter openXMLContentFilter;
-	private IParameters params=null; // DWH 6-15-09 was net.sf.okapi.filters.markupfilter.Parameters
+	private IParameters params=null; // DWH 6-15-09 was net.sf.okapi.filters.abstractmarkup.Parameters
 	private ConditionalParameters cparams=null; // DWH 6-16-09
 	private int nZipType=MSWORD;
 	private int nFileType=MSWORD; // DWH 4-16-09
@@ -483,7 +483,7 @@ public class OpenXMLFilter implements IFilter {
 	 * @param params IParameters object
 	 */
 	public void setParameters (IParameters params) {
-		this.params = (IParameters)params; // DWH 6-25-09 was net.sf.okapi.filters.markupfilter.Parameters
+		this.params = (IParameters)params; // DWH 6-25-09 was net.sf.okapi.filters.abstractmarkup.Parameters
 		readParams(); // DWH 6-19-09
 	}
 
@@ -530,7 +530,7 @@ public class OpenXMLFilter implements IFilter {
 			}
 //			openXMLContentFilter.setUpConfig(nZipType);
 			  // DWH 3-4-09 sets Parameters inside OpenXMLContentFilter based on file type
-//			params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
+//			params = (net.sf.okapi.filters.abstractmarkup.Parameters)openXMLContentFilter.getParameters();
 			  // DWH 3-4-09 params for OpenXMLFilter
 			
 			if (nZipType==MSEXCEL &&
@@ -663,7 +663,7 @@ public class OpenXMLFilter implements IFilter {
 				LOGGER.log(Level.FINER,"\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
+				params = (net.sf.okapi.filters.abstractmarkup.Parameters)openXMLContentFilter.getParameters();
 					// DWH 6-15-09 fully specified Parameters
 				Event ually = openSubDocument(true); // DWH 6-25-09 save the event
 				resetExcel(); // DWH 6-25-09 if Excel and excluding colors or columns, start through zips again if done with worksheets
@@ -707,7 +707,7 @@ public class OpenXMLFilter implements IFilter {
 				else
 					nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
+				params = (net.sf.okapi.filters.abstractmarkup.Parameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
 				LOGGER.log(Level.FINER,"<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				Event ually = openSubDocument(false); // DWH 6-25-09 save the event
@@ -717,7 +717,7 @@ public class OpenXMLFilter implements IFilter {
 			else {
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (net.sf.okapi.filters.markupfilter.Parameters)openXMLContentFilter.getParameters();
+				params = (net.sf.okapi.filters.abstractmarkup.Parameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
 				DocumentPart dp = new DocumentPart(entry.getName(), false);
 				ZipSkeleton skel = new ZipSkeleton(entry);
@@ -746,7 +746,7 @@ public class OpenXMLFilter implements IFilter {
 		BufferedInputStream bis; // DWH 3-5-09
 		InputStream isInputStream;
 		openXMLContentFilter.close(); // Make sure the previous is closed
-		openXMLContentFilter.setParameters((net.sf.okapi.filters.markupfilter.Parameters)params);
+		openXMLContentFilter.setParameters((net.sf.okapi.filters.abstractmarkup.Parameters)params);
 		//YS openXMLContentFilter.setOptions(srcLang, "UTF-8", true);
 		Event event;
 		try

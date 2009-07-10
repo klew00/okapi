@@ -37,7 +37,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.*;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -46,7 +45,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
-import net.sf.okapi.filters.markupfilter.Parameters;
+import net.sf.okapi.filters.abstractmarkup.Parameters;
 
 /**
  * <p>Implements the IFilterWriter interface for the OpenXMLFilter, which
@@ -76,7 +75,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	private IFilterWriter subDocWriter;
 	private File tempFile;
 	private File tempZip;
-	private net.sf.okapi.filters.markupfilter.Parameters params; // DWH 4-13-09
+	private net.sf.okapi.filters.abstractmarkup.Parameters params; // DWH 4-13-09
 	private static final Logger LOGGER = Logger.getLogger(OpenXMLZipFilterWriter.class.getName());
 
 	/**
@@ -369,7 +368,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	}
 	public void setParameters(IParameters params)
 	{
-		this.params = (net.sf.okapi.filters.markupfilter.Parameters)params;
+		this.params = (net.sf.okapi.filters.abstractmarkup.Parameters)params;
 	}
 	public Parameters getParameters()
 	{

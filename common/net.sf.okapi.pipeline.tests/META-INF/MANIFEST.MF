@@ -7,6 +7,6 @@ Fragment-Host: net.sf.okapi.pipeline;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit4;bundle-version="4.3.1",
  net.sf.okapi.filters.html;bundle-version="1.0.0",
- net.sf.okapi.filters.markupfilter;bundle-version="1.0.0",
  net.sf.okapi.filters.xml;bundle-version="1.0.0",
- net.sf.okapi.steps.common;bundle-version="1.0.0"
+ net.sf.okapi.steps.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.abstractmarkup;bundle-version="1.0.0"

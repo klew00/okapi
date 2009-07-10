@@ -46,7 +46,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.markupfilter.AbstractBaseMarkupFilter;
+import net.sf.okapi.filters.abstractmarkup.AbstractBaseMarkupFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class HtmlFilter extends AbstractBaseMarkupFilter {

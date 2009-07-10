@@ -6,7 +6,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.common.tests"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.html.tests"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.idml.tests"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.markupfilter.tests"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.abstractmarkup.tests"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.mif.tests"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.openoffice.tests"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.openxml.tests"/>

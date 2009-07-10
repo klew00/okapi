@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.RawDocument;
-//import net.sf.okapi.filters.markupfilter.Parameters;
+//import net.sf.okapi.filters.abstractmarkup.Parameters;
 //import net.sf.okapi.filters.openxml.OpenXMLContentFilter;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 
