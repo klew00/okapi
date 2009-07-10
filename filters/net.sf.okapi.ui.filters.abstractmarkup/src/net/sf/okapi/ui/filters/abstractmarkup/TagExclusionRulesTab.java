@@ -5,15 +5,16 @@ import net.sf.okapi.ui.common.dialogs.IDialogPage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
 
-public class GroupingRules extends Composite implements IDialogPage {
+public class TagExclusionRulesTab extends Composite implements IDialogPage {
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public GroupingRules(Composite parent, int style) {
+	public TagExclusionRulesTab(Composite parent, int style) {
 		super(parent, style);
+
 	}
 
 	@Override

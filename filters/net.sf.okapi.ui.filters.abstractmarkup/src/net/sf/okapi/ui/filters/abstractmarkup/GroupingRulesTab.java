@@ -5,16 +5,15 @@ import net.sf.okapi.ui.common.dialogs.IDialogPage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
 
-public class PreserveWhitespaceRules extends Composite implements IDialogPage {
+public class GroupingRulesTab extends Composite implements IDialogPage {
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public PreserveWhitespaceRules(Composite parent, int style) {
+	public GroupingRulesTab(Composite parent, int style) {
 		super(parent, style);
-
 	}
 
 	@Override

@@ -11,25 +11,33 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Combo;
 
-public class GeneralOptions extends Composite implements IDialogPage {
+public class GeneralOptionsTab extends Composite implements IDialogPage {
 	private Group grpWhitespaceOptions;
 	private Button btnCollapseToSingle;
 	private Button btnPreserveWhitespace;
+	private Group grpSubFilterOptions;
+	private Combo elementSubFilterCombo;
+	private Combo combo_1;
+	private Label lblElementSubFilter;
+	private Label lblCdataSubFilter;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public GeneralOptions(Composite parent, int style) {
+	public GeneralOptionsTab(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		
 		grpWhitespaceOptions = new Group(this, SWT.NONE);
-		GridData gridData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gridData.heightHint = 64;
-		gridData.widthHint = 194;
+		grpWhitespaceOptions.setLayout(new GridLayout(1, false));
+		GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, true, 1, 1);
+		gridData.heightHint = 86;
+		gridData.widthHint = 396;
 		grpWhitespaceOptions.setLayoutData(gridData);
 		grpWhitespaceOptions.setText("Whitespace Handling");
 		grpWhitespaceOptions.setData("name", "grpWhitespaceOptions");
@@ -40,14 +48,37 @@ public class GeneralOptions extends Composite implements IDialogPage {
 			public void widgetSelected(SelectionEvent e) {
 			}
 		});
-		btnCollapseToSingle.setBounds(10, 20, 180, 16);
 		btnCollapseToSingle.setData("name", "btnCollapseToSingle");
 		btnCollapseToSingle.setText("Collapse to Single Whitespace");
 		
 		btnPreserveWhitespace = new Button(grpWhitespaceOptions, SWT.RADIO);
-		btnPreserveWhitespace.setBounds(10, 42, 180, 16);
 		btnPreserveWhitespace.setData("name", "btnPreserveWhitespace");
 		btnPreserveWhitespace.setText("Preserve Whitespace");
+		
+		grpSubFilterOptions = new Group(this, SWT.NONE);
+		grpSubFilterOptions.setLayout(new GridLayout(1, false));
+		GridData gridData_1 = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		gridData_1.heightHint = 127;
+		gridData_1.widthHint = 393;
+		grpSubFilterOptions.setLayoutData(gridData_1);
+		grpSubFilterOptions.setText("Sub Filter Options");
+		grpSubFilterOptions.setData("name", "grpSubFilterOptions");
+		
+		lblElementSubFilter = new Label(grpSubFilterOptions, SWT.NONE);
+		lblElementSubFilter.setData("name", "lblElementSubFilter");
+		lblElementSubFilter.setText("Element Sub Filter");
+		
+		elementSubFilterCombo = new Combo(grpSubFilterOptions, SWT.READ_ONLY);
+		elementSubFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		elementSubFilterCombo.setData("name", "elementSubFilterCombo");
+		
+		lblCdataSubFilter = new Label(grpSubFilterOptions, SWT.NONE);
+		lblCdataSubFilter.setData("name", "lblCdataSubFilter");
+		lblCdataSubFilter.setText("CDATA Sub Filter");
+		
+		combo_1 = new Combo(grpSubFilterOptions, SWT.READ_ONLY);
+		combo_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		combo_1.setData("name", "combo_1");
 	}
 
 	@Override

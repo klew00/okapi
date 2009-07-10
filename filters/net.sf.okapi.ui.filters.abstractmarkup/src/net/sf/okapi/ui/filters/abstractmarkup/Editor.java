@@ -29,12 +29,13 @@ import org.eclipse.swt.widgets.Widget;
 public class Editor extends AbstractParametersEditor {
 	@Override
 	protected void createPages(TabFolder pageContainer) {		
-		addPage("General Options", GeneralOptions.class);		
-		addPage("Embeddable Tag Rules", EmbeddableTagRules.class);
-		addPage("Attribute Tag Rules", AttributeRules.class);
-		addPage("Tag Exclusion Rules", TagExclusionRules.class);
-		addPage("Grouping Rules", GroupingRules.class);
-		addPage("Preserve Whitespace Rules", PreserveWhitespaceRules.class);
+		addPage("General Options", GeneralOptionsTab.class);		
+		addPage("Embeddable Tag Rules", EmbeddableTagRulesTab.class);
+		addPage("Attribute Tag Rules", AttributeRulesTab.class);
+		addPage("Tag Exclusion Rules", TagExclusionRulesTab.class);
+		addPage("Processing Instruction Rules", ProcessingInstructionRulesTab.class);
+		addPage("Grouping Rules", GroupingRulesTab.class);
+		addPage("Preserve Whitespace Rules", PreserveWhitespaceRulesTab.class);
 	}
 
 	@Override
