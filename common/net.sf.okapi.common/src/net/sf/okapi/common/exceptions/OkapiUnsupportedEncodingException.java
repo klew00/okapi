@@ -20,19 +20,46 @@
 
 package net.sf.okapi.common.exceptions;
 
+/**
+ * Signals that a given character set encoding is not supported by the
+ * current system. 
+ */
 public class OkapiUnsupportedEncodingException extends RuntimeException {
 	
 	private static final long serialVersionUID = -4301626737744375525L;
 
-	public OkapiUnsupportedEncodingException(String message) {
+	/**
+	 * Creates an empty new OkapiUnsupportedEncodingException object.
+	 */
+	public OkapiUnsupportedEncodingException () {
+		super();
+	}
+
+	/**
+	 * Creates a new OkapiUnsupportedEncodingException object with a given message.
+	 * @param message text of the message.
+	 */
+	public OkapiUnsupportedEncodingException (String message) {
 		super(message);
 	}
 
-	public OkapiUnsupportedEncodingException(Throwable cause) {
+	/**
+	 * Creates a new OkapiUnsupportedEncodingException object with a given parent 
+	 * exception cause.
+	 * @param cause the parent exception cause.
+	 */
+	public OkapiUnsupportedEncodingException (Throwable cause) {
 		super(cause);
 	}
 
-	public OkapiUnsupportedEncodingException(String message, Throwable cause) {
+	/**
+	 * Creates a new OkapiUnsupportedEncodingException object with a given message and 
+	 * a given parent exception cause.
+	 * @param message the message.
+	 * @param cause the cause.
+	 */
+	public OkapiUnsupportedEncodingException (String message, Throwable cause) {
 		super(message, cause);
 	}
+
 }

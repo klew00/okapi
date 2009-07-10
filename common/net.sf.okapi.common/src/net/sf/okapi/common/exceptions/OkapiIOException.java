@@ -32,6 +32,7 @@ public class OkapiIOException extends RuntimeException {
 	 * Creates an empty new OkapiIOException object.
 	 */
 	public OkapiIOException () {
+		super();
 	}
 
 	/**

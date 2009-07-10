@@ -61,10 +61,6 @@ public class POEncoder implements IEncoder {
 	public String toNative (String propertyName,
 		String value)
 	{
-		// PROP_LANGUAGE: Not applicable
-		// PROP_ENCODING: No change
-		
-		// No changes for the other values
 		if ( propertyName.equals(Property.APPROVED) ) {
 			if (( value != null ) && ( value.equals("no") )) {
 				return "fuzzy";
@@ -73,6 +69,8 @@ public class POEncoder implements IEncoder {
 				return "";
 			}
 		}
+
+		// No changes for the other values
 		return value;
 	}
 

@@ -20,19 +20,47 @@
 
 package net.sf.okapi.common.exceptions;
 
+/**
+ * Signals that an editor could not be created. This error occurs for example when
+ * trying to edit the parameters of a filter or of a step and the corresponding
+ * editor cannot be created.
+ */
 public class OkapiEditorCreationException extends RuntimeException {
 	
 	private static final long serialVersionUID = -4301626737744375525L;
 
-	public OkapiEditorCreationException(String message) {
+	/**
+	 * Creates an empty new OkapiEditorCreationException object.
+	 */
+	public OkapiEditorCreationException () {
+		super();
+	}
+
+	/**
+	 * Creates a new OkapiEditorCreationException object with a given message.
+	 * @param message text of the message.
+	 */
+	public OkapiEditorCreationException (String message) {
 		super(message);
 	}
 
-	public OkapiEditorCreationException(Throwable cause) {
+	/**
+	 * Creates a new OkapiEditorCreationException object with a given parent 
+	 * exception cause.
+	 * @param cause the parent exception cause.
+	 */
+	public OkapiEditorCreationException (Throwable cause) {
 		super(cause);
 	}
 
-	public OkapiEditorCreationException(String message, Throwable cause) {
+	/**
+	 * Creates a new OkapiEditorCreationException object with a given message and 
+	 * a given parent exception cause.
+	 * @param message the message.
+	 * @param cause the cause.
+	 */
+	public OkapiEditorCreationException (String message, Throwable cause) {
 		super(message, cause);
 	}
+
 }

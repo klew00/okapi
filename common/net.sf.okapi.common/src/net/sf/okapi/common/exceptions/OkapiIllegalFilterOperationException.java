@@ -31,6 +31,7 @@ public class OkapiIllegalFilterOperationException extends RuntimeException {
 	 * Creates an empty new OkapiIllegalFilterOperationException object.
 	 */
 	public OkapiIllegalFilterOperationException () {
+		super();
 	}
 	
 	/**

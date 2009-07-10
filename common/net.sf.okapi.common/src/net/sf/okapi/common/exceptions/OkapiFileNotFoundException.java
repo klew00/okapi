@@ -20,22 +20,45 @@
 
 package net.sf.okapi.common.exceptions;
 
+/**
+ * Signals that a document could not be found.
+ */
 public class OkapiFileNotFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = -3560815361871071813L;
 
-	public OkapiFileNotFoundException() {
+	/**
+	 * Creates an empty new OkapiFileNotFoundException object.
+	 */
+	public OkapiFileNotFoundException () {
+		super();
 	}
 
-	public OkapiFileNotFoundException(String message) {
+	/**
+	 * Creates a new OkapiFileNotFoundException object with a given message.
+	 * @param message text of the message.
+	 */
+	public OkapiFileNotFoundException (String message) {
 		super(message);
 	}
 
-	public OkapiFileNotFoundException(Throwable cause) {
+	/**
+	 * Creates a new OkapiFileNotFoundException object with a given parent 
+	 * exception cause.
+	 * @param cause the parent exception cause.
+	 */
+	public OkapiFileNotFoundException (Throwable cause) {
 		super(cause);
 	}
 
-	public OkapiFileNotFoundException(String message, Throwable cause) {
+	/**
+	 * Creates a new OkapiFileNotFoundException object with a given message and 
+	 * a given parent exception cause.
+	 * @param message the message.
+	 * @param cause the cause.
+	 */
+	public OkapiFileNotFoundException (String message, Throwable cause) {
 		super(message, cause);
 	}
+
 }

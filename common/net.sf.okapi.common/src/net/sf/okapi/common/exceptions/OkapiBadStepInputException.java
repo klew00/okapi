@@ -33,6 +33,7 @@ public class OkapiBadStepInputException extends RuntimeException {
 	 * Creates an empty new OkapiBadStepInputException object.
 	 */
 	public OkapiBadStepInputException () {
+		super();
 	}
 
 	/**

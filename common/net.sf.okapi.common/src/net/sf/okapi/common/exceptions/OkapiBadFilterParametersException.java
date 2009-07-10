@@ -33,6 +33,7 @@ public class OkapiBadFilterParametersException extends RuntimeException {
 	 * Creates an empty new OkapiBadFilterParametersException object.
 	 */
 	public OkapiBadFilterParametersException () {
+		super();
 	}
 
 	/**

@@ -33,6 +33,7 @@ public class OkapiNotImplementedException extends RuntimeException {
 	 * Creates an empty new OkapiNotImplementedException object.
 	 */
 	public OkapiNotImplementedException () {
+		super();
 	}
 
 	/**
