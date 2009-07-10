@@ -647,22 +647,11 @@ public class XLIFFFilter implements IFilter {
 		else {
 			// Get the state attribute if available
 			//TODO: Need to standardize target-state properties
-			String tmp = reader.getAttributeValue("", "state");
-			if ( tmp != null ) {
-				tu.setTargetProperty(trgLang, new Property("state", tmp, false));
-			}
-		
+			String stateValue = reader.getAttributeValue("", "state");
 			// Get the coord attribute if available
-			tmp = reader.getAttributeValue("", Property.COORDINATES);
-			if ( tmp != null ) {
-				tu.setTargetProperty(trgLang, new Property(Property.COORDINATES, tmp, false));
-			}
+			String coordValue = reader.getAttributeValue("", Property.COORDINATES);
 
-			if ( approved ) {
-				// Note that this property is set to the target at the resource-level
-				tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
-			}
-			
+			// Get the target itself
 			skel.addContentPlaceholder(tu, trgLang);
 			tc = processContent("target", false);
 			if ( !tc.isEmpty() ) {
@@ -671,6 +660,21 @@ public class XLIFFFilter implements IFilter {
 				tu.setPreserveWhitespaces(preserveSpaces.peek());
 				tu.setTarget(trgLang, tc);
 			}
+
+			// Set the target properties (after the target container has been set
+			if ( stateValue != null ) {
+				tu.setTargetProperty(trgLang, new Property("state", stateValue, false));
+			}
+		
+			if ( coordValue != null ) {
+				tu.setTargetProperty(trgLang, new Property(Property.COORDINATES, coordValue, false));
+			}
+
+			if ( approved ) {
+				// Note that this property is set to the target at the resource-level
+				tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
+			}
+			
 			targetDone = true;
 		}
 	}

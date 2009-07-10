@@ -56,6 +56,17 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testApprovedTU () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createApprovedTU(), 1);
+		assertNotNull(tu);
+		assertEquals("t1", tu.getSourceContent().toString());
+		assertEquals("translated t1", tu.getTargetContent("fr").toString());
+		Property prop = tu.getTargetProperty("fr", Property.APPROVED);
+		assertNotNull(prop);
+		assertEquals("yes", prop.getValue());
+	}
+
+	@Test
 	public void testDefaultInfo () {
 		assertNotNull(filter.getParameters());
 		assertNotNull(filter.getName());
@@ -297,6 +308,18 @@ public class XLIFFFilterTest {
 			+ "<body>"
 			+ "<trans-unit id=\"1\" xml:space=\"preserve\"><source>t1  t2 t3\t\t<ph id='1'>X</ph>  t4</source></trans-unit>"
 			+ "<trans-unit id=\"2\"><source>t1  t2 t3\t\t<ph id='1'>X</ph>  t4</source></trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		return getEvents(snippet);
+	}
+	
+	private ArrayList<Event> createApprovedTU () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\" approved=\"yes\"><source>t1</source>"
+			+ "<target>translated t1</target></trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";
 		return getEvents(snippet);
