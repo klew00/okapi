@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project name="filters.abstractmarkup" default="filters.abstractmarkup"> 
 
-	<property name="proj_filters.markupfilter" value="../../filters/net.sf.okapi.filters.abstractmarkup"/> 
-	<property name="src_filters.markupfilter" value="${proj_filters.abstractmarkup}/src"/> 
-	<property name="lib_filters.markupfilter" value="${proj_filters.abstractmarkup}/lib"/> 
+	<property name="proj_filters.abstractmarkup" value="../../filters/net.sf.okapi.filters.abstractmarkup"/> 
+	<property name="src_filters.abstractmarkup" value="${proj_filters.abstractmarkup}/src"/> 
+	<property name="lib_filters.abstractmarkup" value="${proj_filters.abstractmarkup}/lib"/> 
  
 	<path id="mainClassPath_filters.abstractmarkup">
 		<pathelement location="${tmp}"/>
