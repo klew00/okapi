@@ -41,6 +41,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -390,8 +391,11 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 		}
 
 		shell.pack();
-		Rectangle Rect = shell.getBounds();
-		shell.setMinimumSize(Rect.width, Rect.height);
+		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 600 ) startSize.x = 600; 
+		if ( startSize.y < 450 ) startSize.y = 450; 
+		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, p_Parent);
 		setData();
 	}

@@ -33,6 +33,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -222,6 +223,10 @@ public class RuleDialog {
 
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
+		Point startSize = shell.getMinimumSize();
+		if ( startSize.x < 600 ) startSize.x = 600; 
+		if ( startSize.y < 550 ) startSize.y = 550; 
+		shell.setSize(startSize);
 		setData();
 		Dialogs.centerWindow(shell, parent);
 	}
