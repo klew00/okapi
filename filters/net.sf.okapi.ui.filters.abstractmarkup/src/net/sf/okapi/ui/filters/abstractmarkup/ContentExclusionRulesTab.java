@@ -12,10 +12,11 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-public class PreserveWhitespaceRulesTab extends Composite implements IDialogPage {
-	private Group grpTagsWhoseContent;
+public class ContentExclusionRulesTab extends Composite implements IDialogPage {
+	private Group grpTagExclusionRules;
 	private Table table;
 	private TableColumn tblclmnTagName;
+	private TableColumn tblclmnRuleType;
 	private TableColumn tblclmnConditionalRules;
 
 	/**
@@ -23,29 +24,34 @@ public class PreserveWhitespaceRulesTab extends Composite implements IDialogPage
 	 * @param parent
 	 * @param style
 	 */
-	public PreserveWhitespaceRulesTab(Composite parent, int style) {
+	public ContentExclusionRulesTab(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		
-		grpTagsWhoseContent = new Group(this, SWT.NONE);
-		grpTagsWhoseContent.setLayout(new FillLayout(SWT.HORIZONTAL));
-		grpTagsWhoseContent.setText("Preserve Whitespace Rules...");
-		grpTagsWhoseContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		grpTagsWhoseContent.setData("name", "grpTagsWhoseContent");
+		grpTagExclusionRules = new Group(this, SWT.NONE);
+		grpTagExclusionRules.setLayout(new FillLayout(SWT.HORIZONTAL));
+		grpTagExclusionRules.setText("Tag Exclusion Rules...");
+		grpTagExclusionRules.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		grpTagExclusionRules.setData("name", "grpTagExclusionRules");
 		
-		table = new Table(grpTagsWhoseContent, SWT.BORDER | SWT.FULL_SELECTION);
+		table = new Table(grpTagExclusionRules, SWT.BORDER | SWT.FULL_SELECTION);
 		table.setData("name", "table");
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		
 		tblclmnTagName = new TableColumn(table, SWT.NONE);
 		tblclmnTagName.setData("name", "tblclmnTagName");
-		tblclmnTagName.setWidth(144);
+		tblclmnTagName.setWidth(100);
 		tblclmnTagName.setText("Tag Name");
+		
+		tblclmnRuleType = new TableColumn(table, SWT.NONE);
+		tblclmnRuleType.setData("name", "tblclmnRuleType");
+		tblclmnRuleType.setWidth(71);
+		tblclmnRuleType.setText("Rule Type");
 		
 		tblclmnConditionalRules = new TableColumn(table, SWT.NONE);
 		tblclmnConditionalRules.setData("name", "tblclmnConditionalRules");
-		tblclmnConditionalRules.setWidth(285);
+		tblclmnConditionalRules.setWidth(259);
 		tblclmnConditionalRules.setText("Conditional Rules");
 
 	}

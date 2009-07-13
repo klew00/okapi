@@ -57,7 +57,7 @@ public class GeneralOptionsTab extends Composite implements IDialogPage {
 		
 		grpSubFilterOptions = new Group(this, SWT.NONE);
 		grpSubFilterOptions.setLayout(new GridLayout(1, false));
-		GridData gridData_1 = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		GridData gridData_1 = new GridData(SWT.FILL, SWT.TOP, true, true, 1, 1);
 		gridData_1.heightHint = 127;
 		gridData_1.widthHint = 393;
 		grpSubFilterOptions.setLayoutData(gridData_1);

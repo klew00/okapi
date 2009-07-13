@@ -32,7 +32,7 @@ public class Editor extends AbstractParametersEditor {
 		addPage("General Options", GeneralOptionsTab.class);		
 		addPage("Embeddable Tag Rules", EmbeddableTagRulesTab.class);
 		addPage("Attribute Tag Rules", AttributeRulesTab.class);
-		addPage("Tag Exclusion Rules", TagExclusionRulesTab.class);
+		addPage("Tag Exclusion Rules", ContentExclusionRulesTab.class);
 		addPage("Processing Instruction Rules", ProcessingInstructionRulesTab.class);
 		addPage("Grouping Rules", GroupingRulesTab.class);
 		addPage("Preserve Whitespace Rules", PreserveWhitespaceRulesTab.class);
