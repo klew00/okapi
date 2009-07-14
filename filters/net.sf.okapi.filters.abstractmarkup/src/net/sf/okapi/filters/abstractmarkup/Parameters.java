@@ -24,6 +24,7 @@ import java.io.File;
 import java.net.URL;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
 /**
@@ -38,17 +39,14 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public Parameters(URL configPath) {
-		reset();
 		setTaggedConfig(new TaggedFilterConfiguration(configPath));
 	}
 
 	public Parameters(File configFile) {
-		reset();
 		setTaggedConfig(new TaggedFilterConfiguration(configFile));
 	}
 
 	public Parameters(String configAsString) {
-		reset();
 		setTaggedConfig(new TaggedFilterConfiguration(configAsString));
 	}
 
@@ -72,7 +70,7 @@ public class Parameters extends BaseParameters {
 	 * @see net.sf.okapi.common.IParameters#reset()
 	 */
 	public void reset() {
-		taggedConfig = null;
+		taggedConfig = new TaggedFilterConfiguration();
 	}
 
 	public TaggedFilterConfiguration getTaggedConfig() {
@@ -80,7 +78,7 @@ public class Parameters extends BaseParameters {
 	}
 
 	/**
-	 * @param Filter Configuration
+	 * @param IFilter Configuration
 	 */
 	public void setTaggedConfig(TaggedFilterConfiguration taggedConfig) {
 		this.taggedConfig = taggedConfig;

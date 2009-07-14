@@ -78,6 +78,10 @@ public class TaggedFilterConfiguration {
 
 	private YamlConfigurationReader configReader;
 
+	public TaggedFilterConfiguration() {
+		configReader = new YamlConfigurationReader();
+	}
+	
 	public TaggedFilterConfiguration(URL configurationPathAsResource) {
 		configReader = new YamlConfigurationReader(configurationPathAsResource);
 	}

@@ -43,6 +43,14 @@ public class YamlConfigurationReader  {
 		this.preserveWhitespace = preserveWhitespace;
 	}
 
+	/**
+	 * Default Tagged Configuration
+	 */
+	@SuppressWarnings("unchecked")
+	public YamlConfigurationReader() {		
+		config = (Map)Yaml.load("collapse_whitespace: false");		
+	}
+	
 	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(URL configurationPathAsResource) {		
 		try {
@@ -59,7 +67,6 @@ public class YamlConfigurationReader  {
 		try {
 			config = (Map)Yaml.load(new FileReader(configurationFile));
 		} catch (FileNotFoundException e) {
-			// TODO Create custom exception
 			throw new RuntimeException(e);
 		}		
 	}
