@@ -1906,7 +1906,7 @@ public class MainForm { //implements IParametersProvider {
 			// Call the dialog
 			updateCustomConfigurations();
 			InputPropertiesForm dlg = new InputPropertiesForm(shell, help, fcMapper, prj, prj.getProjectFolder());
-			dlg.setData(inp.filterSettings, inp.sourceEncoding, inp.targetEncoding, fcMapper);
+			dlg.setData(inp.filterConfigId, inp.sourceEncoding, inp.targetEncoding, fcMapper);
 			String[] aRes = dlg.showDialog();
 			if ( aRes == null ) return;
 
@@ -1918,7 +1918,7 @@ public class MainForm { //implements IParametersProvider {
 				for ( int i=0; i<indices.length; i++ ) {
 					inp = prj.getItemFromRelativePath(currentInput,
 						table.getItem(indices[i]).getText(0));
-					inp.filterSettings = aRes[0];
+					inp.filterConfigId = aRes[0];
 					inp.sourceEncoding = aRes[1];
 					inp.targetEncoding = aRes[2];
 				}
@@ -1926,7 +1926,7 @@ public class MainForm { //implements IParametersProvider {
 			else {
 				inp = prj.getItemFromRelativePath(currentInput,
 					table.getItem(index).getText(0));
-				inp.filterSettings = aRes[0];
+				inp.filterConfigId = aRes[0];
 				inp.sourceEncoding = aRes[1];
 				inp.targetEncoding = aRes[2];
 			}
@@ -1942,48 +1942,6 @@ public class MainForm { //implements IParametersProvider {
 		}
 	}
 
-/*	public IParameters createParameters (String location)
-		throws Exception
-	{
-		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
-			location);
-		IFilter filter = fa.loadFilter(aRes[1], null, null);
-		return filter.getParameters();
-	}
-
-	public IParameters load (String location)
-		throws Exception
-	{
-		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
-			location);
-		IFilter filter = fa.loadFilter(aRes[1], aRes[3], null);
-		return filter.getParameters();
-	}
-
-	public void save (String location,
-		IParameters paramsObject)
-		throws Exception
-	{
-		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
-			location);
-		paramsObject.save(aRes[3]);
-	}
-	
-	public boolean deleteParameters (String location) {
-		String[] aRes = FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(),
-			location);
-		File file = new File(aRes[3]);
-		return file.delete();
-	}
-
-	public String[] splitLocation (String location) {
-		return FilterAccess.splitFilterSettingsType1(prj.getParametersFolder(), location);
-	}
-zzz
-	public String[] getParametersList () {
-		return FilterAccess.getParametersList(prj.getParametersFolder());
-	}
-*/
 	private void openDocument (int index) {
 		try {
 			if ( currentInput == -1 ) return;

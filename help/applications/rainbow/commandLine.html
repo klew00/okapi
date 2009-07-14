@@ -57,17 +57,17 @@ arguments of the command-line as described in the following table:</p>
 		<td>No prompt for utility&#39;s options.</td>
 	</tr>
 	<tr>
-		<td nowrap align="left" valign="top"><code>&lt;inputFile&gt;[ -fs 
-		&lt;filterSettings&gt;]</code></td>
-		<td>Sets the input file, and optionally sets the filter settings to 
+		<td nowrap align="left" valign="top"><code>&lt;inputFile&gt;[ -fc 
+		&lt;filterConfiguration&gt;]</code></td>
+		<td>Sets the input file, and optionally sets the filter configuration to 
 		assign to it. You can specify an absolute or a local filename. The input 
 		file root is reset to the folder of the given input file. If a project 
 		was loaded, all input files in that projects are removed and the input 
 		file root reset.<br>
-		If you specify several input files (and their filter settings) the first 
+		If you specify several input files (and their filter configurations) the first 
 		one will be assigned to the input list 1, the second to the input list 
 		2, etc.<br>
-		If the filter settings is no specified in the command line, the default 
+		If the filter configuration is no specified in the command line, the default 
 		filter (if one can be found) is used.</td>
 	</tr>
 	<tr>
@@ -99,7 +99,7 @@ options are set in the options file named <code>myOptions.opt</code>. If that
 file does not exist, one will be created with the default options for the Text 
 Rewriting utility. In both cases the user will not be prompted to change the 
 options (<code>-np</code> parameter).</p>
-<pre>C:\&gt;java -jar \rnb\lib\rainbow.jar -x oku_transcomparison -sl EN -tl FR -pd . myHumanTrans.xlf myMachineTrans.txt -fs okf_regex@myText</pre>
+<pre>C:\&gt;java -jar \rnb\lib\rainbow.jar -x oku_transcomparison -sl EN -tl FR -pd . myHumanTrans.xlf myMachineTrans.txt -fc okf_regex@myText</pre>
 <p>The command-line above executes the Translation Comparison utility with the 
 source language set to <code>EN</code> and the target language set to <code>FR</code>. 
 The current folder (<code>.</code>) is specified as the parameters directory. 

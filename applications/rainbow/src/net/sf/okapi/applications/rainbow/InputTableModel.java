@@ -57,7 +57,7 @@ class InputTableModel {
 		for ( Input inp : inputList ) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(0, inp.relativePath);
-			item.setText(1, inp.filterSettings);
+			item.setText(1, inp.filterConfigId);
 		}
 		if ( selection == null ) {
 			if ( table.getItemCount() > 0 ) {

@@ -29,6 +29,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -207,10 +208,16 @@ public class Utility extends BaseFilterDrivenUtility {
     	// Do not process non-translatable text units
     	//TODO: Do we need to still make sure we have a target copy?
     	if ( !tu.isTranslatable() ) return;
+    	
+    	boolean approved = false;
+    	Property prop = tu.getTargetProperty(trgLang, Property.APPROVED);
+    	if ( prop != null ) {
+    		if ( "yes".equals(prop.getValue()) ) approved = true;
+    	}
 
     	TextContainer cont = null;
 		// Segment if requested
-		if (( params.preSegment ) && !"no".equals(tu.getProperty("canSegment")) ) {
+		if ( params.preSegment && !approved ) {
 			try {
 				cont = tu.getSource();
 				sourceSeg.computeSegments(cont);

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,6 +26,6 @@ public class Input {
 	public String format;
 	public String sourceEncoding;
 	public String targetEncoding;
-	public String filterSettings;
+	public String filterConfigId;
 
 }

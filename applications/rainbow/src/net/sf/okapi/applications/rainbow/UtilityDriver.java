@@ -184,7 +184,7 @@ public class UtilityDriver implements CancelListener {
 				// Initialize the main input
 				utility.resetLists();
 				String inputPath = prj.getInputRoot(0) + File.separator + item.relativePath;
-				utility.addInputData(inputPath, prj.buildSourceEncoding(item), item.filterSettings);
+				utility.addInputData(inputPath, prj.buildSourceEncoding(item), item.filterConfigId);
 				// Initialize the main output
 				String outputPath = prj.buildTargetPath(0, item.relativePath);
 				utility.addOutputData(outputPath, prj.buildTargetEncoding(item));
@@ -201,7 +201,7 @@ public class UtilityDriver implements CancelListener {
 						utility.addInputData(
 							prj.getInputRoot(j) + File.separator + addItem.relativePath,
 							prj.buildSourceEncoding(addItem),
-							addItem.filterSettings);
+							addItem.filterConfigId);
 						// Output
 						utility.addOutputData(
 							prj.buildTargetPath(j, addItem.relativePath),

@@ -129,7 +129,7 @@ public class Project {
 		Input inp = new Input();
 		inp.sourceEncoding = ((sourceEncoding == null) ? "" : sourceEncoding); //$NON-NLS-1$
 		inp.targetEncoding = ((targetEncoding == null) ? "" : targetEncoding); //$NON-NLS-1$
-		inp.filterSettings = ((filterSettings == null) ? "" : filterSettings); //$NON-NLS-1$
+		inp.filterConfigId = ((filterSettings == null) ? "" : filterSettings); //$NON-NLS-1$
 		inp.relativePath = newPath;
 		inputLists.get(listIndex).add(inp);
 		isModified = true;
@@ -182,7 +182,7 @@ public class Project {
 				writer.writeEndElement(); // root
 				for ( Input item : inputList ) {
 					writer.writeStartElement("fi"); //$NON-NLS-1$
-					writer.writeAttributeString("fs", item.filterSettings); //$NON-NLS-1$
+					writer.writeAttributeString("fs", item.filterConfigId); //$NON-NLS-1$
 					writer.writeAttributeString("fo", item.format); //$NON-NLS-1$
 					writer.writeAttributeString("se", item.sourceEncoding); //$NON-NLS-1$
 					writer.writeAttributeString("te", item.targetEncoding); //$NON-NLS-1$
@@ -305,7 +305,7 @@ public class Project {
 				for ( int j=0; j<n2.getLength(); j++ ) {
 					elem2 = (Element)n2.item(j);
 					item = new Input();
-					item.filterSettings = elem2.getAttribute("fs"); //$NON-NLS-1$
+					item.filterConfigId = elem2.getAttribute("fs"); //$NON-NLS-1$
 					item.format = elem2.getAttribute("fo"); //$NON-NLS-1$
 					item.sourceEncoding = elem2.getAttribute("se"); //$NON-NLS-1$
 					item.targetEncoding = elem2.getAttribute("te"); //$NON-NLS-1$

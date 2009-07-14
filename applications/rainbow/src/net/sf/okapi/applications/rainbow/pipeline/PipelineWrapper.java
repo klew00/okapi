@@ -351,7 +351,7 @@ public class PipelineWrapper {
 			inpURI = (new File(prj.getInputRoot(0) + File.separator + item.relativePath)).toURI();
 			rawDoc = new RawDocument(inpURI, prj.buildSourceEncoding(item),
 				prj.getSourceLanguage(), prj.getTargetLanguage());
-			rawDoc.setFilterConfigId(item.filterSettings);
+			rawDoc.setFilterConfigId(item.filterConfigId);
 			bic = new BatchItemContext(rawDoc, outURI, prj.buildTargetEncoding(item));
 			
 			// Add input/output data from other input lists if requested
@@ -367,7 +367,7 @@ public class PipelineWrapper {
 					inpURI = (new File(prj.getInputRoot(j) + File.separator + item2.relativePath)).toURI();
 					rawDoc = new RawDocument(inpURI, prj.buildSourceEncoding(item),
 						prj.getSourceLanguage(), prj.getTargetLanguage());
-					rawDoc.setFilterConfigId(item2.filterSettings);
+					rawDoc.setFilterConfigId(item2.filterConfigId);
 					bic.add(rawDoc, outURI, prj.buildTargetEncoding(item2));
 				}
 				// Else: don't add anything

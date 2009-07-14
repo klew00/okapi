@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.packages;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -30,6 +31,7 @@ import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -296,7 +298,8 @@ public abstract class BaseWriter implements IWriter {
 			if ( !done ) {
 				ScoresAnnotation scores = tu.getTarget(trgLang).getAnnotation(ScoresAnnotation.class);
 				if ( scores != null ) {
-					tmxWriterTM.writeItem(tu, null);
+					writeScoredItem(tu, scores);
+					//was: tmxWriterTM.writeItem(tu, null);
 				}
 				else {
 					tmxWriterUnApproved.writeItem(tu, null);
@@ -310,9 +313,48 @@ public abstract class BaseWriter implements IWriter {
 			alt.startIteration();
 			while ( alt.moveToNext() ) {
 				TextUnit altTu = alt.getEntry();
-				tmxWriterAlternate.writeItem(altTu, null);
+				tmxWriterAlternate.writeItem(altTu, null, true);
 			}
 		}
+	}
+
+	private void writeScoredItem (TextUnit item,
+		ScoresAnnotation scores)
+	{
+		String tuid = item.getName();
+		TextContainer srcTC = item.getSource();
+		TextContainer trgTC = item.getTarget(trgLang);
+
+		if ( !srcTC.isSegmented() ) { // Source is not segmented
+			if ( scores.getScore(0) == 100 ) {
+				tmxWriterApproved.writeTU(srcTC, trgTC, tuid, null);
+			}
+			else if ( scores.getScore(0) > 0 ) {
+				tmxWriterTM.writeTU(srcTC, trgTC, tuid, null);
+			}
+			// Else: skip score of 0
+		}
+		else if ( trgTC.isSegmented() ) { // Source AND target are segmented
+			// Write the segments
+			List<Segment> srcList = srcTC.getSegments();
+			List<Segment> trgList = trgTC.getSegments();
+			for ( int i=0; i<srcList.size(); i++ ) {
+				if ( scores.getScore(i) == 100 ) {
+					tmxWriterApproved.writeTU(srcList.get(i).text,
+						(i>trgList.size()-1) ? null : trgList.get(i).text,
+						String.format("%s_s%02d", tuid, i+1),
+						null);
+				}
+				else if ( scores.getScore(i) > 0 ) {
+					tmxWriterTM.writeTU(srcList.get(i).text,
+						(i>trgList.size()-1) ? null : trgList.get(i).text,
+						String.format("%s_s%02d", tuid, i+1),
+						null);
+				}
+			}
+			// Else: skip score of 0
+		}
+		// Else no TMX output needed for source segmented but not target
 	}
 
 }

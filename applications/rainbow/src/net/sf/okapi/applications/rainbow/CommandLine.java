@@ -129,13 +129,13 @@ public class CommandLine {
 			else if ( "-opt".equals(arg) ) { //$NON-NLS-1$
 				optionsFile = nextArg(args, ++i);
 			}
-			else if ( "-fs".equals(arg) ) { //$NON-NLS-1$
+			else if ( "-fc".equals(arg) ) { //$NON-NLS-1$
 				Input inp = prj.getLastItem(inpList);
 				if ( inp == null ) { 
 					throw new RuntimeException(Res.getString("CommandLine.fsBeforeInputError")); //$NON-NLS-1$
 				}
 				else {
-					inp.filterSettings = nextArg(args, ++i);
+					inp.filterConfigId = nextArg(args, ++i);
 				}
 			}
 			else if ( "-o".equals(arg) ) { // Output file //$NON-NLS-1$
