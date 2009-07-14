@@ -75,9 +75,9 @@ public class Okapi_GUI_Tester {
 			net.sf.okapi.filters.ui.openoffice.Editor.class.getName(),
 			net.sf.okapi.filters.ui.po.Editor.class.getName(),
 			net.sf.okapi.filters.ui.properties.Editor.class.getName(),
-			net.sf.okapi.ui.filters.openxml.Editor.class.getName(),
+			net.sf.okapi.ui.filters.abstractmarkup.Editor.class.getName(),
+			//net.sf.okapi.ui.filters.openxml.Editor.class.getName(),
 			net.sf.okapi.filters.ui.regex.Editor.class.getName(),
-			
 			net.sf.okapi.steps.ui.bomconversion.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.ui.charlisting.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.ui.encodingconversion.ParametersEditor.class.getName(),
