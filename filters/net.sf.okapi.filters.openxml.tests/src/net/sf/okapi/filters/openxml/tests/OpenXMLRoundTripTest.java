@@ -39,7 +39,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
-import net.sf.okapi.ui.filters.openxml.Editor;
+//import net.sf.okapi.ui.filters.openxml.Editor;
 
 import org.junit.Test;
 
@@ -197,8 +197,8 @@ public class OpenXMLRoundTripTest {
 	private ConditionalParameters getParametersFromUserInterface()
 	{
 		ConditionalParameters parms;
-		parms = (new Editor()).getParametersFromUI(new ConditionalParameters());
-//		parms = new ConditionalParameters();
+//		parms = (new Editor()).getParametersFromUI(new ConditionalParameters());
+		parms = new ConditionalParameters();
 		return parms;
 	}
 }
