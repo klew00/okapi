@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.html;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
@@ -47,12 +49,12 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.abstractmarkup.AbstractBaseMarkupFilter;
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 public class HtmlFilter extends AbstractBaseMarkupFilter {
 
 	private static final Logger LOGGER = Logger.getLogger(HtmlFilter.class.getName());
-	private static final String DEFAULT_PARAMETERS = "defaultConfiguration.yml";
 	
 	/*
 	 * HTML whitespace space (U+0020) tab (U+0009) form feed (U+000C) line feed
@@ -63,13 +65,14 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 	private static final Pattern HTML_WHITESPACE_PATTERN = Pattern.compile(HTML_WHITESPACE_REGEX);
 
 	private StringBuilder bufferedWhitespace;
+	private Parameters parameters;
 
 	public HtmlFilter() {
 		super();
 		bufferedWhitespace = new StringBuilder();
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
-		setDefaultConfig(HtmlFilter.class.getResource(DEFAULT_PARAMETERS));
+		setParameters(new Parameters());
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
@@ -79,18 +82,18 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			getClass().getName(),
 			"HTML/XHTML",
 			"HTML and XHTML documents",
-			DEFAULT_PARAMETERS));
+			Parameters.getDefualtParameterFile()));
 		return list;
 	}
 
 	/**
-	 * Initialize parameters, rule state and parser. Called before processing of
+	 * Initialize rule state and parser. Called before processing of
 	 * each input.
 	 */
 	@Override
 	protected void startFilter() {
 		super.startFilter();
-		setPreserveWhitespace(false);
+		setPreserveWhitespace(false);		
 		if (getConfig().collapseWhitespace()) {
 			LOGGER.log(Level.FINE,
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration");
@@ -550,7 +553,55 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		return false;
 	}
 
-	public static URL getDefaultParameters() {
-		return HtmlFilter.class.getResource(DEFAULT_PARAMETERS);
+	@Override
+	protected TaggedFilterConfiguration getConfig() {
+		return parameters.getTaggedConfig();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common
+	 * .IParameters)
+	 */
+	public void setParameters(IParameters params) {
+		this.parameters = (Parameters) params;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
+	 */
+	public IParameters getParameters() {		
+		return parameters;
+	}
+	
+	/**
+	 * Initialize filter parameters from a URL.
+	 * 
+	 * @param config
+	 */
+	public void setParametersFromURL(URL config) {
+		parameters = new Parameters(config);
+	}
+
+	/**
+	 * Initialize filter parameters from a Java File.
+	 * 
+	 * @param config
+	 */
+	public void setParametersFromFile(File config) {
+		parameters = new Parameters(config);
+	}
+
+	/**
+	 * Initialize filter parameters from a String.
+	 * 
+	 * @param config
+	 */
+	public void setParametersFromString(String config) {
+		parameters = new Parameters(config);
 	}
 }

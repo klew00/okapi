@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.abstractmarkup;
+package net.sf.okapi.filters.html;
 
 import java.io.File;
 import java.net.URL;
@@ -32,6 +32,12 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
  * 
  */
 public class Parameters extends BaseParameters {
+	private static final String DEFAULT_PARAMETERS = "defaultConfiguration.yml";
+
+	public static String getDefualtParameterFile() {
+		return DEFAULT_PARAMETERS;
+	}
+
 	private TaggedFilterConfiguration taggedConfig;
 
 	public Parameters() {
@@ -69,8 +75,8 @@ public class Parameters extends BaseParameters {
 	 * 
 	 * @see net.sf.okapi.common.IParameters#reset()
 	 */
-	public void reset() {
-		taggedConfig = new TaggedFilterConfiguration();
+	public void reset() {		
+		taggedConfig = new TaggedFilterConfiguration(HtmlFilter.class.getResource(DEFAULT_PARAMETERS));
 	}
 
 	public TaggedFilterConfiguration getTaggedConfig() {
@@ -82,5 +88,5 @@ public class Parameters extends BaseParameters {
 	 */
 	public void setTaggedConfig(TaggedFilterConfiguration taggedConfig) {
 		this.taggedConfig = taggedConfig;
-	}
+	}	
 }

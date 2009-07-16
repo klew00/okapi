@@ -21,11 +21,9 @@
 package net.sf.okapi.filters.abstractmarkup;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -51,7 +49,6 @@ import net.htmlparser.jericho.Tag;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -88,9 +85,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 
 	private StreamedSource document;
 	private ExtractionRuleState ruleState;
-	private Parameters parameters;
 	private Iterator<Segment> nodeIterator;
-	private URL defaultConfig;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
 
@@ -107,17 +102,6 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		super();
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
-	 */
-	public IParameters getParameters() {
-		if (parameters == null)
-			return new Parameters(defaultConfig);
-		return parameters;
 	}
 
 	/**
@@ -146,26 +130,12 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * 
 	 * @return a {@link TaggedFilterConfiguration}
 	 */
-	public TaggedFilterConfiguration getConfig() {
-		return parameters.getTaggedConfig();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common
-	 * .IParameters)
-	 */
-	public void setParameters(IParameters params) {
-		this.parameters = (Parameters) params;
-	}
+	abstract protected TaggedFilterConfiguration getConfig();
 
 	/**
 	 * Close the filter and all used resources.
 	 */
-	public void close() {
-		this.parameters = null;
+	public void close() {		
 		try {
 			if (document != null) {
 				document.close();
@@ -278,53 +248,13 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 */
 	@Override
 	protected void startFilter() {
-		super.startFilter();
-
-		if (parameters == null) {
-			parameters = new Parameters(defaultConfig);
-		}
+		super.startFilter();		
 
 		// Segment iterator
 		ruleState = new ExtractionRuleState();
 
 		// This optimizes memory at the expense of performance
 		nodeIterator = document.iterator();
-	}
-
-	/**
-	 * Set the default config file as URL.
-	 * 
-	 * @param classPathToConfig
-	 */
-	protected void setDefaultConfig(URL classPathToConfig) {
-		this.defaultConfig = classPathToConfig;
-	}
-
-	/**
-	 * Initialize filter parameters from a URL.
-	 * 
-	 * @param config
-	 */
-	public void setParametersFromURL(URL config) {
-		parameters = new Parameters(config);
-	}
-
-	/**
-	 * Initialize filter parameters from a Java File.
-	 * 
-	 * @param config
-	 */
-	public void setParametersFromFile(File config) {
-		parameters = new Parameters(config);
-	}
-
-	/**
-	 * Initialize filter parameters from a String.
-	 * 
-	 * @param config
-	 */
-	public void setParametersFromString(String config) {
-		parameters = new Parameters(config);
 	}
 
 	/**
