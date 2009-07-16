@@ -288,6 +288,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	      int i,n;
 	      boolean bIntag=false,bGotname=false,bInap=false,bHavr1=false;
 	      boolean bInsideTextMarkers=false,bInr=false,bB4text=true,bInInnerR=false;
+	      boolean bInsideNastyTextBox=false; // DWH 7-16-09
 	      public void run()
 	      {
 	        try
@@ -367,7 +368,20 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	    	  String tug=snug; // DWH 5-16-09
 	    	  String b4text; // DWH 5-20-09
 	    	  boolean bCollapsing=false; // DWH 5-22-09
-	    	  if (tugname.equals("w:p") || tugname.equals("a:p"))
+	    	  if (bInsideNastyTextBox) // DWH 7-16-09 ignore textboxes but still remove rsids
+	    	  {
+		    	  if (tugname.equals("/v:textbox")) // DWH 7-16-09 ignore textboxes
+		    		  bInsideNastyTextBox = false;
+		    	  else
+		    		  tug = killRevisionIDsAndErrs(snug);
+	    		  innanar(tug);
+	    	  }
+	    	  else if (tugname.equals("v:textbox")) // DWH 7-16-09 ignore textboxes
+	    	  {
+	    		  bInsideNastyTextBox = true;
+	    		  innanar(tug);
+	    	  }
+	    	  else if (tugname.equals("w:p") || tugname.equals("a:p"))
 	    	  {
 	    		  tug = killRevisionIDsAndErrs(snug);
 	    		  onp = tug;
@@ -596,7 +610,9 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	      }
 	      private void havtext(String curtext)
 	      {
-	    	  if (bInap)
+	    	  if (bInsideNastyTextBox) // DWH 7-16-09 ignore textboxes and the text inside them
+	    		  innanar(curtext);
+	    	  else if (bInap)
 	    	  {
 		    	  if (bInInnerR || !bInsideTextMarkers)
 		    	  {
@@ -712,7 +728,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		// if in excluded state everything is skeleton including text
 		if (getRuleState().isExludedState()) {
 			if (bInEmbeddedTextUnit) // DWH 6-29-09
-				addToTextRun(txt);
+			{
+				if (bInTextRun) // DWH 7-16-09
+					addToTextRun(txt);
+				else
+					addToNonTextRun(txt); // DWH 7-16-09
+			}
 			else
 				addToDocumentPart(txt);
 			return;
@@ -1012,7 +1033,10 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			if (sTagElementType.equals("textbox") && !canStartNewTextUnit()) // DWH 6-29-09 for text box: embedded text unit
 			{
 				getRuleState().pushExcludedRule(sTagName); // exclude the embedded text unit for now
-				addToDocumentPart(sTagString);
+				if (bInTextRun) // DWH 4-10-09
+					addToTextRun(sTagString);
+				else
+					addToNonTextRun(sTagString); // DWH 5-5-09
 				bInEmbeddedTextUnit = true;
 				break;
 			}
@@ -1137,10 +1161,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 					getRuleState().popExcludedIncludedRule();
 					bInEmbeddedTextUnit = false;
 				}
-				addToTextRun(sTagString);
+				if (bInTextRun) // DWH 4-10-09
+					addToTextRun(sTagString); // DWH 7-16-09
+				else
+					addToNonTextRun(sTagString); // DWH 7-16-09
 				return;
 			}
-			addToDocumentPart(endTag.toString());
+			addToDocumentPart(sTagString); // DWH 7-16-09
 			// process these tag types to update parser state
 			switch (getConfig().getMainRuleType(sTagName)) {
 			  // DWH 1-23-09
