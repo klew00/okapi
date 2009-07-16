@@ -47,6 +47,10 @@ filetype:
 'm:t':
   ruleTypes: [TEXTMARKER]
 
+'v:textbox':
+  ruleTypes: [TEXTUNIT]
+  elementType: textbox
+
 'w:p':
   ruleTypes: [TEXTUNIT]
 

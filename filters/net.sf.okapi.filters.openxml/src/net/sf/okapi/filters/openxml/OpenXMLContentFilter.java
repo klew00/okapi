@@ -54,6 +54,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.filters.abstractmarkup.AbstractBaseMarkupFilter;
 import net.sf.okapi.filters.abstractmarkup.Parameters;
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
@@ -133,6 +134,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private boolean bInMainFile = false; // DWH 4-15-09
 	private boolean bExcludeTextInRun = false; // DWH 5-27-09
 	private boolean bExcludeTextInUnit = false; // DWH 5-29-09
+	private boolean bInEmbeddedTextUnit = false; // DWH 6-29-09
 	private String sCurrentCharacterStyle = ""; // DWH 5-27-09
 	private String sCurrentParagraphStyle = ""; // DWH 5-27-09
 	private boolean bPreferenceTranslateWordHidden = false; // DWH 6-29-09
@@ -709,7 +711,10 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 		// if in excluded state everything is skeleton including text
 		if (getRuleState().isExludedState()) {
-			addToDocumentPart(txt);
+			if (bInEmbeddedTextUnit) // DWH 6-29-09
+				addToTextRun(txt);
+			else
+				addToDocumentPart(txt);
 			return;
 		}
 		// check for need to modify index in Excel cell pointing to a shared string
@@ -863,7 +868,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	@Override
 	protected void handleStartTag(StartTag startTag) {
 		String sTagName;
-		String sTagString; // DWH 2-26-09
+		String sTagString;
 		String sPartName; // DWH 2-26-09 for PartName attribute in [Content_Types].xml
 		String sContentType; // DWH 2-26-09 for ContentType attribute in [Content_Types].xml
 		// if in excluded state everything is skeleton including text
@@ -880,6 +885,11 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		sTagString = startTag.toString(); // DWH 2-26-09
 		sTagElementType = getConfig().getElementType(sTagName); // DWH 6-13-09
 		if (getRuleState().isExludedState()) {
+			if (bInEmbeddedTextUnit)
+			{
+				addToTextRun(sTagString); //DWH 6-29-09
+				return;
+			}
 			addToDocumentPart(sTagString);
 			// process these tag types to update parser state
 			switch (getConfig().getMainRuleType(sTagName)) {
@@ -999,6 +1009,15 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			addToDocumentPart(sTagString);
 			break;
 		case TEXT_UNIT_ELEMENT:
+			if (sTagElementType.equals("textbox") && !canStartNewTextUnit()) // DWH 6-29-09 for text box: embedded text unit
+			{
+				getRuleState().pushExcludedRule(sTagName); // exclude the embedded text unit for now
+				addToDocumentPart(sTagString);
+				bInEmbeddedTextUnit = true;
+				break;
+			}
+			else if (!canStartNewTextUnit())
+				bInEmbeddedTextUnit = (!(!bInEmbeddedTextUnit));
 			bExcludeTextInUnit = false; // DWH 5-29-09 only exclude text if specific circumstances occur
 			addNonTextRunToCurrentTextUnit(); // DWH 5-5-09 trNonTextRun should be null at this point
 			bBeforeFirstTextRun = true; // DWH 5-5-09 addNonTextRunToCurrentTextUnit sets it false
@@ -1109,6 +1128,18 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 		sTagString = endTag.toString(); // DWH 2-26-09
 		if (getRuleState().isExludedState()) {
+			if (bInEmbeddedTextUnit)
+			{
+				if (sTagElementType.equals("textbox") &&
+					(getConfig().getMainRuleType(sTagName)==RULE_TYPE.TEXT_UNIT_ELEMENT))
+					  // 6-29-09 should keep embedded text unit for dying for now
+				{
+					getRuleState().popExcludedIncludedRule();
+					bInEmbeddedTextUnit = false;
+				}
+				addToTextRun(sTagString);
+				return;
+			}
 			addToDocumentPart(endTag.toString());
 			// process these tag types to update parser state
 			switch (getConfig().getMainRuleType(sTagName)) {
@@ -1198,7 +1229,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				bInTextRun = false;
 			} // otherwise this is an illegal element, so just ignore it
 			addNonTextRunToCurrentTextUnit(); // DWH 5-5-09
-			bBetweenTextMarkers = true; // DWH 4-16-09
+			bBetweenTextMarkers = true; // DWH 4-16-09 ???
 			getRuleState().popTextUnitRule();
 			endTextUnit(new GenericSkeleton(sTagString));
 			break;
