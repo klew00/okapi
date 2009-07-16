@@ -51,7 +51,7 @@ import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState;
-import net.sf.okapi.filters.abstractmarkup.Parameters;
+//import net.sf.okapi.filters.abstractmarkup.Parameters;
 //import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
@@ -69,7 +69,7 @@ public class ExcelAnalyzer
 	private TreeMap<Integer,Point> tmCells;	
 	private TreeSet<String> tsColors;
 	private ExtractionRuleState ruleState;
-	private Parameters parameters;
+	private YamlParameters parameters; // DWH 7-16-09
 	private Iterator<Segment> nodeIterator;
 	private StreamedSource document;
 	private RawDocument input;
@@ -426,7 +426,7 @@ public class ExcelAnalyzer
 		{
 			is = zipFile.getInputStream(entry);
 			URL urlConfig = OpenXMLContentFilter.class.getResource("/net/sf/okapi/filters/openxml/excelConfiguration.yml");
-			parameters = new Parameters(urlConfig);
+			parameters = new YamlParameters(urlConfig); // DWH 7-16-09
 			ruleState = new ExtractionRuleState();
 			document = new StreamedSource(new InputStreamReader(is,"UTF-8"));
 			nodeIterator = document.iterator();
@@ -441,7 +441,7 @@ public class ExcelAnalyzer
 	{
 		try {			
 			URL urlConfig = OpenXMLContentFilter.class.getResource("/net/sf/okapi/filters/openxml/excelStylesConfiguration.yml"); // DWH 3-9-09
-			parameters = new Parameters(urlConfig);
+			parameters = new YamlParameters(urlConfig); // DWH 7-16-09
 			ruleState = new ExtractionRuleState();
 			is = zipFile.getInputStream(ntry);
 			document = new StreamedSource(new InputStreamReader(is));

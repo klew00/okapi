@@ -56,7 +56,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
-import net.sf.okapi.filters.abstractmarkup.Parameters;
+//import net.sf.okapi.filters.abstractmarkup.Parameters;
 
 /**
  * <p>Filters Microsoft Office Word, Excel, and Powerpoint Documents.
@@ -663,7 +663,7 @@ public class OpenXMLFilter implements IFilter {
 				LOGGER.log(Level.FINER,"\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (net.sf.okapi.filters.abstractmarkup.Parameters)openXMLContentFilter.getParameters();
+				params = (YamlParameters)openXMLContentFilter.getParameters();
 					// DWH 6-15-09 fully specified Parameters
 				Event ually = openSubDocument(true); // DWH 6-25-09 save the event
 				resetExcel(); // DWH 6-25-09 if Excel and excluding colors or columns, start through zips again if done with worksheets
@@ -707,7 +707,7 @@ public class OpenXMLFilter implements IFilter {
 				else
 					nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (net.sf.okapi.filters.abstractmarkup.Parameters)openXMLContentFilter.getParameters();
+				params = (YamlParameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
 				LOGGER.log(Level.FINER,"<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				Event ually = openSubDocument(false); // DWH 6-25-09 save the event
@@ -717,7 +717,7 @@ public class OpenXMLFilter implements IFilter {
 			else {
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (net.sf.okapi.filters.abstractmarkup.Parameters)openXMLContentFilter.getParameters();
+				params = (YamlParameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
 				DocumentPart dp = new DocumentPart(entry.getName(), false);
 				ZipSkeleton skel = new ZipSkeleton(entry);
@@ -746,7 +746,7 @@ public class OpenXMLFilter implements IFilter {
 		BufferedInputStream bis; // DWH 3-5-09
 		InputStream isInputStream;
 		openXMLContentFilter.close(); // Make sure the previous is closed
-		openXMLContentFilter.setParameters((net.sf.okapi.filters.abstractmarkup.Parameters)params);
+		openXMLContentFilter.setParameters((YamlParameters)params); // DWH 7-16-09 YamlParameters
 		//YS openXMLContentFilter.setOptions(srcLang, "UTF-8", true);
 		Event event;
 		try

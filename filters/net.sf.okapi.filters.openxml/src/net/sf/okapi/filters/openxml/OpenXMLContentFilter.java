@@ -50,10 +50,11 @@ import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.filters.abstractmarkup.AbstractBaseMarkupFilter;
-import net.sf.okapi.filters.abstractmarkup.Parameters;
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
@@ -116,7 +117,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 
 	private int configurationType;
-	private Package p=null;
+//	private Package p=null;
 	private int filetype=MSWORD; // DWH 4-13-09
 	private String sConfigFileName; // DWH 10-15-08
 	private URL urlConfig; // DWH 3-9-09
@@ -152,6 +153,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private int nNextSharedStringCount=0; // DWH 6-13-09
 	private int nCurrentSharedString=-1; // DWH 6-13-09 if nonzero, text may be excluded from translation
 	private String sCurrentExcelSheet=""; // DWH 6-25-09 current sheet number
+	private YamlParameters params=null; // DWH 7-16-09
+	private TaggedFilterConfiguration config=null; // DWH 7-16-09
 	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
@@ -242,10 +245,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				break;
 		}
 		urlConfig = OpenXMLContentFilter.class.getResource(sConfigFileName); // DWH 3-9-09
-		setDefaultConfig(urlConfig); // DWH 3-9-09
+		config = new TaggedFilterConfiguration(urlConfig);
+//		setDefaultConfig(urlConfig); // DWH 7-16-09 no longer needed; AbstractMarkup now calls getConfig everywhere
 		try
 		{
-			setParameters(new Parameters(urlConfig)); // DWH 3-9-09 it doesn't update automatically from setDefaultConfig
+			setParameters(new YamlParameters(urlConfig));
+			  // DWH 3-9-09 it doesn't update automatically from setDefaultConfig 7-16-09 YamlParameters
 		}
 		catch(Exception e)
 		{
@@ -1803,5 +1808,19 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 		}
 		return rslt;
+	}
+
+	@Override
+	protected TaggedFilterConfiguration getConfig() {
+		return config; // this may be bad if AbstractMarkup calls it too soon !!!!
+	}
+
+	public IParameters getParameters() { // DWH 7-16-09
+		// TODO Auto-generated method stub
+		return params;
+	}
+
+	public void setParameters(IParameters params) { // DWH 7-16-09
+		this.params = (YamlParameters)params;
 	}
 }

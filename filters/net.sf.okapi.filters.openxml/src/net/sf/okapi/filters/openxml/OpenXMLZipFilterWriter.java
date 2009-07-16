@@ -45,7 +45,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
-import net.sf.okapi.filters.abstractmarkup.Parameters;
+//import net.sf.okapi.filters.abstractmarkup.Parameters;
 
 /**
  * <p>Implements the IFilterWriter interface for the OpenXMLFilter, which
@@ -75,7 +75,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	private IFilterWriter subDocWriter;
 	private File tempFile;
 	private File tempZip;
-	private net.sf.okapi.filters.abstractmarkup.Parameters params; // DWH 4-13-09
+	private YamlParameters params; // DWH 7-16-09
 	private static final Logger LOGGER = Logger.getLogger(OpenXMLZipFilterWriter.class.getName());
 
 	/**
@@ -366,11 +366,11 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 			throw new OkapiIOException("Error closing zip output file.");
 		}
 	}
-	public void setParameters(IParameters params)
+	public void setParameters(IParameters params) // DWH 7-16-09
 	{
-		this.params = (net.sf.okapi.filters.abstractmarkup.Parameters)params;
+		this.params = (YamlParameters)params;
 	}
-	public Parameters getParameters()
+	public YamlParameters getParameters() // DWH 7-16-09
 	{
 		return params;
 	}
