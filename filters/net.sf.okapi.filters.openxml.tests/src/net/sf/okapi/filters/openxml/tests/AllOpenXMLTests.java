@@ -31,7 +31,7 @@ import junit.framework.Test;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses({OpenXMLRoundTripTest.class, OpenXMLSnippetsTest.class, OpenXMLZipFullFileTest.class, 
+@SuiteClasses({OpenXMLRoundTripTest.class, OpenXMLRoundTripSequenceTest.class, OpenXMLSnippetsTest.class, OpenXMLZipFullFileTest.class, 
     OpenXMLConfigurationTest.class})
 public class AllOpenXMLTests {
 

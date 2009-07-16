@@ -40,7 +40,7 @@ import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 // Comment the following to remove the parameter UI $$$
-import net.sf.okapi.ui.filters.openxml.Editor;
+//import net.sf.okapi.ui.filters.openxml.Editor;
 
 import org.junit.Test;
 
@@ -163,8 +163,8 @@ public class OpenXMLRoundTripSequenceTest {
 	{
 		ConditionalParameters parms;
 //    Choose the first to get the UI $$$
-		parms = (new Editor()).getParametersFromUI(new ConditionalParameters());
-//		parms = new ConditionalParameters();
+//		parms = (new Editor()).getParametersFromUI(new ConditionalParameters());
+		parms = new ConditionalParameters();
 		return parms;
 	}
 }

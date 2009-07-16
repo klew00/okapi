@@ -39,6 +39,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
+// Comment the following to remove the parameter UI $$$
 //import net.sf.okapi.ui.filters.openxml.Editor;
 
 import org.junit.Test;
@@ -64,6 +65,7 @@ public class OpenXMLRoundTripTest {
 	private static Logger LOGGER = Logger.getLogger(OpenXMLRoundTripTest.class.getName());
 	private boolean allGood=true;
 	private ConditionalParameters cparams; // DWH 6-18-09
+	private boolean bSquishy=true; // DWH 7-16-09
 
 	@Test
 	public void runTest () {
@@ -89,7 +91,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("OpenXML_text_reference_v1_2.docx");
 		themfiles.add("Mauris.docx");
 		themfiles.add("Hidden.docx");
-//		themfiles.add("TestDako2.docx");
+		themfiles.add("TestDako2.docx");
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
@@ -147,8 +149,8 @@ public class OpenXMLRoundTripTest {
 //				filly = new File(sInputPath+filename);
 //				bis = new BufferedInputStream(new FileInputStream(filly));
 //				filter.open(new RawDocument(bis,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 6-09-09			
-//				filter.open(new RawDocument(uri,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 3-27-09
-				filter.open(new RawDocument(uri,"UTF-8","en-US"),true,true,Level.FINEST); // DWH 5-16-09 squish
+
+				filter.open(new RawDocument(uri,"UTF-8","en-US"),true,bSquishy,Level.FINEST); // DWH 7-16-09 squishiness
 			}
 			catch(Exception e)
 			{
@@ -197,6 +199,7 @@ public class OpenXMLRoundTripTest {
 	private ConditionalParameters getParametersFromUserInterface()
 	{
 		ConditionalParameters parms;
+//    Choose the first to get the UI $$$
 //		parms = (new Editor()).getParametersFromUI(new ConditionalParameters());
 		parms = new ConditionalParameters();
 		return parms;
