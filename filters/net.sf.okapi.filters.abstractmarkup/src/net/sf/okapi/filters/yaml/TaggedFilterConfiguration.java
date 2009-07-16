@@ -12,6 +12,8 @@ import java.util.regex.PatternSyntaxException;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Defines extraction rules useful for markup languages such as HTML and XML.
@@ -37,7 +39,7 @@ import net.sf.okapi.common.resource.Code;
  * any element. May be translatable or localizable.
  * <p>
  * TEXT UNIT - Elements whose start and end tags become part of a
- * {@link TextUnit} rather than {@link SkeletonUnit}.
+ * {@link TextUnit} rather than {@link DocumentPart}.
  * <p>
  * TEXT RUN - Elements which group together a common run of inline elements. For
  * example, a style marker in OpenXML.
@@ -45,9 +47,9 @@ import net.sf.okapi.common.resource.Code;
  * TEXT MARKER - Elements which immediately surround text.
  * <p>
  * Any of the above rules may have conditional rules based on attribute names
- * and/or values. Conditional rules ({@link ConditionalAttributeRule}) may be
- * attached to both elements and attributes. More than one conditional rules are
- * evaluated as OR expressions. For example, "type=button" OR "type=default".
+ * and/or values. Conditional rules may be attached to both elements and
+ * attributes. More than one conditional rules are evaluated as OR expressions.
+ * For example, "type=button" OR "type=default".
  */
 public class TaggedFilterConfiguration {
 	private static final String COLLAPSE_WHITSPACE = "collapse_whitespace";
@@ -81,7 +83,7 @@ public class TaggedFilterConfiguration {
 	public TaggedFilterConfiguration() {
 		configReader = new YamlConfigurationReader();
 	}
-	
+
 	public TaggedFilterConfiguration(URL configurationPathAsResource) {
 		configReader = new YamlConfigurationReader(configurationPathAsResource);
 	}
