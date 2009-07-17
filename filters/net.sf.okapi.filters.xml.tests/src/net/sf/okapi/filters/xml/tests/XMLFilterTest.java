@@ -99,11 +99,11 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testSimpleEntities () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r"
 			+ "<!DOCTYPE doc ["
-			+ "<!ENTITY aWithRingAndAcute '&#x01fb;'>\n"
-			+ "<!ENTITY text 'TEXT'>\n"
-			+ "]>\n"
+			+ "<!ENTITY aWithRingAndAcute '&#x01fb;'>\r"
+			+ "<!ENTITY text 'TEXT'>\r"
+			+ "]>\r"
 			+ "<doc>"
 			+ "<p>&aWithRingAndAcute;=e1</p>"
 			+ "<p>&text;=e2</p>"

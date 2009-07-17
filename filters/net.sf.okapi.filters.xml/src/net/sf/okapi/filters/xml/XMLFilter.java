@@ -323,7 +323,7 @@ public class XMLFilter implements IFilter {
 		// Add the internal sub-set if there is any
 		if ( dt.getInternalSubset() != null ) {
 			tmp.append(" [");
-			tmp.append(dt.getInternalSubset());
+			tmp.append(dt.getInternalSubset().replace("\n", lineBreak));
 			tmp.append("]");
 		}
 		
