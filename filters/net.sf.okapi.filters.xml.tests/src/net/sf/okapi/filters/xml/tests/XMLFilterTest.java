@@ -56,6 +56,43 @@ public class XMLFilterTest {
 	}
 
 	@Test
+	public void testSimpleEntities () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<!DOCTYPE doc ["
+			+ "<!ENTITY aWithRingAndAcute '&#x01fb;'>\n"
+			+ "<!ENTITY text 'TEXT'>\n"
+			+ "]>\n"
+			+ "<doc>"
+			+ "<p>&aWithRingAndAcute;=e1</p>"
+			+ "<p>&text;=e2</p>"
+			+ "</doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
+	public void testComplexEntities () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<!DOCTYPE doc ["
+			+ "<!ENTITY entity1 '[&entity2;]'>\n"
+			+ "<!ENTITY entity2 'TEXT'>\n"
+			+ "]>\n"
+			+ "<doc>"
+			+ "<p>&entity1;=[TEXT]</p>"
+			+ "<p>&entity2;=TEXT</p>"
+			+ "</doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
+	public void testSpecialEntities () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc>"
+			+ "<p>&lt;=lt &gt;=gt &quot;=quot &apos;=apos</p>"
+			+ "</doc>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
 	public void testDefaultInfo () {
 		assertNotNull(filter.getParameters());
 		assertNotNull(filter.getName());

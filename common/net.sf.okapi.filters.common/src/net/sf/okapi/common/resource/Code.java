@@ -40,6 +40,7 @@ public class Code {
 	public static final String TYPE_IMAGE = "image";
 	public static final String TYPE_COMMENT = "comment";
 	public static final String TYPE_XML_PROCESSING_INSTRUCTION = "processing-instruction";
+	public static final String TYPE_REFERENCE = "ref";
 	
 	/** Initial capacity for creating annotations maps.
 	 * Keeping it small to save space.

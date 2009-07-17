@@ -197,7 +197,9 @@ public class XMLFilter implements IFilter {
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 		fact.setNamespaceAware(true);
 		fact.setValidating(false);
-		fact.setExpandEntityReferences(false);
+		// Expand entity references only if we do not protect them
+		// "Expand entity" means don't have ENTITY_REFERENCE
+		fact.setExpandEntityReferences(!params.protectEntityRef);
 		
 		// Create the document builder
 		DocumentBuilder docBuilder;
@@ -291,19 +293,7 @@ public class XMLFilter implements IFilter {
 		// Add the DTD if needed
 		DocumentType dt = doc.getDoctype();
 		if ( dt != null ) {
-			String tmp;
-			if ( dt.getPublicId() != null ) {
-				tmp = String.format("<!DOCTYPE %s PUBLIC \"%s\" \"%s\">"+lineBreak,
-						dt.getName(),
-						dt.getPublicId(),
-						dt.getSystemId());
-			}
-			else {
-				tmp = String.format("<!DOCTYPE %s SYSTEM \"%s\">"+lineBreak,
-						dt.getName(),
-						dt.getSystemId());
-			}
-			skel.add(tmp);
+			rebuildDocTypeSection(dt);
 		}
 		
 		startDoc.setSkeleton(skel);
@@ -311,6 +301,38 @@ public class XMLFilter implements IFilter {
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
 
+	private void rebuildDocTypeSection (DocumentType dt) {
+		StringBuilder tmp = new StringBuilder();
+		// Set the start syntax
+		if ( dt.getPublicId() != null ) {
+			tmp.append(String.format("<!DOCTYPE %s PUBLIC \"%s\" \"%s\"",
+				dt.getName(),
+				dt.getPublicId(),
+				dt.getSystemId()));
+		}
+		else if ( dt.getSystemId() != null ) {
+			tmp.append(String.format("<!DOCTYPE %s SYSTEM \"%s\"",
+				dt.getName(),
+				dt.getSystemId()));
+		}
+		else if ( dt.getInternalSubset() != null ) {
+			tmp.append(String.format("<!DOCTYPE %s",
+				dt.getName()));
+		}
+		
+		// Add the internal sub-set if there is any
+		if ( dt.getInternalSubset() != null ) {
+			tmp.append(" [");
+			tmp.append(dt.getInternalSubset());
+			tmp.append("]");
+		}
+		
+		if ( tmp.length() > 0 ) {
+			tmp.append(">"+lineBreak);
+			skel.add(tmp.toString());
+		}
+	}
+	
 	private void process () {
 		Node node;
 		frag = null;
@@ -388,12 +410,35 @@ public class XMLFilter implements IFilter {
 				}
 				break;
 				
-			case Node.NOTATION_NODE:
-				//TODO: handle notations
+			case Node.ENTITY_REFERENCE_NODE:
+				// This get called only if params.protectEntityRef is true
+				// Note: &lt;, etc. are not reported as entity references 
+				if ( !trav.backTracking() ) {
+					if ( frag == null ) {
+						skel.add("&"+node.getNodeName()+";");
+					}
+					else {
+						frag.append(TagType.PLACEHOLDER, Code.TYPE_REFERENCE, "&"+node.getNodeName()+";");
+					}
+					// Swallow the text node of the content (can be nested)
+					Node thisNode = node;
+					do { // Read all the way down and back
+						node = trav.nextNode();
+					} while ( node != thisNode );
+				}
+				// Else: Do not save the entity reference
+				// Nothing to do, the content will be handled by TEXT_NODE	
 				break;
-				
+
 			case Node.DOCUMENT_TYPE_NODE:
 				// Handled in the start document process
+				break;
+				
+			case Node.NOTATION_NODE:
+				//TODO: handle notation nodes
+				break;
+			case Node.ENTITY_NODE:
+				//TODO: handle enity nodes
 				break;
 			}
 		}

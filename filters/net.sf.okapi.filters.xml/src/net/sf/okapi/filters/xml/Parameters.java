@@ -70,9 +70,10 @@ public class Parameters implements IParameters {
 	public InlineCodeFinder codeFinder;
 	public boolean escapeGt;
 	public boolean escapeNbsp;
+	public boolean protectEntityRef;
 	
 	public Parameters () {
-		codeFinder = new InlineCodeFinder();
+		reset();
 		// Create the document builder factory
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
 		fact.setNamespaceAware(true);
@@ -179,10 +180,12 @@ public class Parameters implements IParameters {
 		doc = null;
 		docURI = null;
 
+		codeFinder = new InlineCodeFinder();
 		useCodeFinder = false;
 		codeFinder.reset();
 		escapeGt = true;
 		escapeNbsp = true;
+		protectEntityRef = true;
 	}
 
 	public void save (String filePath) {
@@ -230,6 +233,7 @@ public class Parameters implements IParameters {
 		//TODO: Use DOM to store these
 		if ( name.equals("escapeGt") ) return escapeGt;
 		if ( name.equals("escapeNbsp") ) return escapeNbsp;
+		if ( name.equals("protectEntityRef") ) return protectEntityRef;
 		return false;
 	}
 
