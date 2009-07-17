@@ -31,7 +31,6 @@ import net.sf.okapi.filters.table.tsv.TabSeparatedValuesFilter;
  * Table filter, processes table-like files such as tab-delimited, CSV, fixed-width columns, etc.
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class TableFilter extends CompoundFilter {

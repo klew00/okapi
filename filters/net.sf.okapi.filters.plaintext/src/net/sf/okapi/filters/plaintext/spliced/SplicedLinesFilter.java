@@ -36,7 +36,6 @@ import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
  * 
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class SplicedLinesFilter extends BasePlainTextFilter {
@@ -52,9 +51,11 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 	private List<TextContainer> splicedLines;
 	private boolean merging = false;
 
-	public SplicedLinesFilter() {
-		
-		super();
+//	public void component_create() {
+//		
+//		super.component_create();
+	public SplicedLinesFilter() {	
+	
 		setName(FILTER_NAME);
 		setParameters(new Parameters());	// Spliced Lines Filter parameters
 
@@ -84,11 +85,11 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 	}
 	
 	@Override
-	protected void filter_init() {
+	protected void component_init() {
 		
 		// Commons, should be included in all descendants introducing own params
 		params = getParameters(Parameters.class);	// Throws OkapiBadFilterParametersException		
-		super.filter_init();		// Have the ancestor initialize its part in params 
+		super.component_init();		// Have the ancestor initialize its part in params 
 
 		// Specifics		
 		if (splicedLines == null) 
@@ -98,10 +99,10 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 	}
 
 	@Override
-	protected TextProcessingResult filter_exec(TextContainer lineContainer) {
+	protected TextProcessingResult component_exec(TextContainer lineContainer) {
 	
-		if (lineContainer == null) return super.filter_exec(lineContainer);
-		if (splicedLines == null) return super.filter_exec(lineContainer);
+		if (lineContainer == null) return super.component_exec(lineContainer);
+		if (splicedLines == null) return super.component_exec(lineContainer);
 		
 		//if (TextUnitUtils.getLastChar(lineContainer) == params.splicer) {
 		if (TextUnitUtils.endsWith(lineContainer, params.splicer)) {
@@ -120,27 +121,27 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 				return (mergeLines()) ? TextProcessingResult.ACCEPTED : TextProcessingResult.REJECTED;
 			}
 				
-			return super.filter_exec(lineContainer); // Plain text filter's line processing
+			return super.component_exec(lineContainer); // Plain text filter's line processing
 		}								 								
 	}
 	
 	@Override
-	protected void filter_idle(boolean lastChance) {
+	protected void component_idle(boolean lastChance) {
 		
 		if (merging) mergeLines();
 				
-		super.filter_idle(lastChance);
+		super.component_idle(lastChance);
 	}
 
 	@Override
-	protected void filter_done() {
+	protected void component_done() {
 		
 		if (splicedLines != null) 
 			splicedLines.clear();
 			
 		merging = false;
 		
-		super.filter_done();
+		super.component_done();
 	}
 
 	private boolean mergeLines() {

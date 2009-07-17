@@ -18,35 +18,27 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.common.framework;
-
-import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.framework.INotifiable;
-import net.sf.okapi.common.framework.Notification;
+package net.sf.okapi.common.framework;
 
 
 /**
  * 
  * 
- * @version 0.1, 18.06.2009
- * @author Sergei Vasilyev
+ * @version 0.1 08.07.2009
  */
 
-public abstract class AbstractParameters extends BaseParameters implements INotifiable {
+public interface IComponent {
 
-	protected INotifiable owner = null;
+	/**
+	 * Gets the name of this component.
+	 * @return The name of this component.
+	 */
+	public String getName();
 	
-	public boolean exec(String command, Object info) {
+	/**
+	 * Gets the description of this component.
+	 * @return The description of this component.
+	 */
+	public String getDescription();
 		
-		
-		if (command.equalsIgnoreCase(Notification.PARAMETERS_SET_OWNER)) {
-			
-			if (info instanceof INotifiable)
-				owner = (INotifiable) info;
-			
-			return true;
-		}
-		return false;
-	}
 }
-

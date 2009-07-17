@@ -36,7 +36,6 @@ import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
  * <li>Stand-alone carriage return character ("\r")</ul><p> 
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class PlainTextFilter extends CompoundFilter{

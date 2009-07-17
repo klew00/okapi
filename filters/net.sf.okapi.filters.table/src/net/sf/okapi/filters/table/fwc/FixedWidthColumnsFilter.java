@@ -35,7 +35,6 @@ import net.sf.okapi.filters.table.base.BaseTableFilter;
  * Fixed-Width Columns filter. Extracts text from a fixed-width columns table padded with white-spaces.
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class FixedWidthColumnsFilter extends BaseTableFilter {
@@ -50,9 +49,12 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 	protected List<Integer> columnStartPositions;
 	protected List<Integer> columnEndPositions;
 	
+//	public void component_create() {
+//
+//		super.component_create();
+		
 	public FixedWidthColumnsFilter() {
-
-		super();		
+	
 		setName(FILTER_NAME);
 
 		addConfiguration(true, // Do not inherit configurations from Base Table Filter
@@ -65,11 +67,11 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 	}
 
 	@Override
-	protected void filter_init() {
+	protected void component_init() {
 		
 		// Commons, should be included in all descendants introducing own params
 		params = getParameters(Parameters.class);	// Throws OkapiBadFilterParametersException
-		super.filter_init();
+		super.component_init();
 		
 		// Initialization
 		//columnWidths = ListUtils.stringAsIntList(params.columnWidths);

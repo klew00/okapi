@@ -24,7 +24,6 @@ package net.sf.okapi.filters.table.tsv;
  * Tab-Separated Values filter parameters.
  * 
  * @version 0.1, 10.06.2009
- * @author Sergei Vasilyev
  */
 
 public class Parameters extends net.sf.okapi.filters.table.base.Parameters {

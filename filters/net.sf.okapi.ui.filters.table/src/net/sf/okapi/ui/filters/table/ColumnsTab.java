@@ -52,7 +52,6 @@ import org.eclipse.swt.widgets.Widget;
  * 
  * 
  * @version 0.1, 20.06.2009
- * @author Sergei Vasilyev
  */
 
 public class ColumnsTab extends Composite implements IDialogPage {

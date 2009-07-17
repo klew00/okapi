@@ -38,7 +38,6 @@ import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
  * <li>Stand-alone carriage return character ("\r")</ul><p> 
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class ParaPlainTextFilter extends BasePlainTextFilter{
@@ -51,9 +50,12 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 	private LinkedList<TextContainer> bufferedLines;
 	private boolean merging = false;
 	
+//	public void component_create() {
+//		
+//		super.component_create();
+		
 	public ParaPlainTextFilter() {
 		
-		super();		
 		setName(FILTER_NAME);
 		setParameters(new Parameters());	// Para Plain Text Filter parameters
 
@@ -71,11 +73,11 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 	}
 
 	@Override
-	protected void filter_init() {
+	protected void component_init() {
 		
 		// Commons, should be included in all descendants introducing own params
 		params = getParameters(Parameters.class);	// Throws OkapiBadFilterParametersException		
-		super.filter_init();		// Have the ancestor initialize its part in params  
+		super.component_init();		// Have the ancestor initialize its part in params  
 		
 		// Initialization		
 		if (!params.extractParagraphs) return;
@@ -87,9 +89,9 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 	}
 	
 	@Override
-	protected TextProcessingResult filter_exec(TextContainer lineContainer) {
+	protected TextProcessingResult component_exec(TextContainer lineContainer) {
 		
-		if (bufferedLines == null || !params.extractParagraphs) return super.filter_exec(lineContainer);
+		if (bufferedLines == null || !params.extractParagraphs) return super.component_exec(lineContainer);
 						
 		if (!TextUnitUtils.isEmpty(lineContainer)) {
 			
@@ -107,21 +109,21 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 				return (mergeLines(true)) ? TextProcessingResult.ACCEPTED : TextProcessingResult.REJECTED;
 			}
 			
-			return super.filter_exec(lineContainer);
+			return super.component_exec(lineContainer);
 		}				
 	}
 
 	
 	@Override
-	protected void filter_idle(boolean lastChance) {
+	protected void component_idle(boolean lastChance) {
 		
 		if (merging) mergeLines(false);
 		
-		super.filter_idle(lastChance);
+		super.component_idle(lastChance);
 	}
 
 	@Override
-	protected void filter_done() {
+	protected void component_done() {
 		
 //		if (merging) mergeLines();
 		
@@ -130,7 +132,7 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 		
 		merging = false;
 		
-		super.filter_done();
+		super.component_done();
 	}
 
 	private boolean mergeLines(boolean addLinebreak) {

@@ -30,7 +30,6 @@ import net.sf.okapi.common.Util;
 /**
  * Collection of helper functions for manipulating lists.
  * 
- * @author Sergei Vasilyev
  * @version 0.1, 09.06.2009
  */
 public class ListUtils {
@@ -60,6 +59,17 @@ public class ListUtils {
 			part = part.trim();
 		
 		return Arrays.asList(parts);		
+	}
+	
+	/**
+	 * Splits up a string of comma-separated substrings into an array of those substrings.
+	 * @param st string of comma-separated substrings
+	 * @return
+	 */
+	public static String[] stringAsArray(String st) {
+		
+		List<String> list = stringAsList(st);
+		return (String[]) list.toArray();
 	}
 	
 	/**
@@ -216,5 +226,6 @@ public class ListUtils {
 		
 		return res;
 	}
+	
 	
 }

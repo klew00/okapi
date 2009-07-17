@@ -20,7 +20,7 @@
 
 package net.sf.okapi.ui.filters.table;
 
-import net.sf.okapi.filters.common.framework.CompoundParameters;
+import net.sf.okapi.common.framework.CompoundParameters;
 import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.ui.common.dialogs.IDialogPage;
 import net.sf.okapi.ui.common.utils.SWTUtils;
@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Widget;
  * 
  * 
  * @version 0.1, 20.06.2009
- * @author Sergei Vasilyev
  */
 
 public class TableTab extends Composite implements IDialogPage, SelectionListener {

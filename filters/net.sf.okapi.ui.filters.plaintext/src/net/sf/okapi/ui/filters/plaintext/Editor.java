@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Widget;
  * Plain text filter parameters editor.
  * 
  * @version 0.1, 12.06.2009
- * @author Sergei Vasilyev
  */
 
 public class Editor extends AbstractParametersEditor {
@@ -58,5 +57,6 @@ public class Editor extends AbstractParametersEditor {
 	@Override
 	protected void interop(Widget speaker) {
 		
-	}	
+	}
+
 }

@@ -32,7 +32,6 @@ import org.eclipse.swt.layout.GridData;
  * 
  * 
  * @version 0.1, 23.06.2009
- * @author Sergei Vasilyev
  */
 
 public class InputQueryPageInt extends Composite implements IInputQueryPage {

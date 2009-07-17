@@ -23,8 +23,7 @@ package net.sf.okapi.filters.table.fwc;
 /**
  * Fixed-Width Columns Filter parameters
  * 
- * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev   
+ * @version 0.1, 09.06.2009 
  */
 
 public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
@@ -34,69 +33,51 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	 * The difference is that columnStartPositions are 1-based.  
 	 * Can be represented by one of the following string types:
 	 *<li>"1" - position (1-based) where the column starts
-	 *<li>"1,2,5" - comma-delimited list (1-based) of starting positions of the table columns
+	 *<li>"1,2,5" - comma-delimited list (1-based) of starting positions of the table columns<p>
+	 * Default: Empty
 	 */
-	//public String columnWidths = "";
-	public String columnStartPositions = "";
+	public String columnStartPositions;
 	
 	/** 
 	 * Specifies end positions of fixed-width table columns. The positions are x-coordinates, like the position of a char in a string.
 	 * The difference is that columnEndPositions are 1-based.  
 	 * Can be represented by one of the following string types:
 	 *<li>"1" - position (1-based) where the column starts
-	 *<li>"1,2,5" - comma-delimited list (1-based) of starting positions of the table columns
+	 *<li>"1,2,5" - comma-delimited list (1-based) of starting positions of the table columns<p>
+	 * Default: Empty
 	 */
-	public String columnEndPositions = "";
+	public String columnEndPositions;
 			
 //----------------------------------------------------------------------------------------------------------------------------	
 	
-	public Parameters() {
+	@Override
+	protected void parameters_load() {
+
+		super.parameters_load();
 		
-		super();		
-		
-		reset();
-		toString(); // fill the list
+		columnStartPositions = buffer.getString("columnStartPositions", "").trim(); // null is impossible, default is ""
+		columnEndPositions = buffer.getString("columnEndPositions", "").trim(); // null is impossible, default is ""
 	}
 
-	public void reset() {
+	@Override
+	protected void parameters_reset() {
 		
-		super.reset();
+		super.parameters_reset();
 		
-		// All parameters are set to defaults here
-		//columnWidths = "";
 		columnStartPositions = "";
 		columnEndPositions = "";
 		trimMode = TRIM_ALL;  // To get rid of white-space padding in-between columns
 	}
 
-	public void fromString(String data) {
-		
-		reset();
-		
-		super.fromString(data);
-		
-		buffer.fromString(data);
-		
-		// All parameters are retrieved here		
-		//columnWidths = buffer.getString("columnWidths", "").trim(); // null is impossible, default is ""
-		columnStartPositions = buffer.getString("columnStartPositions", "").trim(); // null is impossible, default is ""
-		columnEndPositions = buffer.getString("columnEndPositions", "").trim(); // null is impossible, default is ""
-	}
-	
 	@Override
-	public String toString () {
+	protected void parameters_save() {
+
+		super.parameters_save();
 		
-		buffer.reset();
-		
-		super.toString(); // Will write to the same buffer
-		
-		// All parameters are set here						
-		//buffer.setString("columnWidths", columnWidths);
 		buffer.setString("columnStartPositions", columnStartPositions);
 		buffer.setString("columnEndPositions", columnEndPositions);
-		
-		return buffer.toString();
 	}
+
 
 }
  

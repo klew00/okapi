@@ -105,7 +105,7 @@ public abstract class AbstractBaseDialog {
 						Object owner = parent.getData("owner");
 						
 						if (owner instanceof INotifiable)
-							((INotifiable) owner).exec(UNREGISTER_DIALOG_PAGE, page);
+							((INotifiable) owner).exec(this, UNREGISTER_DIALOG_PAGE, page);
 					}					
 				}
 			});
@@ -224,7 +224,7 @@ public abstract class AbstractBaseDialog {
 			Object owner = parent.getData("owner");
 			
 			if (owner instanceof INotifiable && page != null)
-				((INotifiable) owner).exec(REGISTER_DIALOG_PAGE, page);
+				((INotifiable) owner).exec(this, REGISTER_DIALOG_PAGE, page);
 		}
 		
 		result = false; // To react to OK only

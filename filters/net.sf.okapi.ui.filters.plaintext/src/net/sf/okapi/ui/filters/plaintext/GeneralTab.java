@@ -23,7 +23,7 @@ package net.sf.okapi.ui.filters.plaintext;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.filters.common.framework.CompoundParameters;
+import net.sf.okapi.common.framework.CompoundParameters;
 import net.sf.okapi.ui.common.dialogs.IDialogPage;
 import net.sf.okapi.ui.common.utils.SWTUtils;
 
@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.Widget;
  * 
  * 
  * @version 0.1, 13.06.2009
- * @author Sergei Vasilyev
  */
 
 public class GeneralTab extends Composite implements IDialogPage {

@@ -42,7 +42,6 @@ import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
  * 
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class BaseTableFilter extends BasePlainTextFilter {
@@ -78,10 +77,11 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	private boolean isColumnNames;
 	private boolean isFixedNumColumns;
 	
-	public BaseTableFilter() {
-		
-		super();
-
+//	public void component_create() {
+//		
+//		super.component_create();
+	public BaseTableFilter() {	
+	
 		setName(FILTER_NAME);
 		setMimeType(FILTER_MIME);
 		
@@ -100,11 +100,11 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	}
 
 	@Override
-	protected void filter_init() {
+	protected void component_init() {
 		
 		// Commons, should be included in all descendants introducing own params
 		params = getParameters(Parameters.class);	// Throws OkapiBadFilterParametersException
-		super.filter_init();
+		super.component_init();
 		
 		// Initialization
 		sourceIdColumns = ListUtils.stringAsIntList(params.sourceIdColumns);
@@ -136,7 +136,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	}
 
 	@Override
-	protected TextProcessingResult filter_exec(TextContainer lineContainer) {		
+	protected TextProcessingResult component_exec(TextContainer lineContainer) {		
 		
 		if (lineContainer == null) return TextProcessingResult.REJECTED;
 				

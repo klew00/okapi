@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.common.framework;
+package net.sf.okapi.common.framework;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -26,13 +26,11 @@ import java.util.LinkedList;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.framework.Notification;
 
 /**
  * Compound Filter parameters.
  * 
  * @version 0.1, 10.06.2009
- * @author Sergei Vasilyev
  */
 
 public class CompoundParameters extends AbstractParameters{
@@ -53,14 +51,6 @@ public class CompoundParameters extends AbstractParameters{
 
 	private String defParametersClass = "";
 	
-	public CompoundParameters() {
-		
-		super();
-		
-		reset();
-		toString(); 		
-	}
-
 	@SuppressWarnings("unchecked")
 	protected boolean addParameters(Class<?> parametersClass) {
 		
@@ -126,7 +116,7 @@ public class CompoundParameters extends AbstractParameters{
 		return res;
 	}
 
-	protected boolean setActiveParameters(String parametersClass) {
+	public boolean setActiveParameters(String parametersClass) {
 		
 		IParameters params = findParameters(parametersClass);
 		if (params == null) return false; 
@@ -139,7 +129,7 @@ public class CompoundParameters extends AbstractParameters{
 		}
 		
 		if (owner != null)
-			owner.exec(Notification.PARAMETERS_CHANGED, parametersClass);
+			owner.exec(this, Notification.PARAMETERS_CHANGED, parametersClass);
 		
 		return true;
 	}
@@ -158,46 +148,6 @@ public class CompoundParameters extends AbstractParameters{
 		}
 		
 		return null;
-	}
-
-	public void reset() {
-		
-		setParametersClassName(defParametersClass);
-	}
-	
-	public void fromString(String data) {
-		
-		reset();
-		
-		buffer.fromString(data);
-		
-		setParametersClassName(buffer.getString("parametersClass", defParametersClass));
-		setActiveParameters(getParametersClassName());
-		
-		// Load active parameters
-		if (activeParameters != null)			
-			activeParameters.fromString(data);
-	}
-	
-	@Override
-	public String toString () {
-				
-		buffer.reset();
-
-		//!!! Do not change the sequence
-
-		// Store active parameters		
-		if (activeParameters != null)			
-			buffer.fromString(activeParameters.toString());
-		
-		if (activeParameters == null)
-			setParametersClassName(defParametersClass);
-		else
-			setParametersClassName(activeParameters.getClass().getName()); 
-
-		buffer.setString("parametersClass", getParametersClassName());
-
-		return buffer.toString();
 	}
 
 	protected void setParametersClassName(String parametersClass) {
@@ -230,6 +180,45 @@ public class CompoundParameters extends AbstractParameters{
 	public LinkedList<IParameters> getParameters() {
 		
 		return parameters;
+	}
+
+	@Override
+	protected void parameters_init() {
+		
+	}
+
+	@Override
+	protected void parameters_load() {
+		
+		setParametersClassName(buffer.getString("parametersClass", defParametersClass));
+		setActiveParameters(getParametersClassName());
+		
+		// Load active parameters
+		if (activeParameters != null)			
+			activeParameters.fromString(data);
+	}
+
+	@Override
+	protected void parameters_reset() {
+		
+		setParametersClassName(defParametersClass);
+	}
+
+	@Override
+	protected void parameters_save() {
+		
+		//!!! Do not change the sequence
+
+		// Store active parameters		
+		if (activeParameters != null)			
+			buffer.fromString(activeParameters.toString());
+		
+		if (activeParameters == null)
+			setParametersClassName(defParametersClass);
+		else
+			setParametersClassName(activeParameters.getClass().getName()); 
+
+		buffer.setString("parametersClass", getParametersClassName());
 	}
 	
 }

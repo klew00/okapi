@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Widget;
  * 
  * 
  * @version 0.1, 27.06.2009
- * @author Sergei Vasilyev
  */
 
 public interface IDialogPage {

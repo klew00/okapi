@@ -43,7 +43,6 @@ import org.eclipse.swt.events.SelectionEvent;
  * 
  * 
  * @version 0.1, 24.06.2009
- * @author Sergei Vasilyev
  */
 
 public class AddModifyColumnDefPage extends Composite implements IInputQueryPage {

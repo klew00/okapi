@@ -34,7 +34,6 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
  * 
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class TextUnitUtils {
@@ -148,10 +147,77 @@ public class TextUnitUtils {
 		
 		if (textUnit == null) return "";
 		
-		TextFragment tf = textUnit.getSourceContent();
-		if (tf == null) return "";
+		return getCodedText(textUnit.getSourceContent());
+	}
+	
+	public static String getTargetText(TextUnit textUnit, String language) {
 		
-		return tf.getCodedText();
+		if (textUnit == null) return "";
+		
+		return getCodedText(textUnit.getTargetContent(language));
+	}
+	
+	public static String getCodedText(TextFragment textFragment) {
+		
+		if (textFragment == null) return "";
+		
+		return textFragment.getCodedText();
+	}
+	
+	/**
+	 * Extracts text from the given text fragment. Used to create a copy of the original string but without code markers.
+	 * The original string is not stripped of code markers, and remains intact.
+	 * @param textFragment TextFragment object with possible codes inside
+	 * @param markerPositions List to store initial positions of removed code markers 
+	 * @return The copy of the string, contained in TextFragment, but w/o code markers
+	 */
+	public static String getText(TextFragment textFragment, List<Integer> markerPositions) {		
+		
+		if (textFragment == null) return "";
+				
+		String res = textFragment.getCodedText();
+		
+		StringBuilder sb = new StringBuilder();
+		
+		if (markerPositions != null) 			
+			markerPositions.clear();
+			
+			// Collect marker positions & remove markers			
+			int startPos = 0;
+			
+			for (int i = 0; i < res.length(); i++) {
+				
+				switch (res.charAt(i) ) {
+				
+				case TextFragment.MARKER_OPENING:
+				case TextFragment.MARKER_CLOSING:
+				case TextFragment.MARKER_ISOLATED:
+				case TextFragment.MARKER_SEGMENT:
+				
+					if (markerPositions != null)
+						markerPositions.add(i);
+				
+					if (i > startPos)
+						sb.append(res.substring(startPos, i));
+					
+					startPos = i + 2;
+					i = startPos;
+				}
+			
+			}
+				
+		return sb.toString();
+	}
+	
+	/**
+	 * Extracts text from the given text fragment. Used to create a copy of the original string but without code markers.
+	 * The original string is not stripped of code markers, and remains intact.
+	 * @param textFragment TextFragment object with possible codes inside
+	 * @return The copy of the string, contained in TextFragment, but w/o code markers
+	 */
+	public static String getText(TextFragment textFragment) {
+		
+		return getText(textFragment, null);
 	}
 	
 	/**

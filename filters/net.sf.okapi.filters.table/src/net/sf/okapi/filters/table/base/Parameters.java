@@ -23,8 +23,7 @@ package net.sf.okapi.filters.table.base;
 /**
  * Base Table Filter parameters
  * 
- * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev   
+ * @version 0.1, 09.06.2009   
  */
 
 public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
@@ -32,42 +31,42 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	/**
 	 * @see detectColumnsMode
 	 */
-	public static int DETECT_COLUMNS_NONE = 0;
-	public static int DETECT_COLUMNS_COL_NAMES = 1;
-	public static int DETECT_COLUMNS_FIXED_NUMBER = 2;
+	final public static int DETECT_COLUMNS_NONE = 0;
+	final public static int DETECT_COLUMNS_COL_NAMES = 1;
+	final public static int DETECT_COLUMNS_FIXED_NUMBER = 2;
 	
 	/**
 	 * @see sendHeaderMode
 	 */
-	public static int SEND_HEADER_NONE = 0;
-	public static int SEND_HEADER_COLUMN_NAMES_ONLY = 1;
-	public static int SEND_HEADER_ALL = 2;
+	final public static int SEND_HEADER_NONE = 0;
+	final public static int SEND_HEADER_COLUMN_NAMES_ONLY = 1;
+	final public static int SEND_HEADER_ALL = 2;
 	
 	/**
 	 * @see sendColumnsMode
 	 */
-	public static int SEND_COLUMNS_NONE = 0;
-	public static int SEND_COLUMNS_LISTED = 1;
-	public static int SEND_COLUMNS_ALL = 2;
+	final public static int SEND_COLUMNS_NONE = 0;
+	final public static int SEND_COLUMNS_LISTED = 1;
+	final public static int SEND_COLUMNS_ALL = 2;
 	
 	/**
 	 * @see trimMode
 	 */
-	public static int TRIM_NONE = 0;
-	public static int TRIM_NONQUALIFIED_ONLY = 1;
-	public static int TRIM_ALL = 2;
+	final public static int TRIM_NONE = 0;
+	final public static int TRIM_NONQUALIFIED_ONLY = 1;
+	final public static int TRIM_ALL = 2;
 		
 	/**
 	 * Number of the line (1-based) containing filed names (column captions).<p>
 	 * Default: 1
 	 */
-	public int columnNamesLineNum = 1;
+	public int columnNamesLineNum;
 	
 	/**
 	 * Number of the line (1-based) where actual data start after the header.<p>
 	 * Default: 2
 	 */
-	public int valuesStartLineNum = 2;
+	public int valuesStartLineNum;
 	
 	/**
 	 * The filter can detect number of columns in the input. This option specifies the way of columns number detection:
@@ -78,13 +77,14 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 * <li>DETECT_COLUMNS_FIXED_NUMBER = 2 - number of columns is explicitly specified by the numColumns parameter.<p>
 	 * Default: DETECT_COLUMNS_NONE
 	 */
-	public int detectColumnsMode = DETECT_COLUMNS_NONE;
+	public int detectColumnsMode;
 	
 	/**
 	 * Number of columns in the input. This option is active only if detectColumnsMode = DETECT_COLUMNS_FIXED_NUMBER.<p>
 	 * Extra columns are dropped, empty TUs are created for missing columns.<p>
+	 * Default: 1
 	 */
-	public int numColumns = 1;
+	public int numColumns;
 	
 	/**
 	 * If there are one or more lines containing description of the data, names of fields etc., 
@@ -93,19 +93,20 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 * <li>SEND_HEADER_FIELD_NAMES_ONLY = 1 - only the values in the line specified by fieldNamesLineNum are sent as text units
 	 * <li>SEND_HEADER_ALL = 2 - values in all header lines are sent as text units
 	 * @see valuesStartLineNum
-	 * @see fieldNamesLineNum
+	 * @see fieldNamesLineNum<p>
+	 * Default: SEND_HEADER_COLUMN_NAMES_ONLY
 	 */
-	public int sendHeaderMode = SEND_HEADER_COLUMN_NAMES_ONLY;
+	public int sendHeaderMode;
 	
 	/**
 	 * Specifies how field values are trimmed of spaces:
 	 * <li>TRIM_NONE = 0 - field values are not trimmed
 	 * <li>TRIM_NONQUALIFIED_ONLY = 1 - only non-qualified field values are trimmed, leading and trailing spaces remain in qualified fields
-	 * <li>TRIM_ALL = 2 - both non-qualified and qualified field values are trimmed of leading and trailing spaces.
+	 * <li>TRIM_ALL = 2 - both non-qualified and qualified field values are trimmed of leading and trailing spaces.	 
+	 * @see textQualifier<p>
 	 * Default: TRIM_NONQUALIFIED_ONLY
-	 * @see textQualifier
 	 */
-	public int trimMode = TRIM_NONQUALIFIED_ONLY;
+	public int trimMode;
 	
 	/**
 	 * Specifies values of which columns should be sent as text units 
@@ -115,34 +116,38 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 * <li>SEND_COLUMNS_ALL = 2 - values from all columns will be sent.<p>
 	 * Default: SEND_COLUMNS_ALL (send all columns)
 	 */
-	public int sendColumnsMode = SEND_COLUMNS_ALL;
+	public int sendColumnsMode;
 	
 	/**
-	 * Index (1-based) of the column containing an optional record ID (or a key) of the current row in the table. 
+	 * Index (1-based) of the column containing an optional record ID (or a key) of the current row in the table.<p>
+	 * Default: 0 
 	 */
-	public int recordIdColumn = 0;
+	public int recordIdColumn;
 	
 	/** 
 	 * Indicates which columns contain source text. If this list is empty, then all columns of the table will be considered
 	 * containing source text to be extracted.
 	 * Can be represented by one of the following strings:
 	 *<li>"1" - index (1-based) of the column, containing source text
-	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text
+	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text<p>
+	 * Default: Empty
 	 */
-	public String sourceColumns = "";				
+	public String sourceColumns;				
 
 	/** 
 	 * Indicates which columns contain source IDs. The source IDs become names of TU resources. 
 	 * Can be represented by one of the following strings:
 	 *<li>"1" - index (1-based) of the column, containing a source ID
-	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source IDs
+	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source IDs<p>
+	 * Default: Empty
 	 */
-	public String sourceIdColumns = "";
+	public String sourceIdColumns;
 
 	/**
 	 * If there is the recordIdColumn index, and a source ID for the given column is not specified in the sourceIdColumns,
 	 * then the source ID for that column is compiled of the value in recordIdColumn column, and the corresponding suffix in the
-	 * sourceIdSuffixes. The source IDs become names of TU resources. 
+	 * sourceIdSuffixes. The source IDs become names of TU resources.<p>
+	 * Default: Empty 
 	 */
 	public String sourceIdSuffixes = "";
 	
@@ -150,14 +155,16 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 * Indicates which source columns the source ID columns on the sourceIdSourceRefs list correspond to.  
 	 * Can be represented by one of the following strings:
 	 *<li>"1" - index (1-based) of the column, containing source text
-	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text
+	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text<p>
+	 * Default: Empty
 	 */	
 	public String sourceIdSourceRefs = "";
 	
 	/** 
 	 * Indicates which columns contain target text. Can be represented by one of the following strings:
 	 *<li>"1" - index (1-based) of the column, containing target text
-	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing target text
+	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing target text<p>
+	 * Default: Empty
 	 */
 	public String targetColumns = "";		
 	
@@ -165,21 +172,24 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 * Indicates which source columns the target columns on the targetColumns list correspond to.  
 	 * Can be represented by one of the following strings:
 	 *<li>"1" - index (1-based) of the column, containing source text
-	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text
+	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text<p>
+	 * Default: Empty
 	 */
 	public String targetSourceRefs = "";
 	
 	/** 
 	 * Indicates which languages should be used in target columns. Can be represented by one of the following strings:
 	 *<li>"fr" - target text in all target columns is French
-	 *<li>"fr, it, ge, fr" - target text in 1-st and 4-th columns is French, 2-nd - Italian, 3-rd - German
+	 *<li>"fr, it, ge, fr" - target text in 1-st and 4-th columns is French, 2-nd - Italian, 3-rd - German<p>
+	 * Default: Empty
 	 */
 	public String targetLanguages = "";
 	
 	/** 
 	 * Indicates which columns contain comments. Can be represented by one of the following string types:
 	 *<li>"1" - index (1-based) of the column, containing a comment
-	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing comments
+	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing comments<p>
+	 * Default: Empty
 	 */
 	public String commentColumns = "";
 	
@@ -189,53 +199,18 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 * If you need a comment translated, list its column on the sourceColumns list.
 	 * Can be represented by one of the following strings:
 	 *<li>"1" - index (1-based) of the column, containing source text
-	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text.
+	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text.<p>
+	 * Default: Empty
 	 */	
 	public String commentSourceRefs = "";
 	
 //----------------------------------------------------------------------------------------------------------------------------	
 	
-	public Parameters() {
-		
-		super();		
-		
-		reset();
-		toString(); // fill the list
-	}
+	@Override
+	protected void parameters_load() {
 
-	public void reset() {
+		super.parameters_load();
 		
-		super.reset();
-		
-		// All parameters are set to defaults here
-		columnNamesLineNum = 1;
-		valuesStartLineNum = 2;
-		detectColumnsMode = DETECT_COLUMNS_NONE;
-		numColumns = 1;
-		sendHeaderMode = SEND_HEADER_COLUMN_NAMES_ONLY;
-		trimMode = TRIM_NONQUALIFIED_ONLY;
-		sendColumnsMode = SEND_COLUMNS_ALL;
-		sourceIdColumns = "";
-		sourceColumns = "";
-		targetColumns = "";
-		commentColumns = "";
-		commentSourceRefs = "";
-		recordIdColumn = 0;
-		sourceIdSourceRefs = "";
-		sourceIdSuffixes = "";
-		targetLanguages = "";
-		targetSourceRefs = "";		
-	}
-
-	public void fromString(String data) {
-		
-		reset();
-		
-		super.fromString(data);
-		
-		buffer.fromString(data);
-		
-		// All parameters are retrieved here		
 		columnNamesLineNum = buffer.getInteger("columnNamesLineNum", 1);
 		valuesStartLineNum = buffer.getInteger("valuesStartLineNum", 2);
 		detectColumnsMode = buffer.getInteger("detectColumnsMode", DETECT_COLUMNS_NONE);
@@ -254,15 +229,36 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		targetLanguages = buffer.getString("targetLanguages", "");
 		targetSourceRefs = buffer.getString("targetSourceRefs", "");
 	}
-	
+
 	@Override
-	public String toString () {
+	protected void parameters_reset() {
 		
-		buffer.reset();
+		super.parameters_reset();
 		
-		super.toString(); // Will write to the same buffer
+		columnNamesLineNum = 1;
+		valuesStartLineNum = 2;
+		detectColumnsMode = DETECT_COLUMNS_NONE;
+		numColumns = 1;
+		sendHeaderMode = SEND_HEADER_COLUMN_NAMES_ONLY;
+		trimMode = TRIM_NONQUALIFIED_ONLY;
+		sendColumnsMode = SEND_COLUMNS_ALL;
+		sourceIdColumns = "";
+		sourceColumns = "";
+		targetColumns = "";
+		commentColumns = "";
+		commentSourceRefs = "";
+		recordIdColumn = 0;
+		sourceIdSourceRefs = "";
+		sourceIdSuffixes = "";
+		targetLanguages = "";
+		targetSourceRefs = "";
+	}
+
+	@Override
+	protected void parameters_save() {
+
+		super.parameters_save();
 		
-		// All parameters are set here				
 		buffer.setInteger("columnNamesLineNum", columnNamesLineNum);
 		buffer.setInteger("valuesStartLineNum", valuesStartLineNum);
 		buffer.setInteger("detectColumnsMode", detectColumnsMode);
@@ -280,8 +276,6 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		buffer.setString("sourceIdSuffixes", sourceIdSuffixes);
 		buffer.setString("targetLanguages", targetLanguages);
 		buffer.setString("targetSourceRefs", targetSourceRefs);
-		
-		return buffer.toString();
 	}
 	
 }

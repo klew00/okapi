@@ -40,7 +40,6 @@ import net.sf.okapi.filters.table.base.BaseTableFilter;
  * optionally containing a header with field names and other info.
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class CommaSeparatedValuesFilter  extends BaseTableFilter {
@@ -64,9 +63,10 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	private boolean merging = false;
 	private int qualifierLen;
 	
+//	public void component_create() {
+//		
+//		super.component_create();
 	public CommaSeparatedValuesFilter() {
-		
-		super();
 		
 		setName(FILTER_NAME);
 
@@ -80,14 +80,14 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	}
 
 	@Override
-	protected void filter_init() {
+	protected void component_init() {
 
 		merging = false;		
 		
 		params = getParameters(Parameters.class);	// Throws OkapiBadFilterParametersException
 		qualifierLen = Util.getLength(params.textQualifier);
 		
-		super.filter_init();
+		super.component_init();
 		
 		if (buffer == null) 
 			buffer = new ArrayList<String>();
@@ -253,16 +253,16 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	}
 	
 	@Override
-	protected void filter_idle(boolean lastChance) {
+	protected void component_idle(boolean lastChance) {
 		
-		super.filter_idle(lastChance);
+		super.component_idle(lastChance);
 		processBuffer(lastChance);		
 	}
 	
 	@Override
-	protected void filter_done() {
+	protected void component_done() {
 				
-		super.filter_done();
+		super.component_done();
 	}	
 	
 	private void startMerging() {

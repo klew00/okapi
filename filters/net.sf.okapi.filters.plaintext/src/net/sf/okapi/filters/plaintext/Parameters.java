@@ -20,13 +20,12 @@
 
 package net.sf.okapi.filters.plaintext;
 
-import net.sf.okapi.filters.common.framework.CompoundParameters;
+import net.sf.okapi.common.framework.CompoundParameters;
 
 /**
  * Plain Text Filter parameters 
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class Parameters extends CompoundParameters {

@@ -24,7 +24,6 @@ package net.sf.okapi.filters.plaintext.paragraphs;
  * Paragraph Plain Text Filter parameters 
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
@@ -34,49 +33,32 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 * When false, each line will be extracted separately. When true, adjacent lines will be extracted together as a paragraph.<p> 
 	 * Default: false (extract single lines)
 	 */
-	public boolean extractParagraphs = true;
+	public boolean extractParagraphs;
 		
 //----------------------------------------------------------------------------------------------------------------------------	
 	
-	public Parameters() {
+	@Override
+	protected void parameters_load() {
+
+		super.parameters_load();
 		
-		super();		
-		
-		reset();
-		toString(); // fill the list
+		extractParagraphs = buffer.getBoolean("extractParagraphs", true);
 	}
 
-	public void reset() {
+	@Override
+	protected void parameters_reset() {
+
+		super.parameters_reset();
 		
-		super.reset();
-		
-		// All parameters are set to defaults here
 		extractParagraphs = true;
 	}
 
-	public void fromString(String data) {
-		
-		reset();
-		
-		super.fromString(data);
-		
-		buffer.fromString(data);
-		
-		// All parameters are retrieved here		
-		extractParagraphs = buffer.getBoolean("extractParagraphs", true);
-	}
-	
 	@Override
-	public String toString () {
+	protected void parameters_save() {
+
+		super.parameters_save();
 		
-		buffer.reset();
-		
-		super.toString(); // Will write to the same buffer
-		
-		// All parameters are set here
 		buffer.setBoolean("extractParagraphs", extractParagraphs);
-		
-		return buffer.toString();
 	}
 	
 }

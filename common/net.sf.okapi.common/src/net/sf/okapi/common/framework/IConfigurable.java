@@ -18,17 +18,28 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.common.framework;
+package net.sf.okapi.common.framework;
+
+import net.sf.okapi.common.IParameters;
 
 /**
  * 
  * 
- * @version 0.1, 09.06.2009
+ * @version 0.1 13.07.2009
  */
 
-public class FilterNotification {
+public interface IConfigurable {
 
-	public static final String FILTER_LINE_BEFORE_PROCESSING = "filter_line_before_processing";
-	public static final String FILTER_LINE_AFTER_PROCESSING = "filter_line_after_processing";
-	
+	/**
+	 * Sets new parameters for this component.
+	 * @param params The new parameters to use.
+	 */
+	public void setParameters (IParameters params);
+
+	/**
+	 * Gets the current parameters for this component.
+	 * @return The current parameters for this component.
+	 */
+	public IParameters getParameters ();
+
 }

@@ -20,10 +20,11 @@
 
 package net.sf.okapi.filters.common.framework;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -32,6 +33,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.common.framework.CompoundParameters;
 import net.sf.okapi.common.framework.Notification;
 
 
@@ -39,7 +41,6 @@ import net.sf.okapi.common.framework.Notification;
  * 
  * 
  * @version 0.1, 10.06.2009
- * @author Sergei Vasilyev
  */
 
 public class CompoundFilter extends AbstractFilter {
@@ -63,6 +64,7 @@ public class CompoundFilter extends AbstractFilter {
 					((AbstractFilter) activeSubFilter).getParametersClassName());
 	}
 
+	@SuppressWarnings("unchecked")
 	protected boolean addSubFilter(Class<?> subFilterClass) {
 		
 		if (subFilters == null) return false;
@@ -70,23 +72,54 @@ public class CompoundFilter extends AbstractFilter {
 	
 		IFilter curSubFilter = null;
 		
+		if (!AbstractFilter.class.isAssignableFrom(subFilterClass)) return false;
+		
 		try {
-			res = subFilters.add((IFilter)subFilterClass.newInstance());
-			if (!res) return false;
+			Constructor<AbstractFilter> cc = (Constructor<AbstractFilter>) subFilterClass.getConstructor(new Class[] {});
+			if (cc == null) return false;
 			
-			curSubFilter = subFilters.getLast();
-			if (curSubFilter == null) return false;
-			
-			this.addConfigurations(curSubFilter.getConfigurations());
+			curSubFilter = (IFilter) cc.newInstance(new Object[] {});
 			
 		} catch (InstantiationException e) {
 			
+			e.printStackTrace();
 			return false;
 			
 		} catch (IllegalAccessException e) {
 			
+			e.printStackTrace();
+			return false;
+			
+		} catch (SecurityException e) {
+			
+			e.printStackTrace();
+			return false;
+			
+		} catch (NoSuchMethodException e) {
+			
+			e.printStackTrace();
+			return false;
+			
+		} catch (IllegalArgumentException e) {
+			
+			e.printStackTrace();
+			return false;
+			
+		} catch (InvocationTargetException e) {
+			
+			e.printStackTrace();
 			return false;
 		}
+		
+		res = subFilters.add(curSubFilter);
+		
+		if (!res) return false;
+		
+		curSubFilter = subFilters.getLast();
+		if (curSubFilter == null) return false;
+		
+		this.addConfigurations(curSubFilter.getConfigurations());
+			
 		
 		if (activeSubFilter == null)
 			activeSubFilter = curSubFilter; // The first non-empty registered one will become active
@@ -288,9 +321,9 @@ public class CompoundFilter extends AbstractFilter {
 	}
 
 	@Override
-	public boolean exec(String command, Object info) {
+	public boolean exec(Object sender, String command, Object info) {
 		
-		if (super.exec(command, info)) return true;
+		if (super.exec(sender, command, info)) return true;
 		
 		if (command.equalsIgnoreCase(Notification.PARAMETERS_CHANGED)) {
 			
@@ -301,5 +334,22 @@ public class CompoundFilter extends AbstractFilter {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.framework.AbstractComponent#component_done()
+	 */
+	@Override
+	protected void component_done() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.framework.AbstractComponent#component_init()
+	 */
+	@Override
+	protected void component_init() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

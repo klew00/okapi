@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -51,14 +50,12 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * and configuration handling mechanisms.  
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
-public class AbstractLineFilter extends AbstractFilter {
+public abstract class AbstractLineFilter extends AbstractFilter {
 
 	public static final String LINE_NUMBER = "line_number";	
 	
-	private final Logger logger = Logger.getLogger(getClass().getName());	
 	private BufferedReader reader;
 	private boolean canceled;
 	private String encoding;
@@ -74,11 +71,6 @@ public class AbstractLineFilter extends AbstractFilter {
 	private String docName;
 	private String srcLang;
 	private boolean hasUTF8BOM;	
-	
-	public AbstractLineFilter() {
-		
-		super();		
-	}
 	
 	public void cancel() {
 		
@@ -111,20 +103,20 @@ public class AbstractLineFilter extends AbstractFilter {
 	}
 
 		
-	/** 
-	 * Called by the filter every time a new input is being open.
-	 * Used to update parameters and filter-specific variables.
-	 */
-	protected void filter_init() {
-		// To be implemented in descendant classes
-	}
+//	/** 
+//	 * Called by the filter every time a new input is being open.
+//	 * Used to update parameters and filter-specific variables.
+//	 */
+//	protected void filter_init() {
+//		// To be implemented in descendant classes
+//	}
 	
 	/**
 	 * Called by the filter for every line read from the input
 	 * @param lineContainer
 	 * @return
 	 */
-	protected TextProcessingResult filter_exec(TextContainer lineContainer) {
+	protected TextProcessingResult component_exec(TextContainer lineContainer) {
 		// To be overridden in descendant classes
 		
 		return TextProcessingResult.REJECTED;		
@@ -136,18 +128,18 @@ public class AbstractLineFilter extends AbstractFilter {
 	 * 
 	 * @param lastChance True if there are no events in the queue, and if the method will not produce events, the filter will be finished.
 	 */
-	protected void filter_idle(boolean lastChance) {
+	protected void component_idle(boolean lastChance) {
 		// To be implemented in descendant classes
 	}
 	
-	/**
-	 * Called once the filter has finished processing of the input.
-	 * Use this method to do final clean-up. Do not use it for actions, that can create events, otherwise those events won't be sent.
-	 * Use filter_exec() and filter_idle() for actual processing and event generation.
-	 */
-	protected void filter_done() {
-		// To be implemented in descendant classes
-	}
+//	/**
+//	 * Called once the filter has finished processing of the input.
+//	 * Use this method to do final clean-up. Do not use it for actions, that can create events, otherwise those events won't be sent.
+//	 * Use filter_exec() and filter_idle() for actual processing and event generation.
+//	 */
+//	protected void filter_done() {
+//		// To be implemented in descendant classes
+//	}
 	
 	public boolean notify(String notification, Object info) {
 		// Can be overridden in descendant classes, but will the call of superclass filter_notify()
@@ -225,7 +217,7 @@ public class AbstractLineFilter extends AbstractFilter {
 		
 		queue = new LinkedList<Event>();
 		
-		filter_init(); // Initialize the filter with implementation-specific parameters (protected method)
+		component_init(); // Initialize the filter with implementation-specific parameters (protected method)
 		
 		// Send start event
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
@@ -233,7 +225,6 @@ public class AbstractLineFilter extends AbstractFilter {
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
 		startDoc.setFilterParameters(getParameters());
-		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(getMimeType());
 		startDoc.setMimeType(getMimeType());
@@ -242,11 +233,6 @@ public class AbstractLineFilter extends AbstractFilter {
 		sendEvent(EventType.START_DOCUMENT, startDoc);				
 	}
 
-	protected final void logMessage (Level level, String text) {
-		
-		logger.log(level, String.format("Line %d: %s", lineNumber, text));
-	}
-	
 	private Event getQueueEvent() {
 		
 		Event event = queue.poll();
@@ -292,7 +278,7 @@ public class AbstractLineFilter extends AbstractFilter {
 						TextContainer lineContainer = new TextContainer(lineRead);
 							
 						lineContainer.setProperty(new Property(LINE_NUMBER, String.valueOf(lineNumber), true)); // Prop of source, not TU
-						lastResult = filter_exec(lineContainer); // Can modify text and codes of lineContainer  
+						lastResult = component_exec(lineContainer); // Can modify text and codes of lineContainer  
 						
 						switch (lastResult) { 
 						
@@ -331,14 +317,14 @@ public class AbstractLineFilter extends AbstractFilter {
 						}
 						else { // 10N							
 							// 5
-							filter_idle(queue.size() == 0);
+							component_idle(queue.size() == 0);
 							
 							// 6
 							if (queue.size() > 0) { // 6Y							
 								return getQueueEvent();
 							}
 							else { // 6N
-								filter_done(); // 7
+								component_done(); // 7
 																
 									// The ending event
 									Ending ending = new Ending(String.valueOf(++otherId));
@@ -484,4 +470,11 @@ public class AbstractLineFilter extends AbstractFilter {
 		if (skel != null && lineNumber > 1) 
 			skel.append(lineBreak);
 	}
+
+	@Override
+	protected void logMessage (Level level, String text) {
+		
+		super.logMessage(level, String.format("Line %d: %s", lineNumber, text));
+	}
+	
 }

@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Widget;
  * 
  * 
  * @version 0.1, 23.06.2009
- * @author Sergei Vasilyev
  */
 
 public class InputQueryPageString extends Composite implements IInputQueryPage  {

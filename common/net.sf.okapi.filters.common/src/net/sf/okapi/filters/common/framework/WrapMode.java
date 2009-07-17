@@ -24,7 +24,6 @@ package net.sf.okapi.filters.common.framework;
  * 
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public enum WrapMode {

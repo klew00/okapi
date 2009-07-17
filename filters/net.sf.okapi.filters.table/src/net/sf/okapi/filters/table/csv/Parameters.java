@@ -23,8 +23,7 @@ package net.sf.okapi.filters.table.csv;
 /**
  * CSV Filter parameters
  * 
- * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev  
+ * @version 0.1, 09.06.2009  
  */
 
 public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
@@ -33,7 +32,7 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	 * Symbol or a string separating fields in a row. <p>
 	 * Default: , (comma)
 	 */
-	public String fieldDelimiter = ",";
+	public String fieldDelimiter;
 	
 	/** 
 	 * Symbol or a string before and after field value to allow special characters inside the field. 
@@ -41,58 +40,43 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	 * The qualifiers are not included in translation units.<p>  
 	 * Default: " (quotation mark)
 	 */ 
-	public String textQualifier = "\"";
+	public String textQualifier;
 	
 	/**
 	 * True if qualifiers should be dropped, and shouldn't go into the text units
 	 */
 	public boolean removeQualifiers = true; 
 
-	public Parameters() {
+	@Override
+	protected void parameters_load() {
+
+		super.parameters_load();
 		
-		super();		
-		
-		reset();
-		toString(); // fill the list
+		fieldDelimiter = buffer.getString("fieldDelimiter", "").trim(); 
+		textQualifier = buffer.getString("textQualifier", "").trim();
+		removeQualifiers = buffer.getBoolean("removeQualifiers", true);
 	}
 
-	public void reset() {
+	@Override
+	protected void parameters_reset() {
+
+		super.parameters_reset();
 		
-		super.reset();
-		
-		// All parameters are set to defaults here
 		fieldDelimiter = ",";
 		textQualifier = "\"";
 		removeQualifiers = true;
 	}
 
-	public void fromString(String data) {
-		
-		reset();
-		
-		super.fromString(data);
-		
-		buffer.fromString(data);
-		
-		// All parameters are retrieved here		
-		fieldDelimiter = buffer.getString("fieldDelimiter", "").trim(); 
-		textQualifier = buffer.getString("textQualifier", "").trim();
-		removeQualifiers = buffer.getBoolean("removeQualifiers", true);
-	}
-	
 	@Override
-	public String toString () {
+	protected void parameters_save() {
+
+		super.parameters_save();
 		
-		buffer.reset();
-		
-		super.toString(); // Will write to the same buffer
-		
-		// All parameters are set here						
 		buffer.setString("fieldDelimiter", fieldDelimiter);
 		buffer.setString("textQualifier", textQualifier);
 		buffer.setBoolean("removeQualifiers", removeQualifiers);
-		
-		return buffer.toString();
 	}
 
+
+	
 }

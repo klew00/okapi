@@ -21,41 +21,50 @@
 package net.sf.okapi.filters.plaintext.base;
 
 import net.sf.okapi.common.filters.InlineCodeFinder;
-import net.sf.okapi.filters.common.framework.AbstractParameters;
+import net.sf.okapi.common.framework.AbstractParameters;
 import net.sf.okapi.filters.common.framework.WrapMode;
 
 /**
  * Base Plain Text Filter parameters
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class Parameters extends AbstractParameters {
 	
-	public boolean unescapeSource = true;
-	public boolean trimLeading = false;
-	public boolean trimTrailing = false;
-	public boolean preserveWS = true;
-	public boolean useCodeFinder = false;
-	public String codeFinderRules = "";	
-	public WrapMode wrapMode = WrapMode.NONE;
+	public boolean unescapeSource;
+	public boolean trimLeading;
+	public boolean trimTrailing;
+	public boolean preserveWS;
+	public boolean useCodeFinder;
+	public String codeFinderRules;	
+	public WrapMode wrapMode;
 	private InlineCodeFinder codeFinder;
 	
-//----------------------------------------------------------------------------------------------------------------------------	
+//----------------------------------------------------------------------------------------------------------------------------
 	
-	public Parameters() {
-		super();
+	@Override
+	protected void parameters_init() {
 		
 		codeFinder = new InlineCodeFinder();
-		
-		reset();
-		toString(); // fill the list
 	}
 
-	public void reset() {
+	@Override
+	protected void parameters_load() {
+
+		unescapeSource = buffer.getBoolean("unescapeSource", true);
+		trimLeading = buffer.getBoolean("trimLeading", false);
+		trimTrailing = buffer.getBoolean("trimTrailing", false);
+		preserveWS = buffer.getBoolean("preserveWS", true);
+		useCodeFinder = buffer.getBoolean("useCodeFinder", false);
+		codeFinderRules = buffer.getString("codeFinderRules", codeFinder.toString());
+//		wrapMode = WrapMode.class.getEnumConstants()[buffer.getInteger("wrapMode", WrapMode.NONE.ordinal())];
+		wrapMode = WrapMode.values()[buffer.getInteger("wrapMode", WrapMode.NONE.ordinal())];		
+	}
+
+	@Override
+	protected void parameters_reset() {
 		
-		// All parameters are set to defaults here
 		unescapeSource = true;
 		trimLeading = false;
 		trimTrailing = false;
@@ -74,27 +83,9 @@ public class Parameters extends AbstractParameters {
 		wrapMode = WrapMode.NONE;
 	}
 
-	public void fromString(String data) {
-		reset();
-		
-		buffer.fromString(data);
-		
-		// All parameters are retrieved here
-		unescapeSource = buffer.getBoolean("unescapeSource", true);
-		trimLeading = buffer.getBoolean("trimLeading", false);
-		trimTrailing = buffer.getBoolean("trimTrailing", false);
-		preserveWS = buffer.getBoolean("preserveWS", true);
-		useCodeFinder = buffer.getBoolean("useCodeFinder", false);
-		codeFinderRules = buffer.getString("codeFinderRules", codeFinder.toString());
-//		wrapMode = WrapMode.class.getEnumConstants()[buffer.getInteger("wrapMode", WrapMode.NONE.ordinal())];
-		wrapMode = WrapMode.values()[buffer.getInteger("wrapMode", WrapMode.NONE.ordinal())];
-	}
-	
 	@Override
-	public String toString () {
-		buffer.reset();
+	protected void parameters_save() {
 		
-		// All parameters are set here
 		buffer.setBoolean("unescapeSource", unescapeSource);
 		buffer.setBoolean("trimLeading", trimLeading);
 		buffer.setBoolean("trimTrailing", trimTrailing);
@@ -102,7 +93,8 @@ public class Parameters extends AbstractParameters {
 		buffer.setBoolean("useCodeFinder", useCodeFinder);
 		buffer.setString("codeFinderRules", codeFinderRules);
 		buffer.setInteger("wrapMode", wrapMode.ordinal());
-		
-		return buffer.toString();
 	}
+
+	
+
 }

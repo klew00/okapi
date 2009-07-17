@@ -76,7 +76,7 @@ public interface IPipelineStep {
 	 * Steps that can generate {@link Event}s such as {@link IFilter}s return false until 
 	 * no more events can be created. 
 	 * Steps which do not create {@link Event}s always return true.
-	 * @return true if can generate more events, false otherwise.
+	 * @return false if can generate more events, true otherwise.
 	 */
 	boolean isDone();
 	

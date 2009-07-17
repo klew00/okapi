@@ -43,7 +43,6 @@ import org.eclipse.swt.widgets.Widget;
  * Options tab for plain text and table filters 
  * 
  * @version 0.1, 13.06.2009
- * @author Sergei Vasilyev
  */
 
 public class OptionsTab extends Composite implements IDialogPage {

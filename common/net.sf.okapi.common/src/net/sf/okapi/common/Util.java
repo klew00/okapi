@@ -955,7 +955,6 @@ public class Util {
 	/**
 	 * Converts an integer value to a string.
 	 * This method simply calls <code>String.valueOf(intValue);</code>.
-	 * @author Sergei Vasilyev
 	 * @param value the value to convert.
 	 * @return the string representation of the given value.
 	 */
@@ -966,7 +965,6 @@ public class Util {
 	/**
 	 * Converts a string to an integer. If the conversion fails the method
 	 * returns the given default value.
-	 * @author Sergei Vasilyev
 	 * @param stringValue the string to convert.
 	 * @param intDefault the default value to use if the conversion fails.
 	 * @return the integer value of the string, or the provided default
@@ -986,7 +984,6 @@ public class Util {
 	/**
 	 * Gets the element of an array for a given index.
 	 * the method returns null if the index is out of bounds.
-	 * @author Sergei Vasilyev
 	 * @param array the array where to lookup the element.
 	 * @param index the index.
 	 * @return the element of the array for the given index, or null if the
@@ -1001,7 +998,6 @@ public class Util {
 
 	/**
 	 * Indicates whether a byte-flag is set or not in a given value. 
-	 * @author Sergei Vasilyev
 	 * @param value the value to check.
 	 * @param flag the flag to look for.
 	 * @return true if the flag is set, false if it is not.

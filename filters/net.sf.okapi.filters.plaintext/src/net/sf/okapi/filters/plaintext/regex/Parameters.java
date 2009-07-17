@@ -25,8 +25,7 @@ import java.util.regex.Pattern;
 /**
  * Parameters of the Regex Plain Text Filter
  * 
- * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev  
+ * @version 0.1, 09.06.2009  
  */
 
 public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
@@ -59,50 +58,37 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 							
 //----------------------------------------------------------------------------------------------------------------------------	
 	
-	public Parameters() {
-		super();		
+	@Override
+	protected void parameters_load() {
+
+		super.parameters_load();
 		
-		reset();
-		toString(); // fill the list
+		rule =  buffer.getString("rule", DEF_RULE);
+		sourceGroup = buffer.getInteger("sourceGroup", DEF_GROUP);		
+		regexOptions = buffer.getInteger("regexOptions", DEF_OPTIONS);
+		sample =  buffer.getString("sample", "");
 	}
 
-	public void reset() {
+	@Override
+	protected void parameters_reset() {
 		
-		super.reset();
+		super.parameters_reset();
 		
-		// All parameters are set to defaults here		
 		rule = DEF_RULE;
 		sourceGroup = DEF_GROUP;		
 		regexOptions = DEF_OPTIONS;
 		sample = DEF_SAMPLE;
 	}
 
-	public void fromString(String data) {
-		reset();
-		
-		super.fromString(data);
-		
-		buffer.fromString(data);
-		
-		// All parameters are retrieved here
-		rule =  buffer.getString("rule", DEF_RULE);
-		sourceGroup = buffer.getInteger("sourceGroup", DEF_GROUP);		
-		regexOptions = buffer.getInteger("regexOptions", DEF_OPTIONS);
-		sample =  buffer.getString("sample", "");
-	}
-	
 	@Override
-	public String toString () {
-		buffer.reset();
+	protected void parameters_save() {
+
+		super.parameters_save();
 		
-		super.toString(); // Will write to the same buffer
-		
-		// All parameters are set here
 		buffer.setString("rule", rule);
 		buffer.setInteger("sourceGroup", sourceGroup);		
 		buffer.setInteger("regexOptions", regexOptions);
 		buffer.setString("sample", sample);
-		
-		return buffer.toString();
 	}
+	
 }

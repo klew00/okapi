@@ -58,7 +58,6 @@ import org.eclipse.swt.widgets.Text;
  * Okapi GUI tester application
  * 
  * @version 0.1, 20.06.2009
- * @author Sergei Vasilyev
  */
 
 public class Okapi_GUI_Tester {

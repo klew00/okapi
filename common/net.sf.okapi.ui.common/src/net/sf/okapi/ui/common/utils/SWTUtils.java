@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Text;
  * 
  * 
  * @version 0.1, 13.06.2009
- * @author Sergei Vasilyev
  */
 
 public class SWTUtils {

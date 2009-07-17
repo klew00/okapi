@@ -18,17 +18,22 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.common.framework;
+package net.sf.okapi.steps.common.counting;
+
+import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
  * 
  * 
- * @version 0.1, 09.06.2009
+ * @version 0.1 08.07.2009
  */
 
-public class FilterNotification {
+public class MetricsAnnotation implements IAnnotation {
 
-	public static final String FILTER_LINE_BEFORE_PROCESSING = "filter_line_before_processing";
-	public static final String FILTER_LINE_AFTER_PROCESSING = "filter_line_after_processing";
-	
+	Metrics metrics = new Metrics();
+
+	public Metrics getMetrics() {
+		
+		return metrics;
+	}	
 }

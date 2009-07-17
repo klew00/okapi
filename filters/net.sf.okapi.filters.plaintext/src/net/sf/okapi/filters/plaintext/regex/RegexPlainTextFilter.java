@@ -49,8 +49,7 @@ import net.sf.okapi.filters.regex.Rule;
  * <li>Next line character ("\u0085")
  * <li>Line separator character ("\u2028")
  * <li>Paragraph separator character ("\u2029").</ul><p>
- * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev  
+ * @version 0.1, 09.06.2009  
  */
 
 public class RegexPlainTextFilter extends AbstractFilter {
@@ -66,10 +65,9 @@ public class RegexPlainTextFilter extends AbstractFilter {
 	private int lineNumber = 0;
 
 		
+//	public void component_create() {
 	public RegexPlainTextFilter() {
-		
-		super();
-		
+				
 		// Create the regex aggregate and its parameters 
 		regex = new RegexFilter(); 
 		setParameters(new Parameters());	// Regex Plain Text Filter parameters
@@ -240,6 +238,16 @@ public class RegexPlainTextFilter extends AbstractFilter {
 				setRule(this.params.rule, this.params.sourceGroup, this.params.regexOptions); // To compile rules
 		}
 	}
+
+	@Override
+	protected void component_done() {
+		
+	}
+
+	@Override
+	protected void component_init() {
+		
+	}
 	
 
 // Helpers 
@@ -264,6 +272,6 @@ public class RegexPlainTextFilter extends AbstractFilter {
 		
 		return regexParams.rules.get(0);
 	}
-	
+
 }	
 	

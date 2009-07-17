@@ -39,7 +39,6 @@ import org.eclipse.swt.widgets.TableItem;
  * A wrapper around SWT table for manipulations with table data
  * 
  * @version 0.1 30.06.2009
- * @author Sergei Vasilyev
  */
 
 public class TableAdapter {

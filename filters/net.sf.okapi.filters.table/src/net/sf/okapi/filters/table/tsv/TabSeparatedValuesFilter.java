@@ -33,7 +33,6 @@ import net.sf.okapi.filters.table.base.BaseTableFilter;
  * Tab-Separated Values filter. Extracts columns, separated by one or more tabs.
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class TabSeparatedValuesFilter  extends BaseTableFilter {

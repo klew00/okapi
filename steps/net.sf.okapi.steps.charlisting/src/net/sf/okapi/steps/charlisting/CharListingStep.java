@@ -47,7 +47,7 @@ public class CharListingStep extends BasePipelineStep {
 	
 	@Override
 	public void destroy () {
-		if ( charList == null ) {
+		if ( charList != null ) {
 			charList.clear();
 			charList = null;
 		}

@@ -18,61 +18,56 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.spliced;
+package net.sf.okapi.steps.common.counting;
 
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.framework.AbstractParameters;
 
 /**
- * Spliced Lines Filter parameters
- * @version 0.1, 09.06.2009
+ * WordCount step parameters
+ * 
+ * @version 0.1 06.07.2009
  */
 
-public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
+public class Parameters extends AbstractParameters {
+
+	public boolean countInBatch;
+	public boolean countInBatchItems;
+	public boolean countInDocuments;
+	public boolean countInSubDocuments;
+	public boolean countInGroups;
 	
-	/**
-	 * Char at the end of a line, signifying the line is continued on the next line (normally "\" or "_"). Can be a custom string too.<p>
-	 * Default: \ (backslash)
-	 */
-	public String splicer; 
-	
-	/**
-	 * If in-line codes should be created for the dropped splicers and linebreaks of spliced lines
-	 * Default: true (create in-line codes)
-	 */
-	public boolean createPlaceholders;
-	
-//----------------------------------------------------------------------------------------------------------------------------	
-	
+	@Override
+	protected void parameters_init() {
+	}
+
 	@Override
 	protected void parameters_load() {
 
-		super.parameters_load();
-		
-		String st = buffer.getString("splicer", "\\");
-		if (Util.isEmpty(st))
-			splicer = "";
-		else
-			splicer = st.trim(); 
-				
-		createPlaceholders = buffer.getBoolean("createPlaceholders", false);
+		countInBatch = buffer.getBoolean("countInBatch", false);
+		countInBatchItems = buffer.getBoolean("countInBatchItems", false);
+		countInDocuments = buffer.getBoolean("countInDocuments", false);
+		countInSubDocuments = buffer.getBoolean("countInSubDocuments", false);
+		countInGroups = buffer.getBoolean("countInGroups", false);
 	}
 
 	@Override
 	protected void parameters_reset() {
 
-		super.parameters_reset();
-		
-		splicer = "\\";
-		createPlaceholders = true;
+		countInBatch = false;
+		countInBatchItems = false;
+		countInDocuments = false;
+		countInSubDocuments = false;
+		countInGroups = false;
 	}
 
 	@Override
 	protected void parameters_save() {
 
-		super.parameters_save();
-		
-		buffer.setString("splicer", splicer);
-		buffer.setBoolean("createPlaceholders", createPlaceholders);
+		buffer.setBoolean("countInBatch", countInBatch);
+		buffer.setBoolean("countInBatchItems", countInBatchItems);
+		buffer.setBoolean("countInDocuments", countInDocuments);
+		buffer.setBoolean("countInSubDocuments", countInSubDocuments);
+		buffer.setBoolean("countInGroups", countInGroups);
 	}
 
 }

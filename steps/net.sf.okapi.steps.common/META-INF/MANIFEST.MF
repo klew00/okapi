@@ -8,4 +8,6 @@ Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.filters.common;bundle-version="1.0.0",
  net.sf.okapi.pipeline;bundle-version="1.0.0"
 Export-Package: net.sf.okapi.steps.common,
+ net.sf.okapi.steps.common.counting,
+ net.sf.okapi.steps.common.framework,
  net.sf.okapi.steps.common.stepintrospector

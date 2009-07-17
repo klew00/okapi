@@ -41,7 +41,6 @@ import net.sf.okapi.filters.common.utils.TextUnitUtils;
  * <code>PlainTextFilter</code> extracts lines of input text, separated by line terminators.
  * 
  * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev
  */
 
 public class BasePlainTextFilter extends AbstractLineFilter {	
@@ -55,9 +54,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	private Parameters params; // Base Plain Text Filter parameters
 	private InlineCodeFinder codeFinder;
 		
+//	protected void component_create() {
 	public BasePlainTextFilter() {
-		
-		super();
 		
 		codeFinder = new InlineCodeFinder();
 		
@@ -86,11 +84,10 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	}
 	
 	@Override
-	protected void filter_init() {
+	protected void component_init() {
 		
 		// Commons, should be included in all descendants introducing own params
 		params = getParameters(Parameters.class);	// Throws OkapiBadFilterParametersException		
-		super.filter_init();		// Have the ancestor initialize its part in params  
 		
 		// Initialization
 		if (params.useCodeFinder && codeFinder != null) {
@@ -286,7 +283,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	}	
 	
 	@Override
-	protected TextProcessingResult filter_exec(TextContainer lineContainer) {
+	protected TextProcessingResult component_exec(TextContainer lineContainer) {
 				
 		return sendAsSource(lineContainer);		
 	}
@@ -352,6 +349,11 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		}
 		
 		textContainer.setCodedText(tmpText.toString());
+	}
+
+	@Override
+	protected void component_done() {
+		
 	}
 
 }	

@@ -31,7 +31,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
-import net.sf.okapi.filters.common.framework.CompoundParameters;
+import net.sf.okapi.common.framework.CompoundParameters;
 import net.sf.okapi.common.framework.INotifiable;
 import net.sf.okapi.ui.common.dialogs.AbstractBaseDialog;
 import net.sf.okapi.ui.common.dialogs.IDialogPage;
@@ -56,7 +56,6 @@ import org.eclipse.swt.widgets.Widget;
  * Abstract base class for parameters editors 
  * 
  * @version 0.1, 12.06.2009
- * @author Sergei Vasilyev
  */
 
 public abstract class AbstractParametersEditor implements IParametersEditor, Listener, INotifiable {
@@ -717,7 +716,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 			((IDialogPage) page).interop(speaker);
 	}
 
-	public boolean exec(String command, Object info) {
+	public boolean exec(Object sender, String command, Object info) {
 		
 		if (command.equalsIgnoreCase(AbstractBaseDialog.REGISTER_DIALOG_PAGE)) {
 

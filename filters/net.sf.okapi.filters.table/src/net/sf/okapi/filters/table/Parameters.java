@@ -20,13 +20,12 @@
 
 package net.sf.okapi.filters.table;
 
-import net.sf.okapi.filters.common.framework.CompoundParameters;
+import net.sf.okapi.common.framework.CompoundParameters;
 
 /**
  * Table Filter parameters
  * 
- * @version 0.1, 09.06.2009
- * @author Sergei Vasilyev  
+ * @version 0.1, 09.06.2009 
  */
 
 public class Parameters extends CompoundParameters {

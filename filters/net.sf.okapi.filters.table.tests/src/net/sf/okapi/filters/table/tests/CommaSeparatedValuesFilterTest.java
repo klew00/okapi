@@ -163,8 +163,8 @@ public class CommaSeparatedValuesFilterTest {
 		
 	@Test
 	public void testNameAndMimeType() {
-		assertEquals(filter.getMimeType(), "text/csv");
-		assertEquals(filter.getName(), "okf_table_csv");
+		assertEquals("text/csv", filter.getMimeType());
+		assertEquals("okf_table_csv", filter.getName());
 		
 		// Read lines from a file, check mime types 
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test1.txt");

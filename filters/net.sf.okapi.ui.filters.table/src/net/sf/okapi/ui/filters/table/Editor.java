@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.Widget;
  * 
  * 
  * @version 0.1, 19.06.2009
- * @author Sergei Vasilyev
  */
 
 public class Editor extends AbstractParametersEditor {

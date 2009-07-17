@@ -23,72 +23,32 @@ package net.sf.okapi.filters.common.framework;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.framework.INotifiable;
-import net.sf.okapi.common.framework.Notification;
+import net.sf.okapi.common.framework.OkapiComponent;
 
 /**
  * The root of the filters hierarchy. Defines generic methods for all kinds of filters.
  * 
  * @version 0.1, 10.06.2009
- * @author Sergei Vasilyev
  */
 
-public abstract class AbstractFilter implements IFilter, INotifiable {
-
-	private String filterName;
-	private String mimeType;
-	private IParameters params;
-	private String parametersClassName;
+public abstract class AbstractFilter extends OkapiComponent implements IFilter {
+	
+	private String mimeType;		
 	List<FilterConfiguration> configList = new ArrayList<FilterConfiguration>();
+
+//	@Override
+//	protected void component_create() {
+//	public AbstractFilter() {
+//		
+//		configList = new ArrayList<FilterConfiguration>();
+//	}
 	
 	public AbstractFilter() {
 		
 		super();
-	}
-
-	public IParameters getParameters() {
-		
-		return params;
-	}
-	
-	public void setParameters(IParameters params) {
-		
-		this.params = (BaseParameters) params;
-		
-		if (params instanceof INotifiable)
-			((INotifiable) params).exec(Notification.PARAMETERS_SET_OWNER, this);
-		
-//		if (!Util.isEmpty(parametersClassName)) return; // This name is set by the first call from the filter's constructor
-		if (params == null) return;
-		if (params.getClass() == null) return;
-		
-		parametersClassName = params.getClass().getName();
-	}
-
-	@SuppressWarnings("unchecked")
-	protected <A> A getParameters(Class<?> expectedClass) {
-		
-		if (params == null) {
-			throw new OkapiBadFilterParametersException("Empty filter parameters");			
-		}
-		
-		if (!expectedClass.isInstance(params)) {
-			
-			String st = "null";
-			if (params.getClass() != null) st = params.getClass().getName();
-			
-			throw new OkapiBadFilterParametersException(
-					String.format("Parameters of class <%s> expected, but are <%s>",
-							expectedClass.getName(), st));			
-		}
-		
-		return (A) params;
 	}
 
 	/**
@@ -112,16 +72,6 @@ public abstract class AbstractFilter implements IFilter, INotifiable {
 		return mimeType;
 	}
 	
-	protected void setName(String filterName) {
-		
-		this.filterName = filterName;
-	}
-	
-	public String getName() {
-		
-		return filterName;
-	}
-
 	protected boolean addConfiguration(			
 			boolean clearAllExisting,
 			String configId,
@@ -165,8 +115,7 @@ public abstract class AbstractFilter implements IFilter, INotifiable {
 		
 		return configList.remove(findConfiguration(configId));
 	}
-			
-	
+				
 	public List<FilterConfiguration> getConfigurations () {
 		
 		List<FilterConfiguration> res = new ArrayList<FilterConfiguration>();
@@ -186,14 +135,6 @@ public abstract class AbstractFilter implements IFilter, INotifiable {
 		return true;
 	}
 	
-	public String getParametersClassName() {
-		
-		return parametersClassName;
-	}
 
-	public boolean exec(String command, Object info) {
-				
-		return false;		
-	}
 }
 
