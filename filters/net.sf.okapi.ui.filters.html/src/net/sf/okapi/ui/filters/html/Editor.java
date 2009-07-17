@@ -45,7 +45,7 @@ public class Editor extends AbstractParametersEditor {
 
 	@Override
 	protected String getCaption() {		
-		return "Markup Filter Parameters";
+		return "Html Filter Parameters";
 	}
 
 	@Override
