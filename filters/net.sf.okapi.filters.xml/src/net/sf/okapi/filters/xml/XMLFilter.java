@@ -663,6 +663,11 @@ public class XMLFilter implements IFilter {
 			tu.setProperty(new Property(Property.NOTE, locNote));
 		}
 		
+		String id = context.peek().idPointer;
+		if ( id != null ) {
+			tu.setName(id);
+		}
+		
 		if ( context.peek().preserveWS ) {
 			tu.setPreserveWhitespaces(true);
 		}

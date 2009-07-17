@@ -56,6 +56,48 @@ public class XMLFilterTest {
 	}
 
 	@Test
+	public void testComplexIdPointer () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
+			+ "<its:translateRule selector=\"//doc\" translate=\"no\"/>"
+			+ "<its:translateRule selector=\"//src\" translate=\"yes\" itsx:idPointer=\"../../name/@id\"/>"
+			+ "</its:rules>"
+			+ "<grp><name id=\"id1\" /><u><src>text 1</src></u></grp>"
+			+ "<grp><name id=\"id1\" /><u><src xml:id=\"xid2\">text 2</src></u></grp>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("id1", tu.getName());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("xid2", tu.getName()); // xml:id overrides global rule
+	}
+	
+	@Test
+	public void testIdPointer () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
+			+ "<its:translateRule selector=\"//p\" translate=\"yes\" itsx:idPointer=\"@name\"/>"
+			+ "</its:rules>"
+			+ "<p name=\"id1\">text 1</p>"
+			+ "<p xml:id=\"xid2\">text 2</p>"
+			+ "<p xml:id=\"xid3\" name=\"id3\">text 3</p></doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("id1", tu.getName());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("xid2", tu.getName()); // No 'name' attribute
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertNotNull(tu);
+		assertEquals("xid3", tu.getName()); // xml:id overrides global rule
+	}
+	
+	@Test
 	public void testSimpleEntities () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<!DOCTYPE doc ["

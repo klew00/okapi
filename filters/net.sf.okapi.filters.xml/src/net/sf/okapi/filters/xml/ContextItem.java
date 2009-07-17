@@ -28,21 +28,24 @@ class ContextItem {
 	Node node;
 	boolean translate;
 	String trgPointer;
+	String idPointer;
 	String locNote;
 	boolean preserveWS;
 
-	public ContextItem (Node node,
-			boolean translate,
-			String trgPointer,
-			String locNote,
-			boolean preserveWS)
-		{
-			this.node = node;
-			this.translate = translate;
-			this.trgPointer = trgPointer;
-			this.locNote = locNote;
-			this.preserveWS = preserveWS;
-		}
+//	public ContextItem (Node node,
+//		boolean translate,
+//		String trgPointer,
+//		String idPointer,
+//		String locNote,
+//		boolean preserveWS)
+//	{
+//		this.node = node;
+//		this.translate = translate;
+//		this.trgPointer = trgPointer;
+//		this.idPointer = idPointer;
+//		this.locNote = locNote;
+//		this.preserveWS = preserveWS;
+//	}
 		
 	public ContextItem (Node node,
 		ITraversal trav)
@@ -51,6 +54,7 @@ class ContextItem {
 		// Context is always an element node
 		this.translate = trav.translate();
 		this.trgPointer = trav.getTargetPointer();
+		this.idPointer = trav.getIdPointer();
 		this.locNote = trav.getNote();
 		this.preserveWS = trav.preserveWS();
 	}

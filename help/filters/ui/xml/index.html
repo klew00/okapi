@@ -15,6 +15,7 @@
 		<td class="smalltoc"><p>
 			- <a href="#overview">Overview</a><br>
 			- <a href="#itsSupport">ITS Support</a><br>
+			- <a href="#itsExtensions">ITS Extensions</a><br>
 			- <a href="#processing">Processing Details</a><br>
 			- <a href="#parameters">Parameters</a><td class="hmenu">
 			<div class="hmenu"><table align="right"><tr>
@@ -102,7 +103,39 @@ is listed below.</p>
 <p>The resulting text units are (in XLIFF 1.2 notation):</p>
 <pre>1: &quot;Paragraph with &lt;x id=&#39;1&#39;&gt; and &lt;g id=&#39;2&#39;&gt;bolded text&lt;/g&gt;.&quot;
 2: &quot;Paragraph with &lt;g id=&#39;1&#39;&gt;&lt;x id=&#39;2&#39;/&gt;&lt;/g&gt; and text.&quot;</pre>
-<p>&nbsp;</p>
+<h2><a name="itsExtensions"></a>ITS Extensions</h2>
+<p>The filter supports extensions to the ITS specification. These extension use 
+the namespace URI <code>http://www.w3.org/2008/12/its-extensions</code>.</p>
+<h3>idPointer and xml:id</h3>
+<p>When the attribute <code>xml:id</code> is found on a translatable element, it 
+is used as the name of the text unit generated for that element.</p>
+<p>For example, in the example below, the resource name associated with the text 
+unit for the <code>&lt;p&gt;</code> element is &quot;<code>id1</code>&quot;.</p>
+<pre>&lt;p xml:id=&quot;id1&quot;&gt;Text&lt;/p&gt;</pre>
+<p>The attribute <code>idPointer</code> used in the ITS <code>translateRule</code> 
+element allows you to define an XPath expression--relative to the selection for 
+that element-- pointing to the node that holds the identifier value for the 
+given selection.</p>
+<p>For example, in the example below, the resource name associated with the text 
+unit for the <code>&lt;p&gt;</code> element is &quot;<code>id1</code>&quot;.</p>
+<pre>&lt;doc&gt;
+ &lt;its:rules version=&quot;1.0&quot; xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
+  xmlns:itsx=&quot;http://www.w3.org/2008/12/its-extensions&quot;&gt;
+  &lt;its:translateRule selector=&quot;//p&quot; translate=&quot;yes&quot; itsx:idPointer=&quot;@name&quot;/&gt;
+ &lt;/its:rules&gt;
+ &lt;p name=\&quot;id1\&quot;&gt;text 1&lt;/p&gt;
+&lt;/doc&gt;</pre>
+<p>Note that <code>xml:id</code> has precedence over <code>idPointer</code> 
+declaration. For example, in the example below, the resource name associated 
+with the text unit for the <code>&lt;p&gt;</code> element is &quot;<code>xid1</code>&quot;, not 
+&quot;<code>id1</code>&quot;.</p>
+<pre>&lt;doc&gt;
+ &lt;its:rules version=&quot;1.0&quot; xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
+  xmlns:itsx=&quot;http://www.w3.org/2008/12/its-extensions&quot;&gt;
+  &lt;its:translateRule selector=&quot;//p&quot; translate=&quot;yes&quot; itsx:idPointer=&quot;@name&quot;/&gt;
+ &lt;/its:rules&gt;
+ &lt;p xml:id=&quot;xid1&quot; name=\&quot;id1\&quot;&gt;text 1&lt;/p&gt;
+&lt;/doc&gt;</pre>
 <h2><a name="processing"></a>Processing Details</h2>
 <h3>Input Encoding</h3>
 <p>The filter decides which encoding to use for the input document using the 

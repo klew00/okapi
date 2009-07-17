@@ -34,7 +34,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	private static final String   FLAGNAME            = "\u00ff";
 	private static final String   FLAGSEP             = "\u001c";
 	// Must have +FLAGSEP as many time as there are FP_XXX_DATA entries +1
-	private static final String   FLAGDEFAULTDATA     = "???????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
+	private static final String   FLAGDEFAULTDATA     = "???????"+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP+FLAGSEP;
 
 	private static final int      FP_TRANSLATE        = 0;
 	private static final int      FP_DIRECTIONALITY   = 1;
@@ -47,7 +47,8 @@ public class ITSEngine implements IProcessor, ITraversal
 	private static final int      FP_TERMINOLOGY_DATA      = 0;
 	private static final int      FP_LOCNOTE_DATA          = 1;
 	private static final int      FP_LANGINFO_DATA         = 2;
-	private static final int      FP_TRANSLATE_DATA        = 3;
+	private static final int      FP_TRGPOINTER_DATA       = 3;
+	private static final int      FP_IDPOINTER_DATA        = 4;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -276,6 +277,11 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( value.length() > 0 ) {
 			rule.info = value;
 			rule.infoType = TRANSLATE_TRGPOINTER; 
+		}
+
+		value = elem.getAttributeNS(ITSX_NS_URI, "idPointer");
+		if ( value.length() > 0 ) {
+			rule.idPointer = value;
 		}
 		rules.add(rule);
 	}
@@ -513,6 +519,8 @@ public class ITSEngine implements IProcessor, ITraversal
 		// Otherwise: see if there are any flags to change
 		if ( data.charAt(FP_TRANSLATE) != '?' ) {
 			trace.peek().translate = (data.charAt(FP_TRANSLATE) == 'y');
+			trace.peek().targetPointer = getFlagData(data, FP_TRGPOINTER_DATA);
+			trace.peek().idPointer = getFlagData(data, FP_IDPOINTER_DATA);
 		}
 		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
@@ -606,7 +614,10 @@ public class ITSEngine implements IProcessor, ITraversal
 					case IProcessor.DC_TRANSLATE:
 						setFlag(NL.item(i), FP_TRANSLATE, (rule.flag ? 'y' : 'n'), true);
 						if ( rule.infoType == TRANSLATE_TRGPOINTER ) {
-							setFlag(NL.item(i), FP_TRANSLATE_DATA, rule.info, true);							
+							setFlag(NL.item(i), FP_TRGPOINTER_DATA, rule.info, true);							
+						}
+						if ( rule.idPointer != null ) {
+							setFlag(NL.item(i), FP_IDPOINTER_DATA, resolvePointer(NL.item(i), rule.idPointer), true);							
 						}
 						break;
 					case IProcessor.DC_DIRECTIONALITY:
@@ -785,6 +796,17 @@ public class ITSEngine implements IProcessor, ITraversal
 					("preserve".equals(value) ? 'y' : '?'), attr.getSpecified());
 			}
 			
+			// xml:id always applied
+			expr = xpath.compile("//*/@"+XML_NS_PREFIX+":id");
+			NL = (NodeList)expr.evaluate(doc, XPathConstants.NODESET);
+			for ( int i=0; i<NL.getLength(); i++ ) {
+				attr = (Attr)NL.item(i);
+				String value = attr.getValue();
+				if (( value != null ) && ( value.length() > 0 )) {
+					setFlag(attr.getOwnerElement(), FP_IDPOINTER_DATA,
+						value, attr.getSpecified());
+				}
+			}
 		}
 		catch ( XPathExpressionException e ) {
 			throw new RuntimeException(e);
@@ -914,6 +936,10 @@ public class ITSEngine implements IProcessor, ITraversal
 
 	public String getTargetPointer () {
 		return trace.peek().targetPointer;
+	}
+	
+	public String getIdPointer () {
+		return trace.peek().idPointer;
 	}
 	
 	public int getDirectionality () {

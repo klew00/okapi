@@ -12,6 +12,7 @@ class ITSTrace {
 	boolean preserveWS;
 	String language;
 	String targetPointer;
+	String idPointer;
 
 	ITSTrace () {
 	}

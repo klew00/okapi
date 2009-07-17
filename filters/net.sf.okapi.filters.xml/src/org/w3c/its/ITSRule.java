@@ -9,6 +9,7 @@ class ITSRule {
 	int value;
 	String info;
 	int infoType;
+	String idPointer;
 
 	public ITSRule (int type) {
 		ruleType = type;

@@ -80,6 +80,8 @@ public class Test {
 						}
 						// Show the language
 						element.appendChild(doc.createTextNode(" + lang="+ trav.getLanguage()));
+						// Show the idPointer
+						element.appendChild(doc.createTextNode(" + idPointer="+ trav.getIdPointer()));
 					}
 					break;
 				}

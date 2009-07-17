@@ -1327,8 +1327,9 @@ public class RTFFilter implements IFilter {
 		case '_': // Non-Breaking hyphen
 			chCurrent = '\u2011';
 			return TOKEN_CHAR;
+		case '-': // Non-required hyphen (should we convert to Soft-hyphen?? U+00AD?)
 		case '|': // Formula character
-		case '-': // Non-required hyphen (Soft-hyphen?? U+00AD?)
+		case ':': // Sub-entry in index entry
 			return TOKEN_CTRLWORD;
 		default: // Should not get here
 			throw new OkapiIllegalFilterOperationException(String.format("Unknown control symbol '%c'", chCurrent));
