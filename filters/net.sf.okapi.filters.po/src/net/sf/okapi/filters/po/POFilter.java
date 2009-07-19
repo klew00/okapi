@@ -306,7 +306,7 @@ public class POFilter implements IFilter {
 					// Else: end of the document
 					Ending ending = new Ending("ed");
 					ending.setSkeleton(skel);
-					parseState = 0;
+					close();
 					return new Event(EventType.END_DOCUMENT, ending);
 				}
 			}

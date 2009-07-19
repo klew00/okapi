@@ -113,11 +113,11 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testComplexEntities () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r"
 			+ "<!DOCTYPE doc ["
-			+ "<!ENTITY entity1 '[&entity2;]'>\n"
-			+ "<!ENTITY entity2 'TEXT'>\n"
-			+ "]>\n"
+			+ "<!ENTITY entity1 '[&entity2;]'>\r"
+			+ "<!ENTITY entity2 'TEXT'>\r"
+			+ "]>\r"
 			+ "<doc>"
 			+ "<p>&entity1;=[TEXT]</p>"
 			+ "<p>&entity2;=TEXT</p>"

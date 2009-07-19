@@ -534,7 +534,7 @@ public class FilterTestDriver {
 	}
 
 	/**
-	 * create a string output from a list of events.
+	 * Creates a string output from a list of events.
 	 * 
 	 * @param list
 	 *            The list of events.
