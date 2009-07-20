@@ -55,6 +55,7 @@ public final class MimeTypeMapper {
 	public static final String DOCM_MIME_TYPE = "application/vnd.ms-word.document.macroEnabled";
 	public static final String XLSM_MIME_TYPE = "application/vnd.ms-excel.sheet.macroEnabled";
 	public static final String PPTM_MIME_TYPE = "application/vnd.ms-powerpoint.presentation.macroEnabled";
+	public static final String TS_MIME_TYPE = "application/x-ts";	
 
 	static {
 		extensionToMimeMap.put("xml", XML_MIME_TYPE);
@@ -82,6 +83,7 @@ public final class MimeTypeMapper {
 		extensionToMimeMap.put("pptx", PPTX_MIME_TYPE);
 		extensionToMimeMap.put("pptm", PPTM_MIME_TYPE);
 		extensionToMimeMap.put("dtd", DTD_MIME_TYPE);
+		extensionToMimeMap.put("ts", TS_MIME_TYPE);		
 	}
 
 	/**
