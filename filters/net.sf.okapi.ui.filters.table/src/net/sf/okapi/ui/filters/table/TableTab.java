@@ -169,7 +169,7 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 				Label label = new Label(composite, SWT.NONE);
 				label.setText("Field delimiter:");
 				label.setAlignment(SWT.RIGHT);
-				label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+				label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 			}
 			{
 				delim = new Combo(composite, SWT.READ_ONLY);
@@ -198,7 +198,7 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 				Label label_1 = new Label(composite, SWT.NONE);
 				label_1.setText("Text qualifier:");
 				label_1.setAlignment(SWT.RIGHT);
-				label_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+				label_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 			}
 			{
 				qualif = new Combo(composite, SWT.READ_ONLY);
@@ -230,7 +230,7 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 		
 		removeQualif = new Button(csvActions, SWT.CHECK);
 		removeQualif.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
-		removeQualif.setText("Remove qualifiers");
+		removeQualif.setText("Exclude qualifiers from extracted text");
 		
 		trim = new Button(csvActions, SWT.CHECK);
 		trim.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
@@ -241,7 +241,7 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 				interop(e.widget);
 			}
 		});
-		trim.setText("Trim values");
+		trim.setText("Exclude leading/trailing white spaces from extracted text");
 		
 		label_2 = new Label(csvActions, SWT.NONE);
 		label_2.setData("name", "label_2");
