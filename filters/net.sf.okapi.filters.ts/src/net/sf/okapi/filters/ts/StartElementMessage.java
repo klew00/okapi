@@ -13,6 +13,14 @@ public class StartElementMessage extends StartElement{
 		setId();
 	}
 	
+	public String getId(){
+		return this.id;
+	}
+	
+	public void setId(String id){
+		this.id = id;
+	}
+	
 	public void setId(){
 		for(Attribute attr: attributes){
 			if(attr.getLocalname().equals("id")){
@@ -20,10 +28,6 @@ public class StartElementMessage extends StartElement{
 				return;
 			}
 		}
-	}
-	
-	public String getId(){
-		return this.id;
 	}
 	
 	public String toString(){

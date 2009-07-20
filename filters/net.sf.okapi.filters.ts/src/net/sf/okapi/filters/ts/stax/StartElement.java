@@ -70,6 +70,10 @@ public class StartElement implements StaxObject{
 		return sb.toString();
 	}
 	
+	/**
+	 * Generates the skeleton for the start element.
+	 * @return the generated GenericSkeleton. 
+	 */	
 	public GenericSkeleton getSkeleton(){
 
 		GenericSkeleton skel = new GenericSkeleton();

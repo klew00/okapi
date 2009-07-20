@@ -29,6 +29,16 @@ public class Characters implements StaxObject{
 		this.escapedText = Util.escapeToXML(reader.getText(), 0, true, null); 
 	}
 	
+	public void append(XMLStreamReader reader){
+		this.rawText = this.rawText.concat(reader.getText()); 
+		this.escapedText = this.rawText.concat(Util.escapeToXML(reader.getText(), 0, true, null));
+	}
+	
+	public void append(String s){
+		this.rawText = this.rawText.concat(s); 
+		this.escapedText = this.rawText.concat(Util.escapeToXML(s, 0, true, null));
+	}	
+	
 	public String toString(){
 		return escapedText;
 	}

@@ -36,6 +36,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -112,10 +113,10 @@ public class TsFilter implements IFilter {
 	public List<FilterConfiguration> getConfigurations() {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
-			"text/x-ts",
+			MimeTypeMapper.TS_MIME_TYPE,
 			getClass().getName(),
 			"TS",
-			"Configuration for Qt Ts files."));
+			"Configuration for Qt TS files."));
 		return list;
 	}
 
@@ -209,6 +210,11 @@ public class TsFilter implements IFilter {
 			hasNext = true;
 			queue = new LinkedList<Event>();
 			
+			// Compile code finder rules
+			if ( params.useCodeFinder ) {
+				params.codeFinder.compile();
+			}
+			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
 			String realEnc = reader.getCharacterEncodingScheme();
@@ -272,7 +278,14 @@ public class TsFilter implements IFilter {
 						procCtxGrp = false;
 					}
 					
-					tMsg = new TsMessage(trgLang,reader,queue, lineBreak);
+					if(!skel.isEmpty()){
+						//--restart the skeleton--
+						DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
+						skel = new GenericSkeleton();
+						queue.add(new Event(EventType.DOCUMENT_PART, dp));
+					}
+					
+					tMsg = new TsMessage(trgLang,reader,queue, lineBreak, params);
 					return tMsg.processMessage(tuId);
 				}
 				

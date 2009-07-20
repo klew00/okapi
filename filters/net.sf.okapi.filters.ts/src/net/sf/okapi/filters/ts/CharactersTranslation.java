@@ -22,6 +22,11 @@ public class CharactersTranslation extends Characters{
 		this.lang = lang;
 		this.tu = tu;
 	}
+
+	public CharactersTranslation(String lang, String str){
+		super(str);
+		this.lang = lang;
+	}
 	
 	public void setTu(TextUnit tu){
 		this.tu = tu;
