@@ -313,12 +313,13 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 		custQualif.setEnabled(qualif.getSelectionIndex() == 3);
 		
 		boolean noQualif = qualif.getSelectionIndex() == 2;
-		boolean trimOn = trim.getSelection() && csvActions.getEnabled();
+		boolean trimOn = trim.getSelection(); // && csvActions.getEnabled();
 		boolean noHeader = start.getSelection() <= 1;
 		boolean headerOn = header.getSelection();
 		boolean noColNames = cols.getSelection() == 0;
 		
-		if (noQualif || !csvActions.getEnabled()) removeQualif.setSelection(false);		
+		//if (noQualif || !csvActions.getEnabled()) removeQualif.setSelection(false);		
+		if (noQualif && csvActions.getEnabled()) removeQualif.setSelection(false);
 		removeQualif.setEnabled(!noQualif && csvActions.getEnabled());
 		
 		//----------------------------
