@@ -42,6 +42,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -120,7 +121,7 @@ public class Merger {
 			
 			// Open the RTF input
 			File f = new File(fileToConvert);
-			//TODO: gusse encoding based on language
+			//TODO: guess encoding based on language
 			rtfFilter.open(new RawDocument(f.toURI(), "windows-1252", manifest.getTargetLanguage()));
 				
 			// Open the output document
@@ -252,44 +253,59 @@ public class Merger {
 			
 		if ( !tu.getId().equals(tuFromTrans.getId()) ) {
 			// Problem: different IDs
-			logger.warning(String.format("ID mismatch: original item id=\"%s\" package item id=\"%s\".",
+			logger.warning(String.format("ID mismatch: Original item id=\"%s\" package item id=\"%s\".",
 				tu.getId(), tuFromTrans.getId()));
-			// Keep the source
-			return;
+			return; // Use the source
 		}
 
 		if ( !tuFromTrans.hasTarget(trgLang) ) {
 			// No translation in package
 			if ( !tu.isEmpty() ) {
 				logger.log(Level.WARNING,
-					String.format("Item id=\"%s\": No translation provided.", tu.getId()));
-				tu.setTarget(trgLang, tu.getSource());
+					String.format("Item id=\"%s\": No translation provided; using source instead.", tu.getId()));
+				return; // Use the source
 			}
 		}
 
-//		boolean approved = false;
-//		Property prop = tu.getTargetProperty(trgLang, Property.APPROVED);
-//		if (( prop != null ) && prop.getValue().equals("yes") ) {
-//			approved = true;
-//		}
+		boolean isTransApproved = false;
+		Property prop = tuFromTrans.getTargetProperty(trgLang, Property.APPROVED);
+		if ( prop != null ) {
+			isTransApproved = prop.getValue().equals("yes");
+		}
+		if ( manifest.useApprovedOnly() && !isTransApproved ) {
+			// Not approved: use the source
+			logger.log(Level.WARNING,
+				String.format("Item id='%s': Target is not approved; using source instead.", tu.getId()));
+			return; // Use the source
+		}
 
-		// Get the translated target, and unsegment it if needed
+		// Get the translated target, and un-segment it if needed
 		TextContainer fromTrans = tuFromTrans.getTarget(trgLang);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSourceContent().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
 			logger.log(Level.WARNING,
-				String.format("Item id='%s': no target in XLIFF.", tu.getId()));
-			return;
+				String.format("Item id='%s': No target in XLIFF; using source instead.", tu.getId()));
+			return; // Use the source
 		}
 		
-//TODO: handle case of empty or non-existant target		
+//TODO: handle case of empty or non-existent target		
 		if ( fromTrans.isSegmented() ) {
 			fromTrans.mergeAllSegments();
 		}
 
 		// We create a new target if needed
 		TextContainer trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
+		
+		// Update 'approved' flag is requested
+		if ( manifest.updateApprovedFlag() ) {
+			prop = trgCont.getProperty(Property.APPROVED);
+			if ( prop == null ) {
+				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
+			}
+			//TODO: Option to set the flag based on isTransApproved
+			prop.setValue("yes");
+		}
 
 		// Adjust the codes to use the appropriate ones
 		List<Code> transCodes = fromTrans.getCodes();

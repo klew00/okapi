@@ -36,6 +36,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -163,7 +164,7 @@ public class GenericFilterWriter implements IFilterWriter {
 			}
 		}
 		catch ( FileNotFoundException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiFileNotFoundException("File not found.", e);
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException(e);

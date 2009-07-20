@@ -56,9 +56,9 @@ public class WordCountTest {
 		
 		assertEquals(4, positions.size());
 		
-		assertEquals(2, positions.get(0));
-		assertEquals(7, positions.get(1));
-		assertEquals(12, positions.get(2));
-		assertEquals(19, positions.get(3));
+		assertEquals(2, (int)positions.get(0));
+		assertEquals(7, (int)positions.get(1));
+		assertEquals(12, (int)positions.get(2));
+		assertEquals(19, (int)positions.get(3));
 	}
 }

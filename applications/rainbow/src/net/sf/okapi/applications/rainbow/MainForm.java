@@ -1502,7 +1502,7 @@ public class MainForm { //implements IParametersProvider {
 		rm.addImage("help"); //$NON-NLS-1$
 		
 		//TODO: deal with commands localization
-		rm.loadCommands("commands.xml"); //$NON-NLS-1$
+		rm.loadCommands("net.sf.okapi.applications.rainbow.Commands"); //$NON-NLS-1$
 
 		fm = new FormatManager();
 		fm.load(null); // TODO: implement real external file, for now it's hard-coded

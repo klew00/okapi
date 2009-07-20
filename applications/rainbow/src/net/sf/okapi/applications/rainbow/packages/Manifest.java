@@ -57,6 +57,8 @@ public class Manifest {
 	private String doneDir;
 	private String readerClass;
 	private String date;
+	private boolean useApprovedOnly;
+	private boolean updateApprovedFlag;
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, ManifestItem>();
@@ -64,6 +66,8 @@ public class Manifest {
 		targetDir = "";
 		originalDir = "";
 		doneDir = "";
+		useApprovedOnly = true;
+		updateApprovedFlag = true;
 	}
 
 	public void setReaderClass (String readerClass) {
@@ -177,6 +181,22 @@ public class Manifest {
 		return date;
 	}
 	
+	public boolean useApprovedOnly () {
+		return useApprovedOnly;
+	}
+	
+	public void setUseApprovedOnly (boolean value) {
+		useApprovedOnly = value;
+	}
+	
+	public boolean updateApprovedFlag () {
+		return updateApprovedFlag;
+	}
+	
+	public void setUpdateApprovedFlag (boolean value) {
+		updateApprovedFlag = value;
+	}
+	
 	/**
 	 * Adds a document to the manifest.
 	 * @param docID Key of the document. Must be unique within the manifest.
@@ -243,6 +263,8 @@ public class Manifest {
 			writer.writeAttributeString("doneDir", doneDir.replace('\\', '/'));
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
+			writer.writeAttributeString("useApprovedOnly", (useApprovedOnly ? "yes" : "no"));
+			writer.writeAttributeString("updateApprovedFlag", (updateApprovedFlag ? "yes" : "no"));
 
 			Iterator<Integer> iter = docs.keySet().iterator();
 			ManifestItem item;
@@ -324,6 +346,11 @@ public class Manifest {
 		    
 		    tmp = elem.getAttribute("date");
 		    setDate(tmp);
+		    
+		    tmp = elem.getAttribute("useApprovedOnly");
+		    if ( tmp != null ) {
+		    	setUseApprovedOnly(tmp.equals("yes"));
+		    }
 
 		    String inPath, outPath, inEnc, outEnc, filterID, postProcessingType;
 		    docs.clear();
@@ -404,4 +431,5 @@ public class Manifest {
 		}
 		return nErrors;
 	}
+
 }

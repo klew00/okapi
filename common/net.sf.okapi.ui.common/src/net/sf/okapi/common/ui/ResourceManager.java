@@ -21,21 +21,19 @@
 package net.sf.okapi.common.ui;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.ResourceBundle;
+import java.util.Vector;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class ResourceManager {
 
@@ -239,64 +237,106 @@ public class ResourceManager {
 		return cmd.label;
 	}
 
-	public void loadCommands (String path) {
+	/**
+	 * Loads menu commands from a properties file.
+	 * @param baseName the base name to use, for example "net.sf.okapi.ui.app.Commands"
+	 * to load the Commands.properties file in net.sf.okapi.ui.app.
+	 */
+	public void loadCommands (String baseName) {
 		try {
-			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
-			Fact.setValidating(false);
-			Document Doc = Fact.newDocumentBuilder().parse(cls.getResourceAsStream(path));
-			NodeList NL = Doc.getElementsByTagName("command");
+			ResourceBundle bundle = ResourceBundle.getBundle(baseName);
 			commands.clear();
-			CommandItem item;
-			String name;
-			for ( int i=0; i<NL.getLength(); i++ ) {
-				item = new CommandItem();
-				item.label = Util.getTextContent(NL.item(i));
-				Node N = NL.item(i).getAttributes().getNamedItem("name");
-				if ( N == null ) throw new Exception("The attribute 'name' is missing.");
-				else name = Util.getTextContent(N);
-				if ( (N = NL.item(i).getAttributes().getNamedItem("alt")) != null )
-					if ( Util.getTextContent(N).equals("1") ) item.accelerator |= SWT.ALT;
-				if ( (N = NL.item(i).getAttributes().getNamedItem("shift")) != null )
-					if ( Util.getTextContent(N).equals("1") ) item.accelerator |= SWT.SHIFT;
-				if ( (N = NL.item(i).getAttributes().getNamedItem("ctrl")) != null )
-					if ( Util.getTextContent(N).equals("1") ) item.accelerator |= SWT.CONTROL;
-				if ( (N = NL.item(i).getAttributes().getNamedItem("cmd")) != null )
-					if ( Util.getTextContent(N).equals("1") ) item.accelerator |= SWT.COMMAND;
-				if ( (N = NL.item(i).getAttributes().getNamedItem("key")) != null ) {
-					String key = Util.getTextContent(N);
-					if ( key.equals("F1") ) item.accelerator |= SWT.F1;
-					else if ( key.equals("F2") ) item.accelerator |= SWT.F2;
-					else if ( key.equals("F3") ) item.accelerator |= SWT.F3;
-					else if ( key.equals("F4") ) item.accelerator |= SWT.F4;
-					else if ( key.equals("F5") ) item.accelerator |= SWT.F5;
-					else if ( key.equals("F6") ) item.accelerator |= SWT.F6;
-					else if ( key.equals("F7") ) item.accelerator |= SWT.F7;
-					else if ( key.equals("F8") ) item.accelerator |= SWT.F8;
-					else if ( key.equals("F9") ) item.accelerator |= SWT.F9;
-					else if ( key.equals("F10") ) item.accelerator |= SWT.F10;
-					else if ( key.equals("F11") ) item.accelerator |= SWT.F11;
-					else if ( key.equals("F12") ) item.accelerator |= SWT.F12;
-					else if ( key.equals("F13") ) item.accelerator |= SWT.F13;
-					else if ( key.equals("F14") ) item.accelerator |= SWT.F14;
-					else if ( key.equals("F15") ) item.accelerator |= SWT.F15;
-					else if ( key.equals("Up") ) item.accelerator |= SWT.ARROW_UP;
-					else if ( key.equals("Down") ) item.accelerator |= SWT.ARROW_DOWN;
-					else if ( key.equals("Left") ) item.accelerator |= SWT.ARROW_LEFT;
-					else if ( key.equals("Right") ) item.accelerator |= SWT.ARROW_RIGHT;
-					else if ( key.equals("PageUp") ) item.accelerator |= SWT.PAGE_UP;
-					else if ( key.equals("PageDown") ) item.accelerator |= SWT.PAGE_DOWN;
-					else if ( key.equals("Home") ) item.accelerator |= SWT.HOME;
-					else if ( key.equals("End") ) item.accelerator |= SWT.END;
-					else if ( key.equals("Insert") ) item.accelerator |= SWT.INSERT;
-					else if ( key.equals("Enter") ) item.accelerator |= SWT.CR;
-					else if ( key.equals("Delete") ) item.accelerator |= SWT.DEL;
-					else item.accelerator |= key.codePointAt(0);
+
+			Enumeration<String> enumKeys = bundle.getKeys();
+			Vector<String> vect = new Vector<String>(Collections.list(enumKeys));
+			Collections.sort(vect);
+			
+			String rootKey = "";
+			CommandItem item = null;
+			for ( String key : vect ) {
+				// Check if it is the same root, if not add the command if we have one
+				int n = key.lastIndexOf('.');
+				if ( !key.substring(0, n).equals(rootKey) ) {
+					if ( item != null ) {
+						commands.put(rootKey, item);
+					}
+					// Create the new item
+					item = new CommandItem();
+					rootKey = key.substring(0, n);
 				}
-				commands.put(name, item);
+				// Fill the command item
+				if ( key.endsWith(".text") ) {
+					item.label = bundle.getString(key);
+				}
+				else if ( key.endsWith(".alt") ) {
+					if ( bundle.getString(key).equals("1") ) {
+						item.accelerator |= SWT.ALT;
+					}
+				}
+				else if ( key.endsWith(".ctrl") ) {
+					if ( bundle.getString(key).equals("1") ) {
+						item.accelerator |= SWT.CONTROL;
+					}
+				}
+				else if ( key.endsWith(".shift") ) {
+					if ( bundle.getString(key).equals("1") ) {
+						item.accelerator |= SWT.SHIFT;
+					}
+				}
+				else if ( key.endsWith(".cmd") ) {
+					if ( bundle.getString(key).equals("1") ) {
+						item.accelerator |= SWT.COMMAND;
+					}
+				}
+				else if ( key.endsWith(".key") ) {
+					String tmp = bundle.getString(key);
+					if ( tmp.equals("F1") ) item.accelerator |= SWT.F1;
+					else if ( tmp.equals("F2") ) item.accelerator |= SWT.F2;
+					else if ( tmp.equals("F3") ) item.accelerator |= SWT.F3;
+					else if ( tmp.equals("F4") ) item.accelerator |= SWT.F4;
+					else if ( tmp.equals("F5") ) item.accelerator |= SWT.F5;
+					else if ( tmp.equals("F6") ) item.accelerator |= SWT.F6;
+					else if ( tmp.equals("F7") ) item.accelerator |= SWT.F7;
+					else if ( tmp.equals("F8") ) item.accelerator |= SWT.F8;
+					else if ( tmp.equals("F9") ) item.accelerator |= SWT.F9;
+					else if ( tmp.equals("F10") ) item.accelerator |= SWT.F10;
+					else if ( tmp.equals("F11") ) item.accelerator |= SWT.F11;
+					else if ( tmp.equals("F12") ) item.accelerator |= SWT.F12;
+					else if ( tmp.equals("F13") ) item.accelerator |= SWT.F13;
+					else if ( tmp.equals("F14") ) item.accelerator |= SWT.F14;
+					else if ( tmp.equals("F15") ) item.accelerator |= SWT.F15;
+					else if ( tmp.equals("Up") ) item.accelerator |= SWT.ARROW_UP;
+					else if ( tmp.equals("Down") ) item.accelerator |= SWT.ARROW_DOWN;
+					else if ( tmp.equals("Left") ) item.accelerator |= SWT.ARROW_LEFT;
+					else if ( tmp.equals("Right") ) item.accelerator |= SWT.ARROW_RIGHT;
+					else if ( tmp.equals("PageUp") ) item.accelerator |= SWT.PAGE_UP;
+					else if ( tmp.equals("PageDown") ) item.accelerator |= SWT.PAGE_DOWN;
+					else if ( tmp.equals("Home") ) item.accelerator |= SWT.HOME;
+					else if ( tmp.equals("End") ) item.accelerator |= SWT.END;
+					else if ( tmp.equals("Insert") ) item.accelerator |= SWT.INSERT;
+					else if ( tmp.equals("Enter") ) item.accelerator |= SWT.CR;
+					else if ( tmp.equals("Delete") ) item.accelerator |= SWT.DEL;
+					else {
+						if ( tmp.length() == 1 ) {
+							item.accelerator |= tmp.codePointAt(0);
+						}
+						else {
+							throw new OkapiIOException("Invalid key in command: "+tmp);
+						}
+					}
+				}
+				else {
+					throw new OkapiIOException("Invalid keyword in command: "+key);
+				}
+			}
+			// Add the last item
+			if ( rootKey.length() > 0 ) {
+				commands.put(rootKey, item);
 			}
         }
 		catch ( Exception e ) {
 			throw new RuntimeException(e);
 		}
 	}
+
 }

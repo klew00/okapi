@@ -64,7 +64,7 @@ public abstract class OkapiComponent extends Component implements IConfigurable 
 	protected <A> A getParameters(Class<?> expectedClass) {
 		
 		if (params == null) {
-			throw new OkapiBadFilterParametersException("Empty filter parameters");			
+			throw new OkapiBadFilterParametersException("Filter parameters object is null.");			
 		}
 		
 		if (!expectedClass.isInstance(params)) {

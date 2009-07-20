@@ -148,7 +148,7 @@ public class SRXEditor {
 		}
 
 		rm = new ResourceManager(SRXEditor.class, shell.getDisplay());
-		rm.loadCommands("commands.xml"); //$NON-NLS-1$
+		rm.loadCommands("net.sf.okapi.lib.ui.segmentation.Commands"); //$NON-NLS-1$
 
 		rm.addImages("ratel", "ratel16", "ratel32"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		shell.setImages(rm.getImages("ratel")); //$NON-NLS-1$

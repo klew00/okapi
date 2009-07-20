@@ -33,6 +33,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -45,6 +46,7 @@ public class ManifestDialog {
 	
 	private Shell shell;
 	private IHelp help;
+	private Manifest manifest;
 	private ManifestTableModel tableMod;
 	private SelectionAdapter CloseActions;
 	private boolean result;
@@ -54,6 +56,8 @@ public class ManifestDialog {
 	private Text edTarget;
 	private Text edDate;
 	private Text edMergeInputRoot;
+	private Button chkUseApprovedOnly;
+	private Button chkUpdateApprovedFlag;
 
 	public ManifestDialog (Shell parent,
 		IHelp helpParam)
@@ -90,6 +94,20 @@ public class ManifestDialog {
 		edMergeInputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edMergeInputRoot.setEditable(false);
 		
+		//--- Options tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Options");
+		tiTmp.setControl(cmpTmp);
+		
+		chkUseApprovedOnly = new Button(cmpTmp, SWT.CHECK);
+		chkUseApprovedOnly.setText("Merge the translation only if it is approved");
+		
+		chkUpdateApprovedFlag = new Button(cmpTmp, SWT.CHECK);
+		chkUpdateApprovedFlag.setText("Se the 'approved' flag on the merged translations.");
+
 		//--- Information tab
 		
 		cmpTmp = new Composite(tfTmp, SWT.NONE);
@@ -143,6 +161,8 @@ public class ManifestDialog {
 				}
 				if ( e.widget.getData().equals("o") ) {
 					tableMod.saveData();
+					manifest.setUseApprovedOnly(chkUseApprovedOnly.getSelection());
+					manifest.setUpdateApprovedFlag(chkUpdateApprovedFlag.getSelection());
 					result = true;
 				}
 				shell.close();
@@ -169,12 +189,15 @@ public class ManifestDialog {
 	}
 	
 	private void setData (Manifest manifest) {
+		this.manifest = manifest;
 		edMergeInputRoot.setText(manifest.getMergeInputRoot());
 		edPkgType.setText(manifest.getPackageType());
 		edPkgID.setText(manifest.getPackageID());
 		edSource.setText(manifest.getSourceLanguage());
 		edTarget.setText(manifest.getTargetLanguage());
 		edDate.setText(manifest.getDate());
+		chkUseApprovedOnly.setSelection(manifest.useApprovedOnly());
+		chkUpdateApprovedFlag.setSelection(manifest.updateApprovedFlag());
 	}
 	
 	public boolean showDialog (Manifest manifest) {
