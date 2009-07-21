@@ -65,13 +65,6 @@ public class TMXWriter {
 	}
 
 	/**
-	 * Increments by one, the count of items processed so far.
-	 */
-	public void incrementItemCount () {
-		itemCount++;
-	}
-
-	/**
 	 * Creates a new TMX document.
 	 * @param path The full path of the TMX document to create.
 	 * If another document exists already it will be overwritten.
@@ -182,18 +175,17 @@ public class TMXWriter {
 	 * @param item the text unit to output.
 	 * @param attributes the optional set of attribute to put along with the entry.
 	 * @param indicates if this item is an 'alternate'. If it is an alternate, if the
-	 * target language does not have any entry in this item, the fisrt found entry is used
+	 * target language does not have any entry in this item, the first found entry is used
 	 * instead. This is to allow getting for example FR-CA translations for an FR project.
 	 */
 	public void writeItem (TextUnit item,
 		Map<String, String> attributes,
 		boolean alternate)
 	{
-		itemCount++;
-		
 		String tuid = item.getName();
 		if (( tuid == null ) || ( tuid.length() == 0 )) {
-			tuid = String.format("autoID%d", itemCount);
+			// itemCount will be incremented in writeTU, so do a +1 here to take that in account
+			tuid = String.format("autoID%d", itemCount+1);
 		}
 		
 		TextContainer srcTC = item.getSource();
@@ -245,9 +237,7 @@ public class TMXWriter {
 	}
 
 	/**
-	 * Writes a TMX TU element. If you call this method from outside
-	 * the TMXWriter class methods, make sure to also call {@link #incrementItemCount()} to
-	 * keep the number of item written up to date.
+	 * Writes a TMX TU element.
 	 * @param source the fragment for the source text.
 	 * @param target the fragment for the target text.
 	 * @param tuid the TUID attribute (can be null).
@@ -266,6 +256,7 @@ public class TMXWriter {
 			}
 		}
 		
+		itemCount++;
 		writer.writeStartElement("tu");
 		if (( tuid != null ) && ( tuid.length() > 0 ))
 			writer.writeAttributeString("tuid", tuid);
@@ -303,8 +294,10 @@ public class TMXWriter {
 	 * Writes a TextUnit (all targets) with all the properties associated to it.
 	 * @param item The text unit to write.
 	 */
-	public void writeFullItem (TextUnit item) {
-		if ( item == null ) throw new NullPointerException();
+	public void writeTUFull (TextUnit item) {
+		if ( item == null ) {
+			throw new NullPointerException();
+		}
 		itemCount++;
 		
 		String tuid = item.getName();

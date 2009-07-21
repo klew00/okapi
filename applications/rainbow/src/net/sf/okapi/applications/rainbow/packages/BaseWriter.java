@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,7 +23,6 @@ package net.sf.okapi.applications.rainbow.packages;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -31,7 +30,6 @@ import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -52,8 +50,8 @@ public abstract class BaseWriter implements IWriter {
 	protected String tmxPathUnApproved;
 	protected TMXWriter tmxWriterAlternate;
 	protected String tmxPathAlternate;
-	protected TMXWriter tmxWriterTM;
-	protected String tmxPathTM;
+	protected TMXWriter tmxWriterLeverage;
+	protected String tmxPathLeverage;
 	protected String trgLang;
 	protected String encoding;
 	protected String outputPath;
@@ -66,7 +64,7 @@ public abstract class BaseWriter implements IWriter {
 		tmxWriterApproved = new TMXWriter();
 		tmxWriterUnApproved = new TMXWriter();
 		tmxWriterAlternate = new TMXWriter();
-		tmxWriterTM = new TMXWriter();
+		tmxWriterLeverage = new TMXWriter();
 	}
 	
 	public void cancel () {
@@ -139,11 +137,11 @@ public abstract class BaseWriter implements IWriter {
 			manifest.getTargetLanguage(), null, null, null, null, null);
 
 		// Create the reference TMX (pre-translation TM)
-		if ( tmxPathTM == null ) {
-			tmxPathTM = manifest.getRoot() + File.separator + "leverage.tmx";
+		if ( tmxPathLeverage == null ) {
+			tmxPathLeverage = manifest.getRoot() + File.separator + "leverage.tmx";
 		}
-		tmxWriterTM.create(tmxPathTM);
-		tmxWriterTM.writeStartDocument(manifest.getSourceLanguage(),
+		tmxWriterLeverage.create(tmxPathLeverage);
+		tmxWriterLeverage.writeStartDocument(manifest.getSourceLanguage(),
 			manifest.getTargetLanguage(), null, null, null, null, null);
 	}
 
@@ -179,10 +177,10 @@ public abstract class BaseWriter implements IWriter {
 				file.delete();
 			}
 
-			tmxWriterTM.writeEndDocument();
-			tmxWriterTM.close();
-			if ( tmxWriterTM.getItemCount() == 0 ) {
-				File file = new File(tmxPathTM);
+			tmxWriterLeverage.writeEndDocument();
+			tmxWriterLeverage.close();
+			if ( tmxWriterLeverage.getItemCount() == 0 ) {
+				File file = new File(tmxPathLeverage);
 				file.delete();
 			}
 		}
@@ -276,10 +274,6 @@ public abstract class BaseWriter implements IWriter {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Helper method to output the TMX entries.
-	 * @param tu the text unit to look at for possible output.
-	 */
 	public void writeTMXEntries (TextUnit tu) {
 		// Write the items in the TM if needed
 		TextContainer tc = tu.getTarget(trgLang);
@@ -299,7 +293,6 @@ public abstract class BaseWriter implements IWriter {
 				ScoresAnnotation scores = tu.getTarget(trgLang).getAnnotation(ScoresAnnotation.class);
 				if ( scores != null ) {
 					writeScoredItem(tu, scores);
-					//was: tmxWriterTM.writeItem(tu, null);
 				}
 				else {
 					tmxWriterUnApproved.writeItem(tu, null);
@@ -318,43 +311,11 @@ public abstract class BaseWriter implements IWriter {
 		}
 	}
 
-	private void writeScoredItem (TextUnit item,
+	public void writeScoredItem (TextUnit item,
 		ScoresAnnotation scores)
 	{
-		String tuid = item.getName();
-		TextContainer srcTC = item.getSource();
-		TextContainer trgTC = item.getTarget(trgLang);
-
-		if ( !srcTC.isSegmented() ) { // Source is not segmented
-			if ( scores.getScore(0) == 100 ) {
-				tmxWriterApproved.writeTU(srcTC, trgTC, tuid, null);
-			}
-			else if ( scores.getScore(0) > 0 ) {
-				tmxWriterTM.writeTU(srcTC, trgTC, tuid, null);
-			}
-			// Else: skip score of 0
-		}
-		else if ( trgTC.isSegmented() ) { // Source AND target are segmented
-			// Write the segments
-			List<Segment> srcList = srcTC.getSegments();
-			List<Segment> trgList = trgTC.getSegments();
-			for ( int i=0; i<srcList.size(); i++ ) {
-				if ( scores.getScore(i) == 100 ) {
-					tmxWriterApproved.writeTU(srcList.get(i).text,
-						(i>trgList.size()-1) ? null : trgList.get(i).text,
-						String.format("%s_s%02d", tuid, i+1),
-						null);
-				}
-				else if ( scores.getScore(i) > 0 ) {
-					tmxWriterTM.writeTU(srcList.get(i).text,
-						(i>trgList.size()-1) ? null : trgList.get(i).text,
-						String.format("%s_s%02d", tuid, i+1),
-						null);
-				}
-			}
-			// Else: skip score of 0
-		}
-		// Else no TMX output needed for source segmented but not target
+		// By default, matches go in the leverage TM
+		tmxWriterLeverage.writeItem(item, null);
 	}
 
 }

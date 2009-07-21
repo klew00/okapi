@@ -21,9 +21,14 @@
 package net.sf.okapi.applications.rainbow.packages.omegat;
 
 import java.io.File;
+import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 
 public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Writer {
 
@@ -50,7 +55,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			+ "unapproved.tmx";
 		tmxPathAlternate = manifest.getRoot() + File.separator + "tm" + File.separator
 			+ "alternate.tmx";
-		tmxPathTM = manifest.getRoot() + File.separator + "tm" + File.separator
+		tmxPathLeverage = manifest.getRoot() + File.separator + "tm" + File.separator
 			+ "leverage.tmx";
 		// Call the base class method
 		super.writeStartPackage();
@@ -74,6 +79,47 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		super.writeEndPackage(p_bCreateZip);
 	}
 
+	@Override
+	public void writeScoredItem (TextUnit item,
+		ScoresAnnotation scores)
+	{
+		// In OmegaT we put both the approved and exact match of the project_save.tmx (the 'approved' one). 
+		String tuid = item.getName();
+		TextContainer srcTC = item.getSource();
+		TextContainer trgTC = item.getTarget(trgLang);
+
+		if ( !srcTC.isSegmented() ) { // Source is not segmented
+			if ( scores.getScore(0) == 100 ) {
+				tmxWriterApproved.writeTU(srcTC, trgTC, tuid, null);
+			}
+			else if ( scores.getScore(0) > 0 ) {
+				tmxWriterLeverage.writeTU(srcTC, trgTC, tuid, null);
+			}
+			// Else: skip score of 0
+		}
+		else if ( trgTC.isSegmented() ) { // Source AND target are segmented
+			// Write the segments
+			List<Segment> srcList = srcTC.getSegments();
+			List<Segment> trgList = trgTC.getSegments();
+			for ( int i=0; i<srcList.size(); i++ ) {
+				if ( scores.getScore(i) == 100 ) {
+					tmxWriterApproved.writeTU(srcList.get(i).text,
+						(i>trgList.size()-1) ? null : trgList.get(i).text,
+						String.format("%s_s%02d", tuid, i+1),
+						null);
+				}
+				else if ( scores.getScore(i) > 0 ) {
+					tmxWriterLeverage.writeTU(srcList.get(i).text,
+						(i>trgList.size()-1) ? null : trgList.get(i).text,
+						String.format("%s_s%02d", tuid, i+1),
+						null);
+				}
+			}
+			// Else: skip score of 0
+		}
+		// Else no TMX output needed for source segmented but not target
+	}
+	
 	private void createOmegaTProject () {
 		XMLWriter XR = null;
 		try {
