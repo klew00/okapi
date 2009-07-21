@@ -224,7 +224,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			tmxTu.setTargetContent(trgLang+params.trgSuffix, trgFrag2);
 			scoreProp.setValue(String.format("%03d", score));
 			tmxTu.setTargetProperty(trgLang+params.trgSuffix, scoreProp);
-			tmx.writeFullItem(tmxTu);
+			tmx.writeTUFull(tmxTu);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -117,7 +117,7 @@ public class GMX {
 	final public static String DateAutoTextWordCount = "DateAutoTextWordCount";
 
 	/**
-	 * An accumulation of the word count for identifiable trade marks, e.g. "Weapons of Mass Destruction™".
+	 * An accumulation of the word count for identifiable trade marks, e.g. "Weapons of Mass Destructionâ„¢".
 	 */
 	final public static String TMAutoTextWordCount = "TMAutoTextWordCount";
 
@@ -223,7 +223,7 @@ public class GMX {
 	final public static String DateAutoTextCharacterCount = "DateAutoTextCharacterCount";
 
 	/**
-	 * An accumulation of the character count for identifiable trade marks, e.g. "Weapons of Mass Destruction™". 
+	 * An accumulation of the character count for identifiable trade marks, e.g. "Weapons of Mass Destructionï¿½". 
 	 */
 	final public static String TMAutoTextCharacterCount = "TMAutoTextCharacterCount";
 

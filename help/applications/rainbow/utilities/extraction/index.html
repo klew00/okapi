@@ -91,9 +91,12 @@ filter the TM matches based on the values of <code>GroupName</code> attribute. W
 have, not only the source text but also the values for <code>GroupName</code> that match are leveraged. When this option is not set, 
 the leveraging is not filtered by the <code>GroupName</code> attribute.</p>
 <p><cite>Leverage only exact (100%) matches</cite> -- Set this option to 
-leverage only the exact matches (matches at 100%).</p>
+leverage only the exact matches (matches at 100%). Note that if there are 
+several matches (regardless of their scores) only the first one is generated in 
+the <a href="#tmxOutput">TMX output</a> and, if the selected package allows it, 
+in the translation file.</p>
 <h3>About SimpleTM</h3>
-<p>SimpleTM is a provisional simple TM engine that can match only exact matches, 
+<p><b>SimpleTM is a provisional simple TM engine</b> that can match only exact matches, 
 and use attributes. It also allows multiple translations of the same source 
 text. When the attributes are not used, you may get several exact matches, if at 
 least of of them has a different translation, the segment is matched at 99% 
@@ -201,8 +204,10 @@ formats.</p>
 unapproved.tmx</a></code>, <code><a href="#tmxOutput">alternate.tmx</a></code> 
 and <code><a href="#tmxOutput">leverage.tmx</a></code> 
 files if they were generated.</p>
-<p>The <code>omegat</code> sub-directory contains the <code>
-<a href="#tmxOutput">approved.tmx</a></code> file if it was generated.</p>
+<p dir="ltr">The <code>omegat</code> sub-directory contains the <code>
+project_save.tmx</code> file if it was generated. This TMX document contains all 
+entries set as approved, and well as all 100% matches of the leverage, if one 
+was done.</p>
 <p>To merge back the translation of this package:</p>
 <ul>
 	<li>Use the <cite>Create Translated Documents</cite> command from the <cite>
@@ -234,17 +239,19 @@ correspond to possible existing translations obtained from the input documents
 themselves (some input formats such as PO or XLIFF may have been pre-translated 
 already).</p>
 <p>The <code>approved.tmx</code> document contains all the translations that 
-were found and had an <i>approved</i> target property set to &quot;<code>yes</code>&quot;.</p>
+were found in the original document and had an <i>approved</i> target property set to &quot;<code>yes</code>&quot;.</p>
 <p>The <code>unapproved.tmx</code> document contains all the translations that 
-were found and had no <i>approved</i> target property or an <i>approved</i> 
+were found in the original document and had no <i>approved</i> target property or an <i>approved</i> 
 target property set to something else than &quot;<code>yes</code>&quot;.</p>
 <p>The <code>alternate.tmx</code> document contains all the alternative 
-translation that were found along with the text units. For example the 
+translation that were found along with the text units in the original document. For example the 
 translation found in the <code>&lt;alt-trans&gt;</code> elements of XLIFF files.</p>
-<p>The <code>leverage.tmx</code> document contains all the matches that were 
+<p>The <code>leverage.tmx</code> document contains the matches that were 
 found if the pre-translation option was set.</p>
 <p>Note that if one of these TMX output does not contain any entry it is not 
-generated.</p>
+generated. Note also that the composition of each TMX document may be different 
+depending on the package you have selected. See the details on each package 
+description above.</p>
 <p>&nbsp;</p>
 </body>
 </html>
