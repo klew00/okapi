@@ -76,7 +76,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 		this.data = data; 
 		buffer.fromString(data);
 
-		parameters_load();
+		parameters_load(); // this.getClass()
 	}
 	
 	final public String toString () {

@@ -73,7 +73,7 @@ public class Editor extends AbstractParametersEditor {
 
 		// Find participants
 		
-//		Control btnCSV = findControl(TableTab.class, "btnCSV");
+		Control btnCSV = findControl(TableTab.class, "btnCSV");
 //		Control btnTSV = findControl(TableTab.class, "btnTSV");
 		Control btnFWC = findControl(TableTab.class, "btnFWC");
 		
@@ -110,7 +110,7 @@ public class Editor extends AbstractParametersEditor {
 		
 		// CSV actions/Trim to Options/Allow trimming
 		
-		if (speaker == allow && SWTUtils.getSelected(trim))
+		if (speaker == allow && SWTUtils.getSelected(trim) && SWTUtils.getSelected(btnCSV))
 			Dialogs.showWarning(getShell(), "You cannot unselect this check-box while the Table/Trim values box is on.", null);
 		
 		if (speaker == body && (SWTUtils.getDisabled(header) || SWTUtils.getNotSelected(header)))
@@ -119,27 +119,34 @@ public class Editor extends AbstractParametersEditor {
 		if (speaker == body && SWTUtils.getNotSelected(body) && SWTUtils.getSelected(header))
 			Dialogs.showWarning(getShell(), "The Columns tab will be disabled as you're extracting the header only.", null);
 		
-		SWTUtils.selectIfSelected(allow, trim);
-		SWTUtils.selectIfSelected(lead, trim);
-		SWTUtils.selectIfSelected(trail, trim);
-		
-		SWTUtils.unselectIfNotSelected(allow, trim);
-		SWTUtils.unselectIfNotSelected(lead, trim);
-		SWTUtils.unselectIfNotSelected(trail, trim);
-		
-		SWTUtils.enableIfSelected(allow, trim);
-		SWTUtils.enableIfSelected(lead, trim);
-		SWTUtils.enableIfSelected(trail, trim);
-		
-		SWTUtils.disableIfNotSelected(allow, trim);
-		SWTUtils.disableIfNotSelected(lead, trim);
-		SWTUtils.disableIfNotSelected(trail, trim);
-		
-		SWTUtils.disableIfNotSelected(allow, trim);
-		SWTUtils.disableIfNotSelected(lead, trim);
-		SWTUtils.disableIfNotSelected(trail, trim);
-		
-		SWTUtils.enableIfSelected(allow, trim);
+		if (SWTUtils.getSelected(btnCSV)) {
+			
+			SWTUtils.selectIfSelected(allow, trim);
+			SWTUtils.selectIfSelected(lead, trim);
+			SWTUtils.selectIfSelected(trail, trim);
+			
+			SWTUtils.unselectIfNotSelected(allow, trim);
+			SWTUtils.unselectIfNotSelected(lead, trim);
+			SWTUtils.unselectIfNotSelected(trail, trim);
+			
+			SWTUtils.enableIfSelected(allow, trim);
+			SWTUtils.enableIfSelected(lead, trim);
+			SWTUtils.enableIfSelected(trail, trim);
+			
+			SWTUtils.disableIfNotSelected(allow, trim);
+			SWTUtils.disableIfNotSelected(lead, trim);
+			SWTUtils.disableIfNotSelected(trail, trim);
+			
+			SWTUtils.disableIfNotSelected(allow, trim);
+			SWTUtils.disableIfNotSelected(lead, trim);
+			SWTUtils.disableIfNotSelected(trail, trim);
+			
+			SWTUtils.enableIfSelected(allow, trim);
+		}
+		else {
+			
+			SWTUtils.setEnabled(allow, true);
+		}
 		
 		// Extract table data enable state affects the Columns page
 		SWTUtils.enableIfSelected(columns, body);

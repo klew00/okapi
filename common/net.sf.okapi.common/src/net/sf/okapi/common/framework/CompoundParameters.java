@@ -37,7 +37,8 @@ public class CompoundParameters extends AbstractParameters{
 
 	private String parametersClass = "";
 	private LinkedList<IParameters> parameters = new LinkedList<IParameters>();
-	private IParameters activeParameters = null;	
+	private IParameters activeParameters = null;
+	private String defParametersClass = "";
 	
 	public IParameters getActiveParameters() {
 		
@@ -47,9 +48,7 @@ public class CompoundParameters extends AbstractParameters{
 	protected void setActiveParameters(IParameters activeParameters) {
 		
 		this.activeParameters = activeParameters;
-	}
-
-	private String defParametersClass = "";
+	}	
 	
 	@SuppressWarnings("unchecked")
 	protected boolean addParameters(Class<?> parametersClass) {
@@ -192,10 +191,14 @@ public class CompoundParameters extends AbstractParameters{
 		
 		setParametersClassName(buffer.getString("parametersClass", defParametersClass));
 		setActiveParameters(getParametersClassName());
-		
+				
 		// Load active parameters
-		if (activeParameters != null)			
+		if (activeParameters != null) {			
 			activeParameters.fromString(data);
+		}
+		
+		if (owner != null) // activeParameters.getClass()
+		owner.exec(this, Notification.PARAMETERS_CHANGED, parametersClass);
 	}
 
 	@Override
@@ -213,12 +216,20 @@ public class CompoundParameters extends AbstractParameters{
 		if (activeParameters != null)			
 			buffer.fromString(activeParameters.toString());
 		
-		if (activeParameters == null)
-			setParametersClassName(defParametersClass);
-		else
-			setParametersClassName(activeParameters.getClass().getName()); 
-
-		buffer.setString("parametersClass", getParametersClassName());
+//		if (activeParameters == null)
+//			setParametersClassName(defParametersClass);
+//		else
+//			setParametersClassName(activeParameters.getClass().getName()); 
+//
+//		buffer.setString("parametersClass", getParametersClassName());
+		
+		 
+			if (activeParameters == null)
+				this.parametersClass = defParametersClass;
+			else
+				this.parametersClass = activeParameters.getClass().getName(); 
+	
+			buffer.setString("parametersClass", this.parametersClass);
 	}
 	
 }

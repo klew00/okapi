@@ -294,13 +294,13 @@ public class CompoundFilter extends AbstractFilter {
 
 	public void open(RawDocument input) {
 		
-		updateSubfilter();
+//		updateSubfilter();
 		if (activeSubFilter != null) activeSubFilter.open(input);
 	}
 
 	public void open(RawDocument input, boolean generateSkeleton) {
 		
-		updateSubfilter();
+//		updateSubfilter();
 		if (activeSubFilter != null) activeSubFilter.open(input, generateSkeleton);		
 	}
 
@@ -318,6 +318,14 @@ public class CompoundFilter extends AbstractFilter {
 		if (Util.isEmpty(className)) return;
 		
 		activeSubFilter = findSubFilterByParameters(className); // !!! not seveActiveSubFilter() to prevent a deadlock
+		
+		IParameters params2 = getActiveParameters();
+		
+		if (params2 != null && params != null)
+			params2.fromString(params.toString());
+		
+		if (activeSubFilter != null)
+			activeSubFilter.setParameters(params2); // to update internal rules of regex filter for example
 	}
 
 	@Override

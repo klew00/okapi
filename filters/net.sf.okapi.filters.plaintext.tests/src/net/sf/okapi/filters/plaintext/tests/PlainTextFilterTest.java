@@ -728,6 +728,53 @@ public class PlainTextFilterTest {
 		
 		filter.close();
 	}
+	
+	@Test
+	public void testLoadParams() {
+		
+		IParameters params = filter.getParameters();
+		params.load(new File(_getPainTextConfig("okf_plaintext_spliced_backslash.fprm")).toURI(), false);
+		
+		IParameters params2 = filter.getActiveParameters();
+		assertTrue(params2 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		net.sf.okapi.filters.plaintext.spliced.Parameters params3 = (net.sf.okapi.filters.plaintext.spliced.Parameters) params2;
+		assertEquals("\\", params3.splicer);
+		
+		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		assertNotNull(input);
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.close();
+		
+		params2 = filter.getActiveParameters();
+		assertTrue(params2 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		params3 = (net.sf.okapi.filters.plaintext.spliced.Parameters) params2;
+		assertEquals("\\", params3.splicer);
+		
+		//--------------------
+		params.load(new File(_getPainTextConfig("okf_plaintext_spliced_underscore.fprm")).toURI(), false);
+		
+		params2 = filter.getActiveParameters();
+		assertTrue(params2 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		params3 = (net.sf.okapi.filters.plaintext.spliced.Parameters) params2;
+		assertEquals("_", params3.splicer);
+		
+		input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
+		assertNotNull(input);
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.close();
+		
+		params2 = filter.getActiveParameters();
+		assertTrue(params2 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
+		
+		params3 = (net.sf.okapi.filters.plaintext.spliced.Parameters) params2;
+		assertEquals("_", params3.splicer);
+	}
+	
 				
 // Helpers
 	
@@ -821,6 +868,13 @@ public class PlainTextFilterTest {
 			}
 			break;
 		}
+	}
+	
+	private String _getPainTextConfig(String fileName) {
+		URL url = PlainTextFilter.class.getResource("okf_plaintext_paragraphs.fprm");
+		String root = Util.getDirectoryName(url.getPath());
+//		root = Util.getDirectoryName(root) + "/data/";
+		return root + "/" + fileName;
 	}
 	
 	private String _getFullFileName(String fileName) {
