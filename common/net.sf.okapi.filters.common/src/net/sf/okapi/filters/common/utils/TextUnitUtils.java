@@ -329,7 +329,7 @@ public class TextUnitUtils {
 		if (target != null && !Util.isEmpty(language))
 			textUnit.setTarget(language, target);
 		
-		if (comment != null)
+		if (!Util.isEmpty(comment))
 			textUnit.setProperty(new Property(Property.NOTE, comment));
 		
 		return textUnit;
