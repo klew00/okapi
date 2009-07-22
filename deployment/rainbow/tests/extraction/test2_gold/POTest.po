@@ -20,11 +20,11 @@ msgstr ""
 msgid "Text with an approved translation %s"
 msgstr "[Tèxt wìth åñ åpprõvèð tråñslåtìõñ %s]"
 
-#, fuzzy, c-format
+#, , c-format
 msgid "Text with non-approved translation %s"
 msgstr "[Tèxt wìth ñõñ-åpprõvèð tråñslåtìõñ %s]"
 
-#, c-format, fuzzy
+#, c-format, 
 msgid "Text 2 with non-approved translation %s"
 msgstr "[Tèxt 2 wìth ñõñ-åpprõvèð tråñslåtìõñ %s]"
 

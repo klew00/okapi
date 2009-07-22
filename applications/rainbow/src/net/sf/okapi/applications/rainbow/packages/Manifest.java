@@ -66,7 +66,7 @@ public class Manifest {
 		targetDir = "";
 		originalDir = "";
 		doneDir = "";
-		useApprovedOnly = true;
+		useApprovedOnly = false;
 		updateApprovedFlag = true;
 	}
 
