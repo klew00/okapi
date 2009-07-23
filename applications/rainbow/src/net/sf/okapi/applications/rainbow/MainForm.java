@@ -784,7 +784,7 @@ public class MainForm { //implements IParametersProvider {
 			
 		// Options tab
 		comp = new Composite(tabFolder, SWT.NONE);
-		comp.setLayout(new GridLayout());
+		comp.setLayout(new GridLayout(2, false));
 		tiOptions = new TabItem(tabFolder, SWT.NONE);
 		tiOptions.setText(Res.getString("OPTTAB_CAPTION")); //$NON-NLS-1$
 		tiOptions.setControl(comp);
@@ -792,7 +792,7 @@ public class MainForm { //implements IParametersProvider {
 		Group group = new Group(comp, SWT.NONE);
 		group.setText(Res.getString("OPTTAB_GRPSOURCE")); //$NON-NLS-1$
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
-		group.setLayout(new GridLayout(4, false));
+		group.setLayout(new GridLayout());
 		
 		Label label = new Label(group, SWT.NONE);
 		label.setText(Res.getString("OPTTAB_LANG")); //$NON-NLS-1$
@@ -805,17 +805,6 @@ public class MainForm { //implements IParametersProvider {
 			}
 		});
 
-		label = new Label(group, SWT.NONE);
-		label.setText(Res.getString("OPTTAB_ENC")); //$NON-NLS-1$
-		
-		edSourceEnc = new Text(group, SWT.BORDER);
-		edSourceEnc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		edSourceEnc.addModifyListener(new ModifyListener () {
-			public void modifyText(ModifyEvent e) {
-				updateSourceEncodingSelection();
-			}
-		});
-		
 		lbSourceLang = new List(group, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
@@ -833,6 +822,17 @@ public class MainForm { //implements IParametersProvider {
 			};
 		});
 
+		label = new Label(group, SWT.NONE);
+		label.setText(Res.getString("OPTTAB_ENC")); //$NON-NLS-1$
+		
+		edSourceEnc = new Text(group, SWT.BORDER);
+		edSourceEnc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edSourceEnc.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateSourceEncodingSelection();
+			}
+		});
+		
 		lbSourceEnc = new List(group, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
@@ -852,7 +852,7 @@ public class MainForm { //implements IParametersProvider {
 		group = new Group(comp, SWT.NONE);
 		group.setText(Res.getString("OPTTAB_GRPTARGET")); //$NON-NLS-1$
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
-		group.setLayout(new GridLayout(4, false));
+		group.setLayout(new GridLayout());
 		
 		label = new Label(group, SWT.NONE);
 		label.setText(Res.getString("OPTTAB_LANG")); //$NON-NLS-1$
@@ -862,17 +862,6 @@ public class MainForm { //implements IParametersProvider {
 		edTargetLang.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
 				updateTargetLanguageSelection();
-			}
-		});
-
-		label = new Label(group, SWT.NONE);
-		label.setText(Res.getString("OPTTAB_ENC")); //$NON-NLS-1$
-		
-		edTargetEnc = new Text(group, SWT.BORDER);
-		edTargetEnc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		edTargetEnc.addModifyListener(new ModifyListener () {
-			public void modifyText(ModifyEvent e) {
-				updateTargetEncodingSelection();
 			}
 		});
 
@@ -891,6 +880,17 @@ public class MainForm { //implements IParametersProvider {
 					inTargetLangSelection = false;
 				}
 			};
+		});
+
+		label = new Label(group, SWT.NONE);
+		label.setText(Res.getString("OPTTAB_ENC")); //$NON-NLS-1$
+		
+		edTargetEnc = new Text(group, SWT.BORDER);
+		edTargetEnc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edTargetEnc.addModifyListener(new ModifyListener () {
+			public void modifyText(ModifyEvent e) {
+				updateTargetEncodingSelection();
+			}
 		});
 
 		lbTargetEnc = new List(group, SWT.BORDER | SWT.V_SCROLL);
