@@ -120,7 +120,7 @@ public class PropertiesFilter implements IFilter {
 			getClass().getName(),
 			"Java Properties",
 			"Java properties files (Output used \\uHHHH escapes)"));
-		list.add(new FilterConfiguration(getName(),
+		list.add(new FilterConfiguration(getName()+"-outputNotEscaped",
 			MimeTypeMapper.PROPERTIES_MIME_TYPE,
 			getClass().getName(),
 			"Java Properties (Output not escaped)",
