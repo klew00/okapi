@@ -45,7 +45,7 @@ public class Parameters extends BaseParameters {
 	
 	public void reset () {
 		locDir.reset();
-		escapeExtendedChars = false;
+		escapeExtendedChars = true;
 
 		useCodeFinder = true;
 		codeFinder.reset();
