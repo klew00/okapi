@@ -57,12 +57,12 @@ public class FilterConfigMapperDialog {
 		this.mapper = mapper;
 		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Filter Configurations");
+		shell.setText(Res.getString("FilterConfigMapperDialog.caption")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 		
 		pnlConfigs = new FilterConfigurationsPanel(shell, SWT.NONE,
-			"net.sf.okapi.applications.rainbow.lib.FilterConfigInfoEditor", mapper);
+			"net.sf.okapi.applications.rainbow.lib.FilterConfigInfoEditor", mapper); //$NON-NLS-1$
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		pnlConfigs.setLayoutData(gdTmp);
 		
@@ -86,8 +86,8 @@ public class FilterConfigMapperDialog {
 		};
 		
 		if ( selectionMode ) {
-			OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, Actions, (help!=null), "Select");
-			pnlActions.btCancel.setText("Close");
+			OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, Actions, (help!=null), Res.getString("FilterConfigMapperDialog.select")); //$NON-NLS-1$
+			pnlActions.btCancel.setText(Res.getString("FilterConfigMapperDialog.close")); //$NON-NLS-1$
 			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 			gdTmp.horizontalSpan = 2;
 			pnlActions.setLayoutData(gdTmp);

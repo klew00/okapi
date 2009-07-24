@@ -78,9 +78,9 @@ public class FilterConfigSelectionPanel extends Composite {
 		super(p_Parent, SWT.NONE);
 		context = new BaseContext();
 		help = helpParam;
-		context.setObject("help", helpParam);
-		context.setString("projDir", projectDir);
-		context.setObject("shell", getShell());
+		context.setObject("help", helpParam); //$NON-NLS-1$
+		context.setString("projDir", projectDir); //$NON-NLS-1$
+		context.setObject("shell", getShell()); //$NON-NLS-1$
 		this.mapper = mapper;
 		this.project = project;
 		createContent();
@@ -134,7 +134,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		int nWidth = 80;
 		
 		btEdit = new Button(this, SWT.PUSH);
-		btEdit.setText("&Edit...");
+		btEdit.setText(Res.getString("FilterConfigSelectionPanel.edit")); //$NON-NLS-1$
 		btEdit.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
 				editParameters();
@@ -142,7 +142,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		});
 
 		btCreate = new Button(this, SWT.PUSH);
-		btCreate.setText("&Create...");
+		btCreate.setText(Res.getString("FilterConfigSelectionPanel.create")); //$NON-NLS-1$
 		btCreate.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
 				createConfiguration();
@@ -150,7 +150,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		});
 
 		btDelete = new Button(this, SWT.PUSH);
-		btDelete.setText("&Delete...");
+		btDelete.setText(Res.getString("FilterConfigSelectionPanel.delete")); //$NON-NLS-1$
 		btDelete.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
 				deleteConfiguration();
@@ -158,20 +158,20 @@ public class FilterConfigSelectionPanel extends Composite {
 		});
 
 		btMore = new Button(this, SWT.PUSH);
-		btMore.setText("&More...");
+		btMore.setText(Res.getString("FilterConfigSelectionPanel.more")); //$NON-NLS-1$
 		btMore.addSelectionListener(new SelectionAdapter () {
 			public void widgetSelected(SelectionEvent e) {
 				editAllConfigurations();
 			}
 		});
 
-		nWidth = UIUtil.getMinimumWidth(nWidth, btEdit, "&View...");
+		nWidth = UIUtil.getMinimumWidth(nWidth, btEdit, Res.getString("FilterConfigSelectionPanel.view")); //$NON-NLS-1$
 		UIUtil.setSameWidth(nWidth, btEdit, btCreate, btDelete, btMore);
 	}
 	
 	public String getConfigurationId () {
 		int n = lbConfigs.getSelectionIndex();
-		if ( n < 0 ) return ""; // No configuration
+		if ( n < 0 ) return ""; // No configuration //$NON-NLS-1$
 		else return lbConfigs.getItem(n);
 	}
 
@@ -179,7 +179,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		// Fill the list of available filters
 		// Rely on order (index+1) because we cannot attach object to the items
 		cbFilters.removeAll();
-		cbFilters.add("<None>");
+		cbFilters.add(Res.getString("FilterConfigSelectionPanel.noFilter")); //$NON-NLS-1$
 		filters = mapper.getFilters();
 		for ( FilterInfo item : filters ) {
 			cbFilters.add(item.toString());
@@ -190,7 +190,7 @@ public class FilterConfigSelectionPanel extends Composite {
 			// Warn no configuration was found (if we were expecting one)
 			if (( configId != null ) && ( configId.length()!=0 )) {
 				Dialogs.showError(getShell(),
-					String.format("The configuration for the identifier '%s' could not be found.", configId), null);
+					String.format(Res.getString("FilterConfigSelectionPanel.configNotFound"), configId), null); //$NON-NLS-1$
 			}
 		}
 		setConfiguration(config);
@@ -208,7 +208,7 @@ public class FilterConfigSelectionPanel extends Composite {
 			if ( n == -1 ) {
 				// Warn that the configuration or filter was not found
 				Dialogs.showError(getShell(), String.format(
-					"The configuration '%s' or its filter could not be found.",
+					Res.getString("FilterConfigSelectionPanel.configOrFilterNotFound"), //$NON-NLS-1$
 					config.configId), null);
 			}
 		}
@@ -243,16 +243,16 @@ public class FilterConfigSelectionPanel extends Composite {
 		String configId = null;
 		if ( n > -1 ) configId = lbConfigs.getItem(n);
 		if (( configId == null ) || ( configId.length() == 0 )) {
-			edDescription.setText("");
+			edDescription.setText(""); //$NON-NLS-1$
 			btEdit.setEnabled(false);
 			btCreate.setEnabled(false);
 			btDelete.setEnabled(false);
 		}
 		else {
 			FilterConfiguration config = mapper.getConfiguration(configId);
-			edDescription.setText(config.name + "\n" + config.description);
-			if ( config.custom ) btEdit.setText("&Edit...");
-			else btEdit.setText("&View...");
+			edDescription.setText(config.name + "\n" + config.description); //$NON-NLS-1$
+			if ( config.custom ) btEdit.setText(Res.getString("FilterConfigSelectionPanel.edit")); //$NON-NLS-1$
+			else btEdit.setText(Res.getString("FilterConfigSelectionPanel.view")); //$NON-NLS-1$
 			btEdit.setEnabled(true);
 			btCreate.setEnabled(true);
 			btDelete.setEnabled(config.custom);
@@ -304,15 +304,15 @@ public class FilterConfigSelectionPanel extends Composite {
 			if ( editor == null ) {
 				// Properties-like editing
 				InputDialog dlg  = new InputDialog(getShell(),
-					"Filters Parameters ("+config.configId+")",
-					"Parameters:",
+					String.format(Res.getString("FilterConfigSelectionPanel.parametersCaption"), config.configId), //$NON-NLS-1$
+					Res.getString("FilterConfigSelectionPanel.parametersLabel"), //$NON-NLS-1$
 					params.toString(), null, 0, 200, 600);
 				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
 				String data = dlg.showDialog();
 				if ( data == null ) return;
 				if ( !config.custom ) return; // Don't save pre-defined parameters
-				data = data.replace("\r\n", "\n");
-				params.fromString(data.replace("\r", "\n"));
+				data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else {
 				if ( !editor.edit(params, !config.custom, context) ) return;
@@ -336,7 +336,7 @@ public class FilterConfigSelectionPanel extends Composite {
 
 			FilterConfiguration newConfig = mapper.createCustomConfiguration(baseConfig);
 			if ( newConfig == null ) {
-				throw new Exception(String.format("Could not create new configuration based on '%s'",
+				throw new Exception(String.format(Res.getString("FilterConfigSelectionPanel.cannotCreateConfig"), //$NON-NLS-1$
 					baseConfig.configId));
 			}
 			
@@ -372,9 +372,9 @@ public class FilterConfigSelectionPanel extends Composite {
 			// Ask confirmation
 			MessageBox dlg = new MessageBox(getParent().getShell(),
 				SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-			dlg.setMessage(String.format("This command will delete permanently the configuration '%s'.\n"
-				+"Do you want to proceed with the deletion?", configId));
-			dlg.setText("Rainbow");
+			dlg.setMessage(String.format(
+				Res.getString("FilterConfigSelectionPanel.confirmDeletion"), configId)); //$NON-NLS-1$
+			dlg.setText("Rainbow"); //$NON-NLS-1$
 			switch  ( dlg.open() ) {
 			case SWT.NO:
 			case SWT.CANCEL:

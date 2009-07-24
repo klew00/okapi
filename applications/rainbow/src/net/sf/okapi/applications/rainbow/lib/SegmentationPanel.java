@@ -81,13 +81,13 @@ public class SegmentationPanel extends Composite {
 		});
 
 		stSourceSRX = new Label(this, SWT.NONE);
-		stSourceSRX.setText("SRX file for the source:");
+		stSourceSRX.setText(Res.getString("SegmentationPanel.sourceSrx")); //$NON-NLS-1$
 		
 		edSourceSRX = new Text(this, SWT.BORDER);
 		edSourceSRX.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		btGetSourceSRX = new Button(this, SWT.PUSH);
-		btGetSourceSRX.setText("...");
+		btGetSourceSRX.setText("..."); //$NON-NLS-1$
 		btGetSourceSRX.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				getSRXFile(edSourceSRX);
@@ -95,7 +95,7 @@ public class SegmentationPanel extends Composite {
 		});
 		
 		btEditSourceSRX = new Button(this, SWT.PUSH);
-		btEditSourceSRX.setText("Edit...");
+		btEditSourceSRX.setText(Res.getString("SegmentationPanel.edit")); //$NON-NLS-1$
 		btEditSourceSRX.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editSRXFile(edSourceSRX);
@@ -103,13 +103,13 @@ public class SegmentationPanel extends Composite {
 		});
 		
 		stTargetSRX = new Label(this, SWT.NONE);
-		stTargetSRX.setText("SRX file for the target:");
+		stTargetSRX.setText(Res.getString("SegmentationPanel.targetSrx")); //$NON-NLS-1$
 		
 		edTargetSRX = new Text(this, SWT.BORDER);
 		edTargetSRX.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		btGetTargetSRX = new Button(this, SWT.PUSH);
-		btGetTargetSRX.setText("...");
+		btGetTargetSRX.setText("..."); //$NON-NLS-1$
 		btGetTargetSRX.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				getSRXFile(edTargetSRX);
@@ -117,7 +117,7 @@ public class SegmentationPanel extends Composite {
 		});
 		
 		btEditTargetSRX = new Button(this, SWT.PUSH);
-		btEditTargetSRX.setText("Edit...");
+		btEditTargetSRX.setText(Res.getString("SegmentationPanel.edit")); //$NON-NLS-1$
 		btEditTargetSRX.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editSRXFile(edTargetSRX);
@@ -128,11 +128,11 @@ public class SegmentationPanel extends Composite {
 	
 	private void getSRXFile (Text edTextField) {
 		String caption;
-		if ( edTextField == edSourceSRX ) caption = "Select SRX for Source";
-		else  caption = "Select SRX for Target";
+		if ( edTextField == edSourceSRX ) caption = Res.getString("SegmentationPanel.selectSourceSrx"); //$NON-NLS-1$
+		else  caption = Res.getString("SegmentationPanel.selectTargetSrx"); //$NON-NLS-1$
 		String[] paths = Dialogs.browseFilenames(getShell(), caption, false, null,
-			"SRX Documents (*.srx)\tAll Files (*.*)",
-			"*.srx\t*.*");
+			Res.getString("SegmentationPanel.srxFilterDescriptions"), //$NON-NLS-1$
+			Res.getString("SegmentationPanel.srxFilterExtensions")); //$NON-NLS-1$
 		if ( paths == null ) return;
 		Utils.checkProjectDirAfterPick(paths[0], edTextField, projectDir);
 	}
@@ -140,7 +140,7 @@ public class SegmentationPanel extends Composite {
 	private void editSRXFile (Text edTextField) {
 		try {
 			SRXEditor editor = new SRXEditor(getShell(), true, help);
-			String oriPath = edTextField.getText().replace("${ProjDir}", projectDir);
+			String oriPath = edTextField.getText().replace("${ProjDir}", projectDir); //$NON-NLS-1$
 			if ( oriPath.length() == 0 ) oriPath = null;
 			editor.showDialog(oriPath);
 			String newPath = editor.getPath();

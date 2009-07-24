@@ -83,7 +83,7 @@ public class PathBuilderPanel extends Composite {
 		};
 
 		m_chkUseSubdir = new Button(this, SWT.CHECK);
-		m_chkUseSubdir.setText("Custom sub-folder:");
+		m_chkUseSubdir.setText(Res.getString("PathBuilderPanel.subFolder")); //$NON-NLS-1$
 		GridData gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		m_chkUseSubdir.setLayoutData(gdTmp);
@@ -96,18 +96,18 @@ public class PathBuilderPanel extends Composite {
 		m_edSubdir.addModifyListener(MLUpdate);
 		
 		m_chkUseExt = new Button(this, SWT.CHECK);
-		m_chkUseExt.setText("Use an extension:");
+		m_chkUseExt.setText(Res.getString("PathBuilderPanel.extension")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 3;
 		m_chkUseExt.setLayoutData(gdTmp);
 		m_chkUseExt.addSelectionListener(SAUpdate);
 		
 		m_chkUsePrefix = new Button(this, SWT.CHECK);
-		m_chkUsePrefix.setText("Add the following prefix:");
+		m_chkUsePrefix.setText(Res.getString("PathBuilderPanel.prefix")); //$NON-NLS-1$
 		m_chkUsePrefix.addSelectionListener(SAUpdate);
 		
 		m_chkUseReplace = new Button(this, SWT.CHECK);
-		m_chkUseReplace.setText("Replace this text:");
+		m_chkUseReplace.setText(Res.getString("PathBuilderPanel.replaceThis")); //$NON-NLS-1$
 		m_chkUseReplace.addSelectionListener(SAUpdate);
 		
 		m_edExt = new Text(this, SWT.BORDER);
@@ -126,13 +126,13 @@ public class PathBuilderPanel extends Composite {
 		layTmp.marginWidth = 0;
 		cmpTmp.setLayout(layTmp);
 		m_rdExtReplace = new Button(cmpTmp, SWT.RADIO);
-		m_rdExtReplace.setText("Replace");
+		m_rdExtReplace.setText(Res.getString("PathBuilderPanel.extensionReplace")); //$NON-NLS-1$
 		m_rdExtReplace.addSelectionListener(SAUpdate);
 		m_rdExtAppend = new Button(cmpTmp, SWT.RADIO);
-		m_rdExtAppend.setText("Append");
+		m_rdExtAppend.setText(Res.getString("PathBuilderPanel.extensionAppend")); //$NON-NLS-1$
 		m_rdExtAppend.addSelectionListener(SAUpdate);
 		m_rdExtPrepend = new Button(cmpTmp, SWT.RADIO);
-		m_rdExtPrepend.setText("Prepend");
+		m_rdExtPrepend.setText(Res.getString("PathBuilderPanel.extensionPrepend")); //$NON-NLS-1$
 		m_rdExtPrepend.addSelectionListener(SAUpdate);
 
 		m_edPrefix = new Text(this, SWT.BORDER);
@@ -147,11 +147,11 @@ public class PathBuilderPanel extends Composite {
 		new Label(this, SWT.NONE); // place-holder
 		
 		m_chkUseSuffix = new Button(this, SWT.CHECK);
-		m_chkUseSuffix.setText("Add the following suffix:");
+		m_chkUseSuffix.setText(Res.getString("PathBuilderPanel.suffix")); //$NON-NLS-1$
 		m_chkUseSuffix.addSelectionListener(SAUpdate);
 		
 		Label stTmp = new Label(this, SWT.NONE);
-		stTmp.setText("By this text:");
+		stTmp.setText(Res.getString("PathBuilderPanel.replaceBy")); //$NON-NLS-1$
 		
 		new Label(this, SWT.NONE); // place-holder
 		new Label(this, SWT.NONE); // place-holder
@@ -165,7 +165,7 @@ public class PathBuilderPanel extends Composite {
 		m_edReplace.addModifyListener(MLUpdate);
 		
 		stTmp = new Label(this, SWT.NONE);
-		stTmp.setText("Before:");
+		stTmp.setText(Res.getString("PathBuilderPanel.before")); //$NON-NLS-1$
 		
 		m_edBefore = new Text(this, SWT.BORDER);
 		m_edBefore.setEditable(false);
@@ -174,7 +174,7 @@ public class PathBuilderPanel extends Composite {
 		m_edBefore.setLayoutData(gdTmp);
 		
 		stTmp = new Label(this, SWT.NONE);
-		stTmp.setText("After:");
+		stTmp.setText(Res.getString("PathBuilderPanel.after")); //$NON-NLS-1$
 
 		m_edAfter = new Text(this, SWT.BORDER);
 		m_edAfter.setEditable(false);
