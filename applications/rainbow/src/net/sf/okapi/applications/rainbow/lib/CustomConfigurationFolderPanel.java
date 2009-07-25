@@ -73,11 +73,11 @@ public class CustomConfigurationFolderPanel extends Composite {
 
 		Group group = new Group(this, SWT.NONE);
 		group.setLayout(new GridLayout(3, false));
-		group.setText("Custom configurations location");
+		group.setText(Res.getString("CustomConfigurationFolderPanel.caption")); //$NON-NLS-1$
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label label = new Label(group, SWT.NONE);
-		label.setText("Folder:");
+		label.setText(Res.getString("CustomConfigurationFolderPanel.folder")); //$NON-NLS-1$
 
 		edParamsFolder = new Text(group, SWT.BORDER);
 		edParamsFolder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -97,9 +97,8 @@ public class CustomConfigurationFolderPanel extends Composite {
 	private void editParamsFolder () {
 		try {
 			InputDialog dlg = new InputDialog(getShell(),
-				"Custom Configurations Folder",
-				"Directory where the custom configurations are stored\n"
-					+ "(Leave empty to use the folder where the project file is saved)",
+				Res.getString("CustomConfigurationFolderPanel.customConfigCaption"), //$NON-NLS-1$
+				Res.getString("CustomConfigurationFolderPanel.customConfigCaptionLabel"), //$NON-NLS-1$
 				project.getParametersFolder(true, false),
 				null, 1, -1, -1);
 			dlg.setAllowEmptyValue(true);
