@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class InlineCodeFinderPanel extends Composite {
 
-	private static final String ACCEPT_LABEL = "Accept";
+	private static final String ACCEPT_LABEL = Res.getString("InlineCodeFinderPanel.accept"); //$NON-NLS-1$
 	
 	private InlineCodeFinder codeFinder;
 	private List lbRules;
@@ -113,7 +113,7 @@ public class InlineCodeFinderPanel extends Composite {
 		cmpTmp.setLayout(layTmp);
 		
 		btAdd = new Button(cmpTmp, SWT.PUSH);
-		btAdd.setText("Add");
+		btAdd.setText(Res.getString("InlineCodeFinderPanel.add")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btAdd.setLayoutData(gdTmp);
 		UIUtil.ensureWidth(btAdd, buttonSet1Width);
@@ -124,7 +124,7 @@ public class InlineCodeFinderPanel extends Composite {
 		});
 	
 		btMoveUp = new Button(cmpTmp, SWT.PUSH);
-		btMoveUp.setText("Move Up");
+		btMoveUp.setText(Res.getString("InlineCodeFinderPanel.moveUp")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btMoveUp.setLayoutData(gdTmp);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
@@ -134,7 +134,7 @@ public class InlineCodeFinderPanel extends Composite {
 		});
 		
 		btRemove = new Button(cmpTmp, SWT.PUSH);
-		btRemove.setText("Remove");
+		btRemove.setText(Res.getString("InlineCodeFinderPanel.remove")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btRemove.setLayoutData(gdTmp);
 		btRemove.addSelectionListener(new SelectionAdapter() {
@@ -144,7 +144,7 @@ public class InlineCodeFinderPanel extends Composite {
 		});
 
 		btMoveDown = new Button(cmpTmp, SWT.PUSH);
-		btMoveDown.setText("Move Down");
+		btMoveDown.setText(Res.getString("InlineCodeFinderPanel.moveDown")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btMoveDown.setLayoutData(gdTmp);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
@@ -176,7 +176,7 @@ public class InlineCodeFinderPanel extends Composite {
 		btModify.pack();
 		Rectangle rect = btModify.getBounds();
 		if ( rect.width > max ) max = rect.width;
-		btModify.setText("Modify");
+		btModify.setText(Res.getString("InlineCodeFinderPanel.modify")); //$NON-NLS-1$
 		UIUtil.ensureWidth(btModify, max);
 		btModify.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -186,7 +186,7 @@ public class InlineCodeFinderPanel extends Composite {
 		});
 		
 		btDiscard = new Button(this, SWT.PUSH);
-		btDiscard.setText("Discard");
+		btDiscard.setText(Res.getString("InlineCodeFinderPanel.discard")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		btDiscard.setLayoutData(gdTmp);
 		UIUtil.ensureWidth(btDiscard, buttonSet2Width);
@@ -198,7 +198,7 @@ public class InlineCodeFinderPanel extends Composite {
 		});
 		
 		btInsertPattern = new Button(this, SWT.PUSH);
-		btInsertPattern.setText("Patterns...");
+		btInsertPattern.setText(Res.getString("InlineCodeFinderPanel.patterns")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		btInsertPattern.setLayoutData(gdTmp);
 		UIUtil.ensureWidth(btInsertPattern, buttonSet2Width);
@@ -206,12 +206,12 @@ public class InlineCodeFinderPanel extends Composite {
 		btInsertPattern.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO
-				Dialogs.showError(getShell(), "Not implemented yet", null);
+				Dialogs.showError(getShell(), Res.getString("InlineCodeFinderPanel.8"), null); //$NON-NLS-1$
 			};
 		});
 		
 		chkTestAllRules = new Button(this, SWT.CHECK);
-		chkTestAllRules.setText("Test using all rules");
+		chkTestAllRules.setText(Res.getString("InlineCodeFinderPanel.useAllrules")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		chkTestAllRules.setLayoutData(gdTmp);
 		chkTestAllRules.addSelectionListener(new SelectionAdapter() {
@@ -266,7 +266,7 @@ public class InlineCodeFinderPanel extends Composite {
 		try {
 			wasNew = createNew;
 			if ( createNew ) {
-				lbRules.add("");
+				lbRules.add(""); //$NON-NLS-1$
 				lbRules.setSelection(lbRules.getItemCount()-1);
 				canUpdateTest = false;
 				updateDisplay();
@@ -284,7 +284,7 @@ public class InlineCodeFinderPanel extends Composite {
 	public boolean endEditMode (boolean accept) {
 		if ( accept ) {
 			if ( edExpression.getText().length() == 0 ) {
-				Dialogs.showError(getShell(), "You must enter an expression.", null);
+				Dialogs.showError(getShell(), Res.getString("InlineCodeFinderPanel.enterExpression"), null); //$NON-NLS-1$
 				edExpression.setFocus();
 				return false;
 			}
@@ -314,7 +314,7 @@ public class InlineCodeFinderPanel extends Composite {
 			edExpression.setFocus();
 		}
 		else {
-			btModify.setText("Modify");
+			btModify.setText(Res.getString("InlineCodeFinderPanel.modify")); //$NON-NLS-1$
 			updateDisplay();
 		}
 	}
@@ -334,7 +334,7 @@ public class InlineCodeFinderPanel extends Composite {
 		btMoveUp.setEnabled(n>0);
 		btMoveDown.setEnabled(n<lbRules.getItemCount()-1);
 		btModify.setEnabled(n>-1);
-		if ( n == -1 ) edExpression.setText("");
+		if ( n == -1 ) edExpression.setText(""); //$NON-NLS-1$
 		else edExpression.setText(lbRules.getItem(n));
 	}
 	
@@ -368,9 +368,9 @@ public class InlineCodeFinderPanel extends Composite {
 	private String getSampleText () {
 		// Change different line breaks type into \n cases
 		String tmp = edSample.getText();
-		tmp = tmp.replaceAll("\r\r\n", "\n");
-		tmp = tmp.replace("\r\n", "\n");
-		return tmp.replace("\r", "\n"); 
+		tmp = tmp.replaceAll("\r\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		tmp = tmp.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		return tmp.replace("\r", "\n");  //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	public void setData (String codeFinderRules) {

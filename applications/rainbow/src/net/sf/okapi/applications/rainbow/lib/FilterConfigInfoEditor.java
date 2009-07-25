@@ -44,9 +44,9 @@ public class FilterConfigInfoEditor implements IFilterConfigurationInfoEditor {
 		String part = config.configId.substring(n+1);
 
 		while ( true ) {
-			InputDialog dlg = new InputDialog(parent, "Create Configuration",
-				String.format("Please, enter the second part of the configuration identifier you want to use.\n"
-					+ "The first part will be '%s'.", prefix+FilterSettingsMarkers.PARAMETERSSEP),
+			InputDialog dlg = new InputDialog(parent, Res.getString("FilterConfigInfoEditor.caption"), //$NON-NLS-1$
+				String.format(Res.getString("FilterConfigInfoEditor.enterConfigId"), //$NON-NLS-1$
+					prefix+FilterSettingsMarkers.PARAMETERSSEP),
 				part, null, 0, -1, 500);
 			String newPart = dlg.showDialog();
 			if ( newPart == null ) return false;
@@ -58,8 +58,8 @@ public class FilterConfigInfoEditor implements IFilterConfigurationInfoEditor {
 			
 			// check if it exists already
 			if ( mapper.getConfiguration(config.configId) != null ) {
-				Dialogs.showError(parent, String.format("The configuration identifier '%s' exists already.\n"
-					+"Please choose another one.", config.configId), null);
+				Dialogs.showError(parent, String.format(Res.getString("FilterConfigInfoEditor.configIdExitsAlready"), //$NON-NLS-1$
+					config.configId), null);
 			}
 			else break; // Done
 		}

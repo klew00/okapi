@@ -73,7 +73,7 @@ public class LogForm implements ILog {
 		
 		int nWidth = 80;
 		Button button = new Button(shell, SWT.PUSH);
-		button.setText("&Help");
+		button.setText(Res.getString("LogForm.help")); //$NON-NLS-1$
 		GridData gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		button.setLayoutData(gdTmp);
@@ -84,7 +84,7 @@ public class LogForm implements ILog {
 		});
 		
 		button = new Button(shell, SWT.PUSH);
-		button.setText("&Clear");
+		button.setText(Res.getString("LogForm.clear")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		button.setLayoutData(gdTmp);
@@ -95,7 +95,7 @@ public class LogForm implements ILog {
 		});
 		
 		btStop = new Button(shell, SWT.PUSH);
-		btStop.setText("&Stop");
+		btStop.setText(Res.getString("LogForm.stop")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		btStop.setLayoutData(gdTmp);
@@ -106,7 +106,7 @@ public class LogForm implements ILog {
 		});
 		
 		button = new Button(shell, SWT.PUSH);
-		button.setText("&Close");
+		button.setText(Res.getString("LogForm.close")); //$NON-NLS-1$
 		gdTmp = new GridData();
 		gdTmp.widthHint = nWidth;
 		button.setLayoutData(gdTmp);
@@ -150,7 +150,7 @@ public class LogForm implements ILog {
 	public boolean beginProcess (String p_sText) {
 		if ( inProgress() ) return false;
 		clear();
-		edLog.append("=== Start process\n");
+		edLog.append(Res.getString("LogForm.startProcess")); //$NON-NLS-1$
 		if (( p_sText != null ) && ( p_sText.length() > 0 ))
 			setLog(LogType.MESSAGE, 0, p_sText);
 		errorCount = warningCount = 0;
@@ -187,16 +187,16 @@ public class LogForm implements ILog {
 	}
 
 	public void clear () {
-		edLog.setText("");
+		edLog.setText(""); //$NON-NLS-1$
 	}
 
 	public void endProcess (String p_sText) {
 		if ( inProgress ) {
 			if (( p_sText != null ) && ( p_sText.length() > 0 ))
 				setLog(LogType.MESSAGE, 0, p_sText);
-			edLog.append(String.format("\nError count: %d, ", errorCount));
-			edLog.append(String.format("Warning count: %d\n", warningCount));
-			edLog.append("=== End process");
+			edLog.append(String.format(Res.getString("LogForm.errorCount"), errorCount)); //$NON-NLS-1$
+			edLog.append(String.format(Res.getString("LogForm.warningCount"), warningCount)); //$NON-NLS-1$
+			edLog.append(Res.getString("LogForm.endProcess")); //$NON-NLS-1$
 		}
 		inProgress = false;
 		updateDisplay();
@@ -238,7 +238,7 @@ public class LogForm implements ILog {
 	}
 
 	public boolean newLine () {
-		return setLog(LogType.MESSAGE, 0, "\n");
+		return setLog(LogType.MESSAGE, 0, "\n"); //$NON-NLS-1$
 	}
 
 	public void save (String path) {
@@ -262,15 +262,15 @@ public class LogForm implements ILog {
 	{
 		switch ( p_nType ) {
 		case LogType.ERROR:
-			edLog.append("ERROR: " + p_sValue + "\n");
+			edLog.append(Res.getString("LogForm.error") + p_sValue + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			errorCount++;
 			break;
 		case LogType.WARNING:
-			edLog.append("WARNING: " + p_sValue + "\n");
+			edLog.append(Res.getString("LogForm.warning") + p_sValue + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			warningCount++;
 			break;
 		case LogType.MESSAGE:
-			edLog.append(p_sValue + "\n");
+			edLog.append(p_sValue + "\n"); //$NON-NLS-1$
 			break;
 		case LogType.SUBPROGRESS:
 		case LogType.MAINPROGRESS:

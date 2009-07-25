@@ -72,11 +72,11 @@ public class InlineCodeFinderDialog {
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
-				if ( e.widget.getData().equals("h") ) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					UIUtil.start(help);
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) {
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
 				}
 				shell.close();

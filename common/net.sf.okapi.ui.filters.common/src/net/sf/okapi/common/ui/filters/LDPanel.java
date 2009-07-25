@@ -50,7 +50,7 @@ public class LDPanel extends Composite {
 		setLayout(layTmp);
 
 		chkUseLD = new Button(this, SWT.CHECK);
-		chkUseLD.setText("Use localization directives when they are present");
+		chkUseLD.setText(Res.getString("LDPanel.useIfPresent")); //$NON-NLS-1$
 		chkUseLD.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateDisplay();
@@ -58,7 +58,7 @@ public class LDPanel extends Composite {
 		});
 		
 		chkLocalizeOutside = new Button(this, SWT.CHECK);
-		chkLocalizeOutside.setText("Extract items outside the scope of localization directives");
+		chkLocalizeOutside.setText(Res.getString("LDPanel.extractOutside")); //$NON-NLS-1$
 		GridData gdTmp = new GridData();
 		gdTmp.horizontalIndent = 16;
 		chkLocalizeOutside.setLayoutData(gdTmp);

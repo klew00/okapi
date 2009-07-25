@@ -86,7 +86,7 @@ public class FilterConfigurationsPanel extends Composite {
 		model.setMapper(mapper);
 		
 		context = new BaseContext();
-		context.setObject("shell", getShell());
+		context.setObject("shell", getShell()); //$NON-NLS-1$
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class FilterConfigurationsPanel extends Composite {
 		edDescription.setEditable(false);
 		
 		btEdit = new Button(this, SWT.PUSH);
-		btEdit.setText("Edit...");
+		btEdit.setText(Res.getString("FilterConfigurationsPanel.edit")); //$NON-NLS-1$
 		btEdit.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editParameters();
@@ -190,7 +190,7 @@ public class FilterConfigurationsPanel extends Composite {
 		});
 		
 		btCreate = new Button(this, SWT.PUSH);
-		btCreate.setText("Create...");
+		btCreate.setText(Res.getString("FilterConfigurationsPanel.create")); //$NON-NLS-1$
 		btCreate.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				createConfiguration();
@@ -198,14 +198,14 @@ public class FilterConfigurationsPanel extends Composite {
 		});
 		
 		btDelete = new Button(this, SWT.PUSH);
-		btDelete.setText("Delete...");
+		btDelete.setText(Res.getString("FilterConfigurationsPanel.delete")); //$NON-NLS-1$
 		btDelete.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				deleteConfiguration();
 			};
 		});
 		
-		int nWidth = UIUtil.getMinimumWidth(80, btEdit, "&View...");
+		int nWidth = UIUtil.getMinimumWidth(80, btEdit, Res.getString("FilterConfigurationsPanel.view")); //$NON-NLS-1$
 		UIUtil.setSameWidth(nWidth, btEdit, btCreate, btDelete);
 	}
 
@@ -218,16 +218,16 @@ public class FilterConfigurationsPanel extends Composite {
 				edFilter.setText(config.filterClass);
 				edDescription.setText(config.description);
 				btEdit.setEnabled(true);
-				if ( config.custom ) btEdit.setText("&Edit...");
-				else btEdit.setText("&View...");
+				if ( config.custom ) btEdit.setText(Res.getString("FilterConfigurationsPanel.edit")); //$NON-NLS-1$
+				else btEdit.setText(Res.getString("FilterConfigurationsPanel.view")); //$NON-NLS-1$
 				btDelete.setEnabled(config.custom);
 				btCreate.setEnabled(true);
 				return;
 			}
 		}
 		// Otherwise:
-		edFilter.setText("");
-		edDescription.setText("");
+		edFilter.setText(""); //$NON-NLS-1$
+		edDescription.setText(""); //$NON-NLS-1$
 		btEdit.setEnabled(false);
 		btCreate.setEnabled(false);
 		btDelete.setEnabled(false);
@@ -248,15 +248,15 @@ public class FilterConfigurationsPanel extends Composite {
 			if ( editor == null ) {
 				// Properties-like editing
 				InputDialog dlg  = new InputDialog(getShell(),
-					"Filters Parameters ("+config.configId+")",
-					"Parameters:",
+					String.format(Res.getString("FilterConfigurationsPanel.editParamsCaption"), config.configId), //$NON-NLS-1$
+					Res.getString("FilterConfigurationsPanel.paramsLabel"), //$NON-NLS-1$
 					params.toString(), null, 0, 200, 600);
 				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
 				String data = dlg.showDialog();
 				if ( data == null ) return;
 				if ( !config.custom ) return; // Don't save pre-defined parameters
-				data = data.replace("\r\n", "\n");
-				params.fromString(data.replace("\r", "\n"));
+				data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else {
 				if ( !editor.edit(params, !config.custom, context) ) return;
@@ -282,9 +282,8 @@ public class FilterConfigurationsPanel extends Composite {
 			// Ask confirmation
 			MessageBox dlg = new MessageBox(getParent().getShell(),
 				SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-			dlg.setMessage(String.format("This command will delete permanently the configuration '%s'.\n"
-				+"Do you want to proceed with the deletion?", id));
-			dlg.setText("Rainbow");
+			dlg.setMessage(String.format(Res.getString("FilterConfigurationsPanel.confirmDeletion"), id)); //$NON-NLS-1$
+			dlg.setText("Rainbow"); //$NON-NLS-1$
 			switch  ( dlg.open() ) {
 			case SWT.NO:
 			case SWT.CANCEL:
@@ -312,7 +311,7 @@ public class FilterConfigurationsPanel extends Composite {
 
 			FilterConfiguration newConfig = mapper.createCustomConfiguration(baseConfig);
 			if ( newConfig == null ) {
-				throw new Exception(String.format("Could not create new configuration based on '%s'",
+				throw new Exception(String.format(Res.getString("FilterConfigurationsPanel.cannotCreateConfig"), //$NON-NLS-1$
 					baseConfig.configId));
 			}
 			
@@ -351,15 +350,15 @@ public class FilterConfigurationsPanel extends Composite {
 			}
 			catch ( InstantiationException e ) {
 				throw new OkapiEditorCreationException(String.format(
-					"Cannot create editor '%s'", configEditorClass), e);
+					Res.getString("FilterConfigurationsPanel.cannotCreateEditor"), configEditorClass), e); //$NON-NLS-1$
 			}
 			catch ( IllegalAccessException e ) {
 				throw new OkapiEditorCreationException(String.format(
-					"Cannot create editor '%s'", configEditorClass), e);
+					Res.getString("FilterConfigurationsPanel.cannotCreateEditor"), configEditorClass), e); //$NON-NLS-1$
 			}
 			catch ( ClassNotFoundException e ) {
 				throw new OkapiEditorCreationException(String.format(
-					"Cannot create editor '%s'", configEditorClass), e);
+					Res.getString("FilterConfigurationsPanel.cannotCreateEditor"), configEditorClass), e); //$NON-NLS-1$
 			}
 		}
 		

@@ -18,30 +18,25 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.xml;
+package net.sf.okapi.common.ui.filters;
 
-import org.w3c.dom.Node;
-import org.w3c.its.ITraversal;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-class ContextItem {
-	
-	Node node;
-	boolean translate;
-	String trgPointer;
-	String idPointer;
-	String locNote;
-	boolean preserveWS;
+public class Res {
+	private static final String BUNDLE_NAME = "net.sf.okapi.common.ui.filters.Res"; //$NON-NLS-1$
 
-	public ContextItem (Node node,
-		ITraversal trav)
-	{
-		this.node = node;
-		// Context is always an element node
-		this.translate = trav.translate();
-		this.trgPointer = trav.getTargetPointer();
-		this.idPointer = trav.getIdPointer();
-		this.locNote = trav.getNote();
-		this.preserveWS = trav.preserveWS();
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+			.getBundle(BUNDLE_NAME);
+
+	private Res() {
 	}
 
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
+	}
 }

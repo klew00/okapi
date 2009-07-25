@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.TableItem;
  */
 class FilterConfigurationsTableModel {
 
-	static final int ID_COLINDEX = 0;
+	static final int ID_COLINDEX = 1;
 	
 	private Table table;
 	private IFilterConfigurationMapper mapper;
@@ -43,13 +43,13 @@ class FilterConfigurationsTableModel {
 	void linkTable (Table newTable) {
 		table = newTable;
 		TableColumn col = new TableColumn(table, SWT.NONE);
-		col.setText("ID");
+		col.setText(Res.getString("FilterConfigurationsTableModel.name")); //$NON-NLS-1$
 		col = new TableColumn(table, SWT.NONE);
-		col.setText("Name");
+		col.setText(Res.getString("FilterConfigurationsTableModel.id")); //$NON-NLS-1$
 		col = new TableColumn(table, SWT.NONE);
-		col.setText("MIME Type");
+		col.setText(Res.getString("FilterConfigurationsTableModel.mimeType")); //$NON-NLS-1$
 		col = new TableColumn(table, SWT.NONE);
-		col.setText("Custom");
+		col.setText(Res.getString("FilterConfigurationsTableModel.custom")); //$NON-NLS-1$
 	}
 	
 	void setMapper (IFilterConfigurationMapper mapper) {
@@ -83,10 +83,10 @@ class FilterConfigurationsTableModel {
 			}
 			i++;
 			TableItem item = new TableItem(table, SWT.NONE);
+			item.setText(0, config.name);
 			item.setText(ID_COLINDEX, config.configId);
-			item.setText(1, config.name);
 			item.setText(2, config.mimeType);
-			item.setText(3, config.custom ? "Custom" : "Pre-defined");
+			item.setText(3, config.custom ? Res.getString("FilterConfigurationsTableModel.customFlag") : Res.getString("FilterConfigurationsTableModel.predefinedFlag")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (( selection < 0 ) || ( selection > table.getItemCount()-1 )) {
 			selection = table.getItemCount()-1;

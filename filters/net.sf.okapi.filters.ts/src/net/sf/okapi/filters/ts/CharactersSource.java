@@ -2,7 +2,6 @@ package net.sf.okapi.filters.ts;
 
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;

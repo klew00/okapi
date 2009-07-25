@@ -1,14 +1,11 @@
 package net.sf.okapi.filters.ts.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -17,19 +14,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.tests.RoundTripComparison;
 import net.sf.okapi.filters.ts.TsFilter;
 
 import org.junit.Assert;

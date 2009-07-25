@@ -57,27 +57,27 @@ public class FilterConfigurationInfoEditor implements IFilterConfigurationInfoEd
 
 	public void create (Shell parent) {
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Edit Configuration Information");
+		shell.setText(Res.getString("FilterConfigurationInfoEditor.caption")); //$NON-NLS-1$
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout(2, false));
 		
 		Label label = new Label(shell, SWT.NONE);
-		label.setText("Identifier:");
+		label.setText(Res.getString("FilterConfigurationInfoEditor.identifier")); //$NON-NLS-1$
 		edIdentifier = new Text(shell, SWT.BORDER);
 		edIdentifier.setLayoutData(new GridData(GridData.FILL_HORIZONTAL)); 
 		
 		label = new Label(shell, SWT.NONE);
-		label.setText("Parameters Location:");
+		label.setText(Res.getString("FilterConfigurationInfoEditor.paramsLocation")); //$NON-NLS-1$
 		edParametersLocation = new Text(shell, SWT.BORDER);
 		edParametersLocation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL)); 
 		
 		label = new Label(shell, SWT.NONE);
-		label.setText("Name:");
+		label.setText(Res.getString("FilterConfigurationInfoEditor.name")); //$NON-NLS-1$
 		edName = new Text(shell, SWT.BORDER);
 		edName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL)); 
 		
 		label = new Label(shell, SWT.NONE);
-		label.setText("Description:");
+		label.setText(Res.getString("FilterConfigurationInfoEditor.description")); //$NON-NLS-1$
 		edDescription = new Text(shell, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 40;
