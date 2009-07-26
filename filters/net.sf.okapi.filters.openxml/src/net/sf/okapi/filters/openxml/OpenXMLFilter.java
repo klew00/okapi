@@ -573,7 +573,7 @@ public class OpenXMLFilter implements IFilter {
 		catch ( IOException e )
 		{
 			LOGGER.log(Level.SEVERE,"Error reading zipped input file.");
-			throw new OkapiIOException("Error reading zipped input file.");
+			throw new OkapiIOException("Error reading zipped input file.", e);
 		}
 	}
 	
