@@ -232,10 +232,15 @@ public class XLIFFFilter implements IFilter {
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
+//TODO: We need to let the XMLStreamReader detect its encoding, only provide a fall back.
+//We could just not use BOMNewlineEncodingDetector, but then we would not have info on BOM and linebreak type.
 			input.setEncoding(detector.getEncoding());
 			reader = fact.createXMLStreamReader(input.getReader());
 
-			encoding = input.getEncoding();
+			String realEnc = reader.getCharacterEncodingScheme();
+			if ( realEnc != null ) encoding = realEnc;
+			else encoding = input.getEncoding();
+
 			srcLang = input.getSourceLanguage();
 			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
 			trgLang = input.getTargetLanguage();
@@ -259,8 +264,6 @@ public class XLIFFFilter implements IFilter {
 			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
-			String realEnc = reader.getCharacterEncodingScheme();
-			if ( realEnc != null ) encoding = realEnc;
 			startDoc.setEncoding(encoding, hasUTF8BOM);
 			startDoc.setLanguage(srcLang);
 			startDoc.setFilterParameters(getParameters());
