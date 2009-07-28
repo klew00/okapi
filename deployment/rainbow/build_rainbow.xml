@@ -106,6 +106,7 @@ Running on: ${os.name} ${os.arch}${line.separator}
 		<ant antfile="../shared/build_filters.ts.xml" inheritAll="true"/>
 		
 		<ant antfile="../shared/build_pipeline.xml" inheritAll="true"/>
+        <ant antfile="../shared/build_pipelinedriver.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_steps.common.xml" inheritAll="true"/>
 		<ant antfile="../shared/build_steps.all.xml" inheritAll="true"/>
 

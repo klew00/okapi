@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<project name="pipelinedriver" default="pipelinedriver"> 
+
+	<property name="proj_pipelinedriver" value="../../common/net.sf.okapi.pipelinedriver"/> 
+	<property name="src_pipelinedriver" value="${proj_pipelinedriver}/src"/> 
+
+	<path id="mainClassPath_pipelinedriver">
+		<pathelement location="${tmp}"/>
+	</path>
+	
+	<target name="pipelinedriver"> 
+		<ant antfile="../shared/build_filters.common.xml" inheritAll="true"/>
+ 		<javac srcdir="${src_pipelinedriver}" destdir="${tmp}" classpathref="mainClassPath_pipelinedriver"/>
+		<copy todir="${tmp}">
+			<fileset dir="${src_pipelinedriver}" excludes="**/*.java"/>
+		</copy>
+	</target>
+
+</project>
