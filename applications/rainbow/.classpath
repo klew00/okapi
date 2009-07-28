@@ -63,5 +63,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.steps.generatesimpletm"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.filters.ts"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.ui.filters.ts"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/net.sf.okapi.pipelinedriver"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -22,7 +22,7 @@ package net.sf.okapi.steps.tests;
 
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.common.pipeline.PipelineDriver;
+import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;

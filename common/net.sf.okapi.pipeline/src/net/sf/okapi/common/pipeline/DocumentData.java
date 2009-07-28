@@ -24,10 +24,10 @@ import java.net.URI;
 
 import net.sf.okapi.common.resource.RawDocument;
 
-class DocumentData {
+public class DocumentData {
 
-	RawDocument rawDocument;
-	URI outputURI;
-	String outputEncoding;
+	public RawDocument rawDocument;
+	public URI outputURI;
+	public String outputEncoding;
 
 }

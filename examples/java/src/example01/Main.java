@@ -30,8 +30,8 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.common.pipeline.BatchItemContext;
-import net.sf.okapi.common.pipeline.IPipelineDriver;
-import net.sf.okapi.common.pipeline.PipelineDriver;
+import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
+import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 
 public class Main {
 	

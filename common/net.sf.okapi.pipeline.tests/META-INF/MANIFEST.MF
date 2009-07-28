@@ -9,4 +9,5 @@ Require-Bundle: org.junit4;bundle-version="4.3.1",
  net.sf.okapi.filters.html;bundle-version="1.0.0",
  net.sf.okapi.filters.xml;bundle-version="1.0.0",
  net.sf.okapi.steps.common;bundle-version="1.0.0",
- net.sf.okapi.filters.abstractmarkup;bundle-version="1.0.0"
+ net.sf.okapi.filters.abstractmarkup;bundle-version="1.0.0",
+ net.sf.okapi.pipelinedriver;bundle-version="1.0.0"
