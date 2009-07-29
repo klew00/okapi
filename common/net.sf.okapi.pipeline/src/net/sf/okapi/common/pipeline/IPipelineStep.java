@@ -21,82 +21,113 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IFilter;
 
 /**
- * Common set of methods for a step within a {@link IPipeline} pipeline. 
+ * Common set of methods for a step within a {@link IPipeline} pipeline.
  */
 public interface IPipelineStep {
-	
+
 	/**
-	 * Sets the pipeline where this step is used.
-	 * @param pipeline the pipeline associated with this step.
+	 * Gets the current {@link PipelineContext} for this pipeline.
+	 * 
+	 * @return the current {@link PipelineContext} for this pipeline.
 	 */
-	public void setPipeline (IPipeline pipeline);
-	
+	public IContext getContext();
+
 	/**
-	 * Gets the pipeline associated with this step.
-	 * @return the pipeline associated with this step.
+	 * Sets the {@link IContext} for this pipeline.
+	 * 
+	 * @param context
+	 *            the new {@link PipelineContext} for this pipeline.
 	 */
-	public IPipeline getPipeline ();
-	
+	public void setContext(IContext context);
+
 	/**
 	 * Gets the current parameters for this step.
-	 * @return the current parameters for this step or null if there are no parameters.
+	 * 
+	 * @return the current parameters for this step or null if there are no
+	 *         parameters.
 	 */
-	public IParameters getParameters ();
+	public IParameters getParameters();
 
 	/**
 	 * Sets new parameters for this step.
-	 * @param params the new parameters to use.
+	 * 
+	 * @param params
+	 *            the new parameters to use.
 	 */
-	public void setParameters (IParameters params);
+	public void setParameters(IParameters params);
 
 	/**
 	 * Gets the localizable name of this step.
+	 * 
 	 * @return the localizable name of this step.
 	 */
 	public String getName();
 
 	/**
 	 * Gets a short localizable description of what this step does.
+	 * 
 	 * @return the text of a short description of what this step does.
 	 */
-	public String getDescription ();
-	
+	public String getDescription();
+
 	/**
 	 * Processes each event sent though the pipeline.
-	 * @param event the event to process.
+	 * 
+	 * @param event
+	 *            the event to process.
 	 * @return the event to pass down the pipeline.
 	 */
-	Event handleEvent(Event event);
-	
+	public Event handleEvent(Event event);
+
 	/**
-	 * Steps that can generate {@link Event}s such as {@link IFilter}s return false until 
-	 * no more events can be created. 
+	 * Steps that can generate {@link Event}s such as {@link IFilter}s return
+	 * false until
+	 * no more events can be created.
 	 * Steps which do not create {@link Event}s always return true.
+	 * 
 	 * @return false if can generate more events, true otherwise.
 	 */
-	boolean isDone();
-	
+	public boolean isDone();
+
 	/**
-	 * Executes any cleanup code for this step. Called once at the end of the pipeline lifecycle.
+	 * Executes any cleanup code for this step. Called once at the end of the
+	 * pipeline lifecycle.
 	 */
-	void destroy();
+	public void destroy();
 
 	/**
 	 * Indicates how many inputs are needed by this step for each process
 	 * within a batch. Most step will request one input per batch item.
+	 * 
 	 * @return the number of requested input per batch item.
 	 */
-	int inputCountRequested ();
-	
+	public int inputCountRequested();
+
 	/**
 	 * Indicates if a given input needs corresponding output information.
-	 * @param inputIndex the index of the input to query. Use 0 for the main input.
+	 * 
+	 * @param inputIndex
+	 *            the index of the input to query. Use 0 for the main input.
 	 * @return true if the given input needs a corresponding output.
 	 */
-	boolean needsOutput (int inputIndex);
+	public boolean needsOutput(int inputIndex);
 
+	/**
+	 * Is this step the last step in the pipeline?
+	 * 
+	 * @return true if last step, false otherwise
+	 */
+	public boolean isLastStep();
+
+	/**
+	 * Tell the step if it is the last one on the pipeline
+	 * 
+	 * @param isLastStep
+	 */
+	public void setLastStep(boolean isLastStep);
 }

@@ -9,6 +9,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
@@ -17,6 +18,8 @@ import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.RawDocumentWriterStep;
 import net.sf.okapi.steps.copysourcetotarget.CopySourceToTargetStep;
 import net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep;
+import net.sf.okapi.steps.segmentation.Parameters;
+import net.sf.okapi.steps.segmentation.SegmentationStep;
 import net.sf.okapi.steps.xsltransform.XSLTransformStep;
 
 import org.junit.After;
@@ -42,7 +45,7 @@ public class MultistepPipelineTest {
 		driver = new PipelineDriver();
 
 		// Set the filter configuration mapper
-		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
+		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
 	}
 
 	@After
@@ -182,7 +185,30 @@ public class MultistepPipelineTest {
 		driver.clearItems();
 		driver.clearSteps();
 	}
-	
+
+	//FIXME: segmenter throws an exception @Test
+	public void segmentationPipeline() throws URISyntaxException {			
+		driver.addStep(new RawDocumentToFilterEventsStep());
+		SegmentationStep ss = new SegmentationStep();
+		Parameters sp = (Parameters)ss.getParameters();
+		sp.sourceSrxPath = new File(getUri("test.srx")).getAbsolutePath();
+		sp.segmentSource = true;
+		driver.addStep(ss);
+		driver.addStep(new FilterEventsWriterStep());
+						
+		// Set the info for the input and output
+		RawDocument rawDoc = new RawDocument(getUri("Test01.properties"), "UTF-8", "en");
+		rawDoc.setFilterConfigId("okf_properties");
+		driver.addBatchItem(rawDoc, getOutputUri("Test01.properties"), "UTF-8");
+				
+		driver.processBatch();	
+		
+		assertTrue((new File(getOutputUri("Test01.properties"))).exists());
+		
+		driver.clearItems();
+		driver.clearSteps();
+	}
+
 	private URI getUri(String fileName) throws URISyntaxException {
 		URL url = MultistepPipelineTest.class.getResource("/" + fileName);
 		return url.toURI();

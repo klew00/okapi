@@ -21,6 +21,7 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -28,39 +29,37 @@ import net.sf.okapi.common.IParameters;
  */
 public abstract class BasePipelineStep implements IPipelineStep {
 
-	private IPipeline pipeline;
+	private IContext context;
+	private boolean isLastStep = false;
 
-	public void setPipeline (IPipeline pipeline) {
-		this.pipeline = pipeline;
-	}
-	
-	public IPipeline getPipeline () {
-		return pipeline;
-	}
-	
 	/**
-	 * Gets the {@link PipelineContext} of the current pipeline associated
+	 * Gets the {@link IContext} of the current pipeline associated
 	 * with this step.
+	 * 
 	 * @return the current {@link PipelineContext} for this step.
 	 */
-	protected PipelineContext getContext () {
-		return pipeline.getContext();
+	public IContext getContext() {
+		return context;
 	}
 
-	public IParameters getParameters () {
-		return null;		
+	public void setContext(IContext context) {
+		this.context = context;
 	}
 
-	public void setParameters (IParameters params) {
-		// No parameters by default	
+	public IParameters getParameters() {
+		return null;
+	}
+
+	public void setParameters(IParameters params) {
+		// No parameters by default
 	}
 
 	public boolean isDone() {
 		return true;
 	}
 
-	public Event handleEvent (Event event) {
-	switch ( event.getEventType() ) {
+	public Event handleEvent(Event event) {
+		switch (event.getEventType()) {
 		case START_BATCH:
 			handleStartBatch(event);
 			break;
@@ -109,119 +108,155 @@ public abstract class BasePipelineStep implements IPipelineStep {
 		return event;
 	}
 
-	public void cancel() {		
+	public void cancel() {
 	}
 
-	public void destroy() {	
+	public void destroy() {
 	}
 
-	public int inputCountRequested () {
+	public int inputCountRequested() {
 		return 1; // Just the main input
 	}
-	
-	public boolean needsOutput (int inputIndex) {
+
+	public boolean needsOutput(int inputIndex) {
 		return false;
 	}
-	
+
+	public boolean isLastStep() {
+		return isLastStep;
+	}
+
+	public void setLastStep(boolean isLastStep) {
+		this.isLastStep = isLastStep;
+	}
+
 	// By default we simply pass the event on to the next step.
 	// Override these methods if you need to process the event
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_BATCH} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleStartBatch (Event event) {
+	protected void handleStartBatch(Event event) {
 	}
-	
+
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_BATCH} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleEndBatch (Event event) {
+	protected void handleEndBatch(Event event) {
 	}
-	
+
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_BATCH_ITEM} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleStartBatchItem (Event event) {
+	protected void handleStartBatchItem(Event event) {
 	}
-	
+
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_BATCH_ITEM} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleEndBatchItem (Event event) {
+	protected void handleEndBatchItem(Event event) {
 	}
-	
+
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#RAW_DOCUMENT} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleRawDocument (Event event) {
+	protected void handleRawDocument(Event event) {
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_DOCUMENT} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleStartDocument (Event event) {
+	protected void handleStartDocument(Event event) {
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_DOCUMENT} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleEndDocument (Event event) {
+	protected void handleEndDocument(Event event) {
 	}
 
 	/**
-	 * Handles the {@link net.sf.okapi.common.EventType#START_SUBDOCUMENT} event.
-	 * @param event the event itself. 
+	 * Handles the {@link net.sf.okapi.common.EventType#START_SUBDOCUMENT}
+	 * event.
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleStartSubDocument (Event event) {
+	protected void handleStartSubDocument(Event event) {
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_SUBDOCUMENT} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleEndSubDocument (Event event) {
+	protected void handleEndSubDocument(Event event) {
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_GROUP} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleStartGroup (Event event) {
+	protected void handleStartGroup(Event event) {
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_GROUP} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleEndGroup (Event event) {
+	protected void handleEndGroup(Event event) {
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#TEXT_UNIT} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleTextUnit (Event event) {
+	protected void handleTextUnit(Event event) {
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#DOCUMENT_PART} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleDocumentPart (Event event) {
+	protected void handleDocumentPart(Event event) {
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#CUSTOM} event.
-	 * @param event the event itself. 
+	 * 
+	 * @param event
+	 *            the event itself.
 	 */
-	protected void handleCustom (Event event) {
+	protected void handleCustom(Event event) {
 	}
-
 }

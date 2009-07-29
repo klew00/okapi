@@ -33,10 +33,11 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditorMapper;
 import net.sf.okapi.common.ParametersEditorMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
-import net.sf.okapi.common.pipeline.BatchItemContext;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.UIUtil;
@@ -310,7 +311,8 @@ public class PipelineWrapper {
 		try {
 			// Build the pipeline
 			driver.setPipeline(new Pipeline());
-			driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
+			// FIXME: The pipeline and steps should only depend on IContext
+			((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
 			for ( StepInfo stepInfo : steps ) {
 				IPipelineStep step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
 				// Update the parameters with the one in the pipeline storage

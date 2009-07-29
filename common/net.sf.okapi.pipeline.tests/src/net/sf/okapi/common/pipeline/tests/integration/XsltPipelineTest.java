@@ -14,6 +14,7 @@ import java.net.URL;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
@@ -34,7 +35,7 @@ public class XsltPipelineTest {
 		fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
 		driver = new PipelineDriver();
-		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
+		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
 	}
 
 	@After

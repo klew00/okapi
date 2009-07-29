@@ -26,6 +26,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
@@ -38,77 +39,83 @@ public class Pipeline implements IPipeline {
 	private volatile boolean cancel = false;
 	private boolean done = false;
 	private boolean destroyed = false;
-	private PipelineContext context;
+	private IContext context;
 
 	/**
 	 * Creates a new Pipeline object.
 	 */
-	public Pipeline () {
+	public Pipeline() {
 		steps = new LinkedList<IPipelineStep>();
 		finishedSteps = new LinkedList<IPipelineStep>();
-		context = new PipelineContext();
 	}
 
 	@Override
-	public void finalize () {
+	public void finalize() {
 		destroy();
 	}
 
-	private void initialize () {
+	private void initialize() {
 		// Copy all the finished steps from previous run
 		for (IPipelineStep step : finishedSteps) {
 			steps.add(step);
 		}
 		finishedSteps.clear();
+		
+		// Initialize steps for this run
+		for (IPipelineStep step : steps) {
+			step.setLastStep(false);
+			step.setContext(getContext());
+		}
+		steps.getLast().setLastStep(true);
 	}
 
-	public void startBatch () {
+	public void startBatch() {
 		initialize();
 		cancel = false;
 		done = false;
 		destroyed = false;
 
 		Event event = new Event(EventType.START_BATCH);
-		for ( IPipelineStep step : steps ) {
+		for (IPipelineStep step : steps) {
 			event = step.handleEvent(event);
 		}
 	}
 
-	public Event endBatch () {		
+	public Event endBatch() {
 		// Non-terminal steps will return END_BATCH after receiving END_BATCH
 		// Terminal steps return an event which may be anything,
 		// including a CUSTOM event. The pipeline returns this final event.
-		// We run this on finishedSteps since steps is empty by the time we get here
+		// We run this on finishedSteps since steps is empty by the time we get
+		// here
 		Event event = Event.END_BATCH_EVENT;
-		for ( IPipelineStep step : finishedSteps ) {
+		for (IPipelineStep step : finishedSteps) {
 			event = step.handleEvent(Event.END_BATCH_EVENT);
 		}
 		done = true;
 		return event;
 	}
 
-	public void addStep (IPipelineStep step) {
-		step.setPipeline(this);
+	public void addStep(IPipelineStep step) {
 		steps.add(step);
 	}
 
-	public List<IPipelineStep> getSteps () {
+	public List<IPipelineStep> getSteps() {
 		return new ArrayList<IPipelineStep>(steps);
 	}
-	
-	public void cancel () {
+
+	public void cancel() {
 		cancel = true;
 	}
 
-	private void execute (Event event) {
+	private void execute(Event event) {
 		// loop through the events until we run out of steps or hit cancel
-		while ( !steps.isEmpty() && !cancel ) {
+		while (!steps.isEmpty() && !cancel) {
 			// cycle through the steps in order, pulling off steps that run out
 			// of events.
-			while ( !steps.getFirst().isDone() && !cancel ) {
+			while (!steps.getFirst().isDone() && !cancel) {
 				// go to each active step and call handleEvent
 				// the event returned is used as input to the next pass
-				for ( IPipelineStep step : steps ) {
+				for (IPipelineStep step : steps) {
 					event = step.handleEvent(event);
 				}
 				// Get ready for another pass down the pipeline
@@ -122,26 +129,26 @@ public class Pipeline implements IPipeline {
 	}
 
 	public PipelineReturnValue getState() {
-		if ( destroyed )
+		if (destroyed)
 			return PipelineReturnValue.DESTROYED;
-		else if ( cancel )
+		else if (cancel)
 			return PipelineReturnValue.CANCELLED;
-		else if ( done )
+		else if (done)
 			return PipelineReturnValue.SUCCEDED;
 		else
 			return PipelineReturnValue.RUNNING;
 	}
 
-	public Event process (RawDocument input) {
+	public Event process(RawDocument input) {
 		return process(new Event(EventType.RAW_DOCUMENT, input));
 	}
-	
-	public Event process (Event input) {
+
+	public Event process(Event input) {
 		initialize();
 
 		// Pre-process for this batch-item
 		Event e = new Event(EventType.START_BATCH_ITEM);
-		for ( IPipelineStep step : steps ) {
+		for (IPipelineStep step : steps) {
 			step.handleEvent(e);
 		}
 
@@ -151,57 +158,52 @@ public class Pipeline implements IPipeline {
 		// process easier down the road if we use the pipeline again
 		for (IPipelineStep step : steps) {
 			finishedSteps.add(step);
-		}		
+		}
 		steps.clear();
-		
+
 		// Post-process for this batch-item
 		e = new Event(EventType.END_BATCH_ITEM);
-		for ( IPipelineStep step : finishedSteps ) {
+		for (IPipelineStep step : finishedSteps) {
 			step.handleEvent(e);
 		}
-		
+
 		return e;
 	}
 
-	public void destroy () {
-		for ( IPipelineStep step : finishedSteps ) {
+	public void destroy() {
+		for (IPipelineStep step : finishedSteps) {
 			step.destroy();
 		}
 		destroyed = true;
 	}
 
-	public int inputCountRequested () {
+	public int inputCountRequested() {
 		int max = 0;
-		for ( IPipelineStep step : steps ) {
-			if ( step.inputCountRequested() > max ) {
+		for (IPipelineStep step : steps) {
+			if (step.inputCountRequested() > max) {
 				max = step.inputCountRequested();
 			}
 		}
 		return max;
 	}
 
-	public boolean needsOutput (int inputIndex) {
-		for ( IPipelineStep step : steps ) {
-			if ( step.needsOutput(inputIndex) ) {
+	public boolean needsOutput(int inputIndex) {
+		for (IPipelineStep step : steps) {
+			if (step.needsOutput(inputIndex)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public PipelineContext getContext () {
+	public IContext getContext() {
 		return context;
 	}
 
-	public void setContext (PipelineContext context) {
+	public void setContext(IContext context) {
 		this.context = context;
 	}
 
-	public boolean isLastStep (IPipelineStep step) {
-		if ( steps.size() == 0 ) return false;
-		return steps.getLast().equals(step);
-	}
-	
 	public void clearSteps() {
 		destroy();
 		steps.clear();

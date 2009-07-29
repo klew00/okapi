@@ -11,6 +11,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -28,7 +29,7 @@ public class Main {
 		
 		IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
-		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
+		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
 
 		// Input resource as URL
 		URL inputXml = Main.class.getResource("test.xml");

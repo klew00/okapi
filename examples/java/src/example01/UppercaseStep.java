@@ -23,6 +23,7 @@ package example01;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -40,7 +41,7 @@ public class UppercaseStep extends BasePipelineStep {
 	protected void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		if ( tu.isTranslatable() ) {
-			TextFragment tf = tu.createTarget(getContext().getTargetLanguage(0),
+			TextFragment tf = tu.createTarget(((PipelineContext)getContext()).getTargetLanguage(0),
 				false, IResource.COPY_CONTENT);
 			tf.setCodedText(tf.getCodedText().toUpperCase());
 		}

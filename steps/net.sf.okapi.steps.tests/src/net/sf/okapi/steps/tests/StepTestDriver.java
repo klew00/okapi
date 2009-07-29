@@ -22,6 +22,7 @@ package net.sf.okapi.steps.tests;
 
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -42,7 +43,7 @@ public class StepTestDriver {
 		fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.po.POFilter");
 		driver = new PipelineDriver();
-		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
+		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
 		captureStep = new CaptureStep();
 		filterStep = new RawDocumentToFilterEventsStep();
 	}

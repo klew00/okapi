@@ -7,8 +7,9 @@ import java.io.StringWriter;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.pipeline.BatchItemContext;
 import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.pipelinedriver.BatchItemContext;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
@@ -38,14 +39,15 @@ public class FilterEventsToRawDocumentStepTest {
 	@Test
 	public void htmlEventsToRawDocument() throws IOException {
 		Event event = null;		
-		pipeline = new Pipeline();
 		eventToDoc = new FilterEventsToRawDocumentStep();
 		
-		eventToDoc.setPipeline(pipeline);
 		RawDocument rawDoc = new RawDocument(htmlSnippet, "en");
 		rawDoc.setFilterConfigId("okf_html");
+		// FIXME: pipeline tests should not depend on pipeline driver
 		BatchItemContext bic = new BatchItemContext(rawDoc, null, "UTF-8");
-		pipeline.getContext().setBatchItemContext(bic);
+		PipelineContext c = new PipelineContext();
+		eventToDoc.setContext(c);
+		c.setBatchItemContext(bic);
 
 		htmlFilter.open(rawDoc);
 		while ( htmlFilter.hasNext() ) {
@@ -61,19 +63,18 @@ public class FilterEventsToRawDocumentStepTest {
 
 	@Test
 	public void htmlEventsToRawDocumentWithUserURI() throws IOException {
-		pipeline = new Pipeline();
 		Event event = null;
 		eventToDoc = new FilterEventsToRawDocumentStep();
-		eventToDoc.setPipeline(pipeline);
-		// Make sure the step in in a pipeline to use the output file
-		pipeline.addStep(eventToDoc); 
 		
 		File tmpFile = File.createTempFile("FilterEventsToRawDocumentStepTest", ".tmp");
 		RawDocument rawDoc = new RawDocument(htmlSnippet, "en");
 		rawDoc.setFilterConfigId("okf_html");
 		BatchItemContext bic = new BatchItemContext(rawDoc, tmpFile.toURI(), "UTF-8");
-		pipeline.getContext().setBatchItemContext(bic);
-
+		// FIXME: pipeline tests should not depend on pipeline driver
+		PipelineContext c = new PipelineContext();
+		eventToDoc.setContext(c);
+		c.setBatchItemContext(bic);
+		
 		htmlFilter.open(rawDoc);
 		while (htmlFilter.hasNext()) {
 			event = eventToDoc.handleEvent(htmlFilter.next());

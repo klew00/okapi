@@ -23,6 +23,7 @@ package example01;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -44,7 +45,7 @@ public class PseudoTranslateStep extends BasePipelineStep {
 		TextUnit tu = (TextUnit)event.getResource();
 		if ( !tu.isTranslatable() ) return;
 
-		TextFragment tf = tu.createTarget(getContext().getTargetLanguage(0),
+		TextFragment tf = tu.createTarget(((PipelineContext)getContext()).getTargetLanguage(0),
 			false, IResource.COPY_CONTENT);
 		StringBuilder text = new StringBuilder(tf.getCodedText());
 		int n;

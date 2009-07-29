@@ -31,6 +31,7 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -52,7 +53,7 @@ public class FilterRoundtripTest {
 		fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
 		driver = new PipelineDriver();
-		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
+		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		driver.addStep(new FilterEventsWriterStep());
 	}

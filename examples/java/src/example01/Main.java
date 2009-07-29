@@ -29,8 +29,9 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
-import net.sf.okapi.common.pipeline.BatchItemContext;
+import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 
 public class Main {
@@ -143,7 +144,7 @@ public class Main {
 		driver.addStep(new FilterEventsWriterStep());
 
 		// Set the filter configuration mapper
-		driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);
+		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
 
 		driver.addBatchItem(new BatchItemContext(
 			(new File(inputPath)).toURI(), // URI of the input document
