@@ -43,6 +43,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class EncodingConversionStep extends BasePipelineStep {
@@ -71,6 +72,15 @@ public class EncodingConversionStep extends BasePipelineStep {
 		params = new Parameters();
 	}
 
+	@Override
+	/**
+	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
+	 * This step depends on the pipeline driver project. 
+	 */
+	public PipelineContext getContext() {		
+		return (PipelineContext)super.getContext();
+	}
+
 	public String getDescription () {
 		return "Convert the character set encoding of a text-based file.";
 	}
@@ -96,7 +106,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 
 	@Override
 	public boolean needsOutput (int inputIndex) {
-		return getPipeline().isLastStep(this);
+		return isLastStep();
 	}
 
 	@Override
@@ -212,7 +222,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			
 			// Open the output document
 			File outFile;
-			if ( getPipeline().isLastStep(this) ) {
+			if ( isLastStep() ) {
 				outFile = new File(getContext().getOutputURI(0));
 				Util.createDirectories(outFile.getAbsolutePath());
 			}

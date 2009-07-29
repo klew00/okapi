@@ -27,6 +27,7 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -51,6 +52,15 @@ public class TranslationComparisonStep extends BasePipelineStep {
 
 	public TranslationComparisonStep () {
 		params = new Parameters();
+	}
+	
+	@Override
+	/**
+	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
+	 * This step depends on the pipeline driver project. 
+	 */
+	public PipelineContext getContext() {		
+		return (PipelineContext)super.getContext();
 	}
 	
 	public String getName () {

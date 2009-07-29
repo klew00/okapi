@@ -27,6 +27,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.simpletm.Database;
@@ -48,6 +49,15 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 
 	public GenerateSimpleTmStep () {
 		params = new Parameters();
+	}
+	
+	@Override
+	/**
+	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
+	 * This step depends on the pipeline driver project. 
+	 */
+	public PipelineContext getContext() {		
+		return (PipelineContext)super.getContext();
 	}
 	
 	public String getName () {

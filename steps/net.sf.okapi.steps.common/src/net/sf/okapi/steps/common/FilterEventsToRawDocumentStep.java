@@ -28,6 +28,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 
@@ -54,6 +55,15 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	 */
 	public FilterEventsToRawDocumentStep () {
 	}
+	
+	@Override
+	/**
+	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
+	 * This step depends on the pipeline driver project. 
+	 */
+	public PipelineContext getContext() {		
+		return (PipelineContext)super.getContext();
+	}
 
 	public String getName() {
 		return "Filter Events to RawDocument";
@@ -65,7 +75,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 
 	@Override
 	public boolean needsOutput (int inputIndex) {
-		return getPipeline().isLastStep(this);
+		return isLastStep();
 	}
 	
 	/**
@@ -121,7 +131,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		filterWriter = startDoc.getFilterWriter();
 		filterWriter.setOptions(language, encoding);
 		
-		if ( getPipeline().isLastStep(this) ) {
+		if ( isLastStep() ) {
 			outputFile = new File(getContext().getOutputURI(0));
 			Util.createDirectories(outputFile.getAbsolutePath());
 		}

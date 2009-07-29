@@ -37,6 +37,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class XSLTransformStep extends BasePipelineStep {
@@ -52,6 +53,15 @@ public class XSLTransformStep extends BasePipelineStep {
 	public XSLTransformStep () {
 		params = new Parameters();
 		trans = null;
+	}
+	
+	@Override
+	/**
+	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
+	 * This step depends on the pipeline driver project. 
+	 */
+	public PipelineContext getContext() {		
+		return (PipelineContext)super.getContext();
 	}
 
 	@Override
@@ -86,7 +96,7 @@ public class XSLTransformStep extends BasePipelineStep {
  
 	@Override
 	public boolean needsOutput (int inputIndex) {
-		return getPipeline().isLastStep(this);
+		return isLastStep();
 	}
 	
 	@Override
@@ -136,7 +146,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			
 			// Create the output
 			File outFile;
-			if ( getPipeline().isLastStep(this) ) {
+			if ( isLastStep() ) {
 				outFile = new File(getContext().getOutputURI(0));
 				Util.createDirectories(outFile.getAbsolutePath());
 			}

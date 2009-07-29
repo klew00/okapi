@@ -41,6 +41,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -64,7 +65,15 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	public SearchAndReplaceStep() {
 		params = new Parameters();
 	}
-
+	
+	@Override
+	/**
+	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
+	 * This step depends on the pipeline driver project. 
+	 */
+	public PipelineContext getContext() {		
+		return (PipelineContext)super.getContext();
+	}
 	
 	public String getDescription () {
 		return "Performs search and replace on the entire file or the text units.";
@@ -97,7 +106,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	@Override
 	public boolean needsOutput (int inputIndex) {
 		if ( params.plainText ) { // Expects RawDocument
-			return getPipeline().isLastStep(this);
+			return isLastStep();
 		}
 		else {
 			return false;
@@ -171,7 +180,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	        
 			// Open the output
 			File outFile;
-			if ( getPipeline().isLastStep(this) ) {
+			if ( isLastStep() ) {
 				outFile = new File(getContext().getOutputURI(0));
 				Util.createDirectories(outFile.getAbsolutePath());
 			}
