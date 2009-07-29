@@ -1,29 +1,10 @@
-/*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
------------------------------------------------------------------------------
-  This library is free software; you can redistribute it and/or modify it 
-  under the terms of the GNU Lesser General Public License as published by 
-  the Free Software Foundation; either version 2.1 of the License, or (at 
-  your option) any later version.
-
-  This library is distributed in the hope that it will be useful, but 
-  WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
-  General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License 
-  along with this library; if not, write to the Free Software Foundation, 
-  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-===========================================================================*/
-
 package net.sf.okapi.steps.tokenization.common;
 
+
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.common.pipeline.PipelineContext;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.plaintext.common.OkapiComponent;
 
@@ -36,33 +17,30 @@ import net.sf.okapi.filters.plaintext.common.OkapiComponent;
 abstract public class AbstractPipelineStep extends OkapiComponent implements IPipelineStep {
 
 	private String language;
-	private IPipeline pipeline;
+	private IContext context;
+	private boolean isLastStep = false;
 
 	public AbstractPipelineStep() {
 		
 		super();
 	}
 
-	public void setPipeline (IPipeline pipeline) {
-		
-		this.pipeline = pipeline;
-	}
-	
-	public IPipeline getPipeline () {
-		
-		return pipeline;
-	}
-		
 	/**
-	 * Gets the {@link PipelineContext} of the current pipeline associated
+	 * Gets the {@link IContext} of the current pipeline associated
 	 * with this step.
+	 * 
 	 * @return the current {@link PipelineContext} for this step.
 	 */
-	protected PipelineContext getContext () {
+	public IContext getContext() {
 		
-		return pipeline.getContext();
+		return context;
 	}
 
+	public void setContext(IContext context) {
+		
+		this.context = context;
+	}
+	
 	protected String getLanguage() {
 		
 		return language;
@@ -173,6 +151,16 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 	public boolean needsOutput(int inputIndex) {
 
 		return false;
+	}
+	
+	public boolean isLastStep() {
+		
+		return isLastStep;
+	}
+
+	public void setLastStep(boolean isLastStep) {
+		
+		this.isLastStep = isLastStep;
 	}
 
 	// By default we simply pass the event on to the next step.
