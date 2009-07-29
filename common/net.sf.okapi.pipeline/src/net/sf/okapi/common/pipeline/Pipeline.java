@@ -49,18 +49,13 @@ public class Pipeline implements IPipeline {
 		finishedSteps = new LinkedList<IPipelineStep>();
 	}
 
-	@Override
-	public void finalize() {
-		destroy();
-	}
-
 	private void initialize() {
 		// Copy all the finished steps from previous run
 		for (IPipelineStep step : finishedSteps) {
 			steps.add(step);
 		}
 		finishedSteps.clear();
-		
+
 		// Initialize steps for this run
 		for (IPipelineStep step : steps) {
 			step.setLastStep(false);
