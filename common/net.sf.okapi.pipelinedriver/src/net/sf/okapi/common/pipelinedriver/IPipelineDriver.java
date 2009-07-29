@@ -23,7 +23,6 @@ package net.sf.okapi.common.pipelinedriver;
 import java.net.URI;
 import java.util.List;
 
-import net.sf.okapi.common.pipeline.IBatchItemContext;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.resource.RawDocument;

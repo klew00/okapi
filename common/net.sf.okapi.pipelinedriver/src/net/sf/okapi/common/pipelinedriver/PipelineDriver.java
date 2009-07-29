@@ -25,9 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.pipeline.BatchItemContext;
-import net.sf.okapi.common.pipeline.DocumentData;
-import net.sf.okapi.common.pipeline.IBatchItemContext;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
@@ -44,6 +41,7 @@ public class PipelineDriver implements IPipelineDriver {
 	protected final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private IPipeline pipeline;
+	private PipelineContext context;
 	private List<IBatchItemContext> batchItems;
 	
 	/**
@@ -51,11 +49,14 @@ public class PipelineDriver implements IPipelineDriver {
 	 */
 	public PipelineDriver () {
 		pipeline = new Pipeline();
+		context = new PipelineContext();
+		pipeline.setContext(context);
 		batchItems = new ArrayList<IBatchItemContext>();
 	}
 
 	public void setPipeline (IPipeline pipeline) {
 		this.pipeline = pipeline;
+		this.pipeline.setContext(context);
 	}
 
 	public IPipeline getPipeline () {
@@ -83,7 +84,7 @@ public class PipelineDriver implements IPipelineDriver {
 		pipeline.startBatch();
 		for ( IBatchItemContext item : batchItems ) {
 			displayInput(item);
-			pipeline.getContext().setBatchItemContext(item);
+			((PipelineContext)pipeline.getContext()).setBatchItemContext(item);
 			pipeline.process(item.getRawDocument(0));
 		}
 		pipeline.endBatch();
