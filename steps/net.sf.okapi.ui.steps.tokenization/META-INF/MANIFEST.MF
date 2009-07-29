@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tokenization Plug-in
+Bundle-SymbolicName: net.sf.okapi.ui.steps.tokenization
+Bundle-Version: 1.0.0
+Require-Bundle: net.sf.okapi.steps.tokenization;bundle-version="1.0.0",
+ net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.ui.common;bundle-version="1.0.0",
+ org.eclipse.swt;bundle-version="3.4.2",
+ net.sf.okapi.ui.filters.plaintext;bundle-version="1.0.0",
+ net.sf.okapi.filters.plaintext;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: net.sf.okapi.ui.steps.tokenization,
+ net.sf.okapi.ui.steps.tokenization.locale,
+ net.sf.okapi.ui.steps.tokenization.mapping,
+ net.sf.okapi.ui.steps.tokenization.mapping.model,
+ net.sf.okapi.ui.steps.tokenization.tokens

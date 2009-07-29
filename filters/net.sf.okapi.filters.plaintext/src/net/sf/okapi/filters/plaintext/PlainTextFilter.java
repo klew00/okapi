@@ -21,8 +21,8 @@
 package net.sf.okapi.filters.plaintext;
 
 import net.sf.okapi.common.MimeTypeMapper;
-import net.sf.okapi.filters.common.framework.CompoundFilter;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
+import net.sf.okapi.filters.plaintext.common.CompoundFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
 import net.sf.okapi.filters.plaintext.Parameters;
 import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;

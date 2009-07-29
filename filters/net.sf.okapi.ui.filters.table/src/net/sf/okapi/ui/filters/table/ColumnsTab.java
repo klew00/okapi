@@ -26,9 +26,9 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ListUtils;
 import net.sf.okapi.filters.table.base.Parameters;
-import net.sf.okapi.ui.common.dialogs.IDialogPage;
-import net.sf.okapi.ui.common.editors.TableAdapter;
-import net.sf.okapi.ui.common.utils.SWTUtils;
+import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
+import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
+import net.sf.okapi.ui.filters.plaintext.common.TableAdapter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -286,7 +286,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			}
 		}
 		
-		adapter.sort(1);
+		adapter.sort(1, true);
 		interop(table);  // Selection changes
 	}
 
@@ -369,7 +369,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			if (params.recordIdColumn > 0)
 				adapter.addRow(params.recordIdColumn, 1);
 			
-			adapter.sort(1);
+			adapter.sort(1, true);
 						
 			List<String> sourceColumns = ListUtils.stringAsList(params.sourceColumns);	
 			List<String> sourceIdSuffixes = ListUtils.stringAsList(params.sourceIdSuffixes);

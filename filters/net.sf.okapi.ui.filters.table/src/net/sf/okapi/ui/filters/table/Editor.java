@@ -22,9 +22,9 @@ package net.sf.okapi.ui.filters.table;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.ui.common.editors.AbstractParametersEditor;
-import net.sf.okapi.ui.common.utils.SWTUtils;
 import net.sf.okapi.ui.filters.plaintext.OptionsTab;
+import net.sf.okapi.ui.filters.plaintext.common.AbstractParametersEditor;
+import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;

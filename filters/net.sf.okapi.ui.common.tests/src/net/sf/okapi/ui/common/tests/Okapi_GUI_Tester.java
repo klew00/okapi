@@ -34,8 +34,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.ui.common.dialogs.IInputQueryPage;
-import net.sf.okapi.ui.common.dialogs.InputQueryDialog;
+import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
+import net.sf.okapi.ui.filters.plaintext.common.InputQueryDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -66,10 +66,16 @@ public class Okapi_GUI_Tester {
 
 			// swt_test.Editor.class.getName(),
 			// net.sf.okapi.steps.ui.xsltransform.ParametersEditor.class.getName(),
+			net.sf.okapi.ui.steps.tokenization.mapping.Mapper.class.getName(),
+			net.sf.okapi.ui.steps.tokenization.mapping.MappingItemPage.class.getName(),
+			net.sf.okapi.ui.steps.wordcount.ParametersEditor.class.getName(),
+			net.sf.okapi.ui.steps.tokenization.tokens.TokensTab.class.getName(),
+			net.sf.okapi.ui.steps.tokenization.tokens.AddModifyTokenPage.class.getName(),
+			net.sf.okapi.ui.steps.tokenization.locale.LanguageListTab.class.getName(),
 			net.sf.okapi.ui.filters.table.Editor.class.getName(),
 			net.sf.okapi.ui.filters.plaintext.Editor.class.getName(),
-			net.sf.okapi.ui.common.dialogs.InputQueryPageInt.class.getName(),
-			net.sf.okapi.ui.common.dialogs.InputQueryPageString.class.getName(),
+			net.sf.okapi.ui.filters.plaintext.common.InputQueryPageInt.class.getName(),
+			net.sf.okapi.ui.filters.plaintext.common.InputQueryPageString.class.getName(),
 			net.sf.okapi.ui.filters.table.AddModifyColumnDefPage.class.getName(),					
 			net.sf.okapi.filters.ui.openoffice.Editor.class.getName(),
 			net.sf.okapi.filters.ui.po.Editor.class.getName(),
@@ -77,7 +83,6 @@ public class Okapi_GUI_Tester {
 			net.sf.okapi.ui.filters.html.Editor.class.getName(),
 			net.sf.okapi.ui.filters.openxml.Editor.class.getName(),
 			net.sf.okapi.filters.ui.regex.Editor.class.getName(),
-			//net.sf.okapi.filters.ui.ts.Editor.class.getName(),
 			net.sf.okapi.steps.ui.bomconversion.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.ui.charlisting.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.ui.encodingconversion.ParametersEditor.class.getName(),
@@ -317,8 +322,7 @@ public class Okapi_GUI_Tester {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
-		
+				
 		if (IParametersEditor.class.isAssignableFrom(c)) {
 			
 			IParametersEditor editor = null;
@@ -353,12 +357,13 @@ public class Okapi_GUI_Tester {
 			
 			if (editor.edit(params, false, context)) {
 				
-				text_1.setText(params.toString());
+				if (params != null)
+					text_1.setText(params.toString());
 			}
 			else
 				params = null;
 		}
-		else if (IInputQueryPage.class.isAssignableFrom(c)) {
+		else if (IDialogPage.class.isAssignableFrom(c)) {
 			
 			InputQueryDialog dlg = new InputQueryDialog();
 			dlg.run(shell, c, shell.getText(), "Input a value:", null, null);
@@ -400,8 +405,7 @@ public class Okapi_GUI_Tester {
 	    	return false;
 	    }
 
-		return true;
-		
+		return true;		
 	}
 
 }

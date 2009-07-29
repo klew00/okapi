@@ -25,10 +25,10 @@ import java.util.LinkedList;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.filters.common.framework.AbstractLineFilter;
-import net.sf.okapi.filters.common.framework.TextProcessingResult;
-import net.sf.okapi.filters.common.utils.TextUnitUtils;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
+import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
+import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
+import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 
 /**
  *  The filter breaks text into paragraphs and sends them as text units.

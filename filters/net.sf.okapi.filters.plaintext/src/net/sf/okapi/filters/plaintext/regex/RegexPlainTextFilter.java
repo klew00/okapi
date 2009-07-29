@@ -35,8 +35,8 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
-import net.sf.okapi.filters.common.framework.AbstractFilter;
-import net.sf.okapi.filters.common.framework.AbstractLineFilter;
+import net.sf.okapi.filters.plaintext.common.AbstractFilter;
+import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.regex.RegexFilter;
 import net.sf.okapi.filters.regex.Rule;
 

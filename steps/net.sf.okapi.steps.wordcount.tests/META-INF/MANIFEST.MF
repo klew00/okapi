@@ -8,4 +8,6 @@ Require-Bundle: org.junit4;bundle-version="4.3.1",
  net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.steps.wordcount;bundle-version="1.0.0",
  net.sf.okapi.filters.common;bundle-version="1.0.0",
- net.sf.okapi.steps.common;bundle-version="1.0.0"
+ net.sf.okapi.steps.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.plaintext;bundle-version="1.0.0"
+Export-Package: net.sf.okapi.steps.wordcount.tests

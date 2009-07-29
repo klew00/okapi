@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.table.base;
 
+import net.sf.okapi.common.ParametersString;
+
 /**
  * Base Table Filter parameters
  * 
@@ -207,9 +209,9 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 //----------------------------------------------------------------------------------------------------------------------------	
 	
 	@Override
-	protected void parameters_load() {
+	protected void parameters_load(ParametersString buffer) {
 
-		super.parameters_load();
+		super.parameters_load(buffer);
 		
 		columnNamesLineNum = buffer.getInteger("columnNamesLineNum", 1);
 		valuesStartLineNum = buffer.getInteger("valuesStartLineNum", 2);
@@ -255,9 +257,9 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	}
 
 	@Override
-	protected void parameters_save() {
+	protected void parameters_save(ParametersString buffer) {
 
-		super.parameters_save();
+		super.parameters_save(buffer);
 		
 		buffer.setInteger("columnNamesLineNum", columnNamesLineNum);
 		buffer.setInteger("valuesStartLineNum", valuesStartLineNum);

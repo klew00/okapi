@@ -20,7 +20,8 @@
 
 package net.sf.okapi.steps.tokenization;
 
-import net.sf.okapi.common.framework.AbstractParameters;
+import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 
 /**
  * Tokenization step parameters
@@ -30,28 +31,32 @@ import net.sf.okapi.common.framework.AbstractParameters;
 
 public class Parameters extends AbstractParameters {
 
-	String tokensOfInterest;
+	public boolean tokenizeSource;
+	public boolean tokenizeTargets;
 	
 	@Override
-	protected void parameters_init() {		
-	}
-
-	@Override
-	protected void parameters_load() {
-
-		tokensOfInterest = buffer.getString("tokensOfInterest", "");
+	protected void parameters_init() {
+		
 	}
 
 	@Override
 	protected void parameters_reset() {
 
-		tokensOfInterest = ""; // All tokens
+		tokenizeSource = true;
+		tokenizeTargets = false;
 	}
 
 	@Override
-	protected void parameters_save() {
+	protected void parameters_load(ParametersString buffer) {
 
-		buffer.setString("tokensOfInterest", tokensOfInterest);
+		tokenizeSource = buffer.getBoolean("tokenizeSource", true);
+		tokenizeTargets = buffer.getBoolean("tokenizeTargets", false);
 	}
 	
+	@Override
+	protected void parameters_save(ParametersString buffer) {
+
+		buffer.setBoolean("tokenizeSource", tokenizeSource);
+		buffer.setBoolean("tokenizeTargets", tokenizeTargets);
+	}	
 }

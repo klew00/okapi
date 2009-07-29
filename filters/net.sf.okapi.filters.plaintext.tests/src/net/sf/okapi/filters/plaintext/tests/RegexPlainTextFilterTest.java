@@ -43,7 +43,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.common.framework.AbstractLineFilter;
+import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.regex.Parameters;
 import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;
 // import net.sf.okapi.filters.regex.Parameters;

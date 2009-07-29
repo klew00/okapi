@@ -20,9 +20,10 @@
 
 package net.sf.okapi.filters.plaintext.base;
 
+import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.filters.InlineCodeFinder;
-import net.sf.okapi.common.framework.AbstractParameters;
-import net.sf.okapi.filters.common.framework.WrapMode;
+import net.sf.okapi.filters.plaintext.common.AbstractParameters;
+import net.sf.okapi.filters.plaintext.common.WrapMode;
 
 /**
  * Base Plain Text Filter parameters
@@ -50,7 +51,7 @@ public class Parameters extends AbstractParameters {
 	}
 
 	@Override
-	protected void parameters_load() {
+	protected void parameters_load(ParametersString buffer) {
 
 		unescapeSource = buffer.getBoolean("unescapeSource", true);
 		trimLeading = buffer.getBoolean("trimLeading", false);
@@ -84,7 +85,7 @@ public class Parameters extends AbstractParameters {
 	}
 
 	@Override
-	protected void parameters_save() {
+	protected void parameters_save(ParametersString buffer) {
 		
 		buffer.setBoolean("unescapeSource", unescapeSource);
 		buffer.setBoolean("trimLeading", trimLeading);

@@ -20,7 +20,11 @@
 
 package net.sf.okapi.steps.tokenization.tests;
 
+import static org.junit.Assert.assertEquals;
+import net.sf.okapi.steps.tokenization.locale.LocaleUtils;
+
 import org.junit.Before;
+import org.junit.Test;
 
 public class TokenizationTest {
 
@@ -29,4 +33,10 @@ public class TokenizationTest {
 		
 	}
 
+	@Test
+	public void testLocaleUtils() {
+		
+		assertEquals("EN-US", LocaleUtils.normalizeLanguageCode_Okapi("en_US"));
+		assertEquals("en_US", LocaleUtils.normalizeLanguageCode_ICU("EN-US"));
+	}
 }

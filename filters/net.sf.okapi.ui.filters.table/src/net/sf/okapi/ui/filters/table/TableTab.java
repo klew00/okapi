@@ -20,10 +20,10 @@
 
 package net.sf.okapi.ui.filters.table;
 
-import net.sf.okapi.common.framework.CompoundParameters;
+import net.sf.okapi.filters.plaintext.common.CompoundParameters;
 import net.sf.okapi.filters.table.base.Parameters;
-import net.sf.okapi.ui.common.dialogs.IDialogPage;
-import net.sf.okapi.ui.common.utils.SWTUtils;
+import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
+import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

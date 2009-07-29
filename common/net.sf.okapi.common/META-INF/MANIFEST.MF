@@ -5,6 +5,5 @@ Bundle-SymbolicName: net.sf.okapi.common
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.common,
  net.sf.okapi.common.annotation,
- net.sf.okapi.common.exceptions,
- net.sf.okapi.common.framework
+ net.sf.okapi.common.exceptions
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

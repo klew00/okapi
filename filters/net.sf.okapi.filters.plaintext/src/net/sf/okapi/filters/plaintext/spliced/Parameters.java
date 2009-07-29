@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.plaintext.spliced;
 
+import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.Util;
 
 /**
@@ -44,9 +45,9 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 //----------------------------------------------------------------------------------------------------------------------------	
 	
 	@Override
-	protected void parameters_load() {
+	protected void parameters_load(ParametersString buffer) {
 
-		super.parameters_load();
+		super.parameters_load(buffer);
 		
 		String st = buffer.getString("splicer", "\\");
 		if (Util.isEmpty(st))
@@ -67,9 +68,9 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	}
 
 	@Override
-	protected void parameters_save() {
+	protected void parameters_save(ParametersString buffer) {
 
-		super.parameters_save();
+		super.parameters_save(buffer);
 		
 		buffer.setString("splicer", splicer);
 		buffer.setBoolean("createPlaceholders", createPlaceholders);

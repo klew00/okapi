@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.plaintext.paragraphs;
 
+import net.sf.okapi.common.ParametersString;
+
 /**
  * Paragraph Plain Text Filter parameters 
  * 
@@ -38,9 +40,9 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 //----------------------------------------------------------------------------------------------------------------------------	
 	
 	@Override
-	protected void parameters_load() {
+	protected void parameters_load(ParametersString buffer) {
 
-		super.parameters_load();
+		super.parameters_load(buffer);
 		
 		extractParagraphs = buffer.getBoolean("extractParagraphs", true);
 	}
@@ -54,9 +56,9 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	}
 
 	@Override
-	protected void parameters_save() {
+	protected void parameters_save(ParametersString buffer) {
 
-		super.parameters_save();
+		super.parameters_save(buffer);
 		
 		buffer.setBoolean("extractParagraphs", extractParagraphs);
 	}

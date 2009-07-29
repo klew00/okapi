@@ -6,8 +6,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.filters.common.utils.TextUnitUtils;
-import net.sf.okapi.steps.wordcount.engine.WordCounter;
+import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
+import net.sf.okapi.steps.wordcount.WordCounter;
 
 import org.junit.Before;
 import org.junit.Test;

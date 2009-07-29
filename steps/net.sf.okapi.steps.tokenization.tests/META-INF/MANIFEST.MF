@@ -7,3 +7,4 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit4;bundle-version="4.3.1",
  net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.steps.tokenization;bundle-version="1.0.0"
+Export-Package: net.sf.okapi.steps.tokenization.tests

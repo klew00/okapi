@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Counting Plug-in
+Bundle-SymbolicName: net.sf.okapi.ui.steps.wordcount
+Bundle-Version: 1.0.0
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.eclipse.swt;bundle-version="3.4.2",
+ net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.ui.common;bundle-version="1.0.0",
+ net.sf.okapi.ui.filters.plaintext;bundle-version="1.0.0",
+ net.sf.okapi.filters.plaintext;bundle-version="1.0.0",
+ net.sf.okapi.steps.wordcount;bundle-version="1.0.0"
+Export-Package: net.sf.okapi.ui.steps.wordcount

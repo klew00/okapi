@@ -22,6 +22,8 @@ package net.sf.okapi.filters.plaintext.regex;
 
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.ParametersString;
+
 /**
  * Parameters of the Regex Plain Text Filter
  * 
@@ -59,9 +61,9 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 //----------------------------------------------------------------------------------------------------------------------------	
 	
 	@Override
-	protected void parameters_load() {
+	protected void parameters_load(ParametersString buffer) {
 
-		super.parameters_load();
+		super.parameters_load(buffer);
 		
 		rule =  buffer.getString("rule", DEF_RULE);
 		sourceGroup = buffer.getInteger("sourceGroup", DEF_GROUP);		
@@ -81,9 +83,9 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	}
 
 	@Override
-	protected void parameters_save() {
+	protected void parameters_save(ParametersString buffer) {
 
-		super.parameters_save();
+		super.parameters_save(buffer);
 		
 		buffer.setString("rule", rule);
 		buffer.setInteger("sourceGroup", sourceGroup);		

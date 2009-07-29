@@ -23,8 +23,8 @@ package net.sf.okapi.ui.filters.table;
 import java.util.Arrays;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.ui.common.dialogs.IInputQueryPage;
-import net.sf.okapi.ui.common.utils.SWTUtils;
+import net.sf.okapi.ui.filters.plaintext.common.IInputQueryPage;
+import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Button;

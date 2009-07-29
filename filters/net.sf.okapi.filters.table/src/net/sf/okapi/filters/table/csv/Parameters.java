@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.table.csv;
 
+import net.sf.okapi.common.ParametersString;
+
 /**
  * CSV Filter parameters
  * 
@@ -48,9 +50,9 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	public boolean removeQualifiers = true; 
 
 	@Override
-	protected void parameters_load() {
+	protected void parameters_load(ParametersString buffer) {
 
-		super.parameters_load();
+		super.parameters_load(buffer);
 		
 		fieldDelimiter = buffer.getString("fieldDelimiter", "").trim(); 
 		textQualifier = buffer.getString("textQualifier", "").trim();
@@ -68,9 +70,9 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	}
 
 	@Override
-	protected void parameters_save() {
+	protected void parameters_save(ParametersString buffer) {
 
-		super.parameters_save();
+		super.parameters_save(buffer);
 		
 		buffer.setString("fieldDelimiter", fieldDelimiter);
 		buffer.setString("textQualifier", textQualifier);

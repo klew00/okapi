@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.table.fwc;
 
+import net.sf.okapi.common.ParametersString;
+
 /**
  * Fixed-Width Columns Filter parameters
  * 
@@ -51,9 +53,9 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 //----------------------------------------------------------------------------------------------------------------------------	
 	
 	@Override
-	protected void parameters_load() {
+	protected void parameters_load(ParametersString buffer) {
 
-		super.parameters_load();
+		super.parameters_load(buffer);
 		
 		columnStartPositions = buffer.getString("columnStartPositions", "").trim(); // null is impossible, default is ""
 		columnEndPositions = buffer.getString("columnEndPositions", "").trim(); // null is impossible, default is ""
@@ -70,9 +72,9 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 	}
 
 	@Override
-	protected void parameters_save() {
+	protected void parameters_save(ParametersString buffer) {
 
-		super.parameters_save();
+		super.parameters_save(buffer);
 		
 		buffer.setString("columnStartPositions", columnStartPositions);
 		buffer.setString("columnEndPositions", columnEndPositions);

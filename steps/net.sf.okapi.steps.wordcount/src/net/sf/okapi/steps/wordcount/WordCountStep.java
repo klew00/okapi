@@ -20,14 +20,9 @@
 
 package net.sf.okapi.steps.wordcount;
 
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.steps.common.counting.BaseCountStep;
-import net.sf.okapi.steps.common.counting.GMX;
-import net.sf.okapi.steps.common.counting.Metrics;
-import net.sf.okapi.steps.tokenization.TokensAnnotation;
-import net.sf.okapi.steps.tokenization.engine.Token;
-import net.sf.okapi.steps.tokenization.engine.Tokens;
-import net.sf.okapi.steps.wordcount.engine.WordCounter;
+import net.sf.okapi.steps.tokenization.tokens.Token;
+import net.sf.okapi.steps.wordcount.common.GMX;
+import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 
 /**
  * Word Counter pipeline step. The counter counts a number of words in translatable text units. 
@@ -38,7 +33,7 @@ import net.sf.okapi.steps.wordcount.engine.WordCounter;
  * @version 0.1 06.07.2009
  */
 
-public class WordCountStep extends BaseCountStep {
+public class WordCountStep extends TokenCountStep {
 	
 	public WordCountStep() {
 		
@@ -49,25 +44,16 @@ public class WordCountStep extends BaseCountStep {
 	}
 
 	@Override
-	protected long getCount(TextUnit textUnit) {
-		// If tokens are present, count WORD tokens, if not, use static WordCounter
+	protected String getMetric() {
 		
-		TokensAnnotation ta = textUnit.getAnnotation(TokensAnnotation.class);
-		if (ta != null) {
-			
-			Tokens tokens = ta.getFilteredList(new String[]{Token.WORD});
-			if (tokens == null) return 0;
-			
-			return tokens.size();
-		}
-		else
-			return WordCounter.getCount(textUnit, getLanguage());		
+		return GMX.TotalWordCount;
 	}
 
 	@Override
-	protected void saveCount(Metrics metrics, long count) {
-		
-		metrics.setMetric(GMX.TotalWordCount, count);
+	protected String getToken() {
+
+		return Token.WORD;
 	}
+
 			
 }

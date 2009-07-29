@@ -22,9 +22,9 @@ package net.sf.okapi.ui.filters.plaintext;
 
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
-import net.sf.okapi.filters.common.framework.WrapMode;
-import net.sf.okapi.ui.common.dialogs.IDialogPage;
-import net.sf.okapi.ui.common.utils.SWTUtils;
+import net.sf.okapi.filters.plaintext.common.WrapMode;
+import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
+import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
