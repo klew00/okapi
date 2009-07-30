@@ -1344,4 +1344,48 @@ public abstract class AbstractBaseFilter implements IFilter {
 	protected String getDocumentName() {
 		return documentName;
 	}
+
+	/**
+	 * Gets the textUnitId (used in OpenXML with textboxes to update the id of the parent filter 
+	 * @return the textUnitId
+	 */
+	protected int getTextUnitId()
+	{
+		return textUnitId;
+	}
+	
+	/**
+	 * Allows implementers to set the textUnitId (used in OpenXML for textboxes)
+	 * 
+	 * @param i
+	 *		the initial value for the textUnitId
+	 */
+	protected void setTextUnitId(int i)
+	{
+		this.textUnitId = i;
+	}
+
+	/**
+	 * Gets the textUnitId (used in OpenXML with textboxes to update the id of the parent filter 
+	 * @return the textUnitId
+	 */
+	protected int getDocumentPartId()
+	{
+		return documentPartId;
+	}
+	
+	/**
+	 * Allows implementers to set the textUnitId (used in OpenXML for textboxes)
+	 * 
+	 * @param i
+	 *		the initial value for the textUnitId
+	 */
+	protected void setDocumentPartId(int i)
+	{
+		this.documentPartId = i;
+	}
+	protected void addFilterEvent(Event e) // for OpenXML
+	{
+		filterEvents.add(e);
+	}
 }
