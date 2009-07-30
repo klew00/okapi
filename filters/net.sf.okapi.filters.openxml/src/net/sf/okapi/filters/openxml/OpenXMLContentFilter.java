@@ -51,15 +51,21 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
+import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.filters.abstractmarkup.AbstractBaseMarkupFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 
 /**
  * <p>Filters Microsoft Office Word, Excel, and Powerpoint Documents.
@@ -122,6 +128,8 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private String sConfigFileName; // DWH 10-15-08
 	private URL urlConfig; // DWH 3-9-09
 	private Hashtable<String,String> htXMLFileType=null;
+	private String sInsideTextBox = ""; // DWH 7-23-09 textbox
+	private boolean bInTextBox = false; // DWH 7-23-09 textbox
 	private boolean bInTextRun = false; // DWH 4-10-09
 	private boolean bInSubTextRun = false; // DWH 4-10-09
 	private boolean bInDeletion = false; // DWH 5-8-09 <w:del> deletion in tracking mode in Word
@@ -135,7 +143,6 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private boolean bInMainFile = false; // DWH 4-15-09
 	private boolean bExcludeTextInRun = false; // DWH 5-27-09
 	private boolean bExcludeTextInUnit = false; // DWH 5-29-09
-	private boolean bInEmbeddedTextUnit = false; // DWH 6-29-09
 	private String sCurrentCharacterStyle = ""; // DWH 5-27-09
 	private String sCurrentParagraphStyle = ""; // DWH 5-27-09
 	private boolean bPreferenceTranslateWordHidden = false; // DWH 6-29-09
@@ -155,6 +162,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	private String sCurrentExcelSheet=""; // DWH 6-25-09 current sheet number
 	private YamlParameters params=null; // DWH 7-16-09
 	private TaggedFilterConfiguration config=null; // DWH 7-16-09
+	private RawDocument rdSource; // Textbox
 	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
@@ -732,15 +740,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 		// if in excluded state everything is skeleton including text
 		if (getRuleState().isExludedState()) {
-			if (bInEmbeddedTextUnit) // DWH 6-29-09
-			{
-				if (bInTextRun) // DWH 7-16-09
-					addToTextRun(txt);
-				else
-					addToNonTextRun(txt); // DWH 7-16-09
-			}
-			else
-				addToDocumentPart(txt);
+			addToDocumentPart(txt);
+			return;
+		}
+		if (bInTextBox)
+		{
+			sInsideTextBox += txt;
 			return;
 		}
 		// check for need to modify index in Excel cell pointing to a shared string
@@ -910,12 +915,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		sTagName = startTag.getName(); // DWH 2-26-09
 		sTagString = startTag.toString(); // DWH 2-26-09
 		sTagElementType = getConfig().getElementType(sTagName); // DWH 6-13-09
+		if (bInTextBox) // DWH 7-23-09 textbox
+		{
+			sInsideTextBox += sTagString;
+			return;
+		}
 		if (getRuleState().isExludedState()) {
-			if (bInEmbeddedTextUnit)
-			{
-				addToTextRun(sTagString); //DWH 6-29-09
-				return;
-			}
 			addToDocumentPart(sTagString);
 			// process these tag types to update parser state
 			switch (getConfig().getMainRuleType(sTagName)) {
@@ -1023,6 +1028,12 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			}
 			break;
 		case GROUP_ELEMENT:
+			if (!canStartNewTextUnit()) // DWH 6-29-09 for text box: embedded text unit
+			{
+				bInTextBox = true; // DWH 7-23-09 textbox
+				sInsideTextBox = ""; // DWH 7-23-09 textbox
+				addTextRunToCurrentTextUnit(true); // DWH 7-29-09 add text run stuff as a placeholder
+			}
 			getRuleState().pushGroupRule(sTagName);
 			startGroup(new GenericSkeleton(sTagString));
 			break;
@@ -1035,18 +1046,6 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			addToDocumentPart(sTagString);
 			break;
 		case TEXT_UNIT_ELEMENT:
-			if (sTagElementType.equals("textbox") && !canStartNewTextUnit()) // DWH 6-29-09 for text box: embedded text unit
-			{
-				getRuleState().pushExcludedRule(sTagName); // exclude the embedded text unit for now
-				if (bInTextRun) // DWH 4-10-09
-					addToTextRun(sTagString);
-				else
-					addToNonTextRun(sTagString); // DWH 5-5-09
-				bInEmbeddedTextUnit = true;
-				break;
-			}
-			else if (!canStartNewTextUnit())
-				bInEmbeddedTextUnit = (!(!bInEmbeddedTextUnit));
 			bExcludeTextInUnit = false; // DWH 5-29-09 only exclude text if specific circumstances occur
 			addNonTextRunToCurrentTextUnit(); // DWH 5-5-09 trNonTextRun should be null at this point
 			bBeforeFirstTextRun = true; // DWH 5-5-09 addNonTextRunToCurrentTextUnit sets it false
@@ -1142,6 +1141,15 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		String sTagString; // DWH 4-14-09
 		String tempTagType; // DWH 5-5-09
 		String sTagElementType; // DWH 6-13-09
+		String s; // temporary string
+		DocumentPart dippy; // DWH 7-28-09 textbox
+		GenericSkeleton skel; // DWH 7-28-09 textbox
+		TextUnit tu; // DWH 7-28-09 textbox
+		int dpid; // DWH 7-28-09 textbox
+		WordTextBox wtb = null; // DWH 7-23-09 textbox
+		ArrayList<Event> textBoxEventList=null; // DWH 7-23-09 textbox
+		Event event; // DWH 7-23-09 textbox
+		OpenXMLContentFilter tboxcf; // DWH 7-23-09
 		if (endTag==null) // DWH 4-14-09
 			return;
 		sTagName = endTag.getName(); // DWH 2-26-09
@@ -1157,21 +1165,6 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		}
 		sTagString = endTag.toString(); // DWH 2-26-09
 		if (getRuleState().isExludedState()) {
-			if (bInEmbeddedTextUnit)
-			{
-				if (sTagElementType.equals("textbox") &&
-					(getConfig().getMainRuleType(sTagName)==RULE_TYPE.TEXT_UNIT_ELEMENT))
-					  // 6-29-09 should keep embedded text unit for dying for now
-				{
-					getRuleState().popExcludedIncludedRule();
-					bInEmbeddedTextUnit = false;
-				}
-				if (bInTextRun) // DWH 4-10-09
-					addToTextRun(sTagString); // DWH 7-16-09
-				else
-					addToNonTextRun(sTagString); // DWH 7-16-09
-				return;
-			}
 			addToDocumentPart(sTagString); // DWH 7-16-09
 			// process these tag types to update parser state
 			switch (getConfig().getMainRuleType(sTagName)) {
@@ -1189,7 +1182,11 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 
 			return;
 		}
-
+		if (bInTextBox && getConfig().getMainRuleType(sTagName)!=RULE_TYPE.GROUP_ELEMENT)
+		{
+			sInsideTextBox += sTagString;
+			return;
+		}
 		switch (getConfig().getMainRuleType(sTagName)) {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
@@ -1242,6 +1239,29 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				addToNonTextRun(endTag); // DWH 5-5-09
 			break;
 		case GROUP_ELEMENT:
+			if (sInsideTextBox.length()>0)
+			{
+				wtb = new WordTextBox();
+				tboxcf = wtb.getTextBoxOpenXMLContentFilter();
+				wtb.open(sInsideTextBox, getSrcLang());
+				tboxcf.setUpConfig(MSWORD);
+				tboxcf.setTextUnitId(getTextUnitId());  // set min textUnitId so no overlap				
+				tboxcf.setDocumentPartId(getDocumentPartId()); // set min documentPartId so no overlap
+				textBoxEventList = wtb.doEvents();
+				for(Iterator<Event> it=textBoxEventList.iterator() ; it.hasNext();)
+				{
+					event = it.next();
+					addFilterEvent(event); // add events from WordTextBox before EndGroup event
+				}
+				setTextUnitId(tboxcf.getTextUnitId());
+				  // set current TextUnitId to next one not used inside textbox
+				setDocumentPartId(tboxcf.getDocumentPartId());
+				  // set current DocumentPartId to next one not used inside textbox
+				// Note: if this class ever uses startGroupId, endGroupId, subDocumentId or documentId
+				// they will need to be set as textUnitId and documentPartId above and here
+			}
+			bInTextBox = false;
+			sInsideTextBox = "";
 			getRuleState().popGroupRule();
 			endGroup(new GenericSkeleton(sTagString));
 			break;
@@ -1586,7 +1606,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				if (text.endsWith("</w:t></w:r>") || text.endsWith("</a:t></a:r>"))
 				{
 					len = text.length();
-					if (len>12) // take of the end codes and leave the rest as a placeholder code, if any
+					if (len>12) // take off the end codes and leave the rest as a placeholder code, if any
 					{
 						text = text.substring(0,len-12);
 						codeType = TextFragment.TagType.CLOSING;
@@ -1823,4 +1843,42 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 	public void setParameters(IParameters params) { // DWH 7-16-09
 		this.params = (YamlParameters)params;
 	}
-}
+
+/*
+ 	Textbox code 
+ 	
+	private void handleTextBox(List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
+			StartTag tag)
+	{
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startDocumentPart(tag.toString(), tag.getName(), propertyTextUnitPlaceholders);
+				endDocumentPart()
+			} else {
+				// no attributes that needs processing - just treat as skeleton
+				addToDocumentPart(tag.toString());
+			}
+
+			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
+				TextUnit tu = embeddedTextUnit(propOrText, tag);
+				currentSkeleton.addReference(tu);
+				referencableFilterEvents.add(new Event(EventType.TEXT_UNIT, tu));
+	}
+
+		private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
+			TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
+			tu.setPreserveWhitespaces(isPreserveWhitespace());
+
+			tu.setMimeType(propOrText.getMimeType());
+			tu.setIsReferent(true);
+
+			GenericSkeleton skel = new GenericSkeleton();
+
+			skel.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
+			skel.addContentPlaceholder(tu);
+			skel.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
+			tu.setSkeleton(skel);
+
+			return tu;
+		}
+*/
+	}

@@ -97,7 +97,6 @@ public class OpenXMLFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private String srcLang;
 	private OpenXMLContentFilter openXMLContentFilter;
-	private IParameters params=null; // DWH 6-15-09 was net.sf.okapi.filters.abstractmarkup.Parameters
 	private ConditionalParameters cparams=null; // DWH 6-16-09
 	private int nZipType=MSWORD;
 	private int nFileType=MSWORD; // DWH 4-16-09
@@ -125,10 +124,10 @@ public class OpenXMLFilter implements IFilter {
 	private int nExcelOriginalSharedStringCount; // DWH 6-12-09
 	private boolean bProcessedExcelSheets=true; // DWH 6-13-09 Excel options
 	private String sCurrentExcelSheet=""; // DWH 6-25-09 current sheet number
+	private YamlParameters yparams=null;
 
 	public OpenXMLFilter () {
 		cparams = new ConditionalParameters(); // DWH 6-16-09
-		params = cparams; // DWH 6-16-09 conditional params can be set by user interface
 		readParams();
 	}
 	
@@ -145,7 +144,6 @@ public class OpenXMLFilter implements IFilter {
 		this.translator = translator;
 		this.sOutputLanguage = sOutputLanguage;
 		cparams = new ConditionalParameters(); // DWH 6-16-09
-		params = cparams; // DWH 6-16-09 conditional params can be set by user interface
 		readParams();
 	}
 
@@ -153,21 +151,19 @@ public class OpenXMLFilter implements IFilter {
 	{
 		try
 		{
-			ConditionalParameters ooparams=(ConditionalParameters) params;
-			bPreferenceTranslateDocProperties = ooparams.bPreferenceTranslateDocProperties;
-			bPreferenceTranslateComments = ooparams.bPreferenceTranslateComments;
-			bPreferenceTranslatePowerpointNotes = ooparams.bPreferenceTranslatePowerpointNotes;
-			bPreferenceTranslatePowerpointMasters = ooparams.bPreferenceTranslatePowerpointMasters;
-			bPreferenceTranslateWordHeadersFooters = ooparams.bPreferenceTranslateWordHeadersFooters;
-			bPreferenceTranslateWordAllStyles = ooparams.bPreferenceTranslateWordAllStyles;
-			bPreferenceTranslateWordHidden = ooparams.bPreferenceTranslateWordHidden;
-			bPreferenceTranslateExcelExcludeColors = ooparams.bPreferenceTranslateExcelExcludeColors;
-			bPreferenceTranslateExcelExcludeColumns = ooparams.bPreferenceTranslateExcelExcludeColumns;
-			tsExcelExcludedColors = ooparams.tsExcelExcludedColors;
-			tsExcelExcludedColumns = ooparams.tsExcelExcludedColumns;
-			tsExcludeWordStyles = ooparams.tsExcludeWordStyles;
-			nFileType = ooparams.nFileType; // DWH 6-27-09
-			cparams = ooparams; // DWH 6-27-09
+			bPreferenceTranslateDocProperties = cparams.bPreferenceTranslateDocProperties;
+			bPreferenceTranslateComments = cparams.bPreferenceTranslateComments;
+			bPreferenceTranslatePowerpointNotes = cparams.bPreferenceTranslatePowerpointNotes;
+			bPreferenceTranslatePowerpointMasters = cparams.bPreferenceTranslatePowerpointMasters;
+			bPreferenceTranslateWordHeadersFooters = cparams.bPreferenceTranslateWordHeadersFooters;
+			bPreferenceTranslateWordAllStyles = cparams.bPreferenceTranslateWordAllStyles;
+			bPreferenceTranslateWordHidden = cparams.bPreferenceTranslateWordHidden;
+			bPreferenceTranslateExcelExcludeColors = cparams.bPreferenceTranslateExcelExcludeColors;
+			bPreferenceTranslateExcelExcludeColumns = cparams.bPreferenceTranslateExcelExcludeColumns;
+			tsExcelExcludedColors = cparams.tsExcelExcludedColors;
+			tsExcelExcludedColumns = cparams.tsExcelExcludedColumns;
+			tsExcludeWordStyles = cparams.tsExcludeWordStyles;
+			nFileType = cparams.nFileType; // DWH 6-27-09
 		}
 		catch(Exception e) {};
 	}
@@ -252,7 +248,7 @@ public class OpenXMLFilter implements IFilter {
 	 * @return the current IParameters object
 	 */
 	public IParameters getParameters () {
-		return params;
+		return cparams;
 	}
 
 	/**
@@ -483,7 +479,7 @@ public class OpenXMLFilter implements IFilter {
 	 * @param params IParameters object
 	 */
 	public void setParameters (IParameters params) {
-		this.params = (IParameters)params; // DWH 6-25-09 was net.sf.okapi.filters.abstractmarkup.Parameters
+		this.cparams = (ConditionalParameters)params; // DWH 6-25-09 was net.sf.okapi.filters.abstractmarkup.Parameters
 		readParams(); // DWH 6-19-09
 	}
 
@@ -527,12 +523,7 @@ public class OpenXMLFilter implements IFilter {
 			{
 				LOGGER.log(Level.SEVERE,"MS Office 2007 filter tried to open a file that is not aMicrosoft Office 2007 Word, Excel, or Powerpoint file.");
 				throw new OkapiBadFilterInputException("MS Office 2007 filter tried to open a file that is not aMicrosoft Office 2007 Word, Excel, or Powerpoint file.");
-			}
-//			openXMLContentFilter.setUpConfig(nZipType);
-			  // DWH 3-4-09 sets Parameters inside OpenXMLContentFilter based on file type
-//			params = (net.sf.okapi.filters.abstractmarkup.Parameters)openXMLContentFilter.getParameters();
-			  // DWH 3-4-09 params for OpenXMLFilter
-			
+			}		
 			if (nZipType==MSEXCEL &&
 					(bPreferenceTranslateExcelExcludeColors || bPreferenceTranslateExcelExcludeColumns))
 				// DWH 6-13-09 Excel options
@@ -663,7 +654,7 @@ public class OpenXMLFilter implements IFilter {
 				LOGGER.log(Level.FINER,"\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (YamlParameters)openXMLContentFilter.getParameters();
+				yparams = (YamlParameters)openXMLContentFilter.getParameters();
 					// DWH 6-15-09 fully specified Parameters
 				Event ually = openSubDocument(true); // DWH 6-25-09 save the event
 				resetExcel(); // DWH 6-25-09 if Excel and excluding colors or columns, start through zips again if done with worksheets
@@ -707,7 +698,7 @@ public class OpenXMLFilter implements IFilter {
 				else
 					nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (YamlParameters)openXMLContentFilter.getParameters();
+				yparams = (YamlParameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
 				LOGGER.log(Level.FINER,"<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
 				Event ually = openSubDocument(false); // DWH 6-25-09 save the event
@@ -717,7 +708,7 @@ public class OpenXMLFilter implements IFilter {
 			else {
 				nFileType = nZipType;
 				openXMLContentFilter.setUpConfig(nFileType);
-				params = (YamlParameters)openXMLContentFilter.getParameters();
+				yparams = (YamlParameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
 				DocumentPart dp = new DocumentPart(entry.getName(), false);
 				ZipSkeleton skel = new ZipSkeleton(entry);
@@ -746,7 +737,8 @@ public class OpenXMLFilter implements IFilter {
 		BufferedInputStream bis; // DWH 3-5-09
 		InputStream isInputStream;
 		openXMLContentFilter.close(); // Make sure the previous is closed
-		openXMLContentFilter.setParameters((YamlParameters)params); // DWH 7-16-09 YamlParameters
+		openXMLContentFilter.setParameters(yparams); // DWH 7-16-09 YamlParameters
+		  // needed for cases where subDocs are read in different orders
 		//YS openXMLContentFilter.setOptions(srcLang, "UTF-8", true);
 		Event event;
 		try
