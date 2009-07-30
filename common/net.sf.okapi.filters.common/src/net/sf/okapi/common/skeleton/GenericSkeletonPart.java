@@ -22,11 +22,11 @@ package net.sf.okapi.common.skeleton;
 
 import net.sf.okapi.common.IResource;
 
-class GenericSkeletonPart {
+public class GenericSkeletonPart { // public for OpenXML
 
 	StringBuilder data;
-	IResource parent;
-	String language;
+	IResource parent=null;
+	String language=null;
 	
 	public GenericSkeletonPart (String data) {
 		this.data = new StringBuilder(data);
