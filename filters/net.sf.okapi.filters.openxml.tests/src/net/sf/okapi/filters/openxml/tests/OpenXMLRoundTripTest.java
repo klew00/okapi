@@ -92,6 +92,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("Mauris.docx");
 		themfiles.add("Hidden.docx");
 		themfiles.add("TestDako2.docx");
+//		themfiles.add("TextBoxes.docx");
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
