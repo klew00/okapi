@@ -24,6 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
@@ -715,5 +717,40 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			else return layer.encode(encoderManager.toNative(name, value), context);
 		}
 	}
-
+	public void addToReferents(Event event) // for OpenXML, so referents can stay private
+	{
+		IResource resource;
+		if (event!=null)
+		{
+			if (referents==null)
+			{
+				referents = new LinkedHashMap<String, Referent>();
+				storageStack = new Stack<StorageList>();
+			}
+			resource = event.getResource();
+			if (resource!=null)
+			{
+				switch(event.getEventType())
+				{
+					case TEXT_UNIT:
+						if (((TextUnit)resource).isReferent())
+							referents.put(resource.getId(), new Referent((TextUnit)resource));
+						break;
+					case DOCUMENT_PART:
+						if (((DocumentPart)resource).isReferent())
+							referents.put(resource.getId(), new Referent((DocumentPart)resource));
+						break;
+					case START_GROUP:
+						if (((StartGroup)resource).isReferent())
+						{
+							StorageList sl = new StorageList((StartGroup)resource);
+							referents.put(sl.getId(), new Referent(sl));
+						}
+						break;
+					default:
+						break;
+				}
+			}
+		}
+	}
 }
