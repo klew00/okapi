@@ -22,7 +22,7 @@ package net.sf.okapi.filters.openxml.tests;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.filters.openxml.ITranslator;
+import net.sf.okapi.filters.openxml.AbstractTranslator;
 
 /**
  * Implements ITranslator and translates the text to be
@@ -32,7 +32,7 @@ import net.sf.okapi.filters.openxml.ITranslator;
  * translated is available to the translator for translation.
  */
 
-public class PigLatinTranslator implements ITranslator {
+public class PigLatinTranslator extends AbstractTranslator {
 	public final static int MSWORD=1;
 	public final static int MSEXCEL=2;
 	public final static int MSPOWERPOINT=3;
