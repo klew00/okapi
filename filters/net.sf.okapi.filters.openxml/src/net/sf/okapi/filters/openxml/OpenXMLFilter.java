@@ -102,7 +102,7 @@ public class OpenXMLFilter implements IFilter {
 	private int nFileType=MSWORD; // DWH 4-16-09
 	private Level nLogLevel=Level.FINE;
 	private boolean bSquishable=true;
-	private ITranslator translator=null;
+	private AbstractTranslator translator=null;
 	private String sOutputLanguage="en-US";
 	private boolean canceled = false;
 	private boolean bPreferenceTranslateDocProperties = true;
@@ -140,7 +140,7 @@ public class OpenXMLFilter implements IFilter {
 	 * @param translator the class that translates the text of a text fragment
 	 * @param sOutputLanguage the locale of the output language, in the form en-US
 	 */
-	public OpenXMLFilter(ITranslator translator, String sOutputLanguage) {
+	public OpenXMLFilter(AbstractTranslator translator, String sOutputLanguage) {
 		this.translator = translator;
 		this.sOutputLanguage = sOutputLanguage;
 		cparams = new ConditionalParameters(); // DWH 6-16-09
@@ -808,6 +808,7 @@ public class OpenXMLFilter implements IFilter {
 				case TEXT_UNIT:
 					if (translator!=null)
 					{
+						translator.addToReferents(event);
 						TextUnit tu = (TextUnit)event.getResource();
 						TextFragment tfSource = tu.getSourceContent();
 						String torg = translator.translate(tfSource,LOGGER,nFileType); // DWH 5-7-09 nFileType
@@ -831,8 +832,12 @@ public class OpenXMLFilter implements IFilter {
 					nextAction = NextAction.NEXTINZIP;
 					ZipSkeleton skel = new ZipSkeleton(
 						(GenericSkeleton)event.getResource().getSkeleton(), entry);
-					return new Event(EventType.END_SUBDOCUMENT, ending, skel);
-				
+					return new Event(EventType.END_SUBDOCUMENT, ending, skel);				
+				case DOCUMENT_PART:
+				case START_GROUP:
+						if (translator!=null)
+							translator.addToReferents(event);
+						// purposely falls through to default
 				default: // Else: just pass the event through
 					openXMLContentFilter.displayOneEvent(event);
 					return event;
