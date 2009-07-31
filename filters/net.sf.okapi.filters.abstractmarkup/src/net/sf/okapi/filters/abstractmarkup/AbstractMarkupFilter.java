@@ -49,37 +49,37 @@ import net.htmlparser.jericho.Tag;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.filters.AbstractBaseFilter;
+import net.sf.okapi.common.filters.AbstractFilter;
+import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 /**
- * Abstract base class useful for creating an {@link IFilter} around the Jericho
+ * Abstract class useful for creating an {@link IFilter} around the Jericho
  * parser. Jericho can parse non-wellformed HTML, XHTML, XML and various server
  * side scripting languages such as PHP, Mason, Perl (all configurable from
- * Jericho). BaseMarkupFilter takes care of the parser initialization and
+ * Jericho). AbstractMarkupFilter takes care of the parser initialization and
  * provides default handlers for each token type returned by the parser.
- * <p>
- * BaseMarkupFilter along with BaseFilter automates the building of Okapi
- * {@link Event}s and {@link IResource}s.
  * <p>
  * Handling of translatable text, inline tags, translatable and read-only
  * attributes are configurable through a user defined YAML file. See the Okapi
- * HtmlFilter and OpenXml (defaultConfiguration.yml) filters for examples.
+ * HtmlFilter with defaultConfiguration.yml and OpenXml filters for examples.
  * 
  */
-public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
-	private static final Logger LOGGER = Logger.getLogger(AbstractBaseMarkupFilter.class.getName());
+public abstract class AbstractMarkupFilter extends AbstractFilter {
+	private static final Logger LOGGER = Logger.getLogger(AbstractMarkupFilter.class.getName());
 
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
@@ -88,6 +88,8 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	private Iterator<Segment> nodeIterator;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
+	private boolean preserveWhitespace;
+	private EventBuilder eventBuilder;
 
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -96,12 +98,27 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	}
 
 	/**
-	 * Default constructor for {@link AbstractBaseMarkupFilter}
+	 * Default constructor for {@link AbstractMarkupFilter} using default
+	 * {@link EventBuilder}
 	 */
-	public AbstractBaseMarkupFilter() {
-		super();
+	public AbstractMarkupFilter() {
+		setEventBuilder(new EventBuilder());
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
+		preserveWhitespace = true;
+		getEventBuilder().setPreserveWhitespace(preserveWhitespace);
+	}
+
+	/**
+	 * Create a {@link AbstractMarkupFilter} with an {@link EventBuilder} for
+	 * {@link AbstractMarkupFilter}
+	 */
+	public AbstractMarkupFilter(EventBuilder eventBuilder) {
+		setEventBuilder(eventBuilder);
+		hasUtf8Bom = false;
+		hasUtf8Encoding = false;
+		preserveWhitespace = true;
+		getEventBuilder().setPreserveWhitespace(preserveWhitespace);
 	}
 
 	/**
@@ -135,16 +152,16 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	/**
 	 * Close the filter and all used resources.
 	 */
-	public void close() {		
+	public void close() {
 		try {
 			if (document != null) {
 				document.close();
 			}
-		} catch (IOException e) {			
-			throw new OkapiIOException("Could not close " + getName(), e);
+		} catch (IOException e) {
+			throw new OkapiIOException("Could not close " + getDocumentName(), e);
 		}
 		this.document = null; // help Java GC
-		LOGGER.log(Level.FINE, getName() + " has been closed");
+		LOGGER.log(Level.FINE, getDocumentName() + " has been closed");
 	}
 
 	/*
@@ -170,7 +187,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			try {
 				inputStream.reset();
 			} catch (IOException e) {
-				
+
 			}
 		}
 	}
@@ -205,11 +222,11 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		if (document != null) {
 			close();
 		}
-		
+
 		if (input.getInputURI() != null) {
 			setDocumentName(input.getInputURI().toString());
 		}
-		
+
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectBom();
 
@@ -232,7 +249,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 					detectedEncoding));
 		}
 
-		try {			
+		try {
 			input.setEncoding(detectedEncoding);
 			setOptions(input.getSourceLanguage(), input.getTargetLanguage(), detectedEncoding, generateSkeleton);
 			document = new StreamedSource(input.getReader());
@@ -243,31 +260,20 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 		startFilter();
 	}
 
-	/**
-	 * Initialize parameters, rule state and Jericho parser.
-	 */
-	@Override
-	protected void startFilter() {
-		super.startFilter();		
-
-		// Segment iterator
-		ruleState = new ExtractionRuleState();
-
-		// This optimizes memory at the expense of performance
-		nodeIterator = document.iterator();
+	public boolean hasNext() {
+		return getEventBuilder().hasNext();
 	}
 
 	/**
 	 * Queue up Jericho tokens until we can buld an Okapi {@link Event} and
 	 * return it.
 	 */
-	@Override
 	public Event next() {
 		// reset state flags and buffers
 		ruleState.reset();
 
-		while (hasQueuedEvents()) {
-			return super.next();
+		while (getEventBuilder().hasQueuedEvents()) {
+			return getEventBuilder().next();
 		}
 
 		while (nodeIterator.hasNext() && !isCanceled()) {
@@ -278,20 +284,18 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
 
-				// set generic inline tag type
-				setTagType(getConfig().getElementType(tag));
-
 				// We just hit a tag that could close the current TextUnit, but
 				// only if it was not opened with a TextUnit tag (i.e., complex
 				// TextUnits such as <p> etc.)
 				boolean inlineTag = false;
-				if (isInsideTextRun()
+				if (getEventBuilder().isInsideTextRun()
 						&& (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
 								|| tag.getTagType() == StartTagType.COMMENT || tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))
 					inlineTag = true;
 
-				if (isCurrentTextUnit() && !isCurrentComplexTextUnit() && !inlineTag) {
-					endTextUnit();
+				if (getEventBuilder().isCurrentTextUnit() && !getEventBuilder().isCurrentComplexTextUnit()
+						&& !inlineTag) {
+					getEventBuilder().endTextUnit();
 				}
 
 				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
@@ -323,10 +327,6 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 						handleDocumentPart(tag);
 					}
 				}
-
-				// unset current generic tag type (bold, underlined etc.)
-				setTagType(null);
-
 			} else if (segment instanceof CharacterEntityReference) {
 				handleCharacterEntity(segment);
 			} else if (segment instanceof NumericCharacterReference) {
@@ -336,26 +336,60 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 				handleText(segment);
 			}
 
-			if (hasQueuedEvents()) {
+			if (getEventBuilder().hasQueuedEvents()) {
 				break;
 			}
 		}
 
 		if (!nodeIterator.hasNext()) {
-			super.endFilter(); // we are done
+			endFilter(); // we are done
 		}
 
 		// return one of the waiting events
-		return super.next();
+		return getEventBuilder().next();
 	}
 
 	/**
-	 * Do any handling needed before the current Segment is processed.
+	 * Initialize the filter for every input and send the {@link StartDocument}
+	 * {@link Event}
+	 */
+	protected void startFilter() {
+		getEventBuilder().reset();
+		getEventBuilder().addFilterEvent(createStartDocumentEvent());
+
+		// Segment iterator
+		ruleState = new ExtractionRuleState();
+
+		// This optimizes memory at the expense of performance
+		nodeIterator = document.iterator();
+	}
+
+	/**
+	 * End the current filter processing and send the {@link Ending}
+	 * {@link Event}
+	 */
+	protected void endFilter() {
+		getEventBuilder().flushRemainingEvents();
+		getEventBuilder().addFilterEvent(createEndDocumentEvent());
+	}
+
+	/**
+	 * Do any handling needed before the current Segment is processed. Default
+	 * is to do nothing.
 	 * 
 	 * @param segment
 	 */
 	protected void preProcess(Segment segment) {
 	};
+
+	/**
+	 * Do any required post-processing on the TextUnit before the {@link Event}
+	 * leaves the {@link IFilter}. Default implementation leaves Event
+	 * unchanged. Override this method if you need to do format specific handing
+	 * such as collapsing whitespace.
+	 */
+	protected void postProcessTextUnit(TextUnit textUnit) {
+	}
 
 	/**
 	 * Handle any recognized escaped server tags.
@@ -429,10 +463,10 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 */
 	protected void handleNumericEntity(Segment entity) {
 		String decodedText = CharacterReference.decode(entity.toString(), false);
-		if (!isCurrentTextUnit()) {
-			startTextUnit();
+		if (!getEventBuilder().isCurrentTextUnit()) {
+			getEventBuilder().startTextUnit();
 		}
-		addToTextUnit(decodedText);
+		getEventBuilder().addToTextUnit(decodedText);
 	}
 
 	/**
@@ -444,10 +478,10 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 */
 	protected void handleCharacterEntity(Segment entity) {
 		String decodedText = CharacterReference.decode(entity.toString(), false);
-		if (!isCurrentTextUnit()) {
-			startTextUnit();
+		if (!getEventBuilder().isCurrentTextUnit()) {
+			getEventBuilder().startTextUnit();
 		}
-		addToTextUnit(decodedText);
+		getEventBuilder().addToTextUnit(decodedText);
 	}
 
 	/**
@@ -517,10 +551,13 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				// add code and process actionable attributes
-				addToTextUnit(codeType, literalTag, startTag.getName(), propertyTextUnitPlaceholders);
+				getEventBuilder().addToTextUnit(new Code(codeType, startTag.getName(), literalTag), getConfig()
+						.getElementType(tag),
+						propertyTextUnitPlaceholders);
 			} else {
 				// no actionable attributes, just add the code as-is
-				addToTextUnit(codeType, literalTag, startTag.getName());
+				getEventBuilder().addToTextUnit(new Code(codeType, startTag.getName(), literalTag), getConfig()
+						.getElementType(tag));
 			}
 		} else { // end or unknown tag
 			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
@@ -528,7 +565,8 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			}
-			addToTextUnit(codeType, literalTag, tag.getName());
+			getEventBuilder().addToTextUnit(new Code(codeType, tag.getName(), literalTag),
+					getConfig().getElementType(tag));
 		}
 	}
 
@@ -606,7 +644,7 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * 
 	 * @return true if the document is in utf8 encoding.
 	 */
-	protected boolean hasUtf8Encoding() {
+	protected boolean isUtf8Encoding() {
 		return hasUtf8Encoding;
 	}
 
@@ -615,20 +653,102 @@ public abstract class AbstractBaseMarkupFilter extends AbstractBaseFilter {
 	 * 
 	 * @return true if the document has a utf-8 byte order mark.
 	 */
-	protected boolean hasUtf8Bom() {
+	protected boolean isUtf8Bom() {
 		return hasUtf8Bom;
 	}
 
 	/**
-	 * Do we preserve the original formatting of the input?
 	 * 
-	 * @return true if the current filter configuration tells us to preserve
-	 *         whitespace as-is.
+	 * @return the preserveWhitespace boolean.
 	 */
-	protected boolean keepOriginalFormatting() {
-		if (getRuleState().isPreserveWhitespaceState() && !getConfig().collapseWhitespace()) {
-			return true;
-		}
-		return false;
+	protected boolean isPreserveWhitespace() {
+		return preserveWhitespace;
+	}
+
+	protected void setPreserveWhitespace(boolean preserveWhitespace) {
+		this.preserveWhitespace = preserveWhitespace;
+		getEventBuilder().setPreserveWhitespace(preserveWhitespace);
+	}
+
+	protected void addToDocumentPart(String part) {
+		getEventBuilder().addToDocumentPart(part);
+	}
+
+	protected void addToTextUnit(String text) {
+		getEventBuilder().addToTextUnit(text);
+	}
+
+	protected void startTextUnit(String text) {
+		getEventBuilder().startTextUnit(text);
+	}
+
+	protected boolean canStartNewTextUnit() {
+		return getEventBuilder().canStartNewTextUnit();
+	}
+
+	protected boolean isInsideTextRun() {
+		return getEventBuilder().isInsideTextRun();
+	}
+
+	protected void addToTextUnit(Code code, String commonType) {
+		getEventBuilder().addToTextUnit(code, commonType);
+	}
+
+	protected void addToTextUnit(Code code, String commonType,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+		getEventBuilder().addToTextUnit(code, commonType, propertyTextUnitPlaceholders);
+	}
+
+	protected void endDocumentPart() {
+		getEventBuilder().endDocumentPart();
+	}
+
+	protected void startDocumentPart(String part, String name,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+		getEventBuilder().startDocumentPart(part, name, propertyTextUnitPlaceholders);
+	}
+
+	protected void startGroup(GenericSkeleton startMarker) {
+		getEventBuilder().startGroup(startMarker);
+	}
+
+	protected void startGroup(GenericSkeleton startMarker, String language,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+		getEventBuilder().startGroup(startMarker, language, propertyTextUnitPlaceholders);
+	}
+
+	protected void startTextUnit(GenericSkeleton startMarker) {
+		getEventBuilder().startTextUnit(startMarker);
+	}
+
+	protected void startTextUnit(GenericSkeleton startMarker,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+		getEventBuilder().startTextUnit(startMarker, propertyTextUnitPlaceholders);
+	}
+
+	protected void endTextUnit(GenericSkeleton endMarker) {
+		getEventBuilder().endTextUnit(endMarker);
+	}
+
+	protected void endGroup(GenericSkeleton endMarker) {
+		getEventBuilder().endGroup(endMarker);
+	}
+
+	protected void startTextUnit() {
+		getEventBuilder().startTextUnit();
+	}
+	
+	/**
+	 * @param eventBuilder the eventBuilder to set
+	 */
+	public void setEventBuilder(EventBuilder eventBuilder) {
+		this.eventBuilder = eventBuilder;
+	}
+
+	/**
+	 * @return the eventBuilder
+	 */
+	public EventBuilder getEventBuilder() {
+		return eventBuilder;
 	}
 }

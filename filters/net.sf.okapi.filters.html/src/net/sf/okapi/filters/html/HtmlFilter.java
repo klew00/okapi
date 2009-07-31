@@ -26,63 +26,53 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import net.htmlparser.jericho.Attribute;
-import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
-import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.abstractmarkup.AbstractBaseMarkupFilter;
+import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
-public class HtmlFilter extends AbstractBaseMarkupFilter {
+public class HtmlFilter extends AbstractMarkupFilter {
 
 	private static final Logger LOGGER = Logger.getLogger(HtmlFilter.class.getName());
-	
-	/*
-	 * HTML whitespace space (U+0020) tab (U+0009) form feed (U+000C) line feed
-	 * (U+000A) carriage return (U+000D) zero-width space (U+200B) (IE6 does not
-	 * recognize these, they are treated as unprintable characters)
-	 */
-	private static final String HTML_WHITESPACE_REGEX = "[ \t\r\n\f\u200B]+";
-	private static final Pattern HTML_WHITESPACE_PATTERN = Pattern.compile(HTML_WHITESPACE_REGEX);
 
 	private StringBuilder bufferedWhitespace;
 	private Parameters parameters;
+	private HtmlEventBuilder eventBuilder;
 
 	public HtmlFilter() {
-		super();
+		super(new HtmlEventBuilder());
+		eventBuilder = (HtmlEventBuilder) getEventBuilder();
 		bufferedWhitespace = new StringBuilder();
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
 		setParameters(new Parameters());
 	}
 
-	public List<FilterConfiguration> getConfigurations () {
+	public List<FilterConfiguration> getConfigurations() {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
-			MimeTypeMapper.HTML_MIME_TYPE,
-			getClass().getName(),
-			"HTML/XHTML",
-			"HTML and XHTML documents",
-			Parameters.getDefualtParameterFile()));
+				MimeTypeMapper.HTML_MIME_TYPE,
+				getClass().getName(),
+				"HTML/XHTML",
+				"HTML and XHTML documents",
+				Parameters.getDefualtParameterFile()));
 		return list;
 	}
 
@@ -93,7 +83,8 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 	@Override
 	protected void startFilter() {
 		super.startFilter();
-		setPreserveWhitespace(false);		
+		setPreserveWhitespace(false);
+		eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 		if (getConfig().collapseWhitespace()) {
 			LOGGER.log(Level.FINE,
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration");
@@ -153,10 +144,6 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		}
 	}
 
-	private String collapseWhitespace(String text) {
-		return HTML_WHITESPACE_PATTERN.matcher(text).replaceAll(" ");
-	}
-
 	@Override
 	protected void handleDocumentPart(Tag tag) {
 		addToDocumentPart(tag.toString());
@@ -164,62 +151,67 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 
 	@Override
 	protected void handleStartTag(StartTag startTag) {
-		// if in excluded state everything is skeleton including text
-		if (getRuleState().isExludedState()) {
-			addToDocumentPart(startTag.toString());
-			// process these tag types to update parser state
+		try {
+			// if in excluded state everything is skeleton including text
+			if (getRuleState().isExludedState()) {
+				addToDocumentPart(startTag.toString());
+				// process these tag types to update parser state
+				switch (getConfig().getMainRuleType(startTag.getName())) {
+				case EXCLUDED_ELEMENT:
+					getRuleState().pushExcludedRule(startTag.getName());
+					break;
+				case INCLUDED_ELEMENT:
+					getRuleState().pushIncludedRule(startTag.getName());
+					break;
+				case PRESERVE_WHITESPACE:
+					getRuleState().pushPreserverWhitespaceRule(startTag.getName());
+					setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+					break;
+				}
+				return;
+			}
+
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
+			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+
 			switch (getConfig().getMainRuleType(startTag.getName())) {
+			case INLINE_ELEMENT:
+				if (canStartNewTextUnit()) {
+					startTextUnit();
+				}
+				addCodeToCurrentTextUnit(startTag);
+				break;
+			case ATTRIBUTES_ONLY:
+				// we assume we have already ended any (non-complex) TextUnit in
+				// the main while loop in BaseMarkupFilter
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				break;
+			case GROUP_ELEMENT:
+				getRuleState().pushGroupRule(startTag.getName());
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				break;
 			case EXCLUDED_ELEMENT:
 				getRuleState().pushExcludedRule(startTag.getName());
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 				break;
 			case INCLUDED_ELEMENT:
 				getRuleState().pushIncludedRule(startTag.getName());
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				break;
+			case TEXT_UNIT_ELEMENT:
+				getRuleState().pushTextUnitRule(startTag.getName());
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 				break;
 			case PRESERVE_WHITESPACE:
 				getRuleState().pushPreserverWhitespaceRule(startTag.getName());
+				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 				break;
+			default:
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 			}
-			return;
-		}
-
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
-		propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
-
-		switch (getConfig().getMainRuleType(startTag.getName())) {
-		case INLINE_ELEMENT:
-			if (canStartNewTextUnit()) {
-				startTextUnit();
-			}
-			addCodeToCurrentTextUnit(startTag);
-			break;
-		case ATTRIBUTES_ONLY:
-			// we assume we have already ended any (non-complex) TextUnit in
-			// the main while loop in BaseMarkupFilter
-			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
-			break;
-		case GROUP_ELEMENT:
-			getRuleState().pushGroupRule(startTag.getName());
-			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
-			break;
-		case EXCLUDED_ELEMENT:
-			getRuleState().pushExcludedRule(startTag.getName());
-			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
-			break;
-		case INCLUDED_ELEMENT:
-			getRuleState().pushIncludedRule(startTag.getName());
-			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
-			break;
-		case TEXT_UNIT_ELEMENT:
-			getRuleState().pushTextUnitRule(startTag.getName());
-			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
-			break;
-		case PRESERVE_WHITESPACE:
-			getRuleState().pushPreserverWhitespaceRule(startTag.getName());
-			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
-			break;
-		default:
-			handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+		} finally {
+			eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 		}
 	}
 
@@ -260,64 +252,69 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 
 	@Override
 	protected void handleEndTag(EndTag endTag) {
-		// if in excluded state everything is skeleton including text
-		if (getRuleState().isExludedState()) {
-			addToDocumentPart(endTag.toString());
-			// process these tag types to update parser state
+		try {
+			// if in excluded state everything is skeleton including text
+			if (getRuleState().isExludedState()) {
+				addToDocumentPart(endTag.toString());
+				// process these tag types to update parser state
+				switch (getConfig().getMainRuleType(endTag.getName())) {
+				case EXCLUDED_ELEMENT:
+					getRuleState().popExcludedIncludedRule();
+					break;
+				case INCLUDED_ELEMENT:
+					getRuleState().popExcludedIncludedRule();
+					break;
+				case PRESERVE_WHITESPACE:
+					getRuleState().popPreserverWhitespaceRule();
+					setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+					break;
+				}
+				return;
+			}
+
 			switch (getConfig().getMainRuleType(endTag.getName())) {
+			case INLINE_ELEMENT:
+				if (canStartNewTextUnit()) {
+					startTextUnit();
+				}
+				addCodeToCurrentTextUnit(endTag);
+				break;
+			case GROUP_ELEMENT:
+				getRuleState().popGroupRule();
+				endGroup(new GenericSkeleton(endTag.toString()));
+				break;
 			case EXCLUDED_ELEMENT:
 				getRuleState().popExcludedIncludedRule();
+				addToDocumentPart(endTag.toString());
 				break;
 			case INCLUDED_ELEMENT:
 				getRuleState().popExcludedIncludedRule();
+				addToDocumentPart(endTag.toString());
+				break;
+			case TEXT_UNIT_ELEMENT:
+				getRuleState().popTextUnitRule();
+				endTextUnit(new GenericSkeleton(endTag.toString()));
 				break;
 			case PRESERVE_WHITESPACE:
 				getRuleState().popPreserverWhitespaceRule();
+				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+
+				addToDocumentPart(endTag.toString());
+				break;
+			default:
+				addToDocumentPart(endTag.toString());
 				break;
 			}
-
-			return;
+		} finally {
+			eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 		}
 
-		switch (getConfig().getMainRuleType(endTag.getName())) {
-		case INLINE_ELEMENT:
-			if (canStartNewTextUnit()) {
-				startTextUnit();
-			}
-			addCodeToCurrentTextUnit(endTag);
-			break;
-		case GROUP_ELEMENT:
-			getRuleState().popGroupRule();
-			endGroup(new GenericSkeleton(endTag.toString()));
-			break;
-		case EXCLUDED_ELEMENT:
-			getRuleState().popExcludedIncludedRule();
-			addToDocumentPart(endTag.toString());
-			break;
-		case INCLUDED_ELEMENT:
-			getRuleState().popExcludedIncludedRule();
-			addToDocumentPart(endTag.toString());
-			break;
-		case TEXT_UNIT_ELEMENT:
-			getRuleState().popTextUnitRule();
-			endTextUnit(new GenericSkeleton(endTag.toString()));
-			break;
-		case PRESERVE_WHITESPACE:
-			getRuleState().popPreserverWhitespaceRule();
-			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-
-			addToDocumentPart(endTag.toString());
-			break;
-		default:
-			addToDocumentPart(endTag.toString());
-			break;
-		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seenet.sf.okapi.common.markupfilter.BaseMarkupFilter#handleComment(net.
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleComment(net.
 	 * htmlparser.jericho.Tag)
 	 */
 	@Override
@@ -367,7 +364,6 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 		} else {
 			addCodeToCurrentTextUnit(tag);
 		}
-
 	}
 
 	/*
@@ -437,27 +433,10 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 					mainEndPos, valueStartPos, valueEndPos);
 		}
 
-		return super.createPropertyTextUnitPlaceholder(type, name, normalizeHtmlText(value, true), tag, attribute);
-	}
-
-	@Override
-	protected Event postProcessText(Event textUnit) {
-		TextFragment text = ((TextUnit) textUnit.getResource()).getSourceContent();
-		text.setCodedText(normalizeHtmlText(text.getCodedText(), false));
-		return textUnit;
-	}
-
-	private String normalizeHtmlText(String text, boolean insideAttribute) {
-		// convert all entities to Unicode
-		String decodedValue = CharacterReference.decode(text, insideAttribute);
-
-		if (!getRuleState().isPreserveWhitespaceState() && getConfig().collapseWhitespace()) {
-			decodedValue = collapseWhitespace(decodedValue);
-			decodedValue = decodedValue.trim();
-		}
-		decodedValue = Util.normalizeNewlines(decodedValue);
-
-		return decodedValue;
+		return super.createPropertyTextUnitPlaceholder(type, name,
+				eventBuilder.normalizeHtmlText(value, true,
+				!isPreserveWhitespace() && getConfig().collapseWhitespace()),
+				tag, attribute);
 	}
 
 	@Override
@@ -474,7 +453,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			if (startTag.isSyntacticalEmptyElementTag()) {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			} else if (startTag.isEndTagRequired()) {
-				codeType = TextFragment.TagType.OPENING;				
+				codeType = TextFragment.TagType.OPENING;
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			}
@@ -487,10 +466,11 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				// add code and process actionable attributes
-				addToTextUnit(codeType, literalTag, startTag.getName(), propertyTextUnitPlaceholders);
+				addToTextUnit(new Code(codeType, startTag.getName(), literalTag), getConfig().getElementType(tag),
+						propertyTextUnitPlaceholders);
 			} else {
 				// no actionable attributes, just add the code as-is
-				addToTextUnit(codeType, literalTag, startTag.getName());
+				addToTextUnit(new Code(codeType, startTag.getName(), literalTag), getConfig().getElementType(tag));
 			}
 		} else { // end or unknown tag
 			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
@@ -498,7 +478,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			}
-			addToTextUnit(codeType, literalTag, tag.getName());
+			addToTextUnit(new Code(codeType, tag.getName(), literalTag), getConfig().getElementType(tag));
 		}
 	}
 
@@ -557,7 +537,7 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 	protected TaggedFilterConfiguration getConfig() {
 		return parameters.getTaggedConfig();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -568,16 +548,16 @@ public class HtmlFilter extends AbstractBaseMarkupFilter {
 	public void setParameters(IParameters params) {
 		this.parameters = (Parameters) params;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
 	 */
-	public IParameters getParameters() {		
+	public IParameters getParameters() {
 		return parameters;
 	}
-	
+
 	/**
 	 * Initialize filter parameters from a URL.
 	 * 
