@@ -736,6 +736,31 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		getEventBuilder().startTextUnit();
 	}
 	
+	protected int getTextUnitId() {
+		return getEventBuilder().getTextUnitId();
+	}
+
+	protected void setTextUnitId(int id) {
+		getEventBuilder().setTextUnitId(id);
+	}
+
+	protected int getDocumentPartId() {
+		return getEventBuilder().getDocumentPartId();
+	}
+
+	protected void setDocumentPartId(int id) {
+		getEventBuilder().setDocumentPartId(id);
+	}
+	
+	protected void appendToFirstSkeletonPart(String text)
+	{
+		getEventBuilder().appendToFirstSkeletonPart(text);
+	}
+
+	protected void addFilterEvent(Event event) {
+		getEventBuilder().addFilterEvent(event);
+	}
+	
 	/**
 	 * @param eventBuilder the eventBuilder to set
 	 */
