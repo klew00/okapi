@@ -93,7 +93,7 @@ public class ConditionalParameters extends BaseParameters {
 		siz = buffer.getInteger("tsExcelExcludedColors");
 		for(i=0;i<siz;i++)
 		{
-			sNummer = "zzz"+(new Integer(i)).toString();
+			sNummer = "ccc"+(new Integer(i)).toString();
 			tsExcelExcludedColors.add(buffer.getString(sNummer, "F1F2F3F4"));
 		}
 
@@ -105,7 +105,7 @@ public class ConditionalParameters extends BaseParameters {
 		tsExcludeWordStyles = new TreeSet<String>();
 		siz = buffer.getInteger("tsExcludeWordStyles");
 		for(i=0;i<siz;i++)
-			tsExcludeWordStyles.add(buffer.getString("zzz"+(new Integer(i)).toString(), "zzzzz"));
+			tsExcludeWordStyles.add(buffer.getString("sss"+(new Integer(i)).toString(), "zzzzz"));
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class ConditionalParameters extends BaseParameters {
 		buffer.setInteger("tsExcelExcludedColors", siz);
 		for(i=0,it=tsExcelExcludedColors.iterator();i<siz && it.hasNext();i++)
 		{
-			buffer.setString("zzz"+(new Integer(i)).toString(), (String)it.next());
+			buffer.setString("ccc"+(new Integer(i)).toString(), (String)it.next());
 		}
 
 		if (tsExcelExcludedColumns==null)
@@ -151,7 +151,7 @@ public class ConditionalParameters extends BaseParameters {
 		buffer.setInteger("tsExcludeWordStyles", siz);
 		for(i=0,it=tsExcludeWordStyles.iterator();i<siz && it.hasNext();i++)
 		{
-			buffer.setString("zzz"+(new Integer(i)).toString(), (String)it.next());
+			buffer.setString("sss"+(new Integer(i)).toString(), (String)it.next());
 		}
 			
 		return buffer.toString();
