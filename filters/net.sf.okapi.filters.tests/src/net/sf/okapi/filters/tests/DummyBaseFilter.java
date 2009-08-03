@@ -99,9 +99,9 @@ public class DummyBaseFilter extends AbstractFilter {
 		
 		//TODO: Skeleton should be GenericSkeleton since BaseFilter uses only that one
 		eventBuilder.startTextUnit("Before ", new GenericSkeleton("<tu attr='val1'>"), list);
-		eventBuilder.addToTextUnit(new Code(TagType.OPENING, "bold", "<b>"), "bold");
+		eventBuilder.addToTextUnit(new Code(TagType.OPENING, "bold", "<b>"));
 		eventBuilder.addToTextUnit("Text");
-		eventBuilder.addToTextUnit(new Code(TagType.CLOSING, "bold", "</b>"), "bold");
+		eventBuilder.addToTextUnit(new Code(TagType.CLOSING, "bold", "</b>"));
 		
 		eventBuilder.flushRemainingEvents();
 		eventBuilder.addFilterEvent(createEndDocumentEvent());
