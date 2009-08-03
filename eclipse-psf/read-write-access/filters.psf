@@ -22,6 +22,7 @@
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xliff,net.sf.okapi.filters.xliff"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.filters.xml,net.sf.okapi.filters.xml"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.pipeline,net.sf.okapi.pipeline"/>
+<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/common/net.sf.okapi.pipelinedriver,net.sf.okapi.pipelinedriver"/>
 </provider>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1246307329241_1" label="Okapi-Filters" name="Okapi-Filters">
 <item elementID="=net.sf.okapi.filters.idml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -30,6 +31,7 @@
 <item elementID="=net.sf.okapi.filters.properties" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.openxml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=net.sf.okapi.pipelinedriver" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.po" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.tmx" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.filters.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
