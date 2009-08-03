@@ -55,7 +55,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
-import net.sf.okapi.filters.abstractmarkup.AbstractBaseMarkupFilter;
+import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 import net.sf.okapi.common.resource.Code;
@@ -64,6 +64,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 
@@ -111,7 +112,7 @@ import net.sf.okapi.common.skeleton.GenericSkeletonPart;
  * work like TEXT_UNIT, TEXT_RUN, and TEXT_MARKER elements combined.
  */
 
-public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
+public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	
 	private Logger LOGGER=null;
 	
@@ -1035,7 +1036,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				addTextRunToCurrentTextUnit(true); // DWH 7-29-09 add text run stuff as a placeholder
 			}
 			getRuleState().pushGroupRule(sTagName);
-			startGroup(new GenericSkeleton(sTagString));
+			startGroup(new GenericSkeleton(sTagString),"textbox");
 			break;
 		case EXCLUDED_ELEMENT:
 			getRuleState().pushExcludedRule(sTagName);
@@ -1225,10 +1226,7 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			{
 				if (trNonTextRun!=null)
 					addNonTextRunToCurrentTextUnit();
-				tempTagType = getTagType(); // DWH 5-7-09 saves what Abstract Base Filter thinks current tag type is
-				setTagType("d"); // DWH 5-7-09 type for current manufactured tag in text run, so tags will balance
-				addToTextUnit(TextFragment.TagType.CLOSING, sTagString, "d"); // DWH 5-7-09 adds as opening d
-				setTagType(tempTagType); // DWH 5-7-09  restore tag type to what AbstractBaseFilter expects
+				addToTextUnitCode(TextFragment.TagType.CLOSING, sTagString, "delete"); // DWH 5-7-09 adds as opening d
 			}
 			else if (sTagElementType.equals("excell")) // DWH 6-13-09 cell in Excel sheet
 			{
@@ -1619,16 +1617,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 				}
 			}
 			propertyTextUnitPlaceholders = trTextRun.getPropertyTextUnitPlaceholders();
-			tempTagType = getTagType(); // DWH 4-24-09 saves what Abstract Base Filter thinks current tag type is
-			setTagType("x"); // DWH 4-24-09 type for current manufactured tag in text run, so tags will balance
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				// add code and process actionable attributes
-				addToTextUnit(codeType, text, "x", propertyTextUnitPlaceholders);
+				addToTextUnitCode(codeType, text, "x", propertyTextUnitPlaceholders);
 			} else {
 				// no actionable attributes, just add the code as-is
-				addToTextUnit(codeType, text, "x");
+				addToTextUnitCode(codeType, text, "x");
 			}
-			setTagType(tempTagType); // DWH 4-24-09 restore tag type to what AbstractBaseFilter expects
 			trTextRun = null;
 			bBeforeFirstTextRun = false; // since the text run has now been added to the text unit
 		}
@@ -1657,16 +1652,13 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 			else
 			{
 				codeType = TextFragment.TagType.PLACEHOLDER;
-				tempTagType = getTagType(); // DWH 4-24-09 saves what Abstract Base Filter thinks current tag type is
-				setTagType("x"); // DWH 4-24-09 type for current manufactured tag in text run, so tags will balance
 				if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 					// add code and process actionable attributes
-					addToTextUnit(codeType, text, "x", propertyTextUnitPlaceholders);
+					addToTextUnitCode(codeType, text, "x", propertyTextUnitPlaceholders);
 				} else {
 					// no actionable attributes, just add the code as-is
-					addToTextUnit(codeType, text, "x");
+					addToTextUnitCode(codeType, text, "x");
 				}
-				setTagType(tempTagType); // DWH 4-24-09 restore tag type to what AbstractBaseFilter expects
 			}
 			trNonTextRun = null;
 		}
@@ -1844,6 +1836,18 @@ public class OpenXMLContentFilter extends AbstractBaseMarkupFilter {
 		this.params = (YamlParameters)params;
 	}
 
+	private void addToTextUnitCode(TagType codeType, String data, String type)
+	{
+		addToTextUnit(new Code(codeType, type, data));
+	}
+	private void addToTextUnitCode(TagType codeType, String data, String type, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
+	{
+		addToTextUnit(new Code(codeType, type, data), propertyTextUnitPlaceholders);		
+	}
+	private String getCommonTagType(Tag tag)
+	{
+		return getConfig().getElementType(tag); // DWH
+	}
 /*
  	Textbox code 
  	
