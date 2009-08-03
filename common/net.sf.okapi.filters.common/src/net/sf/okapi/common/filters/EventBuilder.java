@@ -799,8 +799,8 @@ public class EventBuilder {
 	 * @param startMarker
 	 *            the tag which starts the {@link Group}
 	 */
-	public void startGroup(GenericSkeleton startMarker) {
-		startGroup(startMarker, null, null);
+	public void startGroup(GenericSkeleton startMarker, String commonTagType) {
+		startGroup(startMarker, commonTagType, null, null);
 	}
 
 	/**
@@ -814,7 +814,7 @@ public class EventBuilder {
 	 * @param language
 	 *            the language of any actionable items
 	 */
-	public void startGroup(GenericSkeleton startMarker, String language,
+	public void startGroup(GenericSkeleton startMarker, String commonTagType, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		if (startMarker == null) {
 			throw new OkapiIllegalFilterOperationException(
@@ -848,7 +848,7 @@ public class EventBuilder {
 			@SuppressWarnings("null")
 			Code c = new Code(TagType.PLACEHOLDER, startMarker.toString(), TextFragment.makeRefMarker(gid));
 			c.setReferenceFlag(true);
-			startCode(c);
+			startCode(c, commonTagType);
 			endCode();
 			referencableFilterEvents.add(fe);
 		} else {
@@ -912,13 +912,6 @@ public class EventBuilder {
 	private void startCode(Code code, String tagType) {
 		currentCode = code;
 		currentCode.setType(tagType);
-	}
-
-	/*
-	 * Create a Code and store it for later processing.
-	 */
-	private void startCode(Code code) {
-		startCode(code, null);
 	}
 
 	/*

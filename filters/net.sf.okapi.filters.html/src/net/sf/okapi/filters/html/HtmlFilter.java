@@ -183,7 +183,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 				break;
 			case ATTRIBUTES_ONLY:
 				// we assume we have already ended any (non-complex) TextUnit in
-				// the main while loop in BaseMarkupFilter
+				// the main while loop in AbstractMarkupFilter
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 				break;
 			case GROUP_ELEMENT:
@@ -231,10 +231,10 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			break;
 		case GROUP_ELEMENT:
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startGroup(new GenericSkeleton(tag.toString()), tag.getName(), propertyTextUnitPlaceholders);
+				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag), getSrcLang(), propertyTextUnitPlaceholders);
 			} else {
 				// no attributes that need processing - just treat as skeleton
-				startGroup(new GenericSkeleton(tag.toString()));
+				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag));
 			}
 			break;
 		default:

@@ -708,13 +708,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		getEventBuilder().startDocumentPart(part, name, propertyTextUnitPlaceholders);
 	}
 
-	protected void startGroup(GenericSkeleton startMarker) {
-		getEventBuilder().startGroup(startMarker);
+	protected void startGroup(GenericSkeleton startMarker, String commonTagType) {
+		getEventBuilder().startGroup(startMarker, commonTagType);
 	}
 
-	protected void startGroup(GenericSkeleton startMarker, String language,
+	protected void startGroup(GenericSkeleton startMarker, String commonTagType, String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		getEventBuilder().startGroup(startMarker, language, propertyTextUnitPlaceholders);
+		getEventBuilder().startGroup(startMarker, commonTagType, language, propertyTextUnitPlaceholders);
 	}
 
 	protected void startTextUnit(GenericSkeleton startMarker) {
@@ -750,5 +750,16 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	public EventBuilder getEventBuilder() {
 		return eventBuilder;
+	}
+	
+	/**
+	 * Sets the input document mime type.
+	 * 
+	 * @param mimeType
+	 *            the new mime type
+	 */
+	public void setMimeType(String mimeType) {
+		super.setMimeType(mimeType);
+		eventBuilder.setMimeType(mimeType);
 	}
 }
