@@ -556,8 +556,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 						propertyTextUnitPlaceholders);
 			} else {
 				// no actionable attributes, just add the code as-is
-				getEventBuilder().addToTextUnit(new Code(codeType, startTag.getName(), literalTag), getConfig()
-						.getElementType(tag));
+				getEventBuilder().addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
 			}
 		} else { // end or unknown tag
 			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
@@ -565,8 +564,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			}
-			getEventBuilder().addToTextUnit(new Code(codeType, tag.getName(), literalTag),
-					getConfig().getElementType(tag));
+			getEventBuilder().addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
 		}
 	}
 
@@ -690,13 +688,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		return getEventBuilder().isInsideTextRun();
 	}
 
-	protected void addToTextUnit(Code code, String commonType) {
-		getEventBuilder().addToTextUnit(code, commonType);
+	protected void addToTextUnit(Code code) {
+		getEventBuilder().addToTextUnit(code);
 	}
 
-	protected void addToTextUnit(Code code, String commonType,
+	protected void addToTextUnit(Code code, 
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		getEventBuilder().addToTextUnit(code, commonType, propertyTextUnitPlaceholders);
+		getEventBuilder().addToTextUnit(code, propertyTextUnitPlaceholders);
 	}
 
 	protected void endDocumentPart() {

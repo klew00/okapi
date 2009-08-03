@@ -722,11 +722,11 @@ public class EventBuilder {
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void addToTextUnit(Code code, String commonType) {
+	public void addToTextUnit(Code code) {
 		if (!isCurrentTextUnit()) {
 			throw new OkapiIllegalFilterOperationException("Trying to add a Code to a TextUnit that does not exist.");
 		}
-		startCode(code, commonType);
+		startCode(code);
 		endCode();
 	}
 
@@ -740,9 +740,9 @@ public class EventBuilder {
 	 *            the list of actionable {@link TextUnit} or {@link Properties}
 	 *            with offset information into the tag.
 	 */
-	public void addToTextUnit(Code code, String commonType,
+	public void addToTextUnit(Code code,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		addToTextUnit(code, commonType, null, propertyTextUnitPlaceholders);
+		addToTextUnit(code, null, propertyTextUnitPlaceholders);
 	}
 
 	/**
@@ -758,7 +758,7 @@ public class EventBuilder {
 	 *            the language of the text
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void addToTextUnit(Code code, String commonType,
+	public void addToTextUnit(Code code, 
 			String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
@@ -768,7 +768,7 @@ public class EventBuilder {
 
 		currentSkeleton = new GenericSkeleton();
 		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
-		startCode(code, commonType);
+		startCode(code);
 		processAllEmbedded(code.toString(), language, propertyTextUnitPlaceholders, true, tu);
 		endCode();
 
@@ -783,7 +783,7 @@ public class EventBuilder {
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void appendToFirstSkeletonPart(String text) { // DWH 5-2-09
+	public void appendToFirstSkeletonPart(String text) { 
 		Event tempTextUnit = peekTempEvent();
 		GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource().getSkeleton();
 		skel.appendToFirstPart(text);
@@ -844,11 +844,10 @@ public class EventBuilder {
 
 		if (isCurrentComplexTextUnit()) {
 			// add this group as a code of the complex TextUnit
-			g.setIsReferent(true);
-			@SuppressWarnings("null")
-			Code c = new Code(TagType.PLACEHOLDER, startMarker.toString(), TextFragment.makeRefMarker(gid));
+			g.setIsReferent(true);			
+			Code c = new Code(TagType.PLACEHOLDER, commonTagType, TextFragment.makeRefMarker(gid));
 			c.setReferenceFlag(true);
-			startCode(c, commonTagType);
+			startCode(c);
 			endCode();
 			referencableFilterEvents.add(fe);
 		} else {
@@ -909,9 +908,8 @@ public class EventBuilder {
 	/*
 	 * Create a Code and store it for later processing.
 	 */
-	private void startCode(Code code, String tagType) {
-		currentCode = code;
-		currentCode.setType(tagType);
+	private void startCode(Code code) {
+		currentCode = code;		
 	}
 
 	/*

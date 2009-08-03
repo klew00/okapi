@@ -231,7 +231,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			break;
 		case GROUP_ELEMENT:
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag), getSrcLang(), propertyTextUnitPlaceholders);
+				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag), getSrcLang(),
+						propertyTextUnitPlaceholders);
 			} else {
 				// no attributes that need processing - just treat as skeleton
 				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag));
@@ -330,6 +331,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * 
 	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleDocTypeDeclaration
 	 * (net.htmlparser.jericho.Tag)
 	 */
@@ -354,6 +356,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * 
 	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleProcessingInstruction
 	 * (net.htmlparser.jericho.Tag)
 	 */
@@ -382,6 +385,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * 
 	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommonEscaped
 	 * (net.htmlparser.jericho.Tag)
 	 */
@@ -466,11 +470,11 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				// add code and process actionable attributes
-				addToTextUnit(new Code(codeType, startTag.getName(), literalTag), getConfig().getElementType(tag),
+				addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag),
 						propertyTextUnitPlaceholders);
 			} else {
 				// no actionable attributes, just add the code as-is
-				addToTextUnit(new Code(codeType, startTag.getName(), literalTag), getConfig().getElementType(tag));
+				addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
 			}
 		} else { // end or unknown tag
 			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
@@ -478,7 +482,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			}
-			addToTextUnit(new Code(codeType, tag.getName(), literalTag), getConfig().getElementType(tag));
+			addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
 		}
 	}
 
