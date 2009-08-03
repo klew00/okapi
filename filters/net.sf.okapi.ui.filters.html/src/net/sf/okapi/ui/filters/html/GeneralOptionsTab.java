@@ -1,6 +1,7 @@
 package net.sf.okapi.ui.filters.html;
 
-import net.sf.okapi.ui.common.dialogs.IDialogPage;
+
+import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;

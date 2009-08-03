@@ -1,16 +1,16 @@
 package net.sf.okapi.ui.filters.html;
 
-import net.sf.okapi.ui.common.dialogs.IDialogPage;
+import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Widget;
 
 public class ConditionalRuleEditorDialog extends Composite implements IDialogPage {
 	private Button btnOk;

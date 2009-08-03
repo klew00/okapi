@@ -1,16 +1,16 @@
 package net.sf.okapi.ui.filters.html;
 
-import net.sf.okapi.ui.common.dialogs.IDialogPage;
+import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Widget;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Widget;
 
 public class ContentExclusionRulesTab extends Composite implements IDialogPage {
 	private Group grpTagExclusionRules;
