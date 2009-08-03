@@ -23,17 +23,25 @@ package net.sf.okapi.filters.tests;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filters.AbstractBaseFilter;
+import net.sf.okapi.common.filters.AbstractFilter;
+import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
-public class DummyBaseFilter extends AbstractBaseFilter {
-
+public class DummyBaseFilter extends AbstractFilter {
+	private EventBuilder eventBuilder;
+	
+	public DummyBaseFilter() {
+		eventBuilder = new EventBuilder();
+	}
+	
 	public void close() {
 	}
 
@@ -65,46 +73,59 @@ public class DummyBaseFilter extends AbstractBaseFilter {
 
 	private void createCase1 () {
 		setMimeType("text/xml");
-		startFilter();
-		this.startTextUnit("Text.");
-		this.endTextUnit();
-		this.startDocumentPart("<docPart/>");
-		this.addToDocumentPart("<secondPart/>");
-		this.endDocumentPart();
-		this.endFilter();
+		
+		eventBuilder.reset();
+		eventBuilder.addFilterEvent(createStartDocumentEvent());
+		
+		eventBuilder.startTextUnit("Text.");
+		eventBuilder.endTextUnit();
+		eventBuilder.startDocumentPart("<docPart/>");
+		eventBuilder.addToDocumentPart("<secondPart/>");
+		eventBuilder.endDocumentPart();
+		
+		eventBuilder.flushRemainingEvents();
+		eventBuilder.addFilterEvent(createEndDocumentEvent());
 	}
 
 	private void createCase2 () {
 		setMimeType("text/xml");
 		setNewlineType("\n");
-		startFilter();
+
+		eventBuilder.reset();
+		eventBuilder.addFilterEvent(createStartDocumentEvent());
+
 		ArrayList<PropertyTextUnitPlaceholder> list = new ArrayList<PropertyTextUnitPlaceholder>();
 		list.add(new PropertyTextUnitPlaceholder(PlaceholderType.WRITABLE_PROPERTY, "attr", "val1", 10, 14));
+		
 		//TODO: Skeleton should be GenericSkeleton since BaseFilter uses only that one
-		this.startTextUnit("Before ", new GenericSkeleton("<tu attr='val1'>"), list);
-		this.addToTextUnit(TagType.OPENING, "<b>", "bold");
-		this.addToTextUnit("Text");
-		this.addToTextUnit(TagType.CLOSING, "</b>", "bold");
-		this.endFilter();
-	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.BaseFilter#hasUtf8Bom()
-	 */
-	@Override
-	protected boolean hasUtf8Bom() {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.BaseFilter#hasUtf8Encoding()
-	 */
-	@Override
-	protected boolean hasUtf8Encoding() {
-		return false;
+		eventBuilder.startTextUnit("Before ", new GenericSkeleton("<tu attr='val1'>"), list);
+		eventBuilder.addToTextUnit(new Code(TagType.OPENING, "bold", "<b>"), "bold");
+		eventBuilder.addToTextUnit("Text");
+		eventBuilder.addToTextUnit(new Code(TagType.CLOSING, "bold", "</b>"), "bold");
+		
+		eventBuilder.flushRemainingEvents();
+		eventBuilder.addFilterEvent(createEndDocumentEvent());
 	}
 
 	public List<FilterConfiguration> getConfigurations() {
 		return null;
+	}
+
+	@Override
+	protected boolean isUtf8Bom() {
+		return false;
+	}
+
+	@Override
+	protected boolean isUtf8Encoding() {
+		return false;
+	}
+
+	public boolean hasNext() {
+		return eventBuilder.hasNext();
+	}
+
+	public Event next() {
+		return eventBuilder.next();
 	}	
 }
