@@ -40,7 +40,7 @@ public class Annotations {
 	 * Sets an annotation.
 	 * @param annotation The annotation object to set.
 	 */
-	public void set (IAnnotation annotation) {
+	public <T extends IAnnotation> void set (T annotation) {
 		annotations.put(annotation.getClass(), annotation);
 	}
 	
@@ -49,9 +49,8 @@ public class Annotations {
 	 * @param annotationType Type of the annotation to retrieve.
 	 * @return The found annotation, or null if no annotation of the given type was found. 
 	 */
-	@SuppressWarnings("unchecked")
-	public <A> A get (Class<? extends IAnnotation> annotationType) {
-		return (A) annotations.get(annotationType);
+	public <A extends IAnnotation> A get (Class<A> annotationType) {
+		return annotationType.cast(annotations.get(annotationType) );
 	}
 
 	/**

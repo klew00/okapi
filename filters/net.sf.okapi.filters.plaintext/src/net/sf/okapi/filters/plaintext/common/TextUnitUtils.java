@@ -403,7 +403,7 @@ public class TextUnitUtils {
 		return res;
 	}
 	
-	public static <A> A getSourceAnnotation(TextUnit textUnit, Class<? extends IAnnotation> type) {
+	public static <A extends IAnnotation> A getSourceAnnotation(TextUnit textUnit, Class<A> type) {
 	
 		if (textUnit == null) return null;
 		if (textUnit.getSource() == null) return null;
@@ -419,7 +419,7 @@ public class TextUnitUtils {
 		textUnit.getSource().setAnnotation(annotation);		
 	}
 	
-	public static <A> A getTargetAnnotation(TextUnit textUnit, String language, Class<? extends IAnnotation> type) {
+	public static <A extends IAnnotation> A getTargetAnnotation(TextUnit textUnit, String language, Class<A> type) {
 		
 		if (textUnit == null) return null;
 		if (textUnit.getTarget(language) == null) return null;

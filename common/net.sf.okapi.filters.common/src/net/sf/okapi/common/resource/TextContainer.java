@@ -159,9 +159,8 @@ public class TextContainer extends TextFragment {
 		return properties.keySet();
 	}
 
-	@SuppressWarnings("unchecked")
-	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
-		return (A)annotations.get(type);
+	public <A extends IAnnotation> A getAnnotation (Class<A> type) {
+		return annotations.get(type);
 	}
 
 	public void setAnnotation (IAnnotation annotation) {
