@@ -32,7 +32,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
  * 
  */
 public class YamlParameters extends BaseParameters {
-	private static final String DEFAULT_PARAMETERS = "defaultConfiguration.yml";
+	private static final String DEFAULT_PARAMETERS = "wordConfiguration.yml"; // DWH 8-4-09 to fix Issue 89 
 
 	public static String getDefualtParameterFile() {
 		return DEFAULT_PARAMETERS;
