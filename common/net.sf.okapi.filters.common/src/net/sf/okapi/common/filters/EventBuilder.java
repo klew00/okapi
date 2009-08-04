@@ -46,20 +46,17 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
- * BaseFilter provides a simplified API for filter writers and hides the low
+ * EventBuilder provides a simplified API for filter writers that hides the low
  * level resource API.
  * <p>
- * The BaseFilter allows filter writers to think in terms of simple start and
- * end calls. For example, to produce a non-translatable {@link Event} you would
- * use startDocumentPart() and endDocumentPart(). For a text-based {@link Event}
- * you would use startTextUnit() and endTextUnit().
+ * EventBuilder allows filter writers to think in terms of start and end calls.
+ * For example, to produce a non-translatable {@link Event} you would use
+ * startDocumentPart() and endDocumentPart(). For a text-based {@link Event} you
+ * would use startTextUnit() and endTextUnit().
  * <p>
  * More complex cases such as tags with embedded translatable text can also be
- * handled. See the BaseMarkupFilter, HtmlFilter and OpenXmlFilter for examples
- * of using the AbstractBaseFilter.
- * <p>
- * To create a new filter extend BaseFilter and call startFilter() and
- * endFilter() methods at the beginning and end of each filter run.
+ * handled. See the AbstractMarkupFilter, HtmlFilter and OpenXmlFilter for
+ * examples of using EventBuilder.
  */
 public class EventBuilder {
 	private static final Logger LOGGER = Logger.getLogger(EventBuilder.class.getName());
@@ -97,10 +94,20 @@ public class EventBuilder {
 	public EventBuilder() {
 	}
 
+	/**
+	 * Are we finished parsing the input document?
+	 * 
+	 * @return true of the END_DOCUMENT event was received.
+	 */
 	public boolean hasNext() {
 		return !done;
 	}
 
+	/**
+	 * Return the next filter event waiting in the event queue.
+	 * 
+	 * @return the current {@link Event}
+	 */
 	public Event next() {
 		Event event;
 
@@ -118,10 +125,20 @@ public class EventBuilder {
 		return null;
 	}
 
+	/**
+	 * Add an {@link Event} at the end of the current {@link Event} queue.
+	 * 
+	 * @param event
+	 *            THe {@link Event} to be added
+	 */
 	public void addFilterEvent(Event event) {
 		filterEvents.add(event);
 	}
 
+	/**
+	 * Cancel current processing and add the CANCELED {@link Event} to the event
+	 * queue.
+	 */
 	public void cancel() {
 		// flush out all pending events
 		filterEvents.clear();
@@ -159,7 +176,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Flush all remaining events.
+	 * Flush all remaining events from the {@link Event} queues
 	 */
 	public void flushRemainingEvents() {
 		if (hasUnfinishedSkeleton()) {
@@ -179,7 +196,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Check if the current buffered {@link Event} is a {@link TextUnit}.
+	 * Is the current buffered {@link Event} a {@link TextUnit}?
 	 * 
 	 * @return true if TextUnit, false otherwise.
 	 */
@@ -192,12 +209,13 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Check if the current buffered {@link Event} is a complex {@link TextUnit}
+	 * Is the current buffered {@link Event} a complex {@link TextUnit}?
 	 * A complex TextUnit is one which carries along with it it's surrounding
-	 * context such &lt;p> text &lt;/p> or &lt;title> text &lt;/title>
+	 * formatting or skeleton such &lt;p> text &lt;/p> or &lt;title> text
+	 * &lt;/title>
 	 * 
-	 * 
-	 * @return true, if complex text unit, false otherwise.
+	 * @return true, if current {@link Event} is a complex text unit, false
+	 *         otherwise.
 	 */
 	public boolean isCurrentComplexTextUnit() {
 		Event e = peekTempEvent();
@@ -208,9 +226,9 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Check if the current buffered {@link Event} is a {@link Group}
+	 * Is the current buffered {@link Event} a {@link Group}?
 	 * 
-	 * @return true, if is current group
+	 * @return true, if current {@link Event} is a {@link Group}
 	 */
 	public boolean isCurrentGroup() {
 		Event e = peekTempEvent();
@@ -221,7 +239,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Checks if the filter is inside text run.
+	 * Is the filter is inside text run?
 	 * 
 	 * @return true, if is inside text run
 	 */
@@ -234,7 +252,7 @@ public class EventBuilder {
 	 * started if the current one has been ended with endTextUnit. Or no
 	 * {@link TextUnit} has been created yet.
 	 * 
-	 * @return true, if successful
+	 * @return true, if can start a new {@link TextUnit}
 	 */
 	public boolean canStartNewTextUnit() {
 		if (isCurrentTextUnit()) {
@@ -244,8 +262,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Checks for queued events. We queue events in the correct order as
-	 * expected by the Okapi Writers (IWriter).
+	 * Are there any queued events? We queue events in the correct order as
+	 * expected by the Okapi filter writers (IWriter).
 	 * 
 	 * @return true, if successful
 	 */
@@ -291,7 +309,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Checks for unfinished skeleton aka {@link DocumentPart}
+	 * Is there an unfinished {@link DocumentPart} (aka skeleton)?
 	 * 
 	 * @return true, if successful
 	 */
@@ -303,7 +321,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Checks if the current {@link TextUnit} has a parent.
+	 * Does the current {@link TextUnit} have a parent?
 	 * 
 	 * @return true, if successful
 	 */
@@ -322,8 +340,9 @@ public class EventBuilder {
 		return false;
 	}
 
-	/*
-	 * Reset {@link IFilter} for new input.
+	/**
+	 * Reset {@link IFilter} for a new input. Callers should reset the
+	 * EventBuilder for each input.
 	 */
 	public void reset() {
 		startGroupId = 0;
@@ -350,7 +369,7 @@ public class EventBuilder {
 	// ////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Send the {@link EventType} START_SUBDOCUMENT {@link Event}
+	 * Add the START_SUBDOCUMENT {@link Event} to the event queue.
 	 */
 	public void startSubDocument() {
 		if (hasUnfinishedSkeleton()) {
@@ -364,7 +383,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Send the {@link EventType} END_SUBDOCUMENT {@link Event}
+	 * Add the END_SUBDOCUMENT {@link Event} to the event queue.
 	 */
 	public void endSubDocument() {
 		Ending endDocument = new Ending(createId(END_SUBDOCUMENT, ++subDocumentId));
@@ -527,8 +546,8 @@ public class EventBuilder {
 	// ////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Start a {@link TextUnit}. Also create a TextUnit {@link Event} and queue
-	 * it.
+	 * Start a {@link TextUnit}. Also create a TextUnit {@link Event} and add it
+	 * to the event queue.
 	 * 
 	 * @param text
 	 *            the text used to prime the {@link TextUnit}
@@ -538,7 +557,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Start text unit.
+	 * Start a {@link TextUnit}. Also create a TextUnit {@link Event} and add it
+	 * to the event queue.
 	 */
 	public void startTextUnit() {
 		startTextUnit(null, null, null, null);
@@ -546,7 +566,7 @@ public class EventBuilder {
 
 	/**
 	 * Start a complex {@link TextUnit}. Also create a TextUnit {@link Event}
-	 * and queue it.
+	 * and add it to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag that begins the complex {@link TextUnit}
@@ -557,8 +577,8 @@ public class EventBuilder {
 
 	/**
 	 * Start a complex {@link TextUnit} with actionable (translatable, writable
-	 * or read-only) attributes. Also create a TextUnit {@link Event} and queue
-	 * it.
+	 * or read-only) attributes. Also create a TextUnit {@link Event} and add it
+	 * to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag that begins the complex {@link TextUnit}
@@ -573,8 +593,8 @@ public class EventBuilder {
 
 	/**
 	 * Start a complex {@link TextUnit} with actionable (translatable, writable
-	 * or read-only) attributes. Also create a TextUnit {@link Event} and queue
-	 * it.
+	 * or read-only) attributes. Also create a TextUnit {@link Event} and add it
+	 * to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag that begins the complex {@link TextUnit}
@@ -591,8 +611,8 @@ public class EventBuilder {
 
 	/**
 	 * Start a complex {@link TextUnit} with actionable (translatable, writable
-	 * or read-only) attributes. Also create a TextUnit {@link Event} and queue
-	 * it.
+	 * or read-only) attributes. Also create a TextUnit {@link Event} and add it
+	 * to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag that begins the complex {@link TextUnit}
@@ -635,7 +655,7 @@ public class EventBuilder {
 
 	/**
 	 * End the current {@link TextUnit} and place the {@link Event} on the
-	 * finished queue.
+	 * event queue.
 	 */
 	public TextUnit endTextUnit() {
 		return endTextUnit(null, null, null);
@@ -643,7 +663,7 @@ public class EventBuilder {
 
 	/**
 	 * End the current {@link TextUnit} and place the {@link Event} on the
-	 * finished queue.
+	 * event queue.
 	 * 
 	 * @param endMarker
 	 *            the tag that ends the complex {@link TextUnit}
@@ -654,7 +674,7 @@ public class EventBuilder {
 
 	/**
 	 * End the current {@link TextUnit} and place the {@link Event} on the
-	 * finished queue.
+	 * event queue.
 	 * 
 	 * @param endMarker
 	 *            the tag that ends the complex {@link TextUnit}
@@ -689,7 +709,7 @@ public class EventBuilder {
 		}
 
 		tempTextUnit.setResource(postProcessTextUnit((TextUnit) tempTextUnit.getResource()));
-		
+
 		filterEvents.add(tempTextUnit);
 
 		return (TextUnit) tempTextUnit.getResource();
@@ -715,7 +735,7 @@ public class EventBuilder {
 
 	/**
 	 * Add a {@link Code} to the current {@link TextUnit}. Nothing is actionable
-	 * within the tag (i.e., no properties or text)
+	 * within the tag (i.e., no properties or translatable, localizable text)
 	 * 
 	 * @param code
 	 *            the code type
@@ -732,7 +752,7 @@ public class EventBuilder {
 
 	/**
 	 * Add a {@link Code} to the current {@link TextUnit}. The Code contains
-	 * actionable attributes.
+	 * actionable (i.e., translatable, localizable) attributes.
 	 * 
 	 * @param code
 	 *            the code
@@ -747,7 +767,7 @@ public class EventBuilder {
 
 	/**
 	 * Add a {@link Code} to the current {@link TextUnit}. The Code contains
-	 * actionable attributes.
+	 * actionable (i.e., translatable, localizable) attributes.
 	 * 
 	 * @param code
 	 *            the code
@@ -758,7 +778,7 @@ public class EventBuilder {
 	 *            the language of the text
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void addToTextUnit(Code code, 
+	public void addToTextUnit(Code code,
 			String language,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
@@ -776,14 +796,14 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Appends text to the first data part of the skeleton {@link TextUnit}
+	 * Appends text to the first data part of the skeleton.
 	 * 
 	 * @param text
 	 *            the text
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void appendToFirstSkeletonPart(String text) { 
+	public void appendToFirstSkeletonPart(String text) {
 		Event tempTextUnit = peekTempEvent();
 		GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource().getSkeleton();
 		skel.appendToFirstPart(text);
@@ -794,20 +814,24 @@ public class EventBuilder {
 	// ////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Create and send a {@link StartGroup} {@link Event}
+	 * Create a {@link StartGroup} {@link Event} and add it to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag which starts the {@link Group}
+	 * @param commonTagType
+	 *            the tag name or abstract type for this group.
 	 */
 	public void startGroup(GenericSkeleton startMarker, String commonTagType) {
 		startGroup(startMarker, commonTagType, null, null);
 	}
 
 	/**
-	 * Create and send a {@link StartGroup} {@link Event}
+	 * Create a {@link StartGroup} {@link Event} and add it to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag which starts the {@link Group}
+	 * @param commonTagType
+	 *            the tag name or abstract type for this group.
 	 * @param propertyTextUnitPlaceholders
 	 *            the list of actionable {@link TextUnit} or {@link Properties}
 	 *            with offset information into the tag.
@@ -844,7 +868,7 @@ public class EventBuilder {
 
 		if (isCurrentComplexTextUnit()) {
 			// add this group as a code of the complex TextUnit
-			g.setIsReferent(true);			
+			g.setIsReferent(true);
 			Code c = new Code(TagType.PLACEHOLDER, commonTagType, TextFragment.makeRefMarker(gid));
 			c.setReferenceFlag(true);
 			startCode(c);
@@ -858,7 +882,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Send an {@link Ending} {@link Event} of type END_GROUP
+	 * Create a {@link Ending} {@link Event} of type END_GROUP and add it to the
+	 * event queue.
 	 * 
 	 * @param endMarker
 	 *            the tags that ends the {@link Group}
@@ -868,7 +893,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Send an {@link Ending} {@link Event} of type END_GROUP
+	 * Create a {@link Ending} {@link Event} of type END_GROUP and add it to the
+	 * event queue.
 	 * 
 	 * @param endMarker
 	 *            the tags that ends the {@link Group}
@@ -909,7 +935,7 @@ public class EventBuilder {
 	 * Create a Code and store it for later processing.
 	 */
 	private void startCode(Code code) {
-		currentCode = code;		
+		currentCode = code;
 	}
 
 	/*
@@ -931,8 +957,7 @@ public class EventBuilder {
 	// ////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Start a {@link DocumentPart} and create an {@link Event}. Store the
-	 * {@link Event} for later processing.
+	 * Create a {@link DocumentPart} and store it for later processing.
 	 * 
 	 * @param part
 	 *            the {@link DocumentPart} (aka skeleton)
@@ -948,8 +973,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Start a {@link DocumentPart} and create an {@link Event}. Store the
-	 * {@link Event} for later processing.
+	 * Create a {@link DocumentPart} that references actionable (i.e.,
+	 * translatable, localizable) properties and store it for later processing.
 	 * 
 	 * @param part
 	 *            the {@link DocumentPart} (aka skeleton)
@@ -965,8 +990,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Start a {@link DocumentPart} and create an {@link Event}. Store the
-	 * {@link Event} for later processing.
+	 * Create a {@link DocumentPart} that references actionable (i.e.,
+	 * translatable, localizable) properties and store it for later processing.
 	 * 
 	 * @param part
 	 *            the {@link DocumentPart} (aka skeleton)
@@ -993,8 +1018,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * End the {@link DocumentPart} and finalize the {@link Event}. Place the
-	 * {@link Event} on the finished queue.
+	 * End the current {@link DocumentPart} and finalize the {@link Event}.
+	 * Place the {@link Event} on the event queue.
 	 * 
 	 * @param part
 	 *            the {@link DocumentPart} (aka skeleton)
@@ -1010,7 +1035,7 @@ public class EventBuilder {
 
 	/**
 	 * End the {@link DocumentPart} and finalize the {@link Event}. Place the
-	 * {@link Event} on the finished queue.
+	 * {@link Event} on the event queue.
 	 */
 	public void endDocumentPart() {
 		endDocumentPart(null);
@@ -1051,8 +1076,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Gets the textUnitId (used in OpenXML with textboxes to update the id of
-	 * the parent filter
+	 * Gets the custom textUnitId set by the caller.
 	 * 
 	 * @return the textUnitId
 	 */
@@ -1061,7 +1085,9 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Allows implementers to set the textUnitId
+	 * Set the current textUnitId. Note that using this method overrides the
+	 * built-in id creation algorithm. Useful for some callers that wish to
+	 * create custom ids.
 	 * 
 	 * @param id
 	 *            the initial value for the textUnitId
@@ -1071,16 +1097,18 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Gets the textUnitId
+	 * Gets the current custom {@link DocumentPart} id.
 	 * 
-	 * @return the textUnitId
+	 * @return the id
 	 */
 	public int getDocumentPartId() {
 		return documentPartId;
 	}
 
 	/**
-	 * Allows implementers to set the textUnitId
+	 * Set the current custom {@link DocumentPart} id. Note that using this
+	 * method overrides the built-in id creation algorithm. Useful for some
+	 * callers that wish to create custom ids.
 	 * 
 	 * @param id
 	 *            the initial value for the textUnitId
@@ -1088,13 +1116,14 @@ public class EventBuilder {
 	public void setDocumentPartId(int id) {
 		this.documentPartId = id;
 	}
-	
+
 	/**
-	 * Do any required post-processing on the TextUnit after endTextUnit is called. 
-	 * Default implementation leaves TextUnit unchanged. Override this method if 
-	 * you need to do format specific handing such as collapsing whitespace.
+	 * Do any required post-processing on the TextUnit after endTextUnit is
+	 * called. Default implementation leaves TextUnit unchanged. Override this
+	 * method if you need to do format specific handing such as collapsing
+	 * whitespace.
 	 */
-	protected TextUnit postProcessTextUnit(TextUnit textUnit) {		
+	protected TextUnit postProcessTextUnit(TextUnit textUnit) {
 		return textUnit;
 	}
 }
