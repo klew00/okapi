@@ -278,21 +278,25 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	 */
 	public InputStream combineRepeatedFormat(final InputStream in, final PipedOutputStream pios)
 	{
+		final OutputStreamWriter osw;
+		final BufferedWriter bw;
+		final InputStreamReader isr;
+		final BufferedReader br;
 		PipedInputStream piis=null;
 //		final PipedOutputStream pios = new PipedOutputStream();
 		try
 		{
 			piis = new PipedInputStream(pios);
+			osw = new OutputStreamWriter(pios,"UTF-8");
+			bw = new BufferedWriter(osw);
+			isr = new InputStreamReader(in,"UTF-8");
+			br = new BufferedReader(isr);
 		}
 		catch (IOException e)
 		{
 			LOGGER.log(Level.SEVERE,"Can't read piped input stream.");
 			throw new OkapiIOException("Can't read piped input stream.");
 		}		
-		final OutputStreamWriter osw = new OutputStreamWriter(pios);
-		final BufferedWriter bw = new BufferedWriter(osw);
-		final InputStreamReader isr = new InputStreamReader(in);
-		final BufferedReader br = new BufferedReader(isr);
 	    Thread readThread = new Thread(new Runnable()
 	    {
 	      char cbuf[] = new char[512];
