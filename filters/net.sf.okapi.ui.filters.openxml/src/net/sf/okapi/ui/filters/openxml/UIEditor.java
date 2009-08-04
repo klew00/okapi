@@ -216,7 +216,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 							lblStyles.setText("Styles to Exclude");
 						}
 						{
-							listExcludedWordStyles = new List(compositeWordStyles, SWT.BORDER | SWT.V_SCROLL);
+							listExcludedWordStyles = new List(compositeWordStyles, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 							listExcludedWordStyles.setItems(new String[] {"Emphasis", "ExcludeCharacterStyle", "ExcludeParagraphStyle", "Heading1", "Heading2", "Normal", "Title", "Strong", "Subtitle", "tw4winExternal"});
 							listExcludedWordStyles.setBounds(10, 0, 156, 68);
 						}
@@ -244,7 +244,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 //						}
 						{
 							listExcelColorsToExclude = new List(compositeExcelColors, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-							listExcelColorsToExclude.setItems(new String[] {"black", "blue", "cyan", "green", "magenta", "red", "white", "yellow"});
+							listExcelColorsToExclude.setItems(new String[] {"blue", "dark blue", "dark red", "green", "light blue", "light green", "orange", "purple", "red", "yellow"});
 							listExcelColorsToExclude.setBounds(10, 0, 135, 45);
 						}
 					}

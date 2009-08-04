@@ -117,81 +117,148 @@ public class Editor implements IParametersEditor, SelectionListener {
 		String sRGB;
 		Excell eggshell;
 		String sDuraCell;
+		String sMulti[];
+		TreeSet<String> tsColors;
+		Object o[];
 		int ndx;
+		int siz;
 		ed.btnTranslateDocumentProperties.setSelection(params.bPreferenceTranslateDocProperties) ;
 		ed.btnTranslateComments.setSelection(params.bPreferenceTranslateComments);
 		ed.btnTranslateHeadersAndFooters.setSelection(params.bPreferenceTranslateWordHeadersFooters);
 		ed.btnTranslateHiddenText.setSelection(params.bPreferenceTranslateWordHidden);
 		ed.btnTranslateNotes.setSelection(params.bPreferenceTranslatePowerpointNotes);
 		ed.btnTranslateMasters.setSelection(params.bPreferenceTranslatePowerpointMasters);
-		if (params.bPreferenceTranslateWordAllStyles &&
+		if (!params.bPreferenceTranslateWordAllStyles &&
 			params.tsExcludeWordStyles!=null && !params.tsExcludeWordStyles.isEmpty())
 		{
 			it = params.tsExcludeWordStyles.iterator();
-			while(it.hasNext())
+			siz = params.tsExcludeWordStyles.size();
+			if (siz>0)
 			{
-				sYmphony = (String)it.next();
-				ed.listExcludedWordStyles.add(sYmphony);
+				sMulti = new String[siz];
+				ndx = 0;
+				while(it.hasNext())
+				{
+					sMulti[ndx++] = (String)it.next();
+				}
+				ed.listExcludedWordStyles.setSelection(sMulti);
 			}
 		}	
 		if (params.bPreferenceTranslateExcelExcludeColors &&
 			params.tsExcelExcludedColors!=null && !params.tsExcelExcludedColors.isEmpty())
 		{
+			tsColors = new TreeSet<String>();
 			it = params.tsExcelExcludedColors.iterator();
 			while(it.hasNext())
 			{
 				sRGB = (String)it.next();
-				if (sRGB.equals("000000FF"))
-					sRGB = "black";
-				else if (sRGB.equals("FFFF000"))
+				if (sRGB.equals("FF0070C0"))
 					sRGB = "blue";
-				else if (sRGB.equals("FF0070C0"))
-					sRGB = "blue";
-				else if (sRGB.equals("FF000000"))
-					sRGB = "cyan";
-				else if (sRGB.equals("FF00FF00"))
+				else if (sRGB.equals("FF00B0F0"))
+					sRGB = "light blue";
+				else if (sRGB.equals("FF00B050"))
 					sRGB = "green";
-				else if (sRGB.equals("00FF0000"))
-					sRGB = "magenta";
-				else if (sRGB.equals("00FFFF00"))
+				else if (sRGB.equals("FF7030A0"))
+					sRGB = "purple";
+				else if (sRGB.equals("FFFF0000"))
 					sRGB = "red";
-				else if (sRGB.equals("00000000"))
-					sRGB = "white";
-				else if (sRGB.equals("0000FF00"))
+				else if (sRGB.equals("FFFFFF00"))
 					sRGB = "yellow";
-				ndx = ed.listExcelColorsToExclude.indexOf(sRGB);
-				if (ndx>-1)
-					ed.listExcelColorsToExclude.setSelection(ndx);
+				else if (sRGB.equals("FFC00000"))
+					sRGB = "dark red";
+				else if (sRGB.equals("FF92D050"))
+					sRGB = "light green";
+				else if (sRGB.equals("FFFFC000"))
+					sRGB = "orange";
+				else if (sRGB.equals("FF002060"))
+					sRGB = "dark blue";
+				tsColors.add(sRGB);
+			}
+			siz = tsColors.size();
+			if (siz>0)
+			{
+				sMulti = new String[siz];
+				it = tsColors.iterator();
+				ndx = 0;
+				while(it.hasNext())
+					sMulti[ndx++] = (String)it.next();
+				ed.listExcelColorsToExclude.setSelection(sMulti);
 			}
 		}
 		ed.btnExcludeExcelColumns.setSelection(params.bPreferenceTranslateExcelExcludeColumns);
 		if (params.bPreferenceTranslateExcelExcludeColumns &&
 			params.tsExcelExcludedColumns!=null && !params.tsExcelExcludedColumns.isEmpty())
 		{
-			it = params.tsExcelExcludedColumns.iterator();
-			while(it.hasNext())
+			siz = 0;
+			for(it=params.tsExcelExcludedColumns.iterator();it.hasNext();)
 			{
-				sYmphony = (String)it.next();
+				sYmphony = (String)it.next();			
 				eggshell = new Excell(sYmphony);
 				sDuraCell = eggshell.getColumn();
 				if (eggshell.getSheet().equals("1"))
+					siz++;
+			}
+			if (siz>0)
+			{
+				ndx = 0;
+				sMulti = new String[siz];
+				for(it=params.tsExcelExcludedColumns.iterator();it.hasNext();)
 				{
-					ndx = ed.listExcelSheet1ColumnsToExclude.indexOf(sDuraCell);
-					if (ndx>-1)
-						ed.listExcelSheet1ColumnsToExclude.setSelection(ndx);
+					sYmphony = (String)it.next();			
+					eggshell = new Excell(sYmphony);
+					sDuraCell = eggshell.getColumn();
+					if (eggshell.getSheet().equals("1"))
+						sMulti[ndx++] = sDuraCell;
 				}
+				ed.listExcelSheet1ColumnsToExclude.setSelection(sMulti);
+			}
+
+			siz = 0;
+			for(it=params.tsExcelExcludedColumns.iterator();it.hasNext();)
+			{
+				sYmphony = (String)it.next();			
+				eggshell = new Excell(sYmphony);
+				sDuraCell = eggshell.getColumn();
 				if (eggshell.getSheet().equals("2"))
+					siz++;
+			}
+			if (siz>0)
+			{
+				ndx = 0;
+				sMulti = new String[siz];
+				for(it=params.tsExcelExcludedColumns.iterator();it.hasNext();)
 				{
-					ndx = ed.listExcelSheet2ColumnsToExclude.indexOf(sDuraCell);
-					if (ndx>-1)
-						ed.listExcelSheet2ColumnsToExclude.setSelection(ndx);
+					sYmphony = (String)it.next();			
+					eggshell = new Excell(sYmphony);
+					sDuraCell = eggshell.getColumn();
+					if (eggshell.getSheet().equals("2"))
+						sMulti[ndx++] = sDuraCell;
 				}
+				ed.listExcelSheet2ColumnsToExclude.setSelection(sMulti);
+			}
+
+			siz = 0;
+			for(it=params.tsExcelExcludedColumns.iterator();it.hasNext();)
+			{
+				sYmphony = (String)it.next();			
+				eggshell = new Excell(sYmphony);
+				sDuraCell = eggshell.getColumn();
 				if (eggshell.getSheet().equals("3"))
+					siz++;
+			}
+			if (siz>0)
+			{
+				ndx = 0;
+				sMulti = new String[siz];
+				for(it=params.tsExcelExcludedColumns.iterator();it.hasNext();)
 				{
-					ndx = ed.listExcelSheet3ColumnsToExclude.indexOf(sDuraCell);
-					if (ndx>-1)
-						ed.listExcelSheet3ColumnsToExclude.setSelection(ndx);
+					sYmphony = (String)it.next();			
+					eggshell = new Excell(sYmphony);
+					sDuraCell = eggshell.getColumn();
+					if (eggshell.getSheet().equals("3"))
+						sMulti[ndx++] = sDuraCell;
 				}
+				ed.listExcelSheet3ColumnsToExclude.setSelection(sMulti);
 			}
 		}
 	}
@@ -238,6 +305,7 @@ public class Editor implements IParametersEditor, SelectionListener {
 			{
 				sColor = sArray[i];
 				sRGB = null;
+/*
 				if (sColor.equals("black"))
 					sRGB = "000000FF";
 				else if (sColor.equals("blue"))
@@ -257,6 +325,27 @@ public class Editor implements IParametersEditor, SelectionListener {
 					sRGB = "00000000";
 				else if (sColor.equals("yellow"))
 					sRGB = "0000FF00";
+*/
+				if (sColor.equals("blue")) // FF002060
+					sRGB = "FF0070C0";
+				else if (sColor.equals("light blue"))
+					sRGB = "FF00B0F0";
+				else if (sColor.equals("green"))
+					sRGB = "FF00B050";
+				else if (sColor.equals("purple"))
+					sRGB = "FF7030A0";
+				else if (sColor.equals("FFFF0000"))
+					sRGB = "red";
+				else if (sColor.equals("yellow"))
+					sRGB = "FFFFFF00";
+				else if (sColor.equals("dark red"))
+					sRGB = "FFC00000";
+				else if (sColor.equals("light green"))
+					sRGB = "FF92D050";
+				else if (sColor.equals("orange"))
+					sRGB = "FFFFC000";
+				else if (sColor.equals("dark blue"))
+					sRGB = "FF002060";
 				if (sRGB!=null)
 					params.tsExcelExcludedColors.add(sRGB);
 			}
