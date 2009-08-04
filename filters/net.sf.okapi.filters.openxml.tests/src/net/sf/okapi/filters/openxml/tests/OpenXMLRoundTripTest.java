@@ -94,6 +94,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("TestDako2.docx");
 		themfiles.add("TextBoxes.docx");
 		themfiles.add("ExcelColors.xlsx");
+		themfiles.add("UTF8.docx");
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
