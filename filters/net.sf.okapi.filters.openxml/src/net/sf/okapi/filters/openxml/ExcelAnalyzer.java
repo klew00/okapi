@@ -447,7 +447,6 @@ public class ExcelAnalyzer
 			document = new StreamedSource(new InputStreamReader(is));
 		} catch (IOException e) {
 			OkapiIOException re = new OkapiIOException(e);
-			LOGGER.log(Level.SEVERE, "Filter could not open input stream", re);
 			throw new OkapiIOException("Filter could not open input stream"); // dies here, so return can't be null
 		}
 		return document.iterator();

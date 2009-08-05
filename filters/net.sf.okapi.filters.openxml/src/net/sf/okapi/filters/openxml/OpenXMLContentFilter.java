@@ -263,7 +263,6 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		}
 		catch(Exception e)
 		{
-			LOGGER.log(Level.SEVERE,"Can't read MS Office Filter Configuration File.");
 			throw new OkapiIOException("Can't read MS Office Filter Configuration File.");
 		}
 	}
@@ -294,7 +293,6 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		}
 		catch (IOException e)
 		{
-			LOGGER.log(Level.SEVERE,"Can't read piped input stream.");
 			throw new OkapiIOException("Can't read piped input stream.");
 		}		
 	    Thread readThread = new Thread(new Runnable()
@@ -323,7 +321,6 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	        }
 	        catch(IOException e)
 	        {
-				LOGGER.log(Level.SEVERE,"Can't read input pipe.");
 				throw new OkapiIOException("Can't read input pipe.");	        	
 	        }
 		    try {
@@ -334,7 +331,6 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 //				osw.flush();
 				osw.close();
 			} catch (IOException e) {
-				LOGGER.log(Level.SEVERE,"Can't read piped input.");
 				throw new OkapiIOException("Can't read piped input.");
 			}
 	      }

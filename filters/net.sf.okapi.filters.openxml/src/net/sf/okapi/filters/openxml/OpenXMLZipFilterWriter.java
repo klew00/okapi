@@ -133,7 +133,6 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 				}
 				orig = null;
 				if ( err != null ) {
-					LOGGER.log(Level.SEVERE,"Error closing MS Office 2007 file.");
 					throw new OkapiIOException("Error closing MS Office 2007 file.");
 				} else {
 					if ( tempZip != null ) {
@@ -234,11 +233,9 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 			}
 		}
 		catch ( FileNotFoundException e ) {
-			LOGGER.log(Level.SEVERE,"Existing file could not be overwritten.");
 			throw new OkapiFileNotFoundException("Existing file could not be overwritten.");
 		}
 		catch ( IOException e ) {
-			LOGGER.log(Level.SEVERE,"File could not be written.");
 			throw new OkapiIOException("File could not be written.");
 		}
 	}
@@ -270,7 +267,6 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 				zipOut.closeEntry();
 			}
 			catch ( IOException e ) {
-				LOGGER.log(Level.SEVERE,"Error writing zip file entry.");
 				throw new OkapiIOException("Error writing zip file entry.");
 			}
 		}
@@ -302,7 +298,6 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 			tempFile = File.createTempFile("zfwTmp", null);
 		}
 		catch ( IOException e ) {
-			LOGGER.log(Level.SEVERE,"Error opening temporary zip output file.");
 			throw new OkapiIOException("Error opening temporary zip output file.");
 		}
 		
@@ -362,7 +357,6 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 			tempFile.delete();
 		}
 		catch ( IOException e ) {
-			LOGGER.log(Level.SEVERE,"Error closing zip output file.");
 			throw new OkapiIOException("Error closing zip output file.");
 		}
 	}

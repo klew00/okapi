@@ -180,7 +180,6 @@ public class OpenXMLFilter implements IFilter {
 			}
 		}
 		catch (IOException e) {
-			LOGGER.log(Level.SEVERE,"Error closing zipped output file.");
 			throw new OkapiIOException("Error closing zipped output file.");
 		}
 	}
@@ -521,7 +520,6 @@ public class OpenXMLFilter implements IFilter {
 			}
 			if (nZipType==-1)
 			{
-				LOGGER.log(Level.SEVERE,"MS Office 2007 filter tried to open a file that is not aMicrosoft Office 2007 Word, Excel, or Powerpoint file.");
 				throw new OkapiBadFilterInputException("MS Office 2007 filter tried to open a file that is not aMicrosoft Office 2007 Word, Excel, or Powerpoint file.");
 			}		
 			if (nZipType==MSEXCEL &&
@@ -558,12 +556,10 @@ public class OpenXMLFilter implements IFilter {
 		}
 		catch ( ZipException e )
 		{
-			LOGGER.log(Level.SEVERE,"Error opening zipped input file.");
 			throw new OkapiIOException("Error opening zipped input file.");
 		}
 		catch ( IOException e )
 		{
-			LOGGER.log(Level.SEVERE,"Error reading zipped input file.");
 			throw new OkapiIOException("Error reading zipped input file.", e);
 		}
 	}
@@ -753,7 +749,6 @@ public class OpenXMLFilter implements IFilter {
 						pios.close();
 					} catch (IOException e) {
 						// e.printStackTrace();
-						LOGGER.log(Level.SEVERE,"Error closing input stream.");
 						throw new OkapiIOException("Error closing input stream.");
 					}
 				}
@@ -778,7 +773,6 @@ public class OpenXMLFilter implements IFilter {
 			  // DWH 4-22-09 This lists what YAML actually read out of the configuration file
 		}
 		catch (IOException e) {
-			LOGGER.log(Level.SEVERE,"Error streaming input.");
 			throw new OkapiIOException("Error streaming input.");
 		}
 		
