@@ -29,12 +29,15 @@ public abstract class AbstractFilter implements IFilter {
 	private String mimeType;
 	private IFilterWriter filterWriter;
 	private boolean generateSkeleton;
+	private boolean multilingual;
 
 	/**
 	 * Default constructor
 	 */
 	public AbstractFilter() {
-		newlineType = "\n";
+		// defaults
+		setNewlineType("\n");
+		setMultilingual(false);
 	}
 
 	/**
@@ -72,7 +75,8 @@ public abstract class AbstractFilter implements IFilter {
 		startDocument.setLineBreak(getNewlineType());
 		startDocument.setFilterParameters(getParameters());
 		startDocument.setFilterWriter(getFilterWriter());
-		startDocument.setName(getDocumentName()); 
+		startDocument.setName(getDocumentName());
+		startDocument.setMultilingual(isMultilingual()); 
 		LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId());
 		return new Event(EventType.START_DOCUMENT, startDocument);
 	}
@@ -266,4 +270,18 @@ public abstract class AbstractFilter implements IFilter {
 	 * @return true if the document has a utf-8 byte order mark.
 	 */
 	abstract protected boolean isUtf8Bom();
+
+	/**
+	 * @param multilingual the multilingual to set
+	 */
+	public void setMultilingual(boolean multilingual) {
+		this.multilingual = multilingual;
+	}
+
+	/**
+	 * @return the multilingual
+	 */
+	public boolean isMultilingual() {
+		return multilingual;
+	}
 }
