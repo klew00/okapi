@@ -321,7 +321,10 @@ public class Editor implements IParametersEditor {
 					if ( help != null ) help.showTopic(this, "index");
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) saveData();
+				if ( e.widget.getData().equals("o") ) {
+					if ( !saveData(true) ) return;
+					result = true;
+				}
 				shell.close();
 			};
 		};
@@ -409,14 +412,28 @@ public class Editor implements IParametersEditor {
 		updateSample();
 	}
 
-	private boolean saveData () {
+	private boolean saveData (boolean checkValues) {
 		if ( inInit ) return true;
 		//TODO: verify options (empty path, etc.
+		String tmp = edName.getText();
+		if ( checkValues && ( tmp.length() == 0 )) {
+			Dialogs.showError(shell, "You must provide a package name.", null);
+			edName.setFocus();
+			return false;
+		}
+		params.pkgName = tmp;
+
+		tmp = edOutputFolder.getText();
+		if ( checkValues && ( tmp.length() == 0 )) {
+			Dialogs.showError(shell, "You must provide an output directory.", null);
+			edOutputFolder.setFocus();
+			return false;
+		}
+		params.outputFolder = tmp;
+		
 		String[] aItems = ((String)lbTypes.getData()).split("\t", -2);
 		params.pkgType = aItems[lbTypes.getSelectionIndex()];
 		params.createZip = chkCreateZip.getSelection();
-		params.pkgName = edName.getText();
-		params.outputFolder = edOutputFolder.getText();
 		params.preSegment = pnlSegmentation.getSegment();
 		params.sourceSRX = pnlSegmentation.getSourceSRX();
 		params.targetSRX = pnlSegmentation.getTargetSRX();
@@ -426,12 +443,11 @@ public class Editor implements IParametersEditor {
 		params.useGroupName = chkUseGroupName.getSelection();
 		params.leverageOnlyExact = chkLeverageOnlyExact.getSelection();
 		params.xliffOptions = xliffOptions;
-		result = true;
 		return true;
 	}
 	
 	private void updateSample () {
-		saveData();
+		saveData(false);
 		String out = edOutputFolder.getText() + File.separator + edName.getText();
 		edSample.setText(out.replace(BaseUtility.VAR_PROJDIR, projectDir));
 	}
