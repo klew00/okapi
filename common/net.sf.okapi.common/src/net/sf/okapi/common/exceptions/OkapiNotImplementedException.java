@@ -21,9 +21,9 @@
 package net.sf.okapi.common.exceptions;
 
 /**
- * Signals that a non-implemented method was called. This is generally due
- * to a class that cannot implement a method of an Okapi interface because of 
- * specific requirement.
+ * Signals that a non-implemented method was called, or a non-implemented feature
+ * was invoked. This is generally due to a class that cannot implement a method 
+ * of an Okapi interface because of specific requirement.
  */
 public class OkapiNotImplementedException extends RuntimeException {
 

@@ -23,6 +23,9 @@ package net.sf.okapi.common.tests;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import net.sf.okapi.common.ParameterDescriptor;
+import net.sf.okapi.common.ParametersDescription;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +33,16 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ParametersTest {
+	
+	class TestClass {
+		private String text;
+		public String getText() {
+			return text;
+		}
+		public void setText(String text) {
+			this.text = text;
+		}
+	}
 	
 	@Before
 	public void setUp() throws Exception {
@@ -79,6 +92,30 @@ public class ParametersTest {
 		assertFalse(params.paramBool1);
 		assertEquals(789, params.paramInt1);
 		assertEquals(params.paramStr1, "TestOK");
+	}
+
+	@Test
+	public void testParameterDescriptor () {
+		TestClass ts = new TestClass();
+		ParameterDescriptor pd = new ParameterDescriptor("text", String.class,
+			ts, "displayName", "shortDescription");
+		assertEquals("displayName", pd.getDisplayName());
+		assertEquals("shortDescription", pd.getShortDescription());
+		assertEquals(String.class, pd.getType());
+		assertEquals("text", pd.getName());
+		assertEquals(ts, pd.getParent());
+		assertNotNull(pd.getReadMethod());
+		assertNotNull(pd.getWriteMethod());
+	}
+
+	@Test
+	public void testParametersDescription () {
+		TestClass ts = new TestClass();
+		ParametersDescription desc = new ParametersDescription(ts);
+		desc.add("text", String.class, "displayName", "shortDescription");
+		ParameterDescriptor pd = desc.get("text");
+		assertEquals(1, desc.getDescriptors().size());
+		assertEquals(pd, desc.getDescriptors().get("text"));
 	}
 
 }
