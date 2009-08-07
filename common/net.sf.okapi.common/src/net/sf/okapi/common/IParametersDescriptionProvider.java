@@ -18,11 +18,13 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.uidescription;
+package net.sf.okapi.common;
 
 /**
- * Common type for all containers UI parts (e.g. tabs, groups, etc.).
+ * Common type for classes that can provide a description of their parameters.
  */
-public interface IContainerPart {
+public interface IParametersDescriptionProvider {
+
+	public ParametersDescription getParametersDescription ();
 
 }
