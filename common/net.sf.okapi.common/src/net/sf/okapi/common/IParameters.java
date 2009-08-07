@@ -100,5 +100,12 @@ public interface IParameters {
 	 * @return the value of the given parameter, or 0 if it is not defined.
 	 */
 	public int getInteger (String name);
-	
+
+	/**
+	 * Gets the description of the parameters.
+	 * @return the ParametersDescription object for this set of parameters,
+	 * or null if none is provided.
+	 */
+	public ParametersDescription getParametersDescription ();
+
 }

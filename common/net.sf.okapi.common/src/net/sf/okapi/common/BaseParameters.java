@@ -133,4 +133,8 @@ public abstract class BaseParameters implements IParameters {
 		else return Integer.parseInt(buffer.getString(name));
 	}
 
+	public ParametersDescription getParametersDescription () {
+		return null;
+	}
+
 }

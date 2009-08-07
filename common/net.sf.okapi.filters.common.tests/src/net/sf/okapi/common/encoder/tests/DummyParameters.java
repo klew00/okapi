@@ -23,6 +23,7 @@ package net.sf.okapi.common.encoder.tests;
 import java.net.URI;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.ParametersDescription;
 
 public class DummyParameters implements IParameters {
 
@@ -86,4 +87,8 @@ public class DummyParameters implements IParameters {
 		return 0;
 	}
 	
+	public ParametersDescription getParametersDescription () {
+		return null;
+	}
+
 }

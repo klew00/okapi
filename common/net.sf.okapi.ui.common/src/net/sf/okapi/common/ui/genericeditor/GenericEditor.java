@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Text;
 
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IParametersDescriptionProvider;
+import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.AbstractPart;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
@@ -96,15 +96,16 @@ public class GenericEditor {
 		layTmp.verticalSpacing = 0;
 		shell.setLayout(layTmp);
 
-		// Get the UI descriptions
-		if ( params instanceof IParametersDescriptionProvider ) {
+		// Get the UI description
+		ParametersDescription pd = params.getParametersDescription();
+		if ( pd == null ) {
 			throw new OkapiEditorCreationException(
-				"The parameters object must implement the IParametersDescriptionProvider interface.");
+				"This configuration cannot be edited with the generic editor because it does not provide a description of its parameters.");
 		}
-		description = descProv.createEditorDescription(((IParametersDescriptionProvider)params).getParametersDescription());
+		description = descProv.createEditorDescription(pd);
 		if ( description == null ) {
 			throw new OkapiEditorCreationException(
-				"The configuration provided cannot be edited with the generic editor.");
+				"This configuration cannot be edited with the generic editor because the UI description could not be created.");
 		}
 		controls = new Hashtable<String, Control>();
 		

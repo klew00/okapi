@@ -47,6 +47,7 @@ import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 
@@ -243,6 +244,10 @@ public class Parameters implements IParameters {
 
 	public int getInteger (String name) {
 		return 0;
+	}
+
+	public ParametersDescription getParametersDescription () {
+		return null;
 	}
 
 }

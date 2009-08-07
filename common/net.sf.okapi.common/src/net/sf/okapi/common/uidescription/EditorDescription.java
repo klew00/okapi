@@ -103,7 +103,7 @@ public class EditorDescription {
 	 * @param isPassword flag indicating if the text input should be treated as a password.
 	 * @return the UI part created by this call.
 	 */
-	public TextInputPart addInputUIPart (ParameterDescriptor paramDescriptor,
+	public TextInputPart addTextInputPart (ParameterDescriptor paramDescriptor,
 		boolean allowEmpty,
 		boolean isPassword)
 	{
@@ -117,7 +117,7 @@ public class EditorDescription {
 	 * @param paramDescriptor the parameter descriptor for this UI part.
 	 * @return the UI part created by this call.
 	 */
-	public CheckboxPart addCheckboxUIPart (ParameterDescriptor paramDescriptor) {
+	public CheckboxPart addCheckboxPart (ParameterDescriptor paramDescriptor) {
 		CheckboxPart desc = new CheckboxPart(paramDescriptor);
 		descriptors.put(desc.getName(), desc);
 		return desc;
@@ -129,7 +129,7 @@ public class EditorDescription {
 	 * @param choices the list of items that can be selected.
 	 * @return the UI part created by this call.
 	 */
-	public ListSelectionPart addListSelectionUIPart (ParameterDescriptor paramDescriptor,
+	public ListSelectionPart addListSelectionPart (ParameterDescriptor paramDescriptor,
 		String[] choices)
 	{
 		ListSelectionPart desc = new ListSelectionPart(paramDescriptor, choices);
@@ -144,7 +144,7 @@ public class EditorDescription {
 	 * @param forSaveAs true if the path is to save a file (vs to open one).
 	 * @return the UI part created by this call.
 	 */
-	public PathInputPart addPathinputPart (ParameterDescriptor paramDescriptor,
+	public PathInputPart addPathInputPart (ParameterDescriptor paramDescriptor,
 		String browseTitle,
 		boolean forSaveAs)
 	{
