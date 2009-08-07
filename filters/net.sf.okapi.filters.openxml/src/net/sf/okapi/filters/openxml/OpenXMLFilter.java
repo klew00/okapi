@@ -442,6 +442,8 @@ public class OpenXMLFilter implements IFilter {
 		this.nLogLevel = nLogLevel;
 		openXMLContentFilter.setLogger(LOGGER);
 		this.bSquishable = bSquishable;
+		if (cparams!=null)
+			readParams(); // rainbow loads into cparams before this but after it is open
 		LOGGER.log(Level.FINE,"\nOpening "+inputURI.toString());
 	}
 
@@ -626,7 +628,8 @@ public class OpenXMLFilter implements IFilter {
 		    {
 			    if (!bMinedHiddenStyles) // DWH 5-28-09 find styles for hidden text
 			    {
-			    	if (sDocType.equals("styles+xml"))
+//			    	if (sDocType.equals("styles+xml")) // because glossary can have a styles+xml too
+			    	if (sEntryName.equals("word/styles.xml"))
 			    	{
 			    		bMinedHiddenStyles = true;
 			    		entries = zipFile.entries(); // reset to go through all of them except styles and Content_Types
@@ -636,7 +639,8 @@ public class OpenXMLFilter implements IFilter {
 			    }
 			    else if (!bPreferenceTranslateWordHidden &&
 			    		 (sEntryName.equals("[Content_Types].xml") || // but don't do Content_Types
-			    		  sDocType.equals("styles+xml")))             // and styles a second time
+			    		  sEntryName.equals("word/styles.xml")))             // and styles a second time
+//		    		  	  sDocType.equals("styles+xml")))             // and styles a second time
 			    	continue;
 			          // DWH 5-29-09 these two files have already been added to the zip, so don't add them again
 		    }
@@ -667,7 +671,8 @@ public class OpenXMLFilter implements IFilter {
 		                    (sDocType.equals("comments+xml") && bPreferenceTranslateComments) ||
 		                      // DWH 5-25-09 translate if translating comments
 		                    sDocType.equals("chart+xml") ||
-		                    (sDocType.equals("styles+xml") && !bPreferenceTranslateWordHidden) ||
+		                    (sEntryName.equals("word/styles.xml") && !bPreferenceTranslateWordHidden) ||
+//		                    (sDocType.equals("styles+xml") && !bPreferenceTranslateWordHidden) ||
 		                    sDocType.equals("settings+xml") ||
 		                    (sDocType.equals("core-properties+xml") && bPreferenceTranslateDocProperties) ||
 		                      // DWH 5-25-09 translate if translating document properties

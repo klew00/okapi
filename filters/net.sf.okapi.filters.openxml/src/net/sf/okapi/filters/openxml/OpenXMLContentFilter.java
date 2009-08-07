@@ -47,11 +47,13 @@ import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.Tag;
 
 //import net.sf.okapi.common.encoder.IEncoder;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
@@ -164,12 +166,16 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	private YamlParameters params=null; // DWH 7-16-09
 	private TaggedFilterConfiguration config=null; // DWH 7-16-09
 	private RawDocument rdSource; // Textbox
+	private EncoderManager encoderManager; // to handle text not to be translated
 	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
 		setMimeType("text/xml");
 		setFilterWriter(createFilterWriter());
 		tsExcludeWordStyles = new TreeSet<String>();
+		encoderManager = new EncoderManager(); // DWH 5-14-09
+		encoderManager.setDefaultOptions(null, "utf-8", "\n"); // DWH 5-14-09
+		encoderManager.updateEncoder(MimeTypeMapper.DOCX_MIME_TYPE); // DWH 5-14-09
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
@@ -808,9 +814,10 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			{
 				if (bBetweenTextMarkers)
 				{
-					if (bExcludeTextInRun || bExcludeTextInUnit || // DWH 5-29-09 don't treat as text if excluding text
-						    (filetype==MSEXCEL && txt!=null && txt.length()>0 && txt.charAt(0)=='='))
+					if (filetype==MSEXCEL && txt!=null && txt.length()>0 && txt.charAt(0)=='=')
 						addToTextRun(txt); // DWH 5-13-09 don't treat Excel formula as text to be translated
+					else if (bExcludeTextInRun || bExcludeTextInUnit) // DWH 5-29-09 don't treat as text if excluding text
+						addToTextRun(encoderManager.encode(txt,0)); // DWH 8-7-09 still have to encode text if not in text unit
 					else if (nCurrentSharedString>0 && nCurrentSharedString<nNextSharedStringCount)
 						// DWH 6-13-09 in Excel Shared Strings File, only if some shared strings excluded from translation
 					{
@@ -831,7 +838,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 							bInTextRun = true;							
 						}
 						else
-							addToTextRun(txt); // if not translatable, add as part of code						
+							addToTextRun(encoderManager.encode(txt,0)); // if not translatable, add as part of code						
 					}
 					else
 					{
@@ -843,13 +850,13 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 					}
 				}
 				else
-					addToTextRun(txt); // for <w:delText>text</w:delText> don't translate deleted text (will be inside code)
+					addToTextRun(encoderManager.encode(txt,0)); // for <w:delText>text</w:delText> don't translate deleted text (will be inside code)
 			}
 			else
 			{
 				trTextRun = new TextRun();
 				bInTextRun = true;
-				addToTextRun(txt); // not inside text markers, so this text will become part of a code
+				addToTextRun(encoderManager.encode(txt,0)); // not inside text markers, so this text will become part of a code
 			}
 		}
 	}
