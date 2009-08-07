@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common;
 
-import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -62,17 +61,15 @@ public class ParametersDescription {
 	/**
 	 * Adds a descriptor to this description.
 	 * @param name the name of the parameter.
-	 * @param type the type of the parameter.
 	 * @param displayName the localizable display name for this parameter.
 	 * @param shortDescription a short localizable description for this parameter. 
 	 * @return the parameter descriptor created by the call.
 	 */
 	public ParameterDescriptor add (String name,
-		Type type,
 		String displayName,
 		String shortDescription)
 	{
-		ParameterDescriptor desc = new ParameterDescriptor(name, type, originalObject,
+		ParameterDescriptor desc = new ParameterDescriptor(name, originalObject,
 			displayName, shortDescription);
 		descriptors.put(name, desc);
 		return desc;

@@ -113,7 +113,7 @@ public class EditorDescription {
 	}
 	
 	/**
-	 * Adds a checkbox UI part to this editor description.
+	 * Adds a check box UI part to this editor description.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
 	 * @return the UI part created by this call.
 	 */
@@ -123,21 +123,34 @@ public class EditorDescription {
 		return desc;
 	}
 
-/*	public ListSelectionUIPart addListSelectionUIPart (ParameterDescriptor paramDescriptor,
+	/**
+	 * Adds a selection list UI part to this editor description.
+	 * @param paramDescriptor the parameter descriptor for this UI part.
+	 * @param choices the list of items that can be selected.
+	 * @return the UI part created by this call.
+	 */
+	public ListSelectionPart addListSelectionUIPart (ParameterDescriptor paramDescriptor,
 		String[] choices)
 	{
-		ListSelectionUIPart desc = new ListSelectionUIPart(paramDescriptor, choices);
+		ListSelectionPart desc = new ListSelectionPart(paramDescriptor, choices);
 		descriptors.put(desc.getName(), desc);
 		return desc;
 	}
 
-	public PathUIPart addPathUIPart (ParameterDescriptor paramDescriptor,
+	/**
+	 * Adds a path input field UI part to this editor description.
+	 * @param paramDescriptor the parameter descriptor for this UI part.
+	 * @param browseTitle the title to use for the path browsing dialog.
+	 * @param forSaveAs true if the path is to save a file (vs to open one).
+	 * @return the UI part created by this call.
+	 */
+	public PathInputPart addPathinputPart (ParameterDescriptor paramDescriptor,
 		String browseTitle,
-		boolean saveAs)
+		boolean forSaveAs)
 	{
-		PathUIPart desc = new PathUIPart(paramDescriptor, browseTitle, saveAs);
+		PathInputPart desc = new PathInputPart(paramDescriptor, browseTitle, forSaveAs);
 		descriptors.put(desc.getName(), desc);
 		return desc;
 	}
-*/
+
 }

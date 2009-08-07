@@ -23,69 +23,67 @@ package net.sf.okapi.common.uidescription;
 import net.sf.okapi.common.ParameterDescriptor;
 
 /**
- * UI part descriptor for a text input field. This UI part supports the following
- * types: Integer and String.  
+ * UI part descriptor for a path. This UI part supports the following types:
+ * String.  
  */
-public class TextInputPart extends AbstractPart {
+public class PathInputPart extends AbstractPart {
 
-	private boolean allowEmpty;
-	private boolean password;
-
+	private boolean forSaveAs;
+	private String browseTitle;
+	
 	/**
-	 * Creates a new TextInputPart object with a given parameter descriptor.
+	 * Creates a new PathInputPart object with a given  parameter descriptor.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
-	 * @param allowEmpty flag indicating if the text input can be empty.
-	 * @param password flag indicating if the text input should be treated as a password.
+	 * @param browseTitle the title to use for the path browsing dialog.
+	 * @param forSaveAs true if the path is to save a file (vs to open one).
 	 */
-	public TextInputPart (ParameterDescriptor paramDescriptor,
-		boolean allowEmpty,
-		boolean password)
+	public PathInputPart (ParameterDescriptor paramDescriptor,
+		String browseTitle,
+		boolean forSaveAs)
 	{
 		super(paramDescriptor);
-		checkType();
-		this.allowEmpty = allowEmpty;
-		this.password = password;
+		this.forSaveAs = forSaveAs;
+		this.browseTitle = browseTitle;
 	}
 
 	@Override
 	protected void checkType () {
 		// Check type support
 		if ( getType().equals(String.class) ) return;
-		if ( getType().equals(Integer.class) ) return;
 		// Otherwise: call the base method.
 		super.checkType();
 	}
 
 	/**
-	 * Indicates if the input text can be empty.
-	 * @return true if the input text can be empty, false otherwise.
+	 * Gets the title of the path browse dialog.
+	 * @return the title of the path browse dialog.
 	 */
-	public boolean isAllowEmpty () {
-		return allowEmpty;
+	public String getBrowseTitle () {
+		return browseTitle;
 	}
 
 	/**
-	 * Sets the flag indicating if the input text can be empty. 
-	 * @param allowEmpty true if the input text can be empty, false otherwise.
+	 * Sets the title of the path browse dialog.
+	 * @param browseTitle the new title of the path browse dialog.
 	 */
-	public void setAllowEmpty (boolean allowEmpty) {
-		this.allowEmpty = allowEmpty;
+	public void setBrowseTitle (String browseTitle) {
+		this.browseTitle = browseTitle;
 	}
 
 	/**
-	 * Indicates if the input text should be treated like a password.
-	 * @return true if the input text can be should be treated like a password.
+	 * Indicates if the path is to save a file (vs to open one).
+	 * @return true if the path is to save a file (vs to open one).
 	 */
-	public boolean isPassword () {
-		return password;
+	public boolean isForSaveAs () {
+		return forSaveAs;
 	}
 
 	/**
-	 * Sets the flag indicating if the input text should be treated like a password. 
-	 * @param password true if the input text should be treated like a password, false otherwise.
+	 * Sets the flag indicating if the path is to save a file (vs to open one).
+	 * @param forSaveAs true  if the path is to save a file (vs to open one).
 	 */
-	public void setPassword (boolean password) {
-		this.password = password;
+	public void setForSaveAs (boolean forSaveAs) {
+		this.forSaveAs = forSaveAs;
 	}
 
 }

@@ -46,19 +46,16 @@ public class ParameterDescriptor implements IParameterDescriptor {
 	 * and short description.
 	 * @param name the name of this parameter. The name must follow the JavaBean naming
 	 * conventions.
-	 * @param type the type of this parameter.
 	 * @param parent the object where this parameter is instantiated.
 	 * @param displayName the localizable name of this parameter.
 	 * @param shortDescription a short localizable description of this parameter.
 	 */
 	public ParameterDescriptor (String name,
-		Type type,
 		Object parent,
 		String displayName,
 		String shortDescription)
 	{
 		this.name = name;
-		this.type = type;
 		this.parent = parent;
 		this.displayName = displayName;
 		this.shortDescription = shortDescription;
@@ -77,6 +74,13 @@ public class ParameterDescriptor implements IParameterDescriptor {
 			throw new RuntimeException(String.format(
 				"Introspection error when creating descriptor for '%s'", name), e);
 		}
+		
+		if ( readMethod == null ) {
+			throw new NullPointerException(String.format(
+				"The readMethod for '%s' is null.", name));
+		}
+		// Get the type of the parameter from the return type
+		this.type = readMethod.getGenericReturnType();
 	}
 	
 	public String getName () {

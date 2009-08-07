@@ -23,27 +23,47 @@ package net.sf.okapi.common.uidescription;
 import net.sf.okapi.common.ParameterDescriptor;
 
 /**
- * UI part descriptor for a check box. This UI part supports the following types:
- * Boolean, Integer (0: false, non-0: true), and String ("0": false, not-"0": true).  
+ * UI part descriptor for a string selection. This UI part supports the following
+ * types: String.  
  */
-public class CheckboxPart extends AbstractPart {
+public class ListSelectionPart extends AbstractPart {
 
+	private String[] choices;
+	
 	/**
-	 * Creates a new CheckboxPart object with a given parameter descriptor.
+	 * Creates a new ListSelectionPart object with a given parameter descriptor.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
+	 * @param items the list of the items that can be selected.
 	 */
-	public CheckboxPart (ParameterDescriptor paramDescriptor) {
+	public ListSelectionPart (ParameterDescriptor paramDescriptor,
+		String[] items)
+	{
 		super(paramDescriptor);
+		setChoices(items);
 	}
 
 	@Override
 	protected void checkType () {
 		// Check type support
-		if ( getType().equals(boolean.class) ) return;
-		if ( getType().equals(int.class) ) return;
 		if ( getType().equals(String.class) ) return;
 		// Otherwise: call the base method.
 		super.checkType();
+	}
+
+	/**
+	 * Gets the list of items that can be selected.
+	 * @return the list of items that can be selected.
+	 */
+	public String[] getChoices () {
+		return choices;
+	}
+
+	/**
+	 * Sets the list of items that can be selected.
+	 * @param choices the new list of items that can be selected.
+	 */
+	public void setChoices (String[] choices) {
+		this.choices = choices;
 	}
 
 }

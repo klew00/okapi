@@ -36,11 +36,18 @@ public class ParametersTest {
 	
 	class TestClass {
 		private String text;
+		private boolean flag;
 		public String getText() {
 			return text;
 		}
 		public void setText(String text) {
 			this.text = text;
+		}
+		public boolean isFlag() {
+			return flag;
+		}
+		public void setFlag(boolean flag) {
+			this.flag = flag;
 		}
 	}
 	
@@ -97,8 +104,8 @@ public class ParametersTest {
 	@Test
 	public void testParameterDescriptor () {
 		TestClass ts = new TestClass();
-		ParameterDescriptor pd = new ParameterDescriptor("text", String.class,
-			ts, "displayName", "shortDescription");
+		ParameterDescriptor pd = new ParameterDescriptor("text", ts,
+			"displayName", "shortDescription");
 		assertEquals("displayName", pd.getDisplayName());
 		assertEquals("shortDescription", pd.getShortDescription());
 		assertEquals(String.class, pd.getType());
@@ -112,10 +119,14 @@ public class ParametersTest {
 	public void testParametersDescription () {
 		TestClass ts = new TestClass();
 		ParametersDescription desc = new ParametersDescription(ts);
-		desc.add("text", String.class, "displayName", "shortDescription");
+		desc.add("text", "displayName", "shortDescription");
+		desc.add("flag", "Flag", "A flag");
 		ParameterDescriptor pd = desc.get("text");
-		assertEquals(1, desc.getDescriptors().size());
+		assertEquals(2, desc.getDescriptors().size());
 		assertEquals(pd, desc.getDescriptors().get("text"));
+		pd = desc.get("flag");
+		assertEquals(pd, desc.getDescriptors().get("flag"));
+		assertEquals(boolean.class, pd.getType());
 	}
 
 }
