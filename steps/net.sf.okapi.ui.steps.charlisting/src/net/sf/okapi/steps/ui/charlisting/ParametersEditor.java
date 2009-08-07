@@ -175,8 +175,8 @@ public class ParametersEditor implements IParametersEditor {
 	}
 
 	private void setData () {
-		edOutputPath.setText(params.outputPath);
-		chkAutoOpen.setSelection(params.autoOpen);
+		edOutputPath.setText(params.getOutputPath());
+		chkAutoOpen.setSelection(params.isAutoOpen());
 	}
 
 	private boolean saveData () {
@@ -185,8 +185,8 @@ public class ParametersEditor implements IParametersEditor {
 			edOutputPath.setFocus();
 			return false;
 		}
-		params.outputPath = edOutputPath.getText();
-		params.autoOpen = chkAutoOpen.getSelection();
+		params.setOutputPath(edOutputPath.getText());
+		params.setAutoOpen(chkAutoOpen.getSelection());
 		result = true;
 		return true;
 	}

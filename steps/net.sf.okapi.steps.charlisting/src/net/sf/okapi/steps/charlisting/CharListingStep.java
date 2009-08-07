@@ -79,8 +79,8 @@ public class CharListingStep extends BasePipelineStep {
 		// Generate the report
 		PrintWriter writer = null;
 		try {
-			Util.createDirectories(params.outputPath);
-			writer = new PrintWriter(params.outputPath, "UTF-8");
+			Util.createDirectories(params.getOutputPath());
+			writer = new PrintWriter(params.getOutputPath(), "UTF-8");
 			// Generate BOM if we are on windows
 			if ( !Util.isOSCaseSensitive() ) {
 				writer.write('\uFEFF');
@@ -101,18 +101,18 @@ public class CharListingStep extends BasePipelineStep {
 		}
 		catch ( FileNotFoundException e ) {
 			logger.log(Level.SEVERE,
-				String.format("Error with '%s'.", params.outputPath), e);
+				String.format("Error with '%s'.", params.getOutputPath()), e);
 		}
 		catch ( UnsupportedEncodingException e ) {
 			logger.log(Level.SEVERE,
-				String.format("Error with '%s'.", params.outputPath), e);
+				String.format("Error with '%s'.", params.getOutputPath()), e);
 		}
 		finally {
 			if ( writer != null ) {
 				writer.close();
 				writer = null;
-				if ( params.autoOpen ) {
-					getContext().setString("outputFile", params.outputPath);
+				if ( params.isAutoOpen() ) {
+					getContext().setString("outputFile", params.getOutputPath());
 				}
 			}
 		}

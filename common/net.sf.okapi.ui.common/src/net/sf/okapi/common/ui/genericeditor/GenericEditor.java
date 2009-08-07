@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -137,6 +138,7 @@ public class GenericEditor {
 		}
 
 		// Create the UI parts
+		boolean hasPathInput = false;
 		Composite cmp;
 		int horizAlignFlag = 0;
 		if ( description.alignLabels() ) {
@@ -174,23 +176,24 @@ public class GenericEditor {
 				ctrl.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 				controls.put(d.getName(), ctrl);
 				ctrl.setEditable(d.getWriteMethod()!=null);
+				hasPathInput = true;
 			}
 			else if ( part instanceof ListSelectionPart ) {
 				ListSelectionPart d = (ListSelectionPart)part;
 				cmp = lookupParent(d.getContainer());
-				if ( d.getListType() == ListSelectionPart.TYPE_SIMPLE ) {
+				if ( d.isDropDown() ) {
+					setLabel(cmp, d, horizAlignFlag);
+					Combo combo = new Combo(cmp, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
+					controls.put(d.getName(), combo);
+					combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					combo.setEnabled(d.getWriteMethod()!=null);
+				}
+				else {
 					setLabel(cmp, d, horizAlignFlag|GridData.VERTICAL_ALIGN_BEGINNING);
 					List list = new List(cmp, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 					controls.put(d.getName(), list);
 					list.setLayoutData(new GridData(GridData.FILL_BOTH));
 					list.setEnabled(d.getWriteMethod()!=null);
-				}
-				else {
-					setLabel(cmp, d, horizAlignFlag);
-					Combo combo = new Combo(cmp, SWT.BORDER | SWT.READ_ONLY);
-					controls.put(d.getName(), combo);
-					combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-					combo.setEnabled(d.getWriteMethod()!=null);
 				}
 			}
 		}
@@ -221,10 +224,12 @@ public class GenericEditor {
 
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
-//		Point startSize = shell.getMinimumSize();
-//		if ( startSize.x < 600 ) startSize.x = 600; 
-//		if ( startSize.y < 450 ) startSize.y = 450; 
-//		shell.setSize(startSize);
+		if ( hasPathInput ) {
+			Point startSize = shell.getMinimumSize();
+			if ( startSize.x < 600 ) startSize.x = 600; 
+//			if ( startSize.y < 450 ) startSize.y = 450; 
+			shell.setSize(startSize);
+		}
 		Dialogs.centerWindow(shell, parent);
 		setData();
 	}
@@ -255,11 +260,11 @@ public class GenericEditor {
 			}
 			else if ( part instanceof ListSelectionPart ) {
 				ListSelectionPart d = (ListSelectionPart)part;
-				if ( d.getListType() == ListSelectionPart.TYPE_SIMPLE ) {
-					setListControl((List)controls.get(d.getName()), d);
+				if ( d.isDropDown() ) {
+					setComboControl((Combo)controls.get(d.getName()), d);
 				}
 				else {
-					setComboControl((Combo)controls.get(d.getName()), d);
+					setListControl((List)controls.get(d.getName()), d);
 				}
 			}
 		}
@@ -291,13 +296,13 @@ public class GenericEditor {
 			else if ( ctrl instanceof List ) {
 				if ( description.getDescriptor(name) instanceof ListSelectionPart ) {
 					ListSelectionPart part = (ListSelectionPart)description.getDescriptor(name);
-					if ( part.getListType() == ListSelectionPart.TYPE_SIMPLE ) {
-						if ( !saveListControl((List)ctrl, part) ) {
+					if ( part.isDropDown() ) {
+						if ( !saveComboControl((Combo)ctrl, part) ) {
 							return false;
 						}
 					}
 					else {
-						if ( !saveComboControl((Combo)ctrl, part) ) {
+						if ( !saveListControl((List)ctrl, part) ) {
 							return false;
 						}
 					}
@@ -319,7 +324,7 @@ public class GenericEditor {
 			if ( desc.getType().equals(String.class) ) {
 				desc.getWriteMethod().invoke(desc.getParent(), text.getText());
 			}
-			else if ( desc.getType().equals(Integer.class) ) {
+			else if ( desc.getType().equals(int.class) ) {
 				try {
 					int n = 0;
 					if ( text.getText().length() > 0 ) { 
@@ -333,6 +338,10 @@ public class GenericEditor {
 					text.selectAll();
 					return false;
 				}
+			}
+			else {
+				throw new RuntimeException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
 		catch ( IllegalArgumentException e ) {
@@ -352,14 +361,18 @@ public class GenericEditor {
 	
 	private boolean saveCheckboxControl (Button button, CheckboxPart desc) {
 		try {
-			if ( desc.getType().equals(Boolean.class) ) {
+			if ( desc.getType().equals(boolean.class) ) {
 				desc.getWriteMethod().invoke(desc.getParent(), button.getSelection());
 			}
 			else if ( desc.getType().equals(String.class) ) {
 				desc.getWriteMethod().invoke(desc.getParent(), (button.getSelection() ? "1" : "0"));
 			}
-			else if ( desc.getType().equals(Integer.class) ) {
+			else if ( desc.getType().equals(int.class) ) {
 				desc.getWriteMethod().invoke(desc.getParent(), (button.getSelection() ? 1 : 0));
+			}
+			else {
+				throw new RuntimeException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
 		catch ( IllegalArgumentException e ) {
@@ -380,7 +393,16 @@ public class GenericEditor {
 	private boolean saveTextAndBrowseControl (TextAndBrowsePanel ctrl, PathInputPart desc) {
 		try {
 			if ( desc.getType().equals(String.class) ) {
+				if ( ctrl.getText().length() == 0 ) {
+					Dialogs.showError(shell, "You must specify a path.", null);
+					ctrl.setFocus();
+					return false;
+				}
 				desc.getWriteMethod().invoke(desc.getParent(), ctrl.getText());
+			}
+			else {
+				throw new RuntimeException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
 		catch ( IllegalArgumentException e ) {
@@ -420,8 +442,7 @@ public class GenericEditor {
 		}
 		return true;
 	}
-	
-	
+
 	private boolean saveComboControl (Combo combo, ListSelectionPart desc) {
 		try {
 			int n = combo.getSelectionIndex();
@@ -450,8 +471,12 @@ public class GenericEditor {
 			if ( desc.getType().equals(String.class) ) {
 				tmp = (String)desc.getReadMethod().invoke(desc.getParent());
 			}
-			else if ( desc.getType().equals(Integer.class) ) {
+			else if ( desc.getType().equals(int.class) ) {
 				tmp = ((Integer)desc.getReadMethod().invoke(desc.getParent())).toString();
+			}
+			else {
+				throw new RuntimeException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 			if ( tmp == null ) text.setText("");
 			else text.setText(tmp);
@@ -483,6 +508,10 @@ public class GenericEditor {
 					list.select(found);
 				}
 			}
+			else {
+				throw new RuntimeException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
 		}
 		catch ( IllegalArgumentException e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -511,6 +540,10 @@ public class GenericEditor {
 					combo.select(found);
 				}
 			}
+			else {
+				throw new RuntimeException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
 		}
 		catch ( IllegalArgumentException e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -523,19 +556,22 @@ public class GenericEditor {
 		}
 	}
 	
-
 	private void setCheckboxControl (Button button, CheckboxPart desc) {
 		try {
-			if ( desc.getType().equals(Boolean.class) ) {
+			if ( desc.getType().equals(boolean.class) ) {
 				button.setSelection((Boolean)desc.getReadMethod().invoke(desc.getParent()));
 			}
-			else if ( desc.getType().equals(Integer.class) ) {
+			else if ( desc.getType().equals(int.class) ) {
 				int n = (Integer)desc.getReadMethod().invoke(desc.getParent());
 				button.setSelection(n!=0);
 			}
 			else if ( desc.getType().equals(String.class) ) {
 				String tmp = (String)desc.getReadMethod().invoke(desc.getParent());
 				button.setSelection((tmp!=null) && !tmp.equals("0"));
+			}
+			else {
+				throw new RuntimeException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
 		catch ( IllegalArgumentException e ) {
@@ -554,6 +590,10 @@ public class GenericEditor {
 			if ( desc.getType().equals(String.class) ) {
 				String tmp = (String)desc.getReadMethod().invoke(desc.getParent());
 				ctrl.setText((tmp==null) ? "" : tmp);
+			}
+			else {
+				throw new RuntimeException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
 		catch ( IllegalArgumentException e ) {

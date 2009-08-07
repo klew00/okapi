@@ -21,16 +21,33 @@
 package net.sf.okapi.steps.charlisting;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
-	public String outputPath;
-	public boolean autoOpen;
+	private String outputPath;
+	private boolean autoOpen;
 
 	public Parameters () {
 		reset();
 	}
 	
+	public String getOutputPath () {
+		return outputPath;
+	}
+
+	public void setOutputPath (String outputPath) {
+		this.outputPath = outputPath;
+	}
+
+	public boolean isAutoOpen () {
+		return autoOpen;
+	}
+
+	public void setAutoOpen (boolean autoOpen) {
+		this.autoOpen = autoOpen;
+	}
+
 	public void reset() {
 		outputPath = "charlist.txt";
 		autoOpen = true;
@@ -43,6 +60,7 @@ public class Parameters extends BaseParameters {
 		autoOpen = buffer.getBoolean("autoOpen", autoOpen);
 	}
 
+	@Override
 	public String toString() {
 		buffer.reset();
 		buffer.setParameter("outputPath", outputPath);
@@ -50,4 +68,14 @@ public class Parameters extends BaseParameters {
 		return buffer.toString();
 	}
 	
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add("outputPath",
+			"Path of the result file", "Full path of the result file.");
+		desc.add("autoOpen",
+			"Open the result file after completion", null);
+		return desc;
+	}
+
 }

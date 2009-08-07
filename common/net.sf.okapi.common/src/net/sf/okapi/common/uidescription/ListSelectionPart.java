@@ -24,16 +24,14 @@ import net.sf.okapi.common.ParameterDescriptor;
 
 /**
  * UI part descriptor for a string selection. This UI part supports the following
- * types: String.  
+ * types: String.
+ * <p>Use {@link #setDropDown(boolean)} to specify if the list should be a 
+ * drop-down list or not (it is not by default).
  */
 public class ListSelectionPart extends AbstractPart {
 
-	public static final int TYPE_SIMPLE = 0;
-	public static final int TYPE_COMBO = 1;
-	public static final int TYPE_RADIO = 2;
-	
 	private String[] choices;
-	private int listType = TYPE_SIMPLE;
+	private boolean dropDown = false;
 	
 	/**
 	 * Creates a new ListSelectionPart object with a given parameter descriptor.
@@ -72,19 +70,19 @@ public class ListSelectionPart extends AbstractPart {
 	}
 
 	/**
-	 * Gets the type of list to use.
-	 * @return the type of list to use.
+	 * Indicates if this list is a drop-down list.
+	 * @return true if this list is a drop-down list.
 	 */
-	public int getListType () {
-		return listType;
+	public boolean isDropDown () {
+		return dropDown;
 	}
 
 	/**
-	 * Sets the type of list to use.
-	 * @param listType the new type of list to use.
+	 * Sets the flag indicating if this list is a drop-down list.
+	 * @param value the new flag indicating if this list is a drop-down list.
 	 */
-	public void setListType (int listType) {
-		this.listType = listType;
+	public void setDropDown (boolean dropDown) {
+		this.dropDown = dropDown;
 	}
 
 }

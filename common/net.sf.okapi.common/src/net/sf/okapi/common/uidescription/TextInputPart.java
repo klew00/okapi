@@ -24,13 +24,26 @@ import net.sf.okapi.common.ParameterDescriptor;
 
 /**
  * UI part descriptor for a text input field. This UI part supports the following
- * types: Integer and String.  
+ * types: Integer and String.
+ * <p>Use {@link #setAllowEmpty(boolean)} to specify if the text can be empty. by
+ * default empty text is not allowed.
+ * <p>Use {@link #setPassword(boolean)} to specify if the text should be treated
+ * as a password text (e.g. hidden on input). By default the text is not treated
+ * as a password.
  */
 public class TextInputPart extends AbstractPart {
 
-	private boolean allowEmpty;
-	private boolean password;
+	private boolean allowEmpty = false;
+	private boolean password = false;
 
+	/**
+	 * Creates a new TextInputPart object with a given parameter descriptor.
+	 * @param paramDescriptor the parameter descriptor for this UI part.
+	 */
+	public TextInputPart (ParameterDescriptor paramDescriptor) {
+		super(paramDescriptor);
+	}
+	
 	/**
 	 * Creates a new TextInputPart object with a given parameter descriptor.
 	 * @param paramDescriptor the parameter descriptor for this UI part.

@@ -24,7 +24,10 @@ import net.sf.okapi.common.ParameterDescriptor;
 
 /**
  * UI part descriptor for a path. This UI part supports the following types:
- * String.  
+ * String.
+ * <p>Use {@link #setForSaveAs(boolean)} to specify if the path is for saving
+ * a file (by default it is assumed the path is for saving a file). That choice
+ * affect which browsing dialog is invoked when using the browse button.
  */
 public class PathInputPart extends AbstractPart {
 
