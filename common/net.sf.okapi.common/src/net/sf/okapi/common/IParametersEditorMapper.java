@@ -20,8 +20,14 @@
 
 package net.sf.okapi.common;
 
+import net.sf.okapi.common.uidescription.EditorDescription;
+
 /**
- * Common set of methods to manage parameters editors.
+ * Common set of methods to manage parameters editors and editor description providers.
+ * Editing parameters can be done by a dedicated editor or by a generic editor.
+ * This class is designed to manage these two types of class.
+ * It associates names of parameters classes to editor classes or editor description
+ * provider classes. This last type of class is used by the generic editor.
  */
 public interface IParametersEditorMapper {
 
@@ -37,14 +43,35 @@ public interface IParametersEditorMapper {
 	
 	/**
 	 * Removes a given editor from this mapper.
-	 * @param editorClass the class name of the editor to remove.
+	 * @param className the class name of the editor to remove.
 	 */
-	public void removeEditor (String editorClass);
+	public void removeEditor (String className);
 	
 	/**
 	 * Removes all editor mappings for this mapper.
 	 */
 	public void clearEditors ();
+
+	/**
+	 * Adds a new editor description provider mapping to this mapper.
+	 * @param descriptionProviderClass the class name of the editor description provider to add.
+	 * @param parametersClass the class name of the parameters this editor can edit.
+	 * If this class name is already listed, the exiting entry will be replaced by
+	 * this one.
+	 */
+	public void addDescriptionProvider (String descriptionProviderClass,
+		String parametersClass);
+	
+	/**
+	 * Removes a given editor description provider from this mapper.
+	 * @param className the class name of the editor description provider to remove.
+	 */
+	public void removeDescriptionProvider (String className);
+	
+	/**
+	 * Removes all editor mappings for this mapper.
+	 */
+	public void clearDescriptionProviders ();
 
 	/**
 	 * Creates an instance of the parameters editor for a given parameters class name. 
@@ -56,4 +83,6 @@ public interface IParametersEditorMapper {
 	 */
 	public IParametersEditor createParametersEditor (String parametersClass);
 	
+//	public EditorDescription getEditorDescription (String parametersClass);
+
 }

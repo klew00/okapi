@@ -33,12 +33,18 @@ public class ParametersEditorMapper implements IParametersEditorMapper {
 	 * Map of the editors for this mapper.
 	 */
 	protected LinkedHashMap<String, String> editorMap;
+	
+	/**
+	 * Map of the editor descriptions for this mapper.
+	 */
+	protected LinkedHashMap<String, String> descMap;
 
 	/**
 	 * Creates an empty ParametersEditorMapper object.
 	 */
 	public ParametersEditorMapper () {
 		editorMap = new LinkedHashMap<String, String>();
+		descMap = new LinkedHashMap<String, String>();
 	}
 	
 	public void addEditor (String editorClass,
@@ -47,20 +53,44 @@ public class ParametersEditorMapper implements IParametersEditorMapper {
 		editorMap.put(parametersClass, editorClass);
 	}
 
+	public void addDescriptionProvider (String descriptionProviderClass,
+		String parametersClass)
+	{
+		descMap.put(parametersClass, descriptionProviderClass);
+	}
+
 	public void clearEditors () {
 		editorMap.clear();
 	}
 
-	public void removeEditor (String editorClass) {
+	public void clearDescriptionProviders () {
+		descMap.clear();
+	}
+
+	public void removeEditor (String className) {
 		String found = null;
 		for ( String key : editorMap.keySet() ) {
-			if ( editorMap.get(key).equals(editorClass) ) {
+			if ( editorMap.get(key).equals(className) ) {
 				found = key;
 				break;
 			}
 		}
 		if ( found != null ) {
 			editorMap.remove(found);
+		}
+	}
+
+
+	public void removeDescriptionProvider (String className) {
+		String found = null;
+		for ( String key : descMap.keySet() ) {
+			if ( descMap.get(key).equals(className) ) {
+				found = key;
+				break;
+			}
+		}
+		if ( found != null ) {
+			descMap.remove(found);
 		}
 	}
 
