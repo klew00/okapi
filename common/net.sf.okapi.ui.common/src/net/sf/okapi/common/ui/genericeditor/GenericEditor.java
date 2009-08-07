@@ -295,16 +295,15 @@ public class GenericEditor {
 			}
 			else if ( ctrl instanceof List ) {
 				if ( description.getDescriptor(name) instanceof ListSelectionPart ) {
-					ListSelectionPart part = (ListSelectionPart)description.getDescriptor(name);
-					if ( part.isDropDown() ) {
-						if ( !saveComboControl((Combo)ctrl, part) ) {
-							return false;
-						}
+					if ( !saveListControl((List)ctrl, (ListSelectionPart)description.getDescriptor(name)) ) {
+						return false;
 					}
-					else {
-						if ( !saveListControl((List)ctrl, part) ) {
-							return false;
-						}
+				}
+			}
+			else if ( ctrl instanceof Combo ) {
+				if ( description.getDescriptor(name) instanceof ListSelectionPart ) {
+					if ( !saveComboControl((Combo)ctrl, (ListSelectionPart)description.getDescriptor(name)) ) {
+						return false;
 					}
 				}
 			}
