@@ -77,6 +77,7 @@ public class OpenXMLRoundTripTest {
 
 		ArrayList<String> themfiles = new ArrayList<String>();
 		zc = new ZipCompare();
+/*
 		themfiles.add("BoldWorld.docx");
 		themfiles.add("Deli.docx");
 		themfiles.add("DocProperties.docx");
@@ -95,6 +96,10 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("TextBoxes.docx");
 		themfiles.add("ExcelColors.xlsx");
 		themfiles.add("UTF8.docx");
+		themfiles.add("Practice2.docx");
+*/
+		themfiles.add("Hidden.docx");
+		themfiles.add("Practice2.docx");
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
@@ -176,8 +181,6 @@ public class OpenXMLRoundTripTest {
 				event = filter.next();
 				if (event!=null)
 				{
-//					if (event.getEventType()==EventType.START_SUBDOCUMENT) // DWH 4-16-09 was START_DOCUMENT
-// 6-27-09				writer.setParameters(filter.getParameters());
 					writer.handleEvent(event);
 				}
 				else
