@@ -46,7 +46,6 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	private int countSegsAdded;
 	private boolean isMultilingual;
 
-
 	public GenerateSimpleTmStep () {
 		params = new Parameters();
 	}
@@ -65,7 +64,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Generates simpleTm from multi lingual files.";
+		return "Generates a SimpleTM translation memory from multilingual input files.";
 	}
 
 	@Override
@@ -75,37 +74,31 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 
 	@Override
 	protected void handleStartBatch (Event event) {
-		if(params.tmPath==null || params.tmPath.trim().length()==0){
-			throw new OkapiBadStepInputException("Please provide a valid path and name for the simpleTm.");
+		if ( Util.isEmpty(params.getTmPath()) ) {
+			throw new OkapiBadStepInputException("Please provide a valid path and name for the TM.");
 		}
 	}
-
 	
 	@Override
 	protected void handleStartBatchItem (Event event) {
-		
 		trgLang = getContext().getTargetLanguage(0);
-	
 		if(simpleTm == null){
 			simpleTm = new Database();
-			simpleTm.create(params.tmPath, true, trgLang);
+			simpleTm.create(params.getTmPath(), true, trgLang);
 		}
 	}
 	
 	@Override
 	protected void handleEndBatchItem (Event event) {
-
 		logger.info(String.format("\nSIMPLE TM GENERATION FILE: %s", fileName ));
 		logger.info(String.format("Untranslatable text units = %d",countIsNotTranslatable));
 		logger.info(String.format("Translatable text units but failed to add = %d", countTuNotAdded));
 		logger.info(String.format("Text units added = %d", countTusAdded));
 		logger.info(String.format("Segments added = %d",countSegsAdded));
-
 	}
 
 	@Override
 	protected void handleEndBatch (Event event) {
-		
 		logger.info(String.format("\nSIMPLE TM GENERATION: "));
 		logger.info(String.format("Total untranslatable text units = %d",countIsNotTranslatable));
 		logger.info(String.format("Total text units (Translatable) that failed to add = %d", countTuNotAdded));

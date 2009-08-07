@@ -23,6 +23,7 @@ package net.sf.okapi.common;
 import java.util.LinkedHashMap;
 
 import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 /**
  * Common set of methods to manage parameters editors.
@@ -115,6 +116,29 @@ public class ParametersEditorMapper implements IParametersEditorMapper {
 				String.format("Cannot instantiate the editor '%s'", editorClass), e);
 		}
 		return editor;
+	}
+
+	public IEditorDescriptionProvider getDescriptionProvider(String parametersClass) {
+		String className = descMap.get(parametersClass);
+		if ( className == null ) return null;
+		// Else: instantiate the description provider
+		IEditorDescriptionProvider descProv = null;
+		try {
+			descProv = (IEditorDescriptionProvider)Class.forName(className).newInstance();
+		}
+		catch ( InstantiationException e ) {
+			throw new OkapiEditorCreationException(
+				String.format("Cannot instantiate the description provider '%s'", className), e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new OkapiEditorCreationException(
+				String.format("Cannot instantiate the description provider '%s'", className), e);
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new OkapiEditorCreationException(
+				String.format("Cannot instantiate the description provider '%s'", className), e);
+		}
+		return descProv;
 	}
 
 }

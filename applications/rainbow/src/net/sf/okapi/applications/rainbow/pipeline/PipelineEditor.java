@@ -32,6 +32,8 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.genericeditor.GenericEditor;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -68,6 +70,7 @@ public class PipelineEditor {
 	private Button btEditStep;
 	private Text edDescription;
 	private BaseContext context;
+	private GenericEditor gedit;
 	
 	public boolean edit (Shell parent,
 		Map<String, StepInfo> availableSteps,
@@ -381,34 +384,49 @@ public class PipelineEditor {
 			if ( n < 0 ) return;
 			StepInfo step = workSteps.get(n);
 			if ( step.paramsData == null ) {
-				// No parameters for this step
+				// No parameters data for this step
+				return;
+			}
+			if ( step.paramsClass == null ) {
+				// No parameters class defined
+				return;
+			}
+
+			// Instantiate a Parameters object for this step
+			IParameters params = (IParameters)Class.forName(step.paramsClass).newInstance();
+			
+			// Instantiate an editor object
+			IParametersEditor editor = null;
+			try { // Catch creation error so we can fall-back to default editor
+				editor = wrapper.getEditorMapper().createParametersEditor(step.paramsClass);
+			}
+			catch ( OkapiEditorCreationException e ) {
+				Dialogs.showError(shell, e.getMessage(), null);
+			}
+			if ( editor != null ) {
+				// Set it with the data from this step
+				params.fromString(step.paramsData);
+				// Edit the data
+				if ( !editor.edit(params, false, context) ) return; // Cancel
+				// Save the data
+				step.paramsData = params.toString();
 				return;
 			}
 			
-			if ( step.paramsClass != null ) {
-				// Instantiate an editor object
-				IParametersEditor editor = null;
-				try { // Catch creation error so we can fall-back to default editor
-					editor = wrapper.getEditorMapper().createParametersEditor(step.paramsClass);
-				}
-				catch ( OkapiEditorCreationException e ) {
-					Dialogs.showError(shell, e.getMessage(), null);
-				}
-				if ( editor != null ) {
-					// Instantiate a Parameters object for this step
-					IParameters params = editor.createParameters();
-					// Set it with the data from this step
-					params.fromString(step.paramsData);
-					// Edit the data
-					if ( !editor.edit(params, false, context) ) return; // Cancel
-					// Save the data
-					step.paramsData = params.toString();
-					return;
-				}
-				// Else: Fall thru to Properties-like editing
+			// Else: Try to use the generic editor
+			IEditorDescriptionProvider descProv = wrapper.getEditorMapper().getDescriptionProvider(step.paramsClass);
+			if ( descProv != null ) {
+				if ( gedit == null ) gedit = new GenericEditor();
+				// Set it with the data from this step
+				params.fromString(step.paramsData);
+				// Edit the data
+				if ( !gedit.edit(params, descProv, false, context) ) return; // Cancel
+				// Save the data
+				step.paramsData = params.toString();
+				return;
 			}
 
-			// Properties-like editing
+			// Else: Try the properties-like editor
 			InputDialog dlg  = new InputDialog(shell,
 				"Step Options ("+step.name+")",
 				"Parameters:",

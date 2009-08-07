@@ -20,47 +20,16 @@
 
 package net.sf.okapi.steps.generatesimpletm;
 
-import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
-	
-	private String tmPath;
-	
-	public Parameters () {
-		reset();
-	}
-	
-	public String getTmPath () {
-		return tmPath;
-	}
+public class ParametersUI implements IEditorDescriptionProvider {
 
-	public void setTmPath (String tmPath) {
-		this.tmPath = tmPath;
-	}
-
-	public void reset() {
-		tmPath = "";
-	}
-
-	public void fromString (String data) {
-		reset();
-		buffer.fromString(data);
-		tmPath = buffer.getString("tmPath", tmPath);
-	}
-
-	@Override
-	public String toString() {
-		buffer.reset();
-		buffer.setString("tmPath", tmPath);
-		return buffer.toString();
-	}
-	
-	@Override
-	public ParametersDescription getParametersDescription () {
-		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("tmPath", "Path of the TM", "Full path of the TM to generate.");
+	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("Simple TM Generation");
+		desc.addPathInputPart(paramDesc.get("tmPath"), "TM to Create", true);
 		return desc;
 	}
-	
+
 }

@@ -28,7 +28,12 @@ import net.sf.okapi.common.ParameterDescriptor;
  */
 public class ListSelectionPart extends AbstractPart {
 
+	public static final int TYPE_SIMPLE = 0;
+	public static final int TYPE_COMBO = 1;
+	public static final int TYPE_RADIO = 2;
+	
 	private String[] choices;
+	private int listType = TYPE_SIMPLE;
 	
 	/**
 	 * Creates a new ListSelectionPart object with a given parameter descriptor.
@@ -64,6 +69,22 @@ public class ListSelectionPart extends AbstractPart {
 	 */
 	public void setChoices (String[] choices) {
 		this.choices = choices;
+	}
+
+	/**
+	 * Gets the type of list to use.
+	 * @return the type of list to use.
+	 */
+	public int getListType () {
+		return listType;
+	}
+
+	/**
+	 * Sets the type of list to use.
+	 * @param listType the new type of list to use.
+	 */
+	public void setListType (int listType) {
+		this.listType = listType;
 	}
 
 }

@@ -29,6 +29,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -136,21 +137,17 @@ public class GenericEditor {
 		}
 
 		// Create the UI parts
-		Label label;
 		Composite cmp;
-		int HorizAlignFlag = 0;
+		int horizAlignFlag = 0;
 		if ( description.alignLabels() ) {
-			HorizAlignFlag = GridData.HORIZONTAL_ALIGN_END;
+			horizAlignFlag = GridData.HORIZONTAL_ALIGN_END;
 		}
 		
 		for ( AbstractPart part : description.getDescriptors().values() ) {
 			if ( part instanceof TextInputPart ) {
 				TextInputPart d = (TextInputPart)part;
 				cmp = lookupParent(d.getContainer());
-				label = new Label(cmp, SWT.NONE);
-				label.setText(d.getDisplayName());
-				label.setToolTipText(d.getShortDescription());
-				label.setLayoutData(new GridData(HorizAlignFlag));
+				setLabel(cmp, d, horizAlignFlag);
 				Text text = new Text(cmp, SWT.BORDER);
 				controls.put(d.getName(), text);
 				text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -170,10 +167,7 @@ public class GenericEditor {
 			else if ( part instanceof PathInputPart ) {
 				PathInputPart d = (PathInputPart)part;
 				cmp = lookupParent(d.getContainer());
-				label = new Label(cmp, SWT.NONE);
-				label.setText(d.getDisplayName());
-				label.setToolTipText(d.getShortDescription());
-				label.setLayoutData(new GridData(HorizAlignFlag));
+				setLabel(cmp, d, horizAlignFlag);
 				TextAndBrowsePanel ctrl = new TextAndBrowsePanel(cmp, SWT.NONE, false);
 				ctrl.setSaveAs(d.isForSaveAs());
 				ctrl.setTitle(d.getBrowseTitle());
@@ -184,17 +178,23 @@ public class GenericEditor {
 			else if ( part instanceof ListSelectionPart ) {
 				ListSelectionPart d = (ListSelectionPart)part;
 				cmp = lookupParent(d.getContainer());
-				label = new Label(cmp, SWT.NONE);
-				label.setText(d.getDisplayName());
-				label.setToolTipText(d.getShortDescription());
-				label.setLayoutData(new GridData(HorizAlignFlag|GridData.VERTICAL_ALIGN_BEGINNING));
-				List list = new List(cmp, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-				controls.put(d.getName(), list);
-				list.setLayoutData(new GridData(GridData.FILL_BOTH));
-				list.setEnabled(d.getWriteMethod()!=null);
+				if ( d.getListType() == ListSelectionPart.TYPE_SIMPLE ) {
+					setLabel(cmp, d, horizAlignFlag|GridData.VERTICAL_ALIGN_BEGINNING);
+					List list = new List(cmp, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+					controls.put(d.getName(), list);
+					list.setLayoutData(new GridData(GridData.FILL_BOTH));
+					list.setEnabled(d.getWriteMethod()!=null);
+				}
+				else {
+					setLabel(cmp, d, horizAlignFlag);
+					Combo combo = new Combo(cmp, SWT.BORDER | SWT.READ_ONLY);
+					controls.put(d.getName(), combo);
+					combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					combo.setEnabled(d.getWriteMethod()!=null);
+				}
 			}
 		}
-
+		
 		//--- Dialog-level buttons
 
 		SelectionAdapter okCancelActions = new SelectionAdapter() {
@@ -229,6 +229,16 @@ public class GenericEditor {
 		setData();
 	}
 
+	private void setLabel (Composite parent,
+		AbstractPart part,
+		int flag)
+	{
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(part.getDisplayName());
+		label.setToolTipText(part.getShortDescription());
+		label.setLayoutData(new GridData(flag));
+	}
+	
 	private void setData () {
 		for ( AbstractPart part : description.getDescriptors().values() ) {
 			if ( part instanceof TextInputPart ) {
@@ -245,7 +255,12 @@ public class GenericEditor {
 			}
 			else if ( part instanceof ListSelectionPart ) {
 				ListSelectionPart d = (ListSelectionPart)part;
-				setListControl((List)controls.get(d.getName()), d);
+				if ( d.getListType() == ListSelectionPart.TYPE_SIMPLE ) {
+					setListControl((List)controls.get(d.getName()), d);
+				}
+				else {
+					setComboControl((Combo)controls.get(d.getName()), d);
+				}
 			}
 		}
 	}
@@ -270,6 +285,21 @@ public class GenericEditor {
 				if ( description.getDescriptor(name) instanceof PathInputPart ) {
 					if ( !saveTextAndBrowseControl((TextAndBrowsePanel)ctrl, (PathInputPart)description.getDescriptor(name)) ) {
 						return false;
+					}
+				}
+			}
+			else if ( ctrl instanceof List ) {
+				if ( description.getDescriptor(name) instanceof ListSelectionPart ) {
+					ListSelectionPart part = (ListSelectionPart)description.getDescriptor(name);
+					if ( part.getListType() == ListSelectionPart.TYPE_SIMPLE ) {
+						if ( !saveListControl((List)ctrl, part) ) {
+							return false;
+						}
+					}
+					else {
+						if ( !saveComboControl((Combo)ctrl, part) ) {
+							return false;
+						}
 					}
 				}
 			}
@@ -368,6 +398,52 @@ public class GenericEditor {
 		return true;
 	}
 	
+	
+	private boolean saveListControl (List list, ListSelectionPart desc) {
+		try {
+			int n = list.getSelectionIndex();
+			if ( n > -1 ) {
+				desc.getWriteMethod().invoke(desc.getParent(), list.getItem(n));
+			}
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		return true;
+	}
+	
+	
+	private boolean saveComboControl (Combo combo, ListSelectionPart desc) {
+		try {
+			int n = combo.getSelectionIndex();
+			if ( n > -1 ) {
+				desc.getWriteMethod().invoke(desc.getParent(), combo.getItem(n));
+			}
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		return true;
+	}
+	
 	private void setInputControl (Text text, TextInputPart desc) {
 		try {
 			String tmp = "";
@@ -419,6 +495,35 @@ public class GenericEditor {
 		}
 	}
 	
+	private void setComboControl (Combo combo, ListSelectionPart desc) {
+		try {
+			if ( desc.getType().equals(String.class) ) {
+				String current = (String)desc.getReadMethod().invoke(desc.getParent());
+				if ( current == null ) current = "";
+				int found = -1;
+				int n = 0;
+				for ( String item : desc.getChoices() ) {
+					combo.add(item);
+					if ( item.equals(current) ) found = n;
+					n++;
+				}
+				if ( found > -1 ) {
+					combo.select(found);
+				}
+			}
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+
 	private void setCheckboxControl (Button button, CheckboxPart desc) {
 		try {
 			if ( desc.getType().equals(Boolean.class) ) {

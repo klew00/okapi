@@ -20,7 +20,7 @@
 
 package net.sf.okapi.common;
 
-import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 /**
  * Common set of methods to manage parameters editors and editor description providers.
@@ -83,6 +83,6 @@ public interface IParametersEditorMapper {
 	 */
 	public IParametersEditor createParametersEditor (String parametersClass);
 	
-//	public EditorDescription getEditorDescription (String parametersClass);
+	public IEditorDescriptionProvider getDescriptionProvider (String parametersClass);
 
 }
