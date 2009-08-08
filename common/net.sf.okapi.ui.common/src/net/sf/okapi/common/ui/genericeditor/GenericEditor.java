@@ -116,7 +116,7 @@ public class GenericEditor {
 			shell.setText(description.getCaption());
 		}
 		else { // Default caption
-			shell.setText("Configuration Editor");
+			shell.setText("Parameters");
 		}
 		
 		// Set a frame if there is no tab(s)
@@ -140,40 +140,46 @@ public class GenericEditor {
 		// Create the UI parts
 		boolean hasPathInput = false;
 		Composite cmp;
-		int horizAlignFlag = 0;
-		if ( description.alignLabels() ) {
-			horizAlignFlag = GridData.HORIZONTAL_ALIGN_END;
-		}
+		GridData gdTmp;
 		
 		for ( AbstractPart part : description.getDescriptors().values() ) {
 			if ( part instanceof TextInputPart ) {
 				TextInputPart d = (TextInputPart)part;
 				cmp = lookupParent(d.getContainer());
-				setLabel(cmp, d, horizAlignFlag);
+				setLabel(cmp, d, 0);
 				Text text = new Text(cmp, SWT.BORDER);
 				controls.put(d.getName(), text);
-				text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+				if ( part.isVertical() ) gdTmp.horizontalSpan = 2;
+				text.setLayoutData(gdTmp);
 				text.setEditable(d.getWriteMethod()!=null);
 				if ( d.isPassword() ) text.setEchoChar('*');
 			}
 			else if ( part instanceof CheckboxPart ) {
 				CheckboxPart d = (CheckboxPart)part;
 				cmp = lookupParent(d.getContainer());
-				new Label(cmp, SWT.NONE);
+				if ( !part.isVertical() ) new Label(cmp, SWT.NONE);
 				Button button = new Button(cmp, SWT.CHECK);
 				button.setToolTipText(d.getShortDescription());
 				controls.put(d.getName(), button);
+				if ( part.isVertical() ) {
+					gdTmp = new GridData();
+					gdTmp.horizontalSpan = 2;
+					button.setLayoutData(gdTmp);
+				}
 				button.setText(d.getDisplayName());
 				button.setEnabled(d.getWriteMethod()!=null);
 			}
 			else if ( part instanceof PathInputPart ) {
 				PathInputPart d = (PathInputPart)part;
 				cmp = lookupParent(d.getContainer());
-				setLabel(cmp, d, horizAlignFlag);
+				setLabel(cmp, d, 0);
 				TextAndBrowsePanel ctrl = new TextAndBrowsePanel(cmp, SWT.NONE, false);
 				ctrl.setSaveAs(d.isForSaveAs());
 				ctrl.setTitle(d.getBrowseTitle());
-				ctrl.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+				if ( part.isVertical() ) gdTmp.horizontalSpan = 2;
+				ctrl.setLayoutData(gdTmp);
 				controls.put(d.getName(), ctrl);
 				ctrl.setEditable(d.getWriteMethod()!=null);
 				hasPathInput = true;
@@ -182,17 +188,21 @@ public class GenericEditor {
 				ListSelectionPart d = (ListSelectionPart)part;
 				cmp = lookupParent(d.getContainer());
 				if ( d.isDropDown() ) {
-					setLabel(cmp, d, horizAlignFlag);
+					setLabel(cmp, d, 0);
 					Combo combo = new Combo(cmp, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
 					controls.put(d.getName(), combo);
-					combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+					if ( part.isVertical() ) gdTmp.horizontalSpan = 2;
+					combo.setLayoutData(gdTmp);
 					combo.setEnabled(d.getWriteMethod()!=null);
 				}
 				else {
-					setLabel(cmp, d, horizAlignFlag|GridData.VERTICAL_ALIGN_BEGINNING);
+					setLabel(cmp, d, GridData.VERTICAL_ALIGN_BEGINNING);
 					List list = new List(cmp, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 					controls.put(d.getName(), list);
-					list.setLayoutData(new GridData(GridData.FILL_BOTH));
+					gdTmp = new GridData(GridData.FILL_BOTH);
+					if ( part.isVertical() ) gdTmp.horizontalSpan = 2;
+					list.setLayoutData(gdTmp);
 					list.setEnabled(d.getWriteMethod()!=null);
 				}
 			}
@@ -214,8 +224,7 @@ public class GenericEditor {
 			};
 		};
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, okCancelActions, true);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		//gdTmp.horizontalSpan = 2;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
 		pnlActions.btOK.setEnabled(!readOnly);
 		if ( !readOnly ) {
@@ -239,9 +248,16 @@ public class GenericEditor {
 		int flag)
 	{
 		Label label = new Label(parent, SWT.NONE);
-		label.setText(part.getDisplayName());
+		String tmp = part.getDisplayName();
+		if ( tmp != null ) {
+			if ( !tmp.endsWith(":") ) tmp += ":";
+			label.setText(tmp);
+		}
 		label.setToolTipText(part.getShortDescription());
-		label.setLayoutData(new GridData(flag));
+		if ( part.isLabelFlushed() ) flag |= GridData.HORIZONTAL_ALIGN_END;
+		GridData gdTmp = new GridData(flag);
+		if ( part.isVertical() ) gdTmp.horizontalSpan = 2; 
+		label.setLayoutData(gdTmp);
 	}
 	
 	private void setData () {

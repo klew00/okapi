@@ -35,7 +35,9 @@ public abstract class AbstractPart implements IParameterDescriptor {
 
 	protected ParameterDescriptor paramDescriptor;
 	protected IContainerPart container;
-	
+	protected boolean vertical = false;
+	protected boolean labelFlushed = false;
+
 	/**
 	 * Creates a new BasePart object with a given parameter description. 
 	 * @param paramDescriptor the parameter description for this UI part.
@@ -46,7 +48,7 @@ public abstract class AbstractPart implements IParameterDescriptor {
 		}
 		this.paramDescriptor = paramDescriptor;
 		checkType();
-}
+	}
 
 	public String getDisplayName () {
 		return paramDescriptor.getDisplayName();
@@ -82,6 +84,39 @@ public abstract class AbstractPart implements IParameterDescriptor {
 
 	public void setShortDescription (String shortDescription) {
 		paramDescriptor.setShortDescription(shortDescription);
+	}
+
+	/**
+	 * Indicates if this UI part should be arranged vertically. By default
+	 * it is not.
+	 * @return true if this UI part should be arranged vertically.
+	 */
+	public boolean isVertical () {
+		return vertical;
+	}
+
+	/**
+	 * Sets the flag indicating if this UI part should be arranged vertically.
+	 * @param vertical the new flag indicating if this UI part should be arranged vertically.
+	 */
+	public void setVertical (boolean vertical) {
+		this.vertical = vertical;
+	}
+
+	/**
+	 * Indicates if the label of this UI part should be flushed next to the part. 
+	 * @return true if the label of this UI part should be flushed next to the part.
+	 */
+	public boolean isLabelFlushed () {
+		return labelFlushed;
+	}
+
+	/**
+	 * Sets the flag indicating if the label of this UI part should be flushed next to the part.
+	 * @param labelFlushed the new flag indicating if the label of this UI part should be flushed next to the part.
+	 */
+	public void setLabelFlushed (boolean labelFlushed) {
+		this.labelFlushed = labelFlushed;
 	}
 
 	/**

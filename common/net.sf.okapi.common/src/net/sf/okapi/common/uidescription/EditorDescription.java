@@ -26,10 +26,11 @@ import java.util.Map;
 import net.sf.okapi.common.ParameterDescriptor;
 
 public class EditorDescription {
-
+	
 	private String caption;
-	private boolean alignLabels;
 	private LinkedHashMap<String, AbstractPart> descriptors;
+	private boolean defaultLabelFlushed = false;
+	private boolean defaultVertical = false;
 	
 	/**
 	 * Creates a new EditorDescription object.
@@ -48,6 +49,23 @@ public class EditorDescription {
 	}
 	
 	/**
+	 * Creates a new EditorDescription object with a given caption and
+	 * given default options.
+	 * @param caption the caption of the editor.
+	 * @param defaultVertical default value for this option.
+	 * @param defaultLabelFlushed default value for this option.
+	 */
+	public EditorDescription (String caption,
+		boolean defaultVertical,
+		boolean defaultLabelFlushed)
+	{
+		descriptors = new LinkedHashMap<String, AbstractPart>();
+		setCaption(caption);
+		this.defaultVertical = defaultVertical;
+		this.defaultLabelFlushed = defaultLabelFlushed;
+	}
+	
+	/**
 	 * Gets the caption for this editor.
 	 * @return the caption for this editor.
 	 */
@@ -63,22 +81,6 @@ public class EditorDescription {
 		this.caption = caption;
 	}
 	
-	/**
-	 * Indicates if the labels for this editor should be aligned.
-	 * @return true if the labels for this editor should be aligned, false otherwise.
-	 */
-	public boolean alignLabels () {
-		return alignLabels;
-	}
-
-	/**
-	 * Sets the flag indicating if the labels for this editor should be aligned.
-	 * @param value true if the labels for this editor should be aligned, false otherwise.
-	 */
-	public void setAlignLabels (boolean value) {
-		alignLabels = value;
-	}
-
 	/**
 	 * Gets a map of the descriptor of all UI parts for this editor.
 	 * @return a map of all descriptor of the UI parts.
@@ -108,6 +110,8 @@ public class EditorDescription {
 		boolean isPassword)
 	{
 		TextInputPart desc = new TextInputPart(paramDescriptor, allowEmpty, isPassword);
+		desc.setVertical(defaultVertical);
+		desc.setLabelFlushed(defaultLabelFlushed);
 		descriptors.put(desc.getName(), desc);
 		return desc;
 	}
@@ -119,6 +123,8 @@ public class EditorDescription {
 	 */
 	public CheckboxPart addCheckboxPart (ParameterDescriptor paramDescriptor) {
 		CheckboxPart desc = new CheckboxPart(paramDescriptor);
+		desc.setVertical(defaultVertical);
+		desc.setLabelFlushed(defaultLabelFlushed);
 		descriptors.put(desc.getName(), desc);
 		return desc;
 	}
@@ -133,6 +139,8 @@ public class EditorDescription {
 		String[] choices)
 	{
 		ListSelectionPart desc = new ListSelectionPart(paramDescriptor, choices);
+		desc.setVertical(defaultVertical);
+		desc.setLabelFlushed(defaultLabelFlushed);
 		descriptors.put(desc.getName(), desc);
 		return desc;
 	}
@@ -149,6 +157,8 @@ public class EditorDescription {
 		boolean forSaveAs)
 	{
 		PathInputPart desc = new PathInputPart(paramDescriptor, browseTitle, forSaveAs);
+		desc.setVertical(defaultVertical);
+		desc.setLabelFlushed(defaultLabelFlushed);
 		descriptors.put(desc.getName(), desc);
 		return desc;
 	}

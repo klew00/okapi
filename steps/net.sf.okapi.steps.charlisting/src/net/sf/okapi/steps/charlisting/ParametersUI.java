@@ -27,7 +27,7 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
-		EditorDescription desc = new EditorDescription("Used Characters Listing");
+		EditorDescription desc = new EditorDescription("Used Characters Listing", true, false);
 		desc.addPathInputPart(paramDesc.get("outputPath"), "Result File", true);
 		desc.addCheckboxPart(paramDesc.get("autoOpen"));
 		return desc;

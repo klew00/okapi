@@ -24,5 +24,9 @@ package net.sf.okapi.common.uidescription;
  * Common type for all containers UI parts (e.g. tabs, groups, etc.).
  */
 public interface IContainerPart {
+	
+	public boolean getDefaultVertical ();
+	
+	public boolean getDefaultLabelFlushed ();
 
 }
