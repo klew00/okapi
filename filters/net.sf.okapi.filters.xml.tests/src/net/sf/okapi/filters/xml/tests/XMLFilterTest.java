@@ -48,11 +48,15 @@ public class XMLFilterTest {
 
 	private XMLFilter filter;
 	private GenericContent fmt;
+	private String root;
 
 	@Before
 	public void setUp() {
 		filter = new XMLFilter();
 		fmt = new GenericContent();
+		URL url = XMLFilterTest.class.getResource("/test01.xml");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -145,6 +149,13 @@ public class XMLFilterTest {
 
 	@Test
 	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"test01.xml", null),
+			"UTF-8", "en", "en"));
+	}
+	
+	@Test
+	public void testStartDocumentFromList () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r"
 			+ "<doc>text</doc>";
 		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(snippet));
@@ -319,10 +330,6 @@ public class XMLFilterTest {
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {
 		// Read all files in the data directory
-		URL url = XMLFilterTest.class.getResource("/test01.xml");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"test01.xml", null));
 		list.add(new InputDocument(root+"test02.xml", null));

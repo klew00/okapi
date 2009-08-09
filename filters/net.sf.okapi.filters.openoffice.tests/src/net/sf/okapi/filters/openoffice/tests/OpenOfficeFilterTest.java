@@ -31,6 +31,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -69,6 +70,13 @@ public class OpenOfficeFilterTest {
 			"UTF-8", "en", "en", 1);
 		assertNotNull(tu);
 		assertEquals("Heading 1", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"TestDocument01.odt", null),
+			"UTF-8", "en", "en"));
 	}
 	
 	@Test

@@ -22,6 +22,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.filters.openxml.OpenXMLFilter;
+import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
 import org.junit.Before;
@@ -32,12 +38,18 @@ import static org.junit.Assert.*;
 /**
  * This tests the Office 2007 configuration files that drive the OpenXMLFilter.
  */
-
 public class OpenXMLConfigurationTest {
 	
+	private OpenXMLFilter filter;
+	private String root;
+
 	@Before
 	public void setUp() throws Exception {
-		
+		filter = new OpenXMLFilter();
+		URL url = OpenXMLConfigurationTest.class.getResource("/net/sf/okapi/filters/openxml/tests/anchor.txt");
+		root = Util.getDirectoryName(url.getPath());
+		int n = root.indexOf("/bin/");
+		root = root.substring(0, n) + "/data/";
 	}
 	
 	@Test
@@ -81,4 +93,12 @@ public class OpenXMLConfigurationTest {
 		attributes.put("w:val", "content-language");
 		assertTrue(rules.isWritableLocalizableAttribute("a:rpr", "lang", attributes));
 	}
+
+	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"BoldWorld.docx", null),
+			"UTF-8", "en", "en"));
+	}
+	
 }

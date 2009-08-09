@@ -29,6 +29,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.filters.tests.FilterTestDriver;
@@ -42,10 +43,14 @@ import static org.junit.Assert.*;
 public class PropertiesFilterTest {
 	
 	private PropertiesFilter filter;
+	private String root;
 
 	@Before
 	public void setUp() {
 		filter = new PropertiesFilter();
+		URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -60,10 +65,6 @@ public class PropertiesFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.properties", null));
 		list.add(new InputDocument(root+"Test02.properties", "okf_properties@Test02.fprm"));
@@ -74,6 +75,13 @@ public class PropertiesFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
 	}
 
+	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"Test01.properties", null),
+			"UTF-8", "en", "en"));
+	}
+	
 	@Test
 	public void testLineBreaks_CR () {
 		String snippet = "Key1=Text1\rKey2=Text2\r";

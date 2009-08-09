@@ -35,6 +35,7 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.regex.Parameters;
 import net.sf.okapi.filters.regex.RegexFilter;
@@ -50,19 +51,26 @@ import org.junit.Test;
 public class RegexFilterTest {
 	
 	private RegexFilter filter;
+	private String root;
 	
 	@Before
 	public void setUp() {
 		filter = new RegexFilter();
+		URL url = RegexFilterTest.class.getResource("/Test01_stringinfo_en.info");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"Test01_stringinfo_en.info", null),
+			"UTF-8", "en", "en"));
+	}
+	
+	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = RegexFilterTest.class.getResource("/Test01_stringinfo_en.info");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01_srt_en.srt", "okf_regex@SRT.fprm"));
 		list.add(new InputDocument(root+"Test01_stringinfo_en.info", "okf_regex@StringInfo.fprm"));

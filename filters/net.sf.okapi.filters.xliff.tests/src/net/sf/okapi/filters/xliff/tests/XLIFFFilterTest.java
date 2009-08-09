@@ -48,11 +48,15 @@ public class XLIFFFilterTest {
 
 	private XLIFFFilter filter;
 	private GenericContent fmt;
+	private String root;
 
 	@Before
 	public void setUp() {
 		filter = new XLIFFFilter();
 		fmt = new GenericContent();
+		URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -77,6 +81,13 @@ public class XLIFFFilterTest {
 
 	@Test
 	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"JMP-11-Test01.xlf", null),
+			"UTF-8", "en", "en"));
+	}
+	
+	@Test
+	public void testStartDocumentFromList () {
 		StartDocument sd = FilterTestDriver.getStartDocument(createSimpleXLIFF());
 		assertNotNull(sd);
 		assertNotNull(sd.getEncoding());
@@ -213,10 +224,6 @@ public class XLIFFFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"JMP-11-Test01.xlf", null));
 		//list.add(new InputDocument(root+"Manual-12-AltTrans.xlf", null));

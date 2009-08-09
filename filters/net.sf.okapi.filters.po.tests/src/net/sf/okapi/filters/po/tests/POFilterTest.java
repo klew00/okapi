@@ -34,6 +34,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -49,10 +50,14 @@ import static org.junit.Assert.*;
 public class POFilterTest {
 	
 	private POFilter filter;
+	private String root;
 	
 	@Before
 	public void setUp() {
 		filter = new POFilter();
+		URL url = POFilterTest.class.getResource("/Test01.po");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -64,6 +69,13 @@ public class POFilterTest {
 		assertTrue(list.size()>0);
 	}
 
+	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"Test01.po", null),
+			"UTF-8", "en", "en"));
+	}
+	
 	@Test
 	public void testOuputOptionLine_JustFormat () {
 		String snippet = "#, c-format\n"
@@ -239,10 +251,6 @@ public class POFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = POFilterTest.class.getResource("/Test01.po");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.po", null));
 		list.add(new InputDocument(root+"Test02.po", null));

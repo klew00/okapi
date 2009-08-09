@@ -21,6 +21,8 @@
 package net.sf.okapi.filters.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -625,6 +627,53 @@ public class FilterTestDriver {
 			if ( filter != null ) filter.close();
 		}
 		return null;
+	}
+
+	public static boolean testStartDocument (IFilter filter,
+		InputDocument doc,
+		String defaultEncoding,
+		String srcLang,
+		String trgLang)
+	{
+		try {
+			// Load parameters if needed
+			if  (doc.paramFile == null  || doc.paramFile == "")  {
+				IParameters params = filter.getParameters();
+				if ( params != null ) params.reset();
+			}
+			else {
+				String root = Util.getDirectoryName(doc.path);
+				IParameters params = filter.getParameters();
+				if ( params != null ) params.load(Util.toURI(root+"/"+doc.paramFile), false);
+			}
+			
+			// Open the input
+			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLang, trgLang));
+			// Process the document
+			Event event;
+			while ( filter.hasNext() ) {
+				event = filter.next();
+				assertTrue("First event is not a StartDocument event.", event.getEventType()==EventType.START_DOCUMENT);
+				StartDocument sd = (StartDocument)event.getResource();
+				assertNotNull("No StartDocument", sd);
+				assertNotNull("Name is null", sd.getName());
+				assertNotNull("Encoding is null", sd.getEncoding());
+				assertNotNull("ID is null", sd.getId());
+				assertNotNull("Language is null", sd.getLanguage());
+				assertNotNull("Linebreak is null", sd.getLineBreak());
+				assertNotNull("Filter Parameters is null", sd.getFilterParameters());
+				assertNotNull("FilterWriter is null", sd.getFilterWriter());
+				assertNotNull("Mime type is null", sd.getMimeType());
+				return true;
+			}
+		}
+		catch ( Throwable e ) {
+			System.err.println(e.getMessage());
+		}
+		finally {
+			if ( filter != null ) filter.close();
+		}
+		return false;
 	}
 
 	/**
