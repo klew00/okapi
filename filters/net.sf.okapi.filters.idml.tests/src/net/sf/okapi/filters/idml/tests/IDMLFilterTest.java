@@ -30,6 +30,7 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.filters.idml.IDMLFilter;
+import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
 
@@ -39,10 +40,14 @@ import org.junit.Test;
 public class IDMLFilterTest {
 
 	private IDMLFilter filter;
+	private String root;
 
 	@Before
 	public void setUp() {
 		filter = new IDMLFilter();
+		URL url = IDMLFilterTest.class.getResource("/Test01.idml");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -55,12 +60,15 @@ public class IDMLFilterTest {
 	}
 
 	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"Test01.idml", null),
+			"UTF-8", "en", "en"));
+	}
+	
+	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = IDMLFilterTest.class.getResource("/Test01.idml");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.idml", null));
 		list.add(new InputDocument(root+"helloworld-1.idml", null));

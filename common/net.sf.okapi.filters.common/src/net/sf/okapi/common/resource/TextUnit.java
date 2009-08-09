@@ -198,8 +198,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	public Property getSourceProperty (String name) {
-		if ( source.properties == null ) return null;
-		return source.properties.get(name);
+		return source.getProperty(name);
 	}
 
 	public Property setSourceProperty (Property property) {
@@ -215,8 +214,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 	
 	public boolean hasSourceProperty (String name) {
-		if ( source.properties == null ) return false;
-		return source.properties.containsKey(name);
+		return source.hasProperty(name);
 	}
 
 	public Property getTargetProperty (String language,
@@ -244,10 +242,7 @@ public class TextUnit implements INameable, IReferenceable {
 	
 	public Set<String> getTargetPropertyNames (String language) {
 		TextContainer tc = createTarget(language, false, IResource.CREATE_EMPTY);
-		if ( tc.properties == null ) {
-			tc.properties = new Hashtable<String, Property>(); 
-		}
-		return tc.properties.keySet();
+		return tc.getPropertyNames();
 	}
 
 	public boolean hasTargetProperty (String language,
@@ -330,6 +325,9 @@ public class TextUnit implements INameable, IReferenceable {
 	 * @return the source object that has been set.
 	 */
 	public TextContainer setSource (TextContainer textContainer) {
+		if ( textContainer == null ) {
+			throw new NullPointerException("The source container of a TextUnit cannot be null.");
+		}
 		source = textContainer;
 		return source;
 	}

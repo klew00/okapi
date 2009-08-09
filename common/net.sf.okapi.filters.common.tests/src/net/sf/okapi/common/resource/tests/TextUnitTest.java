@@ -31,7 +31,6 @@ import net.sf.okapi.common.resource.TextUnit;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-
 public class TextUnitTest {
 
 	@Test

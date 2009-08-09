@@ -177,6 +177,7 @@ public class IDMLFilter implements IFilter {
 			nextAction = NextAction.NEXTINZIP;
 			
 			StartDocument startDoc = new StartDocument(docId);
+			startDoc.setEncoding("UTF-8", false); // Default
 			startDoc.setName(docURI.getPath());
 			startDoc.setLanguage(srcLang);
 			startDoc.setMimeType(MIMETYPE);

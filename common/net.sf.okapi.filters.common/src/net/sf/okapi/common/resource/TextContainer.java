@@ -35,16 +35,15 @@ import net.sf.okapi.common.annotation.IAnnotation;
  */
 public class TextContainer extends TextFragment {
 
-	protected Hashtable<String, Property> properties;
-	protected Annotations annotations;
-	protected ArrayList<Segment> segments;
+	private Hashtable<String, Property> properties;
+	private Annotations annotations;
+	private ArrayList<Segment> segments;
 
 	/**
 	 * Creates a new empty TextContainer object.
 	 */
 	public TextContainer () {
 		super();
-		annotations = new Annotations();
 	}
 
 	/**
@@ -53,7 +52,6 @@ public class TextContainer extends TextFragment {
 	 */
 	public TextContainer (String text) {
 		super(text);
-		annotations = new Annotations();
 	}
 	
 	/**
@@ -160,10 +158,12 @@ public class TextContainer extends TextFragment {
 	}
 
 	public <A extends IAnnotation> A getAnnotation (Class<A> type) {
+		if ( annotations == null ) return null;
 		return annotations.get(type);
 	}
 
 	public void setAnnotation (IAnnotation annotation) {
+		if ( annotations == null ) annotations = new Annotations();
 		annotations.set(annotation);
 	}
 
