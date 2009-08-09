@@ -37,6 +37,8 @@ public abstract class AbstractPart implements IParameterDescriptor {
 	protected IContainerPart container;
 	protected boolean vertical = false;
 	protected boolean labelFlushed = false;
+	protected AbstractPart masterPart;
+	protected boolean enabledOnSelection;
 
 	/**
 	 * Creates a new BasePart object with a given parameter description. 
@@ -133,6 +135,38 @@ public abstract class AbstractPart implements IParameterDescriptor {
 	 */
 	public void setContainer (IContainerPart container) {
 		this.container = container;
+	}
+	
+	/**
+	 * Binds this part to a master part. Use this to make this part be enabled
+	 * or disabled depending on the specified master part. 
+	 * @param masterPart the UI part that enables or disables this part.
+	 * @param enabledOnSelection true if this part is enabled only when the master
+	 * part is selected, false to enable this part when the master part is not selected.
+	 */
+	public void setMasterPart (AbstractPart masterPart,
+		boolean enabledOnSelection)
+	{
+		this.masterPart = masterPart;
+		this.enabledOnSelection = enabledOnSelection;
+	}
+	
+	/**
+	 * Gets the master part associated with this UI part.
+	 * @return the master part associated with this UI part, or null if there
+	 * is none.
+	 */
+	public AbstractPart getMasterPart () {
+		return masterPart;
+	}
+	
+	/**
+	 * Indicates how this part is enabled in relation to its master part.
+	 * @return true if this part is enabled only when the master
+	 * part is selected, false to enable this part when the master part is not selected.
+	 */
+	public boolean isEnabledOnSelection () {
+		return enabledOnSelection;
 	}
 
 	/**

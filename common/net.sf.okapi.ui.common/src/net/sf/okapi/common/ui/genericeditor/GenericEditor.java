@@ -21,6 +21,7 @@
 package net.sf.okapi.common.ui.genericeditor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.eclipse.swt.SWT;
@@ -33,8 +34,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -62,7 +65,78 @@ public class GenericEditor {
 	private IParameters params;
 	private EditorDescription description;
 	private Hashtable<String, Control> controls;
+	private Hashtable<Control, MasterItem> masters;
 	private Composite mainCmp;
+
+	/**
+	 * Internal class to store master control and its slaves.
+	 */
+	private class MasterItem {
+		
+		public ArrayList<AbstractPart> slaves;
+		
+		public MasterItem () {
+			slaves = new ArrayList<AbstractPart>();
+		}
+		
+		public void addSlave (AbstractPart part) {
+			slaves.add(part);
+		}
+	}
+	
+	/**
+	 * Internal class to handle the master/slaves enabling/disabling.
+	 */
+	private class CtrlSelectionListener implements Listener {
+		
+		private boolean enabledOnSelection;
+		private Button masterCtrl;
+
+		public CtrlSelectionListener (Control masterCtrl,
+			boolean enabledOnSelection)
+		{
+			this.masterCtrl = (Button)masterCtrl;
+			this.enabledOnSelection = enabledOnSelection;
+		}
+		
+		public void handleEvent (Event event) {
+			if ( enabledOnSelection ) {
+				propagate(masterCtrl, masterCtrl.getSelection());
+			}
+			else {
+				propagate(masterCtrl, !masterCtrl.getSelection());
+			}
+		}
+		
+		private void propagate (Control ctrl, boolean enabled) {
+			Button button = (Button)ctrl;
+			MasterItem mi = masters.get(button);
+			for ( AbstractPart part : mi.slaves ) {
+				Control slaveCtrl = controls.get(part.getName());
+				if ( masters.containsKey(slaveCtrl) ) {
+					slaveCtrl.setEnabled(enabled);
+					if ( part.isEnabledOnSelection() ) {
+						if ( enabled ) propagate(slaveCtrl, button.getSelection());
+						else propagate(slaveCtrl, false);
+					}
+					else {
+						if ( enabled ) propagate(slaveCtrl, !button.getSelection());
+						else propagate(slaveCtrl, false);
+					}
+				}
+				else {
+					if ( part.isEnabledOnSelection() ) {
+						if ( enabled ) slaveCtrl.setEnabled(button.getSelection());
+						else slaveCtrl.setEnabled(false);
+					}
+					else {
+						if ( enabled ) slaveCtrl.setEnabled(!button.getSelection());
+						else slaveCtrl.setEnabled(false);
+					}
+				}
+			}
+		}
+	}
 
 	public boolean edit (IParameters paramsObject,
 		IEditorDescriptionProvider descProvider,
@@ -109,7 +183,9 @@ public class GenericEditor {
 			throw new OkapiEditorCreationException(
 				"This configuration cannot be edited with the generic editor because the UI description could not be created.");
 		}
+	
 		controls = new Hashtable<String, Control>();
+		masters = new Hashtable<Control, MasterItem>();
 		
 		// Set caption is it is provided
 		if ( description.getCaption() != null ) {
@@ -143,6 +219,7 @@ public class GenericEditor {
 		GridData gdTmp;
 		
 		for ( AbstractPart part : description.getDescriptors().values() ) {
+			// Create the control for the given part
 			if ( part instanceof TextInputPart ) {
 				TextInputPart d = (TextInputPart)part;
 				cmp = lookupParent(d.getContainer());
@@ -206,6 +283,11 @@ public class GenericEditor {
 					list.setEnabled(d.getWriteMethod()!=null);
 				}
 			}
+
+			// Update the list of observers if needed
+			if ( part.getMasterPart() != null ) {
+				addObserver(part);
+			}
 		}
 		
 		//--- Dialog-level buttons
@@ -223,7 +305,7 @@ public class GenericEditor {
 				shell.close();
 			};
 		};
-		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, okCancelActions, true);
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, okCancelActions, false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
 		pnlActions.btOK.setEnabled(!readOnly);
@@ -241,6 +323,28 @@ public class GenericEditor {
 		}
 		Dialogs.centerWindow(shell, parent);
 		setData();
+	}
+	
+	private void addObserver (AbstractPart part) {
+		// Add a listener to the master control
+		AbstractPart masterPart = part.getMasterPart();
+		Control masterCtrl = controls.get(masterPart.getName());
+		if ( !(masterCtrl instanceof Button) ) {
+			throw new OkapiEditorCreationException(String.format(
+				"The master UI part for the part '%s' cannot be used as a toggle switch.", part.getName()));
+		}
+		masterCtrl.addListener(SWT.Selection,
+			new CtrlSelectionListener(masterCtrl, part.isEnabledOnSelection()));
+		
+		// Add the master control to the list of masters
+		// This will be used later to cascade setEnabled()
+		MasterItem mi = masters.get(masterCtrl);
+		if ( mi == null ) {
+			mi = new MasterItem();
+			masters.put(masterCtrl, mi);
+		}
+		// Update the list of slaves for the given master
+		mi.addSlave(part);
 	}
 
 	private void setLabel (Composite parent,
@@ -261,6 +365,9 @@ public class GenericEditor {
 	}
 	
 	private void setData () {
+		// Create list to enumerate all bound parts
+		ArrayList<AbstractPart> list = new ArrayList<AbstractPart>();
+		
 		for ( AbstractPart part : description.getDescriptors().values() ) {
 			if ( part instanceof TextInputPart ) {
 				TextInputPart d = (TextInputPart)part;
@@ -283,6 +390,20 @@ public class GenericEditor {
 					setListControl((List)controls.get(d.getName()), d);
 				}
 			}
+			
+			if ( part.getMasterPart() != null ) list.add(part);
+		}
+
+		for ( int i=list.size()-1; i>=0; i-- ) {
+			AbstractPart slavePart = list.get(i);
+			AbstractPart masterPart = slavePart.getMasterPart();
+			Button masterCtrl = (Button)controls.get(masterPart.getName());
+			Control slaveCtrl = controls.get(list.get(i).getName());
+			if ( masterCtrl.isEnabled() ) {
+				if ( slavePart.isEnabledOnSelection() ) slaveCtrl.setEnabled(masterCtrl.getSelection());
+				else slaveCtrl.setEnabled(!masterCtrl.getSelection());
+			}
+			
 		}
 	}
 	
