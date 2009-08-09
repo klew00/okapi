@@ -79,6 +79,7 @@ public class PlainTextFilterTest {
 	
 	private PlainTextFilter filter;
 	private FilterTestDriver testDriver;
+	private String root;
 	
 	@Before
 	public void setUp() {
@@ -90,6 +91,10 @@ public class PlainTextFilterTest {
 		
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
+
+		URL url = PlainTextFilterTest.class.getResource("/cr.txt");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -370,12 +375,15 @@ public class PlainTextFilterTest {
 	}
 	
 	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"cr.txt", null),
+			"UTF-8", "en", "en"));
+	}
+	
+	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = PlainTextFilterTest.class.getResource("/cr.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
 		list.add(new InputDocument(root + "cr.txt", ""));

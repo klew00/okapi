@@ -47,10 +47,14 @@ import org.junit.Test;
 public class DTDFilterTest {
 
 	private DTDFilter filter;
+	private String root;
 
 	@Before
 	public void setUp() {
 		filter = new DTDFilter();
+		URL url = DTDFilterTest.class.getResource("/Test01.dtd");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -62,6 +66,13 @@ public class DTDFilterTest {
 		assertTrue(list.size()>0);
 	}
 
+	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"Test01.dtd", null),
+			"UTF-8", "en", "en"));
+	}
+	
 	@Test
 	public void testSimpleEntry () {
 		String snippet = "<!--Comment-->\n<!ENTITY entry1 \"Text1\"><!ENTITY test2 \"text2\">";
@@ -110,10 +121,6 @@ public class DTDFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = DTDFilterTest.class.getResource("/Test01.dtd");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.dtd", null));
 		list.add(new InputDocument(root+"Test02.dtd", null));

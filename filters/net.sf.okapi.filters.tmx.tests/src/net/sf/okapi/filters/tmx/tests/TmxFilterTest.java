@@ -35,6 +35,7 @@ public class TmxFilterTest {
 
 	private TmxFilter filter;
 	private FilterTestDriver testDriver;
+	private String root;
 	
 	String simpleSnippet = "<?xml version=\"1.0\"?>\r"
 		+ "<!-- document level comment --><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello Universe!</seg></tuv></tu></body></tmx>\r";
@@ -86,6 +87,9 @@ public class TmxFilterTest {
 		testDriver = new FilterTestDriver();
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
+		URL url = TmxFilterTest.class.getResource("/Paragraph_TM.tmx");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 	
 	@Test
@@ -241,6 +245,13 @@ public class TmxFilterTest {
 	
 	@Test
 	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"Paragraph_TM.tmx", null),
+			"UTF-8", "en", "en"));
+	}
+	
+	@Test
+	public void testStartDocumentFromList () {
 		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us","fr-fr"));
 		assertNotNull(sd);
 		assertNotNull(sd.getEncoding());
@@ -393,7 +404,6 @@ public class TmxFilterTest {
 	filter.close();
 	return list;
 	}
-
 	
 	//--without specifying target language--
 	private ArrayList<Event> getEvents(String snippet, String srcLang){
@@ -405,16 +415,11 @@ public class TmxFilterTest {
 		}
 		filter.close();
 		return list;
-		}	
-	
+	}	
 	
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {
 		// Read all files in the data directory
-		URL url = TmxFilterTest.class.getResource("/Paragraph_TM.tmx");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Paragraph_TM.TMX", null));
 

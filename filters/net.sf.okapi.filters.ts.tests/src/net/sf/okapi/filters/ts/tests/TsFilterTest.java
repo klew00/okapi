@@ -21,6 +21,7 @@ import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.ts.TsFilter;
 
 import org.junit.Assert;
@@ -41,15 +42,15 @@ public class TsFilterTest {
 	public void setUp() throws ParserConfigurationException, SAXException, IOException {
 		filter = new TsFilter();
 		testDriver = new FilterTestDriver();
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	      DocumentBuilder builder = factory.newDocumentBuilder();
 	      InputSource is = new InputSource(new StringReader("<hello><name>john</name></hello>"));
 	      Document d = builder.parse( is );
-	      System.out.println("NodeName: "+d.getNodeName());
-	      System.out.println("NodeName: "+d.getElementsByTagName("name"));
+//	      System.out.println("NodeName: "+d.getNodeName());
+//	      System.out.println("NodeName: "+d.getElementsByTagName("name"));
 		
 	}
 	
@@ -133,6 +134,13 @@ public class TsFilterTest {
 		assertEquals("tuid_1", tu.getName());
 	}*/
 	
+	@Test
+	public void testStartDocument () {
+		URL url = TsFilterTest.class.getResource("/TSTest01.ts");
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(url.getPath(), null),
+			"UTF-8", "en", "en"));
+	}
 	
 	@Test
 	public void runTest () {
@@ -142,9 +150,8 @@ public class TsFilterTest {
 			filter = new TsFilter();
 			URL url = TsFilterTest.class.getResource("/TSTest01.ts");
 			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "EN-US", "FR-CA"));			
-			//if ( !testDriver.process(filter) ) Assert.fail();
-			//filter.close();
-			process(filter);
+			if ( !testDriver.process(filter) ) Assert.fail();
+			//process(filter);
 			filter.close();
 			
 		}

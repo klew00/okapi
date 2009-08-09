@@ -61,6 +61,7 @@ public class TableFilterTest {
 
 	private TableFilter filter;
 	private FilterTestDriver testDriver;
+	private String root;
 	
 	@Before
 	public void setUp() {
@@ -72,6 +73,10 @@ public class TableFilterTest {
 		
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
+
+		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
+		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(root) + "/data/";
 	}
 	
 		
@@ -326,12 +331,15 @@ public class TableFilterTest {
 	}		
 	
 	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"csv_test1.txt", null),
+			"UTF-8", "en", "en"));
+	}
+	
+	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
 		list.add(new InputDocument(root + "csv_test1.txt", ""));

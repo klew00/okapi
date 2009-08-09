@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.html.tests.TestUtils;
+import net.sf.okapi.filters.tests.FilterTestDriver;
 import net.sf.okapi.filters.tests.InputDocument;
 import net.sf.okapi.filters.tests.RoundTripComparison;
 
@@ -33,6 +34,13 @@ public class ExtractionComparisionTest {
 
 	@After
 	public void tearDown() throws Exception {		
+	}
+	
+	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(htmlFilter,
+			new InputDocument(root+"324.html", null),
+			"UTF-8", "en", "en"));
 	}
 	
 	@Test
