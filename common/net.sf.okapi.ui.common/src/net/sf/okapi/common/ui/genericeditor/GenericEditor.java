@@ -254,6 +254,7 @@ public class GenericEditor {
 				TextAndBrowsePanel ctrl = new TextAndBrowsePanel(cmp, SWT.NONE, false);
 				ctrl.setSaveAs(d.isForSaveAs());
 				ctrl.setTitle(d.getBrowseTitle());
+				ctrl.setBrowseFilters(d.getFilterNames(), d.getFilterExtensions());
 				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 				if ( part.isVertical() ) gdTmp.horizontalSpan = 2;
 				ctrl.setLayoutData(gdTmp);

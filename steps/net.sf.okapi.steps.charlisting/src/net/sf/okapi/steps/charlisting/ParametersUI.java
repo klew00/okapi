@@ -23,13 +23,18 @@ package net.sf.okapi.steps.charlisting;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.PathInputPart;
 
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("Used Characters Listing", true, false);
-		desc.addPathInputPart(paramDesc.get("outputPath"), "Result File", true);
+
+		PathInputPart part = desc.addPathInputPart(paramDesc.get("outputPath"), "Result File", true);
+		part.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
+		
 		desc.addCheckboxPart(paramDesc.get("autoOpen"));
+		
 		return desc;
 	}
 

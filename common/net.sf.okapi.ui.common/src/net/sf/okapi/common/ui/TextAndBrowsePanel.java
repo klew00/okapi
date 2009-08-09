@@ -45,6 +45,14 @@ public class TextAndBrowsePanel extends Composite {
 	private String filterNames;
 	private String filterExtensions;
 
+	/**
+	 * Creates a new TextAndBrowsePanel object with given arguments.
+	 * @param parent the parent of the panel.
+	 * @param flags the style of the panel.
+	 * @param isFolder true for a directory/folder browse button, false
+	 * for a file browse button.
+	 * @param buttonLabel label of the browse button, if null the text "..." is used. 
+	 */
 	public TextAndBrowsePanel (Composite parent,
 		int flags,
 		boolean isFolder,
@@ -66,9 +74,8 @@ public class TextAndBrowsePanel extends Composite {
 		String buttonLabel)
 	{
 		isFolder = browseFolder;
-		
 		title = "Select a File";
-
+		
 		GridLayout layTmp = new GridLayout(2, false);
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
@@ -124,6 +131,13 @@ public class TextAndBrowsePanel extends Composite {
 	
 	public void setTitle (String title) {
 		this.title = title;
+	}
+	
+	public void setBrowseFilters (String filterNames,
+		String filterExtensions)
+	{
+		this.filterNames = filterNames;
+		this.filterExtensions = filterExtensions;
 	}
 
 	private void browseFolder () {

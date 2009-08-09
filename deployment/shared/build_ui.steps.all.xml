@@ -17,11 +17,6 @@
 			<fileset dir="${src_steps.root}.bomconversion/src" excludes="**/*.java"/>
 		</copy>
 
- 		<javac srcdir="${src_steps.root}.charlisting/src" destdir="${tmp}" classpathref="mainClassPath_ui.steps.all"/>
-		<copy todir="${tmp}">
-			<fileset dir="${src_steps.root}.charlisting/src" excludes="**/*.java"/>
-		</copy>
-
  		<javac srcdir="${src_steps.root}.xsltransform/src" destdir="${tmp}" classpathref="mainClassPath_ui.steps.all"/>
 		<copy todir="${tmp}">
 			<fileset dir="${src_steps.root}.xsltransform/src" excludes="**/*.java"/>

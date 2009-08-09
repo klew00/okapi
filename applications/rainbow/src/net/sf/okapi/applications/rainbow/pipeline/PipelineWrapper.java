@@ -118,7 +118,6 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-//				peMapper.addEditor("net.sf.okapi.steps.ui.charlisting.ParametersEditor", step.paramsClass);
 				peMapper.addDescriptionProvider("net.sf.okapi.steps.charlisting.ParametersUI", step.paramsClass);
 			}
 			map.put(step.id, step);

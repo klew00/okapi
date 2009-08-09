@@ -23,7 +23,6 @@ package net.sf.okapi.applications.rainbow.utilities;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 
 public class UtilityStep implements IPipelineStep {

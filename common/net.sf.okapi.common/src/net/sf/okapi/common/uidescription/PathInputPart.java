@@ -33,6 +33,8 @@ public class PathInputPart extends AbstractPart {
 
 	private boolean forSaveAs;
 	private String browseTitle;
+	private String filterNames;
+	private String filterExtensions;
 	
 	/**
 	 * Creates a new PathInputPart object with a given  parameter descriptor.
@@ -47,6 +49,8 @@ public class PathInputPart extends AbstractPart {
 		super(paramDescriptor);
 		this.forSaveAs = forSaveAs;
 		this.browseTitle = browseTitle;
+		filterNames = "All Files (*.*)";
+		filterExtensions = "*.*";
 	}
 
 	@Override
@@ -55,6 +59,38 @@ public class PathInputPart extends AbstractPart {
 		if ( getType().equals(String.class) ) return;
 		// Otherwise: call the base method.
 		super.checkType();
+	}
+
+	/**
+	 * Gets the names to used for the browse filter.
+	 * @return the names to used for the browse filter.
+	 */
+	public String getFilterNames () {
+		return filterNames;
+	}
+
+	/**
+	 * Gets the extensions to use for the browse filter.
+	 * @return the extensions to use for the browse filter.
+	 */
+	public String getFilterExtensions () {
+		return filterExtensions;
+	}
+
+	/**
+	 * Sets the names and extensions to use for the browse filter. Both strings
+	 * must have the same number of names/extensions parts separated by a \t.
+	 * Use a semi-colon (;) to separate multiple extensions.
+	 * For example: <code>"Documents (*.txt;*.odt)\tAll Files (*.*)"</code> and
+	 * <code>*.txt;*.odt\t*.*"</code>.
+	 * @param filterNames the names to use for the browse filter.
+	 * @param filterExtensions the extensions to use for the browse filter.
+	 */
+	public void setBrowseFilters (String filterNames,
+		String filterExtensions)
+	{
+		this.filterNames = filterNames;
+		this.filterExtensions = filterExtensions;
 	}
 
 	/**

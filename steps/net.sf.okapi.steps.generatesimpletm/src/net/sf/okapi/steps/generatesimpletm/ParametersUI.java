@@ -23,12 +23,14 @@ package net.sf.okapi.steps.generatesimpletm;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.PathInputPart;
 
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
-		EditorDescription desc = new EditorDescription("Simple TM Generation");
-		desc.addPathInputPart(paramDesc.get("tmPath"), "TM to Create", true);
+		EditorDescription desc = new EditorDescription("Simple TM Generation", true, false);
+		PathInputPart part = desc.addPathInputPart(paramDesc.get("tmPath"), "TM to Create", true);
+		part.setBrowseFilters("SimpleTM Files (*.data.db)\tAll Files (*.*)", "*.data.db\t*.*");
 		return desc;
 	}
 
