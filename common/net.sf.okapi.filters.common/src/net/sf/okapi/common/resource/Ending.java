@@ -61,11 +61,11 @@ public class Ending implements IResource {
 		this.skeleton = skeleton;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
-		return (A) annotations.get(type);
+	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
+		if ( annotations == null ) return null;
+		return annotationType.cast(annotations.get(annotationType) );
 	}
-
+	
 	public void setAnnotation (IAnnotation annotation) {
 		annotations.set(annotation);
 	}

@@ -91,7 +91,7 @@ class StorageList extends ArrayList<IResource>
 		return null;
 	}
 
-	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
 		return null; //TODO: Fix this (doesn't compile on command-line) startGroup.getAnnotation(type);
 	}
 

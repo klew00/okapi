@@ -262,12 +262,9 @@ public class RawDocument implements IResource {
 	 * @see
 	 * net.sf.okapi.common.resource.IResource#getAnnotation(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
-	public <A> A getAnnotation(Class<? extends IAnnotation> type) {
-		if (annotations == null)
-			return null;
-		else
-			return (A) annotations.get(type);
+	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
+		if ( annotations == null ) return null;
+		return annotationType.cast(annotations.get(annotationType) );
 	}
 
 	/*

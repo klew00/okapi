@@ -85,10 +85,9 @@ public class BaseNameable implements INameable {
 		mimeType = value;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <A> A getAnnotation (Class<? extends IAnnotation> type) {
+	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
 		if ( annotations == null ) return null;
-		return (A)annotations.get(type);
+		return annotationType.cast(annotations.get(annotationType) );
 	}
 
 	public void setAnnotation (IAnnotation annotation) {
