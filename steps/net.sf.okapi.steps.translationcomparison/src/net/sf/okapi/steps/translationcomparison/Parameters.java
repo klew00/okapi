@@ -21,31 +21,96 @@
 package net.sf.okapi.steps.translationcomparison;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
-	public boolean generateTMX;
-	public String tmxPath;
-	public boolean generateHTML;
-	public boolean autoOpen;
-	public boolean ignoreCase;
-	public boolean ignoreWS;
-	public boolean ignorePunct;
-	public String trgSuffix;
+	private boolean generateTMX;
+	private String tmxPath;
+	private boolean generateHTML;
+	private boolean autoOpen;
+	private boolean caseSensitive;
+	private boolean whitespaceSensitive;
+	private boolean punctuationSensitive;
+	private String targetSuffix;
 
 	public Parameters () {
 		reset();
 	}
 	
+	public boolean isGenerateTMX () {
+		return generateTMX;
+	}
+
+	public void setGenerateTMX (boolean generateTMX) {
+		this.generateTMX = generateTMX;
+	}
+
+	public String getTmxPath () {
+		return tmxPath;
+	}
+
+	public void setTmxPath (String tmxPath) {
+		this.tmxPath = tmxPath;
+	}
+
+	public boolean isGenerateHTML () {
+		return generateHTML;
+	}
+
+	public void setGenerateHTML (boolean generateHTML) {
+		this.generateHTML = generateHTML;
+	}
+
+	public boolean isAutoOpen () {
+		return autoOpen;
+	}
+
+	public void setAutoOpen (boolean autoOpen) {
+		this.autoOpen = autoOpen;
+	}
+
+	public boolean isCaseSensitive () {
+		return caseSensitive;
+	}
+
+	public void setCaseSensitive (boolean caseSensitive) {
+		this.caseSensitive = caseSensitive;
+	}
+
+	public boolean isWhitespaceSensitive () {
+		return whitespaceSensitive;
+	}
+
+	public void setWhitespaceSensitive (boolean whitespaceSensitive) {
+		this.whitespaceSensitive = whitespaceSensitive;
+	}
+
+	public boolean isPunctuationSensitive () {
+		return punctuationSensitive;
+	}
+
+	public void setPunctuationSensitive (boolean punctuationSensitive) {
+		this.punctuationSensitive = punctuationSensitive;
+	}
+
+	public String getTargetSuffix () {
+		return targetSuffix;
+	}
+
+	public void setTargetSuffix (String targetSuffix) {
+		this.targetSuffix = targetSuffix;
+	}
+
 	public void reset() {
 		generateTMX = false;
 		tmxPath = "comparison.tmx"; // "${ProjDir}"+File.separator+"output.tmx";
 		generateHTML = true;
 		autoOpen = true;
-		ignoreCase = false;
-		ignoreWS = false;
-		ignorePunct = false;
-		trgSuffix = "-mt";
+		caseSensitive = true;
+		whitespaceSensitive = true;
+		punctuationSensitive = true;
+		targetSuffix = "-mt";
 	}
 
 	public void fromString (String data) {
@@ -55,10 +120,10 @@ public class Parameters extends BaseParameters {
 		tmxPath = buffer.getString("tmxPath", tmxPath);
 		generateHTML = buffer.getBoolean("generateHTML", generateHTML);
 		autoOpen = buffer.getBoolean("autoOpen", autoOpen);
-		ignoreCase = buffer.getBoolean("ignoreCase", ignoreCase);
-		ignoreWS = buffer.getBoolean("ignoreWS", ignoreWS);
-		ignorePunct = buffer.getBoolean("ignorePunct", ignorePunct);
-		trgSuffix = buffer.getString("trgSuffix", trgSuffix);
+		caseSensitive = buffer.getBoolean("caseSensitive", caseSensitive);
+		whitespaceSensitive = buffer.getBoolean("whitespaceSensitive", whitespaceSensitive);
+		punctuationSensitive = buffer.getBoolean("punctuationSensitive", punctuationSensitive);
+		targetSuffix = buffer.getString("targetSuffix", targetSuffix);
 	}
 
 	public String toString() {
@@ -67,11 +132,32 @@ public class Parameters extends BaseParameters {
 		buffer.setParameter("tmxPath", tmxPath);
 		buffer.setParameter("generateHTML", generateHTML);
 		buffer.setParameter("autoOpen", autoOpen);
-		buffer.setParameter("ignoreCase", ignoreCase);
-		buffer.setParameter("ignoreWS", ignoreWS);
-		buffer.setParameter("ignorePunct", ignorePunct);
-		buffer.setParameter("trgSuffix", trgSuffix);
+		buffer.setParameter("caseSensitive", caseSensitive);
+		buffer.setParameter("whitespaceSensitive", whitespaceSensitive);
+		buffer.setParameter("punctuationSensitive", punctuationSensitive);
+		buffer.setParameter("targetSuffix", targetSuffix);
 		return buffer.toString();
+	}
+
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add("generateTMX",
+			"Generate a TMX output document", "Generates an output document in TMX");
+		desc.add("tmxPath",
+			"TMX output path", "Full path of the output TMX file");
+		desc.add("generateHTML",
+			"Generate output tables in HTML", "Generates output tables in HTML");
+		desc.add("autoOpen",
+			"Opens the first HTML output after completion", null);
+		desc.add("targetSuffix",
+			"Suffix for the second target language code", null);
+		desc.add("caseSensitive",
+			"Take into account case differences", "Takes into account case differences");
+		desc.add("whitespaceSensitive",
+			"Take into account whitespace differences", "Takes into account whitespace differences");
+		desc.add("punctuationSensitive",
+			"Take into account punctuation differences", "Takes into account punctuation differences");
+		return desc;
 	}
 
 }

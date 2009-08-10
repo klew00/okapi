@@ -37,6 +37,7 @@ public abstract class AbstractPart implements IParameterDescriptor {
 	protected IContainerPart container;
 	protected boolean vertical = false;
 	protected boolean labelFlushed = false;
+	protected boolean withLabel = true;
 	protected AbstractPart masterPart;
 	protected boolean enabledOnSelection;
 
@@ -86,6 +87,24 @@ public abstract class AbstractPart implements IParameterDescriptor {
 
 	public void setShortDescription (String shortDescription) {
 		paramDescriptor.setShortDescription(shortDescription);
+	}
+
+	/**
+	 * Indicates if this UI part should be displayed with a label. When this
+	 * option is not set: no label is displayed and the entry field takes the space
+	 * where the label would be.
+	 * @return true if this UI part should be displayed with a label.
+	 */
+	public boolean isWithLabel () {
+		return withLabel;
+	}
+
+	/**
+	 * Sets the flag indicating if this UI part should be displayed with a label.
+	 * @param withLabel true if this UI part should be displayed with a label.
+	 */
+	public void setWithLabel(boolean withLabel) {
+		this.withLabel = withLabel;
 	}
 
 	/**

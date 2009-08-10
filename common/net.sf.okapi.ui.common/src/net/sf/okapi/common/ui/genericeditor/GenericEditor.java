@@ -223,11 +223,11 @@ public class GenericEditor {
 			if ( part instanceof TextInputPart ) {
 				TextInputPart d = (TextInputPart)part;
 				cmp = lookupParent(d.getContainer());
-				setLabel(cmp, d, 0);
+				if ( d.isWithLabel() ) setLabel(cmp, d, 0);
 				Text text = new Text(cmp, SWT.BORDER);
 				controls.put(d.getName(), text);
 				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-				if ( part.isVertical() ) gdTmp.horizontalSpan = 2;
+				if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
 				text.setLayoutData(gdTmp);
 				text.setEditable(d.getWriteMethod()!=null);
 				if ( d.isPassword() ) text.setEchoChar('*');
@@ -239,7 +239,7 @@ public class GenericEditor {
 				Button button = new Button(cmp, SWT.CHECK);
 				button.setToolTipText(d.getShortDescription());
 				controls.put(d.getName(), button);
-				if ( part.isVertical() ) {
+				if ( part.isVertical() || !part.isWithLabel() ) {
 					gdTmp = new GridData();
 					gdTmp.horizontalSpan = 2;
 					button.setLayoutData(gdTmp);
@@ -250,13 +250,13 @@ public class GenericEditor {
 			else if ( part instanceof PathInputPart ) {
 				PathInputPart d = (PathInputPart)part;
 				cmp = lookupParent(d.getContainer());
-				setLabel(cmp, d, 0);
+				if ( d.isWithLabel() ) setLabel(cmp, d, 0);
 				TextAndBrowsePanel ctrl = new TextAndBrowsePanel(cmp, SWT.NONE, false);
 				ctrl.setSaveAs(d.isForSaveAs());
 				ctrl.setTitle(d.getBrowseTitle());
 				ctrl.setBrowseFilters(d.getFilterNames(), d.getFilterExtensions());
 				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-				if ( part.isVertical() ) gdTmp.horizontalSpan = 2;
+				if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
 				ctrl.setLayoutData(gdTmp);
 				controls.put(d.getName(), ctrl);
 				ctrl.setEditable(d.getWriteMethod()!=null);
@@ -266,20 +266,20 @@ public class GenericEditor {
 				ListSelectionPart d = (ListSelectionPart)part;
 				cmp = lookupParent(d.getContainer());
 				if ( d.isDropDown() ) {
-					setLabel(cmp, d, 0);
+					if ( d.isWithLabel() ) setLabel(cmp, d, 0);
 					Combo combo = new Combo(cmp, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
 					controls.put(d.getName(), combo);
 					gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-					if ( part.isVertical() ) gdTmp.horizontalSpan = 2;
+					if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
 					combo.setLayoutData(gdTmp);
 					combo.setEnabled(d.getWriteMethod()!=null);
 				}
 				else {
-					setLabel(cmp, d, GridData.VERTICAL_ALIGN_BEGINNING);
+					if ( d.isWithLabel() ) setLabel(cmp, d, GridData.VERTICAL_ALIGN_BEGINNING);
 					List list = new List(cmp, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 					controls.put(d.getName(), list);
 					gdTmp = new GridData(GridData.FILL_BOTH);
-					if ( part.isVertical() ) gdTmp.horizontalSpan = 2;
+					if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
 					list.setLayoutData(gdTmp);
 					list.setEnabled(d.getWriteMethod()!=null);
 				}

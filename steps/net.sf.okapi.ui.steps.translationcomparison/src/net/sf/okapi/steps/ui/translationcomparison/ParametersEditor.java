@@ -249,14 +249,14 @@ public class ParametersEditor implements IParametersEditor {
 	}
 
 	private void setData () {
-		chkGenerateHTML.setSelection(params.generateHTML);
-		chkGenerateTMX.setSelection(params.generateTMX);
-		edTMXPath.setText(params.tmxPath);
-		edSuffix.setText(params.trgSuffix);
-		chkOpenOutput.setSelection(params.autoOpen);
-		chkIgnoreCase.setSelection(params.ignoreCase);
-		chkIgnoreWS.setSelection(params.ignoreWS);
-		chkIgnorePunct.setSelection(params.ignorePunct);
+		chkGenerateHTML.setSelection(params.isGenerateHTML());
+		chkGenerateTMX.setSelection(params.isGenerateTMX());
+		edTMXPath.setText(params.getTmxPath());
+		edSuffix.setText(params.getTargetSuffix());
+		chkOpenOutput.setSelection(params.isAutoOpen());
+//		chkIgnoreCase.setSelection(params.ignoreCase);
+//		chkIgnoreWS.setSelection(params.ignoreWS);
+//		chkIgnorePunct.setSelection(params.ignorePunct);
 		// Enabling
 		chkOpenOutput.setEnabled(chkGenerateHTML.getSelection());
 		displayTMXPath();
@@ -270,16 +270,16 @@ public class ParametersEditor implements IParametersEditor {
 				return result;
 			}
 		}
-		params.generateTMX = doTMX;
-		params.tmxPath = edTMXPath.getText();
-		params.trgSuffix = edSuffix.getText();
+//		params.generateTMX = doTMX;
+//		params.tmxPath = edTMXPath.getText();
+//		params.trgSuffix = edSuffix.getText();
 		
-		params.ignoreCase = chkIgnoreCase.getSelection();
-		params.ignoreWS = chkIgnoreWS.getSelection();
-		params.ignorePunct = chkIgnorePunct.getSelection();
+//		params.ignoreCase = chkIgnoreCase.getSelection();
+//		params.ignoreWS = chkIgnoreWS.getSelection();
+//		params.ignorePunct = chkIgnorePunct.getSelection();
 
-		params.generateHTML = chkGenerateHTML.getSelection();
-		params.autoOpen = chkOpenOutput.getSelection();
+//		params.generateHTML = chkGenerateHTML.getSelection();
+//		params.autoOpen = chkOpenOutput.getSelection();
 		result = true;
 		return result;
 	}

@@ -93,17 +93,17 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	
 	protected void handleEndBatch (Event event) {
 		matcher = null;
-		if ( params.generateHTML && ( writer != null )) {
+		if ( params.isGenerateHTML() && ( writer != null )) {
 			writer.close();
 			writer = null;
 		}
-		if ( params.generateTMX && ( tmx != null )) {
+		if ( params.isGenerateTMX() && ( tmx != null )) {
 			tmx.writeEndDocument();
 			tmx.close();
 			tmx = null;
 		}
 		Runtime.getRuntime().gc();
-		if ( params.autoOpen && ( pathToOpen != null )) {
+		if ( params.isAutoOpen() && ( pathToOpen != null )) {
 			getContext().setString("outputFile",  pathToOpen);
 		}
 	}
@@ -135,7 +135,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
     	if ( inputToCompare != null ) {
     		inputToCompare.close();
     	}
-    	if ( params.generateHTML ) {
+    	if ( params.isGenerateHTML() ) {
 			writer.writeEndElement(); // table
     		writer.writeElementString("p", String.format("", itemCount));
     		if ( itemCount > 0 ) {
@@ -193,7 +193,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		itemCount++;
 
 		// Output in HTML
-		if ( params.generateHTML ) {
+		if ( params.isGenerateHTML() ) {
 			writer.writeRawXML("<tr><td class='p'>"); //$NON-NLS-1$
 			// Output source if we have one
 			if ( srcFrag != null ) {
@@ -222,7 +222,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
 		}
 
-		if ( params.generateTMX ) {
+		if ( params.isGenerateTMX() ) {
 			TextUnit tmxTu = new TextUnit(tu1.getId());
 			// Set the source: Use the tu1 if possible
 			if ( isBaseMultilingual ) tmxTu.setSource(tu1.getSource());
@@ -231,9 +231,9 @@ public class TranslationComparisonStep extends BasePipelineStep {
 				tmxTu.setSourceContent(srcFrag);
 			}
 			tmxTu.setTargetContent(trgLang, trgFrag1);
-			tmxTu.setTargetContent(trgLang+params.trgSuffix, trgFrag2);
+			tmxTu.setTargetContent(trgLang+params.getTargetSuffix(), trgFrag2);
 			scoreProp.setValue(String.format("%03d", score));
-			tmxTu.setTargetProperty(trgLang+params.trgSuffix, scoreProp);
+			tmxTu.setTargetProperty(trgLang+params.getTargetSuffix(), scoreProp);
 			tmx.writeTUFull(tmxTu);
 		}
 	}
@@ -243,13 +243,13 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		// Both strings are in the target language.
 		matcher = new TextMatcher(trgLang, trgLang);
 		
-		if ( params.generateHTML ) {
+		if ( params.isGenerateHTML() ) {
 			writer = new XMLWriter();
 		}
 		// Start TMX writer (one for all input documents)
-		if ( params.generateTMX ) {
+		if ( params.isGenerateTMX() ) {
 			tmx = new TMXWriter();
-			tmx.create(params.tmxPath); //.replace(VAR_PROJDIR, projectDir));
+			tmx.create(params.getTmxPath()); //.replace(VAR_PROJDIR, projectDir));
 			tmx.writeStartDocument(getContext().getSourceLanguage(0), trgLang,
 				getClass().getName(), null, null, null, null);
 		}
@@ -257,9 +257,9 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		scoreProp = new Property("Txt::Score", "", false);
 		
 		options = 0;
-		if ( params.ignoreCase ) options |= TextMatcher.IGNORE_CASE;
-		if ( params.ignoreWS ) options |= TextMatcher.IGNORE_WHITESPACES;
-		if ( params.ignorePunct ) options |= TextMatcher.IGNORE_PUNCTUATION;
+		if ( !params.isCaseSensitive() ) options |= TextMatcher.IGNORE_CASE;
+		if ( !params.isWhitespaceSensitive() ) options |= TextMatcher.IGNORE_WHITESPACES;
+		if ( !params.isPunctuationSensitive() ) options |= TextMatcher.IGNORE_PUNCTUATION;
 		
 		initDone = true;
 	}
@@ -274,7 +274,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			
 		// Start HTML output
 		if ( writer != null ) writer.close();
-		if ( params.generateHTML ) {
+		if ( params.isGenerateHTML() ) {
 			// Use the to-compare file for the output name
 			String outPath = getContext().getRawDocument(1).getInputURI().getPath() + ".html"; //$NON-NLS-1$
 			if ( pathToOpen == null ) {

@@ -107,9 +107,11 @@ public class TextAndBrowsePanel extends Composite {
 		edText.setText(text);
 	}
 
-	public void setEnable (boolean enable) {
-		edText.setEnabled(enable);
-		btBrowse.setEnabled(enable);
+	@Override
+	public void setEnabled (boolean enabled) {
+		super.setEnabled(enabled);
+		edText.setEnabled(enabled);
+		btBrowse.setEnabled(enabled);
 	}
 
 	public void setEditable (boolean editable) {
