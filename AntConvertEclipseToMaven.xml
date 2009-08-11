@@ -1,0 +1,50 @@
+<project name="convert-my-stuff-to-maven" default="convertify">
+
+    <dirname property="pwd" file="src"/>
+
+    <typedef resource="org/tigris/subversion/svnant/svnantlib.xml">
+        <classpath>
+            <fileset dir="../../third-party/ant/">
+                <include  name="*.jar"/>
+            </fileset>
+        </classpath>
+    </typedef>
+
+    <target  name="convertify" depends="convert.source, convert.tests"/>
+
+    <target name="convert.source" depends="check.for.source" if="source.exists" description="Convert Source Code to Maven Structure">
+        <mkdir dir="src/main/java"/>
+        <svn>
+            <add dir="src/main"/>
+            <move srcPath="src/net" destPath="src/main/java/" message="I hope this doesn't commit"/>
+        </svn>
+    </target>
+
+    <target name="convert.tests" depends="check.for.test" if="tests.exist" description="Convert Tests to be included in the same module">
+        <mkdir dir="src/test/java"/>
+        <svn>
+            <add dir="src/test"/>
+            <move srcPath="${pwd}.tests/src/net" destPath="src/test/java/" message="I hope this doesn't commit"/>
+        </svn>
+    </target>
+
+    <target  name="pwd">
+        <echo>${pwd}.tests</echo>
+    </target>
+    
+    <target name="revert.all" description="Revert all changes done">
+        <svn>
+            <revert dir="src" recurse="true"/>
+            <revert dir="src/net" recurse="true"/>
+            <revert dir="src/main" recurse="true"/>
+        </svn>
+    </target>
+
+    <target name="check.for.source">
+        <available file="src/net" property="source.exists"/>
+    </target>
+
+    <target name="check.for.test">
+        <available file="${pwd}.tests" property="tests.exist"/>
+    </target>
+</project>
