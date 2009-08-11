@@ -25,24 +25,28 @@ import net.sf.okapi.common.ParameterDescriptor;
 /**
  * UI part descriptor for a string selection. This UI part supports the following
  * types: String.
- * <p>Use {@link #setDropDown(boolean)} to specify if the list should be a 
- * drop-down list or not (it is not by default).
+ * <p>Use {@link #setListType(int)} to specify the type of list the UI should use. By default
+ * a simple listbox will be used.
  */
 public class ListSelectionPart extends AbstractPart {
+	
+	public static final int LISTTYPE_SIMPLE = 0;
+	public static final int LISTTYPE_DROPDOWN = 1;
 
-	private String[] choices;
-	private boolean dropDown = false;
+	private String[] choicesValues;
+	private int listType = LISTTYPE_SIMPLE;
+	private String[] choicesLabels;
 	
 	/**
 	 * Creates a new ListSelectionPart object with a given parameter descriptor.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
-	 * @param items the list of the items that can be selected.
+	 * @param choicesValues the list of the items that can be selected.
 	 */
 	public ListSelectionPart (ParameterDescriptor paramDescriptor,
-		String[] items)
+		String[] choicesValues)
 	{
 		super(paramDescriptor);
-		setChoices(items);
+		setChoicesValues(choicesValues);
 	}
 
 	@Override
@@ -57,32 +61,49 @@ public class ListSelectionPart extends AbstractPart {
 	 * Gets the list of items that can be selected.
 	 * @return the list of items that can be selected.
 	 */
-	public String[] getChoices () {
-		return choices;
+	public String[] getChoicesValues () {
+		return choicesValues;
 	}
 
 	/**
 	 * Sets the list of items that can be selected.
-	 * @param choices the new list of items that can be selected.
+	 * @param choicesValues the new list of items that can be selected.
 	 */
-	public void setChoices (String[] choices) {
-		this.choices = choices;
+	public void setChoicesValues (String[] choicesValues) {
+		this.choicesValues = choicesValues;
 	}
 
 	/**
-	 * Indicates if this list is a drop-down list.
-	 * @return true if this list is a drop-down list.
+	 * Gets the type of list this UI part should use.
+	 * @return the type of list this UI part should use.
 	 */
-	public boolean isDropDown () {
-		return dropDown;
+	public int getListType () {
+		return listType;
 	}
 
 	/**
-	 * Sets the flag indicating if this list is a drop-down list.
-	 * @param value the new flag indicating if this list is a drop-down list.
+	 * Sets the type of list this UI part should use.
+	 * @param listType the new type of list this UI part should use.
 	 */
-	public void setDropDown (boolean dropDown) {
-		this.dropDown = dropDown;
+	public void setListType (int listType) {
+		this.listType = listType;
+	}
+
+	/**
+	 * Gets the list of the localizable labels to use with the selectable values.
+	 * @return the list of the localizable labels to use with the selectable values.
+	 */
+	public String[] getChoicesLabels () {
+		return choicesLabels;
+	}
+
+	/**
+	 * Sets the list of the localizable labels to use with the selectable values. If this list
+	 * is not set, the values themselves will be used for display.
+	 * @param choicesLabels the list of the localizable labels to use with the selectable values.
+	 */
+	public void setChoicesLabels (String[] choicesLabels) {
+		this.choicesLabels = choicesLabels;
 	}
 
 }

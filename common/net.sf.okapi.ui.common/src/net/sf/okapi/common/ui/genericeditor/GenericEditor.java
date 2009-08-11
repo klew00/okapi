@@ -265,7 +265,7 @@ public class GenericEditor {
 			else if ( part instanceof ListSelectionPart ) {
 				ListSelectionPart d = (ListSelectionPart)part;
 				cmp = lookupParent(d.getContainer());
-				if ( d.isDropDown() ) {
+				if ( d.getListType() == ListSelectionPart.LISTTYPE_DROPDOWN ) {
 					if ( d.isWithLabel() ) setLabel(cmp, d, 0);
 					Combo combo = new Combo(cmp, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
 					controls.put(d.getName(), combo);
@@ -384,7 +384,7 @@ public class GenericEditor {
 			}
 			else if ( part instanceof ListSelectionPart ) {
 				ListSelectionPart d = (ListSelectionPart)part;
-				if ( d.isDropDown() ) {
+				if ( d.getListType() == ListSelectionPart.LISTTYPE_DROPDOWN ) {
 					setComboControl((Combo)controls.get(d.getName()), d);
 				}
 				else {
@@ -477,7 +477,7 @@ public class GenericEditor {
 				}
 			}
 			else {
-				throw new RuntimeException(String.format(
+				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
@@ -508,7 +508,7 @@ public class GenericEditor {
 				desc.getWriteMethod().invoke(desc.getParent(), (button.getSelection() ? 1 : 0));
 			}
 			else {
-				throw new RuntimeException(String.format(
+				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
@@ -538,7 +538,7 @@ public class GenericEditor {
 				desc.getWriteMethod().invoke(desc.getParent(), ctrl.getText());
 			}
 			else {
-				throw new RuntimeException(String.format(
+				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
@@ -562,7 +562,7 @@ public class GenericEditor {
 		try {
 			int n = list.getSelectionIndex();
 			if ( n > -1 ) {
-				desc.getWriteMethod().invoke(desc.getParent(), list.getItem(n));
+				desc.getWriteMethod().invoke(desc.getParent(), ((String[])list.getData())[n]);
 			}
 		}
 		catch ( IllegalArgumentException e ) {
@@ -584,7 +584,8 @@ public class GenericEditor {
 		try {
 			int n = combo.getSelectionIndex();
 			if ( n > -1 ) {
-				desc.getWriteMethod().invoke(desc.getParent(), combo.getItem(n));
+				// Get the value from the user-data list
+				desc.getWriteMethod().invoke(desc.getParent(), ((String[])combo.getData())[n]);
 			}
 		}
 		catch ( IllegalArgumentException e ) {
@@ -612,7 +613,7 @@ public class GenericEditor {
 				tmp = ((Integer)desc.getReadMethod().invoke(desc.getParent())).toString();
 			}
 			else {
-				throw new RuntimeException(String.format(
+				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 			if ( tmp == null ) text.setText("");
@@ -631,13 +632,29 @@ public class GenericEditor {
 	
 	private void setListControl (List list, ListSelectionPart desc) {
 		try {
+			String[] labels = desc.getChoicesLabels();
+			String[] values = desc.getChoicesValues();
+
+			// If we have labels: check for matching list
+			if ( labels == null ) {
+				labels = values; // Use the values as labels
+			}
+			else { // Labels available
+				if ( labels.length != values.length ) {
+					throw new OkapiEditorCreationException(String.format(
+						"The number of values and labels must be the same for the parameter '%s'.", desc.getName()));
+				}
+			}
+
+			// Set the control
 			if ( desc.getType().equals(String.class) ) {
 				String current = (String)desc.getReadMethod().invoke(desc.getParent());
+				list.setData(values); // Store the list of values in the user-data
 				if ( current == null ) current = "";
 				int found = -1;
 				int n = 0;
-				for ( String item : desc.getChoices() ) {
-					list.add(item);
+				for ( String item : values ) {
+					list.add(labels[n]);
 					if ( item.equals(current) ) found = n;
 					n++;
 				}
@@ -646,7 +663,7 @@ public class GenericEditor {
 				}
 			}
 			else {
-				throw new RuntimeException(String.format(
+				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
@@ -663,13 +680,29 @@ public class GenericEditor {
 	
 	private void setComboControl (Combo combo, ListSelectionPart desc) {
 		try {
+			String[] labels = desc.getChoicesLabels();
+			String[] values = desc.getChoicesValues();
+
+			// If we have labels: check for matching list
+			if ( labels == null ) {
+				labels = values; // Use the values as labels
+			}
+			else { // Labels available
+				if ( labels.length != values.length ) {
+					throw new OkapiEditorCreationException(String.format(
+						"The number of values and labels must be the same for the parameter '%s'.", desc.getName()));
+				}
+			}
+			
+			// Set the control
 			if ( desc.getType().equals(String.class) ) {
 				String current = (String)desc.getReadMethod().invoke(desc.getParent());
+				combo.setData(values); // Store the list of values in the user-data
 				if ( current == null ) current = "";
 				int found = -1;
 				int n = 0;
-				for ( String item : desc.getChoices() ) {
-					combo.add(item);
+				for ( String item : values ) {
+					combo.add(labels[n]);
 					if ( item.equals(current) ) found = n;
 					n++;
 				}
@@ -678,7 +711,7 @@ public class GenericEditor {
 				}
 			}
 			else {
-				throw new RuntimeException(String.format(
+				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
@@ -707,7 +740,7 @@ public class GenericEditor {
 				button.setSelection((tmp!=null) && !tmp.equals("0"));
 			}
 			else {
-				throw new RuntimeException(String.format(
+				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}
@@ -729,7 +762,7 @@ public class GenericEditor {
 				ctrl.setText((tmp==null) ? "" : tmp);
 			}
 			else {
-				throw new RuntimeException(String.format(
+				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
 			}
 		}

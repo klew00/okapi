@@ -108,7 +108,7 @@ public class UIDescriptionTest {
 		assertEquals("text", part.getName());
 		assertEquals("displayName", part.getDisplayName());
 		assertEquals("shortDescription", part.getShortDescription());
-		String[] choices = part.getChoices();
+		String[] choices = part.getChoicesValues();
 		assertNotNull(choices);
 		assertEquals(2, choices.length);
 		assertEquals("selection2", choices[1]);
