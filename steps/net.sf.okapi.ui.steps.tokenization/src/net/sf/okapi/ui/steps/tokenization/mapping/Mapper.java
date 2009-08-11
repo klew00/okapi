@@ -23,7 +23,7 @@ package net.sf.okapi.ui.steps.tokenization.mapping;
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.ui.filters.plaintext.common.AbstractParametersEditor;
+import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
 import net.sf.okapi.ui.steps.tokenization.mapping.model.Parameters;
 
 import org.eclipse.swt.widgets.TabFolder;

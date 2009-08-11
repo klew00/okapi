@@ -20,9 +20,9 @@
 
 package net.sf.okapi.ui.steps.tokenization.mapping;
 
-import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
-import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
-import net.sf.okapi.ui.filters.plaintext.common.TableAdapter;
+import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
 import net.sf.okapi.ui.steps.tokenization.mapping.model.MappingItem;
 import net.sf.okapi.ui.steps.tokenization.mapping.model.Parameters;
 

@@ -22,9 +22,9 @@ package net.sf.okapi.ui.steps.tokenization.locale;
 
 import java.util.ArrayList;
 
+import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
+import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
 import net.sf.okapi.steps.tokenization.locale.LanguageList;
-import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
-import net.sf.okapi.ui.filters.plaintext.common.TableAdapter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;

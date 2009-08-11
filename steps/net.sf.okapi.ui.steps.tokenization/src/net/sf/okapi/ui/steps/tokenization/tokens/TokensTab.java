@@ -21,12 +21,12 @@
 package net.sf.okapi.ui.steps.tokenization.tokens;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ui.abstracteditor.AbstractBaseDialog;
+import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
 import net.sf.okapi.steps.tokenization.tokens.Parameters;
 import net.sf.okapi.steps.tokenization.tokens.Token;
-import net.sf.okapi.ui.filters.plaintext.common.AbstractBaseDialog;
-import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
-import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
-import net.sf.okapi.ui.filters.plaintext.common.TableAdapter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;

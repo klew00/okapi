@@ -21,10 +21,10 @@
 package net.sf.okapi.ui.filters.plaintext;
 
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
 import net.sf.okapi.filters.plaintext.common.WrapMode;
-import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
-import net.sf.okapi.ui.filters.plaintext.common.SWTUtils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

@@ -18,14 +18,13 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.plaintext.common;
+package net.sf.okapi.common.ui.abstracteditor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.filters.plaintext.common.INotifiable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;

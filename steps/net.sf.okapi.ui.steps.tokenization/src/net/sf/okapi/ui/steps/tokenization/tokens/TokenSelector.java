@@ -20,9 +20,9 @@
 
 package net.sf.okapi.ui.steps.tokenization.tokens;
 
+import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
 import net.sf.okapi.steps.tokenization.tokens.Parameters;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
-import net.sf.okapi.ui.filters.plaintext.common.InputQueryDialog;
 
 public class TokenSelector {
 

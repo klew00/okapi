@@ -22,7 +22,7 @@ package net.sf.okapi.ui.steps.tokenization.mapping;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
-import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
+import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;

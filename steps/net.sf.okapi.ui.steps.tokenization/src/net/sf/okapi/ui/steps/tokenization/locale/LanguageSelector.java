@@ -23,7 +23,7 @@ package net.sf.okapi.ui.steps.tokenization.locale;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.ui.filters.plaintext.common.InputQueryDialog;
+import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
 
 public class LanguageSelector {
 

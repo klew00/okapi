@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.plaintext.common;
+package net.sf.okapi.common.ui.abstracteditor;
 
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.OKCancelPanel;

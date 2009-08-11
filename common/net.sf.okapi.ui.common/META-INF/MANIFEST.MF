@@ -4,6 +4,7 @@ Bundle-Name: Common UI Library
 Bundle-SymbolicName: net.sf.okapi.ui.common
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.common.ui,
+ net.sf.okapi.common.ui.abstracteditor,
  net.sf.okapi.common.ui.genericeditor
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.filters.common;bundle-version="1.0.0",
