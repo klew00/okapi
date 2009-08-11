@@ -82,7 +82,8 @@ public class UIDescriptionTest {
 	
 	@Test
 	public void testTextInputPart () {
-		TextInputPart part = new TextInputPart(desc.get("text"), false, true);
+		TextInputPart part = new TextInputPart(desc.get("text"));
+		part.setPassword(true);
 		assertEquals("text", part.getName());
 		assertEquals("displayName", part.getDisplayName());
 		assertEquals("shortDescription", part.getShortDescription());

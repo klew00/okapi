@@ -43,7 +43,7 @@ public class ParametersUI implements IEditorDescriptionProvider {
 		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setMasterPart(cbp1, true);
 		pip.setWithLabel(false);
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get("targetSuffix"), false, false);
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get("targetSuffix"));
 		tip.setMasterPart(cbp1, true);
 		tip.setVertical(false);
 		

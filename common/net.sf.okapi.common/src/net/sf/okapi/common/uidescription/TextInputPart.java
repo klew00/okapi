@@ -44,22 +44,6 @@ public class TextInputPart extends AbstractPart {
 		super(paramDescriptor);
 	}
 	
-	/**
-	 * Creates a new TextInputPart object with a given parameter descriptor.
-	 * @param paramDescriptor the parameter descriptor for this UI part.
-	 * @param allowEmpty flag indicating if the text input can be empty.
-	 * @param password flag indicating if the text input should be treated as a password.
-	 */
-	public TextInputPart (ParameterDescriptor paramDescriptor,
-		boolean allowEmpty,
-		boolean password)
-	{
-		super(paramDescriptor);
-		checkType();
-		this.allowEmpty = allowEmpty;
-		this.password = password;
-	}
-
 	@Override
 	protected void checkType () {
 		// Check type support

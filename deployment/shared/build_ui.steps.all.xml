@@ -37,11 +37,6 @@
 			<fileset dir="${src_steps.root}.textmodification/src" excludes="**/*.java"/>
 		</copy>
 
- 		<javac srcdir="${src_steps.root}.translationcomparison/src" destdir="${tmp}" classpathref="mainClassPath_ui.steps.all"/>
-		<copy todir="${tmp}">
-			<fileset dir="${src_steps.root}.translationcomparison/src" excludes="**/*.java"/>
-		</copy>
-
  		<javac srcdir="${src_steps.root}.fullwidthconversion/src" destdir="${tmp}" classpathref="mainClassPath_ui.steps.all"/>
 		<copy todir="${tmp}">
 			<fileset dir="${src_steps.root}.fullwidthconversion/src" excludes="**/*.java"/>

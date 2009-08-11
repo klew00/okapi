@@ -99,17 +99,12 @@ public class EditorDescription {
 	}
 	
 	/**
-	 * Adds a text input UI part to this editor description.
+	 * Adds a default text input UI part to this editor description.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
-	 * @param allowEmpty flag indicating if the text input can be empty.
-	 * @param isPassword flag indicating if the text input should be treated as a password.
 	 * @return the UI part created by this call.
 	 */
-	public TextInputPart addTextInputPart (ParameterDescriptor paramDescriptor,
-		boolean allowEmpty,
-		boolean isPassword)
-	{
-		TextInputPart desc = new TextInputPart(paramDescriptor, allowEmpty, isPassword);
+	public TextInputPart addTextInputPart (ParameterDescriptor paramDescriptor) {
+		TextInputPart desc = new TextInputPart(paramDescriptor);
 		desc.setVertical(defaultVertical);
 		desc.setLabelFlushed(defaultLabelFlushed);
 		descriptors.put(desc.getName(), desc);
