@@ -60,7 +60,6 @@
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/filters/net.sf.okapi.ui.filters.ts,net.sf.okapi.ui.filters.ts"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/libraries/net.sf.okapi.ui.lib.segmentation,net.sf.okapi.ui.lib.segmentation"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.bomconversion,net.sf.okapi.ui.steps.bomconversion"/>
-<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.charlisting,net.sf.okapi.ui.steps.charlisting"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.encodingconversion,net.sf.okapi.ui.steps.encodingconversion"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.fullwidthconversion,net.sf.okapi.ui.steps.fullwidthconversion"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.linebreakconversion,net.sf.okapi.ui.steps.linebreakconversion"/>
@@ -69,7 +68,6 @@
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.textmodification,net.sf.okapi.ui.steps.textmodification"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.tokenization,net.sf.okapi.ui.steps.tokenization"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.tokenization.tests,net.sf.okapi.ui.steps.tokenization.tests"/>
-<project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.translationcomparison,net.sf.okapi.ui.steps.translationcomparison"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.uriconversion,net.sf.okapi.ui.steps.uriconversion"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.wordcount,net.sf.okapi.ui.steps.wordcount"/>
 <project reference="0.9.3,https://okapi.googlecode.com/svn/trunk/steps/net.sf.okapi.ui.steps.xsltransform,net.sf.okapi.ui.steps.xsltransform"/>
@@ -141,12 +139,10 @@
 <item elementID="=net.sf.okapi.steps.searchandreplace" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1246307329241_5" label="Okapi-UI" name="Okapi-UI">
-<item elementID="=net.sf.okapi.ui.steps.translationcomparison" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.ui.filters.properties" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.ui.filters.openxml" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.ui.filters.plaintext" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.ui.steps.encodingconversion" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=net.sf.okapi.ui.steps.charlisting" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.ui.filters.common" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.ui.steps.textmodification" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=net.sf.okapi.ui.steps.fullwidthconversion" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
