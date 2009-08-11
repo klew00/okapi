@@ -57,7 +57,14 @@ public class HtmlFullFileTest {
 	public void testEncodingShouldBeFound() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/withEncoding.html");
 		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
-		assertEquals(htmlFilter.getEncoding(), "windows-1252");
+		assertEquals("windows-1252", htmlFilter.getEncoding());
+	}
+	
+	@Test
+	public void testEncodingShouldBeFound2() {
+		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/W3CHTMHLTest1.html");
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+		assertEquals("UTF-8", htmlFilter.getEncoding());		
 	}
 
 	@Test

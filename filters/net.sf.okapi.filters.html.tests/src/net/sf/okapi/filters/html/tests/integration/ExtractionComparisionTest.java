@@ -19,32 +19,32 @@ import org.junit.Test;
 
 public class ExtractionComparisionTest {
 	private HtmlFilter htmlFilter;
-	private String[] testFileList;	
+	private String[] testFileList;
 	private String root;
 
 	@Before
 	public void setUp() throws Exception {
-		htmlFilter = new HtmlFilter();		
+		htmlFilter = new HtmlFilter();
 		testFileList = TestUtils.getHtmlTestFiles();
-		
+
 		URL url = ExtractionComparisionTest.class.getResource("/324.html");
 		root = Util.getDirectoryName(url.getPath());
 		root = Util.getDirectoryName(root) + "/html/";
 	}
 
 	@After
-	public void tearDown() throws Exception {		
+	public void tearDown() throws Exception {
 	}
-	
+
 	@Test
-	public void testStartDocument () {
+	public void testStartDocument() {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(htmlFilter,
-			new InputDocument(root+"324.html", null),
-			"UTF-8", "en", "en"));
+				new InputDocument(root + "324.html", null),
+				"UTF-8", "en", "en"));
 	}
-	
+
 	@Test
-	public void testDoubleExtraction () throws URISyntaxException {		
+	public void testDoubleExtraction() throws URISyntaxException {
 		RoundTripComparison rtc = new RoundTripComparison();
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		for (String f : testFileList) {

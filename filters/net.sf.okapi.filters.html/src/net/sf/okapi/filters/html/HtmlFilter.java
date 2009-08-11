@@ -416,28 +416,31 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	}
 
 	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderType type, String name,
-			String value, Tag tag, Attribute attribute) {
-
+			String value, Tag tag, Attribute attribute) {		
+		
+		String normalizeAttributeName = normalizeAttributeName(name, value, tag);
+		
 		// Test for charset in meta tag - we need to isolate the position of
 		// charset within the attribute value
 		// i.e., content="text/html; charset=ISO-2022-JP"
-		if (isMetaCharset(name, value, tag) && value.indexOf("charset=") != -1) {
+		if (isMetaCharset(name, value, tag) && value.toLowerCase().indexOf("charset=") != -1) {
 			// offset of attribute
 			int mainStartPos = attribute.getBegin() - tag.getBegin();
 			int mainEndPos = attribute.getEnd() - tag.getBegin();
 
 			// adjust offset of value of the attribute
-			int charsetValueOffset = value.lastIndexOf("charset=") + "charset=".length();
+			int charsetValueOffset = value.toLowerCase().lastIndexOf("charset=") + "charset=".length();
 
 			int valueStartPos = (attribute.getValueSegment().getBegin() + charsetValueOffset) - tag.getBegin();
 			int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
+			
 			// get the charset value (encoding)
 			value = tag.toString().substring(valueStartPos, valueEndPos);
-			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos,
+			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName, value, mainStartPos,
 					mainEndPos, valueStartPos, valueEndPos);
 		}
-
-		return super.createPropertyTextUnitPlaceholder(type, name,
+		
+		return super.createPropertyTextUnitPlaceholder(type, normalizeAttributeName,
 				eventBuilder.normalizeHtmlText(value, true,
 				!isPreserveWhitespace() && getConfig().collapseWhitespace()),
 				tag, attribute);
@@ -506,10 +509,10 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		}
 
 		// <meta http-equiv="Content-Language" content="en"
-		if (tag.getName().equals("meta") && attrName.equals(HtmlEncoder.CONTENT)) {
+		if (tag.getName().equalsIgnoreCase("meta") && attrName.equalsIgnoreCase(HtmlEncoder.CONTENT)) {
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("http-equiv") != null) {
-				if (st.getAttributeValue("http-equiv").equals("Content-Language")) {
+				if (st.getAttributeValue("http-equiv").equalsIgnoreCase("Content-Language")) {
 					normalizedName = Property.LANGUAGE;
 					return normalizedName;
 				}
@@ -517,7 +520,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		}
 
 		// <x lang="en"> or <x xml:lang="en">
-		if (attrName.equals("lang") || attrName.equals("xml:lang")) {
+		if (attrName.equalsIgnoreCase("lang") || attrName.equalsIgnoreCase("xml:lang")) {
 			normalizedName = Property.LANGUAGE;
 		}
 
@@ -525,11 +528,11 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	}
 
 	private boolean isMetaCharset(String attrName, String attrValue, Tag tag) {
-		if (tag.getName().equals("meta") && attrName.equals(HtmlEncoder.CONTENT)) {
+		if (tag.getName().equalsIgnoreCase("meta") && attrName.equalsIgnoreCase(HtmlEncoder.CONTENT)) {
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("http-equiv") != null && st.getAttributeValue("content") != null) {
-				if (st.getAttributeValue("http-equiv").equals("Content-Type")
-						&& st.getAttributeValue("content").contains("charset=")) {
+				if (st.getAttributeValue("http-equiv").equalsIgnoreCase("Content-Type")
+						&& st.getAttributeValue("content").toLowerCase().contains("charset=")) {
 					return true;
 				}
 			}
