@@ -15,7 +15,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public abstract class AbstractFilter implements IFilter {
 	private static final Logger LOGGER = Logger.getLogger(AbstractFilter.class.getName());
-	
+
 	private static final String START_DOCUMENT = "sd"; //$NON-NLS-1$
 	private static final String END_DOCUMENT = "ed"; //$NON-NLS-1$
 
@@ -67,7 +67,7 @@ public abstract class AbstractFilter implements IFilter {
 	/**
 	 * create a START_DOCUMENT {@link Event}
 	 */
-	public Event createStartDocumentEvent() {
+	protected Event createStartDocumentEvent() {
 		StartDocument startDocument = new StartDocument(createId(START_DOCUMENT, ++documentId));
 		startDocument.setEncoding(getEncoding(), isUtf8Encoding() && isUtf8Bom());
 		startDocument.setLanguage(getSrcLang());
@@ -76,7 +76,7 @@ public abstract class AbstractFilter implements IFilter {
 		startDocument.setFilterParameters(getParameters());
 		startDocument.setFilterWriter(getFilterWriter());
 		startDocument.setName(getDocumentName());
-		startDocument.setMultilingual(isMultilingual()); 
+		startDocument.setMultilingual(isMultilingual());
 		LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId());
 		return new Event(EventType.START_DOCUMENT, startDocument);
 	}
@@ -84,12 +84,12 @@ public abstract class AbstractFilter implements IFilter {
 	/**
 	 * create a END_DOCUMENT {@link Event}
 	 */
-	public Event createEndDocumentEvent() {
-		Ending endDocument = new Ending(createId(END_DOCUMENT, ++documentId));		
+	protected Event createEndDocumentEvent() {
+		Ending endDocument = new Ending(createId(END_DOCUMENT, ++documentId));
 		LOGGER.log(Level.FINE, "End Document for " + endDocument.getId());
 		return new Event(EventType.END_DOCUMENT, endDocument);
 	}
-	
+
 	public void cancel() {
 		canceled = true;
 	}
@@ -100,14 +100,14 @@ public abstract class AbstractFilter implements IFilter {
 	private String createId(String name, int number) {
 		return String.format("%s%d", name, number); //$NON-NLS-1$
 	}
-		
+
 	/**
 	 * Allows implementers to set the START_DOCUMENT name for the current input.
 	 * 
 	 * @param documentName
 	 *            the input document name or path
 	 */
-	public void setDocumentName(String documentName) {
+	protected void setDocumentName(String documentName) {
 		this.documentName = documentName;
 	}
 
@@ -135,7 +135,7 @@ public abstract class AbstractFilter implements IFilter {
 	 * @param newlineType
 	 *            one of '\n', '\r' or '\r\n'.
 	 */
-	public void setNewlineType(String newlineType) {
+	protected void setNewlineType(String newlineType) {
 		this.newlineType = newlineType;
 	}
 
@@ -154,7 +154,7 @@ public abstract class AbstractFilter implements IFilter {
 	 * @param encoding
 	 *            the new encoding
 	 */
-	public void setEncoding(String encoding) {
+	protected void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
 
@@ -173,14 +173,15 @@ public abstract class AbstractFilter implements IFilter {
 	 * @param srcLang
 	 *            the new src lang
 	 */
-	public void setSrcLang(String srcLang) {
+	protected void setSrcLang(String srcLang) {
 		this.srcLang = srcLang;
 	}
 
 	/**
-	 * @param trgLang the trgLang to set
+	 * @param trgLang
+	 *            the trgLang to set
 	 */
-	public void setTrgLang(String trgLang) {
+	protected void setTrgLang(String trgLang) {
 		this.trgLang = trgLang;
 	}
 
@@ -190,7 +191,7 @@ public abstract class AbstractFilter implements IFilter {
 	public String getTrgLang() {
 		return trgLang;
 	}
-	
+
 	/**
 	 * Gets the input document mime type.
 	 * 
@@ -209,7 +210,7 @@ public abstract class AbstractFilter implements IFilter {
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
 	}
-	
+
 	/**
 	 * Checks if the {@link IFilter} has been canceled.
 	 * 
@@ -218,35 +219,39 @@ public abstract class AbstractFilter implements IFilter {
 	public boolean isCanceled() {
 		return canceled;
 	}
-	
+
 	/**
 	 * Gets the filter writer for this filter.
+	 * 
 	 * @return the filter writer.
 	 */
-	public IFilterWriter getFilterWriter () {
+	public IFilterWriter getFilterWriter() {
 		return filterWriter;
 	}
-		
+
 	/**
-	 * Sets the filter writer for this filter. 
-	 * @param filterWriter the filter writer to set.
+	 * Sets the filter writer for this filter.
+	 * 
+	 * @param filterWriter
+	 *            the filter writer to set.
 	 */
-	public void setFilterWriter (IFilterWriter filterWriter) {
+	public void setFilterWriter(IFilterWriter filterWriter) {
 		this.filterWriter = filterWriter;
 	}
-	
+
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
 	}
-	
+
 	public IFilterWriter createFilterWriter() {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
 	/**
-	 * @param generateSkeleton the generateSkeleton to set
+	 * @param generateSkeleton
+	 *            the generateSkeleton to set
 	 */
-	public void setGenerateSkeleton(boolean generateSkeleton) {
+	protected void setGenerateSkeleton(boolean generateSkeleton) {
 		this.generateSkeleton = generateSkeleton;
 	}
 
@@ -256,7 +261,7 @@ public abstract class AbstractFilter implements IFilter {
 	public boolean isGenerateSkeleton() {
 		return generateSkeleton;
 	}
-	
+
 	/**
 	 * Is the input encoded as UTF-8?
 	 * 
@@ -272,9 +277,10 @@ public abstract class AbstractFilter implements IFilter {
 	abstract protected boolean isUtf8Bom();
 
 	/**
-	 * @param multilingual the multilingual to set
+	 * @param multilingual
+	 *            the multilingual to set
 	 */
-	public void setMultilingual(boolean multilingual) {
+	protected void setMultilingual(boolean multilingual) {
 		this.multilingual = multilingual;
 	}
 
