@@ -440,7 +440,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 					mainEndPos, valueStartPos, valueEndPos);
 		}
 		
-		return super.createPropertyTextUnitPlaceholder(type, normalizeAttributeName,
+		// name is normalized in super-class
+		return super.createPropertyTextUnitPlaceholder(type, name,
 				eventBuilder.normalizeHtmlText(value, true,
 				!isPreserveWhitespace() && getConfig().collapseWhitespace()),
 				tag, attribute);
