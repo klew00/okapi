@@ -24,9 +24,9 @@ import net.sf.okapi.common.ParameterDescriptor;
 
 /**
  * UI part descriptor for a string selection. This UI part supports the following
- * types: String.
+ * types: String and int.
  * <p>Use {@link #setListType(int)} to specify the type of list the UI should use. By default
- * a simple listbox will be used.
+ * a simple list box will be used.
  */
 public class ListSelectionPart extends AbstractPart {
 	
@@ -40,7 +40,8 @@ public class ListSelectionPart extends AbstractPart {
 	/**
 	 * Creates a new ListSelectionPart object with a given parameter descriptor.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
-	 * @param choicesValues the list of the items that can be selected.
+	 * @param choicesValues the list of the items that can be selected. When the type of the parameter
+	 * is an int, the first value return 0, the next 1, and so forth (regardless of their actual text. 
 	 */
 	public ListSelectionPart (ParameterDescriptor paramDescriptor,
 		String[] choicesValues)
@@ -53,6 +54,7 @@ public class ListSelectionPart extends AbstractPart {
 	protected void checkType () {
 		// Check type support
 		if ( getType().equals(String.class) ) return;
+		if ( getType().equals(int.class) ) return;
 		// Otherwise: call the base method.
 		super.checkType();
 	}

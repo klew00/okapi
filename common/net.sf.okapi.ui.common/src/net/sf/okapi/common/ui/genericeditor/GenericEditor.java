@@ -562,7 +562,16 @@ public class GenericEditor {
 		try {
 			int n = list.getSelectionIndex();
 			if ( n > -1 ) {
-				desc.getWriteMethod().invoke(desc.getParent(), ((String[])list.getData())[n]);
+				if ( desc.getType().equals(String.class) ) {
+					desc.getWriteMethod().invoke(desc.getParent(), ((String[])list.getData())[n]);
+				}
+				else if ( desc.getType().equals(int.class) ) {
+					desc.getWriteMethod().invoke(desc.getParent(), (Integer)n);
+				}
+				else {
+					throw new OkapiEditorCreationException(String.format(
+						"Invalid type for the parameter '%s'.", desc.getName()));
+				}
 			}
 		}
 		catch ( IllegalArgumentException e ) {
@@ -585,8 +594,18 @@ public class GenericEditor {
 			int n = combo.getSelectionIndex();
 			if ( n > -1 ) {
 				// Get the value from the user-data list
-				desc.getWriteMethod().invoke(desc.getParent(), ((String[])combo.getData())[n]);
+				if ( desc.getType().equals(String.class) ) {
+					desc.getWriteMethod().invoke(desc.getParent(), ((String[])combo.getData())[n]);
+				}
+				else if ( desc.getType().equals(int.class) ) {
+					desc.getWriteMethod().invoke(desc.getParent(), (Integer)n);
+				}
+				else {
+					throw new OkapiEditorCreationException(String.format(
+						"Invalid type for the parameter '%s'.", desc.getName()));
+				}
 			}
+			
 		}
 		catch ( IllegalArgumentException e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -662,6 +681,16 @@ public class GenericEditor {
 					list.select(found);
 				}
 			}
+			else if ( desc.getType().equals(int.class) ) {
+				list.setData(values); // Store the list of values in the user-data
+				for ( String label : labels ) {
+					list.add(label);
+				}
+				int current = (Integer)desc.getReadMethod().invoke(desc.getParent());
+				if (( current > -1 ) && ( current < list.getItemCount() )) {
+					list.select(current);
+				}
+			}
 			else {
 				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
@@ -695,9 +724,9 @@ public class GenericEditor {
 			}
 			
 			// Set the control
+			combo.setData(values); // Store the list of values in the user-data
 			if ( desc.getType().equals(String.class) ) {
 				String current = (String)desc.getReadMethod().invoke(desc.getParent());
-				combo.setData(values); // Store the list of values in the user-data
 				if ( current == null ) current = "";
 				int found = -1;
 				int n = 0;
@@ -708,6 +737,15 @@ public class GenericEditor {
 				}
 				if ( found > -1 ) {
 					combo.select(found);
+				}
+			}
+			else if ( desc.getType().equals(int.class) ) {
+				for ( String label : labels ) {
+					combo.add(label);
+				}
+				int current = (Integer)desc.getReadMethod().invoke(desc.getParent());
+				if (( current > -1 ) && ( current < combo.getItemCount() )) {
+					combo.select(current);
 				}
 			}
 			else {
