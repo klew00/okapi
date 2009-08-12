@@ -125,6 +125,7 @@ public class OpenXMLFilter implements IFilter {
 	private boolean bProcessedExcelSheets=true; // DWH 6-13-09 Excel options
 	private String sCurrentExcelSheet=""; // DWH 6-25-09 current sheet number
 	private YamlParameters yparams=null;
+	private String encoding="UTF-8"; // DWH 8-10-09 issue 104
 
 	public OpenXMLFilter () {
 		cparams = new ConditionalParameters(); // DWH 6-16-09
@@ -473,6 +474,7 @@ public class OpenXMLFilter implements IFilter {
 		boolean generateSkeleton)
 	{
 		srcLang = sourceLanguage;
+		encoding = defaultEncoding; // issue 104
 	}
 
 	/**
@@ -553,6 +555,7 @@ public class OpenXMLFilter implements IFilter {
 			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setLineBreak("\n");
+			startDoc.setEncoding(encoding, false);  // Office 2007 files don't have UTF8BOM
 			ZipSkeleton skel = new ZipSkeleton(zipFile);
 			return new Event(EventType.START_DOCUMENT, startDoc, skel);
 		}
@@ -786,6 +789,7 @@ public class OpenXMLFilter implements IFilter {
 		sd.setName(entry.getName());
 		cparams.nFileType = nFileType; // DWH 6-27-09 record File Type for the OpenXMLContentSkeletonWriter
 		sd.setFilterParameters(cparams); // DWH 6-27-09 StartSubdocument will have conditional parameter info
+//		sd.setEncoding(encoding,false)); // subdoc doesn't have this
 		nextAction = NextAction.NEXTINSUBDOC;
 		ZipSkeleton skel = new ZipSkeleton(
 			(GenericSkeleton)event.getResource().getSkeleton(), entry);
