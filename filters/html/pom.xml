@@ -1,23 +1,21 @@
-
-		
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <parent>
-      <artifactId> (CHANGE ME) parent-artifact-id</artifactId>
+      <artifactId>build-filters</artifactId>
       <groupId>net.sf.okapi</groupId>
       <version>1.0.0</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <!--Should match the directory name-->
-   <artifactId> (CHANGE ME) module-artifact-id</artifactId>
+   <artifactId>filters-html</artifactId>
    <!--Used for display purposes only-->
-   <name> (CHANGE ME) Artifact Display Name</name>
+   <name>HTML Filter</name>
    <dependencies>
       <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId> (CHANGE ME or REMOVE ME) common.filters</artifactId>
-        <version>${project.version}</version>
+        <groupId>net.sf.okapi</groupId>
+        <artifactId>filters-abstractmarkup</artifactId>
+        <version>1.21</version>
       </dependency>
    </dependencies>
    <build>     
@@ -32,6 +30,4 @@
          </plugin>
      </plugins>
   </build>
-</project>		
-		
-		
+</project>
