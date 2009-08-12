@@ -19,7 +19,7 @@
     </scm>
 
     <modules>
-        <module>framework/net.sf.okapi.common</module>
+        <module>framework/core</module>
     </modules>
     <dependencies>
         <dependency>
