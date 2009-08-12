@@ -14,14 +14,16 @@
 
     <target name="convert.source" depends="check.for.source" if="source.exists" description="Convert Source Code to Maven Structure">
         <mkdir dir="src/main/java"/>
+		<mkdir dir="src/main/resources"/>
         <svn>
             <add dir="src/main"/>
-            <move srcPath="src/net" destPath="src/main/java/" message="I hope this doesn't commit"/>
+            <move srcPath="src/net" destPath="src/main/java/" message="I hope this doesn't commit"/>			
         </svn>
     </target>
 
     <target name="convert.tests" depends="check.for.test" if="tests.exist" description="Convert Tests to be included in the same module">
         <mkdir dir="src/test/java"/>
+		<mkdir dir="src/test/resources"/>
         <svn>
             <add dir="src/test"/>
             <move srcPath="${pwd}.tests/src/net" destPath="src/test/java/" message="I hope this doesn't commit"/>
@@ -37,9 +39,11 @@
             <revert dir="src" recurse="true"/>
             <revert dir="src/net" recurse="true"/>
             <revert dir="src/main" recurse="true"/>
+			<revert dir="src/test" recurse="true"/>
 			<revert file="pom.xml" />
         </svn>
 		<delete dir="src/main"/>
+		<delete dir="src/test"/>
 		<delete file="pom.xml"/>
     </target>
 
