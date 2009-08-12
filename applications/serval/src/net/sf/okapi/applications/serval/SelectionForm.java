@@ -9,6 +9,7 @@ import net.sf.okapi.tm.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.tm.opentran.OpenTranTMConnector;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 import net.sf.okapi.tm.trados.TradosTMConnector;
+import net.sf.okapi.tm.translatetoolkit.TranslateToolkitTMConnector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -45,6 +46,7 @@ public class SelectionForm {
 		lbResources.add("Open-Tran translation search server (Internet)");
 		lbResources.add("Trados TM local translation memory");
 		lbResources.add("GlobalSight TM Web service");
+		lbResources.add("Translate Toolkit TM");
 		lbResources.setSelection(0);
 		
 		// Dialog-level buttons
@@ -71,6 +73,9 @@ public class SelectionForm {
 						break;
 					case 4: // GlobalSight TM
 						result = new GlobalSightTMConnector();
+						break;
+					case 5: // Translate Toolkit TM
+						result = new TranslateToolkitTMConnector();
 						break;
 					}
 				}
