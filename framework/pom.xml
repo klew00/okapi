@@ -15,7 +15,7 @@
    <name>Okapi Framework Build</name>
 <modules>
 <module>core</module>
-<module>integration-tests</module>
+<!--<module>integration-tests</module>-->
 </modules>
 </project>		
 		
