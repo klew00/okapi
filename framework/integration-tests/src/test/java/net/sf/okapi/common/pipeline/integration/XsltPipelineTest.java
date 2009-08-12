@@ -1,4 +1,4 @@
-package net.sf.okapi.common.pipeline.tests.integration;
+package net.sf.okapi.common.pipeline.integration;
 
 import java.io.BufferedReader;
 import java.io.File;

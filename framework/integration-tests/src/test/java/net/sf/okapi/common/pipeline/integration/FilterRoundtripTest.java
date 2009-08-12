@@ -18,7 +18,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.pipeline.tests.integration;
+package net.sf.okapi.common.pipeline.integration;
 
 import static org.junit.Assert.assertEquals;
 

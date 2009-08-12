@@ -5,13 +5,13 @@
 	<version>1.0.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>framework.integration-tests</artifactId>
+  <artifactId>framework-integration-tests</artifactId>
   <packaging>pom</packaging>
   <name>Okapi Framework Integration Tests</name>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>core/artifactId>
+      <artifactId>okapi-core</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>

@@ -19,7 +19,7 @@
     </scm>
 
     <modules>
-        <module>framework</module>
+        <module>framework</module>   
     </modules>
     <dependencies>
         <dependency>
