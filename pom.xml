@@ -20,6 +20,7 @@
 
     <modules>
         <module>framework</module>   
+        <module>filters</module>   
     </modules>
     <dependencies>
         <dependency>
