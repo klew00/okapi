@@ -10,7 +10,7 @@
         </classpath>
     </typedef>
 
-    <target  name="convertify" depends="convert.source, convert.tests"/>
+    <target  name="convertify" depends="convert.source, convert.tests, generate.pom"/>
 
     <target name="convert.source" depends="check.for.source" if="source.exists" description="Convert Source Code to Maven Structure">
         <mkdir dir="src/main/java"/>
@@ -37,7 +37,10 @@
             <revert dir="src" recurse="true"/>
             <revert dir="src/net" recurse="true"/>
             <revert dir="src/main" recurse="true"/>
+			<revert file="pom.xml" />
         </svn>
+		<delete dir="src/main"/>
+		<delete file="pom.xml"/>
     </target>
 
     <target name="check.for.source">
@@ -47,4 +50,47 @@
     <target name="check.for.test">
         <available file="${pwd}.tests" property="tests.exist"/>
     </target>
+	
+	<target name="generate.pom">
+		<echo file="pom.xml">
+		<![CDATA[
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <parent>
+      <artifactId> (CHANGE ME) parent-artifact-id</artifactId>
+      <groupId>net.sf.okapi</groupId>
+      <version>1.0.0</version>
+   </parent>
+   <modelVersion>4.0.0</modelVersion>
+   <!--Should match the directory name-->
+   <artifactId> (CHANGE ME) module-artifact-id</artifactId>
+   <!--Used for display purposes only-->
+   <name> (CHANGE ME) Artifact Display Name</name>
+   <dependencies>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId> (CHANGE ME or REMOVE ME) common.filters</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+   </dependencies>
+   <build>     
+     <plugins>
+         <plugin>
+           <artifactId>maven-jar-plugin</artifactId>
+           <configuration>
+              <!--All JAR projects will have this same configuration -->
+              <!-- This projects generated JAR will look like: net.sf.okapi.common.pipeline-1.0.0.jar -->
+              <finalName>${pom.groupId}.${pom.artifactId}-${pom.version}</finalName>
+           </configuration>
+         </plugin>
+     </plugins>
+  </build>
+</project>		
+		]]>
+		</echo>
+		<svn>
+			<add file="pom.xml"/>
+		</svn>
+	</target>
 </project>
