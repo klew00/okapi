@@ -77,7 +77,7 @@ public class OpenXMLRoundTripTest {
 
 		ArrayList<String> themfiles = new ArrayList<String>();
 		zc = new ZipCompare();
-/*
+
 		themfiles.add("BoldWorld.docx");
 		themfiles.add("Deli.docx");
 		themfiles.add("DocProperties.docx");
@@ -97,19 +97,18 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("ExcelColors.xlsx");
 		themfiles.add("UTF8.docx");
 		themfiles.add("Practice2.docx");
-*/
-		themfiles.add("Hidden.docx");
-		themfiles.add("Practice2.docx");
+
+//		themfiles.add("InsertText.pptx");
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
 		
 		for(String s : themfiles)
 		{
-			runOneTest(s,false,false); // English
+//			runOneTest(s,false,false); // English
 			runOneTest(s,true,false);  // PigLatin
-			runOneTest(s,false,true);  // Tags
-			runOneTest(s,true,true);   // Codes
+//			runOneTest(s,false,true);  // Tags
+//			runOneTest(s,true,true);   // Codes
 		}
 		assertTrue("Some Roundtrip files failed.",allGood);
 	}
