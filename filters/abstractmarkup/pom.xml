@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <parent>
+      <artifactId>build-filters</artifactId>
+      <groupId>net.sf.okapi</groupId>
+      <version>1.0.0</version>
+   </parent>
+   <modelVersion>4.0.0</modelVersion>
+   <!--Should match the directory name-->
+   <artifactId>filters-abstractmarkup</artifactId>
+   <!--Used for display purposes only-->
+   <name>Abstract Markup Filter</name>
+   <build>     
+     <plugins>
+         <plugin>
+           <artifactId>maven-jar-plugin</artifactId>
+           <configuration>
+              <!--All JAR projects will have this same configuration -->
+              <!-- This projects generated JAR will look like: net.sf.okapi.common.pipeline-1.0.0.jar -->
+              <finalName>${pom.groupId}.${pom.artifactId}-${pom.version}</finalName>
+           </configuration>
+         </plugin>
+     </plugins>
+  </build>
+</project>
