@@ -13,21 +13,14 @@
    <name>DTD Filter</name>
    <dependencies>
       <dependency>
+        <groupId>net.sf.okapi</groupId>
+        <artifactId>okapi-core</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
         <groupId>dtdparser</groupId>
         <artifactId>dtdparser</artifactId>
         <version>1.21</version>
       </dependency>
    </dependencies>
-   <build>
-     <plugins>
-         <plugin>
-           <artifactId>maven-jar-plugin</artifactId>
-           <configuration>
-              <!--All JAR projects will have this same configuration -->
-              <!-- This projects generated JAR will look like: net.sf.okapi.common.pipeline-1.0.0.jar -->
-              <finalName>${pom.groupId}.${pom.artifactId}-${pom.version}</finalName>
-           </configuration>
-         </plugin>
-     </plugins>
-  </build>
 </project>
