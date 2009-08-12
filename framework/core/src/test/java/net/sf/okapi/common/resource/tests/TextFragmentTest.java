@@ -30,7 +30,7 @@ import net.sf.okapi.common.resource.InvalidPositionException;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.common.filters.tests.FilterTestDriver;
 
 import org.junit.Before;
 import org.junit.Test;

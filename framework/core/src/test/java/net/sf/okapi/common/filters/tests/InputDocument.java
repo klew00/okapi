@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.tests;
+package net.sf.okapi.common.filters.tests;
 
 public class InputDocument {
 

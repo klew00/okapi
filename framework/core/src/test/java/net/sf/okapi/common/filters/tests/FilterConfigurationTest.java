@@ -47,10 +47,10 @@ public class FilterConfigurationTest {
 	@Test
 	public void getDefaultFromMimeTest () {
 		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
-		fcm.addConfigurations("net.sf.okapi.filters.regex.RegexFilter");
-		FilterConfiguration cfg = fcm.getDefaultConfiguration("text/x-regex");
-		assertNotNull(cfg);
-		assertEquals("okf_regex", cfg.configId);
+		fcm.addConfigurations(StubFilter.class.getName());
+		FilterConfiguration cfg = fcm.getDefaultConfiguration("text/foo");
+		assertNotNull("config should not be null", cfg);
+		assertEquals("The Config ID", "foobar", cfg.configId);
 	}
 
 	@Test
@@ -96,20 +96,31 @@ public class FilterConfigurationTest {
 	}
 
 	@Test
-	public void createFilterTest () {
-		String configId = "okf_regex-srt";
+	public void createFilterTestWithDefaultFilter () {
+		String configId = "foobar";
 		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
-		fcm.addConfigurations("net.sf.okapi.filters.regex.RegexFilter");
+		fcm.addConfigurations(StubFilter.class.getName());
 		FilterConfiguration cfg = fcm.getConfiguration(configId);
 		IFilter filter = fcm.createFilter(configId);
-		assertNotNull(filter);
+		assertNotNull("filter should not be null", filter);
+		assertEquals(filter.getClass().getName(), cfg.filterClass);
+	}
+
+	@Test
+	public void createFilterTestWithNonDefaultFilter () {
+		String configId = "foobar-srt";
+		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
+		fcm.addConfigurations(StubFilter.class.getName());
+		FilterConfiguration cfg = fcm.getConfiguration(configId);
+		IFilter filter = fcm.createFilter(configId);
+		assertNotNull("filter should not be null", filter);
 		assertEquals(filter.getClass().getName(), cfg.filterClass);
 	}
 
 	@Test
 	public void removeFilterTest () {
-		String configId = "okf_regex-srt";
-		String filterClass = "net.sf.okapi.filters.regex.RegexFilter";
+		String configId = "foobar-srt";
+		String filterClass = "net.sf.okapi.common.filters.StubFilter";
 		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
 		fcm.addConfigurations(filterClass);
 		FilterConfiguration cfg = fcm.getConfiguration(configId);
@@ -117,15 +128,15 @@ public class FilterConfigurationTest {
 		// Now remove
 		fcm.removeConfigurations(filterClass);
 		cfg = fcm.getConfiguration(configId);
-		assertNull(cfg);
+		assertNull("Config should have not been found.", cfg);
 	}
 
 	@Test
 	public void createEditorTest () {
-		String configId = "okf_regex-srt";
-		String editorClass = "net.sf.okapi.filters.ui.regex.Editor";
+		String configId = "foobar-srt";
+		String editorClass = "net.sf.okapi.common.filters.StubEditor";
 		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
-		fcm.addConfigurations("net.sf.okapi.filters.regex.RegexFilter");
+		fcm.addConfigurations("net.sf.okapi.common.filters.StubFilter");
 		// Get the parameters class name for this filter
 		IFilter filter = fcm.createFilter(configId);
 		assertNotNull(filter);
@@ -134,8 +145,8 @@ public class FilterConfigurationTest {
 		fcm.addEditor(editorClass, params.getClass().getName());
 		// Try to instantiate the editor object
 		IParametersEditor editor = fcm.createParametersEditor(configId);
-		assertNotNull(editor);
-		assertNotNull(editorClass, editor.getClass().getName());
+		assertNotNull("Editor should have been created.", editor);
+		assertEquals("Editor class name.", editorClass, editor.getClass().getName());
 	}
 
 }

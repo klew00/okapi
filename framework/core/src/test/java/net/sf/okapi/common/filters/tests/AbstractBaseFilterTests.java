@@ -24,8 +24,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.filters.tests.DummyBaseFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
 
 public class AbstractBaseFilterTests {
 
