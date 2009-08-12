@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Openoffice Filter
+Bundle-SymbolicName: net.sf.okapi.filters.openoffice
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.filters.openoffice
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.filters.common;bundle-version="1.0.0",
+ stax_wstx;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
