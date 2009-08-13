@@ -16,7 +16,7 @@
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
-package net.sf.okapi.filters.openxml.tests;
+package net.sf.okapi.filters.openxml;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -26,8 +26,8 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
 import org.junit.Before;

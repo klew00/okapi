@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.openxml.tests;
+package net.sf.okapi.filters.openxml;
 
 import java.io.File;
 import java.io.FileInputStream;

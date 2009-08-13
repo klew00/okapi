@@ -13,9 +13,10 @@
    <name>Okapi Filters Build</name>
 <modules>
 	<module>abstractmarkup</module>
-	<module>dtd</module>
 	<module>html</module>
+	<module>dtd</module>
 	<module>po</module>
 	<module>ts</module>
+	<module>openxml</module>
 </modules>
 </project>

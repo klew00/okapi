@@ -36,7 +36,7 @@
 /*
  * @(#)ExampleFileFilter.java	1.14 03/01/23
  */
-package net.sf.okapi.filters.openxml.tests;
+package net.sf.okapi.filters.openxml;
 
 import java.io.File;
 import java.util.Hashtable;

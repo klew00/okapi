@@ -17,7 +17,7 @@
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
-package net.sf.okapi.filters.openxml.tests;
+package net.sf.okapi.filters.openxml;
 
 import static org.junit.Assert.assertEquals;
 
