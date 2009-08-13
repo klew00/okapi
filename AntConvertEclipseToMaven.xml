@@ -21,11 +21,17 @@
         </svn>
     </target>
 
-    <target name="convert.tests" depends="check.for.test" if="tests.exist" description="Convert Tests to be included in the same module">
+    <target name="convert.tests" description="Convert Tests to be included in the same module">
         <mkdir dir="src/test/java"/>
 		<mkdir dir="src/test/resources"/>
         <svn>
             <add dir="src/test"/>
+        </svn>
+        <antcall target="move.tests"/>
+    </target>
+
+    <target name="move.tests" depends="check.for.test" if="tests.exist" description="Actual moves the tests">
+        <svn>
             <move srcPath="${pwd}.tests/src/net" destPath="src/test/java/" message="I hope this doesn't commit"/>
         </svn>
     </target>
