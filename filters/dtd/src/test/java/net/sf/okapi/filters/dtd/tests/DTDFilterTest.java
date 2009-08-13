@@ -47,14 +47,10 @@ import org.junit.Test;
 public class DTDFilterTest {
 
 	private DTDFilter filter;
-	private String root;
 
 	@Before
 	public void setUp() {
 		filter = new DTDFilter();
-		URL url = DTDFilterTest.class.getResource("/Test01.dtd");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -68,8 +64,9 @@ public class DTDFilterTest {
 
 	@Test
 	public void testStartDocument () {
+		URL url = DTDFilterTest.class.getResource("/Test01.dtd");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(root+"Test01.dtd", null),
+			new InputDocument(url.getPath(), null),
 			"UTF-8", "en", "en"));
 	}
 	
@@ -122,8 +119,10 @@ public class DTDFilterTest {
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root+"Test01.dtd", null));
-		list.add(new InputDocument(root+"Test02.dtd", null));
+		URL url = DTDFilterTest.class.getResource("/Test01.dtd");
+		list.add(new InputDocument(url.getPath(), null));
+		url = DTDFilterTest.class.getResource("/Test02.dtd");
+		list.add(new InputDocument(url.getPath(), null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
