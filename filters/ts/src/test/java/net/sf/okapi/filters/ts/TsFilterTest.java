@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.ts.tests;
+package net.sf.okapi.filters.ts;
 
 import static org.junit.Assert.*;
 
@@ -22,7 +22,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.ts.TsFilter;
+import net.sf.okapi.filters.ts.TsFilter;
 
 import org.junit.Assert;
 import org.junit.Before;
