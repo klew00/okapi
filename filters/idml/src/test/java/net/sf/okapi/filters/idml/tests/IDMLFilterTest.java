@@ -26,13 +26,14 @@ import static org.junit.Assert.assertTrue;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.filters.idml.IDMLFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.tests.RoundTripComparison;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,8 +47,7 @@ public class IDMLFilterTest {
 	public void setUp() {
 		filter = new IDMLFilter();
 		URL url = IDMLFilterTest.class.getResource("/Test01.idml");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+		root = Util.getDirectoryName(url.getPath()) + File.separator;
 	}
 
 	@Test
