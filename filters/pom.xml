@@ -23,6 +23,7 @@
         <module>rtf</module>
         <module>tmx</module>
         <module>xml</module>
+        <module>xliff</module>
         <module>regex</module>
         <module>plaintext</module>
         <module>html</module>
