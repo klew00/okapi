@@ -19,28 +19,18 @@
 
 package net.sf.okapi.filters.html;
 
-import java.net.URL;
-import java.util.ArrayList;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.resource.*;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.common.filters.FilterTestDriver;
-
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class HtmlEventTest {
 	private HtmlFilter htmlFilter;
@@ -49,7 +39,7 @@ public class HtmlEventTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
-		parameters = HtmlEventTest.class.getResource("testConfiguration1.yml");
+		parameters = HtmlEventTest.class.getResource("/testConfiguration1.yml");
 	}
 	
 	@Test

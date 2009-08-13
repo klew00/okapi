@@ -2,27 +2,19 @@ package net.sf.okapi.filters.html;
 
 
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.resource.*;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
-import net.sf.okapi.filters.html.HtmlFilter;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class HtmlSnippetsTest {
 	private HtmlFilter htmlFilter;
@@ -31,7 +23,7 @@ public class HtmlSnippetsTest {
 	@Before
 	public void setUp() {
 		htmlFilter = new HtmlFilter();
-		parameters = HtmlSnippetsTest.class.getResource("testConfiguration1.yml");
+		parameters = HtmlSnippetsTest.class.getResource("/testConfiguration1.yml");
 	}
 
 	@After
@@ -170,7 +162,7 @@ public class HtmlSnippetsTest {
 	public void testNewlineDetection() {
 		String snippet = "\r\nX\r\nY\r\n";
 		URL originalParameters = parameters;
-		parameters = HtmlSnippetsTest.class.getResource("collapseWhitespaceOff.yml");
+		parameters = HtmlSnippetsTest.class.getResource("/collapseWhitespaceOff.yml");
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
 		parameters = originalParameters;
 	}
