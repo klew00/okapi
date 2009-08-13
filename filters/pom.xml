@@ -26,5 +26,6 @@
         <module>plaintext</module>
         <module>rtf</module>
         <module>tmx</module>
+        <module>xml</module>
     </modules>
 </project>
