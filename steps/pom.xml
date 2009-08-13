@@ -16,5 +16,6 @@
 		<module>charlisting</module>
 		<module>copysourcetotarget</module>
 		<module>encodingconversion</module>
+		<module>fullwidthconversion</module>
     </modules>
 </project>
