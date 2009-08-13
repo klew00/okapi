@@ -14,14 +14,14 @@
    <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>
-            <artifactId>okapi-core</artifactId>
-            <scope>test</scope>
-            <classifier>tests</classifier>
+            <artifactId>okapi-core</artifactId>            
             <version>${project.version}</version>
         </dependency>
       <dependency>
-        <groupId>${project.groupId}</groupId>
+        <groupId>net.sf.okapi</groupId>
         <artifactId>okapi-core</artifactId>
+        <scope>test</scope>
+            <classifier>tests</classifier>
         <version>${project.version}</version>
       </dependency>
    </dependencies>
