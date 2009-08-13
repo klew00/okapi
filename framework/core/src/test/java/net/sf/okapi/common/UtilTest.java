@@ -69,6 +69,12 @@ public class UtilTest {
 	}
 
 	@Test
+	public void testGetDirectoryName_MixedCases () {
+		String in = "/home/test\\file";
+		assertEquals("/home/test", Util.getDirectoryName(in));
+	}
+
+	@Test
 	public void testGetDirectoryName_Slash () {
 		String in = "/home/test/file";
 		assertEquals("/home/test", Util.getDirectoryName(in));

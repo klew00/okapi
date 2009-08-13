@@ -146,10 +146,11 @@ public class Util {
 	 *         string if path is a filename.
 	 */
 	static public String getDirectoryName(String path) {
-		int n = path.lastIndexOf('/'); // Try generic first
-		if (n == -1) { // Then Windows
-			n = path.lastIndexOf('\\');
-		}
+		String tmp = path.replace('\\', '/'); // Normalize separators (some path are mixed)
+		int n = tmp.lastIndexOf('/'); // Try generic first
+//		if (n == -1) { // Then try Windows
+//			n = path.lastIndexOf('\\');
+//		}
 		if (n > 0)
 			return path.substring(0, n);
 		else
@@ -166,10 +167,11 @@ public class Util {
 	 *            "/C:/test/file.ext").
 	 */
 	static public void createDirectories(String path) {
-		int n = path.lastIndexOf('/'); // Try generic first
-		if (n == -1) { // Then try Windows
-			n = path.lastIndexOf('\\');
-		}
+		String tmp = path.replace('\\', '/'); // Normalize separators (some path are mixed)
+		int n = tmp.lastIndexOf('/'); // Try generic first
+//		if (n == -1) { // Then try Windows
+//			n = path.lastIndexOf('\\');
+//		}
 		if (n == -1)
 			return; // Nothing to do
 		// Else, use the directory part and create the tree
