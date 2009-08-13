@@ -19,26 +19,12 @@
 ===========================================================================*/
 
 package net.sf.okapi.filters.plaintext.tests;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.*;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -46,20 +32,23 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.regex.Parameters;
 import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;
-// import net.sf.okapi.filters.regex.Parameters;
-import net.sf.okapi.common.filters.FilterTestDriver;
-import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
-
 import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class RegexPlainTextFilterTest {
 	
 	private RegexPlainTextFilter filter;
 	private FilterTestDriver testDriver;
-	
+    String root;
+
 	@Before
 	public void setUp() {
 		filter = new RegexPlainTextFilter();
@@ -70,6 +59,7 @@ public class RegexPlainTextFilterTest {
 		
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
+        root = TestUtil.getParentDir(this.getClass(), "/cr.txt");
 	}
 
 	@Test
@@ -269,10 +259,6 @@ public class RegexPlainTextFilterTest {
 			
 	@Test
 	public void testDoubleExtraction () {
-		// Read all files in the data directory
-		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		

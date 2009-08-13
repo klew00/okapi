@@ -20,25 +20,10 @@
 
 package net.sf.okapi.filters.plaintext.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.util.ArrayList;
-
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.*;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
@@ -47,17 +32,18 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.spliced.Parameters;
 import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
-import net.sf.okapi.common.filters.FilterTestDriver;
-import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
-
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.*;
+import java.util.ArrayList;
 
 public class SplicedLinesFilterTest {
 
 	private SplicedLinesFilter filter;
 	private FilterTestDriver testDriver;
+    String root;
 	
 	@Before
 	public void setUp() {
@@ -69,6 +55,7 @@ public class SplicedLinesFilterTest {
 		
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
+        root = TestUtil.getParentDir(this.getClass(), "/cr.txt");
 	}
 
 	@Test
@@ -103,10 +90,6 @@ public class SplicedLinesFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = ParaPlainTextFilterTest.class.getResource("/combined_lines.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
 		list.add(new InputDocument(root + "combined_lines.txt", ""));
@@ -243,9 +226,9 @@ public class SplicedLinesFilterTest {
 	}
 	
 	private String _getFullFileName(String fileName) {
-		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+//		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
+//		String root = Util.getDirectoryName(url.getPath());
+//		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 	

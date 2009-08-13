@@ -19,43 +19,14 @@
 ===========================================================================*/
 
 package net.sf.okapi.filters.plaintext.tests;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.*;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.filters.FilterConfiguration;
-import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.*;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.*;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.plaintext.PlainTextFilter;
@@ -67,13 +38,16 @@ import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.Parameters;
 import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;
 import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
-import net.sf.okapi.common.filters.FilterTestDriver;
-import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
-
 import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlainTextFilterTest {
 	
@@ -92,9 +66,7 @@ public class PlainTextFilterTest {
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
 
-		URL url = PlainTextFilterTest.class.getResource("/cr.txt");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+		root = TestUtil.getParentDir(this.getClass(), "/cr.txt");
 	}
 
 	@Test
@@ -304,7 +276,7 @@ public class PlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("crlf_start.txt")); // Trailing linebreak
+			st = _getSkeleton(root + "crlf_start.txt"); // Trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
@@ -324,7 +296,7 @@ public class PlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test1.txt")); // No trailing linebreak
+			st = _getSkeleton(root + "csv_test1.txt"); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
@@ -344,7 +316,7 @@ public class PlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test2.txt")); // No trailing linebreak
+			st = _getSkeleton(root + "csv_test2.txt"); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	

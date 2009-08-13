@@ -17,12 +17,19 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>okapi-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.okapi.filters</groupId>
       <artifactId>filters-html</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>net.sf.okapi.filters</groupId>
       <artifactId>filters-xml</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
@@ -30,12 +37,6 @@
   </dependencies>
   <build>
     <plugins>
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <configuration>
-            <finalName>${pom.groupId}.${pom.artifactId}-${pom.version}</finalName>
-          </configuration>
-        </plugin>
 		<plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-compiler-plugin</artifactId>

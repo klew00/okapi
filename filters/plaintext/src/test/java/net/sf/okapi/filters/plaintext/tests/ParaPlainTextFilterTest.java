@@ -426,7 +426,7 @@ public class ParaPlainTextFilterTest {
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
 	}
-	
+
 	@Test
 	public void testDoubleExtraction2() {
 		// Read all files in the data directory
@@ -455,7 +455,7 @@ public class ParaPlainTextFilterTest {
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
 	}
-	
+
 	@Test
 	public void testCancel() {
 		testDriver.setDisplayLevel(2);

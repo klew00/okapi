@@ -1,22 +1,14 @@
 package net.sf.okapi.filters.plaintext.tests.common;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.URL;
 
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.TestUtil;
+
+import java.io.*;
 
 
 public class FormTestFiles {
 
 	private static String getPath() {
-		
-		URL url = FormTestFiles.class.getResource("/cr.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		return root;
+		return TestUtil.getParentDir(FormTestFiles.class.getClass(), "/cr.txt");
 	}
 	
 	private static void formTestFile(String fileName, String lineBreak, boolean lineBreakAtFileEnd) {				
