@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.html.tests;
+package net.sf.okapi.filters.html;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

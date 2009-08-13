@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.html.tests;
+package net.sf.okapi.filters.html;
 
 import static org.junit.Assert.assertTrue;
 

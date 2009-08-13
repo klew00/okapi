@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.html.tests.integration;
+package net.sf.okapi.filters.html.integration;
 
 import static org.junit.Assert.assertTrue;
 
@@ -8,10 +8,10 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.filters.html.tests.TestUtils;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.tests.RoundTripComparison;
+import net.sf.okapi.filters.html.TestUtils;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 
 import org.junit.After;
 import org.junit.Before;

@@ -16,7 +16,7 @@
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
-package net.sf.okapi.filters.html.tests;
+package net.sf.okapi.filters.html;
 
 import java.net.URL;
 import java.util.HashMap;

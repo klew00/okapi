@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.dtd.tests;
+package net.sf.okapi.filters.dtd;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

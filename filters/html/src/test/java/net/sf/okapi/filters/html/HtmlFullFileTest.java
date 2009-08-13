@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.html.tests;
+package net.sf.okapi.filters.html;
 
 import java.io.InputStream;
 import java.net.URISyntaxException;

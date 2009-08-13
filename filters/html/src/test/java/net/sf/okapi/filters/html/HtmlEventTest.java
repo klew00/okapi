@@ -17,7 +17,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.filters.html.tests;
+package net.sf.okapi.filters.html;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.common.filters.FilterTestDriver;
 
 import org.junit.Before;
 import org.junit.Test;
