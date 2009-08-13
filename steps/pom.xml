@@ -14,5 +14,6 @@
     <modules>
         <module>bomconversion</module>
 		<module>charlisting</module>
+		<module>copysourcetotarget</module>
     </modules>
 </project>
