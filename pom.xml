@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <groupId>net.sf.okapi</groupId>   
+    <groupId>net.sf.okapi</groupId>
     <artifactId>build-okapi</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -19,8 +19,8 @@
     </scm>
 
     <modules>
-        <module>framework</module>   
-        <module>filters</module>   
+        <module>framework</module>
+        <module>filters</module>
     </modules>
     <dependencies>
         <dependency>
@@ -37,18 +37,18 @@
     </dependencies>
     <build>
         <plugins>
-    <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-	<version>2.3</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -99,15 +99,15 @@
                 <artifactId>maven-surefire-report-plugin</artifactId>
                 <version>2.4.3</version>
             </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <configuration>
-          <formats>
-            <format>html</format>
-          </formats>
-        </configuration>
-      </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <configuration>
+                    <formats>
+                        <format>html</format>
+                    </formats>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
