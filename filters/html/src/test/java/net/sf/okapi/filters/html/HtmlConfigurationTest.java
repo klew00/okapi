@@ -128,7 +128,7 @@ public class HtmlConfigurationTest {
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		assertTrue(rules.collapseWhitespace());
 				
-		url = HtmlConfigurationTest.class.getResource("/net/sf/okapi/filters/html/tests/collapseWhitespaceOff.yml");
+		url = HtmlConfigurationTest.class.getResource("/collapseWhitespaceOff.yml");
 		rules = new TaggedFilterConfiguration(url);
 		assertFalse(rules.collapseWhitespace());
 	}

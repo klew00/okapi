@@ -38,10 +38,10 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.filters.po.POFilter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,14 +50,10 @@ import static org.junit.Assert.*;
 public class POFilterTest {
 	
 	private POFilter filter;
-	private String root;
 	
 	@Before
 	public void setUp() {
 		filter = new POFilter();
-		URL url = POFilterTest.class.getResource("/Test01.po");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -71,8 +67,9 @@ public class POFilterTest {
 
 	@Test
 	public void testStartDocument () {
+		URL url = POFilterTest.class.getResource("/Test01.po");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(root+"Test01.po", null),
+			new InputDocument(url.getPath(), null),
 			"UTF-8", "en", "en"));
 	}
 	
@@ -252,17 +249,28 @@ public class POFilterTest {
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root+"Test01.po", null));
-		list.add(new InputDocument(root+"Test02.po", null));
-		list.add(new InputDocument(root+"Test03.po", null));
-		list.add(new InputDocument(root+"Test04.po", null));
-		list.add(new InputDocument(root+"Test05.po", null));
-		list.add(new InputDocument(root+"TestMonoLingual_EN.po", "okf_po@Monolingual.fprm"));
-		list.add(new InputDocument(root+"TestMonoLingual_FR.po", "okf_po@Monolingual.fprm"));
-		list.add(new InputDocument(root+"AllCasesTest.po", null));
-		list.add(new InputDocument(root+"Test_nautilus.af.po", null));
-		list.add(new InputDocument(root+"Test_DrupalRussianCP1251.po", null));
-		list.add(new InputDocument(root+"POT-Test01.pot", null));
+		URL url = POFilterTest.class.getResource("/Test01.po");
+		list.add(new InputDocument(url.getPath(), null));
+		url = POFilterTest.class.getResource("/Test02.po");
+		list.add(new InputDocument(url.getPath(), null));
+		url = POFilterTest.class.getResource("/Test03.po");
+		list.add(new InputDocument(url.getPath(), null));
+		url = POFilterTest.class.getResource("/Test04.po");
+		list.add(new InputDocument(url.getPath(), null));
+		url = POFilterTest.class.getResource("/Test05.po");
+		list.add(new InputDocument(url.getPath(), null));
+		url = POFilterTest.class.getResource("/TestMonoLingual_EN.po");
+		list.add(new InputDocument(url.getPath(), "okf_po@Monolingual.fprm"));
+		url = POFilterTest.class.getResource("/TestMonoLingual_FR.po");
+		list.add(new InputDocument(url.getPath(), "okf_po@Monolingual.fprm"));
+		url = POFilterTest.class.getResource("/AllCasesTest.po");
+		list.add(new InputDocument(url.getPath(), null));
+		url = POFilterTest.class.getResource("/Test_nautilus.af.po");
+		list.add(new InputDocument(url.getPath(), null));
+		url = POFilterTest.class.getResource("/Test_DrupalRussianCP1251.po");
+		list.add(new InputDocument(url.getPath(), null));
+		url = POFilterTest.class.getResource("/POT-Test01.po");
+		list.add(new InputDocument(url.getPath(), null));
 	
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
