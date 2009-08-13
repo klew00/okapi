@@ -43,14 +43,10 @@ import static org.junit.Assert.*;
 public class PropertiesFilterTest {
 	
 	private PropertiesFilter filter;
-	private String root;
 
 	@Before
 	public void setUp() {
 		filter = new PropertiesFilter();
-		URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
 	}
 
 	@Test
@@ -66,10 +62,14 @@ public class PropertiesFilterTest {
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root+"Test01.properties", null));
-		list.add(new InputDocument(root+"Test02.properties", "okf_properties@Test02.fprm"));
-		list.add(new InputDocument(root+"Test03.properties", "okf_properties@Test03.fprm"));
-		list.add(new InputDocument(root+"Test04.properties", "okf_properties@Test04.fprm"));
+		URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
+		list.add(new InputDocument(url.getPath(), null));
+		url = PropertiesFilterTest.class.getResource("/Test02.properties");
+		list.add(new InputDocument(url.getPath(), "okf_properties@Test02.fprm"));
+		url = PropertiesFilterTest.class.getResource("/Test03.properties");
+		list.add(new InputDocument(url.getPath(), "okf_properties@Test03.fprm"));
+		url = PropertiesFilterTest.class.getResource("/Test04.properties");
+		list.add(new InputDocument(url.getPath(), "okf_properties@Test04.fprm"));
 	
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
@@ -77,8 +77,9 @@ public class PropertiesFilterTest {
 
 	@Test
 	public void testStartDocument () {
+		URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(root+"Test01.properties", null),
+			new InputDocument(url.getPath(), null),
 			"UTF-8", "en", "en"));
 	}
 	
