@@ -19,35 +19,16 @@
 ===========================================================================*/
 
 package net.sf.okapi.filters.plaintext.tests;
-import static org.junit.Assert.*;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.*;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.*;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
@@ -55,19 +36,21 @@ import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 import net.sf.okapi.filters.plaintext.common.WrapMode;
 import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.Parameters;
-import net.sf.okapi.common.filters.FilterTestDriver;
-import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
-
 import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.*;
+import java.net.URI;
+import java.util.ArrayList;
 
 public class ParaPlainTextFilterTest {
 	
 	private ParaPlainTextFilter filter;
 	private FilterTestDriver testDriver;
 	private Parameters params;
+    private String root;
 	
 	@Before
 	public void setUp() {
@@ -82,6 +65,7 @@ public class ParaPlainTextFilterTest {
 		
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
+        root = TestUtil.getParentDir(this.getClass(), "/crt.txt");
 	}
 
 	@Test
@@ -428,9 +412,6 @@ public class ParaPlainTextFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
 		params.extractParagraphs = true;
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
@@ -449,9 +430,6 @@ public class ParaPlainTextFilterTest {
 	@Test
 	public void testDoubleExtraction2() {
 		// Read all files in the data directory
-		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
 		params.extractParagraphs = true;
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
@@ -468,9 +446,6 @@ public class ParaPlainTextFilterTest {
 	@Test
 	public void testDoubleExtraction3() {
 		// Read all files in the data directory
-		URL url = ParaPlainTextFilterTest.class.getResource("/lgpl.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
 		params.extractParagraphs = true;
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
@@ -731,10 +706,7 @@ public class ParaPlainTextFilterTest {
 	}
 	
 	private String _getFullFileName(String fileName) {
-		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		return root + fileName;
+		return TestUtil.getParentDir(this.getClass(), "/cr.txt") + fileName;
 	}
 	
 	private String _getSkeleton (String fileName) throws UnsupportedEncodingException {
