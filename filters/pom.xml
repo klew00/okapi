@@ -12,10 +12,11 @@
     <packaging>pom</packaging>
     <name>Okapi Filters Build</name>
     <modules>
-        <module>idml</module>
+        <module>properties</module>
         <module>abstractmarkup</module>
-        <module>html</module>
         <module>dtd</module>
+        <module>html</module>
+        <module>idml</module>
         <module>po</module>
         <module>ts</module>
         <module>openxml</module>
