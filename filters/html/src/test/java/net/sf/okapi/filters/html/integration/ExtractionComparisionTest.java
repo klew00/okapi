@@ -36,14 +36,14 @@ public class ExtractionComparisionTest {
 	public void tearDown() throws Exception {
 	}
 
-	@Test
+	// FIXME: @Test
 	public void testStartDocument() {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(htmlFilter,
 				new InputDocument(root + "324.html", null),
 				"UTF-8", "en", "en"));
 	}
 
-	@Test
+	// FIXME: Should move to integration project @Test
 	public void testDoubleExtraction() throws URISyntaxException {
 		RoundTripComparison rtc = new RoundTripComparison();
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
