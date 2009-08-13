@@ -24,5 +24,7 @@
         <module>openoffice</module>
         <module>regex</module>
         <module>plaintext</module>
+        <module>rtf</module>
+        <module>tmx</module>
     </modules>
 </project>
