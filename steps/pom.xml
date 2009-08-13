@@ -19,5 +19,6 @@
 		<module>fullwidthconversion</module>
 		<!--<module>generatesimpletm</module> Will fail until TM package is migrated -->
 		<module>linebreakconversion</module>
+		<module>searchandreplace</module>
     </modules>
 </project>
