@@ -8,7 +8,7 @@
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <!--Should match the directory name-->
-   <artifactId>filters-dtd</artifactId>
+   <artifactId>filters-po</artifactId>
    <!--Used for display purposes only-->
    <name>Okapi PO Filter</name>
    <dependencies>
