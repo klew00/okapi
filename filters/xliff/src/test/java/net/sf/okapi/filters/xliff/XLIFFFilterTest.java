@@ -26,6 +26,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.GenericContent;
@@ -54,9 +55,7 @@ public class XLIFFFilterTest {
 	public void setUp() {
 		filter = new XLIFFFilter();
 		fmt = new GenericContent();
-		URL url = XLIFFFilterTest.class.getResource("/JMP-11-Test01.xlf");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+		root = TestUtil.getParentDir(this.getClass(), "/JMP-11-Test01.xlf");
 	}
 
 	@Test
