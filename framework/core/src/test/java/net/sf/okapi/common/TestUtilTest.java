@@ -1,9 +1,9 @@
 package net.sf.okapi.common;
 
-import org.junit.Test;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
-import java.io.FileNotFoundException;
 import java.io.File;
 
 /**
@@ -13,13 +13,14 @@ import java.io.File;
  */
 public class TestUtilTest {
 
-    @Test(expected = FileNotFoundException.class)
-    public void getParentDir_FileNotFound() throws FileNotFoundException {
-        TestUtil.getParentDir(this.getClass(), "some/nonexistent/file/that/could/no/way/exist.txt");
+    @Test
+    public void getParentDir_FileNotFound() {
+        assertNull("A parent directory for a nonexistent file should be null",
+                TestUtil.getParentDir(this.getClass(), "some/nonexistent/file/that/could/no/way/exist.txt"));
     }
 
     @Test
-    public void getParentDir_ValidFile() throws FileNotFoundException {
+    public void getParentDir_ValidFile() {
         assertTrue("Incorrect path returned",
                 TestUtil.getParentDir(this.getClass(), "/TestUtilTestTestFile.txt").endsWith("test-classes"+ File.separator));
     }

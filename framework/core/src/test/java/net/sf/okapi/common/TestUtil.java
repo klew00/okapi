@@ -1,6 +1,5 @@
 package net.sf.okapi.common;
 
-import java.io.FileNotFoundException;
 import java.io.File;
 import java.net.URL;
 
@@ -19,13 +18,13 @@ public class TestUtil {
      * @param filepath - the location of the file. For example &quot;/testFile.txt&quot; would be loaded from the root
      * of the classpath.
      * @return The path of directory which contains the file
-     * @throws FileNotFoundException when the file is not found in the classpath
      */
-    public static String getParentDir(Class clazz, String filepath) throws FileNotFoundException {
+    public static String getParentDir(Class clazz, String filepath) {
         URL url = clazz.getResource(filepath);
-        if (url == null) {
-            throw new FileNotFoundException(filepath + " not found!");
+        String parentDir = null;
+        if (url != null) {
+            parentDir = Util.getDirectoryName(url.getPath()) + File.separator;
         }
-        return Util.getDirectoryName(url.getPath()) + File.separator;
+        return parentDir;
     }
 }

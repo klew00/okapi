@@ -20,7 +20,7 @@
 
 package net.sf.okapi.filters.idml.tests;
 
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -30,10 +30,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
 
 public class IDMLContentFilterTest {
 
@@ -56,8 +54,7 @@ public class IDMLContentFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = IDMLContentFilterTest.class.getResource("/Story_story1.xml");
-		String root = Util.getDirectoryName(url.getPath()) + File.separator;
+		String root = TestUtil.getParentDir(this.getClass(), "/Story_story1.xml");
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Story_story1.xml", null));
