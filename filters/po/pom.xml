@@ -12,6 +12,13 @@
    <!--Used for display purposes only-->
    <name>Okapi PO Filter</name>
    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>okapi-core</artifactId>
+            <scope>test</scope>
+            <classifier>tests</classifier>
+            <version>${project.version}</version>
+        </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>okapi-core</artifactId>
