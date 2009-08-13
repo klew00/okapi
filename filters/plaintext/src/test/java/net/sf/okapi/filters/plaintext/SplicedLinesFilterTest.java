@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.tests;
+package net.sf.okapi.filters.plaintext;
 
 import net.sf.okapi.common.*;
 import net.sf.okapi.common.filters.FilterTestDriver;
@@ -261,7 +261,7 @@ public class SplicedLinesFilterTest {
 	}
 	
 	private String _streamAsString(InputStream input) throws IOException {
-		BufferedReader reader = null;
+		BufferedReader reader;
 		reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 
 		StringBuilder tmp = new StringBuilder();

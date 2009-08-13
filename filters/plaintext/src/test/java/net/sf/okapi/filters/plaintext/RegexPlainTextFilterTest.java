@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.tests;
+package net.sf.okapi.filters.plaintext;
 import net.sf.okapi.common.*;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -360,7 +360,7 @@ public class RegexPlainTextFilterTest {
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
-			assertEquals(expectedLineNum, new Integer(st).intValue());
+			assertEquals(expectedLineNum, Integer.parseInt(st));
 			
 			break;
 			

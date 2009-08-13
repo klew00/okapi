@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.tests;
+package net.sf.okapi.filters.plaintext;
 
 import net.sf.okapi.common.*;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
@@ -29,7 +29,6 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.*;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.plaintext.PlainTextFilter;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
@@ -798,7 +797,7 @@ public class PlainTextFilterTest {
 			IResource res = event.getResource();
 			assertTrue(res instanceof TextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, res.toString());
 			break;
 			
 		case DOCUMENT_PART:
@@ -827,13 +826,13 @@ public class PlainTextFilterTest {
 			IResource res = event.getResource();
 			assertTrue(res instanceof TextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, res.toString());
 			
 			Property prop = ((TextUnit) res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
-			assertEquals(expectedLineNum, new Integer(st).intValue());
+			assertEquals(expectedLineNum, Integer.parseInt(st));
 			
 			break;
 			
@@ -893,7 +892,7 @@ public class PlainTextFilterTest {
 	}
 	
 	private String _streamAsString(InputStream input) throws IOException {
-		BufferedReader reader = null;
+		BufferedReader reader;
 		reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 
 		StringBuilder tmp = new StringBuilder();

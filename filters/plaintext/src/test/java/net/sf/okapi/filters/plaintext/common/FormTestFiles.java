@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.plaintext.tests.common;
+package net.sf.okapi.filters.plaintext.common;
 
 import net.sf.okapi.common.TestUtil;
 
