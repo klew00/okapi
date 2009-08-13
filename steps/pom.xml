@@ -12,6 +12,6 @@
     <packaging>pom</packaging>
     <name>Okapi Steps Build</name>
     <modules>
-        <module>bomconversion</module>        
+        <module>bomconversion</module>
     </modules>
 </project>

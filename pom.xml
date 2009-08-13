@@ -21,6 +21,7 @@
     <modules>
         <module>framework</module>
         <module>filters</module>
+		<module>steps</module>
     </modules>
     <dependencies>
         <dependency>
