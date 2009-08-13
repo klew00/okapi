@@ -1,32 +1,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <parent>
-      <artifactId>build-filters</artifactId>
-      <groupId>net.sf.okapi</groupId>
-      <version>1.0.0</version>
-   </parent>
-   <modelVersion>4.0.0</modelVersion>
-   <!--Should match the directory name-->
-   <artifactId>filters-dtd</artifactId>
-   <!--Used for display purposes only-->
-   <name>Okapi DTD Filter</name>
-   <dependencies>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>okapi-core</artifactId>
-        <scope>test</scope>
-		<version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>okapi-core</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>dtdparser</groupId>
-        <artifactId>dtdparser</artifactId>
-        <version>1.21</version>
-      </dependency>
-   </dependencies>
+    <parent>
+        <artifactId>build-filters</artifactId>
+        <groupId>net.sf.okapi</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <!--Should match the directory name-->
+    <artifactId>filters-dtd</artifactId>
+    <!--Used for display purposes only-->
+    <name>Okapi DTD Filter</name>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>okapi-core</artifactId>
+            <scope>test</scope>
+            <classifier>tests</classifier>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>okapi-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dtdparser</groupId>
+            <artifactId>dtdparser</artifactId>
+            <version>1.21</version>
+        </dependency>
+    </dependencies>
 </project>
