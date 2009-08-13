@@ -18,7 +18,7 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>${project.groupId}</groupId>
+        <groupId>net.sf.okapi</groupId>
         <artifactId>okapi-core-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
