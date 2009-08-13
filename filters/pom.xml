@@ -23,5 +23,6 @@
         <module>openxml</module>
         <module>openoffice</module>
         <module>regex</module>
+        <module>plaintext</module>
     </modules>
 </project>

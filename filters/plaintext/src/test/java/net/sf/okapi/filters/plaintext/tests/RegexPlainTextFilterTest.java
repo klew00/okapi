@@ -47,9 +47,9 @@ import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.regex.Parameters;
 import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;
 // import net.sf.okapi.filters.regex.Parameters;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.tests.RoundTripComparison;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 
 import org.junit.Assert;
 import org.junit.Before;
