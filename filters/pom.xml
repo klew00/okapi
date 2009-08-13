@@ -17,6 +17,7 @@
         <module>dtd</module>
         <module>html</module>
         <module>idml</module>
+        <module>mif</module>
         <module>po</module>
         <module>ts</module>
         <module>openxml</module>

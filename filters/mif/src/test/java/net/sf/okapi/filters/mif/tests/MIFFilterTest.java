@@ -20,21 +20,19 @@
 
 package net.sf.okapi.filters.mif.tests;
 
+import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.filters.mif.MIFFilter;
+import org.junit.Assert;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Assert; 
-
-import net.sf.okapi.common.filters.FilterConfiguration;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.filters.mif.MIFFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
 
 public class MIFFilterTest {
 	
