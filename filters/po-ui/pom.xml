@@ -8,25 +8,19 @@
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <!--Should match the directory name-->
-   <artifactId>filters-dtd</artifactId>
+   <artifactId>filters-po-ui</artifactId>
    <!--Used for display purposes only-->
-   <name>Okapi DTD Filter</name>
+   <name>Okapi PO Filter UI</name>
    <dependencies>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>okapi-core</artifactId>
-        <scope>test</scope>
-		<version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>okapi-core</artifactId>
+        <artifactId>filters-po</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>dtdparser</groupId>
-        <artifactId>dtdparser</artifactId>
-        <version>1.21</version>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>okapi-core-ui</artifactId>
+        <version>${project.version}</version>
       </dependency>
    </dependencies>
 </project>

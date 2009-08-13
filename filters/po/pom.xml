@@ -13,7 +13,7 @@
    <name>Okapi PO Filter</name>
    <dependencies>
       <dependency>
-        <groupId>net.sf.okapi</groupId>
+        <groupId>${project.groupId}</groupId>
         <artifactId>okapi-core</artifactId>
         <version>${project.version}</version>
       </dependency>
