@@ -36,10 +36,11 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.tests.RoundTripComparison;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.filters.xml.XMLFilter;
+import net.sf.okapi.common.TestUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,9 +55,7 @@ public class XMLFilterTest {
 	public void setUp() {
 		filter = new XMLFilter();
 		fmt = new GenericContent();
-		URL url = XMLFilterTest.class.getResource("/test01.xml");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+		root = TestUtil.getParentDir(this.getClass(), "/test01.xml");
 	}
 
 	@Test
