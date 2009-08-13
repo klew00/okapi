@@ -28,15 +28,14 @@ public class ExtractionComparisionTest {
 		testFileList = TestUtils.getHtmlTestFiles();
 
 		URL url = ExtractionComparisionTest.class.getResource("/324.html");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/html/";
+		root = Util.getDirectoryName(url.getPath()) + "/";
 	}
 
 	@After
 	public void tearDown() throws Exception {
 	}
 
-	// FIXME: @Test
+	@Test
 	public void testStartDocument() {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(htmlFilter,
 				new InputDocument(root + "324.html", null),
