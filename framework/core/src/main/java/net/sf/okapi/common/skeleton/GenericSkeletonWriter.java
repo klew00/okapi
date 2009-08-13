@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Stack;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.ScoresAnnotation;

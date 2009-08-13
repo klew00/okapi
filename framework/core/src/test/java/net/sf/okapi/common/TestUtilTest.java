@@ -4,8 +4,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-import java.io.File;
-
 /**
  * User: Christian Hargraves
  * Date: Aug 13, 2009
