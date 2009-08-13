@@ -22,5 +22,6 @@
         <module>ts</module>
         <module>openxml</module>
         <module>openoffice</module>
+        <module>regex</module>
     </modules>
 </project>

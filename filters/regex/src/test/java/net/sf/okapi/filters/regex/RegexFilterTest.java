@@ -20,33 +20,20 @@
 
 package net.sf.okapi.filters.regex;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
-
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.regex.Parameters;
-import net.sf.okapi.filters.regex.RegexFilter;
-import net.sf.okapi.filters.regex.Rule;
+import net.sf.okapi.common.*;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
-
+import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class RegexFilterTest {
 	
@@ -56,9 +43,7 @@ public class RegexFilterTest {
 	@Before
 	public void setUp() {
 		filter = new RegexFilter();
-		URL url = RegexFilterTest.class.getResource("/Test01_stringinfo_en.info");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+		root = TestUtil.getParentDir(this.getClass(),"/Test01_stringinfo_en.info" );
 	}
 
 	@Test
@@ -201,25 +186,53 @@ public class RegexFilterTest {
 		assertNotNull(event);
 		
 		assertTrue(event.getEventType() == expectedType);
-		
-		switch (event.getEventType()) {
-		case TEXT_UNIT:
-			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
-			
-			assertEquals(((TextUnit) res).toString(), expectedText);
-			break;
-			
-		case DOCUMENT_PART:
-			res = event.getResource();
-			assertTrue(res instanceof DocumentPart);
-			
-			ISkeleton skel = res.getSkeleton();
-			if (skel != null) {
-				assertEquals(skel.toString(), expectedText);
-			}
-			break;
-		}
+
+        switch (event.getEventType()) {
+            case TEXT_UNIT:
+                IResource res = event.getResource();
+                assertTrue(res instanceof TextUnit);
+
+                assertEquals(res.toString(), expectedText);
+                break;
+
+            case DOCUMENT_PART:
+                res = event.getResource();
+                assertTrue(res instanceof DocumentPart);
+
+                ISkeleton skel = res.getSkeleton();
+                if (skel != null) {
+                    assertEquals(skel.toString(), expectedText);
+                }
+                break;
+            case CANCELED:
+                break;
+            case CUSTOM:
+                break;
+            case END_BATCH:
+                break;
+            case END_BATCH_ITEM:
+                break;
+            case END_DOCUMENT:
+                break;
+            case END_GROUP:
+                break;
+            case END_SUBDOCUMENT:
+                break;
+            case NO_OP:
+                break;
+            case RAW_DOCUMENT:
+                break;
+            case START_BATCH:
+                break;
+            case START_BATCH_ITEM:
+                break;
+            case START_DOCUMENT:
+                break;
+            case START_GROUP:
+                break;
+            case START_SUBDOCUMENT:
+                break;
+        }
 	}
 		
 	private void _listEvents(String inputText) { 
