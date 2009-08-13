@@ -12,7 +12,9 @@
    <!--Used for display purposes only-->
    <name>Okapi Filters Build</name>
 <modules>
-<module>abstractmarkup</module>
-<module>dtd</module>
+	<module>abstractmarkup</module>
+	<module>dtd</module>
+	<module>html</module>
+	<module>po</module>
 </modules>
 </project>
