@@ -21,5 +21,6 @@
         <module>po</module>
         <module>ts</module>
         <module>openxml</module>
+        <module>openoffice</module>
     </modules>
 </project>

@@ -10,7 +10,7 @@
     <!--Should match the directory name-->
     <artifactId>filters-openoffice</artifactId>
     <!--Used for display purposes only-->
-    <name>Okapi OpenOffice Filter</name>
+    <name>Okapi Open Office Filter</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>
@@ -23,9 +23,12 @@
             <scope>test</scope>
             <classifier>tests</classifier>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>wstx-asl</artifactId>
+            <version>3.2.8</version>
+        </dependency>
     </dependencies>
 </project>
 
-		
-		
