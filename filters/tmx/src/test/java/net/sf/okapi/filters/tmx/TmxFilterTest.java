@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -87,9 +88,7 @@ public class TmxFilterTest {
 		testDriver = new FilterTestDriver();
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
-		URL url = TmxFilterTest.class.getResource("/Paragraph_TM.tmx");
-		root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+		root = TestUtil.getParentDir(this.getClass(), "/Paragraph_TM.tmx");
 	}
 	
 	@Test
