@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.rtf.tests.integration;
+package net.sf.okapi.filters.rtf.integration;
 
 //import static org.junit.Assert.assertTrue;
 
@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Util;
 //import net.sf.okapi.filters.rtf.RTFFilter;
-import net.sf.okapi.filters.rtf.tests.TestUtils;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.tests.RoundTripComparison;
+import net.sf.okapi.filters.rtf.TestUtils;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 
 import org.junit.After;
 import org.junit.Before;

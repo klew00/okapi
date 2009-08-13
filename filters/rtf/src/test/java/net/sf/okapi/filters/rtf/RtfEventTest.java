@@ -17,7 +17,7 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.filters.rtf.tests;
+package net.sf.okapi.filters.rtf;
 
 import java.util.ArrayList;
 

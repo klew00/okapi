@@ -18,14 +18,14 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.rtf.tests;
+package net.sf.okapi.filters.rtf;
 
 import java.io.InputStream;
 
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
+import net.sf.okapi.common.filters.FilterTestDriver;
 
 import org.junit.Assert;
 import org.junit.Before;
