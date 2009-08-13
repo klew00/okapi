@@ -22,6 +22,6 @@ public class TestUtilTest {
     @Test
     public void getParentDir_ValidFile() {
         assertTrue("Incorrect path returned",
-                TestUtil.getParentDir(this.getClass(), "/TestUtilTestTestFile.txt").endsWith("test-classes"+ File.separator));
+                TestUtil.getParentDir(this.getClass(), "/TestUtilTestTestFile.txt").endsWith("test-classes/"));
     }
 }

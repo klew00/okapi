@@ -1,6 +1,5 @@
 package net.sf.okapi.common;
 
-import java.io.File;
 import java.net.URL;
 
 /**
@@ -23,7 +22,7 @@ public class TestUtil {
         URL url = clazz.getResource(filepath);
         String parentDir = null;
         if (url != null) {
-            parentDir = Util.getDirectoryName(url.getPath()) + File.separator;
+            parentDir = Util.getDirectoryName(url.getPath()) + "/";
         }
         return parentDir;
     }
