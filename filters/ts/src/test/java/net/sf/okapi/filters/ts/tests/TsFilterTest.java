@@ -20,9 +20,9 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.ts.TsFilter;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.ts.TsFilter;
 
 import org.junit.Assert;
 import org.junit.Before;

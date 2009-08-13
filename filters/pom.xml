@@ -16,5 +16,6 @@
 	<module>dtd</module>
 	<module>html</module>
 	<module>po</module>
+	<module>ts</module>
 </modules>
 </project>

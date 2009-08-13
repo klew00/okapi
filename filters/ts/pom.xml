@@ -11,16 +11,21 @@
    <artifactId>filters-ts</artifactId>
    <!--Used for display purposes only-->
    <name>Okapi TS Filter</name>
-   <dependencies>
-      <dependency>
-        <groupId>net.sf.okapi</groupId>
-        <artifactId>okapi-core</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-<!--      <dependency> add stax parser
-        <groupId>dtdparser</groupId>
-        <artifactId>dtdparser</artifactId>
-        <version>1.21</version>
-      </dependency> -->
-   </dependencies>
+	<dependencies>
+		<dependency>
+		<groupId>net.sf.okapi</groupId>
+		<artifactId>okapi-core</artifactId>
+		<version>${project.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>stax</groupId>
+		<artifactId>stax-api</artifactId>
+		<version>1.0.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.codehaus.woodstox</groupId>
+		<artifactId>wstx-lgpl</artifactId>
+		<version>3.2.8</version>
+	</dependency>
+	</dependencies>
 </project>
