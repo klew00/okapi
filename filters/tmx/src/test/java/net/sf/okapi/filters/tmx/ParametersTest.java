@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.tmx.tests;
+package net.sf.okapi.filters.tmx;
 
 import static org.junit.Assert.*;
 

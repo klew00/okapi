@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.tmx.tests;
+package net.sf.okapi.filters.tmx;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -21,9 +21,9 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.tests.RoundTripComparison;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.filters.tmx.Parameters;
 import net.sf.okapi.filters.tmx.TmxFilter;
 
