@@ -18,6 +18,7 @@
         <module>idml</module>
         <module>mif</module>
         <module>po</module>
+        <module>po-ui</module>
         <module>ts</module>
         <module>openoffice</module>
         <module>xml</module>
@@ -25,8 +26,11 @@
         <module>tmx</module>
         <module>xliff</module>
         <module>regex</module>
-        <module>plaintext</module>
+        <module>regex-ui</module>
+        <module>properties</module>
         <module>html</module>
+        <module>html-ui</module>
+        <module>plaintext</module>
         <module>openxml</module>
     </modules>
 </project>
