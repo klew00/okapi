@@ -41,15 +41,10 @@ import static org.junit.Assert.*;
 public class OpenXMLConfigurationTest {
 	
 	private OpenXMLFilter filter;
-	private String root;
 
 	@Before
 	public void setUp() throws Exception {
 		filter = new OpenXMLFilter();
-		URL url = OpenXMLConfigurationTest.class.getResource("/anchor.txt");
-		root = Util.getDirectoryName(url.getPath());
-		//int n = root.indexOf("/bin/");
-		//root = root.substring(0, n) + "/data/";
 	}
 	
 	@Test
@@ -96,8 +91,9 @@ public class OpenXMLConfigurationTest {
 
 	@Test
 	public void testStartDocument () {
+		URL url = OpenXMLConfigurationTest.class.getResource("/BoldWorld.docx");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(root+"BoldWorld.docx", null),
+			new InputDocument(url.getPath(), null),
 			"UTF-8", "en", "en"));
 	}
 	
