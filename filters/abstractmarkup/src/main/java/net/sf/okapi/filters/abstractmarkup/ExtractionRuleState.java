@@ -32,13 +32,14 @@ public class ExtractionRuleState {
 
 	private static final class RuleType {
 
+		public String ruleName;
+		public RULE_TYPE ruleType;
+
 		public RuleType(String ruleName, RULE_TYPE ruleType) {
 			this.ruleName = ruleName;
 			this.ruleType = ruleType;
 		}
 
-		public String ruleName;
-		public RULE_TYPE ruleType;
 	}
 
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
