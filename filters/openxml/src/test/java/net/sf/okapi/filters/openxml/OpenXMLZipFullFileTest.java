@@ -29,6 +29,7 @@ import java.util.logging.Level; // DWH 4-22-09
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
 //import net.sf.okapi.filters.markupfilter.Parameters;
 //import net.sf.okapi.filters.openxml.OpenXMLContentFilter;
@@ -50,7 +51,7 @@ public class OpenXMLZipFullFileTest {
 
 	@Before
 	public void setUp() throws Exception {
-		LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
+		LOGGER = Logger.getLogger(OpenXMLZipFullFileTest.class.getName());
 		openXMLFilter = new OpenXMLFilter();	
 		openXMLFilter.setLogger(LOGGER);
 		LOGGER.setLevel(Level.FINER);
@@ -59,16 +60,15 @@ public class OpenXMLZipFullFileTest {
 		openXMLFilter.setOptions("en", "UTF-8", true);
 
 		// read all files in the test html directory
-		URL url = OpenXMLZipFullFileTest.class.getResource("anchor.txt");
-		File dir = new File(url.toURI()).getParentFile().getParentFile().getParentFile().getParentFile().getParentFile().getParentFile().getParentFile().getParentFile();
-		File dir2 = new File(dir.getAbsolutePath()+"/data");
+		URL url = OpenXMLZipFullFileTest.class.getResource("/BoldWorld.docx");
+		File dir = new File(Util.getDirectoryName(url.getPath()));
 
 		FilenameFilter filter = new FilenameFilter() {
-			public boolean accept(File dir2, String name) {
+			public boolean accept(File dir, String name) {
 				return ((name.endsWith(".docx") || name.endsWith(".pptx") || name.endsWith(".xlsx")) && !name.startsWith("Output"));
 			}
 		};
-		testFileList = dir2.list(filter);
+		testFileList = dir.list(filter);
 	}
 
 	@After
@@ -78,22 +78,16 @@ public class OpenXMLZipFullFileTest {
 
 	@Test
 	public void testAll() throws URISyntaxException {
-		Event event;
-		
-		//String base=System.getProperty("user.dir").replace('\\','/').toLowerCase();
-		String base = OpenXMLRoundTripTest.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();;
-		base = base.substring(6,base.length()-5);
-
 		for (String f : testFileList) {
-			String ff = base+deary+f;
-			String fff = "file:/"+ff.replace(" ","%20").toLowerCase(); // DWH 6-11-09 added file: and lowercase
 			try {
-				URI uriFf = new URI(fff);
-				openXMLFilter.open(new RawDocument(uriFf,"UTF-8","en-US"),true,true,Level.FINEST); // DWH 4-22-09
+				URL url = OpenXMLZipFullFileTest.class.getResource("/"+f);
+				//URI uriFf = new URI(fff);
+				openXMLFilter.open(new RawDocument(url.toURI(), "UTF-8", "en-US"),true,true,Level.FINEST); // DWH 4-22-09
 				while (openXMLFilter.hasNext()) {
-					event = openXMLFilter.next();
+					openXMLFilter.next();
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				//System.err.println("Error for file: " + f + ": " + e.toString());
 				throw new RuntimeException("Error for file: " + f + ": " + e.toString());
 			}
