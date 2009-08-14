@@ -27,7 +27,6 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.filters.openoffice.Parameters;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -75,7 +74,7 @@ public class OptionsEditor implements IParametersEditor {
 	}
 	
 	public IParameters createParameters () {
-		return new Parameters();
+		return new Options();
 	}
 	
 	private void create (Shell parent,

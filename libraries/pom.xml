@@ -13,5 +13,7 @@
     <name>Okapi Libraries Build</name>
     <modules>
         <module>lib-segmentation</module>
+        <module>lib-segmentation-ui</module>
+        <module>lib-translation</module>
     </modules>
 </project>
