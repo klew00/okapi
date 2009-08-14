@@ -24,6 +24,7 @@
 -->
         <module>openxml</module>
         <module>plaintext</module>
+        <module>plaintext-ui</module>
         <module>po</module>
         <module>po-ui</module>
         <module>properties</module>
