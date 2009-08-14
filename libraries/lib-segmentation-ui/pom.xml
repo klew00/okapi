@@ -2,15 +2,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>build-applications</artifactId>
-        <groupId>net.sf.okapi.applications</groupId>
+        <artifactId>build-libraries</artifactId>
+        <groupId>net.sf.okapi.lib</groupId>
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <!--Should match the directory name-->
-    <artifactId>rainbow</artifactId>
+    <artifactId>lib-segmentation-ui</artifactId>
     <!--Used for display purposes only-->
-    <name>Okapi Rainbow Build</name>
+    <name>Okapi UI of library for segmentation</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>
@@ -23,24 +23,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-        	<groupId>net.sf.okapi.lib</groupId>
-        	<artifactId>lib-segmentation</artifactId>
-        	<version>1.0.0</version>
-        </dependency>
-        <dependency>
-        	<groupId>net.sf.okapi.lib</groupId>
-        	<artifactId>lib-segmentation-ui</artifactId>
-        	<version>1.0.0</version>
-        </dependency>
-        <dependency>
-        	<groupId>net.sf.okapi.filters</groupId>
-        	<artifactId>filters-xliff</artifactId>
-        	<version>1.0.0</version>
-        </dependency>
-        <dependency>
-        	<groupId>net.sf.okapi.filters</groupId>
-        	<artifactId>filters-rtf</artifactId>
-        	<version>1.0.0</version>
+            <groupId>net.sf.okapi.lib</groupId>
+            <artifactId>lib-segmentation</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
