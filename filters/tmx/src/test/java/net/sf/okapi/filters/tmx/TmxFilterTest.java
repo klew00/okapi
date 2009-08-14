@@ -86,7 +86,7 @@ public class TmxFilterTest {
 	public void setUp() {
 		filter = new TmxFilter();
 		testDriver = new FilterTestDriver();
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 		root = TestUtil.getParentDir(this.getClass(), "/Paragraph_TM.tmx");
 	}
