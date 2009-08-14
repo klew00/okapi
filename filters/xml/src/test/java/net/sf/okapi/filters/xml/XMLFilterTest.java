@@ -18,19 +18,17 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.xml.tests;
+package net.sf.okapi.filters.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
@@ -39,8 +37,8 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
-import net.sf.okapi.filters.xml.XMLFilter;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.filters.xml.XMLFilter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -342,8 +340,8 @@ public class XMLFilterTest {
 		list.add(new InputDocument(root+"LocNote-4.xml", null));
 		list.add(new InputDocument(root+"LocNote-5.xml", null));
 		list.add(new InputDocument(root+"LocNote-6.xml", null));
-		list.add(new InputDocument(root+"Androidtest1.xml", "okf_xml@AndroidStrings.fprm"));
-		list.add(new InputDocument(root+"Androidtest2.xml", "okf_xml@AndroidStrings.fprm"));
+		list.add(new InputDocument(root+"AndroidTest1.xml", "okf_xml@AndroidStrings.fprm"));
+		list.add(new InputDocument(root+"AndroidTest2.xml", "okf_xml@AndroidStrings.fprm"));
 		list.add(new InputDocument(root+"JavaProperties.xml", "okf_xml@JavaProperties.fprm"));
 		list.add(new InputDocument(root+"TestMultiLang.xml", null));
 		list.add(new InputDocument(root+"Test01.resx", "okf_xml@resx.fprm"));
