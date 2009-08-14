@@ -246,7 +246,7 @@ public class CommaSeparatedValuesFilterTest {
 		
 
 		try {
-		String st = "file:" + _getFullFileName("test_params1.txt"); $$$
+		String st = "file:" + _getFullFileName("test_params1.txt");
 		params.load(new URI(st), false);
 	} catch (URISyntaxException e) {
 	}
