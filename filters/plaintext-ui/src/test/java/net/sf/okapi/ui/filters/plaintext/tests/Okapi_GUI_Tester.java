@@ -66,6 +66,7 @@ public class Okapi_GUI_Tester {
 
 			// swt_test.Editor.class.getName(),
 			// net.sf.okapi.steps.ui.xsltransform.ParametersEditor.class.getName(),
+/* temporarily commented out during conversion to maven
 			net.sf.okapi.ui.steps.tokenization.mapping.Mapper.class.getName(),
 			net.sf.okapi.ui.steps.tokenization.mapping.MappingItemPage.class.getName(),
 			net.sf.okapi.ui.steps.wordcount.ParametersEditor.class.getName(),
@@ -94,6 +95,7 @@ public class Okapi_GUI_Tester {
 			net.sf.okapi.steps.ui.translationcomparison.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.ui.uriconversion.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.ui.fullwidthconversion.ParametersEditor.class.getName()
+*/
 		};
 
 	private Group grpParameters;
