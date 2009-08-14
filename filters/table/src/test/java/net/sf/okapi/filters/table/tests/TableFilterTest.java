@@ -49,9 +49,9 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.table.TableFilter;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.tests.RoundTripComparison;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 
 import org.junit.Assert;
 import org.junit.Before;

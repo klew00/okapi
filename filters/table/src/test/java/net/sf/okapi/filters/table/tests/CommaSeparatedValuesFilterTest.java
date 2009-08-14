@@ -53,9 +53,9 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.plaintext.common.WrapMode;
 import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
 import net.sf.okapi.filters.table.csv.Parameters;
-import net.sf.okapi.filters.tests.FilterTestDriver;
-import net.sf.okapi.filters.tests.InputDocument;
-import net.sf.okapi.filters.tests.RoundTripComparison;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,9 +78,10 @@ public class CommaSeparatedValuesFilterTest {
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
 		
-		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
-		String root2 = Util.getDirectoryName(url.getPath());
-		root2 = Util.getDirectoryName(root2) + "/data/";
+//m		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
+//m		String root2 = Util.getDirectoryName(url.getPath());
+//m		root2 = Util.getDirectoryName(root2) + "/data/";
+        		root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
 	}
 	
 	@Test
@@ -245,7 +246,7 @@ public class CommaSeparatedValuesFilterTest {
 		
 
 		try {
-		String st = "file:" + _getFullFileName("test_params1.txt");
+		String st = "file:" + _getFullFileName("test_params1.txt"); $$$
 		params.load(new URI(st), false);
 	} catch (URISyntaxException e) {
 	}
