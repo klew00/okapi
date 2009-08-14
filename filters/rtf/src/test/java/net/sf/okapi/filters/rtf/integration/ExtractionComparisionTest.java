@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Util;
 //import net.sf.okapi.filters.rtf.RTFFilter;
-import net.sf.okapi.filters.rtf.TestUtils;
+import net.sf.okapi.filters.rtf.RtfTestUtils;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 
@@ -24,7 +24,7 @@ public class ExtractionComparisionTest {
 	@Before
 	public void setUp() throws Exception {
 //		rtfFilter = new RTFFilter();		
-		testFileList = TestUtils.getTestFiles();
+		testFileList = RtfTestUtils.getTestFiles();
 		
 		URL url = ExtractionComparisionTest.class.getResource("/AddComments.rtf");
 		root = Util.getDirectoryName(url.getPath());

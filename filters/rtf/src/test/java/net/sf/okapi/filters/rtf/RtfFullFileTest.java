@@ -18,7 +18,7 @@ public class RtfFullFileTest {
 	@Before
 	public void setUp() throws Exception {
 		filter = new RTFFilter();		
-		testFileList = TestUtils.getTestFiles();
+		testFileList = RtfTestUtils.getTestFiles();
 	}
 
 	@After

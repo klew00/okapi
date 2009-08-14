@@ -18,7 +18,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
-public class TestUtils {
+public class RtfTestUtils {
 
 	public static String[] getTestFiles() throws URISyntaxException {
 		// read all files in the test rtf data directory
