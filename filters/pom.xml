@@ -20,6 +20,7 @@
         <module>po</module>
         <module>po-ui</module>
         <module>ts</module>
+        <module>ts-ui</module>
         <module>openoffice</module>
         <module>xml</module>
         <module>rtf</module>
