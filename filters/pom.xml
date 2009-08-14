@@ -32,9 +32,7 @@
         <module>po</module>
         <module>po-ui</module>
         <module>properties</module>
-<!--
         <module>properties-ui</module>
--->
         <module>regex</module>
         <module>regex-ui</module>
         <module>rtf</module>
