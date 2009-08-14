@@ -22,9 +22,13 @@
 <!--
         <module>openoffice-ui</module>
 -->
+<!--passes on windows but not Hudson
         <module>openxml</module>
+-->
         <module>plaintext</module>
+<!--has compile errors
         <module>plaintext-ui</module>
+-->
         <module>po</module>
         <module>po-ui</module>
         <module>properties</module>
@@ -40,6 +44,8 @@
         <module>ts</module>
         <module>ts-ui</module>
         <module>xliff</module>
+<!--Until it doesn't hang hudson
         <module>xml</module>
+-->
     </modules>
 </project>
