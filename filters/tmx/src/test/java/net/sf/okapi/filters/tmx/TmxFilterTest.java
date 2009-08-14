@@ -420,7 +420,7 @@ public class TmxFilterTest {
 	public void testDoubleExtraction () throws URISyntaxException {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root+"Paragraph_TM.TMX", null));
+		list.add(new InputDocument(root+"Paragraph_TM.tmx", null));
 
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en-us", "fr-fr"));
