@@ -181,10 +181,8 @@ public class RegexFilterTest {
 	
 	private void _testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
-		
 		Event event = filter.next();		
 		assertNotNull(event);
-		
 		assertTrue(event.getEventType() == expectedType);
 
         switch (event.getEventType()) {
@@ -238,7 +236,7 @@ public class RegexFilterTest {
 	private void _listEvents(String inputText) { 
 		// List all events in Console
 		FilterTestDriver testDriver = new FilterTestDriver();
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 		
 		filter.open(new RawDocument(inputText, "en"));
