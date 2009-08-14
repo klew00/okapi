@@ -37,7 +37,6 @@ import net.sf.okapi.common.resource.TextUnit;
 //import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.openxml.OpenXMLContentFilter;
 import net.sf.okapi.filters.openxml.OpenXMLContentSkeletonWriter;
-import net.sf.okapi.filters.openxml.OpenXMLFilter;
 
 import org.junit.After;
 import org.junit.Before;

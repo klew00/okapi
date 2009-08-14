@@ -25,16 +25,14 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
@@ -118,12 +116,9 @@ public class OpenXMLRoundTripTest {
 		Event event;
 		File filly;
 		URI uri;
-		String sUserDir;
-		String sUserDirURI;  // DWH 6-9-09 URI
 		OpenXMLFilter filter = null;
 		BufferedInputStream bis;
 		boolean rtrued2;
-		final BaseContext context; // DWH 6-18-09
 		try {
 			if (bPeeking)
 			{
@@ -142,14 +137,21 @@ public class OpenXMLRoundTripTest {
 			filter.setOptions("en-US", "UTF-8", true);
 //			filter.setLogLevel(Level.FINEST);
 //			filter.setLogLevel(Level.FINE);
-			sUserDir = OpenXMLRoundTripTest.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();;
-			sUserDirURI = sUserDir.substring(0,sUserDir.length()-5); // DWH 6-9-09
-			sUserDir = sUserDir.substring(6,sUserDir.length()-5);
-//			sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
-			sInputPath = sUserDirURI + "/data/"; // DWH 6-9-09
-//			sInputPath = sUserDir + "/data/"; // DWH 6-9-09
-			sOutputPath = sUserDir + "/ootput/";
+			
+			URL url = OpenXMLRoundTripTest.class.getResource("/BoldWorld.docx");
+			String sUserDir = Util.getDirectoryName(url.getPath());
+			sInputPath = sUserDir + "/";
+			sOutputPath = sUserDir + "/output/";
 			sGoldPath = sUserDir + "/gold/";
+			
+//			sUserDir = OpenXMLRoundTripTest.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();;
+//			sUserDirURI = sUserDir.substring(0,sUserDir.length()-5); // DWH 6-9-09
+//			sUserDir = sUserDir.substring(6,sUserDir.length()-5);
+////			sUserDir = System.getProperty("user.dir").replace('\\','/').toLowerCase();
+//			sInputPath = sUserDirURI + "/data/"; // DWH 6-9-09
+////			sInputPath = sUserDir + "/data/"; // DWH 6-9-09
+//			sOutputPath = sUserDir + "/ootput/";
+//			sGoldPath = sUserDir + "/gold/";
 			uri = new URI(sInputPath+filename);
 			try
 			{
