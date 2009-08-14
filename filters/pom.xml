@@ -20,9 +20,9 @@
         <module>po</module>
         <module>ts</module>
         <module>openoffice</module>
+        <module>xml</module>
         <module>rtf</module>
         <module>tmx</module>
-        <module>xml</module>
         <module>xliff</module>
         <module>regex</module>
         <module>plaintext</module>
