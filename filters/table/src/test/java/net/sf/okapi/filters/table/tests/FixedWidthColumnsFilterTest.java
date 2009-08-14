@@ -43,6 +43,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
@@ -69,6 +70,7 @@ public class FixedWidthColumnsFilterTest {
 
 	private FixedWidthColumnsFilter filter;
 	private FilterTestDriver testDriver;
+    private String root; // maven move; //m marks deletions
 	
 	@Before
 	public void setUp() {
@@ -80,6 +82,9 @@ public class FixedWidthColumnsFilterTest {
 		
 		testDriver.setDisplayLevel(2);
 		testDriver.setShowSkeleton(true);
+		
+        root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
+
 	}
 			
 	@Test
@@ -911,9 +916,9 @@ public class FixedWidthColumnsFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = TableFilterTest.class.getResource("/csv_test6.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+//m		URL url = TableFilterTest.class.getResource("/csv_test6.txt");
+//m		String root = Util.getDirectoryName(url.getPath());
+//m		root = Util.getDirectoryName(root) + "/data/";
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
@@ -925,9 +930,9 @@ public class FixedWidthColumnsFilterTest {
 
 // Helpers
 	private String _getFullFileName(String fileName) {
-		URL url = TableFilterTest.class.getResource("/csv_test6.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+//m		URL url = TableFilterTest.class.getResource("/csv_test6.txt");
+//m		String root = Util.getDirectoryName(url.getPath());
+//m		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 	

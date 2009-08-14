@@ -56,6 +56,7 @@ import net.sf.okapi.filters.table.csv.Parameters;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.TestUtil; //maven
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -66,6 +67,7 @@ public class CommaSeparatedValuesFilterTest {
 
 	private CommaSeparatedValuesFilter filter;
 	private FilterTestDriver testDriver;
+	private String root; // for maven move; deletions marked with //m
 	
 	@Before
 	public void setUp() {
@@ -81,7 +83,7 @@ public class CommaSeparatedValuesFilterTest {
 //m		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
 //m		String root2 = Util.getDirectoryName(url.getPath());
 //m		root2 = Util.getDirectoryName(root2) + "/data/";
-        		root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
+        root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
 	}
 	
 	@Test
@@ -922,9 +924,9 @@ public class CommaSeparatedValuesFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+//		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
+//		String root = Util.getDirectoryName(url.getPath());
+//		root = Util.getDirectoryName(root) + "/data/";
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
@@ -939,9 +941,9 @@ public class CommaSeparatedValuesFilterTest {
 	
 	// Helpers
 	private String _getFullFileName(String fileName) {
-		URL url = TableFilterTest.class.getResource("/csv_testb.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
+//		URL url = TableFilterTest.class.getResource("/csv_testb.txt");
+//		String root = Util.getDirectoryName(url.getPath());
+//		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 	
