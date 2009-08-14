@@ -644,7 +644,7 @@ public class FilterTestDriver {
 			else {
 				String root = Util.getDirectoryName(doc.path);
 				IParameters params = filter.getParameters();
-				if ( params != null ) params.load(Util.toURI(root+"/"+doc.paramFile), false);
+				if ( params != null ) params.load(Util.toURI(root+File.separator+doc.paramFile), false);
 			}
 			
 			// Open the input

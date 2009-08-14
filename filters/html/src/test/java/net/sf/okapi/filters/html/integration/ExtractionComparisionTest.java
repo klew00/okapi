@@ -2,6 +2,7 @@ package net.sf.okapi.filters.html.integration;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class ExtractionComparisionTest {
 		testFileList = TestUtils.getHtmlTestFiles();
 
 		URL url = ExtractionComparisionTest.class.getResource("/324.html");
-		root = Util.getDirectoryName(url.getPath()) + "/";
+		root = Util.getDirectoryName(url.getPath()) + File.separator;
 	}
 
 	@After
