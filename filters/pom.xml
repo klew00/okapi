@@ -28,7 +28,6 @@
         <module>xliff</module>
         <module>regex</module>
         <module>regex-ui</module>
-        <module>properties</module>
         <module>html</module>
         <module>html-ui</module>
         <module>plaintext</module>
