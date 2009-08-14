@@ -39,15 +39,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * This is a test that filters all files in the data directory.
- */
-
 public class OpenXMLZipFullDirectoryTest {
 	private static Logger LOGGER;
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
 	private static final String deary="/data/";
+
+	public OpenXMLZipFullDirectoryTest()
+                  {
+                  }
 
 	@Before
 	public void setUp() throws Exception {
@@ -58,7 +58,8 @@ public class OpenXMLZipFullDirectoryTest {
 		if (LOGGER.getHandlers().length<1)
 			LOGGER.addHandler(new LogHandlerSystemOut());		
 		openXMLFilter.setOptions("en", "UTF-8", true);
-
+    	    testFileList = new String[1]; // timporary
+/*
 	    JFileChooser chooser = new JFileChooser();
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the JDK.
@@ -81,11 +82,13 @@ public class OpenXMLZipFullDirectoryTest {
 	    else {
 	    	testFileList = new String[]{}; // Empty to skip the manual tests
 	    }
+*/
 	}
 
 	@After
 	public void tearDown() {
 		openXMLFilter.close();
+
 	}
 
 	@Test
@@ -97,6 +100,8 @@ public class OpenXMLZipFullDirectoryTest {
 		//String base=System.getProperty("user.dir").replace('\\','/').toLowerCase();
 
 		for (String f : testFileList) {
+                                                      if (f==null)
+                                                        continue;
 			String ff = f;
 			String ff20 = ff.replace(" ","%20").toLowerCase();
 			String ff20s = ff20.replace('\\','/');
