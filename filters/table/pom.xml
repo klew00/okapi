@@ -30,6 +30,11 @@
          <artifactId>filters-regex</artifactId>
          <version>${project.version}</version>
       </dependency>
+      <dependency>
+         <groupId>${project.groupId}</groupId>
+         <artifactId>filters-plaintext</artifactId>
+         <version>${project.version}</version>
+      </dependency>
    </dependencies>
 </project>		
 		
