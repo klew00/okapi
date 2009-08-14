@@ -18,7 +18,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 
-public class TestUtils {
+public class HtmlUtils {
 
 	public static String[] getHtmlTestFiles() throws URISyntaxException {
 		// read all files in the test html directory

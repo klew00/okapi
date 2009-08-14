@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.filters.html.HtmlFilter;
-import net.sf.okapi.filters.html.TestUtils;
+import net.sf.okapi.filters.html.HtmlUtils;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -26,7 +26,7 @@ public class ExtractionComparisionTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
-		testFileList = TestUtils.getHtmlTestFiles();
+		testFileList = HtmlUtils.getHtmlTestFiles();
 
 		URL url = ExtractionComparisionTest.class.getResource("/324.html");
 		root = Util.getDirectoryName(url.getPath()) + File.separator;
