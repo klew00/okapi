@@ -34,8 +34,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.ui.filters.plaintext.common.IDialogPage;
-import net.sf.okapi.ui.filters.plaintext.common.InputQueryDialog;
+import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
+import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
