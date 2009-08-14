@@ -23,7 +23,6 @@ package net.sf.okapi.filters.rtf;
 import java.io.InputStream;
 
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 
@@ -45,12 +44,12 @@ public class RTFFilterTest {
 			filter = new RTFFilter();
 			InputStream input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
 			filter.open(new RawDocument(input, "windows-1252", "en", "fr"));
-			process1(filter);
+//TODO: replace with non-visual test			process1(filter);
 			filter.close();
 			
 			input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
 			filter.open(new RawDocument(input, "windows-1252", "en", "fr"));
-			process2(filter);
+//TODO: replace with non-visual test			process2(filter);
 			filter.close();
 
 			input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
@@ -67,23 +66,23 @@ public class RTFFilterTest {
 		}
 	}
 	
-	private void process1 (RTFFilter filter) {
-		System.out.println("===== 1 ===========================================");
-		StringBuilder buf = new StringBuilder();
-		while ( filter.getTextUntil(buf, -1, 0) == 0 ) {
-			System.out.println(buf.toString());
-		}
-	}
-
-	private void process2 (RTFFilter filter) {
-		System.out.println("===== 2 ===========================================");
-		TextUnit tu = new TextUnit("testid"); 
-		while ( filter.getSegment(tu) ) {
-			System.out.println("S="+tu.toString());
-			if ( tu.hasTarget("fr") ) {
-				System.out.println("T="+tu.getTargetContent("fr").toString());
-			}
-		}
-	}
+//	private void process1 (RTFFilter filter) {
+//		System.out.println("===== 1 ===========================================");
+//		StringBuilder buf = new StringBuilder();
+//		while ( filter.getTextUntil(buf, -1, 0) == 0 ) {
+//			System.out.println(buf.toString());
+//		}
+//	}
+//
+//	private void process2 (RTFFilter filter) {
+//		System.out.println("===== 2 ===========================================");
+//		TextUnit tu = new TextUnit("testid"); 
+//		while ( filter.getSegment(tu) ) {
+//			System.out.println("S="+tu.toString());
+//			if ( tu.hasTarget("fr") ) {
+//				System.out.println("T="+tu.getTargetContent("fr").toString());
+//			}
+//		}
+//	}
 
 }
