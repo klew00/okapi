@@ -81,6 +81,12 @@
        <artifactId>okapi-core</artifactId>
        <version>${project.version}</version>
      </dependency>
+	 <dependency>
+       <groupId>${project.groupId}</groupId>
+       <artifactId>okapi-core-ui-install-dependencies</artifactId>
+       <version>${project.version}</version>
+       <type>pom</type>
+     </dependency>
   </dependencies>
 </project>        
         
