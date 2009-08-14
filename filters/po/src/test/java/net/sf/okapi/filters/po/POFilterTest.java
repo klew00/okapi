@@ -72,7 +72,7 @@ public class POFilterTest {
 	@Test
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(root+"test01.po", null),
+			new InputDocument(root+"Test01.po", null),
 			"UTF-8", "en", "en"));
 	}
 	
