@@ -46,10 +46,10 @@ public class OpenXMLConfigurationTest {
 	@Before
 	public void setUp() throws Exception {
 		filter = new OpenXMLFilter();
-		URL url = OpenXMLConfigurationTest.class.getResource("/net/sf/okapi/filters/openxml/tests/anchor.txt");
+		URL url = OpenXMLConfigurationTest.class.getResource("/anchor.txt");
 		root = Util.getDirectoryName(url.getPath());
-		int n = root.indexOf("/bin/");
-		root = root.substring(0, n) + "/data/";
+		//int n = root.indexOf("/bin/");
+		//root = root.substring(0, n) + "/data/";
 	}
 	
 	@Test
