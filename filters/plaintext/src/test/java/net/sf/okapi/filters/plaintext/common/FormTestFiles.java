@@ -4,7 +4,7 @@ import net.sf.okapi.common.TestUtil;
 
 import java.io.*;
 
-
+//TODO: Change this so it's used for debug but not unit tests
 public class FormTestFiles {
 
 	private static String getPath() {

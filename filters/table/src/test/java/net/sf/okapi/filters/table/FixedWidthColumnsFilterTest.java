@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.table.tests;
+package net.sf.okapi.filters.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -80,7 +80,7 @@ public class FixedWidthColumnsFilterTest {
 		testDriver = new FilterTestDriver();
 		assertNotNull(testDriver);
 		
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 		
         root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
@@ -395,7 +395,7 @@ public class FixedWidthColumnsFilterTest {
 	}
 	@Test
 	public void testFileEvents() {
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 						
 		// Load filter parameters from a file, check if params have changed
 		URL paramsUrl = TableFilterTest.class.getResource("/test_params3.txt");
@@ -819,7 +819,7 @@ public class FixedWidthColumnsFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test6.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test6.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_test6.txt"));			
@@ -862,7 +862,7 @@ public class FixedWidthColumnsFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_testb.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_testb.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_testb.txt"));			
@@ -904,7 +904,7 @@ public class FixedWidthColumnsFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_testb.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_testb.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_testb.txt"));			

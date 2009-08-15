@@ -60,7 +60,7 @@ public class ParaPlainTextFilterTest {
 		testDriver = new FilterTestDriver();
 		assertNotNull(testDriver);
 		
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
         root = TestUtil.getParentDir(this.getClass(), "/crt.txt");
 	}
@@ -101,8 +101,8 @@ public class ParaPlainTextFilterTest {
 		tc.append(c);
 		
 		tc.append(" string");
-		System.out.println(tc.toString());
-		System.out.println(tc.getCodedText());
+//debug		System.out.println(tc.toString());
+//debug		System.out.println(tc.getCodedText());
 		
 		
 		//--------------------
@@ -300,7 +300,7 @@ public class ParaPlainTextFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "crlf_start.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "crlf_start.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/crlf_start.txt"));			
@@ -320,7 +320,7 @@ public class ParaPlainTextFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
@@ -340,7 +340,7 @@ public class ParaPlainTextFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
@@ -360,7 +360,7 @@ public class ParaPlainTextFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "crlfcrlf.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "crlfcrlf.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/crlfcrlf.txt"));			
@@ -380,7 +380,7 @@ public class ParaPlainTextFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "lgpl.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "lgpl.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/lgpl.txt"));			
@@ -394,13 +394,13 @@ public class ParaPlainTextFilterTest {
 	public void testEvents() {
 		String filename = "cr.txt";
 		
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 		
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
-		System.out.println(filename);
+//debug		System.out.println(filename);
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		if (!testDriver.process(filter)) Assert.fail();
 		filter.close();
@@ -457,7 +457,7 @@ public class ParaPlainTextFilterTest {
 
 	@Test
 	public void testCancel() {
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		params.extractParagraphs = false;
 		
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");
@@ -613,7 +613,7 @@ public class ParaPlainTextFilterTest {
 // Helpers
 	
 	private void _testFile(String filename, boolean emptyTail) {
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);

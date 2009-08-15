@@ -62,7 +62,7 @@ public class PlainTextFilterTest {
 		testDriver = new FilterTestDriver();
 		assertNotNull(testDriver);
 		
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 
 		root = TestUtil.getParentDir(this.getClass(), "/cr.txt");
@@ -104,8 +104,8 @@ public class PlainTextFilterTest {
 		tc.append(c);
 		
 		tc.append(" string");
-		System.out.println(tc.toString());
-		System.out.println(tc.getCodedText());
+//debug		System.out.println(tc.toString());
+//debug		System.out.println(tc.getCodedText());
 		
 		
 		//--------------------
@@ -279,7 +279,7 @@ public class PlainTextFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "crlf_start.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "crlf_start.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/crlf_start.txt"));			
@@ -299,7 +299,7 @@ public class PlainTextFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
@@ -319,7 +319,7 @@ public class PlainTextFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
@@ -333,13 +333,13 @@ public class PlainTextFilterTest {
 	public void testEvents() {
 		String filename = "cr.txt";
 		
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 		
 		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
-		System.out.println(filename);
+//debug		System.out.println(filename);
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		if (!testDriver.process(filter)) Assert.fail();
 		filter.close();
@@ -374,7 +374,7 @@ public class PlainTextFilterTest {
 	
 	@Test
 	public void testCancel() {
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		
 		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
 		assertNotNull(input);
@@ -760,7 +760,7 @@ public class PlainTextFilterTest {
 // Helpers
 	
 	private void _testFile(String filename, boolean emptyTail) {
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		
 		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
@@ -858,12 +858,12 @@ public class PlainTextFilterTest {
 		return root + "/" + fileName;
 	}
 	
-	private String _getFullFileName(String fileName) {
-		URL url = PlainTextFilterTest.class.getResource("/cr.txt");
-		String root = Util.getDirectoryName(url.getPath());
-		root = Util.getDirectoryName(root) + "/data/";
-		return root + fileName;
-	}
+//	private String _getFullFileName(String fileName) {
+//		URL url = PlainTextFilterTest.class.getResource("/cr.txt");
+//		String root = Util.getDirectoryName(url.getPath());
+//		root = Util.getDirectoryName(root) + "/data/";
+//		return root + fileName;
+//	}
 	
 	private String _getSkeleton (String fileName) throws UnsupportedEncodingException {
 		IFilterWriter writer;

@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.table.tests;
+package net.sf.okapi.filters.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
@@ -39,7 +38,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
@@ -71,7 +69,7 @@ public class TabSeparatedValuesFilterTest {
 		testDriver = new FilterTestDriver();
 		assertNotNull(testDriver);
 		
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
         root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt"); // maven
 	}
@@ -209,7 +207,7 @@ public class TabSeparatedValuesFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test9.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test9.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(TabSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test9.txt"));			

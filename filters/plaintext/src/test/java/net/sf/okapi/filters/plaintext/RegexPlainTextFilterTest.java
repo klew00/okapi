@@ -57,7 +57,7 @@ public class RegexPlainTextFilterTest {
 		testDriver = new FilterTestDriver();
 		assertNotNull(testDriver);
 		
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
         root = TestUtil.getParentDir(this.getClass(), "/cr.txt");
 	}
@@ -282,7 +282,7 @@ public class RegexPlainTextFilterTest {
 // Helpers
 	
 	private void _testFile(String filename, boolean emptyTail) {
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);

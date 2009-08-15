@@ -1,5 +1,4 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -53,7 +52,7 @@ public class SplicedLinesFilterTest {
 		testDriver = new FilterTestDriver();
 		assertNotNull(testDriver);
 		
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
         root = TestUtil.getParentDir(this.getClass(), "/cr.txt");
 	}
@@ -108,7 +107,7 @@ public class SplicedLinesFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt"));			
@@ -128,7 +127,7 @@ public class SplicedLinesFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines_end.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines_end.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines_end.txt"));			
@@ -148,7 +147,7 @@ public class SplicedLinesFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines2.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines2.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines2.txt"));			

@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.table.tests;
+package net.sf.okapi.filters.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -33,7 +33,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
@@ -41,7 +40,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -72,7 +70,7 @@ public class TableFilterTest {
 		testDriver = new FilterTestDriver();
 		assertNotNull(testDriver);
 		
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 
 //m		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
@@ -193,7 +191,7 @@ public class TableFilterTest {
 	
 	@Test
 	public void testFileEvents() {
-		testDriver.setDisplayLevel(2);
+		testDriver.setDisplayLevel(0);
 		
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test1.txt");
 		assertNotNull(input);
@@ -302,7 +300,7 @@ public class TableFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(TableFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
@@ -322,7 +320,7 @@ public class TableFilterTest {
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
-		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
+//debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
 		
 		try {
 			expected = _streamAsString(TableFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
