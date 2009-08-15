@@ -20,14 +20,12 @@
 
 package net.sf.okapi.filters.xliff;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
@@ -225,7 +223,7 @@ public class XLIFFFilterTest {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"JMP-11-Test01.xlf", null));
-		//list.add(new InputDocument(root+"Manual-12-AltTrans.xlf", null));
+		list.add(new InputDocument(root+"Manual-12-AltTrans.xlf", null));
 		list.add(new InputDocument(root+"PAS-10-Test01.xlf", null));
 		list.add(new InputDocument(root+"RB-11-Test01.xlf", null));
 		list.add(new InputDocument(root+"RB-12-Test02.xlf", null));

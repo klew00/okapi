@@ -19,16 +19,15 @@
         <module>idml</module>
         <module>mif</module>
         <module>openoffice</module>
-<!--
         <module>openoffice-ui</module>
--->
-<!--passes on windows but not Hudson
+<!--Passes on windows but not Hudson
         <module>openxml</module>
+-->
+<!--Needs swing2swt.jar reference
+        <module>openxml-ui</module>
 -->
         <module>plaintext</module>
         <module>plaintext-ui</module>
-        <module>table</module>
-        <module>table-ui</module>
         <module>po</module>
         <module>po-ui</module>
         <module>properties</module>
@@ -36,11 +35,13 @@
         <module>regex</module>
         <module>regex-ui</module>
         <module>rtf</module>
+        <module>table</module>
+        <module>table-ui</module>
         <module>tmx</module>
         <module>ts</module>
         <module>ts-ui</module>
         <module>xliff</module>
-<!--Until it doesn't hang hudson
+<!--Tests hang when running on Hudson
         <module>xml</module>
 -->
     </modules>

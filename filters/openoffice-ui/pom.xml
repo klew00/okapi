@@ -14,7 +14,7 @@
    <dependencies>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>filters-po</artifactId>
+        <artifactId>filters-openoffice</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
