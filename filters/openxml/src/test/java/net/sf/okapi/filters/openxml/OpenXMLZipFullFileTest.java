@@ -54,7 +54,7 @@ public class OpenXMLZipFullFileTest {
 		LOGGER = Logger.getLogger(OpenXMLZipFullFileTest.class.getName());
 		openXMLFilter = new OpenXMLFilter();	
 		openXMLFilter.setLogger(LOGGER);
-		LOGGER.setLevel(Level.FINER);
+		LOGGER.setLevel(Level.FINE);
 		if (LOGGER.getHandlers().length<1)
 			LOGGER.addHandler(new LogHandlerSystemOut());		
 		openXMLFilter.setOptions("en", "UTF-8", true);
