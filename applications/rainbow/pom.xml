@@ -38,6 +38,11 @@
         	<version>${project.version}</version>
         </dependency>
         <dependency>
+        	<groupId>net.sf.okapi.mt</groupId>
+        	<artifactId>mt-google</artifactId>
+        	<version>${project.version}</version>
+        </dependency>
+        <dependency>
         	<groupId>net.sf.okapi.lib</groupId>
         	<artifactId>lib-translation</artifactId>
         	<version>${project.version}</version>

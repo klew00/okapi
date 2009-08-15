@@ -23,6 +23,7 @@
         <module>filters</module>
 		<module>libraries</module>
 		<module>tm</module>
+		<module>mt</module>
 		<module>steps</module>
     </modules>
     <dependencies>
