@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openxml.ConditionalParameters;
@@ -100,11 +101,17 @@ public class OpenXMLRoundTripSequenceTest {
 			filter.setOptions("en-US", "UTF-8", true);
 //			filter.setLogLevel(Level.FINEST);
 //			filter.setLogLevel(Level.FINE);
-			URL url = OpenXMLRoundTripTest.class.getResource("/BoldWorld.docx");
-			String sUserDir = Util.getDirectoryName(url.getPath());
-			sInputPath = sUserDir + "/";
-			sOutputPath = sUserDir + "/output/";
-			sGoldPath = sUserDir + "/gold/";
+
+			sInputPath = TestUtil.getParentDir(this.getClass(), "/BoldWorld.docx");
+			sOutputPath = sInputPath + "output/";
+			sGoldPath = sInputPath + "gold/";
+
+//			URL url = OpenXMLRoundTripTest.class.getResource("/BoldWorld.docx");
+//			String sUserDir = Util.getDirectoryName(url.getPath());
+//			sInputPath = sUserDir + "/";
+//			sOutputPath = sUserDir + "/output/";
+//			sGoldPath = sUserDir + "/gold/";
+
 			uri = new URI(sInputPath+filename);
 			try
 			{
