@@ -14,6 +14,8 @@
     <modules>
         <module>tm-simpletm</module>
         <module>tm-opentran</module>
+<!--Works, but disabled until json-simple is in Hudson repository
         <module>tm-translatetoolkit</module>
+-->
     </modules>
 </project>
