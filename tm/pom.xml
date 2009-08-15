@@ -17,5 +17,6 @@
 <!--Works, but disabled until json-simple is in Hudson repository
         <module>tm-translatetoolkit</module>
 -->
+        <module>tm-globalsight</module>
     </modules>
 </project>
