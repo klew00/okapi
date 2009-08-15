@@ -8,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <!--Should match the directory name-->
-    <artifactId>tm-simpletm</artifactId>
+    <artifactId>tm-translatetoolkit</artifactId>
     <!--Used for display purposes only-->
     <name>Okapi tm connector for Translate Toolkit</name>
     <dependencies>

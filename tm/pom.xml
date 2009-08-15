@@ -14,5 +14,6 @@
     <modules>
         <module>tm-simpletm</module>
         <module>tm-opentran</module>
+        <module>tm-translatetoolkit</module>
     </modules>
 </project>
