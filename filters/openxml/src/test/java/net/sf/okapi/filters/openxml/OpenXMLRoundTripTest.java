@@ -70,7 +70,7 @@ public class OpenXMLRoundTripTest {
 		LOGGER.setLevel(Level.FINE);
 //		LOGGER.setLevel(Level.FINER);
 //		LOGGER.setLevel(Level.FINEST);
-		LOGGER.addHandler(new LogHandlerSystemOut());
+//		LOGGER.addHandler(new LogHandlerSystemOut());
 		cparams = getParametersFromUserInterface();
 
 		ArrayList<String> themfiles = new ArrayList<String>();
