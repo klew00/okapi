@@ -12,6 +12,6 @@
     <packaging>pom</packaging>
     <name>Okapi Applications Build</name>
     <modules>
-<!--        <module>rainbow</module> -->
+        <module>rainbow</module>
     </modules>
 </project>

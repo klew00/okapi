@@ -25,27 +25,32 @@
         <dependency>
         	<groupId>net.sf.okapi.lib</groupId>
         	<artifactId>lib-segmentation</artifactId>
-        	<version>1.0.0</version>
+        	<version>${project.version}</version>
         </dependency>
         <dependency>
         	<groupId>net.sf.okapi.lib</groupId>
         	<artifactId>lib-segmentation-ui</artifactId>
-        	<version>1.0.0</version>
+        	<version>${project.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.tm</groupId>
+        	<artifactId>tm-simpletm</artifactId>
+        	<version>${project.version}</version>
         </dependency>
         <dependency>
         	<groupId>net.sf.okapi.lib</groupId>
         	<artifactId>lib-translation</artifactId>
-        	<version>1.0.0</version>
+        	<version>${project.version}</version>
         </dependency>
         <dependency>
         	<groupId>net.sf.okapi.filters</groupId>
         	<artifactId>filters-xliff</artifactId>
-        	<version>1.0.0</version>
+        	<version>${project.version}</version>
         </dependency>
         <dependency>
         	<groupId>net.sf.okapi.filters</groupId>
         	<artifactId>filters-rtf</artifactId>
-        	<version>1.0.0</version>
+        	<version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
