@@ -5,10 +5,17 @@
 </head>
 <body>
 <h1>Okapi Framework Changes Log - @date@</h1>
-<h2>M2 to this version</h2>
+<p>Note this document is common to both the <b>okapi-lib</b> distribution and 
+the <b>okapi-apps</b> distribution. The information pertaining to 
+applications other than Tikal are relevant only for the okapi-apps 
+distribution.</p>
+<h2>M2 to this release (M3)</h2>
 <p>The following list enumerates the most important changes in the Okapi Framework between this 
-build and the previous release (M2)</p>
+release (M3) and the previous one (M2)</p>
 <ul>
+	<li>The build system has been completely redone and now uses Maven as its 
+	main builder. This has resulted in several changes in the structure of the 
+	Okapi classes, and in the way the files are distributed.</li>
 	<li>Filters:<ul>
 		<li>Added the TS Filter (beta) for Qt translation files.</li>
 		<li>Fixed handling of fuzzy flag for plural entries in the PO filter.</li>
@@ -23,7 +30,7 @@ build and the previous release (M2)</p>
 	</ul>
 		</li>
 		<li>Properties Filter:<ul>
-		<li>Change dthe default configuration to always escape output.</li>
+		<li>Change the default configuration to always escape output.</li>
 		<li>Added pre-defined configuration for non-escaped output.</li>
 	</ul>
 		</li>
@@ -34,9 +41,11 @@ build and the previous release (M2)</p>
 		<li>The Google MT connector has been enhanced to have the inline codes taken 
 	into account, not simply pushed to the end of the text.</li>
 		<li>Fixed one error in default segmentation rules.</li>
+		<li>Added a connector component for the Translate Toolkit TM server.</li>
 	</ul>
 	</li>
-	<li>Rainbow:<ul>
+	<li>The command-line tool Tikal has been added.</li>
+	<li>Rainbow <i>(okapi-apps distribution only)</i>:<ul>
 		<li>Improved handling of un-approved translations in TMX generated 
 		during a translation package creation.</li>
 		<li>Added option to choose to merge only approved translations in 
@@ -45,8 +54,8 @@ build and the previous release (M2)</p>
 	</li>
 </ul>
 <h2>M1 to M2</h2>
-<p>The following list enumerates the most important changes in the Okapi Framework between this 
-build and the previous release (M1)</p>
+<p>The following list enumerates the most important changes in the Okapi Framework between 
+release M1 and release M2.</p>
 <ul>
 	<li>Filters:<ul>
 		<li>The DTD Filter has been added.</li>

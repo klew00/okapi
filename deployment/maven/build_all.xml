@@ -1,17 +1,22 @@
 <?xml version="1.0"?> 
-<project name="Okapi libraries all distributions" default="all" basedir="."> 
+<project name="All distributions" default="all" basedir="."> 
 
 	<target name="all">
-		<ant antfile="build.xml">
+		<!-- One for all platforms -->
+		<ant antfile="build_okapi-lib.xml">
+		</ant>
+		
+		<!-- One per platform -->
+		<ant antfile="build_okapi-apps.xml">
 			<property name="platform" value="win32-x86"/>
 		</ant>
-		<ant antfile="build.xml">
+		<ant antfile="build_okapi-apps.xml">
 			<property name="platform" value="gtk2-linux-x86"/>
 		</ant>
-		<ant antfile="build.xml">
+		<ant antfile="build_okapi-apps.xml">
 			<property name="platform" value="gtk2-linux-x86_64"/>
 		</ant>
-		<ant antfile="build.xml">
+		<ant antfile="build_okapi-apps.xml">
 			<property name="platform" value="cacoa-macosx"/>
 		</ant>
 	</target>

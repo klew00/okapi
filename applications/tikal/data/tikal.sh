@@ -8,4 +8,4 @@ if [ $? -ne 0 ]; then
 MY_PATH=$(echo $LSOF | sed -E s/'^([^\/]+)\/'/'\/'/1 2>/dev/null)
 fi
 
-java -jar MY_ROOT=$(dirname $MY_PATH)/tikal.jar $1 $2 $3 $4 $5 $6 $7 $8 $9
+java -jar MY_ROOT=$(dirname $MY_PATH)/lib/tikal.jar $1 $2 $3 $4 $5 $6 $7 $8 $9
