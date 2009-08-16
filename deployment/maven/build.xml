@@ -1,0 +1,349 @@
+<?xml version="1.0"?> 
+<project name="rainbow" default="all" basedir="."> 
+
+	<!-- Guess the platform if this build file is not called with the platform already set -->
+	<condition property="platform" value="win32-x86">
+		<os family="windows"/>
+	</condition>
+	<condition property="platform" value="carbon-macosx">
+		<os family="mac"/>
+	</condition>
+	<condition property="platform" value="gtk2-linux-x86">
+		<os name="Linux" arch="x86"/>
+	</condition>
+	<condition property="platform" value="gtk2-linux-x86_64">
+		<os name="Linux" arch="x86_64"/>
+	</condition>
+
+	<!-- Set flags for what dstribution is being built -->
+	<condition property="building-windows">
+		<equals arg1="${platform}" arg2="win32-x86"/>
+	</condition>
+	<condition property="building-mac">
+		<equals arg1="${platform}" arg2="cacoa-macosx"/>
+	</condition>
+	<condition property="building-linux">
+		<or>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
+		</or>
+	</condition>
+
+	<!-- Get the version information to use from file -->
+	<property file="../shared/release.properties" />
+ 	
+ 	<property name="okapilibName" value="okapi-lib"/>
+	<property name="okapilibStamp" value="${okapilibVersion}${releaseInfo}" />
+	<property name="okapilibJar" value="${okapilibName}-${okapilibStamp}.jar"/>
+
+	<property name="tikalStamp" value="${tikalVersion}${releaseInfo}" />
+	
+ 	<property name="tmp" value="tmp"/>
+	<property name="dist" value="dist_${platform}"/>
+	<property name="distLib" value="${dist}/lib"/>
+	<property name="mavenStore" value="${user.home}/.m2/repository"/>
+	<tstamp>
+	 <format property="TODAY" pattern="MMM-dd-yyyy"/>
+	</tstamp>
+	
+	<target name="init">
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${dist}"/>
+		</delete>
+		<mkdir dir="${distLib}"/>
+ 	</target>
+
+	<!-- Make the okapi-lib jar -->
+	<target name="make-okapi-lib"> 
+
+		<!-- Prepare tmp dir for creating the jar -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<delete file="tmpJars" quiet="true"/>
+		<mkdir dir="${tmp}"/>
+
+		<!-- Copy classes -->
+		<copy todir="${tmp}">
+			<!-- core -->
+			<fileset dir="../../framework/core/target/classes"
+			 excludes="**/META-INF/**"/>
+			 
+			<!-- filters -->
+			<fileset dir="../../filters/abstractmarkup/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/dtd/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/html/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/idml/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/mif/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/openoffice/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/openxml/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/plaintext/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/po/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/properties/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/regex/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/rtf/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/table/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/tmx/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/ts/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/xliff/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/xml/target/classes"
+			 excludes="**/META-INF/**"/>
+			 
+			<!-- lib -->
+			<fileset dir="../../libraries/lib-segmentation/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../libraries/lib-translation/target/classes"
+			 excludes="**/META-INF/**"/>
+			
+			<!-- tm -->
+			<fileset dir="../../tm/tm-opentran/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../tm/tm-simpletm/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../tm/tm-translatetoolkit/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../tm/tm-globalsight/target/classes"
+			 excludes="**/META-INF/**"/>
+
+			<!-- mt -->
+			<fileset dir="../../mt/mt-google/target/classes"
+			 excludes="**/META-INF/**"/>
+		</copy>
+		
+		<!-- Copy lib dependencies -->
+		<echo file="tmpJars">okapilibCP=</echo>
+		
+		<property name="dep001" value="${mavenStore}/dtdparser/dtdparser/1.21"/>
+		<fileset id="list.contents" dir="${dep001}"
+		 includes="**/*.jar"/>
+		<property name="jar001" refid="list.contents"/>
+		<echo file="tmpJars" append="yes">${jar001}</echo>
+		<copy todir="${distLib}" file="${dep001}/${jar001}"/>
+
+		<property name="dep002" value="${mavenStore}/net/htmlparser/jericho/jericho-html/3.1"/>
+		<fileset id="list.contents" dir="${dep002}"
+		 includes="**/*.jar"/>
+		<property name="jar002" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar002}</echo>
+		<copy todir="${distLib}" file="${dep002}/${jar002}"/>
+
+		<property name="dep003" value="${mavenStore}/org/jyaml/jyaml/1.3"/>
+		<fileset id="list.contents" dir="${dep003}"
+		 includes="**/*.jar"/>
+		<property name="jar003" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar003}</echo>
+		<copy todir="${distLib}" file="${dep003}/${jar003}"/>
+
+		<property name="dep004" value="${mavenStore}/org/codehaus/woodstox/wstx-lgpl/3.2.8"/>
+		<fileset id="list.contents" dir="${dep004}"
+		 includes="**/*.jar"/>
+		<property name="jar004" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar004}</echo>
+		<copy todir="${distLib}" file="${dep004}/${jar004}"/>
+
+		<property name="dep005" value="${mavenStore}/com/h2database/h2/1.1.103"/>
+		<fileset id="list.contents" dir="${dep005}"
+		 includes="**/*.jar"/>
+		<property name="jar005" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar005}</echo>
+		<copy todir="${distLib}" file="${dep005}/${jar005}"/>
+
+		<property name="dep006" value="${mavenStore}/org/apache/ws/commons/util/ws-commons-util/1.0.2"/>
+		<fileset id="list.contents" dir="${dep006}"
+		 includes="**/*.jar"/>
+		<property name="jar006" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar006}</echo>
+		<copy todir="${distLib}" file="${dep006}/${jar006}"/>
+
+		<property name="dep007" value="${mavenStore}/org/apache/xmlrpc/xmlrpc-client/3.1"/>
+		<fileset id="list.contents" dir="${dep007}"
+		 includes="**/*.jar"/>
+		<property name="jar007" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar007}</echo>
+		<copy todir="${distLib}" file="${dep007}/${jar007}"/>
+
+		<property name="dep008" value="${mavenStore}/org/apache/xmlrpc/xmlrpc-common/3.1"/>
+		<fileset id="list.contents" dir="${dep008}"
+		 includes="**/*.jar"/>
+		<property name="jar008" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar008}</echo>
+		<copy todir="${distLib}" file="${dep008}/${jar008}"/>
+
+		<property name="dep009" value="${mavenStore}/org/json/json-simple/1.1"/>
+		<fileset id="list.contents" dir="${dep009}"
+		 includes="**/*.jar"/>
+		<property name="jar009" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar009}</echo>
+		<copy todir="${distLib}" file="${dep009}/${jar009}"/>
+
+		<property name="dep010" value="${mavenStore}/axis/axis/1.4"/>
+		<fileset id="list.contents" dir="${dep010}"
+		 includes="**/*.jar"/>
+		<property name="jar010" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar010}</echo>
+		<copy todir="${distLib}" file="${dep010}/${jar010}"/>
+
+		<property name="dep011" value="${mavenStore}/commons-discovery/commons-discovery/0.2"/>
+		<fileset id="list.contents" dir="${dep011}"
+		 includes="**/*.jar"/>
+		<property name="jar011" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar011}</echo>
+		<copy todir="${distLib}" file="${dep011}/${jar011}"/>
+
+		<property name="dep012" value="${mavenStore}/commons-logging/commons-logging/1.0.4"/>
+		<fileset id="list.contents" dir="${dep012}"
+		 includes="**/*.jar"/>
+		<property name="jar012" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar012}</echo>
+		<copy todir="${distLib}" file="${dep012}/${jar012}"/>
+
+		<property name="dep013" value="${mavenStore}/axis/axis-jaxrpc/1.4"/>
+		<fileset id="list.contents" dir="${dep013}"
+		 includes="**/*.jar"/>
+		<property name="jar013" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar013}</echo>
+		<copy todir="${distLib}" file="${dep013}/${jar013}"/>
+
+		<property name="dep014" value="${mavenStore}/axis/axis-saaj/1.4"/>
+		<fileset id="list.contents" dir="${dep014}"
+		 includes="**/*.jar"/>
+		<property name="jar014" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar014}</echo>
+		<copy todir="${distLib}" file="${dep014}/${jar014}"/>
+
+		<property name="dep015" value="${mavenStore}/axis/axis-wsdl4j/1.5.1"/>
+		<fileset id="list.contents" dir="${dep015}"
+		 includes="**/*.jar"/>
+		<property name="jar015" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar015}</echo>
+		<copy todir="${distLib}" file="${dep015}/${jar015}"/>
+
+		<property name="dep016" value="${mavenStore}/org/codehaus/woodstox/wstx-lgpl/3.2.8"/>
+		<fileset id="list.contents" dir="${dep016}"
+		 includes="**/*.jar"/>
+		<property name="jar016" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar016}</echo>
+		<copy todir="${distLib}" file="${dep016}/${jar016}"/>
+
+		<property name="dep017" value="${mavenStore}/stax/stax-api/1.0.1"/>
+		<fileset id="list.contents" dir="${dep017}"
+		 includes="**/*.jar"/>
+		<property name="jar017" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar017}</echo>
+		<copy todir="${distLib}" file="${dep017}/${jar017}"/>
+
+		<!-- Create the manifest file -->
+		<property file="tmpJars"/>
+		<manifest file="${tmp}/MANIFEST.MF">
+			<attribute name="Implementation-Title" value="${okapilibName}"/>
+			<attribute name="Implementation-Version" value="${okapilibStamp}"/>
+			<attribute name="Class-Path" value="${okapilibCP}"/>
+  		</manifest>
+		
+		<!-- Create the jar file -->
+		<jar jarfile="${distLib}/${okapilibJar}" basedir="${tmp}"
+		 manifest="${tmp}/MANIFEST.MF"
+		 excludes="MANIFEST.MF" />
+
+	</target>
+
+	<target name="make-tikal">
+		<!-- Prepare tmp dir for creating the jar -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+
+		<!-- Copy classes -->
+		<copy todir="${tmp}">
+			<fileset dir="../../applications/tikal/target/classes"/>
+		</copy>
+		
+		<!-- Copy batch/shell -->
+		<copy todir="${distLib}">
+			<fileset dir="../../applications/tikal/data"/>
+		</copy>
+		
+		<!-- Create the manifest file -->
+		<manifest file="${tmp}/MANIFEST.MF">
+			<attribute name="Implementation-Title" value="tikal"/>
+			<attribute name="Implementation-Version" value="${tikalStamp}"/>
+			<attribute name="Main-Class" value="net.sf.okapi.applications.tikal.Main"/>
+			<attribute name="Class-Path" value="${okapilibJar}"/>
+  		</manifest>
+		
+		<!-- Create the jar file -->
+		<jar jarfile="${distLib}/tikal.jar" basedir="${tmp}"
+		 manifest="${tmp}/MANIFEST.MF"
+		 excludes="MANIFEST.MF" />
+
+		<!-- Clean up -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<delete file="tmpJars" quiet="true"/>
+
+	</target>
+		
+	<!-- make the okapi-lib-ui jar -->
+	<target name="make-okapi-lib-ui"> 
+
+		<!-- Prepare tmp dir for creating the jar -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+
+		<!-- Copy classes -->
+		<copy todir="${tmp}">
+			<fileset dir="../../framework/core-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/html-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/openoffice-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/openxml-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/plaintext-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/po-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/properties-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/regex-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/table-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/ts-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+		</copy>
+		
+		<!-- Copy lib dependencies -->
+
+		<!-- Clean up
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<delete file="tmpJars" quiet="true"/>
+-->
+	</target>
+
+	<target name="all" depends="init, make-okapi-lib, make-tikal"/>
+
+</project>
