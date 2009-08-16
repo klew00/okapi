@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.lib;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,6 +35,7 @@ import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
@@ -42,6 +44,7 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 
 	private String paramsFolder;
 	private ArrayList<FilterInfo> filters;
+	private static final Logger LOGGER = Logger.getLogger(FilterConfigurationMapper.class.getName());
 	
 	/**
 	 * Splits a configuration identifier into a filter and 
@@ -125,7 +128,12 @@ public class FilterConfigMapper extends FilterConfigurationMapper {
 
 				filters.add(info);
 				// Add the default configurations
-				addConfigurations(info.filterClass);
+				try {
+					addConfigurations(info.filterClass);
+				}
+				catch ( OkapiFilterCreationException e ) {
+					LOGGER.warning(e.getMessage());
+				}
 			}
 			
 			list = doc.getElementsByTagName("parametersEditor");

@@ -197,8 +197,14 @@ public class Utils {
 		return (tmp1 + (tmp2.length()==0 ? "" : ("-"+tmp2))); 
 	}
 	
-	static public String getOkapiSharedFolder (String rootFolder) {
-		return rootFolder + File.separatorChar + "lib" + File.separator + "shared";
+	static public String getOkapiSharedFolder (String rootFolder,
+		boolean fromJar)
+	{
+		if ( fromJar ) {
+			return rootFolder + File.separatorChar + "lib" + File.separator + "shared";
+		}
+		// Else: From maven build
+		return rootFolder + File.separatorChar + "classes" + File.separator + "shared";
 	}
 
 	/*static public String getOkapiParametersFolder (String rootFolder) {

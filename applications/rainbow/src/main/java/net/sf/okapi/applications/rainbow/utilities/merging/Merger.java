@@ -64,11 +64,12 @@ public class Merger {
 		// Get the location of the class source
 		File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
 	    String rootFolder = file.getAbsolutePath();
+	    boolean fromJar = rootFolder.endsWith(".jar");
 	    // Remove the JAR file if running an installed version
-	    if ( rootFolder.endsWith(".jar") ) rootFolder = Util.getDirectoryName(rootFolder);
+	    if ( fromJar ) rootFolder = Util.getDirectoryName(rootFolder);
 	    // Remove the application folder in all cases
 	    rootFolder = Util.getDirectoryName(rootFolder);
-		String sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
+		String sharedFolder = Utils.getOkapiSharedFolder(rootFolder, fromJar);
 
 		// Load the FilterAccess list
 		mapper = new FilterConfigMapper();

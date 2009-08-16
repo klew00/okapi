@@ -1428,10 +1428,11 @@ public class MainForm { //implements IParametersProvider {
     	File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
     	rootFolder = URLDecoder.decode(file.getAbsolutePath(),"utf-8"); //$NON-NLS-1$
     	// Remove the JAR file if running an installed version
-    	if ( rootFolder.endsWith(".jar") ) rootFolder = Util.getDirectoryName(rootFolder); //$NON-NLS-1$
+    	boolean fromJar = rootFolder.endsWith(".jar");
+    	if ( fromJar ) rootFolder = Util.getDirectoryName(rootFolder); //$NON-NLS-1$
     	// Remove the application folder in all cases
     	rootFolder = Util.getDirectoryName(rootFolder);
-		sharedFolder = Utils.getOkapiSharedFolder(rootFolder);
+		sharedFolder = Utils.getOkapiSharedFolder(rootFolder, fromJar);
 		help = new BaseHelp(rootFolder+File.separator+"help"); //$NON-NLS-1$
 	}
 	
