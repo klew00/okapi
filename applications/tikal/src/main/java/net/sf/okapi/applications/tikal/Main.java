@@ -29,6 +29,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
 
+import net.sf.okapi.common.BaseContext;
+import net.sf.okapi.common.IContext;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -38,6 +42,7 @@ public class Main {
 	
 	protected final static int CMD_EXTRACT = 0;
 	protected final static int CMD_MERGE = 1;
+	protected final static int CMD_EDITCONFIG = 2;
 	
 	protected ArrayList<String> inputs;
 	protected String skeleton;
@@ -91,6 +96,9 @@ public class Main {
 				else if ( arg.equals("-m") ) {
 					prog.command = CMD_MERGE;
 				}
+				else if ( arg.equals("-edit") ) {
+					prog.command = CMD_EDITCONFIG;
+				}
 				else if ( arg.equals("-listconf") ) {
 					prog.showAllConfigurations();
 					return;
@@ -105,13 +113,17 @@ public class Main {
 			}
 			
 			// Check inputs and command
-			if ( prog.inputs.size() == 0 ) {
-				throw new RuntimeException("No input document specified.");
-			}
 			if ( prog.command == -1 ) {
 				System.out.println("No command specified. Please use one of the command described below:");
 				prog.printUsage();
 				return;
+			}
+			if ( prog.command == CMD_EDITCONFIG ) {
+				prog.editConfiguration();
+				return;
+			}
+			if ( prog.inputs.size() == 0 ) {
+				throw new RuntimeException("No input document specified.");
 			}
 			
 			// Process all input files
@@ -201,6 +213,35 @@ public class Main {
 				"Could not guess the configuration for the extension '%s'", ext));
 		}
 		return id;
+	}
+	
+	private void editConfiguration () {
+		initialize();
+		if ( specifiedConfigId == null ) {
+			throw new RuntimeException("You must specified the configuration to edit.");
+		}
+		configId = specifiedConfigId;
+		if ( !prepareFilter(configId) ) return; // Next input
+
+		FilterConfiguration config = fcMapper.getConfiguration(configId);
+		if ( config == null ) {
+			throw new RuntimeException(String.format(
+				"Cannot find the configuration for '%s'.", configId));
+		}
+		IParametersEditor editor = fcMapper.createParametersEditor(configId);
+		if ( editor != null ) {
+			IParameters params = fcMapper.getParameters(config);
+			if ( params == null ) {
+				throw new RuntimeException(String.format(
+					"Cannot load parameters for '%s'.", config.configId));
+			}
+			editor.edit(params, !config.custom, new BaseContext());
+		}
+		else {
+			throw new RuntimeException(String.format(
+				"Cannot create the parameters editor for '%s'.",
+				configId));
+		}
 	}
 	
 	private void showAllConfigurations () {
@@ -342,7 +383,7 @@ public class Main {
 	
 	private void printBanner () {
 		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
-		System.out.println("Okapi Tikal - Localization Toolbox Command-Line");
+		System.out.println("Okapi Tikal - Simple Localization Toolbox");
 		// This will null for version until compiled as jar, which is ok.
 		System.out.println(String.format("Version: %s", getClass().getPackage().getImplementationVersion()));
 		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
@@ -351,7 +392,7 @@ public class Main {
 	private void printUsage () {
 		System.out.println("-h or -? : Show this help");
 		System.out.println("-listconf : List all available filter configurations");
-		System.out.println("-x : Extract an input file to XLIFF");
+		System.out.println("-x : Extract a file to XLIFF");
 		System.out.println("     -x [options] inputFile [inputFile2...]");
 		System.out.println("     Where the options are:");
 		System.out.println("     -fc configId : filter configuration to use");

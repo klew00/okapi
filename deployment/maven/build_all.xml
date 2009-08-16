@@ -2,10 +2,15 @@
 <project name="All distributions" default="all" basedir="."> 
 
 	<target name="all">
+		<!-- Delete all old distributions -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="done"/>
+		</delete>
+
 		<!-- One for all platforms -->
 		<ant antfile="build_okapi-lib.xml">
 		</ant>
-		
+
 		<!-- One per platform -->
 		<ant antfile="build_okapi-apps.xml">
 			<property name="platform" value="win32-x86"/>
@@ -17,7 +22,7 @@
 			<property name="platform" value="gtk2-linux-x86_64"/>
 		</ant>
 		<ant antfile="build_okapi-apps.xml">
-			<property name="platform" value="cacoa-macosx"/>
+			<property name="platform" value="cocoa-macosx"/>
 		</ant>
 	</target>
 

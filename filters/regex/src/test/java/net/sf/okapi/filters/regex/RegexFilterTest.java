@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.regex;
 
 import net.sf.okapi.common.*;
+import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -32,7 +33,10 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class RegexFilterTest {
@@ -70,6 +74,25 @@ public class RegexFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
 	}
 
+	@Test
+	public void testConfigurations () {
+		List<FilterConfiguration> list = filter.getConfigurations();
+		assertNotNull(list);
+		assertEquals(4, list.size());
+		IParameters params = filter.getParameters();
+		assertNotNull(params);
+		for ( FilterConfiguration config : list ) {
+			if ( config.parametersLocation == null ) continue; // Default
+			URL url = filter.getClass().getResource(config.parametersLocation);
+			try {
+				params.load(url.toURI(), false);
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			assertNotNull(params.toString());
+		}
+	}
+	
 	@Test
 	public void testSimpleRule () {
 		String snippet = "test1=\"text1\"\ntest2=\"text2\"\n";

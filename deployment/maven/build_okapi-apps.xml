@@ -1,17 +1,30 @@
 <?xml version="1.0"?> 
-<project name="okapi-lib" default="all" basedir="."> 
+<project name="okapi-apps" default="all" basedir="."> 
 
 	<!-- Guess the platform if this build file is not called with the platform already set -->
 	<condition property="platform" value="win32-x86">
 		<os family="windows"/>
 	</condition>
-	<condition property="platform" value="carbon-macosx">
+	<condition property="platform" value="cocoa-macosx">
 		<os family="mac"/>
 	</condition>
 	<condition property="platform" value="gtk2-linux-x86">
 		<os name="Linux" arch="x86"/>
 	</condition>
 	<condition property="platform" value="gtk2-linux-x86_64">
+		<os name="Linux" arch="x86_64"/>
+	</condition>
+
+	<condition property="swtdep" value="swt-win-32">
+		<os family="windows"/>
+	</condition>
+	<condition property="swtdep" value="swt-cocoa-macosx">
+		<os family="mac"/>
+	</condition>
+	<condition property="swtdep" value="swt-gtk2-linux-x86">
+		<os name="Linux" arch="x86"/>
+	</condition>
+	<condition property="swtdep" value="swt-gtk2-linux-x86_64">
 		<os name="Linux" arch="x86_64"/>
 	</condition>
 
@@ -35,13 +48,21 @@
  	<property name="okapilibName" value="okapi-lib"/>
 	<property name="okapilibStamp" value="${okapilibVersion}${releaseInfo}" />
 	<property name="okapilibJar" value="${okapilibName}-${okapilibStamp}.jar" />
-	<property name="tikalStamp" value="${tikalVersion}${releaseInfo}" />
+
+ 	<property name="okapilibuiName" value="okapi-lib-ui"/>
+	<property name="okapilibuiStamp" value="${okapilibuiVersion}${releaseInfo}" />
+	<property name="okapilibuiJar" value="${okapilibuiName}-${okapilibuiStamp}.jar" />
+
+	<property name="rainbowStamp" value="${rainbowVersion}${releaseInfo}" />
+
+ 	<property name="okapiappsName" value="okapi-apps"/>
+	<property name="okapiappsStamp" value="${okapiappsVersion}${releaseInfo}" />
 	
  	<property name="tmp" value="tmp"/>
 	<property name="dist" value="dist_${platform}"/>
 	<property name="done" value="done"/>
 	<property name="distLib" value="${dist}/lib"/>
-	<property name="distName" value="${okapilibName}_all-platforms_${okapilibStamp}" />
+	<property name="distName" value="${okapiappsName}_${platform}_${okapiappsStamp}" />
 	<property name="mavenStore" value="${user.home}/.m2/repository"/>
 
 	<tstamp>
@@ -54,9 +75,128 @@
 		</delete>
 		<mkdir dir="${distLib}"/>
 		<mkdir dir="${done}"/>
+		
+		<!-- Copy the okapi-lib common distribution
+		     This build add to it and overrides some files -->
+		<copy todir="${dist}">
+			<fileset dir="dist_common"/>
+		</copy>
  	</target>
 
+	<target name="okapiLibUI">
+	
+		<!-- Prepare tmp dir for creating the jar -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<delete file="tmpJars" quiet="true"/>
+		<mkdir dir="${tmp}"/>
 
-	<target name="all" depends="init"/>
+		<!-- Copy classes -->
+		<copy todir="${tmp}">
+			<!-- core -->
+			<fileset dir="../../framework/core-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			 
+			<!-- filters -->
+			<fileset dir="../../filters/html-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/openoffice-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/openxml/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/plaintext-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/po-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/properties-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/regex-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/table-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/ts-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+		</copy>
+		
+		<!-- Copy lib dependencies -->
+		<echo file="tmpJars">okapilibuiCP=</echo>
+
+		<property name="dep101" value="${mavenStore}/org/eclipse/swt/${swtdep}/3.5"/>
+		<fileset id="list.contents" dir="${dep101}"
+		 includes="**/*.jar"/>
+		<property name="jar101" refid="list.contents"/>
+		<echo file="tmpJars" append="yes">${jar101}</echo>
+		<copy todir="${distLib}" file="${dep101}/${jar101}"/>
+
+		<!-- Create the manifest -->
+		<property file="tmpJars"/>
+		<manifest file="${tmp}/MANIFEST.MF">
+			<attribute name="Implementation-Title" value="${okapilibuiName}"/>
+			<attribute name="Implementation-Version" value="${okapilibuiStamp}"/>
+			<attribute name="Class-Path" value="${okapilibuiCP}"/>
+  		</manifest>
+		
+		<!-- Create the jar file -->
+		<jar jarfile="${distLib}/${okapilibuiJar}" basedir="${tmp}"
+		 manifest="${tmp}/MANIFEST.MF"
+		 excludes="MANIFEST.MF" />
+
+		<!-- Clean up -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<delete file="tmpJars" quiet="true"/>
+
+	</target>
+	
+	<target name="rainbow">
+		<!-- Prepare tmp dir for creating the jar -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+
+		<!-- Copy classes -->
+		<copy todir="${tmp}">
+			<fileset dir="../../applications/rainbow/target/classes"/>
+		</copy>
+		
+		<!-- Create the manifest file -->
+		<manifest file="${tmp}/MANIFEST.MF">
+			<attribute name="Implementation-Title" value="rainbow"/>
+			<attribute name="Implementation-Version" value="${rainbowStamp}"/>
+			<attribute name="Main-Class" value="net.sf.okapi.applications.rainbow.Main"/>
+			<!-- Note the reference to the UI library to allow access to parameters editors
+			when the tool is used in the UI-enabled distribution -->
+			<attribute name="Class-Path" value="${okapilibJar} ${okapilibuiJar}"/>
+  		</manifest>
+		
+		<!-- Create the jar file -->
+		<jar jarfile="${distLib}/rainbow.jar" basedir="${tmp}"
+		 manifest="${tmp}/MANIFEST.MF"
+		 excludes="MANIFEST.MF" />
+
+		<!-- Copy shared resources -->
+		<!--TODO: fix this to have it outside the jar -->
+		<copy todir="${distLib}/shared">
+			<fileset dir="../../applications/rainbow/src/main/resources/shared"/>
+		</copy>
+		
+		<!-- Clean up -->
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+	</target>
+	
+	<target name="zipAll" unless="building-linux">
+		<zip destfile="${done}/${distName}.zip" basedir="${dist}"/>
+	</target>
+
+	<target name="gzipAll" if="building-linux">
+		<tar destfile="${done}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>
+	</target>
+
+	<target name="all" depends="init, okapiLibUI, rainbow, zipAll, gzipAll"/>
 
 </project>
