@@ -25,6 +25,7 @@
 		<module>tm</module>
 		<module>mt</module>
 		<module>steps</module>
+		<module>applications</module>
     </modules>
     <dependencies>
         <dependency>

@@ -12,6 +12,7 @@
     <packaging>pom</packaging>
     <name>Okapi Applications Build</name>
     <modules>
+        <module>tikal</module>
         <module>rainbow</module>
     </modules>
 </project>
