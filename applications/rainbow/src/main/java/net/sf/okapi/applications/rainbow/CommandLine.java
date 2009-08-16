@@ -184,10 +184,10 @@ public class CommandLine {
 	}
 	
 	private void printBanner () {
-		System.out.println("------------------------------------------------------------"); //$NON-NLS-1$
+		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 		System.out.println(Res.getString("CommandLine.bannerApplication")); //$NON-NLS-1$
 		System.out.println(Res.getString("CommandLine.bannerVersion")+getClass().getPackage().getImplementationVersion()); //$NON-NLS-1$
-		System.out.println("------------------------------------------------------------"); //$NON-NLS-1$
+		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
 	
 	private void initialize () throws Exception {

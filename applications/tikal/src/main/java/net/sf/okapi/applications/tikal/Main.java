@@ -341,9 +341,11 @@ public class Main {
 	}
 	
 	private void printBanner () {
-		System.out.println("------------------------------------------------------------"); //$NON-NLS-1$
-		System.out.println("Okapi Tikal 0.1 (Pre-Alpha)");
-		System.out.println("------------------------------------------------------------"); //$NON-NLS-1$
+		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
+		System.out.println("Okapi Tikal - Localization Toolbox Command-Line");
+		// This will null for version until compiled as jar, which is ok.
+		System.out.println(String.format("Version: %s", getClass().getPackage().getImplementationVersion()));
+		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
 	
 	private void printUsage () {
