@@ -57,6 +57,7 @@ public class Main {
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
 	private Hashtable<String, String> filtersMap;
+	private Hashtable<String, String> editorsMap;
 	
 	public static void main (String[] args) {
 		try {
@@ -154,11 +155,13 @@ public class Main {
 		fcMapper = new FilterConfigurationMapper();
 		extensionsMap = new Hashtable<String, String>();
 		filtersMap = new Hashtable<String, String>();
+		editorsMap = new Hashtable<String, String>(); 
 		
 		extensionsMap.put(".docx", "okf_openxml");
 		extensionsMap.put(".pptx", "okf_openxml");
 		extensionsMap.put(".xlsx", "okf_openxml");
 		filtersMap.put("okf_openxml", "net.sf.okapi.filters.openxml.OpenXMLFilter");
+		//editorMap.put("net.sf.okapi.filters.openxml.OpenXMLFilter");
 
 		extensionsMap.put(".odt", "okf_openoffice");
 		extensionsMap.put(".odp", "okf_openoffice");
@@ -168,6 +171,7 @@ public class Main {
 		extensionsMap.put(".htm", "okf_html");
 		extensionsMap.put(".html", "okf_html");
 		filtersMap.put("okf_html", "net.sf.okapi.filters.html.HtmlFilter");
+		editorsMap.put("net.sf.okapi.filters.html.HtmlFilter", "net.sf.okapi.ui.filters.html.Editor");
 		
 		extensionsMap.put(".xlf", "okf_xliff");
 		extensionsMap.put(".xlif", "okf_xliff");
@@ -179,9 +183,11 @@ public class Main {
 		
 		extensionsMap.put(".properties", "okf_properties");
 		filtersMap.put("okf_properties", "net.sf.okapi.filters.properties.PropertiesFilter");
+		editorsMap.put("net.sf.okapi.filters.properties.PropertiesFilter", "net.sf.okapi.filters.ui.properties.Editor");
 		
 		extensionsMap.put(".po", "okf_po");
 		filtersMap.put("okf_po", "net.sf.okapi.filters.po.POFilter");
+		editorsMap.put("net.sf.okapi.filters.po.POFilter", "net.sf.okapi.filters.ui.po.Editor");
 		
 		extensionsMap.put(".xml", "okf_xml");
 		extensionsMap.put(".resx", "okf_xml-resx");
@@ -189,6 +195,7 @@ public class Main {
 		
 		extensionsMap.put(".srt", "okf_regex-srt");
 		filtersMap.put("okf_regex", "net.sf.okapi.filters.regex.RegexFilter");
+		editorsMap.put("net.sf.okapi.filters.regex.RegexFilter", "net.sf.okapi.filters.ui.regex.Editor");
 		
 		extensionsMap.put(".dtd", "okf_dtd");
 		extensionsMap.put(".ent", "okf_dtd");
@@ -217,8 +224,6 @@ public class Main {
 	private void editConfiguration () {
 		initialize();
 		
-		
-		
 		if ( specifiedConfigId == null ) {
 			throw new RuntimeException("You must specified the configuration to edit.");
 		}
@@ -230,13 +235,20 @@ public class Main {
 			throw new RuntimeException(String.format(
 				"Cannot find the configuration for '%s'.", configId));
 		}
+		String editClass = editorsMap.get(config.filterClass);
+		if ( editClass == null ) {
+			throw new RuntimeException(String.format(
+				"No editor for the parameters of '%s'.", config.filterClass));
+		}
+		IParameters params = fcMapper.getParameters(config);
+		if ( params == null ) {
+			throw new RuntimeException(String.format(
+				"Cannot load parameters for '%s'.", config.configId));
+		}
+		fcMapper.addEditor(editClass, params.getClass().getName());
+		
 		IParametersEditor editor = fcMapper.createParametersEditor(configId);
 		if ( editor != null ) {
-			IParameters params = fcMapper.getParameters(config);
-			if ( params == null ) {
-				throw new RuntimeException(String.format(
-					"Cannot load parameters for '%s'.", config.configId));
-			}
 			editor.edit(params, !config.custom, new BaseContext());
 		}
 		else {

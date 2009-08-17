@@ -132,6 +132,22 @@
 			<!-- mt -->
 			<fileset dir="../../mt/mt-google/target/classes"
 			 excludes="**/META-INF/**"/>
+			 
+			 <!-- steps -->
+			<fileset dir="../../steps/bomconversion/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/charlisting/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/copysourcetotarget/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/encodingconversion/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/fullwidthconversion/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/linebreakconversion/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/searchandreplace/target/classes"
+			 excludes="**/META-INF/**"/>
 		</copy>
 		
 		<!-- Copy lib dependencies -->
