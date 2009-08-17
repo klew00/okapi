@@ -92,7 +92,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("Mauris.docx");
 		themfiles.add("Hidden.docx");
 		themfiles.add("TestDako2.docx");
-		themfiles.add("Textboxes.docx");
+		themfiles.add("TextBoxes.docx");
 		themfiles.add("ExcelColors.xlsx");
 		themfiles.add("UTF8.docx");
 		themfiles.add("Practice2.docx");
