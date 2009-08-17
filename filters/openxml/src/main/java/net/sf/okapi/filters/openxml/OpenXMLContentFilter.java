@@ -167,6 +167,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	private TaggedFilterConfiguration config=null; // DWH 7-16-09
 	private RawDocument rdSource; // Textbox
 	private EncoderManager encoderManager; // to handle text not to be translated
+	private String endpara="";  // DWH 8-17-09
 	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
@@ -998,7 +999,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 					else
 						bExcludeTextInUnit = true;
 				}
-				if (bInTextRun) // DWH 4-9-09
+				else if (bInTextRun) // DWH 4-9-09
 					addToTextRun(startTag);
 				else // DWH 5-7-09
 				{
@@ -1029,7 +1030,9 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			else
 			{
 				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag); // 1-29-09
-				if (bInTextRun) // DWH 4-10-09
+				if (sTagElementType.equals("a:endpararpr")) // DWH 8-17-09 for Powerpoint a:endParaRpr
+					endpara += sTagString;
+				else if (bInTextRun) // DWH 4-10-09
 					addToTextRun(startTag,propertyTextUnitPlaceholders);
 				else
 					addToNonTextRun(startTag,propertyTextUnitPlaceholders);
@@ -1288,7 +1291,8 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			addNonTextRunToCurrentTextUnit(); // DWH 5-5-09
 			bBetweenTextMarkers = true; // DWH 4-16-09 ???
 			getRuleState().popTextUnitRule();
-			endTextUnit(new GenericSkeleton(sTagString));
+			endTextUnit(new GenericSkeleton(endpara+sTagString)); // DWH 8-17-09
+			endpara = ""; // DWH 8-17-09 for Powerpoint a:endParaRpr
 			break;
 		case TEXT_RUN_ELEMENT: // DWH 4-10-09 smoosh text runs into single <x>text</x>
 			bExcludeTextInRun = false; // DWH 5-29-09 only exclude text if specific circumstances occur
