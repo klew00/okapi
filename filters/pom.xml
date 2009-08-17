@@ -39,8 +39,6 @@
         <module>ts</module>
         <module>ts-ui</module>
         <module>xliff</module>
-<!--Tests hang when running on Hudson
         <module>xml</module>
--->
     </modules>
 </project>
