@@ -222,8 +222,9 @@ public class MainForm { //implements IParametersProvider {
 				}
 			}
 		}
-		catch ( Throwable E ) {
-			Dialogs.showError(shell, E.getMessage(), null);			
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			//throw new RuntimeException("Error in MainForm.", e); 
 		}
 	}
 
@@ -1514,7 +1515,6 @@ public class MainForm { //implements IParametersProvider {
 		plugins = new PluginsAccess();
 		//TODO: Choose a better location 
 		plugins.addAllPackages(sharedFolder);
-
 	}
 	
 	private void editUserPreferences () {

@@ -319,7 +319,7 @@
 
 		<!-- Copy batch/shell -->
 		<copy todir="${dist}">
-			<fileset dir="../../applications/tikal/data"/>
+			<fileset dir="data/okapi-lib" includes="**/tikal.*"/>
 		</copy>
 
 		<!-- Update and copy change log and readme -->

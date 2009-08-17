@@ -183,6 +183,10 @@
 			<fileset dir="../../applications/rainbow/src/main/resources/shared"/>
 		</copy>
 		
+		<copy todir="${dist}" file="data/okapi-apps/readme.html" overwrite="true"/>
+		<replace file="${dist}/readme.html" token="@version@" value="${rainbowStamp}"/>
+		<replace file="${dist}/readme.html" token="@date@" value="${TODAY}"/>
+
 		<!-- Clean up -->
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
