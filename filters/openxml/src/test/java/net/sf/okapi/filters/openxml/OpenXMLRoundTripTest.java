@@ -97,8 +97,8 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("UTF8.docx");
 		themfiles.add("Practice2.docx");
 //		themfiles.add("commentTable.xlsx");
+		themfiles.add("InsertText.pptx");
 
-//		themfiles.add("InsertText.pptx");
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
@@ -146,7 +146,7 @@ public class OpenXMLRoundTripTest {
 
 //			URL url = OpenXMLRoundTripTest.class.getResource("/BoldWorld.docx");
 //			String sUserDir = Util.getDirectoryName(url.getPath());
-//			sInputPath = sUserDir + "/";
+//     		sInputPath = sUserDir + "/";
 //			sOutputPath = sUserDir + "/output/";
 //			sGoldPath = sUserDir + "/gold/";
 			
