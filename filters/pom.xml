@@ -39,6 +39,8 @@
         <module>ts</module>
         <module>ts-ui</module>
         <module>xliff</module>
+<!--Still hanging on Hudson, not windows
         <module>xml</module>
+-->
     </modules>
 </project>
