@@ -20,10 +20,7 @@
         <module>mif</module>
         <module>openoffice</module>
         <module>openoffice-ui</module>
-<!--Passes on windows, OpenXMLRoundTripTest has one failure on Hudson
         <module>openxml</module>
--->
-
 <!--Needs swing2swt.jar reference
         <module>openxml-ui</module>
 -->
