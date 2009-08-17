@@ -6,7 +6,7 @@
     <parent>
         <artifactId>build-okapi</artifactId>
         <groupId>net.sf.okapi</groupId>
-        <version>1.0.0</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>    
     <artifactId>okapi-core-ui-install-dependencies</artifactId>
     <name>Okapi Install Core UI Dependencies</name>
