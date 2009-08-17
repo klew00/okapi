@@ -197,6 +197,13 @@
 		</delete>
 	</target>
 	
+	<target name="noWinStuff" unless="building-windows">
+		<delete file="${dist}/tikal.bat"/>
+	</target>
+	<target name="winStuff" if="building-windows">
+		<delete file="${dist}/tikal.sh"/>
+	</target>
+
 	<target name="zipAll" unless="building-linux">
 		<zip destfile="${done}/${distName}.zip" basedir="${dist}"/>
 	</target>
@@ -205,6 +212,6 @@
 		<tar destfile="${done}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>
 	</target>
 
-	<target name="all" depends="init, okapiLibUI, rainbow, zipAll, gzipAll"/>
+	<target name="all" depends="init, okapiLibUI, rainbow, noWinStuff, winStuff, zipAll, gzipAll"/>
 
 </project>
