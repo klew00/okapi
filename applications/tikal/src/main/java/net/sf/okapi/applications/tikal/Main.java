@@ -216,6 +216,9 @@ public class Main {
 	
 	private void editConfiguration () {
 		initialize();
+		
+		
+		
 		if ( specifiedConfigId == null ) {
 			throw new RuntimeException("You must specified the configuration to edit.");
 		}
