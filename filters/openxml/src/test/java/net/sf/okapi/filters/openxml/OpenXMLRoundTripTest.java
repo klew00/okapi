@@ -81,7 +81,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("Deli.docx");
 		themfiles.add("DocProperties.docx");
 		themfiles.add("Escapades.docx");
-		themfiles.add("AddComments.docx");
+		themfiles.add("Addcomments.docx");
 		themfiles.add("sample.docx");
 		themfiles.add("styles.docx");
 		themfiles.add("sample.pptx");
