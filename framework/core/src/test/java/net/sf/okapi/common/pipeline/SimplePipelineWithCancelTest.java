@@ -18,11 +18,11 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.pipeline.tests;
-
-import static org.junit.Assert.assertEquals;
+package net.sf.okapi.common.pipeline;
 
 import java.net.URISyntaxException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -30,22 +30,31 @@ import net.sf.okapi.common.pipeline.PipelineReturnValue;
 import net.sf.okapi.common.resource.RawDocument;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class SimplePipelineTest {
+public class SimplePipelineWithCancelTest {
 	
 	@Test
-	public void runPipeline() throws URISyntaxException {
-		IPipeline pipeline = new Pipeline();
-		pipeline.addStep(new Producer());
-		pipeline.addStep(new ConsumerProducer());
-		pipeline.addStep(new Consumer());
-
-		pipeline.startBatch();
-		pipeline.process(new RawDocument("DUMMY", "en"));
-		pipeline.endBatch();
+	public void runPipelineAndCancel() throws URISyntaxException, InterruptedException {
+		final IPipeline pipeline = new Pipeline();
 		
-		assertEquals(PipelineReturnValue.SUCCEDED, pipeline.getState());
+		Runnable runnable = new Runnable() {
+			public void run() {
+				pipeline.addStep(new Producer());
+				pipeline.addStep(new ConsumerProducer());
+				pipeline.addStep(new Consumer());				
+				
+				pipeline.process(new RawDocument("DUMMY", "en"));
+			}
+		};
+
+		ExecutorService e = Executors.newSingleThreadExecutor();
+		e.execute(runnable);
+		Thread.sleep(500);
+		pipeline.cancel();
+		assertEquals(PipelineReturnValue.CANCELLED, pipeline.getState());
 		pipeline.destroy();
+		e.shutdownNow();
 		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());
 	}
 }

@@ -17,21 +17,22 @@
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
-
-package net.sf.okapi.common.pipeline.tests;
+package net.sf.okapi.common.pipeline;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 
-public class ConsumerProducer extends BasePipelineStep {
+public class Producer extends BasePipelineStep {	
 	
-	private static final Logger LOGGER = Logger.getLogger(ConsumerProducer.class.getName());
-	
+	private static final Logger LOGGER = Logger.getLogger(Producer.class.getName());
+	private int eventCount = -1;
+
 	public String getName() {
-		return "ProducerConsumer";
+		return "Producer";
 	}
 
 	public String getDescription() {
@@ -49,10 +50,16 @@ public class ConsumerProducer extends BasePipelineStep {
 	}
 	
 	@Override
-	protected void handleTextUnit(Event event) {
-		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e) {}
+	public Event handleEvent(Event event) {			
+		event = new Event(EventType.TEXT_UNIT, null);		
+		return event;
 	}
 
+	public boolean isDone () {
+		eventCount++;
+		if (eventCount >= 10) {					
+			return true;
+		}
+		return false;
+	}
 }

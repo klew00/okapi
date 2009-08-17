@@ -1,4 +1,4 @@
-package net.sf.okapi.common.pipeline.tests;
+package net.sf.okapi.common.pipeline;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

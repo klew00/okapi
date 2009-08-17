@@ -18,45 +18,34 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.pipeline.tests;
+package net.sf.okapi.common.pipeline;
 
+import static org.junit.Assert.assertEquals;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.net.URISyntaxException;
 
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.pipeline.IPipeline;
+import net.sf.okapi.common.pipeline.PipelineReturnValue;
+import net.sf.okapi.common.resource.RawDocument;
 
-public class Consumer extends BasePipelineStep {
+import org.junit.Test;
+
+public class SimplePipelineTest {
 	
-	private static final Logger LOGGER = Logger.getLogger(Consumer.class.getName());
-	
-	public String getName() {
-		return "Consumer";
-	}
+	@Test
+	public void runPipeline() throws URISyntaxException {
+		IPipeline pipeline = new Pipeline();
+		pipeline.addStep(new Producer());
+		pipeline.addStep(new ConsumerProducer());
+		pipeline.addStep(new Consumer());
 
-	public String getDescription() {
-		return "Description";
+		pipeline.startBatch();
+		pipeline.process(new RawDocument("DUMMY", "en"));
+		pipeline.endBatch();
+		
+		assertEquals(PipelineReturnValue.SUCCEDED, pipeline.getState());
+		pipeline.destroy();
+		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());
 	}
-
-	@Override
-	protected void handleEndBatchItem (Event event) {		
-		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
-	}
-
-	@Override
-	protected void handleStartBatchItem (Event event) {		
-		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
-	}
-	
-	@Override
-	protected void handleTextUnit(Event event) {
-		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
-	}
-	
-	@Override
-	protected void handleRawDocument(Event event) {		
-		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
-	}
-
 }

@@ -18,43 +18,41 @@
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
 
-package net.sf.okapi.common.pipeline.tests;
+package net.sf.okapi.common.pipeline;
 
-import java.net.URISyntaxException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import net.sf.okapi.common.pipeline.Pipeline;
-import net.sf.okapi.common.pipeline.IPipeline;
-import net.sf.okapi.common.pipeline.PipelineReturnValue;
-import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.pipeline.BasePipelineStep;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-public class SimplePipelineWithCancelTest {
+public class ConsumerProducer extends BasePipelineStep {
 	
-	@Test
-	public void runPipelineAndCancel() throws URISyntaxException, InterruptedException {
-		final IPipeline pipeline = new Pipeline();
-		
-		Runnable runnable = new Runnable() {
-			public void run() {
-				pipeline.addStep(new Producer());
-				pipeline.addStep(new ConsumerProducer());
-				pipeline.addStep(new Consumer());				
-				
-				pipeline.process(new RawDocument("DUMMY", "en"));
-			}
-		};
-
-		ExecutorService e = Executors.newSingleThreadExecutor();
-		e.execute(runnable);
-		Thread.sleep(500);
-		pipeline.cancel();
-		assertEquals(PipelineReturnValue.CANCELLED, pipeline.getState());
-		pipeline.destroy();
-		e.shutdownNow();
-		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());
+	private static final Logger LOGGER = Logger.getLogger(ConsumerProducer.class.getName());
+	
+	public String getName() {
+		return "ProducerConsumer";
 	}
+
+	public String getDescription() {
+		return "Description";
+	}
+
+	@Override
+	protected void handleEndBatchItem (Event event) {		
+		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
+	}
+
+	@Override
+	protected void handleStartBatchItem (Event event) {		
+		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
+	}
+	
+	@Override
+	protected void handleTextUnit(Event event) {
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {}
+	}
+
 }
