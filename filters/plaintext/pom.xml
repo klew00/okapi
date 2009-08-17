@@ -9,9 +9,8 @@
       <version>1.0.0</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <artifactId>filters-plaintext</artifactId>
-   <!--Used for display purposes only-->
-   <name>Okapi Plaintext Filter</name>
+   <artifactId>okapi-filter-plaintext</artifactId>
+   <name>Okapi Filter for Plaintext</name>
    <dependencies>
       <dependency>
          <groupId>net.sf.okapi</groupId>
@@ -27,7 +26,7 @@
       </dependency>
       <dependency>
          <groupId>${project.groupId}</groupId>
-         <artifactId>filters-regex</artifactId>
+         <artifactId>okapi-filter-regex</artifactId>
          <version>${project.version}</version>
       </dependency>
    </dependencies>

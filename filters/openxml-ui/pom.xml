@@ -7,14 +7,12 @@
       <version>1.0.0</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <!--Should match the directory name-->
-   <artifactId>filters-openxml-ui</artifactId>
-   <!--Used for display purposes only-->
-   <name>Okapi OpenXML Filter UI</name>
+   <artifactId>okapi-filter-openxml-ui</artifactId>
+   <name>Okapi Filter for OpenXML - UI</name>
    <dependencies>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>filters-openxml</artifactId>
+        <artifactId>okapi-filter-openxml</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

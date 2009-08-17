@@ -8,10 +8,8 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <!--Should match the directory name-->
-    <artifactId>steps-searchandreplace</artifactId>
-    <!--Used for display purposes only-->
-    <name>Okapi Search and Replace Step</name>
+    <artifactId>okapi-step-searchandreplace</artifactId>
+    <name>Okapi Step for Search and Replace</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>

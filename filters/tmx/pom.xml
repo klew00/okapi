@@ -6,10 +6,8 @@
 		<version>1.0.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<!--Should match the directory name-->
-	<artifactId>filters-tmx</artifactId>
-	<!--Used for display purposes only-->
-	<name>Okapi TMX Filter</name>
+	<artifactId>okapi-filter-tmx</artifactId>
+	<name>Okapi Filter for TMX</name>
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.okapi</groupId>

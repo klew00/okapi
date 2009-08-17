@@ -8,10 +8,8 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <!--Should match the directory name-->
-    <artifactId>steps-generatesimpletm</artifactId>
-    <!--Used for display purposes only-->
-    <name>Okapi Generate Simple TM Step</name>
+    <artifactId>okapi-step-generatesimpletm</artifactId>
+    <name>Okapi Step for Generating a Simple TM</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>

@@ -7,14 +7,12 @@
       <version>1.0.0</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <!--Should match the directory name-->
-   <artifactId>filters-regex-ui</artifactId>
-   <!--Used for display purposes only-->
-   <name>Okapi Regex Filter UI</name>
+   <artifactId>okapi-filter-regex-ui</artifactId>
+   <name>Okapi Filter for Regex - UI</name>
    <dependencies>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>filters-regex</artifactId>
+        <artifactId>okapi-filter-regex</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

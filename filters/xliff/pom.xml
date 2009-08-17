@@ -7,10 +7,8 @@
       <version>1.0.0</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <!--Should match the directory name-->
-   <artifactId>filters-xliff</artifactId>
-   <!--Used for display purposes only-->
-   <name>Okapi XLIFF Filter</name>
+   <artifactId>okapi-filter-xliff</artifactId>
+   <name>Okapi Filter for XLIFF</name>
 	<dependencies>
       <dependency>
       	<groupId>net.sf.okapi</groupId>

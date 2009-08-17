@@ -7,14 +7,12 @@
       <version>1.0.0</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <!--Should match the directory name-->
-   <artifactId>filters-properties-ui</artifactId>
-   <!--Used for display purposes only-->
-   <name>Okapi Properties Filter UI</name>
+   <artifactId>okapi-filter-properties-ui</artifactId>
+   <name>Okapi Filter for Properties - UI</name>
    <dependencies>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>filters-properties</artifactId>
+        <artifactId>okapi-filter-properties</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

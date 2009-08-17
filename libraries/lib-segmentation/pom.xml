@@ -7,10 +7,8 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <!--Should match the directory name-->
-    <artifactId>lib-segmentation</artifactId>
-    <!--Used for display purposes only-->
-    <name>Okapi library for Segmentation</name>
+    <artifactId>okapi-lib-segmentation</artifactId>
+    <name>Okapi Library for Segmentation</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>

@@ -7,10 +7,8 @@
       <version>1.0.0</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <!--Should match the directory name-->
-   <artifactId>filters-abstractmarkup</artifactId>
-   <!--Used for display purposes only-->
-   <name>Okapi Abstract Markup Filter</name>
+   <artifactId>okapi-filter-abstractmarkup</artifactId>
+   <name>Okapi Filter for Abstract Markup</name>
    <dependencies>
       <dependency>
         <groupId>net.sf.okapi</groupId>

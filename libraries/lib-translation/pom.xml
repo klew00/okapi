@@ -7,10 +7,8 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <!--Should match the directory name-->
-    <artifactId>lib-translation</artifactId>
-    <!--Used for display purposes only-->
-    <name>Okapi library for translation resources</name>
+    <artifactId>okapi-lib-translation</artifactId>
+    <name>Okapi Library for Translation Resources</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>

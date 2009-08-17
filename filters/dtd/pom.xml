@@ -7,10 +7,8 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <!--Should match the directory name-->
-    <artifactId>filters-dtd</artifactId>
-    <!--Used for display purposes only-->
-    <name>Okapi DTD Filter</name>
+    <artifactId>okapi-filter-dtd</artifactId>
+    <name>Okapi Filter for DTD</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>

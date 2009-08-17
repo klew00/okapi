@@ -7,10 +7,8 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <!--Should match the directory name-->
-    <artifactId>filters-idml</artifactId>
-    <!--Used for display purposes only-->
-    <name>Okapi IDML Filter</name>
+    <artifactId>okapi-filter-idml</artifactId>
+    <name>Okapi Filter for IDML</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>

@@ -7,10 +7,8 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <!--Should match the directory name-->
-    <artifactId>mt-google</artifactId>
-    <!--Used for display purposes only-->
-    <name>Okapi mt connector for Google</name>
+    <artifactId>okapi-mt-google</artifactId>
+    <name>Okapi MT Connector for Google</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>
@@ -19,7 +17,7 @@
         </dependency>
         <dependency>
             <groupId>net.sf.okapi.lib</groupId>
-            <artifactId>lib-translation</artifactId>
+            <artifactId>okapi-lib-translation</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

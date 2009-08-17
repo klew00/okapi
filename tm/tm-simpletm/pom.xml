@@ -7,10 +7,8 @@
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <!--Should match the directory name-->
-    <artifactId>tm-simpletm</artifactId>
-    <!--Used for display purposes only-->
-    <name>Okapi tm connector for SimpleTM</name>
+    <artifactId>okapi-tm-simpletm</artifactId>
+    <name>Okapi TM Connector for SimpleTM</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>
@@ -19,7 +17,7 @@
         </dependency>
         <dependency>
             <groupId>net.sf.okapi.lib</groupId>
-            <artifactId>lib-translation</artifactId>
+            <artifactId>okapi-lib-translation</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
