@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.Locale;
 
 import net.sf.okapi.common.BaseContext;
-import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
@@ -254,7 +253,7 @@ public class Main {
 		FilterConfiguration config;
 		while ( iter.hasNext() ) {
 			config = iter.next();
-			System.out.println(String.format(" - %s =\n%s",
+			System.out.println(String.format(" - %s = %s",
 				config.configId, config.description));
 		}
 	}

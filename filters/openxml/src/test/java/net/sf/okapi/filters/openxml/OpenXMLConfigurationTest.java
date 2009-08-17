@@ -22,9 +22,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
