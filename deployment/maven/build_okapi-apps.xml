@@ -177,6 +177,10 @@
 		 manifest="${tmp}/MANIFEST.MF"
 		 excludes="MANIFEST.MF" />
 
+		<copy todir="${dist}">
+			<fileset dir="data/okapi-apps/${platform}"/>
+		</copy>
+
 		<!-- Copy shared resources -->
 		<!--TODO: fix this to have it outside the jar -->
 		<copy todir="${distLib}/shared">

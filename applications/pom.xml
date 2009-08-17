@@ -10,7 +10,7 @@
     <artifactId>build-applications</artifactId>
     <groupId>net.sf.okapi.applications</groupId>
     <packaging>pom</packaging>
-    <name>Okapi Applications Build</name>
+    <name>Okapi Applications</name>
     <modules>
         <module>tikal</module>
         <module>rainbow</module>
