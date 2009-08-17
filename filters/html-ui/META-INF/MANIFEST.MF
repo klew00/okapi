@@ -5,7 +5,6 @@ Bundle-SymbolicName: net.sf.okapi.ui.filters.html
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.swt;bundle-version="3.5.0",
  net.sf.okapi.ui.common;bundle-version="1.0.0",
- net.sf.okapi.ui.filters.common;bundle-version="1.0.0",
  net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.filters.html;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
