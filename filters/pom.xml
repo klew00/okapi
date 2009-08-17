@@ -20,9 +20,9 @@
         <module>mif</module>
         <module>openoffice</module>
         <module>openoffice-ui</module>
-<!--Passes on windows but not Hudson
+<!--Passes on windows. Trying again for Hudson -->
         <module>openxml</module>
--->
+
 <!--Needs swing2swt.jar reference
         <module>openxml-ui</module>
 -->
