@@ -17,63 +17,63 @@ information on new features.</a></p>
     beginning, and read continuously until you reach the mailer-specific
     configuration chapters.  From that point on, everything is optional,
     read what interests you.  Well... the 
-    <a href="#feedback">feedback chapter</a> isn't really optional. 
+    <a href="sanitizer.html#feedback">feedback chapter</a> isn't really optional.
     Read it. <tt>:-)</tt>
 </p>
 
 <p>
 </p><ul>
-<li>    <a href="#general">Introduction</a>
-</li><li>    <a href="#requirements">Requirements</a>
-</li><li>    <a href="#install">Installation, testing</a>
-</li><li>    <a href="#config">Configuration</a>
+<li>    <a href="sanitizer.html#general">Introduction</a>
+</li><li>    <a href="sanitizer.html#requirements">Requirements</a>
+</li><li>    <a href="sanitizer.html#install">Installation, testing</a>
+</li><li>    <a href="sanitizer.html#config">Configuration</a>
 <ul>
-<li>    <a href="#conf-polvir">Policies and virus scanners</a>
-</li><li>    <a href="#conf-messages">Customizing messages</a>
-</li><li>    <a href="#conf-recommendations">Recommendations</a>
-</li><li>    <a href="#conf-real">A real-world configuration</a>
+<li>    <a href="sanitizer.html#conf-polvir">Policies and virus scanners</a>
+</li><li>    <a href="sanitizer.html#conf-messages">Customizing messages</a>
+</li><li>    <a href="sanitizer.html#conf-recommendations">Recommendations</a>
+</li><li>    <a href="sanitizer.html#conf-real">A real-world configuration</a>
 </li></ul>
 </li><li>    In-transit sanitizing
 <ul>
-<li>    <a href="#in-transit-sendmail">sendmail</a>
-</li><li>    <a href="#in-transit-qmail">qmail</a>
-</li><li>    <a href="#in-transit-others">others</a>
+<li>    <a href="sanitizer.html#in-transit-sendmail">sendmail</a>
+</li><li>    <a href="sanitizer.html#in-transit-qmail">qmail</a>
+</li><li>    <a href="sanitizer.html#in-transit-others">others</a>
 </li></ul>
 </li><li>    Performance
 <ul>
-<li>    <a href="#perf-cpu">CPU</a>
-</li><li>    <a href="#perf-memory">Memory</a>
+<li>    <a href="sanitizer.html#perf-cpu">CPU</a>
+</li><li>    <a href="sanitizer.html#perf-memory">Memory</a>
 </li></ul>
 </li><li>    Miscellanious hints / FAQs
 <ul>
-<li>    <a href="#mh-scanner-codes">Virus scanning doesn't work!</a>
-</li><li>    <a href="#mh-anomy-env">The testcases succeed, but I can't run the Sanitizer!</a>
-</li><li>    <a href="#mh-anomy-env">What is the ANOMY environment variable for?</a>
-</li><li>    <a href="#pf-solaris-procmail">Solaris and procmail</a>
-</li><li>    <a href="#pf-postfix">Incoming mail and Postfix</a>
-</li><li>    <a href="#mh-memory-hog">Large messages and memory consumption</a>
-</li><li>    <a href="#mh-html-uuencode">Corrupt attachments from Outlook users</a>
-</li><li>    <a href="#mh-style-tag">Ugly HTML mail from Outlook users</a>
+<li>    <a href="sanitizer.html#mh-scanner-codes">Virus scanning doesn't work!</a>
+</li><li>    <a href="sanitizer.html#mh-anomy-env">The testcases succeed, but I can't run the Sanitizer!</a>
+</li><li>    <a href="sanitizer.html#mh-anomy-env">What is the ANOMY environment variable for?</a>
+</li><li>    <a href="sanitizer.html#pf-solaris-procmail">Solaris and procmail</a>
+</li><li>    <a href="sanitizer.html#pf-postfix">Incoming mail and Postfix</a>
+</li><li>    <a href="sanitizer.html#mh-memory-hog">Large messages and memory consumption</a>
+</li><li>    <a href="sanitizer.html#mh-html-uuencode">Corrupt attachments from Outlook users</a>
+</li><li>    <a href="sanitizer.html#mh-style-tag">Ugly HTML mail from Outlook users</a>
 </li></ul>
 </li></ul>
 <p></p>
 
 <p>
 </p><ul>
-<li>    <a href="#hacking">Hacking the Anomy sanitizer</a>
+<li>    <a href="sanitizer.html#hacking">Hacking the Anomy sanitizer</a>
 <ul>
-<li>    <a href="#hack-design">Basic design</a>    
-</li><li>    <a href="#hack-streams">Why treat the mail as a stream?</a>
-</li><li>    <a href="#hack-cruft">Rough edges</a>
-</li><li>    <a href="#hack-standards">Standards</a>
+<li>    <a href="sanitizer.html#hack-design">Basic design</a>
+</li><li>    <a href="sanitizer.html#hack-streams">Why treat the mail as a stream?</a>
+</li><li>    <a href="sanitizer.html#hack-cruft">Rough edges</a>
+</li><li>    <a href="sanitizer.html#hack-standards">Standards</a>
 </li></ul>
 </li></ul>
 <p></p>
 
 <p>
 </p><ul>
-<li>    <a href="#feedback">Feedback</a>
-</li><li>    <a href="#credits">Credits &amp; GPL</a>
+<li>    <a href="sanitizer.html#feedback">Feedback</a>
+</li><li>    <a href="sanitizer.html#credits">Credits &amp; GPL</a>
 </li></ul>
 <p></p>
 
@@ -104,7 +104,7 @@ information on new features.</a></p>
 </a></li></ul><p></p>
 <p>
 <a name="general">    The sanitizer is designed not to waste important system resources 
-    (</a><a href="#perf-cpu">CPU</a>, <a href="#perf-memory">memory</a>, disk
+    (</a><a href="sanitizer.html#perf-cpu">CPU</a>, <a href="sanitizer.html#perf-memory">memory</a>, disk
     space) unnecessarily, and does so by treating it's input as a stream
     which is scanned and rewritten a little bit at a time.
 </p>
@@ -114,7 +114,7 @@ information on new features.</a></p>
     rest of it shouldn't be delivered.  Email often contains important
     information, and it is vital that a tool like this interrupt the normal
     flow of communication as little as possible.  It's common courtesy to
-    <a href="#conf-messages">inform the user</a> of any changes that are 
+    <a href="sanitizer.html#conf-messages">inform the user</a> of any changes that are
     made.  The Anomy sanitizer tries to follow these rules.
 </p>
 <p>
@@ -180,7 +180,7 @@ information on new features.</a></p>
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="requirements"></a><hr><h2><a name="requirements">    Requirements    </a></h2>
 
@@ -201,9 +201,9 @@ information on new features.</a></p>
 <p>
 <a name="requirements">    The sanitizer makes no assumptions about what mailer you are using - it
     has been configured to work well with 
-    </a><a href="#in-transit-sendmail">sendmail</a> and 
-    <a href="#in-transit-qmail">qmail</a>, and it should be relatively
-    easy to <a href="#in-transit-others">get it to work with others</a>, 
+    </a><a href="sanitizer.html#in-transit-sendmail">sendmail</a> and
+    <a href="sanitizer.html#in-transit-qmail">qmail</a>, and it should be relatively
+    easy to <a href="sanitizer.html#in-transit-others">get it to work with others</a>,
     such as postfix or exim.
 </p>
 <p>
@@ -222,13 +222,13 @@ information on new features.</a></p>
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="install"></a><hr><h2><a name="install">    Installation, testing    </a></h2>
 
 <p>
 <a name="install">    Download the most recent sanitizer from the web and install all the 
-    </a><a href="#requirements">prerequisites</a>.  The sanitizer can be
+    </a><a href="sanitizer.html#requirements">prerequisites</a>.  The sanitizer can be
     downloaded from it's home page,
     <a href="http://mailtools.anomy.net/">mailtools.anomy.net</a>.
 </p><p>
@@ -329,7 +329,7 @@ information on new features.</a></p>
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="config"></a><hr><h2><a name="config">Configuration</a></h2>
 
@@ -397,7 +397,7 @@ information on new features.</a></p>
 </a></p>
 
 
-<p><a name="config">[ </a><a href="#top">contents</a> ]</p>
+<p><a name="config">[ </a><a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="conf-polvir"></a><hr><h2><a name="conf-polvir">Configuration - Policies and virus scanners</a></h2>
 
@@ -547,7 +547,7 @@ information on new features.</a></p>
 </a></p>
 
 
-<p><a name="conf-polvir">[ </a><a href="#top">contents</a> ]</p>
+<p><a name="conf-polvir">[ </a><a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="conf-messages"></a><hr><h2><a name="conf-messages">Configuration - Customizing messages</a></h2>
 
@@ -616,7 +616,7 @@ information on new features.</a></p>
 </a></p>
 
 
-<p><a name="conf-messages">[ </a><a href="#top">contents</a> ]</p>
+<p><a name="conf-messages">[ </a><a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="conf-recommendations"></a><hr><h2><a name="conf-recommendations">Configuration - Recommendations</a></h2>
 
@@ -671,7 +671,7 @@ information on new features.</a></p>
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="conf-real"></a><hr><h2><a name="conf-real">A real-world configuration</a></h2>
 
@@ -784,7 +784,7 @@ information on new features.</a></p>
 <p></p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="in-transit-sendmail"></a><hr><h2><a name="in-transit-sendmail">In-transit sanitizing - sendmail</a></h2>
 <p>
@@ -793,7 +793,7 @@ information on new features.</a></p>
     gateway, but if you are just sanitizing mail being delivered to local
     recipients (on the same machine as the sanitizer) then it is far simpler
     and safer to use procmail as your local delivery agent and invoke the
-    sanitizer as described in the </a><a href="#install">installation chapter</a>.
+    sanitizer as described in the </a><a href="sanitizer.html#install">installation chapter</a>.
 </p>
 <p>
     One method involves using procmail as an intermediate layer between
@@ -970,7 +970,7 @@ information on new features.</a></p>
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="in-transit-qmail"></a><hr><h2><a name="in-transit-qmail">In-transit sanitizing - qmail</a></h2>
 
@@ -1065,7 +1065,7 @@ exec /usr/bin/qmail-qfilter
 </li></ol><p></p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="in-transit-others"></a><hr><h2><a name="in-transit-others">In-transit sanitizing - others</a></h2>
 
@@ -1084,7 +1084,7 @@ exec /usr/bin/qmail-qfilter
 </a></p>
 
 
-<p><a name="in-transit-others">[ </a><a href="#top">contents</a> ]</p>
+<p><a name="in-transit-others">[ </a><a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="perf-cpu"></a><hr><h2><a name="perf-cpu">    Performance - CPU </a></h2>
 
@@ -1212,12 +1212,12 @@ Dev.test6      4984617    a multipart mixed message with a big base64-encoded
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="perf-memory"></a><hr><h2><a name="perf-memory">    Performance - Memory </a></h2>
 
 <p>
-<a name="perf-memory">    <b>Note:</b> </a><a href="#mh-memory-hog">read this</a> if you are having 
+<a name="perf-memory">    <b>Note:</b> </a><a href="sanitizer.html#mh-memory-hog">read this</a> if you are having
     problems with excessive memory consumption when sanitizing very large 
     messages.
 </p>
@@ -1248,7 +1248,7 @@ Dev.test6      4984617    a multipart mixed message with a big base64-encoded
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="mh-scanner-codes"></a><hr><h2><a name="mh-scanner-codes">Virus scanning doesn't work!</a></h2>
 
@@ -1272,12 +1272,12 @@ Dev.test6      4984617    a multipart mixed message with a big base64-encoded
 </a></li></ol>
 <p></p>
 <p>
-<a name="mh-scanner-codes">     The </a><a href="#conf-real">real world configuration</a> example illustrates
+<a name="mh-scanner-codes">     The </a><a href="sanitizer.html#conf-real">real world configuration</a> example illustrates
      this.
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="mh-anomy-env"></a><hr><h2><a name="mh-anomy-env">The testcases succeed, but I can't run the sanitizer!<br>
 			       What is the ANOMY environment variable for?</a></h2>
@@ -1303,7 +1303,7 @@ Dev.test6      4984617    a multipart mixed message with a big base64-encoded
 <a name="mh-anomy-env">    Which method is best is simply a matter of taste.
 </a></p>
 
-<p><a name="mh-anomy-env">[ </a><a href="#top">contents</a> ]</p>
+<p><a name="mh-anomy-env">[ </a><a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="pf-solaris-procmail"></a><hr><h2><a name="pf-solaris-procmail">    Solaris and Procmail </a></h2>
 
@@ -1320,7 +1320,7 @@ Dev.test6      4984617    a multipart mixed message with a big base64-encoded
 <a name="pf-solaris-procmail">    Special thanks to <b>Peter Burkholde</b> for his detailed feedback.
 </a></p>
 
-<p><a name="pf-solaris-procmail">[ </a><a href="#top">contents</a> ]</p>
+<p><a name="pf-solaris-procmail">[ </a><a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="pf-postfix"></a><hr><h2><a name="pf-postfix">    Incoming mail and Postfix </a></h2>
 
@@ -1333,7 +1333,7 @@ may be found in the <tt>contrib/</tt> directory of the program distribution.
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="mh-memory-hog"></a><hr><h2><a name="mh-memory-hog">Large messages and memory consumption</a></h2>
 
@@ -1347,7 +1347,7 @@ may be found in the <tt>contrib/</tt> directory of the program distribution.
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="mh-html-uuencode"></a><hr><h2><a name="mh-html-uuencode">Corrupt attachments from Outlook users</a></h2>
 
@@ -1377,7 +1377,7 @@ may be found in the <tt>contrib/</tt> directory of the program distribution.
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="mh-style-tag"></a><hr><h2><a name="mh-style-tag">Ugly HTML mail from Outlook users</a></h2>
 
@@ -1410,7 +1410,7 @@ may be found in the <tt>contrib/</tt> directory of the program distribution.
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="hacking"></a><hr><h2><a name="hacking">Hacking the Anomy sanitizer</a></h2>
 
@@ -1421,14 +1421,14 @@ may be found in the <tt>contrib/</tt> directory of the program distribution.
     jumping right in.  So start here. :-)
 </a></p>
 <p></p><ul>
-<li><a name="hacking">    </a><a href="#hack-design">Basic design</a>    
-</li><li>    <a href="#hack-streams">Why treat the mail as a stream?</a>
-</li><li>    <a href="#hack-cruft">Rough edges</a>
-</li><li>    <a href="#hack-standards">Standards</a>
+<li><a name="hacking">    </a><a href="sanitizer.html#hack-design">Basic design</a>
+</li><li>    <a href="sanitizer.html#hack-streams">Why treat the mail as a stream?</a>
+</li><li>    <a href="sanitizer.html#hack-cruft">Rough edges</a>
+</li><li>    <a href="sanitizer.html#hack-standards">Standards</a>
 </li></ul><p></p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="hack-design"></a><hr><h2><a name="hack-design">Hacking - Basic design</a></h2>
 
@@ -1475,7 +1475,7 @@ may be found in the <tt>contrib/</tt> directory of the program distribution.
 </a></p>
 
 
-<p><a name="hack-design">[ </a><a href="#top">contents</a> ]</p>
+<p><a name="hack-design">[ </a><a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="hack-streams"></a><hr><h2><a name="hack-streams">Hacking - Why treat the mail as a stream?</a></h2>
 
@@ -1539,7 +1539,7 @@ way is much more fun!
 </a></p>
 
 
-<p><a name="hack-streams">[ </a><a href="#top">contents</a> ]</p>
+<p><a name="hack-streams">[ </a><a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="hack-cruft"></a><hr><h2><a name="hack-cruft">Hacking - Rough edges</a></h2>
 
@@ -1556,7 +1556,7 @@ way is much more fun!
     with MIMEStream objects' internal variables.
 </a></li><li>
 <a name="hack-cruft">    There's so much work to be done on standards compliance, that I've 
-    devoted a </a><a href="#hack-standards">whole section</a> to the topic.
+    devoted a </a><a href="sanitizer.html#hack-standards">whole section</a> to the topic.
 </li><li>
     The documentation needs lots of work.  Specifically, the sanitizer
     should be able to work with any MTA out there, but unless I document it
@@ -1572,7 +1572,7 @@ way is much more fun!
 </li></ul>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="hack-standards"></a><hr><h2><a name="hack-standards">Hacking - Standards</a></h2>
 
@@ -1667,7 +1667,7 @@ way is much more fun!
 </a></p>
 
 
-<p><a name="hack-standards">[ </a><a href="#top">contents</a> ]</p>
+<p><a name="hack-standards">[ </a><a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="feedback"></a><hr><h2><a name="feedback">    Feedback </a></h2>
 
@@ -1724,7 +1724,7 @@ way is much more fun!
     Thanks!
 </p>
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <a name="credits"></a><hr><h2><a name="credits">Credits &amp; GPL</a></h2>
 
@@ -1748,7 +1748,7 @@ way is much more fun!
     Kim Johnny Mathisen 
     &lt;<a href="mailto:Kim.Mathisen@haukeland.no">Kim.Mathisen@haukeland.no</a>&gt;
     contributed the instructions for 
-    <a href="#in-transit-qmail">in-transit sanitizing with qmail</a>.<br>
+    <a href="sanitizer.html#in-transit-qmail">in-transit sanitizing with qmail</a>.<br>
     Mark Salazar 
     &lt;<a href="mailto:msalazar@schaferdc.com">msalazar@schaferdc.com</a>&gt;
     submitted improvements to the qmail chapter as well.<br>
@@ -1776,7 +1776,7 @@ way is much more fun!
 </p>
 
 
-<p>[ <a href="#top">contents</a> ]</p>
+<p>[ <a href="sanitizer.html#top">contents</a> ]</p>
 <!-- ---------------------------------------------------------------------- -->
 <hr>
 <p>$Id: sanitizer.html,v 1.20 2003/04/30 01:45:24 bre Exp $</p>

@@ -20,28 +20,23 @@
 
 package net.sf.okapi.filters.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.filters.FilterTestDriver;
-import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
-import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.filters.xml.XMLFilter;
-
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XMLFilterTest {
 
@@ -112,7 +107,7 @@ public class XMLFilterTest {
 //			+ "</doc>";
 //		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 //	}
-//	
+//
 //	@Test
 //	public void testComplexEntities () {
 //		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r"

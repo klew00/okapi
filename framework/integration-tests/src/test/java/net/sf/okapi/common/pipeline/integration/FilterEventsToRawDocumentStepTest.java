@@ -1,31 +1,29 @@
 package net.sf.okapi.common.pipeline.integration;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringWriter;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
-
-import static org.junit.Assert.*;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
 
 public class FilterEventsToRawDocumentStepTest {
 	private FilterEventsToRawDocumentStep eventToDoc;
 	private String htmlSnippet;
 	private HtmlFilter htmlFilter;
-	private Pipeline pipeline;
 
-	@Before
+    @Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
 		htmlSnippet = "<p>This is a <i>test</i> snippet</p>";		
@@ -88,7 +86,7 @@ public class FilterEventsToRawDocumentStepTest {
 	}
 
 	private String convertRawDocumentToString(RawDocument d) throws IOException {		
-		int c = -1;
+		int c;
 		StringWriter sw = new StringWriter();
 		Reader r = d.getReader(); 
 		while (true) {

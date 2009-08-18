@@ -15,6 +15,7 @@
         <module>bomconversion</module>
         <module>bomconversion-ui</module>
 		<module>charlisting</module>
+		<module>common</module>
 		<module>copysourcetotarget</module>
 		<module>encodingconversion</module>
 		<module>fullwidthconversion</module>
