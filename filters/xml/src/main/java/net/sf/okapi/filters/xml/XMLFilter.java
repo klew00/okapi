@@ -420,11 +420,14 @@ public class XMLFilter implements IFilter {
 					else {
 						frag.append(TagType.PLACEHOLDER, Code.TYPE_REFERENCE, "&"+node.getNodeName()+";");
 					}
-					// Swallow the text node of the content (can be nested)
-					Node thisNode = node;
-					do { // Read all the way down and back
-						node = trav.nextNode();
-					} while ( node != thisNode );
+					// Some parsers provide the expanded content along with the reference node
+					// If so, this needs to be swallowed (note that it can be nested)
+					if ( node.hasChildNodes() ) {
+						Node thisNode = node;
+						do { // Read all the way down and back
+							node = trav.nextNode();
+						} while ( node != thisNode );
+					}
 				}
 				// Else: Do not save the entity reference
 				// Nothing to do, the content will be handled by TEXT_NODE	
