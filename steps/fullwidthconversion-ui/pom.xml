@@ -14,10 +14,22 @@
 	<name>Okapi Step for Full Width Conversion UI</name>
 	<dependencies>
 		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-fullwidthconversion</artifactId>
+			<version>${project.version}</version>
+		</dependency>        
+		<dependency>
 			<groupId>net.sf.okapi</groupId>
 			<artifactId>okapi-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>        
+<!--
+		<dependency>
+			<groupId>net.sf.okapi.lib</groupId>
+			<artifactId>okapi-lib-fullwidthconversion-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+-->
 	</dependencies>
 </project>		
 		
