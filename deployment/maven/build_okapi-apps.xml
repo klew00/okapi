@@ -16,16 +16,16 @@
 	</condition>
 
 	<condition property="swtdep" value="swt-win-32">
-		<os family="windows"/>
+		<equals arg1="${platform}" arg2="win32-x86"/>
 	</condition>
 	<condition property="swtdep" value="swt-cocoa-macosx">
-		<os family="mac"/>
+		<equals arg1="${platform}" arg2="cocoa-macosx"/>
 	</condition>
 	<condition property="swtdep" value="swt-gtk2-linux-x86">
-		<os name="Linux" arch="x86"/>
+		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
 	</condition>
 	<condition property="swtdep" value="swt-gtk2-linux-x86_64">
-		<os name="Linux" arch="x86_64"/>
+		<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
 	</condition>
 
 	<!-- Set flags for what dstribution is being built -->
