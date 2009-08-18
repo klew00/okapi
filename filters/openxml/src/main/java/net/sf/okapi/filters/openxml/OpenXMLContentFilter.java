@@ -999,7 +999,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 					else
 						bExcludeTextInUnit = true;
 				}
-				else if (bInTextRun) // DWH 4-9-09
+				if (bInTextRun) // DWH 4-9-09
 					addToTextRun(startTag);
 				else // DWH 5-7-09
 				{
