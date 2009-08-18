@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.openoffice.tests;
+package net.sf.okapi.filters.openoffice;
 
 import static org.junit.Assert.*;
 
