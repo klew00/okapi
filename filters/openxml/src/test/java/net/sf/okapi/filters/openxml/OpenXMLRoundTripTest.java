@@ -20,28 +20,19 @@
 
 package net.sf.okapi.filters.openxml;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.resource.RawDocument;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import org.junit.Test;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.filters.openxml.ConditionalParameters;
-import net.sf.okapi.filters.openxml.OpenXMLFilter;
-import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
-// Comment the following to remove the parameter UI $$$
-//import net.sf.okapi.ui.filters.openxml.Editor;
-
-import org.junit.Test;
 
 /**
  * This tests OpenXMLFilter (including OpenXMLContentFilter) and
@@ -203,7 +194,7 @@ public class OpenXMLRoundTripTest {
 		}
 		catch ( Throwable e ) {
 			LOGGER.log(Level.WARNING,e.getMessage());
-			fail("An unexpected exception was thrown " + e);
+			fail("An unexpected exception was thrown on file '"+filename+"': " + e);
 		}
 		finally {
 			if ( filter != null ) filter.close();
