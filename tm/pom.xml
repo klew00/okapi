@@ -12,9 +12,9 @@
     <packaging>pom</packaging>
     <name>Okapi TM Connectors Build</name>
     <modules>
-        <module>tm-simpletm</module>
-        <module>tm-opentran</module>
-        <module>tm-translatetoolkit</module>
-        <module>tm-globalsight</module>
+        <module>simpletm</module>
+        <module>opentran</module>
+        <module>translatetoolkit</module>
+        <module>globalsight</module>
     </modules>
 </project>

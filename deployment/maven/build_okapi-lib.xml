@@ -120,17 +120,17 @@
 			 excludes="**/META-INF/**"/>
 			
 			<!-- tm -->
-			<fileset dir="../../tm/tm-opentran/target/classes"
+			<fileset dir="../../tm/opentran/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../tm/tm-simpletm/target/classes"
+			<fileset dir="../../tm/simpletm/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../tm/tm-translatetoolkit/target/classes"
+			<fileset dir="../../tm/translatetoolkit/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../tm/tm-globalsight/target/classes"
+			<fileset dir="../../tm/globalsight/target/classes"
 			 excludes="**/META-INF/**"/>
 
 			<!-- mt -->
-			<fileset dir="../../mt/mt-google/target/classes"
+			<fileset dir="../../mt/google/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 			 <!-- steps -->

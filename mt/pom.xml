@@ -12,6 +12,6 @@
     <packaging>pom</packaging>
     <name>Okapi MT Connectors Build</name>
     <modules>
-        <module>mt-google</module>
+        <module>google</module>
     </modules>
 </project>
