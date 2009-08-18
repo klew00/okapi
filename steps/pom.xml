@@ -28,6 +28,7 @@
 		<module>segmentation</module>
 		<module>segmentation-ui</module>
         <module>xsltransform</module>
+        <module>xsltransform-ui</module>
     </modules>
 
     <build>
