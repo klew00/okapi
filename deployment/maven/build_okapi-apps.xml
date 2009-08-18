@@ -215,7 +215,7 @@
 		 manifest="${tmp}/MANIFEST.MF"
 		 excludes="MANIFEST.MF" />
 
-		<copy todir="${dist}">
+		<copy todir="${dist}" overwrite="true">
 			<fileset dir="data/okapi-apps/${platform}"/>
 		</copy>
 
