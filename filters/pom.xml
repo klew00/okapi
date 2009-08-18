@@ -21,9 +21,7 @@
         <module>openoffice</module>
         <module>openoffice-ui</module>
         <module>openxml</module>
-<!--Needs swing2swt.jar reference
         <module>openxml-ui</module>
--->
         <module>plaintext</module>
         <module>plaintext-ui</module>
         <module>po</module>
