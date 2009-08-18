@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<doc>
- <msg id="m1">TEXT IN<b>BOLD</b>.</msg>
- <msg id="m1">TEXT IN<i>ITALIC</i>.</msg>
- <msg id="m1"><u>UNDERLINE</u>TEXT.</msg>
-</doc>
