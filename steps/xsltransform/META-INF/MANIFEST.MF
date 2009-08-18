@@ -4,8 +4,5 @@ Bundle-Name: XSL Transformation
 Bundle-SymbolicName: net.sf.okapi.steps.xsltransform
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.steps.xsltransform
-Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.common;bundle-version="1.0.0",
- net.sf.okapi.pipelinedriver;bundle-version="1.0.0"
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
