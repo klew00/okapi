@@ -20,7 +20,7 @@
 		<module>encodingconversion</module>
         <module>encodingconversion-ui</module>
 		<module>fullwidthconversion</module>
-		<!--<module>generatesimpletm</module> Will fail until TM package is migrated -->
+		<module>generatesimpletm</module>
 		<module>linebreakconversion</module>
         <module>linebreakconversion-ui</module>
 		<module>searchandreplace</module>
