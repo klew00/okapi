@@ -353,7 +353,7 @@ public class TmxFilter implements IFilter {
 				skel.append(reader.getText().replace("\n", lineBreak));
 				break;				
 			case XMLStreamConstants.CHARACTERS: //TODO: Check if it's ok to not check for unsupported chars
-				skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+				skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.escapeGT, null));
 				break;
 				
 			case XMLStreamConstants.COMMENT:

@@ -342,7 +342,7 @@ public class XLIFFFilter implements IFilter {
 				skel.append(reader.getText().replace("\n", lineBreak));
 				break;
 			case XMLStreamConstants.CHARACTERS: //TODO: escape unsupported chars
-				skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+				skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.escapeGT, null));
 				break;
 				
 			case XMLStreamConstants.COMMENT:
