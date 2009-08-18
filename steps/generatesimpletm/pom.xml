@@ -16,6 +16,11 @@
             <artifactId>okapi-core</artifactId>
             <version>${project.version}</version>
         </dependency>        
+        <dependency>
+            <groupId>net.sf.okapi.tm</groupId>
+            <artifactId>okapi-tm-simpletm</artifactId>
+            <version>${project.version}</version>
+        </dependency>        
     </dependencies>
 </project>
 
