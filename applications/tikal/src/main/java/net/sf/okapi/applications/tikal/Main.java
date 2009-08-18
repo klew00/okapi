@@ -36,12 +36,17 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.lib.translation.QueryManager;
+import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.mt.google.GoogleMTConnector;
 
 public class Main {
 	
 	protected final static int CMD_EXTRACT = 0;
 	protected final static int CMD_MERGE = 1;
 	protected final static int CMD_EDITCONFIG = 2;
+	protected final static int CMD_QUERYTRANS = 3;
 	
 	protected ArrayList<String> inputs;
 	protected String skeleton;
@@ -50,9 +55,10 @@ public class Main {
 	protected String configId;
 	protected String inputEncoding;
 	protected String outputEncoding;
-	protected String srcLang;
-	protected String trgLang;
+	protected String srcLang = Locale.getDefault().getLanguage();
+	protected String trgLang = "fr";
 	protected int command = -1;
+	protected String query;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -99,6 +105,10 @@ public class Main {
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
 				}
+				else if ( arg.equals("-q") ) {
+					prog.command = CMD_QUERYTRANS;
+					prog.query = getArgument(args, ++i);
+				}
 				else if ( arg.equals("-listconf") ) {
 					prog.showAllConfigurations();
 					return;
@@ -120,6 +130,10 @@ public class Main {
 			}
 			if ( prog.command == CMD_EDITCONFIG ) {
 				prog.editConfiguration();
+				return;
+			}
+			if ( prog.command == CMD_QUERYTRANS ) {
+				prog.query();
 				return;
 			}
 			if ( prog.inputs.size() == 0 ) {
@@ -313,9 +327,6 @@ public class Main {
 			configId = specifiedConfigId;
 		}
 		
-		if ( srcLang == null ) {
-			srcLang = Locale.getDefault().getLanguage();
-		}
 		if ( outputEncoding == null ) {
 			if ( inputEncoding != null ) outputEncoding = inputEncoding;
 			else outputEncoding = Charset.defaultCharset().name();
@@ -355,8 +366,7 @@ public class Main {
 			
 			System.out.println("Source language: "+srcLang);
 			System.out.print("Target language: ");
-			if ( trgLang == null ) System.out.println("<none>");
-			else System.out.println(trgLang);
+			System.out.println(trgLang);
 			System.out.println(" Input encoding: "+inputEncoding);
 			System.out.println("  Configuration: "+configId);
 			System.out.println(" Input document: "+input);
@@ -383,8 +393,7 @@ public class Main {
 			
 			System.out.println("Source language: "+srcLang);
 			System.out.print("Target language: ");
-			if ( trgLang == null ) System.out.println("<none>");
-			else System.out.println(trgLang);
+			System.out.println(trgLang);
 			System.out.println(" Input encoding: "+inputEncoding);
 			System.out.println("Output encoding: "+outputEncoding);
 			System.out.println("  Configuration: "+configId);
@@ -429,6 +438,29 @@ public class Main {
 		System.out.println("      -oe encoding : encoding of the output file");
 		System.out.println("      -sl langCode : source language");
 		System.out.println("      -tl langCode : target language");
+		System.out.println("Query translation resources:");
+		System.out.println("   -q [\"]text[\"] [options]");
+		System.out.println("      where the options are:");
+		System.out.println("      -sl langCode : source language");
+		System.out.println("      -tl langCode : target language");
 	}
 
+	private void query () {
+		IQuery conn = new GoogleMTConnector();
+		conn.open();
+		conn.setLanguages(srcLang, trgLang);
+		if ( conn.query(query) > 0 ) {
+			QueryResult qr;
+			while ( conn.hasNext() ) {
+				qr = conn.next();
+				System.out.println(String.format("Result: From %s (%s->%s, score: %d)", conn.getName(),
+					conn.getSourceLanguage(), conn.getTargetLanguage(), qr.score));
+				System.out.println(String.format("Source: \"%s\"", qr.source.toString()));
+				System.out.println(String.format("Target: \"%s\"", qr.target.toString()));
+			}
+		}
+		else {
+			System.out.println(String.format("No result for \"%s\".", query));
+		}
+	}
 }

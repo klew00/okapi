@@ -21,6 +21,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>net.sf.okapi.lib</groupId>
+            <artifactId>okapi-lib-translation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.okapi.mt</groupId>
+            <artifactId>okapi-mt-google</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
         	<groupId>net.sf.okapi.filters</groupId>
         	<artifactId>okapi-filter-xliff</artifactId>
         	<version>${project.version}</version>
