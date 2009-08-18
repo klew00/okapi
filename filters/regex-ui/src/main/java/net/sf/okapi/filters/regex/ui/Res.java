@@ -24,7 +24,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class Res {
-	private static final String BUNDLE_NAME = "net.sf.okapi.filters.ui.regex.Res"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "Res"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
 			.getBundle(BUNDLE_NAME);
