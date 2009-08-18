@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.ui.regex;
+package net.sf.okapi.filters.regex.ui;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
