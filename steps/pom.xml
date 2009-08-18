@@ -21,5 +21,6 @@
 		<module>linebreakconversion</module>
 		<module>searchandreplace</module>
 		<module>uriconversion</module>
+		<module>segmentation</module>
     </modules>
 </project>
