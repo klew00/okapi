@@ -96,7 +96,7 @@ public class Main {
 				else if ( arg.equals("-m") ) {
 					prog.command = CMD_MERGE;
 				}
-				else if ( arg.equals("-edit") ) {
+				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
 				}
 				else if ( arg.equals("-listconf") ) {
@@ -161,13 +161,13 @@ public class Main {
 		extensionsMap.put(".pptx", "okf_openxml");
 		extensionsMap.put(".xlsx", "okf_openxml");
 		filtersMap.put("okf_openxml", "net.sf.okapi.filters.openxml.OpenXMLFilter");
-//		editorMap.put("net.sf.okapi.filters.openxml.OpenXMLFilter");
+		editorsMap.put("net.sf.okapi.filters.openxml.OpenXMLFilter", "net.sf.okapi.filters.openxml.ui.Editor");
 
 		extensionsMap.put(".odt", "okf_openoffice");
 		extensionsMap.put(".odp", "okf_openoffice");
 		extensionsMap.put(".ods", "okf_openoffice");
 		filtersMap.put("okf_openoffice", "net.sf.okapi.filters.openoffice.OpenOfficeFilter");
-		filtersMap.put("net.sf.okapi.filters.openoffice.OpenOfficeFilter", "net.sf.okapi.filters.openoffice.ui.Editor");
+		editorsMap.put("net.sf.okapi.filters.openoffice.OpenOfficeFilter", "net.sf.okapi.filters.openoffice.ui.Editor");
 
 		extensionsMap.put(".htm", "okf_html");
 		extensionsMap.put(".html", "okf_html");
@@ -208,9 +208,11 @@ public class Main {
 		
 		extensionsMap.put(".txt", "okf_plaintext");
 		filtersMap.put("okf_plaintext", "net.sf.okapi.filters.plaintext.PlainTextFilter");
+		editorsMap.put("net.sf.okapi.filters.plaintext.PlainTextFilter", "net.sf.okapi.filters.plaintext.ui.Editor");
 
 		extensionsMap.put(".csv", "okf_table_csv");
 		filtersMap.put("okf_table", "net.sf.okapi.filters.table.TableFilter");
+		editorsMap.put("net.sf.okapi.filters.table.TableFilter", "net.sf.okapi.filters.table.ui.Editor");
 	}
 	
 	private String getConfigurationId (String ext) {
@@ -406,23 +408,27 @@ public class Main {
 	}
 	
 	private void printUsage () {
-		System.out.println("-h or -? : Show this help");
-		System.out.println("-listconf : List all available filter configurations");
-		System.out.println("-x : Extract a file to XLIFF");
-		System.out.println("     -x [options] inputFile [inputFile2...]");
-		System.out.println("     Where the options are:");
-		System.out.println("     -fc configId : filter configuration to use");
-		System.out.println("     -ie encoding : encoding of the input file");
-		System.out.println("     -sl langCode : source language");
-		System.out.println("     -tl langCode : target language");
-		System.out.println("-m : Merge an XLIFF document back to its original format");
-		System.out.println("     -m [options] xliffFile [xliffFile2...]");
-		System.out.println("     Where the options are:");
-		System.out.println("     -fc configId : filter configuration of the skeleton file");
-		System.out.println("     -ie encoding : encoding of the skeleton file");
-		System.out.println("     -oe encoding : encoding of the output file");
-		System.out.println("     -sl langCode : source language");
-		System.out.println("     -tl langCode : target language");
+		System.out.println("Show this help:");
+		System.out.println("   -h or -?");
+		System.out.println("List all available filter configurations:");
+		System.out.println("   -listconf");
+		System.out.println("Edit or view a filter configuration:");
+		System.out.println("   -e [-fc configId]");
+		System.out.println("Extract a file to XLIFF:");
+		System.out.println("   -x [options] inputFile [inputFile2...]");
+		System.out.println("      where the options are:");
+		System.out.println("      -fc configId : filter configuration to use");
+		System.out.println("      -ie encoding : encoding of the input file");
+		System.out.println("      -sl langCode : source language");
+		System.out.println("      -tl langCode : target language");
+		System.out.println("Merge an XLIFF document back to its original format:");
+		System.out.println("   -m [options] xliffFile [xliffFile2...]");
+		System.out.println("      where the options are:");
+		System.out.println("      -fc configId : filter configuration of the original file");
+		System.out.println("      -ie encoding : encoding of the original file");
+		System.out.println("      -oe encoding : encoding of the output file");
+		System.out.println("      -sl langCode : source language");
+		System.out.println("      -tl langCode : target language");
 	}
 
 }

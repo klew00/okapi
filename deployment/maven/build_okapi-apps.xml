@@ -121,6 +121,17 @@
 			<!-- Libraries -->
 			<fileset dir="../../libraries/lib-segmentation-ui/target/classes"
 			 excludes="**/META-INF/**"/>
+			 
+			 <!-- Steps -->
+			<fileset dir="../../steps/bomconversion-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/linebreakconversion-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/searchandreplace-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/segmentation-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			 
 		</copy>
 		
 		<!-- Copy lib dependencies -->
