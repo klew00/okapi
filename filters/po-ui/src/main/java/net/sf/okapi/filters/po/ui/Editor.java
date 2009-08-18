@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.ui.po;
+package net.sf.okapi.filters.po.ui;
 
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;

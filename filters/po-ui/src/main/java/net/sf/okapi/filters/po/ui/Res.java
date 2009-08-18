@@ -18,13 +18,13 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.ui.po;
+package net.sf.okapi.filters.po.ui;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 class Res {
-	private static final String BUNDLE_NAME = "net.sf.okapi.filters.ui.po.Res";
+	private static final String BUNDLE_NAME = "Res";
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
 		.getBundle(BUNDLE_NAME);
