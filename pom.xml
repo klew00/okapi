@@ -1,3 +1,4 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <groupId>net.sf.okapi</groupId>
@@ -18,6 +19,15 @@
         <url>http://code.google.com/p/okapi/source/browse/</url>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>okapi</id>
+            <name>okapi-repository</name>
+            <url>http://okapi.googlecode.com/svn/maven2/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -25,11 +35,11 @@
     <modules>
         <module>framework</module>
         <module>filters</module>
-		<module>libraries</module>
-		<module>tm</module>
-		<module>mt</module>
-		<module>steps</module>
-		<module>applications</module>
+        <module>libraries</module>
+        <module>tm</module>
+        <module>mt</module>
+        <module>steps</module>
+        <module>applications</module>
     </modules>
     <dependencies>
         <dependency>
