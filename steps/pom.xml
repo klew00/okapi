@@ -13,6 +13,7 @@
     <name>Okapi Steps Build</name>
     <modules>
         <module>bomconversion</module>
+        <module>bomconversion-ui</module>
 		<module>charlisting</module>
 		<module>copysourcetotarget</module>
 		<module>encodingconversion</module>
@@ -20,6 +21,7 @@
 		<!--<module>generatesimpletm</module> Will fail until TM package is migrated -->
 		<module>linebreakconversion</module>
 		<module>searchandreplace</module>
+		<module>searchandreplace-ui</module>
 		<module>uriconversion</module>
 		<module>segmentation</module>
     </modules>
