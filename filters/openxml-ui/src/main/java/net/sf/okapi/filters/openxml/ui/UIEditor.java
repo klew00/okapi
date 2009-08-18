@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.openxml;
+package net.sf.okapi.filters.openxml.ui;
 
 import net.sf.okapi.common.ui.UIUtil;
 
@@ -88,7 +88,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 		return result;
 	}
 
-	public Object open(net.sf.okapi.ui.filters.openxml.Editor sl) {
+	public Object open(net.sf.okapi.filters.openxml.ui.Editor sl) {
 		createContents(); // !!! DWH 6-17-09 do this explicitly, then add listeners
 		btnCancel.addSelectionListener(sl); // DWH 6-17-09 Editor is the listener
 		btnOk.addSelectionListener(sl); // DWH 6-17-09 Editor is the listener

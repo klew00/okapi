@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.openxml;
+package net.sf.okapi.filters.openxml.ui;
 
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -48,7 +48,7 @@ public class Editor implements IParametersEditor, SelectionListener {
 	private BaseContext context;
 
 	/**
-	 * Invokes the editor for the openoffice filter parameters.
+	 * Invokes the editor for the openxml filter parameters.
 	 * @param p_Options The option object of the action.
 	 * @param p_Object The SWT Shell object of the parent shell in the UI.
 	 */
