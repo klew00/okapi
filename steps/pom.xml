@@ -26,6 +26,7 @@
 		<module>uriconversion</module>
 		<module>segmentation</module>
 		<module>segmentation-ui</module>
+        <module>xsltransform</module>
     </modules>
 
     <build>
