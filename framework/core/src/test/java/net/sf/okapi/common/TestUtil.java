@@ -18,7 +18,8 @@ public class TestUtil {
      * of the classpath.
      * @return The path of directory which contains the file
      */
-    public static String getParentDir(Class clazz, String filepath) {
+    @SuppressWarnings("unchecked")
+	public static String getParentDir(Class clazz, String filepath) {
         URL url = clazz.getResource(filepath);
         String parentDir = null;
         if (url != null) {
