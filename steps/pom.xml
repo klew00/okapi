@@ -24,5 +24,6 @@
 		<module>searchandreplace-ui</module>
 		<module>uriconversion</module>
 		<module>segmentation</module>
+		<module>segmentation-ui</module>
     </modules>
 </project>
