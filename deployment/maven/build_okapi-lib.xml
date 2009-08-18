@@ -148,6 +148,10 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/searchandreplace/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/generatesimpletm/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/segmentation/target/classes"
+			 excludes="**/META-INF/**"/>
 		</copy>
 		
 		<!-- Copy lib dependencies -->

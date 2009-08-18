@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.textmodification.tests;
+package net.sf.okapi.steps.textmodification;
 
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.tests.StepTestDriver;
