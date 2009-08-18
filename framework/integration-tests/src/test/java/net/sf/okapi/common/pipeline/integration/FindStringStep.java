@@ -1,4 +1,4 @@
-package net.sf.okapi.steps.tests.integration;
+package net.sf.okapi.common.pipeline.integration;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;

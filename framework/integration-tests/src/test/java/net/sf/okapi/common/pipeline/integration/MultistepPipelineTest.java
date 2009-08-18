@@ -1,4 +1,4 @@
-package net.sf.okapi.steps.tests.integration;
+package net.sf.okapi.common.pipeline.integration;
 
 import java.io.File;
 import java.net.URI;
