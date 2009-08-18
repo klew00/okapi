@@ -18,6 +18,7 @@
 		<module>common</module>
 		<module>copysourcetotarget</module>
 		<module>encodingconversion</module>
+        <module>encodingconversion-ui</module>
 		<module>fullwidthconversion</module>
 		<!--<module>generatesimpletm</module> Will fail until TM package is migrated -->
 		<module>linebreakconversion</module>
@@ -28,6 +29,9 @@
 		<module>segmentation</module>
 		<module>segmentation-ui</module>
         <module>xsltransform</module>
+        <module>tokenization</module>
+        <module>tokenization-ui</module>
+        <module>wordcount</module>
         <module>xsltransform-ui</module>
     </modules>
 

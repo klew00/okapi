@@ -7,8 +7,8 @@
         <version>0.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>okapi-step-encodingconversion</artifactId>
-    <name>Okapi Step for Encoding Conversion</name>
+    <artifactId>okapi-step-encodingconversion-ui</artifactId>
+    <name>Okapi Encoding Conversion Step UI</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>
