@@ -1,25 +1,38 @@
-
-		
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <parent>
-      <artifactId>build-okapi</artifactId>
-      <groupId>net.sf.okapi</groupId>
-      <version>0.3-SNAPSHOT</version>
-   </parent>
-   <modelVersion>4.0.0</modelVersion>
-   <artifactId>build-okapi-framework</artifactId>
-<packaging>pom</packaging>
-   <!--Used for display purposes only-->
-	<name>Okapi Framework Build</name>
-	<modules>
-		<module>core</module>
-		<module>core-ui</module>
-<!--
-		<module>integration-tests</module>
--->
-	</modules>
+    <parent>
+        <artifactId>build-okapi</artifactId>
+        <groupId>net.sf.okapi</groupId>
+        <version>0.3-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>build-okapi-framework</artifactId>
+    <packaging>pom</packaging>
+    <!--Used for display purposes only-->
+    <name>Okapi Framework Build</name>
+    <modules>
+        <module>core</module>
+        <module>core-ui</module>
+        <!--
+                <module>integration-tests</module>
+        -->
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <archive>
+                        <manifestFile>${basedir}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
 </project>		
 		
 		
