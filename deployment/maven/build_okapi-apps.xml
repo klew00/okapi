@@ -125,11 +125,27 @@
 			 <!-- Steps -->
 			<fileset dir="../../steps/bomconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/encodingconversion-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/fullwidthconversion-ui/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/linebreakconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/searchandreplace-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/segmentation-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/textmodification-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/tokenization-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/uriconversion-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/wordcount-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/uriconversion-ui/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/xsltransform-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 		</copy>
@@ -258,7 +274,28 @@
 	</target>
 
 	<target name="gzipAll" if="building-linux">
-		<tar destfile="${done}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>
+<!--		<tar destfile="${done}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>-->
+		
+		<!--
+		TODO: Here we copy the dist dir to a new dir to match the name of the tar file
+		      we could build it directly into such a directory 
+		-->
+		<mkdir dir="${dist}/${distName}"/>
+		<copy todir="${dist}/${distName}">
+			<fileset dir="${dist}" excludes="${distName}"/>
+		</copy>
+
+		<tar destfile="${done}/${distName}.tar.gz" compression="gzip">
+			<tarfileset filemode="755" dir="${dist}">
+				<include name="${distName}/**/*.sh"/>
+			</tarfileset>
+			<tarfileset dir="${dist}">
+				<include name="${distName}/**/*"/>
+				<exclude name="${distName}/**/*.sh"/>
+			</tarfileset>
+		</tar>
+		
+		<delete dir="${dist}/${distName}"/>
 	</target>
 
 	<target name="all" depends="init, okapiLibUI, ratel, rainbow, noWinStuff, winStuff, zipAll, gzipAll"/>

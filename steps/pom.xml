@@ -20,20 +20,29 @@
 		<module>encodingconversion</module>
         <module>encodingconversion-ui</module>
 		<module>fullwidthconversion</module>
+		<module>fullwidthconversion-ui</module>
 		<module>generatesimpletm</module>
 		<module>linebreakconversion</module>
         <module>linebreakconversion-ui</module>
 		<module>searchandreplace</module>
 		<module>searchandreplace-ui</module>
-		<module>uriconversion</module>
-		<module>uriconversion-ui</module>
 		<module>segmentation</module>
 		<module>segmentation-ui</module>
-        <module>xsltransform</module>
-        <module>xsltransform-ui</module>
+<!-- Compile of tests fails
+		<module>textmodification</module>
+-->
+<!-- Need textmodification
+		<module>textmodification-ui</module>
+-->
         <module>tokenization</module>
         <module>tokenization-ui</module>
+        <module>translationcomparison</module>
+		<module>uriconversion</module>
+		<module>uriconversion-ui</module>
         <module>wordcount</module>
+        <module>wordcount-ui</module>
+        <module>xsltransform</module>
+        <module>xsltransform-ui</module>
     </modules>
 
     <build>

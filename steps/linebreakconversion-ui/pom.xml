@@ -8,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>okapi-step-linebreakconversion-ui</artifactId>
-    <name>Okapi Step for Linebreak Conversion - UI</name>
+    <name>Okapi Step for Line Break Conversion - UI</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi.steps</groupId>

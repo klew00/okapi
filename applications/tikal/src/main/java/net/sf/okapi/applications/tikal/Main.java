@@ -426,7 +426,7 @@ public class Main {
 	
 	private void printBanner () {
 		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
-		System.out.println("Okapi Tikal - Simple Localization Toolbox");
+		System.out.println("Okapi Tikal - Localization Toolset");
 		// This will null for version until compiled as jar, which is ok.
 		System.out.println(String.format("Version: %s", getClass().getPackage().getImplementationVersion()));
 		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
@@ -440,28 +440,14 @@ public class Main {
 		System.out.println("Edit or view a filter configuration:");
 		System.out.println("   -e [-fc configId]");
 		System.out.println("Extract a file to XLIFF:");
-		System.out.println("   -x [options] inputFile [inputFile2...]");
-		System.out.println("      where the options are:");
-		System.out.println("      -fc configId : filter configuration to use");
-		System.out.println("      -ie encoding : encoding of the input file");
-		System.out.println("      -sl langCode : source language");
-		System.out.println("      -tl langCode : target language");
+		System.out.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		System.out.println("      [-sl srcLang] [-tl trgLang]");
 		System.out.println("Merge an XLIFF document back to its original format:");
-		System.out.println("   -m [options] xliffFile [xliffFile2...]");
-		System.out.println("      where the options are:");
-		System.out.println("      -fc configId : filter configuration of the original file");
-		System.out.println("      -ie encoding : encoding of the original file");
-		System.out.println("      -oe encoding : encoding of the output file");
-		System.out.println("      -sl langCode : source language");
-		System.out.println("      -tl langCode : target language");
+		System.out.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
+		System.out.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
 		System.out.println("Query translation resources:");
-		System.out.println("   -q \"source text\" [options]");
-		System.out.println("      where the options are:");
-		System.out.println("      -sl langCode : source language");
-		System.out.println("      -tl langCode : target language");
-		System.out.println("      -google : use Google MT engine (default)");
-		System.out.println("      -opentran : use OpenTran repository");
-		System.out.println("      -tt hostname[:port] : use a Translate Toolkit TM server");
+		System.out.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
+		System.out.println("      [-google] [-tt hostname[:port]]");
 	}
 
 	private void displayQuery (IQuery conn) {
@@ -480,8 +466,7 @@ public class Main {
 				conn.getSourceLanguage(), conn.getTargetLanguage()));
 			System.out.println(String.format("  Source: \"%s\"", query));
 			System.out.println("  <Not translation has been found>");
-		}
-		
+		}	
 	}
 	
 	private void processQuery () {

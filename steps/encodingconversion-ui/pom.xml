@@ -7,7 +7,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>okapi-step-encodingconversion-ui</artifactId>
-	<name>Okapi Encoding Conversion Step UI</name>
+	<name>Okapi Step for Encoding Conversion - UI</name>
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.okapi</groupId>
