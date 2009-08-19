@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.steps.tokenization.locale;
+package net.sf.okapi.steps.tokenization.locale.ui;
 
 import java.util.ArrayList;
 import java.util.List;

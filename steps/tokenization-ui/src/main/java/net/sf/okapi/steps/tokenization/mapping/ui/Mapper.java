@@ -18,13 +18,13 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.steps.tokenization.mapping;
+package net.sf.okapi.steps.tokenization.mapping.ui;
 
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
-import net.sf.okapi.ui.steps.tokenization.mapping.model.Parameters;
+import net.sf.okapi.steps.tokenization.mapping.model.ui.Parameters;
 
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Widget;

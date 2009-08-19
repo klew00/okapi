@@ -18,22 +18,17 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.steps.tokenization.tokens;
+package net.sf.okapi.steps.tokenization.mapping.ui;
 
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.ui.abstracteditor.AbstractBaseDialog;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
 import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
-import net.sf.okapi.steps.tokenization.tokens.Parameters;
-import net.sf.okapi.steps.tokenization.tokens.Token;
+import net.sf.okapi.steps.tokenization.mapping.model.ui.MappingItem;
+import net.sf.okapi.steps.tokenization.mapping.model.ui.Parameters;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -43,18 +38,20 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
 
-public class TokensTab extends Composite implements IDialogPage {
-	private Label lblChooseOneOr;
+public class MappingTab extends Composite implements IDialogPage {
 	private Table table;
-	private TableColumn colName;
-	private TableColumn colValue;
-	private TableColumn colDescr;
+	private TableColumn tblclmnParameters;
+	private TableColumn tblclmnEditor;
 	private Button btnAdd;
 	private Button btnModify;
 	private Button btnRemove;
 	private Label label;
 	private TableAdapter adapter;
+	private Label lblThisFormMaps;
 	private boolean modified;
 
 	/**
@@ -62,16 +59,16 @@ public class TokensTab extends Composite implements IDialogPage {
 	 * @param parent
 	 * @param style
 	 */
-	public TokensTab(Composite parent, int style) {
+	public MappingTab(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
 		
-		lblChooseOneOr = new Label(this, SWT.NONE);
-		lblChooseOneOr.setText("Choose one or more tokens from the table below (Ctrl+click, Ctrl+Shift+click for multiple selection):");
-		lblChooseOneOr.setData("name", "lblChooseOneOr");
+		lblThisFormMaps = new Label(this, SWT.NONE);
+		lblThisFormMaps.setData("name", "lblThisFormMaps");
+		lblThisFormMaps.setText("This table maps parameters editor classes to their parameters classes.");
 		new Label(this, SWT.NONE);
 		
-		table = new Table(this, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+		table = new Table(this, SWT.BORDER | SWT.FULL_SELECTION);
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent e) {
 				
@@ -80,25 +77,16 @@ public class TokensTab extends Composite implements IDialogPage {
 		});
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4);
 		gridData.heightHint = 400;
+		gridData.widthHint = 600;
 		table.setLayoutData(gridData);
 		table.setData("name", "table");
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		
-		colName = new TableColumn(table, SWT.NONE);
-		colName.setData("name", "colName");
-		colName.setWidth(150);
-		colName.setText("Token");
-		
-		colValue = new TableColumn(table, SWT.RIGHT);
-		colValue.setData("name", "colValue");
-		colValue.setWidth(60);
-		colValue.setText("Value");
-		
-		colDescr = new TableColumn(table, SWT.NONE);
-		colDescr.setData("name", "colDescr");
-		colDescr.setWidth(100);
-		colDescr.setText("Description");
+		tblclmnEditor = new TableColumn(table, SWT.NONE);
+		tblclmnEditor.setData("name", "tblclmnEditor");
+		tblclmnEditor.setWidth(100);
+		tblclmnEditor.setText("Editor class");
 		
 		btnAdd = new Button(this, SWT.NONE);
 		btnAdd.addSelectionListener(new SelectionAdapter() {
@@ -131,16 +119,32 @@ public class TokensTab extends Composite implements IDialogPage {
 				interop(e.widget);
 			}
 		});
-		btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
+		btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnRemove.setData("name", "btnRemove");
 		btnRemove.setText("Remove");
 		
 		label = new Label(this, SWT.NONE);
-		label.setData("name", "label");
 		label.setText("                         ");
+		label.setData("name", "label");
+		
+		tblclmnParameters = new TableColumn(table, SWT.NONE);
+		tblclmnParameters.setData("name", "tblclmnParameters");
+		tblclmnParameters.setWidth(100);
+		tblclmnParameters.setText("Parameters class");
 		
 		adapter = new TableAdapter(table);
-		adapter.setRelColumnWidths(new double [] {2, 1, 7});
+		adapter.setRelColumnWidths(new double [] {1, 1});
+	}
+
+	public boolean canClose(boolean isOK) {
+
+		return true;
+	}
+
+	public void interop(Widget speaker) {
+
+		btnModify.setEnabled(table.getItemCount() > 0 && table.getSelectionIndex() != -1);
+		btnRemove.setEnabled(btnModify.getEnabled());
 	}
 
 	protected void addModifyRow(TableItem item) {
@@ -148,8 +152,8 @@ public class TokensTab extends Composite implements IDialogPage {
 		if (item == null) { // Add new item			
 			adapter.unselect();
 			
-			if (SWTUtils.inputQuery(AddModifyTokenPage.class, getShell(), "Add token definition", 
-					new String[] {"", "0", ""}, 
+			if (SWTUtils.inputQuery(MappingItemPage.class, getShell(), "Add mapping", 
+					new String[] {"", ""}, 
 					null)) {
 				
 				modified = true;
@@ -159,10 +163,10 @@ public class TokensTab extends Composite implements IDialogPage {
 				adapter.restoreSelection();
 		}
 		else {
-			if (SWTUtils.inputQuery(AddModifyTokenPage.class, getShell(), "Modify token definition", 
+			if (SWTUtils.inputQuery(MappingItemPage.class, getShell(), "Modify mapping", 
 					SWTUtils.getText(item),
 					null)) {					
-				
+
 				modified = true;
 				adapter.modifyRow(item, (String []) SWTUtils.getResult());
 			}
@@ -172,45 +176,18 @@ public class TokensTab extends Composite implements IDialogPage {
 		interop(table);  // Selection changes
 	}
 
-	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
-	}
-
-	public boolean canClose(boolean isOK) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	public void interop(Widget speaker) {
-		
-		btnModify.setEnabled(table.getItemCount() > 0 && table.getSelectionIndex() != -1);
-		btnRemove.setEnabled(btnModify.getEnabled());
-	}
-
 	public boolean load(Object data) {
 
-		if (data == null) {
-			
-			Object d = getData("dialog");
-			
-			if (d instanceof AbstractBaseDialog) {
-				
-				data = new Parameters();
-				((AbstractBaseDialog) d).setData(data);
-			}			
-		}
-		
 		if (data instanceof Parameters) {
 			
 			Parameters params = (Parameters) data;
 
-			if (!params.loadTokens()) return false;
+			if (!params.loadMapping()) return false;
 			
 			adapter.clear();
 			
-			for (Token token : params.tokens)					
-				adapter.addRow(new String[] {token.name, Util.intToStr(token.value), token.description});
+			for (MappingItem item : params.getItems())					
+				adapter.addRow(new String[] {item.editorClass, item.parametersClass});
 
 			adapter.sort(1, false);
 			modified = false;				
@@ -227,13 +204,10 @@ public class TokensTab extends Composite implements IDialogPage {
 			params.reset();
 		
 			for (int i = 1; i <= adapter.getNumRows(); i++)
-				params.addToken(adapter.getValue(i, 1), Util.strToInt(adapter.getValue(i, 2), 0), adapter.getValue(i, 3));
+				params.addMapping(adapter.getValue(i, 1), adapter.getValue(i, 2));
 			
 			if (modified)
-				params.saveTokens();
-			
-			for (TableItem item : table.getSelection())
-				params.addSelectedToken(item.getText(0), Util.strToInt(item.getText(1), 0), item.getText(2));
+				params.saveMapping();
 			
 			modified = false;
 		}

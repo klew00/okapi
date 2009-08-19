@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.steps.tokenization.mapping.model;
+package net.sf.okapi.steps.tokenization.mapping.model.ui;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
