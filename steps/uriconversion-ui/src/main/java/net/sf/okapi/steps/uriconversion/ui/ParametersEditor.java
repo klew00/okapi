@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.ui.uriconversion;
+package net.sf.okapi.steps.uriconversion.ui;
 
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
