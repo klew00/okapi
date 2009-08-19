@@ -30,10 +30,10 @@
 		<module>segmentation</module>
 		<module>segmentation-ui</module>
         <module>xsltransform</module>
+        <module>xsltransform-ui</module>
         <module>tokenization</module>
         <module>tokenization-ui</module>
         <module>wordcount</module>
-        <module>xsltransform-ui</module>
     </modules>
 
     <build>

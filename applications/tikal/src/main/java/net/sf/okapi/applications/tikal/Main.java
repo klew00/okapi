@@ -37,9 +37,11 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.lib.translation.IQuery;
-import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.mt.google.GoogleMTConnector;
+import net.sf.okapi.tm.opentran.OpenTranTMConnector;
+import net.sf.okapi.tm.translatetoolkit.Parameters;
+import net.sf.okapi.tm.translatetoolkit.TranslateToolkitTMConnector;
 
 public class Main {
 	
@@ -59,6 +61,10 @@ public class Main {
 	protected String trgLang = "fr";
 	protected int command = -1;
 	protected String query;
+	protected boolean useGoogle;
+	protected boolean useOpenTran;
+	protected boolean useTT;
+	protected String ttParams;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -109,6 +115,16 @@ public class Main {
 					prog.command = CMD_QUERYTRANS;
 					prog.query = getArgument(args, ++i);
 				}
+				else if ( arg.equals("-google") ) {
+					prog.useGoogle = true;
+				}
+				else if ( arg.equals("-opentran") ) {
+					prog.useOpenTran = true;
+				}
+				else if ( arg.equals("-tt") ) {
+					prog.useTT = true;
+					prog.ttParams = getArgument(args, ++i);
+				}
 				else if ( arg.equals("-listconf") ) {
 					prog.showAllConfigurations();
 					return;
@@ -133,7 +149,7 @@ public class Main {
 				return;
 			}
 			if ( prog.command == CMD_QUERYTRANS ) {
-				prog.query();
+				prog.processQuery();
 				return;
 			}
 			if ( prog.inputs.size() == 0 ) {
@@ -439,28 +455,72 @@ public class Main {
 		System.out.println("      -sl langCode : source language");
 		System.out.println("      -tl langCode : target language");
 		System.out.println("Query translation resources:");
-		System.out.println("   -q [\"]text[\"] [options]");
+		System.out.println("   -q \"source text\" [options]");
 		System.out.println("      where the options are:");
 		System.out.println("      -sl langCode : source language");
 		System.out.println("      -tl langCode : target language");
+		System.out.println("      -google : use Google MT engine (default)");
+		System.out.println("      -opentran : use OpenTran repository");
+		System.out.println("      -tt hostname[:port] : use a Translate Toolkit TM server");
 	}
 
-	private void query () {
-		IQuery conn = new GoogleMTConnector();
-		conn.open();
-		conn.setLanguages(srcLang, trgLang);
+	private void displayQuery (IQuery conn) {
 		if ( conn.query(query) > 0 ) {
 			QueryResult qr;
 			while ( conn.hasNext() ) {
 				qr = conn.next();
 				System.out.println(String.format("Result: From %s (%s->%s, score: %d)", conn.getName(),
 					conn.getSourceLanguage(), conn.getTargetLanguage(), qr.score));
-				System.out.println(String.format("Source: \"%s\"", qr.source.toString()));
-				System.out.println(String.format("Target: \"%s\"", qr.target.toString()));
+				System.out.println(String.format("  Source: \"%s\"", qr.source.toString()));
+				System.out.println(String.format("  Target: \"%s\"", qr.target.toString()));
 			}
 		}
 		else {
-			System.out.println(String.format("No result for \"%s\".", query));
+			System.out.println(String.format("Result: From %s (%s->%s)", conn.getName(),
+				conn.getSourceLanguage(), conn.getTargetLanguage()));
+			System.out.println(String.format("  Source: \"%s\"", query));
+			System.out.println("  <Not translation has been found>");
+		}
+		
+	}
+	
+	private void processQuery () {
+		if ( !useGoogle && !useOpenTran && !useTT ) {
+			useGoogle = true; // Default if none is specified
+		}
+		
+		IQuery conn;
+		if ( useGoogle ) {
+			conn = new GoogleMTConnector();
+			conn.setLanguages(srcLang, trgLang);
+			conn.open();
+			displayQuery(conn);
+			conn.close();
+		}
+		if ( useTT ) {
+			// Parse the parameters hostname:port
+			int n = ttParams.lastIndexOf(':');
+			net.sf.okapi.tm.translatetoolkit.Parameters params = new Parameters();
+			if ( n == -1 ) {
+				params.setHost(ttParams);
+			}
+			else {
+				params.setPort(Integer.valueOf(ttParams.substring(n+1)));
+				params.setHost(ttParams.substring(0, n));
+			}
+			conn = new TranslateToolkitTMConnector();
+			conn.setParameters(params);
+			conn.setLanguages(srcLang, trgLang);
+			conn.open();
+			displayQuery(conn);
+			conn.close();
+		}
+		if ( useOpenTran ) {
+			conn = new OpenTranTMConnector();
+			conn.setLanguages(srcLang, trgLang);
+			conn.open();
+			displayQuery(conn);
+			conn.close();
 		}
 	}
 }

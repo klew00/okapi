@@ -155,7 +155,7 @@ public class GoogleMTConnector implements IQuery {
 			lastError = e.getMessage();
 		}
 		
-		return ((lastError==null) ? 1 : 0);
+		return ((current==0) ? 1 : 0);
 	}
 	
 	/**
@@ -315,7 +315,7 @@ public class GoogleMTConnector implements IQuery {
 			lastError = e.getMessage();
 		}
 
-		return ((lastError==null) ? 1 : 0);
+		return ((current==0) ? 1 : 0);
 	}
 	
 	public void setAttribute (String name,
