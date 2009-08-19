@@ -15,10 +15,10 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>net.sf.okapi</groupId>
-            <artifactId>okapi-core-ui</artifactId>
-            <version>${project.version}</version>
-        </dependency>   
+			<groupId>net.sf.okapi</groupId>
+			<artifactId>okapi-core-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-encodingconversion</artifactId>
