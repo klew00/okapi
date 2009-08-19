@@ -20,5 +20,11 @@
             <artifactId>okapi-lib-segmentation</artifactId>
             <version>${project.version}</version>
         </dependency>        
+        <dependency>
+            <groupId>net.sf.okapi.steps</groupId>
+            <artifactId>okapi-step-common</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>        
     </dependencies>
 </project>

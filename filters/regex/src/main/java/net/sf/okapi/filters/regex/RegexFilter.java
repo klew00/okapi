@@ -114,13 +114,13 @@ public class RegexFilter implements IFilter {
 			MIMETYPE,
 			getClass().getName(),
 			"Text (Line=Paragraph)",
-			"Configuration for text files where each line is a paragraph",
+			"Configuration for text files where each line is a text unit",
 			"textLine.fprm"));
 		list.add(new FilterConfiguration(getName()+"-textBlock",
 			MIMETYPE,
 			getClass().getName(),
 			"Text (Block=Paragraph)",
-			"Configuration for text files where each paragraph is separated by at least two line-breaks.",
+			"Configuration for text files where text units are separated by 2 or more line-breaks.",
 			"textBlock.fprm"));
 		return list;
 	}

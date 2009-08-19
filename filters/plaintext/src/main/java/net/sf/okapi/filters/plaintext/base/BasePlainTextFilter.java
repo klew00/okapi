@@ -65,19 +65,19 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		addConfiguration(true, 
 				FILTER_CONFIG,
 				"Plain Text",
-				"Text files; ANSI, Unicode, UTF-8, UTF-16 are supported.", 
+				"Plain text files.", 
 				null);
 		
 		addConfiguration(false, 
 				FILTER_CONFIG_TRIM_TRAIL,
 				"Plain Text (Trim Trail)",
-				"Text files; ANSI, Unicode, UTF-8, UTF-16 are supported. Trailing spaces and tabs are removed from extracted lines.", 
+				"Text files; trailing spaces and tabs removed from extracted lines.", 
 				"okf_plaintext_trim_trail.fprm");
 		
 		addConfiguration(false, 
 				FILTER_CONFIG_TRIM_ALL,
 				"Plain Text (Trim All)",
-				"Text files; ANSI, Unicode, UTF-8, UTF-16 are supported. Both leading and trailing spaces and tabs are removed from extracted lines.", 
+				"Text files; leading and trailing spaces and tabs removed from extracted lines.", 
 				"okf_plaintext_trim_all.fprm");
 		
 		setParameters(new Parameters());	// Base Plain Text Filter parameters
