@@ -103,7 +103,7 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../filters/openoffice-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/openxml/target/classes"
+			<fileset dir="../../filters/openxml-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../filters/plaintext-ui/target/classes"
 			 excludes="**/META-INF/**"/>

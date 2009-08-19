@@ -75,7 +75,6 @@
   name="(ALPHA) TS Filter"
   inputFilterClass="net.sf.okapi.filters.ts.TsFilter"
  >Filter for QT ts files.</filter>
-
   
  <filter id="okf_idmlcontent"
   name="(ALPHA) IDML-Content Filter"
@@ -96,34 +95,34 @@
 
  <parametersEditor
   parametersClass="net.sf.okapi.filters.properties.Parameters"
-  editorClass="net.sf.okapi.filters.ui.properties.Editor" />
+  editorClass="net.sf.okapi.filters.properties.ui.Editor" />
   
  <parametersEditor
   parametersClass="net.sf.okapi.filters.regex.Parameters"
-  editorClass="net.sf.okapi.filters.ui.regex.Editor" />
+  editorClass="net.sf.okapi.filters.regex.ui.Editor" />
  
  <parametersEditor
   parametersClass="net.sf.okapi.filters.openxml.ConditionalParameters"
-  editorClass="net.sf.okapi.ui.filters.openxml.Editor" />
+  editorClass="net.sf.okapi.filters.openxml.ui.Editor" />
  
  <parametersEditor
   parametersClass="net.sf.okapi.filters.openoffice.Parameters"
-  editorClass="net.sf.okapi.filters.ui.openoffice.Editor" />
+  editorClass="net.sf.okapi.filters.openoffice.ui.Editor" />
   
  <parametersEditor
   parametersClass="net.sf.okapi.filters.po.Parameters"
-  editorClass="net.sf.okapi.filters.ui.po.Editor" />
+  editorClass="net.sf.okapi.filters.po.ui.Editor" />
 
  <parametersEditor
   parametersClass="net.sf.okapi.filters.plaintext.Parameters"
-  editorClass="net.sf.okapi.ui.filters.plaintext.Editor" />
+  editorClass="net.sf.okapi.filters.plaintext.ui.Editor" />
 
  <parametersEditor
   parametersClass="net.sf.okapi.filters.table.Parameters"
-  editorClass="net.sf.okapi.ui.filters.table.Editor" />
+  editorClass="net.sf.okapi.filters.table.ui.Editor" />
   
 <parametersEditor
   parametersClass="net.sf.okapi.filters.ts.Parameters"
-  editorClass="net.sf.okapi.filters.ui.ts.Editor" />
+  editorClass="net.sf.okapi.filters.ts.ui.Editor" />
 
 </okapiFilters>

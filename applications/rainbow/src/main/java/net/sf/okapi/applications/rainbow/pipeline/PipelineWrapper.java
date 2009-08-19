@@ -106,7 +106,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.ui.bomconversion.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.bomconversion.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 
@@ -130,7 +130,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.ui.xsltransform.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.xsltransform.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 		
@@ -142,7 +142,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.ui.linebreakconversion.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.linebreakconversion.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 
@@ -154,7 +154,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.ui.segmentation.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.segmentation.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 
@@ -166,7 +166,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.ui.textmodification.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.textmodification.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 
@@ -190,7 +190,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.ui.fullwidthconversion.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps..fullwidthconversion.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 
@@ -202,7 +202,7 @@ public class PipelineWrapper {
 			params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.ui.searchandreplace.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.searchandreplace.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 
@@ -214,7 +214,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.ui.uriconversion.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.uriconversion.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 			
@@ -226,7 +226,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.ui.encodingconversion.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.encodingconversion.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 						
