@@ -28,12 +28,8 @@
 		<module>searchandreplace-ui</module>
 		<module>segmentation</module>
 		<module>segmentation-ui</module>
-<!-- Compile of tests fails
 		<module>textmodification</module>
--->
-<!-- Need textmodification
 		<module>textmodification-ui</module>
--->
         <module>tokenization</module>
         <module>tokenization-ui</module>
         <module>translationcomparison</module>
