@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.steps.tokenization.tests;
+package net.sf.okapi.ui.steps.tokenization;
 
 import static org.junit.Assert.assertEquals;
 
