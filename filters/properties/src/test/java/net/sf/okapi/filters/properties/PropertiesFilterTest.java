@@ -25,11 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
