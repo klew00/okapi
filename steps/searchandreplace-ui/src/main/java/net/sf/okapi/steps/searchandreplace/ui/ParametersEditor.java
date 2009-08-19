@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.ui.searchandreplace;
+package net.sf.okapi.steps.searchandreplace.ui;
 
 import java.util.regex.Pattern;
 
