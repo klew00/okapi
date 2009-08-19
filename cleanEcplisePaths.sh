@@ -6,6 +6,7 @@ for i in `find . | grep ".pom.xml$"`; do
   svn rm "$d/.settings"; 
   svn rm "$d/.classpath";
   svn rm "$d/.project";
+  svn rm "$d/.pydevproject";
   svn rm "$d/target";
 
   svn propset svn:ignore '
