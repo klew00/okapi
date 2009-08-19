@@ -26,7 +26,7 @@
 		</or>
 	</condition>
 	
-	<property name="rainbowHome" value="../dist_${platform}"/>
+	<property name="rainbowHome" value="../../maven/dist_${platform}"/>
 	<property name="fs" value="${file.separator}"/>
 	<condition property="compare" value="fc" else="diff">
 		<os family="windows"/>

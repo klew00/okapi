@@ -125,4 +125,8 @@
   parametersClass="net.sf.okapi.filters.ts.Parameters"
   editorClass="net.sf.okapi.filters.ts.ui.Editor" />
 
+<parametersEditor
+  parametersClass="net.sf.okapi.filters.html.Parameters"
+  editorClass="net.sf.okapi.filters.html.ui.Editor" />
+
 </okapiFilters>
