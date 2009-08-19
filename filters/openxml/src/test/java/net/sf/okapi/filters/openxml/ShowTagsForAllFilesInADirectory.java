@@ -35,21 +35,27 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class OpenXMLZipFullDirectoryTest {
+public class ShowTagsForAllFilesInADirectory {
 	private static Logger LOGGER;
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
 	private static final String deary="/data/";
 
-	public OpenXMLZipFullDirectoryTest()
-                  {
-                  }
-
-	@Before
+	public void doAll()
+	{
+		try
+		{
+			setUp();
+			testAll();
+			tearDown();
+		}
+		catch(Exception e)
+		{
+			LOGGER.log(Level.WARNING, e.getMessage());
+		}
+	}
+	
 	public void setUp() throws Exception {
 		LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
 		openXMLFilter = new OpenXMLFilter(new TagPeekTranslator(),"en-US");	
@@ -59,7 +65,7 @@ public class OpenXMLZipFullDirectoryTest {
 			LOGGER.addHandler(new LogHandlerSystemOut());		
 		openXMLFilter.setOptions("en", "UTF-8", true);
     	    testFileList = new String[1]; // timporary
-/*
+
 	    JFileChooser chooser = new JFileChooser();
 	    // Note: source for ExampleFileFilter can be found in FileChooserDemo,
 	    // under the demo/jfc directory in the JDK.
@@ -82,16 +88,13 @@ public class OpenXMLZipFullDirectoryTest {
 	    else {
 	    	testFileList = new String[]{}; // Empty to skip the manual tests
 	    }
-*/
 	}
 
-	@After
 	public void tearDown() {
 		openXMLFilter.close();
 
 	}
 
-	@Test
 	public void testAll() throws URISyntaxException {
 		Event event;
 		String sOutputPath;
