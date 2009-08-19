@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: EncodingConversionStep Parameters Editor
 Bundle-SymbolicName: net.sf.okapi.ui.steps.encodingconversion
 Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.ui.encodingconversion
+Export-Package: net.sf.okapi.steps.encodingconversion.ui
 Require-Bundle: net.sf.okapi.steps.encodingconversion;bundle-version="1.0.0",
  net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.ui.common;bundle-version="1.0.0",
