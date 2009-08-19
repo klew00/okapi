@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.ui.segmentation;
+package net.sf.okapi.steps.segmentation.ui;
 
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
