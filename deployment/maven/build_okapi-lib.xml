@@ -292,20 +292,13 @@
 		 manifest="${tmp}/MANIFEST.MF"
 		 excludes="MANIFEST.MF" />
 
-		<!-- Copy examples
-		<copy todir="${dist}/examples/java">
+		<!-- Copy examples -->
+		<copy todir="${dist}/examples">
 			<fileset dir="../../examples/java">
-				<exclude name="**/.*"/>
-				<exclude name="**/bin/**"/>
+				<exclude name="**/target/classes/**"/>
+				<exclude name="**/target/maven-archiver/**"/>
 			</fileset>
 		</copy>
-		<copy  todir="${dist}/examples/python">
-			<fileset dir="../../examples/python">
-				<exclude name="**/.*"/>
-				<exclude name="**/bin/**"/>
-			</fileset>
-		</copy>
-		-->
 
 	</target>
 
