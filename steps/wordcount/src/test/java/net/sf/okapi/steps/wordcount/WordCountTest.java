@@ -1,4 +1,4 @@
-package net.sf.okapi.steps.wordcount.tests;
+package net.sf.okapi.steps.wordcount;
 
 
 import static org.junit.Assert.assertEquals;
