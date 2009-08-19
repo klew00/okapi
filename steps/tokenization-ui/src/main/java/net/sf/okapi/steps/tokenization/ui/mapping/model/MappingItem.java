@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.mapping.model.ui;
+package net.sf.okapi.steps.tokenization.ui.mapping.model;
 
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.filters.plaintext.common.IParametersHandler;

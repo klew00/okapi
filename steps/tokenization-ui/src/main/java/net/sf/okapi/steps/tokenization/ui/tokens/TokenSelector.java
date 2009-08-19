@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.tokens.ui;
+package net.sf.okapi.steps.tokenization.ui.tokens;
 
 import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
 import net.sf.okapi.steps.tokenization.tokens.Parameters;

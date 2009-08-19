@@ -1,6 +1,6 @@
 #v1
 mappingItemCount.i=19
-mappingItem0.editorClass=net.sf.okapi.ui.filters.html.Editor
+mappingItem0.editorClass=net.sf.okapi.filters.html.ui.Editor
 mappingItem0.parametersClass=net.sf.okapi.filters.html.Parameters
 mappingItem1.editorClass=net.sf.okapi.ui.common.mapping.Mapper
 mappingItem1.parametersClass=net.sf.okapi.ui.common.mapping.model.Parameters
@@ -10,13 +10,13 @@ mappingItem3.editorClass=net.sf.okapi.ui.filters.table.Editor
 mappingItem3.parametersClass=net.sf.okapi.filters.table.Parameters
 mappingItem4.editorClass=net.sf.okapi.ui.filters.plaintext.Editor
 mappingItem4.parametersClass=net.sf.okapi.filters.plaintext.Parameters
-mappingItem5.editorClass=net.sf.okapi.filters.ui.openoffice.Editor
+mappingItem5.editorClass=net.sf.okapi.filters.openoffice.ui.Editor
 mappingItem5.parametersClass=net.sf.okapi.filters.openoffice.Parameters
 mappingItem6.editorClass=net.sf.okapi.filters.ui.po.Editor
 mappingItem6.parametersClass=net.sf.okapi.filters.po.Parameters
 mappingItem7.editorClass=net.sf.okapi.filters.ui.properties.Editor
 mappingItem7.parametersClass=net.sf.okapi.filters.properties.Parameters
-mappingItem8.editorClass=net.sf.okapi.filters.ui.regex.Editor
+mappingItem8.editorClass=net.sf.okapi.filters.regex.ui.Editor
 mappingItem8.parametersClass=net.sf.okapi.filters.regex.Parameters
 mappingItem9.editorClass=net.sf.okapi.steps.ui.bomconversion.ParametersEditor
 mappingItem9.parametersClass=net.sf.okapi.steps.bomconversion.Parameters

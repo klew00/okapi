@@ -22,7 +22,7 @@ package net.sf.okapi.steps.tokenization.ui;
 
 import static org.junit.Assert.assertEquals;
 
-import net.sf.okapi.steps.tokenization.mapping.ui.Mapper;
+import net.sf.okapi.steps.tokenization.ui.mapping.Mapper;
 
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class MappingTest {
 	@Test
 	public void testGetClasses() {
 		
-		assertEquals("net.sf.okapi.filters.html.Parameters", Mapper.getParametersClass("net.sf.okapi.ui.filters.html.Editor"));
-		assertEquals("net.sf.okapi.ui.filters.html.Editor", Mapper.getEditorClass("net.sf.okapi.filters.html.Parameters"));
+		assertEquals("net.sf.okapi.filters.regex.Parameters", Mapper.getParametersClass("net.sf.okapi.filters.regex.ui.Editor"));
+		assertEquals("net.sf.okapi.filters.regex.ui.Editor", Mapper.getEditorClass("net.sf.okapi.filters.regex.Parameters"));
 	}
 }

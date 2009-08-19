@@ -7,7 +7,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>okapi-step-tokenization-ui</artifactId>
-	<name>Okapi Tokenization Step UI</name>
+	<name>Okapi Step for Tokenization - UI</name>
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.okapi</groupId>
