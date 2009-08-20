@@ -12,21 +12,30 @@
 	<li><a href="#SetupMac">Macintosh Platform</a></li>
 	<li><a href="#Support">Support</a></li>
 </ul>
-<p>TO UPDATE</p>
 <hr>
 <h2><a name="overview"></a>Overview</h2>
-<p>The <b>okapi-apps</b> distribution is the Okapi Framework libraries along 
-with some applications:</p>
+<p>The <b>okapi-apps</b> distribution contains:</p>
 <ul>
-	<li><b><a href="help/applications/tikal/index.html">Tikal</a></b> is a command-line tool to execute some simple localization-related 
-	tasks, like extraction and merge of XLIFF documents.</li>
-	<li><b><a href="help/applications/rainbow/index.html">Rainbow</a></b> is an application 
+	<li>The <b>okapi-lib</b> distribution, a collection of Java classes design 
+	to help in programming components and applications related to translation 
+	and localization tasks.</li>
+	<li>Several applications built on top of the framework:<ul>
+		<li><b><a href="help/applications/tikal/index.html">Tikal</a></b> is a command-line tool to execute some simple localization-related 
+	tasks, like extraction and merge of 
+		<a href="http://okapi.opentag.com/standards.html#xliff">XLIFF documents</a>.</li>
+		<li><b><a href="help/applications/rainbow/index.html">Rainbow</a></b> is an application 
 	that provides a user interface to launch different translation and 
 	localization-related utilities.</li>
-	<li><b><a href="help/lib/segmentation/ui/index.html">Ratel</a></b> is a simple editor for segmentation rules in SRX format.</li>
+		<li><b><a href="help/lib/segmentation/ui/index.html">Ratel</a></b> is a simple editor for segmentation rules in 
+		<a href="http://okapi.opentag.com/standards.html#srx">SRX format</a>.</li>
+	</ul>
+	</li>
 </ul>
 <p><a href="changes.html">For a list of changes since the previous release, 
 please see the Changes Log document</a>.</p>
+<p><b>Note that parts of this project are still relatively new and still in development. Some of 
+the classes, interfaces and internal workings presented here may change in the 
+upcoming versions of the Okapi Framework.</b></p>
 <hr>
 <h2><a name="SetupWindows"></a>Windows Platform</h2>
 <h3>Requirements</h3>
@@ -83,7 +92,7 @@ the user and called <code>.Rainbow</code>.</li>
 <hr>
 <h2><a name="SetupMac"></a>Macintosh Platform</h2>
 <h3>Requirements</h3>
-<p>On both Mac OS X 10.5 (Leopard) or higher, and Mac OS X 10.4 (Tiger), Rainbow 
+<p><span style="background-color: #FFFF00">TODO-&gt;UPDATE THIS INFO: </span>On both Mac OS X 10.5 (Leopard) or higher, and Mac OS X 10.4 (Tiger), Rainbow 
 requires Java 1.4.2 or Java 1.5.x. Note that Java 1.6 (which is 64-bit) is not supported yet. 
 Currently Rainbow uses Carbon, not Cocoa. Support for Cocoa will 
 come when the Cocoa implementation of SWT is stable.</p>

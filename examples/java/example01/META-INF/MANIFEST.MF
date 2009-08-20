@@ -1,2 +1,2 @@
 Manifest-Version: 1.0
-Main-Class: example01.Main
+Main-Class: Main

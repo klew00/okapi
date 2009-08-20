@@ -11,7 +11,6 @@
 	<li><a href="#JARDependencies">JAR Dependencies</a></li>
 	<li><a href="#Support">Support</a></li>
 </ul>
-<p>TO UPDATE</p>
 <hr>
 <h2><a name="overview"></a>Overview</h2>
 <p>The <b>okapi-lib</b> distribution is a collection of Java classes design to help in 
@@ -22,34 +21,40 @@ The library also provides facilities to manipulate, annotated and in general,
 work with the extracted text.</p>
 <p>The distribution comes also with <a href="help/applications/tikal/index.html">
 <b>Tikal</b>, a command-line tool</a> to execute some simple 
-localization-related tasks, like extraction and merge of XLIFF documants.</p>
+localization-related tasks, like extraction and merge of 
+<a href="http://okapi.opentag.com/standards.html#xliff">XLIFF documents</a>. If 
+you want to use others Okapi tools (e.g. Rainbow),
+<a href="http://okapi.opentag.com/downloads.html">download one of the 
+platform-specific <b>okapi-apps</b> distributions</a>.</p>
 <p><a href="changes.html">For a list of changes since the previous release, 
 please see the Changes Log document</a>.</p>
-<p><b>Note that the framework is still in its early stage of development. Some of 
+<p><b>Note that parts of this project are still relatively new and still in development. Some of 
 the classes, interfaces and internal workings presented here may change in the 
-upcoming versions of the Okapi Library.</b></p>
+upcoming versions of the Okapi Framework.</b></p>
 <p>This distribution contains the following:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table1">
 	<tr>
 		<td align="left" valign="top"><code>lib</code></td>
-		<td>All the files needed to run the Okapi classes.
-		If you do not need any UI components, you can remove the following 
-		files: <code>okapi-libui.jar</code>, <code>swt.jar</code>, and <code>
-		swing2swt.jar</code>. See the <a href="#JARDependencies">JAR 
-		Dependencies</a> section for details.</td>
+		<td>All the files needed to run the non-UI Okapi libraries. This 
+		directory includes the different dependencies some of the components 
+		need. See the <a href="#JARDependencies">JAR 
+		Dependencies</a> section for details. If you want to use any of the 
+		Okapi UI classes, you need to download the okapi-apps distribution, 
+		which is platform-specific (because the UI classes use SWT).</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top"><code>help</code></td>
-		<td>The help files that go with the several UI components provided with 
+		<td>The help files that go with the several components provided with 
 		the library.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top"><code>config</code></td>
-		<td>Some default configuration files (e.g. segmentation rules)</td>
+		<td>Various default configuration files (e.g. segmentation rules, 
+		additional filter configurations, etc.)</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top"><code>examples</code></td>
-		<td>A few examples on how to use the library, in Java and Python.</td>
+		<td>A few Java examples on how to use the library.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top"><code>localweb/devguide</code></td>
@@ -62,7 +67,7 @@ upcoming versions of the Okapi Library.</b></p>
 		this release</a>.</td>
 	</tr>
 </table>
-<p>The latest version of these documents and of the library are always available 
+<p>The latest version of these documents and of the library is always available 
 on-line, at the <a href="http://okapi.opentag.com/">Okapi Framework Web site</a>.</p>
 <hr>
 <h2><a name="setup"></a>Requirements and Installation</h2>
@@ -75,7 +80,7 @@ later.</li>
 	<li>Macintosh: On both Mac OS X 10.5 (Leopard) or higher, and Mac OS X 10.4 (Tiger), the 
 Okapi libraries 
 requires Java 1.4.2 or Java 1.5.x.<br>
-	TODO-&gt;UPDATE THIS: Note that Java 1.6 (which is 64-bit) is not supported yet. 
+	<span style="background-color: #FFFF00">TODO-&gt;UPDATE THIS:</span> Note that Java 1.6 (which is 64-bit) is not supported yet. 
 Currently the Okapi libraries use Carbon, not Cocoa. Support for Cocoa will 
 come when the Cocoa implementation of SWT is stable.</li>
 </ul>
@@ -95,7 +100,7 @@ come when the Cocoa implementation of SWT is stable.</li>
 <hr>
 <h2><a name="JARDependencies"></a>JAR Dependencies</h2>
 <p>The following table shows which third-party JAR files are necessary 
-for which Okapi components.</p>
+for which Okapi components (version numbers have been omitted).</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table2">
 	<tr>
 		<th align="left" valign="top">This third-party JAR</th>
@@ -103,30 +108,20 @@ for which Okapi components.</p>
 		<th align="left" valign="top">When using this Okapi component...</th>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>swt.jar</code></td>
-		<td align="left" valign="top"><code>okapi-lib-ui</code></td>
-		<td align="left" valign="top">any component of the Okapi UI.</td>
-	</tr>
-	<tr>
-		<td align="left" valign="top"><code>swing2swt.jar</code></td>
-		<td align="left" valign="top"><code>okapi-lib-ui</code></td>
-		<td align="left" valign="top"><code>net.sf.okapi.filters.openxml.ui</code></td>
-	</tr>
-	<tr>
-		<td align="left" valign="top"><code>dtdparser121.jar</code></td>
+		<td align="left" valign="top"><code>dtdparser</code></td>
 		<td align="left" valign="top"><code>okapi-lib</code></td>
 		<td align="left" valign="top"><code>net.sf.okapi.filters.dtd</code></td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>jericho-html-3.1-dev-5.jar</code><br>
-		and <code>jyaml-1.3.jar</code></td>
+		<td align="left" valign="top"><code>jericho-html</code><br>
+		and <code>jyaml</code></td>
 		<td align="left" valign="top"><code>okapi-lib</code></td>
 		<td align="left" valign="top"><code>net.sf.okapi.filters.html</code><br>
 		or <code>net.sf.okapi.filters.openxml</code></td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>stax-api-1.0.1.jar</code><br>
-		and <code>wstx-lgpl-3.2.8.jar</code></td>
+		<td align="left" valign="top"><code>stax-api</code><br>
+		and <code>wstx-lgpl</code></td>
 		<td align="left" valign="top"><code>okapi-lib</code></td>
 		<td align="left" valign="top"><code>net.sf.okapi.filters.idml</code><br>
 		or <code>net.sf.okapi.filters.openoffice</code><br>
@@ -134,21 +129,31 @@ for which Okapi components.</p>
 		or <code>net.sf.okapi.filters.xliff</code></td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>axis.jar</code><br>
-		and <code>wsdl4j-1.5.1.jar</code><br>
-		and <code>jaxrpc.jar</code><br>
-		and <code>commons-logging-1.0.4.jar</code><br>
-		and <code>commons-discovery-0.2.jar</code><br>
-		and <code>saaj.jar</code></td>
+		<td align="left" valign="top"><code>axis</code><br>
+		and <code>wsdl4j</code><br>
+		and <code>jaxrpc</code><br>
+		and <code>commons-logging</code><br>
+		and <code>commons-discovery</code><br>
+		and <code>saaj</code></td>
 		<td align="left" valign="top"><code>okapi-lib</code></td>
 		<td align="left" valign="top"><code>net.sf.okapi.tm.globalsight</code></td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>xmlrpc-client-3.1.jar</code><br>
-		and <code>xmlrpc-common-3.1.jar</code><br>
-		and <code>ws-commons-util-1.0.2.jar</code></td>
+		<td align="left" valign="top"><code>xmlrpc-client</code><br>
+		and <code>xmlrpc-common</code><br>
+		and <code>ws-commons-util</code></td>
 		<td align="left" valign="top"><code>okapi-lib</code></td>
 		<td align="left" valign="top"><code>net.sf.okapi.tm.opentran</code></td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>h2</code></td>
+		<td align="left" valign="top"><code>okapi-lib</code></td>
+		<td align="left" valign="top"><code>net.sf.okapi.tm.simpletm</code></td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>json-simple</code></td>
+		<td align="left" valign="top"><code>okapi-lib</code></td>
+		<td align="left" valign="top"><code>net.sf.okapi.tm.translatetoolkit</code></td>
 	</tr>
 </table>
 <p>If you are developing applications that use only some of the Okapi library&#39;s 
