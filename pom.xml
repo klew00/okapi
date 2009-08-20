@@ -41,6 +41,7 @@
         <module>steps</module>
         <module>applications</module>
         <module>examples/java</module>
+        <module>tests</module>
     </modules>
     <dependencies>
         <dependency>
