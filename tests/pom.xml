@@ -8,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>build-tests</artifactId>
-    <groupId>net.sf.okapi.test</groupId>
+    <groupId>net.sf.okapi.tests</groupId>
     <packaging>pom</packaging>
     <name>Okapi Testing Helpers</name>
     <modules>
