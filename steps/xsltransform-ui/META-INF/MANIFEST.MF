@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Xsltransform Parameters Editor
 Bundle-SymbolicName: net.sf.okapi.ui.steps.xsltransform
 Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.ui.xsltransform
+Export-Package: net.sf.okapi.steps.xsltransform.ui
 Require-Bundle: net.sf.okapi.steps.xsltransform;bundle-version="1.0.0",
  net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.ui.common;bundle-version="1.0.0",

@@ -10,4 +10,4 @@ Require-Bundle: org.eclipse.swt;bundle-version="3.4.2",
  net.sf.okapi.ui.filters.plaintext;bundle-version="1.0.0",
  net.sf.okapi.filters.plaintext;bundle-version="1.0.0",
  net.sf.okapi.steps.wordcount;bundle-version="1.0.0"
-Export-Package: net.sf.okapi.ui.steps.wordcount
+Export-Package: net.sf.okapi.steps.wordcount.ui
