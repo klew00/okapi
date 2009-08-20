@@ -283,7 +283,7 @@ public class Editor implements IParametersEditor {
 		//--- Options
 		
 		chkOneLevelGroups = new Button(cmpTmp, SWT.CHECK);
-		chkOneLevelGroups.setText("Auto-close previous group when a new one starts");
+		chkOneLevelGroups.setText(Res.getString("Editor.autoClosegroup")); //$NON-NLS-1$
 		
 		Group optionsGroup = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(2, false);

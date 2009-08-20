@@ -7,7 +7,7 @@
         <version>0.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>applications-rainbow</artifactId>
+    <artifactId>okapi-application-rainbow</artifactId>
     <name>Okapi Rainbow</name>
     <dependencies>
         <dependency>
