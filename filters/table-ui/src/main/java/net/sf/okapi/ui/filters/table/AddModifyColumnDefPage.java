@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.table;
+package net.sf.okapi.filters.table.ui;
 
 import java.util.Arrays;
 
