@@ -308,6 +308,21 @@
 			</fileset>
 		</copy>
 
+		<!-- locaweb -->
+		<copy todir="${dist}/localweb/devguide">
+			<fileset dir="../../website/devguide">
+				<exclude name="**/_*"/>
+				<exclude name="**/.*"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist}/localweb" file="../../website/okapi.css"/>
+		<!-- javadoc files -->
+		<javadoc destdir="${dist}/localweb/javadoc" Encoding="UTF-8">
+			<packageset dir="../../framework/core/src/main/java" defaultexcludes="yes"/>
+			<packageset dir="../../libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>			
+			<packageset dir="../../libraries/lib-translation/src/main/java" defaultexcludes="yes"/>			
+		</javadoc>
+
 	</target>
 
 	<!-- Make Tikal -->

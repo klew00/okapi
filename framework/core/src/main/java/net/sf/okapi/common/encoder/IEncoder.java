@@ -55,7 +55,7 @@ public interface IEncoder {
 	 * low surrogate part of the pair is done on the caller side.
 	 * @param codePoint the code-point to encode.
 	 * @param context the context of the character: 0=text, 1=skeleton, 2=inline.
-	 * @return the encoded character 9as a string since it can be now made up of
+	 * @return the encoded character (as a string since it can be now made up of
 	 * more than one character).
 	 */
 	public String encode (int codePoint, int context);
