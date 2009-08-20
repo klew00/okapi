@@ -300,6 +300,14 @@
 			</fileset>
 		</copy>
 
+		<!-- Copy help -->
+		<copy todir="${dist}/help">
+			<fileset dir="../../help">
+				<exclude name="**/applications/rainbow/**"/>
+				<exclude name="**/tutorials/**"/>
+			</fileset>
+		</copy>
+
 	</target>
 
 	<!-- Make Tikal -->

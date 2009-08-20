@@ -120,8 +120,10 @@ and the merged file will be <code>myFile.out.html</code>.</p>
 	</tr>
 </table>
 <p>For example:</p>
-<pre>tikal -m *.xlf</pre>
-<p>&nbsp;</p>
+<pre>tikal -m *.xlf -sl EN -tl DE</pre>
+<p>Merges all XLIFF documents in the directory. The original files should be in 
+the same directory as well. The source language is English and the target 
+language is German.</p>
 <h2><a name="query"></a>Query Translation Resources</h2>
 <p>This command queries one or more translation resources for a given text. By 
 default the query is sent to the <a href="http://www.google.com/language_tools">
@@ -174,14 +176,19 @@ http://localhost:8080</code> (the port by default is 8080). The source is
 English and the requested translation is Afrikaans.</p>
 <h2><a name="listConfig"></a>List Filter Configurations</h2>
 <p>This command lists all the filter configurations available for Tikal.</p>
-<p>This syntax of this command is:</p>
+<p>For example:</p>
 <pre>tikal -listconf</pre>
+<p>Lists all the configurations currently available.</p>
 <h2><a name="editConfig"></a>Edit Filter Configurations</h2>
-<p>TODO</p>
+<p>This command edits or view filter configurations.</p>
 <p>Note: This command requires access to UI editors that are available only if 
 you have one of the <b>okapi-apps</b> platform-specific distribution. It is not 
 available with the <b>okapi-lib</b> cross-platform distribution.</p>
-<p>&nbsp;</p>
+<p>For example:</p>
+<pre>tikal -e okf_regex@myConfig</pre>
+<p>Edits the filter configuration <code>okf_regex@myConfig</code>. This is a 
+user configuration for the Regex Filter. </p>
+
 <p>&nbsp;</p>
 
 </body>
