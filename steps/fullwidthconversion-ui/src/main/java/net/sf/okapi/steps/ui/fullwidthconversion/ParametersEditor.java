@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.ui.fullwidthconversion;
+package net.sf.okapi.steps.fullwidthconversion.ui;
 
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
