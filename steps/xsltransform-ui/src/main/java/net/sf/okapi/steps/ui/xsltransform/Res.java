@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ============================================================================*/
 
-package net.sf.okapi.steps.ui.xsltransform;
+package net.sf.okapi.steps.xsltransform.ui;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
