@@ -7,10 +7,10 @@
         <version>0.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>build-tests</artifactId>
-    <groupId>net.sf.okapi.tests</groupId>
+    <artifactId>build-test-utilities</artifactId>
+    <groupId>net.sf.okapi.testutilities</groupId>
     <packaging>pom</packaging>
-    <name>Okapi Testing Helpers</name>
+    <name>Okapi Testing utilities</name>
     <modules>
         <module>ui-harness</module>
     </modules>
