@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
     <name>Okapi Testing Helpers</name>
     <modules>
-        <module>okapi-ui-harness</module>
+        <module>ui-harness</module>
     </modules>
 
     <build>
