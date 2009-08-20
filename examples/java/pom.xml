@@ -14,6 +14,7 @@
     <modules>
         <module>example01</module>
         <module>example02</module>
+        <module>example03</module>
     </modules>
 
     <build>
