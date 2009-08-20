@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.steps.wordcount;
+package net.sf.okapi.steps.wordcount.ui;
 
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.steps.wordcount.common.Parameters;
