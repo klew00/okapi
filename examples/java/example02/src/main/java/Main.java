@@ -18,8 +18,6 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package example02;
-
 import java.io.File;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
