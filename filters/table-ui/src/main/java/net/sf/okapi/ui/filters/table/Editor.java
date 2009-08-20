@@ -28,7 +28,7 @@ import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
 import net.sf.okapi.filters.plaintext.common.CompoundParameters;
-import net.sf.okapi.ui.filters.plaintext.OptionsTab;
+import net.sf.okapi.filters.plaintext.ui.OptionsTab;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
