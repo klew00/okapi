@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.ui.filters.plaintext.tests;
+package net.sf.okapi.filters.plaintext.ui;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
