@@ -263,6 +263,13 @@
 		<replace file="${dist}/readme.html" token="@version@" value="${rainbowStamp}"/>
 		<replace file="${dist}/readme.html" token="@date@" value="${TODAY}"/>
 
+		<!-- Copy help -->
+		<copy todir="${dist}/help" overwrite="true">
+			<fileset dir="../../help">
+				<include name="**/applications/rainbow/**"/>
+			</fileset>
+		</copy>
+
 		<!-- Clean up -->
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>

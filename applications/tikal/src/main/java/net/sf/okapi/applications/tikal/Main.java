@@ -21,7 +21,9 @@
 package net.sf.okapi.applications.tikal;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.mt.google.GoogleMTConnector;
@@ -83,8 +86,12 @@ public class Main {
 			for ( int i=0; i<args.length; i++ ) {
 				String arg = args[i];
 				arg = arg.replace('/', '-'); // To allow /x syntax
-				if ( arg.equals("-h") || arg.equals("-?")) {
+				if ( arg.equals("-?") ) {
 					prog.printUsage();
+					return;
+				}
+				else if ( arg.equals("-h") ) {
+					prog.showHelp();
 					return;
 				}
 				else if ( arg.equals("-fc") ) {
@@ -432,9 +439,25 @@ public class Main {
 		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
 	
+	private void showHelp () {
+		//TODO: need to find a cross-platform web page launch call that is not SWT-dependent
+		URL url = getClass().getProtectionDomain().getCodeSource().getLocation();
+		String path = Util.getDirectoryName(Util.getDirectoryName(url.getPath()));
+		// Temporary solution 
+		path += "/help/applications/tikal/index.html"; //$NON-NLS-1$
+		try {
+			UIUtil.start(new File(path).toURL());
+		}
+		catch ( MalformedURLException e ) {
+			e.printStackTrace();
+		}
+	}
+	
 	private void printUsage () {
 		System.out.println("Show this help:");
-		System.out.println("   -h or -?");
+		System.out.println("   -?");
+		System.out.println("Open the user guide page:");
+		System.out.println("   -h");
 		System.out.println("List all available filter configurations:");
 		System.out.println("   -listconf");
 		System.out.println("Edit or view a filter configuration:");
