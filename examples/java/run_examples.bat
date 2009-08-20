@@ -1,9 +1,9 @@
-java -cp .;../../lib/okapi-lib.jar;example01.jar example01.Main myFile.html -s pseudo myFile.out-pseudo.html
-java -cp .;../../lib/okapi-lib.jar;example01.jar example01.Main myFile.html -s upper myFile.out-upper.html
-java -cp .;../../lib/okapi-lib.jar;example01.jar example01.Main myFile.html -s pseudo -s upper myFile.out-both.html
-java -cp .;../../lib/okapi-lib.jar;example01.jar example01.Main myFile.odt -s pseudo
-java -cp .;../../lib/okapi-lib.jar;example01.jar example01.Main myFile.properties -s pseudo
-java -cp .;../../lib/okapi-lib.jar;example01.jar example01.Main myFile.xml -s pseudo
+java -cp .;../lib/okapi-lib-0.3-SNAPSHOT.jar;example01/target/okapi-example-01-0.3-SNAPSHOT.jar Main myFile.html -s pseudo myFile.out-pseudo.html
+java -cp .;../lib/okapi-lib-0.3-SNAPSHOT.jar;example01/target/okapi-example-01-0.3-SNAPSHOT.jar Main myFile.html -s upper myFile.out-upper.html
+java -cp .;../lib/okapi-lib-0.3-SNAPSHOT.jar;example01/target/okapi-example-01-0.3-SNAPSHOT.jar Main myFile.html -s pseudo -s upper myFile.out-both.html
+java -cp .;../lib/okapi-lib-0.3-SNAPSHOT.jar;example01/target/okapi-example-01-0.3-SNAPSHOT.jar Main myFile.odt -s pseudo
+java -cp .;../lib/okapi-lib-0.3-SNAPSHOT.jar;example01/target/okapi-example-01-0.3-SNAPSHOT.jar Main myFile.properties -s pseudo
+java -cp .;../lib/okapi-lib-0.3-SNAPSHOT.jar;example01/target/okapi-example-01-0.3-SNAPSHOT.jar Main myFile.xml -s pseudo
 
 rem java -cp .;../../lib/okapi-lib.jar;example02.jar example02.Main myFile.odt
 

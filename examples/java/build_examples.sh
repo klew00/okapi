@@ -1,2 +1,2 @@
 #!/bin/bash
-ant
+mvn clean package -Dmaven.test.skip=true

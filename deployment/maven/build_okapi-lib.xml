@@ -138,19 +138,33 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/charlisting/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/common/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/copysourcetotarget/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/encodingconversion/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/fullwidthconversion/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/generatesimpletm/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/linebreakconversion/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/searchandreplace/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/generatesimpletm/target/classes"
-			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/segmentation/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/textmodification/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/tokenization/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/translationcomparison/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/uriconversion/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/wordcount/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/xsltransform/target/classes"
 			 excludes="**/META-INF/**"/>
 		</copy>
 		
