@@ -18,8 +18,6 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package example05;
-
 import java.util.Scanner;
 
 import net.sf.okapi.common.filterwriter.GenericContent;
