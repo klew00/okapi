@@ -1,6 +1,0 @@
-STRING_FILE_TABLE_START
-IdNumber1Action	"[Tèxt tõ èxtråçt, vår1=#!{varName1}.\n\nLìst:\n\n#![PG 0 1]·\tBüllèt ìtèm õñè.\n\n·\tBüllèt ìtèm twõ.]"	255 255 255	0x0000	50	182	710	560	18	Arial	1
-TextNoToTranslate	"Untranslatable text"	255 255 255	0x0011	0	0	40	20	18	Arial	0
-TextToTranslate2	"[á=ååçütè, Tråñslåtåblè tèxt 2]"	255 255 255	0x0011	0	0	40	20	18	Arial	1
-TextToTranslate3	"[Tråñslåtåblè tèxt 3]"	255 255 255	0x0011	0	0	40	20	18	Arial	1
-STRING_FILE_TABLE_END

@@ -4,7 +4,6 @@
 	<!--
 	This file build ratel.exe only. It should be run only when something changes in the .exe configuration or
 	for some reasons the .exe needs to be updated.
-	The built .exe is placed in data/win32-x86_nocopy and is under version control
 	This means the main ratel build can be done a) without installing launch4j and b) on non-Windows platforms.
 	-->
 
@@ -14,7 +13,7 @@
 			classname="net.sf.launch4j.ant.Launch4jTask"
 			classpath="${launch4j.dir}/launch4j.jar
 				:${launch4j.dir}/lib/xstream.jar" />
-		<launch4j configFile="./l4j_win_config.xml" />
+		<launch4j configFile="./l4j_ratel_config.xml" />
 	</target>
 	
 </project>

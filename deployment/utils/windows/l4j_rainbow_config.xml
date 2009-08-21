@@ -2,7 +2,7 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>lib\rainbow.jar</jar>
-  <outfile>data\win32-x86_nocopy\rainbow.exe</outfile>
+  <outfile>rainbow.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
@@ -12,7 +12,7 @@
   <customProcName>false</customProcName>
   <stayAlive>false</stayAlive>
   <manifest></manifest>
-  <icon>data\win32-x86_nocopy\rainbow.ico</icon>
+  <icon>rainbow.ico</icon>
   <classPath>
     <mainClass>net.sf.okapi.applications.rainbow.Main</mainClass>
     <cp>swt.jar</cp>

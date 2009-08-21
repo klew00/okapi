@@ -6,7 +6,10 @@ Deploying
 - trunk/deployment/shared/changes.html
 
 
---- 1) Make sure all unit tests pass (manual for now)
+--- 1) Make sure all unit tests pass
+
+Do a full rebuild of the Maven build:
+mvn clean install from /trunk
 
 
 --- 2) Make sure the following files have the proper version and release numbers for this release:
@@ -16,15 +19,15 @@ Deploying
 
 --- 3) Make also sure the readme files are up-to-date:
 
-- trunk/deployment/okapi-lib/data/readme.html
-- trunk/deployment/rainbow/data/readme.html
-- trunk/deployment/ratel/data/readme.html
+- trunk/deployment/maven/okapi-lib/readme.html
+- trunk/deployment/maven/okapi-apps/readme.html
 
 
---- 4) Run trunk/deployment/build.xml This will rebuild all distributions for all platforms.
+--- 4) Run trunk/deployment/build.xml
+This will rebuild all distributions for all platforms.
 
 
---- 5) Go to trunk/deployment/rainbow/tests and run the build.xml there. It runs the integration tests for Rainbow and exercises many of the components of the library.
+TO-UPDATE: --- 5) Go to trunk/deployment/rainbow/tests and run the build.xml there. It runs the integration tests for Rainbow and exercises many of the components of the library.
 
 The file _tests_results.txt shows any differences between the expected results and the curren ones. Note that some differences may be fine if they are coming from a fix or a new feature. Update the gold files if it is the case.
 

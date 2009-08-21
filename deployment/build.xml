@@ -7,9 +7,7 @@
 		</tstamp>
 		<echo message="Build started: ${start.timestamp}" />
 		
-		<ant dir="okapi-lib" />
-		<ant dir="rainbow" />
-		<ant dir="ratel" />
+		<ant dir="maven" />
 		<ant dir="website" />
 		
 		<tstamp>
