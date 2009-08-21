@@ -99,4 +99,5 @@ public class BOMNewlineEncodingDetectorTest {
 		detector2.detectBom();
 		assertFalse(detector2.hasBom());		
 	}
+	
 }
