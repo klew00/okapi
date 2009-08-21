@@ -309,6 +309,8 @@
 		<!-- Copy examples -->
 		<copy todir="${dist}/examples">
 			<fileset dir="../../examples/java">
+				<exclude name="**/.*"/>
+				<exclude name="**/.*/**"/>
 				<exclude name="**/target/classes/**"/>
 				<exclude name="**/target/maven-archiver/**"/>
 			</fileset>

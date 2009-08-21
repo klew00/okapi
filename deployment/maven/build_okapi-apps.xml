@@ -23,6 +23,9 @@
 	<condition property="swtdep" value="swt-cocoa-macosx">
 		<equals arg1="${platform}" arg2="cocoa-macosx"/>
 	</condition>
+	<condition property="swtdep" value="swt-carbon-macosx">
+		<equals arg1="${platform}" arg2="carbon-macosx"/>
+	</condition>
 	<condition property="swtdep" value="swt-gtk2-linux-x86">
 		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
 	</condition>
@@ -35,7 +38,10 @@
 		<equals arg1="${platform}" arg2="win32-x86"/>
 	</condition>
 	<condition property="building-mac">
-		<equals arg1="${platform}" arg2="cacoa-macosx"/>
+		<or>
+			<equals arg1="${platform}" arg2="cacoa-macosx"/>
+			<equals arg1="${platform}" arg2="carbon-macosx"/>
+		</or>
 	</condition>
 	<condition property="building-linux">
 		<or>
@@ -297,8 +303,6 @@
 	</target>
 
 	<target name="gzipAll" if="building-linux">
-<!--		<tar destfile="${done}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>-->
-		
 		<!--
 		TODO: Here we copy the dist dir to a new dir to match the name of the tar file
 		      we could build it directly into such a directory 

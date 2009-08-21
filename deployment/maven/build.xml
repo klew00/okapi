@@ -24,6 +24,9 @@
 		<ant antfile="build_okapi-apps.xml">
 			<property name="platform" value="cocoa-macosx"/>
 		</ant>
+		<ant antfile="build_okapi-apps.xml">
+			<property name="platform" value="carbon-macosx"/>
+		</ant>
 	</target>
 
 </project>
