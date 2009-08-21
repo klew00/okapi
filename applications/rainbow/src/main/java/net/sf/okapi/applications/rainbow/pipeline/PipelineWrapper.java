@@ -190,7 +190,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps..fullwidthconversion.ui.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.fullwidthconversion.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
 
