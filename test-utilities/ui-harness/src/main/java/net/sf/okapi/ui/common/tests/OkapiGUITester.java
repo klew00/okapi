@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.Text;
  * @version 0.1, 20.06.2009
  */
 
-public class Okapi_GUI_Tester {
+public class OkapiGUITester {
 
 	String[] GUI_CLASSES = new String[] {
 
@@ -116,7 +116,7 @@ public class Okapi_GUI_Tester {
 	 */
 	public static void main(String[] args) {
 		try {
-			Okapi_GUI_Tester window = new Okapi_GUI_Tester();
+			OkapiGUITester window = new OkapiGUITester();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -147,7 +147,7 @@ public class Okapi_GUI_Tester {
 		shell.setSize(576, 534);
 		shell.setText("Okapi GUI Tester");
 		
-		URL url = Okapi_GUI_Tester.class.getResource("Rainbow.png");
+		URL url = OkapiGUITester.class.getResource("Rainbow.png");
 		if (url == null) return;
 		
 		String root = Util.getDirectoryName(url.getPath());		
