@@ -242,6 +242,31 @@ public class PipelineWrapper {
 			}
 			map.put(step.id, step);
 
+			ps = (IPipelineStep)Class.forName(
+			"net.sf.okapi.steps.tokenization.TokenizationStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(),
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addEditor("net.sf.okapi.steps.tokenization.ui.ParametersEditor", step.paramsClass);
+			}
+			map.put(step.id, step);
+					
+
+			ps = (IPipelineStep)Class.forName(
+			"net.sf.okapi.steps.wordcount.WordCountStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(),
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addEditor("net.sf.okapi.steps.wordcount.ui.ParametersEditor", step.paramsClass);
+			}
+			map.put(step.id, step);
+					
 		}
 		catch ( InstantiationException e ) {
 			e.printStackTrace();

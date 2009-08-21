@@ -116,6 +116,12 @@ public class Main {
 				}
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
+					prog.specifiedConfigId = getArgument(args, ++i);
+					// Treat case of switch rather than config ID
+					if ( prog.specifiedConfigId.startsWith("-") ) {
+						i--;
+						prog.specifiedConfigId = null;
+					}
 				}
 				else if ( arg.equals("-q") ) {
 					prog.command = CMD_QUERYTRANS;
@@ -470,7 +476,7 @@ public class Main {
 		System.out.println("List all available filter configurations:");
 		System.out.println("   -listconf");
 		System.out.println("Edit or view a filter configuration:");
-		System.out.println("   -e [-fc configId]");
+		System.out.println("   -e [-fc] configId]");
 		System.out.println("Extract a file to XLIFF:");
 		System.out.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		System.out.println("      [-sl srcLang] [-tl trgLang]");
