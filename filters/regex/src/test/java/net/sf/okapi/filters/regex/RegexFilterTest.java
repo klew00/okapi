@@ -69,9 +69,12 @@ public class RegexFilterTest {
 		list.add(new InputDocument(root+"TestRules04.txt", "okf_regex@TestRules04.fprm"));
 		list.add(new InputDocument(root+"TestRules05.txt", "okf_regex@TestRules05.fprm"));
 		list.add(new InputDocument(root+"TestRules06.txt", "okf_regex@TestRules06.fprm")); 
-	
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+
+		list.clear();
+		list.add(new InputDocument(root+"TestFrenchISL.isl", "okf_regex@INI.fprm")); 
+		assertTrue(rtc.executeCompare(filter, list, "Windows-1252", "fr", "fr-ca"));
 	}
 
 	@Test
