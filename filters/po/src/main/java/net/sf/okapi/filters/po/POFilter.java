@@ -70,6 +70,7 @@ public class POFilter implements IFilter {
 	private static final String DOMAIN_SEP = "::";
 	private static final String DOMAIN_NONE = "messages";
 	private static final String DOMAIN_DEFAULT = "default";
+	private static final int DEFAULT_NPLURALS = 2;  // Default = "Germanic langauges" (per Gettext doc)
 
 	private static final int PLURALFORMS_VALUEGROUP = 3;
 	private static final Pattern pluralformsPattern = Pattern.compile(
@@ -104,9 +105,9 @@ public class POFilter implements IFilter {
 	private String srcLang;
 	private String trgLang;
 	private boolean hasUTF8BOM;
-	private int nbPlurals;
+	private int nPlurals;
 	private int level;
-	private int pluralMode;
+	private int pluralMode; // 0=not in a plural, 1=inside a plural, 2=closing a plural 
 	private int pluralCount;
 	private boolean readLine;
 	private String msgID;
@@ -205,7 +206,7 @@ public class POFilter implements IFilter {
 		canceled = false;
 
 		// Initializes the variables
-		nbPlurals = 0;
+		nPlurals = DEFAULT_NPLURALS;
 		tuId = 0;
 		otherId = 0;
 		pluralMode = 0;
@@ -476,13 +477,13 @@ public class POFilter implements IFilter {
 			// Check if we reached the last plural form
 			// Note that PO files have at least 2 plural entries even if nplural=1
 			pluralCount++;
-			switch ( nbPlurals ) {
+			switch ( nPlurals ) {
 			case 1:
 			case 2:
 				if ( pluralCount == 2 ) pluralMode = 2;
 				break;
 			default: // Above 2
-				if ( pluralCount == nbPlurals ) pluralMode = 2;
+				if ( pluralCount == nPlurals ) pluralMode = 2;
 				break;
 			}
 			// Then proceed as a normal entry
@@ -533,8 +534,8 @@ public class POFilter implements IFilter {
 				start = n2+1;
 			}
 			String end = tmp.substring(start).replace("\\n", "\\n\""+lineBreak+"\"");
+			// Remove last empty string if needed
 			if ( end.endsWith("\"\""+lineBreak) ) {
-				// Remove last empty string if needed
 				end = end.substring(0, end.length()-(2+lineBreak.length()));
 			}
 			skel.append(end);
@@ -611,7 +612,7 @@ public class POFilter implements IFilter {
 
 		// Translate flag should be set to no for no-0 case of 1-plural-type forms
 		// Should be true otherwise
-		if (( pluralMode != 0 ) && ( nbPlurals == 1 ) && ( pluralCount-1 > 0 )) {
+		if (( pluralMode != 0 ) && ( nPlurals == 1 ) && ( pluralCount-1 > 0 )) {
 			tu.setIsTranslatable(false);
 		}
 		// Else: it is TextUnit is translatable by default
@@ -791,7 +792,6 @@ public class POFilter implements IFilter {
 			else {
 				// Copy codes before text in code buffer
 				skel.append(textLine.substring(0, nPos1+1));
-				//TODO: make sure: The ending part is generated automatically when writing
 			}
 			// Copy text in text buffer
 			sbTmp.append(textLine.substring(nPos1+1, nPos2));
@@ -838,8 +838,6 @@ public class POFilter implements IFilter {
 	}
 
 	private TextFragment toAbstract (TextFragment frag) {
-		//TODO: Possibly, un-escaping, \n to line-breaks, etc.?
-
 		// Sets the inline codes
 		if ( params.useCodeFinder ) {
 			params.codeFinder.process(frag);
@@ -884,17 +882,22 @@ public class POFilter implements IFilter {
 				m = npluralsPattern.matcher(data);
 				if ( m.find() ) {
 					try {
-						nbPlurals = Integer.valueOf(m.group(NPLURALS_VALUEGROUP));
+						nPlurals = Integer.valueOf(m.group(NPLURALS_VALUEGROUP));
 					}
 					catch ( NumberFormatException e ) {
+						//TODO: If file not a POT, it may be an error, other wise it is normal
 						// The value was likely to be a place-holder
 						// Just swallow the error
-						nbPlurals = 0; // Make sure to reset to default
+						nPlurals = DEFAULT_NPLURALS; // Make sure to reset to default
+					}
+					if ( nPlurals < 0 ) {
+						nPlurals = DEFAULT_NPLURALS; // Make sure to reset to default
+						logger.warning(String.format(Res.getString("npluralsInvalid"), data, nPlurals));
 					}
 				}
 				else { // Missing nplurals field
-					logger.warning(String.format(Res.getString("npluralsNotDetected"), data));
-					nbPlurals = 0; // Make sure to reset to default
+					nPlurals = DEFAULT_NPLURALS; // Make sure to reset to default
+					logger.warning(String.format(Res.getString("npluralsNotDetected"), data, nPlurals));
 				}
 			}
 			// Else: no plural definition found, use default
