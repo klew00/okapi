@@ -73,7 +73,7 @@ public class POFilter implements IFilter {
 	private static final Pattern charsetPattern = Pattern.compile(
 		"(content-type)(\\s*?):(.*?)charset(\\s*?)=(\\s*?)(.*?)([\\\\|;|\\n])",
 		Pattern.CASE_INSENSITIVE);
-		
+			
 	private Parameters params;
 	private BufferedReader reader;
 	private boolean canceled;
@@ -497,6 +497,10 @@ public class POFilter implements IFilter {
 				part2 = tmp.substring(m.end(6))+"\""+lineBreak;
 			}
 			
+			//TODO: plural forms
+			
+			
+			
 			// Always reformat the lines for this entry
 			part1 = part1.replace("\\n", "\\n\""+lineBreak+"\"");
 			part2 = part2.replace("\\n", "\\n\""+lineBreak+"\"");
@@ -719,7 +723,14 @@ public class POFilter implements IFilter {
 			// Try to detect plural information
 			Matcher m = pluralPattern.matcher(tmp);
 			if ( m.find() ) {
-				nbPlurals = Integer.valueOf(m.group(3));
+				try {
+					nbPlurals = Integer.valueOf(m.group(3));
+				}
+				catch ( NumberFormatException e ) {
+					// The value was likely to be a place-holder
+					// Just swallow the error
+					nbPlurals = 0; // Make sure to reset to default
+				}
 			}
 			// Else: no plural definition found, use default
 
@@ -761,5 +772,5 @@ public class POFilter implements IFilter {
  			buffer = null;
  		}
  	}
- 
+
 }

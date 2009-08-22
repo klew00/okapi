@@ -69,6 +69,20 @@ public class POFilterTest {
 	}
 
 	@Test
+	public void testPluralFormAccess () {
+		assertEquals("nplurals=2; plural= n==1 or n%10==1 ? 0 : 1;",
+			PluralForms.getExpression("mk"));
+		assertEquals(4, PluralForms.getNumber("cy"));
+	}
+
+	@Test
+	public void testPluralFormDefaults () {
+		assertEquals("nplurals=2; plural=(n != 1);",
+			PluralForms.getExpression("not-a-valid-code"));
+		assertEquals(2, PluralForms.getNumber("not-a-valid-code"));
+	}
+
+	@Test
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"Test01.po", null),

@@ -31,6 +31,9 @@ public class Parameters extends BaseParameters {
 	public InlineCodeFinder codeFinder;
 	public LocalizationDirectives locDir;
 	public boolean makeID;
+	
+	// POFilterWriter option
+	public boolean wrapContent = true;
 
 	public Parameters () {
 		locDir = new LocalizationDirectives();

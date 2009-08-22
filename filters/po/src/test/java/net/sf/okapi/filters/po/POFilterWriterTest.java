@@ -60,6 +60,20 @@ public class POFilterWriterTest {
 		assertEquals(snippet, result);
 	}
 		
+	@Test
+	public void testOutputWithLinesWithWrap () {
+		String snippet = ""
+			+ "msgid \"\"\n"
+			+ "\"line1\\n\"\n"
+			+ "\"line2\\n\"\n"
+			+ "msgstr \"\"\n"
+			+ "\"line1trans\\n\"\n"
+			+ "\"line2trans\\n\"\n"
+			+ "\"line3trans\"\n";
+		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		assertEquals(snippet, result);
+	}
+		
 	private ArrayList<Event> getEvents(String snippet,
 		String srcLang,
 		String trgLang)

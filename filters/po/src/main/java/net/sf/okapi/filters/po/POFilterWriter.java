@@ -166,8 +166,11 @@ public class POFilterWriter implements IFilterWriter {
 	}
 
 	private void processStartDocument(Event event) {
+		StartDocument sd = (StartDocument)event.getResource();
 		// Create the output
-		createWriter((StartDocument)event.getResource());
+		createWriter(sd);
+		// Writer header
+		//TODO
 	}
 
 	private void processEndDocument () {
@@ -201,11 +204,34 @@ public class POFilterWriter implements IFilterWriter {
 
 	private void writeQuotedContent (TextContainer tc) {
 		try {
-			writer.write("\"");
-			if ( tc != null ) {
-				writer.write(tc.toString());
+			if ( tc == null ) {
+				writer.write("\"\"");
+				return;
 			}
-			writer.write("\"");
+
+			String tmp = tc.toString();
+			if ( !params.wrapContent || ( tmp.indexOf("\\n") == -1 )) {
+				writer.write("\"");
+				writer.write(tmp); // No wrapping needed
+				writer.write("\"");
+			}
+			else { // Wrap at "\n" markers
+				int n = 0;
+				int start = 0;
+				writer.write("\"\""); // First line is empty
+				while ( (n = tmp.indexOf("\\n", start)) > -1 ) {
+					n += 2;
+					writer.write(linebreak+"\"");
+					writer.write(tmp.substring(start, n));
+					writer.write("\"");
+					start = n;
+				}
+				if (( n == -1 ) && ( start < tmp.length() )) {
+					writer.write(linebreak+"\"");
+					writer.write(tmp.substring(start));
+					writer.write("\"");
+				}
+			}
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error writing a quoted text.", e);
