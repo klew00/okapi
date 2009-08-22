@@ -61,5 +61,17 @@
         	<version>0.3-SNAPSHOT</version>
         	<scope>compile</scope>
         </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.filters</groupId>
+        	<artifactId>okapi-filter-po</artifactId>
+        	<version>0.3-SNAPSHOT</version>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.filters</groupId>
+        	<artifactId>okapi-filter-po-ui</artifactId>
+        	<version>0.3-SNAPSHOT</version>
+        	<scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

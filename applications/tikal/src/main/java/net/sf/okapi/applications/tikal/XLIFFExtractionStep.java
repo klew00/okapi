@@ -27,10 +27,10 @@ import net.sf.okapi.common.resource.RawDocument;
 // Temporary extraction step. This should eventually be a normal step
 public class XLIFFExtractionStep {
 	
-	IFilter filter;
-	IFilterConfigurationMapper fcMapper;
-	XLIFFWriter writer;
-	String outputPath;
+	private IFilter filter;
+	private IFilterConfigurationMapper fcMapper;
+	private XLIFFWriter writer;
+	private String outputPath;
 	
 	public XLIFFExtractionStep (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;

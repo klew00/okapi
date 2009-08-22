@@ -33,6 +33,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
@@ -60,6 +61,84 @@ public class POFilterTest {
 	}
 
 	@Test
+	public void testPOHeader () {
+		String snippet = "msgid \"\"\r"
+			+ "msgstr \"\"\r"
+			+ "\"Project-Id-Version: PACKAGE VERSION\\n\"\r"
+			+ "\"Report-Msgid-Bugs-To: \\n\"\r"
+			+ "\"POT-Creation-Date: 2009-03-25 15:39-0700\\n\"\r"
+			+ "\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"\r"
+			+ "\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"\r"
+			+ "\"Language-Team: LANGUAGE <LL@li.org>\\n\"\r"
+			+ "\"MIME-Version: 1.0\\n\"\r"
+			+ "\"Content-Type: text/plain; charset=UTF-8\\n\"\r"
+			+ "\"Content-Transfer-Encoding: 8bit\\n\"\r"
+			+ "\"Plural-Forms: nplurals=2; plural=(n!=1);\\n\"\r\r"
+			+ "msgid \"Text\"\r"
+			+ "msgstr \"Texte\"\r";
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, "en", "fr"), 1);
+		assertNotNull(dp);
+
+		Property prop = dp.getProperty(Property.ENCODING);
+		assertNotNull(prop);
+		assertEquals("UTF-8", prop.getValue());
+		assertFalse(prop.isReadOnly());
+
+		prop = dp.getProperty(POFilter.PROPERTY_PLURALFORMS);
+		assertNotNull(prop);
+		assertEquals("nplurals=2; plural=(n!=1);", prop.getValue());
+		assertFalse(prop.isReadOnly());
+		
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
+		assertEquals(snippet, result);
+	}
+
+
+	@Test
+	public void testPOTHeader () {
+		String snippet = "msgid \"\"\n"
+			+ "msgstr \"\"\n"
+			+ "\"Project-Id-Version: PACKAGE VERSION\\n\"\n"
+			+ "\"Report-Msgid-Bugs-To: \\n\"\n"
+			+ "\"POT-Creation-Date: 2009-03-25 15:39-0700\\n\"\n"
+			+ "\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"\n"
+			+ "\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"\n"
+			+ "\"Language-Team: LANGUAGE <LL@li.org>\\n\"\n"
+			+ "\"MIME-Version: 1.0\\n\"\n"
+			+ "\"Content-Type: text/plain; charset=ENCODING\\n\"\n"
+			+ "\"Content-Transfer-Encoding: 8bit\\n\"\n"
+			+ "msgid \"Text\"\n"
+			+ "msgstr \"\"\n";
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, "en", "fr"), 1);
+		assertNotNull(dp);
+
+		Property prop = dp.getProperty(Property.ENCODING);
+		assertNotNull(prop);
+		assertEquals("ENCODING", prop.getValue());
+		assertFalse(prop.isReadOnly());
+
+		prop = dp.getProperty(POFilter.PROPERTY_PLURALFORMS);
+		assertNull(prop);
+	}
+
+	@Test
+	public void testHeaderNoNPlurals () {
+		String snippet = "msgid \"\"\n"
+			+ "msgstr \"\"\n"
+			+ "\"MIME-Version: 1.0\\n\"\n"
+			+ "\"Content-Type: text/plain; charset=ENCODING\\n\"\n"
+			+ "\"Content-Transfer-Encoding: 8bit\\n\"\n"
+			+ "\"Plural-Forms: nplurzzzals=2; plural=(n!=1);\\n\"\n\n"
+			+ "msgid \"Text\"\n"
+			+ "msgstr \"\"\n";
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, "en", "fr"), 1);
+		assertNotNull(dp);
+		// We should also get a warning about the nplurals field missing
+		Property prop = dp.getProperty(POFilter.PROPERTY_PLURALFORMS);
+		assertNotNull(prop);
+	}
+
+	@Test
 	public void testDefaultInfo () {
 		assertNotNull(filter.getParameters());
 		assertNotNull(filter.getName());
@@ -77,7 +156,7 @@ public class POFilterTest {
 
 	@Test
 	public void testPluralFormDefaults () {
-		assertEquals("nplurals=2; plural=(n != 1);",
+		assertEquals("nplurals=2; plural=(n!=1);",
 			PluralForms.getExpression("not-a-valid-code"));
 		assertEquals(2, PluralForms.getNumber("not-a-valid-code"));
 	}
@@ -90,10 +169,10 @@ public class POFilterTest {
 	}
 	
 	@Test
-	public void testOuputOptionLine_JustFormat () {
-		String snippet = "#, c-format\n"
-			+ "msgid \"Text 1\"\n"
-			+ "msgstr \"Texte 1\"\n";
+	public void testOuputOptionLine_JustFormatWithMacLB () {
+		String snippet = "#, c-format\r"
+			+ "msgid \"Text 1\"\r"
+			+ "msgstr \"Texte 1\"\r";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
 		assertEquals(result, snippet);
 	}
@@ -189,13 +268,13 @@ public class POFilterTest {
 		assertEquals("Comment", prop.getValue());
 		assertTrue(prop.isReadOnly());
 		
-		assertTrue(tu.hasProperty("references"));
-		prop = tu.getProperty("references");
+		assertTrue(tu.hasProperty(POFilter.PROPERTY_REFERENCES));
+		prop = tu.getProperty(POFilter.PROPERTY_REFERENCES);
 		assertEquals("Reference", prop.getValue());
 		assertTrue(prop.isReadOnly());
 
-		assertTrue(tu.hasProperty("transnote"));
-		prop = tu.getProperty("transnote");
+		assertTrue(tu.hasProperty(POFilter.PROPERTY_TRANSNOTE));
+		prop = tu.getProperty(POFilter.PROPERTY_TRANSNOTE);
 		assertEquals("Translator note", prop.getValue());
 		assertTrue(prop.isReadOnly());
 	}
@@ -260,7 +339,7 @@ public class POFilterTest {
 		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
 		assertEquals(snippet, result);
 	}
-		
+
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory

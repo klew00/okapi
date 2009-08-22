@@ -42,15 +42,15 @@ public class XLIFFMergingStep {
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
-	IFilter filter;
-	IFilterWriter writer;
-	IFilterConfigurationMapper fcMapper;
-	XLIFFFilter xlfReader;
-	String xliffPath;
-	String outputPath;
-	String outputEncoding;
-	String srcLang;
-	String trgLang;
+	private IFilter filter;
+	private IFilterWriter writer;
+	private IFilterConfigurationMapper fcMapper;
+	private XLIFFFilter xlfReader;
+	private String xliffPath;
+	private String outputPath;
+	private String outputEncoding;
+	private String srcLang;
+	private String trgLang;
 	
 	public XLIFFMergingStep (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;

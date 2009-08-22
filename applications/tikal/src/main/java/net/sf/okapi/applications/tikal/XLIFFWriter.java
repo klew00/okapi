@@ -112,7 +112,7 @@ public class XLIFFWriter implements IFilterWriter {
 	}
 
 	public void setOutput (OutputStream output) {
-		// TODO Auto-generated method stub
+		// TODO: implement stream
 	}
 
 	public void setParameters (IParameters params) {

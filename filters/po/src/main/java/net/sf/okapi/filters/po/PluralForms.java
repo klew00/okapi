@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
 public class PluralForms {
 	
 	private static final String BUNDLE_NAME = "net.sf.okapi.filters.po.PluralForms";
-	private static final String DEFAULT_EXP = "nplurals=2; plural=(n != 1);";
+	private static final String DEFAULT_EXP = "nplurals=2; plural=(n!=1);";
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
 		.getBundle(BUNDLE_NAME);
@@ -36,7 +36,7 @@ public class PluralForms {
 
 	public static String getExpression (String langCode) {
 		try {
-			return RESOURCE_BUNDLE.getString(langCode);
+			return RESOURCE_BUNDLE.getString(langCode.toLowerCase());
 		}
 		catch ( MissingResourceException e ) {
 			return DEFAULT_EXP; // Default fall-back
@@ -46,7 +46,7 @@ public class PluralForms {
 	public static int getNumber (String langCode) {
 		String tmp;
 		try {
-			tmp = RESOURCE_BUNDLE.getString(langCode);
+			tmp = RESOURCE_BUNDLE.getString(langCode.toLowerCase());
 		}
 		catch ( MissingResourceException e ) {
 			tmp = DEFAULT_EXP; // Default fall-back

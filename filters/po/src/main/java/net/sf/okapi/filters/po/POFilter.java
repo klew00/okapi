@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,18 +63,31 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  */
 public class POFilter implements IFilter {
 
+	public static final String PROPERTY_PLURALFORMS = "pluralforms";
+	public static final String PROPERTY_TRANSNOTE = "transnote";
+	public static final String PROPERTY_REFERENCES = "references";
+	
 	private static final String DOMAIN_SEP = "::";
 	private static final String DOMAIN_NONE = "messages";
 	private static final String DOMAIN_DEFAULT = "default";
 
-	private static final Pattern pluralPattern = Pattern.compile(
-		"nplurals(\\s*?)=(\\s*?)(\\d*?)([\\\\|;|\\n])",
+	private static final int PLURALFORMS_VALUEGROUP = 3;
+	private static final Pattern pluralformsPattern = Pattern.compile(
+		"(plural-forms:)(\\s*)(.*?)(\\\\n|\\z)",
 		Pattern.CASE_INSENSITIVE);
 
+	private static final int NPLURALS_VALUEGROUP = 4;
+	private static final Pattern npluralsPattern = Pattern.compile(
+		"nplurals(\\s*)(=)(\\s*)(\\d*)(;|\\\\n|\\z)",
+		Pattern.CASE_INSENSITIVE);
+
+	private static final int CHARSET_VALUEGROUP = 6;
 	private static final Pattern charsetPattern = Pattern.compile(
-		"(content-type)(\\s*?):(.*?)charset(\\s*?)=(\\s*?)(.*?)([\\\\|;|\\n])",
+		"(content-type)(\\s*):(.*?)charset(\\s*)=(\\s*)(.*?)([\\\\|;|\\n])",
 		Pattern.CASE_INSENSITIVE);
 			
+	private final Logger logger = Logger.getLogger(getClass().getName());
+
 	private Parameters params;
 	private BufferedReader reader;
 	private boolean canceled;
@@ -478,6 +492,163 @@ public class POFilter implements IFilter {
 		}
 
 		// Get the message string
+		StringBuilder tmp = new StringBuilder(getQuotedString(false));
+		
+		// Check for header entry, and update it if required
+		if ( msgID.length() == 0 ) {
+			// Initialize the header and its string
+			String id = String.valueOf(++otherId);
+			DocumentPart dp = new DocumentPart(id, false, skel);
+			tmp.insert(0, "\""+lineBreak+"\"");
+			tmp.append("\""+lineBreak);
+			String TMPMARKER = "\u001E";
+
+			// Look for encoding field
+			Matcher m = charsetPattern.matcher(tmp.toString());
+			if ( m.find() ) { // prepare for property creation
+				tmp.replace(m.start(CHARSET_VALUEGROUP), m.end(CHARSET_VALUEGROUP),
+					TMPMARKER + Property.ENCODING + "=" + encoding + TMPMARKER);
+			}
+			// Look for plural form field
+			m = pluralformsPattern.matcher(tmp.toString());
+			if ( m.find() ) { // prepare for property creation
+				tmp.replace(m.start(PLURALFORMS_VALUEGROUP), m.end(PLURALFORMS_VALUEGROUP),
+					TMPMARKER + PROPERTY_PLURALFORMS + "=" + m.group(PLURALFORMS_VALUEGROUP) + TMPMARKER);
+			}
+
+			// Loop through the inserted properties, create them and add to the skeleton
+			int start = 0;
+			int n1, n2, mid;
+			while ( (n1 = tmp.indexOf(TMPMARKER, start)) > -1 ) {
+				n2 = tmp.indexOf(TMPMARKER, n1+1);
+				// Text before
+				skel.append(tmp.substring(start, n1).replace("\\n", "\\n\""+lineBreak+"\""));
+				String data = tmp.substring(n1+1, n2);
+				mid = data.indexOf('=');
+				// Create property
+				Property prop = new Property(data.substring(0, mid),
+					data.substring(mid+1), false);
+				dp.setProperty(prop);
+				skel.addValuePlaceholder(dp, prop.getName(), "");
+				start = n2+1;
+			}
+			String end = tmp.substring(start).replace("\\n", "\\n\""+lineBreak+"\"");
+			if ( end.endsWith("\"\""+lineBreak) ) {
+				// Remove last empty string if needed
+				end = end.substring(0, end.length()-(2+lineBreak.length()));
+			}
+			skel.append(end);
+
+			// Send this entry as a document part
+			return new Event(EventType.DOCUMENT_PART, dp);
+		}
+
+		// Else: We have a text unit to send
+		// Create it if it was not done yet
+		if ( tu == null ) tu = new TextUnit(null);
+		// Set the ID and other info
+		tu.setId(String.valueOf(++tuId));
+		tu.setPreserveWhitespaces(true);
+		tu.setSkeleton(skel);
+		//TODO: Need to adjust for each format
+		tu.setMimeType(getMimeType());
+		
+		if ( locNote.length() > 0 ) {
+			tu.setProperty(new Property(Property.NOTE, locNote));
+		}
+		if ( transNote.length() > 0 ) {
+			tu.setProperty(new Property(PROPERTY_TRANSNOTE, transNote));
+		}
+		if ( references.length() > 0 ) {
+			tu.setProperty(new Property(PROPERTY_REFERENCES, references));
+		}
+
+		// Set the text and possibly its translation
+		// depending on the processing mode
+		if ( params.bilingualMode ) {
+			String sID = msgID;
+			if (( pluralMode != 0 ) && ( pluralCount-1 > 0 )) {
+				sID = msgIDPlural;
+			}
+			// Add the source text and parse it
+			toAbstract(tu.setSourceContent(new TextFragment(sID)));
+			// Create an ID if requested
+			if ( params.makeID ) {
+				// Note we always use msgID for resname, not msgIDPlural
+				if ( pluralMode == 0 ) {
+					tu.setName(Util.makeID(domain+DOMAIN_SEP+msgID));
+				}
+				else {
+					tu.setName(Util.makeID(domain+DOMAIN_SEP+msgID)
+						+ String.format("-%d", pluralCount-1));
+				}
+			}
+			// Set the translation if one exists
+			if ( tmp.length() > 0 ) {
+				TextContainer tc = tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
+				tc.setContent(toAbstract(new TextFragment(tmp.toString())));
+				if ( !hasFuzzyFlag ) {
+					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", true));
+				}
+				// Synchronizes source and target codes as much as possible
+				tc.synchronizeCodes(tu.getSourceContent());
+			}
+			//else { // Correct the approved property
+			//	tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");
+			//}
+		}
+		else { // Parameters.MODE_MONOLINGUAL
+			if ( pluralMode == 0 ) {
+				tu.setName(domain+DOMAIN_SEP+msgID);
+			}
+			else {
+				tu.setName(domain+DOMAIN_SEP+msgID
+					+ String.format("-%d", pluralCount-1));
+			}
+			// Add the source and parse it 
+			toAbstract(tu.setSourceContent(new TextFragment(tmp.toString())));
+		}
+
+		// Translate flag should be set to no for no-0 case of 1-plural-type forms
+		// Should be true otherwise
+		if (( pluralMode != 0 ) && ( nbPlurals == 1 ) && ( pluralCount-1 > 0 )) {
+			tu.setIsTranslatable(false);
+		}
+		// Else: it is TextUnit is translatable by default
+
+		skel.addContentPlaceholder(tu, trgLang);
+		skel.append("\""+lineBreak);
+		
+		return new Event(EventType.TEXT_UNIT, tu);
+	}
+
+/* Copy before Aug-22-09 changes
+	private Event processMsgStr () {
+		// Check for plural form
+		if ( textLine.indexOf("msgstr[") == 0 ) {
+			// Check if we are indeed in plural mode
+			if ( pluralMode == 0 ) {
+				throw new OkapiIllegalFilterOperationException(Res.getString("extraPluralMsgStr"));
+			}
+			// Check if we reached the last plural form
+			// Note that PO files have at least 2 plural entries even if nplural=1
+			pluralCount++;
+			switch ( nbPlurals ) {
+			case 1:
+			case 2:
+				if ( pluralCount == 2 ) pluralMode = 2;
+				break;
+			default: // Above 2
+				if ( pluralCount == nbPlurals ) pluralMode = 2;
+				break;
+			}
+			// Then proceed as a normal entry
+		}
+		else if ( pluralMode != 0 ) {
+			throw new OkapiIllegalFilterOperationException(Res.getString("missingPluralMsgStr"));
+		}
+
+		// Get the message string
 		String tmp = getQuotedString(false);
 		
 		// Check for header entry, and update it if required
@@ -498,8 +669,6 @@ public class POFilter implements IFilter {
 			}
 			
 			//TODO: plural forms
-			
-			
 			
 			// Always reformat the lines for this entry
 			part1 = part1.replace("\\n", "\\n\""+lineBreak+"\"");
@@ -601,7 +770,8 @@ public class POFilter implements IFilter {
 		
 		return new Event(EventType.TEXT_UNIT, tu);
 	}
-		
+*/		
+	
 	private String getQuotedString (boolean forMsgID) {
 		StringBuilder  sbTmp = new StringBuilder();
 		try {
@@ -663,7 +833,6 @@ public class POFilter implements IFilter {
 			}
 		}
 		catch ( Throwable e ) {
-			//LogMessage(LogType.ERROR, E.Message + "\n" + E.StackTrace);
 			throw new OkapiIllegalFilterOperationException(Res.getString("problemWithQuotes"));
 		}
 	}
@@ -708,27 +877,23 @@ public class POFilter implements IFilter {
 	 		reader.reset();
 	 		String tmp = new String(buffer);  
 
-	 		// try to detect the line-break type
-/*Done by rawdoc			n = tmp.indexOf('\n');
-			if ( n == -1 ) {
-				n = tmp.indexOf('\r');
-				if ( n != -1 ) lineBreak = "\r";
-				// Else: cannot detect, use default
-			}
-			else {
-				if ( tmp.charAt(n-1) != '\r' ) lineBreak = "\n";
-				// Else: same as default
-			}
-*/	 		
 			// Try to detect plural information
-			Matcher m = pluralPattern.matcher(tmp);
+			Matcher m = pluralformsPattern.matcher(tmp);
 			if ( m.find() ) {
-				try {
-					nbPlurals = Integer.valueOf(m.group(3));
+				String data = m.group(PLURALFORMS_VALUEGROUP);
+				m = npluralsPattern.matcher(data);
+				if ( m.find() ) {
+					try {
+						nbPlurals = Integer.valueOf(m.group(NPLURALS_VALUEGROUP));
+					}
+					catch ( NumberFormatException e ) {
+						// The value was likely to be a place-holder
+						// Just swallow the error
+						nbPlurals = 0; // Make sure to reset to default
+					}
 				}
-				catch ( NumberFormatException e ) {
-					// The value was likely to be a place-holder
-					// Just swallow the error
+				else { // Missing nplurals field
+					logger.warning(String.format(Res.getString("npluralsNotDetected"), data));
 					nbPlurals = 0; // Make sure to reset to default
 				}
 			}
@@ -737,14 +902,14 @@ public class POFilter implements IFilter {
 			// Try to detect encoding information
 			m = charsetPattern.matcher(tmp);
 			if ( m.find() ) {
-				if ( m.group(6).equalsIgnoreCase("charset") ) {
+				if ( m.group(CHARSET_VALUEGROUP).equalsIgnoreCase("charset") ) {
 					// POT may have 'charset' for encoding:
 					// We ignore it and use the auto-detected or default encoding
 					// Use the encoding already set
 					return false;
 				}
 				if ( autoDetected ) {
-					if ( !encoding.equalsIgnoreCase(m.group(6)) ) {
+					if ( !encoding.equalsIgnoreCase(m.group(CHARSET_VALUEGROUP)) ) {
 						// Difference between auto-detected and internal
 						// Auto-detected wins
 						//TODO: Warning that the internal encoding may be wrong!
@@ -753,7 +918,7 @@ public class POFilter implements IFilter {
 				}
 				else { // No auto-detection before
 					// Compare with the default
-					if ( !encoding.equalsIgnoreCase(m.group(6)) ) {
+					if ( !encoding.equalsIgnoreCase(m.group(CHARSET_VALUEGROUP)) ) {
 						// Internal wins over default
 						encoding = m.group(6);
 						// And we need to re-open the reader with the new encoding

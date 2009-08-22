@@ -736,6 +736,28 @@ public class FilterTestDriver {
 		return null;
 	}
 
+	/**
+	 * Gets the Nth document part found in the given list of events.
+	 * 
+	 * @param list
+	 *            The list of events
+	 * @param tuNumber
+	 *            The number of the document part to return: 1 for the first one, 2 for
+	 *            the second, etc.
+	 * @return The document part found, or null.
+	 */
+	public static DocumentPart getDocumentPart(ArrayList<Event> list, int dpNumber) {
+		int n = 0;
+		for (Event event : list) {
+			if (event.getEventType() == EventType.DOCUMENT_PART) {
+				if (++n == dpNumber) {
+					return (DocumentPart)event.getResource();
+				}
+			}
+		}
+		return null;
+	}
+
 	public static boolean compareTextUnit (TextUnit tu1,
 		TextUnit tu2)
 	{
