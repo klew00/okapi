@@ -342,7 +342,7 @@ public class XLIFFFilter implements IFilter {
 				skel.append(reader.getText().replace("\n", lineBreak));
 				break;
 			case XMLStreamConstants.CHARACTERS: //TODO: escape unsupported chars
-				skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.escapeGT, null));
+				skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.getEscapeGT(), null));
 				break;
 				
 			case XMLStreamConstants.COMMENT:
@@ -442,7 +442,7 @@ public class XLIFFFilter implements IFilter {
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 				reader.getAttributeLocalName(i));
 			skel.append(String.format(" %s=\"%s\"", attrName,
-				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.escapeGT, null)));
+				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
 			if ( attrName.equals("xml:space") ) {
 				ps = reader.getAttributeValue(i).equals("preserve");
 			}
@@ -489,7 +489,7 @@ public class XLIFFFilter implements IFilter {
 			
 			tmp = reader.getAttributeValue("", "resname");
 			if ( tmp != null ) tu.setName(tmp);
-			else if ( params.fallbackToID ) {
+			else if ( params.getFallbackToID() ) {
 				tu.setName(tu.getId());
 			}
 
@@ -571,7 +571,7 @@ public class XLIFFFilter implements IFilter {
 						}
 					}
 					//TODO: escape unsupported chars
-					skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.escapeGT, null));
+					skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.getEscapeGT(), null));
 					break;
 					
 				case XMLStreamConstants.COMMENT:
@@ -739,7 +739,7 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.SPACE:
 					current.append(reader.getText());
 					if ( store ) { //TODO: escape unsupported chars
-						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+						skel.append(Util.escapeToXML(reader.getText(), 0, params.getEscapeGT(), null));
 					}
 					break;
 		
@@ -992,9 +992,9 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
 					innerCode.append(reader.getText());//TODO: escape unsupported chars
-					outerCode.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+					outerCode.append(Util.escapeToXML(reader.getText(), 0, params.getEscapeGT(), null));
 					if ( store ) //TODO: escape unsupported chars
-						skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+						skel.append(Util.escapeToXML(reader.getText(), 0, params.getEscapeGT(), null));
 					break;
 				}
 			}
@@ -1037,7 +1037,7 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE: //TODO: escape unsupported chars
-					skel.append(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
+					skel.append(Util.escapeToXML(reader.getText(), 0, params.getEscapeGT(), null));
 					tmp.append(reader.getText());
 					break;
 				case XMLStreamConstants.END_ELEMENT:
@@ -1088,7 +1088,7 @@ public class XLIFFFilter implements IFilter {
 		// Get resname (can be null)
 		tmp = reader.getAttributeValue("", "resname");
 		if ( tmp != null ) group.setName(tmp);
-		else if ( params.fallbackToID ) {
+		else if ( params.getFallbackToID() ) {
 			group.setName(reader.getAttributeValue("", "id"));
 		}
 
@@ -1127,7 +1127,7 @@ public class XLIFFFilter implements IFilter {
 		// Get id for resname
 		tmp = reader.getAttributeValue("", "resname");
 		if ( tmp != null ) group.setName(tmp);
-		else if ( params.fallbackToID ) {
+		else if ( params.getFallbackToID() ) {
 			group.setName(reader.getAttributeValue("", "id"));
 		}
 

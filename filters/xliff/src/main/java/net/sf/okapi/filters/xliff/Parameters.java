@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,21 +21,70 @@
 package net.sf.okapi.filters.xliff;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
-	protected boolean useStateValues;
-	protected boolean extractOnlyMatchingValues;
-	protected String stateValues;
-	protected boolean extractNoState;
-	protected boolean fallbackToID;
-	protected boolean escapeGT;
+	private boolean useStateValues;
+	private boolean extractOnlyMatchingValues;
+	private String stateValues;
+	private boolean extractNoState;
+	private boolean fallbackToID;
+	private boolean escapeGT;
 
 	public Parameters () {
 		reset();
 		toString(); // fill the list
 	}
 	
+	public boolean getUseStateValues () {
+		return useStateValues;
+	}
+
+	public void setUseStateValues (boolean useStateValues) {
+		this.useStateValues = useStateValues;
+	}
+
+	public boolean getExtractOnlyMatchingValues () {
+		return extractOnlyMatchingValues;
+	}
+
+	public void setExtractOnlyMatchingValues (boolean extractOnlyMatchingValues) {
+		this.extractOnlyMatchingValues = extractOnlyMatchingValues;
+	}
+
+	public String getStateValues () {
+		return stateValues;
+	}
+
+	public void setStateValues (String stateValues) {
+		this.stateValues = stateValues;
+	}
+
+	public boolean getExtractNoState () {
+		return extractNoState;
+	}
+
+	public void setExtractNoState (boolean extractNoState) {
+		this.extractNoState = extractNoState;
+	}
+
+	public boolean getEscapeGT () {
+		return escapeGT;
+	}
+
+	public void setEscapeGT (boolean escapeGT) {
+		this.escapeGT = escapeGT;
+	}
+
+	public boolean getFallbackToID() {
+		return fallbackToID;
+	}
+
+	public void setFallbackToID(boolean fallbackToID) {
+		this.fallbackToID = fallbackToID;
+	}
+
 	public void reset () {
 		useStateValues = true;
 		stateValues = "new|needs-translation";
@@ -63,9 +112,17 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
 		buffer.setString("stateValues", stateValues);
 		buffer.setBoolean("extractNoState", extractNoState);
+		
 		buffer.setBoolean("fallbackToID", fallbackToID);
 		buffer.setBoolean("escapeGT", escapeGT);
 		return buffer.toString();
 	}
 	
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add("fallbackToID", "Use the trans-unit id attribute for the text unit name if there is no resname", null);
+		desc.add("escapeGT", "Escape the greater-than characters", null);
+		return desc;
+	}
 }
