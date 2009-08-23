@@ -282,6 +282,7 @@
 		<!-- Remove parts that were for the okapi-lib distribution -->
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${dist}/localweb"/>
+			<fileset dir="${dist}/examples"/>
 		</delete>
 
 		<!-- Clean up -->

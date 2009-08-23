@@ -316,6 +316,12 @@
 			</fileset>
 		</copy>
 
+		<!-- Copy config -->
+		<copy todir="${dist}/config">
+			<fileset dir="../shared/config">
+			</fileset>
+		</copy>
+
 		<!-- Copy help -->
 		<copy todir="${dist}/help">
 			<fileset dir="../../help">
