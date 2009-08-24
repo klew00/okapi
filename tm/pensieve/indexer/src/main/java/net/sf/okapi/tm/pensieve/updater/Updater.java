@@ -3,12 +3,12 @@
  * and open the template in the editor.
  */
 
-package net.sf.okapi.tm.pensieve.searcher;
+package net.sf.okapi.tm.pensieve.updater;
 
 /**
  *
  * @author HaslamJD
  */
-public interface Searcher {
+public interface Updater {
 
 }

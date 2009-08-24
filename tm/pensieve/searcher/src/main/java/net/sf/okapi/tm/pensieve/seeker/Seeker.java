@@ -3,12 +3,12 @@
  * and open the template in the editor.
  */
 
-package net.sf.okapi.tm.pensieve.indexer;
+package net.sf.okapi.tm.pensieve.seeker;
 
 /**
  *
  * @author HaslamJD
  */
-public interface Indexer {
+public interface Seeker {
 
 }

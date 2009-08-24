@@ -7,6 +7,6 @@
     <groupId>net.sf.okapi.tm.pensieve</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>  
-  <artifactId>searcher</artifactId>
-  <name>Okapi TM Pensieve Searcher</name>
+  <artifactId>okapi-tm-pensieve-seeker</artifactId>
+  <name>Okapi Pensieve TM Seeker</name>
 </project>
