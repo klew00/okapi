@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Pensieve TM Searcher
-Bundle-SymbolicName: net.sf.okapi.tm.pensieve.searcher
+Bundle-Name: Pensieve TM Seeker
+Bundle-SymbolicName: net.sf.okapi.tm.pensieve.seeker
 Bundle-Version: 0.0.1-SNAPSHOT
-Export-Package: net.sf.okapi.tm.pensieve.searcher
+Export-Package: net.sf.okapi.tm.pensieve.seeker
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
