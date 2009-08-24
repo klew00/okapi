@@ -27,11 +27,8 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
-		EditorDescription desc = new EditorDescription("XLIFF Filter", true, false);
-		
+		EditorDescription desc = new EditorDescription("XLIFF Filter Parameters", true, false);
 		desc.addCheckboxPart(paramDesc.get("fallbackToID"));
-
-		// Output
 		desc.addCheckboxPart(paramDesc.get("escapeGT"));
 		return desc;
 	}

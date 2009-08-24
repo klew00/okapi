@@ -247,8 +247,7 @@ public class FilterConfigurationsPanel extends Composite {
 			IParametersEditor editor = mapper.createConfigurationEditor(config.configId, cachedFilter);
 			IParameters params = mapper.getParameters(config, cachedFilter);
 	
-			// Call the editor
-			if ( editor == null ) {
+			if ( editor == null ) { // If no dedicated editor if found
 				// Try to see if we can edit with the generic editor
 				IEditorDescriptionProvider descProv = mapper.getDescriptionProvider(params.getClass().getCanonicalName());
 				if ( descProv != null ) {
@@ -256,10 +255,8 @@ public class FilterConfigurationsPanel extends Composite {
 					// Edit the data
 					if ( !genEditor.edit(params, descProv, !config.custom, context) ) return; // Cancel
 					// The params object gets updated if edit not canceled.
-					return;
 				}
-				else {
-					// Else: fall back to the plain text editor
+				else { // Else: fall back to the plain text editor
 					InputDialog dlg  = new InputDialog(getShell(),
 						String.format(Res.getString("FilterConfigurationsPanel.editParamsCaption"), config.configId), //$NON-NLS-1$
 						Res.getString("FilterConfigurationsPanel.paramsLabel"), //$NON-NLS-1$
@@ -272,7 +269,7 @@ public class FilterConfigurationsPanel extends Composite {
 					params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
-			else {
+			else { // Edit using the dedicated editor
 				if ( !editor.edit(params, !config.custom, context) ) return; // Cancel
 			}
 			// Don't try to save pre-defined parameters
