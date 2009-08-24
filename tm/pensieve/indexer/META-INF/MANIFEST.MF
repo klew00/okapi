@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Pensieve TM Indexer
+Bundle-SymbolicName: net.sf.okapi.tm.pensieve.indexer
+Bundle-Version: 0.0.1-SNAPSHOT
+Export-Package: net.sf.okapi.tm.pensieve.indexer
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
