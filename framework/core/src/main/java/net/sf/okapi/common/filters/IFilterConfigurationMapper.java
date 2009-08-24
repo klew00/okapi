@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.IParametersEditorMapper;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 
 /**
@@ -41,7 +42,7 @@ import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
  * {@link #getCustomParameters(FilterConfiguration, IFilter)}, and
  * {@link #saveCustomParameters(FilterConfiguration, IParameters)}.
  */
-public interface IFilterConfigurationMapper {
+public interface IFilterConfigurationMapper extends IParametersEditorMapper {
 
 	/**
 	 * Adds a new configuration to this mapper.
@@ -136,7 +137,7 @@ public interface IFilterConfigurationMapper {
 	 * and could not.
 	 * @throws OkapiEditorCreationException if the editor could not be created.
 	 */
-	public IParametersEditor createParametersEditor (String configId,
+	public IParametersEditor createConfigurationEditor (String configId,
 		IFilter existingFilter);
 	
 	/**
@@ -150,7 +151,7 @@ public interface IFilterConfigurationMapper {
 	 * and could not.
 	 * @throws OkapiEditorCreationException if the editor could not be created.
 	 */
-	public IParametersEditor createParametersEditor (String configId);
+	public IParametersEditor createConfigurationEditor (String configId);
 	
 	/**
 	 * Gets the FilterConfiguration object for a given configuration identifier.

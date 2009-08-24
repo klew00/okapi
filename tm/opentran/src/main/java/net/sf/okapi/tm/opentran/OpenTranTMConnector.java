@@ -177,7 +177,7 @@ public class OpenTranTMConnector implements ITMQuery {
 		// Not used with this connector
 	}
 
-	public int getMaximunHits () {
+	public int getMaximumHits () {
 		return maxHits;
 	}
 

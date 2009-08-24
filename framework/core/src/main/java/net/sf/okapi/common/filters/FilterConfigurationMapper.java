@@ -35,7 +35,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ParametersEditorMapper;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 
 /**
@@ -237,12 +236,11 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return params;
 	}
 	
-	@Override
-	public IParametersEditor createParametersEditor (String configId) {
-		return createParametersEditor(configId, null);
+	public IParametersEditor createConfigurationEditor (String configId) {
+		return createConfigurationEditor(configId, null);
 	}
 	
-	public IParametersEditor createParametersEditor (String configId,
+	public IParametersEditor createConfigurationEditor (String configId,
 		IFilter existingFilter)
 	{
 		FilterConfiguration fc = configMap.get(configId);
@@ -256,28 +254,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			return null; // This filter does not have parameters
 		}
 		
-		// Lookup the editor class based on the parameters class
-		String editorClass = editorMap.get(params.getClass().getName());
-		if ( editorClass == null ) return null;
-		
-		// Else: instantiate the editor
-		IParametersEditor editor = null;
-		try {
-			editor = (IParametersEditor)Class.forName(editorClass).newInstance();
-		}
-		catch ( InstantiationException e ) {
-			throw new OkapiEditorCreationException(
-				String.format("Cannot instantiate the editor '%s'", editorClass), e);
-		}
-		catch ( IllegalAccessException e ) {
-			throw new OkapiEditorCreationException(
-				String.format("Cannot instantiate the editor '%s'", editorClass), e);
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new OkapiEditorCreationException(
-				String.format("Cannot instantiate the editor '%s'", editorClass), e);
-		}
-		return editor;
+		return createParametersEditor(params.getClass().getName());
 	}
 
 	public FilterConfiguration getConfiguration (String configId) {

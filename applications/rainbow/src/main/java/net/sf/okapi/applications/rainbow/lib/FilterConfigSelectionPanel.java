@@ -297,7 +297,7 @@ public class FilterConfigSelectionPanel extends Composite {
 			FilterConfiguration config = mapper.getConfiguration(configId);
 			if ( config == null ) return;
 			cachedFilter = mapper.createFilter(config.configId, cachedFilter);
-			IParametersEditor editor = mapper.createParametersEditor(config.configId, cachedFilter);
+			IParametersEditor editor = mapper.createConfigurationEditor(config.configId, cachedFilter);
 			IParameters params = mapper.getParameters(config, cachedFilter);
 			
 			// Call the editor

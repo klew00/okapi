@@ -356,7 +356,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 		this.threshold = threshold; 
 	}
 
-	public int getMaximunHits () {
+	public int getMaximumHits () {
 		return maxHits;
 	}
 

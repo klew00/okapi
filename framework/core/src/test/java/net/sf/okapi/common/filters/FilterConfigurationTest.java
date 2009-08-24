@@ -144,7 +144,7 @@ public class FilterConfigurationTest {
 		// Add it to the mapper
 		fcm.addEditor(editorClass, params.getClass().getName());
 		// Try to instantiate the editor object
-		IParametersEditor editor = fcm.createParametersEditor(configId);
+		IParametersEditor editor = fcm.createConfigurationEditor(configId);
 		assertNotNull("Editor should have been created.", editor);
 		assertEquals("Editor class name.", editorClass, editor.getClass().getName());
 	}

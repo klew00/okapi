@@ -31,6 +31,8 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.genericeditor.GenericEditor;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -64,6 +66,7 @@ public class FilterConfigurationsPanel extends Composite {
 	private IFilter cachedFilter;
 	private IContext context;
 	private String configEditorClass;
+	private GenericEditor genEditor;
 
 	/**
 	 * Creates a FilterConfigurationsPanel object for a given parent with a given style.
@@ -241,25 +244,36 @@ public class FilterConfigurationsPanel extends Composite {
 				table.getItem(n).getText(FilterConfigurationsTableModel.ID_COLINDEX));
 			if ( config == null ) return;
 			cachedFilter = mapper.createFilter(config.configId, cachedFilter);
-			IParametersEditor editor = mapper.createParametersEditor(config.configId, cachedFilter);
+			IParametersEditor editor = mapper.createConfigurationEditor(config.configId, cachedFilter);
 			IParameters params = mapper.getParameters(config, cachedFilter);
 	
 			// Call the editor
 			if ( editor == null ) {
-				// Properties-like editing
-				InputDialog dlg  = new InputDialog(getShell(),
-					String.format(Res.getString("FilterConfigurationsPanel.editParamsCaption"), config.configId), //$NON-NLS-1$
-					Res.getString("FilterConfigurationsPanel.paramsLabel"), //$NON-NLS-1$
-					params.toString(), null, 0, 200, 600);
-				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
-				String data = dlg.showDialog();
-				if ( data == null ) return;
-				if ( !config.custom ) return; // Don't save pre-defined parameters
-				data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
+				// Try to see if we can edit with the generic editor
+				IEditorDescriptionProvider descProv = mapper.getDescriptionProvider(params.getClass().getCanonicalName());
+				if ( descProv != null ) {
+					if ( genEditor == null ) genEditor = new GenericEditor();
+					// Edit the data
+					if ( !genEditor.edit(params, descProv, !config.custom, context) ) return; // Cancel
+					// The params object gets updated if edit not canceled.
+					return;
+				}
+				else {
+					// Else: fall back to the plain text editor
+					InputDialog dlg  = new InputDialog(getShell(),
+						String.format(Res.getString("FilterConfigurationsPanel.editParamsCaption"), config.configId), //$NON-NLS-1$
+						Res.getString("FilterConfigurationsPanel.paramsLabel"), //$NON-NLS-1$
+						params.toString(), null, 0, 200, 600);
+					dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
+					String data = dlg.showDialog();
+					if ( data == null ) return; // Cancel
+					if ( !config.custom ) return; // Don't save pre-defined parameters
+					data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 			}
 			else {
-				if ( !editor.edit(params, !config.custom, context) ) return;
+				if ( !editor.edit(params, !config.custom, context) ) return; // Cancel
 			}
 			// Don't try to save pre-defined parameters
 			if ( !config.custom ) return;

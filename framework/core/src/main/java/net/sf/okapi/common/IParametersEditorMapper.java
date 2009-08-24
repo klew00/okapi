@@ -75,7 +75,7 @@ public interface IParametersEditorMapper {
 
 	/**
 	 * Creates an instance of the parameters editor for a given parameters class name. 
-	 * @param parametersClass the parameters class name to use for look-up.
+	 * @param parametersClass the parameters class name to use for lookup.
 	 * @return a new IParametersEditor object for the given
 	 * class name, or null if no editor is available or if
 	 * the object could not be created.
@@ -83,6 +83,11 @@ public interface IParametersEditorMapper {
 	 */
 	public IParametersEditor createParametersEditor (String parametersClass);
 	
+	/**
+	 * Gets an object that can provide the UI description to use with a generic editor. 
+	 * @param parametersClass the name of the class for which to get the description provider.
+	 * @return an editor description provider or null if none is set for this class.
+	 */
 	public IEditorDescriptionProvider getDescriptionProvider (String parametersClass);
 
 }

@@ -36,7 +36,7 @@ public interface ITMQuery extends IQuery {
 	 * Gets the current maximum number of hits to retrieve.
 	 * @return the current maximum number of hits to retrieve.
 	 */
-	public int getMaximunHits ();
+	public int getMaximumHits ();
 	
 	/**
 	 * Sets the threshold value to use for the query.

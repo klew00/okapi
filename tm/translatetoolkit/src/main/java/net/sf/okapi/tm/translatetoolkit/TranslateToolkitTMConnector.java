@@ -164,7 +164,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		// Not used with this connector
 	}
 
-	public int getMaximunHits () {
+	public int getMaximumHits () {
 		return maxHits;
 	}
 

@@ -44,6 +44,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * Default dialog box for maintaining an {@link FilterConfigurationMapper} object.
+ */
 public class FilterConfigurationsDialog {
 
 	private Shell shell;
@@ -54,7 +57,13 @@ public class FilterConfigurationsDialog {
 	private Text edParamsFolder;
 	private Button btGetParamsFolder;
 
-	
+	/**
+	 * Creates a new FilterConfigurationsDialog object.
+	 * @param parent the parent shell for this dialog box (can be null).
+	 * @param selectionMode true to have a 'Select' button instead of 'Close'.
+	 * @param mapper filter configuration mapper object to edit.
+	 * @param helpParam help context (can be null).
+	 */
 	public FilterConfigurationsDialog (Shell parent,
 		boolean selectionMode,
 		FilterConfigurationMapper mapper,
@@ -158,6 +167,11 @@ public class FilterConfigurationsDialog {
 		}
 	}
 
+	/**
+	 * Opens this dialog box.
+	 * @param configId the identifier of the configuration to select (can be null).
+	 * @return the identifier of the selected configuration, or null if none is selected.
+	 */
 	public String showDialog (String configId) {
 		pnlConfigs.setConfiguration(configId);
 		shell.open();
@@ -169,7 +183,7 @@ public class FilterConfigurationsDialog {
 	}
 
 	/**
-	 * Updates the custom configurations mapper and the list.
+	 * Updates the custom configurations directory and its custom configurations list.
 	 */
 	public void updateCustomConfigurations () {
 		// Re-load custom configurations

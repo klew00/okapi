@@ -136,7 +136,7 @@ public class SimpleTMConnector implements ITMQuery {
 		db.exportToTMX(outputPath, srcLang, trgLang);
 	}
 
-	public int getMaximunHits () {
+	public int getMaximumHits () {
 		return maxHits;
 	}
 

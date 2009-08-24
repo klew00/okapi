@@ -312,7 +312,7 @@ public class Main {
 		}
 		fcMapper.addEditor(editClass, params.getClass().getName());
 		
-		IParametersEditor editor = fcMapper.createParametersEditor(configId);
+		IParametersEditor editor = fcMapper.createConfigurationEditor(configId);
 		if ( editor != null ) {
 			editor.edit(params, !config.custom, new BaseContext());
 		}
