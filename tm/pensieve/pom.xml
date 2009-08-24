@@ -24,8 +24,8 @@
     </repositories>
 
     <modules>
-        <module>indexer</module>
-        <module>searcher</module>
+        <module>updater</module>
+        <module>seeker</module>
     </modules>
     
     <dependencies>
