@@ -30,9 +30,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.DefaultFilenameFilter;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ParametersEditorMapper;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 
@@ -40,20 +42,71 @@ import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
  * Default implementation of the {@link IFilterConfigurationMapper} interface.
  * In this implementation the custom configurations are stored as simple files in the file system
  * of the machine and the value for {@link FilterConfiguration#parametersLocation} for a custom
- * configuration is the path or filename of the parameters file.
+ * configuration is filename of the parameters file. The directory where the files are
+ * located is defined with the {@link #setCustomConfigurationsDirectory(String)}.
  */
 public class FilterConfigurationMapper extends ParametersEditorMapper implements IFilterConfigurationMapper {
+
+	/**
+	 * Extension of the custom configuration files of this mapper.
+	 */
+	public static final String CONFIGFILE_EXT = ".fprm";
+	/**
+	 * Character used to separate the filter name from the custom configuration name
+	 * in a custom configuration identifier for this mapper. 
+	 */
+	public static final char CONFIGFILE_SEPARATOR = '@';
 
 	private static final Logger LOGGER = Logger.getLogger(FilterConfigurationMapper.class.getName());
 
 	private LinkedHashMap<String, FilterConfiguration> configMap;
+	private String customParmsDir;
+	private IFilter tmpFilter;
+	
 	
 	/**
-	 * Creates a new FilterConfigurationMapper object with no mappings.
+	 * Splits a configuration identifier into a filter and 
+	 * @param configId the configuration identifier to split.
+	 * @return an array of two strings: 0=filter (e.g. "okf_xml", 1=parameter info (or null).
+	 */
+	static public String[] splitFilterFromConfiguration (String configId) {
+		String[] res = new String[2];
+		// Get the filter
+		int n  = configId.indexOf(CONFIGFILE_SEPARATOR);
+		if ( n == -1 ) {
+			// Try '-' then
+			n = configId.indexOf('-');
+			if ( n == -1 ) {
+				// Try '_'
+				n = configId.indexOf('_');
+				if ( n == -1 ) {
+					res[0] = configId;
+					return res; // The filter is the configID (default case)
+				}
+				else { // Check for "okf_" case
+					if ( configId.substring(0, n).equals("okf") ) {
+						n = configId.indexOf('_', n+1);
+						if ( n == -1 ) {
+							res[0] = configId;
+							return res; // The filter is the configID (default case) 
+						}
+					}
+				}
+			}
+		}
+		res[0] = configId.substring(0, n);
+		res[1] = configId.substring(n+1);
+		return res;
+	}
+	
+	/**
+	 * Creates a new FilterConfigurationMapper object with no mappings and the
+	 * custom configuration directory set to the current directory.
 	 */
 	public FilterConfigurationMapper () {
 		super();
 		configMap = new LinkedHashMap<String, FilterConfiguration>();
+		setCustomConfigurationsDirectory(Util.getDirectoryName((new File(".")).getAbsolutePath()));
 	}
 
 	public void addConfigurations (String filterClass) {
@@ -63,21 +116,22 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			filter = (IFilter)Class.forName(filterClass).newInstance();
 		}
 		catch ( InstantiationException e ) {
-			throw new OkapiFilterCreationException(
-				String.format("Cannot instantiate the filter '%s'.", filterClass), e);
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
+			return;
 		}
 		catch ( IllegalAccessException e ) {
-			throw new OkapiFilterCreationException(
-				String.format("Cannot instantiate the filter '%s'.", filterClass), e);
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
+			return;
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new OkapiFilterCreationException(
-				String.format("Cannot instantiate the filter '%s'.", filterClass), e);
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
+			return;
 		}
 		// Get the available configurations for this filter
 		List<FilterConfiguration> list = filter.getConfigurations();
 		if (( list == null ) || ( list.size() == 0 )) {
 			LOGGER.warning(String.format("No configuration provided for '%s'", filterClass));
+			return;
 		}
 		// Add the configurations to the mapper
 		for ( FilterConfiguration config : list ) {
@@ -306,35 +360,48 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		}
 
 		// Load the provided parameter file
-		// In this implementation we assume it is in the current directory
-		File file = new File(config.parametersLocation);
+		// In this implementation the file is stored in a given directory
+		File file = new File(customParmsDir + config.parametersLocation);
 		params.load(file.toURI(), false);
 		return params;
 	}
 
 	public void deleteCustomParameters (FilterConfiguration config) {
-		// In this implementation we assume it is in the current directory
-		File file = new File(config.parametersLocation);
+		// In this implementation the file is stored in a given directory
+		File file = new File(customParmsDir + config.parametersLocation);
 		file.delete();
 	}
 
 	public void saveCustomParameters (FilterConfiguration config,
 		IParameters params)
 	{
-		// In this implementation we assume it is in the current directory
-		params.save(config.parametersLocation);
+		// In this implementation the file is stored in a given directory
+		File file = new File(customParmsDir + config.parametersLocation);
+		params.save(file.getAbsolutePath());
 	}
 
 	public FilterConfiguration createCustomConfiguration (FilterConfiguration baseConfig) {
 		// Create the new configuration and set its members as a copy of the base
 		FilterConfiguration newConfig = new FilterConfiguration();
-		newConfig.configId = String.format("%s-Copy", baseConfig.configId);
-		newConfig.name = String.format("Copy of %s", baseConfig.name);
+		String[] res = splitFilterFromConfiguration(baseConfig.configId);
+		if ( res == null ) { // Cannot create the configuration because of ID 
+			return null;
+		}
+		
 		newConfig.custom = true;
+		if ( res[1] == null ) {
+			newConfig.configId = String.format("%s%ccopy-of-default",
+				res[0], CONFIGFILE_SEPARATOR);
+		}
+		else {
+			newConfig.configId = String.format("%s%ccopy-of-%s",
+				res[0], CONFIGFILE_SEPARATOR, res[1]);
+		}
+		newConfig.name = String.format(newConfig.configId);
 		newConfig.description = "";
 		newConfig.filterClass = baseConfig.filterClass;
 		newConfig.mimeType = baseConfig.mimeType;
-		newConfig.parametersLocation = newConfig.configId;
+		newConfig.parametersLocation = newConfig.configId + CONFIGFILE_EXT;
 		
 		// Instantiate a filter and set the new parameters based on the base ones
 		IFilter filter = instantiateFilter(baseConfig, null);
@@ -344,7 +411,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		// Make sure to reset the path, the save function should set it
 		newParams.setPath(null);
 		return newConfig;
-	}
+	}	
 
 	public void clearConfigurations (boolean customOnly) {
 		if ( customOnly ) {
@@ -361,7 +428,68 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			configMap.clear();
 		}
 	}
+
+	/**
+	 * Gets the directory where the custom configuration files are stored.
+	 * @return the directory where the custom configuration files are stored.
+	 */
+	public String getCustomConfigurationsDirectory () {
+		return customParmsDir;
+	}
 	
+	/**
+	 * Sets the directory where the custom configuration files are stored.
+	 * You should call {@link #updateCustomConfigurations()} after this to
+	 * update the list of the custom configurations in this mapper.
+	 * @param dir the new directory where the custom configuration files are stored.
+	 */
+	public void setCustomConfigurationsDirectory (String dir) {
+		customParmsDir = dir;
+		if ( !dir.endsWith(File.separator) ) {
+			customParmsDir += File.separator;
+		}
+	}
+	
+	public void addCustomConfiguration (String configId) {
+		FilterConfiguration fc;
+		fc = new FilterConfiguration();
+		fc.custom = true;
+		fc.configId = configId;
+		
+		// Get the filter
+		String[] res = splitFilterFromConfiguration(fc.configId);
+		if ( res == null ) { // Cannot found the filter in the ID
+			//TODO: Maybe a warning?
+			return;
+		}
+		// Create the filter (this assumes the base-name is the default config ID)
+		tmpFilter = createFilter(res[0], tmpFilter);
+		if ( tmpFilter == null ) return;
+		
+		// Set the data
+		fc.parametersLocation = fc.configId + CONFIGFILE_EXT;
+		fc.filterClass = tmpFilter.getClass().getName();
+		fc.mimeType = tmpFilter.getMimeType();
+		fc.description = "Configuration for "+fc.configId; // Temporary
+		fc.name = fc.configId; // Temporary
+		addConfiguration(fc);
+	}
+	
+	/**
+	 * Updates the custom configurations for this mapper. This should
+	 * be called if the custom configurations directory has changed.
+	 */
+	public void updateCustomConfigurations () {
+		File dir = new File(customParmsDir);
+		String res[] = dir.list(new DefaultFilenameFilter(CONFIGFILE_EXT));
+		clearConfigurations(true); // Only custom configurations
+		if ( res == null ) return;
+		
+		for ( int i=0; i<res.length; i++ ) {
+			addCustomConfiguration(Util.getFilename(res[i], false));
+		}
+	}
+
 	/**
 	 * Instantiate a filter from a given configuration, trying to re-use an existing one.
 	 * @param config the configuration corresponding to the filter to load.

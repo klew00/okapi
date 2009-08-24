@@ -38,6 +38,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.mt.google.GoogleMTConnector;
@@ -116,11 +117,10 @@ public class Main {
 				}
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
-					prog.specifiedConfigId = getArgument(args, ++i);
-					// Treat case of switch rather than config ID
-					if ( prog.specifiedConfigId.startsWith("-") ) {
-						i--;
-						prog.specifiedConfigId = null;
+					if ( args.length > i+1 ) {
+						if ( !args[i+1].startsWith("-") ) {
+							prog.specifiedConfigId = args[++i];
+						}
 					}
 				}
 				else if ( arg.equals("-q") ) {
@@ -157,7 +157,12 @@ public class Main {
 				return;
 			}
 			if ( prog.command == CMD_EDITCONFIG ) {
-				prog.editConfiguration();
+				if ( prog.specifiedConfigId == null ) {
+					prog.editAllConfigurations();
+				}
+				else {
+					prog.editConfiguration();
+				}
 				return;
 			}
 			if ( prog.command == CMD_QUERYTRANS ) {
@@ -267,6 +272,20 @@ public class Main {
 		return id;
 	}
 	
+	private void editAllConfigurations () {
+		initialize();
+		// Add all the pre-defined configurations
+		for ( String className : filtersMap.values() ) {
+			fcMapper.addConfigurations(className);
+		}
+		// Add the custom configurations
+		fcMapper.updateCustomConfigurations();
+		
+		// Edit
+		FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(null, false, fcMapper, null);
+		dlg.showDialog(specifiedConfigId);
+	}
+	
 	private void editConfiguration () {
 		initialize();
 		
@@ -299,8 +318,7 @@ public class Main {
 		}
 		else {
 			throw new RuntimeException(String.format(
-				"Cannot create the parameters editor for '%s'.",
-				configId));
+				"Cannot create the parameters editor for '%s'.", configId));
 		}
 	}
 	
@@ -309,6 +327,7 @@ public class Main {
 		for ( String className : filtersMap.values() ) {
 			fcMapper.addConfigurations(className);
 		}
+
 		System.out.println("List of all filter configurations available:");
 		Iterator<FilterConfiguration> iter = fcMapper.getAllConfigurations();
 		FilterConfiguration config;
@@ -332,6 +351,7 @@ public class Main {
 		for ( String tmp : filtersMap.keySet() ) {
 			if ( configId.startsWith(tmp) ) {
 				fcMapper.addConfigurations(filtersMap.get(tmp));
+				fcMapper.addCustomConfiguration(configId);
 				return true;
 			}
 		}
@@ -475,8 +495,8 @@ public class Main {
 		System.out.println("   -h");
 		System.out.println("List all available filter configurations:");
 		System.out.println("   -listconf");
-		System.out.println("Edit or view a filter configuration:");
-		System.out.println("   -e [-fc] configId]");
+		System.out.println("Edit or view filter configurations (UI-dependent command):");
+		System.out.println("   -e [[-fc] configId]");
 		System.out.println("Extract a file to XLIFF:");
 		System.out.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		System.out.println("      [-sl srcLang] [-tl trgLang]");

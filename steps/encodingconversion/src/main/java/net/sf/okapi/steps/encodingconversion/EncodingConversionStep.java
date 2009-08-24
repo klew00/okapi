@@ -182,7 +182,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			isXML = false;
 			isHTML = false;
 			String ext = Util.getExtension(getContext().getRawDocument(0).getInputURI().getPath());
-			if ( ext != null ) {
+			if ( Util.isEmpty(ext) ) {
 				isHTML = (ext.toLowerCase().indexOf(".htm")==0);
 				isXML = ext.equalsIgnoreCase(".xml");
 			}

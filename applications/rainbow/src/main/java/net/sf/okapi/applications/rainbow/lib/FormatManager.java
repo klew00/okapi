@@ -23,6 +23,8 @@ package net.sf.okapi.applications.rainbow.lib;
 import java.util.Hashtable;
 import java.util.Map;
 
+import net.sf.okapi.common.Util;
+
 public class FormatManager {
 
 	Map<String, String> pairs;
@@ -79,7 +81,7 @@ public class FormatManager {
 	public String[] guessFormat (String p_sPath) {
 		String[] aRes = new String[2];
 		aRes[0] = Utils.detectEncoding(p_sPath);
-		String sExt = Utils.getExtension(p_sPath).toLowerCase();
+		String sExt = Util.getExtension(p_sPath).toLowerCase();
 		aRes[1] = pairs.get(sExt);
 		return aRes;
 	}

@@ -86,7 +86,7 @@ public class Main {
 			
 			// Detect the file to use
 			String ext = Util.getExtension(inputPath);
-			if ( ext == null ) throw new RuntimeException("No filter detected for the file extension.");
+			if ( Util.isEmpty(ext) ) throw new RuntimeException("No filter detected for the file extension.");
 			ext = ext.substring(1); // No dot.
 			String mimeType = MimeTypeMapper.getMimeType(ext);
 			FilterConfiguration cfg = fcMapper.getDefaultConfiguration(mimeType);

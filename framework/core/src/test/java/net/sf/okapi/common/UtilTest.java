@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
@@ -161,7 +162,7 @@ public class UtilTest {
 	@Test
 	public void testGetExtension_None () {
 		String in = "myFile";
-		assertNull(Util.getExtension(in));
+		assertEquals("", Util.getExtension(in));
 	}
 
 	@Test
@@ -169,7 +170,7 @@ public class UtilTest {
 		String in = "myFile.";
 		assertEquals(".", Util.getExtension(in));
 	}
-
+	
 	@Test
 	public void testSplitLanguageCode () {
 		String in = "en";

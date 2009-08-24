@@ -17,7 +17,7 @@
  >Filter for regular-expression parsing on text-based files.</filter>
   
  <filter id="okf_xliff"
-  name="(BETA) XLIFF Filter"
+  name="XLIFF Filter"
   inputFilterClass="net.sf.okapi.filters.xliff.XLIFFFilter"
  >Filter for XML Localisation Interchange File Format (XLIFF) documents.</filter>
   

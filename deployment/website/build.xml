@@ -16,8 +16,10 @@
 			</fileset>
 		</copy>
 		<replace file="${dist}/downloads.html" token="@okapilibVersion@" value="${okapilibVersion}"/>
+		<replace file="${dist}/downloads.html" token="@okapiappsVersion@" value="${okapiappsVersion}"/>
 		<replace file="${dist}/downloads.html" token="@rainbowVersion@" value="${rainbowVersion}"/>
 		<replace file="${dist}/downloads.html" token="@ratelVersion@" value="${ratelVersion}"/>
+		<replace file="${dist}/downloads.html" token="@tikalVersion@" value="${tikalVersion}"/>
 		
 		
 		<copy todir="${dist}/help">
@@ -28,13 +30,11 @@
 		</copy>
 		
 		<mkdir dir="${dist}/javadoc"/>
+		<!-- javadoc files -->
 		<javadoc destdir="${dist}/javadoc" Encoding="UTF-8">
-			<packageset dir="../../common/net.sf.okapi.common/src" defaultexcludes="yes"/>
-			<packageset dir="../../common/net.sf.okapi.filters.common/src" defaultexcludes="yes"/>
-			<packageset dir="../../common/net.sf.okapi.pipeline/src" defaultexcludes="yes"/>
-			<packageset dir="../../steps/net.sf.okapi.steps.common/src" defaultexcludes="yes"/>
-			<packageset dir="../../libraries/net.sf.okapi.lib.segmentation/src" defaultexcludes="yes"/>			
-			<packageset dir="../../libraries/net.sf.okapi.lib.translation/src" defaultexcludes="yes"/>			
+			<packageset dir="../../framework/core/src/main/java" defaultexcludes="yes"/>
+			<packageset dir="../../libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>			
+			<packageset dir="../../libraries/lib-translation/src/main/java" defaultexcludes="yes"/>			
 		</javadoc>
 
 	</target>

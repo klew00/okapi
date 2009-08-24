@@ -113,7 +113,7 @@ public class Util {
 	 *            List of the characters to trim.
 	 * @return The trimmed string.
 	 */
-	static public String trimEnd(String text, String chars) {
+	static public String trimEnd (String text, String chars) {
 		if (text == null)
 			return text;
 		int n = text.length() - 1;
@@ -145,7 +145,7 @@ public class Util {
 	 * @return The directory name (without the final separator), or an empty
 	 *         string if path is a filename.
 	 */
-	static public String getDirectoryName(String path) {
+	static public String getDirectoryName (String path) {
 		String tmp = path.replace('\\', '/'); // Normalize separators (some path are mixed)
 		int n = tmp.lastIndexOf('/'); // Try generic first
 //		if (n == -1) { // Then try Windows
@@ -166,7 +166,7 @@ public class Util {
 	 *            "c:\project\tmp\"). The path can be a URL path (e.g.
 	 *            "/C:/test/file.ext").
 	 */
-	static public void createDirectories(String path) {
+	static public void createDirectories (String path) {
 		String tmp = path.replace('\\', '/'); // Normalize separators (some path are mixed)
 		int n = tmp.lastIndexOf('/'); // Try generic first
 //		if (n == -1) { // Then try Windows
@@ -195,7 +195,11 @@ public class Util {
 	 *            character, or null to never escape normal characters.
 	 * @return The escaped string.
 	 */
-	static public String escapeToXML(String text, int quoteMode, boolean escapeGT, CharsetEncoder encoder) {
+	static public String escapeToXML (String text,
+		int quoteMode,
+		boolean escapeGT,
+		CharsetEncoder encoder)
+	{
 		if (text == null)
 			return "";
 		StringBuffer sbTmp = new StringBuffer(text.length());
@@ -278,7 +282,11 @@ public class Util {
 	 *            Encoder to use for the extended characters.
 	 * @return The input string escaped to RTF.
 	 */
-	static public String escapeToRTF(String text, boolean convertLineBreaks, int lineBreakStyle, CharsetEncoder encoder) {
+	static public String escapeToRTF (String text,
+		boolean convertLineBreaks,
+		int lineBreakStyle,
+		CharsetEncoder encoder)
+	{
 		try {
 			if (text == null)
 				return "";
@@ -432,7 +440,9 @@ public class Util {
 	 *            - output {@link File}
 	 * @throws OkapiIOException
 	 */
-	public static void copy(InputStream is, File outputFile) {
+	public static void copy (InputStream is,
+		File outputFile)
+	{
 		copy(is, outputFile.getAbsolutePath());
 	}
 
@@ -475,7 +485,9 @@ public class Util {
 	 *            - output File
 	 * @throws OkapiIOException
 	 */
-	public static void copyFile(File in, File out) {
+	public static void copyFile (File in,
+		File out)
+	{
 		FileChannel inChannel = null;
 		FileChannel outChannel = null;
 		try {
@@ -507,7 +519,10 @@ public class Util {
 	 *            True to move the file, false to copy it.
 	 * @throws OkapiIOException
 	 */
-	public static void copyFile(String fromPath, String toPath, boolean move) {
+	public static void copyFile (String fromPath,
+		String toPath,
+		boolean move)
+	{
 		FileChannel ic = null;
 		FileChannel oc = null;
 		try {
@@ -543,7 +558,7 @@ public class Util {
 	 * @param directory
 	 *            Directory of the content to delete.
 	 */
-	private static void deleteDirectory(File directory) {
+	private static void deleteDirectory (File directory) {
 		for (File f : directory.listFiles()) {
 			if (f.isDirectory()) {
 				deleteDirectory(f);
@@ -558,12 +573,14 @@ public class Util {
 	 * content.
 	 * 
 	 * @param directory
-	 *            The path of the directory to delete
+	 *            the path of the directory to delete
 	 * @param contentOnly
-	 *            Indicates if the directory itself should be removed. If this
+	 *            indicates if the directory itself should be removed. If this
 	 *            flag is false, only the content is deleted.
 	 */
-	public static void deleteDirectory(String directory, boolean contentOnly) {
+	public static void deleteDirectory (String directory,
+		boolean contentOnly)
+	{
 		File f = new File(directory);
 		// Make sure this is a directory
 		if (!f.isDirectory())
@@ -577,13 +594,15 @@ public class Util {
 	 * Gets the filename of a path.
 	 * 
 	 * @param path
-	 *            The path from where to get the filename. The path can be a URL
+	 *            the path from where to get the filename. The path can be a URL
 	 *            path (e.g. "/C:/test/file.ext").
 	 * @param keepExtension
-	 *            True to keep the existing extension, false to remove it.
-	 * @return The filename with or without extension.
+	 *            true to keep the existing extension, false to remove it.
+	 * @return the filename with or without extension.
 	 */
-	static public String getFilename(String path, boolean keepExtension) {
+	static public String getFilename (String path,
+		boolean keepExtension)
+	{
 		// Get the filename
 		int n = path.lastIndexOf('/'); // Try generic first
 		if (n == -1) { // Then try Windows
@@ -606,16 +625,15 @@ public class Util {
 	 * Gets the extension of a given path or filename.
 	 * 
 	 * @param path
-	 *            The original path or filename.
-	 * @return The last extension of the filename (including the period), or
-	 *         null if there is no period in the filename. If the filename ends
+	 *            the original path or filename.
+	 * @return the last extension of the filename (including the period), or
+	 *         empty if there is no period in the filename. If the filename ends
 	 *         with a period, the return is a period.
 	 */
-	static public String getExtension(String path) {
+	static public String getExtension (String path) {
 		// Get the extension
 		int n = path.lastIndexOf('.');
-		if (n == -1)
-			return null; // None
+		if (n == -1) return ""; // Empty
 		return path.substring(n);
 	}
 
@@ -625,11 +643,11 @@ public class Util {
 	 * "file:///C:/test" will both return "file:///C:/test" encoded as URI.
 	 * 
 	 * @param pathOrUri
-	 *            The path to change to URI string.
-	 * @return The URI string.
+	 *            the path to change to URI string.
+	 * @return the URI string.
 	 * @throws OkapiUnsupportedEncodingException
 	 */
-	static public String makeURIFromPath(String pathOrUri) {
+	static public String makeURIFromPath (String pathOrUri) {
 		// This should catch most of the URI forms
 		pathOrUri = pathOrUri.replace('\\', '/');
 		if (pathOrUri.indexOf("://") != -1)
@@ -650,13 +668,14 @@ public class Util {
 	 * Creates a new URI object from a path or a URI string.
 	 * 
 	 * @param pathOrUri
-	 *            The path or URI string to use.
-	 * @return The new URI object for the given path or URI string.
+	 *            the path or URI string to use.
+	 * @return the new URI object for the given path or URI string.
 	 */
-	static public URI toURI(String pathOrUri) {
+	static public URI toURI (String pathOrUri) {
 		try {
 			return new URI(makeURIFromPath(pathOrUri));
-		} catch (URISyntaxException e) {
+		}
+		catch ( URISyntaxException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -674,7 +693,10 @@ public class Util {
 	 * @return The longest sub-directory that is common to both directories.
 	 *         This can be a null or empty string.
 	 */
-	static public String longestCommonDir(String currentDir, String newDir, boolean ignoreCase) {
+	static public String longestCommonDir (String currentDir,
+		String newDir,
+		boolean ignoreCase)
+	{
 		if (currentDir == null)
 			return newDir;
 		if (currentDir.length() == 0)
@@ -716,7 +738,7 @@ public class Util {
 	/**
 	 * Indicates if the current OS is case-sensitive.
 	 * 
-	 * @return True if the current OS is case-sensitive, false if otherwise.
+	 * @return true if the current OS is case-sensitive, false if otherwise.
 	 */
 	static public boolean isOSCaseSensitive() {
 		// May not work on all platforms,

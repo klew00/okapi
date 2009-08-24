@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,20 +18,34 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ============================================================================*/
 
-package net.sf.okapi.applications.rainbow.lib;
+package net.sf.okapi.common;
 
 import java.io.File;
 import java.io.FilenameFilter;
 
-public class DefaultFilenameFilter implements FilenameFilter
-{
+/**
+ * Implements a default filename filter that supports filtering by extensions
+ * and an optional by prefix of the filename.
+ */
+public class DefaultFilenameFilter implements FilenameFilter {
+
 	private String extension;
 	private String prefix;
 	
+	/**
+	 * Creates a new DefaultFilenameFilter object with a given extension value.
+	 * @param extension the extension to filter on.
+	 */
 	public DefaultFilenameFilter (String extension) {
 		this.extension = extension;
 	}
 
+	/**
+	 * Creates a new DefaultFilenameFilter object with given extension and
+	 * prefix values. Both must be true for the file to be accepted by the filter.
+	 * @param prefix the prefix to filter on
+	 * @param extension the extension to filter on.
+	 */
 	public DefaultFilenameFilter (String prefix,
 		String extension)
 	{
@@ -39,13 +53,17 @@ public class DefaultFilenameFilter implements FilenameFilter
 		this.extension = extension;
 	}
 
+	/**
+	 * Accept or reject a given filename.
+	 * @return true if the filename is accepted. 
+	 */
 	public boolean accept (File directory,
 		String fileName)
 	{
 		boolean bOK = true;
 		if ( fileName != null ) {
 			if ( extension != null ) {
-				bOK &= extension.equalsIgnoreCase(Utils.getExtension(fileName));
+				bOK &= extension.equalsIgnoreCase(Util.getExtension(fileName));
 			}
 			if ( prefix != null ) {
 				bOK &= fileName.startsWith(prefix);
@@ -53,5 +71,6 @@ public class DefaultFilenameFilter implements FilenameFilter
 		}
 		return bOK;
 	}
+
 }
 

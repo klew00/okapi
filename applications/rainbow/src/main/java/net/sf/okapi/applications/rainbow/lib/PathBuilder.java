@@ -241,7 +241,7 @@ public class PathBuilder {
 		String sPath = p_sFullPath.substring(p_sOriginalRoot.length());
 
 		// Extension
-		String sExt = Utils.getExtension(sPath);
+		String sExt = Util.getExtension(sPath);
 		if ( useExtension() ) {
 			switch ( getExtensionType() ) {
 				case EXTTYPE_REPLACE:

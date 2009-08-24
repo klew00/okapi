@@ -249,20 +249,20 @@ public class Utils {
 	}
 	
 	
-	/**
-	 * Gets the extension of a path or file name.
-	 * @param p_sPath The path or file name.
-	 * @return The extension (with the period), or an empty string.
-	 */
-	static public String getExtension (String p_sPath)
-	{
-		int n1 = p_sPath.lastIndexOf(File.separator);
-        int n2 = p_sPath.lastIndexOf('.');
-        if (( n2 > -1 ) && ( n1 < n2 )) {
-        	return p_sPath.substring(n2);
-        }
-        return "";
-	}
+//	/**
+//	 * Gets the extension of a path or file name.
+//	 * @param p_sPath The path or file name.
+//	 * @return The extension (with the period), or an empty string.
+//	 */
+//	static public String getExtension (String p_sPath)
+//	{
+//		int n1 = p_sPath.lastIndexOf(File.separator);
+//        int n2 = p_sPath.lastIndexOf('.');
+//        if (( n2 > -1 ) && ( n1 < n2 )) {
+//        	return p_sPath.substring(n2);
+//        }
+//        return "";
+//	}
 	
 	/**
 	 * Tries to detect the encoding and optionally the line-break type of a given file.
