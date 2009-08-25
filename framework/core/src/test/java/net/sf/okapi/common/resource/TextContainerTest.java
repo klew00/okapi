@@ -20,28 +20,38 @@
 
 package net.sf.okapi.common.resource;
 
+import net.sf.okapi.common.Range;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import net.sf.okapi.common.Range;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
-
 public class TextContainerTest {
+    private TextContainer tc1;
+
+    @Before
+    public void setUp(){
+        tc1 = new TextContainer();
+    }
+
+    @Test
+    public void cloneDeepCopy(){
+        Property p1 = new Property("name", "value", true);
+        tc1.setProperty(p1);
+		TextContainer tc2 = tc1.clone();
+        assertEquals("name property", p1.getValue(), tc2.getProperty("name").getValue());
+        assertNotSame("properties should not be the same reference due to clone", p1, tc2.getProperty("name"));
+    }
 
 	@Test
 	public void testGetSetContent () {
-		TextContainer tc1 = new TextContainer();
 		assertNotNull(tc1.getContent());
 		assertTrue(tc1.isEmpty());
 		tc1 = new TextContainer("text");
-		assertEquals(tc1.getContent(), "text");
+		assertEquals("text", tc1.getContent().toString());
 		// Test cloning
 		TextContainer tc2 = tc1.clone();
 		assertNotSame(tc1, tc2);
@@ -50,7 +60,6 @@ public class TextContainerTest {
 
 	@Test
 	public void testGetSetProperties () {
-		TextContainer tc1 = new TextContainer();
 		Set<String> list = tc1.getPropertyNames();
 		assertNotNull(list);
 		assertTrue(list.size()==0);
@@ -72,46 +81,44 @@ public class TextContainerTest {
 
 	@Test
 	public void testAppendSimpleSegment () {
-		TextContainer tc = new TextContainer();
 		TextFragment tf = new TextFragment("text1");
-		assertEquals(0, tc.getSegmentCount());
-		tc.appendSegment(tf);
-		assertEquals(1, tc.getSegmentCount());
-		assertEquals("text1", tc.getSegments().get(0).toString());
+		assertEquals(0, tc1.getSegmentCount());
+		tc1.appendSegment(tf);
+		assertEquals(1, tc1.getSegmentCount());
+		assertEquals("text1", tc1.getSegments().get(0).toString());
 	}
 
 	private TextContainer createMultiSegmentContent () {
-		TextContainer tc = new TextContainer();
 		TextFragment tf = new TextFragment("text1");
-		tc.appendSegment(tf);
-		tc.append(' ');
+		tc1.appendSegment(tf);
+		tc1.append(' ');
 		tf = new TextFragment("text2");
-		tc.appendSegment(tf);
-		return tc;
+		tc1.appendSegment(tf);
+		return tc1;
 	}
 	
 	@Test
 	public void testAppendSeveralSegments () {
-		TextContainer tc = createMultiSegmentContent();
-		assertEquals(2, tc.getSegmentCount());
-		assertEquals("text1", tc.getSegments().get(0).toString());
-		assertEquals("text2", tc.getSegments().get(1).toString());
-		assertEquals("0 1", tc.toString());
+		tc1 = createMultiSegmentContent();
+		assertEquals(2, tc1.getSegmentCount());
+		assertEquals("text1", tc1.getSegments().get(0).toString());
+		assertEquals("text2", tc1.getSegments().get(1).toString());
+		assertEquals("0 1", tc1.toString());
 	}
 	
 	@Test
 	public void testMergingSegments () {
-		TextContainer tc = createMultiSegmentContent();
-		tc.mergeAllSegments();
-		assertEquals(0, tc.getSegmentCount());
-		assertNull(tc.getSegments());
-		assertEquals("text1 text2", tc.toString());
+		tc1 = createMultiSegmentContent();
+		tc1.mergeAllSegments();
+		assertEquals(0, tc1.getSegmentCount());
+		assertNull(tc1.getSegments());
+		assertEquals("text1 text2", tc1.toString());
 	}
 	
 	@Test
 	public void testSegments () {
 		String originalText = "[seg1][seg2] [seg3]";
-		TextContainer tc1 = new TextContainer(originalText);
+		tc1 = new TextContainer(originalText);
 		// "[seg1][seg2] [seg3]"
 		//  0123456789012345678
 		assertFalse(tc1.isSegmented());
@@ -142,7 +149,7 @@ public class TextContainerTest {
 	@Test
 	public void testSegmentsFromArray () {
 		String originalText = "[seg1][seg2] [seg3]";
-		TextContainer tc1 = new TextContainer(originalText);
+		tc1 = new TextContainer(originalText);
 
 		// Test segmenting from an array
 		List<Range> ranges = new ArrayList<Range>();
