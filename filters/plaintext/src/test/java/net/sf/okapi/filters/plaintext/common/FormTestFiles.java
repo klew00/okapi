@@ -1,8 +1,12 @@
 package net.sf.okapi.filters.plaintext.common;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import net.sf.okapi.common.TestUtil;
 
-import java.io.*;
 
 //TODO: Change this so it's used for debug but not unit tests
 public class FormTestFiles {

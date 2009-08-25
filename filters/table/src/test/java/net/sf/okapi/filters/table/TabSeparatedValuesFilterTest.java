@@ -196,6 +196,65 @@ public class TabSeparatedValuesFilterTest {
 		filter.close();
 		
 	}
+	
+	@Test
+	public void testFileEvents2() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/TSV_test.txt");
+		assertNotNull(input);
+		
+		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+		params.valuesStartLineNum = 2;
+		params.columnNamesLineNum = 1;
+		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source", 1, 0, 1);
+		_testEvent(EventType.TEXT_UNIT, "Target", 1, 0, 2);
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 1", 2, 1, 1);
+		_testEvent(EventType.TEXT_UNIT, "Target text 1", 2, 1, 2);
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 2", 3, 2, 1);
+		_testEvent(EventType.TEXT_UNIT, "Target text 2", 3, 2, 2);
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+		
+		params.valuesStartLineNum = 2;
+		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
+		
+		input = TableFilterTest.class.getResourceAsStream("/TSV_test.txt");
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+				
+		_testEvent(EventType.START_DOCUMENT, null);
+					
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 1", 2, 1, 1);
+		_testEvent(EventType.TEXT_UNIT, "Target text 1", 2, 1, 2);
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 2", 3, 2, 1);
+		_testEvent(EventType.TEXT_UNIT, "Target text 2", 3, 2, 2);
+		_testEvent(EventType.END_GROUP, null);
+				
+		filter.close();
+		
+	}
+	
 
 	@Test
 	public void testSkeleton () {

@@ -19,14 +19,39 @@
 ===========================================================================*/
 
 package net.sf.okapi.filters.plaintext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import net.sf.okapi.common.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.*;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
@@ -34,20 +59,18 @@ import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 import net.sf.okapi.filters.plaintext.common.WrapMode;
 import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.Parameters;
+
 import org.junit.Assert;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.*;
-import java.net.URI;
 
 public class ParaPlainTextFilterTest {
 	
 	private ParaPlainTextFilter filter;
 	private FilterTestDriver testDriver;
 	private Parameters params;
-    private String root;
+    @SuppressWarnings("unused")
+	private String root;
 	
 	@Before
 	public void setUp() {

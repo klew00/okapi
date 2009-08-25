@@ -51,7 +51,9 @@ public class TabSeparatedValuesFilter  extends BaseTableFilter {
 				FILTER_CONFIG,
 				"Table (Tab-Separated Values)",
 				"Columns, separated by one or more tabs.", 
-				"okf_table_tsv.fprm");		
+				"okf_table_tsv.fprm");
+		
+		setParameters(new Parameters());	// Tab-Separated Values Filter parameters
 	}
 
 	@Override

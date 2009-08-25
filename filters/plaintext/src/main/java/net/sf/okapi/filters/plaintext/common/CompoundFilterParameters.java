@@ -34,7 +34,7 @@ import net.sf.okapi.common.ParametersString;
  * @version 0.1, 10.06.2009
  */
 
-public class CompoundParameters extends AbstractParameters{
+public class CompoundFilterParameters extends AbstractParameters {
 
 	private String parametersClass = "";
 	private LinkedList<IParameters> parameters = new LinkedList<IParameters>();

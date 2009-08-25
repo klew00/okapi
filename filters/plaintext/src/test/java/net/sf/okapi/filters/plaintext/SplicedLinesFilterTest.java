@@ -1,4 +1,5 @@
 /*===========================================================================
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -19,7 +20,24 @@
 
 package net.sf.okapi.filters.plaintext;
 
-import net.sf.okapi.common.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -31,12 +49,9 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.spliced.Parameters;
 import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
-import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.*;
-import java.util.ArrayList;
 
 public class SplicedLinesFilterTest {
 

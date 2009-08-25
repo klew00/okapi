@@ -247,7 +247,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		default:
 			cell = cell.replaceAll(LINE_WRAP_TAG, "\n");
 		}
-
+		
 		skel.add(cell);
 		return true;
 	}

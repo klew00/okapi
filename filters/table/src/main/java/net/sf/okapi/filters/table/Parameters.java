@@ -20,7 +20,7 @@
 
 package net.sf.okapi.filters.table;
 
-import net.sf.okapi.filters.plaintext.common.CompoundParameters;
+import net.sf.okapi.filters.plaintext.common.CompoundFilterParameters;
 
 /**
  * Table Filter parameters
@@ -28,7 +28,7 @@ import net.sf.okapi.filters.plaintext.common.CompoundParameters;
  * @version 0.1, 09.06.2009 
  */
 
-public class Parameters extends CompoundParameters {
+public class Parameters extends CompoundFilterParameters {
 
 	public Parameters() {
 		super();

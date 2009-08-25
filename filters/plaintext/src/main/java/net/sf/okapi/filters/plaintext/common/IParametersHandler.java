@@ -25,6 +25,11 @@ import net.sf.okapi.common.ParametersString;
 public interface IParametersHandler {
 
 	/**
+	 * Reset parameters values to defaults.
+	 */
+	public void parameters_reset();
+	
+	/**
 	 * Load from buffer. The protected buffer variable is visible in all subclasses of BaseParameters.<p>
 	 * @example myParam = buffer.getBoolean("myParam", false);
 	 */

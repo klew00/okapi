@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
-import net.sf.okapi.filters.plaintext.common.CompoundParameters;
+import net.sf.okapi.filters.plaintext.common.CompoundFilterParameters;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -415,9 +415,9 @@ public class GeneralTab extends Composite implements IDialogPage {
 	
 	public boolean load(Object data) {
 		
-		if (data instanceof CompoundParameters) {
+		if (data instanceof CompoundFilterParameters) {
 			
-			CompoundParameters params = (CompoundParameters) data;
+			CompoundFilterParameters params = (CompoundFilterParameters) data;
 			
 			Class<?> c = params.getParametersClass();
 				
@@ -496,9 +496,9 @@ public class GeneralTab extends Composite implements IDialogPage {
 
 	public boolean save(Object data) {
 		
-		if (data instanceof CompoundParameters) {
+		if (data instanceof CompoundFilterParameters) {
 			
-			CompoundParameters params = (CompoundParameters) data;
+			CompoundFilterParameters params = (CompoundFilterParameters) data;
 			
 			if (para.getSelection())
 				params.setParametersClass(net.sf.okapi.filters.plaintext.paragraphs.Parameters.class);

@@ -57,8 +57,8 @@ public class CompoundFilter extends AbstractFilter {
 		this.activeSubFilter = activeSubFilter;
 		
 		IParameters params = getParameters();
-		if (params instanceof CompoundParameters && activeSubFilter instanceof AbstractFilter)
-			((CompoundParameters) params).setActiveParameters(
+		if (params instanceof CompoundFilterParameters && activeSubFilter instanceof AbstractFilter)
+			((CompoundFilterParameters) params).setActiveParameters(
 					((AbstractFilter) activeSubFilter).getParametersClassName());
 	}
 
@@ -185,7 +185,7 @@ public class CompoundFilter extends AbstractFilter {
 		
 		IParameters params = getParameters();
 		
-		if (config.parametersLocation != null && params instanceof CompoundParameters) {
+		if (config.parametersLocation != null && params instanceof CompoundFilterParameters) {
 			
 			URL url = this.getClass().getResource(config.parametersLocation);
 			try {
@@ -198,7 +198,9 @@ public class CompoundFilter extends AbstractFilter {
 		}
 			
 		IParameters params2 = getActiveParameters();
-		params2.fromString(params.toString());
+		
+		if (params2 != null)
+			params2.fromString(params.toString());
 		
 		return res;
 	}
@@ -308,8 +310,8 @@ public class CompoundFilter extends AbstractFilter {
 		
 		String className = "";
 		
-		if (params instanceof CompoundParameters)
-			className = ((CompoundParameters) params).getParametersClassName();
+		if (params instanceof CompoundFilterParameters)
+			className = ((CompoundFilterParameters) params).getParametersClassName();
 		else
 			return;
 		

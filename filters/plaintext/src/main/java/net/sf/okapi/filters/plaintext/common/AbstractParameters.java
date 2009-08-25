@@ -20,6 +20,8 @@
 
 package net.sf.okapi.filters.plaintext.common;
 
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 
 import net.sf.okapi.common.BaseParameters;
@@ -33,10 +35,10 @@ import net.sf.okapi.common.Util;
  */
 
 public abstract class AbstractParameters extends BaseParameters implements INotifiable {
-
-	protected Component owner = null;
-	protected String data; // Available in parameters_load() 
 	
+	protected Component owner = null;
+	protected String data;
+	 	
 	public AbstractParameters() {
 		
 		super();		
@@ -49,7 +51,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 	/**
 	 * Called from the parameters' constructor. Create local objects here or leave empty. Initial values are assigned in reset().
 	 */
-	abstract protected void parameters_init();
+	protected void parameters_init() {};
 	
 	/**
 	 * Reset parameters values to defaults.
@@ -152,6 +154,30 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 			item.parameters_save(tmp);
 			buffer.setGroup(String.format("%s%d", groupName, i), tmp.toString());
 		}
+	}
+	
+	public boolean loadFromResource(String resourceLocation) {
+
+		URL url = this.getClass().getResource(resourceLocation);
+        if (url == null) return false;
+        
+        try {
+        	load(url.toURI(), false);
+        }
+        catch (URISyntaxException e) {
+               
+        	return false;
+        }
+        
+		return true;
+	}
+	
+	public void saveToResource(String resourceLocation) {
+		
+		URL url = this.getClass().getResource(resourceLocation);
+        if (url == null) return;
+        
+        save(url.getPath());
 	}
 }
 

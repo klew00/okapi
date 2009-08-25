@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.table;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.TestUtil;
@@ -48,6 +50,11 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.table.TableFilter;
+import net.sf.okapi.filters.table.base.BaseTableFilter;
+import net.sf.okapi.filters.table.base.Parameters;
+import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
+import net.sf.okapi.filters.table.fwc.FixedWidthColumnsFilter;
+import net.sf.okapi.filters.table.tsv.TabSeparatedValuesFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -254,30 +261,84 @@ public class TableFilterTest {
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}
+			
+
+	@Test
+		public void testFileEvents2() {
+			testDriver.setDisplayLevel(2);
+
+			filter.setConfiguration(TabSeparatedValuesFilter.FILTER_CONFIG);		
+			InputStream input = TableFilterTest.class.getResourceAsStream("/TSV_test.txt");
+			assertNotNull(input);
+			
+			net.sf.okapi.filters.table.tsv.Parameters params = (net.sf.okapi.filters.table.tsv.Parameters) filter.getActiveParameters();
+			
+			params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+			params.valuesStartLineNum = 2;
+			params.columnNamesLineNum = 1;
+			params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+			
+			filter.open(new RawDocument(input, "UTF-8", "en"));
+			
+			_testEvent(EventType.START_DOCUMENT, null);
+			
+			_testEvent(EventType.START_GROUP, null);
+			_testEvent(EventType.TEXT_UNIT, "Source");
+			_testEvent(EventType.TEXT_UNIT, "Target");
+			_testEvent(EventType.END_GROUP, null);
+			
+			_testEvent(EventType.START_GROUP, null);
+			_testEvent(EventType.TEXT_UNIT, "Source text 1");
+			_testEvent(EventType.TEXT_UNIT, "Target text 1");
+			_testEvent(EventType.END_GROUP, null);
+			
+			_testEvent(EventType.START_GROUP, null);
+			_testEvent(EventType.TEXT_UNIT, "Source text 2");
+			_testEvent(EventType.TEXT_UNIT, "Target text 2");
+			_testEvent(EventType.END_GROUP, null);
+			
+			_testEvent(EventType.END_DOCUMENT, null);
+			
+			filter.close();
+			
+			// List events		
+			String filename = "csv_test1.txt";
+			input = TableFilterTest.class.getResourceAsStream("/" + filename);
+			assertNotNull(input);
+			
+			System.out.println(filename);
+			filter.open(new RawDocument(input, "UTF-8", "en"));
+			if ( !testDriver.process(filter) ) Assert.fail();
+			filter.close();
+		}
+	
 	
 	@Test
-	public void testDetectColumnsMode() {
-		// 3 different detectColumnsMode, analyze output
-//		_getParameters().detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
-//		
-//		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test3.txt");
-//		assertNotNull(input);
-//		
-//		filter.open(new RawDocument(input, "UTF-8", "en"));
-//		
-//		_testEvent(EventType.START_DOCUMENT, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value11");
-//		_testEvent(EventType.TEXT_UNIT, "");
-//		_testEvent(EventType.TEXT_UNIT, "");
-//		_testEvent(EventType.TEXT_UNIT, "");
-//		
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.END_DOCUMENT, null);
-//		
-//		filter.close();
+	public void testSynchronization() {
+		
+		//------------------------
+		filter.setConfiguration(CommaSeparatedValuesFilter.FILTER_CONFIG);
+		IParameters params2 = filter.getActiveParameters();
+		assertTrue(params2 instanceof net.sf.okapi.filters.table.csv.Parameters);
+		assertTrue(params2 instanceof net.sf.okapi.filters.table.base.Parameters);
+		assertFalse(params2 instanceof net.sf.okapi.filters.table.fwc.Parameters);
+		
+		filter.setConfiguration(FixedWidthColumnsFilter.FILTER_CONFIG);
+		IParameters params3 = filter.getActiveParameters();
+		assertTrue(params3 instanceof net.sf.okapi.filters.table.fwc.Parameters);
+		assertTrue(params3 instanceof net.sf.okapi.filters.table.base.Parameters);
+		assertFalse(params3 instanceof net.sf.okapi.filters.table.csv.Parameters);
+		
+		filter.setConfiguration(TabSeparatedValuesFilter.FILTER_CONFIG);
+		IParameters params4 = filter.getActiveParameters();
+		assertTrue(params4 instanceof net.sf.okapi.filters.table.tsv.Parameters);
+		assertTrue(params4 instanceof net.sf.okapi.filters.table.base.Parameters);
+		assertFalse(params4 instanceof net.sf.okapi.filters.table.fwc.Parameters);
+		
+		filter.setConfiguration(BaseTableFilter.FILTER_CONFIG);
+		IParameters params5 = filter.getActiveParameters();
+		assertTrue(params5 instanceof net.sf.okapi.filters.table.base.Parameters);
+		assertFalse(params5 instanceof net.sf.okapi.filters.table.csv.Parameters);		
 	}
 	
 	@Test

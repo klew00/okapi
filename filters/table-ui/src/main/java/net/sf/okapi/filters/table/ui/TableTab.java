@@ -22,7 +22,7 @@ package net.sf.okapi.filters.table.ui;
 
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
-import net.sf.okapi.filters.plaintext.common.CompoundParameters;
+import net.sf.okapi.filters.plaintext.common.CompoundFilterParameters;
 import net.sf.okapi.filters.table.base.Parameters;
 
 import org.eclipse.swt.SWT;
@@ -444,9 +444,9 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 
 	public boolean load(Object data) {
 
-		if (data instanceof CompoundParameters) {
+		if (data instanceof CompoundFilterParameters) {
 			
-			CompoundParameters params = (CompoundParameters) data;
+			CompoundFilterParameters params = (CompoundFilterParameters) data;
 			
 			Class<?> c = params.getParametersClass();
 				
@@ -604,9 +604,9 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 
 	public boolean save(Object data) {
 
-		if (data instanceof CompoundParameters) {
+		if (data instanceof CompoundFilterParameters) {
 			
-			CompoundParameters params = (CompoundParameters) data;
+			CompoundFilterParameters params = (CompoundFilterParameters) data;
 			
 			if (btnCSV.getSelection())
 				params.setParametersClass(net.sf.okapi.filters.table.csv.Parameters.class);
