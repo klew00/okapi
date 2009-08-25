@@ -315,6 +315,10 @@
 				<exclude name="**/target/maven-archiver/**"/>
 			</fileset>
 		</copy>
+		<replace file="${dist}/examples/build_examples.bat" token="@version@" value="${okapilibStamp}"/>
+		<replace file="${dist}/examples/build_examples.sh" token="@version@" value="${okapilibStamp}"/>
+		<replace file="${dist}/examples/run_examples.bat" token="@version@" value="${okapilibStamp}"/>
+		<replace file="${dist}/examples/run_examples.sh" token="@version@" value="${okapilibStamp}"/>
 
 		<!-- Copy config -->
 		<copy todir="${dist}/config">

@@ -1045,9 +1045,12 @@ public class Util {
 		String osName = System.getProperty("os.name");
 		try {
 			if (osName.startsWith("Mac OS")) { // Macintosh case
+				/* One possible way. But this causes warning when run with -XstartOnFirstThread option
 				Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
 				Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[]{String.class});
-				openURL.invoke(null, new Object[] {url});
+				openURL.invoke(null, new Object[] {url}); */
+				// So, use open, and seems to work on the Macintosh (not Linux)
+				Runtime.getRuntime().exec("open " + url);
 			}
 			else if (osName.startsWith("Windows")) { // Windows case
 				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);

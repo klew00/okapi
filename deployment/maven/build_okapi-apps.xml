@@ -268,7 +268,7 @@
 		</copy>
 		
 		<copy todir="${dist}" file="data/okapi-apps/readme.html" overwrite="true"/>
-		<replace file="${dist}/readme.html" token="@version@" value="${rainbowStamp}"/>
+		<replace file="${dist}/readme.html" token="@version@" value="${okapiappsStamp}"/>
 		<replace file="${dist}/readme.html" token="@date@" value="${TODAY}"/>
 
 		<!-- Copy help -->
@@ -282,7 +282,6 @@
 		<!-- Remove parts that were for the okapi-lib distribution -->
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${dist}/localweb"/>
-			<fileset dir="${dist}/examples"/>
 		</delete>
 
 		<!-- Clean up -->

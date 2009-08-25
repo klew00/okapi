@@ -38,7 +38,11 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
+import net.sf.okapi.common.ui.filters.Res;
+import net.sf.okapi.common.ui.genericeditor.GenericEditor;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.mt.google.GoogleMTConnector;
@@ -149,6 +153,13 @@ public class Main {
 				else {
 					throw new InvalidParameterException(
 						String.format("Invalid command-line argument '%s'.", args[i]));
+				}
+			}
+
+			// Forgive having the extension .fprm from configuration ID if there is one
+			if ( prog.specifiedConfigId != null ) {
+				if ( prog.specifiedConfigId.endsWith(FilterConfigurationMapper.CONFIGFILE_EXT) ) {
+					prog.specifiedConfigId = Util.getFilename(prog.specifiedConfigId, false);
 				}
 			}
 			
@@ -321,11 +332,34 @@ public class Main {
 		
 		IParametersEditor editor = fcMapper.createConfigurationEditor(configId);
 		if ( editor != null ) {
-			editor.edit(params, !config.custom, new BaseContext());
+			if ( !editor.edit(params, !config.custom, new BaseContext()) ) return; // Cancel
 		}
 		else {
-			throw new RuntimeException(String.format(
-				"Cannot create the parameters editor for '%s'.", configId));
+			// Try to see if we can edit with the generic editor
+			IEditorDescriptionProvider descProv = fcMapper.getDescriptionProvider(params.getClass().getCanonicalName());
+			if ( descProv != null ) {
+				// Edit the data
+				GenericEditor genEditor = new GenericEditor();
+				if ( !genEditor.edit(params, descProv, !config.custom, new BaseContext()) ) return; // Cancel
+				// The params object gets updated if edit not canceled.
+			}
+			else { // Else: fall back to the plain text editor
+				InputDialog dlg  = new InputDialog(null,
+					String.format("Filter Parameters (%s)", config.configId), "Parameters:",
+					params.toString(), null, 0, 200, 600);
+				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
+				String data = dlg.showDialog();
+				if ( data == null ) return; // Cancel
+				if ( !config.custom ) return; // Don't save pre-defined parameters
+				data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+		
+		// If not canceled and if custom configuration: save the changes
+		if ( config.custom ) {
+			// Save the configuration filefcMapper
+			fcMapper.saveCustomParameters(config, params);
 		}
 	}
 	
