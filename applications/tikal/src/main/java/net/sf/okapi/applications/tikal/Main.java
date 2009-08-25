@@ -118,7 +118,10 @@ public class Main {
 					prog.command = CMD_EDITCONFIG;
 					if ( args.length > i+1 ) {
 						if ( !args[i+1].startsWith("-") ) {
-							prog.specifiedConfigId = args[++i];
+							++i; // Avoid empty argument
+							if ( args[i].length() > 0 ) {
+								prog.specifiedConfigId = args[i];
+							}
 						}
 					}
 				}

@@ -162,7 +162,7 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 			isXML = false;
 			isHTML = false;
 			String ext = Util.getExtension(getInputPath(0));
-			if ( Util.isEmpty(ext) ) {
+			if ( !Util.isEmpty(ext) ) {
 				isHTML = (ext.toLowerCase().indexOf(".htm")==0);
 				isXML = ext.equalsIgnoreCase(".xml");
 			}
