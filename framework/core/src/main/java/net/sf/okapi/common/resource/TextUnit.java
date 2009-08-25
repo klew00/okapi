@@ -409,6 +409,7 @@ public class TextUnit implements INameable, IReferenceable {
 	 * @return the content of the source for this TextUnit.
 	 */
 	public TextFragment getSourceContent () {
+        //How is this different from getSource()?
 		return source;
 	}
 	
@@ -418,7 +419,11 @@ public class TextUnit implements INameable, IReferenceable {
 	 * @return the new content of the source for this TextUnit. 
 	 */
 	public TextFragment setSourceContent (TextFragment content) {
-		source.setContent(content);
+		//set methods should generally not return anything
+        //In this case it seems non-intuitive to be returning the TextContainer when setting the text fragment on the
+        //textcontainer
+        //Also, doesn't setting the content actually end up appending the content?
+        source.setContent(content);
 		return source;
 	}
 

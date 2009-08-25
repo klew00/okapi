@@ -64,7 +64,7 @@ public interface IResource {
 
 	/**
 	 * Gets the annotation object for a given class for this resource.
-	 * @param type the class of the annotation object to retrieve.
+	 * @param annotationType the class of the annotation object to retrieve.
 	 * @return the annotation for the given class for this resource. 
 	 */
 	public <A extends IAnnotation> A getAnnotation(Class<A> annotationType);
