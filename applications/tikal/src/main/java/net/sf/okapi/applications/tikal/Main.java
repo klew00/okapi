@@ -21,7 +21,7 @@
 package net.sf.okapi.applications.tikal;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -472,21 +472,11 @@ public class Main {
 		URL url = getClass().getProtectionDomain().getCodeSource().getLocation();
 		String path = Util.getDirectoryName(Util.getDirectoryName(url.getPath()));
 		path += "/help/applications/tikal/index.html"; //$NON-NLS-1$
-		File file = new File(path);
-		// Display the file
-		// Because we are Java 1.5 only, we need to use a per-platform command
-		String command;
-		if ( Util.isOSCaseSensitive() ) { // Linux or Macintosh
-			// Should work with bash 
-			command = "open "+file.getPath(); //$NON-NLS-1$
-		}
-		else { // Windows
-			command = "cmd /c start "+file.getPath(); //$NON-NLS-1$
-		}
+		// Opens the file
 		try {
-			Runtime.getRuntime().exec(command);
+			Util.openURL((new File(path)).toURL().toString());
 		}
-		catch (IOException e) {
+		catch ( MalformedURLException e ) {
 			e.printStackTrace();
 		}
 	}

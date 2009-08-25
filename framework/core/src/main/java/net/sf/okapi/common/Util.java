@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -68,6 +69,10 @@ public class Util {
 
 	private static final String NEWLINES_REGEX = "\r(\n)?";
 	private static final Pattern NEWLINES_REGEX_PATTERN = Pattern.compile(NEWLINES_REGEX);
+
+	// Used by openURL()
+	private static final String[] browsers = { "firefox", "opera", "konqueror", "epiphany",
+		"seamonkey", "galeon", "kazehakase", "mozilla", "netscape" };
 
 	/**
 	 * Convert all .r\n and \r to linefeed (\n)
@@ -1028,6 +1033,43 @@ public class Util {
 	 */
 	public static boolean checkFlag (int value, int flag) {
 		return (value & flag) == flag;
+	}
+
+   /**
+    * Opens the specified page in a web browser (Java 1.5 compatible).
+    * <p>This is based on the public domain class BareBonesBrowserLaunch from Dem Pilafian at
+    * (<a href="http://www.centerkey.com/java/browser/">www.centerkey.com/java/browser</a>)
+    * @param url the URL of the page to open.
+    */
+	public static void openURL (String url) {
+		String osName = System.getProperty("os.name");
+		try {
+			if (osName.startsWith("Mac OS")) { // Macintosh case
+				Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
+				Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[]{String.class});
+				openURL.invoke(null, new Object[] {url});
+			}
+			else if (osName.startsWith("Windows")) { // Windows case
+				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+			}
+			else { // Assumes Unix or Linux
+				boolean found = false;
+				for ( String browser : browsers ) {
+					if ( !found ) { // Search for the first browser available
+						found = Runtime.getRuntime().exec(new String[] {"which", browser}).waitFor() == 0;
+						if ( found ) { // Start it if we find one
+							Runtime.getRuntime().exec(new String[] {browser, url});
+						}
+					}
+				}
+				if ( !found ) {
+					throw new Exception("No browser found.");
+				}
+			}
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error attempting to launch web browser.", e);
+		}
 	}
 
 }
