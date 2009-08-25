@@ -20,8 +20,8 @@
 
 package net.sf.okapi.steps.wordcount.ui;
 
-import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.steps.wordcount.common.Parameters;
+import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;

@@ -73,8 +73,8 @@ public class LanguageList {
 		return codes.toArray(new String[] {});
 	}
 	
-	public static ULocale getLocale(String languageInfo) {
-		
-		return map.get(languageInfo);
-	}
+//	public static ULocale getLocale(String languageInfo) {
+//		
+//		return map.get(languageInfo);
+//	}
 }

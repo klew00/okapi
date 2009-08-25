@@ -28,6 +28,7 @@ import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 
@@ -120,7 +121,10 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 
 	private void create(Shell p_Parent) {
 
-		shell.setText(getCaption());
+		String caption = getCaption();
+		if (!Util.isEmpty(caption)) // If getCaption() returns null, a SWT exception fires
+			shell.setText(caption);
+		
 		shell.setData("owner", this);
 
 		if (p_Parent != null)

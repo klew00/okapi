@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,32 +18,8 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.mapping.model;
+package net.sf.okapi.steps.tokenization;
 
-import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.filters.plaintext.common.IParametersHandler;
-
-public class MappingItem implements IParametersHandler {
-
-	public String editorClass;
-	public String parametersClass;
-	
-	public void parameters_load(ParametersString buffer) {
-		
-		editorClass = buffer.getString("editorClass");
-		parametersClass = buffer.getString("parametersClass");
-	}
-
-	public void parameters_save(ParametersString buffer) {
-		
-		buffer.setString("editorClass", editorClass);
-		buffer.setString("parametersClass", parametersClass);
-	}
-
-	public void parameters_reset() {
-		
-		editorClass = "";
-		parametersClass = "";
-	}
+public class PipelineItem {
 
 }

@@ -20,19 +20,22 @@
 
 package net.sf.okapi.steps.tokenization.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 
 /**
- * Tokenization step parameters
+ * Tokenization internal step parameters
  * 
  * @version 0.1 06.07.2009
  */
 
-public class Parameters extends AbstractParameters {
-
-	public String tokenTypes;
-	public String languages;	
+public class TokenizationStepParameters extends AbstractParameters {
+	
+	public String description;
+	public List<TokenizationStepRule> rules = new ArrayList<TokenizationStepRule>();
 	
 	@Override
 	protected void parameters_init() {
@@ -42,21 +45,22 @@ public class Parameters extends AbstractParameters {
 	@Override
 	protected void parameters_reset() {
 
-		tokenTypes = ""; 		// All tokens
-		languages = "";			// All languages
+		description = "";
+		rules.clear();
 	}
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
-
-		tokenTypes = buffer.getString("tokenTypes", "");
-		languages = buffer.getString("languages", "");
+		
+		description = buffer.getString("description", "");
+		loadGroup(buffer, "rules", rules, TokenizationStepRule.class);
 	}
 	
 	@Override
 	protected void parameters_save(ParametersString buffer) {
-
-		buffer.setString("tokenTypes", tokenTypes);
-		buffer.setString("languages", languages);
+		
+		buffer.setString("description", description);
+		saveGroup(buffer, "rules", rules);
 	}	
+	
 }

@@ -37,7 +37,7 @@ public class LanguageSelector {
 		InputQueryDialog dlg = new InputQueryDialog();
 		List<String> list = new ArrayList<String>();
 		
-		dlg.run(null, LanguageListTab.class, "Languages", "", list, null);
+		dlg.run(null, LanguageListPage.class, "Languages", "", list, null);
 			
 		return list.toArray(new String[] {}); 
 	}

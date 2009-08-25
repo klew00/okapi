@@ -21,6 +21,7 @@ public class WordCountTest {
 	@Test
 	public void testStatics() {
 		
+		// TODO debug
 //		assertEquals(5, WordCounter.getCount("Test word count is correct.", "en"));
 //		assertEquals(9, WordCounter.getCount("The quick (\"brown\") fox can't jump 32.3 feet, right?", "en"));
 //		assertEquals(9, WordCounter.getCount("The quick (“brown”) fox can’t jump 32.3 feet, right?", "en"));

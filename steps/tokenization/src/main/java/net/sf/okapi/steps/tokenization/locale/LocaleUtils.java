@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.tokenization.locale;
 
+import com.ibm.icu.util.ULocale;
+
 import net.sf.okapi.common.Util;
 
 public class LocaleUtils {
@@ -54,15 +56,17 @@ public class LocaleUtils {
 		if (Util.isEmpty(languageCode))
 			return null;
 		
-		String[] parts = Util.splitLanguageCode(languageCode);		
-		StringBuilder res = new StringBuilder();
+//		String[] parts = Util.splitLanguageCode(languageCode);		
+//		StringBuilder res = new StringBuilder();
+//		
+//		res.append(parts[0].toLowerCase());  
+//		if (!Util.isEmpty(parts[1])) {
+//			res.append("_");
+//			res.append(parts[1].toUpperCase());
+//		}
+//		return res.toString();
 		
-		res.append(parts[0].toLowerCase());  
-		if (!Util.isEmpty(parts[1])) {
-			res.append("_");
-			res.append(parts[1].toUpperCase());
-		}
-		return res.toString();
+		return ULocale.canonicalize(languageCode);
 	}
 
 }

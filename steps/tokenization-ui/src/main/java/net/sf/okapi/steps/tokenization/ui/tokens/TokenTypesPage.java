@@ -20,13 +20,12 @@
 
 package net.sf.okapi.steps.tokenization.ui.tokens;
 
-import net.sf.okapi.common.Util;
+import net.sf.okapi.steps.tokenization.tokens.Parameters;
+import net.sf.okapi.steps.tokenization.tokens.TokenType;
 import net.sf.okapi.common.ui.abstracteditor.AbstractBaseDialog;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
 import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
-import net.sf.okapi.steps.tokenization.tokens.Parameters;
-import net.sf.okapi.steps.tokenization.tokens.Token;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -44,11 +43,10 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 
-public class TokensTab extends Composite implements IDialogPage {
+public class TokenTypesPage extends Composite implements IDialogPage {
 	private Label lblChooseOneOr;
 	private Table table;
 	private TableColumn colName;
-	private TableColumn colValue;
 	private TableColumn colDescr;
 	private Button btnAdd;
 	private Button btnModify;
@@ -62,7 +60,7 @@ public class TokensTab extends Composite implements IDialogPage {
 	 * @param parent
 	 * @param style
 	 */
-	public TokensTab(Composite parent, int style) {
+	public TokenTypesPage(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
 		
@@ -89,11 +87,6 @@ public class TokensTab extends Composite implements IDialogPage {
 		colName.setData("name", "colName");
 		colName.setWidth(150);
 		colName.setText("Token");
-		
-		colValue = new TableColumn(table, SWT.RIGHT);
-		colValue.setData("name", "colValue");
-		colValue.setWidth(60);
-		colValue.setText("Value");
 		
 		colDescr = new TableColumn(table, SWT.NONE);
 		colDescr.setData("name", "colDescr");
@@ -140,7 +133,7 @@ public class TokensTab extends Composite implements IDialogPage {
 		label.setText("                         ");
 		
 		adapter = new TableAdapter(table);
-		adapter.setRelColumnWidths(new double [] {2, 1, 7});
+		adapter.setRelColumnWidths(new double [] {1, 3});
 	}
 
 	protected void addModifyRow(TableItem item) {
@@ -148,7 +141,7 @@ public class TokensTab extends Composite implements IDialogPage {
 		if (item == null) { // Add new item			
 			adapter.unselect();
 			
-			if (SWTUtils.inputQuery(AddModifyTokenPage.class, getShell(), "Add token definition", 
+			if (SWTUtils.inputQuery(AddModifyTokenTypePage.class, getShell(), "Add token type", 
 					new String[] {"", "0", ""}, 
 					null)) {
 				
@@ -159,7 +152,7 @@ public class TokensTab extends Composite implements IDialogPage {
 				adapter.restoreSelection();
 		}
 		else {
-			if (SWTUtils.inputQuery(AddModifyTokenPage.class, getShell(), "Modify token definition", 
+			if (SWTUtils.inputQuery(AddModifyTokenTypePage.class, getShell(), "Modify token type", 
 					SWTUtils.getText(item),
 					null)) {					
 				
@@ -205,12 +198,12 @@ public class TokensTab extends Composite implements IDialogPage {
 			
 			Parameters params = (Parameters) data;
 
-			if (!params.loadTokens()) return false;
+			if (!params.loadTokenTypes()) return false;
 			
 			adapter.clear();
 			
-			for (Token token : params.tokens)					
-				adapter.addRow(new String[] {token.name, Util.intToStr(token.value), token.description});
+			for (TokenType tokenType : params.tokenTypes)					
+				adapter.addRow(new String[] {tokenType.id, tokenType.description});
 
 			adapter.sort(1, false);
 			modified = false;				
@@ -227,13 +220,13 @@ public class TokensTab extends Composite implements IDialogPage {
 			params.reset();
 		
 			for (int i = 1; i <= adapter.getNumRows(); i++)
-				params.addToken(adapter.getValue(i, 1), Util.strToInt(adapter.getValue(i, 2), 0), adapter.getValue(i, 3));
+				params.addTokenType(adapter.getValue(i, 1), adapter.getValue(i, 2));
 			
 			if (modified)
-				params.saveTokens();
+				params.saveTokenTypes();
 			
 			for (TableItem item : table.getSelection())
-				params.addSelectedToken(item.getText(0), Util.strToInt(item.getText(1), 0), item.getText(2));
+				params.addSelectedTokenType(item.getText(0), item.getText(1));
 			
 			modified = false;
 		}

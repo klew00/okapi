@@ -30,7 +30,7 @@ public abstract class TokenCountStep extends BaseCountStep {
 
 	private TokenizationStep ts = null;
 	
-	protected abstract String getToken();
+	protected abstract String getTokenType();
 	
 	@Override
 	protected long getCount(TextUnit textUnit) {
@@ -40,7 +40,7 @@ public abstract class TokenCountStep extends BaseCountStep {
 		
 		if (ta != null) {
 			
-			tokens = ta.getFilteredList(new String[]{getToken()});			
+			tokens = ta.getFilteredList(new String[]{getTokenType()});			
 		}
 		else {
 			
@@ -49,7 +49,8 @@ public abstract class TokenCountStep extends BaseCountStep {
 			
 			if (ts == null) return 0;
 			
-			tokens = ts.tokenize(TextUnitUtils.getSourceText(textUnit, true), getLanguage(), new String[]{getToken()});
+			tokens = new Tokens();
+			ts.tokenize(TextUnitUtils.getSourceText(textUnit, true), tokens, getLanguage(), new String[]{getTokenType()});
 		}
 		
 		if (tokens == null) return 0;

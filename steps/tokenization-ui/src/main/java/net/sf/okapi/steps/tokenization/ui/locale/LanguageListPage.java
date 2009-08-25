@@ -22,9 +22,9 @@ package net.sf.okapi.steps.tokenization.ui.locale;
 
 import java.util.ArrayList;
 
+import net.sf.okapi.steps.tokenization.locale.LanguageList;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
-import net.sf.okapi.steps.tokenization.locale.LanguageList;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 
-public class LanguageListTab extends Composite implements IDialogPage {
+public class LanguageListPage extends Composite implements IDialogPage {
 	private Label lblChooseOneOr;
 	private Table table;
 	private TableColumn col1;
@@ -49,7 +49,7 @@ public class LanguageListTab extends Composite implements IDialogPage {
 	 * @param parent
 	 * @param style
 	 */
-	public LanguageListTab(Composite parent, int style) {
+	public LanguageListPage(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		

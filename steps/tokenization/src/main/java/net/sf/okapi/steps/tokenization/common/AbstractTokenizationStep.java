@@ -36,23 +36,28 @@ import net.sf.okapi.steps.tokenization.tokens.TokensAnnotation;
  * @version 0.1 06.07.2009
  */
 @SuppressWarnings("unused")
-public abstract class AbstractTokenizationStep extends AbstractPipelineStep {
+public abstract class AbstractTokenizationStep extends AbstractPipelineStep implements ITokenizationStep {
 
-	private Parameters params;
-	private String[] tokenTypes;	
-	private String[] languages;
+	private TokenizationStepParameters params;
+	
+//	private String[] tokenTypes;	
+//	private String[] languages;
+	
+	boolean tokenizeSource;
+	boolean tokenizeTargets;
 	
 	public AbstractTokenizationStep() {
 		
 		super();
 		
-		setParameters(new Parameters());
+		setParameters(new TokenizationStepParameters());
 		setName("Tokenization");
 		setDescription("Extracts tokens from the text units content of a document.");
 	}
 	
-	public abstract Tokens tokenize(String text, String language, String... tokenTypes);
-	
+	public abstract void tokenize(String text, Tokens tokens, String language, String... tokenTypes);
+
+	/* TODO debug
 	public String[] getTokenTypes() {
 		
 		return tokenTypes;
@@ -62,13 +67,16 @@ public abstract class AbstractTokenizationStep extends AbstractPipelineStep {
 		
 		this.tokenTypes = tokenTypes;
 	}
+	*/
 
 	@Override
 	protected void component_init() {
 
-		params = getParameters(Parameters.class);				
+		params = getParameters(TokenizationStepParameters.class);
+		/* TODO debug
 		tokenTypes = ListUtils.stringAsArray(params.tokenTypes);
 		languages = ListUtils.stringAsArray(params.languages);
+		*/
 	}
 
 	@Override
@@ -83,14 +91,16 @@ public abstract class AbstractTokenizationStep extends AbstractPipelineStep {
 		if (tu.isEmpty()) return;
 		if (!tu.isTranslatable()) return;
 		
-//		if (params.tokenizeSource)
-//			tokenizeSource(tu);
-//		
-//		if (params.tokenizeTargets)			
-//			tokenizeTargets(tu);
+		if (tokenizeSource)
+			tokenizeSource(tu);
+		
+		if (tokenizeTargets)			
+			tokenizeTargets(tu);
 	}
 
 	private void tokenizeSource(TextUnit tu) {
+		
+		// TODO debug if (!canTokenize(getLanguage(), tokenTypes)) return;
 		
 		if (tu == null) return;
 		
@@ -98,8 +108,9 @@ public abstract class AbstractTokenizationStep extends AbstractPipelineStep {
 		if (tc == null) return;
 		
 		ArrayList<Integer> positions = new ArrayList<Integer> ();
-		
-		Tokens tokens = tokenize(TextUnitUtils.getText(tc.getContent(), positions), getLanguage(), tokenTypes);
+				
+		Tokens tokens = new Tokens(); 
+		// TODO debug tokenize(TextUnitUtils.getText(tc.getContent(), positions), tokens, getLanguage(), tokenTypes);
 		
 		if (tokens == null) return;
 		
@@ -122,12 +133,15 @@ public abstract class AbstractTokenizationStep extends AbstractPipelineStep {
 		
 		for (String language : tu.getTargetLanguages()) {
 		
+			// TODO debug if (!canTokenize(language, tokenTypes)) return;
+			
 			TextContainer tc = tu.getTarget(language);
 			if (tc == null) continue;
 			
 			positions.clear();
 			
-			Tokens tokens = tokenize(TextUnitUtils.getText(tc.getContent(), positions), getLanguage(), tokenTypes);			
+			Tokens tokens = new Tokens();
+			// TODO debug tokenize(TextUnitUtils.getText(tc.getContent(), positions), tokens, language, tokenTypes);			
 			if (tokens == null) continue;
 			
 			tokens.fixRanges(positions);
@@ -140,6 +154,21 @@ public abstract class AbstractTokenizationStep extends AbstractPipelineStep {
 			else
 				ta.addTokens(tokens);
 		}
+	}
+
+	public void setTokenizeSource(boolean tokenizeSource) {
+		
+		this.tokenizeSource = tokenizeSource;
+	}
+
+	public void setTokenizeTargets(boolean tokenizeTargets) {
+		
+		this.tokenizeTargets = tokenizeTargets;
 	}	
 
+	public boolean canTokenize(String language, String... tokenTypes) {
+
+		// TODO Loop through the rules
+		return true;
+	}
 }

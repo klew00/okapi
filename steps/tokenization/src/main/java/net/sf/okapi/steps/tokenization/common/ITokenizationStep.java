@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,29 +18,14 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.tokens;
+package net.sf.okapi.steps.tokenization.common;
 
-import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
-import net.sf.okapi.steps.tokenization.tokens.Parameters;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class TokenSelector {
+public interface ITokenizationStep {
 
-	/**
-	 * For creation of new tokens and storing them to the globally accessible net.sf.okapi.steps.tokenization.tokens/okf_tokens.fprm
-	 */
-	public static void main(String[] args) {
-		
-		select();
-	}
-
-	private static Tokens select() {
-				
-		InputQueryDialog dlg = new InputQueryDialog();
-		Parameters params = new Parameters(); 
-		
-		dlg.run(null, TokensTab.class, "Tokens", "", params, null);
-		
-		return params.selectedTokens;
-	}
+	public void tokenize(String text, Tokens tokens, String language, String... tokenTypes);
+	public void setTokenizeSource(boolean tokenizeSource);
+	public void setTokenizeTargets(boolean tokenizeTargets);
+	public boolean canTokenize(String language, String... tokenTypes);
 }

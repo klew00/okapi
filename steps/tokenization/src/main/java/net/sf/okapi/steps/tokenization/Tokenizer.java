@@ -39,7 +39,9 @@ public class Tokenizer {
 	
 	protected Tokens tokenizeString(String text, String language, String... tokenTypes) {
 			
-		return ts.tokenize(text, language, tokenTypes);		
+		Tokens res = new Tokens();
+		ts.tokenize(text, res, language, tokenTypes);
+		return res;
 	}
 	
 	static private Tokens doTokenize(Object text, String language, String... tokenTypes) {

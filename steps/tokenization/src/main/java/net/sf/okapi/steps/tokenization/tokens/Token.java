@@ -20,9 +20,7 @@
 
 package net.sf.okapi.steps.tokenization.tokens;
 
-import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.Range;
-import net.sf.okapi.filters.plaintext.common.IParametersHandler;
 
 /**
  * 
@@ -30,55 +28,29 @@ import net.sf.okapi.filters.plaintext.common.IParametersHandler;
  * @version 0.1 08.07.2009
  */
 
-public class Token implements IParametersHandler {
-
-	final static public String WORD 			= "WORD"; 
-	final static public String PUNCTUATION 		= "PUNCTUATION";
-	final static public String WHITESPACE 		= "WHITESPACE";
-	final static public String DATE 			= "DATE";
-	final static public String NUMBER 			= "NUMBER";
-	final static public String CURRENCY 		= "CURRENCY";
-	final static public String NAME 			= "NAME";
-	final static public String EMAIL 			= "EMAIL";
-	final static public String INTERNET 		= "INTERNET";
-	final static public String ABBREVIATION 	= "ABBREVIATION";
+public class Token {
 	
-//-------------------------------------------------------------------------------------------------
-	
-	public String name;
-	public String description;
-	public int value;
+	public String typeID;
 	public Range range;
 	public String lexem;
 	public int score;
-	public Object owner;
 	
-	public Token() {
-		
-		super();
-	}
-
-	public Token(String name, String description, int value) {
+	public Token(String typeID, int start, int end, String lexem, int score) {
 		
 		super();
 		
-		this.name = name;
-		this.description = description;
-		this.value = value;
+		this.typeID = typeID;
+		this.range = new Range(start, end);
+		this.lexem = lexem;
+		this.score = score;
 	}
 
-	public void parameters_load(ParametersString buffer) {
+	@Override
+	public String toString() {
 		
-		name = buffer.getString("name");
-		description = buffer.getString("description");
-		value = buffer.getInteger("value");
+		return String.format("%s\t\t(%d, %d)\t\t[%s]", typeID, range.start, range.end, lexem);
 	}
+
 	
-	public void parameters_save(ParametersString buffer) {
-		
-		buffer.setString("name", name);
-		buffer.setString("description", description);
-		buffer.setInteger("value", value);
-	}
 }
 

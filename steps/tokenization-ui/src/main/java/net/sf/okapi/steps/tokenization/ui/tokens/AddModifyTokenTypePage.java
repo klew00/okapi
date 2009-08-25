@@ -20,7 +20,6 @@
 
 package net.sf.okapi.steps.tokenization.ui.tokens;
 
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 
 import org.eclipse.swt.SWT;
@@ -30,15 +29,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 
-public class AddModifyTokenPage extends Composite implements IDialogPage {
+public class AddModifyTokenTypePage extends Composite implements IDialogPage {
 	private Label lblToken;
 	private Text name;
-	private Label lblValue;
-	private Spinner value;
 	private Label lblDescription;
 	private Text descr;
 	private Label label;
@@ -49,7 +45,7 @@ public class AddModifyTokenPage extends Composite implements IDialogPage {
 	 * @param parent
 	 * @param style
 	 */
-	public AddModifyTokenPage(Composite parent, int style) {
+	public AddModifyTokenTypePage(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(5, false));
 		
@@ -65,7 +61,7 @@ public class AddModifyTokenPage extends Composite implements IDialogPage {
 		lblToken = new Label(this, SWT.NONE);
 		lblToken.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblToken.setData("name", "lblToken");
-		lblToken.setText("Token:");
+		lblToken.setText("ID:");
 		
 		name = new Text(this, SWT.BORDER);
 		name.addVerifyListener(new VerifyListener() {
@@ -77,20 +73,6 @@ public class AddModifyTokenPage extends Composite implements IDialogPage {
 		
 		name.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 		name.setData("name", "name");
-		new Label(this, SWT.NONE);
-		new Label(this, SWT.NONE);
-		new Label(this, SWT.NONE);
-		
-		lblValue = new Label(this, SWT.NONE);
-		lblValue.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
-		lblValue.setData("name", "lblValue");
-		lblValue.setText("Value:");
-		
-		value = new Spinner(this, SWT.BORDER);
-		value.setPageIncrement(100);
-		value.setMaximum(65535);
-		value.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		value.setData("name", "value");
 		new Label(this, SWT.NONE);
 		new Label(this, SWT.NONE);
 		
@@ -133,11 +115,10 @@ public class AddModifyTokenPage extends Composite implements IDialogPage {
 		if (!(data instanceof String[])) return false;
 		
 		String[] colDef = (String[]) data;
-		if (colDef.length != 3) return false; 
+		if (colDef.length != 2) return false; 
 						
 		name.setText(colDef[0]);
-		value.setSelection(Util.strToInt(colDef[1], 0));
-		descr.setText(colDef[2]);
+		descr.setText(colDef[1]);
 		
 		return true;
 	}
@@ -147,11 +128,10 @@ public class AddModifyTokenPage extends Composite implements IDialogPage {
 		if (!(data instanceof String[])) return false;
 		
 		String[] colDef = (String[]) data;
-		if (colDef.length != 3) return false;
+		if (colDef.length != 2) return false;
 		
 		colDef[0] = name.getText();
-		colDef[1] = Util.intToStr(value.getSelection());
-		colDef[2] = descr.getText();
+		colDef[1] = descr.getText();
 		
 		return true;
 	}

@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.filters.plaintext.common.AbstractParameters;
-import net.sf.okapi.filters.plaintext.common.IParametersHandler;
+import net.sf.okapi.common.ListUtils;
 
 /**
  * 
@@ -34,7 +32,7 @@ import net.sf.okapi.filters.plaintext.common.IParametersHandler;
  * @version 0.1 08.07.2009
  */
 
-public class Tokens extends ArrayList<Token> implements IParametersHandler {
+public class Tokens extends ArrayList<Token> {
 
 	private static final long serialVersionUID = 2484560539089898608L;
 
@@ -60,7 +58,7 @@ public class Tokens extends ArrayList<Token> implements IParametersHandler {
 			
 			if (token == null) continue;
 			
-			if (types.contains(token.name))
+			if (types.contains(token.typeID))
 				res.add(token);
 		}
 		
@@ -80,14 +78,17 @@ public class Tokens extends ArrayList<Token> implements IParametersHandler {
 			}			
 		}
 
-	public void parameters_load(ParametersString buffer) {
+	@Override
+	public String toString() {
+
+		List<String> res = new ArrayList<String>();
 		
-		AbstractParameters.loadGroup(buffer, "token", this, Token.class);
+		for (Token token : this) {
+			
+			res.add(token.toString());
+		}
+		
+		return ListUtils.listAsString(res, "\n");
 	}
 
-	public void parameters_save(ParametersString buffer) {
-		
-		AbstractParameters.saveGroup(buffer, "token", this);
-	}
-	
 }

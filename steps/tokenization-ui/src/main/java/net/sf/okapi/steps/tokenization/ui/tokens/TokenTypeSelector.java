@@ -18,32 +18,29 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.mapping.model;
+package net.sf.okapi.steps.tokenization.ui.tokens;
 
-import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.filters.plaintext.common.IParametersHandler;
+import net.sf.okapi.steps.tokenization.tokens.Parameters;
+import net.sf.okapi.steps.tokenization.tokens.TokenTypes;
+import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
 
-public class MappingItem implements IParametersHandler {
+public class TokenTypeSelector {
 
-	public String editorClass;
-	public String parametersClass;
-	
-	public void parameters_load(ParametersString buffer) {
+	/**
+	 * For creation of new tokens and storing them to the globally accessible net.sf.okapi.steps.tokenization.tokens/okf_tokens.fprm
+	 */
+	public static void main(String[] args) {
 		
-		editorClass = buffer.getString("editorClass");
-		parametersClass = buffer.getString("parametersClass");
+		select();
 	}
 
-	public void parameters_save(ParametersString buffer) {
+	private static TokenTypes select() {
+				
+		InputQueryDialog dlg = new InputQueryDialog();
+		Parameters params = new Parameters(); 
 		
-		buffer.setString("editorClass", editorClass);
-		buffer.setString("parametersClass", parametersClass);
-	}
-
-	public void parameters_reset() {
+		dlg.run(null, TokenTypesPage.class, "Tokens", "", params, null);
 		
-		editorClass = "";
-		parametersClass = "";
+		return params.selectedTokenTypes;
 	}
-
 }

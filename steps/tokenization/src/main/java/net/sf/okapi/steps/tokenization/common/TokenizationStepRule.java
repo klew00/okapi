@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,32 +18,45 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.mapping.model;
+package net.sf.okapi.steps.tokenization.common;
 
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.filters.plaintext.common.IParametersHandler;
 
-public class MappingItem implements IParametersHandler {
+public class TokenizationStepRule implements IParametersHandler {
 
-	public String editorClass;
-	public String parametersClass;
+	public String description;
+	public String rule;
+	public String tokenTypes;
+	public String languages;
+	public String exLanguages;
+	
+	public void parameters_reset() {
+
+		description = "";
+		rule = "";
+		tokenTypes = ""; 		// All tokens
+		languages = "";			// All languages
+		exLanguages = "";		// No languages
+	}
 	
 	public void parameters_load(ParametersString buffer) {
 		
-		editorClass = buffer.getString("editorClass");
-		parametersClass = buffer.getString("parametersClass");
+		description = buffer.getString("description", "");
+		rule = buffer.getString("rule", "");
+		tokenTypes = buffer.getString("tokenTypes", "");
+		languages = buffer.getString("languages", "");
+		exLanguages = buffer.getString("exLanguages", "");
 	}
-
+	
 	public void parameters_save(ParametersString buffer) {
 		
-		buffer.setString("editorClass", editorClass);
-		buffer.setString("parametersClass", parametersClass);
+		buffer.setString("tokenTypes", tokenTypes);
+		buffer.setString("rule", rule);
+		buffer.setString("tokenTypes", tokenTypes);
+		buffer.setString("languages", languages);
+		buffer.setString("exLanguages", exLanguages);
 	}
-
-	public void parameters_reset() {
-		
-		editorClass = "";
-		parametersClass = "";
-	}
-
+	
+	
 }

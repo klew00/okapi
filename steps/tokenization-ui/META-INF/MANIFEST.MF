@@ -10,8 +10,9 @@ Require-Bundle: net.sf.okapi.steps.tokenization;bundle-version="1.0.0",
  net.sf.okapi.ui.filters.plaintext;bundle-version="1.0.0",
  net.sf.okapi.filters.plaintext;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Export-Package: net.sf.okapi.steps.tokenization.locale.ui,
- net.sf.okapi.steps.tokenization.mapping.model.ui,
- net.sf.okapi.steps.tokenization.mapping.ui,
- net.sf.okapi.steps.tokenization.tokens.ui,
- net.sf.okapi.steps.tokenization.ui
+Export-Package: net.sf.okapi.steps.tokenization.ui,
+ net.sf.okapi.steps.tokenization.ui.common,
+ net.sf.okapi.steps.tokenization.ui.locale,
+ net.sf.okapi.steps.tokenization.ui.mapping,
+ net.sf.okapi.steps.tokenization.ui.mapping.model,
+ net.sf.okapi.steps.tokenization.ui.tokens

@@ -71,7 +71,7 @@ public class Mapper extends AbstractParametersEditor {
 		if (params == null) {
 			
 			params = new Parameters();
-			if (!params.loadMapping()) return "";
+			if (!params.loadFromResource("okf_mapper.fprm")) return "";
 		}
 				
 		return params.getParametersClass(editorClass);
@@ -84,7 +84,7 @@ public class Mapper extends AbstractParametersEditor {
 		if (params == null) {
 			
 			params = new Parameters();
-			if (!params.loadMapping()) return "";
+			if (!params.loadFromResource("okf_mapper.fprm")) return "";
 		}
 				
 		return params.getEditorClass(parametersClass);

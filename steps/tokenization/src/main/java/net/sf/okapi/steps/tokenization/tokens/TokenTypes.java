@@ -18,32 +18,37 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.mapping.model;
+package net.sf.okapi.steps.tokenization.tokens;
+
+import java.util.ArrayList;
 
 import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 import net.sf.okapi.filters.plaintext.common.IParametersHandler;
 
-public class MappingItem implements IParametersHandler {
+/**
+ * 
+ * 
+ * @version 0.1 08.07.2009
+ */
 
-	public String editorClass;
-	public String parametersClass;
-	
+public class TokenTypes extends ArrayList<TokenType> implements IParametersHandler {
+
+	private static final long serialVersionUID = -1483118086466742086L;
+
 	public void parameters_load(ParametersString buffer) {
 		
-		editorClass = buffer.getString("editorClass");
-		parametersClass = buffer.getString("parametersClass");
+		AbstractParameters.loadGroup(buffer, "tokenType", this, TokenType.class);
 	}
 
 	public void parameters_save(ParametersString buffer) {
 		
-		buffer.setString("editorClass", editorClass);
-		buffer.setString("parametersClass", parametersClass);
+		AbstractParameters.saveGroup(buffer, "tokenType", this);
 	}
 
 	public void parameters_reset() {
 		
-		editorClass = "";
-		parametersClass = "";
+		this.clear();
 	}
-
+	
 }

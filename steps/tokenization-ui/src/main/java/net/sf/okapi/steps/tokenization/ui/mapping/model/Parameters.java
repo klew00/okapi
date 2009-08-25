@@ -20,7 +20,6 @@
 
 package net.sf.okapi.steps.tokenization.ui.mapping.model;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,22 +96,22 @@ public class Parameters extends AbstractParameters {
 		return "";
 	}
 	
-	public boolean loadMapping() {
-		
-		try {
-			load(getClass().getResource("okf_mapper.fprm").toURI(), false);
-						
-		} catch (URISyntaxException e) {
-			
-			return false;
-		}
-		
-		return true;
-	}
-	
-	public void saveMapping() {
-		
-		save(getClass().getResource("okf_mapper.fprm").getPath());
-	}
+//	public boolean loadMapping() {
+//		
+//		try {
+//			load(getClass().getResource("okf_mapper.fprm").toURI(), false);
+//						
+//		} catch (URISyntaxException e) {
+//			
+//			return false;
+//		}
+//		
+//		return true;
+//	}
+//	
+//	public void saveMapping() {
+//		
+//		save(getClass().getResource("okf_mapper.fprm").getPath());
+//	}
 	
 }

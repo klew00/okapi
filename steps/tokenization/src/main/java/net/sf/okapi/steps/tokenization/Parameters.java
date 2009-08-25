@@ -21,7 +21,7 @@
 package net.sf.okapi.steps.tokenization;
 
 import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.filters.plaintext.common.AbstractParameters;
+import net.sf.okapi.steps.tokenization.common.CompoundStepParameters;
 
 /**
  * Tokenization step parameters
@@ -29,19 +29,28 @@ import net.sf.okapi.filters.plaintext.common.AbstractParameters;
  * @version 0.1 06.07.2009
  */
 
-public class Parameters extends AbstractParameters {
+public class Parameters extends CompoundStepParameters {
 
+	/**
+	 * If true, tokenize only the languages listed on the language list (if not present in exLanguages).
+	 * If false, tokenizeSource and tokenizeTargets determine which languages will be tokenized.  
+	 */
+	public boolean useLanguageList;
+		
+	public String tokenTypes;
+	
 	public boolean tokenizeSource;
 	public boolean tokenizeTargets;
-	
-	@Override
-	protected void parameters_init() {
+	public String languages;
+	public String exLanguages;
 		
-	}
-
+	// Also inherits a list of steps from CompoundStepParameters
+	
 	@Override
 	protected void parameters_reset() {
 
+		super.parameters_reset();
+		
 		tokenizeSource = true;
 		tokenizeTargets = false;
 	}
@@ -49,6 +58,8 @@ public class Parameters extends AbstractParameters {
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 
+		super.parameters_load(buffer);  // Loads steps parameters
+		
 		tokenizeSource = buffer.getBoolean("tokenizeSource", true);
 		tokenizeTargets = buffer.getBoolean("tokenizeTargets", false);
 	}
@@ -56,6 +67,8 @@ public class Parameters extends AbstractParameters {
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 
+		super.parameters_save(buffer);
+		
 		buffer.setBoolean("tokenizeSource", tokenizeSource);
 		buffer.setBoolean("tokenizeTargets", tokenizeTargets);
 	}	

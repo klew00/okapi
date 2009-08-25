@@ -27,38 +27,38 @@ import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 
 public class Parameters extends AbstractParameters {
 
-	public Tokens tokens;
-	public Tokens selectedTokens;
+	public TokenTypes tokenTypes;
+	public TokenTypes selectedTokenTypes;
 	
 	@Override
 	protected void parameters_init() {
 		
-		tokens = new Tokens();
-		selectedTokens = new Tokens();
+		tokenTypes = new TokenTypes();
+		selectedTokenTypes = new TokenTypes();
 	}
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 		
-		tokens.parameters_load(buffer);
+		tokenTypes.parameters_load(buffer);
 	}
 
 	@Override
 	protected void parameters_reset() {
 		
-		tokens.clear();
+		tokenTypes.clear();
 	}
 
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		
-		tokens.parameters_save(buffer);
+		tokenTypes.parameters_save(buffer);
 	}
 
-	public boolean loadTokens() {
+	public boolean loadTokenTypes() {
 		
 		try {
-			load(getClass().getResource("okf_tokens.fprm").toURI(), false);
+			load(getClass().getResource("okf_token_types.fprm").toURI(), false);
 						
 		} catch (URISyntaxException e) {
 			
@@ -68,18 +68,18 @@ public class Parameters extends AbstractParameters {
 		return true;
 	}
 	
-	public void saveTokens() {
+	public void saveTokenTypes() {
 		
-		save(getClass().getResource("okf_tokens.fprm").getPath());
+		save(getClass().getResource("okf_token_types.fprm").getPath());
 	}
 
-	public void addToken(String name, int value, String description) {
+	public void addTokenType(String name, String description) {
 		
-		tokens.add(new Token(name, description, value));
+		tokenTypes.add(new TokenType(name, description));
 	}
 	
-	public void addSelectedToken(String name, int value, String description) {
+	public void addSelectedTokenType(String name, String description) {
 		
-		selectedTokens.add(new Token(name, description, value));
+		selectedTokenTypes.add(new TokenType(name, description));
 	}
 }

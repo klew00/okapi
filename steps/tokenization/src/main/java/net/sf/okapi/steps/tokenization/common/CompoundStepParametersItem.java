@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,32 +18,41 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.mapping.model;
+package net.sf.okapi.steps.tokenization.common;
 
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.filters.plaintext.common.IParametersHandler;
 
-public class MappingItem implements IParametersHandler {
+public class CompoundStepParametersItem implements IParametersHandler {
 
-	public String editorClass;
-	public String parametersClass;
+	public String stepClass;
+	public String parametersLocation;
+	public boolean enabled;
 	
-	public void parameters_load(ParametersString buffer) {
+	public IPipelineStep step; // non-serializable
+	public IParameters parameters; // non-serializable
+	
+	public void parameters_reset() {
 		
-		editorClass = buffer.getString("editorClass");
-		parametersClass = buffer.getString("parametersClass");
+		enabled = true;
+		stepClass = "";
+		parametersLocation = "";
+	}
+
+	public void parameters_load(ParametersString buffer) {
+
+		enabled = buffer.getBoolean("enabled", true);
+		stepClass = buffer.getString("stepClass");
+		parametersLocation = buffer.getString("parametersLocation");
 	}
 
 	public void parameters_save(ParametersString buffer) {
 		
-		buffer.setString("editorClass", editorClass);
-		buffer.setString("parametersClass", parametersClass);
+		buffer.setBoolean("enabled", enabled);
+		buffer.setString("stepClass", stepClass);
+		buffer.setString("parametersLocation", parametersLocation);
 	}
-
-	public void parameters_reset() {
 		
-		editorClass = "";
-		parametersClass = "";
-	}
-
 }

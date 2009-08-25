@@ -20,7 +20,7 @@
 
 package net.sf.okapi.steps.tokenization;
 
-import net.sf.okapi.steps.tokenization.common.AbstractTokenizationStep;
+import net.sf.okapi.steps.tokenization.common.CompoundStep;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 /**
@@ -29,14 +29,27 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
  * @version 0.1 06.07.2009
  */
 
-public class TokenizationStep extends AbstractTokenizationStep {
+public class TokenizationStep extends CompoundStep {
 
-	public Tokens tokenize(String text, String language, String... tokenTypes) {
-		
-		// TODO Goes through registered internal tokenizers, passes them its params, analyzes & collects results
-		return null;		
-	}
-		
+	Parameters params;
 	
+	public TokenizationStep() {
+		
+		super();
+		
+		setParameters(new Parameters());
+		setName("Tokenization");
+		setDescription("Extracts tokens from the text units content of a document.");
+		
+		params = getParameters(Parameters.class);
+		if (params == null) return;
+		
+		params.loadFromResource("okf_tokenizer.fprm");				
+	}
 
+	public void tokenize(String text, Tokens tokens, String language, String... tokenTypes) {
+		
+		// TODO Goes through registered internal tokenizers, passes them their params, analyzes & collects results
+	}
+			
 }
