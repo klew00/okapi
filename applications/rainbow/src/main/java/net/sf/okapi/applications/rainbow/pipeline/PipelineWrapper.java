@@ -242,7 +242,7 @@ public class PipelineWrapper {
 			}
 			map.put(step.id, step);
 
-			ps = (IPipelineStep)Class.forName(
+/*			ps = (IPipelineStep)Class.forName(
 			"net.sf.okapi.steps.tokenization.TokenizationStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
@@ -266,7 +266,7 @@ public class PipelineWrapper {
 				peMapper.addEditor("net.sf.okapi.steps.wordcount.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
-					
+*/					
 		}
 		catch ( InstantiationException e ) {
 			e.printStackTrace();

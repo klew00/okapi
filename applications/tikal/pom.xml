@@ -45,5 +45,11 @@
         	<artifactId>okapi-filter-xliff</artifactId>
         	<version>${project.version}</version>
         </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.filters</groupId>
+        	<artifactId>okapi-filter-regex</artifactId>
+        	<version>0.3-SNAPSHOT</version>
+        	<scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

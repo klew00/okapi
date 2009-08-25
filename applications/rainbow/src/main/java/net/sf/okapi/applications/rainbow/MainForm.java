@@ -1706,6 +1706,7 @@ public class MainForm { //implements IParametersProvider {
 		}
 		
 		prj = new Project(lm);
+		mapperNeedsUpdate = true;
 		wrapper = null;
 		currentInput = 0;
 		resetDisplay(-1);

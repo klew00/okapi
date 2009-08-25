@@ -543,7 +543,7 @@ public class SRXDocument {
 		ISegmenter existingSegmenter)
 	{
 		SRXSegmenter segmenter = null;
-		if (( existingSegmenter != null ) && ( existingSegmenter instanceof SRXDocument )) {
+		if (( existingSegmenter != null ) && ( existingSegmenter instanceof SRXSegmenter )) {
 			segmenter = (SRXSegmenter)existingSegmenter;
 		}
 
@@ -587,7 +587,7 @@ public class SRXDocument {
 		ISegmenter existingSegmenter)
 	{
 		SRXSegmenter segmenter = null;
-		if (( existingSegmenter != null ) && ( existingSegmenter instanceof SRXDocument )) {
+		if (( existingSegmenter != null ) && ( existingSegmenter instanceof SRXSegmenter )) {
 			segmenter = (SRXSegmenter)existingSegmenter;
 		}
 		

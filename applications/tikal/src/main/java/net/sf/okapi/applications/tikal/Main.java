@@ -185,6 +185,7 @@ public class Main {
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
+			System.exit(1); // Error
 		}
 	}
 
@@ -357,7 +358,11 @@ public class Main {
 		for ( String tmp : filtersMap.keySet() ) {
 			if ( configId.startsWith(tmp) ) {
 				fcMapper.addConfigurations(filtersMap.get(tmp));
-				fcMapper.addCustomConfiguration(configId);
+				// If the given configuration is not one of the pre-defined
+				if ( fcMapper.getConfiguration(configId) == null ) {
+					// Assume it is a custom one
+					fcMapper.addCustomConfiguration(configId);
+				}
 				return true;
 			}
 		}
