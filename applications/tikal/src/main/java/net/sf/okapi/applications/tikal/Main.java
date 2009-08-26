@@ -40,7 +40,6 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
-import net.sf.okapi.common.ui.filters.Res;
 import net.sf.okapi.common.ui.genericeditor.GenericEditor;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
@@ -77,27 +76,35 @@ public class Main {
 	private Hashtable<String, String> extensionsMap;
 	private Hashtable<String, String> filtersMap;
 	
-	public static void main (String[] args) {
+	public static void main (String[] originalArgs) {
 		try {
 			Main prog = new Main();
+
+			// Remove all empty arguments
+			// This is to work around the "$1" issue in bash
+			ArrayList<String> args = new ArrayList<String>();
+			for ( String tmp : originalArgs ) {
+				if ( tmp.length() > 0 ) args.add(tmp);
+			}
+
 			prog.printBanner();
-			if ( args.length == 0 ) {
+			if ( args.size() == 0 ) {
 				prog.printUsage();
 				return;
 			}
+			if ( args.contains("-?") ) {
+				prog.printUsage();
+				return; // Overrides all arguments 
+			}
+			if ( args.contains("-h") ) {
+				prog.showHelp();
+				return; // Overrides all arguments
+			}
 			
-			for ( int i=0; i<args.length; i++ ) {
-				String arg = args[i];
+			for ( int i=0; i<args.size(); i++ ) {
+				String arg = args.get(i);
 				arg = arg.replace('/', '-'); // To allow /x syntax
-				if ( arg.equals("-?") ) {
-					prog.printUsage();
-					return;
-				}
-				else if ( arg.equals("-h") ) {
-					prog.showHelp();
-					return;
-				}
-				else if ( arg.equals("-fc") ) {
+				if ( arg.equals("-fc") ) {
 					prog.specifiedConfigId = getArgument(args, ++i);
 				}
 				else if ( arg.equals("-sl") ) {
@@ -120,12 +127,9 @@ public class Main {
 				}
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
-					if ( args.length > i+1 ) {
-						if ( !args[i+1].startsWith("-") ) {
-							++i; // Avoid empty argument
-							if ( args[i].length() > 0 ) {
-								prog.specifiedConfigId = args[i];
-							}
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							prog.specifiedConfigId = args.get(++i);
 						}
 					}
 				}
@@ -148,11 +152,11 @@ public class Main {
 					return;
 				}
 				else if ( !arg.startsWith("-") ) {
-					prog.inputs.add(args[i]);
+					prog.inputs.add(args.get(i));
 				}
 				else {
 					throw new InvalidParameterException(
-						String.format("Invalid command-line argument '%s'.", args[i]));
+						String.format("Invalid command-line argument '%s'.", args.get(i)));
 				}
 			}
 
@@ -200,12 +204,12 @@ public class Main {
 		}
 	}
 
-	private static String getArgument (String[] args, int index) {
-		if ( index >= args.length ) {
+	private static String getArgument (ArrayList<String> args, int index) {
+		if ( index >= args.size() ) {
 			throw new RuntimeException(String.format(
-				"Missing parameter after '%s'", args[index-1]));
+				"Missing parameter after '%s'", args.get(index-1)));
 		}
-		return args[index];
+		return args.get(index);
 	}
 	
 	public Main () {
