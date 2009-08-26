@@ -13,9 +13,8 @@
 	</tr>
 </table>
  
-<p>Tikal is a command-line tool that provides a basic set of 
-localization-related utilities.</p>
-<p>The following functions are available:</p>
+<p>Tikal is a command-line tool that provides the following basic 
+localization-related utilities:</p>
 <ul>
 	<li><a href="#extract">Extract Files</a></li>
 	<li><a href="#merge">Merge Files</a></li>
@@ -23,27 +22,30 @@ localization-related utilities.</p>
 	<li><a href="#listConfig">List Filter Configurations</a></li>
 	<li><a href="#editConfig">Edit Filter Configurations</a></li>
 </ul>
-<p>Note: The command <code>-e</code> (Edit filter configurations) does 
+<p>Note: The command <code>-e</code> (Edit Filter Configurations) does 
 require UI-specific libraries. These libraries are in the <b>okapi-apps</b> 
 distribution (which are per-platform), but not in the <b>okapi-lib</b> 
 distribution (which is cross-platform).</p>
 <h2><a name="extract"></a>Extract Files</h2>
 <p>This command extracts the translatable content of one or more given files 
 into an XLIFF document. You can then use any XLIFF-aware translation tool to 
-translate the document. Example of open-source tools that are XLIFF-capable are:
+translate the document. Example of open-source tools that are XLIFF-capable are 
+(among others):
 <a href="http://www.omegat.org/">OmegaT</a>,
-<a href="http://translate.sourceforge.net/wiki/virtaal/index">Virtaal</a>, or
+<a href="http://translate.sourceforge.net/wiki/virtaal/index">Virtaal</a>, and
 <a href="http://userbase.kde.org/Lokalize">Lokalize</a>. When the translation is 
 done, you can use the <a href="#merge">Merge command</a> to create a new 
 translated file in its original format.</p>
 <p>The XLIFF documents created are placed in the same directories as the 
 original files, and have the same name with an additional <code>.xlf</code> 
 extension.</p>
-<p>Several extensions are mapped to specific filter configuration by default, 
-but you can define your own configuration and specify it as well. To get a list 
+<p>By default, some extensions are mapped to a specific filter configuration 
+(for example: <code>.docx</code> to <code>okf_openxml</code>, <code>.odt</code> 
+to okf_openoffice, <code>.po</code> to <code>okf_po</code>, etc.). But you can define your own configuration and specify it as well 
+using the <code>-fc</code> option. To get a list 
 of all available filter configurations use the <a href="#listConfig">List 
 Configurations command</a>. For more details the filters available and their 
-configurations, see each filter&#39;s documentation.</p>
+configurations, see <a href="../../filters/index.html">each filter&#39;s documentation</a>.</p>
 <p>The syntax of this command is:</p>
 <pre>-x [options] inputFile [inputFile2...]</pre>
 <p>Where the options are:</p>
@@ -172,7 +174,8 @@ could omit the <code>-sl</code> option if you are running from a English system.
 &quot;open file&quot; in Zulu.</p>
 <pre>tikal -q &quot;open file&quot; -tt localhost -sl en -tl af</pre>
 <p>Queries a local Translate Toolkit TM server located on <code>
-http://localhost:8080</code> (the port by default is 8080). The source is 
+http://localhost:8080</code> (note that 8080 is omitted in the command line as 
+it is port by default). The source is 
 English and the requested translation is Afrikaans.</p>
 <h2><a name="listConfig"></a>List Filter Configurations</h2>
 <p>This command lists all the filter configurations available for Tikal.</p>
