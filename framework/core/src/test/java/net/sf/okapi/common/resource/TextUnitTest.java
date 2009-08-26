@@ -44,7 +44,7 @@ public class TextUnitTest {
     }
 
     @Test
-    public void isEmptyFlase(){
+    public void isEmptyFalse(){
         tu1.setSource(tc1);
         assertFalse("The TextUnit should not be empty", tu1.isEmpty());
     }
@@ -147,7 +147,6 @@ public class TextUnitTest {
 	
 	@Test
 	public void propertiesInitialization() {
-        //TODO: move properties initialization to constructor and create appropriate test
 		assertEquals("Should be empty", 0, tu1.getPropertyNames().size());
     }
 
@@ -165,7 +164,6 @@ public class TextUnitTest {
 
 	@Test
 	public void sourcePropertiesInitialization () {
-		//TODO: move properties initialization to constructor and create appropriate test
         assertEquals("Should be empty", 0, tu1.getSourcePropertyNames().size());
     }
 
@@ -183,7 +181,6 @@ public class TextUnitTest {
 
 	@Test
 	public void targetPropertiesInitialization() {
-		//TODO: move properties initialization to constructor maybe and create appropriate test 
 		assertEquals(tu1.getTargetPropertyNames(FR).size(), 0);
     }
 

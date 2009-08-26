@@ -39,7 +39,7 @@ With these components you can do things like:</p>
 	<li>Store the extracted text into a common representation, where text is 
 	separated from inline codes.</li>
 	<li>Manipulate the extracted text and any modifiable 
-	properties associated to it.</li>
+	properties associated with it.</li>
 	<li>Re-write the document in its original format, but with its extractable 
 	parts modified if needed.</li>
 	<li>Segment extracted text into sentences.</li>
@@ -188,10 +188,10 @@ for more details.</p>
 <p>Any event that is not understood by a component should be simply passed along 
 down the pipeline.</p>
 <h3><a name="creatingFilter"></a>Creating the Filter</h3>
-<p>To use a filter, you have first to create a filter object. The Okapi 
+<p>To use a filter, you first have to create a filter object. The Okapi 
 Framework provides you with several filters, and you can write your own as well. 
 In the example below, we use the <code>
-net.sf.okapi.filters.properties.PropertiesFilter</code> class which implement 
+net.sf.okapi.filters.properties.PropertiesFilter</code> class which implements 
 the <code>
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html">IFilter</a></code> 
 interface for Java Properties files.</p>
@@ -238,8 +238,8 @@ needs to open the input document:</p>
 </ul>
 <p dir="ltr">In the code below we set the source language to English, using the 
 same standard language tag identifiers you would use with HTML and XML (BCP-47). 
-We set the default encoding to UTF-8. Note that some filters will be able to 
-detect automatically the correct encoding of the input and ignore this value.</p>
+We set the default encoding to UTF-8. Note that some filters will be able to
+automatically detect the correct encoding of the input and ignore this value.</p>
 <pre>// Creates the RawDocument object
 RawDocument res = new RawDocument(myInputStream, &quot;UTF-8&quot;, &quot;en&quot;);
 // Opens the document
@@ -251,22 +251,22 @@ you do not want to generate the skeleton you can specify an additional parameter
 and use:</p>
 <pre>// Opens the document, without generating skeleton
 filter.open(res, false);</pre>
-<p class="question"><b>Question</b>: Why using an intermediate object for 
-opening the document. It would be simpler to just pass the parameters to <code>
-open()</code>.</p>
+<p class="question"><b>Question</b>: Why use an intermediate object for opening the document?
+Wouldn't it be simpler to just pass the parameters to <code>
+open()</code>?</p>
 <p class="answer"><b>Answer</b>: The <code>
 <a href="../javadoc/net/sf/okapi/common/resource/RawDocument.html">
 RawDocument</a></code> object is used because in many cases filters are used 
 in the broader environment of pipelines, where having all information about the 
 input document in one object makes things much easier. The object is also the 
-resource associated to the <code>RAW_DOCUMENT</code> event that allows to mix 
+resource associated with the <code>RAW_DOCUMENT</code> event that allows to mix 
 in the same pipeline steps using filter events or steps working on the input 
 document directly.</p>
 <p dir="ltr">Note that while the filters should do their best to implement all the 
 different input objects, this may not be possible in some cases 
-because of the format the filter deal with. For example, a&nbsp; filter for 
-Adobe Photoshop PSD files is not supporting <code>CharSequence</code> input 
-objects. as PSD are binary formats.</p>
+because of the format the filter deals with. For example, a&nbsp; filter for 
+Adobe Photoshop PSD files does not support <code>CharSequence</code> input 
+objects, as PSD files are binary.</p>
 <p>In our example we want to open a <code>String</code>-based document:</p>
 <pre>// Creates the RawDocument object
 RawDocument res = new RawDocument(&quot;key1=Text1\nkey2=Text2&quot;, &quot;en&quot;);
@@ -283,8 +283,8 @@ key2=Text2</pre>
 we use 
 the method <code><a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#next()">IFilter.next()</a></code> to get the actual event.</p>
 <ul>
-	<li>You must always call <code>
-	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#hasNext()">IFilter.hasNext()</code></a> 
+	<li>You must always call
+	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#hasNext()"><code>IFilter.hasNext()</code></a>
 	before calling
 	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#next()"><code>IFilter.next()</code></a>.</li>
 	<li>You must call
@@ -292,8 +292,8 @@ the method <code><a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#ne
 	once and only once before the next call to
 	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#hasNext()">
 	<code>IFilter.hasNext()</code></a>.</li>
-	<li>Do not rely on <code>
-	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#next()">IFilter.next()</code></a> 
+	<li>Do not rely on
+	<a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#next()"><code>IFilter.next()</code></a> 
 	returning <code>null</code> if there are no more events.</li>
 </ul>
 <pre>// Proper call of hasNext() and next()
@@ -301,7 +301,7 @@ while ( filter.hasNext() ) {
    Event event = filter.next();
    // Do something...
 }</pre>
-<p>Once you have an event, you query its type using <code>
+<p>Once you have an event, you can query its type using <code>
 <a href="../javadoc/net/sf/okapi/common/Event.html#getEventType()">Event.getEventType()</a></code>. The value retuned is one of the constants 
 defined in <code>
 <a href="../javadoc/net/sf/okapi/common/EventType.html">EventType</a></code>. Then, depending on the type, you can get 
@@ -310,7 +310,7 @@ the resource associated with this event (<code><a href="../javadoc/net/sf/okapi/
 <a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#hasNext()">IFilter.hasNext()</a></code> 
 returns false, and you can close the input. Note that it is a good practice for 
 the filters to close the input themselves before sending the last event, but you 
-should close in case this is not done.</p>
+should still call close just in case.</p>
 <pre>// Get the events from the input document
 while ( filter.hasNext() ) {
    Event event = filter.next();
@@ -334,16 +334,16 @@ key=[key2]
 text=[Text2]</pre>
 <h2><a name="modifyingDocument"></a>Modifying a Document</h2>
 <p>Extracting the text parts of a document is useful, but a more useful feature 
-the Okapi Framework offers is writing out the extracted data back into their 
+the Okapi Framework offers is writing out the extracted data back into the 
 original format.</p>
 <p>As we have seen above, when you open a document with a filter, you can 
-specified to generate or not the skeleton. The role of the skeleton is to 
+specify to generate the skeleton. The role of the skeleton is to 
 store information about the parts of the input document that are not extractable, and to provide 
 ways to merge back the parts that are extractable.</p>
-<p>Because file formats are very different, they may need to use different type 
+<p>Because file formats are very different, they may need to use different types 
 of skeleton mechanisms. For example, the skeleton for a binary file such as an OpenOffice.org ODT file (which is really a ZIP file) cannot be treated the same 
 way as the skeleton of a Java properties file. The framework offers a 
-transparent way to work with the different skeletons and let the user ignore the 
+transparent way to work with the different skeletons and lets the user ignore the 
 underlying mechanism.</p>
 <p>The skeleton parts are passed along with the resources of the 
 events. A resource may or may not have an associated skeleton object.</p>
@@ -353,11 +353,11 @@ provides the <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
 interface to do all this transparently.</p>
 <h3><a name="creatingFilterAndWriter"></a>Creating the Filter and the FilterWriter</h3>
-<p>First, you must create the filter, just like before, except that we will use 
+<p>First, you must create the filter, just like before, except we will use 
 the HTML filter this time:</p>
 <pre>// Create a filter object
 IFilter filter = new HtmlFilter();</pre>
-<p>Then, you need to create an <code>
+<p>Next, you need to create an <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
 object. You do this by calling a method of the filter itself (<code><a href="../javadoc/net/sf/okapi/common/filters/IFilter.html#createFilterWriter()">IFilter.createFilterWriter()</a></code>) 
 that provides you with the proper implementation of <code>
@@ -368,11 +368,11 @@ IFilterWriter writer = filter.createFilterWriter();</pre>
 <h3><a name="configuringWriter"></a>Configuring the FilterWriter</h3>
 <p>Once the <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html">IFilterWriter</a></code> 
-object created you need to set its options. This is done with 
+object is created, you need to set its options. This is done with 
 the <code>
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html#setOptions(java.lang.String, java.lang.String)">IFilterWriter.setOptions()</a></code> method.</p>
-<p>We need to set the output language, here French. And we need to indicate in what encoding the 
-output should be written, in our example we will choose Latin-1.</p>
+<p>We need to set the output language. In this case we will use French. We also need to indicate which 
+encoding to use for the out output. In our example, we will choose Latin-1.</p>
 <pre>// Set the filter writer's options
 writer.setOptions(&quot;fr&quot;, &quot;iso-8859-1&quot;);</pre>
 <p>We also need to set where the output will be generated. The type of object 
@@ -410,7 +410,7 @@ filter.open(new RawDocument(&quot;&lt;html&gt;&lt;head&gt;\n&quot;
 <a href="../javadoc/net/sf/okapi/common/filterwriter/IFilterWriter.html#handleEvent(net.sf.okapi.common.Event)">IFilterWriter.handleEvent()</a></code> method each time you get an event from 
 the filter, and then close both input and output when all events have been 
 processed. (Remember that you should always close the input document before the 
-output document, in case you are writing on the same file).</p>
+output document, in case you are writing to the same file).</p>
 <pre>// Processing the input document
 while ( filter.hasNext() ) {
    writer.handleEvent(filter.next());
@@ -418,13 +418,13 @@ while ( filter.hasNext() ) {
 // Closing the filter and the filter writer
 filter.close();
 writer.close();</pre>
-<p>The code above should create a new file called <code>myFile.fr.properties</code> 
+<p>The code above should create a new file called <code>myFile_fr.html</code> 
 in your current directory and its content should be like this:</p>
 <pre>&lt;html&gt;&lt;head&gt;
 &lt;meta http-equiv='Content-Language' content='fr'&gt;&lt;/head&gt;
 &lt;body&gt;
 &lt;p&gt;Text in &lt;b&gt;bold&lt;/b&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</pre>
-<p>As you can notice, the filter writer make some modifications automatically: the HTML 
+<p>As you can see, the filter writer make some modifications automatically: the HTML 
 language declaration has been updated to reflect the target language you 
 specified: &quot;<code>fr</code>&quot;. The remaining of the content is the same as the 
 input.</p>
@@ -435,7 +435,7 @@ extracted text into its original format.</p>
 TEXT_UNIT</code> event, which comes with a <code>
 <a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html">TextUnit</a></code> 
 resource where the source text is stored.</p>
-<p>It is always good practice to isolate the place where you code our changes, so 
+<p>It is always good practice to isolate the place where you code your changes, so 
 we will create a method for it. Our <code>changeTU()</code> method takes one 
 parameter: The <code>
 <a href="../javadoc/net/sf/okapi/common/resource/TextUnit.html">TextUnit</a></code> 
@@ -457,7 +457,7 @@ unit is translatable or not, as shown below:</p>
    if ( !tu.isTranslatable() ) return; // If not, return without changes</pre>
 <p>Once we have established that we can modify the text, we need to create a copy 
 of the source content for the target.</p>
-<p>One thing important to keep in mind when working with filters is that some 
+<p>One important thing to keep in mind when working with filters is that some 
 input documents can be multilingual (for example a PO file, or an XLIFF 
 document). Because of that you may actually already have a target text in your text unit.</p>
 <p>The method <code>
@@ -481,7 +481,7 @@ parameters:</p>
 <pre>   TextContainer tc = tu.createTarget(&quot;fr&quot;, false, IResource.COPY_ALL);</pre>
 <p>The result is a <code>
 <a href="../javadoc/net/sf/okapi/common/resource/TextContainer.html">
-TextContainer</a></code> object, that hold all the target-related data: text, as 
+TextContainer</a></code> object, that holds all the target-related data: text, as 
 well a properties, annotations, etc.</p>
 <p class="question"><b>Question:</b> Is the language code case-sensitive?</p>
 <p class="answer"><b>Answer</b>: Yes it is. Currently &quot;<code>fr</code>&quot; and &quot;<code>FR</code>&quot; 
@@ -537,12 +537,12 @@ target), and annotations (also for the whole unit, for the source, as well as
 for each target). It is also hold its corresponding skeleton object (if there is 
 one).</p>
 <p>The bottom line is that you can access the source text from the text unit, as 
-well create new translation entries or access existing one (if the input 
+well create new translation entries or access existing ones (if the input 
 document is multilingual).</p>
 <p>Each language has a corresponding
 <a href="../javadoc/net/sf/okapi/common/resource/TextContainer.html">
 <code>
-TextContainer</code></a> object that hold the text as well as its associated 
+TextContainer</code></a> object that holds the text as well as its associated 
 properties and annotations. the text itself is in a
 	<a href="../javadoc/net/sf/okapi/common/resource/TextFragment.html"><code>
 	TextFragment</code></a> object. Those parts are easily accessible from the 
@@ -571,8 +571,8 @@ System.out.println(tf1.toString());
 tf1.remove(13, 21);
 // Prints &quot;My first text.&quot;
 System.out.println(tf1.toString());</pre>
-<p dir="ltr">There is, however, one major difference between a <code>
-	<a href="../javadoc/net/sf/okapi/common/resource/TextFragment.html">TextFragment</code></a> 
+<p dir="ltr">There is, however, one major difference between a <a href="../javadoc/net/sf/okapi/common/resource/TextFragment.html">
+    <code>TextFragment</code></a>
 and a string: the inline codes.</p>
 <h3><a name="inlineCodes"></a>Inline Codes</h3>
 <p>Inline codes are spans of the extracted content that are not real text, but 
@@ -631,7 +631,7 @@ characters are in the Private Use Area of Unicode.</p>
  Coded: &quot;Text in <span style="background-color: #FFFF00">\uE101\uE110</span>bold<span style="background-color: #00FF00">\uE102\uE111</span>.&quot;</pre>
 <p>The following method takes a
 	<a href="../javadoc/net/sf/okapi/common/resource/TextFragment.html"><code>
-	TextFragment</code></a> and counts the number of character in the real 
+	TextFragment</code></a> and counts the number of characters in the real 
 text part of the coded text. You can use the <code>
 <a href="../javadoc/net/sf/okapi/common/resource/TextFragment.html#isMarker(char)">
 TextFragment.isMarker()</a></code> helper method to check if a given character 
@@ -650,7 +650,7 @@ character as it represents the index of the inline code to the list of codes.</p
 	<a href="../javadoc/net/sf/okapi/common/resource/TextFragment.html"><code>
 	TextFragment</code></a> and compare it to the other length counts you get:</p>
 <ul>
-	<li><code>tf.getString().length()</code> = 19</li>
+	<li><code>tf.getString().length()</code> = 20</li>
 	<li><code>tf.getCodedText().length()</code> = 17</li>
 	<li><code>countChars(tf)</code> = 13</li>
 </ul>
@@ -660,7 +660,7 @@ into the
 	<a href="../javadoc/net/sf/okapi/common/resource/TextFragment.html"><code>
 	TextFragment</code></a> object. This is done with one of the <code>
 TextFragment.setCodedText()</code> methods.</p>
-<p>The first method set the coded text, and re-use the codes that are 
+<p>The first method sets the coded text, and re-uses the codes that are 
 currently in the
 	<a href="../javadoc/net/sf/okapi/common/resource/TextFragment.html"><code>
 	TextFragment</code></a>. This implies that the inline code markers in the 
@@ -697,7 +697,7 @@ change its type to something else?</p>
 <p class="answer"><b>Answer</b>: No. The <code>TagType</code> flag remains the same 
 (&quot;<code>&lt;b&gt;</code>&quot; is still a start tag). But the marker in the coded text for 
 this inline code should now be <code>MARKER_ISOLATED</code> instead of <code>
-MARKER_OPENING</code>. This change was done automatically you we called <code>
+MARKER_OPENING</code>. This change was done automatically for you when we called <code>
 setCodedText()</code>. We will see more information about how tag types and 
 markers relate to each other later.</p>
 <p>The third method is to specify the list of codes along with the modified 
@@ -754,9 +754,9 @@ tf.append(TagType.PLACEHOLDER, &quot;lb&quot;, &quot;&lt;br/&gt;&quot;);</pre>
 <pre>assert(tf.getCode(0).getTagType() == TagType.OPENING);
 assert(tf.getCode(1).getTagType() == TagType.CLOSING);
 assert(tf.getCode(2).getTagType() == TagType.PLACEHOLDER);</pre>
-<p>This information normally remain unchanged: The code &quot;<code>&lt;b&gt;</code>&quot; is 
-always a start tag regardless of where it is and whether it has a corresponding 
-closing tag or not.</p>
+<p>This information normally remains unchanged: The code &quot;<code>&lt;b&gt;</code>&quot; is 
+always a start tag regardless of where it is and whether or not it has a corresponding
+closing tag.</p>
 <p>There is a difference however between what the tag is and how it should be 
 represented and manipulated from the viewpoint of an extracted segment. That 
 information is related to the position of the inline code in the text and is 

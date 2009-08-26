@@ -317,7 +317,7 @@ public class TextUnit implements INameable, IReferenceable {
 	public TextContainer getSource () {
 		return source;
 	}
-	
+
 	/**
 	 * Sets the source object for this TextUnit. Any existing source object is overwritten.
 	 * @param textContainer the source object to set.
@@ -330,8 +330,8 @@ public class TextUnit implements INameable, IReferenceable {
 		source = textContainer;
 		return source;
 	}
-	
-	/**
+
+    /**
 	 * Gets the target object for this TextUnit for a given language.
 	 * @param language the language to query.
 	 * @return the target object for this TextUnit for the given language, or null if
@@ -341,12 +341,12 @@ public class TextUnit implements INameable, IReferenceable {
 		return targets.get(language);
 	}
 
-	/**
+    /**
 	 * Sets the target object for this TextUnit for a given language.
 	 * Any existing target object for the given language is overwritten.
-	 * To set a target object based on the source, use the 
+	 * To set a target object based on the source, use the
 	 * {@link #createTarget(String, boolean, int)} method.
-	 * @param language the target language. 
+	 * @param language the target language.
 	 * @param text the target object to set.
 	 * @return the target object that has been set.
 	 */
@@ -356,9 +356,9 @@ public class TextUnit implements INameable, IReferenceable {
 		targets.put(language, text);
 		return text;
 	}
-	
-	/**
-	 * Removes a given target object from this TextUnit.  
+
+    /**
+	 * Removes a given target object from this TextUnit.
 	 * @param language the target language to remove.
 	 */
 	public void removeTarget (String language) {
@@ -366,27 +366,27 @@ public class TextUnit implements INameable, IReferenceable {
 			targets.remove(language);
 		}
 	}
-	
-	/**
-	 * Indicates if there is a target object for a given language for this TextUnit. 
+
+    /**
+	 * Indicates if there is a target object for a given language for this TextUnit.
 	 * @param language the language to query.
 	 * @return true if a target object exists for the given language, false otherwise.
 	 */
 	public boolean hasTarget (String language) {
 		return (targets.get(language) != null);
 	}
-	
-	/**
+
+    /**
 	 * Creates or get the target for this TextUnit.
 	 * @param language the target language.
 	 * @param overwriteExisting true to overwrite any existing target for the given language.
-	 * False to not create a new target object if one already exists for the given language. 
+	 * False to not create a new target object if one already exists for the given language.
 	 * @param creationOptions creation options:
 	 * <ul><li>CREATE_EMPTY: Create an empty target object.</li>
 	 * <li>COPY_CONTENT: Copy the text of the source (and any associated in-line code).</li>
 	 * <li>COPY_PROPERTIES: Copy the source properties.</li>
 	 * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES).</li></ul>
-	 * @return the target object that was created, or retrieved. 
+	 * @return the target object that was created, or retrieved.
 	 */
 	public TextContainer createTarget (String language,
 		boolean overwriteExisting,
@@ -395,6 +395,7 @@ public class TextUnit implements INameable, IReferenceable {
 		TextContainer trgCont = targets.get(language);
 		if (( trgCont == null ) || overwriteExisting ) {
 			trgCont = getSource().clone(
+                 // /TODO: find or write a test for this. I only see this one case (what happened to copy_all and copy_content?).
 				(creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
 			if ( creationOptions == CREATE_EMPTY ) {
 				trgCont.clear();
@@ -404,7 +405,7 @@ public class TextUnit implements INameable, IReferenceable {
 		return trgCont;
 	}
 
-	/**
+    /**
 	 * Gets the content of the source for this TextUnit (a {@link TextFragment} object).
 	 * @return the content of the source for this TextUnit.
 	 */
@@ -412,7 +413,7 @@ public class TextUnit implements INameable, IReferenceable {
         //How is this different from getSource()?
 		return source;
 	}
-	
+
 	/**
 	 * Sets the content of the source for thsi TextUnit.
 	 * @param content the new content to set.
