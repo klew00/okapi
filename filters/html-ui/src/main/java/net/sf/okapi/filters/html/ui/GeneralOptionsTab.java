@@ -35,9 +35,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Combo;
 
 public class GeneralOptionsTab extends Composite implements IDialogPage {
-	private Group grpWhitespaceOptions;
-	private Button btnCollapseToSingle;
-	private Button btnPreserveWhitespace;
 	private Group grpSubFilterOptions;
 	private Combo elementSubFilterCombo;
 	private Combo combo_1;
@@ -52,28 +49,6 @@ public class GeneralOptionsTab extends Composite implements IDialogPage {
 	public GeneralOptionsTab(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
-		
-		grpWhitespaceOptions = new Group(this, SWT.NONE);
-		grpWhitespaceOptions.setLayout(new GridLayout(1, false));
-		GridData gridData = new GridData(SWT.FILL, SWT.TOP, true, true, 1, 1);
-		gridData.heightHint = 86;
-		gridData.widthHint = 396;
-		grpWhitespaceOptions.setLayoutData(gridData);
-		grpWhitespaceOptions.setText("Whitespace Handling");
-		grpWhitespaceOptions.setData("name", "grpWhitespaceOptions");
-		
-		btnCollapseToSingle = new Button(grpWhitespaceOptions, SWT.RADIO);
-		btnCollapseToSingle.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
-		btnCollapseToSingle.setData("name", "btnCollapseToSingle");
-		btnCollapseToSingle.setText("Collapse to Single Whitespace");
-		
-		btnPreserveWhitespace = new Button(grpWhitespaceOptions, SWT.RADIO);
-		btnPreserveWhitespace.setData("name", "btnPreserveWhitespace");
-		btnPreserveWhitespace.setText("Preserve Whitespace");
 		
 		grpSubFilterOptions = new Group(this, SWT.NONE);
 		grpSubFilterOptions.setLayout(new GridLayout(1, false));
