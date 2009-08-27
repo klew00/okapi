@@ -9,4 +9,12 @@
   </parent>  
   <artifactId>okapi-tm-pensieve-seeker</artifactId>
   <name>Okapi Pensieve TM Seeker</name>
+
+    <dependencies>
+        <dependency>
+            <artifactId>okapi-tm-pensieve-writer</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
