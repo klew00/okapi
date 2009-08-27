@@ -14,11 +14,11 @@ import java.io.IOException;
  * Date: Aug 5, 2009
  * Time: 8:40:02 AM
  */
-public class LuceneIndexer implements Indexer {
+public class ExactMatchWriter implements TMWriter {
 
     private IndexWriter writer;
 
-    public LuceneIndexer(Directory indexDirectory) throws IOException {
+    public ExactMatchWriter(Directory indexDirectory) throws IOException {
         writer = new IndexWriter(indexDirectory,
                 new SimpleAnalyzer(), true,
                 IndexWriter.MaxFieldLength.UNLIMITED);

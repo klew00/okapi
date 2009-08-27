@@ -5,10 +5,14 @@
 
 package net.sf.okapi.tm.pensieve.writer;
 
+import java.io.IOException;
+
 /**
  *
  * @author HaslamJD
  */
-public interface Updater {
+public interface TMWriter {
+    void endIndex() throws IOException;
 
+    void indexTextUnit(TextUnit tu) throws IOException;
 }
