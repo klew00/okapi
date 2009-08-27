@@ -49,7 +49,7 @@ public class XLIFFMergingStep {
 	private String xliffPath;
 	private String outputPath;
 	private String outputEncoding;
-	private String srcLang;
+//	private String srcLang;
 	private String trgLang;
 	
 	public XLIFFMergingStep (IFilterConfigurationMapper fcMapper) {

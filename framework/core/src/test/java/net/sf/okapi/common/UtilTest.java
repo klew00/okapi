@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;

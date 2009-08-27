@@ -10,7 +10,7 @@ import net.sf.okapi.common.resource.TextUnit;
  * {@link TextUnit}s that are found within tags. HTML and XML attributes are the
  * canonical case. Along with the attribute name, value and type this class
  * stores offset information for the name and value that can be used by the
- * {@link AbstractBaseFilter} to automatically generate proper attribute-based
+ * {@link AbstractFilter} to automatically generate proper attribute-based
  * {@link IResource}s
  */
 public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitPlaceholder> {

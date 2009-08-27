@@ -174,7 +174,7 @@ public class TMXWriter {
 	 * Writes a given text unit.
 	 * @param item the text unit to output.
 	 * @param attributes the optional set of attribute to put along with the entry.
-	 * @param indicates if this item is an 'alternate'. If it is an alternate, if the
+	 * @param alternate indicates if this item is an 'alternate'. If it is an alternate, if the
 	 * target language does not have any entry in this item, the first found entry is used
 	 * instead. This is to allow getting for example FR-CA translations for an FR project.
 	 */

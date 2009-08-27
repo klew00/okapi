@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -994,14 +993,15 @@ public class Util {
 	/**
 	 * Converts a string to an integer. If the conversion fails the method
 	 * returns the given default value.
-	 * @param stringValue the string to convert.
+	 * @param value the string to convert.
 	 * @param intDefault the default value to use if the conversion fails.
 	 * @return the integer value of the string, or the provided default
 	 * value if the conversion failed.
 	 */
 	public static int strToInt (String value, int intDefault) {
-		if (Util.isEmpty(value))
+		if ( Util.isEmpty(value) ) {
 			return intDefault;
+		}
 		try {
 			return Integer.valueOf(value);
 		}

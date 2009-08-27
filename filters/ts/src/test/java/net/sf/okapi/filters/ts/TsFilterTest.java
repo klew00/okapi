@@ -14,12 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.filters.ts.TsFilter;
@@ -27,7 +22,6 @@ import net.sf.okapi.filters.ts.TsFilter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -48,9 +42,7 @@ public class TsFilterTest {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	      DocumentBuilder builder = factory.newDocumentBuilder();
 	      InputSource is = new InputSource(new StringReader("<hello><name>john</name></hello>"));
-	      Document d = builder.parse( is );
-//	      System.out.println("NodeName: "+d.getNodeName());
-//	      System.out.println("NodeName: "+d.getElementsByTagName("name"));
+	      builder.parse( is );
 		
 	}
 	
@@ -164,78 +156,75 @@ public class TsFilterTest {
 		}
 	}	
 	
-	private void process (IFilter filter) {
-		
-		System.out.println("==================================================");
-		Event event;
-		while ( filter.hasNext() ) {
-			event = filter.next();
-			switch ( event.getEventType() ) {		
-			case START_DOCUMENT:
-				System.out.println("---Start Document");
-				printSkeleton(event.getResource());
-				break;
-			case END_DOCUMENT:
-				System.out.println("---End Document");
-				printSkeleton(event.getResource());
-				break;
-			case START_GROUP:
-				System.out.println("---Start Group");
-				printSkeleton(event.getResource());
-				break;
-			case END_GROUP:
-				System.out.println("---End Group");
-				printSkeleton(event.getResource());
-				break;
-			case TEXT_UNIT:
-				System.out.println("---Text Unit");
-				TextUnit tu = (TextUnit)event.getResource();
-				printResource(tu);
-				System.out.println("S=["+tu.toString()+"]");
-				int i = 1;
-				for ( String lang : tu.getTargetLanguages() ) {
-					System.out.println("T"+(i++)+" "+lang+"=["+tu.getTarget(lang).toString()+"]");
-				}
-				printSkeleton(tu);
-				break;
-			case DOCUMENT_PART:
-				System.out.println("---Document Part");
-				printResource((INameable)event.getResource());
-				printSkeleton(event.getResource());
-				break;				
-			}
-		}
-	}
+//	private void process (IFilter filter) {
+//		
+//		System.out.println("==================================================");
+//		Event event;
+//		while ( filter.hasNext() ) {
+//			event = filter.next();
+//			switch ( event.getEventType() ) {		
+//			case START_DOCUMENT:
+//				System.out.println("---Start Document");
+//				printSkeleton(event.getResource());
+//				break;
+//			case END_DOCUMENT:
+//				System.out.println("---End Document");
+//				printSkeleton(event.getResource());
+//				break;
+//			case START_GROUP:
+//				System.out.println("---Start Group");
+//				printSkeleton(event.getResource());
+//				break;
+//			case END_GROUP:
+//				System.out.println("---End Group");
+//				printSkeleton(event.getResource());
+//				break;
+//			case TEXT_UNIT:
+//				System.out.println("---Text Unit");
+//				TextUnit tu = (TextUnit)event.getResource();
+//				printResource(tu);
+//				System.out.println("S=["+tu.toString()+"]");
+//				int i = 1;
+//				for ( String lang : tu.getTargetLanguages() ) {
+//					System.out.println("T"+(i++)+" "+lang+"=["+tu.getTarget(lang).toString()+"]");
+//				}
+//				printSkeleton(tu);
+//				break;
+//			case DOCUMENT_PART:
+//				System.out.println("---Document Part");
+//				printResource((INameable)event.getResource());
+//				printSkeleton(event.getResource());
+//				break;				
+//			}
+//		}
+//	}
 	
-	private void printResource (INameable res) {
-		System.out.println("  id="+res.getId());
-		System.out.println("  name="+res.getName());
-		System.out.println("  type="+res.getType());
-		System.out.println("  mimeType="+res.getMimeType());
-	}
+//	private void printResource (INameable res) {
+//		System.out.println("  id="+res.getId());
+//		System.out.println("  name="+res.getName());
+//		System.out.println("  type="+res.getType());
+//		System.out.println("  mimeType="+res.getMimeType());
+//	}
 
-	private void printSkeleton (IResource res) {
-		ISkeleton skel = res.getSkeleton();
-		if ( skel != null ) {
-			System.out.println("---");
-			System.out.println(skel.toString());
-			System.out.println("---");
-		}
-	}
-	
-	
-	
+//	private void printSkeleton (IResource res) {
+//		ISkeleton skel = res.getSkeleton();
+//		if ( skel != null ) {
+//			System.out.println("---");
+//			System.out.println(skel.toString());
+//			System.out.println("---");
+//		}
+//	}
+
 	private ArrayList<Event> getEvents(String snippet, String srcLang, String trgLang){
-	ArrayList<Event> list = new ArrayList<Event>();
-	filter.open(new RawDocument(snippet, srcLang, trgLang));
-	while ( filter.hasNext() ) {
-		Event event = filter.next();
-		list.add(event);
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(snippet, srcLang, trgLang));
+		while ( filter.hasNext() ) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
 	}
-	filter.close();
-	return list;
-	}
-
 	
 	//--without specifying target language--
 	private ArrayList<Event> getEvents(String snippet, String srcLang){
@@ -247,5 +236,6 @@ public class TsFilterTest {
 		}
 		filter.close();
 		return list;
-		}	
+	}	
+
 }

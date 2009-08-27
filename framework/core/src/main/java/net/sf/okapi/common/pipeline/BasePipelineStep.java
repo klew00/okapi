@@ -36,7 +36,7 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * Gets the {@link IContext} of the current pipeline associated
 	 * with this step.
 	 * 
-	 * @return the current {@link PipelineContext} for this step.
+	 * @return the current {@link IContext} for this step.
 	 */
 	public IContext getContext() {
 		return context;

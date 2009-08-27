@@ -81,17 +81,17 @@ public interface IPipeline {
 	public List<IPipelineStep> getSteps();
 
 	/**
-	 * Gets the current {@link PipelineContext} for this pipeline.
+	 * Gets the current {@link IContext} for this pipeline.
 	 * 
-	 * @return the current {@link PipelineContext} for this pipeline.
+	 * @return the current {@link IContext} for this pipeline.
 	 */
 	public IContext getContext();
 
 	/**
-	 * Sets the {@link PipelineContext} for this pipeline.
+	 * Sets the {@link IContext} for this pipeline.
 	 * 
 	 * @param context
-	 *            the new {@link PipelineContext} for this pipeline.
+	 *            the new {@link IContext} for this pipeline.
 	 */
 	public void setContext(IContext context);
 

@@ -31,9 +31,9 @@ import net.sf.okapi.common.filters.IFilter;
 public interface IPipelineStep {
 
 	/**
-	 * Gets the current {@link PipelineContext} for this pipeline.
+	 * Gets the current {@link IContext} for this pipeline.
 	 * 
-	 * @return the current {@link PipelineContext} for this pipeline.
+	 * @return the current {@link IContext} for this pipeline.
 	 */
 	public IContext getContext();
 
@@ -41,7 +41,7 @@ public interface IPipelineStep {
 	 * Sets the {@link IContext} for this pipeline.
 	 * 
 	 * @param context
-	 *            the new {@link PipelineContext} for this pipeline.
+	 *            the new {@link IContext} for this pipeline.
 	 */
 	public void setContext(IContext context);
 

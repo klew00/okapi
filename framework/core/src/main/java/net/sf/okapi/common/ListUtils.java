@@ -64,9 +64,9 @@ public class ListUtils {
 	/**
 	 * Splits up a string of comma-separated substrings into an array of those substrings.
 	 * @param st string of comma-separated substrings
-	 * @return
+	 * @return the generated array of strings
 	 */
-	public static String[] stringAsArray(String st) {
+	public static String[] stringAsArray (String st) {
 		
 		List<String> list = stringAsList(st);
 		return (String[]) list.toArray();
@@ -75,10 +75,9 @@ public class ListUtils {
 	/**
 	 * Converts a string of comma-separated numbers into a list of integers.
 	 * @param st string of comma-separated numbers 
-	 * @param delimiter a string delimiting numbers in the string
 	 * @return a list of integers 
 	 */
-	public static List<Integer> stringAsIntList(String st) {
+	public static List<Integer> stringAsIntList (String st) {
 		
 		return stringAsIntList(st, ",");
 	}
