@@ -7,6 +7,6 @@
     <groupId>net.sf.okapi.tm.pensieve</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>okapi-tm-pensieve-updater</artifactId>
-  <name>Okapi Pensieve TM Updater</name>
+  <artifactId>okapi-tm-pensieve-writer</artifactId>
+  <name>Okapi Pensieve TM Writer</name>
 </project>

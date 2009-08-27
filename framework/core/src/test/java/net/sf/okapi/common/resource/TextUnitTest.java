@@ -56,7 +56,7 @@ public class TextUnitTest {
     }
 
 	@Test
-	public void testGetSetSource () {
+	public void getSetSource () {
 		tu1.setSource(tc1);
 		assertSame(tu1.getSource(), tc1);
 	}
@@ -67,31 +67,31 @@ public class TextUnitTest {
     }
 
 	@Test
-	public void testGetSetTarget () {
+	public void getSetTarget () {
 		tu1.setTarget(FR, tc1);
 		assertSame("The target should be TextContainer we just set", tc1, tu1.getTarget(FR));
 	}
 
     @Test
-    public void testHasTargetNo(){
+    public void hasTargetNo(){
         assertFalse("No target should exist", tu1.hasTarget(FR));
     }
 
     @Test
-	public void testHasTargetYes () {
+	public void hasTargetYes () {
 		tu1.setTarget(FR, tc1);
 		assertTrue("TextUnit should now have a target", tu1.hasTarget(FR));
 		assertEquals(tu1.hasTarget("FR"), false);
 	}
 
     @Test
-	public void testHasTargetCaseSensitive () {
+	public void hasTargetCaseSensitive () {
 		tu1.setTarget(FR, tc1);
 		assertFalse("FR target is not set", tu1.hasTarget("FR"));
 	}
 
     @Test
-    public void testRemoveTarget(){
+    public void removeTarget(){
         tu1.setTarget(FR, tc1);
         tu1.removeTarget(FR);
         assertFalse("TextUnit should no longer have a target", tu1.hasTarget(FR));

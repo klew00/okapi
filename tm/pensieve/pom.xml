@@ -24,7 +24,7 @@
     </repositories>
 
     <modules>
-        <module>updater</module>
+        <module>writer</module>
         <module>seeker</module>
     </modules>
     
