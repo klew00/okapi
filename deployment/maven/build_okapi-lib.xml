@@ -315,6 +315,11 @@
 				<exclude name="**/target/maven-archiver/**"/>
 			</fileset>
 		</copy>
+		<!-- Delete normal pon file -->
+		<delete file="${dist}/examples/pom.xml" quiet="true"/>
+		<!-- And replace it with the one for deployment -->
+		<rename src="${dist}/examples/pomForDeployment.xml" dest="${dist}/examples/pom.xml"/>
+		
 		<replace file="${dist}/examples/build_examples.bat" token="@version@" value="${okapilibStamp}"/>
 		<replace file="${dist}/examples/build_examples.sh" token="@version@" value="${okapilibStamp}"/>
 		<replace file="${dist}/examples/run_examples.bat" token="@version@" value="${okapilibStamp}"/>

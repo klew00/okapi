@@ -85,6 +85,9 @@ public class ListSelectionPart extends AbstractPart {
 
 	/**
 	 * Sets the type of list this UI part should use.
+	 * <p>The possible values are:
+	 * <ul><li>{@link ListSelectionPart#LISTTYPE_SIMPLE} for a a simple list</li>
+	 * <li> {@link ListSelectionPart#LISTTYPE_DROPDOWN} for a drop-down list</li></ul>
 	 * @param listType the new type of list this UI part should use.
 	 */
 	public void setListType (int listType) {

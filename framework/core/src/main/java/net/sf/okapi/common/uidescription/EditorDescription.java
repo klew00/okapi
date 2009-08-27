@@ -25,6 +25,9 @@ import java.util.Map;
 
 import net.sf.okapi.common.ParameterDescriptor;
 
+/**
+ * Describes the different UI parts and the layout to use for a generic editor.
+ */
 public class EditorDescription {
 	
 	private String caption;
