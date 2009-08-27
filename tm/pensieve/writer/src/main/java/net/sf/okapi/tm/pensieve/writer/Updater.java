@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package net.sf.okapi.tm.pensieve.updater;
+package net.sf.okapi.tm.pensieve.writer;
 
 /**
  *
