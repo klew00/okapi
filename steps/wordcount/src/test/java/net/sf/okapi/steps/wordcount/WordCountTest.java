@@ -1,6 +1,5 @@
 package net.sf.okapi.steps.wordcount;
 
-
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -61,5 +60,38 @@ public class WordCountTest {
 		assertEquals(7, (int)positions.get(1));
 		assertEquals(12, (int)positions.get(2));
 		assertEquals(19, (int)positions.get(3));
+		
+		sb = new StringBuilder();
+		
+		sb.append("ab");
+		sb.append((char) TextFragment.MARKER_OPENING);
+		sb.append((char) (TextFragment.CHARBASE + 1));
+		sb.append("cde");
+		sb.append((char) TextFragment.MARKER_ISOLATED);
+		sb.append((char) (TextFragment.CHARBASE + 2));
+		sb.append("fgh");
+		sb.append((char) TextFragment.MARKER_SEGMENT);
+		sb.append((char) (TextFragment.CHARBASE + 3));
+		sb.append("ijklm");
+		sb.append((char) TextFragment.MARKER_CLOSING);
+		sb.append((char) (TextFragment.CHARBASE + 4));
+		sb.append("n");
+		
+		st = sb.toString(); 
+		
+		assertEquals("abcdefghijklmn", TextUnitUtils.getText(new TextFragment(st)));
+		
+		positions = new ArrayList<Integer> ();
+		assertEquals("abcdefghijklmn", TextUnitUtils.getText(new TextFragment(st), positions));
+		
+		assertEquals(4, positions.size());
+		
+		assertEquals(2, (int)positions.get(0));
+		assertEquals(7, (int)positions.get(1));
+		assertEquals(12, (int)positions.get(2));
+		assertEquals(19, (int)positions.get(3));
+		
+		st = "abcdefghijklmn";
+		assertEquals(st, TextUnitUtils.getText(new TextFragment(st)));
 	}
 }

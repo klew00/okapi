@@ -217,6 +217,9 @@ public class TextUnitUtils {
 				}
 			
 			}
+			
+			if (startPos < res.length())
+				sb.append(res.substring(startPos));
 				
 		return sb.toString();
 	}

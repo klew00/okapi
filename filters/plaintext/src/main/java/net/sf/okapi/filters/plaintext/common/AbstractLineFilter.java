@@ -41,6 +41,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -240,6 +241,24 @@ public abstract class AbstractLineFilter extends AbstractFilter {
 		return event;		
 	}
 	
+//	protected Event getQueueHead() {
+//		
+//		Event event = queue.getFirst();
+//
+//		return event;
+//	}
+	
+	protected TextUnit getFirstTextUnit() {
+		
+		for (Event event : queue) {
+			
+			if (event.getEventType() == EventType.TEXT_UNIT)
+				return (TextUnit) event.getResource();
+		}
+		
+		return null;
+	}
+	
 	public Event next() {
 				
 		// Cancel if requested
@@ -379,6 +398,32 @@ public abstract class AbstractLineFilter extends AbstractFilter {
 		return (GenericSkeleton) skel;
 	}
 	
+	protected final GenericSkeleton getHeadSkeleton() {
+		// Return a skeleton of the first event in the queue
+		
+		if (queue == null) return null;
+		if (Util.isEmpty(queue)) return null;
+		
+		Event event = queue.getFirst();
+		if (event == null) return null;
+
+		IResource res = event.getResource();
+		if (res == null) return null;
+		
+		ISkeleton skel = res.getSkeleton();
+		
+		if (skel == null) {
+			
+		// Force skeleton
+			skel = new GenericSkeleton();
+			res.setSkeleton(skel);
+		}
+			
+		if (!(skel instanceof GenericSkeleton)) return null; 
+		
+		return (GenericSkeleton) skel;
+	}
+	
 	protected final int getQueueSize() {
 		
 		return queue.size();
@@ -467,9 +512,27 @@ public abstract class AbstractLineFilter extends AbstractFilter {
 
 		GenericSkeleton skel = getActiveSkeleton();
 		
-		if (skel != null && lineNumber > 1) 
+		if (skel != null /*&& lineNumber > 1*/) 
 			skel.append(lineBreak);
 	}
+	
+//	protected final void removeLineBreak() {
+//
+//		GenericSkeleton skel = getActiveSkeleton();
+//		
+//		if (skel != null) {
+//			
+//			List<GenericSkeletonPart> parts = skel.getParts();
+//			
+//			if (Util.isEmpty(parts))
+//				return;
+//			
+//			GenericSkeletonPart lastPart = parts.get(parts.size() - 1);
+//			
+//			if (lastPart.toString().equals(lineBreak))
+//				parts.remove(parts.size() - 1);
+//		}
+//	}
 
 	@Override
 	protected void logMessage (Level level, String text) {

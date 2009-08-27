@@ -490,7 +490,14 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		}
 		
 		if (tuSent) {
-			sendEvent(startGroupIndex, EventType.START_GROUP, new StartGroup(""));
+			
+			StartGroup startGroup = new StartGroup("");
+			
+			if (startGroup != null)
+				startGroup.setType("row"); // restype = "row"
+				
+			sendEvent(startGroupIndex, EventType.START_GROUP, startGroup);
+			
 			sendEvent(EventType.END_GROUP, new Ending(""));
 		}
 		

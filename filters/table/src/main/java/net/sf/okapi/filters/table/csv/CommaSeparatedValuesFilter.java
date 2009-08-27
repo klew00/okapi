@@ -23,13 +23,16 @@ package net.sf.okapi.filters.table.csv;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.ListUtils;
 import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
 import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
@@ -47,20 +50,22 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	public static final String FILTER_NAME		= "okf_table_csv";
 	public static final String FILTER_CONFIG	= "okf_table_csv";
 	
-	private static String MERGE_START_TAG	= "\ue10a";
-	private static String MERGE_END_TAG		= "\ue10b";
-	private static String LINE_BREAK_TAG	= "\ue10c";
-	private static String LINE_WRAP_TAG		= "\ue10d";
+// TODO	uncomment
+//	private static String MERGE_START_TAG	= "\ue10a";
+//	private static String MERGE_END_TAG		= "\ue10b";
+//	private static String LINE_BREAK_TAG	= "\ue10c";
+//	private static String LINE_WRAP_TAG		= "\ue10d";
 
 //	Debug
-//	private static String MERGE_START_TAG	= "_start_";
-//	private static String MERGE_END_TAG		= "_end_";
-//	private static String LINE_BREAK_TAG	= "_line_";
-//	private static String LINE_WRAP_TAG		= "_wrap_";
+	private static String MERGE_START_TAG	= "_start_";
+	private static String MERGE_END_TAG		= "_end_";
+	private static String LINE_BREAK_TAG	= "_line_";
+	private static String LINE_WRAP_TAG		= "_wrap_";
 	
 	private Parameters params; // CSV Filter parameters
 	private List<String> buffer;
 	private boolean merging = false;
+	private boolean lineFlushed = false;
 	private int qualifierLen;
 	
 //	public void component_create() {
@@ -82,7 +87,8 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	@Override
 	protected void component_init() {
 
-		merging = false;		
+		merging = false;
+		lineFlushed = false;
 		
 		params = getParameters(Parameters.class);	// Throws OkapiBadFilterParametersException
 		qualifierLen = Util.getLength(params.textQualifier);
@@ -105,7 +111,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 		String line = lineContainer.getCodedText();
 		
-		if (Util.isEmpty(line)) return TextProcessingResult.REJECTED;
+		// if (Util.isEmpty(line)) return TextProcessingResult.REJECTED;
 		
 		if (Util.isEmpty(params.fieldDelimiter)) return super.extractCells(cells, lineContainer, lineNum);		
 		
@@ -183,9 +189,21 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 			}
 		}
 			
-		// Change 2 quotes inside the field to one quote
-		cell = cell.replaceAll("\"\"", "\"");
+//		// Change 2 quotes inside the field to one quote (2 adjacent quotes in CSV are part of quoted text, not field qualifiers)
+//		//cell = cell.replaceAll("\"\"", "\""); // get lost, should go to inline codes
+//				
+//		StringBuilder sb = new StringBuilder();
+//
+//		int start = 0;
+//		do {			
+//			int index = cell.indexOf("\"\"");
+//			if (index == -1) break;
+//			
+//			sb.append(cell.substring(start, index));
+//			start = index + 2;
+//		} while (true);
 		
+		// Process wrapped lines
 		List<String> temp = ListUtils.stringAsList(cell, LINE_WRAP_TAG);
 		
 		if (temp.size() > 1) {
@@ -197,7 +215,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 				String st = temp.get(i);
 				
 				src.append(st);				
-				if (i == temp.size()) break;
+				if (i == temp.size() - 1) break;
 				
 				switch (params.wrapMode) {
 				
@@ -217,6 +235,22 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		}
 		else
 			src.setCodedText(cell); // No line wrappers found 
+		
+		// Change 2 quotes inside the field to one quote (2 adjacent quotes in CSV are part of quoted text, not field qualifiers)
+		String st = src.getCodedText();		
+		String qq = params.textQualifier + params.textQualifier;
+		
+		int start = 0; // abs index
+		do {			
+			int index = st.indexOf(qq); // rel index
+			if (index == -1) break;
+			
+			src.changeToCode(start + index, start + index + 1, TagType.PLACEHOLDER, "CSV quote preamble");
+			
+			start += index + 3; // Code takes 2 positions			
+			st = src.getCodedText().substring(start); // To make sure we're synchronized
+		} while (true);
+
 		
 		boolean res = super.sendSourceCell(tu, column, numColumns);
 				
@@ -299,7 +333,13 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		// Scans the buffer for a line, merges chunks, removes and returns the line's chunks
 		
 		if (buffer == null) return;
-		if (buffer.isEmpty()) return;
+		if (buffer.isEmpty()) {
+			
+//			if (forceEnding)
+//				removeLineBreak();
+			
+			return;
+		}
 		
 		int start = -1;
 		int end = -1;
@@ -378,7 +418,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 //		buf.addAll(buffer.subList(0, index));		
 //		buffer.subList(0, index).clear();
 		
-		addLineBreak(); // Insert a line break after the previous line
+//		addLineBreak(); // Insert a line break after the previous line
 		
 		List<TextUnit> buf = new ArrayList<TextUnit>();
 		
@@ -387,7 +427,31 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 		buffer.subList(0, index).clear();
 		
+		if (lineFlushed && !forceEnding)
+			// We cannot add line break when forceEnding=true, as there's no event in the queue to provide a skeleton
+			addLineBreak();
+		
+		if (forceEnding)
+			getQueueSize();
+		
 		processCells(buf, lineNum);
+		lineFlushed = true;
+		
+		
+		if (lineFlushed && forceEnding) {
+		
+			TextUnit tu = getFirstTextUnit();
+			if (tu == null) return;
+			
+			GenericSkeleton skel = (GenericSkeleton) tu.getSkeleton();
+			if (skel != null) {
+			
+				List <GenericSkeletonPart> parts = skel.getParts();				
+				parts.add(0, new GenericSkeletonPart(getLineBreak()));
+			}
+		}
+		
+		
 	}
 	
 }

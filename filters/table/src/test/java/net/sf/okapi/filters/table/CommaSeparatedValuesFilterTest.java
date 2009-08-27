@@ -48,8 +48,12 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
+import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 import net.sf.okapi.filters.plaintext.common.WrapMode;
 import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
 import net.sf.okapi.filters.table.csv.Parameters;
@@ -338,8 +342,9 @@ public class CommaSeparatedValuesFilterTest {
 		assertEquals(expected, st);
 	}
 	
+	
 	@Test
-	public void testSkeleton3 () {
+	public void testSkeleton2 () {
 		String st = null;
 		String expected = null;
 		
@@ -352,6 +357,26 @@ public class CommaSeparatedValuesFilterTest {
 		
 		try {
 			expected = _streamAsString(CommaSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
+		} 
+		catch (IOException e) {
+		}
+		assertEquals(expected, st);
+	}
+	
+	@Test
+	public void testSkeleton3 () {
+		String st = null;
+		String expected = null;
+		
+		try {
+			st = _getSkeleton(_getFullFileName("csv_test3.txt"));
+		} 
+		catch (UnsupportedEncodingException e) {
+		}	
+		//debug System.out.println(String.format("Skeleton of %s\n---\n", "csv_test3.txt") + st + "\n----------");
+		
+		try {
+			expected = _streamAsString(CommaSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test3.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -418,11 +443,199 @@ public class CommaSeparatedValuesFilterTest {
 		input = TableFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
-		System.out.println(filename);
+		// System.out.println(filename);
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}
+	
+	
+//	@Test
+//	public void testFileEvents106() {
+//		
+//		Parameters params = (Parameters) filter.getParameters();
+//		
+//		InputStream input = TableFilterTest.class.getResourceAsStream("/csv.txt"); // issue 106
+//		assertNotNull(input);
+//		
+//		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+//		params.valuesStartLineNum = 2;
+//		params.columnNamesLineNum = 1;
+//		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+//		
+//		filter.open(new RawDocument(input, "UTF-8", "en"));
+//		
+//		_testEvent(EventType.START_DOCUMENT, null);
+//						
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "id");
+//		_testEvent(EventType.TEXT_UNIT, "value");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "01");
+//		_testEvent(EventType.TEXT_UNIT, "one");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "02");
+//		_testEvent(EventType.TEXT_UNIT, "first,\nsecond\n");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "03");
+//		_testEvent(EventType.TEXT_UNIT, "three");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.END_DOCUMENT, null);
+//		
+//		filter.close();
+//	}
+//	
+//	@Test
+//	public void testFileEvents106_2() {
+//		
+//		Parameters params = (Parameters) filter.getParameters();
+//		
+//		InputStream input = TableFilterTest.class.getResourceAsStream("/csv2.txt"); // issue 106
+//		assertNotNull(input);
+//		
+//		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+//		params.valuesStartLineNum = 2;
+//		params.columnNamesLineNum = 1;
+//		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+//		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+//		
+//		filter.open(new RawDocument(input, "UTF-8", "en"));
+//		
+//		_testEvent(EventType.START_DOCUMENT, null);
+//						
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "id");
+//		_testEvent(EventType.TEXT_UNIT, "value");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "01");
+//		_testEvent(EventType.TEXT_UNIT, "one");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "02");
+//		_testEvent(EventType.TEXT_UNIT, "first,\nsecond");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "03");
+//		_testEvent(EventType.TEXT_UNIT, "three");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.END_DOCUMENT, null);
+//		
+//		filter.close();
+//	}
+//	
+//	@Test
+//	public void testFileEvents96() {
+//		
+//		Parameters params = (Parameters) filter.getParameters();
+//		
+//		InputStream input = TableFilterTest.class.getResourceAsStream("/CSVTest_96.txt"); // issue 96
+//		assertNotNull(input);
+//		
+////		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+////		params.valuesStartLineNum = 2;
+////		params.columnNamesLineNum = 1;
+////		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+////		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+////		
+////		params.detectColumnsMode = Parameters.DETECT_COLUMNS_FIXED_NUMBER;
+////		params.numColumns = 3;
+//				
+//		params.loadFromResource("/okf_table@copy-of-csv_96.fprm");
+//		//params.numColumns = 3;
+//		//params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+//		
+//		filter.open(new RawDocument(input, "UTF-8", "en"));
+//		
+//		_testEvent(EventType.START_DOCUMENT, null);
+//						
+////		_testEvent(EventType.START_GROUP, null);
+////		_testEvent(EventType.TEXT_UNIT, "Source");
+////		_testEvent(EventType.TEXT_UNIT, "Target");
+////		_testEvent(EventType.TEXT_UNIT, "Data");
+////		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+////		_testEvent(EventType.TEXT_UNIT, "Target text 1");
+////		_testEvent(EventType.TEXT_UNIT, "third column data1");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+////		_testEvent(EventType.TEXT_UNIT, "Target text 2");
+////		_testEvent(EventType.TEXT_UNIT, "third column data2");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.END_DOCUMENT, null);
+//		
+//		filter.close();
+//	}
+//	
+//	@Test
+//	public void testFileEvents97() {
+//		
+//		Parameters params = (Parameters) filter.getParameters();
+//		
+//		InputStream input = TableFilterTest.class.getResourceAsStream("/CSVTest_97.txt"); // issue 97
+//		assertNotNull(input);
+//		
+////		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+////		params.valuesStartLineNum = 2;
+////		params.columnNamesLineNum = 1;
+////		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+////		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+////		
+////		params.detectColumnsMode = Parameters.DETECT_COLUMNS_FIXED_NUMBER;
+////		params.numColumns = 3;
+//				
+//		params.loadFromResource("/okf_table@copy-of-csv_97.fprm");
+//		//params.numColumns = 5;
+//		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+//		
+//		filter.open(new RawDocument(input, "UTF-8", "en"));
+//		
+//		_testEvent(EventType.START_DOCUMENT, null);
+//						
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "Source");
+//		_testEvent(EventType.TEXT_UNIT, "Target");
+//		_testEvent(EventType.TEXT_UNIT, "Data");
+//		_testEvent(EventType.TEXT_UNIT, "Source");
+//		_testEvent(EventType.TEXT_UNIT, "Target");		
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "Source text 1");
+//		_testEvent(EventType.TEXT_UNIT, "Target text 1");
+//		_testEvent(EventType.TEXT_UNIT, "third column data1");
+//		_testEvent(EventType.TEXT_UNIT, "SourceB1");
+//		_testEvent(EventType.TEXT_UNIT, "TargetB1");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.START_GROUP, null);
+//		_testEvent(EventType.TEXT_UNIT, "Source text 2");
+//		_testEvent(EventType.TEXT_UNIT, "Target text 2");
+//		_testEvent(EventType.TEXT_UNIT, "third column data2");
+//		_testEvent(EventType.TEXT_UNIT, "SourceB2");
+//		_testEvent(EventType.TEXT_UNIT, "TargetB2");
+//		_testEvent(EventType.END_GROUP, null);
+//		
+//		_testEvent(EventType.END_DOCUMENT, null);
+//		
+//		filter.close();
+//	}
 	
 	@Test
 	public void testQualifiedValues() {
@@ -930,8 +1143,9 @@ public class CommaSeparatedValuesFilterTest {
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
-		list.add(new InputDocument(root + "csv_test1.txt", ""));
-		list.add(new InputDocument(root + "csv_test2.txt", ""));
+//		list.add(new InputDocument(root + "csv_test1.txt", ""));
+//		list.add(new InputDocument(root + "csv_test2.txt", ""));
+		list.add(new InputDocument(root + "csv_test3.txt", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
@@ -960,7 +1174,8 @@ public class CommaSeparatedValuesFilterTest {
 			IResource res = event.getResource();
 			assertTrue(res instanceof TextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			// assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, TextUnitUtils.getSourceText((TextUnit) res, true));
 			break;
 			
 		case DOCUMENT_PART:
@@ -974,6 +1189,50 @@ public class CommaSeparatedValuesFilterTest {
 			}
 			break;
 		}
+	}
+	
+	private void _testEvent(EventType expectedType, String source, String expName, String target, String language, String comment) {
+		
+		assertNotNull(filter);
+		
+		Event event = filter.next();		
+		assertNotNull(event);
+		
+		assertTrue(event.getEventType() == expectedType);
+		
+		switch (event.getEventType()) {
+		
+		case TEXT_UNIT:
+			IResource res = event.getResource();
+			assertTrue(res instanceof TextUnit);
+			TextUnit tu = (TextUnit) res;
+			
+			assertEquals(source, tu.toString());
+			
+			Property prop = tu.getSourceProperty(AbstractLineFilter.LINE_NUMBER);
+			assertNotNull(prop);
+			
+			if (!Util.isEmpty(expName)) {
+				assertEquals(expName, tu.getName());
+			}
+			
+			if (!Util.isEmpty(target) && !Util.isEmpty(language)) {
+				
+				TextContainer trg = tu.getTarget(language);
+				assertNotNull(trg);
+				assertEquals(target, trg.toString());
+			}
+			
+			if (!Util.isEmpty(comment)) {
+				
+				prop = tu.getProperty(Property.NOTE);
+				assertNotNull(prop);
+				assertEquals(comment, prop.toString());
+			}
+			
+			break;
+		}
+			
 	}
 
 	private Parameters _getParameters() {
