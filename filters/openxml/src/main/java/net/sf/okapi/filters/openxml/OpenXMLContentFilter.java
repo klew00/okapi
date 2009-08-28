@@ -168,6 +168,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	private RawDocument rdSource; // Textbox
 	private EncoderManager encoderManager; // to handle text not to be translated
 	private String endpara="";  // DWH 8-17-09
+	private boolean bInPowerpointEndPara; // DWH 8-17-09
 	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
@@ -855,9 +856,17 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			}
 			else
 			{
-				trTextRun = new TextRun();
-				bInTextRun = true;
-				addToTextRun(encoderManager.encode(txt,0)); // not inside text markers, so this text will become part of a code
+				if (bInPowerpointEndPara) // DWH 8-28-09 skip everything in a:endParaRpr
+				{
+					endpara += txt;
+					return;
+				}
+				else
+				{
+					trTextRun = new TextRun();
+					bInTextRun = true;
+					addToTextRun(encoderManager.encode(txt,0)); // not inside text markers, so this text will become part of a code
+				}
 			}
 		}
 	}
@@ -927,6 +936,11 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		if (bInTextBox) // DWH 7-23-09 textbox
 		{
 			sInsideTextBox += sTagString;
+			return;
+		}
+		if (bInPowerpointEndPara) // DWH 8-27-09  skip everything in a:endParaRpr
+		{
+			endpara += sTagString;
 			return;
 		}
 		if (getRuleState().isExludedState()) {
@@ -1031,7 +1045,11 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			{
 				propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag); // 1-29-09
 				if (sTagElementType.equals("a:endpararpr")) // DWH 8-17-09 for Powerpoint a:endParaRpr
+				{
 					endpara += sTagString;
+					if (!startTag.isSyntacticalEmptyElementTag()) // if not standalone tag, ignore tags until end tag
+						bInPowerpointEndPara = true;
+				}
 				else if (bInTextRun) // DWH 4-10-09
 					addToTextRun(startTag,propertyTextUnitPlaceholders);
 				else
@@ -1196,6 +1214,13 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		if (bInTextBox && getConfig().getMainRuleType(sTagName)!=RULE_TYPE.GROUP_ELEMENT)
 		{
 			sInsideTextBox += sTagString;
+			return;
+		}
+		if (bInPowerpointEndPara) // DWH 8-27-09  skip everything in a:endParaRpr
+		{
+			endpara += sTagString;
+			if (sTagElementType.equals("a:endpararpr")) // DWH 8-27-09 for Powerpoint a:endParaRpr
+				bInPowerpointEndPara = false;
 			return;
 		}
 		switch (getConfig().getMainRuleType(sTagName)) {
