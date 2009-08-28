@@ -15,7 +15,8 @@
 		<td class="smalltoc"><p>
 			- <a href="#overview">Overview</a><br>
 			- <a href="#processing">Processing Details</a><br>
-			- <a href="#parameters">Parameters</a><td class="hmenu">
+			- <a href="#parameters">Parameters</a><br>
+			- <a href="#knownIssues">Known issues</a><td class="hmenu">
 			<div class="hmenu"><table align="right"><tr>
 				<td><a href="../index.html">Filters</a></td>
 				<td><a href="http://okapi.opentag.com/devguide/index.html">Developer&#39;s Guide</a></td>
@@ -34,7 +35,7 @@ net.sf.okapi.filters.openoffice.OpenOfficeFilter</code> of the Okapi library.</p
 filter: The ODF Filter is an Okapi component that implements the <code>IFilter</code> 
 interface for raw OpenDocument XML files. That filter is implement in the class <code>
 net.sf.okapi.filters.openoffice.ODFFilter</code> of the Okapi library.</p>
-<p>This way you can process OpenOffice.org documents, or directly the raw ODF 
+<p>Having access to the two filters allows you to process OpenOffice.org documents, or directly raw ODF 
 documents if needed.</p>
 
 <h2><a name="processing"></a>Processing Details</h2>
@@ -67,6 +68,20 @@ OpenOffice, so any translation done for these content will be automatically
 overwritten as soon as the document is updated. However, in some cases it may be 
 useful to be able to have the referenced text as part of the segment where it is 
 inserted.</p>
+<h2><a name="knownIssues"></a>Known Issues</h2>
+<p>This filter has several know issues:</p>
+<ul>
+	<li>Some deleted text may get extracted. Make sure you have accepted or 
+	rejected the revisions changes before processing the input document, as 
+	currently some text marked as deleted is still extracted.</li>
+	<li>The options to extract or not the notes and the references is not 
+	working yet. They wll be extracted regardless of the option settings.</li>
+	<li>Sequential tabs may get reduced to a single tab during an extraction and 
+	merge round trip: The elements for spaces and tabs are supported in output 
+	but still incorrectly handled on input.</li>
+</ul>
+<p>Please, report any other issues to the
+<a href="http://code.google.com/p/okapi/issues/list">Issues List of the project</a>.</p>
 <p>&nbsp;</p>
 
 </body>

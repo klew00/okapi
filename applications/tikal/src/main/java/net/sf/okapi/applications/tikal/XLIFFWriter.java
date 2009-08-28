@@ -174,7 +174,7 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeAttributeString("datatype",contentType);
 		
 		if (( configId != null ) || ( inputEncoding != null )) {
-			writer.writeAttributeString("xmlns:x", "myExtensions");
+			writer.writeAttributeString("xmlns:x", "http://net.sf.okapi/ns/xliff-extensions");
 			writer.writeAttributeString("x:inputEncoding", inputEncoding);
 			writer.writeAttributeString("x:configId", configId);
 		}
