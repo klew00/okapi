@@ -34,6 +34,7 @@ public class TMXContent {
 	private String codedText;
 	private List<Code> codes;
 	private boolean withTradosWorkarounds = false;
+	private int defaultQuoteMode = 1;
 
 	/**
 	 * Creates a new TMXContent object without any content.
@@ -61,6 +62,16 @@ public class TMXContent {
 	}
 	
 	/**
+	 * Sets the default quote mode. This value is used when using {@link #toString()}
+	 * instead of {@link #toString(int, boolean)}.
+	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
+	 * and 3=quot only.
+	 */
+	public void setQuoteMode (int quoteMode) {
+		defaultQuoteMode = quoteMode;
+	}
+	
+	/**
 	 * Sets the fragment to format.
 	 * @param content The TextFragment object to format.
 	 * @return Itself
@@ -73,12 +84,13 @@ public class TMXContent {
 	
 	/**
 	 * Generates a TMX string from the content.
-	 * This is the same as calling this.toString(1, true).
+	 * This is the same as calling this.toString(quoteMode, true),
+	 * where quoteMode is the value set by {@link #setQuoteMode(int)} or 1 by default.
 	 * @return The string formatted in TMX.
 	 */
 	@Override
 	public String toString () {
-		return toString(1, true);
+		return toString(defaultQuoteMode, true);
 	}
 
 	/**

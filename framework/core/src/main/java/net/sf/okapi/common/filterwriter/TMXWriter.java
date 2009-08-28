@@ -43,8 +43,14 @@ public class TMXWriter {
 	private String srcLang;
 	private String trgLang;
 	private int itemCount;
-	private boolean withTradosWorkarounds;
 	private Pattern exclusionPattern = null;
+
+	/**
+	 * Creates a new TMXWriter object.
+	 */
+	public TMXWriter () {
+		tmxCont = new TMXContent();
+	}
 
 	/**
 	 * Closes the current output document if one is opened.
@@ -73,8 +79,6 @@ public class TMXWriter {
 		if ( path == null ) throw new NullPointerException();
 		itemCount = 0;
 		writer = new XMLWriter();
-		tmxCont = new TMXContent();
-		tmxCont.setTradosWorkarounds(withTradosWorkarounds);
 		writer.create(path);
 	}
 	
@@ -84,10 +88,7 @@ public class TMXWriter {
 	 * @param value True to output Trados-specific workarounds. False otherwise.
 	 */
 	public void setTradosWorkarounds (boolean value) {
-		withTradosWorkarounds = value;
-		if ( tmxCont != null ) {
-			tmxCont.setTradosWorkarounds(withTradosWorkarounds);
-		}
+		tmxCont.setTradosWorkarounds(value);
 	}
 	
 	/**
@@ -102,6 +103,15 @@ public class TMXWriter {
 		else {
 			exclusionPattern = Pattern.compile(pattern);
 		}
+	}
+
+	/**
+	 * Sets the default quote mode to use in escaping the TMX segment content (1 is the default).
+	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
+	 * and 3=quot only.
+	 */
+	public void setQuoteMode (int quoteMode) {
+		tmxCont.setQuoteMode(quoteMode);
 	}
 	
 	/**
