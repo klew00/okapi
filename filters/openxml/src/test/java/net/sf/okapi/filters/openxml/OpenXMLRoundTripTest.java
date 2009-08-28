@@ -89,7 +89,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("Practice2.docx");
 		themfiles.add("commentTable.xlsx");
 		themfiles.add("InsertText.pptx");
-
+		themfiles.add("Endpara.pptx");
 
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
