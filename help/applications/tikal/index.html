@@ -22,17 +22,17 @@ localization-related utilities:</p>
 	<li><a href="#listConfig">List Filter Configurations</a></li>
 	<li><a href="#editConfig">Edit Filter Configurations</a></li>
 </ul>
-<p>Note: The command <code>-e</code> (Edit Filter Configurations) does 
-require UI-specific libraries. These libraries are in the <b>okapi-apps</b> 
-distribution (which are per-platform), but not in the <b>okapi-lib</b> 
-distribution (which is cross-platform).</p>
+<p>Note: The command <code>-e</code> (Edit Filter Configurations) requires 
+access to UI editors that are available only if you have one of the <b>okapi-apps</b> platform-specific distributions. It is not 
+available with the <b>okapi-lib</b> cross-platform distribution.</p>
 <h2><a name="extract"></a>Extract Files</h2>
 <p>This command extracts the translatable content of one or more given files 
 into an XLIFF document. You can then use any XLIFF-aware translation tool to 
 translate the document. Example of open-source tools that are XLIFF-capable are 
 (among others):
 <a href="http://www.omegat.org/">OmegaT</a>,
-<a href="http://translate.sourceforge.net/wiki/virtaal/index">Virtaal</a>, and
+<a href="http://translate.sourceforge.net/wiki/virtaal/index">Virtaal</a>, 
+<a href="http://qt.nokia.com/products/developer-tools">Qt Linguist</a>, and
 <a href="http://userbase.kde.org/Lokalize">Lokalize</a>. When the translation is 
 done, you can use the <a href="#merge">Merge command</a> to create a new 
 translated file in its original format.</p>
