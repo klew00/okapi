@@ -32,6 +32,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
+import net.sf.okapi.filters.plaintext.common.StringUtils;
 import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
 import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
@@ -48,17 +49,16 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	public static final String FILTER_NAME		= "okf_table_csv";
 	public static final String FILTER_CONFIG	= "okf_table_csv";
 	
-// TODO	uncomment
-//	private static String MERGE_START_TAG	= "\ue10a";
-//	private static String MERGE_END_TAG		= "\ue10b";
-//	private static String LINE_BREAK_TAG	= "\ue10c";
-//	private static String LINE_WRAP_TAG		= "\ue10d";
+	private static String MERGE_START_TAG	= "\ue10a";
+	private static String MERGE_END_TAG		= "\ue10b";
+	private static String LINE_BREAK_TAG	= "\ue10c";
+	private static String LINE_WRAP_TAG		= "\ue10d";
 
 //	Debug
-	private static String MERGE_START_TAG	= "_start_";
-	private static String MERGE_END_TAG		= "_end_";
-	private static String LINE_BREAK_TAG	= "_line_";
-	private static String LINE_WRAP_TAG		= "_wrap_";
+//	private static String MERGE_START_TAG	= "_start_";
+//	private static String MERGE_END_TAG		= "_end_";
+//	private static String LINE_BREAK_TAG	= "_line_";
+//	private static String LINE_WRAP_TAG		= "_wrap_";
 	
 	private Parameters params; // CSV Filter parameters
 	private List<String> buffer;
@@ -97,6 +97,18 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 			buffer = new ArrayList<String>();
 		else
 			buffer.clear();		
+	}
+
+	@Override
+	protected void preProcessTarget(TextUnit target) {
+		
+		TextUnitUtils.removeQualifiers(target, params.textQualifier);
+	}
+
+	@Override
+	protected String preProcessCell(String cell) {
+		
+		return StringUtils.removeQualifiers(cell, params.textQualifier);
 	}
 
 	@Override

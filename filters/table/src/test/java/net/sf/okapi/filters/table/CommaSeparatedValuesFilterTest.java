@@ -624,107 +624,122 @@ public class CommaSeparatedValuesFilterTest {
 		filter.close();
 	}
 	
-//	@Test
-//	public void testFileEvents96() {
-//		
-//		Parameters params = (Parameters) filter.getParameters();
-//		
-//		InputStream input = TableFilterTest.class.getResourceAsStream("/CSVTest_96.txt"); // issue 96
-//		assertNotNull(input);
-//		
-////		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
-////		params.valuesStartLineNum = 2;
-////		params.columnNamesLineNum = 1;
-////		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
-////		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
-////		
-////		params.detectColumnsMode = Parameters.DETECT_COLUMNS_FIXED_NUMBER;
-////		params.numColumns = 3;
-//				
-//		params.loadFromResource("/okf_table@copy-of-csv_96.fprm");
-//		//params.numColumns = 3;
-//		//params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
-//		
-//		filter.open(new RawDocument(input, "UTF-8", "en"));
-//		
-//		_testEvent(EventType.START_DOCUMENT, null);
-//						
-////		_testEvent(EventType.START_GROUP, null);
-////		_testEvent(EventType.TEXT_UNIT, "Source");
-////		_testEvent(EventType.TEXT_UNIT, "Target");
-////		_testEvent(EventType.TEXT_UNIT, "Data");
-////		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
-////		_testEvent(EventType.TEXT_UNIT, "Target text 1");
-////		_testEvent(EventType.TEXT_UNIT, "third column data1");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
-////		_testEvent(EventType.TEXT_UNIT, "Target text 2");
-////		_testEvent(EventType.TEXT_UNIT, "third column data2");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.END_DOCUMENT, null);
-//		
-//		filter.close();
-//	}
-//	
-//	@Test
-//	public void testFileEvents97() {
-//		
-//		Parameters params = (Parameters) filter.getParameters();
-//		
-//		InputStream input = TableFilterTest.class.getResourceAsStream("/CSVTest_97.txt"); // issue 97
-//		assertNotNull(input);
-//		
-////		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
-////		params.valuesStartLineNum = 2;
-////		params.columnNamesLineNum = 1;
-////		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
-////		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
-////		
-////		params.detectColumnsMode = Parameters.DETECT_COLUMNS_FIXED_NUMBER;
-////		params.numColumns = 3;
-//				
-//		params.loadFromResource("/okf_table@copy-of-csv_97.fprm");
-//		//params.numColumns = 5;
-//		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
-//		
-//		filter.open(new RawDocument(input, "UTF-8", "en"));
-//		
-//		_testEvent(EventType.START_DOCUMENT, null);
-//						
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Source");
-//		_testEvent(EventType.TEXT_UNIT, "Target");
-//		_testEvent(EventType.TEXT_UNIT, "Data");
-//		_testEvent(EventType.TEXT_UNIT, "Source");
-//		_testEvent(EventType.TEXT_UNIT, "Target");		
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Source text 1");
-//		_testEvent(EventType.TEXT_UNIT, "Target text 1");
-//		_testEvent(EventType.TEXT_UNIT, "third column data1");
-//		_testEvent(EventType.TEXT_UNIT, "SourceB1");
-//		_testEvent(EventType.TEXT_UNIT, "TargetB1");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Source text 2");
-//		_testEvent(EventType.TEXT_UNIT, "Target text 2");
-//		_testEvent(EventType.TEXT_UNIT, "third column data2");
-//		_testEvent(EventType.TEXT_UNIT, "SourceB2");
-//		_testEvent(EventType.TEXT_UNIT, "TargetB2");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.END_DOCUMENT, null);
-//		
-//		filter.close();
-//	}
+	@Test
+	public void testFileEvents96() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/CSVTest_96.txt"); // issue 96
+		assertNotNull(input);
+		
+		params.loadFromResource("/okf_table@copy-of-csv_96.fprm");
+		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source");
+		_testEvent(EventType.TEXT_UNIT, "Target");
+		_testEvent(EventType.TEXT_UNIT, "Data");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+		
+		input = TableFilterTest.class.getResourceAsStream("/CSVTest_96.txt"); // issue 96
+		assertNotNull(input);
+		
+		params.loadFromResource("/okf_table@copy-of-csv_96.fprm");
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+	}
+	
+	@Test
+	public void testFileEvents97() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/CSVTest_97.txt"); // issue 97
+		assertNotNull(input);
+		
+		params.loadFromResource("/okf_table@copy-of-csv_97.fprm");
+		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source");
+		_testEvent(EventType.TEXT_UNIT, "Target");
+		_testEvent(EventType.TEXT_UNIT, "Data");
+		_testEvent(EventType.TEXT_UNIT, "Source");
+		_testEvent(EventType.TEXT_UNIT, "Target");		
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		_testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", "FR-CA", "");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		_testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", "FR-CA", "");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+		
+		
+		input = TableFilterTest.class.getResourceAsStream("/CSVTest_97.txt"); // issue 97
+		assertNotNull(input);
+		
+		params.loadFromResource("/okf_table@copy-of-csv_97.fprm");
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		_testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", "FR-CA", "");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		_testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", "FR-CA", "");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+	}
 	
 	@Test
 	public void testQualifiedValues() {

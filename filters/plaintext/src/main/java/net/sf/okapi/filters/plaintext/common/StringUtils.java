@@ -32,4 +32,21 @@ public class StringUtils {
 		return st.substring(0,1).toUpperCase() + st.substring(1);
 	}
 	
+	public static String removeQualifiers(String st, String qualifier) {
+	
+		if (Util.isEmpty(st) || Util.isEmpty(qualifier))
+			return st;
+		
+		int qualifierLen = qualifier.length();
+		
+		if (st.startsWith(qualifier) && st.endsWith(qualifier))
+			return st.substring(qualifierLen, Util.getLength(st) - qualifierLen);
+			
+		return st;
+	}
+	
+	public static String removeQualifiers(String st) {
+	
+		return removeQualifiers(st, "\"");
+	}
 }

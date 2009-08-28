@@ -209,6 +209,11 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		return TextProcessingResult.ACCEPTED; 
 	}
 
+	protected String preProcessCell(String cell) {
+		
+		return cell;
+	}
+	
 	protected boolean processCells(List<TextUnit> cells, long lineNum) {
 		// Processes cells of one line
 		// To be called from descendants, least likely overridden
@@ -311,7 +316,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			for (int i = 0; i < cells.size(); i++)	{
 				
 				TextUnit cell = cells.get(i); // Can be empty				
-				String trimmedCell = Util.trim(TextUnitUtils.getSourceText(cell));
+				String trimmedCell = preProcessCell(Util.trim(TextUnitUtils.getSourceText(cell)));
 				
 				int colNumber = i + 1;
 //				boolean isRecognized = false;
@@ -582,9 +587,14 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		return sendAsSource(tu) == TextProcessingResult.ACCEPTED;
 	}
 
+	protected void preProcessTarget(TextUnit target) {
+		
+	}
+	
 	private boolean sendTargetCell(TextUnit target, TextUnit source,
 			GenericSkeleton skel, String language, int column, int numColumns) {
 		
+		preProcessTarget(target);
 		return sendAsTarget(target, source, language, skel) == TextProcessingResult.ACCEPTED;
 	}
 

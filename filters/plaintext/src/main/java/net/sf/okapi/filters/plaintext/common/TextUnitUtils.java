@@ -460,5 +460,19 @@ public class TextUnitUtils {
 		
 		return false;
 	}
+
+	public static void removeQualifiers(TextUnit textUnit, String qualifier) {
 		
+		if (textUnit == null)
+			return;
+		
+		if (Util.isEmpty(qualifier))
+			return;
+		
+		TextFragment tf = textUnit.getSourceContent(); 
+		String st = tf.getCodedText();
+		
+		tf.setCodedText(StringUtils.removeQualifiers(st, qualifier));
+	}
+	
 }
