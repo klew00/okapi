@@ -14,6 +14,7 @@ mvn clean install from /trunk
 
 --- 2) Make sure the following files have the proper version and release numbers for this release:
 
+- All the POM.XML files
 - trunk/deployment/shared/release.properties
 
 
@@ -23,8 +24,16 @@ mvn clean install from /trunk
 - trunk/deployment/maven/okapi-apps/readme.html
 
 
---- 4) Run trunk/deployment/build.xml
-This will rebuild all distributions for all platforms.
+--- 4) Rebuild all
+
+Run "mvn clean install" in /trunk
+Then run "ant" in /trunk/deployment/maven
+
+This will re-compile, tests, and create packages.
+Then rebuild all distributions for all platforms.
+
+--- Update the Okapi Public repository with the proper JARs
+(So the examples can be build using Maven)
 
 
 TO-UPDATE: --- 5) Go to trunk/deployment/rainbow/tests and run the build.xml there. It runs the integration tests for Rainbow and exercises many of the components of the library.
@@ -33,7 +42,14 @@ The file _tests_results.txt shows any differences between the expected results a
 
 
 --- 6) Post each packge (.zip or .gz) of the distributions to the GoogleCode download area.
-
+Use the following summary, in this order:
+Okapi Libraries for all platforms (GZIP)
+Okapi Libraries for all platforms (ZIP)
+Okapi Applications for Macintosh Carbon
+Okapi Applications for Macintosh Cocoa
+Okapi Applications for Linux 64-bit
+Okapi Applications for Linux
+Okapi Applications for Windows
 
 --- 7) Update the Web site with any files that was modified in trunk/website. Usually at least the JavaDoc, the updates.html and the downloads.html should be updated.
 

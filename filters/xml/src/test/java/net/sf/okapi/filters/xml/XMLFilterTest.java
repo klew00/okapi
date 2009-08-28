@@ -52,8 +52,21 @@ public class XMLFilterTest {
 	}
 
 	@Test
+	public void testSpecialEntities () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc>"
+			+ "<p>&lt;=lt &gt;=gt &quot;=quot &apos;=apos</p>"
+			+ "</doc>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc>"
+			+ "<p>&lt;=lt &gt;=gt &quot;=quot &apos;=apos</p>"
+			+ "</doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
 	public void testComplexIdPointer () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
 			+ "<its:translateRule selector=\"//doc\" translate=\"no\"/>"
@@ -73,7 +86,7 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testIdPointer () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
 			+ "<its:translateRule selector=\"//p\" translate=\"yes\" itsx:idPointer=\"@name\"/>"
@@ -123,15 +136,6 @@ public class XMLFilterTest {
 //	}
 	
 	@Test
-	public void testSpecialEntities () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<doc>"
-			+ "<p>&lt;=lt &gt;=gt &quot;=quot &apos;=apos</p>"
-			+ "</doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
-	}
-	
-	@Test
 	public void testDefaultInfo () {
 		assertNotNull(filter.getParameters());
 		assertNotNull(filter.getName());
@@ -149,7 +153,7 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testStartDocumentFromList () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r"
+		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<doc>text</doc>";
 		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(snippet));
 		assertNotNull(sd);
@@ -162,44 +166,56 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testOutputBasic_Comment () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><!--c--></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><!--c--></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputBasic_PI () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><?pi ?></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><?pi ?></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputBasic_OneChar () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc>T</doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc>T</doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputBasic_EmptyRoot () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc/>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc/>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
 	public void testOutputSimpleContent () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>test</p></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>test</p></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 
 	@Test
 	public void testOutputSimpleContent_WithEscapes () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>&amp;=amp, &lt;=lt, &quot;=quot..</p></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>&amp;=amp, &lt;=lt, &quot;=quot..</p></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	//TODO: Implement language handling
@@ -215,7 +231,7 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testOutputSupplementalChars () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<p>[&#x20000;]=U+D840,U+DC00</p>";
 		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<p>[\uD840\uDC00]=U+D840,U+DC00</p>";
@@ -224,7 +240,7 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testCDATAParsing () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p><![CDATA[&=amp, <=lt, &#xaaa;=not-a-ncr]]></p></doc>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
@@ -233,7 +249,7 @@ public class XMLFilterTest {
 
 	@Test
 	public void testOutputCDATA () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p><![CDATA[&=amp, <=lt, &#xaaa;=not-a-ncr]]></p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>&amp;=amp, &lt;=lt, &amp;#xaaa;=not-a-ncr</p></doc>";
@@ -242,7 +258,7 @@ public class XMLFilterTest {
 
 	@Test
 	public void testCommentParsing () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>t1 <!--comment--> t2</p></doc>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
@@ -251,14 +267,16 @@ public class XMLFilterTest {
 
 	@Test
 	public void testOutputComment () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>t1 <!--comment--> t2</p></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>t1 <!--comment--> t2</p></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 
 	@Test
 	public void testPIParsing () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>t1 <?abc attr=\"value\"?> t2</p></doc>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
@@ -267,14 +285,16 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testOutputPI () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>t1 <?abc attr=\"value\"?> t2</p></doc>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>t1 <?abc attr=\"value\"?> t2</p></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 
 	@Test
 	public void testOutputWhitespaces_Preserve () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>part 1\npart 2</p>"
 			+ "<p xml:space=\"preserve\">part 1\npart 2</p></doc>";
 		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -285,7 +305,7 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testOutputWhitespaces_Default () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<p>part 1\npart 2\n  part3\n\t part4</p>";
 		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<p>part 1 part 2 part3 part4</p>";
@@ -294,7 +314,7 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testSeveralUnits () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>text 1</p><p>text 2</p><p>text 3</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
 		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
@@ -310,7 +330,7 @@ public class XMLFilterTest {
 	
 	@Test
 	public void testTranslatableAttributes () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p text=\"value 1\">text 1</p><p>text 2</p><p>text 3</p></doc>";
@@ -344,6 +364,8 @@ public class XMLFilterTest {
 		list.add(new InputDocument(root+"MozillaRDFTest01.rdf", "okf_xml@MozillaRDF.fprm"));
 		list.add(new InputDocument(root+"XRTT-Source1.xml", null));
 		list.add(new InputDocument(root+"TestCDATA1.xml", null));
+		list.add(new InputDocument(root+"test07.xml", null));
+		list.add(new InputDocument(root+"test08_utf8nobom.xml", null));
 
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));

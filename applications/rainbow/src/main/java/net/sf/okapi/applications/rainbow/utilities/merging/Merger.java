@@ -387,7 +387,7 @@ public class Merger {
 				if ( oriIndices[i] != -1 ) {
 					Code code = oriCodes.get(oriIndices[i]);
 					if ( !code.isDeleteable() ) {
-						logger.severe(String.format("The non-deletable code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
 							code.getId(), code.getData(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 						logger.info("Source='"+tu.getSource().toString()+"'");
 					}

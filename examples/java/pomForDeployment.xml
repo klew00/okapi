@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>build-examples</artifactId>
     <groupId>net.sf.okapi.examples</groupId>
-    <version>0.3-SNAPSHOT</version>
+    <version>@version@</version>
     <packaging>pom</packaging>
     <name>Okapi Examples Build</name>
     <modules>

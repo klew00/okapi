@@ -216,19 +216,22 @@ public class XMLFilter implements IFilter {
 		input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectBom();
-		encoding = detector.getEncoding();
-		//--Start workaround issue with XML Parser
-		// "UTF-16xx" are not handled as expected, using "UTF-16" alone 
-		// seems to resolve the issue.
-		if (( encoding.equals("UTF-16LE") ) || ( encoding.equals("UTF-16BE") )) {
-			encoding = "UTF-16";
+		
+		if ( detector.isAutodetected() ) {
+			encoding = detector.getEncoding();
+			//--Start workaround issue with XML Parser
+			// "UTF-16xx" are not handled as expected, using "UTF-16" alone 
+			// seems to resolve the issue.
+			if (( encoding.equals("UTF-16LE") ) || ( encoding.equals("UTF-16BE") )) {
+				encoding = "UTF-16";
+			}
+			//--End workaround
+			input.setEncoding(encoding);
 		}
-		//--End workaround
-		input.setEncoding(encoding);
 		
 		try {
 			InputSource is = new InputSource(input.getStream());
-			is.setEncoding(input.getEncoding());
+			//is.setEncoding(input.getEncoding());
 			doc = docBuilder.parse(is);
 		}
 		catch ( SAXException e ) {
@@ -238,7 +241,10 @@ public class XMLFilter implements IFilter {
 			throw new OkapiIOException("Error when reading the document.", e);
 		}
 
-		encoding = input.getEncoding();
+		encoding = doc.getXmlEncoding();
+		if ( encoding == null ) {
+			encoding = detector.getEncoding();
+		}
 		srcLang = input.getSourceLanguage();
 		if ( srcLang == null ) throw new NullPointerException("Source language not set.");
 		hasUTF8BOM = detector.hasUtf8Bom();
