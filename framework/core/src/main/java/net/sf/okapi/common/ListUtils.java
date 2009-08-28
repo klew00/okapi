@@ -119,7 +119,6 @@ public class ListUtils {
 	/**
 	 * Converts a string of comma-separated numbers into a list of integers.
 	 * @param st string of comma-separated numbers 
-	 * @param delimiter a string delimiting numbers in the string
 	 * @return a list of integers 
 	 */
 	public static List<Integer> stringAsIntList (String st) {
