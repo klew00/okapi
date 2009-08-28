@@ -586,58 +586,43 @@ public class CommaSeparatedValuesFilterTest {
 		filter.close();
 	}
 	
-//	@Test
-//	public void testFileEvents106_4() {
-//		
-//		Parameters params = (Parameters) filter.getParameters();
-//		
-//		InputStream input = TableFilterTest.class.getResourceAsStream("/csv.txt"); // issue 106
-//		assertNotNull(input);
-//		
-////		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
-////		params.valuesStartLineNum = 2;
-////		params.columnNamesLineNum = 1;
-////		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
-////		params.trimLeading = false;
-////		params.trimTrailing = false;
-//		
-//		
-//		URL paramsUrl = TableFilterTest.class.getResource("/okf_table@copy-of-csv._106.fprm");
-//		assertNotNull(paramsUrl);  
-//		
-//		try {
-//			params.load(paramsUrl.toURI(), false);
-//		} catch (URISyntaxException e) {
-//		}
-//		
-//		filter.open(new RawDocument(input, "UTF-8", "en"));
-//		
-//		_testEvent(EventType.START_DOCUMENT, null);
-//						
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "id");
-//		_testEvent(EventType.TEXT_UNIT, "value");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "01");
-//		_testEvent(EventType.TEXT_UNIT, "one");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "02");
-//		_testEvent(EventType.TEXT_UNIT, "first,\nsecond\n");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "03");
-//		_testEvent(EventType.TEXT_UNIT, "three");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.END_DOCUMENT, null);
-//		
-//		filter.close();
-//	}
+	@Test
+	public void testFileEvents106_4() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv.txt"); // issue 106
+		assertNotNull(input);
+		
+		URL paramsUrl = TableFilterTest.class.getResource("/okf_table@copy-of-csv._106.fprm");
+		assertNotNull(paramsUrl);  
+		
+		try {
+			params.load(paramsUrl.toURI(), false);
+		} catch (URISyntaxException e) {
+		}
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		//_testEvent(EventType.TEXT_UNIT, "one");
+		_testEvent(EventType.TEXT_UNIT, "one", "01", null, null, null);
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "first,\nsecond\n", "02", null, null, null);
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "three", "03", null, null, null);
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+	}
 	
 //	@Test
 //	public void testFileEvents96() {
@@ -1295,7 +1280,6 @@ public class CommaSeparatedValuesFilterTest {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	private void _testEvent(EventType expectedType, String source, String expName, String target, String language, String comment) {
 		
 		assertNotNull(filter);
