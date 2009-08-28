@@ -21,11 +21,8 @@
 package net.sf.okapi.common;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import net.sf.okapi.common.Util;
 
 /**
  * Collection of helper functions for manipulating lists.
@@ -53,12 +50,39 @@ public class ListUtils {
 	public static List<String> stringAsList(String st, String delimiter) {
 
 		if (Util.isEmpty(st)) return new ArrayList<String>();
-	
-		String[] parts = st.split(delimiter);
-		for (String part : parts) 
-			part = part.trim();
 		
-		return Arrays.asList(parts);		
+		ArrayList<String> res = new ArrayList<String>();
+		if (res == null) 
+			return res;
+		
+		if (Util.isEmpty(delimiter)) {
+						
+			res.add(st);
+			return res;
+		}
+	
+//		String[] parts = st.split(delimiter);
+//		for (String part : parts) 
+//			part = part.trim();
+//		
+//		return Arrays.asList(parts);
+		
+		int start = 0;
+		int len = delimiter.length();
+		
+		while (true) {
+			
+			int index = st.substring(start).indexOf(delimiter);
+			if (index == -1) break;
+			
+			res.add(st.substring(start, start + index));
+			start += index + len;
+		}
+		
+		if (start <= st.length())
+			res.add(st.substring(start, st.length()));
+		
+		return res;
 	}
 	
 	/**
@@ -66,15 +90,36 @@ public class ListUtils {
 	 * @param st string of comma-separated substrings
 	 * @return the generated array of strings
 	 */
-	public static String[] stringAsArray (String st) {
+	public static String[] stringAsArray(String st) {
 		
 		List<String> list = stringAsList(st);
-		return (String[]) list.toArray();
+		
+		if (Util.isEmpty(list))
+			return new String[] {};
+		
+		return (String[]) list.toArray(new String[] {});
+	}
+	
+	/**
+	 * Splits up a string of comma-separated substrings into an array of those substrings.
+	 * @param st string of comma-separated substrings
+	 * @param delimiter a string delimiting substrings in the string
+	 * @return
+	 */
+	public static String[] stringAsArray(String st, String delimiter) {
+		
+		List<String> list = stringAsList(st, delimiter);
+		
+		if (Util.isEmpty(list))
+			return new String[] {};
+
+		return (String[]) list.toArray(new String[] {});
 	}
 	
 	/**
 	 * Converts a string of comma-separated numbers into a list of integers.
 	 * @param st string of comma-separated numbers 
+	 * @param delimiter a string delimiting numbers in the string
 	 * @return a list of integers 
 	 */
 	public static List<Integer> stringAsIntList (String st) {

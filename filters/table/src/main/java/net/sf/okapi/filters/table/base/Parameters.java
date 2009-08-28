@@ -230,6 +230,13 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		sourceIdSuffixes = buffer.getString("sourceIdSuffixes", "");
 		targetLanguages = buffer.getString("targetLanguages", "");
 		targetSourceRefs = buffer.getString("targetSourceRefs", "");
+		
+		if (trimMode != TRIM_NONE) {
+		
+			trimLeading = true;
+			trimTrailing = true;
+		}
+
 	}
 
 	@Override
@@ -254,6 +261,9 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		sourceIdSuffixes = "";
 		targetLanguages = "";
 		targetSourceRefs = "";
+		
+		trimLeading = true;
+		trimTrailing = true;
 	}
 
 	@Override

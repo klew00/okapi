@@ -32,6 +32,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.ListUtils;
 import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
@@ -109,9 +110,14 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	 */
 	private void trimTU(TextUnit textUnit, TextContainer source, GenericSkeleton skel) {
 		
-		if (params.trimLeading) TextUnitUtils.trimLeading(source, skel);							
-		skel.addContentPlaceholder(textUnit);		
-		if (params.trimTrailing) TextUnitUtils.trimTrailing(source, skel);
+		if (params.trimLeading)						
+			TextUnitUtils.trimLeading(source, skel);
+		
+		if (!TextUnitUtils.hasContentPlaceholder(skel))
+			skel.addContentPlaceholder(textUnit);
+					
+		if (params.trimTrailing) 
+			TextUnitUtils.trimTrailing(source, skel);
 	}
 	
 	protected TextProcessingResult sendAsSource(TextUnit textUnit) {
@@ -156,7 +162,6 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		return TextProcessingResult.ACCEPTED;
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean processTextUnit(TextUnit textUnit) {
 
 		if (textUnit == null) return false;
@@ -175,17 +180,14 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		
 		if (params.trimLeading || params.trimTrailing) {
 			
-			List<?> temp = skel.getParts();
-			List<Object> list = (List<Object>) temp;
+			List<GenericSkeletonPart> list = skel.getParts();
 			
 			int index = -1;
 			String tuRef = TextFragment.makeRefMarker("$self$");
 			
 			for (int i = 0; i < list.size(); i++) {
 				
-				Object obj = list.get(i);
-				if (obj == null) continue;
-				String st = obj.toString();
+				String st = list.get(i).toString();
 				
 				if (Util.isEmpty(st)) continue;
 				if (st.equalsIgnoreCase(tuRef)) {
@@ -194,9 +196,11 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 				}
 			}
 			
+//			index = list.indexOf(tuRef); 
 			if (index > -1) { // tu ref was found in the skeleton
 				
-				List<Object> list2 = (List<Object>) ListUtils.moveItems(list); // clears the original list
+				//List<Object> list2 = (List<Object>) ListUtils.moveItems(list); // clears the original list
+				List<GenericSkeletonPart> list2 = (List<GenericSkeletonPart>) ListUtils.moveItems(list); // clears the original list
 								
 				GenericSkeleton skel2 = new GenericSkeleton();				
 				trimTU(textUnit, source, skel2);

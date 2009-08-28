@@ -206,8 +206,8 @@ public class CommaSeparatedValuesFilterTest {
 		Parameters params = (Parameters) filter.getParameters();
 						
 		assertEquals(params.unescapeSource, true);
-		assertEquals(params.trimLeading, false);
-		assertEquals(params.trimTrailing, false);
+		assertEquals(params.trimLeading, true);
+		assertEquals(params.trimTrailing, true);
 		assertEquals(params.preserveWS, true);
 		assertEquals(params.useCodeFinder, false);
 		assertEquals(				
@@ -450,18 +450,165 @@ public class CommaSeparatedValuesFilterTest {
 	}
 	
 	
+	@Test
+	public void testFileEvents106() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv.txt"); // issue 106
+		assertNotNull(input);
+		
+		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+		params.valuesStartLineNum = 2;
+		params.columnNamesLineNum = 1;
+		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+		params.trimLeading = false;
+		params.trimTrailing = false;
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "id");
+		_testEvent(EventType.TEXT_UNIT, "value");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "01");
+		_testEvent(EventType.TEXT_UNIT, "one");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "02");
+		_testEvent(EventType.TEXT_UNIT, "first,\nsecond\n");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "03");
+		_testEvent(EventType.TEXT_UNIT, "three");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+	}
+	
+	@Test
+	public void testFileEvents106_2() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv2.txt"); // issue 106
+		assertNotNull(input);
+		
+		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+		params.valuesStartLineNum = 2;
+		params.columnNamesLineNum = 1;
+		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "id");
+		_testEvent(EventType.TEXT_UNIT, "value");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "01");
+		_testEvent(EventType.TEXT_UNIT, "one");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "02");
+		_testEvent(EventType.TEXT_UNIT, "first,\nsecond");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "03");
+		_testEvent(EventType.TEXT_UNIT, "three");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+	}
+	
+	@Test
+	public void testFileEvents106_3() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv3.txt"); // issue 106
+		assertNotNull(input);
+		
+//		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+//		params.valuesStartLineNum = 2;
+//		params.columnNamesLineNum = 1;
+//		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+		
+		params.trimLeading = true;
+		params.trimTrailing = false;
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "02");
+		_testEvent(EventType.TEXT_UNIT, "first,\nsecond\n");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+		
+		input = TableFilterTest.class.getResourceAsStream("/csv3.txt"); // issue 106
+		assertNotNull(input);
+		
+		params.trimLeading = true;
+		params.trimTrailing = true;
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		_testEvent(EventType.START_DOCUMENT, null);
+						
+		_testEvent(EventType.START_GROUP, null);
+		_testEvent(EventType.TEXT_UNIT, "02");
+		_testEvent(EventType.TEXT_UNIT, "first,\nsecond");
+		_testEvent(EventType.END_GROUP, null);
+		
+		_testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+	}
+	
 //	@Test
-//	public void testFileEvents106() {
+//	public void testFileEvents106_4() {
 //		
 //		Parameters params = (Parameters) filter.getParameters();
 //		
 //		InputStream input = TableFilterTest.class.getResourceAsStream("/csv.txt"); // issue 106
 //		assertNotNull(input);
 //		
-//		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
-//		params.valuesStartLineNum = 2;
-//		params.columnNamesLineNum = 1;
-//		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+////		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
+////		params.valuesStartLineNum = 2;
+////		params.columnNamesLineNum = 1;
+////		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+////		params.trimLeading = false;
+////		params.trimTrailing = false;
+//		
+//		
+//		URL paramsUrl = TableFilterTest.class.getResource("/okf_table@copy-of-csv._106.fprm");
+//		assertNotNull(paramsUrl);  
+//		
+//		try {
+//			params.load(paramsUrl.toURI(), false);
+//		} catch (URISyntaxException e) {
+//		}
 //		
 //		filter.open(new RawDocument(input, "UTF-8", "en"));
 //		
@@ -491,50 +638,7 @@ public class CommaSeparatedValuesFilterTest {
 //		
 //		filter.close();
 //	}
-//	
-//	@Test
-//	public void testFileEvents106_2() {
-//		
-//		Parameters params = (Parameters) filter.getParameters();
-//		
-//		InputStream input = TableFilterTest.class.getResourceAsStream("/csv2.txt"); // issue 106
-//		assertNotNull(input);
-//		
-//		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
-//		params.valuesStartLineNum = 2;
-//		params.columnNamesLineNum = 1;
-//		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
-//		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
-//		
-//		filter.open(new RawDocument(input, "UTF-8", "en"));
-//		
-//		_testEvent(EventType.START_DOCUMENT, null);
-//						
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "id");
-//		_testEvent(EventType.TEXT_UNIT, "value");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "01");
-//		_testEvent(EventType.TEXT_UNIT, "one");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "02");
-//		_testEvent(EventType.TEXT_UNIT, "first,\nsecond");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "03");
-//		_testEvent(EventType.TEXT_UNIT, "three");
-//		_testEvent(EventType.END_GROUP, null);
-//		
-//		_testEvent(EventType.END_DOCUMENT, null);
-//		
-//		filter.close();
-//	}
-//	
+	
 //	@Test
 //	public void testFileEvents96() {
 //		
@@ -1143,8 +1247,8 @@ public class CommaSeparatedValuesFilterTest {
 		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
-//		list.add(new InputDocument(root + "csv_test1.txt", ""));
-//		list.add(new InputDocument(root + "csv_test2.txt", ""));
+		list.add(new InputDocument(root + "csv_test1.txt", ""));
+		list.add(new InputDocument(root + "csv_test2.txt", ""));
 		list.add(new InputDocument(root + "csv_test3.txt", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
@@ -1191,6 +1295,7 @@ public class CommaSeparatedValuesFilterTest {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void _testEvent(EventType expectedType, String source, String expName, String target, String language, String comment) {
 		
 		assertNotNull(filter);

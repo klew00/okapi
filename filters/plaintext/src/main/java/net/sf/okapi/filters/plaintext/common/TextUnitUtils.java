@@ -30,6 +30,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 
 /**
  * 
@@ -436,6 +437,28 @@ public class TextUnitUtils {
 		if (textUnit.getTarget(language) == null) return;
 		
 		textUnit.getTarget(language).setAnnotation(annotation);		
+	}
+
+	public static boolean hasContentPlaceholder(GenericSkeleton skel) {
+		
+		if (skel == null)
+			return false;
+		
+		List<GenericSkeletonPart> list = skel.getParts();
+		
+		String tuRef = TextFragment.makeRefMarker("$self$");
+		
+		for (int i = 0; i < list.size(); i++) {
+			
+			String st = list.get(i).toString();
+			
+			if (Util.isEmpty(st)) continue;
+			
+			if (st.equals(tuRef))				
+				return true;
+		}
+		
+		return false;
 	}
 		
 }

@@ -256,7 +256,7 @@ public class TableFilterTest {
 		input = TableFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
-		System.out.println(filename);
+		// System.out.println(filename);
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
@@ -265,7 +265,7 @@ public class TableFilterTest {
 
 	@Test
 		public void testFileEvents2() {
-			testDriver.setDisplayLevel(2);
+			testDriver.setDisplayLevel(0);
 
 			filter.setConfiguration(TabSeparatedValuesFilter.FILTER_CONFIG);		
 			InputStream input = TableFilterTest.class.getResourceAsStream("/TSV_test.txt");
@@ -306,7 +306,7 @@ public class TableFilterTest {
 			input = TableFilterTest.class.getResourceAsStream("/" + filename);
 			assertNotNull(input);
 			
-			System.out.println(filename);
+			// System.out.println(filename);
 			filter.open(new RawDocument(input, "UTF-8", "en"));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();

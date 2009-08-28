@@ -23,17 +23,15 @@ package net.sf.okapi.filters.table.csv;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.ListUtils;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
-import net.sf.okapi.common.ListUtils;
 import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
 import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
@@ -116,7 +114,13 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		if (Util.isEmpty(params.fieldDelimiter)) return super.extractCells(cells, lineContainer, lineNum);		
 		
 		// Split line into fields									
-		String[] chunks = line.split(params.fieldDelimiter);
+		// String[] chunks = line.split(params.fieldDelimiter);
+		
+		String[] chunks;
+		if (Util.isEmpty(line)) 
+			chunks = new String[] {""};
+		else					
+			chunks = ListUtils.stringAsArray(line, params.fieldDelimiter);
 		
 		// Analyze chunks for being multi-line
 		for (String chunk : chunks) {
@@ -147,8 +151,14 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 			if (merging && startsQualified && !endsQualified)		// 110
 				{cancelMerging(); startMerging(); buffer.add(chunk); continue;}
 				
-			if (merging && startsQualified && endsQualified)		// 111
-				{cancelMerging(); buffer.add(chunk); continue;}			
+			if (merging && startsQualified && endsQualified) {		// 111
+				
+				if (trimmedChunk.length() == qualifierLen) // hanging qualifier
+					{buffer.add(chunk); endMerging(); continue;}
+				else
+					{cancelMerging(); buffer.add(chunk); continue;}
+			}
+							
 		}
 		
 		buffer.add(LINE_BREAK_TAG);

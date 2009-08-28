@@ -119,11 +119,17 @@ public class BaseTableFilter extends BasePlainTextFilter {
 										
 		sendListedMode = params.sendColumnsMode == Parameters.SEND_COLUMNS_LISTED;
 		
-		if (params.trimMode != Parameters.TRIM_NONE) {
-			
-			params.trimLeading = true;
-			params.trimTrailing = true;
-		}
+//		if (params.trimMode == Parameters.TRIM_NONE) {
+//			
+//			params.trimLeading = false;
+//			params.trimTrailing = false;
+//		}
+		
+//		if (params.trimMode != Parameters.TRIM_NONE) {
+//			
+//			params.trimLeading = true;
+//			params.trimTrailing = true;
+//		}
 		
 		rowNumber = 0;
 		
