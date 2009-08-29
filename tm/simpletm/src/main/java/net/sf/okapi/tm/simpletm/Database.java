@@ -369,7 +369,7 @@ public class Database {
 					tc = new TextContainer();
 					tc.setCodedText(result.getString(6),
 						Code.stringToCodes(result.getString(7)), false);
-					tu.setTarget(trgLang, tc);
+					tu.setTarget(targetLanguage, tc);
 					tu.setName(result.getString(1));
 					attributes.put(NGRPNAME, result.getString(2));
 					attributes.put(NFILENAME, result.getString(3));

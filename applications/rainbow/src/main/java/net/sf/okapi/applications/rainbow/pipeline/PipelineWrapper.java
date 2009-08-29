@@ -242,6 +242,15 @@ public class PipelineWrapper {
 			}
 			map.put(step.id, step);
 
+			
+			ps = (IPipelineStep)Class.forName(
+			 	"net.sf.okapi.steps.simpletm2tmx.SimpleTM2TMXStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(),
+				null);
+			map.put(step.id, step);
+
 /*			ps = (IPipelineStep)Class.forName(
 			"net.sf.okapi.steps.tokenization.TokenizationStep").newInstance();
 			params = ps.getParameters();

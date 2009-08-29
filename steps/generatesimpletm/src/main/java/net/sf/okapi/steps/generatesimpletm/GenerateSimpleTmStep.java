@@ -60,7 +60,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	}
 	
 	public String getName () {
-		return "Generate SimpleTm";
+		return "Generate SimpleTM";
 	}
 
 	public String getDescription () {
