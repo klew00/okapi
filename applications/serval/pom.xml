@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<artifactId>build-applications</artifactId>
+		<groupId>net.sf.okapi.applications</groupId>
+		<version>0.4-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>okapi-application-serval</artifactId>
+	<name>Okapi Serval</name>
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.okapi</groupId>
+			<artifactId>okapi-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi</groupId>
+			<artifactId>okapi-core-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.lib</groupId>
+			<artifactId>okapi-lib-translation</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.tm</groupId>
+			<artifactId>okapi-tm-globalsight</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.tm</groupId>
+			<artifactId>okapi-tm-simpletm</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.tm</groupId>
+			<artifactId>okapi-tm-translatetoolkit</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.tm</groupId>
+			<artifactId>okapi-tm-opentran</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.mt</groupId>
+			<artifactId>okapi-mt-google</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+	</dependencies>
+</project>

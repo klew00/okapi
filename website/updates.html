@@ -42,8 +42,9 @@ function CheckVersions ()
 	//=============================================================
 	// These variables must be set to the latest released versions
 	//-------------------------------------------------------------
-	var sRainbowVersion = "6.0";
-	var sRatelVersion = "1.0";
+	var sRainbowVersion = "6.0.3";
+	var sRatelVersion = "1.0.3";
+	var sOkapiLibUIVersion = "0.3";
 	//=============================================================
 
 	var sParam, aParams;
@@ -65,6 +66,12 @@ function CheckVersions ()
 		sBuf1 = document.getElementById('placeholder').innerHTML;
 		document.getElementById('placeholder').innerHTML
 			= sBuf1 + CheckVersion("rainbow", aParams[1], sRainbowVersion);
+	}
+	else if ( aParams[0] == "okapi-lib-ui" )
+	{
+		sBuf1 = document.getElementById('placeholder').innerHTML;
+		document.getElementById('placeholder').innerHTML
+			= sBuf1 + CheckVersion("okapi-lib-ui", aParams[1], sOkapiLibUIVersion);
 	}
 	else
 	{

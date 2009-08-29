@@ -63,6 +63,8 @@
 
 	<property name="rainbowStamp" value="${rainbowVersion}${releaseInfo}" />
 
+	<property name="ratelStamp" value="${ratelVersion}${releaseInfo}" />
+
  	<property name="okapiappsName" value="okapi-apps"/>
 	<property name="okapiappsStamp" value="${okapiappsVersion}${releaseInfo}" />
 	

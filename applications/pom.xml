@@ -15,5 +15,6 @@
         <module>tikal</module>
         <module>rainbow</module>
         <module>ratel</module>
+        <module>serval</module> <!-- For TM debug -->
     </modules>
 </project>
