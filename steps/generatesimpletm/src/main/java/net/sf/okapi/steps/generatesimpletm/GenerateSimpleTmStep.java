@@ -28,6 +28,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.simpletm.Database;
@@ -144,12 +145,21 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 			logger.warning("TextUnit is missing "+trgLang+" target.");
 			countTuNotAdded++;
 			return;
-		}		
+		}
 		
-		int added = simpleTm.addEntry(tu, tu.getName(), fileName);
-		if(added==0){
+		// Check if the attributes for GroupName and FileName are available from the input
+		Property propGName = tu.getProperty(Database.NGRPNAME);
+		Property propFName = tu.getProperty(Database.NFILENAME);
+
+		// Add the entry
+		int added = simpleTm.addEntry(tu,
+			(propGName==null) ? tu.getName() : propGName.getValue(),
+			(propFName==null) ? fileName : propGName.getValue());
+
+		if ( added==0 ) {
 			countTuNotAdded++;
-		}else if(added>0){
+		}
+		else if( added>0 ) {
 			countTusAdded++;
 			countSegsAdded+=added;
 		}

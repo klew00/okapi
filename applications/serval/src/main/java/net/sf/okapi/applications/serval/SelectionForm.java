@@ -6,6 +6,7 @@ import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.mt.google.GoogleMTConnector;
 import net.sf.okapi.tm.globalsight.GlobalSightTMConnector;
+import net.sf.okapi.tm.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.tm.opentran.OpenTranTMConnector;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
 import net.sf.okapi.tm.translatetoolkit.TranslateToolkitTMConnector;
@@ -44,7 +45,8 @@ public class SelectionForm {
 		lbResources.add("SimpleTM local translation memory file");
 		lbResources.add("Open-Tran translation search server (Internet)");
 		lbResources.add("GlobalSight TM Web service");
-		lbResources.add("Translate Toolkit TM");
+		lbResources.add("Translate Toolkit TM (remote or local)");
+		lbResources.add("MyMemory TM (Internet)");
 		lbResources.setSelection(0);
 		
 		// Dialog-level buttons
@@ -71,6 +73,9 @@ public class SelectionForm {
 						break;
 					case 4: // Translate Toolkit TM
 						result = new TranslateToolkitTMConnector();
+						break;
+					case 5: // MyMemory TM
+						result = new MyMemoryTMConnector();
 						break;
 					}
 				}

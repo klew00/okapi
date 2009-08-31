@@ -18,60 +18,58 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.tm.translatetoolkit;
+package net.sf.okapi.tm.mymemory;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.apache.axis.AxisFault;
+import org.tempuri.GetResponse;
+import org.tempuri.Match;
+import org.tempuri.OtmsSoapStub;
+import org.tempuri.Query;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 
-public class TranslateToolkitTMConnector implements ITMQuery {
+public class MyMemoryTMConnector implements ITMQuery {
 
-	private Parameters params;
-	private String baseURL;
 	private String srcLang;
 	private String trgLang;
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 25;
-	JSONParser parser;
-	
-	public TranslateToolkitTMConnector () {
+	private int threshold = 75;
+	private Parameters params;
+	private OtmsSoapStub otms;
+
+	public MyMemoryTMConnector () {
 		params = new Parameters();
 	}
-	
+
 	public String getName () {
-		return "Translate Toolkit TM";
+		return "MyMemory-TM";
 	}
 
 	public void close () {
 	}
 
 	public void export (String outputPath) {
-		throw new UnsupportedOperationException();
+		throw new OkapiNotImplementedException("The export() method is not supported.");
 	}
 
 	public String getSourceLanguage () {
-		return srcLang;
+		return toISOCode(srcLang);
 	}
 
 	public String getTargetLanguage () {
-		return trgLang;
+		return toISOCode(trgLang);
 	}
 
 	public boolean hasNext () {
@@ -93,62 +91,57 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	}
 
 	public void open () {
-		baseURL = String.format("http://%s:%d/tmserver/",
-			params.getHost(), params.getPort());
-		parser = new JSONParser();
-	}
-
-	public int query (String plainText) {
-		results = new ArrayList<QueryResult>();
-		current = -1;
 		try {
-			URL url = new URL(baseURL + srcLang + "/" + trgLang + "/unit/"
-				+ URLEncoder.encode(plainText, "UTF-8").replace("+", "%20"));
-			URLConnection conn = url.openConnection();
-
-			// Get the response
-	        JSONArray array = (JSONArray)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-			QueryResult qr;
-	        for ( int i=0; i<array.size(); i++ ) {
-	        	if ( i == maxHits ) break; // Stop at maxHits
-	        	@SuppressWarnings("unchecked")
-	        	Map<String, Object> map = (Map<String, Object>)array.get(i);
-	        	qr = new QueryResult();
-	        	qr.score = ((Double)map.get("quality")).intValue();
-	        	qr.source = new TextFragment((String)map.get("source"));
-	        	qr.target = new TextFragment((String)map.get("target"));
-	        	results.add(qr);
-	        }
-			if ( results.size() > 0 ) current = 0;
-			return results.size();
+			results = new ArrayList<QueryResult>();
+			URL url = new URL("http://mymemory.translated.net/otms/");
+			otms = new OtmsSoapStub(url, null);
+		}
+		catch ( AxisFault e ) {
+			throw new RuntimeException("Error creating the GlobalSight Web services.", e);
 		}
 		catch ( MalformedURLException e ) {
-			throw new RuntimeException("Error when querying.", e);
-		}
-		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException("Error when querying.", e);
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException("Error when querying.", e);
-		}
-		catch ( ParseException e ) {
-			throw new RuntimeException("Error when parsing JSON results.", e);
+			throw new RuntimeException("Invalid server URL.", e);
 		}
 	}
 
-	public int query (TextFragment text) {
-		String tmp = text.getCodedText();
-		return query(tmp);
+	public int query (String text) {
+		results.clear();
+		try {
+			// TODO: Chenge domain
+			Query query = new Query(text, srcLang, trgLang, "Computer_Science");
+			GetResponse gresp = otms.otmsGet(params.key, query);
+			if ( gresp.isSuccess() ) {
+				QueryResult res;
+				Match[] matches = gresp.getMatches();
+				int i = 0;
+				for ( Match match : matches ) {
+					if ( ++i > maxHits ) break; // maximum reached
+					res = new QueryResult();
+					res.source = new TextFragment(match.getSegment());
+					res.target = new TextFragment(match.getTranslation());
+					res.score = match.getScore();
+					// Score not working: if ( res.score < getThreshold() ) break;
+					results.add(res);
+				}
+			}
+		}
+		catch ( RemoteException e ) {
+			throw new RuntimeException("Error querying TM.", e);
+		}
+		if ( results.size() > 0 ) current = 0;
+		return results.size();
 	}
 
+	public int query (TextFragment frag) {
+		return query(frag.toString());
+	}
+	
 	public void removeAttribute (String name) {
-		// Not used with this connector
 	}
 
 	public void setAttribute (String name,
 		String value)
 	{
-		// Not used with this connector
 	}
 
 	public void setLanguages (String sourceLang,
@@ -158,12 +151,26 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		trgLang = toInternalCode(targetLang);
 	}
 
+	private String toInternalCode (String standardCode) {
+		return standardCode;
+	}
+
+	private String toISOCode (String internalCode) {
+		//String code = internalCode.toLowerCase().replace('_', '-');
+		return internalCode;
+	}
+
+	/**
+	 * Sets the maximum number of hits to return. Note that with this
+	 * connector this method can only reduce the maximum number of hits from
+	 * the one defined in the active TM profile.
+	 */
 	public void setMaximumHits (int max) {
 		maxHits = max;
 	}
 
 	public void setThreshold (int threshold) {
-		// Not used with this connector
+		this.threshold = threshold; 
 	}
 
 	public int getMaximumHits () {
@@ -171,13 +178,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	}
 
 	public int getThreshold () {
-		// Not used with this connector
-		return 0;
-	}
-
-	private String toInternalCode (String standardCode) {
-		String code = standardCode.toLowerCase().replace('-', '_');
-		return code;
+		return threshold;
 	}
 
 	public IParameters getParameters () {

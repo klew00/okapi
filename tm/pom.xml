@@ -17,6 +17,7 @@
         <module>translatetoolkit</module>
         <module>globalsight</module>
         <module>pensieve</module>
+        <module>mymemory</module>
     </modules>
 
     <build>
