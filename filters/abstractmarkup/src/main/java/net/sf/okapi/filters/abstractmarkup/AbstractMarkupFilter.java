@@ -642,6 +642,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * 
 	 * @return true if the document is in utf8 encoding.
 	 */
+	@Override
 	protected boolean isUtf8Encoding() {
 		return hasUtf8Encoding;
 	}
@@ -651,6 +652,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * 
 	 * @return true if the document has a utf-8 byte order mark.
 	 */
+	@Override
 	protected boolean isUtf8Bom() {
 		return hasUtf8Bom;
 	}
@@ -781,6 +783,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @param mimeType
 	 *            the new mime type
 	 */
+	@Override
 	public void setMimeType(String mimeType) {
 		super.setMimeType(mimeType);
 		eventBuilder.setMimeType(mimeType);
