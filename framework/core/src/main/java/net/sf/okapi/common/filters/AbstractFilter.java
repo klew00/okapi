@@ -337,7 +337,7 @@ public abstract class AbstractFilter implements IFilter {
 		return multilingual;
 	}
 
-	public void setName(String name) {
+	protected void setName(String name) {
 
 		this.name = name;
 	}
@@ -346,7 +346,7 @@ public abstract class AbstractFilter implements IFilter {
 		return name;
 	}
 
-	public void setDescription(String description) {
+	protected void setDescription(String description) {
 		this.description = description;
 	}
 
