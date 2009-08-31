@@ -22,7 +22,6 @@ package net.sf.okapi.filters.html;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,22 +62,17 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
 		setParameters(new Parameters());
-	}
-
-	public List<FilterConfiguration> getConfigurations() {
-		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
-		list.add(new FilterConfiguration(getName(),
-				MimeTypeMapper.HTML_MIME_TYPE,
+		setName("okf_html"); //$NON-NLS-1$
+		setDescription("HTML/XHTML Filter"); //$NON-NLS-1$
+		addConfiguration(new FilterConfiguration(getName(), 
+				MimeTypeMapper.HTML_MIME_TYPE, 
 				getClass().getName(),
-				"HTML/XHTML",
-				"HTML and XHTML documents",
+				"HTML/XHTML", "HTML and XHTML documents",   //$NON-NLS-1$//$NON-NLS-2$
 				Parameters.getDefualtParameterFile()));
-		return list;
 	}
 
 	/**
-	 * Initialize rule state and parser. Called before processing of
-	 * each input.
+	 * Initialize rule state and parser. Called before processing of each input.
 	 */
 	@Override
 	protected void startFilter() {
@@ -87,7 +81,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 		if (getConfig().collapseWhitespace()) {
 			LOGGER.log(Level.FINE,
-					"By default the HTML filter will collapse whitespace unless overridden in the configuration");
+					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
 		}
 	}
 
@@ -332,6 +326,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 * 
 	 * @see
 	 * 
+	 * 
 	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleDocTypeDeclaration
 	 * (net.htmlparser.jericho.Tag)
 	 */
@@ -356,6 +351,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * 
 	 * 
 	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleProcessingInstruction
 	 * (net.htmlparser.jericho.Tag)
@@ -386,6 +382,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 * 
 	 * @see
 	 * 
+	 * 
 	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommonEscaped
 	 * (net.htmlparser.jericho.Tag)
 	 */
@@ -406,45 +403,35 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		handleDocumentPart(tag);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.filters.IFilter#getName()
-	 */
-	public String getName() {
-		return "okf_html"; //$NON-NLS-1$
-	}
-
+	@Override
 	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderType type, String name,
-			String value, Tag tag, Attribute attribute) {		
-		
+			String value, Tag tag, Attribute attribute) {
+
 		String normalizeAttributeName = normalizeAttributeName(name, value, tag);
-		
+
 		// Test for charset in meta tag - we need to isolate the position of
 		// charset within the attribute value
 		// i.e., content="text/html; charset=ISO-2022-JP"
-		if (isMetaCharset(name, value, tag) && value.toLowerCase().indexOf("charset=") != -1) {
+		if (isMetaCharset(name, value, tag) && value.toLowerCase().indexOf("charset=") != -1) { //$NON-NLS-1$
 			// offset of attribute
 			int mainStartPos = attribute.getBegin() - tag.getBegin();
 			int mainEndPos = attribute.getEnd() - tag.getBegin();
 
 			// adjust offset of value of the attribute
-			int charsetValueOffset = value.toLowerCase().lastIndexOf("charset=") + "charset=".length();
+			int charsetValueOffset = value.toLowerCase().lastIndexOf("charset=") + "charset=".length(); //$NON-NLS-1$
 
 			int valueStartPos = (attribute.getValueSegment().getBegin() + charsetValueOffset) - tag.getBegin();
 			int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
-			
+
 			// get the charset value (encoding)
-			value = tag.toString().substring(valueStartPos, valueEndPos);
-			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName, value, mainStartPos,
-					mainEndPos, valueStartPos, valueEndPos);
+			String v = tag.toString().substring(valueStartPos, valueEndPos);
+			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName, v, mainStartPos, mainEndPos,
+					valueStartPos, valueEndPos);
 		}
-		
+
 		// name is normalized in super-class
-		return super.createPropertyTextUnitPlaceholder(type, name,
-				eventBuilder.normalizeHtmlText(value, true,
-				!isPreserveWhitespace() && getConfig().collapseWhitespace()),
-				tag, attribute);
+		return super.createPropertyTextUnitPlaceholder(type, name, eventBuilder.normalizeHtmlText(value, true,
+				!isPreserveWhitespace() && getConfig().collapseWhitespace()), tag, attribute);
 	}
 
 	@Override
