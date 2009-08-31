@@ -1250,6 +1250,12 @@ public class CommaSeparatedValuesFilterTest {
 		list.add(new InputDocument(root + "csv_test1.txt", ""));
 		list.add(new InputDocument(root + "csv_test2.txt", ""));
 		list.add(new InputDocument(root + "csv_test3.txt", ""));
+		list.add(new InputDocument(root + "csv.txt", ""));
+		list.add(new InputDocument(root + "csv2.txt", ""));
+		list.add(new InputDocument(root + "csv3.txt", ""));
+		list.add(new InputDocument(root + "CSVTest_96.txt", ""));
+		list.add(new InputDocument(root + "CSVTest_97.txt", ""));
+		list.add(new InputDocument(root + "CSVTesting01.csv", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
