@@ -123,17 +123,17 @@ public abstract class AbstractFilter implements IFilter {
 	}
 
 	public List<FilterConfiguration> getConfigurations() {
-		List<FilterConfiguration> res = new ArrayList<FilterConfiguration>();
+		List<FilterConfiguration> configs = new ArrayList<FilterConfiguration>();
 
 		for (FilterConfiguration fc : configList)
-			res.add(new FilterConfiguration(fc.configId, getMimeType(), getClass().getName(), fc.name, fc.description,
+			configs.add(new FilterConfiguration(fc.configId, getMimeType(), getClass().getName(), fc.name, fc.description,
 					fc.parametersLocation));
 
-		return res;
+		return configs;
 	}
 
-	public boolean setConfiguration(String configId) {
-		return true;
+	public void addConfiguration(FilterConfiguration configuration) {
+		configList.add(configuration);
 	}
 
 	public void cancel() {
