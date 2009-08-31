@@ -8,16 +8,14 @@
 package org.tempuri;
 
 public class Insert  implements java.io.Serializable {
-    private java.lang.String subject;
 
+	private static final long serialVersionUID = 1L;
+
+	private java.lang.String subject;
     private java.lang.String source_lang;
-
     private java.lang.String target_lang;
-
     private java.lang.String segment;
-
     private java.lang.String translation;
-
     private java.lang.Integer reserved;
 
     public Insert() {
@@ -281,6 +279,7 @@ public class Insert  implements java.io.Serializable {
     /**
      * Get Custom Serializer
      */
+    @SuppressWarnings("unchecked")
     public static org.apache.axis.encoding.Serializer getSerializer(
            java.lang.String mechType, 
            java.lang.Class _javaType,  
@@ -293,6 +292,7 @@ public class Insert  implements java.io.Serializable {
     /**
      * Get Custom Deserializer
      */
+    @SuppressWarnings("unchecked")
     public static org.apache.axis.encoding.Deserializer getDeserializer(
            java.lang.String mechType, 
            java.lang.Class _javaType,  

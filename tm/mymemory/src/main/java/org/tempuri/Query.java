@@ -212,6 +212,7 @@ public class Query  implements java.io.Serializable {
      */
     public static org.apache.axis.encoding.Serializer getSerializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 
@@ -224,6 +225,7 @@ public class Query  implements java.io.Serializable {
      */
     public static org.apache.axis.encoding.Deserializer getDeserializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 

@@ -8,8 +8,9 @@
 package org.tempuri;
 
 public class InsertResponse  implements java.io.Serializable {
-    private boolean success;
+	private static final long serialVersionUID = 1L;
 
+	private boolean success;
     private java.lang.String error_message;
 
     public InsertResponse() {
@@ -130,6 +131,7 @@ public class InsertResponse  implements java.io.Serializable {
      */
     public static org.apache.axis.encoding.Serializer getSerializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 
@@ -142,6 +144,7 @@ public class InsertResponse  implements java.io.Serializable {
      */
     public static org.apache.axis.encoding.Deserializer getDeserializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 

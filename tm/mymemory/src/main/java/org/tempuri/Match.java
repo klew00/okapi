@@ -8,24 +8,17 @@
 package org.tempuri;
 
 public class Match  implements java.io.Serializable {
-    private java.lang.String subject;
+	private static final long serialVersionUID = 1L;
 
+	private java.lang.String subject;
     private int quality;
-
     private int score;
-
     private java.lang.String translator;
-
     private java.util.Calendar create_date;
-
     private java.lang.String job_id;
-
     private java.lang.String segment;
-
     private java.lang.String translation;
-
     private java.lang.String source_lang;
-
     private java.lang.String target_lang;
 
     public Match() {
@@ -420,6 +413,7 @@ public class Match  implements java.io.Serializable {
      */
     public static org.apache.axis.encoding.Serializer getSerializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 
@@ -432,6 +426,7 @@ public class Match  implements java.io.Serializable {
      */
     public static org.apache.axis.encoding.Deserializer getDeserializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 

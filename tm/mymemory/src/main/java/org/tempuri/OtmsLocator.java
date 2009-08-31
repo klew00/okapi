@@ -9,7 +9,9 @@ package org.tempuri;
 
 public class OtmsLocator extends org.apache.axis.client.Service implements org.tempuri.Otms {
 
-    public OtmsLocator() {
+	private static final long serialVersionUID = 1L;
+
+	public OtmsLocator() {
     }
 
 
@@ -117,6 +119,7 @@ public class OtmsLocator extends org.apache.axis.client.Service implements org.t
      * This service has multiple ports for a given interface;
      * the proxy implementation returned may be indeterminate.
      */
+    @SuppressWarnings("unchecked")
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
             if (org.tempuri.OtmsSoap.class.isAssignableFrom(serviceEndpointInterface)) {
@@ -141,6 +144,7 @@ public class OtmsLocator extends org.apache.axis.client.Service implements org.t
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
+    @SuppressWarnings("unchecked")
     public java.rmi.Remote getPort(javax.xml.namespace.QName portName, Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         if (portName == null) {
             return getPort(serviceEndpointInterface);
@@ -163,8 +167,10 @@ public class OtmsLocator extends org.apache.axis.client.Service implements org.t
         return new javax.xml.namespace.QName("http://tempuri.org/", "otms");
     }
 
+    @SuppressWarnings("unchecked")
     private java.util.HashSet ports = null;
 
+    @SuppressWarnings("unchecked")
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
