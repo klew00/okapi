@@ -380,7 +380,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @param segment
 	 */
 	protected void preProcess(Segment segment) {
-	};
+	}
 
 	/**
 	 * Do any required post-processing on the TextUnit before the {@link Event}
