@@ -1,10 +1,13 @@
 package net.sf.okapi.common.filters;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -19,6 +22,7 @@ public abstract class AbstractFilter implements IFilter {
 	private static final String START_DOCUMENT = "sd"; //$NON-NLS-1$
 	private static final String END_DOCUMENT = "ed"; //$NON-NLS-1$
 
+	List<FilterConfiguration> configList = new ArrayList<FilterConfiguration>();
 	private int documentId = 0;
 	private boolean canceled = false;
 	private String documentName;
@@ -30,13 +34,15 @@ public abstract class AbstractFilter implements IFilter {
 	private IFilterWriter filterWriter;
 	private boolean generateSkeleton;
 	private boolean multilingual;
+	private String name;
+	private String description;
 
 	/**
 	 * Default constructor
 	 */
 	public AbstractFilter() {
 		// defaults
-		setNewlineType("\n");
+		setNewlineType("\n"); //$NON-NLS-1$
 		setMultilingual(false);
 	}
 
@@ -77,7 +83,7 @@ public abstract class AbstractFilter implements IFilter {
 		startDocument.setFilterWriter(getFilterWriter());
 		startDocument.setName(getDocumentName());
 		startDocument.setMultilingual(isMultilingual());
-		LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId());
+		LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId()); //$NON-NLS-1$
 		return new Event(EventType.START_DOCUMENT, startDocument);
 	}
 
@@ -86,8 +92,48 @@ public abstract class AbstractFilter implements IFilter {
 	 */
 	protected Event createEndDocumentEvent() {
 		Ending endDocument = new Ending(createId(END_DOCUMENT, ++documentId));
-		LOGGER.log(Level.FINE, "End Document for " + endDocument.getId());
+		LOGGER.log(Level.FINE, "End Document for " + endDocument.getId()); //$NON-NLS-1$
 		return new Event(EventType.END_DOCUMENT, endDocument);
+	}
+
+	public boolean addConfigurations(List<FilterConfiguration> configs) {
+		if (configList == null)
+			return false;
+
+		return configList.addAll(configs);
+	}
+
+	public FilterConfiguration getConfiguration(String configId) {
+		if (Util.isEmpty(configList))
+			return null;
+
+		for (FilterConfiguration config : configList) {
+
+			if (config == null)
+				continue;
+			if (config.configId.equalsIgnoreCase(configId))
+				return config;
+		}
+
+		return null;
+	}
+
+	public boolean removeConfiguration(String configId) {
+		return configList.remove(getConfiguration(configId));
+	}
+
+	public List<FilterConfiguration> getConfigurations() {
+		List<FilterConfiguration> res = new ArrayList<FilterConfiguration>();
+
+		for (FilterConfiguration fc : configList)
+			res.add(new FilterConfiguration(fc.configId, getMimeType(), getClass().getName(), fc.name, fc.description,
+					fc.parametersLocation));
+
+		return res;
+	}
+
+	public boolean setConfiguration(String configId) {
+		return true;
 	}
 
 	public void cancel() {
@@ -289,5 +335,23 @@ public abstract class AbstractFilter implements IFilter {
 	 */
 	public boolean isMultilingual() {
 		return multilingual;
+	}
+
+	public void setName(String name) {
+
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getDescription() {
+		// return this.getClass().getName();
+		return description;
 	}
 }
