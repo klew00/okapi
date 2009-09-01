@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Pensieve TM Writer
-Bundle-SymbolicName: net.sf.okapi.tm.pensieve.writer
-Bundle-Version: 0.0.1-SNAPSHOT
-Export-Package: net.sf.okapi.tm.pensieve.writer
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
