@@ -1,4 +1,4 @@
-package net.sf.okapi.tm.pensieve.writer;
+package net.sf.okapi.tm.pensieve.common;
 
 /**
  * User: Christian Hargraves

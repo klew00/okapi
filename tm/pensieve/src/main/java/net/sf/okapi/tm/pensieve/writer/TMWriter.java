@@ -5,6 +5,7 @@
 
 package net.sf.okapi.tm.pensieve.writer;
 
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import java.io.IOException;
 
 /**

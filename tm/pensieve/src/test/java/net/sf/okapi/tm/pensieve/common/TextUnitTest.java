@@ -1,5 +1,6 @@
-package net.sf.okapi.tm.pensieve.writer;
+package net.sf.okapi.tm.pensieve.common;
 
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 

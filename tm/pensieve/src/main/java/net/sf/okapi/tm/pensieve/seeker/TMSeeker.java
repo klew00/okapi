@@ -11,8 +11,8 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.okapi.tm.pensieve.writer.TranslationUnit;
-import net.sf.okapi.tm.pensieve.writer.TextUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.common.TextUnitFields;
 
 /**
  * @author Christian Hargraves

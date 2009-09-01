@@ -1,5 +1,7 @@
 package net.sf.okapi.tm.pensieve.writer;
 
+import net.sf.okapi.tm.pensieve.common.TextUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;

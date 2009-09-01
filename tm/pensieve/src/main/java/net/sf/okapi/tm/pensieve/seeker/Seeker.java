@@ -5,8 +5,8 @@
 
 package net.sf.okapi.tm.pensieve.seeker;
 
-import net.sf.okapi.tm.pensieve.writer.TranslationUnit;
-import net.sf.okapi.tm.pensieve.writer.TextUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.common.TextUnitFields;
 
 import java.util.List;
 import java.io.IOException;

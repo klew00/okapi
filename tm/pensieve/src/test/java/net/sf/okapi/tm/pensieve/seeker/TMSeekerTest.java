@@ -1,8 +1,8 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.tm.pensieve.writer.ExactMatchWriter;
-import net.sf.okapi.tm.pensieve.writer.TranslationUnit;
-import net.sf.okapi.tm.pensieve.writer.TextUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.common.TextUnitFields;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.store.Directory;
