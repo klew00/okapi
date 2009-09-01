@@ -1,7 +1,7 @@
 package net.sf.okapi.tm.pensieve.common;
 
 import net.sf.okapi.common.resource.TextFragment;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
@@ -16,10 +16,58 @@ public class TranslationUnitTest {
     final static TextFragment CONTENT = new TextFragment("Some content that isn't very long");
 
     @Test
+    public void noArgConstructor(){
+        tu = new TranslationUnit();
+        assertNull("source", tu.getSource());
+        assertNull("content", tu.getTarget());
+    }
+
+    @Test
     public void constructor_allParamsPassed(){
         tu = new TranslationUnit(SOURCE, CONTENT);
-        assertEquals("source", SOURCE, tu.getSource().getCodedText());
-        assertEquals("content", CONTENT, tu.getTarget().getCodedText());
+        assertEquals("source", SOURCE, tu.getSource());
+        assertEquals("content", CONTENT, tu.getTarget());
     }
+
+    @Test
+    public void isSourceEmptyNull(){
+        tu = new TranslationUnit();
+        assertTrue("source should be empty", tu.isSourceEmpty());
+    }
+
+    @Test
+    public void isSourceEmptyEmpty(){
+        tu = new TranslationUnit();
+        tu.setSource(new TextFragment(""));
+        assertTrue("source should be empty", tu.isSourceEmpty());
+    }
+
+    @Test
+    public void isSourceEmptyNotEmpty(){
+        tu = new TranslationUnit();
+        tu.setSource(new TextFragment("this is not empty"));
+        assertFalse("source should not be empty", tu.isSourceEmpty());
+    }
+
+    @Test
+    public void isTargetEmptyNull(){
+        tu = new TranslationUnit();
+        assertTrue("target should be empty", tu.isTargetEmpty());
+    }
+
+    @Test
+    public void isTargetEmptyEmpty(){
+        tu = new TranslationUnit();
+        tu.setTarget(new TextFragment(""));
+        assertTrue("target should be empty", tu.isTargetEmpty());
+    }
+
+    @Test
+    public void isTargetEmptyNotEmpty(){
+        tu = new TranslationUnit();
+        tu.setTarget(new TextFragment("this is not empty"));
+        assertFalse("target should not be empty", tu.isTargetEmpty());
+    }
+
 
 }

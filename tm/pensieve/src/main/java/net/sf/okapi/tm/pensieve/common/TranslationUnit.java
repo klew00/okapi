@@ -11,7 +11,11 @@ public class TranslationUnit {
     private TextFragment source;
     private TextFragment target;
 
+    public TranslationUnit(){
+    }
+
     public TranslationUnit(TextFragment source, TextFragment target) {
+        this();
         this.source = source;
         this.target = target;
     }
@@ -22,5 +26,25 @@ public class TranslationUnit {
 
     public TextFragment getTarget() {
         return target;
+    }
+
+    public void setSource(TextFragment source) {
+        this.source = source;
+    }
+
+    public void setTarget(TextFragment target) {
+        this.target = target;
+    }
+
+    public boolean isSourceEmpty() {
+        return isFragmentEmpty(source);
+    }
+
+    public boolean isTargetEmpty() {
+        return isFragmentEmpty(target);
+    }
+
+    private static boolean isFragmentEmpty(TextFragment frag){
+        return frag == null || frag.isEmpty();
     }
 }

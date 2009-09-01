@@ -75,7 +75,9 @@ public class TMSeeker implements Seeker {
     }
 
     TranslationUnit getTranslationUnit(Document doc) {
-        return new TranslationUnit(new TextFragment(getFieldValue(doc, TranslationUnitFields.SOURCE_EXACT)), new TextFragment(getFieldValue(doc, TranslationUnitFields.TARGET)));
+        return new TranslationUnit(new TextFragment(getFieldValue(
+                doc, TranslationUnitFields.SOURCE_EXACT)),
+                new TextFragment(getFieldValue(doc, TranslationUnitFields.TARGET)));
     }
 
     String getFieldValue(Document doc, TranslationUnitFields field){
