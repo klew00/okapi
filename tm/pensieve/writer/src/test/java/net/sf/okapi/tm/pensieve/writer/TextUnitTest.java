@@ -10,13 +10,13 @@ import org.junit.Test;
  */
 public class TextUnitTest {
 
-    TextUnit tu;
+    TranslationUnit tu;
     final static String AUTHOR = "Joe McMac";
     final static String CONTENT = "Some content that isn't very long";
 
     @Test
     public void constructor_allParamsPassed(){
-        tu = new TextUnit(AUTHOR, CONTENT);
+        tu = new TranslationUnit(AUTHOR, CONTENT);
         assertEquals("author", AUTHOR, tu.getAuthor());
         assertEquals("content", CONTENT, tu.getContent());
     }

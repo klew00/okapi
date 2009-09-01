@@ -40,14 +40,14 @@ public class ExactMatchWriter implements TMWriter {
         return writer;
     }
 
-    public void indexTextUnit(TextUnit tu) throws IOException {
+    public void indexTextUnit(TranslationUnit tu) throws IOException {
         if (tu == null){
             throw new NullPointerException("TextUnit can not be null");
         }
         writer.addDocument(getDocument(tu));
     }
 
-    Document getDocument(TextUnit tu) {
+    Document getDocument(TranslationUnit tu) {
         if (tu == null || tu.getContent() == null){
             throw new NullPointerException("content not set");
         }

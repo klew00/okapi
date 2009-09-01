@@ -11,7 +11,7 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.okapi.tm.pensieve.writer.TextUnit;
+import net.sf.okapi.tm.pensieve.writer.TranslationUnit;
 import net.sf.okapi.tm.pensieve.writer.TextUnitFields;
 
 /**
@@ -27,7 +27,7 @@ public class TMSeeker implements Seeker {
         this.indexDir = indexDir;
     }
 
-    public List<TextUnit> searchForWords(TextUnitFields field, String query, int max) throws IOException {
+    public List<TranslationUnit> searchForWords(TextUnitFields field, String query, int max) throws IOException {
         QueryParser parser = new QueryParser(field.name(), new SimpleAnalyzer());
         Query q;
         try {
@@ -38,7 +38,7 @@ public class TMSeeker implements Seeker {
         return search(max, q);
     }
 
-    public List<TextUnit> searchExact(TextUnitFields field, String query, int max) throws IOException {
+    public List<TranslationUnit> searchExact(TextUnitFields field, String query, int max) throws IOException {
         //If using QueryParser.parse("\"phrase to match\""), the indexed field must be set to Field.Index.ANALYZED
         //At which point subphrases will also match. This is not the desired behavior of an exact match.
         //Query q = new QueryParser(field.name(), new SimpleAnalyzer()).parse("\""+query+"\"");
@@ -50,9 +50,9 @@ public class TMSeeker implements Seeker {
         return search(max, q);
     }
 
-    private List<TextUnit> search(int max, Query q) throws IOException {
+    private List<TranslationUnit> search(int max, Query q) throws IOException {
         IndexSearcher is = null;
-        List<TextUnit> docs = new ArrayList<TextUnit>();
+        List<TranslationUnit> docs = new ArrayList<TranslationUnit>();
         try{
             is = new IndexSearcher(indexDir, true);
             TopDocs hits = is.search(q, max);
@@ -68,8 +68,8 @@ public class TMSeeker implements Seeker {
         return docs;
     }
 
-    TextUnit getTextUnit(Document doc) {
-        return new TextUnit(getFieldValue(doc, TextUnitFields.AUTHOR), getFieldValue(doc, TextUnitFields.CONTENT_EXACT));
+    TranslationUnit getTextUnit(Document doc) {
+        return new TranslationUnit(getFieldValue(doc, TextUnitFields.AUTHOR), getFieldValue(doc, TextUnitFields.CONTENT_EXACT));
     }
 
     String getFieldValue(Document doc, TextUnitFields field){

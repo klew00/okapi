@@ -5,11 +5,11 @@ package net.sf.okapi.tm.pensieve.writer;
  * Date: Aug 19, 2009
  * Time: 6:53:34 AM
  */
-public class TextUnit {
+public class TranslationUnit {
     private String author;
     private String content;
 
-    public TextUnit(String author, String content) {
+    public TranslationUnit(String author, String content) {
         this.author = author;
         this.content = content;
     }

@@ -1,7 +1,7 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.tm.pensieve.writer.ExactMatchWriter;
-import net.sf.okapi.tm.pensieve.writer.TextUnit;
+import net.sf.okapi.tm.pensieve.writer.TranslationUnit;
 import net.sf.okapi.tm.pensieve.writer.TextUnitFields;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -39,7 +39,7 @@ public class TMSeekerTest {
     public void searchForWordsNothingFound() throws Exception {
         ExactMatchWriter writer = getWriter();
         writer.endIndex();
-        List<TextUnit> docs = seeker.searchForWords(TextUnitFields.CONTENT, "anonexistentwordthatshouldnowayeverexist", 10);
+        List<TranslationUnit> docs = seeker.searchForWords(TextUnitFields.CONTENT, "anonexistentwordthatshouldnowayeverexist", 10);
         assertNotNull("docs returned should not be null", docs);
         assertEquals("number of docs found", 0, docs.size());
     }
@@ -51,7 +51,7 @@ public class TMSeekerTest {
         populateIndex(writer, 12, "patents are evil", "unittest");
         final int desiredReturns = 2;
         writer.endIndex();
-        List<TextUnit> docs = seeker.searchForWords(TextUnitFields.CONTENT, "patents", desiredReturns);
+        List<TranslationUnit> docs = seeker.searchForWords(TextUnitFields.CONTENT, "patents", desiredReturns);
         assertEquals("number of docs found", desiredReturns, docs.size());
     }
 
@@ -64,7 +64,7 @@ public class TMSeekerTest {
         populateIndex(writer, desiredReturns, "patents are evil", "unittest");
         writer.endIndex();
 
-        List<TextUnit> docs = seeker.searchForWords(TextUnitFields.CONTENT, "patents", 10);
+        List<TranslationUnit> docs = seeker.searchForWords(TextUnitFields.CONTENT, "patents", 10);
         assertEquals("number of docs found", desiredReturns, docs.size());
     }
 
@@ -77,13 +77,13 @@ public class TMSeekerTest {
     public void searchWordsMultipleSubPhrases() throws Exception {
         ExactMatchWriter writer = getWriter();
 
-        writer.indexTextUnit(new TextUnit("joe", "patents are evil"));
-        writer.indexTextUnit(new TextUnit("joe", "patents evil are"));
-        writer.indexTextUnit(new TextUnit("joe", "are patents evil"));
-        writer.indexTextUnit(new TextUnit("joe", "completely unrelated phrase"));
+        writer.indexTextUnit(new TranslationUnit("joe", "patents are evil"));
+        writer.indexTextUnit(new TranslationUnit("joe", "patents evil are"));
+        writer.indexTextUnit(new TranslationUnit("joe", "are patents evil"));
+        writer.indexTextUnit(new TranslationUnit("joe", "completely unrelated phrase"));
         writer.endIndex();
 
-        List<TextUnit> docs = seeker.searchForWords(TextUnitFields.CONTENT, "\"patents evil\"", 10);
+        List<TranslationUnit> docs = seeker.searchForWords(TextUnitFields.CONTENT, "\"patents evil\"", 10);
         assertEquals("number of docs found", 2, docs.size());
     }
 
@@ -97,7 +97,7 @@ public class TMSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
-        List<TextUnit> docs = seeker.searchExact(TextUnitFields.CONTENT_EXACT, str+1, 10);
+        List<TranslationUnit> docs = seeker.searchExact(TextUnitFields.CONTENT_EXACT, str+1, 10);
         assertEquals("number of docs found", 1, docs.size());
     }
 
@@ -106,11 +106,11 @@ public class TMSeekerTest {
         ExactMatchWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
         for(int i = 0; i < 5; i++){
-            writer.indexTextUnit(new TextUnit("joe", str));
+            writer.indexTextUnit(new TranslationUnit("joe", str));
         }
 
         writer.endIndex();
-        List<TextUnit> docs = seeker.searchExact(TextUnitFields.CONTENT_EXACT, str, 10);
+        List<TranslationUnit> docs = seeker.searchExact(TextUnitFields.CONTENT_EXACT, str, 10);
         assertEquals("number of docs found", 5, docs.size());
     }
 
@@ -118,11 +118,11 @@ public class TMSeekerTest {
     public void searchExactDifferentStopWords() throws Exception {
         ExactMatchWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
-        writer.indexTextUnit(new TextUnit("joe", str));
-        writer.indexTextUnit(new TextUnit("joe", "watch out for the the killer rabbit"));
+        writer.indexTextUnit(new TranslationUnit("joe", str));
+        writer.indexTextUnit(new TranslationUnit("joe", "watch out for the the killer rabbit"));
 
         writer.endIndex();
-        List<TextUnit> docs = seeker.searchExact(TextUnitFields.CONTENT_EXACT, str, 10);
+        List<TranslationUnit> docs = seeker.searchExact(TextUnitFields.CONTENT_EXACT, str, 10);
         assertEquals("number of docs found", 1, docs.size());
     }
 
@@ -130,11 +130,11 @@ public class TMSeekerTest {
     public void searchExactDifferentOrder() throws Exception {
         ExactMatchWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
-        writer.indexTextUnit(new TextUnit("joe", str));
-        writer.indexTextUnit(new TextUnit("joe", "watch out for the the killer rabbit"));
+        writer.indexTextUnit(new TranslationUnit("joe", str));
+        writer.indexTextUnit(new TranslationUnit("joe", "watch out for the the killer rabbit"));
 
         writer.endIndex();
-        List<TextUnit> docs = seeker.searchExact(TextUnitFields.CONTENT_EXACT, "killer rabbit the for out watch", 10);
+        List<TranslationUnit> docs = seeker.searchExact(TextUnitFields.CONTENT_EXACT, "killer rabbit the for out watch", 10);
         assertEquals("number of docs found", 0, docs.size());
     }
 
@@ -146,7 +146,7 @@ public class TMSeekerTest {
                 Field.Store.NO, Field.Index.ANALYZED));
         doc.add(new Field(TextUnitFields.AUTHOR.name(), "j",
                 Field.Store.NO, Field.Index.ANALYZED));
-        TextUnit tu = seeker.getTextUnit(doc);
+        TranslationUnit tu = seeker.getTextUnit(doc);
         assertEquals("content field", str, tu.getContent());
         assertEquals("author field", "j", tu.getAuthor());
     }
@@ -158,8 +158,8 @@ public class TMSeekerTest {
     void populateIndex(ExactMatchWriter writer, int numOfEntries, String text, String author) throws Exception {
 
         for (int i=0; i<numOfEntries; i++) {
-            writer.indexTextUnit(new TextUnit(author, text + i));
+            writer.indexTextUnit(new TranslationUnit(author, text + i));
         }
-        writer.indexTextUnit(new TextUnit("unittest", "something that in no way should ever match"));
+        writer.indexTextUnit(new TranslationUnit("unittest", "something that in no way should ever match"));
     }
 }
