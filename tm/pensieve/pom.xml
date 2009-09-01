@@ -24,7 +24,6 @@
     </repositories>
 
     <modules>
-        <module>writer</module>
         <module>seeker</module>
     </modules>
     
