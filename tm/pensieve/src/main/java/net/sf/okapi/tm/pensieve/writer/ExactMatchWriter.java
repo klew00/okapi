@@ -1,6 +1,6 @@
 package net.sf.okapi.tm.pensieve.writer;
 
-import net.sf.okapi.tm.pensieve.common.TextUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
@@ -54,12 +54,12 @@ public class ExactMatchWriter implements TMWriter {
             throw new NullPointerException("content not set");
         }
         Document doc = new Document();
-        doc.add(new Field(TextUnitFields.CONTENT.name(), tu.getContent(),
+        doc.add(new Field(TranslationUnitFields.CONTENT.name(), tu.getContent(),
                 Field.Store.NO, Field.Index.ANALYZED));
-        doc.add(new Field(TextUnitFields.CONTENT_EXACT.name(), tu.getContent(),
+        doc.add(new Field(TranslationUnitFields.CONTENT_EXACT.name(), tu.getContent(),
                 Field.Store.YES, Field.Index.NOT_ANALYZED));
         if (tu.getAuthor() != null){
-            doc.add(new Field(TextUnitFields.AUTHOR.name(), tu.getAuthor(),
+            doc.add(new Field(TranslationUnitFields.AUTHOR.name(), tu.getAuthor(),
                     Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
         return doc;

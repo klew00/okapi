@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TextUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
 
 /**
  * @author Christian Hargraves
@@ -27,7 +27,7 @@ public class TMSeeker implements Seeker {
         this.indexDir = indexDir;
     }
 
-    public List<TranslationUnit> searchForWords(TextUnitFields field, String query, int max) throws IOException {
+    public List<TranslationUnit> searchForWords(TranslationUnitFields field, String query, int max) throws IOException {
         QueryParser parser = new QueryParser(field.name(), new SimpleAnalyzer());
         Query q;
         try {
@@ -38,7 +38,7 @@ public class TMSeeker implements Seeker {
         return search(max, q);
     }
 
-    public List<TranslationUnit> searchExact(TextUnitFields field, String query, int max) throws IOException {
+    public List<TranslationUnit> searchExact(TranslationUnitFields field, String query, int max) throws IOException {
         //If using QueryParser.parse("\"phrase to match\""), the indexed field must be set to Field.Index.ANALYZED
         //At which point subphrases will also match. This is not the desired behavior of an exact match.
         //Query q = new QueryParser(field.name(), new SimpleAnalyzer()).parse("\""+query+"\"");
@@ -69,10 +69,10 @@ public class TMSeeker implements Seeker {
     }
 
     TranslationUnit getTextUnit(Document doc) {
-        return new TranslationUnit(getFieldValue(doc, TextUnitFields.AUTHOR), getFieldValue(doc, TextUnitFields.CONTENT_EXACT));
+        return new TranslationUnit(getFieldValue(doc, TranslationUnitFields.AUTHOR), getFieldValue(doc, TranslationUnitFields.CONTENT_EXACT));
     }
 
-    String getFieldValue(Document doc, TextUnitFields field){
+    String getFieldValue(Document doc, TranslationUnitFields field){
         return doc.getField(field.name()).stringValue();
     }
 }

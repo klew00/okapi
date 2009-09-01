@@ -1,6 +1,6 @@
 package net.sf.okapi.tm.pensieve.writer;
 
-import net.sf.okapi.tm.pensieve.common.TextUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -74,15 +74,15 @@ public class ExactMatchWriterTest {
     @Test
     public void getDocumentValues(){
         Document doc = emWriter.getDocument(new TranslationUnit("someone", "blah blah blah"));
-        assertEquals("Document's content field", "blah blah blah", doc.getField(TextUnitFields.CONTENT.name()).stringValue());
-        assertEquals("Document's content exact field", "blah blah blah", doc.getField(TextUnitFields.CONTENT_EXACT.name()).stringValue());
-        assertEquals("Document's author field", "someone", doc.getField(TextUnitFields.AUTHOR.name()).stringValue());
+        assertEquals("Document's content field", "blah blah blah", doc.getField(TranslationUnitFields.CONTENT.name()).stringValue());
+        assertEquals("Document's content exact field", "blah blah blah", doc.getField(TranslationUnitFields.CONTENT_EXACT.name()).stringValue());
+        assertEquals("Document's author field", "someone", doc.getField(TranslationUnitFields.AUTHOR.name()).stringValue());
     }
 
     @Test
     public void getDocumentNoAuthor(){
         Document doc = emWriter.getDocument(new TranslationUnit(null, "blah blah blah"));
-        assertNull("Document's author field should be null", doc.getField(TextUnitFields.AUTHOR.name()));
+        assertNull("Document's author field should be null", doc.getField(TranslationUnitFields.AUTHOR.name()));
     }
 
     @Test(expected = NullPointerException.class)
