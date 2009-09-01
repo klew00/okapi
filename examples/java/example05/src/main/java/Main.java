@@ -69,13 +69,13 @@ public class Main {
 			}
 			
 			System.out.print("Service URL (e.g. http://myserver:8080/globalsight/services/AmbassadorWebService?wsdl) = ");
-			params.serverURL = scanner.nextLine();
+			params.setServerURL(scanner.nextLine());
 			System.out.print("Username = ");
-			params.username = scanner.nextLine();
+			params.setUsername(scanner.nextLine());
 			System.out.print("Password = ");
-			params.password = scanner.nextLine();
+			params.setPassword(scanner.nextLine());
 			System.out.print("TM Profile name = ");
-			params.tmProfile = scanner.nextLine();
+			params.setTmProfile(scanner.nextLine());
 			System.out.print("Source language (e.g. en) = ");
 			String srcLang = scanner.nextLine();
 			System.out.print("Target language (e.g. fr) = ");
