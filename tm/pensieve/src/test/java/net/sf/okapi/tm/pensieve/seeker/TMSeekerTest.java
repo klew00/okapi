@@ -78,10 +78,10 @@ public class TMSeekerTest {
     public void searchWordsMultipleSubPhrases() throws Exception {
         ExactMatchWriter writer = getWriter();
 
-        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), "patents are evil"));
-        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), "patents evil are"));
-        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), "are patents evil"));
-        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), "completely unrelated phrase"));
+        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment("patents are evil")));
+        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment("patents evil are")));
+        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment("are patents evil")));
+        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment("completely unrelated phrase")));
         writer.endIndex();
 
         List<TranslationUnit> docs = seeker.searchForWords(TranslationUnitFields.CONTENT, "\"patents evil\"", 10);
@@ -107,7 +107,7 @@ public class TMSeekerTest {
         ExactMatchWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
         for(int i = 0; i < 5; i++){
-            writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), str));
+            writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment(str)));
         }
 
         writer.endIndex();
@@ -119,8 +119,8 @@ public class TMSeekerTest {
     public void searchExactDifferentStopWords() throws Exception {
         ExactMatchWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
-        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), str));
-        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), "watch out for the the killer rabbit"));
+        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment(str)));
+        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment("watch out for the the killer rabbit")));
 
         writer.endIndex();
         List<TranslationUnit> docs = seeker.searchExact(TranslationUnitFields.CONTENT_EXACT, str, 10);
@@ -131,8 +131,8 @@ public class TMSeekerTest {
     public void searchExactDifferentOrder() throws Exception {
         ExactMatchWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
-        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), str));
-        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), "watch out for the the killer rabbit"));
+        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment(str)));
+        writer.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment("watch out for the the killer rabbit")));
 
         writer.endIndex();
         List<TranslationUnit> docs = seeker.searchExact(TranslationUnitFields.CONTENT_EXACT, "killer rabbit the for out watch", 10);
@@ -148,7 +148,7 @@ public class TMSeekerTest {
         doc.add(new Field(TranslationUnitFields.AUTHOR.name(), "j",
                 Field.Store.NO, Field.Index.ANALYZED));
         TranslationUnit tu = seeker.getTextUnit(doc);
-        assertEquals("content field", str, tu.getTarget());
+        assertEquals("content field", str, tu.getTarget().getCodedText());
         assertEquals("author field", "j", tu.getSource().getCodedText());
     }
 
@@ -159,8 +159,8 @@ public class TMSeekerTest {
     void populateIndex(ExactMatchWriter writer, int numOfEntries, String text, String author) throws Exception {
 
         for (int i=0; i<numOfEntries; i++) {
-            writer.indexTextUnit(new TranslationUnit(new TextFragment(author), text + i));
+            writer.indexTextUnit(new TranslationUnit(new TextFragment(author), new TextFragment(text + i)));
         }
-        writer.indexTextUnit(new TranslationUnit(new TextFragment("unittest"), "something that in no way should ever match"));
+        writer.indexTextUnit(new TranslationUnit(new TextFragment("unittest"), new TextFragment("something that in no way should ever match")));
     }
 }

@@ -59,7 +59,7 @@ public class ExactMatchWriterTest {
 
     @Test
     public void endIndexCommits() throws IOException {
-        emWriter.indexTextUnit(new TranslationUnit(new TextFragment("dax"), "is funny (sometimes)"));
+        emWriter.indexTextUnit(new TranslationUnit(new TextFragment("dax"), new TextFragment("is funny (sometimes)")));
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed before endIndex", 0, reader.maxDoc());
         emWriter.endIndex();
@@ -74,7 +74,7 @@ public class ExactMatchWriterTest {
 
     @Test
     public void getDocumentValues(){
-        Document doc = emWriter.getDocument(new TranslationUnit(new TextFragment("someone"), "blah blah blah"));
+        Document doc = emWriter.getDocument(new TranslationUnit(new TextFragment("someone"), new TextFragment("blah blah blah")));
         assertEquals("Document's content field", "blah blah blah", doc.getField(TranslationUnitFields.CONTENT.name()).stringValue());
         assertEquals("Document's content exact field", "blah blah blah", doc.getField(TranslationUnitFields.CONTENT_EXACT.name()).stringValue());
         assertEquals("Document's author field", "someone", doc.getField(TranslationUnitFields.AUTHOR.name()).stringValue());
@@ -82,7 +82,7 @@ public class ExactMatchWriterTest {
 
     @Test
     public void getDocumentNoAuthor(){
-        Document doc = emWriter.getDocument(new TranslationUnit(null, "blah blah blah"));
+        Document doc = emWriter.getDocument(new TranslationUnit(null, new TextFragment("blah blah blah")));
         assertNull("Document's author field should be null", doc.getField(TranslationUnitFields.AUTHOR.name()));
     }
 
@@ -98,7 +98,7 @@ public class ExactMatchWriterTest {
 
     @Test
     public void indexTextUnit() throws IOException {
-        emWriter.indexTextUnit(new TranslationUnit(new TextFragment("joe"), "schmoe"));
+        emWriter.indexTextUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment("schmoe")));
         assertEquals("num of docs indexed", 1, emWriter.getIndexWriter().numDocs());
     }
 

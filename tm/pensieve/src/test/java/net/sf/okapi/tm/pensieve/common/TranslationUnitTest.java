@@ -13,13 +13,13 @@ public class TranslationUnitTest {
 
     TranslationUnit tu;
     final static TextFragment SOURCE = new TextFragment("Joe McMac");
-    final static String CONTENT = "Some content that isn't very long";
+    final static TextFragment CONTENT = new TextFragment("Some content that isn't very long");
 
     @Test
     public void constructor_allParamsPassed(){
         tu = new TranslationUnit(SOURCE, CONTENT);
         assertEquals("source", SOURCE, tu.getSource().getCodedText());
-        assertEquals("content", CONTENT, tu.getTarget());
+        assertEquals("content", CONTENT, tu.getTarget().getCodedText());
     }
 
 }

@@ -54,9 +54,9 @@ public class ExactMatchWriter implements TMWriter {
             throw new NullPointerException("content not set");
         }
         Document doc = new Document();
-        doc.add(new Field(TranslationUnitFields.CONTENT.name(), tu.getTarget(),
+        doc.add(new Field(TranslationUnitFields.CONTENT.name(), tu.getTarget().getCodedText(),
                 Field.Store.NO, Field.Index.ANALYZED));
-        doc.add(new Field(TranslationUnitFields.CONTENT_EXACT.name(), tu.getTarget(),
+        doc.add(new Field(TranslationUnitFields.CONTENT_EXACT.name(), tu.getTarget().getCodedText(),
                 Field.Store.YES, Field.Index.NOT_ANALYZED));
         if (tu.getSource() != null){
             doc.add(new Field(TranslationUnitFields.AUTHOR.name(), tu.getSource().getCodedText(),

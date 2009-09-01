@@ -9,9 +9,9 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 public class TranslationUnit {
     private TextFragment source;
-    private String target;
+    private TextFragment target;
 
-    public TranslationUnit(TextFragment source, String target) {
+    public TranslationUnit(TextFragment source, TextFragment target) {
         this.source = source;
         this.target = target;
     }
@@ -20,7 +20,7 @@ public class TranslationUnit {
         return source;
     }
 
-    public String getTarget() {
+    public TextFragment getTarget() {
         return target;
     }
 }
