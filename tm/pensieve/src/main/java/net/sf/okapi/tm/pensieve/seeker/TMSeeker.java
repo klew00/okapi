@@ -39,6 +39,11 @@ public class TMSeeker implements Seeker {
         return search(max, q);
     }
 
+    public List<TranslationUnit> searchFuzzyWuzzy(TranslationUnitFields field, String query, int max) throws IOException {
+        Query q = new FuzzyQuery(new Term(field.name(), query)); 
+        return search(max, q);
+    }
+
     public List<TranslationUnit> searchExact(TranslationUnitFields field, String query, int max) throws IOException {
         //If using QueryParser.parse("\"phrase to match\""), the indexed field must be set to Field.Index.ANALYZED
         //At which point subphrases will also match. This is not the desired behavior of an exact match.

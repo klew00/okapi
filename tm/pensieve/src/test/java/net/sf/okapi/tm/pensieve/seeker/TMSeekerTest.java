@@ -80,7 +80,6 @@ public class TMSeekerTest {
     public void searchWordsMultipleSubPhrases() throws Exception {
         ExactMatchWriter writer = getWriter();
 
-
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("patents are evil"),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("patents evil are"),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("are patents evil"),TARGET));
@@ -89,6 +88,52 @@ public class TMSeekerTest {
 
         List<TranslationUnit> docs = seeker.searchForWords(TranslationUnitFields.SOURCE, "\"patents evil\"", 10);
         assertEquals("number of docs found", 2, docs.size());
+    }
+
+    @Test
+    public void searchFuzzyWuzzyMiddleMatch() throws Exception {
+        ExactMatchWriter writer = getWriter();
+        String str = "watch out for the killer rabbit";
+
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(str),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch for the killer rabbit"),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out the killer rabbit"),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch rabbit"),TARGET));
+
+        writer.endIndex();
+        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(TranslationUnitFields.SOURCE_EXACT, str+"~", 10);
+        assertEquals("number of docs found", 3, docs.size());
+    }
+
+    @Test
+    public void searchFuzzyWuzzyMiddleMatch80Percent() throws Exception {
+        ExactMatchWriter writer = getWriter();
+        String str = "watch out for the killer rabbit";
+
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch rabbit"),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(str),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out the killer rabbit and some extra stuff"),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch for the killer rabbit"),TARGET));
+
+        writer.endIndex();
+        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(TranslationUnitFields.SOURCE_EXACT, str+"~0.8", 10);
+        assertEquals("number of docs found", 2, docs.size());
+        assertEquals("1st match", "watch out for the killer rabbit", docs.get(0).getSource().toString());
+        assertEquals("2nd match", "watch for the killer rabbit", docs.get(1).getSource().toString());
+    }
+
+    @Test
+    public void searchFuzzyWuzzyEndMatch() throws Exception {
+        ExactMatchWriter writer = getWriter();
+        String str = "watch out for the killer rabbit";
+
+        final int numOfIndices = 9;
+
+        populateIndex(writer, numOfIndices, str, "two");
+
+        writer.endIndex();
+        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(TranslationUnitFields.SOURCE_EXACT, str+"~", 10);
+        assertEquals("number of docs found", 9, docs.size());
     }
 
     @Test
@@ -162,7 +207,7 @@ public class TMSeekerTest {
 
     void populateIndex(ExactMatchWriter writer, int numOfEntries, String source, String target) throws Exception {
 
-        for (int i=0; i<numOfEntries; i++) {
+        for (int i=0; i < numOfEntries; i++) {
             writer.indexTranslationUnit(new TranslationUnit(new TextFragment(source + i), new TextFragment(target)));
         }
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("something that in no way should ever match"), new TextFragment("unittesttarget")));

@@ -20,4 +20,6 @@ public interface Seeker {
     List<TranslationUnit> searchForWords(TranslationUnitFields field, String query, int max) throws IOException;
 
     List<TranslationUnit> searchExact(TranslationUnitFields field, String query, int max) throws IOException;
+
+    List<TranslationUnit> searchFuzzyWuzzy(TranslationUnitFields field, String query, int max) throws IOException;
 }
