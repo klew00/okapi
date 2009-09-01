@@ -118,7 +118,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 					res = new QueryResult();
 					res.source = new TextFragment(match.getSegment());
 					res.target = new TextFragment(match.getTranslation());
-					res.score = match.getQuality();
+					res.score = match.getScore();
 					// Score not working yet. if ( res.score < getThreshold() ) break;
 					results.add(res);
 				}
