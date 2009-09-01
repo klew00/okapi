@@ -21,13 +21,19 @@
 package net.sf.okapi.tm.globalsight;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
-	public String username;
-	public String password;
-	public String serverURL;
-	public String tmProfile;
+	protected static String USERNAME = "username";
+	protected static String PASSWORD = "password";
+	protected static String SERVERURL = "serverURL";
+	protected static String TMPROFILE = "tmProfile";
+	
+	private String username;
+	private String password;
+	private String serverURL;
+	private String tmProfile;
 	
 	public Parameters () {
 		reset();
@@ -38,13 +44,45 @@ public class Parameters extends BaseParameters {
 		fromString(initialData);
 	}
 	
+	public String getUsername () {
+		return username;
+	}
+
+	public void setUsername (String username) {
+		this.username = username;
+	}
+
+	public String getPassword () {
+		return password;
+	}
+
+	public void setPassword (String password) {
+		this.password = password;
+	}
+
+	public String getServerURL () {
+		return serverURL;
+	}
+
+	public void setServerURL (String serverURL) {
+		this.serverURL = serverURL;
+	}
+
+	public String getTmProfile () {
+		return tmProfile;
+	}
+
+	public void setTmProfile (String tmProfile) {
+		this.tmProfile = tmProfile;
+	}
+
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		username = buffer.getString("username", username);
-		password = buffer.getString("password", password);
-		serverURL = buffer.getString("serverURL", serverURL);
-		tmProfile = buffer.getString("tmProfile", tmProfile);
+		username = buffer.getString(Parameters.USERNAME, username);
+		password = buffer.getString(Parameters.PASSWORD, password);
+		serverURL = buffer.getString(Parameters.SERVERURL, serverURL);
+		tmProfile = buffer.getString(Parameters.TMPROFILE, tmProfile);
 	}
 
 	public void reset () {
@@ -57,11 +95,24 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setString("username", username);
-		buffer.setString("password", password);
-		buffer.setString("serverURL", serverURL);
-		buffer.setString("tmProfile", tmProfile);
+		buffer.setString(Parameters.USERNAME, username);
+		buffer.setString(Parameters.PASSWORD, password);
+		buffer.setString(Parameters.SERVERURL, serverURL);
+		buffer.setString(Parameters.TMPROFILE, tmProfile);
 		return buffer.toString();
 	}
 
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(Parameters.SERVERURL,
+			"Server URL", "The full URL of the TM server (e.g. http://xyz:8080/globalsight/services/AmbassadorWebService?wsdl");
+		desc.add(Parameters.USERNAME,
+			"User name", "The login name to use");
+		desc.add(Parameters.PASSWORD,
+			"Password", "The password for the given user name");
+		desc.add(Parameters.TMPROFILE,
+			"TM profile", "The name of the TM profile to use");
+		return desc;
+	}
 }

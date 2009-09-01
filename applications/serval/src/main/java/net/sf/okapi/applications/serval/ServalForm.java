@@ -51,7 +51,7 @@ public class ServalForm {
 			queryMgt.setLanguages(getDefaultSourceLanguage(), this.getDefaultTargetLanguage());
 
 			// Default
-			queryMgt.addAndInitializeResource(new GoogleMTConnector(), "GoogleMT", null);
+			//queryMgt.addAndInitializeResource(new GoogleMTConnector(), "GoogleMT", null);
 			// For test
 			//SimpleTMConnector smptm = new SimpleTMConnector();
 			//queryMgt.addAndInitializeResource(smptm, "SimpleTM test", "C:\\Projects\\CaridianBCT\\AlignerTests\\RealProject\\PL-PL\\outputdb_PL");

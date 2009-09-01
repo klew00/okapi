@@ -79,7 +79,7 @@ public class Parameters extends BaseParameters {
 		desc.add("host",
 			"Host", "The host name of the TM server (e.g. localhost)");
 		desc.add("port",
-			"Port", "The port number of the TM server (e.g. 8080");
+			"Port", "The port number of the TM server (e.g. 8080)");
 		return desc;
 	}
 }

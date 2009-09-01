@@ -120,13 +120,13 @@ public class GlobalSightTMConnector implements ITMQuery {
 
 	public void open () {
 		try {
-			URL url = new URL(params.serverURL);
+			URL url = new URL(params.getServerURL());
 			gsWS = new AmbassadorWebServiceSoapBindingStub(url, null);
-			gsToken = gsWS.login(params.username, params.password);
+			gsToken = gsWS.login(params.getUsername(), params.getPassword());
 			// Remove the end part
 			int n = gsToken.lastIndexOf("+_+");
 			gsToken = gsToken.substring(0, n);
-			gsTmProfile = params.tmProfile;
+			gsTmProfile = params.getTmProfile();
 			results = new ArrayList<QueryResult>();
 		}
 		catch ( AxisFault e ) {

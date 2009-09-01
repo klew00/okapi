@@ -107,20 +107,19 @@ public class MyMemoryTMConnector implements ITMQuery {
 	public int query (String text) {
 		results.clear();
 		try {
-			// TODO: Chenge domain
-			Query query = new Query(text, srcLang, trgLang, "Computer_Science");
+			Query query = new Query(text, srcLang, trgLang, null);
 			GetResponse gresp = otms.otmsGet(params.key, query);
 			if ( gresp.isSuccess() ) {
 				QueryResult res;
 				Match[] matches = gresp.getMatches();
 				int i = 0;
 				for ( Match match : matches ) {
-					if ( ++i > maxHits ) break; // maximum reached
+					if ( ++i > maxHits ) break; // Maximum reached
 					res = new QueryResult();
 					res.source = new TextFragment(match.getSegment());
 					res.target = new TextFragment(match.getTranslation());
-					res.score = match.getScore();
-					// Score not working: if ( res.score < getThreshold() ) break;
+					res.score = match.getQuality();
+					// Score not working yet. if ( res.score < getThreshold() ) break;
 					results.add(res);
 				}
 			}
@@ -137,11 +136,13 @@ public class MyMemoryTMConnector implements ITMQuery {
 	}
 	
 	public void removeAttribute (String name) {
+		//TODO: use domain
 	}
 
 	public void setAttribute (String name,
 		String value)
 	{
+		//TODO: use domain
 	}
 
 	public void setLanguages (String sourceLang,
@@ -152,25 +153,25 @@ public class MyMemoryTMConnector implements ITMQuery {
 	}
 
 	private String toInternalCode (String standardCode) {
+		//TODO: Check
 		return standardCode;
 	}
 
 	private String toISOCode (String internalCode) {
-		//String code = internalCode.toLowerCase().replace('_', '-');
+		//TODO: Check
 		return internalCode;
 	}
 
 	/**
-	 * Sets the maximum number of hits to return. Note that with this
-	 * connector this method can only reduce the maximum number of hits from
-	 * the one defined in the active TM profile.
+	 * Sets the maximum number of hits to return.
 	 */
 	public void setMaximumHits (int max) {
-		maxHits = max;
+		if ( max < 1 ) maxHits = 1;
+		else maxHits = max;
 	}
 
 	public void setThreshold (int threshold) {
-		this.threshold = threshold; 
+		this.threshold = threshold;
 	}
 
 	public int getMaximumHits () {
@@ -186,7 +187,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 	}
 
 	public void setParameters (IParameters params) {
-		this.params = (Parameters)params;
+		params = (Parameters)params;
 	}
 
 }
