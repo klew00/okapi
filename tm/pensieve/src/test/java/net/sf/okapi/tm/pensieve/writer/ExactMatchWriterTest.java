@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import net.sf.okapi.common.resource.TextFragment;
 
 /**
  * User: Christian Hargraves
@@ -58,7 +59,7 @@ public class ExactMatchWriterTest {
 
     @Test
     public void endIndexCommits() throws IOException {
-        emWriter.indexTextUnit(new TranslationUnit("dax", "is funny (sometimes)"));
+        emWriter.indexTextUnit(new TranslationUnit(new TextFragment("dax"), "is funny (sometimes)"));
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed before endIndex", 0, reader.maxDoc());
         emWriter.endIndex();
@@ -68,12 +69,12 @@ public class ExactMatchWriterTest {
 
     @Test(expected = NullPointerException.class)
     public void getDocumentNoContent(){
-        emWriter.getDocument(new TranslationUnit("some author", null));
+        emWriter.getDocument(new TranslationUnit(new TextFragment("some author"), null));
     }
 
     @Test
     public void getDocumentValues(){
-        Document doc = emWriter.getDocument(new TranslationUnit("someone", "blah blah blah"));
+        Document doc = emWriter.getDocument(new TranslationUnit(new TextFragment("someone"), "blah blah blah"));
         assertEquals("Document's content field", "blah blah blah", doc.getField(TranslationUnitFields.CONTENT.name()).stringValue());
         assertEquals("Document's content exact field", "blah blah blah", doc.getField(TranslationUnitFields.CONTENT_EXACT.name()).stringValue());
         assertEquals("Document's author field", "someone", doc.getField(TranslationUnitFields.AUTHOR.name()).stringValue());
@@ -97,7 +98,7 @@ public class ExactMatchWriterTest {
 
     @Test
     public void indexTextUnit() throws IOException {
-        emWriter.indexTextUnit(new TranslationUnit("joe", "schmoe"));
+        emWriter.indexTextUnit(new TranslationUnit(new TextFragment("joe"), "schmoe"));
         assertEquals("num of docs indexed", 1, emWriter.getIndexWriter().numDocs());
     }
 

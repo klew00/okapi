@@ -1,6 +1,6 @@
 package net.sf.okapi.tm.pensieve.common;
 
-import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.common.resource.TextFragment;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -12,14 +12,14 @@ import org.junit.Test;
 public class TranslationUnitTest {
 
     TranslationUnit tu;
-    final static String AUTHOR = "Joe McMac";
+    final static TextFragment SOURCE = new TextFragment("Joe McMac");
     final static String CONTENT = "Some content that isn't very long";
 
     @Test
     public void constructor_allParamsPassed(){
-        tu = new TranslationUnit(AUTHOR, CONTENT);
-        assertEquals("author", AUTHOR, tu.getAuthor());
-        assertEquals("content", CONTENT, tu.getContent());
+        tu = new TranslationUnit(SOURCE, CONTENT);
+        assertEquals("source", SOURCE, tu.getSource().getCodedText());
+        assertEquals("content", CONTENT, tu.getTarget());
     }
 
 }
