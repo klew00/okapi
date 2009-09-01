@@ -9,7 +9,7 @@ import org.junit.Test;
  * Date: Aug 19, 2009
  * Time: 6:49:59 AM
  */
-public class TextUnitTest {
+public class TranslationUnitTest {
 
     TranslationUnit tu;
     final static String AUTHOR = "Joe McMac";
