@@ -1,8 +1,9 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
-import net.sf.okapi.tm.pensieve.writer.ExactMatchWriter;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
+import net.sf.okapi.tm.pensieve.writer.ExactMatchWriter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.store.Directory;
@@ -14,7 +15,6 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.util.List;
-import net.sf.okapi.common.resource.TextFragment;
 
 /**
  * User: Christian Hargraves
@@ -188,17 +188,19 @@ public class TMSeekerTest {
     }
 
     @Test
-    public void getTextUnit() throws Exception {
+    public void getTranslationUnit() throws Exception {
         String source = "watch out for the killer rabbit";
         String target = "j";
         Document doc = new Document();
         doc.add(new Field(TranslationUnitFields.SOURCE_EXACT.name(), source,
                 Field.Store.NO, Field.Index.ANALYZED));
+        doc.add(new Field(TranslationUnitFields.SOURCE.name(), source,
+                Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field(TranslationUnitFields.TARGET.name(), target,
                 Field.Store.NO, Field.Index.NOT_ANALYZED));
         TranslationUnit tu = seeker.getTranslationUnit(doc);
-        assertEquals("source field", source, tu.getSource().getCodedText());
-        assertEquals("target field", target, tu.getTarget().getCodedText());
+        assertEquals("source field", source, tu.getSource().toString());
+        assertEquals("target field", target, tu.getTarget().toString());
     }
 
     ExactMatchWriter getWriter() throws Exception {

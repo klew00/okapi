@@ -1,5 +1,8 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
@@ -11,9 +14,6 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
 
 /**
  * @author Christian Hargraves
@@ -76,7 +76,7 @@ public class TMSeeker implements Seeker {
 
     TranslationUnit getTranslationUnit(Document doc) {
         return new TranslationUnit(new TextFragment(getFieldValue(
-                doc, TranslationUnitFields.SOURCE_EXACT)),
+                doc, TranslationUnitFields.SOURCE)),
                 new TextFragment(getFieldValue(doc, TranslationUnitFields.TARGET)));
     }
 
