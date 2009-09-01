@@ -42,7 +42,7 @@ public class ExactMatchWriter implements TMWriter {
         return writer;
     }
 
-    public void indexTextUnit(TranslationUnit tu) throws IOException {
+    public void indexTranslationUnit(TranslationUnit tu) throws IOException {
         if (tu == null){
             throw new NullPointerException("TextUnit can not be null");
         }
@@ -50,16 +50,16 @@ public class ExactMatchWriter implements TMWriter {
     }
 
     Document getDocument(TranslationUnit tu) {
-        if (tu == null || tu.getTarget() == null){
-            throw new NullPointerException("content not set");
+        if (tu == null || tu.getSource() == null || tu.getSource().getCodedText().equals("")){
+            throw new NullPointerException("source content not set");
         }
         Document doc = new Document();
-        doc.add(new Field(TranslationUnitFields.CONTENT.name(), tu.getTarget().getCodedText(),
+        doc.add(new Field(TranslationUnitFields.SOURCE.name(), tu.getSource().getCodedText(),
                 Field.Store.NO, Field.Index.ANALYZED));
-        doc.add(new Field(TranslationUnitFields.CONTENT_EXACT.name(), tu.getTarget().getCodedText(),
+        doc.add(new Field(TranslationUnitFields.SOURCE_EXACT.name(), tu.getSource().getCodedText(),
                 Field.Store.YES, Field.Index.NOT_ANALYZED));
-        if (tu.getSource() != null){
-            doc.add(new Field(TranslationUnitFields.AUTHOR.name(), tu.getSource().getCodedText(),
+        if (tu.getTarget() != null && !tu.getTarget().getCodedText().equals("")){
+            doc.add(new Field(TranslationUnitFields.TARGET.name(), tu.getTarget().getCodedText(),
                     Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
         return doc;

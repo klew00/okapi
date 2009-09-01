@@ -6,5 +6,5 @@ package net.sf.okapi.tm.pensieve.common;
  * Time: 7:01:25 AM
  */
 public enum TranslationUnitFields {
-    AUTHOR, CONTENT_EXACT, CONTENT
+    SOURCE_EXACT, SOURCE, TARGET
 }

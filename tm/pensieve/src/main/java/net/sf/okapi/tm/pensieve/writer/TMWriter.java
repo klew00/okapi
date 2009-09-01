@@ -15,5 +15,5 @@ import java.io.IOException;
 public interface TMWriter {
     void endIndex() throws IOException;
 
-    void indexTextUnit(TranslationUnit tu) throws IOException;
+    void indexTranslationUnit(TranslationUnit tu) throws IOException;
 }

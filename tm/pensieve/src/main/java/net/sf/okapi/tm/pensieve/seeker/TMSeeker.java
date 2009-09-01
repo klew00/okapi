@@ -59,7 +59,7 @@ public class TMSeeker implements Seeker {
             TopDocs hits = is.search(q, max);
             for (int j = 0; j < hits.scoreDocs.length; j++) {
                 ScoreDoc scoreDoc = hits.scoreDocs[j];
-                docs.add(getTextUnit(is.doc(scoreDoc.doc)));
+                docs.add(getTranslationUnit(is.doc(scoreDoc.doc)));
             }
         }finally{
             if (is != null){
@@ -69,8 +69,8 @@ public class TMSeeker implements Seeker {
         return docs;
     }
 
-    TranslationUnit getTextUnit(Document doc) {
-        return new TranslationUnit(new TextFragment(getFieldValue(doc, TranslationUnitFields.AUTHOR)), new TextFragment(getFieldValue(doc, TranslationUnitFields.CONTENT_EXACT)));
+    TranslationUnit getTranslationUnit(Document doc) {
+        return new TranslationUnit(new TextFragment(getFieldValue(doc, TranslationUnitFields.SOURCE_EXACT)), new TextFragment(getFieldValue(doc, TranslationUnitFields.TARGET)));
     }
 
     String getFieldValue(Document doc, TranslationUnitFields field){
