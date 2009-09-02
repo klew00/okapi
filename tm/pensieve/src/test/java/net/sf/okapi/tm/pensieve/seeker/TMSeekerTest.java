@@ -8,13 +8,13 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.util.List;
+import net.sf.okapi.tm.pensieve.common.TMHit;
 
 /**
  * User: Christian Hargraves
@@ -25,8 +25,12 @@ public class TMSeekerTest {
 
     static final Directory DIR = new RAMDirectory();
     static final TextFragment TARGET = new TextFragment("target text");
+    static final String STR = "watch out for the killer rabbit";
+
 
     TMSeeker seeker;
+
+    List<TMHit> tmhits;
 
     @Before
     public void setUp() throws FileNotFoundException {
@@ -42,9 +46,9 @@ public class TMSeekerTest {
     public void searchForWordsNothingFound() throws Exception {
         ExactMatchWriter writer = getWriter();
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchForWords("anonexistentwordthatshouldnowayeverexist", 10);
-        assertNotNull("docs returned should not be null", docs);
-        assertEquals("number of docs found", 0, docs.size());
+        tmhits = seeker.searchForWords("anonexistentwordthatshouldnowayeverexist", 10);
+        assertNotNull("docs returned should not be null", tmhits);
+        assertEquals("number of docs found", 0, tmhits.size());
     }
 
     @Test
@@ -54,8 +58,8 @@ public class TMSeekerTest {
         populateIndex(writer, 12, "patents are evil", "unittest");
         final int desiredReturns = 2;
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchForWords("patents", desiredReturns);
-        assertEquals("number of docs found", desiredReturns, docs.size());
+        tmhits = seeker.searchForWords("patents", desiredReturns);
+        assertEquals("number of docs found", desiredReturns, tmhits.size());
     }
 
     @Test
@@ -67,8 +71,8 @@ public class TMSeekerTest {
         populateIndex(writer, desiredReturns, "patents are evil", "unittest");
         writer.endIndex();
 
-        List<TranslationUnit> docs = seeker.searchForWords("patents", 10);
-        assertEquals("number of docs found", desiredReturns, docs.size());
+        tmhits = seeker.searchForWords("patents", 10);
+        assertEquals("number of docs found", desiredReturns, tmhits.size());
     }
 
     @Test(expected = RuntimeException.class)
@@ -86,40 +90,71 @@ public class TMSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("completely unrelated phrase"),TARGET));
         writer.endIndex();
 
-        List<TranslationUnit> docs = seeker.searchForWords("\"patents evil\"", 10);
-        assertEquals("number of docs found", 2, docs.size());
+        tmhits = seeker.searchForWords("\"patents evil\"", 10);
+        assertEquals("number of docs found", 2, tmhits.size());
     }
 
     @Test
     public void searchFuzzyWuzzyMiddleMatch() throws Exception {
         ExactMatchWriter writer = getWriter();
-        String str = "watch out for the killer rabbit";
+        
 
-        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(str),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(STR),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch for the killer rabbit"),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out the killer rabbit"),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch rabbit"),TARGET));
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(str+"~", 10);
-        assertEquals("number of docs found", 3, docs.size());
+        tmhits = seeker.searchFuzzyWuzzy(STR+"~", 10);
+        assertEquals("number of docs found", 3, tmhits.size());
     }
 
     @Test
     public void searchFuzzyWuzzyMiddleMatch80Percent() throws Exception {
         ExactMatchWriter writer = getWriter();
-        String str = "watch out for the killer rabbit";
 
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch rabbit"),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(str),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(STR),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out the killer rabbit and some extra stuff"),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch for the killer rabbit"),TARGET));
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(str+"~0.8", 10);
-        assertEquals("number of docs found", 2, docs.size());
-        assertEquals("1st match", "watch out for the killer rabbit", docs.get(0).getSource().toString());
-        assertEquals("2nd match", "watch for the killer rabbit", docs.get(1).getSource().toString());
+        tmhits = seeker.searchFuzzyWuzzy(STR+"~0.8", 10);
+        assertEquals("number of docs found", 2, tmhits.size());
+        assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().toString());
+        assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().toString());
+    }
+
+    @Test
+    public void fuzzyWuzzyScoreSortNoFuzzyThreshold() throws Exception {
+        ExactMatchWriter writer = getWriter();
+
+        String[] testStrings = {STR,
+            STR + " 1",
+            STR + " 2 words",
+            STR + " 3 words now"
+        };
+
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(testStrings[0]),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(testStrings[1]),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(testStrings[2]),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(testStrings[3]),TARGET));
+        writer.endIndex();
+        //If you add a threshold it changes the sort order
+        tmhits = seeker.searchFuzzyWuzzy(STR+"~", 10);
+        
+        assertEquals("number of docs found", 4, tmhits.size());
+        assertEquals("first match", testStrings[0], tmhits.get(0).getTu().getSource().toString());
+
+        //Verify sort order
+        Float previous = tmhits.get(0).getScore();
+        for(int i = 1; i < tmhits.size(); i++)
+        {
+            Float currentScore = tmhits.get(i).getScore();
+            assertEquals(i + " match", testStrings[i], tmhits.get(i).getTu().getSource().toString());
+            assertTrue("results should be sorted descending by score", currentScore < previous);
+            previous = currentScore;
+        }        
     }
 
     @Test
@@ -132,8 +167,8 @@ public class TMSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(str+"~", 10);
-        assertEquals("number of docs found", 9, docs.size());
+        tmhits = seeker.searchFuzzyWuzzy(str+"~", 10);
+        assertEquals("number of docs found", 9, tmhits.size());
     }
 
     @Test
@@ -146,8 +181,8 @@ public class TMSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchExact(str+1, 10);
-        assertEquals("number of docs found", 1, docs.size());
+        tmhits = seeker.searchExact(str+1, 10);
+        assertEquals("number of docs found", 1, tmhits.size());
     }
 
     @Test
@@ -159,8 +194,8 @@ public class TMSeekerTest {
         }
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchExact(str, 10);
-        assertEquals("number of docs found", 5, docs.size());
+        tmhits = seeker.searchExact(str, 10);
+        assertEquals("number of docs found", 5, tmhits.size());
     }
 
     @Test
@@ -171,8 +206,8 @@ public class TMSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out for the the killer rabbit"), TARGET));
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchExact(str, 10);
-        assertEquals("number of docs found", 1, docs.size());
+        tmhits = seeker.searchExact(str, 10);
+        assertEquals("number of docs found", 1, tmhits.size());
     }
 
     @Test
@@ -183,8 +218,8 @@ public class TMSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out for the the killer rabbit"), TARGET));
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchExact(str, 10);
-        assertEquals("number of docs found", 1, docs.size());
+        tmhits = seeker.searchExact(str, 10);
+        assertEquals("number of docs found", 1, tmhits.size());
     }
 
     @Test
@@ -195,8 +230,8 @@ public class TMSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out for the the killer rabbit"), TARGET));
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchExact("killer rabbit the for out watch", 10);
-        assertEquals("number of docs found", 0, docs.size());
+        tmhits = seeker.searchExact("killer rabbit the for out watch", 10);
+        assertEquals("number of docs found", 0, tmhits.size());
     }
 
     @Test

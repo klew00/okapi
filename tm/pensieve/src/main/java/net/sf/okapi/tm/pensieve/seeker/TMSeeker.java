@@ -14,6 +14,7 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import net.sf.okapi.tm.pensieve.common.TMHit;
 
 /**
  * @author Christian Hargraves
@@ -28,7 +29,7 @@ public class TMSeeker implements Seeker {
         this.indexDir = indexDir;
     }
 
-    public List<TranslationUnit> searchForWords(String query, int max) throws IOException {
+    public List<TMHit> searchForWords(String query, int max) throws IOException {
         QueryParser parser = new QueryParser(TranslationUnitFields.SOURCE.name(), new SimpleAnalyzer());
         Query q;
         try {
@@ -39,12 +40,12 @@ public class TMSeeker implements Seeker {
         return search(max, q);
     }
 
-    public List<TranslationUnit> searchFuzzyWuzzy(String query, int max) throws IOException {
+    public List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException {
         Query q = new FuzzyQuery(new Term(TranslationUnitFields.SOURCE_FUZZY.name(), query));
         return search(max, q);
     }
 
-    public List<TranslationUnit> searchExact(String query, int max) throws IOException {
+    public List<TMHit> searchExact(String query, int max) throws IOException {
         //If using QueryParser.parse("\"phrase to match\""), the indexed field must be set to Field.Index.ANALYZED
         //At which point subphrases will also match. This is not the desired behavior of an exact match.
         //Query q = new QueryParser(field.name(), new SimpleAnalyzer()).parse("\""+query+"\"");
@@ -56,22 +57,25 @@ public class TMSeeker implements Seeker {
         return search(max, q);
     }
 
-    private List<TranslationUnit> search(int max, Query q) throws IOException {
+    private List<TMHit> search(int max, Query q) throws IOException {
         IndexSearcher is = null;
-        List<TranslationUnit> docs = new ArrayList<TranslationUnit>();
+        List<TMHit> tmhits = new ArrayList<TMHit>();
         try{
             is = new IndexSearcher(indexDir, true);
             TopDocs hits = is.search(q, max);
             for (int j = 0; j < hits.scoreDocs.length; j++) {
                 ScoreDoc scoreDoc = hits.scoreDocs[j];
-                docs.add(getTranslationUnit(is.doc(scoreDoc.doc)));
+                TMHit tmhit = new TMHit();
+                tmhit.setScore(scoreDoc.score);
+                tmhit.setTu(getTranslationUnit(is.doc(scoreDoc.doc)));
+                tmhits.add(tmhit);
             }
         }finally{
             if (is != null){
                 is.close();
             }
         }
-        return docs;
+        return tmhits;
     }
 
     TranslationUnit getTranslationUnit(Document doc) {
