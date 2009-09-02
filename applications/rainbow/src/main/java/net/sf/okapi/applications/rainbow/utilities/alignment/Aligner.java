@@ -39,7 +39,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
-import net.sf.okapi.mt.google.GoogleMTConnector;
+import net.sf.okapi.connectors.google.GoogleMTConnector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;

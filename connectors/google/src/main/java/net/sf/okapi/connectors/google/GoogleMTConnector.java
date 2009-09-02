@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.mt.google;
+package net.sf.okapi.connectors.google;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

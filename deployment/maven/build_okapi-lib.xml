@@ -120,21 +120,23 @@
 			 excludes="**/META-INF/**"/>
 			
 			<!-- tm -->
-			<fileset dir="../../tm/opentran/target/classes"
-			 excludes="**/META-INF/**"/>
 			<fileset dir="../../tm/simpletm/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../tm/translatetoolkit/target/classes"
+
+			<!-- connectors -->
+			<fileset dir="../../connectors/opentran/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../tm/globalsight/target/classes"
+			<fileset dir="../../connectors/simpletm/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../tm/mymemory/target/classes"
+			<fileset dir="../../connectors/translatetoolkit/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../connectors/globalsight/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../connectors/mymemory/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../connectors/google/target/classes"
 			 excludes="**/META-INF/**"/>
 
-			<!-- mt -->
-			<fileset dir="../../mt/google/target/classes"
-			 excludes="**/META-INF/**"/>
-			 
 			 <!-- steps -->
 			<fileset dir="../../steps/bomconversion/target/classes"
 			 excludes="**/META-INF/**"/>

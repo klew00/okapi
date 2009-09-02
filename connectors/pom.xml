@@ -10,13 +10,14 @@
     <artifactId>build-connectors</artifactId>
     <groupId>net.sf.okapi.connectors</groupId>
     <packaging>pom</packaging>
-    <name>Okapi TM Connectors Build</name>
+    <name>Okapi Connectors Build</name>
     <modules>
         <module>globalsight</module>
         <module>mymemory</module>
         <module>opentran</module>
         <module>translatetoolkit</module>
         <module>simpletm</module>
+        <module>google</module>
     </modules>
 
     <build>

@@ -45,7 +45,7 @@ import net.sf.okapi.common.ui.genericeditor.GenericEditor;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
-import net.sf.okapi.mt.google.GoogleMTConnector;
+import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;

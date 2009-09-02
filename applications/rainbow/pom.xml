@@ -35,8 +35,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.okapi.mt</groupId>
-			<artifactId>okapi-mt-google</artifactId>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-google</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

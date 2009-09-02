@@ -4,7 +4,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.IQuery;
-import net.sf.okapi.mt.google.GoogleMTConnector;
+import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
