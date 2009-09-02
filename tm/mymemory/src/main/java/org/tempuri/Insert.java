@@ -9,9 +9,10 @@ package org.tempuri;
 
 public class Insert  implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -5196303472671546305L;
 
-	private java.lang.String subject;
+	private java.lang.String id;
+    private java.lang.String subject;
     private java.lang.String source_lang;
     private java.lang.String target_lang;
     private java.lang.String segment;
@@ -22,18 +23,40 @@ public class Insert  implements java.io.Serializable {
     }
 
     public Insert(
+           java.lang.String id,
            java.lang.String subject,
            java.lang.String source_lang,
            java.lang.String target_lang,
            java.lang.String segment,
            java.lang.String translation,
            java.lang.Integer reserved) {
+           this.id = id;
            this.subject = subject;
            this.source_lang = source_lang;
            this.target_lang = target_lang;
            this.segment = segment;
            this.translation = translation;
            this.reserved = reserved;
+    }
+
+
+    /**
+     * Gets the id value for this Insert.
+     * 
+     * @return id
+     */
+    public java.lang.String getId() {
+        return id;
+    }
+
+
+    /**
+     * Sets the id value for this Insert.
+     * 
+     * @param id
+     */
+    public void setId(java.lang.String id) {
+        this.id = id;
     }
 
 
@@ -168,6 +191,9 @@ public class Insert  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
+            ((this.id==null && other.getId()==null) || 
+             (this.id!=null &&
+              this.id.equals(other.getId()))) &&
             ((this.subject==null && other.getSubject()==null) || 
              (this.subject!=null &&
               this.subject.equals(other.getSubject()))) &&
@@ -197,6 +223,9 @@ public class Insert  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
+        if (getId() != null) {
+            _hashCode += getId().hashCode();
+        }
         if (getSubject() != null) {
             _hashCode += getSubject().hashCode();
         }
@@ -226,6 +255,13 @@ public class Insert  implements java.io.Serializable {
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://tempuri.org/", "insert"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("id");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://tempuri.org/", "id"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("subject");
         elemField.setXmlName(new javax.xml.namespace.QName("http://tempuri.org/", "subject"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
@@ -279,9 +315,9 @@ public class Insert  implements java.io.Serializable {
     /**
      * Get Custom Serializer
      */
-    @SuppressWarnings("unchecked")
     public static org.apache.axis.encoding.Serializer getSerializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 
@@ -292,9 +328,9 @@ public class Insert  implements java.io.Serializable {
     /**
      * Get Custom Deserializer
      */
-    @SuppressWarnings("unchecked")
     public static org.apache.axis.encoding.Deserializer getDeserializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 

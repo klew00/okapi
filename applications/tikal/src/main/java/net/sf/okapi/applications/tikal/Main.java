@@ -46,8 +46,8 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.mt.google.GoogleMTConnector;
+import net.sf.okapi.tm.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.tm.opentran.OpenTranTMConnector;
-import net.sf.okapi.tm.translatetoolkit.Parameters;
 import net.sf.okapi.tm.translatetoolkit.TranslateToolkitTMConnector;
 
 public class Main {
@@ -72,6 +72,9 @@ public class Main {
 	protected boolean useOpenTran;
 	protected boolean useTT;
 	protected String ttParams;
+	protected boolean useMM;
+	protected String mmParams;
+	
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -147,6 +150,10 @@ public class Main {
 				else if ( arg.equals("-tt") ) {
 					prog.useTT = true;
 					prog.ttParams = getArgument(args, ++i);
+				}
+				else if ( arg.equals("-mm") ) {
+					prog.useMM = true;
+					prog.mmParams = getArgument(args, ++i);
 				}
 				else if ( arg.equals("-listconf") ) {
 					prog.showAllConfigurations();
@@ -569,7 +576,7 @@ public class Main {
 	}
 	
 	private void processQuery () {
-		if ( !useGoogle && !useOpenTran && !useTT ) {
+		if ( !useGoogle && !useOpenTran && !useTT && !useMM ) {
 			useGoogle = true; // Default if none is specified
 		}
 		
@@ -584,7 +591,8 @@ public class Main {
 		if ( useTT ) {
 			// Parse the parameters hostname:port
 			int n = ttParams.lastIndexOf(':');
-			net.sf.okapi.tm.translatetoolkit.Parameters params = new Parameters();
+			net.sf.okapi.tm.translatetoolkit.Parameters params 
+				= new net.sf.okapi.tm.translatetoolkit.Parameters();
 			if ( n == -1 ) {
 				params.setHost(ttParams);
 			}
@@ -593,6 +601,18 @@ public class Main {
 				params.setHost(ttParams.substring(0, n));
 			}
 			conn = new TranslateToolkitTMConnector();
+			conn.setParameters(params);
+			conn.setLanguages(srcLang, trgLang);
+			conn.open();
+			displayQuery(conn);
+			conn.close();
+		}
+		if ( useMM ) {
+			// The parameters for now is just the access key
+			net.sf.okapi.tm.mymemory.Parameters params
+				= new net.sf.okapi.tm.mymemory.Parameters();
+			params.setKey(mmParams);
+			conn = new MyMemoryTMConnector();
 			conn.setParameters(params);
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();

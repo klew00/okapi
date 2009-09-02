@@ -81,14 +81,6 @@ public class OtmsSoapStub extends org.apache.axis.client.Stub implements org.tem
             javax.xml.namespace.QName qName2;
             java.lang.Class beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
             java.lang.Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
-//            java.lang.Class enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
-//            java.lang.Class enumdf = org.apache.axis.encoding.ser.EnumDeserializerFactory.class;
-//            java.lang.Class arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
-//            java.lang.Class arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
-//            java.lang.Class simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
-//            java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
-//            java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
-//            java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
             qName = new javax.xml.namespace.QName("http://tempuri.org/", "ArrayOfMatch");
             cachedSerQNames.add(qName);
             cls = org.tempuri.Match[].class;
@@ -215,7 +207,7 @@ public class OtmsSoapStub extends org.apache.axis.client.Stub implements org.tem
         _call.setOperationName(new javax.xml.namespace.QName("http://tempuri.org/", "otmsGet"));
 
         setRequestHeaders(_call);
-        //YS: no attachments setAttachments(_call);
+        setAttachments(_call);
  try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {key, q});
 
         if (_resp instanceof java.rmi.RemoteException) {

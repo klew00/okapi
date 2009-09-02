@@ -9,12 +9,10 @@ package org.tempuri;
 
 public class GetResponse  implements java.io.Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -2551264622500680770L;
 
 	private boolean success;
-
     private java.lang.String error_message;
-
     private org.tempuri.Match[] matches;
 
     public GetResponse() {
@@ -28,6 +26,7 @@ public class GetResponse  implements java.io.Serializable {
            this.error_message = error_message;
            this.matches = matches;
     }
+
 
     /**
      * Gets the success value for this GetResponse.
@@ -176,9 +175,9 @@ public class GetResponse  implements java.io.Serializable {
     /**
      * Get Custom Serializer
      */
-    @SuppressWarnings("unchecked")
 	public static org.apache.axis.encoding.Serializer getSerializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 
@@ -189,9 +188,9 @@ public class GetResponse  implements java.io.Serializable {
     /**
      * Get Custom Deserializer
      */
-    @SuppressWarnings("unchecked")
     public static org.apache.axis.encoding.Deserializer getDeserializer(
            java.lang.String mechType, 
+           @SuppressWarnings("unchecked")
            java.lang.Class _javaType,  
            javax.xml.namespace.QName _xmlType) {
         return 

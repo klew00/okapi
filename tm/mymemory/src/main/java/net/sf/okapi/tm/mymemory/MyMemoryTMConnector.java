@@ -107,8 +107,8 @@ public class MyMemoryTMConnector implements ITMQuery {
 	public int query (String text) {
 		results.clear();
 		try {
-			Query query = new Query(text, srcLang, trgLang, null);
-			GetResponse gresp = otms.otmsGet(params.key, query);
+			Query query = new Query(null, text, srcLang, trgLang, null, params.getUseMT());
+			GetResponse gresp = otms.otmsGet(params.getKey(), query);
 			if ( gresp.isSuccess() ) {
 				QueryResult res;
 				Match[] matches = gresp.getMatches();
@@ -119,7 +119,10 @@ public class MyMemoryTMConnector implements ITMQuery {
 					res.source = new TextFragment(match.getSegment());
 					res.target = new TextFragment(match.getTranslation());
 					res.score = match.getScore();
-					// Score not working yet. if ( res.score < getThreshold() ) break;
+					// To workaround bug in score calculation
+					// Score > 100 should be treated as 100 per Alberto's info.
+					//if (res.score > 100 ) res.score = 100;
+					//TODO: if ( res.score < getThreshold() ) break;
 					results.add(res);
 				}
 			}
@@ -153,7 +156,8 @@ public class MyMemoryTMConnector implements ITMQuery {
 	}
 
 	private String toInternalCode (String standardCode) {
-		//TODO: Check
+		//TODO: The expected MM code in lang-Region with region mandatory
+		// We will need to build a lookup table for the non-easy re-naming case like en -> en-us
 		return standardCode;
 	}
 

@@ -8,7 +8,7 @@
 package org.tempuri;
 
 public class Match  implements java.io.Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2192859075314843032L;
 
 	private java.lang.String subject;
     private int quality;

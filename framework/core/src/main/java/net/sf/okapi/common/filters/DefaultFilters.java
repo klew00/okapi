@@ -18,7 +18,7 @@ public class DefaultFilters {
 	 * @param fcMapper the mapper where to add the mapping.
 	 * @param addConfigurations true to add the filters configurations, false to add 
 	 * only the parameters editors and UI descriptions.
-	 * @param reset true to clear all filters, editors and decsriptions in the mapper
+	 * @param reset true to clear all filters, editors and dec descriptions in the mapper
 	 * before setting the new ones.
 	 */
 	public static void setMappings (IFilterConfigurationMapper fcMapper,

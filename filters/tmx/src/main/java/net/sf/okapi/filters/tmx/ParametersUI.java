@@ -16,60 +16,22 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-===========================================================================*/
+============================================================================*/
 
-package net.sf.okapi.tm.mymemory;
+package net.sf.okapi.filters.tmx;
 
-import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+public class ParametersUI implements IEditorDescriptionProvider {
 
-	private String key;
-	private int useMT;
-	
-	public Parameters () {
-		reset();
-		toString();
-	}
-	
-	public Parameters (String initialData) {
-		fromString(initialData);
-	}
-	
-	public String getKey () {
-		return key;
-	}
-
-	public void setKey (String key) {
-		this.key = key;
-	}
-
-	public int getUseMT() {
-		return useMT;
-	}
-
-	public void setUseMT (int useMT) {
-		this.useMT = useMT;
-	}
-
-	public void fromString (String data) {
-		reset();
-		buffer.fromString(data);
-		key = buffer.getString("key", key);
-		useMT = buffer.getInteger("useMT", useMT);
-	}
-
-	public void reset () {
-		key = "mmDemo123";
-		useMT = 1;
-	}
-
-	@Override
-	public String toString () {
-		buffer.reset();
-		buffer.setString("key", key);
-		buffer.setInteger("useMT", useMT);
-		return buffer.toString();
+	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("TMX Filter Parameters", true, false);
+		desc.addCheckboxPart(paramDesc.get("processAllTargets"));
+		desc.addCheckboxPart(paramDesc.get("consolidateDpSkeleton"));
+		desc.addCheckboxPart(paramDesc.get("escapeGT"));
+		return desc;
 	}
 
 }

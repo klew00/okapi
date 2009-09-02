@@ -8,6 +8,7 @@
 package org.tempuri;
 
 public class InsertResponse  implements java.io.Serializable {
+
 	private static final long serialVersionUID = 1L;
 
 	private boolean success;

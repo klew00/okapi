@@ -8,29 +8,51 @@
 package org.tempuri;
 
 public class Query  implements java.io.Serializable {
+	private static final long serialVersionUID = 7130298885295773742L;
 
-	private static final long serialVersionUID = 1L;
-
-	private java.lang.String source;
-
+	private java.lang.String id;
+    private java.lang.String source;
     private java.lang.String source_lang;
-
     private java.lang.String target_lang;
-
     private java.lang.String subject;
+    private java.lang.Integer mt;
 
     public Query() {
     }
 
     public Query(
+           java.lang.String id,
            java.lang.String source,
            java.lang.String source_lang,
            java.lang.String target_lang,
-           java.lang.String subject) {
+           java.lang.String subject,
+           java.lang.Integer mt) {
+           this.id = id;
            this.source = source;
            this.source_lang = source_lang;
            this.target_lang = target_lang;
            this.subject = subject;
+           this.mt = mt;
+    }
+
+
+    /**
+     * Gets the id value for this Query.
+     * 
+     * @return id
+     */
+    public java.lang.String getId() {
+        return id;
+    }
+
+
+    /**
+     * Sets the id value for this Query.
+     * 
+     * @param id
+     */
+    public void setId(java.lang.String id) {
+        this.id = id;
     }
 
 
@@ -113,6 +135,26 @@ public class Query  implements java.io.Serializable {
         this.subject = subject;
     }
 
+
+    /**
+     * Gets the mt value for this Query.
+     * 
+     * @return mt
+     */
+    public java.lang.Integer getMt() {
+        return mt;
+    }
+
+
+    /**
+     * Sets the mt value for this Query.
+     * 
+     * @param mt
+     */
+    public void setMt(java.lang.Integer mt) {
+        this.mt = mt;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof Query)) return false;
@@ -125,6 +167,9 @@ public class Query  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
+            ((this.id==null && other.getId()==null) || 
+             (this.id!=null &&
+              this.id.equals(other.getId()))) &&
             ((this.source==null && other.getSource()==null) || 
              (this.source!=null &&
               this.source.equals(other.getSource()))) &&
@@ -136,7 +181,10 @@ public class Query  implements java.io.Serializable {
               this.target_lang.equals(other.getTarget_lang()))) &&
             ((this.subject==null && other.getSubject()==null) || 
              (this.subject!=null &&
-              this.subject.equals(other.getSubject())));
+              this.subject.equals(other.getSubject()))) &&
+            ((this.mt==null && other.getMt()==null) || 
+             (this.mt!=null &&
+              this.mt.equals(other.getMt())));
         __equalsCalc = null;
         return _equals;
     }
@@ -148,6 +196,9 @@ public class Query  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
+        if (getId() != null) {
+            _hashCode += getId().hashCode();
+        }
         if (getSource() != null) {
             _hashCode += getSource().hashCode();
         }
@@ -160,6 +211,9 @@ public class Query  implements java.io.Serializable {
         if (getSubject() != null) {
             _hashCode += getSubject().hashCode();
         }
+        if (getMt() != null) {
+            _hashCode += getMt().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -171,6 +225,13 @@ public class Query  implements java.io.Serializable {
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://tempuri.org/", "query"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("id");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://tempuri.org/", "id"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("source");
         elemField.setXmlName(new javax.xml.namespace.QName("http://tempuri.org/", "source"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
@@ -195,6 +256,13 @@ public class Query  implements java.io.Serializable {
         elemField.setFieldName("subject");
         elemField.setXmlName(new javax.xml.namespace.QName("http://tempuri.org/", "subject"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("mt");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://tempuri.org/", "mt"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

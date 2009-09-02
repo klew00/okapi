@@ -9,7 +9,7 @@ package org.tempuri;
 
 public class OtmsLocator extends org.apache.axis.client.Service implements org.tempuri.Otms {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 8639587061356723332L;
 
 	public OtmsLocator() {
     }

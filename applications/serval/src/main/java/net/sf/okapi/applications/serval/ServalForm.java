@@ -10,7 +10,6 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.QueryResult;
-import net.sf.okapi.mt.google.GoogleMTConnector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
