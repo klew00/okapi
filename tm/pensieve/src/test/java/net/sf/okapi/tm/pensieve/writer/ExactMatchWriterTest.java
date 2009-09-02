@@ -48,7 +48,7 @@ public class ExactMatchWriterTest {
     @Test(expected = AlreadyClosedException.class)
     public void endIndexClosesWriter() throws IOException {
         emWriter.endIndex();
-        writer.commit();
+        emWriter.getIndexWriter().commit();
     }
 
     @Test
@@ -57,13 +57,10 @@ public class ExactMatchWriterTest {
         emWriter.endIndex();
     }
 
-    @Test
     public void endIndexCommits() throws IOException {
         emWriter.indexTranslationUnit(new TranslationUnit(new TextFragment("dax"), new TextFragment("is funny (sometimes)")));
-        IndexReader reader = IndexReader.open(dir, true);
-        assertEquals("num of docs indexed before endIndex", 0, reader.maxDoc());
         emWriter.endIndex();
-        reader = IndexReader.open(dir, true);
+        IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed after endIndex", 1, reader.maxDoc());
     }
 
@@ -72,12 +69,24 @@ public class ExactMatchWriterTest {
         emWriter.getDocument(new TranslationUnit(null, new TextFragment("some target")));
     }
 
+    @Test(expected = NullPointerException.class)
+    public void getDocumentEmptySourceContent(){
+        emWriter.getDocument(new TranslationUnit(new TextFragment(""), new TextFragment("some target")));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void getDocumentNullTU(){
+        emWriter.getDocument(null);
+    }
+
     @Test
     public void getDocumentValues(){
-        Document doc = emWriter.getDocument(new TranslationUnit(new TextFragment("blah blah blah"), new TextFragment("someone")));
+        String text = "blah blah blah";
+        Document doc = emWriter.getDocument(new TranslationUnit(new TextFragment(text), new TextFragment("someone")));
         assertEquals("Document's content field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE.name()).stringValue());
-        assertEquals("Document's content exact field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE_EXACT.name()).stringValue());
-        assertEquals("Document's author field", "someone", doc.getField(TranslationUnitFields.TARGET.name()).stringValue());
+        assertEquals("Document's content fuzzy field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE_FUZZY.name()).stringValue());
+        assertEquals("Document's content exact field", "blah blah blah".hashCode()+"", doc.getField(TranslationUnitFields.SOURCE_EXACT.name()).stringValue());
+        assertEquals("Document's target field", "someone", doc.getField(TranslationUnitFields.TARGET.name()).stringValue());
     }
 
     @Test
@@ -87,13 +96,20 @@ public class ExactMatchWriterTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void indexTextUnitNull() throws IOException {
+    public void indexTranslationUnitNull() throws IOException {
         emWriter.indexTranslationUnit(null);
     }
 
     @Test
-    public void indexTextUnitnoIndexedDocsBeforeCall() throws IOException {
+    public void indexTranslationUnitNoIndexedDocsBeforeCall() throws IOException {
         assertEquals("num of docs indexed", 0, emWriter.getIndexWriter().numDocs());
+    }
+
+    @Test
+    public void indexTranslationUnitBeforeCommit() throws IOException {
+        emWriter.indexTranslationUnit(new TranslationUnit(new TextFragment("dax"), new TextFragment("is funny (sometimes)")));
+        IndexReader reader = IndexReader.open(dir, true);
+        assertEquals("num of docs indexed before endIndex", 0, reader.maxDoc());
     }
 
     @Test

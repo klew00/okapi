@@ -32,10 +32,7 @@ public class ExactMatchWriter implements TMWriter {
             writer.commit();
         }catch(AlreadyClosedException ignored){
         }finally{
-            try{
-                writer.close();
-            }catch(AlreadyClosedException ignored){
-            }
+            writer.close();
         }
     }
 
@@ -56,7 +53,8 @@ public class ExactMatchWriter implements TMWriter {
         }
         Document doc = new Document();
         doc.add(createField(TranslationUnitFields.SOURCE, tu.getSource(), Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(createField(TranslationUnitFields.SOURCE_EXACT, tu.getSource(), Field.Store.NO, Field.Index.NOT_ANALYZED));
+        doc.add(createField(TranslationUnitFields.SOURCE_EXACT, tu.getSource().toString().hashCode(), Field.Store.NO, Field.Index.NOT_ANALYZED));
+        doc.add(createField(TranslationUnitFields.SOURCE_FUZZY, tu.getSource(), Field.Store.NO, Field.Index.NOT_ANALYZED));
         if (!tu.isTargetEmpty()){
             doc.add(createField(TranslationUnitFields.TARGET, tu.getTarget(), Field.Store.YES, Field.Index.NO));
         }
@@ -68,6 +66,13 @@ public class ExactMatchWriter implements TMWriter {
                   Field.Store store,
                   Field.Index index){
         return new Field(field.name(), frag.toString(), store, index);
+    }
+
+    Field createField(TranslationUnitFields field,
+                  int hashCode,
+                  Field.Store store,
+                  Field.Index index){
+        return new Field(field.name(), hashCode+"", store, index);
     }
 
 }

@@ -6,10 +6,9 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
 
-import java.util.List;
 import java.io.IOException;
+import java.util.List;
 
 /**
  *
@@ -17,9 +16,9 @@ import java.io.IOException;
  */
 public interface Seeker {
 
-    List<TranslationUnit> searchForWords(TranslationUnitFields field, String query, int max) throws IOException;
+    List<TranslationUnit> searchForWords(String query, int max) throws IOException;
 
-    List<TranslationUnit> searchExact(TranslationUnitFields field, String query, int max) throws IOException;
+    List<TranslationUnit> searchExact(String query, int max) throws IOException;
 
-    List<TranslationUnit> searchFuzzyWuzzy(TranslationUnitFields field, String query, int max) throws IOException;
+    List<TranslationUnit> searchFuzzyWuzzy(String query, int max) throws IOException;
 }

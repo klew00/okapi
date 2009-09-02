@@ -42,7 +42,7 @@ public class TMSeekerTest {
     public void searchForWordsNothingFound() throws Exception {
         ExactMatchWriter writer = getWriter();
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchForWords(TranslationUnitFields.SOURCE, "anonexistentwordthatshouldnowayeverexist", 10);
+        List<TranslationUnit> docs = seeker.searchForWords("anonexistentwordthatshouldnowayeverexist", 10);
         assertNotNull("docs returned should not be null", docs);
         assertEquals("number of docs found", 0, docs.size());
     }
@@ -54,7 +54,7 @@ public class TMSeekerTest {
         populateIndex(writer, 12, "patents are evil", "unittest");
         final int desiredReturns = 2;
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchForWords(TranslationUnitFields.SOURCE, "patents", desiredReturns);
+        List<TranslationUnit> docs = seeker.searchForWords("patents", desiredReturns);
         assertEquals("number of docs found", desiredReturns, docs.size());
     }
 
@@ -67,13 +67,13 @@ public class TMSeekerTest {
         populateIndex(writer, desiredReturns, "patents are evil", "unittest");
         writer.endIndex();
 
-        List<TranslationUnit> docs = seeker.searchForWords(TranslationUnitFields.SOURCE, "patents", 10);
+        List<TranslationUnit> docs = seeker.searchForWords("patents", 10);
         assertEquals("number of docs found", desiredReturns, docs.size());
     }
 
     @Test(expected = RuntimeException.class)
     public void searchWordsInvalidQuery() throws Exception {
-        seeker.searchForWords(TranslationUnitFields.SOURCE, "patents evil are]", 10);
+        seeker.searchForWords("patents evil are]", 10);
     }
 
     @Test
@@ -86,7 +86,7 @@ public class TMSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("completely unrelated phrase"),TARGET));
         writer.endIndex();
 
-        List<TranslationUnit> docs = seeker.searchForWords(TranslationUnitFields.SOURCE, "\"patents evil\"", 10);
+        List<TranslationUnit> docs = seeker.searchForWords("\"patents evil\"", 10);
         assertEquals("number of docs found", 2, docs.size());
     }
 
@@ -101,7 +101,7 @@ public class TMSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch rabbit"),TARGET));
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(TranslationUnitFields.SOURCE_EXACT, str+"~", 10);
+        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(str+"~", 10);
         assertEquals("number of docs found", 3, docs.size());
     }
 
@@ -116,7 +116,7 @@ public class TMSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch for the killer rabbit"),TARGET));
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(TranslationUnitFields.SOURCE_EXACT, str+"~0.8", 10);
+        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(str+"~0.8", 10);
         assertEquals("number of docs found", 2, docs.size());
         assertEquals("1st match", "watch out for the killer rabbit", docs.get(0).getSource().toString());
         assertEquals("2nd match", "watch for the killer rabbit", docs.get(1).getSource().toString());
@@ -132,7 +132,7 @@ public class TMSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(TranslationUnitFields.SOURCE_EXACT, str+"~", 10);
+        List<TranslationUnit> docs = seeker.searchFuzzyWuzzy(str+"~", 10);
         assertEquals("number of docs found", 9, docs.size());
     }
 
@@ -146,7 +146,7 @@ public class TMSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchExact(TranslationUnitFields.SOURCE_EXACT, str+1, 10);
+        List<TranslationUnit> docs = seeker.searchExact(str+1, 10);
         assertEquals("number of docs found", 1, docs.size());
     }
 
@@ -159,7 +159,7 @@ public class TMSeekerTest {
         }
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchExact(TranslationUnitFields.SOURCE_EXACT, str, 10);
+        List<TranslationUnit> docs = seeker.searchExact(str, 10);
         assertEquals("number of docs found", 5, docs.size());
     }
 
@@ -171,7 +171,19 @@ public class TMSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out for the the killer rabbit"), TARGET));
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchExact(TranslationUnitFields.SOURCE_EXACT, str, 10);
+        List<TranslationUnit> docs = seeker.searchExact(str, 10);
+        assertEquals("number of docs found", 1, docs.size());
+    }
+
+    @Test
+    public void searchExactDifferentCases() throws Exception {
+        ExactMatchWriter writer = getWriter();
+        String str = "watch Out for The killEr rabbit";
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment(str), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out for the the killer rabbit"), TARGET));
+
+        writer.endIndex();
+        List<TranslationUnit> docs = seeker.searchExact(str, 10);
         assertEquals("number of docs found", 1, docs.size());
     }
 
@@ -183,7 +195,7 @@ public class TMSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out for the the killer rabbit"), TARGET));
 
         writer.endIndex();
-        List<TranslationUnit> docs = seeker.searchExact(TranslationUnitFields.SOURCE_EXACT, "killer rabbit the for out watch", 10);
+        List<TranslationUnit> docs = seeker.searchExact("killer rabbit the for out watch", 10);
         assertEquals("number of docs found", 0, docs.size());
     }
 

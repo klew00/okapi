@@ -28,8 +28,8 @@ public class TMSeeker implements Seeker {
         this.indexDir = indexDir;
     }
 
-    public List<TranslationUnit> searchForWords(TranslationUnitFields field, String query, int max) throws IOException {
-        QueryParser parser = new QueryParser(field.name(), new SimpleAnalyzer());
+    public List<TranslationUnit> searchForWords(String query, int max) throws IOException {
+        QueryParser parser = new QueryParser(TranslationUnitFields.SOURCE.name(), new SimpleAnalyzer());
         Query q;
         try {
             q = parser.parse(query);
@@ -39,12 +39,12 @@ public class TMSeeker implements Seeker {
         return search(max, q);
     }
 
-    public List<TranslationUnit> searchFuzzyWuzzy(TranslationUnitFields field, String query, int max) throws IOException {
-        Query q = new FuzzyQuery(new Term(field.name(), query)); 
+    public List<TranslationUnit> searchFuzzyWuzzy(String query, int max) throws IOException {
+        Query q = new FuzzyQuery(new Term(TranslationUnitFields.SOURCE_FUZZY.name(), query));
         return search(max, q);
     }
 
-    public List<TranslationUnit> searchExact(TranslationUnitFields field, String query, int max) throws IOException {
+    public List<TranslationUnit> searchExact(String query, int max) throws IOException {
         //If using QueryParser.parse("\"phrase to match\""), the indexed field must be set to Field.Index.ANALYZED
         //At which point subphrases will also match. This is not the desired behavior of an exact match.
         //Query q = new QueryParser(field.name(), new SimpleAnalyzer()).parse("\""+query+"\"");
@@ -52,7 +52,7 @@ public class TMSeeker implements Seeker {
         //This means that if we follow this way, then it will require the same tu to be indexed twice; one time as
         //Field.Index.ANALYZED (for word searching) and another time as Field.Index.NOT_ANALYZED (for exact matches)
         PhraseQuery q = new PhraseQuery();
-        q.add(new Term(field.name(), query));
+        q.add(new Term(TranslationUnitFields.SOURCE_EXACT.name(), query.hashCode()+""));
         return search(max, q);
     }
 
