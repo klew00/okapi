@@ -26,18 +26,18 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.okapi.tm</groupId>
-            <artifactId>okapi-tm-opentran</artifactId>
+            <groupId>net.sf.okapi.connectors</groupId>
+            <artifactId>okapi-connector-opentran</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.okapi.tm</groupId>
-            <artifactId>okapi-tm-translatetoolkit</artifactId>
+            <groupId>net.sf.okapi.connectors</groupId>
+            <artifactId>okapi-connector-translatetoolkit</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.okapi.tm</groupId>
-            <artifactId>okapi-tm-mymemory</artifactId>
+            <groupId>net.sf.okapi.connectors</groupId>
+            <artifactId>okapi-connector-mymemory</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

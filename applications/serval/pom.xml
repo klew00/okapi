@@ -25,8 +25,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.okapi.tm</groupId>
-			<artifactId>okapi-tm-globalsight</artifactId>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-globalsight</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -35,13 +35,13 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.okapi.tm</groupId>
-			<artifactId>okapi-tm-translatetoolkit</artifactId>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-translatetoolkit</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.okapi.tm</groupId>
-			<artifactId>okapi-tm-opentran</artifactId>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-opentran</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -49,10 +49,9 @@
 			<artifactId>okapi-mt-google</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<dependency>
-			<groupId>net.sf.okapi.tm</groupId>
-			<artifactId>okapi-tm-mymemory</artifactId>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-mymemory</artifactId>
 			<version>0.4-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

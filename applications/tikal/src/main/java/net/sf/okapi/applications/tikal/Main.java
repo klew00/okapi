@@ -46,9 +46,9 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.mt.google.GoogleMTConnector;
-import net.sf.okapi.tm.mymemory.MyMemoryTMConnector;
-import net.sf.okapi.tm.opentran.OpenTranTMConnector;
-import net.sf.okapi.tm.translatetoolkit.TranslateToolkitTMConnector;
+import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
+import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
+import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
 
 public class Main {
 	
@@ -591,8 +591,8 @@ public class Main {
 		if ( useTT ) {
 			// Parse the parameters hostname:port
 			int n = ttParams.lastIndexOf(':');
-			net.sf.okapi.tm.translatetoolkit.Parameters params 
-				= new net.sf.okapi.tm.translatetoolkit.Parameters();
+			net.sf.okapi.connectors.translatetoolkit.Parameters params 
+				= new net.sf.okapi.connectors.translatetoolkit.Parameters();
 			if ( n == -1 ) {
 				params.setHost(ttParams);
 			}
@@ -609,8 +609,8 @@ public class Main {
 		}
 		if ( useMM ) {
 			// The parameters for now is just the access key
-			net.sf.okapi.tm.mymemory.Parameters params
-				= new net.sf.okapi.tm.mymemory.Parameters();
+			net.sf.okapi.connectors.mymemory.Parameters params
+				= new net.sf.okapi.connectors.mymemory.Parameters();
 			params.setKey(mmParams);
 			conn = new MyMemoryTMConnector();
 			conn.setParameters(params);

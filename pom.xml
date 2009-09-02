@@ -36,6 +36,7 @@
         <module>filters</module>
         <module>libraries</module>
         <module>tm</module>
+        <module>connectors</module>
         <module>mt</module>
         <module>steps</module>
         <module>applications</module>

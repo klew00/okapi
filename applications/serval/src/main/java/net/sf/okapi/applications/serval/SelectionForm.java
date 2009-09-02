@@ -5,11 +5,11 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.mt.google.GoogleMTConnector;
-import net.sf.okapi.tm.globalsight.GlobalSightTMConnector;
-import net.sf.okapi.tm.mymemory.MyMemoryTMConnector;
-import net.sf.okapi.tm.opentran.OpenTranTMConnector;
+import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
+import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
+import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.tm.simpletm.SimpleTMConnector;
-import net.sf.okapi.tm.translatetoolkit.TranslateToolkitTMConnector;
+import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

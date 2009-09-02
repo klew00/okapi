@@ -7,13 +7,15 @@
         <version>0.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>build-tm</artifactId>
-    <groupId>net.sf.okapi.tm</groupId>
+    <artifactId>build-connectors</artifactId>
+    <groupId>net.sf.okapi.connectors</groupId>
     <packaging>pom</packaging>
-    <name>Okapi TM Build</name>
+    <name>Okapi TM Connectors Build</name>
     <modules>
-        <module>simpletm</module>
-        <module>pensieve</module>
+        <module>globalsight</module>
+        <module>mymemory</module>
+        <module>opentran</module>
+        <module>translatetoolkit</module>
     </modules>
 
     <build>
