@@ -146,7 +146,13 @@ public class XLIFFFilterTest {
 			+ "<body><trans-unit id=\"13\"><source><g id=\"1\">S1</g>, <g id=\"2\">S2</g></source>"
 			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
 			+ "</file></xliff>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\" target-language=\"fr\">"
+			+ "<body><trans-unit id=\"13\"><source><g id=\"1\">S1</g>, <g id=\"2\">S2</g></source>"
+			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
+			+ "</file></xliff>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 
 	@Test

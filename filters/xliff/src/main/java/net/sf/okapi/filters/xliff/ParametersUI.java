@@ -30,6 +30,7 @@ public class ParametersUI implements IEditorDescriptionProvider {
 		EditorDescription desc = new EditorDescription("XLIFF Filter Parameters", true, false);
 		desc.addCheckboxPart(paramDesc.get("fallbackToID"));
 		desc.addCheckboxPart(paramDesc.get("escapeGT"));
+		desc.addCheckboxPart(paramDesc.get("addTargetLanguage"));
 		return desc;
 	}
 

@@ -130,38 +130,45 @@ language is German.</p>
 <p>This command queries one or more translation resources for a given text. By 
 default the query is sent to the <a href="http://www.google.com/language_tools">
 Google MT engine</a>, but you can also query the <a href="http://open-tran.eu/">
-Open-Tran repository</a> and any
+Open-Tran repository</a>, the <a href="http://mymemory.translated.net/">MyMemory 
+repository</a>, as well as any
 <a href="http://translate.sourceforge.net/wiki/toolkit/tmserver">Translate 
-Toolkit TM server</a>. The two first are available if you have an Internet 
-connection, the last is available if you have access to a server. You can query 
-all of them at once.</p>
+Toolkit TM server</a>. The three first require an Internet 
+connection. The last can be access locally if the server runs on your machine. You can query 
+all resources at once.</p>
 <p>The syntax of this command is:</p>
 <pre>-q &quot;text&quot; [options]</pre>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table1">
 	<tr>
-		<td><code>-sl srcLang</code></td>
-		<td>The code of the source language (language of the text queried)</td>
+		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top">The code of the source language (language of the text queried)</td>
 	</tr>
 	<tr>
-		<td><code>-tl trgLang</code></td>
-		<td>The code of the target language (language of the requested 
+		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top">The code of the target language (language of the requested 
 		translation)</td>
 	</tr>
 	<tr>
-		<td><code>-google</code></td>
-		<td>Query the Google MT system. If no other type of resource is 
+		<td align="left" valign="top"><code>-google</code></td>
+		<td align="left" valign="top">Query the Google MT system. If no other type of resource is 
 		specified, this is used by default. This requires Internet access.</td>
 	</tr>
 	<tr>
-		<td><code>-opentran</code></td>
-		<td>Query the OpenTran translation repository. This requires Internet 
+		<td align="left" valign="top"><code>-opentran</code></td>
+		<td align="left" valign="top">Query the OpenTran translation repository. This requires Internet 
 		access.</td>
 	</tr>
 	<tr>
-		<td><code>-tt hostname[:port]</code></td>
-		<td>Query the specified Translate Toolkit TM server. This assumes you 
+		<td align="left" valign="top"><code>-tt hostname[:port]</code></td>
+		<td align="left" valign="top">Query the specified Translate Toolkit TM server. This assumes you 
 		have access to the server (local or remote).</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-mm key</code></td>
+		<td align="left" valign="top">Query the MyMemory translation repository 
+		with a given key access (use <code>mmDemo123</code> for demo). This 
+		requires Internet access.</td>
 	</tr>
 </table>
 <p>For example:</p>

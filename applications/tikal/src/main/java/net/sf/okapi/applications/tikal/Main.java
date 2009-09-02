@@ -553,7 +553,7 @@ public class Main {
 		System.out.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
 		System.out.println("Query translation resources:");
 		System.out.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
-		System.out.println("      [-google] [-tt hostname[:port]]");
+		System.out.println("      [-google] [-tt hostname[:port]] [-mm key]");
 	}
 
 	private void displayQuery (IQuery conn) {

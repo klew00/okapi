@@ -25,12 +25,14 @@ import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
+	private boolean fallbackToID;
+	private boolean escapeGT;
+	private boolean addTargetLanguage;
+	// Not used for now
 	private boolean useStateValues;
 	private boolean extractOnlyMatchingValues;
 	private String stateValues;
 	private boolean extractNoState;
-	private boolean fallbackToID;
-	private boolean escapeGT;
 
 	public Parameters () {
 		reset();
@@ -85,13 +87,22 @@ public class Parameters extends BaseParameters {
 		this.fallbackToID = fallbackToID;
 	}
 
+	public boolean getAddTargetLanguage () {
+		return addTargetLanguage;
+	}
+
+	public void setAddTargetLanguage (boolean addTargetLanguage) {
+		this.addTargetLanguage = addTargetLanguage;
+	}
+
 	public void reset () {
 		useStateValues = true;
 		stateValues = "new|needs-translation";
 		extractOnlyMatchingValues = true;
 		extractNoState = true;
-		fallbackToID = true;
+		fallbackToID = false;
 		escapeGT = false;
+		addTargetLanguage = true;
 	}
 
 	public void fromString (String data) {
@@ -103,6 +114,7 @@ public class Parameters extends BaseParameters {
 		extractNoState = buffer.getBoolean("extractNoState", extractNoState);
 		fallbackToID = buffer.getBoolean("fallbackToID", fallbackToID);
 		escapeGT = buffer.getBoolean("escapeGT", escapeGT);
+		addTargetLanguage = buffer.getBoolean("addTargetLanguage", addTargetLanguage);
 	}
 
 	@Override
@@ -115,6 +127,7 @@ public class Parameters extends BaseParameters {
 		
 		buffer.setBoolean("fallbackToID", fallbackToID);
 		buffer.setBoolean("escapeGT", escapeGT);
+		buffer.setBoolean("addTargetLanguage", addTargetLanguage);
 		return buffer.toString();
 	}
 	
@@ -123,6 +136,7 @@ public class Parameters extends BaseParameters {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add("fallbackToID", "Use the trans-unit id attribute for the text unit name if there is no resname", null);
 		desc.add("escapeGT", "Escape the greater-than characters", null);
+		desc.add("addTargetLanguage", "Add the target-language attribute if not present", null);
 		return desc;
 	}
 }

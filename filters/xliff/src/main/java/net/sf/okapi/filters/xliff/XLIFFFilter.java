@@ -383,8 +383,9 @@ public class XLIFFFilter implements IFilter {
 			queue.add(new Event(EventType.DOCUMENT_PART, dp));
 		}
 		
-		storeStartElement();
 		StartSubDocument startSubDoc = new StartSubDocument(String.valueOf(++otherId));
+		storeStartElementFile(startSubDoc);
+		
 		String tmp = reader.getAttributeValue("", "original");
 		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'original'.");
 		else startSubDoc.setName(tmp);
@@ -392,15 +393,17 @@ public class XLIFFFilter implements IFilter {
 		// Check the source language
 		tmp = reader.getAttributeValue("", "source-language");
 		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'source-language'.");
-		if ( !Util.isSameLanguage(tmp, srcLang, true) ) { // Warn about source language
+		if ( !Util.isSameLanguage(tmp, srcLang, false) ) { // Warn about source language
 			logger.warning(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
 		}
 		
 		// Check the target language
-		tmp = reader.getAttributeValue("", "target-language");
-		if ( tmp != null ) {
-			if ( !Util.isSameLanguage(tmp, trgLang, true) ) { // Warn about target language
-				logger.warning(String.format("The target language declared in <file> is '%s' not '%s'.", tmp, trgLang));
+		Property prop = startSubDoc.getProperty("targetLanguage");
+		if ( prop != null ) {
+			if ( !Util.isSameLanguage(prop.getValue(), trgLang, false) ) { // Warn about target language
+				logger.warning(String.format("The target language declared in <file> is '%s' not '%s'. '%s' will be used.",
+					prop.getValue(), trgLang, prop.getValue()));
+				trgLang = prop.getValue();
 			}
 		}
 		
@@ -434,6 +437,7 @@ public class XLIFFFilter implements IFilter {
 		}
 		String attrName;
 		boolean ps = preserveSpaces.peek();
+		
 		count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
 			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
@@ -447,6 +451,63 @@ public class XLIFFFilter implements IFilter {
 				ps = reader.getAttributeValue(i).equals("preserve");
 			}
 		}
+		skel.append(">");
+		preserveSpaces.push(ps);
+	}
+	
+	private void storeStartElementFile (StartSubDocument startSubDoc) {
+		String prefix = reader.getPrefix();
+		if (( prefix == null ) || ( prefix.length()==0 )) {
+			skel.append("<"+reader.getLocalName());
+		}
+		else {
+			skel.append("<"+prefix+":"+reader.getLocalName());
+		}
+
+		int count = reader.getNamespaceCount();
+		for ( int i=0; i<count; i++ ) {
+			prefix = reader.getNamespacePrefix(i);
+			skel.append(String.format(" xmlns%s=\"%s\"",
+				((prefix!=null) ? ":"+prefix : ""),
+				reader.getNamespaceURI(i)));
+		}
+		String attrName;
+		boolean ps = preserveSpaces.peek();
+		boolean hasTargetlanguage = false;
+		
+		count = reader.getAttributeCount();
+		for ( int i=0; i<count; i++ ) {
+			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
+			prefix = reader.getAttributePrefix(i);
+			attrName = String.format("%s%s",
+				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
+				reader.getAttributeLocalName(i));
+			
+			if ( reader.getAttributeLocalName(i).equals("target-language") ) {
+				// Create a property
+				hasTargetlanguage = true;
+				startSubDoc.setProperty(new Property("targetLanguage", reader.getAttributeValue(i), false));
+				skel.append(String.format(" %s=\"", attrName));
+				skel.addValuePlaceholder(startSubDoc, "targetLanguage", "");
+				skel.append("\"");
+			}
+			else {
+				skel.append(String.format(" %s=\"%s\"", attrName,
+					Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
+				if ( attrName.equals("xml:space") ) {
+					ps = reader.getAttributeValue(i).equals("preserve");
+				}
+			}
+		}
+		
+		if ( params.getAddTargetLanguage() && !hasTargetlanguage ) {
+			// Create the attribute (as a property) if not there yet
+			startSubDoc.setProperty(new Property("targetLanguage", trgLang, false));
+			skel.append(" target-language=\"");
+			skel.addValuePlaceholder(startSubDoc, "targetLanguage", "");
+			skel.append("\"");
+		}
+		
 		skel.append(">");
 		preserveSpaces.push(ps);
 	}
