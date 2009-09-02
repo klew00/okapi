@@ -57,6 +57,23 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testOutputBPTTypeTransUnit () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\">"
+			+ "<body><trans-unit id=\"1\" resname=\"13\"><source><g id=\"1\">S1</g>, <g id=\"2\">S2</g></source>"
+			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
+			+ "</file></xliff>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\" target-language=\"fr\">"
+			+ "<body><trans-unit id=\"1\" resname=\"13\"><source><g id=\"1\">S1</g>, <g id=\"2\">S2</g></source>"
+			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
+			+ "</file></xliff>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+
+	@Test
 	public void testApprovedTU () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createApprovedTU(), 1);
 		assertNotNull(tu);
@@ -136,23 +153,6 @@ public class XLIFFFilterTest {
 		assertTrue(tu.hasTarget("fr"));
 		fmt.setContent(tu.getTargetContent("fr"));
 		assertEquals("<2>T2</2>, <1>T1</1>", fmt.toString());
-	}
-
-	@Test
-	public void testOutputBPTTypeTransUnit () {
-		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-			+ "<xliff version=\"1.2\">"
-			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\">"
-			+ "<body><trans-unit id=\"13\"><source><g id=\"1\">S1</g>, <g id=\"2\">S2</g></source>"
-			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
-			+ "</file></xliff>";
-		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-			+ "<xliff version=\"1.2\">"
-			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\" target-language=\"fr\">"
-			+ "<body><trans-unit id=\"13\"><source><g id=\"1\">S1</g>, <g id=\"2\">S2</g></source>"
-			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
-			+ "</file></xliff>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 
 	@Test
@@ -251,7 +251,7 @@ public class XLIFFFilterTest {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<xliff version=\"1.2\">\r"
 			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\">"
-			+ "<body><trans-unit id=\"13\"><source>Hello World!</source></trans-unit></body>"
+			+ "<body><trans-unit id=\"1\" resname=\"13\"><source>Hello World!</source></trans-unit></body>"
 			+ "</file></xliff>";
 		return getEvents(snippet);
 	}
