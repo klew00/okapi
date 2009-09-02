@@ -10,8 +10,19 @@ import net.sf.okapi.common.resource.TextFragment;
 public class TranslationUnit {
     private TextFragment source;
     private TextFragment target;
+    private MetaData metadata;
+
+    public MetaData getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(MetaData metadata) {
+        this.metadata = metadata;
+    }
+
 
     public TranslationUnit(){
+        metadata = new MetaData();
     }
 
     public TranslationUnit(TextFragment source, TextFragment target) {

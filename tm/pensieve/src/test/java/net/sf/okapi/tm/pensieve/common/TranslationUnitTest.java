@@ -20,6 +20,7 @@ public class TranslationUnitTest {
         tu = new TranslationUnit();
         assertNull("source", tu.getSource());
         assertNull("content", tu.getTarget());
+        assertEquals("metadata entries", 0, tu.getMetadata().size());
     }
 
     @Test
@@ -27,6 +28,7 @@ public class TranslationUnitTest {
         tu = new TranslationUnit(SOURCE, CONTENT);
         assertEquals("source", SOURCE, tu.getSource());
         assertEquals("content", CONTENT, tu.getTarget());
+        assertEquals("metadata entries", 0, tu.getMetadata().size());
     }
 
     @Test
