@@ -21,7 +21,7 @@
 package net.sf.okapi.steps.tokenization;
 
 import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.steps.tokenization.common.CompoundStepParameters;
+import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 
 /**
  * Tokenization step parameters
@@ -29,47 +29,85 @@ import net.sf.okapi.steps.tokenization.common.CompoundStepParameters;
  * @version 0.1 06.07.2009
  */
 
-public class Parameters extends CompoundStepParameters {
+public class Parameters extends AbstractParameters {
 
 	/**
-	 * If true, tokenize only the languages listed on the language list (if not present in exLanguages).
-	 * If false, tokenizeSource and tokenizeTargets determine which languages will be tokenized.  
+	 * @see languageMode;
 	 */
-	public boolean useLanguageList;
-		
-	public String tokenTypes;
+	final public static int LANGUAGES_ALL = 0;
+	final public static int LANGUAGES_ONLY_WHITE_LIST = 1;
+	final public static int LANGUAGES_ALL_EXCEPT_BLACK_LIST = 2;
+	
+	/**
+	 * @see tokenMode;
+	 */
+	final public static int TOKENS_ALL = 0;
+	final public static int TOKENS_ONLY_LISTED = 1;
 	
 	public boolean tokenizeSource;
 	public boolean tokenizeTargets;
-	public String languages;
-	public String exLanguages;
+	
+	/**
+	 * The tokenization step will tokenize text only in the languages specified by languageMode:
+	 * <li>LANGUAGES_ALL = 0 - text in any language will be tokenized.  
+	 * <li>LANGUAGES_ONLY_WHITE_LIST = 1 - if text is in a language listed on languagesWhiteList, it will be tokenized. 
+	 * <li>LANGUAGES_ALL_EXCEPT_BLACK_LIST = 2 - if text is in a language not listed on languagesBlackList, it will be tokenized.<p>
+	 * Default: LANGUAGES_ALL
+	 */
+	public int languageMode = LANGUAGES_ALL; 
+	public String languageWhiteList;
+	public String languageBlackList;
 		
+	/**
+	 * The tokenization step will extract only the tokens specified by tokenMode:
+	 * <li>TOKENS_ALL = 0 - all registered token types will be tried to be extracted.  
+	 * <li>TOKENS_ONLY_LISTED = 1 - only the token types listed on tokenTypes will be tried to be extracted.<p> 
+	 * Default: TOKENS_ALL
+	 */
+	public int tokenMode = TOKENS_ALL;
+	public String tokenTypes;
+	
 	// Also inherits a list of steps from CompoundStepParameters
 	
 	@Override
 	protected void parameters_reset() {
 
-		super.parameters_reset();
-		
 		tokenizeSource = true;
 		tokenizeTargets = false;
+		
+		languageMode = LANGUAGES_ALL;
+		languageWhiteList = "";
+		languageBlackList = "";
+		
+		tokenMode = TOKENS_ALL;
+		tokenTypes = "";
 	}
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 
-		super.parameters_load(buffer);  // Loads steps parameters
-		
 		tokenizeSource = buffer.getBoolean("tokenizeSource", true);
 		tokenizeTargets = buffer.getBoolean("tokenizeTargets", false);
+		
+		languageMode = buffer.getInteger("languageMode", LANGUAGES_ALL);
+		languageWhiteList = buffer.getString("languageWhiteList");
+		languageBlackList = buffer.getString("languageBlackList");
+		
+		tokenMode = buffer.getInteger("tokenMode", TOKENS_ALL);
+		tokenTypes = buffer.getString("tokenTypes");
 	}
 	
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 
-		super.parameters_save(buffer);
-		
 		buffer.setBoolean("tokenizeSource", tokenizeSource);
 		buffer.setBoolean("tokenizeTargets", tokenizeTargets);
+		
+		buffer.setInteger("languageMode", languageMode);
+		buffer.setString("languageWhiteList", languageWhiteList);
+		buffer.setString("languageBlackList", languageBlackList);
+		
+		buffer.setInteger("tokenMode", tokenMode);
+		buffer.setString("tokenTypes", tokenTypes);
 	}	
 }

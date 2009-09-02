@@ -34,6 +34,8 @@ import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
 
 abstract public class BaseCounter {
 	
+	private static BaseCounter counter = null;
+	
 	abstract protected long doGetCount(String text, String language);
 	
 	static protected long getCount(Class<?> classRef, Object text, String language) {
@@ -50,7 +52,7 @@ abstract public class BaseCounter {
 				return getCount(classRef,tu.getTarget(language), language);
 			else
 				return getCount(classRef, tu.getSource(), language);
-		}
+		} 
 		else if (text instanceof TextContainer) {
 			
 			TextContainer tc = (TextContainer) text;
@@ -66,20 +68,21 @@ abstract public class BaseCounter {
 		}
 		else if (text instanceof String) {
 			
-			BaseCounter obj = null;
-			try {
-				obj = (BaseCounter) classRef.newInstance();
+			if (counter == null)				
+				try {
+					counter = (BaseCounter) classRef.newInstance();
+					
+				} catch (InstantiationException e) {
+					
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					
+					e.printStackTrace();
+				}
 				
-			} catch (InstantiationException e) {
-				
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				
-				e.printStackTrace();
-			}
-			if (obj == null) return 0L;
-				
-			return obj.doGetCount((String) text, language);
+			if (counter == null) return 0L;
+			
+			return counter.doGetCount((String) text, language);
 		}
 		
 		return 0;		

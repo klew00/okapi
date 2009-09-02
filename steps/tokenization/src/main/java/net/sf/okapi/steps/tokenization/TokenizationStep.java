@@ -21,7 +21,7 @@
 package net.sf.okapi.steps.tokenization;
 
 import net.sf.okapi.steps.tokenization.common.CompoundStep;
-import net.sf.okapi.steps.tokenization.tokens.Tokens;
+import net.sf.okapi.steps.tokenization.common.CompoundStepParameters;
 
 /**
  * 
@@ -32,24 +32,38 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 public class TokenizationStep extends CompoundStep {
 
 	Parameters params;
+	CompoundStepParameters structureParams;
 	
 	public TokenizationStep() {
 		
 		super();
-		
-		setParameters(new Parameters());
+				
 		setName("Tokenization");
 		setDescription("Extracts tokens from the text units content of a document.");
+				
+		structureParams = new net.sf.okapi.steps.tokenization.common.CompoundStepParameters(); 
+		if (structureParams == null) return;
 		
-		params = getParameters(Parameters.class);
-		if (params == null) return;
-		
-		params.loadFromResource("okf_tokenizer.fprm");				
+		super.setParameters(structureParams);
+		structureParams.loadFromResource(this.getClass(), "okf_tokenizers.fprm");
+				
+		setParameters(new Parameters());
 	}
 
-	public void tokenize(String text, Tokens tokens, String language, String... tokenTypes) {
-		
-		// TODO Goes through registered internal tokenizers, passes them their params, analyzes & collects results
+	@SuppressWarnings("unchecked")
+	@Override
+	protected <A> A getParameters(Class<?> expectedClass) {
+					
+		if (expectedClass == CompoundStepParameters.class)
+			return (A) structureParams;
+		else
+			return super.getParameters(expectedClass);
 	}
-			
+	
+	@Override
+	protected void component_init() {
+		
+		params = getParameters(Parameters.class);	
+	}
+				
 }

@@ -46,7 +46,8 @@ public class TokenizationStepParameters extends AbstractParameters {
 	protected void parameters_reset() {
 
 		description = "";
-		rules.clear();
+		if (rules != null)
+			rules.clear();
 	}
 
 	@Override

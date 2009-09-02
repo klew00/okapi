@@ -24,8 +24,8 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public interface ITokenizationStep {
 
-	public void tokenize(String text, Tokens tokens, String language, String... tokenTypes);
-	public void setTokenizeSource(boolean tokenizeSource);
-	public void setTokenizeTargets(boolean tokenizeTargets);
-	public boolean canTokenize(String language, String... tokenTypes);
+	void tokenize(String text, Tokens tokens, String language, String... tokenTypes);
+	void setTokenizeSource(boolean tokenizeSource);
+	void setTokenizeTargets(boolean tokenizeTargets);
+	boolean canTokenize(String language, String... tokenTypes);
 }

@@ -23,7 +23,6 @@ package net.sf.okapi.steps.tokenization.ui;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
 import net.sf.okapi.steps.tokenization.Parameters;
-import net.sf.okapi.steps.tokenization.ui.common.CompoundStepItemsTab;
 import net.sf.okapi.steps.tokenization.ui.locale.LanguagesTab;
 import net.sf.okapi.steps.tokenization.ui.tokens.TokenTypesTab;
 
@@ -34,11 +33,10 @@ public class ParametersEditor extends AbstractParametersEditor {
 
 	@Override
 	protected void createPages(TabFolder pageContainer) {
-		
-		addPage("Tokenizers", CompoundStepItemsTab.class);
+				
 		addPage("Options", OptionsTab.class);
 		addPage("Languages", LanguagesTab.class);
-		addPage("Tokens", TokenTypesTab.class);
+		addPage("Tokens", TokenTypesTab.class);		
 	}
 
 	@Override

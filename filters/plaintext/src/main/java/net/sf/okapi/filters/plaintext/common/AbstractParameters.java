@@ -172,9 +172,43 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 		return true;
 	}
 	
+	public boolean loadFromResource(Class<?> classRef, String resourceLocation) {
+
+		if (classRef == null) 
+			return loadFromResource(resourceLocation);
+		
+		URL url = classRef.getResource(resourceLocation);
+        if (url == null) return false;
+        
+        try {
+        	load(url.toURI(), false);
+        }
+        catch (URISyntaxException e) {
+               
+        	return false;
+        }
+        
+		return true;
+	}
+	
 	public void saveToResource(String resourceLocation) {
 		
 		URL url = this.getClass().getResource(resourceLocation);
+        if (url == null) return;
+        
+        save(url.getPath());
+	}
+	
+	// TODO Test
+	public void saveToResource(Class<?> classRef, String resourceLocation) {
+		
+		if (classRef == null) {
+			
+			saveToResource(resourceLocation);
+			return;
+		}
+			 		
+		URL url = classRef.getResource(resourceLocation);
         if (url == null) return;
         
         save(url.getPath());

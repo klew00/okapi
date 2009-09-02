@@ -61,7 +61,7 @@ public class AddModifyTokenTypePage extends Composite implements IDialogPage {
 		lblToken = new Label(this, SWT.NONE);
 		lblToken.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblToken.setData("name", "lblToken");
-		lblToken.setText("ID:");
+		lblToken.setText("ID (string):");
 		
 		name = new Text(this, SWT.BORDER);
 		name.addVerifyListener(new VerifyListener() {

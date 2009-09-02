@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.rbbi;
+package net.sf.okapi.steps.tokenization.engine.rbbi;
 
 import java.util.TreeMap;
 

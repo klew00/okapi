@@ -21,8 +21,12 @@
 package net.sf.okapi.steps.tokenization;
 
 import static org.junit.Assert.assertEquals;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
+import net.sf.okapi.steps.tokenization.engine.rbbi.WordBreakIteratorStep;
 import net.sf.okapi.steps.tokenization.locale.LocaleUtils;
-import net.sf.okapi.steps.tokenization.rbbi.WordBreakIteratorStep;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 import org.junit.Before;
@@ -33,6 +37,14 @@ import com.ibm.icu.text.RuleBasedBreakIterator;
 
 public class TokenizationTest {
 
+	private String text = "Jaguar will sell its new XJ-6 model in the U.S. for " +
+    "a small fortune :-). Expect to pay around USD 120ks. Custom options " +
+    "can set you back another few 10,000 dollars. For details, go to " +
+    "<a href=\"http://www.jaguar.com/sales\" alt=\"Click here\">" +
+    "Jaguar Sales</a> or contact xj-6@jaguar.com.";
+	
+	private TokenizationStep ts;
+	
 	@Before
 	public void setUp() {
 		
@@ -53,14 +65,21 @@ public class TokenizationTest {
 	}
 	
 	@Test
+	public void testTS() {
+		
+		ts = new TokenizationStep();
+		
+		TextUnit tu = TextUnitUtils.buildTU(text);
+		Event event = new Event(EventType.TEXT_UNIT, tu);
+		
+		ts.handleEvent(new Event(EventType.START_BATCH));
+		ts.handleEvent(event);
+		ts.handleEvent(new Event(EventType.END_BATCH));
+	}
+	
+	@Test
 	public void testRBBI() {
 		/* TODO debug
-	    String text = "Jaguar will sell its new XJ-6 model in the U.S. for " +
-	      "a small fortune :-). Expect to pay around USD 120ks. Custom options " +
-	      "can set you back another few 10,000 dollars. For details, go to " +
-	      "<a href=\"http://www.jaguar.com/sales\" alt=\"Click here\">" +
-	      "Jaguar Sales</a> or contact xj-6@jaguar.com.";
-	    
 	    String text2 = "Test word count is correct.";
 	    String text3 = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
 	    String text4 = "The quick (“brown”) fox can’t jump 32.3 feet, right?";

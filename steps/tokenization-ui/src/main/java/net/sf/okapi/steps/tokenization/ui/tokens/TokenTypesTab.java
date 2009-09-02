@@ -69,7 +69,12 @@ public class TokenTypesTab extends Composite implements IDialogPage {
 		new Label(grpExtract, SWT.NONE);
 		
 		list = new List(grpExtract, SWT.BORDER);
-		list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
+		{
+			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
+			gridData.heightHint = 300;
+			gridData.widthHint = 500;
+			list.setLayoutData(gridData);
+		}
 		list.setData("name", "list");
 		
 		btnAdd = new Button(grpExtract, SWT.NONE);

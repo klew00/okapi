@@ -20,6 +20,9 @@
 
 package net.sf.okapi.steps.wordcount;
 
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.tokenization.Tokenizer;
 import net.sf.okapi.steps.tokenization.tokens.TokenType;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
@@ -42,19 +45,24 @@ public class WordCounter extends BaseCounter {
 		return tokens.size();
 	}
 	
-	/**
-	 * 
-	 * @param text any of the following:
-	 * <li> TextUnit
-	 * <li> TextContainer
-	 * <li> TextFragment
-	 * <li> String
-	 * @param language RFC 4646, 4647 language tag (like "en-US")
-	 * @return word count in the current text
-	 */
-	static public long getCount(Object text, String language) {
+	static public long getCount(TextUnit textUnit, String language) {
 		
-		return getCount(WordCounter.class, text, language);		
+		return getCount(WordCounter.class, textUnit, language);		
+	}
+	
+	static public long getCount(TextContainer textContainer, String language) {
+		
+		return getCount(WordCounter.class, textContainer, language);		
+	}
+
+	static public long getCount(TextFragment textFragment, String language) {
+		
+		return getCount(WordCounter.class, textFragment, language);		
+	}
+	
+	static public long getCount(String string, String language) {
+		
+		return getCount(WordCounter.class, string, language);		
 	}
 
 }

@@ -49,6 +49,8 @@ public class CompoundStep extends AbstractPipelineStep {
 	private void rebuildPipeline() {
 		
 		if (pipeline == null) return;
+		
+		params = getParameters(CompoundStepParameters.class);
 		if (params == null) return;
 		
 		pipeline.clearSteps();
@@ -74,6 +76,7 @@ public class CompoundStep extends AbstractPipelineStep {
 	@Override
 	public Event handleEvent(Event event) {
 		
+		super.handleEvent(event);
 		return pipeline.process(event);
 	}
 	

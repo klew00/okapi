@@ -22,14 +22,12 @@ package net.sf.okapi.steps.wordcount.common;
 
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
-import net.sf.okapi.steps.tokenization.TokenizationStep;
+import net.sf.okapi.steps.tokenization.Tokenizer;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.tokenization.tokens.TokensAnnotation;
 
 public abstract class TokenCountStep extends BaseCountStep {
 
-	private TokenizationStep ts = null;
-	
 	protected abstract String getTokenType();
 	
 	@Override
@@ -38,20 +36,10 @@ public abstract class TokenCountStep extends BaseCountStep {
 		TokensAnnotation ta = TextUnitUtils.getSourceAnnotation(textUnit, TokensAnnotation.class);
 		Tokens tokens = null;
 		
-		if (ta != null) {
-			
+		if (ta != null)			
 			tokens = ta.getFilteredList(new String[]{getTokenType()});			
-		}
-		else {
-			
-			if (ts == null)
-				ts = new TokenizationStep();
-			
-			if (ts == null) return 0;
-			
-			tokens = new Tokens();
-			ts.tokenize(TextUnitUtils.getSourceText(textUnit, true), tokens, getLanguage(), new String[]{getTokenType()});
-		}
+		else
+			tokens = Tokenizer.tokenize(TextUnitUtils.getSourceText(textUnit, true), getLanguage(), new String[]{getTokenType()});
 		
 		if (tokens == null) return 0;
 		

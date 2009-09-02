@@ -62,10 +62,14 @@ public class CompoundStepItemPage extends Composite implements IDialogPage {
 		lblStepClass = new Label(this, SWT.NONE);
 		lblStepClass.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblStepClass.setData("name", "lblStepClass");
-		lblStepClass.setText("Step class:");
+		lblStepClass.setText("Step class (fully qualified):");
 		
 		ctext = new Text(this, SWT.BORDER);
-		ctext.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		{
+			GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+			gridData.widthHint = 400;
+			ctext.setLayoutData(gridData);
+		}
 		ctext.setData("name", "ctext");
 		
 		label_1 = new Label(this, SWT.NONE);
@@ -76,7 +80,7 @@ public class CompoundStepItemPage extends Composite implements IDialogPage {
 		lblResourceName = new Label(this, SWT.NONE);
 		lblResourceName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblResourceName.setData("name", "lblResourceName");
-		lblResourceName.setText("Parameters resource name:");
+		lblResourceName.setText("Parameters resource (short filename):");
 		
 		ptext = new Text(this, SWT.BORDER);
 		ptext.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));

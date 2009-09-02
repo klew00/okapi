@@ -1,0 +1,6 @@
+#v1
+description=Internal tokenizers of TokenizationStep in the order of invocation
+CompoundStepParametersItemCount.i=1
+CompoundStepParametersItem0.enabled.b=true
+CompoundStepParametersItem0.stepClass=net.sf.okapi.steps.tokenization.engine.rbbi.WordBreakIteratorStep
+CompoundStepParametersItem0.parametersLocation=okf_tokenizer_rbbi_main.fprm

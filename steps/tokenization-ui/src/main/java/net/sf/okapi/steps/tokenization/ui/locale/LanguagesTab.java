@@ -73,7 +73,12 @@ public class LanguagesTab extends Composite implements IDialogPage {
 		new Label(grpTokenizeTextIn, SWT.NONE);
 		
 		list = new List(grpTokenizeTextIn, SWT.BORDER);
-		list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
+		{
+			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
+			gridData.heightHint = 100;
+			gridData.widthHint = 500;
+			list.setLayoutData(gridData);
+		}
 		list.setData("name", "list");
 		
 		btnAdd = new Button(grpTokenizeTextIn, SWT.NONE);
@@ -99,7 +104,12 @@ public class LanguagesTab extends Composite implements IDialogPage {
 		new Label(grpTokenizeTextIn, SWT.NONE);
 		
 		list_1 = new List(grpTokenizeTextIn, SWT.BORDER);
-		list_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3));
+		{
+			GridData gridData_1 = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
+			gridData_1.widthHint = 500;
+			gridData_1.heightHint = 100;
+			list_1.setLayoutData(gridData_1);
+		}
 		list_1.setData("name", "list_1");
 		
 		btnAdd_1 = new Button(grpTokenizeTextIn, SWT.NONE);

@@ -936,6 +936,10 @@ public class Util {
 		return (e == null ||(e != null && e.isEmpty()));
 	}
 	
+	static public boolean isEmpty(Object[] e) {
+		return (e == null ||(e != null && e.length == 0));
+	}
+	
 // Safe string functions	
 	static public int getLength(String string) {
 		return (isEmpty(string)) ? 0 : string.length();
