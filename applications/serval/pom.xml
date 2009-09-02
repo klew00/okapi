@@ -30,8 +30,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.okapi.tm</groupId>
-			<artifactId>okapi-tm-simpletm</artifactId>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-simpletm</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -16,6 +16,7 @@
         <module>mymemory</module>
         <module>opentran</module>
         <module>translatetoolkit</module>
+        <module>simpletm</module>
     </modules>
 
     <build>

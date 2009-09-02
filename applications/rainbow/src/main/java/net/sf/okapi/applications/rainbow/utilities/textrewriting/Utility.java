@@ -35,7 +35,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryResult;
-import net.sf.okapi.tm.simpletm.SimpleTMConnector;
+import net.sf.okapi.connectors.simpletm.SimpleTMConnector;
 
 public class Utility extends BaseFilterDrivenUtility {
 
@@ -77,7 +77,8 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {
 			tmQ = new SimpleTMConnector();
-			net.sf.okapi.tm.simpletm.Parameters tmParams = new net.sf.okapi.tm.simpletm.Parameters();
+			net.sf.okapi.connectors.simpletm.Parameters tmParams
+				= new net.sf.okapi.connectors.simpletm.Parameters();
 			tmParams.dbPath = params.tmPath;
 			tmParams.dbPath.replace(VAR_PROJDIR, projectDir);
 			tmQ.setParameters(tmParams);

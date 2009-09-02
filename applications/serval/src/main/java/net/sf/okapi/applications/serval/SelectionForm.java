@@ -8,7 +8,7 @@ import net.sf.okapi.mt.google.GoogleMTConnector;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
-import net.sf.okapi.tm.simpletm.SimpleTMConnector;
+import net.sf.okapi.connectors.simpletm.SimpleTMConnector;
 import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
 
 import org.eclipse.swt.SWT;

@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.tm.simpletm;
+package net.sf.okapi.connectors.simpletm;
 
 import net.sf.okapi.common.BaseParameters;
 

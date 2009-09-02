@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.tm.simpletm;
+package net.sf.okapi.connectors.simpletm;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +27,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.tm.simpletm.Database;
 
 public class SimpleTMConnector implements ITMQuery {
 	

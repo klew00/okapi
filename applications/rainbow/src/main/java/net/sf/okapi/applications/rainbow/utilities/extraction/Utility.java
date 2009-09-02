@@ -38,7 +38,7 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryManager;
-import net.sf.okapi.tm.simpletm.SimpleTMConnector;
+import net.sf.okapi.connectors.simpletm.SimpleTMConnector;
 
 public class Utility extends BaseFilterDrivenUtility {
 
@@ -96,7 +96,8 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( params.preTranslate ) {
 			qm = new QueryManager();
 			qm.setLanguages(srcLang, trgLang);
-			net.sf.okapi.tm.simpletm.Parameters tmParams = new net.sf.okapi.tm.simpletm.Parameters();
+			net.sf.okapi.connectors.simpletm.Parameters tmParams
+				= new net.sf.okapi.connectors.simpletm.Parameters();
 			tmParams.dbPath = params.tmPath.replace(VAR_PROJDIR, projectDir);
 			qm.addAndInitializeResource(new SimpleTMConnector(), tmParams.dbPath, tmParams);
 			if ( params.leverageOnlyExact ) {

@@ -2,13 +2,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>build-tm</artifactId>
-        <groupId>net.sf.okapi.tm</groupId>
+        <artifactId>build-connectors</artifactId>
+        <groupId>net.sf.okapi.connectors</groupId>
         <version>0.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>okapi-tm-simpletm</artifactId>
-    <name>Okapi TM SimpleTM</name>
+    <artifactId>okapi-connector-simpletm</artifactId>
+    <name>Okapi TM Connector for SimpleTM</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>
@@ -21,9 +21,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.1.103</version>
+            <groupId>net.sf.okapi.tm</groupId>
+            <artifactId>okapi-tm-simpletm</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
