@@ -41,7 +41,7 @@ public class TMSeeker implements Seeker {
     }
 
     public List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException {
-        Query q = new FuzzyQuery(new Term(TranslationUnitFields.SOURCE_FUZZY.name(), query));
+        Query q = new FuzzyQuery(new Term(TranslationUnitFields.SOURCE_EXACT.name(), query));
         return search(max, q);
     }
 
@@ -53,7 +53,7 @@ public class TMSeeker implements Seeker {
         //This means that if we follow this way, then it will require the same tu to be indexed twice; one time as
         //Field.Index.ANALYZED (for word searching) and another time as Field.Index.NOT_ANALYZED (for exact matches)
         PhraseQuery q = new PhraseQuery();
-        q.add(new Term(TranslationUnitFields.SOURCE_EXACT.name(), query.hashCode()+""));
+        q.add(new Term(TranslationUnitFields.SOURCE_EXACT.name(), query));
         return search(max, q);
     }
 

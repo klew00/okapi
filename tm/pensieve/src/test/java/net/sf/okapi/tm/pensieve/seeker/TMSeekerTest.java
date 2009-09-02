@@ -3,7 +3,7 @@ package net.sf.okapi.tm.pensieve.seeker;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
-import net.sf.okapi.tm.pensieve.writer.ExactMatchWriter;
+import net.sf.okapi.tm.pensieve.writer.PensieveWriter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.store.Directory;
@@ -44,7 +44,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchForWordsNothingFound() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
         writer.endIndex();
         tmhits = seeker.searchForWords("anonexistentwordthatshouldnowayeverexist", 10);
         assertNotNull("docs returned should not be null", tmhits);
@@ -53,7 +53,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchForWordsOverMaxDocs() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
 
         populateIndex(writer, 12, "patents are evil", "unittest");
         final int desiredReturns = 2;
@@ -64,7 +64,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchForWordsUnderMaxDocs() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
 
         final int desiredReturns = 8;
 
@@ -82,7 +82,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchWordsMultipleSubPhrases() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
 
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("patents are evil"),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("patents evil are"),TARGET));
@@ -96,7 +96,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchFuzzyWuzzyMiddleMatch() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
         
 
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment(STR),TARGET));
@@ -111,7 +111,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchFuzzyWuzzyMiddleMatch80Percent() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
 
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch rabbit"),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment(STR),TARGET));
@@ -127,7 +127,7 @@ public class TMSeekerTest {
 
     @Test
     public void fuzzyWuzzyScoreSortNoFuzzyThreshold() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
 
         String[] testStrings = {STR,
             STR + " 1",
@@ -159,7 +159,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchFuzzyWuzzyEndMatch() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
 
         final int numOfIndices = 9;
@@ -173,7 +173,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchExactSingleMatch() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
 
         final int numOfIndices = 18;
@@ -187,7 +187,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchExactMultipleMatches() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
         for(int i = 0; i < 5; i++){
             writer.indexTranslationUnit(new TranslationUnit(new TextFragment(str), TARGET));
@@ -200,7 +200,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchExactDifferentStopWords() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment(str), TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out for the the killer rabbit"), TARGET));
@@ -212,7 +212,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchExactDifferentCases() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
         String str = "watch Out for The killEr rabbit";
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment(str), TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out for the the killer rabbit"), TARGET));
@@ -224,7 +224,7 @@ public class TMSeekerTest {
 
     @Test
     public void searchExactDifferentOrder() throws Exception {
-        ExactMatchWriter writer = getWriter();
+        PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment(str), TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TextFragment("watch out for the the killer rabbit"), TARGET));
@@ -250,11 +250,11 @@ public class TMSeekerTest {
         assertEquals("target field", target, tu.getTarget().toString());
     }
 
-    ExactMatchWriter getWriter() throws Exception {
-        return new ExactMatchWriter(DIR);
+    PensieveWriter getWriter() throws Exception {
+        return new PensieveWriter(DIR);
     }
 
-    void populateIndex(ExactMatchWriter writer, int numOfEntries, String source, String target) throws Exception {
+    void populateIndex(PensieveWriter writer, int numOfEntries, String source, String target) throws Exception {
 
         for (int i=0; i < numOfEntries; i++) {
             writer.indexTranslationUnit(new TranslationUnit(new TextFragment(source + i), new TextFragment(target)));

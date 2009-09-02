@@ -16,14 +16,12 @@ public class MatchScorerTest {
 
 
     @Test
-    public void scoreExactMatch()
-    {
+    public void scoreExactMatch(){
         assertEquals("exact match score", 0.0, MatchScorer.scoreMatch("DOG", "DOG"), 0.0);
     }
 
     @Test
-    public void scoreSameLengthEachDifferent()
-    {
+    public void scoreSameLengthEachDifferent(){
         assertEquals("exact match score", 3.0, MatchScorer.scoreMatch("DOG", "CAT"), 0.0);
     }
 }

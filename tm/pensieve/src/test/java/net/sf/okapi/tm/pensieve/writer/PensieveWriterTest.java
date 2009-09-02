@@ -20,9 +20,9 @@ import net.sf.okapi.common.resource.TextFragment;
  * Date: Aug 11, 2009
  * Time: 6:35:45 AM
  */
-public class ExactMatchWriterTest {
+public class PensieveWriterTest {
 
-    ExactMatchWriter emWriter;
+    PensieveWriter emWriter;
     IndexWriter writer;
     static final File GOOD_DIR = new File("../data/");
     static final File GOOD_FILE = new File(GOOD_DIR, "apache1.0.txt");
@@ -31,7 +31,7 @@ public class ExactMatchWriterTest {
     @Before
     public void init() throws IOException {
         dir = new RAMDirectory();
-        emWriter = new ExactMatchWriter(dir);
+        emWriter = new PensieveWriter(dir);
         writer = emWriter.getIndexWriter();
     }
 
@@ -84,8 +84,7 @@ public class ExactMatchWriterTest {
         String text = "blah blah blah";
         Document doc = emWriter.getDocument(new TranslationUnit(new TextFragment(text), new TextFragment("someone")));
         assertEquals("Document's content field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE.name()).stringValue());
-        assertEquals("Document's content fuzzy field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE_FUZZY.name()).stringValue());
-        assertEquals("Document's content exact field", "blah blah blah".hashCode()+"", doc.getField(TranslationUnitFields.SOURCE_EXACT.name()).stringValue());
+        assertEquals("Document's content exact field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE_EXACT.name()).stringValue());
         assertEquals("Document's target field", "someone", doc.getField(TranslationUnitFields.TARGET.name()).stringValue());
     }
 
