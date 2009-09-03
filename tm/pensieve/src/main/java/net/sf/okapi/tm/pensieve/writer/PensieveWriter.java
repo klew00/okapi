@@ -43,7 +43,7 @@ public class PensieveWriter implements TMWriter {
     }
 
     public void importTMX(String file, String sourceLang, String targetLang) throws IOException {
-        List<TranslationUnit> tus = TMXHandler.importTMX(file, sourceLang, targetLang);
+        List<TranslationUnit> tus = TMXHandler.getTranslationUnitsFromTMX(file, sourceLang, targetLang);
         for(TranslationUnit tu : tus) {
             indexTranslationUnit(tu);
         }

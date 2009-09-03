@@ -19,11 +19,11 @@ import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
 
 public class TMXHandler {
 
-    public static List<TranslationUnit> importTMX(String filename, String sourceLang, String targetLang) {
+    public static List<TranslationUnit> getTranslationUnitsFromTMX(String filename, String sourceLang, String targetLang) {
 
         List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
 
-        List<TextUnit> textunits = getTextUnit(getEvents(filename, sourceLang, targetLang));
+        List<TextUnit> textunits = getTextUnit(getEventsFromTMX(filename, sourceLang, targetLang));
 
         for (TextUnit textunit : textunits) {
             TranslationUnit tu = new TranslationUnit();
@@ -37,7 +37,7 @@ public class TMXHandler {
         return tus;
     }
 
-    private static List<Event> getEvents(String filename, String sourceLang, String targetLang) {
+    private static List<Event> getEventsFromTMX(String filename, String sourceLang, String targetLang) {
         URI fileURI;
         try {
             fileURI = TMXHandler.class.getResource(filename).toURI();

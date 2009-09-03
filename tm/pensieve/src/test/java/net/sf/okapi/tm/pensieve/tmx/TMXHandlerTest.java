@@ -23,33 +23,33 @@ public class TMXHandlerTest {
     private final String sampleTMX = "/sample_tmx.xml";
     @Before
     public void setUp() {
-        italian_tus = TMXHandler.importTMX(sampleTMX, "EN", "IT");
-        nonExistantLang_tus = TMXHandler.importTMX(sampleTMX, "EN", "FR");
+        italian_tus = TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "IT");
+        nonExistantLang_tus = TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "FR");
     }
 
     @Test(expected=NullPointerException.class)
     public void nonExistantFile() {
-        TMXHandler.importTMX("/filethathasnochanceofexisting.xml", "EN", "FR");
+        TMXHandler.getTranslationUnitsFromTMX("/filethathasnochanceofexisting.xml", "EN", "FR");
     }
 
     @Test(expected=NullPointerException.class)
     public void EmptySourceLang() {
-        TMXHandler.importTMX(sampleTMX, "", "FR");
+        TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "", "FR");
     }
 
     @Test(expected=NullPointerException.class)
     public void NullSourceLang() {
-        TMXHandler.importTMX(sampleTMX, null, "FR");
+        TMXHandler.getTranslationUnitsFromTMX(sampleTMX, null, "FR");
     }
 
     @Test(expected=NullPointerException.class)
     public void EmptyTargetLang() {
-        TMXHandler.importTMX(sampleTMX, "EN", "");
+        TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "");
     }
 
     @Test(expected=NullPointerException.class)
     public void NullTargetLang() {
-        TMXHandler.importTMX(sampleTMX, "EN", null);
+        TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", null);
     }
 
     @Test
