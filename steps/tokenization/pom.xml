@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>build-steps</artifactId>
 		<groupId>net.sf.okapi.steps</groupId>
-		<version>0.3-SNAPSHOT</version>
+		<version>0.4-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>okapi-step-tokenization</artifactId>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-common</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>
