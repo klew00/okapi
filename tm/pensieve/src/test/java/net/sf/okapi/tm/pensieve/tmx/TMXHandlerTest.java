@@ -6,6 +6,7 @@
 package net.sf.okapi.tm.pensieve.tmx;
 
 import java.util.List;
+import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,8 +69,17 @@ public class TMXHandlerTest {
     }
 
     @Test
+    public void MetaDataForExistingLang() {
+        assertEquals("first match source_lang", "EN",
+                italian_tus.get(0).getMetadata().get(MetaDataTypes.SOURCE_LANG));
+        assertEquals("first match target", "IT",
+                italian_tus.get(0).getMetadata().get(MetaDataTypes.TARGET_LANG));
+    }
+
+    @Test
     public void SourceAndTargetForNonExistingLang() {
-        assertEquals("first match source", "hello", nonExistantLang_tus.get(0).getSource().toString());
+        assertEquals("first match source", "hello",
+                nonExistantLang_tus.get(0).getSource().toString());
         assertNull("target for non-existant language should be null",
                 nonExistantLang_tus.get(0).getTarget());
     }

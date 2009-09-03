@@ -10,7 +10,7 @@ package net.sf.okapi.tm.pensieve.common;
  * @author HaslamJD
  */
 public enum MetaDataTypes {
-    ID, NAME, CONTEXT, CATEGORY, FILE_NAME
+    ID, NAME, CONTEXT, CATEGORY, FILE_NAME, SOURCE_LANG, TARGET_LANG
 }
 
 

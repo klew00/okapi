@@ -117,4 +117,9 @@ public class PensieveWriterTest {
         assertEquals("num of docs indexed", 1, emWriter.getIndexWriter().numDocs());
     }
 
+    @Test
+    public void importTMX() throws IOException {
+        emWriter.importTMX("/sample_tmx.xml", "EN", "IT");
+        assertEquals("entries in TM", 2, emWriter.getIndexWriter().numDocs());
+    }
 }

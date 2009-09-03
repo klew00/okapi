@@ -15,26 +15,29 @@ import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.filters.tmx.TmxFilter;
+import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
 
 public class TMXHandler {
 
-    public static List<TranslationUnit> importTMX(String filename, String srcLang, String trgLang) {
+    public static List<TranslationUnit> importTMX(String filename, String sourceLang, String targetLang) {
 
         List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
 
-        List<TextUnit> textunits = getTextUnit(getEvents(filename, srcLang, trgLang));
+        List<TextUnit> textunits = getTextUnit(getEvents(filename, sourceLang, targetLang));
 
         for (TextUnit textunit : textunits) {
             TranslationUnit tu = new TranslationUnit();
             tu.setSource(textunit.getSourceContent());
-            tu.setTarget(textunit.getTargetContent(trgLang));
+            tu.getMetadata().put(MetaDataTypes.SOURCE_LANG, sourceLang);
+            tu.setTarget(textunit.getTargetContent(targetLang));
+            tu.getMetadata().put(MetaDataTypes.TARGET_LANG, targetLang);
             tus.add(tu);
         }
 
         return tus;
     }
 
-    private static List<Event> getEvents(String filename, String srcLang, String trgLang) {
+    private static List<Event> getEvents(String filename, String sourceLang, String targetLang) {
         URI fileURI;
         try {
             fileURI = TMXHandler.class.getResource(filename).toURI();
@@ -44,7 +47,7 @@ public class TMXHandler {
 
         IFilter filter = new TmxFilter();
         ArrayList<Event> list = new ArrayList<Event>();
-        filter.open(new RawDocument(fileURI, null, srcLang, trgLang));
+        filter.open(new RawDocument(fileURI, null, sourceLang, targetLang));
         while (filter.hasNext()) {
             Event event = filter.next();
             list.add(event);

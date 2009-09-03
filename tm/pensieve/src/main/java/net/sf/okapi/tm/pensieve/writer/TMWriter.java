@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package net.sf.okapi.tm.pensieve.writer;
 
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
@@ -13,7 +12,10 @@ import java.io.IOException;
  * @author HaslamJD
  */
 public interface TMWriter {
+
     void endIndex() throws IOException;
 
     void indexTranslationUnit(TranslationUnit tu) throws IOException;
+
+    void importTMX(String file, String sourceLang, String targetLang) throws IOException;
 }
