@@ -98,6 +98,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( this.encoderManager != null ) {
 			this.encoderManager.setDefaultOptions(resource.getFilterParameters(), outputEncoding,
 				resource.getLineBreak());
+			encoderManager.updateEncoder(resource.getMimeType());
 		}
 		
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);

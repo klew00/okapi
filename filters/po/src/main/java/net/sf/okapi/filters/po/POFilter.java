@@ -500,6 +500,7 @@ public class POFilter implements IFilter {
 			// Initialize the header and its string
 			String id = String.valueOf(++otherId);
 			DocumentPart dp = new DocumentPart(id, false, skel);
+			dp.setMimeType(getMimeType());
 			tmp.insert(0, "\""+lineBreak+"\"");
 			tmp.append("\""+lineBreak);
 			String TMPMARKER = "\u001E";

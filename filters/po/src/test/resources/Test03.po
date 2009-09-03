@@ -1,6 +1,6 @@
 ﻿# Sample PO file
 #
-
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: MyApplication 1.0\n"

@@ -21,13 +21,13 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.okapi.tm</groupId>
-            <artifactId>okapi-tm-globalsight</artifactId>
+            <groupId>net.sf.okapi.connectors</groupId>
+            <artifactId>okapi-connector-globalsight</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.okapi.tm</groupId>
-            <artifactId>okapi-tm-opentran</artifactId>
+            <groupId>net.sf.okapi.connectors</groupId>
+            <artifactId>okapi-connector-opentran</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

@@ -62,7 +62,8 @@ public class POFilterTest {
 
 	@Test
 	public void testPOHeader () {
-		String snippet = "msgid \"\"\r"
+		String snippet = "#, fuzzy\r"
+			+ "msgid \"\"\r"
 			+ "msgstr \"\"\r"
 			+ "\"Project-Id-Version: PACKAGE VERSION\\n\"\r"
 			+ "\"Report-Msgid-Bugs-To: \\n\"\r"

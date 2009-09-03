@@ -23,9 +23,9 @@ import java.util.Scanner;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
-import net.sf.okapi.tm.globalsight.GlobalSightTMConnector;
-import net.sf.okapi.tm.globalsight.Parameters;
-import net.sf.okapi.tm.opentran.OpenTranTMConnector;
+import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
+import net.sf.okapi.connectors.globalsight.Parameters;
+import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 
 public class Main {
 	public static void main (String[] args) {
