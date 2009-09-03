@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,46 +18,39 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization;
+package net.sf.okapi.steps.tokenization.ui.engine.rbbi;
 
-import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Widget;
 
-/**
- * Tokenization step parameters
- * 
- * @version 0.1 06.07.2009
- */
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.steps.tokenization.engine.rbbi.Rule;
+import net.sf.okapi.steps.tokenization.ui.engine.AbstractRuleEditor;
 
-public class Parameters extends LanguageAndTokenParameters {
+public class RuleEditor extends AbstractRuleEditor {
 
-	public boolean tokenizeSource;
-	public boolean tokenizeTargets;
-		
 	@Override
-	protected void parameters_reset() {
-
-		super.parameters_reset();
+	protected Class<? extends Composite> getRuleClass() {
 		
-		tokenizeSource = true;
-		tokenizeTargets = false;
+		return RuleTab.class;
 	}
 
 	@Override
-	protected void parameters_load(ParametersString buffer) {
-
-		super.parameters_load(buffer);
+	public IParameters createParameters() {
 		
-		tokenizeSource = buffer.getBoolean("tokenizeSource", true);
-		tokenizeTargets = buffer.getBoolean("tokenizeTargets", false);
+		return new Rule();
 	}
-	
-	@Override
-	protected void parameters_save(ParametersString buffer) {
 
-		super.parameters_save(buffer);
+	@Override
+	protected String getCaption() {
 		
-		buffer.setBoolean("tokenizeSource", tokenizeSource);
-		buffer.setBoolean("tokenizeTargets", tokenizeTargets);
-	}	
+		return "Word break iterator rule";
+	}
+
+	@Override
+	protected void interop(Widget speaker) {
+		
+		
+	}
+
 }

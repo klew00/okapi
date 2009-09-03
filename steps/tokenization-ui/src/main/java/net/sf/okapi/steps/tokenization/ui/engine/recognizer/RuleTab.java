@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,46 +18,33 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization;
+package net.sf.okapi.steps.tokenization.ui.engine.recognizer;
 
-import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.SWT;
 
-/**
- * Tokenization step parameters
- * 
- * @version 0.1 06.07.2009
- */
+public class RuleTab extends Composite {
 
-public class Parameters extends LanguageAndTokenParameters {
+	/**
+	 * Create the composite.
+	 * @param parent
+	 * @param style
+	 */
+	public RuleTab(Composite parent, int style) {
+		super(parent, style);
+		setLayout(new GridLayout(1, false));
+		{
+			Label lblRecognizer = new Label(this, SWT.NONE);
+			lblRecognizer.setText("Recognizer");
+		}
 
-	public boolean tokenizeSource;
-	public boolean tokenizeTargets;
-		
-	@Override
-	protected void parameters_reset() {
-
-		super.parameters_reset();
-		
-		tokenizeSource = true;
-		tokenizeTargets = false;
 	}
 
 	@Override
-	protected void parameters_load(ParametersString buffer) {
-
-		super.parameters_load(buffer);
-		
-		tokenizeSource = buffer.getBoolean("tokenizeSource", true);
-		tokenizeTargets = buffer.getBoolean("tokenizeTargets", false);
+	protected void checkSubclass() {
+		// Disable the check that prevents subclassing of SWT components
 	}
-	
-	@Override
-	protected void parameters_save(ParametersString buffer) {
 
-		super.parameters_save(buffer);
-		
-		buffer.setBoolean("tokenizeSource", tokenizeSource);
-		buffer.setBoolean("tokenizeTargets", tokenizeTargets);
-	}	
 }

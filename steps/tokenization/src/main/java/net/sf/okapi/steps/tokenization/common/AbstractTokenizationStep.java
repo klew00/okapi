@@ -46,17 +46,18 @@ public abstract class AbstractTokenizationStep extends AbstractPipelineStep impl
 	boolean tokenizeSource;
 	boolean tokenizeTargets;
 	
+	protected abstract TokenizationStepParameters createParameters();
+	public abstract void tokenize(String text, Tokens tokens, String language, String... tokenTypes);
+	
 	public AbstractTokenizationStep() {
 		
 		super();
 		
-		setParameters(new TokenizationStepParameters());
+		setParameters(createParameters());
 		setName("Tokenization");
 		setDescription("Extracts tokens from the text units content of a document.");
 	}
 	
-	public abstract void tokenize(String text, Tokens tokens, String language, String... tokenTypes);
-
 	/* TODO debug
 	public String[] getTokenTypes() {
 		

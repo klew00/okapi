@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.steps.tokenization.common.AbstractTokenizationStep;
+import net.sf.okapi.steps.tokenization.common.TokenizationStepParameters;
 import net.sf.okapi.steps.tokenization.tokens.Token;
 import net.sf.okapi.steps.tokenization.tokens.TokenType;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
@@ -80,6 +81,12 @@ public class WordBreakIteratorStep extends AbstractTokenizationStep {
 		}
 		
 //		System.out.println(tokens.toString());
+	}
+
+	@Override
+	protected TokenizationStepParameters createParameters() {
+		
+		return new Parameters();
 	}
 
 	

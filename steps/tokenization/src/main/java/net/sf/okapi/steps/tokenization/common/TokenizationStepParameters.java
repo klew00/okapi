@@ -32,10 +32,12 @@ import net.sf.okapi.filters.plaintext.common.AbstractParameters;
  * @version 0.1 06.07.2009
  */
 
-public class TokenizationStepParameters extends AbstractParameters {
+public abstract class TokenizationStepParameters extends AbstractParameters {
 	
 	public String description;
 	public List<TokenizationStepRule> rules = new ArrayList<TokenizationStepRule>();
+	
+	public abstract Class<? extends TokenizationStepRule> getRuleClass();
 	
 	@Override
 	protected void parameters_init() {
@@ -50,11 +52,12 @@ public class TokenizationStepParameters extends AbstractParameters {
 			rules.clear();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void parameters_load(ParametersString buffer) {
 		
 		description = buffer.getString("description", "");
-		loadGroup(buffer, "rules", rules, TokenizationStepRule.class);
+		loadGroup(buffer, "rules", rules, (Class<TokenizationStepRule>) getRuleClass());
 	}
 	
 	@Override

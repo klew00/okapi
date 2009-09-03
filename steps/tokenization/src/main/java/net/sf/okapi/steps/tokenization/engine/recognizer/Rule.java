@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,46 +18,10 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization;
+package net.sf.okapi.steps.tokenization.engine.recognizer;
 
-import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
+import net.sf.okapi.steps.tokenization.common.TokenizationStepRule;
 
-/**
- * Tokenization step parameters
- * 
- * @version 0.1 06.07.2009
- */
+public class Rule extends TokenizationStepRule {
 
-public class Parameters extends LanguageAndTokenParameters {
-
-	public boolean tokenizeSource;
-	public boolean tokenizeTargets;
-		
-	@Override
-	protected void parameters_reset() {
-
-		super.parameters_reset();
-		
-		tokenizeSource = true;
-		tokenizeTargets = false;
-	}
-
-	@Override
-	protected void parameters_load(ParametersString buffer) {
-
-		super.parameters_load(buffer);
-		
-		tokenizeSource = buffer.getBoolean("tokenizeSource", true);
-		tokenizeTargets = buffer.getBoolean("tokenizeTargets", false);
-	}
-	
-	@Override
-	protected void parameters_save(ParametersString buffer) {
-
-		super.parameters_save(buffer);
-		
-		buffer.setBoolean("tokenizeSource", tokenizeSource);
-		buffer.setBoolean("tokenizeTargets", tokenizeTargets);
-	}	
 }

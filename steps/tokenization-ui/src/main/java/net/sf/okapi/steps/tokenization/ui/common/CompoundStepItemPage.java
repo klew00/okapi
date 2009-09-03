@@ -80,7 +80,7 @@ public class CompoundStepItemPage extends Composite implements IDialogPage {
 		lblResourceName = new Label(this, SWT.NONE);
 		lblResourceName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblResourceName.setData("name", "lblResourceName");
-		lblResourceName.setText("Parameters resource (short filename):");
+		lblResourceName.setText("Configuration (short filename):");
 		
 		ptext = new Text(this, SWT.BORDER);
 		ptext.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));

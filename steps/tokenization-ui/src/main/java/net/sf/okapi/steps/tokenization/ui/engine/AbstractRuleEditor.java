@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,46 +18,28 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization;
+package net.sf.okapi.steps.tokenization.ui.engine;
 
-import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
+import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
+import net.sf.okapi.steps.tokenization.ui.common.NameDescriptionTab;
+import net.sf.okapi.steps.tokenization.ui.locale.LanguagesTab;
+import net.sf.okapi.steps.tokenization.ui.tokens.TokenTypesTab;
 
-/**
- * Tokenization step parameters
- * 
- * @version 0.1 06.07.2009
- */
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TabFolder;
 
-public class Parameters extends LanguageAndTokenParameters {
+public abstract class AbstractRuleEditor extends AbstractParametersEditor {
 
-	public boolean tokenizeSource;
-	public boolean tokenizeTargets;
-		
-	@Override
-	protected void parameters_reset() {
-
-		super.parameters_reset();
-		
-		tokenizeSource = true;
-		tokenizeTargets = false;
-	}
-
-	@Override
-	protected void parameters_load(ParametersString buffer) {
-
-		super.parameters_load(buffer);
-		
-		tokenizeSource = buffer.getBoolean("tokenizeSource", true);
-		tokenizeTargets = buffer.getBoolean("tokenizeTargets", false);
-	}
+	protected abstract Class<? extends Composite> getRuleClass();
 	
 	@Override
-	protected void parameters_save(ParametersString buffer) {
+	protected void createPages(TabFolder pageContainer) {
+				
+		addPage("Rule", getRuleClass());
+		addPage("Languages", LanguagesTab.class);
+		addPage("Tokens", TokenTypesTab.class);
+		addPage("Info", NameDescriptionTab.class);
+	}
 
-		super.parameters_save(buffer);
-		
-		buffer.setBoolean("tokenizeSource", tokenizeSource);
-		buffer.setBoolean("tokenizeTargets", tokenizeTargets);
-	}	
+
 }

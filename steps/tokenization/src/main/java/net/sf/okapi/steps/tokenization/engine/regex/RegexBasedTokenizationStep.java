@@ -1,6 +1,7 @@
 package net.sf.okapi.steps.tokenization.engine.regex;
 
 import net.sf.okapi.steps.tokenization.common.AbstractTokenizationStep;
+import net.sf.okapi.steps.tokenization.common.TokenizationStepParameters;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class RegexBasedTokenizationStep extends AbstractTokenizationStep {
@@ -10,6 +11,12 @@ public class RegexBasedTokenizationStep extends AbstractTokenizationStep {
 			String... tokenTypes) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	protected TokenizationStepParameters createParameters() {
+
+		return new Parameters();
 	}
 
 }
