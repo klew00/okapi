@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.tikal;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -56,6 +57,8 @@ public class Main {
 	protected final static int CMD_MERGE = 1;
 	protected final static int CMD_EDITCONFIG = 2;
 	protected final static int CMD_QUERYTRANS = 3;
+
+	private static PrintStream ps;
 	
 	protected ArrayList<String> inputs;
 	protected String skeleton;
@@ -75,10 +78,27 @@ public class Main {
 	protected boolean useMM;
 	protected String mmParams;
 	
-	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
 	private Hashtable<String, String> filtersMap;
+
+	/**
+	 * Try the guess the encoding of the console.
+	 * @return the guessed name of the console's encoding.
+	 */
+	private static String getConsoleEncodingName () {
+		String enc = Charset.defaultCharset().name();
+		String osName = System.getProperty("os.name");
+		if ( osName.startsWith("Mac OS")) {
+			//TODO: Check if it's a mac encoding or ISO
+			// for now keep default
+		}
+		else if ( osName.startsWith("Windows") ) {
+			//TODO: Get cp by languages
+			enc = "cp850"; // Many languages
+		}
+		return enc;
+	}
 	
 	public static void main (String[] originalArgs) {
 		try {
@@ -90,6 +110,12 @@ public class Main {
 			for ( String tmp : originalArgs ) {
 				if ( tmp.length() > 0 ) args.add(tmp);
 			}
+			
+			// Create an encoding-aware output for the console
+			// System.out uses the default system encoding that
+			// may not be the right one (e.g. windows-1252 vs cp850)
+			// TODO: get the proper encoding
+			ps = new PrintStream(System.out, true, getConsoleEncodingName());
 
 			prog.printBanner();
 			if ( args.size() == 0 ) {
@@ -177,7 +203,7 @@ public class Main {
 			
 			// Check inputs and command
 			if ( prog.command == -1 ) {
-				System.out.println("No command specified. Please use one of the command described below:");
+				ps.println("No command specified. Please use one of the command described below:");
 				prog.printUsage();
 				return;
 			}
@@ -201,7 +227,7 @@ public class Main {
 			// Process all input files
 			for ( int i=0; i<prog.inputs.size(); i++ ) {
 				if ( i > 0 ) {
-					System.out.println("------------------------------------------------------------"); //$NON-NLS-1$
+					ps.println("------------------------------------------------------------"); //$NON-NLS-1$
 				}
 				prog.process(prog.inputs.get(i));
 			}
@@ -382,12 +408,12 @@ public class Main {
 		initialize();
 		DefaultFilters.setMappings(fcMapper, true, true);
 
-		System.out.println("List of all filter configurations available:");
+		ps.println("List of all filter configurations available:");
 		Iterator<FilterConfiguration> iter = fcMapper.getAllConfigurations();
 		FilterConfiguration config;
 		while ( iter.hasNext() ) {
 			config = iter.next();
-			System.out.println(String.format(" - %s = %s",
+			ps.println(String.format(" - %s = %s",
 				config.configId, config.description));
 		}
 	}
@@ -415,7 +441,7 @@ public class Main {
 		}
 		
 		// Could not guess
-		System.out.println(String.format(
+		ps.println(String.format(
 			"ERROR: Could not guess the filter for the configuration '%s'", configId));
 		return false;
 	}
@@ -470,19 +496,19 @@ public class Main {
 			RawDocument rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			rd.setFilterConfigId(configId);
 			
-			System.out.println("Source language: "+srcLang);
-			System.out.print("Target language: ");
-			System.out.println(trgLang);
-			System.out.println(" Input encoding: "+inputEncoding);
-			System.out.println("  Configuration: "+configId);
-			System.out.println(" Input document: "+input);
-			System.out.print("Output document: ");
-			if ( output == null ) System.out.println("<auto-defined>");
-			else System.out.println(output);
-			System.out.print("Extaction...");
+			ps.println("Source language: "+srcLang);
+			ps.print("Target language: ");
+			ps.println(trgLang);
+			ps.println(" Input encoding: "+inputEncoding);
+			ps.println("  Configuration: "+configId);
+			ps.println(" Input document: "+input);
+			ps.print("Output document: ");
+			if ( output == null ) ps.println("<auto-defined>");
+			else ps.println(output);
+			ps.print("Extaction...");
 			
 			step.handleRawDocument(rd);
-			System.out.println(" Done");
+			ps.println(" Done");
 		}
 		else if ( command == CMD_MERGE ) {
 			guessMergingArguments(input);
@@ -497,29 +523,29 @@ public class Main {
 			step.setOutputPath(output);
 			step.setOutputEncoding(outputEncoding);
 			
-			System.out.println("Source language: "+srcLang);
-			System.out.print("Target language: ");
-			System.out.println(trgLang);
-			System.out.println(" Input encoding: "+inputEncoding);
-			System.out.println("Output encoding: "+outputEncoding);
-			System.out.println("  Configuration: "+configId);
-			System.out.println(" XLIFF document: "+input);
-			System.out.print("Output document: ");
-			if ( output == null ) System.out.println("<auto-defined>");
-			else System.out.println(output);
-			System.out.print("Merging...");
+			ps.println("Source language: "+srcLang);
+			ps.print("Target language: ");
+			ps.println(trgLang);
+			ps.println(" Input encoding: "+inputEncoding);
+			ps.println("Output encoding: "+outputEncoding);
+			ps.println("  Configuration: "+configId);
+			ps.println(" XLIFF document: "+input);
+			ps.print("Output document: ");
+			if ( output == null ) ps.println("<auto-defined>");
+			else ps.println(output);
+			ps.print("Merging...");
 
 			step.handleRawDocument(skelRawDoc);
-			System.out.println(" Done");
+			ps.println(" Done");
 		}
 	}
 	
 	private void printBanner () {
-		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
-		System.out.println("Okapi Tikal - Localization Toolset");
+		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
+		ps.println("Okapi Tikal - Localization Toolset");
 		// This will null for version until compiled as jar, which is ok.
-		System.out.println(String.format("Version: %s", getClass().getPackage().getImplementationVersion()));
-		System.out.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
+		ps.println(String.format("Version: %s", getClass().getPackage().getImplementationVersion()));
+		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
 	
 	private void showHelp () {
@@ -537,23 +563,23 @@ public class Main {
 	}
 	
 	private void printUsage () {
-		System.out.println("Show this help:");
-		System.out.println("   -?");
-		System.out.println("Open the user guide page:");
-		System.out.println("   -h");
-		System.out.println("List all available filter configurations:");
-		System.out.println("   -listconf");
-		System.out.println("Edit or view filter configurations (UI-dependent command):");
-		System.out.println("   -e [[-fc] configId]");
-		System.out.println("Extract a file to XLIFF:");
-		System.out.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		System.out.println("      [-sl srcLang] [-tl trgLang]");
-		System.out.println("Merge an XLIFF document back to its original format:");
-		System.out.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
-		System.out.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
-		System.out.println("Query translation resources:");
-		System.out.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
-		System.out.println("      [-google] [-tt hostname[:port]] [-mm key]");
+		ps.println("Show this help:");
+		ps.println("   -?");
+		ps.println("Open the user guide page:");
+		ps.println("   -h");
+		ps.println("List all available filter configurations:");
+		ps.println("   -listconf");
+		ps.println("Edit or view filter configurations (UI-dependent command):");
+		ps.println("   -e [[-fc] configId]");
+		ps.println("Extract a file to XLIFF:");
+		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		ps.println("      [-sl srcLang] [-tl trgLang]");
+		ps.println("Merge an XLIFF document back to its original format:");
+		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
+		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
+		ps.println("Query translation resources:");
+		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
+		ps.println("      [-google] [-tt hostname[:port]] [-mm key]");
 	}
 
 	private void displayQuery (IQuery conn) {
@@ -561,17 +587,17 @@ public class Main {
 			QueryResult qr;
 			while ( conn.hasNext() ) {
 				qr = conn.next();
-				System.out.println(String.format("Result: From %s (%s->%s, score: %d)", conn.getName(),
+				ps.println(String.format("Result: From %s (%s->%s, score: %d)", conn.getName(),
 					conn.getSourceLanguage(), conn.getTargetLanguage(), qr.score));
-				System.out.println(String.format("  Source: \"%s\"", qr.source.toString()));
-				System.out.println(String.format("  Target: \"%s\"", qr.target.toString()));
+				ps.println(String.format("  Source: \"%s\"", qr.source.toString()));
+				ps.println(String.format("  Target: \"%s\"", qr.target.toString()));
 			}
 		}
 		else {
-			System.out.println(String.format("Result: From %s (%s->%s)", conn.getName(),
+			ps.println(String.format("Result: From %s (%s->%s)", conn.getName(),
 				conn.getSourceLanguage(), conn.getTargetLanguage()));
-			System.out.println(String.format("  Source: \"%s\"", query));
-			System.out.println("  <Not translation has been found>");
+			ps.println(String.format("  Source: \"%s\"", query));
+			ps.println("  <Not translation has been found>");
 		}	
 	}
 	
