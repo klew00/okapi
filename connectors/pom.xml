@@ -17,6 +17,7 @@
         <module>opentran</module>
         <module>translatetoolkit</module>
         <module>simpletm</module>
+        <module>pensieve</module>
         <module>google</module>
     </modules>
 
