@@ -21,9 +21,9 @@
 package net.sf.okapi.steps.tokenization.common;
 
 import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.filters.plaintext.common.IParametersHandler;
+import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 
-public class TokenizationStepRule implements IParametersHandler {
+public class TokenizationStepRule extends AbstractParameters {
 
 	public String description;
 	public String rule;
@@ -31,7 +31,8 @@ public class TokenizationStepRule implements IParametersHandler {
 	public String languages;
 	public String exLanguages;
 	
-	public void parameters_reset() {
+	@Override
+	protected void parameters_reset() {
 
 		description = "";
 		rule = "";
@@ -40,7 +41,8 @@ public class TokenizationStepRule implements IParametersHandler {
 		exLanguages = "";		// No languages
 	}
 	
-	public void parameters_load(ParametersString buffer) {
+	@Override
+	protected void parameters_load(ParametersString buffer) {
 		
 		description = buffer.getString("description", "");
 		rule = buffer.getString("rule", "");
@@ -49,9 +51,10 @@ public class TokenizationStepRule implements IParametersHandler {
 		exLanguages = buffer.getString("exLanguages", "");
 	}
 	
-	public void parameters_save(ParametersString buffer) {
+	@Override
+	protected void parameters_save(ParametersString buffer) {
 		
-		buffer.setString("tokenTypes", tokenTypes);
+		buffer.setString("description", description);
 		buffer.setString("rule", rule);
 		buffer.setString("tokenTypes", tokenTypes);
 		buffer.setString("languages", languages);

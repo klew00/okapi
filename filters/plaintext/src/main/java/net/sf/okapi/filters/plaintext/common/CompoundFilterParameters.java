@@ -51,8 +51,7 @@ public class CompoundFilterParameters extends AbstractParameters {
 		this.activeParameters = activeParameters;
 	}	
 	
-	@SuppressWarnings("unchecked")
-	protected boolean addParameters(Class<?> parametersClass) {
+	protected <T extends BaseParameters> boolean addParameters(Class<T> parametersClass) {
 		
 		if (parameters == null) return false;
 		boolean res = false;
@@ -64,9 +63,9 @@ public class CompoundFilterParameters extends AbstractParameters {
 			
 			if (!BaseParameters.class.isAssignableFrom(parametersClass)) return false;
 				
-			Constructor<BaseParameters> bpc;
+			Constructor<T> bpc;
 			try {
-				bpc = (Constructor<BaseParameters>) parametersClass.getConstructor(new Class[] {});			
+				bpc = (Constructor<T>) parametersClass.getConstructor(new Class[] {});			
 				if (bpc == null) return false;			
 										
 				bp = bpc.newInstance(new Object[] {});
@@ -188,7 +187,7 @@ public class CompoundFilterParameters extends AbstractParameters {
 	}
 
 	@Override
-	public void parameters_load(ParametersString buffer) {
+	protected void parameters_load(ParametersString buffer) {
 		
 		setParametersClassName(buffer.getString("parametersClass", defParametersClass));
 		setActiveParameters(getParametersClassName());

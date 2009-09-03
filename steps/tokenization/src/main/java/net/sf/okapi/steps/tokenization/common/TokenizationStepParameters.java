@@ -43,7 +43,7 @@ public class TokenizationStepParameters extends AbstractParameters {
 	}
 
 	@Override
-	protected void parameters_reset() {
+	public void parameters_reset() {
 
 		description = "";
 		if (rules != null)
@@ -51,14 +51,14 @@ public class TokenizationStepParameters extends AbstractParameters {
 	}
 
 	@Override
-	protected void parameters_load(ParametersString buffer) {
+	public void parameters_load(ParametersString buffer) {
 		
 		description = buffer.getString("description", "");
 		loadGroup(buffer, "rules", rules, TokenizationStepRule.class);
 	}
 	
 	@Override
-	protected void parameters_save(ParametersString buffer) {
+	public void parameters_save(ParametersString buffer) {
 		
 		buffer.setString("description", description);
 		saveGroup(buffer, "rules", rules);

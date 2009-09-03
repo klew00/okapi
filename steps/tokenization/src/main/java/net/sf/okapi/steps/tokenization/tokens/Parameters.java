@@ -20,27 +20,39 @@
 
 package net.sf.okapi.steps.tokenization.tokens;
 
-import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 
 public class Parameters extends AbstractParameters {
 
-	public TokenTypes tokenTypes;
-	public TokenTypes selectedTokenTypes;
+	private List<TokenType> tokenTypes;
+	private List<TokenType> selectedTokenTypes;
 	
+	public List<TokenType> getTokenTypes() {
+		
+		return tokenTypes;
+	}
+	
+	public List<TokenType> getSelectedTokenTypes() {
+		
+		return selectedTokenTypes;
+	}
+
 	@Override
 	protected void parameters_init() {
 		
-		tokenTypes = new TokenTypes();
-		selectedTokenTypes = new TokenTypes();
+		tokenTypes = new ArrayList<TokenType>();
+		selectedTokenTypes = new ArrayList<TokenType>();
 	}
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 		
-		tokenTypes.parameters_load(buffer);
+		//tokenTypes.parameters_load(buffer);
+		loadGroup(buffer, "tokenType", tokenTypes, TokenType.class);
 	}
 
 	@Override
@@ -52,25 +64,28 @@ public class Parameters extends AbstractParameters {
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		
-		tokenTypes.parameters_save(buffer);
+		//tokenTypes.parameters_save(buffer);
+		saveGroup(buffer, "tokenType", tokenTypes);
 	}
 
 	public boolean loadTokenTypes() {
 		
-		try {
-			load(getClass().getResource("okf_token_types.fprm").toURI(), false);
-						
-		} catch (URISyntaxException e) {
-			
-			return false;
-		}
-		
-		return true;
+//		try {
+//			load(getClass().getResource("okf_token_types.fprm").toURI(), false);
+//						
+//		} catch (URISyntaxException e) {
+//			
+//			return false;
+//		}
+//		
+//		return true;
+		return loadFromResource("okf_token_types.fprm");
 	}
 	
 	public void saveTokenTypes() {
 		
-		save(getClass().getResource("okf_token_types.fprm").getPath());
+		//save(getClass().getResource("okf_token_types.fprm").getPath());
+		saveToResource("okf_token_types.fprm");
 	}
 
 	public void addTokenType(String name, String description) {

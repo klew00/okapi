@@ -50,12 +50,11 @@ public class TokenizationStep extends CompoundStep {
 		setParameters(new Parameters());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected <A> A getParameters(Class<?> expectedClass) {
+	protected <A> A getParameters(Class<A> expectedClass) {
 					
 		if (expectedClass == CompoundStepParameters.class)
-			return (A) structureParams;
+			return expectedClass.cast(structureParams);
 		else
 			return super.getParameters(expectedClass);
 	}

@@ -62,18 +62,15 @@ public class CompoundFilter extends AbstractFilter {
 					((AbstractFilter) activeSubFilter).getParametersClassName());
 	}
 
-	@SuppressWarnings("unchecked")
-	protected boolean addSubFilter(Class<?> subFilterClass) {
+	protected <A extends AbstractFilter> boolean addSubFilter(Class<A> subFilterClass) {
 		
 		if (subFilters == null) return false;
 		boolean res = false;
 	
 		IFilter curSubFilter = null;
 		
-		if (!AbstractFilter.class.isAssignableFrom(subFilterClass)) return false;
-		
 		try {
-			Constructor<AbstractFilter> cc = (Constructor<AbstractFilter>) subFilterClass.getConstructor(new Class[] {});
+			Constructor<A> cc = (Constructor<A>) subFilterClass.getConstructor(new Class[] {});
 			if (cc == null) return false;
 			
 			curSubFilter = (IFilter) cc.newInstance(new Object[] {});

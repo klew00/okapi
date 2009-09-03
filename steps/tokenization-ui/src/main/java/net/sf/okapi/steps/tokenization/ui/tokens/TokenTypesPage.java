@@ -202,7 +202,7 @@ public class TokenTypesPage extends Composite implements IDialogPage {
 			
 			adapter.clear();
 			
-			for (TokenType tokenType : params.tokenTypes)					
+			for (TokenType tokenType : params.getTokenTypes())					
 				adapter.addRow(new String[] {tokenType.id, tokenType.description});
 
 			adapter.sort(1, false);

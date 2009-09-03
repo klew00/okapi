@@ -56,19 +56,19 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 	/**
 	 * Reset parameters values to defaults.
 	 */
-	abstract protected void parameters_reset();
+	protected abstract void parameters_reset();
 	
 	/**
 	 * Load from buffer. The protected buffer variable is visible in all subclasses of BaseParameters.<p>
 	 * @example myParam = buffer.getBoolean("myParam", false);
 	 */
-	abstract protected void parameters_load(ParametersString buffer);
+	protected abstract void parameters_load(ParametersString buffer);
 	
 	/**
 	 * Save to buffer. The protected buffer variable is visible in all subclasses of BaseParameters.<p>
 	 * @example buffer.setBoolean("myParam", myParam);
 	 */
-	abstract protected void parameters_save(ParametersString buffer);
+	protected abstract void parameters_save(ParametersString buffer);
 	
 	
 	final public void reset() {
@@ -105,8 +105,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static <T> void loadGroup(ParametersString buffer, String groupName, List<T> group, Class<? extends IParametersHandler> elementClass) {
+	public static <T extends AbstractParameters> void loadGroup(ParametersString buffer, String groupName, List<T> group, Class<T> elementClass) {
 		
 		if (buffer == null) return;
 		if (group == null) return;
@@ -118,7 +117,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 		
 		for (int i = 0; i < count; i++ ) {
 			
-			IParametersHandler item = null;
+			T item = null;
 			try {
 				item = elementClass.newInstance();
 				
@@ -134,11 +133,11 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 			if (item == null) return;
 			
 			item.parameters_load(new ParametersString(buffer.getGroup(String.format("%s%d", groupName, i))));
-			group.add((T) item);
+			group.add(item);
 		}
 	}
 	
-	public static void saveGroup(ParametersString buffer, String groupName, List<? extends IParametersHandler> group) {
+	public static <T extends AbstractParameters> void saveGroup(ParametersString buffer, String groupName, List<T> group) {
 		
 		if (buffer == null) return;
 		if (group == null) return;
@@ -148,7 +147,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 		
 		for (int i = 0; i < group.size(); i++) {
 			
-			IParametersHandler item = group.get(i);
+			AbstractParameters item = group.get(i);
 			ParametersString tmp = new ParametersString(); 
 			
 			item.parameters_save(tmp);

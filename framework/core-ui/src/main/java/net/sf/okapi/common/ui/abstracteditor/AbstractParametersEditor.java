@@ -541,14 +541,13 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 		return SWTUtils.findControl(page, controlName);
 	}
 
-	@SuppressWarnings("unchecked")
-	protected Composite addPage(String caption, Class<?> pageClass) {
+	protected <T extends Composite> Composite addPage(String caption, Class<T> pageClass) {
 
 		if (!Composite.class.isAssignableFrom(pageClass))
 			return null;
 
 		try {
-			Constructor<Composite> cc = (Constructor<Composite>) pageClass.getConstructor(new Class[] {
+			Constructor<T> cc = (Constructor<T>) pageClass.getConstructor(new Class[] {
 					Composite.class, int.class });
 			if (cc == null)
 				return null;

@@ -228,28 +228,32 @@ public class ListUtils {
 			
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") 
 	public static <E> List<E> copyItems(List<E> buffer, int start, int end) {
+		// No way to determine the actual type of E at compile time to cast newInstance(), so @SuppressWarnings("unchecked") 
 	
 		if (buffer == null) return null;
 		if (Util.isEmpty(buffer)) return null;
 		if (buffer.getClass() == null) return null;
 		
 		List<E> res = null;
-		try {
-			res = buffer.getClass().newInstance();
+			try {
+				res = buffer.getClass().newInstance();
+				
+			} catch (InstantiationException e) {
+				
+				e.printStackTrace();
+				
+			} catch (IllegalAccessException e) {
+				
+				e.printStackTrace();
+			}
 			
 			res.addAll(buffer.subList(start, end + 1));		
-			
-		} catch (InstantiationException e) {
-			//TODO: do something with the exception, or comment why it's swallowed
-		} catch (IllegalAccessException e) {
-			//TODO: do something with the exception, or comment why it's swallowed
-		}
-		
+					
 		return res;
 	}
-	
+		
 	public static <E> List<E> moveItems(List<E> buffer, int start, int end) {
 	
 		List<E> res = copyItems(buffer, start, end);

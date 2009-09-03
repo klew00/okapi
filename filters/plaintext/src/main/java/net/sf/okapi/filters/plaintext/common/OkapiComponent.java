@@ -60,8 +60,7 @@ public abstract class OkapiComponent extends Component implements IConfigurable 
 		parametersClassName = params.getClass().getName();
 	}
 
-	@SuppressWarnings("unchecked")
-	protected <A> A getParameters(Class<?> expectedClass) {
+	protected <A> A getParameters(Class<A> expectedClass) {
 		
 		if (params == null) {
 			throw new OkapiBadFilterParametersException("Filter parameters object is null.");			
@@ -77,7 +76,7 @@ public abstract class OkapiComponent extends Component implements IConfigurable 
 							expectedClass.getName(), st));			
 		}
 		
-		return (A) params;
+		return expectedClass.cast(params);
 	}
 
 	public String getParametersClassName() {

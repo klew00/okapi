@@ -370,23 +370,20 @@ public class TextUnitUtils {
 	 * @param textUnit
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public static GenericSkeleton convertToSkeleton(TextUnit textUnit) {
 		
 		if (textUnit == null) return null;
 		
 		GenericSkeleton skel = (GenericSkeleton) textUnit.getSkeleton();
 		
-		List<?> temp = skel.getParts();
-		List<Object> list = (List<Object>) temp;
+		List<GenericSkeletonPart> list = skel.getParts(); 
 		
 		String tuRef = TextFragment.makeRefMarker("$self$");
 		String srcText = TextUnitUtils.getSourceText(textUnit);
 				
 		GenericSkeleton res = new GenericSkeleton();
 		
-		List<?> temp2 = res.getParts();
-		List<Object> list2 = (List<Object>) temp2;
+		List<GenericSkeletonPart> list2 = res.getParts();
 		
 		for (int i = 0; i < list.size(); i++) {
 			

@@ -20,8 +20,10 @@
 
 package net.sf.okapi.steps.tokenization.ui.tokens;
 
+import java.util.List;
+
 import net.sf.okapi.steps.tokenization.tokens.Parameters;
-import net.sf.okapi.steps.tokenization.tokens.TokenTypes;
+import net.sf.okapi.steps.tokenization.tokens.TokenType;
 import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
 
 public class TokenTypeSelector {
@@ -34,13 +36,13 @@ public class TokenTypeSelector {
 		select();
 	}
 
-	private static TokenTypes select() {
+	private static List<TokenType> select() {
 				
 		InputQueryDialog dlg = new InputQueryDialog();
 		Parameters params = new Parameters(); 
 		
 		dlg.run(null, TokenTypesPage.class, "Tokens", "", params, null);
 		
-		return params.selectedTokenTypes;
+		return params.getSelectedTokenTypes();
 	}
 }

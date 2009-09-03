@@ -23,9 +23,9 @@ package net.sf.okapi.steps.tokenization.common;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.filters.plaintext.common.IParametersHandler;
+import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 
-public class CompoundStepParametersItem implements IParametersHandler {
+public class CompoundStepParametersItem extends AbstractParameters {
 
 	public String stepClass;
 	public String parametersLocation;
@@ -34,21 +34,24 @@ public class CompoundStepParametersItem implements IParametersHandler {
 	public IPipelineStep step; // non-serializable
 	public IParameters parameters; // non-serializable
 	
-	public void parameters_reset() {
+	@Override
+	protected void parameters_reset() {
 		
 		enabled = true;
 		stepClass = "";
 		parametersLocation = "";
 	}
 
-	public void parameters_load(ParametersString buffer) {
+	@Override
+	protected void parameters_load(ParametersString buffer) {
 
 		enabled = buffer.getBoolean("enabled", true);
 		stepClass = buffer.getString("stepClass");
 		parametersLocation = buffer.getString("parametersLocation");
 	}
 
-	public void parameters_save(ParametersString buffer) {
+	@Override
+	protected void parameters_save(ParametersString buffer) {
 		
 		buffer.setBoolean("enabled", enabled);
 		buffer.setString("stepClass", stepClass);

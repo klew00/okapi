@@ -111,7 +111,7 @@ public class LanguageListPage extends Composite implements IDialogPage {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 	public boolean save(Object data) {
 		
 		if (data instanceof ArrayList) {

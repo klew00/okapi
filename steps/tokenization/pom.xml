@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>build-steps</artifactId>
 		<groupId>net.sf.okapi.steps</groupId>
-		<version>0.4-SNAPSHOT</version>
+		<version>0.3-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>okapi-step-tokenization</artifactId>
@@ -23,6 +23,11 @@
 			<groupId>com.ibm.icu</groupId>
 			<artifactId>icu4j</artifactId>
 			<version>4.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-common</artifactId>
+			<version>0.3-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

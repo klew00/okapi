@@ -21,26 +21,29 @@
 package net.sf.okapi.steps.tokenization.ui.mapping.model;
 
 import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.filters.plaintext.common.IParametersHandler;
+import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 
-public class MappingItem implements IParametersHandler {
+public class MappingItem extends AbstractParameters {
 
 	public String editorClass;
 	public String parametersClass;
 	
-	public void parameters_load(ParametersString buffer) {
+	@Override
+	protected void parameters_load(ParametersString buffer) {
 		
 		editorClass = buffer.getString("editorClass");
 		parametersClass = buffer.getString("parametersClass");
 	}
 
-	public void parameters_save(ParametersString buffer) {
+	@Override
+	protected void parameters_save(ParametersString buffer) {
 		
 		buffer.setString("editorClass", editorClass);
 		buffer.setString("parametersClass", parametersClass);
 	}
 
-	public void parameters_reset() {
+	@Override
+	protected void parameters_reset() {
 		
 		editorClass = "";
 		parametersClass = "";

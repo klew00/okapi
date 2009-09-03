@@ -37,7 +37,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-public abstract class AbstractBaseDialog {
+public abstract class AbstractBaseDialog <T extends Composite> {
 
 	static final public String REGISTER_DIALOG_PAGE = "REGISTER_DIALOG_PAGE"; 
 	static final public String UNREGISTER_DIALOG_PAGE = "UNREGISTER_DIALOG_PAGE";
@@ -50,7 +50,7 @@ public abstract class AbstractBaseDialog {
 	private IHelp help;
 	protected IDialogPage page;
 	protected Composite pageC;
-	private Class<?> pageClass;
+	private Class<T> pageClass;
 
 	protected int getStyle() {
 		
@@ -61,7 +61,6 @@ public abstract class AbstractBaseDialog {
 	protected abstract void init();
 	protected abstract void done();
 	
-	@SuppressWarnings("unchecked")
 	protected void create (Shell p_Parent) {
 				
 		try {	
@@ -82,9 +81,8 @@ public abstract class AbstractBaseDialog {
 			
 							
 			if (pageClass == null) return;
-			if (!Composite.class.isAssignableFrom(pageClass)) return;
 				
-			Constructor<Composite> cc = (Constructor<Composite>) pageClass.getConstructor(new Class[] {Composite.class, int.class});
+			Constructor<T> cc = (Constructor<T>) pageClass.getConstructor(new Class[] {Composite.class, int.class});
 			
 			if (cc == null) return;
 			
@@ -181,7 +179,7 @@ public abstract class AbstractBaseDialog {
 		Dialogs.centerWindow(shell, p_Parent);
 	}
 	
-	protected boolean run(Shell parent, Class<?> pageClass, String caption, Object initialData, IHelp help) {
+	protected boolean run(Shell parent, Class<T> pageClass, String caption, Object initialData, IHelp help) {
 		
 		try {
 			//if (parent.getClass().isAssignableFrom(this.getClass()));

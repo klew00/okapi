@@ -21,9 +21,9 @@
 package net.sf.okapi.steps.tokenization.tokens;
 
 import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.filters.plaintext.common.IParametersHandler;
+import net.sf.okapi.filters.plaintext.common.AbstractParameters;
 
-public class TokenType implements IParametersHandler {
+public class TokenType extends AbstractParameters {
 
 	final static public String UNKNOWN 			= "UNKNOWN";
 	final static public String WORD 			= "WORD"; 
@@ -41,7 +41,6 @@ public class TokenType implements IParametersHandler {
 	
 	public String id;
 	public String description;
-//	public int value;
 	
 	public TokenType() {
 		
@@ -54,24 +53,24 @@ public class TokenType implements IParametersHandler {
 		
 		this.id = id;
 		this.description = description;
-//		this.value = value;
 	}
 
-	public void parameters_load(ParametersString buffer) {
+	@Override
+	protected void parameters_load(ParametersString buffer) {
 		
 		id = buffer.getString("id");
 		description = buffer.getString("description");
-//		value = buffer.getInteger("value");
 	}
 	
-	public void parameters_save(ParametersString buffer) {
+	@Override
+	protected void parameters_save(ParametersString buffer) {
 		
 		buffer.setString("id", id);
 		buffer.setString("description", description);
-//		buffer.setInteger("value", value);
 	}
 
-	public void parameters_reset() {
+	@Override
+	protected void parameters_reset() {
 		
 		id = "";
 		description = "";
