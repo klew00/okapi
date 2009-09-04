@@ -12,6 +12,7 @@ import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
 import java.util.List;
+import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
 import net.sf.okapi.tm.pensieve.tmx.TMXHandler;
 
 /**
@@ -66,6 +67,12 @@ public class PensieveWriter implements TMWriter {
         if (!tu.isTargetEmpty()){
             doc.add(createField(TranslationUnitFields.TARGET, tu.getTarget(), Field.Store.YES, Field.Index.NO));
         }
+//        if (!tu.getMetadata().containsKey(MetaDataTypes.SOURCE_LANG)){
+//            doc.add(createField(TranslationUnitFields.SOURCE_LANG, tu, MetaDataTypes.SOURCE_LANG, Field.Store.YES, Field.Index.NO));
+//        }
+//        if (!tu.getMetadata().containsKey(MetaDataTypes.TARGET_LANG)){
+//            doc.add(createField(TranslationUnitFields.TARGET_LANG, tu, MetaDataTypes.TARGET_LANG, Field.Store.YES, Field.Index.NO));
+//        }
         return doc;
     }
 
@@ -74,6 +81,14 @@ public class PensieveWriter implements TMWriter {
                   Field.Store store,
                   Field.Index index){
         return new Field(field.name(), frag.toString(), store, index);
+    }
+
+    Field createField(TranslationUnitFields field,
+                  TranslationUnit tu,
+                  MetaDataTypes mdt,
+                  Field.Store store,
+                  Field.Index index){
+        return new Field(field.name(), tu.getMetadata().get(mdt).toString(), store, index);
     }
 
 }

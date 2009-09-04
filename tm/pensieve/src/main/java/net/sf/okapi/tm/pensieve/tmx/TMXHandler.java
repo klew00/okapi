@@ -17,13 +17,19 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
 
-public class TMXHandler {
+public final class TMXHandler {
+
+
+    private TMXHandler() {
+    //this should never be instantiated
+    }
 
     public static List<TranslationUnit> getTranslationUnitsFromTMX(String filename, String sourceLang, String targetLang) {
 
         List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
 
-        List<TextUnit> textunits = getTextUnit(getEventsFromTMX(filename, sourceLang, targetLang));
+        List<TextUnit> textunits = getTextUnit(
+                getEventsFromTMX(filename, sourceLang, targetLang));
 
         for (TextUnit textunit : textunits) {
             TranslationUnit tu = new TranslationUnit();
@@ -39,10 +45,10 @@ public class TMXHandler {
 
     private static List<Event> getEventsFromTMX(String filename, String sourceLang, String targetLang) {
         URI fileURI;
-        try {
+        try {            
             fileURI = TMXHandler.class.getResource(filename).toURI();
         } catch (URISyntaxException use) {
-            throw new RuntimeException(use);
+            throw new IllegalArgumentException(use);
         }
 
         IFilter filter = new TmxFilter();

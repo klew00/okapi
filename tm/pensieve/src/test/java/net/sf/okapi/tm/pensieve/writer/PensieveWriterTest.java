@@ -14,6 +14,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
 
 /**
  * User: Christian Hargraves
@@ -82,10 +83,15 @@ public class PensieveWriterTest {
     @Test
     public void getDocumentValues(){
         String text = "blah blah blah";
-        Document doc = emWriter.getDocument(new TranslationUnit(new TextFragment(text), new TextFragment("someone")));
+        TranslationUnit tu = new TranslationUnit(new TextFragment(text), new TextFragment("someone"));
+        tu.getMetadata().put(MetaDataTypes.SOURCE_LANG, "EN");
+        tu.getMetadata().put(MetaDataTypes.TARGET_LANG, "FR");
+        Document doc = emWriter.getDocument(tu);
         assertEquals("Document's content field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE.name()).stringValue());
         assertEquals("Document's content exact field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE_EXACT.name()).stringValue());
         assertEquals("Document's target field", "someone", doc.getField(TranslationUnitFields.TARGET.name()).stringValue());
+//        assertEquals("Document's source lang field", "EN", doc.getField(TranslationUnitFields.SOURCE_LANG.name()).stringValue());
+//        assertEquals("Document's target lang field", "FR", doc.getField(TranslationUnitFields.TARGET_LANG.name()).stringValue());
     }
 
     @Test
@@ -118,8 +124,8 @@ public class PensieveWriterTest {
     }
 
     @Test
-    public void importTMX() throws IOException {
+    public void importTMXDocCount() throws IOException {
         emWriter.importTMX("/sample_tmx.xml", "EN", "IT");
         assertEquals("entries in TM", 2, emWriter.getIndexWriter().numDocs());
-    }
+    }    
 }

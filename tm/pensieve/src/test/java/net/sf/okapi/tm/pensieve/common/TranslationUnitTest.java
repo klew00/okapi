@@ -32,6 +32,14 @@ public class TranslationUnitTest {
     }
 
     @Test
+    public void metaDataSetter(){
+        tu = new TranslationUnit(SOURCE, CONTENT);
+        MetaData md = new MetaData();
+        tu.setMetadata(md);
+        assertSame("metadata should be the same", md, tu.getMetadata());
+    }
+
+    @Test
     public void isSourceEmptyNull(){
         tu = new TranslationUnit();
         assertTrue("source should be empty", tu.isSourceEmpty());
