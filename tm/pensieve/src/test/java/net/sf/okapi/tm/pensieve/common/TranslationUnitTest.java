@@ -12,8 +12,8 @@ import org.junit.Test;
 public class TranslationUnitTest {
 
     TranslationUnit tu;
-    final static TextFragment SOURCE = new TextFragment("Joe McMac");
-    final static TextFragment CONTENT = new TextFragment("Some content that isn't very long");
+    final static TranslationUnitValue SOURCE = new TranslationUnitValue("EN", new TextFragment("Joe McMac"));
+    final static TranslationUnitValue CONTENT = new TranslationUnitValue("EN", new TextFragment("Some content that isn't very long"));
 
     @Test
     public void noArgConstructor(){
@@ -48,14 +48,14 @@ public class TranslationUnitTest {
     @Test
     public void isSourceEmptyEmpty(){
         tu = new TranslationUnit();
-        tu.setSource(new TextFragment(""));
+        tu.setSource(new TranslationUnitValue("EN", new TextFragment("")));
         assertTrue("source should be empty", tu.isSourceEmpty());
     }
 
     @Test
     public void isSourceEmptyNotEmpty(){
         tu = new TranslationUnit();
-        tu.setSource(new TextFragment("this is not empty"));
+        tu.setSource(new TranslationUnitValue("EN", new TextFragment("this is not empty")));
         assertFalse("source should not be empty", tu.isSourceEmpty());
     }
 
@@ -68,16 +68,14 @@ public class TranslationUnitTest {
     @Test
     public void isTargetEmptyEmpty(){
         tu = new TranslationUnit();
-        tu.setTarget(new TextFragment(""));
+        tu.setTarget(new TranslationUnitValue("EN", new TextFragment("")));
         assertTrue("target should be empty", tu.isTargetEmpty());
     }
 
     @Test
     public void isTargetEmptyNotEmpty(){
         tu = new TranslationUnit();
-        tu.setTarget(new TextFragment("this is not empty"));
+        tu.setTarget(new TranslationUnitValue("EN", new TextFragment("this is not empty")));
         assertFalse("target should not be empty", tu.isTargetEmpty());
     }
-
-
 }

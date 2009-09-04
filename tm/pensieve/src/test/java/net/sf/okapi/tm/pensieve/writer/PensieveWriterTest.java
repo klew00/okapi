@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitValue;
 
 /**
  * User: Christian Hargraves
@@ -59,7 +60,7 @@ public class PensieveWriterTest {
     }
 
     public void endIndexCommits() throws IOException {
-        emWriter.indexTranslationUnit(new TranslationUnit(new TextFragment("dax"), new TextFragment("is funny (sometimes)")));
+        emWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("dax")), new TranslationUnitValue("ES", new TextFragment("is funny (sometimes)"))));
         emWriter.endIndex();
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed after endIndex", 1, reader.maxDoc());
@@ -67,12 +68,12 @@ public class PensieveWriterTest {
 
     @Test(expected = NullPointerException.class)
     public void getDocumentNoSourceContent(){
-        emWriter.getDocument(new TranslationUnit(null, new TextFragment("some target")));
+        emWriter.getDocument(new TranslationUnit(null, new TranslationUnitValue("EN", new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
     public void getDocumentEmptySourceContent(){
-        emWriter.getDocument(new TranslationUnit(new TextFragment(""), new TextFragment("some target")));
+        emWriter.getDocument(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("")), new TranslationUnitValue("EN", new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
@@ -83,7 +84,7 @@ public class PensieveWriterTest {
     @Test
     public void getDocumentValues(){
         String text = "blah blah blah";
-        TranslationUnit tu = new TranslationUnit(new TextFragment(text), new TextFragment("someone"));
+        TranslationUnit tu = new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(text)), new TranslationUnitValue("EN", new TextFragment("someone")));
         tu.getMetadata().put(MetaDataTypes.SOURCE_LANG, "EN");
         tu.getMetadata().put(MetaDataTypes.TARGET_LANG, "FR");
         Document doc = emWriter.getDocument(tu);
@@ -96,7 +97,7 @@ public class PensieveWriterTest {
 
     @Test
     public void getDocumentNoTarget(){
-        Document doc = emWriter.getDocument(new TranslationUnit(new TextFragment("blah blah blah"), null));
+        Document doc = emWriter.getDocument(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("blah blah blah")), null));
         assertNull("Document's target field should be null", doc.getField(TranslationUnitFields.TARGET.name()));
     }
 
@@ -112,14 +113,14 @@ public class PensieveWriterTest {
 
     @Test
     public void indexTranslationUnitBeforeCommit() throws IOException {
-        emWriter.indexTranslationUnit(new TranslationUnit(new TextFragment("dax"), new TextFragment("is funny (sometimes)")));
+        emWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("dax")), new TranslationUnitValue("EN", new TextFragment("is funny (sometimes)"))));
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed before endIndex", 0, reader.maxDoc());
     }
 
     @Test
     public void indexTextUnit() throws IOException {
-        emWriter.indexTranslationUnit(new TranslationUnit(new TextFragment("joe"), new TextFragment("schmoe")));
+        emWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("joe")), new TranslationUnitValue("EN", new TextFragment("schmoe"))));
         assertEquals("num of docs indexed", 1, emWriter.getIndexWriter().numDocs());
     }
 

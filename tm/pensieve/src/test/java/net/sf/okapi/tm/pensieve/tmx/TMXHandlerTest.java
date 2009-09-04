@@ -64,8 +64,8 @@ public class TMXHandlerTest {
     
     @Test
     public void SourceAndTargetForExistingLang() {
-        assertEquals("first match source", "hello", italian_tus.get(0).getSource().toString());
-        assertEquals("first match target", "ciao", italian_tus.get(0).getTarget().toString());
+        assertEquals("first match source", "hello", italian_tus.get(0).getSource().getContent().toString());
+        assertEquals("first match target", "ciao", italian_tus.get(0).getTarget().getContent().toString());
     }
 
     @Test
@@ -79,8 +79,8 @@ public class TMXHandlerTest {
     @Test
     public void SourceAndTargetForNonExistingLang() {
         assertEquals("first match source", "hello",
-                nonExistantLang_tus.get(0).getSource().toString());
+                nonExistantLang_tus.get(0).getSource().getContent().toString());
         assertNull("target for non-existant language should be null",
-                nonExistantLang_tus.get(0).getTarget());
+                nonExistantLang_tus.get(0).getTarget().getContent());
     }
 }

@@ -62,10 +62,10 @@ public class PensieveWriter implements TMWriter {
             throw new NullPointerException("source content not set");
         }
         Document doc = new Document();
-        doc.add(createField(TranslationUnitFields.SOURCE, tu.getSource(), Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(createField(TranslationUnitFields.SOURCE_EXACT, tu.getSource(), Field.Store.NO, Field.Index.NOT_ANALYZED));
+        doc.add(createField(TranslationUnitFields.SOURCE, tu.getSource().getContent(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(createField(TranslationUnitFields.SOURCE_EXACT, tu.getSource().getContent(), Field.Store.NO, Field.Index.NOT_ANALYZED));
         if (!tu.isTargetEmpty()){
-            doc.add(createField(TranslationUnitFields.TARGET, tu.getTarget(), Field.Store.YES, Field.Index.NO));
+            doc.add(createField(TranslationUnitFields.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
         }
 //        if (!tu.getMetadata().containsKey(MetaDataTypes.SOURCE_LANG)){
 //            doc.add(createField(TranslationUnitFields.SOURCE_LANG, tu, MetaDataTypes.SOURCE_LANG, Field.Store.YES, Field.Index.NO));
@@ -83,12 +83,12 @@ public class PensieveWriter implements TMWriter {
         return new Field(field.name(), frag.toString(), store, index);
     }
 
-    Field createField(TranslationUnitFields field,
-                  TranslationUnit tu,
-                  MetaDataTypes mdt,
-                  Field.Store store,
-                  Field.Index index){
-        return new Field(field.name(), tu.getMetadata().get(mdt).toString(), store, index);
-    }
+//    Field createField(TranslationUnitFields field,
+//                  TranslationUnit tu,
+//                  MetaDataTypes mdt,
+//                  Field.Store store,
+//                  Field.Index index){
+//        return new Field(field.name(), tu.getMetadata().get(mdt).toString(), store, index);
+//    }
 
 }

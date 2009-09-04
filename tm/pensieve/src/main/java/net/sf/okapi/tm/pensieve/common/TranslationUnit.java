@@ -1,15 +1,13 @@
 package net.sf.okapi.tm.pensieve.common;
 
-import net.sf.okapi.common.resource.TextFragment;
-
 /**
  * User: Christian Hargraves
  * Date: Aug 19, 2009
  * Time: 6:53:34 AM
  */
 public class TranslationUnit {
-    private TextFragment source;
-    private TextFragment target;
+    private TranslationUnitValue source;
+    private TranslationUnitValue target;
     private MetaData metadata;
 
     public MetaData getMetadata() {
@@ -25,25 +23,25 @@ public class TranslationUnit {
         metadata = new MetaData();
     }
 
-    public TranslationUnit(TextFragment source, TextFragment target) {
+    public TranslationUnit(TranslationUnitValue source, TranslationUnitValue target) {
         this();
         this.source = source;
         this.target = target;
     }
 
-    public TextFragment getSource() {
+    public TranslationUnitValue getSource() {
         return source;
     }
 
-    public TextFragment getTarget() {
+    public TranslationUnitValue getTarget() {
         return target;
     }
 
-    public void setSource(TextFragment source) {
+    public void setSource(TranslationUnitValue source) {
         this.source = source;
     }
 
-    public void setTarget(TextFragment target) {
+    public void setTarget(TranslationUnitValue target) {
         this.target = target;
     }
 
@@ -55,7 +53,7 @@ public class TranslationUnit {
         return isFragmentEmpty(target);
     }
 
-    private static boolean isFragmentEmpty(TextFragment frag){
-        return frag == null || frag.isEmpty();
+    private static boolean isFragmentEmpty(TranslationUnitValue frag){
+        return frag == null || frag.getContent().isEmpty();
     }
 }

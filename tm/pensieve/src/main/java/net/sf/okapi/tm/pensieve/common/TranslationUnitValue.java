@@ -11,7 +11,7 @@ import net.sf.okapi.common.resource.TextFragment;
  *
  * @author HaslamJD
  */
-class TranslationUnitValue {
+public class TranslationUnitValue {
     private String lang;
     private TextFragment content;
 

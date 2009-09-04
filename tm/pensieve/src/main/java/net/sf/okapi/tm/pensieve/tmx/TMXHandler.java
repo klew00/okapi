@@ -16,6 +16,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitValue;
 
 public final class TMXHandler {
 
@@ -33,9 +34,9 @@ public final class TMXHandler {
 
         for (TextUnit textunit : textunits) {
             TranslationUnit tu = new TranslationUnit();
-            tu.setSource(textunit.getSourceContent());
+            tu.setSource(new TranslationUnitValue(sourceLang, textunit.getSourceContent()));
             tu.getMetadata().put(MetaDataTypes.SOURCE_LANG, sourceLang);
-            tu.setTarget(textunit.getTargetContent(targetLang));
+            tu.setTarget(new TranslationUnitValue(targetLang, textunit.getTargetContent(targetLang)));
             tu.getMetadata().put(MetaDataTypes.TARGET_LANG, targetLang);
             tus.add(tu);
         }
