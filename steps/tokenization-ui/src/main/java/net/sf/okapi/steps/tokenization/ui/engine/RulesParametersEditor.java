@@ -18,59 +18,38 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.common;
+package net.sf.okapi.steps.tokenization.ui.engine;
 
-import net.sf.okapi.common.ui.abstracteditor.AbstractListTab;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
 
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.Widget;
 
-public abstract class CompoundStepItemsTab extends AbstractListTab {
+public class RulesParametersEditor extends AbstractParametersEditor {
 
-	public CompoundStepItemsTab(Composite parent, int style) {
+	@Override
+	protected void createPages(TabFolder pageContainer) {
 		
-		super(parent, style);
+		addPage("Rules", RulesTab.class);
 	}
 
 	@Override
-	protected String getAddButtonCaption() {
+	public IParameters createParameters() {
 
-		return "Add...";
+		return null;
 	}
 
 	@Override
-	protected String getListDescription() {
-
-		return "Listed below are internal steps in the order of invocation.";
+	protected String getCaption() {
+		
+		return "Rules";
 	}
 
 	@Override
-	protected String getModifyButtonCaption() {
+	protected void interop(Widget speaker) {
 
-		return "Modify...";
-	}
-
-	@Override
-	protected String getRemoveButtonCaption() {
-
-		return "Remove";
-	}
-
-	@Override
-	protected boolean getUpDownVisible() {
-
-		return true;
-	}
-
-	@Override
-	protected String getMoveDownButtonCaption() {
-
-		return "Move Down";
-	}
-
-	@Override
-	protected String getMoveUpButtonCaption() {
-
-		return "Move Up";
+		
 	}
 
 }

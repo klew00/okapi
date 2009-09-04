@@ -18,59 +18,73 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.common;
-
-import net.sf.okapi.common.ui.abstracteditor.AbstractListTab;
+package net.sf.okapi.steps.tokenization.ui.engine;
 
 import org.eclipse.swt.widgets.Composite;
 
-public abstract class CompoundStepItemsTab extends AbstractListTab {
+import net.sf.okapi.steps.tokenization.ui.common.CompoundStepItemsTab;
 
-	public CompoundStepItemsTab(Composite parent, int style) {
+public class TokenizersTab extends CompoundStepItemsTab {
+
+	public TokenizersTab(Composite parent, int style) {
 		
 		super(parent, style);
 	}
 
-	@Override
-	protected String getAddButtonCaption() {
-
-		return "Add...";
+	public boolean canClose(boolean isOK) {
+		
+		return true;
 	}
 
-	@Override
-	protected String getListDescription() {
+	public boolean load(Object data) {
 
-		return "Listed below are internal steps in the order of invocation.";
+		return true;
 	}
 
-	@Override
-	protected String getModifyButtonCaption() {
-
-		return "Modify...";
-	}
-
-	@Override
-	protected String getRemoveButtonCaption() {
-
-		return "Remove";
-	}
-
-	@Override
-	protected boolean getUpDownVisible() {
+	public boolean save(Object data) {
 
 		return true;
 	}
 
 	@Override
-	protected String getMoveDownButtonCaption() {
+	protected String getListDescription() {
 
-		return "Move Down";
+		return "Listed below are internal tokenizers in the order of invocation.";
 	}
 
 	@Override
-	protected String getMoveUpButtonCaption() {
-
-		return "Move Up";
+	protected void actionAdd(int afterIndex) {
+		// TODO Auto-generated method stub
+		
+		System.out.println("add");
 	}
 
+	@Override
+	protected void actionDown(int itemIndex) {
+		// TODO Auto-generated method stub
+		
+		System.out.println("down");
+	}
+
+	@Override
+	protected void actionModify(int itemIndex) {
+		// TODO Auto-generated method stub
+		
+		System.out.println("modify");
+	}
+
+	@Override
+	protected boolean actionRemove(int itemIndex) {
+		// TODO Auto-generated method stub
+		
+		System.out.println("remove");
+		return false;
+	}
+
+	@Override
+	protected void actionUp(int itemIndex) {
+		// TODO Auto-generated method stub
+	
+		System.out.println("up");
+	}
 }

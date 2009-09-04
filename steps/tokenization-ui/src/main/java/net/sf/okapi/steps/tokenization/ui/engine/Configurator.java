@@ -4,7 +4,6 @@ import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
 import net.sf.okapi.steps.tokenization.common.CompoundStepParameters;
-import net.sf.okapi.steps.tokenization.ui.common.CompoundStepItemsTab;
 
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Widget;
@@ -22,7 +21,7 @@ public class Configurator extends AbstractParametersEditor {
 	@Override
 	protected void createPages(TabFolder pageContainer) {
 		
-		addPage("Tokenizers", CompoundStepItemsTab.class);
+		addPage("Tokenizers", TokenizersTab.class);
 	}
 
 	@Override

@@ -521,17 +521,17 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 		control.addListener(eventType, this);
 	}
 
-	protected void addSpeaker(Class<?> pageClass, String controlName) {
+	protected void addSpeaker(Class<? extends Composite> pageClass, String controlName) {
 
 		addSpeaker(SWTUtils.findControl(findPage(pageClass), controlName));
 	}
 
-	protected void addSpeaker(Class<?> pageClass, String controlName, int eventType) {
+	protected void addSpeaker(Class<? extends Composite> pageClass, String controlName, int eventType) {
 
 		addSpeaker(SWTUtils.findControl(findPage(pageClass), controlName), eventType);
 	}
 
-	protected Control findControl(Class<?> pageClass, String controlName) {
+	protected Control findControl(Class<? extends Composite> pageClass, String controlName) {
 
 		return SWTUtils.findControl(findPage(pageClass), controlName);
 	}
@@ -615,7 +615,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 		return pageContainer;
 	}
 
-	protected Composite findPage(Class<?> pageClass) {
+	protected Composite findPage(Class<? extends Composite> pageClass) {
 
 		for (IDialogPage page : pages) {
 
@@ -629,7 +629,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 		return null;
 	}
 
-	protected Composite findPageInTabs(Class<?> pageClass) {
+	protected Composite findPageInTabs(Class<? extends Composite> pageClass) {
 
 		for (TabItem tabItem : pageContainer.getItems()) {
 
@@ -704,7 +704,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 		interop(event.widget);
 	}
 
-	protected void pageInterop(Class<?> pageClass, Widget speaker) {
+	protected void pageInterop(Class<? extends Composite> pageClass, Widget speaker) {
 
 		Composite page = findPage(pageClass);
 

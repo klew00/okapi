@@ -31,11 +31,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * 
@@ -46,7 +50,9 @@ import org.eclipse.swt.widgets.Text;
 public class SWTUtils {
 
 	public static final String GET_CAPTION = "SWT_GET_CAPTION";
-
+	private static Listener listener = null;
+	private static Event lastEvent = null;
+	
 // Enabling/disabling
 	
 	/**
@@ -131,6 +137,22 @@ public class SWTUtils {
 		return !getEnabled(control);		
 	}
 	
+// Visibility	
+	
+	public static void setVisible(Control control, boolean visible) {
+
+		if (control == null) return;
+		
+		control.setVisible(visible);
+	}
+	
+	public static boolean getVisible(Control control) {
+		
+		if (control == null) return false;
+		
+		return control.getVisible();		
+	}
+	
 // Selection / unselection
 
 	public static boolean getSelected(Control control) {
@@ -160,6 +182,21 @@ public class SWTUtils {
 		
 		((Button) control).setGrayed(grayed);
 	}
+	
+	public static int getSelection(Control control) {
+		
+		if (!(control instanceof org.eclipse.swt.widgets.List)) return -1;
+		
+		return ((org.eclipse.swt.widgets.List) control).getSelectionIndex();
+	}
+	
+	public static int getNumItems(Control control) {
+		
+		if (!(control instanceof org.eclipse.swt.widgets.List)) return 0;
+		
+		return ((org.eclipse.swt.widgets.List) control).getItemCount();
+	}
+	
 	
 // Input query
 	
@@ -438,11 +475,75 @@ public class SWTUtils {
 			setEnabled(target, false);
 	}
 
+	/**
+	 * 	Sets text of the given control.
+	 * @param control the control to set text
+	 * @param text the text to set <p>
+	 * <li>text = null - don't change existing control's text
+	 * <li>text = "" - set empty text
+	 */
 	public static void setText(Control control, String text) {
 		
 		if (control == null) return;
-		if (!(control instanceof Text)) return;
+		if (text == null) return;
 		
-		((Text) control).setText(text);
+		if (control instanceof Text)		
+			((Text) control).setText(text);
+		
+		if (control instanceof Label)		
+			((Label) control).setText(text);
+		
+		if (control instanceof Button)		
+			((Button) control).setText(text);
 	}
+	
+	protected static void addSpeaker(Composite page, Control control) {
+
+		addSpeaker(page, control, SWT.Selection);	
+	}
+	
+	public static Event getEvent() {
+		
+		return lastEvent;
+	}
+	
+	public static int getEventType() {
+		
+		if (lastEvent == null) return SWT.None;
+		
+		return lastEvent.type;
+	}
+	
+	public static void addSpeaker(Composite page, Control control, int eventType) {
+	
+		class LocalListener implements Listener {
+
+			public void handleEvent(Event event) {
+		
+				lastEvent = event;
+				Widget speaker = event.widget;
+				if (speaker == null) return;
+				
+				IDialogPage page = (IDialogPage) speaker.getData("page");
+				if (page == null) return;
+				
+				page.interop(speaker);
+			}			
+		}
+
+		if (control == null) return;
+		if (!(page instanceof IDialogPage)) return;
+
+		if (listener == null)
+			listener = new LocalListener();
+		
+		control.setData("page", page);
+		control.addListener(eventType, listener);
+	}
+	
+	public static void addSpeaker(Composite page, String controlName) {
+
+		addSpeaker(page, findControl(page, controlName));
+	}
+	
 }

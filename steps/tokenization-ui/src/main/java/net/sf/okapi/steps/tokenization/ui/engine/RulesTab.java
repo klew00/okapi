@@ -18,59 +18,104 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.common;
-
-import net.sf.okapi.common.ui.abstracteditor.AbstractListTab;
+package net.sf.okapi.steps.tokenization.ui.engine;
 
 import org.eclipse.swt.widgets.Composite;
 
-public abstract class CompoundStepItemsTab extends AbstractListTab {
+import net.sf.okapi.common.ui.abstracteditor.AbstractListTab;
 
-	public CompoundStepItemsTab(Composite parent, int style) {
+public class RulesTab extends AbstractListTab {
+
+	public RulesTab(Composite parent, int style) {
 		
 		super(parent, style);
 	}
 
 	@Override
 	protected String getAddButtonCaption() {
-
-		return "Add...";
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	protected String getListDescription() {
-
-		return "Listed below are internal steps in the order of invocation.";
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	protected String getModifyButtonCaption() {
-
-		return "Modify...";
-	}
-
-	@Override
-	protected String getRemoveButtonCaption() {
-
-		return "Remove";
-	}
-
-	@Override
-	protected boolean getUpDownVisible() {
-
-		return true;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	protected String getMoveDownButtonCaption() {
-
-		return "Move Down";
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	protected String getMoveUpButtonCaption() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-		return "Move Up";
+	@Override
+	protected String getRemoveButtonCaption() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected boolean getUpDownVisible() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean canClose(boolean isOK) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean load(Object data) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean save(Object data) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected void actionAdd(int afterIndex) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void actionDown(int itemIndex) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void actionModify(int itemIndex) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected boolean actionRemove(int itemIndex) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected void actionUp(int itemIndex) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
