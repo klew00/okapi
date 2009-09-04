@@ -24,55 +24,71 @@ public class OkapiTMXHandlerTest {
     List<TranslationUnit> italian_tus;
     List<TranslationUnit> nonExistantLang_tus;
     private final String sampleTMX = "/sample_tmx.xml";
+    TMXHandler handler;
+
     @Before
     public void setUp() {
-        italian_tus = OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "IT");
-        nonExistantLang_tus = OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "FR");
+        handler = new OkapiTMXHandler(sampleTMX, "EN");
+        italian_tus = handler.getTranslationUnitsFromTMX("IT");
+        nonExistantLang_tus = handler.getTranslationUnitsFromTMX("FR");
     }
 
-    @Test(expected=NullPointerException.class)
-    public void nonExistantFile() {
-        OkapiTMXHandler.getTranslationUnitsFromTMX("/filethathasnochanceofexisting.xml", "EN", "FR");
+    public void constructorNullFile() {
+        String errMsg = null;
+        try{
+            new OkapiTMXHandler("", "EN");
+        }catch(IllegalArgumentException iae){
+            errMsg = iae.getMessage();
+        }
+        assertEquals("Error message", "both filename and sourceLang must be set", errMsg);
     }
 
-    @Test(expected=NullPointerException.class)
-    public void EmptySourceLang() {
-        OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "", "FR");
+    public void constructorEmptySourceLang() {
+        String errMsg = null;
+        try{
+            new OkapiTMXHandler(sampleTMX, "");
+        }catch(IllegalArgumentException iae){
+            errMsg = iae.getMessage();
+        }
+        assertEquals("Error message", "both filename and sourceLang must be set", errMsg);
     }
 
-    @Test(expected=NullPointerException.class)
-    public void NullSourceLang() {
-        OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, null, "FR");
+    public void constructornonExistantFile() {
+        String errMsg = null;
+        try{
+            new OkapiTMXHandler("/filethathasnochanceofexisting.xml", "EN");
+        }catch(IllegalArgumentException iae){
+            errMsg = iae.getMessage();
+        }
+        assertEquals("Error message", "/filethathasnochanceofexisting.xml was not found!", errMsg);
     }
 
-    @Test(expected=NullPointerException.class)
-    public void EmptyTargetLang() {
-        OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "");
+    public void getTranslationUnitsFromTMXEmptyTargetLang() {
+        assertEquals("# found on empty target lang", 0, handler.getTranslationUnitsFromTMX("").size());
     }
 
-    @Test(expected=NullPointerException.class)
-    public void NullTargetLang() {
-        OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", null);
+    public void getTranslationUnitsFromTMXNullTargetLang() {
+        assertEquals("# found on empty target lang", 0, handler.getTranslationUnitsFromTMX("").size());
     }
 
     @Test
-    public void TUCount_ExistingLang() {
+    public void tUCount_ExistingLang() {
         assertEquals("number of TUs", 2, italian_tus.size());
     }
 
     @Test
-    public void TUCount_NonExistingLang() {
+    public void tUCount_NonExistingLang() {
         assertEquals("number of TUs", 2, nonExistantLang_tus.size());
     }
     
     @Test
-    public void SourceAndTargetForExistingLang() {
+    public void sourceAndTargetForExistingLang() {
         assertEquals("first match source", "hello", italian_tus.get(0).getSource().getContent().toString());
         assertEquals("first match target", "ciao", italian_tus.get(0).getTarget().getContent().toString());
     }
 
     @Test
-    public void SourceAndTargetForNonExistingLang() {
+    public void sourceAndTargetForNonExistingLang() {
         assertEquals("first match source", "hello",
                 nonExistantLang_tus.get(0).getSource().getContent().toString());
         assertNull("target for non-existant language should be null",
