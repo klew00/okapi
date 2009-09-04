@@ -1,10 +1,13 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.tm.pensieve.common.TMHit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitValue;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -14,9 +17,6 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.okapi.tm.pensieve.common.TMHit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitValue;
-import org.apache.lucene.document.Field;
 
 /**
  * @author Christian Hargraves
@@ -81,8 +81,10 @@ public class TMSeeker implements Seeker {
     }
 
     TranslationUnit getTranslationUnit(Document doc) {
-        return new TranslationUnit(new TranslationUnitValue(getFieldValue(doc, TranslationUnitFields.SOURCE_LANG), new TextFragment(getFieldValue(doc, TranslationUnitFields.SOURCE))),
-                                   new TranslationUnitValue(getFieldValue(doc, TranslationUnitFields.TARGET_LANG), new TextFragment(getFieldValue(doc, TranslationUnitFields.TARGET))));
+        return new TranslationUnit(new TranslationUnitValue(getFieldValue(doc, TranslationUnitFields.SOURCE_LANG),
+                new TextFragment(getFieldValue(doc, TranslationUnitFields.SOURCE))),
+                new TranslationUnitValue(getFieldValue(doc, TranslationUnitFields.TARGET_LANG),
+                        new TextFragment(getFieldValue(doc, TranslationUnitFields.TARGET))));
     }
 
     String getFieldValue(Document doc, TranslationUnitFields field){

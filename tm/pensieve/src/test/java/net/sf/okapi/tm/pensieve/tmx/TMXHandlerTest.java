@@ -5,12 +5,15 @@
 
 package net.sf.okapi.tm.pensieve.tmx;
 
-import java.util.List;
-import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import java.util.List;
 
 /**
  *
@@ -69,18 +72,22 @@ public class TMXHandlerTest {
     }
 
     @Test
-    public void MetaDataForExistingLang() {
-        assertEquals("first match source_lang", "EN",
-                italian_tus.get(0).getMetadata().get(MetaDataTypes.SOURCE_LANG));
-        assertEquals("first match target", "IT",
-                italian_tus.get(0).getMetadata().get(MetaDataTypes.TARGET_LANG));
-    }
-
-    @Test
     public void SourceAndTargetForNonExistingLang() {
         assertEquals("first match source", "hello",
                 nonExistantLang_tus.get(0).getSource().getContent().toString());
         assertNull("target for non-existant language should be null",
                 nonExistantLang_tus.get(0).getTarget().getContent());
     }
+
+    @Test
+    public void convertTranslationUnit(){
+        TextUnit textUnit = new TextUnit("someId", "some great text");
+        textUnit.setTargetContent("kr", new TextFragment("some great text in Korean"));
+        TranslationUnit tu = TMXHandler.convertTranslationUnit("en", "kr", textUnit);
+        assertEquals("sourceLang", "en", tu.getSource().getLang());
+        assertEquals("source content", "some great text", tu.getSource().getContent().toString());
+        assertEquals("targetLang", "kr", tu.getTarget().getLang());
+        assertEquals("target content", "some great text in Korean", tu.getTarget().getContent().toString());
+    }
+
 }
