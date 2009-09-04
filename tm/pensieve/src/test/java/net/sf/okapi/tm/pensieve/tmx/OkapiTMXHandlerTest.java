@@ -5,14 +5,17 @@
 
 package net.sf.okapi.tm.pensieve.tmx;
 
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.writer.TMWriter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,26 +26,29 @@ public class OkapiTMXHandlerTest {
 
     List<TranslationUnit> italian_tus;
     List<TranslationUnit> nonExistantLang_tus;
-    private final String sampleTMX = "/sample_tmx.xml";
+    private URI sampleTMX;
     TMXHandler handler;
 
     @Before
-    public void setUp() {
+    public void setUp() throws URISyntaxException {
+        sampleTMX = this.getClass().getResource("/sample_tmx.xml").toURI();
         handler = new OkapiTMXHandler(sampleTMX, "EN");
         italian_tus = handler.getTranslationUnitsFromTMX("IT");
         nonExistantLang_tus = handler.getTranslationUnitsFromTMX("FR");
     }
 
+    @Test
     public void constructorNullFile() {
         String errMsg = null;
         try{
-            new OkapiTMXHandler("", "EN");
+            new OkapiTMXHandler(null, "EN");
         }catch(IllegalArgumentException iae){
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "both filename and sourceLang must be set", errMsg);
+        assertEquals("Error message", "both uri and sourceLang must be set", errMsg);
     }
 
+    @Test
     public void constructorEmptySourceLang() {
         String errMsg = null;
         try{
@@ -50,25 +56,17 @@ public class OkapiTMXHandlerTest {
         }catch(IllegalArgumentException iae){
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "both filename and sourceLang must be set", errMsg);
+        assertEquals("Error message", "both uri and sourceLang must be set", errMsg);
     }
 
-    public void constructornonExistantFile() {
-        String errMsg = null;
-        try{
-            new OkapiTMXHandler("/filethathasnochanceofexisting.xml", "EN");
-        }catch(IllegalArgumentException iae){
-            errMsg = iae.getMessage();
-        }
-        assertEquals("Error message", "/filethathasnochanceofexisting.xml was not found!", errMsg);
-    }
-
+    @Test(expected=IllegalArgumentException.class)
     public void getTranslationUnitsFromTMXEmptyTargetLang() {
         assertEquals("# found on empty target lang", 0, handler.getTranslationUnitsFromTMX("").size());
     }
 
+    @Test(expected=IllegalArgumentException.class)
     public void getTranslationUnitsFromTMXNullTargetLang() {
-        assertEquals("# found on empty target lang", 0, handler.getTranslationUnitsFromTMX("").size());
+        assertEquals("# found on empty target lang", 0, handler.getTranslationUnitsFromTMX(null).size());
     }
 
     @Test
@@ -95,15 +93,27 @@ public class OkapiTMXHandlerTest {
                 nonExistantLang_tus.get(0).getTarget().getContent());
     }
 
+    //An example of a Stub. I will likely change this to a Mock later
     @Test
-    public void convertTranslationUnit(){
-        TextUnit textUnit = new TextUnit("someId", "some great text");
-        textUnit.setTargetContent("kr", new TextFragment("some great text in Korean"));
-        TranslationUnit tu = OkapiTMXHandler.convertTranslationUnit("en", "kr", textUnit);
-        assertEquals("sourceLang", "en", tu.getSource().getLang());
-        assertEquals("source content", "some great text", tu.getSource().getContent().toString());
-        assertEquals("targetLang", "kr", tu.getTarget().getLang());
-        assertEquals("target content", "some great text in Korean", tu.getTarget().getContent().toString());
+    public void importTMXDocCount() throws IOException {
+        StubTMWriter tmWriter = new StubTMWriter();
+
+        handler.importTMX("EN", tmWriter);
+        assertEquals("entries indexed", 2, tmWriter.tus.size());
     }
+
+    public class StubTMWriter implements TMWriter{
+        protected boolean endIndexCalled = false;
+        protected List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
+        public void endIndex() throws IOException {
+
+        }
+
+        public void indexTranslationUnit(TranslationUnit tu) throws IOException {
+            tus.add(tu);
+        }
+    }
+
+
 
 }

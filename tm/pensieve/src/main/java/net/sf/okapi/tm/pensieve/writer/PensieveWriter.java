@@ -3,7 +3,6 @@ package net.sf.okapi.tm.pensieve.writer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
-import net.sf.okapi.tm.pensieve.tmx.OkapiTMXHandler;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -12,7 +11,6 @@ import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * User: Christian Hargraves
@@ -40,13 +38,6 @@ public class PensieveWriter implements TMWriter {
 
     public IndexWriter getIndexWriter(){
         return writer;
-    }
-
-    public void importTMX(String file, String sourceLang, String targetLang) throws IOException {
-        List<TranslationUnit> tus = new OkapiTMXHandler(file, sourceLang).getTranslationUnitsFromTMX(targetLang);
-        for(TranslationUnit tu : tus) {
-            indexTranslationUnit(tu);
-        }
     }
 
     public void indexTranslationUnit(TranslationUnit tu) throws IOException {

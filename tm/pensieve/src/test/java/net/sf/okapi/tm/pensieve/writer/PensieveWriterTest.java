@@ -125,12 +125,6 @@ public class PensieveWriterTest {
     }
 
     @Test
-    public void importTMXDocCount() throws IOException {
-        tmWriter.importTMX("/sample_tmx.xml", "EN", "IT");
-        assertEquals("entries in TM", 2, tmWriter.getIndexWriter().numDocs());
-    }
-
-    @Test
     public void validateTUNoSourceLang(){
 
     }

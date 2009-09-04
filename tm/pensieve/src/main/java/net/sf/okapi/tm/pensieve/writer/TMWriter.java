@@ -17,5 +17,4 @@ public interface TMWriter {
 
     void indexTranslationUnit(TranslationUnit tu) throws IOException;
 
-    void importTMX(String file, String sourceLang, String targetLang) throws IOException;
 }

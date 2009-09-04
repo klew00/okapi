@@ -7,6 +7,7 @@ package net.sf.okapi.tm.pensieve.common;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import net.sf.okapi.tm.pensieve.Helper;
 
 /**
  *
@@ -14,10 +15,14 @@ import static org.junit.Assert.*;
  */
 public class MatchScorerTest {
 
+    @Test
+    public void stupidTestOnlyForCoverage() throws Exception {
+        Helper.genericTestConstructor(MatchScorer.class);
+    }
 
     @Test
     public void scoreExactMatch() {
-        assertEquals("exact match score", 0.0, MatchScorer.scoreMatch("DOG", "DOG"), 0.0);
+        assertEquals("exact match score", 100.0, MatchScorer.scoreMatch("DOG", "DOG"), 0.0);
     }
 
     @Test

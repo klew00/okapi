@@ -10,16 +10,15 @@ package net.sf.okapi.tm.pensieve.common;
  */
 public final class MatchScorer {
 
-    private MatchScorer() {
-    //should never be instantiated
-    }
+    private MatchScorer(){}
 
     public static Float scoreMatch(String query, String match) {
-        Float score = 0.0f;
+        Float score;
         if (query.equals(match)) {
             score = 100.0f;
+        }else{
+            score = (float)levenshtein(query, match);
         }
-        score = new Float(levenshtein(query, match));
         return score;
     }
 

@@ -11,60 +11,51 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.tmx.TmxFilter;
+import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitValue;
+import net.sf.okapi.tm.pensieve.writer.TMWriter;
 
+import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OkapiTMXHandler implements TMXHandler{
 
-    private URI filename;
+    private URI uri;
     private String sourceLang;
 
-    public OkapiTMXHandler(String filename, String sourceLang) {
-        if (Util.isEmpty(filename) || Util.isEmpty(sourceLang)){
-            throw new IllegalArgumentException("both filename and sourceLang must be set");
+    public OkapiTMXHandler(URI uri, String sourceLang) {
+        if (uri == null || Util.isEmpty(sourceLang)){
+            throw new IllegalArgumentException("both uri and sourceLang must be set");
         }
-        URL tmpFile = this.getClass().getResource(filename);
-        if (tmpFile == null){
-            throw new IllegalArgumentException(filename + " was not found!");
-        }
-        try{
-            this.filename = tmpFile.toURI();
-        }catch(URISyntaxException urise){
-            //How could this happen? It found the file, but couldn't convert it to a URI?
-            //:'( no coverage for this one.
-            throw new IllegalArgumentException(filename + " does not represent a valid URI.", urise);
-        }
-        if (this.filename == null){
-        }
+        this.uri = uri;
         this.sourceLang = sourceLang;
     }
 
     public List<TranslationUnit> getTranslationUnitsFromTMX(String targetLang) {
+        if (Util.isEmpty(targetLang)){
+            throw new IllegalArgumentException("targetLang was not set");
+        }
         List<TextUnit> textUnits = getTextUnits(getEventsFromTMX(targetLang));
         List<TranslationUnit> tus = new ArrayList<TranslationUnit>(textUnits.size());
         for (TextUnit textUnit : textUnits) {
-            tus.add(convertTranslationUnit(sourceLang, targetLang, textUnit));
+            tus.add(PensieveUtil.convertTranslationUnit(sourceLang, targetLang, textUnit));
         }
         return tus;
     }
 
-    public static TranslationUnit convertTranslationUnit(String sourceLang, String targetLang, TextUnit textUnit) {
-        TranslationUnitValue source = new TranslationUnitValue(sourceLang, textUnit.getSourceContent());
-        TranslationUnitValue target = new TranslationUnitValue(targetLang, textUnit.getTargetContent(targetLang));
-        return new TranslationUnit(source, target);
+    public void importTMX(String targetLang, TMWriter tmWriter) throws IOException {
+        List<TranslationUnit> tus = getTranslationUnitsFromTMX(targetLang);
+        for(TranslationUnit tu : tus) {
+            tmWriter.indexTranslationUnit(tu);
+        }
     }
 
     private List<Event> getEventsFromTMX(String targetLang) {
-
         IFilter filter = new TmxFilter();
         ArrayList<Event> list = new ArrayList<Event>();
-        filter.open(new RawDocument(filename, null, sourceLang, targetLang));
+        filter.open(new RawDocument(uri, null, sourceLang, targetLang));
         while (filter.hasNext()) {
             Event event = filter.next();
             list.add(event);
@@ -82,4 +73,5 @@ public class OkapiTMXHandler implements TMXHandler{
         }
         return tus;
     }
+
 }
