@@ -8,7 +8,11 @@ package net.sf.okapi.tm.pensieve.common;
  *
  * @author HaslamJD
  */
-public class MatchScorer {
+public final class MatchScorer {
+
+    private MatchScorer() {
+    //should never be instantiated
+    }
 
     public static Float scoreMatch(String query, String match) {
         Float score = 0.0f;
