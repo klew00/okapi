@@ -97,9 +97,9 @@ public class OpenXMLRoundTripTest {
 
 		for(String s : themfiles)
 		{
-			runOneTest(s,false,false); // English
-			runOneTest(s,true,false);  // PigLatin
-			runOneTest(s,false,true);  // Tags
+//			runOneTest(s,false,false); // English
+//			runOneTest(s,true,false);  // PigLatin
+//			runOneTest(s,false,true);  // Tags
 			runOneTest(s,true,true);   // Codes
 		}
 		assertTrue("Some Roundtrip files failed.",allGood);
