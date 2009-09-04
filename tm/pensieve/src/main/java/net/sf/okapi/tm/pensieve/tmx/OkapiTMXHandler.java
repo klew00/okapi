@@ -18,10 +18,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class TMXHandler {
+public final class OkapiTMXHandler {
 
 
-    private TMXHandler() {
+    private OkapiTMXHandler() {
     }
 
     public static List<TranslationUnit> getTranslationUnitsFromTMX(String filename, String sourceLang, String targetLang) {
@@ -42,7 +42,7 @@ public final class TMXHandler {
     private static List<Event> getEventsFromTMX(String filename, String sourceLang, String targetLang) {
         URI fileURI;
         try {
-            fileURI = TMXHandler.class.getResource(filename).toURI();
+            fileURI = OkapiTMXHandler.class.getResource(filename).toURI();
         } catch (URISyntaxException use) {
             throw new IllegalArgumentException(use);
         }

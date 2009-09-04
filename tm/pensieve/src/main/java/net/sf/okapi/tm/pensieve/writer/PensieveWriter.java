@@ -12,8 +12,8 @@ import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
 import java.util.List;
-import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
-import net.sf.okapi.tm.pensieve.tmx.TMXHandler;
+
+import net.sf.okapi.tm.pensieve.tmx.OkapiTMXHandler;
 
 /**
  * User: Christian Hargraves
@@ -44,7 +44,7 @@ public class PensieveWriter implements TMWriter {
     }
 
     public void importTMX(String file, String sourceLang, String targetLang) throws IOException {
-        List<TranslationUnit> tus = TMXHandler.getTranslationUnitsFromTMX(file, sourceLang, targetLang);
+        List<TranslationUnit> tus = OkapiTMXHandler.getTranslationUnitsFromTMX(file, sourceLang, targetLang);
         for(TranslationUnit tu : tus) {
             indexTranslationUnit(tu);
         }

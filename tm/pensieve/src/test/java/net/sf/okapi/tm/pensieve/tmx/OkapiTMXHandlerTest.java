@@ -19,40 +19,40 @@ import java.util.List;
  *
  * @author Dax
  */
-public class TMXHandlerTest {
+public class OkapiTMXHandlerTest {
 
     List<TranslationUnit> italian_tus;
     List<TranslationUnit> nonExistantLang_tus;
     private final String sampleTMX = "/sample_tmx.xml";
     @Before
     public void setUp() {
-        italian_tus = TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "IT");
-        nonExistantLang_tus = TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "FR");
+        italian_tus = OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "IT");
+        nonExistantLang_tus = OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "FR");
     }
 
     @Test(expected=NullPointerException.class)
     public void nonExistantFile() {
-        TMXHandler.getTranslationUnitsFromTMX("/filethathasnochanceofexisting.xml", "EN", "FR");
+        OkapiTMXHandler.getTranslationUnitsFromTMX("/filethathasnochanceofexisting.xml", "EN", "FR");
     }
 
     @Test(expected=NullPointerException.class)
     public void EmptySourceLang() {
-        TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "", "FR");
+        OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "", "FR");
     }
 
     @Test(expected=NullPointerException.class)
     public void NullSourceLang() {
-        TMXHandler.getTranslationUnitsFromTMX(sampleTMX, null, "FR");
+        OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, null, "FR");
     }
 
     @Test(expected=NullPointerException.class)
     public void EmptyTargetLang() {
-        TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "");
+        OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", "");
     }
 
     @Test(expected=NullPointerException.class)
     public void NullTargetLang() {
-        TMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", null);
+        OkapiTMXHandler.getTranslationUnitsFromTMX(sampleTMX, "EN", null);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class TMXHandlerTest {
     public void convertTranslationUnit(){
         TextUnit textUnit = new TextUnit("someId", "some great text");
         textUnit.setTargetContent("kr", new TextFragment("some great text in Korean"));
-        TranslationUnit tu = TMXHandler.convertTranslationUnit("en", "kr", textUnit);
+        TranslationUnit tu = OkapiTMXHandler.convertTranslationUnit("en", "kr", textUnit);
         assertEquals("sourceLang", "en", tu.getSource().getLang());
         assertEquals("source content", "some great text", tu.getSource().getContent().toString());
         assertEquals("targetLang", "kr", tu.getTarget().getLang());
