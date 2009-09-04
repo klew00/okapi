@@ -20,17 +20,8 @@
 
 package net.sf.okapi.common;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import net.sf.okapi.common.Util;
-
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -38,7 +29,12 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import static org.junit.Assert.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 
 public class UtilTest {
 	
@@ -55,6 +51,53 @@ public class UtilTest {
 	@After
 	public void tearDown() {
 	}
+
+    @Test
+    public void isEmptyNull(){
+        assertTrue("null should be empty", Util.isEmpty(""));
+    }
+
+    @Test
+    public void isEmptyEmpty(){
+        assertTrue("null should be empty", Util.isEmpty(""));
+    }
+
+    @Test
+    public void isEmptyNotEmpty(){
+        assertFalse("null should be empty", Util.isEmpty("not"));
+    }
+
+    @Test
+    public void isEmptyNotEmptyWhitespace(){
+        assertFalse("null should be empty", Util.isEmpty(" "));
+    }
+
+    @Test
+    public void isEmptyIgnoreWSNotEmptyWhitespace(){
+        assertTrue("null should be empty", Util.isEmpty(" ", true));
+    }
+
+    @Test
+    public void isEmptyIgnoreWSEmpty(){
+        assertTrue("null should be empty", Util.isEmpty("", true));
+    }
+
+    @Test
+    public void isEmptyIgnoreWSNull(){
+        assertTrue("null should be empty", Util.isEmpty(null, true));
+    }
+
+    @Test
+    public void isEmptyIgnoreWSNotEmpty(){
+        assertFalse("null should be empty", Util.isEmpty("s", true));
+    }
+
+    @Test
+    public void isEmptyIgnoreWSNotEmptyImmutable(){
+        String tmp = "s ";
+        Util.isEmpty(tmp, true);
+        assertEquals("tmp after method call", "s ", tmp);
+    }
 
 	@Test
 	public void testTrimStart () {

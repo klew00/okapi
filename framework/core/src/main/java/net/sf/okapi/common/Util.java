@@ -20,33 +20,21 @@
 
 package net.sf.okapi.common;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import org.w3c.dom.Node;
+
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.channels.Channel;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
+import java.nio.channels.*;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
-
-import org.w3c.dom.Node;
 
 /**
  * Collection of various all-purpose helper functions.
@@ -303,7 +291,7 @@ public class Util {
 				case '{':
 				case '}':
 				case '\\':
-					tmp.append("\\" + text.charAt(i));
+					tmp.append("\\").append(text.charAt(i));
 					break;
 				case '\r': // to skip
 					break;
@@ -917,15 +905,14 @@ public class Util {
 	 */
 	static public boolean isEmpty(String string) {
 		// return (string == null || string == ""); // !!! Doesn't work
-		return (string == null || string == "" || (string != null && string.length() == 0));
+		return string == null || string.length() == 0;
 	}
 	
 	static public boolean isEmpty(String string, boolean ignoreWS) {
-		return (string == null || string == "" ||				
-				(string != null && 
-						(string.length() == 0 || 
-						(ignoreWS && isEmpty(string.trim()))
-				)));
+        if (ignoreWS && string != null){
+            string = string.trim();
+        }
+		return isEmpty(string);
 	}
 	
 	static public boolean isEmpty(StringBuilder sb) {
