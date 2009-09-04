@@ -8,7 +8,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.steps.common;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0"
+ net.sf.okapi.ui.common;bundle-version="1.0.0",
+ net.sf.okapi.ui.filters.openxml;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: net.sf.okapi.applications.workbench
