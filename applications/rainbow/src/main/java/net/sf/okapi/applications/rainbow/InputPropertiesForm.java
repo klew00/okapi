@@ -20,9 +20,9 @@
 
 package net.sf.okapi.applications.rainbow;
 
-import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.lib.FilterConfigSelectionPanel;
 import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
@@ -51,7 +51,7 @@ class InputPropertiesForm {
 
 	InputPropertiesForm (Shell parent,
 		IHelp helpParam,
-		FilterConfigMapper fcMapper,
+		FilterConfigurationMapper fcMapper,
 		Project project,
 		String projectDir)
 	{
@@ -134,7 +134,7 @@ class InputPropertiesForm {
 	void setData (String filterSettings,
 		String sourceEncoding,
 		String targetEncoding,
-		FilterConfigMapper fcMapper)
+		FilterConfigurationMapper fcMapper)
 	{
 		oldData = filterSettings + sourceEncoding + targetEncoding;
 		pnlFilterConfigSelection.setConfigurationId(filterSettings);

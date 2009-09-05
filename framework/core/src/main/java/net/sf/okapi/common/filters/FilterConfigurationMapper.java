@@ -59,9 +59,9 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	private static final Logger LOGGER = Logger.getLogger(FilterConfigurationMapper.class.getName());
 
 	private LinkedHashMap<String, FilterConfiguration> configMap;
+	private ArrayList<FilterInfo> filters;
 	private String customParmsDir;
 	private IFilter tmpFilter;
-	
 	
 	/**
 	 * Splits a configuration identifier into a filter and 
@@ -105,6 +105,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	public FilterConfigurationMapper () {
 		super();
 		configMap = new LinkedHashMap<String, FilterConfiguration>();
+		filters = new ArrayList<FilterInfo>();
 		setCustomConfigurationsDirectory(Util.getDirectoryName((new File(".")).getAbsolutePath()));
 	}
 
@@ -126,6 +127,13 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
 			return;
 		}
+		
+		// Add the filter to the list
+		FilterInfo info = new FilterInfo();
+		info.className = filterClass;
+		info.name = filter.getName();
+		filters.add(info);
+		
 		// Get the available configurations for this filter
 		List<FilterConfiguration> list = filter.getConfigurations();
 		if (( list == null ) || ( list.size() == 0 )) {
@@ -501,6 +509,10 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			}
 		}
 		return filter;
+	}
+
+	public List<FilterInfo> getFiltersInfo() {
+		return filters;
 	}
 
 }

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
@@ -39,6 +38,8 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.DefaultFilters;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
@@ -54,7 +55,7 @@ public class Merger {
 
 	private Manifest manifest;
 	private IReader reader;
-	private FilterConfigMapper mapper;
+	private FilterConfigurationMapper mapper;
 	private IFilter inpFilter;
 	private IFilterWriter outFilter;
 	private RTFFilter rtfFilter;
@@ -72,8 +73,9 @@ public class Merger {
 		String sharedFolder = Utils.getOkapiSharedFolder(rootFolder, fromJar);
 
 		// Load the FilterAccess list
-		mapper = new FilterConfigMapper();
-		mapper.loadList(sharedFolder + File.separator + "filters.xml");
+		mapper = new FilterConfigurationMapper();
+		DefaultFilters.setMappings(mapper, false, true);
+//fc		mapper.loadList(sharedFolder + File.separator + "filters.xml");
 		// No need to load custom configuration because we are loading the parameters ourselves
 	}
 

@@ -33,8 +33,6 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.EncodingItem;
 import net.sf.okapi.applications.rainbow.lib.EncodingManager;
-import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
-import net.sf.okapi.applications.rainbow.lib.FilterConfigMapperDialog;
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.lib.LanguageItem;
@@ -47,6 +45,8 @@ import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.DefaultFilters;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.BaseHelp;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
@@ -56,6 +56,7 @@ import net.sf.okapi.common.ui.MRUList;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
+import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;
@@ -154,7 +155,7 @@ public class MainForm { //implements IParametersProvider {
 	private LanguageManager lm;
 	private ResourceManager rm;
 	private FormatManager fm;
-	private FilterConfigMapper fcMapper;
+	private FilterConfigurationMapper fcMapper;
 	private EncodingManager em;
 	private PluginsAccess plugins;
 	private UtilityDriver ud;
@@ -253,9 +254,10 @@ public class MainForm { //implements IParametersProvider {
 		setLogLevel();
 		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 
-		fcMapper = new FilterConfigMapper();
+		fcMapper = new FilterConfigurationMapper();
 		// Get pre-defined configurations
-		fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
+		DefaultFilters.setMappings(fcMapper, false, true);
+//fc		fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 		mapperNeedsUpdate = true;
 		
 		// Toolbar
@@ -1193,7 +1195,7 @@ public class MainForm { //implements IParametersProvider {
 
 	private void updateCustomConfigurations () {
 		if ( mapperNeedsUpdate ) {
-			fcMapper.setParametersFolder(prj.getParametersFolder());
+			fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 			fcMapper.updateCustomConfigurations();
 			mapperNeedsUpdate = false;
 		}
@@ -1993,7 +1995,8 @@ public class MainForm { //implements IParametersProvider {
 		try {
 			saveSurfaceData();
 			updateCustomConfigurations();
-			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false, prj, fcMapper, help);
+			FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(shell, false, fcMapper, help); 
+			//FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false, prj, fcMapper, help);
 			updateCustomConfigurations();
 			dlg.showDialog(null);
 		}

@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.lib;
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
+import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -44,7 +45,7 @@ public class CustomConfigurationFolderPanel extends Composite {
 	private Text edParamsFolder;
 	private Button btGetParamsFolder;
 	private Project project;
-	private FilterConfigMapperDialog dialog;
+	private FilterConfigurationsDialog dialog;
 	
 	/**
 	 * Creates a CustomConfigurationFolderPanel panel.
@@ -57,7 +58,7 @@ public class CustomConfigurationFolderPanel extends Composite {
 	public CustomConfigurationFolderPanel (Composite parent,
 		int style,
 		Project project,
-		FilterConfigMapperDialog dialog)
+		FilterConfigurationsDialog dialog)
 	{
 		super(parent, style);
 		this.dialog = dialog;

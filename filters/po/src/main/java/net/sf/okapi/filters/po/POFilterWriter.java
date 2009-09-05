@@ -165,7 +165,7 @@ public class POFilterWriter implements IFilterWriter {
 		params = (Parameters)params;
 	}
 
-	private void processStartDocument(Event event) {
+	private void processStartDocument (Event event) {
 		StartDocument sd = (StartDocument)event.getResource();
 		// Create the output
 		createWriter(sd);

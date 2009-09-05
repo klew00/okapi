@@ -20,16 +20,16 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
-import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 
 /**
  * Provides a common way of executing an arbitrary utility.
  */
 public interface IUtility {
 
-	public void setFilterAccess (FilterConfigMapper mapper);
+	public void setFilterAccess (FilterConfigurationMapper mapper);
 	
 	/**
 	 * Sets the context UI to use with the utility.

@@ -27,13 +27,14 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.widgets.Shell;
 
-import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.DefaultFilters;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.ui.BaseHelp;
 
 public class CommandLine {
@@ -44,7 +45,7 @@ public class CommandLine {
 	private Project prj;
 	private Shell shell;
 	private UtilityDriver ud;
-	private FilterConfigMapper mapper;
+	private FilterConfigurationMapper mapper;
 	private PluginsAccess plugins;
 	private BatchLog log;
 	private LogHandler logHandler;
@@ -211,8 +212,9 @@ public class CommandLine {
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$
 		
 		// Set up the filter configuration mapper
-		mapper = new FilterConfigMapper();
-		mapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
+		mapper = new FilterConfigurationMapper();
+		DefaultFilters.setMappings(mapper, false, true);
+//		mapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 
 		plugins = new PluginsAccess();
 		plugins.addAllPackages(sharedFolder);
@@ -222,7 +224,7 @@ public class CommandLine {
 		if ( utilityId == null ) return;
 		// Create the utility driver if needed
 		if ( ud == null ) {
-			mapper.setParametersFolder(prj.getParametersFolder());
+			mapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 			mapper.updateCustomConfigurations();
 			ud = new UtilityDriver(log, mapper, plugins, help, false);
 		}

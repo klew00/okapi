@@ -169,6 +169,12 @@ public interface IFilterConfigurationMapper extends IParametersEditorMapper {
 	public FilterConfiguration getDefaultConfiguration (String mimeType);
 	
 	/**
+	 * Gets a list of information on all filters in this mapper.
+	 * @return a list of information on all filters in this mapper.
+	 */
+	public List<FilterInfo> getFiltersInfo ();
+
+	/**
 	 * Gets an iterator on all configurations objects for this mapper.
 	 * @return an iterator on all configurations for this mapper.
 	 */

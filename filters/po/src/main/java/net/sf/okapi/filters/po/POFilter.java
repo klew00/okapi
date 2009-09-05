@@ -507,13 +507,13 @@ public class POFilter implements IFilter {
 
 			// Look for encoding field
 			Matcher m = charsetPattern.matcher(tmp.toString());
-			if ( m.find() ) { // prepare for property creation
+			if ( m.find() ) { // Prepare for property creation
 				tmp.replace(m.start(CHARSET_VALUEGROUP), m.end(CHARSET_VALUEGROUP),
 					TMPMARKER + Property.ENCODING + "=" + encoding + TMPMARKER);
 			}
 			// Look for plural form field
 			m = pluralformsPattern.matcher(tmp.toString());
-			if ( m.find() ) { // prepare for property creation
+			if ( m.find() ) { // Prepare for property creation
 				tmp.replace(m.start(PLURALFORMS_VALUEGROUP), m.end(PLURALFORMS_VALUEGROUP),
 					TMPMARKER + PROPERTY_PLURALFORMS + "=" + m.group(PLURALFORMS_VALUEGROUP) + TMPMARKER);
 			}

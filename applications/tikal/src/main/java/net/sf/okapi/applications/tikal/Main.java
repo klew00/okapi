@@ -87,17 +87,16 @@ public class Main {
 	 * @return the guessed name of the console's encoding.
 	 */
 	private static String getConsoleEncodingName () {
-		String enc = Charset.defaultCharset().name();
 		String osName = System.getProperty("os.name");
 		if ( osName.startsWith("Mac OS")) {
-			//TODO: Check if it's a mac encoding or ISO
-			// for now keep default
+			return "UTF-8"; // Apparently the default for bash on Mac
 		}
-		else if ( osName.startsWith("Windows") ) {
-			//TODO: Get cp by languages
-			enc = "cp850"; // Many languages
+		if ( osName.startsWith("Windows") ) {
+			//TODO: Get DOS code-pages per locale
+			return "cp850"; // Not perfect, but covers many languages
 		}
-		return enc;
+		// Default: Assumes unique encoding overall 
+		return Charset.defaultCharset().name();
 	}
 	
 	public static void main (String[] originalArgs) {

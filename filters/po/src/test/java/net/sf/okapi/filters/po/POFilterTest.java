@@ -61,6 +61,33 @@ public class POFilterTest {
 	}
 
 	@Test
+	public void testPOTHeader () {
+		String snippet = "msgid \"\"\n"
+			+ "msgstr \"\"\n"
+			+ "\"Project-Id-Version: PACKAGE VERSION\\n\"\n"
+			+ "\"Report-Msgid-Bugs-To: \\n\"\n"
+			+ "\"POT-Creation-Date: 2009-03-25 15:39-0700\\n\"\n"
+			+ "\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"\n"
+			+ "\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"\n"
+			+ "\"Language-Team: LANGUAGE <LL@li.org>\\n\"\n"
+			+ "\"MIME-Version: 1.0\\n\"\n"
+			+ "\"Content-Type: text/plain; charset=ENCODING\\n\"\n"
+			+ "\"Content-Transfer-Encoding: 8bit\\n\"\n"
+			+ "msgid \"Text\"\n"
+			+ "msgstr \"\"\n";
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, "en", "fr"), 1);
+		assertNotNull(dp);
+
+		Property prop = dp.getProperty(Property.ENCODING);
+		assertNotNull(prop);
+		assertEquals("ENCODING", prop.getValue());
+		assertFalse(prop.isReadOnly());
+
+		prop = dp.getProperty(POFilter.PROPERTY_PLURALFORMS);
+		assertNull(prop);
+	}
+
+	@Test
 	public void testPOHeader () {
 		String snippet = "#, fuzzy\r"
 			+ "msgid \"\"\r"
@@ -92,34 +119,6 @@ public class POFilterTest {
 		
 		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
 		assertEquals(snippet, result);
-	}
-
-
-	@Test
-	public void testPOTHeader () {
-		String snippet = "msgid \"\"\n"
-			+ "msgstr \"\"\n"
-			+ "\"Project-Id-Version: PACKAGE VERSION\\n\"\n"
-			+ "\"Report-Msgid-Bugs-To: \\n\"\n"
-			+ "\"POT-Creation-Date: 2009-03-25 15:39-0700\\n\"\n"
-			+ "\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"\n"
-			+ "\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"\n"
-			+ "\"Language-Team: LANGUAGE <LL@li.org>\\n\"\n"
-			+ "\"MIME-Version: 1.0\\n\"\n"
-			+ "\"Content-Type: text/plain; charset=ENCODING\\n\"\n"
-			+ "\"Content-Transfer-Encoding: 8bit\\n\"\n"
-			+ "msgid \"Text\"\n"
-			+ "msgstr \"\"\n";
-		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, "en", "fr"), 1);
-		assertNotNull(dp);
-
-		Property prop = dp.getProperty(Property.ENCODING);
-		assertNotNull(prop);
-		assertEquals("ENCODING", prop.getValue());
-		assertFalse(prop.isReadOnly());
-
-		prop = dp.getProperty(POFilter.PROPERTY_PLURALFORMS);
-		assertNull(prop);
 	}
 
 	@Test

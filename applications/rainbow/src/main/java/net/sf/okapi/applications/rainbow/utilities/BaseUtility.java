@@ -27,9 +27,9 @@ import javax.swing.event.EventListenerList;
 
 import org.eclipse.swt.widgets.Shell;
 
-import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 
 public abstract class BaseUtility implements IUtility {
 
@@ -37,7 +37,7 @@ public abstract class BaseUtility implements IUtility {
 	
 	protected final Logger logger = Logger.getLogger(getClass().getName());
 	protected EventListenerList listenerList = new EventListenerList();
-	protected FilterConfigMapper mapper;
+	protected FilterConfigurationMapper mapper;
 	protected Shell shell;
 	protected IHelp help;
 	protected ArrayList<InputData> inputs;
@@ -90,7 +90,7 @@ public abstract class BaseUtility implements IUtility {
 		trgLang = targetLanguage;
 	}
 
-	public void setFilterAccess (FilterConfigMapper mapper) {
+	public void setFilterAccess (FilterConfigurationMapper mapper) {
 		this.mapper = mapper;
 	}
 

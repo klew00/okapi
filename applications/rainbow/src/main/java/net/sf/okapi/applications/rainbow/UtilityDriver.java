@@ -26,7 +26,6 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.applications.rainbow.lib.FilterConfigMapper;
 import net.sf.okapi.applications.rainbow.lib.ILog;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
@@ -38,6 +37,7 @@ import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.Dialogs;
 
@@ -51,7 +51,7 @@ public class UtilityDriver implements CancelListener {
 	
 	private ILog log;
 	private Project prj;
-	private FilterConfigMapper mapper;
+	private FilterConfigurationMapper mapper;
 	private IFilter filter;
 	private IUtility utility;
 	private IParametersEditor editor;
@@ -64,7 +64,7 @@ public class UtilityDriver implements CancelListener {
 	private BaseContext context;
 	
 	public UtilityDriver (ILog log,
-		FilterConfigMapper mapper,
+		FilterConfigurationMapper mapper,
 		PluginsAccess plugins,
 		IHelp help,
 		boolean canPrompt)

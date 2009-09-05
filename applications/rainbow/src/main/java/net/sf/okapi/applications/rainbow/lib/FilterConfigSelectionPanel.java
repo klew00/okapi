@@ -20,18 +20,19 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
-import java.util.ArrayList;
-
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.filters.FilterInfo;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.common.ui.filters.IFilterConfigurationInfoEditor;
 
 import org.eclipse.swt.SWT;
@@ -54,7 +55,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class FilterConfigSelectionPanel extends Composite {
 
-	private FilterConfigMapper mapper;
+	private FilterConfigurationMapper mapper;
 	private Combo cbFilters;
 	private Text edDescription;
 	private List lbConfigs;
@@ -63,7 +64,7 @@ public class FilterConfigSelectionPanel extends Composite {
 	private Button btDelete;
 	private Button btMore;
 	private BaseContext context;
-	private ArrayList<FilterInfo> filters;
+	private java.util.List<FilterInfo> filters;
 	private IFilter cachedFilter;
 	private Project project;
 	private IHelp help;
@@ -71,7 +72,7 @@ public class FilterConfigSelectionPanel extends Composite {
 	public FilterConfigSelectionPanel (Composite p_Parent,
 		IHelp helpParam,
 		int p_nFlags,
-		FilterConfigMapper mapper,
+		FilterConfigurationMapper mapper,
 		Project project,
 		String projectDir)
 	{
@@ -180,7 +181,8 @@ public class FilterConfigSelectionPanel extends Composite {
 		// Rely on order (index+1) because we cannot attach object to the items
 		cbFilters.removeAll();
 		cbFilters.add(Res.getString("FilterConfigSelectionPanel.noFilter")); //$NON-NLS-1$
-		filters = mapper.getFilters();
+
+		filters = mapper.getFiltersInfo();
 		for ( FilterInfo item : filters ) {
 			cbFilters.add(item.toString());
 		}
@@ -200,7 +202,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		int n = -1;
 		if ( config != null ) {
 			for ( int i=0; i<filters.size(); i++ ) {
-				if ( filters.get(i).filterClass.equals(config.filterClass) ) {
+				if ( filters.get(i).className.equals(config.filterClass) ) {
 					n = i; // Found it 
 					break;
 				}
@@ -225,7 +227,8 @@ public class FilterConfigSelectionPanel extends Composite {
 				configId = lbConfigs.getItem(n);
 			}
 			String oldConfigId = configId;
-			FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(getShell(), true, project, mapper, help);
+			//FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(getShell(), true, project, mapper, help);
+			FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(getShell(), true, mapper, help); 
 			configId = dlg.showDialog(configId);
 			if ( configId == null ) { // Close without selection
 				configId = oldConfigId;
@@ -274,7 +277,7 @@ public class FilterConfigSelectionPanel extends Composite {
 			return; // First is <None>
 		}
 		n--; // Real index in filters list
-		java.util.List<FilterConfiguration> list = mapper.getFilterConfigurations(filters.get(n).filterClass);
+		java.util.List<FilterConfiguration> list = mapper.getFilterConfigurations(filters.get(n).className);
 
 		// Fill the list, and detect selected configuration if needed
 		int i = 0;
