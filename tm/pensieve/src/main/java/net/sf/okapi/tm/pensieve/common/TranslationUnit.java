@@ -6,8 +6,8 @@ package net.sf.okapi.tm.pensieve.common;
  * Time: 6:53:34 AM
  */
 public class TranslationUnit {
-    private TranslationUnitValue source;
-    private TranslationUnitValue target;
+    private TranslationUnitVariant source;
+    private TranslationUnitVariant target;
     private MetaData metadata;
 
     public MetaData getMetadata() {
@@ -23,25 +23,25 @@ public class TranslationUnit {
         metadata = new MetaData();
     }
 
-    public TranslationUnit(TranslationUnitValue source, TranslationUnitValue target) {
+    public TranslationUnit(TranslationUnitVariant source, TranslationUnitVariant target) {
         this();
         this.source = source;
         this.target = target;
     }
 
-    public TranslationUnitValue getSource() {
+    public TranslationUnitVariant getSource() {
         return source;
     }
 
-    public TranslationUnitValue getTarget() {
+    public TranslationUnitVariant getTarget() {
         return target;
     }
 
-    public void setSource(TranslationUnitValue source) {
+    public void setSource(TranslationUnitVariant source) {
         this.source = source;
     }
 
-    public void setTarget(TranslationUnitValue target) {
+    public void setTarget(TranslationUnitVariant target) {
         this.target = target;
     }
 
@@ -53,7 +53,7 @@ public class TranslationUnit {
         return isFragmentEmpty(target);
     }
 
-    private static boolean isFragmentEmpty(TranslationUnitValue frag){
+    private static boolean isFragmentEmpty(TranslationUnitVariant frag){
         return frag == null || frag.getContent().isEmpty();
     }
 }

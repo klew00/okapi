@@ -12,8 +12,8 @@ public final class PensieveUtil {
     private PensieveUtil(){}
 
     public static TranslationUnit convertTranslationUnit(String sourceLang, String targetLang, TextUnit textUnit) {
-        TranslationUnitValue source = new TranslationUnitValue(sourceLang, textUnit.getSourceContent());
-        TranslationUnitValue target = new TranslationUnitValue(targetLang, textUnit.getTargetContent(targetLang));
+        TranslationUnitVariant source = new TranslationUnitVariant(sourceLang, textUnit.getSourceContent());
+        TranslationUnitVariant target = new TranslationUnitVariant(targetLang, textUnit.getTargetContent(targetLang));
         return new TranslationUnit(source, target);
     }
     

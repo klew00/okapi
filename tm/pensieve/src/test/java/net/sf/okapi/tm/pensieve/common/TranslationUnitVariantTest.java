@@ -12,14 +12,14 @@ import static org.junit.Assert.*;
  *
  * @author HaslamJD
  */
-public class TranslationUnitValueTest {
+public class TranslationUnitVariantTest {
 
     private final TextFragment content = new TextFragment();
     private final String lang = "fb";
 
     @Test
     public void constructorNoArg() {
-        TranslationUnitValue tuv = new TranslationUnitValue();
+        TranslationUnitVariant tuv = new TranslationUnitVariant();
         assertNull("text fragment should be null", tuv.getContent());
         assertNull("lang should be null", tuv.getLang());
     }
@@ -27,21 +27,21 @@ public class TranslationUnitValueTest {
     @Test
     public void constructorTwoArgs() {
 
-        TranslationUnitValue tuv = new TranslationUnitValue(lang, content);
+        TranslationUnitVariant tuv = new TranslationUnitVariant(lang, content);
         assertSame("content", content, tuv.getContent());
         assertSame("lang", lang, tuv.getLang());
     }
 
     @Test
     public void setContent() {
-        TranslationUnitValue tuv = new TranslationUnitValue();
+        TranslationUnitVariant tuv = new TranslationUnitVariant();
         tuv.setContent(content);
         assertSame("content", content, tuv.getContent());
     }
 
     @Test
     public void setLang() {
-        TranslationUnitValue tuv = new TranslationUnitValue();
+        TranslationUnitVariant tuv = new TranslationUnitVariant();
         tuv.setLang(lang);
         assertSame("content", lang, tuv.getLang());
     }

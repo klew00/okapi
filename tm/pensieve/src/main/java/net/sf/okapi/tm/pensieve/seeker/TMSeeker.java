@@ -4,7 +4,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TMHit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitValue;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -81,9 +81,9 @@ public class TMSeeker implements Seeker {
     }
 
     TranslationUnit getTranslationUnit(Document doc) {
-        return new TranslationUnit(new TranslationUnitValue(getFieldValue(doc, TranslationUnitFields.SOURCE_LANG),
+        return new TranslationUnit(new TranslationUnitVariant(getFieldValue(doc, TranslationUnitFields.SOURCE_LANG),
                 new TextFragment(getFieldValue(doc, TranslationUnitFields.SOURCE))),
-                new TranslationUnitValue(getFieldValue(doc, TranslationUnitFields.TARGET_LANG),
+                new TranslationUnitVariant(getFieldValue(doc, TranslationUnitFields.TARGET_LANG),
                         new TextFragment(getFieldValue(doc, TranslationUnitFields.TARGET))));
     }
 

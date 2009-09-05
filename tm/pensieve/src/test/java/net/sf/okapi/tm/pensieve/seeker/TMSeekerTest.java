@@ -15,7 +15,7 @@ import org.junit.Test;
 import java.io.FileNotFoundException;
 import java.util.List;
 import net.sf.okapi.tm.pensieve.common.TMHit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitValue;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 
 /**
  * User: Christian Hargraves
@@ -25,7 +25,7 @@ import net.sf.okapi.tm.pensieve.common.TranslationUnitValue;
 public class TMSeekerTest {
 
     static final Directory DIR = new RAMDirectory();
-    static final TranslationUnitValue TARGET = new TranslationUnitValue("EN", new TextFragment("target text"));
+    static final TranslationUnitVariant TARGET = new TranslationUnitVariant("EN", new TextFragment("target text"));
     static final String STR = "watch out for the killer rabbit";
 
 
@@ -85,10 +85,10 @@ public class TMSeekerTest {
     public void searchWordsMultipleSubPhrases() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("patents are evil")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("patents evil are")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("are patents evil")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("completely unrelated phrase")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("patents are evil")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("patents evil are")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("are patents evil")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("completely unrelated phrase")),TARGET));
         writer.endIndex();
 
         tmhits = seeker.searchForWords("\"patents evil\"", 10);
@@ -100,10 +100,10 @@ public class TMSeekerTest {
         PensieveWriter writer = getWriter();
         
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(STR)),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("watch for the killer rabbit")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("watch out the killer rabbit")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("watch rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out the killer rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchFuzzyWuzzy(STR+"~", 10);
@@ -114,10 +114,10 @@ public class TMSeekerTest {
     public void searchFuzzyWuzzyMiddleMatch80Percent() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("watch rabbit")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(STR)),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("watch out the killer rabbit and some extra stuff")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("watch for the killer rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out the killer rabbit and some extra stuff")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchFuzzyWuzzy(STR+"~0.8", 10);
@@ -136,10 +136,10 @@ public class TMSeekerTest {
             STR + " 3 words now"
         };
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(testStrings[0])),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(testStrings[1])),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(testStrings[2])),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(testStrings[3])),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[0])),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[1])),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[2])),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[3])),TARGET));
         writer.endIndex();
         //If you add a threshold it changes the sort order
         tmhits = seeker.searchFuzzyWuzzy(STR+"~", 10);
@@ -191,7 +191,7 @@ public class TMSeekerTest {
         PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
         for(int i = 0; i < 5; i++){
-            writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(str)), TARGET));
+            writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
         }
 
         writer.endIndex();
@@ -203,8 +203,8 @@ public class TMSeekerTest {
     public void searchExactDifferentStopWords() throws Exception {
         PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(str)), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchExact(str, 10);
@@ -215,8 +215,8 @@ public class TMSeekerTest {
     public void searchExactDifferentCases() throws Exception {
         PensieveWriter writer = getWriter();
         String str = "watch Out for The killEr rabbit";
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(str)), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchExact(str, 10);
@@ -227,8 +227,8 @@ public class TMSeekerTest {
     public void searchExactDifferentOrder() throws Exception {
         PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(str)), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchExact("killer rabbit the for out watch", 10);
@@ -258,8 +258,8 @@ public class TMSeekerTest {
     void populateIndex(PensieveWriter writer, int numOfEntries, String source, String target) throws Exception {
 
         for (int i=0; i < numOfEntries; i++) {
-            writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(source + i)), new TranslationUnitValue("EN", new TextFragment(target))));
+            writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(source + i)), new TranslationUnitVariant("EN", new TextFragment(target))));
         }
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("something that in no way should ever match")), new TranslationUnitValue("EN", new TextFragment("unittesttarget"))));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("something that in no way should ever match")), new TranslationUnitVariant("EN", new TextFragment("unittesttarget"))));
     }
 }

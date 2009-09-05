@@ -11,13 +11,13 @@ import net.sf.okapi.common.resource.TextFragment;
  *
  * @author HaslamJD
  */
-public class TranslationUnitValue {
+public class TranslationUnitVariant {
     private String lang;
     private TextFragment content;
 
-    public TranslationUnitValue() {}
+    public TranslationUnitVariant() {}
 
-    public TranslationUnitValue(String lang, TextFragment content) {
+    public TranslationUnitVariant(String lang, TextFragment content) {
         this.lang = lang;
         this.content = content;
     }

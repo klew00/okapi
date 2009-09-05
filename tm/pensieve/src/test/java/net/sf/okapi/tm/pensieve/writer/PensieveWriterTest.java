@@ -4,7 +4,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitValue;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -60,7 +60,7 @@ public class PensieveWriterTest {
     }
 
     public void endIndexCommits() throws IOException {
-        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("dax")), new TranslationUnitValue("ES", new TextFragment("is funny (sometimes)"))));
+        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("dax")), new TranslationUnitVariant("ES", new TextFragment("is funny (sometimes)"))));
         tmWriter.endIndex();
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed after endIndex", 1, reader.maxDoc());
@@ -68,12 +68,12 @@ public class PensieveWriterTest {
 
     @Test(expected = NullPointerException.class)
     public void getDocumentNoSourceContent(){
-        tmWriter.getDocument(new TranslationUnit(null, new TranslationUnitValue("EN", new TextFragment("some target"))));
+        tmWriter.getDocument(new TranslationUnit(null, new TranslationUnitVariant("EN", new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
     public void getDocumentEmptySourceContent(){
-        tmWriter.getDocument(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("")), new TranslationUnitValue("EN", new TextFragment("some target"))));
+        tmWriter.getDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("")), new TranslationUnitVariant("EN", new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
@@ -84,7 +84,7 @@ public class PensieveWriterTest {
     @Test
     public void getDocumentValues(){
         String text = "blah blah blah";
-        TranslationUnit tu = new TranslationUnit(new TranslationUnitValue("EN", new TextFragment(text)), new TranslationUnitValue("EN", new TextFragment("someone")));
+        TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(text)), new TranslationUnitVariant("EN", new TextFragment("someone")));
         tu.getMetadata().put(MetaDataTypes.SOURCE_LANG, "EN");
         tu.getMetadata().put(MetaDataTypes.TARGET_LANG, "FR");
         Document doc = tmWriter.getDocument(tu);
@@ -97,7 +97,7 @@ public class PensieveWriterTest {
 
     @Test
     public void getDocumentNoTarget(){
-        Document doc = tmWriter.getDocument(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("blah blah blah")), null));
+        Document doc = tmWriter.getDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("blah blah blah")), null));
         assertNull("Document's target field should be null", doc.getField(TranslationUnitFields.TARGET.name()));
     }
 
@@ -113,14 +113,14 @@ public class PensieveWriterTest {
 
     @Test
     public void indexTranslationUnitBeforeCommit() throws IOException {
-        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("dax")), new TranslationUnitValue("EN", new TextFragment("is funny (sometimes)"))));
+        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("dax")), new TranslationUnitVariant("EN", new TextFragment("is funny (sometimes)"))));
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed before endIndex", 0, reader.maxDoc());
     }
 
     @Test
     public void indexTextUnit() throws IOException {
-        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitValue("EN", new TextFragment("joe")), new TranslationUnitValue("EN", new TextFragment("schmoe"))));
+        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("joe")), new TranslationUnitVariant("EN", new TextFragment("schmoe"))));
         assertEquals("num of docs indexed", 1, tmWriter.getIndexWriter().numDocs());
     }
 
