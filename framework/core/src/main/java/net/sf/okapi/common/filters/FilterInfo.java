@@ -23,7 +23,7 @@ package net.sf.okapi.common.filters;
 /**
  * Storage for filter information.
  */
-public class FilterInfo {
+public class FilterInfo implements Comparable<FilterInfo> {
 
 	/**
 	 * Name of the filter.
@@ -43,6 +43,10 @@ public class FilterInfo {
 	@Override
 	public String toString () {
 		return displayName;
+	}
+
+	public int compareTo(FilterInfo obj) {
+		return displayName.compareTo(obj.displayName);
 	}
 
 }

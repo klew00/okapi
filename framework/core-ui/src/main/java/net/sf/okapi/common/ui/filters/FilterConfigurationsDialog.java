@@ -119,7 +119,7 @@ public class FilterConfigurationsDialog {
 		};
 		
 		if ( selectionMode ) {
-			OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, Actions, (help!=null), Res.getString("FilterConfigMapperDialog.select")); //$NON-NLS-1$
+			OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, Actions, (help!=null), Res.getString("FilterConfigurationsDialog.select")); //$NON-NLS-1$
 			pnlActions.btCancel.setText(Res.getString("FilterConfigurationsDialog.close")); //$NON-NLS-1$
 			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 			gdTmp.horizontalSpan = 2;

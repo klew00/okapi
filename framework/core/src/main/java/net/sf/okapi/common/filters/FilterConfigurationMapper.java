@@ -24,6 +24,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -513,6 +514,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	}
 
 	public List<FilterInfo> getFiltersInfo() {
+		Collections.sort(filters); // Sort before returning
 		return filters;
 	}
 
