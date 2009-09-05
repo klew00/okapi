@@ -3,6 +3,7 @@ package net.sf.okapi.tm.pensieve.writer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -56,13 +57,9 @@ public class PensieveWriter implements TMWriter {
         doc.add(createField(TranslationUnitFields.SOURCE_EXACT, tu.getSource().getContent(), Field.Store.NO, Field.Index.NOT_ANALYZED));
         if (!tu.isTargetEmpty()){
             doc.add(createField(TranslationUnitFields.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
+            doc.add(createField(TranslationUnitFields.TARGET_LANG, tu.getTarget(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
-//        if (!tu.getMetadata().containsKey(MetaDataTypes.SOURCE_LANG)){
-//            doc.add(createField(TranslationUnitFields.SOURCE_LANG, tu, MetaDataTypes.SOURCE_LANG, Field.Store.YES, Field.Index.NO));
-//        }
-//        if (!tu.getMetadata().containsKey(MetaDataTypes.TARGET_LANG)){
-//            doc.add(createField(TranslationUnitFields.TARGET_LANG, tu, MetaDataTypes.TARGET_LANG, Field.Store.YES, Field.Index.NO));
-//        }
+        doc.add(createField(TranslationUnitFields.SOURCE_LANG, tu.getSource(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         return doc;
     }
 
@@ -73,12 +70,11 @@ public class PensieveWriter implements TMWriter {
         return new Field(field.name(), frag.toString(), store, index);
     }
 
-//    Field createField(TranslationUnitFields field,
-//                  TranslationUnit tu,
-//                  MetaDataTypes mdt,
-//                  Field.Store store,
-//                  Field.Index index){
-//        return new Field(field.name(), tu.getMetadata().get(mdt).toString(), store, index);
-//    }
+    Field createField(TranslationUnitFields field,
+                  TranslationUnitVariant tuv,
+                  Field.Store store,
+                  Field.Index index){
+        return new Field(field.name(), tuv.getLang(), store, index);
+    }
 
 }

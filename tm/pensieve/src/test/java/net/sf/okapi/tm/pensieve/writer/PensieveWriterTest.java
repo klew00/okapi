@@ -1,9 +1,8 @@
 package net.sf.okapi.tm.pensieve.writer;
 
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.tm.pensieve.common.MetaDataTypes;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
+import static net.sf.okapi.tm.pensieve.common.TranslationUnitFields.*;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -60,7 +59,8 @@ public class PensieveWriterTest {
     }
 
     public void endIndexCommits() throws IOException {
-        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("dax")), new TranslationUnitVariant("ES", new TextFragment("is funny (sometimes)"))));
+        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN",
+                new TextFragment("dax")), new TranslationUnitVariant("ES", new TextFragment("is funny (sometimes)"))));
         tmWriter.endIndex();
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed after endIndex", 1, reader.maxDoc());
@@ -68,12 +68,14 @@ public class PensieveWriterTest {
 
     @Test(expected = NullPointerException.class)
     public void getDocumentNoSourceContent(){
-        tmWriter.getDocument(new TranslationUnit(null, new TranslationUnitVariant("EN", new TextFragment("some target"))));
+        tmWriter.getDocument(new TranslationUnit(null, new TranslationUnitVariant("EN",
+                new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
     public void getDocumentEmptySourceContent(){
-        tmWriter.getDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("")), new TranslationUnitVariant("EN", new TextFragment("some target"))));
+        tmWriter.getDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("")),
+                new TranslationUnitVariant("EN", new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
@@ -84,21 +86,20 @@ public class PensieveWriterTest {
     @Test
     public void getDocumentValues(){
         String text = "blah blah blah";
-        TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(text)), new TranslationUnitVariant("EN", new TextFragment("someone")));
-        tu.getMetadata().put(MetaDataTypes.SOURCE_LANG, "EN");
-        tu.getMetadata().put(MetaDataTypes.TARGET_LANG, "FR");
+        TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(text)),
+                new TranslationUnitVariant("FR", new TextFragment("someone")));
         Document doc = tmWriter.getDocument(tu);
-        assertEquals("Document's content field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE.name()).stringValue());
-        assertEquals("Document's content exact field", "blah blah blah", doc.getField(TranslationUnitFields.SOURCE_EXACT.name()).stringValue());
-        assertEquals("Document's target field", "someone", doc.getField(TranslationUnitFields.TARGET.name()).stringValue());
-//        assertEquals("Document's source lang field", "EN", doc.getField(TranslationUnitFields.SOURCE_LANG.name()).stringValue());
-//        assertEquals("Document's target lang field", "FR", doc.getField(TranslationUnitFields.TARGET_LANG.name()).stringValue());
+        assertEquals("Document's content field", "blah blah blah", getFieldValue(doc, SOURCE.name()));
+        assertEquals("Document's content exact field", "blah blah blah", getFieldValue(doc, SOURCE_EXACT.name()));
+        assertEquals("Document's target field", "someone", getFieldValue(doc, TARGET.name()));
+        assertEquals("Document's source lang field", "EN", getFieldValue(doc, SOURCE_LANG.name()));
+        assertEquals("Document's target lang field", "FR", getFieldValue(doc, TARGET_LANG.name()));
     }
 
     @Test
     public void getDocumentNoTarget(){
         Document doc = tmWriter.getDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("blah blah blah")), null));
-        assertNull("Document's target field should be null", doc.getField(TranslationUnitFields.TARGET.name()));
+        assertNull("Document's target field should be null", doc.getField(TARGET.name()));
     }
 
     @Test(expected = NullPointerException.class)
@@ -127,5 +128,9 @@ public class PensieveWriterTest {
     @Test
     public void validateTUNoSourceLang(){
 
+    }
+
+    private String getFieldValue(Document doc, String fieldName) {
+        return doc.getField(fieldName).stringValue();
     }
 }
