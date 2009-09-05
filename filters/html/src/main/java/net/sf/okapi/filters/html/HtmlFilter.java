@@ -63,7 +63,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		setFilterWriter(createFilterWriter());
 		setParameters(new Parameters());
 		setName("okf_html"); //$NON-NLS-1$
-		setDescription("HTML/XHTML Filter"); //$NON-NLS-1$
+		setDisplayName("HTML/XHTML Filter"); //$NON-NLS-1$
 		addConfiguration(new FilterConfiguration(getName(), 
 				MimeTypeMapper.HTML_MIME_TYPE, 
 				getClass().getName(),

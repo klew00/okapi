@@ -44,10 +44,16 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 public interface IFilter {	
 
 	/**
-	 * Gets the name of this filter.
-	 * @return The name of the filter.
+	 * Gets the name/identifier of this filter.
+	 * @return The name/identifier of the filter.
 	 */
 	public String getName ();
+	
+	/**
+	 * Gets the localizable display name of this filter.
+	 * @return the localizable display name of this filter.
+	 */
+	public String getDisplayName ();
 
 	/**
 	 * Opens the input document described in a give RawDocument object.

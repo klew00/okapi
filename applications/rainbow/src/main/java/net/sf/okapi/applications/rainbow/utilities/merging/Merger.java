@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.applications.rainbow.packages.Manifest;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
@@ -62,20 +61,9 @@ public class Merger {
 	private String trgLang;
 
 	public Merger () {
-		// Get the location of the class source
-		File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
-	    String rootFolder = file.getAbsolutePath();
-	    boolean fromJar = rootFolder.endsWith(".jar");
-	    // Remove the JAR file if running an installed version
-	    if ( fromJar ) rootFolder = Util.getDirectoryName(rootFolder);
-	    // Remove the application folder in all cases
-	    rootFolder = Util.getDirectoryName(rootFolder);
-		String sharedFolder = Utils.getOkapiSharedFolder(rootFolder, fromJar);
-
-		// Load the FilterAccess list
+		// Load the filter configurations
 		mapper = new FilterConfigurationMapper();
 		DefaultFilters.setMappings(mapper, false, true);
-//fc		mapper.loadList(sharedFolder + File.separator + "filters.xml");
 		// No need to load custom configuration because we are loading the parameters ourselves
 	}
 

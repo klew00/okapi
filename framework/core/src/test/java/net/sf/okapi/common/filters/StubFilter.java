@@ -24,6 +24,10 @@ public class StubFilter implements IFilter {
     public String getName() {
         return "foobar";
     }
+	
+	public String getDisplayName () {
+		return "Stub Filter";
+	}
 
     public void open(RawDocument input) {
     }

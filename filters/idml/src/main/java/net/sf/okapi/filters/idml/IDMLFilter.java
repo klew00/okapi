@@ -103,6 +103,10 @@ public class IDMLFilter implements IFilter {
 		return "okf_idml";
 	}
 
+	public String getDisplayName () {
+		return "IDML Filter (ALPHA)";
+	}
+
 	public String getMimeType () {
 		return MIMETYPE;
 	}

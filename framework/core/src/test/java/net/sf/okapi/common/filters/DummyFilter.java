@@ -63,6 +63,10 @@ public class DummyFilter implements IFilter {
 		return "DummyFilter";
 	}
 
+	public String getDisplayName () {
+		return "Dummy Filter";
+	}
+
 	public String getMimeType () {
 		return "text/xml";
 	}

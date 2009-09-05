@@ -48,6 +48,7 @@ public class PlainTextFilter extends CompoundFilter{
 		super();	
 		
 		setName(FILTER_NAME);
+		setDisplayName("Plain Text Filter (BETA)");
 		setMimeType(FILTER_MIME);
 		setParameters(new Parameters());	// Plain Text Filter parameters
 		

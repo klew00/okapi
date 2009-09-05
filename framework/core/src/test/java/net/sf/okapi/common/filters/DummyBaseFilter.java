@@ -45,8 +45,13 @@ public class DummyBaseFilter extends AbstractFilter {
 	public void close() {
 	}
 
+	@Override
 	public String getName() {
 		return "DummyBaseFilter";
+	}
+	
+	public String getDisplayName () {
+		return "Dummy Base Filter";
 	}
 
 	public IParameters getParameters() {

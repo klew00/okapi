@@ -114,6 +114,10 @@ public class MIFFilter implements IFilter {
 		return "MIFFilter";
 	}
 	
+	public String getDisplayName () {
+		return "MIF Filter (Pre-ALPHA don't even try)";
+	}
+
 	public String getMimeType () {
 		return MimeTypeMapper.MIF_MIME_TYPE;
 	}

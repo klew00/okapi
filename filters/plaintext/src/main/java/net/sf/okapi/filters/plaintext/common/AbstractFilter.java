@@ -35,7 +35,8 @@ import net.sf.okapi.common.filters.IFilter;
 
 public abstract class AbstractFilter extends OkapiComponent implements IFilter {
 	
-	private String mimeType;		
+	private String mimeType;
+	private String displayName;
 	List<FilterConfiguration> configList = new ArrayList<FilterConfiguration>();
 
 //	@Override
@@ -46,29 +47,23 @@ public abstract class AbstractFilter extends OkapiComponent implements IFilter {
 //	}
 	
 	public AbstractFilter() {
-		
 		super();
 	}
 
-	/**
-	 * Sets the input document mime type.
-	 * 
-	 * @param mimeType the new mime type
-	 */
 	protected void setMimeType(String mimeType) {
-		
 		this.mimeType = mimeType;
 	}
 
-	/**
-	 * Gets the input document mime type.
-	 * 
-	 * @return the mime type
-	 */
-
 	public String getMimeType() {
-		
 		return mimeType;
+	}
+	
+	protected void setDisplayName (String displayName) {
+		this.displayName = displayName;
+	}
+	
+	public String getDisplayName () {
+		return displayName;
 	}
 	
 	protected boolean addConfiguration(			

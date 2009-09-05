@@ -122,6 +122,10 @@ public class TmxFilter implements IFilter {
 		return "okf_tmx";
 	}
 	
+	public String getDisplayName () {
+		return "TMX Filter (BETA)";
+	}
+
 	public String getMimeType () {
 		return "text/x-tmx";
 	}

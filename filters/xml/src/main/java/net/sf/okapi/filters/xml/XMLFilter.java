@@ -106,6 +106,10 @@ public class XMLFilter implements IFilter {
 		return "okf_xml";
 	}
 	
+	public String getDisplayName () {
+		return "XML Filter (BETA)";
+	}
+
 	public String getMimeType () {
 		return MimeTypeMapper.XML_MIME_TYPE;
 	}

@@ -31,13 +31,18 @@ public class FilterInfo {
 	public String name;
 	
 	/**
+	 * display name of the filter.
+	 */
+	public String displayName;
+	
+	/**
 	 * Name of the class of the filter.
 	 */
 	public String className;
 	
 	@Override
 	public String toString () {
-		return name;
+		return displayName;
 	}
 
 }

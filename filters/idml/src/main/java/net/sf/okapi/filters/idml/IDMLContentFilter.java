@@ -104,6 +104,10 @@ public class IDMLContentFilter implements IFilter {
 		return "okf_idmlcontent";
 	}
 	
+	public String getDisplayName () {
+		return "IDML-Content Filter (ALPHA)";
+	}
+
 	public String getMimeType () {
 		return "text/xml";
 	}

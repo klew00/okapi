@@ -61,6 +61,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		codeFinder = new InlineCodeFinder();
 		
 		setName(FILTER_NAME);
+		setDisplayName("Plain Text Filter (BETA)");
 		setMimeType(FILTER_MIME);
 		
 		addConfiguration(true, 

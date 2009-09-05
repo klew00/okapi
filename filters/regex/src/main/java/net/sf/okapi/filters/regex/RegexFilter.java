@@ -93,6 +93,10 @@ public class RegexFilter implements IFilter {
 		return "okf_regex";
 	}
 	
+	public String getDisplayName () {
+		return "Regex Filter";
+	}
+
 	public String getMimeType () {
 		return MIMETYPE;
 	}

@@ -116,6 +116,10 @@ public class XLIFFFilter implements IFilter {
 		return "okf_xliff";
 	}
 
+	public String getDisplayName () {
+		return "XLIFF Filter";
+	}
+
 	public String getMimeType () {
 		return MimeTypeMapper.XLIFF_MIME_TYPE;
 	}

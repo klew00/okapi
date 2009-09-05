@@ -112,6 +112,10 @@ public class DTDFilter implements IFilter {
 		return "okf_dtd";
 	}
 	
+	public String getDisplayName () {
+		return "DTD Filter (BETA)";
+	}
+
 	public String getMimeType () {
 		return MimeTypeMapper.DTD_MIME_TYPE;
 	}

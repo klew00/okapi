@@ -128,6 +128,10 @@ public class TsFilter implements IFilter {
 		return "okf_ts";
 	}
 
+	public String getDisplayName () {
+		return "TS Filter (ALPHA)";
+	}
+
 	public IParameters getParameters() {
 		return this.params;
 	}

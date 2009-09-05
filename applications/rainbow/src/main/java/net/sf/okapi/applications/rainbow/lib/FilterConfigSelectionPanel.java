@@ -20,7 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
-import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -66,14 +65,12 @@ public class FilterConfigSelectionPanel extends Composite {
 	private BaseContext context;
 	private java.util.List<FilterInfo> filters;
 	private IFilter cachedFilter;
-	private Project project;
 	private IHelp help;
 	
 	public FilterConfigSelectionPanel (Composite p_Parent,
 		IHelp helpParam,
 		int p_nFlags,
 		FilterConfigurationMapper mapper,
-		Project project,
 		String projectDir)
 	{
 		super(p_Parent, SWT.NONE);
@@ -83,7 +80,6 @@ public class FilterConfigSelectionPanel extends Composite {
 		context.setString("projDir", projectDir); //$NON-NLS-1$
 		context.setObject("shell", getShell()); //$NON-NLS-1$
 		this.mapper = mapper;
-		this.project = project;
 		createContent();
 	}
 	
@@ -186,6 +182,7 @@ public class FilterConfigSelectionPanel extends Composite {
 		for ( FilterInfo item : filters ) {
 			cbFilters.add(item.toString());
 		}
+		
 		// Set the current filter
 		FilterConfiguration config = mapper.getConfiguration(configId);
 		if ( config == null ) {
@@ -227,7 +224,6 @@ public class FilterConfigSelectionPanel extends Composite {
 				configId = lbConfigs.getItem(n);
 			}
 			String oldConfigId = configId;
-			//FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(getShell(), true, project, mapper, help);
 			FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(getShell(), true, mapper, help); 
 			configId = dlg.showDialog(configId);
 			if ( configId == null ) { // Close without selection

@@ -214,7 +214,6 @@ public class CommandLine {
 		// Set up the filter configuration mapper
 		mapper = new FilterConfigurationMapper();
 		DefaultFilters.setMappings(mapper, false, true);
-//		mapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
 
 		plugins = new PluginsAccess();
 		plugins.addAllPackages(sharedFolder);

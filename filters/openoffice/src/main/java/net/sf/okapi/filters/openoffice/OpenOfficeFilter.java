@@ -111,6 +111,10 @@ public class OpenOfficeFilter implements IFilter {
 		return "okf_openoffice";
 	}
 
+	public String getDisplayName () {
+		return "OpenOffice.org Filter (BETA)";
+	}
+
 	public String getMimeType () {
 		return MIMETYPE;
 	}

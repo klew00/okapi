@@ -132,6 +132,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		FilterInfo info = new FilterInfo();
 		info.className = filterClass;
 		info.name = filter.getName();
+		info.displayName = filter.getDisplayName();
 		filters.add(info);
 		
 		// Get the available configurations for this filter

@@ -109,6 +109,10 @@ public class PropertiesFilter implements IFilter {
 		return "okf_properties";
 	}
 	
+	public String getDisplayName () {
+		return "Properties Filter";
+	}
+
 	public String getMimeType () {
 		return MimeTypeMapper.PROPERTIES_MIME_TYPE;
 	}

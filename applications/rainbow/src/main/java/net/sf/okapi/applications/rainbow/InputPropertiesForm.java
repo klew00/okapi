@@ -67,7 +67,7 @@ class InputPropertiesForm {
 		grpTmp.setText(Res.getString("INPROP_GRPPARAMS")); //$NON-NLS-1$
 
 		pnlFilterConfigSelection = new FilterConfigSelectionPanel(grpTmp, help,
-			SWT.NONE, fcMapper, project, projectDir);
+			SWT.NONE, fcMapper, projectDir);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		pnlFilterConfigSelection.setLayoutData(gdTmp);
 		

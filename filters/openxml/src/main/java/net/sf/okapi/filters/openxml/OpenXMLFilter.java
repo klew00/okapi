@@ -217,18 +217,14 @@ public class OpenXMLFilter implements IFilter {
 		return new OpenXMLZipFilterWriter();
 	}
 
-	/**
-	 * Returns a name for this filter to be used in a user interface.
-	 * @return the filter name
-	 */
 	public String getName () {
 		return "okf_openxml";
 	}
 
-	/**
-	 * Returns the current mimetype
-	 * @return the current mimetype
-	 */
+	public String getDisplayName () {
+		return "OpenXML Filter (BETA)";
+	}
+
 	public String getMimeType () {
 		return MIMETYPE;
 	}

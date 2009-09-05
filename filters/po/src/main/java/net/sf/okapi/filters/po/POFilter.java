@@ -144,6 +144,10 @@ public class POFilter implements IFilter {
 		return "okf_po";
 	}
 	
+	public String getDisplayName () {
+		return "PO Filter";
+	}
+
 	public String getMimeType () {
 		return MimeTypeMapper.PO_MIME_TYPE;
 	}

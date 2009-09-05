@@ -35,7 +35,7 @@ public abstract class AbstractFilter implements IFilter {
 	private boolean generateSkeleton;
 	private boolean multilingual;
 	private String name;
-	private String description;
+	private String displayName;
 
 	/**
 	 * Default constructor
@@ -346,12 +346,12 @@ public abstract class AbstractFilter implements IFilter {
 		return name;
 	}
 
-	protected void setDescription(String description) {
-		this.description = description;
+	public String getDisplayName () {
+		return displayName;
 	}
 
-	public String getDescription() {
-		// return this.getClass().getName();
-		return description;
+	protected void setDisplayName (String displayName) {
+		this.displayName = displayName;
 	}
+
 }

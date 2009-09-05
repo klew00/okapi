@@ -237,6 +237,10 @@ public class ODFFilter implements IFilter {
 		return "okf_odf";
 	}
 
+	public String getDisplayName () {
+		return "ODF-Content Filter (BETA)";
+	}
+
 	public String getMimeType () {
 		return MIMETYPE;
 	}
