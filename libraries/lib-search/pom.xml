@@ -8,6 +8,18 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>okapi-lib-search</artifactId>
 	<name>Okapi Library for Indexed Search</name>
+	
+    <repositories>
+        <repository>
+            <id>apache-snapshot-repo</id>
+            <url>http://people.apache.org/maven-snapshot-repository/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+	
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.okapi</groupId>
