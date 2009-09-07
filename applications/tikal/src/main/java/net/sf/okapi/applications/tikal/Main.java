@@ -263,41 +263,29 @@ public class Main {
 		extensionsMap.put(".pptx", "okf_openxml");
 		extensionsMap.put(".xlsx", "okf_openxml");
 		filtersMap.put("okf_openxml", "net.sf.okapi.filters.openxml.OpenXMLFilter");
-//		fcMapper.addEditor("net.sf.okapi.filters.openxml.ui.Editor",
-//			"net.sf.okapi.filters.openxml.ConditionalParameters");
 
 		extensionsMap.put(".odt", "okf_openoffice");
 		extensionsMap.put(".odp", "okf_openoffice");
 		extensionsMap.put(".ods", "okf_openoffice");
 		filtersMap.put("okf_openoffice", "net.sf.okapi.filters.openoffice.OpenOfficeFilter");
-//		fcMapper.addEditor("net.sf.okapi.filters.openoffice.ui.Editor",
-//			"net.sf.okapi.filters.openoffice.Parameters");
 
 		extensionsMap.put(".htm", "okf_html");
 		extensionsMap.put(".html", "okf_html");
 		filtersMap.put("okf_html", "net.sf.okapi.filters.html.HtmlFilter");
-//		fcMapper.addEditor("net.sf.okapi.filters.html.ui.Editor",
-//			"net.sf.okapi.filters.html.HtmlFilter.Parameters");
 		
 		extensionsMap.put(".xlf", "okf_xliff");
 		extensionsMap.put(".xlif", "okf_xliff");
 		extensionsMap.put(".xliff", "okf_xliff");
 		filtersMap.put("okf_xliff", "net.sf.okapi.filters.xliff.XLIFFFilter");
-//		fcMapper.addDescriptionProvider("net.sf.okapi.filters.xliff.ParametersUI",
-//			"net.sf.okapi.filters.xliff.Parameters");
 		
 		extensionsMap.put(".tmx", "okf_tmx");
 		filtersMap.put("okf_tmx", "net.sf.okapi.filters.tmx.TmxFilter");
 		
 		extensionsMap.put(".properties", "okf_properties");
 		filtersMap.put("okf_properties", "net.sf.okapi.filters.properties.PropertiesFilter");
-//		fcMapper.addEditor("net.sf.okapi.filters.properties.ui.Editor",
-//			"net.sf.okapi.filters.properties.Parameters");
 		
 		extensionsMap.put(".po", "okf_po");
 		filtersMap.put("okf_po", "net.sf.okapi.filters.po.POFilter");
-//		fcMapper.addEditor("net.sf.okapi.filters.po.ui.Editor",
-//			"net.sf.okapi.filters.po.Parameters");
 		
 		extensionsMap.put(".xml", "okf_xml");
 		extensionsMap.put(".resx", "okf_xml-resx");
@@ -305,8 +293,6 @@ public class Main {
 		
 		extensionsMap.put(".srt", "okf_regex-srt");
 		filtersMap.put("okf_regex", "net.sf.okapi.filters.regex.RegexFilter");
-//		fcMapper.addEditor("net.sf.okapi.filters.regex.ui.Editor",
-//			"net.sf.okapi.filters.regex.Parameters");
 		
 		extensionsMap.put(".dtd", "okf_dtd");
 		extensionsMap.put(".ent", "okf_dtd");
@@ -314,18 +300,15 @@ public class Main {
 		
 		extensionsMap.put(".ts", "okf_ts");
 		filtersMap.put("okf_ts", "net.sf.okapi.filters.ts.TsFilter");
-//		fcMapper.addEditor("net.sf.okapi.filters.ts.ui.Editor",
-//			"net.sf.okapi.filters.ts.Parameters");
 		
 		extensionsMap.put(".txt", "okf_plaintext");
 		filtersMap.put("okf_plaintext", "net.sf.okapi.filters.plaintext.PlainTextFilter");
-//		fcMapper.addEditor("net.sf.okapi.filters.plaintext.ui.Editor",
-//			"net.sf.okapi.filters.plaintext.Parameters");
 
 		extensionsMap.put(".csv", "okf_table_csv");
 		filtersMap.put("okf_table", "net.sf.okapi.filters.table.TableFilter");
-//		fcMapper.addEditor("net.sf.okapi.filters.table.ui.Editor",
-//			"net.sf.okapi.filters.table.Parameters");
+
+		extensionsMap.put(".json", "okf_json");
+		filtersMap.put("okf_json", "net.sf.okapi.filters.json.JSONFilter");
 	}
 	
 	private String getConfigurationId (String ext) {

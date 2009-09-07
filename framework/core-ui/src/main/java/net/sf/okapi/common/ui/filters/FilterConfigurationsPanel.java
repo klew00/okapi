@@ -37,6 +37,8 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -166,6 +168,16 @@ public class FilterConfigurationsPanel extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				updateInfo();
 			};
+		});
+		table.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if ( e.character == ' ' ) {
+					editParameters();
+				}
+				else if ( e.keyCode == SWT.DEL ) {
+					deleteConfiguration();
+				}
+			}
 		});
 		
 		model = new FilterConfigurationsTableModel();

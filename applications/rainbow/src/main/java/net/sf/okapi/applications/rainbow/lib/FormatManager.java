@@ -70,6 +70,7 @@ public class FormatManager {
 		pairs.put(".ts", "okf_ts");
 		pairs.put(".txt", "okf_plaintext");
 		pairs.put(".srt", "okf_regex-srt");
+		pairs.put(".json", "okf_json");
 	}
 	
 	/**

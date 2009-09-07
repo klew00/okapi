@@ -24,13 +24,23 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import org.w3c.dom.Node;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.channels.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.util.List;
@@ -418,7 +428,8 @@ public class Util {
 			while (buffer.hasRemaining()) {
 				outChannel.write(buffer);
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new OkapiIOException(e);
 		}
 	}
@@ -427,9 +438,9 @@ public class Util {
 	 * Copy an {@link InputStream} to a File.
 	 * 
 	 * @param is
-	 *            - input stream
+	 *            input stream
 	 * @param outputFile
-	 *            - output {@link File}
+	 *            output {@link File}
 	 * @throws OkapiIOException
 	 */
 	public static void copy (InputStream is,
@@ -442,9 +453,9 @@ public class Util {
 	 * Copy an {@link InputStream} to a File.
 	 * 
 	 * @param is
-	 *            - input stream
+	 *            input stream
 	 * @param outputPath
-	 *            - output path
+	 *            output path
 	 * @throws OkapiIOException
 	 */
 	public static void copy(InputStream is, String outputPath) {
@@ -454,9 +465,11 @@ public class Util {
 			inChannel = Channels.newChannel(is);
 			outChannel = new FileOutputStream(new File(outputPath)).getChannel();
 			copy(inChannel, outChannel);
-		} catch (FileNotFoundException e) {
+		}
+		catch (FileNotFoundException e) {
 			throw new OkapiIOException(e);
-		} finally {
+		}
+		finally {
 			try {
 				if (inChannel != null)
 					inChannel.close();
@@ -472,9 +485,9 @@ public class Util {
 	 * Copies one file to another.
 	 * 
 	 * @param in
-	 *            - input File
+	 *            input file
 	 * @param out
-	 *            - output File
+	 *            output file
 	 * @throws OkapiIOException
 	 */
 	public static void copyFile (File in,
@@ -486,9 +499,11 @@ public class Util {
 			inChannel = new FileInputStream(in).getChannel();
 			outChannel = new FileOutputStream(out).getChannel();
 			copy(inChannel, outChannel);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new OkapiIOException(e);
-		} finally {
+		}
+		finally {
 			try {
 				if (inChannel != null)
 					inChannel.close();
@@ -551,8 +566,8 @@ public class Util {
 	 *            Directory of the content to delete.
 	 */
 	private static void deleteDirectory (File directory) {
-		for (File f : directory.listFiles()) {
-			if (f.isDirectory()) {
+		for ( File f : directory.listFiles() ) {
+			if ( f.isDirectory() ) {
 				deleteDirectory(f);
 			}
 			f.delete();
@@ -575,11 +590,13 @@ public class Util {
 	{
 		File f = new File(directory);
 		// Make sure this is a directory
-		if (!f.isDirectory())
+		if ( !f.isDirectory() ) {
 			return;
+		}
 		deleteDirectory(f);
-		if (!contentOnly)
+		if ( !contentOnly ) {
 			f.delete();
+		}
 	}
 
 	/**
@@ -597,20 +614,23 @@ public class Util {
 	{
 		// Get the filename
 		int n = path.lastIndexOf('/'); // Try generic first
-		if (n == -1) { // Then try Windows
+		if ( n == -1 ) { // Then try Windows
 			n = path.lastIndexOf('\\');
 		}
-		if (n > -1)
+		if ( n > -1 ) {
 			path = path.substring(n + 1);
+		}
 		// Stop here if we keep the extension
-		if (keepExtension)
+		if ( keepExtension ) {
 			return path;
+		}
 		// Else: remove the extension if there is one
 		n = path.lastIndexOf('.');
-		if (n > -1)
+		if ( n > -1 ) {
 			return path.substring(0, n);
-		else
-			return path;
+		}
+		// Else:
+		return path;
 	}
 
 	/**
@@ -649,7 +669,8 @@ public class Util {
 			String tmp = URLEncoder.encode(pathOrUri, "UTF-8");
 			// Use '%20' instead of '+': '+ not working with File(uri) it seems
 			return "file:///" + tmp.replace("+", "%20");
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e) {
 			throw new OkapiUnsupportedEncodingException(e); // UTF-8 should be
 			// always supported
 			// anyway
@@ -677,12 +698,12 @@ public class Util {
 	 * new one.
 	 * 
 	 * @param currentDir
-	 *            The current longest common path.
+	 *            the current longest common path.
 	 * @param newDir
-	 *            The new directory to compare with.
+	 *            the new directory to compare with.
 	 * @param ignoreCase
-	 *            True if the method should ignore cases differences.
-	 * @return The longest sub-directory that is common to both directories.
+	 *            true if the method should ignore cases differences.
+	 * @return the longest sub-directory that is common to both directories.
 	 *         This can be a null or empty string.
 	 */
 	static public String longestCommonDir (String currentDir,
@@ -744,14 +765,17 @@ public class Util {
 	 * methods must be the first call after opening the writer.
 	 * 
 	 * @param writer
-	 *            Writer where to output the BOM.
+	 *            writer where to output the BOM.
 	 * @param bomOnUTF8
-	 *            Indicates if we should use a BOM on UTF-8 files.
+	 *            indicates if we should use a BOM on UTF-8 files.
 	 * @param encoding
-	 *            Encoding of the output.
+	 *            encoding of the output.
 	 * @throws OkapiIOException
 	 */
-	static public void writeBOMIfNeeded(Writer writer, boolean bomOnUTF8, String encoding) {
+	static public void writeBOMIfNeeded (Writer writer,
+		boolean bomOnUTF8,
+		String encoding)
+	{
 		try {
 			String tmp = encoding.toLowerCase();
 
@@ -827,7 +851,7 @@ public class Util {
 	 *            the container element.
 	 * @return the text of the first TEXT child node.
 	 */
-	public static String getTextContent(Node node) {
+	public static String getTextContent (Node node) {
 		Node tmp = node.getFirstChild();
 		while (true) {
 			if (tmp == null)
@@ -843,12 +867,14 @@ public class Util {
 	 * Calculates safely a percentage. If the total is 0, the methods return 1.
 	 * 
 	 * @param part
-	 *            The part of the total.
+	 *            the part of the total.
 	 * @param total
 	 *            the total.
-	 * @return The percentage of part in total.
+	 * @return the percentage of part in total.
 	 */
-	public static int getPercentage(int part, int total) {
+	public static int getPercentage (int part,
+		int total)
+	{
 		return (total == 0 ? 1 : Math.round((float) part / (float) total * 100));
 	}
 
@@ -880,7 +906,10 @@ public class Util {
 	 * @return true if, according the given options, the two language codes are
 	 *         the same. False otherwise.
 	 */
-	static public boolean isSameLanguage(String lang1, String lang2, boolean ignoreRegion) {
+	static public boolean isSameLanguage (String lang1,
+		String lang2,
+		boolean ignoreRegion)
+	{
 		lang1 = lang1.replace('_', '-');
 		lang2 = lang2.replace('_', '-');
 		if (ignoreRegion) { // Do not take the region part into account
@@ -903,13 +932,12 @@ public class Util {
 	 *            the string to check.
 	 * @return true if the given string is null or empty.
 	 */
-	static public boolean isEmpty(String string) {
-		// return (string == null || string == ""); // !!! Doesn't work
-		return string == null || string.length() == 0;
+	static public boolean isEmpty (String string) {
+		return (( string == null ) || ( string.length() == 0 ));
 	}
 	
-	static public boolean isEmpty(String string, boolean ignoreWS) {
-        if (ignoreWS && string != null){
+	static public boolean isEmpty (String string, boolean ignoreWS) {
+        if ( ignoreWS && ( string != null )) {
             string = string.trim();
         }
 		return isEmpty(string);
@@ -927,39 +955,41 @@ public class Util {
 		return (e == null ||(e != null && e.length == 0));
 	}
 	
-// Safe string functions	
+	
+	//=== Safe string functions
+	
 	static public int getLength(String string) {
 		return (isEmpty(string)) ? 0 : string.length();
 	}
 
-	static public char getCharAt(String string, int pos) {
-		if (isEmpty(string))
+	static public char getCharAt (String string, int pos) {
+		if ( isEmpty(string) ) {
 			return '\0';
-
+		}
 		return (string.length() > pos) ? string.charAt(pos) : 0;
 	}
 
-	static public char getLastChar(String string) {
-		if (isEmpty(string))
+	static public char getLastChar (String string) {
+		if ( isEmpty(string) ) {
 			return '\0';
-
+		}
 		return string.charAt(string.length() - 1);
 	}
 
-	static public String deleteLastChar(String string) {
-		if (isEmpty(string))
+	static public String deleteLastChar (String string) {
+		if ( isEmpty(string) ) {
 			return "";
-
+		}
 		return string.substring(0, string.length() - 1);
 	}
 
-	static public char getLastChar(StringBuilder sb) {
+	static public char getLastChar (StringBuilder sb) {
 		if ((sb == null) || (sb.length() == 0))
 			return '\0';
 		return sb.charAt(sb.length() - 1);
 	}
 
-	static public void deleteLastChar(StringBuilder sb) {
+	static public void deleteLastChar (StringBuilder sb) {
 		if ((sb == null) || (sb.length() == 0))
 			return;
 		sb.deleteCharAt(sb.length() - 1);
@@ -967,7 +997,6 @@ public class Util {
 
 // List helpers	
 	public static <E> boolean checkIndex(int index, List<E> list) {
-		
 		return ((list != null) && (index >= 0) && (index < list.size()));
 	}
 

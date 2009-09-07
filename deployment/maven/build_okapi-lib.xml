@@ -86,6 +86,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../filters/idml/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/json/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../filters/mif/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../filters/openoffice/target/classes"

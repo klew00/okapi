@@ -44,6 +44,7 @@
 			<artifactId>okapi-lib-translation</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-xliff</artifactId>
@@ -75,11 +76,6 @@
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-html-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-xsltransform-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -117,37 +113,42 @@
 			<artifactId>okapi-filter-ts-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-tmx</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-xml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-dtd</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-idml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-mif</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-json</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-xsltransform-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-bomconversion-ui</artifactId>

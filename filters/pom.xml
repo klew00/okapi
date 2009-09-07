@@ -38,6 +38,7 @@
         <module>ts-ui</module>
         <module>xliff</module>
         <module>xml</module>
+        <module>json</module>
     </modules>
 
     <build>

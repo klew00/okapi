@@ -54,42 +54,42 @@ public class UtilTest {
 
     @Test
     public void isEmptyNull(){
-        assertTrue("null should be empty", Util.isEmpty(""));
+        assertTrue("null should be empty", Util.isEmpty((String)null));
     }
 
     @Test
     public void isEmptyEmpty(){
-        assertTrue("null should be empty", Util.isEmpty(""));
+        assertTrue("Empty should be empty", Util.isEmpty(""));
     }
 
     @Test
     public void isEmptyNotEmpty(){
-        assertFalse("null should be empty", Util.isEmpty("not"));
+        assertFalse("Not empty should be not empty", Util.isEmpty("not"));
     }
 
     @Test
     public void isEmptyNotEmptyWhitespace(){
-        assertFalse("null should be empty", Util.isEmpty(" "));
+        assertFalse("Space should not be empty", Util.isEmpty(" "));
     }
 
     @Test
     public void isEmptyIgnoreWSNotEmptyWhitespace(){
-        assertTrue("null should be empty", Util.isEmpty(" ", true));
+        assertTrue("Space should be empty", Util.isEmpty(" ", true));
     }
 
     @Test
     public void isEmptyIgnoreWSEmpty(){
-        assertTrue("null should be empty", Util.isEmpty("", true));
+        assertTrue("Empty should be empty", Util.isEmpty("", true));
     }
 
     @Test
     public void isEmptyIgnoreWSNull(){
-        assertTrue("null should be empty", Util.isEmpty(null, true));
+        assertTrue("Null should be empty", Util.isEmpty(null, true));
     }
 
     @Test
     public void isEmptyIgnoreWSNotEmpty(){
-        assertFalse("null should be empty", Util.isEmpty("s", true));
+        assertFalse("Not empty should be not empty", Util.isEmpty("s", true));
     }
 
     @Test
