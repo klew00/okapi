@@ -25,7 +25,7 @@ import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import static net.sf.okapi.tm.pensieve.common.TranslationUnitField.*;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
-import net.sf.okapi.tm.pensieve.common.MetaData;
+import net.sf.okapi.tm.pensieve.common.Metadata;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -60,7 +60,7 @@ public class PensieveWriterTest {
 
        @Test
     public void addMetadataToDocument(){
-        MetaData md = new MetaData();
+        Metadata md = new Metadata();
         md.put(MetadataType.FILE_NAME, "some/file");
         md.put(MetadataType.GROUP_NAME, "some group");
         md.put(MetadataType.ID, "someId");

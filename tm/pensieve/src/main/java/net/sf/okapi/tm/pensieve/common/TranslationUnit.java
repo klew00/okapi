@@ -28,10 +28,10 @@ package net.sf.okapi.tm.pensieve.common;
 public class TranslationUnit {
     private TranslationUnitVariant source;
     private TranslationUnitVariant target;
-    private MetaData metadata;
+    private Metadata metadata;
 
     public TranslationUnit(){
-        metadata = new MetaData();
+        metadata = new Metadata();
     }
 
     public TranslationUnit(TranslationUnitVariant source, TranslationUnitVariant target) {
@@ -40,11 +40,11 @@ public class TranslationUnit {
         this.target = target;
     }
 
-    public MetaData getMetadata() {
+    public Metadata getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(MetaData metadata) {
+    public void setMetadata(Metadata metadata) {
         this.metadata = metadata;
     }
 

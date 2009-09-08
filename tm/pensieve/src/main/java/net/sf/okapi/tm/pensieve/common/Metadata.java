@@ -26,6 +26,6 @@ import java.util.HashMap;
  *
  * @author HaslamJD
  */
-public class MetaData extends HashMap<MetadataType, String> {
+public class Metadata extends HashMap<MetadataType, String> {
 
 }

@@ -54,7 +54,7 @@ public class TranslationUnitTest {
     @Test
     public void metaDataSetter(){
         tu = new TranslationUnit(SOURCE, CONTENT);
-        MetaData md = new MetaData();
+        Metadata md = new Metadata();
         tu.setMetadata(md);
         assertSame("metadata should be the same", md, tu.getMetadata());
     }

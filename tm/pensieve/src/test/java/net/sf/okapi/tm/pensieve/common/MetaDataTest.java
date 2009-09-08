@@ -31,12 +31,12 @@ public class MetaDataTest {
 
     @Test
     public void noArgConstructor() {
-        assertEquals("metadata entries", 0, new MetaData().size());
+        assertEquals("metadata entries", 0, new Metadata().size());
     }
 
     @Test
     public void keysAndValues() {
-        MetaData md = new MetaData();
+        Metadata md = new Metadata();
         String id = "MetaData - pronounced may-da-day-da";
         md.put(MetadataType.ID, id);
         assertEquals("metadata entries", id, md.get(MetadataType.ID));
