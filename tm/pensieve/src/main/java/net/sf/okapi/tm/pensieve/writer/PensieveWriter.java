@@ -21,9 +21,7 @@
 package net.sf.okapi.tm.pensieve.writer;
 
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
+import net.sf.okapi.tm.pensieve.common.*;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -73,28 +71,33 @@ public class PensieveWriter implements TMWriter {
             throw new NullPointerException("source content not set");
         }
         Document doc = new Document();
-        doc.add(createField(TranslationUnitFields.SOURCE, tu.getSource().getContent(), Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(createField(TranslationUnitFields.SOURCE_LANG, tu.getSource(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(createField(TranslationUnitFields.SOURCE_EXACT, tu.getSource().getContent(), Field.Store.NO, Field.Index.NOT_ANALYZED));
+        doc.add(createField(TranslationUnitField.SOURCE, tu.getSource().getContent(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(createField(TranslationUnitField.SOURCE_LANG, tu.getSource(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(createField(TranslationUnitField.SOURCE_EXACT, tu.getSource().getContent(), Field.Store.NO, Field.Index.NOT_ANALYZED));
         if (!tu.isTargetEmpty()){
-            doc.add(createField(TranslationUnitFields.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
-            doc.add(createField(TranslationUnitFields.TARGET_LANG, tu.getTarget(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(createField(TranslationUnitField.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
+            doc.add(createField(TranslationUnitField.TARGET_LANG, tu.getTarget(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
         return doc;
     }
 
-    Field createField(TranslationUnitFields field,
+    Field createField(TranslationUnitField field,
                   TextFragment frag,
                   Field.Store store,
                   Field.Index index){
         return new Field(field.name(), frag.toString(), store, index);
     }
 
-    Field createField(TranslationUnitFields field,
+    Field createField(TranslationUnitField field,
                   TranslationUnitVariant tuv,
                   Field.Store store,
                   Field.Index index){
         return new Field(field.name(), tuv.getLang(), store, index);
     }
 
+    public void addMetadataToDocument(Document doc, MetaData metadata) {
+        for(MetaDataType type : metadata.keySet()) {
+            doc.add(new Field(type.fieldName(), metadata.get(type), type.store(), type.indexType()));
+        }
+    }
 }

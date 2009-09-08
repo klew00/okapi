@@ -25,6 +25,6 @@ package net.sf.okapi.tm.pensieve.common;
  * Date: Aug 19, 2009
  * Time: 7:01:25 AM
  */
-public enum TranslationUnitFields {
+public enum TranslationUnitField {
     SOURCE_EXACT, SOURCE, TARGET, SOURCE_LANG, TARGET_LANG
 }

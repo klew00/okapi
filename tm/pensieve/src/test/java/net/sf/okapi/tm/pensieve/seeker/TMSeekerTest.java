@@ -22,7 +22,7 @@ package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
 import net.sf.okapi.tm.pensieve.writer.PensieveWriter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -260,11 +260,11 @@ public class TMSeekerTest {
         String source = "watch out for the killer rabbit";
         String target = "j";
         Document doc = new Document();
-        doc.add(new Field(TranslationUnitFields.SOURCE_EXACT.name(), source,
+        doc.add(new Field(TranslationUnitField.SOURCE_EXACT.name(), source,
                 Field.Store.NO, Field.Index.ANALYZED));
-        doc.add(new Field(TranslationUnitFields.SOURCE.name(), source,
+        doc.add(new Field(TranslationUnitField.SOURCE.name(), source,
                 Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field(TranslationUnitFields.TARGET.name(), target,
+        doc.add(new Field(TranslationUnitField.TARGET.name(), target,
                 Field.Store.NO, Field.Index.NOT_ANALYZED));
         TranslationUnit tu = seeker.getTranslationUnit(doc);
         assertEquals("source field", source, tu.getSource().getContent().toString());

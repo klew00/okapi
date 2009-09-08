@@ -23,7 +23,7 @@ package net.sf.okapi.tm.pensieve.seeker;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TMHit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitFields;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
@@ -52,7 +52,7 @@ public class TMSeeker implements Seeker {
     }
 
     public List<TMHit> searchForWords(String query, int max) throws IOException {
-        QueryParser parser = new QueryParser(TranslationUnitFields.SOURCE.name(), new SimpleAnalyzer());
+        QueryParser parser = new QueryParser(TranslationUnitField.SOURCE.name(), new SimpleAnalyzer());
         Query q;
         try {
             q = parser.parse(query);
@@ -63,7 +63,7 @@ public class TMSeeker implements Seeker {
     }
 
     public List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException {
-        Query q = new FuzzyQuery(new Term(TranslationUnitFields.SOURCE_EXACT.name(), query));
+        Query q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
         return search(max, q);
     }
 
@@ -75,7 +75,7 @@ public class TMSeeker implements Seeker {
         //This means that if we follow this way, then it will require the same tu to be indexed twice; one time as
         //Field.Index.ANALYZED (for word searching) and another time as Field.Index.NOT_ANALYZED (for exact matches)
         PhraseQuery q = new PhraseQuery();
-        q.add(new Term(TranslationUnitFields.SOURCE_EXACT.name(), query));
+        q.add(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
         return search(max, q);
     }
 
@@ -102,13 +102,13 @@ public class TMSeeker implements Seeker {
     }
 
     TranslationUnit getTranslationUnit(Document doc) {
-        return new TranslationUnit(new TranslationUnitVariant(getFieldValue(doc, TranslationUnitFields.SOURCE_LANG),
-                new TextFragment(getFieldValue(doc, TranslationUnitFields.SOURCE))),
-                new TranslationUnitVariant(getFieldValue(doc, TranslationUnitFields.TARGET_LANG),
-                        new TextFragment(getFieldValue(doc, TranslationUnitFields.TARGET))));
+        return new TranslationUnit(new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.SOURCE_LANG),
+                new TextFragment(getFieldValue(doc, TranslationUnitField.SOURCE))),
+                new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.TARGET_LANG),
+                        new TextFragment(getFieldValue(doc, TranslationUnitField.TARGET))));
     }
 
-    String getFieldValue(Document doc, TranslationUnitFields field){
+    String getFieldValue(Document doc, TranslationUnitField field){
         String fieldValue = null;
         Field tempField = doc.getField(field.name());
         if (tempField != null) {

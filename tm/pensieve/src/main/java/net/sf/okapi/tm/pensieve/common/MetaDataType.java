@@ -20,37 +20,35 @@
 
 package net.sf.okapi.tm.pensieve.common;
 
+import org.apache.lucene.document.Field;
+
 /**
  *
  * @author HaslamJD
  */
 public enum MetaDataType {
-    ID("tuid", StoreType.YES, IndexType.NOT_ANALYZED),
-    NAME("Name", StoreType.YES, IndexType.NOT_ANALYZED),
-    TYPE("Type", StoreType.YES, IndexType.NOT_ANALYZED),
-    GROUP_NAME("GroupName", StoreType.YES, IndexType.NOT_ANALYZED),
-    FILE_NAME("FileName", StoreType.YES, IndexType.NOT_ANALYZED);
+    ID("tuid"),
+    NAME("Name"),
+    TYPE("Type"),
+    GROUP_NAME("GroupName"),
+    FILE_NAME("FileName");
 
     private String fieldName;
-    private StoreType store;
-    private IndexType indexType;
 
-    private MetaDataType(String fieldName, StoreType store, IndexType indexType){
+    private MetaDataType(String fieldName){
         this.fieldName = fieldName;
-        this.store = store;
-        this.indexType = indexType;
     }
 
     public String fieldName(){
         return fieldName;
     }
 
-    public StoreType store(){
-        return store;
+    public Field.Store store(){
+        return Field.Store.YES;
     }
 
-    public IndexType indexType(){
-        return indexType;
+    public Field.Index indexType(){
+        return Field.Index.NOT_ANALYZED;
     }
 }
 

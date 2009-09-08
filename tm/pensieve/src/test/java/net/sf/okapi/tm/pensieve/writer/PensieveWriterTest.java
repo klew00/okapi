@@ -22,8 +22,10 @@ package net.sf.okapi.tm.pensieve.writer;
 
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import static net.sf.okapi.tm.pensieve.common.TranslationUnitFields.*;
+import static net.sf.okapi.tm.pensieve.common.TranslationUnitField.*;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
+import net.sf.okapi.tm.pensieve.common.MetaDataType;
+import net.sf.okapi.tm.pensieve.common.MetaData;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -54,6 +56,21 @@ public class PensieveWriterTest {
         dir = new RAMDirectory();
         tmWriter = new PensieveWriter(dir);
         writer = tmWriter.getIndexWriter();
+    }
+
+       @Test
+    public void addMetadataToDocument(){
+        MetaData md = new MetaData();
+        md.put(MetaDataType.FILE_NAME, "some/file");
+        md.put(MetaDataType.GROUP_NAME, "some group");
+        md.put(MetaDataType.ID, "someId");
+        md.put(MetaDataType.TYPE, "someType");
+        Document doc = new Document();
+        tmWriter.addMetadataToDocument(doc, md);
+        assertEquals("Document's file name field", "some/file", getFieldValue(doc, MetaDataType.FILE_NAME.fieldName()));
+        assertEquals("Document's group name field", "some group", getFieldValue(doc, MetaDataType.GROUP_NAME.fieldName()));
+        assertEquals("Document's id field", "someId", getFieldValue(doc, MetaDataType.ID.fieldName()));
+        assertEquals("Document's type field", "someType", getFieldValue(doc, MetaDataType.TYPE.fieldName()));
     }
 
     @Test
