@@ -700,5 +700,11 @@ public class XMLFilter implements IFilter {
 		skel = new GenericSkeleton();
 		return true;
 	}
-	
+
+	//TODO: use sub-filter to extract a content
+	private void processSubContent () {
+		// The variable frag contains the content
+		
+	}
+
 }

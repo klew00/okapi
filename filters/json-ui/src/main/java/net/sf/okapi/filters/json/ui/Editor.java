@@ -20,10 +20,14 @@
 
 package net.sf.okapi.filters.json.ui;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
@@ -38,9 +42,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Text;
 
 public class Editor implements IParametersEditor {
 	
@@ -48,8 +54,11 @@ public class Editor implements IParametersEditor {
 	private boolean result = false;
 	private OKCancelPanel pnlActions;
 	private Parameters params;
+	private Button chkExtractStandalone;
+	private Button rdExtractAllPairs;
+	private Button rdDontExtractPairs;
+	private Text edExceptions;
 	private Button chkUseCodeFinder;
-	private Button chkDecodeByteValues;
 	private InlineCodeFinderPanel pnlCodeFinder;
 	private IHelp help;
 
@@ -104,12 +113,31 @@ public class Editor implements IParametersEditor {
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		grpTmp.setLayout(layTmp);
-		grpTmp.setText(Res.getString("character"));
+		grpTmp.setText(Res.getString("grpStandaloneStrings"));
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 		
-		chkDecodeByteValues = new Button(grpTmp, SWT.CHECK);
-		chkDecodeByteValues.setText(Res.getString("chkDecodeByteValues"));
+		chkExtractStandalone = new Button(grpTmp, SWT.CHECK);
+		chkExtractStandalone.setText(Res.getString("chkExtractStandalone"));
+		
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setLayout(new GridLayout());
+		grpTmp.setText(Res.getString("grpKeyValuePairs"));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		grpTmp.setLayoutData(gdTmp);
+		
+		rdExtractAllPairs = new Button(grpTmp, SWT.RADIO);
+		rdExtractAllPairs.setText(Res.getString("rdExtractAllPairs"));
+		rdDontExtractPairs = new Button(grpTmp, SWT.RADIO);
+		rdDontExtractPairs.setText(Res.getString("rdDontExtractPairs"));
+		
+		Label label = new Label(grpTmp, SWT.NONE);
+		label.setText(Res.getString("stExceptions"));
+		
+		edExceptions = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		edExceptions.setLayoutData(gdTmp);
+		
 		
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText(Res.getString("tabOptions"));
@@ -199,23 +227,50 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
-		//chkDecodeByteValues.setSelection(params.decodeByteValues);
+		chkExtractStandalone.setSelection(params.getExtractStandalone());
+		rdExtractAllPairs.setSelection(params.getExtractAllPairs());
+		rdDontExtractPairs.setSelection(!params.getExtractAllPairs());
+		edExceptions.setText(params.getExceptions()==null ? "" : params.getExceptions());
 		//chkUseCodeFinder.setSelection(params.useCodeFinder);
 		//pnlCodeFinder.setData(params.codeFinder.toString());
 		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
 	}
+
+	// Returns null if expression is OK, a message if it is not.
+	private String checkExceptionsSyntax () {
+		try {
+			String tmp = edExceptions.getText();
+			if ( Util.isEmpty(tmp) ) return null;
+			Pattern.compile(tmp);
+			params.setExceptions(tmp);
+		}
+		catch ( PatternSyntaxException e ) {
+			return e.getMessage();
+		}
+		return null;
+	}
 	
 	private boolean saveData () {
-		String tmp = pnlCodeFinder.getData();
-		if ( tmp == null ) {
+//		if ( pnlCodeFinder.getData() == null ) {
+//			return false;
+//		}
+//		else {
+//			params.codeFinder.fromString(pnlCodeFinder.getData());
+//		}
+		
+		String tmp = checkExceptionsSyntax();
+		if ( tmp != null ) {
+			edExceptions.selectAll();
+			edExceptions.setFocus();
+			Dialogs.showError(shell, tmp, null);
 			return false;
 		}
-		else {
-//			params.codeFinder.fromString(tmp);
-		}
-//		params.decodeByteValues = chkDecodeByteValues.getSelection();
+		params.setExceptions(edExceptions.getText());
+		params.setExtractStandalone(chkExtractStandalone.getSelection());
+		params.setExtractAllPairs(rdExtractAllPairs.getSelection());
+		
 //		params.useCodeFinder = chkUseCodeFinder.getSelection();
 		return true;
 	}
