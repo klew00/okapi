@@ -21,14 +21,18 @@
 package net.sf.okapi.filters.json;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 
 public class Parameters extends BaseParameters {
 
 	private boolean extractStandalone;
 	private boolean extractAllPairs;
 	private String exceptions;
+	private boolean useCodeFinder;
+	private InlineCodeFinder codeFinder;
 
 	public Parameters () {
+		codeFinder = new InlineCodeFinder();
 		reset();
 		toString(); // fill the list
 	}
@@ -57,10 +61,36 @@ public class Parameters extends BaseParameters {
 		this.exceptions = exceptions;
 	}
 
+	public boolean getUseCodeFinder () {
+		return useCodeFinder;
+	}
+
+	public void setUseCodeFinder (boolean useCodeFinder) {
+		this.useCodeFinder = useCodeFinder;
+	}
+
+	public InlineCodeFinder getCodeFinder () {
+		return codeFinder;
+	}
+
+	public String getCodeFinderData () {
+		return codeFinder.toString();
+	}
+
+	public void setCodeFinderData (String data) {
+		codeFinder.fromString(data);
+	}
+
 	public void reset () {
 		extractStandalone = false;
 		extractAllPairs = true;
 		exceptions = "";
+		
+		useCodeFinder = false;
+		codeFinder.reset();
+		codeFinder.setSample("&name; <tag></at><tag/> <tag attr='val'> </tag=\"val\">");
+		codeFinder.setUseAllRulesWhenTesting(true);
+		codeFinder.addRule("</?([A-Z0-9a-z]*)\\b[^>]*>");
 	}
 
 	public void fromString (String data) {
@@ -69,6 +99,8 @@ public class Parameters extends BaseParameters {
 		extractStandalone = buffer.getBoolean("extractIsolatedStrings", extractStandalone);
 		extractAllPairs = buffer.getBoolean("extractAllPairs", extractAllPairs);
 		exceptions = buffer.getString("exceptions", exceptions);
+		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
+		codeFinder.fromString(buffer.getGroup("codeFinderRules", ""));
 	}
 	
 	@Override
@@ -77,6 +109,8 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("extractIsolatedStrings", extractStandalone);
 		buffer.setBoolean("extractAllPairs", extractAllPairs);
 		buffer.setString("exceptions", exceptions);
+		buffer.setBoolean("useCodeFinder", useCodeFinder);
+		buffer.setGroup("codeFinderRules", codeFinder.toString());
 		return buffer.toString();
 	}
 

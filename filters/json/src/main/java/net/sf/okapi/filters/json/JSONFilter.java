@@ -39,12 +39,15 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -222,6 +225,11 @@ public class JSONFilter implements IFilter {
 		}
 		else {
 			exceptions = Pattern.compile(params.getExceptions());
+		}
+		
+		// Compile code finder rules
+		if ( params.getUseCodeFinder() ) {
+			params.getCodeFinder().compile();
 		}
 		
 		// Set the start event
@@ -441,16 +449,22 @@ public class JSONFilter implements IFilter {
 		// Else: This is a stand-alone string, we have already tested if
 		// if was to be extracted.
 		
+		// Create the new text unit
 		TextUnit tu = new TextUnit(String.valueOf(++tuId));
-		tu.setSource(new TextContainer(buffer.toString()));
-
+		
+		// Create the text and process its inline codes if requested
+		TextFragment tf = new TextFragment(buffer.toString());
+		if ( params.getUseCodeFinder() ) {
+			params.getCodeFinder().process(tf);
+		}
+		tu.setSourceContent(tf);
+		
+		// Sets the name if available
 		if ( !Util.isEmpty(resName) ) {
 			tu.setName(resName);
 		}
 
-//		if ( m_Opt.m_bUseCodeFinder )
-//			m_Opt.m_CodeFinder.ProcessFilterItem(m_CurrentFI);
-
+		// Compute and set the skeleton
 		GenericSkeleton skel = new GenericSkeleton();
 		skel.append(inputText.substring(startRead, startString+1).replace("\n", lineBreak));
 		skel.addContentPlaceholder(tu);

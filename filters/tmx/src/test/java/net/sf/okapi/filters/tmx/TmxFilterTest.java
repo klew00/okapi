@@ -17,6 +17,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -87,6 +88,20 @@ public class TmxFilterTest {
 		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 		root = TestUtil.getParentDir(this.getClass(), "/Paragraph_TM.tmx");
+	}
+
+	@Test
+	public void testTUProperties () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.4\"><header creationtool=\"z\" creationtoolversion=\"z\" segtype=\"block\" o-tmf=\"z\" adminlang=\"en\" srclang=\"en\" datatype=\"unknown\"></header>"
+			+ "<body><tu tuid=\"tuid_1\">"
+			+ "<prop type=\"p1\">val1</prop>"
+			+ "<tuv xml:lang=\"en\"><seg>Hello World!</seg></tuv></tu></body></tmx>\r";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, "en","fr"), 1);
+		assertNotNull(tu);
+		Property prop = tu.getProperty("p1");
+		assertNotNull(prop);
+		assertEquals("val1", prop.getValue());
 	}
 	
 	@Test

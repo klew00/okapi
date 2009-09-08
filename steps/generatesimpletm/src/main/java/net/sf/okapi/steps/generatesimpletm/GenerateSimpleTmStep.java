@@ -149,7 +149,9 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 		
 		// Check if the attributes for GroupName and FileName are available from the input
 		Property propGName = tu.getProperty(Database.NGRPNAME);
+		if ( propGName == null ) propGName = tu.getProperty("Txt::"+Database.NGRPNAME);
 		Property propFName = tu.getProperty(Database.NFILENAME);
+		if ( propFName == null ) propFName = tu.getProperty("Txt::"+Database.NFILENAME);
 
 		// Add the entry
 		int added = simpleTm.addEntry(tu,

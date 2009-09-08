@@ -231,8 +231,8 @@ public class Editor implements IParametersEditor {
 		rdExtractAllPairs.setSelection(params.getExtractAllPairs());
 		rdDontExtractPairs.setSelection(!params.getExtractAllPairs());
 		edExceptions.setText(params.getExceptions()==null ? "" : params.getExceptions());
-		//chkUseCodeFinder.setSelection(params.useCodeFinder);
-		//pnlCodeFinder.setData(params.codeFinder.toString());
+		chkUseCodeFinder.setSelection(params.getUseCodeFinder());
+		pnlCodeFinder.setData(params.getCodeFinderData());
 		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
@@ -253,13 +253,14 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private boolean saveData () {
-//		if ( pnlCodeFinder.getData() == null ) {
-//			return false;
-//		}
-//		else {
-//			params.codeFinder.fromString(pnlCodeFinder.getData());
-//		}
-		
+		if ( chkUseCodeFinder.getSelection() ) {
+			if ( pnlCodeFinder.getData() == null ) {
+				return false;
+			}
+			else {
+				params.setCodeFinderData(pnlCodeFinder.getData());
+			}
+		}
 		String tmp = checkExceptionsSyntax();
 		if ( tmp != null ) {
 			edExceptions.selectAll();
@@ -267,11 +268,11 @@ public class Editor implements IParametersEditor {
 			Dialogs.showError(shell, tmp, null);
 			return false;
 		}
+
+		params.setUseCodeFinder(chkUseCodeFinder.getSelection());
 		params.setExceptions(edExceptions.getText());
 		params.setExtractStandalone(chkExtractStandalone.getSelection());
 		params.setExtractAllPairs(rdExtractAllPairs.getSelection());
-		
-//		params.useCodeFinder = chkUseCodeFinder.getSelection();
 		return true;
 	}
 	
