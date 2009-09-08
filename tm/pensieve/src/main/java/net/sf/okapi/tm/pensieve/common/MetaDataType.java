@@ -24,8 +24,34 @@ package net.sf.okapi.tm.pensieve.common;
  *
  * @author HaslamJD
  */
-public enum MetaDataTypes {
-    ID, NAME, TYPE, GROUP, FILE_NAME
+public enum MetaDataType {
+    ID("tuid", StoreType.YES, IndexType.NOT_ANALYZED),
+    NAME("Name", StoreType.YES, IndexType.NOT_ANALYZED),
+    TYPE("Type", StoreType.YES, IndexType.NOT_ANALYZED),
+    GROUP_NAME("GroupName", StoreType.YES, IndexType.NOT_ANALYZED),
+    FILE_NAME("FileName", StoreType.YES, IndexType.NOT_ANALYZED);
+
+    private String fieldName;
+    private StoreType store;
+    private IndexType indexType;
+
+    private MetaDataType(String fieldName, StoreType store, IndexType indexType){
+        this.fieldName = fieldName;
+        this.store = store;
+        this.indexType = indexType;
+    }
+
+    public String fieldName(){
+        return fieldName;
+    }
+
+    public StoreType store(){
+        return store;
+    }
+
+    public IndexType indexType(){
+        return indexType;
+    }
 }
 
 

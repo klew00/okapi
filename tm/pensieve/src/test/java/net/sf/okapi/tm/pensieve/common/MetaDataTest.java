@@ -38,7 +38,7 @@ public class MetaDataTest {
     public void keysAndValues() {
         MetaData md = new MetaData();
         String id = "MetaData - pronounced may-da-day-da";
-        md.put(MetaDataTypes.ID, id);
-        assertEquals("metadata entries", id, md.get(MetaDataTypes.ID));
+        md.put(MetaDataType.ID, id);
+        assertEquals("metadata entries", id, md.get(MetaDataType.ID));
     }
 }
