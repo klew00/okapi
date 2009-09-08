@@ -31,6 +31,7 @@ public interface TMWriter {
 
     void endIndex() throws IOException;
 
+    //TODO: get rid of the IOException requirement
     void indexTranslationUnit(TranslationUnit tu) throws IOException;
 
 }

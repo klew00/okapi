@@ -21,14 +21,18 @@
 package net.sf.okapi.tm.pensieve.writer;
 
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.tm.pensieve.common.Metadata;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import static net.sf.okapi.tm.pensieve.common.TranslationUnitField.*;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
-import net.sf.okapi.tm.pensieve.common.MetadataType;
-import net.sf.okapi.tm.pensieve.common.Metadata;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.RAMDirectory;
 import static org.junit.Assert.*;
@@ -58,7 +62,39 @@ public class PensieveWriterTest {
         writer = tmWriter.getIndexWriter();
     }
 
-       @Test
+    @Test
+    public void indexTranslationUnitMetaData() throws IOException, ParseException {
+        tmWriter.indexTranslationUnit(createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(createTU("EN", "KR", "Jane", "Jaen","2"));
+        writer.commit();
+
+        assertEquals("# of docs found for id=1", 1, getNumOfHitsFor(MetadataType.ID.fieldName(), "1"));
+        assertEquals("# of docs found for id=2", 1, getNumOfHitsFor(MetadataType.ID.fieldName(), "2"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void deleteNullId() throws IOException, ParseException {
+        tmWriter.delete(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void deleteEmptyId() throws IOException, ParseException {
+        tmWriter.delete(null);
+    }
+
+    @Test
+    public void deleteWithId() throws IOException, ParseException {
+        tmWriter.indexTranslationUnit(createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(createTU("EN", "KR", "Jane", "Jaen","2"));
+        writer.commit();
+
+        tmWriter.delete("1");
+        writer.commit();
+        assertEquals("# of docs found for id=1", 0, getNumOfHitsFor(MetadataType.ID.fieldName(), "1"));
+        assertEquals("# of docs found for id=2", 1, getNumOfHitsFor(MetadataType.ID.fieldName(), "2"));
+    }
+
+    @Test
     public void addMetadataToDocument(){
         Metadata md = new Metadata();
         md.put(MetadataType.FILE_NAME, "some/file");
@@ -125,12 +161,15 @@ public class PensieveWriterTest {
         String text = "blah blah blah";
         TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(text)),
                 new TranslationUnitVariant("FR", new TextFragment("someone")));
+        Metadata md = tu.getMetadata();
+        md.put(MetadataType.ID, "someId");
         Document doc = tmWriter.getDocument(tu);
         assertEquals("Document's content field", "blah blah blah", getFieldValue(doc, SOURCE.name()));
         assertEquals("Document's content exact field", "blah blah blah", getFieldValue(doc, SOURCE_EXACT.name()));
         assertEquals("Document's target field", "someone", getFieldValue(doc, TARGET.name()));
         assertEquals("Document's source lang field", "EN", getFieldValue(doc, SOURCE_LANG.name()));
         assertEquals("Document's target lang field", "FR", getFieldValue(doc, TARGET_LANG.name()));
+        assertEquals("Document's id field", "someId", getFieldValue(doc, MetadataType.ID.fieldName()));
     }
 
     @Test
@@ -162,12 +201,23 @@ public class PensieveWriterTest {
         assertEquals("num of docs indexed", 1, tmWriter.getIndexWriter().numDocs());
     }
 
-    @Test
-    public void validateTUNoSourceLang(){
-
-    }
-
     private String getFieldValue(Document doc, String fieldName) {
         return doc.getField(fieldName).stringValue();
+    }
+
+    private TranslationUnit createTU(String srcLang, String targetLang, String source, String target, String id){
+        TranslationUnitVariant tuvS = new TranslationUnitVariant(srcLang, new TextFragment(source));
+        TranslationUnitVariant tuvT = new TranslationUnitVariant(targetLang, new TextFragment(target));
+        TranslationUnit tu = new TranslationUnit(tuvS, tuvT);
+        tu.getMetadata().put(MetadataType.ID, id);
+        return tu;
+    }
+
+    private int getNumOfHitsFor(String fieldName, String fieldValue) throws IOException {
+        IndexSearcher is = new IndexSearcher(dir, true);
+        PhraseQuery q = new PhraseQuery();
+        q.add(new Term(fieldName, fieldValue));
+        return is.search(q, 10).scoreDocs.length;
+
     }
 }

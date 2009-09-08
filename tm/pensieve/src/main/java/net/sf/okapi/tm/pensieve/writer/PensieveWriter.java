@@ -20,12 +20,14 @@
 
 package net.sf.okapi.tm.pensieve.writer;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.*;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
 
@@ -78,6 +80,7 @@ public class PensieveWriter implements TMWriter {
             doc.add(createField(TranslationUnitField.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
             doc.add(createField(TranslationUnitField.TARGET_LANG, tu.getTarget(), Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
+        addMetadataToDocument(doc, tu.getMetadata());
         return doc;
     }
 
@@ -99,5 +102,12 @@ public class PensieveWriter implements TMWriter {
         for(MetadataType type : metadata.keySet()) {
             doc.add(new Field(type.fieldName(), metadata.get(type), type.store(), type.indexType()));
         }
+    }
+
+    public void delete(String id) throws IOException {
+        if (Util.isEmpty(id)){
+            throw new IllegalArgumentException("id is a required field for delete to happen");
+        }
+        writer.deleteDocuments(new Term(MetadataType.ID.fieldName(), id));
     }
 }
