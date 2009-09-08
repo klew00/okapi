@@ -34,4 +34,7 @@ public interface TMWriter {
     //TODO: get rid of the IOException requirement
     void indexTranslationUnit(TranslationUnit tu) throws IOException;
 
+    //TODO: get rid of the IOException requirement
+    void delete(String id) throws IOException;
+
 }
