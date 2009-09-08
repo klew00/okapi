@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -89,6 +90,7 @@ public class JSONFilter implements IFilter {
 	private int startString;
 	private int endString;
 	private boolean hasNext;
+	private Pattern exceptions;
 	
 	public JSONFilter () {
 		params = new Parameters();
@@ -214,6 +216,14 @@ public class JSONFilter implements IFilter {
 		otherId = 0;
 		buffer = new StringBuilder();
 		
+		// Pre-compile exceptions or set them to null
+		if ( Util.isEmpty(params.getExceptions()) ) {
+			exceptions = null;
+		}
+		else {
+			exceptions = Pattern.compile(params.getExceptions());
+		}
+		
 		// Set the start event
 		queue = new LinkedList<Event>();
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
@@ -252,7 +262,7 @@ public class JSONFilter implements IFilter {
 				case SEPARATOR:
 				case ENDARRAY:
 					if (( prevWasString ) && ( params.getExtractStandalone() )) {
-						if ( doExtract(null) ) return;
+						if ( processString(null) ) return;
 					}
 					prevWasString = false;
 					break;
@@ -269,7 +279,7 @@ public class JSONFilter implements IFilter {
 				state = 0;
 				prevWasString = false;
 				if ( token == TOKEN.STRING ) {
-					if ( doExtract(key) ) return;
+					if ( processString(key) ) return;
 				}
 				break;
 			}
@@ -413,21 +423,23 @@ public class JSONFilter implements IFilter {
 		}
 	}
 
-	private boolean doExtract (String resName) {
-		// Treat options for key+value pairs
-		boolean extract = params.getExtractAllPairs();
+	private boolean processString (String resName) {
+		// Process key-specific case
 		if ( !Util.isEmpty(resName) ) {
-			if ( extract ) {
-				extract = (params.getExceptions().indexOf("\t"+resName+"\t") == -1);
+			// Treat options for key+value pairs
+			boolean extract = params.getExtractAllPairs();
+			if ( exceptions != null ) {
+				if ( exceptions.matcher(resName).find() ) {
+					// It's an exception, so we reverse the extraction flag
+					extract = !extract;
+				}
 			}
-			else {
-				extract = (params.getExceptions().indexOf("\t"+resName+"\t") != -1);
+			if ( !extract ) { // Not to extract
+				return false;
 			}
-			if ( !extract ) return false;
 		}
-		else if ( !extract ) {
-			return false;
-		}
+		// Else: This is a stand-alone string, we have already tested if
+		// if was to be extracted.
 		
 		TextUnit tu = new TextUnit(String.valueOf(++tuId));
 		tu.setSource(new TextContainer(buffer.toString()));
@@ -443,7 +455,7 @@ public class JSONFilter implements IFilter {
 		skel.append(inputText.substring(startRead, startString+1).replace("\n", lineBreak));
 		skel.addContentPlaceholder(tu);
 		if ( endString < current ) {
-			skel.append(inputText.substring(endString, current-endString).replace("\n", lineBreak));
+			skel.append(inputText.substring(endString, current+1).replace("\n", lineBreak));
 		}
 		tu.setSkeleton(skel);
 		

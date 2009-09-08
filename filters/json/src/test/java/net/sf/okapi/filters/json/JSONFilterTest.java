@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.InputDocument;
@@ -53,9 +54,39 @@ public class JSONFilterTest {
 	}
 
 	@Test
+	public void testAllWithKeynoException () {
+		String snippet = "{ \"key1\" : \"Text1\" }";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		assertNotNull(tu);
+		assertEquals("Text1", tu.getSource().toString());
+		assertEquals("key1", tu.getName());
+	}
+	
+	@Test
+	public void testStandaloneYes () {
+		String snippet = "{ \"key\" : [ \"Text1\", \"Text2\" ] }";
+		Parameters params = new Parameters();
+		params.setExtractStandalone(true);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
+		assertNotNull(tu);
+		assertEquals("Text1", tu.getSource().toString());
+		assertTrue(tu.getName()==null);
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 2);
+		assertNotNull(tu);
+		assertEquals("Text2", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testStandaloneDefaultWhichIsNo () {
+		String snippet = "{ \"key\" : [ \"Text1\" ] }";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		assertTrue(tu==null);
+	}
+	
+	@Test
 	public void testEscape () {
 		String snippet = "{ \"key1\" : \"agrave=\\u00E0\" }";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
 		assertNotNull(tu);
 		assertEquals("agrave=\u00e0", tu.getSource().toString());
 		assertEquals("key1", tu.getName());
@@ -68,7 +99,9 @@ public class JSONFilterTest {
 		list.add(new InputDocument(root+"test02.json", null));
 		list.add(new InputDocument(root+"test03.json", null));
 		list.add(new InputDocument(root+"test04.json", null));
-		
+		list.add(new InputDocument(root+"test05.json", null));
+		list.add(new InputDocument(root+"test06.json", null));
+
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
 	}
@@ -86,28 +119,26 @@ public class JSONFilterTest {
 	@Test
 	public void testSimpleEntrySkeleton () {
 		String snippet = "  {\r  \"key1\" :  \"Text1\"  } \r ";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet, null), "en"));
 	}
-	
-	@Test
-	public void testSimpleEntry () {
-		String snippet = "{ \"key1\" : \"Text1\" }";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
-		assertNotNull(tu);
-		assertEquals("Text1", tu.getSource().toString());
-		assertEquals("key1", tu.getName());
-	}
-	
+
 	@Test
 	public void testLineBreaks () {
 		String snippet = "{ \"key1\" : \"Text1\" }\r";
-		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(snippet));
+		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(snippet, null));
 		assertNotNull(sd);
 		assertEquals("\r", sd.getLineBreak());
 	}
 	
-	private ArrayList<Event> getEvents(String snippet) {
+	private ArrayList<Event> getEvents(String snippet, IParameters params) {
 		ArrayList<Event> list = new ArrayList<Event>();
+		if ( params == null ) {
+			params = filter.getParameters();
+			params.reset();
+		}
+		else {
+			filter.setParameters(params);
+		}
 		filter.open(new RawDocument(snippet, "en"));
 		while (filter.hasNext()) {
 			Event event = filter.next();
