@@ -21,8 +21,7 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
+import net.sf.okapi.tm.pensieve.common.*;
 import net.sf.okapi.tm.pensieve.writer.PensieveWriter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -34,8 +33,6 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.util.List;
-import net.sf.okapi.tm.pensieve.common.TMHit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 
 /**
  * User: Christian Hargraves
@@ -118,7 +115,6 @@ public class TMSeekerTest {
     @Test
     public void searchFuzzyWuzzyMiddleMatch() throws Exception {
         PensieveWriter writer = getWriter();
-        
 
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
@@ -149,7 +145,6 @@ public class TMSeekerTest {
     @Test
     public void fuzzyWuzzyScoreSortNoFuzzyThreshold() throws Exception {
         PensieveWriter writer = getWriter();
-
         String[] testStrings = {STR,
             STR + " 1",
             STR + " 2 words",
@@ -169,8 +164,7 @@ public class TMSeekerTest {
 
         //Verify sort order
         Float previous = tmhits.get(0).getScore();
-        for(int i = 1; i < tmhits.size(); i++)
-        {
+        for(int i = 1; i < tmhits.size(); i++){
             Float currentScore = tmhits.get(i).getScore();
             assertEquals(i + " match", testStrings[i], tmhits.get(i).getTu().getSource().getContent().toString());
             assertTrue("results should be sorted descending by score", currentScore < previous);
@@ -255,20 +249,33 @@ public class TMSeekerTest {
         assertEquals("number of docs found", 0, tmhits.size());
     }
 
+    //TODO support metadata
     @Test
     public void getTranslationUnit() throws Exception {
-        String source = "watch out for the killer rabbit";
-        String target = "j";
+        final String source = "watch out for the killer rabbit";
+        final String target = "j";
+//        final String id = "1";
+        final String targetLang = "KR";
+        final String sourceLang = "EN";
         Document doc = new Document();
         doc.add(new Field(TranslationUnitField.SOURCE_EXACT.name(), source,
                 Field.Store.NO, Field.Index.ANALYZED));
         doc.add(new Field(TranslationUnitField.SOURCE.name(), source,
                 Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field(TranslationUnitField.SOURCE_LANG.name(), sourceLang,
+                Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field(TranslationUnitField.TARGET.name(), target,
                 Field.Store.NO, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(TranslationUnitField.TARGET_LANG.name(), targetLang,
+                Field.Store.YES, Field.Index.ANALYZED));
+//        doc.add(new Field(MetadataType.ID.fieldName(), id,
+//                Field.Store.YES, Field.Index.NOT_ANALYZED));
         TranslationUnit tu = seeker.getTranslationUnit(doc);
         assertEquals("source field", source, tu.getSource().getContent().toString());
+        assertEquals("source lang", sourceLang, tu.getSource().getLang());
         assertEquals("target field", target, tu.getTarget().getContent().toString());
+        assertEquals("target lang", targetLang, tu.getTarget().getLang());
+//        assertEquals("id field", id, tu.getMetadata().get(MetadataType.ID));
     }
 
     PensieveWriter getWriter() throws Exception {

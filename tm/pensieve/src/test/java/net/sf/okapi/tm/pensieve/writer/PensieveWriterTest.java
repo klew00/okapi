@@ -21,11 +21,8 @@
 package net.sf.okapi.tm.pensieve.writer;
 
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.tm.pensieve.common.Metadata;
-import net.sf.okapi.tm.pensieve.common.MetadataType;
-import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import static net.sf.okapi.tm.pensieve.common.TranslationUnitField.*;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
+import net.sf.okapi.tm.pensieve.common.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -33,6 +30,8 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PhraseQuery;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.RAMDirectory;
 import static org.junit.Assert.*;
@@ -73,13 +72,41 @@ public class PensieveWriterTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void updateNullTu() throws IOException, ParseException {
+        tmWriter.update(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void updateEmptyId() throws IOException, ParseException {
+        tmWriter.update(new TranslationUnit());
+    }
+
+    @Test
+    public void update() throws IOException, ParseException {
+        TranslationUnit tu1 = createTU("EN", "KR", "Joe", "Jo","1");
+        TranslationUnit tu2 = createTU("EN", "KR", "Jane", "Jaen","2");
+        tmWriter.indexTranslationUnit(tu1);
+        tmWriter.indexTranslationUnit(tu2);
+        writer.commit();
+
+        tu1.getTarget().setContent(new TextFragment("Ju"));
+        tmWriter.update(tu1);
+        writer.commit();
+        Document doc1 = findDocument(MetadataType.ID.fieldName(), "1");
+        Document doc2 = findDocument(MetadataType.ID.fieldName(), "2");
+        assertEquals("source text", tu1.getSource().getContent().toString(), doc1.getField(TranslationUnitField.SOURCE.name()).stringValue());
+        assertEquals("target text", tu1.getTarget().getContent().toString(), doc1.getField(TranslationUnitField.TARGET.name()).stringValue());
+        assertEquals("target text", tu2.getTarget().getContent().toString(), doc2.getField(TranslationUnitField.TARGET.name()).stringValue());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void deleteNullId() throws IOException, ParseException {
         tmWriter.delete(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void deleteEmptyId() throws IOException, ParseException {
-        tmWriter.delete(null);
+        tmWriter.delete("");
     }
 
     @Test
@@ -220,4 +247,14 @@ public class PensieveWriterTest {
         return is.search(q, 10).scoreDocs.length;
 
     }
+
+    private Document findDocument(String fieldName, String fieldValue) throws IOException {
+        IndexSearcher is = new IndexSearcher(dir, true);
+        PhraseQuery q = new PhraseQuery();
+        q.add(new Term(fieldName, fieldValue));
+        TopDocs hits = is.search(q, 1);
+        ScoreDoc scoreDoc = hits.scoreDocs[0];
+        return is.doc(scoreDoc.doc);
+    }
+
 }

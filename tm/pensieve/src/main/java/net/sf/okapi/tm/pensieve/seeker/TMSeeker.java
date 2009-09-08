@@ -21,10 +21,7 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.tm.pensieve.common.TMHit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
-import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
+import net.sf.okapi.tm.pensieve.common.*;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -35,8 +32,7 @@ import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Christian Hargraves

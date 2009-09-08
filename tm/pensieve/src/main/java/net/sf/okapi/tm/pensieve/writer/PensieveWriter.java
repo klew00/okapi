@@ -110,4 +110,13 @@ public class PensieveWriter implements TMWriter {
         }
         writer.deleteDocuments(new Term(MetadataType.ID.fieldName(), id));
     }
+
+    public void update(TranslationUnit tu) throws IOException {
+        if (tu == null || tu.getMetadata().get(MetadataType.ID) == null){
+            throw new IllegalArgumentException("tu must be set and at least have its ID set");
+        }
+        //TODO -- make this transactional
+        delete(tu.getMetadata().get(MetadataType.ID));
+        indexTranslationUnit(tu);
+    }
 }
