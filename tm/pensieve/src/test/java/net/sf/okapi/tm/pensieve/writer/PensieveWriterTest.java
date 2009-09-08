@@ -24,7 +24,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import static net.sf.okapi.tm.pensieve.common.TranslationUnitField.*;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
-import net.sf.okapi.tm.pensieve.common.MetaDataType;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.MetaData;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
@@ -61,16 +61,16 @@ public class PensieveWriterTest {
        @Test
     public void addMetadataToDocument(){
         MetaData md = new MetaData();
-        md.put(MetaDataType.FILE_NAME, "some/file");
-        md.put(MetaDataType.GROUP_NAME, "some group");
-        md.put(MetaDataType.ID, "someId");
-        md.put(MetaDataType.TYPE, "someType");
+        md.put(MetadataType.FILE_NAME, "some/file");
+        md.put(MetadataType.GROUP_NAME, "some group");
+        md.put(MetadataType.ID, "someId");
+        md.put(MetadataType.TYPE, "someType");
         Document doc = new Document();
         tmWriter.addMetadataToDocument(doc, md);
-        assertEquals("Document's file name field", "some/file", getFieldValue(doc, MetaDataType.FILE_NAME.fieldName()));
-        assertEquals("Document's group name field", "some group", getFieldValue(doc, MetaDataType.GROUP_NAME.fieldName()));
-        assertEquals("Document's id field", "someId", getFieldValue(doc, MetaDataType.ID.fieldName()));
-        assertEquals("Document's type field", "someType", getFieldValue(doc, MetaDataType.TYPE.fieldName()));
+        assertEquals("Document's file name field", "some/file", getFieldValue(doc, MetadataType.FILE_NAME.fieldName()));
+        assertEquals("Document's group name field", "some group", getFieldValue(doc, MetadataType.GROUP_NAME.fieldName()));
+        assertEquals("Document's id field", "someId", getFieldValue(doc, MetadataType.ID.fieldName()));
+        assertEquals("Document's type field", "someType", getFieldValue(doc, MetadataType.TYPE.fieldName()));
     }
 
     @Test

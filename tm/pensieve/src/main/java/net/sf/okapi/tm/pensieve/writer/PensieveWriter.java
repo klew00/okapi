@@ -96,7 +96,7 @@ public class PensieveWriter implements TMWriter {
     }
 
     public void addMetadataToDocument(Document doc, MetaData metadata) {
-        for(MetaDataType type : metadata.keySet()) {
+        for(MetadataType type : metadata.keySet()) {
             doc.add(new Field(type.fieldName(), metadata.get(type), type.store(), type.indexType()));
         }
     }

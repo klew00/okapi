@@ -26,7 +26,7 @@ import org.apache.lucene.document.Field;
  *
  * @author HaslamJD
  */
-public enum MetaDataType {
+public enum MetadataType {
     ID("tuid"),
     NAME("Name"),
     TYPE("Type"),
@@ -35,7 +35,7 @@ public enum MetaDataType {
 
     private String fieldName;
 
-    private MetaDataType(String fieldName){
+    private MetadataType(String fieldName){
         this.fieldName = fieldName;
     }
 
