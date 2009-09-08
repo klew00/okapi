@@ -143,6 +143,12 @@
 			<artifactId>okapi-filter-json</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-json-ui</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
 		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>

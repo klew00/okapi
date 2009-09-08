@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ============================================================================*/
 
-package net.sf.okapi.filters.ts.ui;
+package net.sf.okapi.filters.json.ui;
 
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
@@ -27,7 +27,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
-import net.sf.okapi.filters.ts.Parameters;
+import net.sf.okapi.filters.json.Parameters;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -46,21 +46,21 @@ public class Editor implements IParametersEditor {
 	
 	private Shell shell;
 	private boolean result = false;
-	private Button chkDecodeByteValues;
 	private OKCancelPanel pnlActions;
 	private Parameters params;
 	private Button chkUseCodeFinder;
+	private Button chkDecodeByteValues;
 	private InlineCodeFinderPanel pnlCodeFinder;
 	private IHelp help;
 
-	public boolean edit (IParameters p_Options,
+	public boolean edit (IParameters params,
 		boolean readOnly,
 		IContext context)
 	{
 		help = (IHelp)context.getObject("help");
 		boolean bRes = false;
 		shell = null;
-		params = (Parameters)p_Options;
+		this.params = (Parameters)params;
 		try {
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)context.getObject("shell"), readOnly);
@@ -81,11 +81,11 @@ public class Editor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	private void create (Shell p_Parent,
+	private void create (Shell parent,
 		boolean readOnly)
 	{
 		shell.setText(Res.getString("EditorCaption"));
-		if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
+		if ( parent != null ) shell.setImage(parent.getImage());
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
 		layTmp.verticalSpacing = 0;
@@ -185,7 +185,7 @@ public class Editor implements IParametersEditor {
 		shell.pack();
 		Rectangle Rect = shell.getBounds();
 		shell.setMinimumSize(Rect.width, Rect.height);
-		Dialogs.centerWindow(shell, p_Parent);
+		Dialogs.centerWindow(shell, parent);
 		setData();
 	}
 	
@@ -199,9 +199,9 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
-		chkDecodeByteValues.setSelection(params.decodeByteValues);
-		chkUseCodeFinder.setSelection(params.useCodeFinder);
-		pnlCodeFinder.setData(params.codeFinder.toString());
+		//chkDecodeByteValues.setSelection(params.decodeByteValues);
+		//chkUseCodeFinder.setSelection(params.useCodeFinder);
+		//pnlCodeFinder.setData(params.codeFinder.toString());
 		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
@@ -213,10 +213,10 @@ public class Editor implements IParametersEditor {
 			return false;
 		}
 		else {
-			params.codeFinder.fromString(tmp);
+//			params.codeFinder.fromString(tmp);
 		}
-		params.decodeByteValues = chkDecodeByteValues.getSelection();
-		params.useCodeFinder = chkUseCodeFinder.getSelection();
+//		params.decodeByteValues = chkDecodeByteValues.getSelection();
+//		params.useCodeFinder = chkUseCodeFinder.getSelection();
 		return true;
 	}
 	

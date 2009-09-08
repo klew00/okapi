@@ -18,42 +18,26 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ============================================================================*/
 
-package net.sf.okapi.filters.ts.stax;
+package net.sf.okapi.filters.json.ui;
 
-import javax.xml.stream.XMLStreamReader;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.ts.stax.StaxObject;
+class Res {
+	private static final String BUNDLE_NAME = "net.sf.okapi.filters.json.ui.Res";
 
-public class EndElement implements StaxObject{
-	String namespace;
-	String localname;
-	
-	public EndElement(XMLStreamReader reader){
-		readObject(reader);
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+		.getBundle(BUNDLE_NAME);
+
+	private Res() {
 	}
 
-	public EndElement(String localname) {
-		this.namespace = "";
-		this.localname = localname;
-	}
-
-	public void readObject(XMLStreamReader reader){
-		this.namespace = reader.getPrefix();
-		this.localname = reader.getLocalName();
+	public static String getString(String key) {
+		try {
+			return RESOURCE_BUNDLE.getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
 	}
 	
-	public String toString(){
-		if (( namespace == null ) || ( namespace.length()==0 ))
-			return "</"+localname+">";
-		else
-			return "</"+namespace+":"+localname+">";
-	}
-	
-	public GenericSkeleton getSkeleton(){
-		if (( namespace == null ) || ( namespace.length()==0 ))
-			return new GenericSkeleton("</"+localname+">");
-		else
-			return new GenericSkeleton("</"+namespace+":"+localname+">");
-	}
 }

@@ -54,9 +54,30 @@ public class JSONFilterTest {
 	}
 
 	@Test
-	public void testAllWithKeynoException () {
+	public void testAllWithKeyNoException () {
 		String snippet = "{ \"key1\" : \"Text1\" }";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		assertNotNull(tu);
+		assertEquals("Text1", tu.getSource().toString());
+		assertEquals("key1", tu.getName());
+	}
+	
+	@Test
+	public void testAllWithKeywithException () {
+		String snippet = "{ \"key1\" : \"Text1\" }";
+		Parameters params = new Parameters(); // Default: all with keys
+		params.setExceptions("key?"); // Except those
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
+		assertTrue(tu==null);
+	}
+	
+	@Test
+	public void testNoneWithKeywithException () {
+		String snippet = "{ \"key1\" : \"Text1\" }";
+		Parameters params = new Parameters();
+		params.setExtractAllPairs(false); // None with key
+		params.setExceptions("key?"); // Except those
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.getSource().toString());
 		assertEquals("key1", tu.getName());

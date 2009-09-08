@@ -39,6 +39,7 @@
         <module>xliff</module>
         <module>xml</module>
         <module>json</module>
+        <module>json-ui</module>
     </modules>
 
     <build>
