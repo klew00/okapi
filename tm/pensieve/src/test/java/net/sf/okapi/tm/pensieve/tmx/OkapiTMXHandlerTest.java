@@ -146,6 +146,10 @@ public class OkapiTMXHandlerTest {
         public void indexTranslationUnit(TranslationUnit tu) throws IOException {
             tus.add(tu);
         }
+
+        public void delete(String id) throws IOException {
+            
+        }
     }
 
     public class StubTMXFilter extends AbstractFilter{
