@@ -1,21 +1,21 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
-  This library is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or (at
-  your option) any later version.
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at
+your option) any later version.
 
-  This library is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
-  General Public License for more details.
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public License
-  along with this library; if not, write to the Free Software Foundation,
-  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+You should have received a copy of the GNU Lesser General Public License
+along with this library; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
 package net.sf.okapi.tm.pensieve.tmx;
@@ -40,6 +40,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
 
 /**
  *
@@ -55,9 +57,15 @@ public class OkapiTMXHandlerTest {
     @Before
     public void setUp() throws URISyntaxException {
 
+        String[][] properties = {{"tuid", "helloid"},
+            {"datatype", "plaintext"},
+            {"Txt::FileName", "StringInfoForTest3.info"},
+            {"Txt::GroupName", "APCCalibrateTimeoutAction0"}
+        };
+
         stubTmxFilter = new StubTMXFilter();
-        stubTmxFilter.addEvent("1", "hello", "ciao", "IT");
-        stubTmxFilter.addEvent("2", "world", "mondo", "IT");
+        stubTmxFilter.addEvent("1", "hello", "ciao", "IT", properties);
+        stubTmxFilter.addEvent("2", "world", "mondo", "IT", null);
         stubTmxFilter.events.add(new Event(EventType.DOCUMENT_PART, new TextUnit("holy cow")));
 
         sampleTMX = new URI("");
@@ -66,11 +74,24 @@ public class OkapiTMXHandlerTest {
     }
 
     @Test
+    public void importTMXMetadata() throws IOException {
+        handler.importTmx(sampleTMX, "IT", stubTmWriter);
+        assertEquals("ID", "helloid", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.ID));
+        assertEquals("TYPE", "plaintext", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.TYPE));
+        assertEquals("FILE_NAME", "StringInfoForTest3.info", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.FILE_NAME));
+        assertEquals("GROUP_NAME", "APCCalibrateTimeoutAction0", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.GROUP_NAME));
+        assertNull("ID", stubTmWriter.tus.get(1).getMetadata().get(MetadataType.ID));
+        assertNull("TYPE", stubTmWriter.tus.get(1).getMetadata().get(MetadataType.TYPE));
+        assertNull("FILE_NAME", stubTmWriter.tus.get(1).getMetadata().get(MetadataType.FILE_NAME));
+        assertNull("GROUP_NAME", stubTmWriter.tus.get(1).getMetadata().get(MetadataType.GROUP_NAME));
+    }
+
+    @Test
     public void importTmxNullFile() throws IOException {
         String errMsg = null;
-        try{
+        try {
             handler.importTmx(null, "FR", stubTmWriter);
-        }catch(IllegalArgumentException iae){
+        } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
         assertEquals("Error message", "tmxUri was not set", errMsg);
@@ -79,9 +100,9 @@ public class OkapiTMXHandlerTest {
     @Test
     public void constructorEmptySourceLang() {
         String errMsg = null;
-        try{
-            new OkapiTMXHandler("", stubTmxFilter );
-        }catch(IllegalArgumentException iae){
+        try {
+            new OkapiTMXHandler("", stubTmxFilter);
+        } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
         assertEquals("Error message", "sourceLang must be set", errMsg);
@@ -90,26 +111,26 @@ public class OkapiTMXHandlerTest {
     @Test
     public void constructorEmptyFilter() {
         String errMsg = null;
-        try{
-            new OkapiTMXHandler("EN", null );
-        }catch(IllegalArgumentException iae){
+        try {
+            new OkapiTMXHandler("EN", null);
+        } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
         assertEquals("Error message", "filter must be set", errMsg);
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void importTMXEmptyTargetLang() throws IOException{
+    @Test(expected = IllegalArgumentException.class)
+    public void importTMXEmptyTargetLang() throws IOException {
         handler.importTmx(sampleTMX, "", new StubTMWriter());
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void importTMXNullTargetLang() throws IOException{
-        handler.importTmx(sampleTMX,null, new StubTMWriter());
+    @Test(expected = IllegalArgumentException.class)
+    public void importTMXNullTargetLang() throws IOException {
+        handler.importTmx(sampleTMX, null, new StubTMWriter());
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void importTMXNullTMWriter() throws IOException{
+    @Test(expected = IllegalArgumentException.class)
+    public void importTMXNullTMWriter() throws IOException {
         handler.importTmx(sampleTMX, "FR", null);
     }
 
@@ -127,7 +148,7 @@ public class OkapiTMXHandlerTest {
         assertNull("targets content should be null", stubTmWriter.tus.get(0).getTarget().getContent());
         assertEquals("target lang", "FR", stubTmWriter.tus.get(0).getTarget().getLang());
     }
-    
+
     @Test
     public void sourceAndTargetForExistingLang() throws IOException {
         handler.importTmx(sampleTMX, "IT", stubTmWriter);
@@ -152,11 +173,12 @@ public class OkapiTMXHandlerTest {
         assertEquals("entries indexed", 2, tmWriter.tus.size());
     }
 
-    public class StubTMWriter implements TMWriter{
+    public class StubTMWriter implements TMWriter {
+
         protected boolean endIndexCalled = false;
         protected List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
-        public void endIndex() throws IOException {
 
+        public void endIndex() throws IOException {
         }
 
         public void indexTranslationUnit(TranslationUnit tu) throws IOException {
@@ -164,15 +186,14 @@ public class OkapiTMXHandlerTest {
         }
 
         public void delete(String id) throws IOException {
-            
         }
 
         public void update(TranslationUnit tu) throws IOException {
-            
         }
     }
 
-    public class StubTMXFilter extends AbstractFilter{
+    public class StubTMXFilter extends AbstractFilter {
+
         private List<Event> events;
         private Iterator<Event> eventIterator;
 
@@ -181,9 +202,15 @@ public class OkapiTMXHandlerTest {
 
         }
 
-        public void addEvent(String id, String source, String target, String targetLang) {
+        public void addEvent(String id, String source, String target, String targetLang, String[][] properties) {
             TextUnit tu = new TextUnit(id, source);
             tu.setTargetContent(targetLang, new TextFragment(target));
+            //populate properties
+            if (properties != null) {
+                for (String[] prop : properties) {
+                    tu.setProperty(new Property(prop[0], prop[1]));
+                }
+            }
             events.add(new Event(EventType.TEXT_UNIT, tu));
         }
 
@@ -210,14 +237,16 @@ public class OkapiTMXHandlerTest {
             return null;
         }
 
-        public void setParameters(IParameters params) {}
+        public void setParameters(IParameters params) {
+        }
 
-        public void open(RawDocument input) {}
+        public void open(RawDocument input) {
+        }
 
-        public void open(RawDocument input, boolean generateSkeleton) {}
+        public void open(RawDocument input, boolean generateSkeleton) {
+        }
 
-        public void close() {}
+        public void close() {
+        }
     }
-
-
 }
