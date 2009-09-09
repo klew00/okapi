@@ -87,6 +87,17 @@ public class OkapiTMXHandlerTest {
         assertEquals("Error message", "sourceLang must be set", errMsg);
     }
 
+    @Test
+    public void constructorEmptyFilter() {
+        String errMsg = null;
+        try{
+            new OkapiTMXHandler("EN", null );
+        }catch(IllegalArgumentException iae){
+            errMsg = iae.getMessage();
+        }
+        assertEquals("Error message", "filter must be set", errMsg);
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void importTMXEmptyTargetLang() throws IOException{
         handler.importTmx(sampleTMX, "", new StubTMWriter());
@@ -95,6 +106,11 @@ public class OkapiTMXHandlerTest {
     @Test(expected=IllegalArgumentException.class)
     public void importTMXNullTargetLang() throws IOException{
         handler.importTmx(sampleTMX,null, new StubTMWriter());
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void importTMXNullTMWriter() throws IOException{
+        handler.importTmx(sampleTMX, "FR", null);
     }
 
     @Test

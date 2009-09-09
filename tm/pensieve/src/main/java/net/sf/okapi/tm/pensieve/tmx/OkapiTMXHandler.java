@@ -52,6 +52,9 @@ public class OkapiTMXHandler implements TMXHandler{
         if (Util.isEmpty(sourceLang)){
             throw new IllegalArgumentException("sourceLang must be set");
         }
+        if (tmxFilter == null){
+            throw new IllegalArgumentException("filter must be set");
+        }
     }
 
     /**
@@ -62,7 +65,7 @@ public class OkapiTMXHandler implements TMXHandler{
      * @throws IOException if there was a problem with the TMX import
      */
     public void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException {
-        checkImportTmxParams(tmxUri, targetLang);
+        checkImportTmxParams(tmxUri, targetLang, tmWriter);
         try{
             tmxFilter.open(new RawDocument(tmxUri, null, sourceLang, targetLang));
             while (tmxFilter.hasNext()) {
@@ -74,12 +77,15 @@ public class OkapiTMXHandler implements TMXHandler{
         }
     }
 
-    private void checkImportTmxParams(URI tmxUri, String targetLang) {
+    private void checkImportTmxParams(URI tmxUri, String targetLang, TMWriter tmWriter) {
         if (Util.isEmpty(targetLang)){
             throw new IllegalArgumentException("targetLang was not set");
         }
         if (tmxUri == null){
             throw new IllegalArgumentException("tmxUri was not set");
+        }
+        if (tmWriter == null){
+            throw new IllegalArgumentException("tmWriter was not set");
         }
     }
 
