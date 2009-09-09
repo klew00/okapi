@@ -35,18 +35,33 @@ import java.io.IOException;
 import java.util.*;
 
 /**
+ * Used to query the TM
  * @author Christian Hargraves
  */
 public class TMSeeker implements Seeker {
     private Directory indexDir;
 
+    /**
+     * Creates an instance of TMSeeker
+     * @param indexDir The Directory implementation to use for the queries
+     * @throws IllegalArgumentException If the indexDir is not set
+     *
+     */
     public TMSeeker(Directory indexDir) throws IllegalArgumentException {
+        //TODO - Change indexDir to some other non-lucene class.
         if (indexDir == null) {
             throw new IllegalArgumentException("indexDir cannot be null!");
         }
         this.indexDir = indexDir;
     }
 
+    /**
+     * Gets a list of matches for a given set of words. In this case OR is assumed.
+     * @param query The words to query for
+     * @param max The max number of results
+     * @return A list of matches for a given set of words. In this case OR is assumed.
+     * @throws IOException if the search cannot be completed do to I/O problems
+     */
     public List<TMHit> searchForWords(String query, int max) throws IOException {
         QueryParser parser = new QueryParser(TranslationUnitField.SOURCE.name(), new SimpleAnalyzer());
         Query q;
@@ -58,11 +73,23 @@ public class TMSeeker implements Seeker {
         return search(max, q);
     }
 
+    /**
+     * Gets a list of fuzzy matches for a given phrase.
+     * @param max The max number of results
+     * @return A list of fuzzy matches
+     * @throws IOException if the search cannot be completed do to I/O problems
+     */
     public List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException {
         Query q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
         return search(max, q);
     }
 
+    /**
+     * Gets a list of exact matches for a given phrase.
+     * @param max The max number of results
+     * @return A list of exact matches
+     * @throws IOException if the search cannot be completed do to I/O problems
+     */
     public List<TMHit> searchExact(String query, int max) throws IOException {
         //If using QueryParser.parse("\"phrase to match\""), the indexed field must be set to Field.Index.ANALYZED
         //At which point subphrases will also match. This is not the desired behavior of an exact match.
@@ -97,6 +124,11 @@ public class TMSeeker implements Seeker {
         return tmhits;
     }
 
+    /**
+     * Translates a Document into a TranslationUnit
+     * @param doc The Document to translate
+     * @return a TranslationUnit that represents what was returned in the document.
+     */
     TranslationUnit getTranslationUnit(Document doc) {
         return new TranslationUnit(new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.SOURCE_LANG),
                 new TextFragment(getFieldValue(doc, TranslationUnitField.SOURCE))),
@@ -104,6 +136,12 @@ public class TMSeeker implements Seeker {
                         new TextFragment(getFieldValue(doc, TranslationUnitField.TARGET))));
     }
 
+    /**
+     * Gets a Document's Field Value
+     * @param doc The document ot get the field value from
+     * @param field The field to extract
+     * @return The value of the field
+     */
     String getFieldValue(Document doc, TranslationUnitField field){
         String fieldValue = null;
         Field tempField = doc.getField(field.name());

@@ -23,10 +23,11 @@ package net.sf.okapi.tm.pensieve.common;
 import org.apache.lucene.document.Field;
 
 /**
- *
+ * The types of metadata that is supported. Currently all properties use the same store and indexTypes
  * @author HaslamJD
  */
 public enum MetadataType {
+    //TODO move ID which should be required to the TranslationUnitField enum
     ID("tuid"),
     NAME("Name"),
     TYPE("Type"),

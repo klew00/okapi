@@ -23,15 +23,23 @@ package net.sf.okapi.tm.pensieve.common;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
- *
+ * Represents a Unit of Translation's Variant. This is used for both the source and targets
  * @author HaslamJD
  */
 public class TranslationUnitVariant {
     private String lang;
     private TextFragment content;
 
+    /**
+     * Creates an empty TUV
+     */
     public TranslationUnitVariant() {}
 
+    /**
+     * Creates a TUV with the given language and content
+     * @param lang The language of the TUV
+     * @param content The content of the TUV
+     */
     public TranslationUnitVariant(String lang, TextFragment content) {
         this.lang = lang;
         this.content = content;

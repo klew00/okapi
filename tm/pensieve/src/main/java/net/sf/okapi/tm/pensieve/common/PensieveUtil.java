@@ -23,14 +23,19 @@ package net.sf.okapi.tm.pensieve.common;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
- * User: Christian Hargraves
- * Date: Sep 4, 2009
- * Time: 4:12:24 PM
+ * A helper class
  */
 public final class PensieveUtil {
 
     private PensieveUtil(){}
 
+    /**
+     * converts a TextUnit into a TranslationUnit
+     * @param sourceLang The source language to transform
+     * @param targetLang The target language to transform
+     * @param textUnit The textunit to convert
+     * @return A TranslationUnit that represents the TextUnit
+     */
     public static TranslationUnit convertTranslationUnit(String sourceLang, String targetLang, TextUnit textUnit) {
         TranslationUnitVariant source = new TranslationUnitVariant(sourceLang, textUnit.getSourceContent());
         TranslationUnitVariant target = new TranslationUnitVariant(targetLang, textUnit.getTargetContent(targetLang));

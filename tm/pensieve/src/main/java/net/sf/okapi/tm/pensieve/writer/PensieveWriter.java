@@ -34,21 +34,29 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 
 /**
- * User: Christian Hargraves
- * Date: Aug 5, 2009
- * Time: 8:40:02 AM
+ * Used to write, delete and update the index.
  */
 public class PensieveWriter implements TMWriter {
 
     private IndexWriter writer;
 
+    /**
+     * Creates a PensieveWriter
+     * @param indexDirectory - the Lucene Directory implementation of choice.
+     * @throws IOException if the indexDirectory can not load
+     */
     public PensieveWriter(Directory indexDirectory) throws IOException {
         writer = new IndexWriter(indexDirectory,
                 new SimpleAnalyzer(), true,
                 IndexWriter.MaxFieldLength.UNLIMITED);
     }
 
+    /**
+     * Commits and closes (for now) the transaction.
+     * @throws IOException if the commit cannot happen.
+     */
     public void endIndex() throws IOException {
+        //TODO: make a close method that is separate from this and rename this to commitIndex.
         try{
             writer.commit();
         }catch(AlreadyClosedException ignored){
@@ -57,15 +65,51 @@ public class PensieveWriter implements TMWriter {
         }
     }
 
+    /**
+     * Gets a handle on the IndexWriter so that commits and rollbacks can happen outside. For now, this is a convience method.
+     * In other words, don't depend on it working for you.
+     * @return a handle on the IndexWriter used to Create, Update or Delete the index.
+     */
     public IndexWriter getIndexWriter(){
         return writer;
     }
 
+    /**
+     * Adds a TranslationUnit to the index
+     * @param tu The TranslationUnit to index
+     * @throws IOException if the TU can not be indexed.
+     */
     public void indexTranslationUnit(TranslationUnit tu) throws IOException {
         if (tu == null){
             throw new NullPointerException("TextUnit can not be null");
         }
         writer.addDocument(getDocument(tu));
+    }
+
+    /**
+     * Deletes a TranslationUnit based on the id.
+     * @param id The Unique ID of the TU to delete
+     * @throws IOException if the delete can not happen
+     */
+    public void delete(String id) throws IOException {
+        if (Util.isEmpty(id)){
+            throw new IllegalArgumentException("id is a required field for delete to happen");
+        }
+        writer.deleteDocuments(new Term(MetadataType.ID.fieldName(), id));
+    }
+
+    /**
+     * Updates a TranslationUnit.
+     * @param tu The TranslationUnit to update
+     * @throws IOException if the update can not happen
+     */
+    public void update(TranslationUnit tu) throws IOException {
+        if (tu == null || tu.getMetadata().get(MetadataType.ID) == null){
+            throw new IllegalArgumentException("tu must be set and at least have its ID set");
+        }
+        //TODO -- make this transactional
+        delete(tu.getMetadata().get(MetadataType.ID));
+        indexTranslationUnit(tu);
     }
 
     Document getDocument(TranslationUnit tu) {
@@ -98,25 +142,9 @@ public class PensieveWriter implements TMWriter {
         return new Field(field.name(), tuv.getLang(), store, index);
     }
 
-    public void addMetadataToDocument(Document doc, Metadata metadata) {
+    void addMetadataToDocument(Document doc, Metadata metadata) {
         for(MetadataType type : metadata.keySet()) {
             doc.add(new Field(type.fieldName(), metadata.get(type), type.store(), type.indexType()));
         }
-    }
-
-    public void delete(String id) throws IOException {
-        if (Util.isEmpty(id)){
-            throw new IllegalArgumentException("id is a required field for delete to happen");
-        }
-        writer.deleteDocuments(new Term(MetadataType.ID.fieldName(), id));
-    }
-
-    public void update(TranslationUnit tu) throws IOException {
-        if (tu == null || tu.getMetadata().get(MetadataType.ID) == null){
-            throw new IllegalArgumentException("tu must be set and at least have its ID set");
-        }
-        //TODO -- make this transactional
-        delete(tu.getMetadata().get(MetadataType.ID));
-        indexTranslationUnit(tu);
     }
 }

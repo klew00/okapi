@@ -21,25 +21,35 @@
 package net.sf.okapi.tm.pensieve.common;
 
 /**
- * User: Christian Hargraves
- * Date: Aug 19, 2009
- * Time: 6:53:34 AM
+ * Represents a Unit of Translation.
  */
 public class TranslationUnit {
     private TranslationUnitVariant source;
     private TranslationUnitVariant target;
     private Metadata metadata;
 
+    /**
+     * Creates a TU w/o an source or target defined
+     */
     public TranslationUnit(){
         metadata = new Metadata();
     }
 
+    /**
+     * Creates a TU with the provided source and targets
+     * @param source The source of the TU
+     * @param target The target of the TU
+     */
     public TranslationUnit(TranslationUnitVariant source, TranslationUnitVariant target) {
         this();
         this.source = source;
         this.target = target;
     }
 
+    /**
+     * Gets the metadata or attributes for this TU
+     * @return The Metadata of this TU
+     */
     public Metadata getMetadata() {
         return metadata;
     }
@@ -64,10 +74,18 @@ public class TranslationUnit {
         this.target = target;
     }
 
+    /**
+     * Checks to see if the the source is empty
+     * @return true if the source is empty
+     */
     public boolean isSourceEmpty() {
         return isFragmentEmpty(source);
     }
 
+    /**
+     * Checks to see if the the target is empty
+     * @return true if the target is empty
+     */
     public boolean isTargetEmpty() {
         return isFragmentEmpty(target);
     }

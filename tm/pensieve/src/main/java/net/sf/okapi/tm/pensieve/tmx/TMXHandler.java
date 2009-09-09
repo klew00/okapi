@@ -26,11 +26,16 @@ import java.io.IOException;
 import java.net.URI;
 
 /**
- * User: Christian Hargraves
- * Date: Sep 4, 2009
- * Time: 1:54:27 PM
+ * The TMX interface to Pensieve.
  */
 public interface TMXHandler {
 
+    /**
+     * Imports TMX to Pensieve
+     * @param tmxUri The location of the TMX
+     * @param targetLang The target language to index
+     * @param tmWriter The TMWriter to use when writing to the TM
+     * @throws IOException if there was a problem with the TMX import
+     */
     void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException;
 }

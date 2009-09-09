@@ -33,11 +33,19 @@ import net.sf.okapi.tm.pensieve.writer.TMWriter;
 import java.io.IOException;
 import java.net.URI;
 
+/**
+ * Used to interact with the Okapi Standards for TMX. For example, the property names and default fields stored.
+ */
 public class OkapiTMXHandler implements TMXHandler{
 
     private String sourceLang;
     IFilter tmxFilter;
 
+    /**
+     * Creates an instance of OkapiTMXHandler
+     * @param sourceLang The language to import as the source language
+     * @param tmxFilter The IFilter to use to parse the TMX
+     */
     public OkapiTMXHandler(String sourceLang, IFilter tmxFilter) {
         this.tmxFilter = tmxFilter;
         this.sourceLang = sourceLang;
@@ -46,6 +54,13 @@ public class OkapiTMXHandler implements TMXHandler{
         }
     }
 
+    /**
+     * Imports TMX to Pensieve
+     * @param tmxUri The location of the TMX
+     * @param targetLang The target language to index
+     * @param tmWriter The TMWriter to use when writing to the TM
+     * @throws IOException if there was a problem with the TMX import
+     */
     public void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException {
         checkImportTmxParams(tmxUri, targetLang);
         try{

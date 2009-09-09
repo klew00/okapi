@@ -21,9 +21,7 @@
 package net.sf.okapi.tm.pensieve.common;
 
 /**
- * User: Christian Hargraves
- * Date: Aug 19, 2009
- * Time: 7:01:25 AM
+ * A field of a translation unit. These are things that are always stored vs metadata is optional.
  */
 public enum TranslationUnitField {
     SOURCE_EXACT, SOURCE, TARGET, SOURCE_LANG, TARGET_LANG

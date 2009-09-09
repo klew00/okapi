@@ -21,7 +21,7 @@
 package net.sf.okapi.tm.pensieve.common;
 
 /**
- *
+ * Represents a TM Hit. This stores a reference to the TranslationUnit and its score.
  * @author HaslamJD
  */
 public class TMHit {

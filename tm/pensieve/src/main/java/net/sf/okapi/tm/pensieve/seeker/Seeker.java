@@ -26,14 +26,35 @@ import net.sf.okapi.tm.pensieve.common.TMHit;
 import java.util.List;
 
 /**
- *
+ * Used to query the TM.
  * @author HaslamJD
  */
 public interface Seeker {
 
+    /**
+     * Gets a list of matches for a given set of words. In this case OR is assumed.
+     * @param query The words to query for
+     * @param max The max number of results
+     * @return A list of matches for a given set of words. In this case OR is assumed.
+     * @throws IOException if the search cannot be completed do to I/O problems
+     */
     List<TMHit> searchForWords(String query, int max) throws IOException;
 
+    /**
+     * Gets a list of exact matches for a given phrase.
+     * @param query The exact text to search for
+     * @param max The max number of results
+     * @return A list of exact matches
+     * @throws IOException if the search cannot be completed do to I/O problems
+     */
     List<TMHit> searchExact(String query, int max) throws IOException;
 
+    /**
+     * Gets a list of fuzzy matches for a given phrase.
+     * @param query The fuzzy query to match
+     * @param max The max number of results
+     * @return A list of fuzzy matches
+     * @throws IOException if the search cannot be completed do to I/O problems
+     */
     List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException;
 }

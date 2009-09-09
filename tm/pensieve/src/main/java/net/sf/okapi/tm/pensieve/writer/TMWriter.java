@@ -29,12 +29,34 @@ import java.io.IOException;
  */
 public interface TMWriter {
 
+    /**
+     * Closes the index and forces a commit against the index.
+     * @throws IOException if the commit can not happen
+     */
     void endIndex() throws IOException;
 
+    /**
+     * Closes the index and forces a commit against the index.
+     * @param tu The Translationunit to index
+     * @throws IOException if the index can not happen
+     */
     //TODO: get rid of the IOException requirement
     void indexTranslationUnit(TranslationUnit tu) throws IOException;
 
+    /**
+     * Deletes a TranslationUnit based on the id.
+     * @param id The Unique ID of the TU to delete
+     * @throws IOException if the delete can not happen
+     */
     //TODO: get rid of the IOException requirement
     void delete(String id) throws IOException;
+
+    /**
+     * Updates a TranslationUnit.
+     * @param tu The TranslationUnit to update
+     * @throws IOException if the update can not happen
+     */
+    //TODO: get rid of the IOException requirement
+    public void update(TranslationUnit tu) throws IOException;
 
 }

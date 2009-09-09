@@ -23,7 +23,7 @@ package net.sf.okapi.tm.pensieve.common;
 import java.util.HashMap;
 
 /**
- *
+ * A class that keeps track of the metadata of a TU
  * @author HaslamJD
  */
 public class Metadata extends HashMap<MetadataType, String> {
