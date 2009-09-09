@@ -24,6 +24,8 @@ import net.sf.okapi.tm.pensieve.writer.TMWriter;
 
 import java.io.IOException;
 import java.net.URI;
+import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.tm.pensieve.seeker.Seeker;
 
 /**
  * The TMX interface to Pensieve.
@@ -38,4 +40,13 @@ public interface TMXHandler {
      * @throws IOException if there was a problem with the TMX import
      */
     void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException;
+
+
+    /**
+     * Exports Pensieve contents to TMX
+     * @param tmxUri The location of the TMX
+     * @param tmWriter The Seeker to use when reading from the TM
+     * @param tmxWriter The TMXWriter to use when writing to the TMX file
+     */
+    void exportTmx(URI tmxUri, Seeker tmSeeker, TMXWriter tmxWriter) throws IOException;
 }

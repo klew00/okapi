@@ -20,6 +20,8 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 
 package net.sf.okapi.tm.pensieve.tmx;
 
+import java.util.Map;
+import net.sf.okapi.tm.pensieve.common.TMHit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.writer.TMWriter;
 import net.sf.okapi.common.filters.AbstractFilter;
@@ -31,6 +33,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.EventType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,8 +43,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
+import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
+import net.sf.okapi.tm.pensieve.seeker.Seeker;
 
 /**
  *
@@ -52,7 +58,9 @@ public class OkapiTMXHandlerTest {
     private URI sampleTMX;
     OkapiTMXHandler handler;
     StubTMWriter stubTmWriter;
+    StubTMSeeker stubTmSeeker;
     StubTMXFilter stubTmxFilter;
+    StubTmxWriter stubTmxWriter;
 
     @Before
     public void setUp() throws URISyntaxException {
@@ -68,9 +76,68 @@ public class OkapiTMXHandlerTest {
         stubTmxFilter.addEvent("2", "world", "mondo", "IT", null);
         stubTmxFilter.events.add(new Event(EventType.DOCUMENT_PART, new TextUnit("holy cow")));
 
-        sampleTMX = new URI("");
+        sampleTMX = new URI("test.tmx");
         handler = new OkapiTMXHandler("EN", stubTmxFilter);
         stubTmWriter = new StubTMWriter();
+        stubTmSeeker = new StubTMSeeker();
+        stubTmSeeker.addTU("source", "EN", "target", "FR", "sourceid");
+        stubTmSeeker.addTU("source2", "EN", "target2", "FR", "sourceid2");
+        stubTmxWriter = new StubTmxWriter();
+    }
+
+    @Test
+    public void exportTmxStepsCalled() throws IOException {
+        handler.exportTmx(sampleTMX, stubTmSeeker, stubTmxWriter);
+        assertEquals("tmx path", sampleTMX.getPath(), stubTmxWriter.path);
+        assertTrue("doc started", stubTmxWriter.startWritten);
+        //TODO: find out about lang - assertEquals("sourceLang", "EN", stubTmxWriter.sourceLanguage);
+        //TODO: find out about lang - assertEquals("targetLang", "IT", stubTmxWriter.sourceLanguage);
+        assertEquals("creationTool", "pensieve", stubTmxWriter.creationTool);
+        assertEquals("creationToolVersion", "0.0.1", stubTmxWriter.creationToolVersion);
+        assertEquals("segType", "sentence", stubTmxWriter.segType);
+        assertEquals("originalTMFormat", "pensieve", stubTmxWriter.originalTMFormat);
+        assertEquals("dataType", "unknown", stubTmxWriter.dataType);
+        assertEquals("number of tus", 2, stubTmxWriter.textUnits.size());
+        assertEquals("source of first tu written", "source", stubTmxWriter.textUnits.get(0).getSourceContent().toString());
+        assertEquals("target of first tu written", "target", stubTmxWriter.textUnits.get(0).getTargetContent("FR").toString());
+
+        assertEquals("attributes of first tu written", "sourceid", stubTmxWriter.attributes.get(0).get(MetadataType.ID.fieldName()));
+        //TODO: Verify Content
+        assertTrue("endDocument written", stubTmxWriter.endWritten);
+        assertTrue("writer closed", stubTmxWriter.closed);
+    }
+
+    @Test
+    public void exportTmxFileNull() throws IOException {
+        String errMsg = null;
+        try {
+            handler.exportTmx(null, stubTmSeeker, stubTmxWriter);
+        } catch (IllegalArgumentException iae) {
+            errMsg = iae.getMessage();
+        }
+        assertEquals("Error message", "tmxUri was not set", errMsg);
+    }
+
+    @Test
+    public void exportTmxSeekerNull() throws IOException {
+        String errMsg = null;
+        try {
+            handler.exportTmx(sampleTMX, null, stubTmxWriter);
+        } catch (IllegalArgumentException iae) {
+            errMsg = iae.getMessage();
+        }
+        assertEquals("Error message", "tmSeeker was not set", errMsg);
+    }
+
+    @Test
+    public void exportTmxWriterNull() throws IOException {
+        String errMsg = null;
+        try {
+            handler.exportTmx(sampleTMX, stubTmSeeker, null);
+        } catch (IllegalArgumentException iae) {
+            errMsg = iae.getMessage();
+        }
+        assertEquals("Error message", "tmxWriter was not set", errMsg);
     }
 
     @Test
@@ -189,6 +256,97 @@ public class OkapiTMXHandlerTest {
         }
 
         public void update(TranslationUnit tu) throws IOException {
+        }
+    }
+
+    public class StubTMSeeker implements Seeker {
+
+        List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
+
+        private void addTU(String source, String sourceLang, String target, String targetLang, String id) {
+            tus.add(Helper.createTU(sourceLang, targetLang, source, target, id));
+        }
+
+        public List<TMHit> searchExact(String query, int max) throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public List<TMHit> searchForWords(String query, int max) throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public List<TranslationUnit> getAllTranslationUnits() {
+            return tus;
+        }
+    }
+
+    public class StubTmxWriter extends TMXWriter {
+
+        private String path;
+        private String sourceLanguage;
+        private String targetLanguage;
+        private String creationTool;
+        private String creationToolVersion;
+        private String segType;
+        private String originalTMFormat;
+        private String dataType;
+        private Boolean closed;
+        private Boolean startWritten;
+        private Boolean endWritten;
+        private List<TextUnit> textUnits;
+        private List<Map<String, String>> attributes;
+
+        public StubTmxWriter() {
+            path = "";
+            sourceLanguage = "";
+            targetLanguage = "";
+            creationTool = "";
+            creationToolVersion = "";
+            segType = "";
+            originalTMFormat = "";
+            dataType = "";
+            closed = false;
+            startWritten = false;
+            endWritten = false;
+            textUnits = new ArrayList<TextUnit>();
+            attributes = new ArrayList<Map<String, String>>();
+        }
+
+        @Override
+        public void close() {
+            closed = true;
+        }
+
+        @Override
+        public void create(String path) {
+            this.path = path;
+        }
+
+        @Override
+        public void writeEndDocument() {
+            endWritten = true;
+        }
+
+        @Override
+        public void writeItem(TextUnit item, Map<String, String> attributes) {
+            textUnits.add(item);
+            this.attributes.add(attributes);
+        }
+
+        @Override
+        public void writeStartDocument(String sourceLanguage, String targetLanguage, String creationTool, String creationToolVersion, String segType, String originalTMFormat, String dataType) {
+            startWritten = true;
+            this.sourceLanguage = sourceLanguage;
+            this.targetLanguage = targetLanguage;
+            this.creationTool = creationTool;
+            this.creationToolVersion = creationToolVersion;
+            this.segType = segType;
+            this.originalTMFormat = originalTMFormat;
+            this.dataType = dataType;
         }
     }
 

@@ -40,6 +40,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import net.sf.okapi.tm.pensieve.Helper;
 
 /**
  * User: Christian Hargraves
@@ -63,8 +64,8 @@ public class PensieveWriterTest {
 
     @Test
     public void indexTranslationUnitMetaData() throws IOException, ParseException {
-        tmWriter.indexTranslationUnit(createTU("EN", "KR", "Joe", "Jo","1"));
-        tmWriter.indexTranslationUnit(createTU("EN", "KR", "Jane", "Jaen","2"));
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Jane", "Jaen","2"));
         writer.commit();
 
         assertEquals("# of docs found for id=1", 1, getNumOfHitsFor(MetadataType.ID.fieldName(), "1"));
@@ -83,8 +84,8 @@ public class PensieveWriterTest {
 
     @Test
     public void update() throws IOException, ParseException {
-        TranslationUnit tu1 = createTU("EN", "KR", "Joe", "Jo","1");
-        TranslationUnit tu2 = createTU("EN", "KR", "Jane", "Jaen","2");
+        TranslationUnit tu1 = Helper.createTU("EN", "KR", "Joe", "Jo","1");
+        TranslationUnit tu2 = Helper.createTU("EN", "KR", "Jane", "Jaen","2");
         tmWriter.indexTranslationUnit(tu1);
         tmWriter.indexTranslationUnit(tu2);
         writer.commit();
@@ -111,8 +112,8 @@ public class PensieveWriterTest {
 
     @Test
     public void deleteWithId() throws IOException, ParseException {
-        tmWriter.indexTranslationUnit(createTU("EN", "KR", "Joe", "Jo","1"));
-        tmWriter.indexTranslationUnit(createTU("EN", "KR", "Jane", "Jaen","2"));
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Jane", "Jaen","2"));
         writer.commit();
 
         tmWriter.delete("1");
@@ -232,13 +233,7 @@ public class PensieveWriterTest {
         return doc.getField(fieldName).stringValue();
     }
 
-    private TranslationUnit createTU(String srcLang, String targetLang, String source, String target, String id){
-        TranslationUnitVariant tuvS = new TranslationUnitVariant(srcLang, new TextFragment(source));
-        TranslationUnitVariant tuvT = new TranslationUnitVariant(targetLang, new TextFragment(target));
-        TranslationUnit tu = new TranslationUnit(tuvS, tuvT);
-        tu.getMetadata().put(MetadataType.ID, id);
-        return tu;
-    }
+    
 
     private int getNumOfHitsFor(String fieldName, String fieldValue) throws IOException {
         IndexSearcher is = new IndexSearcher(dir, true);

@@ -24,6 +24,10 @@ import org.junit.Assert;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 
 /**
  * User: Christian Hargraves
@@ -44,5 +48,13 @@ public class Helper {
         final Object n = c.newInstance((Object[])null);
         Assert.assertNotNull(n);
         return n;
+    }
+
+    public static TranslationUnit createTU(String srcLang, String targetLang, String source, String target, String id){
+        TranslationUnitVariant tuvS = new TranslationUnitVariant(srcLang, new TextFragment(source));
+        TranslationUnitVariant tuvT = new TranslationUnitVariant(targetLang, new TextFragment(target));
+        TranslationUnit tu = new TranslationUnit(tuvS, tuvT);
+        tu.getMetadata().put(MetadataType.ID, id);
+        return tu;
     }
 }

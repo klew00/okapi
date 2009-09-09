@@ -1,21 +1,21 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
-  This library is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or (at
-  your option) any later version.
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at
+your option) any later version.
 
-  This library is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
-  General Public License for more details.
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public License
-  along with this library; if not, write to the Free Software Foundation,
-  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+You should have received a copy of the GNU Lesser General Public License
+along with this library; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
 package net.sf.okapi.tm.pensieve.seeker;
@@ -33,12 +33,15 @@ import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
 import java.util.*;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 
 /**
  * Used to query the TM
  * @author Christian Hargraves
  */
 public class TMSeeker implements Seeker {
+
     private Directory indexDir;
 
     /**
@@ -102,10 +105,25 @@ public class TMSeeker implements Seeker {
         return search(max, q);
     }
 
+    public List<TranslationUnit> getAllTranslationUnits() throws IOException {
+        List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
+        IndexReader ir;
+        try {
+           ir = IndexReader.open(indexDir, true);
+        } catch (CorruptIndexException cie) {
+            throw new RuntimeException(cie);
+        }
+        for (int i = 0; i < ir.maxDoc(); i++) {
+            tus.add(getTranslationUnit(ir.document(i)));
+        }
+        return tus;
+
+    }
+
     private List<TMHit> search(int max, Query q) throws IOException {
         IndexSearcher is = null;
         List<TMHit> tmhits = new ArrayList<TMHit>();
-        try{
+        try {
             is = new IndexSearcher(indexDir, true);
             TopDocs hits = is.search(q, max);
             for (int j = 0; j < hits.scoreDocs.length; j++) {
@@ -115,9 +133,9 @@ public class TMSeeker implements Seeker {
                 tmhit.setTu(getTranslationUnit(is.doc(scoreDoc.doc)));
                 tmhits.add(tmhit);
             }
-        }finally{
+        } finally {
             //TODO we need to test this
-            if (is != null){
+            if (is != null) {
                 is.close();
             }
         }
@@ -133,7 +151,7 @@ public class TMSeeker implements Seeker {
         return new TranslationUnit(new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.SOURCE_LANG),
                 new TextFragment(getFieldValue(doc, TranslationUnitField.SOURCE))),
                 new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.TARGET_LANG),
-                        new TextFragment(getFieldValue(doc, TranslationUnitField.TARGET))));
+                new TextFragment(getFieldValue(doc, TranslationUnitField.TARGET))));
     }
 
     /**
@@ -142,7 +160,7 @@ public class TMSeeker implements Seeker {
      * @param field The field to extract
      * @return The value of the field
      */
-    String getFieldValue(Document doc, TranslationUnitField field){
+    String getFieldValue(Document doc, TranslationUnitField field) {
         String fieldValue = null;
         Field tempField = doc.getField(field.name());
         if (tempField != null) {

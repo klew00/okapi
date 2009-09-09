@@ -24,6 +24,7 @@ package net.sf.okapi.tm.pensieve.seeker;
 import java.io.IOException;
 import net.sf.okapi.tm.pensieve.common.TMHit;
 import java.util.List;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 
 /**
  * Used to query the TM.
@@ -57,4 +58,11 @@ public interface Seeker {
      * @throws IOException if the search cannot be completed do to I/O problems
      */
     List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException;
+
+    /**
+     * Gets all entries in the TM as a list TranslationUnit
+     * @return A list of all Translation Units
+     * @throws IOException if the search cannot be completed do to I/O problems
+     */
+    List<TranslationUnit> getAllTranslationUnits() throws IOException;
 }

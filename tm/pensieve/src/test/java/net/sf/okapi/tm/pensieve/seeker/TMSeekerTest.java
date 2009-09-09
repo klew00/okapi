@@ -61,6 +61,17 @@ public class TMSeekerTest {
     }
 
     @Test
+    public void getAllTranslationUnits() throws Exception {
+        PensieveWriter writer = getWriter();
+        populateIndex(writer, 12, "patents are evil", "unittest");
+        writer.endIndex();
+        List<TranslationUnit> tus = seeker.getAllTranslationUnits();
+        assertEquals("number of tus", 13, tus.size());
+        assertEquals("first document", "patents are evil0", tus.get(0).getSource().getContent().toString());
+        assertEquals("second document", "patents are evil1", tus.get(1).getSource().getContent().toString());
+    }
+
+    @Test
     public void searchForWordsNothingFound() throws Exception {
         PensieveWriter writer = getWriter();
         writer.endIndex();
