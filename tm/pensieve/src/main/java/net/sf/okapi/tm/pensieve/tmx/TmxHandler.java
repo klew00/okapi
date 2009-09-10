@@ -18,34 +18,36 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.tm.pensieve.common;
+package net.sf.okapi.tm.pensieve.tmx;
+
+import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
+import net.sf.okapi.tm.pensieve.writer.TMWriter;
+
+import java.io.IOException;
+import java.net.URI;
 
 /**
- * Represents a TM Hit. This stores a reference to the TranslationUnit and its score.
- * @author HaslamJD
+ * The TMX interface to Pensieve.
  */
-public class TMHit {
+public interface TmxHandler {
 
-    public TMHit() {
+    /**
+     * Imports TMX to Pensieve
+     * @param tmxUri The location of the TMX
+     * @param targetLang The target language to index
+     * @param tmWriter The TMWriter to use when writing to the TM
+     * @throws IOException if there was a problem with the TMX import
+     */
+    void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException;
 
-    }
 
-    private TranslationUnit tu;
-    private Float score;
-
-    public Float getScore() {
-        return score;
-    }
-
-    public void setScore(Float score) {
-        this.score = score;
-    }
-
-    public TranslationUnit getTu() {
-        return tu;
-    }
-
-    public void setTu(TranslationUnit tu) {
-        this.tu = tu;
-    }
+    /**
+     * Exports Pensieve contents to TMX
+     * @param tmxUri The location of the TMX
+     * @param tmSeeker The Seeker to use when reading from the TM
+     * @param tmxWriter The TMXWriter to use when writing to the TMX file
+     * @throws IOException if there was a problem with the TMX export
+     */
+    void exportTmx(URI tmxUri, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
 }

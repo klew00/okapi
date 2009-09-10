@@ -18,36 +18,21 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.tm.pensieve.tmx;
+package net.sf.okapi.tm.pensieve.common;
 
-import net.sf.okapi.tm.pensieve.writer.TMWriter;
-
-import java.io.IOException;
-import java.net.URI;
-import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.tm.pensieve.seeker.TMSeeker;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
- * The TMX interface to Pensieve.
+ *
+ * @author HaslamJD
  */
-public interface TMXHandler {
+public class TmHitTest {
 
-    /**
-     * Imports TMX to Pensieve
-     * @param tmxUri The location of the TMX
-     * @param targetLang The target language to index
-     * @param tmWriter The TMWriter to use when writing to the TM
-     * @throws IOException if there was a problem with the TMX import
-     */
-    void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException;
-
-
-    /**
-     * Exports Pensieve contents to TMX
-     * @param tmxUri The location of the TMX
-     * @param tmSeeker The Seeker to use when reading from the TM
-     * @param tmxWriter The TMXWriter to use when writing to the TMX file
-     * @throws IOException if there was a problem with the TMX export
-     */
-    void exportTmx(URI tmxUri, TMSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
+    @Test
+    public void noArgConstructor() {
+        TmHit tmh = new TmHit();
+        assertNull(tmh.getTu());
+        assertNull(tmh.getScore());
+    }
 }

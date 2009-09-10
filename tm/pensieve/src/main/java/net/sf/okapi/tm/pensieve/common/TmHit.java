@@ -20,19 +20,32 @@
 
 package net.sf.okapi.tm.pensieve.common;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
-
 /**
- *
+ * Represents a TM Hit. This stores a reference to the TranslationUnit and its score.
  * @author HaslamJD
  */
-public class TMHitTest {
+public class TmHit {
 
-    @Test
-    public void noArgConstructor() {
-        TMHit tmh = new TMHit();
-        assertNull(tmh.getTu());
-        assertNull(tmh.getScore());
+    public TmHit() {
+
+    }
+
+    private TranslationUnit tu;
+    private Float score;
+
+    public Float getScore() {
+        return score;
+    }
+
+    public void setScore(Float score) {
+        this.score = score;
+    }
+
+    public TranslationUnit getTu() {
+        return tu;
+    }
+
+    public void setTu(TranslationUnit tu) {
+        this.tu = tu;
     }
 }

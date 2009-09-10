@@ -40,7 +40,7 @@ import org.apache.lucene.index.IndexReader;
  * Used to query the TM
  * @author Christian Hargraves
  */
-public class PensieveSeeker implements TMSeeker {
+public class PensieveSeeker implements TmSeeker {
 
     private Directory indexDir;
 
@@ -65,7 +65,7 @@ public class PensieveSeeker implements TMSeeker {
      * @return A list of matches for a given set of words. In this case OR is assumed.
      * @throws IOException if the search cannot be completed do to I/O problems
      */
-    public List<TMHit> searchForWords(String query, int max) throws IOException {
+    public List<TmHit> searchForWords(String query, int max) throws IOException {
         QueryParser parser = new QueryParser(TranslationUnitField.SOURCE.name(), new SimpleAnalyzer());
         Query q;
         try {
@@ -82,7 +82,7 @@ public class PensieveSeeker implements TMSeeker {
      * @return A list of fuzzy matches
      * @throws IOException if the search cannot be completed do to I/O problems
      */
-    public List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException {
+    public List<TmHit> searchFuzzyWuzzy(String query, int max) throws IOException {
         Query q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
         return search(max, q);
     }
@@ -93,7 +93,7 @@ public class PensieveSeeker implements TMSeeker {
      * @return A list of exact matches
      * @throws IOException if the search cannot be completed do to I/O problems
      */
-    public List<TMHit> searchExact(String query, int max) throws IOException {
+    public List<TmHit> searchExact(String query, int max) throws IOException {
         //If using QueryParser.parse("\"phrase to match\""), the indexed field must be set to Field.Index.ANALYZED
         //At which point subphrases will also match. This is not the desired behavior of an exact match.
         //Query q = new QueryParser(field.name(), new SimpleAnalyzer()).parse("\""+query+"\"");
@@ -120,15 +120,15 @@ public class PensieveSeeker implements TMSeeker {
 
     }
 
-    private List<TMHit> search(int max, Query q) throws IOException {
+    private List<TmHit> search(int max, Query q) throws IOException {
         IndexSearcher is = null;
-        List<TMHit> tmhits = new ArrayList<TMHit>();
+        List<TmHit> tmhits = new ArrayList<TmHit>();
         try {
             is = new IndexSearcher(indexDir, true);
             TopDocs hits = is.search(q, max);
             for (int j = 0; j < hits.scoreDocs.length; j++) {
                 ScoreDoc scoreDoc = hits.scoreDocs[j];
-                TMHit tmhit = new TMHit();
+                TmHit tmhit = new TmHit();
                 tmhit.setScore(scoreDoc.score);
                 tmhit.setTu(getTranslationUnit(is.doc(scoreDoc.doc)));
                 tmhits.add(tmhit);

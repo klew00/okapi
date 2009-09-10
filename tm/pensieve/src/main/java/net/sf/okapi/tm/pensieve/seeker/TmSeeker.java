@@ -21,16 +21,17 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
 
-import java.io.IOException;
-import net.sf.okapi.tm.pensieve.common.TMHit;
-import java.util.List;
+import net.sf.okapi.tm.pensieve.common.TmHit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Used to query the TM.
  * @author HaslamJD
  */
-public interface TMSeeker {
+public interface TmSeeker {
 
     /**
      * Gets a list of matches for a given set of words. In this case OR is assumed.
@@ -39,7 +40,7 @@ public interface TMSeeker {
      * @return A list of matches for a given set of words. In this case OR is assumed.
      * @throws IOException if the search cannot be completed do to I/O problems
      */
-    List<TMHit> searchForWords(String query, int max) throws IOException;
+    List<TmHit> searchForWords(String query, int max) throws IOException;
 
     /**
      * Gets a list of exact matches for a given phrase.
@@ -48,7 +49,7 @@ public interface TMSeeker {
      * @return A list of exact matches
      * @throws IOException if the search cannot be completed do to I/O problems
      */
-    List<TMHit> searchExact(String query, int max) throws IOException;
+    List<TmHit> searchExact(String query, int max) throws IOException;
 
     /**
      * Gets a list of fuzzy matches for a given phrase.
@@ -57,7 +58,7 @@ public interface TMSeeker {
      * @return A list of fuzzy matches
      * @throws IOException if the search cannot be completed do to I/O problems
      */
-    List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException;
+    List<TmHit> searchFuzzyWuzzy(String query, int max) throws IOException;
 
     /**
      * Gets all entries in the TM as a list TranslationUnit

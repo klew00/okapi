@@ -47,7 +47,7 @@ public class PensieveSeekerTest {
 
     PensieveSeeker seeker;
 
-    List<TMHit> tmhits;
+    List<TmHit> tmhits;
 
     @Before
     public void setUp() throws FileNotFoundException {

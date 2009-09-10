@@ -30,7 +30,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.seeker.TMSeeker;
+import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
 import net.sf.okapi.tm.pensieve.writer.TMWriter;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -49,14 +49,14 @@ import java.util.Map;
 /**
  * @author Dax
  */
-public class OkapiTMXHandlerTest {
+public class OkapiTmxHandlerTest {
 
     private URI sampleTMX;
-    OkapiTMXHandler handler;
+    OkapiTmxHandler handler;
     StubTmWriter stubTmWriter;
     IFilter mockFilter;
     StubTmxWriter stubTmxWriter;
-    TMSeeker mockSeeker;
+    TmSeeker mockSeeker;
 
     @Before
     public void setUp() throws URISyntaxException, IOException {
@@ -77,10 +77,10 @@ public class OkapiTMXHandlerTest {
                 .thenReturn(new Event(EventType.DOCUMENT_PART, new TextUnit("holy cow")));
 
         sampleTMX = new URI("test.tmx");
-        handler = new OkapiTMXHandler("EN", mockFilter);
+        handler = new OkapiTmxHandler("EN", mockFilter);
 
         stubTmWriter = new StubTmWriter();
-        mockSeeker = mock(TMSeeker.class);
+        mockSeeker = mock(TmSeeker.class);
         List<TranslationUnit> tus = new LinkedList<TranslationUnit>();
         tus.add(Helper.createTU("EN", "FR", "source", "target", "sourceid"));
         tus.add(Helper.createTU("EN", "FR", "source2", "target2", "sourceid2"));
@@ -90,6 +90,8 @@ public class OkapiTMXHandlerTest {
 
     @Test
     public void exportTmxStepsCalled() throws IOException {
+        //TODO: This should be easier to test. We should probably add some methods in XMLWriter and TMXWriter that
+        //allow for interfaces like java's Writer to be sent it.
         handler.exportTmx(sampleTMX, mockSeeker, stubTmxWriter);
         assertEquals("tmx path", sampleTMX.getPath(), stubTmxWriter.path);
         assertTrue("doc started", stubTmxWriter.startWritten);
@@ -174,7 +176,7 @@ public class OkapiTMXHandlerTest {
     public void constructorEmptySourceLang() {
         String errMsg = null;
         try {
-            new OkapiTMXHandler("", mockFilter);
+            new OkapiTmxHandler("", mockFilter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -185,7 +187,7 @@ public class OkapiTMXHandlerTest {
     public void constructorEmptyFilter() {
         String errMsg = null;
         try {
-            new OkapiTMXHandler("EN", null);
+            new OkapiTmxHandler("EN", null);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }

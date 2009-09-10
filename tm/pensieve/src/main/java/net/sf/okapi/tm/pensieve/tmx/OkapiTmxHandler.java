@@ -30,7 +30,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.seeker.TMSeeker;
+import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
 import net.sf.okapi.tm.pensieve.writer.TMWriter;
 
 import java.io.IOException;
@@ -42,7 +42,7 @@ import java.util.Map;
 /**
  * Used to interact with the Okapi Standards for TMX. For example, the property names and default fields stored.
  */
-public class OkapiTMXHandler implements TMXHandler {
+public class OkapiTmxHandler implements TmxHandler {
 
     private String sourceLang;
     IFilter tmxFilter;
@@ -52,7 +52,7 @@ public class OkapiTMXHandler implements TMXHandler {
      * @param sourceLang The language to import as the source language
      * @param tmxFilter The IFilter to use to parse the TMX
      */
-    public OkapiTMXHandler(String sourceLang, IFilter tmxFilter) {
+    public OkapiTmxHandler(String sourceLang, IFilter tmxFilter) {
         this.tmxFilter = tmxFilter;
         this.sourceLang = sourceLang;
         if (Util.isEmpty(sourceLang)) {
@@ -89,7 +89,7 @@ public class OkapiTMXHandler implements TMXHandler {
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX
      */
-    public void exportTmx(URI tmxUri, TMSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
+    public void exportTmx(URI tmxUri, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
         checkExportTmxParams(tmxUri, tmSeeker, tmxWriter);
         try {
             tmxWriter.create(tmxUri.getPath());
@@ -131,7 +131,7 @@ public class OkapiTMXHandler implements TMXHandler {
         }
     }
 
-    private void checkExportTmxParams(URI tmxUri, TMSeeker tmSeeker, TMXWriter tmxWriter) {
+    private void checkExportTmxParams(URI tmxUri, TmSeeker tmSeeker, TMXWriter tmxWriter) {
         if (tmxUri == null) {
             throw new IllegalArgumentException("tmxUri was not set");
         }
