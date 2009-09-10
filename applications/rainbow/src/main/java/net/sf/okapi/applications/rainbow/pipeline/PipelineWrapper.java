@@ -33,6 +33,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditorMapper;
 import net.sf.okapi.common.ParametersEditorMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
@@ -313,10 +314,10 @@ public class PipelineWrapper {
 		return peMapper;
 	}
 	
-	public void load (String path) {
-		PipelineStorage store = new PipelineStorage();
-		store.setPath(path);
-		driver.setPipeline(store.read());
+	public void loadPipeline (IPipeline newPipeline,
+		String path)
+	{
+		driver.setPipeline(newPipeline);
 		// Set the info-steps
 		StepInfo infoStep;
 		IParameters params;
@@ -333,6 +334,12 @@ public class PipelineWrapper {
 			steps.add(infoStep);
 		}
 		this.path = path;
+	}
+	
+	public void load (String path) {
+		PipelineStorage store = new PipelineStorage();
+		store.setPath(path);
+		loadPipeline(store.read(), path);
 	}
 	
 	public void save (String path) {

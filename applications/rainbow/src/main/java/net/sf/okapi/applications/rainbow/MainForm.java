@@ -40,6 +40,9 @@ import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.LogForm;
 import net.sf.okapi.applications.rainbow.lib.PathBuilderPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.applications.rainbow.pipeline.ExportTMPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.ImportTMPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
@@ -1168,7 +1171,11 @@ public class MainForm { //implements IParametersProvider {
 		}
 	}
 
-	private void executePipeline () {
+	/**
+	 * Executes (and edit) a pipeline.
+	 * @param predefinedPipeline optional predefined pipeline or null.
+	 */
+	private void executePipeline (IPredefinedPipeline predefinedPipeline) {
 		try {
 			// Save any pending data
 			saveSurfaceData();
@@ -1176,13 +1183,20 @@ public class MainForm { //implements IParametersProvider {
 			if ( wrapper == null ) {
 				wrapper = new PipelineWrapper(fcMapper);
 			}
+			
+			// If we have a predefined pipeline: set it
+			if ( predefinedPipeline != null ) {
+				wrapper.loadPipeline(predefinedPipeline, null);
+			}
+			
 			PipelineEditor dlg = new PipelineEditor();
-			if ( !dlg.edit(shell, wrapper.availableSteps, wrapper, null, null) ) {
+			if ( !dlg.edit(shell, wrapper.availableSteps, wrapper,
+				(predefinedPipeline==null) ? null : predefinedPipeline.getTitle(),
+				null, null) ) {
 				return; // No execution
 			}
 			// Else: execute
 			startWaiting(Res.getString("MainForm.startWaiting"), true); //$NON-NLS-1$
-			// Get the latest custom configurations
 			wrapper.execute(prj);
 		}
 		catch ( Exception e ) {
@@ -1305,7 +1319,7 @@ public class MainForm { //implements IParametersProvider {
 		rm.setCommand(menuItem, "utilities.pipeline"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline();
+				executePipeline(null);
 			}
 		});
 		
@@ -1329,6 +1343,26 @@ public class MainForm { //implements IParametersProvider {
 				});
 			}
 		}
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
+		// Add pre-defined pipelines
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.importtm"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new ImportTMPipeline());
+			}
+		});
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.exporttm"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new ExportTMPipeline());
+			}
+		});
+		
 	}
 
 	public void run () {

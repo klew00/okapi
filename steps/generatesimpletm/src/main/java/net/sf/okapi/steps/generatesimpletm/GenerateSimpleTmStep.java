@@ -156,7 +156,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 		// Add the entry
 		int added = simpleTm.addEntry(tu,
 			(propGName==null) ? tu.getName() : propGName.getValue(),
-			(propFName==null) ? fileName : propGName.getValue());
+			(propFName==null) ? fileName : propFName.getValue());
 
 		if ( added==0 ) {
 			countTuNotAdded++;

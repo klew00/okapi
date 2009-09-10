@@ -27,6 +27,7 @@ import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
@@ -71,15 +72,18 @@ public class PipelineEditor {
 	private Text edDescription;
 	private BaseContext context;
 	private GenericEditor gedit;
+	private String predefined;
 	
 	public boolean edit (Shell parent,
 		Map<String, StepInfo> availableSteps,
 		PipelineWrapper wrapper,
+		String predefined, // null if not predefined, title otherwise
 		IHelp helpParam,
 		String projectDir)
 	{
 		context = new BaseContext();
 		context.setObject("shell", parent);
+		this.predefined = predefined;
 		
 		boolean result = false;
 		try {
@@ -89,6 +93,20 @@ public class PipelineEditor {
 			setDataFromWrapper();
 			create(parent);
 			populate(0);
+			
+			// Set focus on steps if possible
+			if ( lbSteps.getItemCount() > 0 ) {
+				lbSteps.setFocus();
+			}
+			// Select the first step with parameters if possible
+			for ( int i=0; i<workSteps.size(); i++ ) {
+				if ( workSteps.get(i).paramsData != null ) {
+					lbSteps.select(i);
+					updateStepDisplay();
+					break;
+				}
+			}
+			
 			result = showDialog();
 		}
 		catch ( Exception e ) {
@@ -177,7 +195,8 @@ public class PipelineEditor {
 		btSave.setLayoutData(gdTmp);
 		btSave.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				save(edPath.getText());
+				// Like save as if it is a predefined pipeline
+				save((predefined==null) ? edPath.getText() : null);
 			}
 		});
 		
@@ -302,6 +321,7 @@ public class PipelineEditor {
 		int n = lbSteps.getSelectionIndex();
 		if ( n < 0 ) {
 			edDescription.setText("");
+			btAddStep.setEnabled((predefined==null) ? true : false);
 			btRemoveStep.setEnabled(false);
 			btMoveStepUp.setEnabled(false);
 			btMoveStepDown.setEnabled(false);
@@ -310,14 +330,20 @@ public class PipelineEditor {
 		}
 		StepInfo step = workSteps.get(n);
 		edDescription.setText(step.description);
-		btRemoveStep.setEnabled(true);
-		btMoveStepUp.setEnabled(n>0);
-		btMoveStepDown.setEnabled(n<workSteps.size()-1);
+		btAddStep.setEnabled((predefined==null) ? true : false);
+		btRemoveStep.setEnabled((predefined==null) ? true : false);
+		btMoveStepUp.setEnabled((predefined==null) ? (n>0) : false);
+		btMoveStepDown.setEnabled((predefined==null) ? (n<workSteps.size()-1) : false);
 		btEditStep.setEnabled(step.paramsData!=null);
 	}
 	
 	private void populate (int index) {
-		edPath.setText(wrapper.getPath()==null ? "" : wrapper.getPath());
+		if ( predefined != null ) {
+			edPath.setText(predefined);
+		}
+		else {
+			edPath.setText(wrapper.getPath()==null ? "" : wrapper.getPath());
+		}
 		lbSteps.removeAll();
 		for ( StepInfo step : workSteps ) {
 			lbSteps.add(String.format("%s  - [%s]", step.name, step.id));
@@ -465,12 +491,21 @@ public class PipelineEditor {
 	
 	private void save (String path) {
 		try {
-			if (( path == null ) || ( path.length() == 0 )) {
+			if ( Util.isEmpty(path) ) {
 				path = Dialogs.browseFilenamesForSave(shell, "Save Pipeline As", null, null, null);
 				if ( path == null ) return;
 			}
 			if ( !saveData() ) return;
 			wrapper.save(path);
+			
+			// If it was a predefined pipeline it is not anymore
+			if ( predefined != null ) {
+				predefined = null;
+				updateStepDisplay();
+			}
+			
+			// Update the path display
+			edPath.setText(wrapper.getPath());
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
