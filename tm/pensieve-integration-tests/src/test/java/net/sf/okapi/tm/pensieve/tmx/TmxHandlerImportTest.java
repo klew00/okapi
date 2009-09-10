@@ -115,8 +115,4 @@ public class TmxHandlerImportTest {
         assertEquals("tu Type", "plaintext", tu.getMetadata().get(MetadataType.TYPE));
     }
 
-    @Test
-    public void hookup(){
-        assertTrue("not hooked up", true);
-    }
 }
