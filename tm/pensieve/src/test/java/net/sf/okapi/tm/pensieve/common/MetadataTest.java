@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  *
  * @author HaslamJD
  */
-public class MetaDataTest {
+public class MetadataTest {
 
     @Test
     public void noArgConstructor() {
