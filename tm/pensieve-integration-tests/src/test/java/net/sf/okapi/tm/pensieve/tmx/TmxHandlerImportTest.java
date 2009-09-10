@@ -16,6 +16,21 @@ import static org.junit.Assert.assertEquals;
 public class TmxHandlerImportTest {
 
     @Test
+    public void importTmx_paragraph_tmx_basics() throws Exception {
+        TmxFilter tmxFilter = new TmxFilter();
+        RAMDirectory ramDir = new RAMDirectory();
+        TmWriter tmWriter = new PensieveWriter(ramDir);
+        OkapiTmxHandler tmxHandler = new OkapiTmxHandler("en-us", tmxFilter);
+        tmxHandler.importTmx(this.getClass().getResource("/Paragraph_TM.tmx").toURI(),"de-de", tmWriter);
+
+        TmSeeker seeker = new PensieveSeeker(ramDir);
+        TranslationUnit tu = seeker.searchExact("Touch Retry tout content enresume the procedure.\n" +
+                "                ", 2).get(0).getTu();
+        assertEquals("tu target content", "Zur Fortsetzungut content dedes Verfahrens 'Wiederholen' drücken.\n" +
+                "                ", tu.getTarget().getContent().toString());
+    }
+
+    @Test
     public void importTmx_sample_tmx_basics() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         RAMDirectory ramDir = new RAMDirectory();
