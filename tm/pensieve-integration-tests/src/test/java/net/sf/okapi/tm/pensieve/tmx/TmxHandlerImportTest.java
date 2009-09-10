@@ -21,7 +21,7 @@ import java.util.List;
 public class TmxHandlerImportTest {
 
 //        @Test
-    public void importTmx_really_big_file() throws Exception {
+    public void importTmx_exact_really_big_file() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         Directory directory = new NIOFSDirectory(new File("target/test-classes/"));
         TmWriter tmWriter = new PensieveWriter(directory);
@@ -58,6 +58,59 @@ public class TmxHandlerImportTest {
 
         startTime = System.currentTimeMillis();
         tus = seeker.searchExact("Second Ed. C:", 10);
+
+        totalTime = System.currentTimeMillis() - startTime;
+        System.out.println("query time " + totalTime);
+        System.out.println("number found " + tus.size());
+        assertTrue("Didn't find something", tus.size() > 0);
+    }
+
+//        @Test
+    public void importTmx_fuzzy_really_big_file() throws Exception {
+        TmxFilter tmxFilter = new TmxFilter();
+        Directory directory = new NIOFSDirectory(new File("target/test-classes/"));
+        TmWriter tmWriter = new PensieveWriter(directory);
+        OkapiTmxHandler tmxHandler = new OkapiTmxHandler("EN-US", tmxFilter);
+        long startTime = System.currentTimeMillis();
+        tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), "es", tmWriter);
+        long totalTime = System.currentTimeMillis() - startTime;
+        System.out.println("total time to import TMX: " + totalTime);
+
+        TmSeeker seeker = new PensieveSeeker(directory);
+        startTime = System.currentTimeMillis();
+        List<TmHit> tus = seeker.searchFuzzyWuzzy("All Rights Reserved.~0.8", 10);
+
+        totalTime = System.currentTimeMillis() - startTime;
+        System.out.println("query time " + totalTime);
+        System.out.println("number found " + tus.size());
+        assertTrue("Didn't find something", tus.size() > 0);
+
+        startTime = System.currentTimeMillis();
+        tus = seeker.searchFuzzyWuzzy("Notice to U.S. Government End Users.~0.8", 10);
+
+        totalTime = System.currentTimeMillis() - startTime;
+        System.out.println("query time " + totalTime);
+        System.out.println("number found " + tus.size());
+        assertTrue("Didn't find something", tus.size() > 0);
+
+        startTime = System.currentTimeMillis();
+        tus = seeker.searchFuzzyWuzzy("Portions copyright 1984-1998 FairCom Corporation.~0.8", 10);
+
+        totalTime = System.currentTimeMillis() - startTime;
+        System.out.println("query time " + totalTime);
+        System.out.println("number found " + tus.size());
+        assertTrue("Didn't find something", tus.size() > 0);
+
+        startTime = System.currentTimeMillis();
+        tus = seeker.searchFuzzyWuzzy("Second Ed. C:~0.8", 10);
+
+        totalTime = System.currentTimeMillis() - startTime;
+        System.out.println("query time " + totalTime);
+        System.out.println("number found " + tus.size());
+        assertTrue("Didn't find something", tus.size() > 0);
+
+        startTime = System.currentTimeMillis();
+        tus = seeker.searchFuzzyWuzzy("Notice to U.S. Government End Users.~0.8", 10);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
