@@ -55,9 +55,17 @@ public class TmxHandlerImportTest {
         System.out.println("query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
+
+        startTime = System.currentTimeMillis();
+        tus = seeker.searchExact("Second Ed. C:", 10);
+
+        totalTime = System.currentTimeMillis() - startTime;
+        System.out.println("query time " + totalTime);
+        System.out.println("number found " + tus.size());
+        assertTrue("Didn't find something", tus.size() > 0);
     }
 
-    //    @Test
+        @Test
     public void importTmx_paragraph_tmx_basics() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
@@ -67,13 +75,11 @@ public class TmxHandlerImportTest {
         tmxHandler.importTmx(this.getClass().getResource("/Paragraph_TM.tmx").toURI(), "de-de", tmWriter);
 
         TmSeeker seeker = new PensieveSeeker(ramDir);
-        TranslationUnit tu = seeker.searchExact("Touch Retry tout content enresume the procedure.\n" +
-                "                ", 2).get(0).getTu();
-        assertEquals("tu target content", "Zur Fortsetzungut content dedes Verfahrens 'Wiederholen' drücken.\n" +
-                "                ", tu.getTarget().getContent().toString());
+        TranslationUnit tu = seeker.searchExact("Pumps have been paused for 3 minutes. Consider starting a saline drip.", 2).get(0).getTu();
+        assertEquals("tu target content", "Pumpen wurden 3 Minuten lang angehalten, ggf. NaCl-Infusion starten", tu.getTarget().getContent().toString());
     }
 
-    //    @Test
+        @Test
     public void importTmx_sample_tmx_basics() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
@@ -91,7 +97,7 @@ public class TmxHandlerImportTest {
         assertEquals("tu source content", "world", tu.getSource().getContent().toString());
     }
 
-//    @Test
+    @Test
     public void importTmx_sample_metadata() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
