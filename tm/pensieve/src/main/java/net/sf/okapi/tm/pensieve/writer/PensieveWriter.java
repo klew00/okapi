@@ -36,7 +36,7 @@ import java.io.IOException;
 /**
  * Used to write, delete and update the index.
  */
-public class PensieveWriter implements TMWriter {
+public class PensieveWriter implements TmWriter {
 
     private IndexWriter writer;
 

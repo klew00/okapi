@@ -31,7 +31,7 @@ import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
-import net.sf.okapi.tm.pensieve.writer.TMWriter;
+import net.sf.okapi.tm.pensieve.writer.TmWriter;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -259,7 +259,7 @@ public class OkapiTmxHandlerTest {
         return new Event(EventType.TEXT_UNIT, tu);
     }
 
-    public class StubTmWriter implements TMWriter {
+    public class StubTmWriter implements TmWriter {
 
         protected boolean endIndexCalled = false;
         protected List<TranslationUnit> tus = new ArrayList<TranslationUnit>();

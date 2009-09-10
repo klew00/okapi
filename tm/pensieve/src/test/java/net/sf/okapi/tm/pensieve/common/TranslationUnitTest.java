@@ -22,6 +22,7 @@ package net.sf.okapi.tm.pensieve.common;
 
 import net.sf.okapi.common.resource.TextFragment;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -34,6 +35,42 @@ public class TranslationUnitTest {
     TranslationUnit tu;
     final static TranslationUnitVariant SOURCE = new TranslationUnitVariant("EN", new TextFragment("Joe McMac"));
     final static TranslationUnitVariant CONTENT = new TranslationUnitVariant("EN", new TextFragment("Some content that isn't very long"));
+
+    @Before
+    public void setUp(){
+        tu = new TranslationUnit();
+    }
+
+
+    @Test
+    public void getMetadataValueNullKey(){
+        tu.setMetadataValue(MetadataType.ID, "test");
+        assertNull("The ID metadata should not exist", tu.getMetadataValue(null));
+    }
+
+    @Test
+    public void getMetadataValueKey(){
+        tu.setMetadataValue(MetadataType.ID, "test");
+        assertEquals("The ID metadata", "test", tu.getMetadataValue(MetadataType.ID));
+    }
+
+    @Test
+    public void setMetadataValueNull(){
+        tu.setMetadataValue(MetadataType.ID, null);
+        assertFalse("The ID metadata should not exist", tu.getMetadata().containsKey(MetadataType.ID));
+    }
+
+    @Test
+    public void setMetadataValueEmpty(){
+        tu.setMetadataValue(MetadataType.ID, "");
+        assertFalse("The ID metadata should not exist", tu.getMetadata().containsKey(MetadataType.ID));
+    }
+
+    @Test
+    public void setMetadataValue(){
+        tu.setMetadataValue(MetadataType.ID, "yipee");
+        assertEquals("The ID metadata", "yipee", tu.getMetadata().get(MetadataType.ID));
+    }
 
     @Test
     public void noArgConstructor(){
@@ -61,40 +98,34 @@ public class TranslationUnitTest {
 
     @Test
     public void isSourceEmptyNull(){
-        tu = new TranslationUnit();
         assertTrue("source should be empty", tu.isSourceEmpty());
     }
 
     @Test
     public void isSourceEmptyEmpty(){
-        tu = new TranslationUnit();
         tu.setSource(new TranslationUnitVariant("EN", new TextFragment("")));
         assertTrue("source should be empty", tu.isSourceEmpty());
     }
 
     @Test
     public void isSourceEmptyNotEmpty(){
-        tu = new TranslationUnit();
         tu.setSource(new TranslationUnitVariant("EN", new TextFragment("this is not empty")));
         assertFalse("source should not be empty", tu.isSourceEmpty());
     }
 
     @Test
     public void isTargetEmptyNull(){
-        tu = new TranslationUnit();
         assertTrue("target should be empty", tu.isTargetEmpty());
     }
 
     @Test
     public void isTargetEmptyEmpty(){
-        tu = new TranslationUnit();
         tu.setTarget(new TranslationUnitVariant("EN", new TextFragment("")));
         assertTrue("target should be empty", tu.isTargetEmpty());
     }
 
     @Test
     public void isTargetEmptyNotEmpty(){
-        tu = new TranslationUnit();
         tu.setTarget(new TranslationUnitVariant("EN", new TextFragment("this is not empty")));
         assertFalse("target should not be empty", tu.isTargetEmpty());
     }

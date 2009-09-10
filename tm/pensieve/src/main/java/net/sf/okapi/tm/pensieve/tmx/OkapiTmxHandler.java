@@ -31,7 +31,7 @@ import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
-import net.sf.okapi.tm.pensieve.writer.TMWriter;
+import net.sf.okapi.tm.pensieve.writer.TmWriter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -70,7 +70,7 @@ public class OkapiTmxHandler implements TmxHandler {
      * @param tmWriter The TMWriter to use when writing to the TM
      * @throws IOException if there was a problem with the TMX import
      */
-    public void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException {
+    public void importTmx(URI tmxUri, String targetLang, TmWriter tmWriter) throws IOException {
         checkImportTmxParams(tmxUri, targetLang, tmWriter);
         try {
             tmxFilter.open(new RawDocument(tmxUri, null, sourceLang, targetLang));
@@ -80,6 +80,7 @@ public class OkapiTmxHandler implements TmxHandler {
             }
         } finally {
             tmxFilter.close();
+            tmWriter.endIndex();
         }
     }
 
@@ -119,7 +120,7 @@ public class OkapiTmxHandler implements TmxHandler {
         }
     }
 
-    private void checkImportTmxParams(URI tmxUri, String targetLang, TMWriter tmWriter) {
+    private void checkImportTmxParams(URI tmxUri, String targetLang, TmWriter tmWriter) {
         if (Util.isEmpty(targetLang)) {
             throw new IllegalArgumentException("targetLang was not set");
         }
@@ -143,7 +144,7 @@ public class OkapiTmxHandler implements TmxHandler {
         }
     }
 
-    private void indexEvent(String targetLang, TMWriter tmWriter, Event event) throws IOException {
+    private void indexEvent(String targetLang, TmWriter tmWriter, Event event) throws IOException {
         TranslationUnit tu;
         if (event.getEventType() == EventType.TEXT_UNIT) {
             tu = PensieveUtil.convertTranslationUnit(sourceLang, targetLang, (TextUnit) event.getResource());

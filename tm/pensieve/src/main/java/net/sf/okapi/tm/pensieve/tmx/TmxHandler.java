@@ -22,7 +22,7 @@ package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
-import net.sf.okapi.tm.pensieve.writer.TMWriter;
+import net.sf.okapi.tm.pensieve.writer.TmWriter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -39,7 +39,7 @@ public interface TmxHandler {
      * @param tmWriter The TMWriter to use when writing to the TM
      * @throws IOException if there was a problem with the TMX import
      */
-    void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException;
+    void importTmx(URI tmxUri, String targetLang, TmWriter tmWriter) throws IOException;
 
 
     /**

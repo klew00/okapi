@@ -41,4 +41,5 @@ public class MetadataTest {
         md.put(MetadataType.ID, id);
         assertEquals("metadata entries", id, md.get(MetadataType.ID));
     }
+
 }

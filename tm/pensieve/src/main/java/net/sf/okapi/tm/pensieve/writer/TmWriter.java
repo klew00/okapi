@@ -27,7 +27,7 @@ import java.io.IOException;
  *
  * @author HaslamJD
  */
-public interface TMWriter {
+public interface TmWriter {
 
     /**
      * Closes the index and forces a commit against the index.

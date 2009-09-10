@@ -11,10 +11,10 @@
     </header>
     <body>
         
-        <tu tuid="hello" datatype="plaintext">
-            <prop type="Txt::FileName">StringInfoForTest3.info</prop>
-            <prop type="Txt::GroupName">APCCalibrateTimeoutAction0</prop>
-            <prop type="Att::Test">TestValue</prop>
+        <tu tuid="hello123" datatype="plaintext">
+            <prop type="Txt::FileName">GeorgeInTheJungle.hdf</prop>
+            <prop type="Txt::GroupName">ImAGroupie</prop>
+            <prop type="Att::Test">IWillGetIgnored</prop>
             <tuv xml:lang="EN">
                 <seg>hello</seg>
             </tuv>

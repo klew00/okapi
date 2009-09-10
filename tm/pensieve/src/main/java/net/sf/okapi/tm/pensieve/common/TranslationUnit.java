@@ -20,6 +20,8 @@
 
 package net.sf.okapi.tm.pensieve.common;
 
+import net.sf.okapi.common.Util;
+
 /**
  * Represents a Unit of Translation.
  */
@@ -53,7 +55,7 @@ public class TranslationUnit {
     public Metadata getMetadata() {
         return metadata;
     }
-
+    //TODO: get rid of me
     public void setMetadata(Metadata metadata) {
         this.metadata = metadata;
     }
@@ -83,11 +85,33 @@ public class TranslationUnit {
     }
 
     /**
+     * Sets the value for a give metadata value field
+     * @param key the key for the data we want set
+     * @param value the vlaue to set the metadata to
+     */
+    public void setMetadataValue(MetadataType key, String value) {
+        if (Util.isEmpty(value)){
+            metadata.remove(key);
+        }else{
+            metadata.put(key, value);
+        }
+    }
+
+    /**
      * Checks to see if the the target is empty
      * @return true if the target is empty
      */
     public boolean isTargetEmpty() {
         return isFragmentEmpty(target);
+    }
+
+    /**
+     * Gets the value for a give metadata value field
+     * @param key the key for the data we want
+     * @return the value for a give metadata value field
+     */
+    public String getMetadataValue(MetadataType key) {
+        return metadata.get(key);
     }
 
     private static boolean isFragmentEmpty(TranslationUnitVariant frag){

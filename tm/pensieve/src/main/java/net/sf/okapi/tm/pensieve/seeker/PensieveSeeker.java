@@ -25,6 +25,8 @@ import net.sf.okapi.tm.pensieve.common.*;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -32,9 +34,8 @@ import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
-import java.util.*;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Used to query the TM
@@ -149,10 +150,15 @@ public class PensieveSeeker implements TmSeeker {
      */
     TranslationUnit getTranslationUnit(Document doc) {
         //TODO Make sure metadata is supported here
-        return new TranslationUnit(new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.SOURCE_LANG),
+        TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.SOURCE_LANG),
                 new TextFragment(getFieldValue(doc, TranslationUnitField.SOURCE))),
                 new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.TARGET_LANG),
                 new TextFragment(getFieldValue(doc, TranslationUnitField.TARGET))));
+
+        for(MetadataType type : MetadataType.values()) {
+            tu.setMetadataValue(type, getFieldValue(doc, type));
+        }
+        return tu;
     }
 
     /**
@@ -162,8 +168,28 @@ public class PensieveSeeker implements TmSeeker {
      * @return The value of the field
      */
     String getFieldValue(Document doc, TranslationUnitField field) {
+        return getFieldValue(doc, field.name());
+    }
+
+    /**
+     * Gets a Document's Field Value
+     * @param doc The document ot get the field value from
+     * @param type The field to extract
+     * @return The value of the field
+     */
+    String getFieldValue(Document doc, MetadataType type) {
+        return getFieldValue(doc, type.fieldName());
+    }
+
+    /**
+     * Gets a Document's Field Value
+     * @param doc The document ot get the field value from
+     * @param fieldName The name of the field to extract
+     * @return The value of the field
+     */
+    String getFieldValue(Document doc, String fieldName) {
         String fieldValue = null;
-        Field tempField = doc.getField(field.name());
+        Field tempField = doc.getField(fieldName);
         if (tempField != null) {
             fieldValue = tempField.stringValue();
         }

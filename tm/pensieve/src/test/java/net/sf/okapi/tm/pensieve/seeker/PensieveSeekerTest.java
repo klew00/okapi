@@ -219,6 +219,7 @@ public class PensieveSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
+        //Fuzzy or phrase matching would return "watch out for the killer rabbit1" & "watch out for the killer rabbit11"
         tmhits = seeker.searchExact(str+1, 10);
         assertEquals("number of docs found", 1, tmhits.size());
     }
@@ -274,10 +275,9 @@ public class PensieveSeekerTest {
 
     //TODO support metadata
     @Test
-    public void getTranslationUnit() throws Exception {
+    public void getTranslationUnitFields() throws Exception {
         final String source = "watch out for the killer rabbit";
         final String target = "j";
-//        final String id = "1";
         final String targetLang = "KR";
         final String sourceLang = "EN";
         Document doc = new Document();
@@ -291,14 +291,45 @@ public class PensieveSeekerTest {
                 Field.Store.NO, Field.Index.NOT_ANALYZED));
         doc.add(new Field(TranslationUnitField.TARGET_LANG.name(), targetLang,
                 Field.Store.YES, Field.Index.ANALYZED));
-//        doc.add(new Field(MetadataType.ID.fieldName(), id,
-//                Field.Store.YES, Field.Index.NOT_ANALYZED));
         TranslationUnit tu = seeker.getTranslationUnit(doc);
         assertEquals("source field", source, tu.getSource().getContent().toString());
         assertEquals("source lang", sourceLang, tu.getSource().getLang());
         assertEquals("target field", target, tu.getTarget().getContent().toString());
         assertEquals("target lang", targetLang, tu.getTarget().getLang());
-//        assertEquals("id field", id, tu.getMetadata().get(MetadataType.ID));
+    }
+
+    @Test
+    public void getTranslationUnitMeta() throws Exception {
+        final String source = "watch out for the killer rabbit";
+        final String target = "j";
+        final String id = "1";
+        final String filename = "fname";
+        final String groupname = "gname";
+        final String type = "typeA";
+        final String targetLang = "KR";
+        final String sourceLang = "EN";
+        Document doc = new Document();
+        doc.add(new Field(TranslationUnitField.SOURCE.name(), source,
+                Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field(TranslationUnitField.SOURCE_LANG.name(), sourceLang,
+                Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field(TranslationUnitField.TARGET.name(), target,
+                Field.Store.NO, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(TranslationUnitField.TARGET_LANG.name(), targetLang,
+                Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field(MetadataType.ID.fieldName(), id,
+                Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(MetadataType.FILE_NAME.fieldName(), filename,
+                Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(MetadataType.GROUP_NAME.fieldName(), groupname,
+                Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(MetadataType.TYPE.fieldName(), type,
+                Field.Store.YES, Field.Index.NOT_ANALYZED));
+        TranslationUnit tu = seeker.getTranslationUnit(doc);
+        assertEquals("id field", id, tu.getMetadata().get(MetadataType.ID));
+        assertEquals("filename field", filename, tu.getMetadata().get(MetadataType.FILE_NAME));
+        assertEquals("groupname field", groupname, tu.getMetadata().get(MetadataType.GROUP_NAME));
+        assertEquals("type field", type, tu.getMetadata().get(MetadataType.TYPE));
     }
 
     PensieveWriter getWriter() throws Exception {
