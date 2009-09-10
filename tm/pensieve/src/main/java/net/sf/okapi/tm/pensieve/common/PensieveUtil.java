@@ -45,12 +45,14 @@ public final class PensieveUtil {
     }
 
     private static void populateMetaDataFromProperties(TextUnit textUnit, TranslationUnit tu) {
-        for (String property : textUnit.getPropertyNames()) {
-           MetadataType mdt = MetadataType.findMetadataType(property);
+        MetadataType mdt;
+        for (String key : textUnit.getPropertyNames()) {
+           mdt = MetadataType.findMetadataType(key);
             if (mdt != null) {
-                tu.getMetadata().put(mdt, textUnit.getProperty(property).getValue());
+                tu.getMetadata().put(mdt, textUnit.getProperty(key).getValue());
             } else {
-               //TODO: What do we do if mapping for metadata doesn't exist?
+               //TODO: What do we do if mapping for metadata doesn't exist?  It is enough for simpleTM replacement to
+                //support a finite set.
             }
         }
     }

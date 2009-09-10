@@ -38,6 +38,15 @@ public enum MetadataType {
 
     private String fieldName;
 
+    private static Map<String, MetadataType> mapping = new HashMap<String, MetadataType>() {
+        {
+            put("Txt::GroupName", GROUP_NAME);
+            put("Txt::FileName", FILE_NAME);
+            put("datatype", TYPE);
+            put("tuid", ID);
+        }
+    };
+
     private MetadataType(String fieldName) {
         this.fieldName = fieldName;
     }
@@ -53,15 +62,6 @@ public enum MetadataType {
     public Field.Index indexType() {
         return Field.Index.NOT_ANALYZED;
     }
-
-    private static Map<String, MetadataType> mapping = new HashMap<String, MetadataType>() {
-        {
-            put("Txt::GroupName", GROUP_NAME);
-            put("Txt::FileName", FILE_NAME);
-            put("datatype", TYPE);
-            put("tuid", ID);
-        }
-    };
 
     public static MetadataType findMetadataType(String keyword) {
         return mapping.get(keyword);

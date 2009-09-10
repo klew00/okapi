@@ -47,7 +47,7 @@ import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
-import net.sf.okapi.tm.pensieve.seeker.Seeker;
+import net.sf.okapi.tm.pensieve.seeker.TMSeeker;
 
 /**
  *
@@ -141,16 +141,19 @@ public class OkapiTMXHandlerTest {
     }
 
     @Test
-    public void importTMXMetadata() throws IOException {
+    public void importTMXMetadataWithData() throws IOException {
         handler.importTmx(sampleTMX, "IT", stubTmWriter);
         assertEquals("ID", "helloid", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.ID));
         assertEquals("TYPE", "plaintext", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.TYPE));
         assertEquals("FILE_NAME", "StringInfoForTest3.info", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.FILE_NAME));
         assertEquals("GROUP_NAME", "APCCalibrateTimeoutAction0", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.GROUP_NAME));
-        assertNull("ID", stubTmWriter.tus.get(1).getMetadata().get(MetadataType.ID));
-        assertNull("TYPE", stubTmWriter.tus.get(1).getMetadata().get(MetadataType.TYPE));
-        assertNull("FILE_NAME", stubTmWriter.tus.get(1).getMetadata().get(MetadataType.FILE_NAME));
-        assertNull("GROUP_NAME", stubTmWriter.tus.get(1).getMetadata().get(MetadataType.GROUP_NAME));
+        assertEquals("# of metadata", 0, stubTmWriter.tus.get(1).getMetadata().size());
+    }
+
+    @Test
+    public void importTMXMetadataWithoutData() throws IOException {
+        handler.importTmx(sampleTMX, "IT", stubTmWriter);
+        assertEquals("# of metadata", 0, stubTmWriter.tus.get(1).getMetadata().size());
     }
 
     @Test
@@ -210,7 +213,6 @@ public class OkapiTMXHandlerTest {
     @Test
     public void tUCount_NonExistingLang() throws IOException {
         handler.importTmx(sampleTMX, "FR", stubTmWriter);
-        //TODO: Is this the behavior we want?  Returning null targets for nonexistant languages
         assertEquals("number of TUs", 2, stubTmWriter.tus.size());
         assertNull("targets content should be null", stubTmWriter.tus.get(0).getTarget().getContent());
         assertEquals("target lang", "FR", stubTmWriter.tus.get(0).getTarget().getLang());
@@ -259,7 +261,7 @@ public class OkapiTMXHandlerTest {
         }
     }
 
-    public class StubTMSeeker implements Seeker {
+    public class StubTMSeeker implements TMSeeker {
 
         List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
 

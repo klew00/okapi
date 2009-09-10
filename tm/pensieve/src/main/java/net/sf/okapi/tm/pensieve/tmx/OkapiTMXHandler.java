@@ -36,9 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
-import net.sf.okapi.tm.pensieve.seeker.Seeker;
+import net.sf.okapi.tm.pensieve.seeker.TMSeeker;
 
 /**
  * Used to interact with the Okapi Standards for TMX. For example, the property names and default fields stored.
@@ -72,6 +71,7 @@ public class OkapiTMXHandler implements TMXHandler {
      * @throws IOException if there was a problem with the TMX import
      */
     public void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException {
+        //TODO TMWriter is a bit confusing. It's too close to TMXWriter
         checkImportTmxParams(tmxUri, targetLang, tmWriter);
         try {
             tmxFilter.open(new RawDocument(tmxUri, null, sourceLang, targetLang));
@@ -90,11 +90,12 @@ public class OkapiTMXHandler implements TMXHandler {
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX
      */
-    public void exportTmx(URI tmxUri, Seeker tmSeeker, TMXWriter tmxWriter) throws IOException {
+    public void exportTmx(URI tmxUri, TMSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
         checkExportTmxParams(tmxUri, tmSeeker, tmxWriter);
         try {
             tmxWriter.create(tmxUri.getPath());
             tmxWriter.writeStartDocument("??", "??", "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
+            //TODO might eat up too much memory for large TMs
             List<TranslationUnit> tus = tmSeeker.getAllTranslationUnits();
             for (TranslationUnit tu : tus) {
                 String tuid = tu.getMetadata().get(MetadataType.ID);
@@ -107,6 +108,7 @@ public class OkapiTMXHandler implements TMXHandler {
                 Map<String, String> attributes = new HashMap<String, String>();
                 for (MetadataType type : tu.getMetadata().keySet()) {
                     //TODO: potentially need TMX attribute name associated with
+                    //TODO: test that tmx attributes are written as attributes while properties are written as properties (i.e. tuid vs Txt::Filename
                     attributes.put(type.fieldName(), tu.getMetadata().get(type));
                 }
                 tmxWriter.writeItem(textUnit, attributes);
@@ -130,7 +132,7 @@ public class OkapiTMXHandler implements TMXHandler {
         }
     }
 
-    private void checkExportTmxParams(URI tmxUri, Seeker tmSeeker, TMXWriter tmxWriter) {
+    private void checkExportTmxParams(URI tmxUri, TMSeeker tmSeeker, TMXWriter tmxWriter) {
         if (tmxUri == null) {
             throw new IllegalArgumentException("tmxUri was not set");
         }

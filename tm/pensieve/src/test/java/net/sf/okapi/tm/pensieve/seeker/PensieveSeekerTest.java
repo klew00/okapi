@@ -39,25 +39,24 @@ import java.util.List;
  * Date: Aug 17, 2009
  * Time: 1:04:24 PM
  */
-public class TMSeekerTest {
+public class PensieveSeekerTest {
 
     static final Directory DIR = new RAMDirectory();
     static final TranslationUnitVariant TARGET = new TranslationUnitVariant("EN", new TextFragment("target text"));
     static final String STR = "watch out for the killer rabbit";
 
-
-    TMSeeker seeker;
+    PensieveSeeker seeker;
 
     List<TMHit> tmhits;
 
     @Before
     public void setUp() throws FileNotFoundException {
-        seeker = new TMSeeker(DIR);
+        seeker = new PensieveSeeker(DIR);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void constructorNullIndexDir() {
-        new TMSeeker(null);
+        new PensieveSeeker(null);
     }
 
     @Test
