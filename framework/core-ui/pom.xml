@@ -11,6 +11,7 @@
     <artifactId>okapi-core-ui</artifactId>
    <!--Used for display purposes only-->
     <name>Okapi Core UI</name>
+
     <profiles>
         <profile>
             <id>WIN_SWT</id>
@@ -82,5 +83,34 @@
             <artifactId>okapi-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+		<!-- Forces dependencies for the supported platforms so we can plus everything -->
+		<!--TODO: this makes the profiles not necessary if they only get platform-specific jars-->
+		<dependency>
+			<groupId>org.eclipse.swt.win32.win32</groupId>
+			<artifactId>x86</artifactId>
+			<version>3.5.0-v3550b</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.swt.carbon</groupId>
+			<artifactId>macosx</artifactId>
+			<version>3.5.0-v3550b</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.swt.cocoa</groupId>
+			<artifactId>macosx</artifactId>
+			<version>3.5.0-v3550b</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.swt.gtk2.linux</groupId>
+			<artifactId>x86</artifactId>
+			<version>3.5.0-v3550b</version>
+		</dependency>
+			<dependency>
+			<groupId>org.eclipse.swt.gtk2.linux</groupId>
+			<artifactId>x86_64</artifactId>
+			<version>3.5.0-v3550b</version>
+		</dependency>
+
     </dependencies>
 </project>

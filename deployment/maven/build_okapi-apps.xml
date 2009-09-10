@@ -23,13 +23,13 @@
 	<condition property="swtdep" value="cocoa/macosx/3.5.0-v3550b">
 		<equals arg1="${platform}" arg2="cocoa-macosx"/>
 	</condition>
-	<condition property="swtdep" value="swt-carbon-macosx"> <!-- to fix -->
+	<condition property="swtdep" value="carbon/macosx/3.5.0-v3550b">
 		<equals arg1="${platform}" arg2="carbon-macosx"/>
 	</condition>
-	<condition property="swtdep" value="gtk2/linuk/x86/3.5.0-v3550b">
+	<condition property="swtdep" value="gtk2/linux/x86/3.5.0-v3550b">
 		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
 	</condition>
-	<condition property="swtdep" value="gtk2/linuk/x86_64/3.5.0-v3550b">
+	<condition property="swtdep" value="gtk2/linux/x86_64/3.5.0-v3550b">
 		<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
 	</condition>
 
