@@ -20,74 +20,77 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 
 package net.sf.okapi.tm.pensieve.tmx;
 
-import java.util.Map;
-import net.sf.okapi.tm.pensieve.common.TMHit;
-import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.writer.TMWriter;
-import net.sf.okapi.common.filters.AbstractFilter;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.EventType;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.tm.pensieve.Helper;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.seeker.TMSeeker;
+import net.sf.okapi.tm.pensieve.writer.TMWriter;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Iterator;
-import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.tm.pensieve.Helper;
-import net.sf.okapi.tm.pensieve.common.MetadataType;
-import net.sf.okapi.tm.pensieve.seeker.TMSeeker;
+import java.util.Map;
 
 /**
- *
  * @author Dax
  */
 public class OkapiTMXHandlerTest {
 
     private URI sampleTMX;
     OkapiTMXHandler handler;
-    StubTMWriter stubTmWriter;
-    StubTMSeeker stubTmSeeker;
-    StubTMXFilter stubTmxFilter;
+    StubTmWriter stubTmWriter;
+    IFilter mockFilter;
     StubTmxWriter stubTmxWriter;
+    TMSeeker mockSeeker;
 
     @Before
-    public void setUp() throws URISyntaxException {
-
+    public void setUp() throws URISyntaxException, IOException {
         String[][] properties = {{"tuid", "helloid"},
-            {"datatype", "plaintext"},
-            {"Txt::FileName", "StringInfoForTest3.info"},
-            {"Txt::GroupName", "APCCalibrateTimeoutAction0"}
+                {"datatype", "plaintext"},
+                {"Txt::FileName", "StringInfoForTest3.info"},
+                {"Txt::GroupName", "APCCalibrateTimeoutAction0"}
         };
-
-        stubTmxFilter = new StubTMXFilter();
-        stubTmxFilter.addEvent("1", "hello", "ciao", "IT", properties);
-        stubTmxFilter.addEvent("2", "world", "mondo", "IT", null);
-        stubTmxFilter.events.add(new Event(EventType.DOCUMENT_PART, new TextUnit("holy cow")));
+        mockFilter = mock(IFilter.class);
+        when(mockFilter.hasNext())
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(false);
+        when(mockFilter.next())
+                .thenReturn(createEvent("1", "hello", "ciao", "IT", properties))
+                .thenReturn(createEvent("2", "world", "mondo", "IT", null))
+                .thenReturn(new Event(EventType.DOCUMENT_PART, new TextUnit("holy cow")));
 
         sampleTMX = new URI("test.tmx");
-        handler = new OkapiTMXHandler("EN", stubTmxFilter);
-        stubTmWriter = new StubTMWriter();
-        stubTmSeeker = new StubTMSeeker();
-        stubTmSeeker.addTU("source", "EN", "target", "FR", "sourceid");
-        stubTmSeeker.addTU("source2", "EN", "target2", "FR", "sourceid2");
+        handler = new OkapiTMXHandler("EN", mockFilter);
+
+        stubTmWriter = new StubTmWriter();
+        mockSeeker = mock(TMSeeker.class);
+        List<TranslationUnit> tus = new LinkedList<TranslationUnit>();
+        tus.add(Helper.createTU("EN", "FR", "source", "target", "sourceid"));
+        tus.add(Helper.createTU("EN", "FR", "source2", "target2", "sourceid2"));
+        when(mockSeeker.getAllTranslationUnits()).thenReturn(tus);
         stubTmxWriter = new StubTmxWriter();
     }
 
     @Test
     public void exportTmxStepsCalled() throws IOException {
-        handler.exportTmx(sampleTMX, stubTmSeeker, stubTmxWriter);
+        handler.exportTmx(sampleTMX, mockSeeker, stubTmxWriter);
         assertEquals("tmx path", sampleTMX.getPath(), stubTmxWriter.path);
         assertTrue("doc started", stubTmxWriter.startWritten);
         //TODO: find out about lang - assertEquals("sourceLang", "EN", stubTmxWriter.sourceLanguage);
@@ -111,7 +114,7 @@ public class OkapiTMXHandlerTest {
     public void exportTmxFileNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx(null, stubTmSeeker, stubTmxWriter);
+            handler.exportTmx(null, mockSeeker, stubTmxWriter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -133,7 +136,7 @@ public class OkapiTMXHandlerTest {
     public void exportTmxWriterNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx(sampleTMX, stubTmSeeker, null);
+            handler.exportTmx(sampleTMX, mockSeeker, null);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -171,7 +174,7 @@ public class OkapiTMXHandlerTest {
     public void constructorEmptySourceLang() {
         String errMsg = null;
         try {
-            new OkapiTMXHandler("", stubTmxFilter);
+            new OkapiTMXHandler("", mockFilter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -191,12 +194,12 @@ public class OkapiTMXHandlerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void importTMXEmptyTargetLang() throws IOException {
-        handler.importTmx(sampleTMX, "", new StubTMWriter());
+        handler.importTmx(sampleTMX, "", new StubTmWriter());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void importTMXNullTargetLang() throws IOException {
-        handler.importTmx(sampleTMX, null, new StubTMWriter());
+        handler.importTmx(sampleTMX, null, new StubTmWriter());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -237,12 +240,24 @@ public class OkapiTMXHandlerTest {
     //An example of a Stub. I will likely change this to a Mock later
     @Test
     public void importTMXDocCount() throws IOException {
-        StubTMWriter tmWriter = new StubTMWriter();
+        StubTmWriter tmWriter = new StubTmWriter();
         handler.importTmx(sampleTMX, "EN", tmWriter);
         assertEquals("entries indexed", 2, tmWriter.tus.size());
     }
 
-    public class StubTMWriter implements TMWriter {
+    private Event createEvent(String id, String source, String target, String targetLang, String[][] properties) {
+        TextUnit tu = new TextUnit(id, source);
+        tu.setTargetContent(targetLang, new TextFragment(target));
+        //populate properties
+        if (properties != null) {
+            for (String[] prop : properties) {
+                tu.setProperty(new Property(prop[0], prop[1]));
+            }
+        }
+        return new Event(EventType.TEXT_UNIT, tu);
+    }
+
+    public class StubTmWriter implements TMWriter {
 
         protected boolean endIndexCalled = false;
         protected List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
@@ -258,31 +273,6 @@ public class OkapiTMXHandlerTest {
         }
 
         public void update(TranslationUnit tu) throws IOException {
-        }
-    }
-
-    public class StubTMSeeker implements TMSeeker {
-
-        List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
-
-        private void addTU(String source, String sourceLang, String target, String targetLang, String id) {
-            tus.add(Helper.createTU(sourceLang, targetLang, source, target, id));
-        }
-
-        public List<TMHit> searchExact(String query, int max) throws IOException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        public List<TMHit> searchForWords(String query, int max) throws IOException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        public List<TMHit> searchFuzzyWuzzy(String query, int max) throws IOException {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        public List<TranslationUnit> getAllTranslationUnits() {
-            return tus;
         }
     }
 
@@ -352,61 +342,4 @@ public class OkapiTMXHandlerTest {
         }
     }
 
-    public class StubTMXFilter extends AbstractFilter {
-
-        private List<Event> events;
-        private Iterator<Event> eventIterator;
-
-        public StubTMXFilter() {
-            this.events = new ArrayList<Event>();
-
-        }
-
-        public void addEvent(String id, String source, String target, String targetLang, String[][] properties) {
-            TextUnit tu = new TextUnit(id, source);
-            tu.setTargetContent(targetLang, new TextFragment(target));
-            //populate properties
-            if (properties != null) {
-                for (String[] prop : properties) {
-                    tu.setProperty(new Property(prop[0], prop[1]));
-                }
-            }
-            events.add(new Event(EventType.TEXT_UNIT, tu));
-        }
-
-        public boolean hasNext() {
-            if (eventIterator == null) {
-                eventIterator = this.events.iterator();
-            }
-            return eventIterator.hasNext();
-        }
-
-        public Event next() {
-            return eventIterator.next();
-        }
-
-        protected boolean isUtf8Encoding() {
-            return false;
-        }
-
-        protected boolean isUtf8Bom() {
-            return false;
-        }
-
-        public IParameters getParameters() {
-            return null;
-        }
-
-        public void setParameters(IParameters params) {
-        }
-
-        public void open(RawDocument input) {
-        }
-
-        public void open(RawDocument input, boolean generateSkeleton) {
-        }
-
-        public void close() {
-        }
-    }
 }

@@ -54,6 +54,19 @@ public class PensieveSeekerTest {
         seeker = new PensieveSeeker(DIR);
     }
 
+    @Test
+    public void getFieldValueNoField(){
+        Document doc = new Document();
+        assertNull("Null should be returned for an empty field", seeker.getFieldValue(doc, TranslationUnitField.SOURCE));
+    }
+
+    @Test
+    public void getFieldValue(){
+        Document doc = new Document();
+        doc.add(new Field(TranslationUnitField.SOURCE.name(), "lk", Field.Store.NO,  Field.Index.NOT_ANALYZED));
+        assertEquals("source field", "lk",  seeker.getFieldValue(doc, TranslationUnitField.SOURCE));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void constructorNullIndexDir() {
         new PensieveSeeker(null);

@@ -24,10 +24,13 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.seeker.TMSeeker;
 import net.sf.okapi.tm.pensieve.writer.TMWriter;
 
 import java.io.IOException;
@@ -35,9 +38,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.tm.pensieve.common.MetadataType;
-import net.sf.okapi.tm.pensieve.seeker.TMSeeker;
 
 /**
  * Used to interact with the Okapi Standards for TMX. For example, the property names and default fields stored.
@@ -71,7 +71,6 @@ public class OkapiTMXHandler implements TMXHandler {
      * @throws IOException if there was a problem with the TMX import
      */
     public void importTmx(URI tmxUri, String targetLang, TMWriter tmWriter) throws IOException {
-        //TODO TMWriter is a bit confusing. It's too close to TMXWriter
         checkImportTmxParams(tmxUri, targetLang, tmWriter);
         try {
             tmxFilter.open(new RawDocument(tmxUri, null, sourceLang, targetLang));
