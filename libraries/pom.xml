@@ -16,5 +16,6 @@
         <module>lib-segmentation-ui</module>
         <module>lib-translation</module>
         <module>lib-search</module>
+        <module>lib-extra</module>
     </modules>
 </project>
