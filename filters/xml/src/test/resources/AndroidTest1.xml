@@ -3,7 +3,13 @@
     android:orientation="vertical"  
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent"  
-    >  
+    >
+
+<EditText id="text"
+    android:layout_width="fill_parent" android:layout_height="fill_parent"
+    android:textColor="@android:color/opaque_red"
+    android:text="@string/hello_world" /> <!-- Not to be translated-->
+  
     <TextView  
         android:layout_width="fill_parent"  
         android:layout_height="wrap_content"  
