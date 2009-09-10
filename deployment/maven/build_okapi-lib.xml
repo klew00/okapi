@@ -233,7 +233,7 @@
 		<echo file="tmpJars" append="yes"> ${jar008}</echo>
 		<copy todir="${distLib}" file="${dep008}/${jar008}"/>
 
-		<property name="dep009" value="${mavenStore}/org/json/json-simple/1.1"/>
+		<property name="dep009" value="${mavenStore}/com/googlecode/json-simple/json-simple/1.1"/>
 		<fileset id="list.contents" dir="${dep009}"
 		 includes="**/*.jar"/>
 		<property name="jar009" refid="list.contents"/>
