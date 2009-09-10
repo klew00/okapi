@@ -89,6 +89,27 @@ public class CommaSeparatedValuesFilterTest {
 //m		root2 = Util.getDirectoryName(root2) + "/data/";
         root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
 	}
+
+	@Test
+	public void testThreeColumnsSrcTrgData () {
+		String snippet = "\"src\",\"trg\",data\n"
+			+ "\"source1\",\"target1\",data1\n"
+			+ "\"source2\",\"target2\",data2\n";
+
+		// Set the parameters
+		Parameters params = new Parameters();
+		params.fieldDelimiter = ",";
+		params.textQualifier = "\"";
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		params.sourceColumns = "1";
+		params.targetColumns = "2";
+		params.targetLanguages = "FR-CA";
+		params.targetSourceRefs = "1";
+		filter.setParameters(params);
+		
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");
+		//UNCOMMENT assertEquals(snippet, result);
+	}
 	
 	@Test
 	public void testEmptyInput() {
@@ -1395,6 +1416,20 @@ public class CommaSeparatedValuesFilterTest {
 		
         return tmp.toString();
     }
+
+	private ArrayList<Event> getEvents (String snippet,
+		String srcLang,
+		String trgLang)
+	{
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(snippet, srcLang, trgLang));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
+	}
 
 	
 }
