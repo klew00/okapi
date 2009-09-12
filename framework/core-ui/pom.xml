@@ -85,7 +85,9 @@
         </dependency>
 
 		<!-- Forces dependencies for the supported platforms so we can plus everything -->
-		<!--TODO: this makes the profiles not necessary if they only get platform-specific jars-->
+		<!--TODO: Find a solution outside the POm for this, otherwise we get 
+		multiple refernces of the same methods in in IDE
+		
 		<dependency>
 			<groupId>org.eclipse.swt.win32.win32</groupId>
 			<artifactId>x86</artifactId>
@@ -111,6 +113,7 @@
 			<artifactId>x86_64</artifactId>
 			<version>3.5.0-v3550b</version>
 		</dependency>
+		-->
 
     </dependencies>
 </project>
