@@ -45,6 +45,10 @@ public class PensieveTMConnector implements ITMQuery {
 		return "Pensieve";
 	}
 
+	public String getSettingsDisplay () {
+		return "TODO";
+	}
+	
 	public void setMaximumHits (int max) {
 		if ( max < 1 ) maxHits = 1;
 		else maxHits = max;

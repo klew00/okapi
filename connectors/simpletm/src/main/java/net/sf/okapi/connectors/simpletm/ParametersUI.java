@@ -18,18 +18,21 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.connectors.translatetoolkit;
+package net.sf.okapi.connectors.simpletm;
 
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.PathInputPart;
 
 public class ParametersUI implements IEditorDescriptionProvider {
 
-	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Translation Toolkit TM Connector Settings");
-		desc.addTextInputPart(paramsDesc.get("host"));
-		desc.addTextInputPart(paramsDesc.get("port"));
+	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("SimpleTM Connector Settings", true, false);
+
+		PathInputPart part = desc.addPathInputPart(paramDesc.get("dbPath"), "Database File", false);
+		part.setBrowseFilters("Database Files (*.data.db)\tAll Files (*.*)", "*.data.db\t*.*");
+		
 		return desc;
 	}
 

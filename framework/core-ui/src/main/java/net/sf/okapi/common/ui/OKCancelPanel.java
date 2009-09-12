@@ -109,7 +109,7 @@ public class OKCancelPanel extends Composite {
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		setLayout(layTmp);
-		int nWidth = 80;
+		int nWidth = UIUtil.BUTTON_DEFAULT_WIDTH;
 
 		btHelp = new Button(this, SWT.PUSH);
 		btHelp.setText(Res.getString("OKCancelPanel.btHelp"));
@@ -184,4 +184,5 @@ public class OKCancelPanel extends Composite {
 	public void setOKText (String text) {
 		btOK.setText(text);
 	}
+
 }

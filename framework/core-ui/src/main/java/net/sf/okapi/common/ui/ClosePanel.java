@@ -60,7 +60,7 @@ public class ClosePanel extends Composite {
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		setLayout(layTmp);
-		int nWidth = 80;
+		int nWidth = UIUtil.BUTTON_DEFAULT_WIDTH;
 
 		btHelp = new Button(this, SWT.PUSH);
 		btHelp.setText(Res.getString("ClosePanel.btHelp")); //$NON-NLS-1$

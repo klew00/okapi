@@ -21,9 +21,13 @@
 package net.sf.okapi.connectors.mymemory;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
+	public static final String KEY = "key";
+	public static final String USEMT = "useMT";
+	
 	private String key;
 	private int useMT;
 	
@@ -55,8 +59,8 @@ public class Parameters extends BaseParameters {
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		key = buffer.getString("key", key);
-		useMT = buffer.getInteger("useMT", useMT);
+		key = buffer.getString(Parameters.KEY, key);
+		useMT = buffer.getInteger(Parameters.USEMT, useMT);
 	}
 
 	public void reset () {
@@ -67,9 +71,17 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setString("key", key);
-		buffer.setInteger("useMT", useMT);
+		buffer.setString(Parameters.KEY, key);
+		buffer.setInteger(Parameters.USEMT, useMT);
 		return buffer.toString();
+	}
+
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(Parameters.KEY, "Key", "Access key");
+		desc.add(Parameters.USEMT, "Provide also machine translation result", null);
+		return desc;
 	}
 
 }

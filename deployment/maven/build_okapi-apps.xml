@@ -133,6 +133,8 @@
 			<!-- Libraries -->
 			<fileset dir="../../libraries/lib-segmentation-ui/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../libraries/lib-translation-ui/target/classes"
+			 excludes="**/META-INF/**"/>
 			 
 			 <!-- Steps -->
 			<fileset dir="../../steps/bomconversion-ui/target/classes"

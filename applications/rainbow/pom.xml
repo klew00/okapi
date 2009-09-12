@@ -31,7 +31,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.connectors</groupId>
-			<artifactId>okapi-connector-simpletm</artifactId>
+			<artifactId>okapi-connector-globalsight</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -40,8 +40,33 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-mymemory</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-opentran</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-simpletm</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-translatetoolkit</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-translation</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.lib</groupId>
+			<artifactId>okapi-lib-translation-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

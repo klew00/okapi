@@ -59,6 +59,11 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		return "Translate Toolkit TM";
 	}
 
+	public String getSettingsDisplay () {
+		return "Server: "+String.format("http://%s:%d/tmserver/",
+			params.getHost(), params.getPort());
+	}
+	
 	public void close () {
 	}
 

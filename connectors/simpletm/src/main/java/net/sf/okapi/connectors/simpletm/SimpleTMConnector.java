@@ -51,6 +51,10 @@ public class SimpleTMConnector implements ITMQuery {
 		return "SimpleTM";
 	}
 
+	public String getSettingsDisplay () {
+		return "Database: "+params.getDbPath();
+	}
+	
 	public void setMaximumHits (int max) {
 		if ( max < 1 ) maxHits = 1;
 		else maxHits = max;
@@ -83,7 +87,7 @@ public class SimpleTMConnector implements ITMQuery {
 	}
 
 	public void open () {
-		db.open(params.dbPath);
+		db.open(params.getDbPath());
 	}
 
 	public int query (String plainText) {

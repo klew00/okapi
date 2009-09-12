@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Shell;
  * Helpers methods to wrap commonly used dialog boxes.
  */
 public class Dialogs {
+	
 	/**
 	 * Browses for one or more files.
 	 * @param parent Parent of the dialog.

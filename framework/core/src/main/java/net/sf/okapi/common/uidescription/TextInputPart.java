@@ -48,7 +48,7 @@ public class TextInputPart extends AbstractPart {
 	protected void checkType () {
 		// Check type support
 		if ( getType().equals(String.class) ) return;
-		if ( getType().equals(Integer.class) ) return;
+		if ( getType().equals(int.class) ) return;
 		// Otherwise: call the base method.
 		super.checkType();
 	}

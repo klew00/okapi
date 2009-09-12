@@ -88,8 +88,8 @@ public class Parameters extends BaseParameters {
 	public void reset () {
 		username = "";
 		password = "";
-		serverURL = "";
-		tmProfile = "";
+		serverURL = "http://HOST:PORT/globalsight/services/AmbassadorWebService?wsdl";
+		tmProfile = "default";
 	}
 
 	@Override

@@ -78,6 +78,9 @@ public class GoogleMTConnector implements IQuery {
 		return "Google-MT";
 	}
 
+	public String getSettingsDisplay () {
+		return "Server: " + addressAjax;
+	}
 	public boolean hasNext () {
 		return (current>-1);
 	}

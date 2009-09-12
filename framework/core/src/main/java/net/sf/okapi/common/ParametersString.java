@@ -134,6 +134,7 @@ public class ParametersString {
 	{
 		if ( prefix == null ) prefix = "";
 		else prefix += ".";
+		if ( data == null ) data = "";
 		
 		String[] lines = data.split("\n", 0);
 		int n;

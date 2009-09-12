@@ -18,18 +18,20 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.connectors.translatetoolkit;
+package net.sf.okapi.connectors.mymemory;
 
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Translation Toolkit TM Connector Settings");
-		desc.addTextInputPart(paramsDesc.get("host"));
-		desc.addTextInputPart(paramsDesc.get("port"));
+		EditorDescription desc = new EditorDescription("MyMemory TM Connector Settings");
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.KEY));
+		tip.setPassword(true);
+		desc.addCheckboxPart(paramsDesc.get(Parameters.USEMT));
 		return desc;
 	}
 

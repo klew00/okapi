@@ -37,6 +37,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class UIUtil {
 
+	public static final int BUTTON_DEFAULT_WIDTH = 80;
+
 	public static final int PFTYPE_WIN      = 0;
 	public static final int PFTYPE_MAC      = 1;
 	public static final int PFTYPE_UNIX     = 2;
@@ -154,7 +156,7 @@ public class UIUtil {
 	}
 
 	/**
-	 * Ensures that a control using GridData layout has a given minimum width.
+	 * Ensures that a control in a GridData layout has a given minimum width.
 	 * @param control the control to adjust.
 	 * @param minimumWidth the minimum width to use.
 	 */
@@ -164,7 +166,12 @@ public class UIUtil {
 		control.pack();
 		Rectangle rect = control.getBounds();
 		if ( rect.width < minimumWidth ) {
-			((GridData)control.getLayoutData()).widthHint = minimumWidth;
+			GridData gd = (GridData)control.getLayoutData(); 
+			if ( gd == null ) {
+				gd = new GridData();
+				control.setLayoutData(gd);
+			}
+			gd.widthHint = minimumWidth;
 		}
 	}
 	

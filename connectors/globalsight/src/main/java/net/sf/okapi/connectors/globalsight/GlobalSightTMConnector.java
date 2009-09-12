@@ -85,6 +85,11 @@ public class GlobalSightTMConnector implements ITMQuery {
 		return "GlobalSight-TM";
 	}
 
+	public String getSettingsDisplay () {
+		return String.format("URL: %s\nTM profile: %s",
+			params.getServerURL(), params.getTmProfile());
+	}
+	
 	public void close () {
 	}
 

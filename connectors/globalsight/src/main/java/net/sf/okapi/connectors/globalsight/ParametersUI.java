@@ -28,7 +28,7 @@ import net.sf.okapi.common.uidescription.TextInputPart;
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription();
+		EditorDescription desc = new EditorDescription("GlobalSight TM Connector Settings");
 		desc.addTextInputPart(paramsDesc.get(Parameters.SERVERURL));
 		desc.addTextInputPart(paramsDesc.get(Parameters.USERNAME));
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.PASSWORD));

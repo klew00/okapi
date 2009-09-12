@@ -59,6 +59,10 @@ public class OpenTranTMConnector implements ITMQuery {
 		return "OpenTran-Repository";
 	}
 
+	public String getSettingsDisplay () {
+		return "REST services at http://.open-tran.eu";
+	}
+	
 	public void close () {
 		if ( !useREST ) {
 			if ( client != null ) {

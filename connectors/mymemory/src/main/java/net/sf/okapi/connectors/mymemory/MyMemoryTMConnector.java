@@ -40,6 +40,8 @@ import net.sf.okapi.lib.translation.QueryResult;
 
 public class MyMemoryTMConnector implements ITMQuery {
 
+	private static final String SERVER_URL = "http://mymemory.translated.net/otms/";
+	
 	private String srcLang;
 	private String trgLang;
 	private List<QueryResult> results;
@@ -57,6 +59,11 @@ public class MyMemoryTMConnector implements ITMQuery {
 		return "MyMemory-TM";
 	}
 
+	public String getSettingsDisplay () {
+		return String.format("Server: %s\nAllow MT: %s", SERVER_URL,
+			((params.getUseMT()==1) ? "Yes" : "No"));
+	}
+	
 	public void close () {
 	}
 
@@ -93,7 +100,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 	public void open () {
 		try {
 			results = new ArrayList<QueryResult>();
-			URL url = new URL("http://mymemory.translated.net/otms/");
+			URL url = new URL(SERVER_URL);
 			otms = new OtmsSoapStub(url, null);
 		}
 		catch ( AxisFault e ) {

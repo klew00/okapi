@@ -79,8 +79,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			tmQ = new SimpleTMConnector();
 			net.sf.okapi.connectors.simpletm.Parameters tmParams
 				= new net.sf.okapi.connectors.simpletm.Parameters();
-			tmParams.dbPath = params.tmPath;
-			tmParams.dbPath.replace(VAR_PROJDIR, projectDir);
+			tmParams.setDbPath(params.tmPath.replace(VAR_PROJDIR, projectDir));
 			tmQ.setParameters(tmParams);
 			tmQ.open();
 		}

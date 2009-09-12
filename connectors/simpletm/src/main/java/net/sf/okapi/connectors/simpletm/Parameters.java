@@ -21,6 +21,7 @@
 package net.sf.okapi.connectors.simpletm;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
@@ -28,7 +29,7 @@ public class Parameters extends BaseParameters {
 	  * The full path of the database name to open.
 	  * The path can have the extension ".data.db" or not extension.
 	  */
-	public String dbPath;
+	private String dbPath;
 	
 	public Parameters () {
 		reset();
@@ -39,6 +40,14 @@ public class Parameters extends BaseParameters {
 		fromString(initialData);
 	}
 	
+	public String getDbPath () {
+		return dbPath;
+	}
+
+	public void setDbPath (String dbPath) {
+		this.dbPath = dbPath;
+	}
+
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
@@ -54,6 +63,14 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setString("dbPath", dbPath);
 		return buffer.toString();
+	}
+
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add("dbPath",
+			"Path of the Database file", "Full path of the database file (.data.db)");
+		return desc;
 	}
 
 }

@@ -34,6 +34,14 @@ public interface IQuery {
 	 * @return the name of the connector.
 	 */
 	public String getName ();
+	
+	/**
+	 * Gets a display representation of the current settings for this connector.
+	 * This can be a display of some of the parameters for example, or some explanations
+	 * about default non-modifiable settings.
+	 * @return a display representation of the current settings.
+	 */
+	public String getSettingsDisplay ();
 
 	/**
 	 * Sets the source and target languages for this query engine.

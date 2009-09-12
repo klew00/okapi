@@ -161,7 +161,7 @@ public class GroupsAndOptionsDialog {
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		cmpTmp.setLayoutData(gdTmp);
 		
-		int buttonWidth = 80;
+		int buttonWidth = UIUtil.BUTTON_DEFAULT_WIDTH;
 		btAddRules = new Button(cmpTmp, SWT.PUSH);
 		btAddRules.setText(Res.getString("options.addRules")); //$NON-NLS-1$
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);

@@ -23,10 +23,8 @@ package net.sf.okapi.applications.rainbow.utilities.extraction;
 import java.io.File;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
-import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.packages.xliff.OptionsEditor;
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
-import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -34,7 +32,9 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.tm.simpletm.Database;
+import net.sf.okapi.lib.ui.translation.ConnectorSelectionPanel;
+import net.sf.okapi.lib.ui.translation.DefaultConnectors;
+import net.sf.okapi.lib.ui.translation.IConnectorList;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -69,8 +69,6 @@ public class Editor implements IParametersEditor {
 	private Button chkCreateZip;
 	private Text edSample;
 	private Button chkPreTranslate;
-	private Text edTmPath;
-	private Button btGetTmPath;
 	private Button chkUseFileName;
 	private Button chkUseGroupName;
 	private Button chkLeverageOnlyExact;
@@ -79,7 +77,9 @@ public class Editor implements IParametersEditor {
 	private IHelp help;
 	private String projectDir;
 	private IParameters xliffOptions;
-	private BaseContext context;
+	private IContext context;
+	private ConnectorSelectionPanel connectorPanel;
+	private IConnectorList connectors;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -92,10 +92,12 @@ public class Editor implements IParametersEditor {
 			this.projectDir = context.getString("projDir");
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+			connectors = new DefaultConnectors();
+	
+			this.context = context;
 			create((Shell)context.getObject("shell"), readOnly);
-
-			this.context = new BaseContext(context.getProperties());
-			this.context.setObject("shell", shell);
+			//this.context = new BaseContext(context.getProperties());
+			//this.context.setObject("shell", shell);
 			
 			return showDialog();
 		}
@@ -268,7 +270,7 @@ public class Editor implements IParametersEditor {
 		tiTmp.setControl(cmpTmp);
 
 		chkPreTranslate = new Button(cmpTmp, SWT.CHECK);
-		chkPreTranslate.setText("Pre-translate the extracted text using the following TM:");
+		chkPreTranslate.setText("Pre-translate the extracted text");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkPreTranslate.setLayoutData(gdTmp);
@@ -278,20 +280,10 @@ public class Editor implements IParametersEditor {
 			}
 		});
 
-		edTmPath = new Text(cmpTmp, SWT.BORDER);
-		edTmPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		btGetTmPath = new Button(cmpTmp, SWT.PUSH);
-		btGetTmPath.setText("...");
-		btGetTmPath.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String[] paths = Dialogs.browseFilenames(shell, "Simple TM File", false, null,
-					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
-					"*"+Database.DATAFILE_EXT+"\t*.*");
-				if ( paths == null ) return;
-				Utils.checkProjectDirAfterPick(paths[0], edTmPath, projectDir);
-			}
-		});
+		connectorPanel = new ConnectorSelectionPanel(cmpTmp, SWT.NONE, connectors, context,
+			"Translation resource to use:");
+		connectorPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		chkUseFileName = new Button(cmpTmp, SWT.CHECK);
 		chkUseFileName.setText("Penalize matches with a FileName attribute different from the document being processed");
@@ -369,8 +361,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void updatePretranslate () {
-		edTmPath.setEnabled(chkPreTranslate.getSelection());
-		btGetTmPath.setEnabled(chkPreTranslate.getSelection());
+		connectorPanel.setEnabled(chkPreTranslate.getSelection());
 		chkUseFileName.setEnabled(chkPreTranslate.getSelection());
 		chkUseGroupName.setEnabled(chkPreTranslate.getSelection());
 		chkLeverageOnlyExact.setEnabled(chkPreTranslate.getSelection());
@@ -400,13 +391,16 @@ public class Editor implements IParametersEditor {
 		edName.setText(params.pkgName);
 		chkCreateZip.setSelection(params.createZip);
 		pnlSegmentation.setData(params.preSegment, params.sourceSRX, params.targetSRX);
+		
 		chkPreTranslate.setSelection(params.preTranslate);
-		edTmPath.setText(params.tmPath);
+		connectorPanel.setData(params.transResClass, params.transResParams);
+		
 		chkUseFileName.setSelection(params.useFileName);
 		chkUseGroupName.setSelection(params.useGroupName);
 		chkLeverageOnlyExact.setSelection(params.leverageOnlyExact);
 		// TODO: This needs to be a clone, not the object itself, or it will get saved on cancel
 		xliffOptions = params.xliffOptions;
+
 		updatePackageType();
 		updatePretranslate();
 		updateSample();
@@ -437,8 +431,11 @@ public class Editor implements IParametersEditor {
 		params.preSegment = pnlSegmentation.getSegment();
 		params.sourceSRX = pnlSegmentation.getSourceSRX();
 		params.targetSRX = pnlSegmentation.getTargetSRX();
+
 		params.preTranslate = chkPreTranslate.getSelection();
-		params.tmPath = edTmPath.getText();
+		params.transResClass = connectorPanel.getConnectorClass();
+		params.transResParams = connectorPanel.getConnectorParameters();
+		
 		params.useFileName = chkUseFileName.getSelection();
 		params.useGroupName = chkUseGroupName.getSelection();
 		params.leverageOnlyExact = chkLeverageOnlyExact.getSelection();
