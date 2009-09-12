@@ -22,7 +22,13 @@ package net.sf.okapi.common;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Stack;
 
@@ -31,10 +37,9 @@ import java.util.Stack;
  */
 public class XMLWriter {
 
-    private PrintWriter writer = null;
+	private PrintWriter writer = null;
 	private boolean inStartTag;
 	private Stack<String> elements;
-	private StringWriter strWriter = null;
 
 	private final String lineBreak = System.getProperty("line.separator");
 
@@ -51,38 +56,23 @@ public class XMLWriter {
 			OutputStream output = new BufferedOutputStream(new FileOutputStream(path));
 			Charset charset = Charset.forName("UTF-8");
 			create(new OutputStreamWriter(output, charset.newEncoder()));
-		}catch ( IOException e ) {
+		}
+		catch ( IOException e ) {
 			throw new OkapiIOException(e);
 		}
 	}
 	
 	/**
-	 * Creates a new XML document in a string.
-	 * Use the method {@link #getStringOutput()} to get the resulting string.
-     * @deprecated use create(Writer writer) instead.
+	 * Creates a new XML document for a given writer object.
+	 * @param writer the writer to use to output the document.
 	 */
-	public void create () {
-		strWriter = new StringWriter();
-        create(strWriter);
-	}
-
-    public void create(Writer writer) {
+	public void create (Writer writer) {
         this.writer = new PrintWriter(writer);
         inStartTag = false;
         elements = new Stack<String>();
     }
 
-    /**
-	 * Gets the string buffer of the XML document created with {@link #create()}.
-	 * @return the string buffer of the XML document created with {@link #create()}.
-     * @deprecated - used create(Writer writer) instead and hang on to your own writer
-	 */
-	public String getStringOutput () {
-		close();
-		return strWriter.toString();
-	}
-
-    /**
+	/**
 	 * Closes the writer and release any associated resources.
 	 */
 	public void close () {
@@ -96,14 +86,14 @@ public class XMLWriter {
 		}
 	}
 
-    /**
+	/**
 	 * Writes the start of the document. This method generate the XML declaration.
 	 */
 	public void writeStartDocument () {
 		writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 	}
 
-    /**
+	/**
 	 * Writes the end of the document. This method closes any open tag, and
 	 * flush the writer.
 	 */
@@ -112,7 +102,7 @@ public class XMLWriter {
 		writer.flush();
 	}
 
-    /**
+	/**
 	 * Writes the start of an element.
 	 * @param name the name of the element to start.
 	 */
@@ -123,7 +113,7 @@ public class XMLWriter {
 		inStartTag = true;
 	}
 
-    /**
+	/**
 	 * Writes the end of the last started element.
 	 */
 	public void writeEndElement () {
@@ -131,7 +121,7 @@ public class XMLWriter {
 		writer.write("</" + elements.pop() + ">");
 	}
 
-    /**
+	/**
 	 * Writes the end of the last started element and writes a line-break.
 	 */
 	public void writeEndElementLineBreak () {
@@ -141,7 +131,7 @@ public class XMLWriter {
 		}
 	}
 
-    /**
+	/**
 	 * Writes an element and its content.
 	 * @param name the name of the element to write.
 	 * @param content the content to enclose inside this element.
@@ -155,7 +145,7 @@ public class XMLWriter {
 		writer.print("</" + name + ">");
 	}
 
-    /**
+	/**
 	 * Writes an attribute and its associated value. You must use
 	 * {@link #writeStartElement(String)} just before.
 	 * @param name the name of the attribute.
@@ -167,7 +157,7 @@ public class XMLWriter {
 		writer.write(" " + name + "=\"" + Util.escapeToXML(value, 3, false, null) + "\"");
 	}
 
-    /**
+	/**
 	 * Writes a string. The text is automatically escaped.
 	 * @param text the text to output.
 	 */
@@ -176,7 +166,7 @@ public class XMLWriter {
 		writer.write(Util.escapeToXML(text, 0, false, null).replace("\n", lineBreak));
 	}
 
-    /**
+	/**
 	 * Writes a chunk of raw XML (where line-breaks are assumed to be normalized to \n).
 	 * @param xmlData the data to output. No escaping is performed, but the line-breaks are
 	 * converted to the line-break type of the output.
@@ -186,7 +176,7 @@ public class XMLWriter {
 		writer.write(xmlData.replace("\n", lineBreak));
 	}
 
-    /**
+	/**
 	 * Writes a comment.
 	 * @param text the text of the comment.
 	 */
@@ -197,7 +187,7 @@ public class XMLWriter {
 		writer.write("-->");
 	}
 
-    /**
+	/**
 	 * Writes a line-break.
 	 */
 	public void writeLineBreak () {
@@ -205,7 +195,7 @@ public class XMLWriter {
 		writer.println("");
 	}
 
-    /**
+	/**
 	 * Closes the tag of the last start tag output, if needed.
 	 */
 	private void closeStartTag () {

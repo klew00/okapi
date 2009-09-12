@@ -22,6 +22,7 @@ package net.sf.okapi.lib.segmentation;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
@@ -906,11 +907,13 @@ public class SRXDocument {
 		boolean saveNonValidInfo)
 	{
 		XMLWriter writer = new XMLWriter();
-		writer.create();
+		StringWriter strWriter = new StringWriter();
+		writer.create(strWriter);
 		boolean current = modified;
 		saveRules(writer, saveExtensions, saveNonValidInfo);
 		modified = current; // Keep the same state for modified
-		return writer.getStringOutput();
+		writer.close();
+		return strWriter.toString();
 	}
 
 	/**
