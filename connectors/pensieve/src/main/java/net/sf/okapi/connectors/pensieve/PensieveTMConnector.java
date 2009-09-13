@@ -42,11 +42,11 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 	
 	public String getName () {
-		return "Pensieve";
+		return "Pensieve TM";
 	}
 
 	public String getSettingsDisplay () {
-		return "TODO";
+		return "Database: " + params.getDbDirectory();
 	}
 	
 	public void setMaximumHits (int max) {

@@ -14,13 +14,13 @@ public class DefaultConnectors implements IConnectorList {
 	
 	// Temporary hard-coded mapping
 	private void setDefaultMapping () {
-//		ConnectorInfo trc = new ConnectorInfo();
-//		trc.description = "Pensieve TM Engine";
-//		trc.connectorClass = "net.sf.okapi.connectors.pensieve.PensieveTMConnector";
-//		trc.descriptionProviderClass = "net.sf.okapi.connectors.pensieve.ParametersUI";
-//		list.add(trc);
-		
 		ConnectorInfo trc = new ConnectorInfo();
+		trc.description = "Pensieve TM Engine";
+		trc.connectorClass = "net.sf.okapi.connectors.pensieve.PensieveTMConnector";
+		trc.descriptionProviderClass = "net.sf.okapi.connectors.pensieve.ParametersUI";
+		list.add(trc);
+		
+		trc = new ConnectorInfo();
 		trc.description = "SimpleTM TM Engine";
 		trc.connectorClass = "net.sf.okapi.connectors.simpletm.SimpleTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.simpletm.ParametersUI";

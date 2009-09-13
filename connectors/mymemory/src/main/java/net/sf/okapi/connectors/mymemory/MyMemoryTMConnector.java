@@ -33,6 +33,7 @@ import org.tempuri.OtmsSoapStub;
 import org.tempuri.Query;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -114,6 +115,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 	public int query (String text) {
 		results.clear();
 		try {
+			if ( Util.isEmpty(text) ) return 0;
 			Query query = new Query(null, text, srcLang, trgLang, null, params.getUseMT());
 			GetResponse gresp = otms.otmsGet(params.getKey(), query);
 			if ( gresp.isSuccess() ) {

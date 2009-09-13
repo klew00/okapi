@@ -36,7 +36,6 @@ public class Parameters extends BaseParameters {
 	public String sourceSRX;
 	public String targetSRX;
 	public boolean preTranslate;
-//	public String tmPath;
 	public boolean useFileName;
 	public boolean useGroupName;
 	public boolean protectAccepted;
@@ -58,13 +57,11 @@ public class Parameters extends BaseParameters {
 		sourceSRX = "";
 		targetSRX = "";
 		preTranslate = false;
-//		tmPath = "";
 		useFileName = true;
 		useGroupName = true;
 		protectAccepted = true;
 		xliffOptions = new Options();
 		leverageOnlyExact = true;
-		
 		transResClass = "net.sf.okapi.connectors.simpletm.SimpleTMConnector";
 		transResParams = null;
 	}
@@ -80,13 +77,11 @@ public class Parameters extends BaseParameters {
 		sourceSRX = buffer.getString("sourceSRX", sourceSRX);
 		targetSRX = buffer.getString("targetSRX", targetSRX);
 		preTranslate = buffer.getBoolean("preTranslate", preTranslate);
-//		tmPath = buffer.getString("tmPath", tmPath);
 		useFileName = buffer.getBoolean("useFileName", useFileName);
 		useGroupName = buffer.getBoolean("useGroupName", useGroupName);
 		protectAccepted = buffer.getBoolean("protectAccepted", protectAccepted);
 		xliffOptions.fromString(buffer.getGroup("xliffOptions"));
 		leverageOnlyExact = buffer.getBoolean("leverageOnlyExact", leverageOnlyExact);
-		
 		transResClass = buffer.getString("transResClass", transResClass);
 		transResParams = buffer.getGroup("transResParams", transResParams);
 	}
@@ -101,13 +96,11 @@ public class Parameters extends BaseParameters {
 		buffer.setString("sourceSRX", sourceSRX);
 		buffer.setString("targetSRX", targetSRX);
 		buffer.setBoolean("preTranslate", preTranslate);
-//		buffer.setString("tmPath", tmPath);
 		buffer.setBoolean("useFileName", useFileName);
 		buffer.setBoolean("useGroupName", useGroupName);
 		buffer.setBoolean("protectAccepted", protectAccepted);
 		buffer.setGroup("xliffOptions", xliffOptions.toString());
 		buffer.setBoolean("leverageOnlyExact", leverageOnlyExact);
-		
 		buffer.setString("transResClass", transResClass);
 		buffer.setGroup("transResParams", transResParams);
 		

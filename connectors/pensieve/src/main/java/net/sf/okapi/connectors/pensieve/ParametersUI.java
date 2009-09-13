@@ -20,53 +20,15 @@
 
 package net.sf.okapi.connectors.pensieve;
 
-import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+public class ParametersUI implements IEditorDescriptionProvider {
 
-	public static final String DBDIRECTORY = "dbDirectory";
-
-	private String dbDirectory;
-	
-	public Parameters () {
-		reset();
-		toString();
-	}
-	
-	public Parameters (String initialData) {
-		fromString(initialData);
-	}
-	
-	public String getDbDirectory () {
-		return dbDirectory;
-	}
-
-	public void setDbDirectory(String dbDirectory) {
-		this.dbDirectory = dbDirectory;
-	}
-
-	public void fromString (String data) {
-		reset();
-		buffer.fromString(data);
-		dbDirectory = buffer.getString(DBDIRECTORY, dbDirectory);
-	}
-
-	public void reset () {
-		dbDirectory = "";
-	}
-
-	@Override
-	public String toString () {
-		buffer.reset();
-		buffer.setString(DBDIRECTORY, dbDirectory);
-		return buffer.toString();
-	}
-
-	@Override
-	public ParametersDescription getParametersDescription () {
-		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(DBDIRECTORY, "Directory", "Directory of the database");
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Pensieve TM Connector Settings");
+		desc.addTextInputPart(paramsDesc.get(Parameters.DBDIRECTORY));
 		return desc;
 	}
 

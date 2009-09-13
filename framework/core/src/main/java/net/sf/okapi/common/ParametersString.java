@@ -126,6 +126,8 @@ public class ParametersString {
 				throw new RuntimeException("Invalide type: "+key);
 			}
 		}
+		// If we have only the start marker, it's really empty
+		if ( tmp.length() == 3 ) tmp.setLength(0);
 		return tmp.toString();
 	}
 	

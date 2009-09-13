@@ -133,13 +133,13 @@ public class ConnectorSelectionPanel extends Composite {
 			} // Otherwise use the defaults
 		}
 		catch ( InstantiationException e ) {
-			throw new RuntimeException("Error creating the connector.", e);
+			throw new RuntimeException("Error creating the connector. " + e.getMessage(), e);
 		}
 		catch ( IllegalAccessException e ) {
-			throw new RuntimeException("Error creating the connector.", e);
+			throw new RuntimeException("Error creating the connector. " + e.getMessage(), e);
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new RuntimeException("Error creating the connector.", e);
+			throw new RuntimeException("Error creating the connector. " + e.getMessage(), e);
 		}
 	}
 	

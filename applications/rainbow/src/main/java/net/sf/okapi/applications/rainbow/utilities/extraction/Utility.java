@@ -110,7 +110,9 @@ public class Utility extends BaseFilterDrivenUtility {
 				throw new RuntimeException("Error creating connector.", e);
 			}
 			IParameters tmParams = conn.getParameters();
-			tmParams.fromString(params.transResParams);
+			if ( tmParams != null ) { // Set the parameters only if the connector take some
+				tmParams.fromString(params.transResParams);
+			}
 			qm.addAndInitializeResource(conn, conn.getName(), tmParams);
 			if ( params.leverageOnlyExact ) {
 				qm.setThreshold(100);
