@@ -39,9 +39,9 @@ import net.sf.okapi.lib.translation.QueryResult;
 
 public class GoogleMTConnector implements IQuery {
 
-	private static final String addressSite = "http://translate.google.com/translate_t";
-	private static final String baseQuerySite = "?text=%s&hl=en&ie=UTF8&langpair=%s|%s&oe=UTF8";
-	private static final Pattern patternSite = Pattern.compile("<div\\sid=result_box .*?>(.*?)</div>");
+//	private static final String addressSite = "http://translate.google.com/translate_t";
+//	private static final String baseQuerySite = "?text=%s&hl=en&ie=UTF8&langpair=%s|%s&oe=UTF8";
+//	private static final Pattern patternSite = Pattern.compile("<div\\sid=result_box .*?>(.*?)</div>");
 
 	private static final String addressAjax = "http://ajax.googleapis.com/ajax/services/language/translate";
 	private static final String baseQueryAjax = "?v=1.0&q=%s&langpair=%s|%s";
@@ -58,17 +58,6 @@ public class GoogleMTConnector implements IQuery {
 	private QueryResult result;
 	private int current = -1;
 	private String hostId;
-	private boolean ajaxMode = true;
-	
-	public GoogleMTConnector () {
-		try {
-			InetAddress thisIp = InetAddress.getLocalHost();
-			hostId = "http://"+thisIp.getHostAddress();
-		}
-		catch ( UnknownHostException e ) {
-			hostId = "http://unkown";
-		}
-	}
 	
 	public void close () {
 		// Nothing to do
@@ -94,7 +83,13 @@ public class GoogleMTConnector implements IQuery {
 	}
 
 	public void open () {
-		// Nothing to do
+		try {
+			InetAddress thisIp = InetAddress.getLocalHost();
+			hostId = "http://"+thisIp.getHostAddress();
+		}
+		catch ( UnknownHostException e ) {
+			hostId = "http://unkown";
+		}
 	}
 
 	public int query (String plainText) {
@@ -105,8 +100,7 @@ public class GoogleMTConnector implements IQuery {
 	public int query (TextFragment text) {
 		lastError = null;
 		current = -1;
-		if ( ajaxMode ) return queryAjax(text);
-		else return querySite(text);
+		return queryAjax(text);
 	}
 	
 	private int queryAjax (TextFragment fragment) {
@@ -260,66 +254,67 @@ public class GoogleMTConnector implements IQuery {
 
 		return sb.toString();
 	}
-	
-	public int querySite (TextFragment text) {
-		try {
-			String qtext = text.getCodedText();
-			StringBuilder tmpCodes = new StringBuilder();
-			if ( text.hasCode() ) {
-				StringBuilder tmpText = new StringBuilder();
-				for ( int i=0; i<qtext.length(); i++ ) {
-					switch ( qtext.charAt(i) ) {
-					case TextFragment.MARKER_OPENING:
-					case TextFragment.MARKER_CLOSING:
-					case TextFragment.MARKER_ISOLATED:
-					case TextFragment.MARKER_SEGMENT:
-						tmpCodes.append(qtext.charAt(i));
-						tmpCodes.append(qtext.charAt(++i));
-						break;
-					default:
-						tmpText.append(qtext.charAt(i));
-					}
-				}
-				qtext = tmpText.toString();
-			}
 
-			URL url = new URL(addressSite + String.format(baseQuerySite,
-				URLEncoder.encode(qtext, "UTF-8"), srcLang, trgLang));
-			URLConnection conn = url.openConnection();
-			// Make sure we send a user-agent property, otherwise we get 403 error
-			conn.setRequestProperty("User-Agent", getClass().getName());
-
-			// Get the response
-	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-	        StringBuilder res = new StringBuilder();
-			char[] buf = new char[2048];
-			int count = 0;
-			while (( count = rd.read(buf)) != -1 ) {
-				res.append(buf, 0, count);
-			}
-	        rd.close();
-	        
-	        Matcher m = patternSite.matcher(res.toString());
-	        if ( m.find() ) {
-				result = new QueryResult();
-				result.source = text;
-				if ( text.hasCode() ) {
-					result.target = new TextFragment(unescape(m.group(1))+tmpCodes.toString(),
-						text.getCodes());
-				}
-				else {
-					result.target = new TextFragment(unescape(m.group(1)));
-				}
-				result.score = (text.hasCode() ? 98 : 99);
-				current = 0;
-	        }
-		}
-		catch ( Throwable e ) {
-			lastError = e.getMessage();
-		}
-
-		return ((current==0) ? 1 : 0);
-	}
+// Old query, scraping the result page
+//	public int querySite (TextFragment text) {
+//		try {
+//			String qtext = text.getCodedText();
+//			StringBuilder tmpCodes = new StringBuilder();
+//			if ( text.hasCode() ) {
+//				StringBuilder tmpText = new StringBuilder();
+//				for ( int i=0; i<qtext.length(); i++ ) {
+//					switch ( qtext.charAt(i) ) {
+//					case TextFragment.MARKER_OPENING:
+//					case TextFragment.MARKER_CLOSING:
+//					case TextFragment.MARKER_ISOLATED:
+//					case TextFragment.MARKER_SEGMENT:
+//						tmpCodes.append(qtext.charAt(i));
+//						tmpCodes.append(qtext.charAt(++i));
+//						break;
+//					default:
+//						tmpText.append(qtext.charAt(i));
+//					}
+//				}
+//				qtext = tmpText.toString();
+//			}
+//
+//			URL url = new URL(addressSite + String.format(baseQuerySite,
+//				URLEncoder.encode(qtext, "UTF-8"), srcLang, trgLang));
+//			URLConnection conn = url.openConnection();
+//			// Make sure we send a user-agent property, otherwise we get 403 error
+//			conn.setRequestProperty("User-Agent", getClass().getName());
+//
+//			// Get the response
+//	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+//	        StringBuilder res = new StringBuilder();
+//			char[] buf = new char[2048];
+//			int count = 0;
+//			while (( count = rd.read(buf)) != -1 ) {
+//				res.append(buf, 0, count);
+//			}
+//	        rd.close();
+//	        
+//	        Matcher m = patternSite.matcher(res.toString());
+//	        if ( m.find() ) {
+//				result = new QueryResult();
+//				result.source = text;
+//				if ( text.hasCode() ) {
+//					result.target = new TextFragment(unescape(m.group(1))+tmpCodes.toString(),
+//						text.getCodes());
+//				}
+//				else {
+//					result.target = new TextFragment(unescape(m.group(1)));
+//				}
+//				result.score = (text.hasCode() ? 98 : 99);
+//				current = 0;
+//	        }
+//		}
+//		catch ( Throwable e ) {
+//			lastError = e.getMessage();
+//		}
+//
+//		return ((current==0) ? 1 : 0);
+//	}
 	
 	public void setAttribute (String name,
 		String value)
@@ -346,14 +341,14 @@ public class GoogleMTConnector implements IQuery {
 		return trgLang;
 	}
 
-	private String unescape (String text) {
-		if ( text == null ) return "";
-		String tmp = text.replace("&#39;", "'");
-		tmp = tmp.replace("&lt;", "<");
-		tmp = tmp.replace("&gt;", ">");
-		tmp = tmp.replace("&quot;", "\"");
-		return tmp.replace("&amp;", "&");
-	}
+//	private String unescape (String text) {
+//		if ( text == null ) return "";
+//		String tmp = text.replace("&#39;", "'");
+//		tmp = tmp.replace("&lt;", "<");
+//		tmp = tmp.replace("&gt;", ">");
+//		tmp = tmp.replace("&quot;", "\"");
+//		return tmp.replace("&amp;", "&");
+//	}
 
 	private String convertLangCode (String standardCode) {
 		String code = standardCode.toLowerCase();

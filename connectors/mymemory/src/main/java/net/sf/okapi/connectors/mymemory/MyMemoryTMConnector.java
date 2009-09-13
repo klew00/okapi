@@ -38,6 +38,7 @@ import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.lib.translation.QueryUtil;
 
 public class MyMemoryTMConnector implements ITMQuery {
 
@@ -51,9 +52,11 @@ public class MyMemoryTMConnector implements ITMQuery {
 	private int threshold = 75;
 	private Parameters params;
 	private OtmsSoapStub otms;
+	private QueryUtil qutil;
 
 	public MyMemoryTMConnector () {
 		params = new Parameters();
+		qutil = new QueryUtil();
 	}
 
 	public String getName () {
@@ -112,10 +115,11 @@ public class MyMemoryTMConnector implements ITMQuery {
 		}
 	}
 
-	public int query (String text) {
-		results.clear();
+	// Assumes results are reset and emptiness checked
+	private int queryText (String text,
+		boolean hadCodes)
+	{
 		try {
-			if ( Util.isEmpty(text) ) return 0;
 			Query query = new Query(null, text, srcLang, trgLang, null, params.getUseMT());
 			GetResponse gresp = otms.otmsGet(params.getKey(), query);
 			if ( gresp.isSuccess() ) {
@@ -132,6 +136,10 @@ public class MyMemoryTMConnector implements ITMQuery {
 					// Score > 100 should be treated as 100 per Alberto's info.
 					//if (res.score > 100 ) res.score = 100;
 					//TODO: if ( res.score < getThreshold() ) break;
+					if ( hadCodes ) {
+						if ( res.score >= 100 ) res.score = 99;
+						else res.score--;
+					}
 					results.add(res);
 				}
 			}
@@ -143,8 +151,19 @@ public class MyMemoryTMConnector implements ITMQuery {
 		return results.size();
 	}
 
+
+	public int query (String text) {
+		results.clear();
+		current = -1;
+		if ( Util.isEmpty(text) ) return 0;
+		return queryText(text, false);
+	}
+
 	public int query (TextFragment frag) {
-		return query(frag.toString());
+		results.clear();
+		current = -1;
+		if ( !frag.hasText(false) ) return 0;
+		return queryText(qutil.separateCodesFromText(frag), frag.hasCode());
 	}
 	
 	public void removeAttribute (String name) {

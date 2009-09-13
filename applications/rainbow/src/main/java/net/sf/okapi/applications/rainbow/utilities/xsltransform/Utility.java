@@ -37,13 +37,17 @@ import net.sf.okapi.common.Util;
 
 public class Utility extends BaseUtility implements ISimpleUtility {
 
+	private static final String FACTORY_PROP = "javax.xml.transform.TransformerFactory";
+	
 	private Source xsltInput;
 	private Map<String, String> paramList;
 	private Transformer trans;
 	private Parameters params;
+	private String originalProcessor;
 	
 	public Utility () {
 		params = new Parameters();
+		originalProcessor = System.getProperty(FACTORY_PROP);
 	}
 	
 	public String getName () {
@@ -61,12 +65,23 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 				new File(params.xsltPath.replace(VAR_PROJDIR, projectDir)));
 			
 			// Create an instance of TransformerFactory
-			javax.xml.transform.TransformerFactory fact =
-				javax.xml.transform.TransformerFactory.newInstance();
+			if ( params.useCustomTransformer ) {
+				System.setProperty(FACTORY_PROP, params.factoryClass);
+			}
+			javax.xml.transform.TransformerFactory fact = javax.xml.transform.TransformerFactory.newInstance();
+
 			trans = fact.newTransformer(xsltInput);
+			logger.info("Factory used: " + fact.getClass().getCanonicalName());
+			logger.info("Transformer used: " + trans.getClass().getCanonicalName());
 		}
 		catch ( TransformerConfigurationException e ) {
 			throw new RuntimeException(Res.getString("utility.errorInXSLT"), e); //$NON-NLS-1$
+		}
+		finally {
+			// Make sure to reset the original property
+			if ( params.useCustomTransformer ) {
+				System.setProperty(FACTORY_PROP, originalProcessor);
+			}
 		}
 	}
 	

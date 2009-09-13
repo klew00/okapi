@@ -32,6 +32,9 @@ public class Parameters extends BaseParameters {
 	 * List of parameters to pass to the template.
 	 */
 	public String paramList;
+	
+	public boolean useCustomTransformer;
+	public String factoryClass;
 
 	public Parameters () {
 		reset();
@@ -40,6 +43,9 @@ public class Parameters extends BaseParameters {
 	public void reset () {
 		xsltPath = ""; //$NON-NLS-1$
 		paramList = ""; //$NON-NLS-1$
+		useCustomTransformer = false;
+		// Example: net.sf.saxon.TransformerFactoryImpl
+		factoryClass = ""; //$NON-NLS-1$
 	}
 
 	public void fromString (String data) {
@@ -47,6 +53,8 @@ public class Parameters extends BaseParameters {
 		buffer.fromString(data);
 		xsltPath = buffer.getString("xsltPath", xsltPath); //$NON-NLS-1$
 		paramList = buffer.getString("paramList", paramList); //$NON-NLS-1$
+		useCustomTransformer = buffer.getBoolean("useCustomTransformer", useCustomTransformer); //$NON-NLS-1$
+		factoryClass = buffer.getString("transformerClass", factoryClass); //$NON-NLS-1$
 	}
 
 	@Override
@@ -54,6 +62,8 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setString("xsltPath", xsltPath); //$NON-NLS-1$
 		buffer.setString("paramList", paramList); //$NON-NLS-1$
+		buffer.setBoolean("useCustomTransformer", useCustomTransformer); //$NON-NLS-1$
+		buffer.setString("transformerClass", factoryClass); //$NON-NLS-1$
 		return buffer.toString();
 	}
 

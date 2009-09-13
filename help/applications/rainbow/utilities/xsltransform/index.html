@@ -39,7 +39,8 @@ XSLT template to use to generate the output. You can use the variable
 template. the format must be name=value with one parameter per line. For 
 example:</p>
 <pre>Lang=en
-tmFile=myTM.tmx</pre>
+tmFile=myTM.tmx
+inputFile=${Input2}</pre>
 <p>You can use the following variables in the parameters values:</p>
 <ul>
 	<li><code>${SrcLang}</code> = The code of the current source language.</li>
@@ -60,6 +61,15 @@ tmFile=myTM.tmx</pre>
 <p><cite>Default Parameters</cite> -- Click this button to copy into the 
 parameters list all the default parameters declared in the template.</p>
 <p><cite>Open Template</cite> -- Click this button to open the template file.</p>
+<p><cite>Use the transformer created by this factory class</cite> -- Set this 
+option to use an XSLT transformer implementation different than the one your 
+current Java settings gives. Enter the name of the factory class in the text 
+field. The class specified must be in your Java class-path.</p>
+<p>The default transformer class used depends on your implementation and version 
+of Java. See the
+<a href="http://www.j2ee.me/j2se/1.5.0/docs/api/javax/xml/transform/TransformerFactory.html#newInstance()">
+documentation of <code>TransformerFactory.newInstance()</code></a> for more 
+details on how the lookup for the class is done.</p>
 <p>&nbsp;</p>
 </body>
 </html>

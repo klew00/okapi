@@ -187,7 +187,9 @@ public class ConfigurationString {
 	public Map<String, String> toMap () {
 		LinkedHashMap<String, String> table = new LinkedHashMap<String, String>();
 		String tmp = toString();
-		String[] pairs = tmp.split("\n");
+		if ( Util.isEmpty(tmp) ) return table;
+
+		String[] pairs = tmp.split("\n", 0);
 		for ( String pair : pairs ) {
 			String[] keyvalue = pair.split("=");
 			table.put(keyvalue[0], // Handle empty parameters

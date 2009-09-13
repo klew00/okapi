@@ -62,6 +62,8 @@ public class Editor implements IParametersEditor {
 	private boolean result = false;
 	private OKCancelPanel pnlActions;
 	private Parameters params;
+	private Button chkUseCustomTransformer;
+	private Text edFactoryClass;
 	private Text edXsltPath;
 	private Text edParameters;
 	private IHelp help;
@@ -176,6 +178,22 @@ public class Editor implements IParametersEditor {
 		gdTmp.horizontalSpan = 4;
 		edParameters.setLayoutData(gdTmp);
 		
+		chkUseCustomTransformer = new Button(cmpTmp, SWT.CHECK);
+		chkUseCustomTransformer.setText(Res.getString("editor.useCustomTransformer")); //$NON-NLS-1$
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 4;
+		chkUseCustomTransformer.setLayoutData(gdTmp);
+		chkUseCustomTransformer.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
+			}
+		});
+		
+		edFactoryClass = new Text(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 4;
+		edFactoryClass.setLayoutData(gdTmp);
+		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -203,7 +221,7 @@ public class Editor implements IParametersEditor {
 		Dialogs.centerWindow(shell, parent);
 		setData();
 	}
-	
+
 	private boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -214,15 +232,28 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
+		chkUseCustomTransformer.setSelection(params.useCustomTransformer);
+		edFactoryClass.setText(params.factoryClass);
 		edXsltPath.setText(params.xsltPath);
 		ConfigurationString tmp = new ConfigurationString(params.paramList);
 		edParameters.setText(tmp.toString());
+		edFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
 	}
 
 	private boolean saveData () {
 		if ( edXsltPath.getText().length() == 0 ) {
 			edXsltPath.setFocus();
 			return false;
+		}
+		if ( chkUseCustomTransformer.getSelection() ) {
+			if ( edFactoryClass.getText().length() == 0 ) {
+				edFactoryClass.setFocus();
+				return false;
+			}
+		}
+		params.useCustomTransformer = chkUseCustomTransformer.getSelection();
+		if ( params.useCustomTransformer ) {
+			params.factoryClass = edFactoryClass.getText();
 		}
 		params.xsltPath = edXsltPath.getText();
 		ConfigurationString tmp = new ConfigurationString(edParameters.getText());
