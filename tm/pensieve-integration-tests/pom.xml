@@ -11,7 +11,7 @@
     <name>Okapi Pensieve Integration Tests</name>
     <dependencies>
         <dependency>
-            <groupId>net.sf.okapi.tm.pensieve</groupId>
+            <groupId>net.sf.okapi.tm</groupId>
             <artifactId>okapi-tm-pensieve</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>test</scope>
