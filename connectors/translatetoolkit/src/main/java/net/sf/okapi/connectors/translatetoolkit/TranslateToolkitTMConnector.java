@@ -36,6 +36,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -106,6 +107,9 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	public int query (String plainText) {
 		results = new ArrayList<QueryResult>();
 		current = -1;
+		if ( Util.isEmpty(plainText) ) {
+			return 0;
+		}
 		try {
 			URL url = new URL(baseURL + srcLang + "/" + trgLang + "/unit/"
 				+ URLEncoder.encode(plainText, "UTF-8").replace("+", "%20"));

@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.textrewriting;
 
 import net.sf.okapi.applications.rainbow.lib.SegmentationPanel;
-import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -29,7 +28,9 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.tm.simpletm.Database;
+import net.sf.okapi.lib.ui.translation.ConnectorSelectionPanel;
+import net.sf.okapi.lib.ui.translation.DefaultConnectors;
+import net.sf.okapi.lib.ui.translation.IConnectorList;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -63,11 +64,12 @@ public class Editor implements IParametersEditor {
 	private Button chkAddID;
 	private Button chkAddName;
 	private Button chkMarkSegments;
-	private Text edTMPath;
-	private Button btGetTMPath;
 	private SegmentationPanel pnlSegmentation;
 	private IHelp help;
 	private String projectDir;
+	private IContext context;
+	private ConnectorSelectionPanel connectorPanel;
+	private IConnectorList connectors;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -80,6 +82,9 @@ public class Editor implements IParametersEditor {
 			this.projectDir = context.getString("projDir");
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+			connectors = new DefaultConnectors();
+			this.context = context;
+			
 			create((Shell)context.getObject("shell"), readOnly);
 			return showDialog();
 		}
@@ -129,7 +134,7 @@ public class Editor implements IParametersEditor {
 		lbTypes.add("Keep the original text");
 		lbTypes.add("Replace letters by Xs and digits by Ns");
 		lbTypes.add("Remove text but keep inline codes");
-		lbTypes.add("Translate extact matches");
+		lbTypes.add("Replace text with translation resource matches");
 		lbTypes.add("Replace selected ASCII letters by extended characters");
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
@@ -137,8 +142,7 @@ public class Editor implements IParametersEditor {
 		lbTypes.setLayoutData(gdTmp);
 		lbTypes.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				edTMPath.setEnabled(lbTypes.getSelectionIndex() == 3);
-				btGetTMPath.setEnabled(edTMPath.isEnabled());
+				connectorPanel.setEnabled(lbTypes.getSelectionIndex() == 3);
 			}
 		});
 		
@@ -195,43 +199,20 @@ public class Editor implements IParametersEditor {
 		gdTmp.horizontalSpan = 2;
 		grpTmp.setLayoutData(gdTmp);
 		
-		Composite cmpTM = new Composite(cmpTmp, SWT.NONE);
-		layTmp = new GridLayout(2, false);
-		layTmp.marginWidth = 0;
-		cmpTM.setLayout(layTmp);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
-		cmpTM.setLayoutData(gdTmp);
-		
-		stTmp = new Label(cmpTM, SWT.NONE);
-		stTmp.setText("Full path of the TM database to use for translation:");
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
-		stTmp.setLayoutData(gdTmp);
-		
-		edTMPath = new Text(cmpTM, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edTMPath.setLayoutData(gdTmp);
-		
-		btGetTMPath = new Button(cmpTM, SWT.PUSH);
-		btGetTMPath.setText("...");
-		btGetTMPath.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String[] paths = Dialogs.browseFilenames(shell, "Simple TM File", false, null,
-					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
-					"*"+Database.DATAFILE_EXT+"\t*.*");
-				if ( paths == null ) return;
-				if ( paths[0].endsWith(Database.DATAFILE_EXT) ) {
-					paths[0] = paths[0].substring(0, paths[0].length()-Database.DATAFILE_EXT.length());
-				}
-				Utils.checkProjectDirAfterPick(paths[0], edTMPath, projectDir);
-			}
-		});
-
 		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
 			"Apply the following segmentation rules:", null, projectDir);
 		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Translation resource");
+		grpTmp.setLayout(new GridLayout(1, false));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		grpTmp.setLayoutData(gdTmp);
+		
+		connectorPanel = new ConnectorSelectionPanel(grpTmp, SWT.NONE, connectors, context, null);
+		connectorPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -281,12 +262,12 @@ public class Editor implements IParametersEditor {
 		chkAddName.setSelection(params.addName);
 		chkAddID.setSelection(params.addID);
 		chkMarkSegments.setSelection(params.markSegments);
-		edTMPath.setText(params.tmPath);
+		connectorPanel.setData(params.transResClass, params.transResParams);
 
 		edPrefix.setEnabled(chkAddPrefix.getSelection());
 		edSuffix.setEnabled(chkAddSuffix.getSelection());
-		edTMPath.setEnabled(lbTypes.getSelectionIndex() == 3);
-		btGetTMPath.setEnabled(edTMPath.isEnabled());
+		connectorPanel.setEnabled(lbTypes.getSelectionIndex() == 3);
+		
 		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 	}
 
@@ -301,10 +282,14 @@ public class Editor implements IParametersEditor {
 		params.addName = chkAddName.getSelection();
 		params.addID = chkAddID.getSelection();
 		params.markSegments = chkMarkSegments.getSelection();
-		params.tmPath = edTMPath.getText();
+		
+		params.transResClass = connectorPanel.getConnectorClass();
+		params.transResParams = connectorPanel.getConnectorParameters();
+		
 		params.segment = pnlSegmentation.getSegment();
 		params.sourceSrxPath = pnlSegmentation.getSourceSRX();
 		params.targetSrxPath = pnlSegmentation.getTargetSRX();
+		
 		result = true;
 		return true;
 	}

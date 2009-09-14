@@ -34,8 +34,8 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
+import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
-import net.sf.okapi.connectors.simpletm.SimpleTMConnector;
 
 public class Utility extends BaseFilterDrivenUtility {
 
@@ -49,7 +49,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	private Parameters params;
 	private ISegmenter srcSeg;
 	private ISegmenter trgSeg;
-	private SimpleTMConnector tmQ;
+	private IQuery tmQ;
 	
 	public Utility () {
 		params = new Parameters();
@@ -76,11 +76,23 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 		
 		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {
-			tmQ = new SimpleTMConnector();
-			net.sf.okapi.connectors.simpletm.Parameters tmParams
-				= new net.sf.okapi.connectors.simpletm.Parameters();
-			tmParams.setDbPath(params.tmPath.replace(VAR_PROJDIR, projectDir));
-			tmQ.setParameters(tmParams);
+			try {
+				tmQ = (IQuery)Class.forName(params.transResClass).newInstance();
+			}
+			catch ( InstantiationException e ) {
+				throw new RuntimeException("Error creating a connector.", e);
+			}
+			catch ( IllegalAccessException e ) {
+				throw new RuntimeException("Error creating a connector.", e);
+			}
+			catch ( ClassNotFoundException e ) {
+				throw new RuntimeException("Error creating a connector.", e);
+			}
+			IParameters tmParams = tmQ.getParameters();
+			if ( tmParams != null ) {
+				tmParams.fromString(params.transResParams);
+			}
+			tmQ.setLanguages(srcLang, trgLang);
 			tmQ.open();
 		}
 	}
@@ -280,7 +292,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( tc.isSegmented() ) {
 				int segIndex = 0;
 				for ( Segment seg : tc.getSegments() ) {
-					if ( tmQ.query(seg.text) == 1 ) {
+					if ( tmQ.query(seg.text) > 0 ) {
 						qr = tmQ.next();
 						tc.getSegments().get(segIndex).text = qr.target;
 					}
@@ -288,7 +300,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				}
 			}
 			else {
-				if ( tmQ.query(tc) == 1 ) {
+				if ( tmQ.query(tc) > 0 ) {
 					qr = tmQ.next();
 					tc = new TextContainer();
 					tc.append(qr.target);

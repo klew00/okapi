@@ -42,7 +42,8 @@ public class Parameters extends BaseParameters {
 	protected boolean markSegments;
 	protected String sourceSrxPath;
 	protected String targetSrxPath;
-	protected String tmPath;
+	protected String transResClass;
+	protected String transResParams;
 	
 	public Parameters () {
 		reset();
@@ -61,7 +62,8 @@ public class Parameters extends BaseParameters {
 		markSegments = false;
 		sourceSrxPath = "";
 		targetSrxPath = "";
-		tmPath = "";
+		transResClass = "net.sf.okapi.connectors.simpletm.SimpleTMConnector";
+		transResParams = null;
 	}
 
 	public void fromString (String data) {
@@ -79,7 +81,8 @@ public class Parameters extends BaseParameters {
 		markSegments = buffer.getBoolean("markSegments", markSegments);
 		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
-		tmPath = buffer.getString("tmPath", tmPath);
+		transResClass = buffer.getString("transResClass", transResClass);
+		transResParams = buffer.getString("transResParams", transResParams);
 	}
 
 	@Override
@@ -97,7 +100,8 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("markSegments", markSegments);
 		buffer.setString("sourceSrxPath", sourceSrxPath);
 		buffer.setString("targetSrxPath", targetSrxPath);
-		buffer.setString("tmPath", tmPath);
+		buffer.setString("transResClass", transResClass);
+		buffer.setGroup("transResParams", transResParams);
 		return buffer.toString();
 	}
 	
