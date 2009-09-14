@@ -139,6 +139,7 @@ public class PensieveSeekerTest {
     public void searchFuzzyWuzzyMiddleMatch() throws Exception {
         PensieveWriter writer = getWriter();
 
+
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out the killer rabbit")),TARGET));
@@ -147,6 +148,22 @@ public class PensieveSeekerTest {
         writer.endIndex();
         tmhits = seeker.searchFuzzyWuzzy(STR+"~", 10);
         assertEquals("number of docs found", 3, tmhits.size());
+    }
+
+    @Test
+    public void searchFuzzyWuzzyWordOrder80Percent() throws Exception {
+        PensieveWriter writer = getWriter();
+
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("rabbit killer the for out watch")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
+
+        writer.endIndex();
+        tmhits = seeker.searchFuzzyWuzzy(STR+"~0.8", 10);
+        assertEquals("number of docs found", 2, tmhits.size());
+        assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
+        assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
     }
 
     @Test
