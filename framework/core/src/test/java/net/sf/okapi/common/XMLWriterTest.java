@@ -22,6 +22,7 @@ package net.sf.okapi.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static net.sf.okapi.common.TestUtil.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -148,13 +149,6 @@ public class XMLWriterTest {
         assertTrue("New lines were not written", m.matches());
     }
 
-    private String getFileAsString(final File file) throws IOException {
-        final BufferedInputStream bis = new BufferedInputStream(
-            new FileInputStream(file));
-        final byte [] bytes = new byte[(int) file.length()];
-        bis.read(bytes);
-        bis.close();
-        return new String(bytes);
-    }
+    
 
 }

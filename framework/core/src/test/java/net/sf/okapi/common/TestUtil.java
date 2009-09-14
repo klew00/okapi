@@ -1,5 +1,9 @@
 package net.sf.okapi.common;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -26,5 +30,14 @@ public class TestUtil {
             parentDir = Util.getDirectoryName(url.getPath()) + "/";
         }
         return parentDir;
+    }
+
+    public static String getFileAsString(final File file) throws IOException {
+        final BufferedInputStream bis = new BufferedInputStream(
+            new FileInputStream(file));
+        final byte [] bytes = new byte[(int) file.length()];
+        bis.read(bytes);
+        bis.close();
+        return new String(bytes);
     }
 }
