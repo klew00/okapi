@@ -17,7 +17,6 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
-
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.Event;
@@ -39,12 +38,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import net.sf.okapi.common.XMLWriter;
 
 /**
  * @author Dax
@@ -61,9 +62,9 @@ public class OkapiTmxHandlerTest {
     @Before
     public void setUp() throws URISyntaxException, IOException {
         String[][] properties = {{"tuid", "helloid"},
-                {"datatype", "plaintext"},
-                {"Txt::FileName", "StringInfoForTest3.info"},
-                {"Txt::GroupName", "APCCalibrateTimeoutAction0"}
+            {"datatype", "plaintext"},
+            {"Txt::FileName", "StringInfoForTest3.info"},
+            {"Txt::GroupName", "APCCalibrateTimeoutAction0"}
         };
         mockFilter = mock(IFilter.class);
         when(mockFilter.hasNext())
@@ -92,11 +93,11 @@ public class OkapiTmxHandlerTest {
     public void exportTmxStepsCalled() throws IOException {
         //TODO: This should be easier to test. We should probably add some methods in XMLWriter and TMXWriter that
         //allow for interfaces like java's Writer to be sent it.
-        handler.exportTmx(sampleTMX, mockSeeker, stubTmxWriter);
+        handler.exportTmx(sampleTMX, "EN", "FR", mockSeeker, stubTmxWriter);
         assertEquals("tmx path", sampleTMX.getPath(), stubTmxWriter.path);
         assertTrue("doc started", stubTmxWriter.startWritten);
-        //TODO: find out about lang - assertEquals("sourceLang", "EN", stubTmxWriter.sourceLanguage);
-        //TODO: find out about lang - assertEquals("targetLang", "IT", stubTmxWriter.sourceLanguage);
+        assertEquals("sourceLang", "EN", stubTmxWriter.sourceLanguage);
+        assertEquals("targetLang", "FR", stubTmxWriter.targetLanguage);
         assertEquals("creationTool", "pensieve", stubTmxWriter.creationTool);
         assertEquals("creationToolVersion", "0.0.1", stubTmxWriter.creationToolVersion);
         assertEquals("segType", "sentence", stubTmxWriter.segType);
@@ -105,8 +106,8 @@ public class OkapiTmxHandlerTest {
         assertEquals("number of tus", 2, stubTmxWriter.textUnits.size());
         assertEquals("source of first tu written", "source", stubTmxWriter.textUnits.get(0).getSourceContent().toString());
         assertEquals("target of first tu written", "target", stubTmxWriter.textUnits.get(0).getTargetContent("FR").toString());
+        assertEquals("target of first tu written", "sourceid", stubTmxWriter.textUnits.get(0).getName());
 
-        assertEquals("attributes of first tu written", "sourceid", stubTmxWriter.attributes.get(0).get(MetadataType.ID.fieldName()));
         //TODO: Verify Content
         assertTrue("endDocument written", stubTmxWriter.endWritten);
         assertTrue("writer closed", stubTmxWriter.closed);
@@ -116,7 +117,7 @@ public class OkapiTmxHandlerTest {
     public void exportTmxFileNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx(null, mockSeeker, stubTmxWriter);
+            handler.exportTmx(null, "", "", mockSeeker, stubTmxWriter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -127,7 +128,7 @@ public class OkapiTmxHandlerTest {
     public void exportTmxSeekerNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx(sampleTMX, null, stubTmxWriter);
+            handler.exportTmx(sampleTMX, "", "", null, stubTmxWriter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -138,7 +139,7 @@ public class OkapiTmxHandlerTest {
     public void exportTmxWriterNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx(sampleTMX, mockSeeker, null);
+            handler.exportTmx(sampleTMX, "", "", mockSeeker, null);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -343,5 +344,4 @@ public class OkapiTmxHandlerTest {
             this.dataType = dataType;
         }
     }
-
 }

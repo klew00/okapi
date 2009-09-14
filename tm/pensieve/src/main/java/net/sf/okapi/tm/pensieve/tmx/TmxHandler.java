@@ -49,5 +49,5 @@ public interface TmxHandler {
      * @param tmxWriter The TMXWriter to use when writing to the TMX file
      * @throws IOException if there was a problem with the TMX export
      */
-    void exportTmx(URI tmxUri, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
+    void exportTmx(URI tmxUri, String sourceLang, String targetLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
 }

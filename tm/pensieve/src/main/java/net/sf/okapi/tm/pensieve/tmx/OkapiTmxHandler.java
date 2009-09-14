@@ -90,11 +90,11 @@ public class OkapiTmxHandler implements TmxHandler {
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX
      */
-    public void exportTmx(URI tmxUri, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
+    public void exportTmx(URI tmxUri, String sourceLang, String targetLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
         checkExportTmxParams(tmxUri, tmSeeker, tmxWriter);
         try {
             tmxWriter.create(tmxUri.getPath());
-            tmxWriter.writeStartDocument("??", "??", "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
+            tmxWriter.writeStartDocument(sourceLang, targetLang, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
             //TODO might eat up too much memory for large TMs
             List<TranslationUnit> tus = tmSeeker.getAllTranslationUnits();
             for (TranslationUnit tu : tus) {
@@ -102,13 +102,21 @@ public class OkapiTmxHandler implements TmxHandler {
                 if (tuid == null) {
                     tuid = "";
                 }
+
                 TextUnit textUnit = new TextUnit(tuid);
+                if (!tuid.equals("")) {
+                    textUnit.setName(tuid);
+                }
                 textUnit.setSourceContent(tu.getSource().getContent());
                 textUnit.setTargetContent(tu.getTarget().getLang(), tu.getTarget().getContent());
                 Map<String, String> attributes = new HashMap<String, String>();
                 for (MetadataType type : tu.getMetadata().keySet()) {
                     //TODO: potentially need TMX attribute name associated with
                     //TODO: test that tmx attributes are written as attributes while properties are written as properties (i.e. tuid vs Txt::Filename
+                    //don't write the id as a prop because it's an attribute of tu
+                    if (type == MetadataType.ID) {
+                        continue;
+                    }
                     attributes.put(type.fieldName(), tu.getMetadata().get(type));
                 }
                 tmxWriter.writeItem(textUnit, attributes);

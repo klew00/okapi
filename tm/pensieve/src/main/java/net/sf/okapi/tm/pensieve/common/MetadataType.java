@@ -31,10 +31,9 @@ import org.apache.lucene.document.Field;
 public enum MetadataType {
     //TODO move ID which should be required to the TranslationUnitField enum
     ID("tuid"),
-    NAME("Name"),
-    TYPE("Type"),
-    GROUP_NAME("GroupName"),
-    FILE_NAME("FileName");
+    TYPE("datatype"),
+    GROUP_NAME("Txt::GroupName"),
+    FILE_NAME("Txt::FileName");
 
     private String fieldName;
 
