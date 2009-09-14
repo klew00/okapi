@@ -21,7 +21,7 @@
 package net.sf.okapi.steps.tokenization.tokens;
 
 import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.filters.plaintext.common.AbstractParameters;
+import net.sf.okapi.lib.extra.AbstractParameters;
 
 public class TokenType extends AbstractParameters {
 

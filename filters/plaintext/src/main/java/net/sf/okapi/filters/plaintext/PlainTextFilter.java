@@ -22,11 +22,11 @@ package net.sf.okapi.filters.plaintext;
 
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
-import net.sf.okapi.filters.plaintext.common.CompoundFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
 import net.sf.okapi.filters.plaintext.Parameters;
 import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;
 import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
+import net.sf.okapi.lib.extra.filters.CompoundFilter;
 
 /**
  * Plain Text filter, processes text files encoded in ANSI, Unicode, UTF-8, UTF-16. Provides the byte-order mask detection. 

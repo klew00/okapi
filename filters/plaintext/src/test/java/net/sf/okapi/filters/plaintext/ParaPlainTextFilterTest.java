@@ -54,11 +54,11 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
-import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
-import net.sf.okapi.filters.plaintext.common.WrapMode;
+import net.sf.okapi.common.TextUnitUtils;
 import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.Parameters;
+import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
+import net.sf.okapi.lib.extra.filters.WrapMode;
 
 import org.junit.Assert;
 import org.junit.Before;

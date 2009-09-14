@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.lib.extra;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

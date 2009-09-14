@@ -46,9 +46,9 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.plaintext.spliced.Parameters;
 import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
+import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 
 import org.junit.Before;
 import org.junit.Test;

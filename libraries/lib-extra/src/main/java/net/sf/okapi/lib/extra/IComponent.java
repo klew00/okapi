@@ -18,51 +18,27 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization;
+package net.sf.okapi.lib.extra;
 
-import net.sf.okapi.lib.extra.steps.CompoundStep;
-import net.sf.okapi.lib.extra.steps.CompoundStepParameters;
 
 /**
  * 
  * 
- * @version 0.1 06.07.2009
+ * @version 0.1 08.07.2009
  */
 
-public class TokenizationStep extends CompoundStep {
+public interface IComponent {
 
-	Parameters params;
-	CompoundStepParameters structureParams;
+	/**
+	 * Gets the name of this component.
+	 * @return The name of this component.
+	 */
+	public String getName();
 	
-	public TokenizationStep() {
+	/**
+	 * Gets the description of this component.
+	 * @return The description of this component.
+	 */
+	public String getDescription();
 		
-		super();
-				
-		setName("Tokenization");
-		setDescription("Extracts tokens from the text units content of a document.");
-				
-		structureParams = new net.sf.okapi.lib.extra.steps.CompoundStepParameters(); 
-		if (structureParams == null) return;
-		
-		super.setParameters(structureParams);
-		structureParams.loadFromResource(this.getClass(), "okf_tokenizers.fprm");
-				
-		setParameters(new Parameters());
-	}
-
-	@Override
-	protected <A> A getParameters(Class<A> expectedClass) {
-					
-		if (expectedClass == CompoundStepParameters.class)
-			return expectedClass.cast(structureParams);
-		else
-			return super.getParameters(expectedClass);
-	}
-	
-	@Override
-	protected void component_init() {
-		
-		params = getParameters(Parameters.class);	
-	}
-				
 }

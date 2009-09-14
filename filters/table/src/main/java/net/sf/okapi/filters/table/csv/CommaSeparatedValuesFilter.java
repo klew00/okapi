@@ -32,10 +32,10 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
-import net.sf.okapi.filters.plaintext.common.StringUtils;
-import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
-import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
+import net.sf.okapi.common.StringUtils;
+import net.sf.okapi.common.TextUnitUtils;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
+import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
 /**
  * Comma-Separated Values filter. Extracts text from a comma-separated values table, 

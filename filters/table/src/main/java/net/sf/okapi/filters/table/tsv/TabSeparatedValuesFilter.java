@@ -25,9 +25,9 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
-import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
+import net.sf.okapi.common.TextUnitUtils;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
+import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
 /**
  * Tab-Separated Values filter. Extracts columns, separated by one or more tabs.

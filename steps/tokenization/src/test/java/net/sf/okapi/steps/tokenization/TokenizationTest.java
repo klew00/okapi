@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
+import net.sf.okapi.common.TextUnitUtils;
 import net.sf.okapi.steps.tokenization.locale.LocaleUtils;
 
 import org.junit.Before;

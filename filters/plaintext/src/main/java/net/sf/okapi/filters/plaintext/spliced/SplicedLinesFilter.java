@@ -28,9 +28,9 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
-import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
-import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
-import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
+import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
+import net.sf.okapi.lib.extra.filters.TextProcessingResult;
+import net.sf.okapi.common.TextUnitUtils;
 
 /**
  * 

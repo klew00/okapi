@@ -27,9 +27,9 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ListUtils;
-import net.sf.okapi.filters.plaintext.common.TextProcessingResult;
-import net.sf.okapi.filters.plaintext.common.TextUnitUtils;
+import net.sf.okapi.common.TextUnitUtils;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
+import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
 /**
  * Fixed-Width Columns filter. Extracts text from a fixed-width columns table padded with white-spaces.

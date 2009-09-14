@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.lib.extra;
 
 
 /**
@@ -9,9 +9,6 @@ package net.sf.okapi.filters.plaintext.common;
 
 public class Notification {
 
-//	public static final String PORT_HAS_DATA = "port_has_data";
-//	public static final String PORT_SEND_DATA = "port_send_data";	
-	
 	public static final String PARAMETERS_SET_OWNER = "parameters_set_owner";
 	public static final String PARAMETERS_CHANGED = "parameters_changed";
 	

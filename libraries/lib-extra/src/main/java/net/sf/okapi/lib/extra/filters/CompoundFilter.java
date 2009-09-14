@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.lib.extra.filters;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -33,6 +33,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.lib.extra.Notification;
 
 
 /**
@@ -41,7 +42,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * @version 0.1, 10.06.2009
  */
 
-public class CompoundFilter extends AbstractFilter {
+public class CompoundFilter extends AbstractBaseFilter {
 
 	private LinkedList<IFilter> subFilters = new LinkedList<IFilter>();
 	
@@ -57,12 +58,12 @@ public class CompoundFilter extends AbstractFilter {
 		this.activeSubFilter = activeSubFilter;
 		
 		IParameters params = getParameters();
-		if (params instanceof CompoundFilterParameters && activeSubFilter instanceof AbstractFilter)
+		if (params instanceof CompoundFilterParameters && activeSubFilter instanceof AbstractBaseFilter)
 			((CompoundFilterParameters) params).setActiveParameters(
-					((AbstractFilter) activeSubFilter).getParametersClassName());
+					((AbstractBaseFilter) activeSubFilter).getParametersClassName());
 	}
 
-	protected <A extends AbstractFilter> boolean addSubFilter(Class<A> subFilterClass) {
+	protected <A extends AbstractBaseFilter> boolean addSubFilter(Class<A> subFilterClass) {
 		
 		if (subFilters == null) return false;
 		boolean res = false;
@@ -250,9 +251,9 @@ public class CompoundFilter extends AbstractFilter {
 		
 		for (IFilter subFilter : subFilters) {
 
-			if (!(subFilter instanceof AbstractFilter)) continue;
+			if (!(subFilter instanceof AbstractBaseFilter)) continue;
 			
-			if (((AbstractFilter) subFilter).getParametersClassName().equalsIgnoreCase(parametersClassName)) 
+			if (((AbstractBaseFilter) subFilter).getParametersClassName().equalsIgnoreCase(parametersClassName)) 
 				return subFilter;
 		}
 		

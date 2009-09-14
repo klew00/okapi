@@ -20,7 +20,8 @@
 
 package net.sf.okapi.filters.plaintext;
 
-import net.sf.okapi.filters.plaintext.common.CompoundFilterParameters;
+import net.sf.okapi.lib.extra.filters.CompoundFilterParameters;
+
 
 /**
  * Plain Text Filter parameters 

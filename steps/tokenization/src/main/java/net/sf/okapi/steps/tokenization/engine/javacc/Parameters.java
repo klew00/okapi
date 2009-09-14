@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,31 +18,17 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.steps.tokenization.engine.javacc;
 
-/**
- * 
- * 
- * @version 0.1, 09.06.2009
- */
+import net.sf.okapi.steps.tokenization.common.TokenizationStepParameters;
+import net.sf.okapi.steps.tokenization.common.TokenizationStepRule;
 
-public enum WrapMode {
-	/**
-	 * Lines of a multi-line text fragment (filter-specific) will be separated with the LF character (line feed, \n).
-	 * @see wrapMode
-	 */
-	NONE,
-	
-	/**
-	 * Replace line terminators in multi-line text fragments (filter-specific) with spaces,
-	 * thus merging lines together (or unwrapping the lines).
-	 * @see wrapMode 
-	 */
-	SPACES,
-	
-	/**
-	 * Replace line terminators in multi-line text fragments (filter-specific) with in-line codes.
-	 * @see wrapMode
-	 */
-	PLACEHOLDERS
+public class Parameters extends TokenizationStepParameters {
+
+	@Override
+	public Class<? extends TokenizationStepRule> getRuleClass() {
+		
+		return Rule.class;
+	}
+
 }

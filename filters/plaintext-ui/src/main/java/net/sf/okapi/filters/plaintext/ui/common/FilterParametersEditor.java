@@ -6,7 +6,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
-import net.sf.okapi.filters.plaintext.common.CompoundFilterParameters;
+import net.sf.okapi.lib.extra.filters.CompoundFilterParameters;
 
 public abstract class FilterParametersEditor extends AbstractParametersEditor {
 

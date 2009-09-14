@@ -23,7 +23,7 @@ package net.sf.okapi.steps.tokenization.locale;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import net.sf.okapi.filters.plaintext.common.StringUtils;
+import net.sf.okapi.common.StringUtils;
 
 import com.ibm.icu.util.ULocale;
 

@@ -18,12 +18,12 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.common;
+package net.sf.okapi.lib.extra.steps;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.filters.plaintext.common.AbstractParameters;
+import net.sf.okapi.lib.extra.AbstractParameters;
 
 public class CompoundStepParametersItem extends AbstractParameters {
 

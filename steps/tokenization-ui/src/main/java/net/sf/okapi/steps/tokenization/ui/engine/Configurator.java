@@ -3,7 +3,7 @@ package net.sf.okapi.steps.tokenization.ui.engine;
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
-import net.sf.okapi.steps.tokenization.common.CompoundStepParameters;
+import net.sf.okapi.lib.extra.steps.CompoundStepParameters;
 
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Widget;

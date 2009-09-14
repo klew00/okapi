@@ -18,51 +18,35 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization;
+package net.sf.okapi.common;
 
-import net.sf.okapi.lib.extra.steps.CompoundStep;
-import net.sf.okapi.lib.extra.steps.CompoundStepParameters;
+import net.sf.okapi.common.Util;
 
-/**
- * 
- * 
- * @version 0.1 06.07.2009
- */
+public class StringUtils {
 
-public class TokenizationStep extends CompoundStep {
-
-	Parameters params;
-	CompoundStepParameters structureParams;
-	
-	public TokenizationStep() {
+	// String formatting
+	public static String titleCase(String st) {
+		if (Util.isEmpty(st)) 
+			return st;
 		
-		super();
-				
-		setName("Tokenization");
-		setDescription("Extracts tokens from the text units content of a document.");
-				
-		structureParams = new net.sf.okapi.lib.extra.steps.CompoundStepParameters(); 
-		if (structureParams == null) return;
-		
-		super.setParameters(structureParams);
-		structureParams.loadFromResource(this.getClass(), "okf_tokenizers.fprm");
-				
-		setParameters(new Parameters());
-	}
-
-	@Override
-	protected <A> A getParameters(Class<A> expectedClass) {
-					
-		if (expectedClass == CompoundStepParameters.class)
-			return expectedClass.cast(structureParams);
-		else
-			return super.getParameters(expectedClass);
+		return st.substring(0,1).toUpperCase() + st.substring(1);
 	}
 	
-	@Override
-	protected void component_init() {
+	public static String removeQualifiers(String st, String qualifier) {
+	
+		if (Util.isEmpty(st) || Util.isEmpty(qualifier))
+			return st;
 		
-		params = getParameters(Parameters.class);	
+		int qualifierLen = qualifier.length();
+		
+		if (st.startsWith(qualifier) && st.endsWith(qualifier))
+			return st.substring(qualifierLen, Util.getLength(st) - qualifierLen);
+			
+		return st;
 	}
-				
+	
+	public static String removeQualifiers(String st) {
+	
+		return removeQualifiers(st, "\"");
+	}
 }

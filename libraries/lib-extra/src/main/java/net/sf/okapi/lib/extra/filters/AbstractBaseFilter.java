@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.lib.extra.filters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.lib.extra.OkapiComponent;
 
 /**
  * The root of the filters hierarchy. Defines generic methods for all kinds of filters.
@@ -33,7 +34,7 @@ import net.sf.okapi.common.filters.IFilter;
  * @version 0.1, 10.06.2009
  */
 
-public abstract class AbstractFilter extends OkapiComponent implements IFilter {
+public abstract class AbstractBaseFilter extends OkapiComponent implements IFilter {
 	
 	private String mimeType;
 	private String displayName;
@@ -46,7 +47,7 @@ public abstract class AbstractFilter extends OkapiComponent implements IFilter {
 //		configList = new ArrayList<FilterConfiguration>();
 //	}
 	
-	public AbstractFilter() {
+	public AbstractBaseFilter() {
 		super();
 	}
 

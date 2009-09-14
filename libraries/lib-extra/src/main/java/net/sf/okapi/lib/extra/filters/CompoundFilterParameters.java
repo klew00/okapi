@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.lib.extra.filters;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.lib.extra.AbstractParameters;
+import net.sf.okapi.lib.extra.Notification;
 
 /**
  * Compound Filter parameters.

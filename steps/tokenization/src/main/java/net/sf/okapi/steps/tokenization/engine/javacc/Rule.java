@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,32 +18,11 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.wordcount.common;
+package net.sf.okapi.steps.tokenization.engine.javacc;
 
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.TextUnitUtils;
-import net.sf.okapi.steps.tokenization.Tokenizer;
-import net.sf.okapi.steps.tokenization.tokens.Tokens;
-import net.sf.okapi.steps.tokenization.tokens.TokensAnnotation;
+import net.sf.okapi.steps.tokenization.common.TokenizationStepRule;
 
-public abstract class TokenCountStep extends BaseCountStep {
+public class Rule extends TokenizationStepRule {
 
-	protected abstract String getTokenType();
 	
-	@Override
-	protected long getCount(TextUnit textUnit) {
-		
-		TokensAnnotation ta = TextUnitUtils.getSourceAnnotation(textUnit, TokensAnnotation.class);
-		Tokens tokens = null;
-		
-		if (ta != null)			
-			tokens = ta.getFilteredList(new String[]{getTokenType()});			
-		else
-			tokens = Tokenizer.tokenize(TextUnitUtils.getSourceText(textUnit, true), getLanguage(), new String[]{getTokenType()});
-		
-		if (tokens == null) return 0;
-		
-		return tokens.size();		
-	}
-
 }

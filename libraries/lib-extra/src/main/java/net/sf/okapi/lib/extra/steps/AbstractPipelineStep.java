@@ -18,14 +18,14 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.common;
+package net.sf.okapi.lib.extra.steps;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.filters.plaintext.common.OkapiComponent;
+import net.sf.okapi.lib.extra.OkapiComponent;
 
 /**
  * 

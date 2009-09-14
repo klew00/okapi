@@ -23,7 +23,7 @@ package net.sf.okapi.steps.wordcount.common;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.steps.tokenization.common.AbstractPipelineStep;
+import net.sf.okapi.lib.extra.steps.AbstractPipelineStep;
 
 /**
  * Base abstract class for different counter steps (word count step, character count step, etc.).

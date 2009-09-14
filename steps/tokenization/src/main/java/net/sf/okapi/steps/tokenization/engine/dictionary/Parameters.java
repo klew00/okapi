@@ -21,11 +21,12 @@
 package net.sf.okapi.steps.tokenization.engine.dictionary;
 
 import net.sf.okapi.steps.tokenization.common.TokenizationStepParameters;
+import net.sf.okapi.steps.tokenization.common.TokenizationStepRule;
 
 public class Parameters extends TokenizationStepParameters {
 
 	@Override
-	public Class<Rule> getRuleClass() {
+	public Class<? extends TokenizationStepRule> getRuleClass() {
 
 		return Rule.class;
 	}

@@ -35,10 +35,10 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
-import net.sf.okapi.filters.plaintext.common.AbstractFilter;
-import net.sf.okapi.filters.plaintext.common.AbstractLineFilter;
 import net.sf.okapi.filters.regex.RegexFilter;
 import net.sf.okapi.filters.regex.Rule;
+import net.sf.okapi.lib.extra.filters.AbstractBaseFilter;
+import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 
 /**
  * <code>PlainTextFilter</code> extracts lines of input text, separated by line terminators.
@@ -52,7 +52,7 @@ import net.sf.okapi.filters.regex.Rule;
  * @version 0.1, 09.06.2009  
  */
 
-public class RegexPlainTextFilter extends AbstractFilter {
+public class RegexPlainTextFilter extends AbstractBaseFilter {
 
 	public static final String FILTER_NAME				= "okf_plaintext_regex";
 	public static final String FILTER_MIME				= MimeTypeMapper.PLAIN_TEXT_MIME_TYPE;	

@@ -29,7 +29,16 @@
          <artifactId>okapi-filter-regex</artifactId>
          <version>${project.version}</version>
       </dependency>
+      <dependency>
+      	<groupId>net.sf.okapi.lib</groupId>
+      	<artifactId>okapi-lib-extra</artifactId>
+      	<version>0.4-SNAPSHOT</version>
+      </dependency>
    </dependencies>
+   <dependencyManagement>
+   	<dependencies>
+   	</dependencies>
+   </dependencyManagement>
 </project>		
 		
 		

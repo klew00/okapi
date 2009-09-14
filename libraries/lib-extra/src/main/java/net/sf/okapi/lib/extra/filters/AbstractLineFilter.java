@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.lib.extra.filters;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,7 +53,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * @version 0.1, 09.06.2009
  */
 
-public abstract class AbstractLineFilter extends AbstractFilter {
+public abstract class AbstractLineFilter extends AbstractBaseFilter {
 
 	public static final String LINE_NUMBER = "line_number";	
 	

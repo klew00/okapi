@@ -18,28 +18,31 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.common;
-
-import net.sf.okapi.common.IParameters;
+package net.sf.okapi.lib.extra.filters;
 
 /**
  * 
  * 
- * @version 0.1 13.07.2009
+ * @version 0.1, 09.06.2009
  */
 
-public interface IConfigurable {
-
+public enum WrapMode {
 	/**
-	 * Sets new parameters for this component.
-	 * @param params The new parameters to use.
+	 * Lines of a multi-line text fragment (filter-specific) will be separated with the LF character (line feed, \n).
+	 * @see wrapMode
 	 */
-	public void setParameters (IParameters params);
-
+	NONE,
+	
 	/**
-	 * Gets the current parameters for this component.
-	 * @return The current parameters for this component.
+	 * Replace line terminators in multi-line text fragments (filter-specific) with spaces,
+	 * thus merging lines together (or unwrapping the lines).
+	 * @see wrapMode 
 	 */
-	public IParameters getParameters ();
-
+	SPACES,
+	
+	/**
+	 * Replace line terminators in multi-line text fragments (filter-specific) with in-line codes.
+	 * @see wrapMode
+	 */
+	PLACEHOLDERS
 }

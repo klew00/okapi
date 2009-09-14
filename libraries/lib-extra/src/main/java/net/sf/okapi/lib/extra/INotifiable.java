@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.lib.extra;
 
 
 /**

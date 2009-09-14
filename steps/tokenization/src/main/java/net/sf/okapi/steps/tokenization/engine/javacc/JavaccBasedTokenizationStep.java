@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,35 +18,25 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.steps.tokenization.engine.javacc;
 
-import net.sf.okapi.common.Util;
+import net.sf.okapi.steps.tokenization.common.AbstractTokenizationStep;
+import net.sf.okapi.steps.tokenization.common.TokenizationStepParameters;
+import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class StringUtils {
+public class JavaccBasedTokenizationStep extends AbstractTokenizationStep {
 
-	// String formatting
-	public static String titleCase(String st) {
-		if (Util.isEmpty(st)) 
-			return st;
-		
-		return st.substring(0,1).toUpperCase() + st.substring(1);
+	@Override
+	protected TokenizationStepParameters createParameters() {
+
+		return new Parameters();
 	}
-	
-	public static String removeQualifiers(String st, String qualifier) {
-	
-		if (Util.isEmpty(st) || Util.isEmpty(qualifier))
-			return st;
+
+	@Override
+	public void tokenize(String text, Tokens tokens, String language,
+			String... tokenTypes) {
+		// TODO Auto-generated method stub
 		
-		int qualifierLen = qualifier.length();
-		
-		if (st.startsWith(qualifier) && st.endsWith(qualifier))
-			return st.substring(qualifierLen, Util.getLength(st) - qualifierLen);
-			
-		return st;
 	}
-	
-	public static String removeQualifiers(String st) {
-	
-		return removeQualifiers(st, "\"");
-	}
+
 }

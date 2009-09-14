@@ -18,27 +18,28 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.plaintext.common;
+package net.sf.okapi.lib.extra;
 
+import net.sf.okapi.common.IParameters;
 
 /**
  * 
  * 
- * @version 0.1 08.07.2009
+ * @version 0.1 13.07.2009
  */
 
-public interface IComponent {
+public interface IConfigurable {
 
 	/**
-	 * Gets the name of this component.
-	 * @return The name of this component.
+	 * Sets new parameters for this component.
+	 * @param params The new parameters to use.
 	 */
-	public String getName();
-	
+	public void setParameters (IParameters params);
+
 	/**
-	 * Gets the description of this component.
-	 * @return The description of this component.
+	 * Gets the current parameters for this component.
+	 * @return The current parameters for this component.
 	 */
-	public String getDescription();
-		
+	public IParameters getParameters ();
+
 }

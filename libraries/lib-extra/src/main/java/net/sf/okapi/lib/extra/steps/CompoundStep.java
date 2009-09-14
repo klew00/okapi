@@ -18,12 +18,12 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.common;
+package net.sf.okapi.lib.extra.steps;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.Pipeline;
-import net.sf.okapi.filters.plaintext.common.Notification;
+import net.sf.okapi.lib.extra.Notification;
 
 public class CompoundStep extends AbstractPipelineStep {
 
