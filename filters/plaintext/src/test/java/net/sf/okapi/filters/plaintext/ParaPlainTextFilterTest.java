@@ -293,14 +293,14 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = false;
 		params.preserveWS = false;
 		
-		_testFile("BOM_MacUTF16withBOM2.txt", false);		
-		_testFile("cr.txt", false);
-		_testFile("crlf_start.txt", true);
-		_testFile("crlf_end.txt", true);
-		_testFile("crlf.txt", false);
-		_testFile("crlfcrlf_end.txt", true);
-		_testFile("crlfcrlf.txt", false);
-		_testFile("lf.txt", false);
+		testFile("BOM_MacUTF16withBOM2.txt", false);		
+		testFile("cr.txt", false);
+		testFile("crlf_start.txt", true);
+		testFile("crlf_end.txt", true);
+		testFile("crlf.txt", false);
+		testFile("crlfcrlf_end.txt", true);
+		testFile("crlfcrlf.txt", false);
+		testFile("lf.txt", false);
 	}
 				
 	@Test
@@ -309,7 +309,7 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = true;
 //		params.reset();
 		
-		_testFile("crlfcrlf_end.txt", true);
+		testFile("crlfcrlf_end.txt", true);
 	}
 	
 	@Test
@@ -319,14 +319,14 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = false;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("crlf_start.txt")); // Trailing linebreak
+			st = getSkeleton(getFullFileName("crlf_start.txt")); // Trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "crlf_start.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/crlf_start.txt"));			
+			expected = streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/crlf_start.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -339,14 +339,14 @@ public class ParaPlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test1.txt")); // No trailing linebreak
+			st = getSkeleton(getFullFileName("csv_test1.txt")); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
+			expected = streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -359,14 +359,14 @@ public class ParaPlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test2.txt")); // No trailing linebreak
+			st = getSkeleton(getFullFileName("csv_test2.txt")); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
+			expected = streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -379,14 +379,14 @@ public class ParaPlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("crlfcrlf.txt")); // No trailing linebreak
+			st = getSkeleton(getFullFileName("crlfcrlf.txt")); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "crlfcrlf.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/crlfcrlf.txt"));			
+			expected = streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/crlfcrlf.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -399,14 +399,14 @@ public class ParaPlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("lgpl.txt")); // No trailing linebreak
+			st = getSkeleton(getFullFileName("lgpl.txt")); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "lgpl.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/lgpl.txt"));			
+			expected = streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/lgpl.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -488,11 +488,11 @@ public class ParaPlainTextFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
 		filter.cancel();
-		_testEvent(EventType.CANCELED, null);
+		testEvent(EventType.CANCELED, null);
 		assertFalse(filter.hasNext());
 		
 		filter.close();		
@@ -509,13 +509,13 @@ public class ParaPlainTextFilterTest {
 		params.wrapMode = WrapMode.NONE;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1", 1);
-		_testEvent(EventType.TEXT_UNIT, "Line 2", 2);
-		_testEvent(EventType.TEXT_UNIT, "Line 3", 4);
-		_testEvent(EventType.TEXT_UNIT, "Line 4", 5);
-		_testEvent(EventType.TEXT_UNIT, "Line 5", 6);
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1", 1);
+		testEvent(EventType.TEXT_UNIT, "Line 2", 2);
+		testEvent(EventType.TEXT_UNIT, "Line 3", 4);
+		testEvent(EventType.TEXT_UNIT, "Line 4", 5);
+		testEvent(EventType.TEXT_UNIT, "Line 5", 6);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();		
 		
@@ -526,10 +526,10 @@ public class ParaPlainTextFilterTest {
 		params.wrapMode = WrapMode.NONE;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2", 1);
-		_testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5", 4);
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2", 1);
+		testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5", 4);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -545,13 +545,13 @@ public class ParaPlainTextFilterTest {
 		params.wrapMode = WrapMode.NONE;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.TEXT_UNIT, "Line 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.TEXT_UNIT, "Line 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -562,13 +562,13 @@ public class ParaPlainTextFilterTest {
 		params.wrapMode = WrapMode.PLACEHOLDERS;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.TEXT_UNIT, "Line 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.TEXT_UNIT, "Line 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -579,13 +579,13 @@ public class ParaPlainTextFilterTest {
 		params.wrapMode = WrapMode.SPACES;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.TEXT_UNIT, "Line 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.TEXT_UNIT, "Line 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 				
@@ -597,10 +597,10 @@ public class ParaPlainTextFilterTest {
 		params.wrapMode = WrapMode.NONE;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -611,10 +611,10 @@ public class ParaPlainTextFilterTest {
 		params.wrapMode = WrapMode.SPACES;		
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1 Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3 Line 4 Line 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1 Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3 Line 4 Line 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -625,17 +625,17 @@ public class ParaPlainTextFilterTest {
 		params.wrapMode = WrapMode.PLACEHOLDERS;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1\rLine 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3\rLine 4\rLine 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1\rLine 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3\rLine 4\rLine 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
 				
 // Helpers
 	
-	private void _testFile(String filename, boolean emptyTail) {
+	private void testFile(String filename, boolean emptyTail) {
 		testDriver.setDisplayLevel(0);
 		
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
@@ -643,12 +643,12 @@ public class ParaPlainTextFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -662,7 +662,7 @@ public class ParaPlainTextFilterTest {
 		filter.close();
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText) {
+	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -691,7 +691,7 @@ public class ParaPlainTextFilterTest {
 		}
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum) {
+	private void testEvent(EventType expectedType, String expectedText, int expectedLineNum) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -727,11 +727,11 @@ public class ParaPlainTextFilterTest {
 		}
 	}
 	
-	private String _getFullFileName(String fileName) {
+	private String getFullFileName(String fileName) {
 		return TestUtil.getParentDir(this.getClass(), "/cr.txt") + fileName;
 	}
 	
-	private String _getSkeleton (String fileName) throws UnsupportedEncodingException {
+	private String getSkeleton (String fileName) throws UnsupportedEncodingException {
 		IFilterWriter writer;
 		ByteArrayOutputStream writerBuffer;
 										
@@ -759,7 +759,7 @@ public class ParaPlainTextFilterTest {
 		return new String(writerBuffer.toByteArray(), "UTF-16");
 	}
 	
-	private String _streamAsString(InputStream input) throws IOException {
+	private String streamAsString(InputStream input) throws IOException {
 		BufferedReader reader;
 		reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 

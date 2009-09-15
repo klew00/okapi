@@ -205,49 +205,49 @@ public class TableFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "FieldName1");
-		_testEvent(EventType.TEXT_UNIT, "FieldName2");
-		_testEvent(EventType.TEXT_UNIT, "FieldName3");
-		_testEvent(EventType.TEXT_UNIT, "FieldName4");
-		_testEvent(EventType.TEXT_UNIT, "FieldName5");
-		_testEvent(EventType.TEXT_UNIT, "FieldName6");
-		_testEvent(EventType.TEXT_UNIT, "FieldName7");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "FieldName1");
+		testEvent(EventType.TEXT_UNIT, "FieldName2");
+		testEvent(EventType.TEXT_UNIT, "FieldName3");
+		testEvent(EventType.TEXT_UNIT, "FieldName4");
+		testEvent(EventType.TEXT_UNIT, "FieldName5");
+		testEvent(EventType.TEXT_UNIT, "FieldName6");
+		testEvent(EventType.TEXT_UNIT, "FieldName7");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11");
-		_testEvent(EventType.TEXT_UNIT, "Value12");
-		_testEvent(EventType.TEXT_UNIT, "Value13");
-		_testEvent(EventType.TEXT_UNIT, "Value14");
-		_testEvent(EventType.TEXT_UNIT, "Value15");
-		_testEvent(EventType.TEXT_UNIT, "Value16");
-		_testEvent(EventType.TEXT_UNIT, "Value17");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11");
+		testEvent(EventType.TEXT_UNIT, "Value12");
+		testEvent(EventType.TEXT_UNIT, "Value13");
+		testEvent(EventType.TEXT_UNIT, "Value14");
+		testEvent(EventType.TEXT_UNIT, "Value15");
+		testEvent(EventType.TEXT_UNIT, "Value16");
+		testEvent(EventType.TEXT_UNIT, "Value17");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21");
-		_testEvent(EventType.TEXT_UNIT, "Value22");
-		_testEvent(EventType.TEXT_UNIT, "Value23");
-		_testEvent(EventType.TEXT_UNIT, "Value24");
-		_testEvent(EventType.TEXT_UNIT, "Value25");
-		_testEvent(EventType.TEXT_UNIT, "Value26");
-		_testEvent(EventType.TEXT_UNIT, "Value27");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21");
+		testEvent(EventType.TEXT_UNIT, "Value22");
+		testEvent(EventType.TEXT_UNIT, "Value23");
+		testEvent(EventType.TEXT_UNIT, "Value24");
+		testEvent(EventType.TEXT_UNIT, "Value25");
+		testEvent(EventType.TEXT_UNIT, "Value26");
+		testEvent(EventType.TEXT_UNIT, "Value27");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31");
-		_testEvent(EventType.TEXT_UNIT, "Value32");
-		_testEvent(EventType.TEXT_UNIT, "Value33");
-		_testEvent(EventType.TEXT_UNIT, "Value34");
-		_testEvent(EventType.TEXT_UNIT, "Value35");
-		_testEvent(EventType.TEXT_UNIT, "Value36");
-		_testEvent(EventType.TEXT_UNIT, "Value37");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31");
+		testEvent(EventType.TEXT_UNIT, "Value32");
+		testEvent(EventType.TEXT_UNIT, "Value33");
+		testEvent(EventType.TEXT_UNIT, "Value34");
+		testEvent(EventType.TEXT_UNIT, "Value35");
+		testEvent(EventType.TEXT_UNIT, "Value36");
+		testEvent(EventType.TEXT_UNIT, "Value37");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -280,24 +280,24 @@ public class TableFilterTest {
 			
 			filter.open(new RawDocument(input, "UTF-8", "en"));
 			
-			_testEvent(EventType.START_DOCUMENT, null);
+			testEvent(EventType.START_DOCUMENT, null);
 			
-			_testEvent(EventType.START_GROUP, null);
-			_testEvent(EventType.TEXT_UNIT, "Source");
-			_testEvent(EventType.TEXT_UNIT, "Target");
-			_testEvent(EventType.END_GROUP, null);
+			testEvent(EventType.START_GROUP, null);
+			testEvent(EventType.TEXT_UNIT, "Source");
+			testEvent(EventType.TEXT_UNIT, "Target");
+			testEvent(EventType.END_GROUP, null);
 			
-			_testEvent(EventType.START_GROUP, null);
-			_testEvent(EventType.TEXT_UNIT, "Source text 1");
-			_testEvent(EventType.TEXT_UNIT, "Target text 1");
-			_testEvent(EventType.END_GROUP, null);
+			testEvent(EventType.START_GROUP, null);
+			testEvent(EventType.TEXT_UNIT, "Source text 1");
+			testEvent(EventType.TEXT_UNIT, "Target text 1");
+			testEvent(EventType.END_GROUP, null);
 			
-			_testEvent(EventType.START_GROUP, null);
-			_testEvent(EventType.TEXT_UNIT, "Source text 2");
-			_testEvent(EventType.TEXT_UNIT, "Target text 2");
-			_testEvent(EventType.END_GROUP, null);
+			testEvent(EventType.START_GROUP, null);
+			testEvent(EventType.TEXT_UNIT, "Source text 2");
+			testEvent(EventType.TEXT_UNIT, "Target text 2");
+			testEvent(EventType.END_GROUP, null);
 			
-			_testEvent(EventType.END_DOCUMENT, null);
+			testEvent(EventType.END_DOCUMENT, null);
 			
 			filter.close();
 			
@@ -357,14 +357,14 @@ public class TableFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test1.txt"));
+			st = getSkeleton(getFullFileName("csv_test1.txt"));
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(TableFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
+			expected = streamAsString(TableFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -377,14 +377,14 @@ public class TableFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test2.txt"));
+			st = getSkeleton(getFullFileName("csv_test2.txt"));
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(TableFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
+			expected = streamAsString(TableFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -411,14 +411,14 @@ public class TableFilterTest {
 	}
 
 // Helpers
-	private String _getFullFileName(String fileName) {
+	private String getFullFileName(String fileName) {
 //m		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
 //m		String root = Util.getDirectoryName(url.getPath());
 //m		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText) {
+	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -456,7 +456,7 @@ public class TableFilterTest {
 //			return null;
 //	}
 
-	private String _getSkeleton (String fileName) throws UnsupportedEncodingException {
+	private String getSkeleton (String fileName) throws UnsupportedEncodingException {
 		IFilterWriter writer;
 		ByteArrayOutputStream writerBuffer;
 										
@@ -484,7 +484,7 @@ public class TableFilterTest {
 		return new String(writerBuffer.toByteArray(), "UTF-16");
 	}
 	
-	private String _streamAsString(InputStream input) throws IOException {
+	private String streamAsString(InputStream input) throws IOException {
 		BufferedReader reader = null;
 		reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 

@@ -287,14 +287,14 @@ public class PlainTextFilterTest {
 
 		filter.setConfiguration(BasePlainTextFilter.FILTER_CONFIG_TRIM_ALL);
 		
-//		_testFile("BOM_MacUTF16withBOM2.txt", false);		
-//		_testFile("cr.txt", false);
-		_testFile("crlf_start.txt", true);
-//		_testFile("crlf_end.txt", true);
-//		_testFile("crlf.txt", false);
-//		_testFile("crlfcrlf_end.txt", true);
-//		_testFile("crlfcrlf.txt", false);
-//		_testFile("lf.txt", false);
+//		testFile("BOM_MacUTF16withBOM2.txt", false);		
+//		testFile("cr.txt", false);
+		testFile("crlf_start.txt", true);
+//		testFile("crlf_end.txt", true);
+//		testFile("crlf.txt", false);
+//		testFile("crlfcrlf_end.txt", true);
+//		testFile("crlfcrlf.txt", false);
+//		testFile("lf.txt", false);
 	}
 				
 	@Test
@@ -303,14 +303,14 @@ public class PlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(root + "crlf_start.txt"); // Trailing linebreak
+			st = getSkeleton(root + "crlf_start.txt"); // Trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "crlf_start.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/crlf_start.txt"));			
+			expected = streamAsString(PlainTextFilterTest.class.getResourceAsStream("/crlf_start.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -323,14 +323,14 @@ public class PlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(root + "csv_test1.txt"); // No trailing linebreak
+			st = getSkeleton(root + "csv_test1.txt"); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
+			expected = streamAsString(PlainTextFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -343,14 +343,14 @@ public class PlainTextFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(root + "csv_test2.txt"); // No trailing linebreak
+			st = getSkeleton(root + "csv_test2.txt"); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(PlainTextFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
+			expected = streamAsString(PlainTextFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -409,11 +409,11 @@ public class PlainTextFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
 		filter.cancel();
-		_testEvent(EventType.CANCELED, null);
+		testEvent(EventType.CANCELED, null);
 		assertFalse(filter.hasNext());
 		
 		filter.close();		
@@ -612,13 +612,13 @@ public class PlainTextFilterTest {
 		params.wrapMode = WrapMode.NONE;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1", 1);
-		_testEvent(EventType.TEXT_UNIT, "Line 2", 2);
-		_testEvent(EventType.TEXT_UNIT, "Line 3", 4);
-		_testEvent(EventType.TEXT_UNIT, "Line 4", 5);
-		_testEvent(EventType.TEXT_UNIT, "Line 5", 6);
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1", 1);
+		testEvent(EventType.TEXT_UNIT, "Line 2", 2);
+		testEvent(EventType.TEXT_UNIT, "Line 3", 4);
+		testEvent(EventType.TEXT_UNIT, "Line 4", 5);
+		testEvent(EventType.TEXT_UNIT, "Line 5", 6);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();		
 		
@@ -629,10 +629,10 @@ public class PlainTextFilterTest {
 		params.wrapMode = WrapMode.NONE;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2", 1);
-		_testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5", 4);
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2", 1);
+		testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5", 4);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -650,13 +650,13 @@ public class PlainTextFilterTest {
 		params.wrapMode = WrapMode.NONE;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.TEXT_UNIT, "Line 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.TEXT_UNIT, "Line 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -667,13 +667,13 @@ public class PlainTextFilterTest {
 		params.wrapMode = WrapMode.PLACEHOLDERS;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.TEXT_UNIT, "Line 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.TEXT_UNIT, "Line 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -684,13 +684,13 @@ public class PlainTextFilterTest {
 		params.wrapMode = WrapMode.SPACES;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.TEXT_UNIT, "Line 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.TEXT_UNIT, "Line 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 				
@@ -702,10 +702,10 @@ public class PlainTextFilterTest {
 		params.wrapMode = WrapMode.NONE;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -716,10 +716,10 @@ public class PlainTextFilterTest {
 		params.wrapMode = WrapMode.SPACES;		
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1 Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3 Line 4 Line 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1 Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3 Line 4 Line 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -730,10 +730,10 @@ public class PlainTextFilterTest {
 		params.wrapMode = WrapMode.PLACEHOLDERS;
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1\rLine 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3\rLine 4\rLine 5");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1\rLine 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3\rLine 4\rLine 5");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -742,7 +742,7 @@ public class PlainTextFilterTest {
 	public void testLoadParams() {
 		
 		IParameters params = filter.getParameters();
-		params.load(new File(_getPainTextConfig("okf_plaintext_spliced_backslash.fprm")).toURI(), false);
+		params.load(new File(getPainTextConfig("okf_plaintext_spliced_backslash.fprm")).toURI(), false);
 		
 		IParameters params2 = filter.getActiveParameters();
 		assertTrue(params2 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
@@ -763,7 +763,7 @@ public class PlainTextFilterTest {
 		assertEquals("\\", params3.splicer);
 		
 		//--------------------
-		params.load(new File(_getPainTextConfig("okf_plaintext_spliced_underscore.fprm")).toURI(), false);
+		params.load(new File(getPainTextConfig("okf_plaintext_spliced_underscore.fprm")).toURI(), false);
 		
 		params2 = filter.getActiveParameters();
 		assertTrue(params2 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
@@ -787,7 +787,7 @@ public class PlainTextFilterTest {
 				
 // Helpers
 	
-	private void _testFile(String filename, boolean emptyTail) {
+	private void testFile(String filename, boolean emptyTail) {
 		testDriver.setDisplayLevel(0);
 		
 		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/" + filename);
@@ -795,12 +795,12 @@ public class PlainTextFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -814,7 +814,7 @@ public class PlainTextFilterTest {
 		filter.close();
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText) {
+	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -843,7 +843,7 @@ public class PlainTextFilterTest {
 		}
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum) {
+	private void testEvent(EventType expectedType, String expectedText, int expectedLineNum) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -879,7 +879,7 @@ public class PlainTextFilterTest {
 		}
 	}
 	
-	private String _getPainTextConfig(String fileName) {
+	private String getPainTextConfig(String fileName) {
 		URL url = PlainTextFilter.class.getResource("okf_plaintext_paragraphs.fprm");
 		String root = Util.getDirectoryName(url.getPath());
 //		root = Util.getDirectoryName(root) + "/data/";
@@ -893,7 +893,7 @@ public class PlainTextFilterTest {
 //		return root + fileName;
 //	}
 	
-	private String _getSkeleton (String fileName) throws UnsupportedEncodingException {
+	private String getSkeleton (String fileName) throws UnsupportedEncodingException {
 		IFilterWriter writer;
 		ByteArrayOutputStream writerBuffer;
 										
@@ -921,7 +921,7 @@ public class PlainTextFilterTest {
 		return new String(writerBuffer.toByteArray(), "UTF-16");
 	}
 	
-	private String _streamAsString(InputStream input) throws IOException {
+	private String streamAsString(InputStream input) throws IOException {
 		BufferedReader reader;
 		reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 

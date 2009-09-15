@@ -171,20 +171,20 @@ public class RegexFilterTest {
 		//                  0123456 7 8901234 5 6 7 8 9012345 6 7 890123 
 		//                  0           1              2            3
 				
-		_listEvents(inputText);
+		listEvents(inputText);
 		
 		// Test individual events
 		filter.open(new RawDocument(inputText, "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, "");
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.DOCUMENT_PART, "\n\n");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.DOCUMENT_PART, "\n\n\n\n\n");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.DOCUMENT_PART, "\n\n\n");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.END_DOCUMENT, "");
+		testEvent(EventType.START_DOCUMENT, "");
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.DOCUMENT_PART, "\n\n");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.DOCUMENT_PART, "\n\n\n\n\n");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.DOCUMENT_PART, "\n\n\n");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.END_DOCUMENT, "");
 		
 		
 		String inputText2 = "Line 1\nLine 2\n\nLine 3\n\n\nLine 4\n\n\n\n\n\n";
@@ -193,19 +193,19 @@ public class RegexFilterTest {
 		
 		filter.open(new RawDocument(inputText2, "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, "");
-		_testEvent(EventType.TEXT_UNIT, "Line 1");
-		_testEvent(EventType.DOCUMENT_PART, "\n");
-		_testEvent(EventType.TEXT_UNIT, "Line 2");
-		_testEvent(EventType.DOCUMENT_PART, "\n\n");
-		_testEvent(EventType.TEXT_UNIT, "Line 3");
-		_testEvent(EventType.DOCUMENT_PART, "\n\n\n");
-		_testEvent(EventType.TEXT_UNIT, "Line 4");
-		_testEvent(EventType.DOCUMENT_PART, "\n\n\n\n\n\n");
-		_testEvent(EventType.END_DOCUMENT, "");
+		testEvent(EventType.START_DOCUMENT, "");
+		testEvent(EventType.TEXT_UNIT, "Line 1");
+		testEvent(EventType.DOCUMENT_PART, "\n");
+		testEvent(EventType.TEXT_UNIT, "Line 2");
+		testEvent(EventType.DOCUMENT_PART, "\n\n");
+		testEvent(EventType.TEXT_UNIT, "Line 3");
+		testEvent(EventType.DOCUMENT_PART, "\n\n\n");
+		testEvent(EventType.TEXT_UNIT, "Line 4");
+		testEvent(EventType.DOCUMENT_PART, "\n\n\n\n\n\n");
+		testEvent(EventType.END_DOCUMENT, "");
 	}	
 	
-	private void _testEvent(EventType expectedType, String expectedText) {
+	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
 		Event event = filter.next();		
 		assertNotNull(event);
@@ -259,7 +259,7 @@ public class RegexFilterTest {
         }
 	}
 		
-	private void _listEvents(String inputText) { 
+	private void listEvents(String inputText) { 
 		// List all events in Console
 		FilterTestDriver testDriver = new FilterTestDriver();
 		testDriver.setDisplayLevel(0);

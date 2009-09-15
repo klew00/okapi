@@ -83,20 +83,20 @@ public class SplicedLinesFilterTest {
 		params.createPlaceholders = false;
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1 Line 2 Line 3", 1);
-		_testEvent(EventType.TEXT_UNIT, "Line 4", 4);
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1 Line 2 Line 3", 1);
+		testEvent(EventType.TEXT_UNIT, "Line 4", 4);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		// 2.
 		params.createPlaceholders = true;
 		input = ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt");				
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1 \\\rLine 2 \\\rLine 3");
-		_testEvent(EventType.TEXT_UNIT, "Line 4\\");
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1 \\\rLine 2 \\\rLine 3");
+		testEvent(EventType.TEXT_UNIT, "Line 4\\");
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -118,14 +118,14 @@ public class SplicedLinesFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("combined_lines.txt")); // No trailing linebreak
+			st = getSkeleton(getFullFileName("combined_lines.txt")); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt"));			
+			expected = streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -138,14 +138,14 @@ public class SplicedLinesFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("combined_lines_end.txt")); // No trailing linebreak
+			st = getSkeleton(getFullFileName("combined_lines_end.txt")); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines_end.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines_end.txt"));			
+			expected = streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines_end.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -158,14 +158,14 @@ public class SplicedLinesFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("combined_lines2.txt")); // No trailing linebreak
+			st = getSkeleton(getFullFileName("combined_lines2.txt")); // No trailing linebreak
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "combined_lines2.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines2.txt"));			
+			expected = streamAsString(ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines2.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -174,7 +174,7 @@ public class SplicedLinesFilterTest {
 	
 // Helpers
 	
-	private void _testEvent(EventType expectedType, String expectedText) {
+	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -203,7 +203,7 @@ public class SplicedLinesFilterTest {
 		}
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum) {
+	private void testEvent(EventType expectedType, String expectedText, int expectedLineNum) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -239,14 +239,14 @@ public class SplicedLinesFilterTest {
 		}
 	}
 	
-	private String _getFullFileName(String fileName) {
+	private String getFullFileName(String fileName) {
 //		URL url = ParaPlainTextFilterTest.class.getResource("/cr.txt");
 //		String root = Util.getDirectoryName(url.getPath());
 //		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 	
-	private String _getSkeleton (String fileName) throws UnsupportedEncodingException {
+	private String getSkeleton (String fileName) throws UnsupportedEncodingException {
 		IFilterWriter writer;
 		ByteArrayOutputStream writerBuffer;
 										
@@ -274,7 +274,7 @@ public class SplicedLinesFilterTest {
 		return new String(writerBuffer.toByteArray(), "UTF-16");
 	}
 	
-	private String _streamAsString(InputStream input) throws IOException {
+	private String streamAsString(InputStream input) throws IOException {
 		BufferedReader reader;
 		reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 

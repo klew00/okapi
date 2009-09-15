@@ -214,7 +214,7 @@ public class FixedWidthColumnsFilterTest {
 		params.columnStartPositions = "";
 		params.columnEndPositions = "";
 		
-		params = _getParameters();
+		params = getParameters();
 				
 		//assertEquals("", params.columnWidths);
 		assertEquals("", params.columnStartPositions);
@@ -310,19 +310,19 @@ public class FixedWidthColumnsFilterTest {
 				
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value24", "Value21", "Value27", "it", "Value25");
-		_testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", "ge-sw", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value24", "Value21", "Value27", "it", "Value25");
+		testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", "ge-sw", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "Value37", "it", "Value35");
-		_testEvent(EventType.TEXT_UNIT, "Value36", "recID2_descr", "Value32", "ge-sw", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "Value37", "it", "Value35");
+		testEvent(EventType.TEXT_UNIT, "Value36", "recID2_descr", "Value32", "ge-sw", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -357,39 +357,39 @@ public class FixedWidthColumnsFilterTest {
 				
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "ID"); 
-		_testEvent(EventType.TEXT_UNIT, "Target1");
-		_testEvent(EventType.TEXT_UNIT, "SID1");
-		_testEvent(EventType.TEXT_UNIT, "Source1");
-		_testEvent(EventType.TEXT_UNIT, "Source2");
-		_testEvent(EventType.TEXT_UNIT, "Target2");
-		_testEvent(EventType.TEXT_UNIT, "Key");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "ID"); 
+		testEvent(EventType.TEXT_UNIT, "Target1");
+		testEvent(EventType.TEXT_UNIT, "SID1");
+		testEvent(EventType.TEXT_UNIT, "Source1");
+		testEvent(EventType.TEXT_UNIT, "Source2");
+		testEvent(EventType.TEXT_UNIT, "Target2");
+		testEvent(EventType.TEXT_UNIT, "Key");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value14", "Value11", "Value17", "it", "");
-		//_testEvent(EventType.TEXT_UNIT, "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value14", "Value11", "Value17", "it", "");
+		//testEvent(EventType.TEXT_UNIT, "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value24", "Value28_name", "Value27", "it", "Value25");
-		_testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", "ge-sw", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value24", "Value28_name", "Value27", "it", "Value25");
+		testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", "ge-sw", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "", "it", "");
-		//_testEvent(EventType.TEXT_UNIT, "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "", "it", "");
+		//testEvent(EventType.TEXT_UNIT, "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value44", "Value41", "Value47", "it", "Value45");
-		_testEvent(EventType.TEXT_UNIT, "Value46", "Value48_descr", "Value42", "ge-sw", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value44", "Value41", "Value47", "it", "Value45");
+		testEvent(EventType.TEXT_UNIT, "Value46", "Value48_descr", "Value42", "ge-sw", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -415,77 +415,55 @@ public class FixedWidthColumnsFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 0, 1);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 0, 2);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 0, 3);
-		_testEvent(EventType.TEXT_UNIT, "\"FieldName4\"", 1, 0, 4);	// Quotes remain part of the value
-		_testEvent(EventType.TEXT_UNIT, "FieldName5", 1, 0, 5);
-		_testEvent(EventType.TEXT_UNIT, "FieldName6", 1, 0, 6);
-		_testEvent(EventType.TEXT_UNIT, "FieldName7", 1, 0, 7);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 0, 1);
+		testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 0, 2);
+		testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 0, 3);
+		testEvent(EventType.TEXT_UNIT, "\"FieldName4\"", 1, 0, 4);	// Quotes remain part of the value
+		testEvent(EventType.TEXT_UNIT, "FieldName5", 1, 0, 5);
+		testEvent(EventType.TEXT_UNIT, "FieldName6", 1, 0, 6);
+		testEvent(EventType.TEXT_UNIT, "FieldName7", 1, 0, 7);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11", 2, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value12", 2, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value13", 2, 1, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value14", 2, 1, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value17", 2, 1, 7);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11", 2, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Value12", 2, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Value13", 2, 1, 3);
+		testEvent(EventType.TEXT_UNIT, "Value14", 2, 1, 4);
+		testEvent(EventType.TEXT_UNIT, "Value17", 2, 1, 7);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 3, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 3, 2, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 3, 2, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value24", 3, 2, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value25", 3, 2, 5);
-		_testEvent(EventType.TEXT_UNIT, "Value26", 3, 2, 6);
-		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 2, 7);			
-		_testEvent(EventType.TEXT_UNIT, "Value28", 3, 2, 8);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 3, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Value22", 3, 2, 2);
+		testEvent(EventType.TEXT_UNIT, "Value23", 3, 2, 3);
+		testEvent(EventType.TEXT_UNIT, "Value24", 3, 2, 4);
+		testEvent(EventType.TEXT_UNIT, "Value25", 3, 2, 5);
+		testEvent(EventType.TEXT_UNIT, "Value26", 3, 2, 6);
+		testEvent(EventType.TEXT_UNIT, "Value27", 3, 2, 7);			
+		testEvent(EventType.TEXT_UNIT, "Value28", 3, 2, 8);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31", 4, 3, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value32", 4, 3, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value33", 4, 3, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value34", 4, 3, 4);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31", 4, 3, 1);
+		testEvent(EventType.TEXT_UNIT, "Value32", 4, 3, 2);
+		testEvent(EventType.TEXT_UNIT, "Value33", 4, 3, 3);
+		testEvent(EventType.TEXT_UNIT, "Value34", 4, 3, 4);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value41", 5, 4, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value42", 5, 4, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value43", 5, 4, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value44", 5, 4, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value45", 5, 4, 5);
-		_testEvent(EventType.TEXT_UNIT, "Value46", 5, 4, 6);
-		_testEvent(EventType.TEXT_UNIT, "Value47", 5, 4, 7);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value41", 5, 4, 1);
+		testEvent(EventType.TEXT_UNIT, "Value42", 5, 4, 2);
+		testEvent(EventType.TEXT_UNIT, "Value43", 5, 4, 3);
+		testEvent(EventType.TEXT_UNIT, "Value44", 5, 4, 4);
+		testEvent(EventType.TEXT_UNIT, "Value45", 5, 4, 5);
+		testEvent(EventType.TEXT_UNIT, "Value46", 5, 4, 6);
+		testEvent(EventType.TEXT_UNIT, "Value47", 5, 4, 7);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
-		
-		filter.close();
-		
-		params.valuesStartLineNum = 3;
-		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
-		
-		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
-				
-		_testEvent(EventType.START_DOCUMENT, null);
-					
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5);
-		_testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6);
-		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7);
-		_testEvent(EventType.TEXT_UNIT, "Value28", 3, 1, 8);
-		_testEvent(EventType.END_GROUP, null);
-				
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -495,18 +473,40 @@ public class FixedWidthColumnsFilterTest {
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 				
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 					
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1, 10);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2, 12);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3, 12);
-		_testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4, 12);
-		_testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5, 10);
-		_testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6, 10);
-		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7, 10);			
-		_testEvent(EventType.TEXT_UNIT, "Value28", 3, 1, 8, 7);			
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3);
+		testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4);
+		testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5);
+		testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6);
+		testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7);
+		testEvent(EventType.TEXT_UNIT, "Value28", 3, 1, 8);
+		testEvent(EventType.END_GROUP, null);
+				
+		
+		filter.close();
+		
+		params.valuesStartLineNum = 3;
+		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
+		
+		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+				
+		testEvent(EventType.START_DOCUMENT, null);
+					
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1, 10);
+		testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2, 12);
+		testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3, 12);
+		testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4, 12);
+		testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5, 10);
+		testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6, 10);
+		testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7, 10);			
+		testEvent(EventType.TEXT_UNIT, "Value28", 3, 1, 8, 7);			
+		testEvent(EventType.END_GROUP, null);
 		
 		filter.close();
 		
@@ -516,28 +516,28 @@ public class FixedWidthColumnsFilterTest {
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 				
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 					
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 0, 1);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 0, 2);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 0, 3);
-		_testEvent(EventType.TEXT_UNIT, "\"FieldName4\"", 1, 0, 4);	// Quotes remain part of the value
-		_testEvent(EventType.TEXT_UNIT, "FieldName5", 1, 0, 5);
-		_testEvent(EventType.TEXT_UNIT, "FieldName6", 1, 0, 6);
-		_testEvent(EventType.TEXT_UNIT, "FieldName7", 1, 0, 7);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 0, 1);
+		testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 0, 2);
+		testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 0, 3);
+		testEvent(EventType.TEXT_UNIT, "\"FieldName4\"", 1, 0, 4);	// Quotes remain part of the value
+		testEvent(EventType.TEXT_UNIT, "FieldName5", 1, 0, 5);
+		testEvent(EventType.TEXT_UNIT, "FieldName6", 1, 0, 6);
+		testEvent(EventType.TEXT_UNIT, "FieldName7", 1, 0, 7);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5);
-		_testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6);
-		_testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7);			
-		_testEvent(EventType.TEXT_UNIT, "Value28", 3, 1, 8);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3);
+		testEvent(EventType.TEXT_UNIT, "Value24", 3, 1, 4);
+		testEvent(EventType.TEXT_UNIT, "Value25", 3, 1, 5);
+		testEvent(EventType.TEXT_UNIT, "Value26", 3, 1, 6);
+		testEvent(EventType.TEXT_UNIT, "Value27", 3, 1, 7);			
+		testEvent(EventType.TEXT_UNIT, "Value28", 3, 1, 8);
+		testEvent(EventType.END_GROUP, null);
 		
 		filter.close();
 		
@@ -549,19 +549,19 @@ public class FixedWidthColumnsFilterTest {
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 				
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 					
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 1, 3);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 1, 3);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11", 2, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value12", 2, 2, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value13", 2, 2, 3);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11", 2, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Value12", 2, 2, 2);
+		testEvent(EventType.TEXT_UNIT, "Value13", 2, 2, 3);
+		testEvent(EventType.END_GROUP, null);
 		
 		filter.close();
 		
@@ -570,25 +570,25 @@ public class FixedWidthColumnsFilterTest {
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 				
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 					
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 1, 3);
-		_testEvent(EventType.TEXT_UNIT, "\"FieldName4\"", 1, 1, 4);	// Quotes remain part of the value
-		_testEvent(EventType.TEXT_UNIT, "FieldName5", 1, 1, 5);
-		_testEvent(EventType.TEXT_UNIT, "FieldName6", 1, 1, 6);
-		_testEvent(EventType.TEXT_UNIT, "FieldName7", 1, 1, 7);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 1, 3);
+		testEvent(EventType.TEXT_UNIT, "\"FieldName4\"", 1, 1, 4);	// Quotes remain part of the value
+		testEvent(EventType.TEXT_UNIT, "FieldName5", 1, 1, 5);
+		testEvent(EventType.TEXT_UNIT, "FieldName6", 1, 1, 6);
+		testEvent(EventType.TEXT_UNIT, "FieldName7", 1, 1, 7);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11", 2, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value12", 2, 2, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value13", 2, 2, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value14", 2, 2, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value17", 2, 2, 7);			// Value28 is ignored
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11", 2, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Value12", 2, 2, 2);
+		testEvent(EventType.TEXT_UNIT, "Value13", 2, 2, 3);
+		testEvent(EventType.TEXT_UNIT, "Value14", 2, 2, 4);
+		testEvent(EventType.TEXT_UNIT, "Value17", 2, 2, 7);			// Value28 is ignored
+		testEvent(EventType.END_GROUP, null);
 		
 		filter.close();
 		
@@ -626,50 +626,50 @@ public class FixedWidthColumnsFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 		
-		_testEvent(EventType.TEXT_UNIT, "Test table", 1, 0, true);
+		testEvent(EventType.TEXT_UNIT, "Test table", 1, 0, true);
 		
-		_testEvent(EventType.TEXT_UNIT, "Contains column names in the 4-th line, a table caption in the 1-st line, and 4 lines of description. This is the 1-st header row.", 
+		testEvent(EventType.TEXT_UNIT, "Contains column names in the 4-th line, a table caption in the 1-st line, and 4 lines of description. This is the 1-st header row.", 
 				2, 0, true);
 		
-		_testEvent(EventType.TEXT_UNIT, "This is the 2-nd header row. This table also delimits the number of columns by their names (5 columns only are extracted here)", 
+		testEvent(EventType.TEXT_UNIT, "This is the 2-nd header row. This table also delimits the number of columns by their names (5 columns only are extracted here)", 
 				3, 0, true);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "FieldName1", 4, 0, 1, true);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 2", 4, 0, 2, true);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 3", 4, 0, 3, true);
-		_testEvent(EventType.TEXT_UNIT, "FieldName4", 4, 0, 4, true);	
-		_testEvent(EventType.TEXT_UNIT, "FieldName5", 4, 0, 5, true);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "FieldName1", 4, 0, 1, true);
+		testEvent(EventType.TEXT_UNIT, "Field Name 2", 4, 0, 2, true);
+		testEvent(EventType.TEXT_UNIT, "Field Name 3", 4, 0, 3, true);
+		testEvent(EventType.TEXT_UNIT, "FieldName4", 4, 0, 4, true);	
+		testEvent(EventType.TEXT_UNIT, "FieldName5", 4, 0, 5, true);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.TEXT_UNIT, "This is the 4-th header row.",	5, 0, true);
-		_testEvent(EventType.TEXT_UNIT, "This is the 5-th header row. Data start right after here.", 6, 0, true);
+		testEvent(EventType.TEXT_UNIT, "This is the 4-th header row.",	5, 0, true);
+		testEvent(EventType.TEXT_UNIT, "This is the 5-th header row. Data start right after here.", 6, 0, true);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11", 7, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value12", 7, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value13", 7, 1, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value14", 7, 1, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value15", 7, 1, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11", 7, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Value12", 7, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Value13", 7, 1, 3);
+		testEvent(EventType.TEXT_UNIT, "Value14", 7, 1, 4);
+		testEvent(EventType.TEXT_UNIT, "Value15", 7, 1, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 8, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 8, 2, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 8, 2, 3);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 8, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Value22", 8, 2, 2);
+		testEvent(EventType.TEXT_UNIT, "Value23", 8, 2, 3);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31", 9, 3, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value32", 9, 3, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value33", 9, 3, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value34", 9, 3, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value35", 9, 3, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31", 9, 3, 1);
+		testEvent(EventType.TEXT_UNIT, "Value32", 9, 3, 2);
+		testEvent(EventType.TEXT_UNIT, "Value33", 9, 3, 3);
+		testEvent(EventType.TEXT_UNIT, "Value34", 9, 3, 4);
+		testEvent(EventType.TEXT_UNIT, "Value35", 9, 3, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 				
@@ -683,31 +683,31 @@ public class FixedWidthColumnsFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 				
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11", 7, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value12", 7, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value13", 7, 1, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value14", 7, 1, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value15", 7, 1, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11", 7, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Value12", 7, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Value13", 7, 1, 3);
+		testEvent(EventType.TEXT_UNIT, "Value14", 7, 1, 4);
+		testEvent(EventType.TEXT_UNIT, "Value15", 7, 1, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 8, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 8, 2, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 8, 2, 3);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 8, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Value22", 8, 2, 2);
+		testEvent(EventType.TEXT_UNIT, "Value23", 8, 2, 3);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31", 9, 3, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value32", 9, 3, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value33", 9, 3, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value34", 9, 3, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value35", 9, 3, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31", 9, 3, 1);
+		testEvent(EventType.TEXT_UNIT, "Value32", 9, 3, 2);
+		testEvent(EventType.TEXT_UNIT, "Value33", 9, 3, 3);
+		testEvent(EventType.TEXT_UNIT, "Value34", 9, 3, 4);
+		testEvent(EventType.TEXT_UNIT, "Value35", 9, 3, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -721,39 +721,39 @@ public class FixedWidthColumnsFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "FieldName1", 4, 0, 1, true);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 2", 4, 0, 2, true);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 3", 4, 0, 3, true);
-		_testEvent(EventType.TEXT_UNIT, "FieldName4", 4, 0, 4, true);	
-		_testEvent(EventType.TEXT_UNIT, "FieldName5", 4, 0, 5, true);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "FieldName1", 4, 0, 1, true);
+		testEvent(EventType.TEXT_UNIT, "Field Name 2", 4, 0, 2, true);
+		testEvent(EventType.TEXT_UNIT, "Field Name 3", 4, 0, 3, true);
+		testEvent(EventType.TEXT_UNIT, "FieldName4", 4, 0, 4, true);	
+		testEvent(EventType.TEXT_UNIT, "FieldName5", 4, 0, 5, true);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11", 7, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value12", 7, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value13", 7, 1, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value14", 7, 1, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value15", 7, 1, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11", 7, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Value12", 7, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Value13", 7, 1, 3);
+		testEvent(EventType.TEXT_UNIT, "Value14", 7, 1, 4);
+		testEvent(EventType.TEXT_UNIT, "Value15", 7, 1, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 8, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 8, 2, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 8, 2, 3);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 8, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Value22", 8, 2, 2);
+		testEvent(EventType.TEXT_UNIT, "Value23", 8, 2, 3);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31", 9, 3, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value32", 9, 3, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value33", 9, 3, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value34", 9, 3, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value35", 9, 3, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31", 9, 3, 1);
+		testEvent(EventType.TEXT_UNIT, "Value32", 9, 3, 2);
+		testEvent(EventType.TEXT_UNIT, "Value33", 9, 3, 3);
+		testEvent(EventType.TEXT_UNIT, "Value34", 9, 3, 4);
+		testEvent(EventType.TEXT_UNIT, "Value35", 9, 3, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -775,31 +775,31 @@ public class FixedWidthColumnsFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11", 7, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value12", 7, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value13", 7, 1, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value14", 7, 1, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value15", 7, 1, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11", 7, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Value12", 7, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Value13", 7, 1, 3);
+		testEvent(EventType.TEXT_UNIT, "Value14", 7, 1, 4);
+		testEvent(EventType.TEXT_UNIT, "Value15", 7, 1, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 8, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 8, 2, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 8, 2, 3);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 8, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Value22", 8, 2, 2);
+		testEvent(EventType.TEXT_UNIT, "Value23", 8, 2, 3);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31", 9, 3, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value32", 9, 3, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value33", 9, 3, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value34", 9, 3, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value35", 9, 3, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31", 9, 3, 1);
+		testEvent(EventType.TEXT_UNIT, "Value32", 9, 3, 2);
+		testEvent(EventType.TEXT_UNIT, "Value33", 9, 3, 3);
+		testEvent(EventType.TEXT_UNIT, "Value34", 9, 3, 4);
+		testEvent(EventType.TEXT_UNIT, "Value35", 9, 3, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -815,14 +815,14 @@ public class FixedWidthColumnsFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test6.txt"));
+			st = getSkeleton(getFullFileName("csv_test6.txt"));
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test6.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_test6.txt"));			
+			expected = streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_test6.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -858,14 +858,14 @@ public class FixedWidthColumnsFilterTest {
 		params.recordIdColumn = 8;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_testb.txt"));
+			st = getSkeleton(getFullFileName("csv_testb.txt"));
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_testb.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_testb.txt"));			
+			expected = streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_testb.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -900,14 +900,14 @@ public class FixedWidthColumnsFilterTest {
 		params.recordIdColumn = 8;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_testb.txt"));
+			st = getSkeleton(getFullFileName("csv_testb.txt"));
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_testb.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_testb.txt"));			
+			expected = streamAsString(FixedWidthColumnsFilterTest.class.getResourceAsStream("/csv_testb.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -929,14 +929,14 @@ public class FixedWidthColumnsFilterTest {
 	}
 
 // Helpers
-	private String _getFullFileName(String fileName) {
+	private String getFullFileName(String fileName) {
 //m		URL url = TableFilterTest.class.getResource("/csv_test6.txt");
 //m		String root = Util.getDirectoryName(url.getPath());
 //m		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText) {
+	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -965,7 +965,7 @@ public class FixedWidthColumnsFilterTest {
 		}
 	}
 
-	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, int expCol) {
+	private void testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, int expCol) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -1014,7 +1014,7 @@ public class FixedWidthColumnsFilterTest {
 		}
 	}
 
-	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, 
+	private void testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, 
 			int expCol, int expWidth) {
 		
 		assertNotNull(filter);
@@ -1071,7 +1071,7 @@ public class FixedWidthColumnsFilterTest {
 		}
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, 
+	private void testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, 
 			boolean isHeader) {
 		
 		assertNotNull(filter);
@@ -1116,7 +1116,7 @@ public class FixedWidthColumnsFilterTest {
 		}
 	}
 	
-	private void _testEvent(EventType expectedType, String source, String expName, String target, String language, String comment) {
+	private void testEvent(EventType expectedType, String source, String expName, String target, String language, String comment) {
 		
 		assertNotNull(filter);
 		
@@ -1160,7 +1160,7 @@ public class FixedWidthColumnsFilterTest {
 			
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, 
+	private void testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, 
 			int expCol, boolean isHeader) {
 		
 		assertNotNull(filter);
@@ -1211,7 +1211,7 @@ public class FixedWidthColumnsFilterTest {
 		}
 	}
 	
-	private Parameters _getParameters() {
+	private Parameters getParameters() {
 		IParameters punk = filter.getParameters();
 		
 		if (punk instanceof Parameters)
@@ -1220,7 +1220,7 @@ public class FixedWidthColumnsFilterTest {
 			return null;
 	}
 
-	private String _getSkeleton (String fileName) throws UnsupportedEncodingException {
+	private String getSkeleton (String fileName) throws UnsupportedEncodingException {
 		IFilterWriter writer;
 		ByteArrayOutputStream writerBuffer;
 										
@@ -1248,7 +1248,7 @@ public class FixedWidthColumnsFilterTest {
 		return new String(writerBuffer.toByteArray(), "UTF-16");
 	}
 	
-	private String _streamAsString(InputStream input) throws IOException {
+	private String streamAsString(InputStream input) throws IOException {
 		BufferedReader reader = null;
 		reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 

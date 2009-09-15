@@ -84,9 +84,6 @@ public class CommaSeparatedValuesFilterTest {
 		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 		
-//m		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
-//m		String root2 = Util.getDirectoryName(url.getPath());
-//m		root2 = Util.getDirectoryName(root2) + "/data/";
         root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
 	}
 
@@ -108,8 +105,51 @@ public class CommaSeparatedValuesFilterTest {
 		filter.setParameters(params);
 		
 		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");
-		//UNCOMMENT assertEquals(snippet, result);
+//		assertEquals(snippet, result);
 	}
+	
+	@Test
+	public void testFileEvents96_2() {
+		
+		//Parameters params = (Parameters) filter.getParameters();
+			
+		InputStream input = TableFilterTest.class.getResourceAsStream("/CSVTest_96_2.txt"); // issue 96
+		assertNotNull(input);
+	
+		// Set the parameters
+		Parameters params = new Parameters();
+		params.fieldDelimiter = ",";
+		params.textQualifier = "\"";
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		params.sourceColumns = "1";
+		params.targetColumns = "2";
+		params.targetLanguages = "FR-CA";
+		params.targetSourceRefs = "1";
+		filter.setParameters(params);
+		
+		filter.open(new RawDocument(input, "UTF-8", "en"));
+		
+		testEvent(EventType.START_DOCUMENT, null);
+						
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "src");
+		testEvent(EventType.TEXT_UNIT, "trg");
+		testEvent(EventType.TEXT_UNIT, "data");
+		testEvent(EventType.END_GROUP, null);
+		
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1", "", "target1", "FR-CA", "");
+		testEvent(EventType.END_GROUP, null);
+		
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source2", "", "target2", "FR-CA", "");
+		testEvent(EventType.END_GROUP, null);
+		
+		testEvent(EventType.END_DOCUMENT, null);
+				filter.close();
+		
+	}
+	
 	
 	@Test
 	public void testEmptyInput() {
@@ -255,7 +295,7 @@ public class CommaSeparatedValuesFilterTest {
 		params.preserveWS = true;
 		params.useCodeFinder = true;
 		
-		params = _getParameters();
+		params = getParameters();
 		
 		assertEquals(params.fieldDelimiter, "1");
 		assertEquals(params.columnNamesLineNum, 1);
@@ -273,7 +313,7 @@ public class CommaSeparatedValuesFilterTest {
 		
 
 		try {
-		String st = "file:" + _getFullFileName("test_params1.txt");
+		String st = "file:" + getFullFileName("test_params1.txt");
 		params.load(new URI(st), false);
 	} catch (URISyntaxException e) {
 	}
@@ -349,14 +389,14 @@ public class CommaSeparatedValuesFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test1.txt"));
+			st = getSkeleton(getFullFileName("csv_test1.txt"));
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test1.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(CommaSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
+			expected = streamAsString(CommaSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test1.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -370,14 +410,14 @@ public class CommaSeparatedValuesFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test2.txt"));
+			st = getSkeleton(getFullFileName("csv_test2.txt"));
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test2.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(CommaSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
+			expected = streamAsString(CommaSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test2.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -390,14 +430,14 @@ public class CommaSeparatedValuesFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test3.txt"));
+			st = getSkeleton(getFullFileName("csv_test3.txt"));
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 		//debug System.out.println(String.format("Skeleton of %s\n---\n", "csv_test3.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(CommaSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test3.txt"));			
+			expected = streamAsString(CommaSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test3.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -413,49 +453,49 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "FieldName1");
-		_testEvent(EventType.TEXT_UNIT, "FieldName2");
-		_testEvent(EventType.TEXT_UNIT, "FieldName3");
-		_testEvent(EventType.TEXT_UNIT, "FieldName4");
-		_testEvent(EventType.TEXT_UNIT, "FieldName5");
-		_testEvent(EventType.TEXT_UNIT, "FieldName6");
-		_testEvent(EventType.TEXT_UNIT, "FieldName7");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "FieldName1");
+		testEvent(EventType.TEXT_UNIT, "FieldName2");
+		testEvent(EventType.TEXT_UNIT, "FieldName3");
+		testEvent(EventType.TEXT_UNIT, "FieldName4");
+		testEvent(EventType.TEXT_UNIT, "FieldName5");
+		testEvent(EventType.TEXT_UNIT, "FieldName6");
+		testEvent(EventType.TEXT_UNIT, "FieldName7");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11");
-		_testEvent(EventType.TEXT_UNIT, "Value12");
-		_testEvent(EventType.TEXT_UNIT, "Value13");
-		_testEvent(EventType.TEXT_UNIT, "Value14");
-		_testEvent(EventType.TEXT_UNIT, "Value15");
-		_testEvent(EventType.TEXT_UNIT, "Value16");
-		_testEvent(EventType.TEXT_UNIT, "Value17");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11");
+		testEvent(EventType.TEXT_UNIT, "Value12");
+		testEvent(EventType.TEXT_UNIT, "Value13");
+		testEvent(EventType.TEXT_UNIT, "Value14");
+		testEvent(EventType.TEXT_UNIT, "Value15");
+		testEvent(EventType.TEXT_UNIT, "Value16");
+		testEvent(EventType.TEXT_UNIT, "Value17");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21");
-		_testEvent(EventType.TEXT_UNIT, "Value22");
-		_testEvent(EventType.TEXT_UNIT, "Value23");
-		_testEvent(EventType.TEXT_UNIT, "Value24");
-		_testEvent(EventType.TEXT_UNIT, "Value25");
-		_testEvent(EventType.TEXT_UNIT, "Value26");
-		_testEvent(EventType.TEXT_UNIT, "Value27");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21");
+		testEvent(EventType.TEXT_UNIT, "Value22");
+		testEvent(EventType.TEXT_UNIT, "Value23");
+		testEvent(EventType.TEXT_UNIT, "Value24");
+		testEvent(EventType.TEXT_UNIT, "Value25");
+		testEvent(EventType.TEXT_UNIT, "Value26");
+		testEvent(EventType.TEXT_UNIT, "Value27");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31");
-		_testEvent(EventType.TEXT_UNIT, "Value32");
-		_testEvent(EventType.TEXT_UNIT, "Value33");
-		_testEvent(EventType.TEXT_UNIT, "Value34");
-		_testEvent(EventType.TEXT_UNIT, "Value35");
-		_testEvent(EventType.TEXT_UNIT, "Value36");
-		_testEvent(EventType.TEXT_UNIT, "Value37");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31");
+		testEvent(EventType.TEXT_UNIT, "Value32");
+		testEvent(EventType.TEXT_UNIT, "Value33");
+		testEvent(EventType.TEXT_UNIT, "Value34");
+		testEvent(EventType.TEXT_UNIT, "Value35");
+		testEvent(EventType.TEXT_UNIT, "Value36");
+		testEvent(EventType.TEXT_UNIT, "Value37");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -488,29 +528,29 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "id");
-		_testEvent(EventType.TEXT_UNIT, "value");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "id");
+		testEvent(EventType.TEXT_UNIT, "value");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "01");
-		_testEvent(EventType.TEXT_UNIT, "one");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "01");
+		testEvent(EventType.TEXT_UNIT, "one");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "02");
-		_testEvent(EventType.TEXT_UNIT, "first,\nsecond\n");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "02");
+		testEvent(EventType.TEXT_UNIT, "first,\nsecond\n");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "03");
-		_testEvent(EventType.TEXT_UNIT, "three");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "03");
+		testEvent(EventType.TEXT_UNIT, "three");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -531,29 +571,29 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "id");
-		_testEvent(EventType.TEXT_UNIT, "value");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "id");
+		testEvent(EventType.TEXT_UNIT, "value");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "01");
-		_testEvent(EventType.TEXT_UNIT, "one");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "01");
+		testEvent(EventType.TEXT_UNIT, "one");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "02");
-		_testEvent(EventType.TEXT_UNIT, "first,\nsecond");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "02");
+		testEvent(EventType.TEXT_UNIT, "first,\nsecond");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "03");
-		_testEvent(EventType.TEXT_UNIT, "three");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "03");
+		testEvent(EventType.TEXT_UNIT, "three");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -576,14 +616,14 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "02");
-		_testEvent(EventType.TEXT_UNIT, "first,\nsecond\n");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "02");
+		testEvent(EventType.TEXT_UNIT, "first,\nsecond\n");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -595,14 +635,14 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "02");
-		_testEvent(EventType.TEXT_UNIT, "first,\nsecond");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "02");
+		testEvent(EventType.TEXT_UNIT, "first,\nsecond");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -625,22 +665,22 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		//_testEvent(EventType.TEXT_UNIT, "one");
-		_testEvent(EventType.TEXT_UNIT, "one", "01", null, null, null);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		//testEvent(EventType.TEXT_UNIT, "one");
+		testEvent(EventType.TEXT_UNIT, "one", "01", null, null, null);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "first,\nsecond\n", "02", null, null, null);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "first,\nsecond\n", "02", null, null, null);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "three", "03", null, null, null);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "three", "03", null, null, null);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -658,23 +698,23 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source");
-		_testEvent(EventType.TEXT_UNIT, "Target");
-		_testEvent(EventType.TEXT_UNIT, "Data");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source");
+		testEvent(EventType.TEXT_UNIT, "Target");
+		testEvent(EventType.TEXT_UNIT, "Data");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -685,17 +725,17 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -713,27 +753,27 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source");
-		_testEvent(EventType.TEXT_UNIT, "Target");
-		_testEvent(EventType.TEXT_UNIT, "Data");
-		_testEvent(EventType.TEXT_UNIT, "Source");
-		_testEvent(EventType.TEXT_UNIT, "Target");		
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source");
+		testEvent(EventType.TEXT_UNIT, "Target");
+		testEvent(EventType.TEXT_UNIT, "Data");
+		testEvent(EventType.TEXT_UNIT, "Source");
+		testEvent(EventType.TEXT_UNIT, "Target");		
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
-		_testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", "FR-CA", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", "FR-CA", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
-		_testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", "FR-CA", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", "FR-CA", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -745,19 +785,19 @@ public class CommaSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
-		_testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", "FR-CA", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", "FR-CA", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
-		_testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", "FR-CA", "");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", "FR-CA", "");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 	}
@@ -777,166 +817,166 @@ public class CommaSeparatedValuesFilterTest {
 		params.wrapMode = WrapMode.NONE; // !!!
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 		
 		// Line 1
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11");
-		_testEvent(EventType.TEXT_UNIT, "Value12");
-		_testEvent(EventType.TEXT_UNIT, "Value13");
-		_testEvent(EventType.TEXT_UNIT, "Value14");		
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11");
+		testEvent(EventType.TEXT_UNIT, "Value12");
+		testEvent(EventType.TEXT_UNIT, "Value13");
+		testEvent(EventType.TEXT_UNIT, "Value14");		
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 2
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21");
-		_testEvent(EventType.TEXT_UNIT, "Value22.1,Value22.2, Value22.3");
-		_testEvent(EventType.TEXT_UNIT, "Value23");
-		_testEvent(EventType.TEXT_UNIT, "Value24");		
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21");
+		testEvent(EventType.TEXT_UNIT, "Value22.1,Value22.2, Value22.3");
+		testEvent(EventType.TEXT_UNIT, "Value23");
+		testEvent(EventType.TEXT_UNIT, "Value24");		
+		testEvent(EventType.END_GROUP, null);
 				
 		// Correct multiline chunk
 		// Line 4-7
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31");
-		_testEvent(EventType.TEXT_UNIT, "Value32");
-		_testEvent(EventType.TEXT_UNIT, "Value33");
-		_testEvent(EventType.TEXT_UNIT, "Value34.1\nValue34.2\nValue34.3\nValue34.4,Value34.5");
-		_testEvent(EventType.TEXT_UNIT, "Value35");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31");
+		testEvent(EventType.TEXT_UNIT, "Value32");
+		testEvent(EventType.TEXT_UNIT, "Value33");
+		testEvent(EventType.TEXT_UNIT, "Value34.1\nValue34.2\nValue34.3\nValue34.4,Value34.5");
+		testEvent(EventType.TEXT_UNIT, "Value35");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Incorrect multiline chunk 1
 		// Line 9
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value41");
-		_testEvent(EventType.TEXT_UNIT, "Value42");
-		_testEvent(EventType.TEXT_UNIT, "Value43");
-		_testEvent(EventType.TEXT_UNIT, "\"Value44.1");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value41");
+		testEvent(EventType.TEXT_UNIT, "Value42");
+		testEvent(EventType.TEXT_UNIT, "Value43");
+		testEvent(EventType.TEXT_UNIT, "\"Value44.1");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 10
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value44.2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value44.2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 11
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value44.3");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value44.3");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 12
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value44.4");
-		_testEvent(EventType.TEXT_UNIT, "Value45.1,Value45.2");
-		_testEvent(EventType.END_GROUP, null);		
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value44.4");
+		testEvent(EventType.TEXT_UNIT, "Value45.1,Value45.2");
+		testEvent(EventType.END_GROUP, null);		
 		
 		// Incorrect multiline chunk 2
 		// Line 14
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value51");
-		_testEvent(EventType.TEXT_UNIT, "Value52");
-		_testEvent(EventType.TEXT_UNIT, "Value53");
-		_testEvent(EventType.TEXT_UNIT, "\"Value54.1");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value51");
+		testEvent(EventType.TEXT_UNIT, "Value52");
+		testEvent(EventType.TEXT_UNIT, "Value53");
+		testEvent(EventType.TEXT_UNIT, "\"Value54.1");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 15
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value54.2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value54.2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 16
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value54.3");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value54.3");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 17-18
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value54.4");
-		_testEvent(EventType.TEXT_UNIT, "Value55.1,Value55.2\nValue55.3,Value55.4");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value54.4");
+		testEvent(EventType.TEXT_UNIT, "Value55.1,Value55.2\nValue55.3,Value55.4");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Incorrect multiline chunk 3
 		// Line 20
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value61");
-		_testEvent(EventType.TEXT_UNIT, "Value62");
-		_testEvent(EventType.TEXT_UNIT, "Value63");
-		_testEvent(EventType.TEXT_UNIT, "\"Value64.1");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value61");
+		testEvent(EventType.TEXT_UNIT, "Value62");
+		testEvent(EventType.TEXT_UNIT, "Value63");
+		testEvent(EventType.TEXT_UNIT, "\"Value64.1");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 21
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value64.2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value64.2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 22
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value64.3");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value64.3");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 23
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value64.4");
-		_testEvent(EventType.TEXT_UNIT, "\"Value65.1");
-		_testEvent(EventType.TEXT_UNIT, "Value65.2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value64.4");
+		testEvent(EventType.TEXT_UNIT, "\"Value65.1");
+		testEvent(EventType.TEXT_UNIT, "Value65.2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 24
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value65.3");
-		_testEvent(EventType.TEXT_UNIT, "Value65.4");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value65.3");
+		testEvent(EventType.TEXT_UNIT, "Value65.4");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 25
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value65.5");
-		_testEvent(EventType.TEXT_UNIT, "Value66");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value65.5");
+		testEvent(EventType.TEXT_UNIT, "Value66");
+		testEvent(EventType.END_GROUP, null);
 		// -------------------------------------------------
 		
 		// Line 27
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value71");
-		_testEvent(EventType.TEXT_UNIT, "Value72 \"quoted part 1\"\"quoted part 2\" value");
-		_testEvent(EventType.TEXT_UNIT, "Value73");
-		_testEvent(EventType.TEXT_UNIT, "Value74");		
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value71");
+		testEvent(EventType.TEXT_UNIT, "Value72 \"quoted part 1\"\"quoted part 2\" value");
+		testEvent(EventType.TEXT_UNIT, "Value73");
+		testEvent(EventType.TEXT_UNIT, "Value74");		
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 28
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value81");
-		_testEvent(EventType.TEXT_UNIT, "\"Value82 with unclosed quote"); // Preserve the wrong quotation
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value81");
+		testEvent(EventType.TEXT_UNIT, "\"Value82 with unclosed quote"); // Preserve the wrong quotation
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 29
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value91");
-		_testEvent(EventType.TEXT_UNIT, "Value92");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value91");
+		testEvent(EventType.TEXT_UNIT, "Value92");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 30
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "ValueA1");
-		_testEvent(EventType.TEXT_UNIT, "ValueA2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "ValueA1");
+		testEvent(EventType.TEXT_UNIT, "ValueA2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 31
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "ValueB1");
-		_testEvent(EventType.TEXT_UNIT, "Value\"B2,Va\"lueB3");		// If quotation marks are not around field, preserve them 
-		_testEvent(EventType.TEXT_UNIT, "Va\"lueB4\"");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "ValueB1");
+		testEvent(EventType.TEXT_UNIT, "Value\"B2,Va\"lueB3");		// If quotation marks are not around field, preserve them 
+		testEvent(EventType.TEXT_UNIT, "Va\"lueB4\"");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 32
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "ValueC1");
-		_testEvent(EventType.TEXT_UNIT, "\"ValueC2");		 
-		_testEvent(EventType.TEXT_UNIT, "ValueC3");			
-		_testEvent(EventType.TEXT_UNIT, "\"ValueC4");
-		_testEvent(EventType.TEXT_UNIT, "ValueC5");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "ValueC1");
+		testEvent(EventType.TEXT_UNIT, "\"ValueC2");		 
+		testEvent(EventType.TEXT_UNIT, "ValueC3");			
+		testEvent(EventType.TEXT_UNIT, "\"ValueC4");
+		testEvent(EventType.TEXT_UNIT, "ValueC5");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		filter.close();
 		
 		
@@ -947,166 +987,166 @@ public class CommaSeparatedValuesFilterTest {
 		params.wrapMode = WrapMode.SPACES; // !!!
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 		
 		// Line 1
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11");
-		_testEvent(EventType.TEXT_UNIT, "Value12");
-		_testEvent(EventType.TEXT_UNIT, "Value13");
-		_testEvent(EventType.TEXT_UNIT, "Value14");		
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11");
+		testEvent(EventType.TEXT_UNIT, "Value12");
+		testEvent(EventType.TEXT_UNIT, "Value13");
+		testEvent(EventType.TEXT_UNIT, "Value14");		
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 2
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21");
-		_testEvent(EventType.TEXT_UNIT, "Value22.1,Value22.2, Value22.3");
-		_testEvent(EventType.TEXT_UNIT, "Value23");
-		_testEvent(EventType.TEXT_UNIT, "Value24");		
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21");
+		testEvent(EventType.TEXT_UNIT, "Value22.1,Value22.2, Value22.3");
+		testEvent(EventType.TEXT_UNIT, "Value23");
+		testEvent(EventType.TEXT_UNIT, "Value24");		
+		testEvent(EventType.END_GROUP, null);
 				
 		// Correct multiline chunk
 		// Line 4-7
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31");
-		_testEvent(EventType.TEXT_UNIT, "Value32");
-		_testEvent(EventType.TEXT_UNIT, "Value33");
-		_testEvent(EventType.TEXT_UNIT, "Value34.1 Value34.2 Value34.3 Value34.4,Value34.5");
-		_testEvent(EventType.TEXT_UNIT, "Value35");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31");
+		testEvent(EventType.TEXT_UNIT, "Value32");
+		testEvent(EventType.TEXT_UNIT, "Value33");
+		testEvent(EventType.TEXT_UNIT, "Value34.1 Value34.2 Value34.3 Value34.4,Value34.5");
+		testEvent(EventType.TEXT_UNIT, "Value35");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Incorrect multiline chunk 1
 		// Line 9
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value41");
-		_testEvent(EventType.TEXT_UNIT, "Value42");
-		_testEvent(EventType.TEXT_UNIT, "Value43");
-		_testEvent(EventType.TEXT_UNIT, "\"Value44.1");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value41");
+		testEvent(EventType.TEXT_UNIT, "Value42");
+		testEvent(EventType.TEXT_UNIT, "Value43");
+		testEvent(EventType.TEXT_UNIT, "\"Value44.1");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 10
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value44.2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value44.2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 11
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value44.3");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value44.3");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 12
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value44.4");
-		_testEvent(EventType.TEXT_UNIT, "Value45.1,Value45.2");
-		_testEvent(EventType.END_GROUP, null);		
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value44.4");
+		testEvent(EventType.TEXT_UNIT, "Value45.1,Value45.2");
+		testEvent(EventType.END_GROUP, null);		
 		
 		// Incorrect multiline chunk 2
 		// Line 14
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value51");
-		_testEvent(EventType.TEXT_UNIT, "Value52");
-		_testEvent(EventType.TEXT_UNIT, "Value53");
-		_testEvent(EventType.TEXT_UNIT, "\"Value54.1");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value51");
+		testEvent(EventType.TEXT_UNIT, "Value52");
+		testEvent(EventType.TEXT_UNIT, "Value53");
+		testEvent(EventType.TEXT_UNIT, "\"Value54.1");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 15
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value54.2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value54.2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 16
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value54.3");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value54.3");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 17-18
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value54.4");
-		_testEvent(EventType.TEXT_UNIT, "Value55.1,Value55.2 Value55.3,Value55.4");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value54.4");
+		testEvent(EventType.TEXT_UNIT, "Value55.1,Value55.2 Value55.3,Value55.4");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Incorrect multiline chunk 3
 		// Line 20
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value61");
-		_testEvent(EventType.TEXT_UNIT, "Value62");
-		_testEvent(EventType.TEXT_UNIT, "Value63");
-		_testEvent(EventType.TEXT_UNIT, "\"Value64.1");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value61");
+		testEvent(EventType.TEXT_UNIT, "Value62");
+		testEvent(EventType.TEXT_UNIT, "Value63");
+		testEvent(EventType.TEXT_UNIT, "\"Value64.1");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 21
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value64.2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value64.2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 22
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value64.3");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value64.3");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 23
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value64.4");
-		_testEvent(EventType.TEXT_UNIT, "\"Value65.1");
-		_testEvent(EventType.TEXT_UNIT, "Value65.2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value64.4");
+		testEvent(EventType.TEXT_UNIT, "\"Value65.1");
+		testEvent(EventType.TEXT_UNIT, "Value65.2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 24
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value65.3");
-		_testEvent(EventType.TEXT_UNIT, "Value65.4");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value65.3");
+		testEvent(EventType.TEXT_UNIT, "Value65.4");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 25
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value65.5");
-		_testEvent(EventType.TEXT_UNIT, "Value66");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value65.5");
+		testEvent(EventType.TEXT_UNIT, "Value66");
+		testEvent(EventType.END_GROUP, null);
 		// -------------------------------------------------
 		
 		// Line 27
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value71");
-		_testEvent(EventType.TEXT_UNIT, "Value72 \"quoted part 1\"\"quoted part 2\" value");
-		_testEvent(EventType.TEXT_UNIT, "Value73");
-		_testEvent(EventType.TEXT_UNIT, "Value74");		
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value71");
+		testEvent(EventType.TEXT_UNIT, "Value72 \"quoted part 1\"\"quoted part 2\" value");
+		testEvent(EventType.TEXT_UNIT, "Value73");
+		testEvent(EventType.TEXT_UNIT, "Value74");		
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 28
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value81");
-		_testEvent(EventType.TEXT_UNIT, "\"Value82 with unclosed quote"); // Preserve the wrong quotation
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value81");
+		testEvent(EventType.TEXT_UNIT, "\"Value82 with unclosed quote"); // Preserve the wrong quotation
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 29
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "Value91");
-		_testEvent(EventType.TEXT_UNIT, "Value92");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "Value91");
+		testEvent(EventType.TEXT_UNIT, "Value92");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 30
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "ValueA1");
-		_testEvent(EventType.TEXT_UNIT, "ValueA2");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "ValueA1");
+		testEvent(EventType.TEXT_UNIT, "ValueA2");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 31
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "ValueB1");
-		_testEvent(EventType.TEXT_UNIT, "Value\"B2,Va\"lueB3");		// If quotation marks are not around field, preserve them 
-		_testEvent(EventType.TEXT_UNIT, "Va\"lueB4\"");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "ValueB1");
+		testEvent(EventType.TEXT_UNIT, "Value\"B2,Va\"lueB3");		// If quotation marks are not around field, preserve them 
+		testEvent(EventType.TEXT_UNIT, "Va\"lueB4\"");
+		testEvent(EventType.END_GROUP, null);
 		
 		// Line 32
-		_testEvent(EventType.START_GROUP, null);		
-		_testEvent(EventType.TEXT_UNIT, "ValueC1");
-		_testEvent(EventType.TEXT_UNIT, "\"ValueC2");		 
-		_testEvent(EventType.TEXT_UNIT, "ValueC3");			
-		_testEvent(EventType.TEXT_UNIT, "\"ValueC4");
-		_testEvent(EventType.TEXT_UNIT, "ValueC5");
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "ValueC1");
+		testEvent(EventType.TEXT_UNIT, "\"ValueC2");		 
+		testEvent(EventType.TEXT_UNIT, "ValueC3");			
+		testEvent(EventType.TEXT_UNIT, "\"ValueC4");
+		testEvent(EventType.TEXT_UNIT, "ValueC5");
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		filter.close();
 		
 		
@@ -1116,144 +1156,144 @@ public class CommaSeparatedValuesFilterTest {
 //		params.wrapMode = WrapMode.SPACE;
 //		filter.open(new RawDocument(input, "UTF-8", "en"));
 //		
-//		_testEvent(EventType.START_DOCUMENT, null);
+//		testEvent(EventType.START_DOCUMENT, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value11");
-//		_testEvent(EventType.TEXT_UNIT, "Value12");
-//		_testEvent(EventType.TEXT_UNIT, "Value13");
-//		_testEvent(EventType.TEXT_UNIT, "Value14");		
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value11");
+//		testEvent(EventType.TEXT_UNIT, "Value12");
+//		testEvent(EventType.TEXT_UNIT, "Value13");
+//		testEvent(EventType.TEXT_UNIT, "Value14");		
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value21");
-//		_testEvent(EventType.TEXT_UNIT, "Value22.1,Value22.2, Value22.3");
-//		_testEvent(EventType.TEXT_UNIT, "Value23");
-//		_testEvent(EventType.TEXT_UNIT, "Value24");		
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value21");
+//		testEvent(EventType.TEXT_UNIT, "Value22.1,Value22.2, Value22.3");
+//		testEvent(EventType.TEXT_UNIT, "Value23");
+//		testEvent(EventType.TEXT_UNIT, "Value24");		
+//		testEvent(EventType.END_GROUP, null);
 //		
 //		// Correct multiline chunk
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value31");
-//		_testEvent(EventType.TEXT_UNIT, "Value32");
-//		_testEvent(EventType.TEXT_UNIT, "Value33");
-////		_testEvent(EventType.TEXT_UNIT, "Value34.1\nValue34.2\nValue34.3\nValue34.4,Value34.5");
-//		_testEvent(EventType.TEXT_UNIT, "Value34.1,Value34.2,Value34.3,Value34.4,Value34.5");
-//		_testEvent(EventType.TEXT_UNIT, "Value35");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value31");
+//		testEvent(EventType.TEXT_UNIT, "Value32");
+//		testEvent(EventType.TEXT_UNIT, "Value33");
+////		testEvent(EventType.TEXT_UNIT, "Value34.1\nValue34.2\nValue34.3\nValue34.4,Value34.5");
+//		testEvent(EventType.TEXT_UNIT, "Value34.1,Value34.2,Value34.3,Value34.4,Value34.5");
+//		testEvent(EventType.TEXT_UNIT, "Value35");
+//		testEvent(EventType.END_GROUP, null);
 //		
 //		// Incorrect multiline chunk 1
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value31");
-//		_testEvent(EventType.TEXT_UNIT, "Value32");
-//		_testEvent(EventType.TEXT_UNIT, "Value33");
-//		_testEvent(EventType.TEXT_UNIT, "\"Value34.1");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value31");
+//		testEvent(EventType.TEXT_UNIT, "Value32");
+//		testEvent(EventType.TEXT_UNIT, "Value33");
+//		testEvent(EventType.TEXT_UNIT, "\"Value34.1");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value34.2");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value34.2");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value34.3");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value34.3");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value34.4");
-//		_testEvent(EventType.TEXT_UNIT, "Value35.1,Value35.2");
-//		_testEvent(EventType.END_GROUP, null);		
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value34.4");
+//		testEvent(EventType.TEXT_UNIT, "Value35.1,Value35.2");
+//		testEvent(EventType.END_GROUP, null);		
 //		
 //		// Incorrect multiline chunk 2
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value31");
-//		_testEvent(EventType.TEXT_UNIT, "Value32");
-//		_testEvent(EventType.TEXT_UNIT, "Value33");
-//		_testEvent(EventType.TEXT_UNIT, "\"Value34.1");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value31");
+//		testEvent(EventType.TEXT_UNIT, "Value32");
+//		testEvent(EventType.TEXT_UNIT, "Value33");
+//		testEvent(EventType.TEXT_UNIT, "\"Value34.1");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value34.2");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value34.2");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value34.3");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value34.3");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value34.4");
-//		_testEvent(EventType.TEXT_UNIT, "Value35.1,Value35.2,Value35.3,Value35.4");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value34.4");
+//		testEvent(EventType.TEXT_UNIT, "Value35.1,Value35.2,Value35.3,Value35.4");
+//		testEvent(EventType.END_GROUP, null);
 //		
 //		// Incorrect multiline chunk 3
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value31");
-//		_testEvent(EventType.TEXT_UNIT, "Value32");
-//		_testEvent(EventType.TEXT_UNIT, "Value33");
-//		_testEvent(EventType.TEXT_UNIT, "\"Value34.1");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value31");
+//		testEvent(EventType.TEXT_UNIT, "Value32");
+//		testEvent(EventType.TEXT_UNIT, "Value33");
+//		testEvent(EventType.TEXT_UNIT, "\"Value34.1");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value34.2");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value34.2");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value34.3");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value34.3");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value34.4");
-//		_testEvent(EventType.TEXT_UNIT, "\"Value35.1,Value35.2");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value34.4");
+//		testEvent(EventType.TEXT_UNIT, "\"Value35.1,Value35.2");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value35.3");
-//		_testEvent(EventType.TEXT_UNIT, "Value35.4");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value35.3");
+//		testEvent(EventType.TEXT_UNIT, "Value35.4");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value35.5");
-//		_testEvent(EventType.TEXT_UNIT, "Value35.6");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value35.5");
+//		testEvent(EventType.TEXT_UNIT, "Value35.6");
+//		testEvent(EventType.END_GROUP, null);
 //		// -------------------------------------------------
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value41");
-//		_testEvent(EventType.TEXT_UNIT, "Value42 \"quoted part 1\" \"quoted part 2\" value");
-//		_testEvent(EventType.TEXT_UNIT, "Value43");
-//		_testEvent(EventType.TEXT_UNIT, "Value44");		
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value41");
+//		testEvent(EventType.TEXT_UNIT, "Value42 \"quoted part 1\" \"quoted part 2\" value");
+//		testEvent(EventType.TEXT_UNIT, "Value43");
+//		testEvent(EventType.TEXT_UNIT, "Value44");		
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value51");
-//		_testEvent(EventType.TEXT_UNIT, "\"Value52 with unclosed quote"); // Preserve the wrong quotation
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value51");
+//		testEvent(EventType.TEXT_UNIT, "\"Value52 with unclosed quote"); // Preserve the wrong quotation
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value61");
-//		_testEvent(EventType.TEXT_UNIT, "Value62");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value61");
+//		testEvent(EventType.TEXT_UNIT, "Value62");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value71");
-//		_testEvent(EventType.TEXT_UNIT, "Value72");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value71");
+//		testEvent(EventType.TEXT_UNIT, "Value72");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value81");
-//		_testEvent(EventType.TEXT_UNIT, "\"Value\"82");		// If quotation marks are not around field, preserve them 
-//		_testEvent(EventType.TEXT_UNIT, "Value83");			// If quotation marks are not around field, preserve them
-//		_testEvent(EventType.TEXT_UNIT, "Va\"lue84\"");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value81");
+//		testEvent(EventType.TEXT_UNIT, "\"Value\"82");		// If quotation marks are not around field, preserve them 
+//		testEvent(EventType.TEXT_UNIT, "Value83");			// If quotation marks are not around field, preserve them
+//		testEvent(EventType.TEXT_UNIT, "Va\"lue84\"");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.START_GROUP, null);
-//		_testEvent(EventType.TEXT_UNIT, "Value91");
-//		_testEvent(EventType.TEXT_UNIT, "\"Value92");		 
-//		_testEvent(EventType.TEXT_UNIT, "Value93");			
-//		_testEvent(EventType.TEXT_UNIT, "\"Value94");
-//		_testEvent(EventType.TEXT_UNIT, "Value95");
-//		_testEvent(EventType.END_GROUP, null);
+//		testEvent(EventType.START_GROUP, null);
+//		testEvent(EventType.TEXT_UNIT, "Value91");
+//		testEvent(EventType.TEXT_UNIT, "\"Value92");		 
+//		testEvent(EventType.TEXT_UNIT, "Value93");			
+//		testEvent(EventType.TEXT_UNIT, "\"Value94");
+//		testEvent(EventType.TEXT_UNIT, "Value95");
+//		testEvent(EventType.END_GROUP, null);
 //		
-//		_testEvent(EventType.END_DOCUMENT, null);
+//		testEvent(EventType.END_DOCUMENT, null);
 //		
 //		filter.close();
 	}
@@ -1285,14 +1325,14 @@ public class CommaSeparatedValuesFilterTest {
 
 	
 	// Helpers
-	private String _getFullFileName(String fileName) {
+	private String getFullFileName(String fileName) {
 //		URL url = TableFilterTest.class.getResource("/csv_testb.txt");
 //		String root = Util.getDirectoryName(url.getPath());
 //		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText) {
+	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -1322,7 +1362,7 @@ public class CommaSeparatedValuesFilterTest {
 		}
 	}
 	
-	private void _testEvent(EventType expectedType, String source, String expName, String target, String language, String comment) {
+	private void testEvent(EventType expectedType, String source, String expName, String target, String language, String comment) {
 		
 		assertNotNull(filter);
 		
@@ -1366,7 +1406,7 @@ public class CommaSeparatedValuesFilterTest {
 			
 	}
 
-	private Parameters _getParameters() {
+	private Parameters getParameters() {
 		IParameters punk = filter.getParameters();
 		
 		if (punk instanceof Parameters)
@@ -1375,7 +1415,7 @@ public class CommaSeparatedValuesFilterTest {
 			return null;
 	}
 
-	private String _getSkeleton (String fileName) throws UnsupportedEncodingException {
+	private String getSkeleton (String fileName) throws UnsupportedEncodingException {
 		IFilterWriter writer;
 		ByteArrayOutputStream writerBuffer;
 										
@@ -1403,7 +1443,7 @@ public class CommaSeparatedValuesFilterTest {
 		return new String(writerBuffer.toByteArray(), "UTF-16");
 	}
 	
-	private String _streamAsString(InputStream input) throws IOException {
+	private String streamAsString(InputStream input) throws IOException {
 		BufferedReader reader = null;
 		reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 

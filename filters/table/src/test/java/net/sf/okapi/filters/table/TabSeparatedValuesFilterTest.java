@@ -73,60 +73,6 @@ public class TabSeparatedValuesFilterTest {
 		testDriver.setShowSkeleton(true);
         root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt"); // maven
 	}
-
-	
-//	@Test
-//	public void testSplit() {
-//		
-////		String st1 = "hello <b>world</b>";
-////		String[] chunks1 = st1.split("(<[^>]*>)");  // Returns ["hello ","<b>","world","</b>",""] 
-//		
-//		//String line = "a1\t\ta2\t\ta3\ta4\t\t\t";
-//		String line = "abc\td";
-//		
-//		ArrayList<String> chunks = new ArrayList<String>();
-//				
-//		int start = -1;
-//		int prevStart = -1;
-//		
-//		for (int i = 0; i < line.length(); i++) {
-//						
-//			if (start > -1 && line.charAt(i) < ' ') {
-//				if (prevStart > -1)
-//					chunks.add(line.substring(prevStart, start));
-//				
-//				prevStart = start;
-//				start = -1;
-//				continue;
-//			}
-//			
-//			if (start == -1 && line.charAt(i) > ' ') {
-//				start = i;
-//			}						
-//		}
-//		
-//		if (start == -1) start = line.length();
-//		
-//		if (prevStart > -1 && start > -1)
-//			chunks.add(line.substring(prevStart, start));
-//		
-//		if (start < line.length()) {
-//			chunks.add(line.substring(start, line.length()));
-//		}
-//			
-//		
-////		//String st2 = "a1,a2,a3,a4";
-////		
-////		String[] chunks1 = st1.split("\t+");
-//		//String[] chunks2 = st2.split(",");
-//		
-//		System.out.println(chunks.size());
-//		//System.out.println(chunks2.length);
-//		for (String st : chunks) {
-//			System.out.println("\"" + st + "\"");
-//		}
-//	}
-	
 	
 	@Test
 	public void testFileEvents() {
@@ -143,39 +89,39 @@ public class TabSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 0, 1);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 0, 2);
-		_testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 0, 3);
-		_testEvent(EventType.TEXT_UNIT, "FieldName4", 1, 0, 4);	// Quotes remain part of the value
-		_testEvent(EventType.TEXT_UNIT, "FieldName5", 1, 0, 5);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "FieldName1", 1, 0, 1);
+		testEvent(EventType.TEXT_UNIT, "Field Name 2", 1, 0, 2);
+		testEvent(EventType.TEXT_UNIT, "Field Name 3", 1, 0, 3);
+		testEvent(EventType.TEXT_UNIT, "FieldName4", 1, 0, 4);	// Quotes remain part of the value
+		testEvent(EventType.TEXT_UNIT, "FieldName5", 1, 0, 5);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value11", 2, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value12", 2, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value13", 2, 1, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value14", 2, 1, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value15", 2, 1, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value11", 2, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Value12", 2, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Value13", 2, 1, 3);
+		testEvent(EventType.TEXT_UNIT, "Value14", 2, 1, 4);
+		testEvent(EventType.TEXT_UNIT, "Value15", 2, 1, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 3, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 3, 2, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 3, 2, 3);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 3, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Value22", 3, 2, 2);
+		testEvent(EventType.TEXT_UNIT, "Value23", 3, 2, 3);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value31", 4, 3, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value32", 4, 3, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value33", 4, 3, 3);
-		_testEvent(EventType.TEXT_UNIT, "Value34", 4, 3, 4);
-		_testEvent(EventType.TEXT_UNIT, "Value35", 4, 3, 5);				
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value31", 4, 3, 1);
+		testEvent(EventType.TEXT_UNIT, "Value32", 4, 3, 2);
+		testEvent(EventType.TEXT_UNIT, "Value33", 4, 3, 3);
+		testEvent(EventType.TEXT_UNIT, "Value34", 4, 3, 4);
+		testEvent(EventType.TEXT_UNIT, "Value35", 4, 3, 5);				
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -185,13 +131,13 @@ public class TabSeparatedValuesFilterTest {
 		input = TableFilterTest.class.getResourceAsStream("/csv_test9.txt");
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 				
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 					
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2);
-		_testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Value21", 3, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Value22", 3, 1, 2);
+		testEvent(EventType.TEXT_UNIT, "Value23", 3, 1, 3);
+		testEvent(EventType.END_GROUP, null);
 				
 		filter.close();
 		
@@ -212,24 +158,24 @@ public class TabSeparatedValuesFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 						
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source", 1, 0, 1);
-		_testEvent(EventType.TEXT_UNIT, "Target", 1, 0, 2);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source", 1, 0, 1);
+		testEvent(EventType.TEXT_UNIT, "Target", 1, 0, 2);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 1", 2, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Target text 1", 2, 1, 2);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 1", 2, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Target text 1", 2, 1, 2);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 2", 3, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Target text 2", 3, 2, 2);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 2", 3, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Target text 2", 3, 2, 2);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -239,17 +185,17 @@ public class TabSeparatedValuesFilterTest {
 		input = TableFilterTest.class.getResourceAsStream("/TSV_test.txt");
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 				
-		_testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
 					
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 1", 2, 1, 1);
-		_testEvent(EventType.TEXT_UNIT, "Target text 1", 2, 1, 2);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 1", 2, 1, 1);
+		testEvent(EventType.TEXT_UNIT, "Target text 1", 2, 1, 2);
+		testEvent(EventType.END_GROUP, null);
 		
-		_testEvent(EventType.START_GROUP, null);
-		_testEvent(EventType.TEXT_UNIT, "Source text 2", 3, 2, 1);
-		_testEvent(EventType.TEXT_UNIT, "Target text 2", 3, 2, 2);
-		_testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Source text 2", 3, 2, 1);
+		testEvent(EventType.TEXT_UNIT, "Target text 2", 3, 2, 2);
+		testEvent(EventType.END_GROUP, null);
 				
 		filter.close();
 		
@@ -262,14 +208,14 @@ public class TabSeparatedValuesFilterTest {
 		String expected = null;
 		
 		try {
-			st = _getSkeleton(_getFullFileName("csv_test9.txt"));
+			st = getSkeleton(getFullFileName("csv_test9.txt"));
 		} 
 		catch (UnsupportedEncodingException e) {
 		}	
 //debug		System.out.println(String.format("Skeleton of %s\n---\n", "csv_test9.txt") + st + "\n----------");
 		
 		try {
-			expected = _streamAsString(TabSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test9.txt"));			
+			expected = streamAsString(TabSeparatedValuesFilterTest.class.getResourceAsStream("/csv_test9.txt"));			
 		} 
 		catch (IOException e) {
 		}
@@ -293,14 +239,14 @@ public class TabSeparatedValuesFilterTest {
 
 
 // Helpers
-	private String _getFullFileName(String fileName) {
+	private String getFullFileName(String fileName) {
 //m		URL url = TableFilterTest.class.getResource("/csv_test9.txt");
 //m		String root = Util.getDirectoryName(url.getPath());
 //m		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 
-	private void _testEvent(EventType expectedType, String expectedText) {
+	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -329,7 +275,7 @@ public class TabSeparatedValuesFilterTest {
 		}
 	}
 
-	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, int expCol) {
+	private void testEvent(EventType expectedType, String expectedText, int expectedLineNum, int expRow, int expCol) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -378,7 +324,7 @@ public class TabSeparatedValuesFilterTest {
 		}
 	}
 
-	private String _getSkeleton (String fileName) throws UnsupportedEncodingException {
+	private String getSkeleton (String fileName) throws UnsupportedEncodingException {
 		IFilterWriter writer;
 		ByteArrayOutputStream writerBuffer;
 										
@@ -406,7 +352,7 @@ public class TabSeparatedValuesFilterTest {
 		return new String(writerBuffer.toByteArray(), "UTF-16");
 	}
 	
-	private String _streamAsString(InputStream input) throws IOException {
+	private String streamAsString(InputStream input) throws IOException {
 		BufferedReader reader = null;
 		reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
 

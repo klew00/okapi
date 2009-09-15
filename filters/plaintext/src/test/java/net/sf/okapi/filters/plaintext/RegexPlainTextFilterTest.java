@@ -189,9 +189,9 @@ public class RegexPlainTextFilterTest {
 		// Test the parameters are loaded into the internal regex and compiled
 		filter.open(new RawDocument("Line 1/r/nLine2 Test rule", "UTF-8", "en"), true);
 		
-		_testEvent(EventType.START_DOCUMENT, "");
-		_testEvent(EventType.DOCUMENT_PART, "Line 1/r/nLine2 ");
-		_testEvent(EventType.TEXT_UNIT, "rule"); 
+		testEvent(EventType.START_DOCUMENT, "");
+		testEvent(EventType.DOCUMENT_PART, "Line 1/r/nLine2 ");
+		testEvent(EventType.TEXT_UNIT, "rule"); 
 		
 		params.rule = "(a*+)";
 		params.sourceGroup = 1;
@@ -258,16 +258,16 @@ public class RegexPlainTextFilterTest {
 	
 	@Test
 	public void testFiles() {
-		_testFile("cr.txt", false);
-		_testFile("crlf_end.txt", true);
-		_testFile("crlf.txt", false);
-		_testFile("crlfcrlf_end.txt", true);
-		_testFile("crlfcrlf.txt", false);
-		_testFile("lf.txt", false);
-		_testFile("mixture.txt", true);
-		_testFile("u0085.txt", false);
-		_testFile("u2028.txt", false);
-		_testFile("u2029.txt", false);		
+		testFile("cr.txt", false);
+		testFile("crlf_end.txt", true);
+		testFile("crlf.txt", false);
+		testFile("crlfcrlf_end.txt", true);
+		testFile("crlfcrlf.txt", false);
+		testFile("lf.txt", false);
+		testFile("mixture.txt", true);
+		testFile("u0085.txt", false);
+		testFile("u2028.txt", false);
+		testFile("u2029.txt", false);		
 	}
 			
 	@Test
@@ -294,7 +294,7 @@ public class RegexPlainTextFilterTest {
 	
 // Helpers
 	
-	private void _testFile(String filename, boolean emptyTail) {
+	private void testFile(String filename, boolean emptyTail) {
 		testDriver.setDisplayLevel(0);
 		
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
@@ -302,16 +302,16 @@ public class RegexPlainTextFilterTest {
 		
 		filter.open(new RawDocument(input, "UTF-8", "en"));
 		
-		_testEvent(EventType.START_DOCUMENT, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 1", 1);
-		_testEvent(EventType.DOCUMENT_PART, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 2", 2);
-		_testEvent(EventType.DOCUMENT_PART, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 3", 3);
-		_testEvent(EventType.DOCUMENT_PART, null);
-		_testEvent(EventType.TEXT_UNIT, "Line 4", 4);
-		if (emptyTail) _testEvent(EventType.DOCUMENT_PART, null);
-		_testEvent(EventType.END_DOCUMENT, null);
+		testEvent(EventType.START_DOCUMENT, null);
+		testEvent(EventType.TEXT_UNIT, "Line 1", 1);
+		testEvent(EventType.DOCUMENT_PART, null);
+		testEvent(EventType.TEXT_UNIT, "Line 2", 2);
+		testEvent(EventType.DOCUMENT_PART, null);
+		testEvent(EventType.TEXT_UNIT, "Line 3", 3);
+		testEvent(EventType.DOCUMENT_PART, null);
+		testEvent(EventType.TEXT_UNIT, "Line 4", 4);
+		if (emptyTail) testEvent(EventType.DOCUMENT_PART, null);
+		testEvent(EventType.END_DOCUMENT, null);
 		
 		filter.close();
 		
@@ -325,7 +325,7 @@ public class RegexPlainTextFilterTest {
 		filter.close();
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText) {
+	private void testEvent(EventType expectedType, String expectedText) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		
@@ -354,7 +354,7 @@ public class RegexPlainTextFilterTest {
 		}
 	}
 	
-	private void _testEvent(EventType expectedType, String expectedText, int expectedLineNum) {
+	private void testEvent(EventType expectedType, String expectedText, int expectedLineNum) {
 		assertNotNull(filter);
 		
 		Event event = filter.next();		

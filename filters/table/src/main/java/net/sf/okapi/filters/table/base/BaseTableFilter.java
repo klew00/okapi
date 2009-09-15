@@ -259,16 +259,12 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				TextUnit cell = cells.get(i);
 				int colNumber = i + 1;
 				
-				//if (Util.isEmpty(cell, true)) continue;
 				if (TextUnitUtils.isEmpty(cell, true)) {  // only spaces, no translatable text
 					
 					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
 					continue;
 				}					
 								
-//				TextUnit tu = new TextUnit("", cell);
-//				if (tu == null) continue;
-
 				cell.setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(lineNum), true));				
 				cell.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
 				cell.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
@@ -280,38 +276,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		
 		// Send only listed cells (id, source, target, comment)
 		else if (sendListedMode) {
-		
-//			if (tuCache == null) return false;			
-//			tuCache.clear();
-			
-//			// Create text units for source cells			
-//			for (int i = 0; i < cells.size(); i++)	{
-//				
-//				TextUnit cell = cells.get(i);
-//				if (TextUnitUtils.isEmpty(cell, true)) { // no translatable text, possibly spaces
-//					
-//					//tuCache.add(null);
-//					//tuCache.add(cell);
-//					continue;
-//				}
-//			
-//				int colNumber = i + 1;
-//				if (isSource(colNumber)) {
-//			
-//					//TextUnit tu = new TextUnit("", cell);
-//					//tuCache.add(cell);
-//					
-//					if (cell == null) continue;
-//
-//					cell.setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(lineNum), true));				
-//					cell.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
-//					cell.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
-//				}
-//				//else
-//					//tuCache.add(null);
-//					//tuCache.add(cell);
-//			}
-					
+							
 			// Add content of other columns to the created sources
 			for (int i = 0; i < cells.size(); i++)	{
 				
@@ -319,12 +284,8 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				String trimmedCell = preProcessCell(Util.trim(TextUnitUtils.getSourceText(cell)));
 				
 				int colNumber = i + 1;
-//				boolean isRecognized = false;
 				
 				if (isSourceId(colNumber)) {
-					
-//					isRecognized = true;
-//					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
 					
 					TextUnit tu = getSourceFromIdRef(cells, colNumber);
 					if (tu == null) continue;										
@@ -350,46 +311,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					continue;
 				}
 				
-				if (isTarget(colNumber)) {
-					
-//					isRecognized = true;
-					
-					TextUnit tu = getSourceFromTargetRef(cells, colNumber);
-					if (tu == null) {
-						
-//						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
-						continue;
-					}
-					
-					String language = getLanguageFromTargetRef(colNumber);
-					if (Util.isEmpty(language)) {
-						
-//						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
-						continue;
-					}
-					
-//					TextContainer trg = new TextContainer(TextUnitUtils.getSourceText(cell));					
-//					tu.setTarget(language, trg);
-					
-//					// Do not add to the TU's skeleton as it might be sent before or later
-//					GenericSkeleton skel = new GenericSkeleton();
-//					
-//					TextUnitUtils.trimLeading(trg, skel);
-//					skel.addContentPlaceholder(tu, language);
-//					TextUnitUtils.trimTrailing(trg, skel);
-//					
-//					sendSkeletonPart(skel);										
-					
-					//sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
-//					sendTargetCell(cell, tu, getActiveSkeleton(), language, colNumber, cells.size());
-					
-					continue;
-				}
-				
 				if (isComment(colNumber)) {
-					
-//					isRecognized = true;
-//					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
 					
 					TextUnit tu = getSourceFromCommentRef(cells, colNumber);
 					if (tu == null) continue;
@@ -402,32 +324,14 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				
 				if (isSource(colNumber)) {
 					
-//					isRecognized = true;
-					
 					if (cell == null) continue;
 
 					cell.setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(lineNum), true));				
 					cell.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
 					cell.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
 					
-//					TextUnit tu = getFromTuCache(i);
-//					if (tu == null) continue;
-					
-					// After sending a cell it's still accessible for modifications (the cell is not cloned for the queue), so no additional loop is needed
-					//if (!sendCell(tu, colNumber, cells.size())) {
-//					if (!sendSourceCell(cell, colNumber, cells.size())) {
-//						
-//						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
-//						continue; 
-//					}
-//					tuSent = true;
-					
 					continue;
-				}
-				
-				// Unknown type goes to the skeleton 
-//				if (!isRecognized)
-//					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+				}				
 			}
 			
 			// Send cells (OKAPI-A 7*)
