@@ -20,68 +20,21 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 
 package net.sf.okapi.tm.pensieve.tmx;
 
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
-import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
-import net.sf.okapi.tm.pensieve.writer.TmWriter;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import net.sf.okapi.common.resource.Property;
 
 /**
  * Used to interact with the Okapi Standards for TMX. For example, the property names and default fields stored.
  */
 public class OkapiTmxHandler implements TmxHandler {
-
-    private String sourceLang;
-    IFilter tmxFilter;
-
-    /**
-     * Creates an instance of OkapiTMXHandler
-     * @param sourceLang The language to import as the source language
-     * @param tmxFilter The IFilter to use to parse the TMX
-     */
-    public OkapiTmxHandler(String sourceLang, IFilter tmxFilter) {
-        this.tmxFilter = tmxFilter;
-        this.sourceLang = sourceLang;
-        if (Util.isEmpty(sourceLang)) {
-            throw new IllegalArgumentException("sourceLang must be set");
-        }
-        if (tmxFilter == null) {
-            throw new IllegalArgumentException("filter must be set");
-        }
-    }
-
-    /**
-     * Imports TMX to Pensieve
-     * @param tmxUri The location of the TMX
-     * @param targetLang The target language to index
-     * @param tmWriter The TMWriter to use when writing to the TM
-     * @throws IOException if there was a problem with the TMX import
-     */
-    public void importTmx(URI tmxUri, String targetLang, TmWriter tmWriter) throws IOException {
-        checkImportTmxParams(tmxUri, targetLang, tmWriter);
-        try {
-            tmxFilter.open(new RawDocument(tmxUri, null, sourceLang, targetLang));
-            while (tmxFilter.hasNext()) {
-                Event event = tmxFilter.next();
-                indexEvent(targetLang, tmWriter, event);
-            }
-        } finally {
-            tmxFilter.close();
-            tmWriter.endIndex();
-        }
-    }
 
     /**
      * Exports Pensieve to TMX
@@ -120,18 +73,6 @@ public class OkapiTmxHandler implements TmxHandler {
         }
     }
 
-    private void checkImportTmxParams(URI tmxUri, String targetLang, TmWriter tmWriter) {
-        if (Util.isEmpty(targetLang)) {
-            throw new IllegalArgumentException("targetLang was not set");
-        }
-        if (tmxUri == null) {
-            throw new IllegalArgumentException("tmxUri was not set");
-        }
-        if (tmWriter == null) {
-            throw new IllegalArgumentException("tmWriter was not set");
-        }
-    }
-
     private void checkExportTmxParams(URI tmxUri, TmSeeker tmSeeker, TMXWriter tmxWriter) {
         if (tmxUri == null) {
             throw new IllegalArgumentException("tmxUri was not set");
@@ -144,11 +85,4 @@ public class OkapiTmxHandler implements TmxHandler {
         }
     }
 
-    private void indexEvent(String targetLang, TmWriter tmWriter, Event event) throws IOException {
-        TranslationUnit tu;
-        if (event.getEventType() == EventType.TEXT_UNIT) {
-            tu = PensieveUtil.convertTranslationUnit(sourceLang, targetLang, (TextUnit) event.getResource());
-            tmWriter.indexTranslationUnit(tu);
-        }
-    }
 }

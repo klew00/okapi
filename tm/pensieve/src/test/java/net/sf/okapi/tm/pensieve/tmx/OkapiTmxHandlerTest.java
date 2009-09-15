@@ -19,44 +19,31 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 package net.sf.okapi.tm.pensieve.tmx;
 
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.Helper;
-import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
-import net.sf.okapi.tm.pensieve.writer.TmWriter;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import static org.mockito.Mockito.*;
-
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import net.sf.okapi.common.filterwriter.TMXWriter;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Dax
  */
 public class OkapiTmxHandlerTest {
 
-    private URI sampleTMX;
+    URI sampleTMX;
     OkapiTmxHandler handler;
-    StubTmWriter stubTmWriter;
-    IFilter mockFilter;
     TMXWriter mockTmxWriter;
-    //    StubTmxWriter stubTmxWriter;
     TmSeeker mockSeeker;
     List<TranslationUnit> tus;
 
@@ -64,32 +51,14 @@ public class OkapiTmxHandlerTest {
     public void setUp() throws URISyntaxException, IOException {
         mockTmxWriter = mock(TMXWriter.class);
 
-        String[][] properties = {{"tuid", "helloid"},
-            {"datatype", "plaintext"},
-            {"Txt::FileName", "StringInfoForTest3.info"},
-            {"Txt::GroupName", "APCCalibrateTimeoutAction0"}
-        };
-        mockFilter = mock(IFilter.class);
-        when(mockFilter.hasNext())
-                .thenReturn(true)
-                .thenReturn(true)
-                .thenReturn(true)
-                .thenReturn(false);
-        when(mockFilter.next())
-                .thenReturn(createEvent("1", "hello", "ciao", "IT", properties))
-                .thenReturn(createEvent("2", "world", "mondo", "IT", null))
-                .thenReturn(new Event(EventType.DOCUMENT_PART, new TextUnit("holy cow")));
-
         sampleTMX = new URI("test.tmx");
-        handler = new OkapiTmxHandler("EN", mockFilter);
+        handler = new OkapiTmxHandler();
 
-        stubTmWriter = new StubTmWriter();
         mockSeeker = mock(TmSeeker.class);
         tus = new LinkedList<TranslationUnit>();
         tus.add(Helper.createTU("EN", "FR", "source", "target", "sourceid"));
         tus.add(Helper.createTU("EN", "FR", "source2", "target2", "sourceid2"));
         when(mockSeeker.getAllTranslationUnits()).thenReturn(tus);
-//        stubTmxWriter = new StubTmxWriter(new XMLWriter(new StringWriter()));
     }
 
     @Test
@@ -144,204 +113,4 @@ public class OkapiTmxHandlerTest {
         }
         assertEquals("Error message", "tmxWriter was not set", errMsg);
     }
-     
-    @Test
-    public void importTMXMetadataWithData() throws IOException {
-        handler.importTmx(sampleTMX, "IT", stubTmWriter);
-        assertEquals("ID", "helloid", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.ID));
-        assertEquals("TYPE", "plaintext", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.TYPE));
-        assertEquals("FILE_NAME", "StringInfoForTest3.info", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.FILE_NAME));
-        assertEquals("GROUP_NAME", "APCCalibrateTimeoutAction0", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.GROUP_NAME));
-        assertEquals("# of metadata", 0, stubTmWriter.tus.get(1).getMetadata().size());
-    }
-
-    @Test
-    public void importTMXMetadataWithoutData() throws IOException {
-        handler.importTmx(sampleTMX, "IT", stubTmWriter);
-        assertEquals("# of metadata", 0, stubTmWriter.tus.get(1).getMetadata().size());
-    }
-
-    @Test
-    public void importTmxNullFile() throws IOException {
-        String errMsg = null;
-        try {
-            handler.importTmx(null, "FR", stubTmWriter);
-        } catch (IllegalArgumentException iae) {
-            errMsg = iae.getMessage();
-        }
-        assertEquals("Error message", "tmxUri was not set", errMsg);
-    }
-
-    @Test
-    public void constructorEmptySourceLang() {
-        String errMsg = null;
-        try {
-            new OkapiTmxHandler("", mockFilter);
-        } catch (IllegalArgumentException iae) {
-            errMsg = iae.getMessage();
-        }
-        assertEquals("Error message", "sourceLang must be set", errMsg);
-    }
-
-    @Test
-    public void constructorEmptyFilter() {
-        String errMsg = null;
-        try {
-            new OkapiTmxHandler("EN", null);
-        } catch (IllegalArgumentException iae) {
-            errMsg = iae.getMessage();
-        }
-        assertEquals("Error message", "filter must be set", errMsg);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void importTMXEmptyTargetLang() throws IOException {
-        handler.importTmx(sampleTMX, "", new StubTmWriter());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void importTMXNullTargetLang() throws IOException {
-        handler.importTmx(sampleTMX, null, new StubTmWriter());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void importTMXNullTMWriter() throws IOException {
-        handler.importTmx(sampleTMX, "FR", null);
-    }
-
-    @Test
-    public void tUCount_ExistingLang() throws IOException {
-        handler.importTmx(sampleTMX, "IT", stubTmWriter);
-        assertEquals("number of TUs", 2, stubTmWriter.tus.size());
-    }
-
-    @Test
-    public void tUCount_NonExistingLang() throws IOException {
-        handler.importTmx(sampleTMX, "FR", stubTmWriter);
-        assertEquals("number of TUs", 2, stubTmWriter.tus.size());
-        assertNull("targets content should be null", stubTmWriter.tus.get(0).getTarget().getContent());
-        assertEquals("target lang", "FR", stubTmWriter.tus.get(0).getTarget().getLang());
-    }
-
-    @Test
-    public void sourceAndTargetForExistingLang() throws IOException {
-        handler.importTmx(sampleTMX, "IT", stubTmWriter);
-        assertEquals("first match source", "hello", stubTmWriter.tus.get(0).getSource().getContent().toString());
-        assertEquals("first match target", "ciao", stubTmWriter.tus.get(0).getTarget().getContent().toString());
-    }
-
-    @Test
-    public void sourceAndTargetForNonExistingLang() throws IOException {
-        handler.importTmx(sampleTMX, "FR", stubTmWriter);
-        assertEquals("first match source", "hello",
-                stubTmWriter.tus.get(0).getSource().getContent().toString());
-        assertNull("target for non-existant language should be null",
-                stubTmWriter.tus.get(0).getTarget().getContent());
-    }
-
-    //An example of a Stub. I will likely change this to a Mock later
-    @Test
-    public void importTMXDocCount() throws IOException {
-        StubTmWriter tmWriter = new StubTmWriter();
-        handler.importTmx(sampleTMX, "EN", tmWriter);
-        assertEquals("entries indexed", 2, tmWriter.tus.size());
-    }
-
-    private Event createEvent(String id, String source, String target, String targetLang, String[][] properties) {
-        TextUnit tu = new TextUnit(id, source);
-        tu.setTargetContent(targetLang, new TextFragment(target));
-        //populate properties
-        if (properties != null) {
-            for (String[] prop : properties) {
-                tu.setProperty(new Property(prop[0], prop[1]));
-            }
-        }
-        return new Event(EventType.TEXT_UNIT, tu);
-    }
-
-    public class StubTmWriter implements TmWriter {
-
-        protected boolean endIndexCalled = false;
-        protected List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
-
-        public void endIndex() throws IOException {
-        }
-
-        public void indexTranslationUnit(TranslationUnit tu) throws IOException {
-            tus.add(tu);
-        }
-
-        public void delete(String id) throws IOException {
-        }
-
-        public void update(TranslationUnit tu) throws IOException {
-        }
-    }
-
- /*
-    public class StubTmxWriter extends TMXWriter {
-
-        private String path;
-        private String sourceLanguage;
-        private String targetLanguage;
-        private String creationTool;
-        private String creationToolVersion;
-        private String segType;
-        private String originalTMFormat;
-        private String dataType;
-        private Boolean closed;
-        private Boolean startWritten;
-        private Boolean endWritten;
-        private List<TextUnit> textUnits;
-        private List<Map<String, String>> attributes;
-        private XMLWriter writer;
-
-        public StubTmxWriter(){}
-
-        public StubTmxWriter(XMLWriter writer) {
-            this.writer = writer;
-            path = "";
-            sourceLanguage = "";
-            targetLanguage = "";
-            creationTool = "";
-            creationToolVersion = "";
-            segType = "";
-            originalTMFormat = "";
-            dataType = "";
-            closed = false;
-            startWritten = false;
-            endWritten = false;
-            textUnits = new ArrayList<TextUnit>();
-            attributes = new ArrayList<Map<String, String>>();
-        }
-
-        @Override
-        public void close() {
-            closed = true;
-        }
-
-        @Override
-        public void writeEndDocument() {
-            endWritten = true;
-        }
-
-        @Override
-        public void writeItem(TextUnit item, Map<String, String> attributes) {
-            textUnits.add(item);
-            this.attributes.add(attributes);
-        }
-
-        @Override
-        public void writeStartDocument(String sourceLanguage, String targetLanguage, String creationTool, String creationToolVersion, String segType, String originalTMFormat, String dataType) {
-            startWritten = true;
-            this.sourceLanguage = sourceLanguage;
-            this.targetLanguage = targetLanguage;
-            this.creationTool = creationTool;
-            this.creationToolVersion = creationToolVersion;
-            this.segType = segType;
-            this.originalTMFormat = originalTMFormat;
-            this.dataType = dataType;
-        }
-    }
-    */
 }
