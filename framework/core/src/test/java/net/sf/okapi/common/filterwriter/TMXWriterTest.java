@@ -19,14 +19,16 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 package net.sf.okapi.common.filterwriter;
 
+import static net.sf.okapi.common.TestUtil.getFileAsString;
+import net.sf.okapi.common.XMLWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import net.sf.okapi.common.XMLWriter;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
-import static net.sf.okapi.common.TestUtil.*;
 
 /**
  *
@@ -37,15 +39,15 @@ public class TMXWriterTest {
     final static File TMX_File = new File("target/test-classes/tmxwritertest_tmxfile.tmx");
     TMXWriter tmxWriter;
 
+    @SuppressWarnings({"ResultOfMethodCallIgnored"})
     @Before
     public void setUp() {
         TMX_File.delete();
-        tmxWriter = new TMXWriter();
-        tmxWriter.create(TMX_File.getPath());
+        tmxWriter = new TMXWriter(TMX_File.getPath());
     }
 
     @Test
-    public void createStringPath() {
+    public void constructorStringPath() {
         assertTrue("tmx file should have been created", TMX_File.exists());
     }
 
@@ -57,11 +59,10 @@ public class TMXWriterTest {
     }
 
     @Test
-    public void createWithXmlWriter() {
+    public void constructorWithXmlWriter() {
         StringWriter strWriter = new StringWriter();
-        XMLWriter xmlWriter = new XMLWriter();
-        xmlWriter.create(strWriter);
-        tmxWriter.create(xmlWriter);
+        XMLWriter xmlWriter = new XMLWriter(strWriter);
+        tmxWriter = new TMXWriter(xmlWriter);
         createTmxHeader();
         String tmx = strWriter.toString();
         testHeader(tmx);

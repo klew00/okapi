@@ -50,9 +50,9 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 	}
 	
 	public void write (IPipeline pipeline) {
-		XMLWriter writer = new XMLWriter();
+		XMLWriter writer = null;
 		try {
-			writer.create(path);
+			writer = new XMLWriter(path);
 			writer.writeStartDocument();
 			writer.writeStartElement("rainbowPipeline");
 			writer.writeAttributeString("version", "1");

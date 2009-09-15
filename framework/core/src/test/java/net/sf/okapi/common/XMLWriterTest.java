@@ -38,36 +38,26 @@ public class XMLWriterTest {
 
     @Before
     public void setUp(){
-        writer = new XMLWriter();
         sWriter = new StringWriter();
-        writer.create(sWriter);
+        writer = new XMLWriter(sWriter);
     }
 
     //TODO: possibly move out into integration test since it touches the file system. For now it is still fast.
     @Test
-    public void createWithPath() throws IOException {
+    public void constructorWithPath() throws IOException {
         final String filename = "target/test-classes/some/dir/to/be/created/some.xml";
-        writer.create(filename);
+        writer = new XMLWriter(filename);
         File f = new File(filename);
         assertTrue("A file should have been created along with the directory structure", f.exists());
         writer.writeStartDocument();
         writer.close();
         String xml = getFileAsString(f);
         assertEquals("writer's contents", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", xml.trim());
-        assertTrue(f.delete());
+        assertTrue("Could not delete file " + f.getPath(), f.delete());
     }
 
     @Test
-    public void createWithWriter(){
-        final StringWriter sWriter = new StringWriter();
-        writer.create(sWriter);
-        writer.writeStartDocument();
-        assertEquals("writer's contents", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", sWriter.toString().trim());
-
-    }
-
-    @Test
-    public void createNoParams(){
+    public void constructorWithWriter(){
         assertEquals("writer's contents", "", sWriter.toString());
     }
 

@@ -20,8 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.packages.xliff;
 
-import java.io.File;
-
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Event;
@@ -29,13 +27,9 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
-import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.*;
+
+import java.io.File;
 
 /**
  * Implements IWriter for generic XLIFF translation packages.
@@ -121,11 +115,9 @@ public class Writer extends BaseWriter {
 		relativeWorkPath += EXTENSION;
 		super.createOutput(docID, relativeSourcePath, relativeTargetPath,
 			sourceEncoding, targetEncoding, filtersettings, filterParams);
-		if ( writer == null ) writer = new XMLWriter();
-		else writer.close(); // Else: make sure the previous output is closed
-
-		writer.create(manifest.getRoot() + File.separator
-			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
+        close();
+		writer = new XMLWriter(manifest.getRoot() + File.separator
+			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator))
 			+ relativeWorkPath);
 	}
 

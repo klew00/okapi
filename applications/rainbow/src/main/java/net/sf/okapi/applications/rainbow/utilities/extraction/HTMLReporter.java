@@ -36,8 +36,7 @@ class HTMLReporter implements IAnalysisReporter {
 	private String docPath;
 
 	public void create (String path) {
-		writer = new XMLWriter();
-		writer.create(path);
+		writer = new XMLWriter(path);
 		writer.writeStartDocument();
 		writer.writeStartElement("html");
 		writer.writeStartElement("head");

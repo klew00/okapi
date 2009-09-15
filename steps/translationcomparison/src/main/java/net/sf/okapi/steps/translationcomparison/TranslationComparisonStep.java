@@ -78,7 +78,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 
 	@Override
 	public void setParameters (IParameters params) {
-		params = (Parameters)params;
+		this.params = (Parameters)params;
 	}
  
 	@Override
@@ -140,7 +140,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
     		writer.writeElementString("p", String.format("", itemCount));
     		if ( itemCount > 0 ) {
     			writer.writeElementString("p", String.format("Number of items = %d. Average score = %.2f",
-    				itemCount, (float)((float)scoreTotal / itemCount)));
+    				itemCount, (float)scoreTotal / itemCount));
     		}
 			writer.writeEndElement(); // body
 			writer.writeEndElement(); // html
@@ -244,12 +244,11 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		matcher = new TextMatcher(trgLang, trgLang);
 		
 		if ( params.isGenerateHTML() ) {
-			writer = new XMLWriter();
+			writer = new XMLWriter(getOutputFilename());
 		}
 		// Start TMX writer (one for all input documents)
 		if ( params.isGenerateTMX() ) {
-			tmx = new TMXWriter();
-			tmx.create(params.getTmxPath()); //.replace(VAR_PROJDIR, projectDir));
+			tmx = new TMXWriter(params.getTmxPath());
 			tmx.writeStartDocument(getContext().getSourceLanguage(0), trgLang,
 				getClass().getName(), null, null, null, null);
 		}
@@ -264,6 +263,10 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		initDone = true;
 	}
 
+    private String getOutputFilename(){
+       return getContext().getRawDocument(1).getInputURI().getPath() + ".html"; //$NON-NLS-1$
+    }
+
 	private void initializeDocumentData () {
 		// Initialize the filter to read the translation to compare
 		inputToCompare = getContext().getFilterConfigurationMapper().createFilter(
@@ -276,12 +279,11 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		if ( writer != null ) writer.close();
 		if ( params.isGenerateHTML() ) {
 			// Use the to-compare file for the output name
-			String outPath = getContext().getRawDocument(1).getInputURI().getPath() + ".html"; //$NON-NLS-1$
 			if ( pathToOpen == null ) {
 				pathToOpen = getContext().getRawDocument(1).getInputURI().toString();
 				pathToOpen += ".html";
 			}
-			writer.create(outPath); //$NON-NLS-1$
+			writer = new XMLWriter(getOutputFilename()); //$NON-NLS-1$
 			writer.writeStartDocument();
 			writer.writeStartElement("html"); //$NON-NLS-1$
 			writer.writeStartElement("head"); //$NON-NLS-1$

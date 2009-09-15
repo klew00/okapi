@@ -38,8 +38,9 @@ public class XMLWriter {
 
     private PrintWriter writer = null;
     private boolean inStartTag;
-    private Stack<String> elements;
+    private Stack<String> elements = new Stack<String>();
     private final String lineBreak = System.getProperty("line.separator");
+
 
     /**
      * Creates a new XML document on disk.
@@ -48,12 +49,12 @@ public class XMLWriter {
      * always written in UTF-8 and the type of line-breaks is the one of the
      * platform where the application runs.
      */
-    public void create(String path) {
+    public XMLWriter(String path) {
         try {
             Util.createDirectories(path);
             OutputStream output = new BufferedOutputStream(new FileOutputStream(path));
             Charset charset = Charset.forName("UTF-8");
-            create(new OutputStreamWriter(output, charset.newEncoder()));
+            writer = new PrintWriter(new OutputStreamWriter(output, charset.newEncoder()));
         } catch (IOException e) {
             throw new OkapiIOException(e);
         }
@@ -63,10 +64,8 @@ public class XMLWriter {
      * Creates a new XML document for a given writer object.
      * @param writer the writer to use to output the document.
      */
-    public void create(Writer writer) {
+    public XMLWriter(Writer writer) {
         this.writer = new PrintWriter(writer);
-        inStartTag = false;
-        elements = new Stack<String>();
     }
 
     /**

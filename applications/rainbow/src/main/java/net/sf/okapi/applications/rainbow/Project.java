@@ -20,22 +20,20 @@
 
 package net.sf.okapi.applications.rainbow;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Hashtable;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.PathBuilder;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.ui.UIUtil;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class Project {
 
@@ -166,8 +164,7 @@ public class Project {
 	{
 		XMLWriter writer = null;
 		try {
-			writer = new XMLWriter();
-			writer.create(newPath);
+			writer = new XMLWriter(newPath);
 			writer.writeStartDocument();
 			writer.writeStartElement("rainbowProject"); //$NON-NLS-1$
 			writer.writeAttributeString("version", "4"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -20,20 +20,14 @@
 
 package net.sf.okapi.applications.tikal;
 
-import java.io.OutputStream;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
-import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.*;
+
+import java.io.OutputStream;
 
 // Temporary writer for XLIFF
 public class XLIFFWriter implements IFilterWriter {
@@ -119,10 +113,9 @@ public class XLIFFWriter implements IFilterWriter {
 	}
 
 	private void processStartDocument (StartDocument resource) {
-		if ( writer == null ) writer = new XMLWriter();
-		else writer.close(); // Else: make sure the previous output is closed
-		
-		writer.create(outputPath);
+		if ( writer != null ) writer.close();
+
+		writer = new XMLWriter(outputPath);
 
 		srcLang = resource.getLanguage();
 		writer.writeStartDocument();

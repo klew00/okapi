@@ -20,14 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.packages.ttx;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.TimeZone;
-
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
 import net.sf.okapi.common.Event;
@@ -37,6 +29,14 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Implements IWriter for TTX-based translation packages.
@@ -108,11 +108,9 @@ public class Writer extends BaseWriter {
 		relativeWorkPath = relativeSourcePath + EXTENSION; 
 		super.createOutput(docID, relativeSourcePath, relativeTargetPath,
 			sourceEncoding, targetEncoding, filterID, filterParams);
-		if ( writer == null ) writer = new XMLWriter();
-		else writer.close(); // Else: make sure the previous output is closed
-		
-		writer.create(manifest.getRoot() + File.separator
-			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
+		close();
+        writer = new XMLWriter(manifest.getRoot() + File.separator
+			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator))
 			+ relativeWorkPath);
 	}
 

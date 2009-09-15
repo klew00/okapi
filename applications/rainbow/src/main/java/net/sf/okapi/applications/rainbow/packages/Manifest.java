@@ -240,8 +240,7 @@ public class Manifest {
 	public void Save () {
 		XMLWriter writer = null;
 		try {
-			writer = new XMLWriter();
-			writer.create(rootFolder + File.separator + "manifest.xml");
+			writer = new XMLWriter(rootFolder + File.separator + "manifest.xml");
 
 			writer.writeStartDocument();
 			writer.writeComment("=================================================================");

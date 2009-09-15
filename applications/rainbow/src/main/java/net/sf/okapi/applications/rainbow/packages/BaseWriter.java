@@ -20,10 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.packages;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
@@ -32,6 +28,10 @@ import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public abstract class BaseWriter implements IWriter {
 
@@ -61,10 +61,6 @@ public abstract class BaseWriter implements IWriter {
 	public BaseWriter () {
 		manifest = new Manifest();
 		manifest.setReaderClass(getReaderClass());
-		tmxWriterApproved = new TMXWriter();
-		tmxWriterUnApproved = new TMXWriter();
-		tmxWriterAlternate = new TMXWriter();
-		tmxWriterLeverage = new TMXWriter();
 	}
 	
 	public void cancel () {
@@ -116,7 +112,7 @@ public abstract class BaseWriter implements IWriter {
 		if ( tmxPathApproved == null ) {
 			tmxPathApproved = manifest.getRoot() + File.separator + "approved.tmx";
 		}
-		tmxWriterApproved.create(tmxPathApproved);
+		tmxWriterApproved = new TMXWriter(tmxPathApproved);
 		tmxWriterApproved.writeStartDocument(manifest.getSourceLanguage(),
 			manifest.getTargetLanguage(), null, null, null, null, null);
 
@@ -124,7 +120,7 @@ public abstract class BaseWriter implements IWriter {
 		if ( tmxPathUnApproved == null ) {
 			tmxPathUnApproved = manifest.getRoot() + File.separator + "unapproved.tmx";
 		}
-		tmxWriterUnApproved.create(tmxPathUnApproved);
+		tmxWriterUnApproved = new TMXWriter(tmxPathUnApproved);
 		tmxWriterUnApproved.writeStartDocument(manifest.getSourceLanguage(),
 			manifest.getTargetLanguage(), null, null, null, null, null);
 
@@ -132,7 +128,7 @@ public abstract class BaseWriter implements IWriter {
 		if ( tmxPathAlternate == null ) {
 			tmxPathAlternate = manifest.getRoot() + File.separator + "alternate.tmx";
 		}
-		tmxWriterAlternate.create(tmxPathAlternate);
+		tmxWriterAlternate = new TMXWriter(tmxPathAlternate);
 		tmxWriterAlternate.writeStartDocument(manifest.getSourceLanguage(),
 			manifest.getTargetLanguage(), null, null, null, null, null);
 
@@ -140,7 +136,7 @@ public abstract class BaseWriter implements IWriter {
 		if ( tmxPathLeverage == null ) {
 			tmxPathLeverage = manifest.getRoot() + File.separator + "leverage.tmx";
 		}
-		tmxWriterLeverage.create(tmxPathLeverage);
+		tmxWriterLeverage = new TMXWriter(tmxPathLeverage);
 		tmxWriterLeverage.writeStartDocument(manifest.getSourceLanguage(),
 			manifest.getTargetLanguage(), null, null, null, null, null);
 	}
@@ -153,6 +149,7 @@ public abstract class BaseWriter implements IWriter {
 			}
 			if ( createZip ) {
 				// Zip the package if needed
+                //TODO: What if manifest is null?
 				Compression.zipDirectory(manifest.getRoot(), manifest.getRoot() + ".zip");
 			}
 	

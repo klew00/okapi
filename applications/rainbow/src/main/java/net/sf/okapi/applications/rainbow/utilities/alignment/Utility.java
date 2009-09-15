@@ -20,10 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.Event;
@@ -38,6 +34,10 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.tm.simpletm.Database;
+
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Utility extends BaseFilterDrivenUtility {
 
@@ -96,9 +96,8 @@ public class Utility extends BaseFilterDrivenUtility {
 				tmxWriter.close();
 				tmxWriter = null;
 			}
-			tmxWriter = new TMXWriter();
-			resolvedTmxPath = params.tmxPath.replace(VAR_PROJDIR, projectDir);
-			tmxWriter.create(resolvedTmxPath);
+            resolvedTmxPath = params.tmxPath.replace(VAR_PROJDIR, projectDir);
+            tmxWriter = new TMXWriter(resolvedTmxPath);
 			tmxWriter.setTradosWorkarounds(params.useTradosWorkarounds);
 			tmxWriter.writeStartDocument(srcLang, trgLang,
 				getName(), null, (params.segment ? "sentence" : "paragraph"),

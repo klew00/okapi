@@ -20,8 +20,6 @@
 
 package net.sf.okapi.applications.rainbow.utilities.transcomparison;
 
-import java.io.File;
-
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -29,12 +27,10 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.*;
 import net.sf.okapi.common.ui.UIUtil;
+
+import java.io.File;
 
 public class Utility extends BaseFilterDrivenUtility {
 
@@ -65,12 +61,11 @@ public class Utility extends BaseFilterDrivenUtility {
 		matcher = new TextMatcher(trgLang, trgLang);
 		
 		if ( params.generateHTML ) {
-			writer = new XMLWriter();
+			writer = new XMLWriter(getInputPath(1) + ".html");
 		}
 		// Start TMX writer (one for all input documents)
 		if ( params.generateTMX ) {
-			tmx = new TMXWriter();
-			tmx.create(params.tmxPath.replace(VAR_PROJDIR, projectDir));
+			tmx = new TMXWriter(params.tmxPath.replace(VAR_PROJDIR, projectDir));
 			tmx.writeStartDocument(srcLang, trgLang, getName(), null, null, null, null);
 		}
 		pathToOpen = null;
@@ -154,7 +149,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( pathToOpen == null ) {
 				pathToOpen = getInputPath(1) + ".html"; //$NON-NLS-1$
 			}
-			writer.create(getInputPath(1) + ".html"); //$NON-NLS-1$
+			writer = new XMLWriter(getInputPath(1) + ".html"); //$NON-NLS-1$
 			writer.writeStartDocument();
 			writer.writeStartElement("html"); //$NON-NLS-1$
 			writer.writeStartElement("head"); //$NON-NLS-1$
@@ -190,7 +185,7 @@ public class Utility extends BaseFilterDrivenUtility {
     		writer.writeElementString("p", String.format("", itemCount));
     		if ( itemCount > 0 ) {
     			writer.writeElementString("p", String.format("Number of items = %d. Average score = %.2f",
-    				itemCount, (float)((float)scoreTotal / itemCount)));
+    				itemCount, (float)scoreTotal / itemCount));
     		}
 			writer.writeEndElement(); // body
 			writer.writeEndElement(); // html

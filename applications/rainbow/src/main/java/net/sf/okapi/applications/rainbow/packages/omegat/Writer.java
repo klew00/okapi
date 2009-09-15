@@ -123,8 +123,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 	private void createOmegaTProject () {
 		XMLWriter XR = null;
 		try {
-			XR = new XMLWriter();
-			XR.create(manifest.getRoot() + File.separator + "omegat.project");
+			XR = new XMLWriter(manifest.getRoot() + File.separator + "omegat.project");
 			XR.writeStartDocument();
 			XR.writeStartElement("omegat");
 			XR.writeStartElement("project");

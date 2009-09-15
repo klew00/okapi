@@ -20,22 +20,12 @@
 
 package net.sf.okapi.lib.segmentation;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
+import net.sf.okapi.common.DefaultEntityResolver;
+import net.sf.okapi.common.NSContextManager;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.resource.TextFragment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -43,12 +33,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import net.sf.okapi.common.DefaultEntityResolver;
-import net.sf.okapi.common.NSContextManager;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.resource.TextFragment;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.regex.Pattern;
 
 /**
  * Provides facilities to load, save, and manage segmentation rules in SRX format.
@@ -623,7 +617,7 @@ public class SRXDocument {
 			throw new SegmentationRuleException("language rule '"+ruleName+"' not found.");
 		}
 		ArrayList<Rule> langRule = langRules.get(ruleName);
-		String pattern = null;
+		String pattern;
 		for ( Rule rule : langRule ) {
 			if ( rule.isActive ) {
 				if ( rule.before.endsWith(NOAUTO)) {
@@ -892,7 +886,7 @@ public class SRXDocument {
 		String tagName,
 		Element elem)
 	{
-		NodeList list = (NodeList)elem.getElementsByTagNameNS(ns, tagName);
+		NodeList list = elem.getElementsByTagNameNS(ns, tagName);
 		if (( list == null ) || ( list.getLength() < 1 )) return null;
 		return (Element)list.item(0);
 	}
@@ -906,9 +900,8 @@ public class SRXDocument {
 	public String saveRulesToString (boolean saveExtensions,
 		boolean saveNonValidInfo)
 	{
-		XMLWriter writer = new XMLWriter();
-		StringWriter strWriter = new StringWriter();
-		writer.create(strWriter);
+        StringWriter strWriter = new StringWriter();
+		XMLWriter writer = new XMLWriter(strWriter);
 		boolean current = modified;
 		saveRules(writer, saveExtensions, saveNonValidInfo);
 		modified = current; // Keep the same state for modified
@@ -926,8 +919,7 @@ public class SRXDocument {
 		boolean saveExtensions,
 		boolean saveNonValidInfo)
 	{
-		XMLWriter writer = new XMLWriter();
-		writer.create(rulesPath);
+		XMLWriter writer = new XMLWriter(rulesPath);
 		saveRules(writer, saveExtensions, saveNonValidInfo);
 	}
 	

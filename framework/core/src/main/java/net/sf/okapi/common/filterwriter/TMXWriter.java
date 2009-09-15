@@ -38,7 +38,7 @@ import net.sf.okapi.common.resource.TextUnit;
 public class TMXWriter {
 
     private XMLWriter writer;
-    private TMXContent tmxCont;
+    private TMXContent tmxCont = new TMXContent();
     private String srcLang;
     private String trgLang;
     private int itemCount;
@@ -46,9 +46,25 @@ public class TMXWriter {
 
     /**
      * Creates a new TMXWriter object.
+     * Creates a new TMX document.
+     * @param path The full path of the TMX document to create.
+     * If another document exists already it will be overwritten.
      */
-    public TMXWriter() {
-        tmxCont = new TMXContent();
+    public TMXWriter(String path) {
+        if (path == null) {
+            throw new IllegalArgumentException("path must be set");
+        }
+        writer = new XMLWriter(path);
+    }
+
+    /**
+     * Creates a new TMXWriter object.
+     * Creates a new TMX document.
+     * @param writer an instance of an XMLWriter to use.
+     * If another document exists already it will be overwritten.
+     */
+    public TMXWriter(XMLWriter writer) {
+        this.writer = writer;
     }
 
     /**
@@ -78,13 +94,11 @@ public class TMXWriter {
         if (path == null) {
             throw new NullPointerException();
         }
-        XMLWriter xmlWriter = new XMLWriter();
-        xmlWriter.create(path);
+        XMLWriter xmlWriter = new XMLWriter(path);
         create(xmlWriter);
     }
 
     public void create(XMLWriter xmlWriter) {
-        itemCount = 0;
         writer = xmlWriter;
     }
 

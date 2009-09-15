@@ -93,7 +93,6 @@ public class OkapiTmxHandler implements TmxHandler {
     public void exportTmx(URI tmxUri, String sourceLang, String targetLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
         checkExportTmxParams(tmxUri, tmSeeker, tmxWriter);
         try {
-            tmxWriter.create(tmxUri.getPath());
             tmxWriter.writeStartDocument(sourceLang, targetLang, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
             //TODO might eat up too much memory for large TMs
             List<TranslationUnit> tus = tmSeeker.getAllTranslationUnits();

@@ -20,27 +20,18 @@
 
 package net.sf.okapi.tm.simpletm;
 
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.resource.*;
+import net.sf.okapi.lib.translation.QueryResult;
+
 import java.io.File;
 import java.io.FilenameFilter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.translation.QueryResult;
 
 /**
  * Simple database to store align source and target with some context info.
@@ -101,7 +92,7 @@ public class Database {
 		}
 	}
 
-	private void deleteFiles (String pathAndPattern) {
+    private void deleteFiles (String pathAndPattern) {
 		class WildcharFilenameFilter implements FilenameFilter {
 			public boolean accept(File dir, String name) {
 				return Pattern.matches(".*?\\..*?\\.db", name);
@@ -196,7 +187,6 @@ public class Database {
 			try {
 				if ( stm != null ) {
 					stm.close();
-					stm = null;
 				}
 			}
 			catch ( SQLException e ) {
@@ -282,7 +272,7 @@ public class Database {
 				tmp.append(String.format("SELECT %s,%s,%s,%s FROM %s WHERE %s=?",
 					NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, TBLNAME, NSRCTEXT));
 				for ( String name : attributes.keySet() ) {
-					tmp.append(" AND "+name+"=?");
+					tmp.append(" AND ").append(name).append("=?");
 				}
 				qstm = conn.prepareStatement(tmp.toString());
 			}
@@ -348,8 +338,7 @@ public class Database {
 		Statement stm = null;
 		TMXWriter writer = null;
 		try {
-			writer = new TMXWriter();
-			writer.create(outputPath);
+			writer = new TMXWriter(outputPath);
 			writer.writeStartDocument(sourceLanguage, targetLanguage,
 				null, null, "sentence", "simpleTM", null);
 			stm = conn.createStatement();
