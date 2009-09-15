@@ -96,14 +96,12 @@ public class OkapiTmxHandler implements TmxHandler {
             tmxWriter.writeStartDocument(sourceLang, targetLang, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
             //TODO might eat up too much memory for large TMs
             List<TranslationUnit> tus = tmSeeker.getAllTranslationUnits();
+            TextUnit textUnit;
             for (TranslationUnit tu : tus) {
                 String tuid = tu.getMetadata().get(MetadataType.ID);
-                if (tuid == null) {
-                    tuid = "";
-                }
 
-                TextUnit textUnit = new TextUnit(tuid);
-                if (!tuid.equals("")) {
+                textUnit = new TextUnit(tuid);
+                if (tuid != null) {
                     textUnit.setName(tuid);
                 }
                 textUnit.setSourceContent(tu.getSource().getContent());
@@ -113,14 +111,12 @@ public class OkapiTmxHandler implements TmxHandler {
                     //TODO: potentially need TMX attribute name associated with
                     //TODO: test that tmx attributes are written as attributes while properties are written as properties (i.e. tuid vs Txt::Filename
                     //don't write the id as a prop because it's an attribute of tu
-                    if (type == MetadataType.ID) {
-                        continue;
+                    if (type != MetadataType.ID) {
+                        attributes.put(type.fieldName(), tu.getMetadata().get(type));
                     }
-                    attributes.put(type.fieldName(), tu.getMetadata().get(type));
                 }
                 tmxWriter.writeItem(textUnit, attributes);
             }
-
             tmxWriter.writeEndDocument();
         } finally {
             tmxWriter.close();
