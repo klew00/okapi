@@ -22,42 +22,33 @@ package net.sf.okapi.tm.pensieve.tmx;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
 import net.sf.okapi.tm.pensieve.writer.TmWriter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.mockito.ArgumentCaptor;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 public class OkapiTmxImporterTest {
 
     URI sampleTMX;
     OkapiTmxImporter tmxImporter;
-    StubTmWriter stubTmWriter;
+    TmWriter mockTmWriter;
     IFilter mockFilter;
-    TMXWriter mockTmxWriter;
-    TmSeeker mockSeeker;
-    List<TranslationUnit> tus;
 
     @Before
     public void setUp() throws URISyntaxException, IOException {
-        mockTmxWriter = mock(TMXWriter.class);
+        mockTmWriter = mock(TmWriter.class);
 
         String[][] properties = {{"tuid", "helloid"},
             {"datatype", "plaintext"},
@@ -77,42 +68,58 @@ public class OkapiTmxImporterTest {
 
         sampleTMX = new URI("test.tmx");
         tmxImporter = new OkapiTmxImporter("EN", mockFilter);
-
-        stubTmWriter = new StubTmWriter();
-        mockSeeker = mock(TmSeeker.class);
-        tus = new LinkedList<TranslationUnit>();
-        tus.add(Helper.createTU("EN", "FR", "source", "target", "sourceid"));
-        tus.add(Helper.createTU("EN", "FR", "source2", "target2", "sourceid2"));
-        when(mockSeeker.getAllTranslationUnits()).thenReturn(tus);
-//        stubTmxWriter = new StubTmxWriter(new XMLWriter(new StringWriter()));
     }
 
 
     @Test
     public void importTMXMetadataWithData() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "IT", stubTmWriter);
-        assertEquals("ID", "helloid", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.ID));
-        assertEquals("TYPE", "plaintext", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.TYPE));
-        assertEquals("FILE_NAME", "StringInfoForTest3.info", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.FILE_NAME));
-        assertEquals("GROUP_NAME", "APCCalibrateTimeoutAction0", stubTmWriter.tus.get(0).getMetadata().get(MetadataType.GROUP_NAME));
-        assertEquals("# of metadata", 0, stubTmWriter.tus.get(1).getMetadata().size());
+        tmxImporter.importTmx(sampleTMX, "IT", mockTmWriter);
+        ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
+        assertEquals("ID", "helloid", tuCapture.getAllValues().get(0).getMetadata().get(MetadataType.ID));
+        assertEquals("TYPE", "plaintext", tuCapture.getAllValues().get(0).getMetadata().get(MetadataType.TYPE));
+        assertEquals("FILE_NAME", "StringInfoForTest3.info", tuCapture.getAllValues().get(0).getMetadata().get(MetadataType.FILE_NAME));
+        assertEquals("GROUP_NAME", "APCCalibrateTimeoutAction0", tuCapture.getAllValues().get(0).getMetadata().get(MetadataType.GROUP_NAME));
+        assertEquals("# of metadata", 0, tuCapture.getAllValues().get(1).getMetadata().size());
     }
 
     @Test
     public void importTMXMetadataWithoutData() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "IT", stubTmWriter);
-        assertEquals("# of metadata", 0, stubTmWriter.tus.get(1).getMetadata().size());
+        tmxImporter.importTmx(sampleTMX, "IT", mockTmWriter);
+        ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
+        assertEquals("# of metadata", 0, tuCapture.getAllValues().get(1).getMetadata().size());
     }
 
     @Test
     public void importTmxNullFile() throws IOException {
         String errMsg = null;
         try {
-            tmxImporter.importTmx(null, "FR", stubTmWriter);
+            tmxImporter.importTmx(null, "FR", mockTmWriter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
         assertEquals("Error message", "tmxUri was not set", errMsg);
+    }
+
+    @Test
+    public void importTmxNullTarget() throws IOException {
+        String errMsg = null;
+        try {
+            tmxImporter.importTmx(sampleTMX, null, mockTmWriter);
+        } catch (IllegalArgumentException iae) {
+            errMsg = iae.getMessage();
+        }
+        assertEquals("Error message", "targetLang was not set", errMsg);
+    }
+
+    @Test
+    public void importTmxNullTmWriter() throws IOException {
+        String errMsg = null;
+        try {
+            tmxImporter.importTmx(sampleTMX, "FR", null);
+        } catch (IllegalArgumentException iae) {
+            errMsg = iae.getMessage();
+        }
+        assertEquals("Error message", "tmWriter was not set", errMsg);
     }
 
     @Test
@@ -139,12 +146,12 @@ public class OkapiTmxImporterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void importTMXEmptyTargetLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "", new StubTmWriter());
+        tmxImporter.importTmx(sampleTMX, "", mockTmWriter);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void importTMXNullTargetLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, null, new StubTmWriter());
+        tmxImporter.importTmx(sampleTMX, null, mockTmWriter);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -153,41 +160,51 @@ public class OkapiTmxImporterTest {
     }
 
     @Test
-    public void tUCount_ExistingLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "IT", stubTmWriter);
-        assertEquals("number of TUs", 2, stubTmWriter.tus.size());
+    public void importTmxExistingLang() throws IOException {
+        tmxImporter.importTmx(sampleTMX, "IT", mockTmWriter);
+        ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
+        assertEquals("number of TUs", 2, tuCapture.getAllValues().size());
     }
 
     @Test
-    public void tUCount_NonExistingLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "FR", stubTmWriter);
-        assertEquals("number of TUs", 2, stubTmWriter.tus.size());
-        assertNull("targets content should be null", stubTmWriter.tus.get(0).getTarget().getContent());
-        assertEquals("target lang", "FR", stubTmWriter.tus.get(0).getTarget().getLang());
+    public void importTmxNonExistingLang() throws IOException {
+        tmxImporter.importTmx(sampleTMX, "FR", mockTmWriter);
+        ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
+        assertEquals("number of TUs", 2, tuCapture.getAllValues().size());
+        assertNull("targets content should be null", tuCapture.getAllValues().get(0).getTarget().getContent());
+        assertEquals("target lang", "FR", tuCapture.getAllValues().get(0).getTarget().getLang());
     }
 
     @Test
     public void sourceAndTargetForExistingLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "IT", stubTmWriter);
-        assertEquals("first match source", "hello", stubTmWriter.tus.get(0).getSource().getContent().toString());
-        assertEquals("first match target", "ciao", stubTmWriter.tus.get(0).getTarget().getContent().toString());
+        tmxImporter.importTmx(sampleTMX, "IT", mockTmWriter);
+        ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
+        assertEquals("first match source", "hello", tuCapture.getAllValues().get(0).getSource().getContent().toString());
+        assertEquals("first match target", "ciao", tuCapture.getAllValues().get(0).getTarget().getContent().toString());
     }
 
     @Test
     public void sourceAndTargetForNonExistingLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "FR", stubTmWriter);
+        tmxImporter.importTmx(sampleTMX, "FR", mockTmWriter);
+        ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
         assertEquals("first match source", "hello",
-                stubTmWriter.tus.get(0).getSource().getContent().toString());
+                tuCapture.getAllValues().get(0).getSource().getContent().toString());
         assertNull("target for non-existant language should be null",
-                stubTmWriter.tus.get(0).getTarget().getContent());
+                tuCapture.getAllValues().get(0).getTarget().getContent());
     }
 
     //An example of a Stub. I will likely change this to a Mock later
     @Test
     public void importTMXDocCount() throws IOException {
-        StubTmWriter tmWriter = new StubTmWriter();
-        tmxImporter.importTmx(sampleTMX, "EN", tmWriter);
-        assertEquals("entries indexed", 2, tmWriter.tus.size());
+        tmxImporter.importTmx(sampleTMX, "EN", mockTmWriter);
+        ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
+        assertEquals("entries indexed", 2, tuCapture.getAllValues().size());
+    }
+
+    private ArgumentCaptor<TranslationUnit> verifyIndexTU() throws IOException {
+        ArgumentCaptor<TranslationUnit> tuCapture = ArgumentCaptor.forClass(TranslationUnit.class);
+        verify(mockTmWriter, times(2)).indexTranslationUnit(tuCapture.capture());
+        return tuCapture;
     }
 
     private Event createEvent(String id, String source, String target, String targetLang, String[][] properties) {
@@ -200,25 +217,6 @@ public class OkapiTmxImporterTest {
             }
         }
         return new Event(EventType.TEXT_UNIT, tu);
-    }
-
-    public class StubTmWriter implements TmWriter {
-
-        protected boolean endIndexCalled = false;
-        protected List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
-
-        public void endIndex() throws IOException {
-        }
-
-        public void indexTranslationUnit(TranslationUnit tu) throws IOException {
-            tus.add(tu);
-        }
-
-        public void delete(String id) throws IOException {
-        }
-
-        public void update(TranslationUnit tu) throws IOException {
-        }
     }
 
 
