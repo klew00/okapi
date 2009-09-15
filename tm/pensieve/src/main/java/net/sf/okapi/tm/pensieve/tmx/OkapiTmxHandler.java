@@ -17,7 +17,6 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
-
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filterwriter.TMXWriter;
@@ -37,35 +36,48 @@ import java.util.List;
 public class OkapiTmxHandler implements TmxHandler {
 
     /**
-     * Exports Pensieve to TMX
+     * Exports all target langs in Pensieve to TMX
+     * @param tmxUri The location of the TMX
+     * @param sourceLang The source language of desired tran
+     * @param tmSeeker The TMSeeker to use when reading from the TM
+     * @param tmxWriter The TMXWriter to use when writing out the TMX
+     */
+    public void exportTmx(URI tmxUri, String sourceLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
+        exportTmx(tmxUri, sourceLang, null, tmSeeker, tmxWriter);
+    }
+
+    /**
+     * Exports only specific target langs Pensieve to TMX
      * @param tmxUri The location of the TMX
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX
      */
     public void exportTmx(URI tmxUri, String sourceLang, String targetLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
-        checkExportTmxParams(tmxUri, tmSeeker, tmxWriter);
+        checkExportTmxParams(tmxUri, sourceLang, tmSeeker, tmxWriter);
         try {
             tmxWriter.writeStartDocument(sourceLang, targetLang, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
             //TODO might eat up too much memory for large TMs
             List<TranslationUnit> tus = tmSeeker.getAllTranslationUnits();
             TextUnit textUnit;
             for (TranslationUnit tu : tus) {
-                String tuid = tu.getMetadata().get(MetadataType.ID);
+                if (sourceLang.equals(tu.getSource().getLang()) && (targetLang == null || targetLang.equals(tu.getTarget().getLang()))) {
+                    String tuid = tu.getMetadata().get(MetadataType.ID);
 
-                textUnit = new TextUnit(tuid);
-                if (tuid != null) {
-                    textUnit.setName(tuid);
-                }
-                textUnit.setSourceContent(tu.getSource().getContent());
-                textUnit.setTargetContent(tu.getTarget().getLang(), tu.getTarget().getContent());
-                for (MetadataType type : tu.getMetadata().keySet()) {
-                    //TODO: test that tmx attributes are written as attributes while properties are written as properties (i.e. tuid vs Txt::Filename
-                    //don't write the id as a prop because it's an attribute of tu
-                    if (type != MetadataType.ID) {
-                        textUnit.setProperty(new Property(type.fieldName(), tu.getMetadata().get(type)));
+                    textUnit = new TextUnit(tuid);
+                    if (tuid != null) {
+                        textUnit.setName(tuid);
                     }
+                    textUnit.setSourceContent(tu.getSource().getContent());
+                    textUnit.setTargetContent(tu.getTarget().getLang(), tu.getTarget().getContent());
+                    for (MetadataType type : tu.getMetadata().keySet()) {
+                        //TODO: test that tmx attributes are written as attributes while properties are written as properties (i.e. tuid vs Txt::Filename
+                        //don't write the id as a prop because it's an attribute of tu
+                        if (type != MetadataType.ID) {
+                            textUnit.setProperty(new Property(type.fieldName(), tu.getMetadata().get(type)));
+                        }
+                    }
+                    tmxWriter.writeTUFull(textUnit);
                 }
-                tmxWriter.writeTUFull(textUnit);
             }
             tmxWriter.writeEndDocument();
         } finally {
@@ -73,7 +85,10 @@ public class OkapiTmxHandler implements TmxHandler {
         }
     }
 
-    private void checkExportTmxParams(URI tmxUri, TmSeeker tmSeeker, TMXWriter tmxWriter) {
+    private void checkExportTmxParams(URI tmxUri, String sourceLang, TmSeeker tmSeeker, TMXWriter tmxWriter) {
+        if (sourceLang == null) {
+            throw new IllegalArgumentException("sourceLang was not set");
+        }
         if (tmxUri == null) {
             throw new IllegalArgumentException("tmxUri was not set");
         }
@@ -84,5 +99,4 @@ public class OkapiTmxHandler implements TmxHandler {
             throw new IllegalArgumentException("tmxWriter was not set");
         }
     }
-
 }
