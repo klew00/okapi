@@ -35,9 +35,8 @@ import net.sf.okapi.tm.pensieve.writer.TmWriter;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import net.sf.okapi.common.resource.Property;
 
 /**
  * Used to interact with the Okapi Standards for TMX. For example, the property names and default fields stored.
@@ -106,16 +105,14 @@ public class OkapiTmxHandler implements TmxHandler {
                 }
                 textUnit.setSourceContent(tu.getSource().getContent());
                 textUnit.setTargetContent(tu.getTarget().getLang(), tu.getTarget().getContent());
-                Map<String, String> attributes = new HashMap<String, String>();
                 for (MetadataType type : tu.getMetadata().keySet()) {
-                    //TODO: potentially need TMX attribute name associated with
                     //TODO: test that tmx attributes are written as attributes while properties are written as properties (i.e. tuid vs Txt::Filename
                     //don't write the id as a prop because it's an attribute of tu
                     if (type != MetadataType.ID) {
-                        attributes.put(type.fieldName(), tu.getMetadata().get(type));
+                        textUnit.setProperty(new Property(type.fieldName(), tu.getMetadata().get(type)));
                     }
                 }
-                tmxWriter.writeItem(textUnit, attributes);
+                tmxWriter.writeTUFull(textUnit);
             }
             tmxWriter.writeEndDocument();
         } finally {

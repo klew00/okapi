@@ -34,8 +34,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 
 import java.io.IOException;
 import java.net.URI;
@@ -43,6 +43,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import net.sf.okapi.common.filterwriter.TMXWriter;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Dax
@@ -53,11 +55,15 @@ public class OkapiTmxHandlerTest {
     OkapiTmxHandler handler;
     StubTmWriter stubTmWriter;
     IFilter mockFilter;
-//    StubTmxWriter stubTmxWriter;
+    TMXWriter mockTmxWriter;
+    //    StubTmxWriter stubTmxWriter;
     TmSeeker mockSeeker;
+    List<TranslationUnit> tus;
 
     @Before
     public void setUp() throws URISyntaxException, IOException {
+        mockTmxWriter = mock(TMXWriter.class);
+
         String[][] properties = {{"tuid", "helloid"},
             {"datatype", "plaintext"},
             {"Txt::FileName", "StringInfoForTest3.info"},
@@ -79,43 +85,38 @@ public class OkapiTmxHandlerTest {
 
         stubTmWriter = new StubTmWriter();
         mockSeeker = mock(TmSeeker.class);
-        List<TranslationUnit> tus = new LinkedList<TranslationUnit>();
+        tus = new LinkedList<TranslationUnit>();
         tus.add(Helper.createTU("EN", "FR", "source", "target", "sourceid"));
         tus.add(Helper.createTU("EN", "FR", "source2", "target2", "sourceid2"));
         when(mockSeeker.getAllTranslationUnits()).thenReturn(tus);
 //        stubTmxWriter = new StubTmxWriter(new XMLWriter(new StringWriter()));
     }
 
-    /*
     @Test
     public void exportTmxStepsCalled() throws IOException {
         //TODO: This should be easier to test. We should probably add some methods in XMLWriter and TMXWriter that
         //allow for interfaces like java's Writer to be sent it.
-        handler.exportTmx(sampleTMX, "EN", "FR", mockSeeker, stubTmxWriter);
-        assertEquals("tmx path", sampleTMX.getPath(), stubTmxWriter.path);
-        assertTrue("doc started", stubTmxWriter.startWritten);
-        assertEquals("sourceLang", "EN", stubTmxWriter.sourceLanguage);
-        assertEquals("targetLang", "FR", stubTmxWriter.targetLanguage);
-        assertEquals("creationTool", "pensieve", stubTmxWriter.creationTool);
-        assertEquals("creationToolVersion", "0.0.1", stubTmxWriter.creationToolVersion);
-        assertEquals("segType", "sentence", stubTmxWriter.segType);
-        assertEquals("originalTMFormat", "pensieve", stubTmxWriter.originalTMFormat);
-        assertEquals("dataType", "unknown", stubTmxWriter.dataType);
-        assertEquals("number of tus", 2, stubTmxWriter.textUnits.size());
-        assertEquals("source of first tu written", "source", stubTmxWriter.textUnits.get(0).getSourceContent().toString());
-        assertEquals("target of first tu written", "target", stubTmxWriter.textUnits.get(0).getTargetContent("FR").toString());
-        assertEquals("target of first tu written", "sourceid", stubTmxWriter.textUnits.get(0).getName());
+        handler.exportTmx(sampleTMX, "EN", "FR", mockSeeker, mockTmxWriter);
 
-        //TODO: Verify Content
-        assertTrue("endDocument written", stubTmxWriter.endWritten);
-        assertTrue("writer closed", stubTmxWriter.closed);
+        ArgumentCaptor<TextUnit> tuCapture = ArgumentCaptor.forClass(TextUnit.class);
+
+        verify(mockTmxWriter).writeStartDocument("EN", "FR", "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
+        verify(mockTmxWriter, times(2)).writeTUFull(tuCapture.capture());
+        assertEquals("source of first tu written", "source", tuCapture.getAllValues().get(0).getSourceContent().toString());
+        assertEquals("target of first tu written", "target", tuCapture.getAllValues().get(0).getTargetContent("FR").toString());
+        assertEquals("target of first tu written", "sourceid", tuCapture.getAllValues().get(0).getName());
+        assertEquals("source of second tu written", "source2", tuCapture.getAllValues().get(1).getSourceContent().toString());
+        assertEquals("target of second tu written", "target2", tuCapture.getAllValues().get(1).getTargetContent("FR").toString());
+        assertEquals("target of second tu written", "sourceid2", tuCapture.getAllValues().get(1).getName());
+        verify(mockTmxWriter).writeEndDocument();
+        verify(mockTmxWriter).close();
     }
 
     @Test
     public void exportTmxFileNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx(null, "", "", mockSeeker, stubTmxWriter);
+            handler.exportTmx(null, "", "", mockSeeker, mockTmxWriter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -126,7 +127,7 @@ public class OkapiTmxHandlerTest {
     public void exportTmxSeekerNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx(sampleTMX, "", "", null, stubTmxWriter);
+            handler.exportTmx(sampleTMX, "", "", null, mockTmxWriter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -143,7 +144,7 @@ public class OkapiTmxHandlerTest {
         }
         assertEquals("Error message", "tmxWriter was not set", errMsg);
     }
-     */
+     
     @Test
     public void importTMXMetadataWithData() throws IOException {
         handler.importTmx(sampleTMX, "IT", stubTmWriter);
