@@ -36,6 +36,9 @@ import org.junit.Test;
 public class POFilterWriterTest {
 	
 	private POFilter filter;
+	private String header = "#, fuzzy\nmsgid \"\"\nmsgstr \"\"\n"
+		+ "\"Content-Type: text/plain; charset=UTF-8\\n\"\n"
+		+ "\"Content-Transfer-Encoding: 8bit\\n\"\n\n";
 	
 	@Before
 	public void setUp() {
@@ -46,20 +49,20 @@ public class POFilterWriterTest {
 	public void testSrcSimpleOutput () {
 		String snippet = ""
 			+ "msgid \"Text 1\"\r"
-			+ "msgstr \"\"\r";
+			+ "msgstr \"\"\r\r";
 		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
-		assertEquals(snippet, result);
+		assertEquals(header.replace('\n', '\r')+snippet, result);
 	}
 		
 	@Test
 	public void testSrcTrgSimpleOutput () {
 		String snippet = ""
 			+ "msgid \"Text 1\"\r"
-			+ "msgstr \"Texte 1\"\r";
+			+ "msgstr \"Texte 1\"\r\r";
 		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
-		assertEquals(snippet, result);
+		assertEquals(header.replace('\n', '\r')+snippet, result);
 	}
-		
+	
 	@Test
 	public void testOutputWithLinesWithWrap () {
 		String snippet = ""
@@ -69,9 +72,29 @@ public class POFilterWriterTest {
 			+ "msgstr \"\"\n"
 			+ "\"line1trans\\n\"\n"
 			+ "\"line2trans\\n\"\n"
-			+ "\"line3trans\"\n";
+			+ "\"line3trans\"\n\n";
 		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
-		assertEquals(snippet, result);
+		assertEquals(header+snippet, result);
+	}
+		
+	@Test
+	public void testOutputWithPlural () {
+		String snippet = ""
+			+ "msgid \"source singular\"\n"
+			+ "msgid_plural \"source plural\"\n"
+			+ "msgstr[0] \"target singular\"\n"
+			+ "msgstr[1] \"target plural\"\n\n";
+		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		assertEquals(header+snippet, result);
+	}
+		
+	@Test
+	public void testOutputWithFuzzy () {
+		String snippet = "#, fuzzy\n"
+			+ "msgid \"source\"\n"
+			+ "msgstr \"target\"\n\n";
+		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		assertEquals(header+snippet, result);
 	}
 		
 	private ArrayList<Event> getEvents(String snippet,

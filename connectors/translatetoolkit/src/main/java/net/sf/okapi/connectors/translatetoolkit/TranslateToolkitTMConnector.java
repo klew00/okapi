@@ -66,6 +66,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	}
 	
 	public void close () {
+		// Nothing to do
 	}
 
 	public void export (String outputPath) {
@@ -146,6 +147,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	}
 
 	public int query (TextFragment text) {
+		//TODO: Deal with inline codes, maybe using generic codes
 		String tmp = text.getCodedText();
 		return query(tmp);
 	}

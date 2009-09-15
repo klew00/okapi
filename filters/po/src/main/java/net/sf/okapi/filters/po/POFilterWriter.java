@@ -30,13 +30,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -50,10 +54,15 @@ public class POFilterWriter implements IFilterWriter {
 	private String language;
 	private String encoding;
 	private int group;
+	private int pluralGroup;
 	private String linebreak;
+	private GenericContent fmt;
+	private ArrayList<TextUnit> plurals;
 	
 	public POFilterWriter () {
 		params = new Parameters();
+		fmt = new GenericContent();
+		plurals = new ArrayList<TextUnit>();
 	}
 	
 	public void cancel () {
@@ -138,12 +147,17 @@ public class POFilterWriter implements IFilterWriter {
 			processEndGroup(event);
 			break;
 		case TEXT_UNIT:
-			processTextUnit(event);
+			if ( pluralGroup > -1 ) { // Store until we reach the end of the group
+				plurals.add((TextUnit)event.getResource());
+			}
+			else {
+				processTextUnit(event);
+			}
 			break;
 		}
 		return event;
 	}
-
+	
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
@@ -166,11 +180,21 @@ public class POFilterWriter implements IFilterWriter {
 	}
 
 	private void processStartDocument (Event event) {
-		StartDocument sd = (StartDocument)event.getResource();
-		// Create the output
-		createWriter(sd);
-		// Writer header
-		//TODO
+		try {
+			StartDocument sd = (StartDocument)event.getResource();
+			// Create the output
+			createWriter(sd);
+			// Writer header
+			writer.write("#, fuzzy"+linebreak);
+			writer.write("msgid \"\""+linebreak);
+			writer.write("msgstr \"\""+linebreak);
+			writer.write("\"Content-Type: text/plain; charset="+encoding+"\\n\""+linebreak);
+			writer.write("\"Content-Transfer-Encoding: 8bit\\n\""+linebreak);
+			writer.write(linebreak);
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error writing the header.", e);
+		}
 	}
 
 	private void processEndDocument () {
@@ -179,23 +203,84 @@ public class POFilterWriter implements IFilterWriter {
 
 	private void processStartGroup (Event event) {
 		group++;
+		StartGroup sg = (StartGroup)event.getResource();
+		if (( sg.getType() != null ) && sg.getType().equals("x-gettext-plurals") ) {
+			pluralGroup = group;
+			plurals.clear();
+		}
 	}
 
 	private void processEndGroup (Event event) {
+		if ( pluralGroup == group ) {
+			writePluralForms();
+			pluralGroup = -1;
+		}
 		group--;
+	}
+	
+	private void writePluralForms () {
+		try {
+			if ( plurals.size() < 2 ) {
+				throw new OkapiIOException("PO connot have less than two entries for a plural form.");
+			}
+			// msgid
+			writer.write("msgid ");
+			writeQuotedContent(plurals.get(0).getSource());
+			writer.write(linebreak);
+	
+			writer.write("msgid_plural ");
+			writeQuotedContent(plurals.get(1).getSource());
+			writer.write(linebreak);
+	
+			int count = 0;
+			for ( TextUnit tu : plurals ) {
+				writer.write(String.format("msgstr[%d] ", count));
+				if ( tu.hasTarget(language) ) {
+					writeQuotedContent(tu.getTarget(language));
+				}
+				else {
+					writer.write("\"\"");
+				}
+				writer.write(linebreak);
+				count++;
+			}
+			writer.write(linebreak);
+		}		
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error writing a plural group.", e);
+		}
 	}
 	
 	private void processTextUnit (Event event) {
 		try {
 			TextUnit tu = (TextUnit)event.getResource();
+			if ( tu.isEmpty() ) return; // Do not write out entries with empty source
+			
+			TextContainer tc = tu.getTarget(language);
+			Property prop = null;
+			if ( tc != null ) {
+				prop = tc.getProperty(Property.APPROVED);
+			}
+			
+			// Fuzzy
+			if ( prop != null ) {
+				if ( !prop.getValue().equals("yes") ) {
+					writer.write("#, fuzzy"+linebreak);
+				}
+			}
 			// msgid
 			writer.write("msgid ");
 			writeQuotedContent(tu.getSource());
 			writer.write(linebreak);
 			// msgstr
 			writer.write("msgstr ");
-			writeQuotedContent(tu.getTarget(language));
-			writer.write(linebreak);
+			if ( tc != null ) {
+				writeQuotedContent(tc);
+			}
+			else {
+				writer.write("\"\"");
+			}
+			writer.write(linebreak+linebreak);
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error writing a text unit.", e);
@@ -209,7 +294,14 @@ public class POFilterWriter implements IFilterWriter {
 				return;
 			}
 
-			String tmp = tc.toString();
+			String tmp;
+			if ( params.outputGeneric ) {
+				tmp = fmt.setContent(tc.getContent()).toString();
+			}
+			else {
+				tmp = tc.toString();
+			}
+			
 			if ( !params.wrapContent || ( tmp.indexOf("\\n") == -1 )) {
 				writer.write("\"");
 				writer.write(tmp); // No wrapping needed
@@ -240,6 +332,7 @@ public class POFilterWriter implements IFilterWriter {
 
 	private void createWriter (StartDocument startDoc) {
 		group = 0;
+		pluralGroup = -1;
 		linebreak = startDoc.getLineBreak();
 		try {
 			tempFile = null;

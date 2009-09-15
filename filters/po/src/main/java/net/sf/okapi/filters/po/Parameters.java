@@ -34,6 +34,7 @@ public class Parameters extends BaseParameters {
 	
 	// POFilterWriter option
 	public boolean wrapContent = true;
+	public boolean outputGeneric = false;
 
 	public Parameters () {
 		locDir = new LocalizationDirectives();

@@ -235,30 +235,31 @@
 			<artifactId>okapi-step-wordcount-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-charlisting</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-translationcomparison</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-generatesimpletm</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
-		
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-formatconversion</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 	</dependencies>
 </project>

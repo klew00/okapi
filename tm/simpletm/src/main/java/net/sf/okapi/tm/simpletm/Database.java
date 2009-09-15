@@ -22,12 +22,21 @@ package net.sf.okapi.tm.simpletm;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.common.resource.*;
+import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.QueryResult;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -92,7 +101,7 @@ public class Database {
 		}
 	}
 
-    private void deleteFiles (String pathAndPattern) {
+	private void deleteFiles (String pathAndPattern) {
 		class WildcharFilenameFilter implements FilenameFilter {
 			public boolean accept(File dir, String name) {
 				return Pattern.matches(".*?\\..*?\\.db", name);

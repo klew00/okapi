@@ -27,7 +27,11 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.common.resource.*;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.UIUtil;
 
 import java.io.File;
@@ -60,9 +64,6 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Both strings are in the target language.
 		matcher = new TextMatcher(trgLang, trgLang);
 		
-		if ( params.generateHTML ) {
-			writer = new XMLWriter(getInputPath(1) + ".html");
-		}
 		// Start TMX writer (one for all input documents)
 		if ( params.generateTMX ) {
 			tmx = new TMXWriter(params.tmxPath.replace(VAR_PROJDIR, projectDir));
@@ -138,7 +139,6 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Initialize the filter to read the translation to compare
 		inputToCompare = mapper.createFilter(getInputFilterSettings(1), inputToCompare);
 		
-		
 		File f = new File(getInputPath(1));
 		inputToCompare.open(new RawDocument(f.toURI(), getInputEncoding(1), srcLang, trgLang));
 			
@@ -185,7 +185,7 @@ public class Utility extends BaseFilterDrivenUtility {
     		writer.writeElementString("p", String.format("", itemCount));
     		if ( itemCount > 0 ) {
     			writer.writeElementString("p", String.format("Number of items = %d. Average score = %.2f",
-    				itemCount, (float)scoreTotal / itemCount));
+    				itemCount, (float)(scoreTotal / itemCount)));
     		}
 			writer.writeEndElement(); // body
 			writer.writeEndElement(); // html

@@ -39,6 +39,8 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
@@ -46,6 +48,9 @@ import net.sf.okapi.common.ui.genericeditor.GenericEditor;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.formatconversion.FormatConversionStep;
+import net.sf.okapi.steps.formatconversion.Parameters;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
@@ -57,6 +62,7 @@ public class Main {
 	protected final static int CMD_MERGE = 1;
 	protected final static int CMD_EDITCONFIG = 2;
 	protected final static int CMD_QUERYTRANS = 3;
+	protected final static int CMD_CONV2PO = 4;
 
 	private static PrintStream ps;
 	
@@ -77,6 +83,7 @@ public class Main {
 	protected String ttParams;
 	protected boolean useMM;
 	protected String mmParams;
+	protected boolean genericOutput = false;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -154,6 +161,9 @@ public class Main {
 				else if ( arg.equals("-m") ) {
 					prog.command = CMD_MERGE;
 				}
+				else if ( arg.equals("-2po") ) {
+					prog.command = CMD_CONV2PO;
+				}
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
 					if ( args.size() > i+1 ) {
@@ -161,6 +171,9 @@ public class Main {
 							prog.specifiedConfigId = args.get(++i);
 						}
 					}
+				}
+				else if ( arg.equals("-generic") ) {
+					prog.genericOutput = true;
 				}
 				else if ( arg.equals("-q") ) {
 					prog.command = CMD_QUERYTRANS;
@@ -520,6 +533,27 @@ public class Main {
 			step.handleRawDocument(skelRawDoc);
 			ps.println(" Done");
 		}
+		else if ( command == CMD_CONV2PO ) {
+			guessMissingParameters(input);
+			if ( !prepareFilter(configId) ) return; // Next input
+			
+			File file = new File(input);
+			RawDocument rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
+			rd.setFilterConfigId(configId);
+			
+			ps.println("Source language: "+srcLang);
+			ps.println("Target language: "+trgLang);
+			ps.println(" Input encoding: "+inputEncoding);
+			ps.println("  Configuration: "+configId);
+			ps.println(" Input document: "+input);
+//			ps.print("Output document: ");
+//			if ( output == null ) ps.println("<auto-defined>");
+//			else ps.println(output);
+			ps.print("Conversion to PO...");
+			
+			convertToPO(rd);
+			ps.println(" Done");
+		}
 	}
 	
 	private void printBanner () {
@@ -636,4 +670,26 @@ public class Main {
 		}
 	}
 
+	private void convertToPO (RawDocument rd) {
+		// Create the context and the pipeline
+		PipelineContext ctx = new PipelineContext();
+		ctx.setFilterConfigurationMapper(fcMapper);
+		PipelineDriver driver = new PipelineDriver();
+		driver.getPipeline().setContext(ctx);
+
+		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
+		driver.addStep(rd2feStep);
+		
+		FormatConversionStep fcStep = new FormatConversionStep();
+		net.sf.okapi.steps.formatconversion.Parameters params = fcStep.getParameters(); 
+		params.setOutputFormat(Parameters.FORMAT_PO);
+		params.setOutputPath("output.po");
+		params.setSingleOutput(true);
+		params.setUseGenericCodes(genericOutput);
+		driver.addStep(fcStep);
+		
+		driver.addBatchItem(rd);
+		driver.processBatch();
+		
+	}
 }

@@ -25,7 +25,13 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
-import net.sf.okapi.common.resource.*;
+import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 
 import java.io.OutputStream;
 

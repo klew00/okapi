@@ -53,7 +53,25 @@
         <dependency>
         	<groupId>net.sf.okapi.filters</groupId>
         	<artifactId>okapi-filter-regex</artifactId>
-        	<version>0.4-SNAPSHOT</version>
+        	<version>${project.version}</version>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.filters</groupId>
+        	<artifactId>okapi-filter-tmx</artifactId>
+        	<version>${project.version}</version>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.steps</groupId>
+        	<artifactId>okapi-step-common</artifactId>
+        	<version>${project.version}</version>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.steps</groupId>
+        	<artifactId>okapi-step-formatconversion</artifactId>
+        	<version>${project.version}</version>
         	<scope>compile</scope>
         </dependency>
     </dependencies>

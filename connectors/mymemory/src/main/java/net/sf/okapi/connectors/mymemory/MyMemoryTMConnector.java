@@ -184,13 +184,28 @@ public class MyMemoryTMConnector implements ITMQuery {
 	}
 
 	private String toInternalCode (String standardCode) {
-		//TODO: The expected MM code in lang-Region with region mandatory
-		// We will need to build a lookup table for the non-easy re-naming case like en -> en-us
-		return standardCode;
+		// The expected language code is language-Region with region mandatory
+		String[] res = Util.splitLanguageCode(standardCode);
+		//TODO: Use a lookup table and a more complete one
+		if ( res[0].equals("en") ) res[1] = "us";
+		else if ( res[0].equals("pt") ) res[1] = "br";
+		else if ( res[0].equals("el") ) res[1] = "gr";
+		else if ( res[0].equals("he") ) res[1] = "il";
+		else if ( res[0].equals("ja") ) res[1] = "jp";
+		else if ( res[0].equals("ko") ) res[1] = "kr";
+		else if ( res[0].equals("ms") ) res[1] = "my";
+		else if ( res[0].equals("sl") ) res[1] = "si";
+		else if ( res[0].equals("sq") ) res[1] = "al";
+		else if ( res[0].equals("sv") ) res[1] = "se";
+		else if ( res[0].equals("vi") ) res[1] = "vn";
+		else if ( res[0].equals("zh") ) {
+			if ( Util.isEmpty(res[1]) ) res[1] = "cn";
+		}
+		else res[1] = res[0];
+		return res[0]+"-"+res[1];
 	}
 
 	private String toISOCode (String internalCode) {
-		//TODO: Check
 		return internalCode;
 	}
 

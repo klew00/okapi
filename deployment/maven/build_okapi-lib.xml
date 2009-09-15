@@ -120,6 +120,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../libraries/lib-translation/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../libraries/lib-extra/target/classes"
+			 excludes="**/META-INF/**"/>
 			
 			<!-- tm -->
 			<fileset dir="../../tm/simpletm/target/classes"
@@ -155,6 +157,8 @@
 			<fileset dir="../../steps/encodingconversion/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/fullwidthconversion/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/formatconversion/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/generatesimpletm/target/classes"
 			 excludes="**/META-INF/**"/>

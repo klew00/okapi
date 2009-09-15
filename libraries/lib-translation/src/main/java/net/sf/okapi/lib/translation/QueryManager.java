@@ -20,14 +20,18 @@
 
 package net.sf.okapi.lib.translation;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-
-import java.util.*;
 
 /**
  * Provides a wrapper to manage and query several translation resources at the 
@@ -344,38 +348,38 @@ public class QueryManager {
 		
 		if ( tc.isSegmented() ) {
 			List<Segment> segList = tc.getSegments();
-            for (Segment aSegList : segList) {
-                count = query(aSegList.text);
-                if (count == 0) {
-                    scores.add(0);
-                    continue;
-                }
-                qr = next();
-                // It's a 100% match
-                if (qr.score == 100) {
-                    // Check if they are several and if they have the same translation
-                    if (!exactsHaveSameTranslation()) {
-                        if (threshold == 100) {
-                            scores.add(0);
-                            continue;
-                        }
-                        // If we do: Use the first one and lower the score to 99%
-                        scores.add(99);
-                        aSegList.text = qr.target;
-                        leveraged++;
-                        continue;
-                    }
-                    // Else: First is 100%, possibly several that have the same translations
-                    scores.add(qr.score); // That's 100% then
-                    aSegList.text = qr.target;
-                    leveraged++;
-                    continue;
-                }
-                // First is not 100%: use it and move on
-                scores.add(qr.score);
-                aSegList.text = qr.target;
-                leveraged++;
-            }
+			for (Segment segment : segList) {
+				count = query(segment.text);
+				if ( count == 0 ) {
+					scores.add(0);
+					continue;
+				}
+				qr = next();
+				// It's a 100% match
+				if ( qr.score == 100 ) {
+					// Check if they are several and if they have the same translation
+					if ( !exactsHaveSameTranslation() ) {
+						if ( threshold == 100 ) {
+							scores.add(0);
+							continue;
+						}
+						// If we do: Use the first one and lower the score to 99%
+						scores.add(99);
+						segment.text = qr.target;
+						leveraged++;
+						continue;
+					}
+					// Else: First is 100%, possibly several that have the same translations
+					scores.add(qr.score); // That's 100% then
+					segment.text = qr.target;
+					leveraged++;
+					continue;
+				}
+				// First is not 100%: use it and move on
+				scores.add(qr.score);
+				segment.text = qr.target;
+				leveraged++;
+			}
 		}
 		else { // Case of un-segmented entries
 			count = query(tc);

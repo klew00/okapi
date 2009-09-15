@@ -17,6 +17,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.common;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -41,7 +42,6 @@ public class XMLWriter {
     private Stack<String> elements = new Stack<String>();
     private final String lineBreak = System.getProperty("line.separator");
 
-
     /**
      * Creates a new XML document on disk.
      * @param path the full path of the document to create. If any directory in the
@@ -49,15 +49,16 @@ public class XMLWriter {
      * always written in UTF-8 and the type of line-breaks is the one of the
      * platform where the application runs.
      */
-    public XMLWriter(String path) {
-        try {
-            Util.createDirectories(path);
-            OutputStream output = new BufferedOutputStream(new FileOutputStream(path));
-            Charset charset = Charset.forName("UTF-8");
-            writer = new PrintWriter(new OutputStreamWriter(output, charset.newEncoder()));
-        } catch (IOException e) {
-            throw new OkapiIOException(e);
-        }
+    public XMLWriter (String path) {
+    	try {
+    		Util.createDirectories(path);
+    		OutputStream output = new BufferedOutputStream(new FileOutputStream(path));
+    		Charset charset = Charset.forName("UTF-8");
+    		writer = new PrintWriter(new OutputStreamWriter(output, charset.newEncoder()));
+    	}
+    	catch ( IOException e ) {
+    		throw new OkapiIOException(e);
+    	}
     }
 
     /**
@@ -71,29 +72,29 @@ public class XMLWriter {
     /**
      * Closes the writer and release any associated resources.
      */
-    public void close() {
-        if (writer != null) {
-            writer.close();
-            writer = null;
-        }
-        if (elements != null) {
-            elements.clear();
-            elements = null;
-        }
+    public void close () {
+    	if (writer != null) {
+    		writer.close();
+    		writer = null;
+    	}
+    	if (elements != null) {
+    		elements.clear();
+    		elements = null;
+    	}
     }
 
     /**
      * Writes the start of the document. This method generate the XML declaration.
      */
-    public void writeStartDocument() {
-        writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+    public void writeStartDocument () {
+    	writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     }
 
     /**
      * Writes the end of the document. This method closes any open tag, and
      * flush the writer.
      */
-    public void writeEndDocument() {
+    public void writeEndDocument () {
         closeStartTag();
         writer.flush();
     }

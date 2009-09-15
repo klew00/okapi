@@ -130,7 +130,7 @@ public class EditorDescription {
 	/**
 	 * Adds a selection list UI part to this editor description.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
-	 * @param choices the list of items that can be selected.
+	 * @param choices the list of items values that can be selected.
 	 * @return the UI part created by this call.
 	 */
 	public ListSelectionPart addListSelectionPart (ParameterDescriptor paramDescriptor,
