@@ -40,10 +40,10 @@ import net.sf.okapi.tm.pensieve.common.MetadataType;
 /**
  * @author Dax
  */
-public class OkapiTmxHandlerTest {
+public class OkapiTmxExporterTest {
 
     URI sampleTMX;
-    OkapiTmxHandler handler;
+    OkapiTmxExporter handler;
     TMXWriter mockTmxWriter;
     TmSeeker mockSeeker;
     
@@ -56,7 +56,7 @@ public class OkapiTmxHandlerTest {
         mockTmxWriter = mock(TMXWriter.class);
 
         sampleTMX = new URI("test.tmx");
-        handler = new OkapiTmxHandler();
+        handler = new OkapiTmxExporter();
 
         mockSeeker = mock(TmSeeker.class);
         List<TranslationUnit> tus = new LinkedList<TranslationUnit>();

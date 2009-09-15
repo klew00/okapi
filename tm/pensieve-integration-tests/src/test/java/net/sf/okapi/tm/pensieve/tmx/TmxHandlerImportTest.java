@@ -25,9 +25,9 @@ public class TmxHandlerImportTest {
         TmxFilter tmxFilter = new TmxFilter();
         Directory directory = new NIOFSDirectory(new File("target/test-classes/"));
         TmWriter tmWriter = new PensieveWriter(directory);
-        OkapiTmxHandler tmxHandler = new OkapiTmxHandler("EN-US", tmxFilter);
+        OkapiTmxImporter tmxImporter = new OkapiTmxImporter("EN-US", tmxFilter);
         long startTime = System.currentTimeMillis();
-        tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), "es", tmWriter);
+        tmxImporter.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), "es", tmWriter);
         long totalTime = System.currentTimeMillis() - startTime;
         System.out.println("total time to import TMX: " + totalTime);
 
@@ -70,7 +70,7 @@ public class TmxHandlerImportTest {
         TmxFilter tmxFilter = new TmxFilter();
         Directory directory = new NIOFSDirectory(new File("target/test-classes/"));
         TmWriter tmWriter = new PensieveWriter(directory);
-        OkapiTmxHandler tmxHandler = new OkapiTmxHandler("EN-US", tmxFilter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("EN-US", tmxFilter);
         long startTime = System.currentTimeMillis();
         tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), "es", tmWriter);
         long totalTime = System.currentTimeMillis() - startTime;
@@ -124,7 +124,7 @@ public class TmxHandlerImportTest {
         Directory ramDir = new RAMDirectory();
 //        Directory ramDir = new NIOFSDirectory(new File("target/test-classes/"));
         TmWriter tmWriter = new PensieveWriter(ramDir);
-        OkapiTmxHandler tmxHandler = new OkapiTmxHandler("en-us", tmxFilter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("en-us", tmxFilter);
         tmxHandler.importTmx(this.getClass().getResource("/Paragraph_TM.tmx").toURI(), "de-de", tmWriter);
 
         TmSeeker seeker = new PensieveSeeker(ramDir);
@@ -138,7 +138,7 @@ public class TmxHandlerImportTest {
         Directory ramDir = new RAMDirectory();
 //        Directory ramDir = new NIOFSDirectory(new File("target/test-classes/"));
         TmWriter tmWriter = new PensieveWriter(ramDir);
-        OkapiTmxHandler tmxHandler = new OkapiTmxHandler("EN", tmxFilter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("EN", tmxFilter);
         tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
 
         TmSeeker seeker = new PensieveSeeker(ramDir);
@@ -156,7 +156,7 @@ public class TmxHandlerImportTest {
         Directory ramDir = new RAMDirectory();
 //        Directory ramDir = new NIOFSDirectory(new File("target/test-classes/"));
         TmWriter tmWriter = new PensieveWriter(ramDir);
-        OkapiTmxHandler tmxHandler = new OkapiTmxHandler("EN", tmxFilter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("EN", tmxFilter);
         tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
 
         TmSeeker seeker = new PensieveSeeker(ramDir);

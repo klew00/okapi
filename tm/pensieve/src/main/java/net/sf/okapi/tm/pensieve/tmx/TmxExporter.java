@@ -29,11 +29,11 @@ import java.net.URI;
 /**
  * The TMX interface to Pensieve.
  */
-public interface TmxHandler {
+public interface TmxExporter {
 
 
     /**
-     * Exports Pensieve contents to TMX
+     * Exports all Pensieve contents matching source and target language to TMX
      * @param tmxUri The location of the TMX
      * @param sourceLang The source language to export
      * @param targetLang The target language to export
@@ -42,4 +42,14 @@ public interface TmxHandler {
      * @throws IOException if there was a problem with the TMX export
      */
     void exportTmx(URI tmxUri, String sourceLang, String targetLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
+
+    /**
+     * Exports all Pensieve contents matching source languages to TMX
+     * @param tmxUri The location of the TMX
+     * @param sourceLang The source language to export
+     * @param tmSeeker The Seeker to use when reading from the TM
+     * @param tmxWriter The TMXWriter to use when writing to the TMX file
+     * @throws IOException if there was a problem with the TMX export
+     */
+    void exportTmx(URI tmxUri, String sourceLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
 }

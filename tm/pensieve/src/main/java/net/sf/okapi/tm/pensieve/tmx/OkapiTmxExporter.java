@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Used to interact with the Okapi Standards for TMX. For example, the property names and default fields stored.
  */
-public class OkapiTmxHandler implements TmxHandler {
+public class OkapiTmxExporter implements TmxExporter {
 
     /**
      * Exports all target langs in Pensieve to TMX
