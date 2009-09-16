@@ -20,9 +20,7 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.tm.pensieve.common.MetadataType;
+import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
 
@@ -49,6 +47,8 @@ public class OkapiTmxExporter implements TmxExporter {
     /**
      * Exports only specific target langs Pensieve to TMX
      * @param tmxUri The location of the TMX
+     * @param sourceLang The source language of desired tran
+     * @param targetLang The target language of desired tran (or null for all target languages)
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX
      */
@@ -58,31 +58,19 @@ public class OkapiTmxExporter implements TmxExporter {
             tmxWriter.writeStartDocument(sourceLang, targetLang, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
             //TODO might eat up too much memory for large TMs
             List<TranslationUnit> tus = tmSeeker.getAllTranslationUnits();
-            TextUnit textUnit;
             for (TranslationUnit tu : tus) {
-                if (sourceLang.equals(tu.getSource().getLang()) && (targetLang == null || targetLang.equals(tu.getTarget().getLang()))) {
-                    String tuid = tu.getMetadata().get(MetadataType.ID);
-
-                    textUnit = new TextUnit(tuid);
-                    if (tuid != null) {
-                        textUnit.setName(tuid);
-                    }
-                    textUnit.setSourceContent(tu.getSource().getContent());
-                    textUnit.setTargetContent(tu.getTarget().getLang(), tu.getTarget().getContent());
-                    for (MetadataType type : tu.getMetadata().keySet()) {
-                        //TODO: test that tmx attributes are written as attributes while properties are written as properties (i.e. tuid vs Txt::Filename
-                        //don't write the id as a prop because it's an attribute of tu
-                        if (type != MetadataType.ID) {
-                            textUnit.setProperty(new Property(type.fieldName(), tu.getMetadata().get(type)));
-                        }
-                    }
-                    tmxWriter.writeTUFull(textUnit);
+                if (isWriteTextUnit(sourceLang, targetLang, tu)) {
+                    tmxWriter.writeTUFull(PensieveUtil.convertToTextUnit(tu));
                 }
             }
             tmxWriter.writeEndDocument();
         } finally {
             tmxWriter.close();
         }
+    }
+
+    private static boolean isWriteTextUnit(String sourceLang, String targetLang, TranslationUnit tu) {
+        return sourceLang.equals(tu.getSource().getLang()) && (targetLang == null || targetLang.equals(tu.getTarget().getLang()));
     }
 
     private void checkExportTmxParams(URI tmxUri, String sourceLang, TmSeeker tmSeeker, TMXWriter tmxWriter) {

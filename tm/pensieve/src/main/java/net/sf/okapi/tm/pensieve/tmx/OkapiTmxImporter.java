@@ -90,7 +90,7 @@ public class OkapiTmxImporter implements TmxImporter {
     private void indexEvent(String targetLang, TmWriter tmWriter, Event event) throws IOException {
         TranslationUnit tu;
         if (event.getEventType() == EventType.TEXT_UNIT) {
-            tu = PensieveUtil.convertTranslationUnit(sourceLang, targetLang, (TextUnit) event.getResource());
+            tu = PensieveUtil.convertToTranslationUnit(sourceLang, targetLang, (TextUnit) event.getResource());
             tmWriter.indexTranslationUnit(tu);
         }
     }

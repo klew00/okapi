@@ -21,6 +21,7 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 package net.sf.okapi.tm.pensieve.common;
 
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.Property;
 
 /**
  * A helper class
@@ -36,13 +37,38 @@ public final class PensieveUtil {
      * @param textUnit The textunit to convert
      * @return A TranslationUnit that represents the TextUnit
      */
-    public static TranslationUnit convertTranslationUnit(String sourceLang, String targetLang, TextUnit textUnit) {
+    public static TranslationUnit convertToTranslationUnit(String sourceLang, String targetLang, TextUnit textUnit) {
         TranslationUnitVariant source = new TranslationUnitVariant(sourceLang, textUnit.getSourceContent());
         TranslationUnitVariant target = new TranslationUnitVariant(targetLang, textUnit.getTargetContent(targetLang));
         TranslationUnit tu = new TranslationUnit(source, target);
         populateMetaDataFromProperties(textUnit, tu);
         return tu;
     }
+
+    /**
+     * Converts a TranslationUnit to a TextUnit
+     * @param tu The TranslationUnit to convert.
+     * @return The converted TextUnit
+     */
+    public static TextUnit convertToTextUnit(TranslationUnit tu) {
+        TextUnit textUnit;
+        String tuid = tu.getMetadata().get(MetadataType.ID);
+
+        textUnit = new TextUnit(tuid);
+        if (tuid != null) {
+            textUnit.setName(tuid);
+        }
+        textUnit.setSourceContent(tu.getSource().getContent());
+        textUnit.setTargetContent(tu.getTarget().getLang(), tu.getTarget().getContent());
+        for (MetadataType type : tu.getMetadata().keySet()) {
+            if (type != MetadataType.ID) {
+                textUnit.setProperty(new Property(type.fieldName(), tu.getMetadata().get(type)));
+            }
+        }
+        return textUnit;
+    }
+
+
 
     private static void populateMetaDataFromProperties(TextUnit textUnit, TranslationUnit tu) {
         MetadataType mdt;

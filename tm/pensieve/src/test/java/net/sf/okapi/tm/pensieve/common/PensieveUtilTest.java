@@ -39,14 +39,26 @@ public class PensieveUtilTest {
     }
 
     @Test
-    public void convertTranslationUnit(){
+    public void convertToTranslationUnit(){
         TextUnit textUnit = new TextUnit("someId", "some great text");
         textUnit.setTargetContent("kr", new TextFragment("some great text in Korean"));
-        TranslationUnit tu = PensieveUtil.convertTranslationUnit("en", "kr", textUnit);
+        TranslationUnit tu = PensieveUtil.convertToTranslationUnit("en", "kr", textUnit);
         assertEquals("sourceLang", "en", tu.getSource().getLang());
         assertEquals("source content", "some great text", tu.getSource().getContent().toString());
         assertEquals("targetLang", "kr", tu.getTarget().getLang());
         assertEquals("target content", "some great text in Korean", tu.getTarget().getContent().toString());
+    }
+
+    @Test
+    public void convertToTextUnit(){
+        TranslationUnit tu = Helper.createTU("EN", "KR", "bipity bopity boo", "something in korean", "1");
+        tu.setMetadataValue(MetadataType.GROUP_NAME, "groupie");
+        TextUnit textUnit = PensieveUtil.convertToTextUnit(tu);
+        assertEquals("source content", "bipity bopity boo", textUnit.getSource().getContent().toString());
+        assertEquals("target content", "something in korean", textUnit.getTarget("KR").getContent().toString());
+        assertEquals("tuid", "1", textUnit.getId());
+        assertEquals("name", "1", textUnit.getName());
+        assertEquals("group attribute", "groupie", textUnit.getProperty(MetadataType.GROUP_NAME.fieldName()).getValue());
     }
 
 }
