@@ -25,7 +25,7 @@ import org.apache.lucene.store.FSDirectory;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-public class TMSeekerFactoryTest {
+public class TmSeekerFactoryTest {
 
     @Test
     public void createFileBasedTmSeeker() {
