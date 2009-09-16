@@ -64,6 +64,7 @@ public class Main {
 	protected final static int CMD_EDITCONFIG = 2;
 	protected final static int CMD_QUERYTRANS = 3;
 	protected final static int CMD_CONV2PO = 4;
+	protected final static int CMD_CONV2TMX = 5;
 
 	private static PrintStream ps;
 	
@@ -163,6 +164,9 @@ public class Main {
 				}
 				else if ( arg.equals("-2po") ) {
 					prog.command = CMD_CONV2PO;
+				}
+				else if ( arg.equals("-2tmx") ) {
+					prog.command = CMD_CONV2TMX;
 				}
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
@@ -481,14 +485,16 @@ public class Main {
 	
 	protected void process (String input) throws URISyntaxException {
 		initialize();
-
-		if ( command == CMD_EXTRACT ) {
+		RawDocument rd;
+		File file;
+		
+		switch ( command ) {
+		case CMD_EXTRACT:
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
-			XLIFFExtractionStep step = new XLIFFExtractionStep(fcMapper);
 			
-			File file = new File(input);
-			RawDocument rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
+			file = new File(input);
+			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			rd.setFilterConfigId(configId);
 			
 			ps.println("Source language: "+srcLang);
@@ -502,21 +508,23 @@ public class Main {
 			else ps.println(output);
 			ps.print("Extaction...");
 			
-			step.handleRawDocument(rd);
+			XLIFFExtractionStep stepExt = new XLIFFExtractionStep(fcMapper);
+			stepExt.handleRawDocument(rd);
 			ps.println(" Done");
-		}
-		else if ( command == CMD_MERGE ) {
+			break;
+		
+		case CMD_MERGE:
 			guessMergingArguments(input);
 			guessMissingParameters(skeleton);
 			if ( !prepareFilter(configId) ) return; // Next input
-			XLIFFMergingStep step = new XLIFFMergingStep(fcMapper);
+			XLIFFMergingStep stepMrg = new XLIFFMergingStep(fcMapper);
 
-			File file = new File(skeleton);
+			file = new File(skeleton);
 			RawDocument skelRawDoc = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			skelRawDoc.setFilterConfigId(configId);
-			step.setXliffPath(input);
-			step.setOutputPath(output);
-			step.setOutputEncoding(outputEncoding);
+			stepMrg.setXliffPath(input);
+			stepMrg.setOutputPath(output);
+			stepMrg.setOutputEncoding(outputEncoding);
 			
 			ps.println("Source language: "+srcLang);
 			ps.print("Target language: ");
@@ -530,17 +538,25 @@ public class Main {
 			else ps.println(output);
 			ps.print("Merging...");
 
-			step.handleRawDocument(skelRawDoc);
+			stepMrg.handleRawDocument(skelRawDoc);
 			ps.println(" Done");
-		}
-		else if ( command == CMD_CONV2PO ) {
+			break;
+			
+		case CMD_CONV2PO:
+		case CMD_CONV2TMX:
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			
-			File file = new File(input);
-			String output = input+".po";
+			file = new File(input);
+			String output = input;
+			if ( command == CMD_CONV2PO ) {
+				output += ".po";
+			}
+			else { // TMX
+				output += ".tmx";
+			}
 			URI outputURI = new File(output).toURI();
-			RawDocument rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
+			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			rd.setFilterConfigId(configId);
 			
 			ps.println("Source language: "+srcLang);
@@ -549,10 +565,16 @@ public class Main {
 			ps.println("  Configuration: "+configId);
 			ps.println(" Input document: "+input);
 			ps.println("Output document: "+output);
-			ps.print("Conversion to PO...");
+			if ( command == CMD_CONV2PO ) {
+				ps.print("Conversion to PO...");
+			}
+			else {
+				ps.print("Conversion to TMX...");
+			}
 			
-			convertToPO(rd, outputURI);
+			convertFile(rd, outputURI);
 			ps.println(" Done");
+			break;
 		}
 	}
 	
@@ -673,7 +695,7 @@ public class Main {
 		}
 	}
 
-	private void convertToPO (RawDocument rd, URI outputURI) {
+	private void convertFile (RawDocument rd, URI outputURI) {
 		// Create the context and the pipeline
 		PipelineContext ctx = new PipelineContext();
 		ctx.setFilterConfigurationMapper(fcMapper);
@@ -684,9 +706,15 @@ public class Main {
 		driver.addStep(rd2feStep);
 		
 		FormatConversionStep fcStep = new FormatConversionStep();
-		net.sf.okapi.steps.formatconversion.Parameters params = fcStep.getParameters(); 
-		params.setOutputFormat(Parameters.FORMAT_PO);
-		params.setOutputPath("output.po");
+		net.sf.okapi.steps.formatconversion.Parameters params = fcStep.getParameters();
+		if ( command == CMD_CONV2PO ) {
+			params.setOutputFormat(Parameters.FORMAT_PO);
+			params.setOutputPath("output.po");
+		}
+		else if ( command == CMD_CONV2TMX ) {
+			params.setOutputFormat(Parameters.FORMAT_TMX);
+			params.setOutputPath("output.tmx");
+		}
 		params.setSingleOutput(false);
 		params.setUseGenericCodes(genericOutput);
 		driver.addStep(fcStep);
@@ -694,4 +722,5 @@ public class Main {
 		driver.addBatchItem(rd, outputURI, outputEncoding);
 		driver.processBatch();
 	}
+
 }

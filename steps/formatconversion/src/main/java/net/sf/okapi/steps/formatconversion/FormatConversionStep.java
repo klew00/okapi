@@ -27,6 +27,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.Ending;
@@ -35,6 +36,7 @@ import net.sf.okapi.filters.po.POFilterWriter;
 public class FormatConversionStep extends BasePipelineStep {
 
 	private static final int PO_OUTPUT = 0;
+	private static final int TMX_OUTPUT = 1;
 	
 	private Parameters params;
 	private IFilterWriter writer;
@@ -80,6 +82,9 @@ public class FormatConversionStep extends BasePipelineStep {
 			if ( params.getOutputFormat().equals(Parameters.FORMAT_PO) ) {
 				outputType = PO_OUTPUT;
 			}
+			else if ( params.getOutputFormat().equals(Parameters.FORMAT_TMX) ) {
+				outputType = TMX_OUTPUT;
+			}
 			break;
 		case END_BATCH:
 			if ( params.isSingleOutput() ) {
@@ -92,6 +97,10 @@ public class FormatConversionStep extends BasePipelineStep {
 				switch ( outputType ) {
 				case PO_OUTPUT:
 					startPOOutput();
+					break;
+				case TMX_OUTPUT:
+					startTMXOutput();
+					break;
 				}
 			}
 			writer.handleEvent(event);
@@ -148,4 +157,33 @@ public class FormatConversionStep extends BasePipelineStep {
 		}
 		firstOutputCreated = true;
 	}
+
+	private void startTMXOutput () {
+		writer = new TMXFilterWriter();
+//		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
+//		outParams.outputGeneric = params.getUseGenericCodes();
+		File outFile;
+		if ( isLastStep() ) {
+			if ( params.isSingleOutput() ) {
+				outFile = new File(params.getOutputPath());
+			}
+			else {
+				outFile = new File(getContext().getOutputURI(0));
+			}
+			// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
+			writer.setOutput(outFile.getPath());
+			writer.setOptions(getContext().getTargetLanguage(0), "UTF-8");
+		}
+		else {
+			try {
+				outFile = File.createTempFile("okp-fc_", ".tmp");
+			}
+			catch ( Throwable e ) {
+				throw new OkapiIOException("Cannot create temporary output.", e);
+			}
+			outFile.deleteOnExit();
+		}
+		firstOutputCreated = true;
+	}
+
 }

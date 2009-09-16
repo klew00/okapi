@@ -63,19 +63,19 @@ public class XMLWriter {
      * Creates a new XML document for a given writer object.
      * @param writer the writer to use to output the document.
      */
-    public XMLWriter(Writer writer) {
-        this.writer = new PrintWriter(writer);
+    public XMLWriter (Writer writer) {
+    	this.writer = new PrintWriter(writer);
     }
 
     /**
      * Closes the writer and release any associated resources.
      */
     public void close () {
-    	if (writer != null) {
+    	if ( writer != null ) {
     		writer.close();
     		writer = null;
     	}
-    	if (elements != null) {
+    	if ( elements != null ) {
     		elements.clear();
     		elements = null;
     	}
@@ -93,37 +93,35 @@ public class XMLWriter {
      * flush the writer.
      */
     public void writeEndDocument () {
-        closeStartTag();
-        writer.flush();
+    	closeStartTag();
+    	writer.flush();
     }
 
     /**
      * Writes the start of an element.
      * @param name the name of the element to start.
      */
-    public void writeStartElement(String name) {
-        closeStartTag();
-        elements.push(name);
-        writer.write("<" + name);
-        inStartTag = true;
+    public void writeStartElement (String name) {
+    	closeStartTag();
+    	elements.push(name);
+    	writer.write("<" + name);
+    	inStartTag = true;
     }
 
     /**
      * Writes the end of the last started element.
      */
-    public void writeEndElement() {
-        closeStartTag();
-        writer.write("</" + elements.pop() + ">");
+    public void writeEndElement () {
+    	closeStartTag();
+    	writer.write("</" + elements.pop() + ">");
     }
 
     /**
      * Writes the end of the last started element and writes a line-break.
      */
-    public void writeEndElementLineBreak() {
-        closeStartTag();
-        if (!elements.isEmpty()) {
-            writer.println("</" + elements.pop() + ">");
-        }
+    public void writeEndElementLineBreak () {
+    	closeStartTag();
+   		writer.write("</" + elements.pop() + ">"+lineBreak);
     }
 
     /**
@@ -131,12 +129,13 @@ public class XMLWriter {
      * @param name the name of the element to write.
      * @param content the content to enclose inside this element.
      */
-    public void writeElementString(String name,
-            String content) {
-        closeStartTag();
-        writer.write("<" + name + ">");
-        writer.write(Util.escapeToXML(content, 0, false, null));
-        writer.print("</" + name + ">");
+    public void writeElementString (String name,
+   		String content)
+    {
+    	closeStartTag();
+    	writer.write("<" + name + ">");
+    	writer.write(Util.escapeToXML(content, 0, false, null));
+    	writer.print("</" + name + ">");
     }
 
     /**
@@ -145,18 +144,19 @@ public class XMLWriter {
      * @param name the name of the attribute.
      * @param value the value of the attribute.
      */
-    public void writeAttributeString(String name,
-            String value) {
-        writer.write(" " + name + "=\"" + Util.escapeToXML(value, 3, false, null) + "\"");
+    public void writeAttributeString (String name,
+   		String value)
+    {
+    	writer.write(" " + name + "=\"" + Util.escapeToXML(value, 3, false, null) + "\"");
     }
 
     /**
      * Writes a string. The text is automatically escaped.
      * @param text the text to output.
      */
-    public void writeString(String text) {
-        closeStartTag();
-        writer.write(Util.escapeToXML(text, 0, false, null).replace("\n", lineBreak));
+    public void writeString (String text) {
+    	closeStartTag();
+    	writer.write(Util.escapeToXML(text, 0, false, null).replace("\n", lineBreak));
     }
 
     /**
@@ -164,37 +164,38 @@ public class XMLWriter {
      * @param xmlData the data to output. No escaping is performed, but the line-breaks are
      * converted to the line-break type of the output.
      */
-    public void writeRawXML(String xmlData) {
-        closeStartTag();
-        writer.write(xmlData.replace("\n", lineBreak));
+    public void writeRawXML (String xmlData) {
+    	closeStartTag();
+    	writer.write(xmlData.replace("\n", lineBreak));
     }
 
     /**
      * Writes a comment.
      * @param text the text of the comment.
      */
-    public void writeComment(String text) {
-        closeStartTag();
-        writer.write("<!--");
-        writer.write(text.replace("\n", lineBreak));
-        writer.write("-->");
+    public void writeComment (String text) {
+    	closeStartTag();
+    	writer.write("<!--");
+    	writer.write(text.replace("\n", lineBreak));
+    	writer.write("-->");
     }
 
     /**
-     * Writes a line-break.
+     * Writes a line-break, and if the writer is in a start tag, close it before.
      */
-    public void writeLineBreak() {
-        closeStartTag();
-        writer.println("");
+    public void writeLineBreak () {
+    	closeStartTag();
+    	writer.write(lineBreak);
     }
 
     /**
      * Closes the tag of the last start tag output, if needed.
      */
-    private void closeStartTag() {
-        if (inStartTag) {
-            writer.write(">");
-            inStartTag = false;
-        }
+    private void closeStartTag () {
+    	if ( inStartTag ) {
+    		writer.write(">");
+    		inStartTag = false;
+    	}
     }
+
 }

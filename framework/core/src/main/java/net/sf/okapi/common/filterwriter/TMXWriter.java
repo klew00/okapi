@@ -39,6 +39,10 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class TMXWriter {
 
+    private static final String ATTR_NAMES = ";lang;tuid;o-encoding;datatype;usagecount;"
+    	+ "lastusagedate;creationtool;creationtoolversion;creationdate;creationid"
+    	+ "changedate;segtype;changeid;o-tmf;srclang;";
+
     private XMLWriter writer;
     private TMXContent tmxCont = new TMXContent();
     private String srcLang;
@@ -197,7 +201,7 @@ public class TMXWriter {
      * target language does not have any entry in this item, the first found entry is used
      * instead. This is to allow getting for example FR-CA translations for an FR project.
      */
-    public void writeItem(TextUnit item,
+    public void writeItem (TextUnit item,
    		Map<String, String> attributes,
    		boolean alternate)
     {
@@ -264,7 +268,7 @@ public class TMXWriter {
      * @param tuid the TUID attribute (can be null).
      * @param attributes the optional set of attribute to put along with the entry.
      */
-    public void writeTU(TextFragment source,
+    public void writeTU (TextFragment source,
    		TextFragment target,
    		String tuid,
    		Map<String, String> attributes)
@@ -286,6 +290,9 @@ public class TMXWriter {
 
     	if (( attributes != null ) && ( attributes.size() > 0 )) {
     		for ( String name : attributes.keySet() ) {
+    			// Filter out attributes (temporary solution)
+    			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
+    			// Write out the property
     			writer.writeStartElement("prop");
     			writer.writeAttributeString("type", name);
     			writer.writeString(attributes.get(name));
@@ -316,7 +323,7 @@ public class TMXWriter {
      * Writes a TextUnit (all targets) with all the properties associated to it.
      * @param item The text unit to write.
      */
-    public void writeTUFull(TextUnit item) {
+    public void writeTUFull (TextUnit item) {
     	if ( item == null ) {
     		throw new NullPointerException();
     	}
@@ -342,6 +349,9 @@ public class TMXWriter {
     		// Write any resource-level properties
     		Set<String> names = item.getPropertyNames();
     		for ( String name : names ) {
+    			// Filter out attributes (temporary solution)
+    			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
+    			// Write out the property
     			writer.writeStartElement("prop");
     			writer.writeAttributeString("type", name);
     			writer.writeString(item.getProperty(name).getValue());
@@ -369,7 +379,7 @@ public class TMXWriter {
      * @param contForProp The TextContainer that has the properties to write for
      * this TUV, or null for no properties.
      */
-    private void writeTUV(TextFragment frag,
+    private void writeTUV (TextFragment frag,
    		String language,
    		TextContainer contForProp)
     {
@@ -380,15 +390,21 @@ public class TMXWriter {
     	writer.writeEndElement(); // seg
 
     	if ( contForProp != null ) {
+    		boolean propWritten = false;
     		Set<String> names = contForProp.getPropertyNames();
-    		if ( names.size() > 0 ) {
-    			writer.writeLineBreak();
-    		}
     		for ( String name : names ) {
+    			// Filter out attributes (temporary solution)
+    			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
+    			// Write out the property
+    			writer.writeLineBreak();
     			writer.writeStartElement("prop");
     			writer.writeAttributeString("type", name);
     			writer.writeString(contForProp.getProperty(name).getValue());
-    			writer.writeEndElementLineBreak(); // prop
+    			writer.writeEndElement(); // prop
+    			propWritten = true;
+    		}
+    		if ( propWritten ) {
+    			writer.writeLineBreak();
     		}
     	}
     	writer.writeEndElementLineBreak(); // tuv

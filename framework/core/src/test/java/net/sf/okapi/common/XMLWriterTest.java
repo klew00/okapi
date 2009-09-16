@@ -106,8 +106,7 @@ public class XMLWriterTest {
         assertEquals("writer's contents", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><jack></jack>", xml);
     }
 
-    //TODO: Is this the behavior we want? Why not just first check for a previous tag and only end it if it is started?
-    //For example, writeEndElementLineBreak checks the stack before attempting to end the tag.
+    // Calling writeEndElement without a writeStartElement is not logical, and therefore not allowed 
     @Test(expected = EmptyStackException.class)
     public void writeEndElementNoStartElement(){
         writer.writeStartDocument();
@@ -117,17 +116,6 @@ public class XMLWriterTest {
         xml = xml.replaceAll("\r","");
         assertEquals("writer's contents", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", xml);
     }
-
-    @Test
-    public void writeEndElementLineBreakNoStartElement(){
-        writer.writeStartDocument();
-        writer.writeEndElementLineBreak();
-        String xml = sWriter.toString().trim();
-        xml = xml.replaceAll("\n","");
-        xml = xml.replaceAll("\r","");
-        assertEquals("writer's contents", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", xml);
-    }
-
     @Test
     public void writeEndElementLineBreakStartElement(){
         writer.writeStartDocument();
@@ -139,6 +127,15 @@ public class XMLWriterTest {
         assertTrue("New lines were not written", m.matches());
     }
 
-    
+    // Calling writeEndElementLineBreak without a writeStartElement is not logical, and therefore not allowed 
+    @Test(expected = EmptyStackException.class)
+    public void writeEndElementLineBreakNoStartElement(){
+        writer.writeStartDocument();
+        writer.writeEndElementLineBreak();
+        String xml = sWriter.toString().trim();
+        xml = xml.replaceAll("\n","");
+        xml = xml.replaceAll("\r","");
+        assertEquals("writer's contents", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", xml);
+    }
 
 }

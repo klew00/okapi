@@ -31,8 +31,6 @@ import net.sf.okapi.common.uidescription.PathInputPart;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	public static final String FORMAT_TMX = "tmx";
-	public static final String FORMAT_XLIFF = "xliff";
-	public static final String FORMAT_TSV = "tsv";
 	public static final String FORMAT_PO = "po";
 	
 	static final String SINGLEOUTPUT = "singleOutput";
