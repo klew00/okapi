@@ -29,7 +29,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.Stack;
 
 /**
@@ -53,8 +52,7 @@ public class XMLWriter {
     	try {
     		Util.createDirectories(path);
     		OutputStream output = new BufferedOutputStream(new FileOutputStream(path));
-    		Charset charset = Charset.forName("UTF-8");
-    		writer = new PrintWriter(new OutputStreamWriter(output, charset.newEncoder()));
+    		writer = new PrintWriter(new OutputStreamWriter(output, "UTF-8"));
     	}
     	catch ( IOException e ) {
     		throw new OkapiIOException(e);

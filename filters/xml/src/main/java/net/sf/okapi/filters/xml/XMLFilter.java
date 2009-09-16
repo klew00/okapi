@@ -145,6 +145,12 @@ public class XMLFilter implements IFilter {
 			"Android Strings",
 			"Configuration for Android Strings XML documents.",
 			"AndroidStrings.fprm"));
+		list.add(new FilterConfiguration(getName()+"-ditaNoNS",
+			MimeTypeMapper.XML_MIME_TYPE,
+			getClass().getName(),
+			"DITA (without namespace)",
+			"Configuration for DITA documents.",
+			"ditaNoNS.fprm"));
 		return list;
 	}
 	

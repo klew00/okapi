@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -44,6 +45,11 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
+/**
+ * Implementation of {@link IFilterWriter} for PO. This class is not
+ * designed to be used with the PO Filter, but as a standalone writer that
+ * can be driven by filter events.
+ */
 public class POFilterWriter implements IFilterWriter {
 
 	private Parameters params;
@@ -109,7 +115,8 @@ public class POFilterWriter implements IFilterWriter {
 			if ( orig != null ) {
 				try {
 					orig.close();
-				} catch ( IOException e ) {
+				}
+				catch ( IOException e ) {
 					err = e;
 				}
 				orig = null;
@@ -397,10 +404,10 @@ public class POFilterWriter implements IFilterWriter {
 			Util.writeBOMIfNeeded(writer, useUTF8BOM, encoding);
 		}
 		catch ( FileNotFoundException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiFileNotFoundException(e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 

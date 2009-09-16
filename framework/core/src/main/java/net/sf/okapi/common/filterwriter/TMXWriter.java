@@ -17,6 +17,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.common.filterwriter;
 
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.Segment;
@@ -50,11 +52,11 @@ public class TMXWriter {
      * @param path The full path of the TMX document to create.
      * If another document exists already it will be overwritten.
      */
-    public TMXWriter(String path) {
-        if (path == null) {
-            throw new IllegalArgumentException("path must be set");
-        }
-        writer = new XMLWriter(path);
+    public TMXWriter (String path) {
+    	if ( path == null ) {
+    		throw new IllegalArgumentException("path must be set");
+    	}
+    	writer = new XMLWriter(path);
     }
 
     /**
@@ -63,43 +65,26 @@ public class TMXWriter {
      * @param writer an instance of an XMLWriter to use.
      * If another document exists already it will be overwritten.
      */
-    public TMXWriter(XMLWriter writer) {
-        this.writer = writer;
+    public TMXWriter (XMLWriter writer) {
+    	this.writer = writer;
     }
 
     /**
      * Closes the current output document if one is opened.
      */
-    public void close() {
-        if (writer != null) {
-            writer.close();
-            writer = null;
-        }
+    public void close () {
+    	if ( writer != null ) {
+    		writer.close();
+    		writer = null;
+    	}
     }
 
     /**
      * Gets the number of TU elements that have been written in the current output document.
      * @return The number of TU elements written in the current output document.
      */
-    public int getItemCount() {
-        return itemCount;
-    }
-
-    /**
-     * Creates a new TMX document.
-     * @param path The full path of the TMX document to create.
-     * If another document exists already it will be overwritten.
-     */
-    public void create(String path) {
-        if (path == null) {
-            throw new NullPointerException();
-        }
-        XMLWriter xmlWriter = new XMLWriter(path);
-        create(xmlWriter);
-    }
-
-    public void create(XMLWriter xmlWriter) {
-        writer = xmlWriter;
+    public int getItemCount () {
+    	return itemCount;
     }
 
     /**
@@ -107,8 +92,8 @@ public class TMXWriter {
      * workaround codes specific for Trados.
      * @param value True to output Trados-specific workarounds. False otherwise.
      */
-    public void setTradosWorkarounds(boolean value) {
-        tmxCont.setTradosWorkarounds(value);
+    public void setTradosWorkarounds (boolean value) {
+    	tmxCont.setTradosWorkarounds(value);
     }
 
     /**
@@ -116,12 +101,13 @@ public class TMXWriter {
      * the source content of each item, if it matches, the item is not written.
      * @param pattern The regular expression pattern of the contents to not output.
      */
-    public void setExclusionOption(String pattern) {
-        if ((pattern == null) || (pattern.length() == 0)) {
-            exclusionPattern = null;
-        } else {
-            exclusionPattern = Pattern.compile(pattern);
-        }
+    public void setExclusionOption (String pattern) {
+    	if ( Util.isEmpty(pattern) ) {
+    		exclusionPattern = null;
+    	} 
+    	else {
+    		exclusionPattern = Pattern.compile(pattern);
+    	}
     }
 
     /**
@@ -129,8 +115,8 @@ public class TMXWriter {
      * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
      * and 3=quot only.
      */
-    public void setQuoteMode(int quoteMode) {
-        tmxCont.setQuoteMode(quoteMode);
+    public void setQuoteMode (int quoteMode) {
+    	tmxCont.setQuoteMode(quoteMode);
     }
 
     /**
@@ -144,51 +130,52 @@ public class TMXWriter {
      * @param dataType The type of data to output.
      */
     public void writeStartDocument(String sourceLanguage,
-            String targetLanguage,
-            String creationTool,
-            String creationToolVersion,
-            String segType,
-            String originalTMFormat,
-            String dataType) {
-        if (sourceLanguage == null) {
-            throw new NullPointerException();
-        }
-        if (targetLanguage == null) {
-            throw new NullPointerException();
-        }
-        this.srcLang = sourceLanguage;
-        this.trgLang = targetLanguage;
+   		String targetLanguage,
+   		String creationTool,
+   		String creationToolVersion,
+   		String segType,
+   		String originalTMFormat,
+   		String dataType)
+    {
+    	if ( sourceLanguage == null ) {
+    		throw new NullPointerException();
+    	}
+    	if ( targetLanguage == null ) {
+    		throw new NullPointerException();
+    	}
+    	this.srcLang = sourceLanguage;
+    	this.trgLang = targetLanguage;
 
-        writer.writeStartDocument();
-        writer.writeStartElement("tmx");
-        writer.writeAttributeString("version", "1.4");
+    	writer.writeStartDocument();
+    	writer.writeStartElement("tmx");
+    	writer.writeAttributeString("version", "1.4");
 
-        writer.writeStartElement("header");
-        writer.writeAttributeString("creationtool",
-                (creationTool == null) ? "unknown" : creationTool);
-        writer.writeAttributeString("creationtoolversion",
-                (creationToolVersion == null) ? "unknown" : creationToolVersion);
-        writer.writeAttributeString("segtype",
-                (segType == null) ? "paragraph" : segType);
-        writer.writeAttributeString("o-tmf",
-                (originalTMFormat == null) ? "unknown" : originalTMFormat);
-        writer.writeAttributeString("adminlang", "en");
-        writer.writeAttributeString("srclang", srcLang);
-        writer.writeAttributeString("datatype",
-                (dataType == null) ? "unknown" : dataType);
-        writer.writeEndElement(); // header
+    	writer.writeStartElement("header");
+    	writer.writeAttributeString("creationtool",
+    		(creationTool == null) ? "unknown" : creationTool);
+    	writer.writeAttributeString("creationtoolversion",
+    		(creationToolVersion == null) ? "unknown" : creationToolVersion);
+    	writer.writeAttributeString("segtype",
+    		(segType == null) ? "paragraph" : segType);
+    	writer.writeAttributeString("o-tmf",
+    		(originalTMFormat == null) ? "unknown" : originalTMFormat);
+    	writer.writeAttributeString("adminlang", "en");
+    	writer.writeAttributeString("srclang", srcLang);
+    	writer.writeAttributeString("datatype",
+    		(dataType == null) ? "unknown" : dataType);
+    	writer.writeEndElement(); // header
 
-        writer.writeStartElement("body");
-        writer.writeLineBreak();
+    	writer.writeStartElement("body");
+    	writer.writeLineBreak();
     }
 
     /**
      * Writes the end of the TMX document.
      */
-    public void writeEndDocument() {
-        writer.writeEndElementLineBreak(); // body
-        writer.writeEndElementLineBreak(); // tmx
-        writer.writeEndDocument();
+    public void writeEndDocument () {
+    	writer.writeEndElementLineBreak(); // body
+    	writer.writeEndElementLineBreak(); // tmx
+    	writer.writeEndDocument();
     }
 
     /**
@@ -196,9 +183,10 @@ public class TMXWriter {
      * @param item The text unit to output.
      * @param attributes The optional set of attribute to put along with the entry.
      */
-    public void writeItem(TextUnit item,
-            Map<String, String> attributes) {
-        writeItem(item, attributes, false);
+    public void writeItem (TextUnit item,
+    	Map<String, String> attributes)
+    {
+    	writeItem(item, attributes, false);
     }
 
     /**
@@ -210,60 +198,63 @@ public class TMXWriter {
      * instead. This is to allow getting for example FR-CA translations for an FR project.
      */
     public void writeItem(TextUnit item,
-            Map<String, String> attributes,
-            boolean alternate) {
-        String tuid = item.getName();
-        if ((tuid == null) || (tuid.length() == 0)) {
-            // itemCount will be incremented in writeTU, so do a +1 here to take that in account
-            tuid = String.format("autoID%d", itemCount + 1);
-        }
+   		Map<String, String> attributes,
+   		boolean alternate)
+    {
+    	String tuid = item.getName();
+    	if ( !Util.isEmpty(tuid) ) {
+    		// itemCount will be incremented in writeTU, so do a +1 here to take that in account
+    		tuid = String.format("autoID%d", itemCount + 1);
+    	}
 
-        TextContainer srcTC = item.getSource();
-        TextContainer trgTC = item.getTarget(trgLang);
+    	TextContainer srcTC = item.getSource();
+    	TextContainer trgTC = item.getTarget(trgLang);
 
-        if ((trgTC == null) && alternate) {
-            // If we don't have a target but are in alternate mode: get the first
-            // available language in the list
-            Iterator<String> iter = item.getTargetLanguages().iterator();
-            if (iter.hasNext()) {
-                trgTC = item.getTarget(iter.next());
-            }
-        }
+    	if (( trgTC == null ) && alternate ) {
+    		// If we don't have a target but are in alternate mode: get the first
+    		// available language in the list
+    		Iterator<String> iter = item.getTargetLanguages().iterator();
+    		if ( iter.hasNext() ) {
+    			trgTC = item.getTarget(iter.next());
+    		}
+    	}
 
-//TODO: Output only the items with real match or translations (not copy of source)		
+    	//TODO: Output only the items with real match or translations (not copy of source)		
 
-        ScoresAnnotation scores = null;
-        if (trgTC != null) {
-            scores = trgTC.getAnnotation(ScoresAnnotation.class);
-        }
+    	ScoresAnnotation scores = null;
+    	if ( trgTC != null ) {
+    		scores = trgTC.getAnnotation(ScoresAnnotation.class);
+    	}
 
-        if (!srcTC.isSegmented()) { // Source is not segmented
-            if (scores != null) {
-                // Skip segments not leveraged
-                if (scores.getScore(0) > 0) {
-                    writeTU(srcTC, trgTC, tuid, attributes);
-                }
-            } else {
-                writeTU(srcTC, trgTC, tuid, attributes);
-            }
-        } else if (trgTC.isSegmented()) { // Source AND target are segmented
-            // Write the segments
-            List<Segment> srcList = srcTC.getSegments();
-            List<Segment> trgList = trgTC.getSegments();
-            for (int i = 0; i < srcList.size(); i++) {
-                if (scores != null) {
-                    // Skip segments not leveraged
-                    if (scores.getScore(i) == 0) {
-                        continue;
-                    }
-                }
-                writeTU(srcList.get(i).text,
-                        (i > trgList.size() - 1) ? null : trgList.get(i).text,
-                        String.format("%s_s%02d", tuid, i + 1),
-                        attributes);
-            }
-        }
-        // Else no TMX output needed for source segmented but not target
+    	if ( !srcTC.isSegmented() ) { // Source is not segmented
+    		if ( scores != null ) {
+    			// Skip segments not leveraged
+    			if ( scores.getScore(0) > 0 ) {
+    				writeTU(srcTC, trgTC, tuid, attributes);
+    			}
+    		} 
+    		else {
+    			writeTU(srcTC, trgTC, tuid, attributes);
+    		}
+    	}
+    	else if ( trgTC.isSegmented() ) { // Source AND target are segmented
+    		// Write the segments
+    		List<Segment> srcList = srcTC.getSegments();
+    		List<Segment> trgList = trgTC.getSegments();
+    		for ( int i = 0; i < srcList.size(); i++ ) {
+    			if ( scores != null ) {
+    				// Skip segments not leveraged
+    				if ( scores.getScore(i) == 0 ) {
+    					continue;
+    				}
+    			}
+    			writeTU(srcList.get(i).text,
+    				(i > trgList.size() - 1) ? null : trgList.get(i).text,
+    				String.format("%s_s%02d", tuid, i + 1),
+    				attributes);
+    		}
+    	}
+    	// Else no TMX output needed for source segmented but not target
     }
 
     /**
@@ -274,50 +265,51 @@ public class TMXWriter {
      * @param attributes the optional set of attribute to put along with the entry.
      */
     public void writeTU(TextFragment source,
-            TextFragment target,
-            String tuid,
-            Map<String, String> attributes) {
-        // Check if this source entry should be excluded from the output
-        if (exclusionPattern != null) {
-            if (exclusionPattern.matcher(source.getCodedText()).matches()) {
-                // The source coded text matches: do not include this entry in the output
-                return;
-            }
-        }
+   		TextFragment target,
+   		String tuid,
+   		Map<String, String> attributes)
+    {
+    	// Check if this source entry should be excluded from the output
+    	if ( exclusionPattern != null ) {
+    		if ( exclusionPattern.matcher(source.getCodedText()).matches() ) {
+    			// The source coded text matches: do not include this entry in the output
+    			return;
+    		}
+    	}
 
-        itemCount++;
-        writer.writeStartElement("tu");
-        if ((tuid != null) && (tuid.length() > 0)) {
-            writer.writeAttributeString("tuid", tuid);
-        }
-        writer.writeLineBreak();
+    	itemCount++;
+    	writer.writeStartElement("tu");
+    	if (( tuid != null ) && ( tuid.length() > 0 )) {
+    		writer.writeAttributeString("tuid", tuid);
+    	}
+    	writer.writeLineBreak();
 
-        if ((attributes != null) && (attributes.size() > 0)) {
-            for (String name : attributes.keySet()) {
-                writer.writeStartElement("prop");
-                writer.writeAttributeString("type", name);
-                writer.writeString(attributes.get(name));
-                writer.writeEndElementLineBreak(); // prop
-            }
-        }
+    	if (( attributes != null ) && ( attributes.size() > 0 )) {
+    		for ( String name : attributes.keySet() ) {
+    			writer.writeStartElement("prop");
+    			writer.writeAttributeString("type", name);
+    			writer.writeString(attributes.get(name));
+    			writer.writeEndElementLineBreak(); // prop
+    		}
+    	}
 
-        writer.writeStartElement("tuv");
-        writer.writeAttributeString("xml:lang", srcLang);
-        writer.writeStartElement("seg");
-        writer.writeRawXML(tmxCont.setContent(source).toString());
-        writer.writeEndElement(); // seg
-        writer.writeEndElementLineBreak(); // tuv
+    	writer.writeStartElement("tuv");
+    	writer.writeAttributeString("xml:lang", srcLang);
+    	writer.writeStartElement("seg");
+    	writer.writeRawXML(tmxCont.setContent(source).toString());
+    	writer.writeEndElement(); // seg
+    	writer.writeEndElementLineBreak(); // tuv
 
-        if (target != null) {
-            writer.writeStartElement("tuv");
-            writer.writeAttributeString("xml:lang", trgLang);
-            writer.writeStartElement("seg");
-            writer.writeRawXML(tmxCont.setContent(target).toString());
-            writer.writeEndElement(); // seg
-            writer.writeEndElementLineBreak(); // tuv
-        }
+    	if ( target != null ) {
+    		writer.writeStartElement("tuv");
+    		writer.writeAttributeString("xml:lang", trgLang);
+    		writer.writeStartElement("seg");
+    		writer.writeRawXML(tmxCont.setContent(target).toString());
+    		writer.writeEndElement(); // seg
+    		writer.writeEndElementLineBreak(); // tuv
+    	}
 
-        writer.writeEndElementLineBreak(); // tu
+    	writer.writeEndElementLineBreak(); // tu
     }
 
     /**
@@ -325,48 +317,48 @@ public class TMXWriter {
      * @param item The text unit to write.
      */
     public void writeTUFull(TextUnit item) {
-        if (item == null) {
-            throw new NullPointerException();
-        }
-        itemCount++;
+    	if ( item == null ) {
+    		throw new NullPointerException();
+    	}
+    	itemCount++;
 
-        String tuid = item.getName();
-        if ((tuid == null) || (tuid.length() == 0)) {
-            tuid = String.format("autoID%d", itemCount);
-        }
+    	String tuid = item.getName();
+    	if ( Util.isEmpty(tuid) ) {
+    		tuid = String.format("autoID%d", itemCount);
+    	}
 
-        TextContainer srcCont = item.getSource();
-        Set<String> langs = item.getTargetLanguages();
+    	TextContainer srcCont = item.getSource();
+    	Set<String> langs = item.getTargetLanguages();
 
-//TODO: Support segmented output
-        if (!srcCont.isSegmented()) { // Source is not segmented
-            // Write start TU
-            writer.writeStartElement("tu");
-            if ((tuid != null) && (tuid.length() > 0)) {
-                writer.writeAttributeString("tuid", tuid);
-            }
-            writer.writeLineBreak();
+    	//TODO: Support segmented output
+    	if ( !srcCont.isSegmented() ) { // Source is not segmented
+    		// Write start TU
+    		writer.writeStartElement("tu");
+    		if ( !Util.isEmpty(tuid) ) {
+    			writer.writeAttributeString("tuid", tuid);
+    		}
+    		writer.writeLineBreak();
 
-            // Write any resource-level properties
-            Set<String> names = item.getPropertyNames();
-            for (String name : names) {
-                writer.writeStartElement("prop");
-                writer.writeAttributeString("type", name);
-                writer.writeString(item.getProperty(name).getValue());
-                writer.writeEndElementLineBreak(); // prop
-            }
+    		// Write any resource-level properties
+    		Set<String> names = item.getPropertyNames();
+    		for ( String name : names ) {
+    			writer.writeStartElement("prop");
+    			writer.writeAttributeString("type", name);
+    			writer.writeString(item.getProperty(name).getValue());
+    			writer.writeEndElementLineBreak(); // prop
+    		}
 
-            // Write source TUV
-            writeTUV(srcCont, srcLang, srcCont);
+    		// Write source TUV
+    		writeTUV(srcCont, srcLang, srcCont);
 
-            // Write each target TUV
-            for (String lang : langs) {
-                writeTUV(item.getTarget(lang), lang, item.getTarget(lang));
-            }
+    		// Write each target TUV
+    		for ( String lang : langs ) {
+    			writeTUV(item.getTarget(lang), lang, item.getTarget(lang));
+    		}
 
-            // Write end TU
-            writer.writeEndElementLineBreak(); // tu
-        }
+    		// Write end TU
+    		writer.writeEndElementLineBreak(); // tu
+    	}
     }
 
     /**
@@ -378,26 +370,28 @@ public class TMXWriter {
      * this TUV, or null for no properties.
      */
     private void writeTUV(TextFragment frag,
-            String language,
-            TextContainer contForProp) {
-        writer.writeStartElement("tuv");
-        writer.writeAttributeString("xml:lang", language);
-        writer.writeStartElement("seg");
-        writer.writeRawXML(tmxCont.setContent(frag).toString());
-        writer.writeEndElement(); // seg
+   		String language,
+   		TextContainer contForProp)
+    {
+    	writer.writeStartElement("tuv");
+    	writer.writeAttributeString("xml:lang", language);
+    	writer.writeStartElement("seg");
+    	writer.writeRawXML(tmxCont.setContent(frag).toString());
+    	writer.writeEndElement(); // seg
 
-        if (contForProp != null) {
-            Set<String> names = contForProp.getPropertyNames();
-            if (names.size() > 0) {
-                writer.writeLineBreak();
-            }
-            for (String name : names) {
-                writer.writeStartElement("prop");
-                writer.writeAttributeString("type", name);
-                writer.writeString(contForProp.getProperty(name).getValue());
-                writer.writeEndElementLineBreak(); // prop
-            }
-        }
-        writer.writeEndElementLineBreak(); // tuv
+    	if ( contForProp != null ) {
+    		Set<String> names = contForProp.getPropertyNames();
+    		if ( names.size() > 0 ) {
+    			writer.writeLineBreak();
+    		}
+    		for ( String name : names ) {
+    			writer.writeStartElement("prop");
+    			writer.writeAttributeString("type", name);
+    			writer.writeString(contForProp.getProperty(name).getValue());
+    			writer.writeEndElementLineBreak(); // prop
+    		}
+    	}
+    	writer.writeEndElementLineBreak(); // tuv
     }
+
 }
