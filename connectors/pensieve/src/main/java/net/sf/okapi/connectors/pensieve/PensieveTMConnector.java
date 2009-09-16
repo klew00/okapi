@@ -101,19 +101,13 @@ public class PensieveTMConnector implements ITMQuery {
 		results = new ArrayList<QueryResult>();  
 		current = -1;
 		try {
-			// Do the search
-			List<TmHit> list = seeker.searchExact(text.toString(), maxHits);
-			int more = maxHits;
-			if ( !Util.isEmpty(list) ) {
-				more = more-list.size();
-			}
-			if ( more > 0 ) {
-				list.addAll(seeker.searchFuzzyWuzzy(text.toString(), more));
-			}
+			// searchFuzzy also returns exact, so no need to call searchExact
+			List<TmHit> list = seeker.searchFuzzyWuzzy(text.toString(), maxHits);
 			// Convert to normalized results
 			for ( TmHit hit : list ) {
 				QueryResult qr = new QueryResult();
-				qr.score = hit.getScore().intValue();
+				Float f = hit.getScore() * 100;
+				qr.score = f.intValue();
 				qr.source = hit.getTu().getSource().getContent();
 				qr.target = hit.getTu().getTarget().getContent();
 				results.add(qr);

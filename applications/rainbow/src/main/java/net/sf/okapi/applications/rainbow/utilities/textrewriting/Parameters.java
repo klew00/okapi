@@ -82,7 +82,7 @@ public class Parameters extends BaseParameters {
 		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
 		transResClass = buffer.getString("transResClass", transResClass);
-		transResParams = buffer.getString("transResParams", transResParams);
+		transResParams = buffer.getGroup("transResParams", transResParams);
 	}
 
 	@Override

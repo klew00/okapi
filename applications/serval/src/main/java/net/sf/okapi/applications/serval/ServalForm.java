@@ -5,9 +5,11 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.lib.translation.QueryManager;
@@ -27,6 +29,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
@@ -357,19 +360,31 @@ public class ServalForm {
 	private void importTMXInPensieve () {
 		try {
 			// Get the directory
-			String dir= "C:\\Tmp\\pensieveTests";
+			DirectoryDialog dlg = new DirectoryDialog(shell);
+			String dir = dlg.open();
+			if (  dir == null ) return;
+			
+			// Get the languages
+			InputDialog dlg2 = new InputDialog(shell, "Languages",
+				"Enter source and target language separated by a space", "EN-US FR-FR", null, 0, -1, -1);
+			String tmp = dlg2.showDialog();
+			if ( Util.isEmpty(tmp) ) return;
+			String[] langs = tmp.split("[ ,]", 0);
+			if ( langs.length != 2 ) {
+				throw new RuntimeException(String.format("Invalid languages: '%s'", tmp));
+			}
 			
 			// Get TMX file
 			String[] paths = Dialogs.browseFilenames(shell, "Select TMX Document to Import", false, null, null, null);
 			if ( paths == null ) return;
 			
 			TmxFilter filter = new TmxFilter();
-			OkapiTmxImporter imp = new OkapiTmxImporter("EN-US", filter);
+			OkapiTmxImporter imp = new OkapiTmxImporter(langs[0], filter);
 			
 			TmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir);
 			
 			File file = new File(paths[0]);
-			imp.importTmx(file.toURI(), "FR-FR", writer);
+			imp.importTmx(file.toURI(), langs[1], writer);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
