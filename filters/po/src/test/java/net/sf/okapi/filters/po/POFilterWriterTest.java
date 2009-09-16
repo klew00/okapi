@@ -38,7 +38,8 @@ public class POFilterWriterTest {
 	private POFilter filter;
 	private String header = "#, fuzzy\nmsgid \"\"\nmsgstr \"\"\n"
 		+ "\"Content-Type: text/plain; charset=UTF-8\\n\"\n"
-		+ "\"Content-Transfer-Encoding: 8bit\\n\"\n\n";
+		+ "\"Content-Transfer-Encoding: 8bit\\n\"\n"
+		+ "\"Plural-Forms: nplurals=2; plural=(n>1);\\n\"\n\n";
 	
 	@Before
 	public void setUp() {
@@ -80,6 +81,18 @@ public class POFilterWriterTest {
 	@Test
 	public void testOutputWithPlural () {
 		String snippet = ""
+			+ "msgid \"source singular\"\n"
+			+ "msgid_plural \"source plural\"\n"
+			+ "msgstr[0] \"target singular\"\n"
+			+ "msgstr[1] \"target plural\"\n\n";
+		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		assertEquals(header+snippet, result);
+	}
+		
+	@Test
+	public void testOutputWithFuzzyPlural () {
+		String snippet = ""
+			+ "#, fuzzy\n"
 			+ "msgid \"source singular\"\n"
 			+ "msgid_plural \"source plural\"\n"
 			+ "msgstr[0] \"target singular\"\n"

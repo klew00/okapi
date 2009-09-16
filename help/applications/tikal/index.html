@@ -21,6 +21,7 @@ localization-related utilities:</p>
 	<li><a href="#query">Query Translation Resources</a></li>
 	<li><a href="#listConfig">List Filter Configurations</a></li>
 	<li><a href="#editConfig">Edit Filter Configurations</a></li>
+	<li><a href="#conv2po">Conversion to PO Format</a></li>
 </ul>
 <p>Note: The command <code>-e</code> (Edit Filter Configurations) requires 
 access to UI editors that are available only if you have one of the <b>okapi-apps</b> platform-specific distributions. It is not 
@@ -205,6 +206,41 @@ user configuration for the RegEx Filter. </p>
 <p>Opens the Filter Configurations dialog box, where all the available 
 configurations are listed and can be viewed or edited, and from where you can 
 create new configurations.</p>
+<h2><a name="conv2po"></a>Conversion to PO Format</h2>
+<p>Creates a PO file for the give input file. If the input file is multilingual 
+(like a TMX or a TS file), the source and target will be in the PO file.</p>
+<p>The syntax of this command is:</p>
+<pre>-2po [options] inputFile [inputFile2...]</pre>
+<p>Where the options are:</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table3">
+	<tr>
+		<td><code>-fc configId</code></td>
+		<td>The identifier of the filter configuration to use for the 
+		input files</td>
+	</tr>
+	<tr>
+		<td><code>-ie encoding</code></td>
+		<td>The encoding name of the input files. this is used only if the 
+		filter cannot detect the encoding from the input file itself.</td>
+	</tr>
+	<tr>
+		<td><code>-sl srcLang</code></td>
+		<td>The code of the source language of the input files.</td>
+	</tr>
+	<tr>
+		<td><code>-tl trgLang</code></td>
+		<td>The code of the target language.</td>
+	</tr>
+	<tr>
+		<td><code>-generic</code></td>
+		<td>Indicates to use generic notation for inline codes in the generated 
+		PO file, for example <code>&lt;1/&gt;</code> vs. &lt;br/&gt;.</td>
+	</tr>
+</table>
+<p>For example:</p>
+<pre>tikal -2po data.tmx -sl EN -tl ZU</pre>
+<p>Creates a PO file from the TMX document <code>data.tmx</code>. The source 
+language will be English and the target Zulu.</p>
 <p>&nbsp;</p>
 
 </body>

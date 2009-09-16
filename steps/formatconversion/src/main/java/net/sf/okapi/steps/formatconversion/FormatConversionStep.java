@@ -124,7 +124,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	private void startPOOutput () {
 		writer = new POFilterWriter();
 		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
-		outParams.outputGeneric = true;
+		outParams.outputGeneric = params.getUseGenericCodes();
 		File outFile;
 		if ( isLastStep() ) {
 			if ( params.isSingleOutput() ) {

@@ -23,6 +23,7 @@ package net.sf.okapi.applications.tikal;
 import java.io.File;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -132,14 +133,13 @@ public class Main {
 				prog.printUsage();
 				return; // Overrides all arguments 
 			}
-			if ( args.contains("-h") ) {
+			if ( args.contains("-h") || args.contains("--help") || args.contains("-help") ) {
 				prog.showHelp();
 				return; // Overrides all arguments
 			}
 			
 			for ( int i=0; i<args.size(); i++ ) {
 				String arg = args.get(i);
-				arg = arg.replace('/', '-'); // To allow /x syntax
 				if ( arg.equals("-fc") ) {
 					prog.specifiedConfigId = getArgument(args, ++i);
 				}
@@ -538,6 +538,8 @@ public class Main {
 			if ( !prepareFilter(configId) ) return; // Next input
 			
 			File file = new File(input);
+			String output = input+".po";
+			URI outputURI = new File(output).toURI();
 			RawDocument rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			rd.setFilterConfigId(configId);
 			
@@ -546,12 +548,10 @@ public class Main {
 			ps.println(" Input encoding: "+inputEncoding);
 			ps.println("  Configuration: "+configId);
 			ps.println(" Input document: "+input);
-//			ps.print("Output document: ");
-//			if ( output == null ) ps.println("<auto-defined>");
-//			else ps.println(output);
+			ps.println("Output document: "+output);
 			ps.print("Conversion to PO...");
 			
-			convertToPO(rd);
+			convertToPO(rd, outputURI);
 			ps.println(" Done");
 		}
 	}
@@ -596,6 +596,9 @@ public class Main {
 		ps.println("Query translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
 		ps.println("      [-google] [-tt hostname[:port]] [-mm key]");
+		ps.println("Conversion to PO file:");
+		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-generic]");
 	}
 
 	private void displayQuery (IQuery conn) {
@@ -670,7 +673,7 @@ public class Main {
 		}
 	}
 
-	private void convertToPO (RawDocument rd) {
+	private void convertToPO (RawDocument rd, URI outputURI) {
 		// Create the context and the pipeline
 		PipelineContext ctx = new PipelineContext();
 		ctx.setFilterConfigurationMapper(fcMapper);
@@ -684,12 +687,11 @@ public class Main {
 		net.sf.okapi.steps.formatconversion.Parameters params = fcStep.getParameters(); 
 		params.setOutputFormat(Parameters.FORMAT_PO);
 		params.setOutputPath("output.po");
-		params.setSingleOutput(true);
+		params.setSingleOutput(false);
 		params.setUseGenericCodes(genericOutput);
 		driver.addStep(fcStep);
 		
-		driver.addBatchItem(rd);
+		driver.addBatchItem(rd, outputURI, outputEncoding);
 		driver.processBatch();
-		
 	}
 }

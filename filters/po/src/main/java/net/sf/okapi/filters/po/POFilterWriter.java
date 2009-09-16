@@ -190,7 +190,8 @@ public class POFilterWriter implements IFilterWriter {
 			writer.write("msgstr \"\""+linebreak);
 			writer.write("\"Content-Type: text/plain; charset="+encoding+"\\n\""+linebreak);
 			writer.write("\"Content-Transfer-Encoding: 8bit\\n\""+linebreak);
-			writer.write(linebreak);
+			writer.write("\"Plural-Forms: "+PluralForms.getExpression(language));
+			writer.write("\\n\""+linebreak+linebreak);
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error writing the header.", e);
@@ -223,6 +224,18 @@ public class POFilterWriter implements IFilterWriter {
 			if ( plurals.size() < 2 ) {
 				throw new OkapiIOException("PO connot have less than two entries for a plural form.");
 			}
+
+			// Fuzzy
+			TextContainer tc = plurals.get(0).getTarget(language);
+			if ( tc != null ) {
+				Property prop = tc.getProperty(Property.APPROVED);
+				if ( prop != null ) {
+					if ( !prop.getValue().equals("yes") ) {
+						writer.write("#, fuzzy"+linebreak);
+					}
+				}
+			}
+			
 			// msgid
 			writer.write("msgid ");
 			writeQuotedContent(plurals.get(0).getSource());
