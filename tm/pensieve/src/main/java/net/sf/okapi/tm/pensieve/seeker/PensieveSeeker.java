@@ -195,4 +195,8 @@ public class PensieveSeeker implements TmSeeker {
         }
         return fieldValue;
     }
+
+    public Directory getIndexDir() {
+        return indexDir;
+    }
 }

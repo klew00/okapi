@@ -20,14 +20,13 @@
 
 package net.sf.okapi.tm.pensieve;
 
-import org.junit.Assert;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
+import org.junit.Assert;
+
+import java.lang.reflect.Constructor;
 
 /**
  * User: Christian Hargraves
@@ -39,8 +38,7 @@ public class Helper {
     /*
      * Invoke private constructor by reflection purely for code-coverage 
      */
-    public static Object genericTestConstructor(final Class<?> cls) throws InstantiationException,
-            IllegalAccessException, InvocationTargetException {
+    public static Object genericTestConstructor(final Class<?> cls) throws Exception {
         //This is going to be the only constructor since it is for testing private constructors ... why have
         //more than one private constructor?
         final Constructor<?> c = cls.getDeclaredConstructors()[0];

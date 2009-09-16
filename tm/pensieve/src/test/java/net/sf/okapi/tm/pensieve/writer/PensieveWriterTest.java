@@ -21,8 +21,9 @@
 package net.sf.okapi.tm.pensieve.writer;
 
 import net.sf.okapi.common.resource.TextFragment;
-import static net.sf.okapi.tm.pensieve.common.TranslationUnitField.*;
+import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.*;
+import static net.sf.okapi.tm.pensieve.common.TranslationUnitField.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -30,8 +31,8 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PhraseQuery;
-import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.RAMDirectory;
 import static org.junit.Assert.*;
@@ -40,7 +41,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import net.sf.okapi.tm.pensieve.Helper;
 
 /**
  * User: Christian Hargraves
@@ -60,6 +60,11 @@ public class PensieveWriterTest {
         dir = new RAMDirectory();
         tmWriter = new PensieveWriter(dir);
         writer = tmWriter.getIndexWriter();
+    }
+
+    @Test
+    public void getIndexWriterSameDirectory(){
+        assertSame("ram directory", dir, tmWriter.getIndexWriter().getDirectory());
     }
 
     @Test

@@ -55,6 +55,11 @@ public class PensieveSeekerTest {
     }
 
     @Test
+    public void getDirectory(){
+        assertSame("directory", DIR, seeker.getIndexDir());
+    }
+
+    @Test
     public void getFieldValueNoField(){
         Document doc = new Document();
         assertNull("Null should be returned for an empty field", seeker.getFieldValue(doc, TranslationUnitField.SOURCE));
