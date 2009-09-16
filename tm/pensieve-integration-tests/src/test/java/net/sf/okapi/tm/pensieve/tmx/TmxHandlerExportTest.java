@@ -27,7 +27,8 @@ public class TmxHandlerExportTest {
 
         TmSeeker seeker = new PensieveSeeker(ramDir);
         StringWriter sWriter = new StringWriter();
-        tmxExporter.exportTmx(new URI("target/test-classes/output_tmx.xml"), "EN", "IT", seeker, new TMXWriter(new XMLWriter(sWriter)));
+        URI uri = new URI("target/test-classes/output_tmx.xml");
+        tmxExporter.exportTmx("EN", "IT", seeker, new TMXWriter(new XMLWriter(sWriter)));
         
         //TODO: verify content of file
     }

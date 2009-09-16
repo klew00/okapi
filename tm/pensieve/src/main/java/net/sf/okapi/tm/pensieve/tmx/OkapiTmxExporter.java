@@ -25,7 +25,6 @@ import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -40,20 +39,19 @@ public class OkapiTmxExporter implements TmxExporter {
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX
      */
-    public void exportTmx(URI tmxUri, String sourceLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
-        exportTmx(tmxUri, sourceLang, null, tmSeeker, tmxWriter);
+    public void exportTmx(String sourceLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
+        exportTmx(sourceLang, null, tmSeeker, tmxWriter);
     }
 
     /**
      * Exports only specific target langs Pensieve to TMX
-     * @param tmxUri The location of the TMX
      * @param sourceLang The source language of desired tran
      * @param targetLang The target language of desired tran (or null for all target languages)
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX
      */
-    public void exportTmx(URI tmxUri, String sourceLang, String targetLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
-        checkExportTmxParams(tmxUri, sourceLang, tmSeeker, tmxWriter);
+    public void exportTmx(String sourceLang, String targetLang, TmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
+        checkExportTmxParams(sourceLang, tmSeeker, tmxWriter);
         try {
             tmxWriter.writeStartDocument(sourceLang, targetLang, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
             //TODO might eat up too much memory for large TMs
@@ -73,12 +71,9 @@ public class OkapiTmxExporter implements TmxExporter {
         return sourceLang.equals(tu.getSource().getLang()) && (targetLang == null || targetLang.equals(tu.getTarget().getLang()));
     }
 
-    private void checkExportTmxParams(URI tmxUri, String sourceLang, TmSeeker tmSeeker, TMXWriter tmxWriter) {
+    private void checkExportTmxParams(String sourceLang, TmSeeker tmSeeker, TMXWriter tmxWriter) {
         if (sourceLang == null) {
             throw new IllegalArgumentException("sourceLang was not set");
-        }
-        if (tmxUri == null) {
-            throw new IllegalArgumentException("tmxUri was not set");
         }
         if (tmSeeker == null) {
             throw new IllegalArgumentException("tmSeeker was not set");
