@@ -21,6 +21,7 @@
 package net.sf.okapi.connectors.pensieve;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.IParameters;
@@ -97,7 +98,7 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 	
 	public int query (TextFragment text) {
-		results.clear();
+		results = new ArrayList<QueryResult>();  
 		current = -1;
 		try {
 			// Do the search
@@ -115,13 +116,13 @@ public class PensieveTMConnector implements ITMQuery {
 				qr.score = hit.getScore().intValue();
 				qr.source = hit.getTu().getSource().getContent();
 				qr.target = hit.getTu().getTarget().getContent();
+				results.add(qr);
 			}
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error when querying the TM.", e);
 		}
-		if ( results == null ) return 0;
-		current = 0;
+		if ( results.size() > 0 ) current = 0;
 		return results.size();
 	}
 	

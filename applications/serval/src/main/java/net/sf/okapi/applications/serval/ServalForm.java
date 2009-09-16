@@ -1,5 +1,6 @@
 package net.sf.okapi.applications.serval;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,8 +9,12 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.tm.pensieve.tmx.OkapiTmxImporter;
+import net.sf.okapi.tm.pensieve.writer.TmWriter;
+import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -81,6 +86,14 @@ public class ServalForm {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				editOptions();
+            }
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		menuItem.setText("&Import TMX in Pensieve TM...");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				importTMXInPensieve();
             }
 		});
 
@@ -340,5 +353,28 @@ public class ServalForm {
 		}
 		return tf;
 	}
+
+	private void importTMXInPensieve () {
+		try {
+			// Get the directory
+			String dir= "C:\\Tmp\\pensieveTests";
+			
+			// Get TMX file
+			String[] paths = Dialogs.browseFilenames(shell, "Select TMX Document to Import", false, null, null, null);
+			if ( paths == null ) return;
+			
+			TmxFilter filter = new TmxFilter();
+			OkapiTmxImporter imp = new OkapiTmxImporter("EN-US", filter);
+			
+			TmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir);
+			
+			File file = new File(paths[0]);
+			imp.importTmx(file.toURI(), "FR-FR", writer);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+	}
+
 }
 
