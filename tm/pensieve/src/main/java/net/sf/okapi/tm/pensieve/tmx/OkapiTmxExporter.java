@@ -34,7 +34,6 @@ public class OkapiTmxExporter implements TmxExporter {
 
     /**
      * Exports all target langs in Pensieve to TMX
-     * @param tmxUri The location of the TMX
      * @param sourceLang The source language of desired tran
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX

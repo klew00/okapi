@@ -24,7 +24,6 @@ import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
 
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * The TMX interface to Pensieve.
