@@ -20,12 +20,18 @@
 
 package net.sf.okapi.connectors.pensieve;
 
+import java.io.IOException;
 import java.util.List;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.tm.pensieve.common.TmHit;
+import net.sf.okapi.tm.pensieve.seeker.PensieveSeeker;
+import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
 
 public class PensieveTMConnector implements ITMQuery {
 	
@@ -36,6 +42,7 @@ public class PensieveTMConnector implements ITMQuery {
 	private String srcLang;
 	private String trgLang;
 	private Parameters params;
+	private PensieveSeeker seeker;
 
 	public PensieveTMConnector () {
 		params = new Parameters();
@@ -59,7 +66,7 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 
 	public void close() {
-		//TODO
+		seeker = null;
 	}
 
 	public boolean hasNext () {
@@ -81,7 +88,7 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 
 	public void open () {
-		//TODO
+		seeker = (PensieveSeeker)TmSeekerFactory.createFileBasedTmSeeker(params.getDbDirectory());
 	}
 
 	public int query (String plainText) {
@@ -90,9 +97,29 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 	
 	public int query (TextFragment text) {
+		results.clear();
 		current = -1;
-		//TODO
-
+		try {
+			// Do the search
+			List<TmHit> list = seeker.searchExact(text.toString(), maxHits);
+			int more = maxHits;
+			if ( !Util.isEmpty(list) ) {
+				more = more-list.size();
+			}
+			if ( more > 0 ) {
+				list.addAll(seeker.searchFuzzyWuzzy(text.toString(), more));
+			}
+			// Convert to normalized results
+			for ( TmHit hit : list ) {
+				QueryResult qr = new QueryResult();
+				qr.score = hit.getScore().intValue();
+				qr.source = hit.getTu().getSource().getContent();
+				qr.target = hit.getTu().getTarget().getContent();
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error when querying the TM.", e);
+		}
 		if ( results == null ) return 0;
 		current = 0;
 		return results.size();
