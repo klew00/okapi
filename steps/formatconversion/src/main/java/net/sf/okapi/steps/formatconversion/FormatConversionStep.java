@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.formatconversion;
 
 import java.io.File;
+import java.net.URI;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -29,7 +30,8 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.filters.po.POFilterWriter;
 
@@ -42,22 +44,29 @@ public class FormatConversionStep extends BasePipelineStep {
 	private IFilterWriter writer;
 	private boolean firstOutputCreated;
 	private int outputType;
+	private URI outputURI;
+	private String targetLanguage;
 
 	public FormatConversionStep () {
 		params = new Parameters();
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	public void setTargetLanguage (String targetLanguage) {
+		this.targetLanguage = targetLanguage;
+	}
+	
 	public String getDescription () {
 		return "Converts the output of a filter into a specified file format.";
 	}
 
 	public String getName () {
 		return "Format Conversion";
-	}
-
-	@Override
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
 	}
 
 	@Override
@@ -140,11 +149,11 @@ public class FormatConversionStep extends BasePipelineStep {
 				outFile = new File(params.getOutputPath());
 			}
 			else {
-				outFile = new File(getContext().getOutputURI(0));
+				outFile = new File(outputURI);
 			}
 			// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
 			writer.setOutput(outFile.getPath());
-			writer.setOptions(getContext().getTargetLanguage(0), "UTF-8");
+			writer.setOptions(targetLanguage, "UTF-8");
 		}
 		else {
 			try {
@@ -168,11 +177,11 @@ public class FormatConversionStep extends BasePipelineStep {
 				outFile = new File(params.getOutputPath());
 			}
 			else {
-				outFile = new File(getContext().getOutputURI(0));
+				outFile = new File(outputURI);
 			}
 			// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
 			writer.setOutput(outFile.getPath());
-			writer.setOptions(getContext().getTargetLanguage(0), "UTF-8");
+			writer.setOptions(targetLanguage, "UTF-8");
 		}
 		else {
 			try {

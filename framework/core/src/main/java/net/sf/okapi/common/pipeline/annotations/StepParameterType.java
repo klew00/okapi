@@ -20,16 +20,16 @@
 
 package net.sf.okapi.common.pipeline.annotations;
 
+/**
+ * Types of the runtime parameters for steps.
+ */
 public enum StepParameterType {
-	filter, 
 	
-	SourceLanguage,
-	
-	OutputURI,
-	
-	TargetLanguage, 
-	
-	FilterConfigurationId,
-	
-	FilterConfigurationMapper		
+	OUTPUT_URI,
+	FILTER,
+	SOURCE_LANGUAGE,
+	TARGET_LANGUAGE, 
+	FILTER_CONFIGURATION_ID,
+	FILTER_CONFIGURATION_MAPPER		
+
 }

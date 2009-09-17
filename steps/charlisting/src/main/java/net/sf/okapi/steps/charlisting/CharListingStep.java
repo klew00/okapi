@@ -40,6 +40,7 @@ public class CharListingStep extends BasePipelineStep {
 
 	private Parameters params;
 	private Hashtable<Character, Integer> charList;
+	private String outputPath;
 
 	public CharListingStep () {
 		params = new Parameters();
@@ -51,6 +52,10 @@ public class CharListingStep extends BasePipelineStep {
 			charList.clear();
 			charList = null;
 		}
+	}
+	
+	public String getOutputPath () {
+		return outputPath;
 	}
 
 	public String getDescription () {
@@ -112,7 +117,7 @@ public class CharListingStep extends BasePipelineStep {
 				writer.close();
 				writer = null;
 				if ( params.isAutoOpen() ) {
-					getContext().setString("outputFile", params.getOutputPath());
+					outputPath = params.getOutputPath();
 				}
 			}
 		}

@@ -76,21 +76,21 @@ public class BlindPipelineDriver {
 					Method method = p.getMethod();
 					if ( method == null ) continue;
 					switch ( p.getParameterType() ) {
-					case OutputURI:
+					case OUTPUT_URI:
 						if ( lastOutputStep == p.getStep() ) {
 							method.invoke(p.getStep(), outputURI);
 						}
 						break;
-					case SourceLanguage:
+					case SOURCE_LANGUAGE:
 						method.invoke(p.getStep(), input.getSourceLanguage());
 						break;
-					case TargetLanguage:
+					case TARGET_LANGUAGE:
 						method.invoke(p.getStep(), input.getTargetLanguage());
 						break;
-					case FilterConfigurationId:
+					case FILTER_CONFIGURATION_ID:
 						method.invoke(p.getStep(), input.getFilterConfigId());
 						break;
-					case FilterConfigurationMapper:
+					case FILTER_CONFIGURATION_MAPPER:
 						method.invoke(p.getStep(), fcMapper);
 						break;
 					}
