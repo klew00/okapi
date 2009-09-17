@@ -21,12 +21,14 @@
 package net.sf.okapi.steps.common;
 
 import java.io.File;
+import java.net.URI;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
@@ -38,6 +40,7 @@ import net.sf.okapi.common.resource.RawDocument;
 public class RawDocumentWriterStep extends BasePipelineStep {
 
 	private boolean isDone;
+	private URI outputURI;
 	
 	/**
 	 * Creates a new RawDocumentWriterStep object.
@@ -46,15 +49,10 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 	public RawDocumentWriterStep () {
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
 	}
-
 	
 	public String getDescription() {
 		return "Write a RawDocument to an output file.";
@@ -92,7 +90,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 			rawDoc = (RawDocument)event.getResource();
 			
 			if ( isLastStep() ) {
-				outFile = new File(getContext().getOutputURI(0));
+				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}
 			else {

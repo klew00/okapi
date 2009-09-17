@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -31,7 +32,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class BOMConversionStep extends BasePipelineStep {
@@ -45,24 +47,17 @@ public class BOMConversionStep extends BasePipelineStep {
 	private boolean isDone;
 	private Parameters params;
 	private byte[] buffer;
+	private URI outputURI;
 
 	public BOMConversionStep () {
 		params = new Parameters();
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
 	}
-
-	public void destroy () {
-		// Nothing to do
-	}
-
+	
 	public String getDescription () {
 		return "Add or remove Unicode Byte-Order-Mark (BOM) in a text-based file.";
 	}
@@ -116,7 +111,7 @@ public class BOMConversionStep extends BasePipelineStep {
 			// Open the output
 			File outFile;
 			if ( isLastStep() ) {
-				outFile = new File(getContext().getOutputURI(0));
+				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}
 			else {

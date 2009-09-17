@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -41,7 +42,8 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -51,11 +53,11 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private Parameters params;
-	private String trgLang;
 	private boolean isDone;
-	
 	private Matcher matcher;
 	private Pattern patterns[];
+	private URI outputURI;
+	private String targetLanguage;
 	
 	@Override
 	public void destroy () {
@@ -66,13 +68,14 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		params = new Parameters();
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	public void setTargetLanguage (String targetLanguage) {
+		this.targetLanguage = targetLanguage;
 	}
 	
 	public String getDescription () {
@@ -143,7 +146,6 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		if ( !params.plainText ) { // RawDocument mode
 			isDone = false;
 		}		
-		trgLang = getContext().getTargetLanguage(0);
 	}	
 	
 	@Override
@@ -181,7 +183,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			// Open the output
 			File outFile;
 			if ( isLastStep() ) {
-				outFile = new File(getContext().getOutputURI(0));
+				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}
 			else {
@@ -247,7 +249,6 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	
 	@Override
 	protected void handleTextUnit (Event event) {
-
 		//--Limit the textunit handler to running in filter-mode--
 		if ( params.plainText ) {
 			throw new OkapiBadStepInputException("Search and Replace cannot be performed on the entire file (non-filter mode) in the current pipeline configuration. \nPlease re-configure the pipeline or modify Search and Replace to use the filter-mode option. ");
@@ -261,20 +262,20 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		try {
 			// Else: do the requested modifications
 			// Make sure we have a target where to set data
-			tu.createTarget(trgLang, false, IResource.COPY_ALL);
+			tu.createTarget(targetLanguage, false, IResource.COPY_ALL);
 
-			String result = tu.getTargetContent(trgLang).getCodedText();
+			String result = tu.getTargetContent(targetLanguage).getCodedText();
 
         	if ( params.regEx ){
         		for(int i=0; i<params.rules.size();i++){
             		String s[] = params.rules.get(i);
      	           	if ( s[0].equals("true") ) {
-		        		
      	           		matcher = patterns[i].matcher(result);
 		        		result = matcher.replaceAll(s[2]);
     	        	}
     	        }
-        	}else{
+        	}
+        	else {
     	        for ( String[] s : params.rules ) {
     	        	if ( s[0].equals("true") ) {
    		        		result = result.replace(s[1],s[2]);
@@ -282,11 +283,12 @@ public class SearchAndReplaceStep extends BasePipelineStep {
     	        }
         	}
 			
-			TextContainer cnt = tu.getTarget(trgLang); 
+			TextContainer cnt = tu.getTarget(targetLanguage); 
 			cnt.setCodedText(result);
 		}
 		catch ( Exception e ) {
-			logger.log(Level.WARNING, "Error when updating content: '"+tmp+"'", e);
+			logger.log(Level.WARNING,
+				String.format("Error when updating content: '%s'.", tmp), e);
 		}		
 	}
 }

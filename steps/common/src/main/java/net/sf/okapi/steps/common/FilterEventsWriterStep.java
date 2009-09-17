@@ -20,12 +20,16 @@
 
 package net.sf.okapi.steps.common;
 
+import java.net.URI;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 
 /**
  * Outputs filters events into a document.
@@ -39,6 +43,11 @@ import net.sf.okapi.common.pipelinedriver.PipelineContext;
 public class FilterEventsWriterStep extends BasePipelineStep {
 
 	private IFilterWriter filterWriter;
+	private IFilterConfigurationMapper fcMapper;
+	private String filterConfigId;
+	private URI outputURI;
+	private String targetLanguage;
+	private String outputEncoding;
 
 	/**
 	 * Creates a new FilterEventsWriterStep object.
@@ -46,16 +55,6 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	 */
 	public FilterEventsWriterStep () {
 	}
-	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
-	}
-
 	
 	/**
 	 * Creates a new FilterEventsWriterStep object.
@@ -65,6 +64,31 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	 */
 	public FilterEventsWriterStep (IFilterWriter filterWriter) {
 		setFilterWriter(filterWriter);
+	}
+
+	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_ID)
+	public void setFilterConfigurationId (String filterConfigId) {
+		this.filterConfigId = filterConfigId;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	public void setTargetLanguage (String targetLanguage) {
+		this.targetLanguage = targetLanguage;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_ENCODING)
+	public void setOutputEncoding (String outputEncoding) {
+		this.outputEncoding = outputEncoding;
 	}
 	
 	/**
@@ -91,16 +115,14 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	public Event handleEvent(Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
-			IFilter tmp = getContext().getFilterConfigurationMapper().createFilter(
-				getContext().getFilterConfigurationId(0));
+			IFilter tmp = fcMapper.createFilter(filterConfigId);
 			if ( tmp == null ) {
 				throw new OkapiFilterCreationException("Error when creating writer from filter.");
 			}
 			filterWriter = tmp.createFilterWriter();
-			filterWriter.setOptions(getContext().getTargetLanguage(0),
-				getContext().getOutputEncoding(0));
+			filterWriter.setOptions(targetLanguage, outputEncoding);
 			filterWriter.setParameters(tmp.getParameters());
-			filterWriter.setOutput(getContext().getOutputURI(0).getPath());
+			filterWriter.setOutput(outputURI.getPath());
 			// Fall thru
 
 		// Filter events:

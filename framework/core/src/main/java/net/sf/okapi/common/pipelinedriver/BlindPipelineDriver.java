@@ -26,11 +26,13 @@ import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.annotations.ConfigurationParameter;
 import net.sf.okapi.common.pipeline.annotations.StepIntrospector;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class BlindPipelineDriver {
@@ -55,8 +57,7 @@ public class BlindPipelineDriver {
 		paramList.add(pList);
 
 		for ( ConfigurationParameter p : pList ) {
-			String methodName = p.getMethod().getName();
-			if (( methodName != null ) && (methodName).equals("setOutputURI") ) {
+			if ( p.getParameterType() == StepParameterType.OUTPUT_URI ) {
 				if ( lastOutputStep != null ) {
 					lastOutputStep.setLastStep(false);
 				}
@@ -66,7 +67,10 @@ public class BlindPipelineDriver {
 		}
 	}
 
-	public void execute (RawDocument input, URI outputURI) {
+	public void execute (RawDocument input,
+		URI outputURI,
+		String outputEncoding)
+	{
 		try {
 			// Set the runtime parameters using the method annotations
 			// For each step
@@ -93,6 +97,13 @@ public class BlindPipelineDriver {
 					case FILTER_CONFIGURATION_MAPPER:
 						method.invoke(p.getStep(), fcMapper);
 						break;
+					case OUTPUT_ENCODING:
+						method.invoke(p.getStep(), outputEncoding);
+						break;
+					default:
+						throw new OkapiBadStepInputException(String.format(
+							"The step '%s' is using a runtime parameters not supported by the driver.",
+							p.getStep().getName()));
 					}
 				}
 			}

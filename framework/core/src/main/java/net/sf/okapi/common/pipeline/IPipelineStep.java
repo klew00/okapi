@@ -35,6 +35,7 @@ public interface IPipelineStep {
 	 * 
 	 * @return the current {@link IContext} for this pipeline.
 	 */
+	@Deprecated
 	public IContext getContext();
 
 	/**
@@ -43,6 +44,7 @@ public interface IPipelineStep {
 	 * @param context
 	 *            the new {@link IContext} for this pipeline.
 	 */
+	@Deprecated
 	public void setContext(IContext context);
 
 	/**
@@ -106,6 +108,7 @@ public interface IPipelineStep {
 	 * 
 	 * @return the number of requested input per batch item.
 	 */
+	@Deprecated
 	public int inputCountRequested();
 
 	/**
@@ -115,6 +118,7 @@ public interface IPipelineStep {
 	 *            the index of the input to query. Use 0 for the main input.
 	 * @return true if the given input needs a corresponding output.
 	 */
+	@Deprecated
 	public boolean needsOutput(int inputIndex);
 
 	/**

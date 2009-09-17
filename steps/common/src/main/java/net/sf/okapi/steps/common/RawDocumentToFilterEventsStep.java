@@ -24,8 +24,10 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
@@ -43,6 +45,8 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	private IFilter filter;
 	private boolean filterfromSetFilter;
 	private boolean isDone;
+	private IFilterConfigurationMapper fcMapper;
+	private String filterConfigId;
 
 	/**
 	 * Creates a new RawDocumentToFilterEventsStep object. This constructor is
@@ -51,15 +55,6 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	public RawDocumentToFilterEventsStep() {
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
-	}
-
 	/**
 	 * Creates a new RawDocumentToFilterEventsStep object with a given filter.
 	 * Use this constructor to create an object that is using a filter set using
@@ -73,17 +68,22 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 		setFilter(filter);
 	}
 
-	/**
-	 * Sets the filter for this RawDocumentToEventsStep object.
-	 * 
-	 * @param filter
-	 *            the filter to use.
-	 */
-	public void setFilter(IFilter filter) {
+	@StepParameterMapping(parameterType = StepParameterType.FILTER)
+	public void setFilter (IFilter filter) {
 		filterfromSetFilter = true;
 		this.filter = filter;
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_ID)
+	public void setFilterConfigurationId (String filterConfigId) {
+		this.filterConfigId = filterConfigId;
+	}
+	
 	public String getName() {
 		return "RawDocument to Filter Events";
 	}
@@ -109,14 +109,13 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 		case RAW_DOCUMENT:
 			if (!filterfromSetFilter) {
 				// Filter is to be set from the batch item info
-				if (Util.isEmpty(getContext().getFilterConfigurationId(0))) {
+				if (Util.isEmpty(filterConfigId)) {
 					// No filter configuration provided: just pass it down
 					isDone = true;
 					return event;
 				}
 				// Else: Get the filter to use
-				filter = getContext().getFilterConfigurationMapper().createFilter(
-						getContext().getFilterConfigurationId(0), filter);
+				filter = fcMapper.createFilter(filterConfigId, filter);
 				if (filter == null) {
 					throw new RuntimeException("Unsupported filter type.");
 				}

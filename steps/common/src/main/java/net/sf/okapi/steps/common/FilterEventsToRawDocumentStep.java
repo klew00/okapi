@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.common;
 
 import java.io.File;
+import java.net.URI;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -28,7 +29,8 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 
@@ -46,9 +48,10 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 
 	private IFilterWriter filterWriter;
 	private boolean isDone;
-	private String language;
-	private String encoding;
 	private File outputFile;
+	private URI outputURI;
+	private String targetLanguage;
+	private String outputEncoding;
 
 	/**
 	 * Create a new FilterEventsToRawDocumentStep object.
@@ -56,15 +59,21 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	public FilterEventsToRawDocumentStep () {
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
 	}
-
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	public void setTargetLanguage (String targetLanguage) {
+		this.targetLanguage = targetLanguage;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_ENCODING)
+	public void setOutputEncoding (String outputEncoding) {
+		this.outputEncoding = outputEncoding;
+	}
+	
 	public String getName() {
 		return "Filter Events to RawDocument";
 	}
@@ -115,24 +124,22 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 
 		// Return the RawDocument Event that is the end result of all
 		// previous Events
-		RawDocument input = new RawDocument(outputFile.toURI(), encoding, language);
+		RawDocument input = new RawDocument(outputFile.toURI(), outputEncoding, targetLanguage);
 		isDone = true;
 		return new Event(EventType.RAW_DOCUMENT, input);
 	}
 	
 	@Override
 	protected void handleStartDocument (Event event) {
-		language = getContext().getTargetLanguage(0); 
-		encoding = getContext().getOutputEncoding(0);
 
 		StartDocument startDoc = (StartDocument)event.getResource();
-		if ( encoding == null ) encoding = startDoc.getEncoding();
+		if ( outputEncoding == null ) outputEncoding = startDoc.getEncoding();
 		
 		filterWriter = startDoc.getFilterWriter();
-		filterWriter.setOptions(language, encoding);
+		filterWriter.setOptions(targetLanguage, outputEncoding);
 		
 		if ( isLastStep() ) {
-			outputFile = new File(getContext().getOutputURI(0));
+			outputFile = new File(outputURI);
 			Util.createDirectories(outputFile.getAbsolutePath());
 		}
 		else {
