@@ -55,14 +55,6 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 			steps.add(step);
 		}
 		finishedSteps.clear();
-
-		// Initialize steps for this run
-//TODO: I don't think we need this anymore, to check
-//		for (IPipelineStep step : steps) {
-//			step.setLastStep(false);
-//			step.setContext(getContext());
-//		}
-//		steps.getLast().setLastStep(true);
 	}
 
 	public void startBatch() {
