@@ -40,13 +40,11 @@ public class SimpleTM2TMXStep extends BasePipelineStep {
 		return "SimpleTM to TMX";
 	}
 
-
 	@Override
 	public boolean isDone () {
 		return isDone;
 	}
 
-	
 	@Override
 	protected void handleStartBatchItem (Event event) {
 		isDone = false;

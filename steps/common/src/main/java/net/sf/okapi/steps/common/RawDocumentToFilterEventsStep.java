@@ -68,7 +68,9 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 		setFilter(filter);
 	}
 
-	@StepParameterMapping(parameterType = StepParameterType.FILTER)
+	// This is redundant with the other parameters
+	// So it is not part of the 'published' parameters, but remain
+	// accessible to manula coder
 	public void setFilter (IFilter filter) {
 		filterfromSetFilter = true;
 		this.filter = filter;

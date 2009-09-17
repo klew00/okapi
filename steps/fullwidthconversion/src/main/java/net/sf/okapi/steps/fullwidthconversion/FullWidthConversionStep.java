@@ -24,7 +24,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -32,19 +33,15 @@ import net.sf.okapi.common.resource.TextUnit;
 public class FullWidthConversionStep extends BasePipelineStep {
 
 	private Parameters params;
-	private String trgLang;
+	private String targetLanguage;
 
 	public FullWidthConversionStep () {
 		params = new Parameters();
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	public void setTargetLanguage (String targetLanguage) {
+		this.targetLanguage = targetLanguage;
 	}
 	
 	public String getName () {
@@ -61,17 +58,12 @@ public class FullWidthConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatchItem (Event event) {
-		trgLang = getContext().getTargetLanguage(0);
-	}
-	
-	@Override
 	protected void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 
-		TextContainer tc = tu.createTarget(trgLang, false, IResource.COPY_ALL);
+		TextContainer tc = tu.createTarget(targetLanguage, false, IResource.COPY_ALL);
 		String text = tc.getCodedText();
 		StringBuilder sb = new StringBuilder(text);
 

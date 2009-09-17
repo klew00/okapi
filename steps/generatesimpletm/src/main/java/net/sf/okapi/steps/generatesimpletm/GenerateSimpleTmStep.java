@@ -27,7 +27,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -39,7 +40,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 
 	private Database simpleTm = null;
 	private Parameters params;
-	private String trgLang;
+	private String targetLanguage;
 	private String fileName;
 	private int countIsNotTranslatable;
 	private int countTuNotAdded;
@@ -51,13 +52,9 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 		params = new Parameters();
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	public void setTargetLanguage (String targetLanguage) {
+		this.targetLanguage = targetLanguage;
 	}
 	
 	public String getName () {
@@ -82,10 +79,9 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	
 	@Override
 	protected void handleStartBatchItem (Event event) {
-		trgLang = getContext().getTargetLanguage(0);
 		if(simpleTm == null){
 			simpleTm = new Database();
-			simpleTm.create(params.getTmPath(), true, trgLang);
+			simpleTm.create(params.getTmPath(), true, targetLanguage);
 		}
 	}
 	
@@ -141,8 +137,8 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 			return;
 		}
 		
-		if(!tu.hasTarget(trgLang) || (tu.getTarget(trgLang)==null)){
-			logger.warning("TextUnit is missing "+trgLang+" target.");
+		if( !tu.hasTarget(targetLanguage) || ( tu.getTarget(targetLanguage)==null )){
+			logger.warning(String.format("TextUnit is missing '%s' target.", targetLanguage));
 			countTuNotAdded++;
 			return;
 		}

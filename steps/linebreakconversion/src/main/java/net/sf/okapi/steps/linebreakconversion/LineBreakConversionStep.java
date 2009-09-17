@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URI;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -35,7 +36,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class LineBreakConversionStep extends BasePipelineStep {
@@ -44,18 +46,15 @@ public class LineBreakConversionStep extends BasePipelineStep {
 	
 	private boolean isDone;
 	private Parameters params;
+	private URI outputURI;
 
 	public LineBreakConversionStep () {
 		params = new Parameters();
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
 	}
 	
 	public String getDescription () {
@@ -107,7 +106,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			// Open the output
 			File outFile;
 			if ( isLastStep() ) {
-				outFile = new File(getContext().getOutputURI(0));
+				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}
 			else {

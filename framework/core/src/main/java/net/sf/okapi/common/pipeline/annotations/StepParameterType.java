@@ -25,8 +25,8 @@ package net.sf.okapi.common.pipeline.annotations;
  */
 public enum StepParameterType {
 	
+	INPUT_URI,
 	OUTPUT_URI,
-	FILTER,
 	SOURCE_LANGUAGE,
 	TARGET_LANGUAGE,
 	FILTER_CONFIGURATION_ID,

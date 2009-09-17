@@ -26,7 +26,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -38,7 +39,8 @@ public class SegmentationStep extends BasePipelineStep {
 	private Parameters params;
 	private ISegmenter srcSeg;
 	private ISegmenter trgSeg;
-	private String trgLang;
+	private String sourceLanguage;
+	private String targetLanguage;
 	private boolean initDone;
 
 	public SegmentationStep () {
@@ -46,13 +48,14 @@ public class SegmentationStep extends BasePipelineStep {
 		srcSeg = null;
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LANGUAGE)
+	public void setSourceLanguage (String sourceLanguage) {
+		this.sourceLanguage = sourceLanguage;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	public void setTargetLanguage (String targetLanguage) {
+		this.targetLanguage = targetLanguage;
 	}
 	
 	public String getName () {
@@ -83,7 +86,7 @@ public class SegmentationStep extends BasePipelineStep {
 			src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
 			srxDoc.loadRules(src);
 			if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
-			srcSeg = srxDoc.compileLanguageRules(getContext().getSourceLanguage(0), null);
+			srcSeg = srxDoc.compileLanguageRules(sourceLanguage, null);
 		}
 		if ( params.segmentTarget ) {
 			String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
@@ -92,8 +95,7 @@ public class SegmentationStep extends BasePipelineStep {
 				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			}
 		}
-		trgLang = getContext().getTargetLanguage(0);
-		trgSeg = srxDoc.compileLanguageRules(trgLang, null);
+		trgSeg = srxDoc.compileLanguageRules(targetLanguage, null);
 	}
 	
 	@Override
@@ -102,10 +104,10 @@ public class SegmentationStep extends BasePipelineStep {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 
-		if ( tu.hasTarget(trgLang) ) {
+		if ( tu.hasTarget(targetLanguage) ) {
 			if ( params.segmentTarget ) {
-				trgSeg.computeSegments(tu.getTarget(trgLang));
-				tu.getTarget(trgLang).createSegments(trgSeg.getRanges());
+				trgSeg.computeSegments(tu.getTarget(targetLanguage));
+				tu.getTarget(targetLanguage).createSegments(trgSeg.getRanges());
 			}
 		}
 		else if ( params.segmentSource ) {
@@ -114,7 +116,7 @@ public class SegmentationStep extends BasePipelineStep {
 		}
 		
 		// Make sure we have target content
-		tu.createTarget(trgLang, false, IResource.COPY_ALL);
+		tu.createTarget(targetLanguage, false, IResource.COPY_ALL);
 	}
 
 }

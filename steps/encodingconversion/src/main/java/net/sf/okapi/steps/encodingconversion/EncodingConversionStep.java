@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -43,7 +44,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class EncodingConversionStep extends BasePipelineStep {
@@ -67,20 +69,29 @@ public class EncodingConversionStep extends BasePipelineStep {
 	private boolean isXML;
 	private boolean isHTML;
 	private boolean isDone;
+	private URI outputURI;
+	private URI inputURI;
+	private String outputEncoding;
 
 	public EncodingConversionStep () {
 		params = new Parameters();
 	}
 
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
 	}
-
+	
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_URI)
+	public void setInputURI (URI inputURI) {
+		this.inputURI = inputURI;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_ENCODING)
+	public void setOutputEncoding (String outputEncoding) {
+		this.outputEncoding = outputEncoding;
+	}
+	
 	public String getDescription () {
 		return "Convert the character set encoding of a text-based file.";
 	}
@@ -181,13 +192,11 @@ public class EncodingConversionStep extends BasePipelineStep {
 			// Try to detect the type of file from extension
 			isXML = false;
 			isHTML = false;
-			String ext = Util.getExtension(getContext().getRawDocument(0).getInputURI().getPath());
+			String ext = Util.getExtension(inputURI.getPath());
 			if ( !Util.isEmpty(ext) ) {
 				isHTML = (ext.toLowerCase().indexOf(".htm")==0);
 				isXML = ext.equalsIgnoreCase(".xml");
 			}
-			
-			String outputEncoding = getContext().getOutputEncoding(0);
 			
 			//=== Try to detect the encoding
 			
@@ -223,7 +232,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			// Open the output document
 			File outFile;
 			if ( isLastStep() ) {
-				outFile = new File(getContext().getOutputURI(0));
+				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}
 			else {
@@ -363,7 +372,6 @@ public class EncodingConversionStep extends BasePipelineStep {
 		buffer.limit(buffer.position());
 		buffer.position(0);
 		StringBuffer text = new StringBuffer(buffer.toString());
-		String outputEncoding = getContext().getOutputEncoding(0);
 		
 		// Look for XML encoding declaration
 		String encoding = defEncoding;

@@ -80,6 +80,9 @@ public class BlindPipelineDriver {
 					Method method = p.getMethod();
 					if ( method == null ) continue;
 					switch ( p.getParameterType() ) {
+					case INPUT_URI:
+						method.invoke(p.getStep(), input.getInputURI());
+						break;
 					case OUTPUT_URI:
 						if ( lastOutputStep == p.getStep() ) {
 							method.invoke(p.getStep(), outputURI);
