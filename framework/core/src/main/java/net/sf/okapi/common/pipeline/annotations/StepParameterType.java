@@ -24,13 +24,50 @@ package net.sf.okapi.common.pipeline.annotations;
  * Types of the runtime parameters for steps.
  */
 public enum StepParameterType {
+
+	/**
+	 * RawDocument object of the main input document.
+	 */
+	INPUT_RAWDOC,
 	
+	/**
+	 * RawDocument object of the secondary input document.
+	 */
+	SECONDARY_INPUT_RAWDOC,
+	
+	/**
+	 * URI of the main input document.
+	 */
 	INPUT_URI,
+	
+	/**
+	 * URI of the main output document.
+	 */
 	OUTPUT_URI,
+	
+	/**
+	 * Source language code.
+	 */
 	SOURCE_LANGUAGE,
+	
+	/**
+	 * Target language code.
+	 */
 	TARGET_LANGUAGE,
+
+	/**
+	 * Filter configuration identifier for the main input document.
+	 */
 	FILTER_CONFIGURATION_ID,
+	
+	/**
+	 * Filter configuration mapper.
+	 */
 	FILTER_CONFIGURATION_MAPPER,
+	
+	/**
+	 * Output encoding of the main output document.
+	 */
 	OUTPUT_ENCODING
 
 }

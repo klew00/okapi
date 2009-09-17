@@ -29,7 +29,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -40,6 +41,7 @@ public class UriConversionStep extends BasePipelineStep {
 	static final int ESCAPE    = 1;
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
+	
 	private Parameters params;
 	private String trgLang;
 	
@@ -47,13 +49,9 @@ public class UriConversionStep extends BasePipelineStep {
 		params = new Parameters();
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	public void setTargetLanguage (String targetLanguage) {
+		trgLang = targetLanguage;
 	}
 	
 	public String getDescription () {
@@ -74,11 +72,6 @@ public class UriConversionStep extends BasePipelineStep {
 		params = (Parameters)params;
 	}
 	
-	@Override
-	protected void handleStartBatchItem (Event event) {
-		trgLang = getContext().getTargetLanguage(0);
-	}	
- 
 	@Override
 	protected void handleTextUnit (Event event) {
 

@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.xsltransform;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -37,7 +38,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class XSLTransformStep extends BasePipelineStep {
@@ -49,6 +51,9 @@ public class XSLTransformStep extends BasePipelineStep {
 	private Map<String, String> paramList;
 	private Transformer trans;
 	private boolean isDone;
+	private URI outputURI;
+	private RawDocument input;
+	private RawDocument secondaryInput;
 	
 	public XSLTransformStep () {
 		params = new Parameters();
@@ -56,21 +61,27 @@ public class XSLTransformStep extends BasePipelineStep {
 	}
 	
 	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
-	}
-
-	@Override
 	public void destroy () {
 		// Make available to GC
 		trans = null;
 		xsltInput = null;
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_RAWDOC)
+	public void setInput (RawDocument input) {
+		this.input = input;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.SECONDARY_INPUT_RAWDOC)
+	public void setSecondaryInput (RawDocument secondaryInput) {
+		this.secondaryInput = secondaryInput;
+	}
+	
 	public String getDescription () {
 		return "Apply an XSLT template to an XML document.";
 	}
@@ -147,7 +158,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			// Create the output
 			File outFile;
 			if ( isLastStep() ) {
-				outFile = new File(getContext().getOutputURI(0));
+				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}
 			else {
@@ -182,28 +193,28 @@ public class XSLTransformStep extends BasePipelineStep {
 		String value = null;
 		try {
 			for ( String key : paramList.keySet() ) {
-				value = paramList.get(key).replace("${SrcLang}", getContext().getSourceLanguage(0)); //$NON-NLS-1$
+				value = paramList.get(key).replace("${SrcLang}", input.getSourceLanguage()); //$NON-NLS-1$
 				if ( value.indexOf("${Input1}") > -1 ) {
-					value = value.replace("${Input1}", getContext().getRawDocument(0).getInputURI().toString()); //$NON-NLS-1$
+					value = value.replace("${Input1}", input.getInputURI().toString()); //$NON-NLS-1$
 				}
 				if ( value.indexOf("${TrgLang}") > -1 ) {
-					value = value.replace("${TrgLang}", getContext().getTargetLanguage(0)); //$NON-NLS-1$
+					value = value.replace("${TrgLang}", input.getTargetLanguage()); //$NON-NLS-1$
 				}
 				if ( value.indexOf("${Output1}") > -1 ) {
-					value = value.replace("${Output1}", getContext().getOutputURI(0).toString()); //$NON-NLS-1$
+					value = value.replace("${Output1}", outputURI.toString()); //$NON-NLS-1$
 				}
 				if ( value.indexOf("${Input2}") > -1 ) {
-					value = value.replace("${Input2}", getContext().getRawDocument(1).getInputURI().toString()); //$NON-NLS-1$
+					value = value.replace("${Input2}", secondaryInput.getInputURI().toString()); //$NON-NLS-1$
 				}
-				if ( value.indexOf("${Output2}") > -1 ) {
-					value = value.replace("${Output2}", getContext().getOutputURI(1).toString()); //$NON-NLS-1$
-				}
-				if ( value.indexOf("${Input3}") > -1 ) {
-					value = value.replace("${Input3}", getContext().getRawDocument(2).getInputURI().toString()); //$NON-NLS-1$
-				}
-				if ( value.indexOf("${Output3}") > -1 ) {
-					value = value.replace("${Output3}", getContext().getOutputURI(2).toString()); //$NON-NLS-1$
-				}
+//				if ( value.indexOf("${Output2}") > -1 ) {
+//					value = value.replace("${Output2}", getContext().getOutputURI(1).toString()); //$NON-NLS-1$
+//				}
+//				if ( value.indexOf("${Input3}") > -1 ) {
+//					value = value.replace("${Input3}", getContext().getRawDocument(2).getInputURI().toString()); //$NON-NLS-1$
+//				}
+//				if ( value.indexOf("${Output3}") > -1 ) {
+//					value = value.replace("${Output3}", getContext().getOutputURI(2).toString()); //$NON-NLS-1$
+//				}
 				value = paramList.get(key);
 				trans.setParameter(key, value);
 			}

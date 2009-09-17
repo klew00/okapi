@@ -20,15 +20,20 @@
 
 package net.sf.okapi.steps.translationcomparison;
 
+import java.net.URI;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -48,19 +53,39 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private long scoreTotal;
 	private int itemCount;
 	private boolean initDone;
-	private String trgLang;
+	private IFilterConfigurationMapper fcMapper;
+	private String targetLanguage;
+	private String sourceLanguage;
+	private URI inputURI;
+	private RawDocument secondaryInput;
 
 	public TranslationComparisonStep () {
 		params = new Parameters();
 	}
 	
-	@Override
-	/**
-	 * FIXME: Steps should only depend on the IPipeline, IPipelineStep and IContext interfaces. 
-	 * This step depends on the pipeline driver project. 
-	 */
-	public PipelineContext getContext() {		
-		return (PipelineContext)super.getContext();
+	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LANGUAGE)
+	public void setSourceLanguage (String sourceLanguage) {
+		this.sourceLanguage = sourceLanguage;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	public void setTargetLanguage (String targetLanguage) {
+		this.targetLanguage = targetLanguage;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_URI)
+	public void setInputURI (URI inputURI) {
+		this.inputURI = inputURI;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.SECONDARY_INPUT_RAWDOC)
+	public void setSecondaryInput (RawDocument secondaryInput) {
+		this.secondaryInput = secondaryInput;
 	}
 	
 	public String getName () {
@@ -167,12 +192,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		
 		// Get the text for the base translation
 		TextFragment trgFrag1;
-		if ( isBaseMultilingual ) trgFrag1 = tu1.getTargetContent(trgLang);
+		if ( isBaseMultilingual ) trgFrag1 = tu1.getTargetContent(targetLanguage);
 		else trgFrag1 = tu1.getSourceContent();
 
 		// Get the text for the to-compare translation
 		TextFragment trgFrag2;
-		if ( isToCompareMultilingual ) trgFrag2 = tu2.getTargetContent(trgLang);
+		if ( isToCompareMultilingual ) trgFrag2 = tu2.getTargetContent(targetLanguage);
 		else trgFrag2 = tu2.getSourceContent();
 		
 		// Do we have a base translation?
@@ -230,18 +255,17 @@ public class TranslationComparisonStep extends BasePipelineStep {
 				// Otherwise at least try to use the content of tu2
 				tmxTu.setSourceContent(srcFrag);
 			}
-			tmxTu.setTargetContent(trgLang, trgFrag1);
-			tmxTu.setTargetContent(trgLang+params.getTargetSuffix(), trgFrag2);
+			tmxTu.setTargetContent(targetLanguage, trgFrag1);
+			tmxTu.setTargetContent(targetLanguage+params.getTargetSuffix(), trgFrag2);
 			scoreProp.setValue(String.format("%03d", score));
-			tmxTu.setTargetProperty(trgLang+params.getTargetSuffix(), scoreProp);
+			tmxTu.setTargetProperty(targetLanguage+params.getTargetSuffix(), scoreProp);
 			tmx.writeTUFull(tmxTu);
 		}
 	}
 
 	private void initializeBatch () {
-		trgLang = getContext().getTargetLanguage(0);
 		// Both strings are in the target language.
-		matcher = new TextMatcher(trgLang, trgLang);
+		matcher = new TextMatcher(targetLanguage, targetLanguage);
 		
 		if ( params.isGenerateHTML() ) {
 			writer = new XMLWriter(getOutputFilename());
@@ -249,7 +273,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		// Start TMX writer (one for all input documents)
 		if ( params.isGenerateTMX() ) {
 			tmx = new TMXWriter(params.getTmxPath());
-			tmx.writeStartDocument(getContext().getSourceLanguage(0), trgLang,
+			tmx.writeStartDocument(sourceLanguage, targetLanguage,
 				getClass().getName(), null, null, null, null);
 		}
 		pathToOpen = null;
@@ -264,23 +288,23 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	}
 
     private String getOutputFilename(){
-       return getContext().getRawDocument(1).getInputURI().getPath() + ".html"; //$NON-NLS-1$
+       return inputURI.getPath() + ".html"; //$NON-NLS-1$
     }
 
 	private void initializeDocumentData () {
 		// Initialize the filter to read the translation to compare
-		inputToCompare = getContext().getFilterConfigurationMapper().createFilter(
-			getContext().getFilterConfigurationId(1), inputToCompare);
+		inputToCompare = fcMapper.createFilter(
+			secondaryInput.getFilterConfigId(), inputToCompare);
 		
 		// Open the second input for this batch item
-		inputToCompare.open(getContext().getRawDocument(1));
+		inputToCompare.open(secondaryInput);
 			
 		// Start HTML output
 		if ( writer != null ) writer.close();
 		if ( params.isGenerateHTML() ) {
 			// Use the to-compare file for the output name
 			if ( pathToOpen == null ) {
-				pathToOpen = getContext().getRawDocument(1).getInputURI().toString();
+				pathToOpen = secondaryInput.getInputURI().toString();
 				pathToOpen += ".html";
 			}
 			writer = new XMLWriter(getOutputFilename()); //$NON-NLS-1$
@@ -296,8 +320,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeEndElement();
 			writer.writeStartElement("p"); //$NON-NLS-1$
 			writer.writeString(String.format("Comparing %s (T2) against %s (T1).",
-				getContext().getRawDocument(1).getInputURI(),
-				getContext().getRawDocument(0).getInputURI()));
+				secondaryInput.getInputURI(), inputURI));
 			writer.writeEndElement();
 			writer.writeStartElement("table"); //$NON-NLS-1$
 		}

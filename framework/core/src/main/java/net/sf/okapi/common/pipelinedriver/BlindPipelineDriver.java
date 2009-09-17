@@ -68,6 +68,7 @@ public class BlindPipelineDriver {
 	}
 
 	public void execute (RawDocument input,
+		RawDocument secondaryInput,
 		URI outputURI,
 		String outputEncoding)
 	{
@@ -80,19 +81,22 @@ public class BlindPipelineDriver {
 					Method method = p.getMethod();
 					if ( method == null ) continue;
 					switch ( p.getParameterType() ) {
-					case INPUT_URI:
-						method.invoke(p.getStep(), input.getInputURI());
-						break;
 					case OUTPUT_URI:
 						if ( lastOutputStep == p.getStep() ) {
 							method.invoke(p.getStep(), outputURI);
 						}
 						break;
+					case TARGET_LANGUAGE:
+						method.invoke(p.getStep(), input.getTargetLanguage());
+						break;
 					case SOURCE_LANGUAGE:
 						method.invoke(p.getStep(), input.getSourceLanguage());
 						break;
-					case TARGET_LANGUAGE:
-						method.invoke(p.getStep(), input.getTargetLanguage());
+					case OUTPUT_ENCODING:
+						method.invoke(p.getStep(), outputEncoding);
+						break;
+					case INPUT_URI:
+						method.invoke(p.getStep(), input.getInputURI());
 						break;
 					case FILTER_CONFIGURATION_ID:
 						method.invoke(p.getStep(), input.getFilterConfigId());
@@ -100,9 +104,13 @@ public class BlindPipelineDriver {
 					case FILTER_CONFIGURATION_MAPPER:
 						method.invoke(p.getStep(), fcMapper);
 						break;
-					case OUTPUT_ENCODING:
-						method.invoke(p.getStep(), outputEncoding);
+					case INPUT_RAWDOC:
+						method.invoke(p.getStep(), input);
 						break;
+					case SECONDARY_INPUT_RAWDOC:
+						method.invoke(p.getStep(), secondaryInput);
+						break;
+						
 					default:
 						throw new OkapiBadStepInputException(String.format(
 							"The step '%s' is using a runtime parameters not supported by the driver.",
