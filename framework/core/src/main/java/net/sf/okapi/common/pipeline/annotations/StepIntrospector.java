@@ -58,7 +58,7 @@ public final class StepIntrospector {
 		for (Method m : methods) {
 			// only look at methods with a single Event
 			// parameter and return type
-			if (m.getName().startsWith("handle")
+			if (m.getName().startsWith("handle") //$NON-NLS-1$
 					&& m.getParameterTypes().length == 1
 					&& Arrays.asList(m.getParameterTypes()).contains(
 							Event.class)) {
@@ -68,7 +68,7 @@ public final class StepIntrospector {
 
 		if (eventHandlers.size() <= 0) {
 			throw new OkapiBadStepInputException(
-					"Steps must implement at least one handler method");
+					"Steps must implement at least one handler method"); //$NON-NLS-1$
 		}
 
 		return eventHandlers;
