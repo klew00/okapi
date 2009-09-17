@@ -29,7 +29,6 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -40,14 +39,14 @@ import net.sf.okapi.common.resource.RawDocument;
  */
 public class Main {
 
-	public static void main(String[] args)
+	public static void main (String[] args)
 		throws URISyntaxException, UnsupportedEncodingException
 	{
 		IPipelineDriver driver = new PipelineDriver();
 		
 		IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
-		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
+		driver.setFilterConfigurationMapper(fcMapper);
 
 		// Input resource as URL
 		URL inputXml = Main.class.getResource("test.xml");
@@ -77,6 +76,5 @@ public class Main {
 		// (3) XML filtering step creates IResource Events
 		// (4) Writer step takes Events and writes them out to outStream
 		driver.processBatch();
-
 	}
 }

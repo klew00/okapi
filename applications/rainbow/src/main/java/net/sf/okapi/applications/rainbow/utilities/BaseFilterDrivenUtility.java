@@ -24,7 +24,6 @@ import java.io.File;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -85,10 +84,6 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 		return false;
 	}
 
-	public boolean needsOutput (int inputIndex) {
-		return (inputIndex==0);
-	}
-
 	public void setPipeline(IPipeline pipeline) {
 		// Not used
 	}
@@ -98,22 +93,12 @@ public abstract class BaseFilterDrivenUtility extends BaseUtility
 		return null;
 	}
 	
-	// FIXME: These are currently not used
-	public IContext getContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public boolean isLastStep() {
+	public boolean isLastOutputStep() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	public void setContext(IContext context) {
-		// TODO Auto-generated method stub		
-	}
-
-	public void setLastStep(boolean isLastStep) {
+	public void setLastOutputStep(boolean isLastStep) {
 		// TODO Auto-generated method stub		
 	}
 }

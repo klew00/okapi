@@ -23,10 +23,10 @@ public class XsltPipelineTest {
 
     @Before
     public void setUp() throws Exception {
-        IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
-        fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
-        driver = new PipelineDriver();
-        ((PipelineContext) driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
+    	IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+    	fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
+    	driver = new PipelineDriver();
+    	driver.setFilterConfigurationMapper(fcMapper);
     }
 
     @After

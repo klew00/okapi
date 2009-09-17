@@ -40,7 +40,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.InputDialog;
@@ -696,11 +695,9 @@ public class Main {
 	}
 
 	private void convertFile (RawDocument rd, URI outputURI) {
-		// Create the context and the pipeline
-		PipelineContext ctx = new PipelineContext();
-		ctx.setFilterConfigurationMapper(fcMapper);
+		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
-		driver.getPipeline().setContext(ctx);
+		driver.setFilterConfigurationMapper(fcMapper);
 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
 		driver.addStep(rd2feStep);

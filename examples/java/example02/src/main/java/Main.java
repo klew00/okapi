@@ -29,6 +29,7 @@ import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 
 public class Main {
+	
 	public static void main (String[] args) {
 		try {
 			// Create the filter (based on the extension of the input)

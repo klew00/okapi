@@ -70,11 +70,6 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	public boolean needsOutput (int inputIndex) {
-		return isLastStep();
-	}
-
-	@Override
 	public void setParameters (IParameters params) {
 		this.params = (Parameters) params;
 	}
@@ -144,7 +139,7 @@ public class FormatConversionStep extends BasePipelineStep {
 		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
 		outParams.outputGeneric = params.getUseGenericCodes();
 		File outFile;
-		if ( isLastStep() ) {
+		if ( isLastOutputStep() ) {
 			if ( params.isSingleOutput() ) {
 				outFile = new File(params.getOutputPath());
 			}
@@ -172,7 +167,7 @@ public class FormatConversionStep extends BasePipelineStep {
 //		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
 //		outParams.outputGeneric = params.getUseGenericCodes();
 		File outFile;
-		if ( isLastStep() ) {
+		if ( isLastOutputStep() ) {
 			if ( params.isSingleOutput() ) {
 				outFile = new File(params.getOutputPath());
 			}

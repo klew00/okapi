@@ -82,11 +82,6 @@ public class BOMConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	public boolean needsOutput (int inputIndex) {
-		return isLastStep();
-	}
-	
-	@Override
 	protected void handleStartBatchItem (Event event) {
 		buffer = new byte[1024*2];
 		isDone = false;
@@ -110,7 +105,7 @@ public class BOMConversionStep extends BasePipelineStep {
 						
 			// Open the output
 			File outFile;
-			if ( isLastStep() ) {
+			if ( isLastOutputStep() ) {
 				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}

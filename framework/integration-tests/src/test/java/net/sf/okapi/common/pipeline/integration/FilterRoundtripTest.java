@@ -53,7 +53,7 @@ public class FilterRoundtripTest {
 		fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
 		driver = new PipelineDriver();
-		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
+		driver.setFilterConfigurationMapper(fcMapper);
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		driver.addStep(new FilterEventsWriterStep());
 	}

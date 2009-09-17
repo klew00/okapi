@@ -82,11 +82,6 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		return "Combine filter events into a full document and pass it along as a RawDocument.";
 	}
 
-	@Override
-	public boolean needsOutput (int inputIndex) {
-		return isLastStep();
-	}
-	
 	/**
 	 * Catch all incoming {@link Event}s and write them out to the output document.
 	 * This step generates NO_OP events until the input events are exhausted, at
@@ -138,7 +133,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		filterWriter = startDoc.getFilterWriter();
 		filterWriter.setOptions(targetLanguage, outputEncoding);
 		
-		if ( isLastStep() ) {
+		if ( isLastOutputStep() ) {
 			outputFile = new File(outputURI);
 			Util.createDirectories(outputFile.getAbsolutePath());
 		}

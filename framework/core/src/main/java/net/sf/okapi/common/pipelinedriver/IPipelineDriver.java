@@ -23,6 +23,7 @@ package net.sf.okapi.common.pipelinedriver;
 import java.net.URI;
 import java.util.List;
 
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
@@ -34,82 +35,62 @@ public interface IPipelineDriver {
 
 	/**
 	 * Sets the {@link IPipeline} to use with this driver.
-	 * 
 	 * @param pipeline
 	 *            the new {@link IPipeline} to associate with this driver.
 	 */
-	public void setPipeline(IPipeline pipeline);
+	public void setPipeline (IPipeline pipeline);
 
+	/**
+	 * Sets the filter configuration mapper object for this driver.
+	 * @param fcMapper the filter configuration mapper to use.
+	 */
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper);
+	
 	/**
 	 * Gets the {@link IPipeline} currently associated with this driver.
-	 * 
 	 * @return the {@link IPipeline} currently associated with this driver.
 	 */
-	public IPipeline getPipeline();
-
-	/**
-	 * Indicates what is the highest number of inputs needed by the steps
-	 * currently in this driver.
-	 * 
-	 * @return the highest number of requested input per batch item.
-	 */
-	public int inputCountRequested();
-
-	/**
-	 * Indicates if any of the current steps in this driver needs output
-	 * information.
-	 * 
-	 * @param inputIndex
-	 *            the index of the input to query. Use 0 for the main input.
-	 * @return true if output information is needed.
-	 */
-
-	public boolean needsOutput(int inputIndex);
+	public IPipeline getPipeline ();
 
 	/**
 	 * Adds a step to the pipeline currently associated with this driver.
-	 * 
 	 * @param step
 	 *            the step to add.
 	 */
-	public void addStep(IPipelineStep step);
+	public void addStep (IPipelineStep step);
 
 	/**
 	 * Sets a new set of batch items for this driver and processes them. Any
 	 * batch item that was already in the driver is removed and replaced by the
 	 * ones provided to this method.
-	 * 
 	 * @param batchItems
 	 *            the list of the batch items to process.
 	 */
-	public void processBatch(List<IBatchItemContext> batchItems);
+	public void processBatch (List<IBatchItemContext> batchItems);
 
 	/**
 	 * Processes all the batch items currently in the driver.
 	 */
-	public void processBatch();
+	public void processBatch ();
 
 	/**
 	 * Adds an item to this batch.
-	 * 
 	 * @param item
 	 *            the item to add to this batch.
 	 */
-	public void addBatchItem(IBatchItemContext item);
+	public void addBatchItem (IBatchItemContext item);
 
 	/**
 	 * Adds an item to this batch, using one or more RawDocument objects. The
 	 * added batch item will have as many input documents as provided.
-	 * 
 	 * @param rawDocs
 	 *            one or more RawDocuments to include in this item.
 	 */
-	public void addBatchItem(RawDocument... rawDocs);
+	public void addBatchItem (RawDocument... rawDocs);
 
 	/**
 	 * Adds an item to this batch, using a RawDocument object. The added item
 	 * will have a single input document.
-	 * 
 	 * @param rawDoc
 	 *            the RawDocument object from which to create an entry.
 	 * @param outputURI
@@ -117,12 +98,13 @@ public interface IPipelineDriver {
 	 * @param outputEncoding
 	 *            encoding of the output (can be null if no used)
 	 */
-	public void addBatchItem(RawDocument rawDoc, URI outputURI, String outputEncoding);
+	public void addBatchItem (RawDocument rawDoc,
+		URI outputURI,
+		String outputEncoding);
 
 	/**
 	 * Adds an item to this batch, using direct parameters. The added item will
 	 * have a single input document.
-	 * 
 	 * @param inputURI
 	 *            the URI of the input document.
 	 * @param defaultEncoding
@@ -135,17 +117,28 @@ public interface IPipelineDriver {
 	 * @param trgLang
 	 *            the target language.
 	 */
-	public void addBatchItem(URI inputURI, String defaultEncoding, String filterConfigId, String srcLang, String trgLang);
+	public void addBatchItem (URI inputURI,
+		String defaultEncoding,
+		String filterConfigId,
+		String srcLang,
+		String trgLang);
 
 	/**
 	 * Remove all the {@link IPipelineStep}s from the pipeline. Also calls the
 	 * destroy() method on each step.
 	 */
-	public void clearSteps();
+	public void clearSteps ();
 
 	/**
 	 * Removes all current batch items from this driver.
 	 */
-	public void clearItems();
+	public void clearItems ();
+
+	/**
+	 * Gets the highest number of input documents needed to run the pipeline
+	 * for this driver. 
+	 * @return the higher number of input document needed.
+	 */
+	public int getRequestedInputCount ();
 
 }

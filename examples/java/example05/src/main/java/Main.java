@@ -28,6 +28,7 @@ import net.sf.okapi.connectors.globalsight.Parameters;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 
 public class Main {
+
 	public static void main (String[] args) {
 		try {
 			/* OpenTran (http://en.fr.open-tran.eu/) is a repository of translations

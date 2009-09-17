@@ -63,11 +63,6 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 	}
 
 	@Override
-	public boolean needsOutput (int inputIndex) {
-		return isLastStep();
-	}
-
-	@Override
 	public boolean isDone () {
 		return isDone;
 	}
@@ -89,7 +84,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 			File outFile;
 			rawDoc = (RawDocument)event.getResource();
 			
-			if ( isLastStep() ) {
+			if ( isLastOutputStep() ) {
 				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}

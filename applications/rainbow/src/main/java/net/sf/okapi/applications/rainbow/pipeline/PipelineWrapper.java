@@ -38,10 +38,8 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.ui.UIUtil;
 
 public class PipelineWrapper {
 	
@@ -365,8 +363,7 @@ public class PipelineWrapper {
 		try {
 			// Build the pipeline
 			driver.setPipeline(new Pipeline());
-			// FIXME: The pipeline and steps should only depend on IContext
-			((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
+			driver.setFilterConfigurationMapper(fcMapper);
 			for ( StepInfo stepInfo : steps ) {
 				IPipelineStep step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
 				// Update the parameters with the one in the pipeline storage
@@ -392,13 +389,13 @@ public class PipelineWrapper {
 		copyInfoStepsToPipeline();
 		// Set the batch items
 		driver.clearItems();
-		driver.getPipeline().getContext().removeProperty("outputFile");
+		//TODO: Replace this: driver.getPipeline().getContext().removeProperty("outputFile");
 		int f = -1;
 		URI outURI;
 		URI inpURI;
 		RawDocument rawDoc;
 		BatchItemContext bic;
-		int inputRequested = driver.inputCountRequested();
+		int inputRequested = driver.getRequestedInputCount();
 		
 		for ( Input item : prj.getList(0) ) {
 			f++;
@@ -438,10 +435,10 @@ public class PipelineWrapper {
 		driver.processBatch();
 		
 		// Look if there 
-		String path = driver.getPipeline().getContext().getString("outputFile");
-		if ( path != null ) {
-			UIUtil.start(path);
-		}
+//TODO: Replace this		String path = driver.getPipeline().getContext().getString("outputFile");
+//		if ( path != null ) {
+//			UIUtil.start(path);
+//		}
 	}
 
 	public void addStep (StepInfo step) {

@@ -106,11 +106,6 @@ public class XSLTransformStep extends BasePipelineStep {
 	}
  
 	@Override
-	public boolean needsOutput (int inputIndex) {
-		return isLastStep();
-	}
-	
-	@Override
 	protected void handleStartBatch (Event event) {
 		try {
 			// Create the parameters map
@@ -157,7 +152,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			
 			// Create the output
 			File outFile;
-			if ( isLastStep() ) {
+			if ( isLastOutputStep() ) {
 				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}

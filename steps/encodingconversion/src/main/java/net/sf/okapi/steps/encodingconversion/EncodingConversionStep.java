@@ -116,11 +116,6 @@ public class EncodingConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	public boolean needsOutput (int inputIndex) {
-		return isLastStep();
-	}
-
-	@Override
 	protected void handleStartBatch (Event event) {
 		buffer = CharBuffer.allocate(MAXBUF);
 		// Pre-compile the patterns for declaration detection
@@ -231,7 +226,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			
 			// Open the output document
 			File outFile;
-			if ( isLastStep() ) {
+			if ( isLastOutputStep() ) {
 				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
 			}

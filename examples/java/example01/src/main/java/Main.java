@@ -29,7 +29,6 @@ import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 
 public class Main {
@@ -140,9 +139,8 @@ public class Main {
 
 		// Add the writer step to the pipeline
 		driver.addStep(new FilterEventsWriterStep());
-
 		// Set the filter configuration mapper
-		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
+		driver.setFilterConfigurationMapper(fcMapper);
 
 		driver.addBatchItem(new BatchItemContext(
 			(new File(inputPath)).toURI(), // URI of the input document

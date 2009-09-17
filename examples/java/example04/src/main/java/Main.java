@@ -30,6 +30,7 @@ import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 public class Main {
+
 	public static void main (String[] args) {
 		try {
 			// Create and load the SRX document

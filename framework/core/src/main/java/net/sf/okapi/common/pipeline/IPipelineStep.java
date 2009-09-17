@@ -21,7 +21,6 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.IFilter;
 
@@ -29,23 +28,6 @@ import net.sf.okapi.common.filters.IFilter;
  * Common set of methods for a step within a {@link IPipeline} pipeline.
  */
 public interface IPipelineStep {
-
-	/**
-	 * Gets the current {@link IContext} for this pipeline.
-	 * 
-	 * @return the current {@link IContext} for this pipeline.
-	 */
-	@Deprecated
-	public IContext getContext();
-
-	/**
-	 * Sets the {@link IContext} for this pipeline.
-	 * 
-	 * @param context
-	 *            the new {@link IContext} for this pipeline.
-	 */
-	@Deprecated
-	public void setContext(IContext context);
 
 	/**
 	 * Gets the current parameters for this step.
@@ -103,35 +85,17 @@ public interface IPipelineStep {
 	public void destroy();
 
 	/**
-	 * Indicates how many inputs are needed by this step for each process
-	 * within a batch. Most step will request one input per batch item.
+	 * Is this step the last step with output in the pipeline?
 	 * 
-	 * @return the number of requested input per batch item.
+	 * @return true if last step with output, false otherwise.
 	 */
-	@Deprecated
-	public int inputCountRequested();
+	public boolean isLastOutputStep();
 
 	/**
-	 * Indicates if a given input needs corresponding output information.
+	 * Tell the step if it is the last one on the pipeline with output.
 	 * 
-	 * @param inputIndex
-	 *            the index of the input to query. Use 0 for the main input.
-	 * @return true if the given input needs a corresponding output.
+	 * @param isLastStep true if last step with output, false otherwise.
 	 */
-	@Deprecated
-	public boolean needsOutput(int inputIndex);
+	public void setLastOutputStep(boolean isLastStep);
 
-	/**
-	 * Is this step the last step in the pipeline?
-	 * 
-	 * @return true if last step, false otherwise
-	 */
-	public boolean isLastStep();
-
-	/**
-	 * Tell the step if it is the last one on the pipeline
-	 * 
-	 * @param isLastStep
-	 */
-	public void setLastStep(boolean isLastStep);
 }

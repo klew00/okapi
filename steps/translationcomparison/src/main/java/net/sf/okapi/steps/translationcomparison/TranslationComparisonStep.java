@@ -107,11 +107,6 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	}
  
 	@Override
-	public int inputCountRequested () {
-		return 2; // Source and target documents
-	}
-	
-	@Override
 	protected void handleStartBatch (Event event) {
 		initDone = false; // Delay batch initialization until first batch item
 	}
@@ -129,7 +124,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		}
 		Runtime.getRuntime().gc();
 		if ( params.isAutoOpen() && ( pathToOpen != null )) {
-			getContext().setString("outputFile",  pathToOpen);
+			//TODO: Replace this: getContext().setString("outputFile",  pathToOpen);
 		}
 	}
 	

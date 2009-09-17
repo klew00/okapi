@@ -45,7 +45,7 @@ public class MultistepPipelineTest {
 		driver = new PipelineDriver();
 
 		// Set the filter configuration mapper
-		((PipelineContext)driver.getPipeline().getContext()).setFilterConfigurationMapper(fcMapper);
+		driver.setFilterConfigurationMapper(fcMapper);
 	}
 
 	@After

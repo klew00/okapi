@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 
@@ -82,46 +81,17 @@ public class UtilityStep implements IPipelineStep {
 		//x TODO Auto-generated method stub		
 	}
 
-	public int inputCountRequested() {
-		//x TODO Auto-generated method stub
-		return 1;
-	}
-
 	public boolean isDone() {
 		//x TODO Auto-generated method stub
 		return false;
 	}
 
-	public boolean needsOutput(int inputIndex) {
-		//x TODO Auto-generated method stub
-		return false;
-	}
-
-	/* FIXME: no longer part of IPipelineStep interface
-	public void setPipeline(IPipeline pipeline) {
-		//x TODO Auto-generated method stub
-	}
-
-	public IPipeline getPipeline() {
-		//x TODO Auto-generated method stub
-		return null;
-	}*/
-
-	public IContext getContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public boolean isLastStep() {
+	public boolean isLastOutputStep() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	public void setContext(IContext context) {
-		// TODO Auto-generated method stub		
-	}
-
-	public void setLastStep(boolean isLastStep) {
+	public void setLastOutputStep(boolean isLastStep) {
 		// TODO Auto-generated method stub		
 	}
 }

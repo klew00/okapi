@@ -23,7 +23,6 @@ package net.sf.okapi.common.pipeline;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
@@ -79,23 +78,6 @@ public interface IPipeline {
 	public List<IPipelineStep> getSteps();
 
 	/**
-	 * Gets the current {@link IContext} for this pipeline.
-	 * 
-	 * @return the current {@link IContext} for this pipeline.
-	 */
-	@Deprecated
-	public IContext getContext();
-
-	/**
-	 * Sets the {@link IContext} for this pipeline.
-	 * 
-	 * @param context
-	 *            the new {@link IContext} for this pipeline.
-	 */
-	@Deprecated
-	public void setContext(IContext context);
-
-	/**
 	 * Starts a batch of inputs.
 	 */
 	public void startBatch();
@@ -107,26 +89,6 @@ public interface IPipeline {
 	public void endBatch();
 
 	/**
-	 * Indicates the highest number of inputs that was requested by any of the
-	 * steps
-	 * in this pipeline.
-	 * 
-	 * @return highest number of input requested by this pipeline.
-	 */
-	@Deprecated
-	public int inputCountRequested();
-
-	/**
-	 * Indicates if an output is needed for a given input.
-	 * 
-	 * @param inputIndex
-	 *            the index of the input to query. Use 0 for the main input.
-	 * @return true if an output is needed for the given input.
-	 */
-	@Deprecated
-	public boolean needsOutput(int inputIndex);
-
-	/**
 	 * Frees all resources from all steps in this pipeline.
 	 */
 	public void destroy();
@@ -136,4 +98,5 @@ public interface IPipeline {
 	 * destroy() method on each step.
 	 */
 	public void clearSteps();
+
 }

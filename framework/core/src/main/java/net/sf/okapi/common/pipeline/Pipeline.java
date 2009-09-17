@@ -26,7 +26,6 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.observer.BaseObservable;
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
@@ -39,7 +38,6 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 
 	private LinkedList<IPipelineStep> steps;
 	private LinkedList<IPipelineStep> finishedSteps;
-	private IContext context;
 	private volatile PipelineReturnValue state;
 
 	/**
@@ -176,37 +174,6 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		state = PipelineReturnValue.DESTROYED;
 	}
 
-	@Deprecated
-	public int inputCountRequested() {
-		int max = 0;
-		for (IPipelineStep step : steps) {
-			if (step.inputCountRequested() > max) {
-				max = step.inputCountRequested();
-			}
-		}
-		return max;
-	}
-
-	@Deprecated
-	public boolean needsOutput(int inputIndex) {
-		for (IPipelineStep step : steps) {
-			if (step.needsOutput(inputIndex)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Deprecated
-	public IContext getContext() {
-		return context;
-	}
-
-	@Deprecated
-	public void setContext(IContext context) {
-		this.context = context;
-	}
-
 	public void clearSteps() {
 		destroy();
 		steps.clear();
@@ -260,4 +227,5 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	public List<IObserver> getObservers() {
 		return delegatedObservable.getObservers();
 	}
+
 }

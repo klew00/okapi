@@ -21,7 +21,6 @@
 package net.sf.okapi.common.pipeline;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -29,22 +28,7 @@ import net.sf.okapi.common.IParameters;
  */
 public abstract class BasePipelineStep implements IPipelineStep {
 
-	private IContext context;
-	private boolean isLastStep = false;
-
-	/**
-	 * Gets the {@link IContext} of the current pipeline associated
-	 * with this step.
-	 * 
-	 * @return the current {@link IContext} for this step.
-	 */
-	public IContext getContext() {
-		return context;
-	}
-
-	public void setContext(IContext context) {
-		this.context = context;
-	}
+	private boolean isLastOutputStep = false;
 
 	public IParameters getParameters() {
 		return null;
@@ -114,20 +98,12 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	public void destroy() {
 	}
 
-	public int inputCountRequested() {
-		return 1; // Just the main input
+	public boolean isLastOutputStep () {
+		return isLastOutputStep;
 	}
 
-	public boolean needsOutput(int inputIndex) {
-		return false;
-	}
-
-	public boolean isLastStep() {
-		return isLastStep;
-	}
-
-	public void setLastStep(boolean isLastStep) {
-		this.isLastStep = isLastStep;
+	public void setLastOutputStep (boolean isLastStep) {
+		this.isLastOutputStep = isLastStep;
 	}
 
 	// By default we simply pass the event on to the next step.

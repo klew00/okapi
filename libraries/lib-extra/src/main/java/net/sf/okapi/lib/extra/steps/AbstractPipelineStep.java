@@ -37,7 +37,7 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 
 	private String language;
 	private IContext context;
-	private boolean isLastStep = false;
+	private boolean isLastOutputStep = false;
 
 	public AbstractPipelineStep() {
 		
@@ -80,74 +80,60 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 		switch ( event.getEventType() ) {
 		
 		case START_BATCH:
-			
 			component_init();
 			handleStartBatch(event);
 			break;
 			
 		case END_BATCH:
-			
 			component_done();
 			handleEndBatch(event);
 			break;
 			
 		case START_BATCH_ITEM:
-			
 			handleStartBatchItem(event);
 			break;
 			
 		case END_BATCH_ITEM:
-			
 			handleEndBatchItem(event);
 			break;
 			
 		case RAW_DOCUMENT:
-			
 			handleRawDocument(event);
 			break;
 			
 		case START_DOCUMENT:
-			
 			handleStartDocument(event);
 			break;
 			
 		case END_DOCUMENT:
-			
 			handleEndDocument(event);
 			break;
 			
 		case START_SUBDOCUMENT:
-			
 			handleStartSubDocument(event);
 			break;
 			
 		case END_SUBDOCUMENT:
-			
 			handleEndSubDocument(event);
 			break;
 			
 		case START_GROUP:
-			
 			handleStartGroup(event);
 			break;
 			
 		case END_GROUP:
-			
 			handleEndGroup(event);
 			break;
 			
 		case TEXT_UNIT:
-			
 			handleTextUnit(event);
 			break;
 			
 		case DOCUMENT_PART:
-			
 			handleDocumentPart(event);
 			break;
 			
 		case CUSTOM:
-			
 			handleCustom(event);
 			break;
 			
@@ -157,29 +143,16 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 		return event;
 	}
 
-	public int inputCountRequested() {
-		
-		return 1; // Just the main input
-	}
-
 	public boolean isDone() {
-
 		return true;
 	}
 
-	public boolean needsOutput(int inputIndex) {
-
-		return false;
-	}
-	
-	public boolean isLastStep() {
-		
-		return isLastStep;
+	public boolean isLastOutputStep () {
+		return isLastOutputStep;
 	}
 
-	public void setLastStep(boolean isLastStep) {
-		
-		this.isLastStep = isLastStep;
+	public void setLastOutputStep (boolean isLastStep) {
+		this.isLastOutputStep = isLastStep;
 	}
 
 	// By default we simply pass the event on to the next step.
