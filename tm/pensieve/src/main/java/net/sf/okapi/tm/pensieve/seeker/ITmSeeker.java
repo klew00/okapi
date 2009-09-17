@@ -58,7 +58,7 @@ public interface ITmSeeker {
      * @return A list of fuzzy matches
      * @throws IOException if the search cannot be completed do to I/O problems
      */
-    List<TmHit> searchFuzzyWuzzy(String query, int max) throws IOException;
+    List<TmHit> searchFuzzy(String query, int max) throws IOException;
 
     /**
      * Gets all entries in the TM as a list TranslationUnit

@@ -141,7 +141,7 @@ public class PensieveSeekerTest {
     }
 
     @Test
-    public void searchFuzzyWuzzyMiddleMatch() throws Exception {
+    public void searchFuzzyMiddleMatch() throws Exception {
         PensieveWriter writer = getWriter();
 
 
@@ -151,12 +151,12 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzyWuzzy(STR+"~", 10);
+        tmhits = seeker.searchFuzzy(STR+"~", 10);
         assertEquals("number of docs found", 3, tmhits.size());
     }
 
     @Test
-    public void searchFuzzyWuzzyWordOrder80Percent() throws Exception {
+    public void searchFuzzyWordOrder80Percent() throws Exception {
         PensieveWriter writer = getWriter();
 
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
@@ -165,14 +165,14 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzyWuzzy(STR+"~0.8", 10);
+        tmhits = seeker.searchFuzzy(STR+"~0.8", 10);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
     }
 
     @Test
-    public void searchFuzzyWuzzyMiddleMatch80Percent() throws Exception {
+    public void searchFuzzyMiddleMatch80Percent() throws Exception {
         PensieveWriter writer = getWriter();
 
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
@@ -181,14 +181,14 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzyWuzzy(STR+"~0.8", 10);
+        tmhits = seeker.searchFuzzy(STR+"~0.8", 10);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
     }
 
     @Test
-    public void fuzzyWuzzyScoreSortNoFuzzyThreshold() throws Exception {
+    public void searchFuzzyScoreSortNoFuzzyThreshold() throws Exception {
         PensieveWriter writer = getWriter();
         String[] testStrings = {STR,
             STR + " 1",
@@ -202,7 +202,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[3])),TARGET));
         writer.endIndex();
         //If you add a threshold it changes the sort order
-        tmhits = seeker.searchFuzzyWuzzy(STR+"~", 10);
+        tmhits = seeker.searchFuzzy(STR+"~", 10);
         
         assertEquals("number of docs found", 4, tmhits.size());
         assertEquals("first match", testStrings[0], tmhits.get(0).getTu().getSource().getContent().toString());
@@ -218,7 +218,7 @@ public class PensieveSeekerTest {
     }
 
     @Test
-    public void searchFuzzyWuzzyEndMatch() throws Exception {
+    public void searchFuzzyEndMatch() throws Exception {
         PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
 
@@ -227,7 +227,7 @@ public class PensieveSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzyWuzzy(str+"~", 10);
+        tmhits = seeker.searchFuzzy(str+"~", 10);
         assertEquals("number of docs found", 9, tmhits.size());
     }
 

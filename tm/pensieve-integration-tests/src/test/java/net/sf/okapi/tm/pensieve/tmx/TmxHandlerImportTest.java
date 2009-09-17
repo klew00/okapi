@@ -79,7 +79,7 @@ public class TmxHandlerImportTest {
 
         ITmSeeker seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR);
         startTime = System.currentTimeMillis();
-        List<TmHit> tus = seeker.searchFuzzyWuzzy("All Rights Reserved.~0.8", 10);
+        List<TmHit> tus = seeker.searchFuzzy("All Rights Reserved.~0.8", 10);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -87,7 +87,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchFuzzyWuzzy("Notice to U.S. Government End Users.~0.8", 10);
+        tus = seeker.searchFuzzy("Notice to U.S. Government End Users.~0.8", 10);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -95,7 +95,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchFuzzyWuzzy("Portions copyright 1984-1998 FairCom Corporation.~0.8", 10);
+        tus = seeker.searchFuzzy("Portions copyright 1984-1998 FairCom Corporation.~0.8", 10);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -103,7 +103,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchFuzzyWuzzy("Second Ed. C:~0.8", 10);
+        tus = seeker.searchFuzzy("Second Ed. C:~0.8", 10);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -111,7 +111,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchFuzzyWuzzy("Notice to U.S. Government End Users.~0.8", 10);
+        tus = seeker.searchFuzzy("Notice to U.S. Government End Users.~0.8", 10);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
