@@ -127,7 +127,7 @@ public class PensieveSeekerTest {
     }
 
     @Test
-    public void searchWordsMultipleSubPhrases() throws Exception {
+    public void searchSubphrase() throws Exception {
         PensieveWriter writer = getWriter();
 
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("patents are evil")),TARGET));
@@ -136,8 +136,10 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("completely unrelated phrase")),TARGET));
         writer.endIndex();
 
-        tmhits = seeker.searchForWords("\"patents evil\"", 10);
+        tmhits = seeker.searchSubphrase("patents evil", 10);
         assertEquals("number of docs found", 2, tmhits.size());
+        assertEquals("1st target", "patents evil are", tmhits.get(0).getTu().getSource().getContent().toString());
+        assertEquals("1st target", "are patents evil", tmhits.get(1).getTu().getSource().getContent().toString());
     }
 
     @Test

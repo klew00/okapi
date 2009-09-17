@@ -106,6 +106,17 @@ public class PensieveSeeker implements ITmSeeker {
         return search(max, q);
     }
 
+    /**
+     * Gets a list of TmHits which have segments that contain the provided subphrase
+     * @param subPhrase The subphrase to match again
+     * @param maxHits The maximum number of hits to return
+     * @return A list of TmHits which have segments that contain the provided subphrase
+     * @throws IOException if the search cannot be completed do to I/O problems
+     */
+    public List<TmHit> searchSubphrase(String subPhrase, int maxHits) throws IOException {
+        return searchForWords("\""+subPhrase+"\"", maxHits);
+    }
+
     public List<TranslationUnit> getAllTranslationUnits() throws IOException {
         List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
         IndexReader ir;

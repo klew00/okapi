@@ -61,10 +61,21 @@ public interface ITmSeeker {
     List<TmHit> searchFuzzy(String query, int max) throws IOException;
 
     /**
+     * Gets a list of TmHits which have segments that contain the provided subphrase
+     * @param subPhrase The subphrase to match again
+     * @param maxHits The maximum number of hits to return
+     * @return A list of TmHits which have segments that contain the provided subphrase
+     * @throws IOException if the search cannot be completed do to I/O problems
+     */
+    List<TmHit> searchSubphrase(String subPhrase, int maxHits) throws IOException;
+
+
+    /**
      * Gets all entries in the TM as a list TranslationUnit
      * @return A list of all Translation Units
      * @throws IOException if the search cannot be completed do to I/O problems
      */
     List<TranslationUnit> getAllTranslationUnits() throws IOException;
     //TODO accept fields and values for filtering
+    //TODO move this out of this interface and into the ITmxExporter interface
 }
