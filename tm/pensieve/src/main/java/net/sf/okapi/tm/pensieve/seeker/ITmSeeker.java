@@ -67,14 +67,5 @@ public interface ITmSeeker {
      * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
     List<TmHit> searchSubphrase(String subPhrase, int maxHits);
-
-
-    /**
-     * Gets all entries in the TM as a list TranslationUnit
-     * @return A list of all Translation Units
-     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
-     */
-    List<TranslationUnit> getAllTranslationUnits();
-    //TODO accept fields and values for filtering
-    //TODO move this out of this interface and into the ITmxExporter interface
+   
 }

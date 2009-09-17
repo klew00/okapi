@@ -33,12 +33,15 @@ import org.apache.lucene.store.RAMDirectory;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import net.sf.okapi.tm.pensieve.Helper;
+import org.apache.lucene.index.IndexReader;
 
 /**
  * User: Christian Hargraves
@@ -60,20 +63,90 @@ public class PensieveSeekerTest {
         seeker = new PensieveSeeker(DIR);
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-    @Test(expected = OkapiIOException.class)
-    public void getAllTranslationUnitsHandleCorruptIndexException() throws IOException {
-        PensieveSeeker spy = spy(seeker);
-        doThrow(new CorruptIndexException("some exception")).when(spy).openIndexReader();
-        spy.getAllTranslationUnits();
+    @Test
+    public void translationUnitIterator() throws Exception {
+        PensieveWriter writer = getWriter();
+        populateIndex(writer, 12, "patents are evil", "unittest");
+        writer.endIndex();
+        
+        Iterator<TranslationUnit> tuIterator = seeker.iterator();
+        List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
+        while(tuIterator.hasNext()) {
+            tus.add(tuIterator.next());
+        }
+        assertEquals("number of tus", 13, tus.size());
+        assertEquals("first document", "patents are evil0", tus.get(0).getSource().getContent().toString());
+        assertEquals("second document", "patents are evil1", tus.get(1).getSource().getContent().toString());
+    }
+
+    @Test
+    public void translationUnitIteratorNextCallOnEmpty() throws Exception {
+        PensieveWriter writer = getWriter();
+        populateIndex(writer, 1, "patents are evil", "unittest");
+        writer.endIndex();
+
+        Iterator<TranslationUnit> tuIterator = seeker.iterator();
+        TranslationUnit tu;
+        tu = tuIterator.next();
+        tu = tuIterator.next();
+        assertNotNull(tu);
+        assertFalse(tuIterator.hasNext());
+        assertNull(tuIterator.next());
     }
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     @Test(expected = OkapiIOException.class)
-    public void getAllTranslationUnitsHandleIOException() throws IOException {
+    public void iteratorInstantiationHandleIOException() throws IOException {
         PensieveSeeker spy = spy(seeker);
         doThrow(new IOException("some exception")).when(spy).openIndexReader();
-        spy.getAllTranslationUnits();
+        spy.iterator();
+    }
+
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @Test(expected = OkapiIOException.class)
+    public void iteratorInstantiationHandleCorruptedIndexException() throws IOException {
+        PensieveSeeker spy = spy(seeker);
+        doThrow(new CorruptIndexException("some exception")).when(spy).openIndexReader();
+        spy.iterator();
+    }
+
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @Test(expected = OkapiIOException.class)
+    public void iteratorNextIOException() throws Exception {
+        PensieveWriter writer = getWriter();
+        populateIndex(writer, 1, "patents are evil", "unittest");
+        writer.endIndex();
+
+        Iterator<TranslationUnit> iterator = seeker.iterator();
+
+        IndexReader mockIndexReader = mock(IndexReader.class);
+        doThrow(new IOException("some exception")).when(mockIndexReader).document(anyInt());
+        Helper.setPrivateMember(iterator, "ir", mockIndexReader);
+
+        iterator.next();
+    }
+
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @Test(expected = OkapiIOException.class)
+    public void iteratorNextCorruptedIndexException() throws Exception {
+        PensieveWriter writer = getWriter();
+        populateIndex(writer, 1, "patents are evil", "unittest");
+        writer.endIndex();
+
+        Iterator<TranslationUnit> iterator = seeker.iterator();
+
+        IndexReader mockIndexReader = mock(IndexReader.class);
+        doThrow(new CorruptIndexException("some exception")).when(mockIndexReader).document(anyInt());
+        Helper.setPrivateMember(iterator, "ir", mockIndexReader);
+
+        iterator.next();
+    }
+
+
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void iteratorUnsupportedRemove() throws IOException {
+        seeker.iterator().remove();
     }
 
     @SuppressWarnings({"ThrowableInstanceNeverThrown"})
@@ -105,17 +178,6 @@ public class PensieveSeekerTest {
     @Test(expected = IllegalArgumentException.class)
     public void constructorNullIndexDir() {
         new PensieveSeeker(null);
-    }
-
-    @Test
-    public void getAllTranslationUnits() throws Exception {
-        PensieveWriter writer = getWriter();
-        populateIndex(writer, 12, "patents are evil", "unittest");
-        writer.endIndex();
-        List<TranslationUnit> tus = seeker.getAllTranslationUnits();
-        assertEquals("number of tus", 13, tus.size());
-        assertEquals("first document", "patents are evil0", tus.get(0).getSource().getContent().toString());
-        assertEquals("second document", "patents are evil1", tus.get(1).getSource().getContent().toString());
     }
 
     @Test

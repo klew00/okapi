@@ -25,7 +25,8 @@ import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Iterator;
+import net.sf.okapi.tm.pensieve.seeker.PensieveSeeker;
 
 /**
  * Used to interact with the Okapi Standards for TMX. For example, the property names and default fields stored.
@@ -54,8 +55,9 @@ public class OkapiTmxExporter implements ITmxExporter {
         try {
             tmxWriter.writeStartDocument(sourceLang, targetLang, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
             //TODO might eat up too much memory for large TMs
-            List<TranslationUnit> tus = tmSeeker.getAllTranslationUnits();
-            for (TranslationUnit tu : tus) {
+            Iterator<TranslationUnit> iterator = ((PensieveSeeker) tmSeeker).iterator();
+            while (iterator.hasNext()) {
+                TranslationUnit tu = iterator.next();
                 if (isWriteTextUnit(sourceLang, targetLang, tu)) {
                     tmxWriter.writeTUFull(PensieveUtil.convertToTextUnit(tu));
                 }
@@ -74,9 +76,11 @@ public class OkapiTmxExporter implements ITmxExporter {
         if (sourceLang == null) {
             throw new IllegalArgumentException("'sourceLang' was not set");
         }
+
         if (tmSeeker == null) {
             throw new IllegalArgumentException("'tmSeeker' was not set");
         }
+
         if (tmxWriter == null) {
             throw new IllegalArgumentException("'tmxWriter' was not set");
         }

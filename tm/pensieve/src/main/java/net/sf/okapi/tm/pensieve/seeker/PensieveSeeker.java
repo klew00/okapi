@@ -17,7 +17,6 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
-
 package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.common.resource.TextFragment;
@@ -26,7 +25,6 @@ import net.sf.okapi.tm.pensieve.common.*;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
@@ -36,14 +34,16 @@ import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import org.apache.lucene.index.CorruptIndexException;
 
 /**
  * Used to query the TM
  *
  * @author Christian Hargraves
  */
-public class PensieveSeeker implements ITmSeeker {
+public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
     private Directory indexDir;
 
@@ -59,6 +59,15 @@ public class PensieveSeeker implements ITmSeeker {
             throw new IllegalArgumentException("'indexDir' cannot be null!");
         }
         this.indexDir = indexDir;
+    }
+
+    /**
+     * gets an iterator to traverse all translation units in the indexdir
+     * @return the iterator for translation units
+     */
+    //TODO:  Needs to accept query items and parameters
+    public Iterator<TranslationUnit> iterator() {
+        return new TranslationUnitIterator();
     }
 
     /**
@@ -123,23 +132,22 @@ public class PensieveSeeker implements ITmSeeker {
         return searchForWords("\"" + subPhrase + "\"", maxHits);
     }
 
-    public List<TranslationUnit> getAllTranslationUnits() {
-        List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
-        IndexReader ir;
-        try {
-            ir = openIndexReader();
-            for (int i = 0; i < ir.maxDoc(); i++) {
-                tus.add(getTranslationUnit(ir.document(i)));
-            }
-        } catch (CorruptIndexException cie) {
-            throw new OkapiIOException("The index is corrupt: " + cie.getMessage(), cie);
-        } catch (IOException ioe) {
-            throw new OkapiIOException("Could not complete query: " + ioe.getMessage(), ioe);
-        }
-        return tus;
-
-    }
-
+//    public List<TranslationUnit> getAllTranslationUnits() {
+//        List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
+//        IndexReader ir;
+//        try {
+//            ir = openIndexReader();
+//            for (int i = 0; i < ir.maxDoc(); i++) {
+//                tus.add(getTranslationUnit(ir.document(i)));
+//            }
+//        } catch (CorruptIndexException cie) {
+//            throw new OkapiIOException("The index is corrupt: " + cie.getMessage(), cie);
+//        } catch (IOException ioe) {
+//            throw new OkapiIOException("Could not complete query: " + ioe.getMessage(), ioe);
+//        }
+//        return tus;
+//
+//    }
     public Directory getIndexDir() {
         return indexDir;
     }
@@ -159,13 +167,13 @@ public class PensieveSeeker implements ITmSeeker {
             }
         } catch (IOException ioe) {
             throw new OkapiIOException("Could not complete query: " + ioe.getMessage(), ioe);
-        }
-        finally {
+        } finally {
             //TODO we need to test this
             if (is != null) {
                 try {
                     is.close();
-                } catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
             }
         }
         return tmhits;
@@ -182,7 +190,7 @@ public class PensieveSeeker implements ITmSeeker {
         TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.SOURCE_LANG),
                 new TextFragment(getFieldValue(doc, TranslationUnitField.SOURCE))),
                 new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.TARGET_LANG),
-                        new TextFragment(getFieldValue(doc, TranslationUnitField.TARGET))));
+                new TextFragment(getFieldValue(doc, TranslationUnitField.TARGET))));
 
         for (MetadataType type : MetadataType.values()) {
             tu.setMetadataValue(type, getFieldValue(doc, type));
@@ -234,5 +242,46 @@ public class PensieveSeeker implements ITmSeeker {
 
     protected IndexReader openIndexReader() throws IOException {
         return IndexReader.open(indexDir, true);
+    }
+
+    private class TranslationUnitIterator implements Iterator<TranslationUnit> {
+
+        private int currentIndex;
+        private int maxIndex;
+        private IndexReader ir;
+
+        TranslationUnitIterator() {
+            try {
+                ir = openIndexReader();
+            } catch (CorruptIndexException cie) {
+                throw new OkapiIOException(cie.getMessage(), cie);
+            } catch (IOException ioe) {
+                throw new OkapiIOException(ioe.getMessage(), ioe);
+            }
+            currentIndex = 0;
+            maxIndex = ir.maxDoc();
+        }
+
+        public boolean hasNext() {
+            return currentIndex < maxIndex;
+        }
+
+        public TranslationUnit next() {
+            TranslationUnit tu = null;
+            if (hasNext()) {
+                try {
+                    tu = getTranslationUnit(ir.document(currentIndex++));
+                } catch (CorruptIndexException cie) {
+                    throw new OkapiIOException(cie.getMessage(), cie);
+                } catch (IOException ioe) {
+                    throw new OkapiIOException(ioe.getMessage(), ioe);
+                }
+            }
+            return tu;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("Will not support remove method - Please remove items via ITmSeeker interface");
+        }
     }
 }

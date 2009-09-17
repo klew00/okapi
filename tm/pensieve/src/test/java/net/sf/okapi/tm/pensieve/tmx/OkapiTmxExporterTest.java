@@ -24,7 +24,6 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,8 +33,8 @@ import static org.mockito.Mockito.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Iterator;
+import net.sf.okapi.tm.pensieve.seeker.PensieveSeeker;
 
 /**
  * @author Dax
@@ -45,7 +44,8 @@ public class OkapiTmxExporterTest {
     URI sampleTMX;
     OkapiTmxExporter handler;
     TMXWriter mockTmxWriter;
-    ITmSeeker mockSeeker;
+    Iterator<TranslationUnit> mockIterator;
+    PensieveSeeker mockSeeker;
     
     ArgumentCaptor<TextUnit> tuCapture;
 
@@ -53,23 +53,32 @@ public class OkapiTmxExporterTest {
     public void setUp() throws URISyntaxException, IOException {
         tuCapture = ArgumentCaptor.forClass(TextUnit.class);
 
+        mockIterator = mock(Iterator.class);
         mockTmxWriter = mock(TMXWriter.class);
 
         sampleTMX = new URI("test.tmx");
         handler = new OkapiTmxExporter();
 
-        mockSeeker = mock(ITmSeeker.class);
-        List<TranslationUnit> tus = new LinkedList<TranslationUnit>();
-        tus.add(Helper.createTU("EN", "FR", "source", "target", "sourceid"));
-        tus.add(Helper.createTU("EN", "FR", "source2", "target2", "sourceid2"));
-        tus.add(Helper.createTU("EN", "KR", "kr_source", "kr_target", "kr_sourceid"));
+        mockSeeker = mock(PensieveSeeker.class);
 
+        when(mockIterator.hasNext())
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(false);
         TranslationUnit tuWithMetadata = Helper.createTU("EN", "Props", "props_source", "props_target", "props_sourceid");
         tuWithMetadata.setMetadataValue(MetadataType.GROUP_NAME, "PropsGroupName");
         tuWithMetadata.setMetadataValue(MetadataType.FILE_NAME, "PropsFileName");
-        tus.add(tuWithMetadata);
 
-        when(mockSeeker.getAllTranslationUnits()).thenReturn(tus);
+        when(mockIterator.next())
+                .thenReturn(Helper.createTU("EN", "FR", "source", "target", "sourceid"))
+                .thenReturn(Helper.createTU("EN", "FR", "source2", "target2", "sourceid2"))
+                .thenReturn(Helper.createTU("EN", "KR", "kr_source", "kr_target", "kr_sourceid"))
+                .thenReturn(tuWithMetadata)
+                .thenReturn(null);
+
+        when(mockSeeker.iterator()).thenReturn(mockIterator);
     }
 
     @Test
