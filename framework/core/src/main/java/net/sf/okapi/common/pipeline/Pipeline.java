@@ -27,19 +27,20 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IContext;
+import net.sf.okapi.common.observer.BaseObservable;
+import net.sf.okapi.common.observer.IObservable;
+import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
  * Default implementations of the {@link IPipeline} interface.
  */
-public class Pipeline implements IPipeline {
+public class Pipeline implements IPipeline, IObservable, IObserver {
 
 	private LinkedList<IPipelineStep> steps;
 	private LinkedList<IPipelineStep> finishedSteps;
-	private volatile boolean cancel = false;
-	private boolean done = false;
-	private boolean destroyed = false;
 	private IContext context;
+	private volatile PipelineReturnValue state;
 
 	/**
 	 * Creates a new Pipeline object.
@@ -47,6 +48,7 @@ public class Pipeline implements IPipeline {
 	public Pipeline() {
 		steps = new LinkedList<IPipelineStep>();
 		finishedSteps = new LinkedList<IPipelineStep>();
+		state = PipelineReturnValue.PAUSED;
 	}
 
 	private void initialize() {
@@ -65,18 +67,18 @@ public class Pipeline implements IPipeline {
 	}
 
 	public void startBatch() {
-		initialize();
-		cancel = false;
-		done = false;
-		destroyed = false;
-
+		state = PipelineReturnValue.RUNNING;
+		
+		initialize();		
+		
 		Event event = new Event(EventType.START_BATCH);
 		for (IPipelineStep step : steps) {
-			event = step.handleEvent(event);
-		}
+			step.handleEvent(event);
+		}		
+		notifyObservers(event);
 	}
 
-	public Event endBatch() {
+	public void endBatch() {
 		// Non-terminal steps will return END_BATCH after receiving END_BATCH
 		// Terminal steps return an event which may be anything,
 		// including a CUSTOM event. The pipeline returns this final event.
@@ -84,10 +86,11 @@ public class Pipeline implements IPipeline {
 		// here
 		Event event = Event.END_BATCH_EVENT;
 		for (IPipelineStep step : finishedSteps) {
-			event = step.handleEvent(Event.END_BATCH_EVENT);
-		}
-		done = true;
-		return event;
+			step.handleEvent(Event.END_BATCH_EVENT);
+		}				
+		notifyObservers(event);
+		
+		state = PipelineReturnValue.SUCCEDED;		
 	}
 
 	public void addStep(IPipelineStep step) {
@@ -98,47 +101,44 @@ public class Pipeline implements IPipeline {
 		return new ArrayList<IPipelineStep>(steps);
 	}
 
-	public void cancel() {
-		cancel = true;
+	public void cancel() {	
+		state = PipelineReturnValue.CANCELLED;
 	}
 
-	private void execute(Event event) {
+	private Event execute(Event event) {
+		state = PipelineReturnValue.RUNNING;
+		
 		// loop through the events until we run out of steps or hit cancel
-		while (!steps.isEmpty() && !cancel) {
+		while (!steps.isEmpty() && !(state == PipelineReturnValue.CANCELLED)) {
 			// cycle through the steps in order, pulling off steps that run out
 			// of events.
-			while (!steps.getFirst().isDone() && !cancel) {
+			while (!steps.getFirst().isDone() && !(state == PipelineReturnValue.CANCELLED)) {
 				// go to each active step and call handleEvent
 				// the event returned is used as input to the next pass
 				for (IPipelineStep step : steps) {
 					event = step.handleEvent(event);
-				}
-				// Get ready for another pass down the pipeline
-				// overwrite the terminal steps event
-				event = Event.NOOP_EVENT;
+				}				
+				// notify observers that the final step has sent an Event
+				notifyObservers(event);
 			}
 			// As each step exhausts its events remove it from the list and move
 			// on to the next
 			finishedSteps.add(steps.remove());
 		}
+		
+		return event;
 	}
 
 	public PipelineReturnValue getState() {
-		if (destroyed)
-			return PipelineReturnValue.DESTROYED;
-		else if (cancel)
-			return PipelineReturnValue.CANCELLED;
-		else if (done)
-			return PipelineReturnValue.SUCCEDED;
-		else
-			return PipelineReturnValue.RUNNING;
+		return state;
 	}
 
-	public Event process(RawDocument input) {
-		return process(new Event(EventType.RAW_DOCUMENT, input));
+	public Event process(RawDocument input) {		
+		return process(new Event(EventType.RAW_DOCUMENT, input));		
 	}
 
 	public Event process(Event input) {
+		state = PipelineReturnValue.RUNNING;
 		initialize();
 
 		// Pre-process for this batch-item
@@ -146,9 +146,11 @@ public class Pipeline implements IPipeline {
 		for (IPipelineStep step : steps) {
 			step.handleEvent(e);
 		}
+		notifyObservers(e);
 
 		// Prime the pipeline with the input Event and run it to completion.
-		execute(input);
+		Event finalEvent = execute(input);
+		
 		// Copy any remaining steps into finishedSteps - makes initialization
 		// process easier down the road if we use the pipeline again
 		for (IPipelineStep step : steps) {
@@ -160,18 +162,20 @@ public class Pipeline implements IPipeline {
 		e = new Event(EventType.END_BATCH_ITEM);
 		for (IPipelineStep step : finishedSteps) {
 			step.handleEvent(e);
-		}
-
-		return e;
+		}		
+		notifyObservers(e);
+		
+		return finalEvent;
 	}
 
 	public void destroy() {
 		for (IPipelineStep step : finishedSteps) {
 			step.destroy();
 		}
-		destroyed = true;
+		state = PipelineReturnValue.DESTROYED;
 	}
 
+	@Deprecated
 	public int inputCountRequested() {
 		int max = 0;
 		for (IPipelineStep step : steps) {
@@ -182,6 +186,7 @@ public class Pipeline implements IPipeline {
 		return max;
 	}
 
+	@Deprecated
 	public boolean needsOutput(int inputIndex) {
 		for (IPipelineStep step : steps) {
 			if (step.needsOutput(inputIndex)) {
@@ -191,10 +196,12 @@ public class Pipeline implements IPipeline {
 		return false;
 	}
 
+	@Deprecated
 	public IContext getContext() {
 		return context;
 	}
 
+	@Deprecated
 	public void setContext(IContext context) {
 		this.context = context;
 	}
@@ -203,5 +210,53 @@ public class Pipeline implements IPipeline {
 		destroy();
 		steps.clear();
 		finishedSteps.clear();
+	}
+	
+	//
+	// implements IObserver interface
+	//
+
+	public void update(IObservable o, Object arg) {
+		notifyObservers();
+	}
+	
+	//
+	// implements IObservable interface
+	//
+	
+	/**
+	 * Implements multiple inheritance via delegate pattern to an inner class
+	 * 
+	 * @see IObservable
+	 * @see BaseObservable
+	 */
+	private IObservable delegatedObservable = new BaseObservable(this);
+
+	public void addObserver(IObserver observer) {
+		delegatedObservable.addObserver(observer);
+	}
+
+	public int countObservers() {
+		return delegatedObservable.countObservers();
+	}
+
+	public void deleteObserver(IObserver observer) {
+		delegatedObservable.deleteObserver(observer);
+	}
+
+	public void notifyObservers() {
+		delegatedObservable.notifyObservers();
+	}
+
+	public void notifyObservers(Object arg) {
+		delegatedObservable.notifyObservers(arg);
+	}
+
+	public void deleteObservers() {
+		delegatedObservable.deleteObservers();
+	}
+
+	public List<IObserver> getObservers() {
+		return delegatedObservable.getObservers();
 	}
 }

@@ -29,7 +29,7 @@ public class FilebasedPipelineTest {
 		pipeline.addStep(new ConsumerProducer());
 		pipeline.addStep(new Consumer());
 
-		assertEquals(PipelineReturnValue.RUNNING, pipeline.getState());
+		assertEquals(PipelineReturnValue.PAUSED, pipeline.getState());
 		pipeline.process(new RawDocument("<b>Test this resource</b>", "en"));	
 		pipeline.destroy();
 		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());
