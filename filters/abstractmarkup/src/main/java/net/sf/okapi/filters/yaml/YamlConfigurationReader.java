@@ -28,10 +28,11 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Map;
 
-import org.ho.yaml.Yaml;
+import org.yaml.snakeyaml.Yaml;
 
 public class YamlConfigurationReader  {	
-	private boolean preserveWhitespace;	
+	private boolean preserveWhitespace;
+	private Yaml yaml;
 	@SuppressWarnings("unchecked")
 	private Map config;
 	
@@ -47,14 +48,16 @@ public class YamlConfigurationReader  {
 	 * Default Tagged Configuration
 	 */
 	@SuppressWarnings("unchecked")
-	public YamlConfigurationReader() {		
-		config = (Map)Yaml.load("collapse_whitespace: false");		
+	public YamlConfigurationReader() {
+		yaml = new Yaml();
+		config = (Map)yaml.load("collapse_whitespace: false");		
 	}
 	
 	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(URL configurationPathAsResource) {		
 		try {
-			config = (Map)Yaml.load(new InputStreamReader(configurationPathAsResource.openStream()));
+			yaml = new Yaml();
+			config = (Map)yaml.load(new InputStreamReader(configurationPathAsResource.openStream()));
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {			
@@ -65,7 +68,8 @@ public class YamlConfigurationReader  {
 	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(File configurationFile) {				
 		try {
-			config = (Map)Yaml.load(new FileReader(configurationFile));
+			yaml = new Yaml();
+			config = (Map)yaml.load(new FileReader(configurationFile));
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}		
@@ -73,12 +77,13 @@ public class YamlConfigurationReader  {
 	
 	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(String configurationScript) {
-		config = (Map)Yaml.load(configurationScript);			
+		yaml = new Yaml();
+		config = (Map)yaml.load(configurationScript);			
 	}
 	
 	@Override
 	public String toString() {	
-		return Yaml.dump(config);
+		return yaml.dump(config);
 	}
 	
 	@SuppressWarnings("unchecked")
