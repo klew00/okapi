@@ -4,9 +4,9 @@ import java.io.StringWriter;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.tm.pensieve.seeker.PensieveSeeker;
-import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
+import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import net.sf.okapi.tm.pensieve.writer.PensieveWriter;
-import net.sf.okapi.tm.pensieve.writer.TmWriter;
+import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.junit.Test;
@@ -19,12 +19,12 @@ public class TmxHandlerExportTest {
     @Test
     public void exportTmx_sample_metadata() throws Exception {
         Directory ramDir = new RAMDirectory();
-        TmWriter tmWriter = new PensieveWriter(ramDir);
+        ITmWriter tmWriter = new PensieveWriter(ramDir);
         OkapiTmxImporter tmxImporter = new OkapiTmxImporter("EN", new TmxFilter());
         OkapiTmxExporter tmxExporter = new OkapiTmxExporter();
         tmxImporter.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
 
-        TmSeeker seeker = new PensieveSeeker(ramDir);
+        ITmSeeker seeker = new PensieveSeeker(ramDir);
         StringWriter sWriter = new StringWriter();
         tmxExporter.exportTmx("EN", "IT", seeker, new TMXWriter(new XMLWriter(sWriter)));
 
