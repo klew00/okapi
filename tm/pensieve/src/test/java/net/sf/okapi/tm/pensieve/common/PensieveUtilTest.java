@@ -27,11 +27,6 @@ import net.sf.okapi.tm.pensieve.Helper;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-/**
- * User: Christian Hargraves
- * Date: Sep 4, 2009
- * Time: 4:12:34 PM
- */
 public class PensieveUtilTest {
 
     @Test

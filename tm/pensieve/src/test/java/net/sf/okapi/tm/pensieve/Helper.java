@@ -27,6 +27,7 @@ import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import org.junit.Assert;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 
 /**
  * User: Christian Hargraves
@@ -54,5 +55,11 @@ public class Helper {
         TranslationUnit tu = new TranslationUnit(tuvS, tuvT);
         tu.getMetadata().put(MetadataType.ID, id);
         return tu;
+    }
+
+    public static void setPrivateMember(Object instance, String memberName, Object value) throws Exception{
+        Field field = instance.getClass().getDeclaredField(memberName);
+        field.setAccessible(true);
+        field.set(instance, value);
     }
 }

@@ -21,6 +21,7 @@
 package net.sf.okapi.tm.pensieve.writer;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.*;
 import org.apache.lucene.analysis.SimpleAnalyzer;
@@ -28,8 +29,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.AlreadyClosedException;
 
 import java.io.IOException;
 
@@ -38,7 +39,7 @@ import java.io.IOException;
  */
 public class PensieveWriter implements ITmWriter {
 
-    private IndexWriter writer;
+    private IndexWriter indexWriter;
 
     /**
      * Creates a PensieveWriter
@@ -46,7 +47,7 @@ public class PensieveWriter implements ITmWriter {
      * @throws IOException if the indexDirectory can not load
      */
     public PensieveWriter(Directory indexDirectory) throws IOException {
-        writer = new IndexWriter(indexDirectory,
+        indexWriter = new IndexWriter(indexDirectory,
                 new SimpleAnalyzer(), true,
                 IndexWriter.MaxFieldLength.UNLIMITED);
     }
@@ -55,13 +56,17 @@ public class PensieveWriter implements ITmWriter {
      * Commits and closes (for now) the transaction.
      * @throws IOException if the commit cannot happen.
      */
-    public void endIndex() throws IOException {
+    public void endIndex() throws OkapiIOException, IOException {
         //TODO: make a close method that is separate from this and rename this to commitIndex.
         try{
-            writer.commit();
-        }catch(AlreadyClosedException ignored){
-        }finally{
-            writer.close();
+            indexWriter.commit();
+        } catch (IOException e) {
+            throw new OkapiIOException(e);  //To change body of catch statement use File | Settings | File Templates.
+        } catch(AlreadyClosedException ignored){
+        } finally{
+            try{
+                indexWriter.close();
+            }catch(IOException ignored){}
         }
     }
 
@@ -71,7 +76,7 @@ public class PensieveWriter implements ITmWriter {
      * @return a handle on the IndexWriter used to Create, Update or Delete the index.
      */
     public IndexWriter getIndexWriter(){
-        return writer;
+        return indexWriter;
     }
 
     /**
@@ -83,7 +88,7 @@ public class PensieveWriter implements ITmWriter {
         if (tu == null){
             throw new NullPointerException("TextUnit can not be null");
         }
-        writer.addDocument(getDocument(tu));
+        indexWriter.addDocument(getDocument(tu));
     }
 
     /**
@@ -95,7 +100,7 @@ public class PensieveWriter implements ITmWriter {
         if (Util.isEmpty(id)){
             throw new IllegalArgumentException("id is a required field for delete to happen");
         }
-        writer.deleteDocuments(new Term(MetadataType.ID.fieldName(), id));
+        indexWriter.deleteDocuments(new Term(MetadataType.ID.fieldName(), id));
     }
 
     /**

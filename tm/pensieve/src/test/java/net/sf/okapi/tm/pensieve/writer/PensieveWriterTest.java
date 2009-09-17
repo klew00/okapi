@@ -20,6 +20,7 @@
 
 package net.sf.okapi.tm.pensieve.writer;
 
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.*;
@@ -150,6 +151,15 @@ public class PensieveWriterTest {
     @Test
     public void constructorUsesExpectedDirectory(){
         assertTrue("The index directory should end with 'target/test-classes'", writer.getDirectory() instanceof RAMDirectory);
+    }
+
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @Test(expected = OkapiIOException.class)
+    public void endIndexHandlesIOException() throws Exception {
+//        IndexWriter spyWriter = spy(writer);
+//        doThrow(new IOException("some text")).when(spyWriter).commit();
+//        Helper.setPrivateMember(tmWriter, "indexWriter", spyWriter);
+//        tmWriter.endIndex();
     }
 
     @Test(expected = AlreadyClosedException.class)
