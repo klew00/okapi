@@ -26,8 +26,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class TmWriterFactory {
-    public static TmWriter createFileBasedTmWriter(String indexDirectoryPath) {
-        TmWriter writer;
+    public static ITmWriter createFileBasedTmWriter(String indexDirectoryPath) {
+        ITmWriter writer;
         try{
             File f = new File(indexDirectoryPath);
             if (!f.exists()){

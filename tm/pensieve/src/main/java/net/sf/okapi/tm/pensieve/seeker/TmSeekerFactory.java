@@ -30,7 +30,7 @@ public final class TmSeekerFactory {
 
     private TmSeekerFactory(){}
 
-    public static TmSeeker createFileBasedTmSeeker(String indexDirectoryPath) {
+    public static ITmSeeker createFileBasedTmSeeker(String indexDirectoryPath) {
         Directory dir;
         try{
             File f = new File(indexDirectoryPath);

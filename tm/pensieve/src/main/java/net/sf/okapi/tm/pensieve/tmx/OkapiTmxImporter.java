@@ -25,14 +25,14 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.tm.pensieve.writer.TmWriter;
+import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 
 import java.net.URI;
 import java.io.IOException;
 
-public class OkapiTmxImporter implements TmxImporter {
+public class OkapiTmxImporter implements ITmxImporter {
 
     private IFilter tmxFilter;
     private String sourceLang;
@@ -60,7 +60,7 @@ public class OkapiTmxImporter implements TmxImporter {
      * @param tmWriter The TMWriter to use when writing to the TM
      * @throws java.io.IOException if there was a problem with the TMX import
      */
-    public void importTmx(URI tmxUri, String targetLang, TmWriter tmWriter) throws IOException {
+    public void importTmx(URI tmxUri, String targetLang, ITmWriter tmWriter) throws IOException {
         checkImportTmxParams(tmxUri, targetLang, tmWriter);
         try {
             tmxFilter.open(new RawDocument(tmxUri, null, sourceLang, targetLang));
@@ -74,7 +74,7 @@ public class OkapiTmxImporter implements TmxImporter {
         }
     }
 
-    private void checkImportTmxParams(URI tmxUri, String targetLang, TmWriter tmWriter) {
+    private void checkImportTmxParams(URI tmxUri, String targetLang, ITmWriter tmWriter) {
         if (Util.isEmpty(targetLang)) {
             throw new IllegalArgumentException("targetLang was not set");
         }
@@ -87,7 +87,7 @@ public class OkapiTmxImporter implements TmxImporter {
     }
 
 
-    private void indexEvent(String targetLang, TmWriter tmWriter, Event event) throws IOException {
+    private void indexEvent(String targetLang, ITmWriter tmWriter, Event event) throws IOException {
         TranslationUnit tu;
         if (event.getEventType() == EventType.TEXT_UNIT) {
             tu = PensieveUtil.convertToTranslationUnit(sourceLang, targetLang, (TextUnit) event.getResource());

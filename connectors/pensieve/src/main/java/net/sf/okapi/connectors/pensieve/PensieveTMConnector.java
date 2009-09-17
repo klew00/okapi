@@ -20,19 +20,18 @@
 
 package net.sf.okapi.connectors.pensieve;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.tm.pensieve.common.TmHit;
-import net.sf.okapi.tm.pensieve.seeker.PensieveSeeker;
+import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PensieveTMConnector implements ITMQuery {
 	
@@ -43,7 +42,7 @@ public class PensieveTMConnector implements ITMQuery {
 	private String srcLang;
 	private String trgLang;
 	private Parameters params;
-	private PensieveSeeker seeker;
+	private ITmSeeker seeker;
 
 	public PensieveTMConnector () {
 		params = new Parameters();
@@ -89,7 +88,7 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 
 	public void open () {
-		seeker = (PensieveSeeker)TmSeekerFactory.createFileBasedTmSeeker(params.getDbDirectory());
+		seeker = TmSeekerFactory.createFileBasedTmSeeker(params.getDbDirectory());
 	}
 
 	public int query (String plainText) {
@@ -146,7 +145,7 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 
 	public void export (String outputPath) {
-		//TODO
+		throw new UnsupportedOperationException("This method is not implemented yet " + outputPath);
 	}
 
 	public int getMaximumHits () {

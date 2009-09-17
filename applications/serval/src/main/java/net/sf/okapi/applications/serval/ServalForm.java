@@ -1,10 +1,5 @@
 package net.sf.okapi.applications.serval;
 
-import java.io.File;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -15,9 +10,8 @@ import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.tm.pensieve.tmx.OkapiTmxImporter;
-import net.sf.okapi.tm.pensieve.writer.TmWriter;
+import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -28,15 +22,12 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
+
+import java.io.File;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ServalForm {
 
@@ -381,7 +372,7 @@ public class ServalForm {
 			TmxFilter filter = new TmxFilter();
 			OkapiTmxImporter imp = new OkapiTmxImporter(langs[0], filter);
 			
-			TmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir);
+			ITmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir);
 			
 			File file = new File(paths[0]);
 			imp.importTmx(file.toURI(), langs[1], writer);

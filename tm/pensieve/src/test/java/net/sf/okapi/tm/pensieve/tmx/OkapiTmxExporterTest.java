@@ -23,7 +23,7 @@ import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.seeker.TmSeeker;
+import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class OkapiTmxExporterTest {
     URI sampleTMX;
     OkapiTmxExporter handler;
     TMXWriter mockTmxWriter;
-    TmSeeker mockSeeker;
+    ITmSeeker mockSeeker;
     
     ArgumentCaptor<TextUnit> tuCapture;
 
@@ -58,7 +58,7 @@ public class OkapiTmxExporterTest {
         sampleTMX = new URI("test.tmx");
         handler = new OkapiTmxExporter();
 
-        mockSeeker = mock(TmSeeker.class);
+        mockSeeker = mock(ITmSeeker.class);
         List<TranslationUnit> tus = new LinkedList<TranslationUnit>();
         tus.add(Helper.createTU("EN", "FR", "source", "target", "sourceid"));
         tus.add(Helper.createTU("EN", "FR", "source2", "target2", "sourceid2"));

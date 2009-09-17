@@ -41,7 +41,7 @@ import java.util.List;
  * Used to query the TM
  * @author Christian Hargraves
  */
-public class PensieveSeeker implements TmSeeker {
+public class PensieveSeeker implements ITmSeeker {
 
     private Directory indexDir;
 

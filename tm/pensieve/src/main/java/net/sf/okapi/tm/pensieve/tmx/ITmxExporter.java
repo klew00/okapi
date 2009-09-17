@@ -18,45 +18,35 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.tm.pensieve.writer;
+package net.sf.okapi.tm.pensieve.tmx;
 
-import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
+
 import java.io.IOException;
 
 /**
- *
- * @author HaslamJD
+ * The TMX interface to Pensieve.
  */
-public interface TmWriter {
+public interface ITmxExporter {
+
 
     /**
-     * Closes the index and forces a commit against the index.
-     * @throws IOException if the commit can not happen
+     * Exports all Pensieve contents matching source and target language to TMX
+     * @param sourceLang The source language to export
+     * @param targetLang The target language to export
+     * @param tmSeeker The Seeker to use when reading from the TM
+     * @param tmxWriter The TMXWriter to use when writing to the TMX file
+     * @throws IOException if there was a problem with the TMX export
      */
-    void endIndex() throws IOException;
+    void exportTmx(String sourceLang, String targetLang, ITmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
 
     /**
-     * Closes the index and forces a commit against the index.
-     * @param tu The Translationunit to index
-     * @throws IOException if the index can not happen
+     * Exports all Pensieve contents matching source languages to TMX
+     * @param sourceLang The source language to export
+     * @param tmSeeker The Seeker to use when reading from the TM
+     * @param tmxWriter The TMXWriter to use when writing to the TMX file
+     * @throws IOException if there was a problem with the TMX export
      */
-    //TODO: get rid of the IOException requirement
-    void indexTranslationUnit(TranslationUnit tu) throws IOException;
-
-    /**
-     * Deletes a TranslationUnit based on the id.
-     * @param id The Unique ID of the TU to delete
-     * @throws IOException if the delete can not happen
-     */
-    //TODO: get rid of the IOException requirement
-    void delete(String id) throws IOException;
-
-    /**
-     * Updates a TranslationUnit.
-     * @param tu The TranslationUnit to update
-     * @throws IOException if the update can not happen
-     */
-    //TODO: get rid of the IOException requirement
-    public void update(TranslationUnit tu) throws IOException;
-
+    void exportTmx(String sourceLang, ITmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
 }

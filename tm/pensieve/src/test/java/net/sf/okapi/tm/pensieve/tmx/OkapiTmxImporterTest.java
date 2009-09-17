@@ -27,7 +27,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import net.sf.okapi.tm.pensieve.writer.TmWriter;
+import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
@@ -43,12 +43,12 @@ public class OkapiTmxImporterTest {
 
     URI sampleTMX;
     OkapiTmxImporter tmxImporter;
-    TmWriter mockTmWriter;
+    ITmWriter mockTmWriter;
     IFilter mockFilter;
 
     @Before
     public void setUp() throws URISyntaxException, IOException {
-        mockTmWriter = mock(TmWriter.class);
+        mockTmWriter = mock(ITmWriter.class);
 
         String[][] properties = {{"tuid", "helloid"},
             {"datatype", "plaintext"},

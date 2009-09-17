@@ -31,7 +31,7 @@ import java.util.List;
  * Used to query the TM.
  * @author HaslamJD
  */
-public interface TmSeeker {
+public interface ITmSeeker {
 
     /**
      * Gets a list of matches for a given set of words. In this case OR is assumed.
