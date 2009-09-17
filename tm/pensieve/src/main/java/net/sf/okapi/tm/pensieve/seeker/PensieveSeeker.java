@@ -54,7 +54,7 @@ public class PensieveSeeker implements ITmSeeker {
     public PensieveSeeker(Directory indexDir) throws IllegalArgumentException {
         //TODO - Change indexDir to some other non-lucene class.
         if (indexDir == null) {
-            throw new IllegalArgumentException("indexDir cannot be null!");
+            throw new IllegalArgumentException("'indexDir' cannot be null!");
         }
         this.indexDir = indexDir;
     }

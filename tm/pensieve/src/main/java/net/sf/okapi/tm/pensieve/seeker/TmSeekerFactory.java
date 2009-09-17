@@ -41,7 +41,7 @@ public final class TmSeekerFactory {
         }catch(IOException ioe){
             throw new OkapiIOException("Trouble creating FSDirectory with the given path: " +indexDirectoryPath, ioe);
         }catch(NullPointerException npe) {
-            throw new OkapiIOException("indexDirectoryPath cannot be null");
+            throw new OkapiIOException("'indexDirectoryPath' cannot be null");
         }
         return new PensieveSeeker(dir);
     }

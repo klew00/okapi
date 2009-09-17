@@ -22,6 +22,7 @@ package net.sf.okapi.tm.pensieve.tmx;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.Helper;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import static org.junit.Assert.assertEquals;
@@ -35,7 +36,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
-import net.sf.okapi.tm.pensieve.common.MetadataType;
 
 /**
  * @author Dax
@@ -136,7 +136,7 @@ public class OkapiTmxExporterTest {
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "tmSeeker was not set", errMsg);
+        assertEquals("Error message", "'tmSeeker' was not set", errMsg);
     }
 
     @Test
@@ -147,7 +147,7 @@ public class OkapiTmxExporterTest {
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "tmxWriter was not set", errMsg);
+        assertEquals("Error message", "'tmxWriter' was not set", errMsg);
     }
 
     @Test
@@ -158,6 +158,6 @@ public class OkapiTmxExporterTest {
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "sourceLang was not set", errMsg);
+        assertEquals("Error message", "'sourceLang' was not set", errMsg);
     }
 }

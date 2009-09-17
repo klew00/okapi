@@ -72,13 +72,13 @@ public class OkapiTmxExporter implements ITmxExporter {
 
     private void checkExportTmxParams(String sourceLang, ITmSeeker tmSeeker, TMXWriter tmxWriter) {
         if (sourceLang == null) {
-            throw new IllegalArgumentException("sourceLang was not set");
+            throw new IllegalArgumentException("'sourceLang' was not set");
         }
         if (tmSeeker == null) {
-            throw new IllegalArgumentException("tmSeeker was not set");
+            throw new IllegalArgumentException("'tmSeeker' was not set");
         }
         if (tmxWriter == null) {
-            throw new IllegalArgumentException("tmxWriter was not set");
+            throw new IllegalArgumentException("'tmxWriter' was not set");
         }
     }
 }

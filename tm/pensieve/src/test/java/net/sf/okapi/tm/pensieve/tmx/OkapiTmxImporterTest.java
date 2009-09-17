@@ -97,7 +97,7 @@ public class OkapiTmxImporterTest {
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "tmxUri was not set", errMsg);
+        assertEquals("Error message", "'tmxUri' was not set", errMsg);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class OkapiTmxImporterTest {
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "targetLang was not set", errMsg);
+        assertEquals("Error message", "'targetLang' was not set", errMsg);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class OkapiTmxImporterTest {
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "tmWriter was not set", errMsg);
+        assertEquals("Error message", "'tmWriter' was not set", errMsg);
     }
 
     @Test
@@ -130,7 +130,7 @@ public class OkapiTmxImporterTest {
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "sourceLang must be set", errMsg);
+        assertEquals("Error message", "'sourceLang' must be set", errMsg);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class OkapiTmxImporterTest {
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
-        assertEquals("Error message", "filter must be set", errMsg);
+        assertEquals("Error message", "'filter' must be set", errMsg);
     }
 
     @Test(expected = IllegalArgumentException.class)

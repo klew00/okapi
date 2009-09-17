@@ -46,10 +46,10 @@ public class OkapiTmxImporter implements ITmxImporter {
         this.tmxFilter = tmxFilter;
         this.sourceLang = sourceLang;
         if (Util.isEmpty(sourceLang)) {
-            throw new IllegalArgumentException("sourceLang must be set");
+            throw new IllegalArgumentException("'sourceLang' must be set");
         }
         if (tmxFilter == null) {
-            throw new IllegalArgumentException("filter must be set");
+            throw new IllegalArgumentException("'filter' must be set");
         }
     }
 
@@ -76,13 +76,13 @@ public class OkapiTmxImporter implements ITmxImporter {
 
     private void checkImportTmxParams(URI tmxUri, String targetLang, ITmWriter tmWriter) {
         if (Util.isEmpty(targetLang)) {
-            throw new IllegalArgumentException("targetLang was not set");
+            throw new IllegalArgumentException("'targetLang' was not set");
         }
         if (tmxUri == null) {
-            throw new IllegalArgumentException("tmxUri was not set");
+            throw new IllegalArgumentException("'tmxUri' was not set");
         }
         if (tmWriter == null) {
-            throw new IllegalArgumentException("tmWriter was not set");
+            throw new IllegalArgumentException("'tmWriter' was not set");
         }
     }
 
