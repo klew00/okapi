@@ -20,18 +20,24 @@
 
 package net.sf.okapi.tm.pensieve.seeker;
 
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.*;
 import net.sf.okapi.tm.pensieve.writer.PensieveWriter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -52,6 +58,30 @@ public class PensieveSeekerTest {
     @Before
     public void setUp() throws FileNotFoundException {
         seeker = new PensieveSeeker(DIR);
+    }
+
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @Test(expected = OkapiIOException.class)
+    public void getAllTranslationUnitsHandleCorruptIndexException() throws IOException {
+        PensieveSeeker spy = spy(seeker);
+        doThrow(new CorruptIndexException("some exception")).when(spy).openIndexReader();
+        spy.getAllTranslationUnits();
+    }
+
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @Test(expected = OkapiIOException.class)
+    public void getAllTranslationUnitsHandleIOException() throws IOException {
+        PensieveSeeker spy = spy(seeker);
+        doThrow(new IOException("some exception")).when(spy).openIndexReader();
+        spy.getAllTranslationUnits();
+    }
+
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @Test(expected = OkapiIOException.class)
+    public void searchHandleIOException() throws IOException {
+        PensieveSeeker spy = spy(seeker);
+        doThrow(new IOException("some exception")).when(spy).getIndexSearcher();
+        spy.search(1, new PhraseQuery());
     }
 
     @Test

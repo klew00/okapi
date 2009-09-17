@@ -20,6 +20,7 @@
 
 package net.sf.okapi.tm.pensieve.common;
 
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.Helper;
@@ -39,6 +40,26 @@ public class PensieveUtilTest {
     }
 
     @Test
+    public void convertToTranslationUnitMetadata(){
+        TextUnit textUnit = new TextUnit("someId", "some great text");
+        textUnit.setTargetContent("kr", new TextFragment("some great text in Korean"));
+        textUnit.setProperty(new Property(MetadataType.FILE_NAME.fieldName(), "sumdumfilename"));
+        TranslationUnit tu = PensieveUtil.convertToTranslationUnit("en", "kr", textUnit);
+        assertEquals("# of meetadaatas", 1, tu.getMetadata().size());
+        assertEquals("file name meta data", "sumdumfilename", tu.getMetadataValue(MetadataType.FILE_NAME));
+    }
+
+    @Test
+    public void convertToTranslationUnitNonMatchingProperty(){
+        TextUnit textUnit = new TextUnit("someId", "some great text");
+        textUnit.setTargetContent("kr", new TextFragment("some great text in Korean"));
+        textUnit.setProperty(new Property(MetadataType.FILE_NAME.fieldName(), "sumdumfilename"));
+        textUnit.setProperty(new Property("somedumbkey", "sumdumvalue"));
+        TranslationUnit tu = PensieveUtil.convertToTranslationUnit("en", "kr", textUnit);
+        assertEquals("# of meetadaatas", 1, tu.getMetadata().size());
+    }
+
+    @Test
     public void convertToTranslationUnit(){
         TextUnit textUnit = new TextUnit("someId", "some great text");
         textUnit.setTargetContent("kr", new TextFragment("some great text in Korean"));
@@ -47,6 +68,18 @@ public class PensieveUtilTest {
         assertEquals("source content", "some great text", tu.getSource().getContent().toString());
         assertEquals("targetLang", "kr", tu.getTarget().getLang());
         assertEquals("target content", "some great text in Korean", tu.getTarget().getContent().toString());
+    }
+
+    @Test
+    public void convertToTextUnitNullId(){
+        TranslationUnit tu = Helper.createTU("EN", "KR", "bipity bopity boo", "something in korean", null);
+        tu.setMetadataValue(MetadataType.GROUP_NAME, "groupie");
+        TextUnit textUnit = PensieveUtil.convertToTextUnit(tu);
+        assertEquals("source content", "bipity bopity boo", textUnit.getSource().getContent().toString());
+        assertEquals("target content", "something in korean", textUnit.getTarget("KR").getContent().toString());
+        assertEquals("tuid", null, textUnit.getId());
+        assertEquals("name", null, textUnit.getName());
+        assertEquals("group attribute", "groupie", textUnit.getProperty(MetadataType.GROUP_NAME.fieldName()).getValue());
     }
 
     @Test

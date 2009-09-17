@@ -24,7 +24,6 @@ package net.sf.okapi.tm.pensieve.seeker;
 import net.sf.okapi.tm.pensieve.common.TmHit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -38,44 +37,44 @@ public interface ITmSeeker {
      * @param query The words to query for
      * @param max The max number of results
      * @return A list of matches for a given set of words. In this case OR is assumed.
-     * @throws IOException if the search cannot be completed do to I/O problems
+     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
-    List<TmHit> searchForWords(String query, int max) throws IOException;
+    List<TmHit> searchForWords(String query, int max);
 
     /**
      * Gets a list of exact matches for a given phrase.
      * @param query The exact text to search for
      * @param max The max number of results
      * @return A list of exact matches
-     * @throws IOException if the search cannot be completed do to I/O problems
+     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
-    List<TmHit> searchExact(String query, int max) throws IOException;
+    List<TmHit> searchExact(String query, int max);
 
     /**
      * Gets a list of fuzzy matches for a given phrase.
      * @param query The fuzzy query to match
      * @param max The max number of results
      * @return A list of fuzzy matches
-     * @throws IOException if the search cannot be completed do to I/O problems
+     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
-    List<TmHit> searchFuzzy(String query, int max) throws IOException;
+    List<TmHit> searchFuzzy(String query, int max);
 
     /**
      * Gets a list of TmHits which have segments that contain the provided subphrase
      * @param subPhrase The subphrase to match again
      * @param maxHits The maximum number of hits to return
      * @return A list of TmHits which have segments that contain the provided subphrase
-     * @throws IOException if the search cannot be completed do to I/O problems
+     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
-    List<TmHit> searchSubphrase(String subPhrase, int maxHits) throws IOException;
+    List<TmHit> searchSubphrase(String subPhrase, int maxHits);
 
 
     /**
      * Gets all entries in the TM as a list TranslationUnit
      * @return A list of all Translation Units
-     * @throws IOException if the search cannot be completed do to I/O problems
+     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
-    List<TranslationUnit> getAllTranslationUnits() throws IOException;
+    List<TranslationUnit> getAllTranslationUnits();
     //TODO accept fields and values for filtering
     //TODO move this out of this interface and into the ITmxExporter interface
 }
