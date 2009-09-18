@@ -171,7 +171,7 @@ public class Main {
 				else if ( arg.equals("-2tmx") ) {
 					prog.command = CMD_CONV2TMX;
 				}
-				else if ( arg.equals("-2pstm") ) {
+				else if ( arg.equals("-2pen") ) {
 					prog.command = CMD_CONV2PEN;
 					prog.penDir = getArgument(args, ++i);
 				}

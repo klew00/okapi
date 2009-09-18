@@ -21,27 +21,45 @@
 package net.sf.okapi.steps.formatconversion;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
+/**
+ * Implementation of the {@link IFilterWriter} interface for Pensieve TM.
+ * The resources are expected to have a target entry for the given target language.
+ */
 public class PensieveFilterWriter implements IFilterWriter {
 
 	private ITmWriter writer;
 	private String directory;
+	private String srcLang;
+	private String trgLang;
 	
 	public void cancel () {
-		// TODO Auto-generated method stub
+		//TODO: support cancel
 	}
 
 	public void close () {
-		// TODO Auto-generated method stub
+		if ( writer != null ) {
+			try {
+				writer.endIndex();
+			}
+			catch ( IOException e ) {
+				throw new OkapiIOException("Error when closing the TM index.", e);
+			}
+		}
 	}
 
 	public String getName () {
@@ -57,31 +75,65 @@ public class PensieveFilterWriter implements IFilterWriter {
 		case START_DOCUMENT:
 			handleStartDocument(event);
 			break;
+		case TEXT_UNIT:
+			handleTextUnit(event);
+			break;
+		case END_DOCUMENT:
+			close();
+			break;
 		}
 		return event;
 	}
 
+	/**
+	 * Sets the options for this writer.
+	 * @param language code of the output language.
+	 * @param defaultEncoding encoding is ignored for this writer (it can be null).
+	 */
 	public void setOptions (String language,
 		String defaultEncoding)
 	{
-		// TODO Auto-generated method stub
+		trgLang = language;
+		// Encoding is ignored in this writer
 	}
 
+	/**
+	 * Sets the output directory for the TM
+	 * @param path full path of the output directory.
+	 */
 	public void setOutput (String path) {
 		directory = path; // We assume it is a directory
 	}
 
+	/**
+	 * This method is not supported by this writer and will
+	 * throw and exception if called.
+	 */
 	public void setOutput (OutputStream output) {
-		throw new OkapiIllegalFilterOperationException("Output type not supported.");
+		throw new OkapiNotImplementedException("Output type not supported.");
 	}
 
 	public void setParameters (IParameters params) {
-		// TODO Auto-generated method stub
+		// No parameters for now.
 	}
 
 	private void handleStartDocument (Event event) {
 		Util.createDirectories(directory+File.separator);
 		writer = TmWriterFactory.createFileBasedTmWriter(directory);
+		StartDocument sd = (StartDocument)event.getResource();
+		srcLang = sd.getLanguage();
+	}
+	
+	private void handleTextUnit (Event event) {
+		TextUnit tu = (TextUnit)event.getResource();
+		try {
+			if ( tu.hasTarget(trgLang) ) {
+				writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLang, trgLang, tu));
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error when indexing a text unit.", e);
+		}
 	}
 
 }

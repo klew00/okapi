@@ -81,12 +81,6 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 	
 	public Event handleEvent (Event event) {
-		// Special case for Pensive
-		if ( outputType == PENSIEVE_OUTPUT ) {
-			
-			return event;
-		}
-		
 		switch (event.getEventType()) {
 		case START_BATCH:
 			firstOutputCreated = false;
@@ -100,12 +94,14 @@ public class FormatConversionStep extends BasePipelineStep {
 				outputType = PENSIEVE_OUTPUT;
 			}
 			break;
+			
 		case END_BATCH:
 			if ( params.isSingleOutput() ) {
 				Ending ending = new Ending("end");
 				writer.handleEvent(new Event(EventType.END_DOCUMENT, ending));
 			}
 			break;
+			
 		case START_DOCUMENT:
 			if ( !firstOutputCreated || !params.isSingleOutput() ) {
 				switch ( outputType ) {
@@ -122,26 +118,32 @@ public class FormatConversionStep extends BasePipelineStep {
 			}
 			writer.handleEvent(event);
 			break;
+			
 		case END_DOCUMENT:
 			if ( !params.isSingleOutput() ) {
 				writer.handleEvent(event);
 			}
 			// Else: Do nothing
 			break;
-		case START_BATCH_ITEM:
-		case END_BATCH_ITEM:
+			
 		case START_SUBDOCUMENT:
 		case END_SUBDOCUMENT:
 		case START_GROUP:
 		case END_GROUP:
-		case TEXT_UNIT:
-			if ( writer != null ) {
-				writer.handleEvent(event);
-			}
+			writer.handleEvent(event);
 			break;
+
+		case TEXT_UNIT:
+			//TODO: Filter empty tu, non-target tu, etc.
+			writer.handleEvent(event);
+			break;
+			
+		case START_BATCH_ITEM:
+		case END_BATCH_ITEM:
 		case RAW_DOCUMENT:
 		case DOCUMENT_PART:
 		case CUSTOM:
+			// Do nothing
 			break;
 		}
 		return event;
