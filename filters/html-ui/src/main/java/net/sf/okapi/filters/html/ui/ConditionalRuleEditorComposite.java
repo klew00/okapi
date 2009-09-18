@@ -21,24 +21,21 @@
 package net.sf.okapi.filters.html.ui;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.GridData;
 
 public class ConditionalRuleEditorComposite extends Composite {
-	private Label label;
-	private Combo combo;
 	private Group group;
 	private Composite composite;
-	private Combo comboAttributeName;
+	private Text comboAttributeName;
 	private Combo comboOperator;
-	private Combo comboAttributeValue;
+	private Text comboAttributeValue;
 	private List list;
 
 	/**
@@ -48,77 +45,41 @@ public class ConditionalRuleEditorComposite extends Composite {
 	 */
 	public ConditionalRuleEditorComposite(Composite parent, int style) {
 		super(parent, style);
-		setLayout(new FormLayout());
-		
-		label = new Label(this, SWT.NONE);
-		FormData formData = new FormData();
-		formData.height = 21;
-		formData.top = new FormAttachment(0, 10);
-		formData.width = 117;
-		formData.left = new FormAttachment(0, 10);
-		label.setLayoutData(formData);
-		label.setText("Tag Name:");
-		label.setData("name", "label");
-		
-		combo = new Combo(this, SWT.NONE);
-		FormData formData_1 = new FormData();
-		formData_1.top = new FormAttachment(0, 10);
-		formData_1.right = new FormAttachment(100, -142);
-		formData_1.left = new FormAttachment(label, 6);
-		formData_1.width = 305;
-		combo.setLayoutData(formData_1);
-		combo.setData("name", "combo");
+		setLayout(new GridLayout(1, true));
 		
 		group = new Group(this, SWT.NONE);
-		FormData formData_2 = new FormData();
-		formData_2.bottom = new FormAttachment(100, -40);
-		formData_2.height = 332;
-		formData_2.top = new FormAttachment(label, 15);
-		formData_2.right = new FormAttachment(100);
-		formData_2.left = new FormAttachment(0);
-		group.setLayoutData(formData_2);
-		group.setLayout(new FormLayout());
+		group.setLayout(new GridLayout(1, false));
+		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		group.setText("Conditional Rule");
 		group.setData("name", "group");
 		
-		composite = new Composite(group, SWT.NONE);
-		FillLayout fillLayout = new FillLayout(SWT.HORIZONTAL);
-		fillLayout.spacing = 10;
-		composite.setLayout(fillLayout);
-		FormData formData_3 = new FormData();
-		formData_3.left = new FormAttachment(0, 10);
-		formData_3.right = new FormAttachment(100, -10);
-		formData_3.top = new FormAttachment(0, 10);
-		composite.setLayoutData(formData_3);
+		composite = new Composite(group, SWT.BORDER);
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		composite.setLayout(new GridLayout(7, false));
 		composite.setData("name", "composite");
 		
-		comboAttributeName = new Combo(composite, SWT.NONE);
+		comboAttributeName = new Text(composite, SWT.BORDER);
+		comboAttributeName.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		comboAttributeName.setData("name", "combo_1");
+		new Label(composite, SWT.NONE);
 		
 		comboOperator = new Combo(composite, SWT.NONE);
+		comboOperator.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		comboOperator.setVisibleItemCount(3);
 		comboOperator.setItems(new String[] {"equal", "not equal", "regex"});
 		comboOperator.setData("name", "combo_2");
+		new Label(composite, SWT.NONE);
 		
-		comboAttributeValue = new Combo(composite, SWT.NONE);
+		comboAttributeValue = new Text(composite, SWT.BORDER);
+		comboAttributeValue.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		comboAttributeValue.setData("name", "combo_3");
 		
 		list = new List(group, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-		FormData formData_4 = new FormData();
-		formData_4.bottom = new FormAttachment(100);
-		formData_4.top = new FormAttachment(composite, 14);
-		formData_4.left = new FormAttachment(0, 10);
-		formData_4.right = new FormAttachment(100, -10);
-		list.setLayoutData(formData_4);
+		list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		list.setData("name", "list");
 		{
 			AddDeleteComposite addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
-			{
-				FormData formData_5 = new FormData();
-				formData_5.top = new FormAttachment(group, 6);
-				formData_5.right = new FormAttachment(100, -10);
-				addDeleteComposite.setLayoutData(formData_5);
-			}
+			addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		}
 
 	}

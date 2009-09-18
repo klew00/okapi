@@ -23,13 +23,14 @@ package net.sf.okapi.filters.html.ui;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
+import net.sf.okapi.common.ui.OKCancelPanel;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Group;
 
-public class ConditionalRuleEditorDialog extends Composite implements IDialogPage {
+public class EmbeddableTagRulesDialog extends Composite implements IDialogPage {
 	private ConditionalRuleEditorComposite conditionalRuleEditorComposite;
 
 	/**
@@ -37,28 +38,28 @@ public class ConditionalRuleEditorDialog extends Composite implements IDialogPag
 	 * @param parent
 	 * @param style
 	 */
-	public ConditionalRuleEditorDialog(Composite parent, int style) {
+	public EmbeddableTagRulesDialog(Composite parent, int style) {
 		super(parent, style);
-		setLayout(new FormLayout());
-		
-		conditionalRuleEditorComposite = new ConditionalRuleEditorComposite(this, SWT.NONE);
-		FormData formData = new FormData();
-		formData.bottom = new FormAttachment(100, -44);
-		formData.top = new FormAttachment(0, 10);
-		formData.right = new FormAttachment(100, -10);
-		formData.left = new FormAttachment(0, 10);
-		conditionalRuleEditorComposite.setLayoutData(formData);
-		conditionalRuleEditorComposite.setData("name", "conditionalRuleEditorComposite");
+		setLayout(new GridLayout(1, false));
 		{
-			OkCancelComposite okCancelComposite = new OkCancelComposite(this, SWT.NONE);
+			Group grpTag = new Group(this, SWT.NONE);
+			grpTag.setText("Tag Name");
 			{
-				FormData formData_1 = new FormData();
-				formData_1.top = new FormAttachment(conditionalRuleEditorComposite, 6);
-				formData_1.right = new FormAttachment(conditionalRuleEditorComposite, 0, SWT.RIGHT);
-				okCancelComposite.setLayoutData(formData_1);
+				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+				gridData.heightHint = 46;
+				grpTag.setLayoutData(gridData);
 			}
 		}
-
+		
+		conditionalRuleEditorComposite = new ConditionalRuleEditorComposite(this, SWT.BORDER);
+		GridLayout gridLayout = (GridLayout) conditionalRuleEditorComposite.getLayout();
+		gridLayout.makeColumnsEqualWidth = true;
+		conditionalRuleEditorComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		conditionalRuleEditorComposite.setData("name", "conditionalRuleEditorComposite");
+		{
+			OKCancelPanel cancelPanel = new OKCancelPanel(this, SWT.NONE);
+			cancelPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		}
 	}
 
 	@Override

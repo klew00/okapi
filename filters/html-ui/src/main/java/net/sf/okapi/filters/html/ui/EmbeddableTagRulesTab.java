@@ -38,6 +38,7 @@ public class EmbeddableTagRulesTab extends Composite implements IDialogPage {
 	private TableColumn embeddableTagColumn;
 	private TableColumn conditionalRulesColumn;
 	private AddDeleteComposite addDeleteComposite;
+	private TableColumn tblclmnGenericType;
 
 	/**
 	 * Create the composite.
@@ -66,8 +67,12 @@ public class EmbeddableTagRulesTab extends Composite implements IDialogPage {
 		
 		conditionalRulesColumn = new TableColumn(table, SWT.CENTER);
 		conditionalRulesColumn.setData("name", "conditionalRulesColumn");
-		conditionalRulesColumn.setWidth(425);
+		conditionalRulesColumn.setWidth(278);
 		conditionalRulesColumn.setText("Conditional Rules");
+		
+		tblclmnGenericType = new TableColumn(table, SWT.CENTER);
+		tblclmnGenericType.setWidth(114);
+		tblclmnGenericType.setText("Generic Type");
 		
 		addDeleteComposite = new AddDeleteComposite(grpEmbeddableTags, SWT.NONE);
 		addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
