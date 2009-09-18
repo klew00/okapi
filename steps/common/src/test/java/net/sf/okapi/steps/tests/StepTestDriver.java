@@ -40,7 +40,7 @@ public class StepTestDriver {
 	
 	public StepTestDriver () {
 		fcMapper = new FilterConfigurationMapper();
-		fcMapper.addConfigurations("net.sf.okapi.filters.po.POFilter");
+		fcMapper.addConfigurations("net.sf.okapi.common.filters.DummyFilter");
 		driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
 		captureStep = new CaptureStep();
@@ -49,8 +49,8 @@ public class StepTestDriver {
 
 	/**
 	 * Prepares the data to process.
-	 * @param srcText the source text to process (PO format)
-	 * @param trgText the optional target text to process (PO format)
+	 * @param srcText the source text to process
+	 * @param trgText the optional target text to process (can be null)
 	 * @param srcLang the source language.
 	 * @param trgLang the target language.
 	 */
@@ -60,13 +60,13 @@ public class StepTestDriver {
 		String trgLang)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("msgid \""+srcText+"\"\nmsgstr \"");
+		sb.append(srcText);
 		if ( trgText != null ) {
+			sb.append("\n");
 			sb.append(trgText);
 		}
-		sb.append("\"\n");
 		rawDoc = new RawDocument(sb.toString(), srcLang, trgLang);
-		rawDoc.setFilterConfigId("okf_po");
+		rawDoc.setFilterConfigId("okf_dummy");
 	}
 	
 	/**

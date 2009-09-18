@@ -199,7 +199,7 @@
 		<echo file="tmpJars" append="yes"> ${jar002}</echo>
 		<copy todir="${distLib}" file="${dep002}/${jar002}"/>
 
-		<property name="dep003" value="${mavenStore}/org/jyaml/jyaml/1.3"/>
+		<property name="dep003" value="${mavenStore}/org/yaml/snakeyaml/1.4"/>
 		<fileset id="list.contents" dir="${dep003}"
 		 includes="**/*.jar"/>
 		<property name="jar003" refid="list.contents"/>

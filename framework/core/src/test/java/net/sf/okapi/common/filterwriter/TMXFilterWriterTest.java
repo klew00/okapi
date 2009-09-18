@@ -43,7 +43,7 @@ public class TMXFilterWriterTest {
 
 	@Test
 	public void testSimpleOutput () {
-		String result = rewrite(getEvents("dummy", "en", "fr"), "fr");
+		String result = rewrite(getEvents(null, "en", "fr"), "fr");
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<tmx version=\"1.4\"><header creationtool=\"unknown\" creationtoolversion=\"unknown\" segtype=\"TODO\" o-tmf=\"TODO\" adminlang=\"en\" srclang=\"en\" datatype=\"TODO\"></header><body>"
 			+ "<tu tuid=\"autoID1\">"
@@ -63,7 +63,7 @@ public class TMXFilterWriterTest {
 		String trgLang)
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, srcLang, trgLang));
+		filter.open(new RawDocument((CharSequence)null, srcLang, trgLang));
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			list.add(event);

@@ -20,14 +20,14 @@
 
 package net.sf.okapi.common.filters;
 
-import java.io.InputStream;
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -37,6 +37,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -47,7 +48,12 @@ public class DummyFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private String srcLang;
 	private String trgLang;
+	private DummyParameters params;
 
+	public DummyFilter () {
+		params = new DummyParameters();
+	}
+	
 	public void cancel () {
 		canceled = true;
 	}
@@ -60,7 +66,7 @@ public class DummyFilter implements IFilter {
 	}
 
 	public String getName () {
-		return "DummyFilter";
+		return "okf_dummy";
 	}
 
 	public String getDisplayName () {
@@ -72,7 +78,7 @@ public class DummyFilter implements IFilter {
 	}
 
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	public boolean hasNext () {
@@ -87,6 +93,11 @@ public class DummyFilter implements IFilter {
 		return queue.poll();
 	}
 
+	/**
+	 * Use this filter with a string input where the string has all your text unit,
+	 * each text separated by a '\n'.
+	 * For dummy inline codes use "@#$N" where N is a number between 0 and 9.
+	 */
 	public void open (RawDocument input) {
 		open(input, true);
 	}
@@ -97,29 +108,12 @@ public class DummyFilter implements IFilter {
 		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
 			input.getEncoding(), generateSkeleton);
 		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getStream() != null ) {
-			open(input.getStream());
+			reset(input.getInputCharSequence().toString());
 		}
 		else {
-			throw new RuntimeException("RawDocument has no input defined.");
+			// In all other case: Use the default events
+			reset();
 		}
-	}
-	
-	private void open (InputStream input) {
-		reset();
-	}
-
-	private void open (CharSequence inputText) {
-		reset();
-	}
-
-	private void open (URI inputURI) {
-		reset();
 	}
 
 	private void setOptions (String sourceLanguage,
@@ -132,6 +126,7 @@ public class DummyFilter implements IFilter {
 	}
 
 	public void setParameters (IParameters params) {
+		this.params = (DummyParameters)params;
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {
@@ -142,6 +137,44 @@ public class DummyFilter implements IFilter {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
+	private void reset (String data) {
+		close();
+		queue = new LinkedList<Event>();
+		String[] parts = data.split("\n", 0);
+
+		StartDocument sd = new StartDocument("sd1");
+		sd.setLanguage(srcLang);
+		sd.setMultilingual(parts.length>1);
+		sd.setMimeType("text");
+		queue.add(new Event(EventType.START_DOCUMENT, sd));
+		
+		TextUnit tu = new TextUnit("id1", parts[0]);
+		String text = tu.getSourceContent().getCodedText();
+		int n = text.indexOf("@#$");
+		while ( n > -1 ) {
+			tu.getSourceContent().changeToCode(n, n+4, TagType.PLACEHOLDER, "z");
+			text = tu.getSourceContent().getCodedText();
+			n = text.indexOf("@#$");
+		}
+		
+		if ( parts.length > 1 ) {
+			TextContainer tc = new TextContainer(parts[1]);
+			text = tc.getCodedText();
+			n = text.indexOf("@#$");
+			while ( n > -1 ) {
+				tc.changeToCode(n, n+4, TagType.PLACEHOLDER, "z");
+				text = tc.getCodedText();
+				n = text.indexOf("@#$");
+			}
+			tu.setTarget(trgLang, tc);
+		}
+		
+		queue.add(new Event(EventType.TEXT_UNIT, tu));
+
+		Ending ending = new Ending("ed1");
+		queue.add(new Event(EventType.END_DOCUMENT, ending));
+	}
+	
 	private void reset () {
 		close();
 		queue = new LinkedList<Event>();
@@ -181,7 +214,13 @@ public class DummyFilter implements IFilter {
 	}
 
 	public List<FilterConfiguration> getConfigurations() {
-		return null;
+ 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MimeTypeMapper.DEFAULT_MIME_TYPE,
+			getClass().getName(),
+			"Dummy Filter",
+			"Default for dummy."));
+		return list;
 	}
 
 }

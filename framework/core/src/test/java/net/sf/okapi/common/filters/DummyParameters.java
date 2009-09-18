@@ -18,18 +18,28 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.connectors.pensieve;
+package net.sf.okapi.common.filters;
 
-import net.sf.okapi.common.ParametersDescription;
-import net.sf.okapi.common.uidescription.EditorDescription;
-import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.BaseParameters;
 
-public class ParametersUI implements IEditorDescriptionProvider {
-
-	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Pensieve TM Connector Settings");
-		desc.addTextInputPart(paramsDesc.get(Parameters.DBDIRECTORY));
-		return desc;
+public class DummyParameters extends BaseParameters {
+	
+	public DummyParameters () {
+		reset();
+		toString(); // fill the list
+	}
+	
+	public void reset () {
 	}
 
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+	}
+
+	@Override
+	public String toString () {
+		buffer.reset();
+		return buffer.toString();
+	}
 }
