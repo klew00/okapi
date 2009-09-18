@@ -3,7 +3,6 @@ package net.sf.okapi.common.pipeline.integration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;

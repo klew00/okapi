@@ -2,8 +2,6 @@ package net.sf.okapi.common.pipeline.integration;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.pipelinedriver.BatchItemContext;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
@@ -19,6 +17,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 
 public class FilterEventsToRawDocumentStepTest {
+
 	private FilterEventsToRawDocumentStep eventToDoc;
 	private String htmlSnippet;
 	private HtmlFilter htmlFilter;
@@ -35,22 +34,20 @@ public class FilterEventsToRawDocumentStepTest {
 	}
 
 	@Test
-	public void htmlEventsToRawDocument() throws IOException {
-		Event event = null;		
+	public void htmlEventsToRawDocumentWithUserURI() throws IOException {
+		Event event = null;
 		eventToDoc = new FilterEventsToRawDocumentStep();
 		
 		RawDocument rawDoc = new RawDocument(htmlSnippet, "en");
-		rawDoc.setFilterConfigId("okf_html");
-		// FIXME: pipeline tests should not depend on pipeline driver
-		BatchItemContext bic = new BatchItemContext(rawDoc, null, "UTF-8");
-		PipelineContext c = new PipelineContext();
-		eventToDoc.setContext(c);
-		c.setBatchItemContext(bic);
-
+		File tmpFile = File.createTempFile("FilterEventsToRawDocumentStepTest", ".tmp");
+		eventToDoc.setOutputURI(tmpFile.toURI());
+		eventToDoc.setOutputEncoding("UTF-8");
+		
 		htmlFilter.open(rawDoc);
-		while ( htmlFilter.hasNext() ) {
+		while (htmlFilter.hasNext()) {
 			event = eventToDoc.handleEvent(htmlFilter.next());
 		}
+		htmlFilter.close();
 
 		// last event should be RawDocument
 		assertTrue(event.getEventType() == EventType.RAW_DOCUMENT);
@@ -60,23 +57,17 @@ public class FilterEventsToRawDocumentStepTest {
 	}
 
 	@Test
-	public void htmlEventsToRawDocumentWithUserURI() throws IOException {
-		Event event = null;
+	public void htmlEventsToRawDocument() throws IOException {
+		Event event = null;		
 		eventToDoc = new FilterEventsToRawDocumentStep();
-		
-		File tmpFile = File.createTempFile("FilterEventsToRawDocumentStepTest", ".tmp");
 		RawDocument rawDoc = new RawDocument(htmlSnippet, "en");
-		rawDoc.setFilterConfigId("okf_html");
-		BatchItemContext bic = new BatchItemContext(rawDoc, tmpFile.toURI(), "UTF-8");
-		// FIXME: pipeline tests should not depend on pipeline driver
-		PipelineContext c = new PipelineContext();
-		eventToDoc.setContext(c);
-		c.setBatchItemContext(bic);
-		
+		eventToDoc.setOutputEncoding("UTF-8");
+
 		htmlFilter.open(rawDoc);
-		while (htmlFilter.hasNext()) {
+		while ( htmlFilter.hasNext() ) {
 			event = eventToDoc.handleEvent(htmlFilter.next());
 		}
+		htmlFilter.close();
 
 		// last event should be RawDocument
 		assertTrue(event.getEventType() == EventType.RAW_DOCUMENT);
@@ -89,10 +80,10 @@ public class FilterEventsToRawDocumentStepTest {
 		int c;
 		StringWriter sw = new StringWriter();
 		Reader r = d.getReader(); 
-		while (true) {
+		while ( true ) {
 			c = r.read();			
-			if (c == -1) break;							
-			sw.append((char) c);			
+			if (c == -1) break;
+			sw.append((char) c);
 		}
 		d.getReader().close();
 		return sw.toString();
