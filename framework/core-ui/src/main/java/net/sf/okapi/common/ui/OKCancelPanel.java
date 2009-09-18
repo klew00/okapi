@@ -44,6 +44,17 @@ public class OKCancelPanel extends Composite {
 	 * Creates a new panel for Help/OK/Cancel buttons.
 	 * @param parent Parent control.
 	 * @param flags Style flags.
+	 */
+	public OKCancelPanel (Composite parent,	int style)
+	{
+		super(parent, SWT.NONE);
+		createContent(null, false, Res.getString("OKCancelPanel.btOK"), null);
+	}
+
+	/**
+	 * Creates a new panel for Help/OK/Cancel buttons.
+	 * @param parent Parent control.
+	 * @param flags Style flags.
 	 * @param action Action to execute when any of the buttons is clicked.
 	 * The receiving event, the widget's data is marked: 'c' for the Cancel
 	 * button, 'o' for OK, and 'h' for help.
@@ -114,7 +125,9 @@ public class OKCancelPanel extends Composite {
 		btHelp = new Button(this, SWT.PUSH);
 		btHelp.setText(Res.getString("OKCancelPanel.btHelp"));
 		btHelp.setData("h");
-		btHelp.addSelectionListener(action);
+		if (action != null) {
+			btHelp.addSelectionListener(action);
+		}
 		GridData gdTmp = new GridData();
 		btHelp.setLayoutData(gdTmp);
 		UIUtil.ensureWidth(btHelp, nWidth);
@@ -143,7 +156,9 @@ public class OKCancelPanel extends Composite {
 
 		btOK.setText(okLabel);
 		btOK.setData("o");
-		btOK.addSelectionListener(action);
+		if (action != null) {
+			btOK.addSelectionListener(action);
+		}
 		RowData rdTmp = new RowData();
 		btOK.setLayoutData(rdTmp);
 		btOK.pack();
@@ -151,7 +166,9 @@ public class OKCancelPanel extends Composite {
 		
 		btCancel.setText(Res.getString("OKCancelPanel.btCancel"));
 		btCancel.setData("c");
-		btCancel.addSelectionListener(action);
+		if (action != null) {
+			btCancel.addSelectionListener(action);
+		}
 		rdTmp = new RowData();
 		btCancel.setLayoutData(rdTmp);
 		btCancel.pack();
@@ -161,7 +178,9 @@ public class OKCancelPanel extends Composite {
 		if ( btExtra != null ) {
 			btExtra.setText(extraLabel);
 			btExtra.setData("x");
-			btExtra.addSelectionListener(action);
+			if (action != null) {
+				btExtra.addSelectionListener(action);
+			}
 			rdTmp = new RowData();
 			btExtra.setLayoutData(rdTmp);
 			btExtra.pack();
