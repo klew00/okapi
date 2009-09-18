@@ -34,6 +34,7 @@ public class ProcessingInstructionRulesTab extends Composite {
 	private Table table;
 	private TableColumn tblclmnProcessingInstruction;
 	private TableColumn tblclmnAction;
+	private AddDeleteComposite addDeleteComposite;
 
 	/**
 	 * Create the composite.
@@ -64,6 +65,9 @@ public class ProcessingInstructionRulesTab extends Composite {
 		tblclmnAction.setData("name", "tblclmnAction");
 		tblclmnAction.setWidth(296);
 		tblclmnAction.setText("Action");
+		
+		addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
+		addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 	}
 

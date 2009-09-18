@@ -38,6 +38,7 @@ public class ContentExclusionRulesTab extends Composite implements IDialogPage {
 	private TableColumn tblclmnTagName;
 	private TableColumn tblclmnRuleType;
 	private TableColumn tblclmnConditionalRules;
+	private AddDeleteComposite addDeleteComposite;
 
 	/**
 	 * Create the composite.
@@ -73,6 +74,9 @@ public class ContentExclusionRulesTab extends Composite implements IDialogPage {
 		tblclmnConditionalRules.setData("name", "tblclmnConditionalRules");
 		tblclmnConditionalRules.setWidth(259);
 		tblclmnConditionalRules.setText("Conditional Rules");
+		
+		addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
+		addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 	}
 

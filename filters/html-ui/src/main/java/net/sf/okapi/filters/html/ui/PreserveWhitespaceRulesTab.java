@@ -32,8 +32,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 
@@ -46,6 +44,7 @@ public class PreserveWhitespaceRulesTab extends Composite implements IDialogPage
 	private Button button;
 	private Button btnAlwaysPreserveWhitespace;
 	private Group grpPreserveWhitespaceRules;
+	private AddDeleteComposite addDeleteComposite;
 
 	/**
 	 * Create the composite.
@@ -102,6 +101,9 @@ public class PreserveWhitespaceRulesTab extends Composite implements IDialogPage
 		tblclmnConditionalRules.setData("name", "tblclmnConditionalRules");
 		tblclmnConditionalRules.setWidth(285);
 		tblclmnConditionalRules.setText("Conditional Rules");
+		
+		addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
+		addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 
 	}
 

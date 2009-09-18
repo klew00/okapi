@@ -28,7 +28,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Widget;
@@ -43,6 +42,8 @@ public class AttributeRulesTab extends Composite implements IDialogPage {
 	private TableColumn tblclmnTagName;
 	private TableColumn tblclmnConditionalRules;
 	private TableColumn tblclmnConditionalRules_1;
+	private AddDeleteComposite addDeleteComposite;
+	private AddDeleteComposite addDeleteComposite_1;
 
 	/**
 	 * Create the composite.
@@ -76,7 +77,9 @@ public class AttributeRulesTab extends Composite implements IDialogPage {
 		tblclmnAllTagsExcept.setData("name", "tblclmnAllTagsExcept");
 		tblclmnAllTagsExcept.setWidth(409);
 		tblclmnAllTagsExcept.setText("All Tags Except...");
-		new Label(this, SWT.NONE);
+		
+		addDeleteComposite_1 = new AddDeleteComposite(this, SWT.NONE);
+		addDeleteComposite_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		
 		grpTagsWithAttributes = new Group(this, SWT.NONE);
 		grpTagsWithAttributes.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -105,6 +108,9 @@ public class AttributeRulesTab extends Composite implements IDialogPage {
 		tblclmnConditionalRules_1.setData("name", "tblclmnConditionalRules_1");
 		tblclmnConditionalRules_1.setWidth(287);
 		tblclmnConditionalRules_1.setText("Conditional Rules");
+		
+		addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
+		addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, false, 1, 1));
 
 	}
 

@@ -30,12 +30,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.layout.FillLayout;
 
 public class EmbeddableTagRulesTab extends Composite implements IDialogPage {
 	private Group grpEmbeddableTags;
 	private Table table;
 	private TableColumn embeddableTagColumn;
 	private TableColumn conditionalRulesColumn;
+	private AddDeleteComposite addDeleteComposite;
 
 	/**
 	 * Create the composite.
@@ -44,11 +46,10 @@ public class EmbeddableTagRulesTab extends Composite implements IDialogPage {
 	 */
 	public EmbeddableTagRulesTab(Composite parent, int style) {
 		super(parent, style);
-		setLayout(new GridLayout(1, false));
+		setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		grpEmbeddableTags = new Group(this, SWT.BORDER);
 		grpEmbeddableTags.setLayout(new GridLayout(1, false));
-		grpEmbeddableTags.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		grpEmbeddableTags.setText("Embeddable Tags");
 		grpEmbeddableTags.setData("name", "grpEmbeddableTags");
 		
@@ -67,6 +68,9 @@ public class EmbeddableTagRulesTab extends Composite implements IDialogPage {
 		conditionalRulesColumn.setData("name", "conditionalRulesColumn");
 		conditionalRulesColumn.setWidth(425);
 		conditionalRulesColumn.setText("Conditional Rules");
+		
+		addDeleteComposite = new AddDeleteComposite(grpEmbeddableTags, SWT.NONE);
+		addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 	}
 
 	@Override

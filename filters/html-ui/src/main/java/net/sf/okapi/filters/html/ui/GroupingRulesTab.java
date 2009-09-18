@@ -39,6 +39,7 @@ public class GroupingRulesTab extends Composite implements IDialogPage {
 	private TableColumn tblclmnTagName;
 	private TableColumn tblclmnGroupType;
 	private TableColumn tblclmnConditionalRules;
+	private AddDeleteComposite addDeleteComposite;
 
 	/**
 	 * Create the composite.
@@ -74,6 +75,9 @@ public class GroupingRulesTab extends Composite implements IDialogPage {
 		tblclmnConditionalRules.setData("name", "tblclmnConditionalRules");
 		tblclmnConditionalRules.setWidth(277);
 		tblclmnConditionalRules.setText("Conditional Rules");
+		
+		addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
+		addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 	}
 
 	@Override

@@ -23,18 +23,13 @@ package net.sf.okapi.filters.html.ui;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
 
 public class ConditionalRuleEditorDialog extends Composite implements IDialogPage {
-	private Button btnOk;
-	private Button btnCancel;
 	private ConditionalRuleEditorComposite conditionalRuleEditorComposite;
 
 	/**
@@ -48,42 +43,21 @@ public class ConditionalRuleEditorDialog extends Composite implements IDialogPag
 		
 		conditionalRuleEditorComposite = new ConditionalRuleEditorComposite(this, SWT.NONE);
 		FormData formData = new FormData();
+		formData.bottom = new FormAttachment(100, -44);
 		formData.top = new FormAttachment(0, 10);
 		formData.right = new FormAttachment(100, -10);
 		formData.left = new FormAttachment(0, 10);
 		conditionalRuleEditorComposite.setLayoutData(formData);
 		conditionalRuleEditorComposite.setData("name", "conditionalRuleEditorComposite");
-		
-		btnOk = new Button(this, SWT.NONE);
-		formData.bottom = new FormAttachment(btnOk, -9);
-		btnOk.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
+		{
+			OkCancelComposite okCancelComposite = new OkCancelComposite(this, SWT.NONE);
+			{
+				FormData formData_1 = new FormData();
+				formData_1.top = new FormAttachment(conditionalRuleEditorComposite, 6);
+				formData_1.right = new FormAttachment(conditionalRuleEditorComposite, 0, SWT.RIGHT);
+				okCancelComposite.setLayoutData(formData_1);
 			}
-		});
-		FormData formData_3 = new FormData();
-		formData_3.bottom = new FormAttachment(100, -10);
-		formData_3.height = 25;
-		formData_3.width = 75;
-		btnOk.setLayoutData(formData_3);
-		btnOk.setData("name", "btnOk");
-		btnOk.setText("OK");
-		
-		btnCancel = new Button(this, SWT.NONE);
-		formData_3.right = new FormAttachment(btnCancel, -6);
-		btnCancel.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
-		FormData formData_4 = new FormData();
-		formData_4.right = new FormAttachment(100, -10);
-		formData_4.height = 25;
-		formData_4.width = 75;
-		formData_4.bottom = new FormAttachment(100, -10);
-		btnCancel.setLayoutData(formData_4);
-		btnCancel.setData("name", "btnCancel");
-		btnCancel.setText("Cancel");
+		}
 
 	}
 

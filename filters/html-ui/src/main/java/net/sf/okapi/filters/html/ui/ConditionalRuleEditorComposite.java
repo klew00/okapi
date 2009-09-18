@@ -29,7 +29,6 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.layout.FillLayout;
 
 public class ConditionalRuleEditorComposite extends Composite {
@@ -37,12 +36,10 @@ public class ConditionalRuleEditorComposite extends Composite {
 	private Combo combo;
 	private Group group;
 	private Composite composite;
-	private Combo combo_1;
-	private Combo combo_2;
-	private Combo combo_3;
+	private Combo comboAttributeName;
+	private Combo comboOperator;
+	private Combo comboAttributeValue;
 	private List list;
-	private Button button;
-	private Button button_1;
 
 	/**
 	 * Create the composite.
@@ -74,7 +71,7 @@ public class ConditionalRuleEditorComposite extends Composite {
 		
 		group = new Group(this, SWT.NONE);
 		FormData formData_2 = new FormData();
-		formData_2.bottom = new FormAttachment(100);
+		formData_2.bottom = new FormAttachment(100, -40);
 		formData_2.height = 332;
 		formData_2.top = new FormAttachment(label, 15);
 		formData_2.right = new FormAttachment(100);
@@ -89,51 +86,40 @@ public class ConditionalRuleEditorComposite extends Composite {
 		fillLayout.spacing = 10;
 		composite.setLayout(fillLayout);
 		FormData formData_3 = new FormData();
-		formData_3.top = new FormAttachment(0, 10);
+		formData_3.left = new FormAttachment(0, 10);
 		formData_3.right = new FormAttachment(100, -10);
+		formData_3.top = new FormAttachment(0, 10);
 		composite.setLayoutData(formData_3);
 		composite.setData("name", "composite");
 		
-		combo_1 = new Combo(composite, SWT.NONE);
-		combo_1.setData("name", "combo_1");
+		comboAttributeName = new Combo(composite, SWT.NONE);
+		comboAttributeName.setData("name", "combo_1");
 		
-		combo_2 = new Combo(composite, SWT.NONE);
-		combo_2.setVisibleItemCount(3);
-		combo_2.setItems(new String[] {"equal", "not equal", "regex"});
-		combo_2.setData("name", "combo_2");
+		comboOperator = new Combo(composite, SWT.NONE);
+		comboOperator.setVisibleItemCount(3);
+		comboOperator.setItems(new String[] {"equal", "not equal", "regex"});
+		comboOperator.setData("name", "combo_2");
 		
-		combo_3 = new Combo(composite, SWT.NONE);
-		combo_3.setData("name", "combo_3");
+		comboAttributeValue = new Combo(composite, SWT.NONE);
+		comboAttributeValue.setData("name", "combo_3");
 		
-		list = new List(group, SWT.BORDER | SWT.V_SCROLL);
-		formData_3.left = new FormAttachment(list, 0, SWT.LEFT);
+		list = new List(group, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 		FormData formData_4 = new FormData();
+		formData_4.bottom = new FormAttachment(100);
 		formData_4.top = new FormAttachment(composite, 14);
 		formData_4.left = new FormAttachment(0, 10);
 		formData_4.right = new FormAttachment(100, -10);
 		list.setLayoutData(formData_4);
 		list.setData("name", "list");
-		
-		button = new Button(group, SWT.NONE);
-		formData_4.bottom = new FormAttachment(button, -4);
-		FormData formData_5 = new FormData();
-		formData_5.width = 75;
-		formData_5.height = 25;
-		button.setLayoutData(formData_5);
-		button.setText("Add");
-		button.setData("name", "button");
-		
-		button_1 = new Button(group, SWT.NONE);
-		formData_5.bottom = new FormAttachment(button_1, 0, SWT.BOTTOM);
-		formData_5.right = new FormAttachment(button_1, -6);
-		FormData formData_6 = new FormData();
-		formData_6.width = 75;
-		formData_6.height = 25;
-		formData_6.bottom = new FormAttachment(100);
-		formData_6.right = new FormAttachment(100, -10);
-		button_1.setLayoutData(formData_6);
-		button_1.setText("Remove");
-		button_1.setData("name", "button_1");
+		{
+			AddDeleteComposite addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
+			{
+				FormData formData_5 = new FormData();
+				formData_5.top = new FormAttachment(group, 6);
+				formData_5.right = new FormAttachment(100, -10);
+				addDeleteComposite.setLayoutData(formData_5);
+			}
+		}
 
 	}
 
@@ -141,5 +127,4 @@ public class ConditionalRuleEditorComposite extends Composite {
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
 	}
-
 }
