@@ -39,6 +39,7 @@ public class FormatConversionStep extends BasePipelineStep {
 
 	private static final int PO_OUTPUT = 0;
 	private static final int TMX_OUTPUT = 1;
+	private static final int PENSIEVE_OUTPUT = 2;
 	
 	private Parameters params;
 	private IFilterWriter writer;
@@ -80,6 +81,12 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 	
 	public Event handleEvent (Event event) {
+		// Special case for Pensive
+		if ( outputType == PENSIEVE_OUTPUT ) {
+			
+			return event;
+		}
+		
 		switch (event.getEventType()) {
 		case START_BATCH:
 			firstOutputCreated = false;
@@ -88,6 +95,9 @@ public class FormatConversionStep extends BasePipelineStep {
 			}
 			else if ( params.getOutputFormat().equals(Parameters.FORMAT_TMX) ) {
 				outputType = TMX_OUTPUT;
+			}
+			else if ( params.getOutputFormat().equals(Parameters.FORMAT_PENSIEVE) ) {
+				outputType = PENSIEVE_OUTPUT;
 			}
 			break;
 		case END_BATCH:
@@ -104,6 +114,9 @@ public class FormatConversionStep extends BasePipelineStep {
 					break;
 				case TMX_OUTPUT:
 					startTMXOutput();
+					break;
+				case PENSIEVE_OUTPUT:
+					startPensieveOutput();
 					break;
 				}
 			}
@@ -188,6 +201,12 @@ public class FormatConversionStep extends BasePipelineStep {
 			outFile.deleteOnExit();
 		}
 		firstOutputCreated = true;
+	}
+
+	private void startPensieveOutput () {
+		writer = new PensieveFilterWriter();
+		writer.setOutput(params.getOutputPath());
+		writer.setOptions(targetLanguage, "UTF-8");
 	}
 
 }

@@ -54,6 +54,7 @@ import net.sf.okapi.steps.formatconversion.Parameters;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
+import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
 import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
 
 public class Main {
@@ -64,6 +65,7 @@ public class Main {
 	protected final static int CMD_QUERYTRANS = 3;
 	protected final static int CMD_CONV2PO = 4;
 	protected final static int CMD_CONV2TMX = 5;
+	protected final static int CMD_CONV2PEN = 6;
 
 	private static PrintStream ps;
 	
@@ -83,7 +85,9 @@ public class Main {
 	protected boolean useTT;
 	protected String ttParams;
 	protected boolean useMM;
+	protected boolean usePen;
 	protected String mmParams;
+	protected String penDir;
 	protected boolean genericOutput = false;
 	
 	private FilterConfigurationMapper fcMapper;
@@ -167,6 +171,10 @@ public class Main {
 				else if ( arg.equals("-2tmx") ) {
 					prog.command = CMD_CONV2TMX;
 				}
+				else if ( arg.equals("-2pstm") ) {
+					prog.command = CMD_CONV2PEN;
+					prog.penDir = getArgument(args, ++i);
+				}
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
 					if ( args.size() > i+1 ) {
@@ -195,6 +203,10 @@ public class Main {
 				else if ( arg.equals("-mm") ) {
 					prog.useMM = true;
 					prog.mmParams = getArgument(args, ++i);
+				}
+				else if ( arg.equals("-pen") ) {
+					prog.usePen = true;
+					prog.penDir = getArgument(args, ++i);
 				}
 				else if ( arg.equals("-listconf") ) {
 					prog.showAllConfigurations();
@@ -543,6 +555,7 @@ public class Main {
 			
 		case CMD_CONV2PO:
 		case CMD_CONV2TMX:
+		case CMD_CONV2PEN:
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			
@@ -551,8 +564,11 @@ public class Main {
 			if ( command == CMD_CONV2PO ) {
 				output += ".po";
 			}
-			else { // TMX
+			else if ( command == CMD_CONV2TMX ) {
 				output += ".tmx";
+			}
+			else { // Pensieve
+				output = penDir;
 			}
 			URI outputURI = new File(output).toURI();
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
@@ -567,8 +583,11 @@ public class Main {
 			if ( command == CMD_CONV2PO ) {
 				ps.print("Conversion to PO...");
 			}
-			else {
+			else if ( command == CMD_CONV2TMX ) {
 				ps.print("Conversion to TMX...");
+			}
+			else {
+				ps.print("Importing to Pensieve TM...");
 			}
 			
 			convertFile(rd, outputURI);
@@ -642,13 +661,25 @@ public class Main {
 	}
 	
 	private void processQuery () {
-		if ( !useGoogle && !useOpenTran && !useTT && !useMM ) {
+		if ( !useGoogle && !useOpenTran && !useTT && !useMM && !usePen ) {
 			useGoogle = true; // Default if none is specified
 		}
 		
 		IQuery conn;
 		if ( useGoogle ) {
 			conn = new GoogleMTConnector();
+			conn.setLanguages(srcLang, trgLang);
+			conn.open();
+			displayQuery(conn);
+			conn.close();
+		}
+		if ( usePen ) {
+			// The parameters for now is just the access key
+			net.sf.okapi.connectors.pensieve.Parameters params
+				= new net.sf.okapi.connectors.pensieve.Parameters();
+			params.setDbDirectory(penDir);
+			conn = new PensieveTMConnector();
+			conn.setParameters(params);
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
 			displayQuery(conn);
@@ -712,7 +743,12 @@ public class Main {
 			params.setOutputFormat(Parameters.FORMAT_TMX);
 			params.setOutputPath("output.tmx");
 		}
-		params.setSingleOutput(false);
+		else if ( command == CMD_CONV2PEN ) {
+			params.setOutputFormat(Parameters.FORMAT_PENSIEVE);
+			params.setOutputPath(penDir);
+		}
+		
+		params.setSingleOutput(command==CMD_CONV2PEN);
 		params.setUseGenericCodes(genericOutput);
 		driver.addStep(fcStep);
 		

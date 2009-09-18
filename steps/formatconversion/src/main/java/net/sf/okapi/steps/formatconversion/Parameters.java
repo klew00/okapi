@@ -32,6 +32,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public static final String FORMAT_TMX = "tmx";
 	public static final String FORMAT_PO = "po";
+	public static final String FORMAT_PENSIEVE = "pensieve";
 	
 	static final String SINGLEOUTPUT = "singleOutput";
 	static final String OUTPUTPATH = "outputPath";
@@ -117,8 +118,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("Format Conversion", true, false);
 
-		String[] choices = {FORMAT_PO, FORMAT_TMX};
-		String[] choicesLabels = {"PO File", "TMX Document"};
+		String[] choices = {FORMAT_PO, FORMAT_TMX, FORMAT_PENSIEVE};
+		String[] choicesLabels = {"PO File", "TMX Document", "Pensieve TM"};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTFORMAT), choices);
 		lsp.setChoicesLabels(choicesLabels);
 		
