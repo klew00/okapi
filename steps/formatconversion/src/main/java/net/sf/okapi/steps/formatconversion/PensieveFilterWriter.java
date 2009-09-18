@@ -23,6 +23,7 @@ package net.sf.okapi.steps.formatconversion;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -30,9 +31,13 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
@@ -126,9 +131,34 @@ public class PensieveFilterWriter implements IFilterWriter {
 	
 	private void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
+		if ( !tu.hasTarget(trgLang) ) return;
 		try {
-			if ( tu.hasTarget(trgLang) ) {
+			TextContainer srcCont = tu.getSource();
+			// If not segmented: index the whole entry
+			if ( !srcCont.isSegmented() ) {
 				writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLang, trgLang, tu));
+				return;
+			}
+			
+			// Else: check if we have the same number of segments
+			List<Segment> trgList = tu.getTarget(trgLang).getSegments();
+			if ( trgList.size() != srcCont.getSegmentCount() ) {
+				// Fall back to full entry
+				writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLang, trgLang, tu));
+				//TODO: Log a warning
+				return;
+			}
+			
+			// Index each segment
+			int i = 0;
+			for ( Segment segment : srcCont.getSegments() ) {
+				TranslationUnitVariant source = new TranslationUnitVariant(srcLang, segment.text);
+				TranslationUnitVariant target = new TranslationUnitVariant(trgLang, trgList.get(i).text);
+				TranslationUnit trUnit = new TranslationUnit(source, target);
+				//TODO: what do we do with properties? e.g. tuid should not be used as it
+				//PensieveUtil.populateMetaDataFromProperties(tu, trUnit);
+				writer.indexTranslationUnit(trUnit);
+				i++;
 			}
 		}
 		catch ( IOException e ) {

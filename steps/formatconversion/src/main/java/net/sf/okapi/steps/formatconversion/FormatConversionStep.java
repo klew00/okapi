@@ -161,9 +161,6 @@ public class FormatConversionStep extends BasePipelineStep {
 			else {
 				outFile = new File(outputURI);
 			}
-			// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
-			writer.setOutput(outFile.getPath());
-			writer.setOptions(targetLanguage, "UTF-8");
 		}
 		else {
 			try {
@@ -174,6 +171,9 @@ public class FormatConversionStep extends BasePipelineStep {
 			}
 			outFile.deleteOnExit();
 		}
+		// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
+		writer.setOutput(outFile.getPath());
+		writer.setOptions(targetLanguage, "UTF-8");
 		firstOutputCreated = true;
 	}
 
