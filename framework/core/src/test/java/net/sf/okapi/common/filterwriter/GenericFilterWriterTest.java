@@ -27,6 +27,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -42,44 +43,70 @@ public class GenericFilterWriterTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		StartDocument sd = new StartDocument("sd");
-		sd.setEncoding("UTF-8", false);
-		sd.setLineBreak("\n");
-		sd.setLanguage("en");
-		startDocEvent = new Event(EventType.START_DOCUMENT, sd);
+	}
+
+	@Test
+	public void testSourceTargetSkeleton () {
+		TextUnit tu = new TextUnit("tu1");
+		tu.setSourceContent(new TextFragment("src"));
+		tu.setTargetContent("fr", new TextContainer("trg"));
+		Event textUnitEvent = new Event(EventType.TEXT_UNIT, tu);
+			
+		GenericSkeleton skel = new GenericSkeleton();
+		skel.add("[start]");
+		skel.addContentPlaceholder(tu);
+		skel.add("[middle]");
+		skel.addContentPlaceholder(tu, "fr");
+		skel.add("[end]");
+		tu.setSkeleton(skel);
+			
+		GenericFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter());
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		writer.setOptions("fr", "UTF-8");
+		writer.setOutput(output);
+		writer.handleEvent(createStartDocument(true));
+		writer.handleEvent(textUnitEvent);
+		writer.close();
+		
+		assertEquals("[start]src[middle]trg[end]", output.toString());
 	}
 
 	@Test
 	public void testTextUnitReferenceInDocumentPart () {
-		try {
-			TextUnit tu = new TextUnit("tu1");
-			tu.setSourceContent(new TextFragment("text"));
-			tu.setIsReferent(true);
-			Event textUnitEvent = new Event(EventType.TEXT_UNIT, tu);
+		TextUnit tu = new TextUnit("tu1");
+		tu.setSourceContent(new TextFragment("text"));
+		tu.setIsReferent(true);
+		Event textUnitEvent = new Event(EventType.TEXT_UNIT, tu);
 			
-			GenericSkeleton skel = new GenericSkeleton();
-			skel.add("[bSkel]");
-			skel.addReference(tu);
-			skel.add("[eSkel]");
-			DocumentPart dp = new DocumentPart("id1", false);
-			dp.setSkeleton(skel);
-			Event docPartEvent = new Event(EventType.DOCUMENT_PART, dp);
+		GenericSkeleton skel = new GenericSkeleton();
+		skel.add("[bSkel]");
+		skel.addReference(tu);
+		skel.add("[eSkel]");
+		DocumentPart dp = new DocumentPart("id1", false);
+		dp.setSkeleton(skel);
+		Event docPartEvent = new Event(EventType.DOCUMENT_PART, dp);
 			
-			GenericFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter());
-			writer.setOptions("en", "UTF-8");
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			writer.setOutput(output);
+		GenericFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter());
+		writer.setOptions("en", "UTF-8");
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		writer.setOutput(output);
 			
-			writer.handleEvent(startDocEvent);
-			writer.handleEvent(textUnitEvent);
-			writer.handleEvent(docPartEvent);
-			writer.close();
+		writer.handleEvent(createStartDocument(false));
+		writer.handleEvent(textUnitEvent);
+		writer.handleEvent(docPartEvent);
+		writer.close();
 			
-			assertEquals("[bSkel]text[eSkel]", output.toString());
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-		}
+		assertEquals("[bSkel]text[eSkel]", output.toString());
 	}
 
+	private Event createStartDocument (boolean multilingual) {
+		StartDocument sd = new StartDocument("sd");
+		sd.setEncoding("UTF-8", false);
+		sd.setLineBreak("\n");
+		sd.setLanguage("en");
+		sd.setMultilingual(multilingual);
+		startDocEvent = new Event(EventType.START_DOCUMENT, sd);
+		return startDocEvent;
+	}
 }
