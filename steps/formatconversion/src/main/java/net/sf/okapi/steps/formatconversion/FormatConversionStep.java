@@ -39,7 +39,8 @@ public class FormatConversionStep extends BasePipelineStep {
 
 	private static final int PO_OUTPUT = 0;
 	private static final int TMX_OUTPUT = 1;
-	private static final int PENSIEVE_OUTPUT = 2;
+	private static final int TABLE_OUTPUT = 2;
+	private static final int PENSIEVE_OUTPUT = 3;
 	
 	private Parameters params;
 	private IFilterWriter writer;
@@ -93,6 +94,9 @@ public class FormatConversionStep extends BasePipelineStep {
 			else if ( params.getOutputFormat().equals(Parameters.FORMAT_PENSIEVE) ) {
 				outputType = PENSIEVE_OUTPUT;
 			}
+			else if ( params.getOutputFormat().equals(Parameters.FORMAT_TABLE) ) {
+				outputType = TABLE_OUTPUT;
+			}
 			break;
 			
 		case END_BATCH:
@@ -110,6 +114,9 @@ public class FormatConversionStep extends BasePipelineStep {
 					break;
 				case TMX_OUTPUT:
 					startTMXOutput();
+					break;
+				case TABLE_OUTPUT:
+					startTableOutput();
 					break;
 				case PENSIEVE_OUTPUT:
 					startPensieveOutput();
@@ -181,6 +188,32 @@ public class FormatConversionStep extends BasePipelineStep {
 		writer = new TMXFilterWriter();
 //		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
 //		outParams.outputGeneric = params.getUseGenericCodes();
+		File outFile;
+		if ( isLastOutputStep() ) {
+			if ( params.isSingleOutput() ) {
+				outFile = new File(params.getOutputPath());
+			}
+			else {
+				outFile = new File(outputURI);
+			}
+			// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
+			writer.setOutput(outFile.getPath());
+			writer.setOptions(targetLanguage, "UTF-8");
+		}
+		else {
+			try {
+				outFile = File.createTempFile("okp-fc_", ".tmp");
+			}
+			catch ( Throwable e ) {
+				throw new OkapiIOException("Cannot create temporary output.", e);
+			}
+			outFile.deleteOnExit();
+		}
+		firstOutputCreated = true;
+	}
+
+	private void startTableOutput () {
+		writer = new TableFilterWriter();
 		File outFile;
 		if ( isLastOutputStep() ) {
 			if ( params.isSingleOutput() ) {

@@ -65,7 +65,8 @@ public class Main {
 	protected final static int CMD_QUERYTRANS = 3;
 	protected final static int CMD_CONV2PO = 4;
 	protected final static int CMD_CONV2TMX = 5;
-	protected final static int CMD_CONV2PEN = 6;
+	protected final static int CMD_CONV2TABLE = 6;
+	protected final static int CMD_CONV2PEN = 67;
 
 	private static PrintStream ps;
 	
@@ -171,7 +172,10 @@ public class Main {
 				else if ( arg.equals("-2tmx") ) {
 					prog.command = CMD_CONV2TMX;
 				}
-				else if ( arg.equals("-2pen") ) {
+				else if ( arg.equals("-2tbl") ) {
+					prog.command = CMD_CONV2TABLE;
+				}
+				else if ( arg.equals("-imp") ) {
 					prog.command = CMD_CONV2PEN;
 					prog.penDir = getArgument(args, ++i);
 				}
@@ -208,7 +212,7 @@ public class Main {
 					prog.usePen = true;
 					prog.penDir = getArgument(args, ++i);
 				}
-				else if ( arg.equals("-listconf") ) {
+				else if ( arg.equals("-listconf") || arg.equals("-lfc") ) {
 					prog.showAllConfigurations();
 					return;
 				}
@@ -293,8 +297,13 @@ public class Main {
 		filtersMap.put("okf_openxml", "net.sf.okapi.filters.openxml.OpenXMLFilter");
 
 		extensionsMap.put(".odt", "okf_openoffice");
-		extensionsMap.put(".odp", "okf_openoffice");
+		extensionsMap.put(".swx", "okf_openoffice");
 		extensionsMap.put(".ods", "okf_openoffice");
+		extensionsMap.put(".swc", "okf_openoffice");
+		extensionsMap.put(".odp", "okf_openoffice");
+		extensionsMap.put(".sxi", "okf_openoffice");
+		extensionsMap.put(".odg", "okf_openoffice");
+		extensionsMap.put(".sxd", "okf_openoffice");
 		filtersMap.put("okf_openoffice", "net.sf.okapi.filters.openoffice.OpenOfficeFilter");
 
 		extensionsMap.put(".htm", "okf_html");
@@ -556,6 +565,7 @@ public class Main {
 		case CMD_CONV2PO:
 		case CMD_CONV2TMX:
 		case CMD_CONV2PEN:
+		case CMD_CONV2TABLE:
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			
@@ -566,6 +576,9 @@ public class Main {
 			}
 			else if ( command == CMD_CONV2TMX ) {
 				output += ".tmx";
+			}
+			else if ( command == CMD_CONV2TABLE) {
+				output += ".csv";
 			}
 			else { // Pensieve
 				output = penDir;
@@ -585,6 +598,9 @@ public class Main {
 			}
 			else if ( command == CMD_CONV2TMX ) {
 				ps.print("Conversion to TMX...");
+			}
+			else if ( command == CMD_CONV2TABLE ) {
+				ps.print("Conversion to Table...");
 			}
 			else {
 				ps.print("Importing to Pensieve TM...");
@@ -610,6 +626,7 @@ public class Main {
 		String path = Util.getDirectoryName(Util.getDirectoryName(url.getPath()));
 		path += "/help/applications/tikal/index.html"; //$NON-NLS-1$
 		// Opens the file
+		ps.println("Help: "+path);
 		try {
 			Util.openURL((new File(path)).toURL().toString());
 		}
@@ -619,26 +636,35 @@ public class Main {
 	}
 	
 	private void printUsage () {
-		ps.println("Show this help:");
+		ps.println("Show this screen:");
 		ps.println("   -?");
 		ps.println("Open the user guide page:");
-		ps.println("   -h");
+		ps.println("   -h or --help");
 		ps.println("List all available filter configurations:");
-		ps.println("   -listconf");
+		ps.println("   -lfc or -listconf");
 		ps.println("Edit or view filter configurations (UI-dependent command):");
 		ps.println("   -e [[-fc] configId]");
 		ps.println("Extract a file to XLIFF:");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang]");
+		ps.println("      [-sl sourceLang] [-tl targetLang]");
 		ps.println("Merge an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
+		ps.println("      [-oe encoding] [-sl sourceLang] [-tl targetLang]");
 		ps.println("Query translation resources:");
-		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-opentran]");
-		ps.println("      [-google] [-tt hostname[:port]] [-mm key]");
+		ps.println("   -q \"source text\" [-sl sourceLang] [-tl targetLang] [-google] [-opentran]");
+		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory]");
 		ps.println("Conversion to PO file:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-generic]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic]");
+		ps.println("Conversion to TMX file:");
+		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		ps.println("      [-sl sourceLang] [-tl targetLang]");
+		ps.println("Conversion to table:");
+		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		ps.println("      [-sl sourceLang] [-tl targetLang]");
+		ps.println("Import to Pensive TM:");
+		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		ps.println("      [-sl sourceLang] [-tl targetLang]");
 	}
 
 	private void displayQuery (IQuery conn) {
@@ -742,6 +768,10 @@ public class Main {
 		else if ( command == CMD_CONV2TMX ) {
 			params.setOutputFormat(Parameters.FORMAT_TMX);
 			params.setOutputPath("output.tmx");
+		}
+		else if ( command == CMD_CONV2TABLE ) {
+			params.setOutputFormat(Parameters.FORMAT_TABLE);
+			params.setOutputPath("output.csv");
 		}
 		else if ( command == CMD_CONV2PEN ) {
 			params.setOutputFormat(Parameters.FORMAT_PENSIEVE);
