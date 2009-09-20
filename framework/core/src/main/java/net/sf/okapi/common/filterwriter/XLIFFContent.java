@@ -75,6 +75,16 @@ public class XLIFFContent {
 
 	/**
 	 * Generates an XLIFF string from the content.
+	 * This is the same as calling this.toString(1, true, false) and setting gMode.
+	 * @param gMode True to use g/x markup, false to use bpt/ept/ph
+	 * @return The string formatted in XLIFF.
+	 */
+	public String toString (boolean gMode) {
+		return toString(1, true, false, gMode);
+	}
+
+	/**
+	 * Generates an XLIFF string from the content.
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
 	 * @param escapeGT True to always escape '>' to gt

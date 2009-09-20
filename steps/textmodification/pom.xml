@@ -31,9 +31,9 @@
 		<dependency>
 			<groupId>net.sf.okapi</groupId>
 			<artifactId>okapi-core</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 			<classifier>tests</classifier>
-			<version>${project.version}</version>
 		</dependency>
         <dependency>
             <groupId>net.sf.okapi.steps</groupId>

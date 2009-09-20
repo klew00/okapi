@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.translationcomparison;
+package net.sf.okapi.lib.translation;
 
 import java.text.BreakIterator;
 import java.util.ArrayList;
@@ -29,9 +29,9 @@ import net.sf.okapi.common.resource.TextFragment;
 
 public class TextMatcher {
 
-	public static final int IGNORE_CASE          = 0x01;
-	public static final int IGNORE_WHITESPACES   = 0x02;
-	public static final int IGNORE_PUNCTUATION   = 0x04;
+	public static final int IGNORE_CASE = 0x01;
+	public static final int IGNORE_WHITESPACES = 0x02;
+	public static final int IGNORE_PUNCTUATION = 0x04;
 	
 	private static final int MAXTOKEN = 1024;
 	
@@ -77,12 +77,30 @@ public class TextMatcher {
 		return (short)Math.min(value1, Math.min(value2, value3));
 	}
 	
-	protected static int levenshtein (List<String> tokens1,
+	private static int waikoloa (List<String> tokens1,
+		List<String> tokens2)
+	{
+		int wordsInQuery = tokens1.size();
+		int wordsInCandidate = tokens2.size();
+		int wordsFound = 0;
+		int n;
+		for ( String token : tokens1 ) {
+			//TODO: fix order and duplicates cases
+			if ( (n = tokens2.indexOf(token)) > -1 ) {
+				wordsFound++;
+				tokens2.set(n, null);
+			}
+		}
+		
+		Float f = 100 * ((float)(2*wordsFound) / (wordsInQuery+wordsInCandidate));
+		return f.intValue(); 
+	}
+	
+	private static int levenshtein (List<String> tokens1,
 		List<String> tokens2)
 	{
 		int n = tokens1.size();
 		int m = tokens2.size();
-	
 		if ( n == 0 ) return m;
 		if ( m == 0 ) return n;
 
@@ -171,7 +189,48 @@ public class TextMatcher {
 		}
 		else return n;
 	}
+	
+	/**
+	 * Creates a list of tokens from a string to use
+	 * with the {@link #compareToBaseTokens(String, List, TextFragment)}.
+	 * @param plainText the based text.
+	 * @return the list of tokens for the given fragment.
+	 */
+	public List<String> prepareBaseTokens (String plainText) {
+		String text = plainText.replaceAll("\\p{Punct}", " ");
+		return tokenize(text.toLowerCase(), breaker1);
+	}
 
+	/**
+	 * Compare a list of tokens to a {@link TextFragment} object. 
+	 * @param text1 the list of tokens.
+	 * @param frag2 the fragment to compare against list of tokens.
+	 * @return A score between 0 (no match) and 100 (exact match).
+	 */
+	public int compareToBaseTokens (String text1,
+		List<String> tokens1,
+		TextFragment frag2)
+	{
+		String text2 = frag2.getCodedText();
+		// Check if it actually is exactly the same?
+		if ( text1.equals(text2) ) return 100;
+		// Check if there is only casing differences
+		if ( text1.equalsIgnoreCase(text2) ) {
+			return 99;
+		}
+
+		text2 = text2.replaceAll("\\p{Punct}", " ");
+		List<String> tokens2 = tokenize(text2.toLowerCase(), breaker2);
+
+		//int n = levenshtein(tokens1, tokens2);
+		int n = waikoloa(tokens1, tokens2);
+		if ( n == 100 ) {
+			// Differences are hidden tokenization
+			return 99;
+		}
+		else return n;
+	}
+	
 	/**
 	 * Breaks the text into words (or equivalents).
 	 * @param text The text to break down.
@@ -183,103 +242,10 @@ public class TextMatcher {
 		breakerToUse.setText(text);
 		ArrayList<String> list = new ArrayList<String>();
 		int start = breakerToUse.first();
-		for (int end = breakerToUse.next(); end != BreakIterator.DONE; start=end, end=breakerToUse.next()) {
+		for ( int end = breakerToUse.next(); end != BreakIterator.DONE; start=end, end=breakerToUse.next() ) {
 			list.add(text.substring(start,end));
 		}
 		return list;
 	}
-
-	/* ====== Old code
-	private List<String> tokenize_OLD (String text) {
-		int len = text.length();
-		boolean isWord = false;
-		StringBuilder token = new StringBuilder();
-		int count = 0;
-		ArrayList<String> list = new ArrayList<String>();
-
-		for ( int i=0; i<len; i++ ) {
-			char ch = text.charAt(i);
-			if ( isWord ) {
-				if ( Character.isLetter(ch) ) {
-					token.append(ch);
-				}
-				else {
-					count++;
-					isWord = false;
-					list.add(token.toString());
-				}
-			}
-			else {
-				if ( Character.isLetter(ch) ) {
-					if ( isCJK(ch) ) {
-						//TODO: Same for Thai, etc.
-						count++;
-						list.add(String.valueOf(ch));
-					}
-					else {
-						isWord = true;
-						token.setLength(0); // Reset for next token
-						token.append(ch);
-					}
-				}
-			}
-		}
-		if ( isWord ) {
-			count++;
-			list.add(token.toString());
-		}
-		return list;
-	}
-	=== */
-	
-	/**
-	 * Checks if the given character is some-kind of CJK character
-	 * @param value The character to lookup.
-	 * @return True if it is recognized as a "CJK" character, false if not.
-	 === Old code
-	private boolean isCJK (char value) {
-		// To go faster (most of the cases)
-		if ( value < 0x1100 ) return false;
-		// Otherwise: check CJK-related ranges (most likely to be used are listed first)
-		// Hiragana U+3040 U+309F 
-		if (( value >= 0x3040 ) || ( value <= 0x309F )) return true;
-		// Katakana U+30A0 U+30FF 
-		if (( value >= 0x30A0 ) || ( value <= 0x30FF )) return true;
-		// Unified ideographs U+4E00 U+9FFF
-		if (( value >= 0x4E00 ) || ( value <= 0x9FFF )) return true;
-		// CJK Compatibility U+3300 U+33FF
-		if (( value >= 0x3300 ) || ( value <= 0x33FF )) return true;
-		// CJK Compatibility forms U+FE30 U+FE4F
-		if (( value >= 0xFE30 ) || ( value <= 0xFE4F )) return true;
-		// CJK Compatibility Ideographs U+F900 U+FAFF
-		if (( value >= 0xF900 ) || ( value <= 0xFAFF )) return true;
-		// CJK Radical Supplement U+2E80 U+2EFF
-		if (( value >= 0x2E80 ) || ( value <= 0x2EFF )) return true;
-		// CJK Symbols and Punctuations U+3000 U+303F
-		if (( value >= 0x3000 ) || ( value <= 0x303F )) return true;
-		// CJK Unified Ideographs Extension A U+3400 U+4DBF
-		if (( value >= 0x3400 ) || ( value <= 0x4DBF )) return true;
-		// Enclosed CJK Letters and Months U+3200 U+32FF
-		if (( value >= 0x3200 ) || ( value <= 0x32FF )) return true;
-		// Kanbun U+3190 U+319F
-		if (( value >= 0x3190 ) || ( value <= 0x319F )) return true;
-		// Katakana Phonetic Extension U+31F0 U+31FF
-		if (( value >= 0x31F0 ) || ( value <= 0x31FF )) return true;
-		// Bopomofo U+3100 U+312F
-		if (( value >= 0x3100 ) || ( value <= 0x312F )) return true;
-		// Bopomofo Extended U+31A0 U+31BF 
-		if (( value >= 0x31A0 ) || ( value <= 0x31BF )) return true;
-		// Kangxi radicals U+2F00 U+2FDF
-		if (( value >= 0x2F00 ) || ( value <= 0x2FDF )) return true;
-		// Hangul compatibility jamo U+3130 U+318F
-		if (( value >= 0x3130 ) || ( value <= 0x318F )) return true;
-		// Hangul jamo U+1100 U+11FF
-		if (( value >= 0x1100 ) || ( value <= 0x11FF )) return true;
-		// Hangul syllables U+AC00 U+D7AF
-		if (( value >= 0xAC00 ) || ( value <= 0xD7AF )) return true;
-		// Default
-		return false;
-	}
-	=== */
 
 }

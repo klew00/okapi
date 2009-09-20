@@ -28,6 +28,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +39,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.lib.translation.TextMatcher;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
@@ -46,14 +50,23 @@ import org.json.simple.parser.ParseException;
 
 public class OpenTranTMConnector implements ITMQuery {
 
-	private static boolean useREST = true;
+	private static boolean useREST = false;
 	
 	private XmlRpcClient client;
 	private String srcLang;
 	private String trgLang;
 	private List<QueryResult> results;
 	private int current = -1;
-	private int maxHits = 25;
+	private int maxHits = 12;
+	private int threshold = 60;
+	private TextMatcher matcher;
+	private ScoreComparer scorComp = new ScoreComparer();
+	
+	class ScoreComparer implements Comparator<QueryResult> {
+		public int compare(QueryResult arg0, QueryResult arg1) {
+			return (arg0.score>arg1.score ? -1 : (arg0.score==arg1.score ? 0 : 1));
+		}
+	}
 	
 	public String getName () {
 		return "OpenTran-Repository";
@@ -210,6 +223,10 @@ public class OpenTranTMConnector implements ITMQuery {
 				}
 			}
 
+			// Adjust scores
+			//TODO: re-order and re-filter results
+			fixupResults(plainText);
+			
 			current = 0;
 			return results.size();
 		}
@@ -235,6 +252,7 @@ public class OpenTranTMConnector implements ITMQuery {
 	public void setLanguages (String sourceLang,
 		String targetLang)
 	{
+		matcher = new TextMatcher(sourceLang, sourceLang);
 		srcLang = toInternalCode(sourceLang);
 		trgLang = toInternalCode(targetLang);
 	}
@@ -244,7 +262,7 @@ public class OpenTranTMConnector implements ITMQuery {
 	}
 
 	public void setThreshold (int threshold) {
-		// Not used with this connector
+		this.threshold = threshold;
 	}
 
 	public int getMaximumHits () {
@@ -252,8 +270,7 @@ public class OpenTranTMConnector implements ITMQuery {
 	}
 
 	public int getThreshold () {
-		// Not used with this connector
-		return 0;
+		return threshold;
 	}
 
 	private String toInternalCode (String standardCode) {
@@ -273,4 +290,23 @@ public class OpenTranTMConnector implements ITMQuery {
 		// Not used with this connector
 	}
 
+	/**
+	 * Re-calculates the scores, re-orders and filters the results based on
+	 * more meaning full comparisons.
+	 * @param plainText the original text query.
+	 */
+	private void fixupResults (String plainText) {
+		if ( results.size() == 0 ) return;
+		List<String> tokens = matcher.prepareBaseTokens(plainText);
+		// Loop through the results
+		for ( Iterator<QueryResult> iter = results.iterator(); iter.hasNext(); ) {
+			QueryResult qr = iter.next();
+			// Compute the adjusted score
+			qr.score = matcher.compareToBaseTokens(plainText, tokens, qr.source);
+			// Remove the item if lower than the threshold 
+			if ( qr.score < threshold ) iter.remove();
+		}
+		// Re-order the list from the 
+		Collections.sort(results, scorComp);
+	}
 }

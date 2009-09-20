@@ -37,6 +37,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.translation.TextMatcher;
 
 public class TranslationComparisonStep extends BasePipelineStep {
 
@@ -52,7 +53,6 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private Property scoreProp;
 	private long scoreTotal;
 	private int itemCount;
-	private boolean initDone;
 	private IFilterConfigurationMapper fcMapper;
 	private String targetLanguage;
 	private String sourceLanguage;
@@ -108,7 +108,25 @@ public class TranslationComparisonStep extends BasePipelineStep {
  
 	@Override
 	protected void handleStartBatch (Event event) {
-		initDone = false; // Delay batch initialization until first batch item
+		// Both strings are in the target language.
+		matcher = new TextMatcher(targetLanguage, targetLanguage);
+		
+		if ( params.isGenerateHTML() ) {
+			writer = new XMLWriter(getOutputFilename());
+		}
+		// Start TMX writer (one for all input documents)
+		if ( params.isGenerateTMX() ) {
+			tmx = new TMXWriter(params.getTmxPath());
+			tmx.writeStartDocument(sourceLanguage, targetLanguage,
+				getClass().getName(), null, null, null, null);
+		}
+		pathToOpen = null;
+		scoreProp = new Property("Txt::Score", "", false);
+		
+		options = 0;
+		if ( !params.isCaseSensitive() ) options |= TextMatcher.IGNORE_CASE;
+		if ( !params.isWhitespaceSensitive() ) options |= TextMatcher.IGNORE_WHITESPACES;
+		if ( !params.isPunctuationSensitive() ) options |= TextMatcher.IGNORE_PUNCTUATION;
 	}
 	
 	protected void handleEndBatch (Event event) {
@@ -128,15 +146,6 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		}
 	}
 	
-	@Override
-	protected void handleStartBatchItem (Event event) {
-		// Once per batch initialization
-		// (that requires to access the language info)
-		if ( !initDone ) {
-			initializeBatch();
-		}
-	}
-
 	@Override
 	protected void handleStartDocument (Event event1) {
 		StartDocument startDoc1 = (StartDocument)event1.getResource();
@@ -256,30 +265,6 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			tmxTu.setTargetProperty(targetLanguage+params.getTargetSuffix(), scoreProp);
 			tmx.writeTUFull(tmxTu);
 		}
-	}
-
-	private void initializeBatch () {
-		// Both strings are in the target language.
-		matcher = new TextMatcher(targetLanguage, targetLanguage);
-		
-		if ( params.isGenerateHTML() ) {
-			writer = new XMLWriter(getOutputFilename());
-		}
-		// Start TMX writer (one for all input documents)
-		if ( params.isGenerateTMX() ) {
-			tmx = new TMXWriter(params.getTmxPath());
-			tmx.writeStartDocument(sourceLanguage, targetLanguage,
-				getClass().getName(), null, null, null, null);
-		}
-		pathToOpen = null;
-		scoreProp = new Property("Txt::Score", "", false);
-		
-		options = 0;
-		if ( !params.isCaseSensitive() ) options |= TextMatcher.IGNORE_CASE;
-		if ( !params.isWhitespaceSensitive() ) options |= TextMatcher.IGNORE_WHITESPACES;
-		if ( !params.isPunctuationSensitive() ) options |= TextMatcher.IGNORE_PUNCTUATION;
-		
-		initDone = true;
 	}
 
     private String getOutputFilename(){

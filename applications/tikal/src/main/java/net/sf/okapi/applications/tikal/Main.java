@@ -578,7 +578,7 @@ public class Main {
 				output += ".tmx";
 			}
 			else if ( command == CMD_CONV2TABLE) {
-				output += ".csv";
+				output += ".txt";
 			}
 			else { // Pensieve
 				output = penDir;
@@ -615,7 +615,7 @@ public class Main {
 	private void printBanner () {
 		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 		ps.println("Okapi Tikal - Localization Toolset");
-		// This will null for version until compiled as jar, which is ok.
+		// The version will show as 'null' until the code is build as a JAR.
 		ps.println(String.format("Version: %s", getClass().getPackage().getImplementationVersion()));
 		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}

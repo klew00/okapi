@@ -36,7 +36,10 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.filterwriter.TMXContent;
+import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -48,6 +51,13 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class TableFilterWriter implements IFilterWriter {
 
+	private static final int INLINE_ORIGINAL = 0;
+	private static final int INLINE_GENERIC = 1;
+	private static final int INLINE_TMX = 2;
+	private static final int INLINE_XLIFF = 3;
+	private static final int INLINE_XLIFF_GX = 4;
+	
+	private TableFilterWriterParameters params;
 	private OutputStreamWriter writer;
 	private OutputStream outputStream;
 	private String outputPath;
@@ -55,6 +65,15 @@ public class TableFilterWriter implements IFilterWriter {
 	private String encoding;
 	private File tempFile;
 	private String linebreak = System.getProperty("line.separator");
+	private int inlineType;
+	private TMXContent tmxFmt;
+	private XLIFFContent xliffFmt;
+	private GenericContent genericFmt;
+	private boolean useDQ;
+	
+	public TableFilterWriter () {
+		params = new TableFilterWriterParameters();
+	}
 	
 	public void cancel () {
 		//TODO: support cancel
@@ -120,11 +139,14 @@ public class TableFilterWriter implements IFilterWriter {
 	}
 
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
+		case START_BATCH:
+			initialize();
+			break;
 		case START_DOCUMENT:
 			handleStartDocument(event);
 			break;
@@ -154,9 +176,32 @@ public class TableFilterWriter implements IFilterWriter {
 	}
 
 	public void setParameters (IParameters params) {
-		// No parameters for now.
+		this.params = (TableFilterWriterParameters)params;
 	}
 
+	private void initialize () {
+		useDQ = params.getUseDoubleQuotes();
+		if ( params.getInlineFormat().equals(TableFilterWriterParameters.INLINE_GENERIC) ) {
+			inlineType = INLINE_GENERIC;
+			genericFmt = new GenericContent();
+		}
+		else if ( params.getInlineFormat().equals(TableFilterWriterParameters.INLINE_TMX) ) {
+			inlineType = INLINE_TMX;
+			tmxFmt = new TMXContent();
+		}
+		else if ( params.getInlineFormat().equals(TableFilterWriterParameters.INLINE_XLIFF) ) {
+			inlineType = INLINE_XLIFF;
+			xliffFmt = new XLIFFContent();
+		}
+		else if ( params.getInlineFormat().equals(TableFilterWriterParameters.INLINE_XLIFF_GX) ) {
+			inlineType = INLINE_XLIFF_GX;
+			xliffFmt = new XLIFFContent();
+		}
+		else {
+			inlineType = INLINE_ORIGINAL;
+		}
+	}
+	
 	private void handleStartDocument (Event event) {
 		try {
 			StartDocument sd = (StartDocument)event.getResource();
@@ -218,20 +263,24 @@ public class TableFilterWriter implements IFilterWriter {
 	
 	private void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
-		if ( !tu.hasTarget(trgLang) ) return;
 
 		TextContainer srcCont = tu.getSource();
+		TextContainer trgCont = tu.getTarget(trgLang);
+		if ( trgCont == null ) {
+			trgCont = new TextContainer(); // Empty
+		}
+
 		// If not segmented: index the whole entry
 		if ( !srcCont.isSegmented() ) {
-			writeRow(srcCont.getContent(), tu.getTarget(trgLang).getContent());
+			writeRow(srcCont.getContent(), trgCont.getContent());
 			return;
 		}
-			
+
 		// Else: check if we have the same number of segments
-		List<Segment> trgList = tu.getTarget(trgLang).getSegments();
+		List<Segment> trgList = trgCont.getSegments();
 		if ( trgList.size() != srcCont.getSegmentCount() ) {
 			// Fall back to full entry
-			writeRow(srcCont.getContent(), tu.getTarget(trgLang).getContent());
+			writeRow(srcCont.getContent(), trgCont.getContent());
 			//TODO: Log a warning
 			return;
 		}
@@ -248,14 +297,44 @@ public class TableFilterWriter implements IFilterWriter {
 		TextFragment trgFrag)
 	{
 		try {
-			writer.write(srcFrag.toString());
-			writer.write("\t");
-			writer.write(trgFrag.toString());
+			if ( useDQ ) writer.write("\"");
+			writer.write(format(srcFrag));
+			if ( useDQ ) writer.write("\""+params.getSeparator()+"\"");
+			else writer.write(params.getSeparator());
+			writer.write(format(trgFrag));
+			if ( useDQ ) writer.write("\"");			
 			writer.write(linebreak);
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error writing row.", e);
 		}
+	}
+
+	private String format (TextFragment frag) {
+		String tmp;
+		switch ( inlineType ) {
+		case INLINE_GENERIC:
+			tmp = genericFmt.setContent(frag).toString();
+			break;
+		case INLINE_TMX:
+			tmp = tmxFmt.setContent(frag).toString();
+			break;
+		case INLINE_XLIFF:
+			tmp = xliffFmt.setContent(frag).toString();
+			break;
+		case INLINE_XLIFF_GX:
+			tmp = xliffFmt.setContent(frag).toString(true);
+			break;
+		default:
+			tmp = frag.toString();
+			break;
+		}
+		if ( useDQ ) {
+			// Automatically escape \ and " if text is double-quoted
+			tmp = tmp.replace("\\", "\\\\");
+			return tmp.replace("\"", "\\\"");
+		}
+		else return tmp;
 	}
 
 }

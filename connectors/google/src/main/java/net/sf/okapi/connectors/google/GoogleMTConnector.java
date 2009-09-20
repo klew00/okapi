@@ -144,7 +144,7 @@ public class GoogleMTConnector implements IQuery {
 				else {
 					result.target = new TextFragment(fromCodedHTML(m.group(1), fragment));
 				}
-				result.score = 99;
+				result.score = 95; // Arbitrary score for MT
 				current = 0;
 	        }
 		}

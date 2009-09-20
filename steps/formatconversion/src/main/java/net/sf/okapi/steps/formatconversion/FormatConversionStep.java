@@ -87,16 +87,22 @@ public class FormatConversionStep extends BasePipelineStep {
 			firstOutputCreated = false;
 			if ( params.getOutputFormat().equals(Parameters.FORMAT_PO) ) {
 				outputType = PO_OUTPUT;
+				createPOWriter();
 			}
 			else if ( params.getOutputFormat().equals(Parameters.FORMAT_TMX) ) {
 				outputType = TMX_OUTPUT;
+				createTMXWriter();
 			}
 			else if ( params.getOutputFormat().equals(Parameters.FORMAT_PENSIEVE) ) {
 				outputType = PENSIEVE_OUTPUT;
+				createPensieveWriter();
 			}
 			else if ( params.getOutputFormat().equals(Parameters.FORMAT_TABLE) ) {
 				outputType = TABLE_OUTPUT;
+				createTableWriter();
 			}
+			// Start sending event to the writer
+			writer.handleEvent(event);
 			break;
 			
 		case END_BATCH:
@@ -156,10 +162,13 @@ public class FormatConversionStep extends BasePipelineStep {
 		return event;
 	}
 
-	private void startPOOutput () {
+	private void createPOWriter () {
 		writer = new POFilterWriter();
 		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
 		outParams.outputGeneric = params.getUseGenericCodes();
+	}
+	
+	private void startPOOutput () {
 		File outFile;
 		if ( isLastOutputStep() ) {
 			if ( params.isSingleOutput() ) {
@@ -184,10 +193,13 @@ public class FormatConversionStep extends BasePipelineStep {
 		firstOutputCreated = true;
 	}
 
-	private void startTMXOutput () {
+	private void createTMXWriter () {
 		writer = new TMXFilterWriter();
 //		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
 //		outParams.outputGeneric = params.getUseGenericCodes();
+	}
+	
+	private void startTMXOutput () {
 		File outFile;
 		if ( isLastOutputStep() ) {
 			if ( params.isSingleOutput() ) {
@@ -212,8 +224,11 @@ public class FormatConversionStep extends BasePipelineStep {
 		firstOutputCreated = true;
 	}
 
-	private void startTableOutput () {
+	private void createTableWriter () {
 		writer = new TableFilterWriter();
+	}
+	
+	private void startTableOutput () {
 		File outFile;
 		if ( isLastOutputStep() ) {
 			if ( params.isSingleOutput() ) {
@@ -236,12 +251,14 @@ public class FormatConversionStep extends BasePipelineStep {
 			outFile.deleteOnExit();
 		}
 		firstOutputCreated = true;
+	}
+
+	private void createPensieveWriter () {
+		writer = new PensieveFilterWriter();
 	}
 
 	private void startPensieveOutput () {
-		writer = new PensieveFilterWriter();
 		writer.setOutput(params.getOutputPath());
 		writer.setOptions(targetLanguage, "UTF-8");
 	}
-
 }
