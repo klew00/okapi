@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -848,23 +849,21 @@ public class TmxFilter implements IFilter {
 	
 	
 	/**
-	 * Gets the xml:lang attribute from the current <tuv> element
-	 * @return 	returns the language or throws exception if xml:lang is missing
-	 * @throws 	OkapiBadFilterInputException If xml:Lang is missing
+	 * Gets the value of the xml:lang or lang attribute from the current <tuv> element
+	 * @return the language value
+	 * @throws OkapiBadFilterInputException if xml:Lang or lang is missing
 	 */		
 	private String getXmlLangFromCurTuv(){
-
-		String prefix;
+		String lang = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
+		if ( lang != null ) return lang;
+		// If xml:lang not found, fall back to lang (old TMX versions)
 		int count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
-			prefix = reader.getAttributePrefix(i);
-			if(prefix.equals("xml")){
-				if(reader.getAttributeLocalName(i).equals("lang")){
-					return reader.getAttributeValue(i);
-				}
+			if ( reader.getAttributeLocalName(i).equals("lang")){
+				return reader.getAttributeValue(i);
 			}
 		}
-		throw new OkapiBadFilterInputException("The required xml:lang attribute is missing in <tuv>. The file is not valid TMX.");
+		throw new OkapiBadFilterInputException("The required xml:lang or lang attribute is missing in <tuv>. The file is not valid TMX.");
 	}
 
 	

@@ -286,20 +286,15 @@ class TmxTu {
 	 * Enforce various Tu related rules by throwing Okapi Exceptions if rules are broken
 	 */	
 	void enforceTuRules(){
-
-		//--RULE 1: Make sure each <tu> contains at least one <tuv>--
-		if(tuvCount() < 1){
+		// RULE 1: Make sure each <tu> contains at least one <tuv>
+		if ( tuvCount() < 1 ) {
 			throw new OkapiBadFilterInputException("Each <tu> requires at least one <tuv>");							
 		}
-		
-		//--RULE 2: Make sure each <tu> contains at least one <tuv>--
-		if(getSourceTuv() == null){
-			throw new OkapiBadFilterInputException("Each <tu> requires at least one source <tuv>");			
-		}
-		
-		//--RULE 3: Make sure each <tu> contains no more than one source <tuv>--
-		if(langCount(srcLang) > 1){
-			throw new OkapiBadFilterInputException("Each <tu> is limited to one source <tuv>");			
+
+		// RULE 2: Make sure each <tu> contains one and only one source <tuv>
+		if (( getSourceTuv() == null ) || ( langCount(srcLang) > 1 )) {
+			throw new OkapiBadFilterInputException(String.format(
+				"Each <tu> requires one source <tuv>. The source language specified is '%s'.", srcLang));			
 		}
 	}
 	
