@@ -28,6 +28,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -54,6 +55,17 @@ public class XLIFFFilterTest {
 		filter = new XLIFFFilter();
 		fmt = new GenericContent();
 		root = TestUtil.getParentDir(this.getClass(), "/JMP-11-Test01.xlf");
+	}
+
+	@Test
+	public void testAlTrans () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithAltTrans(), 1);
+		assertNotNull(tu);
+		assertEquals("t1", tu.getSource().toString());
+		AltTransAnnotation annot = tu.getAnnotation(AltTransAnnotation.class);
+		assertNotNull(annot);
+		assertEquals("alt source {t1}", annot.getEntry().getSource().toString());
+		assertEquals("alt target {t1}", annot.getEntry().getTarget("fr").toString());
 	}
 
 	@Test
@@ -331,6 +343,23 @@ public class XLIFFFilterTest {
 			+ "<body>"
 			+ "<trans-unit id=\"1\" approved=\"yes\"><source>t1</source>"
 			+ "<target>translated t1</target></trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		return getEvents(snippet);
+	}
+	
+	private ArrayList<Event> createTUWithAltTrans () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\"><source>t1</source>"
+			+ "<target>translated t1</target>"
+			+ "<alt-trans>"
+			+ "<source>alt source <bpt id=\"1\">{</bpt>t1<ept id=\"1\">}</ept></source>"
+			+ "<target>alt target <mrk mtype=\"term\"><bpt id=\"1\">{</bpt>t1<ept id=\"1\">}</ept></mrk></target>"
+			+ "</alt-trans>"
+			+ "</trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";
 		return getEvents(snippet);
