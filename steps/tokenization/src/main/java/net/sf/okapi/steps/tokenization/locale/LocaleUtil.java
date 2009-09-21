@@ -24,7 +24,7 @@ import com.ibm.icu.util.ULocale;
 
 import net.sf.okapi.common.Util;
 
-public class LocaleUtils {
+public class LocaleUtil {
 	
 	/**
 	 * Converts the language tag (language ID and an optional region/country part) to the Okapi format: upper case, delimited with a dash.

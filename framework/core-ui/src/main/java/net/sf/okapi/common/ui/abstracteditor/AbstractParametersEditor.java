@@ -523,22 +523,22 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 
 	protected void addSpeaker(Class<? extends Composite> pageClass, String controlName) {
 
-		addSpeaker(SWTUtils.findControl(findPage(pageClass), controlName));
+		addSpeaker(SWTUtil.findControl(findPage(pageClass), controlName));
 	}
 
 	protected void addSpeaker(Class<? extends Composite> pageClass, String controlName, int eventType) {
 
-		addSpeaker(SWTUtils.findControl(findPage(pageClass), controlName), eventType);
+		addSpeaker(SWTUtil.findControl(findPage(pageClass), controlName), eventType);
 	}
 
 	protected Control findControl(Class<? extends Composite> pageClass, String controlName) {
 
-		return SWTUtils.findControl(findPage(pageClass), controlName);
+		return SWTUtil.findControl(findPage(pageClass), controlName);
 	}
 
 	protected Control findControl(Composite page, String controlName) {
 
-		return SWTUtils.findControl(page, controlName);
+		return SWTUtil.findControl(page, controlName);
 	}
 
 	protected <T extends Composite> Composite addPage(String caption, Class<T> pageClass) {

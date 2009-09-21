@@ -23,7 +23,7 @@ package net.sf.okapi.steps.tokenization.locale;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import net.sf.okapi.common.StringUtils;
+import net.sf.okapi.common.StringUtil;
 
 import com.ibm.icu.util.ULocale;
 
@@ -41,7 +41,7 @@ public class LanguageList {
 	protected static String formatLanguageInfo(ULocale locale) {
 		
 		if (locale == null) return "";
-		return StringUtils.titleCase(locale.getDisplayName());
+		return StringUtil.titleCase(locale.getDisplayName());
 	}
 	
 	public static String[] getLanguages() {
@@ -55,7 +55,7 @@ public class LanguageList {
 
 		for (ULocale locale : map.values()) {
 			
-			codes.add(LocaleUtils.normalizeLanguageCode_Okapi(locale.getName()));
+			codes.add(LocaleUtil.normalizeLanguageCode_Okapi(locale.getName()));
 		}
 		
 		return codes.toArray(new String[] {});

@@ -393,6 +393,51 @@ public class FixedWidthColumnsFilterTest {
 		
 		filter.close();
 	}
+	
+	@Test
+	public void testListedColumns3() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_testa.txt");
+		assertNotNull(input);
+		
+		params.columnNamesLineNum = 1;
+		params.valuesStartLineNum = 2;
+		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		//params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
+		params.columnStartPositions = "1, 20, 50, 71, 87, 102, 123, 144";
+		params.columnEndPositions = "11, 32, 62, 83, 97, 112, 133, 151";
+		
+		params.sourceColumns = "4, 6";
+		params.sourceIdSuffixes = "_name, _descr";
+		params.targetColumns = "     2,7   ";
+		params.targetLanguages = "ge-sw, it";
+		params.targetSourceRefs = "6, 4";
+		params.sourceIdColumns = "1, 3";
+		params.sourceIdSourceRefs = "4, 6";
+		params.commentColumns = "5";
+		params.commentSourceRefs = "4";
+		params.recordIdColumn = 8;
+		
+		String snippet = null;
+		
+		try {
+			snippet = streamAsString(input);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		//System.out.println(snippet);
+		
+		// TODO "ge-sw");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "ge-sw"), "EN");
+		assertEquals(snippet, result);
+	}
+	
 	@Test
 	public void testFileEvents() {
 		testDriver.setDisplayLevel(0);
@@ -1261,5 +1306,19 @@ public class FixedWidthColumnsFilterTest {
 		
         return tmp.toString();
     }
+	
+	private ArrayList<Event> getEvents (String snippet,
+			String srcLang,
+			String trgLang)
+		{
+			ArrayList<Event> list = new ArrayList<Event>();
+			filter.open(new RawDocument(snippet, srcLang, trgLang));
+			while (filter.hasNext()) {
+				Event event = filter.next();
+				list.add(event);
+			}
+			filter.close();
+			return list;
+		}
 
 }

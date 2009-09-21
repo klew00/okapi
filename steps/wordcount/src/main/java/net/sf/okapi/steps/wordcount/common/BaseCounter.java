@@ -24,7 +24,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.TextUnitUtils;
+import net.sf.okapi.common.resource.TextUnitUtil;
 
 /**
  * 
@@ -64,7 +64,7 @@ abstract public class BaseCounter {
 			
 			TextFragment tf = (TextFragment) text;
 			
-			return getCount(classRef, TextUnitUtils.getText(tf), language);
+			return getCount(classRef, TextUnitUtil.getText(tf), language);
 		}
 		else if (text instanceof String) {
 			

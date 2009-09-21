@@ -221,6 +221,39 @@ public class TabSeparatedValuesFilterTest {
 		}
 		assertEquals(expected, st);
 	}
+	
+	@Test
+	public void testSkeleton2 () {
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/TSV_test.txt");
+		assertNotNull(input);
+		
+		String snippet = null;
+		
+		try {
+			snippet = streamAsString(input);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+
+		// Set the parameters
+		Parameters params = new Parameters();
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		params.sourceColumns = "1";
+		params.targetColumns = "2";
+		params.targetLanguages = "FR-CA";
+		params.targetSourceRefs = "1";
+		filter.setParameters(params);
+		
+		//System.out.println(snippet);
+		
+		// TODO "FR-CA");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "EN");
+		//System.out.println(result);
+		assertEquals(snippet, result);
+	}
 
 	@Test
 	public void testDoubleExtraction () {
@@ -365,5 +398,19 @@ public class TabSeparatedValuesFilterTest {
 		
         return tmp.toString();
     }
+	
+	private ArrayList<Event> getEvents (String snippet,
+			String srcLang,
+			String trgLang)
+		{
+			ArrayList<Event> list = new ArrayList<Event>();
+			filter.open(new RawDocument(snippet, srcLang, trgLang));
+			while (filter.hasNext()) {
+				Event event = filter.next();
+				list.add(event);
+			}
+			filter.close();
+			return list;
+		}
 
 }

@@ -21,7 +21,7 @@
 package net.sf.okapi.steps.tokenization.ui.mapping;
 
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
-import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
 import net.sf.okapi.steps.tokenization.ui.mapping.model.MappingItem;
 import net.sf.okapi.steps.tokenization.ui.mapping.model.Parameters;
@@ -152,23 +152,23 @@ public class MappingTab extends Composite implements IDialogPage {
 		if (item == null) { // Add new item			
 			adapter.unselect();
 			
-			if (SWTUtils.inputQuery(MappingItemPage.class, getShell(), "Add mapping", 
+			if (SWTUtil.inputQuery(MappingItemPage.class, getShell(), "Add mapping", 
 					new String[] {"", ""}, 
 					null)) {
 				
 				modified = true;
-				adapter.addModifyRow((String []) SWTUtils.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
+				adapter.addModifyRow((String []) SWTUtil.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
 			}
 			else
 				adapter.restoreSelection();
 		}
 		else {
-			if (SWTUtils.inputQuery(MappingItemPage.class, getShell(), "Modify mapping", 
-					SWTUtils.getText(item),
+			if (SWTUtil.inputQuery(MappingItemPage.class, getShell(), "Modify mapping", 
+					SWTUtil.getText(item),
 					null)) {					
 
 				modified = true;
-				adapter.modifyRow(item, (String []) SWTUtils.getResult());
+				adapter.modifyRow(item, (String []) SWTUtil.getResult());
 			}
 		}
 		

@@ -250,7 +250,7 @@ public class OkapiGUITester {
 		formData_5.top = new FormAttachment(btnClear, 4);
 		btnClear.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-//				SWTUtils.inputQuery(shell, "caption", "Input a value prompt:", 1, null);
+//				SWTUtil.inputQuery(shell, "caption", "Input a value prompt:", 1, null);
 				text.setText("");
 				text_1.setText("");
 			}

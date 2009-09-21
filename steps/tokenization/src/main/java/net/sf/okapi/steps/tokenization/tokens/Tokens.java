@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.okapi.common.ListUtils;
+import net.sf.okapi.common.ListUtil;
 
 /**
  * 
@@ -88,7 +88,7 @@ public class Tokens extends ArrayList<Token> {
 			res.add(token.toString());
 		}
 		
-		return ListUtils.listAsString(res, "\n");
+		return ListUtil.listAsString(res, "\n");
 	}
 
 }

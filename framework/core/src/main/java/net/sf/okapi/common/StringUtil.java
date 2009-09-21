@@ -22,7 +22,7 @@ package net.sf.okapi.common;
 
 import net.sf.okapi.common.Util;
 
-public class StringUtils {
+public class StringUtil {
 
 	// String formatting
 	public static String titleCase(String st) {

@@ -26,7 +26,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.TextUnitUtils;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.tokenization.tokens.TokensAnnotation;
 
@@ -63,13 +63,13 @@ public class Tokenizer {
 		
 		ts.handleEvent(new Event(EventType.START_BATCH));
 		
-		TextUnit tu = TextUnitUtils.buildTU(text);
+		TextUnit tu = TextUnitUtil.buildTU(text);
 		Event event = new Event(EventType.TEXT_UNIT, tu);
 		
 		ts.handleEvent(event);
 		
 		// Move tokens from the event's annotation to result
-		TokensAnnotation ta = TextUnitUtils.getSourceAnnotation(tu, TokensAnnotation.class);
+		TokensAnnotation ta = TextUnitUtil.getSourceAnnotation(tu, TokensAnnotation.class);
 		if (ta != null)
 			res.addAll(ta.getTokens());
 		
@@ -103,7 +103,7 @@ public class Tokenizer {
 			
 			TextFragment tf = (TextFragment) text;
 			
-			return doTokenize(TextUnitUtils.getText(tf), language, tokenTypes);
+			return doTokenize(TextUnitUtil.getText(tf), language, tokenTypes);
 		}
 		else if (text instanceof String) {
 			

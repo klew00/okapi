@@ -25,7 +25,7 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.TextUnitUtils;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
@@ -72,7 +72,7 @@ public class TabSeparatedValuesFilter  extends BaseTableFilter {
 						
 			if (start > -1 && line.charAt(i) == '\t') {
 				if (prevStart > -1)
-					cells.add(TextUnitUtils.buildTU(line.substring(prevStart, start)));
+					cells.add(TextUnitUtil.buildTU(line.substring(prevStart, start)));
 				
 				prevStart = start;
 				start = -1;
@@ -87,10 +87,10 @@ public class TabSeparatedValuesFilter  extends BaseTableFilter {
 		if (start == -1) start = line.length();
 		
 		if (prevStart > -1 && start > -1)
-			cells.add(TextUnitUtils.buildTU(line.substring(prevStart, start)));
+			cells.add(TextUnitUtil.buildTU(line.substring(prevStart, start)));
 		
 		if (start < line.length()) {
-			cells.add(TextUnitUtils.buildTU(line.substring(start, line.length())));
+			cells.add(TextUnitUtil.buildTU(line.substring(start, line.length())));
 		}
 		
 		return TextProcessingResult.ACCEPTED;

@@ -52,7 +52,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.TextUnitUtils;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
 import net.sf.okapi.filters.table.csv.Parameters;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
@@ -104,8 +104,66 @@ public class CommaSeparatedValuesFilterTest {
 		params.targetSourceRefs = "1";
 		filter.setParameters(params);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");
-//		assertEquals(snippet, result);
+		// TODO "FR-CA");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "EN");
+		assertEquals(snippet, result);
+	}
+	
+	@Test
+	public void testThreeColumnsSrcTrgData_2 () {
+		String snippet = "\"src\",\"trg\",data\n"
+			+ "\"source1\",         \"target1\",data1\n"
+			+ "\"source2\"    ,\"target2\",data2\n";
+
+		// Set the parameters
+		Parameters params = new Parameters();
+		params.fieldDelimiter = ",";
+		params.textQualifier = "\"";
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		params.sourceColumns = "1";
+		params.targetColumns = "2";
+		params.targetLanguages = "FR-CA";
+		params.targetSourceRefs = "1";
+		filter.setParameters(params);
+		
+		// TODO "FR-CA");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "EN");  
+		assertEquals(snippet, result);
+	}
+	
+	@Test
+	public void testThreeColumnsSrcTrgData_3 () {
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/CSVTest_97.txt");
+		assertNotNull(input);
+		
+		String snippet = null;
+		
+		try {
+			snippet = streamAsString(input);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+
+		// Set the parameters
+		Parameters params = new Parameters();
+		params.fieldDelimiter = ",";
+		params.textQualifier = "\"";
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		params.sourceColumns = "1,4";
+		params.targetColumns = "2,5";
+		params.targetLanguages = "FR-CA,FR-CA";
+		params.targetSourceRefs = "1,4";
+		filter.setParameters(params);
+		
+		//System.out.println(snippet);
+		
+		// TODO "FR-CA");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "EN");
+		//System.out.println(result);
+		assertEquals(snippet, result);
 	}
 	
 	@Test
@@ -1346,7 +1404,7 @@ public class CommaSeparatedValuesFilterTest {
 			assertTrue(res instanceof TextUnit);
 			
 			// assertEquals(expectedText, ((TextUnit) res).toString());
-			assertEquals(expectedText, TextUnitUtils.getSourceText((TextUnit) res, true));
+			assertEquals(expectedText, TextUnitUtil.getSourceText((TextUnit) res, true));
 			break;
 			
 		case DOCUMENT_PART:

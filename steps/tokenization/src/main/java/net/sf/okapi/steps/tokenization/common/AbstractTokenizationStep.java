@@ -23,10 +23,10 @@ package net.sf.okapi.steps.tokenization.common;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.ListUtils;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.TextUnitUtils;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.extra.steps.AbstractPipelineStep;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.tokenization.tokens.TokensAnnotation;
@@ -76,8 +76,8 @@ public abstract class AbstractTokenizationStep extends AbstractPipelineStep impl
 
 		params = getParameters(TokenizationStepParameters.class);
 		/* TODO debug
-		tokenTypes = ListUtils.stringAsArray(params.tokenTypes);
-		languages = ListUtils.stringAsArray(params.languages);
+		tokenTypes = ListUtil.stringAsArray(params.tokenTypes);
+		languages = ListUtil.stringAsArray(params.languages);
 		*/
 	}
 
@@ -112,17 +112,17 @@ public abstract class AbstractTokenizationStep extends AbstractPipelineStep impl
 		ArrayList<Integer> positions = new ArrayList<Integer> ();
 				
 		Tokens tokens = new Tokens(); 
-		// TODO debug tokenize(TextUnitUtils.getText(tc.getContent(), positions), tokens, getLanguage(), tokenTypes);
+		// TODO debug tokenize(TextUnitUtil.getText(tc.getContent(), positions), tokens, getLanguage(), tokenTypes);
 		
 		if (tokens == null) return;
 		
 		tokens.fixRanges(positions);
 		
 		// Attach to TU		
-		TokensAnnotation ta = TextUnitUtils.getSourceAnnotation(tu, TokensAnnotation.class);
+		TokensAnnotation ta = TextUnitUtil.getSourceAnnotation(tu, TokensAnnotation.class);
 		
 		if (ta == null)
-			TextUnitUtils.setSourceAnnotation(tu, new TokensAnnotation(tokens));
+			TextUnitUtil.setSourceAnnotation(tu, new TokensAnnotation(tokens));
 		else
 			ta.addTokens(tokens);
 	}	
@@ -143,16 +143,16 @@ public abstract class AbstractTokenizationStep extends AbstractPipelineStep impl
 			positions.clear();
 			
 			Tokens tokens = new Tokens();
-			// TODO debug tokenize(TextUnitUtils.getText(tc.getContent(), positions), tokens, language, tokenTypes);			
+			// TODO debug tokenize(TextUnitUtil.getText(tc.getContent(), positions), tokens, language, tokenTypes);			
 			if (tokens == null) continue;
 			
 			tokens.fixRanges(positions);
 			
 			// Attach to TU		
-			TokensAnnotation ta = TextUnitUtils.getTargetAnnotation(tu, language, TokensAnnotation.class);
+			TokensAnnotation ta = TextUnitUtil.getTargetAnnotation(tu, language, TokensAnnotation.class);
 			
 			if (ta == null)
-				TextUnitUtils.setTargetAnnotation(tu, language, new TokensAnnotation(tokens));
+				TextUnitUtil.setTargetAnnotation(tu, language, new TokensAnnotation(tokens));
 			else
 				ta.addTokens(tokens);
 		}

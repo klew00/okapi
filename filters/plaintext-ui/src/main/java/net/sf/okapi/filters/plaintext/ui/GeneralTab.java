@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
-import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.lib.extra.filters.CompoundFilterParameters;
 
 import org.eclipse.swt.SWT;
@@ -331,8 +331,8 @@ public class GeneralTab extends Composite implements IDialogPage {
 		boolean lineMode = line.getSelection();
 		boolean ruleMode = rule.getSelection();
 		
-		SWTUtils.setAllEnabled(regex, ruleMode);
-		SWTUtils.setAllEnabled(spliced, lineMode);
+		SWTUtil.setAllEnabled(regex, ruleMode);
+		SWTUtil.setAllEnabled(spliced, lineMode);
 		
 		if (splicer.getSelectionIndex() == 3 && lineMode) {
 		
@@ -365,8 +365,8 @@ public class GeneralTab extends Composite implements IDialogPage {
 //				
 //		if (slSelected) {
 //			
-//			SWTUtils.setAllEnabled(regex, false);
-//			SWTUtils.setAllEnabled(spliced, true);
+//			SWTUtil.setAllEnabled(regex, false);
+//			SWTUtil.setAllEnabled(spliced, true);
 //
 ////			btnExtractByParagraphs.setSelection(false);
 ////			btnExtractByParagraphs.setEnabled(false);
@@ -375,7 +375,7 @@ public class GeneralTab extends Composite implements IDialogPage {
 //			rule.setEnabled(false);
 //		} else {
 //					
-//			SWTUtils.setAllEnabled(spliced, false);
+//			SWTUtil.setAllEnabled(spliced, false);
 //			
 //			slEnabled = line.getEnabled(); // Update state
 ////			if (slEnabled) btnExtractByParagraphs.setEnabled(true);
@@ -384,8 +384,8 @@ public class GeneralTab extends Composite implements IDialogPage {
 //		
 //		if (reSelected) {
 //			
-//			SWTUtils.setAllEnabled(regex, true);
-//			SWTUtils.setAllEnabled(spliced, false);
+//			SWTUtil.setAllEnabled(regex, true);
+//			SWTUtil.setAllEnabled(spliced, false);
 //			
 ////			btnExtractByParagraphs.setSelection(false);
 ////			btnExtractByParagraphs.setEnabled(false);
@@ -396,7 +396,7 @@ public class GeneralTab extends Composite implements IDialogPage {
 //			edExpression.setFocus();
 //		} else {
 //						
-//			SWTUtils.setAllEnabled(regex, false);
+//			SWTUtil.setAllEnabled(regex, false);
 //			
 //			reEnabled = rule.getEnabled(); // Update state
 ////			if (reEnabled) btnExtractByParagraphs.setEnabled(true);

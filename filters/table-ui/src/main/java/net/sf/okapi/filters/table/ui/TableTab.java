@@ -21,7 +21,7 @@
 package net.sf.okapi.filters.table.ui;
 
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
-import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.lib.extra.filters.CompoundFilterParameters;
 
@@ -305,8 +305,8 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 
 	public void interop(Widget speaker) {
 
-		SWTUtils.setAllEnabled(csvOptions, btnCSV.getSelection());
-		SWTUtils.setAllEnabled(csvActions, btnCSV.getSelection());
+		SWTUtil.setAllEnabled(csvOptions, btnCSV.getSelection());
+		SWTUtil.setAllEnabled(csvActions, btnCSV.getSelection());
 		
 		custDelim.setEnabled(delim.getSelectionIndex() == 4);		
 		
@@ -427,12 +427,12 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 		}
 		
 		// Make sure main box and children are disabled together
-		SWTUtils.disableIfDisabled(names, header);
-		SWTUtils.disableIfDisabled(allE, header);
+		SWTUtil.disableIfDisabled(names, header);
+		SWTUtil.disableIfDisabled(allE, header);
 		
 		
 		// Lock Extract table data enabled if no header
-		SWTUtils.selectIfDisabled(body, header);
+		SWTUtil.selectIfDisabled(body, header);
 		
 		// Do not allow both boxes empty
 		if (body.getEnabled()) {

@@ -18,19 +18,19 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common;
+package net.sf.okapi.common.resource;
 
 import java.util.List;
 
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.SkeletonUtil;
 
 /**
  * 
@@ -38,7 +38,7 @@ import net.sf.okapi.common.skeleton.GenericSkeletonPart;
  * @version 0.1, 09.06.2009
  */
 
-public class TextUnitUtils {
+public class TextUnitUtil {
 	
 	/**
 	 * 
@@ -73,7 +73,9 @@ public class TextUnitUtils {
 		if (skel == null) return;
 		if (skelTF == null) return;
 		
-		skel.append(skelTF.toString());  // Codes get removed
+		st = skelTF.toString();
+		if (!Util.isEmpty(st))
+			skel.append(st);  // Codes get removed
 	}
 	
 	/**
@@ -109,7 +111,9 @@ public class TextUnitUtils {
 		if (skel == null) return;
 		if (skelTF == null) return;
 		
-		skel.append(skelTF.toString());  // Codes get removed);
+		st = skelTF.toString();
+		if (!Util.isEmpty(st))
+			skel.append(st);  // Codes get removed
 	}
 
 	/**
@@ -166,6 +170,7 @@ public class TextUnitUtils {
 	public static String getTargetText(TextUnit textUnit, String language) {
 		
 		if (textUnit == null) return "";
+		if (Util.isEmpty(language)) return "";
 		
 		return getCodedText(textUnit.getTargetContent(language));
 	}
@@ -355,14 +360,19 @@ public class TextUnitUtils {
 		
 		if (tu == null) return null;
 		
-		ISkeleton res = tu.getSkeleton();
-		if (res == null) {
+		GenericSkeleton skel = (GenericSkeleton) tu.getSkeleton();
+		if (skel == null) {
 			
-			res = new GenericSkeleton();
-			tu.setSkeleton(res);
+			skel = new GenericSkeleton();
+			if (skel == null) return null;
+			
+			tu.setSkeleton(skel);			
 		}
 		
-		return (GenericSkeleton) res;
+		if (!SkeletonUtil.hasTuRef(skel))
+			skel.addContentPlaceholder(tu);
+		
+		return skel;
 	}
 
 	/**
@@ -376,31 +386,51 @@ public class TextUnitUtils {
 		
 		GenericSkeleton skel = (GenericSkeleton) textUnit.getSkeleton();
 		
-		List<GenericSkeletonPart> list = skel.getParts(); 
+		if (skel == null) 
+			return new GenericSkeleton(textUnit.toString());
+		
+		List<GenericSkeletonPart> list = skel.getParts();
+		if (list.size() == 0) 
+			return new GenericSkeleton(textUnit.toString());
 		
 		String tuRef = TextFragment.makeRefMarker("$self$");
-		String srcText = TextUnitUtils.getSourceText(textUnit);
 				
 		GenericSkeleton res = new GenericSkeleton();
 		
 		List<GenericSkeletonPart> list2 = res.getParts();
-		
-		for (int i = 0; i < list.size(); i++) {
+
+		for (GenericSkeletonPart part : list) {
 			
-			Object obj = list.get(i);
-			if (obj == null) continue;
-			String st = obj.toString();
+			String st = part.toString();
 			
 			if (Util.isEmpty(st)) continue;
+			
 			if (st.equalsIgnoreCase(tuRef)) {
 				
-				res.add(srcText);
+				String language = part.getLanguage();
+				if (Util.isEmpty(language))
+					res.add(TextUnitUtil.getSourceText(textUnit));
+				else
+					res.add(TextUnitUtil.getTargetText(textUnit, language));
+				
 				continue;
 			}
 			
-			list2.add(list.get(i));			
+			list2.add(part);
 		}
 		
+//		GenericSkeletonWriter writer = new GenericSkeletonWriter();
+//		if (writer == null) return null;
+		
+//		return new GenericSkeleton(writer.processTextUnit(textUnit));
+		
+		
+//		if (textUnit == null) return null;
+//		
+//		GenericSkeleton skel = (GenericSkeleton) textUnit.getSkeleton();
+//		if (skel == null) return null;
+//		
+//		return new GenericSkeleton(skel.toString());
 		return res;
 	}
 	
@@ -423,6 +453,7 @@ public class TextUnitUtils {
 	public static <A extends IAnnotation> A getTargetAnnotation(TextUnit textUnit, String language, Class<A> type) {
 		
 		if (textUnit == null) return null;
+		if (Util.isEmpty(language)) return null;
 		if (textUnit.getTarget(language) == null) return null;
 		
 		return textUnit.getTarget(language).getAnnotation(type);		
@@ -431,45 +462,84 @@ public class TextUnitUtils {
 	public static void setTargetAnnotation(TextUnit textUnit, String language, IAnnotation annotation) {
 		
 		if (textUnit == null) return;
+		if (Util.isEmpty(language)) return;
 		if (textUnit.getTarget(language) == null) return;
 		
 		textUnit.getTarget(language).setAnnotation(annotation);		
 	}
-
-	public static boolean hasContentPlaceholder(GenericSkeleton skel) {
+	
+	public static void setSourceText(TextUnit textUnit, String text) {
 		
-		if (skel == null)
-			return false;
+		if (textUnit == null) return;
 		
-		List<GenericSkeletonPart> list = skel.getParts();
+		TextFragment source = textUnit.getSource(); 
+		if (source == null) return;
 		
-		String tuRef = TextFragment.makeRefMarker("$self$");
-		
-		for (int i = 0; i < list.size(); i++) {
-			
-			String st = list.get(i).toString();
-			
-			if (Util.isEmpty(st)) continue;
-			
-			if (st.equals(tuRef))				
-				return true;
-		}
-		
-		return false;
-	}
-
-	public static void removeQualifiers(TextUnit textUnit, String qualifier) {
-		
-		if (textUnit == null)
-			return;
-		
-		if (Util.isEmpty(qualifier))
-			return;
-		
-		TextFragment tf = textUnit.getSourceContent(); 
-		String st = tf.getCodedText();
-		
-		tf.setCodedText(StringUtils.removeQualifiers(st, qualifier));
+		source.setCodedText(text);
 	}
 	
+	public static void setTargetText(TextUnit textUnit, String language, String text) {
+		
+		if (textUnit == null) return;
+		if (Util.isEmpty(language)) return;
+		
+		TextFragment target = textUnit.getTargetContent(language); 
+		if (target == null) return;
+		
+		target.setCodedText(text);
+	}
+
+	public static void trimTU(TextUnit textUnit, boolean trimLeading, boolean trimTrailing) {
+		
+		if (textUnit == null) return;
+		if (!trimLeading && !trimTrailing) return;
+		
+		TextContainer source = textUnit.getSource();
+		GenericSkeleton tuSkel = TextUnitUtil.forseSkeleton(textUnit);
+		GenericSkeleton skel = new GenericSkeleton();
+		
+		if (trimLeading)						
+			trimLeading(source, skel);
+		
+		skel.addContentPlaceholder(textUnit);
+					
+		if (trimTrailing) 
+			trimTrailing(source, skel);
+		
+		int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
+		if (index != -1)
+			SkeletonUtil.replaceSkeletonPart(tuSkel, index, skel);
+		else
+			tuSkel.add(skel);
+	}
+	
+	public static void removeQualifiers(TextUnit textUnit, String qualifier) {
+		
+		if (textUnit == null) return;		
+		if (Util.isEmpty(qualifier)) return;
+		
+		String st = getSourceText(textUnit);
+		if (st == null) return;
+		
+		int qualifierLen = qualifier.length();
+		
+		if (st.startsWith(qualifier) && st.endsWith(qualifier)) {
+			
+			GenericSkeleton tuSkel = TextUnitUtil.forseSkeleton(textUnit);
+			GenericSkeleton skel = new GenericSkeleton();
+			
+			skel.add(qualifier);
+			skel.addContentPlaceholder(textUnit);
+			skel.add(qualifier);
+			
+			setSourceText(textUnit, st.substring(qualifierLen, Util.getLength(st) - qualifierLen));
+			
+			int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
+			if (index != -1)
+				SkeletonUtil.replaceSkeletonPart(tuSkel, index, skel);
+			else
+				tuSkel.add(skel);
+		}
+	}
+
 }

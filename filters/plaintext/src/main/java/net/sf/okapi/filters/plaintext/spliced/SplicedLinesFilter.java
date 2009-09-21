@@ -26,11 +26,11 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
-import net.sf.okapi.common.TextUnitUtils;
 
 /**
  * 
@@ -104,8 +104,8 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 		if (lineContainer == null) return super.component_exec(lineContainer);
 		if (splicedLines == null) return super.component_exec(lineContainer);
 		
-		//if (TextUnitUtils.getLastChar(lineContainer) == params.splicer) {
-		if (TextUnitUtils.endsWith(lineContainer, params.splicer)) {
+		//if (TextUnitUtil.getLastChar(lineContainer) == params.splicer) {
+		if (TextUnitUtil.endsWith(lineContainer, params.splicer)) {
 			
 			merging = true;
 			splicedLines.add(lineContainer);
@@ -160,8 +160,8 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 					
 //			String s = "";
 						
-//			int pos = TextUnitUtils.lastIndexOf(curLine, s+= params.splicer);
-			int pos = TextUnitUtils.lastIndexOf(curLine, params.splicer);
+//			int pos = TextUnitUtil.lastIndexOf(curLine, s+= params.splicer);
+			int pos = TextUnitUtil.lastIndexOf(curLine, params.splicer);
 			if (pos > -1)
 				if (params.createPlaceholders) 
 					curLine.changeToCode(pos, pos + len, TagType.PLACEHOLDER, "line splicer");

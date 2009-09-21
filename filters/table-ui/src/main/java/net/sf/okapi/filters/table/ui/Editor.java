@@ -22,7 +22,7 @@ package net.sf.okapi.filters.table.ui;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.filters.plaintext.ui.OptionsTab;
 import net.sf.okapi.filters.plaintext.ui.common.FilterParametersEditor;
 
@@ -99,68 +99,68 @@ public class Editor extends FilterParametersEditor {
 
 		// StartPos & EndPos in column definitions are enabled only when
 		// fixed-width columns
-		SWTUtils.enableIfSelected(start, btnFWC);
-		SWTUtils.enableIfSelected(lstart, btnFWC);
-		SWTUtils.enableIfSelected(end, btnFWC);
-		SWTUtils.enableIfSelected(lend, btnFWC);
+		SWTUtil.enableIfSelected(start, btnFWC);
+		SWTUtil.enableIfSelected(lstart, btnFWC);
+		SWTUtil.enableIfSelected(end, btnFWC);
+		SWTUtil.enableIfSelected(lend, btnFWC);
 
-		SWTUtils.disableIfNotSelected(start, btnFWC);
-		SWTUtils.disableIfNotSelected(lstart, btnFWC);
-		SWTUtils.disableIfNotSelected(end, btnFWC);
-		SWTUtils.disableIfNotSelected(lend, btnFWC);
+		SWTUtil.disableIfNotSelected(start, btnFWC);
+		SWTUtil.disableIfNotSelected(lstart, btnFWC);
+		SWTUtil.disableIfNotSelected(end, btnFWC);
+		SWTUtil.disableIfNotSelected(lend, btnFWC);
 
 		// CSV actions/Trim to Options/Allow trimming
 
-		if (speaker == allow && SWTUtils.getSelected(trim) && SWTUtils.getSelected(btnCSV))
+		if (speaker == allow && SWTUtil.getSelected(trim) && SWTUtil.getSelected(btnCSV))
 			Dialogs.showWarning(getShell(),
 					"You cannot unselect this check-box while the Table/Trim values box is on.", null);
 
-		if (speaker == body && (SWTUtils.getDisabled(header) || SWTUtils.getNotSelected(header)))
+		if (speaker == body && (SWTUtil.getDisabled(header) || SWTUtil.getNotSelected(header)))
 			Dialogs.showWarning(getShell(),
 					"You cannot unselect this check-box, otherwise there's noting to extract from the table.", null);
 
-		if (speaker == body && SWTUtils.getNotSelected(body) && SWTUtils.getSelected(header))
+		if (speaker == body && SWTUtil.getNotSelected(body) && SWTUtil.getSelected(header))
 			Dialogs.showWarning(getShell(), "The Columns tab will be disabled as you're extracting the header only.",
 					null);
 
-		if (SWTUtils.getSelected(btnCSV)) {
+		if (SWTUtil.getSelected(btnCSV)) {
 
-			SWTUtils.selectIfSelected(allow, trim);
-			SWTUtils.selectIfSelected(lead, trim);
-			SWTUtils.selectIfSelected(trail, trim);
+			SWTUtil.selectIfSelected(allow, trim);
+			SWTUtil.selectIfSelected(lead, trim);
+			SWTUtil.selectIfSelected(trail, trim);
 
-			SWTUtils.unselectIfNotSelected(allow, trim);
-			SWTUtils.unselectIfNotSelected(lead, trim);
-			SWTUtils.unselectIfNotSelected(trail, trim);
+			SWTUtil.unselectIfNotSelected(allow, trim);
+			SWTUtil.unselectIfNotSelected(lead, trim);
+			SWTUtil.unselectIfNotSelected(trail, trim);
 
-			SWTUtils.enableIfSelected(allow, trim);
-			SWTUtils.enableIfSelected(lead, trim);
-			SWTUtils.enableIfSelected(trail, trim);
+			SWTUtil.enableIfSelected(allow, trim);
+			SWTUtil.enableIfSelected(lead, trim);
+			SWTUtil.enableIfSelected(trail, trim);
 
-			SWTUtils.disableIfNotSelected(allow, trim);
-			SWTUtils.disableIfNotSelected(lead, trim);
-			SWTUtils.disableIfNotSelected(trail, trim);
+			SWTUtil.disableIfNotSelected(allow, trim);
+			SWTUtil.disableIfNotSelected(lead, trim);
+			SWTUtil.disableIfNotSelected(trail, trim);
 
-			SWTUtils.disableIfNotSelected(allow, trim);
-			SWTUtils.disableIfNotSelected(lead, trim);
-			SWTUtils.disableIfNotSelected(trail, trim);
+			SWTUtil.disableIfNotSelected(allow, trim);
+			SWTUtil.disableIfNotSelected(lead, trim);
+			SWTUtil.disableIfNotSelected(trail, trim);
 
-			SWTUtils.enableIfSelected(allow, trim);
+			SWTUtil.enableIfSelected(allow, trim);
 		} else {
 
-			SWTUtils.setEnabled(allow, true);
+			SWTUtil.setEnabled(allow, true);
 		}
 
 		// Extract table data enable state affects the Columns page
-		SWTUtils.enableIfSelected(columns, body);
-		// SWTUtils.selectIfSelected(all, body);
+		SWTUtil.enableIfSelected(columns, body);
+		// SWTUtil.selectIfSelected(all, body);
 
-		if (SWTUtils.getSelected(body) && !SWTUtils.getSelected(defs))
-			SWTUtils.setSelected(all, true);
+		if (SWTUtil.getSelected(body) && !SWTUtil.getSelected(defs))
+			SWTUtil.setSelected(all, true);
 
-		SWTUtils.disableIfNotSelected(columns, body);
+		SWTUtil.disableIfNotSelected(columns, body);
 
-		if (SWTUtils.getEnabled(columns))
+		if (SWTUtil.getEnabled(columns))
 			pageInterop(ColumnsTab.class, speaker); // to update the enabled 
 		// state of numColuimns and panel
 	}

@@ -29,7 +29,7 @@ import java.util.List;
  * 
  * @version 0.1, 09.06.2009
  */
-public class ListUtils {
+public class ListUtil {
 	
 	/**
 	 * Splits up a string of comma-separated substrings into a string list of those substrings.

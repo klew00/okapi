@@ -55,69 +55,69 @@ public abstract class AbstractListTab extends ListTabLayout implements IDialogPa
 		super(parent, style);
 		
 		// Init
-		listDescr = SWTUtils.findControl(this, "listDescr");
-		list = SWTUtils.findControl(this, "list");
-		itemDescr = SWTUtils.findControl(this, "itemDescr");
-		add = SWTUtils.findControl(this, "add");
-		modify = SWTUtils.findControl(this, "modify");
-		remove = SWTUtils.findControl(this, "remove");
-		up = SWTUtils.findControl(this, "up");
-		down = SWTUtils.findControl(this, "down");
+		listDescr = SWTUtil.findControl(this, "listDescr");
+		list = SWTUtil.findControl(this, "list");
+		itemDescr = SWTUtil.findControl(this, "itemDescr");
+		add = SWTUtil.findControl(this, "add");
+		modify = SWTUtil.findControl(this, "modify");
+		remove = SWTUtil.findControl(this, "remove");
+		up = SWTUtil.findControl(this, "up");
+		down = SWTUtil.findControl(this, "down");
 		
 		// Configure interop
-		SWTUtils.addSpeaker(this, listDescr);
-		SWTUtils.addSpeaker(this, list, SWT.MouseDoubleClick);
-		SWTUtils.addSpeaker(this, list, SWT.Selection);
-		SWTUtils.addSpeaker(this, itemDescr);
-		SWTUtils.addSpeaker(this, add);
-		SWTUtils.addSpeaker(this, modify);
-		SWTUtils.addSpeaker(this, remove);
-		SWTUtils.addSpeaker(this, up);
-		SWTUtils.addSpeaker(this, down);
+		SWTUtil.addSpeaker(this, listDescr);
+		SWTUtil.addSpeaker(this, list, SWT.MouseDoubleClick);
+		SWTUtil.addSpeaker(this, list, SWT.Selection);
+		SWTUtil.addSpeaker(this, itemDescr);
+		SWTUtil.addSpeaker(this, add);
+		SWTUtil.addSpeaker(this, modify);
+		SWTUtil.addSpeaker(this, remove);
+		SWTUtil.addSpeaker(this, up);
+		SWTUtil.addSpeaker(this, down);
 		
 		// Configure layout in descendants
-		SWTUtils.setText(listDescr, getListDescription());
-		SWTUtils.setText(add, getAddButtonCaption());
-		SWTUtils.setText(modify, getModifyButtonCaption());
-		SWTUtils.setText(remove, getRemoveButtonCaption());
-		SWTUtils.setText(up, getMoveUpButtonCaption());
-		SWTUtils.setText(down, getMoveDownButtonCaption());
-		SWTUtils.setVisible(up, getUpDownVisible());
-		SWTUtils.setVisible(down, getUpDownVisible());
+		SWTUtil.setText(listDescr, getListDescription());
+		SWTUtil.setText(add, getAddButtonCaption());
+		SWTUtil.setText(modify, getModifyButtonCaption());
+		SWTUtil.setText(remove, getRemoveButtonCaption());
+		SWTUtil.setText(up, getMoveUpButtonCaption());
+		SWTUtil.setText(down, getMoveDownButtonCaption());
+		SWTUtil.setVisible(up, getUpDownVisible());
+		SWTUtil.setVisible(down, getUpDownVisible());
 	}
 
 	public void interop(Widget speaker) {
 		
-		SWTUtils.setEnabled(add, true);
+		SWTUtil.setEnabled(add, true);
 		
-		int index = SWTUtils.getSelection(list);
-		SWTUtils.setEnabled(modify, index != -1);
-		SWTUtils.setEnabled(remove, index != -1);
-		SWTUtils.setEnabled(up, index > 0);
-		SWTUtils.setEnabled(down, index > -1 && index < SWTUtils.getNumItems(list) - 1);
+		int index = SWTUtil.getSelection(list);
+		SWTUtil.setEnabled(modify, index != -1);
+		SWTUtil.setEnabled(remove, index != -1);
+		SWTUtil.setEnabled(up, index > 0);
+		SWTUtil.setEnabled(down, index > -1 && index < SWTUtil.getNumItems(list) - 1);
 		
 		if (speaker == add)
-			actionAdd(SWTUtils.getSelection(list));
+			actionAdd(SWTUtil.getSelection(list));
 		
-		else if (speaker == list && SWTUtils.getEventType() == SWT.MouseDoubleClick)
-			actionModify(SWTUtils.getSelection(list));
+		else if (speaker == list && SWTUtil.getEventType() == SWT.MouseDoubleClick)
+			actionModify(SWTUtil.getSelection(list));
 		
 		else if (speaker == modify)
-			actionModify(SWTUtils.getSelection(list));
+			actionModify(SWTUtil.getSelection(list));
 		
 		else if (speaker == remove) {
 			
-			if (actionRemove(SWTUtils.getSelection(list))) {
+			if (actionRemove(SWTUtil.getSelection(list))) {
 				
 				
 			}
 		}
 		
 		else if (speaker == up)
-			actionUp(SWTUtils.getSelection(list));
+			actionUp(SWTUtil.getSelection(list));
 		
 		else if (speaker == down)
-			actionDown(SWTUtils.getSelection(list));
+			actionDown(SWTUtil.getSelection(list));
 				
 	}
 

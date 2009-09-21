@@ -24,11 +24,11 @@ import java.util.LinkedList;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
-import net.sf.okapi.common.TextUnitUtils;
 
 /**
  *  The filter breaks text into paragraphs and sends them as text units.
@@ -93,7 +93,7 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 		
 		if (bufferedLines == null || !params.extractParagraphs) return super.component_exec(lineContainer);
 						
-		if (!TextUnitUtils.isEmpty(lineContainer)) {
+		if (!TextUnitUtil.isEmpty(lineContainer)) {
 			
 			merging = true;
 			
@@ -173,7 +173,8 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 		sendAsSource(mergedLine);
 		
 		if (addLinebreak) 
-			sendSkeletonPart(getLineBreak());
+			//sendSkeletonPart(getLineBreak());
+			sendAsSkeleton(getLineBreak());
 				
 		return true;		
 	}

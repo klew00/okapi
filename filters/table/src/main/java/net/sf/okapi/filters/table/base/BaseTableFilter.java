@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Ending;
@@ -31,12 +32,10 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.ListUtils;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
-import net.sf.okapi.common.TextUnitUtils;
 
 /**
  * 
@@ -107,15 +106,15 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		super.component_init();
 		
 		// Initialization
-		sourceIdColumns = ListUtils.stringAsIntList(params.sourceIdColumns);
-		sourceColumns = ListUtils.stringAsIntList(params.sourceColumns);
-		targetColumns = ListUtils.stringAsIntList(params.targetColumns);
-		targetLanguages = ListUtils.stringAsList(params.targetLanguages);
-		commentColumns = ListUtils.stringAsIntList(params.commentColumns);
-		targetSourceRefs = ListUtils.stringAsIntList(params.targetSourceRefs);
-		commentSourceRefs = ListUtils.stringAsIntList(params.commentSourceRefs);
-		sourceIdSourceRefs = ListUtils.stringAsIntList(params.sourceIdSourceRefs);
-		sourceIdSuffixes = ListUtils.stringAsList(params.sourceIdSuffixes);
+		sourceIdColumns = ListUtil.stringAsIntList(params.sourceIdColumns);
+		sourceColumns = ListUtil.stringAsIntList(params.sourceColumns);
+		targetColumns = ListUtil.stringAsIntList(params.targetColumns);
+		targetLanguages = ListUtil.stringAsList(params.targetLanguages);
+		commentColumns = ListUtil.stringAsIntList(params.commentColumns);
+		targetSourceRefs = ListUtil.stringAsIntList(params.targetSourceRefs);
+		commentSourceRefs = ListUtil.stringAsIntList(params.commentSourceRefs);
+		sourceIdSourceRefs = ListUtil.stringAsIntList(params.sourceIdSourceRefs);
+		sourceIdSuffixes = ListUtil.stringAsList(params.sourceIdSuffixes);
 										
 		sendListedMode = params.sendColumnsMode == Parameters.SEND_COLUMNS_LISTED;
 		
@@ -204,14 +203,19 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {		
 		// To be overridden in descendant classes
 		
-		if (cells != null) cells.add(TextUnitUtils.buildTU(lineContainer));
+		if (cells != null) cells.add(TextUnitUtil.buildTU(lineContainer));
 		
 		return TextProcessingResult.ACCEPTED; 
 	}
 
-	protected String preProcessCell(String cell) {
+//	protected String preProcessCell(String cell) {
+//		
+//		return cell;
+//	}
+	
+	protected String getFieldDelimiter() {
 		
-		return cell;
+		return null;
 	}
 	
 	protected boolean processCells(List<TextUnit> cells, long lineNum) {
@@ -228,7 +232,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 						
 			if (cells.size() < params.numColumns)
 				for (int i = cells.size(); i < params.numColumns; i++)
-					cells.add(TextUnitUtils.buildTU(""));
+					cells.add(TextUnitUtil.buildTU(""));
 
 			if (cells.size() > params.numColumns)
 				cells.subList(params.numColumns, cells.size()).clear();
@@ -240,7 +244,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			
 			for (TextUnit tu : cells) {
 				
-				String st = TextUnitUtils.getSourceText(tu).trim();
+				String st = TextUnitUtil.getSourceText(tu).trim();
 				columnNames.add(st);
 			}
 						
@@ -255,13 +259,16 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		if (params.sendColumnsMode == Parameters.SEND_COLUMNS_ALL || inHeaderArea) {
 			
 			for (int i = 0; i < cells.size(); i++)	{
-								
+				
+				if (i > 0) sendAsSkeleton(getFieldDelimiter());
+				
 				TextUnit cell = cells.get(i);
 				int colNumber = i + 1;
 				
-				if (TextUnitUtils.isEmpty(cell, true)) {  // only spaces, no translatable text
+				if (TextUnitUtil.isEmpty(cell, true)) {  // only spaces, no translatable text
 					
-					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+					//sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+					sendAsSkeleton(cell);
 					continue;
 				}					
 								
@@ -269,7 +276,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				cell.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
 				cell.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
 				
-				if (!sendSourceCell(cell, colNumber, cells.size())) continue;
+				if (sendAsSource(cell) != TextProcessingResult.ACCEPTED) continue;
 				tuSent = true;
 			}					
 		}
@@ -281,7 +288,11 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			for (int i = 0; i < cells.size(); i++)	{
 				
 				TextUnit cell = cells.get(i); // Can be empty				
-				String trimmedCell = preProcessCell(Util.trim(TextUnitUtils.getSourceText(cell)));
+				//String trimmedCell = preProcessCell(Util.trim(TextUnitUtil.getSourceText(cell)));
+				
+				TextUnit temp = new TextUnit("temp", TextUnitUtil.getSourceText(cell)); 
+				TextUnitUtil.trimTU(temp, true, true);
+				String trimmedCell = TextUnitUtil.getSourceText(temp);
 				
 				int colNumber = i + 1;
 				
@@ -290,13 +301,13 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					TextUnit tu = getSourceFromIdRef(cells, colNumber);
 					if (tu == null) continue;										
 					
-					if (TextUnitUtils.isEmpty(cell, true)) {
+					if (TextUnitUtil.isEmpty(cell, true)) {
 
 						String recordID = ""; 
 						int index = params.recordIdColumn - 1;
 						
 						if (Util.checkIndex(index, cells))
-							recordID = TextUnitUtils.getSourceText(cells.get(index));
+							recordID = TextUnitUtil.getSourceText(cells.get(index));
 						
 						if (recordID != null) recordID = recordID.trim();
 						
@@ -336,60 +347,21 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			
 			// Send cells (OKAPI-A 7*)
 			for (int i = 0; i < cells.size(); i++)	{
+
+				if (i > 0) sendAsSkeleton(getFieldDelimiter());
+					
 				
 				TextUnit cell = cells.get(i); // Can be empty
 				
 				int colNumber = i + 1;
-				boolean isRecognized = false;
-				
-				if (isSourceId(colNumber)) {
-					
-					isRecognized = true;
-					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
-															
-					continue;
-				}
-				
-				if (isTarget(colNumber)) {
-					
-					isRecognized = true;
-					
-					TextUnit tu = getSourceFromTargetRef(cells, colNumber);
-					if (tu == null) {
-						
-						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
-						continue;
-					}
-					
-					String language = getLanguageFromTargetRef(colNumber);
-					if (Util.isEmpty(language)) {
-						
-						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
-						continue;
-					}
-					
-					sendTargetCell(cell, tu, getActiveSkeleton(), language, colNumber, cells.size());
-					
-					continue;
-				}
-				
-				if (isComment(colNumber)) {
-					
-					isRecognized = true;
-					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
-					
-					continue;
-				}
 				
 				if (isSource(colNumber)) {
 					
-					isRecognized = true;
-					
 					if (cell == null) continue;
 
-					if (!sendSourceCell(cell, colNumber, cells.size())) {
+					if (sendAsSource(cell) != TextProcessingResult.ACCEPTED) {
 						
-						sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
+						sendAsSkeleton(cell);
 						continue; 
 					}
 					tuSent = true;
@@ -397,11 +369,30 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					continue;
 				}
 				
-				// Unknown type goes to the skeleton 
-				if (!isRecognized)
-					sendSkeletonCell(cell, getActiveSkeleton(), colNumber, cells.size());
-			}
-									
+				if (isTarget(colNumber)) {
+					
+					TextUnit tu = getSourceFromTargetRef(cells, colNumber);
+					if (tu == null) {
+						
+						sendAsSkeleton(cell);
+						continue;
+					}
+					
+					String language = getLanguageFromTargetRef(colNumber);
+					if (Util.isEmpty(language)) {
+						
+						sendAsSkeleton(cell);
+						continue;
+					}
+					
+					sendAsTarget(cell, tu, language);
+					
+					continue;
+				}
+				
+				// All other kinds of cells go to skeleton
+				sendAsSkeleton(cell);
+			}									
 		}
 		
 		if (tuSent) {
@@ -485,43 +476,46 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		return sourceIdSuffixes.get(index);
 	}
 
-	protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
-		// Can be overridden in descendant classes
-		
-		return sendAsSource(tu) == TextProcessingResult.ACCEPTED;
-	}
+//	protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
+//		// Can be overridden in descendant classes
+//		
+//		return sendAsSource(tu) == TextProcessingResult.ACCEPTED;
+//	}
 
-	protected void preProcessTarget(TextUnit target) {
-		
-	}
+//	protected void preProcessTarget(TextUnit target) {
+//		
+//	}
 	
-	private boolean sendTargetCell(TextUnit target, TextUnit source,
-			GenericSkeleton skel, String language, int column, int numColumns) {
-		
-		preProcessTarget(target);
-		return sendAsTarget(target, source, language, skel) == TextProcessingResult.ACCEPTED;
-	}
+//	protected boolean sendTargetCell(TextUnit target, TextUnit source,
+//			GenericSkeleton skel, String language, int column, int numColumns) {
+	
+//	@Override
+//	protected TextProcessingResult sendAsTarget(TextUnit target, TextUnit source, String language, GenericSkeleton skel) {
+//		
+//		preProcessTarget(target);
+//		return super.sendAsTarget(target, source, language, skel);
+//	}
 
 	
-	protected boolean sendSkeletonCell(TextUnit cell, GenericSkeleton skel, int column, int numColumns) {
-		
-//		if (skel == null) return;
+//	protected boolean sendSkeletonCell(TextUnit cell, GenericSkeleton skel, int column, int numColumns) {
 //		
-////		String st = TextUnitUtils.getSourceText(cell);
-//		
-//		// If the cell contained a skeleton, before we drop it, we need to transfer it to the skel
-//				
-////		GenericSkeleton skel2 = TextUnitUtils.getSkeleton(cell, true);
-////		skel.add(skel2);
+////		if (skel == null) return;
 ////		
-////		if (Util.isEmpty(st)) return; // strict empty, even no spaces allowed
+//////		String st = TextUnitUtil.getSourceText(cell);
 ////		
-////		skel.add(st);
+////		// If the cell contained a skeleton, before we drop it, we need to transfer it to the skel
+////				
+//////		GenericSkeleton skel2 = TextUnitUtil.getSkeleton(cell, true);
+//////		skel.add(skel2);
+//////		
+//////		if (Util.isEmpty(st)) return; // strict empty, even no spaces allowed
+//////		
+//////		skel.add(st);
+////		
+////		skel.add(TextUnitUtil.convertToSkeleton(cell));
 //		
-//		skel.add(TextUnitUtils.convertToSkeleton(cell));
-		
-		return sendAsSkeleton(cell, skel) == TextProcessingResult.ACCEPTED;
-	}
+//		return sendAsSkeleton(cell, skel) == TextProcessingResult.ACCEPTED;
+//	}
 	
 	private void updateLineInfo(long lineNum) {
 		inHeaderArea = lineNum < params.valuesStartLineNum;

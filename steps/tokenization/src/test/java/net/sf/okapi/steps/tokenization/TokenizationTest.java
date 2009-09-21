@@ -24,8 +24,8 @@ import static org.junit.Assert.assertEquals;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.TextUnitUtils;
-import net.sf.okapi.steps.tokenization.locale.LocaleUtils;
+import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.steps.tokenization.locale.LocaleUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,10 +56,10 @@ public class TokenizationTest {
 	}
 	
 	@Test
-	public void testLocaleUtils() {
+	public void testLocaleUtil() {
 		
-		assertEquals("EN-US", LocaleUtils.normalizeLanguageCode_Okapi("en_US"));
-		assertEquals("en_US", LocaleUtils.normalizeLanguageCode_ICU("EN-US"));
+		assertEquals("EN-US", LocaleUtil.normalizeLanguageCode_Okapi("en_US"));
+		assertEquals("en_US", LocaleUtil.normalizeLanguageCode_ICU("EN-US"));
 	}
 	
 	@Test
@@ -67,7 +67,7 @@ public class TokenizationTest {
 		
 		ts = new TokenizationStep();
 		
-		TextUnit tu = TextUnitUtils.buildTU(text);
+		TextUnit tu = TextUnitUtil.buildTU(text);
 		Event event = new Event(EventType.TEXT_UNIT, tu);
 		
 		ts.handleEvent(new Event(EventType.START_BATCH));

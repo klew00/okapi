@@ -46,4 +46,8 @@ public class GenericSkeletonPart { // public for OpenXML
 		this.data.append(data);
 	}
 
+	public String getLanguage() {
+		return language;
+	}
+
 }

@@ -22,7 +22,7 @@ package net.sf.okapi.filters.plaintext.ui;
 
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
-import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
 import net.sf.okapi.lib.extra.filters.WrapMode;
 
@@ -167,9 +167,9 @@ public class OptionsTab extends Composite implements IDialogPage {
 		
 //		if (inlines.getSelection())
 //			panel.enable(true);
-//			//SWTUtils.setAllEnabled(panel, true);
+//			//SWTUtil.setAllEnabled(panel, true);
 //		else
-//			SWTUtils.setAllEnabled(panel, false);
+//			SWTUtil.setAllEnabled(panel, false);
 //		//	panel.enable(false);
 
 		panel.enable(inlines.getSelection());
@@ -178,10 +178,10 @@ public class OptionsTab extends Composite implements IDialogPage {
 //		if (btnProcessInlineCodes.getSelection())
 //			pnlCodeFinder.enable(true);
 //		else
-//			SWTUtils.setAllEnabled(pnlCodeFinder, false);
+//			SWTUtil.setAllEnabled(pnlCodeFinder, false);
 		
 //		if (inlines.getSelection())
-//			SWTUtils.setAllEnabled(grpInlineCodes, true);
+//			SWTUtil.setAllEnabled(grpInlineCodes, true);
 //		else {
 //			if (panel.inEditMode()) {
 //
@@ -190,10 +190,10 @@ public class OptionsTab extends Composite implements IDialogPage {
 //				inlines.setSelection(true);
 //			}
 //			else
-//				SWTUtils.setAllEnabled(grpInlineCodes, false);
+//				SWTUtil.setAllEnabled(grpInlineCodes, false);
 //		}
 						
-//		SWTUtils.setAllEnabled(grpInlineCodes, btnProcessInlineCodes.getSelection());
+//		SWTUtil.setAllEnabled(grpInlineCodes, btnProcessInlineCodes.getSelection());
 		
 //		if (btnPreserveWhiteSpaces.getSelection()) {
 //			
@@ -225,7 +225,7 @@ public class OptionsTab extends Composite implements IDialogPage {
 			inlines.setSelection(params.useCodeFinder);
 			panel.setData(params.codeFinderRules);
 			
-			SWTUtils.unselectAll(multi);
+			SWTUtil.unselectAll(multi);
 			
 			switch (params.wrapMode) {
 			

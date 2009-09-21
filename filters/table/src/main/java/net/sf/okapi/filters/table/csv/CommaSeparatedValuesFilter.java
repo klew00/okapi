@@ -23,17 +23,17 @@ package net.sf.okapi.filters.table.csv;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.ListUtils;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
-import net.sf.okapi.common.StringUtils;
-import net.sf.okapi.common.TextUnitUtils;
+import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
@@ -99,16 +99,22 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 			buffer.clear();		
 	}
 
-	@Override
-	protected void preProcessTarget(TextUnit target) {
-		
-		TextUnitUtils.removeQualifiers(target, params.textQualifier);
-	}
+//	@Override
+//	protected void preProcessTarget(TextUnit target) {
+//		
+//		TextUnitUtil.removeQualifiers(target, params.textQualifier);
+//	}
 
+//	@Override
+//	protected String preProcessCell(String cell) {
+//		
+//		return StringUtil.removeQualifiers(cell, params.textQualifier);
+//	}
+	
 	@Override
-	protected String preProcessCell(String cell) {
+	protected String getFieldDelimiter() {
 		
-		return StringUtils.removeQualifiers(cell, params.textQualifier);
+		return params.fieldDelimiter;
 	}
 
 	@Override
@@ -132,7 +138,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		if (Util.isEmpty(line)) 
 			chunks = new String[] {""};
 		else					
-			chunks = ListUtils.stringAsArray(line, params.fieldDelimiter);
+			chunks = ListUtil.stringAsArray(line, params.fieldDelimiter);
 		
 		// Analyze chunks for being multi-line
 		for (String chunk : chunks) {
@@ -182,62 +188,29 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	}
 
 	@Override
-	protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
+	protected boolean processTU(TextUnit textUnit) {
+	
+		if (textUnit == null) return false;
 		
-		if (tu == null) return false;
-		
-		TextFragment src = tu.getSourceContent(); 
-		if (src == null) return false;
-		
-		String cell = src.getCodedText();
-		if (Util.isEmpty(cell)) return false;
-						
-		GenericSkeleton skel = TextUnitUtils.forseSkeleton(tu);
-			
-		String trimmedChunk = cell.trim();
-		
-		boolean startsQualified = trimmedChunk.startsWith(params.textQualifier);
-		boolean endsQualified = trimmedChunk.endsWith(params.textQualifier);
-		
-		// Remove qualifiers around fields (only both ends)
-		if (startsQualified && endsQualified) {		
-			
-			cell = trimmedChunk.substring(qualifierLen, Util.getLength(trimmedChunk) - qualifierLen);
-			if (skel != null) {
-				
-				skel.add(params.textQualifier);
-				skel.addContentPlaceholder(tu);
-				skel.add(params.textQualifier);
-			}
-		}
-			
-//		// Change 2 quotes inside the field to one quote (2 adjacent quotes in CSV are part of quoted text, not field qualifiers)
-//		//cell = cell.replaceAll("\"\"", "\""); // get lost, should go to inline codes
-//				
-//		StringBuilder sb = new StringBuilder();
-//
-//		int start = 0;
-//		do {			
-//			int index = cell.indexOf("\"\"");
-//			if (index == -1) break;
-//			
-//			sb.append(cell.substring(start, index));
-//			start = index + 2;
-//		} while (true);
+		TextUnitUtil.trimTU(textUnit, true, true);
+		TextUnitUtil.removeQualifiers(textUnit, params.textQualifier);
 		
 		// Process wrapped lines
-		List<String> temp = ListUtils.stringAsList(cell, LINE_WRAP_TAG);
+		TextFragment src = textUnit.getSourceContent();
+		String cell = src.getCodedText();
 		
-		if (temp.size() > 1) {
+		List<String> list = ListUtil.stringAsList(cell, LINE_WRAP_TAG);
+		
+		if (list.size() > 1) {
 			
 			src.setCodedText("");
 			
-			for (int i = 0; i < temp.size(); i++) {
+			for (int i = 0; i < list.size(); i++) {
 				
-				String st = temp.get(i);
+				String st = list.get(i);
 				
 				src.append(st);				
-				if (i == temp.size() - 1) break;
+				if (i == list.size() - 1) break;
 				
 				switch (params.wrapMode) {
 				
@@ -255,9 +228,9 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 				}
 			}			
 		}
-		else
-			src.setCodedText(cell); // No line wrappers found 
-		
+//		else
+//			src.setCodedText(cell); // No line wrappers found 
+
 		// Change 2 quotes inside the field to one quote (2 adjacent quotes in CSV are part of quoted text, not field qualifiers)
 		String st = src.getCodedText();		
 		String qq = params.textQualifier + params.textQualifier;
@@ -267,46 +240,199 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 			int index = st.indexOf(qq); // rel index
 			if (index == -1) break;
 			
-			src.changeToCode(start + index, start + index + 1, TagType.PLACEHOLDER, "CSV quote preamble");
+			src.changeToCode(start + index, start + index + 1, TagType.PLACEHOLDER, "CSV quote preamble"); // First quotation mark
 			
 			start += index + 3; // Code takes 2 positions			
 			st = src.getCodedText().substring(start); // To make sure we're synchronized
 		} while (true);
 
 		
-		boolean res = super.sendSourceCell(tu, column, numColumns);
-				
-		// Add field delimiter to skeleton
-		if (res && column < numColumns) { // For all columns but the last
-												
-			if (skel != null) skel.add(params.fieldDelimiter);
-		}
-		
-		return res;
+		return super.processTU(textUnit);
 	}
+	
+//	@Override
+//	//protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
+//	protected TextProcessingResult sendAsSource(TextUnit textUnit) {
+//		
+//		if (textUnit == null) return TextProcessingResult.REJECTED;
+//		
+//		TextFragment src = textUnit.getSourceContent(); 
+//		if (src == null) return TextProcessingResult.REJECTED;
+//		
+//		String cell = src.getCodedText();
+//		if (Util.isEmpty(cell)) return TextProcessingResult.REJECTED;
+//						
+//		GenericSkeleton skel = TextUnitUtil.forseSkeleton(textUnit);
+//			
+//		String trimmedChunk = cell.trim();
+//		
+//		boolean startsQualified = trimmedChunk.startsWith(params.textQualifier);
+//		boolean endsQualified = trimmedChunk.endsWith(params.textQualifier);
+//		
+//		// Remove qualifiers around fields (only both ends)
+//		if (startsQualified && endsQualified) {		
+//			
+//			cell = trimmedChunk.substring(qualifierLen, Util.getLength(trimmedChunk) - qualifierLen);
+//			if (skel != null) {
+//				
+//				skel.add(params.textQualifier);
+//				skel.addContentPlaceholder(textUnit);
+//				skel.add(params.textQualifier);
+//			}
+//		}
+//			
+//		// Process wrapped lines
+//		List<String> temp = ListUtil.stringAsList(cell, LINE_WRAP_TAG);
+//		
+//		if (temp.size() > 1) {
+//			
+//			src.setCodedText("");
+//			
+//			for (int i = 0; i < temp.size(); i++) {
+//				
+//				String st = temp.get(i);
+//				
+//				src.append(st);				
+//				if (i == temp.size() - 1) break;
+//				
+//				switch (params.wrapMode) {
+//				
+//				case PLACEHOLDERS:
+//					src.append(new Code(TagType.PLACEHOLDER, "line break", getLineBreak()));
+//					break;
+//					
+//				case SPACES:
+//					src.append(' ');
+//					break;
+//					
+//				case NONE:
+//				default:
+//					src.append('\n');
+//				}
+//			}			
+//		}
+//		else
+//			src.setCodedText(cell); // No line wrappers found 
+//		
+//		// Change 2 quotes inside the field to one quote (2 adjacent quotes in CSV are part of quoted text, not field qualifiers)
+//		String st = src.getCodedText();		
+//		String qq = params.textQualifier + params.textQualifier;
+//		
+//		int start = 0; // abs index
+//		do {			
+//			int index = st.indexOf(qq); // rel index
+//			if (index == -1) break;
+//			
+//			src.changeToCode(start + index, start + index + 1, TagType.PLACEHOLDER, "CSV quote preamble");
+//			
+//			start += index + 3; // Code takes 2 positions			
+//			st = src.getCodedText().substring(start); // To make sure we're synchronized
+//		} while (true);
+//
+//		
+////		boolean res = super.sendSourceCell(tu, column, numColumns);
+////				
+//////		// Add field delimiter to skeleton
+//////		if (res && column < numColumns) { // For all columns but the last
+//////												
+//////			if (skel != null) skel.add(params.fieldDelimiter);
+//////		}
+//		
+//		return super.sendAsSource(textUnit);
+//	}
+	
+	
+//	@Override
+//	protected boolean sendTargetCell(TextUnit target, TextUnit source,
+//			GenericSkeleton skel, String language, int column, int numColumns) {
+//		
+////		if (target == null && skel == null) 
+////			return super.sendTargetCell(target, source, skel, language, column, numColumns);
+////		
+////		TextFragment src = target.getSourceContent(); 
+////		if (src == null) return false;
+////		
+////		String cell = src.getCodedText();
+////		if (Util.isEmpty(cell)) return false;
+////		
+////		String trimmedChunk = cell.trim();
+////		
+////		boolean startsQualified = trimmedChunk.startsWith(params.textQualifier);
+////		boolean endsQualified = trimmedChunk.endsWith(params.textQualifier);
+////		
+////		// Remove qualifiers around fields (only both ends)
+////		if (startsQualified && endsQualified) {		
+////			
+////			cell = trimmedChunk.substring(qualifierLen, Util.getLength(trimmedChunk) - qualifierLen);
+////			if (skel != null) {
+////				
+////				//skel.add(params.textQualifier);
+////				skel.addContentPlaceholder(target, language);
+////				//skel.add(params.textQualifier);
+////			}
+////		}
+//		
+////		skel.addContentPlaceholder(target, language);
+////		boolean res = true; //super.sendTargetCell(target, source, skel, language, column, numColumns);
+//		boolean res = super.sendTargetCell(target, source, skel, language, column, numColumns);
+//		
+////		// Add field delimiter to skeleton
+////		if (res && column < numColumns) { // For all columns but the last
+////												
+////			if (skel != null) skel.add(params.fieldDelimiter);
+////		}
+//		
+//		return res;
+//	}
 
-	@Override
-	protected boolean sendSkeletonCell(TextUnit cell0, GenericSkeleton skel, int column, int numColumns) {
-		
-		String cell = TextUnitUtils.getSourceText(cell0);
-		
-		if (column < numColumns) cell = cell + params.fieldDelimiter;
-		
-		switch (params.wrapMode) {
-		
-		case SPACES:
-			cell = cell.replaceAll(LINE_WRAP_TAG, " ");
-			break;
-			
-		case PLACEHOLDERS:	
-		case NONE:
-		default:
-			cell = cell.replaceAll(LINE_WRAP_TAG, "\n");
-		}
-		
-		skel.add(cell);
-		return true;
-	}
+//	@Override
+//	protected boolean sendSkeletonCell(TextUnit cell0, GenericSkeleton skel, int column, int numColumns) {
+//		
+//		String cell = TextUnitUtil.getSourceText(cell0);
+//		
+//		// if (column < numColumns) cell = cell + params.fieldDelimiter;
+//		
+//		switch (params.wrapMode) {
+//		
+//		case SPACES:
+//			cell = cell.replaceAll(LINE_WRAP_TAG, " ");
+//			break;
+//			
+//		case PLACEHOLDERS:	
+//		case NONE:
+//		default:
+//			cell = cell.replaceAll(LINE_WRAP_TAG, "\n");
+//		}
+//		
+//		skel.add(cell);
+//		return true;
+//	}
+
+// TODO Move parts to ProcessTU()	
+//	@Override
+////	protected boolean sendSkeletonCell(TextUnit cell0, GenericSkeleton skel, int column, int numColumns) {
+//	protected TextProcessingResult sendAsSkeleton(TextUnit textUnit) {
+//		
+//		GenericSkeleton parentSkeleton = getActiveSkeleton();
+//		String cell = TextUnitUtil.getSourceText(textUnit);
+//		
+//		// if (column < numColumns) cell = cell + params.fieldDelimiter;
+//		
+//		switch (params.wrapMode) {
+//		
+//		case SPACES:
+//			cell = cell.replaceAll(LINE_WRAP_TAG, " ");
+//			break;
+//			
+//		case PLACEHOLDERS:	
+//		case NONE:
+//		default:
+//			cell = cell.replaceAll(LINE_WRAP_TAG, "\n");
+//		}
+//		
+//		parentSkeleton.add(cell);
+//		return TextProcessingResult.ACCEPTED;
+//	}
 	
 	@Override
 	protected void component_idle(boolean lastChance) {
@@ -375,7 +501,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 			if (start == -1 || end == -1) break;
 			if (start >= end) break;
 			
-			List<String> buf = ListUtils.copyItems(buffer, start + 1, end - 1);
+			List<String> buf = ListUtil.copyItems(buffer, start + 1, end - 1);
 
 			while (true) {
 				int index = buf.indexOf(LINE_BREAK_TAG);		
@@ -392,13 +518,13 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 				if (!Util.checkIndex(index - 1, buf)) break;
 				if (!Util.checkIndex(index + 1, buf)) break;
 		
-				String mergedChunk = ListUtils.listAsString(buf.subList(index - 1, index + 2), "");
+				String mergedChunk = ListUtil.listAsString(buf.subList(index - 1, index + 2), "");
 				buf.subList(index, index + 2).clear();
 				
 				buf.set(index - 1, mergedChunk);
 			}
 			
-			String mergedChunk = ListUtils.listAsString(buf, params.fieldDelimiter);
+			String mergedChunk = ListUtil.listAsString(buf, params.fieldDelimiter);
 			
 			buffer.subList(start + 1, end + 1).clear();
 			
@@ -434,7 +560,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 		// Transfer chunks to a temp buffer, process
 		
-//		List<String> buf0 = ListUtils.moveItems(buffer, 0, index - 1);
+//		List<String> buf0 = ListUtil.moveItems(buffer, 0, index - 1);
 		
 //		List<String> buf = new ArrayList<String>();
 //		buf.addAll(buffer.subList(0, index));		
@@ -445,7 +571,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		List<TextUnit> buf = new ArrayList<TextUnit>();
 		
 		for (int i = 0; i < index; i++)			
-			buf.add(TextUnitUtils.buildTU(buffer.get(i)));
+			buf.add(TextUnitUtil.buildTU(buffer.get(i)));
 		
 		buffer.subList(0, index).clear();
 		

@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.ListUtils;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
-import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
 import net.sf.okapi.filters.table.base.Parameters;
 
@@ -268,21 +268,21 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		if (item == null) { // Add new item			
 			adapter.unselect();
 			
-			if (SWTUtils.inputQuery(AddModifyColumnDefPage.class, getShell(), "Add column definition", 
-					new String[] {Util.intToStr(SWTUtils.getColumnMaxValue(table, 0) + 1), "Source", "", "", "", "0", "0"}, 
+			if (SWTUtil.inputQuery(AddModifyColumnDefPage.class, getShell(), "Add column definition", 
+					new String[] {Util.intToStr(SWTUtil.getColumnMaxValue(table, 0) + 1), "Source", "", "", "", "0", "0"}, 
 					null)) {
 				
-				adapter.addModifyRow((String []) SWTUtils.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
+				adapter.addModifyRow((String []) SWTUtil.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
 			}
 			else
 				adapter.restoreSelection();
 		}
 		else {
-			if (SWTUtils.inputQuery(AddModifyColumnDefPage.class, getShell(), "Modify column definition", 
-					SWTUtils.getText(item),
+			if (SWTUtil.inputQuery(AddModifyColumnDefPage.class, getShell(), "Modify column definition", 
+					SWTUtil.getText(item),
 					null)) {					
 				
-				adapter.addModifyRow(item, (String []) SWTUtils.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
+				adapter.addModifyRow(item, (String []) SWTUtil.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
 			}
 		}
 		
@@ -302,8 +302,8 @@ public class ColumnsTab extends Composite implements IDialogPage {
 
 	public void interop(Widget speaker) {
 		
-		SWTUtils.setAllEnabled(colDefs, defs.getSelection());
-		SWTUtils.setAllEnabled(buttons, defs.getSelection());
+		SWTUtil.setAllEnabled(colDefs, defs.getSelection());
+		SWTUtil.setAllEnabled(buttons, defs.getSelection());
 		num.setEnabled(fix.getSelection());
 		
 		btnModify.setEnabled(buttons.getEnabled() && table.getItemCount() > 0 && table.getSelectionIndex() != -1);
@@ -322,7 +322,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			num.setSelection(params.numColumns);
 			
 			//------------------
-			SWTUtils.unselectAll(gnum);
+			SWTUtil.unselectAll(gnum);
 			
 			if (params.detectColumnsMode == Parameters.DETECT_COLUMNS_FIXED_NUMBER)
 				fix.setSelection(true);
@@ -334,7 +334,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 				vals.setSelection(true);
 			
 			//------------------
-			SWTUtils.unselectAll(extr);
+			SWTUtil.unselectAll(extr);
 			
 			if (params.sendColumnsMode == Parameters.SEND_COLUMNS_LISTED) {
 				
@@ -371,15 +371,15 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			
 			adapter.sort(1, true);
 						
-			List<String> sourceColumns = ListUtils.stringAsList(params.sourceColumns);	
-			List<String> sourceIdSuffixes = ListUtils.stringAsList(params.sourceIdSuffixes);
-			List<String> targetColumns = ListUtils.stringAsList(params.targetColumns);
-			List<String> targetLanguages = ListUtils.stringAsList(params.targetLanguages);
-			List<String> targetSourceRefs = ListUtils.stringAsList(params.targetSourceRefs);			
-			List<String> sourceIdColumns = ListUtils.stringAsList(params.sourceIdColumns);
-			List<String> sourceIdSourceRefs = ListUtils.stringAsList(params.sourceIdSourceRefs);
-			List<String> commentColumns = ListUtils.stringAsList(params.commentColumns);
-			List<String> commentSourceRefs = ListUtils.stringAsList(params.commentSourceRefs);
+			List<String> sourceColumns = ListUtil.stringAsList(params.sourceColumns);	
+			List<String> sourceIdSuffixes = ListUtil.stringAsList(params.sourceIdSuffixes);
+			List<String> targetColumns = ListUtil.stringAsList(params.targetColumns);
+			List<String> targetLanguages = ListUtil.stringAsList(params.targetLanguages);
+			List<String> targetSourceRefs = ListUtil.stringAsList(params.targetSourceRefs);			
+			List<String> sourceIdColumns = ListUtil.stringAsList(params.sourceIdColumns);
+			List<String> sourceIdSourceRefs = ListUtil.stringAsList(params.sourceIdSourceRefs);
+			List<String> commentColumns = ListUtil.stringAsList(params.commentColumns);
+			List<String> commentSourceRefs = ListUtil.stringAsList(params.commentSourceRefs);
 					
 			// Types
 			for (int i = 0; i < sourceColumns.size(); i++)
@@ -418,8 +418,8 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			net.sf.okapi.filters.table.fwc.Parameters params =
 				(net.sf.okapi.filters.table.fwc.Parameters) data;
 						
-			List<String> columnStartPositions = ListUtils.stringAsList(params.columnStartPositions);	
-			List<String> columnEndPositions = ListUtils.stringAsList(params.columnEndPositions);
+			List<String> columnStartPositions = ListUtil.stringAsList(params.columnStartPositions);	
+			List<String> columnEndPositions = ListUtil.stringAsList(params.columnEndPositions);
 
 			for (int i = 0; i < Math.min(columnStartPositions.size(), columnEndPositions.size()); i++) {
 				
@@ -499,15 +499,15 @@ public class ColumnsTab extends Composite implements IDialogPage {
 					params.recordIdColumn = Util.strToInt(adapter.getValue(i, 1), 0);					
 			}
 			
-			params.sourceColumns = ListUtils.listAsString(sourceColumns);
-			params.sourceIdSuffixes = ListUtils.listAsString(sourceIdSuffixes);
-			params.targetColumns = ListUtils.listAsString(targetColumns);
-			params.targetLanguages = ListUtils.listAsString(targetLanguages);
-			params.targetSourceRefs = ListUtils.listAsString(targetSourceRefs);
-			params.sourceIdColumns = ListUtils.listAsString(sourceIdColumns);
-			params.sourceIdSourceRefs = ListUtils.listAsString(sourceIdSourceRefs);
-			params.commentColumns = ListUtils.listAsString(commentColumns);
-			params.commentSourceRefs = ListUtils.listAsString(commentSourceRefs);
+			params.sourceColumns = ListUtil.listAsString(sourceColumns);
+			params.sourceIdSuffixes = ListUtil.listAsString(sourceIdSuffixes);
+			params.targetColumns = ListUtil.listAsString(targetColumns);
+			params.targetLanguages = ListUtil.listAsString(targetLanguages);
+			params.targetSourceRefs = ListUtil.listAsString(targetSourceRefs);
+			params.sourceIdColumns = ListUtil.listAsString(sourceIdColumns);
+			params.sourceIdSourceRefs = ListUtil.listAsString(sourceIdSourceRefs);
+			params.commentColumns = ListUtil.listAsString(commentColumns);
+			params.commentSourceRefs = ListUtil.listAsString(commentSourceRefs);
 		}
 		
 		if (data instanceof net.sf.okapi.filters.table.fwc.Parameters) {
@@ -524,8 +524,8 @@ public class ColumnsTab extends Composite implements IDialogPage {
 				columnEndPositions.add(adapter.getValue(i, 7));
 			}
 			
-			params.columnStartPositions = ListUtils.listAsString(columnStartPositions);
-			params.columnEndPositions = ListUtils.listAsString(columnEndPositions);			
+			params.columnStartPositions = ListUtil.listAsString(columnStartPositions);
+			params.columnEndPositions = ListUtil.listAsString(columnEndPositions);			
 		}
 		
 		return true;

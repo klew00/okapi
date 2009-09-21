@@ -24,7 +24,7 @@ import net.sf.okapi.steps.tokenization.tokens.Parameters;
 import net.sf.okapi.steps.tokenization.tokens.TokenType;
 import net.sf.okapi.common.ui.abstracteditor.AbstractBaseDialog;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
-import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
 
 import org.eclipse.swt.SWT;
@@ -141,23 +141,23 @@ public class TokenTypesPage extends Composite implements IDialogPage {
 		if (item == null) { // Add new item			
 			adapter.unselect();
 			
-			if (SWTUtils.inputQuery(AddModifyTokenTypePage.class, getShell(), "Add token type", 
+			if (SWTUtil.inputQuery(AddModifyTokenTypePage.class, getShell(), "Add token type", 
 					new String[] {"", "0", ""}, 
 					null)) {
 				
 				modified = true;
-				adapter.addModifyRow((String []) SWTUtils.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
+				adapter.addModifyRow((String []) SWTUtil.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
 			}
 			else
 				adapter.restoreSelection();
 		}
 		else {
-			if (SWTUtils.inputQuery(AddModifyTokenTypePage.class, getShell(), "Modify token type", 
-					SWTUtils.getText(item),
+			if (SWTUtil.inputQuery(AddModifyTokenTypePage.class, getShell(), "Modify token type", 
+					SWTUtil.getText(item),
 					null)) {					
 				
 				modified = true;
-				adapter.modifyRow(item, (String []) SWTUtils.getResult());
+				adapter.modifyRow(item, (String []) SWTUtil.getResult());
 			}
 		}
 		

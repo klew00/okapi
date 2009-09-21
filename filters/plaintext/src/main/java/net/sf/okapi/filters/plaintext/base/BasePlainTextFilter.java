@@ -31,10 +31,11 @@ import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
-import net.sf.okapi.common.ListUtils;
-import net.sf.okapi.common.TextUnitUtils;
+import net.sf.okapi.common.skeleton.SkeletonUtil;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
@@ -95,7 +96,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		if (params.useCodeFinder && codeFinder != null) {
 			
 			codeFinder.reset();
-			List<String> rules = ListUtils.stringAsList(params.codeFinderRules, "\n");
+			List<String> rules = ListUtil.stringAsList(params.codeFinderRules, "\n");
 			
 			for (String rule : rules)
 				codeFinder.addRule(rule);
@@ -104,72 +105,220 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		}
 	}
 	
-	/**
-	 * @param textUnit
-	 * @param source
-	 * @param skel
-	 */
-	private void trimTU(TextUnit textUnit, TextContainer source, GenericSkeleton skel) {
-		
-		if (params.trimLeading)						
-			TextUnitUtils.trimLeading(source, skel);
-		
-		if (!TextUnitUtils.hasContentPlaceholder(skel))
-			skel.addContentPlaceholder(textUnit);
-					
-		if (params.trimTrailing) 
-			TextUnitUtils.trimTrailing(source, skel);
-	}
+//	/**
+//	 * @param textUnit
+//	 * @param source
+//	 * @param skel
+//	 */
+//	private void trimTU(TextUnit textUnit) {
+//		
+//		if (textUnit == null) return;
+//		
+//		TextContainer source = textUnit.getSource();
+//		GenericSkeleton skel = (GenericSkeleton) textUnit.getSkeleton();
+//		
+//		if (params.trimLeading)						
+//			TextUnitUtil.trimLeading(source, skel);
+//		
+////		if (!TextUnitUtil.hasContentPlaceholder(skel))
+//			skel.addContentPlaceholder(textUnit);
+//					
+//		if (params.trimTrailing) 
+//			TextUnitUtil.trimTrailing(source, skel);
+//	}
 	
-	protected TextProcessingResult sendAsSource(TextUnit textUnit) {
+	protected final TextProcessingResult sendAsSource(TextUnit textUnit) {
 		
-		if (!processTextUnit(textUnit)) return TextProcessingResult.REJECTED;
+		if (textUnit == null) return TextProcessingResult.REJECTED;
+		TextUnitUtil.forseSkeleton(textUnit);
 		
-		if (!TextUnitUtils.hasSource(textUnit)) return TextProcessingResult.REJECTED;
+		if (!processTU(textUnit)) return TextProcessingResult.REJECTED;
+		
+		if (!TextUnitUtil.hasSource(textUnit)) return TextProcessingResult.REJECTED;
 		
 		sendEvent(EventType.TEXT_UNIT, textUnit);
 		
 		return TextProcessingResult.ACCEPTED;
 	}
 	
-	protected TextProcessingResult sendAsTarget(TextUnit target, TextUnit source, String language, GenericSkeleton parentSkeleton) {
+	protected final TextProcessingResult sendAsSource(TextContainer textContainer) {
+		
+		if (textContainer == null) return TextProcessingResult.REJECTED;
+		
+		return sendAsSource(TextUnitUtil.buildTU(null, "", textContainer, null, "", ""));
+	}
+	
+	protected final TextProcessingResult sendAsTarget(TextUnit target, TextUnit source, String language) {
 		
 		if (target == null) return TextProcessingResult.REJECTED;
 		if (source == null) return TextProcessingResult.REJECTED;
+		if (language == null) return TextProcessingResult.REJECTED;
 		
-		if (parentSkeleton == null)
-			parentSkeleton = (GenericSkeleton) source.getSkeleton();
+		GenericSkeleton skel = getActiveSkeleton();
+		if (skel == null) return TextProcessingResult.REJECTED;
 		
-		if (!processTextUnit(target)) return TextProcessingResult.REJECTED;
+		GenericSkeleton targetSkel = TextUnitUtil.forseSkeleton(target);
+		if (targetSkel == null) return TextProcessingResult.REJECTED;
 		
-		TextContainer trg = new TextContainer(TextUnitUtils.getSourceText(target));					
-		source.setTarget(language, trg);
+		if (!processTU(target)) return TextProcessingResult.REJECTED;
 		
-		parentSkeleton.add(TextUnitUtils.convertToSkeleton(target));
+		source.setTarget(language, target.getSource());
+	
+		int index = SkeletonUtil.findTuRefInSkeleton(targetSkel);
+		if (index != -1) {
+
+			// Replace target tu ref with a source ref
+			GenericSkeleton tempSkel = new GenericSkeleton();
+			tempSkel.addContentPlaceholder(source, language);
+			SkeletonUtil.replaceSkeletonPart(targetSkel, index, tempSkel);
+		}
+		
+		skel.add(targetSkel);
 		
 		return TextProcessingResult.ACCEPTED;
 	}
 	
-	protected TextProcessingResult sendAsSkeleton(TextUnit textUnit, GenericSkeleton parentSkeleton) {
+	protected final TextProcessingResult sendAsSkeleton(TextUnit textUnit) {
 		
 //		if (!processTextUnit(textUnit)) return TextProcessingResult.REJECTED;
 		
-		if (parentSkeleton == null)
-			parentSkeleton = (GenericSkeleton) textUnit.getSkeleton();
+//		if (parentSkeleton == null)
+//			parentSkeleton = (GenericSkeleton) textUnit.getSkeleton();
 		
+		GenericSkeleton parentSkeleton = getActiveSkeleton();
 		if (parentSkeleton == null) return TextProcessingResult.REJECTED;
 		
-		parentSkeleton.add(TextUnitUtils.convertToSkeleton(textUnit));
+		//if (!processTU(textUnit)) return TextProcessingResult.REJECTED;
+		processTU(textUnit); // Can have an empty source, no problem
+		
+		parentSkeleton.add(TextUnitUtil.convertToSkeleton(textUnit));
+		return TextProcessingResult.ACCEPTED;
+	}
+	
+	protected final TextProcessingResult sendAsSkeleton(GenericSkeleton skelPart) {
+		
+		if (skelPart == null) return TextProcessingResult.REJECTED;
+		
+		GenericSkeleton activeSkel = getActiveSkeleton();
+		if (activeSkel == null) return TextProcessingResult.REJECTED;
+		
+		activeSkel.add(skelPart);
+		
+		return TextProcessingResult.ACCEPTED;
+	}
+	
+	protected final TextProcessingResult sendAsSkeleton(String skelPart) {
+		
+		if (skelPart == null) return TextProcessingResult.REJECTED;
+		
+		GenericSkeleton activeSkel = getActiveSkeleton();
+		if (activeSkel == null) return TextProcessingResult.REJECTED;
+		
+		activeSkel.add(skelPart);
+		
 		return TextProcessingResult.ACCEPTED;
 	}
 
-	private boolean processTextUnit(TextUnit textUnit) {
+//	protected boolean processTU(TextUnit textUnit) {
+//		
+//		return processTU(textUnit, null, null, TextUnitUtil.forseSkeleton(textUnit));
+//	}
+//	
+//	protected boolean processTU(TextUnit textUnit, TextUnit srcRef, String language, GenericSkeleton skel) {
+//
+//		if (textUnit == null) return false;
+//		TextContainer source = textUnit.getSource();
+//		if (source == null) return false;		
+//		
+//		//GenericSkeleton skel = TextUnitUtil.forseSkeleton(textUnit);
+//		
+//		if (!checkTU(source)) return false;
+//		if (source.isEmpty()) return false;
+//		
+//		if (params.unescapeSource) _unescape(source);
+//		
+//		//------------------------------
+//		// The cell can already have something in the skeleton (for instance, a gap after the source)
+//		
+//		if (params.trimLeading || params.trimTrailing) {
+//			
+//			List<GenericSkeletonPart> list = skel.getParts();
+//			
+//			int index = -1;
+//			String tuRef = TextFragment.makeRefMarker("$self$");
+//			
+//			for (int i = 0; i < list.size(); i++) {
+//				
+//				GenericSkeletonPart part = list.get(i);				
+//				String st = part.toString();
+//				
+//				if (Util.isEmpty(st)) continue;
+//				if (st.equalsIgnoreCase(tuRef)) {
+//					index = i;
+//					break;
+//				}
+//			}
+//			
+////			index = list.indexOf(tuRef); 
+//			if (index > -1) { // tu ref was found in the skeleton
+//				
+//				//List<Object> list2 = (List<Object>) ListUtil.moveItems(list); // clears the original list
+//				List<GenericSkeletonPart> list2 = (List<GenericSkeletonPart>) ListUtil.moveItems(list); // clears the original list
+//								
+//				GenericSkeleton skel2 = new GenericSkeleton();				
+//				trimTU(textUnit, srcRef, language, skel2);
+//			
+//				for (int i = 0; i < list2.size(); i++) {
+//					
+//					if (i == index)						
+//						skel.add(skel2);
+//					else
+//						list.add(list2.get(i));										
+//				}				
+//			}
+//			else {		
+//				trimTU(textUnit, srcRef, language, skel);
+//			}
+//			
+//		}
+//		else {
+//			trimTU(textUnit, srcRef, language, skel);
+//		}
+//							
+//		//------------------------------
+//		
+////		Set<String> languages = textUnit.getTargetLanguages();
+//
+//		textUnit.setMimeType(getMimeType());
+//		textUnit.setPreserveWhitespaces(params.preserveWS);
+//		
+//		if (!params.preserveWS ) {
+//			// Unwrap the content
+//			TextFragment.unwrap(source);
+//			
+////			for (String lng : languages)
+////				TextFragment.unwrap(textUnit.getTargetContent(lng));				
+//		}
+//		
+//		// Automatically replace text fragments with in-line codes (based on regex rules of codeFinder)
+//		if (params.useCodeFinder && codeFinder != null) {
+//			
+//			codeFinder.process(source);
+//			
+////			for (String lng : languages)
+////				codeFinder.process(textUnit.getTargetContent(lng));
+//		}
+//		
+//		return true;
+//	}
 
+	protected boolean processTU(TextUnit textUnit) {
+		
 		if (textUnit == null) return false;
 		TextContainer source = textUnit.getSource();
 		if (source == null) return false;		
 		
-		GenericSkeleton skel = TextUnitUtils.forseSkeleton(textUnit);
+		// GenericSkeleton skel = TextUnitUtil.forseSkeleton(textUnit);
 		
 		if (!checkTU(source)) return false;
 		if (source.isEmpty()) return false;
@@ -178,54 +327,42 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		
 		//------------------------------
 		// The cell can already have something in the skeleton (for instance, a gap after the source)
+
+		TextUnitUtil.trimTU(textUnit, params.trimLeading, params.trimTrailing);
 		
-		if (params.trimLeading || params.trimTrailing) {
-			
-			List<GenericSkeletonPart> list = skel.getParts();
-			
-			int index = -1;
-			String tuRef = TextFragment.makeRefMarker("$self$");
-			
-			for (int i = 0; i < list.size(); i++) {
-				
-				String st = list.get(i).toString();
-				
-				if (Util.isEmpty(st)) continue;
-				if (st.equalsIgnoreCase(tuRef)) {
-					index = i;
-					break;
-				}
-			}
-			
-//			index = list.indexOf(tuRef); 
-			if (index > -1) { // tu ref was found in the skeleton
-				
-				//List<Object> list2 = (List<Object>) ListUtils.moveItems(list); // clears the original list
-				List<GenericSkeletonPart> list2 = (List<GenericSkeletonPart>) ListUtils.moveItems(list); // clears the original list
-								
-				GenericSkeleton skel2 = new GenericSkeleton();				
-				trimTU(textUnit, source, skel2);
-			
-				for (int i = 0; i < list2.size(); i++) {
-					
-					if (i == index)						
-						skel.add(skel2);
-					else
-						list.add(list2.get(i));										
-				}				
-			}
-			else {		
-				trimTU(textUnit, source, skel);
-			}
-			
-		}
-		else {
-			trimTU(textUnit, source, skel);
-		}
+//		if (params.trimLeading || params.trimTrailing) {
+//			
+//			int index = TextUnitUtil.findTuRefInSkeleton(textUnit); 
+//			if (index > -1) { // tu ref was found in the skeleton
+//
+//				List<GenericSkeletonPart> list = skel.getParts();
+//				List<GenericSkeletonPart> list2 = (List<GenericSkeletonPart>) ListUtil.moveItems(list); // clears the original list
+//								
+//				GenericSkeleton skel2 = new GenericSkeleton();				
+//				//trimTU(textUnit, skel2);
+//				TextUnitUtil.trimTU(textUnit, params.trimLeading, params.trimTrailing);
+//			
+////				for (int i = 0; i < list2.size(); i++) {
+////					
+////					if (i == index)						
+////						skel.add(skel2);
+////					else
+////						list.add(list2.get(i));										
+////				}				
+//			}
+//			else {		
+//				//trimTU(textUnit, skel);
+//				TextUnitUtil.trimTU(textUnit, params.trimLeading, params.trimTrailing);
+//			}
+//			
+//		}
+//		else {
+//			trimTU(textUnit, skel); // Just adds the src ref, no trimming is performed
+//		}
 							
 		//------------------------------
 		
-		Set<String> languages = textUnit.getTargetLanguages();
+//		Set<String> languages = textUnit.getTargetLanguages();
 
 		textUnit.setMimeType(getMimeType());
 		textUnit.setPreserveWhitespaces(params.preserveWS);
@@ -234,8 +371,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 			// Unwrap the content
 			TextFragment.unwrap(source);
 			
-			for (String language : languages)
-				TextFragment.unwrap(textUnit.getTargetContent(language));				
+//			for (String lng : languages)
+//				TextFragment.unwrap(textUnit.getTargetContent(lng));				
 		}
 		
 		// Automatically replace text fragments with in-line codes (based on regex rules of codeFinder)
@@ -243,43 +380,13 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 			
 			codeFinder.process(source);
 			
-			for (String language : languages)
-				codeFinder.process(textUnit.getTargetContent(language));
+//			for (String lng : languages)
+//				codeFinder.process(textUnit.getTargetContent(lng));
 		}
 		
 		return true;
 	}
 
-	protected TextProcessingResult sendAsSource(TextContainer textContainer) {
-		
-		if (textContainer == null) return TextProcessingResult.REJECTED;
-		
-		return sendAsSource(TextUnitUtils.buildTU(null, "", textContainer, null, "", ""));
-	}
-	
-	protected boolean sendSkeletonPart(GenericSkeleton skelPart) {
-		
-		if (skelPart == null) return false;
-		
-		GenericSkeleton activeSkel = getActiveSkeleton();
-		if (activeSkel == null) return false;
-		
-		activeSkel.add(skelPart);
-		
-		return true;
-	}
-	
-	protected boolean sendSkeletonPart(String skelPart) {
-		
-		if (skelPart == null) return false;
-		
-		GenericSkeleton activeSkel = getActiveSkeleton();
-		if (activeSkel == null) return false;
-		
-		activeSkel.add(skelPart);
-		
-		return true;
-	}
 	
 	protected boolean checkTU(TextContainer tuSource) {
 		// Can be overridden in descendant classes

@@ -52,9 +52,9 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.TextUnitUtils;
 import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.Parameters;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
@@ -88,98 +88,6 @@ public class ParaPlainTextFilterTest {
         root = TestUtil.getParentDir(this.getClass(), "/crt.txt");
 	}
 
-	@Test
-	public void testUtils() {
-		String st = "12345678";
-		assertEquals("45678", Util.trimStart(st, "123"));
-		assertEquals("12345", Util.trimEnd(st, "678"));
-		assertEquals("12345678", Util.trimEnd(st, "9"));
-		
-		st = "     ";
-		assertEquals("", Util.trimStart(st, " "));
-		assertEquals("", Util.trimEnd(st, " "));
-		
-		st = "  1234   ";
-		TextFragment tf = new TextFragment(st);
-		TextUnitUtils.trimLeading(tf, null);
-		assertEquals("1234   ", tf.toString());
-		TextUnitUtils.trimTrailing(tf, null);
-		assertEquals("1234", tf.toString());
-		
-		st = "     ";
-		tf = new TextFragment(st);
-		TextUnitUtils.trimLeading(tf, null);
-		assertEquals("", tf.toString());
-		TextUnitUtils.trimTrailing(tf, null);
-		assertEquals("", tf.toString());
-		
-		st = "     ";
-		tf = new TextFragment(st);
-		TextUnitUtils.trimTrailing(tf, null);
-		assertEquals("", tf.toString());
-		
-		TextFragment tc = new TextFragment("test");
-		
-		Code c = new Code(TagType.PLACEHOLDER, "code");
-		tc.append(c);
-		
-		tc.append(" string");
-//debug		System.out.println(tc.toString());
-//debug		System.out.println(tc.getCodedText());
-		
-		
-		//--------------------
-		//TextContainer tcc = new TextContainer("    123456  ");
-		TextContainer tcc = new TextContainer();
-		Code c2 = new Code(TagType.PLACEHOLDER, "code");
-		tcc.append(c2);
-		tcc.append("    123456  ");
-		
-		GenericSkeleton skel = new GenericSkeleton();
-		TextUnitUtils.trimLeading(tcc, skel);
-		
-		assertEquals("123456  ", tcc.getCodedText());
-		assertEquals("    ", skel.toString());
-		
-		//--------------------
-		TextContainer tcc2 = new TextContainer("    123456  ");
-		Code c3 = new Code(TagType.PLACEHOLDER, "code");
-		tcc2.append(c3);
-		
-		GenericSkeleton skel2 = new GenericSkeleton();
-		TextUnitUtils.trimTrailing(tcc2, skel2);
-		
-		assertEquals("    123456", tcc2.getCodedText());
-		assertEquals("  ", skel2.toString());
-		
-		//--------------------
-		TextContainer tcc4 = new TextContainer("    123456  ");
-		Code c4 = new Code(TagType.PLACEHOLDER, "code");
-		tcc4.append(c4);
-		
-		char ch = TextUnitUtils.getLastChar(tcc4);
-		assertEquals('6', ch);
-		
-		//--------------------
-		TextContainer tcc5 = new TextContainer("    123456  ");
-		
-		TextUnitUtils.deleteLastChar(tcc5);
-		assertEquals("    12345  ", tcc5.getCodedText());
-		
-		//--------------------
-		TextContainer tcc6 = new TextContainer("123456_    ");
-		
-		assertTrue(TextUnitUtils.endsWith(tcc6, "_"));
-		assertTrue(TextUnitUtils.endsWith(tcc6, "6_"));
-		assertFalse(TextUnitUtils.endsWith(tcc6, "  "));
-		
-		TextContainer tcc7 = new TextContainer("123456<splicer>    ");
-		assertTrue(TextUnitUtils.endsWith(tcc7, "<splicer>"));
-		assertTrue(TextUnitUtils.endsWith(tcc7, "6<splicer>"));
-		assertFalse(TextUnitUtils.endsWith(tcc7, "  "));
-		
-	}
-	
 	@Test
 	public void testEmptyInput() {
 		// Empty input, check exceptions

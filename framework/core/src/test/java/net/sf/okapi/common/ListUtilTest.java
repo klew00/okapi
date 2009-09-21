@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Test;
 
 
-public class ListUtilsTest {
+public class ListUtilTest {
 
 	@Test
 	public void testListToArray() {
@@ -30,7 +30,7 @@ public class ListUtilsTest {
 	public void testStringAsList() {
 		
 		String st = "1,2,3,4";
-		List<String> list = ListUtils.stringAsList(st);
+		List<String> list = ListUtil.stringAsList(st);
 		
 		assertNotNull(list);
 		
@@ -43,7 +43,7 @@ public class ListUtilsTest {
 		
 		
 		st = "1,2,3,4,  ";
-		list = ListUtils.stringAsList(st);
+		list = ListUtil.stringAsList(st);
 		
 		assertNotNull(list);
 		
@@ -55,7 +55,7 @@ public class ListUtilsTest {
 		assertEquals("4", list.get(3));
 		assertEquals("", list.get(4));
 		
-		String[] s = ListUtils.stringAsArray(st);
+		String[] s = ListUtil.stringAsArray(st);
 		assertEquals(5, s.length);
 		
 		assertEquals("1", s[0]);

@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sf.okapi.common.ListUtils;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.Util;
 
 import org.eclipse.swt.SWT;
@@ -221,7 +221,7 @@ public class TableAdapter {
 	 */
 	public void addRows(String values, int columnNumber) {
 		
-		List<String> valList = ListUtils.stringAsList(values);
+		List<String> valList = ListUtil.stringAsList(values);
 		
 		for (String st : valList) {	
 
@@ -334,7 +334,7 @@ public class TableAdapter {
 	
 	public void sort(TableColumn sortColumn, boolean treatAsInt) {
 		
-		sort(SWTUtils.getColumnIndex(sortColumn) + 1, true, treatAsInt);
+		sort(SWTUtil.getColumnIndex(sortColumn) + 1, true, treatAsInt);
 	}
 
 	/**
@@ -384,7 +384,7 @@ public class TableAdapter {
 	
 	public void setValue(int rowNum, int colNum, String value) {
 		
-		if (!SWTUtils.checkRowIndex(table, rowNum - 1)) return;
+		if (!SWTUtil.checkRowIndex(table, rowNum - 1)) return;
 		
 		TableItem item = table.getItem(rowNum - 1);
 		if (item == null) return;
@@ -404,7 +404,7 @@ public class TableAdapter {
 
 	public String getValue(int rowNum, int colNum) {
 		
-		if (!SWTUtils.checkRowIndex(table, rowNum - 1)) return "";
+		if (!SWTUtil.checkRowIndex(table, rowNum - 1)) return "";
 		TableItem item = table.getItem(rowNum - 1);
 		if (item == null) return "";
 			

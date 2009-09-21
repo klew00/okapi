@@ -26,8 +26,8 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.ListUtils;
-import net.sf.okapi.common.TextUnitUtils;
+import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
@@ -74,9 +74,9 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 		super.component_init();
 		
 		// Initialization
-		//columnWidths = ListUtils.stringAsIntList(params.columnWidths);
-		columnStartPositions = ListUtils.stringAsIntList(params.columnStartPositions);
-		columnEndPositions = ListUtils.stringAsIntList(params.columnEndPositions);
+		//columnWidths = ListUtil.stringAsIntList(params.columnWidths);
+		columnStartPositions = ListUtil.stringAsIntList(params.columnStartPositions);
+		columnEndPositions = ListUtil.stringAsIntList(params.columnEndPositions);
 	}
 
 	@Override
@@ -134,39 +134,42 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 			String srcPart = line.substring(start, end); // end is excluded
 			String skelPart = line.substring(end, skelEnd);
 			
-			TextUnit cell = TextUnitUtils.buildTU(srcPart, skelPart);
+			TextUnit cell = TextUnitUtil.buildTU(srcPart, skelPart);
+			// TODO check (end - start)
+			cell.setSourceProperty(new Property(COLUMN_WIDTH, String.valueOf(end - start), true));
 			cells.add(cell);
 		}
 		
 		return TextProcessingResult.ACCEPTED;
 	}
 
-	@Override
-	protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
-		// column is 1-based
-		
-		if (tu == null) return false;
-		
-		int index = column - 1; 
-		//if (!Util.checkIndex(index, columnWidths)) return false;
-		if (!Util.checkIndex(index, columnStartPositions)) return false;
-		if (!Util.checkIndex(index, columnEndPositions)) return false;
-		
-		//int colWidth = columnWidths.get(index);
-		int colWidth = columnEndPositions.get(index) - columnStartPositions.get(index); 
-		
-		tu.setSourceProperty(new Property(COLUMN_WIDTH, String.valueOf(colWidth), true));
-		
-		boolean res = super.sendSourceCell(tu, column, numColumns);
-		
-//		if (column < numColumns) {
-//			
-//			String gap = new String();
-//			
-//			sendSkeletonCell(gap, getActiveSkeleton(), column, numColumns);
-//		}
-//				
-		return res;
-	}
+//	@Override
+//	//protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
+//	protected TextProcessingResult sendAsSource(TextUnit textUnit) {
+//		// column is 1-based
+//		
+//		if (tu == null) return false;
+//		
+//		int index = column - 1; 
+//		//if (!Util.checkIndex(index, columnWidths)) return false;
+//		if (!Util.checkIndex(index, columnStartPositions)) return false;
+//		if (!Util.checkIndex(index, columnEndPositions)) return false;
+//		
+//		//int colWidth = columnWidths.get(index);
+//		int colWidth = columnEndPositions.get(index) - columnStartPositions.get(index); 
+//		
+//		tu.setSourceProperty(new Property(COLUMN_WIDTH, String.valueOf(colWidth), true));
+//		
+//		boolean res = super.sendSourceCell(tu, column, numColumns);
+//		
+////		if (column < numColumns) {
+////			
+////			String gap = new String();
+////			
+////			sendSkeletonCell(gap, getActiveSkeleton(), column, numColumns);
+////		}
+////				
+//		return res;
+//	}
 	
 }

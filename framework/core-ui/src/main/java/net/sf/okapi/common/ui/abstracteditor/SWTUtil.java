@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Widget;
  * @version 0.1, 13.06.2009
  */
 
-public class SWTUtils {
+public class SWTUtil {
 
 	public static final String GET_CAPTION = "SWT_GET_CAPTION";
 	private static Listener listener = null;

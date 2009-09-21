@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.abstracteditor.IInputQueryPage;
-import net.sf.okapi.common.ui.abstracteditor.SWTUtils;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Button;
@@ -205,7 +205,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		if (colDef.length != 7) return false; 
 		
 		colNum.setSelection(Util.strToInt(colDef[0], 1));
-		SWTUtils.setRadioGroupSelection(typeGroup, colDef[1]);
+		SWTUtil.setRadioGroupSelection(typeGroup, colDef[1]);
 		srcIndex.setSelection(Util.strToInt(colDef[2], 0));		
 		language.setText(colDef[3]);
 		suffix.setText(colDef[4]);
@@ -226,7 +226,7 @@ public class AddModifyColumnDefPage extends Composite implements IInputQueryPage
 		
 		colDef[0] = Util.intToStr(colNum.getSelection());
 		
-		Button btn = SWTUtils.getRadioGroupSelection(typeGroup);
+		Button btn = SWTUtil.getRadioGroupSelection(typeGroup);
 		if (btn == null) 
 			colDef[1] = "";		
 		else
