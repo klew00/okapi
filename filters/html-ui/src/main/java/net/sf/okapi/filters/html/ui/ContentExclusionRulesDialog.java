@@ -31,23 +31,24 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Combo;
 
-public class EmbeddableTagRulesDialog extends Composite implements IDialogPage {
+public class ContentExclusionRulesDialog extends Composite implements IDialogPage {
 	private ConditionalRuleEditorComposite conditionalRuleEditorComposite;
-	private Text txtEmbeddableTagName;
-	private Text txtEmbeddabletagType;
+	private Text txtTagName;
+	private Combo exclusionTypeCombo;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public EmbeddableTagRulesDialog(Composite parent, int style) {
+	public ContentExclusionRulesDialog(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		{
 			Group grpEmbeddableTag = new Group(this, SWT.NONE);
-			grpEmbeddableTag.setText("Embeddable Tag");
+			grpEmbeddableTag.setText("Exclusion Tag");
 			{
 				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 				gridData.heightHint = 46;
@@ -55,21 +56,23 @@ public class EmbeddableTagRulesDialog extends Composite implements IDialogPage {
 			}
 			{
 				Label lblTagName = new Label(grpEmbeddableTag, SWT.NONE);
-				lblTagName.setBounds(10, 21, 69, 31);
-				lblTagName.setText("Tag Name:");
+				lblTagName.setBounds(10, 21, 38, 31);
+				lblTagName.setText("Name:");
 			}
 			{
-				txtEmbeddableTagName = new Text(grpEmbeddableTag, SWT.BORDER);
-				txtEmbeddableTagName.setBounds(85, 18, 152, 23);
+				txtTagName = new Text(grpEmbeddableTag, SWT.BORDER);
+				txtTagName.setBounds(49, 18, 185, 23);
 			}
 			{
-				Label lblType = new Label(grpEmbeddableTag, SWT.NONE);
-				lblType.setBounds(250, 21, 39, 31);
-				lblType.setText("Type:");
+				Label lblExclusionType = new Label(grpEmbeddableTag, SWT.NONE);
+				lblExclusionType.setBounds(240, 21, 78, 31);
+				lblExclusionType.setText("Exclusion Type:");
 			}
 			{
-				txtEmbeddabletagType = new Text(grpEmbeddableTag, SWT.BORDER);
-				txtEmbeddabletagType.setBounds(295, 18, 150, 23);
+				exclusionTypeCombo = new Combo(grpEmbeddableTag, SWT.BORDER);
+				exclusionTypeCombo.setItems(new String[] {"exclude", "include"});
+				exclusionTypeCombo.setBounds(322, 18, 108, 21);
+				exclusionTypeCombo.select(0);
 			}
 		}
 		{

@@ -32,22 +32,21 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class EmbeddableTagRulesDialog extends Composite implements IDialogPage {
+public class PreserveWhiteSpaceRulesDialog extends Composite implements IDialogPage {
 	private ConditionalRuleEditorComposite conditionalRuleEditorComposite;
-	private Text txtEmbeddableTagName;
-	private Text txtEmbeddabletagType;
+	private Text txtTagName;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public EmbeddableTagRulesDialog(Composite parent, int style) {
+	public PreserveWhiteSpaceRulesDialog(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		{
 			Group grpEmbeddableTag = new Group(this, SWT.NONE);
-			grpEmbeddableTag.setText("Embeddable Tag");
+			grpEmbeddableTag.setText("Preserve Whitespace Tag");
 			{
 				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 				gridData.heightHint = 46;
@@ -55,21 +54,12 @@ public class EmbeddableTagRulesDialog extends Composite implements IDialogPage {
 			}
 			{
 				Label lblTagName = new Label(grpEmbeddableTag, SWT.NONE);
-				lblTagName.setBounds(10, 21, 69, 31);
-				lblTagName.setText("Tag Name:");
+				lblTagName.setBounds(10, 21, 55, 31);
+				lblTagName.setText("Name:");
 			}
 			{
-				txtEmbeddableTagName = new Text(grpEmbeddableTag, SWT.BORDER);
-				txtEmbeddableTagName.setBounds(85, 18, 152, 23);
-			}
-			{
-				Label lblType = new Label(grpEmbeddableTag, SWT.NONE);
-				lblType.setBounds(250, 21, 39, 31);
-				lblType.setText("Type:");
-			}
-			{
-				txtEmbeddabletagType = new Text(grpEmbeddableTag, SWT.BORDER);
-				txtEmbeddabletagType.setBounds(295, 18, 150, 23);
+				txtTagName = new Text(grpEmbeddableTag, SWT.BORDER);
+				txtTagName.setBounds(65, 18, 172, 23);
 			}
 		}
 		{

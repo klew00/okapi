@@ -31,58 +31,62 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Combo;
 
-public class EmbeddableTagRulesDialog extends Composite implements IDialogPage {
-	private ConditionalRuleEditorComposite conditionalRuleEditorComposite;
-	private Text txtEmbeddableTagName;
-	private Text txtEmbeddabletagType;
+public class ProcessingInstructionRulesDialog extends Composite implements IDialogPage {
+	private Text txtPIName;
+	private Combo piProcessingTypeCombo;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public EmbeddableTagRulesDialog(Composite parent, int style) {
+	public ProcessingInstructionRulesDialog(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		{
 			Group grpEmbeddableTag = new Group(this, SWT.NONE);
-			grpEmbeddableTag.setText("Embeddable Tag");
+			grpEmbeddableTag.setText("Processing Instruction");
+			grpEmbeddableTag.setLayout(new GridLayout(5, false));
 			{
 				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
-				gridData.heightHint = 46;
+				gridData.heightHint = 47;
 				grpEmbeddableTag.setLayoutData(gridData);
 			}
 			{
 				Label lblTagName = new Label(grpEmbeddableTag, SWT.NONE);
-				lblTagName.setBounds(10, 21, 69, 31);
-				lblTagName.setText("Tag Name:");
+				{
+					GridData gridData = new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 2);
+					gridData.widthHint = 59;
+					lblTagName.setLayoutData(gridData);
+				}
+				lblTagName.setText("Name:");
 			}
 			{
-				txtEmbeddableTagName = new Text(grpEmbeddableTag, SWT.BORDER);
-				txtEmbeddableTagName.setBounds(85, 18, 152, 23);
+				txtPIName = new Text(grpEmbeddableTag, SWT.BORDER);
+				{
+					GridData gridData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+					gridData.widthHint = 126;
+					txtPIName.setLayoutData(gridData);
+				}
+			}
+			new Label(grpEmbeddableTag, SWT.NONE);
+			{
+				Label lblProcessAs = new Label(grpEmbeddableTag, SWT.NONE);
+				lblProcessAs.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+				lblProcessAs.setText("ProcessingType:");
 			}
 			{
-				Label lblType = new Label(grpEmbeddableTag, SWT.NONE);
-				lblType.setBounds(250, 21, 39, 31);
-				lblType.setText("Type:");
+				piProcessingTypeCombo = new Combo(grpEmbeddableTag, SWT.BORDER);
+				piProcessingTypeCombo.setItems(new String[] {"skeleton", "embedded tag", "remove"});
+				piProcessingTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+				piProcessingTypeCombo.select(0);
 			}
-			{
-				txtEmbeddabletagType = new Text(grpEmbeddableTag, SWT.BORDER);
-				txtEmbeddabletagType.setBounds(295, 18, 150, 23);
-			}
-		}
-		{
-			Group grpConditionalRules = new Group(this, SWT.NONE);
-			grpConditionalRules.setText("Conditional Rules");
-			grpConditionalRules.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-			grpConditionalRules.setLayout(new GridLayout(1, false));
-			
-			conditionalRuleEditorComposite = new ConditionalRuleEditorComposite(grpConditionalRules, SWT.BORDER);
-			conditionalRuleEditorComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-			GridLayout gridLayout = (GridLayout) conditionalRuleEditorComposite.getLayout();
-			gridLayout.makeColumnsEqualWidth = true;
-			conditionalRuleEditorComposite.setData("name", "conditionalRuleEditorComposite");
+			new Label(grpEmbeddableTag, SWT.NONE);
+			new Label(grpEmbeddableTag, SWT.NONE);
+			new Label(grpEmbeddableTag, SWT.NONE);
+			new Label(grpEmbeddableTag, SWT.NONE);
 		}
 		{
 			OKCancelPanel okCancelPanel = new OKCancelPanel(this, SWT.NONE);

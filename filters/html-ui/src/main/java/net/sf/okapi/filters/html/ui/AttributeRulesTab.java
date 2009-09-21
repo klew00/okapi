@@ -35,10 +35,10 @@ import org.eclipse.swt.widgets.Widget;
 public class AttributeRulesTab extends Composite implements IDialogPage {
 	private Group grpAttributesWhichOccur;
 	private Group grpTagsWithAttributes;
-	private Table table;
+	private Table globalAttributeRulesTable;
 	private TableColumn tblclmnAttrinuteName;
 	private TableColumn tblclmnAllTagsExcept;
-	private Table table_1;
+	private Table attributeRulesTable;
 	private TableColumn tblclmnTagName;
 	private TableColumn tblclmnConditionalRules;
 	private TableColumn tblclmnConditionalRules_1;
@@ -63,17 +63,17 @@ public class AttributeRulesTab extends Composite implements IDialogPage {
 		grpAttributesWhichOccur.setText("Global Attribute Rules");
 		grpAttributesWhichOccur.setData("name", "grpAttributesWhichOccur");
 		
-		table = new Table(grpAttributesWhichOccur, SWT.BORDER | SWT.FULL_SELECTION);
-		table.setData("name", "table");
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		globalAttributeRulesTable = new Table(grpAttributesWhichOccur, SWT.BORDER | SWT.FULL_SELECTION);
+		globalAttributeRulesTable.setData("name", "table");
+		globalAttributeRulesTable.setHeaderVisible(true);
+		globalAttributeRulesTable.setLinesVisible(true);
 		
-		tblclmnAttrinuteName = new TableColumn(table, SWT.NONE);
+		tblclmnAttrinuteName = new TableColumn(globalAttributeRulesTable, SWT.NONE);
 		tblclmnAttrinuteName.setData("name", "tblclmnAttrinuteName");
 		tblclmnAttrinuteName.setWidth(182);
 		tblclmnAttrinuteName.setText("Attrinute Name");
 		
-		tblclmnAllTagsExcept = new TableColumn(table, SWT.CENTER);
+		tblclmnAllTagsExcept = new TableColumn(globalAttributeRulesTable, SWT.CENTER);
 		tblclmnAllTagsExcept.setData("name", "tblclmnAllTagsExcept");
 		tblclmnAllTagsExcept.setWidth(392);
 		tblclmnAllTagsExcept.setText("All Tags Except...");
@@ -89,25 +89,25 @@ public class AttributeRulesTab extends Composite implements IDialogPage {
 		grpTagsWithAttributes.setText("Attribute Rules");
 		grpTagsWithAttributes.setData("name", "grpTagsWithAttributes");
 		
-		table_1 = new Table(grpTagsWithAttributes, SWT.BORDER | SWT.FULL_SELECTION);
-		table_1.setData("name", "table_1");
-		table_1.setHeaderVisible(true);
-		table_1.setLinesVisible(true);
+		attributeRulesTable = new Table(grpTagsWithAttributes, SWT.BORDER | SWT.FULL_SELECTION);
+		attributeRulesTable.setData("name", "table_1");
+		attributeRulesTable.setHeaderVisible(true);
+		attributeRulesTable.setLinesVisible(true);
 		
-		tblclmnTagName = new TableColumn(table_1, SWT.CENTER);
+		tblclmnTagName = new TableColumn(attributeRulesTable, SWT.CENTER);
 		tblclmnTagName.setData("name", "tblclmnTagName");
 		tblclmnTagName.setWidth(181);
 		tblclmnTagName.setText("Tag Name");
 		
-		tblclmnConditionalRules = new TableColumn(table_1, SWT.CENTER);
-		tblclmnConditionalRules.setText("Localizable Attributes");
+		tblclmnConditionalRules = new TableColumn(attributeRulesTable, SWT.CENTER);
+		tblclmnConditionalRules.setText("Attributes");
 		tblclmnConditionalRules.setData("name", "tblclmnConditionalRules");
 		tblclmnConditionalRules.setWidth(121);
 		
-		tblclmnConditionalRules_1 = new TableColumn(table_1, SWT.CENTER);
+		tblclmnConditionalRules_1 = new TableColumn(attributeRulesTable, SWT.CENTER);
 		tblclmnConditionalRules_1.setData("name", "tblclmnConditionalRules_1");
 		tblclmnConditionalRules_1.setWidth(287);
-		tblclmnConditionalRules_1.setText("Conditional Rules");
+		tblclmnConditionalRules_1.setText("Conditional Attributes");
 		
 		addDeleteCompositeRules = new AddDeleteComposite(this, SWT.NONE);
 		addDeleteCompositeRules.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, false, 1, 1));

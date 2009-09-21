@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.layout.GridLayout;
@@ -65,18 +64,22 @@ public class ConditionalRuleEditorComposite extends Composite {
 		ruleComposite.setData("name", "composite");
 		
 		attributeNameCombo = new Text(ruleComposite, SWT.BORDER);
+		attributeNameCombo.setToolTipText("Attribute Name");
 		attributeNameCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		attributeNameCombo.setData("name", "combo_1");
 		new Label(ruleComposite, SWT.NONE);
 		
 		operatorCombo = new Combo(ruleComposite, SWT.READ_ONLY);
+		operatorCombo.setToolTipText("Compare Operator");
 		operatorCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		operatorCombo.setVisibleItemCount(3);
-		operatorCombo.setItems(new String[] {"equal", "not equal", "matches"});
+		operatorCombo.setItems(new String[] {"equals", "not equal", "matches"});
 		operatorCombo.setData("name", "combo_2");
+		operatorCombo.select(0);
 		new Label(ruleComposite, SWT.NONE);
 		
 		attributeValueCombo = new Text(ruleComposite, SWT.BORDER);
+		attributeValueCombo.setToolTipText("Attribute Value");
 		attributeValueCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		attributeValueCombo.setData("name", "combo_3");
 		

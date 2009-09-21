@@ -34,7 +34,7 @@ import org.eclipse.swt.layout.FillLayout;
 
 public class EmbeddableTagRulesTab extends Composite implements IDialogPage {
 	private Group grpEmbeddableTags;
-	private Table table;
+	private Table embeddableTagTable;
 	private TableColumn embeddableTagColumn;
 	private TableColumn conditionalRulesColumn;
 	private AddDeleteComposite addDeleteComposite;
@@ -54,23 +54,23 @@ public class EmbeddableTagRulesTab extends Composite implements IDialogPage {
 		grpEmbeddableTags.setText("Embeddable Tags");
 		grpEmbeddableTags.setData("name", "grpEmbeddableTags");
 		
-		table = new Table(grpEmbeddableTags, SWT.BORDER | SWT.FULL_SELECTION);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		table.setData("name", "table");
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		embeddableTagTable = new Table(grpEmbeddableTags, SWT.BORDER | SWT.FULL_SELECTION);
+		embeddableTagTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		embeddableTagTable.setData("name", "table");
+		embeddableTagTable.setHeaderVisible(true);
+		embeddableTagTable.setLinesVisible(true);
 		
-		embeddableTagColumn = new TableColumn(table, SWT.CENTER);
+		embeddableTagColumn = new TableColumn(embeddableTagTable, SWT.CENTER);
 		embeddableTagColumn.setData("name", "embeddableTagColumn");
 		embeddableTagColumn.setWidth(146);
 		embeddableTagColumn.setText("EmbedableTag");
 		
-		conditionalRulesColumn = new TableColumn(table, SWT.CENTER);
+		conditionalRulesColumn = new TableColumn(embeddableTagTable, SWT.CENTER);
 		conditionalRulesColumn.setData("name", "conditionalRulesColumn");
 		conditionalRulesColumn.setWidth(278);
 		conditionalRulesColumn.setText("Conditional Rules");
 		
-		tblclmnGenericType = new TableColumn(table, SWT.CENTER);
+		tblclmnGenericType = new TableColumn(embeddableTagTable, SWT.CENTER);
 		tblclmnGenericType.setWidth(114);
 		tblclmnGenericType.setText("Generic Type");
 		

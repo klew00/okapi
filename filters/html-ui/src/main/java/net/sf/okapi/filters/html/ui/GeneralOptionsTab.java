@@ -30,6 +30,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Text;
 
 public class GeneralOptionsTab extends Composite implements IDialogPage {
 	private Group grpSubFilterOptions;
@@ -37,6 +38,11 @@ public class GeneralOptionsTab extends Composite implements IDialogPage {
 	private Combo cdataSubFilterCombo;
 	private Label lblElementSubFilter;
 	private Label lblCdataSubFilter;
+	private Group grpGuidTagattribute;
+	private Label lblTagName;
+	private Text txtTagName;
+	private Label lblAttributeName;
+	private Text txtAttributeName;
 
 	/**
 	 * Create the composite.
@@ -45,32 +51,78 @@ public class GeneralOptionsTab extends Composite implements IDialogPage {
 	 */
 	public GeneralOptionsTab(Composite parent, int style) {
 		super(parent, style);
-		setLayout(new GridLayout(1, false));
+		setLayout(new GridLayout(1, true));
 		
 		grpSubFilterOptions = new Group(this, SWT.NONE);
-		grpSubFilterOptions.setLayout(new GridLayout(1, false));
-		GridData gridData_1 = new GridData(SWT.FILL, SWT.TOP, true, true, 1, 1);
-		gridData_1.heightHint = 127;
-		gridData_1.widthHint = 393;
-		grpSubFilterOptions.setLayoutData(gridData_1);
+		{
+			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+			gridData.heightHint = 18;
+			grpSubFilterOptions.setLayoutData(gridData);
+		}
+		grpSubFilterOptions.setLayout(new GridLayout(2, false));
 		grpSubFilterOptions.setText("Sub Filter Options");
 		grpSubFilterOptions.setData("name", "grpSubFilterOptions");
 		
 		lblElementSubFilter = new Label(grpSubFilterOptions, SWT.NONE);
+		{
+			GridData gridData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+			gridData.widthHint = 135;
+			lblElementSubFilter.setLayoutData(gridData);
+		}
 		lblElementSubFilter.setData("name", "lblElementSubFilter");
-		lblElementSubFilter.setText("Element Sub Filter");
+		lblElementSubFilter.setText("Element Sub Filter:");
 		
 		elementSubFilterCombo = new Combo(grpSubFilterOptions, SWT.READ_ONLY);
-		elementSubFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		elementSubFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 		elementSubFilterCombo.setData("name", "elementSubFilterCombo");
 		
 		lblCdataSubFilter = new Label(grpSubFilterOptions, SWT.NONE);
+		{
+			GridData gridData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+			gridData.widthHint = 132;
+			lblCdataSubFilter.setLayoutData(gridData);
+		}
 		lblCdataSubFilter.setData("name", "lblCdataSubFilter");
-		lblCdataSubFilter.setText("CDATA Sub Filter");
+		lblCdataSubFilter.setText("CDATA Sub Filter:");
 		
 		cdataSubFilterCombo = new Combo(grpSubFilterOptions, SWT.READ_ONLY);
 		cdataSubFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		cdataSubFilterCombo.setData("name", "combo_1");
+		
+		grpGuidTagattribute = new Group(this, SWT.NONE);
+		grpGuidTagattribute.setText("GUID Tag/Attribute");
+		grpGuidTagattribute.setLayout(new GridLayout(2, false));
+		{
+			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+			gridData.heightHint = 32;
+			grpGuidTagattribute.setLayoutData(gridData);
+		}
+		
+		lblTagName = new Label(grpGuidTagattribute, SWT.NONE);
+		{
+			GridData gridData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+			gridData.widthHint = 132;
+			lblTagName.setLayoutData(gridData);
+		}
+		lblTagName.setText("Tag Name:");
+		lblTagName.setBounds(0, 0, 135, 13);
+		
+		txtTagName = new Text(grpGuidTagattribute, SWT.BORDER);
+		txtTagName.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		txtTagName.setBounds(0, 0, 284, 21);
+		
+		lblAttributeName = new Label(grpGuidTagattribute, SWT.NONE);
+		{
+			GridData gridData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+			gridData.widthHint = 133;
+			lblAttributeName.setLayoutData(gridData);
+		}
+		lblAttributeName.setText("Attribute Name:");
+		lblAttributeName.setBounds(0, 0, 132, 13);
+		
+		txtAttributeName = new Text(grpGuidTagattribute, SWT.BORDER);
+		txtAttributeName.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		txtAttributeName.setBounds(0, 0, 284, 21);
 	}
 
 	@Override
