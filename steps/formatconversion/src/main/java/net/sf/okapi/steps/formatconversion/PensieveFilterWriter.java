@@ -107,7 +107,9 @@ public class PensieveFilterWriter implements IFilterWriter {
 	 * @param path full path of the output directory.
 	 */
 	public void setOutput (String path) {
-		directory = path; // We assume it is a directory
+		File f = new File(path);
+		// We need to make sure this is absolute
+		directory = f.getAbsolutePath(); // We assume it is a directory
 	}
 
 	/**

@@ -16,5 +16,6 @@
         <module>rainbow</module>
         <module>ratel</module>
         <module>serval</module> <!-- For TM debug -->
+        <module>applications-integration-tests</module>
     </modules>
 </project>
