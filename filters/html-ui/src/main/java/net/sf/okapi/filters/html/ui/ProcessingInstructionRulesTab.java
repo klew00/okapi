@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 public class ProcessingInstructionRulesTab extends Composite {
 	private Group grpProcessingInstructionRules;
-	private Table table;
+	private Table processingInstructionRulesTable;
 	private TableColumn tblclmnProcessingInstruction;
 	private TableColumn tblclmnAction;
 	private AddDeleteComposite addDeleteComposite;
@@ -51,17 +51,17 @@ public class ProcessingInstructionRulesTab extends Composite {
 		grpProcessingInstructionRules.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		grpProcessingInstructionRules.setData("name", "grpProcessingInstructionRules");
 		
-		table = new Table(grpProcessingInstructionRules, SWT.BORDER | SWT.FULL_SELECTION);
-		table.setData("name", "table");
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		processingInstructionRulesTable = new Table(grpProcessingInstructionRules, SWT.BORDER | SWT.FULL_SELECTION);
+		processingInstructionRulesTable.setData("name", "table");
+		processingInstructionRulesTable.setHeaderVisible(true);
+		processingInstructionRulesTable.setLinesVisible(true);
 		
-		tblclmnProcessingInstruction = new TableColumn(table, SWT.CENTER);
+		tblclmnProcessingInstruction = new TableColumn(processingInstructionRulesTable, SWT.CENTER);
 		tblclmnProcessingInstruction.setData("name", "tblclmnProcessingInstruction");
 		tblclmnProcessingInstruction.setWidth(133);
 		tblclmnProcessingInstruction.setText("Processing Instruction");
 		
-		tblclmnAction = new TableColumn(table, SWT.CENTER);
+		tblclmnAction = new TableColumn(processingInstructionRulesTable, SWT.CENTER);
 		tblclmnAction.setData("name", "tblclmnAction");
 		tblclmnAction.setWidth(296);
 		tblclmnAction.setText("Action");

@@ -42,8 +42,8 @@ public class AttributeRulesTab extends Composite implements IDialogPage {
 	private TableColumn tblclmnTagName;
 	private TableColumn tblclmnConditionalRules;
 	private TableColumn tblclmnConditionalRules_1;
-	private AddDeleteComposite addDeleteComposite;
-	private AddDeleteComposite addDeleteComposite_1;
+	private AddDeleteComposite addDeleteCompositeRules;
+	private AddDeleteComposite addDeleteCompositeGlobal;
 
 	/**
 	 * Create the composite.
@@ -70,16 +70,16 @@ public class AttributeRulesTab extends Composite implements IDialogPage {
 		
 		tblclmnAttrinuteName = new TableColumn(table, SWT.NONE);
 		tblclmnAttrinuteName.setData("name", "tblclmnAttrinuteName");
-		tblclmnAttrinuteName.setWidth(179);
+		tblclmnAttrinuteName.setWidth(182);
 		tblclmnAttrinuteName.setText("Attrinute Name");
 		
 		tblclmnAllTagsExcept = new TableColumn(table, SWT.CENTER);
 		tblclmnAllTagsExcept.setData("name", "tblclmnAllTagsExcept");
-		tblclmnAllTagsExcept.setWidth(409);
+		tblclmnAllTagsExcept.setWidth(392);
 		tblclmnAllTagsExcept.setText("All Tags Except...");
 		
-		addDeleteComposite_1 = new AddDeleteComposite(this, SWT.NONE);
-		addDeleteComposite_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		addDeleteCompositeGlobal = new AddDeleteComposite(this, SWT.NONE);
+		addDeleteCompositeGlobal.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		
 		grpTagsWithAttributes = new Group(this, SWT.NONE);
 		grpTagsWithAttributes.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -109,8 +109,8 @@ public class AttributeRulesTab extends Composite implements IDialogPage {
 		tblclmnConditionalRules_1.setWidth(287);
 		tblclmnConditionalRules_1.setText("Conditional Rules");
 		
-		addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
-		addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, false, 1, 1));
+		addDeleteCompositeRules = new AddDeleteComposite(this, SWT.NONE);
+		addDeleteCompositeRules.setLayoutData(new GridData(SWT.RIGHT, SWT.BOTTOM, false, false, 1, 1));
 
 	}
 

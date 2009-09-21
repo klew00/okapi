@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Widget;
 
 public class ContentExclusionRulesTab extends Composite implements IDialogPage {
 	private Group grpTagExclusionRules;
-	private Table table;
+	private Table tagExclusionRulesTable;
 	private TableColumn tblclmnTagName;
 	private TableColumn tblclmnRuleType;
 	private TableColumn tblclmnConditionalRules;
@@ -55,22 +55,22 @@ public class ContentExclusionRulesTab extends Composite implements IDialogPage {
 		grpTagExclusionRules.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		grpTagExclusionRules.setData("name", "grpTagExclusionRules");
 		
-		table = new Table(grpTagExclusionRules, SWT.BORDER | SWT.FULL_SELECTION);
-		table.setData("name", "table");
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		tagExclusionRulesTable = new Table(grpTagExclusionRules, SWT.BORDER | SWT.FULL_SELECTION);
+		tagExclusionRulesTable.setData("name", "table");
+		tagExclusionRulesTable.setHeaderVisible(true);
+		tagExclusionRulesTable.setLinesVisible(true);
 		
-		tblclmnTagName = new TableColumn(table, SWT.CENTER);
+		tblclmnTagName = new TableColumn(tagExclusionRulesTable, SWT.CENTER);
 		tblclmnTagName.setData("name", "tblclmnTagName");
 		tblclmnTagName.setWidth(100);
 		tblclmnTagName.setText("Tag Name");
 		
-		tblclmnRuleType = new TableColumn(table, SWT.CENTER);
+		tblclmnRuleType = new TableColumn(tagExclusionRulesTable, SWT.CENTER);
 		tblclmnRuleType.setData("name", "tblclmnRuleType");
 		tblclmnRuleType.setWidth(71);
 		tblclmnRuleType.setText("Rule Type");
 		
-		tblclmnConditionalRules = new TableColumn(table, SWT.CENTER);
+		tblclmnConditionalRules = new TableColumn(tagExclusionRulesTable, SWT.CENTER);
 		tblclmnConditionalRules.setData("name", "tblclmnConditionalRules");
 		tblclmnConditionalRules.setWidth(259);
 		tblclmnConditionalRules.setText("Conditional Rules");

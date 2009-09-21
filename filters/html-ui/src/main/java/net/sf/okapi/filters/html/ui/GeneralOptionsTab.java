@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Combo;
 public class GeneralOptionsTab extends Composite implements IDialogPage {
 	private Group grpSubFilterOptions;
 	private Combo elementSubFilterCombo;
-	private Combo combo_1;
+	private Combo cdataSubFilterCombo;
 	private Label lblElementSubFilter;
 	private Label lblCdataSubFilter;
 
@@ -68,9 +68,9 @@ public class GeneralOptionsTab extends Composite implements IDialogPage {
 		lblCdataSubFilter.setData("name", "lblCdataSubFilter");
 		lblCdataSubFilter.setText("CDATA Sub Filter");
 		
-		combo_1 = new Combo(grpSubFilterOptions, SWT.READ_ONLY);
-		combo_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		combo_1.setData("name", "combo_1");
+		cdataSubFilterCombo = new Combo(grpSubFilterOptions, SWT.READ_ONLY);
+		cdataSubFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		cdataSubFilterCombo.setData("name", "combo_1");
 	}
 
 	@Override

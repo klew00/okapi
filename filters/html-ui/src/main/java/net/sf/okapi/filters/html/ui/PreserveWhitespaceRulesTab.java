@@ -37,11 +37,11 @@ import org.eclipse.swt.events.SelectionEvent;
 
 public class PreserveWhitespaceRulesTab extends Composite implements IDialogPage {
 	private Group grpTagsWhoseContent;
-	private Table table;
+	private Table exceptionRulesTable;
 	private TableColumn tblclmnTagName;
 	private TableColumn tblclmnConditionalRules;
 	private Group groupWhitespaceHandling;
-	private Button button;
+	private Button btnCollpaseWhiteSpace;
 	private Button btnAlwaysPreserveWhitespace;
 	private Group grpPreserveWhitespaceRules;
 	private AddDeleteComposite addDeleteComposite;
@@ -68,9 +68,9 @@ public class PreserveWhitespaceRulesTab extends Composite implements IDialogPage
 		groupWhitespaceHandling.setData("name", "groupWhitespaceHandling");
 		groupWhitespaceHandling.setLayout(new GridLayout(1, false));
 		
-		button = new Button(groupWhitespaceHandling, SWT.RADIO);
-		button.setText("Collapse to Single Whitespace");
-		button.setData("name", "button");
+		btnCollpaseWhiteSpace = new Button(groupWhitespaceHandling, SWT.RADIO);
+		btnCollpaseWhiteSpace.setText("Collapse to Single Whitespace");
+		btnCollpaseWhiteSpace.setData("name", "button");
 		
 		btnAlwaysPreserveWhitespace = new Button(groupWhitespaceHandling, SWT.RADIO);
 		btnAlwaysPreserveWhitespace.addSelectionListener(new SelectionAdapter() {
@@ -87,17 +87,17 @@ public class PreserveWhitespaceRulesTab extends Composite implements IDialogPage
 		grpPreserveWhitespaceRules.setData("name", "grpPreserveWhitespaceRules");
 		grpPreserveWhitespaceRules.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
-		table = new Table(grpPreserveWhitespaceRules, SWT.BORDER | SWT.FULL_SELECTION);
-		table.setData("name", "table");
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		exceptionRulesTable = new Table(grpPreserveWhitespaceRules, SWT.BORDER | SWT.FULL_SELECTION);
+		exceptionRulesTable.setData("name", "table");
+		exceptionRulesTable.setHeaderVisible(true);
+		exceptionRulesTable.setLinesVisible(true);
 		
-		tblclmnTagName = new TableColumn(table, SWT.NONE);
+		tblclmnTagName = new TableColumn(exceptionRulesTable, SWT.NONE);
 		tblclmnTagName.setData("name", "tblclmnTagName");
 		tblclmnTagName.setWidth(144);
 		tblclmnTagName.setText("Tag Name");
 		
-		tblclmnConditionalRules = new TableColumn(table, SWT.NONE);
+		tblclmnConditionalRules = new TableColumn(exceptionRulesTable, SWT.NONE);
 		tblclmnConditionalRules.setData("name", "tblclmnConditionalRules");
 		tblclmnConditionalRules.setWidth(285);
 		tblclmnConditionalRules.setText("Conditional Rules");

@@ -31,12 +31,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 
 public class ConditionalRuleEditorComposite extends Composite {
-	private Group group;
-	private Composite composite;
-	private Text comboAttributeName;
-	private Combo comboOperator;
-	private Text comboAttributeValue;
-	private List list;
+	private Composite conditionalRuleComposite;
+	private Composite ruleComposite;
+	private Text attributeNameCombo;
+	private Combo operatorCombo;
+	private Text attributeValueCombo;
+	private List ruleList;
 
 	/**
 	 * Create the composite.
@@ -47,36 +47,46 @@ public class ConditionalRuleEditorComposite extends Composite {
 		super(parent, style);
 		setLayout(new GridLayout(1, true));
 		
-		group = new Group(this, SWT.NONE);
-		group.setLayout(new GridLayout(1, false));
-		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		group.setText("Conditional Rule");
-		group.setData("name", "group");
+		conditionalRuleComposite = new Composite(this, SWT.NONE);
+		GridLayout gridLayout = new GridLayout(1, false);
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		gridLayout.verticalSpacing = 0;
+		conditionalRuleComposite.setLayout(gridLayout);
+		conditionalRuleComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 0, 0));
+		conditionalRuleComposite.setData("name", "group");
 		
-		composite = new Composite(group, SWT.BORDER);
-		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		composite.setLayout(new GridLayout(7, false));
-		composite.setData("name", "composite");
+		ruleComposite = new Composite(conditionalRuleComposite, SWT.BORDER);
+		ruleComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 0));
+		GridLayout gridLayout_1 = new GridLayout(7, false);
+		gridLayout_1.marginWidth = 0;
+		gridLayout_1.marginHeight = 0;
+		ruleComposite.setLayout(gridLayout_1);
+		ruleComposite.setData("name", "composite");
 		
-		comboAttributeName = new Text(composite, SWT.BORDER);
-		comboAttributeName.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		comboAttributeName.setData("name", "combo_1");
-		new Label(composite, SWT.NONE);
+		attributeNameCombo = new Text(ruleComposite, SWT.BORDER);
+		attributeNameCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		attributeNameCombo.setData("name", "combo_1");
+		new Label(ruleComposite, SWT.NONE);
 		
-		comboOperator = new Combo(composite, SWT.NONE);
-		comboOperator.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		comboOperator.setVisibleItemCount(3);
-		comboOperator.setItems(new String[] {"equal", "not equal", "regex"});
-		comboOperator.setData("name", "combo_2");
-		new Label(composite, SWT.NONE);
+		operatorCombo = new Combo(ruleComposite, SWT.READ_ONLY);
+		operatorCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		operatorCombo.setVisibleItemCount(3);
+		operatorCombo.setItems(new String[] {"equal", "not equal", "matches"});
+		operatorCombo.setData("name", "combo_2");
+		new Label(ruleComposite, SWT.NONE);
 		
-		comboAttributeValue = new Text(composite, SWT.BORDER);
-		comboAttributeValue.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		comboAttributeValue.setData("name", "combo_3");
+		attributeValueCombo = new Text(ruleComposite, SWT.BORDER);
+		attributeValueCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		attributeValueCombo.setData("name", "combo_3");
 		
-		list = new List(group, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
-		list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		list.setData("name", "list");
+		ruleList = new List(conditionalRuleComposite, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
+		{
+			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 10);
+			gridData.verticalIndent = 10;
+			ruleList.setLayoutData(gridData);
+		}
+		ruleList.setData("name", "list");
 		{
 			AddDeleteComposite addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
 			addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));

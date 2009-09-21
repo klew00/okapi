@@ -31,23 +31,25 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.List;
 
-public class EmbeddableTagRulesDialog extends Composite implements IDialogPage {
+public class AttributeTagRulesDialog extends Composite implements IDialogPage {
 	private ConditionalRuleEditorComposite conditionalRuleEditorComposite;
 	private Text text;
-	private Text text_1;
+	private Text txtAttributeName;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public EmbeddableTagRulesDialog(Composite parent, int style) {
+	public AttributeTagRulesDialog(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		{
 			Group grpEmbeddableTag = new Group(this, SWT.NONE);
-			grpEmbeddableTag.setText("Embeddable Tag");
+			grpEmbeddableTag.setText("Tag");
 			{
 				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
 				gridData.heightHint = 46;
@@ -55,31 +57,66 @@ public class EmbeddableTagRulesDialog extends Composite implements IDialogPage {
 			}
 			{
 				Label lblTagName = new Label(grpEmbeddableTag, SWT.NONE);
-				lblTagName.setBounds(10, 21, 69, 31);
+				lblTagName.setBounds(10, 18, 61, 31);
 				lblTagName.setText("Tag Name:");
 			}
 			{
 				text = new Text(grpEmbeddableTag, SWT.BORDER);
-				text.setBounds(85, 18, 152, 23);
-			}
-			{
-				Label lblType = new Label(grpEmbeddableTag, SWT.NONE);
-				lblType.setBounds(250, 21, 39, 31);
-				lblType.setText("Type:");
-			}
-			{
-				text_1 = new Text(grpEmbeddableTag, SWT.BORDER);
-				text_1.setBounds(295, 18, 150, 23);
+				text.setBounds(77, 15, 152, 23);
 			}
 		}
 		{
-			Group grpConditionalRules = new Group(this, SWT.NONE);
-			grpConditionalRules.setText("Conditional Rules");
-			grpConditionalRules.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-			grpConditionalRules.setLayout(new GridLayout(1, false));
+			Group grpAttribute = new Group(this, SWT.NONE);
+			grpAttribute.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 0, 0));
+			grpAttribute.setText("Localizable Attributes");
+			GridLayout gridLayout_1 = new GridLayout(1, true);
+			gridLayout_1.verticalSpacing = 0;
+			gridLayout_1.marginHeight = 0;
+			grpAttribute.setLayout(gridLayout_1);
+			{
+				Composite localizibleAttributesComposite = new Composite(grpAttribute, SWT.NONE);
+				GridLayout gridLayout = new GridLayout(2, false);
+				gridLayout.verticalSpacing = 0;
+				gridLayout.marginWidth = 0;
+				gridLayout.marginHeight = 0;
+				localizibleAttributesComposite.setLayout(gridLayout);
+				localizibleAttributesComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 0));
+				{
+					txtAttributeName = new Text(localizibleAttributesComposite, SWT.BORDER);
+					txtAttributeName.setToolTipText("Attribute Name");
+					txtAttributeName.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+				}
+				{
+					Combo attributeTypeCombo = new Combo(localizibleAttributesComposite, SWT.NONE);
+					attributeTypeCombo.setToolTipText("Attribute Type");
+					attributeTypeCombo.setItems(new String[] {"translatable", "localizaible", "read-only"});
+					attributeTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 0));
+				}
+			}
+			{
+				List attributeList = new List(grpAttribute, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
+				{
+					GridData gridData = new GridData(SWT.FILL, SWT.BOTTOM, true, true, 1, 10);
+					gridData.heightHint = 76;
+					gridData.verticalIndent = 10;
+					attributeList.setLayoutData(gridData);
+				}
+			}
+			new Label(grpAttribute, SWT.NONE);
+			new Label(grpAttribute, SWT.NONE);
+			{
+				AddDeleteComposite addDeleteComposite = new AddDeleteComposite(grpAttribute, SWT.NONE);
+				addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+			}
+		}
+		{
+			Group grpAttributerules = new Group(this, SWT.NONE);
+			grpAttributerules.setText("Conditional Attributes");
+			grpAttributerules.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+			grpAttributerules.setLayout(new GridLayout(1, false));
 			
-			conditionalRuleEditorComposite = new ConditionalRuleEditorComposite(grpConditionalRules, SWT.BORDER);
-			conditionalRuleEditorComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			conditionalRuleEditorComposite = new ConditionalRuleEditorComposite(grpAttributerules, SWT.NONE);
+			conditionalRuleEditorComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 0, 0));
 			GridLayout gridLayout = (GridLayout) conditionalRuleEditorComposite.getLayout();
 			gridLayout.makeColumnsEqualWidth = true;
 			conditionalRuleEditorComposite.setData("name", "conditionalRuleEditorComposite");

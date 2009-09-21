@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 public class GroupingRulesTab extends Composite implements IDialogPage {
 	private Group grpGroupingRules;
-	private Table table;
+	private Table groupingRulesTable;
 	private TableColumn tblclmnTagName;
 	private TableColumn tblclmnGroupType;
 	private TableColumn tblclmnConditionalRules;
@@ -56,22 +56,22 @@ public class GroupingRulesTab extends Composite implements IDialogPage {
 		grpGroupingRules.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		grpGroupingRules.setData("name", "grpGroupingRules");
 		
-		table = new Table(grpGroupingRules, SWT.BORDER | SWT.FULL_SELECTION);
-		table.setData("name", "table");
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		groupingRulesTable = new Table(grpGroupingRules, SWT.BORDER | SWT.FULL_SELECTION);
+		groupingRulesTable.setData("name", "table");
+		groupingRulesTable.setHeaderVisible(true);
+		groupingRulesTable.setLinesVisible(true);
 		
-		tblclmnTagName = new TableColumn(table, SWT.NONE);
+		tblclmnTagName = new TableColumn(groupingRulesTable, SWT.NONE);
 		tblclmnTagName.setData("name", "tblclmnTagName");
 		tblclmnTagName.setWidth(81);
 		tblclmnTagName.setText("Tag Name");
 		
-		tblclmnGroupType = new TableColumn(table, SWT.NONE);
+		tblclmnGroupType = new TableColumn(groupingRulesTable, SWT.NONE);
 		tblclmnGroupType.setData("name", "tblclmnGroupType");
 		tblclmnGroupType.setWidth(72);
 		tblclmnGroupType.setText("Group Type");
 		
-		tblclmnConditionalRules = new TableColumn(table, SWT.NONE);
+		tblclmnConditionalRules = new TableColumn(groupingRulesTable, SWT.NONE);
 		tblclmnConditionalRules.setData("name", "tblclmnConditionalRules");
 		tblclmnConditionalRules.setWidth(277);
 		tblclmnConditionalRules.setText("Conditional Rules");
