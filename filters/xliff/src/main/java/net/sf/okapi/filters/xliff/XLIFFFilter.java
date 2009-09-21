@@ -814,8 +814,9 @@ public class XLIFFFilter implements IFilter {
 						return content;
 					}
 					if ( name.equals("mrk") ) { // Check of end of segment
-						if ( idStack.pop() == segIdStack ) {
+						if ( idStack.peek() == segIdStack ) {
 							current = content; // Point back to content
+							idStack.pop(); // Pop only after test is true
 							segIdStack = -1; // Reset to not trigger segment ending again
 							// Add the segment to the content
 							content.appendSegment(segment); //TODO: mid should be the segid
