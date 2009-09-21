@@ -32,6 +32,9 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IParameters;
@@ -51,6 +54,7 @@ import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.formatconversion.FormatConversionStep;
 import net.sf.okapi.steps.formatconversion.Parameters;
+import net.sf.okapi.steps.formatconversion.TableFilterWriterParameters;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
@@ -66,7 +70,7 @@ public class Main {
 	protected final static int CMD_CONV2PO = 4;
 	protected final static int CMD_CONV2TMX = 5;
 	protected final static int CMD_CONV2TABLE = 6;
-	protected final static int CMD_CONV2PEN = 67;
+	protected final static int CMD_CONV2PEN = 7;
 
 	private static PrintStream ps;
 	
@@ -90,6 +94,8 @@ public class Main {
 	protected String mmParams;
 	protected String penDir;
 	protected boolean genericOutput = false;
+	protected String tableConvOptions;
+	protected int convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_TARGETOREMPTY;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -116,6 +122,20 @@ public class Main {
 		try {
 			Main prog = new Main();
 
+			// Create an encoding-aware output for the console
+			// System.out uses the default system encoding that
+			// may not be the right one (e.g. windows-1252 vs cp850)
+			ps = new PrintStream(System.out, true, getConsoleEncodingName());
+			// Disable root console handler
+			Handler[] handlers = Logger.getLogger("").getHandlers();
+			for ( Handler handler : handlers ) {
+				Logger.getLogger("").removeHandler(handler);
+			}
+			// Create our own handler
+			LogHandler logHandler = new LogHandler(ps);
+			logHandler.setLevel(Level.INFO);
+			Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
+			
 			// Remove all empty arguments
 			// This is to work around the "$1" issue in bash
 			ArrayList<String> args = new ArrayList<String>();
@@ -123,12 +143,6 @@ public class Main {
 				if ( tmp.length() > 0 ) args.add(tmp);
 			}
 			
-			// Create an encoding-aware output for the console
-			// System.out uses the default system encoding that
-			// may not be the right one (e.g. windows-1252 vs cp850)
-			// TODO: get the proper encoding
-			ps = new PrintStream(System.out, true, getConsoleEncodingName());
-
 			prog.printBanner();
 			if ( args.size() == 0 ) {
 				prog.printUsage();
@@ -174,6 +188,15 @@ public class Main {
 				}
 				else if ( arg.equals("-2tbl") ) {
 					prog.command = CMD_CONV2TABLE;
+				}
+				else if ( arg.equals("-opt") ) {
+					prog.tableConvOptions = getArgument(args, ++i);
+				}
+				else if ( arg.equals("-target=source") ) {
+					prog.convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_FORCESOURCE;
+				}
+				else if ( arg.equals("-target=empty") ) {
+					prog.convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_FORCEEMPTY;
 				}
 				else if ( arg.equals("-imp") ) {
 					prog.command = CMD_CONV2PEN;
@@ -655,16 +678,17 @@ public class Main {
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory]");
 		ps.println("Conversion to PO file:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic] [-target=(source|empty)]");
 		ps.println("Conversion to TMX file:");
 		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-target=(source|empty)]");
 		ps.println("Conversion to table:");
 		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-target=(source|empty)]");
+		ps.println("      [-opt [csv|tab][,xliff|xliffgx|tmx|generic]");
 		ps.println("Import to Pensive TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-target=(source|empty)]");
 	}
 
 	private void displayQuery (IQuery conn) {
@@ -771,7 +795,11 @@ public class Main {
 		}
 		else if ( command == CMD_CONV2TABLE ) {
 			params.setOutputFormat(Parameters.FORMAT_TABLE);
-			params.setOutputPath("output.csv");
+			TableFilterWriterParameters opt = new TableFilterWriterParameters();
+			opt.fromStringArgument(tableConvOptions);
+			params.setFormatOptions(opt.toString());
+			params.setOutputPath("output.txt");
+			
 		}
 		else if ( command == CMD_CONV2PEN ) {
 			params.setOutputFormat(Parameters.FORMAT_PENSIEVE);
@@ -780,6 +808,7 @@ public class Main {
 		
 		params.setSingleOutput(command==CMD_CONV2PEN);
 		params.setUseGenericCodes(genericOutput);
+		params.setTargetStyle(convTargetStyle);
 		driver.addStep(fcStep);
 		
 		driver.addBatchItem(rd, outputURI, outputEncoding);

@@ -21,7 +21,10 @@ localization-related utilities:</p>
 	<li><a href="#query">Query Translation Resources</a></li>
 	<li><a href="#listConfig">List Filter Configurations</a></li>
 	<li><a href="#editConfig">Edit Filter Configurations</a></li>
-	<li><a href="#conv2po">Conversion to PO Format</a></li>
+	<li><a href="#conv2po">Convert to PO Format</a></li>
+	<li><a href="#conv2tmx">Convert to TMX Format</a></li>
+	<li><a href="#conv2table">Convert to Table Format</a></li>
+	<li><a href="#penImport">Import into Pensieve TM</a></li>
 </ul>
 <p>Note: The command <code>-e</code> (Edit Filter Configurations) requires 
 access to UI editors that are available only if you have one of the <b>okapi-apps</b> platform-specific distributions. It is not 
@@ -99,27 +102,27 @@ and the merged file will be <code>myFile.out.html</code>.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table2">
 	<tr>
-		<td><code>-fc configId</code></td>
-		<td>The identifier of the filter configuration to use for the 
+		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top">The identifier of the filter configuration to use for the 
 		extraction.</td>
 	</tr>
 	<tr>
-		<td><code>-ie encoding</code></td>
-		<td>The encoding name of the original files. This is used only if the 
+		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top">The encoding name of the original files. This is used only if the 
 		filter cannot detect the encoding from the input file itself.</td>
 	</tr>
 	<tr>
-		<td><code>-oe encoding</code></td>
-		<td>The encoding name of the file to generate. The same encoding as the 
+		<td align="left" valign="top"><code>-oe encoding</code></td>
+		<td align="left" valign="top">The encoding name of the file to generate. The same encoding as the 
 		input file will be used if this option is not specified.</td>
 	</tr>
 	<tr>
-		<td><code>-sl srcLang</code></td>
-		<td>The code of the source language.</td>
+		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top">The code of the source language.</td>
 	</tr>
 	<tr>
-		<td><code>-tl trgLang</code></td>
-		<td>The code of the target language.</td>
+		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 </table>
 <p>For example:</p>
@@ -211,7 +214,7 @@ user configuration for the RegEx Filter. </p>
 <p>Opens the Filter Configurations dialog box, where all the available 
 configurations are listed and can be viewed or edited, and from where you can 
 create new configurations.</p>
-<h2><a name="conv2po"></a>Conversion to PO Format</h2>
+<h2><a name="conv2po"></a>Convert to PO Format</h2>
 <p>Creates a PO file for the give input file. If the input file is multilingual 
 (like a TMX or a TS file), the source and target will be in the PO file.</p>
 <p>The syntax of this command is:</p>
@@ -219,33 +222,175 @@ create new configurations.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table3">
 	<tr>
-		<td><code>-fc configId</code></td>
-		<td>The identifier of the filter configuration to use for the 
+		<td valign="top" align="left"><code>-fc configId</code></td>
+		<td align="left" valign="top">The identifier of the filter configuration to use for the 
 		input files</td>
 	</tr>
 	<tr>
-		<td><code>-ie encoding</code></td>
-		<td>The encoding name of the input files. this is used only if the 
+		<td valign="top" align="left"><code>-ie encoding</code></td>
+		<td align="left" valign="top">The encoding name of the input files. this is used only if the 
 		filter cannot detect the encoding from the input file itself.</td>
 	</tr>
 	<tr>
-		<td><code>-sl srcLang</code></td>
-		<td>The code of the source language of the input files.</td>
+		<td valign="top" align="left"><code>-sl srcLang</code></td>
+		<td align="left" valign="top">The code of the source language of the input files.</td>
 	</tr>
 	<tr>
-		<td><code>-tl trgLang</code></td>
-		<td>The code of the target language.</td>
+		<td valign="top" align="left"><code>-tl trgLang</code></td>
+		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td><code>-generic</code></td>
-		<td>Indicates to use generic notation for inline codes in the generated 
-		PO file, for example <code>&lt;1/&gt;</code> vs. &lt;br/&gt;.</td>
+		<td valign="top" align="left"><code>-generic</code></td>
+		<td align="left" valign="top">Indicates to use generic notation for inline codes in the generated 
+		PO file, for example <code>&lt;1/&gt;</code> vs. &lt;br/&gt;. If this 
+		option is not specified the inline codes are output in their original 
+		form.</td>
+	</tr>
+	<tr>
+		<td valign="top" align="left"><code>-target=(source|empty)</code></td>
+		<td align="left" valign="top">Forces the content of the output target 
+		field to be either a copy of the source or empty. If neither option is 
+		set the content of the target field is the target text or empty.</td>
 	</tr>
 </table>
 <p>For example:</p>
 <pre>tikal -2po data.tmx -sl EN -tl ZU</pre>
 <p>Creates a PO file from the TMX document <code>data.tmx</code>. The source 
 language will be English and the target Zulu.</p>
+<h2><a name="conv2tmx"></a>Convert to TMX Format</h2>
+<p>Creates a TMX document for the give input file. If the input file is multilingual 
+(like a PO or a TS file), the source and target will be in the TMX document.</p>
+<p>The syntax of this command is:</p>
+<pre>-2tmx [options] inputFile [inputFile2...]</pre>
+<p>Where the options are:</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table4">
+	<tr>
+		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top">The identifier of the filter configuration to use for the 
+		input files</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top">The encoding name of the input files. this 
+		is used only if the filter cannot detect the encoding from the input 
+		file itself.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top">The code of the source language of the input files.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top">The code of the target language.</td>
+	</tr>
+	<tr>
+		<td valign="top" align="left"><code>-target=(source|empty)</code></td>
+		<td align="left" valign="top">Forces the content of the output target 
+		field to be either a copy of the source or empty. If neither option is 
+		set the content of the target field is the target text or empty.</td>
+	</tr>
+	</table>
+<p>For example:</p>
+<pre>tikal -2tmx data.po -sl EN -tl ZU</pre>
+<p>Creates a TMX document from the PO file <code>data.po</code>. The source 
+language will be English and the target Zulu.</p>
+<pre>tikal -2tmx data.tmx -sl EN -tl DE -target=empty</pre>
+<p>Creates a TMX document from another TMX document named <code>data.tmx</code>. The source 
+language will be English and the target German. The content of the <code>&lt;tuv&gt;</code> 
+elements for the German will be empty.</p>
+<h2><a name="conv2table"></a>Convert to Table Format</h2>
+<p>Creates a table-like output for the give input file. If the input file is multilingual 
+(like a PO or a TS file), the source and target will be in the output table.</p>
+<p>The syntax of this command is:</p>
+<pre>-2tbl [options] inputFile [inputFile2...]</pre>
+<p>Where the options are:</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table6">
+	<tr>
+		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top">The identifier of the filter configuration to use for the 
+		input files</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top">The encoding name of the input files. this 
+		is used only if the filter cannot detect the encoding from the input 
+		file itself.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top">The code of the source language of the input files.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top">The code of the target language.</td>
+	</tr>
+	<tr>
+		<td valign="top" align="left"><code>-target=(source|empty)</code></td>
+		<td align="left" valign="top">Forces the content of the output target 
+		field to be either a copy of the source or empty. If neither option is 
+		set the content of the target field is the target text or empty.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-opt [csv|tab][,xliff|xliffgx|tmx|generic]</code></td>
+		<td align="left" valign="top">Optional formatting information: keywords 
+		separated by a single comma no spaces<br>
+		format: <code>csv</code> for comma-separated values, or <code>tab</code> 
+		for tab-delimited values.<br>
+		inline codes: <code>xliff</code> for XLIFF, <code>xliffgx</code> for 
+		XLIFF with g/x notation, <code>tmx</code> for TMX, or <code>generic</code> 
+		for generic place-holders.</td>
+	</tr>
+	</table>
+<p>For example:</p>
+<pre>tikal -2tbl data.tmx -sl EN -tl ZU</pre>
+<p>Creates a tab-delimited file from the TMX document <code>data.tmx</code>. Any 
+inline codes is output in its original form. The source 
+language is English and the target Zulu. Any tab character within the text is 
+escaped with a backslash prefix.</p>
+<pre>tikal -2tbl data.po -sl EN -tl ES -opt csv,xliffgx -target=source</pre>
+<p>Creates a comma-separated values output file from the PO file <code>data.po</code>. 
+The inline codes are represented as XLIFF elements using the &lt;g&gt; and &lt;x&gt; 
+notation. The text is between double quotes, and any double-quote and backslash 
+characters within the text is escaped with a backslash prefix. The source 
+language is English and the target Spanish. the content of the target column is 
+a copy of the source.</p>
+<h2><a name="penImport"></a>Import into Pensieve TM</h2>
+<p>Imports the specified input documents into a Pensieve TM database.</p>
+<p>The syntax of this command is:</p>
+<pre>-imp myTMdirectory [options] inputFile [inputFile2...]</pre>
+<p>Where the options are:</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table5">
+	<tr>
+		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top">The identifier of the filter configuration to use for the 
+		input files</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top">The encoding name of the input files. this 
+		is used only if the filter cannot detect the encoding from the input 
+		file itself.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top">The code of the source language of the input files.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top">The code of the target language.</td>
+	</tr>
+	<tr>
+		<td valign="top" align="left"><code>-force-(source|empty)</code></td>
+		<td align="left" valign="top">Force the content of the output target 
+		field to be either a copy of the source or empty. If neither option is 
+		set the content of the target field is the target text or empty.</td>
+	</tr>
+	</table>
+<p>For example:</p>
+<pre>tikal -imp myTMdir data.po -sl JA -tl FR</pre>
+<p>Imports the PO file <code>data.po</code> into the TM database located in
+<code>myTMDir</code>. If the directory does not exists it will be created. the 
+source language of the PO file is Japanese and the target French.</p>
 <p>&nbsp;</p>
 
 </body>

@@ -75,11 +75,15 @@ once, saving processing time. You can use the variable <code>${ProjDir}</code>
 to specify the directory of your project.</p>
 <h3>Pre-Translation Tab</h3>
 <p><cite>Pre-translate the extracted text using the following TM</cite> -- Set 
-this option to use a SimpleTM translation memory to leverage any exact match 
-into the prepared document (if the package to generate allows to do so).</p>
-<p>Enter the full path of the SimpleTM file you want to use for the 
-pre-translation. You can use the variable <code>${ProjDir}</code> 
-to specify the directory of your project.</p>
+this option to use a translation resource to leverage matches 
+into the prepared document (if the package to generate allows to do so). Select the translation resource to use.</p>
+<p><cite>Settings</cite> -- Click this button to enter the settings for the 
+selected translation resource. Not all translation resource connectors require 
+settings. the current settings are displayed under the translation resource 
+selection.</p>
+<p>Be aware that some translation resources can be slow to access (especially 
+those accessed through Internet), and using them may cause the process to be <b>
+extremely long</b> to complete.</p>
 <p><cite>Penalize matches with a FileName attribute different from the document 
 being processed</cite> -- Set this option to 
 filter the TM matches based on the values of <code>FileName</code> attribute. When this option is set, only the matches that 
@@ -158,7 +162,8 @@ GroupName = myGroup</p>
 	</tr>
 </table>
 <p>&nbsp;</p>
-<p>SimpleTM will be replaced by more a powerful TM engine in the future.</p>
+<p>In the future, the SimpleTM engine will be replaced by more a powerful TM engine: 
+the Pensieve TM.</p>
 <h2><a name="processing"></a>Processing Details</h2>
 <p>The output of this utility varies depending on which type of package is 
 selected.</p>

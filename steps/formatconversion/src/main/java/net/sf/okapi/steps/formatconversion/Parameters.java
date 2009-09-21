@@ -21,32 +21,42 @@
 package net.sf.okapi.steps.formatconversion;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.ParametersDescription;
-import net.sf.okapi.common.uidescription.CheckboxPart;
-import net.sf.okapi.common.uidescription.EditorDescription;
-import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
-import net.sf.okapi.common.uidescription.ListSelectionPart;
-import net.sf.okapi.common.uidescription.PathInputPart;
 
-public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+public class Parameters extends BaseParameters {
 
 	public static final String FORMAT_TMX = "tmx";
 	public static final String FORMAT_PO = "po";
 	public static final String FORMAT_TABLE = "table";
 	public static final String FORMAT_PENSIEVE = "pensieve";
 	
+	public static final int TRG_TARGETOREMPTY = 0; 
+	public static final int TRG_FORCESOURCE = 1; 
+	public static final int TRG_FORCEEMPTY = 2; 
+
 	static final String SINGLEOUTPUT = "singleOutput";
 	static final String OUTPUTPATH = "outputPath";
+	static final String TARGETSTYLE = "targetStyle";
 	static final String OUTPUTFORMAT = "outputFormat";
+	static final String FORMATOPTIONS = "formatOptions";
 	static final String USEGENERICCODES = "useGenericCodes";
 	
 	private boolean singleOutput;
 	private String outputPath;
+	private int targetStyle;
 	private String outputFormat;
 	private boolean useGenericCodes;
+	private String formatOptions;
 	
 	public Parameters () {
 		reset();
+	}
+
+	public int getTargetStyle () {
+		return targetStyle;
+	}
+
+	public void setTargetStyle (int targetStyle) {
+		this.targetStyle = targetStyle;
 	}
 
 	public boolean isSingleOutput () {
@@ -77,14 +87,24 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return useGenericCodes;
 	}
 
+	public String getFormatOptions () {
+		return formatOptions;
+	}
+
+	public void setFormatOptions (String formatOptions) {
+		this.formatOptions = formatOptions;
+	}
+
 	public void setUseGenericCodes (boolean useGenericCodes) {
 		this.useGenericCodes = useGenericCodes;
 	}
 
 	public void reset () {
 		singleOutput = true;
+		targetStyle = TRG_TARGETOREMPTY;
 		outputPath = "output";
 		outputFormat = FORMAT_TMX;
+		formatOptions = null;
 		useGenericCodes = false;
 	}
 
@@ -92,45 +112,49 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		singleOutput = buffer.getBoolean(SINGLEOUTPUT, singleOutput);
+		targetStyle = buffer.getInteger(TARGETSTYLE, targetStyle);
 		outputPath = buffer.getString(OUTPUTPATH, outputPath);
 		outputFormat = buffer.getString(OUTPUTFORMAT, outputFormat);
+		formatOptions = buffer.getGroup(FORMATOPTIONS, formatOptions);
 		useGenericCodes = buffer.getBoolean(USEGENERICCODES, useGenericCodes);
 	}
 
 	public String toString() {
 		buffer.reset();
 		buffer.setBoolean(SINGLEOUTPUT, singleOutput);
+		buffer.setInteger(TARGETSTYLE, targetStyle);
 		buffer.setString(OUTPUTPATH, outputPath);
 		buffer.setString(OUTPUTFORMAT, outputFormat);
+		buffer.setGroup(FORMATOPTIONS, formatOptions);
 		buffer.setBoolean(USEGENERICCODES, useGenericCodes);
 		return buffer.toString();
 	}
 
-	@Override
-	public ParametersDescription getParametersDescription () {
-		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(SINGLEOUTPUT, "Create a single output document", null);
-		desc.add(OUTPUTPATH, "Output path", "Full path of the single output document to generate");
-		desc.add(OUTPUTFORMAT, "Output format", "Format to generate in output");
-		desc.add(USEGENERICCODES, "Output generic inline codes", null);
-		return desc;
-	}
-
-	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
-		EditorDescription desc = new EditorDescription("Format Conversion", true, false);
-
-		String[] choices = {FORMAT_PO, FORMAT_TMX, FORMAT_TABLE, FORMAT_PENSIEVE};
-		String[] choicesLabels = {"PO File", "TMX Document", "Tab-Delimited Table", "Pensieve TM"};
-		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTFORMAT), choices);
-		lsp.setChoicesLabels(choicesLabels);
-		
-		desc.addCheckboxPart(paramDesc.get(USEGENERICCODES));
-
-		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(SINGLEOUTPUT));
-		PathInputPart pip = desc.addPathInputPart(paramDesc.get(OUTPUTPATH), "Output File", true);
-		pip.setMasterPart(cbp, true);
-		
-		return desc;
-	}
+//	@Override
+//	public ParametersDescription getParametersDescription () {
+//		ParametersDescription desc = new ParametersDescription(this);
+//		desc.add(SINGLEOUTPUT, "Create a single output document", null);
+//		desc.add(OUTPUTPATH, "Output path", "Full path of the single output document to generate");
+//		desc.add(OUTPUTFORMAT, "Output format", "Format to generate in output");
+//		desc.add(USEGENERICCODES, "Output generic inline codes", null);
+//		return desc;
+//	}
+//
+//	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
+//		EditorDescription desc = new EditorDescription("Format Conversion", true, false);
+//
+//		String[] choices = {FORMAT_PO, FORMAT_TMX, FORMAT_TABLE, FORMAT_PENSIEVE};
+//		String[] choicesLabels = {"PO File", "TMX Document", "Tab-Delimited Table", "Pensieve TM"};
+//		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTFORMAT), choices);
+//		lsp.setChoicesLabels(choicesLabels);
+//		
+//		desc.addCheckboxPart(paramDesc.get(USEGENERICCODES));
+//
+//		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(SINGLEOUTPUT));
+//		PathInputPart pip = desc.addPathInputPart(paramDesc.get(OUTPUTPATH), "Output File", true);
+//		pip.setMasterPart(cbp, true);
+//		
+//		return desc;
+//	}
 
 }

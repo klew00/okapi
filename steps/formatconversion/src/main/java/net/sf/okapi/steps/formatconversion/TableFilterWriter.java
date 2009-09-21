@@ -70,6 +70,7 @@ public class TableFilterWriter implements IFilterWriter {
 	private XLIFFContent xliffFmt;
 	private GenericContent genericFmt;
 	private boolean useDQ;
+	private boolean escapeTab;
 	
 	public TableFilterWriter () {
 		params = new TableFilterWriterParameters();
@@ -181,6 +182,7 @@ public class TableFilterWriter implements IFilterWriter {
 
 	private void initialize () {
 		useDQ = params.getUseDoubleQuotes();
+		escapeTab = (params.getSeparator().indexOf('\t') > -1);
 		if ( params.getInlineFormat().equals(TableFilterWriterParameters.INLINE_GENERIC) ) {
 			inlineType = INLINE_GENERIC;
 			genericFmt = new GenericContent();
@@ -193,7 +195,7 @@ public class TableFilterWriter implements IFilterWriter {
 			inlineType = INLINE_XLIFF;
 			xliffFmt = new XLIFFContent();
 		}
-		else if ( params.getInlineFormat().equals(TableFilterWriterParameters.INLINE_XLIFF_GX) ) {
+		else if ( params.getInlineFormat().equals(TableFilterWriterParameters.INLINE_XLIFFGX) ) {
 			inlineType = INLINE_XLIFF_GX;
 			xliffFmt = new XLIFFContent();
 		}
@@ -332,9 +334,12 @@ public class TableFilterWriter implements IFilterWriter {
 		if ( useDQ ) {
 			// Automatically escape \ and " if text is double-quoted
 			tmp = tmp.replace("\\", "\\\\");
-			return tmp.replace("\"", "\\\"");
+			tmp = tmp.replace("\"", "\\\"");
 		}
-		else return tmp;
+		if ( escapeTab ) {
+			return tmp.replace("\t", "\\t");
+		}
+		return tmp;
 	}
 
 }

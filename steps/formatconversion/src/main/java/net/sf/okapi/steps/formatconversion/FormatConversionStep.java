@@ -26,6 +26,7 @@ import java.net.URI;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
@@ -33,6 +34,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.po.POFilterWriter;
 
 public class FormatConversionStep extends BasePipelineStep {
@@ -147,8 +149,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			break;
 
 		case TEXT_UNIT:
-			//TODO: Filter empty tu, non-target tu, etc.
-			writer.handleEvent(event);
+			processTextUnit(event);
 			break;
 			
 		case START_BATCH_ITEM:
@@ -160,6 +161,20 @@ public class FormatConversionStep extends BasePipelineStep {
 			break;
 		}
 		return event;
+	}
+
+	protected void processTextUnit (Event event) {
+		TextUnit tu = (TextUnit)event.getResource();
+		// If requested, overwrite the target
+		switch ( params.getTargetStyle() ) {
+		case Parameters.TRG_FORCEEMPTY:
+			tu.createTarget(targetLanguage, true, IResource.CREATE_EMPTY);
+			break;
+		case Parameters.TRG_FORCESOURCE:
+			tu.createTarget(targetLanguage, true, IResource.COPY_ALL);
+			break;
+		}
+		writer.handleEvent(event);
 	}
 
 	private void createPOWriter () {
@@ -226,6 +241,8 @@ public class FormatConversionStep extends BasePipelineStep {
 
 	private void createTableWriter () {
 		writer = new TableFilterWriter();
+		TableFilterWriterParameters options = (TableFilterWriterParameters)writer.getParameters();
+		options.fromString(params.getFormatOptions());
 	}
 	
 	private void startTableOutput () {

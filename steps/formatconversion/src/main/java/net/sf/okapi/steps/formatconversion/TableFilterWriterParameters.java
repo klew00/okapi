@@ -21,13 +21,14 @@
 package net.sf.okapi.steps.formatconversion;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.Util;
 
 public class TableFilterWriterParameters extends BaseParameters {
 
 	public static final String INLINE_ORIGINAL = "original";
 	public static final String INLINE_TMX = "tmx";
 	public static final String INLINE_XLIFF = "xliff";
-	public static final String INLINE_XLIFF_GX = "xliff_gx";
+	public static final String INLINE_XLIFFGX = "xliff_gx";
 	public static final String INLINE_GENERIC = "generic";
 	
 	static final String INLINEFORMAT = "inlineFormat";
@@ -105,5 +106,44 @@ public class TableFilterWriterParameters extends BaseParameters {
 //		
 //		return desc;
 //	}
+
+	/**
+	 * Sets the parameters values from a string in a special short format that can be used
+	 * with command-line tools.
+	 * @param data the string to process.
+	 */
+	public void fromStringArgument (String data) {
+		if ( Util.isEmpty(data) ) return;
+		String[] parts = data.toLowerCase().split(",", 0);
+		for ( String part : parts ) {
+			part = part.trim();
+			if ( part.equals("csv") ) {
+				separator = ",";
+				useDoubleQuotes = true;
+			}
+			else if ( part.equals("tab") ) {
+				separator = "\t";
+				useDoubleQuotes = false;
+			}
+			else if ( part.equals("generic") ) {
+				inlineFormat = INLINE_GENERIC;
+			}
+			else if ( part.equals("tmx") ) {
+				inlineFormat = INLINE_TMX;
+			}
+			else if ( part.equals("xliff") ) {
+				inlineFormat = INLINE_XLIFF;
+			}
+			else if ( part.equals("xliffgx") ) {
+				inlineFormat = INLINE_XLIFFGX;
+			}
+			else if ( part.equals("original") ) {
+				inlineFormat = INLINE_ORIGINAL;
+			}
+			else {
+				throw new RuntimeException(String.format("Invalid option '%s' in format options.", part));
+			}
+		}
+	}
 
 }
