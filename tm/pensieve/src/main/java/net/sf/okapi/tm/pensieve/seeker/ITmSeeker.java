@@ -49,15 +49,24 @@ public interface ITmSeeker {
      * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
     List<TmHit> searchExact(String query, int max);
+/**
+     * Gets a list of fuzzy matches for a given phrase.
+     *
+     *
+     * @return A list of fuzzy matches
+     * @throws OkapiIOException if the search cannot be completed do to I/O problems
+     */
+
 
     /**
      * Gets a list of fuzzy matches for a given phrase.
-     * @param query The fuzzy query to match
+     * @param query The query string to match WITHOUT ~ and threshold value
+     * @param similarityThreshold The desired threshold - null for default threshold of 0.5
      * @param max The max number of results
      * @return A list of fuzzy matches
      * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
-    List<TmHit> searchFuzzy(String query, int max);
+    List<TmHit> searchFuzzy(String query, Float similarityThreshold, int max);
 
     /**
      * Gets a list of TmHits which have segments that contain the provided subphrase

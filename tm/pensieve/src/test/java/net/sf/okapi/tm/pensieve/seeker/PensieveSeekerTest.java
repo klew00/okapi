@@ -245,7 +245,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(STR+"~", 10);
+        tmhits = seeker.searchFuzzy(STR, null, 10);
         assertEquals("number of docs found", 3, tmhits.size());
     }
 
@@ -259,10 +259,28 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(STR+"~0.8", 10);
+        tmhits = seeker.searchFuzzy(STR, 0.8f, 10);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void searchFuzzyThresholdGreaterThan1() throws Exception {
+        PensieveWriter writer = getWriter();
+
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
+        writer.endIndex();
+        seeker.searchFuzzy(STR, 1.00f, 10);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void searchFuzzyThresholdLessThan0() throws Exception {
+        PensieveWriter writer = getWriter();
+
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
+        writer.endIndex();
+        seeker.searchFuzzy(STR, -0.01f, 10);
     }
 
     @Test
@@ -275,11 +293,11 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(STR+"~0.8", 10);
+        tmhits = seeker.searchFuzzy(STR, 0.8f, 10);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
-    }
+    }  
 
     @Test
     public void searchFuzzyScoreSortNoFuzzyThreshold() throws Exception {
@@ -296,7 +314,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[3])),TARGET));
         writer.endIndex();
         //If you add a threshold it changes the sort order
-        tmhits = seeker.searchFuzzy(STR+"~", 10);
+        tmhits = seeker.searchFuzzy(STR, null, 10);
         
         assertEquals("number of docs found", 4, tmhits.size());
         assertEquals("first match", testStrings[0], tmhits.get(0).getTu().getSource().getContent().toString());
@@ -321,7 +339,7 @@ public class PensieveSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(str+"~", 10);
+        tmhits = seeker.searchFuzzy(str, null, 10);
         assertEquals("number of docs found", 9, tmhits.size());
     }
 

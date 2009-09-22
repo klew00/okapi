@@ -24,7 +24,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.*;
-import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
@@ -33,6 +32,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.AlreadyClosedException;
 
 import java.io.IOException;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 
 /**
  * Used to write, delete and update the index.

@@ -92,12 +92,20 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
     /**
      * Gets a list of fuzzy matches for a given phrase.
      *
+     * @param query The query string WITHOUT ~ and threshold value
      * @param max The max number of results
+     * @param threshold The desired threshold - null for default threshold of 0.5f
      * @return A list of fuzzy matches
      * @throws OkapiIOException if the search cannot be completed do to I/O problems
      */
-    public List<TmHit> searchFuzzy(String query, int max) {
-        Query q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
+    public List<TmHit> searchFuzzy(String query, Float similarityThreshold, int max) {
+
+        Query q;
+        if (similarityThreshold == null) {
+            q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
+        } else {
+            q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query), similarityThreshold);
+        }
         return search(max, q);
     }
 
