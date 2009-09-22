@@ -1,23 +1,22 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
-  This library is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or (at
-  your option) any later version.
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at
+your option) any later version.
 
-  This library is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
-  General Public License for more details.
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public License
-  along with this library; if not, write to the Free Software Foundation,
-  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+You should have received a copy of the GNU Lesser General Public License
+along with this library; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
-
 package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -53,9 +52,7 @@ public class PensieveSeekerTest {
     static final Directory DIR = new RAMDirectory();
     static final TranslationUnitVariant TARGET = new TranslationUnitVariant("EN", new TextFragment("target text"));
     static final String STR = "watch out for the killer rabbit";
-
     PensieveSeeker seeker;
-
     List<TmHit> tmhits;
 
     @Before
@@ -68,10 +65,10 @@ public class PensieveSeekerTest {
         PensieveWriter writer = getWriter();
         populateIndex(writer, 12, "patents are evil", "unittest");
         writer.endIndex();
-        
+
         Iterator<TranslationUnit> tuIterator = seeker.iterator();
         List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
-        while(tuIterator.hasNext()) {
+        while (tuIterator.hasNext()) {
             tus.add(tuIterator.next());
         }
         assertEquals("number of tus", 13, tus.size());
@@ -142,8 +139,6 @@ public class PensieveSeekerTest {
         iterator.next();
     }
 
-
-
     @Test(expected = UnsupportedOperationException.class)
     public void iteratorUnsupportedRemove() throws IOException {
         seeker.iterator().remove();
@@ -154,25 +149,25 @@ public class PensieveSeekerTest {
     public void searchHandleIOException() throws IOException {
         PensieveSeeker spy = spy(seeker);
         doThrow(new IOException("some exception")).when(spy).getIndexSearcher();
-        spy.search(1, new PhraseQuery());
+        spy.search(1, new PhraseQuery(), null);
     }
 
     @Test
-    public void getDirectory(){
+    public void getDirectory() {
         assertSame("directory", DIR, seeker.getIndexDir());
     }
 
     @Test
-    public void getFieldValueNoField(){
+    public void getFieldValueNoField() {
         Document doc = new Document();
         assertNull("Null should be returned for an empty field", seeker.getFieldValue(doc, TranslationUnitField.SOURCE));
     }
 
     @Test
-    public void getFieldValue(){
+    public void getFieldValue() {
         Document doc = new Document();
-        doc.add(new Field(TranslationUnitField.SOURCE.name(), "lk", Field.Store.NO,  Field.Index.NOT_ANALYZED));
-        assertEquals("source field", "lk",  seeker.getFieldValue(doc, TranslationUnitField.SOURCE));
+        doc.add(new Field(TranslationUnitField.SOURCE.name(), "lk", Field.Store.NO, Field.Index.NOT_ANALYZED));
+        assertEquals("source field", "lk", seeker.getFieldValue(doc, TranslationUnitField.SOURCE));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -184,7 +179,7 @@ public class PensieveSeekerTest {
     public void searchForWordsNothingFound() throws Exception {
         PensieveWriter writer = getWriter();
         writer.endIndex();
-        tmhits = seeker.searchForWords("anonexistentwordthatshouldnowayeverexist", 10);
+        tmhits = seeker.searchForWords("anonexistentwordthatshouldnowayeverexist", 10, null);
         assertNotNull("docs returned should not be null", tmhits);
         assertEquals("number of docs found", 0, tmhits.size());
     }
@@ -196,8 +191,25 @@ public class PensieveSeekerTest {
         populateIndex(writer, 12, "patents are evil", "unittest");
         final int desiredReturns = 2;
         writer.endIndex();
-        tmhits = seeker.searchForWords("patents", desiredReturns);
+        tmhits = seeker.searchForWords("patents", desiredReturns, null);
         assertEquals("number of docs found", desiredReturns, tmhits.size());
+    }
+
+    @Test
+    public void searchForWordsMetadata() throws Exception {
+        PensieveWriter writer = getWriter();
+
+        populateIndex(writer, 12, "patents are evil", "unittest", "id", "nachofile", "nachogroup", "nachotype");
+        populateIndex(writer, 12, "evil patents are", "unittest", "id2", "yofile", "yogroup", "yotype");
+        final int desiredReturns = 24;
+        writer.endIndex();
+        Metadata metadata = new Metadata();
+        metadata.put(MetadataType.FILE_NAME, "yofile");
+        metadata.put(MetadataType.GROUP_NAME, "yogroup");
+        metadata.put(MetadataType.TYPE, "yotype");
+
+        tmhits = seeker.searchForWords("patents", desiredReturns, metadata);
+        assertEquals("number of docs found", 12, tmhits.size());
     }
 
     @Test
@@ -209,26 +221,46 @@ public class PensieveSeekerTest {
         populateIndex(writer, desiredReturns, "patents are evil", "unittest");
         writer.endIndex();
 
-        tmhits = seeker.searchForWords("patents", 10);
+        tmhits = seeker.searchForWords("patents", 10, null);
         assertEquals("number of docs found", desiredReturns, tmhits.size());
     }
 
     @Test(expected = RuntimeException.class)
     public void searchWordsInvalidQuery() throws Exception {
-        seeker.searchForWords("patents evil are]", 10);
+        seeker.searchForWords("patents evil are]", 10, null);
+    }
+
+    @Test
+    public void searchSubphraseMetadata() throws Exception {
+        PensieveWriter writer = getWriter();
+
+        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "patents are evil", "nacho target. It's mine!!", "id", "yofile", "yogroup", "yotype"));
+        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "patents evil are", "nacho target. It's mine!!", "id", "yofile", "yogroup", "yotype"));
+        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "are patents evil", "nacho target. It's mine!!", "id", "yofile", "yogroup", "yotype"));
+        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "are patents evil", "nacho target. It's mine!!", "id", "nachofile", "nachogroup", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "completely unrelated phrase", "nacho target. It's mine!!", "id", "nachofile", "nachogroup", "nachotype"));
+        writer.endIndex();
+        Metadata md = new Metadata();
+        md.put(MetadataType.FILE_NAME, "yofile");
+        md.put(MetadataType.GROUP_NAME, "yogroup");
+        md.put(MetadataType.TYPE, "yotype");
+        tmhits = seeker.searchSubphrase("patents evil", 10, md);
+        assertEquals("number of docs found", 2, tmhits.size());
+        assertEquals("1st target", "patents evil are", tmhits.get(0).getTu().getSource().getContent().toString());
+        assertEquals("2nd target", "are patents evil", tmhits.get(1).getTu().getSource().getContent().toString());
     }
 
     @Test
     public void searchSubphrase() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("patents are evil")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("patents evil are")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("are patents evil")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("completely unrelated phrase")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("patents are evil")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("patents evil are")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("are patents evil")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("completely unrelated phrase")), TARGET));
         writer.endIndex();
 
-        tmhits = seeker.searchSubphrase("patents evil", 10);
+        tmhits = seeker.searchSubphrase("patents evil", 10, null);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st target", "patents evil are", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("1st target", "are patents evil", tmhits.get(1).getTu().getSource().getContent().toString());
@@ -239,13 +271,13 @@ public class PensieveSeekerTest {
         PensieveWriter writer = getWriter();
 
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out the killer rabbit")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(STR, null, 10);
+        tmhits = seeker.searchFuzzy(STR, null, 10, null);
         assertEquals("number of docs found", 3, tmhits.size());
     }
 
@@ -253,13 +285,13 @@ public class PensieveSeekerTest {
     public void searchFuzzyWordOrder80Percent() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("rabbit killer the for out watch")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("rabbit killer the for out watch")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(STR, 0.8f, 10);
+        tmhits = seeker.searchFuzzy(STR, 0.8f, 10, null);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
@@ -269,35 +301,56 @@ public class PensieveSeekerTest {
     public void searchFuzzyThresholdGreaterThan1() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
         writer.endIndex();
-        seeker.searchFuzzy(STR, 1.00f, 10);
+        seeker.searchFuzzy(STR, 1.00f, 10, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void searchFuzzyThresholdLessThan0() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
         writer.endIndex();
-        seeker.searchFuzzy(STR, -0.01f, 10);
+        seeker.searchFuzzy(STR, -0.01f, 10, null);
     }
 
     @Test
     public void searchFuzzyMiddleMatch80Percent() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out the killer rabbit and some extra stuff")),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out the killer rabbit and some extra stuff")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(STR, 0.8f, 10);
+        tmhits = seeker.searchFuzzy(STR, 0.8f, 10, null);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
-    }  
+    }
+
+    @Test
+    public void searchFuzzy80PercentWithMetadata() throws Exception {
+        PensieveWriter writer = getWriter();
+
+        writer.indexTranslationUnit(Helper.createTU("EN", "KR", "watch rabbit", "something that is the same", "1", "some_file", "some_group", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU("EN", "KR", STR, "something that is the same", "2", "some_file", "some_group", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU("EN", "KR", "watch out the killer rabbit and some extra stuff", "something that is the same", "3", "some_file", "some_group", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU("EN", "KR", "watch for the killer rabbit", "something that is the same", "4", "some_file", "some_group", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU("EN", "KR", "watch for the killer rabbit", "something that is the same", "5", "nacho_file", "some_group", "nachotype"));
+
+        writer.endIndex();
+        Metadata md = new Metadata();
+        md.put(MetadataType.FILE_NAME, "some_file");
+        md.put(MetadataType.GROUP_NAME, "some_group");
+        md.put(MetadataType.TYPE, "nachotype");
+        tmhits = seeker.searchFuzzy(STR, 0.8f, 10, md);
+        assertEquals("number of docs found", 2, tmhits.size());
+        assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
+        assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
+    }
 
     @Test
     public void searchFuzzyScoreSortNoFuzzyThreshold() throws Exception {
@@ -308,25 +361,25 @@ public class PensieveSeekerTest {
             STR + " 3 words now"
         };
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[0])),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[1])),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[2])),TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[3])),TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[0])), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[1])), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[2])), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[3])), TARGET));
         writer.endIndex();
         //If you add a threshold it changes the sort order
-        tmhits = seeker.searchFuzzy(STR, null, 10);
-        
+        tmhits = seeker.searchFuzzy(STR, null, 10, null);
+
         assertEquals("number of docs found", 4, tmhits.size());
         assertEquals("first match", testStrings[0], tmhits.get(0).getTu().getSource().getContent().toString());
 
         //Verify sort order
         Float previous = tmhits.get(0).getScore();
-        for(int i = 1; i < tmhits.size(); i++){
+        for (int i = 1; i < tmhits.size(); i++) {
             Float currentScore = tmhits.get(i).getScore();
             assertEquals(i + " match", testStrings[i], tmhits.get(i).getTu().getSource().getContent().toString());
             assertTrue("results should be sorted descending by score", currentScore < previous);
             previous = currentScore;
-        }        
+        }
     }
 
     @Test
@@ -339,7 +392,7 @@ public class PensieveSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(str, null, 10);
+        tmhits = seeker.searchFuzzy(str, null, 10, null);
         assertEquals("number of docs found", 9, tmhits.size());
     }
 
@@ -354,20 +407,49 @@ public class PensieveSeekerTest {
 
         writer.endIndex();
         //Fuzzy or phrase matching would return "watch out for the killer rabbit1" & "watch out for the killer rabbit11"
-        tmhits = seeker.searchExact(str+1, 10);
+        tmhits = seeker.searchExact(str + 1, 10, null);
         assertEquals("number of docs found", 1, tmhits.size());
+    }
+
+    @Test
+    public void searchExactSingleMatchWithMetadata() throws Exception {
+        PensieveWriter writer = getWriter();
+        String str = "watch out for the killer rabbit";
+
+        final int numOfIndices = 18;
+        populateIndex(writer, numOfIndices, str, "two", "ID", "FileORama", "groupie", "singletype");
+        writer.endIndex();
+        Metadata metadata = new Metadata();
+        metadata.put(MetadataType.ID, "ID1");
+        tmhits = seeker.searchExact(str, 20, metadata);
+        assertEquals("number of docs found", 1, tmhits.size());
+    }
+
+    @Test
+    public void searchExactMultipleMatchesWithMetadata() throws Exception {
+        PensieveWriter writer = getWriter();
+        String str = "watch out for the killer rabbit";
+
+        final int numOfIndices = 18;
+        populateIndex(writer, numOfIndices, str, "two", "ID", "FileORama", "groupie", "singletype");
+        populateIndex(writer, 5, str, "two", "ID", "ORama", "groupx", "nachotype");
+        writer.endIndex();
+        Metadata metadata = new Metadata();
+        metadata.put(MetadataType.TYPE, "nachotype");
+        tmhits = seeker.searchExact(str, 20, metadata);
+        assertEquals("number of docs found", 5, tmhits.size());
     }
 
     @Test
     public void searchExactMultipleMatches() throws Exception {
         PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
-        for(int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
         }
 
         writer.endIndex();
-        tmhits = seeker.searchExact(str, 10);
+        tmhits = seeker.searchExact(str, 10, null);
         assertEquals("number of docs found", 5, tmhits.size());
     }
 
@@ -379,7 +461,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchExact(str, 10);
+        tmhits = seeker.searchExact(str, 10, null);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -391,7 +473,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchExact(str, 10);
+        tmhits = seeker.searchExact(str, 10, null);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -403,7 +485,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchExact("killer rabbit the for out watch", 10);
+        tmhits = seeker.searchExact("killer rabbit the for out watch", 10, null);
         assertEquals("number of docs found", 0, tmhits.size());
     }
 
@@ -471,10 +553,16 @@ public class PensieveSeekerTest {
     }
 
     void populateIndex(PensieveWriter writer, int numOfEntries, String source, String target) throws Exception {
-
-        for (int i=0; i < numOfEntries; i++) {
+        for (int i = 0; i < numOfEntries; i++) {
             writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(source + i)), new TranslationUnitVariant("EN", new TextFragment(target))));
         }
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("something that in no way should ever match")), new TranslationUnitVariant("EN", new TextFragment("unittesttarget"))));
+    }
+
+    void populateIndex(PensieveWriter writer, int numOfEntries, String source, String target, String id,
+            String filename, String groupname, String type) throws Exception {
+        for (int i = 0; i < numOfEntries; i++) {
+            writer.indexTranslationUnit(Helper.createTU("EN", "KR", source, target, id+i, filename, groupname, type));
+        }
     }
 }

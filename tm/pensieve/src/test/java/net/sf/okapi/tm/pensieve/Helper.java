@@ -57,6 +57,19 @@ public class Helper {
         return tu;
     }
 
+    public static TranslationUnit createTU(String srcLang,
+            String targetLang, String source, String target, String id,
+            String filename, String groupname, String type){
+        TranslationUnitVariant tuvS = new TranslationUnitVariant(srcLang, new TextFragment(source));
+        TranslationUnitVariant tuvT = new TranslationUnitVariant(targetLang, new TextFragment(target));
+        TranslationUnit tu = new TranslationUnit(tuvS, tuvT);
+        tu.getMetadata().put(MetadataType.ID, id);
+        tu.getMetadata().put(MetadataType.FILE_NAME, filename);
+        tu.getMetadata().put(MetadataType.GROUP_NAME, groupname);
+        tu.getMetadata().put(MetadataType.TYPE, type);
+        return tu;
+    }
+
     public static void setPrivateMember(Object instance, String memberName, Object value) throws Exception{
         Field field = instance.getClass().getDeclaredField(memberName);
         field.setAccessible(true);

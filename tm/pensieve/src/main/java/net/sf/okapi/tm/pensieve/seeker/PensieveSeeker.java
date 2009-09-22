@@ -75,10 +75,11 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      *
      * @param query The words to query for
      * @param max   The max number of results
+     * @param metadata The metadata attributes to also match against, null for no metadata
      * @return A list of matches for a given set of words. In this case OR is assumed.
      * @throws OkapiIOException if the search cannot be completed do to I/O problems
      */
-    public List<TmHit> searchForWords(String query, int max) {
+    public List<TmHit> searchForWords(String query, int max, Metadata metadata) {
         QueryParser parser = new QueryParser(TranslationUnitField.SOURCE.name(), new SimpleAnalyzer());
         Query q;
         try {
@@ -86,7 +87,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
         } catch (ParseException pe) {
             throw new OkapiIOException("Query String didn't parse: " + query, pe);
         }
-        return search(max, q);
+        return search(max, q, metadata);
     }
 
     /**
@@ -95,10 +96,11 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      * @param query The query string WITHOUT ~ and threshold value
      * @param max The max number of results
      * @param threshold The desired threshold - null for default threshold of 0.5f
+     * @param metadata The metadata attributes to also match against, null for no metadata
      * @return A list of fuzzy matches
      * @throws OkapiIOException if the search cannot be completed do to I/O problems
      */
-    public List<TmHit> searchFuzzy(String query, Float similarityThreshold, int max) {
+    public List<TmHit> searchFuzzy(String query, Float similarityThreshold, int max, Metadata metadata) {
 
         Query q;
         if (similarityThreshold == null) {
@@ -106,17 +108,18 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
         } else {
             q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query), similarityThreshold);
         }
-        return search(max, q);
+        return search(max, q, metadata);
     }
 
     /**
      * Gets a list of exact matches for a given phrase.
      *
      * @param max The max number of results
+     * @param metadata The metadata attributes to also match against, null for no metadata
      * @return A list of exact matches
      * @throws OkapiIOException if the search cannot be completed do to I/O problems
      */
-    public List<TmHit> searchExact(String query, int max) {
+    public List<TmHit> searchExact(String query, int max, Metadata metadata) {
         //If using QueryParser.parse("\"phrase to match\""), the indexed field must be set to Field.Index.ANALYZED
         //At which point subphrases will also match. This is not the desired behavior of an exact match.
         //Query q = new QueryParser(field.name(), new SimpleAnalyzer()).parse("\""+query+"\"");
@@ -125,7 +128,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
         //Field.Index.ANALYZED (for word searching) and another time as Field.Index.NOT_ANALYZED (for exact matches)
         PhraseQuery q = new PhraseQuery();
         q.add(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
-        return search(max, q);
+        return search(max, q, metadata);
     }
 
     /**
@@ -133,23 +136,36 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      *
      * @param subPhrase The subphrase to match again
      * @param maxHits   The maximum number of hits to return
+     * @param metadata The metadata attributes to also match against, null for no metadata
      * @return A list of TmHits which have segments that contain the provided subphrase
      * @throws OkapiIOException if the search cannot be completed do to I/O problems
      */
-    public List<TmHit> searchSubphrase(String subPhrase, int maxHits) {
-        return searchForWords("\"" + subPhrase + "\"", maxHits);
+    public List<TmHit> searchSubphrase(String subPhrase, int maxHits, Metadata metadata) {
+        return searchForWords("\"" + subPhrase + "\"", maxHits, metadata);
     }
 
     public Directory getIndexDir() {
         return indexDir;
     }
 
-    List<TmHit> search(int max, Query q) {
+    private BooleanQuery createQuery(Query q, Metadata metadata) {
+        BooleanQuery bQuery = new BooleanQuery();
+        bQuery.add(q, BooleanClause.Occur.MUST);
+        if (metadata != null) {
+            for (MetadataType type : metadata.keySet()) {
+                bQuery.add(new TermQuery(new Term(type.fieldName(), metadata.get(type))), BooleanClause.Occur.MUST);
+            }
+        }
+        return bQuery;
+    }
+
+    List<TmHit> search(int max, Query q, Metadata metadata) {
         IndexSearcher is = null;
         List<TmHit> tmhits = new ArrayList<TmHit>();
+        BooleanQuery bQuery = createQuery(q, metadata);
         try {
             is = getIndexSearcher();
-            TopDocs hits = is.search(q, max);
+            TopDocs hits = is.search(bQuery, max);
             for (int j = 0; j < hits.scoreDocs.length; j++) {
                 ScoreDoc scoreDoc = hits.scoreDocs[j];
                 TmHit tmhit = new TmHit();

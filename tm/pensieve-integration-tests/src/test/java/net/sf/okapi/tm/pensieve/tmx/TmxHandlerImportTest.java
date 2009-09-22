@@ -35,7 +35,7 @@ public class TmxHandlerImportTest {
 
         ITmSeeker seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR);
         startTime = System.currentTimeMillis();
-        List<TmHit> tus = seeker.searchExact("All Rights Reserved.", 10);
+        List<TmHit> tus = seeker.searchExact("All Rights Reserved.", 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -43,7 +43,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchExact("Notice to U.S. Government End Users.", 10);
+        tus = seeker.searchExact("Notice to U.S. Government End Users.", 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -51,7 +51,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchExact("Portions copyright 1984-1998 FairCom Corporation.", 10);
+        tus = seeker.searchExact("Portions copyright 1984-1998 FairCom Corporation.", 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -59,7 +59,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchExact("Second Ed. C:", 10);
+        tus = seeker.searchExact("Second Ed. C:", 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -79,7 +79,7 @@ public class TmxHandlerImportTest {
 
         ITmSeeker seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR);
         startTime = System.currentTimeMillis();
-        List<TmHit> tus = seeker.searchFuzzy("All Rights Reserved.", 0.8f, 10);
+        List<TmHit> tus = seeker.searchFuzzy("All Rights Reserved.", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -87,7 +87,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchFuzzy("Notice to U.S. Government End Users.", 0.8f, 10);
+        tus = seeker.searchFuzzy("Notice to U.S. Government End Users.", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -95,7 +95,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchFuzzy("Portions copyright 1984-1998 FairCom Corporation.", 0.8f, 10);
+        tus = seeker.searchFuzzy("Portions copyright 1984-1998 FairCom Corporation.", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -103,7 +103,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchFuzzy("Second Ed. C:", 0.8f, 10);
+        tus = seeker.searchFuzzy("Second Ed. C:", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -111,7 +111,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
 
         startTime = System.currentTimeMillis();
-        tus = seeker.searchFuzzy("Notice to U.S. Government End Users.", 0.8f, 10);
+        tus = seeker.searchFuzzy("Notice to U.S. Government End Users.", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
         System.out.println("query time " + totalTime);
@@ -128,7 +128,7 @@ public class TmxHandlerImportTest {
         tmxHandler.importTmx(this.getClass().getResource("/Paragraph_TM.tmx").toURI(), "de-de", tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
-        TranslationUnit tu = seeker.searchExact("Pumps have been paused for 3 minutes. Consider starting a saline drip.", 2).get(0).getTu();
+        TranslationUnit tu = seeker.searchExact("Pumps have been paused for 3 minutes. Consider starting a saline drip.", 2, null).get(0).getTu();
         assertEquals("tu target content", "Pumpen wurden 3 Minuten lang angehalten, ggf. NaCl-Infusion starten", tu.getTarget().getContent().toString());
     }
 
@@ -141,10 +141,10 @@ public class TmxHandlerImportTest {
         tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
-        TranslationUnit tu = seeker.searchExact("hello", 2).get(0).getTu();
+        TranslationUnit tu = seeker.searchExact("hello", 2, null).get(0).getTu();
         assertEquals("tu target content", "ciao", tu.getTarget().getContent().toString());
         assertEquals("tu source content", "hello", tu.getSource().getContent().toString());
-        tu = seeker.searchExact("world", 2).get(0).getTu();
+        tu = seeker.searchExact("world", 2, null).get(0).getTu();
         assertEquals("tu target content", "mondo", tu.getTarget().getContent().toString());
         assertEquals("tu source content", "world", tu.getSource().getContent().toString());
     }
@@ -158,7 +158,7 @@ public class TmxHandlerImportTest {
         tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
-        TranslationUnit tu = seeker.searchExact("hello", 2).get(0).getTu();
+        TranslationUnit tu = seeker.searchExact("hello", 2, null).get(0).getTu();
         assertEquals("# of metadata (not ignored)", 4, tu.getMetadata().size());
         assertEquals("tu id", "hello123", tu.getMetadata().get(MetadataType.ID));
         assertEquals("tu FileName", "GeorgeInTheJungle.hdf", tu.getMetadata().get(MetadataType.FILE_NAME));
