@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="/C:/OkapiJava/trunk/applications/integration-tests/target/test-classes/jsontest.json" source-language="en" target-language="fr" datatype="x-application/json" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<body>
+<trans-unit id="1" resname="title">
+<source xml:lang="en">example glossary with agrave=à</source>
+<target xml:lang="fr">example glossary with agrave=à</target>
+</trans-unit>
+<trans-unit id="2" resname="title">
+<source xml:lang="en">S</source>
+<target xml:lang="fr">S</target>
+</trans-unit>
+<trans-unit id="3" resname="ID">
+<source xml:lang="en">SGML</source>
+<target xml:lang="fr">SGML</target>
+</trans-unit>
+<trans-unit id="4" resname="SortAs">
+<source xml:lang="en">SGML</source>
+<target xml:lang="fr">SGML</target>
+</trans-unit>
+<trans-unit id="5" resname="GlossTerm">
+<source xml:lang="en">Standard Generalized Markup Language</source>
+<target xml:lang="fr">Standard Generalized Markup Language</target>
+</trans-unit>
+<trans-unit id="6" resname="Acronym">
+<source xml:lang="en">SGML</source>
+<target xml:lang="fr">SGML</target>
+</trans-unit>
+<trans-unit id="7" resname="Abbrev">
+<source xml:lang="en">ISO 8879:1986</source>
+<target xml:lang="fr">ISO 8879:1986</target>
+</trans-unit>
+<trans-unit id="8" resname="para">
+<source xml:lang="en">A meta-markup language, used to create markup languages such as DocBook.</source>
+<target xml:lang="fr">A meta-markup language, used to create markup languages such as DocBook.</target>
+</trans-unit>
+<trans-unit id="9" resname="GlossSee">
+<source xml:lang="en">markup</source>
+<target xml:lang="fr">markup</target>
+</trans-unit>
+</body>
+</file>
+</xliff>
