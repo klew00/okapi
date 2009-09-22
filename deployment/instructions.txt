@@ -26,11 +26,15 @@ mvn clean install from /trunk
 
 --- 4) Rebuild all
 
-Run "mvn clean install" in /trunk
-Then run "ant" in /trunk/deployment/maven
+/trunk> mvn clean install
+/trunk/deployment/maven> ant
+/trunk/applications/integration-tests> mvn integration-test -Dmaven.test.skip=true
 
-This will re-compile, tests, and create packages.
+This will re-compile, tests, and create the packages.
 Then rebuild all distributions for all platforms.
+Then run the integration tests for the applications
+(The skip option is because you don't need to re-run the unit tests)
+
 
 --- Update the Okapi Public repository with the proper JARs
 (So the examples can be build using Maven)
