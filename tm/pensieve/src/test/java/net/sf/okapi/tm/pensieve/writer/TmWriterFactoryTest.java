@@ -29,23 +29,23 @@ public class TmWriterFactoryTest {
 
     @Test
     public void createFileBasedTmWriter() {
-        PensieveWriter writer = (PensieveWriter) TmWriterFactory.createFileBasedTmWriter("target/test-classes/");
+        PensieveWriter writer = (PensieveWriter) TmWriterFactory.createFileBasedTmWriter("target/test-classes/", true);
         assertTrue("indexDir should be filebased", writer.getIndexWriter().getDirectory() instanceof FSDirectory);
     }
 
     @Test(expected = OkapiIOException.class)
     public void createFileBasedTmWriterNotDirectory() {
-        TmWriterFactory.createFileBasedTmWriter("pom.xml");
+        TmWriterFactory.createFileBasedTmWriter("pom.xml", true);
     }
 
     @Test(expected = OkapiIOException.class)
     public void createFileBasedTmWriterBadDirectory() {
-        TmWriterFactory.createFileBasedTmWriter("prettymuch/a/non/existent/directory");
+        TmWriterFactory.createFileBasedTmWriter("prettymuch/a/non/existent/directory", true);
     }
 
     @Test(expected = OkapiIOException.class)
     public void createFileBasedTmWriterNullDirectory() {
-        TmWriterFactory.createFileBasedTmWriter(null);
+        TmWriterFactory.createFileBasedTmWriter(null, true);
     }
 
     @Test

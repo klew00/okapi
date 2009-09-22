@@ -20,7 +20,6 @@
 
 package net.sf.okapi.tm.pensieve.writer;
 
-import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.*;
@@ -59,8 +58,28 @@ public class PensieveWriterTest {
     @Before
     public void init() throws IOException {
         dir = new RAMDirectory();
-        tmWriter = new PensieveWriter(dir);
+        tmWriter = new PensieveWriter(dir, true);
         writer = tmWriter.getIndexWriter();
+    }
+
+    @Test
+    public void constructorCreateNew() throws IOException {
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.endIndex();
+        tmWriter = new PensieveWriter(dir, true);
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joseph", "Yosep","2"));
+        tmWriter.endIndex();
+        assertEquals("# of docs in tm", 1, tmWriter.getIndexWriter().numDocs());
+    }
+
+    @Test
+    public void constructorAppend() throws IOException {
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.endIndex();
+        tmWriter = new PensieveWriter(dir, false);
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joseph", "Yosep","2"));
+        tmWriter.endIndex();
+        assertEquals("# of docs in tm", 2, tmWriter.getIndexWriter().numDocs());
     }
 
     @Test

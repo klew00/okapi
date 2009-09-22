@@ -19,7 +19,7 @@ public class TmxHandlerExportTest {
     @Test
     public void exportTmx_sample_metadata() throws Exception {
         Directory ramDir = new RAMDirectory();
-        ITmWriter tmWriter = new PensieveWriter(ramDir);
+        ITmWriter tmWriter = new PensieveWriter(ramDir, true);
         OkapiTmxImporter tmxImporter = new OkapiTmxImporter("EN", new TmxFilter());
         OkapiTmxExporter tmxExporter = new OkapiTmxExporter();
         tmxImporter.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);

@@ -22,11 +22,13 @@ package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.*;
 import net.sf.okapi.tm.pensieve.writer.PensieveWriter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
@@ -40,8 +42,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import net.sf.okapi.tm.pensieve.Helper;
-import org.apache.lucene.index.IndexReader;
 
 /**
  * User: Christian Hargraves
@@ -87,7 +87,7 @@ public class PensieveSeekerTest {
 
         Iterator<TranslationUnit> tuIterator = seeker.iterator();
         TranslationUnit tu;
-        tu = tuIterator.next();
+        tuIterator.next();
         tu = tuIterator.next();
         assertNotNull(tu);
         assertFalse(tuIterator.hasNext());
@@ -449,7 +449,7 @@ public class PensieveSeekerTest {
     }
 
     PensieveWriter getWriter() throws Exception {
-        return new PensieveWriter(DIR);
+        return new PensieveWriter(DIR, true);
     }
 
     void populateIndex(PensieveWriter writer, int numOfEntries, String source, String target) throws Exception {

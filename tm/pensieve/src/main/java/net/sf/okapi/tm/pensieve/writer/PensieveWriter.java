@@ -44,11 +44,12 @@ public class PensieveWriter implements ITmWriter {
     /**
      * Creates a PensieveWriter
      * @param indexDirectory - the Lucene Directory implementation of choice.
+     * @param createNewTmIndex Set to false to append to the existing TM index file. Set to true to overwrite.
      * @throws IOException if the indexDirectory can not load
      */
-    public PensieveWriter(Directory indexDirectory) throws IOException {
+    public PensieveWriter(Directory indexDirectory, boolean createNewTmIndex) throws IOException {
         indexWriter = new IndexWriter(indexDirectory,
-                new SimpleAnalyzer(), true,
+                new SimpleAnalyzer(), createNewTmIndex,
                 IndexWriter.MaxFieldLength.UNLIMITED);
     }
 

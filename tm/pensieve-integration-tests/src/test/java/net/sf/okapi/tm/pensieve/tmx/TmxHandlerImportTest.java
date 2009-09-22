@@ -26,7 +26,7 @@ public class TmxHandlerImportTest {
     public void importTmx_exact_really_big_file() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();        
         
-        ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(INDEX_DIR);
+        ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(INDEX_DIR, true);
         OkapiTmxImporter tmxImporter = new OkapiTmxImporter("EN-US", tmxFilter);
         long startTime = System.currentTimeMillis();
         tmxImporter.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), "es", tmWriter);
@@ -70,7 +70,7 @@ public class TmxHandlerImportTest {
 //        @Test
     public void importTmx_fuzzy_really_big_file() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
-        ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(INDEX_DIR);
+        ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(INDEX_DIR, true);
         OkapiTmxImporter tmxHandler = new OkapiTmxImporter("EN-US", tmxFilter);
         long startTime = System.currentTimeMillis();
         tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), "es", tmWriter);
@@ -123,7 +123,7 @@ public class TmxHandlerImportTest {
     public void importTmx_paragraph_tmx_basics() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
-        ITmWriter tmWriter = new PensieveWriter(ramDir);
+        ITmWriter tmWriter = new PensieveWriter(ramDir, true);
         OkapiTmxImporter tmxHandler = new OkapiTmxImporter("en-us", tmxFilter);
         tmxHandler.importTmx(this.getClass().getResource("/Paragraph_TM.tmx").toURI(), "de-de", tmWriter);
 
@@ -136,7 +136,7 @@ public class TmxHandlerImportTest {
     public void importTmx_sample_tmx_basics() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
-        ITmWriter tmWriter = new PensieveWriter(ramDir);
+        ITmWriter tmWriter = new PensieveWriter(ramDir, true);
         OkapiTmxImporter tmxHandler = new OkapiTmxImporter("EN", tmxFilter);
         tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
 
@@ -153,7 +153,7 @@ public class TmxHandlerImportTest {
     public void importTmx_sample_metadata() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
-        ITmWriter tmWriter = new PensieveWriter(ramDir);
+        ITmWriter tmWriter = new PensieveWriter(ramDir, true);
         OkapiTmxImporter tmxHandler = new OkapiTmxImporter("EN", tmxFilter);
         tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
 

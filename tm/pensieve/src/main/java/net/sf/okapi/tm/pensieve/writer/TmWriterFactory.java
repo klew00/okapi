@@ -26,14 +26,14 @@ import java.io.File;
 import java.io.IOException;
 
 public class TmWriterFactory {
-    public static ITmWriter createFileBasedTmWriter(String indexDirectoryPath) {
+    public static ITmWriter createFileBasedTmWriter(String indexDirectoryPath, boolean createNewTmIndex) {
         ITmWriter writer;
         try{
             File f = new File(indexDirectoryPath);
             if (!f.exists()){
                 throw new OkapiIOException(indexDirectoryPath + " does not exist");
             }
-            writer = new PensieveWriter(FSDirectory.open(f));
+            writer = new PensieveWriter(FSDirectory.open(f), createNewTmIndex);
         }catch(IOException ioe){
             throw new OkapiIOException("Trouble creating FSDirectory with the given path: " +indexDirectoryPath, ioe);
         }catch(NullPointerException npe) {

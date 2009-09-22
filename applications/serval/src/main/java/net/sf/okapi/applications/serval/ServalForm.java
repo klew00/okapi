@@ -169,8 +169,8 @@ public class ServalForm {
 		    public void controlResized(ControlEvent e) {
 		    	Table table = (Table)e.getSource();
 		    	Rectangle rect = table.getClientArea();
-				int nPart = (int)(rect.width / 100);
-				int nRemain = (int)(rect.width % 100);
+				int nPart = rect.width / 100;
+				int nRemain = rect.width % 100;
 				table.getColumn(0).setWidth(8*nPart);
 				table.getColumn(1).setWidth(12*nPart);
 				table.getColumn(2).setWidth(40*nPart);
@@ -384,7 +384,7 @@ public class ServalForm {
 			TmxFilter filter = new TmxFilter();
 			OkapiTmxImporter imp = new OkapiTmxImporter(langs[0], filter);
 			
-			ITmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir);
+			ITmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir, false);
 			
 			File file = new File(paths[0]);
 			imp.importTmx(file.toURI(), langs[1], writer);
