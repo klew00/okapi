@@ -21,56 +21,32 @@
 package net.sf.okapi.lib.extra.steps;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.common.pipelinedriver.PipelineContext;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.lib.extra.OkapiComponent;
 
 /**
- * 
- * 
- * @version 0.1 08.07.2009
+ * Abstract implementation of the {@link IPipelineStep} interface. 
  */
-
 abstract public class AbstractPipelineStep extends OkapiComponent implements IPipelineStep {
 
 	private String language;
-	private IContext context;
 	private boolean isLastOutputStep = false;
 
 	public AbstractPipelineStep() {
-		
 		super();
 	}
 
-	/**
-	 * Gets the {@link IContext} of the current pipeline associated
-	 * with this step.
-	 * 
-	 * @return the current {@link PipelineContext} for this step.
-	 */
-	public IContext getContext() {
-		
-		return context;
-	}
-
-	public void setContext(IContext context) {
-		
-		this.context = context;
-	}
-	
 	protected String getLanguage() {
-		
 		return language;
 	}
 	
 	public void cancel() {
-		
+		//TODO???
 	}
 	
 	public void destroy() {
-				
+		// Do nothing by default
 	}
 
 	public Event handleEvent(Event event) {

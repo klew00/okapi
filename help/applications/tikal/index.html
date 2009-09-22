@@ -247,7 +247,7 @@ create new configurations.</p>
 		form.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-target=(source|empty)</code></td>
+		<td valign="top" align="left"><code>-trgsource|-trgempty</code></td>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
@@ -284,7 +284,7 @@ language will be English and the target Zulu.</p>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-target=(source|empty)</code></td>
+		<td valign="top" align="left"><code>-trgsource|-trgempty</code></td>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
@@ -294,7 +294,7 @@ language will be English and the target Zulu.</p>
 <pre>tikal -2tmx data.po -sl EN -tl ZU</pre>
 <p>Creates a TMX document from the PO file <code>data.po</code>. The source 
 language will be English and the target Zulu.</p>
-<pre>tikal -2tmx data.tmx -sl EN -tl DE -target=empty</pre>
+<pre>tikal -2tmx data.tmx -sl EN -tl DE -trgempty</pre>
 <p>Creates a TMX document from another TMX document named <code>data.tmx</code>. The source 
 language will be English and the target German. The content of the <code>&lt;tuv&gt;</code> 
 elements for the German will be empty.</p>
@@ -325,20 +325,21 @@ elements for the German will be empty.</p>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-target=(source|empty)</code></td>
+		<td valign="top" align="left"><code>-trgsource|-trgempty</code></td>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-opt [csv|tab][,xliff|xliffgx|tmx|generic]</code></td>
-		<td align="left" valign="top">Optional formatting information: keywords 
-		separated by a single comma no spaces<br>
-		format: <code>csv</code> for comma-separated values, or <code>tab</code> 
-		for tab-delimited values.<br>
-		inline codes: <code>xliff</code> for XLIFF, <code>xliffgx</code> for 
+		<td align="left" valign="top"><code>-csv|-tab</code></td>
+		<td align="left" valign="top">Output format: <code>csv</code> for comma-separated values, or <code>tab</code> 
+		for tab-delimited values.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-xliff|-xliffgx|-tmx|-generic</code></td>
+		<td align="left" valign="top">Inline codes format: <code>xliff</code> for XLIFF, <code>xliffgx</code> for 
 		XLIFF with g/x notation, <code>tmx</code> for TMX, or <code>generic</code> 
-		for generic place-holders.</td>
+		for generic placeholders.</td>
 	</tr>
 	</table>
 <p>For example:</p>
@@ -347,7 +348,7 @@ elements for the German will be empty.</p>
 inline codes is output in its original form. The source 
 language is English and the target Zulu. Any tab character within the text is 
 escaped with a backslash prefix.</p>
-<pre>tikal -2tbl data.po -sl EN -tl ES -opt csv,xliffgx -target=source</pre>
+<pre>tikal -2tbl data.po -sl EN -tl ES -csv -xliffgx -trgsource</pre>
 <p>Creates a comma-separated values output file from the PO file <code>data.po</code>. 
 The inline codes are represented as XLIFF elements using the &lt;g&gt; and &lt;x&gt; 
 notation. The text is between double quotes, and any double-quote and backslash 
@@ -380,7 +381,7 @@ a copy of the source.</p>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-force-(source|empty)</code></td>
+		<td valign="top" align="left"><code>-trgsource|-trgempty</code></td>
 		<td align="left" valign="top">Force the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>

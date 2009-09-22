@@ -94,7 +94,8 @@ public class Main {
 	protected String mmParams;
 	protected String penDir;
 	protected boolean genericOutput = false;
-	protected String tableConvOptions;
+	protected String tableConvFormat;
+	protected String tableConvCodes;
 	protected int convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_TARGETOREMPTY;
 	
 	private FilterConfigurationMapper fcMapper;
@@ -189,13 +190,25 @@ public class Main {
 				else if ( arg.equals("-2tbl") ) {
 					prog.command = CMD_CONV2TABLE;
 				}
-				else if ( arg.equals("-opt") ) {
-					prog.tableConvOptions = getArgument(args, ++i);
+				else if ( arg.equals("-csv") ) {
+					prog.tableConvFormat = "csv";
 				}
-				else if ( arg.equals("-target=source") ) {
+				else if ( arg.equals("-tab") ) {
+					prog.tableConvFormat = "tab";
+				}
+				else if ( arg.equals("-xliff") ) {
+					prog.tableConvCodes = TableFilterWriterParameters.INLINE_XLIFF;
+				}
+				else if ( arg.equals("-xliffgx") ) {
+					prog.tableConvCodes = TableFilterWriterParameters.INLINE_XLIFFGX;
+				}
+				else if ( arg.equals("-tmx") ) {
+					prog.tableConvCodes = TableFilterWriterParameters.INLINE_TMX;
+				}
+				else if ( arg.equals("-trgsource") ) {
 					prog.convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_FORCESOURCE;
 				}
-				else if ( arg.equals("-target=empty") ) {
+				else if ( arg.equals("-trgempty") ) {
 					prog.convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_FORCEEMPTY;
 				}
 				else if ( arg.equals("-imp") ) {
@@ -212,6 +225,7 @@ public class Main {
 				}
 				else if ( arg.equals("-generic") ) {
 					prog.genericOutput = true;
+					prog.tableConvCodes = TableFilterWriterParameters.INLINE_GENERIC;
 				}
 				else if ( arg.equals("-q") ) {
 					prog.command = CMD_QUERYTRANS;
@@ -678,17 +692,17 @@ public class Main {
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory]");
 		ps.println("Conversion to PO file:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic] [-target=(source|empty)]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic] [-trgsource|-trgempty]");
 		ps.println("Conversion to TMX file:");
 		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-target=(source|empty)]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
 		ps.println("Conversion to table:");
 		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-target=(source|empty)]");
-		ps.println("      [-opt [csv|tab][,xliff|xliffgx|tmx|generic]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
+		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic]");
 		ps.println("Import to Pensive TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-target=(source|empty)]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
 	}
 
 	private void displayQuery (IQuery conn) {
@@ -796,7 +810,7 @@ public class Main {
 		else if ( command == CMD_CONV2TABLE ) {
 			params.setOutputFormat(Parameters.FORMAT_TABLE);
 			TableFilterWriterParameters opt = new TableFilterWriterParameters();
-			opt.fromStringArgument(tableConvOptions);
+			opt.fromArguments(tableConvFormat, tableConvCodes);
 			params.setFormatOptions(opt.toString());
 			params.setOutputPath("output.txt");
 			

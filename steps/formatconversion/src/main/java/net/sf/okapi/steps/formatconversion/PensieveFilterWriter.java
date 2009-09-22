@@ -126,7 +126,8 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 	private void handleStartDocument (Event event) {
 		Util.createDirectories(directory+File.separator);
-		writer = TmWriterFactory.createFileBasedTmWriter(directory, false);
+		//TODO: have an option or set to false (for now: false cause an exception: it does not create the TM)
+		writer = TmWriterFactory.createFileBasedTmWriter(directory, true);
 		StartDocument sd = (StartDocument)event.getResource();
 		srcLang = sd.getLanguage();
 	}

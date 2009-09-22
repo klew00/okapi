@@ -91,8 +91,9 @@ public class FileCompare {
 						if ( obuf[i] != gbuf[i] ) {
 							System.err.println("Difference in content:");
 							int start = ((i-20) < 0 ) ? 0 : (i-20);
-							String oText = new String(obuf, start, i-start);
-							String gText = new String(gbuf, start, i-start);
+							int extra = (i<BUFSIZ-11) ? 10 : 1;
+							String oText = new String(obuf, start, (i-start)+extra);
+							String gText = new String(gbuf, start, (i-start)+extra);
 							System.err.println(" out='"+oText+"'");
 							System.err.println("gold='"+gText+"'");
 							return false;

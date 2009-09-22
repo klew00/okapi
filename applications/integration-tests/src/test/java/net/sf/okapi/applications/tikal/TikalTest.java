@@ -131,6 +131,32 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeProperties () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("proptest.properties.xlf"));
+    	assertTrue(deleteOutputFile("proptest.out.properties"));
+    	// Extract
+    	assertEquals(0, runTikal("-x proptest.properties"));
+    	assertTrue("File different from gold", compareWithGoldFile("proptest.properties.xlf"));
+    	// Merge
+    	assertEquals(0, runTikal("-m proptest.properties.xlf"));
+    	assertTrue("File different from gold", compareWithGoldFile("proptest.out.properties"));
+    }
+
+    @Test
+    public void testExtractMergePropertiesNoEscapes () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("proptest.properties.xlf"));
+    	assertTrue(deleteOutputFile("proptest.out.noesc.properties"));
+    	// Extract
+    	assertEquals(0, runTikal("-x proptest.properties -fc okf_properties-outputNotEscaped"));
+    	assertTrue("File different from gold", compareWithGoldFile("proptest.properties.xlf"));
+    	// Merge
+    	assertEquals(0, runTikal("-m proptest.properties.xlf -fc okf_properties-outputNotEscaped"));
+    	assertTrue("File different from gold", compareWithGoldFile("proptest.out.properties", "proptest.out.noesc.properties"));
+    }
+
+    @Test
     public void testExtractMergeODT () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputFile("odttest.odt.xlf"));
@@ -187,11 +213,11 @@ public class TikalTest {
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.tmx", "potest.po.normal.tmx"));
     	// Test normal conversion (target=source)
     	assertTrue(deleteOutputFile("potest.po.tmx"));
-    	assertEquals(0, runTikal("-2tmx potest.po -target=source"));
+    	assertEquals(0, runTikal("-2tmx potest.po -trgsource"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.tmx", "potest.po.source.tmx"));
     	// Test normal conversion (target=empty)
     	assertTrue(deleteOutputFile("potest.po.tmx"));
-    	assertEquals(0, runTikal("-2tmx potest.po -target=empty"));
+    	assertEquals(0, runTikal("-2tmx potest.po -trgempty"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.tmx", "potest.po.empty.tmx"));
     }
 

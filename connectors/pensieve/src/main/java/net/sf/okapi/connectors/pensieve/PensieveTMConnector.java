@@ -107,7 +107,8 @@ public class PensieveTMConnector implements ITMQuery {
 		results = new ArrayList<QueryResult>();
 		current = -1;
 		// searchFuzzy also returns exact, so no need to call searchExact
-		List<TmHit> list = seeker.searchFuzzy(text.toString(), 0.8f, maxHits, null);
+		//TODO: add threshold. For now even 0.99f gives sometimes no return on exact matches
+		List<TmHit> list = seeker.searchFuzzy(text.toString(), null, maxHits, null);
 		// Convert to normalized results
 		for ( TmHit hit : list ) {
 			QueryResult qr = new QueryResult();

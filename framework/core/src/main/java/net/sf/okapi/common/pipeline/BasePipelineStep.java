@@ -30,15 +30,15 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	private boolean isLastOutputStep = false;
 
-	public IParameters getParameters() {
+	public IParameters getParameters () {
 		return null;
 	}
 
-	public void setParameters(IParameters params) {
+	public void setParameters (IParameters params) {
 		// No parameters by default
 	}
 
-	public boolean isDone() {
+	public boolean isDone () {
 		return true;
 	}
 

@@ -28,7 +28,7 @@ public class TableFilterWriterParameters extends BaseParameters {
 	public static final String INLINE_ORIGINAL = "original";
 	public static final String INLINE_TMX = "tmx";
 	public static final String INLINE_XLIFF = "xliff";
-	public static final String INLINE_XLIFFGX = "xliff_gx";
+	public static final String INLINE_XLIFFGX = "xliffgx";
 	public static final String INLINE_GENERIC = "generic";
 	
 	static final String INLINEFORMAT = "inlineFormat";
@@ -108,40 +108,38 @@ public class TableFilterWriterParameters extends BaseParameters {
 //	}
 
 	/**
-	 * Sets the parameters values from a string in a special short format that can be used
+	 * Sets the parameters values from two strings in a special short format that can be used
 	 * with command-line tools.
-	 * @param data the string to process.
+	 * @param format the format ("csv" or "tab")
+	 * @param inlineCodes the format of the inline codes.
 	 */
-	public void fromStringArgument (String data) {
-		if ( Util.isEmpty(data) ) return;
-		String[] parts = data.toLowerCase().split(",", 0);
-		for ( String part : parts ) {
-			part = part.trim();
-			if ( part.equals("csv") ) {
+	public void fromArguments (String format,
+		String inlineFormat)
+	{
+		if ( !Util.isEmpty(format) ) {
+			if ( format.equals("csv") ) {
 				separator = ",";
 				useDoubleQuotes = true;
 			}
-			else if ( part.equals("tab") ) {
+			else if ( format.equals("tab") ) {
 				separator = "\t";
 				useDoubleQuotes = false;
 			}
-			else if ( part.equals("generic") ) {
-				inlineFormat = INLINE_GENERIC;
+			else {
+				throw new RuntimeException(String.format("Invalid option '%s' in format options.", format));
 			}
-			else if ( part.equals("tmx") ) {
-				inlineFormat = INLINE_TMX;
-			}
-			else if ( part.equals("xliff") ) {
-				inlineFormat = INLINE_XLIFF;
-			}
-			else if ( part.equals("xliffgx") ) {
-				inlineFormat = INLINE_XLIFFGX;
-			}
-			else if ( part.equals("original") ) {
-				inlineFormat = INLINE_ORIGINAL;
+		}
+		if ( !Util.isEmpty(inlineFormat) ) {
+			if (( inlineFormat.equals(INLINE_GENERIC) )
+				|| ( inlineFormat.equals(INLINE_TMX) )
+				|| ( inlineFormat.equals(INLINE_XLIFF) )
+				|| ( inlineFormat.equals(INLINE_XLIFFGX) )
+				|| ( inlineFormat.equals(INLINE_ORIGINAL) ))
+			{
+				this.inlineFormat = inlineFormat;
 			}
 			else {
-				throw new RuntimeException(String.format("Invalid option '%s' in format options.", part));
+				throw new RuntimeException(String.format("Invalid option '%s' in codes options.", inlineFormat));
 			}
 		}
 	}
