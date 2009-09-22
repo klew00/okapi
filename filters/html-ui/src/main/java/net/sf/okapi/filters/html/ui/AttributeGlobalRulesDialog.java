@@ -30,48 +30,66 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.List;
 
-public class PreserveWhiteSpaceRulesDialog extends Composite implements IDialogPage {
-	private ConditionalRuleEditorComposite conditionalRuleEditorComposite;
-	private Text txtTagName;
+public class AttributeGlobalRulesDialog extends Composite implements IDialogPage {
+	private Text attributeNameTxt;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public PreserveWhiteSpaceRulesDialog(Composite parent, int style) {
+	public AttributeGlobalRulesDialog(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		{
 			Group grpEmbeddableTag = new Group(this, SWT.NONE);
-			grpEmbeddableTag.setText("Preserve Whitespace Tag");
+			grpEmbeddableTag.setText("Attribute");
+			grpEmbeddableTag.setLayout(new GridLayout(4, false));
 			{
 				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
-				gridData.heightHint = 46;
+				gridData.heightHint = 40;
 				grpEmbeddableTag.setLayoutData(gridData);
 			}
 			{
-				Label lblTagName = new Label(grpEmbeddableTag, SWT.NONE);
-				lblTagName.setBounds(10, 21, 55, 31);
-				lblTagName.setText("Name:");
+				Label lblName = new Label(grpEmbeddableTag, SWT.NONE);
+				lblName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+				lblName.setText("Name:");
 			}
 			{
-				txtTagName = new Text(grpEmbeddableTag, SWT.BORDER);
-				txtTagName.setBounds(65, 18, 172, 23);
+				attributeNameTxt = new Text(grpEmbeddableTag, SWT.BORDER);
+				attributeNameTxt.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+			}
+			{
+				Label lblType = new Label(grpEmbeddableTag, SWT.NONE);
+				lblType.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+				lblType.setText("Type:");
+			}
+			{
+				Combo attributeTypeCombo = new Combo(grpEmbeddableTag, SWT.NONE);
+				attributeTypeCombo.setItems(new String[] {"translatable", "localizaible", "read-only"});
+				attributeTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
 			}
 		}
 		{
-			Group grpConditionalRules = new Group(this, SWT.NONE);
-			grpConditionalRules.setText("Conditional Rules");
-			grpConditionalRules.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-			grpConditionalRules.setLayout(new GridLayout(1, false));
-			
-			conditionalRuleEditorComposite = new ConditionalRuleEditorComposite(grpConditionalRules, SWT.BORDER);
-			conditionalRuleEditorComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-			GridLayout gridLayout = (GridLayout) conditionalRuleEditorComposite.getLayout();
-			gridLayout.makeColumnsEqualWidth = true;
-			conditionalRuleEditorComposite.setData("name", "conditionalRuleEditorComposite");
+			Group grpAllTagsExcept = new Group(this, SWT.NONE);
+			grpAllTagsExcept.setText("All Tags Except");
+			grpAllTagsExcept.setLayout(new GridLayout(1, false));
+			grpAllTagsExcept.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+			{
+				List allTagsExceptList = new List(grpAllTagsExcept, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
+				{
+					GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 5);
+					gridData.heightHint = 125;
+					allTagsExceptList.setLayoutData(gridData);
+				}
+			}
+			{
+				AddDeleteComposite addDeleteComposite = new AddDeleteComposite(grpAllTagsExcept, SWT.NONE);
+				addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+			}
 		}
 	}
 

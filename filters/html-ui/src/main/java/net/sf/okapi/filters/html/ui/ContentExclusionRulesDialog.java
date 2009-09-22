@@ -25,7 +25,6 @@ import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
-import net.sf.okapi.common.ui.OKCancelPanel;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Group;
@@ -86,10 +85,6 @@ public class ContentExclusionRulesDialog extends Composite implements IDialogPag
 			GridLayout gridLayout = (GridLayout) conditionalRuleEditorComposite.getLayout();
 			gridLayout.makeColumnsEqualWidth = true;
 			conditionalRuleEditorComposite.setData("name", "conditionalRuleEditorComposite");
-		}
-		{
-			OKCancelPanel okCancelPanel = new OKCancelPanel(this, SWT.NONE);
-			okCancelPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		}
 	}
 

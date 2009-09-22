@@ -32,10 +32,11 @@ import org.eclipse.swt.layout.GridData;
 public class ConditionalRuleEditorComposite extends Composite {
 	private Composite conditionalRuleComposite;
 	private Composite ruleComposite;
-	private Text attributeNameCombo;
+	private Text attributeNameTxt;
 	private Combo operatorCombo;
-	private Text attributeValueCombo;
+	private Text attributeValueTxt;
 	private List ruleList;
+	private AddDeleteComposite addDeleteComposite;
 
 	/**
 	 * Create the composite.
@@ -63,10 +64,10 @@ public class ConditionalRuleEditorComposite extends Composite {
 		ruleComposite.setLayout(gridLayout_1);
 		ruleComposite.setData("name", "composite");
 		
-		attributeNameCombo = new Text(ruleComposite, SWT.BORDER);
-		attributeNameCombo.setToolTipText("Attribute Name");
-		attributeNameCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		attributeNameCombo.setData("name", "combo_1");
+		attributeNameTxt = new Text(ruleComposite, SWT.BORDER);
+		attributeNameTxt.setToolTipText("Attribute Name");
+		attributeNameTxt.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		attributeNameTxt.setData("name", "combo_1");
 		new Label(ruleComposite, SWT.NONE);
 		
 		operatorCombo = new Combo(ruleComposite, SWT.READ_ONLY);
@@ -78,10 +79,10 @@ public class ConditionalRuleEditorComposite extends Composite {
 		operatorCombo.select(0);
 		new Label(ruleComposite, SWT.NONE);
 		
-		attributeValueCombo = new Text(ruleComposite, SWT.BORDER);
-		attributeValueCombo.setToolTipText("Attribute Value");
-		attributeValueCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-		attributeValueCombo.setData("name", "combo_3");
+		attributeValueTxt = new Text(ruleComposite, SWT.BORDER);
+		attributeValueTxt.setToolTipText("Attribute Value");
+		attributeValueTxt.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+		attributeValueTxt.setData("name", "combo_3");
 		
 		ruleList = new List(conditionalRuleComposite, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 		{
@@ -91,7 +92,7 @@ public class ConditionalRuleEditorComposite extends Composite {
 		}
 		ruleList.setData("name", "list");
 		{
-			AddDeleteComposite addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
+			addDeleteComposite = new AddDeleteComposite(this, SWT.NONE);
 			addDeleteComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		}
 
@@ -100,5 +101,17 @@ public class ConditionalRuleEditorComposite extends Composite {
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+	public List getRuleList() {
+		return ruleList;
+	}
+	public Text getAttributeNameTxt() {
+		return attributeNameTxt;
+	}
+	public Text getAttributeValueTxt() {
+		return attributeValueTxt;
+	}
+	public AddDeleteComposite getAddDeleteComposite() {
+		return addDeleteComposite;
 	}
 }

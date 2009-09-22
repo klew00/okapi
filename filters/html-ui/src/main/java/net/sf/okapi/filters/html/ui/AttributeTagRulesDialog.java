@@ -65,6 +65,7 @@ public class AttributeTagRulesDialog extends Composite implements IDialogPage {
 				txtEmbeddableTag.setBounds(56, 15, 173, 23);
 			}
 		}
+		new Label(this, SWT.NONE);
 		{
 			Group grpAttribute = new Group(this, SWT.NONE);
 			grpAttribute.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 0, 0));
@@ -132,10 +133,6 @@ public class AttributeTagRulesDialog extends Composite implements IDialogPage {
 			GridLayout gridLayout = (GridLayout) conditionalRuleEditorComposite.getLayout();
 			gridLayout.makeColumnsEqualWidth = true;
 			conditionalRuleEditorComposite.setData("name", "conditionalRuleEditorComposite");
-		}
-		{
-			OKCancelPanel okCancelPanel = new OKCancelPanel(this, SWT.NONE);
-			okCancelPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		}
 	}
 
