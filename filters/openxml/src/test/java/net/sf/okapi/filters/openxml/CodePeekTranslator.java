@@ -25,7 +25,6 @@ import java.util.logging.Level;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.openxml.AbstractTranslator;
 
 /**

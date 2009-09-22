@@ -94,7 +94,7 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 
 	public void open () {
-        //TODO make it so that you can create a fresh new TM or create a new one
+		// Create a seeker (the TM must exist: we are just querying)
 		seeker = TmSeekerFactory.createFileBasedTmSeeker(params.getDbDirectory());
 	}
 

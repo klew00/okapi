@@ -25,7 +25,6 @@ import java.util.logging.Level;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.openxml.AbstractTranslator;
 
 /**
@@ -239,21 +238,22 @@ public class TagPeekTranslator extends AbstractTranslator {
 		}
 		return i;		
 	}
-	private String eggspand(Code code)
-	{
-		String s,ss="";
-		int len;
-		char carrot;
-		s = expandCodeContent(code, "en-US", 1);
-		len = s.length();
-		for(int i=0; i<len; i++)
-		{
-			carrot = s.charAt(i);
-			if (carrot=='<')
-				ss += "&lt;";
-			else
-				ss += carrot;
-		}
-		return ss;
-	}
+
+//	private String eggspand(Code code)
+//	{
+//		String s,ss="";
+//		int len;
+//		char carrot;
+//		s = expandCodeContent(code, "en-US", 1);
+//		len = s.length();
+//		for(int i=0; i<len; i++)
+//		{
+//			carrot = s.charAt(i);
+//			if (carrot=='<')
+//				ss += "&lt;";
+//			else
+//				ss += carrot;
+//		}
+//		return ss;
+//	}
 }

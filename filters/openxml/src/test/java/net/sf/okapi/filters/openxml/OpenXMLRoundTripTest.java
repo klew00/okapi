@@ -27,8 +27,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-import java.io.BufferedInputStream;
-import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -108,10 +106,10 @@ public class OpenXMLRoundTripTest {
 	public void runOneTest (String filename, boolean bTranslating, boolean bPeeking) {
 		String sInputPath=null,sOutputPath=null,sGoldPath=null;
 		Event event;
-		File filly;
+		//File filly;
 		URI uri;
 		OpenXMLFilter filter = null;
-		BufferedInputStream bis;
+		//BufferedInputStream bis;
 		boolean rtrued2;
 		try {
 			if (bPeeking)

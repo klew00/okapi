@@ -23,17 +23,13 @@ package net.sf.okapi.filters.openxml;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.BufferedInputStream;
-import java.io.File;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
@@ -91,9 +87,9 @@ public class OpenXMLRoundTripSequenceTest {
 	public void runOneTest (String filename, OpenXMLFilter filter) {
 		String sInputPath=null,sOutputPath=null,sGoldPath=null;
 		Event event;
-		File filly;
+		//File filly;
 		URI uri;
-		BufferedInputStream bis;
+		//BufferedInputStream bis;
 		boolean rtrued2;
 		try {	
 			filter.setParameters(cparams);

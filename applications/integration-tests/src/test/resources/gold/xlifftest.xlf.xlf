@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="test1" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="UTF-8" x:configId="">
+<body>
+<trans-unit id="6">
+<source xml:lang="en">Text <x id="1"/> text.</source>
+<target xml:lang="fr">Text <x id="1"/> text.</target>
+</trans-unit>
+<trans-unit id="0" translate="no">
+<source xml:lang="en">Do not translate this.</source>
+<target xml:lang="fr">Do not translate this.</target>
+</trans-unit>
+<trans-unit id="1">
+<source xml:lang="en">Text number 1</source>
+<target xml:lang="fr">Text number 1</target>
+</trans-unit>
+<trans-unit id="2">
+<source xml:lang="en">Text number 2</source>
+<target xml:lang="fr">Texte numéro 2.</target>
+</trans-unit>
+<trans-unit id="3" approved="yes">
+<source xml:lang="en">Text number 3</source>
+<target xml:lang="fr">Texte numéro 3</target>
+</trans-unit>
+<trans-unit id="4">
+<source xml:lang="en">Text number four</source>
+<target xml:lang="fr">Text number four</target>
+</trans-unit>
+<trans-unit id="5">
+<source xml:lang="en">Text <x id="1"/> text.</source>
+<target xml:lang="fr">Text <x id="1"/> text.</target>
+</trans-unit>
+</body>
+</file>
+</xliff>

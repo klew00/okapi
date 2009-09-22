@@ -40,7 +40,6 @@ public class ShowTagsForAllFilesInADirectory {
 	private static Logger LOGGER;
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
-	private static final String deary="/data/";
 
 	public void doAll()
 	{

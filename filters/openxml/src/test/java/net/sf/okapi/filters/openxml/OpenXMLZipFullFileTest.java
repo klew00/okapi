@@ -38,6 +38,7 @@ import net.sf.okapi.filters.openxml.OpenXMLFilter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * This is a test that filters all files in the data directory.
@@ -47,7 +48,6 @@ public class OpenXMLZipFullFileTest {
 	private static Logger LOGGER;
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
-	private static final String deary="/data/";
 
 	@Before
 	public void setUp() throws Exception {
@@ -101,9 +101,9 @@ public class OpenXMLZipFullFileTest {
 		{
 			URI uriFf = new URI(filename);
 			openXMLFilter.open(uriFf,true,Level.FINEST); // DWH 4-22-09
-			while (openXMLFilter.hasNext())
-			{
+			while (openXMLFilter.hasNext()) {
 				Event event = openXMLFilter.next();
+				assertNotNull(event);
 			}
 			throw new RuntimeException("Should have recognized" + filename + " is not an MSOffice 2007 file");
 		}

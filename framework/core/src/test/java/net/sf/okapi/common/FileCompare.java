@@ -61,8 +61,8 @@ public class FileCompare {
 	public boolean filesExactlyTheSame (URI outputFileURI,
 		URI goldFileURI)
 	{
-		InputStream ois = null;
-		InputStream gis = null;
+		InputStream ois;
+		InputStream gis;
 		try {
 			ois = outputFileURI.toURL().openStream();
 			gis = goldFileURI.toURL().openStream();
@@ -72,19 +72,9 @@ public class FileCompare {
 			e.printStackTrace();
 			return false;
 		}
-		finally {
-			try {
-				if ( ois != null ) ois.close();
-				if ( gis != null ) gis.close();
-			}
-			catch ( IOException e ) {
-				e.printStackTrace();
-				return false;
-			}
-		}
 	}
 	
-	private boolean filesExactlyTheSame (InputStream ois,
+	public boolean filesExactlyTheSame (InputStream ois,
 		InputStream gis)
 	{
 		try {
@@ -93,11 +83,18 @@ public class FileCompare {
 				ored = ois.read(obuf);
 				gred = gis.read(gbuf);
 				if ( ored != gred ) {
+					System.err.println("Size difference in files.");
 					return false;
 				}
 				if ( ored > 0 ) {
 					for ( int i=0; i<ored; i++ ) {
-						if ( obuf[i]!=gbuf[i] ) {
+						if ( obuf[i] != gbuf[i] ) {
+							System.err.println("Difference in content:");
+							int start = ((i-20) < 0 ) ? 0 : (i-20);
+							String oText = new String(obuf, start, i-start);
+							String gText = new String(gbuf, start, i-start);
+							System.err.println(" out='"+oText+"'");
+							System.err.println("gold='"+gText+"'");
 							return false;
 						}
 					}
@@ -111,6 +108,20 @@ public class FileCompare {
 		catch ( Exception e ) {
 			e.printStackTrace();
 			return false;
+		}
+		finally {
+			try {
+				if ( ois != null ) {
+					ois.close();
+				}
+				if ( gis != null ) {
+					gis.close();
+				}
+			}
+			catch ( IOException e ) {
+				e.printStackTrace();
+				return false;
+			}
 		}
 	}
 

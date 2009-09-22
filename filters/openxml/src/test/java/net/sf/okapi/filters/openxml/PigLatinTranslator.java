@@ -53,7 +53,7 @@ public class PigLatinTranslator extends AbstractTranslator {
 	{
 		String s = tf.getCodedText();
 		String rslt=s,ss="",slow;
-		int i,j,k,len,rslen;
+		int i,j,k,len;
 		char carrot;
 		len = s.length();
 		if (len>1)

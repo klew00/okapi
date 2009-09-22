@@ -157,6 +157,19 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeXLIFF () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("xlifftest.xlf.xlf"));
+    	assertTrue(deleteOutputFile("xlifftest.out.xlf"));
+    	// Extract
+    	assertEquals(0, runTikal("-x xlifftest.xlf"));
+    	assertTrue("File different from gold", compareWithGoldFile("xlifftest.xlf.xlf"));
+    	// Merge
+    	assertEquals(0, runTikal("-m xlifftest.xlf.xlf"));
+    	assertTrue("File different from gold", compareWithGoldFile("xlifftest.out.xlf"));
+    }
+
+    @Test
     public void testImportPensieve () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputDir("pensieveTM", true));

@@ -20,16 +20,14 @@
 
 package net.sf.okapi.filters.openxml;
 
-//import java.io.File;
 import java.io.File;
 import java.io.InputStream;
-//import java.net.URL;
 import java.util.Enumeration;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
+
+import net.sf.okapi.common.FileCompare;
 
 /**
  * This class compares two zip files to see if they have
