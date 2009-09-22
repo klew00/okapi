@@ -179,9 +179,33 @@ public class TikalTest {
     	assertEquals(0, runTikal("-q \"One entry in the TM.\" -pen pensieveTM -sl EN-US -tl FR-FR"));
     }
 
+    @Test
+    public void testConvertToTMX () throws IOException, InterruptedException {
+    	// Test normal conversion
+    	assertTrue(deleteOutputFile("potest.po.tmx"));
+    	assertEquals(0, runTikal("-2tmx potest.po"));
+    	assertTrue("File different from gold", compareWithGoldFile("potest.po.tmx", "potest.po.normal.tmx"));
+    	// Test normal conversion (target=source)
+    	assertTrue(deleteOutputFile("potest.po.tmx"));
+    	assertEquals(0, runTikal("-2tmx potest.po -target=source"));
+    	assertTrue("File different from gold", compareWithGoldFile("potest.po.tmx", "potest.po.source.tmx"));
+    	// Test normal conversion (target=empty)
+    	assertTrue(deleteOutputFile("potest.po.tmx"));
+    	assertEquals(0, runTikal("-2tmx potest.po -target=empty"));
+    	assertTrue("File different from gold", compareWithGoldFile("potest.po.tmx", "potest.po.empty.tmx"));
+    }
+
     private boolean compareWithGoldFile (String outputBase) {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
+    	return fc.filesExactlyTheSame(outputPath, goldPath);
+    }
+    
+    private boolean compareWithGoldFile (String outputBase,
+    	String goldBase)
+    {
+    	String outputPath = root + File.separator + outputBase;
+    	String goldPath = root + File.separator + "gold" + File.separator + goldBase; 
     	return fc.filesExactlyTheSame(outputPath, goldPath);
     }
     

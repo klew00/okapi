@@ -27,7 +27,7 @@
       <target xml:lang="fr">Text number four</target>
 <alt-trans>
          <source xml:lang="en">The text number four.</source>
-         <target xml:lang="fr">Le texte numéro quatre.</target>
+         <target xml:lang="fr">Le texte numéro <mrk mtype="term">quatre</mrk>.</target>
       </alt-trans>
    </trans-unit>
    <trans-unit id="5">
