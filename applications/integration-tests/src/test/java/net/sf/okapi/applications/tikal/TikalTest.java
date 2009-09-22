@@ -64,6 +64,19 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeDTD () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("dtdtest.dtd.xlf"));
+    	assertTrue(deleteOutputFile("dtdtest.out.dtd"));
+    	// Extract
+    	assertEquals(0, runTikal("-x dtdtest.dtd"));
+    	//TODO: compare output with gold one
+    	// Merge
+    	assertEquals(0, runTikal("-m dtdtest.dtd.xlf"));
+    	//TODO: compare output with gold one
+    }
+
+    @Test
     public void testExtractMergeHTML () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputFile("htmltest.html.xlf"));
@@ -77,14 +90,67 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeJSON () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("jsontest.json.xlf"));
+    	assertTrue(deleteOutputFile("jsontest.out.json"));
+    	// Extract
+    	assertEquals(0, runTikal("-x jsontest.json"));
+    	//TODO: compare output with gold one
+    	// Merge
+    	assertEquals(0, runTikal("-m jsontest.json.xlf"));
+    	//TODO: compare output with gold one
+    }
+
+    @Test
+    public void testExtractMergePO () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("potest.po.xlf"));
+    	assertTrue(deleteOutputFile("potest.out.po"));
+    	// Extract
+    	assertEquals(0, runTikal("-x potest.po"));
+    	//TODO: compare output with gold one
+    	// Merge
+    	assertEquals(0, runTikal("-m potest.po.xlf"));
+    	//TODO: compare output with gold one
+    }
+
+    @Test
+    public void testExtractMergePOMono () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("potest-mono.po.xlf"));
+    	assertTrue(deleteOutputFile("potest-mono.out.po"));
+    	// Extract
+    	assertEquals(0, runTikal("-x potest-mono.po -fc okf_po-monolingual"));
+    	//TODO: compare output with gold one
+    	// Merge
+    	assertEquals(0, runTikal("-m potest-mono.po.xlf -fc okf_po-monolingual"));
+    	//TODO: compare output with gold one
+    }
+
+    @Test
+    public void testExtractMergeODT () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("odttest.odt.xlf"));
+    	assertTrue(deleteOutputFile("odttest.out.odt"));
+    	// Extract
+    	assertEquals(0, runTikal("-x odttest.odt"));
+    	//TODO: compare output with gold one
+    	// Merge
+    	assertEquals(0, runTikal("-m odttest.odt.xlf"));
+    	//TODO: compare output with gold one
+    }
+
+    @Test
     public void testExtractMergeTMX () throws IOException, InterruptedException {
     	// Delete previous output
-    	assertTrue(deleteOutputFile("withattributes.tmx.xlf"));
-    	assertTrue(deleteOutputFile("withattributes.out.tmx"));
+    	assertTrue(deleteOutputFile("tmxtest-attributes.tmx.xlf"));
+    	assertTrue(deleteOutputFile("tmxtest-attributes.tmx.out.po"));
     	// Extract
-    	assertEquals(0, runTikal("-x withattributes.tmx -sl EN-US -tl FR-FR"));
+    	assertEquals(0, runTikal("-x tmxtest-attributes.tmx -sl EN-US -tl FR-FR"));
+    	//TODO: compare output with gold one
     	// Merge
-    	assertEquals(0, runTikal("-m withattributes.tmx.xlf -sl EN-US -tl FR-FR"));
+    	assertEquals(0, runTikal("-m tmxtest-attributes.tmx.xlf -sl EN-US -tl FR-FR"));
     	//TODO: compare output with gold one
     }
 
@@ -93,7 +159,7 @@ public class TikalTest {
     	// Delete previous output
     	assertTrue(deleteOutputDir("pensieveTM", true));
     	// Import
-    	assertEquals(0, runTikal("-imp pensieveTM withattributes.tmx -sl EN-US -tl FR-FR"));
+    	assertEquals(0, runTikal("-imp pensieveTM tmxtest-attributes.tmx -sl EN-US -tl FR-FR"));
     	//TODO: compare output with gold one
     }
 
