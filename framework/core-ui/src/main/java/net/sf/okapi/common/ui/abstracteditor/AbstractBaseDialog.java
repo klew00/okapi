@@ -37,7 +37,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-public abstract class AbstractBaseDialog <T extends Composite> {
+public abstract class AbstractBaseDialog {
 
 	static final public String REGISTER_DIALOG_PAGE = "REGISTER_DIALOG_PAGE"; 
 	static final public String UNREGISTER_DIALOG_PAGE = "UNREGISTER_DIALOG_PAGE";
@@ -50,7 +50,7 @@ public abstract class AbstractBaseDialog <T extends Composite> {
 	private IHelp help;
 	protected IDialogPage page;
 	protected Composite pageC;
-	private Class<T> pageClass;
+	private Class<? extends Composite> pageClass;
 
 	protected int getStyle() {
 		
@@ -82,7 +82,7 @@ public abstract class AbstractBaseDialog <T extends Composite> {
 							
 			if (pageClass == null) return;
 				
-			Constructor<T> cc = (Constructor<T>) pageClass.getConstructor(new Class[] {Composite.class, int.class});
+			Constructor<? extends Composite> cc = (Constructor<? extends Composite>) pageClass.getConstructor(new Class[] {Composite.class, int.class});
 			
 			if (cc == null) return;
 			
@@ -179,7 +179,7 @@ public abstract class AbstractBaseDialog <T extends Composite> {
 		Dialogs.centerWindow(shell, p_Parent);
 	}
 	
-	protected boolean run(Shell parent, Class<T> pageClass, String caption, Object initialData, IHelp help) {
+	protected boolean run(Shell parent, Class<? extends Composite> pageClass2, String caption, Object initialData, IHelp help) {
 		
 		try {
 			//if (parent.getClass().isAssignableFrom(this.getClass()));
@@ -188,7 +188,7 @@ public abstract class AbstractBaseDialog <T extends Composite> {
 			// if (parent instanceof AbstractParametersEditor);
 			
 			this.parent = parent;
-			this.pageClass = pageClass;
+			this.pageClass = pageClass2;
 			this.caption = caption;
 			this.data = initialData;
 			this.help = help;

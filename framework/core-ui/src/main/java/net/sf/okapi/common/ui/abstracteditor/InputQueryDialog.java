@@ -26,6 +26,7 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -34,7 +35,7 @@ import org.eclipse.swt.widgets.Shell;
  * @version 0.1, 23.06.2009
  */
 
-public class InputQueryDialog extends AbstractBaseDialog {
+public class InputQueryDialog extends AbstractBaseDialog  {
 	
 //	private OKCancelPanel pnlActions;
 //	private String caption;
@@ -44,7 +45,7 @@ public class InputQueryDialog extends AbstractBaseDialog {
 //	private Class<?> pageClass;
 //	private IInputQueryPage page; 
 	
-	public boolean run(Shell parent, Class<?> pageClass, String caption, String prompt, Object initialData, IHelp help) {
+	public boolean run(Shell parent, Class<? extends Composite> pageClass, String caption, String prompt, Object initialData, IHelp help) {
 		
 //		if (!IDialogPage.class.isAssignableFrom(pageClass)) return false;
 //		if (!Composite.class.isAssignableFrom(pageClass)) return false;

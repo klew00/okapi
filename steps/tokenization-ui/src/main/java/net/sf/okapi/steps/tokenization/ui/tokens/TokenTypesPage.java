@@ -190,7 +190,7 @@ public class TokenTypesPage extends Composite implements IDialogPage {
 			if (d instanceof AbstractBaseDialog) {
 				
 				data = new Parameters();
-				((AbstractBaseDialog<?>) d).setData(data);
+				((AbstractBaseDialog) d).setData(data);
 			}			
 		}
 		

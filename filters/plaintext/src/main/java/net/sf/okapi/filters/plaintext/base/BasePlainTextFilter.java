@@ -21,10 +21,10 @@
 package net.sf.okapi.filters.plaintext.base;
 
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.InlineCodeFinder;
@@ -33,9 +33,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
-import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
@@ -64,6 +62,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		setName(FILTER_NAME);
 		setDisplayName("Plain Text Filter (BETA)");
 		setMimeType(FILTER_MIME);
+		setMultilingual(false);
 		
 		addConfiguration(true, 
 				FILTER_CONFIG,
@@ -91,6 +90,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		
 		// Commons, should be included in all descendants introducing own params
 		params = getParameters(Parameters.class);	// Throws OkapiBadFilterParametersException		
+
+		super.component_init();
 		
 		// Initialization
 		if (params.useCodeFinder && codeFinder != null) {

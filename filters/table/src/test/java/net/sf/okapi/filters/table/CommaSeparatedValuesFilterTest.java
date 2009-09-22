@@ -104,8 +104,7 @@ public class CommaSeparatedValuesFilterTest {
 		params.targetSourceRefs = "1";
 		filter.setParameters(params);
 		
-		// TODO "FR-CA");
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "EN");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");
 		assertEquals(snippet, result);
 	}
 	
@@ -126,8 +125,7 @@ public class CommaSeparatedValuesFilterTest {
 		params.targetSourceRefs = "1";
 		filter.setParameters(params);
 		
-		// TODO "FR-CA");
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "EN");  
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");  
 		assertEquals(snippet, result);
 	}
 	
@@ -160,8 +158,7 @@ public class CommaSeparatedValuesFilterTest {
 		
 		//System.out.println(snippet);
 		
-		// TODO "FR-CA");
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "EN");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");
 		//System.out.println(result);
 		assertEquals(snippet, result);
 	}

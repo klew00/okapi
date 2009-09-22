@@ -22,14 +22,10 @@ package net.sf.okapi.common.resource;
 
 import java.util.List;
 
-import net.sf.okapi.common.ISkeleton;
-import net.sf.okapi.common.ListUtil;
-import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
 
 /**

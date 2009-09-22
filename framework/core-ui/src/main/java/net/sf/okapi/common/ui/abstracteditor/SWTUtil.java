@@ -224,7 +224,7 @@ public class SWTUtil {
 		return res;
 	}
 	
-	public static boolean inputQuery(Class<?> pageClass, Shell parent, String caption, Object initialData, IHelp help) {
+	public static boolean inputQuery(Class<? extends Composite> pageClass, Shell parent, String caption, Object initialData, IHelp help) {
 
 		result = null;
 				

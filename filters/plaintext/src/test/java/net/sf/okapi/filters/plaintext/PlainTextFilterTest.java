@@ -48,19 +48,15 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
-import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.filters.plaintext.PlainTextFilter;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.Parameters;
@@ -68,9 +64,6 @@ import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;
 import net.sf.okapi.filters.plaintext.spliced.SplicedLinesFilter;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 import net.sf.okapi.lib.extra.filters.WrapMode;
-import net.sf.okapi.common.filters.FilterTestDriver;
-import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -294,14 +287,12 @@ public class PlainTextFilterTest {
 		filter.close();
 	}
 	
-/*  TODO: fix this
 	@Test
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"cr.txt", null),
 			"UTF-8", "en", "en"));
 	}
-*/
 
 	@Test
 	public void testDoubleExtraction () {

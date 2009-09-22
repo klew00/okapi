@@ -117,6 +117,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		sourceIdSuffixes = ListUtil.stringAsList(params.sourceIdSuffixes);
 										
 		sendListedMode = params.sendColumnsMode == Parameters.SEND_COLUMNS_LISTED;
+		setMultilingual(sendListedMode && targetColumns.size() > 0);
 		
 //		if (params.trimMode == Parameters.TRIM_NONE) {
 //			

@@ -33,7 +33,6 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
-import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
@@ -66,9 +65,6 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	private boolean lineFlushed = false;
 	private int qualifierLen;
 	
-//	public void component_create() {
-//		
-//		super.component_create();
 	public CommaSeparatedValuesFilter() {
 		
 		setName(FILTER_NAME);
@@ -99,18 +95,6 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 			buffer.clear();		
 	}
 
-//	@Override
-//	protected void preProcessTarget(TextUnit target) {
-//		
-//		TextUnitUtil.removeQualifiers(target, params.textQualifier);
-//	}
-
-//	@Override
-//	protected String preProcessCell(String cell) {
-//		
-//		return StringUtil.removeQualifiers(cell, params.textQualifier);
-//	}
-	
 	@Override
 	protected String getFieldDelimiter() {
 		
@@ -249,191 +233,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 		return super.processTU(textUnit);
 	}
-	
-//	@Override
-//	//protected boolean sendSourceCell(TextUnit tu, int column, int numColumns) {
-//	protected TextProcessingResult sendAsSource(TextUnit textUnit) {
-//		
-//		if (textUnit == null) return TextProcessingResult.REJECTED;
-//		
-//		TextFragment src = textUnit.getSourceContent(); 
-//		if (src == null) return TextProcessingResult.REJECTED;
-//		
-//		String cell = src.getCodedText();
-//		if (Util.isEmpty(cell)) return TextProcessingResult.REJECTED;
-//						
-//		GenericSkeleton skel = TextUnitUtil.forseSkeleton(textUnit);
-//			
-//		String trimmedChunk = cell.trim();
-//		
-//		boolean startsQualified = trimmedChunk.startsWith(params.textQualifier);
-//		boolean endsQualified = trimmedChunk.endsWith(params.textQualifier);
-//		
-//		// Remove qualifiers around fields (only both ends)
-//		if (startsQualified && endsQualified) {		
-//			
-//			cell = trimmedChunk.substring(qualifierLen, Util.getLength(trimmedChunk) - qualifierLen);
-//			if (skel != null) {
-//				
-//				skel.add(params.textQualifier);
-//				skel.addContentPlaceholder(textUnit);
-//				skel.add(params.textQualifier);
-//			}
-//		}
-//			
-//		// Process wrapped lines
-//		List<String> temp = ListUtil.stringAsList(cell, LINE_WRAP_TAG);
-//		
-//		if (temp.size() > 1) {
-//			
-//			src.setCodedText("");
-//			
-//			for (int i = 0; i < temp.size(); i++) {
-//				
-//				String st = temp.get(i);
-//				
-//				src.append(st);				
-//				if (i == temp.size() - 1) break;
-//				
-//				switch (params.wrapMode) {
-//				
-//				case PLACEHOLDERS:
-//					src.append(new Code(TagType.PLACEHOLDER, "line break", getLineBreak()));
-//					break;
-//					
-//				case SPACES:
-//					src.append(' ');
-//					break;
-//					
-//				case NONE:
-//				default:
-//					src.append('\n');
-//				}
-//			}			
-//		}
-//		else
-//			src.setCodedText(cell); // No line wrappers found 
-//		
-//		// Change 2 quotes inside the field to one quote (2 adjacent quotes in CSV are part of quoted text, not field qualifiers)
-//		String st = src.getCodedText();		
-//		String qq = params.textQualifier + params.textQualifier;
-//		
-//		int start = 0; // abs index
-//		do {			
-//			int index = st.indexOf(qq); // rel index
-//			if (index == -1) break;
-//			
-//			src.changeToCode(start + index, start + index + 1, TagType.PLACEHOLDER, "CSV quote preamble");
-//			
-//			start += index + 3; // Code takes 2 positions			
-//			st = src.getCodedText().substring(start); // To make sure we're synchronized
-//		} while (true);
-//
-//		
-////		boolean res = super.sendSourceCell(tu, column, numColumns);
-////				
-//////		// Add field delimiter to skeleton
-//////		if (res && column < numColumns) { // For all columns but the last
-//////												
-//////			if (skel != null) skel.add(params.fieldDelimiter);
-//////		}
-//		
-//		return super.sendAsSource(textUnit);
-//	}
-	
-	
-//	@Override
-//	protected boolean sendTargetCell(TextUnit target, TextUnit source,
-//			GenericSkeleton skel, String language, int column, int numColumns) {
-//		
-////		if (target == null && skel == null) 
-////			return super.sendTargetCell(target, source, skel, language, column, numColumns);
-////		
-////		TextFragment src = target.getSourceContent(); 
-////		if (src == null) return false;
-////		
-////		String cell = src.getCodedText();
-////		if (Util.isEmpty(cell)) return false;
-////		
-////		String trimmedChunk = cell.trim();
-////		
-////		boolean startsQualified = trimmedChunk.startsWith(params.textQualifier);
-////		boolean endsQualified = trimmedChunk.endsWith(params.textQualifier);
-////		
-////		// Remove qualifiers around fields (only both ends)
-////		if (startsQualified && endsQualified) {		
-////			
-////			cell = trimmedChunk.substring(qualifierLen, Util.getLength(trimmedChunk) - qualifierLen);
-////			if (skel != null) {
-////				
-////				//skel.add(params.textQualifier);
-////				skel.addContentPlaceholder(target, language);
-////				//skel.add(params.textQualifier);
-////			}
-////		}
-//		
-////		skel.addContentPlaceholder(target, language);
-////		boolean res = true; //super.sendTargetCell(target, source, skel, language, column, numColumns);
-//		boolean res = super.sendTargetCell(target, source, skel, language, column, numColumns);
-//		
-////		// Add field delimiter to skeleton
-////		if (res && column < numColumns) { // For all columns but the last
-////												
-////			if (skel != null) skel.add(params.fieldDelimiter);
-////		}
-//		
-//		return res;
-//	}
-
-//	@Override
-//	protected boolean sendSkeletonCell(TextUnit cell0, GenericSkeleton skel, int column, int numColumns) {
-//		
-//		String cell = TextUnitUtil.getSourceText(cell0);
-//		
-//		// if (column < numColumns) cell = cell + params.fieldDelimiter;
-//		
-//		switch (params.wrapMode) {
-//		
-//		case SPACES:
-//			cell = cell.replaceAll(LINE_WRAP_TAG, " ");
-//			break;
-//			
-//		case PLACEHOLDERS:	
-//		case NONE:
-//		default:
-//			cell = cell.replaceAll(LINE_WRAP_TAG, "\n");
-//		}
-//		
-//		skel.add(cell);
-//		return true;
-//	}
-
-// TODO Move parts to ProcessTU()	
-//	@Override
-////	protected boolean sendSkeletonCell(TextUnit cell0, GenericSkeleton skel, int column, int numColumns) {
-//	protected TextProcessingResult sendAsSkeleton(TextUnit textUnit) {
-//		
-//		GenericSkeleton parentSkeleton = getActiveSkeleton();
-//		String cell = TextUnitUtil.getSourceText(textUnit);
-//		
-//		// if (column < numColumns) cell = cell + params.fieldDelimiter;
-//		
-//		switch (params.wrapMode) {
-//		
-//		case SPACES:
-//			cell = cell.replaceAll(LINE_WRAP_TAG, " ");
-//			break;
-//			
-//		case PLACEHOLDERS:	
-//		case NONE:
-//		default:
-//			cell = cell.replaceAll(LINE_WRAP_TAG, "\n");
-//		}
-//		
-//		parentSkeleton.add(cell);
-//		return TextProcessingResult.ACCEPTED;
-//	}
-	
+		
 	@Override
 	protected void component_idle(boolean lastChance) {
 		

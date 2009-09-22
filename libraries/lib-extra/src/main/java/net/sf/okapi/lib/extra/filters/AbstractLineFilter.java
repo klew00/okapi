@@ -71,7 +71,9 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 	private int parseState = 0;	
 	private String docName;
 	private String srcLang;
-	private boolean hasUTF8BOM;	
+	private boolean hasUTF8BOM;
+	private IFilterWriter filterWriter;
+	private boolean multilingual;
 	
 	public void cancel() {
 		
@@ -103,14 +105,31 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		return new GenericSkeletonWriter();
 	}
 
+	public IFilterWriter getFilterWriter() {
 		
-//	/** 
-//	 * Called by the filter every time a new input is being open.
-//	 * Used to update parameters and filter-specific variables.
-//	 */
-//	protected void filter_init() {
-//		// To be implemented in descendant classes
-//	}
+		return filterWriter;
+	}
+		
+	public void setFilterWriter(IFilterWriter filterWriter) {
+		
+		this.filterWriter = filterWriter;
+	}
+	
+	protected void setMultilingual(boolean multilingual) {
+		
+		this.multilingual = multilingual;
+	}
+
+	public boolean isMultilingual() {
+		
+		return multilingual;
+	}
+	
+	@Override
+	protected void component_init() {
+		
+		setFilterWriter(createFilterWriter());
+	}
 	
 	/**
 	 * Called by the filter for every line read from the input
@@ -220,16 +239,19 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		
 		component_init(); // Initialize the filter with implementation-specific parameters (protected method)
 		
+		// TODO setIsMultilingual()
 		// Send start event
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLanguage(srcLang);
-		startDoc.setFilterParameters(getParameters());
+		startDoc.setFilterParameters(getParameters());		
+		startDoc.setFilterWriter(getFilterWriter());		
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(getMimeType());
 		startDoc.setMimeType(getMimeType());
 		startDoc.setSkeleton(new GenericSkeleton());
+		startDoc.setMultilingual(isMultilingual());
 		
 		sendEvent(EventType.START_DOCUMENT, startDoc);				
 	}

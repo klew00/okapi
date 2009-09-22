@@ -249,8 +249,7 @@ public class TabSeparatedValuesFilterTest {
 		
 		//System.out.println(snippet);
 		
-		// TODO "FR-CA");
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "EN");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");
 		//System.out.println(result);
 		assertEquals(snippet, result);
 	}

@@ -433,8 +433,7 @@ public class FixedWidthColumnsFilterTest {
 		}
 		//System.out.println(snippet);
 		
-		// TODO "ge-sw");
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "ge-sw"), "EN");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "ge-sw"), "ge-sw");
 		assertEquals(snippet, result);
 	}
 	
