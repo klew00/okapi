@@ -23,13 +23,31 @@ public class TikalTest {
 		root = Util.getDirectoryName(file.getAbsolutePath());
 		rootAsFile = new File(root);
 
+		String distDir;
+		String osName = System.getProperty("os.name");
+		if ( osName.startsWith("Mac OS") ) { // Macintosh case
+			distDir = "dist_cocoa-macosx";
+			//TODO: How to detect carbon vs cocoa?
+		}
+		else if ( osName.startsWith("Windows") ) { // Windows case
+			distDir = "dist_win32-x86";
+		}
+		else { // Assumes Unix or Linux
+			if ( System.getProperty("os.arch").equals("x86_64") ) {
+				distDir = "dist_gtk2-linux-x86_64";
+			}
+			else {
+				distDir = "dist_gtk2-linux-x86";
+			}
+		}
+		
 		// Set the path for the jar
 		String libDir = Util.getDirectoryName(root); // Go up one dir
 		libDir = Util.getDirectoryName(libDir); // Go up one dir
 		libDir = Util.getDirectoryName(libDir); // Go up one dir
 		libDir = Util.getDirectoryName(libDir); // Go up one dir
-		libDir += String.format("%sdeployment%smaven%sdist_win32-x86%slib%s",
-			File.separator, File.separator, File.separator, File.separator, File.separator);
+		libDir += String.format("%sdeployment%smaven%s%s%slib%s",
+			File.separator, File.separator, File.separator, distDir, File.separator, File.separator);
 		javaTikal = "java -jar " + libDir + "tikal.jar";
 	}
 	
