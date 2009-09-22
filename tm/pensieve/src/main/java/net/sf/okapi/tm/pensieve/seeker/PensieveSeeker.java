@@ -140,22 +140,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
         return searchForWords("\"" + subPhrase + "\"", maxHits);
     }
 
-//    public List<TranslationUnit> getAllTranslationUnits() {
-//        List<TranslationUnit> tus = new ArrayList<TranslationUnit>();
-//        IndexReader ir;
-//        try {
-//            ir = openIndexReader();
-//            for (int i = 0; i < ir.maxDoc(); i++) {
-//                tus.add(getTranslationUnit(ir.document(i)));
-//            }
-//        } catch (CorruptIndexException cie) {
-//            throw new OkapiIOException("The index is corrupt: " + cie.getMessage(), cie);
-//        } catch (IOException ioe) {
-//            throw new OkapiIOException("Could not complete query: " + ioe.getMessage(), ioe);
-//        }
-//        return tus;
-//
-//    }
     public Directory getIndexDir() {
         return indexDir;
     }
