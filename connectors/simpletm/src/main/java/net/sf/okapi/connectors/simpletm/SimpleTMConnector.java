@@ -117,6 +117,7 @@ public class SimpleTMConnector implements ITMQuery {
 	
 	public void clearAttributes () {
 		attributes.clear();
+		db.clearAttributes();
 	}
 
 	public void removeAttribute (String name) {

@@ -269,6 +269,10 @@ public class Database {
 		}
 	}
 	
+	public void clearAttributes () {
+		setAttributes(null);
+	}
+	
 	public void setAttributes (LinkedHashMap<String, String> attributes) {
 		try {
 			// prepare the query with or without context condition

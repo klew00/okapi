@@ -35,8 +35,8 @@ import java.util.List;
 
 public class PensieveTMConnector implements ITMQuery {
 
-	private int maxHits = 5;
-	private int threshold = 60;
+	private int maxHits = 50;
+	private int threshold = 100;
 	private List<QueryResult> results;
 	private int current = -1;
 	private String srcLang;
@@ -112,7 +112,15 @@ public class PensieveTMConnector implements ITMQuery {
 		current = -1;
 		// searchFuzzy also returns exact, so no need to call searchExact
 		//TODO: add threshold. For now even 0.99f gives sometimes no return on exact matches
-		List<TmHit> list = seeker.searchFuzzy(text.toString(), null, maxHits, attrs);
+
+		List<TmHit> list;
+		if ( threshold == 100 ) {
+			list = seeker.searchExact(text.toString(), maxHits, attrs);
+		}
+		else {
+			list = seeker.searchFuzzy(text.toString(), null, maxHits, attrs);
+		}
+
 		// Convert to normalized results
 		for ( TmHit hit : list ) {
 			QueryResult qr = new QueryResult();

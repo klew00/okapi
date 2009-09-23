@@ -217,6 +217,9 @@ public class ServalForm {
 	
 	private void query () {
 		try {
+//			queryMgt.setThreshold(60);
+//			queryMgt.setMaximumHits(50);
+			
 			if ( !setAttributes() ) return;
 			long start = System.nanoTime(); 
 			if ( chkRawText.getSelection() ) {

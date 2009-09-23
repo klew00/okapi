@@ -47,6 +47,7 @@ public class QueryManager {
 	private String trgLang;
 	private LinkedHashMap<String, String> attributes;
 	private int threshold = 75;
+	private int maxHits = 5;
 	
 	/**
 	 * Creates a new QueryManager object.
@@ -77,7 +78,7 @@ public class QueryManager {
 	/**
 	 * Adds a translation resource to the manager and initializes it with the 
 	 * current source and target language of this manager, as well as any
-	 * attributes that is set, and the current threshold if it is relevant.
+	 * attributes that is set, and the current threshold and maximum hits if it is relevant.
 	 * @param connector The translation resource connector to add.
 	 * @param resourceName Name of the translation resource to add.
 	 * @param params the parameters for this connector.
@@ -101,6 +102,7 @@ public class QueryManager {
 		}
 		if ( connector instanceof ITMQuery ) {
 			((ITMQuery)connector).setThreshold(threshold);
+			((ITMQuery)connector).setMaximumHits(maxHits);
 		}
 		return id;
 	}
@@ -332,12 +334,31 @@ public class QueryManager {
 	public String getTargetLanguage () {
 		return trgLang;
 	}
-	
+
+	/**
+	 * Sets the threshold for this query manager and all the relevant
+	 * translation resources it holds.
+	 * @param value the threshold value to set.
+	 */
 	public void setThreshold (int value) {
 		threshold = value;
 		for ( ResourceItem ri : resList.values() ) {
 			if ( ri.query instanceof ITMQuery ) {
 				((ITMQuery)ri.query).setThreshold(threshold);
+			}
+		}
+	}
+	
+	/**
+	 * Sets the maximum number of hits to return for this query manager
+	 * and all the relevant translation resources it holds.
+	 * @param max the maximum value to set.
+	 */
+	public void setMaximumHits (int max) {
+		maxHits = max;
+		for ( ResourceItem ri : resList.values() ) {
+			if ( ri.query instanceof ITMQuery ) {
+				((ITMQuery)ri.query).setMaximumHits(maxHits);
 			}
 		}
 	}
