@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="/C:/OkapiJava/trunk/applications/integration-tests/target/test-classes/resxtest.resx" source-language="en" target-language="fr" datatype="xml" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="UTF-8" x:configId="">
+<body>
+<trans-unit id="1" xml:space="preserve">
+<source xml:lang="en">&amp;File</source>
+<target xml:lang="fr">&amp;File</target>
+<note></note>
+</trans-unit>
+<trans-unit id="2" xml:space="preserve">
+<source xml:lang="en">Last session log</source>
+<target xml:lang="fr">Last session log</target>
+<note></note>
+</trans-unit>
+<trans-unit id="3" xml:space="preserve">
+<source xml:lang="en">Last month log</source>
+<target xml:lang="fr">Last month log</target>
+<note></note>
+</trans-unit>
+<trans-unit id="4" xml:space="preserve">
+<source xml:lang="en">List of the previous log documents</source>
+<target xml:lang="fr">List of the previous log documents</target>
+<note></note>
+</trans-unit>
+<trans-unit id="5" xml:space="preserve">
+<source xml:lang="en">Recording Mode</source>
+<target xml:lang="fr">Recording Mode</target>
+<note></note>
+</trans-unit>
+<trans-unit id="6" xml:space="preserve">
+<source xml:lang="en">This shows the type of recording behing done at the moment.</source>
+<target xml:lang="fr">This shows the type of recording behing done at the moment.</target>
+<note></note>
+</trans-unit>
+<trans-unit id="7" xml:space="preserve">
+<source xml:lang="en">Main Menu</source>
+<target xml:lang="fr">Main Menu</target>
+<note></note>
+</trans-unit>
+<trans-unit id="8" xml:space="preserve">
+<source xml:lang="en">&amp;Open Archive...</source>
+<target xml:lang="fr">&amp;Open Archive...</target>
+<note></note>
+</trans-unit>
+<trans-unit id="9" xml:space="preserve">
+<source xml:lang="en">&amp;Save Current Log</source>
+<target xml:lang="fr">&amp;Save Current Log</target>
+<note></note>
+</trans-unit>
+<trans-unit id="10" xml:space="preserve">
+<source xml:lang="en">E&amp;xit</source>
+<target xml:lang="fr">E&amp;xit</target>
+<note></note>
+</trans-unit>
+<trans-unit id="11" xml:space="preserve">
+<source xml:lang="en">Main Toolbar</source>
+<target xml:lang="fr">Main Toolbar</target>
+<note></note>
+</trans-unit>
+<trans-unit id="12" xml:space="preserve">
+<source xml:lang="en">Enable Watcher</source>
+<target xml:lang="fr">Enable Watcher</target>
+<note></note>
+</trans-unit>
+<trans-unit id="13" xml:space="preserve">
+<source xml:lang="en">Click here to enable the Watcher</source>
+<target xml:lang="fr">Click here to enable the Watcher</target>
+<note></note>
+</trans-unit>
+<trans-unit id="14" xml:space="preserve">
+<source xml:lang="en">Direct monitoring</source>
+<target xml:lang="fr">Direct monitoring</target>
+<note></note>
+</trans-unit>
+<trans-unit id="15" xml:space="preserve">
+<source xml:lang="en">Random monitoring</source>
+<target xml:lang="fr">Random monitoring</target>
+<note></note>
+</trans-unit>
+<trans-unit id="16" xml:space="preserve">
+<source xml:lang="en">List of the monitoring command available.</source>
+<target xml:lang="fr">List of the monitoring command available.</target>
+<note></note>
+</trans-unit>
+<trans-unit id="17" xml:space="preserve">
+<source xml:lang="en">&amp;Export...</source>
+<target xml:lang="fr">&amp;Export...</target>
+<note></note>
+</trans-unit>
+<trans-unit id="18" xml:space="preserve">
+<source xml:lang="en">Options</source>
+<target xml:lang="fr">Options</target>
+<note></note>
+</trans-unit>
+<trans-unit id="19" xml:space="preserve">
+<source xml:lang="en">64 frames recording mode.</source>
+<target xml:lang="fr">64 frames recording mode.</target>
+<note></note>
+</trans-unit>
+<trans-unit id="20" xml:space="preserve">
+<source xml:lang="en">32 franes recording mode,</source>
+<target xml:lang="fr">32 franes recording mode,</target>
+<note></note>
+</trans-unit>
+<trans-unit id="21" xml:space="preserve">
+<source xml:lang="en">Start logger when starting session</source>
+<target xml:lang="fr">Start logger when starting session</target>
+<note></note>
+</trans-unit>
+<trans-unit id="22" xml:space="preserve">
+<source xml:lang="en">Gandalf Monitoring System</source>
+<target xml:lang="fr">Gandalf Monitoring System</target>
+</trans-unit>
+</body>
+</file>
+</xliff>

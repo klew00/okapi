@@ -163,9 +163,22 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("odttest.out.odt"));
     	// Extract
     	assertEquals(0, runTikal("-x odttest.odt"));
-//TODO: zip    	assertTrue("File different from gold", compareWithGoldFile("odttest.odt.xlf"));
+    	assertTrue("File different from gold", compareWithGoldFile("odttest.odt.xlf"));
     	// Merge
     	assertEquals(0, runTikal("-m odttest.odt.xlf"));
+//TODO: zip    	assertTrue("File different from gold", compareWithGoldFile("odttest.out.odt"));
+    }
+
+    @Test
+    public void testExtractMergeDOCX () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("docxtest.docx.xlf"));
+    	assertTrue(deleteOutputFile("docxtest.out.docx"));
+    	// Extract
+    	assertEquals(0, runTikal("-x docxtest.docx"));
+    	assertTrue("File different from gold", compareWithGoldFile("docxtest.docx.xlf"));
+    	// Merge
+    	assertEquals(0, runTikal("-m docxtest.docx.xlf"));
 //TODO: zip    	assertTrue("File different from gold", compareWithGoldFile("odttest.out.odt"));
     }
 
@@ -193,6 +206,19 @@ public class TikalTest {
     	// Merge
     	assertEquals(0, runTikal("-m xlifftest.xlf.xlf"));
     	assertTrue("File different from gold", compareWithGoldFile("xlifftest.out.xlf"));
+    }
+
+    @Test
+    public void testExtractMergeRESX () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("resxtest.resx.xlf"));
+    	assertTrue(deleteOutputFile("resxtest.out.resx"));
+    	// Extract
+    	assertEquals(0, runTikal("-x resxtest.resx")); // Auto-assign okf_xml-resx
+    	assertTrue("File different from gold", compareWithGoldFile("resxtest.resx.xlf"));
+    	// Merge
+    	assertEquals(0, runTikal("-m resxtest.resx.xlf")); // Auto-assign okf_xml-resx
+    	assertTrue("File different from gold", compareWithGoldFile("resxtest.out.resx"));
     }
 
     @Test
