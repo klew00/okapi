@@ -141,23 +141,26 @@ public class TokenTypesPage extends Composite implements IDialogPage {
 		if (item == null) { // Add new item			
 			adapter.unselect();
 			
-			if (SWTUtil.inputQuery(AddModifyTokenTypePage.class, getShell(), "Add token type", 
-					new String[] {"", "0", ""}, 
-					null)) {
+			Object res = SWTUtil.inputQuery(AddModifyTokenTypePage.class, getShell(), "Add token type", 
+					new String[] {"", "0", ""}, null);
+			
+			if (res != null) {
 				
 				modified = true;
-				adapter.addModifyRow((String []) SWTUtil.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
+				adapter.addModifyRow((String []) res, 1, TableAdapter.DUPLICATE_REPLACE);
 			}
 			else
 				adapter.restoreSelection();
 		}
 		else {
-			if (SWTUtil.inputQuery(AddModifyTokenTypePage.class, getShell(), "Modify token type", 
-					SWTUtil.getText(item),
-					null)) {					
+			
+			Object res = SWTUtil.inputQuery(AddModifyTokenTypePage.class, getShell(), "Modify token type", 
+					SWTUtil.getText(item), null); 
+			
+			if (res != null) {					
 				
 				modified = true;
-				adapter.modifyRow(item, (String []) SWTUtil.getResult());
+				adapter.modifyRow(item, (String []) res);
 			}
 		}
 		

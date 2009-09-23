@@ -152,23 +152,26 @@ public class MappingTab extends Composite implements IDialogPage {
 		if (item == null) { // Add new item			
 			adapter.unselect();
 			
-			if (SWTUtil.inputQuery(MappingItemPage.class, getShell(), "Add mapping", 
-					new String[] {"", ""}, 
-					null)) {
+			Object res = SWTUtil.inputQuery(MappingItemPage.class, getShell(), "Add mapping", 
+					new String[] {"", ""}, null);
+			
+			if (res != null) {
 				
 				modified = true;
-				adapter.addModifyRow((String []) SWTUtil.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
+				adapter.addModifyRow((String []) res, 1, TableAdapter.DUPLICATE_REPLACE);
 			}
 			else
 				adapter.restoreSelection();
 		}
 		else {
-			if (SWTUtil.inputQuery(MappingItemPage.class, getShell(), "Modify mapping", 
-					SWTUtil.getText(item),
-					null)) {					
+			
+			Object res = SWTUtil.inputQuery(MappingItemPage.class, getShell(), "Modify mapping", 
+					SWTUtil.getText(item), null);
+			
+			if (res != null) {					
 
 				modified = true;
-				adapter.modifyRow(item, (String []) SWTUtil.getResult());
+				adapter.modifyRow(item, (String []) res);
 			}
 		}
 		

@@ -199,45 +199,28 @@ public class SWTUtil {
 	
 	
 // Input query
-	
-	private static Object result = null;
-	
-	public static boolean inputQuery(Shell parent, String caption, String prompt, int initialValue, IHelp help) {
+	public static Object inputQuery(Shell parent, String caption, String prompt, int initialValue, IHelp help) {
 
-		result = null;
-		
 		InputQueryDialog dlg = new InputQueryDialog();
 		boolean res = dlg.run(parent, InputQueryPageInt.class, caption, prompt, initialValue, help);
 		
-		if (res) result = dlg.getResult();		
-		return res;
+		return (res)? dlg.getResult() : null;
 	}
 	
-	public static boolean inputQuery(Shell parent, String caption, String prompt, String initialValue, IHelp help) {
-		
-		result = null;
+	public static Object inputQuery(Shell parent, String caption, String prompt, String initialValue, IHelp help) {
 		
 		InputQueryDialog dlg = new InputQueryDialog();
 		boolean res = dlg.run(parent, InputQueryPageString.class, caption, prompt, initialValue, help);
 		
-		if (res) result = dlg.getResult();		
-		return res;
+		return (res)? dlg.getResult() : null;
 	}
 	
-	public static boolean inputQuery(Class<? extends Composite> pageClass, Shell parent, String caption, Object initialData, IHelp help) {
+	public static Object inputQuery(Class<? extends Composite> pageClass, Shell parent, String caption, Object initialData, IHelp help) {
 
-		result = null;
-				
 		InputQueryDialog dlg = new InputQueryDialog();
 		boolean res = dlg.run(parent, pageClass, caption, null, initialData, help);
 		
-		if (res) result = dlg.getResult();		
-		return res;
-	}
-
-	public static Object getResult() {
-		
-		return result;
+		return (res)? dlg.getResult() : null;
 	}
 
 // Radio group

@@ -268,22 +268,23 @@ public class ColumnsTab extends Composite implements IDialogPage {
 		if (item == null) { // Add new item			
 			adapter.unselect();
 			
-			if (SWTUtil.inputQuery(AddModifyColumnDefPage.class, getShell(), "Add column definition", 
+			Object res = SWTUtil.inputQuery(AddModifyColumnDefPage.class, getShell(), "Add column definition", 
 					new String[] {Util.intToStr(SWTUtil.getColumnMaxValue(table, 0) + 1), "Source", "", "", "", "0", "0"}, 
-					null)) {
-				
-				adapter.addModifyRow((String []) SWTUtil.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
-			}
+					null); 
+			
+			if (res != null)				
+				adapter.addModifyRow((String []) res, 1, TableAdapter.DUPLICATE_REPLACE);
 			else
 				adapter.restoreSelection();
 		}
 		else {
-			if (SWTUtil.inputQuery(AddModifyColumnDefPage.class, getShell(), "Modify column definition", 
+		
+			Object res = SWTUtil.inputQuery(AddModifyColumnDefPage.class, getShell(), "Modify column definition", 
 					SWTUtil.getText(item),
-					null)) {					
-				
-				adapter.addModifyRow(item, (String []) SWTUtil.getResult(), 1, TableAdapter.DUPLICATE_REPLACE);
-			}
+					null);
+			
+			if (res != null)							
+				adapter.addModifyRow(item, (String []) res, 1, TableAdapter.DUPLICATE_REPLACE);
 		}
 		
 		adapter.sort(1, true);
