@@ -51,10 +51,12 @@ import net.sf.okapi.common.ui.genericeditor.GenericEditor;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.formatconversion.FormatConversionStep;
 import net.sf.okapi.steps.formatconversion.Parameters;
 import net.sf.okapi.steps.formatconversion.TableFilterWriterParameters;
+import net.sf.okapi.steps.segmentation.SegmentationStep;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
@@ -71,7 +73,7 @@ public class Main {
 	protected final static int CMD_CONV2TMX = 5;
 	protected final static int CMD_CONV2TABLE = 6;
 	protected final static int CMD_CONV2PEN = 7;
-
+	
 	private static PrintStream ps;
 	
 	protected ArrayList<String> inputs;
@@ -97,6 +99,7 @@ public class Main {
 	protected String tableConvFormat;
 	protected String tableConvCodes;
 	protected int convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_TARGETOREMPTY;
+	protected String segRules;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -253,6 +256,10 @@ public class Main {
 					prog.showAllConfigurations();
 					return;
 				}
+				else if ( arg.equals("-seg") ) {
+					prog.segRules = getArgument(args, ++i);
+				}
+				//=== Input file or error
 				else if ( !arg.startsWith("-") ) {
 					prog.inputs.add(args.get(i));
 				}
@@ -546,30 +553,41 @@ public class Main {
 		File file;
 		
 		switch ( command ) {
+//		case CMD_EXTRACT:
+//			guessMissingParameters(input);
+//			if ( !prepareFilter(configId) ) return; // Next input
+//			
+//			file = new File(input);
+//			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
+//			rd.setFilterConfigId(configId);
+//			
+//			ps.println("Source language: "+srcLang);
+//			ps.print("Target language: ");
+//			ps.println(trgLang);
+//			ps.println(" Input encoding: "+inputEncoding);
+//			ps.println("  Configuration: "+configId);
+//			ps.println(" Input document: "+input);
+//			ps.print("Output document: ");
+//			if ( output == null ) ps.println("<auto-defined>");
+//			else ps.println(output);
+//			ps.print("Extaction...");
+//			
+//			XLIFFExtractionStep stepExt = new XLIFFExtractionStep(fcMapper);
+//			stepExt.handleRawDocument(rd);
+//			ps.println(" Done");
+//			break;
+		
 		case CMD_EXTRACT:
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
-			
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			rd.setFilterConfigId(configId);
-			
-			ps.println("Source language: "+srcLang);
-			ps.print("Target language: ");
-			ps.println(trgLang);
-			ps.println(" Input encoding: "+inputEncoding);
-			ps.println("  Configuration: "+configId);
-			ps.println(" Input document: "+input);
-			ps.print("Output document: ");
-			if ( output == null ) ps.println("<auto-defined>");
-			else ps.println(output);
 			ps.print("Extaction...");
-			
-			XLIFFExtractionStep stepExt = new XLIFFExtractionStep(fcMapper);
-			stepExt.handleRawDocument(rd);
-			ps.println(" Done");
+			extractFile(rd);
+			ps.println("Done");
 			break;
-		
+			
 		case CMD_MERGE:
 			guessMergingArguments(input);
 			guessMissingParameters(skeleton);
@@ -656,20 +674,19 @@ public class Main {
 		ps.println(String.format("Version: %s", getClass().getPackage().getImplementationVersion()));
 		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
-	
-	private void showHelp () {
-		// Get the path/URL of the help file 
+
+	private String getRootDirectory () {
 		URL url = getClass().getProtectionDomain().getCodeSource().getLocation();
-		String path = Util.getDirectoryName(Util.getDirectoryName(url.getPath()));
+		return Util.getDirectoryName(Util.getDirectoryName(url.getPath()));
+	}
+	
+	private void showHelp () throws MalformedURLException {
+		// Get the path/URL of the help file 
+		String path = getRootDirectory();
 		path += "/help/applications/tikal/index.html"; //$NON-NLS-1$
 		// Opens the file
 		ps.println("Help: "+path);
-		try {
-			Util.openURL((new File(path)).toURL().toString());
-		}
-		catch ( MalformedURLException e ) {
-			e.printStackTrace();
-		}
+		Util.openURL((new File(path)).toURL().toString());
 	}
 	
 	private void printUsage () {
@@ -683,7 +700,7 @@ public class Main {
 		ps.println("   -e [[-fc] configId]");
 		ps.println("Extract a file to XLIFF:");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg (srxFile|-)]");
 		ps.println("Merge an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl sourceLang] [-tl targetLang]");
@@ -826,6 +843,50 @@ public class Main {
 		driver.addStep(fcStep);
 		
 		driver.addBatchItem(rd, outputURI, outputEncoding);
+		driver.processBatch();
+	}
+
+	private void extractFile (RawDocument rd) throws URISyntaxException {
+		// Create the driver
+		PipelineDriver driver = new PipelineDriver();
+		driver.setFilterConfigurationMapper(fcMapper);
+
+		// Raw document to filter events step 
+		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
+		driver.addStep(rd2feStep);
+		
+		if ( segRules != null ) {
+			if ( segRules.equals("-") ) { // Defaults
+				segRules = getRootDirectory();
+				segRules += File.separator + "config" + File.separator + "defaultSegmentation.srx";
+			}
+			else {
+				if ( Util.isEmpty(Util.getExtension(segRules)) ) {
+					segRules += ".srx";
+				}
+			}
+			SegmentationStep segStep = new SegmentationStep();
+			File f = new File(segRules);
+			net.sf.okapi.steps.segmentation.Parameters segParams
+				= (net.sf.okapi.steps.segmentation.Parameters)segStep.getParameters();
+			segParams.segmentSource = true;
+			segParams.segmentTarget = true;
+			segParams.sourceSrxPath = f.getAbsolutePath();
+			segParams.targetSrxPath = f.getAbsolutePath();
+			driver.addStep(segStep);
+			ps.println("Segmentation: " + segRules);
+		}
+		
+		// Filter events to raw document final step (using the XLIFF writer)
+		FilterEventsWriterStep fewStep = new FilterEventsWriterStep();
+		fewStep.setFilterWriter(new XLIFFWriter());
+		driver.addStep(fewStep);
+
+		// Create the raw document and set the output
+		String tmp = rd.getInputURI().getRawPath() + ".xlf";
+		driver.addBatchItem(rd, new URI(tmp), outputEncoding);
+
+		// Process
 		driver.processBatch();
 	}
 

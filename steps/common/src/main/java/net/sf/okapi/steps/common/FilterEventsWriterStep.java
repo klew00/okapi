@@ -22,6 +22,8 @@ package net.sf.okapi.steps.common;
 
 import java.net.URI;
 
+import javax.swing.text.DefaultEditorKit.CutAction;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
@@ -43,6 +45,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 public class FilterEventsWriterStep extends BasePipelineStep {
 
 	private IFilterWriter filterWriter;
+	private IFilterWriter customFilterWriter;
 	private IFilterConfigurationMapper fcMapper;
 	private String filterConfigId;
 	private URI outputURI;
@@ -96,7 +99,7 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	 * @param filterWriter the filter writer to use.
 	 */
 	public void setFilterWriter (IFilterWriter filterWriter) {
-		this.filterWriter = filterWriter;
+		customFilterWriter = filterWriter;
 	}
 
 	public String getName() {
@@ -115,14 +118,22 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	public Event handleEvent(Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
-			IFilter tmp = fcMapper.createFilter(filterConfigId);
-			if ( tmp == null ) {
-				throw new OkapiFilterCreationException("Error when creating writer from filter.");
+			if ( customFilterWriter == null ) {
+				// Create a writer from the filter information
+				IFilter tmp = fcMapper.createFilter(filterConfigId);
+				if ( tmp == null ) {
+					throw new OkapiFilterCreationException("Error when creating writer from filter.");
+				}
+				filterWriter = tmp.createFilterWriter();
+				filterWriter.setOptions(targetLanguage, outputEncoding);
+				filterWriter.setParameters(tmp.getParameters());
+				filterWriter.setOutput(outputURI.getPath());
 			}
-			filterWriter = tmp.createFilterWriter();
-			filterWriter.setOptions(targetLanguage, outputEncoding);
-			filterWriter.setParameters(tmp.getParameters());
-			filterWriter.setOutput(outputURI.getPath());
+			else { // If we have a custom writer, use it
+				filterWriter = customFilterWriter;
+				filterWriter.setOptions(targetLanguage, outputEncoding);
+				filterWriter.setOutput(outputURI.getPath());
+			}
 			// Fall thru
 
 		// Filter events:

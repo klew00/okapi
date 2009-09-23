@@ -50,6 +50,12 @@ using the <code>-fc</code> option. To get a list
 of all available filter configurations use the <a href="#listConfig">List 
 Configurations command</a>. For more details the filters available and their 
 configurations, see <a href="../../filters/index.html">each filter&#39;s documentation</a>.</p>
+<p>You can use the <code>-seg</code> option to specify that the extracted text 
+should be segmented. Use &quot;<code>-seg -</code>&quot; to use the default segmentation 
+rules, use &quot;<code>-seg myRules.srx</code>&quot; to specify your own rules. The rules 
+file must be in SRX format. The segments are marked up according the
+<a href="http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#Struct_Segmentation">
+XLIFF 1.2 specifications</a>.</p>
 <p>The syntax of this command is:</p>
 <pre>-x [options] inputFile [inputFile2...]</pre>
 <p>Where the options are:</p>
@@ -73,19 +79,35 @@ configurations, see <a href="../../filters/index.html">each filter&#39;s documen
 		<td>The code of the target language for the output (also used in the 
 		input if the input documents are multilingual).</td>
 	</tr>
+	<tr>
+		<td><code>-seg srxFile</code></td>
+		<td>The segmentation rules to utilize. Use a dash instead of a SRX 
+		filename (&quot;<code>-seg -</code>&quot;) to specify the default rules 
+		that come with the installation. the default rules are in <code>config/defaultSegmentation.srx</code> 
+		in your Okapi main directory.</td>
+	</tr>
 </table>
 <p>For example:</p>
 <pre>tikal -x *.docx *.html</pre>
 <p>Extracts all <code>.docx</code> and <code>.html</code> files in the current 
 directory into corresponding <code>.docx.xlf</code> and <code>.html.xlf</code> 
 XLIFF documents. The source language here is the default, which is the current 
-language of the system. The target language by default is <code>fr</code>.</p>
+language of the system. The target language by default is <code>fr</code>. No 
+segmentation is done.</p>
 <pre>tikal -x -sl EN tl DE -fc okf_regex-srt -ie iso-8859-1 findingNemo.srt</pre>
 <p>Extracts the sub-title file <code>findingNemo.srt</code> into a <code>
 findingNemo.srt.xlf</code> XLIFF document. The encoding <code>iso-8859-1</code> 
 is used to process the input file. The filter used is the Regex filter with the 
 pre-define configuration for SRT documents. The source language is English (<code>EN</code>) 
-and the target language is German (<code>DE</code>).</p>
+and the target language is German (<code>DE</code>). No segmentation is done.</p>
+<pre>tikal -x *.docx -seg - -tl BR</pre>
+<p>Extracts all <code>.docx</code> in the current 
+directory into corresponding <code>.docx.xlf</code> 
+XLIFF documents. The source language here is the default, which is the current 
+language of the system. The target language is Breton. The extracted text units 
+will be segmented according the rules defined in the default SRX segmentation 
+rules file (located in the <code>config</code> sub-directory in your Okapi main 
+directory).</p>
 <h2><a name="merge"></a>Merge Files</h2>
 <p>This command merges back into their original format one or more XLIFF 
 documents that were created using the <a href="#extract">Extract command</a>. 

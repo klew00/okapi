@@ -120,7 +120,6 @@ public class XLIFFWriter implements IFilterWriter {
 
 	private void processStartDocument (StartDocument resource) {
 		if ( writer != null ) writer.close();
-
 		writer = new XMLWriter(outputPath);
 
 		srcLang = resource.getLanguage();
@@ -134,10 +133,6 @@ public class XLIFFWriter implements IFilterWriter {
 		IParameters params = resource.getFilterParameters();
 		if ( params == null ) configId = null;
 		else configId = params.getPath();
-		
-//		if (( options.message != null ) && ( options.message.length() > 0 )) {
-//			writer.writeComment(options.message);
-//		}
 	}
 
 	private void processEndDocument () {
