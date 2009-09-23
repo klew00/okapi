@@ -20,10 +20,15 @@
 
 package net.sf.okapi.common;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 
 /**
@@ -42,13 +47,10 @@ public class FileCompare {
 		String goldFilePath)
 	{
 		FileInputStream ois, gis;
-		File ofil, gfil;
 		boolean bRslt=false;
 		try {
-			ofil = new File(outputFilePath);
-			gfil = new File(goldFilePath);
-			ois = new FileInputStream(ofil);
-			gis = new FileInputStream(gfil);
+			ois = new FileInputStream(new File(outputFilePath));
+			gis = new FileInputStream(new File(goldFilePath));
 			bRslt = filesExactlyTheSame(ois, gis);
 		}
 		catch ( Exception e ) {
@@ -71,6 +73,78 @@ public class FileCompare {
 		catch ( IOException e ) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	public boolean compareFilesPerLines (String outputFilePath,
+		String goldFilePath,
+		String encoding)
+	{
+		FileInputStream ois, gis;
+		boolean bRslt=false;
+		try {
+			ois = new FileInputStream(new File(outputFilePath));
+			gis = new FileInputStream(new File(goldFilePath));
+			bRslt = compareFilesPerLines(ois, gis, encoding);
+		}
+		catch ( Exception e ) {
+			e.printStackTrace();
+			bRslt = false;
+		}
+		return bRslt;
+	}
+		
+	public boolean compareFilesPerLines (InputStream ois,
+		InputStream gis,
+		String encoding)
+	{
+		BufferedReader obr = null;
+		BufferedReader gbr = null;
+		try {
+			obr = new BufferedReader(new InputStreamReader(ois, encoding));
+			gbr = new BufferedReader(new InputStreamReader(gis, encoding));
+			
+			String oLine;
+			String gLine;
+			while ( true ) {
+				oLine = obr.readLine();
+				gLine = gbr.readLine();
+				if (( oLine == null ) && ( gLine != null )) {
+					System.err.println("Extra line in gold file:" + gLine);
+					return false;
+				}
+				if (( oLine != null ) && ( gLine == null )) {
+					System.err.println("Extra line in output file:" + oLine);
+					return false;
+				}
+				if (( oLine == null ) && ( gLine == null )) {
+					return true; // Done
+				}
+				if ( !oLine.equals(gLine) )  {
+					System.err.println("Difference in line:");
+					System.err.println(" out: \""+oLine+"\"");
+					System.err.println("gold: \""+gLine+"\"");
+					return false;
+				}
+			}
+		}
+		catch ( UnsupportedEncodingException e ) {
+			e.printStackTrace();
+			return false;
+		}
+		catch ( IOException e ) {
+			e.printStackTrace();
+			return false;
+		}
+		finally {
+			try {
+				if ( obr != null ) obr.close();
+				if ( gbr != null ) gbr.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
 		}
 	}
 	
