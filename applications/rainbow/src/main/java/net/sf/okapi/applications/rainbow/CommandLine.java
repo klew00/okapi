@@ -236,7 +236,8 @@ public class CommandLine {
 		if ( optionsFile != null ) {
 			if ( util.hasParameters() ) {
 				// Ignore errors to allow to create an options file
-				util.getParameters().load(Util.toURI(optionsFile), true);
+				File f = new File(optionsFile);
+				util.getParameters().load(Util.toURI(f.getAbsolutePath()), true);
 			}
 		}
 		

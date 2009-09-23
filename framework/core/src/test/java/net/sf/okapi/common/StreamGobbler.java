@@ -1,16 +1,16 @@
-package net.sf.okapi.applications.tikal;
+package net.sf.okapi.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-class StreamGobbler extends Thread {
+public class StreamGobbler extends Thread {
 	
-	InputStream is;
-	String type;
+	private InputStream is;
+	private String type;
 
-	StreamGobbler (InputStream is, String type) {
+	public StreamGobbler (InputStream is, String type) {
 		this.is = is;
 		this.type = type;
 	}

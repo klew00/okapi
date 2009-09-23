@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import net.sf.okapi.common.FileCompare;
+import net.sf.okapi.common.StreamGobbler;
 import net.sf.okapi.common.Util;
 
 import org.junit.Before;
@@ -20,7 +21,6 @@ public class TikalTest {
 
 	@Before
 	public void setUp () throws URISyntaxException {
-		//TODO: make this relative and OS-independent
 		File file = new File(getClass().getResource("/htmltest.html").toURI());
 		root = Util.getDirectoryName(file.getAbsolutePath());
 		rootAsFile = new File(root);
