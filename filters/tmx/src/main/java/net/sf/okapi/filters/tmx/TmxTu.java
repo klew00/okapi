@@ -294,7 +294,7 @@ class TmxTu {
 		// RULE 2: Make sure each <tu> contains one and only one source <tuv>
 		if (( getSourceTuv() == null ) || ( langCount(srcLang) > 1 )) {
 			throw new OkapiBadFilterInputException(String.format(
-				"Each <tu> requires one source <tuv>. The source language specified is '%s'.", srcLang));			
+				"The source language specified is '%s', but no <tuv> in the <tu> are set to this language.", srcLang));			
 		}
 	}
 	

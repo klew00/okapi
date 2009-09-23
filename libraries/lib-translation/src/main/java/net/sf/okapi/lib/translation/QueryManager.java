@@ -279,7 +279,7 @@ public class QueryManager {
 	}
 	
 	/**
-	 * Remove a given attribute from this manager and all translation
+	 * Removes a given attribute from this manager and all translation
 	 * resources in this manager.
 	 * @param name The name of the attribute to remove.
 	 */
@@ -287,6 +287,17 @@ public class QueryManager {
 		attributes.remove(name);
 		for ( ResourceItem ri : resList.values() ) {
 			ri.query.removeAttribute(name);
+		}
+	}
+	
+	/**
+	 * Removes all attributes from this manager and all the translation
+	 * resources in this manager.
+	 */
+	public void clearAttributes () {
+		attributes.clear();
+		for ( ResourceItem ri : resList.values() ) {
+			ri.query.clearAttributes();
 		}
 	}
 	

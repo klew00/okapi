@@ -243,6 +243,10 @@ public class OpenTranTMConnector implements ITMQuery {
 		// Not used with this connector
 	}
 
+	public void clearAttributes () {
+		//TODO: use platform, etc.
+	}
+
 	public void setAttribute (String name,
 		String value)
 	{

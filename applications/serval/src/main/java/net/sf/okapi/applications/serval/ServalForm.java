@@ -40,6 +40,7 @@ public class ServalForm {
 	private QueryManager queryMgt;
 	private Font displayFont;
 	private Button chkRawText;
+	private Text edAttributes;
 	private Label stElapsedTime;
 	
 	public ServalForm (Shell shell) {
@@ -119,6 +120,15 @@ public class ServalForm {
 		displayFont = new Font(font.getDevice(), fontData[0]);
 		edQuery.setFont(displayFont);
 		
+		stTmp = new Label(shell, SWT.NONE);
+		stTmp.setText("Attrbutes (key=value):");
+		stTmp.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+
+		edAttributes = new Text(shell, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 3;
+		edAttributes.setLayoutData(gdTmp);
+		
 		stTmp = new Label(shell, SWT.NONE); // Place-holder
 		
 		Button btSearch = UIUtil.createGridButton(shell, SWT.PUSH, "Search", 80, 1);
@@ -186,8 +196,28 @@ public class ServalForm {
 		modResults.linkTable(tblResults);
 	}
 	
+	private boolean setAttributes () {
+		String tmp = edAttributes.getText();
+		queryMgt.clearAttributes();
+		if ( tmp.length() == 0 ) {
+			return true;
+		}
+		String[] pairs = tmp.split("[\\s;,]", 0);
+		for ( String pair : pairs ) {
+			if ( pair.length() == 0 ) continue;
+			String parts[] = pair.split("=", 0);
+			if ( parts.length != 2 ) {
+				Dialogs.showError(shell, "Syntax error in the attributes.", null);
+				return false;
+			}
+			queryMgt.setAttribute(parts[0].trim(), parts[1].trim());
+		}
+		return true;
+	}
+	
 	private void query () {
 		try {
+			if ( !setAttributes() ) return;
 			long start = System.nanoTime(); 
 			if ( chkRawText.getSelection() ) {
 				queryMgt.query(edQuery.getText());

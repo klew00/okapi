@@ -320,6 +320,9 @@ public class GlobalSightTMConnector implements ITMQuery {
 	
 	public void removeAttribute (String name) {
 	}
+	
+	public void clearAttributes () {
+	}
 
 	public void setAttribute (String name,
 		String value)

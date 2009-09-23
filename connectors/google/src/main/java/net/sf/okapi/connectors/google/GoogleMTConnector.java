@@ -326,6 +326,10 @@ public class GoogleMTConnector implements IQuery {
 		// Not used with this MT engine
 	}
 	
+	public void clearAttributes () {
+		// Not used with this MT engine
+	}
+
 	public void setLanguages (String sourceLang,
 		String targetLang)
 	{

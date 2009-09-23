@@ -115,6 +115,10 @@ public class SimpleTMConnector implements ITMQuery {
 		}
 	}
 	
+	public void clearAttributes () {
+		attributes.clear();
+	}
+
 	public void removeAttribute (String name) {
 		if ( attributes.containsKey(name) ) {
 			attributes.remove(name);

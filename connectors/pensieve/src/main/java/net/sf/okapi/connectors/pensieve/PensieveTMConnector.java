@@ -24,6 +24,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.tm.pensieve.common.Metadata;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TmHit;
 import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
@@ -41,9 +43,11 @@ public class PensieveTMConnector implements ITMQuery {
 	private String trgLang;
 	private Parameters params;
 	private ITmSeeker seeker;
+	private Metadata attrs;
 
 	public PensieveTMConnector () {
 		params = new Parameters();
+		attrs = new Metadata();
 	}
 
 	public String getName() {
@@ -108,7 +112,7 @@ public class PensieveTMConnector implements ITMQuery {
 		current = -1;
 		// searchFuzzy also returns exact, so no need to call searchExact
 		//TODO: add threshold. For now even 0.99f gives sometimes no return on exact matches
-		List<TmHit> list = seeker.searchFuzzy(text.toString(), null, maxHits, null);
+		List<TmHit> list = seeker.searchFuzzy(text.toString(), null, maxHits, attrs);
 		// Convert to normalized results
 		for ( TmHit hit : list ) {
 			QueryResult qr = new QueryResult();
@@ -127,11 +131,37 @@ public class PensieveTMConnector implements ITMQuery {
 	public void setAttribute (String name,
 		String value)
 	{
-		//TODO
+		if ( "resname".equals(name) ) {
+			attrs.put(MetadataType.ID, value);
+		}
+		else if ( "restype".equals(name) ) {
+			attrs.put(MetadataType.TYPE, value);
+		}
+		else if ( "GroupName".equals(name) ) {
+			attrs.put(MetadataType.GROUP_NAME, value);
+		}
+		else if ( "FileName".equals(name) ) {
+			attrs.put(MetadataType.FILE_NAME, value);
+		}
+	}
+
+	public void clearAttributes () {
+		attrs.clear();
 	}
 
 	public void removeAttribute (String name) {
-		//TODO
+		if ( "resname".equals(name) ) {
+			attrs.remove(MetadataType.ID);
+		}
+		else if ( "restype".equals(name) ) {
+			attrs.remove(MetadataType.TYPE);
+		}
+		else if ( "GroupName".equals(name) ) {
+			attrs.remove(MetadataType.GROUP_NAME);
+		}
+		else if ( "FileName".equals(name) ) {
+			attrs.remove(MetadataType.FILE_NAME);
+		}
 	}
 
 	public void setLanguages (String sourceLang,

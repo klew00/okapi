@@ -72,11 +72,16 @@ public interface IQuery {
 		String value);
 	
 	/**
-	 * Remove a given attribute from this query engine.
+	 * Removes a given attribute from this query engine.
 	 * @param name The name of the attribute to remove.
 	 */
 	public void removeAttribute (String name);
 
+	/**
+	 * Removes all attributes from this query engine.
+	 */
+	public void clearAttributes ();
+	
 	/**
 	 * Sets the parameters for opening and querying this connector.
 	 * @param params the parameters to set.

@@ -152,6 +152,10 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		return query(tmp);
 	}
 
+	public void clearAttributes () {
+		// Not used with this connector
+	}
+
 	public void removeAttribute (String name) {
 		// Not used with this connector
 	}

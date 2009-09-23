@@ -170,6 +170,10 @@ public class MyMemoryTMConnector implements ITMQuery {
 		//TODO: use domain
 	}
 
+	public void clearAttributes () {
+		//TODO: use domain
+	}
+
 	public void setAttribute (String name,
 		String value)
 	{
