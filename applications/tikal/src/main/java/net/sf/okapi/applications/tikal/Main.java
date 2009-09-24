@@ -123,6 +123,7 @@ public class Main {
 	}
 	
 	public static void main (String[] originalArgs) {
+		boolean showTrace = false;
 		try {
 			Main prog = new Main();
 
@@ -159,6 +160,10 @@ public class Main {
 			if ( args.contains("-h") || args.contains("--help") || args.contains("-help") ) {
 				prog.showHelp();
 				return; // Overrides all arguments
+			}
+			if ( args.contains("-trace") ) {
+				// Check early so the option does not get 'eaten' by a bad syntax
+				showTrace = true;
 			}
 			
 			for ( int i=0; i<args.size(); i++ ) {
@@ -308,7 +313,13 @@ public class Main {
 			}
 		}
 		catch ( Throwable e ) {
-			e.printStackTrace();
+			if ( showTrace ) e.printStackTrace();
+			else {
+				ps.println("ERROR: "+e.getMessage());
+				Throwable e2 = e.getCause();
+				if ( e2 != null ) ps.println(e2.getMessage());
+				ps.println("You can use the -trace option for more details.");
+			}
 			System.exit(1); // Error
 		}
 	}
@@ -855,6 +866,7 @@ public class Main {
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
 		driver.addStep(rd2feStep);
 		
+		// Add segmentation step if necessary
 		if ( segRules != null ) {
 			if ( segRules.equals("-") ) { // Defaults
 				segRules = getRootDirectory();

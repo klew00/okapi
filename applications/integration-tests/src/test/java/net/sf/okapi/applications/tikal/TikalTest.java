@@ -209,6 +209,19 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeTSV () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("tsvtest.txt.xlf"));
+    	assertTrue(deleteOutputFile("tsvtest.out.txt"));
+    	// Extract
+    	assertEquals(0, runTikal("-x tsvtest.txt"));
+    	assertTrue("File different from gold", compareWithGoldFile("tsvtest.txt.xlf", "UTF-8"));
+    	// Merge
+    	assertEquals(0, runTikal("-m tsvtest.txt.xlf"));
+    	assertTrue("File different from gold", compareWithGoldFile("tsvtest.out.txt", "UTF-8"));
+    }
+
+    @Test
     public void testExtractMergeRESX () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputFile("resxtest.resx.xlf"));
@@ -219,6 +232,32 @@ public class TikalTest {
     	// Merge
     	assertEquals(0, runTikal("-m resxtest.resx.xlf")); // Auto-assign okf_xml-resx
     	assertTrue("File different from gold", compareWithGoldFile("resxtest.out.resx", "UTF-8"));
+    }
+
+//    @Test Filter not ready yet
+//    public void testExtractMergeTS () throws IOException, InterruptedException {
+//    	// Delete previous output
+//    	assertTrue(deleteOutputFile("tstest.ts.xlf"));
+//    	assertTrue(deleteOutputFile("tstest.out.ts"));
+//    	// Extract
+//    	assertEquals(0, runTikal("-x tstest.ts")); // Auto-assign okf_ts
+//    	assertTrue("File different from gold", compareWithGoldFile("tstest.ts.xlf", "UTF-8"));
+//    	// Merge
+//    	assertEquals(0, runTikal("-m tstest.ts.xlf")); // Auto-assign okf_ts
+//    	assertTrue("File different from gold", compareWithGoldFile("tstest.out.ts", "UTF-8"));
+//    }
+
+    @Test
+    public void testExtractMergeSRT () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("srttest.srt.xlf"));
+    	assertTrue(deleteOutputFile("srttest.out.srt"));
+    	// Extract
+    	assertEquals(0, runTikal("-x srttest.srt")); // Auto-assign okf_regex-srt
+    	assertTrue("File different from gold", compareWithGoldFile("resxtest.resx.xlf", "UTF-8"));
+    	// Merge
+    	assertEquals(0, runTikal("-m srttest.srt.xlf")); // Auto-assign okf_regex-srt
+    	assertTrue("File different from gold", compareWithGoldFile("srttest.out.srt", "UTF-8"));
     }
 
     @Test
