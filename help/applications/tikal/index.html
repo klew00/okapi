@@ -61,30 +61,39 @@ XLIFF 1.2 specifications</a>.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4">
 	<tr>
-		<td><code>-fc configId</code></td>
-		<td>The identifier of the filter configuration to use for the 
+		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top">The identifier of the filter configuration to use for the 
 		extraction.</td>
 	</tr>
 	<tr>
-		<td><code>-ie encoding</code></td>
-		<td>The encoding name of the input files. this is used only if the 
+		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top">The encoding name of the input files. this is used only if the 
 		filter cannot detect the encoding from the input file itself.</td>
 	</tr>
 	<tr>
-		<td><code>-sl srcLang</code></td>
-		<td>The code of the source language of the input files.</td>
+		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top">The code of the source language of the input files.</td>
 	</tr>
 	<tr>
-		<td><code>-tl trgLang</code></td>
-		<td>The code of the target language for the output (also used in the 
+		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top">The code of the target language for the output (also used in the 
 		input if the input documents are multilingual).</td>
 	</tr>
 	<tr>
-		<td><code>-seg srxFile</code></td>
-		<td>The segmentation rules to utilize. Use a dash instead of a SRX 
+		<td align="left" valign="top"><code>-seg srxFile|-</code></td>
+		<td align="left" valign="top">The segmentation rules to utilize. Use a dash instead of a SRX 
 		filename (&quot;<code>-seg -</code>&quot;) to specify the default rules 
 		that come with the installation. the default rules are in <code>config/defaultSegmentation.srx</code> 
 		in your Okapi main directory.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-pen tmDirectory|<br>
+		-tt hostname[:port]|<br>
+		-mm key|<br>
+		-google</code></td>
+		<td align="left" valign="top">A translation resource to use to 
+		pre-translate the extracted document. The leveraging occurs after 
+		segmentation, if you have specify segmentation rules.</td>
 	</tr>
 </table>
 <p>For example:</p>
@@ -176,6 +185,11 @@ all resources at once.</p>
 		translation)</td>
 	</tr>
 	<tr>
+		<td align="left" valign="top"><code>-pen directory</code></td>
+		<td align="left" valign="top">Query a Pensieve TM stored in a given 
+		directory.</td>
+	</tr>
+	<tr>
 		<td align="left" valign="top"><code>-google</code></td>
 		<td align="left" valign="top">Query the Google MT system. If no other type of resource is 
 		specified, this is used by default. This requires Internet access.</td>
@@ -196,12 +210,7 @@ all resources at once.</p>
 		with a given key access (use <code>mmDemo123</code> for demo). This 
 		requires Internet access.</td>
 	</tr>
-	<tr>
-		<td align="left" valign="top"><code>-ps directory</code></td>
-		<td align="left" valign="top">Query a Pensieve TM stored in a given 
-		directory.</td>
-	</tr>
-</table>
+	</table>
 <p>For example:</p>
 <pre>tikal -q &quot;open file&quot; -sl en</pre>
 <p>Queries the default translation resource (Google MT system) for the text 
@@ -269,7 +278,8 @@ create new configurations.</p>
 		form.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-trgsource|-trgempty</code></td>
+		<td valign="top" align="left"><code>-trgsource|<br>
+		-trgempty</code></td>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
@@ -306,7 +316,8 @@ language will be English and the target Zulu.</p>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-trgsource|-trgempty</code></td>
+		<td valign="top" align="left"><code>-trgsource|<br>
+		-trgempty</code></td>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
@@ -347,18 +358,23 @@ elements for the German will be empty.</p>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-trgsource|-trgempty</code></td>
+		<td valign="top" align="left"><code>-trgsource|<br>
+		-trgempty</code></td>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-csv|-tab</code></td>
+		<td align="left" valign="top"><code>-csv|<br>
+		-tab</code></td>
 		<td align="left" valign="top">Output format: <code>csv</code> for comma-separated values, or <code>tab</code> 
 		for tab-delimited values.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-xliff|-xliffgx|-tmx|-generic</code></td>
+		<td align="left" valign="top"><code>-xliff|<br>
+		-xliffgx|<br>
+		-tmx|<br>
+		-generic</code></td>
 		<td align="left" valign="top">Inline codes format: <code>xliff</code> for XLIFF, <code>xliffgx</code> for 
 		XLIFF with g/x notation, <code>tmx</code> for TMX, or <code>generic</code> 
 		for generic placeholders.</td>
@@ -403,7 +419,8 @@ a copy of the source.</p>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-trgsource|-trgempty</code></td>
+		<td valign="top" align="left"><code>-trgsource|<br>
+		-trgempty</code></td>
 		<td align="left" valign="top">Force the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>

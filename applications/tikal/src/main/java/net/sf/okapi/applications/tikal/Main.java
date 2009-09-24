@@ -725,17 +725,17 @@ public class Main {
 		ps.println("Query translation resources:");
 		ps.println("   -q \"source text\" [-sl sourceLang] [-tl targetLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory]");
-		ps.println("Conversion to PO file:");
+		ps.println("Conversion to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic] [-trgsource|-trgempty]");
-		ps.println("Conversion to TMX file:");
+		ps.println("Conversion to TMX format:");
 		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
-		ps.println("Conversion to table:");
+		ps.println("Conversion to table format:");
 		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
 		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic]");
-		ps.println("Import to Pensive TM:");
+		ps.println("Import to Pensieve TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
 	}
