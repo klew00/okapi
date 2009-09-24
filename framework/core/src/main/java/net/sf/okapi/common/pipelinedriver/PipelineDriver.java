@@ -102,7 +102,13 @@ public class PipelineDriver implements IPipelineDriver {
 	}
 	
 	public void processBatch () {
+		// Set the runtime parameters for the START_BATCH events
+		// Especially source and target languages
+		if ( batchItems.size() > 0 ) {
+			assignRuntimeParameters(batchItems.get(0));
+		}
 		pipeline.startBatch();
+		// Run each item in the batch
 		for ( IBatchItemContext item : batchItems ) {
 			displayInput(item);
 			// Set the runtime parameters

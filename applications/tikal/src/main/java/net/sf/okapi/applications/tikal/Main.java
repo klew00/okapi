@@ -56,6 +56,7 @@ import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.formatconversion.FormatConversionStep;
 import net.sf.okapi.steps.formatconversion.Parameters;
 import net.sf.okapi.steps.formatconversion.TableFilterWriterParameters;
+import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
@@ -263,6 +264,10 @@ public class Main {
 				}
 				else if ( arg.equals("-seg") ) {
 					prog.segRules = getArgument(args, ++i);
+				}
+				else if ( arg.equals("-trace") ) {
+					// Trace aAlready set. this is just to avoid
+					// seeing -trace as invalid parameter
 				}
 				//=== Input file or error
 				else if ( !arg.startsWith("-") ) {
@@ -712,6 +717,8 @@ public class Main {
 		ps.println("Extract a file to XLIFF:");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg (srxFile|-)]");
+		ps.println("      [- sourceLang] [-tl targetLang] [-seg (srxFile|-)]");
+		ps.println("      [-tt hostname[:port]|-mm key|-pen tmDirectory|-google]");
 		ps.println("Merge an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl sourceLang] [-tl targetLang]");
@@ -760,49 +767,31 @@ public class Main {
 		IQuery conn;
 		if ( useGoogle ) {
 			conn = new GoogleMTConnector();
+			conn.setParameters(prepareConnectorParameters());
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
 			displayQuery(conn);
 			conn.close();
 		}
 		if ( usePen ) {
-			// The parameters for now is just the access key
-			net.sf.okapi.connectors.pensieve.Parameters params
-				= new net.sf.okapi.connectors.pensieve.Parameters();
-			params.setDbDirectory(penDir);
 			conn = new PensieveTMConnector();
-			conn.setParameters(params);
+			conn.setParameters(prepareConnectorParameters());
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
 			displayQuery(conn);
 			conn.close();
 		}
 		if ( useTT ) {
-			// Parse the parameters hostname:port
-			int n = ttParams.lastIndexOf(':');
-			net.sf.okapi.connectors.translatetoolkit.Parameters params 
-				= new net.sf.okapi.connectors.translatetoolkit.Parameters();
-			if ( n == -1 ) {
-				params.setHost(ttParams);
-			}
-			else {
-				params.setPort(Integer.valueOf(ttParams.substring(n+1)));
-				params.setHost(ttParams.substring(0, n));
-			}
 			conn = new TranslateToolkitTMConnector();
-			conn.setParameters(params);
+			conn.setParameters(prepareConnectorParameters());
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
 			displayQuery(conn);
 			conn.close();
 		}
 		if ( useMM ) {
-			// The parameters for now is just the access key
-			net.sf.okapi.connectors.mymemory.Parameters params
-				= new net.sf.okapi.connectors.mymemory.Parameters();
-			params.setKey(mmParams);
 			conn = new MyMemoryTMConnector();
-			conn.setParameters(params);
+			conn.setParameters(prepareConnectorParameters());
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
 			displayQuery(conn);
@@ -866,7 +855,7 @@ public class Main {
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
 		driver.addStep(rd2feStep);
 		
-		// Add segmentation step if necessary
+		// Add segmentation step if requested
 		if ( segRules != null ) {
 			if ( segRules.equals("-") ) { // Defaults
 				segRules = getRootDirectory();
@@ -878,15 +867,36 @@ public class Main {
 				}
 			}
 			SegmentationStep segStep = new SegmentationStep();
-			File f = new File(segRules);
 			net.sf.okapi.steps.segmentation.Parameters segParams
 				= (net.sf.okapi.steps.segmentation.Parameters)segStep.getParameters();
 			segParams.segmentSource = true;
 			segParams.segmentTarget = true;
+			File f = new File(segRules);
 			segParams.sourceSrxPath = f.getAbsolutePath();
 			segParams.targetSrxPath = f.getAbsolutePath();
 			driver.addStep(segStep);
 			ps.println("Segmentation: " + segRules);
+		}
+		
+		// Add leveraging step if requested
+		if ( useGoogle || useTT || useMM || usePen ) {
+			LeveragingStep levStep = new LeveragingStep();
+			net.sf.okapi.steps.leveraging.Parameters levParams
+				= (net.sf.okapi.steps.leveraging.Parameters)levStep.getParameters();
+			if ( usePen ) {
+				levParams.setResourceClassName(PensieveTMConnector.class.getName());
+			}
+			else if ( useTT ) {
+				levParams.setResourceClassName(TranslateToolkitTMConnector.class.getName());
+			}
+			else if ( useMM ) {
+				levParams.setResourceClassName(MyMemoryTMConnector.class.getName());
+			}
+			else if ( useGoogle ) {
+				levParams.setResourceClassName(GoogleMTConnector.class.getName());
+			}
+			levParams.setResourceParameters(prepareConnectorParameters().toString());
+			driver.addStep(levStep);
 		}
 		
 		// Filter events to raw document final step (using the XLIFF writer)
@@ -900,6 +910,40 @@ public class Main {
 
 		// Process
 		driver.processBatch();
+	}
+
+	private IParameters prepareConnectorParameters () {
+		if ( usePen ) {
+			net.sf.okapi.connectors.pensieve.Parameters params
+				= new net.sf.okapi.connectors.pensieve.Parameters();
+			params.setDbDirectory(penDir);
+			return params;
+		}
+
+		if ( useTT ) {
+			net.sf.okapi.connectors.translatetoolkit.Parameters params
+				= new net.sf.okapi.connectors.translatetoolkit.Parameters();
+			// Parse the parameters hostname:port
+			int n = ttParams.lastIndexOf(':');
+			if ( n == -1 ) {
+				params.setHost(ttParams);
+			}
+			else {
+				params.setPort(Integer.valueOf(ttParams.substring(n+1)));
+				params.setHost(ttParams.substring(0, n));
+			}
+			return params;
+		}
+
+		if ( useMM ) {
+			net.sf.okapi.connectors.mymemory.Parameters params
+				= new net.sf.okapi.connectors.mymemory.Parameters();
+			params.setKey(mmParams);
+			return params;
+		}
+		
+		// Other connector: no parameters
+		return null;
 	}
 
 }

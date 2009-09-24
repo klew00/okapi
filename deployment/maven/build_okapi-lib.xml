@@ -168,6 +168,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/segmentation/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/leveraging/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/textmodification/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/tokenization/target/classes"

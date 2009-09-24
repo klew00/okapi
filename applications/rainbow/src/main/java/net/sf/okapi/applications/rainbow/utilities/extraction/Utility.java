@@ -254,7 +254,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		htmlRpt.addSegmentCount(n==0 ? 1 : n);
 
 		// Leverage if requested
-		if ( qm != null ) {
+		if (( qm != null ) && !approved ) {
 			if ( params.useGroupName ) {
 				qm.setAttribute("GroupName", tu.getName());
 			}

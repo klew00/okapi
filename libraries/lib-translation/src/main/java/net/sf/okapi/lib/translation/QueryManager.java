@@ -370,9 +370,8 @@ public class QueryManager {
 	 */
 	public void leverage (TextUnit tu) {
 		if ( !tu.isTranslatable() ) return;
-		if ( tu.hasTarget(trgLang) ) return;
 		
-		TextContainer tc = tu.getSource().clone(); //tu.setTarget(trgLang, tu.getSource().clone());
+		TextContainer tc = tu.getSource().clone();
 		ScoresAnnotation scores = new ScoresAnnotation();
 		QueryResult qr;
 		int count;
