@@ -599,7 +599,7 @@ public class Main {
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			rd.setFilterConfigId(configId);
-			ps.print("Extaction...");
+			ps.println("Extaction");
 			extractFile(rd);
 			ps.println("Done");
 			break;
@@ -627,10 +627,10 @@ public class Main {
 			ps.print("Output document: ");
 			if ( output == null ) ps.println("<auto-defined>");
 			else ps.println(output);
-			ps.print("Merging...");
+			ps.println("Merging");
 
 			stepMrg.handleRawDocument(skelRawDoc);
-			ps.println(" Done");
+			ps.println("Done");
 			break;
 			
 		case CMD_CONV2PO:
@@ -665,20 +665,20 @@ public class Main {
 			ps.println(" Input document: "+input);
 			ps.println("Output document: "+output);
 			if ( command == CMD_CONV2PO ) {
-				ps.print("Conversion to PO...");
+				ps.println("Conversion to PO");
 			}
 			else if ( command == CMD_CONV2TMX ) {
-				ps.print("Conversion to TMX...");
+				ps.println("Conversion to TMX");
 			}
 			else if ( command == CMD_CONV2TABLE ) {
-				ps.print("Conversion to Table...");
+				ps.println("Conversion to Table");
 			}
 			else {
-				ps.print("Importing to Pensieve TM...");
+				ps.println("Importing to Pensieve TM");
 			}
 			
 			convertFile(rd, outputURI);
-			ps.println(" Done");
+			ps.println("Done");
 			break;
 		}
 	}
@@ -714,7 +714,7 @@ public class Main {
 		ps.println("   -lfc or -listconf");
 		ps.println("Edit or view filter configurations (UI-dependent command):");
 		ps.println("   -e [[-fc] configId]");
-		ps.println("Extract a file to XLIFF:");
+		ps.println("Extract a file to XLIFF (and optionally segment and pre-translate):");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg (srxFile|-)]");
 		ps.println("      [- sourceLang] [-tl targetLang] [-seg (srxFile|-)]");
@@ -830,7 +830,6 @@ public class Main {
 			opt.fromArguments(tableConvFormat, tableConvCodes);
 			params.setFormatOptions(opt.toString());
 			params.setOutputPath("output.txt");
-			
 		}
 		else if ( command == CMD_CONV2PEN ) {
 			params.setOutputFormat(Parameters.FORMAT_PENSIEVE);

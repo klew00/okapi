@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.leveraging;
 
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -32,6 +34,8 @@ import net.sf.okapi.lib.translation.QueryManager;
 
 public class LeveragingStep extends BasePipelineStep {
 
+	private final Logger logger = Logger.getLogger(getClass().getName());
+	
 	private Parameters params;
 	private String sourceLanguage;
 	private String targetLanguage;
@@ -77,6 +81,8 @@ public class LeveragingStep extends BasePipelineStep {
 				tmp.fromString(params.getResourceParameters());
 			}
 			qm.addAndInitializeResource(connector, connector.getName(), tmp);
+			logger.info("Leveraging settings: "+connector.getName());
+			logger.info(connector.getSettingsDisplay());
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException("Error creating a connector.", e);

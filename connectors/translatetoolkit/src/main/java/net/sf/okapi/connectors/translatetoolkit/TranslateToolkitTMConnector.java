@@ -50,7 +50,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 25;
-	JSONParser parser;
+	private JSONParser parser;
 	
 	public TranslateToolkitTMConnector () {
 		params = new Parameters();

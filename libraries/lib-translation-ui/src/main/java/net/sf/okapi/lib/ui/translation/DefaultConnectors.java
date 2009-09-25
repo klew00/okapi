@@ -15,7 +15,7 @@ public class DefaultConnectors implements IConnectorList {
 	// Temporary hard-coded mapping
 	private void setDefaultMapping () {
 		ConnectorInfo trc = new ConnectorInfo();
-		trc.description = "Pensieve TM Engine";
+		trc.description = "Pensieve TM Engine (Alpha)";
 		trc.connectorClass = "net.sf.okapi.connectors.pensieve.PensieveTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.pensieve.ParametersUI";
 		list.add(trc);
@@ -38,18 +38,18 @@ public class DefaultConnectors implements IConnectorList {
 		list.add(trc);
 		
 		trc = new ConnectorInfo();
-		trc.description = "MyMemory TM Web Services";
+		trc.description = "MyMemory TM Web Services (Beta)";
 		trc.connectorClass = "net.sf.okapi.connectors.mymemory.MyMemoryTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.mymemory.ParametersUI";
 		list.add(trc);
 
 		trc = new ConnectorInfo();
-		trc.description = "OpenTran Web Repository";
+		trc.description = "OpenTran Web Repository (Beta)";
 		trc.connectorClass = "net.sf.okapi.connectors.opentran.OpenTranTMConnector";
 		list.add(trc);
 
 		trc = new ConnectorInfo();
-		trc.description = "Translate Toolkit TM Server";
+		trc.description = "Translate Toolkit TM Server (Beta)";
 		trc.connectorClass = "net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.translatetoolkit.ParametersUI";
 		list.add(trc);

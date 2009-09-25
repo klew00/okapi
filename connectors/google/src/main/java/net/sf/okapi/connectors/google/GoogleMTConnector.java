@@ -20,15 +20,18 @@
 
 package net.sf.okapi.connectors.google;
 
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -45,7 +48,7 @@ public class GoogleMTConnector implements IQuery {
 
 	private static final String addressAjax = "http://ajax.googleapis.com/ajax/services/language/translate";
 	private static final String baseQueryAjax = "?v=1.0&q=%s&langpair=%s|%s";
-	private static final Pattern patternAjax = Pattern.compile("\"translatedText\":\"(.*?)\"\\},");
+//	private static final Pattern patternAjax = Pattern.compile("\"translatedText\":\"(.*?)\"\\},");
 
 	private static final String CLOSING_CODE = "</s>";
 	private static final int CLOSING_CODE_LENGTH = CLOSING_CODE.length();
@@ -58,6 +61,7 @@ public class GoogleMTConnector implements IQuery {
 	private QueryResult result;
 	private int current = -1;
 	private String hostId;
+	private JSONParser parser;
 	
 	public void close () {
 		// Nothing to do
@@ -86,6 +90,7 @@ public class GoogleMTConnector implements IQuery {
 		try {
 			InetAddress thisIp = InetAddress.getLocalHost();
 			hostId = "http://"+thisIp.getHostAddress();
+			parser = new JSONParser();
 		}
 		catch ( UnknownHostException e ) {
 			hostId = "http://unkown";
@@ -102,7 +107,7 @@ public class GoogleMTConnector implements IQuery {
 		current = -1;
 		return queryAjax(text);
 	}
-	
+
 	private int queryAjax (TextFragment fragment) {
 		try {
 			// Check if there is actually text to translate
@@ -123,38 +128,31 @@ public class GoogleMTConnector implements IQuery {
 			conn.setRequestProperty("Referer", hostId); // With one 'r' for official RFC error
 
 			// Get the response
-	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-	        StringBuilder res = new StringBuilder();
-			char[] buf = new char[2048];
-			int count = 0;
-			while (( count = rd.read(buf)) != -1 ) {
-				res.append(buf, 0, count);
-			}
-	        rd.close();
+	        JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+	        @SuppressWarnings("unchecked")
+	        Map<String, Object> map = (Map<String, Object>)object;
+	    	@SuppressWarnings("unchecked")
+	        Map<String, Object> data = (Map<String, Object>)map.get("responseData");
+	        String res = (String)data.get("translatedText");
 	        
-	        // Look for the translation in the resulting data
-	        Matcher m = patternAjax.matcher(res.toString());
-	        if ( m.find() ) {
-				result = new QueryResult();
-				result.source = fragment;
-				if ( fragment.hasCode() ) {
-					result.target = new TextFragment(fromCodedHTML(m.group(1), fragment),
-						fragment.getCodes());
-				}
-				else {
-					result.target = new TextFragment(fromCodedHTML(m.group(1), fragment));
-				}
-				result.score = 95; // Arbitrary score for MT
-				current = 0;
-	        }
+			result = new QueryResult();
+			result.source = fragment;
+			if ( fragment.hasCode() ) {
+				result.target = new TextFragment(fromCodedHTML(res, fragment),
+					fragment.getCodes());
+			}
+			else {
+				result.target = new TextFragment(fromCodedHTML(res, fragment));
+			}
+			result.score = 95; // Arbitrary score for MT
+			current = 0;
 		}
 		catch ( Throwable e ) {
 			lastError = e.getMessage();
 		}
-		
 		return ((current==0) ? 1 : 0);
 	}
-	
+
 	/**
 	 * Converts from coded text to coded HTML.
 	 * @param fragment the fragment to convert.
@@ -181,7 +179,7 @@ public class GoogleMTConnector implements IQuery {
 				break;
 			case TextFragment.MARKER_SEGMENT:
 				// Segment-holder text not supported
-				break;
+				throw new RuntimeException("Fragment with segment markers are not supported by the Google connector. Send the segments instead.");
 			case '&':
 				sb.append("&amp;");
 				break;
@@ -203,27 +201,12 @@ public class GoogleMTConnector implements IQuery {
 	private String fromCodedHTML (String text,
 		TextFragment fragment)
 	{
-		if ( text == null ) return "";
-		StringBuilder sb = new StringBuilder();
-		for ( int i=0; i<text.length(); i++ ) {
-			if ( text.charAt(i) == '\\' ) { // Should be uHHHH
-				try {
-					int n = Integer.valueOf(text.substring(i+2, i+6), 16);
-					sb.append((char)n);
-				}
-				catch ( NumberFormatException e ) {
-					sb.append("[ERR:"+text.substring(i+2, i+6)+"]");
-				}
-				i += 5;
-			}
-			else sb.append(text.charAt(i));
-		}
-		
-		text = sb.toString().replace("&#39;", "'");
+		if ( Util.isEmpty(text) ) return "";
+		text = text.toString().replace("&#39;", "'");
 		text = text.replace("&lt;", "<");
 		text = text.replace("&gt;", ">");
 		text = text.replace("&quot;", "\"");
-		sb.setLength(0);
+		StringBuilder sb = new StringBuilder();
 		sb.append(text.replace("&amp;", "&"));
 
 		Matcher m = opening.matcher(sb.toString());
@@ -233,7 +216,7 @@ public class GoogleMTConnector implements IQuery {
         	String markers = String.format("%c%c", TextFragment.MARKER_OPENING,
         		TextFragment.toChar(fragment.getIndex(id)));
         	sb.replace(m.start(), m.end(), markers);
-        	//Search corresponding closing part
+        	// Search corresponding closing part
         	int n = sb.toString().indexOf(CLOSING_CODE);
         	// Replace closing code by the coded text markers for closing
         	markers = String.format("%c%c", TextFragment.MARKER_CLOSING,

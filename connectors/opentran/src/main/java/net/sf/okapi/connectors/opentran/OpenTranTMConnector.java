@@ -73,7 +73,7 @@ public class OpenTranTMConnector implements ITMQuery {
 	}
 
 	public String getSettingsDisplay () {
-		return "REST services at http://.open-tran.eu";
+		return "REST services at http://open-tran.eu";
 	}
 	
 	public void close () {

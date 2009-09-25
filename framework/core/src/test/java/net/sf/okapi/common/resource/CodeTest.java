@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import static org.junit.Assert.*;
@@ -58,5 +61,32 @@ public class CodeTest {
     	assertTrue(code.hasReference());
     }
 
+    @Test
+    public void testStrings () {
+    	ArrayList<Code> codes = new ArrayList<Code>();
+    	codes.add(new Code(TagType.OPENING, "bold", "<b>"));
+    	codes.add(new Code(TagType.PLACEHOLDER, "break", "<br/>"));
+    	codes.add(new Code(TagType.CLOSING, "bold", "</b>"));
+    	String tmp = Code.codesToString(codes);
+    	
+    	assertNotNull(tmp);
+    	List<Code> codesAfter = Code.stringToCodes(tmp);
+    	assertEquals(3, codesAfter.size());
+    	
+    	Code code = codesAfter.get(0);
+    	assertEquals("<b>", code.getData());
+    	assertEquals(TagType.OPENING, code.getTagType());
+    	assertEquals("bold", code.getType());
+    	
+    	code = codesAfter.get(1);
+    	assertEquals("<br/>", code.getData());
+    	assertEquals(TagType.PLACEHOLDER, code.getTagType());
+    	assertEquals("break", code.getType());
+    	
+    	code = codesAfter.get(2);
+    	assertEquals("</b>", code.getData());
+    	assertEquals(TagType.CLOSING, code.getTagType());
+    	assertEquals("bold", code.getType());
+    }
 
 }
