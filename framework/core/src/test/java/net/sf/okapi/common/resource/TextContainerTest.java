@@ -21,6 +21,7 @@
 package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +38,52 @@ public class TextContainerTest {
         tc1 = new TextContainer();
     }
 
+	@Test
+	public void testSegmentsWithCodePlusOneChar () {
+		TextContainer tc = new TextContainer();
+		tc.append(TagType.PLACEHOLDER, "BR", "<br/>");
+		tc.append(".");
+		tc.createSegment(0, -1);
+		assertEquals(1, tc.getSegmentCount());
+		assertEquals("<br/>.", tc.getSegments().get(0).toString());
+	}
+	
+	@Test
+	public void testSegmentsWithJustCode () {
+		TextContainer tc = new TextContainer();
+		tc.append(TagType.PLACEHOLDER, "BR", "<br/>");
+		tc.createSegment(0, -1);
+		assertEquals(1, tc.getSegmentCount());
+		assertEquals("<br/>", tc.getSegments().get(0).toString());
+	}
+	
+	@Test
+	public void testSegmentsWithTwoCodes () {
+		TextContainer tc = new TextContainer();
+		tc.append(TagType.PLACEHOLDER, "BR1", "<br1/>");
+		tc.append(TagType.PLACEHOLDER, "BR2", "<br2/>");
+		tc.createSegment(0, -1);
+		assertEquals(1, tc.getSegmentCount());
+		assertEquals("<br1/><br2/>", tc.getSegments().get(0).toString());
+	}
+	
+	@Test
+	public void testSegmentsWithOneChar () {
+		TextContainer tc = new TextContainer();
+		tc.append("z");
+		tc.createSegment(0, -1);
+		assertEquals(1, tc.getSegmentCount());
+		assertEquals("z", tc.getSegments().get(0).toString());
+	}
+	
+	@Test
+	public void testSegmentsEmpty () {
+		TextContainer tc = new TextContainer();
+		assertNull(tc.createSegment(0, -1));
+		assertEquals(0, tc.getSegmentCount());
+	}
+	
+	// Test segmenting from an array
     @Test
     public void cloneDeepCopy(){
         Property p1 = new Property("name", "value", true);

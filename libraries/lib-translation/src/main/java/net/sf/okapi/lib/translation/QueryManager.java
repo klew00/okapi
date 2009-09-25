@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -483,7 +484,9 @@ public class QueryManager {
 		if ( !srcTc.hasText(false) ) return;
 		// Else create a single segment that is the whole content
 		srcTc.createSegment(0, -1);
-		tu.getTarget(trgLang).createSegment(0, -1);
+		TextContainer tc = tu.getTarget(trgLang);
+		if ( tc == null ) tc = tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
+		tc.createSegment(0, -1);
 	}
 	
 	/**

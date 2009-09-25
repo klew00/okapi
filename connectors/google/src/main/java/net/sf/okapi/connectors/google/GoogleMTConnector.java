@@ -144,6 +144,10 @@ public class GoogleMTConnector implements IQuery {
 			else {
 				result.target = new TextFragment(fromCodedHTML(res, fragment));
 			}
+			// If query and translated result are the same: don't see this as a translation
+			if ( result.target.equals(fragment) ) { // Test ignore codes content
+				return 0;
+			}
 			result.score = 95; // Arbitrary score for MT
 			current = 0;
 		}

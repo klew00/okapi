@@ -5,33 +5,34 @@
 <tool tool-id="P25CBF2C2" tool-name="Okapi.Utilities.Set01" tool-version="1.0.21.0" />
 </header>
 <body>
-<trans-unit id="1">
+<trans-unit id="1" translate="no">
 <source xml:lang="en">Text attribute</source>
-<target xml:lang="fr">Text attribute</target>
 </trans-unit>
-<trans-unit id="2">
+<trans-unit id="2" approved='yes'>
 <source xml:lang="en">Paragraph.</source>
-<target xml:lang="fr">Paragraph.</target>
+<source xml:lang="en">Paragraphe.</source>
+</trans-unit>
+<trans-unit id="200"> <!-- to translate -->
+<source xml:lang="en">Paragraph.</source>
+<source xml:lang="en">Paragraphe.</source>
 </trans-unit>
 <trans-unit id="3" resname="ID1">
 <source xml:lang="en">Paragraph 2</source>
-<target xml:lang="fr">Paragraph 2</target>
+<target xml:lang="fr"></target>
 </trans-unit>
 <trans-unit id="4">
 <source xml:lang="en">Text with <bpt id="1">&lt;code></bpt>code<ept id="1">&lt;/code></ept> and <bpt id="2">&lt;b></bpt>bold<ept id="2">&lt;/b></ept>.</source>
-<target xml:lang="fr">Text with <bpt id="1">&lt;code></bpt>code<ept id="1">&lt;/code></ept> and <bpt id="2">&lt;b></bpt>bold<ept id="2">&lt;/b></ept>.</target>
+<target xml:lang="fr"></target>
 </trans-unit>
 <trans-unit id="5">
 <source xml:lang="en">Text of the footnote</source>
-<target xml:lang="fr">Text of the footnote</target>
 </trans-unit>
 <trans-unit id="6" resname="OtherID">
 <source xml:lang="en">Text with a footnote<ph id="1">&lt;fn>[$SF1$]&lt;/fn></ph> and more text</source>
-<target xml:lang="fr">Text with a footnote<ph id="1">&lt;fn>[$SF1$]&lt;/fn></ph> and more text</target>
 </trans-unit>
 <trans-unit id="7">
 <source xml:lang="en">Text with <bpt id="2">&lt;xd:rmk></bpt><ph id="1">XDoc info non-translatable</ph><ept id="2">&lt;/xd:rmk></ept> and more text.</source>
-<target xml:lang="fr">Text with <bpt id="2">&lt;xd:rmk></bpt><ph id="1">XDoc info non-translatable</ph><ept id="2">&lt;/xd:rmk></ept> and more text.</target>
+<target xml:lang="fr"></target>
 </trans-unit>
 </body>
 </file>
