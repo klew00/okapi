@@ -108,7 +108,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 			otms = new OtmsSoapStub(url, null);
 		}
 		catch ( AxisFault e ) {
-			throw new RuntimeException("Error creating the GlobalSight Web services.", e);
+			throw new RuntimeException("Error creating the myMemory Web services.", e);
 		}
 		catch ( MalformedURLException e ) {
 			throw new RuntimeException("Invalid server URL.", e);
@@ -191,6 +191,8 @@ public class MyMemoryTMConnector implements ITMQuery {
 		// The expected language code is language-Region with region mandatory
 		String[] res = Util.splitLanguageCode(standardCode);
 		//TODO: Use a lookup table and a more complete one
+		res[0] = res[0].toLowerCase();
+		if ( !Util.isEmpty(res[1]) ) res[1] = res[1].toLowerCase();
 		if ( res[0].equals("en") ) res[1] = "us";
 		else if ( res[0].equals("pt") ) res[1] = "br";
 		else if ( res[0].equals("el") ) res[1] = "gr";
