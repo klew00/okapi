@@ -609,8 +609,9 @@ public class XLIFFFilter implements IFilter {
 				
 				case XMLStreamConstants.END_ELEMENT:
 					name = reader.getLocalName();
-					addTargetIfNeeded();
+					//addTargetIfNeeded();
 					if ( "trans-unit".equals(name) ) {
+						addTargetIfNeeded();
 						storeEndElement();
 						tu.setSkeleton(skel);
 						tu.setMimeType(MimeTypeMapper.XLIFF_MIME_TYPE);
@@ -640,12 +641,12 @@ public class XLIFFFilter implements IFilter {
 					break;
 					
 				case XMLStreamConstants.COMMENT:
-					addTargetIfNeeded();
+					//addTargetIfNeeded();
 					skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
 					break;
 				
 				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					addTargetIfNeeded();
+					//addTargetIfNeeded();
 					skel.append("<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
 					break;
 				}
@@ -820,6 +821,7 @@ public class XLIFFFilter implements IFilter {
 							segIdStack = -1; // Reset to not trigger segment ending again
 							// Add the segment to the content
 							content.appendSegment(segment); //TODO: mid should be the segid
+							if ( store ) storeEndElement();
 							continue;
 						}
 					}

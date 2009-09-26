@@ -1,33 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="test1" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="UTF-8" x:configId="">
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="test" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="utf-8" x:configId="">
 <body>
-<trans-unit id="6">
-<source xml:lang="en">Text <x id="1"/> text.</source>
-<target xml:lang="fr">Text <x id="1"/> text.</target>
+<trans-unit id="1" translate="no">
+<source xml:lang="en">Text not to translate</source>
+<target xml:lang="fr">Text not to translate</target>
 </trans-unit>
-<trans-unit id="0" translate="no">
-<source xml:lang="en">Do not translate this.</source>
-<target xml:lang="fr">Do not translate this.</target>
+<trans-unit id="2" approved="yes">
+<source xml:lang="en">Paragraph.</source>
+<target xml:lang="fr">Paragraphe (approved translation)</target>
 </trans-unit>
-<trans-unit id="1">
-<source xml:lang="en">Text number 1</source>
-<target xml:lang="fr">Text number 1</target>
-</trans-unit>
-<trans-unit id="2">
-<source xml:lang="en">Text number 2</source>
-<target xml:lang="fr">Texte numéro 2.</target>
-</trans-unit>
-<trans-unit id="3" approved="yes">
-<source xml:lang="en">Text number 3</source>
-<target xml:lang="fr">Texte numéro 3</target>
+<trans-unit id="3">
+<source xml:lang="en">Text to translate.</source>
+<target xml:lang="fr">Text to translate.</target>
 </trans-unit>
 <trans-unit id="4">
+<source xml:lang="en">Other text to translate.</source>
+<target xml:lang="fr">Other text to translate.</target>
+</trans-unit>
+<trans-unit id="5">
+<source xml:lang="en">Text to translate with PI</source>
+<target xml:lang="fr">Text to translate with PI</target>
+</trans-unit>
+<trans-unit id="6" resname="ID1">
+<source xml:lang="en">Text to translate for ID1</source>
+<target xml:lang="fr">Text to translate for ID1</target>
+</trans-unit>
+<trans-unit id="7">
+<source xml:lang="en">Text with <g id="1">code</g> and <g id="2">bold</g>.</source>
+<target xml:lang="fr">Text with <g id="1">code</g> and <g id="2">bold</g>.</target>
+</trans-unit>
+<trans-unit id="8">
+<source xml:lang="en">Text of the footnote</source>
+<target xml:lang="fr">Text of the footnote</target>
+</trans-unit>
+<trans-unit id="9" resname="OtherID">
+<source xml:lang="en">Text with a footnote<x id="1"/> and more text</source>
+<target xml:lang="fr">Text with a footnote<x id="1"/> and more text</target>
+</trans-unit>
+<trans-unit id="10">
+<source xml:lang="en">Text with <g id="2"><x id="1"/></g> and more text.</source>
+<target xml:lang="fr">Text with <g id="2"><x id="1"/></g> and more text.</target>
+</trans-unit>
+<trans-unit id="11">
+<source xml:lang="en">Sentence 1. Sentence 2</source>
+<target xml:lang="fr">Sentence 1. Sentence 2</target>
+</trans-unit>
+<trans-unit id="12">
 <source xml:lang="en">Text number four</source>
 <target xml:lang="fr">Text number four</target>
 </trans-unit>
-<trans-unit id="5">
-<source xml:lang="en">Text <x id="1"/> text.</source>
-<target xml:lang="fr">Text <x id="1"/> text.</target>
+<trans-unit id="13">
+<source xml:lang="en"><x id="1"/></source>
+<target xml:lang="fr"><x id="1"/></target>
+</trans-unit>
+<trans-unit id="14">
+<source xml:lang="en"></source>
+<target xml:lang="fr"></target>
 </trans-unit>
 </body>
 </file>

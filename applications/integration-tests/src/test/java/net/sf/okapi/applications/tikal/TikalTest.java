@@ -286,6 +286,14 @@ public class TikalTest {
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.tmx", "potest.po.empty.tmx", "UTF-8"));
     }
 
+    @Test
+    public void testConvertToPO () throws IOException, InterruptedException {
+    	// Test normal conversion
+    	assertTrue(deleteOutputFile("tmxtest-attributes.tmx.po"));
+    	assertEquals(0, runTikal("-2po tmxtest-attributes.tmx -sl EN-US -tl FR-FR"));
+    	assertTrue("File different from gold", compareWithGoldFile("tmxtest-attributes.tmx.po", "UTF-8"));
+    }
+
     private boolean compareWithGoldFile (String outputBase, String encoding) {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
