@@ -32,6 +32,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.StartDocument;
 
 /**
@@ -152,12 +153,15 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 				filterWriter = customFilterWriter;
 				filterWriter.setOptions(targetLanguage, outputEncoding);
 				filterWriter.setOutput(outputURI.getPath());
-				normalizeDocumentResourceName(event);
+				normalizeResourceName(event);
 			}
-			// Fall thru
+			return filterWriter.handleEvent(event);
 
 		// Filter events:
 		case START_SUBDOCUMENT:
+			normalizeResourceName(event);
+			return filterWriter.handleEvent(event);
+			
 		case END_SUBDOCUMENT:
 		case START_GROUP:
 		case END_GROUP:
@@ -184,16 +188,16 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 		}
 	}
 
-	private void normalizeDocumentResourceName (Event event) {
+	private void normalizeResourceName (Event event) {
 		if ( documentsRoot == null ) return; // Nothing to do
-		StartDocument sd = (StartDocument)event.getResource();
-		String name = sd.getName();
+		INameable res = (INameable)event.getResource();
+		String name = res.getName();
 		if ( Util.isEmpty(name) ) return; // Nothing to do
 		name = name.replace('\\', '/');
 		if ( name.startsWith(documentsRoot) ) {
 			name = name.substring(documentsRoot.length());
 		}
-		sd.setName(name);
+		res.setName(name);
 	}
 
 }
