@@ -35,6 +35,8 @@ public class ServalForm {
 	private Text edQuery;
 	private Text edSource;
 	private Text edTarget;
+	private Text edThreshold;
+	private Text edMaxHits;
 	private Table tblResults;
 	private TableModel modResults;
 	private QueryManager queryMgt;
@@ -64,7 +66,7 @@ public class ServalForm {
 	}
 	
 	private void createContent () {
-		GridLayout layTmp = new GridLayout(4, false);
+		GridLayout layTmp = new GridLayout(8, false);
 		shell.setLayout(layTmp);
 		
 		// Menus
@@ -111,7 +113,7 @@ public class ServalForm {
 		edQuery = new Text(shell, SWT.BORDER | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 7;
 		edQuery.setLayoutData(gdTmp);
 
 		Font font = edQuery.getFont();
@@ -126,7 +128,7 @@ public class ServalForm {
 
 		edAttributes = new Text(shell, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 7;
 		edAttributes.setLayoutData(gdTmp);
 		
 		stTmp = new Label(shell, SWT.NONE); // Place-holder
@@ -142,6 +144,22 @@ public class ServalForm {
 		chkRawText = new Button(shell, SWT.CHECK);
 		chkRawText.setText("Raw text");
 		
+		stTmp = new Label(shell, SWT.NONE);
+		stTmp.setText("Threshold:");
+		edThreshold = new Text(shell, SWT.BORDER);
+		edThreshold.setText("95");
+		gdTmp = new GridData();
+		gdTmp.widthHint = 30;
+		edThreshold.setLayoutData(gdTmp);
+		
+		stTmp = new Label(shell, SWT.NONE);
+		stTmp.setText("Maximun number of hits:");
+		edMaxHits = new Text(shell, SWT.BORDER);
+		edMaxHits.setText("25");
+		gdTmp = new GridData();
+		gdTmp.widthHint = 30;
+		edMaxHits.setLayoutData(gdTmp);
+
 		stElapsedTime = new Label(shell, SWT.NONE);
 		stElapsedTime.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
@@ -152,7 +170,7 @@ public class ServalForm {
 		edTarget = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 7;
 		edTarget.setLayoutData(gdTmp);
 		edTarget.setEditable(false);
 		edTarget.setFont(displayFont);
@@ -164,14 +182,14 @@ public class ServalForm {
 		edSource = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 7;
 		edSource.setLayoutData(gdTmp);
 		edSource.setEditable(false);
 		edSource.setFont(displayFont);
 		
 		tblResults = new Table(shell, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 8;
 		tblResults.setFont(displayFont);
 		tblResults.setLayoutData(gdTmp);
 		tblResults.setHeaderVisible(true);
@@ -217,10 +235,32 @@ public class ServalForm {
 	
 	private void query () {
 		try {
-//			queryMgt.setThreshold(60);
-//			queryMgt.setMaximumHits(50);
+			String tmp = edThreshold.getText();
+			int n;
+			try {
+				n = Integer.valueOf(tmp);
+				if ( n < 0 ) n = 0;
+				if ( n > 100 ) n = 100;
+			}
+			catch ( NumberFormatException e ) {
+				n = 95;
+			}
+			edThreshold.setText(String.valueOf(n));
+			queryMgt.setThreshold(n);
+			
+			tmp = edMaxHits.getText();
+			try {
+				n = Integer.valueOf(tmp);
+				if ( n < 0 ) n = 0;
+			}
+			catch ( NumberFormatException e ) {
+				n = 25;
+			}
+			edMaxHits.setText(String.valueOf(n));
+			queryMgt.setMaximumHits(n);
 			
 			if ( !setAttributes() ) return;
+
 			long start = System.nanoTime(); 
 			if ( chkRawText.getSelection() ) {
 				queryMgt.query(edQuery.getText());

@@ -24,5 +24,8 @@ package net.sf.okapi.tm.pensieve.common;
  * A field of a translation unit. These are things that are always stored vs metadata is optional.
  */
 public enum TranslationUnitField {
-    SOURCE_EXACT, SOURCE, TARGET, SOURCE_LANG, TARGET_LANG
+    SOURCE_EXACT, SOURCE, TARGET, SOURCE_LANG, TARGET_LANG,
+    
+    // Added for try out of inline code support
+    SOURCE_CODES, TARGET_CODES
 }

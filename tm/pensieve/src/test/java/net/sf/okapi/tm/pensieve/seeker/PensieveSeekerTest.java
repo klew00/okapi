@@ -21,6 +21,7 @@ package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.*;
 import net.sf.okapi.tm.pensieve.writer.PensieveWriter;
@@ -489,6 +490,67 @@ public class PensieveSeekerTest {
         assertEquals("number of docs found", 0, tmhits.size());
     }
 
+    @Test
+    public void searchExactWithCodes () throws Exception {
+    	PensieveWriter writer = getWriter();
+    	String str = "watch out for the killer rabbit";
+    	TextFragment frag = new TextFragment("watch out for ");
+    	frag.append(TagType.OPENING, "b", "<b>");
+    	frag.append("the killer");
+    	frag.append(TagType.CLOSING, "b", "</b>");
+    	frag.append(" rabbit");
+    	
+    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
+    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
+    	writer.endIndex();
+    	
+    	tmhits = seeker.searchExact2(frag, 10, null);
+    	assertEquals("number of docs found", 1, tmhits.size());
+    	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
+    }
+    
+    @Test
+    public void searchExactWithCodesQueryNoCodes () throws Exception {
+    	PensieveWriter writer = getWriter();
+    	String str = "watch out for the killer rabbit";
+    	TextFragment frag = new TextFragment("watch out for ");
+    	frag.append(TagType.OPENING, "b", "<b>");
+    	frag.append("the killer");
+    	frag.append(TagType.CLOSING, "b", "</b>");
+    	frag.append(" rabbit");
+    	
+    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
+    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
+    	writer.endIndex();
+    	
+    	frag = new TextFragment("watch out for the killer rabbit");
+    	tmhits = seeker.searchExact2(frag, 10, null);
+    	assertEquals("number of docs found", 1, tmhits.size());
+    	assertEquals("watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
+    }
+    
+    @Test
+    public void searchFuzzyWithCodes () throws Exception {
+    	PensieveWriter writer = getWriter();
+    	String str1 = "watch out for the killer rabbit";
+    	String str2 = "something very different";
+    	TextFragment frag = new TextFragment("watch out for ");
+    	frag.append(TagType.OPENING, "b", "<b>");
+    	frag.append("the killer");
+    	frag.append(TagType.CLOSING, "b", "</b>");
+    	frag.append(" rabbit");
+    	
+    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str1)), TARGET));
+    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str2)), TARGET));
+    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
+    	writer.endIndex();
+    	
+    	tmhits = seeker.searchFuzzy2(frag, null, 10, null);
+    	assertEquals("number of docs found", 2, tmhits.size());
+    	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
+    	assertEquals("watch out for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
+    }
+    
     //TODO support metadata
     @Test
     public void getTranslationUnitFields() throws Exception {

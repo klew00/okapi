@@ -21,6 +21,7 @@
 package net.sf.okapi.tm.pensieve.seeker;
 
 
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.TmHit;
 
 import java.util.List;
@@ -51,14 +52,16 @@ public interface ITmSeeker {
      * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
     List<TmHit> searchExact(String query, int max, Metadata metadata);
-/**
-     * Gets a list of fuzzy matches for a given phrase.
-     *
-     *
-     * @return A list of fuzzy matches
-     * @throws OkapiIOException if the search cannot be completed do to I/O problems
-     */
 
+    /**
+     * Temporary method to get a list of exact matches for a given text fragment, taking inline codes in account.
+     * @param query the fragment to search for
+     * @param max the max number of results
+     * @param metadata the metadata attributes to also match against, null for no metadata
+     * @return a list of exact matches
+     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed due to I/O problems
+     */
+    List<TmHit> searchExact2 (TextFragment query, int max, Metadata metadata);
 
     /**
      * Gets a list of fuzzy matches for a given phrase.
@@ -70,6 +73,17 @@ public interface ITmSeeker {
      * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
     List<TmHit> searchFuzzy(String query, Float similarityThreshold, int max, Metadata metadata);
+
+    /**
+     * Temporary method to get a list of fuzzy matches for a given text fragment, taking inline codes in account.
+     * @param query the fragment to search for.
+     * @param threshold the desired threshold - null for default threshold of 0.5
+     * @param max the max number of results
+     * @param metadata the metadata attributes to also match against, null for no metadata
+     * @return a list of fuzzy matches
+     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
+     */
+    List<TmHit> searchFuzzy2 (TextFragment query, Float threshold, int max, Metadata metadata);
 
     /**
      * Gets a list of TmHits which have segments that contain the provided subphrase

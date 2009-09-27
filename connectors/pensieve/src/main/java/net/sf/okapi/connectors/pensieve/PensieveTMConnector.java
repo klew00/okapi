@@ -31,12 +31,14 @@ import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class PensieveTMConnector implements ITMQuery {
 
-	private int maxHits = 50;
-	private int threshold = 100;
+	private int maxHits = 25;
+	private int threshold = 95;
 	private List<QueryResult> results;
 	private int current = -1;
 	private String srcLang;
@@ -44,7 +46,14 @@ public class PensieveTMConnector implements ITMQuery {
 	private Parameters params;
 	private ITmSeeker seeker;
 	private Metadata attrs;
+//	private ScoreComparer scorComp = new ScoreComparer();
 
+//	class ScoreComparer implements Comparator<QueryResult> {
+//		public int compare(QueryResult arg0, QueryResult arg1) {
+//			return (arg0.score>arg1.score ? -1 : (arg0.score==arg1.score ? 0 : 1));
+//		}
+//	}
+	
 	public PensieveTMConnector () {
 		params = new Parameters();
 		attrs = new Metadata();
@@ -115,16 +124,17 @@ public class PensieveTMConnector implements ITMQuery {
 
 		List<TmHit> list;
 		if ( threshold == 100 ) {
-			list = seeker.searchExact(text.toString(), maxHits, attrs);
+			list = seeker.searchExact2(text, maxHits, attrs);
 		}
 		else {
-			list = seeker.searchFuzzy(text.toString(), null, maxHits, attrs);
+			list = seeker.searchFuzzy2(text, null, maxHits, attrs);
 		}
 
 		// Convert to normalized results
 		for ( TmHit hit : list ) {
-			QueryResult qr = new QueryResult();
 			Float f = hit.getScore() * 100;
+//			if ( f.intValue() < threshold ) break;
+			QueryResult qr = new QueryResult();
 			qr.score = f.intValue();
 			qr.source = hit.getTu().getSource().getContent();
 			qr.target = hit.getTu().getTarget().getContent();

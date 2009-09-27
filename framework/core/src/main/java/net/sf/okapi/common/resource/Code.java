@@ -87,6 +87,31 @@ public class Code {
 	}
 	
 	/**
+	 * Indicates if two codes-storing strings have the same codes or not.
+	 * @param codes1 the first codes-storing string.
+	 * @param codes2 the second codes-storing string.
+	 * @return true if both codes-storing strings are identical.
+	 */
+	public static boolean sameCodes (List<Code> codes1,
+		List<Code> codes2)
+	{
+		if ( codes1.size() != codes2.size() ) return false;
+		Code code1, code2;
+		for ( int i=0; i<codes1.size(); i++ ) {
+			code1 = codes1.get(i);
+			code2 = codes2.get(i);
+			if ( code1.id != code2.id ) return false;
+			if ( code1.data != null ) {
+				if ( !code1.data.equals(code2.data) ) return false;
+			}
+			else {
+				if ( code1.data != null ) return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * Gets a string storage representation of the annotations of a Code.
 	 * @param map the list of annotations.
 	 * @return the storage string.
@@ -106,7 +131,7 @@ public class Code {
 	
 	/**
 	 * Helper method to convert a storage string into a list of codes.
-	 * @param data the storage string to convert.
+	 * @param data the storage string to convert (can be null).
 	 * @return a list of the codes in the storage string.
 	 * @see #codesToString(List)
 	 */

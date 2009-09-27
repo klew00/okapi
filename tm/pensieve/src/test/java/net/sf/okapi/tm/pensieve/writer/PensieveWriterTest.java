@@ -20,7 +20,9 @@
 
 package net.sf.okapi.tm.pensieve.writer;
 
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.*;
 import static net.sf.okapi.tm.pensieve.common.TranslationUnitField.*;
@@ -68,6 +70,16 @@ public class PensieveWriterTest {
         tmWriter.endIndex();
         tmWriter = new PensieveWriter(dir, true);
         tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joseph", "Yosep","2"));
+        tmWriter.endIndex();
+        assertEquals("# of docs in tm", 1, tmWriter.getIndexWriter().numDocs());
+    }
+
+    @Test
+    public void constructorCreateNew2 () throws IOException {
+        tmWriter.indexTranslationUnit2(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.endIndex();
+        tmWriter = new PensieveWriter(dir, true);
+        tmWriter.indexTranslationUnit2(Helper.createTU("EN", "KR", "Joseph", "Yosep","2"));
         tmWriter.endIndex();
         assertEquals("# of docs in tm", 1, tmWriter.getIndexWriter().numDocs());
     }
@@ -172,7 +184,7 @@ public class PensieveWriterTest {
         assertTrue("The index directory should end with 'target/test-classes'", writer.getDirectory() instanceof RAMDirectory);
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+//    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
 //TODO: Fix me please
     //    @Test(expected = OkapiIOException.class)
     public void endIndexHandlesIOException() throws Exception {
@@ -236,6 +248,36 @@ public class PensieveWriterTest {
     }
 
     @Test
+    public void testCreateDocument (){
+    	TextFragment srcFrag = new TextFragment("blah ");
+    	srcFrag.append(TagType.OPENING, "b", "<b>");
+    	srcFrag.append("bold");
+    	srcFrag.append(TagType.CLOSING, "b", "</b>");
+    	String srcCT = srcFrag.getCodedText();
+    	String srcCodes = Code.codesToString(srcFrag.getCodes());
+    	TextFragment trgFrag = new TextFragment("blah ");
+    	trgFrag.append(TagType.OPENING, "i", "<i>");
+    	trgFrag.append("gras");
+    	trgFrag.append(TagType.CLOSING, "i", "</i>");
+    	String trgCT = trgFrag.getCodedText();
+    	String trgCodes = Code.codesToString(trgFrag.getCodes());
+
+    	TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant("EN", srcFrag),
+   			new TranslationUnitVariant("FR", trgFrag));
+    	Metadata md = tu.getMetadata();
+    	md.put(MetadataType.ID, "someId");
+    	Document doc = tmWriter.createDocument(tu);
+    	assertEquals("Document's content field", srcCT, getFieldValue(doc, SOURCE.name()));
+    	assertEquals("Document's content exact field", srcCT, getFieldValue(doc, SOURCE_EXACT.name()));
+    	assertEquals("Document's target field", trgCT, getFieldValue(doc, TARGET.name()));
+    	assertEquals("Document's source lang field", "EN", getFieldValue(doc, SOURCE_LANG.name()));
+    	assertEquals("Document's target lang field", "FR", getFieldValue(doc, TARGET_LANG.name()));
+    	assertEquals("Document's id field", "someId", getFieldValue(doc, MetadataType.ID.fieldName()));
+    	assertEquals("Document's source codes", srcCodes, getFieldValue(doc, SOURCE_CODES.name()));
+    	assertEquals("Document's target codes", trgCodes, getFieldValue(doc, TARGET_CODES.name()));
+    }
+
+    @Test
     public void getDocumentNoTarget(){
         Document doc = tmWriter.getDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("blah blah blah")), null));
         assertNull("Document's target field should be null", doc.getField(TARGET.name()));
@@ -244,6 +286,11 @@ public class PensieveWriterTest {
     @Test(expected = NullPointerException.class)
     public void indexTranslationUnitNull() throws IOException {
         tmWriter.indexTranslationUnit(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void indexTranslationUnitNull2() throws IOException {
+        tmWriter.indexTranslationUnit2(null);
     }
 
     @Test
@@ -264,18 +311,21 @@ public class PensieveWriterTest {
         assertEquals("num of docs indexed", 1, tmWriter.getIndexWriter().numDocs());
     }
 
+    @Test
+    public void indexTextUnit2() throws IOException {
+        tmWriter.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("joe")), new TranslationUnitVariant("EN", new TextFragment("schmoe"))));
+        assertEquals("num of docs indexed", 1, tmWriter.getIndexWriter().numDocs());
+    }
+
     private String getFieldValue(Document doc, String fieldName) {
         return doc.getField(fieldName).stringValue();
     }
-
-    
 
     private int getNumOfHitsFor(String fieldName, String fieldValue) throws IOException {
         IndexSearcher is = new IndexSearcher(dir, true);
         PhraseQuery q = new PhraseQuery();
         q.add(new Term(fieldName, fieldValue));
         return is.search(q, 10).scoreDocs.length;
-
     }
 
     private Document findDocument(String fieldName, String fieldValue) throws IOException {

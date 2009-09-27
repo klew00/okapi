@@ -114,7 +114,7 @@ public class TranslationUnit {
         return metadata.get(key);
     }
 
-    private static boolean isFragmentEmpty(TranslationUnitVariant frag){
-        return frag == null || frag.getContent().isEmpty();
+    private static boolean isFragmentEmpty (TranslationUnitVariant frag){
+        return (( frag == null ) || frag.getContent().isEmpty() );
     }
 }

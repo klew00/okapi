@@ -139,7 +139,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 			TextContainer srcCont = tu.getSource();
 			// If not segmented: index the whole entry
 			if ( !srcCont.isSegmented() ) {
-				writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLang, trgLang, tu));
+				writer.indexTranslationUnit2(PensieveUtil.convertToTranslationUnit(srcLang, trgLang, tu));
 				return;
 			}
 			
@@ -147,7 +147,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 			List<Segment> trgList = tu.getTarget(trgLang).getSegments();
 			if ( trgList.size() != srcCont.getSegmentCount() ) {
 				// Fall back to full entry
-				writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLang, trgLang, tu));
+				writer.indexTranslationUnit2(PensieveUtil.convertToTranslationUnit(srcLang, trgLang, tu));
 				//TODO: Log a warning
 				return;
 			}
@@ -160,7 +160,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 				TranslationUnit trUnit = new TranslationUnit(source, target);
 				//TODO: what do we do with properties? e.g. tuid should not be used as it
 				//PensieveUtil.populateMetaDataFromProperties(tu, trUnit);
-				writer.indexTranslationUnit(trUnit);
+				writer.indexTranslationUnit2(trUnit);
 				i++;
 			}
 		}

@@ -1,5 +1,5 @@
 /*===========================================================================
-Copyright (C) 2008-2009 by the Okapi Framework contributors
+Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
 This library is free software; you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License as published by
@@ -17,11 +17,19 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.tm.pensieve.seeker;
 
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.tm.pensieve.common.*;
+import net.sf.okapi.tm.pensieve.common.Metadata;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
+import net.sf.okapi.tm.pensieve.common.TmHit;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
+
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -29,11 +37,21 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.FuzzyQuery;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PhraseQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.lucene.index.CorruptIndexException;
@@ -45,7 +63,14 @@ import org.apache.lucene.index.CorruptIndexException;
  */
 public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
+	private class ScoresComparer implements Comparator<TmHit> {
+		public int compare(TmHit arg1, TmHit arg2) {
+			return (arg1.getScore()>arg2.getScore() ? -1 : (arg1.getScore()==arg2.getScore() ? 0 : 1));
+		}
+	}
+	
     private Directory indexDir;
+	private ScoresComparer scoresComp = new ScoresComparer();
 
     /**
      * Creates an instance of TMSeeker
@@ -292,4 +317,144 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
             throw new UnsupportedOperationException("Will not support remove method - Please remove items via ITmSeeker interface");
         }
     }
+
+    //=== Added for try out of inline codes support
+
+    /**
+     * Search for exact matches.
+     * @param query the fragment to query.
+     * @param max the maximum number of hits to return.
+     * @param metadata any associated attributes to use for filter.
+     * @return the list of hits of the given argument.
+     */
+    public List<TmHit> searchExact2 (TextFragment query,
+    	int max,
+    	Metadata metadata)
+    {
+    	PhraseQuery q = new PhraseQuery();
+    	q.add(new Term(TranslationUnitField.SOURCE_EXACT.name(), query.getCodedText()));
+    	return search2(max, q, query.getCodes(), metadata);
+    }
+
+    /**
+     * Search for exact and fuzzy matches
+     * @param query the fragment to query.
+     * @param threshold the minimal score value to return.
+     * @param max the maximum number of hits to return.
+     * @param metadata any associated attributes to use for filter.
+     * @return the list of hits of the given argument.
+     */
+    public List<TmHit> searchFuzzy2 (TextFragment query,
+    	Float threshold,
+    	int max,
+    	Metadata metadata)
+    {
+    	Query q;
+    	if ( threshold == null ) {
+    		q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query.getCodedText()));
+    	}
+    	else {
+    		q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query.getCodedText()), threshold);
+    	}
+    	return search2(max, q, query.getCodes(), metadata);
+    }
+
+    /**
+     * Search the best list of hits for a given query, taking inline codes into account.
+     * @param max the maximum number of hits to return.
+     * @param q the query
+     * @param srcCodes the source codes.
+     * @param metadata any associated attributes to use for filter.
+     * @return the list of hits found for the given arguments (never null).
+     */
+    private List<TmHit> search2 (int max,
+    	Query q,
+    	List<Code> srcCodes,
+    	Metadata metadata)
+    {
+    	IndexSearcher is = null;
+    	List<TmHit> tmhits = new ArrayList<TmHit>();
+    	BooleanQuery bQuery = createQuery(q, metadata);
+    	try {
+    		is = getIndexSearcher();
+    		TopDocs hits = is.search(bQuery, max);
+    		List<Code> tmCodes;
+    		boolean sort = false;
+    		ScoreDoc scoreDoc;
+    		TmHit tmHit;
+    		for ( int j=0; j<hits.scoreDocs.length; j++ ) {
+    			scoreDoc = hits.scoreDocs[j];
+    			tmCodes = Code.stringToCodes(getFieldValue(is.doc(scoreDoc.doc), TranslationUnitField.SOURCE_CODES));
+    			tmHit = new TmHit();
+    			if (( srcCodes.size() > 0 ) && ( tmCodes.size() > 0 )) {
+    				// If tmScrCodes is null, equals will return false
+        			if ( Code.sameCodes(srcCodes, tmCodes) ) {
+        				tmHit.setScore(scoreDoc.score);
+        			}
+        			else {
+        				//TODO: we may want to have different penalty per type of code differences
+        				tmHit.setScore(scoreDoc.score-0.01f);
+        				sort = true;
+        			}
+    			}
+    			else { // Either or none has code(s)
+    				// In this case any potential differences is already set by the markers in the text
+    				tmHit.setScore(scoreDoc.score);
+    			}
+    			// Set the translation unit
+    			tmHit.setTu(
+    				createTranslationUnit(
+    					is.doc(scoreDoc.doc),
+    					getFieldValue(is.doc(scoreDoc.doc), TranslationUnitField.SOURCE),
+    					tmCodes));
+    			tmhits.add(tmHit);
+    		}
+    		
+    		// Re-sort if needed
+    		if ( sort ) {
+    			Collections.sort(tmhits, scoresComp);
+    		}
+    	}
+    	catch (IOException e) {
+    		throw new OkapiIOException("Could not complete query.", e);
+    	}
+    	finally {
+    		if ( is != null ) {
+    			try {
+    				is.close();
+    			} catch (IOException ignored) {}
+    		}
+    	}
+    	return tmhits;
+    }
+    
+    /**
+     * Creates a {@link TranslationUnit} for a given document.
+     * @param doc the document from which to create the new translation unit.
+     * @param srcCodedText the source coded text to re-use.
+     * @param srcCodes the source codes to re-use.
+     * @return a new translation unit for the given document.
+     */
+    private TranslationUnit createTranslationUnit (Document doc,
+    	String srcCodedText,
+    	List<Code> srcCodes)
+    {
+    	TextFragment frag = new TextFragment();
+    	frag.setCodedText(srcCodedText, srcCodes, false);
+    	TranslationUnitVariant srcTuv = new TranslationUnitVariant(
+    		getFieldValue(doc, TranslationUnitField.SOURCE_LANG), frag);
+    	
+    	frag = new TextFragment();
+    	List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
+    	frag.setCodedText(getFieldValue(doc, TranslationUnitField.TARGET), codes, false);
+    	TranslationUnitVariant trgTuv = new TranslationUnitVariant(
+    		getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
+    	
+    	TranslationUnit tu = new TranslationUnit(srcTuv, trgTuv);
+    	for (MetadataType type : MetadataType.values()) {
+    		tu.setMetadataValue(type, getFieldValue(doc, type));
+    	}
+    	return tu;
+    }
+
 }

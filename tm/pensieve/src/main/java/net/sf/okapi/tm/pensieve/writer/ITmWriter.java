@@ -36,13 +36,21 @@ public interface ITmWriter {
     void endIndex() throws IOException;
 
     /**
-     * Closes the index and forces a commit against the index.
-     * @param tu The Translationunit to index
-     * @throws IOException if the index can not happen
+     * Indexes a given translation unit.
+     * @param tu the translation unit to index.
+     * @throws IOException if the indexing cannot happen.
      */
     //TODO: get rid of the IOException requirement
     void indexTranslationUnit(TranslationUnit tu) throws IOException;
 
+    /**
+     * Temporary method to indexes a given translation unit, taking inline codes into account.
+     * @param tu the translation unit to index.
+     * @throws IOException if the indexing cannot happen.
+     */
+    //TODO: get rid of the IOException requirement
+    void indexTranslationUnit2 (TranslationUnit tu) throws IOException;
+    
     /**
      * Deletes a TranslationUnit based on the id.
      * @param id The Unique ID of the TU to delete

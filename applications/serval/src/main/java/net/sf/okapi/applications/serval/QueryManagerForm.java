@@ -197,7 +197,7 @@ public class QueryManagerForm {
 				if ( q == null ) return; // Cancel
 				// Set the initial parameters
 				q.setLanguages(qm.getSourceLanguage(), qm.getTargetLanguage());
-				int id = qm.addResource(q, "New resource");
+				int id = qm.addResource(q, q.getName());
 				// Add the new resource to the list and select it
 				model.addToTable(qm, id);
 				table.setSelection(table.getItemCount()-1);
