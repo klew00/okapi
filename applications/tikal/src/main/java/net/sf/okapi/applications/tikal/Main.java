@@ -913,6 +913,7 @@ public class Main {
 		// Filter events to raw document final step (using the XLIFF writer)
 		FilterEventsWriterStep fewStep = new FilterEventsWriterStep();
 		fewStep.setFilterWriter(new XLIFFWriter());
+		fewStep.setDocumentRoots(System.getProperty("user.dir"));
 		driver.addStep(fewStep);
 
 		// Create the raw document and set the output

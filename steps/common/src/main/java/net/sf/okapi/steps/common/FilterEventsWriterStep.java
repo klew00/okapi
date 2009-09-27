@@ -20,11 +20,11 @@
 
 package net.sf.okapi.steps.common;
 
+import java.io.File;
 import java.net.URI;
 
-import javax.swing.text.DefaultEditorKit.CutAction;
-
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -32,6 +32,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.StartDocument;
 
 /**
  * Outputs filters events into a document.
@@ -51,6 +52,7 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	private URI outputURI;
 	private String targetLanguage;
 	private String outputEncoding;
+	private String documentsRoot;
 
 	/**
 	 * Creates a new FilterEventsWriterStep object.
@@ -101,6 +103,23 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	public void setFilterWriter (IFilterWriter filterWriter) {
 		customFilterWriter = filterWriter;
 	}
+	
+	/**
+	 * Sets the root of the documents to process. This is to be used when
+	 * creating XLIFF output, as a temporary solution for the 'original' attribute.
+	 * The value specified is used to fix-up the start document name.
+	 * @param documentsRoot documents root.
+	 */
+	public void setDocumentRoots (String newDocumentsRoot) {
+		// Set and normalize root
+		File file = new File(newDocumentsRoot);
+		documentsRoot = file.toURI().getPath();
+		documentsRoot = documentsRoot.replace('\\', '/');
+		// Make sure it ends with a '/'
+		if ( !documentsRoot.endsWith("/") ) {
+			documentsRoot += "/";
+		}
+	}
 
 	public String getName() {
 		return "Filter Events Writer";
@@ -133,6 +152,7 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 				filterWriter = customFilterWriter;
 				filterWriter.setOptions(targetLanguage, outputEncoding);
 				filterWriter.setOutput(outputURI.getPath());
+				normalizeDocumentResourceName(event);
 			}
 			// Fall thru
 
@@ -162,6 +182,18 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 		if ( filterWriter != null ) {
 			filterWriter.close();
 		}
+	}
+
+	private void normalizeDocumentResourceName (Event event) {
+		if ( documentsRoot == null ) return; // Nothing to do
+		StartDocument sd = (StartDocument)event.getResource();
+		String name = sd.getName();
+		if ( Util.isEmpty(name) ) return; // Nothing to do
+		name = name.replace('\\', '/');
+		if ( name.startsWith(documentsRoot) ) {
+			name = name.substring(documentsRoot.length());
+		}
+		sd.setName(name);
 	}
 
 }
