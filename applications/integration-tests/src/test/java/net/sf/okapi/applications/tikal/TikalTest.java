@@ -74,7 +74,7 @@ public class TikalTest {
     	assertEquals(0, runTikal("-x dtdtest.dtd -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("dtdtest.dtd.xlf", "UTF-8"));
     	// Merge
-    	assertEquals(0, runTikal("-m dtdtest.dtd.xlf -ie windows-1252"));
+    	assertEquals(0, runTikal("-m dtdtest.dtd.xlf -oe windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("dtdtest.out.dtd", "windows-1252"));
     }
 
@@ -84,10 +84,10 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("htmltest.html.xlf"));
     	assertTrue(deleteOutputFile("htmltest.out.html"));
     	// Extract
-    	assertEquals(0, runTikal("-x htmltest.html"));
+    	assertEquals(0, runTikal("-x htmltest.html -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("htmltest.html.xlf", "UTF-8"));
     	// Merge
-    	assertEquals(0, runTikal("-m htmltest.html.xlf -ie windows-1252"));
+    	assertEquals(0, runTikal("-m htmltest.html.xlf -oe windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("htmltest.out.html", "windows-1252"));
     }
 
@@ -97,10 +97,10 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("jsontest.json.xlf"));
     	assertTrue(deleteOutputFile("jsontest.out.json"));
     	// Extract
-    	assertEquals(0, runTikal("-x jsontest.json"));
+    	assertEquals(0, runTikal("-x jsontest.json -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("jsontest.json.xlf", "UTF-8"));
     	// Merge
-    	assertEquals(0, runTikal("-m jsontest.json.xlf -ie windows-1252"));
+    	assertEquals(0, runTikal("-m jsontest.json.xlf -oe windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("jsontest.out.json", "windows-1252"));
     }
 
@@ -110,10 +110,10 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("potest.po.xlf"));
     	assertTrue(deleteOutputFile("potest.out.po"));
     	// Extract
-    	assertEquals(0, runTikal("-x potest.po"));
+    	assertEquals(0, runTikal("-x potest.po -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.xlf", "UTF-8"));
     	// Merge
-    	assertEquals(0, runTikal("-m potest.po.xlf -ie windows-1252"));
+    	assertEquals(0, runTikal("-m potest.po.xlf -oe windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.out.po", "windows-1252"));
     }
 
@@ -123,10 +123,10 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("potest-mono.po.xlf"));
     	assertTrue(deleteOutputFile("potest-mono.out.po"));
     	// Extract
-    	assertEquals(0, runTikal("-x potest-mono.po -fc okf_po-monolingual"));
+    	assertEquals(0, runTikal("-x potest-mono.po -fc okf_po-monolingual -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("potest-mono.po.xlf", "UTF-8"));
     	// Merge
-    	assertEquals(0, runTikal("-m potest-mono.po.xlf -fc okf_po-monolingual -ie windows-1252"));
+    	assertEquals(0, runTikal("-m potest-mono.po.xlf -fc okf_po-monolingual -oe windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("potest-mono.out.po", "windows-1252"));
     }
 
@@ -136,7 +136,7 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("proptest.properties.xlf"));
     	assertTrue(deleteOutputFile("proptest.out.properties"));
     	// Extract
-    	assertEquals(0, runTikal("-x proptest.properties"));
+    	assertEquals(0, runTikal("-x proptest.properties -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("proptest.properties.xlf", "UTF-8"));
     	// Merge
     	assertEquals(0, runTikal("-m proptest.properties.xlf -oe windows-1252"));
@@ -149,10 +149,10 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("proptest.properties.xlf"));
     	assertTrue(deleteOutputFile("proptest.out.noesc.properties"));
     	// Extract
-    	assertEquals(0, runTikal("-x proptest.properties -fc okf_properties-outputNotEscaped"));
+    	assertEquals(0, runTikal("-x proptest.properties -fc okf_properties-outputNotEscaped -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("proptest.properties.xlf", "UTF-8"));
     	// Merge
-    	assertEquals(0, runTikal("-m proptest.properties.xlf -fc okf_properties-outputNotEscaped -ie windows-1252"));
+    	assertEquals(0, runTikal("-m proptest.properties.xlf -fc okf_properties-outputNotEscaped -oe windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("proptest.out.properties", "proptest.out.noesc.properties", "windows-1252"));
     }
 
@@ -188,10 +188,10 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("tmxtest-attributes.tmx.xlf"));
     	assertTrue(deleteOutputFile("tmxtest-attributes.tmx.out.po"));
     	// Extract
-    	assertEquals(0, runTikal("-x tmxtest-attributes.tmx -sl EN-US -tl FR-FR"));
+    	assertEquals(0, runTikal("-x tmxtest-attributes.tmx -sl EN-US -tl FR-FR -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("tmxtest-attributes.tmx.xlf", "UTF-8"));
     	// Merge
-    	assertEquals(0, runTikal("-m tmxtest-attributes.tmx.xlf -sl EN-US -tl FR-FR -ie windows-1252"));
+    	assertEquals(0, runTikal("-m tmxtest-attributes.tmx.xlf -sl EN-US -tl FR-FR -oe windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("tmxtest-attributes.out.tmx", "windows-1252"));
     }
 
@@ -204,7 +204,7 @@ public class TikalTest {
     	assertEquals(0, runTikal("-x xlifftest.xlf"));
     	assertTrue("File different from gold", compareWithGoldFile("xlifftest.xlf.xlf", "UTF-8"));
     	// Merge
-    	assertEquals(0, runTikal("-m xlifftest.xlf.xlf -ie windows-1252"));
+    	assertEquals(0, runTikal("-m xlifftest.xlf.xlf -oe windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("xlifftest.out.xlf", "UTF-8"));
     }
 
