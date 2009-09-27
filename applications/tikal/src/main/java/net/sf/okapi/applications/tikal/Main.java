@@ -35,6 +35,8 @@ import java.util.Locale;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IParameters;
@@ -45,6 +47,8 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.common.ui.genericeditor.GenericEditor;
@@ -741,7 +745,15 @@ public class Main {
 	}
 
 	private void displayQuery (IQuery conn) {
-		if ( conn.query(query) > 0 ) {
+		int count;
+		if ( conn.getClass().getName().endsWith("PensieveTMConnector")
+			|| conn.getClass().getName().endsWith("GoogleMTConnector") ) {
+			count = conn.query(parseToTextFragment(query));
+		}
+		else { // Raw text otherwise
+			count = conn.query(query);
+		}
+		if ( count > 0 ) {
 			QueryResult qr;
 			while ( conn.hasNext() ) {
 				qr = conn.next();
@@ -767,7 +779,7 @@ public class Main {
 		IQuery conn;
 		if ( useGoogle ) {
 			conn = new GoogleMTConnector();
-			conn.setParameters(prepareConnectorParameters());
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
 			displayQuery(conn);
@@ -775,7 +787,7 @@ public class Main {
 		}
 		if ( usePen ) {
 			conn = new PensieveTMConnector();
-			conn.setParameters(prepareConnectorParameters());
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
 			displayQuery(conn);
@@ -783,7 +795,7 @@ public class Main {
 		}
 		if ( useTT ) {
 			conn = new TranslateToolkitTMConnector();
-			conn.setParameters(prepareConnectorParameters());
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
 			displayQuery(conn);
@@ -791,7 +803,7 @@ public class Main {
 		}
 		if ( useMM ) {
 			conn = new MyMemoryTMConnector();
-			conn.setParameters(prepareConnectorParameters());
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
 			displayQuery(conn);
@@ -894,7 +906,7 @@ public class Main {
 			else if ( useGoogle ) {
 				levParams.setResourceClassName(GoogleMTConnector.class.getName());
 			}
-			levParams.setResourceParameters(prepareConnectorParameters().toString());
+			levParams.setResourceParameters(prepareConnectorParameters(levParams.getResourceClassName()).toString());
 			driver.addStep(levStep);
 		}
 		
@@ -911,15 +923,15 @@ public class Main {
 		driver.processBatch();
 	}
 
-	private IParameters prepareConnectorParameters () {
-		if ( usePen ) {
+	private IParameters prepareConnectorParameters (String connectorClassName) {
+		if ( connectorClassName.equals(PensieveTMConnector.class.getName()) ) {
 			net.sf.okapi.connectors.pensieve.Parameters params
 				= new net.sf.okapi.connectors.pensieve.Parameters();
 			params.setDbDirectory(penDir);
 			return params;
 		}
 
-		if ( useTT ) {
+		if ( connectorClassName.equals(TranslateToolkitTMConnector.class.getName()) ) {
 			net.sf.okapi.connectors.translatetoolkit.Parameters params
 				= new net.sf.okapi.connectors.translatetoolkit.Parameters();
 			// Parse the parameters hostname:port
@@ -934,7 +946,7 @@ public class Main {
 			return params;
 		}
 
-		if ( useMM ) {
+		if ( connectorClassName.equals(MyMemoryTMConnector.class.getName()) ) {
 			net.sf.okapi.connectors.mymemory.Parameters params
 				= new net.sf.okapi.connectors.mymemory.Parameters();
 			params.setKey(mmParams);
@@ -943,6 +955,55 @@ public class Main {
 		
 		// Other connector: no parameters
 		return null;
+	}
+
+	/**
+	 * Converts the plain text string into a TextFragment, using HTML-like patterns are inline codes.
+	 * @param text the plain text to convert to TextFragment
+	 * @return a new TextFragment (with possibly inline codes).
+	 */	
+	public TextFragment parseToTextFragment (String text) {
+		// Parses any thing within <...> into opening codes
+		// Parses any thing within </...> into closing codes
+		// Parses any thing within <.../> into placeholder codes
+		Pattern patternOpening = Pattern.compile("\\<(\\w+)[ ]*[^\\>/]*\\>");
+		Pattern patternClosing = Pattern.compile("\\</(\\w+)[ ]*[^\\>]*\\>");
+		Pattern patternPlaceholder = Pattern.compile("\\<(\\w+)[ ]*[^\\>]*/\\>");
+		
+		TextFragment tf = new TextFragment();
+		tf.setCodedText(text);
+
+		int n;
+		int start = 0;
+		int diff = 0;
+		Matcher m = patternOpening.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += tf.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.OPENING, m.group(1));
+			start = (n+m.group().length());
+		}
+		
+		text = tf.getCodedText();
+		start = diff = 0;
+		m = patternClosing.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += tf.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.CLOSING, m.group(1));
+			start = (n+m.group().length());
+		}
+		
+		text = tf.getCodedText();
+		start = diff = 0;
+		m = patternPlaceholder.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			diff += tf.changeToCode(n+diff, (n+diff)+m.group().length(),
+				TagType.PLACEHOLDER, null);
+			start = (n+m.group().length());
+		}
+		return tf;
 	}
 
 }

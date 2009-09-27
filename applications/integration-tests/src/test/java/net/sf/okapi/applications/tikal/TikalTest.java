@@ -294,6 +294,14 @@ public class TikalTest {
     	assertTrue("File different from gold", compareWithGoldFile("tmxtest-attributes.tmx.po", "UTF-8"));
     }
 
+    @Test
+    public void testQuerySeveralConnectors () throws IOException, InterruptedException {
+    	assertEquals(0, runTikal("-imp pensieveTM tmxtest-attributes.tmx -sl EN-US -tl FR-FR"));
+    	// Query several services
+    	assertEquals(0, runTikal("-q \"Close the <b>application</b>.\" -sl EN-US -tl FR-FR -pen pensieveTM -mm mmDemo123 -opentran"));
+    }
+
+    
     private boolean compareWithGoldFile (String outputBase, String encoding) {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
@@ -317,7 +325,7 @@ public class TikalTest {
     	else return true;
     }
     
-    public boolean deleteOutputDir (String dirname, boolean relative) {
+    private boolean deleteOutputDir (String dirname, boolean relative) {
     	File d;
     	if ( relative ) d = new File(root + File.separator + dirname);
     	else d = new File(dirname);

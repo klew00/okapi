@@ -29,6 +29,10 @@
 <source xml:lang="EN-US">One entry in the TM.</source>
 <target xml:lang="FR-FR">Une entrée dans la MT (no file, no group)</target>
 </trans-unit>
+<trans-unit id="8">
+<source xml:lang="EN-US">Close the <g id="1">application</g>.</source>
+<target xml:lang="FR-FR">Fermer <g id="1">l'application</g>.</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

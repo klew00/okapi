@@ -169,8 +169,10 @@ Open-Tran repository</a>, the <a href="http://mymemory.translated.net/">MyMemory
 repository</a>, as well as any
 <a href="http://translate.sourceforge.net/wiki/toolkit/tmserver">Translate 
 Toolkit TM server</a>. The three first require an Internet 
-connection. The last can be access locally if the server runs on your machine. You can query 
-all resources at once.</p>
+connection. The last can be access locally if the server runs on your machine.</p>
+<p>You can query 
+all resources at once. When querying several resources, the results are shown 
+per resource, not sorted by best score as a whole.</p>
 <p>The syntax of this command is:</p>
 <pre>-q &quot;text&quot; [options]</pre>
 <p>Where the options are:</p>
@@ -211,11 +213,25 @@ all resources at once.</p>
 		requires Internet access.</td>
 	</tr>
 	</table>
+<p>Because the text of the query cannot be associated with a given file format, 
+there is no support for format-specific inline codes. However, <b>when querying 
+a resource that in inline-code aware</b>, you can use HTML-like tags to replace 
+codes: For example, in &quot;<code>Open the &lt;x&gt;window&lt;/x&gt;&lt;x/&gt;.</code>&quot; the tags &quot;<code>&lt;x&gt;</code>&quot;, 
+&quot;<code>&lt;/x&gt;</code>&quot; and &quot;<code>&lt;x/&gt;</code>&quot; will be interpreted as opening, 
+closing and placeholder inline codes, and the query processed as such. When 
+querying resources that are not inline code-aware, the tags are treated as plain 
+text.</p>
+<p>The resources that are inline code-aware are: Pensieve and Google</p>
 <p>For example:</p>
 <pre>tikal -q &quot;open file&quot; -sl en</pre>
 <p>Queries the default translation resource (Google MT system) for the text 
 &quot;open file&quot; in English. The target language by default is French. Note: You 
 could omit the <code>-sl</code> option if you are running from a English system.</p>
+<pre>tikal -q &quot;open &lt;x&gt;file&lt;/x&gt;&quot; -sl en -pen mytm</pre>
+<p>Queries the Pensieve TM located in <code>mytm</code> for the text 
+&quot;open &lt;x&gt;file&lt;/x&gt;&quot; in English. The target language by default is French. 
+Because Pensieve TM can work with inline codes, the tags &quot;<code>&lt;x&gt;</code>&quot; and 
+&quot;<code>&lt;/x&gt;</code>&quot; are processed as inline codes.</p>
 <pre>tikal -q &quot;open file&quot; -opentran -sl en -tl zu</pre>
 <p dir="ltr">Queries the OpenTran translation repository for the English text 
 &quot;open file&quot; in Zulu.</p>

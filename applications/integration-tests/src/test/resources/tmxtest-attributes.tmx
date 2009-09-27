@@ -77,5 +77,14 @@
 </tuv>
 </tu>
 
+<tu>
+<tuv xml:lang="EN-US">
+<seg>Close the <bpt i='0' x='0'>&lt;b></bpt>application<ept i='0'>&lt;/b></ept>.</seg>
+</tuv>
+<tuv xml:lang="FR-FR">
+<seg>Fermer <bpt i='0' x='0'>&lt;b></bpt>l'application<ept i='0'>&lt;/b></ept>.</seg>
+</tuv>
+</tu>
+
 </body>
 </tmx>
