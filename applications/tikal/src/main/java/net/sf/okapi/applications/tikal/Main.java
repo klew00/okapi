@@ -906,7 +906,8 @@ public class Main {
 			else if ( useGoogle ) {
 				levParams.setResourceClassName(GoogleMTConnector.class.getName());
 			}
-			levParams.setResourceParameters(prepareConnectorParameters(levParams.getResourceClassName()).toString());
+			IParameters p = prepareConnectorParameters(levParams.getResourceClassName());
+			if ( p != null ) levParams.setResourceParameters(p.toString());
 			driver.addStep(levStep);
 		}
 		
