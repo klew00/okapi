@@ -162,7 +162,7 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("odttest.odt.xlf"));
     	assertTrue(deleteOutputFile("odttest.out.odt"));
     	// Extract
-    	assertEquals(0, runTikal("-x odttest.odt"));
+    	assertEquals(0, runTikal("-x odttest.odt -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("odttest.odt.xlf", "UTF-8"));
     	// Merge
     	assertEquals(0, runTikal("-m odttest.odt.xlf"));
@@ -175,7 +175,7 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("docxtest.docx.xlf"));
     	assertTrue(deleteOutputFile("docxtest.out.docx"));
     	// Extract
-    	assertEquals(0, runTikal("-x docxtest.docx"));
+    	assertEquals(0, runTikal("-x docxtest.docx -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("docxtest.docx.xlf", "UTF-8"));
     	// Merge
     	assertEquals(0, runTikal("-m docxtest.docx.xlf"));
@@ -214,10 +214,10 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("tsvtest.txt.xlf"));
     	assertTrue(deleteOutputFile("tsvtest.out.txt"));
     	// Extract
-    	assertEquals(0, runTikal("-x tsvtest.txt"));
+    	assertEquals(0, runTikal("-x tsvtest.txt -ie windows-1252"));
     	assertTrue("File different from gold", compareWithGoldFile("tsvtest.txt.xlf", "UTF-8"));
     	// Merge
-    	assertEquals(0, runTikal("-m tsvtest.txt.xlf -ie UTF-8"));
+    	assertEquals(0, runTikal("-m tsvtest.txt.xlf -oe UTF-8"));
     	assertTrue("File different from gold", compareWithGoldFile("tsvtest.out.txt", "UTF-8"));
     }
 
