@@ -668,10 +668,10 @@ public class XLIFFFilter implements IFilter {
 			tc = processContent(isSegSource ? "seg-source" : "source", true);
 			// Put the source in the alt-trans annotation
 			if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
-			// Store in altTrans only when we are witnin alt-trans
+			// Store in altTrans only when we are within alt-trans
 			if ( altTrans != null ) {
 				if ( isSegSource ) {
-					// TODO: handle seg-source
+					//TODO: handle seg-source
 					//TODO: content of seg-source should be the one to use???
 					//TODO: what if they are different?
 				}
@@ -681,7 +681,14 @@ public class XLIFFFilter implements IFilter {
 				}
 			}
 			else { // It's seg-source just after a <source> (not in alt-trans)
-				//TODO: Handle segmented content
+				TextContainer cont = tc.clone();
+				cont.mergeAllSegments();
+				if ( cont.compareTo(tu.getSourceContent(), true) != 0 ) {
+					logger.warning(String.format("The <seg-source> content for the entry id='%s' is different from its <source>. The un-segmented content of <source> will be used.", tu.getId()));
+				}
+				else { // Same content: use the segmented one
+					tu.setSource(tc);
+				}
 			}
 		}
 		else {
@@ -690,7 +697,6 @@ public class XLIFFFilter implements IFilter {
 			if ( tmp != null ) {
 				tu.setSourceProperty(new Property(Property.COORDINATES, tmp, false));
 			}
-
 			skel.addContentPlaceholder(tu);
 			tc = processContent(isSegSource ? "seg-source" : "source", false);
 			if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
@@ -771,12 +777,11 @@ public class XLIFFFilter implements IFilter {
 	
 	/**
 	 * Processes a segment content.
-	 * @param tagName The name of the element content that is being processed.
-	 * @param store True if the data must be stored in the skeleton.
-	 * This is used to merge later on.
-	 * @param inlineCodes Array where to save the in-line codes. Do not save if this parameter
+	 * @param tagName the name of the element content that is being processed.
+	 * @param store true if the data must be stored in the skeleton. This is used to merge later on.
+	 * @param inlineCodes array where to save the in-line codes. Do not save if this parameter
 	 * is set to null.
-	 * @return A new TextContainer object with the parsed content.
+	 * @return a new TextContainer object with the parsed content.
 	 */
 	private TextContainer processContent (String tagName,
 		boolean store)

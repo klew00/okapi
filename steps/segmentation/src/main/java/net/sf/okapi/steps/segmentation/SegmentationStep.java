@@ -28,6 +28,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -104,15 +105,22 @@ public class SegmentationStep extends BasePipelineStep {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 
+		TextContainer cont;
 		if ( tu.hasTarget(targetLanguage) ) {
 			if ( params.segmentTarget ) {
-				trgSeg.computeSegments(tu.getTarget(targetLanguage));
-				tu.getTarget(targetLanguage).createSegments(trgSeg.getRanges());
+				cont = tu.getTarget(targetLanguage);
+				if ( !cont.isSegmented() ) {
+					trgSeg.computeSegments(cont);
+					cont.createSegments(trgSeg.getRanges());
+				}
 			}
 		}
 		else if ( params.segmentSource ) {
-			srcSeg.computeSegments(tu.getSource());
-			tu.getSource().createSegments(srcSeg.getRanges());
+			cont = tu.getSource();
+			if ( !cont.isSegmented() ) {
+				srcSeg.computeSegments(cont);
+				cont.createSegments(srcSeg.getRanges());
+			}
 		}
 		
 		// Make sure we have target content

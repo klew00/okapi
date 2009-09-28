@@ -153,15 +153,16 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( !params.applyToExistingTarget && tu.hasTarget(trgLang) ) return;
 		
 		// Apply the segmentation and/or segment marks if requested
-		if ( params.segment || params.markSegments ) {
+		// Do not re-segment something already segmented
+		if ( params.segment ) {
 			if ( tu.hasTarget(trgLang) ) {
-				if ( params.segment ) {
+				if ( !tu.getTarget(trgLang).isSegmented() ) {
 					trgSeg.computeSegments(tu.getTarget(trgLang));
 					tu.getTarget(trgLang).createSegments(trgSeg.getRanges());
 				}
 			}
 			else {
-				if ( params.segment ) {
+				if ( !tu.getSource().isSegmented() ) {
 					srcSeg.computeSegments(tu.getSource());
 					tu.getSource().createSegments(srcSeg.getRanges());
 				}

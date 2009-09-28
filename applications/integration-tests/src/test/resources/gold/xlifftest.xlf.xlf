@@ -43,7 +43,8 @@
 </trans-unit>
 <trans-unit id="11">
 <source xml:lang="en">Sentence 1. Sentence 2</source>
-<target xml:lang="fr">Sentence 1. Sentence 2</target>
+<seg-source><mrk mid="0" mtype="seg">Sentence 1.</mrk> <mrk mid="1" mtype="seg">Sentence 2</mrk></seg-source>
+<target xml:lang="fr"><mrk mid="0" mtype="seg">Sentence 1.</mrk> <mrk mid="1" mtype="seg">Sentence 2</mrk></target>
 </trans-unit>
 <trans-unit id="12">
 <source xml:lang="en">Text number four</source>

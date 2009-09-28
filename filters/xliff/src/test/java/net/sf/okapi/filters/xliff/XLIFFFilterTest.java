@@ -33,6 +33,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
@@ -58,7 +59,66 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testSegmentedTarget () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1. t2</source>"
+			+ "<target xml:lang=\"fr\"><mrk mid=\"0\" mtype=\"seg\">t1.</mrk> <mrk mid=\"1\" mtype=\"seg\">t2</mrk></target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getTarget("fr");
+		assertEquals(2, cont.getSegmentCount());
+		assertEquals("t1.", cont.getSegments().get(0).text.toString());
+		assertEquals("t2", cont.getSegments().get(1).text.toString());
+	}
+
+	@Test
 	public void testSegmentedEntry () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1. t2</source>"
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
+			+ "<target xml:lang=\"fr\">t1. t2</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(2, tu.getSource().getSegmentCount());
+		assertEquals("t1.", tu.getSource().getSegments().get(0).text.toString());
+		assertEquals("t2", tu.getSource().getSegments().get(1).text.toString());
+	}
+
+	@Test
+	public void testSegmentedEntryWithDifferences () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1. x t2</source>" // Extra x in source
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
+			+ "<target xml:lang=\"fr\">t1. t2</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(0, tu.getSource().getSegmentCount());
+		assertEquals("t1. x t2", tu.getSource().toString());
+	}
+
+	@Test
+	public void testSegmentedEntryOutput () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"

@@ -235,12 +235,16 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( params.preSegment && !approved ) {
 			try {
 				cont = tu.getSource();
-				sourceSeg.computeSegments(cont);
-				cont.createSegments(sourceSeg.getRanges());
+				if ( !cont.isSegmented() ) {
+					sourceSeg.computeSegments(cont);
+					cont.createSegments(sourceSeg.getRanges());
+				}
 				if ( tu.hasTarget(trgLang) ) {
 					cont = tu.getTarget(trgLang);
-					targetSeg.computeSegments(cont);
-					cont.createSegments(targetSeg.getRanges());
+					if ( !cont.isSegmented() ) {
+						targetSeg.computeSegments(cont);
+						cont.createSegments(targetSeg.getRanges());
+					}
 				}
 			}
 			catch ( Throwable e ) {
