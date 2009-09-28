@@ -287,6 +287,34 @@ public class TikalTest {
     }
 
     @Test
+    public void testConvertToTable () throws IOException, InterruptedException {
+    	// Test csv conversion
+    	assertTrue(deleteOutputFile("potest.po.txt"));
+    	assertEquals(0, runTikal("-2tbl potest.po -csv"));
+    	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.normal.csv", "UTF-8"));
+    	// Test csv conversion (codes=generic)
+    	assertTrue(deleteOutputFile("potest.po.txt"));
+    	assertEquals(0, runTikal("-2tbl potest.po -csv -generic"));
+    	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.generic.csv", "UTF-8"));
+    	// Test csv conversion (codes=tmx)
+    	assertTrue(deleteOutputFile("potest.po.txt"));
+    	assertEquals(0, runTikal("-2tbl potest.po -csv -tmx"));
+    	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.tmx.csv", "UTF-8"));
+    	// Test table conversion
+    	assertTrue(deleteOutputFile("potest.po.txt"));
+    	assertEquals(0, runTikal("-2tbl potest.po -tab"));
+    	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.normal.tab", "UTF-8"));
+    	// Test table conversion (codes=generic)
+    	assertTrue(deleteOutputFile("potest.po.txt"));
+    	assertEquals(0, runTikal("-2tbl potest.po -tab -generic"));
+    	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.generic.tab", "UTF-8"));
+    	// Test table conversion (codes=xliffgx)
+    	assertTrue(deleteOutputFile("potest.po.txt"));
+    	assertEquals(0, runTikal("-2tbl potest.po -tab -xliffgx"));
+    	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.xliffgx.tab", "UTF-8"));
+    }
+
+    @Test
     public void testConvertToPO () throws IOException, InterruptedException {
     	// Test normal conversion
     	assertTrue(deleteOutputFile("tmxtest-attributes.tmx.po"));
