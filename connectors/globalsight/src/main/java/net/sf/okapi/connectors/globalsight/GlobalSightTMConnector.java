@@ -145,17 +145,18 @@ public class GlobalSightTMConnector implements ITMQuery {
 		}
 	}
 
-	public int query (TextFragment text) {
+	public int query (TextFragment frag) {
 		/* The GlobalSight TM Web service does not support query with inline codes
 		 * for the time being (v7.1.3), so we query plain text to get the best match 
 		 * possible. But queries with codes will never get an exact match even if one 
 		 * exists in the TM.
 		 */
 		results.clear();
+		if ( !frag.hasText() ) return 0;
 		try {
-			String qtext = text.getCodedText();
+			String qtext = frag.getCodedText();
 			StringBuilder tmpCodes = new StringBuilder();
-			if ( text.hasCode() ) {
+			if ( frag.hasCode() ) {
 				StringBuilder tmpText = new StringBuilder();
 				for ( int i=0; i<qtext.length(); i++ ) {
 					switch ( qtext.charAt(i) ) {
@@ -191,15 +192,15 @@ public class GlobalSightTMConnector implements ITMQuery {
 				
 				list2 = elem.getElementsByTagName("source");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
-				res.source = readSegment((Element)list3.item(0));
+				res.source = readSegment((Element)list3.item(0), frag);
 
 				list2 = elem.getElementsByTagName("target");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
-				res.target = readSegment((Element)list3.item(0));
+				res.target = readSegment((Element)list3.item(0), frag);
 				
 				// Query is done without codes, so any exact match result from a text
 				// with codes should be down-graded
-				if ( text.hasCode() && res.score >= 100 ) {
+				if ( frag.hasCode() && res.score >= 100 ) {
 					res.score = 99;
 				}
 				results.add(res);
@@ -241,10 +242,10 @@ public class GlobalSightTMConnector implements ITMQuery {
 				if ( res.score < threshold ) continue;
 				list2 = elem.getElementsByTagName("source");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
-				res.source = readSegment((Element)list3.item(0));
+				res.source = readSegment((Element)list3.item(0), null);
 				list2 = elem.getElementsByTagName("target");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
-				res.target = readSegment((Element)list3.item(0));
+				res.target = readSegment((Element)list3.item(0), null);
 				results.add(res);
 			}
 		}
@@ -264,14 +265,23 @@ public class GlobalSightTMConnector implements ITMQuery {
 		return results.size();
 	}
 	
-	// This assumes a simple structure: basically <ph> elements
-	private TextFragment readSegment (Element elem) {
+	// The original parameter can be null
+	private TextFragment readSegment (Element elem,
+		TextFragment original)
+	{
 		TextFragment tf = new TextFragment();
 		NodeList list = elem.getChildNodes();
 		int lastId = -1;
 		int id = -1;
 		Node node;
 		Stack<Code> stack = new Stack<Code>();
+		List<Code> oriCodes = null;
+		
+		if ( original != null ) {
+			oriCodes = original.getCodes();
+		}
+		
+		// Note that this parsing assumes non-overlapping codes.
 		for ( int i=0; i<list.getLength(); i++ ) {
 			node = list.item(i);
 			switch ( node.getNodeType() ) {
