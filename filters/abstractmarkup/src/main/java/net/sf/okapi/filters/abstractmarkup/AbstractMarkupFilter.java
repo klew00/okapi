@@ -224,7 +224,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 
 		if (input.getInputURI() != null) {
-			setDocumentName(input.getInputURI().toString());
+			// YS Sep-27-09: change from tostring() to getPath()
+			// to match other filters. But toString() may be better ultimately
+			setDocumentName(input.getInputURI().getPath());
 		}
 
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
