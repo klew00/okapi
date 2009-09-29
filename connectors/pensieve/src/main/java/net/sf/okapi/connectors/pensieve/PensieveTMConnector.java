@@ -31,8 +31,6 @@ import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class PensieveTMConnector implements ITMQuery {
@@ -46,13 +44,6 @@ public class PensieveTMConnector implements ITMQuery {
 	private Parameters params;
 	private ITmSeeker seeker;
 	private Metadata attrs;
-//	private ScoreComparer scorComp = new ScoreComparer();
-
-//	class ScoreComparer implements Comparator<QueryResult> {
-//		public int compare(QueryResult arg0, QueryResult arg1) {
-//			return (arg0.score>arg1.score ? -1 : (arg0.score==arg1.score ? 0 : 1));
-//		}
-//	}
 	
 	public PensieveTMConnector () {
 		params = new Parameters();
@@ -123,7 +114,9 @@ public class PensieveTMConnector implements ITMQuery {
 		//TODO: add threshold. For now even 0.99f gives sometimes no return on exact matches
 
 		List<TmHit> list;
-		if ( threshold == 100 ) {
+		if ( threshold >= 99 ) {
+			// Special temporary case for 99 and above, to get meaningful scores
+			// and allow actual leveraging based on the results.
 			list = seeker.searchExact2(text, maxHits, attrs);
 		}
 		else {

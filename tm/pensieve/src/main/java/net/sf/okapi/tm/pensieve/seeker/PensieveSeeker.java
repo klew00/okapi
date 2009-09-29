@@ -333,7 +333,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
     {
     	PhraseQuery q = new PhraseQuery();
     	q.add(new Term(TranslationUnitField.SOURCE_EXACT.name(), query.getCodedText()));
-    	return search2(max, q, query.getCodes(), metadata);
+    	return search2(max, q, query.getCodes(), metadata, true);
     }
 
     /**
@@ -356,7 +356,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
     	else {
     		q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query.getCodedText()), threshold);
     	}
-    	return search2(max, q, query.getCodes(), metadata);
+    	return search2(max, q, query.getCodes(), metadata, false);
     }
 
     /**
@@ -365,12 +365,17 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      * @param q the query
      * @param srcCodes the source codes.
      * @param metadata any associated attributes to use for filter.
+     * @param scoreForExact true to tweak the scores so they return 100 or 99. This is a temporary 
+     * solution to get meaningful scores when querying for exact matches, and allowing actual leveraging.
+     * (otherwise we get the top match but cannot know if it's a real exact or not without additional compare)
+     * This is triggered from the connector by setting its threshold to 99 or above.
      * @return the list of hits found for the given arguments (never null).
      */
     private List<TmHit> search2 (int max,
     	Query q,
     	List<Code> srcCodes,
-    	Metadata metadata)
+    	Metadata metadata,
+    	boolean scoreForExact)
     {
     	IndexSearcher is = null;
     	List<TmHit> tmhits = new ArrayList<TmHit>();
@@ -389,17 +394,17 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
     			if (( srcCodes.size() > 0 ) && ( tmCodes.size() > 0 )) {
     				// If tmScrCodes is null, equals will return false
         			if ( Code.sameCodes(srcCodes, tmCodes) ) {
-        				tmHit.setScore(scoreDoc.score);
+        				tmHit.setScore(scoreForExact ? 1.0f : scoreDoc.score);
         			}
         			else {
         				//TODO: we may want to have different penalty per type of code differences
-        				tmHit.setScore(scoreDoc.score-0.01f);
+        				tmHit.setScore(scoreForExact ? 0.99f : scoreDoc.score-0.01f);
         				sort = true;
         			}
     			}
     			else { // Either or none has code(s)
     				// In this case any potential differences is already set by the markers in the text
-    				tmHit.setScore(scoreDoc.score);
+    				tmHit.setScore(scoreForExact ? 1.0f : scoreDoc.score);
     			}
     			// Set the translation unit
     			tmHit.setTu(
