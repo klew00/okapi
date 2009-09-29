@@ -101,8 +101,18 @@ public class UtilTest {
 
 	@Test
 	public void testTrimStart () {
-		String in = " \t ztext  ";
-		assertEquals("text  ", Util.trimStart(in, " \tz"));
+		assertEquals("textz \t ", Util.trimStart(" \t ztextz \t ", " \tz"));
+		assertEquals("", Util.trimStart(" \t ", " \tz"));
+		assertEquals(null, Util.trimStart(null, " \tz"));
+		assertEquals("", Util.trimStart("", " \tz"));
+	}
+
+	@Test
+	public void testTrimEnd () {
+		assertEquals(" \t ztext", Util.trimEnd(" \t ztextz \t ", " \tz"));
+		assertEquals("", Util.trimEnd(" \t ", " \tz"));
+		assertEquals(null, Util.trimEnd(null, " \tz"));
+		assertEquals("", Util.trimEnd("", " \tz"));
 	}
 
 	@Test

@@ -79,6 +79,8 @@ public class Main {
 	protected final static int CMD_CONV2TABLE = 6;
 	protected final static int CMD_CONV2PEN = 7;
 	
+	private static final String DEFAULT_SEGRULES = "-";
+
 	private static PrintStream ps;
 	
 	protected ArrayList<String> inputs;
@@ -105,6 +107,7 @@ public class Main {
 	protected String tableConvCodes;
 	protected int convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_TARGETOREMPTY;
 	protected String segRules;
+	protected boolean showTraceHint = true;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -128,10 +131,9 @@ public class Main {
 	}
 	
 	public static void main (String[] originalArgs) {
+		Main prog = new Main();
 		boolean showTrace = false;
 		try {
-			Main prog = new Main();
-
 			// Create an encoding-aware output for the console
 			// System.out uses the default system encoding that
 			// may not be the right one (e.g. windows-1252 vs cp850)
@@ -174,19 +176,19 @@ public class Main {
 			for ( int i=0; i<args.size(); i++ ) {
 				String arg = args.get(i);
 				if ( arg.equals("-fc") ) {
-					prog.specifiedConfigId = getArgument(args, ++i);
+					prog.specifiedConfigId = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-sl") ) {
-					prog.srcLang = getArgument(args, ++i);
+					prog.srcLang = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-tl") ) {
-					prog.trgLang = getArgument(args, ++i);
+					prog.trgLang = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-ie") ) {
-					prog.inputEncoding = getArgument(args, ++i);
+					prog.inputEncoding = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-oe") ) {
-					prog.outputEncoding = getArgument(args, ++i);
+					prog.outputEncoding = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-x") ) {
 					prog.command = CMD_EXTRACT;
@@ -226,7 +228,7 @@ public class Main {
 				}
 				else if ( arg.equals("-imp") ) {
 					prog.command = CMD_CONV2PEN;
-					prog.penDir = getArgument(args, ++i);
+					prog.penDir = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
@@ -242,7 +244,7 @@ public class Main {
 				}
 				else if ( arg.equals("-q") ) {
 					prog.command = CMD_QUERYTRANS;
-					prog.query = getArgument(args, ++i);
+					prog.query = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-google") ) {
 					prog.useGoogle = true;
@@ -252,22 +254,27 @@ public class Main {
 				}
 				else if ( arg.equals("-tt") ) {
 					prog.useTT = true;
-					prog.ttParams = getArgument(args, ++i);
+					prog.ttParams = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-mm") ) {
 					prog.useMM = true;
-					prog.mmParams = getArgument(args, ++i);
+					prog.mmParams = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-pen") ) {
 					prog.usePen = true;
-					prog.penDir = getArgument(args, ++i);
+					prog.penDir = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-listconf") || arg.equals("-lfc") ) {
 					prog.showAllConfigurations();
 					return;
 				}
 				else if ( arg.equals("-seg") ) {
-					prog.segRules = getArgument(args, ++i);
+					prog.segRules = DEFAULT_SEGRULES; // Default
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							prog.segRules = args.get(++i);
+						}
+					}
 				}
 				else if ( arg.equals("-trace") ) {
 					// Trace aAlready set. this is just to avoid
@@ -278,6 +285,7 @@ public class Main {
 					prog.inputs.add(args.get(i));
 				}
 				else {
+					prog.showTraceHint = false; // Using trace is not helpful to the user for this error
 					throw new InvalidParameterException(
 						String.format("Invalid command-line argument '%s'.", args.get(i)));
 				}
@@ -327,22 +335,23 @@ public class Main {
 				ps.println("ERROR: "+e.getMessage());
 				Throwable e2 = e.getCause();
 				if ( e2 != null ) ps.println(e2.getMessage());
-				ps.println("You can use the -trace option for more details.");
+				if ( prog.showTraceHint ) ps.println("You can use the -trace option for more details.");
 			}
 			System.exit(1); // Error
 		}
 	}
 
-	private static String getArgument (ArrayList<String> args, int index) {
+	public Main () {
+		inputs = new ArrayList<String>();
+	}
+	
+	protected String getArgument (ArrayList<String> args, int index) {
 		if ( index >= args.size() ) {
+			showTraceHint = false; // Using trace is not helpful to the user for this error
 			throw new RuntimeException(String.format(
 				"Missing parameter after '%s'", args.get(index-1)));
 		}
 		return args.get(index);
-	}
-	
-	public Main () {
-		inputs = new ArrayList<String>();
 	}
 	
 	private void initialize () {
@@ -720,8 +729,7 @@ public class Main {
 		ps.println("   -e [[-fc] configId]");
 		ps.println("Extract a file to XLIFF (and optionally segment and pre-translate):");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg (srxFile|-)]");
-		ps.println("      [- sourceLang] [-tl targetLang] [-seg (srxFile|-)]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg [srxFile]]");
 		ps.println("      [-tt hostname[:port]|-mm key|-pen tmDirectory|-google]");
 		ps.println("Merge an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
@@ -868,7 +876,7 @@ public class Main {
 		
 		// Add segmentation step if requested
 		if ( segRules != null ) {
-			if ( segRules.equals("-") ) { // Defaults
+			if ( segRules.equals(DEFAULT_SEGRULES) ) { // Defaults
 				segRules = getRootDirectory();
 				segRules += File.separator + "config" + File.separator + "defaultSegmentation.srx";
 			}

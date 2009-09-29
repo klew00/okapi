@@ -108,7 +108,6 @@ public class Util {
 
 	/**
 	 * Removes from the end of a string any of the specified characters.
-	 * 
 	 * @param text
 	 *            String to trim.
 	 * @param chars
@@ -131,13 +130,6 @@ public class Util {
 		return text;
 	}
 
-	static public String trim(String text) {
-		
-		if (text == null) return "";	
-						
-		return text.trim();
-	}
-	
 	/**
 	 * Gets the directory name of a full path.
 	 * 

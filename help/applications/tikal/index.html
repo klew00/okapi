@@ -51,7 +51,7 @@ of all available filter configurations use the <a href="#listConfig">List
 Configurations command</a>. For more details the filters available and their 
 configurations, see <a href="../../filters/index.html">each filter&#39;s documentation</a>.</p>
 <p>You can use the <code>-seg</code> option to specify that the extracted text 
-should be segmented. Use &quot;<code>-seg -</code>&quot; to use the default segmentation 
+should be segmented. Use <code>-seg</code> without filename to use the default segmentation 
 rules, use &quot;<code>-seg myRules.srx</code>&quot; to specify your own rules. The rules 
 file must be in SRX format. The segments are marked up according the
 <a href="http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#Struct_Segmentation">
@@ -80,10 +80,11 @@ XLIFF 1.2 specifications</a>.</p>
 		input if the input documents are multilingual).</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-seg srxFile|-</code></td>
-		<td align="left" valign="top">The segmentation rules to utilize. Use a dash instead of a SRX 
-		filename (&quot;<code>-seg -</code>&quot;) to specify the default rules 
-		that come with the installation. the default rules are in <code>config/defaultSegmentation.srx</code> 
+		<td align="left" valign="top"><code>-seg [srxFile]</code></td>
+		<td align="left" valign="top">
+		<p dir="ltr">The segmentation rules to utilize. To specify the default rules 
+		that come with the installation, use <code>-seg</code> without filename. 
+		The default rules are in <code>config/defaultSegmentation.srx</code> 
 		in your Okapi main directory.</td>
 	</tr>
 	<tr>
@@ -109,7 +110,7 @@ findingNemo.srt.xlf</code> XLIFF document. The encoding <code>iso-8859-1</code>
 is used to process the input file. The filter used is the Regex filter with the 
 pre-define configuration for SRT documents. The source language is English (<code>EN</code>) 
 and the target language is German (<code>DE</code>). No segmentation is done.</p>
-<pre>tikal -x *.docx -seg - -tl BR</pre>
+<pre>tikal -x *.docx -seg -tl BR</pre>
 <p>Extracts all <code>.docx</code> in the current 
 directory into corresponding <code>.docx.xlf</code> 
 XLIFF documents. The source language here is the default, which is the current 
