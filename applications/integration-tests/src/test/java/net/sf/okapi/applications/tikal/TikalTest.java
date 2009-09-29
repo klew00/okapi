@@ -274,13 +274,17 @@ public class TikalTest {
     }
 
     @Test
-    public void testImportPensieve () throws IOException, InterruptedException {
+    public void testImportExportPensieve () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputDir("pensieveTM", true));
     	// Import
     	assertEquals(0, runTikal("-imp pensieveTM tmxtest-attributes.tmx -sl EN-US -tl FR-FR"));
     	// Check if we can query the TM (does not check the result)
     	assertEquals(0, runTikal("-q \"One entry in the TM.\" -pen pensieveTM -sl EN-US -tl FR-FR"));
+    	
+    	// Export now
+    	assertEquals(0, runTikal("-2tmx pensieveTM -fc okf_pensieve -sl EN-US -tl FR-FR"));
+    	assertTrue("File different from gold", compareWithGoldFile("pensieveTM.tmx", "UTF-8"));
     }
 
     @Test

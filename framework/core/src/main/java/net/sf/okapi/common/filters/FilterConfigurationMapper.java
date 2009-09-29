@@ -182,8 +182,13 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 
 		IParameters params = filter.getParameters();
 		if ( params == null ) {
-			throw new RuntimeException(String.format(
-				"Cannot create default parameters for '%s'.", fc.configId));
+			if ( fc.custom ) {
+				throw new RuntimeException(String.format(
+					"Cannot create default parameters for '%s'.", fc.configId));
+			}
+			else { // No parameters, nothing more to do
+				return filter;
+			}
 		}
 
 		// Always load the parameters (if there are parameters)

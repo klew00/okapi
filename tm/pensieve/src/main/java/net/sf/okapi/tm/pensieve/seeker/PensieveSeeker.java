@@ -303,7 +303,9 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
             TranslationUnit tu = null;
             if (hasNext()) {
                 try {
-                    tu = getTranslationUnit(ir.document(currentIndex++));
+                	// Using createTranslationUnit(), not createTranslationUnit()
+                	// ensure that we get the inline codes
+                    tu = createTranslationUnit(ir.document(currentIndex++));
                 } catch (CorruptIndexException cie) {
                     throw new OkapiIOException(cie.getMessage(), cie);
                 } catch (IOException ioe) {
@@ -455,6 +457,26 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
     	TranslationUnitVariant trgTuv = new TranslationUnitVariant(
     		getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
     	
+    	TranslationUnit tu = new TranslationUnit(srcTuv, trgTuv);
+    	for (MetadataType type : MetadataType.values()) {
+    		tu.setMetadataValue(type, getFieldValue(doc, type));
+    	}
+    	return tu;
+    }
+
+    private TranslationUnit createTranslationUnit (Document doc) {
+    	TextFragment frag = new TextFragment();
+    	List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.SOURCE_CODES));
+    	frag.setCodedText(getFieldValue(doc, TranslationUnitField.SOURCE), codes, false);
+    	TranslationUnitVariant srcTuv = new TranslationUnitVariant(
+    		getFieldValue(doc, TranslationUnitField.SOURCE_LANG), frag);
+
+    	frag = new TextFragment();
+    	codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
+    	frag.setCodedText(getFieldValue(doc, TranslationUnitField.TARGET), codes, false);
+    	TranslationUnitVariant trgTuv = new TranslationUnitVariant(
+    		getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
+
     	TranslationUnit tu = new TranslationUnit(srcTuv, trgTuv);
     	for (MetadataType type : MetadataType.values()) {
     		tu.setMetadataValue(type, getFieldValue(doc, type));

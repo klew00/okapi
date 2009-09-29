@@ -419,6 +419,8 @@ public class Main {
 
 		extensionsMap.put(".json", "okf_json");
 		filtersMap.put("okf_json", "net.sf.okapi.filters.json.JSONFilter");
+
+		filtersMap.put("okf_pensieve", "net.sf.okapi.steps.formatconversion.PensieveFilter");
 	}
 	
 	private String getConfigurationId (String ext) {
@@ -499,6 +501,9 @@ public class Main {
 	private void showAllConfigurations () {
 		initialize();
 		DefaultFilters.setMappings(fcMapper, true, true);
+		// Add the Pensieve filter to the list (for now)
+		// The filter may be added in the default list at some point, but is not yet.
+		fcMapper.addConfigurations(filtersMap.get("okf_pensieve"));
 
 		ps.println("List of all filter configurations available:");
 		Iterator<FilterConfiguration> iter = fcMapper.getAllConfigurations();
@@ -926,7 +931,12 @@ public class Main {
 		driver.addStep(fewStep);
 
 		// Create the raw document and set the output
-		String tmp = rd.getInputURI().getRawPath() + ".xlf";
+		String tmp = rd.getInputURI().getPath();
+		// If the input is a directory, it ends with a separator, then we remove it
+		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		tmp += ".xlf";
 		driver.addBatchItem(rd, new URI(tmp), outputEncoding);
 
 		// Process
