@@ -75,4 +75,13 @@ public class Helper {
         field.setAccessible(true);
         field.set(instance, value);
     }
+
+    public static Object getPrivateMember(Object instance, String memberName) throws Exception {
+        Field field = instance.getClass().getDeclaredField(memberName);
+        field.setAccessible(true);
+        return field.get(instance);
+    }
+
+  
+
 }
