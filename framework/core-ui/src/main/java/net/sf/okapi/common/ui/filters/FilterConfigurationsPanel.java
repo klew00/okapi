@@ -151,9 +151,10 @@ public class FilterConfigurationsPanel extends Composite {
 		    	Rectangle rect = table.getClientArea();
 		    	int whidthCol3 = 80;
 				int nPart = (int)((rect.width-whidthCol3) / 100);
-				table.getColumn(0).setWidth(26*nPart);
-				table.getColumn(1).setWidth(40*nPart);
-				table.getColumn(2).setWidth(34*nPart);
+				int remainder = (int)((rect.width-whidthCol3) % 100);
+				table.getColumn(0).setWidth((38*nPart+remainder)-1);
+				table.getColumn(1).setWidth(36*nPart);
+				table.getColumn(2).setWidth(26*nPart);
 				table.getColumn(3).setWidth(whidthCol3);
 		    }
 		});
