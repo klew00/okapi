@@ -22,53 +22,45 @@ package net.sf.okapi.steps.tokenization.ui.tokens;
 
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Widget;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Widget;
 
-public class TokenTypesTab extends Composite implements IDialogPage {
+public class TokenNamesRuleTab extends Composite implements IDialogPage {
 	private Button btnAllTokens;
 	private Button btnOnlyTheseTokens;
 	private List list;
 	private Button btnAdd;
 	private Button btnRemove;
-	private Group grpExtract;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public TokenTypesTab(Composite parent, int style) {
+	public TokenNamesRuleTab(Composite parent, int style) {
 		super(parent, style);
-		setLayout(new GridLayout(1, false));
+		setLayout(new GridLayout(3, false));
 		
-		grpExtract = new Group(this, SWT.NONE);
-		grpExtract.setText("Extract tokens:");
-		grpExtract.setLayout(new GridLayout(3, false));
-		grpExtract.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		grpExtract.setData("name", "grpExtract");
-		
-		btnAllTokens = new Button(grpExtract, SWT.RADIO);
+		btnAllTokens = new Button(this, SWT.RADIO);
 		btnAllTokens.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 		btnAllTokens.setData("name", "btnAllTokens");
-		btnAllTokens.setText("All");
-		new Label(grpExtract, SWT.NONE);
+		btnAllTokens.setText("All tokens");
+		new Label(this, SWT.NONE);
 		
-		btnOnlyTheseTokens = new Button(grpExtract, SWT.RADIO);
+		btnOnlyTheseTokens = new Button(this, SWT.RADIO);
 		btnOnlyTheseTokens.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 		btnOnlyTheseTokens.setData("name", "btnOnlyTheseTokens");
-		btnOnlyTheseTokens.setText("Only these:");
-		new Label(grpExtract, SWT.NONE);
-		new Label(grpExtract, SWT.NONE);
+		btnOnlyTheseTokens.setText("Only these tokens:");
+		new Label(this, SWT.NONE);
+		new Label(this, SWT.NONE);
 		
-		list = new List(grpExtract, SWT.BORDER);
+		list = new List(this, SWT.BORDER);
 		{
 			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
 			gridData.heightHint = 300;
@@ -77,20 +69,20 @@ public class TokenTypesTab extends Composite implements IDialogPage {
 		}
 		list.setData("name", "list");
 		
-		btnAdd = new Button(grpExtract, SWT.NONE);
+		btnAdd = new Button(this, SWT.NONE);
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gridData.widthHint = 90;
 		btnAdd.setLayoutData(gridData);
 		btnAdd.setData("name", "btnAdd");
 		btnAdd.setText("Add...");
-		new Label(grpExtract, SWT.NONE);
+		new Label(this, SWT.NONE);
 		
-		btnRemove = new Button(grpExtract, SWT.NONE);
+		btnRemove = new Button(this, SWT.NONE);
 		btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnRemove.setData("name", "btnRemove");
 		btnRemove.setText("Remove");
-		new Label(grpExtract, SWT.NONE);
-		new Label(grpExtract, SWT.NONE);
+		new Label(this, SWT.NONE);
+		new Label(this, SWT.NONE);
 
 	}
 

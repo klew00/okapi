@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,29 +20,17 @@
 
 package net.sf.okapi.steps.tokenization.ui.tokens;
 
-import java.util.List;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 
-import net.sf.okapi.steps.tokenization.tokens.Parameters;
-import net.sf.okapi.steps.tokenization.tokens.TokenType;
-import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
+import org.eclipse.swt.widgets.Composite;
 
-public class TokenTypeSelector {
+public class TokenSelectorTsPage extends TokenSelectorPage {
 
-	/**
-	 * For creation of new tokens and storing them to the globally accessible net.sf.okapi.steps.tokenization.tokens/okf_tokens.fprm
-	 */
-	public static void main(String[] args) {
+	public TokenSelectorTsPage(Composite parent, int style) {
 		
-		select();
+		super(parent, style);
+	
+		SWTUtil.setText(listDescr, "This program lets you configure the global set of tokens.");
 	}
 
-	private static List<TokenType> select() {
-				
-		InputQueryDialog dlg = new InputQueryDialog();
-		Parameters params = new Parameters(); 
-		
-		dlg.run(null, TokenTypesPage.class, "Tokens", "", params, null);
-		
-		return params.getSelectedTokenTypes();
-	}
 }

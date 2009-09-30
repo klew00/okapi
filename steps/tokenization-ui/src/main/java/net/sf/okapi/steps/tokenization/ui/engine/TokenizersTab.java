@@ -74,17 +74,34 @@ public class TokenizersTab extends CompoundStepItemsTab {
 	}
 
 	@Override
-	protected boolean actionRemove(int itemIndex) {
-		// TODO Auto-generated method stub
-		
-		System.out.println("remove");
-		return false;
-	}
-
-	@Override
 	protected void actionUp(int itemIndex) {
 		// TODO Auto-generated method stub
 	
 		System.out.println("up");
 	}
+
+	@Override
+	protected boolean getDisplayItemDescr() {
+
+		return true;
+	}
+
+	@Override
+	protected boolean getDisplayListDescr() {
+
+		return true;
+	}
+
+	@Override
+	protected String getItemDescription(int index) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected boolean getDisplayModify() {
+		
+		return true;
+	}
+
 }

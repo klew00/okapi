@@ -22,79 +22,71 @@ package net.sf.okapi.steps.tokenization.tokens;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.lib.extra.AbstractParameters;
 
 public class Parameters extends AbstractParameters {
 
-	private List<TokenType> tokenTypes;
-	private List<TokenType> selectedTokenTypes;
+	private List<TokenItem> items;
 	
-	public List<TokenType> getTokenTypes() {
-		
-		return tokenTypes;
-	}
-	
-	public List<TokenType> getSelectedTokenTypes() {
-		
-		return selectedTokenTypes;
-	}
-
 	@Override
 	protected void parameters_init() {
 		
-		tokenTypes = new ArrayList<TokenType>();
-		selectedTokenTypes = new ArrayList<TokenType>();
+		items = new ArrayList<TokenItem>();
 	}
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 		
-		//tokenTypes.parameters_load(buffer);
-		loadGroup(buffer, "tokenType", tokenTypes, TokenType.class);
+		loadGroup(buffer, "tokenItem", items, TokenItem.class);
 	}
 
 	@Override
 	protected void parameters_reset() {
 		
-		tokenTypes.clear();
+		items.clear();
 	}
 
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		
-		//tokenTypes.parameters_save(buffer);
-		saveGroup(buffer, "tokenType", tokenTypes);
+		//items.parameters_save(buffer);
+		saveGroup(buffer, "tokenItem", items);
 	}
 
-	public boolean loadTokenTypes() {
+	public boolean loadItems() {
 		
-//		try {
-//			load(getClass().getResource("okf_token_types.fprm").toURI(), false);
-//						
-//		} catch (URISyntaxException e) {
+		return loadFromResource("okf_tokens.fprm");
+	}
+	
+	public void saveItems() {
+		
+		saveToResource("okf_tokens.fprm");
+	}
+
+//	protected int generateId() {
+//		// Slow, as used only from UI  
+//		
+//		int max = 0;
+//		for (TokenItem item : items) {
 //			
-//			return false;
+//			if (item == null) continue;
+//			if (max < item.getId())
+//				max = item.getId();
 //		}
 //		
-//		return true;
-		return loadFromResource("okf_token_types.fprm");
-	}
+//		//return (max > 0) ? max + 1: 0;
+//		return max + 1;
+//	}
 	
-	public void saveTokenTypes() {
+	public void addTokenItem(String name, String description) {
 		
-		//save(getClass().getResource("okf_token_types.fprm").getPath());
-		saveToResource("okf_token_types.fprm");
+		items.add(new TokenItem(name, description));
 	}
 
-	public void addTokenType(String name, String description) {
+	public List<TokenItem> getItems() {
 		
-		tokenTypes.add(new TokenType(name, description));
+		return items;
 	}
 	
-	public void addSelectedTokenType(String name, String description) {
-		
-		selectedTokenTypes.add(new TokenType(name, description));
-	}
 }

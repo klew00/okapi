@@ -26,7 +26,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.steps.tokenization.common.AbstractTokenizationStep;
 import net.sf.okapi.steps.tokenization.common.TokenizationStepParameters;
 import net.sf.okapi.steps.tokenization.tokens.Token;
-import net.sf.okapi.steps.tokenization.tokens.TokenType;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 import com.ibm.icu.text.BreakIterator;
@@ -75,9 +74,9 @@ public class WordBreakIteratorStep extends AbstractTokenizationStep {
 			System.out.println(String.format("%d\t\t[%s]\t\t(%d, %d)", status, text.substring(start,end), start, end));
 			
 			if (status == 0)
-				tokens.add(new Token(TokenType.UNKNOWN, start, end, text.substring(start,end), 1));
+				tokens.add(new Token(Tokens.getTokenId(Token.UNKNOWN), text.substring(start,end), start, end, 100, 0));
 			else
-				tokens.add(new Token(TokenType.WORD, start, end, text.substring(start,end), 1));
+				tokens.add(new Token(Tokens.getTokenId(Token.WORD), text.substring(start,end), start, end, 100, 0));
 		}
 		
 //		System.out.println(tokens.toString());

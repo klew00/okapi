@@ -21,6 +21,7 @@
 package net.sf.okapi.common;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -195,6 +196,16 @@ public class ListUtil {
 				res.add(st.trim());
 			
 		return res;
+	}
+	
+	public static String arrayAsString(String[] array) {
+				
+		return arrayAsString(array, ",");
+	}
+	
+	public static String arrayAsString(String[] array, String delimiter) {
+		
+		return listAsString(Arrays.asList(array), delimiter);
 	}
 	
 	public static String listAsString(List<String> list) {

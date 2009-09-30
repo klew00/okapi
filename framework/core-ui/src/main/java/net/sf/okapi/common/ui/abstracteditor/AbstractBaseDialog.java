@@ -22,9 +22,9 @@ package net.sf.okapi.common.ui.abstracteditor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.lib.extra.INotifiable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -37,10 +37,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-public abstract class AbstractBaseDialog {
+public abstract class AbstractBaseDialog implements INotifiable {
 
 	static final public String REGISTER_DIALOG_PAGE = "REGISTER_DIALOG_PAGE"; 
 	static final public String UNREGISTER_DIALOG_PAGE = "UNREGISTER_DIALOG_PAGE";
+	static final public String NOTIFICATION_OK = "NOTIFICATION_OK";
+	static final public String NOTIFICATION_CANCEL = "NOTIFICATION_CANCEL";
 	
 	protected boolean result = true;
 	protected Shell shell;
@@ -55,6 +57,12 @@ public abstract class AbstractBaseDialog {
 	protected int getStyle() {
 		
 		return SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL;
+//		return 
+//		//SWT.CLOSE |
+//		//SWT.BORDER |
+//		SWT.TITLE | 
+//		SWT.RESIZE | 
+//		SWT.APPLICATION_MODAL;
 	}
 	
 	protected abstract void setActionButtonsPanel(Shell shell, SelectionAdapter listener);
@@ -70,7 +78,8 @@ public abstract class AbstractBaseDialog {
 			if (shell == null) return;
 			
 			shell.setText(caption);
-			shell.setData("owner", this);
+			shell.setData("owner", this);			
+			shell.setData("parent", p_Parent);
 			
 			//if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
 			
@@ -179,7 +188,7 @@ public abstract class AbstractBaseDialog {
 		Dialogs.centerWindow(shell, p_Parent);
 	}
 	
-	protected boolean run(Shell parent, Class<? extends Composite> pageClass2, String caption, Object initialData, IHelp help) {
+	protected boolean run(Shell parent, Class<? extends Composite> pageClass, String caption, Object initialData, IHelp help) {
 		
 		try {
 			//if (parent.getClass().isAssignableFrom(this.getClass()));
@@ -188,7 +197,7 @@ public abstract class AbstractBaseDialog {
 			// if (parent instanceof AbstractParametersEditor);
 			
 			this.parent = parent;
-			this.pageClass = pageClass2;
+			this.pageClass = pageClass;
 			this.caption = caption;
 			this.data = initialData;
 			this.help = help;
@@ -228,6 +237,10 @@ public abstract class AbstractBaseDialog {
 		
 		result = false; // To react to OK only
 		shell.open();
+		
+		shell.update();
+		if (page != null) page.interop(shell);
+		
 		while ( !shell.isDisposed() ) {
 			
 			try {
@@ -253,6 +266,21 @@ public abstract class AbstractBaseDialog {
 	public Shell getShell() {
 		
 		return shell;
+	}
+
+	public boolean exec(Object sender, String command, Object info) {
+		
+		if (command.equalsIgnoreCase(NOTIFICATION_OK)) {
+		
+			if (page != null) 
+				result = page.save(data);
+			
+			shell.close();
+			
+			return true;
+		}
+		
+		return false;		
 	}
 	
 }

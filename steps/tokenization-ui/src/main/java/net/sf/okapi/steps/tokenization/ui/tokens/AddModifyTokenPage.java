@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 
-public class AddModifyTokenTypePage extends Composite implements IDialogPage {
+public class AddModifyTokenPage extends Composite implements IDialogPage {
 	private Label lblToken;
 	private Text name;
 	private Label lblDescription;
@@ -45,7 +45,7 @@ public class AddModifyTokenTypePage extends Composite implements IDialogPage {
 	 * @param parent
 	 * @param style
 	 */
-	public AddModifyTokenTypePage(Composite parent, int style) {
+	public AddModifyTokenPage(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(5, false));
 		
@@ -61,7 +61,7 @@ public class AddModifyTokenTypePage extends Composite implements IDialogPage {
 		lblToken = new Label(this, SWT.NONE);
 		lblToken.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblToken.setData("name", "lblToken");
-		lblToken.setText("ID (string):");
+		lblToken.setText("Token name:");
 		
 		name = new Text(this, SWT.BORDER);
 		name.addVerifyListener(new VerifyListener() {
@@ -78,7 +78,7 @@ public class AddModifyTokenTypePage extends Composite implements IDialogPage {
 		
 		lblDescription = new Label(this, SWT.NONE);
 		lblDescription.setData("name", "lblDescription");
-		lblDescription.setText("Description:");
+		lblDescription.setText("Token description:");
 		
 		descr = new Text(this, SWT.BORDER);
 		descr.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));

@@ -36,7 +36,7 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 	 * @see tokenMode;
 	 */
 	final public static int TOKENS_ALL = 0;
-	final public static int TOKENS_ONLY_LISTED = 1;
+	final public static int TOKENS_SELECTED = 1;
 	
 	/**
 	 * The tokenization step will tokenize text only in the languages specified by languageMode:
@@ -56,7 +56,7 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 	 * Default: TOKENS_ALL
 	 */
 	public int tokenMode = TOKENS_ALL;
-	public String tokenTypes;
+	public String tokenNames;
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
@@ -66,7 +66,7 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 		languageBlackList = buffer.getString("languageBlackList");
 		
 		tokenMode = buffer.getInteger("tokenMode", TOKENS_ALL);
-		tokenTypes = buffer.getString("tokenTypes");
+		tokenNames = buffer.getString("tokenNames");
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 		languageBlackList = "";
 		
 		tokenMode = TOKENS_ALL;
-		tokenTypes = "";
+		tokenNames = "";
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 		buffer.setString("languageBlackList", languageBlackList);
 		
 		buffer.setInteger("tokenMode", tokenMode);
-		buffer.setString("tokenTypes", tokenTypes);
+		buffer.setString("tokenNames", tokenNames);
 	}
 
 }

@@ -22,20 +22,20 @@ package net.sf.okapi.steps.tokenization.locale;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
-
 import net.sf.okapi.common.StringUtil;
-
 import com.ibm.icu.util.ULocale;
 
 public class LanguageList {
 
+	// The map keys are ICU locale ID's 
 	private static TreeMap<String, ULocale> map = new TreeMap<String, ULocale>();
 	
 	static {
 		ULocale[] locales = ULocale.getAvailableLocales();
 		
 		for (ULocale locale : locales)			
-			map.put(formatLanguageInfo(locale), locale);
+			if (locale != null)
+				map.put(locale.getName(), locale);
 	}
 	
 	protected static String formatLanguageInfo(ULocale locale) {
@@ -46,35 +46,45 @@ public class LanguageList {
 	
 	public static String[] getLanguages() {
 		
-		return map.keySet().toArray(new String[] {});
+		ArrayList<String> res = new ArrayList<String> ();
+
+		for (ULocale locale : map.values()) {
+			
+			res.add(formatLanguageInfo(locale));
+		}
+		
+		return res.toArray(new String[] {});
 	}
 	
 	public static String[] getLanguageCodes_Okapi() {
 		
-		ArrayList<String> codes = new ArrayList<String> ();
+		ArrayList<String> res = new ArrayList<String> ();
 
 		for (ULocale locale : map.values()) {
 			
-			codes.add(LocaleUtil.normalizeLanguageCode_Okapi(locale.getName()));
+			res.add(LocaleUtil.normalizeLanguageCode_Okapi(locale.getName()));
 		}
 		
-		return codes.toArray(new String[] {});
+		return res.toArray(new String[] {});
 	}
 	
 	public static String[] getLanguageCodes_ICU() {
 		
-		ArrayList<String> codes = new ArrayList<String> ();
+		ArrayList<String> res = new ArrayList<String> ();
 
 		for (ULocale locale : map.values()) {
 			
-			codes.add(locale.getName());
+			res.add(locale.getName());
 		}
 		
-		return codes.toArray(new String[] {});
+		return res.toArray(new String[] {});
 	}
 	
-//	public static ULocale getLocale(String languageInfo) {
-//		
-//		return map.get(languageInfo);
-//	}
+	public static String getDisplayName(String code_Okapi) {
+		
+		String code_ICU = LocaleUtil.normalizeLanguageCode_ICU(code_Okapi);
+		
+		return formatLanguageInfo(map.get(code_ICU));
+	}
+	
 }

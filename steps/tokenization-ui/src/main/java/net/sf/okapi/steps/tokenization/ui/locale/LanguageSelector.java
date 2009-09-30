@@ -23,6 +23,8 @@ package net.sf.okapi.steps.tokenization.ui.locale;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Shell;
+
 import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
 
 public class LanguageSelector {
@@ -34,10 +36,15 @@ public class LanguageSelector {
 
 	public static String[] select() {
 		
+		return select(null); 
+	}
+	
+	public static String[] select(Shell parent) {
+		
 		InputQueryDialog dlg = new InputQueryDialog();
 		List<String> list = new ArrayList<String>();
 		
-		dlg.run(null, LanguageListPage.class, "Languages", "", list, null);
+		dlg.run(parent, LanguageListPage.class, "Languages", "", list, null);
 			
 		return list.toArray(new String[] {}); 
 	}

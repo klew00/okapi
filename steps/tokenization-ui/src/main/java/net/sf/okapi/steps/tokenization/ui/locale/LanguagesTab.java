@@ -22,27 +22,24 @@ package net.sf.okapi.steps.tokenization.ui.locale;
 
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Widget;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Widget;
 
 public class LanguagesTab extends Composite implements IDialogPage {
-	private Button btnAll;
-	private Button btnAllExceptThese;
-	private List list;
-	private Button btnAdd;
-	private Button btnRemove;
-	private Button btnOnlyTheseLanguages;
-	private List list_1;
-	private Button btnAdd_1;
-	private Button btnRemove_1;
-	private Group grpTokenizeTextIn;
+	private Button except;
+	private List listW;
+	private Button addB;
+	private Button removeB;
+	private Button only;
+	private List listB;
+	private Button addW;
+	private Button removeW;
 
 	/**
 	 * Create the composite.
@@ -53,77 +50,63 @@ public class LanguagesTab extends Composite implements IDialogPage {
 		super(parent, style);
 		setLayout(new GridLayout(3, false));
 		
-		grpTokenizeTextIn = new Group(this, SWT.NONE);
-		grpTokenizeTextIn.setText("Tokenize text in:");
-		grpTokenizeTextIn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
-		grpTokenizeTextIn.setLayout(new GridLayout(3, false));
-		grpTokenizeTextIn.setData("name", "grpTokenizeTextIn");
+		only = new Button(this, SWT.RADIO);
+		only.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+		only.setData("name", "only");
+		only.setText("Only these languages:");
+		new Label(this, SWT.NONE);
 		
-		btnAll = new Button(grpTokenizeTextIn, SWT.RADIO);
-		btnAll.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		btnAll.setData("name", "btnAll");
-		btnAll.setText("All languages");
-		new Label(grpTokenizeTextIn, SWT.NONE);
-		
-		btnAllExceptThese = new Button(grpTokenizeTextIn, SWT.RADIO);
-		btnAllExceptThese.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		btnAllExceptThese.setData("name", "btnAllExceptThese");
-		btnAllExceptThese.setText("All languages except these:");
-		new Label(grpTokenizeTextIn, SWT.NONE);
-		new Label(grpTokenizeTextIn, SWT.NONE);
-		
-		list = new List(grpTokenizeTextIn, SWT.BORDER);
+		listW = new List(this, SWT.BORDER);
 		{
 			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
-			gridData.heightHint = 100;
+			gridData.heightHint = 150;
 			gridData.widthHint = 500;
-			list.setLayoutData(gridData);
+			listW.setLayoutData(gridData);
 		}
-		list.setData("name", "list");
+		listW.setData("name", "listB");
 		
-		btnAdd = new Button(grpTokenizeTextIn, SWT.NONE);
+		addB = new Button(this, SWT.NONE);
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
 		gridData.widthHint = 90;
-		btnAdd.setLayoutData(gridData);
-		btnAdd.setData("name", "btnAdd");
-		btnAdd.setText("Add...");
-		new Label(grpTokenizeTextIn, SWT.NONE);
+		addB.setLayoutData(gridData);
+		addB.setData("name", "addB");
+		addB.setText("Add...");
+		new Label(this, SWT.NONE);
 		
-		btnRemove = new Button(grpTokenizeTextIn, SWT.NONE);
-		btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnRemove.setData("name", "btnRemove");
-		btnRemove.setText("Remove");
-		new Label(grpTokenizeTextIn, SWT.NONE);
-		new Label(grpTokenizeTextIn, SWT.NONE);
+		removeB = new Button(this, SWT.NONE);
+		removeB.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		removeB.setData("name", "removeB");
+		removeB.setText("Remove");
+		new Label(this, SWT.NONE);
+		new Label(this, SWT.NONE);
 		
-		btnOnlyTheseLanguages = new Button(grpTokenizeTextIn, SWT.RADIO);
-		btnOnlyTheseLanguages.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		btnOnlyTheseLanguages.setData("name", "btnOnlyTheseLanguages");
-		btnOnlyTheseLanguages.setText("Only these languages:");
-		new Label(grpTokenizeTextIn, SWT.NONE);
-		new Label(grpTokenizeTextIn, SWT.NONE);
+		except = new Button(this, SWT.RADIO);
+		except.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+		except.setData("name", "except");
+		except.setText("All languages except these:");
+		new Label(this, SWT.NONE);
 		
-		list_1 = new List(grpTokenizeTextIn, SWT.BORDER);
+		listB = new List(this, SWT.BORDER);
 		{
 			GridData gridData_1 = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
 			gridData_1.widthHint = 500;
-			gridData_1.heightHint = 100;
-			list_1.setLayoutData(gridData_1);
+			gridData_1.heightHint = 150;
+			listB.setLayoutData(gridData_1);
 		}
-		list_1.setData("name", "list_1");
+		listB.setData("name", "listW");
 		
-		btnAdd_1 = new Button(grpTokenizeTextIn, SWT.NONE);
-		btnAdd_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnAdd_1.setData("name", "btnAdd_1");
-		btnAdd_1.setText("Add...");
-		new Label(grpTokenizeTextIn, SWT.NONE);
+		addW = new Button(this, SWT.NONE);
+		addW.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		addW.setData("name", "addW");
+		addW.setText("Add...");
+		new Label(this, SWT.NONE);
 		
-		btnRemove_1 = new Button(grpTokenizeTextIn, SWT.NONE);
-		btnRemove_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnRemove_1.setData("name", "btnRemove_1");
-		btnRemove_1.setText("Remove");
-		new Label(grpTokenizeTextIn, SWT.NONE);
-		new Label(grpTokenizeTextIn, SWT.NONE);
+		removeW = new Button(this, SWT.NONE);
+		removeW.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		removeW.setData("name", "removeW");
+		removeW.setText("Remove");
+		new Label(this, SWT.NONE);
+		new Label(this, SWT.NONE);
 
 	}
 

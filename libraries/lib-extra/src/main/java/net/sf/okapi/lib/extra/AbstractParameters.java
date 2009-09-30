@@ -26,6 +26,7 @@ import java.util.List;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.Util;
 
 /**
@@ -37,7 +38,7 @@ import net.sf.okapi.common.Util;
 public abstract class AbstractParameters extends BaseParameters implements INotifiable {
 	
 	protected Component owner = null;
-	protected String data;
+	//protected String data;
 	 	
 	public AbstractParameters() {
 		
@@ -79,8 +80,9 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 	final public void fromString(String data) {
 		
 		reset();
-		this.data = data; 
-		buffer.fromString(data);
+//		this.data = StringUtil.normalizeLineBreaks(data); 
+//		buffer.fromString(this.data);
+		buffer.fromString(StringUtil.normalizeLineBreaks(data));
 
 		parameters_load(buffer); // this.getClass()
 	}

@@ -47,6 +47,20 @@ public class StringUtil {
 	
 	public static String removeQualifiers(String st) {
 	
-		return removeQualifiers(st, "\"");
+		return removeQualifiers(st, "\""); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	public static String normalizeLineBreaks(String string) {
+		
+		String res = string;
+		
+		if (!Util.isEmpty(res)) {
+		
+			res = res.replaceAll("\r\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			res = res.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			res = res.replace("\r", "\n");  //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
+		return res;
 	}
 }

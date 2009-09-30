@@ -18,27 +18,54 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.engine;
+package net.sf.okapi.steps.tokenization.ui.locale;
 
-import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
-import net.sf.okapi.steps.tokenization.ui.common.NameDescriptionTab;
-import net.sf.okapi.steps.tokenization.ui.locale.LanguagesAllTab;
-import net.sf.okapi.steps.tokenization.ui.tokens.TokenNamesRuleTab;
+import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Widget;
 
-public abstract class AbstractRuleEditor extends AbstractParametersEditor {
+public class LanguagesAllTab extends LanguagesTab implements IDialogPage {
+	private Button all;
 
-	protected abstract Class<? extends Composite> getRuleClass();
-	
-	@Override
-	protected void createPages(TabFolder pageContainer) {
-				
-		addPage("Rule", getRuleClass());
-		addPage("Languages", LanguagesAllTab.class);
-		addPage("Tokens", TokenNamesRuleTab.class);
-		addPage("Info", NameDescriptionTab.class);
+	public LanguagesAllTab(Composite parent, int style) {
+		
+		super(parent, style);
+		
+		all = new Button(this, SWT.RADIO);
+		all.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		all.setData("name", "all");
+		all.setText("All languages");
+		new Label(this, SWT.NONE);
 	}
 
+	@Override
+	protected void checkSubclass() {
+		// Disable the check that prevents subclassing of SWT components
+	}
+
+	public boolean canClose(boolean isOK) {
+
+		return true;
+	}
+
+	public void interop(Widget speaker) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean load(Object data) {
+
+		return true;
+	}
+
+	public boolean save(Object data) {
+
+		return true;
+	}
 
 }

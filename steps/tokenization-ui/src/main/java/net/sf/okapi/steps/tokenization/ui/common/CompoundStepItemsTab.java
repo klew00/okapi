@@ -32,45 +32,9 @@ public abstract class CompoundStepItemsTab extends AbstractListTab {
 	}
 
 	@Override
-	protected String getAddButtonCaption() {
-
-		return "Add...";
-	}
-
-	@Override
 	protected String getListDescription() {
 
 		return "Listed below are internal steps in the order of invocation.";
-	}
-
-	@Override
-	protected String getModifyButtonCaption() {
-
-		return "Modify...";
-	}
-
-	@Override
-	protected String getRemoveButtonCaption() {
-
-		return "Remove";
-	}
-
-	@Override
-	protected boolean getUpDownVisible() {
-
-		return true;
-	}
-
-	@Override
-	protected String getMoveDownButtonCaption() {
-
-		return "Move Down";
-	}
-
-	@Override
-	protected String getMoveUpButtonCaption() {
-
-		return "Move Up";
 	}
 
 }

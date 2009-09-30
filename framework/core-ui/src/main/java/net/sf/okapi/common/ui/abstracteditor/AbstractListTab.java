@@ -22,47 +22,21 @@ package net.sf.okapi.common.ui.abstracteditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 
 public abstract class AbstractListTab extends ListTabLayout implements IDialogPage {
 
-	private Control listDescr;
-	private Control list;
-	private Control itemDescr;
-	private Control add;
-	private Control modify;
-	private Control remove;
-	private Control up;
-	private Control down;
-	
-	protected abstract String getListDescription();
-	protected abstract String getAddButtonCaption();
-	protected abstract String getModifyButtonCaption();
-	protected abstract String getRemoveButtonCaption();
-	protected abstract String getMoveUpButtonCaption();
-	protected abstract String getMoveDownButtonCaption();
-	protected abstract boolean getUpDownVisible();
-	
 	protected abstract void actionAdd(int afterIndex);
-	protected abstract void actionModify(int itemIndex);
-	protected abstract boolean actionRemove(int itemIndex);
+	protected abstract void actionModify(int itemIndex);	
 	protected abstract void actionUp(int itemIndex);
 	protected abstract void actionDown(int itemIndex);
+	
+	protected abstract String getListDescription();
+	protected abstract String getItemDescription(int index);
 	
 	public AbstractListTab(Composite parent, int style) {
 		
 		super(parent, style);
-		
-		// Init
-		listDescr = SWTUtil.findControl(this, "listDescr");
-		list = SWTUtil.findControl(this, "list");
-		itemDescr = SWTUtil.findControl(this, "itemDescr");
-		add = SWTUtil.findControl(this, "add");
-		modify = SWTUtil.findControl(this, "modify");
-		remove = SWTUtil.findControl(this, "remove");
-		up = SWTUtil.findControl(this, "up");
-		down = SWTUtil.findControl(this, "down");
 		
 		// Configure interop
 		SWTUtil.addSpeaker(this, listDescr);
@@ -77,47 +51,70 @@ public abstract class AbstractListTab extends ListTabLayout implements IDialogPa
 		
 		// Configure layout in descendants
 		SWTUtil.setText(listDescr, getListDescription());
-		SWTUtil.setText(add, getAddButtonCaption());
-		SWTUtil.setText(modify, getModifyButtonCaption());
-		SWTUtil.setText(remove, getRemoveButtonCaption());
-		SWTUtil.setText(up, getMoveUpButtonCaption());
-		SWTUtil.setText(down, getMoveDownButtonCaption());
-		SWTUtil.setVisible(up, getUpDownVisible());
-		SWTUtil.setVisible(down, getUpDownVisible());
 	}
 
+	protected void selectListItem(int index) {
+		
+		if (SWTUtil.checkListIndex(list, index)) {
+			
+			list.setSelection(index);
+			SWTUtil.setText(itemDescr, getItemDescription(index));
+		}
+		else
+			SWTUtil.setText(itemDescr, "");
+		
+		list.setFocus();
+	}
+	
 	public void interop(Widget speaker) {
 		
 		SWTUtil.setEnabled(add, true);
 		
 		int index = SWTUtil.getSelection(list);
+		
 		SWTUtil.setEnabled(modify, index != -1);
 		SWTUtil.setEnabled(remove, index != -1);
 		SWTUtil.setEnabled(up, index > 0);
 		SWTUtil.setEnabled(down, index > -1 && index < SWTUtil.getNumItems(list) - 1);
 		
-		if (speaker == add)
-			actionAdd(SWTUtil.getSelection(list));
+		if (speaker == add) {
+			
+			actionAdd(index);			
+			selectListItem(list.getItemCount() - 1);
+			interop(null);
+			//selectListItem(0);
+		}
+					
+		else if (speaker == list && SWTUtil.getEventType() == SWT.MouseDoubleClick) {
+			
+			if (SWTUtil.getVisible(modify))
+				actionModify(index);
+			else
+				actionAdd(index);
+		}
 		
-		else if (speaker == list && SWTUtil.getEventType() == SWT.MouseDoubleClick)
-			actionModify(SWTUtil.getSelection(list));
+		else if (speaker == list && SWTUtil.getEventType() == SWT.Selection) {
+			
+			SWTUtil.setText(itemDescr, getItemDescription(index));
+		}
 		
 		else if (speaker == modify)
-			actionModify(SWTUtil.getSelection(list));
+			actionModify(index);
 		
 		else if (speaker == remove) {
 			
-			if (actionRemove(SWTUtil.getSelection(list))) {
-				
-				
-			}
+			list.remove(index);
+			
+			if (index > list.getItemCount() - 1) index = list.getItemCount() - 1;
+			selectListItem(index);	
+			interop(null);
 		}
 		
 		else if (speaker == up)
-			actionUp(SWTUtil.getSelection(list));
+			actionUp(index);
 		
 		else if (speaker == down)
-			actionDown(SWTUtil.getSelection(list));
+			actionDown(index);
 				
 	}
 

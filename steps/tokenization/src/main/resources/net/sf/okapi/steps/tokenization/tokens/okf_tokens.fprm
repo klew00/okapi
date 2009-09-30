@@ -1,0 +1,16 @@
+#v1
+tokenItemCount.i=7
+tokenItem0.name=ABBREVIATION
+tokenItem0.description=Abbreviation
+tokenItem1.name=NUMBER
+tokenItem1.description=Numbers
+tokenItem2.name=PUNCTUATION
+tokenItem2.description=
+tokenItem3.name=TEST
+tokenItem3.description=Test token
+tokenItem4.name=UNKNOWN
+tokenItem4.description=
+tokenItem5.name=WHITESPACE
+tokenItem5.description=White space
+tokenItem6.name=WORD
+tokenItem6.description=

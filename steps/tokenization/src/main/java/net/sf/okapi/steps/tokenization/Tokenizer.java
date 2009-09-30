@@ -56,10 +56,10 @@ public class Tokenizer {
 		params.languageMode = Parameters.LANGUAGES_ONLY_WHITE_LIST;
 		params.languageWhiteList = language;
 		
-		params.tokenMode = Parameters.TOKENS_ONLY_LISTED;
+		params.tokenMode = Parameters.TOKENS_SELECTED;
 		
 		if (!Util.isEmpty(tokenTypes))
-			params.tokenTypes = tokenTypes.toString();
+			params.tokenNames = tokenTypes.toString();
 		
 		ts.handleEvent(new Event(EventType.START_BATCH));
 		

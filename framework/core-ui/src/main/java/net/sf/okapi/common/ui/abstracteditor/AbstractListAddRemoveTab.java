@@ -18,27 +18,58 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.engine;
+package net.sf.okapi.common.ui.abstracteditor;
 
-import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
-import net.sf.okapi.steps.tokenization.ui.common.NameDescriptionTab;
-import net.sf.okapi.steps.tokenization.ui.locale.LanguagesAllTab;
-import net.sf.okapi.steps.tokenization.ui.tokens.TokenNamesRuleTab;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Widget;
 
-public abstract class AbstractRuleEditor extends AbstractParametersEditor {
+public abstract class AbstractListAddRemoveTab extends AbstractListTab {
 
-	protected abstract Class<? extends Composite> getRuleClass();
-	
-	@Override
-	protected void createPages(TabFolder pageContainer) {
-				
-		addPage("Rule", getRuleClass());
-		addPage("Languages", LanguagesAllTab.class);
-		addPage("Tokens", TokenNamesRuleTab.class);
-		addPage("Info", NameDescriptionTab.class);
+	public AbstractListAddRemoveTab(Composite parent, int style) {
+		
+		super(parent, style);
+		
+		SWTUtil.setVisible(modify, false);
+		SWTUtil.setVisible(up, false);
+		SWTUtil.setVisible(down, false);
 	}
 
+	@Override
+	protected void actionDown(int itemIndex) {
+		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	protected void actionModify(int itemIndex) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void actionUp(int itemIndex) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected boolean getDisplayModify() {
+		
+		return false;
+	}
+
+	@Override
+	public void interop(Widget speaker) {
+		
+		super.interop(speaker);
+		
+		// If the list is empty, display a selection dialog
+		if (speaker instanceof Shell && list.getItemCount() == 0) {// speaker is Shell only when called from showDialog()
+		
+			actionAdd(0);
+			selectListItem(list.getItemCount() - 1);
+			interop(null);  // To update the Remove button status 
+		}			
+	}
 }

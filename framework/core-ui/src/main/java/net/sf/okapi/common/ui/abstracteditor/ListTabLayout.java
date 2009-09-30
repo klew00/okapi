@@ -29,16 +29,20 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 
-public class ListTabLayout extends Composite {
-	private Label listDescr;
-	private List list;
-	private Text itemDescr;
-	private Button add;
-	private Button modify;
-	private Button remove;
-	private Button up;
-	private Button down;
+public abstract class ListTabLayout extends Composite {
+	protected Label listDescr;
+	protected List list;
+	protected Text itemDescr;
+	protected Button add;
+	protected Button modify;
+	protected Button remove;
+	protected Button up;
+	protected Button down;
 
+	protected abstract boolean getDisplayListDescr();
+	protected abstract boolean getDisplayItemDescr();
+	protected abstract boolean getDisplayModify();
+	
 	/**
 	 * Create the composite.
 	 * @param parent
@@ -47,10 +51,14 @@ public class ListTabLayout extends Composite {
 	public ListTabLayout(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
+
+		if (getDisplayListDescr()) {
+			
+			listDescr = new Label(this, SWT.NONE);
+			listDescr.setData("name", "listDescr");
+			new Label(this, SWT.NONE);
+		}
 		
-		listDescr = new Label(this, SWT.NONE);
-		listDescr.setData("name", "listDescr");
-		new Label(this, SWT.NONE);
 		
 		list = new List(this, SWT.BORDER | SWT.V_SCROLL);
 //		list.addMouseListener(new MouseAdapter() {
@@ -61,7 +69,7 @@ public class ListTabLayout extends Composite {
 //					add.
 //			}
 //		});
-		list.setItems(new String[] {"111111111111", "2222222222222", "333333333333", "444444444444"});
+		list.setItems(new String[] {});
 		list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 10));
 		list.setData("name", "list");
 		
@@ -70,10 +78,13 @@ public class ListTabLayout extends Composite {
 		add.setData("name", "add");
 		add.setText("Add...");
 		
-		modify = new Button(this, SWT.NONE);
-		modify.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		modify.setData("name", "modify");
-		modify.setText("Modify...");
+		if (getDisplayModify()) {
+			
+			modify = new Button(this, SWT.NONE);
+			modify.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+			modify.setData("name", "modify");
+			modify.setText("Modify...");
+		}
 		
 		remove = new Button(this, SWT.NONE);
 		remove.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -97,12 +108,20 @@ public class ListTabLayout extends Composite {
 		new Label(this, SWT.NONE);
 		new Label(this, SWT.NONE);
 		
-		itemDescr = new Text(this, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
-		gridData.heightHint = 50;
-		gridData.widthHint = 500;
-		itemDescr.setLayoutData(gridData);
-		itemDescr.setData("name", "itemDescr");
+		if (getDisplayItemDescr()) {
+			
+			itemDescr = new Text(this, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
+			GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
+			gridData.heightHint = 50;
+			gridData.widthHint = 500;
+			itemDescr.setLayoutData(gridData);
+			itemDescr.setData("name", "itemDescr");
+			itemDescr.setVisible(true);
+		}
+		
+//		System.out.println(itemDescr.isDisposed());
+//		System.out.println(itemDescr.toString());
 	}
-
+	
+	
 }

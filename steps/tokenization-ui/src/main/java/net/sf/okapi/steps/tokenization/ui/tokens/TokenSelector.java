@@ -18,48 +18,45 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui;
+package net.sf.okapi.steps.tokenization.ui.tokens;
 
-import net.sf.okapi.common.BaseContext;
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
-import net.sf.okapi.steps.tokenization.Parameters;
+import java.util.ArrayList;
+import java.util.List;
+import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
+import org.eclipse.swt.widgets.Shell;
 
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.Widget;
+public class TokenSelector {
 
-public class ParametersEditor extends AbstractParametersEditor {
-
+	/**
+	 * For creation of new tokens and storing them to the globally accessible net.sf.okapi.steps.tokenization.tokens/okf_tokens.fprm
+	 */
 	public static void main(String[] args) {
 		
-		ParametersEditor editor = new ParametersEditor();
-		editor.edit(editor.createParameters(), false, new BaseContext());
-	}
-	
-	@Override
-	protected void createPages(TabFolder pageContainer) {
-				
-		addPage("Options", OptionsTab.class);
-//		addPage("Languages", LanguagesTab.class);
-//		addPage("Tokens", TokenTypesTab.class);		
+		select();
 	}
 
-	@Override
-	public IParameters createParameters() {
+	public static String[] select() {
 		
-		return new Parameters();
+		return select(null, false, false); 
 	}
 
-	@Override
-	protected String getCaption() {
-
-		return "Tokenization";
+	public static String[] select(Shell parent, boolean readOnly, boolean showListDescription) {
+				
+		InputQueryDialog dlg = new InputQueryDialog();
+		List<String> list = new ArrayList<String>();
+		
+		if (readOnly && showListDescription) 
+			dlg.run(parent, TokenSelectorReadOnlyPage.class, "Tokens", "", list, null);
+		
+		else if (!readOnly && showListDescription)
+			dlg.run(parent, TokenSelectorPage.class, "Tokens", "", list, null);
+		
+		else if (!readOnly && !showListDescription)
+			dlg.run(parent, TokenSelectorTsPage.class, "Tokens", "", list, null);
+		
+		else
+			dlg.run(parent, TokenSelectorPage.class, "Tokens", "", list, null);
+		
+		return list.toArray(new String[] {});
 	}
-
-	@Override
-	protected void interop(Widget speaker) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

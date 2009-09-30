@@ -171,7 +171,8 @@ public class SWTUtil {
 		
 		if (!(control instanceof Button)) return;
 		
-		unselectAll(control.getParent()); // SWT feature: several radio-buttons of the same group can get selected at the same time
+		if (selected)
+			unselectAll(control.getParent()); // SWT feature: several radio-buttons of the same group can get selected at the same time
 		
 		((Button) control).setSelection(selected);
 	}
@@ -302,6 +303,13 @@ public class SWTUtil {
 		if (table == null) return false;
 		
 		return colIndex >= 0 && colIndex < table.getColumnCount();
+	}
+	
+	public static boolean checkListIndex(org.eclipse.swt.widgets.List list, int index) {
+		
+		if (list == null) return false;
+		
+		return index >= 0 && index < list.getItemCount();
 	}
 	
 	public static int getColumnMaxValue(Table table, int colIndex) {
@@ -527,6 +535,17 @@ public class SWTUtil {
 	public static void addSpeaker(Composite page, String controlName) {
 
 		addSpeaker(page, findControl(page, controlName));
+	}
+	
+	public static void addSpeakers(Composite page, Control... controls) {
+	
+		for (Control speaker : Arrays.asList(controls))
+			addSpeaker(page, speaker);
+	}
+
+	public static boolean checkControl(Control control) {
+		
+		return (control != null && !control.isDisposed());
 	}
 	
 }

@@ -20,12 +20,13 @@
 
 package net.sf.okapi.steps.tokenization.ui.tokens;
 
-import net.sf.okapi.steps.tokenization.tokens.Parameters;
-import net.sf.okapi.steps.tokenization.tokens.TokenType;
-import net.sf.okapi.common.ui.abstracteditor.AbstractBaseDialog;
+import java.util.ArrayList;
+
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
+import net.sf.okapi.steps.tokenization.tokens.Parameters;
+import net.sf.okapi.steps.tokenization.tokens.TokenItem;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -43,31 +44,33 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 
-public class TokenTypesPage extends Composite implements IDialogPage {
-	private Label lblChooseOneOr;
+public class TokenSelectorPage extends Composite implements IDialogPage {
+	protected Label listDescr;
 	private Table table;
 	private TableColumn colName;
 	private TableColumn colDescr;
-	private Button btnAdd;
-	private Button btnModify;
-	private Button btnRemove;
-	private Label label;
+	protected Button add;
+	protected Button modify;
+	protected Button remove;
 	private TableAdapter adapter;
-	private boolean modified;
+	protected boolean modified;
 
 	/**
 	 * Create the composite.
 	 * @param parent
 	 * @param style
 	 */
-	public TokenTypesPage(Composite parent, int style) {
+	public TokenSelectorPage(Composite parent, int style) {
 		super(parent, style);
-		setLayout(new GridLayout(2, false));
 		
-		lblChooseOneOr = new Label(this, SWT.NONE);
-		lblChooseOneOr.setText("Choose one or more tokens from the table below (Ctrl+click, Ctrl+Shift+click for multiple selection):");
-		lblChooseOneOr.setData("name", "lblChooseOneOr");
-		new Label(this, SWT.NONE);
+		
+		setLayout(new GridLayout(2, false));
+
+		listDescr = new Label(this, SWT.NONE);
+		listDescr.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		listDescr.setText("Choose one or more tokens from the table below (Ctrl+click, Ctrl+Shift+click for multiple selection):");
+		listDescr.setData("name", "listDescr");
+		
 		
 		table = new Table(this, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
 		table.addMouseListener(new MouseAdapter() {
@@ -77,46 +80,49 @@ public class TokenTypesPage extends Composite implements IDialogPage {
 			}
 		});
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4);
+		gridData.widthHint = 500;
 		gridData.heightHint = 400;
 		table.setLayoutData(gridData);
 		table.setData("name", "table");
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		
-		colName = new TableColumn(table, SWT.NONE);
+		colName = new TableColumn(table, SWT.LEFT);
 		colName.setData("name", "colName");
 		colName.setWidth(150);
-		colName.setText("Token");
+		colName.setText("Name");
 		
-		colDescr = new TableColumn(table, SWT.NONE);
+		colDescr = new TableColumn(table, SWT.LEFT);
 		colDescr.setData("name", "colDescr");
 		colDescr.setWidth(100);
 		colDescr.setText("Description");
-		
-		btnAdd = new Button(this, SWT.NONE);
-		btnAdd.addSelectionListener(new SelectionAdapter() {
+
+		add = new Button(this, SWT.NONE);
+		add.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
 				addModifyRow(null);
 			}
 		});
-		btnAdd.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnAdd.setData("name", "btnAdd");
-		btnAdd.setText("Add...");
+		GridData gridData_1 = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		gridData_1.widthHint = 70;
+		add.setLayoutData(gridData_1);
+		add.setData("name", "add");
+		add.setText("Add...");
 		
-		btnModify = new Button(this, SWT.NONE);
-		btnModify.addSelectionListener(new SelectionAdapter() {
+		modify = new Button(this, SWT.NONE);
+		modify.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
 				addModifyRow(table.getItem(table.getSelectionIndex()));
 			}
 		});
-		btnModify.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnModify.setData("name", "btnModify");
-		btnModify.setText("Modify...");
+		modify.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		modify.setData("name", "modify");
+		modify.setText("Modify...");
 		
-		btnRemove = new Button(this, SWT.NONE);
-		btnRemove.addSelectionListener(new SelectionAdapter() {
+		remove = new Button(this, SWT.NONE);
+		remove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				
 				adapter.removeSelected();
@@ -124,15 +130,12 @@ public class TokenTypesPage extends Composite implements IDialogPage {
 				interop(e.widget);
 			}
 		});
-		btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
-		btnRemove.setData("name", "btnRemove");
-		btnRemove.setText("Remove");
-		
-		label = new Label(this, SWT.NONE);
-		label.setData("name", "label");
-		label.setText("                         ");
+		remove.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
+		remove.setData("name", "remove");
+		remove.setText("Remove");
 		
 		adapter = new TableAdapter(table);
+		new Label(this, SWT.NONE);
 		adapter.setRelColumnWidths(new double [] {1, 3});
 	}
 
@@ -141,8 +144,8 @@ public class TokenTypesPage extends Composite implements IDialogPage {
 		if (item == null) { // Add new item			
 			adapter.unselect();
 			
-			Object res = SWTUtil.inputQuery(AddModifyTokenTypePage.class, getShell(), "Add token type", 
-					new String[] {"", "0", ""}, null);
+			Object res = SWTUtil.inputQuery(AddModifyTokenPage.class, getShell(), "Add token type", 
+					new String[] {"", ""}, null);
 			
 			if (res != null) {
 				
@@ -154,7 +157,7 @@ public class TokenTypesPage extends Composite implements IDialogPage {
 		}
 		else {
 			
-			Object res = SWTUtil.inputQuery(AddModifyTokenTypePage.class, getShell(), "Modify token type", 
+			Object res = SWTUtil.inputQuery(AddModifyTokenPage.class, getShell(), "Modify token type", 
 					SWTUtil.getText(item), null); 
 			
 			if (res != null) {					
@@ -174,64 +177,57 @@ public class TokenTypesPage extends Composite implements IDialogPage {
 	}
 
 	public boolean canClose(boolean isOK) {
-		// TODO Auto-generated method stub
+
 		return true;
 	}
 
 	public void interop(Widget speaker) {
 		
-		btnModify.setEnabled(table.getItemCount() > 0 && table.getSelectionIndex() != -1);
-		btnRemove.setEnabled(btnModify.getEnabled());
+		if (SWTUtil.checkControl(modify))
+			modify.setEnabled(table.getItemCount() > 0 && table.getSelectionIndex() != -1);
+		
+		if (SWTUtil.checkControl(remove))
+			remove.setEnabled(modify.getEnabled());
 	}
 
 	public boolean load(Object data) {
 
-		if (data == null) {
+//		if (data == null) {
+//			
+//			Object d = getData("dialog");
+//			
+//			if (d instanceof AbstractBaseDialog) {
+//				
+//				data = new Parameters();
+//				((AbstractBaseDialog) d).setData(data);
+//			}			
+//		}
+//		
+			Parameters params = new Parameters();
+			if (params == null) return false;
 			
-			Object d = getData("dialog");
-			
-			if (d instanceof AbstractBaseDialog) {
-				
-				data = new Parameters();
-				((AbstractBaseDialog) d).setData(data);
-			}			
-		}
-		
-		if (data instanceof Parameters) {
-			
-			Parameters params = (Parameters) data;
-
-			if (!params.loadTokenTypes()) return false;
+			if (!params.loadItems()) return false;
 			
 			adapter.clear();
 			
-			for (TokenType tokenType : params.getTokenTypes())					
-				adapter.addRow(new String[] {tokenType.id, tokenType.description});
+			for (TokenItem item : params.getItems())					
+				adapter.addRow(new String[] {item.getName(), item.getDescription()});
 
 			adapter.sort(1, false);
 			modified = false;				
-		}		
 		
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean save(Object data) {
 		
-		if (data instanceof Parameters) {
+		if (data instanceof ArrayList) {
 			
-			Parameters params = (Parameters) data;
-			params.reset();
-		
-			for (int i = 1; i <= adapter.getNumRows(); i++)
-				params.addTokenType(adapter.getValue(i, 1), adapter.getValue(i, 2));
+			ArrayList<String> list = (ArrayList<String>) data;
 			
-			if (modified)
-				params.saveTokenTypes();
-			
-			for (TableItem item : table.getSelection())
-				params.addSelectedTokenType(item.getText(0), item.getText(1));
-			
-			modified = false;
+			for (TableItem item : table.getSelection())			
+				list.add(item.getText(0));
 		}
 
 		return true;

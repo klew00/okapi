@@ -31,6 +31,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.lib.extra.INotifiable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -87,11 +88,7 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 			shell = null;
 			params = paramsObject;
 
-			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE /*
-																		 * |
-																		 * SWT.
-																		 * MAX
-																		 */| SWT.APPLICATION_MODAL);
+			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			// shell.addListener(SWT.Traverse, new Listener() {
 			// public void handleEvent(Event event) {
 			// if (event.detail == SWT.TRAVERSE_ESCAPE) {

@@ -32,45 +32,9 @@ public class RulesTab extends AbstractListTab {
 	}
 
 	@Override
-	protected String getAddButtonCaption() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	protected String getListDescription() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	protected String getModifyButtonCaption() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected String getMoveDownButtonCaption() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected String getMoveUpButtonCaption() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected String getRemoveButtonCaption() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected boolean getUpDownVisible() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	public boolean canClose(boolean isOK) {
@@ -107,15 +71,33 @@ public class RulesTab extends AbstractListTab {
 	}
 
 	@Override
-	protected boolean actionRemove(int itemIndex) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	protected void actionUp(int itemIndex) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	protected boolean getDisplayItemDescr() {
+
+		return true;
+	}
+
+	@Override
+	protected boolean getDisplayListDescr() {
+
+		return true;
+	}
+
+	@Override
+	protected String getItemDescription(int index) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected boolean getDisplayModify() {
+
+		return true;
 	}
 
 }

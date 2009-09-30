@@ -30,27 +30,95 @@ import net.sf.okapi.common.Range;
 
 public class Token {
 	
-	public String typeID;
-	public Range range;
-	public String lexem;
-	public int score;
+	final static public String UNKNOWN 			= "UNKNOWN";
+	final static public String WORD 			= "WORD"; 
+	final static public String PUNCTUATION 		= "PUNCTUATION";
+	final static public String WHITESPACE 		= "WHITESPACE";
+	final static public String DATE 			= "DATE";
+	final static public String NUMBER 			= "NUMBER";
+	final static public String CURRENCY 		= "CURRENCY";
+	final static public String NAME 			= "NAME";
+	final static public String EMAIL 			= "EMAIL";
+	final static public String INTERNET 		= "INTERNET";
+	final static public String ABBREVIATION 	= "ABBREVIATION";
 	
-	public Token(String typeID, int start, int end, String lexem, int score) {
+	/**
+	 * Integer identifier of the token. 
+	 */
+	private int id; 
+	
+	/**
+	 * Substring of text captured as the given token.
+	 */
+	private String value;
+	
+	/**
+	 * Range of text captured as the given token.
+	 */
+	private Range range;
+	
+	/**
+	 * Percentage reflecting trustworthiness of the token recognition.
+	 */
+	private int score;
+	
+	/**
+	 * ID of the rule that captured this token. Used by the scoring engine internally.
+	 */
+	private int ruleId;
+	
+	public Token(int id, String value, int start, int end, int score, int ruleId) {
 		
 		super();
 		
-		this.typeID = typeID;
+		this.id = id;
 		this.range = new Range(start, end);
-		this.lexem = lexem;
+		this.value = value;
 		this.score = score;
+		this.ruleId = ruleId;
+	}
+
+	public int getId() {
+		
+		return id;
+	}
+
+	public String getValue() {
+		
+		return value;
+	}
+
+	public Range getRange() {
+		
+		return range;
+	}
+
+	public int getScore() {
+		
+		return score;
+	}
+
+	public int getRuleId() {
+		
+		return ruleId;
+	}
+	
+	public String getName() {
+		
+		return Tokens.getTokenName(id);
+	}
+	
+	public String getDescription() {
+				
+		return Tokens.getTokenDescription(id);
 	}
 
 	@Override
 	public String toString() {
 		
-		return String.format("%s\t\t(%d, %d)\t\t[%s]", typeID, range.start, range.end, lexem);
+		return String.format("%s [%d]\t\t(Range: %d, %d)\t\t[%s]\t(Score: %d)\t(Rule: %d)", 
+				getName(), id, range.start, range.end, value, score, ruleId);
 	}
-
-	
+		
 }
 

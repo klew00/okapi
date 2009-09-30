@@ -18,27 +18,19 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.engine;
+package net.sf.okapi.steps.tokenization.ui.tokens;
 
-import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
-import net.sf.okapi.steps.tokenization.ui.common.NameDescriptionTab;
-import net.sf.okapi.steps.tokenization.ui.locale.LanguagesAllTab;
-import net.sf.okapi.steps.tokenization.ui.tokens.TokenNamesRuleTab;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TabFolder;
 
-public abstract class AbstractRuleEditor extends AbstractParametersEditor {
+public class TokenSelectorReadOnlyPage extends TokenSelectorPage {
 
-	protected abstract Class<? extends Composite> getRuleClass();
+	public TokenSelectorReadOnlyPage(Composite parent, int style) {
+		
+		super(parent, style);
 	
-	@Override
-	protected void createPages(TabFolder pageContainer) {
-				
-		addPage("Rule", getRuleClass());
-		addPage("Languages", LanguagesAllTab.class);
-		addPage("Tokens", TokenNamesRuleTab.class);
-		addPage("Info", NameDescriptionTab.class);
+		add.dispose();
+		modify.dispose();
+		remove.dispose();
 	}
-
 
 }

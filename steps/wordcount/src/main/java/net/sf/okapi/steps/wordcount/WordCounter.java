@@ -24,7 +24,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.tokenization.Tokenizer;
-import net.sf.okapi.steps.tokenization.tokens.TokenType;
+import net.sf.okapi.steps.tokenization.tokens.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
 
@@ -39,7 +39,7 @@ public class WordCounter extends BaseCounter {
 	@Override
 	protected long doGetCount(String text, String language) {
 		
-		Tokens tokens = Tokenizer.tokenize(text, language, new String[]{TokenType.WORD});		
+		Tokens tokens = Tokenizer.tokenize(text, language, new String[]{Token.WORD});		
 		if (tokens == null) return 0;
 		
 		return tokens.size();

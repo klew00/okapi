@@ -31,7 +31,7 @@ import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
 
 public class Parameters extends LanguageAndTokenParameters {
 
-	public boolean tokenizeSource;
+	public boolean tokenizeSource; 
 	public boolean tokenizeTargets;
 		
 	@Override

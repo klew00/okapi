@@ -23,56 +23,53 @@ package net.sf.okapi.steps.tokenization.tokens;
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.lib.extra.AbstractParameters;
 
-public class TokenType extends AbstractParameters {
+public class TokenItem extends AbstractParameters {
 
-	final static public String UNKNOWN 			= "UNKNOWN";
-	final static public String WORD 			= "WORD"; 
-	final static public String PUNCTUATION 		= "PUNCTUATION";
-	final static public String WHITESPACE 		= "WHITESPACE";
-	final static public String DATE 			= "DATE";
-	final static public String NUMBER 			= "NUMBER";
-	final static public String CURRENCY 		= "CURRENCY";
-	final static public String NAME 			= "NAME";
-	final static public String EMAIL 			= "EMAIL";
-	final static public String INTERNET 		= "INTERNET";
-	final static public String ABBREVIATION 	= "ABBREVIATION";
+	private String name;
+	private String description;
 	
-//-------------------------------------------------------------------------------------------------
-	
-	public String id;
-	public String description;
-	
-	public TokenType() {
+	public TokenItem() {
 		
 		super();
 	}
-	
-	public TokenType(String id, String description) {
+
+	public TokenItem(String name, String description) {
 		
 		super();
 		
-		this.id = id;
+		this.name = name;
 		this.description = description;
 	}
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 		
-		id = buffer.getString("id");
+		name = buffer.getString("name");
 		description = buffer.getString("description");
 	}
 	
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		
-		buffer.setString("id", id);
+		buffer.setString("name", name);
 		buffer.setString("description", description);
 	}
 
 	@Override
 	protected void parameters_reset() {
 		
-		id = "";
+		name = "";
 		description = "";
 	}
+
+	public String getName() {
+		
+		return name;
+	}
+
+	public String getDescription() {
+		
+		return description;
+	}
+
 }
