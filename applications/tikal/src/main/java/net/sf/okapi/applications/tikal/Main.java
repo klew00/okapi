@@ -62,6 +62,7 @@ import net.sf.okapi.steps.formatconversion.Parameters;
 import net.sf.okapi.steps.formatconversion.TableFilterWriterParameters;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
+import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
@@ -96,12 +97,14 @@ public class Main {
 	protected String query;
 	protected boolean useGoogle;
 	protected boolean useOpenTran;
-	protected boolean useTT;
-	protected String ttParams;
-	protected boolean useMM;
-	protected boolean usePen;
-	protected String mmParams;
-	protected String penDir;
+	protected boolean useTransToolkit;
+	protected String transToolkitParams;
+	protected boolean useGlobalSight;
+	protected String globalSightParams;
+	protected boolean useMyMemory;
+	protected String myMemoryParams;
+	protected boolean usePensieve;
+	protected String pensieveDir;
 	protected boolean genericOutput = false;
 	protected String tableConvFormat;
 	protected String tableConvCodes;
@@ -228,7 +231,7 @@ public class Main {
 				}
 				else if ( arg.equals("-imp") ) {
 					prog.command = CMD_CONV2PEN;
-					prog.penDir = prog.getArgument(args, ++i);
+					prog.pensieveDir = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
@@ -253,16 +256,20 @@ public class Main {
 					prog.useOpenTran = true;
 				}
 				else if ( arg.equals("-tt") ) {
-					prog.useTT = true;
-					prog.ttParams = prog.getArgument(args, ++i);
+					prog.useTransToolkit = true;
+					prog.transToolkitParams = prog.getArgument(args, ++i);
+				}
+				else if ( arg.equals("-gs") ) {
+					prog.useGlobalSight = true;
+					prog.globalSightParams = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-mm") ) {
-					prog.useMM = true;
-					prog.mmParams = prog.getArgument(args, ++i);
+					prog.useMyMemory = true;
+					prog.myMemoryParams = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-pen") ) {
-					prog.usePen = true;
-					prog.penDir = prog.getArgument(args, ++i);
+					prog.usePensieve = true;
+					prog.pensieveDir = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-listconf") || arg.equals("-lfc") ) {
 					prog.showAllConfigurations();
@@ -670,7 +677,7 @@ public class Main {
 				output += ".txt";
 			}
 			else { // Pensieve
-				output = penDir;
+				output = pensieveDir;
 			}
 			URI outputURI = new File(output).toURI();
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
@@ -735,13 +742,13 @@ public class Main {
 		ps.println("Extract a file to XLIFF (and optionally segment and pre-translate):");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg [srxFile]]");
-		ps.println("      [-tt hostname[:port]|-mm key|-pen tmDirectory|-google]");
+		ps.println("      [-tt hostname[:port]|-mm key|-pen tmDirectory|-google|-gs configFile]");
 		ps.println("Merge an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl sourceLang] [-tl targetLang]");
 		ps.println("Query translation resources:");
 		ps.println("   -q \"source text\" [-sl sourceLang] [-tl targetLang] [-google] [-opentran]");
-		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory]");
+		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
 		ps.println("Conversion to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic] [-trgsource|-trgempty]");
@@ -760,7 +767,8 @@ public class Main {
 	private void displayQuery (IQuery conn) {
 		int count;
 		if ( conn.getClass().getName().endsWith("PensieveTMConnector")
-			|| conn.getClass().getName().endsWith("GoogleMTConnector") ) {
+			|| conn.getClass().getName().endsWith("GoogleMTConnector")
+			|| conn.getClass().getName().endsWith("GlobalSightTMConnector") ) {
 			count = conn.query(parseToTextFragment(query));
 		}
 		else { // Raw text otherwise
@@ -785,7 +793,8 @@ public class Main {
 	}
 	
 	private void processQuery () {
-		if ( !useGoogle && !useOpenTran && !useTT && !useMM && !usePen ) {
+		if ( !useGoogle && !useOpenTran && !useTransToolkit && !useMyMemory
+			&& !usePensieve && ! useGlobalSight ) {
 			useGoogle = true; // Default if none is specified
 		}
 		
@@ -798,7 +807,7 @@ public class Main {
 			displayQuery(conn);
 			conn.close();
 		}
-		if ( usePen ) {
+		if ( usePensieve ) {
 			conn = new PensieveTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
@@ -806,7 +815,7 @@ public class Main {
 			displayQuery(conn);
 			conn.close();
 		}
-		if ( useTT ) {
+		if ( useTransToolkit ) {
 			conn = new TranslateToolkitTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
@@ -814,7 +823,15 @@ public class Main {
 			displayQuery(conn);
 			conn.close();
 		}
-		if ( useMM ) {
+		if ( useGlobalSight ) {
+			conn = new GlobalSightTMConnector();
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
+			conn.setLanguages(srcLang, trgLang);
+			conn.open();
+			displayQuery(conn);
+			conn.close();
+		}
+		if ( useMyMemory ) {
 			conn = new MyMemoryTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
@@ -858,7 +875,7 @@ public class Main {
 		}
 		else if ( command == CMD_CONV2PEN ) {
 			params.setOutputFormat(Parameters.FORMAT_PENSIEVE);
-			params.setOutputPath(penDir);
+			params.setOutputPath(pensieveDir);
 		}
 		
 		params.setSingleOutput(command==CMD_CONV2PEN);
@@ -903,17 +920,17 @@ public class Main {
 		}
 		
 		// Add leveraging step if requested
-		if ( useGoogle || useTT || useMM || usePen ) {
+		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve ) {
 			LeveragingStep levStep = new LeveragingStep();
 			net.sf.okapi.steps.leveraging.Parameters levParams
 				= (net.sf.okapi.steps.leveraging.Parameters)levStep.getParameters();
-			if ( usePen ) {
+			if ( usePensieve ) {
 				levParams.setResourceClassName(PensieveTMConnector.class.getName());
 			}
-			else if ( useTT ) {
+			else if ( useTransToolkit ) {
 				levParams.setResourceClassName(TranslateToolkitTMConnector.class.getName());
 			}
-			else if ( useMM ) {
+			else if ( useMyMemory ) {
 				levParams.setResourceClassName(MyMemoryTMConnector.class.getName());
 			}
 			else if ( useGoogle ) {
@@ -947,7 +964,7 @@ public class Main {
 		if ( connectorClassName.equals(PensieveTMConnector.class.getName()) ) {
 			net.sf.okapi.connectors.pensieve.Parameters params
 				= new net.sf.okapi.connectors.pensieve.Parameters();
-			params.setDbDirectory(penDir);
+			params.setDbDirectory(pensieveDir);
 			return params;
 		}
 
@@ -955,13 +972,13 @@ public class Main {
 			net.sf.okapi.connectors.translatetoolkit.Parameters params
 				= new net.sf.okapi.connectors.translatetoolkit.Parameters();
 			// Parse the parameters hostname:port
-			int n = ttParams.lastIndexOf(':');
+			int n = transToolkitParams.lastIndexOf(':');
 			if ( n == -1 ) {
-				params.setHost(ttParams);
+				params.setHost(transToolkitParams);
 			}
 			else {
-				params.setPort(Integer.valueOf(ttParams.substring(n+1)));
-				params.setHost(ttParams.substring(0, n));
+				params.setPort(Integer.valueOf(transToolkitParams.substring(n+1)));
+				params.setHost(transToolkitParams.substring(0, n));
 			}
 			return params;
 		}
@@ -969,7 +986,15 @@ public class Main {
 		if ( connectorClassName.equals(MyMemoryTMConnector.class.getName()) ) {
 			net.sf.okapi.connectors.mymemory.Parameters params
 				= new net.sf.okapi.connectors.mymemory.Parameters();
-			params.setKey(mmParams);
+			params.setKey(myMemoryParams);
+			return params;
+		}
+		
+		if ( connectorClassName.equals(GlobalSightTMConnector.class.getName()) ) {
+			net.sf.okapi.connectors.globalsight.Parameters params
+				= new net.sf.okapi.connectors.globalsight.Parameters();
+			URI paramURI = (new File(globalSightParams).toURI());
+			params.load(paramURI, false);
 			return params;
 		}
 		
