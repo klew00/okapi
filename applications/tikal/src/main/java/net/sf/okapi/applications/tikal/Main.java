@@ -920,7 +920,7 @@ public class Main {
 		}
 		
 		// Add leveraging step if requested
-		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve ) {
+		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve || useGlobalSight ) {
 			LeveragingStep levStep = new LeveragingStep();
 			net.sf.okapi.steps.leveraging.Parameters levParams
 				= (net.sf.okapi.steps.leveraging.Parameters)levStep.getParameters();
@@ -936,6 +936,9 @@ public class Main {
 			else if ( useGoogle ) {
 				levParams.setResourceClassName(GoogleMTConnector.class.getName());
 			}
+			else if ( useGlobalSight ) {
+				levParams.setResourceClassName(GlobalSightTMConnector.class.getName());
+			}
 			IParameters p = prepareConnectorParameters(levParams.getResourceClassName());
 			if ( p != null ) levParams.setResourceParameters(p.toString());
 			driver.addStep(levStep);
@@ -948,7 +951,7 @@ public class Main {
 		driver.addStep(fewStep);
 
 		// Create the raw document and set the output
-		String tmp = rd.getInputURI().getPath();
+		String tmp = rd.getInputURI().getRawPath();
 		// If the input is a directory, it ends with a separator, then we remove it
 		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
 			tmp = tmp.substring(0, tmp.length()-1);
