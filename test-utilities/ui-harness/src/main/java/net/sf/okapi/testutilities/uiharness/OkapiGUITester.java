@@ -75,6 +75,7 @@ public class OkapiGUITester {
 			net.sf.okapi.filters.ts.ui.Editor.class.getName(),
 			
 			// steps
+			net.sf.okapi.steps.tokenization.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.bomconversion.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.encodingconversion.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.fullwidthconversion.ui.ParametersEditor.class.getName(),
