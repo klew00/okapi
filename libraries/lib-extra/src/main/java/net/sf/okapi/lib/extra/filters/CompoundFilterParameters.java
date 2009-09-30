@@ -195,10 +195,8 @@ public class CompoundFilterParameters extends AbstractParameters {
 		setActiveParameters(getParametersClassName());
 				
 		// Load active parameters
-		if (activeParameters != null) {			
-			//activeParameters.fromString(data);
-			activeParameters.fromString(buffer.toString());
-		}
+		if (activeParameters != null)			
+			activeParameters.fromString(getData());
 		
 		if (owner != null) // activeParameters.getClass()
 		owner.exec(this, Notification.PARAMETERS_CHANGED, parametersClass);
