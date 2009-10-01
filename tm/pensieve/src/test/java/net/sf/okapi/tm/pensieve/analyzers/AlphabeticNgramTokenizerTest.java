@@ -18,10 +18,6 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sf.okapi.tm.pensieve.analyzers;
 
 import java.io.Reader;

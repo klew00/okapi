@@ -150,7 +150,7 @@ public class PensieveSeekerTest {
     public void searchHandleIOException() throws IOException {
         PensieveSeeker spy = spy(seeker);
         doThrow(new IOException("some exception")).when(spy).getIndexSearcher();
-        spy.search(1, new PhraseQuery(), null);
+        spy.search(1, new PhraseQuery(), null, null);
     }
 
     @Test
@@ -375,6 +375,7 @@ public class PensieveSeekerTest {
 
         //Verify sort order
         Float previous = tmhits.get(0).getScore();
+
         for (int i = 1; i < tmhits.size(); i++) {
             Float currentScore = tmhits.get(i).getScore();
             assertEquals(i + " match", testStrings[i], tmhits.get(i).getTu().getSource().getContent().toString());
