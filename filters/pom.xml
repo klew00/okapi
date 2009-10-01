@@ -26,6 +26,7 @@
         <module>plaintext-ui</module>
         <module>po</module>
         <module>po-ui</module>
+        <module>php</module>
         <module>properties</module>
         <module>properties-ui</module>
         <module>regex</module>
