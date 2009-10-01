@@ -293,7 +293,7 @@ public class XMLFilterTest {
 	}
 
 	@Test
-	public void testOutputWhitespaces_Preserve () {
+	public void testOutputWhitespacesPreserve () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>part 1\npart 2</p>"
 			+ "<p xml:space=\"preserve\">part 1\npart 2</p></doc>";
@@ -304,11 +304,24 @@ public class XMLFilterTest {
 	}
 	
 	@Test
-	public void testOutputWhitespaces_Default () {
+	public void testOutputWhitespacesDefault () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<p>part 1\npart 2\n  part3\n\t part4</p>";
 		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<p>part 1 part 2 part3 part4</p>";
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
+	public void testOutputWhitespacesITS () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\" xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
+			+ "<its:translateRule itsx:whiteSpaces=\"preserve\" selector=\"//pre\" translate=\"yes\"/></its:rules>"
+			+ "<p>[  \t]</p><pre>[  \t]</pre></doc>";
+		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\" xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
+			+ "<its:translateRule itsx:whiteSpaces=\"preserve\" selector=\"//pre\" translate=\"yes\"/></its:rules>"
+			+ "<p>[ ]</p><pre>[  \t]</pre></doc>";
 		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
@@ -366,6 +379,7 @@ public class XMLFilterTest {
 		list.add(new InputDocument(root+"TestCDATA1.xml", null));
 		list.add(new InputDocument(root+"test07.xml", null));
 		list.add(new InputDocument(root+"test08_utf8nobom.xml", null));
+		list.add(new InputDocument(root+"test09.xml", null));
 
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));

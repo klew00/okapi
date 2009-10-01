@@ -267,7 +267,7 @@ public class TikalTest {
     	assertTrue(deleteOutputFile("srttest.out.srt"));
     	// Extract
     	assertEquals(0, runTikal("-x srttest.srt")); // Auto-assign okf_regex-srt
-    	assertTrue("File different from gold", compareWithGoldFile("resxtest.resx.xlf", "UTF-8"));
+    	assertTrue("File different from gold", compareWithGoldFile("srttest.srt.xlf", "UTF-8"));
     	// Merge
     	assertEquals(0, runTikal("-m srttest.srt.xlf -ie UTF-8")); // Auto-assign okf_regex-srt
     	assertTrue("File different from gold", compareWithGoldFile("srttest.out.srt", "UTF-8"));

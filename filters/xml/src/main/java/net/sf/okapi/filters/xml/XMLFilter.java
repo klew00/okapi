@@ -708,9 +708,9 @@ public class XMLFilter implements IFilter {
 	}
 
 	//TODO: use sub-filter to extract a content
-	private void processSubContent () {
-		// The variable frag contains the content
-		
-	}
+//	private void processSubContent () {
+//		// The variable frag contains the content
+//		
+//	}
 
 }

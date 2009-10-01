@@ -23,7 +23,7 @@ public class Main {
 
 	public static void main (String[] args) {
 		try {
-			System.out.println("ITSTest version 1.6");
+			System.out.println("ITSTest version 1.7");
 			
 			File inputFile;
 			if ( args.length > 0 ) inputFile = new File(args[0]);
@@ -47,9 +47,7 @@ public class Main {
 			Document doc = fact.newDocumentBuilder().parse(inputFile);
 			ITraversal trav = applyITSRules(doc, inputFile, rulesFile);
 			
-			// Process the document:
-			// Adds "+ TRANSLATION" too all elements that are translatable and have text
-			// and to translatable attribute values.
+			// Process the document
 			trav.startTraversal();
 			Node node;
 			while ( (node = trav.nextNode()) != null ) {
@@ -80,8 +78,10 @@ public class Main {
 						}
 						// Show the language
 						element.appendChild(doc.createTextNode(" + lang="+ trav.getLanguage()));
-						// Show the idPointer
+						// Show idPointer
 						element.appendChild(doc.createTextNode(" + idPointer="+ trav.getIdPointer()));
+						// Show white spaces
+						element.appendChild(doc.createTextNode(" + ws="+ (trav.preserveWS() ? "preserve" : "default")));
 					}
 					break;
 				}

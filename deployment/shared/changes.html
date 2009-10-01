@@ -21,6 +21,8 @@ release (M4) and the previous one (M3)</p>
 	<li>The JSON Filter has been added, to support for example AJAX or Palm 
 	WebOS applications.</li>
 	<li>Added default DITA configuration to the XML Filter.</li>
+	<li>Fixed several issues with the TS and Table filters.</li>
+	<li>Added whiteSpaces ITS extension support in the XML Filter.</li>
 </ul>
 	</li>
 	<li>Translation resources:<ul>
@@ -29,6 +31,8 @@ release (M4) and the previous one (M3)</p>
 		<li>Modified the OpenTran connector to use the REST interface instead of 
 		RCP.</li>
 		<li>Added the connector to the MyMemory server (<a href="http://mymemory.translated.net/">http://mymemory.translated.net</a>)</li>
+		<li>Improved Google and GlobalSight connectors.</li>
+		<li>Added connector for Pensieve TMs.</li>
 	</ul>
 	</li>
 	<li>Steps and utilities:<ul>
@@ -41,6 +45,7 @@ release (M4) and the previous one (M3)</p>
 		for the pre-translation options.</li>
 		<li>Updated the <cite>Text Rewriting</cite> utility to select from 
 		several resources for the translation options.</li>
+		<li>Added the FormatConversion step.</li>
 	</ul>
 	</li>
 	<li>Tikal:<ul>
@@ -51,8 +56,11 @@ release (M4) and the previous one (M3)</p>
 	option).</li>
 	<li>Added a command to create TMX files from any input (<code>-2tmx</code> 
 	option).</li>
-	<li>Added capability to query a Pensieve TM (<code>-ps</code> option with
-	<code>-q</code> command).</li>
+	<li>Added a command to create Table files from any input (<code>-2tbl</code> 
+	option).</li>
+	<li>Added capability to query a Pensieve TM (<code>-pen</code> option).</li>
+	<li>Added support for GlobalSight TM access (<code>-gs</code> option).</li>
+	<li>Added segmentation and leveraging options for the extraction command.</li>
 </ul>
 	</li>
 </ul>

@@ -10,6 +10,7 @@ class ITSRule {
 	String info;
 	int infoType;
 	String idPointer;
+	boolean preserveWS;
 
 	public ITSRule (int type) {
 		ruleType = type;

@@ -49,6 +49,10 @@
 <source xml:lang="en">text for p again</source>
 <target xml:lang="fr">text for p again</target>
 </trans-unit>
+<trans-unit id="13" xml:space="preserve">
+<source xml:lang="en">Text with ws [  		] <g id="1">and more [  		]</g> after</source>
+<target xml:lang="fr">Text with ws [  		] <g id="1">and more [  		]</g> after</target>
+</trans-unit>
 </body>
 </file>
 </xliff>

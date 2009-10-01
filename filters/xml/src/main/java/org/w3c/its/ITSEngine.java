@@ -283,6 +283,14 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( value.length() > 0 ) {
 			rule.idPointer = value;
 		}
+		
+		value = elem.getAttributeNS(ITSX_NS_URI, "whiteSpaces");
+		if ( value.length() > 0 ) {
+			if ( "preserve".equals(value) ) rule.preserveWS = true;
+			else if ( "default".equals(value) ) rule.preserveWS = false;
+			else throw new ITSException("Invalid value for 'witheSpaces'.");
+		}
+		
 		rules.add(rule);
 	}
 
@@ -619,6 +627,7 @@ public class ITSEngine implements IProcessor, ITraversal
 						if ( rule.idPointer != null ) {
 							setFlag(NL.item(i), FP_IDPOINTER_DATA, resolvePointer(NL.item(i), rule.idPointer), true);							
 						}
+						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
 						break;
 					case IProcessor.DC_DIRECTIONALITY:
 						setFlag(NL.item(i), FP_DIRECTIONALITY,
@@ -789,7 +798,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				// Validate the value
 				String value = attr.getValue();
 				if (( !"preserve".equals(value) ) && ( !"default".equals(value) )) {
-					throw new ITSException("Invalid value for 'xml;space'.");
+					throw new ITSException("Invalid value for 'xml:space'.");
 				}
 				// Set the flag
 				setFlag(attr.getOwnerElement(), FP_PRESERVEWS,
