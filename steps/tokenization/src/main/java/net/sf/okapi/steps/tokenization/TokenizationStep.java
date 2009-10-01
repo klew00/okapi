@@ -45,7 +45,7 @@ public class TokenizationStep extends CompoundStep {
 		if (structureParams == null) return;
 		
 		super.setParameters(structureParams);
-		structureParams.loadFromResource(this.getClass(), "okf_tokenizers.fprm");
+		structureParams.loadFromResource(this.getClass(), "tokenizers.tprm");
 				
 		setParameters(new Parameters());
 	}

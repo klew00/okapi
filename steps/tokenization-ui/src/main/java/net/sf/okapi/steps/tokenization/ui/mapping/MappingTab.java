@@ -185,7 +185,7 @@ public class MappingTab extends Composite implements IDialogPage {
 			
 			Parameters params = (Parameters) data;
 
-			if (!params.loadFromResource("okf_mapper.fprm")) return false;
+			if (!params.loadFromResource("mapper.tprm")) return false;
 			
 			adapter.clear();
 			
@@ -210,7 +210,7 @@ public class MappingTab extends Composite implements IDialogPage {
 				params.addMapping(adapter.getValue(i, 1), adapter.getValue(i, 2));
 			
 			if (modified)
-				params.saveToResource("okf_mapper.fprm");
+				params.saveToResource("mapper.tprm");
 			
 			modified = false;
 		}

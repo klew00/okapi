@@ -41,8 +41,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 
-public class LanguageListPage extends Composite implements IDialogPage {
-	private Label lblChooseOneOr;
+public class LanguageSelectorPage extends Composite implements IDialogPage {
+	protected Label listDescr;
 	private Table table;
 	private TableColumn col1;
 	private TableColumn col2;
@@ -54,15 +54,22 @@ public class LanguageListPage extends Composite implements IDialogPage {
 	 * @param parent
 	 * @param style
 	 */
-	public LanguageListPage(final Composite parent, int style) {
+	public LanguageSelectorPage(final Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(1, false));
 		
-		lblChooseOneOr = new Label(this, SWT.NONE);
-		lblChooseOneOr.setData("name", "lblChooseOneOr");
-		lblChooseOneOr.setText("Choose one or more languages from the table below (Ctrl+click, Ctrl+Shift+click for multiple selection):");
+		listDescr = new Label(this, SWT.NONE);
+		listDescr.setData("name", "listDescr");
+		listDescr.setText("The program displays installed languages and their codes.");
 		
-		table = new Table(this, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+		table = new Table(this, SWT.BORDER | SWT.FULL_SELECTION);
+		// Recreate table, SWT Designer cannot handle *else* here
+		if (hasCheckBoxes()) {
+			
+			table.dispose(); //!!! Otherwise layout gets broken
+			table = new Table(this, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
+		}
+				
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
@@ -106,6 +113,11 @@ public class LanguageListPage extends Composite implements IDialogPage {
 		adapter.setRelColumnWidths(new double [] {6, 1.25, 1.25});
 	}
 
+	protected boolean hasCheckBoxes() {
+
+		return false;
+	}
+
 	public boolean canClose(boolean isOK) {
 		// TODO Auto-generated method stub
 		return true;
@@ -116,6 +128,7 @@ public class LanguageListPage extends Composite implements IDialogPage {
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean load(Object data) {
 				
 //		list.setItems(LanguageList.getLanguages());
@@ -130,18 +143,35 @@ public class LanguageListPage extends Composite implements IDialogPage {
 			adapter.addRow(new String[] {languages[i], codes[i], codes2[i]}, false);
 		}
 		
+		adapter.sort(1, false);
+		
+		if (data instanceof ArrayList<?>) {
+			
+			ArrayList<String> list = (ArrayList<String>) data;
+			
+			for (String string : list) {
+				
+				TableItem item = adapter.findValue(string, 2);
+				if (item == null) continue;
+				
+				item.setChecked(true);
+			}
+		}
+		
 		return true;
 	}
 
 	@SuppressWarnings("unchecked")
 	public boolean save(Object data) {
 		
-		if (data instanceof ArrayList) {
+		if (data instanceof ArrayList<?>) {
 		
 			ArrayList<String> list = (ArrayList<String>) data;
 			
-			for (TableItem item : table.getSelection())			
-				list.add(item.getText(1));
+			list.clear();
+			for (TableItem item : table.getItems())
+				if (item.getChecked())
+					list.add(item.getText(1));
 		}
 				
 		return true;

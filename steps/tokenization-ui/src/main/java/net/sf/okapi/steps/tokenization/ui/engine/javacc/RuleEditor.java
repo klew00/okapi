@@ -18,54 +18,39 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.locale;
+package net.sf.okapi.steps.tokenization.ui.engine.javacc;
 
-import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Widget;
 
-public class LanguagesAllTab extends LanguagesTab implements IDialogPage {
-	private Button all;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.steps.tokenization.engine.rbbi.Rule;
+import net.sf.okapi.steps.tokenization.ui.engine.AbstractRuleEditor;
 
-	public LanguagesAllTab(Composite parent, int style) {
+public class RuleEditor extends AbstractRuleEditor {
+
+	@Override
+	protected Class<? extends Composite> getRuleClass() {
 		
-		super(parent, style);
-		
-		all = new Button(this, SWT.RADIO);
-		all.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		all.setData("name", "all");
-		all.setText("All languages");
-		new Label(this, SWT.NONE);
+		return RuleTab.class;
 	}
 
 	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
-	}
-
-	public boolean canClose(boolean isOK) {
-
-		return true;
-	}
-
-	public void interop(Widget speaker) {
-		// TODO Auto-generated method stub
+	public IParameters createParameters() {
 		
+		return new Rule();
 	}
 
-	public boolean load(Object data) {
-
-		return true;
+	@Override
+	protected String getCaption() {
+		
+		return "JavaCC-based tokenization rule";
 	}
 
-	public boolean save(Object data) {
-
-		return true;
+	@Override
+	protected void interop(Widget speaker) {
+		
+		
 	}
 
 }

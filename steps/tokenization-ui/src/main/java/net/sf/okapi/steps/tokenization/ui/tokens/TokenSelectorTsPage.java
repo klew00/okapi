@@ -20,7 +20,12 @@
 
 package net.sf.okapi.steps.tokenization.ui.tokens;
 
+import java.util.List;
+
 import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
+import net.sf.okapi.common.ui.abstracteditor.TableAdapter;
+import net.sf.okapi.steps.tokenization.tokens.Parameters;
+import net.sf.okapi.steps.tokenization.tokens.TokenItem;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -31,6 +36,26 @@ public class TokenSelectorTsPage extends TokenSelectorPage {
 		super(parent, style);
 	
 		SWTUtil.setText(listDescr, "This program lets you configure the global set of tokens.");
+	}
+
+	@Override
+	public boolean save(Object data) {
+		
+		if (super.save(data)) {
+			
+			Parameters params = new Parameters();
+			if (params == null) return false;
+			
+			TableAdapter adapter = getAdapter();
+			List<TokenItem> items = params.getItems();
+			
+			for (int i = 0; i < adapter.getNumRows(); i++)			
+				items.add(new TokenItem(adapter.getValue(i + 1, 1), adapter.getValue(i + 1, 2)));
+			
+			params.saveItems();
+		}			
+		
+		return true;
 	}
 
 }

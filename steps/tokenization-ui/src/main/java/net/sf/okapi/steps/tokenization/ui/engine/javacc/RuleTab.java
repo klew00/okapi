@@ -18,19 +18,33 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.tokens;
+package net.sf.okapi.steps.tokenization.ui.engine.javacc;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.SWT;
 
-public class TokenSelectorReadOnlyPage extends TokenSelectorPage {
+public class RuleTab extends Composite {
 
-	public TokenSelectorReadOnlyPage(Composite parent, int style) {
-		
+	/**
+	 * Create the composite.
+	 * @param parent
+	 * @param style
+	 */
+	public RuleTab(Composite parent, int style) {
 		super(parent, style);
-	
-		add.dispose();
-		modify.dispose();
-		remove.dispose();
+		setLayout(new GridLayout(1, false));
+		{
+			Label lblWordbreakiterator = new Label(this, SWT.NONE);
+			lblWordbreakiterator.setText("JavaCC");
+		}
+
+	}
+
+	@Override
+	protected void checkSubclass() {
+		// Disable the check that prevents subclassing of SWT components
 	}
 
 }

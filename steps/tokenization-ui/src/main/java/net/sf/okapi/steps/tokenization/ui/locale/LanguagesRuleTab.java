@@ -31,7 +31,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Widget;
 
-public class LanguagesTab extends Composite implements IDialogPage {
+public class LanguagesRuleTab extends Composite implements IDialogPage {
+	private Button all;
 	private Button except;
 	private List listW;
 	private Button addB;
@@ -46,9 +47,15 @@ public class LanguagesTab extends Composite implements IDialogPage {
 	 * @param parent
 	 * @param style
 	 */
-	public LanguagesTab(Composite parent, int style) {
+	public LanguagesRuleTab(Composite parent, int style) {
 		super(parent, style);
 		setLayout(new GridLayout(3, false));
+		
+		all = new Button(this, SWT.RADIO);
+		all.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+		all.setData("name", "all");
+		all.setText("All languages");
+		new Label(this, SWT.NONE);
 		
 		only = new Button(this, SWT.RADIO);
 		only.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));

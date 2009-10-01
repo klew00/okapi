@@ -99,7 +99,7 @@ public class Parameters extends AbstractParameters {
 //	public boolean loadMapping() {
 //		
 //		try {
-//			load(getClass().getResource("okf_mapper.fprm").toURI(), false);
+//			load(getClass().getResource("mapper.tprm").toURI(), false);
 //						
 //		} catch (URISyntaxException e) {
 //			
@@ -111,7 +111,7 @@ public class Parameters extends AbstractParameters {
 //	
 //	public void saveMapping() {
 //		
-//		save(getClass().getResource("okf_mapper.fprm").getPath());
+//		save(getClass().getResource("mapper.tprm").getPath());
 //	}
 	
 }

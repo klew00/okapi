@@ -22,7 +22,7 @@ package net.sf.okapi.steps.tokenization.ui.engine;
 
 import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
 import net.sf.okapi.steps.tokenization.ui.common.NameDescriptionTab;
-import net.sf.okapi.steps.tokenization.ui.locale.LanguagesAllTab;
+import net.sf.okapi.steps.tokenization.ui.locale.LanguagesRuleTab;
 import net.sf.okapi.steps.tokenization.ui.tokens.TokenNamesRuleTab;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
@@ -35,7 +35,7 @@ public abstract class AbstractRuleEditor extends AbstractParametersEditor {
 	protected void createPages(TabFolder pageContainer) {
 				
 		addPage("Rule", getRuleClass());
-		addPage("Languages", LanguagesAllTab.class);
+		addPage("Languages", LanguagesRuleTab.class);
 		addPage("Tokens", TokenNamesRuleTab.class);
 		addPage("Info", NameDescriptionTab.class);
 	}

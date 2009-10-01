@@ -20,12 +20,12 @@
 
 package net.sf.okapi.steps.tokenization.ui.locale;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Shell;
-
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
+
+import org.eclipse.swt.widgets.Shell;
 
 public class LanguageSelector {
 
@@ -36,15 +36,15 @@ public class LanguageSelector {
 
 	public static String[] select() {
 		
-		return select(null); 
+		return select(null, LanguageSelectorPage.class, null); 
 	}
 	
-	public static String[] select(Shell parent) {
+	public static String[] select(Shell parent, Class<? extends LanguageSelectorPage> classRef, String initialData) {
 		
 		InputQueryDialog dlg = new InputQueryDialog();
-		List<String> list = new ArrayList<String>();
+		List<String> list = ListUtil.stringAsList(initialData);
 		
-		dlg.run(parent, LanguageListPage.class, "Languages", "", list, null);
+		dlg.run(parent, classRef, "Languages", "", list, null);
 			
 		return list.toArray(new String[] {}); 
 	}

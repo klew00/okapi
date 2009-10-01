@@ -402,6 +402,12 @@ public class TableAdapter {
 		return table.getColumnCount();
 	}
 
+	/**
+	 * 
+	 * @param rowNum 1-based
+	 * @param colNum 1-based
+	 * @return
+	 */
 	public String getValue(int rowNum, int colNum) {
 		
 		if (!SWTUtil.checkRowIndex(table, rowNum - 1)) return "";

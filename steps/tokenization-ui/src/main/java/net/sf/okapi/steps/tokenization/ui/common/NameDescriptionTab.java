@@ -64,7 +64,10 @@ public class NameDescriptionTab extends Composite implements IDialogPage {
 			}
 			{
 				text_1 = new Text(grpGeneral, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
-				text_1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+				GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+				gridData.widthHint = 400;
+				gridData.heightHint = 100;
+				text_1.setLayoutData(gridData);
 			}
 		}
 		{

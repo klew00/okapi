@@ -56,12 +56,12 @@ public class Parameters extends AbstractParameters {
 
 	public boolean loadItems() {
 		
-		return loadFromResource("okf_tokens.fprm");
+		return loadFromResource("tokens.tprm");
 	}
 	
 	public void saveItems() {
 		
-		saveToResource("okf_tokens.fprm");
+		saveToResource("tokens.tprm");
 	}
 
 //	protected int generateId() {

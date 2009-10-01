@@ -49,7 +49,7 @@ public class LanguagesPage extends AbstractListAddRemoveTab {
 	@Override
 	protected void actionAdd(int afterIndex) {
 		
-		String[] res = LanguageSelector.select(getShell());
+		String[] res = LanguageSelector.select(getShell(), LanguageSelectorPePage.class, "EN-US,RU-RU");
 		
 		for (int i = 0; i < res.length; i++) {
 			

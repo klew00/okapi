@@ -1,5 +1,4 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -68,11 +67,25 @@ public class TokenSelectorPage extends Composite implements IDialogPage {
 
 		listDescr = new Label(this, SWT.NONE);
 		listDescr.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		listDescr.setText("Choose one or more tokens from the table below (Ctrl+click, Ctrl+Shift+click for multiple selection):");
+		listDescr.setText("Select tokens in the table below using the check-boxes:");
 		listDescr.setData("name", "listDescr");
 		
+		table = new Table(this, SWT.BORDER | SWT.FULL_SELECTION);
 		
-		table = new Table(this, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+		// Recreate table, SWT Designer cannot handle *else* here
+		if (hasCheckBoxes()) {
+			
+			table.dispose(); //!!! Otherwise layout gets broken
+			table = new Table(this, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
+		}
+					
+		table.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				interop(e.widget);
+			}
+		});
+		
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent e) {
 				
@@ -87,7 +100,7 @@ public class TokenSelectorPage extends Composite implements IDialogPage {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		
-		colName = new TableColumn(table, SWT.LEFT);
+		colName = new TableColumn(table, SWT.NONE);
 		colName.setData("name", "colName");
 		colName.setWidth(150);
 		colName.setText("Name");
@@ -136,7 +149,12 @@ public class TokenSelectorPage extends Composite implements IDialogPage {
 		
 		adapter = new TableAdapter(table);
 		new Label(this, SWT.NONE);
-		adapter.setRelColumnWidths(new double [] {1, 3});
+		adapter.setRelColumnWidths(new double [] {1, 3});		
+	}
+
+	protected boolean hasCheckBoxes() {
+
+		return false;
 	}
 
 	protected void addModifyRow(TableItem item) {
@@ -190,6 +208,7 @@ public class TokenSelectorPage extends Composite implements IDialogPage {
 			remove.setEnabled(modify.getEnabled());
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean load(Object data) {
 
 //		if (data == null) {
@@ -211,26 +230,45 @@ public class TokenSelectorPage extends Composite implements IDialogPage {
 			adapter.clear();
 			
 			for (TokenItem item : params.getItems())					
-				adapter.addRow(new String[] {item.getName(), item.getDescription()});
+				adapter.addRow(new String[] {item.getName(), item.getDescription()}, false);
 
 			adapter.sort(1, false);
 			modified = false;				
 		
+			if (data instanceof ArrayList<?>) {
+				
+				ArrayList<String> list = (ArrayList<String>) data;
+				
+				for (String string : list) {
+					
+					TableItem item = adapter.findValue(string, 1);
+					if (item == null) continue;
+					
+					item.setChecked(true);
+				}
+			}
+			
 		return true;
 	}
 
 	@SuppressWarnings("unchecked")
 	public boolean save(Object data) {
 		
-		if (data instanceof ArrayList) {
+		if (data instanceof ArrayList<?>) {
 			
 			ArrayList<String> list = (ArrayList<String>) data;
 			
-			for (TableItem item : table.getSelection())			
-				list.add(item.getText(0));
+			list.clear();
+			for (TableItem item : table.getItems())
+				if (item.getChecked())
+					list.add(item.getText(0));
 		}
 
 		return true;
 	}
 
+	protected TableAdapter getAdapter() {
+		
+		return adapter;
+	}
 }

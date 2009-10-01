@@ -37,7 +37,7 @@ public class TokenNamesPage extends AbstractListAddRemoveTab {
 	@Override
 	protected void actionAdd(int afterIndex) {
 		
-		String[] res = TokenSelector.select(getShell(), true, true);
+		String[] res = TokenSelector.select(getShell(), TokenSelectorPePage.class, "WORD,NUMBER");
 		
 		for (int i = 0; i < res.length; i++) {
 			
