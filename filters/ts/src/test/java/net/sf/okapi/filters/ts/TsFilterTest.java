@@ -34,10 +34,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Event;
+
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.filters.ts.TsFilter;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,7 +52,7 @@ public class TsFilterTest {
 	private TsFilter filter;
 	private FilterTestDriver testDriver;
 	
-	String simpleSnippet = "<TS><context><name>AlarmAddLogDlg</name><message><source>Add Entry To System Log</source><translation type=\"unfinished\">Add Entry To System Log</translation></message></context></TS>";
+	String simpleSnippet = "<TS><context><name>AlarmAddLogDlg</name><message><source>Add Entry To System Log</source><translation type=\"unfinished\">Lagg till i system Loggen</translation></message></context></TS>";
 
 	@Before
 	public void setUp() throws ParserConfigurationException, SAXException, IOException {
@@ -74,7 +76,7 @@ public class TsFilterTest {
 
 	@Test
 	public void testGetMimeType() {
-		assertEquals("text/x-ts", filter.getMimeType());
+		assertEquals("application/x-ts", filter.getMimeType());
 	}	
 	
 	//--exceptions--
@@ -119,6 +121,32 @@ public class TsFilterTest {
 		//System.out.println(FilterTestDriver.generateOutput(getEvents(simpleSnippet, "en-us","fr-fr"), simpleSnippet, "fr-fr"));
 	}	
 
+	@Test
+	public void testTu() {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, "en-us", "fr-fr"), 1);
+		assertNotNull(tu);
+		assertEquals("Add Entry To System Log", tu.getSourceContent().getCodedText());
+		assertEquals("Lagg till i system Loggen", tu.getTargetContent("fr-fr").getCodedText());
+		
+		System.out.println(tu.getId());
+		System.out.println(tu.getMimeType());
+		System.out.println(tu.getName());
+		System.out.println(tu.getType());
+		System.out.println(tu.getPropertyNames());
+		System.out.println(tu.getSkeleton());
+		System.out.println(tu.getTargetLanguages());
+		
+		tu.setTargetProperty("fr-fr", new Property(Property.APPROVED, "no", false));
+		System.out.println(tu.getTargetPropertyNames("fr-fr"));
+		/*Property prop = dp.getProperty(Property.ENCODING);
+		assertNotNull(prop);
+		assertEquals("UTF-8", prop.getValue());
+		assertFalse(prop.isReadOnly());*/
+		
+	}	
+
+	
+
 	
 	/*
 	@Test
@@ -161,7 +189,7 @@ public class TsFilterTest {
 		try {
 			filter = new TsFilter();
 			URL url = TsFilterTest.class.getResource("/TSTest01.ts");
-			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "EN-US", "FR-CA"));			
+			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "EN-US", "fr-fr"));			
 			if ( !testDriver.process(filter) ) Assert.fail();
 			//process(filter);
 			filter.close();
