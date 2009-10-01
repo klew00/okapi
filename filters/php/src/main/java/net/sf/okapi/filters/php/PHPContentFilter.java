@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,6 +49,7 @@ public class PHPContentFilter implements IFilter {
 
 	private static final String MIMETYPE = "x-application/php";
 	
+	private Parameters params;
 	private String srcLang;
 	private String lineBreak;
 	private String inputText;
@@ -56,6 +58,10 @@ public class PHPContentFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private boolean hasNext;
 	private int current;
+	
+	public PHPContentFilter () {
+		params = new Parameters();
+	}
 	
 	public void cancel () {
 		// TODO Auto-generated method stub
@@ -77,8 +83,13 @@ public class PHPContentFilter implements IFilter {
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
-		// TODO Auto-generated method stub
-		return null;
+		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
+		list.add(new FilterConfiguration(getName(),
+			MIMETYPE,
+			getClass().getName(),
+			"PHP Content Default",
+			"Default PHP Content configuration."));
+		return list;
 	}
 
 	public String getDisplayName () {
@@ -86,17 +97,15 @@ public class PHPContentFilter implements IFilter {
 	}
 
 	public String getMimeType () {
-		// TODO Auto-generated method stub
-		return null;
+		return MIMETYPE;
 	}
 
 	public String getName () {
-		return "okf_php";
+		return "okf_phpcontent";
 	}
 
 	public IParameters getParameters () {
-		// TODO Auto-generated method stub
-		return null;
+		return params;
 	}
 
 	public boolean hasNext () {
@@ -189,12 +198,15 @@ public class PHPContentFilter implements IFilter {
 	}
 
 	public void setParameters (IParameters params) {
-		// TODO Auto-generated method stub
+		this.params = (Parameters)params;
 	}
 
 	private void parse () {
 		int prevState = 0;
 		int state = 0;
+		StringBuilder buf = null;
+		StringBuilder heredocKey = null;
+		
 		while ( true ) {
 			if ( current >= inputText.length() ) {
 				// End of input
@@ -221,8 +233,12 @@ public class PHPContentFilter implements IFilter {
 						if (( inputText.charAt(current+1) == '<' ) 
 							&& ( inputText.charAt(current+1) == '<' )) {
 							// Gets the keyword
-							//TODO
+							current+=2;
+							heredocKey = new StringBuilder();
+							state = 6;
+							continue;
 						}
+						// Else: fall thru
 					}
 					// Else: not a heredoc
 					continue;
@@ -267,6 +283,24 @@ public class PHPContentFilter implements IFilter {
 				// Else: 
 				state = 4; // Go back to comment
 				current--;
+				continue;
+				
+			case 6: // after <<<, getting the heredoc key
+				if ( Character.isWhitespace(ch) ) {
+					// End of key
+					state = 7; // wait for the end of heredoc
+					continue;
+				}
+				else {
+					heredocKey.append(ch);
+				}
+				continue;
+				
+			case 7: // End of end of heredoc (linebreak+key+';' or line break)
+				if ( ch == '\n' ) {
+					//TODO
+				}
+				//TODO
 				continue;
 			}
 		}
