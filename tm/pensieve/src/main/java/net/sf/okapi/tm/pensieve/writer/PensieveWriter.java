@@ -33,7 +33,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.AlreadyClosedException;
 
 import java.io.IOException;
-import org.apache.lucene.analysis.SimpleAnalyzer;
+import java.util.Locale;
+import net.sf.okapi.tm.pensieve.analyzers.NgramAnalyzer;
 
 /**
  * Used to write, delete and update the index.
@@ -50,7 +51,7 @@ public class PensieveWriter implements ITmWriter {
      */
     public PensieveWriter(Directory indexDirectory, boolean createNewTmIndex) throws IOException {
         indexWriter = new IndexWriter(indexDirectory,
-                new SimpleAnalyzer(), createNewTmIndex,
+                new NgramAnalyzer(Locale.ENGLISH, 4), createNewTmIndex,
                 IndexWriter.MaxFieldLength.UNLIMITED);
     }
 

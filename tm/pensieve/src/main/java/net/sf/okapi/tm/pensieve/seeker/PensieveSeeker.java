@@ -54,6 +54,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import net.sf.okapi.tm.pensieve.analyzers.NgramAnalyzer;
 import org.apache.lucene.index.CorruptIndexException;
 
 /**
@@ -105,7 +107,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      * @throws OkapiIOException if the search cannot be completed do to I/O problems
      */
     public List<TmHit> searchForWords(String query, int max, Metadata metadata) {
-        QueryParser parser = new QueryParser(TranslationUnitField.SOURCE.name(), new SimpleAnalyzer());
+        QueryParser parser = new QueryParser(TranslationUnitField.SOURCE.name(), new NgramAnalyzer(Locale.ENGLISH, 4));
         Query q;
         try {
             q = parser.parse(query);

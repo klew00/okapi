@@ -50,8 +50,9 @@ public class AlphabeticNgramTokenizerTest {
     }
 
     @Test
-    public void testConstructor() throws Exception {
-        ngramTk = new AlphabeticNgramTokenizer(null, 5, Locale.CANADA);
+    public void Constructor() throws Exception {
+        Reader r = new StringReader("123456");
+        ngramTk = new AlphabeticNgramTokenizer(r, 5, Locale.CANADA);
         assertEquals("ngram length", 5, ngramTk.getNgramLength());
         assertEquals("locale", Locale.CANADA, ngramTk.getLocale());
         assertNotNull("Term Attribute should initialized", Helper.getPrivateMember(ngramTk, "termAttribute"));
@@ -60,19 +61,24 @@ public class AlphabeticNgramTokenizerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNGramLength() {
+    public void InvalidNGramLengthConstructor() {
         ngramTk = new AlphabeticNgramTokenizer(null, 0, Locale.CANADA);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void NullReaderConstructor() {
+        ngramTk = new AlphabeticNgramTokenizer(null, 10, Locale.CANADA);
+    }
+
     @Test
-    public void testIncrementToken() throws Exception {
+    public void IncrementToken() throws Exception {
         assertTrue("should have first token", ngramTk.incrementToken());
         assertTrue("should have second token", ngramTk.incrementToken());
         assertFalse("should not have third token", ngramTk.incrementToken());
     }
 
     @Test
-    public void testIncrementTokenTermValue() throws Exception {
+    public void IncrementTokenTermValue() throws Exception {
         ngramTk.incrementToken();
         assertEquals("First Token Value", "12345", getTermString());
         ngramTk.incrementToken();
@@ -82,7 +88,7 @@ public class AlphabeticNgramTokenizerTest {
     }
 
     @Test
-    public void testIncrementTokenTypeValue() throws Exception {
+    public void IncrementTokenTypeValue() throws Exception {
         ngramTk.incrementToken();
         assertEquals("First Token Type", "ngram(5)", getTypeString());
         ngramTk.incrementToken();
@@ -92,7 +98,7 @@ public class AlphabeticNgramTokenizerTest {
     }
 
     @Test
-    public void testIncrementTokenOffsetValue() throws Exception {
+    public void IncrementTokenOffsetValue() throws Exception {
 
         ngramTk.incrementToken();
         assertEquals("First Token Offset Start", 0, getOffsetStart());
@@ -106,7 +112,7 @@ public class AlphabeticNgramTokenizerTest {
     }
 
     @Test
-    public void testIncrementTokenTypeValueNoLocaleNoLowerCase() throws Exception {
+    public void IncrementTokenTypeValueNoLocaleNoLowerCase() throws Exception {
         Reader r = new StringReader("THIS SHOULD NOT BE LOWERCASE");
         ngramTk = new AlphabeticNgramTokenizer(r, 27, null);
         ngramTk.incrementToken();
@@ -114,7 +120,7 @@ public class AlphabeticNgramTokenizerTest {
     }
 
     @Test
-    public void testIncrementTokenTypeValueNonArmenianLocaleLowerCase() throws Exception {
+    public void IncrementTokenTypeValueNonArmenianLocaleLowerCase() throws Exception {
         Reader r = new StringReader("THIS SHOULD ALL BE LOWERCASE");
         ngramTk = new AlphabeticNgramTokenizer(r, 27, Locale.CANADA);
         ngramTk.incrementToken();
@@ -122,7 +128,7 @@ public class AlphabeticNgramTokenizerTest {
     }
 
     @Test
-    public void testIncrementTokenTypeValueArmenianLocaleNoLowerCase() throws Exception {
+    public void IncrementTokenTypeValueArmenianLocaleNoLowerCase() throws Exception {
         Reader r = new StringReader("THIS SHOULD NOT BE LOWERCASE");
         ngramTk = new AlphabeticNgramTokenizer(r, 27, new Locale("hy"));
         ngramTk.incrementToken();
@@ -134,7 +140,7 @@ public class AlphabeticNgramTokenizerTest {
     }
 
     @Test
-    public void testResetNewReader() throws Exception {
+    public void ResetNewReader() throws Exception {
         ngramTk.incrementToken();
         ngramTk.incrementToken();
         Reader r = new StringReader("Holy Reset Batman");
@@ -143,12 +149,6 @@ public class AlphabeticNgramTokenizerTest {
         assertEquals("First Token Value", "Holy ", getTermString());
         assertEquals("First Token Offset Start", 0, getOffsetStart());
         assertEquals("First Token Offset End", 5, getOffsetEnd());
-    }
-
-    @Test(expected=UnsupportedOperationException.class)
-    public void testReset() throws Exception {
-        ngramTk.incrementToken();
-        ngramTk.reset();
     }
 
     private String getTermString() throws Exception {

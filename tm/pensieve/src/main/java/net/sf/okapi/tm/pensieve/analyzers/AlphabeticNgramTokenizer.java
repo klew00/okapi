@@ -27,7 +27,10 @@ package net.sf.okapi.tm.pensieve.analyzers;
 import com.ibm.icu.lang.UCharacter;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
@@ -48,20 +51,29 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
     private TermAttribute termAttribute;
     private OffsetAttribute offsetAttribute;
     private TypeAttribute typeAttribute;
-    private char[] ngram;
+
+    /**
+     * Instance variable for performance reasons ONLY
+     */
+    private List<Character> ngramCache;
+
     private Locale locale;
 
     public AlphabeticNgramTokenizer(Reader reader, int ngramLength, Locale locale) {
         super(reader);
         if (ngramLength <= 0) {
-            throw new IllegalArgumentException("ngramLength must be greater than 0");
+            throw new IllegalArgumentException("'ngramLength' must be greater than 0");
+        }
+        if (reader == null) {
+            throw new IllegalArgumentException("'reader' cannot be null");
         }
         this.ngramLength = ngramLength;
         this.termAttribute = (TermAttribute) addAttribute(TermAttribute.class);
         this.offsetAttribute = (OffsetAttribute) addAttribute(OffsetAttribute.class);
         this.typeAttribute = (TypeAttribute) addAttribute(TypeAttribute.class);
-        this.locale = locale;
-        this.ngram = new char[ngramLength];
+        this.locale = locale;        
+        this.ngramCache = new ArrayList<Character>(ngramLength);
+        initializeCache();
         this.ngramType = "ngram(" + getNgramLength() + ")";
         this.offset = 0;
     }
@@ -74,28 +86,41 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
         return ngramLength;
     }
 
+    private void initializeCache() {
+        //Clearing for when it's called by reset
+        ngramCache.clear();
+
+        //Place dummy character at beginning for first call to increment to remove
+        ngramCache.add(Character.MIN_VALUE);
+        int c;
+        for (int i = 1; i < ngramLength; i++) {
+            try {
+                c = input.read();
+            } catch (IOException ioe) {
+                throw new OkapiIOException(ioe.getMessage(), ioe);
+            }
+            ngramCache.add((char) c);
+        }
+
+    }
+
     @Override
     public boolean incrementToken() throws IOException {
         clearAttributes();
         int c;
-        for (int i = 0; i < ngramLength; i++) {
-            c = input.read();
-            if (c == NO_CHAR) {
-                offset = 0;
-                return false;
-            }
-            ngram[i] = (char) c;
+        c = input.read();
+        if (c == NO_CHAR) {
+            offset = 0;
+            return false;
         }
+        ngramCache.remove(0);
+        ngramCache.add((char) c);
 
         //Populate Attributes
-        termAttribute.setTermBuffer(toLowerCase(ngram));
-        offsetAttribute.setOffset(offset, offset + termAttribute.termLength());
+        termAttribute.setTermBuffer(toLowerCase(ngramCache));
+        offsetAttribute.setOffset(offset, offset + ngramLength);
         typeAttribute.setType(ngramType);
 
-        //Reset to marker and then advance marker and offset;
-        input.reset();
-        input.skip(1);
-        input.mark(ngramLength);
         offset++;
         return true;
     }
@@ -103,16 +128,17 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
     @Override
     public void reset(Reader input) throws IOException {
         super.reset(input);
+        initializeCache();
         offset = 0;
     }
 
-    @Override
-    public void reset() throws IOException {
-        throw new UnsupportedOperationException("reset is not supported please create a new reader and use reset(Reader r)");
-    }
-
-    private String toLowerCase(char[] ngram) {
-        String termValue = new String(ngram);
+    private String toLowerCase(List<Character> ngram) {
+        //TODO: Better way to do convert List<Character> to String
+        StringBuilder sb = new StringBuilder();
+        for(Character cha : ngram) {
+            sb.append(cha);
+        }
+        String termValue = sb.toString();
         //Don't we want to always lowercase things?  Not only if a locale is specified
         if (locale != null) {
             if (!(locale.equals(ARMENIAN) || locale.equals(SINHALA))) // FIXME:

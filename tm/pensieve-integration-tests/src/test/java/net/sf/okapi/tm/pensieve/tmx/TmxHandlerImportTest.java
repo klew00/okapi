@@ -38,7 +38,7 @@ public class TmxHandlerImportTest {
         List<TmHit> tus = seeker.searchExact("All Rights Reserved.", 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("query time " + totalTime);
+        System.out.println("exact query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
 
@@ -46,7 +46,7 @@ public class TmxHandlerImportTest {
         tus = seeker.searchExact("Notice to U.S. Government End Users.", 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("query time " + totalTime);
+        System.out.println("exact query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
 
@@ -54,7 +54,7 @@ public class TmxHandlerImportTest {
         tus = seeker.searchExact("Portions copyright 1984-1998 FairCom Corporation.", 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("query time " + totalTime);
+        System.out.println("exact query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
 
@@ -62,7 +62,7 @@ public class TmxHandlerImportTest {
         tus = seeker.searchExact("Second Ed. C:", 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("query time " + totalTime);
+        System.out.println("exact query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
     }
@@ -82,7 +82,7 @@ public class TmxHandlerImportTest {
         List<TmHit> tus = seeker.searchFuzzy("All Rights Reserved.", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("query time " + totalTime);
+        System.out.println("fuzzy query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
 
@@ -90,7 +90,7 @@ public class TmxHandlerImportTest {
         tus = seeker.searchFuzzy("Notice to U.S. Government End Users.", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("query time " + totalTime);
+        System.out.println("fuzzy query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
 
@@ -98,7 +98,7 @@ public class TmxHandlerImportTest {
         tus = seeker.searchFuzzy("Portions copyright 1984-1998 FairCom Corporation.", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("query time " + totalTime);
+        System.out.println("fuzzy query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
 
@@ -106,7 +106,7 @@ public class TmxHandlerImportTest {
         tus = seeker.searchFuzzy("Second Ed. C:", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("query time " + totalTime);
+        System.out.println("fuzzy query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
 
@@ -114,7 +114,7 @@ public class TmxHandlerImportTest {
         tus = seeker.searchFuzzy("Notice to U.S. Government End Users.", 0.8f, 10, null);
 
         totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("query time " + totalTime);
+        System.out.println("fuzzy query time " + totalTime);
         System.out.println("number found " + tus.size());
         assertTrue("Didn't find something", tus.size() > 0);
     }
