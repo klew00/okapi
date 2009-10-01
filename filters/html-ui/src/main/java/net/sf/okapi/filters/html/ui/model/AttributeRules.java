@@ -2,7 +2,7 @@ package net.sf.okapi.filters.html.ui.model;
 
 import java.util.List;
 
-public class AttributeRules {
+public class AttributeRules extends AbstractModelObject {
 	private String globalAttributeName;
 	private List<String> allTagsExcept;
 	private String tagName;
