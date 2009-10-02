@@ -20,12 +20,16 @@
 
 package net.sf.okapi.filters.php;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -36,10 +40,12 @@ import static org.junit.Assert.*;
 public class PHPContentFilterTest {
 	
 	private PHPContentFilter filter;
+	private String root;
 
 	@Before
 	public void setUp() {
 		filter = new PHPContentFilter();
+		root = TestUtil.getParentDir(this.getClass(), "/test01.phpcnt");
 	}
 
 	@Test
@@ -49,6 +55,22 @@ public class PHPContentFilterTest {
 		List<FilterConfiguration> list = filter.getConfigurations();
 		assertNotNull(list);
 		assertTrue(list.size()>0);
+	}
+	
+	@Test
+	public void testCommentsSingleLine () {
+		String snippet = "// $a='abc';\n$b=\"def\";";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("def", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testCommentsMultiline () {
+		String snippet = "/* $a='abc';\nstuff // etc. * / \n */$b=\"def\";";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("def", tu.getSource().toString());
 	}
 	
 	@Test
@@ -108,6 +130,12 @@ public class PHPContentFilterTest {
 	}
 	
 	@Test
+	public void testLineBreakType () {
+		String snippet = "$a='abc';\r\n$b=\"def\";\r\n";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
 	public void testOutputWithNoStrings () {
 		String snippet = "echo $a=$b; and other dummy code";
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
@@ -121,10 +149,21 @@ public class PHPContentFilterTest {
 	
 	@Test
 	public void testOutputMix () {
-		String snippet = "$a=<<<EOT\ntext\nEOT \n EOT \n\nEOT;\n$b=\"abc\"\n// 'comments'\n$c = 'def'";
+		String snippet = "$a=<<<EOT\ntext\nEOT \n EOT \n\nEOT;\n"
+			+ "$b=\"abc\"\n// 'comments'\n$c = 'def';\n"
+			+ "/* $c=\"abc\" */";
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
+	@Test
+	public void testDoubleExtraction () throws URISyntaxException {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"test01.phpcnt", null));
+
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
+	}
+
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, "en"));

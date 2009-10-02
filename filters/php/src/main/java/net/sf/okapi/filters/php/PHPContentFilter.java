@@ -48,7 +48,8 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
- * Implements the IFilter interface for PHP files.
+ * Implements the IFilter interface for PHP content. This filter is
+ * expected to be called from a parent filter that processed the container.
  */
 public class PHPContentFilter implements IFilter {
 
@@ -72,7 +73,7 @@ public class PHPContentFilter implements IFilter {
 	}
 	
 	public void cancel () {
-		// TODO Auto-generated method stub
+		// TODO: Support cancel
 	}
 
 	public void close () {
@@ -99,7 +100,7 @@ public class PHPContentFilter implements IFilter {
 	}
 
 	public String getDisplayName () {
-		return "PHP Content Filter";
+		return "PHP Content Filter (ALPHA)";
 	}
 
 	public String getMimeType () {
@@ -160,7 +161,6 @@ public class PHPContentFilter implements IFilter {
 			docName = input.getInputURI().getPath();
 		}
 		
-		//TODO: Optimize this with a better 'readToEnd()'
 		StringBuilder tmp = new StringBuilder();
 		char[] buf = new char[2048];
 		int count = 0;
@@ -215,6 +215,7 @@ public class PHPContentFilter implements IFilter {
 		StringBuilder buf = null;
 		StringBuilder possibleEndKey = null;
 		StringBuilder heredocKey = null;
+		char ch;
 		
 		if ( current < 0 ) startSkl = 0;
 		else startSkl = current;
@@ -225,14 +226,14 @@ public class PHPContentFilter implements IFilter {
 				// End of input
 				Ending ending = new Ending(String.valueOf(++otherId));
 				if ( startSkl < inputText.length() ) {
-					GenericSkeleton skl = new GenericSkeleton(inputText.substring(startSkl));
+					GenericSkeleton skl = new GenericSkeleton(inputText.substring(startSkl).replace("\n", lineBreak));
 					ending.setSkeleton(skl);
 				}
 				queue.add(new Event(EventType.END_DOCUMENT, ending));
 				return;
 			}
 			
-			char ch = inputText.charAt(++current);
+			ch = inputText.charAt(++current);
 			
 			switch ( state ) {
 			case 0:
@@ -343,8 +344,13 @@ public class PHPContentFilter implements IFilter {
 				switch ( ch ) {
 				case '\n':
 					if ( possibleEndKey.length() > 0 ) { // End of key
-						processString(buf.toString());
-						return;
+						if ( processString(buf.toString(), true) ) {
+							return;
+						}
+						else {
+							state = prevState;
+							continue;
+						}
 					}
 					// Else: Sequential line-breaks
 					buf.append("\n"); // Append the previous
@@ -353,8 +359,13 @@ public class PHPContentFilter implements IFilter {
 					break;
 				case ';':
 					if ( possibleEndKey.length() > 0 ) { // End of key
-						processString(buf.toString());
-						return;
+						if ( processString(buf.toString(), true) ) {
+							return;
+						}
+						else {
+							state = prevState;
+							continue;
+						}
 					}
 					// Else: fall thru (';' in string and back to previous state)
 				default:
@@ -372,8 +383,13 @@ public class PHPContentFilter implements IFilter {
 				if ( ch == '\'' ) {
 					// End of string
 					endStr = current;
-					processString(buf.toString());
-					return;
+					if ( processString(buf.toString(), false) ) {
+						return;
+					}
+					else {
+						state = prevState;
+						continue;
+					}
 				}
 				else if ( ch == '\\' ) {
 					if ( inputText.length() > current+1 ) {
@@ -393,8 +409,13 @@ public class PHPContentFilter implements IFilter {
 				if ( ch == '"' ) {
 					// End of string
 					endStr = current;
-					processString(buf.toString());
-					return;
+					if ( processString(buf.toString(), false) ) {
+						return;
+					}
+					else {
+						state = prevState;
+						continue;
+					}
 				}
 				else if ( ch == '\\' ) {
 					if ( inputText.length() > current+1 ) {
@@ -413,19 +434,25 @@ public class PHPContentFilter implements IFilter {
 		}
 	}
 
-	private void processString (String text) {
+	// Returns true if we have an event to send
+	private boolean processString (String text,
+		boolean preserveWS)
+	{
 		TextUnit tu = new TextUnit(String.valueOf(++tuId), text);
+		tu.setPreserveWhitespaces(preserveWS);
+		
 		GenericSkeleton skl = new GenericSkeleton();
 		tu.setSkeleton(skl);
 		
 		if ( startStr > startSkl ) {
-			skl.add(inputText.substring(startSkl, startStr+1));
+			skl.add(inputText.substring(startSkl, startStr+1).replace("\n", lineBreak));
 		}
 		skl.addContentPlaceholder(tu);
 		if ( endStr < current ) {
-			skl.add(inputText.substring(endStr, current));
+			skl.add(inputText.substring(endStr, current).replace("\n", lineBreak));
 		}
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
+		return true;
 	}
 
 }
