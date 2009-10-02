@@ -37,11 +37,14 @@ import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -60,6 +63,9 @@ public class PHPContentFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private boolean hasNext;
 	private int current;
+	private int startSkl;
+	private int startStr;
+	private int endStr;
 	
 	public PHPContentFilter () {
 		params = new Parameters();
@@ -74,14 +80,12 @@ public class PHPContentFilter implements IFilter {
 		hasNext = false;
 	}
 
-	public IFilterWriter createFilterWriter () {
-		// TODO Auto-generated method stub
-		return null;
+	public ISkeletonWriter createSkeletonWriter() {
+		return new GenericSkeletonWriter();
 	}
 
-	public ISkeletonWriter createSkeletonWriter () {
-		// TODO Auto-generated method stub
-		return null;
+	public IFilterWriter createFilterWriter () {
+		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
@@ -209,12 +213,21 @@ public class PHPContentFilter implements IFilter {
 		int prevState = 0;
 		int state = 0;
 		StringBuilder buf = null;
+		StringBuilder possibleEndKey = null;
 		StringBuilder heredocKey = null;
+		
+		if ( current < 0 ) startSkl = 0;
+		else startSkl = current;
+		endStr = -1;
 		
 		while ( true ) {
 			if ( current+1 >= inputText.length() ) {
 				// End of input
 				Ending ending = new Ending(String.valueOf(++otherId));
+				if ( startSkl < inputText.length() ) {
+					GenericSkeleton skl = new GenericSkeleton(inputText.substring(startSkl));
+					ending.setSkeleton(skl);
+				}
 				queue.add(new Event(EventType.END_DOCUMENT, ending));
 				return;
 			}
@@ -232,7 +245,7 @@ public class PHPContentFilter implements IFilter {
 					prevState = state;
 					state = 4;
 					continue;
-				case '<': // Test for heredoc
+				case '<': // Test for heredoc (nowdocs are the same from our viewpoint)
 					if ( inputText.length() > current+2) {
 						if (( inputText.charAt(current+1) == '<' ) 
 							&& ( inputText.charAt(current+1) == '<' )) {
@@ -248,12 +261,14 @@ public class PHPContentFilter implements IFilter {
 					continue;
 				case '\'': // Single-quoted string
 					prevState = state;
-					state = 8;
+					state = 9;
+					startStr = current;
 					buf = new StringBuilder();
 					continue;
 				case '"': // Double-quoted string
 					prevState = state;
-					state = 9;
+					state = 10;
+					startStr = current;
 					buf = new StringBuilder();
 					continue;
 				}
@@ -300,10 +315,12 @@ public class PHPContentFilter implements IFilter {
 				current--;
 				continue;
 				
-			case 6: // after <<<, getting the heredoc key
+			case 6: // After <<<, getting the heredoc key
 				if ( Character.isWhitespace(ch) ) {
 					// End of key
 					state = 7; // wait for the end of heredoc
+					startStr = current;
+					buf = new StringBuilder();
 					continue;
 				}
 				else {
@@ -311,16 +328,50 @@ public class PHPContentFilter implements IFilter {
 				}
 				continue;
 				
-			case 7: // End of end of heredoc (linebreak+key+';' or line break)
+			case 7: // Inside a heredoc entry, wait for linebreak
 				if ( ch == '\n' ) {
-					//TODO
+					endStr = current;
+					possibleEndKey = new StringBuilder();
+					state = 8;
 				}
-				//TODO
+				else {
+					buf.append(ch);
+				}
 				continue;
 				
-			case 8: // Inside a single-quoted string, wait for closing single quote
+			case 8: // Parsing the end-key for the heredoc entry
+				switch ( ch ) {
+				case '\n':
+					if ( possibleEndKey.length() > 0 ) { // End of key
+						processString(buf.toString());
+						return;
+					}
+					// Else: Sequential line-breaks
+					buf.append("\n"); // Append the previous
+					endStr = current; // Reset possible ending point
+					// and stay in this state
+					break;
+				case ';':
+					if ( possibleEndKey.length() > 0 ) { // End of key
+						processString(buf.toString());
+						return;
+					}
+					// Else: fall thru (';' in string and back to previous state)
+				default:
+					possibleEndKey.append(ch);
+					if ( !heredocKey.toString().startsWith(possibleEndKey.toString()) ) {
+						// Not the end key, just part of the text
+						state = 7; // back to inside heredoc entry
+						// Don't forget the initial linebreak of case 7
+						buf.append("\n"+possibleEndKey);
+					}
+				}
+				continue;
+				
+			case 9: // Inside a single-quoted string, wait for closing single quote
 				if ( ch == '\'' ) {
 					// End of string
+					endStr = current;
 					processString(buf.toString());
 					return;
 				}
@@ -338,9 +389,10 @@ public class PHPContentFilter implements IFilter {
 				}
 				continue;
 
-			case 9: // Inside a double-quoted string, wait for closing double quote
+			case 10: // Inside a double-quoted string, wait for closing double quote
 				if ( ch == '"' ) {
 					// End of string
+					endStr = current;
 					processString(buf.toString());
 					return;
 				}
@@ -363,6 +415,16 @@ public class PHPContentFilter implements IFilter {
 
 	private void processString (String text) {
 		TextUnit tu = new TextUnit(String.valueOf(++tuId), text);
+		GenericSkeleton skl = new GenericSkeleton();
+		tu.setSkeleton(skl);
+		
+		if ( startStr > startSkl ) {
+			skl.add(inputText.substring(startSkl, startStr+1));
+		}
+		skl.addContentPlaceholder(tu);
+		if ( endStr < current ) {
+			skl.add(inputText.substring(endStr, current));
+		}
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 	}
 

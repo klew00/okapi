@@ -63,10 +63,66 @@ public class PHPContentFilterTest {
 	@Test
 	public void testDoubleQuotedString () {
 		String snippet = "$a=\"text\\\"\";\n$b=\"'text\\\"\";";
-		// check second TU
+		// Check second TU
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertTrue(tu!=null);
 		assertEquals("'text\\\"", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testHeredocString () {
+		String snippet = "$a=<<<EOT\ntext\nEOT \n\nEOT;";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text\nEOT \n", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testSemiColumnHeredocString () {
+		String snippet = "$a=<<<EOT\ntext\nEOT \n;\nEOT;";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text\nEOT \n;", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testMultipleLinesHeredocString () {
+		String snippet = "$a=<<<EOT\ntext\nEOT \n EOT \n\nEOT;\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text\nEOT \n EOT \n", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testEmptyHeredocString () {
+		String snippet = "$a=<<<EOT\n\nEOT;";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testOutputSimple () {
+		String snippet = "$a='abc';\n$b=\"def\";";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
+	public void testOutputWithNoStrings () {
+		String snippet = "echo $a=$b; and other dummy code";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
+	public void testOutputHeredoc () {
+		String snippet = "$a=<<<EOT\ntext\nEOT \n EOT \n\nEOT;\n";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
+	public void testOutputMix () {
+		String snippet = "$a=<<<EOT\ntext\nEOT \n EOT \n\nEOT;\n$b=\"abc\"\n// 'comments'\n$c = 'def'";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {
