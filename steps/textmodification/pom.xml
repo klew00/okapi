@@ -1,3 +1,4 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -14,7 +15,7 @@
             <groupId>net.sf.okapi</groupId>
             <artifactId>okapi-core</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>net.sf.okapi.lib</groupId>
             <artifactId>okapi-lib-segmentation</artifactId>
@@ -25,28 +26,21 @@
             <groupId>net.sf.okapi.steps</groupId>
             <artifactId>okapi-step-common</artifactId>
             <version>${project.version}</version>
-			<scope>test</scope>
-			<classifier>tests</classifier>
+            <scope>test</scope>
+            <classifier>tests</classifier>
         </dependency>
-		<dependency>
-			<groupId>net.sf.okapi</groupId>
-			<artifactId>okapi-core</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-			<classifier>tests</classifier>
-		</dependency>
+        <dependency>
+            <groupId>net.sf.okapi</groupId>
+            <artifactId>okapi-core</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <classifier>tests</classifier>
+        </dependency>
         <dependency>
             <groupId>net.sf.okapi.steps</groupId>
             <artifactId>okapi-step-common</artifactId>
             <version>${project.version}</version>
-			<scope>test</scope>
-			<classifier>tests</classifier>
-        </dependency>        
-        <dependency>
-            <groupId>net.sf.okapi.steps</groupId>
-            <artifactId>okapi-step-common</artifactId>
-            <version>${project.version}</version>
-			<scope>test</scope>
-        </dependency>        
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
