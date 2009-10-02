@@ -24,7 +24,7 @@ package net.sf.okapi.tm.pensieve.common;
  * Represents a TM Hit. This stores a reference to the TranslationUnit and its score.
  * @author HaslamJD
  */
-public class TmHit {
+public class TmHit implements Comparable<TmHit> {
 
     public TmHit() {
 
@@ -47,5 +47,9 @@ public class TmHit {
 
     public void setTu(TranslationUnit tu) {
         this.tu = tu;
+    }
+
+    public int compareTo(TmHit o) {
+        return score.compareTo(o.score);
     }
 }

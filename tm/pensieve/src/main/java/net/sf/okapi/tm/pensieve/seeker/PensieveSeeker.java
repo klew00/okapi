@@ -65,14 +65,8 @@ import org.apache.lucene.search.spell.StringDistance;
  */
 public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
-    private class ScoresComparer implements Comparator<TmHit> {
-
-        public int compare(TmHit arg1, TmHit arg2) {
-            return (arg1.getScore() > arg2.getScore() ? -1 : (arg1.getScore() == arg2.getScore() ? 0 : 1));
-        }
-    }
-    private Directory indexDir;
-    private ScoresComparer scoresComp = new ScoresComparer();
+    
+    private Directory indexDir;    
     private final static StringDistance distanceCalc = new NGramDistance(4);
 
     /**
@@ -285,49 +279,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
         return IndexReader.open(indexDir, true);
     }
 
-    private class TranslationUnitIterator implements Iterator<TranslationUnit> {
-
-        private int currentIndex;
-        private int maxIndex;
-        private IndexReader ir;
-
-        TranslationUnitIterator() {
-            try {
-                ir = openIndexReader();
-            } catch (CorruptIndexException cie) {
-                throw new OkapiIOException(cie.getMessage(), cie);
-            } catch (IOException ioe) {
-                throw new OkapiIOException(ioe.getMessage(), ioe);
-            }
-            currentIndex = 0;
-            maxIndex = ir.maxDoc();
-        }
-
-        public boolean hasNext() {
-            return currentIndex < maxIndex;
-        }
-
-        public TranslationUnit next() {
-            TranslationUnit tu = null;
-            if (hasNext()) {
-                try {
-                    // Using createTranslationUnit(), not createTranslationUnit()
-                    // ensure that we get the inline codes
-                    tu = createTranslationUnit(ir.document(currentIndex++));
-                } catch (CorruptIndexException cie) {
-                    throw new OkapiIOException(cie.getMessage(), cie);
-                } catch (IOException ioe) {
-                    throw new OkapiIOException(ioe.getMessage(), ioe);
-                }
-            }
-            return tu;
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException("Will not support remove method - Please remove items via ITmSeeker interface");
-        }
-    }
-
     //=== Added for try out of inline codes support
     /**
      * Search for exact matches.
@@ -420,7 +371,9 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
             // Re-sort if needed
             if (sort) {
-                Collections.sort(tmhits, scoresComp);
+                //Reverse Sort so the highest score first
+                //TmHit implements comparator using natural ascending order sort
+                Collections.sort(tmhits, Collections.reverseOrder());
             }
         } catch (IOException e) {
             throw new OkapiIOException("Could not complete query.", e);
@@ -481,5 +434,48 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
             tu.setMetadataValue(type, getFieldValue(doc, type));
         }
         return tu;
+    }
+
+    private class TranslationUnitIterator implements Iterator<TranslationUnit> {
+
+        private int currentIndex;
+        private int maxIndex;
+        private IndexReader ir;
+
+        TranslationUnitIterator() {
+            try {
+                ir = openIndexReader();
+            } catch (CorruptIndexException cie) {
+                throw new OkapiIOException(cie.getMessage(), cie);
+            } catch (IOException ioe) {
+                throw new OkapiIOException(ioe.getMessage(), ioe);
+            }
+            currentIndex = 0;
+            maxIndex = ir.maxDoc();
+        }
+
+        public boolean hasNext() {
+            return currentIndex < maxIndex;
+        }
+
+        public TranslationUnit next() {
+            TranslationUnit tu = null;
+            if (hasNext()) {
+                try {
+                    // Using createTranslationUnit(), not createTranslationUnit()
+                    // ensure that we get the inline codes
+                    tu = createTranslationUnit(ir.document(currentIndex++));
+                } catch (CorruptIndexException cie) {
+                    throw new OkapiIOException(cie.getMessage(), cie);
+                } catch (IOException ioe) {
+                    throw new OkapiIOException(ioe.getMessage(), ioe);
+                }
+            }
+            return tu;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("Will not support remove method - Please remove items via ITmSeeker interface");
+        }
     }
 }

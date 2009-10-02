@@ -18,10 +18,6 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package net.sf.okapi.tm.pensieve.analyzers;
 
 import com.ibm.icu.lang.UCharacter;
@@ -86,6 +82,10 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
         return ngramLength;
     }
 
+    private Reader getReader() {
+        return input;
+    }
+
     private void initializeCache() {
         //Clearing for when it's called by reset
         ngramCache.clear();
@@ -95,7 +95,7 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
         int c;
         for (int i = 1; i < ngramLength; i++) {
             try {
-                c = input.read();
+                c = getReader().read();
             } catch (IOException ioe) {
                 throw new OkapiIOException(ioe.getMessage(), ioe);
             }
@@ -108,7 +108,7 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
     public boolean incrementToken() throws IOException {
         clearAttributes();
         int c;
-        c = input.read();
+        c = getReader().read();
         if (c == NO_CHAR) {
             offset = 0;
             return false;
