@@ -33,6 +33,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -40,6 +41,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -118,7 +120,9 @@ public class PHPContentFilter implements IFilter {
 			parse();
 		}
 		Event event = queue.poll();
-		hasNext = (event.getEventType() == EventType.END_DOCUMENT);
+		if ( event.getEventType() == EventType.END_DOCUMENT ) {
+			hasNext = false;
+		}
 		return event;
 	}
 
@@ -208,7 +212,7 @@ public class PHPContentFilter implements IFilter {
 		StringBuilder heredocKey = null;
 		
 		while ( true ) {
-			if ( current >= inputText.length() ) {
+			if ( current+1 >= inputText.length() ) {
 				// End of input
 				Ending ending = new Ending(String.valueOf(++otherId));
 				queue.add(new Event(EventType.END_DOCUMENT, ending));
@@ -242,7 +246,18 @@ public class PHPContentFilter implements IFilter {
 					}
 					// Else: not a heredoc
 					continue;
+				case '\'': // Single-quoted string
+					prevState = state;
+					state = 8;
+					buf = new StringBuilder();
+					continue;
+				case '"': // Double-quoted string
+					prevState = state;
+					state = 9;
+					buf = new StringBuilder();
+					continue;
 				}
+				continue;
 				
 			case 1: // After initial '/'
 				if ( ch == '/' ) {
@@ -302,8 +317,53 @@ public class PHPContentFilter implements IFilter {
 				}
 				//TODO
 				continue;
+				
+			case 8: // Inside a single-quoted string, wait for closing single quote
+				if ( ch == '\'' ) {
+					// End of string
+					processString(buf.toString());
+					return;
+				}
+				else if ( ch == '\\' ) {
+					if ( inputText.length() > current+1 ) {
+						buf.append('\\');
+						buf.append(inputText.charAt(++current));
+					}
+					else {
+						throw new OkapiIllegalFilterOperationException("Unexpected end.");
+					}
+				}
+				else {
+					buf.append(ch);
+				}
+				continue;
+
+			case 9: // Inside a double-quoted string, wait for closing double quote
+				if ( ch == '"' ) {
+					// End of string
+					processString(buf.toString());
+					return;
+				}
+				else if ( ch == '\\' ) {
+					if ( inputText.length() > current+1 ) {
+						buf.append('\\');
+						buf.append(inputText.charAt(++current));
+					}
+					else {
+						throw new OkapiIllegalFilterOperationException("Unexpected end.");
+					}
+				}
+				else {
+					buf.append(ch);
+				}
+				continue;
 			}
 		}
+	}
+
+	private void processString (String text) {
+		TextUnit tu = new TextUnit(String.valueOf(++tuId), text);
+		queue.add(new Event(EventType.TEXT_UNIT, tu));
 	}
 
 }

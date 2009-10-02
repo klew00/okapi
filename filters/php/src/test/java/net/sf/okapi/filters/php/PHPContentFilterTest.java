@@ -20,9 +20,14 @@
 
 package net.sf.okapi.filters.php;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,16 +50,34 @@ public class PHPContentFilterTest {
 		assertNotNull(list);
 		assertTrue(list.size()>0);
 	}
-
-//	private ArrayList<Event> getEvents(String snippet) {
-//		ArrayList<Event> list = new ArrayList<Event>();
-//		filter.open(new RawDocument(snippet, "en"));
-//		while (filter.hasNext()) {
-//			Event event = filter.next();
-//			list.add(event);
-//		}
-//		filter.close();
-//		return list;
-//	}
+	
+	@Test
+	public void testSingleQuotedString () {
+		String snippet = "$a='\\\\text\\'';\n$b='\\'\"text\"';";
+		// Check first TU
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("\\\\text\\'", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testDoubleQuotedString () {
+		String snippet = "$a=\"text\\\"\";\n$b=\"'text\\\"\";";
+		// check second TU
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertTrue(tu!=null);
+		assertEquals("'text\\\"", tu.getSource().toString());
+	}
+	
+	private ArrayList<Event> getEvents(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(snippet, "en"));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
+	}
 
 }
