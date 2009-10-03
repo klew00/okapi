@@ -111,22 +111,11 @@ public class PensieveTMConnector implements ITMQuery {
 		results = new ArrayList<QueryResult>();
 		current = -1;
 		// searchFuzzy also returns exact, so no need to call searchExact
-		//TODO: add threshold. For now even 0.99f gives sometimes no return on exact matches
-
-		List<TmHit> list;
-		if ( threshold >= 99 ) {
-			// Special temporary case for 99 and above, to get meaningful scores
-			// and allow actual leveraging based on the results.
-			list = seeker.searchExact2(text, maxHits, attrs);
-		}
-		else {
-			list = seeker.searchFuzzy2(text, null, maxHits, attrs);
-		}
+		List<TmHit> list = seeker.searchFuzzy2(text, threshold, maxHits, attrs);
 
 		// Convert to normalized results
 		for ( TmHit hit : list ) {
 			Float f = hit.getScore() * 100;
-//			if ( f.intValue() < threshold ) break;
 			QueryResult qr = new QueryResult();
 			qr.score = f.intValue();
 			qr.source = hit.getTu().getSource().getContent();

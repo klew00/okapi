@@ -546,7 +546,7 @@ public class PensieveSeekerTest {
     	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
     	writer.endIndex();
     	
-    	tmhits = seeker.searchFuzzy2(frag, null, 10, null);
+    	tmhits = seeker.searchFuzzy2(frag, 5, 10, null);
     	assertEquals("number of docs found", 2, tmhits.size());
     	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
     	assertEquals("watch out for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());

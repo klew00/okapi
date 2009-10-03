@@ -457,7 +457,7 @@ public class ServalForm {
 			TmxFilter filter = new TmxFilter();
 			OkapiTmxImporter imp = new OkapiTmxImporter(langs[0], filter);
 			
-			ITmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir, false);
+			ITmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir, true);
 			
 			File file = new File(paths[0]);
 			imp.importTmx(file.toURI(), langs[1], writer);

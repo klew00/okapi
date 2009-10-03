@@ -49,7 +49,6 @@ import org.apache.lucene.store.Directory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -123,7 +122,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      * @throws OkapiIOException if the search cannot be completed do to I/O problems
      */
     public List<TmHit> searchFuzzy(final String query, Float similarityThreshold, int max, Metadata metadata) {
-
         Query q;
         if (similarityThreshold == null) {
             q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
@@ -282,111 +280,120 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
     //=== Added for try out of inline codes support
     /**
      * Search for exact matches.
-     * @param query the fragment to query.
+     * @param queryFrag the fragment to query.
      * @param max the maximum number of hits to return.
      * @param metadata any associated attributes to use for filter.
      * @return the list of hits of the given argument.
      */
-    public List<TmHit> searchExact2(TextFragment query,
-            int max,
-            Metadata metadata) {
-        PhraseQuery q = new PhraseQuery();
-        q.add(new Term(TranslationUnitField.SOURCE_EXACT.name(), query.getCodedText()));
-        return search2(max, q, query.getCodes(), metadata, true);
-    }
+	public List<TmHit> searchExact2 (TextFragment queryFrag,
+		int max,
+		Metadata metadata)
+	{
+		PhraseQuery query = new PhraseQuery();
+		query.add(new Term(TranslationUnitField.SOURCE_EXACT.name(), queryFrag.getCodedText()));
+		return search2(max, 1.0f, query, queryFrag, metadata);
+	}
 
     /**
      * Search for exact and fuzzy matches
-     * @param query the fragment to query.
+     * @param queryFrag the fragment to query.
      * @param threshold the minimal score value to return.
      * @param max the maximum number of hits to return.
      * @param metadata any associated attributes to use for filter.
      * @return the list of hits of the given argument.
      */
-    public List<TmHit> searchFuzzy2(TextFragment query,
-            Float threshold,
-            int max,
-            Metadata metadata) {
-        Query q;
-        if (threshold == null) {
-            q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query.getCodedText()));
-        } else {
-            q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query.getCodedText()), threshold);
-        }
-        return search2(max, q, query.getCodes(), metadata, false);
-    }
+	public List<TmHit> searchFuzzy2 (TextFragment queryFrag,
+		int threshold,
+		int max,
+		Metadata metadata)
+	{
+		Query query;
+		float searchThreshold = threshold / 100.0f;
+		if ( threshold < 0 ) searchThreshold = 0.0f;
+		if ( threshold > 100 ) searchThreshold = 1.0f;
+		query = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(),
+			queryFrag.getCodedText()));
+		return search2(max, searchThreshold, query, queryFrag, metadata);
+	}
 
     /**
      * Search the best list of hits for a given query, taking inline codes into account.
+     * @param threshold the minumum score to return (between 0.0 and 1.0)
      * @param max the maximum number of hits to return.
-     * @param q the query
-     * @param srcCodes the source codes.
+     * @param query the query
+     * @param queryFrag the text fragment for the query.
      * @param metadata any associated attributes to use for filter.
-     * @param scoreForExact true to tweak the scores so they return 100 or 99. This is a temporary 
-     * solution to get meaningful scores when querying for exact matches, and allowing actual leveraging.
-     * (otherwise we get the top match but cannot know if it's a real exact or not without additional compare)
-     * This is triggered from the connector by setting its threshold to 99 or above.
      * @return the list of hits found for the given arguments (never null).
      */
-    private List<TmHit> search2(int max,
-            Query q,
-            List<Code> srcCodes,
-            Metadata metadata,
-            boolean scoreForExact) {
-        IndexSearcher is = null;
-        List<TmHit> tmhits = new ArrayList<TmHit>();
-        BooleanQuery bQuery = createQuery(q, metadata);
-        try {
-            is = getIndexSearcher();
-            TopDocs hits = is.search(bQuery, max);
-            List<Code> tmCodes;
-            boolean sort = false;
-            ScoreDoc scoreDoc;
-            TmHit tmHit;
-            for (int j = 0; j < hits.scoreDocs.length; j++) {
-                scoreDoc = hits.scoreDocs[j];
-                tmCodes = Code.stringToCodes(getFieldValue(is.doc(scoreDoc.doc), TranslationUnitField.SOURCE_CODES));
-                tmHit = new TmHit();
-                if ((srcCodes.size() > 0) && (tmCodes.size() > 0)) {
-                    // If tmScrCodes is null, equals will return false
-                    if (Code.sameCodes(srcCodes, tmCodes)) {
-                        tmHit.setScore(scoreForExact ? 1.0f : scoreDoc.score);
-                    } else {
-                        //TODO: we may want to have different penalty per type of code differences
-                        tmHit.setScore(scoreForExact ? 0.99f : scoreDoc.score - 0.01f);
-                        sort = true;
-                    }
-                } else { // Either or none has code(s)
-                    // In this case any potential differences is already set by the markers in the text
-                    tmHit.setScore(scoreForExact ? 1.0f : scoreDoc.score);
-                }
-                // Set the translation unit
-                tmHit.setTu(
-                        createTranslationUnit(
-                        is.doc(scoreDoc.doc),
-                        getFieldValue(is.doc(scoreDoc.doc), TranslationUnitField.SOURCE),
-                        tmCodes));
-                tmhits.add(tmHit);
-            }
+	private List<TmHit> search2 (int max,
+		float threshold,
+		Query query,
+		TextFragment queryFrag,
+		Metadata metadata)
+	{
+		IndexSearcher is = null;
+		List<TmHit> tmhits = new ArrayList<TmHit>();
+		BooleanQuery bQuery = createQuery(query, metadata);
+		List<Code> queryCodes = queryFrag.getCodes();
+		String queryCodedText = queryFrag.getCodedText();
 
-            // Re-sort if needed
-            if (sort) {
-                //Reverse Sort so the highest score first
-                //TmHit implements comparator using natural ascending order sort
-                Collections.sort(tmhits, Collections.reverseOrder());
-            }
-        } catch (IOException e) {
-            throw new OkapiIOException("Could not complete query.", e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-        return tmhits;
-    }
+		try {
+			is = getIndexSearcher();
+			TopDocs hits = is.search(bQuery, max);
+			boolean sort = false;
+			List<Code> tmCodes;
+			String tmCodedText;
+			ScoreDoc scoreDoc;
+			TmHit tmHit;
+			float score;
+			
+			for ( int j=0; j<hits.scoreDocs.length; j++ ) {
+				scoreDoc = hits.scoreDocs[j];
+				tmCodes = Code.stringToCodes(getFieldValue(is.doc(scoreDoc.doc),
+					TranslationUnitField.SOURCE_CODES));
+				tmCodedText = getFieldValue(is.doc(scoreDoc.doc), TranslationUnitField.SOURCE);
+                score = calcEditDistance(tmCodedText, queryCodedText);
+                if ( score < threshold ) break; // Done
+				if (( queryCodes.size() > 0 ) && ( tmCodes.size() > 0 )) {
+					// If tmScrCodes is null, equals will return false
+					if ( !Code.sameCodes(queryCodes, tmCodes) ) {
+						// Substract code penalty
+						// TODO: we may want to have different penalty per type of code differences
+						score -= 0.01f;
+		                if ( score < threshold ) continue; // Don't include this hit
+		                sort = true;
+					}
+				}
+				// Else: Either or none has code(s)
+				// In this case any potential differences is already set by
+				// the markers in the text, so there is nothing to do
+				// Set the translation unit
+				tmHit = new TmHit();
+				tmHit.setScore(score);
+				tmHit.setTu(createTranslationUnit(is.doc(scoreDoc.doc), tmCodedText, tmCodes));
+				tmhits.add(tmHit);
+			}
+
+			// Re-sort if needed
+			if ( sort ) {
+				// Reverse the result so the highest score first
+				// (TmHit implements comparator using natural ascending order)
+				Collections.sort(tmhits, Collections.reverseOrder());
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Could not complete query.", e);
+		}
+		finally {
+			if ( is != null ) {
+				try {
+					is.close();
+				}
+				catch ( IOException ignored ) {}
+			}
+		}
+		return tmhits;
+	}
 
     /**
      * Creates a {@link TranslationUnit} for a given document.
@@ -396,44 +403,45 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      * @return a new translation unit for the given document.
      */
     private TranslationUnit createTranslationUnit(Document doc,
-            String srcCodedText,
-            List<Code> srcCodes) {
-        TextFragment frag = new TextFragment();
-        frag.setCodedText(srcCodedText, srcCodes, false);
-        TranslationUnitVariant srcTuv = new TranslationUnitVariant(
-                getFieldValue(doc, TranslationUnitField.SOURCE_LANG), frag);
+    	String srcCodedText,
+    	List<Code> srcCodes)
+    {
+    	TextFragment frag = new TextFragment();
+    	frag.setCodedText(srcCodedText, srcCodes, false);
+    	TranslationUnitVariant srcTuv = new TranslationUnitVariant(
+    		getFieldValue(doc, TranslationUnitField.SOURCE_LANG), frag);
 
-        frag = new TextFragment();
-        List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
-        frag.setCodedText(getFieldValue(doc, TranslationUnitField.TARGET), codes, false);
-        TranslationUnitVariant trgTuv = new TranslationUnitVariant(
-                getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
+    	frag = new TextFragment();
+    	List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
+    	frag.setCodedText(getFieldValue(doc, TranslationUnitField.TARGET), codes, false);
+    	TranslationUnitVariant trgTuv = new TranslationUnitVariant(
+   			getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
 
-        TranslationUnit tu = new TranslationUnit(srcTuv, trgTuv);
-        for (MetadataType type : MetadataType.values()) {
-            tu.setMetadataValue(type, getFieldValue(doc, type));
-        }
-        return tu;
+    	TranslationUnit tu = new TranslationUnit(srcTuv, trgTuv);
+    	for ( MetadataType type : MetadataType.values() ) {
+    		tu.setMetadataValue(type, getFieldValue(doc, type));
+    	}
+    	return tu;
     }
 
     private TranslationUnit createTranslationUnit(Document doc) {
-        TextFragment frag = new TextFragment();
-        List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.SOURCE_CODES));
-        frag.setCodedText(getFieldValue(doc, TranslationUnitField.SOURCE), codes, false);
-        TranslationUnitVariant srcTuv = new TranslationUnitVariant(
-                getFieldValue(doc, TranslationUnitField.SOURCE_LANG), frag);
+		TextFragment frag = new TextFragment();
+		List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.SOURCE_CODES));
+		frag.setCodedText(getFieldValue(doc, TranslationUnitField.SOURCE), codes, false);
+		TranslationUnitVariant srcTuv = new TranslationUnitVariant(
+			getFieldValue(doc, TranslationUnitField.SOURCE_LANG), frag);
 
-        frag = new TextFragment();
-        codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
-        frag.setCodedText(getFieldValue(doc, TranslationUnitField.TARGET), codes, false);
-        TranslationUnitVariant trgTuv = new TranslationUnitVariant(
-                getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
+		frag = new TextFragment();
+		codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
+		frag.setCodedText(getFieldValue(doc, TranslationUnitField.TARGET), codes, false);
+		TranslationUnitVariant trgTuv = new TranslationUnitVariant(
+			getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
 
-        TranslationUnit tu = new TranslationUnit(srcTuv, trgTuv);
-        for (MetadataType type : MetadataType.values()) {
-            tu.setMetadataValue(type, getFieldValue(doc, type));
-        }
-        return tu;
+		TranslationUnit tu = new TranslationUnit(srcTuv, trgTuv);
+		for ( MetadataType type : MetadataType.values() ) {
+			tu.setMetadataValue(type, getFieldValue(doc, type));
+		}
+		return tu;
     }
 
     private class TranslationUnitIterator implements Iterator<TranslationUnit> {
