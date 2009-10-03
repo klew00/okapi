@@ -30,6 +30,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -48,6 +49,26 @@ public class PHPContentFilterTest {
 		root = TestUtil.getParentDir(this.getClass(), "/test01.phpcnt");
 	}
 
+//	@Test
+//	public void testDefine () {
+//		String snippet = "define('myconst', 'text');";
+//	}
+	
+//	@Test
+//	public void testArrayDeclarations () {
+//		String snippet = "$arr=array('key1' => 'text1', 'key2' => 'text2');";
+//	}
+
+//	@Test
+//	public void testArrayDeclarationsNoKeys () {
+//		String snippet = "$arr=array('text1', 'text2');";
+//	}
+
+//	@Test
+//	public void testArrayDeclarationsMixed () {
+//		String snippet = "$arr=array('text1', 'key2' => 'text2');";
+//	}
+
 	@Test
 	public void testDefaultInfo () {
 		assertNotNull(filter.getParameters());
@@ -55,6 +76,19 @@ public class PHPContentFilterTest {
 		List<FilterConfiguration> list = filter.getConfigurations();
 		assertNotNull(list);
 		assertTrue(list.size()>0);
+	}
+	
+	@Test
+	public void testEntryWithCodes () {
+		String snippet = "$a='{0}abc%s';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("{0}abc%s", tu.getSource().toString());
+		List<Code> codes = tu.getSourceContent().getCodes();
+		assertNotNull(codes);
+		assertEquals(2, codes.size());
+		assertEquals("{0}", codes.get(0).toString());
+		assertEquals("%s", codes.get(1).toString());
 	}
 	
 	@Test
@@ -71,6 +105,22 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("def", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testEmptyComment () {
+		String snippet = "/**/$a='abc';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("abc", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testCommentsWithApos () {
+		String snippet = "/** Felix's Favorites */\n$cnt['glob']['type'] = 'Felix\\'s Favorites';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("Felix\\'s Favorites", tu.getSource().toString());
 	}
 	
 	@Test
@@ -97,6 +147,25 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text\nEOT \n", tu.getSource().toString());
+		assertEquals("x-heredoc", tu.getType());
+	}
+	
+	@Test
+	public void testQuotedHeredocString () {
+		String snippet = "$a=<<<\"EOT\"\ntext\nEOT \n\nEOT;";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text\nEOT \n", tu.getSource().toString());
+		assertEquals("x-heredoc", tu.getType());
+	}
+	
+	@Test
+	public void testQuotedNowdocString () {
+		String snippet = "$a=<<<'EOT'\ntext\nEOT \n\nEOT;";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text\nEOT \n", tu.getSource().toString());
+		assertEquals("x-nowdoc", tu.getType());
 	}
 	
 	@Test
@@ -116,11 +185,21 @@ public class PHPContentFilterTest {
 	}
 	
 	@Test
-	public void testEmptyHeredocString () {
+	public void testEmptyHeredocStringAndOutput () {
 		String snippet = "$a=<<<EOT\n\nEOT;";
+		// Should be empty so no TU
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
-		assertTrue(tu!=null);
-		assertEquals("", tu.getSource().toString());
+		assertTrue(tu==null);
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
+	public void testWhiteHeredocStringAndOutput () {
+		String snippet = "$a=<<<EOT\n  \t  \nEOT;";
+		// No text so no TU
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu==null);
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	
 	@Test
@@ -152,6 +231,20 @@ public class PHPContentFilterTest {
 		String snippet = "$a=<<<EOT\ntext\nEOT \n EOT \n\nEOT;\n"
 			+ "$b=\"abc\"\n// 'comments'\n$c = 'def';\n"
 			+ "/* $c=\"abc\" */";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
+	public void testArrayKeys () {
+		String snippet = "$arr1[\"foo\"]; $arr2[  'foo' ] = 'text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+
+	@Test
+	public void testOutputArrayKeys () {
+		String snippet = "$arr1[\"foo\"]; $arr2[  'foo' ] = 'text';";
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
 	}
 	

@@ -32,6 +32,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -54,6 +55,11 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 public class PHPContentFilter implements IFilter {
 
 	private static final String MIMETYPE = "x-application/php";
+	
+	private static final int STRTYPE_SINGLEQUOTED = 0;
+	private static final int STRTYPE_DOUBLEQUOTED = 1;
+	private static final int STRTYPE_HEREDOC = 2;
+	private static final int STRTYPE_NOWDOC = 3;
 	
 	private Parameters params;
 	private String srcLang;
@@ -188,6 +194,10 @@ public class PHPContentFilter implements IFilter {
 		current = -1;
 		tuId = 0;
 		otherId = 0;
+		// Compile code finder rules
+		if ( params.useCodeFinder ) {
+			params.codeFinder.compile();
+		}
 
 		// Set the start event
 		queue = new LinkedList<Event>();
@@ -214,8 +224,10 @@ public class PHPContentFilter implements IFilter {
 		int state = 0;
 		StringBuilder buf = null;
 		StringBuilder possibleEndKey = null;
-		StringBuilder heredocKey = null;
-		char ch;
+		String endKey = null;
+		int blockType = STRTYPE_HEREDOC;
+		char ch = 0x0;
+		char pch = 0x0;
 		
 		if ( current < 0 ) startSkl = 0;
 		else startSkl = current;
@@ -233,6 +245,10 @@ public class PHPContentFilter implements IFilter {
 				return;
 			}
 			
+			if ( state == 0 ) {
+				// In state 0: remember the last non-whietspace chararcter
+				if ( !Character.isWhitespace(ch) ) pch = ch;
+			}
 			ch = inputText.charAt(++current);
 			
 			switch ( state ) {
@@ -246,13 +262,13 @@ public class PHPContentFilter implements IFilter {
 					prevState = state;
 					state = 4;
 					continue;
-				case '<': // Test for heredoc (nowdocs are the same from our viewpoint)
+				case '<': // Test for heredoc/nowdoc
 					if ( inputText.length() > current+2) {
 						if (( inputText.charAt(current+1) == '<' ) 
 							&& ( inputText.charAt(current+1) == '<' )) {
 							// Gets the keyword
 							current+=2;
-							heredocKey = new StringBuilder();
+							buf = new StringBuilder();
 							state = 6;
 							continue;
 						}
@@ -306,30 +322,43 @@ public class PHPContentFilter implements IFilter {
 				state = prevState;
 				continue;
 				
-			case 5: // After '*', expect (from multi-line comment)
+			case 5: // After '*', expect slash (from multi-line comment)
 				if ( ch == '/' ) {
 					state = prevState;
 					continue;
 				}
 				// Else: 
-				state = 4; // Go back to comment
+				state = 3; // Go back to comment
 				current--;
 				continue;
 				
 			case 6: // After <<<, getting the heredoc key
 				if ( Character.isWhitespace(ch) ) {
 					// End of key
-					state = 7; // wait for the end of heredoc
+					if ( buf.toString().startsWith("'") ) {
+						blockType = STRTYPE_NOWDOC;
+						endKey  = Util.trimEnd(Util.trimStart(buf.toString(), "'"), "'");
+					}
+					else if ( buf.toString().startsWith("\"") ) {
+						blockType = STRTYPE_HEREDOC;
+						endKey  = Util.trimEnd(Util.trimStart(buf.toString(), "\""), "\"");
+					}
+					else {
+						blockType = STRTYPE_HEREDOC;
+						endKey = buf.toString();
+					}
+					// Change state to wait for the end of heredoc/nowdoc
+					state = 7;
 					startStr = current;
 					buf = new StringBuilder();
 					continue;
 				}
 				else {
-					heredocKey.append(ch);
+					buf.append(ch);
 				}
 				continue;
 				
-			case 7: // Inside a heredoc entry, wait for linebreak
+			case 7: // Inside a heredoc/nowdoc entry, wait for linebreak
 				if ( ch == '\n' ) {
 					endStr = current;
 					possibleEndKey = new StringBuilder();
@@ -340,11 +369,11 @@ public class PHPContentFilter implements IFilter {
 				}
 				continue;
 				
-			case 8: // Parsing the end-key for the heredoc entry
+			case 8: // Parsing the end-key for the heredoc/nowdoc entry
 				switch ( ch ) {
 				case '\n':
 					if ( possibleEndKey.length() > 0 ) { // End of key
-						if ( processString(buf.toString(), true) ) {
+						if ( processString(buf.toString(), pch, blockType) ) {
 							return;
 						}
 						else {
@@ -359,7 +388,7 @@ public class PHPContentFilter implements IFilter {
 					break;
 				case ';':
 					if ( possibleEndKey.length() > 0 ) { // End of key
-						if ( processString(buf.toString(), true) ) {
+						if ( processString(buf.toString(), pch, blockType) ) {
 							return;
 						}
 						else {
@@ -370,7 +399,7 @@ public class PHPContentFilter implements IFilter {
 					// Else: fall thru (';' in string and back to previous state)
 				default:
 					possibleEndKey.append(ch);
-					if ( !heredocKey.toString().startsWith(possibleEndKey.toString()) ) {
+					if ( !endKey.startsWith(possibleEndKey.toString()) ) {
 						// Not the end key, just part of the text
 						state = 7; // back to inside heredoc entry
 						// Don't forget the initial linebreak of case 7
@@ -383,7 +412,7 @@ public class PHPContentFilter implements IFilter {
 				if ( ch == '\'' ) {
 					// End of string
 					endStr = current;
-					if ( processString(buf.toString(), false) ) {
+					if ( processString(buf.toString(), pch, STRTYPE_SINGLEQUOTED) ) {
 						return;
 					}
 					else {
@@ -409,7 +438,7 @@ public class PHPContentFilter implements IFilter {
 				if ( ch == '"' ) {
 					// End of string
 					endStr = current;
-					if ( processString(buf.toString(), false) ) {
+					if ( processString(buf.toString(), pch, STRTYPE_DOUBLEQUOTED) ) {
 						return;
 					}
 					else {
@@ -436,11 +465,40 @@ public class PHPContentFilter implements IFilter {
 
 	// Returns true if we have an event to send
 	private boolean processString (String text,
-		boolean preserveWS)
+		char lastNonWSChar,
+		int stringType)
 	{
-		TextUnit tu = new TextUnit(String.valueOf(++tuId), text);
-		tu.setPreserveWhitespaces(preserveWS);
+		// Do not extract strings used as array key
+		if ( lastNonWSChar == '[' ) return false;
 		
+		TextUnit tu = new TextUnit(null, text);
+
+		boolean preserveWS = false;
+		switch ( stringType ) {
+		case STRTYPE_HEREDOC:
+			preserveWS = true;
+			tu.setType("x-heredoc");
+			break;
+		case STRTYPE_NOWDOC:
+			preserveWS = true;
+			tu.setType("x-nowdoc");
+			break;
+		case STRTYPE_SINGLEQUOTED:
+			tu.setType("x-singlequoted");
+			break;
+		case STRTYPE_DOUBLEQUOTED:
+			tu.setType("x-doublequoted");
+			break;
+		}
+		
+		if ( params.useCodeFinder ) {
+			params.codeFinder.process(tu.getSourceContent());
+		}
+		
+		if ( !tu.getSource().hasText(false) ) return false; // Nothing to localize 
+
+		tu.setId(String.valueOf(++tuId));
+		tu.setPreserveWhitespaces(preserveWS);
 		GenericSkeleton skl = new GenericSkeleton();
 		tu.setSkeleton(skl);
 		
