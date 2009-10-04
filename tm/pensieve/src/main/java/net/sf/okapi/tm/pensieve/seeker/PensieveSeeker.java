@@ -403,7 +403,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      * @param srcCodes the source codes to re-use.
      * @return a new translation unit for the given document.
      */
-    private TranslationUnit createTranslationUnit(Document doc,
+    private TranslationUnit createTranslationUnit (Document doc,
     	String srcCodedText,
     	List<Code> srcCodes)
     {
@@ -414,7 +414,8 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
     	frag = new TextFragment();
     	List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
-    	frag.setCodedText(getFieldValue(doc, TranslationUnitField.TARGET), codes, false);
+    	String codedText = getFieldValue(doc, TranslationUnitField.TARGET);
+		frag.setCodedText(codedText==null ? "" : codedText, codes, false);
     	TranslationUnitVariant trgTuv = new TranslationUnitVariant(
    			getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
 
@@ -425,7 +426,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
     	return tu;
     }
 
-    private TranslationUnit createTranslationUnit(Document doc) {
+    private TranslationUnit createTranslationUnit (Document doc) {
 		TextFragment frag = new TextFragment();
 		List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.SOURCE_CODES));
 		frag.setCodedText(getFieldValue(doc, TranslationUnitField.SOURCE), codes, false);
@@ -434,7 +435,8 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 		frag = new TextFragment();
 		codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
-		frag.setCodedText(getFieldValue(doc, TranslationUnitField.TARGET), codes, false);
+		String codedText = getFieldValue(doc, TranslationUnitField.TARGET);
+		frag.setCodedText(codedText==null ? "" : codedText, codes, false);
 		TranslationUnitVariant trgTuv = new TranslationUnitVariant(
 			getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
 

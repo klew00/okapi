@@ -110,8 +110,13 @@ public class PensieveTMConnector implements ITMQuery {
 	public int query (TextFragment text) {
 		results = new ArrayList<QueryResult>();
 		current = -1;
-		// searchFuzzy also returns exact, so no need to call searchExact
-		List<TmHit> list = seeker.searchFuzzy2(text, threshold, maxHits, attrs);
+		List<TmHit> list;
+		if ( threshold >= 100 ) { // searchExact goes faster for exact 
+			list = seeker.searchExact2(text, maxHits, attrs);
+		}
+		else {
+			list = seeker.searchFuzzy2(text, threshold, maxHits, attrs);
+		}
 
 		// Convert to normalized results
 		for ( TmHit hit : list ) {

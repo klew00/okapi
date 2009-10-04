@@ -48,6 +48,7 @@ import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.filters.table.tsv.TabSeparatedValuesFilter;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 
@@ -57,7 +58,8 @@ import org.junit.Test;
 
 public class TabSeparatedValuesFilterTest {
 
-	private TabSeparatedValuesFilter filter;
+	//private TabSeparatedValuesFilter filter;
+	private IFilter filter;
 	private FilterTestDriver testDriver;
 	private String root; // for maven move; deletions marked with //m
 	

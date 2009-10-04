@@ -126,15 +126,22 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 	private void handleStartDocument (Event event) {
 		Util.createDirectories(directory+File.separator);
-		//TODO: have an option or set to false (for now: false cause an exception: it does not create the TM)
-		writer = TmWriterFactory.createFileBasedTmWriter(directory, true);
+		//TODO: Move this check at the pensieve package level
+		File file = new File(directory+File.separator+"segments.gen");
+		// Create a new index only if one does not exists yet
+		// If one exists we pass false to append to it
+		writer = TmWriterFactory.createFileBasedTmWriter(directory, !file.exists());
 		StartDocument sd = (StartDocument)event.getResource();
 		srcLang = sd.getLanguage();
 	}
 	
 	private void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
+
+		//TODO: What do we do with entries with empty/non-existing target?
 		if ( !tu.hasTarget(trgLang) ) return;
+		//if ( tu.getTarget(trgLang).isEmpty() ) return;
+
 		try {
 			TextContainer srcCont = tu.getSource();
 			// If not segmented: index the whole entry

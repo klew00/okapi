@@ -411,7 +411,9 @@ characters within the text is escaped with a backslash prefix. The source
 language is English and the target Spanish. the content of the target column is 
 a copy of the source.</p>
 <h2><a name="penImport"></a>Import into Pensieve TM</h2>
-<p>Imports the specified input documents into a Pensieve TM database.</p>
+<p>Imports the specified input documents into a Pensieve TM database. If the 
+specified TM does not exists, it is created. If it does exist, the input files 
+are added to it.</p>
 <p>The syntax of this command is:</p>
 <pre>-imp myTMdirectory [options] inputFile [inputFile2...]</pre>
 <p>Where the options are:</p>
@@ -446,7 +448,8 @@ a copy of the source.</p>
 <p>For example:</p>
 <pre>tikal -imp myTMdir data.po -sl JA -tl FR</pre>
 <p>Imports the PO file <code>data.po</code> into the TM database located in
-<code>myTMDir</code>. If the directory does not exists it will be created. the 
+<code>myTMDir</code>. If the directory does not exists it will be created. If a 
+TM exists, the input file9s) will be added to it. The 
 source language of the PO file is Japanese and the target French.</p>
 <p>&nbsp;</p>
 
