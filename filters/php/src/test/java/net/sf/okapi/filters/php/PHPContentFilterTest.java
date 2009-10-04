@@ -52,21 +52,33 @@ public class PHPContentFilterTest {
 //	@Test
 //	public void testDefine () {
 //		String snippet = "define('myconst', 'text');";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		assertTrue(tu!=null);
+//		assertEquals("text", tu.getSource().toString());
 //	}
 	
 //	@Test
 //	public void testArrayDeclarations () {
 //		String snippet = "$arr=array('key1' => 'text1', 'key2' => 'text2');";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+//		assertTrue(tu!=null);
+//		assertEquals("text2", tu.getSource().toString());
 //	}
 
 //	@Test
 //	public void testArrayDeclarationsNoKeys () {
 //		String snippet = "$arr=array('text1', 'text2');";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+//		assertTrue(tu!=null);
+//		assertEquals("text2", tu.getSource().toString());
 //	}
 
 //	@Test
 //	public void testArrayDeclarationsMixed () {
 //		String snippet = "$arr=array('text1', 'key2' => 'text2');";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		assertTrue(tu!=null);
+//		assertEquals("text1", tu.getSource().toString());
 //	}
 
 	@Test
@@ -80,15 +92,14 @@ public class PHPContentFilterTest {
 	
 	@Test
 	public void testEntryWithCodes () {
-		String snippet = "$a='{0}abc%s';";
+		String snippet = "$a='{$abc}=text';";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
-		assertEquals("{0}abc%s", tu.getSource().toString());
+		assertEquals("{$abc}=text", tu.getSource().toString());
 		List<Code> codes = tu.getSourceContent().getCodes();
 		assertNotNull(codes);
-		assertEquals(2, codes.size());
-		assertEquals("{0}", codes.get(0).toString());
-		assertEquals("%s", codes.get(1).toString());
+		assertEquals(1, codes.size());
+		assertEquals("{$abc}", codes.get(0).toString());
 	}
 	
 	@Test

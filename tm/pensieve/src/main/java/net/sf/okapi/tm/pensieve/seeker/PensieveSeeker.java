@@ -352,7 +352,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				tmCodes = Code.stringToCodes(getFieldValue(is.doc(scoreDoc.doc),
 					TranslationUnitField.SOURCE_CODES));
 				tmCodedText = getFieldValue(is.doc(scoreDoc.doc), TranslationUnitField.SOURCE);
-                score = calcEditDistance(tmCodedText, queryCodedText);
+                score = distanceCalc.getDistance(tmCodedText, queryCodedText);
                 if ( score < threshold ) break; // Done
 				if (( queryCodes.size() > 0 ) && ( tmCodes.size() > 0 )) {
 					// If tmScrCodes is null, equals will return false
@@ -361,6 +361,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 						// TODO: we may want to have different penalty per type of code differences
 						score -= 0.01f;
 		                if ( score < threshold ) continue; // Don't include this hit
+		                // But continue the main loop since we could have more matches at a higher score
 		                sort = true;
 					}
 				}

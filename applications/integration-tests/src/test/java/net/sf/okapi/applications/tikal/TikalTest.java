@@ -247,16 +247,16 @@ public class TikalTest {
     	assertTrue("File different from gold", compareWithGoldFile("resxtest.out.resx", "windows-1252"));
     }
 
-//    @Test Filter not ready yet
+//    @Test
 //    public void testExtractMergeTS () throws IOException, InterruptedException {
 //    	// Delete previous output
 //    	assertTrue(deleteOutputFile("tstest.ts.xlf"));
 //    	assertTrue(deleteOutputFile("tstest.out.ts"));
 //    	// Extract
-//    	assertEquals(0, runTikal("-x tstest.ts")); // Auto-assign okf_ts
+//    	assertEquals(0, runTikal("-x tstest.ts -ie UTF-8")); // Auto-assign okf_ts
 //    	assertTrue("File different from gold", compareWithGoldFile("tstest.ts.xlf", "UTF-8"));
 //    	// Merge
-//    	assertEquals(0, runTikal("-m tstest.ts.xlf")); // Auto-assign okf_ts
+//    	assertEquals(0, runTikal("-m tstest.ts.xlf -oe UTF-8")); // Auto-assign okf_ts
 //    	assertTrue("File different from gold", compareWithGoldFile("tstest.out.ts", "UTF-8"));
 //    }
 

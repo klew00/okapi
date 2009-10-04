@@ -50,6 +50,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 25;
+	private int threshold = 60;
 	private JSONParser parser;
 	
 	public TranslateToolkitTMConnector () {
@@ -120,11 +121,12 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	        JSONArray array = (JSONArray)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 			QueryResult qr;
 	        for ( int i=0; i<array.size(); i++ ) {
-	        	if ( i == maxHits ) break; // Stop at maxHits
+	        	if ( i >= maxHits ) break; // Stop at maxHits
 	        	@SuppressWarnings("unchecked")
 	        	Map<String, Object> map = (Map<String, Object>)array.get(i);
 	        	qr = new QueryResult();
 	        	qr.score = ((Double)map.get("quality")).intValue();
+	        	if ( qr.score < threshold ) break; // Done
 	        	qr.source = new TextFragment((String)map.get("source"));
 	        	qr.target = new TextFragment((String)map.get("target"));
 	        	results.add(qr);
@@ -178,7 +180,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	}
 
 	public void setThreshold (int threshold) {
-		// Not used with this connector
+		this.threshold = threshold;
 	}
 
 	public int getMaximumHits () {
@@ -186,8 +188,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	}
 
 	public int getThreshold () {
-		// Not used with this connector
-		return 0;
+		return threshold;
 	}
 
 	private String toInternalCode (String standardCode) {

@@ -246,7 +246,7 @@ public class PHPContentFilter implements IFilter {
 			}
 			
 			if ( state == 0 ) {
-				// In state 0: remember the last non-whietspace chararcter
+				// In state 0: remember the last non-whitespace chararcter
 				if ( !Character.isWhitespace(ch) ) pch = ch;
 			}
 			ch = inputText.charAt(++current);
