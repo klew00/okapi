@@ -56,6 +56,7 @@ public final class MimeTypeMapper {
 	public static final String XLSM_MIME_TYPE = "application/vnd.ms-excel.sheet.macroEnabled";
 	public static final String PPTM_MIME_TYPE = "application/vnd.ms-powerpoint.presentation.macroEnabled";
 	public static final String TS_MIME_TYPE = "application/x-ts";	
+	public static final String PHP_MIME_TYPE = "application/x-php";	
 
 	static {
 		extensionToMimeMap.put("xml", XML_MIME_TYPE);

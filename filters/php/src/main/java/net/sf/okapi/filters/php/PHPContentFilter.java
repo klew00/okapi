@@ -32,6 +32,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
@@ -43,6 +44,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -54,8 +56,6 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  */
 public class PHPContentFilter implements IFilter {
 
-	private static final String MIMETYPE = "x-application/php";
-	
 	private static final int STRTYPE_SINGLEQUOTED = 0;
 	private static final int STRTYPE_DOUBLEQUOTED = 1;
 	private static final int STRTYPE_HEREDOC = 2;
@@ -73,9 +73,11 @@ public class PHPContentFilter implements IFilter {
 	private int startSkl;
 	private int startStr;
 	private int endStr;
+	private StringBuilder escaped;
 	
 	public PHPContentFilter () {
 		params = new Parameters();
+		escaped = new StringBuilder();
 	}
 	
 	public void cancel () {
@@ -98,7 +100,7 @@ public class PHPContentFilter implements IFilter {
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
-			MIMETYPE,
+			MimeTypeMapper.PHP_MIME_TYPE,
 			getClass().getName(),
 			"PHP Content Default",
 			"Default PHP Content configuration."));
@@ -110,7 +112,7 @@ public class PHPContentFilter implements IFilter {
 	}
 
 	public String getMimeType () {
-		return MIMETYPE;
+		return MimeTypeMapper.PHP_MIME_TYPE;
 	}
 
 	public String getName () {
@@ -208,8 +210,8 @@ public class PHPContentFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setFilterWriter(createFilterWriter());
-		startDoc.setType(MIMETYPE);
-		startDoc.setMimeType(MIMETYPE);
+		startDoc.setType(MimeTypeMapper.PHP_MIME_TYPE);
+		startDoc.setMimeType(MimeTypeMapper.PHP_MIME_TYPE);
 		startDoc.setMultilingual(false);
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		hasNext = true;
@@ -472,15 +474,20 @@ public class PHPContentFilter implements IFilter {
 		if ( lastNonWSChar == '[' ) return false;
 		
 		TextUnit tu = new TextUnit(null, text);
+		if ( params.useCodeFinder ) {
+			params.codeFinder.process(tu.getSourceContent());
+		}
+		
+		if ( !tu.getSourceContent().hasText(false) ) return false; // Nothing to localize
 
 		boolean preserveWS = false;
 		switch ( stringType ) {
 		case STRTYPE_HEREDOC:
-			preserveWS = true;
+			//TODO: not sure about ws preserveWS = true;
 			tu.setType("x-heredoc");
 			break;
 		case STRTYPE_NOWDOC:
-			preserveWS = true;
+			//TODO: not sure about ws preserveWS = true;
 			tu.setType("x-nowdoc");
 			break;
 		case STRTYPE_SINGLEQUOTED:
@@ -490,14 +497,8 @@ public class PHPContentFilter implements IFilter {
 			tu.setType("x-doublequoted");
 			break;
 		}
-		
-		if ( params.useCodeFinder ) {
-			params.codeFinder.process(tu.getSourceContent());
-		}
-		
-		if ( !tu.getSource().hasText(false) ) return false; // Nothing to localize 
-
 		tu.setId(String.valueOf(++tuId));
+		tu.setMimeType(MimeTypeMapper.PHP_MIME_TYPE);
 		tu.setPreserveWhitespaces(preserveWS);
 		GenericSkeleton skl = new GenericSkeleton();
 		tu.setSkeleton(skl);
