@@ -79,6 +79,7 @@ public class TsFilter implements IFilter {
 		TranslationStatus status = TranslationStatus.UNDETERMINED;
 		boolean sourceExists = false;
 		boolean targetExists = false;
+		String elemBeforeTrg = null;
 		boolean sourceIsEmpty = true;
 		boolean targetIsEmpty = true;
 		String messageId = null;
@@ -101,6 +102,7 @@ public class TsFilter implements IFilter {
 			status = TranslationStatus.UNDETERMINED;
 			sourceExists = false;
 			targetExists = false;
+			elemBeforeTrg = null;
 			sourceIsEmpty = true;
 			targetIsEmpty = true;
 			messageId = null;
@@ -133,10 +135,28 @@ public class TsFilter implements IFilter {
 			else
 				return false;
 		}
+		
+		boolean missingSourceAndTarget(){
+			if ( !ts.sourceExists && !ts.targetExists ){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
+		boolean missingSourceNotTarget(){
+			if ( !ts.sourceExists && ts.targetExists){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
 		public void reset(){
 			this.status = TranslationStatus.UNDETERMINED;
 			sourceExists = false;
 			targetExists = false;
+			elemBeforeTrg = null;
 			sourceIsEmpty = true;
 			targetIsEmpty = true;
 			messageId = null;
@@ -151,6 +171,8 @@ public class TsFilter implements IFilter {
 
 		public void analyzeMessage() {
 
+			String validBefore = ",source,oldsource,comment,oldcomment,extracomment,translatorcomment,";
+			
 			for(XMLEvent event: eventList){
 				
 				if(event.getEventType() == XMLEvent.START_ELEMENT){
@@ -171,6 +193,14 @@ public class TsFilter implements IFilter {
 							status = TranslationStatus.OTHER;
 						}
 						targetExists = true;
+					}
+				}else if(event.getEventType() == XMLEvent.END_ELEMENT){
+
+					EndElement endElem = event.asEndElement();
+					String endElemName = endElem.getName().getLocalPart();
+
+					if( validBefore.contains(","+endElemName+",")){
+						elemBeforeTrg = endElemName;
 					}
 				}
 			}
@@ -324,7 +354,6 @@ public class TsFilter implements IFilter {
 			XMLStreamReader reader = fact.createXMLStreamReader(input.getReader());
 
 			String realEnc = reader.getCharacterEncodingScheme();
-			System.out.println(reader.getCharacterEncodingScheme());
 			if ( realEnc != null ) 
 				encoding = realEnc;
 			else 
@@ -436,11 +465,22 @@ public class TsFilter implements IFilter {
 				if(endElemName.equals("message")){
 					//TODO validateMessage();
 					ts.analyzeMessage();
-					if( ts.msgIsObsolete() ){
+					
+					if( ts.msgIsObsolete() || ts.missingSourceAndTarget() || ts.missingSourceNotTarget() ){
+
+						StartElement se = getStartElement("message");
+						if( ts.missingSourceAndTarget() ){
+							logger.warning("Message (Line "+se.getLocation().getLineNumber()+" contains no <translation> and no <source>. Message will be ignored.");
+						}else if( ts.missingSourceNotTarget() ){
+							logger.warning("Message (Line "+se.getLocation().getLineNumber()+" contains <translation> but no <source>. Message will be ignored.");
+						}
+
 						DocumentPart dp = generateObsoleteTu();
 						//printDp(dp);
 						queue.add(new Event(EventType.DOCUMENT_PART, dp));
+						eventList.clear();
 						ts.reset();
+						
 					}else{
 						TextUnit tu = generateTu();
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
@@ -478,10 +518,23 @@ public class TsFilter implements IFilter {
 		IResource resource = generateTsPart(false);
 		queue.add(new Event(EventType.DOCUMENT_PART, resource));
 		eventList.clear();
+		skel = new GenericSkeleton("");
 		return false;
 	}	
 
-	
+	private StartElement getStartElement(String string) {
+
+		for(XMLEvent event: eventList){
+			if(event.getEventType() == XMLEvent.START_ELEMENT){
+				StartElement startElement = event.asStartElement();
+				if( startElement.getName().getLocalPart().equals("message") ){
+					return startElement;
+				}
+			}
+		}
+		return null;
+	}
+
 	private boolean tsPartReady(String elemName) {
 		if(ts.currentDocumentLocation == DocumentLocation.TS){
 			if( elemName.equals("context") || elemName.equals("message") ){
@@ -617,8 +670,7 @@ public class TsFilter implements IFilter {
 		return resource;
 	}
 	
-	
-		
+			
 	TextUnit generateTu(){
 		
 		boolean nextIsSkippableEmpty = false;
@@ -693,6 +745,20 @@ public class TsFilter implements IFilter {
 				}else{
 					procEndElem(endElem);
 				}
+				
+				if( !ts.targetExists ){
+					if (endElemName.equals(ts.elemBeforeTrg)){
+						skel.append(lineBreak);
+						skel.append("<translation");
+						skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
+						tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
+						tu.setTargetProperty(trgLang, new Property("variants", "no"));
+						skel.append(" variants=\"no\">");
+						skel.addContentPlaceholder(tu, trgLang);
+						skel.append("</translation>");
+					}
+				}
+				
 			}else if(event.getEventType() == XMLEvent.CHARACTERS){
 				
 				Characters chars = event.asCharacters();
@@ -711,6 +777,8 @@ public class TsFilter implements IFilter {
 		}
 		return tu;
 	}
+
+	
 	DocumentPart generateObsoleteTu(){
 		
 		boolean nextIsSkippableEmpty = false;
@@ -782,20 +850,21 @@ public class TsFilter implements IFilter {
 	
 	private void procCharacters(Characters chars) {
 
-		String escaped = Util.escapeToXML(chars.getData(), 0, true, null); 
+		String escaped = Util.escapeToXML(chars.getData().replace("\n", lineBreak), 0, true, null); 
 		skel.append(escaped);	
 	}
 
 
 	private void procDTD(XMLEvent event) {
 		DTD dtd =(DTD)event;
-		skel.append(dtd.getDocumentTypeDeclaration());
+		skel.append(dtd.getDocumentTypeDeclaration().replace("\n", lineBreak));
 	}
 
 
 	private void procComment(XMLEvent event) {
 		Comment comment = (Comment)event;
-		skel.append("<!--"+comment.getText()+"-->");
+		skel.append("<!--"+comment.getText().replace("\n", lineBreak)+"-->");
+		
 	}
 	
 	
@@ -978,7 +1047,7 @@ public class TsFilter implements IFilter {
 				Attribute attr = startElement.getAttributeByName(new QName("value"));
 				tc.append(decodeByteValue(attr.getValue()));
 			}else{
-				tc.append("<byte value=\""+startElement.getName().getLocalPart()+"/>");
+				tc.append("<byte value=\""+startElement.getAttributeByName(new QName("value")).getValue()+"\"/>");
 				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
 				//TODO: should it be text or code?
 			}
@@ -993,7 +1062,7 @@ public class TsFilter implements IFilter {
 				Attribute attr = startElement.getAttributeByName(new QName("value"));
 				tc.append(decodeByteValue(attr.getValue()));
 			}else{
-				tc.append("<byte value=\""+startElement.getName().getLocalPart()+"/>");
+				tc.append("<byte value=\""+startElement.getAttributeByName(new QName("value")).getValue()+"\"/>");
 				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
 				//TODO: should it be text or code?
 			}
@@ -1002,7 +1071,7 @@ public class TsFilter implements IFilter {
 		
 	
 	private void procStartElemByte(StartElement startElement) {
-		skel.append("<byte value=\""+startElement.getName().getLocalPart()+"/>");
+		skel.append("<byte value=\""+startElement.getAttributeByName(new QName("value")).getValue()+"\"/>");
 	}
 	
 		
