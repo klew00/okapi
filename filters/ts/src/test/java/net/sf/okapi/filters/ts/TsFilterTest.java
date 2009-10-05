@@ -258,13 +258,14 @@ public class TsFilterTest {
 		
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,"en-us","fr-fr"), "fr"));
 	}
+	
 	@Test
 	public void StartDocument_FromFile() {
 		StartDocument sd = FilterTestDriver.getStartDocument(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"));
-		
 		assertEquals("Incorrect id","1", sd.getId());
 		assertEquals("Incorrect mimeType",MimeTypeMapper.TS_MIME_TYPE, sd.getMimeType());
-		assertEquals("Incorrect name", "/C:/Okapi/trunk/filters/ts/target/test-classes/Complete_valid_utf8_bom_crlf.ts", sd.getName());
+		assertTrue(sd.getName().startsWith(root));
+		assertTrue(sd.getName().endsWith("/Complete_valid_utf8_bom_crlf.ts"));
 		assertEquals("Incorrect encoding", "utf-8", sd.getEncoding());
 		assertEquals("Incorrect src language", "en-us", sd.getLanguage());
 		assertEquals("Incorrect linebreak", "\r\n", sd.getLineBreak());
@@ -274,12 +275,10 @@ public class TsFilterTest {
 		assertTrue(sd.getFilterWriter() instanceof GenericFilterWriter);
 		assertEquals("utf-8", sd.getProperty("encoding").getValue());
 		assertEquals(
-				"<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>", 
-				sd.getSkeleton().toString());
-
-		
-		
+			"<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>", 
+			sd.getSkeleton().toString());
 	}	
+
 	@Test
 	public void DocumentPartTsPart_FromFile() {
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 1);
@@ -488,9 +487,9 @@ public class TsFilterTest {
 				"</message>",
 				dp.getSkeleton().toString());
 	}		
+
 	@Test
 	public void testDoubleExtraction () {
-		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Complete_valid_utf8_bom_crlf.ts", null));
 		RoundTripComparison rtc = new RoundTripComparison();
