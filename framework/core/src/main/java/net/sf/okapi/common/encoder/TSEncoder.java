@@ -72,7 +72,7 @@ public class TSEncoder implements IEncoder {
 			if (( value != null ) && ( value.equals("yes") )) {
 				return "";
 			}else{
-				return "type=\"unfinished\"";
+				return " type=\"unfinished\"";
 			}
 		}
 		return value;		
