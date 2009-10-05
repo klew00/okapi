@@ -196,6 +196,22 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeTS () throws IOException, InterruptedException {
+    
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("tstest.ts.xlf"));
+    	assertTrue(deleteOutputFile("tstest.out.ts"));
+
+    	// Extract
+    	assertEquals(0, runTikal("-x tstest.ts -sl EN-US -tl FR-FR -ie UTF-8"));
+    	assertTrue("File different from gold", compareWithGoldFile("tstest.ts.xlf", "UTF-8"));
+  	
+    	// Merge
+    	assertEquals(0, runTikal("-m tstest.ts.xlf -sl EN-US -tl FR-FR -oe UTF-8"));
+    	assertTrue("File different from gold", compareWithGoldFile("tstest.out.ts", "windows-1252"));
+    }
+    
+    @Test
     public void testExtractMergeXLIFF () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputFile("xlifftest.xlf.xlf"));
@@ -246,19 +262,6 @@ public class TikalTest {
     	assertEquals(0, runTikal("-m resxtest.resx.xlf -ie windows-1252")); // Auto-assign okf_xml-resx
     	assertTrue("File different from gold", compareWithGoldFile("resxtest.out.resx", "windows-1252"));
     }
-
-//    @Test
-//    public void testExtractMergeTS () throws IOException, InterruptedException {
-//    	// Delete previous output
-//    	assertTrue(deleteOutputFile("tstest.ts.xlf"));
-//    	assertTrue(deleteOutputFile("tstest.out.ts"));
-//    	// Extract
-//    	assertEquals(0, runTikal("-x tstest.ts -ie UTF-8")); // Auto-assign okf_ts
-//    	assertTrue("File different from gold", compareWithGoldFile("tstest.ts.xlf", "UTF-8"));
-//    	// Merge
-//    	assertEquals(0, runTikal("-m tstest.ts.xlf -oe UTF-8")); // Auto-assign okf_ts
-//    	assertTrue("File different from gold", compareWithGoldFile("tstest.out.ts", "UTF-8"));
-//    }
 
     @Test
     public void testExtractMergeSRT () throws IOException, InterruptedException {
