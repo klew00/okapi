@@ -135,6 +135,89 @@ public class PHPContentFilterTest {
 	}
 	
 	@Test
+	public void testSkipDirective () {
+		String snippet = "//_skip\n $a='skip';\n$b='text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testTextInBSkipDirective () {
+		String snippet = "//_bskip\n $a='skip';\n//_text\n$b='text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testESkipDirective () {
+		String snippet = "//_bskip\n $a='skip';\n//_eskip\n$b='text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testDirectiveInMultilineComment () {
+		String snippet = "/*_skip*/ $a='skip'; $b='text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testBTextDirective () {
+		String snippet = "/*_bskip*/ $a='skip'; /*_btext*/ $b='text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testETextDirective () {
+		String snippet = "/*_bskip*/ $a='skip'; /*_btext*/ $b='textB'; /*_etext*/\n"
+			+"$c='skip'; /*_eskip*/ $d='textD'";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("textB", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertTrue(tu!=null);
+		assertEquals("textD", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testSkipOutsideDirective () {
+		String snippet = "$a='skip'; /*_btext*/ $b='textB';";
+		Parameters params = (Parameters)filter.getParameters();
+		params.locDir.setOptions(true, false);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
+		assertTrue(tu!=null);
+		assertEquals("textB", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testDisabledDirectives () {
+		String snippet = "/*_skip*/ $a='textA'; $b='textB';";
+		Parameters params = (Parameters)filter.getParameters();
+		params.locDir.setOptions(false, false);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
+		assertTrue(tu!=null);
+		assertEquals("textA", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 2);
+		assertTrue(tu!=null);
+		assertEquals("textB", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testDirectiveScope () {
+		String snippet = "/*_skip*/ $a['key1']='skip'; $a['key2']='text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+
+	@Test
 	public void testSingleQuotedString () {
 		String snippet = "$a='\\\\text\\'';\n$b='\\'\"text\"';";
 		// Check first TU
@@ -269,8 +352,16 @@ public class PHPContentFilterTest {
 	}
 
 	private ArrayList<Event> getEvents(String snippet) {
+		return getEvents(snippet, null);
+	}
+	
+	private ArrayList<Event> getEvents(String snippet, Parameters params) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, "en"));
+		
+		if ( params == null ) filter.getParameters().reset();
+		else filter.setParameters(params);
+		
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);

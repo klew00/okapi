@@ -44,7 +44,6 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -73,11 +72,11 @@ public class PHPContentFilter implements IFilter {
 	private int startSkl;
 	private int startStr;
 	private int endStr;
-	private StringBuilder escaped;
+//	private StringBuilder escaped;
 	
 	public PHPContentFilter () {
 		params = new Parameters();
-		escaped = new StringBuilder();
+//		escaped = new StringBuilder();
 	}
 	
 	public void cancel () {
@@ -295,11 +294,13 @@ public class PHPContentFilter implements IFilter {
 				
 			case 1: // After initial '/'
 				if ( ch == '/' ) {
-					state = 2; // Wait for EOL/EOS
+					state = 2; // Single-line comment: Wait for EOL/EOS
+					buf = new StringBuilder();
 					continue;
 				}
 				if ( ch == '*' ) {
-					state = 3; // wait for slash+star
+					state = 3; // Comment: wait for slash+star
+					buf = new StringBuilder();
 					continue;
 				}
 				// Else: Was a normal '/'
@@ -309,15 +310,24 @@ public class PHPContentFilter implements IFilter {
 				
 			case 2: // In single-line comment, wait for EOL/EOS
 				if ( ch == '\n' ) {
+					// Process the comment for directives
+					params.locDir.process(buf.toString());
+					// And go back to previous state
 					state = prevState;
 					continue;
 				}
+				// Else: Store the comment
+				buf.append(ch);
 				continue;
 				
 			case 3: // In multi-line comment, wait for star+slash
 				if ( ch == '*' ) {
+					// Check for next character
 					state = 5;
+					continue;
 				}
+				// Else: Store the comment
+				buf.append(ch);
 				continue;
 				
 			case 4: // After backslash for escape
@@ -326,11 +336,15 @@ public class PHPContentFilter implements IFilter {
 				
 			case 5: // After '*', expect slash (from multi-line comment)
 				if ( ch == '/' ) {
+					// Process the comment for directives
+					params.locDir.process(buf.toString());
+					// And go back to previous state
 					state = prevState;
 					continue;
 				}
 				// Else: 
 				state = 3; // Go back to comment
+				buf.append('*'); // Store the trigger
 				current--;
 				continue;
 				
@@ -473,6 +487,15 @@ public class PHPContentFilter implements IFilter {
 		// Do not extract strings used as array key
 		if ( lastNonWSChar == '[' ) return false;
 		
+		// Do the directive check after auto-skipped strings
+		if ( params.locDir.isWithinScope() ) {
+			if ( !params.locDir.isLocalizable(true) ) return false; 
+		}
+		else { // Outside directive scope: check if we extract text outside
+			if ( !params.locDir.localizeOutside() ) return false;
+		}
+
+		// Set the inline codes if needed
 		TextUnit tu = new TextUnit(null, text);
 		if ( params.useCodeFinder ) {
 			params.codeFinder.process(tu.getSourceContent());

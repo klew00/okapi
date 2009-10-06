@@ -47,6 +47,8 @@ public class Parameters extends BaseParameters {
 		codeFinder.addRule("(\\{\\$(\\w.*?)\\})|</\\w+?>|<\\w.*?(>|\\Z)");
 		codeFinder.addRule("\\A[^<]*?>|<\\w+.*?(>|\\Z)|(\\b\\w*_\\w*\\b)");
 		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
+		codeFinder.addRule("(\\w[-._\\w]*\\w@\\w[-._\\w]*\\w\\.\\w{2,3})");
+		codeFinder.addRule("\\[[\\w_]*?\\]");
 	}
 
 	@Override
