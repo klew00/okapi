@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common.ui.filters;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextContainer;
@@ -202,11 +205,14 @@ public class InlineCodeFinderPanel extends Composite {
 		gdTmp = new GridData();
 		btInsertPattern.setLayoutData(gdTmp);
 		UIUtil.ensureWidth(btInsertPattern, buttonSet2Width);
-		btInsertPattern.setEnabled(false);
 		btInsertPattern.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO
-				Dialogs.showError(getShell(), Res.getString("InlineCodeFinderPanel.8"), null); //$NON-NLS-1$
+				//TODO: Implement real insert
+				//Dialogs.showError(getShell(), Res.getString("InlineCodeFinderPanel.8"), null); //$NON-NLS-1$
+				try {
+					UIUtil.start(new URL("http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html"));
+				}
+				catch ( MalformedURLException ignore ) {}
 			};
 		});
 		
@@ -302,7 +308,7 @@ public class InlineCodeFinderPanel extends Composite {
 		lbRules.setEnabled(!editMode);
 		edExpression.setEditable(editMode);
 		btDiscard.setEnabled(editMode);
-		btInsertPattern.setEnabled(editMode);
+		//TODO: To comment out when implements real insert btInsertPattern.setEnabled(editMode);
 		btAdd.setEnabled(!editMode);
 		
 		if ( editMode ) {

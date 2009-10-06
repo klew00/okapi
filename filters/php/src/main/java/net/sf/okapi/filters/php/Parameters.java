@@ -45,7 +45,7 @@ public class Parameters extends BaseParameters {
 		codeFinder.setUseAllRulesWhenTesting(true);
 		// Default in-line codes:
 		codeFinder.addRule("(\\{\\$(\\w.*?)\\})|</\\w+?>|<\\w.*?(>|\\Z)");
-		codeFinder.addRule("\\A.*?>|</\\w+?>|<\\w.*?(>|\\Z)|(\\b\\w*_\\w*\\b)");
+		codeFinder.addRule("\\A[^<]*?>|<\\w+.*?(>|\\Z)|(\\b\\w*_\\w*\\b)");
 		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
 	}
 
