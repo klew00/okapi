@@ -44,7 +44,9 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -59,6 +61,7 @@ public class PHPContentFilter implements IFilter {
 	private static final int STRTYPE_DOUBLEQUOTED = 1;
 	private static final int STRTYPE_HEREDOC = 2;
 	private static final int STRTYPE_NOWDOC = 3;
+	private static final int STRTYPE_MIXED = 4;
 	
 	private Parameters params;
 	private String srcLang;
@@ -69,14 +72,17 @@ public class PHPContentFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private boolean hasNext;
 	private int current;
-	private int startSkl;
-	private int startStr;
-	private int endStr;
-//	private StringBuilder escaped;
+	private int firstSkelStart;
+	private int skelStart;
+	private int stringStart;
+	private int stringEnd;
+	private TextFragment srcFrag;
+	private TextUnit textUnit;
+	private GenericSkeleton srcSkel;
+	private int resType;
 	
 	public PHPContentFilter () {
 		params = new Parameters();
-//		escaped = new StringBuilder();
 	}
 	
 	public void cancel () {
@@ -228,18 +234,21 @@ public class PHPContentFilter implements IFilter {
 		String endKey = null;
 		int blockType = STRTYPE_HEREDOC;
 		char ch = 0x0;
-		char pch = 0x0;
+		char tch = 0x0;
 		
-		if ( current < 0 ) startSkl = 0;
-		else startSkl = current;
-		endStr = -1;
+		resetStorage();
+		if ( current < 0 ) skelStart = 0;
+		else skelStart = current;
+		firstSkelStart = skelStart;
+		stringEnd = -1;
 		
 		while ( true ) {
 			if ( current+1 >= inputText.length() ) {
+				processTextUnit();
 				// End of input
 				Ending ending = new Ending(String.valueOf(++otherId));
-				if ( startSkl < inputText.length() ) {
-					GenericSkeleton skl = new GenericSkeleton(inputText.substring(startSkl).replace("\n", lineBreak));
+				if ( skelStart < inputText.length() ) {
+					GenericSkeleton skl = new GenericSkeleton(inputText.substring(skelStart).replace("\n", lineBreak));
 					ending.setSkeleton(skl);
 				}
 				queue.add(new Event(EventType.END_DOCUMENT, ending));
@@ -247,8 +256,8 @@ public class PHPContentFilter implements IFilter {
 			}
 			
 			if ( state == 0 ) {
-				// In state 0: remember the last non-whitespace chararcter
-				if ( !Character.isWhitespace(ch) ) pch = ch;
+				// In state 0: check for array bracket
+				if ( !Character.isWhitespace(ch) ) tch = ch;
 			}
 			ch = inputText.charAt(++current);
 			
@@ -275,19 +284,24 @@ public class PHPContentFilter implements IFilter {
 						}
 						// Else: fall thru
 					}
-					// Else: not a heredoc
+					// Else: not a heredoc/nowdoc
 					continue;
 				case '\'': // Single-quoted string
 					prevState = state;
 					state = 9;
-					startStr = current;
+					stringStart = current;
 					buf = new StringBuilder();
 					continue;
 				case '"': // Double-quoted string
 					prevState = state;
 					state = 10;
-					startStr = current;
+					stringStart = current;
 					buf = new StringBuilder();
+					continue;
+				case ';': // End of statement
+				case ',': // End of argument
+				case '=': // Assignment
+					if ( processTextUnit() ) return;
 					continue;
 				}
 				continue;
@@ -365,7 +379,7 @@ public class PHPContentFilter implements IFilter {
 					}
 					// Change state to wait for the end of heredoc/nowdoc
 					state = 7;
-					startStr = current;
+					stringStart = current;
 					buf = new StringBuilder();
 					continue;
 				}
@@ -376,7 +390,7 @@ public class PHPContentFilter implements IFilter {
 				
 			case 7: // Inside a heredoc/nowdoc entry, wait for linebreak
 				if ( ch == '\n' ) {
-					endStr = current;
+					stringEnd = current;
 					possibleEndKey = new StringBuilder();
 					state = 8;
 				}
@@ -389,30 +403,22 @@ public class PHPContentFilter implements IFilter {
 				switch ( ch ) {
 				case '\n':
 					if ( possibleEndKey.length() > 0 ) { // End of key
-						if ( processString(buf.toString(), pch, blockType) ) {
-							return;
-						}
-						else {
-							state = prevState;
-							continue;
-						}
+						addString(buf, blockType, tch);
+						state = prevState;
+						continue;
 					}
 					// Else: Sequential line-breaks
 					buf.append("\n"); // Append the previous
-					endStr = current; // Reset possible ending point
+					stringEnd = current; // Reset possible ending point
 					// and stay in this state
 					break;
 				case ';':
 					if ( possibleEndKey.length() > 0 ) { // End of key
-						if ( processString(buf.toString(), pch, blockType) ) {
-							return;
-						}
-						else {
-							state = prevState;
-							continue;
-						}
+						addString(buf, blockType, tch);
+						state = prevState;
+						continue;
 					}
-					// Else: fall thru (';' in string and back to previous state)
+					// Else: fall thru
 				default:
 					possibleEndKey.append(ch);
 					if ( !endKey.startsWith(possibleEndKey.toString()) ) {
@@ -427,14 +433,10 @@ public class PHPContentFilter implements IFilter {
 			case 9: // Inside a single-quoted string, wait for closing single quote
 				if ( ch == '\'' ) {
 					// End of string
-					endStr = current;
-					if ( processString(buf.toString(), pch, STRTYPE_SINGLEQUOTED) ) {
-						return;
-					}
-					else {
-						state = prevState;
-						continue;
-					}
+					stringEnd = current;
+					addString(buf, STRTYPE_SINGLEQUOTED, tch);
+					state = prevState;
+					continue;
 				}
 				else if ( ch == '\\' ) {
 					if ( inputText.length() > current+1 ) {
@@ -453,14 +455,10 @@ public class PHPContentFilter implements IFilter {
 			case 10: // Inside a double-quoted string, wait for closing double quote
 				if ( ch == '"' ) {
 					// End of string
-					endStr = current;
-					if ( processString(buf.toString(), pch, STRTYPE_DOUBLEQUOTED) ) {
-						return;
-					}
-					else {
-						state = prevState;
-						continue;
-					}
+					stringEnd = current;
+					addString(buf, STRTYPE_SINGLEQUOTED, tch);
+					state = prevState;
+					continue;
 				}
 				else if ( ch == '\\' ) {
 					if ( inputText.length() > current+1 ) {
@@ -479,62 +477,107 @@ public class PHPContentFilter implements IFilter {
 		}
 	}
 
-	// Returns true if we have an event to send
-	private boolean processString (String text,
-		char lastNonWSChar,
-		int stringType)
+	private void addString (StringBuilder buffer,
+		int type,
+		char lastTokenChar)
 	{
-		// Do not extract strings used as array key
-		if ( lastNonWSChar == '[' ) return false;
-		
-		// Do the directive check after auto-skipped strings
-		if ( params.locDir.isWithinScope() ) {
-			if ( !params.locDir.isLocalizable(true) ) return false; 
-		}
-		else { // Outside directive scope: check if we extract text outside
-			if ( !params.locDir.localizeOutside() ) return false;
-		}
+		if ( lastTokenChar == '[') return; // It's an index
+		if ( buffer.length() == 0 ) return; // Empty string
 
-		// Set the inline codes if needed
-		TextUnit tu = new TextUnit(null, text);
+		if ( stringStart > skelStart ) { // Do we have pre-string codes?
+			if ( srcFrag.isEmpty() ) {
+				// If no text yet: codes go to skeleton
+				srcSkel.add(inputText.substring(skelStart, stringStart+1).replace("\n", lineBreak));
+			}
+			else { // Otherwise they are inline codes
+				srcFrag.append(TagType.PLACEHOLDER, "code",
+					inputText.substring(skelStart, stringStart+1).replace("\n", lineBreak));
+			}
+		}
+		
+		// Set the text and process it for inline codes
+		TextFragment tf = new TextFragment(buffer.toString());
 		if ( params.useCodeFinder ) {
-			params.codeFinder.process(tu.getSourceContent());
+			params.codeFinder.process(tf);
 		}
 		
-		if ( !tu.getSourceContent().hasText(false) ) return false; // Nothing to localize
-
-		boolean preserveWS = false;
-		switch ( stringType ) {
-		case STRTYPE_HEREDOC:
-			//TODO: not sure about ws preserveWS = true;
-			tu.setType("x-heredoc");
-			break;
-		case STRTYPE_NOWDOC:
-			//TODO: not sure about ws preserveWS = true;
-			tu.setType("x-nowdoc");
+		// Do we still have text in the fragment? (and started the source?) 
+		if ( !tf.hasText(true) && srcFrag.isEmpty() ) {
+			// If no text yet: string-with-codes-only goes to skeleton
+			srcSkel.add(inputText.substring(stringStart, stringEnd+1).replace("\n", lineBreak));
+		}
+	
+		// Otherwise it's either text or inline codes or both
+		srcFrag.append(tf);
+		// Compute the type
+		if ( resType == -1 ) resType = type;
+		else {
+			if ( resType != type ) {
+				resType = STRTYPE_MIXED;
+			}
+		}
+		// Move the start for the next skeleton part
+		skelStart = stringEnd;
+	}
+	
+	private boolean processTextUnit () {
+		// Check if we have text (as a whole)
+		boolean extract = srcFrag.hasText(false);
+		// Check for directives
+		if ( extract ) {
+			// Do the directive check after auto-skipped strings
+			if ( params.locDir.isWithinScope() ) {
+				if ( !params.locDir.isLocalizable(true) ) extract = false; 
+			}
+			else { // Outside directive scope: check if we extract text outside
+				if ( !params.locDir.localizeOutside() ) extract = false;
+			}
+		}
+		
+		// If no extraction: reset and move on
+		if ( !extract ) {
+			resetStorage();
+			skelStart = firstSkelStart;
+			return false;
+		}
+		
+		// Otherwise: set the text unit data
+		textUnit = new TextUnit(String.valueOf(++tuId));
+		switch ( resType ) {
+		case STRTYPE_DOUBLEQUOTED:
+			textUnit.setType("x-doublequoted");
 			break;
 		case STRTYPE_SINGLEQUOTED:
-			tu.setType("x-singlequoted");
+			textUnit.setType("x-singlequoted");
 			break;
-		case STRTYPE_DOUBLEQUOTED:
-			tu.setType("x-doublequoted");
+		case STRTYPE_HEREDOC:
+			textUnit.setType("x-heredoc");
+			break;
+		case STRTYPE_NOWDOC:
+			textUnit.setType("x-nowdoc");
+			break;
+		case STRTYPE_MIXED:
+			textUnit.setType("x-mixed");
 			break;
 		}
-		tu.setId(String.valueOf(++tuId));
-		tu.setMimeType(MimeTypeMapper.PHP_MIME_TYPE);
-		tu.setPreserveWhitespaces(preserveWS);
-		GenericSkeleton skl = new GenericSkeleton();
-		tu.setSkeleton(skl);
+		srcSkel.addContentPlaceholder(textUnit);
+		textUnit.setMimeType(MimeTypeMapper.PHP_MIME_TYPE);
+		textUnit.getSourceContent().append(srcFrag);
+		if ( !srcSkel.isEmpty() ) textUnit.setSkeleton(srcSkel);
 		
-		if ( startStr > startSkl ) {
-			skl.add(inputText.substring(startSkl, startStr+1).replace("\n", lineBreak));
+		// Any dangling skeleton?
+		if ( skelStart < current ) {
+			srcSkel.add(inputText.substring(skelStart, current).replace("\n", lineBreak));
 		}
-		skl.addContentPlaceholder(tu);
-		if ( endStr < current ) {
-			skl.add(inputText.substring(endStr, current).replace("\n", lineBreak));
-		}
-		queue.add(new Event(EventType.TEXT_UNIT, tu));
+		queue.add(new Event(EventType.TEXT_UNIT, textUnit));
+		skelStart = current;
 		return true;
+	}
+
+	private void resetStorage () {
+		resType = -1;
+		srcFrag = new TextFragment();
+		srcSkel = new GenericSkeleton();
 	}
 
 }

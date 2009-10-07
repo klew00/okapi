@@ -29,6 +29,7 @@ public class Parameters extends BaseParameters {
 	public boolean useCodeFinder;
 	public InlineCodeFinder codeFinder;
 	public LocalizationDirectives locDir;
+	private boolean concatenate;
 
 	public Parameters () {
 		locDir = new LocalizationDirectives();
@@ -37,18 +38,30 @@ public class Parameters extends BaseParameters {
 		toString(); // fill the list
 	}
 	
+	public boolean getConcatenate () {
+		return concatenate;
+	}
+
+	public void setConcatenate (boolean concatenate) {
+		this.concatenate = concatenate;
+	}
+
 	public void reset () {
 		locDir.reset();
 		useCodeFinder = true;
 		codeFinder.reset();
 		codeFinder.setSample("${abc} {$abc) $abc");
 		codeFinder.setUseAllRulesWhenTesting(true);
-		// Default in-line codes:
-		codeFinder.addRule("(\\{\\$(\\w.*?)\\})|</\\w+?>|<\\w.*?(>|\\Z)");
-		codeFinder.addRule("\\A[^<]*?>|<\\w+.*?(>|\\Z)|(\\b\\w*_\\w*\\b)");
-		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
+
+		// HTML-like tags (including without start or end)
+		codeFinder.addRule("(\\A[^<]*?>)|(<[\\w!?/].*?(>|\\Z))");
+		// Basic escaped characters
+		codeFinder.addRule("\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
+		// Email address
 		codeFinder.addRule("(\\w[-._\\w]*\\w@\\w[-._\\w]*\\w\\.\\w{2,3})");
-		codeFinder.addRule("\\[[\\w_]*?\\]");
+		// [var] and {var} variables
+		codeFinder.addRule("[\\[{][\\w_$]+?[}\\]]");
+		concatenate = true;
 	}
 
 	@Override
@@ -58,6 +71,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
 		buffer.setBoolean("useCodeFinder", useCodeFinder);
 		buffer.setGroup("codeFinderRules", codeFinder.toString());
+		buffer.setBoolean("concatenate", concatenate);
 		return buffer.toString();
 	}
 	
@@ -69,6 +83,7 @@ public class Parameters extends BaseParameters {
 		locDir.setOptions(tmpBool1, tmpBool2);
 		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
 		codeFinder.fromString(buffer.getGroup("codeFinderRules", ""));
+		buffer.getBoolean("concatenate", concatenate);
 	}
 
 }

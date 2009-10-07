@@ -30,6 +30,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -42,11 +43,13 @@ public class PHPContentFilterTest {
 	
 	private PHPContentFilter filter;
 	private String root;
+	private GenericContent fmt;
 
 	@Before
 	public void setUp() {
 		filter = new PHPContentFilter();
 		root = TestUtil.getParentDir(this.getClass(), "/test01.phpcnt");
+		fmt = new GenericContent();
 	}
 
 //	@Test
@@ -81,6 +84,38 @@ public class PHPContentFilterTest {
 //		assertEquals("text1", tu.getSource().toString());
 //	}
 
+//	@Test
+//	public void testRequireOnceFunction () {
+//		String snippet = "require_once('file.php'); $a='text';";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		assertTrue(tu!=null);
+//		assertEquals("text", tu.getSource().toString());
+//	}
+	
+//	@Test
+//	public void testRequireFunction () {
+//		String snippet = "require('file.php'); $a='text';";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		assertTrue(tu!=null);
+//		assertEquals("text", tu.getSource().toString());
+//	}
+	
+//	@Test
+//	public void testIncludeFunction () {
+//		String snippet = "include('file.php'); $a='text';";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		assertTrue(tu!=null);
+//		assertEquals("text", tu.getSource().toString());
+//	}
+	
+//	@Test //TODO later: case where array index is composite
+//	public void testArrayIndexWithVariable () {
+//		String snippet = "$a[$b.'skip'] = 'text';";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		assertTrue(tu!=null);
+//		assertEquals("text", tu.getSource().toString());
+//	}
+	
 	@Test
 	public void testDefaultInfo () {
 		assertNotNull(filter.getParameters());
@@ -88,6 +123,36 @@ public class PHPContentFilterTest {
 		List<FilterConfiguration> list = filter.getConfigurations();
 		assertNotNull(list);
 		assertTrue(list.size()>0);
+	}
+	
+	@Test
+	public void testConcatSQStrings () {
+		String snippet = "$a='t1' \r. 't2';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("t1' \r. 't2", tu.getSource().toString());
+		List<Code> codes = tu.getSourceContent().getCodes();
+		assertEquals(1, codes.size());
+		assertEquals("' \r. '", codes.get(0).toString());
+	}
+	
+	@Test
+	public void testConcatMultipleSQStrings () {
+		String snippet = "$a='t1' \r.$b.' t2';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("t1' \r.$b.' t2", tu.getSource().toString());
+		List<Code> codes = tu.getSourceContent().getCodes();
+		assertEquals(1, codes.size());
+		assertEquals("' \r.$b.'", codes.get(0).toString());
+	}
+	
+	@Test
+	public void testConcatSGAndDQStrings () {
+		String snippet = "$a='t1' . \"t2\";";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("t1' . \"t2", tu.getSource().toString());
 	}
 	
 	@Test
@@ -100,6 +165,74 @@ public class PHPContentFilterTest {
 		assertNotNull(codes);
 		assertEquals(1, codes.size());
 		assertEquals("{$abc}", codes.get(0).toString());
+	}
+	
+	@Test
+	public void testSimpleHTMLCodes () {
+		String snippet = "$a='t<a>t</a>t<a attr=\"val\"/>t';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("t<a>t</a>t<a attr=\"val\"/>t", tu.getSource().toString());
+		assertEquals("t<1/>t<2/>t<3/>t", fmt.setContent(tu.getSourceContent()).toString());
+	}
+	
+	@Test
+	public void testParitalStartingHTMLCodes () {
+		String snippet = "$a='c attr=\"val\"> text <br/>';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("c attr=\"val\"> text <br/>", tu.getSource().toString());
+		assertEquals("<1/> text <2/>", fmt.setContent(tu.getSourceContent()).toString());
+	}
+	
+	@Test
+	public void testParitalClosingHTMLCodes () {
+		String snippet = "$a='<br/> text <a href=\"...';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("<br/> text <a href=\"...", tu.getSource().toString());
+		assertEquals("<1/> text <2/>", fmt.setContent(tu.getSourceContent()).toString());
+	}
+	
+	@Test
+	public void testSpecialHTMLCodes () {
+		String snippet = "$a='<!DOCTYPE...> t <?pi attr=\"val\"?> t';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("<!DOCTYPE...> t <?pi attr=\"val\"?> t", tu.getSource().toString());
+		assertEquals("<1/> t <2/> t", fmt.setContent(tu.getSourceContent()).toString());
+	}
+	
+	@Test
+	public void testEscapeCodes () {
+		String snippet = "$a='\\n t \\r t \\n\\r t \\v t \\a';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("\\n t \\r t \\n\\r t \\v t \\a", tu.getSource().toString());
+		assertEquals("<1/> t <2/> t <3/><4/> t <5/> t <6/>", fmt.setContent(tu.getSourceContent()).toString());
+	}
+	
+	@Test
+	public void testLinefeedCodes () {
+		String snippet = "$a='\\n\\n';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		// No extraction because no text
+		assertTrue(tu==null);
+	}
+	
+	@Test
+	public void testOutputLinefeedCodes () {
+		String snippet = "$a='\\n\\n';";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+	}
+	
+	@Test
+	public void testVariableCodes () {
+		String snippet = "$a=\"t [var1] t {var2} t {$var3} t\";";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("t [var1] t {var2} t {$var3} t", tu.getSource().toString());
+		assertEquals("t <1/> t <2/> t <3/> t", fmt.setContent(tu.getSourceContent()).toString());
 	}
 	
 	@Test
@@ -137,6 +270,14 @@ public class PHPContentFilterTest {
 	@Test
 	public void testSkipDirective () {
 		String snippet = "//_skip\n $a='skip';\n$b='text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testSkipDirectiveOnConcat () {
+		String snippet = "//_skip\n $a='skip' . $x . 'skip';\n$b='text';";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
@@ -329,8 +470,48 @@ public class PHPContentFilterTest {
 	}
 	
 	@Test
-	public void testArrayKeys () {
-		String snippet = "$arr1[\"foo\"]; $arr2[  'foo' ] = 'text';";
+	public void testSQIndex () {
+		String snippet = "$a['skip']; $arr2[  'skip' ] = 'text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+
+	@Test
+	public void testnoStringIndex () {
+		String snippet = "$a[2] = 'text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+
+	@Test
+	public void testDQIndex () {
+		String snippet = "$a[\"skip\"]; $arr2[  \"skip\" ] = 'text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+
+	@Test
+	public void testHeredocIndex () {
+		String snippet = "$a[ <<<key\nskip\nkey\n] = 'text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+
+	@Test
+	public void testQuotedHeredocIndex () {
+		String snippet = "$a[ <<<\"key\"\nskip\nkey\n] = 'text';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("text", tu.getSource().toString());
+	}
+
+	@Test
+	public void testNowdocIndex () {
+		String snippet = "$a[ <<<'key'\nskip\nkey\n] = 'text';";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
