@@ -42,6 +42,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -80,9 +81,11 @@ public class PHPContentFilter implements IFilter {
 	private TextUnit textUnit;
 	private GenericSkeleton srcSkel;
 	private int resType;
+	private HTMLCharacterEntities cerList;
 	
 	public PHPContentFilter () {
 		params = new Parameters();
+		cerList = new HTMLCharacterEntities();
 	}
 	
 	public void cancel () {
@@ -431,14 +434,14 @@ public class PHPContentFilter implements IFilter {
 				continue;
 				
 			case 9: // Inside a single-quoted string, wait for closing single quote
-				if ( ch == '\'' ) {
+				switch ( ch ) {
+				case '\'':
 					// End of string
 					stringEnd = current;
 					addString(buf, STRTYPE_SINGLEQUOTED, tch);
 					state = prevState;
 					continue;
-				}
-				else if ( ch == '\\' ) {
+				case '\\':
 					if ( inputText.length() > current+1 ) {
 						buf.append('\\');
 						buf.append(inputText.charAt(++current));
@@ -446,8 +449,15 @@ public class PHPContentFilter implements IFilter {
 					else {
 						throw new OkapiIllegalFilterOperationException("Unexpected end.");
 					}
-				}
-				else {
+					continue;
+				case '&':
+					int ucode = getEntity();
+					if ( ucode != -1 ) {
+						buf.append((char)ucode);
+						continue;
+					}
+					// Else: just fall thru to add '&'
+				default:
 					buf.append(ch);
 				}
 				continue;
@@ -456,7 +466,7 @@ public class PHPContentFilter implements IFilter {
 				if ( ch == '"' ) {
 					// End of string
 					stringEnd = current;
-					addString(buf, STRTYPE_SINGLEQUOTED, tch);
+					addString(buf, STRTYPE_DOUBLEQUOTED, tch);
 					state = prevState;
 					continue;
 				}
@@ -477,6 +487,42 @@ public class PHPContentFilter implements IFilter {
 		}
 	}
 
+	// Assumes current points to '&'
+	private int getEntity () {
+		int n = inputText.indexOf(';', current);
+		if ( n == -1 ) return -1;
+		String tmp = inputText.substring(current+1, n);
+		if ( tmp.length() < 1 ) return -1; // Just "&;"
+		int res;
+		if ( tmp.charAt(0) == '#' ) {
+			if ( tmp.length() < 2 ) return -1; // "&#;"
+			try {
+				if ( tmp.charAt(1) == 'x' ) {
+					// Hexadecimal NCR, assume "&#xh..;"
+					res = Integer.parseInt(tmp.substring(2), 16);
+				}
+				else {
+					// Decimal NCR, assume "&#d...;"
+					res = Integer.parseInt(tmp.substring(1));
+				}
+			}
+			catch ( NumberFormatException e ) {
+				return -1; // Syntatx error
+			}
+		}
+		else if ( Character.isWhitespace(tmp.charAt(0)) ) {
+			// Case of "& " (to go faster)
+			return -1;
+		}
+		else { // Maybe a real character entity reference
+			cerList.ensureInitialization();
+			res = cerList.lookupName(tmp);
+			if ( res == -1 ) return -1;
+		}
+		current = n;
+		return res;
+	}
+	
 	private void addString (StringBuilder buffer,
 		int type,
 		char lastTokenChar)
@@ -558,6 +604,8 @@ public class PHPContentFilter implements IFilter {
 			break;
 		case STRTYPE_MIXED:
 			textUnit.setType("x-mixed");
+			textUnit.setProperty(new Property(Property.NOTE,
+				"This entry is a concatenation of different types of strings: beware when moving codes or variables."));
 			break;
 		}
 		srcSkel.addContentPlaceholder(textUnit);

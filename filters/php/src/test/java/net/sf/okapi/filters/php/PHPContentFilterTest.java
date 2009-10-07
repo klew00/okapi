@@ -126,6 +126,22 @@ public class PHPContentFilterTest {
 	}
 	
 	@Test
+	public void testEntityReferences () {
+		String snippet = "$a='&aacute;&#xC1;&#225;&#x00c1;';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("\u00e1\u00c1\u00e1\u00c1", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testReferencesLooklike () {
+		String snippet = "$a='& &; &#; &aacute';";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("& &; &#; &aacute", tu.getSource().toString());
+	}
+	
+	@Test
 	public void testConcatSQStrings () {
 		String snippet = "$a='t1' \r. 't2';";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
@@ -134,10 +150,11 @@ public class PHPContentFilterTest {
 		List<Code> codes = tu.getSourceContent().getCodes();
 		assertEquals(1, codes.size());
 		assertEquals("' \r. '", codes.get(0).toString());
+		assertEquals("x-singlequoted", tu.getType());
 	}
 	
 	@Test
-	public void testConcatMultipleSQStrings () {
+	public void testConcatWithVariable () {
 		String snippet = "$a='t1' \r.$b.' t2';";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
@@ -148,11 +165,31 @@ public class PHPContentFilterTest {
 	}
 	
 	@Test
+	public void testConcatMultipleStrings () {
+		String snippet = "$a='t1' \r.$b.' t2' . $c.\" t3 \"";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("t1' \r.$b.' t2' . $c.\" t3 ", tu.getSource().toString());
+		assertEquals("t1<1/> t2<2/> t3 ", fmt.setContent(tu.getSourceContent()).toString());
+		assertEquals("x-mixed", tu.getType());
+	}
+	
+	@Test
+	public void testConcatWithEndings () {
+		String snippet = "$a= $z.'t1' \r.$b.' t2' . $c.\" t3 \".$d;";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("t1' \r.$b.' t2' . $c.\" t3 ", tu.getSource().toString());
+		assertEquals("t1<1/> t2<2/> t3 ", fmt.setContent(tu.getSourceContent()).toString());
+	}
+	
+	@Test
 	public void testConcatSGAndDQStrings () {
 		String snippet = "$a='t1' . \"t2\";";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' . \"t2", tu.getSource().toString());
+		assertEquals("x-mixed", tu.getType());
 	}
 	
 	@Test
