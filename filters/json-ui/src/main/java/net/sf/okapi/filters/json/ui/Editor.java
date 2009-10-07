@@ -232,7 +232,7 @@ public class Editor implements IParametersEditor {
 		rdDontExtractPairs.setSelection(!params.getExtractAllPairs());
 		edExceptions.setText(params.getExceptions()==null ? "" : params.getExceptions());
 		chkUseCodeFinder.setSelection(params.getUseCodeFinder());
-		pnlCodeFinder.setData(params.getCodeFinderData());
+		pnlCodeFinder.setRules(params.getCodeFinderData());
 		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
@@ -254,11 +254,11 @@ public class Editor implements IParametersEditor {
 	
 	private boolean saveData () {
 		if ( chkUseCodeFinder.getSelection() ) {
-			if ( pnlCodeFinder.getData() == null ) {
+			if ( pnlCodeFinder.getRules() == null ) {
 				return false;
 			}
 			else {
-				params.setCodeFinderData(pnlCodeFinder.getData());
+				params.setCodeFinderData(pnlCodeFinder.getRules());
 			}
 		}
 		String tmp = checkExceptionsSyntax();
@@ -277,7 +277,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void updateInlineCodes () {
-		pnlCodeFinder.enable(chkUseCodeFinder.getSelection());
+		pnlCodeFinder.setEnabled(chkUseCodeFinder.getSelection());
 	}
 
 }

@@ -172,7 +172,7 @@ public class OptionsTab extends Composite implements IDialogPage {
 //			SWTUtil.setAllEnabled(panel, false);
 //		//	panel.enable(false);
 
-		panel.enable(inlines.getSelection());
+		panel.setEnabled(inlines.getSelection());
 		//This re-enable some buttons: panel.updateDisplay();
 		
 //		if (btnProcessInlineCodes.getSelection())
@@ -223,7 +223,7 @@ public class OptionsTab extends Composite implements IDialogPage {
 			convert.setSelection(params.unescapeSource);
 						
 			inlines.setSelection(params.useCodeFinder);
-			panel.setData(params.codeFinderRules);
+			panel.setRules(params.codeFinderRules);
 			
 			SWTUtil.unselectAll(multi);
 			
@@ -259,7 +259,7 @@ public class OptionsTab extends Composite implements IDialogPage {
 			params.unescapeSource = convert.getSelection();			
 			
 			params.useCodeFinder = inlines.getSelection();
-			params.codeFinderRules = panel.getData();
+			params.codeFinderRules = panel.getRules();
 			
 			if (separate.getSelection())
 				params.wrapMode = WrapMode.NONE;

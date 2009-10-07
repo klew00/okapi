@@ -114,11 +114,11 @@ public class InlineCodeFinderDialog {
 	 * @param codeFinderRules the string storage of the rules to edit.
 	 */
 	public void setData (String codeFinderRules) {
-		pnlCodeFinder.setData(codeFinderRules);
+		pnlCodeFinder.setRules(codeFinderRules);
 	}
 
 	private boolean saveData () {
-		result = pnlCodeFinder.getData();
+		result = pnlCodeFinder.getRules();
 		return (result != null);
 	}
 

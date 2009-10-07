@@ -488,6 +488,7 @@ public class PHPContentFilter implements IFilter {
 	}
 
 	// Assumes current points to '&'
+	// Returns -1 if not found, char-value if found and adjust the current position.
 	private int getEntity () {
 		int n = inputText.indexOf(';', current);
 		if ( n == -1 ) return -1;
@@ -507,7 +508,7 @@ public class PHPContentFilter implements IFilter {
 				}
 			}
 			catch ( NumberFormatException e ) {
-				return -1; // Syntatx error
+				return -1; // Syntax error
 			}
 		}
 		else if ( Character.isWhitespace(tmp.charAt(0)) ) {
@@ -517,9 +518,9 @@ public class PHPContentFilter implements IFilter {
 		else { // Maybe a real character entity reference
 			cerList.ensureInitialization();
 			res = cerList.lookupName(tmp);
-			if ( res == -1 ) return -1;
+			if ( res == -1 ) return -1; // name not found
 		}
-		current = n;
+		current = n; // Update the current position
 		return res;
 	}
 	

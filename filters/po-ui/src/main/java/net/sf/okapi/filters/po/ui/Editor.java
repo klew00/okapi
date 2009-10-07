@@ -254,7 +254,7 @@ public class Editor implements IParametersEditor {
 		
 		//For later: pnlLD.setOptions(params.locDir.useLD(), params.locDir.localizeOutside());
 		chkUseCodeFinder.setSelection(params.useCodeFinder);
-		pnlCodeFinder.setData(params.codeFinder.toString());
+		pnlCodeFinder.setRules(params.codeFinder.toString());
 		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
@@ -262,7 +262,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private boolean saveData () {
-		String tmp = pnlCodeFinder.getData();
+		String tmp = pnlCodeFinder.getRules();
 		if ( tmp == null ) {
 			return false;
 		}
@@ -279,7 +279,7 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void updateInlineCodes () {
-		pnlCodeFinder.enable(chkUseCodeFinder.getSelection());
+		pnlCodeFinder.setEnabled(chkUseCodeFinder.getSelection());
 	}
 
 }

@@ -379,7 +379,7 @@ public class InlineCodeFinderPanel extends Composite {
 		return tmp.replace("\r", "\n");  //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	public void setData (String codeFinderRules) {
+	public void setRules (String codeFinderRules) {
 		codeFinder.fromString(codeFinderRules);
 		lbRules.removeAll();
 		for ( String pattern : codeFinder.getRules() ) {
@@ -393,7 +393,7 @@ public class InlineCodeFinderPanel extends Composite {
 		}
 	}
 
-	public String getData () {
+	public String getRules () {
 		if ( editMode ) {
 			if ( !endEditMode(true) ) return null;
 		}
@@ -410,17 +410,19 @@ public class InlineCodeFinderPanel extends Composite {
 		return editMode;
 	}
 	
-	public void enable (boolean enabled) {
-		this.setEnabled(enabled);
+	@Override
+	public void setEnabled (boolean enabled) {
+		super.setEnabled(enabled);
 		btAdd.setEnabled(enabled);
+		chkTestAllRules.setEnabled(enabled);
+		lbRules.setEnabled(enabled);
+		edExpression.setEnabled(enabled);
+		edResults.setEnabled(enabled);
+		edSample.setEnabled(enabled);
+		btInsertPattern.setEnabled(enabled);
+		
 		if ( enabled ) {
 			updateDisplay();
-			// No dynamic
-			chkTestAllRules.setEnabled(true);
-			lbRules.setEnabled(true);
-			edExpression.setEnabled(true);
-			edResults.setEnabled(true);
-			edSample.setEnabled(true);
 		}
 		else {
 			if ( inEditMode() ) endEditMode(false);
@@ -429,12 +431,6 @@ public class InlineCodeFinderPanel extends Composite {
 			btMoveUp.setEnabled(false);
 			btMoveDown.setEnabled(false);
 			btModify.setEnabled(false);
-			// Non dynamic
-			chkTestAllRules.setEnabled(false);
-			lbRules.setEnabled(false);
-			edExpression.setEnabled(false);
-			edResults.setEnabled(false);
-			edSample.setEnabled(false);
 		}
 	}
 
