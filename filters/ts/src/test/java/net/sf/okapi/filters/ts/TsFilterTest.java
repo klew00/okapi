@@ -256,6 +256,7 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 		
+		//System.out.println(FilterTestDriver.generateOutput(getEvents(snippet,"en-us","fr-fr"), "fr"));
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,"en-us","fr-fr"), "fr"));
 	}
 	
@@ -278,7 +279,6 @@ public class TsFilterTest {
 			"<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>", 
 			sd.getSkeleton().toString());
 	}	
-
 	@Test
 	public void DocumentPartTsPart_FromFile() {
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 1);
@@ -487,7 +487,62 @@ public class TsFilterTest {
 				"</message>",
 				dp.getSkeleton().toString());
 	}		
-
+	@Test
+	public void TextUnitMessageEmptySource_FromFile() {
+		
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 5);
+			
+		assertEquals("8", dp.getId());
+		assertEquals(0, dp.getPropertyNames().size());
+		assertEquals(0, dp.getSourcePropertyNames().size());
+		assertEquals(0, dp.getTargetPropertyNames("fr-fr").size());
+		assertEquals( 
+				"\r\n<message id=\"7\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
+				"<location filename=\"test.ts\" line=\"55\"/>\r\n" +
+				"<source></source>\r\n" +
+				"<oldsource>old hello world</oldsource>\r\n" +
+				"<comment>old hello <byte value=\"79\"/>comment</comment>\r\n" +
+				"<oldcomment>old hello old comment</oldcomment>\r\n" +
+				"<extracomment>old hello extra comment</extracomment>\r\n" +
+				"<translatorcomment>old hello translator comment</translatorcomment>\r\n" +
+				"<userdata>hello userdata</userdata>\r\n" +
+				"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r\n" +
+				"</message>",
+				dp.getSkeleton().toString());
+	}		
+	@Test
+	public void TextUnitMessageEmptyTranslation_FromFile() {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 4);
+	
+		assertEquals("4", tu.getId());
+		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
+		assertEquals("8", tu.getName());
+		assertFalse(tu.isEmpty());
+		
+		assertEquals("8", tu.getProperty("id").getValue());
+		assertEquals("utf-8", tu.getProperty("encoding").getValue());
+		assertEquals("no", tu.getProperty("numerus").getValue());
+		assertEquals(0, tu.getSourcePropertyNames().size());
+		assertEquals("no", tu.getTargetProperty("fr-fr", "variants").getValue());
+		assertEquals("no", tu.getTargetProperty("fr-fr", "approved").getValue());
+	
+		assertEquals( 
+				"\r\n<message id=\"8\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
+				"<location filename=\"test.ts\" line=\"55\"/>\r\n" +
+				"<source>[#$$self$]</source>\r\n" +
+				"<oldsource>old hello world</oldsource>\r\n" +
+				"<comment>old hello <byte value=\"79\"/>comment</comment>\r\n" +
+				"<oldcomment>old hello old comment</oldcomment>\r\n" +
+				"<extracomment>old hello extra comment</extracomment>\r\n" +
+				"<translatorcomment>old hello translator comment</translatorcomment>\r\n" +
+				"<translation variants=\"no\"[#$$self$@%approved]>[#$$self$]</translation>\r\n" +
+				"<userdata>hello userdata</userdata>\r\n" +
+				"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r\n" +
+				"</message>", 
+				tu.getSkeleton().toString());
+	}	
+	
+	
 	@Test
 	public void testDoubleExtraction () {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
@@ -496,13 +551,15 @@ public class TsFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en-us", "fr-fr"));
 	}
 	
-	//TODO: empty source
-	//TODO: empty target
 	//TODO: split numerus forms
+	//TODO: PO attributes
+
+	
 	
 	//--methods--
 	@Test
 	public void testGetName() {
+		System.out.println(FilterTestDriver.generateOutput(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), "fr-fr"));
 		assertEquals("okf_ts", filter.getName());
 	}
 

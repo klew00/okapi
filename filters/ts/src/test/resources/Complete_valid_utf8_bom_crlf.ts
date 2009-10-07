@@ -78,6 +78,44 @@
 <userdata>hello userdata</userdata>
 <extra-loc-blank>hello extra-loc-blank</extra-loc-blank>
 </message>
+<message id="7" encoding="utf-8" numerus="no">
+<location filename="test.ts" line="55"/>
+<source></source>
+<oldsource>old hello world</oldsource>
+<comment>old hello <byte value="79"/>comment</comment>
+<oldcomment>old hello old comment</oldcomment>
+<extracomment>old hello extra comment</extracomment>
+<translatorcomment>old hello translator comment</translatorcomment>
+<userdata>hello userdata</userdata>
+<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>
+</message>
+<message id="8" encoding="utf-8" numerus="no">
+<location filename="test.ts" line="55"/>
+<source>hello <byte value="79"/>world</source>
+<oldsource>old hello world</oldsource>
+<comment>old hello <byte value="79"/>comment</comment>
+<oldcomment>old hello old comment</oldcomment>
+<extracomment>old hello extra comment</extracomment>
+<translatorcomment>old hello translator comment</translatorcomment>
+<translation variants="no"></translation>
+<userdata>hello userdata</userdata>
+<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>
+</message>
+<message id="9" encoding="utf-8" numerus="no">
+<location filename="test.ts" line="55"/>
+<source>hello <byte value="79"/>world</source>
+<oldsource>old hello world</oldsource>
+<comment>old hello <byte value="79"/>comment</comment>
+<oldcomment>old hello old comment</oldcomment>
+<extracomment>old hello extra comment</extracomment>
+<translatorcomment>old hello translator comment</translatorcomment>
+<translation variants="no">
+<numerusform variants="no">Numerus 1</numerusform>
+<numerusform variants="no">Numerus 2</numerusform>
+</translation>
+<userdata>hello userdata</userdata>
+<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>
+</message>
 <![CDATA[hello cdata]]>
 </context>
 </context>

@@ -79,9 +79,10 @@ public class TsFilter implements IFilter {
 		TranslationStatus status = TranslationStatus.UNDETERMINED;
 		boolean sourceExists = false;
 		boolean targetExists = false;
-		String elemBeforeTrg = null;
 		boolean sourceIsEmpty = true;
 		boolean targetIsEmpty = true;
+		String elemBeforeTrg = null;
+		int numerusFormCount = 0;
 		String messageId = null;
 		
 		int obsoletes = 0;
@@ -94,7 +95,6 @@ public class TsFilter implements IFilter {
 		
 		Stack<Integer> contextStack = new Stack<Integer>();
 		
-		
 		public void resetAll(){
 
 			currentDocumentLocation = DocumentLocation.TS;
@@ -105,6 +105,7 @@ public class TsFilter implements IFilter {
 			elemBeforeTrg = null;
 			sourceIsEmpty = true;
 			targetIsEmpty = true;
+			numerusFormCount = 0;
 			messageId = null;
 			
 			obsoletes = 0;
@@ -135,6 +136,43 @@ public class TsFilter implements IFilter {
 			else
 				return false;
 		}
+
+		boolean sourceIsEmpty(){
+			if ( ts.sourceIsEmpty ){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		boolean sourceIsMissing(){
+			if ( !ts.sourceExists ){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		boolean noSource(){
+			if ( sourceIsEmpty() || sourceIsMissing() ){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		boolean targetIsEmpty(){
+			if ( ts.targetIsEmpty ){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		boolean targetIsMissing(){
+			if ( !ts.targetExists ){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		
 		
 		boolean missingSourceAndTarget(){
 			if ( !ts.sourceExists && !ts.targetExists ){
@@ -159,6 +197,7 @@ public class TsFilter implements IFilter {
 			elemBeforeTrg = null;
 			sourceIsEmpty = true;
 			targetIsEmpty = true;
+			numerusFormCount = 0;
 			messageId = null;
 		}
 		
@@ -172,17 +211,21 @@ public class TsFilter implements IFilter {
 		public void analyzeMessage() {
 
 			String validBefore = ",source,oldsource,comment,oldcomment,extracomment,translatorcomment,";
+			boolean hasContent = false;
 			
 			for(XMLEvent event: eventList){
 				
 				if(event.getEventType() == XMLEvent.START_ELEMENT){
-
-					StartElement startElement = event.asStartElement();
 					
-					if( startElement.getName().getLocalPart().equals("source") ){
-						sourceExists = true;						
-					}else if( startElement.getName().getLocalPart().equals("translation") ){
-						Attribute attr = startElement.getAttributeByName(new QName("type"));
+					StartElement startElem = event.asStartElement();
+					String startElemName = startElem.getName().getLocalPart();
+					
+					if( startElemName.equals("source") ){
+						sourceExists = true;
+						hasContent = false;
+						
+					}else if( startElemName.equals("translation") ){
+						Attribute attr = startElem.getAttributeByName(new QName("type"));
 						if(attr == null){
 							status = TranslationStatus.APPROVED;	
 						}else if (attr.getValue().equals("obsolete")){
@@ -193,15 +236,37 @@ public class TsFilter implements IFilter {
 							status = TranslationStatus.OTHER;
 						}
 						targetExists = true;
+						hasContent = false;
+						
+					}else if( startElemName.equals("numerusform") ){
+						numerusFormCount++;
+						
+					}else if( startElemName.equals("byte") ){
+						hasContent = true;
 					}
 				}else if(event.getEventType() == XMLEvent.END_ELEMENT){
 
 					EndElement endElem = event.asEndElement();
 					String endElemName = endElem.getName().getLocalPart();
 
+					if( endElemName.equals("source") ){
+						if( hasContent ){
+							sourceIsEmpty = false;
+						}
+					}else if( endElemName.equals("translation") ){
+						if( hasContent ){
+							targetIsEmpty = false;
+						}
+					}
+					
 					if( validBefore.contains(","+endElemName+",")){
 						elemBeforeTrg = endElemName;
 					}
+				}else if(event.getEventType() == XMLEvent.CHARACTERS){
+				
+					Characters chars = event.asCharacters();
+					if( !chars.isWhiteSpace() )
+						hasContent = true;
 				}
 			}
 		}
@@ -220,8 +285,7 @@ public class TsFilter implements IFilter {
 	static enum MessageLocation {RESOURCE, SOURCE, TARGET};
 	static enum TranslationStatus {UNDETERMINED, UNFINISHED, OBSOLETE, APPROVED, OTHER};
 
-	//boolean decodeByteValues=false;
-	
+	Stack<String> elementStack = new Stack<String>();
 	ArrayList<XMLEvent> eventList = new ArrayList<XMLEvent>();
 	GenericSkeleton skel;
 	
@@ -421,7 +485,8 @@ public class TsFilter implements IFilter {
 		while ( eventReader.hasNext() ) {
 			
 			XMLEvent event = eventReader.nextEvent();
-			
+
+			//TODO: Validate before adding
 			eventList.add(event);
 			
 			switch ( event.getEventType() ) {
@@ -430,6 +495,8 @@ public class TsFilter implements IFilter {
 
 				StartElement startElem = event.asStartElement();
 				String startElemName = startElem.getName().getLocalPart();
+				if( !startElemName.equals("byte") )
+					elementStack.push(startElemName);	
 				
 				if(tsPartReady(startElemName)){
 					//TODO validateTs();
@@ -462,19 +529,20 @@ public class TsFilter implements IFilter {
 				EndElement endElem = event.asEndElement();
 				String endElemName = endElem.getName().getLocalPart();
 
+				if( !endElemName.equals("byte") )
+					elementStack.pop();	
+
 				if(endElemName.equals("message")){
 					//TODO validateMessage();
 					ts.analyzeMessage();
 					
-					if( ts.msgIsObsolete() || ts.missingSourceAndTarget() || ts.missingSourceNotTarget() ){
+					if( ts.msgIsObsolete() || ts.noSource() ){
 
 						StartElement se = getStartElement("message");
-						if( ts.missingSourceAndTarget() ){
-							logger.warning("Message (Line "+se.getLocation().getLineNumber()+" contains no <translation> and no <source>. Message will be ignored.");
-						}else if( ts.missingSourceNotTarget() ){
-							logger.warning("Message (Line "+se.getLocation().getLineNumber()+" contains <translation> but no <source>. Message will be ignored.");
+						if( ts.noSource() ){
+							logger.warning("Message (Line "+se.getLocation().getLineNumber()+" contains no <source>. Message will be ignored.");
 						}
-
+						
 						DocumentPart dp = generateObsoleteTu();
 						//printDp(dp);
 						queue.add(new Event(EventType.DOCUMENT_PART, dp));
@@ -726,14 +794,21 @@ public class TsFilter implements IFilter {
 				
 				if( endElemName.equals("source") ){
 					ts.currentMessageLocation = MessageLocation.RESOURCE;
-					if(ts.sourceIsEmpty){
-						skel.addContentPlaceholder(tu);	
-					}
 					procEndElem(endElem);
+					
 				}else if( endElemName.equals("translation") ){
 					ts.currentMessageLocation = MessageLocation.RESOURCE;
-					if(ts.targetIsEmpty){
-						skel.addContentPlaceholder(tu, trgLang);	
+					
+					if( ts.targetIsEmpty() ){
+						
+						skel.addContentPlaceholder(tu, trgLang);
+						
+						Property approvedProp = tu.getTargetProperty(trgLang, Property.APPROVED);
+						if(approvedProp.getValue().equals("yes")){
+							approvedProp.setValue("no");
+							tu.setTargetProperty(trgLang, approvedProp);
+							logger.warning("Translation (Line "+endElem.getLocation().getLineNumber()+") is empty. type attribute was updated to unfinished.");
+						}
 					}
 					procEndElem(endElem);
 				}else if( endElemName.equals("numerusform") ){
@@ -746,16 +821,10 @@ public class TsFilter implements IFilter {
 					procEndElem(endElem);
 				}
 				
-				if( !ts.targetExists ){
-					if (endElemName.equals(ts.elemBeforeTrg)){
-						skel.append(lineBreak);
-						skel.append("<translation");
-						skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
-						tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
-						tu.setTargetProperty(trgLang, new Property("variants", "no"));
-						skel.append(" variants=\"no\">");
-						skel.addContentPlaceholder(tu, trgLang);
-						skel.append("</translation>");
+
+				if (needTargetSection() ){
+					if (insertTargetAfterElem(endElemName) ){
+						addTargetSection(tu);	
 					}
 				}
 				
@@ -779,6 +848,33 @@ public class TsFilter implements IFilter {
 	}
 
 	
+	private void addTargetSection(TextUnit tu) {
+		skel.append(lineBreak);
+		skel.append("<translation");
+		skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
+		tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
+		tu.setTargetProperty(trgLang, new Property("variants", "no"));
+		skel.append(" variants=\"no\">");
+		skel.addContentPlaceholder(tu, trgLang);
+		skel.append("</translation>");
+	}
+
+	private boolean insertTargetAfterElem(String endElemName) {
+		if (endElemName.equals(ts.elemBeforeTrg)){
+			return true;
+		}else{
+			return false;	
+		}
+	}
+
+	private boolean needTargetSection() {
+		if ( !ts.noSource() && !ts.targetExists ){
+			return true;
+		}else {
+			return false;
+		}
+	}
+
 	DocumentPart generateObsoleteTu(){
 		
 		boolean nextIsSkippableEmpty = false;
@@ -835,7 +931,7 @@ public class TsFilter implements IFilter {
 				skel.addContentPlaceholder(tu);	
 			}
 			tc.append(chars.getData());
-			ts.sourceIsEmpty = false;
+
 		}else if(ts.currentMessageLocation == MessageLocation.TARGET){
 
 			TextContainer tc = tu.getTarget(trgLang);
@@ -843,7 +939,6 @@ public class TsFilter implements IFilter {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
 			tc.append(chars.getData());
-			ts.targetIsEmpty = false;
 		}
 	}
 	
