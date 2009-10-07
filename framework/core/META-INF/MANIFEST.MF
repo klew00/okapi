@@ -5,6 +5,15 @@ Bundle-SymbolicName: net.sf.okapi.common
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.common,
  net.sf.okapi.common.annotation,
+ net.sf.okapi.common.encoder,
  net.sf.okapi.common.exceptions,
+ net.sf.okapi.common.filters,
+ net.sf.okapi.common.filterwriter,
+ net.sf.okapi.common.observer,
+ net.sf.okapi.common.pipeline,
+ net.sf.okapi.common.pipeline.annotations,
+ net.sf.okapi.common.pipelinedriver,
+ net.sf.okapi.common.resource,
+ net.sf.okapi.common.skeleton,
  net.sf.okapi.common.uidescription
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
