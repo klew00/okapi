@@ -3,16 +3,9 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Abstract Markupfilter Filter
 Bundle-SymbolicName: net.sf.okapi.filters.abstractmarkup
 Bundle-Version: 1.0.0
-Bundle-ClassPath: lib/jyaml-1.3.jar,
- lib/jericho-html-3.1-dev-5.jar
-Export-Package: net.htmlparser.jericho,
- net.htmlparser.jericho.nodoc,
- net.sf.okapi.filters.abstractmarkup,
- net.sf.okapi.filters.yaml,
- org.ho.util,
- org.ho.yaml,
- org.ho.yaml.exception,
- org.ho.yaml.wrapper,
- yaml.parser
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Export-Package: net.sf.okapi.filters.abstractmarkup,
+ net.sf.okapi.filters.yaml
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ net.htmlparser.jericho;bundle-version="3.1.0",
+ org.yaml.snakeyaml;bundle-version="1.4.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
