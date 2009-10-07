@@ -154,6 +154,19 @@ public class PHPContentFilterTest {
 	}
 	
 	@Test
+	public void testCommaCaseWithConcat () {
+		String snippet = "$a=test('t1', 't2 '.\"and t3\");";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("t1", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertTrue(tu!=null);
+		assertEquals("t2 '.\"and t3", tu.getSource().toString());
+		assertEquals("t2 <1/>and t3", fmt.setContent(tu.getSourceContent()).toString());
+		assertEquals("x-mixed", tu.getType());
+	}
+	
+	@Test
 	public void testConcatWithVariable () {
 		String snippet = "$a='t1' \r.$b.' t2';";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);

@@ -205,8 +205,8 @@ public class PHPContentFilter implements IFilter {
 		tuId = 0;
 		otherId = 0;
 		// Compile code finder rules
-		if ( params.useCodeFinder ) {
-			params.codeFinder.compile();
+		if ( params.getUseCodeFinder() ) {
+			params.getCodeFinder().compile();
 		}
 
 		// Set the start event
@@ -544,8 +544,8 @@ public class PHPContentFilter implements IFilter {
 		
 		// Set the text and process it for inline codes
 		TextFragment tf = new TextFragment(buffer.toString());
-		if ( params.useCodeFinder ) {
-			params.codeFinder.process(tf);
+		if ( params.getUseCodeFinder() ) {
+			params.getCodeFinder().process(tf);
 		}
 		
 		// Do we still have text in the fragment? (and started the source?) 

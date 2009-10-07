@@ -46,6 +46,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.AbstractPart;
 import net.sf.okapi.common.uidescription.CheckboxPart;
+import net.sf.okapi.common.uidescription.CodeFinderPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IContainerPart;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
@@ -56,6 +57,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
 import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
 
 public class GenericEditor {
@@ -284,6 +286,19 @@ public class GenericEditor {
 					list.setEnabled(d.getWriteMethod()!=null);
 				}
 			}
+			else if ( part instanceof CodeFinderPart ) {
+				CodeFinderPart d = (CodeFinderPart)part;
+				cmp = lookupParent(d.getContainer());
+				if ( !part.isVertical() ) new Label(cmp, SWT.NONE);
+				InlineCodeFinderPanel panel = new InlineCodeFinderPanel(cmp, SWT.NONE);
+				controls.put(d.getName(), panel);
+				if ( part.isVertical() || !part.isWithLabel() ) {
+					gdTmp = new GridData();
+					gdTmp.horizontalSpan = 2;
+					panel.setLayoutData(gdTmp);
+				}
+				panel.setEnabled(d.getWriteMethod()!=null);
+			}
 
 			// Update the list of observers if needed
 			if ( part.getMasterPart() != null ) {
@@ -391,6 +406,10 @@ public class GenericEditor {
 					setListControl((List)controls.get(d.getName()), d);
 				}
 			}
+			else if ( part instanceof CodeFinderPart ) {
+				CodeFinderPart d = (CodeFinderPart)part;
+				setCodeFinderControl((InlineCodeFinderPanel)controls.get(d.getName()), d);
+			}
 			
 			if ( part.getMasterPart() != null ) list.add(part);
 		}
@@ -441,6 +460,13 @@ public class GenericEditor {
 			else if ( ctrl instanceof Combo ) {
 				if ( description.getDescriptor(name) instanceof ListSelectionPart ) {
 					if ( !saveComboControl((Combo)ctrl, (ListSelectionPart)description.getDescriptor(name)) ) {
+						return false;
+					}
+				}
+			}
+			else if ( ctrl instanceof InlineCodeFinderPanel ) {
+				if ( description.getDescriptor(name) instanceof CodeFinderPart ) {
+					if ( !saveCodeFinderControl((InlineCodeFinderPanel)ctrl, (CodeFinderPart)description.getDescriptor(name)) ) {
 						return false;
 					}
 				}
@@ -557,6 +583,31 @@ public class GenericEditor {
 		return true;
 	}
 	
+	private boolean saveCodeFinderControl (InlineCodeFinderPanel ctrl, CodeFinderPart desc) {
+		try {
+			if ( desc.getType().equals(String.class) ) {
+				String tmp = ctrl.getRules();
+				desc.getWriteMethod().invoke(desc.getParent(), tmp);
+			}
+			else {
+				throw new OkapiEditorCreationException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		return true;
+	}
 	
 	private boolean saveListControl (List list, ListSelectionPart desc) {
 		try {
@@ -649,6 +700,31 @@ public class GenericEditor {
 		}
 	}
 	
+	private void setCodeFinderControl (InlineCodeFinderPanel panel, CodeFinderPart desc) {
+		try {
+			String tmp = "";
+			if ( desc.getType().equals(String.class) ) {
+				tmp = (String)desc.getReadMethod().invoke(desc.getParent());
+			}
+			else {
+				throw new OkapiEditorCreationException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
+			if ( tmp == null ) panel.setRules("");
+			else panel.setRules(tmp);
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+
 	private void setListControl (List list, ListSelectionPart desc) {
 		try {
 			String[] labels = desc.getChoicesLabels();
