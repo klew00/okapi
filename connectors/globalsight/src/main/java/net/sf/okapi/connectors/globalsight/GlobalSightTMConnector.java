@@ -146,6 +146,84 @@ public class GlobalSightTMConnector implements ITMQuery {
 	}
 
 	public int query (TextFragment frag) {
+		results.clear();
+		if ( !frag.hasText() ) return 0;
+		try {
+			String text = frag.getCodedText();
+			if ( frag.hasCode() ) {
+				StringBuilder tmp = new StringBuilder();
+				Code code;
+				for ( int i=0; i<text.length(); i++ ) {
+					switch ( text.charAt(i) ) {
+					case TextFragment.MARKER_OPENING:
+						code = frag.getCode(text.charAt(++i));
+						tmp.append(String.format("<bpt i=\"%d\" x=\"%d\" type=\"text\"/>", code.getId(), code.getId()));
+						break;
+					case TextFragment.MARKER_CLOSING:
+						code = frag.getCode(text.charAt(++i));
+						tmp.append(String.format("<ept i=\"%d\"/>", code.getId()));
+						break;
+					case TextFragment.MARKER_ISOLATED:
+						code = frag.getCode(text.charAt(++i));
+						tmp.append(String.format("<ph i=\"%d\" type=\"text\"/>", code.getId()));
+						break;
+					case TextFragment.MARKER_SEGMENT:
+						++i; // Skip
+						// Do nothing: we should get segment only
+						break;
+					default:
+						tmp.append(text.charAt(i));
+						break;
+					}
+				}
+				text = tmp.toString();
+			}
+
+			String xmlRes = gsWS.searchEntries(gsToken, gsTmProfile, text, srcLang);
+			Document doc = docBuilder.parse(new InputSource(new StringReader(xmlRes)));
+			NodeList list1 = doc.getElementsByTagName("entry");
+			Element elem;
+			NodeList list2;
+			NodeList list3;
+			QueryResult res;
+			for ( int i=0; i<list1.getLength(); i++ ) {
+				if ( i >= maxHits ) break;
+				
+				elem = (Element)list1.item(i);
+				list2 = elem.getElementsByTagName("percentage");
+				res = new QueryResult();
+				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
+				if ( res.score < threshold ) continue;
+				
+				list2 = elem.getElementsByTagName("source");
+				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
+				res.source = readSegment((Element)list3.item(0), frag);
+
+				list2 = elem.getElementsByTagName("target");
+				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
+				res.target = readSegment((Element)list3.item(0), frag);
+
+				results.add(res);
+			}
+
+		}
+		catch ( WebServiceException e ) {
+			throw new RuntimeException("Error querying TM.", e);
+		}
+		catch ( RemoteException e ) {
+			throw new RuntimeException("Error querying TM.", e);
+		}
+		catch ( SAXException e ) {
+			throw new RuntimeException("Error with query results.", e);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException("Error with query results.", e);
+		}
+		if ( results.size() > 0 ) current = 0;
+		return results.size();
+	}
+
+	public int queryV5 (TextFragment frag) {
 		/* The GlobalSight TM Web service does not support query with inline codes
 		 * for the time being (v7.1.3), so we query plain text to get the best match 
 		 * possible. But queries with codes will never get an exact match even if one 
@@ -274,12 +352,13 @@ public class GlobalSightTMConnector implements ITMQuery {
 		int lastId = -1;
 		int id = -1;
 		Node node;
+		Code code;
 		Stack<Code> stack = new Stack<Code>();
-		List<Code> oriCodes = null;
-		
-		if ( original != null ) {
-			oriCodes = original.getCodes();
-		}
+//		List<Code> oriCodes = null;
+//		
+//		if ( original != null ) {
+//			oriCodes = original.getCodes();
+//		}
 		
 		// Note that this parsing assumes non-overlapping codes.
 		for ( int i=0; i<list.getLength(); i++ ) {
@@ -296,7 +375,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 					stack.push(tf.append(TagType.OPENING, (attr==null ? "Xpt" : attr.getNodeValue()), "[bpt/]", id));
 				}
 				else if ( node.getNodeName().equals("ept") ) {
-					Code code = stack.pop();
+					code = stack.pop();
 					tf.append(TagType.CLOSING, code.getType(), "[ept/]", code.getId());
 				}
 				else if ( node.getNodeName().equals("ph") ) {
@@ -323,6 +402,21 @@ public class GlobalSightTMConnector implements ITMQuery {
 		return tf;
 	}
 
+//	private Code guessCode (List<Code> codes,
+//		TagType tagType,
+//		int rawIndex) // Starts at 0
+//	{
+//		if ( codes == null ) return null;
+//		if (( rawIndex < 0 ) || ( rawIndex >= codes.size() )) {
+//			return null;
+//		}
+//		Code code = codes.get(rawIndex);
+//		if ( code.getTagType() == tagType ) {
+//			return code.clone();
+//		}
+//		return null;
+//	}
+	
 	private int getIdentifier (int lastId, Node attr) {
 		if ( attr == null ) return ++lastId;
 		return Integer.valueOf(attr.getNodeValue());

@@ -30,6 +30,10 @@ public class TableModel {
 		col.setText("Target");
 	}
 
+	void clearTable () {
+		table.removeAll();
+	}
+	
 	void updateTable (QueryManager qm) {
 		table.removeAll();
 		QueryResult qr;

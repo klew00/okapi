@@ -273,6 +273,9 @@ public class ServalForm {
 			updateCurrentHit(end-start);
 		}
 		catch ( Throwable e ) {
+			modResults.clearTable();
+			edTarget.setText("");
+			edSource.setText("");
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
 		}
 	}
