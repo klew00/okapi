@@ -427,6 +427,7 @@ public class Main {
 		extensionsMap.put(".json", "okf_json");
 		filtersMap.put("okf_json", "net.sf.okapi.filters.json.JSONFilter");
 
+		filtersMap.put("okf_phpcontent", "net.sf.okapi.filters.php.PHPContentFilter");
 		filtersMap.put("okf_pensieve", "net.sf.okapi.steps.formatconversion.PensieveFilter");
 	}
 	

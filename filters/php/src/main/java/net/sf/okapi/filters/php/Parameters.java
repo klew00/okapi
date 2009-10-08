@@ -80,7 +80,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		locDir.reset();
 		useCodeFinder = true;
 		codeFinder.reset();
-		codeFinder.setSample("${abc} {$abc) $abc");
+		codeFinder.setSample("... attr='val'> text <br/> text \n text <a att='val'> text [VAR1] text\n{VAR2} text <a att='val' ...");
 		codeFinder.setUseAllRulesWhenTesting(true);
 
 		// HTML-like tags (including without start or end)
@@ -119,8 +119,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(USEDIRECTIVES, "Use localization directives", null);
-		desc.add(EXTRACTOUTSIDEDIRECTIVES, "Extract outside the scope of the directives", null);
+//		desc.add(USEDIRECTIVES, "Use localization directives", null);
+//		desc.add(EXTRACTOUTSIDEDIRECTIVES, "Extract outside the scope of the directives", null);
 		desc.add(USECODEFINDER, "Has inline codes as defined below:", null);
 		desc.add(CODEFINDERRULES, null, "Rules for inline codes");
 		return desc;
