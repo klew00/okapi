@@ -53,18 +53,6 @@ public class TokenNamesPage extends AbstractListAddRemoveTab {
 	}
 
 	@Override
-	protected String getListDescription() {
-
-		return null;
-	}
-
-	@Override
-	protected boolean getDisplayItemDescr() {
-
-		return true;
-	}
-
-	@Override
 	protected boolean getDisplayListDescr() {
 
 		return false;
@@ -80,9 +68,9 @@ public class TokenNamesPage extends AbstractListAddRemoveTab {
 		if (!(data instanceof LanguageAndTokenParameters)) return false;
 		
 		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;		
-		if (params.tokenMode == LanguageAndTokenParameters.TOKENS_ALL) return false;		
+		if (params.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL) return false;		
 		
-		list.setItems(ListUtil.stringAsArray(params.tokenNames));		
+		list.setItems(ListUtil.listAsArray(params.getTokenNames()));		
 		selectListItem(0);			
 		
 		return true;
@@ -93,12 +81,11 @@ public class TokenNamesPage extends AbstractListAddRemoveTab {
 		if (!(data instanceof LanguageAndTokenParameters)) return false;
 		
 		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;
-		if (params.tokenMode == LanguageAndTokenParameters.TOKENS_ALL) return false;
+		if (params.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL) return false;
 		
-		params.tokenNames = ListUtil.arrayAsString(list.getItems());
+		params.setTokenNames(ListUtil.arrayAsList(list.getItems()));
 		
 		return true;
 	}
-
 
 }

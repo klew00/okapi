@@ -40,7 +40,7 @@ public class Parameters extends AbstractParameters {
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 		
-		loadGroup(buffer, "mappingItem", items, MappingItem.class);
+		loadGroup(buffer, items, MappingItem.class);
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class Parameters extends AbstractParameters {
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		
-		saveGroup(buffer, "mappingItem", items);
+		saveGroup(buffer, items, MappingItem.class);
 	}
 	
 	public void addMapping(String editorClass, String parametersClass) {

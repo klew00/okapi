@@ -35,12 +35,6 @@ public class LanguagesPage extends AbstractListAddRemoveTab {
 	}
 
 	@Override
-	protected boolean getDisplayItemDescr() {
-
-		return true;
-	}
-
-	@Override
 	protected boolean getDisplayListDescr() {
 
 		return false;
@@ -58,12 +52,6 @@ public class LanguagesPage extends AbstractListAddRemoveTab {
 		}
 	}
 
-	@Override
-	protected String getListDescription() {
-
-		return null;
-	}
-
 	public boolean canClose(boolean isOK) {
 
 		return true;
@@ -75,13 +63,13 @@ public class LanguagesPage extends AbstractListAddRemoveTab {
 		
 		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;
 		
-		if (params.languageMode == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
+		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
 		
-		if (params.languageMode == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)
-			list.setItems(ListUtil.stringAsArray(params.languageWhiteList));
+		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)
+			list.setItems(ListUtil.listAsArray(params.getLanguageWhiteList()));
 		
-		if (params.languageMode == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
-			list.setItems(ListUtil.stringAsArray(params.languageBlackList));
+		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
+			list.setItems(ListUtil.listAsArray(params.getLanguageBlackList()));
 			
 		selectListItem(0);			
 		
@@ -93,13 +81,13 @@ public class LanguagesPage extends AbstractListAddRemoveTab {
 		if (!(data instanceof LanguageAndTokenParameters)) return false;
 		
 		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;
-		if (params.languageMode == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
+		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
 		
-		if (params.languageMode == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)			
-			params.languageWhiteList = ListUtil.arrayAsString(list.getItems());
+		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)			
+			params.setLanguageWhiteList(ListUtil.arrayAsList(list.getItems()));
 		
-		if (params.languageMode == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
-			params.languageBlackList = ListUtil.arrayAsString(list.getItems());
+		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
+			params.setLanguageBlackList(ListUtil.arrayAsList(list.getItems()));
 		
 		return true;
 	}

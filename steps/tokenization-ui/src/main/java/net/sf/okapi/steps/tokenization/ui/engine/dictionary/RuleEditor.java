@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Widget;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.steps.tokenization.engine.dictionary.Rule;
 import net.sf.okapi.steps.tokenization.ui.engine.AbstractRuleEditor;
 
 public class RuleEditor extends AbstractRuleEditor {
@@ -38,7 +37,7 @@ public class RuleEditor extends AbstractRuleEditor {
 	@Override
 	public IParameters createParameters() {
 		
-		return new Rule();
+		return null;
 	}
 
 	@Override

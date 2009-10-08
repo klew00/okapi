@@ -31,12 +31,6 @@ public class RulesTab extends AbstractListTab {
 		super(parent, style);
 	}
 
-	@Override
-	protected String getListDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public boolean canClose(boolean isOK) {
 		// TODO Auto-generated method stub
 		return false;
@@ -77,12 +71,6 @@ public class RulesTab extends AbstractListTab {
 	}
 
 	@Override
-	protected boolean getDisplayItemDescr() {
-
-		return true;
-	}
-
-	@Override
 	protected boolean getDisplayListDescr() {
 
 		return true;
@@ -92,12 +80,6 @@ public class RulesTab extends AbstractListTab {
 	protected String getItemDescription(int index) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	protected boolean getDisplayModify() {
-
-		return true;
 	}
 
 }

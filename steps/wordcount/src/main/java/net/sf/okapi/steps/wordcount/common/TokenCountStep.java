@@ -23,8 +23,8 @@ package net.sf.okapi.steps.wordcount.common;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.Tokenizer;
+import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
-import net.sf.okapi.steps.tokenization.tokens.TokensAnnotation;
 
 public abstract class TokenCountStep extends BaseCountStep {
 

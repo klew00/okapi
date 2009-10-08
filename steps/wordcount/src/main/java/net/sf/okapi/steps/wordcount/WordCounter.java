@@ -24,7 +24,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.tokenization.Tokenizer;
-import net.sf.okapi.steps.tokenization.tokens.Token;
+import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
 

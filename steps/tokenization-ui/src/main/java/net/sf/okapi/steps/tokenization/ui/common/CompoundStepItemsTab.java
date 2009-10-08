@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.tokenization.ui.common;
 
 import net.sf.okapi.common.ui.abstracteditor.AbstractListTab;
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -29,12 +30,8 @@ public abstract class CompoundStepItemsTab extends AbstractListTab {
 	public CompoundStepItemsTab(Composite parent, int style) {
 		
 		super(parent, style);
-	}
-
-	@Override
-	protected String getListDescription() {
-
-		return "Listed below are internal steps in the order of invocation.";
+		
+		SWTUtil.setText(listDescr, "Listed below are internal steps in the order of invocation.");
 	}
 
 }

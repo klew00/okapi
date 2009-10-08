@@ -22,13 +22,16 @@ package net.sf.okapi.steps.tokenization.ui.engine;
 
 import org.eclipse.swt.widgets.Composite;
 
+import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.steps.tokenization.ui.common.CompoundStepItemsTab;
 
-public class TokenizersTab extends CompoundStepItemsTab {
+public class LexersTab extends CompoundStepItemsTab {
 
-	public TokenizersTab(Composite parent, int style) {
+	public LexersTab(Composite parent, int style) {
 		
 		super(parent, style);
+		
+		SWTUtil.setText(listDescr, "Listed below are configured lexers in the order of invocation.");
 	}
 
 	public boolean canClose(boolean isOK) {
@@ -44,12 +47,6 @@ public class TokenizersTab extends CompoundStepItemsTab {
 	public boolean save(Object data) {
 
 		return true;
-	}
-
-	@Override
-	protected String getListDescription() {
-
-		return "Listed below are internal tokenizers in the order of invocation.";
 	}
 
 	@Override
@@ -81,27 +78,9 @@ public class TokenizersTab extends CompoundStepItemsTab {
 	}
 
 	@Override
-	protected boolean getDisplayItemDescr() {
-
-		return true;
-	}
-
-	@Override
-	protected boolean getDisplayListDescr() {
-
-		return true;
-	}
-
-	@Override
 	protected String getItemDescription(int index) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	protected boolean getDisplayModify() {
-		
-		return true;
 	}
 
 }

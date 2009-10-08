@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.engine.recognizer;
+package net.sf.okapi.steps.tokenization.ui.engine.filter;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.layout.GridLayout;

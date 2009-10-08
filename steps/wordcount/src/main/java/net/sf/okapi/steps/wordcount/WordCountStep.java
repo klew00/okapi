@@ -20,7 +20,7 @@
 
 package net.sf.okapi.steps.wordcount;
 
-import net.sf.okapi.steps.tokenization.tokens.Token;
+import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.wordcount.common.GMX;
 import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 

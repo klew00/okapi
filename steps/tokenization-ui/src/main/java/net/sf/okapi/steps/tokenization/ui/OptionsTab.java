@@ -289,16 +289,16 @@ public class OptionsTab extends Composite implements IDialogPage {
 			SWTUtil.setSelected(source, params.tokenizeSource);
 			SWTUtil.setSelected(targets, params.tokenizeTargets);
 			
-			SWTUtil.setSelected(langAll, params.languageMode == LanguageAndTokenParameters.LANGUAGES_ALL);
-			SWTUtil.setSelected(langW, params.languageMode == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST);
-			SWTUtil.setSelected(langB, params.languageMode == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST);
+			SWTUtil.setSelected(langAll, params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL);
+			SWTUtil.setSelected(langW, params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST);
+			SWTUtil.setSelected(langB, params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST);
 			
-			SWTUtil.setSelected(tokensAll, params.tokenMode == LanguageAndTokenParameters.TOKENS_ALL);								
-			SWTUtil.setSelected(tokens, params.tokenMode == LanguageAndTokenParameters.TOKENS_SELECTED);
+			SWTUtil.setSelected(tokensAll, params.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL);								
+			SWTUtil.setSelected(tokens, params.getTokenMode() == LanguageAndTokenParameters.TOKENS_SELECTED);
 			
-			SWTUtil.setText(langWE, params.languageWhiteList);
-			SWTUtil.setText(langBE, params.languageBlackList);
-			SWTUtil.setText(tokensE, params.tokenNames);
+			SWTUtil.setText(langWE, ListUtil.listAsString(params.getLanguageWhiteList()));
+			SWTUtil.setText(langBE, ListUtil.listAsString(params.getLanguageBlackList()));
+			SWTUtil.setText(tokensE, ListUtil.listAsString(params.getTokenNames()));
 			
 //			if (filterParams != null) {
 //				
@@ -330,23 +330,23 @@ public class OptionsTab extends Composite implements IDialogPage {
 			params.tokenizeTargets = SWTUtil.getSelected(targets);
 			
 			if (SWTUtil.getSelected(langAll))
-				params.languageMode = LanguageAndTokenParameters.LANGUAGES_ALL;
+				params.setLanguageMode(LanguageAndTokenParameters.LANGUAGES_ALL);
 			
 			if (SWTUtil.getSelected(langW))
-				params.languageMode = LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST;
+				params.setLanguageMode(LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST);
 			
 			if (SWTUtil.getSelected(langB))
-				params.languageMode = LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST;
+				params.setLanguageMode(LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST);
 			
 			if (SWTUtil.getSelected(tokensAll))
-				params.tokenMode = LanguageAndTokenParameters.TOKENS_ALL;
+				params.setTokenMode(LanguageAndTokenParameters.TOKENS_ALL);
 			
 			if (SWTUtil.getSelected(tokens))
-				params.tokenMode = LanguageAndTokenParameters.TOKENS_SELECTED;
+				params.setTokenMode(LanguageAndTokenParameters.TOKENS_SELECTED);
 									
-			params.languageWhiteList = langWE.getText();
-			params.languageBlackList = langBE.getText();
-			params.tokenNames = tokensE.getText();;
+			params.setLanguageWhiteList(ListUtil.stringAsList(langWE.getText()));
+			params.setLanguageBlackList(ListUtil.stringAsList(langBE.getText()));
+			params.setTokenNames(ListUtil.stringAsList(tokensE.getText()));
 		}
 
 		return true;

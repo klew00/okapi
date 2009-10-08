@@ -3,7 +3,7 @@ package net.sf.okapi.steps.tokenization.ui.engine;
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
-import net.sf.okapi.lib.extra.steps.CompoundStepParameters;
+import net.sf.okapi.steps.tokenization.common.StructureParameters;
 
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Widget;
@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Widget;
 public class Configurator extends AbstractParametersEditor {
 
 	private static Configurator configurator = new Configurator();
-	private static CompoundStepParameters params = null;
+	private static StructureParameters params = null;
 	
 	public static void main(String[] args) {
 		
@@ -21,13 +21,13 @@ public class Configurator extends AbstractParametersEditor {
 	@Override
 	protected void createPages(TabFolder pageContainer) {
 		
-		addPage("Tokenizers", TokenizersTab.class);
+		addPage("Lexers", LexersTab.class);
 	}
 
 	@Override
 	public IParameters createParameters() {
 
-		return new CompoundStepParameters();
+		return new StructureParameters();
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class Configurator extends AbstractParametersEditor {
 		
 		if (configurator == null) return false;
 		
-		params = (CompoundStepParameters) configurator.createParameters();
+		params = (StructureParameters) configurator.createParameters();
 		if (params == null) return false;
 				
 		return configurator.edit(params, false, new BaseContext());
