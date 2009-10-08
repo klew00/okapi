@@ -36,24 +36,6 @@ public abstract class AbstractListAddRemoveTab extends AbstractListTab {
 	}
 
 	@Override
-	protected void actionDown(int itemIndex) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void actionModify(int itemIndex) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void actionUp(int itemIndex) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	protected boolean getDisplayModify() {
 		
 		return false;

@@ -523,6 +523,7 @@ public class SWTUtil {
 		}
 
 		if (control == null) return;
+		if (control.isDisposed()) return;
 		if (!(page instanceof IDialogPage)) return;
 
 		if (listener == null)

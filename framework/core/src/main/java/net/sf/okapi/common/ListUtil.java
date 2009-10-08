@@ -44,30 +44,49 @@ public class ListUtil {
 	
 	/**
 	 * Splits up a string of comma-separated substrings into a string list of those substrings.
-	 * @param st string of comma-separated substrings
+	 * @param list a list to put the substrings
+	 * @param st string of comma-separated substrings 
+	 */
+	public static void stringAsList(List<String> list, String st) {
+
+		stringAsList(list, st, ",");
+		listTrimValues(list);
+	}
+	
+	/**
+	 * Splits up a string of delimited substrings into a string list of those substrings.
+	 * @param st string of delimited substrings
 	 * @param delimiter a string delimiting substrings in the string 
 	 * @return a list of substrings
 	 */
 	public static List<String> stringAsList(String st, String delimiter) {
 
-		if (Util.isEmpty(st)) return new ArrayList<String>();
-		
 		ArrayList<String> res = new ArrayList<String>();
-		if (res == null) 
-			return res;
+		if (res == null) return null;
+
+		stringAsList(res, st, delimiter);		
+		return res;		
+	}
+	
+	/**
+	 * Splits up a string of delimited substrings into a string list of those substrings.
+	 * @param list a list to put the substrings
+	 * @param st string of delimited substrings
+	 * @param delimiter a string delimiting substrings in the string	  
+	 */
+	public static void stringAsList(List<String> list, String st, String delimiter) {
+
+		if (Util.isEmpty(st)) return;
+		if (list == null) return;
+		
+		list.clear();
 		
 		if (Util.isEmpty(delimiter)) {
 						
-			res.add(st);
-			return res;
+			list.add(st);
+			return;
 		}
 	
-//		String[] parts = st.split(delimiter);
-//		for (String part : parts) 
-//			part = part.trim();
-//		
-//		return Arrays.asList(parts);
-		
 		int start = 0;
 		int len = delimiter.length();
 		
@@ -76,14 +95,12 @@ public class ListUtil {
 			int index = st.substring(start).indexOf(delimiter);
 			if (index == -1) break;
 			
-			res.add(st.substring(start, start + index));
+			list.add(st.substring(start, start + index));
 			start += index + len;
 		}
 		
 		if (start <= st.length())
-			res.add(st.substring(start, st.length()));
-		
-		return res;
+			list.add(st.substring(start, st.length()));		
 	}
 	
 	/**
@@ -197,6 +214,24 @@ public class ListUtil {
 			
 		return res;
 	}
+
+	/**
+	 * Converts a list of strings into an array of those strings.
+	 * @param list List of strings.
+	 * @return Array of strings.
+	 */
+	public static String[] listAsArray(List<String> list) {
+		
+		if (Util.isEmpty(list))
+			return new String[] {};
+		
+		return (String[]) list.toArray(new String[] {});
+	}
+	
+	public static <E> List<E> arrayAsList(E[] array) {
+		
+		return Arrays.asList(array);
+	}
 	
 	public static String arrayAsString(String[] array) {
 				
@@ -226,6 +261,21 @@ public class ListUtil {
 		}
 		
 		return res;
+	}
+	
+	public static String intListAsString(List<Integer> list) {
+		
+		return intListAsString(list, ",");
+	}
+	
+	public static String intListAsString(List<Integer> list, String delimiter) {
+		
+		List<String> stList = new ArrayList<String>();
+
+		for (Integer value : list)
+			stList.add(Util.intToStr(value));
+		
+		return listAsString(stList, delimiter);
 	}
 
 	public static <E> void remove(List<E> list, int start, int end) {
@@ -285,5 +335,13 @@ public class ListUtil {
 		return res;
 	}
 	
-	
+	public static <E> E getFirstNonNullItem(List<E> list) {
+		
+		if (Util.isEmpty(list)) return null;
+
+		for (E item : list)			
+			if (item != null) return item;
+
+		return null;		
+	}
 }

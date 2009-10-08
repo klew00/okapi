@@ -53,6 +53,9 @@ public abstract class OkapiComponent extends Component implements IConfigurable 
 		if (params instanceof INotifiable)
 			((INotifiable) params).exec(this, Notification.PARAMETERS_SET_OWNER, this);
 		
+		if (this instanceof INotifiable)
+			((INotifiable) this).exec(this, Notification.PARAMETERS_CHANGED, null);
+		
 //		if (!Util.isEmpty(parametersClassName)) return; // This name is set by the first call from the filter's constructor
 		if (params == null) return;
 		if (params.getClass() == null) return;

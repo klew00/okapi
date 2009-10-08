@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.List;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.Util;
@@ -85,6 +86,9 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 //		buffer.fromString(StringUtil.normalizeLineBreaks(data));
 
 		parameters_load(buffer); // this.getClass()
+		
+		if (owner != null)
+			owner.exec(this, Notification.PARAMETERS_CHANGED, null);
 	}
 	
 	final public String toString () {
@@ -105,6 +109,13 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 			return true;
 		}
 		return false;
+	}
+	
+	public static <T extends AbstractParameters> void loadGroup(ParametersString buffer, List<T> group, Class<T> elementClass) {
+		
+		if (elementClass == null) return;
+		
+		loadGroup(buffer, elementClass.getSimpleName(), group, elementClass);
 	}
 	
 	public static <T extends AbstractParameters> void loadGroup(ParametersString buffer, String groupName, List<T> group, Class<T> elementClass) {
@@ -135,8 +146,15 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 			if (item == null) return;
 			
 			item.parameters_load(new ParametersString(buffer.getGroup(String.format("%s%d", groupName, i))));
+			
 			group.add(item);
 		}
+		
+		T item = ListUtil.getFirstNonNullItem(group);
+		if (item == null) return;
+		
+		if (item.owner != null)
+			item.owner.exec(group, Notification.PARAMETERS_CHANGED, null);
 	}
 	
 	public static <T extends AbstractParameters> void saveGroup(ParametersString buffer, String groupName, List<T> group) {
@@ -155,6 +173,13 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 			item.parameters_save(tmp);
 			buffer.setGroup(String.format("%s%d", groupName, i), tmp.toString());
 		}
+	}
+	
+	public static <T extends AbstractParameters> void saveGroup(ParametersString buffer, List<T> group, Class<T> elementClass) {
+		
+		if (elementClass == null) return;
+		
+		saveGroup(buffer, elementClass.getSimpleName(), group);
 	}
 	
 	public boolean loadFromResource(String resourceLocation) {

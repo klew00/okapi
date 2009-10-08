@@ -21,22 +21,91 @@
 package net.sf.okapi.common.ui.abstracteditor;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 
-public abstract class AbstractListTab extends ListTabLayout implements IDialogPage {
+public abstract class AbstractListTab extends Composite implements IDialogPage {
+	protected Label listDescr;
+	protected List list;
+	protected Text itemDescr;
+	protected Button add;
+	protected Button modify;
+	protected Button remove;
+	protected Button up;
+	protected Button down;
 
-	protected abstract void actionAdd(int afterIndex);
-	protected abstract void actionModify(int itemIndex);	
-	protected abstract void actionUp(int itemIndex);
-	protected abstract void actionDown(int itemIndex);
-	
-	protected abstract String getListDescription();
-	protected abstract String getItemDescription(int index);
-	
+	/**
+	 * Create the composite.
+	 * @param parent
+	 * @param style
+	 */
 	public AbstractListTab(Composite parent, int style) {
-		
 		super(parent, style);
+		setLayout(new GridLayout(2, false));
+
+		listDescr = new Label(this, SWT.NONE);
+		listDescr.setData("name", "listDescr");
+		new Label(this, SWT.NONE);
+		
+		if (!getDisplayListDescr())
+			listDescr.dispose();
+				
+		list = new List(this, SWT.BORDER | SWT.V_SCROLL);
+		list.setItems(new String[] {});
+		list.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 10));
+		list.setData("name", "list");
+		
+		add = new Button(this, SWT.NONE);
+		add.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		add.setData("name", "add");
+		add.setText("Add...");
+		
+		modify = new Button(this, SWT.NONE);
+		modify.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		modify.setData("name", "modify");
+		modify.setText("Modify...");
+		
+		if (!getDisplayModify())
+			modify.dispose();
+		
+		remove = new Button(this, SWT.NONE);
+		remove.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		remove.setData("name", "remove");
+		remove.setText("Remove");
+		new Label(this, SWT.NONE);
+		
+		up = new Button(this, SWT.NONE);
+		up.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		up.setData("name", "up");
+		up.setText("Move Up");		
+		
+		down = new Button(this, SWT.NONE);
+		GridData gridData_1 = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
+		gridData_1.widthHint = 90;
+		down.setLayoutData(gridData_1);
+		down.setData("name", "down");
+		down.setText("Move Down");
+		new Label(this, SWT.NONE);
+		new Label(this, SWT.NONE);
+		new Label(this, SWT.NONE);
+		new Label(this, SWT.NONE);
+			
+		itemDescr = new Text(this, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP | SWT.V_SCROLL);
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
+		gridData.heightHint = 50;
+		gridData.widthHint = 500;
+		itemDescr.setLayoutData(gridData);
+		itemDescr.setData("name", "itemDescr");
+		itemDescr.setVisible(true);
+		
+		if (!getDisplayItemDescr())
+			itemDescr.dispose();
 		
 		// Configure interop
 		SWTUtil.addSpeaker(this, listDescr);
@@ -48,11 +117,8 @@ public abstract class AbstractListTab extends ListTabLayout implements IDialogPa
 		SWTUtil.addSpeaker(this, remove);
 		SWTUtil.addSpeaker(this, up);
 		SWTUtil.addSpeaker(this, down);
-		
-		// Configure layout in descendants
-		SWTUtil.setText(listDescr, getListDescription());
 	}
-
+	
 	protected void selectListItem(int index) {
 		
 		if (SWTUtil.checkListIndex(list, index)) {
@@ -65,6 +131,42 @@ public abstract class AbstractListTab extends ListTabLayout implements IDialogPa
 		
 		list.setFocus();
 	}
+
+	protected boolean getDisplayListDescr() {
+		
+		return true;
+	}
+	
+	protected boolean getDisplayItemDescr() {
+		
+		return true;
+	}
+	
+	protected boolean getDisplayModify() {
+		
+		return true;
+	}
+	
+	protected String getItemDescription(int index) {
+		
+		return "";
+	}
+
+	protected void actionAdd(int afterIndex) {
+		
+	};
+	
+	protected void actionModify(int itemIndex) {
+		
+	};	
+	
+	protected void actionUp(int itemIndex) {
+		
+	};
+	
+	protected void actionDown(int itemIndex) {
+		
+	};
 	
 	public void interop(Widget speaker) {
 		
@@ -116,6 +218,5 @@ public abstract class AbstractListTab extends ListTabLayout implements IDialogPa
 		else if (speaker == down)
 			actionDown(index);
 				
-	}
-
+	}	
 }
