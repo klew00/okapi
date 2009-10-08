@@ -30,52 +30,22 @@ import net.sf.okapi.tm.pensieve.common.Metadata;
 /**
  * Used to query the TM.
  * @author HaslamJD
+ * @author HARGRAVEJE
  */
-public interface ITmSeeker {
-
+public interface ITmSeeker {    
+	 	 
     /**
-     * Gets a list of matches for a given set of words. In this case OR is assumed.
-     * @param query The words to query for
-     * @param max The max number of results
-     * @param metadata The metadata attributes to also match against, null for no metadata
-     * @return A list of matches for a given set of words. In this case OR is assumed.
-     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
-     */
-    List<TmHit> searchForWords(String query, int max, Metadata metadata);
-
-    /**
-     * Gets a list of exact matches for a given phrase.
-     * @param query The exact text to search for
-     * @param max The max number of results
-     * @param metadata The metadata attributes to also match against, null for no metadata
-     * @return A list of exact matches
-     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
-     */
-    List<TmHit> searchExact(String query, int max, Metadata metadata);
-
-    /**
-     * Temporary method to get a list of exact matches for a given text fragment, taking inline codes in account.
+     * Get a list of exact matches for a given text fragment, taking inline codes in account.
      * @param query the fragment to search for
      * @param max the max number of results.
      * @param metadata the metadata attributes to also match against, null for no metadata.
      * @return a list of exact matches
      * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed due to I/O problems
      */
-    List<TmHit> searchExact2 (TextFragment query, int max, Metadata metadata);
-
+    List<TmHit> searchExact(TextFragment query, int max, Metadata metadata);    
+    
     /**
-     * Gets a list of fuzzy matches for a given phrase.
-     * @param query The query string to match WITHOUT ~ and threshold value
-     * @param similarityThreshold The desired threshold - null for default threshold of 0.5
-     * @param max The max number of results
-     * @param metadata The metadata attributes to also match against, null for no metadata
-     * @return A list of exact or fuzzy matches
-     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
-     */
-    List<TmHit> searchFuzzy(String query, Float similarityThreshold, int max, Metadata metadata);
-
-    /**
-     * Temporary method to get a list of fuzzy matches for a given text fragment, taking inline codes in account.
+     * Get a list of fuzzy matches for a given text fragment, taking inline codes in account.
      * @param query the fragment to search for.
      * @param threshold the minimal score value to return.
      * @param max the max number of results.
@@ -83,16 +53,5 @@ public interface ITmSeeker {
      * @return a list of exact or fuzzy matches.
      * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
      */
-    List<TmHit> searchFuzzy2 (TextFragment query, int threshold, int max, Metadata metadata);
-
-    /**
-     * Gets a list of TmHits which have segments that contain the provided subphrase
-     * @param subPhrase The subphrase to match again
-     * @param maxHits The maximum number of hits to return
-     * @param metadata The metadata attributes to also match against, null for no metadata
-     * @return A list of TmHits which have segments that contain the provided subphrase
-     * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed do to I/O problems
-     */
-    List<TmHit> searchSubphrase(String subPhrase, int maxHits, Metadata metadata);
-   
+    List<TmHit> searchFuzzy(TextFragment query, int threshold, int max, Metadata metadata);
 }

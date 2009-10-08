@@ -61,6 +61,7 @@ import org.apache.lucene.search.spell.StringDistance;
  * Used to query the TM
  *
  * @author Christian Hargraves
+ * @author HARGRAVEJE
  */
 public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
@@ -91,79 +92,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
         return new TranslationUnitIterator();
     }
 
-    /**
-     * Gets a list of matches for a given set of words. In this case OR is assumed.
-     *
-     * @param query The words to query for
-     * @param max   The max number of results
-     * @param metadata The metadata attributes to also match against, null for no metadata
-     * @return A list of matches for a given set of words. In this case OR is assumed.
-     * @throws OkapiIOException if the search cannot be completed do to I/O problems
-     */
-    public List<TmHit> searchForWords(String query, int max, Metadata metadata) {
-        QueryParser parser = new QueryParser(TranslationUnitField.SOURCE.name(), new NgramAnalyzer(Locale.ENGLISH, 4));
-        Query q;
-        try {
-            q = parser.parse(query);
-        } catch (ParseException pe) {
-            throw new OkapiIOException("Query String didn't parse: " + query, pe);
-        }
-        return search(max, q, metadata, query);
-    }
-
-    /**
-     * Gets a list of fuzzy matches for a given phrase.
-     *
-     * @param query The query string WITHOUT ~ and threshold value
-     * @param max The max number of results
-     * @param threshold The desired threshold - null for default threshold of 0.5f
-     * @param metadata The metadata attributes to also match against, null for no metadata
-     * @return A list of fuzzy matches
-     * @throws OkapiIOException if the search cannot be completed do to I/O problems
-     */
-    public List<TmHit> searchFuzzy(final String query, Float similarityThreshold, int max, Metadata metadata) {
-        Query q;
-        if (similarityThreshold == null) {
-            q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
-        } else {
-            q = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query), similarityThreshold);
-        }
-        return search(max, q, metadata, query);
-    }
-
-    /**
-     * Gets a list of exact matches for a given phrase.
-     *
-     * @param max The max number of results
-     * @param metadata The metadata attributes to also match against, null for no metadata
-     * @return A list of exact matches
-     * @throws OkapiIOException if the search cannot be completed do to I/O problems
-     */
-    public List<TmHit> searchExact(String query, int max, Metadata metadata) {
-        //If using QueryParser.parse("\"phrase to match\""), the indexed field must be set to Field.Index.ANALYZED
-        //At which point subphrases will also match. This is not the desired behavior of an exact match.
-        //Query q = new QueryParser(field.name(), new SimpleAnalyzer()).parse("\""+query+"\"");
-        //The combination of Field.Index.NOT_ANALYZED and using the PhraseQuery does the exact match as expected.
-        //This means that if we follow this way, then it will require the same tu to be indexed twice; one time as
-        //Field.Index.ANALYZED (for word searching) and another time as Field.Index.NOT_ANALYZED (for exact matches)
-        PhraseQuery q = new PhraseQuery();
-        q.add(new Term(TranslationUnitField.SOURCE_EXACT.name(), query));
-        return search(max, q, metadata, query);
-    }
-
-    /**
-     * Gets a list of TmHits which have segments that contain the provided subphrase
-     *
-     * @param subPhrase The subphrase to match again
-     * @param maxHits   The maximum number of hits to return
-     * @param metadata The metadata attributes to also match against, null for no metadata
-     * @return A list of TmHits which have segments that contain the provided subphrase
-     * @throws OkapiIOException if the search cannot be completed do to I/O problems
-     */
-    public List<TmHit> searchSubphrase(String subPhrase, int maxHits, Metadata metadata) {
-        return searchForWords("\"" + subPhrase + "\"", maxHits, metadata);
-    }
-
     public Directory getIndexDir() {
         return indexDir;
     }
@@ -182,36 +110,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
     protected float calcEditDistance(String actual, String target) {
         return distanceCalc.getDistance(actual, target);
     }
-
-    List<TmHit> search(int max, Query q, Metadata metadata, String origQuery) {
-        IndexSearcher is = null;
-        List<TmHit> tmhits = new ArrayList<TmHit>();
-        BooleanQuery bQuery = createQuery(q, metadata);
-        try {
-            is = getIndexSearcher();
-            TopDocs hits = is.search(bQuery, max);
-            for (int j = 0; j < hits.scoreDocs.length; j++) {
-                ScoreDoc scoreDoc = hits.scoreDocs[j];
-                TmHit tmhit = new TmHit();
-                tmhit.setTu(getTranslationUnit(is.doc(scoreDoc.doc)));
-                float score = calcEditDistance(tmhit.getTu().getSource().getContent().toString(), origQuery);
-                tmhit.setScore(score);
-                tmhits.add(tmhit);
-            }
-        } catch (IOException ioe) {
-            throw new OkapiIOException("Could not complete query: " + ioe.getMessage(), ioe);
-        } finally {
-            //TODO we need to test this
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
-        return tmhits;
-    }
-
+    
     /**
      * Translates a Document into a TranslationUnit
      *
@@ -285,13 +184,13 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      * @param metadata any associated attributes to use for filter.
      * @return the list of hits of the given argument.
      */
-	public List<TmHit> searchExact2 (TextFragment queryFrag,
+	public List<TmHit> searchExact(TextFragment queryFrag,
 		int max,
 		Metadata metadata)
 	{
 		PhraseQuery query = new PhraseQuery();
 		query.add(new Term(TranslationUnitField.SOURCE_EXACT.name(), queryFrag.getCodedText()));
-		return search2(max, 1.0f, query, queryFrag, metadata);
+		return search(max, 1.0f, query, queryFrag, metadata);
 	}
 
     /**
@@ -301,19 +200,24 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      * @param max the maximum number of hits to return.
      * @param metadata any associated attributes to use for filter.
      * @return the list of hits of the given argument.
+     * @throws IllegalArgumentException If threshold is greater than 100 or less than 0
      */
-	public List<TmHit> searchFuzzy2 (TextFragment queryFrag,
+	public List<TmHit> searchFuzzy(TextFragment queryFrag,
 		int threshold,
 		int max,
 		Metadata metadata)
 	{
+		if (threshold < 0 || threshold > 100) {
+			throw new IllegalArgumentException("");
+		}
+		
 		Query query;
 		float searchThreshold = threshold / 100.0f;
 		if ( threshold < 0 ) searchThreshold = 0.0f;
 		if ( threshold > 100 ) searchThreshold = 1.0f;
 		query = new FuzzyQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(),
 			queryFrag.getCodedText()));
-		return search2(max, searchThreshold, query, queryFrag, metadata);
+		return search(max, searchThreshold, query, queryFrag, metadata);
 	}
 
     /**
@@ -325,7 +229,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      * @param metadata any associated attributes to use for filter.
      * @return the list of hits found for the given arguments (never null).
      */
-	private List<TmHit> search2 (int max,
+	List<TmHit> search(int max,
 		float threshold,
 		Query query,
 		TextFragment queryFrag,

@@ -29,7 +29,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import static org.junit.Assert.*;
@@ -47,6 +46,8 @@ import java.util.List;
  * User: Christian Hargraves
  * Date: Aug 17, 2009
  * Time: 1:04:24 PM
+ * 
+ * @author HARGRAVEJE
  */
 public class PensieveSeekerTest {
 
@@ -145,14 +146,6 @@ public class PensieveSeekerTest {
         seeker.iterator().remove();
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
-    @Test(expected = OkapiIOException.class)
-    public void searchHandleIOException() throws IOException {
-        PensieveSeeker spy = spy(seeker);
-        doThrow(new IOException("some exception")).when(spy).getIndexSearcher();
-        spy.search(1, new PhraseQuery(), null, null);
-    }
-
     @Test
     public void getDirectory() {
         assertSame("directory", DIR, seeker.getIndexDir());
@@ -174,98 +167,7 @@ public class PensieveSeekerTest {
     @Test(expected = IllegalArgumentException.class)
     public void constructorNullIndexDir() {
         new PensieveSeeker(null);
-    }
-
-    @Test
-    public void searchForWordsNothingFound() throws Exception {
-        PensieveWriter writer = getWriter();
-        writer.endIndex();
-        tmhits = seeker.searchForWords("anonexistentwordthatshouldnowayeverexist", 10, null);
-        assertNotNull("docs returned should not be null", tmhits);
-        assertEquals("number of docs found", 0, tmhits.size());
-    }
-
-    @Test
-    public void searchForWordsOverMaxDocs() throws Exception {
-        PensieveWriter writer = getWriter();
-
-        populateIndex(writer, 12, "patents are evil", "unittest");
-        final int desiredReturns = 2;
-        writer.endIndex();
-        tmhits = seeker.searchForWords("patents", desiredReturns, null);
-        assertEquals("number of docs found", desiredReturns, tmhits.size());
-    }
-
-    @Test
-    public void searchForWordsMetadata() throws Exception {
-        PensieveWriter writer = getWriter();
-
-        populateIndex(writer, 12, "patents are evil", "unittest", "id", "nachofile", "nachogroup", "nachotype");
-        populateIndex(writer, 12, "evil patents are", "unittest", "id2", "yofile", "yogroup", "yotype");
-        final int desiredReturns = 24;
-        writer.endIndex();
-        Metadata metadata = new Metadata();
-        metadata.put(MetadataType.FILE_NAME, "yofile");
-        metadata.put(MetadataType.GROUP_NAME, "yogroup");
-        metadata.put(MetadataType.TYPE, "yotype");
-
-        tmhits = seeker.searchForWords("patents", desiredReturns, metadata);
-        assertEquals("number of docs found", 12, tmhits.size());
-    }
-
-    @Test
-    public void searchForWordsUnderMaxDocs() throws Exception {
-        PensieveWriter writer = getWriter();
-
-        final int desiredReturns = 8;
-
-        populateIndex(writer, desiredReturns, "patents are evil", "unittest");
-        writer.endIndex();
-
-        tmhits = seeker.searchForWords("patents", 10, null);
-        assertEquals("number of docs found", desiredReturns, tmhits.size());
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void searchWordsInvalidQuery() throws Exception {
-        seeker.searchForWords("patents evil are]", 10, null);
-    }
-
-    @Test
-    public void searchSubphraseMetadata() throws Exception {
-        PensieveWriter writer = getWriter();
-
-        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "patents are evil", "nacho target. It's mine!!", "id", "yofile", "yogroup", "yotype"));
-        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "patents evil are", "nacho target. It's mine!!", "id", "yofile", "yogroup", "yotype"));
-        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "are patents evil", "nacho target. It's mine!!", "id", "yofile", "yogroup", "yotype"));
-        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "are patents evil", "nacho target. It's mine!!", "id", "nachofile", "nachogroup", "nachotype"));
-        writer.indexTranslationUnit(Helper.createTU("EN", "JP", "completely unrelated phrase", "nacho target. It's mine!!", "id", "nachofile", "nachogroup", "nachotype"));
-        writer.endIndex();
-        Metadata md = new Metadata();
-        md.put(MetadataType.FILE_NAME, "yofile");
-        md.put(MetadataType.GROUP_NAME, "yogroup");
-        md.put(MetadataType.TYPE, "yotype");
-        tmhits = seeker.searchSubphrase("patents evil", 10, md);
-        assertEquals("number of docs found", 2, tmhits.size());
-        assertEquals("1st target", "patents evil are", tmhits.get(0).getTu().getSource().getContent().toString());
-        assertEquals("2nd target", "are patents evil", tmhits.get(1).getTu().getSource().getContent().toString());
-    }
-
-    @Test
-    public void searchSubphrase() throws Exception {
-        PensieveWriter writer = getWriter();
-
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("patents are evil")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("patents evil are")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("are patents evil")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("completely unrelated phrase")), TARGET));
-        writer.endIndex();
-
-        tmhits = seeker.searchSubphrase("patents evil", 10, null);
-        assertEquals("number of docs found", 2, tmhits.size());
-        assertEquals("1st target", "patents evil are", tmhits.get(0).getTu().getSource().getContent().toString());
-        assertEquals("1st target", "are patents evil", tmhits.get(1).getTu().getSource().getContent().toString());
-    }
+    }    
 
     @Test
     public void searchFuzzyMiddleMatch() throws Exception {
@@ -278,7 +180,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(STR, null, 10, null);
+        tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, null);
         assertEquals("number of docs found", 3, tmhits.size());
     }
 
@@ -292,19 +194,19 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(STR, 0.8f, 10, null);
+        tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, null);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void searchFuzzyThresholdGreaterThan1() throws Exception {
+    public void searchFuzzyThresholdGreaterThan100() throws Exception {
         PensieveWriter writer = getWriter();
 
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
         writer.endIndex();
-        seeker.searchFuzzy(STR, 1.00f, 10, null);
+        seeker.searchFuzzy(new TextFragment(STR), 101, 10, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -313,7 +215,7 @@ public class PensieveSeekerTest {
 
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
         writer.endIndex();
-        seeker.searchFuzzy(STR, -0.01f, 10, null);
+        seeker.searchFuzzy(new TextFragment(STR), -1, 10, null);
     }
 
     @Test
@@ -326,7 +228,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(STR, 0.8f, 10, null);
+        tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, null);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
@@ -347,7 +249,7 @@ public class PensieveSeekerTest {
         md.put(MetadataType.FILE_NAME, "some_file");
         md.put(MetadataType.GROUP_NAME, "some_group");
         md.put(MetadataType.TYPE, "nachotype");
-        tmhits = seeker.searchFuzzy(STR, 0.8f, 10, md);
+        tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, md);
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
@@ -368,7 +270,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[3])), TARGET));
         writer.endIndex();
         //If you add a threshold it changes the sort order
-        tmhits = seeker.searchFuzzy(STR, null, 10, null);
+        tmhits = seeker.searchFuzzy(new TextFragment(STR), 0, 10, null);
 
         assertEquals("number of docs found", 4, tmhits.size());
         assertEquals("first match", testStrings[0], tmhits.get(0).getTu().getSource().getContent().toString());
@@ -394,7 +296,7 @@ public class PensieveSeekerTest {
         populateIndex(writer, numOfIndices, str, "two");
 
         writer.endIndex();
-        tmhits = seeker.searchFuzzy(str, null, 10, null);
+        tmhits = seeker.searchFuzzy(new TextFragment(str), 0, 10, null);
         assertEquals("number of docs found", 9, tmhits.size());
     }
 
@@ -409,7 +311,7 @@ public class PensieveSeekerTest {
 
         writer.endIndex();
         //Fuzzy or phrase matching would return "watch out for the killer rabbit1" & "watch out for the killer rabbit11"
-        tmhits = seeker.searchExact(str + 1, 10, null);
+        tmhits = seeker.searchExact(new TextFragment(str + 1), 10, null);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -423,7 +325,7 @@ public class PensieveSeekerTest {
         writer.endIndex();
         Metadata metadata = new Metadata();
         metadata.put(MetadataType.ID, "ID1");
-        tmhits = seeker.searchExact(str, 20, metadata);
+        tmhits = seeker.searchExact(new TextFragment(str), 20, metadata);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -438,7 +340,7 @@ public class PensieveSeekerTest {
         writer.endIndex();
         Metadata metadata = new Metadata();
         metadata.put(MetadataType.TYPE, "nachotype");
-        tmhits = seeker.searchExact(str, 20, metadata);
+        tmhits = seeker.searchExact(new TextFragment(str), 20, metadata);
         assertEquals("number of docs found", 5, tmhits.size());
     }
 
@@ -451,7 +353,7 @@ public class PensieveSeekerTest {
         }
 
         writer.endIndex();
-        tmhits = seeker.searchExact(str, 10, null);
+        tmhits = seeker.searchExact(new TextFragment(str), 10, null);
         assertEquals("number of docs found", 5, tmhits.size());
     }
 
@@ -463,7 +365,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchExact(str, 10, null);
+        tmhits = seeker.searchExact(new TextFragment(str), 10, null);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -475,7 +377,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchExact(str, 10, null);
+        tmhits = seeker.searchExact(new TextFragment(str), 10, null);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -487,7 +389,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchExact("killer rabbit the for out watch", 10, null);
+        tmhits = seeker.searchExact(new TextFragment("killer rabbit the for out watch"), 10, null);
         assertEquals("number of docs found", 0, tmhits.size());
     }
 
@@ -505,7 +407,7 @@ public class PensieveSeekerTest {
     	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
     	writer.endIndex();
     	
-    	tmhits = seeker.searchExact2(frag, 10, null);
+    	tmhits = seeker.searchExact(frag, 10, null);
     	assertEquals("number of docs found", 1, tmhits.size());
     	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
     }
@@ -525,7 +427,7 @@ public class PensieveSeekerTest {
     	writer.endIndex();
     	
     	frag = new TextFragment("watch out for the killer rabbit");
-    	tmhits = seeker.searchExact2(frag, 10, null);
+    	tmhits = seeker.searchExact(frag, 10, null);
     	assertEquals("number of docs found", 1, tmhits.size());
     	assertEquals("watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
     }
@@ -546,7 +448,7 @@ public class PensieveSeekerTest {
     	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
     	writer.endIndex();
     	
-    	tmhits = seeker.searchFuzzy2(frag, 5, 10, null);
+    	tmhits = seeker.searchFuzzy(frag, 5, 10, null);
     	assertEquals("number of docs found", 2, tmhits.size());
     	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
     	assertEquals("watch out for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
