@@ -20,12 +20,10 @@
 
 package net.sf.okapi.steps.tokenization.common;
 
-import net.sf.okapi.steps.tokenization.tokens.Tokens;
+import java.util.ArrayList;
 
-public interface ITokenizationStep {
+public class Lexems extends ArrayList<Lexem> {
 
-	void tokenize(String text, Tokens tokens, String language, String... tokenTypes);
-	void setTokenizeSource(boolean tokenizeSource);
-	void setTokenizeTargets(boolean tokenizeTargets);
-	boolean canTokenize(String language, String... tokenTypes);
+	private static final long serialVersionUID = -3494037235504417730L;
+
 }

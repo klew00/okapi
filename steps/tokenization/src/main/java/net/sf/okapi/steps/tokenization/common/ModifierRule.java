@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,75 +18,67 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.tokens;
+package net.sf.okapi.steps.tokenization.common;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.lib.extra.AbstractParameters;
+import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class Parameters extends AbstractParameters {
+public class ModifierRule extends LexerRule {
 
-	private List<TokenItem> items;
-	
+	private List<Integer> inTokenIDs;
+	private List<String> inTokenNames;
+
 	@Override
 	protected void parameters_init() {
-		
-		items = new ArrayList<TokenItem>();
-	}
 
+		super.parameters_init();
+		
+		inTokenIDs = new ArrayList<Integer>();
+		inTokenNames = new ArrayList<String>();
+	}
+	
 	@Override
 	protected void parameters_load(ParametersString buffer) {
+
+		super.parameters_load(buffer);
 		
-		loadGroup(buffer, items, TokenItem.class);
+		ListUtil.stringAsList(inTokenNames, buffer.getString("inTokenNames"));
+
+		// Convert token names to a list of IDs
+		inTokenIDs.clear();
+		
+		for (String tokenName : inTokenNames)			
+			inTokenIDs.add(Tokens.getTokenId(tokenName));
 	}
 
 	@Override
 	protected void parameters_reset() {
-		
-		items.clear();
+
+		super.parameters_reset();
+		inTokenIDs.clear();
 	}
 
 	@Override
 	protected void parameters_save(ParametersString buffer) {
+
+		super.parameters_save(buffer);
+
+		// Convert IDs to token names
+		inTokenNames.clear();
 		
-		//items.parameters_save(buffer);
-		saveGroup(buffer, items, TokenItem.class);
+		for (Integer tokenId : inTokenIDs)
+			inTokenNames.add(Tokens.getTokenName(tokenId));
+
+		buffer.setString("inTokenNames", ListUtil.listAsString(inTokenNames));
 	}
 
-	public boolean loadItems() {
+	public List<Integer> getInTokenIDs() {
 		
-		return loadFromResource("tokens.tprm");
+		return inTokenIDs;
 	}
-	
-	public void saveItems() {
-		
-		saveToResource("tokens.tprm");
-	}
-
-//	protected int generateId() {
-//		// Slow, as used only from UI  
-//		
-//		int max = 0;
-//		for (TokenItem item : items) {
-//			
-//			if (item == null) continue;
-//			if (max < item.getId())
-//				max = item.getId();
-//		}
-//		
-//		//return (max > 0) ? max + 1: 0;
-//		return max + 1;
-//	}
-	
-	public void addTokenItem(String name, String description) {
-		
-		items.add(new TokenItem(name, description));
-	}
-
-	public List<TokenItem> getItems() {
-		
-		return items;
-	}
-	
+			
 }

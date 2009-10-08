@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.steps.tokenization.common.Token;
 
 /**
  * 
@@ -45,6 +46,7 @@ public class Tokens extends ArrayList<Token> {
 	static {
 		
 		Parameters params = new Parameters();
+		
 		idMap = new TreeMap<Integer, TokenItem>();
 		nameMap = new TreeMap<String, TokenItem>();
 
@@ -176,4 +178,13 @@ public class Tokens extends ArrayList<Token> {
 		return idMap.values();
 	}
 
+	/**
+	 * Gets list of names of all tokens.
+	 * @return List of available token names.
+	 */
+	public static List<String> getAllTokens() {
+	
+		return new ArrayList<String>(nameMap.keySet());
+	}
+	
 }

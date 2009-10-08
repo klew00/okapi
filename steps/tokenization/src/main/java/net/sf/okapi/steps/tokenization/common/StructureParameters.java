@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,75 +18,49 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.tokens;
+package net.sf.okapi.steps.tokenization.common;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.lib.extra.AbstractParameters;
+import net.sf.okapi.lib.extra.Notification;
 
-public class Parameters extends AbstractParameters {
+public class StructureParameters extends AbstractParameters {
 
-	private List<TokenItem> items;
-	
-	@Override
-	protected void parameters_init() {
-		
-		items = new ArrayList<TokenItem>();
-	}
+	public String description;
+	private List<StructureParametersItem> items = new ArrayList<StructureParametersItem>();	
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
+
+		description = buffer.getString("description", "");
+		loadGroup(buffer, items, StructureParametersItem.class);
 		
-		loadGroup(buffer, items, TokenItem.class);
+		if (owner != null)
+			owner.exec(this, Notification.PARAMETERS_CHANGED, null);
 	}
 
 	@Override
 	protected void parameters_reset() {
 		
-		items.clear();
+		description = "";
+		
+		if (items == null) return;
+		items.clear();		
 	}
 
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		
-		//items.parameters_save(buffer);
-		saveGroup(buffer, items, TokenItem.class);
+		buffer.setString("description", description);
+		saveGroup(buffer, items, StructureParametersItem.class);
 	}
 
-	public boolean loadItems() {
-		
-		return loadFromResource("tokens.tprm");
-	}
-	
-	public void saveItems() {
-		
-		saveToResource("tokens.tprm");
-	}
-
-//	protected int generateId() {
-//		// Slow, as used only from UI  
-//		
-//		int max = 0;
-//		for (TokenItem item : items) {
-//			
-//			if (item == null) continue;
-//			if (max < item.getId())
-//				max = item.getId();
-//		}
-//		
-//		//return (max > 0) ? max + 1: 0;
-//		return max + 1;
-//	}
-	
-	public void addTokenItem(String name, String description) {
-		
-		items.add(new TokenItem(name, description));
-	}
-
-	public List<TokenItem> getItems() {
+	public List<StructureParametersItem> getItems() {
 		
 		return items;
 	}
-	
+
 }

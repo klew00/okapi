@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,47 +18,15 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.tokens;
+package net.sf.okapi.steps.tokenization.common;
 
-import net.sf.okapi.common.annotation.IAnnotation;
 
-/**
- * 
- * 
- * @version 0.1 08.07.2009
- */
+public class LexerRules extends AbstractLexerRules {
 
-public class TokensAnnotation implements IAnnotation {
-
-	private Tokens tokens = new Tokens ();
-
-	public TokensAnnotation(Tokens tokens) {
+	@Override
+	public Class<? extends LexerRule> getRuleClass() {
 		
-		super();
-		this.tokens = tokens;
+		return LexerRule.class;
 	}
 
-	public void setTokens(Tokens tokens) {
-		
-		this.tokens = tokens;
-	}
-
-	public Tokens getTokens() {
-		
-		return tokens;
-	} 
-	
-	public Tokens getFilteredList(String... tokenTypes) {
-		
-		if (tokens == null) return getTokens(); // return all
-		
-		return tokens.getFilteredList(tokenTypes);
-	}
-
-	public void addTokens(Tokens tokens) {
-		
-		this.tokens.addAll(tokens);
-		
-		// TODO Handle overlapping and duplicate ranges for the same token type
-	}
 }

@@ -18,9 +18,10 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.tokens;
+package net.sf.okapi.steps.tokenization.common;
 
 import net.sf.okapi.common.Range;
+import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 /**
  * 
@@ -44,53 +45,48 @@ public class Token {
 	
 	/**
 	 * Integer identifier of the token. 
+	 * !!! Non-serializable. 
 	 */
-	private int id; 
+	private int tokenId; 
 	
 	/**
-	 * Substring of text captured as the given token.
+	 * Underlying lexem extracted by a tokenizer.
 	 */
-	private String value;
-	
-	/**
-	 * Range of text captured as the given token.
-	 */
-	private Range range;
+	private Lexem lexem;
 	
 	/**
 	 * Percentage reflecting trustworthiness of the token recognition.
 	 */
 	private int score;
 	
-	/**
-	 * ID of the rule that captured this token. Used by the scoring engine internally.
-	 */
-	private int ruleId;
-	
-	public Token(int id, String value, int start, int end, int score, int ruleId) {
+	public Token(int tokenId, Lexem lexem, int score) {
 		
 		super();
 		
-		this.id = id;
-		this.range = new Range(start, end);
-		this.value = value;
+		this.tokenId = tokenId;
+		this.lexem = lexem;
 		this.score = score;
-		this.ruleId = ruleId;
 	}
 
-	public int getId() {
+	/**
+	 * Gets integer identifier of the token. 
+	 * !!! Non-serializable. 
+	 */
+	public int getTokenId() {
 		
-		return id;
+		return tokenId;
 	}
 
-	public String getValue() {
+	public Lexem getLexem() {
 		
-		return value;
+		return lexem;
 	}
 
 	public Range getRange() {
 		
-		return range;
+		if (lexem == null) return new Range(0, 0);
+		
+		return lexem.getRange();
 	}
 
 	public int getScore() {
@@ -98,26 +94,42 @@ public class Token {
 		return score;
 	}
 
-	public int getRuleId() {
+	public int getLexerId() {
 		
-		return ruleId;
+		if (lexem == null) return 0;
+		
+		return lexem.getLexerId();
+	}
+
+	public int getLexemId() {
+		
+		if (lexem == null) return 0;
+		
+		return lexem.getId();
 	}
 	
+	public String getValue() {
+		
+		if (lexem == null) return "";
+		
+		return lexem.getValue();
+	}
+
 	public String getName() {
 		
-		return Tokens.getTokenName(id);
+		return Tokens.getTokenName(tokenId);
 	}
 	
 	public String getDescription() {
 				
-		return Tokens.getTokenDescription(id);
+		return Tokens.getTokenDescription(tokenId);
 	}
 
 	@Override
 	public String toString() {
 		
-		return String.format("%s [%d]\t\t(Range: %d, %d)\t\t[%s]\t(Score: %d)\t(Rule: %d)", 
-				getName(), id, range.start, range.end, value, score, ruleId);
+		return String.format("%-15s\t%d\t%3d%%\t%s", 
+				getName(), tokenId, score, lexem.toString());
 	}
 		
 }

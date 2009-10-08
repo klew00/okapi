@@ -1,0 +1,28 @@
+ #v1
+description=Lexers of the tokenization step (in the order of invocation) 
+StructureParametersItemCount.i=5
+
+StructureParametersItem0.enabled.b=true
+StructureParametersItem0.description=Internal RuleBasedBreakIterator rules of RbbiLexer.
+StructureParametersItem0.lexerClass=net.sf.okapi.steps.tokenization.engine.RbbiLexer
+StructureParametersItem0.rulesLocation=rbbi_main.tprm
+
+StructureParametersItem1.enabled.b=true
+StructureParametersItem1.description=RBBI rules of RbbiLexer (by Sujit Pal at http://sujitpal.blogspot.com/2008/05/tokenizing-text-with-icu4js.html, http://jtmt.svn.sourceforge.net/viewvc/jtmt/src/main/resources/word_break_rules.txt?revision=1&view=markup).
+StructureParametersItem1.lexerClass=net.sf.okapi.steps.tokenization.engine.RbbiLexer
+StructureParametersItem1.rulesLocation=rbbi_sujit.tprm
+
+StructureParametersItem2.enabled.b=true
+StructureParametersItem2.description=Arranges tokens by their position in the text.
+StructureParametersItem2.lexerClass=net.sf.okapi.steps.tokenization.engine.Sorter
+StructureParametersItem2.rulesLocation=
+
+StructureParametersItem3.enabled.b=true
+StructureParametersItem3.description=Removes tokens, which ranges are within the range of a token produced by a later lexer.
+StructureParametersItem3.lexerClass=net.sf.okapi.steps.tokenization.engine.Replacer
+StructureParametersItem3.rulesLocation=
+
+StructureParametersItem4.enabled.b=true
+StructureParametersItem4.description=UNKNOWN-type tokens cleaner.
+StructureParametersItem4.lexerClass=net.sf.okapi.steps.tokenization.engine.Cleaner
+StructureParametersItem4.rulesLocation=cleaner_unknown.tprm

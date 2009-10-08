@@ -20,6 +20,9 @@
 
 package net.sf.okapi.steps.tokenization.locale;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ibm.icu.util.ULocale;
 
 import net.sf.okapi.common.Util;
@@ -44,6 +47,23 @@ public class LocaleUtil {
 			res.append(parts[1].toUpperCase());
 		}
 		return res.toString();
+	}
+	
+	/**
+	 * Converts a list of language tags (language ID and an optional region/country part) to the Okapi format: upper case, delimited with a dash.
+	 * @param languageCodes List of language codes to normalize.
+	 * @return A new list, containing language codes in Okapi format.
+	 */
+	public static List<String> normalizeLanguageCodes_Okapi(List<String> languageCodes) {
+		
+		if (languageCodes == null) return null;
+		
+		List<String> res = new ArrayList<String>();
+		
+		for (String languageCode : languageCodes)
+			res.add(normalizeLanguageCode_Okapi(languageCode));
+		
+		return res;
 	}
 	
 	/**

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,51 +20,56 @@
 
 package net.sf.okapi.steps.tokenization.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.lib.extra.AbstractParameters;
 
-/**
- * Tokenization internal step parameters
- * 
- * @version 0.1 06.07.2009
- */
+public class StructureParametersItem extends AbstractParameters {
 
-public abstract class TokenizationStepParameters extends AbstractParameters {
-	
-	public String description;
-	public List<TokenizationStepRule> rules = new ArrayList<TokenizationStepRule>();
-	
-	public abstract Class<? extends TokenizationStepRule> getRuleClass();
-	
-	@Override
-	protected void parameters_init() {
+	private boolean enabled;
+	private String description;
+	private String lexerClass;
+	private String rulesLocation;
 		
-	}
-
 	@Override
-	public void parameters_reset() {
-
+	protected void parameters_reset() {
+		
+		enabled = true;
 		description = "";
-		if (rules != null)
-			rules.clear();
+		lexerClass = "";
+		rulesLocation = "";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void parameters_load(ParametersString buffer) {
-		
-		description = buffer.getString("description", "");
-		loadGroup(buffer, "rules", rules, (Class<TokenizationStepRule>) getRuleClass());
+	protected void parameters_load(ParametersString buffer) {
+
+		enabled = buffer.getBoolean("enabled", true);
+		description = buffer.getString("description");
+		lexerClass = buffer.getString("lexerClass");
+		rulesLocation = buffer.getString("rulesLocation");
 	}
-	
+
 	@Override
-	public void parameters_save(ParametersString buffer) {
+	protected void parameters_save(ParametersString buffer) {
 		
+		buffer.setBoolean("enabled", enabled);
 		buffer.setString("description", description);
-		saveGroup(buffer, "rules", rules);
-	}	
-	
+		buffer.setString("lexerClass", lexerClass);
+		buffer.setString("rulesLocation", rulesLocation);
+	}
+
+	public String getLexerClass() {
+		
+		return lexerClass;
+	}
+
+	public String getRulesLocation() {
+		
+		return rulesLocation;
+	}
+
+	public boolean isEnabled() {
+		
+		return enabled;
+	}
+		
 }
