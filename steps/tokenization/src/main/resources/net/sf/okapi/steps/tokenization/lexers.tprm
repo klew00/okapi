@@ -1,6 +1,6 @@
  #v1
 description=Lexers of the tokenization step (in the order of invocation) 
-StructureParametersItemCount.i=5
+StructureParametersItemCount.i=6
 
 StructureParametersItem0.enabled.b=true
 StructureParametersItem0.description=Internal RuleBasedBreakIterator rules of RbbiLexer.
@@ -13,9 +13,9 @@ StructureParametersItem1.lexerClass=net.sf.okapi.steps.tokenization.engine.RbbiL
 StructureParametersItem1.rulesLocation=rbbi_sujit.tprm
 
 StructureParametersItem2.enabled.b=true
-StructureParametersItem2.description=Arranges tokens by their position in the text.
-StructureParametersItem2.lexerClass=net.sf.okapi.steps.tokenization.engine.Sorter
-StructureParametersItem2.rulesLocation=
+StructureParametersItem2.description=WHITESPACE and PUNCTUATION resolver.
+StructureParametersItem2.lexerClass=net.sf.okapi.steps.tokenization.engine.Recognizer
+StructureParametersItem2.rulesLocation=recognizer_main.tprm
 
 StructureParametersItem3.enabled.b=true
 StructureParametersItem3.description=Removes tokens, which ranges are within the range of a token produced by a later lexer.
@@ -23,6 +23,11 @@ StructureParametersItem3.lexerClass=net.sf.okapi.steps.tokenization.engine.Repla
 StructureParametersItem3.rulesLocation=
 
 StructureParametersItem4.enabled.b=true
-StructureParametersItem4.description=UNKNOWN-type tokens cleaner.
-StructureParametersItem4.lexerClass=net.sf.okapi.steps.tokenization.engine.Cleaner
-StructureParametersItem4.rulesLocation=cleaner_unknown.tprm
+StructureParametersItem4.description=Arranges tokens by their position in the text.
+StructureParametersItem4.lexerClass=net.sf.okapi.steps.tokenization.engine.Sorter
+StructureParametersItem4.rulesLocation=
+
+StructureParametersItem5.enabled.b=true
+StructureParametersItem5.description=UNKNOWN-type tokens cleaner.
+StructureParametersItem5.lexerClass=net.sf.okapi.steps.tokenization.engine.Cleaner
+StructureParametersItem5.rulesLocation=cleaner_unknown.tprm

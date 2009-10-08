@@ -1,0 +1,35 @@
+ #v1
+RuleCount.i=3
+
+Rule0.name=Whitespace
+Rule0.description=Whitespace extraction rule for all languages except CJK
+Rule0.inTokenNames=UNKNOWN
+Rule0.lexemId.i=0
+Rule0.rule=\s+
+Rule0.languageMode.i=2
+Rule0.languageWhiteList=
+Rule0.languageBlackList=ZH,ZH-HANT,ZH-HANT-HK,ZH-HANT-MO,ZH-HANT-TW,ZH-HANS,ZH-HANS-HK,ZH-HANS-CN,ZH-HANS-MO,ZH-HANS-SG,KO,KO-KR,JA,JA-JP
+Rule0.tokenMode.i=1
+Rule0.tokenNames=WHITESPACE
+
+Rule1.name=Punctuation
+Rule1.description=
+Rule1.inTokenNames=UNKNOWN
+Rule1.lexemId.i=1
+Rule1.rule=\p{Punct}
+Rule1.languageMode.i=0
+Rule1.languageWhiteList=
+Rule1.languageBlackList=
+Rule1.tokenMode.i=1
+Rule1.tokenNames=PUNCTUATION
+
+Rule2.name=URL_Detector
+Rule2.description=URL detection rule
+Rule2.inTokenNames=WORD
+Rule2.lexemId.i=2
+Rule2.rule=(@)?(href=')?(HREF=')?(HREF=\")?(href=\")?(http://)?[a-zA-Z_0-9\-]+(\.\w[a-zA-Z_0-9\-]+)+(/[#&\n\-=?\+\%/\.\w]+)?
+Rule2.languageMode.i=0
+Rule2.languageWhiteList=
+Rule2.languageBlackList=
+Rule2.tokenMode.i=1
+Rule2.tokenNames=INTERNET

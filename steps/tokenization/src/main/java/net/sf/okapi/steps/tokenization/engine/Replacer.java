@@ -85,9 +85,9 @@ public class Replacer extends AbstractLexer {
 				
 				if (token2 == token) continue;
 				
-				if (token.getLexerId() > token2.getLexerId() && // Only later lexers can replace tokens of the predecessors 
-						contains(token.getLexem().getRange(), token2.getLexem().getRange()))					
-					wasteBin.add(token2);
+				// if (token.getLexerId() > token2.getLexerId() && // Only later lexers can replace tokens of the predecessors 
+					if (contains(token.getLexem().getRange(), token2.getLexem().getRange()))					
+						wasteBin.add(token2);
 			}
 		}
 		

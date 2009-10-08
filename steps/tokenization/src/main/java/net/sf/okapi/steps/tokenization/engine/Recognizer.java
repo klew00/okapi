@@ -20,7 +20,10 @@
 
 package net.sf.okapi.steps.tokenization.engine;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
@@ -32,57 +35,70 @@ import net.sf.okapi.steps.tokenization.common.ModifierRules;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class Cleaner extends AbstractLexer {
-	
+public class Recognizer extends AbstractLexer {
+	 
+	 private List<LexerRule> items;
+	 private HashMap<LexerRule, Pattern> patterns;  
+	  
 	@Override
 	protected Class<? extends LexerRules> lexer_getRulesClass() {
 		
 		return ModifierRules.class;
 	}
-	
+
 	@Override
-	public boolean lexer_hasNext() {
+	protected boolean lexer_hasNext() {
+
+		return false;
+	}
+
+	@Override
+	protected void lexer_init() {
 		
-		return false; // Iterator is not used
-	}
-
-	@Override
-	public void lexer_init() {
-
-	}
-
-	@Override
-	public Lexem lexer_next() {
-
-		return null; // Iterator is not used
-	}
-
-	@Override
-	public void lexer_open(String text, String language, Tokens tokens) {
+		patterns = new HashMap<LexerRule, Pattern>();
+		items = getRules();
 		
-		 // Iterator is not used
-	}
-
-	public Lexems process(String text, String language, Tokens tokens) {
-
-		if (tokens == null) return null;
-				
-		Tokens wasteBin = new Tokens();
-		
-		for (LexerRule item : getRules()) {
-
-			List<Integer> inTokenIDs = ((ModifierRule) item).getInTokenIDs();
+		for (LexerRule item : items) {
 			
-			for (Token token : tokens)			
-				if (inTokenIDs.contains(token.getTokenId()))
-					wasteBin.add(token);
+			Pattern pattern = Pattern.compile(item.getRule());
+			patterns.put(item, pattern);
 		}
-		
-		for (Token token : wasteBin)
-			tokens.remove(token);
-		
+							
+	}
+
+	@Override
+	protected Lexem lexer_next() {
+
 		return null;
 	}
 
+	@Override
+	protected void lexer_open(String text, String language, Tokens tokens) {
+
+	}
+
+	public Lexems process(String text, String language, Tokens tokens) {
+		
+		Lexems lexems = new Lexems();
+
+		for (LexerRule item : items) {
+			
+			List<Integer> inTokenIDs = ((ModifierRule) item).getInTokenIDs();
+			
+			Pattern pattern = patterns.get(item);
+			if (pattern == null) continue;
+			
+			for (Token token : tokens)			
+				if (inTokenIDs.contains(token.getTokenId())) {
+				
+					Matcher matcher = pattern.matcher(token.getValue());
+					
+				    if (matcher.matches())
+				    	lexems.add(new Lexem(item.getLexemId(), token.getValue(), token.getRange(), getLexerId()));
+				}
+		}
+		
+		return lexems;
+	}
 
 }
