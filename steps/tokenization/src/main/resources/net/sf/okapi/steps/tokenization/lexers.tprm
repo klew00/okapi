@@ -1,6 +1,6 @@
  #v1
 description=Lexers of the tokenization step (in the order of invocation) 
-StructureParametersItemCount.i=6
+StructureParametersItemCount.i=7
 
 StructureParametersItem0.enabled.b=true
 StructureParametersItem0.description=Internal RuleBasedBreakIterator rules of RbbiLexer.
@@ -31,3 +31,8 @@ StructureParametersItem5.enabled.b=true
 StructureParametersItem5.description=UNKNOWN-type tokens cleaner.
 StructureParametersItem5.lexerClass=net.sf.okapi.steps.tokenization.engine.Cleaner
 StructureParametersItem5.rulesLocation=cleaner_unknown.tprm
+
+StructureParametersItem6.enabled.b=true
+StructureParametersItem6.description=Duplicate tokens cleaner.
+StructureParametersItem6.lexerClass=net.sf.okapi.steps.tokenization.engine.DuplicateCleaner
+StructureParametersItem6.rulesLocation=

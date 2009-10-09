@@ -27,7 +27,6 @@ import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.common.LexerRule;
-import net.sf.okapi.steps.tokenization.common.LexerRules;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 import com.ibm.icu.text.BreakIterator;
@@ -44,12 +43,6 @@ public class RbbiLexer extends AbstractLexer {
 	private int end;
 	private String text;
 	
-	@Override
-	protected Class<? extends LexerRules> lexer_getRulesClass() {
-
-		return LexerRules.class;
-	}
-
 	@Override
 	public void lexer_init() {
 		

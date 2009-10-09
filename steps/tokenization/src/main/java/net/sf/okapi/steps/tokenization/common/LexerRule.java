@@ -20,9 +20,14 @@
 
 package net.sf.okapi.steps.tokenization.common;
 
-import net.sf.okapi.common.ParametersString;
+import java.util.ArrayList;
+import java.util.List;
 
-public class LexerRule extends LanguageAndTokenParameters {
+import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.steps.tokenization.tokens.Tokens;
+
+public class LexerRule extends LanguageParameters {
 
 	/**
 	 * Unique in the lexer's scope name of the rule to be displayed on rule lists in GUI, also to identify the rule inside lexers.
@@ -46,6 +51,14 @@ public class LexerRule extends LanguageAndTokenParameters {
 	 */
 	private String rule;
 	
+	private List<Integer> inTokenIDs;
+	private List<String> inTokens;
+	
+	private List<Integer> outTokenIDs;
+	private List<String> outTokens;
+	
+	private List<Integer> userTokenIDs;
+	private List<String> userTokens;
 	
 	@Override
 	protected void parameters_reset() {
@@ -54,18 +67,60 @@ public class LexerRule extends LanguageAndTokenParameters {
 		
 		name = "";
 		description = "";
+		inTokenIDs.clear();
+		outTokenIDs.clear();
+		userTokenIDs.clear();
 		lexemId = 0;
 		rule = "";
 	}
+
+	@Override
+	protected void parameters_init() {
+
+		super.parameters_init();
+		
+		inTokenIDs = new ArrayList<Integer>();
+		inTokens = new ArrayList<String>();
+		
+		outTokenIDs = new ArrayList<Integer>();
+		outTokens = new ArrayList<String>();
+		
+		userTokenIDs = new ArrayList<Integer>();
+		userTokens = new ArrayList<String>();
+	}
 	
-// TODO Add a compile rule hook	
 	@Override
 	protected void parameters_load(ParametersString buffer) {
-		
+
 		super.parameters_load(buffer);
 		
 		name = buffer.getString("name", "");
 		description = buffer.getString("description", "");
+		
+		ListUtil.stringAsList(inTokens, buffer.getString("inTokens"));
+
+		// Convert token names to a list of IDs
+		inTokenIDs.clear();
+		
+		for (String tokenName : inTokens)			
+			inTokenIDs.add(Tokens.getTokenId(tokenName));
+		
+		ListUtil.stringAsList(outTokens, buffer.getString("outTokens"));
+
+		// Convert token names to a list of IDs
+		outTokenIDs.clear();
+		
+		for (String tokenName : outTokens)			
+			outTokenIDs.add(Tokens.getTokenId(tokenName));
+		
+		ListUtil.stringAsList(userTokens, buffer.getString("userTokens"));
+
+		// Convert token names to a list of IDs
+		userTokenIDs.clear();
+		
+		for (String tokenName : userTokens)			
+			userTokenIDs.add(Tokens.getTokenId(tokenName));
+		
 		lexemId = buffer.getInteger("lexemId", 0);
 		rule = buffer.getString("rule", "");
 	}
@@ -73,12 +128,37 @@ public class LexerRule extends LanguageAndTokenParameters {
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		
-		super.parameters_save(buffer);
-		
 		buffer.setString("name", name);
 		buffer.setString("description", description);
+		
+		// Convert IDs to token names
+		inTokens.clear();
+		
+		for (Integer tokenId : inTokenIDs)
+			inTokens.add(Tokens.getTokenName(tokenId));
+
+		buffer.setString("inTokens", ListUtil.listAsString(inTokens));
+		
+		// Convert IDs to token names
+		outTokens.clear();
+		
+		for (Integer tokenId : outTokenIDs)
+			outTokens.add(Tokens.getTokenName(tokenId));
+
+		buffer.setString("outTokens", ListUtil.listAsString(outTokens));
+		
+		// Convert IDs to token names
+		userTokens.clear();
+		
+		for (Integer tokenId : userTokenIDs)
+			userTokens.add(Tokens.getTokenName(tokenId));
+
+		buffer.setString("userTokens", ListUtil.listAsString(userTokens));
+		
 		buffer.setInteger("lexemId", lexemId);
 		buffer.setString("rule", rule);
+		
+		super.parameters_save(buffer);  // Languages go last
 	}
 
 	public String getName() {
@@ -121,4 +201,18 @@ public class LexerRule extends LanguageAndTokenParameters {
 		this.rule = rule;
 	}
 		
+	public List<Integer> getInTokenIDs() {
+		
+		return inTokenIDs;
+	}
+	
+	public List<Integer> getOutTokenIDs() {
+		
+		return outTokenIDs;
+	}
+	
+	public List<Integer> getUserTokenIDs() {
+		
+		return userTokenIDs;
+	}
 }

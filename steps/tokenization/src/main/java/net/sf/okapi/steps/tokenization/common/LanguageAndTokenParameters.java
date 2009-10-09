@@ -25,18 +25,9 @@ import java.util.List;
 
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.lib.extra.AbstractParameters;
-import net.sf.okapi.steps.tokenization.locale.LocaleUtil;
 
-public class LanguageAndTokenParameters extends AbstractParameters {
+public class LanguageAndTokenParameters extends LanguageParameters {
 
-	/**
-	 * @see languageMode;
-	 */
-	final public static int LANGUAGES_ALL = 0;
-	final public static int LANGUAGES_ONLY_WHITE_LIST = 1;
-	final public static int LANGUAGES_ALL_EXCEPT_BLACK_LIST = 2;
-	
 	/**
 	 * @see tokenMode;
 	 */
@@ -44,20 +35,9 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 	final public static int TOKENS_SELECTED = 1;
 	
 	/**
-	 * The tokenization step will tokenize text only in the languages specified by languageMode:
-	 * <li>LANGUAGES_ALL = 0 - text in any language will be tokenized.  
-	 * <li>LANGUAGES_ONLY_WHITE_LIST = 1 - if text is in a language listed on languagesWhiteList, it will be tokenized. 
-	 * <li>LANGUAGES_ALL_EXCEPT_BLACK_LIST = 2 - if text is in a language not listed on languagesBlackList, it will be tokenized.<p>
-	 * Default: LANGUAGES_ALL
-	 */
-	private int languageMode = LANGUAGES_ALL; 
-	private List<String> languageWhiteList;
-	private List<String> languageBlackList;
-		
-	/**
-	 * The tokenization step will extract only the tokens specified by tokenMode:
-	 * <li>TOKENS_ALL = 0 - all registered token types will be tried to be extracted.  
-	 * <li>TOKENS_ONLY_LISTED = 1 - only the token types listed on tokenTypes will be tried to be extracted.<p> 
+	 * The set of tokens is specified by tokenMode:
+	 * <li>TOKENS_ALL = 0 - all registered token names  
+	 * <li>TOKENS_ONLY_LISTED = 1 - only the token names listed on tokenNames<p> 
 	 * Default: TOKENS_ALL
 	 */
 	private int tokenMode = TOKENS_ALL;
@@ -65,18 +45,16 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 
 	@Override
 	protected void parameters_init() {
+
+		super.parameters_init();
 		
-		languageWhiteList = new ArrayList<String>();
-		languageBlackList = new ArrayList<String>();
 		tokenNames = new ArrayList<String>();
 	}
 	
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 		
-		languageMode = buffer.getInteger("languageMode", LANGUAGES_ALL);
-		setLanguageWhiteList(ListUtil.stringAsList(buffer.getString("languageWhiteList")));
-		setLanguageWhiteList(ListUtil.stringAsList(buffer.getString("languageBlackList")));
+		super.parameters_load(buffer);
 		
 		tokenMode = buffer.getInteger("tokenMode", TOKENS_ALL);
 		ListUtil.stringAsList(tokenNames, buffer.getString("tokenNames"));		
@@ -85,9 +63,7 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 	@Override
 	protected void parameters_reset() {
 		
-		languageMode = LANGUAGES_ALL;
-		languageWhiteList.clear();
-		languageBlackList.clear();
+		super.parameters_reset();
 		
 		tokenMode = TOKENS_ALL;
 		tokenNames.clear();
@@ -96,42 +72,10 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		
-		buffer.setInteger("languageMode", languageMode);
-		buffer.setString("languageWhiteList", ListUtil.listAsString(languageWhiteList));
-		buffer.setString("languageBlackList", ListUtil.listAsString(languageBlackList));
+		super.parameters_save(buffer);
 		
 		buffer.setInteger("tokenMode", tokenMode);
 		buffer.setString("tokenNames", ListUtil.listAsString(tokenNames));
-	}
-
-	public int getLanguageMode() {
-		
-		return languageMode;
-	}
-
-	public void setLanguageMode(int languageMode) {
-		
-		this.languageMode = languageMode;
-	}
-
-	public List<String> getLanguageWhiteList() {
-		
-		return languageWhiteList;
-	}
-
-	public void setLanguageWhiteList(List<String> languageWhiteList) {
-		
-		this.languageWhiteList = LocaleUtil.normalizeLanguageCodes_Okapi(languageWhiteList);
-	}
-
-	public List<String> getLanguageBlackList() {
-		
-		return languageBlackList;
-	}
-
-	public void setLanguageBlackList(List<String> languageBlackList) {
-		
-		this.languageBlackList = LocaleUtil.normalizeLanguageCodes_Okapi(languageBlackList);
 	}
 
 	public int getTokenMode() {
@@ -154,15 +98,6 @@ public class LanguageAndTokenParameters extends AbstractParameters {
 		this.tokenNames = tokenNames;
 	}
 
-	public boolean supportsLanguage(String language) {
-		
-		if (languageMode == LANGUAGES_ALL_EXCEPT_BLACK_LIST && languageBlackList.contains(language)) return false;
-		
-		if (languageMode == LANGUAGES_ONLY_WHITE_LIST && !languageWhiteList.contains(language)) return false;
-		
-		return true;
-	}	
-	
 	public boolean supportsTokenName(String tokenName) {
 		
 		if (tokenMode == TOKENS_SELECTED && !tokenNames.contains(tokenName)) return false;

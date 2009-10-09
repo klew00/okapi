@@ -31,7 +31,6 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.tokenization.locale.LocaleUtil;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;

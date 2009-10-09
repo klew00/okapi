@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.logging.Level;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.Range;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -58,10 +57,10 @@ public class TokenizationStep extends AbstractPipelineStep {
 	
 	private List<ILexer> lexers = new ArrayList<ILexer>();
 	
-	/**
-	 * The lexers with no rules capable of processing the current set of languages and tokens specified by Parameters.
-	 */
-	private List<ILexer> idleLexers = new ArrayList<ILexer>(); 
+//	/**
+//	 * The lexers with no rules capable of processing the current set of languages and tokens specified by Parameters.
+//	 */
+//	private List<ILexer> idleLexers = new ArrayList<ILexer>(); 
 	
 	/**
 	 * The rules not capable of processing the current set of languages and tokens specified by Parameters.<p>
@@ -70,7 +69,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 	private List<LexerRule> idleRules = new ArrayList<LexerRule>();
 	
 	private List<String> languageFilter = new ArrayList<String>();  
-	private List<String> tokenFilter = new ArrayList<String>();
+	private List<Integer> tokenFilter = new ArrayList<Integer>();
 	private ArrayList<Integer> positions = new ArrayList<Integer> ();
 	
 	public TokenizationStep() {
@@ -106,7 +105,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 				ILexer lexer = (ILexer) Class.forName(item.getLexerClass()).newInstance();
 				if (lexer == null) continue;
 				
-				lexer.setLexerId(lexers.size() + 1);
+				//lexer.setLexerId(lexers.size() + 1);
 				
 				LexerRules lexerRules = lexer.getRules(); // Null if the lexer doesn't need rules to operate
 				
@@ -192,10 +191,10 @@ public class TokenizationStep extends AbstractPipelineStep {
 	private void setFilters() {
 		
 		if (params == null) return;
-		if (idleLexers == null) return;
+		//if (idleLexers == null) return;
 		if (idleRules == null) return;
 		
-		idleLexers.clear();
+		//idleLexers.clear();
 		idleRules.clear();
 		
 		languageFilter = LanguageList.getAllLanguages(); // No need to clone, getAllLanguages() returns a new list every time
@@ -206,24 +205,24 @@ public class TokenizationStep extends AbstractPipelineStep {
 		else if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
 			languageFilter.removeAll(params.getLanguageBlackList());
 		
-		tokenFilter = Tokens.getAllTokens();
+		tokenFilter = Tokens.getTokenIDs();
 		
 		if (params.getTokenMode() == LanguageAndTokenParameters.TOKENS_SELECTED)
-			tokenFilter.retainAll(params.getTokenNames());
+			tokenFilter.retainAll(Tokens.getTokenIDs(params.getTokenNames()));
 
-		// If nothing is allowed by params
-		if (languageFilter.size() == 0 || tokenFilter.size() == 0) {
-			
-			idleLexers.addAll(lexers);
-			return;
-		}
+//		// If nothing is allowed by params
+//		if (languageFilter.size() == 0 || tokenFilter.size() == 0) {
+//			
+//			idleLexers.addAll(lexers);
+//			return;
+//		}
 		
 		for (ILexer lexer : lexers) {
 			
 			if (lexer == null) continue;
 			if (lexer.getRules() == null) continue;
 			
-			boolean isIdleLexer = true;
+			//boolean isIdleLexer = true;
 			
 			// TODO Tests
 			for (LexerRule rule : lexer.getRules()) {
@@ -233,39 +232,37 @@ public class TokenizationStep extends AbstractPipelineStep {
 				// Languages
 				if (rule.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) {
 
-					isIdleLexer = false;
+					//isIdleLexer = false;
 					
 				} else if (rule.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST) { 
 					
 					if (rule.getLanguageBlackList().containsAll(languageFilter))
 						idleRules.add(rule);
 					else
-						isIdleLexer = false;
+						//isIdleLexer = false;
+						;
 						
 				} else if (rule.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST) { 
 					
 					if (rule.getLanguageWhiteList().size() == 0)
 						idleRules.add(rule);
 					else
-						isIdleLexer = false;
+						//isIdleLexer = false;
+						;
 				}
 								
 				// Tokens
-				if (rule.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL) {
-
-					isIdleLexer = false;
-					
-				} else if (rule.getTokenMode() == LanguageAndTokenParameters.TOKENS_SELECTED) { 
-					
-					if (rule.getTokenNames().size() == 0)
+					if (rule.getInTokenIDs().size() == 0 && 
+							rule.getOutTokenIDs().size() == 0 &&
+							rule.getUserTokenIDs().size() == 0)
 						idleRules.add(rule);
 					else
-						isIdleLexer = false;
-				}
+						//isIdleLexer = false;
+						;
 			}
 			
-			if (isIdleLexer)
-				idleLexers.add(lexer);
+//			if (isIdleLexer)
+//				idleLexers.add(lexer);
 		}
 	}
 
@@ -296,29 +293,16 @@ public class TokenizationStep extends AbstractPipelineStep {
 		if (rule == null) return;
 		if (idleRules.contains(rule)) return;
 		
-		// TODO Set lexer ID to the lexem (? or the lexer should do it?)
-
-		for (String tokenName : rule.getTokenNames())
-			if (tokenFilter.contains(tokenName)) {
+		lexem.setLexerId(lexers.indexOf(lexer) + 1);
+		
+		for (int tokenId : rule.getOutTokenIDs())
+			if (tokenFilter.contains(tokenId)) {
 				
-				Token token = new Token(Tokens.getTokenId(tokenName), lexem, 100);
+				Token token = new Token(tokenId, lexem, 100);
 				tokens.add(token);
 			}
 	}
 	
-//	private Comparator<Token> rangeComparator = new Comparator<Token>()
-//    {
-//        public int compare(Token token1, Token token2) {
-//
-//        	int s1 = token1.getLexem().getRange().start;
-//        	int s2 = token2.getLexem().getRange().start;
-//        	
-//        	if (s1 < s2) return -1;        	
-//        	if (s1 > s2) return 1;
-//        	return 0;
-//        }    
-//    };
-    
 	private Tokens tokenize(TextContainer tc, String language) {
 		
 		if (tc == null) return null;
@@ -335,7 +319,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 		
 		for (ILexer lexer : lexers) {
 		
-			if (idleLexers.contains(lexer)) continue;			
+			//if (idleLexers.contains(lexer)) continue;			
 			if (lexer == null) continue;
 			
 			// Single-call way
@@ -357,31 +341,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 				lexer.close();
 			}			
 		}
-					
-		// Reconcile lexers' collisions, update scores
-		
-//@@@		// If the token's range includes other tokens' ranges, destroy those.
-//		// TODO Find something better than o(n2) 
-//		Tokens wasteBin = new Tokens();
-//		
-//		for (Token token : tokens) {
-//			
-//			for (Token token2 : tokens) {
-//				
-//				if (token2 == token) continue;
-//				
-//				if (contains(token.getLexem().getRange(), token2.getLexem().getRange()))
-//					wasteBin.add(token2);
-//			}
-//		}
-		
-//@@@		for (Token token : wasteBin)			
-//			tokens.remove(token);		
-				
-		// Sort by range start
-		//@@@		Collections.sort(tokens, rangeComparator);
-		
-		
+									
 		// Restore codes from positions
 		if (tokens != null)
 			tokens.fixRanges(positions);
@@ -389,13 +349,6 @@ public class TokenizationStep extends AbstractPipelineStep {
 		return tokens;
 	}
 	
-//	private boolean contains(Range range, Range range2) {
-//
-//		// Exact matches are dropped
-//		return (range.start < range2.start && range.end >= range2.end) ||
-//		(range.start <= range2.start && range.end > range2.end);
-//	}
-
 	private void tokenizeSource(TextUnit tu) {
 		
 		if (tu == null) return;

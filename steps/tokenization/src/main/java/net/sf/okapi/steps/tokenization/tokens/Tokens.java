@@ -163,7 +163,7 @@ public class Tokens extends ArrayList<Token> {
 		return (item != null) ? item.getDescription(): "";
 	}
 	
-	public static String getTokenNames() {
+	public static String getTokenNamesStr() {
 		
 		if (nameMap == null) return "";
 		
@@ -182,9 +182,37 @@ public class Tokens extends ArrayList<Token> {
 	 * Gets list of names of all tokens.
 	 * @return List of available token names.
 	 */
-	public static List<String> getAllTokens() {
+	public static List<String> getTokenNames() {
 	
 		return new ArrayList<String>(nameMap.keySet());
+	}
+	
+	/**
+	 * Gets list of IDs of all tokens.
+	 * @return List of available token IDs.
+	 */
+	public static List<Integer> getTokenIDs() {
+	
+		List<Integer> idList = new ArrayList<Integer>(); 
+		
+		for (String tokenName : nameMap.keySet())			
+			idList.add(Tokens.getTokenId(tokenName));
+		
+		return idList; 
+	}
+	
+	/**
+	 * Gets list of IDs of the given tokens.
+	 * @return List of token IDs.
+	 */
+	public static List<Integer> getTokenIDs(List<String> tokenNames) {
+	
+		List<Integer> idList = new ArrayList<Integer>(); 
+		
+		for (String tokenName : tokenNames)			
+			idList.add(Tokens.getTokenId(tokenName));
+		
+		return idList; 
 	}
 	
 }

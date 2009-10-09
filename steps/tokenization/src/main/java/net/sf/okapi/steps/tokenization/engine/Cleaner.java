@@ -26,19 +26,10 @@ import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.common.LexerRule;
-import net.sf.okapi.steps.tokenization.common.LexerRules;
-import net.sf.okapi.steps.tokenization.common.ModifierRule;
-import net.sf.okapi.steps.tokenization.common.ModifierRules;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class Cleaner extends AbstractLexer {
-	
-	@Override
-	protected Class<? extends LexerRules> lexer_getRulesClass() {
-		
-		return ModifierRules.class;
-	}
 	
 	@Override
 	public boolean lexer_hasNext() {
@@ -71,7 +62,7 @@ public class Cleaner extends AbstractLexer {
 		
 		for (LexerRule item : getRules()) {
 
-			List<Integer> inTokenIDs = ((ModifierRule) item).getInTokenIDs();
+			List<Integer> inTokenIDs = item.getInTokenIDs();
 			
 			for (Token token : tokens)			
 				if (inTokenIDs.contains(token.getTokenId()))

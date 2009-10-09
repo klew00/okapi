@@ -30,8 +30,7 @@ public abstract class AbstractLexer extends Component implements ILexer {
 	private boolean cancelled = false;
 	private int lexerId = 0;
 	private LexerRules rules;
-	
-	protected abstract Class<? extends LexerRules> lexer_getRulesClass();
+		
 	protected abstract void lexer_init();
 	protected abstract boolean lexer_hasNext();
 	protected abstract Lexem lexer_next();
@@ -41,7 +40,7 @@ public abstract class AbstractLexer extends Component implements ILexer {
 		
 		super();
 		
-		Class<? extends LexerRules> rulesClass = lexer_getRulesClass();
+		Class<? extends LexerRules> rulesClass = lexer_getRulesClass2();
 		if (rulesClass == null) return;
 		
 		try {
@@ -135,4 +134,8 @@ public abstract class AbstractLexer extends Component implements ILexer {
 		this.rules = rules;
 	}
 
+	protected Class<? extends LexerRules> lexer_getRulesClass2() {
+		
+		return LexerRules.class;
+	}
 }

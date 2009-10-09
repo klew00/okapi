@@ -63,27 +63,27 @@ public interface ILexer {
 	 */
 	void init();
 	
-	/**
-	 * Assigns an ID to the lexer. !!! Non-serializable. 
-	 * @param lexerId 
-	 */
-	void setLexerId(int lexerId);
-	
-	/**
-	 * Gets the previously assigned lexer ID. !!! Non-serializable.
-	 * @return The lexer ID. 
-	 */
-	int getLexerId();
-			
+//	/**
+//	 * Assigns an ID to the lexer. !!! Non-serializable. 
+//	 * @param lexerId 
+//	 */
+//	void setLexerId(int lexerId);
+//	
+//	/**
+//	 * Gets the previously assigned lexer ID. !!! Non-serializable.
+//	 * @return The lexer ID. 
+//	 */
+//	int getLexerId();
+//			
 	/**
 	 * Gets the current rules for this lexer.
-	 * @return The current rules for this lexer.
+	 * @return The current rules for this lexer
 	 */
 	LexerRules getRules();
 
 	/**
 	 * Sets new rules for this lexer.
-	 * @param rules The new rules to use.
+	 * @param rules The new rules to use
 	 */
 	void setRules(LexerRules rules);
 
@@ -98,22 +98,22 @@ public interface ILexer {
 	/**
 	 * Alternative non-iterator way of extracting lexems. In opposite to open()-hasNext()-next()-close(), 
 	 * all extraction is done by a single method call. Implementations might be less memory-effective compared to the iterator. 
-	 * @param text The string to be processed.
-	 * @param language The language of the text.
-	 * @param tokens The string to be processed.
-	 * @return A list of extracted lexems.
+	 * @param text The string to be processed
+	 * @param language The language of the text
+	 * @param tokens The string to be processed
+	 * @return A list of extracted lexems
 	 */
 	Lexems process(String text, String language, Tokens tokens);
 	
 	/**
 	 * Indicates if there is a lexem extracted.
-	 * @return True if there is at least one lexem has been extracted, false if none.
+	 * @return True if there is at least one lexem has been extracted, false if none
 	 */
 	boolean hasNext();
 	
 	/**
 	 * Gets the next lexem available.
-	 * @return The next lexem available or null if there are no events.
+	 * @return The next lexem available or null if there are no events
 	 */
 	Lexem next();
 	

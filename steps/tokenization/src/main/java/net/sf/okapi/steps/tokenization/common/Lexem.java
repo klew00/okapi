@@ -88,6 +88,11 @@ public class Lexem {
 		
 		return lexerId;
 	}
+
+	public void setLexerId(int lexerId) {
+		
+		this.lexerId = lexerId;
+	}
 	
 	@Override
 	public String toString() {
@@ -95,5 +100,5 @@ public class Lexem {
 		return String.format("%-20s%4d\t%4d, %4d\t%4d", 
 				value, id, range.start, range.end, lexerId);
 	}
+	
 }
-

@@ -20,16 +20,14 @@
 
 package net.sf.okapi.steps.tokenization.engine;
 
-import java.util.Collections;
-import java.util.Comparator;
-
+import net.sf.okapi.common.Range;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class Sorter extends AbstractLexer {
+public class DuplicateCleaner extends AbstractLexer {
 
 	@Override
 	protected boolean lexer_hasNext() {
@@ -39,7 +37,6 @@ public class Sorter extends AbstractLexer {
 
 	@Override
 	protected void lexer_init() {
-
 
 	}
 
@@ -52,25 +49,40 @@ public class Sorter extends AbstractLexer {
 	@Override
 	protected void lexer_open(String text, String language, Tokens tokens) {
 
-
 	}
 
-	private Comparator<Token> rangeComparator = new Comparator<Token>()
-  {
-      public int compare(Token token1, Token token2) {
-
-      	int s1 = token1.getLexem().getRange().start;
-      	int s2 = token2.getLexem().getRange().start;
-      	
-      	if (s1 < s2) return -1;        	
-      	if (s1 > s2) return 1;
-      	return 0;
-      }    
-  };
+	private boolean checkEqual(Token token1, Token token2) {
+	
+		if (token1 == null || token2 == null) return false;
+		
+		Range r1 = token1.getRange();
+		Range r2 = token2.getRange();
+		
+		return r1.start == r2.start && r1.end == r2.end && token1.getTokenId() == token2.getTokenId();
+	}
 
 	public Lexems process(String text, String language, Tokens tokens) {
 
-		Collections.sort(tokens, rangeComparator);
+		// If 2 tokens are identical, destroy one.
+		// TODO Find something better than o(n2) 
+		Tokens wasteBin = new Tokens();
+		
+		for (Token token : tokens) {
+
+			if (wasteBin.indexOf(token) != -1) continue; // Skip the to be deleted
+			
+			for (Token token2 : tokens) {
+				
+				if (token2 == token) continue;
+				
+					if (checkEqual(token, token2))					
+						wasteBin.add(token2);
+			}
+		}
+		
+		for (Token token : wasteBin)			
+			tokens.remove(token);		
+
 		return null;
 	}
 

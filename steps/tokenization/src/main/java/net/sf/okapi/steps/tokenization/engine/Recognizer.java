@@ -29,9 +29,6 @@ import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.common.LexerRule;
-import net.sf.okapi.steps.tokenization.common.LexerRules;
-import net.sf.okapi.steps.tokenization.common.ModifierRule;
-import net.sf.okapi.steps.tokenization.common.ModifierRules;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
@@ -40,12 +37,6 @@ public class Recognizer extends AbstractLexer {
 	 private List<LexerRule> items;
 	 private HashMap<LexerRule, Pattern> patterns;  
 	  
-	@Override
-	protected Class<? extends LexerRules> lexer_getRulesClass() {
-		
-		return ModifierRules.class;
-	}
-
 	@Override
 	protected boolean lexer_hasNext() {
 
@@ -80,10 +71,11 @@ public class Recognizer extends AbstractLexer {
 	public Lexems process(String text, String language, Tokens tokens) {
 		
 		Lexems lexems = new Lexems();
-
+		Tokens wasteBin = new Tokens();
+		
 		for (LexerRule item : items) {
 			
-			List<Integer> inTokenIDs = ((ModifierRule) item).getInTokenIDs();
+			List<Integer> inTokenIDs = item.getInTokenIDs();
 			
 			Pattern pattern = patterns.get(item);
 			if (pattern == null) continue;
@@ -93,10 +85,16 @@ public class Recognizer extends AbstractLexer {
 				
 					Matcher matcher = pattern.matcher(token.getValue());
 					
-				    if (matcher.matches())
+				    if (matcher.matches()) {
+				    	
 				    	lexems.add(new Lexem(item.getLexemId(), token.getValue(), token.getRange(), getLexerId()));
+				    	wasteBin.add(token); // Remove replaced token
+				    }
 				}
 		}
+		
+		for (Token token : wasteBin)			
+			tokens.remove(token);
 		
 		return lexems;
 	}

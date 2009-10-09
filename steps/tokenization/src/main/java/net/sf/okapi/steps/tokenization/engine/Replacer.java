@@ -24,17 +24,10 @@ import net.sf.okapi.common.Range;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
-import net.sf.okapi.steps.tokenization.common.LexerRules;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class Replacer extends AbstractLexer {
-
-	@Override
-	protected Class<? extends LexerRules> lexer_getRulesClass() {
-
-		return null;
-	}
 
 	@Override
 	protected boolean lexer_hasNext() {
@@ -60,6 +53,16 @@ public class Replacer extends AbstractLexer {
 
 	}
 
+//	private boolean checkEqual(Token token1, Token token2) {
+//		
+//		if (token1 == null || token2 == null) return false;
+//		
+//		Range r1 = token1.getRange();
+//		Range r2 = token2.getRange();
+//		
+//		return r1.start == r2.start && r1.end == r2.end && token1.getTokenId() == token2.getTokenId();
+//	}
+	
 	/**
 	 * Returns true if range2 is within range.
 	 * @param range
@@ -70,7 +73,7 @@ public class Replacer extends AbstractLexer {
 
 		// Exact matches are dropped
 		return (range.start < range2.start && range.end >= range2.end) ||
-		(range.start <= range2.start && range.end > range2.end);
+			(range.start <= range2.start && range.end > range2.end);
 	}
 
 	public Lexems process(String text, String language, Tokens tokens) {
@@ -80,13 +83,15 @@ public class Replacer extends AbstractLexer {
 		Tokens wasteBin = new Tokens();
 		
 		for (Token token : tokens) {
+
+			if (wasteBin.indexOf(token) != -1) continue; // Skip the to be deleted
 			
 			for (Token token2 : tokens) {
 				
 				if (token2 == token) continue;
 				
-				// if (token.getLexerId() > token2.getLexerId() && // Only later lexers can replace tokens of the predecessors 
-					if (contains(token.getLexem().getRange(), token2.getLexem().getRange()))					
+					if (//checkEqual(token, token2) || // Remove duplicate tokens 
+							contains(token.getLexem().getRange(), token2.getLexem().getRange())) // Remove overlapped tokens					
 						wasteBin.add(token2);
 			}
 		}

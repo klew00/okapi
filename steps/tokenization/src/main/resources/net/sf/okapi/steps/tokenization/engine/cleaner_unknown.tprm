@@ -3,11 +3,11 @@ RuleCount.i=1
 
 Rule0.name=UnknownCleaner
 Rule0.description=Removes occurrences of UNKNOWN from a list of tokens
-Rule0.inTokenNames=UNKNOWN
+Rule0.inTokens=UNKNOWN
+Rule0.outTokens=
+Rule0.userTokens=
 Rule0.lexemId.i=0
 Rule0.rule=
 Rule0.languageMode.i=0
 Rule0.languageWhiteList=
 Rule0.languageBlackList=
-Rule0.tokenMode.i=1
-Rule0.tokenNames=

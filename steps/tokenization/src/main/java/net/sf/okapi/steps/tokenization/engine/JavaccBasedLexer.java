@@ -23,16 +23,9 @@ package net.sf.okapi.steps.tokenization.engine;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
-import net.sf.okapi.steps.tokenization.common.LexerRules;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class JavaccBasedLexer  extends AbstractLexer {
-
-	@Override
-	protected Class<? extends LexerRules> lexer_getRulesClass() {
-
-		return LexerRules.class;
-	}
 
 	@Override
 	protected boolean lexer_hasNext() {
