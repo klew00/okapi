@@ -21,7 +21,10 @@
 package net.sf.okapi.lib.translation;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -29,6 +32,11 @@ import net.sf.okapi.common.resource.TextFragment;
  * Collection of helper method for preparing and querying translation resources.
  */
 public class QueryUtil {
+
+	private static final String CLOSING_CODE = "</s>";
+	private static final int CLOSING_CODE_LENGTH = CLOSING_CODE.length();
+	private static final Pattern opening = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>");
+	private static final Pattern isolated = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
 
 	private StringBuilder codesMarkers;
 	private List<Code> codes;
@@ -52,7 +60,7 @@ public class QueryUtil {
 		if ( !frag.hasCode() ) {
 			return text; // No codes
 		}
-		// If there are codes: store them appart
+		// If there are codes: store them apart
 		StringBuilder tmp = new StringBuilder();
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
@@ -82,5 +90,91 @@ public class QueryUtil {
 	public TextFragment createNewFragmentWithCodes (String plainText) {
 		return new TextFragment(plainText + codesMarkers, codes);
 	}
+
+	/**
+	 * Converts from coded text to coded HTML.
+	 * @param fragment the fragment to convert.
+	 * @return The resulting HTML string.
+	 */
+	public String toCodedHTML (TextFragment fragment) {
+		if ( fragment == null ) return "";
+		Code code;
+		StringBuilder sb = new StringBuilder();
+		String text = fragment.getCodedText();
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				code = fragment.getCode(text.charAt(++i));
+				sb.append(String.format("<s id='%d'>", code.getId()));
+				break;
+			case TextFragment.MARKER_CLOSING:
+				i++;
+				sb.append("</s>");
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				code = fragment.getCode(text.charAt(++i));
+				sb.append(String.format("<br id='%d'/>", code.getId()));
+				break;
+			case TextFragment.MARKER_SEGMENT:
+				// Segment-holder text not supported
+				throw new RuntimeException("Fragment with segment markers are not supported by the Google connector. Send the segments instead.");
+			case '&':
+				sb.append("&amp;");
+				break;
+			case '<':
+				sb.append("&lt;");
+				break;
+			default:
+				sb.append(text.charAt(i));
+			}
+		}
+		return sb.toString();
+	}
 	
+	/**
+	 * Converts back a coded HTML to a coded text.
+	 * @param text the coded HTML to convert back.
+	 * @param fragment the original text fragment.
+	 * @return the coded text with its code markers.
+	 */
+	public String fromCodedHTML (String text,
+		TextFragment fragment)
+	{
+		if ( Util.isEmpty(text) ) return "";
+		text = text.toString().replace("&#39;", "'");
+		text = text.replace("&lt;", "<");
+		text = text.replace("&gt;", ">");
+		text = text.replace("&quot;", "\"");
+		StringBuilder sb = new StringBuilder();
+		sb.append(text.replace("&amp;", "&"));
+
+		Matcher m = opening.matcher(sb.toString());
+        while ( m.find() ) {
+        	// Replace the HTML fake code by the coded text markers
+        	int id = Util.strToInt(m.group(2), -1);
+        	String markers = String.format("%c%c", TextFragment.MARKER_OPENING,
+        		TextFragment.toChar(fragment.getIndex(id)));
+        	sb.replace(m.start(), m.end(), markers);
+        	// Search corresponding closing part
+        	int n = sb.toString().indexOf(CLOSING_CODE);
+        	// Replace closing code by the coded text markers for closing
+        	markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
+        		TextFragment.toChar(fragment.getIndexForClosing(id)));
+        	sb.replace(n, n+CLOSING_CODE_LENGTH, markers);
+        	m = opening.matcher(sb.toString());
+        }
+        
+		m = isolated.matcher(sb.toString());
+        while ( m.find() ) {
+        	// Replace the HTML fake code by the coded text markers
+        	int id = Util.strToInt(m.group(2), -1);
+        	String markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
+        		TextFragment.toChar(fragment.getIndex(id)));
+        	sb.replace(m.start(), m.end(), markers);
+        	m = isolated.matcher(sb.toString());
+        }
+
+		return sb.toString();
+	}
+
 }

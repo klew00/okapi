@@ -91,10 +91,13 @@ XLIFF 1.2 specifications</a>.</p>
 		<td align="left" valign="top"><code>-pen tmDirectory|<br>
 		-tt hostname[:port]|<br>
 		-mm key|<br>
-		-google</code></td>
+		-google|<br>
+		-apertium&nbsp;[serverURL]</code></td>
 		<td align="left" valign="top">A translation resource to use to 
 		pre-translate the extracted document. The leveraging occurs after 
-		segmentation, if you have specify segmentation rules.</td>
+		segmentation, if you have specify segmentation rules.<p>Note that some 
+		internet-based resource may be slow and result in lengthy processing 
+		time.</td>
 	</tr>
 </table>
 <p>For example:</p>
@@ -193,11 +196,6 @@ per resource, not sorted by best score as a whole.</p>
 		directory.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-google</code></td>
-		<td align="left" valign="top">Query the Google MT system. If no other type of resource is 
-		specified, this is used by default. This requires Internet access.</td>
-	</tr>
-	<tr>
 		<td align="left" valign="top"><code>-opentran</code></td>
 		<td align="left" valign="top">Query the OpenTran translation repository. This requires Internet 
 		access.</td>
@@ -212,6 +210,17 @@ per resource, not sorted by best score as a whole.</p>
 		<td align="left" valign="top">Query the MyMemory translation repository 
 		with a given key access (use <code>mmDemo123</code> for demo). This 
 		requires Internet access.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-google</code></td>
+		<td align="left" valign="top">Query the Google MT system. If no other type of resource is 
+		specified, this is used by default. This requires Internet access.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-apertium [serverURL]</code></td>
+		<td align="left" valign="top">
+		<p dir="ltr">Query the specified Apertium MT server (local or remote). A 
+		default remote server is provided.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top"><code>-opt threshold[:maxhits]</code></td>
@@ -231,7 +240,7 @@ codes: For example, in &quot;<code>Open the &lt;x&gt;window&lt;/x&gt;&lt;x/&gt;.
 closing and placeholder inline codes, and the query processed as such. When 
 querying resources that are not inline code-aware, the tags are treated as plain 
 text.</p>
-<p>The resources that are inline code-aware are: Pensieve, GlobalSight and Google</p>
+<p>The resources that are inline code-aware are: Pensieve, GlobalSight, Apertium and Google</p>
 <p>For example:</p>
 <pre>tikal -q &quot;open file&quot; -sl en</pre>
 <p>Queries the default translation resource (Google MT system) for the text 

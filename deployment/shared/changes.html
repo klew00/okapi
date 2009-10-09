@@ -23,7 +23,7 @@ release (M4) and the previous one (M3)</p>
 	<li>Added default DITA configuration to the XML Filter.</li>
 	<li>Fixed several issues with the TS and Table filters.</li>
 	<li>Added <code>whiteSpaces</code> ITS extension support in the XML Filter.</li>
-	<li>The PHP Content filter has been added.</li>
+	<li>The PHP Content Filter has been added.</li>
 </ul>
 	</li>
 	<li>Translation resources:<ul>
@@ -32,10 +32,12 @@ release (M4) and the previous one (M3)</p>
 		<li>Modified the OpenTran connector to use the REST interface instead of 
 		RCP.</li>
 		<li>Added the connector to the MyMemory server (<a href="http://mymemory.translated.net/">http://mymemory.translated.net</a>)</li>
-		<li>Improved Google MT conector.</li>
-		<li>Improved GlobalSight connector for inline codes, and adjusted it for 
+		<li>Improved Google MT connector.</li>
+		<li>Improved GlobalSight TM connector for inline codes, and adjusted it for 
 		GS version 7.1.6.</li>
-		<li>Added Pensive TM engine and its connector.</li>
+		<li>Added Pensieve TM engine and its connector.</li>
+		<li>Added the connector for the open-source Apertium MT system web 
+		service (<a href="http://wiki.apertium.org/wiki/Main_Page">http://wiki.apertium.org/wiki/Main_Page</a>)</li>
 	</ul>
 	</li>
 	<li>Steps and utilities:<ul>
@@ -55,6 +57,7 @@ release (M4) and the previous one (M3)</p>
 	<li>Added access to MyMemory (<code>-mm</code> option)</li>
 	<li>Corrected display of extended characters on the console for some 
 	languages/platforms.</li>
+	<li>Added threshold and max-hits options for TM query command (<code>-q</code>)</li>
 	<li>Added a command to create PO files from any input (<code>-2po</code> 
 	option).</li>
 	<li>Added a command to create TMX files from any input (<code>-2tmx</code> 
@@ -63,6 +66,7 @@ release (M4) and the previous one (M3)</p>
 	option).</li>
 	<li>Added capability to query a Pensieve TM (<code>-pen</code> option).</li>
 	<li>Added support for GlobalSight TM access (<code>-gs</code> option).</li>
+	<li>Added support for Apertium MT access (<code>-ap</code> option).</li>
 	<li>Added segmentation and leveraging options for the extraction command.</li>
 </ul>
 	</li>

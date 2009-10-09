@@ -271,7 +271,7 @@ public class Main {
 					prog.useGlobalSight = true;
 					prog.globalSightParams = prog.getArgument(args, ++i);
 				}
-				else if ( arg.equals("-ap") ) {
+				else if ( arg.equals("-apertium") ) {
 					prog.useApertium = true;
 					if ( args.size() > i+1 ) {
 						if ( !args.get(i+1).startsWith("-") ) {
@@ -759,14 +759,15 @@ public class Main {
 		ps.println("Extract a file to XLIFF (and optionally segment and pre-translate):");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg [srxFile]]");
-		ps.println("      [-tt hostname[:port]|-mm key|-pen tmDirectory|-google|-gs configFile]");
+		ps.println("      [-tt hostname[:port]|-mm key|-pen tmDirectory|-gs configFile");
+		ps.println("      |-google|-apertium [serverURL]]");
 		ps.println("Merge an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl sourceLang] [-tl targetLang]");
 		ps.println("Query translation resources:");
 		ps.println("   -q \"source text\" [-sl sourceLang] [-tl targetLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
-		ps.println("      [-opt threshold[:maxhits]]");
+		ps.println("      [-apertium [serverURL]] [-opt threshold[:maxhits]]");
 		ps.println("Conversion to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic] [-trgsource|-trgempty]");

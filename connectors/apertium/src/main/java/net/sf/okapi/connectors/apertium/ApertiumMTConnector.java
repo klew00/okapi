@@ -37,6 +37,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.lib.translation.QueryUtil;
 
 public class ApertiumMTConnector implements IQuery {
 
@@ -48,12 +49,14 @@ public class ApertiumMTConnector implements IQuery {
 	private QueryResult result;
 	private Pattern cerPattern;
 	private HTMLCharacterEntities entities;
+	private QueryUtil store;
 	
 	public ApertiumMTConnector () {
 		params = new Parameters();
 		cerPattern = Pattern.compile("(&\\w*?;)");
 		entities = new HTMLCharacterEntities();
 		entities.ensureInitialization(true);
+		store = new QueryUtil();
 	}
 	
 	public String getName () {
@@ -100,11 +103,23 @@ public class ApertiumMTConnector implements IQuery {
 	}
 
 	public int query (String plainText) {
+		return query(new TextFragment(plainText));
+	}
+
+	public int query (TextFragment frag) {
 		result = null;
 		hasNext = false;
+		String plainText;
+		if ( frag.hasCode() ) {
+			plainText = store.toCodedHTML(frag);
+		}
+		else {
+			plainText = frag.toString();
+		}
 		if ( Util.isEmpty(plainText) ) {
 			return 0;
 		}
+		
 		try {
 			URL url = new URL(String.format("%s?mode=%s&text=%s",
 				params.getServer(), pair,
@@ -114,15 +129,15 @@ public class ApertiumMTConnector implements IQuery {
 			// Get the response
 	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 	        StringBuilder res = new StringBuilder();
-			String line;
-			while (( line = rd.readLine()) != null ) {
+			String transText;
+			while (( transText = rd.readLine()) != null ) {
 				if ( res.length() > 0 ) res.append("\n");
-				res.append(line);
+				res.append(transText);
 			}
 	        rd.close();
-	        String text = res.toString();
+	        transText = res.toString();
 
-	        if ( text.startsWith("Error: Mode ") ) {
+	        if ( transText.startsWith("Error: Mode ") ) {
 	        	// Most likely this pair is not supported
 	        	return 0;
 	        }
@@ -130,11 +145,11 @@ public class ApertiumMTConnector implements IQuery {
 	        // Unescape the CERs if needed
 			Matcher m;
 			while ( true ) {
-				m = cerPattern.matcher(text);
+				m = cerPattern.matcher(transText);
 				if ( !m.find() ) break;
 				int val = entities.lookupReference(m.group(0));
 				if ( val != -1 ) {
-					text = text.replace(m.group(0), String.valueOf((char)val));
+					transText = transText.replace(m.group(0), String.valueOf((char)val));
 				}
 				else { // Unknown entity
 					//TODO: replace by something meaningful to allow continuing the replacements
@@ -144,8 +159,14 @@ public class ApertiumMTConnector implements IQuery {
 	        
 	        result = new QueryResult();
 	        result.score = 95; // Fixed score for MT
-        	result.source = new TextFragment(plainText);
-        	result.target = new TextFragment(text);
+        	result.source = frag;
+			if ( frag.hasCode() ) {
+				result.target = new TextFragment(store.fromCodedHTML(transText, frag),
+					frag.getCodes());
+			}
+			else {
+				result.target = new TextFragment(store.fromCodedHTML(transText, frag));
+			}
 			hasNext = (result != null);
 			return (hasNext ? 1 : 0);
 		}
@@ -158,12 +179,6 @@ public class ApertiumMTConnector implements IQuery {
 		catch ( IOException e ) {
 			throw new RuntimeException("Error when querying.", e);
 		}
-	}
-
-	public int query (TextFragment text) {
-		//TODO: Deal with inline codes, maybe using generic codes
-		String tmp = text.toString();
-		return query(tmp);
 	}
 
 	public void setLanguages (String sourceLang,

@@ -39,6 +39,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.lib.translation.QueryUtil;
 
 public class GoogleMTConnector implements IQuery {
 
@@ -48,12 +49,11 @@ public class GoogleMTConnector implements IQuery {
 
 	private static final String addressAjax = "http://ajax.googleapis.com/ajax/services/language/translate";
 	private static final String baseQueryAjax = "?v=1.0&q=%s&langpair=%s|%s";
-//	private static final Pattern patternAjax = Pattern.compile("\"translatedText\":\"(.*?)\"\\},");
 
-	private static final String CLOSING_CODE = "</s>";
-	private static final int CLOSING_CODE_LENGTH = CLOSING_CODE.length();
-	private static final Pattern opening = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>");
-	private static final Pattern isolated = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
+//	private static final String CLOSING_CODE = "</s>";
+//	private static final int CLOSING_CODE_LENGTH = CLOSING_CODE.length();
+//	private static final Pattern opening = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>");
+//	private static final Pattern isolated = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
 	
 	private String srcLang;
 	private String trgLang;
@@ -62,6 +62,11 @@ public class GoogleMTConnector implements IQuery {
 	private int current = -1;
 	private String hostId;
 	private JSONParser parser;
+	private QueryUtil util;
+
+	public GoogleMTConnector () {
+		util = new QueryUtil();
+	}
 	
 	public void close () {
 		// Nothing to do
@@ -113,7 +118,7 @@ public class GoogleMTConnector implements IQuery {
 			// Check if there is actually text to translate
 			if ( !fragment.hasText(false) ) return 0;
 			// Convert the fragment to coded HTML
-			String qtext = toCodedHTML(fragment);
+			String qtext = util.toCodedHTML(fragment);
 			// To compile with Google TOS: no more than 5000 characters at a time
 			if ( qtext.length() > 5000 ) {
 				return 0; 
@@ -138,11 +143,11 @@ public class GoogleMTConnector implements IQuery {
 			result = new QueryResult();
 			result.source = fragment;
 			if ( fragment.hasCode() ) {
-				result.target = new TextFragment(fromCodedHTML(res, fragment),
+				result.target = new TextFragment(util.fromCodedHTML(res, fragment),
 					fragment.getCodes());
 			}
 			else {
-				result.target = new TextFragment(fromCodedHTML(res, fragment));
+				result.target = new TextFragment(util.fromCodedHTML(res, fragment));
 			}
 			// If query and translated result are the same: don't see this as a translation
 			if ( result.target.equals(fragment) ) { // Test ignore codes content
@@ -162,85 +167,85 @@ public class GoogleMTConnector implements IQuery {
 	 * @param fragment the fragment to convert.
 	 * @return The resulting HTML string.
 	 */
-	private String toCodedHTML (TextFragment fragment) {
-		if ( fragment == null ) return "";
-		Code code;
-		StringBuilder sb = new StringBuilder();
-		String text = fragment.getCodedText();
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case TextFragment.MARKER_OPENING:
-				code = fragment.getCode(text.charAt(++i));
-				sb.append(String.format("<s id='%d'>", code.getId()));
-				break;
-			case TextFragment.MARKER_CLOSING:
-				i++;
-				sb.append("</s>");
-				break;
-			case TextFragment.MARKER_ISOLATED:
-				code = fragment.getCode(text.charAt(++i));
-				sb.append(String.format("<br id='%d'/>", code.getId()));
-				break;
-			case TextFragment.MARKER_SEGMENT:
-				// Segment-holder text not supported
-				throw new RuntimeException("Fragment with segment markers are not supported by the Google connector. Send the segments instead.");
-			case '&':
-				sb.append("&amp;");
-				break;
-			case '<':
-				sb.append("&lt;");
-				break;
-			default:
-				sb.append(text.charAt(i));
-			}
-		}
-		return sb.toString();
-	}
+//	private String toCodedHTML (TextFragment fragment) {
+//		if ( fragment == null ) return "";
+//		Code code;
+//		StringBuilder sb = new StringBuilder();
+//		String text = fragment.getCodedText();
+//		for ( int i=0; i<text.length(); i++ ) {
+//			switch ( text.charAt(i) ) {
+//			case TextFragment.MARKER_OPENING:
+//				code = fragment.getCode(text.charAt(++i));
+//				sb.append(String.format("<s id='%d'>", code.getId()));
+//				break;
+//			case TextFragment.MARKER_CLOSING:
+//				i++;
+//				sb.append("</s>");
+//				break;
+//			case TextFragment.MARKER_ISOLATED:
+//				code = fragment.getCode(text.charAt(++i));
+//				sb.append(String.format("<br id='%d'/>", code.getId()));
+//				break;
+//			case TextFragment.MARKER_SEGMENT:
+//				// Segment-holder text not supported
+//				throw new RuntimeException("Fragment with segment markers are not supported by the Google connector. Send the segments instead.");
+//			case '&':
+//				sb.append("&amp;");
+//				break;
+//			case '<':
+//				sb.append("&lt;");
+//				break;
+//			default:
+//				sb.append(text.charAt(i));
+//			}
+//		}
+//		return sb.toString();
+//	}
 	
 	/**
 	 * Converts back a coded HTML to a coded text.
 	 * @param text the coded HTML to convert back.
 	 * @return the coded text with its code markers.
 	 */
-	private String fromCodedHTML (String text,
-		TextFragment fragment)
-	{
-		if ( Util.isEmpty(text) ) return "";
-		text = text.toString().replace("&#39;", "'");
-		text = text.replace("&lt;", "<");
-		text = text.replace("&gt;", ">");
-		text = text.replace("&quot;", "\"");
-		StringBuilder sb = new StringBuilder();
-		sb.append(text.replace("&amp;", "&"));
-
-		Matcher m = opening.matcher(sb.toString());
-        while ( m.find() ) {
-        	// Replace the HTML fake code by the coded text markers
-        	int id = Util.strToInt(m.group(2), -1);
-        	String markers = String.format("%c%c", TextFragment.MARKER_OPENING,
-        		TextFragment.toChar(fragment.getIndex(id)));
-        	sb.replace(m.start(), m.end(), markers);
-        	// Search corresponding closing part
-        	int n = sb.toString().indexOf(CLOSING_CODE);
-        	// Replace closing code by the coded text markers for closing
-        	markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
-        		TextFragment.toChar(fragment.getIndexForClosing(id)));
-        	sb.replace(n, n+CLOSING_CODE_LENGTH, markers);
-        	m = opening.matcher(sb.toString());
-        }
-        
-		m = isolated.matcher(sb.toString());
-        while ( m.find() ) {
-        	// Replace the HTML fake code by the coded text markers
-        	int id = Util.strToInt(m.group(2), -1);
-        	String markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
-        		TextFragment.toChar(fragment.getIndex(id)));
-        	sb.replace(m.start(), m.end(), markers);
-        	m = isolated.matcher(sb.toString());
-        }
-
-		return sb.toString();
-	}
+//	private String fromCodedHTML (String text,
+//		TextFragment fragment)
+//	{
+//		if ( Util.isEmpty(text) ) return "";
+//		text = text.toString().replace("&#39;", "'");
+//		text = text.replace("&lt;", "<");
+//		text = text.replace("&gt;", ">");
+//		text = text.replace("&quot;", "\"");
+//		StringBuilder sb = new StringBuilder();
+//		sb.append(text.replace("&amp;", "&"));
+//
+//		Matcher m = opening.matcher(sb.toString());
+//        while ( m.find() ) {
+//        	// Replace the HTML fake code by the coded text markers
+//        	int id = Util.strToInt(m.group(2), -1);
+//        	String markers = String.format("%c%c", TextFragment.MARKER_OPENING,
+//        		TextFragment.toChar(fragment.getIndex(id)));
+//        	sb.replace(m.start(), m.end(), markers);
+//        	// Search corresponding closing part
+//        	int n = sb.toString().indexOf(CLOSING_CODE);
+//        	// Replace closing code by the coded text markers for closing
+//        	markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
+//        		TextFragment.toChar(fragment.getIndexForClosing(id)));
+//        	sb.replace(n, n+CLOSING_CODE_LENGTH, markers);
+//        	m = opening.matcher(sb.toString());
+//        }
+//        
+//		m = isolated.matcher(sb.toString());
+//        while ( m.find() ) {
+//        	// Replace the HTML fake code by the coded text markers
+//        	int id = Util.strToInt(m.group(2), -1);
+//        	String markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
+//        		TextFragment.toChar(fragment.getIndex(id)));
+//        	sb.replace(m.start(), m.end(), markers);
+//        	m = isolated.matcher(sb.toString());
+//        }
+//
+//		return sb.toString();
+//	}
 
 // Old query, scraping the result page
 //	public int querySite (TextFragment text) {
