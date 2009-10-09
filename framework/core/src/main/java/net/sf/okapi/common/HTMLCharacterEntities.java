@@ -18,21 +18,34 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.php;
+package net.sf.okapi.common;
 
 import java.util.Hashtable;
 
-class HTMLCharacterEntities {
+/**
+ * Helper class to handle HTML character entities.
+ */
+public class HTMLCharacterEntities {
 
 	private Hashtable<String, Character> charEntities;
 
-	public void ensureInitialization () {
+	/**
+	 * Ensures the lookup table is initialized. You must call this method before
+	 * using others.
+	 * @param includeSpecialChars true if XML-pre-defined entities should be
+	 * included in the list of supported entities.
+	 */
+	public void ensureInitialization (boolean includeSpecialChars) {
 		if ( charEntities == null ) {
-			createCharEntitiesTable();
+			createCharEntitiesTable(includeSpecialChars);
 		}
 	}
 	
-	// Looks up "&abc;"
+	/**
+	 * Gets the character for a given character entity reference (e.g. "&aacute;").
+	 * @param ref the reference to lookup.
+	 * @return the unicode value for the given reference, or -1 if it was not found.
+	 */
 	public int lookupReference (String ref) {
 		if (( ref == null ) || ( ref.length() < 3 )) {
 			return -1;
@@ -40,7 +53,11 @@ class HTMLCharacterEntities {
 		return lookupName(ref.substring(1, ref.length()-1));
 	}
 	
-	// Looks up "abc"
+	/**
+	 * Gets the character for a given entity name (e.g. "aacute").
+	 * @param ref the name to lookup.
+	 * @return the unicode value for the given name, or -1 if it was not found.
+	 */
 	public int lookupName (String name) {
 		if ( charEntities.containsKey(name) ) {
 			return (int)charEntities.get(name);
@@ -48,7 +65,12 @@ class HTMLCharacterEntities {
 		// Else: un-known name
 		return -1;
 	}
-	
+
+	/**
+	 * Gets the entity name for the given character.
+	 * @param value the character to lookup.
+	 * @return the name for the given character, or null if it was not found.
+	 */
 	public String getName (char value) {
 		for ( String key : charEntities.keySet() ) {
 			if ( value == charEntities.get(key) ) {
@@ -58,14 +80,16 @@ class HTMLCharacterEntities {
 		return null;
 	}
 	
-	private void createCharEntitiesTable () {
+	private void createCharEntitiesTable (boolean includeSpecialChars) {
 		charEntities = new Hashtable<String, Character>();
 		// XML pre-defined
-//		charEntities.put("amp", '&');
-//		charEntities.put("lt", '<');
-//		charEntities.put("apos", '\'');
-//		charEntities.put("gt", '>');
-//		charEntities.put("quot", '"');
+		if ( includeSpecialChars ) {
+			charEntities.put("amp", '&');
+			charEntities.put("lt", '<');
+			charEntities.put("apos", '\'');
+			charEntities.put("gt", '>');
+			charEntities.put("quot", '"');
+		}
 		// Others
 		charEntities.put("nbsp", '\u00a0');
 		charEntities.put("iexcl", '\u00a1');

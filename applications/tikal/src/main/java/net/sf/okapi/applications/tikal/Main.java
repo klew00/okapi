@@ -54,6 +54,7 @@ import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.common.ui.genericeditor.GenericEditor;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
@@ -62,6 +63,7 @@ import net.sf.okapi.steps.formatconversion.Parameters;
 import net.sf.okapi.steps.formatconversion.TableFilterWriterParameters;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
+import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
@@ -103,6 +105,8 @@ public class Main {
 	protected String globalSightParams;
 	protected boolean useMyMemory;
 	protected String myMemoryParams;
+	protected boolean useApertium;
+	protected String apertiumServer;
 	protected boolean usePensieve;
 	protected String pensieveDir;
 	protected boolean genericOutput = false;
@@ -111,6 +115,7 @@ public class Main {
 	protected int convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_TARGETOREMPTY;
 	protected String segRules;
 	protected boolean showTraceHint = true;
+	protected String tmOptions;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -249,6 +254,9 @@ public class Main {
 					prog.command = CMD_QUERYTRANS;
 					prog.query = prog.getArgument(args, ++i);
 				}
+				else if ( arg.equals("-opt") ) {
+					prog.tmOptions = prog.getArgument(args, ++i);
+				}
 				else if ( arg.equals("-google") ) {
 					prog.useGoogle = true;
 				}
@@ -262,6 +270,14 @@ public class Main {
 				else if ( arg.equals("-gs") ) {
 					prog.useGlobalSight = true;
 					prog.globalSightParams = prog.getArgument(args, ++i);
+				}
+				else if ( arg.equals("-ap") ) {
+					prog.useApertium = true;
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							prog.apertiumServer = args.get(++i);
+						}
+					}
 				}
 				else if ( arg.equals("-mm") ) {
 					prog.useMyMemory = true;
@@ -750,6 +766,7 @@ public class Main {
 		ps.println("Query translation resources:");
 		ps.println("   -q \"source text\" [-sl sourceLang] [-tl targetLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
+		ps.println("      [-opt threshold[:maxhits]]");
 		ps.println("Conversion to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic] [-trgsource|-trgempty]");
@@ -765,7 +782,9 @@ public class Main {
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
 	}
 
-	private void displayQuery (IQuery conn) {
+	private void displayQuery (IQuery conn,
+		boolean isTM)
+	{
 		int count;
 		if ( conn.getClass().getName().endsWith("PensieveTMConnector")
 			|| conn.getClass().getName().endsWith("GoogleMTConnector")
@@ -775,29 +794,39 @@ public class Main {
 		else { // Raw text otherwise
 			count = conn.query(query);
 		}
+
+		ps.println(String.format("\n= From %s (%s->%s)", conn.getName(),
+			conn.getSourceLanguage(), conn.getTargetLanguage()));
+		if ( isTM ) {
+			ITMQuery tmConn = (ITMQuery)conn;
+			ps.println(String.format("  Threshold=%d, Maximum hits=%d",
+				tmConn.getThreshold(), tmConn.getMaximumHits()));
+		}
+		
 		if ( count > 0 ) {
 			QueryResult qr;
 			while ( conn.hasNext() ) {
 				qr = conn.next();
-				ps.println(String.format("Result: From %s (%s->%s, score: %d)", conn.getName(),
-					conn.getSourceLanguage(), conn.getTargetLanguage(), qr.score));
+				ps.println(String.format("score: %d", qr.score));
 				ps.println(String.format("  Source: \"%s\"", qr.source.toString()));
 				ps.println(String.format("  Target: \"%s\"", qr.target.toString()));
 			}
 		}
 		else {
-			ps.println(String.format("Result: From %s (%s->%s)", conn.getName(),
-				conn.getSourceLanguage(), conn.getTargetLanguage()));
 			ps.println(String.format("  Source: \"%s\"", query));
-			ps.println("  <Not translation has been found>");
+			ps.println("  <No translation has been found>");
 		}	
 	}
 	
 	private void processQuery () {
 		if ( !useGoogle && !useOpenTran && !useTransToolkit && !useMyMemory
-			&& !usePensieve && ! useGlobalSight ) {
+			&& !usePensieve && !useGlobalSight && !useApertium ) {
 			useGoogle = true; // Default if none is specified
 		}
+		// Query options
+		int[] opt = parseTMOptions();
+		int threshold = opt[0];
+		int maxhits = opt[1];
 		
 		IQuery conn;
 		if ( useGoogle ) {
@@ -805,50 +834,101 @@ public class Main {
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
 			conn.open();
-			displayQuery(conn);
+			displayQuery(conn, false);
 			conn.close();
 		}
 		if ( usePensieve ) {
 			conn = new PensieveTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
+			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
-			displayQuery(conn);
+			displayQuery(conn, true);
 			conn.close();
 		}
 		if ( useTransToolkit ) {
 			conn = new TranslateToolkitTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
+			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
-			displayQuery(conn);
+			displayQuery(conn, true);
 			conn.close();
 		}
 		if ( useGlobalSight ) {
 			conn = new GlobalSightTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
+			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
-			displayQuery(conn);
+			displayQuery(conn, true);
 			conn.close();
 		}
 		if ( useMyMemory ) {
 			conn = new MyMemoryTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLang, trgLang);
+			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
-			displayQuery(conn);
+			displayQuery(conn, true);
+			conn.close();
+		}
+		if ( useApertium ) {
+			conn = new ApertiumMTConnector();
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
+			conn.setLanguages(srcLang, trgLang);
+			conn.open();
+			displayQuery(conn, false);
 			conn.close();
 		}
 		if ( useOpenTran ) {
 			conn = new OpenTranTMConnector();
 			conn.setLanguages(srcLang, trgLang);
+			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
-			displayQuery(conn);
+			displayQuery(conn, true);
 			conn.close();
 		}
 	}
 
+	private int[] parseTMOptions () {
+		int[] opt = new int[2];
+		opt[0] = -1;
+		opt[1] = -1;
+		if ( !Util.isEmpty(tmOptions) ) {
+			try {
+				// Expected format: "threshold[:maxhits]"
+				int n = tmOptions.indexOf(':');
+				if ( n == -1 ) { // Threshold only
+					opt[0] = Integer.parseInt(tmOptions);
+				}
+				else {
+					opt[0] = Integer.parseInt(tmOptions.substring(0, n));
+					opt[1] = Integer.parseInt(tmOptions.substring(n+1));
+					if ( opt[1] < 0 ) {
+						throw new RuntimeException(String.format("Invalid TM options: '%s' Maximum hits must be more than 0.", tmOptions));
+					}
+				}
+				if (( opt[0] < 0 ) || ( opt[0] > 100 )) {
+					throw new RuntimeException(String.format("Invalid TM options: '%s' Thresold must be between 0 and 100.", tmOptions));
+				}
+			}
+			catch ( NumberFormatException e ) {
+				throw new RuntimeException(String.format("Invalid TM options: '%s'", tmOptions));
+			}
+		}
+		return opt;
+	}
+	
+	private void setTMOptionsIfPossible (IQuery conn,
+		int threshold,
+		int maxhits)
+	{
+		ITMQuery tmConn = (ITMQuery)conn;
+		if ( threshold > -1 ) tmConn.setThreshold(threshold);
+		if ( maxhits > -1 ) tmConn.setMaximumHits(maxhits);
+	}
+	
 	private void convertFile (RawDocument rd, URI outputURI) {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
@@ -921,7 +1001,8 @@ public class Main {
 		}
 		
 		// Add leveraging step if requested
-		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve || useGlobalSight ) {
+		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve
+				|| useGlobalSight || useApertium ) {
 			LeveragingStep levStep = new LeveragingStep();
 			net.sf.okapi.steps.leveraging.Parameters levParams
 				= (net.sf.okapi.steps.leveraging.Parameters)levStep.getParameters();
@@ -939,6 +1020,9 @@ public class Main {
 			}
 			else if ( useGlobalSight ) {
 				levParams.setResourceClassName(GlobalSightTMConnector.class.getName());
+			}
+			else if ( useApertium ) {
+				levParams.setResourceClassName(ApertiumMTConnector.class.getName());
 			}
 			IParameters p = prepareConnectorParameters(levParams.getResourceClassName());
 			if ( p != null ) levParams.setResourceParameters(p.toString());
@@ -999,6 +1083,15 @@ public class Main {
 				= new net.sf.okapi.connectors.globalsight.Parameters();
 			URI paramURI = (new File(globalSightParams).toURI());
 			params.load(paramURI, false);
+			return params;
+		}
+		
+		if ( connectorClassName.equals(ApertiumMTConnector.class.getName()) ) {
+			net.sf.okapi.connectors.apertium.Parameters params
+				= new net.sf.okapi.connectors.apertium.Parameters();
+			if ( apertiumServer != null ) {
+				params.setServer(apertiumServer);
+			} // Use default otherwise
 			return params;
 		}
 		

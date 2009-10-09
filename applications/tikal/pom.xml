@@ -56,6 +56,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>net.sf.okapi.connectors</groupId>
+            <artifactId>okapi-connector-apertium</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
         	<groupId>net.sf.okapi.filters</groupId>
         	<artifactId>okapi-filter-xliff</artifactId>
         	<version>${project.version}</version>

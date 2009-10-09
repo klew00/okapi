@@ -62,6 +62,12 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-apertium</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-tmx</artifactId>
 			<version>${project.version}</version>

@@ -53,6 +53,12 @@ public class DefaultConnectors implements IConnectorList {
 		trc.connectorClass = "net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.translatetoolkit.ParametersUI";
 		list.add(trc);
+
+		trc = new ConnectorInfo();
+		trc.description = "Apertium MT Server (Beta)";
+		trc.connectorClass = "net.sf.okapi.connectors.apertium.ApertiumMTConnector";
+		trc.descriptionProviderClass = "net.sf.okapi.connectors.apertium.Parameters";
+		list.add(trc);
 	}
 
 	public List<ConnectorInfo> getList () {

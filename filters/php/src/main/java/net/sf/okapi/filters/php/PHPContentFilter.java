@@ -31,6 +31,7 @@ import java.util.List;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.HTMLCharacterEntities;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
@@ -516,7 +517,7 @@ public class PHPContentFilter implements IFilter {
 			return -1;
 		}
 		else { // Maybe a real character entity reference
-			cerList.ensureInitialization();
+			cerList.ensureInitialization(false);
 			res = cerList.lookupName(tmp);
 			if ( res == -1 ) return -1; // name not found
 		}

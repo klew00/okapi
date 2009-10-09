@@ -4,6 +4,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
@@ -49,6 +50,7 @@ public class SelectionForm {
 		lbResources.add("Translate Toolkit TM (remote or local)");
 		lbResources.add("MyMemory TM (Internet)");
 		lbResources.add("Pensieve TM");
+		lbResources.add("Apertium MT (remote or local)");
 		lbResources.setSelection(0);
 		
 		// Dialog-level buttons
@@ -81,6 +83,9 @@ public class SelectionForm {
 						break;
 					case 6: // Pensieve TM
 						result = new PensieveTMConnector();
+						break;
+					case 7: // Apertium MT
+						result = new ApertiumMTConnector();
 						break;
 					}
 				}

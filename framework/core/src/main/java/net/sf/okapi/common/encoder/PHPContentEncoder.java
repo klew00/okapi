@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,9 +20,6 @@
 
 package net.sf.okapi.common.encoder;
 
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -30,20 +27,20 @@ import net.sf.okapi.common.IParameters;
  */
 public class PHPContentEncoder implements IEncoder {
 	
-	private CharsetEncoder chsEnc;
+//	private CharsetEncoder chsEnc;
 	
 	/**
 	 * Creates a new PHPContentEncoder object, with US-ASCII as the encoding.
 	 */
 	public PHPContentEncoder () {
-		chsEnc = Charset.forName("us-ascii").newEncoder();
+//		chsEnc = Charset.forName("us-ascii").newEncoder();
 	}
 	
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
 	{
-		chsEnc = Charset.forName(encoding).newEncoder();
+//		chsEnc = Charset.forName(encoding).newEncoder();
 	}
 
 	public String encode (String text,

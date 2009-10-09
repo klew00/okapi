@@ -353,6 +353,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 		int id = -1;
 		Node node;
 		Code code;
+//		Code srcCode;
 		Stack<Code> stack = new Stack<Code>();
 //		List<Code> oriCodes = null;
 //		
@@ -371,25 +372,28 @@ public class GlobalSightTMConnector implements ITMQuery {
 				NamedNodeMap map = node.getAttributes();
 				Node attr = map.getNamedItem("type");
 				if ( node.getNodeName().equals("bpt") ) {
-					id = getIdentifier(lastId, map.getNamedItem("x"));
-					stack.push(tf.append(TagType.OPENING, (attr==null ? "Xpt" : attr.getNodeValue()), "[bpt/]", id));
+					id = getRawIndex(lastId, map.getNamedItem("x"));
+					stack.push(tf.append(TagType.OPENING, (attr==null ? "Xpt" : attr.getNodeValue()),
+						String.format("{%d}", id), id));
 				}
 				else if ( node.getNodeName().equals("ept") ) {
 					code = stack.pop();
-					tf.append(TagType.CLOSING, code.getType(), "[ept/]", code.getId());
+					tf.append(TagType.CLOSING, code.getType(),
+						String.format("{/%d}", code.getId()), code.getId());
 				}
 				else if ( node.getNodeName().equals("ph") ) {
-					id = getIdentifier(lastId, map.getNamedItem("x"));
-					tf.append(TagType.PLACEHOLDER, (attr==null ? "ph" : attr.getNodeValue()), "[ph/]", id);
+					id = getRawIndex(lastId, map.getNamedItem("x"));
+					tf.append(TagType.PLACEHOLDER, (attr==null ? "ph" : attr.getNodeValue()),
+						String.format("{%d/}", id), id);
 				}
 				else if ( node.getNodeName().equals("it") ) {
 					Node pos = map.getNamedItem("pos");
 					if ( pos == null ) { // Error, but just treat it as a placeholder
-						id = getIdentifier(lastId, map.getNamedItem("x"));
+						id = getRawIndex(lastId, map.getNamedItem("x"));
 						tf.append(TagType.PLACEHOLDER, (attr==null ? "ph" : attr.getNodeValue()), "[it/]", id);
 					}
 					else if ( pos.getNodeValue().equals("begin") ) {
-						id = getIdentifier(lastId, map.getNamedItem("x"));
+						id = getRawIndex(lastId, map.getNamedItem("x"));
 						tf.append(TagType.OPENING, (attr==null ? "Xpt" : attr.getNodeValue()), "[it-bpt/]", id);
 					}
 					else { // Assumes 'end'
@@ -417,8 +421,9 @@ public class GlobalSightTMConnector implements ITMQuery {
 //		return null;
 //	}
 	
-	private int getIdentifier (int lastId, Node attr) {
-		if ( attr == null ) return ++lastId;
+	private int getRawIndex (int lastIndex, Node attr) {
+		if ( attr == null ) return ++lastIndex;
+		// GS codes return are 0-base
 		return Integer.valueOf(attr.getNodeValue());
 	}
 	

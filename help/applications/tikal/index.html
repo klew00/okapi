@@ -213,6 +213,15 @@ per resource, not sorted by best score as a whole.</p>
 		with a given key access (use <code>mmDemo123</code> for demo). This 
 		requires Internet access.</td>
 	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-opt threshold[:maxhits]</code></td>
+		<td align="left" valign="top">
+		<p dir="ltr">TM query options: the threshold is a number between 0 and 
+		100. The maximum number of hits is a number above 0. If this option is 
+		not set each TM engine uses its own defaults. If this option is set, all 
+		TM engines are set to use the specified options. Note that parameters of 
+		some engines may be limited by their configuration.</td>
+	</tr>
 	</table>
 <p>Because the text of the query cannot be associated with a given file format, 
 there is no support for format-specific inline codes. However, <b>when querying 
@@ -222,17 +231,18 @@ codes: For example, in &quot;<code>Open the &lt;x&gt;window&lt;/x&gt;&lt;x/&gt;.
 closing and placeholder inline codes, and the query processed as such. When 
 querying resources that are not inline code-aware, the tags are treated as plain 
 text.</p>
-<p>The resources that are inline code-aware are: Pensieve and Google</p>
+<p>The resources that are inline code-aware are: Pensieve, GlobalSight and Google</p>
 <p>For example:</p>
 <pre>tikal -q &quot;open file&quot; -sl en</pre>
 <p>Queries the default translation resource (Google MT system) for the text 
 &quot;open file&quot; in English. The target language by default is French. Note: You 
 could omit the <code>-sl</code> option if you are running from a English system.</p>
-<pre>tikal -q &quot;open &lt;x&gt;file&lt;/x&gt;&quot; -sl en -pen mytm</pre>
+<pre>tikal -q &quot;open &lt;x&gt;file&lt;/x&gt;&quot; -sl en -pen mytm -opt 60:20</pre>
 <p>Queries the Pensieve TM located in <code>mytm</code> for the text 
 &quot;open &lt;x&gt;file&lt;/x&gt;&quot; in English. The target language by default is French. 
 Because Pensieve TM can work with inline codes, the tags &quot;<code>&lt;x&gt;</code>&quot; and 
-&quot;<code>&lt;/x&gt;</code>&quot; are processed as inline codes.</p>
+&quot;<code>&lt;/x&gt;</code>&quot; are processed as inline codes. The threshold 
+is set to 60 and the maximum hits is set to 20.</p>
 <pre>tikal -q &quot;open file&quot; -opentran -sl en -tl zu</pre>
 <p dir="ltr">Queries the OpenTran translation repository for the English text 
 &quot;open file&quot; in Zulu.</p>

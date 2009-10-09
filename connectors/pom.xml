@@ -19,6 +19,7 @@
         <module>simpletm</module>
         <module>pensieve</module>
         <module>google</module>
+        <module>apertium</module>
     </modules>
 
     <build>

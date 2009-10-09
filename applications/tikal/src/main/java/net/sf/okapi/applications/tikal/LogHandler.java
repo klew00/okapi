@@ -48,7 +48,7 @@ class LogHandler extends Handler {
 	@Override
 	public void publish (LogRecord record) {
 		if ( record.getLevel() == Level.SEVERE ) {
-			ps.println(record.getMessage());
+			ps.println("Error: " + record.getMessage());
 			Throwable e = record.getThrown();
 			if ( e != null ) {
 				ps.println(e.getMessage());
@@ -56,7 +56,10 @@ class LogHandler extends Handler {
 			}
 		}
 		else if ( record.getLevel() == Level.WARNING ) {
-			ps.println(record.getMessage());
+			// Filter out Axis warnings
+			if ( "org.apache.axis.utils.JavaUtils".equals(record.getLoggerName()) ) return;
+			// Otherwise print
+			ps.println("Warning: " + record.getMessage());
 		}
 		else if ( record.getLevel() == Level.INFO ) {
 			ps.println(record.getMessage());

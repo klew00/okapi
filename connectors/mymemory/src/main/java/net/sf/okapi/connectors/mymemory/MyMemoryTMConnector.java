@@ -134,8 +134,8 @@ public class MyMemoryTMConnector implements ITMQuery {
 					res.score = match.getScore();
 					// To workaround bug in score calculation
 					// Score > 100 should be treated as 100 per Alberto's info.
-					//if (res.score > 100 ) res.score = 100;
-					//TODO: if ( res.score < getThreshold() ) break;
+					if (res.score > 100 ) res.score = 100;
+					if ( res.score < getThreshold() ) break;
 					if ( hadCodes ) {
 						if ( res.score >= 100 ) res.score = 99;
 						else res.score--;

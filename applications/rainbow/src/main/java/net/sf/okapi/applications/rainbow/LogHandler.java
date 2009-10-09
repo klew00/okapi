@@ -58,6 +58,9 @@ class LogHandler extends Handler {
 			}
 		}
 		else if ( record.getLevel() == Level.WARNING ) {
+			// Filter out Axis warnings
+			if ( "org.apache.axis.utils.JavaUtils".equals(record.getLoggerName()) ) return;
+			// Otherwise print
 			log.warning(record.getMessage());
 		}
 		else if ( record.getLevel() == Level.INFO ) {
