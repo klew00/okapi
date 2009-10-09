@@ -154,8 +154,8 @@ public class TokenizationTest {
 		String expected = null;
 		
 		try {
-			expected = Util.normalizeNewlines(streamAsString(this.getClass().getResourceAsStream("rbbi_custom.txt")));
-			rules = streamAsString(this.getClass().getResourceAsStream("rbbi_default.txt"));
+			expected = Util.normalizeNewlines(streamAsString(this.getClass().getResourceAsStream("/rbbi_custom.txt")));
+			rules = streamAsString(this.getClass().getResourceAsStream("/rbbi_default.txt"));
 			
 			//rules = RbbiLexer.formatCaption(rules, "Custom rules");
 			
