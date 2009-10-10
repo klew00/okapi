@@ -20,7 +20,6 @@
 
 package net.sf.okapi.steps.wordcount;
 
-import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.wordcount.common.GMX;
 import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 
@@ -50,9 +49,9 @@ public class WordCountStep extends TokenCountStep {
 	}
 
 	@Override
-	protected String getTokenType() {
+	protected String getTokenName() {
 
-		return Token.WORD;
+		return WordCounter.getTokenName();
 	}
 
 			

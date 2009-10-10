@@ -38,7 +38,7 @@ import net.sf.okapi.lib.extra.AbstractParameters;
 
 public abstract class AbstractLexerRules extends AbstractParameters implements List<LexerRule> {
 	
-	private List<LexerRule> items = new ArrayList<LexerRule>();
+	private List<LexerRule> rules = new ArrayList<LexerRule>();
 	
 	private TreeMap<Integer, LexerRule> idMap = new TreeMap<Integer, LexerRule>();
 	
@@ -52,26 +52,44 @@ public abstract class AbstractLexerRules extends AbstractParameters implements L
 	@Override
 	public void parameters_reset() {
 
-		if (items != null)
-			items.clear();
+		if (rules != null)
+			rules.clear();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void parameters_load(ParametersString buffer) {
 		
-		loadGroup(buffer, "Rule", items, (Class<LexerRule>) getRuleClass());
+		loadGroup(buffer, "Rule", rules, (Class<LexerRule>) getRuleClass());
+		
+		// Fix lexemId to be unique		
+		List<Integer> usedIDs = new ArrayList<Integer>();
+		
+		for (LexerRule rule : rules) {
+			
+			int id = rule.getLexemId();
+			
+			if (id == 0 && usedIDs.contains(id)) { // First 0 is allowed
+				
+				while (usedIDs.contains(id))
+					id++;
+				
+				rule.setLexemId(id);
+			}
+			
+			usedIDs.add(id);
+		}
 		
 		idMap.clear();
 		
-		for (LexerRule item : items)			
-			idMap.put(item.getLexemId(), item);
+		for (LexerRule rule : rules)			
+			idMap.put(rule.getLexemId(), rule);
 	}
 	
 	@Override
 	public void parameters_save(ParametersString buffer) {
 		
-		saveGroup(buffer, "Rule", items);
+		saveGroup(buffer, "Rule", rules);
 	}	
 	
 	/**
@@ -93,116 +111,116 @@ public abstract class AbstractLexerRules extends AbstractParameters implements L
 	// List implementation 
 	public boolean add(LexerRule o) {
 		
-		return items.add(o);
+		return rules.add(o);
 	}
 
 	public void add(int index, LexerRule element) {
 		
-		items.add(index, element);
+		rules.add(index, element);
 	}
 
 	public boolean addAll(Collection<? extends LexerRule> c) {
 
-		return items.addAll(c);
+		return rules.addAll(c);
 	}
 
 	public boolean addAll(int index, Collection<? extends LexerRule> c) {
 		
-		return items.addAll(index, c);
+		return rules.addAll(index, c);
 	}
 
 	public void clear() {
 		
-		items.clear();
+		rules.clear();
 	}
 
 	public boolean contains(Object o) {
 		
-		return items.contains(o);
+		return rules.contains(o);
 	}
 
 	public boolean containsAll(Collection<?> c) {
 
-		return items.containsAll(c);
+		return rules.containsAll(c);
 	}
 
 	public LexerRule get(int index) {
 		
-		return items.get(index);
+		return rules.get(index);
 	}
 
 	public int indexOf(Object o) {
 
-		return items.indexOf(o);
+		return rules.indexOf(o);
 	}
 
 	public boolean isEmpty() {
 
-		return items.isEmpty();
+		return rules.isEmpty();
 	}
 
 	public Iterator<LexerRule> iterator() {
 	
-		return items.iterator();
+		return rules.iterator();
 	}
 
 	public int lastIndexOf(Object o) {
 
-		return items.lastIndexOf(o);
+		return rules.lastIndexOf(o);
 	}
 
 	public ListIterator<LexerRule> listIterator() {
 
-		return items.listIterator();
+		return rules.listIterator();
 	}
 
 	public ListIterator<LexerRule> listIterator(int index) {
 
-		return items.listIterator(index);
+		return rules.listIterator(index);
 	}
 
 	public boolean remove(Object o) {
 	
-		return items.remove(o);
+		return rules.remove(o);
 	}
 
 	public LexerRule remove(int index) {
 
-		return items.remove(index);
+		return rules.remove(index);
 	}
 
 	public boolean removeAll(Collection<?> c) {
 
-		return items.removeAll(c);
+		return rules.removeAll(c);
 	}
 
 	public boolean retainAll(Collection<?> c) {
 
-		return items.retainAll(c);
+		return rules.retainAll(c);
 	}
 
 	public LexerRule set(int index, LexerRule element) {
 
-		return items.set(index, element);
+		return rules.set(index, element);
 	}
 
 	public int size() {
 
-		return items.size();
+		return rules.size();
 	}
 
 	public List<LexerRule> subList(int fromIndex, int toIndex) {
 
-		return items.subList(fromIndex, toIndex);
+		return rules.subList(fromIndex, toIndex);
 	}
 
 	public Object[] toArray() {
 
-		return items.toArray();
+		return rules.toArray();
 	}
 
 	public <T> T[] toArray(T[] a) {
 
-		return items.toArray(a);
+		return rules.toArray(a);
 	}
 }

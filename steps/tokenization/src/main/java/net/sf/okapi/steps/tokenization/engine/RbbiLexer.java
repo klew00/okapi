@@ -63,7 +63,7 @@ public class RbbiLexer extends AbstractLexer {
 		if (start >= end) return null;
 		
 		int lexemId = iterator.getRuleStatus();
-		Lexem lexem = new Lexem(lexemId, text.substring(start,end), start, end, getLexerId());
+		Lexem lexem = new Lexem(lexemId, text.substring(start,end), start, end);
 		
 		//System.out.println(lexem.toString());
 		start = end; // Prepare for the next iteration
@@ -107,11 +107,11 @@ public class RbbiLexer extends AbstractLexer {
 			String newRules = defaultRules;			
 			//boolean addCaption = true;
 			
-			for (LexerRule item : getRules()) {
+			for (LexerRule rule : getRules()) {
 				
-				boolean isInternal = Util.isEmpty(item.getRule());
+				boolean isInternal = Util.isEmpty(rule.getPattern());
 				
-				if (item.supportsLanguage(language) && !isInternal) {
+				if (rule.supportsLanguage(language) && !isInternal) {
 					
 //					if (addCaption) {
 //						
@@ -119,7 +119,7 @@ public class RbbiLexer extends AbstractLexer {
 //						addCaption = false;
 //					}
 					
-					newRules = formatRule(newRules, item.getName(), item.getDescription(), item.getRule(), item.getLexemId());
+					newRules = formatRule(newRules, rule.getName(), rule.getDescription(), rule.getPattern(), rule.getLexemId());
 				}					
 			}				
 			

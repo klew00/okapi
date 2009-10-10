@@ -1,4 +1,4 @@
- #v1
+#v1
 RuleCount.i=4
 
 Rule0.name=Whitespace
@@ -7,7 +7,7 @@ Rule0.inTokens=UNKNOWN
 Rule0.outTokens=WHITESPACE
 Rule0.userTokens=
 Rule0.lexemId.i=0
-Rule0.rule=\s+
+Rule0.pattern=\s+
 Rule0.languageMode.i=2
 Rule0.languageWhiteList=
 Rule0.languageBlackList=ZH,ZH-HANT,ZH-HANT-HK,ZH-HANT-MO,ZH-HANT-TW,ZH-HANS,ZH-HANS-HK,ZH-HANS-CN,ZH-HANS-MO,ZH-HANS-SG,KO,KO-KR,JA,JA-JP
@@ -17,8 +17,8 @@ Rule1.description=
 Rule1.inTokens=UNKNOWN
 Rule1.outTokens=PUNCTUATION
 Rule1.userTokens=
-Rule1.lexemId.i=1
-Rule1.rule=\p{Punct}
+Rule1.lexemId.i=0
+Rule1.pattern=\p{Punct}
 Rule1.languageMode.i=0
 Rule1.languageWhiteList=
 Rule1.languageBlackList=
@@ -28,8 +28,8 @@ Rule2.description=URL detection rule
 Rule2.inTokens=WORD
 Rule2.outTokens=INTERNET
 Rule2.userTokens=
-Rule2.lexemId.i=2
-Rule2.rule=(@)?(href=')?(HREF=')?(HREF=\")?(href=\")?(http://)?[a-zA-Z_0-9\-]+(\.\w[a-zA-Z_0-9\-]+)+(/[#&\n\-=?\+\%/\.\w]+)?
+Rule2.lexemId.i=0
+Rule2.pattern=(@)?(href=')?(HREF=')?(HREF=\")?(href=\")?(http://)?[a-zA-Z_0-9\-]+(\.\w[a-zA-Z_0-9\-]+)+(/[#&\n\-=?\+\%/\.\w]+)?
 Rule2.languageMode.i=0
 Rule2.languageWhiteList=
 Rule2.languageBlackList=
@@ -39,8 +39,8 @@ Rule3.description=Detects IP-addresses (192.168.0.5 etc.)
 Rule3.inTokens=NUMBER,INTERNET
 Rule3.outTokens=INTERNET
 Rule3.userTokens=
-Rule3.lexemId.i=3
-Rule3.rule=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
+Rule3.lexemId.i=0
+Rule3.pattern=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
 Rule3.languageMode.i=0
 Rule3.languageWhiteList=
 Rule3.languageBlackList=

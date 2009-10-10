@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,32 +18,45 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.wordcount.common;
+package net.sf.okapi.steps.tokenization.common;
 
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
-import net.sf.okapi.steps.tokenization.Tokenizer;
-import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
-import net.sf.okapi.steps.tokenization.tokens.Tokens;
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class TokenCountStep extends BaseCountStep {
+import net.sf.okapi.common.ParametersString;
 
-	protected abstract String getTokenName();
+public class RegexRule extends LexerRule {
+
+	private List<RegexRuleItem> items = new ArrayList<RegexRuleItem>();
 	
 	@Override
-	protected long getCount(TextUnit textUnit) {
-		
-		TokensAnnotation ta = TextUnitUtil.getSourceAnnotation(textUnit, TokensAnnotation.class);
-		Tokens tokens = null;
-		
-		if (ta != null)			
-			tokens = ta.getFilteredList(getTokenName());			
-		else
-			tokens = Tokenizer.tokenize(TextUnitUtil.getSourceText(textUnit, true), getLanguage(), getTokenName());
-		
-		if (tokens == null) return 0;
-		
-		return tokens.size();		
+	protected void parameters_load(ParametersString buffer) {
+
+		loadGroup(buffer, "item", items, RegexRuleItem.class);		
 	}
 
+	@Override
+	protected void parameters_reset() {
+		
+		if (items == null) return;
+		items.clear();		
+	}
+
+	@Override
+	protected void parameters_save(ParametersString buffer) {
+		
+		saveGroup(buffer, "item", items);
+	}
+
+	public List<RegexRuleItem> getItems() {
+		
+		return items;
+	}
+
+	@Override
+	public List<Integer> getOutTokenIDs() {
+		
+		return super.getOutTokenIDs();
+	}
 }
+

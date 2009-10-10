@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,30 +20,34 @@
 
 package net.sf.okapi.steps.wordcount.common;
 
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
-import net.sf.okapi.steps.tokenization.Tokenizer;
-import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
-import net.sf.okapi.steps.tokenization.tokens.Tokens;
+import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.lib.extra.AbstractParameters;
 
-public abstract class TokenCountStep extends BaseCountStep {
+public class StructureParameters extends AbstractParameters {
 
-	protected abstract String getTokenName();
+	private String tokenName;
 	
 	@Override
-	protected long getCount(TextUnit textUnit) {
+	protected void parameters_load(ParametersString buffer) {
 		
-		TokensAnnotation ta = TextUnitUtil.getSourceAnnotation(textUnit, TokensAnnotation.class);
-		Tokens tokens = null;
+		tokenName = buffer.getString("tokenName");
+	}
+
+	@Override
+	protected void parameters_reset() {
+
+		tokenName = "";
+	}
+
+	@Override
+	protected void parameters_save(ParametersString buffer) {
+
+		buffer.setString("tokenName", tokenName);
+	}
+
+	public String getTokenName() {
 		
-		if (ta != null)			
-			tokens = ta.getFilteredList(getTokenName());			
-		else
-			tokens = Tokenizer.tokenize(TextUnitUtil.getSourceText(textUnit, true), getLanguage(), getTokenName());
-		
-		if (tokens == null) return 0;
-		
-		return tokens.size();		
+		return tokenName;
 	}
 
 }

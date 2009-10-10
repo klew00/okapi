@@ -35,8 +35,10 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 abstract public class BaseCounter {
 	
 	private static BaseCounter counter = null;
+	protected static StructureParameters params;
 	
 	abstract protected long doGetCount(String text, String language);
+	abstract protected String getResourceName();
 	
 	static protected long getCount(Class<?> classRef, Object text, String language) {
 	
@@ -71,6 +73,8 @@ abstract public class BaseCounter {
 			if (counter == null)				
 				try {
 					counter = (BaseCounter) classRef.newInstance();
+					params = new StructureParameters();
+					params.loadFromResource(counter.getResourceName());
 					
 				} catch (InstantiationException e) {
 					
@@ -88,4 +92,8 @@ abstract public class BaseCounter {
 		return 0;		
 	}
 	
+	public static String getTokenName() {
+		
+		return params.getTokenName();
+	}
 }

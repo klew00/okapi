@@ -20,8 +20,6 @@
 
 package net.sf.okapi.steps.tokenization;
 
-import java.util.Arrays;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ListUtil;
@@ -76,7 +74,8 @@ public class Tokenizer {
 		
 			params.setTokenMode(Parameters.TOKENS_SELECTED);
 			//params.setTokenNames(ListUtil.stringAsList(tokenNames.toString()));
-			params.setTokenNames(Arrays.asList(tokenNames));
+			//params.setTokenNames(Arrays.asList(tokenNames));
+			params.setTokenNames(ListUtil.arrayAsList(tokenNames));
 		}
 					
 		ts.handleEvent(new Event(EventType.START_BATCH)); // Calls component_init();

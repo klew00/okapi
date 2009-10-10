@@ -230,7 +230,13 @@ public class ListUtil {
 	
 	public static <E> List<E> arrayAsList(E[] array) {
 		
-		return Arrays.asList(array);
+		//return Arrays.asList(array); // Fixed size, no clear() etc. possible
+		List<E> list = new ArrayList<E>();
+		
+		for (int i = 0; i < array.length; i++)			
+			list.add(array[i]);
+		
+		return list;
 	}
 	
 	public static String arrayAsString(String[] array) {

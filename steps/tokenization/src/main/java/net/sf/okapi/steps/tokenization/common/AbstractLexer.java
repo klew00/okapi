@@ -28,7 +28,7 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 public abstract class AbstractLexer extends Component implements ILexer {
 
 	private boolean cancelled = false;
-	private int lexerId = 0;
+	//private int lexerId = 0;
 	private LexerRules rules;
 		
 	protected abstract void lexer_init();
@@ -40,7 +40,7 @@ public abstract class AbstractLexer extends Component implements ILexer {
 		
 		super();
 		
-		Class<? extends LexerRules> rulesClass = lexer_getRulesClass2();
+		Class<? extends LexerRules> rulesClass = lexer_getRulesClass();
 		if (rulesClass == null) return;
 		
 		try {
@@ -95,10 +95,10 @@ public abstract class AbstractLexer extends Component implements ILexer {
 	public void close() {				
 	}
 
-	public int getLexerId() {
-		
-		return lexerId;
-	}
+//	public int getLexerId() {
+//		
+//		return lexerId;
+//	}
 
 	public LexerRules getRules() {
 
@@ -124,17 +124,17 @@ public abstract class AbstractLexer extends Component implements ILexer {
 		lexer_open(text, language, tokens);
 	}
 
-	public void setLexerId(int lexerId) {
-		
-		this.lexerId = lexerId;
-	}
+//	public void setLexerId(int lexerId) {
+//		
+//		this.lexerId = lexerId;
+//	}
 
 	public void setRules(LexerRules rules) {
 		
 		this.rules = rules;
 	}
 
-	protected Class<? extends LexerRules> lexer_getRulesClass2() {
+	protected Class<? extends LexerRules> lexer_getRulesClass() {
 		
 		return LexerRules.class;
 	}

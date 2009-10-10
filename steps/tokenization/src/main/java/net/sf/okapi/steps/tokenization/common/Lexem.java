@@ -42,24 +42,25 @@ public class Lexem {
 	private Range range;
 	
 	/**
-	 * ID of the lexer that extracted this lexem. 
+	 * ID of the lexer that extracted this lexem. Set by a lexers manager when processing the lexem. 
 	 * !!! Non-serializable.
 	 */
 	private int lexerId;
 	
-	public Lexem(int id, String value, Range range, int lexerId) {
+	//public Lexem(int id, String value, Range range, int lexerId) {
+	public Lexem(int id, String value, Range range) {
 		
 		super();
 				
 		this.id = id;
 		this.value = value;
 		this.range = range;
-		this.lexerId = lexerId;				
 	}
 	
-	public Lexem(int id, String value, int start, int end, int lexerId) {
+	//public Lexem(int id, String value, int start, int end, int lexerId) {
+	public Lexem(int id, String value, int start, int end) {
 		
-		this(id, value, new Range(start, end), lexerId);
+		this(id, value, new Range(start, end));
 	}
 
 	/**

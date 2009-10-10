@@ -49,7 +49,7 @@ public class LexerRule extends LanguageParameters {
 	/**
 	 * Optional string, configuring the underlying lexer to produce the lexem.
 	 */
-	private String rule;
+	private String pattern;
 	
 	private List<Integer> inTokenIDs;
 	private List<String> inTokens;
@@ -71,7 +71,7 @@ public class LexerRule extends LanguageParameters {
 		outTokenIDs.clear();
 		userTokenIDs.clear();
 		lexemId = 0;
-		rule = "";
+		pattern = "";
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class LexerRule extends LanguageParameters {
 			userTokenIDs.add(Tokens.getTokenId(tokenName));
 		
 		lexemId = buffer.getInteger("lexemId", 0);
-		rule = buffer.getString("rule", "");
+		pattern = buffer.getString("pattern", "");
 	}
 	
 	@Override
@@ -156,7 +156,8 @@ public class LexerRule extends LanguageParameters {
 		buffer.setString("userTokens", ListUtil.listAsString(userTokens));
 		
 		buffer.setInteger("lexemId", lexemId);
-		buffer.setString("rule", rule);
+		
+		buffer.setString("pattern", pattern);
 		
 		super.parameters_save(buffer);  // Languages go last
 	}
@@ -191,14 +192,14 @@ public class LexerRule extends LanguageParameters {
 		this.lexemId = lexemId;
 	}
 
-	public String getRule() {
+	public String getPattern() {
 		
-		return rule;
+		return pattern;
 	}
 
-	public void setRule(String rule) {
+	public void setPattern(String pattern) {
 		
-		this.rule = rule;
+		this.pattern = pattern;
 	}
 		
 	public List<Integer> getInTokenIDs() {

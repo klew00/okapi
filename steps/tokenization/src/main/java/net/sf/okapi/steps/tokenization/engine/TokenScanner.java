@@ -5,7 +5,7 @@ import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class RegexBasedLexer extends AbstractLexer {
+public class TokenScanner extends AbstractLexer {
 
 	@Override
 	protected boolean lexer_hasNext() {

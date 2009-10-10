@@ -31,18 +31,6 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class Token {
 	
-	final static public String UNKNOWN 			= "UNKNOWN";
-	final static public String WORD 			= "WORD"; 
-	final static public String PUNCTUATION 		= "PUNCTUATION";
-	final static public String WHITESPACE 		= "WHITESPACE";
-	final static public String DATE 			= "DATE";
-	final static public String NUMBER 			= "NUMBER";
-	final static public String CURRENCY 		= "CURRENCY";
-	final static public String NAME 			= "NAME";
-	final static public String EMAIL 			= "EMAIL";
-	final static public String INTERNET 		= "INTERNET";
-	final static public String ABBREVIATION 	= "ABBREVIATION";
-	
 	/**
 	 * Integer identifier of the token. 
 	 * !!! Non-serializable. 
@@ -50,7 +38,7 @@ public class Token {
 	private int tokenId; 
 	
 	/**
-	 * Underlying lexem extracted by a tokenizer.
+	 * Underlying lexem extracted by a lexer.
 	 */
 	private Lexem lexem;
 	

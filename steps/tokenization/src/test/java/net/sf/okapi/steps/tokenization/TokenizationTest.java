@@ -51,10 +51,12 @@ public class TokenizationTest {
 
 	private String text = "Jaguar will sell its new XJ-6 model in the U.S. for " +
     "a small fortune :-). Expect to pay around USD 120ks. Custom options " +
-    "can set you back another few 10,000 dollars. For details, go to " +
+    "can set you back another few 10,000 dollars (USD 120ks). For details, go to " +
     "<a href=\"http://www.jaguar.com/sales\" alt=\"Click here\">" +
-    "Jaguar Sales</a> or contact xj-6@jaguar.com. See http://www.jaguar.com/sales, www.jaguar.com, 192.168.0.5 for info.";
+    "Jaguar Sales</a> or contact xj-6@jaguar.com. See http://www.jaguar.com/sales, www.jaguar.com, 192.168.0.5 for info 3.5pct.";
 
+	//private String text = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
+		
 	//private String text = "http://www.jaguar.com/sales";
 	//private String text = "<a href=\"http://www.jaguar.com/sales\" alt=\"Click here\">";
 	

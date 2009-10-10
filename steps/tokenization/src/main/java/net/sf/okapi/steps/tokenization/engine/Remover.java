@@ -20,10 +20,7 @@
 
 package net.sf.okapi.steps.tokenization.engine;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
@@ -32,71 +29,50 @@ import net.sf.okapi.steps.tokenization.common.LexerRule;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class Recognizer extends AbstractLexer {
-	 
-	 private List<LexerRule> rules;
-	 private HashMap<LexerRule, Pattern> patterns;  
-	  
+public class Remover extends AbstractLexer {
+	
 	@Override
-	protected boolean lexer_hasNext() {
-
-		return false;
-	}
-
-	@Override
-	protected void lexer_init() {
+	public boolean lexer_hasNext() {
 		
-		patterns = new HashMap<LexerRule, Pattern>();
-		rules = getRules();
+		return false; // Iterator is not used
+	}
+
+	@Override
+	public void lexer_init() {
+
+	}
+
+	@Override
+	public Lexem lexer_next() {
+
+		return null; // Iterator is not used
+	}
+
+	@Override
+	public void lexer_open(String text, String language, Tokens tokens) {
 		
-		for (LexerRule rule : rules) {
-			
-			Pattern pattern = Pattern.compile(rule.getPattern());
-			patterns.put(rule, pattern);
-		}
-							
-	}
-
-	@Override
-	protected Lexem lexer_next() {
-
-		return null;
-	}
-
-	@Override
-	protected void lexer_open(String text, String language, Tokens tokens) {
-
+		 // Iterator is not used
 	}
 
 	public Lexems process(String text, String language, Tokens tokens) {
-		
-		Lexems lexems = new Lexems();
+
+		if (tokens == null) return null;
+				
 		Tokens wasteBin = new Tokens();
 		
-		for (LexerRule rule : rules) {
-			
-			List<Integer> inTokenIDs = rule.getInTokenIDs();
-			
-			Pattern pattern = patterns.get(rule);
-			if (pattern == null) continue;
+		for (LexerRule item : getRules()) {
+
+			List<Integer> inTokenIDs = item.getInTokenIDs();
 			
 			for (Token token : tokens)			
-				if (inTokenIDs.contains(token.getTokenId())) {
-				
-					Matcher matcher = pattern.matcher(token.getValue());
-					
-				    if (matcher.matches()) {
-				    	
-				    	lexems.add(new Lexem(rule.getLexemId(), token.getValue(), token.getRange()));
-				    	wasteBin.add(token); // Remove replaced token
-				    }
-				}
+				if (inTokenIDs.contains(token.getTokenId())) // Remove listed tokens
+					wasteBin.add(token);
 		}
 		
-		for (Token token : wasteBin)			
+		for (Token token : wasteBin)
 			tokens.remove(token);
 		
-		return lexems;
+		return null;
 	}
 
 }

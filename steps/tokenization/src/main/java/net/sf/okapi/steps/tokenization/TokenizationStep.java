@@ -146,7 +146,8 @@ public class TokenizationStep extends AbstractPipelineStep {
 	@Override
 	protected void component_init() {
 		
-		validateParameters();
+		validateParameters();		
+		setFilters();
 	}
 				
 	private void validateParameters() {

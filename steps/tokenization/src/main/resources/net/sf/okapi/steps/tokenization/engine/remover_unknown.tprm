@@ -1,4 +1,4 @@
- #v1
+#v1
 RuleCount.i=1
 
 Rule0.name=UnknownCleaner
@@ -7,7 +7,7 @@ Rule0.inTokens=UNKNOWN
 Rule0.outTokens=
 Rule0.userTokens=
 Rule0.lexemId.i=0
-Rule0.rule=
+Rule0.pattern=
 Rule0.languageMode.i=0
 Rule0.languageWhiteList=
 Rule0.languageBlackList=
