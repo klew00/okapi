@@ -93,6 +93,12 @@
         	<scope>compile</scope>
         </dependency>
         <dependency>
+        	<groupId>net.sf.okapi.filters</groupId>
+        	<artifactId>okapi-filter-openxml</artifactId>
+        	<version>${project.version}</version>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
         	<groupId>net.sf.okapi.steps</groupId>
         	<artifactId>okapi-step-common</artifactId>
         	<version>${project.version}</version>

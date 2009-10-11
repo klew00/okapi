@@ -1057,7 +1057,8 @@ public class TextFragment implements Comparable<Object> {
 			if ( j > 0 ) {
 				if (( codes == null ) || ( j < codes.size() )) {
 					throw new InvalidContentException(
-						String.format("Markers in coded text: %d. Listed codes: %d ", j, codes.size()));
+						String.format("Markers in coded text: %d. Listed codes: %d. New text=\"%s\" ",
+							j, codes.size(), newCodedText));
 				}
 			}
 		}

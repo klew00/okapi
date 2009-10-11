@@ -45,6 +45,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -56,6 +57,7 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.formatconversion.FormatConversionStep;
@@ -81,6 +83,7 @@ public class Main {
 	protected final static int CMD_CONV2TMX = 5;
 	protected final static int CMD_CONV2TABLE = 6;
 	protected final static int CMD_CONV2PEN = 7;
+	protected final static int CMD_TRANSLATE = 8;
 	
 	private static final String DEFAULT_SEGRULES = "-";
 
@@ -116,6 +119,8 @@ public class Main {
 	protected String segRules;
 	protected boolean showTraceHint = true;
 	protected String tmOptions;
+	protected boolean levOptFillTarget = false;
+	protected String levOptTMXPath;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -201,6 +206,9 @@ public class Main {
 				else if ( arg.equals("-x") ) {
 					prog.command = CMD_EXTRACT;
 				}
+				else if ( arg.equals("-t") ) {
+					prog.command = CMD_TRANSLATE;
+				}
 				else if ( arg.equals("-m") ) {
 					prog.command = CMD_MERGE;
 				}
@@ -227,6 +235,17 @@ public class Main {
 				}
 				else if ( arg.equals("-tmx") ) {
 					prog.tableConvCodes = TableFilterWriterParameters.INLINE_TMX;
+				}
+				else if ( arg.equals("-nofill") ) {
+					prog.levOptFillTarget = false;
+				}
+				else if ( arg.equals("-maketmx") ) {
+					prog.levOptTMXPath = "pretrans.tmx";
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							prog.levOptTMXPath = args.get(++i);
+						}
+					}
 				}
 				else if ( arg.equals("-trgsource") ) {
 					prog.convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_FORCESOURCE;
@@ -611,37 +630,24 @@ public class Main {
 		File file;
 		
 		switch ( command ) {
-//		case CMD_EXTRACT:
-//			guessMissingParameters(input);
-//			if ( !prepareFilter(configId) ) return; // Next input
-//			
-//			file = new File(input);
-//			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
-//			rd.setFilterConfigId(configId);
-//			
-//			ps.println("Source language: "+srcLang);
-//			ps.print("Target language: ");
-//			ps.println(trgLang);
-//			ps.println(" Input encoding: "+inputEncoding);
-//			ps.println("  Configuration: "+configId);
-//			ps.println(" Input document: "+input);
-//			ps.print("Output document: ");
-//			if ( output == null ) ps.println("<auto-defined>");
-//			else ps.println(output);
-//			ps.print("Extaction...");
-//			
-//			XLIFFExtractionStep stepExt = new XLIFFExtractionStep(fcMapper);
-//			stepExt.handleRawDocument(rd);
-//			ps.println(" Done");
-//			break;
-		
+		case CMD_TRANSLATE:
+			guessMissingParameters(input);
+			if ( !prepareFilter(configId) ) return; // Next input
+			file = new File(input);
+			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
+			rd.setFilterConfigId(configId);
+			ps.println("Translation");
+			translateFile(rd);
+			ps.println("Done");
+			break;
+			
 		case CMD_EXTRACT:
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			rd.setFilterConfigId(configId);
-			ps.println("Extaction");
+			ps.println("Extraction");
 			extractFile(rd);
 			ps.println("Done");
 			break;
@@ -757,13 +763,18 @@ public class Main {
 		ps.println("Edit or view filter configurations (UI-dependent command):");
 		ps.println("   -e [[-fc] configId]");
 		ps.println("Extract a file to XLIFF (and optionally segment and pre-translate):");
-		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg [srxFile]]");
-		ps.println("      [-tt hostname[:port]|-mm key|-pen tmDirectory|-gs configFile");
-		ps.println("      |-google|-apertium [serverURL]]");
+		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl sourceLang]");
+		ps.println("      [-tl targetLang] [-seg [srxFile]] [-tt hostname[:port]");
+		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
+		ps.println("      [-maketmx [tmxFile]] [-opt threshold[:maxhits]]");
 		ps.println("Merge an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl sourceLang] [-tl targetLang]");
+		ps.println("Translate a file:");
+		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
+		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg [srxFile]] [-tt hostname[:port]");
+		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
+		ps.println("      [-maketmx [tmxFile]] [-opt threshold[:maxhits]]");
 		ps.println("Query translation resources:");
 		ps.println("   -q \"source text\" [-sl sourceLang] [-tl targetLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
@@ -969,6 +980,60 @@ public class Main {
 		driver.processBatch();
 	}
 
+	private IPipelineStep addSegmentationStep () {
+		if ( segRules.equals(DEFAULT_SEGRULES) ) { // Defaults
+			segRules = getRootDirectory();
+			segRules += File.separator + "config" + File.separator + "defaultSegmentation.srx";
+		}
+		else {
+			if ( Util.isEmpty(Util.getExtension(segRules)) ) {
+				segRules += ".srx";
+			}
+		}
+		SegmentationStep segStep = new SegmentationStep();
+		net.sf.okapi.steps.segmentation.Parameters segParams
+			= (net.sf.okapi.steps.segmentation.Parameters)segStep.getParameters();
+		segParams.segmentSource = true;
+		segParams.segmentTarget = true;
+		File f = new File(segRules);
+		segParams.sourceSrxPath = f.getAbsolutePath();
+		segParams.targetSrxPath = f.getAbsolutePath();
+		ps.println("Segmentation: " + segRules);
+		return segStep;
+	}
+
+	private IPipelineStep addLeveragingStep () {
+		LeveragingStep levStep = new LeveragingStep();
+		net.sf.okapi.steps.leveraging.Parameters levParams
+			= (net.sf.okapi.steps.leveraging.Parameters)levStep.getParameters();
+		if ( usePensieve ) {
+			levParams.setResourceClassName(PensieveTMConnector.class.getName());
+		}
+		else if ( useTransToolkit ) {
+			levParams.setResourceClassName(TranslateToolkitTMConnector.class.getName());
+		}
+		else if ( useMyMemory ) {
+			levParams.setResourceClassName(MyMemoryTMConnector.class.getName());
+		}
+		else if ( useGoogle ) {
+			levParams.setResourceClassName(GoogleMTConnector.class.getName());
+		}
+		else if ( useGlobalSight ) {
+			levParams.setResourceClassName(GlobalSightTMConnector.class.getName());
+		}
+		else if ( useApertium ) {
+			levParams.setResourceClassName(ApertiumMTConnector.class.getName());
+		}
+		IParameters p = prepareConnectorParameters(levParams.getResourceClassName());
+		if ( p != null ) levParams.setResourceParameters(p.toString());
+		levParams.setFillTarget(levOptFillTarget);
+		if ( levOptTMXPath != null ) {
+			levParams.setMakeTMX(true);
+			levParams.setTMXPath(levOptTMXPath);
+		}
+		return levStep;
+	}
+
 	private void extractFile (RawDocument rd) throws URISyntaxException {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
@@ -980,54 +1045,13 @@ public class Main {
 		
 		// Add segmentation step if requested
 		if ( segRules != null ) {
-			if ( segRules.equals(DEFAULT_SEGRULES) ) { // Defaults
-				segRules = getRootDirectory();
-				segRules += File.separator + "config" + File.separator + "defaultSegmentation.srx";
-			}
-			else {
-				if ( Util.isEmpty(Util.getExtension(segRules)) ) {
-					segRules += ".srx";
-				}
-			}
-			SegmentationStep segStep = new SegmentationStep();
-			net.sf.okapi.steps.segmentation.Parameters segParams
-				= (net.sf.okapi.steps.segmentation.Parameters)segStep.getParameters();
-			segParams.segmentSource = true;
-			segParams.segmentTarget = true;
-			File f = new File(segRules);
-			segParams.sourceSrxPath = f.getAbsolutePath();
-			segParams.targetSrxPath = f.getAbsolutePath();
-			driver.addStep(segStep);
-			ps.println("Segmentation: " + segRules);
+			driver.addStep(addSegmentationStep());
 		}
 		
 		// Add leveraging step if requested
 		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve
 				|| useGlobalSight || useApertium ) {
-			LeveragingStep levStep = new LeveragingStep();
-			net.sf.okapi.steps.leveraging.Parameters levParams
-				= (net.sf.okapi.steps.leveraging.Parameters)levStep.getParameters();
-			if ( usePensieve ) {
-				levParams.setResourceClassName(PensieveTMConnector.class.getName());
-			}
-			else if ( useTransToolkit ) {
-				levParams.setResourceClassName(TranslateToolkitTMConnector.class.getName());
-			}
-			else if ( useMyMemory ) {
-				levParams.setResourceClassName(MyMemoryTMConnector.class.getName());
-			}
-			else if ( useGoogle ) {
-				levParams.setResourceClassName(GoogleMTConnector.class.getName());
-			}
-			else if ( useGlobalSight ) {
-				levParams.setResourceClassName(GlobalSightTMConnector.class.getName());
-			}
-			else if ( useApertium ) {
-				levParams.setResourceClassName(ApertiumMTConnector.class.getName());
-			}
-			IParameters p = prepareConnectorParameters(levParams.getResourceClassName());
-			if ( p != null ) levParams.setResourceParameters(p.toString());
-			driver.addStep(levStep);
+			driver.addStep(addLeveragingStep());
 		}
 		
 		// Filter events to raw document final step (using the XLIFF writer)
@@ -1044,6 +1068,44 @@ public class Main {
 		}
 		tmp += ".xlf";
 		driver.addBatchItem(rd, new URI(tmp), outputEncoding);
+
+		// Process
+		driver.processBatch();
+	}
+
+	private void translateFile (RawDocument rd) throws URISyntaxException {
+		// Create the driver
+		PipelineDriver driver = new PipelineDriver();
+		driver.setFilterConfigurationMapper(fcMapper);
+
+		// Raw document to filter events step 
+		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
+		driver.addStep(rd2feStep);
+		
+		// Add segmentation step if requested
+		if ( segRules != null ) {
+			driver.addStep(addSegmentationStep());
+		}
+		
+		// Add leveraging step
+		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve
+			|| useGlobalSight || useApertium ) {
+			driver.addStep(addLeveragingStep());
+		}
+		else { // Or indicate that we won't translate
+			ps.println("No valid translation resource has been specified: The text will not be modified.");
+		}
+		
+		// Filter events to raw document final step
+		FilterEventsToRawDocumentStep ferdStep = new FilterEventsToRawDocumentStep();
+		driver.addStep(ferdStep);
+
+		// Create the raw document and set the output
+		String tmp = rd.getInputURI().toString(); //getRawPath();
+		String ext = Util.getExtension(tmp);
+		int n = tmp.lastIndexOf('.');
+		output = tmp.substring(0, n) + ".out" + ext;
+		driver.addBatchItem(rd, new URI(output), outputEncoding);
 
 		// Process
 		driver.processBatch();

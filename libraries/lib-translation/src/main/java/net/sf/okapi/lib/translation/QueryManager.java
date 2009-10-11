@@ -25,10 +25,13 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -40,6 +43,8 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class QueryManager {
 
+	private final Logger logger = Logger.getLogger(getClass().getName());
+	
 	private LinkedHashMap<Integer, ResourceItem> resList;
 	private ArrayList<QueryResult> results;
 	private int current = -1;
@@ -49,6 +54,8 @@ public class QueryManager {
 	private LinkedHashMap<String, String> attributes;
 	private int threshold = 75;
 	private int maxHits = 5;
+	private int totalSegments;
+	private int leveragedSegments;
 	
 	/**
 	 * Creates a new QueryManager object.
@@ -367,9 +374,12 @@ public class QueryManager {
 	/**
 	 * Leverages a text unit (segmented or not) based on the current settings.
 	 * Any options or attributes needed must be set before calling this method.
-	 * @param tu The text unit to modify.
+	 * @param tu the text unit to leverage.
+	 * @param tmxWriter TMX writer object where to also write the results (can be null).
 	 */
-	public void leverage (TextUnit tu) {
+	public void leverage (TextUnit tu,
+		TMXWriter tmxWriter)
+	{
 		if ( !tu.isTranslatable() ) return;
 		
 		TextContainer tc = tu.getSource().clone();
@@ -377,10 +387,12 @@ public class QueryManager {
 		QueryResult qr;
 		int count;
 		int leveraged = 0;
+		boolean makeSS = false;
 		
 		if ( tc.isSegmented() ) {
 			List<Segment> segList = tc.getSegments();
 			for (Segment segment : segList) {
+				totalSegments++;
 				count = query(segment.text);
 				if ( count == 0 ) {
 					scores.add(0);
@@ -397,23 +409,24 @@ public class QueryManager {
 						}
 						// If we do: Use the first one and lower the score to 99%
 						scores.add(99);
-						segment.text = qr.target;
+						segment.text = adjustNewFragment(segment.text, qr.target, true, tu);
 						leveraged++;
 						continue;
 					}
 					// Else: First is 100%, possibly several that have the same translations
 					scores.add(qr.score); // That's 100% then
-					segment.text = qr.target;
+					segment.text = adjustNewFragment(segment.text, qr.target, true, tu);
 					leveraged++;
 					continue;
 				}
 				// First is not 100%: use it and move on
 				scores.add(qr.score);
-				segment.text = qr.target;
+				segment.text = adjustNewFragment(segment.text, qr.target, true, tu);
 				leveraged++;
 			}
 		}
 		else { // Case of un-segmented entries
+			totalSegments++;
 			count = query(tc);
 			if ( count == 0 ) {
 				scores.add(0);
@@ -424,10 +437,7 @@ public class QueryManager {
 				if ( qr.score < 100 ) {
 					scores.add(qr.score);
 					tc.setCodedText(qr.target.getCodedText(), false);
-					// Un-segmented entries that we have leveraged should be like
-					// a text unit with a single segment
-					makeSingleSegment(tu);
-					leveraged++;
+					makeSS = true;
 				}
 				// Else: one or more matches, first is 100%
 				// Check if they are several and if they have the same translation
@@ -439,29 +449,36 @@ public class QueryManager {
 						// If we do: Use the first one and lower the score to 99%
 						scores.add(99);
 						tc.setCodedText(qr.target.getCodedText(), false);
-						// Un-segmented entries that we have leveraged should be like
-						// a text unit with a single segment
-						makeSingleSegment(tu);
-						leveraged++;
+						makeSS = true;
 					}
 				}
 				// Else: Only one 100% or several that have the same translations
 				else {
 					scores.add(qr.score); // That's 100% then
 					tc.setCodedText(qr.target.getCodedText(), false);
-					// Un-segmented entries that we have leveraged should be like
-					// a text unit with a single segment
-					makeSingleSegment(tu);
-					leveraged++;
+					makeSS = true;
 				}
 			}
 		}
 
 		// Set the scores only if there is something to report
-		if ( leveraged > 0 ) {
+		if (( leveraged > 0 ) || makeSS ) {
+			leveragedSegments++;
+			// Set the target and attach the score
 			tc.setAnnotation(scores);
-			tu.setTarget(trgLang, tc);			
+			tu.setTarget(trgLang, tc);
+			if ( makeSS ) {
+				// Un-segmented entries that we have leveraged should be like
+				// a text unit with a single segment
+				makeSingleSegment(tu);
+				leveraged++;
+			}
+			
+			if ( tmxWriter != null ) {
+				tmxWriter.writeItem(tu, null);
+			}
 		}
+		
 	}
 	
 	private boolean exactsHaveSameTranslation () {
@@ -488,39 +505,128 @@ public class QueryManager {
 		if ( tc == null ) tc = tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
 		tc.createSegment(0, -1);
 	}
-	
-	/**
-	 * Saves all the settings to a file.
-	 * @param path Full path of the file to save.
-	 */
-/*	This method is not used can does not work
-    public void save (String path) {
-		XMLWriter writer = null;
-		try {
-			writer = new XMLWriter();
-			writer.writeStartDocument();
-			writer.writeStartElement("okapiQMSettings");
-			writer.writeAttributeString("version", "1.0");
 
-			ResourceItem ri;
-			for ( int id : resList.keySet() ) {
-				ri = resList.get(id);
-				writer.writeStartElement("resource");
-				writer.writeAttributeString("id", String.valueOf(id));
-				writer.writeAttributeString("name", ri.name);
-//				writer.writeAttributeString("params", ri.query.getParameters().toString());
-				//TODO: save options, etc
-				writer.writeEndElement(); // resource
+	/**
+	 * Adjusts the inline codes of a new text fragment based on an original one.
+	 * @param oriFrag the original text fragment.
+	 * @param newFrag the new text fragment.
+	 * @param parent the parent text unit (used for error information only)
+	 * @return the new text fragment
+	 */
+	public TextFragment  adjustNewFragment (TextFragment oriFrag,
+		TextFragment newFrag,
+		boolean removeExtra,
+		TextUnit parent)
+	{
+		// If both new and original have no code, return the new fragment
+		if ( !newFrag.hasCode() && !oriFrag.hasCode() ) {
+			return newFrag;
+		}
+		List<Code> oriCodes = oriFrag.getCodes();
+		List<Code> newCodes = newFrag.getCodes();
+		
+		int[] oriIndices = new int[oriCodes.size()];
+		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
+		
+		int done = 0;
+		boolean orderWarning;
+		Code newCode, oriCode;
+//		StringBuilder text = new StringBuilder(newFrag.getCodedText());
+		
+//		for ( int i=0; i<text.length(); i++ ) {
+//			if ( !TextFragment.isMarker(text.charAt(i)) ) {
+//				continue;
+//			}
+//			
+//			newCode = newFrag.getCode(text.charAt(++i));
+//			newCode.setOuterData(null); // Remove outer codes
+//
+//			// Get the data from the original code (match on id)
+//			oriCode = null;
+//			orderWarning = true;
+//			for ( int j=0; j<oriIndices.length; j++ ) {
+//				if ( oriIndices[j] == -1) continue; // Used already
+//				if ( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ) {
+//					oriCode = oriCodes.get(oriIndices[j]);
+//					oriIndices[j] = -1;
+//					done++;
+//					break;
+//				}
+//				if ( orderWarning ) {
+//					logger.warning(String.format("The target code id='%d' has been moved (item id='%s', name='%s')",
+//						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
+//					orderWarning = false; 
+//				}
+//			}
+//		}
+		
+		for ( int i=0; i<newCodes.size(); i++ ) {
+			newCode = newCodes.get(i);
+			newCode.setOuterData(null); // Remove XLIFF outer codes if needed
+
+			// Get the data from the original code (match on id)
+			oriCode = null;
+			orderWarning = true;
+			for ( int j=0; j<oriIndices.length; j++ ) {
+				if ( oriIndices[j] == -1) continue; // Used already
+				if ( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ) {
+					oriCode = oriCodes.get(oriIndices[j]);
+					oriIndices[j] = -1;
+					done++;
+					break;
+				}
+				if ( orderWarning ) {
+					logger.warning(String.format("The target code id='%d' has been moved (item id='%s', name='%s')",
+						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
+					orderWarning = false; 
+				}
 			}
 			
-			writer.writeEndElement(); // okapiQMSettings
-		}
-		finally {
-			if ( writer != null ) {
-				writer.writeEndDocument();
-				writer.close();
+			if ( oriCode == null ) { // Not found in original (extra in target)
+				if (( newCode.getData() == null )
+					|| ( newCode.getData().length() == 0 )) {
+					// Leave it like that
+					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
+						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
+				}
+				
+			}
+			else { // A code with same ID existed in the original
+				// Get the data from the original
+				newCode.setData(oriCode.getData());
+				newCode.setOuterData(oriCode.getOuterData());
+				newCode.setReferenceFlag(oriCode.hasReference());
 			}
 		}
+		
+		// If needed, check for missing codes in new fragment
+		if ( oriCodes.size() > done ) {
+			// Any index > -1 in source means it was was deleted in target
+			for ( int i=0; i<oriIndices.length; i++ ) {
+				if ( oriIndices[i] != -1 ) {
+					Code code = oriCodes.get(oriIndices[i]);
+					if ( !code.isDeleteable() ) {
+						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+							code.getId(), code.getData(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
+						logger.info("Source='"+parent.getSource().toString()+"'");
+					}
+				}
+			}
+		}
+		
+		return newFrag;
 	}
-*/
+
+	public void resetCounters () {
+		totalSegments = 0;
+		leveragedSegments = 0;
+	}
+	
+	public int getTotalSegments () {
+		return totalSegments;
+	}
+	
+	public int getLeveragedSegments () {
+		return leveragedSegments;
+	}
 }

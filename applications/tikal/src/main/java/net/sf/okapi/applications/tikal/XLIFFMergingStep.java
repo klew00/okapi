@@ -244,6 +244,7 @@ public class XLIFFMergingStep {
 		int[] oriIndices = new int[oriCodes.size()];
 		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
 		int done = 0;
+		boolean orderWarning;
 		
 		Code transCode, oriCode;
 		for ( int i=0; i<transCodes.size(); i++ ) {
@@ -252,6 +253,7 @@ public class XLIFFMergingStep {
 
 			// Get the data from the original code (match on id)
 			oriCode = null;
+			orderWarning = true;
 			for ( int j=0; j<oriIndices.length; j++ ) {
 				if ( oriIndices[j] == -1) continue; // Used already
 				if ( oriCodes.get(oriIndices[j]).getId() == transCode.getId() ) {
@@ -259,6 +261,11 @@ public class XLIFFMergingStep {
 					oriIndices[j] = -1;
 					done++;
 					break;
+				}
+				if ( orderWarning ) {
+					logger.warning(String.format("The target code id='%d' has been moved (item id='%s', name='%s')",
+						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
+					orderWarning = false; 
 				}
 			}
 			if ( oriCode == null ) { // Not found in original (extra in target)

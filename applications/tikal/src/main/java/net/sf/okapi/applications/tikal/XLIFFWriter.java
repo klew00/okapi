@@ -176,9 +176,6 @@ public class XLIFFWriter implements IFilterWriter {
 		
 		inFile = true;
 
-//		writer.writeStartElement("header");
-//		writer.writeEndElement(); // header
-		
 		writer.writeStartElement("body");
 		writer.writeLineBreak();
 	}

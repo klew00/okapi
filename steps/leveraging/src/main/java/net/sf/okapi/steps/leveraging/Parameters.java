@@ -23,10 +23,17 @@ package net.sf.okapi.steps.leveraging;
 import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
+
+	private static final String FILLTARGET = "fillTarget";
+	private static final String MAKETMX = "makeTMX";
+	private static final String TMXPATH = "tmxPath";
 	
 	private String resourceClassName;
 	private String resourceParameters;
 	private int threshold;
+	private boolean fillTarget;
+	private boolean makeTMX;
+	private String tmxPath;
 	
 	public Parameters () {
 		reset();
@@ -56,10 +63,37 @@ public class Parameters extends BaseParameters {
 		this.threshold = threshold;
 	}
 
+	public boolean getFillTarget () {
+		return fillTarget;
+	}
+
+	public void setFillTarget (boolean fillTarget) {
+		this.fillTarget = fillTarget;
+	}
+
+	public boolean getMakeTMX () {
+		return makeTMX;
+	}
+
+	public void setMakeTMX (boolean makeTMX) {
+		this.makeTMX = makeTMX;
+	}
+
+	public String getTMXPath () {
+		return tmxPath;
+	}
+
+	public void setTMXPath (String tmxPath) {
+		this.tmxPath = tmxPath;
+	}
+
 	public void reset() {
 		resourceClassName = "net.sf.okapi.connectors.pensieve.PensieveTMConnector";
 		resourceParameters = null;
 		threshold = 95;
+		fillTarget = true;
+		makeTMX = false;
+		tmxPath = "pretrans.tmx";
 	}
 
 	public void fromString (String data) {
@@ -68,6 +102,9 @@ public class Parameters extends BaseParameters {
 		resourceClassName = buffer.getString("resourceClassName", resourceClassName);
 		resourceParameters = buffer.getGroup("resourceParameters", resourceParameters);
 		threshold = buffer.getInteger("threshold", threshold);
+		fillTarget = buffer.getBoolean(FILLTARGET, fillTarget);
+		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
+		tmxPath = buffer.getString(TMXPATH, tmxPath);
 	}
 
 	@Override
@@ -76,6 +113,9 @@ public class Parameters extends BaseParameters {
 		buffer.setString("resourceClassName", resourceClassName);
 		buffer.setGroup("resourceParameters", resourceParameters);
 		buffer.setInteger("threshold", threshold);
+		buffer.setBoolean(FILLTARGET, fillTarget);
+		buffer.setBoolean(MAKETMX, makeTMX);
+		buffer.setString(TMXPATH, tmxPath);
 		return buffer.toString();
 	}
 

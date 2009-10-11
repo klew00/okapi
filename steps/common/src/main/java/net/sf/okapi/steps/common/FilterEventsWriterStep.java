@@ -33,7 +33,6 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.StartDocument;
 
 /**
  * Outputs filters events into a document.

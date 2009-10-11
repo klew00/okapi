@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -40,6 +41,7 @@ public class LeveragingStep extends BasePipelineStep {
 	private String sourceLanguage;
 	private String targetLanguage;
 	private QueryManager qm;
+	private TMXWriter tmxWriter;
 
 	public LeveragingStep () {
 		params = new Parameters();
@@ -83,6 +85,12 @@ public class LeveragingStep extends BasePipelineStep {
 			qm.addAndInitializeResource(connector, connector.getName(), tmp);
 			logger.info("Leveraging settings: "+connector.getName());
 			logger.info(connector.getSettingsDisplay());
+			
+			if ( params.getMakeTMX() ) {
+				tmxWriter = new TMXWriter(params.getTMXPath());
+				tmxWriter.writeStartDocument(sourceLanguage, targetLanguage,
+					getClass().getName(), "", "sentence", "undefined", "undefined");
+			}
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException("Error creating a connector.", e);
@@ -101,6 +109,17 @@ public class LeveragingStep extends BasePipelineStep {
 	}
 	
 	@Override
+	protected void handleStartDocument (Event event) {
+		qm.resetCounters();
+	}
+
+	@Override
+	protected void handleEndDocument (Event event) {
+		logger.info(String.format("    Total segments = %d", qm.getTotalSegments()));
+		logger.info(String.format("Leveraged segments = %d", qm.getLeveragedSegments()));
+	}
+	
+	@Override
 	protected void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		if ( !tu.isTranslatable() ) return;
@@ -110,10 +129,11 @@ public class LeveragingStep extends BasePipelineStep {
     	if ( prop != null ) {
     		if ( "yes".equals(prop.getValue()) ) approved = true;
     	}
-    	if ( approved ) return; // Do not translate pre-approved entries
+    	if ( approved ) return; // Do not leverage pre-approved entries
 
     	// Leverage
-		qm.leverage(tu);
+		qm.leverage(tu, tmxWriter);
+		
 	}
 
 	@Override
@@ -121,6 +141,11 @@ public class LeveragingStep extends BasePipelineStep {
 		if ( qm != null ) {
 			qm.close();
 			qm = null;
+		}
+		if ( tmxWriter != null ) {
+			tmxWriter.writeEndDocument();
+			tmxWriter.close();
+			tmxWriter = null;
 		}
 	}
 

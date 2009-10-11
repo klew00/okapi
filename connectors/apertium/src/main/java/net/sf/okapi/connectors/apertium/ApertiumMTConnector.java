@@ -190,7 +190,7 @@ public class ApertiumMTConnector implements IQuery {
 	}
 
 	private String toInternalCode (String standardCode) {
-		String[] codes = Util.splitLanguageCode(standardCode);
+		String[] codes = Util.splitLanguageCode(standardCode.toLowerCase());
 		if ( codes[1] != null ) {
 			// Temporary fix for the Aranese case (until we get real LocaleID)
 			if ( codes[1].equals("aran") ) codes[0] += "_aran";
