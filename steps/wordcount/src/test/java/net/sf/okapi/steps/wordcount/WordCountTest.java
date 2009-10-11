@@ -16,7 +16,7 @@ public class WordCountTest {
 		
 		assertEquals(5, WordCounter.getCount("Test word count is correct.", "en"));
 		assertEquals(9, WordCounter.getCount("The quick (\"brown\") fox can't jump 32.3 feet, right?", "en"));
-		assertEquals(9, WordCounter.getCount("The quick (“brown”) fox can’t jump 32.3 feet, right?", "en"));
+		assertEquals(9, WordCounter.getCount("The quick (\u201Cbrown\u201D) fox can\u2019t jump 32.3 feet, right?", "en"));
 	}
 	
 }
