@@ -115,11 +115,12 @@ public class MyMemoryTMConnector implements ITMQuery {
 		}
 	}
 
-	// Assumes results are reset and emptiness checked
-	private int queryText (String text,
-		boolean hadCodes)
-	{
+	public int query (TextFragment frag) {
+		results.clear();
+		current = -1;
+		if ( !frag.hasText(false) ) return 0;
 		try {
+			String text = qutil.separateCodesFromText(frag);
 			Query query = new Query(null, text, srcLang, trgLang, null, params.getUseMT());
 			GetResponse gresp = otms.otmsGet(params.getKey(), query);
 			if ( gresp.isSuccess() ) {
@@ -129,16 +130,20 @@ public class MyMemoryTMConnector implements ITMQuery {
 				for ( Match match : matches ) {
 					if ( ++i > maxHits ) break; // Maximum reached
 					res = new QueryResult();
-					res.source = new TextFragment(match.getSegment());
-					res.target = new TextFragment(match.getTranslation());
-					res.score = match.getScore();
+					if ( match.getTranslator().equals("MT!") ) res.score = 95; // Standard score for MT
+					else res.score = match.getScore();
 					// To workaround bug in score calculation
 					// Score > 100 should be treated as 100 per Alberto's info.
 					if (res.score > 100 ) res.score = 100;
 					if ( res.score < getThreshold() ) break;
-					if ( hadCodes ) {
-						if ( res.score >= 100 ) res.score = 99;
-						else res.score--;
+					if ( qutil.hasCode() ) {
+						res.score--;
+						res.source = qutil.createNewFragmentWithCodes(match.getSegment());
+						res.target = qutil.createNewFragmentWithCodes(match.getTranslation());
+					}
+					else {
+						res.source = new TextFragment(match.getSegment());
+						res.target = new TextFragment(match.getTranslation());
 					}
 					results.add(res);
 				}
@@ -152,20 +157,10 @@ public class MyMemoryTMConnector implements ITMQuery {
 	}
 
 
-	public int query (String text) {
-		results.clear();
-		current = -1;
-		if ( Util.isEmpty(text) ) return 0;
-		return queryText(text, false);
+	public int query (String plainText) {
+		return query(new TextFragment(plainText));
 	}
 
-	public int query (TextFragment frag) {
-		results.clear();
-		current = -1;
-		if ( !frag.hasText(false) ) return 0;
-		return queryText(qutil.separateCodesFromText(frag), frag.hasCode());
-	}
-	
 	public void removeAttribute (String name) {
 		//TODO: use domain
 	}

@@ -631,60 +631,63 @@ public class Main {
 		
 		switch ( command ) {
 		case CMD_TRANSLATE:
+			ps.println("Translation");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			rd.setFilterConfigId(configId);
-			ps.println("Translation");
 			translateFile(rd);
-			ps.println("Done");
 			break;
 			
 		case CMD_EXTRACT:
+			ps.println("Extraction");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			rd.setFilterConfigId(configId);
-			ps.println("Extraction");
 			extractFile(rd);
-			ps.println("Done");
 			break;
 			
 		case CMD_MERGE:
+			ps.println("Merging");
 			guessMergingArguments(input);
 			guessMissingParameters(skeleton);
 			if ( !prepareFilter(configId) ) return; // Next input
 			XLIFFMergingStep stepMrg = new XLIFFMergingStep(fcMapper);
-
 			file = new File(skeleton);
 			RawDocument skelRawDoc = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
 			skelRawDoc.setFilterConfigId(configId);
 			stepMrg.setXliffPath(input);
 			stepMrg.setOutputPath(output);
 			stepMrg.setOutputEncoding(outputEncoding);
-			
 			ps.println("Source language: "+srcLang);
-			ps.print("Target language: ");
-			ps.println(trgLang);
-			ps.println(" Input encoding: "+inputEncoding);
+			ps.println("Target language: "+trgLang);
+			ps.println("Default input encoding: "+inputEncoding);
 			ps.println("Output encoding: "+outputEncoding);
-			ps.println("  Configuration: "+configId);
-			ps.println(" XLIFF document: "+input);
-			ps.print("Output document: ");
-			if ( output == null ) ps.println("<auto-defined>");
-			else ps.println(output);
-			ps.println("Merging");
-
+			ps.println("Filter configuration: "+configId);
+			ps.println("XLIFF: "+input);
+			ps.println(String.format("Output: %s", (output==null) ? "<auto-defined>" : output));
 			stepMrg.handleRawDocument(skelRawDoc);
-			ps.println("Done");
 			break;
 			
 		case CMD_CONV2PO:
 		case CMD_CONV2TMX:
 		case CMD_CONV2PEN:
 		case CMD_CONV2TABLE:
+			if ( command == CMD_CONV2PO ) {
+				ps.println("Conversion to PO");
+			}
+			else if ( command == CMD_CONV2TMX ) {
+				ps.println("Conversion to TMX");
+			}
+			else if ( command == CMD_CONV2TABLE ) {
+				ps.println("Conversion to Table");
+			}
+			else {
+				ps.println("Importing to Pensieve TM");
+			}
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			
@@ -708,27 +711,16 @@ public class Main {
 			
 			ps.println("Source language: "+srcLang);
 			ps.println("Target language: "+trgLang);
-			ps.println(" Input encoding: "+inputEncoding);
-			ps.println("  Configuration: "+configId);
-			ps.println(" Input document: "+input);
-			ps.println("Output document: "+output);
-			if ( command == CMD_CONV2PO ) {
-				ps.println("Conversion to PO");
-			}
-			else if ( command == CMD_CONV2TMX ) {
-				ps.println("Conversion to TMX");
-			}
-			else if ( command == CMD_CONV2TABLE ) {
-				ps.println("Conversion to Table");
-			}
-			else {
-				ps.println("Importing to Pensieve TM");
-			}
+			ps.println("Default input encoding: "+inputEncoding);
+			ps.println("Filter configuration: "+configId);
+			ps.println("Input: "+input);
+			ps.println("Output: "+output);
 			
 			convertFile(rd, outputURI);
-			ps.println("Done");
 			break;
 		}
+		ps.println("Done");
+		
 	}
 	
 	private void printBanner () {
@@ -1069,6 +1061,12 @@ public class Main {
 		tmp += ".xlf";
 		driver.addBatchItem(rd, new URI(tmp), outputEncoding);
 
+		ps.println("Source language: "+srcLang);
+		ps.println("Target language: "+trgLang);
+		ps.println("Default input encoding: "+inputEncoding);
+		ps.println("Filter configuration: "+configId);
+		ps.println("Output: "+tmp);
+
 		// Process
 		driver.processBatch();
 	}
@@ -1101,10 +1099,18 @@ public class Main {
 		driver.addStep(ferdStep);
 
 		// Create the raw document and set the output
-		String tmp = rd.getInputURI().toString(); //getRawPath();
+		String tmp = rd.getInputURI().toString();
 		String ext = Util.getExtension(tmp);
 		int n = tmp.lastIndexOf('.');
 		output = tmp.substring(0, n) + ".out" + ext;
+
+		ps.println("Source language: "+srcLang);
+		ps.println("Target language: "+trgLang);
+		ps.println("Default input encoding: "+inputEncoding);
+		ps.println("Output encoding: "+outputEncoding);
+		ps.println("Filter configuration: "+configId);
+		ps.println("Output: "+output);
+		
 		driver.addBatchItem(rd, new URI(output), outputEncoding);
 
 		// Process

@@ -46,6 +46,16 @@ public class QueryUtil {
 	}
 	
 	/**
+	 * Indicates if the last text fragment passed to {@link #separateCodesFromText(TextFragment)}
+	 * has codes or not.
+	 * @return true if the fragment has one or more code, false if it does not.
+	 */
+	public boolean hasCode () {
+		if ( codes == null ) return false;
+		return (codes.size() > 0);
+	}
+	
+	/**
 	 * Separate and store codes of a given text fragment.
 	 * @param frag the fragment to process. Use {@link #appendCodesToText(TextFragment, String)}
 	 * to reconstruct the text back with its codes at the end.

@@ -392,8 +392,14 @@ public class QueryManager {
 		if ( tc.isSegmented() ) {
 			List<Segment> segList = tc.getSegments();
 			for (Segment segment : segList) {
-				totalSegments++;
-				count = query(segment.text);
+				// Query if needed
+				if ( segment.text.hasText(false) ) {
+					totalSegments++;
+					count = query(segment.text);
+				}
+				else count = 0;
+				
+				// Process results
 				if ( count == 0 ) {
 					scores.add(0);
 					continue;
@@ -426,8 +432,14 @@ public class QueryManager {
 			}
 		}
 		else { // Case of un-segmented entries
-			totalSegments++;
-			count = query(tc);
+			// Query if needed
+			if ( tc.hasText(false) ) {
+				totalSegments++;
+				count = query(tc);
+			}
+			else count = 0;
+			
+			// Process results
 			if ( count == 0 ) {
 				scores.add(0);
 			}
@@ -477,8 +489,7 @@ public class QueryManager {
 			if ( tmxWriter != null ) {
 				tmxWriter.writeItem(tu, null);
 			}
-		}
-		
+		}	
 	}
 	
 	private boolean exactsHaveSameTranslation () {
