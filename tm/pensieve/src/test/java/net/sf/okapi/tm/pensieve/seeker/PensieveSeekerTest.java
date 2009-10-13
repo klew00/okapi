@@ -403,8 +403,8 @@ public class PensieveSeekerTest {
     	frag.append(TagType.CLOSING, "b", "</b>");
     	frag.append(" rabbit");
     	
-    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
-    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
     	writer.endIndex();
     	
     	tmhits = seeker.searchExact(frag, 10, null);
@@ -422,8 +422,8 @@ public class PensieveSeekerTest {
     	frag.append(TagType.CLOSING, "b", "</b>");
     	frag.append(" rabbit");
     	
-    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
-    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
     	writer.endIndex();
     	
     	frag = new TextFragment("watch out for the killer rabbit");
@@ -443,9 +443,9 @@ public class PensieveSeekerTest {
     	frag.append(TagType.CLOSING, "b", "</b>");
     	frag.append(" rabbit");
     	
-    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str1)), TARGET));
-    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str2)), TARGET));
-    	writer.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str1)), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str2)), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
     	writer.endIndex();
     	
     	tmhits = seeker.searchFuzzy(frag, 5, 10, null);

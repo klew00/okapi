@@ -76,10 +76,10 @@ public class PensieveWriterTest {
 
     @Test
     public void constructorCreateNew2 () throws IOException {
-        tmWriter.indexTranslationUnit2(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
         tmWriter.endIndex();
         tmWriter = new PensieveWriter(dir, true);
-        tmWriter.indexTranslationUnit2(Helper.createTU("EN", "KR", "Joseph", "Yosep","2"));
+        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joseph", "Yosep","2"));
         tmWriter.endIndex();
         assertEquals("# of docs in tm", 1, tmWriter.getIndexWriter().numDocs());
     }
@@ -216,19 +216,19 @@ public class PensieveWriterTest {
 
     @Test(expected = NullPointerException.class)
     public void getDocumentNoSourceContent(){
-        tmWriter.getDocument(new TranslationUnit(null, new TranslationUnitVariant("EN",
+        tmWriter.createDocument(new TranslationUnit(null, new TranslationUnitVariant("EN",
                 new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
     public void getDocumentEmptySourceContent(){
-        tmWriter.getDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("")),
+        tmWriter.createDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("")),
                 new TranslationUnitVariant("EN", new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
     public void getDocumentNullTU(){
-        tmWriter.getDocument(null);
+        tmWriter.createDocument(null);
     }
 
     @Test
@@ -238,7 +238,7 @@ public class PensieveWriterTest {
                 new TranslationUnitVariant("FR", new TextFragment("someone")));
         Metadata md = tu.getMetadata();
         md.put(MetadataType.ID, "someId");
-        Document doc = tmWriter.getDocument(tu);
+        Document doc = tmWriter.createDocument(tu);
         assertEquals("Document's content field", "blah blah blah", getFieldValue(doc, SOURCE.name()));
         assertEquals("Document's content exact field", "blah blah blah", getFieldValue(doc, SOURCE_EXACT.name()));
         assertEquals("Document's target field", "someone", getFieldValue(doc, TARGET.name()));
@@ -279,7 +279,7 @@ public class PensieveWriterTest {
 
     @Test
     public void getDocumentNoTarget(){
-        Document doc = tmWriter.getDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("blah blah blah")), null));
+        Document doc = tmWriter.createDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("blah blah blah")), null));
         assertNull("Document's target field should be null", doc.getField(TARGET.name()));
     }
 
@@ -290,7 +290,7 @@ public class PensieveWriterTest {
 
     @Test(expected = NullPointerException.class)
     public void indexTranslationUnitNull2() throws IOException {
-        tmWriter.indexTranslationUnit2(null);
+        tmWriter.indexTranslationUnit(null);
     }
 
     @Test
@@ -313,7 +313,7 @@ public class PensieveWriterTest {
 
     @Test
     public void indexTextUnit2() throws IOException {
-        tmWriter.indexTranslationUnit2(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("joe")), new TranslationUnitVariant("EN", new TextFragment("schmoe"))));
+        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("joe")), new TranslationUnitVariant("EN", new TextFragment("schmoe"))));
         assertEquals("num of docs indexed", 1, tmWriter.getIndexWriter().numDocs());
     }
 

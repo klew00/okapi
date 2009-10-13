@@ -91,7 +91,7 @@ public class PensieveWriter implements ITmWriter {
         if (tu == null){
             throw new NullPointerException("TextUnit can not be null");
         }
-        indexWriter.addDocument(getDocument(tu));
+        indexWriter.addDocument(createDocument(tu));
     }
 
     /**
@@ -120,21 +120,21 @@ public class PensieveWriter implements ITmWriter {
         indexTranslationUnit(tu);
     }
 
-    Document getDocument(TranslationUnit tu) {
-        if (tu == null || tu.isSourceEmpty()){
-            throw new NullPointerException("source content not set");
-        }
-        Document doc = new Document();
-        doc.add(createField(TranslationUnitField.SOURCE, tu.getSource().getContent(), Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(createField(TranslationUnitField.SOURCE_LANG, tu.getSource(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(createField(TranslationUnitField.SOURCE_EXACT, tu.getSource().getContent(), Field.Store.NO, Field.Index.NOT_ANALYZED));
-        if (!tu.isTargetEmpty()){
-            doc.add(createField(TranslationUnitField.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
-            doc.add(createField(TranslationUnitField.TARGET_LANG, tu.getTarget(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        }
-        addMetadataToDocument(doc, tu.getMetadata());
-        return doc;
-    }
+//    Document getDocument(TranslationUnit tu) {
+//        if (tu == null || tu.isSourceEmpty()){
+//            throw new NullPointerException("source content not set");
+//        }
+//        Document doc = new Document();
+//        doc.add(createField(TranslationUnitField.SOURCE, tu.getSource().getContent(), Field.Store.YES, Field.Index.ANALYZED));
+//        doc.add(createField(TranslationUnitField.SOURCE_LANG, tu.getSource(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+//        doc.add(createField(TranslationUnitField.SOURCE_EXACT, tu.getSource().getContent(), Field.Store.NO, Field.Index.NOT_ANALYZED));
+//        if (!tu.isTargetEmpty()){
+//            doc.add(createField(TranslationUnitField.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
+//            doc.add(createField(TranslationUnitField.TARGET_LANG, tu.getTarget(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+//        }
+//        addMetadataToDocument(doc, tu.getMetadata());
+//        return doc;
+//    }
 
     Field createField(TranslationUnitField field,
                   TextFragment frag,
@@ -159,17 +159,17 @@ public class PensieveWriter implements ITmWriter {
     
     //=== Added for try out on inline code handling
 
-    /**
-     * Adds a {@link TranslationUnit} to the index.
-     * @param tu the translation unit to index.
-     * @throws IOException if the translation unit cannot be indexed.
-     */
-    public void indexTranslationUnit2 (TranslationUnit tu) throws IOException {
-    	if ( tu == null ) {
-    		throw new NullPointerException("TextUnit can not be null");
-    	}
-    	indexWriter.addDocument(createDocument(tu));
-    }
+//    /**
+//     * Adds a {@link TranslationUnit} to the index.
+//     * @param tu the translation unit to index.
+//     * @throws IOException if the translation unit cannot be indexed.
+//     */
+//    public void indexTranslationUnit2 (TranslationUnit tu) throws IOException {
+//    	if ( tu == null ) {
+//    		throw new NullPointerException("TextUnit can not be null");
+//    	}
+//    	indexWriter.addDocument(createDocument(tu));
+//    }
 
     /**
      * Creates a document for a given translation unit, including inline codes.
