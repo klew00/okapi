@@ -376,9 +376,11 @@ public class QueryManager {
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu the text unit to leverage.
 	 * @param tmxWriter TMX writer object where to also write the results (can be null).
+	 * @param fillTarget true to put the leveraged text into the target, false to not.
 	 */
 	public void leverage (TextUnit tu,
-		TMXWriter tmxWriter)
+		TMXWriter tmxWriter,
+		boolean fillTarget)
 	{
 		if ( !tu.isTranslatable() ) return;
 		
@@ -475,7 +477,6 @@ public class QueryManager {
 
 		// Set the scores only if there is something to report
 		if (( leveraged > 0 ) || makeSS ) {
-			leveragedSegments++;
 			// Set the target and attach the score
 			tc.setAnnotation(scores);
 			tu.setTarget(trgLang, tc);
@@ -485,9 +486,13 @@ public class QueryManager {
 				makeSingleSegment(tu);
 				leveraged++;
 			}
-			
+			leveragedSegments += leveraged;
+
 			if ( tmxWriter != null ) {
 				tmxWriter.writeItem(tu, null);
+			}
+			if ( !fillTarget ) {
+				tu.removeTarget(trgLang);
 			}
 		}	
 	}

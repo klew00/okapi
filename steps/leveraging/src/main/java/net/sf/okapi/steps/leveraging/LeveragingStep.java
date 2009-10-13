@@ -115,8 +115,8 @@ public class LeveragingStep extends BasePipelineStep {
 
 	@Override
 	protected void handleEndDocument (Event event) {
-		logger.info(String.format("    Total segments = %d", qm.getTotalSegments()));
-		logger.info(String.format("Leveraged segments = %d", qm.getLeveragedSegments()));
+		logger.info(String.format("Segments with text = %d", qm.getTotalSegments()));
+		logger.info(String.format("Segments leveraged = %d", qm.getLeveragedSegments()));
 	}
 	
 	@Override
@@ -132,7 +132,7 @@ public class LeveragingStep extends BasePipelineStep {
     	if ( approved ) return; // Do not leverage pre-approved entries
 
     	// Leverage
-		qm.leverage(tu, tmxWriter);
+		qm.leverage(tu, tmxWriter, params.getFillTarget());
 		
 	}
 

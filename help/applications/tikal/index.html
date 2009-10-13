@@ -18,6 +18,7 @@ localization-related utilities:</p>
 <ul>
 	<li><a href="#extract">Extract Files</a></li>
 	<li><a href="#merge">Merge Files</a></li>
+	<li><a href="#translate">Translate Files</a></li>
 	<li><a href="#query">Query Translation Resources</a></li>
 	<li><a href="#listConfig">List Filter Configurations</a></li>
 	<li><a href="#editConfig">Edit Filter Configurations</a></li>
@@ -97,7 +98,14 @@ XLIFF 1.2 specifications</a>.</p>
 		pre-translate the extracted document. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
-		time.</td>
+		time. Be also aware that some translation resources may not always 
+		provide a good handling of inline codes.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-maketmx [tmxFile]</code></td>
+		<td align="left" valign="top">Generates a TMX document with all the 
+		entries leveraged. You can specify the name of the document, if you do 
+		not it will be named <code>pretrans.tmx</code>.</td>
 	</tr>
 </table>
 <p>For example:</p>
@@ -165,6 +173,82 @@ and the merged file will be <code>myFile.out.html</code>.</p>
 <p>Merges all XLIFF documents in the directory. The original files should be in 
 the same directory as well. The source language is English and the target 
 language is German.</p>
+<h2><a name="translate"></a>Translate Files</h2>
+<p>This command creates a pre-translated version of the input files. It is 
+basically the same thing as running an <a href="#extract">Extraction command</a> 
+(with pre-translation) immediately followed by a <a href="#merge">Merge command</a>.</p>
+<p>By default, some extensions are mapped to a specific filter configuration 
+(for example: <code>.docx</code> to <code>okf_openxml</code>, <code>.odt</code> 
+to okf_openoffice, <code>.po</code> to <code>okf_po</code>, etc.). But you can define your own configuration and specify it as well 
+using the <code>-fc</code> option. To get a list 
+of all available filter configurations use the <a href="#listConfig">List 
+Configurations command</a>. For more details the filters available and their 
+configurations, see <a href="../../filters/index.html">each filter&#39;s documentation</a>.</p>
+<p>You can use the <code>-seg</code> option to specify that the extracted text 
+should be segmented. Use <code>-seg</code> without filename to use the default segmentation 
+rules, use &quot;<code>-seg myRules.srx</code>&quot; to specify your own rules. The rules 
+file must be in SRX format.</p>
+<p>The syntax of this command is:</p>
+<pre>-t [options] inputFile [inputFile2...]</pre>
+<p>Where the options are:</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table7">
+	<tr>
+		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top">The identifier of the filter configuration to use for the 
+		extraction.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top">The encoding name of the input files. this is used only if the 
+		filter cannot detect the encoding from the input file itself.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-oe encoding</code></td>
+		<td align="left" valign="top">The encoding name of the output file to generate. The same encoding as the 
+		input file will be used if this option is not specified.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top">The code of the source language of the input files.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top">The code of the target language for the output (also used in the 
+		input if the input documents are multilingual).</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-seg [srxFile]</code></td>
+		<td align="left" valign="top">
+		<p dir="ltr">The segmentation rules to utilize. To specify the default rules 
+		that come with the installation, use <code>-seg</code> without filename. 
+		The default rules are in <code>config/defaultSegmentation.srx</code> 
+		in your Okapi main directory.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-pen tmDirectory|<br>
+		-tt hostname[:port]|<br>
+		-mm key|<br>
+		-google|<br>
+		-apertium&nbsp;[serverURL]</code></td>
+		<td align="left" valign="top">A translation resource to use to 
+		translate the document. The leveraging occurs after 
+		segmentation, if you have specify segmentation rules.<p>Note that some 
+		internet-based resource may be slow and result in lengthy processing 
+		time. Be also aware that some translation resources may not always 
+		provide a good handling of inline codes.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top"><code>-maketmx [tmxFile]</code></td>
+		<td align="left" valign="top">Generates a TMX document with all the 
+		entries leveraged. You can specify the name of the document, if you do 
+		not it will be named <code>pretrans.tmx</code>.</td>
+	</tr>
+</table>
+<p>For example:</p>
+<pre>tikal -t *.html -sl en -tl eo -apertium</pre>
+<p dir="ltr">Translate from English to Esperanto all <code>.html</code> files in the current 
+directory, using the default Apertium MT demonstration server. No segmentation 
+is used.</p>
 <h2><a name="query"></a>Query Translation Resources</h2>
 <p>This command queries one or more translation resources for a given text. By 
 default the query is sent to the <a href="http://www.google.com/language_tools">

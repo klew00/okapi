@@ -119,7 +119,7 @@ public class Main {
 	protected String segRules;
 	protected boolean showTraceHint = true;
 	protected String tmOptions;
-	protected boolean levOptFillTarget = false;
+	protected boolean levOptFillTarget = true;
 	protected String levOptTMXPath;
 	
 	private FilterConfigurationMapper fcMapper;
