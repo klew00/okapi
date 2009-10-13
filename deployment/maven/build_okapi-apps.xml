@@ -299,6 +299,8 @@
 	
 	<target name="noWinStuff" unless="building-windows">
 		<delete file="${dist}/tikal.bat"/>
+		<delete file="${dist}/tikalPrompt.bat"/>
+		<delete file="${dist}/startTikalPrompt.bat"/>
 	</target>
 	<target name="winStuff" if="building-windows">
 		<delete file="${dist}/tikal.sh"/>

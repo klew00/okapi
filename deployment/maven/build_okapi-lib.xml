@@ -428,7 +428,8 @@
 
 		<!-- Copy batch/shell -->
 		<copy todir="${dist}">
-			<fileset dir="data/okapi-lib" includes="**/tikal.*"/>
+			<fileset dir="data/okapi-lib" includes="**/tikal*"/>
+			<fileset dir="data/okapi-lib" includes="**/startTikal*"/>
 		</copy>
 
 		<!-- Update and copy change log and readme -->
