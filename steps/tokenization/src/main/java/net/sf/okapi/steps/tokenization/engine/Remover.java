@@ -60,9 +60,11 @@ public class Remover extends AbstractLexer {
 				
 		Tokens wasteBin = new Tokens();
 		
-		for (LexerRule item : getRules()) {
+		for (LexerRule rule : getRules()) {
 
-			List<Integer> inTokenIDs = item.getInTokenIDs();
+			if (!checkRule(rule, language)) continue;
+			
+			List<Integer> inTokenIDs = rule.getInTokenIDs();
 			
 			for (Token token : tokens)			
 				if (inTokenIDs.contains(token.getTokenId())) // Remove listed tokens

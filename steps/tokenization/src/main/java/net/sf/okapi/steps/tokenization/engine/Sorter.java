@@ -62,8 +62,19 @@ public class Sorter extends AbstractLexer {
       	int s1 = token1.getLexem().getRange().start;
       	int s2 = token2.getLexem().getRange().start;
       	
-      	if (s1 < s2) return -1;        	
+      	if (s1 < s2) return -1;        	      	
       	if (s1 > s2) return 1;
+      	
+      	if (s1 == s2) {
+      		
+      		int e1 = token1.getLexem().getRange().end;
+          	int e2 = token2.getLexem().getRange().end;
+
+          	// Longer tokens go first
+      		if (e1 < e2) return 1;
+      		if (e1 > e2) return -1;
+      	}
+      	
       	return 0;
       }    
   };

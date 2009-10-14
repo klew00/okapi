@@ -20,10 +20,17 @@
 
 package net.sf.okapi.common;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Collection of helper functions for manipulating lists.
@@ -31,6 +38,8 @@ import java.util.List;
  * @version 0.1, 09.06.2009
  */
 public class ListUtil {
+
+	protected static final Logger logger = Logger.getLogger(ClassUtil.getClassName(ListUtil.class));
 	
 	/**
 	 * Splits up a string of comma-separated substrings into a string list of those substrings.
@@ -296,27 +305,29 @@ public class ListUtil {
 	}
 
 	@SuppressWarnings("unchecked") 
-	public static <E> List<E> copyItems(List<E> buffer, int start, int end) {
+	public static <E> List<E> copyItems(List<E> list, int start, int end) {
 		// No way to determine the actual type of E at compile time to cast newInstance(), so @SuppressWarnings("unchecked") 
 	
-		if (buffer == null) return null;
-		if (Util.isEmpty(buffer)) return null;
-		if (buffer.getClass() == null) return null;
+		if (list == null) return null;
+		if (Util.isEmpty(list)) return null;
+		if (list.getClass() == null) return null;
 		
 		List<E> res = null;
 			try {
-				res = buffer.getClass().newInstance();
+				res = list.getClass().newInstance();
 				
 			} catch (InstantiationException e) {
 				
-				e.printStackTrace();
+				logMessage(Level.FINE, "List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				return null;
 				
 			} catch (IllegalAccessException e) {
 				
-				e.printStackTrace();
+				logMessage(Level.FINE, "List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				return null;
 			}
 			
-			res.addAll(buffer.subList(start, end + 1));		
+			res.addAll(list.subList(start, end + 1));		
 					
 		return res;
 	}
@@ -350,4 +361,53 @@ public class ListUtil {
 
 		return null;		
 	}
+	
+	protected static void logMessage (Level level, String text) {
+		
+		if (logger != null)
+			logger.log(level, text);
+	}
+
+	public static List<String> loadList(Class<?> classRef, String resourceLocation) {
+		
+		List<String> res = new ArrayList<String>();
+		
+		loadList(res, classRef, resourceLocation);		
+		return res;
+	}
+	
+	public static void loadList(List<String> list, Class<?> classRef, String resourceLocation) {
+
+		if (list == null) return;
+		if (classRef == null) return;
+		if (Util.isEmpty(resourceLocation)) return;
+		
+		BufferedReader reader = null;
+		
+		try {
+			reader = new BufferedReader(new InputStreamReader(classRef.getResourceAsStream(resourceLocation), "UTF-8"));
+			
+		} catch (UnsupportedEncodingException e) {
+			
+			logMessage(Level.FINE, String.format("ListUtil.loadList() encoding problem of \"%s\": %s", resourceLocation, e.getMessage()));
+			return;
+		}
+		
+		try {
+			while (reader.ready()) {
+				
+				String line = reader.readLine();
+				if (line == null) break;
+				if (Util.isEmpty(line)) continue;
+				
+				if (!line.startsWith("#"))
+					list.add(line);
+			}
+		} catch (IOException e) {
+			
+			logMessage(Level.FINE, String.format("ListUtil.loadList() IO problem of \"%s\": %s", resourceLocation, e.getMessage()));
+			return;
+		}	
+	}
+	
 }

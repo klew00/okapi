@@ -20,47 +20,13 @@
 
 package net.sf.okapi.steps.tokenization.common;
 
-import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.lib.extra.AbstractParameters;
 
-public class RegexRuleItem extends AbstractParameters {
-
-	/**
-	 * 0-based index of the Java regex group in the parent rule. 
-	 */
-	private int groupIndex;
-	
-	/**
-	 * Token(s) to be generated for the text extracted by the group.
-	 */
-	private String groupOutTokens;
-	
-	/**
-	 * Java regex options. Composition of Pattern.CASE_INSENSITIVE, Pattern.MULTILINE, etc. flags.
-	 */
-	private int regexOptions;
-	
-	@Override
-	protected void parameters_load(ParametersString buffer) {
-		
-		groupIndex = buffer.getInteger("groupIndex", groupIndex);
-		groupOutTokens = buffer.getString("groupOutTokens", groupOutTokens);
-		regexOptions = buffer.getInteger("regexOptions", regexOptions);
-	}
+public class RegexRules extends LexerRules {
 
 	@Override
-	protected void parameters_reset() {
-		
-		groupIndex = 0;
-		groupOutTokens = ""; 
-		regexOptions = 0;
+	protected Class<? extends LexerRule> getRuleClass() {
+
+		return RegexRule.class;
 	}
 
-	@Override
-	protected void parameters_save(ParametersString buffer) {
-		
-		buffer.setInteger("groupIndex", groupIndex);
-		buffer.setString("groupOutTokens", groupOutTokens);
-		buffer.setInteger("regexOptions", regexOptions);
-	}
 }

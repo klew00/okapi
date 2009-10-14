@@ -29,14 +29,23 @@ import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.common.LexerRule;
+import net.sf.okapi.steps.tokenization.common.LexerRules;
+import net.sf.okapi.steps.tokenization.common.RegexRule;
+import net.sf.okapi.steps.tokenization.common.RegexRules;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class Recognizer extends AbstractLexer {
+public class TokenMatcher extends AbstractLexer {
 	 
-	 private List<LexerRule> rules;
-	 private HashMap<LexerRule, Pattern> patterns;  
+	private LexerRules rules;
+	private HashMap<LexerRule, Pattern> patterns;  
 	  
+	@Override
+		protected Class<? extends LexerRules> lexer_getRulesClass() {
+
+			return RegexRules.class;
+		}
+	 
 	@Override
 	protected boolean lexer_hasNext() {
 
@@ -46,15 +55,28 @@ public class Recognizer extends AbstractLexer {
 	@Override
 	protected void lexer_init() {
 		
+//		patterns = new HashMap<LexerRule, Pattern>();
+//		rules = getRules();
+//		
+//		for (LexerRule rule : rules) {
+//			
+//			Pattern pattern = Pattern.compile(rule.getPattern());
+//			patterns.put(rule, pattern);
+//		}
+		
 		patterns = new HashMap<LexerRule, Pattern>();
 		rules = getRules();
 		
-		for (LexerRule rule : rules) {
+		for (LexerRule item : rules) {
 			
-			Pattern pattern = Pattern.compile(rule.getPattern());
+			RegexRule rule = (RegexRule) item;
+			
+			Pattern pattern = null;
+			if (rule.getPattern() != null)
+				pattern = Pattern.compile(rule.getPattern(), rule.getRegexOptions());
+			
 			patterns.put(rule, pattern);
 		}
-							
 	}
 
 	@Override
@@ -73,8 +95,11 @@ public class Recognizer extends AbstractLexer {
 		Lexems lexems = new Lexems();
 		Tokens wasteBin = new Tokens();
 		
-		for (LexerRule rule : rules) {
+		for (LexerRule item : rules) {
 			
+			RegexRule rule = (RegexRule) item;
+			
+			if (!checkRule(rule, language)) continue;
 			List<Integer> inTokenIDs = rule.getInTokenIDs();
 			
 			Pattern pattern = patterns.get(rule);
@@ -88,7 +113,9 @@ public class Recognizer extends AbstractLexer {
 				    if (matcher.matches()) {
 				    	
 				    	lexems.add(new Lexem(rule.getLexemId(), token.getValue(), token.getRange()));
-				    	wasteBin.add(token); // Remove replaced token
+				    	
+				    	if (!rule.getKeepInput())
+				    		wasteBin.add(token); // Remove replaced token
 				    }
 				}
 		}

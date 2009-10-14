@@ -21,10 +21,12 @@
 package net.sf.okapi.steps.tokenization;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -52,10 +54,22 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class TokenizationStep extends AbstractPipelineStep {
 
+	public static final int RAWTEXT = -1;
+	
 	private Parameters params;
 	private StructureParameters structureParams;
 	
+	/**
+	 * Lexers generating lexems
+	 */
 	private List<ILexer> lexers = new ArrayList<ILexer>();
+	
+	/**
+	 * Lexers not generating lexems, but rather performing sorting, cleaning etc. service tasks
+	 */
+	private List<ILexer> serviceLexers = new ArrayList<ILexer>();
+	
+	private boolean allowNewRawText = true;
 	
 //	/**
 //	 * The lexers with no rules capable of processing the current set of languages and tokens specified by Parameters.
@@ -71,6 +85,11 @@ public class TokenizationStep extends AbstractPipelineStep {
 	private List<String> languageFilter = new ArrayList<String>();  
 	private List<Integer> tokenFilter = new ArrayList<Integer>();
 	private ArrayList<Integer> positions = new ArrayList<Integer> ();
+	
+	/**
+	 * Lexems for repeated processing (text that was extracted from other lexems and requires tokenization)
+	 */
+	private LinkedList<Lexem> rawtextLexems = new LinkedList<Lexem>();
 	
 	public TokenizationStep() {
 		
@@ -114,21 +133,31 @@ public class TokenizationStep extends AbstractPipelineStep {
 					if (!lexerRules.loadFromResource(lexer.getClass(), item.getRulesLocation())) continue;
 				
 				lexer.init();
-				lexers.add(lexer);
+				
+				if (lexerRules == null)
+					serviceLexers.add(lexer);
+				
+				else {
+				
+					if (lexerRules.hasOutTokens())
+						lexers.add(lexer);
+					else
+						serviceLexers.add(lexer);
+				}
 				
 			} catch (ClassNotFoundException e) {
 				
-				logMessage(Level.FINE, "Lexer instantialion falied: " + e.getMessage());
+				logMessage(Level.FINE, "Lexer instantiation falied: " + e.getMessage());
 				continue;
 				
 			} catch (InstantiationException e) {
 				
-				logMessage(Level.FINE, "Lexer instantialion falied: " + e.getMessage());
+				logMessage(Level.FINE, "Lexer instantiation falied: " + e.getMessage());
 				continue;
 				
 			} catch (IllegalAccessException e) {
 				
-				logMessage(Level.FINE, "Lexer instantialion falied: " + e.getMessage());
+				logMessage(Level.FINE, "Lexer instantiation falied: " + e.getMessage());
 				continue;
 			}				
 		}
@@ -230,6 +259,9 @@ public class TokenizationStep extends AbstractPipelineStep {
 				
 				// Okapi-B 22, Check if the rule conforms to the current set of tokens and languages
 				
+				if (!rule.isEnabled())
+					idleRules.add(rule);
+				
 				// Languages
 				if (rule.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) {
 
@@ -286,9 +318,17 @@ public class TokenizationStep extends AbstractPipelineStep {
 			tokenizeTargets(tu);
 	}
 	
-	private void processLexem(Lexem lexem, ILexer lexer, Tokens tokens) {
+	private void processLexem(Lexem lexem, ILexer lexer, Tokens tokens, int textShift) {
 		
 		if (lexem == null) return;
+		
+		if (lexem.getId() == RAWTEXT) {
+			
+			if (allowNewRawText)
+				rawtextLexems.add(lexem);
+			return;
+		}
+		
 		LexerRules rules = lexer.getRules();
 		LexerRule rule = rules.getRule(lexem.getId());
 		if (rule == null) return;
@@ -299,9 +339,44 @@ public class TokenizationStep extends AbstractPipelineStep {
 		for (int tokenId : rule.getOutTokenIDs())
 			if (tokenFilter.contains(tokenId)) {
 				
+				if (textShift > 0) {
+					
+					Range r = lexem.getRange();
+					r.start += textShift;
+					r.end += textShift;
+				}
+					 
 				Token token = new Token(tokenId, lexem, 100);
 				tokens.add(token);
 			}
+	}
+	
+	private void runLexers(List<ILexer> lexers, String text, String language, Tokens tokens, int textShift) {
+	
+		for (ILexer lexer : lexers) {
+			
+			//if (idleLexers.contains(lexer)) continue;			
+			if (lexer == null) continue;
+			
+			// Single-call way
+			Lexems lexems = lexer.process(text, language, tokens);
+
+			if (lexems != null)
+				for (Lexem lexem : lexems)
+					processLexem(lexem, lexer, tokens, 0); // 0 - token ranges don't need shifting
+			
+			// Iterator way
+			lexer.open(text, language, tokens);
+			try {
+				
+				while (lexer.hasNext())					
+					processLexem(lexer.next(), lexer, tokens, textShift);
+			}
+			finally {
+				
+				lexer.close();
+			}			
+		}
 	}
 	
 	private Tokens tokenize(TextContainer tc, String language) {
@@ -313,36 +388,50 @@ public class TokenizationStep extends AbstractPipelineStep {
 		if (positions == null) return null;		
 		positions.clear();
 		
-		Tokens tokens = new Tokens(); 
+		Tokens tokens = new Tokens();
+		Tokens tempTokens = new Tokens();
+		int textShift = 0;
+		rawtextLexems.clear();
 		
 		// Remove codes, store to positions
 		String text = TextUnitUtil.getText(tc.getContent(), positions);
 		
-		for (ILexer lexer : lexers) {
+		allowNewRawText = true;
+		runLexers(lexers, text, language, tokens, textShift);		
+		runLexers(serviceLexers, text, language, tokens, textShift);
+		allowNewRawText = false;
 		
-			//if (idleLexers.contains(lexer)) continue;			
-			if (lexer == null) continue;
+		if (rawtextLexems.size() > 0) {
 			
-			// Single-call way
-			Lexems lexems = lexer.process(text, language, tokens);
-
-			if (lexems != null)
-				for (Lexem lexem : lexems)
-					processLexem(lexem, lexer, tokens);
+			int saveNumRawtextLexems = 0;
 			
-			// Iterator way
-			lexer.open(text, language, tokens);
-			try {
+			while (rawtextLexems.size() > 0) {
 				
-				while (lexer.hasNext())					
-					processLexem(lexer.next(), lexer, tokens);
+				// Deadlock and chain-reaction protection
+				if (saveNumRawtextLexems > 0 && rawtextLexems.size() >= saveNumRawtextLexems) {
+					
+					if (rawtextLexems.size() == saveNumRawtextLexems)
+						logMessage(Level.FINE, "RAWTEXT lexems are not processed in tokenize()");
+					else
+						logMessage(Level.FINE, "RAWTEXT lexems are creating a chain reaction in tokenize()");
+					
+					break;
+				}
+	
+				tempTokens.clear();
+				saveNumRawtextLexems = rawtextLexems.size();
+				
+				Lexem lexem = rawtextLexems.poll();
+				text = lexem.getValue();
+				textShift = lexem.getRange().start;
+				
+				runLexers(lexers, text, language, tempTokens, textShift);
+				tokens.addAll(tempTokens);
 			}
-			finally {
-				
-				lexer.close();
-			}			
+						
+			runLexers(serviceLexers, text, language, tokens, 0);
 		}
-									
+				
 		// Restore codes from positions
 		if (tokens != null)
 			tokens.fixRanges(positions);

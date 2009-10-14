@@ -23,6 +23,8 @@ package net.sf.okapi.lib.extra;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ListUtil;
@@ -40,7 +42,9 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 	
 	protected Component owner = null;
 	private String data;
-	 	
+
+	protected final Logger logger = Logger.getLogger(this.getClass().getName());
+	
 	public AbstractParameters() {
 		
 		super();		
@@ -111,14 +115,14 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 		return false;
 	}
 	
-	public static <T extends AbstractParameters> void loadGroup(ParametersString buffer, List<T> group, Class<T> elementClass) {
+	public <T extends AbstractParameters> void loadGroup(ParametersString buffer, List<T> group, Class<T> elementClass) {
 		
 		if (elementClass == null) return;
 		
 		loadGroup(buffer, elementClass.getSimpleName(), group, elementClass);
 	}
 	
-	public static <T extends AbstractParameters> void loadGroup(ParametersString buffer, String groupName, List<T> group, Class<T> elementClass) {
+	public <T extends AbstractParameters> void loadGroup(ParametersString buffer, String groupName, List<T> group, Class<T> elementClass) {
 		
 		if (buffer == null) return;
 		if (group == null) return;
@@ -136,11 +140,15 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 				
 			} catch (InstantiationException e) {
 				
-				e.printStackTrace();
+				//e.printStackTrace();
+				logMessage(Level.FINE, "Group element instantiation failed: " + e.getMessage());
+				return;
 				
 			} catch (IllegalAccessException e) {
 				
-				e.printStackTrace();
+				//e.printStackTrace();
+				logMessage(Level.FINE, "Group element instantiation failed: " + e.getMessage());
+				return;
 			}
 			
 			if (item == null) return;
@@ -157,7 +165,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 			item.owner.exec(group, Notification.PARAMETERS_CHANGED, null);
 	}
 	
-	public static <T extends AbstractParameters> void saveGroup(ParametersString buffer, String groupName, List<T> group) {
+	public <T extends AbstractParameters> void saveGroup(ParametersString buffer, String groupName, List<T> group) {
 		
 		if (buffer == null) return;
 		if (group == null) return;
@@ -175,7 +183,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 		}
 	}
 	
-	public static <T extends AbstractParameters> void saveGroup(ParametersString buffer, List<T> group, Class<T> elementClass) {
+	public <T extends AbstractParameters> void saveGroup(ParametersString buffer, List<T> group, Class<T> elementClass) {
 		
 		if (elementClass == null) return;
 		
@@ -243,6 +251,12 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 	public String getData() {
 		
 		return data;
+	}
+	
+	protected void logMessage (Level level, String text) {
+		
+		if (logger != null)
+			logger.log(level, text);
 	}
 }
 

@@ -53,7 +53,8 @@ public class Component implements IComponent, INotifiable {
 
 	protected void logMessage (Level level, String text) {
 		
-		logger.log(level, text);
+		if (logger != null)
+			logger.log(level, text);
 	}
 	
 	protected void setName(String name) {

@@ -20,43 +20,47 @@
 
 package net.sf.okapi.steps.tokenization.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.okapi.common.ParametersString;
 
 public class RegexRule extends LexerRule {
 
-	private List<RegexRuleItem> items = new ArrayList<RegexRuleItem>();
+	private int regexOptions;
+	private int regexGroup;
 	
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 
-		loadGroup(buffer, "item", items, RegexRuleItem.class);		
+		super.parameters_load(buffer);
+		
+		regexOptions = buffer.getInteger("regexOptions");
+		regexGroup = buffer.getInteger("regexGroup");
 	}
 
 	@Override
 	protected void parameters_reset() {
 		
-		if (items == null) return;
-		items.clear();		
+		super.parameters_reset();
+		
+		regexOptions = 0;
+		regexGroup = 0;		
 	}
 
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		
-		saveGroup(buffer, "item", items);
+		super.parameters_save(buffer);
+		
+		buffer.setInteger("regexOptions", regexOptions);
+		buffer.setInteger("regexGroup", regexGroup);
 	}
 
-	public List<RegexRuleItem> getItems() {
+	public int getRegexOptions() {
 		
-		return items;
+		return regexOptions;
 	}
 
-	@Override
-	public List<Integer> getOutTokenIDs() {
+	public int getRegexGroup() {
 		
-		return super.getOutTokenIDs();
+		return regexGroup;
 	}
 }
-

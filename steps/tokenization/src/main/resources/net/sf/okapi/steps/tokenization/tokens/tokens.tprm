@@ -1,5 +1,5 @@
 #v1
-TokenItemCount.i=12
+TokenItemCount.i=18
 TokenItem0.name=UNKNOWN
 TokenItem0.description=Not recognized as any other token
 TokenItem1.name=NUMBER
@@ -24,3 +24,15 @@ TokenItem10.name=MARKUP
 TokenItem10.description=
 TokenItem11.name=EMOTICON
 TokenItem11.description=
+TokenItem12.name=DATE
+TokenItem12.description=
+TokenItem13.name=TIME
+TokenItem13.description=
+TokenItem14.name=CURRENCY
+TokenItem14.description=
+TokenItem15.name=RAWTEXT
+TokenItem15.description=Text to be tokenized again
+TokenItem16.name=COMPANY
+TokenItem16.description=Company names like AT&T, P&G, Cache&Carry
+TokenItem17.name=STOPWORD
+TokenItem17.description=Stop-word (frequent words with no important significance, often filtered out by NLP tools)

@@ -25,6 +25,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.logging.Level;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
@@ -78,32 +80,38 @@ public class CompoundFilter extends AbstractBaseFilter {
 			
 		} catch (InstantiationException e) {
 			
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (IllegalAccessException e) {
 			
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (SecurityException e) {
 			
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (NoSuchMethodException e) {
 			
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (IllegalArgumentException e) {
 			
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
 			return false;
 			
 		} catch (InvocationTargetException e) {
 			
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Subfilter instantiation failed: " + e.getMessage());
 			return false;
 		}
 		

@@ -23,6 +23,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
@@ -65,6 +67,8 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 	private TabFolder pageContainer;
 	private List<IDialogPage> pages = null;
 	boolean readOnly = false;
+	
+	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	public boolean edit(IParameters paramsObject, boolean readOnly, IContext context) {
 
@@ -555,37 +559,43 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 		} catch (InstantiationException e) {
 
 			result = false;
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (IllegalAccessException e) {
 
 			result = false;
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (SecurityException e) {
 
 			result = false;
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (NoSuchMethodException e) {
 
 			result = false;
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (IllegalArgumentException e) {
 
 			result = false;
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
 			return null;
 
 		} catch (InvocationTargetException e) {
 
 			result = false;
-			e.printStackTrace();
+			//e.printStackTrace();
+			logMessage(Level.FINE, "Page instantiation failed: " + e.getMessage());
 			return null;
 		}
 	}
@@ -763,5 +773,11 @@ public abstract class AbstractParametersEditor implements IParametersEditor, Lis
 	 */
 	protected boolean isReadOnly() {
 		return readOnly;
+	}
+
+	protected void logMessage (Level level, String text) {
+		
+		if (logger != null)
+			logger.log(level, text);
 	}
 }

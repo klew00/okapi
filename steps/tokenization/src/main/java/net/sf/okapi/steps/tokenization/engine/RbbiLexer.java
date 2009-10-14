@@ -111,7 +111,7 @@ public class RbbiLexer extends AbstractLexer {
 				
 				boolean isInternal = Util.isEmpty(rule.getPattern());
 				
-				if (rule.supportsLanguage(language) && !isInternal) {
+				if (checkRule(rule, language) && !isInternal) {
 					
 //					if (addCaption) {
 //						

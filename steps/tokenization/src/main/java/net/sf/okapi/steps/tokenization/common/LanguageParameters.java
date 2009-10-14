@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.extra.AbstractParameters;
 import net.sf.okapi.steps.tokenization.locale.LocaleUtil;
 
@@ -60,7 +61,10 @@ public class LanguageParameters extends AbstractParameters {
 		
 		languageMode = buffer.getInteger("languageMode", LANGUAGES_ALL);
 		setLanguageWhiteList(ListUtil.stringAsList(buffer.getString("languageWhiteList")));
-		setLanguageWhiteList(ListUtil.stringAsList(buffer.getString("languageBlackList")));
+		setLanguageBlackList(ListUtil.stringAsList(buffer.getString("languageBlackList")));
+		
+		if (languageMode == LANGUAGES_ONLY_WHITE_LIST && Util.isEmpty(languageWhiteList))
+			languageMode = LANGUAGES_ALL;
 	}
 
 	@Override

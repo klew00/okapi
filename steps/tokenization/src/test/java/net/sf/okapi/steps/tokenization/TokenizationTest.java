@@ -28,9 +28,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
@@ -38,6 +38,10 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.engine.RbbiLexer;
+import net.sf.okapi.steps.tokenization.engine.javacc.ParseException;
+import net.sf.okapi.steps.tokenization.engine.javacc.SimpleCharStream;
+import net.sf.okapi.steps.tokenization.engine.javacc.WordTokenizer;
+import net.sf.okapi.steps.tokenization.engine.javacc.WordTokenizerTokenManager;
 import net.sf.okapi.steps.tokenization.locale.LocaleUtil;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
@@ -50,12 +54,14 @@ import com.ibm.icu.text.RuleBasedBreakIterator;
 public class TokenizationTest {
 
 	private String text = "Jaguar will sell its new XJ-6 model in the U.S. for " +
-    "a small fortune :-). Expect to pay around USD 120ks. Custom options " +
-    "can set you back another few 10,000 dollars (USD 120ks). For details, go to " +
+    "a small fortune :-). Expect to pay around USD 120ks ($120,000.00 on 05/30/2007 at 12.30PM). Custom options " +
+    "can set you back another few 10,000 dollars. For details, go to " +
     "<a href=\"http://www.jaguar.com/sales\" alt=\"Click here\">" +
-    "Jaguar Sales</a> or contact xj-6@jaguar.com. See http://www.jaguar.com/sales, www.jaguar.com, 192.168.0.5 for info 3.5pct.";
+    "Jaguar Sales</a> or contact xj-6@jaguar.com."+
+    " See http://www.jaguar.com/sales, www.jaguar.com, AT&T, P&G, Johnson&Johnson, 192.168.0.5 for info 3.5pct.";
 
 	//private String text = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
+//	private String text = "$120,000.00 on 05/30/2007 at 12.30PM is much better than $10.00 on 05/30/2007 at 22:30:15";
 		
 	//private String text = "http://www.jaguar.com/sales";
 	//private String text = "<a href=\"http://www.jaguar.com/sales\" alt=\"Click here\">";
@@ -105,7 +111,7 @@ public class TokenizationTest {
 	}
 	
 	@Test
-	public void testRBBI() {
+	public void testTokenizer() {
 		/* 
 	    String text2 = "Test word count is correct.";
 	    String text3 = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
@@ -114,10 +120,51 @@ public class TokenizationTest {
 		
 		Tokens tokens = Tokenizer.tokenize(text, "en-us"); // All tokens
 		//assertEquals(127, tokens.size());
-		
-		//System.out.println(tokens.size());		
+						
 		listTokens(tokens);
+		System.out.println(tokens.size());
 	}
+	
+	@Test
+	public void testJavaCC() {
+		
+		StringReader sr = new StringReader("This is a 1248-th test. U.S.A.F. read-through\n didn't AT&T, P&G, Johnson&Johnson \n\nadmin@yahoo.com 192.168.0.7");
+		SimpleCharStream stream = new SimpleCharStream(sr);
+		
+		WordTokenizer tokenizer = new WordTokenizer(new WordTokenizerTokenManager(stream));
+		
+		net.sf.okapi.steps.tokenization.engine.javacc.Token token = null;
+		
+		do {
+			try {
+			token = tokenizer.nextToken();
+			} catch (ParseException e) {
+
+				e.printStackTrace();
+				break;
+				
+			} catch (IOException e) {
+
+				e.printStackTrace();
+				break;
+			}
+			
+			if (token == null) break;
+			//System.out.println(((Manager)tokenizer.token_source).input_stream.getBeginColumn());
+			//System.out.println(jj_input_stream.getBeginColumn());	
+						
+			System.out.println(String.format("%d  %15s (%d, %d - %d, %d)\t%d - %d", token.kind, token.image, 
+					stream.getBeginColumn(), 
+					stream.getBeginLine(), 
+					stream.getEndColumn(), 
+					stream.getEndLine(),
+					stream.bufpos + 1 - token.image.length(),
+					stream.bufpos + 1));
+			
+			
+		} while (token != null);
+	}
+	
 	
 	@Test
 	public void testRetainRemove() {

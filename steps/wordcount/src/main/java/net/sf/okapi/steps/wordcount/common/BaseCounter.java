@@ -20,6 +20,10 @@
 
 package net.sf.okapi.steps.wordcount.common;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -36,6 +40,7 @@ abstract public class BaseCounter {
 	
 	private static BaseCounter counter = null;
 	protected static StructureParameters params;
+	protected static Logger logger = null;
 	
 	abstract protected long doGetCount(String text, String language);
 	abstract protected String getResourceName();
@@ -78,10 +83,15 @@ abstract public class BaseCounter {
 					
 				} catch (InstantiationException e) {
 					
-					e.printStackTrace();
+					//e.printStackTrace();
+					logMessage(classRef, Level.FINE, "Counter instantiation failed: " + e.getMessage());
+					return 0L;
+					
 				} catch (IllegalAccessException e) {
 					
-					e.printStackTrace();
+					//e.printStackTrace();
+					logMessage(classRef, Level.FINE, "Counter instantiation failed: " + e.getMessage());
+					return 0L;
 				}
 				
 			if (counter == null) return 0L;
@@ -95,5 +105,14 @@ abstract public class BaseCounter {
 	public static String getTokenName() {
 		
 		return params.getTokenName();
+	}
+	
+	protected static void logMessage (Class<?> classRef, Level level, String text) {
+		
+		if (logger == null) 
+			logger = Logger.getLogger(ClassUtil.getClassName(classRef));
+		
+		if (logger != null)
+			logger.log(level, text);
 	}
 }

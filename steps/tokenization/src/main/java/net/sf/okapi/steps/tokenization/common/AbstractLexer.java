@@ -102,7 +102,10 @@ public abstract class AbstractLexer extends Component implements ILexer {
 
 	public LexerRules getRules() {
 
-		return rules;
+		Class<? extends LexerRules> classRef = lexer_getRulesClass();
+		
+		return (classRef != null) ? classRef.cast(rules): null;
+		//return rules;
 	}
 	
 	public boolean hasNext() {
@@ -132,6 +135,16 @@ public abstract class AbstractLexer extends Component implements ILexer {
 	public void setRules(LexerRules rules) {
 		
 		this.rules = rules;
+	}
+	
+	protected boolean checkRule(LexerRule rule, String language) {
+		
+		return rule != null && rule.supportsLanguage(language) && rule.isEnabled();
+	}
+	
+	protected boolean checkRule(LexerRule rule) {
+		
+		return rule != null && rule.isEnabled();
 	}
 
 	protected Class<? extends LexerRules> lexer_getRulesClass() {
