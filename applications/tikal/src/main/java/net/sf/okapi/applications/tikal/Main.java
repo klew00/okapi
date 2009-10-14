@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -181,6 +182,10 @@ public class Main {
 				prog.showHelp();
 				return; // Overrides all arguments
 			}
+			if ( args.contains("-i") || args.contains("--info")  || args.contains("-info") ) {
+				prog.showInfo();
+				return; // Overrides all arguments 
+			}
 			if ( args.contains("-trace") ) {
 				// Check early so the option does not get 'eaten' by a bad syntax
 				showTrace = true;
@@ -306,7 +311,7 @@ public class Main {
 					prog.usePensieve = true;
 					prog.pensieveDir = prog.getArgument(args, ++i);
 				}
-				else if ( arg.equals("-listconf") || arg.equals("-lfc") ) {
+				else if ( arg.endsWith("-listconf") || arg.equals("-lfc") ) {
 					prog.showAllConfigurations();
 					return;
 				}
@@ -731,6 +736,22 @@ public class Main {
 		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
 
+	private void showInfo () {
+		Runtime rt = Runtime.getRuntime();
+		rt.runFinalization();
+		rt.gc();
+		ps.println("Java version: " + System.getProperty("java.version")); //$NON-NLS-1$
+		ps.println(String.format("Platform: %s, %s, %s",
+			System.getProperty("os.name"), //$NON-NLS-1$ 
+			System.getProperty("os.arch"), //$NON-NLS-1$
+			System.getProperty("os.version"))); //$NON-NLS-1$
+		NumberFormat nf = NumberFormat.getInstance();
+		ps.println(String.format("Java VM memory: free=%s KB, total=%s KB", //$NON-NLS-1$
+			nf.format(rt.freeMemory()/1024),
+			nf.format(rt.totalMemory()/1024)));
+		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
+	}
+	
 	private String getRootDirectory () {
 		URL url = getClass().getProtectionDomain().getCodeSource().getLocation();
 		return Util.getDirectoryName(Util.getDirectoryName(url.getPath()));
@@ -746,42 +767,40 @@ public class Main {
 	}
 	
 	private void printUsage () {
-		ps.println("Show this screen:");
-		ps.println("   -?");
-		ps.println("Open the user guide page:");
-		ps.println("   -h or --help");
-		ps.println("List all available filter configurations:");
-		ps.println("   -lfc or -listconf");
-		ps.println("Edit or view filter configurations (UI-dependent command):");
+		ps.println("Shows this screen: -?");
+		ps.println("Shows version and other information: -i or --info");
+		ps.println("Opens the user guide page: -h or --help");
+		ps.println("Lists all available filter configurations: -lfc or --listconf");
+		ps.println("Edits or view filter configurations (UI-dependent command):");
 		ps.println("   -e [[-fc] configId]");
-		ps.println("Extract a file to XLIFF (and optionally segment and pre-translate):");
+		ps.println("Extracts a file to XLIFF (and optionally segment and pre-translate):");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl sourceLang]");
 		ps.println("      [-tl targetLang] [-seg [srxFile]] [-tt hostname[:port]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
 		ps.println("      [-maketmx [tmxFile]] [-opt threshold[:maxhits]]");
-		ps.println("Merge an XLIFF document back to its original format:");
+		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl sourceLang] [-tl targetLang]");
-		ps.println("Translate a file:");
+		ps.println("Translates a file:");
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg [srxFile]] [-tt hostname[:port]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
 		ps.println("      [-maketmx [tmxFile]] [-opt threshold[:maxhits]]");
-		ps.println("Query translation resources:");
+		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl sourceLang] [-tl targetLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
 		ps.println("      [-apertium [serverURL]] [-opt threshold[:maxhits]]");
-		ps.println("Conversion to PO format:");
+		ps.println("Converts to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic] [-trgsource|-trgempty]");
-		ps.println("Conversion to TMX format:");
+		ps.println("Converts to TMX format:");
 		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
-		ps.println("Conversion to table format:");
+		ps.println("Converts to table format:");
 		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
 		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic]");
-		ps.println("Import to Pensieve TM:");
+		ps.println("Imports to Pensieve TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
 	}
@@ -792,6 +811,7 @@ public class Main {
 		int count;
 		if ( conn.getClass().getName().endsWith("PensieveTMConnector")
 			|| conn.getClass().getName().endsWith("GoogleMTConnector")
+			|| conn.getClass().getName().endsWith("MyMemoryTMConnector")
 			|| conn.getClass().getName().endsWith("GlobalSightTMConnector") ) {
 			count = conn.query(parseToTextFragment(query));
 		}
