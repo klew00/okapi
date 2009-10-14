@@ -11,6 +11,6 @@ goto End
 
 :Start
 set PATH=%PATH%;%1
-tikal
+tikal -info
 
 :End
