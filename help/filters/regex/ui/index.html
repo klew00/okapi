@@ -133,7 +133,7 @@ different groups it may use:</p>
 		<th align="left" valign="top">Note</th>
 	</tr>
 	<tr>
-		<th align="left" valign="top">Extract the strings in the source</th>
+		<th align="left" valign="top">Extract the strings in the source group</th>
 		<td align="left" valign="top">Sends a <code>TEXT_UNIT</code> event for 
 		each string found in the source capturing group.</td>
 		<td align="left" valign="top">Must be defined. It is where the string or 
@@ -147,7 +147,7 @@ different groups it may use:</p>
 		associated to each text unit corresponding to each extracted string.</td>
 	</tr>
 	<tr>
-		<th align="left" valign="top">Extract the content</th>
+		<th align="left" valign="top">Extract the content of the source group</th>
 		<td align="left" valign="top">Sends a single <code>TEXT_UNIT</code> 
 		event based on the 
 		different capturing groups.</td>
@@ -161,7 +161,7 @@ different groups it may use:</p>
 		associated to the text unit.</td>
 	</tr>
 	<tr>
-		<th align="left" valign="top">Treat the source as a comment</th>
+		<th align="left" valign="top">Treat the source group as comment</th>
 		<td align="left" valign="top">
 		<p dir="ltr">Process the source capturing group for localization 
 		directives (if requested) and leaves the content of the whole expression&#39;s 
@@ -182,20 +182,20 @@ different groups it may use:</p>
 		<td align="left" valign="top">Not used</td>
 	</tr>
 	<tr>
-		<th align="left" valign="top">Start a group</th>
+		<th align="left" valign="top"><a name="startSection"></a>Start a section</th>
 		<td align="left" valign="top">Sends a <code>START_GROUP</code> event. If 
-		the option <cite>Auto-close previous group when a new one starts</cite> 
-		is set, you must not define a corresponding end group. If that option is 
-		not set, you must define a rule to close this group.</td>
+		the option <cite>Auto-close previous section when a new one starts</cite> 
+		is set, you must not define a corresponding end section. If that option is 
+		not set, you must define a rule to close this section.</td>
 		<td align="left" valign="top">Not used</td>
 		<td align="left" valign="top">Not used</td>
-		<td align="left" valign="top">If defined: It is the name of the group 
-		being opened.</td>
+		<td align="left" valign="top">If defined: It is the name of the section 
+		being opened. A section corresponds to a <code>&lt;group&gt;</code> in XLIFF.</td>
 		<td align="left" valign="top">If defined: It is the note property 
-		associated to the group being opened.</td>
+		associated to the section being opened.</td>
 	</tr>
 	<tr>
-		<th align="left" valign="top">End a group</th>
+		<th align="left" valign="top">End a section</th>
 		<td align="left" valign="top">Sends an <code>END_GROUP</code> event.</td>
 		<td align="left" valign="top">Not used</td>
 		<td align="left" valign="top">Not used</td>
@@ -231,10 +231,12 @@ some part of the extracted text into inline codes.</p>
 <p><cite>Edit Inline Codes Patterns</cite> -- Click this button to open the 
 <cite>Inline Codes Patterns</cite> dialog box where you can define rules for converting parts 
 of text into inline codes.</p>
-<p><cite>Auto-close previous group when a new one starts</cite> -- Set this 
-option to automatically close any opened group when a new one is starting. This 
-option allows you to define only start of groups. If this option is not set, 
-each start of group must correspond to an end of group.</p>
+<p><cite>Auto-close previous section when a new one starts</cite> -- Set this 
+option to automatically close any opened section when a new one is starting. 
+Section are defined with the <a href="#startSection"><cite>Start a section</cite> 
+action</a>. This 
+option allows you to define only start of sections. If this option is not set, 
+each start of section must correspond to an end of section.</p>
 <h4>Regular expressions options</h4>
 <p>This set of options are used for all rules defined in the list. If you need 
 to overwrite an option for a given rule, use the <code>(?idmsux-idmsux)</code> 

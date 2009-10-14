@@ -400,6 +400,9 @@ public class TikalTest {
     }
     
     private int runTikal (String extraArgs) throws IOException, InterruptedException {
+    	System.out.println("");
+    	System.out.println("cmd>===============================================================================");
+    	System.out.println("cmd>"+((extraArgs==null) ? "" : " "+extraArgs));
     	Process p = Runtime.getRuntime().exec(javaTikal + ((extraArgs==null) ? "" : " "+extraArgs),
     		null, rootAsFile);
     	StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), "err");            

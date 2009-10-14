@@ -55,7 +55,7 @@ public class HTMLCharacterEntities {
 	
 	/**
 	 * Gets the character for a given entity name (e.g. "aacute").
-	 * @param ref the name to lookup.
+	 * @param name the name to lookup.
 	 * @return the unicode value for the given name, or -1 if it was not found.
 	 */
 	public int lookupName (String name) {

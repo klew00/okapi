@@ -592,7 +592,7 @@ public class QueryManager {
 					break;
 				}
 				if ( orderWarning ) {
-					logger.warning(String.format("The target code id='%d' has been moved (item id='%s', name='%s')",
+					logger.warning(String.format("The target code id='%d' has been re-ordered (item id='%s', name='%s')",
 						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
 					orderWarning = false; 
 				}

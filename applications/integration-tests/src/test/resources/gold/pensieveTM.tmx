@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tmx version="1.4"><header creationtool="unknown" creationtoolversion="unknown" segtype="TODO" o-tmf="TODO" adminlang="en" srclang="EN-US" datatype="TODO"></header><body>
+<tmx version="1.4"><header creationtool="unknown" creationtoolversion="unknown" segtype="paragraph" o-tmf="unknown" adminlang="en" srclang="EN-US" datatype="text"></header><body>
 <tu tuid="autoID1">
 <prop type="Txt::GroupName">group1</prop>
 <prop type="Txt::FileName">file1</prop>

@@ -29,18 +29,18 @@ All matches for the given rule are provided.</p>
 <p><cite>Action</cite> -- Select the action to perform for this rule. Which 
 fields can be used depends on the action selected. There are the following choices:</p>
 <ul>
-	<li><cite>Extract the strings in the source</cite>: Extracts each 
-	strings within the source capturing group defined for thsi rule. The content into a separate text unit. The beginning and 
+	<li><cite>Extract the strings in the source group</cite>: Extracts each 
+	strings within the source capturing group defined for this rule. The content into a separate text unit. The beginning and 
 	ending of the strings are defined <a href="#OptionsStrings">in the <cite>
 	Options</cite> tab</a>.</li>
-	<li><cite>Extract the content</cite>: Extracts the content into a single 
+	<li><cite>Extract the content of the source group</cite>: Extracts the content into a single 
 	text unit, according the different capturing groups defined for the rule.</li>
-	<li><cite>Treat the source as a comment</cite>: Does not extract anything, 
+	<li><cite>Treat the source group content as comment</cite>: Does not extract anything, 
 	but process the content as a comment and search for localization directives 
 	if that option is set.</li>
 	<li><cite>Do not extract</cite>: Leaves the content alone.</li>
-	<li><cite>Start a group</cite>: Sends a <code>START_GROUP</code> event.</li>
-	<li><cite>End a group</cite>: Sends an <code>END_GROUP</code> event.</li>
+	<li><cite>Start a section</cite>: Sends a <code>START_GROUP</code> event.</li>
+	<li><cite>End a section</cite>: Sends an <code>END_GROUP</code> event.</li>
 </ul>
 <p>See the <a href="index.html#actions">Actions</a> section for more detailed 
 information on how actions work.</p>

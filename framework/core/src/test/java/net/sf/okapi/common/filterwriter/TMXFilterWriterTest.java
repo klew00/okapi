@@ -45,7 +45,7 @@ public class TMXFilterWriterTest {
 	public void testSimpleOutput () {
 		String result = rewrite(getEvents(null, "en", "fr"), "fr");
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-			+ "<tmx version=\"1.4\"><header creationtool=\"unknown\" creationtoolversion=\"unknown\" segtype=\"TODO\" o-tmf=\"TODO\" adminlang=\"en\" srclang=\"en\" datatype=\"TODO\"></header><body>"
+			+ "<tmx version=\"1.4\"><header creationtool=\"unknown\" creationtoolversion=\"unknown\" segtype=\"paragraph\" o-tmf=\"unknown\" adminlang=\"en\" srclang=\"en\" datatype=\"text\"></header><body>"
 			+ "<tu tuid=\"autoID1\">"
 			+ "<tuv xml:lang=\"en\"><seg>Source text</seg></tuv>"
 			+ "<tuv xml:lang=\"fr\"><seg>Target text</seg></tuv>"

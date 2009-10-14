@@ -206,7 +206,7 @@ public class TMXWriter {
    		boolean alternate)
     {
     	String tuid = item.getName();
-    	if ( !Util.isEmpty(tuid) ) {
+    	if ( Util.isEmpty(tuid) ) {
     		// itemCount will be incremented in writeTU, so do a +1 here to take that in account
     		tuid = String.format("autoID%d", itemCount + 1);
     	}
@@ -341,9 +341,7 @@ public class TMXWriter {
     	if ( !srcCont.isSegmented() ) { // Source is not segmented
     		// Write start TU
     		writer.writeStartElement("tu");
-    		if ( !Util.isEmpty(tuid) ) {
-    			writer.writeAttributeString("tuid", tuid);
-    		}
+   			writer.writeAttributeString("tuid", tuid);
     		writer.writeLineBreak();
 
     		// Write any resource-level properties

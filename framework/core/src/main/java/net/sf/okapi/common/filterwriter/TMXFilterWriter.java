@@ -44,7 +44,12 @@ public class TMXFilterWriter implements IFilterWriter {
 	private String outputPath;
 	private String language;
 	private boolean canceled;
+	private String segType;
 
+	public void setSegType (String segType) {
+		this.segType = segType;
+	}
+	
 	public void cancel () {
 		close();
 		canceled = true;
@@ -118,7 +123,8 @@ public class TMXFilterWriter implements IFilterWriter {
 				writer = new TMXWriter(new XMLWriter(
 					new OutputStreamWriter(outputStream, "UTF-8")));
 			}
-			writer.writeStartDocument(sd.getLanguage(), language, null, null, "TODO", "TODO", "TODO");
+			writer.writeStartDocument(sd.getLanguage(), language,
+				null, null, segType, "unknown", "text");
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error writing the header.", e);
