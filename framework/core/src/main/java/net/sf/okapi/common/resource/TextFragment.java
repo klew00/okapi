@@ -23,6 +23,9 @@ package net.sf.okapi.common.resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Implements the methods for creating and manipulating a pre-parsed
@@ -99,6 +102,11 @@ public class TextFragment implements Comparable<Object> {
 	 * Code type name for segment place-holder.
 	 */
 	public static final String CODETYPE_SEGMENT  = "$seg$";
+	
+	/*
+	 * Compiled regex for all TextFragment markers
+	 */
+	private static final Pattern MARKERS_REGEX = Pattern.compile("[\uE101\uE102\uE103\uE104].");
 
 	/**
 	 * List of the types of tag usable for in-line codes.
@@ -699,6 +707,18 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	public void trim () {
 		text = new StringBuilder(text.toString().trim());
+	}
+	
+	/**
+	 * Get the text of the fragment (all codes are removed)
+	 * @return the content of fragment without codes
+	 */
+	public String getText() {		
+		if (!hasCode()) {
+			return text.toString();
+		}
+		Matcher m = MARKERS_REGEX.matcher(new String(text));
+		return m.replaceAll(""); 
 	}
 
 	/**
@@ -1392,7 +1412,7 @@ public class TextFragment implements Comparable<Object> {
 				break;
 			}
 		}
-		// No change, we're don.
+		// No change, we're done.
 		if ( text.length() == before ) return;
 		// Else: We need to re-build the list of codes and adjust the indices
 		// Make a list of all remaining codes

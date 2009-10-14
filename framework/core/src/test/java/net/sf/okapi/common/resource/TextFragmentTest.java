@@ -285,6 +285,16 @@ public class TextFragmentTest {
 	}
 	
 	@Test
+	public void testGetText () {
+		TextFragment frag = new TextFragment("watch out for ");
+    	frag.append(TagType.OPENING, "b", "<b>");
+    	frag.append("the killer");
+    	frag.append(TagType.CLOSING, "b", "</b>");
+    	frag.append(" rabbit");
+    	assertEquals("watch out for the killer rabbit", frag.getText());
+	}
+	
+	@Test
 	public void testHasCode () {
 		TextFragment tf1 = new TextFragment();
 		assertFalse(tf1.hasCode());
