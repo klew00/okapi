@@ -98,8 +98,8 @@ public class Main {
 	protected String configId;
 	protected String inputEncoding;
 	protected String outputEncoding;
-	protected LocaleId srcLang = new LocaleId(Locale.getDefault());
-	protected LocaleId trgLang = new LocaleId("fr-fr", false);
+	protected LocaleId srcLoc;
+	protected LocaleId trgLoc;
 	protected int command = -1;
 	protected String query;
 	protected boolean useGoogle;
@@ -147,6 +147,14 @@ public class Main {
 	
 	public static void main (String[] originalArgs) {
 		Main prog = new Main();
+	
+		// Set the default locales
+		prog.srcLoc = new LocaleId("en", false);
+		prog.trgLoc = new LocaleId(Locale.getDefault());
+		if ( prog.trgLoc.sameLanguageAs(prog.srcLoc) ) {
+			prog.trgLoc = new LocaleId("fr", false);
+		}
+		
 		boolean showTrace = false;
 		try {
 			// Create an encoding-aware output for the console
@@ -198,10 +206,10 @@ public class Main {
 					prog.specifiedConfigId = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-sl") ) {
-					prog.srcLang = new LocaleId(prog.getArgument(args, ++i), true);
+					prog.srcLoc = new LocaleId(prog.getArgument(args, ++i), true);
 				}
 				else if ( arg.equals("-tl") ) {
-					prog.trgLang = new LocaleId(prog.getArgument(args, ++i), true);
+					prog.trgLoc = new LocaleId(prog.getArgument(args, ++i), true);
 				}
 				else if ( arg.equals("-ie") ) {
 					prog.inputEncoding = prog.getArgument(args, ++i);
@@ -262,6 +270,10 @@ public class Main {
 				else if ( arg.equals("-imp") ) {
 					prog.command = CMD_CONV2PEN;
 					prog.pensieveDir = prog.getArgument(args, ++i);
+				}
+				else if ( arg.equals("-exp") ) {
+					prog.command = CMD_CONV2TMX;
+					prog.specifiedConfigId = "okf_pensieve";
 				}
 				else if ( arg.equals("-e") ) {
 					prog.command = CMD_EDITCONFIG;
@@ -642,7 +654,7 @@ public class Main {
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding,
-				srcLang.toString(), trgLang.toString());
+				srcLoc.toString(), trgLoc.toString());
 			rd.setFilterConfigId(configId);
 			translateFile(rd);
 			break;
@@ -653,7 +665,7 @@ public class Main {
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding,
-				srcLang.toString(), trgLang.toString());
+				srcLoc.toString(), trgLoc.toString());
 			rd.setFilterConfigId(configId);
 			extractFile(rd);
 			break;
@@ -666,13 +678,13 @@ public class Main {
 			XLIFFMergingStep stepMrg = new XLIFFMergingStep(fcMapper);
 			file = new File(skeleton);
 			RawDocument skelRawDoc = new RawDocument(file.toURI(), inputEncoding,
-				srcLang.toString(), trgLang.toString());
+				srcLoc.toString(), trgLoc.toString());
 			skelRawDoc.setFilterConfigId(configId);
 			stepMrg.setXliffPath(input);
 			stepMrg.setOutputPath(output);
 			stepMrg.setOutputEncoding(outputEncoding);
-			ps.println("Source language: "+srcLang);
-			ps.println("Target language: "+trgLang);
+			ps.println("Source locale: "+srcLoc);
+			ps.println("Target locale: "+trgLoc);
 			ps.println("Default input encoding: "+inputEncoding);
 			ps.println("Output encoding: "+outputEncoding);
 			ps.println("Filter configuration: "+configId);
@@ -716,11 +728,11 @@ public class Main {
 			}
 			URI outputURI = new File(output).toURI();
 			rd = new RawDocument(file.toURI(), inputEncoding,
-				srcLang.toString(), trgLang.toString());
+				srcLoc.toString(), trgLoc.toString());
 			rd.setFilterConfigId(configId);
 			
-			ps.println("Source language: "+srcLang);
-			ps.println("Target language: "+trgLang);
+			ps.println("Source locale: "+srcLoc);
+			ps.println("Target locale: "+trgLoc);
 			ps.println("Default input encoding: "+inputEncoding);
 			ps.println("Filter configuration: "+configId);
 			ps.println("Input: "+input);
@@ -779,35 +791,38 @@ public class Main {
 		ps.println("Edits or view filter configurations (UI-dependent command):");
 		ps.println("   -e [[-fc] configId]");
 		ps.println("Extracts a file to XLIFF (and optionally segment and pre-translate):");
-		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl sourceLang]");
-		ps.println("      [-tl targetLang] [-seg [srxFile]] [-tt hostname[:port]");
+		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl sourceLoc]");
+		ps.println("      [-tl targetLoc] [-seg [srxFile]] [-tt hostname[:port]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
-		ps.println("      [-maketmx [tmxFile]] [-opt threshold[:maxhits]]");
+		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-oe encoding] [-sl sourceLang] [-tl targetLang]");
+		ps.println("      [-oe encoding] [-sl sourceLoc] [-tl targetLoc]");
 		ps.println("Translates a file:");
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-seg [srxFile]] [-tt hostname[:port]");
+		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-seg [srxFile]] [-tt hostname[:port]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
-		ps.println("      [-maketmx [tmxFile]] [-opt threshold[:maxhits]]");
+		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Queries translation resources:");
-		ps.println("   -q \"source text\" [-sl sourceLang] [-tl targetLang] [-google] [-opentran]");
+		ps.println("   -q \"source text\" [-sl sourceLoc] [-tl targetLoc] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
 		ps.println("      [-apertium [serverURL]] [-opt threshold[:maxhits]]");
 		ps.println("Converts to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-generic] [-trgsource|-trgempty]");
+		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-generic] [-trgsource|-trgempty]");
 		ps.println("Converts to TMX format:");
 		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
+		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-trgsource|-trgempty]");
 		ps.println("Converts to table format:");
 		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
+		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-trgsource|-trgempty]");
 		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic]");
 		ps.println("Imports to Pensieve TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLang] [-tl targetLang] [-trgsource|-trgempty]");
+		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-trgsource|-trgempty]");
+		ps.println("Export Pensieve TM as TMX:");
+		ps.println("   -exp tmDirectory1 [tmDirectory2...] [-sl sourceLoc] [-tl targetLoc]");
+		ps.println("      [-trgsource|-trgempty]");
 	}
 
 	private void displayQuery (IQuery conn,
@@ -861,7 +876,7 @@ public class Main {
 		if ( useGoogle ) {
 			conn = new GoogleMTConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang.toString(), trgLang.toString());
+			conn.setLanguages(srcLoc.toString(), trgLoc.toString());
 			conn.open();
 			displayQuery(conn, false);
 			conn.close();
@@ -869,7 +884,7 @@ public class Main {
 		if ( usePensieve ) {
 			conn = new PensieveTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang.toString(), trgLang.toString());
+			conn.setLanguages(srcLoc.toString(), trgLoc.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
@@ -878,7 +893,7 @@ public class Main {
 		if ( useTransToolkit ) {
 			conn = new TranslateToolkitTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang.toString(), trgLang.toString());
+			conn.setLanguages(srcLoc.toString(), trgLoc.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
@@ -887,7 +902,7 @@ public class Main {
 		if ( useGlobalSight ) {
 			conn = new GlobalSightTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang.toString(), trgLang.toString());
+			conn.setLanguages(srcLoc.toString(), trgLoc.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
@@ -896,7 +911,7 @@ public class Main {
 		if ( useMyMemory ) {
 			conn = new MyMemoryTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang.toString(), trgLang.toString());
+			conn.setLanguages(srcLoc.toString(), trgLoc.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
@@ -905,14 +920,14 @@ public class Main {
 		if ( useApertium ) {
 			conn = new ApertiumMTConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang.toString(), trgLang.toString());
+			conn.setLanguages(srcLoc.toString(), trgLoc.toString());
 			conn.open();
 			displayQuery(conn, false);
 			conn.close();
 		}
 		if ( useOpenTran ) {
 			conn = new OpenTranTMConnector();
-			conn.setLanguages(srcLang.toString(), trgLang.toString());
+			conn.setLanguages(srcLoc.toString(), trgLoc.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
@@ -1015,7 +1030,7 @@ public class Main {
 		File f = new File(segRules);
 		segParams.sourceSrxPath = f.getAbsolutePath();
 		segParams.targetSrxPath = f.getAbsolutePath();
-		ps.println("Segmentation: " + segRules);
+		ps.println("Segmentation: " + f.getAbsolutePath());
 		return segStep;
 	}
 
@@ -1044,6 +1059,9 @@ public class Main {
 		IParameters p = prepareConnectorParameters(levParams.getResourceClassName());
 		if ( p != null ) levParams.setResourceParameters(p.toString());
 		levParams.setFillTarget(levOptFillTarget);
+		// Query options
+		int[] opt = parseTMOptions();
+		if ( opt[0] > -1 ) levParams.setThreshold(opt[0]);
 		if ( levOptTMXPath != null ) {
 			levParams.setMakeTMX(true);
 			levParams.setTMXPath(levOptTMXPath);
@@ -1078,16 +1096,16 @@ public class Main {
 		driver.addStep(fewStep);
 
 		// Create the raw document and set the output
-		String tmp = rd.getInputURI().getRawPath();
+		String tmp = rd.getInputURI().getPath();
 		// If the input is a directory, it ends with a separator, then we remove it
 		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
 			tmp = tmp.substring(0, tmp.length()-1);
 		}
 		tmp += ".xlf";
-		driver.addBatchItem(rd, new URI(tmp), outputEncoding);
+		driver.addBatchItem(rd, new File(tmp).toURI(), outputEncoding);
 
-		ps.println("Source language: "+srcLang);
-		ps.println("Target language: "+trgLang);
+		ps.println("Source locale: "+srcLoc);
+		ps.println("Target locale: "+trgLoc);
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Filter configuration: "+configId);
 		ps.println("Output: "+tmp);
@@ -1124,19 +1142,19 @@ public class Main {
 		driver.addStep(ferdStep);
 
 		// Create the raw document and set the output
-		String tmp = rd.getInputURI().toString();
+		String tmp = rd.getInputURI().getPath();
 		String ext = Util.getExtension(tmp);
 		int n = tmp.lastIndexOf('.');
 		output = tmp.substring(0, n) + ".out" + ext;
 
-		ps.println("Source language: "+srcLang);
-		ps.println("Target language: "+trgLang);
+		ps.println("Source locale: "+srcLoc);
+		ps.println("Target locale: "+trgLoc);
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Output encoding: "+outputEncoding);
 		ps.println("Filter configuration: "+configId);
 		ps.println("Output: "+output);
 		
-		driver.addBatchItem(rd, new URI(output), outputEncoding);
+		driver.addBatchItem(rd, new File(output).toURI(), outputEncoding);
 
 		// Process
 		driver.processBatch();

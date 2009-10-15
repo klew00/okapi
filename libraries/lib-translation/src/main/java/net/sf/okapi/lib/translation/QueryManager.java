@@ -239,6 +239,7 @@ public class QueryManager {
 				while ( ri.query.hasNext() ) {
 					res = ri.query.next();
 					res.connectorId = id;
+					if ( res.score < threshold ) break; // Weed out MT if needed
 					results.add(res);
 				}
 			}
@@ -263,6 +264,7 @@ public class QueryManager {
 				QueryResult res;
 				while ( ri.query.hasNext() ) {
 					res = ri.query.next();
+					if ( res.score < threshold ) break;
 					res.connectorId = id;
 					results.add(res);
 				}

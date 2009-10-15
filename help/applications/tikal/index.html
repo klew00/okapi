@@ -26,6 +26,7 @@ localization-related utilities:</p>
 	<li><a href="#conv2tmx">Convert to TMX Format</a></li>
 	<li><a href="#conv2table">Convert to Table Format</a></li>
 	<li><a href="#penImport">Import into Pensieve TM</a></li>
+	<li><a href="#penExport">Export TMX from Pensieve TM</a></li>
 </ul>
 <p>Note: The command <code>-e</code> (Edit Filter Configurations) requires 
 access to UI editors that are available only if you have one of the <b>okapi-apps</b> platform-specific distributions. It is not 
@@ -62,26 +63,26 @@ XLIFF 1.2 specifications</a>.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4">
 	<tr>
-		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top" nowrap><code>-fc configId</code></td>
 		<td align="left" valign="top">The identifier of the filter configuration to use for the 
 		extraction.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top" nowrap><code>-ie encoding</code></td>
 		<td align="left" valign="top">The encoding name of the input files. this is used only if the 
 		filter cannot detect the encoding from the input file itself.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top" nowrap><code>-sl srcLang</code></td>
 		<td align="left" valign="top">The code of the source language of the input files.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top" nowrap><code>-tl trgLang</code></td>
 		<td align="left" valign="top">The code of the target language for the output (also used in the 
 		input if the input documents are multilingual).</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-seg [srxFile]</code></td>
+		<td align="left" valign="top" nowrap><code>-seg [srxFile]</code></td>
 		<td align="left" valign="top">
 		<p dir="ltr">The segmentation rules to utilize. To specify the default rules 
 		that come with the installation, use <code>-seg</code> without filename. 
@@ -89,7 +90,7 @@ XLIFF 1.2 specifications</a>.</p>
 		in your Okapi main directory.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-pen tmDirectory|<br>
+		<td align="left" valign="top" nowrap><code>-pen tmDirectory|<br>
 		-tt hostname[:port]|<br>
 		-mm key|<br>
 		-google|<br>
@@ -102,7 +103,15 @@ XLIFF 1.2 specifications</a>.</p>
 		provide a good handling of inline codes.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-maketmx [tmxFile]</code></td>
+		<td align="left" valign="top" nowrap><code>-opt threshold</code></td>
+		<td align="left" valign="top">
+		<p dir="ltr">TM query option: The threshold is a number between 0 and 
+		100. If this option is 
+		not set the default is 95. Note that this option may be limited for some 
+		search engines because of the way they are configured.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top" nowrap><code>-maketmx [tmxFile]</code></td>
 		<td align="left" valign="top">Generates a TMX document with all the 
 		entries leveraged. You can specify the name of the document, if you do 
 		not it will be named <code>pretrans.tmx</code>.</td>
@@ -193,31 +202,31 @@ file must be in SRX format.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table7">
 	<tr>
-		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top" nowrap><code>-fc configId</code></td>
 		<td align="left" valign="top">The identifier of the filter configuration to use for the 
 		extraction.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top" nowrap><code>-ie encoding</code></td>
 		<td align="left" valign="top">The encoding name of the input files. this is used only if the 
 		filter cannot detect the encoding from the input file itself.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-oe encoding</code></td>
+		<td align="left" valign="top" nowrap><code>-oe encoding</code></td>
 		<td align="left" valign="top">The encoding name of the output file to generate. The same encoding as the 
 		input file will be used if this option is not specified.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top" nowrap><code>-sl srcLang</code></td>
 		<td align="left" valign="top">The code of the source language of the input files.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top" nowrap><code>-tl trgLang</code></td>
 		<td align="left" valign="top">The code of the target language for the output (also used in the 
 		input if the input documents are multilingual).</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-seg [srxFile]</code></td>
+		<td align="left" valign="top" nowrap><code>-seg [srxFile]</code></td>
 		<td align="left" valign="top">
 		<p dir="ltr">The segmentation rules to utilize. To specify the default rules 
 		that come with the installation, use <code>-seg</code> without filename. 
@@ -225,7 +234,7 @@ file must be in SRX format.</p>
 		in your Okapi main directory.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-pen tmDirectory|<br>
+		<td align="left" valign="top" nowrap><code>-pen tmDirectory|<br>
 		-tt hostname[:port]|<br>
 		-mm key|<br>
 		-google|<br>
@@ -238,7 +247,15 @@ file must be in SRX format.</p>
 		provide a good handling of inline codes.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-maketmx [tmxFile]</code></td>
+		<td align="left" valign="top" nowrap><code>-opt threshold</code></td>
+		<td align="left" valign="top">
+		<p dir="ltr">TM query option: The threshold is a number between 0 and 
+		100. If this option is 
+		not set the default is 95. Note that this option may be limited for some 
+		search engines because of the way they are configured.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top" nowrap><code>-maketmx [tmxFile]</code></td>
 		<td align="left" valign="top">Generates a TMX document with all the 
 		entries leveraged. You can specify the name of the document, if you do 
 		not it will be named <code>pretrans.tmx</code>.</td>
@@ -266,50 +283,50 @@ per resource, not sorted by best score as a whole.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table1">
 	<tr>
-		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top" nowrap><code>-sl srcLang</code></td>
 		<td align="left" valign="top">The code of the source language (language of the text queried)</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top" nowrap><code>-tl trgLang</code></td>
 		<td align="left" valign="top">The code of the target language (language of the requested 
 		translation)</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-pen directory</code></td>
+		<td align="left" valign="top" nowrap><code>-pen directory</code></td>
 		<td align="left" valign="top">Query a Pensieve TM stored in a given 
 		directory.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-opentran</code></td>
+		<td align="left" valign="top" nowrap><code>-opentran</code></td>
 		<td align="left" valign="top">Query the OpenTran translation repository. This requires Internet 
 		access.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-tt hostname[:port]</code></td>
+		<td align="left" valign="top" nowrap><code>-tt hostname[:port]</code></td>
 		<td align="left" valign="top">Query the specified Translate Toolkit TM server. This assumes you 
 		have access to the server (local or remote).</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-mm key</code></td>
+		<td align="left" valign="top" nowrap><code>-mm key</code></td>
 		<td align="left" valign="top">Query the MyMemory translation repository 
 		with a given key access (use <code>mmDemo123</code> for demo). This 
 		requires Internet access.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-google</code></td>
+		<td align="left" valign="top" nowrap><code>-google</code></td>
 		<td align="left" valign="top">Query the Google MT system. If no other type of resource is 
 		specified, this is used by default. This requires Internet access.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-apertium [serverURL]</code></td>
+		<td align="left" valign="top" nowrap><code>-apertium [serverURL]</code></td>
 		<td align="left" valign="top">
 		<p dir="ltr">Query the specified Apertium MT server (local or remote). A 
 		default remote server is provided.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-opt threshold[:maxhits]</code></td>
+		<td align="left" valign="top" nowrap><code>-opt threshold[:maxhits]</code></td>
 		<td align="left" valign="top">
-		<p dir="ltr">TM query options: the threshold is a number between 0 and 
+		<p dir="ltr">TM query options: The threshold is a number between 0 and 
 		100. The maximum number of hits is a number above 0. If this option is 
 		not set each TM engine uses its own defaults. If this option is set, all 
 		TM engines are set to use the specified options. Note that parameters of 
@@ -378,32 +395,32 @@ create new configurations.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table3">
 	<tr>
-		<td valign="top" align="left"><code>-fc configId</code></td>
+		<td valign="top" align="left" nowrap><code>-fc configId</code></td>
 		<td align="left" valign="top">The identifier of the filter configuration to use for the 
 		input files</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-ie encoding</code></td>
+		<td valign="top" align="left" nowrap><code>-ie encoding</code></td>
 		<td align="left" valign="top">The encoding name of the input files. this is used only if the 
 		filter cannot detect the encoding from the input file itself.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-sl srcLang</code></td>
+		<td valign="top" align="left" nowrap><code>-sl srcLang</code></td>
 		<td align="left" valign="top">The code of the source language of the input files.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-tl trgLang</code></td>
+		<td valign="top" align="left" nowrap><code>-tl trgLang</code></td>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-generic</code></td>
+		<td valign="top" align="left" nowrap><code>-generic</code></td>
 		<td align="left" valign="top">Indicates to use generic notation for inline codes in the generated 
 		PO file, for example <code>&lt;1/&gt;</code> vs. &lt;br/&gt;. If this 
 		option is not specified the inline codes are output in their original 
 		form.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-trgsource|<br>
+		<td valign="top" align="left" nowrap><code>-trgsource|<br>
 		-trgempty</code></td>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
@@ -422,26 +439,26 @@ language will be English and the target Zulu.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table4">
 	<tr>
-		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top" nowrap><code>-fc configId</code></td>
 		<td align="left" valign="top">The identifier of the filter configuration to use for the 
 		input files</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top" nowrap><code>-ie encoding</code></td>
 		<td align="left" valign="top">The encoding name of the input files. this 
 		is used only if the filter cannot detect the encoding from the input 
 		file itself.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top" nowrap><code>-sl srcLang</code></td>
 		<td align="left" valign="top">The code of the source language of the input files.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top" nowrap><code>-tl trgLang</code></td>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-trgsource|<br>
+		<td valign="top" align="left" nowrap><code>-trgsource|<br>
 		-trgempty</code></td>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
@@ -464,39 +481,39 @@ elements for the German will be empty.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table6">
 	<tr>
-		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top" nowrap><code>-fc configId</code></td>
 		<td align="left" valign="top">The identifier of the filter configuration to use for the 
 		input files</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top" nowrap><code>-ie encoding</code></td>
 		<td align="left" valign="top">The encoding name of the input files. this 
 		is used only if the filter cannot detect the encoding from the input 
 		file itself.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top" nowrap><code>-sl srcLang</code></td>
 		<td align="left" valign="top">The code of the source language of the input files.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top" nowrap><code>-tl trgLang</code></td>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-trgsource|<br>
+		<td valign="top" align="left" nowrap><code>-trgsource|<br>
 		-trgempty</code></td>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-csv|<br>
+		<td align="left" valign="top" nowrap><code>-csv|<br>
 		-tab</code></td>
 		<td align="left" valign="top">Output format: <code>csv</code> for comma-separated values, or <code>tab</code> 
 		for tab-delimited values.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-xliff|<br>
+		<td align="left" valign="top" nowrap><code>-xliff|<br>
 		-xliffgx|<br>
 		-tmx|<br>
 		-generic</code></td>
@@ -527,26 +544,26 @@ are added to it.</p>
 <p>Where the options are:</p>
 <table border="1" cellspacing="0" cellpadding="4" id="table5">
 	<tr>
-		<td align="left" valign="top"><code>-fc configId</code></td>
+		<td align="left" valign="top" nowrap><code>-fc configId</code></td>
 		<td align="left" valign="top">The identifier of the filter configuration to use for the 
 		input files</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-ie encoding</code></td>
+		<td align="left" valign="top" nowrap><code>-ie encoding</code></td>
 		<td align="left" valign="top">The encoding name of the input files. this 
 		is used only if the filter cannot detect the encoding from the input 
 		file itself.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-sl srcLang</code></td>
+		<td align="left" valign="top" nowrap><code>-sl srcLang</code></td>
 		<td align="left" valign="top">The code of the source language of the input files.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top"><code>-tl trgLang</code></td>
+		<td align="left" valign="top" nowrap><code>-tl trgLang</code></td>
 		<td align="left" valign="top">The code of the target language.</td>
 	</tr>
 	<tr>
-		<td valign="top" align="left"><code>-trgsource|<br>
+		<td valign="top" align="left" nowrap><code>-trgsource|<br>
 		-trgempty</code></td>
 		<td align="left" valign="top">Force the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
@@ -559,6 +576,38 @@ are added to it.</p>
 <code>myTMDir</code>. If the directory does not exists it will be created. If a 
 TM exists, the input file9s) will be added to it. The 
 source language of the PO file is Japanese and the target French.</p>
+<h2><a name="penExport"></a>Export TMX from Pensieve TM</h2>
+<p dir="ltr">Creates a TMX output file for the the give Pensive TMs.</p>
+<p>The syntax of this command is:</p>
+<pre>-exp tmDirectory [tmDirectory2...] [options]</pre>
+<p>Where the options are:</p>
+<table border="1" cellspacing="0" cellpadding="4" id="table8">
+	<tr>
+		<td align="left" valign="top" nowrap><code>-sl srcLang</code></td>
+		<td align="left" valign="top">The code of the source language.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top" nowrap><code>-tl trgLang</code></td>
+		<td align="left" valign="top">The code of the target language.</td>
+	</tr>
+	<tr>
+		<td valign="top" align="left" nowrap><code>-trgsource|<br>
+		-trgempty</code></td>
+		<td align="left" valign="top">Forces the content of the output target 
+		field to be either a copy of the source or empty. If neither option is 
+		set the content of the target field is the target text or empty.</td>
+	</tr>
+	</table>
+<p>For example:</p>
+<pre>tikal -exp myProjectTM -sl en -tl IT</pre>
+<p>Creates a TMX document from the Pensieve TM stored in myProjectTM. The source 
+language is English and the target Italian.</p>
+<p>Note that the command <code>-exp</code> is a shortcut for the <code>-2tmx</code> 
+command (<a href="#conv2tmx">Convert to TMX Format</a>). You can export Pensieve 
+TM entries in table, TMX or PO format using the filter configuration <code>
+okf_pensieve</code>. For instance, the example above can be also execute using 
+the following command:</p>
+<pre>tikal -2tmx myProjectTM -fc okf_pensieve -sl en -tl IT</pre>
 <p>&nbsp;</p>
 
 </body>

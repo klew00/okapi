@@ -43,6 +43,7 @@ release (M4) and the previous one (M3)</p>
 	<li>Steps and utilities:<ul>
 		<li>Added the SimpleTM2TMX step.</li>
 		<li>Added Import and Export utilities for SimpleTM files.</li>
+		<li>Continued improving the Tokenization and WordCount steps.</li>
 		<li>Implement an option to select the XSLT processor to use with the 
 		<cite>XSL 
 		Transformation</cite> utility.</li>
@@ -54,20 +55,25 @@ release (M4) and the previous one (M3)</p>
 	</ul>
 	</li>
 	<li>Tikal:<ul>
-	<li>Added access to MyMemory (<code>-mm</code> option)</li>
+	<li>Added support for accessing the MyMemory repository (<code>-mm</code> option)</li>
 	<li>Corrected display of extended characters on the console for some 
 	languages/platforms.</li>
-	<li>Added threshold and max-hits options for TM query command (<code>-q</code>)</li>
+	<li>Added threshold and max-hits options for TM query command (<code>-opt</code> 
+	option)</li>
 	<li>Added a command to create PO files from any input (<code>-2po</code> 
-	option).</li>
+	command).</li>
 	<li>Added a command to create TMX files from any input (<code>-2tmx</code> 
-	option).</li>
+	command).</li>
 	<li>Added a command to create Table files from any input (<code>-2tbl</code> 
-	option).</li>
+	command).</li>
 	<li>Added capability to query a Pensieve TM (<code>-pen</code> option).</li>
-	<li>Added support for GlobalSight TM access (<code>-gs</code> option).</li>
-	<li>Added support for Apertium MT access (<code>-ap</code> option).</li>
+	<li>Added support for accessing GlobalSight TM servers (<code>-gs</code> option).</li>
+	<li>Added support for accessing Apertium MT servers (<code>-apertium</code> option).</li>
 	<li>Added segmentation and leveraging options for the extraction command.</li>
+	<li>Added a commands to import any file into a Pensieve TM (<code>-imp</code> 
+	command).</li>
+	<li>Added a command to export a Pensieve TM to a TMX file (<code>-exp</code> 
+	command).</li>
 </ul>
 	</li>
 </ul>

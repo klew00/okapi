@@ -1,1 +1,1 @@
-%comspec% /k call tikalPrompt.bat %~dp0
+%comspec% /k call tikalPrompt.bat "%~dp0"

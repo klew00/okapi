@@ -37,6 +37,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -674,7 +676,8 @@ public class SRXDocument {
 			Document doc;
 			if ( inputType == 0 ) {
 				String pathOrURL = (String)input;
-				doc = docBuilder.parse(Util.makeURIFromPath(pathOrURL));
+				//doc = docBuilder.parse(Util.makeURIFromPath(pathOrURL));
+				doc = docBuilder.parse(new File(pathOrURL));
 			}
 			else {
 				CharSequence data = (CharSequence)input;

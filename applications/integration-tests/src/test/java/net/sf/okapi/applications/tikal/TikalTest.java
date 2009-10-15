@@ -286,7 +286,13 @@ public class TikalTest {
     	assertEquals(0, runTikal("-q \"One entry in the TM.\" -pen pensieveTM -sl EN-US -tl FR-FR"));
     	
     	// Export now
+    	assertTrue(deleteOutputFile("pensieveTM.tmx"));
     	assertEquals(0, runTikal("-2tmx pensieveTM -fc okf_pensieve -sl EN-US -tl FR-FR"));
+    	assertTrue("File different from gold", compareWithGoldFile("pensieveTM.tmx", "UTF-8"));
+
+    	// Export again, using -exp 
+    	assertTrue(deleteOutputFile("pensieveTM.tmx"));
+    	assertEquals(0, runTikal("-exp pensieveTM -sl EN-US -tl FR-FR"));
     	assertTrue("File different from gold", compareWithGoldFile("pensieveTM.tmx", "UTF-8"));
     }
 
@@ -353,6 +359,22 @@ public class TikalTest {
     	if ( res != 0 ) {
     		System.err.println("\n=============== WARNING ===============");
     		System.err.println("The test of querying several translation resources failed.");
+    		System.err.println("This may be due to connection issues, or to real API problems with one of the connectors. Please check.");
+    		System.err.println("=======================================");
+    	}
+    }
+
+    @Test
+    public void testTranslateXML () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("xmltest2out.xml"));
+    	int res = runTikal("-t -sl en -tl eo xmltest2.xml -apertium -oe UTF-8");
+    	if ( res == 0 ) {
+    		assertTrue("File different from gold", compareWithGoldFile("xmltest2.out.xml", "UTF-8"));
+    	}
+    	else {
+    		System.err.println("\n=============== WARNING ===============");
+    		System.err.println("This test did not pass because the translation resources failed.");
     		System.err.println("This may be due to connection issues, or to real API problems with one of the connectors. Please check.");
     		System.err.println("=======================================");
     	}
