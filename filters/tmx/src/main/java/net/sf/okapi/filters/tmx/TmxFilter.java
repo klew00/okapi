@@ -660,6 +660,10 @@ public class TmxFilter implements IFilter {
 					}else if(reader.getLocalName().equals("tuv")){
 						
 						currentLang = getXmlLangFromCurTuv();
+						
+						//TOFIX: temporary fix to replace with localeId
+						currentLang = currentLang.toLowerCase();
+						
 						tuvTrgType = getTuvTrgType(currentLang);
 						
 						TmxTuv tmxTuv = tmxTu.addTmxTuv(currentLang,tuvTrgType);

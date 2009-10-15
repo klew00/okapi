@@ -545,56 +545,23 @@ public class QueryManager {
 		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
 		
 		int done = 0;
-		boolean orderWarning;
 		Code newCode, oriCode;
-//		StringBuilder text = new StringBuilder(newFrag.getCodedText());
-		
-//		for ( int i=0; i<text.length(); i++ ) {
-//			if ( !TextFragment.isMarker(text.charAt(i)) ) {
-//				continue;
-//			}
-//			
-//			newCode = newFrag.getCode(text.charAt(++i));
-//			newCode.setOuterData(null); // Remove outer codes
-//
-//			// Get the data from the original code (match on id)
-//			oriCode = null;
-//			orderWarning = true;
-//			for ( int j=0; j<oriIndices.length; j++ ) {
-//				if ( oriIndices[j] == -1) continue; // Used already
-//				if ( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ) {
-//					oriCode = oriCodes.get(oriIndices[j]);
-//					oriIndices[j] = -1;
-//					done++;
-//					break;
-//				}
-//				if ( orderWarning ) {
-//					logger.warning(String.format("The target code id='%d' has been moved (item id='%s', name='%s')",
-//						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
-//					orderWarning = false; 
-//				}
-//			}
-//		}
-		
+
 		for ( int i=0; i<newCodes.size(); i++ ) {
 			newCode = newCodes.get(i);
 			newCode.setOuterData(null); // Remove XLIFF outer codes if needed
 
 			// Get the data from the original code (match on id)
 			oriCode = null;
-			orderWarning = true;
 			for ( int j=0; j<oriIndices.length; j++ ) {
 				if ( oriIndices[j] == -1) continue; // Used already
-				if ( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ) {
+				if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() )
+					&& ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ))
+				{
 					oriCode = oriCodes.get(oriIndices[j]);
 					oriIndices[j] = -1;
 					done++;
 					break;
-				}
-				if ( orderWarning ) {
-					logger.warning(String.format("The target code id='%d' has been re-ordered (item id='%s', name='%s')",
-						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
-					orderWarning = false; 
 				}
 			}
 			
@@ -605,7 +572,7 @@ public class QueryManager {
 					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
 						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
 				}
-				
+				// Else: This is a new code: keep it
 			}
 			else { // A code with same ID existed in the original
 				// Get the data from the original
@@ -614,6 +581,12 @@ public class QueryManager {
 				newCode.setReferenceFlag(oriCode.hasReference());
 			}
 		}
+		
+		// Check order for warning
+//		if ( oriCodes.size() > 1 ) {
+//			StringBuilder tmp = new StringBuilder(oriCodes.size()*2);
+//		
+//		}
 		
 		// If needed, check for missing codes in new fragment
 		if ( oriCodes.size() > done ) {

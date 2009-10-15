@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.translation;
 
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -31,6 +32,7 @@ import static org.junit.Assert.*;
 public class QueryManagerTest {
 
 	private QueryManager qm;
+	private GenericContent fmt = new GenericContent();
 	
 	@Before
 	public void setUp() {
@@ -62,7 +64,7 @@ public class QueryManagerTest {
 
 	@Test
 	public void testAdjustSameMarkers () {
-		TextUnit tu = createTextUnit();
+		TextUnit tu = createTextUnit1();
 		TextFragment tf = new TextFragment("T ");
 		tf.append(TagType.OPENING, "b", "<T>");
 		tf.append("BOLD");
@@ -71,11 +73,13 @@ public class QueryManagerTest {
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
 		qm.adjustNewFragment(tu.getSourceContent(), tf, false, tu);
 		assertEquals("T <b>BOLD</b> T <br/>", tf.toString());
+		fmt.setContent(tf);
+		assertEquals("T <1>BOLD</1> T <2/>", fmt.toString());
 	}
 
 	@Test
 	public void testAdjustExtraMarkers () {
-		TextUnit tu = createTextUnit();
+		TextUnit tu = createTextUnit1();
 		TextFragment tf = new TextFragment("T ");
 		tf.append(TagType.OPENING, "b", "<T>");
 		tf.append("BOLD");
@@ -85,9 +89,26 @@ public class QueryManagerTest {
 		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
 		qm.adjustNewFragment(tu.getSourceContent(), tf, false, tu);
 		assertEquals("T <b>BOLD</b> T <br/><EXTRA/>", tf.toString());
+		fmt.setContent(tf);
+		assertEquals("T <1>BOLD</1> T <2/><3/>", fmt.toString());
 	}
 
-	private TextUnit createTextUnit () {
+	@Test
+	public void testAdjustMissingMarker () {
+		TextUnit tu = createTextUnit1();
+		TextFragment tf = new TextFragment("T ");
+		tf.append(TagType.OPENING, "b", "<T>");
+		tf.append("BOLD");
+		tf.append(" T ");
+		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
+		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
+		qm.adjustNewFragment(tu.getSourceContent(), tf, false, tu);
+		assertEquals("T <b>BOLD T <br/><EXTRA/>", tf.toString());
+		fmt.setContent(tf);
+		assertEquals("T <1/>BOLD T <2/><3/>", fmt.toString());
+	}
+
+	private TextUnit createTextUnit1 () {
 		TextUnit tu = new TextUnit("1", "t ");
 		TextFragment tf = tu.getSourceContent();
 		tf.append(TagType.OPENING, "b", "<b>");
@@ -97,4 +118,19 @@ public class QueryManagerTest {
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		return tu;
 	}
+
+//	private TextUnit createTextUnit2 () {
+//		TextUnit tu = new TextUnit("1", "t ");
+//		TextFragment tf = tu.getSourceContent();
+//		tf.append(TagType.OPENING, "b", "<b>");
+//		tf.append("bold");
+//		tf.append(TagType.CLOSING, "b", "</b>");
+//		tf.append(" t ");
+//		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+//		tf.append(TagType.OPENING, "i", "<i>");
+//		tf.append("italics");
+//		tf.append(TagType.CLOSING, "i", "</i>");
+//		return tu;
+//	}
+
 }

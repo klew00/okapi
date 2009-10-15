@@ -20,28 +20,28 @@ public class TmxHandlerExportTest {
     public void exportTmx_sample_metadata() throws Exception {
         Directory ramDir = new RAMDirectory();
         ITmWriter tmWriter = new PensieveWriter(ramDir, true);
-        OkapiTmxImporter tmxImporter = new OkapiTmxImporter("EN", new TmxFilter());
+        OkapiTmxImporter tmxImporter = new OkapiTmxImporter("en", new TmxFilter());
         OkapiTmxExporter tmxExporter = new OkapiTmxExporter();
-        tmxImporter.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
+        tmxImporter.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "it", tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
         StringWriter sWriter = new StringWriter();
-        tmxExporter.exportTmx("EN", "IT", seeker, new TMXWriter(new XMLWriter(sWriter)));
+        tmxExporter.exportTmx("en", "it", seeker, new TMXWriter(new XMLWriter(sWriter)));
 
         String expectedTmx = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<tmx version=\"1.4\">" +
                 "<header creationtool=\"pensieve\" creationtoolversion=\"0.0.1\" " +
                 "segtype=\"sentence\" o-tmf=\"pensieve\" adminlang=\"en\" " +
-                "srclang=\"EN\" datatype=\"unknown\"></header>" +
+                "srclang=\"en\" datatype=\"unknown\"></header>" +
                 "<body>" +
                 "<tu tuid=\"hello123\">" +
                 "<prop type=\"Txt::GroupName\">ImAGroupie</prop>" +
                 "<prop type=\"Txt::FileName\">GeorgeInTheJungle.hdf</prop>" +
-                "<tuv xml:lang=\"EN\"><seg>hello</seg></tuv>" +
-                "<tuv xml:lang=\"IT\"><seg>ciao</seg></tuv></tu>" + 
+                "<tuv xml:lang=\"en\"><seg>hello</seg></tuv>" +
+                "<tuv xml:lang=\"it\"><seg>ciao</seg></tuv></tu>" + 
                 "<tu tuid=\"world\">" +
-                "<tuv xml:lang=\"EN\"><seg>world</seg></tuv>" +
-                "<tuv xml:lang=\"IT\"><seg>mondo</seg></tuv>" + 
+                "<tuv xml:lang=\"en\"><seg>world</seg></tuv>" +
+                "<tuv xml:lang=\"it\"><seg>mondo</seg></tuv>" + 
                 "</tu></body></tmx>";
         assertEquals("tmx content", expectedTmx.replaceAll("[\\n\\r]+", ""), sWriter.toString().replaceAll("[\\n\\r]+", ""));
     }

@@ -138,8 +138,8 @@ public class TmxHandlerImportTest {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
         ITmWriter tmWriter = new PensieveWriter(ramDir, true);
-        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("EN", tmxFilter);
-        tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("en", tmxFilter);
+        tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "it", tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
         TranslationUnit tu = seeker.searchExact(new TextFragment("hello"), 2, null).get(0).getTu();
@@ -155,8 +155,8 @@ public class TmxHandlerImportTest {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
         ITmWriter tmWriter = new PensieveWriter(ramDir, true);
-        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("EN", tmxFilter);
-        tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "IT", tmWriter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("en", tmxFilter);
+        tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "it", tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
         TranslationUnit tu = seeker.searchExact(new TextFragment("hello"), 2, null).get(0).getTu();

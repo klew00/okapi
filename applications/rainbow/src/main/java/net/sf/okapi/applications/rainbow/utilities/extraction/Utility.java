@@ -117,11 +117,8 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( params.leverageOnlyExact ) {
 				qm.setThreshold(100);
 			}
-			else {
-				// Special temporary case for Pensieve, to get meaningful scores
-				if ( params.transResClass.endsWith("PensieveTMConnector") ) {
-					qm.setThreshold(99);
-				}
+			else { //TODO: Make this a parameter
+				qm.setThreshold(90);
 			}
 		}
 		

@@ -46,6 +46,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.locale.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
@@ -97,8 +98,8 @@ public class Main {
 	protected String configId;
 	protected String inputEncoding;
 	protected String outputEncoding;
-	protected String srcLang = Locale.getDefault().getLanguage();
-	protected String trgLang = "fr";
+	protected LocaleId srcLang = new LocaleId(Locale.getDefault());
+	protected LocaleId trgLang = new LocaleId("fr-fr", false);
 	protected int command = -1;
 	protected String query;
 	protected boolean useGoogle;
@@ -197,10 +198,10 @@ public class Main {
 					prog.specifiedConfigId = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-sl") ) {
-					prog.srcLang = prog.getArgument(args, ++i);
+					prog.srcLang = new LocaleId(prog.getArgument(args, ++i), true);
 				}
 				else if ( arg.equals("-tl") ) {
-					prog.trgLang = prog.getArgument(args, ++i);
+					prog.trgLang = new LocaleId(prog.getArgument(args, ++i), true);
 				}
 				else if ( arg.equals("-ie") ) {
 					prog.inputEncoding = prog.getArgument(args, ++i);
@@ -640,7 +641,8 @@ public class Main {
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
-			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
+			rd = new RawDocument(file.toURI(), inputEncoding,
+				srcLang.toString(), trgLang.toString());
 			rd.setFilterConfigId(configId);
 			translateFile(rd);
 			break;
@@ -650,7 +652,8 @@ public class Main {
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
-			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
+			rd = new RawDocument(file.toURI(), inputEncoding,
+				srcLang.toString(), trgLang.toString());
 			rd.setFilterConfigId(configId);
 			extractFile(rd);
 			break;
@@ -662,7 +665,8 @@ public class Main {
 			if ( !prepareFilter(configId) ) return; // Next input
 			XLIFFMergingStep stepMrg = new XLIFFMergingStep(fcMapper);
 			file = new File(skeleton);
-			RawDocument skelRawDoc = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
+			RawDocument skelRawDoc = new RawDocument(file.toURI(), inputEncoding,
+				srcLang.toString(), trgLang.toString());
 			skelRawDoc.setFilterConfigId(configId);
 			stepMrg.setXliffPath(input);
 			stepMrg.setOutputPath(output);
@@ -711,7 +715,8 @@ public class Main {
 				output = pensieveDir;
 			}
 			URI outputURI = new File(output).toURI();
-			rd = new RawDocument(file.toURI(), inputEncoding, srcLang, trgLang);
+			rd = new RawDocument(file.toURI(), inputEncoding,
+				srcLang.toString(), trgLang.toString());
 			rd.setFilterConfigId(configId);
 			
 			ps.println("Source language: "+srcLang);
@@ -856,7 +861,7 @@ public class Main {
 		if ( useGoogle ) {
 			conn = new GoogleMTConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang, trgLang);
+			conn.setLanguages(srcLang.toString(), trgLang.toString());
 			conn.open();
 			displayQuery(conn, false);
 			conn.close();
@@ -864,7 +869,7 @@ public class Main {
 		if ( usePensieve ) {
 			conn = new PensieveTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang, trgLang);
+			conn.setLanguages(srcLang.toString(), trgLang.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
@@ -873,7 +878,7 @@ public class Main {
 		if ( useTransToolkit ) {
 			conn = new TranslateToolkitTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang, trgLang);
+			conn.setLanguages(srcLang.toString(), trgLang.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
@@ -882,7 +887,7 @@ public class Main {
 		if ( useGlobalSight ) {
 			conn = new GlobalSightTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang, trgLang);
+			conn.setLanguages(srcLang.toString(), trgLang.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
@@ -891,7 +896,7 @@ public class Main {
 		if ( useMyMemory ) {
 			conn = new MyMemoryTMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang, trgLang);
+			conn.setLanguages(srcLang.toString(), trgLang.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
@@ -900,14 +905,14 @@ public class Main {
 		if ( useApertium ) {
 			conn = new ApertiumMTConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
-			conn.setLanguages(srcLang, trgLang);
+			conn.setLanguages(srcLang.toString(), trgLang.toString());
 			conn.open();
 			displayQuery(conn, false);
 			conn.close();
 		}
 		if ( useOpenTran ) {
 			conn = new OpenTranTMConnector();
-			conn.setLanguages(srcLang, trgLang);
+			conn.setLanguages(srcLang.toString(), trgLang.toString());
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);

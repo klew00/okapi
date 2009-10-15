@@ -22,7 +22,6 @@ package net.sf.okapi.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -129,9 +128,9 @@ public class ListUtil {
 	
 	/**
 	 * Splits up a string of comma-separated substrings into an array of those substrings.
-	 * @param st string of comma-separated substrings
-	 * @param delimiter a string delimiting substrings in the string
-	 * @return
+	 * @param st string of comma-separated substrings.
+	 * @param delimiter a string delimiting substrings in the string.
+	 * @return the generated array of strings.
 	 */
 	public static String[] stringAsArray(String st, String delimiter) {
 		
@@ -227,7 +226,7 @@ public class ListUtil {
 	/**
 	 * Converts a list of strings into an array of those strings.
 	 * @param list List of strings.
-	 * @return Array of strings.
+	 * @return an array of strings.
 	 */
 	public static String[] listAsArray(List<String> list) {
 		

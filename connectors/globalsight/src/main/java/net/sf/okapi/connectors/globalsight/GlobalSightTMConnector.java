@@ -446,6 +446,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 	}
 
 	private String toInternalCode (String standardCode) {
+		//TODO: Do we need to adjust the code to always have the country?
 		String code = standardCode.toLowerCase().replace('-', '_');
 		return code;
 	}

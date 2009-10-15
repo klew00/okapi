@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tmx version="1.4"><header creationtool="unknown" creationtoolversion="unknown" segtype="paragraph" o-tmf="unknown" adminlang="en" srclang="EN-US" datatype="text"></header><body>
+<tmx version="1.4"><header creationtool="unknown" creationtoolversion="unknown" segtype="paragraph" o-tmf="unknown" adminlang="en" srclang="en-us" datatype="text"></header><body>
 <tu tuid="autoID1">
 <prop type="Txt::GroupName">group1</prop>
 <prop type="Txt::FileName">file1</prop>
-<tuv xml:lang="EN-US"><seg>One entry in the TM.</seg></tuv>
-<tuv xml:lang="FR-FR"><seg>Une entrée dans la MT (file1, group1)</seg></tuv>
+<tuv xml:lang="en-us"><seg>One entry in the TM.</seg></tuv>
+<tuv xml:lang="fr-fr"><seg>Une entrée dans la MT (file1, group1)</seg></tuv>
 </tu>
 <tu tuid="autoID2">
 <prop type="Txt::FileName">file1</prop>
-<tuv xml:lang="EN-US"><seg>One entry in the TM.</seg></tuv>
-<tuv xml:lang="FR-FR"><seg>Une entrée dans la MT (file1, no group)</seg></tuv>
+<tuv xml:lang="en-us"><seg>One entry in the TM.</seg></tuv>
+<tuv xml:lang="fr-fr"><seg>Une entrée dans la MT (file1, no group)</seg></tuv>
 </tu>
 <tu tuid="autoID3">
 <prop type="Txt::GroupName">group1</prop>
-<tuv xml:lang="EN-US"><seg>One entry in the TM.</seg></tuv>
-<tuv xml:lang="FR-FR"><seg>Une entrée dans la MT (no file, group1)</seg></tuv>
+<tuv xml:lang="en-us"><seg>One entry in the TM.</seg></tuv>
+<tuv xml:lang="fr-fr"><seg>Une entrée dans la MT (no file, group1)</seg></tuv>
 </tu>
 <tu tuid="autoID4">
 <prop type="Txt::GroupName">group2</prop>
 <prop type="Txt::FileName">file1</prop>
-<tuv xml:lang="EN-US"><seg>One entry in the TM.</seg></tuv>
-<tuv xml:lang="FR-FR"><seg>Une entrée dans la MT (file1, group2)</seg></tuv>
+<tuv xml:lang="en-us"><seg>One entry in the TM.</seg></tuv>
+<tuv xml:lang="fr-fr"><seg>Une entrée dans la MT (file1, group2)</seg></tuv>
 </tu>
 <tu tuid="autoID5">
 <prop type="Txt::GroupName">group2</prop>
 <prop type="Txt::FileName">file2</prop>
-<tuv xml:lang="EN-US"><seg>One entry in the TM.</seg></tuv>
-<tuv xml:lang="FR-FR"><seg>Une entrée dans la MT (file2, group2)</seg></tuv>
+<tuv xml:lang="en-us"><seg>One entry in the TM.</seg></tuv>
+<tuv xml:lang="fr-fr"><seg>Une entrée dans la MT (file2, group2)</seg></tuv>
 </tu>
 <tu tuid="autoID6">
 <prop type="Txt::GroupName">group1</prop>
 <prop type="Txt::FileName">file2</prop>
-<tuv xml:lang="EN-US"><seg>One entry in the TM.</seg></tuv>
-<tuv xml:lang="FR-FR"><seg>Une entrée dans la MT (file2, group1)</seg></tuv>
+<tuv xml:lang="en-us"><seg>One entry in the TM.</seg></tuv>
+<tuv xml:lang="fr-fr"><seg>Une entrée dans la MT (file2, group1)</seg></tuv>
 </tu>
 <tu tuid="autoID7">
-<tuv xml:lang="EN-US"><seg>One entry in the TM.</seg></tuv>
-<tuv xml:lang="FR-FR"><seg>Une entrée dans la MT (no file, no group)</seg></tuv>
+<tuv xml:lang="en-us"><seg>One entry in the TM.</seg></tuv>
+<tuv xml:lang="fr-fr"><seg>Une entrée dans la MT (no file, no group)</seg></tuv>
 </tu>
 <tu tuid="autoID8">
-<tuv xml:lang="EN-US"><seg>Close the <bpt i="1">&lt;b&gt;</bpt>application<ept i="1">&lt;/b&gt;</ept>.</seg></tuv>
-<tuv xml:lang="FR-FR"><seg>Fermer <bpt i="1">&lt;b&gt;</bpt>l&apos;application<ept i="1">&lt;/b&gt;</ept>.</seg></tuv>
+<tuv xml:lang="en-us"><seg>Close the <bpt i="1">&lt;b&gt;</bpt>application<ept i="1">&lt;/b&gt;</ept>.</seg></tuv>
+<tuv xml:lang="fr-fr"><seg>Fermer <bpt i="1">&lt;b&gt;</bpt>l&apos;application<ept i="1">&lt;/b&gt;</ept>.</seg></tuv>
 </tu>
 </body>
 </tmx>
