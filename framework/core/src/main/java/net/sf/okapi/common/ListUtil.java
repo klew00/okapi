@@ -32,9 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Collection of helper functions for manipulating lists.
- * 
- * @version 0.1, 09.06.2009
+ * Helper methods to manipulate lists.
  */
 public class ListUtil {
 
@@ -42,8 +40,8 @@ public class ListUtil {
 	
 	/**
 	 * Splits up a string of comma-separated substrings into a string list of those substrings.
-	 * @param st string of comma-separated substrings 
-	 * @return a list of substrings 
+	 * @param st string of comma-separated substrings. 
+	 * @return a list of substrings.
 	 */
 	public static List<String> stringAsList(String st) {
 
@@ -52,8 +50,8 @@ public class ListUtil {
 	
 	/**
 	 * Splits up a string of comma-separated substrings into a string list of those substrings.
-	 * @param list a list to put the substrings
-	 * @param st string of comma-separated substrings 
+	 * @param list a list to put the substrings.
+	 * @param st string of comma-separated substrings. 
 	 */
 	public static void stringAsList(List<String> list, String st) {
 
@@ -63,9 +61,9 @@ public class ListUtil {
 	
 	/**
 	 * Splits up a string of delimited substrings into a string list of those substrings.
-	 * @param st string of delimited substrings
-	 * @param delimiter a string delimiting substrings in the string 
-	 * @return a list of substrings
+	 * @param st string of delimited substrings.
+	 * @param delimiter a string delimiting substrings in the string. 
+	 * @return a list of substrings.
 	 */
 	public static List<String> stringAsList(String st, String delimiter) {
 
@@ -78,9 +76,9 @@ public class ListUtil {
 	
 	/**
 	 * Splits up a string of delimited substrings into a string list of those substrings.
-	 * @param list a list to put the substrings
-	 * @param st string of delimited substrings
-	 * @param delimiter a string delimiting substrings in the string	  
+	 * @param list a list to put the substrings.
+	 * @param st string of delimited substrings.
+	 * @param delimiter a string delimiting substrings in the string.	  
 	 */
 	public static void stringAsList(List<String> list, String st, String delimiter) {
 
@@ -113,8 +111,8 @@ public class ListUtil {
 	
 	/**
 	 * Splits up a string of comma-separated substrings into an array of those substrings.
-	 * @param st string of comma-separated substrings
-	 * @return the generated array of strings
+	 * @param st string of comma-separated substrings.
+	 * @return the generated array of strings.
 	 */
 	public static String[] stringAsArray(String st) {
 		
@@ -144,8 +142,8 @@ public class ListUtil {
 	
 	/**
 	 * Converts a string of comma-separated numbers into a list of integers.
-	 * @param st string of comma-separated numbers 
-	 * @return a list of integers 
+	 * @param st string of comma-separated numbers. 
+	 * @return a list of integers.
 	 */
 	public static List<Integer> stringAsIntList (String st) {
 		
@@ -190,7 +188,7 @@ public class ListUtil {
 	/**
 	 * Remove empty trailing elements of the given list.
 	 * Possible empty elements in the head and middle of the list remain if located before a non-empty element.
-	 * @param list the list to be trimmed
+	 * @param list the list to be trimmed.
 	 */
 	public static void listTrimTrail(List<String> list) {
 	
@@ -208,6 +206,7 @@ public class ListUtil {
 	 * @param list
 	 * @return the list with trimmed elements.
 	 */
+	//TODO: javadoc
 	public static List<String> listTrimValues(List<String> list) {
 		
 		if (list == null) return list;
@@ -236,6 +235,7 @@ public class ListUtil {
 		return (String[]) list.toArray(new String[] {});
 	}
 	
+	//TODO: javadoc
 	public static <E> List<E> arrayAsList(E[] array) {
 		
 		//return Arrays.asList(array); // Fixed size, no clear() etc. possible
@@ -247,21 +247,25 @@ public class ListUtil {
 		return list;
 	}
 	
+	//TODO: javadoc
 	public static String arrayAsString(String[] array) {
 				
 		return arrayAsString(array, ",");
 	}
 	
+	//TODO: javadoc
 	public static String arrayAsString(String[] array, String delimiter) {
 		
 		return listAsString(Arrays.asList(array), delimiter);
 	}
 	
+	//TODO: javadoc
 	public static String listAsString(List<String> list) {
 		
 		return listAsString(list, ",");
 	}
 	
+	//TODO: javadoc
 	public static String listAsString(List<String> list, String delimiter) {
 		
 		if (list == null) return "";
@@ -277,11 +281,13 @@ public class ListUtil {
 		return res;
 	}
 	
+	//TODO: javadoc
 	public static String intListAsString(List<Integer> list) {
 		
 		return intListAsString(list, ",");
 	}
 	
+	//TODO: javadoc
 	public static String intListAsString(List<Integer> list, String delimiter) {
 		
 		List<String> stList = new ArrayList<String>();
@@ -292,6 +298,7 @@ public class ListUtil {
 		return listAsString(stList, delimiter);
 	}
 
+	//TODO: javadoc
 	public static <E> void remove(List<E> list, int start, int end) {
 		
 		if (list == null) return;
@@ -304,6 +311,7 @@ public class ListUtil {
 	}
 
 	@SuppressWarnings("unchecked") 
+	//TODO: javadoc
 	public static <E> List<E> copyItems(List<E> list, int start, int end) {
 		// No way to determine the actual type of E at compile time to cast newInstance(), so @SuppressWarnings("unchecked") 
 	
@@ -331,6 +339,7 @@ public class ListUtil {
 		return res;
 	}
 		
+	//TODO: javadoc
 	public static <E> List<E> moveItems(List<E> buffer, int start, int end) {
 	
 		List<E> res = copyItems(buffer, start, end);
@@ -341,6 +350,7 @@ public class ListUtil {
 		return res;
 	}
 	
+	//TODO: javadoc
 	public static <E> List<E> moveItems(List<E> buffer) {
 		
 		List<E> res = copyItems(buffer, 0, buffer.size() - 1);
@@ -351,6 +361,7 @@ public class ListUtil {
 		return res;
 	}
 	
+	//TODO: javadoc
 	public static <E> E getFirstNonNullItem(List<E> list) {
 		
 		if (Util.isEmpty(list)) return null;
@@ -361,12 +372,14 @@ public class ListUtil {
 		return null;		
 	}
 	
+	//TODO: javadoc
 	protected static void logMessage (Level level, String text) {
 		
 		if (logger != null)
 			logger.log(level, text);
 	}
 
+	//TODO: javadoc
 	public static List<String> loadList(Class<?> classRef, String resourceLocation) {
 		
 		List<String> res = new ArrayList<String>();
@@ -375,6 +388,7 @@ public class ListUtil {
 		return res;
 	}
 	
+	//TODO: javadoc
 	public static void loadList(List<String> list, Class<?> classRef, String resourceLocation) {
 
 		if (list == null) return;

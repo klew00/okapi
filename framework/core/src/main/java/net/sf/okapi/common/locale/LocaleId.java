@@ -20,8 +20,6 @@
 
 package net.sf.okapi.common.locale;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -395,30 +393,30 @@ public final class LocaleId implements Comparable<Object> {
 	 * @param other the string to compare.
 	 * @return true if the languages of both objects are the same.
 	 */
-	public boolean sameLanguageAs (String other) {
-		return sameLanguageAs(other, true);
+	public boolean sameLanguageAs (String langCode) {
+		return sameLanguageAs(langCode, true);
 	}
 	
-	private boolean sameLanguageAs (String other,
+	private boolean sameLanguageAs (String otherLocId,
 		boolean normalize)
 	{
-		if ( other == null ) {
+		if ( otherLocId == null ) {
 			return false; // locId is not null
 		}
 		if ( normalize ) {
-			other = normalize(other);
+			otherLocId = normalize(otherLocId);
 		}
 		// Get the '-' position
 		int n1 = locId.indexOf('-');
-		int n2 = other.indexOf('-');
+		int n2 = otherLocId.indexOf('-');
 		// If not present it means the whole string is the language
 		if ( n1 == -1 ) n1 = locId.length();
-		if ( n2 == -1 ) n2 = other.length();
+		if ( n2 == -1 ) n2 = otherLocId.length();
 		// Not the same length means they are different
 		if ( n1 != n2 ) return false;
 		// Now n1 == n2, and both are > -1
 		for ( int i=0; i<n1; i++ ) {
-			if ( locId.charAt(i) != other.charAt(i) ) return false;
+			if ( locId.charAt(i) != otherLocId.charAt(i) ) return false;
 		}
 		return true;
 	}

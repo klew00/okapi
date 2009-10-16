@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
@@ -71,7 +72,8 @@ public class Editor implements IParametersEditor {
 	private Button chkPreTranslate;
 	private Button chkUseFileName;
 	private Button chkUseGroupName;
-	private Button chkLeverageOnlyExact;
+	private Label stThreshold;
+	private Spinner spinThreshold;
 	private SegmentationPanel pnlSegmentation;
 	private boolean inInit = true;
 	private IHelp help;
@@ -279,11 +281,12 @@ public class Editor implements IParametersEditor {
 				updatePretranslate();
 			}
 		});
-
 		
 		connectorPanel = new ConnectorSelectionPanel(cmpTmp, SWT.NONE, connectors, context,
 			"Translation resource to use:");
-		connectorPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		connectorPanel.setLayoutData(gdTmp);
 		
 		chkUseFileName = new Button(cmpTmp, SWT.CHECK);
 		chkUseFileName.setText("Penalize matches with a FileName attribute different from the document being processed");
@@ -297,12 +300,13 @@ public class Editor implements IParametersEditor {
 		gdTmp.horizontalSpan = 2;
 		chkUseGroupName.setLayoutData(gdTmp);
 
-		chkLeverageOnlyExact = new Button(cmpTmp, SWT.CHECK);
-		chkLeverageOnlyExact.setText("Leverage only exatct (100%) matches");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkLeverageOnlyExact.setLayoutData(gdTmp);
+		stThreshold = new Label(cmpTmp, SWT.NONE);
+		stThreshold.setText("Leverage only matches greater or equal to: ");
 		
+		spinThreshold = new Spinner(cmpTmp, SWT.BORDER);
+		spinThreshold.setMaximum(100);
+		spinThreshold.setMinimum(0);
+		spinThreshold.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
 		
 		//--- Dialog-level buttons
 
@@ -364,7 +368,8 @@ public class Editor implements IParametersEditor {
 		connectorPanel.setEnabled(chkPreTranslate.getSelection());
 		chkUseFileName.setEnabled(chkPreTranslate.getSelection());
 		chkUseGroupName.setEnabled(chkPreTranslate.getSelection());
-		chkLeverageOnlyExact.setEnabled(chkPreTranslate.getSelection());
+		stThreshold.setEnabled(chkPreTranslate.getSelection());
+		spinThreshold.setEnabled(chkPreTranslate.getSelection());
 	}
 	
 	private boolean showDialog () {
@@ -397,7 +402,7 @@ public class Editor implements IParametersEditor {
 		
 		chkUseFileName.setSelection(params.useFileName);
 		chkUseGroupName.setSelection(params.useGroupName);
-		chkLeverageOnlyExact.setSelection(params.leverageOnlyExact);
+		spinThreshold.setSelection(params.threshold);
 		// TODO: This needs to be a clone, not the object itself, or it will get saved on cancel
 		xliffOptions = params.xliffOptions;
 
@@ -438,7 +443,7 @@ public class Editor implements IParametersEditor {
 		
 		params.useFileName = chkUseFileName.getSelection();
 		params.useGroupName = chkUseGroupName.getSelection();
-		params.leverageOnlyExact = chkLeverageOnlyExact.getSelection();
+		params.threshold = spinThreshold.getSelection();
 		params.xliffOptions = xliffOptions;
 		return true;
 	}

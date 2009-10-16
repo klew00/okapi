@@ -45,10 +45,10 @@ package net.sf.okapi.common.observer;
 import java.lang.ref.WeakReference;
 
 /**
- * Implementation of Observable that holds references to Observers as
+ * Implementation of {@link IObservable} that holds references to Observers as
  * WeakReferences.
  * 
- * @note This implementation notifies the observers in a synchronous
+ * This implementation notifies the observers in a synchronous
  * fashion. Note that this can cause trouble if you notify the observers while
  * in a transactional context because the notification is then done also in the
  * transaction.
@@ -71,6 +71,10 @@ import java.lang.ref.WeakReference;
  */
 public class WeakReferenceObservable extends BaseObservable {
 
+	/**
+	 * Creates a new WeakReferenceObservable object with a given {@link IObservable} object.
+	 * @param observable the object to observe.
+	 */
     public WeakReferenceObservable(IObservable observable) {
         super(observable);
     }
@@ -96,11 +100,9 @@ public class WeakReferenceObservable extends BaseObservable {
         super.deleteObserver(observer);
     }
     
-
     //
-    // inner classes
+    // Inner class
     //
-    
     private class WeakReferenceObserver extends WeakReference<IObserver> implements IObserver {
     	
         public WeakReferenceObserver(IObserver referent) {

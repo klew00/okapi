@@ -97,65 +97,15 @@ requires Java 1.4.2 or Java 1.5.x.</li>
 
 <hr>
 <h2><a name="JARDependencies"></a>JAR Dependencies</h2>
-<p>The following table shows which third-party JAR files are necessary 
-for which Okapi components (version numbers have been omitted).</p>
-<table border="1" cellspacing="0" cellpadding="4" id="table2">
-	<tr>
-		<th align="left" valign="top">This third-party JAR</th>
-		<th align="left" valign="top">Is used by...</th>
-		<th align="left" valign="top">When using this Okapi component...</th>
-	</tr>
-	<tr>
-		<td align="left" valign="top"><code>dtdparser</code></td>
-		<td align="left" valign="top"><code>okapi-lib</code></td>
-		<td align="left" valign="top"><code>net.sf.okapi.filters.dtd</code></td>
-	</tr>
-	<tr>
-		<td align="left" valign="top"><code>jericho-html</code><br>
-		and <code>jyaml</code></td>
-		<td align="left" valign="top"><code>okapi-lib</code></td>
-		<td align="left" valign="top"><code>net.sf.okapi.filters.html</code><br>
-		or <code>net.sf.okapi.filters.openxml</code></td>
-	</tr>
-	<tr>
-		<td align="left" valign="top"><code>stax-api</code><br>
-		and <code>wstx-lgpl</code></td>
-		<td align="left" valign="top"><code>okapi-lib</code></td>
-		<td align="left" valign="top"><code>net.sf.okapi.filters.idml</code><br>
-		or <code>net.sf.okapi.filters.openoffice</code><br>
-		or <code>net.sf.okapi.filters.tmx</code><br>
-		or <code>net.sf.okapi.filters.xliff</code></td>
-	</tr>
-	<tr>
-		<td align="left" valign="top"><code>axis</code><br>
-		and <code>wsdl4j</code><br>
-		and <code>jaxrpc</code><br>
-		and <code>commons-logging</code><br>
-		and <code>commons-discovery</code><br>
-		and <code>saaj</code></td>
-		<td align="left" valign="top"><code>okapi-lib</code></td>
-		<td align="left" valign="top"><code>net.sf.okapi.tm.globalsight</code></td>
-	</tr>
-	<tr>
-		<td align="left" valign="top"><code>xmlrpc-client</code><br>
-		and <code>xmlrpc-common</code><br>
-		and <code>ws-commons-util</code></td>
-		<td align="left" valign="top"><code>okapi-lib</code></td>
-		<td align="left" valign="top"><code>net.sf.okapi.tm.opentran</code></td>
-	</tr>
-	<tr>
-		<td align="left" valign="top"><code>h2</code></td>
-		<td align="left" valign="top"><code>okapi-lib</code></td>
-		<td align="left" valign="top"><code>net.sf.okapi.tm.simpletm</code></td>
-	</tr>
-	<tr>
-		<td align="left" valign="top"><code>json-simple</code></td>
-		<td align="left" valign="top"><code>okapi-lib</code></td>
-		<td align="left" valign="top"><code>net.sf.okapi.tm.translatetoolkit</code></td>
-	</tr>
-</table>
-<p>If you are developing applications that use only some of the Okapi library&#39;s 
-components, you may remove some dependencies.</p>
+<p>Several Okapi packages depend on thir-party libraries. While the Okapi 
+packages are distributed in a single JAR file, it is easy to build separate JAR 
+files if needed.</p>
+<p>For more information on what third-party libraries are used with which 
+package, see the <code>pom.xml</code> file of each package in the source code:
+<a href="http://code.google.com/p/okapi/source/browse/#svn/trunk">
+http://code.google.com/p/okapi/source/browse/#svn/trunk</a></p>
+<p>Currently most dependencies are for the connectors and for some filters and 
+steps. The Okapi core packages have no dependencies.</p>
 
 <hr>
 <h2><a name="Support"></a>Support</h2>

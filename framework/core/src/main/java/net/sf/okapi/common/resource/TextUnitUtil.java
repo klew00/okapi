@@ -29,17 +29,15 @@ import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
 
 /**
- * 
- * 
- * @version 0.1, 09.06.2009
+ * Helper methods to manipulate {@link TextFragment} objects. 
  */
-
 public class TextUnitUtil {
 	
 	/**
 	 * 
 	 * @param textFragment
 	 */
+	//TODO: javadoc
 	public static void trimLeading(TextFragment textFragment) {
 		
 		trimLeading(textFragment, null);
@@ -50,6 +48,7 @@ public class TextUnitUtil {
 	 * @param textFragment
 	 * @param skel
 	 */
+	//TODO: javadoc
 	public static void trimLeading(TextFragment textFragment, GenericSkeleton skel) {
 		
 		if (textFragment == null) return;
@@ -78,6 +77,7 @@ public class TextUnitUtil {
 	 * 
 	 * @param textFragment
 	 */
+	//TODO: javadoc
 	public static void trimTrailing(TextFragment textFragment) {
 		trimTrailing(textFragment, null);
 	}
@@ -87,6 +87,7 @@ public class TextUnitUtil {
 	 * @param textFragment
 	 * @param skel
 	 */
+	//TODO: javadoc
 	public static void trimTrailing(TextFragment textFragment, GenericSkeleton skel) {
 		
 		if (textFragment == null) return;
@@ -113,10 +114,11 @@ public class TextUnitUtil {
 	}
 
 	/**
-	 * !!! Trailing spaces are not counted. 
-	 * @param textFragment
-	 * @param substr
-	 * @return
+	 * Indicates if a given text fragment ends with a given sub-string.
+	 * <b>Trailing spaces are not counted</b>.
+	 * @param textFragment the text fragment to examine.
+	 * @param substr the text to lookup.
+	 * @return true if the given text fragment ends with the given sub-string.
 	 */
 	public static boolean endsWith(TextFragment textFragment, String substr) {
 		
@@ -131,21 +133,25 @@ public class TextUnitUtil {
 		return st.lastIndexOf(substr) == pos - substr.length() + 1;
 	}
 
+	//TODO: javadoc
 	public static boolean isEmpty(TextUnit textUnit) {
 		
 		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit)));
 	}
 	
+	//TODO: javadoc
 	public static boolean hasSource(TextUnit textUnit) {
 		
 		return !isEmpty(textUnit, true);
 	}
 	
+	//TODO: javadoc
 	public static boolean isEmpty(TextUnit textUnit, boolean ignoreWS) {
 		
 		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit), ignoreWS));
 	}
 	
+	//TODO: javadoc
 	public static String getSourceText(TextUnit textUnit) {
 		
 		if (textUnit == null) return "";
@@ -153,6 +159,7 @@ public class TextUnitUtil {
 		return getCodedText(textUnit.getSourceContent());
 	}
 	
+	//TODO: javadoc
 	public static String getSourceText(TextUnit textUnit, boolean removeCodes) {
 		
 		if (textUnit == null) return "";
@@ -163,6 +170,7 @@ public class TextUnitUtil {
 			return getCodedText(textUnit.getSourceContent());
 	}
 	
+	//TODO: javadoc
 	public static String getTargetText(TextUnit textUnit, String language) {
 		
 		if (textUnit == null) return "";
@@ -171,6 +179,7 @@ public class TextUnitUtil {
 		return getCodedText(textUnit.getTargetContent(language));
 	}
 	
+	//TODO: javadoc
 	public static String getCodedText(TextFragment textFragment) {
 		
 		if (textFragment == null) return "";
@@ -238,9 +247,9 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * 
-	 * @param textFragment
-	 * @return
+	 * Gets the last character of a given text fragment.
+	 * @param textFragment the text fragment to examin.
+	 * @return the last character of the given text fragment, or '\0'.
 	 */
 	public static char getLastChar(TextFragment textFragment) {
 		
@@ -255,8 +264,8 @@ public class TextUnitUtil {
 	}
 
 	/**
-	 * 
-	 * @param textFragment
+	 * Deletes the last non-whitespace and non-code character of a given text fragment.
+	 * @param textFragment the text fragment to examine.
 	 */
 	public static void deleteLastChar(TextFragment textFragment) {
 		
@@ -275,6 +284,7 @@ public class TextUnitUtil {
 	 * @param findWhat
 	 * @return
 	 */
+	//TODO: javadoc
 	public static int lastIndexOf(TextFragment textFragment, String findWhat) {
 		
 		if (textFragment == null) return -1;
@@ -284,16 +294,19 @@ public class TextUnitUtil {
 		return (textFragment.getCodedText()).lastIndexOf(findWhat);
 	}
 				
+	//TODO: javadoc
 	public static boolean isEmpty(TextFragment textFragment) {
 		
 		return (textFragment == null || (textFragment != null && textFragment.isEmpty()));		
 	}
 	
+	//TODO: javadoc
 	public static TextUnit buildTU (TextContainer source) {
 			
 		return buildTU(null, "", source, null, "", "");
 	}
 	
+	//TODO: javadoc
 	public static TextUnit buildTU (String source) {
 		
 		return buildTU(new TextContainer(source));
@@ -304,6 +317,7 @@ public class TextUnitUtil {
 	 * @param skelPart
 	 * @return
 	 */
+	//TODO: javadoc
 	public static TextUnit buildTU(String srcPart, String skelPart) {
 		
 		TextUnit res = buildTU(srcPart);
@@ -318,6 +332,7 @@ public class TextUnitUtil {
 		return res;
 	}	
 	
+	//TODO: javadoc
 	public static TextUnit buildTU(
 			TextUnit textUnit, 
 			String name, 
@@ -352,6 +367,7 @@ public class TextUnitUtil {
 		return textUnit;
 	}
 
+	//TODO: javadoc
 	public static GenericSkeleton forseSkeleton(TextUnit tu) {
 		
 		if (tu == null) return null;
@@ -376,6 +392,7 @@ public class TextUnitUtil {
 	 * @param textUnit
 	 * @return
 	 */
+	//TODO: javadoc
 	public static GenericSkeleton convertToSkeleton(TextUnit textUnit) {
 		
 		if (textUnit == null) return null;
@@ -430,6 +447,7 @@ public class TextUnitUtil {
 		return res;
 	}
 	
+	//TODO: javadoc
 	public static <A extends IAnnotation> A getSourceAnnotation(TextUnit textUnit, Class<A> type) {
 	
 		if (textUnit == null) return null;
@@ -438,6 +456,7 @@ public class TextUnitUtil {
 		return textUnit.getSource().getAnnotation(type);		
 	}
 	
+	//TODO: javadoc
 	public static void setSourceAnnotation(TextUnit textUnit, IAnnotation annotation) {
 		
 		if (textUnit == null) return;
@@ -446,6 +465,7 @@ public class TextUnitUtil {
 		textUnit.getSource().setAnnotation(annotation);		
 	}
 	
+	//TODO: javadoc
 	public static <A extends IAnnotation> A getTargetAnnotation(TextUnit textUnit, String language, Class<A> type) {
 		
 		if (textUnit == null) return null;
@@ -455,6 +475,7 @@ public class TextUnitUtil {
 		return textUnit.getTarget(language).getAnnotation(type);		
 	}
 	
+	//TODO: javadoc
 	public static void setTargetAnnotation(TextUnit textUnit, String language, IAnnotation annotation) {
 		
 		if (textUnit == null) return;
@@ -464,6 +485,7 @@ public class TextUnitUtil {
 		textUnit.getTarget(language).setAnnotation(annotation);		
 	}
 	
+	//TODO: javadoc
 	public static void setSourceText(TextUnit textUnit, String text) {
 		
 		if (textUnit == null) return;
@@ -474,6 +496,7 @@ public class TextUnitUtil {
 		source.setCodedText(text);
 	}
 	
+	//TODO: javadoc
 	public static void setTargetText(TextUnit textUnit, String language, String text) {
 		
 		if (textUnit == null) return;
@@ -485,6 +508,7 @@ public class TextUnitUtil {
 		target.setCodedText(text);
 	}
 
+	//TODO: javadoc
 	public static void trimTU(TextUnit textUnit, boolean trimLeading, boolean trimTrailing) {
 		
 		if (textUnit == null) return;
@@ -509,6 +533,7 @@ public class TextUnitUtil {
 			tuSkel.add(skel);
 	}
 	
+	//TODO: javadoc
 	public static void removeQualifiers(TextUnit textUnit, String qualifier) {
 		
 		if (textUnit == null) return;		

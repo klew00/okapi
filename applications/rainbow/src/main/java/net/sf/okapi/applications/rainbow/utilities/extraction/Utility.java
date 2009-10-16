@@ -114,12 +114,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				tmParams.fromString(params.transResParams);
 			}
 			qm.addAndInitializeResource(conn, conn.getName(), tmParams);
-			if ( params.leverageOnlyExact ) {
-				qm.setThreshold(100);
-			}
-			else { //TODO: Make this a parameter
-				qm.setThreshold(90);
-			}
+			qm.setThreshold(params.threshold);
 		}
 		
 		resolvedOutputDir = params.outputFolder + File.separator + params.pkgName;

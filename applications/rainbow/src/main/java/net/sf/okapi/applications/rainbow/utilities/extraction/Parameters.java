@@ -40,7 +40,7 @@ public class Parameters extends BaseParameters {
 	public boolean useGroupName;
 	public boolean protectAccepted;
 	public IParameters xliffOptions;
-	public boolean leverageOnlyExact;
+	public int threshold;
 	public String transResClass;
 	public String transResParams;
 
@@ -61,7 +61,7 @@ public class Parameters extends BaseParameters {
 		useGroupName = true;
 		protectAccepted = true;
 		xliffOptions = new Options();
-		leverageOnlyExact = true;
+		threshold = 95;
 		transResClass = "net.sf.okapi.connectors.simpletm.SimpleTMConnector";
 		transResParams = null;
 	}
@@ -81,7 +81,7 @@ public class Parameters extends BaseParameters {
 		useGroupName = buffer.getBoolean("useGroupName", useGroupName);
 		protectAccepted = buffer.getBoolean("protectAccepted", protectAccepted);
 		xliffOptions.fromString(buffer.getGroup("xliffOptions"));
-		leverageOnlyExact = buffer.getBoolean("leverageOnlyExact", leverageOnlyExact);
+		threshold = buffer.getInteger("threshold", threshold);
 		transResClass = buffer.getString("transResClass", transResClass);
 		transResParams = buffer.getGroup("transResParams", transResParams);
 	}
@@ -100,7 +100,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("useGroupName", useGroupName);
 		buffer.setBoolean("protectAccepted", protectAccepted);
 		buffer.setGroup("xliffOptions", xliffOptions.toString());
-		buffer.setBoolean("leverageOnlyExact", leverageOnlyExact);
+		buffer.setInteger("threshold", threshold);
 		buffer.setString("transResClass", transResClass);
 		buffer.setGroup("transResParams", transResParams);
 		

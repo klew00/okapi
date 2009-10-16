@@ -22,9 +22,13 @@ package net.sf.okapi.common;
 
 import net.sf.okapi.common.Util;
 
+/**
+ * Helper methods to manupulate strings.
+ */
 public class StringUtil {
 
 	// String formatting
+	//TODO: javadoc
 	public static String titleCase(String st) {
 		if (Util.isEmpty(st)) 
 			return st;
@@ -32,6 +36,7 @@ public class StringUtil {
 		return st.substring(0,1).toUpperCase() + st.substring(1);
 	}
 	
+	//TODO: javadoc
 	public static String removeQualifiers(String st, String qualifier) {
 	
 		if (Util.isEmpty(st) || Util.isEmpty(qualifier))
@@ -45,11 +50,13 @@ public class StringUtil {
 		return st;
 	}
 	
+	//TODO: javadoc
 	public static String removeQualifiers(String st) {
 	
 		return removeQualifiers(st, "\""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	//TODO: javadoc
 	public static String normalizeLineBreaks(String string) {
 		
 		String res = string;
@@ -63,4 +70,5 @@ public class StringUtil {
 		
 		return res;
 	}
+
 }

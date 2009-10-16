@@ -57,7 +57,7 @@ public class QueryUtil {
 	
 	/**
 	 * Separate and store codes of a given text fragment.
-	 * @param frag the fragment to process. Use {@link #appendCodesToText(TextFragment, String)}
+	 * @param frag the fragment to process. Use {@link #createNewFragmentWithCodes(String)}
 	 * to reconstruct the text back with its codes at the end.
 	 * @return the fragment content stripped of its codes.
 	 */

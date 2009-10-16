@@ -94,8 +94,9 @@ being processed</cite> -- Set this option to
 filter the TM matches based on the values of <code>GroupName</code> attribute. When this option is set, only the matches that 
 have, not only the source text but also the values for <code>GroupName</code> that match are leveraged. When this option is not set, 
 the leveraging is not filtered by the <code>GroupName</code> attribute.</p>
-<p><cite>Leverage only exact (100%) matches</cite> -- Set this option to 
-leverage only the exact matches (matches at 100%). Note that if there are 
+<p><cite>Leverage only matches greater or equal to</cite> -- Set the threshold 
+under which matches should not be leveraged. the value must be between 0 
+(leverage anything) and 100 (leverage only exact matches). Note that if there are 
 several matches (regardless of their scores) only the first one is generated in 
 the <a href="#tmxOutput">TMX output</a> and, if the selected package allows it, 
 in the translation file.</p>
@@ -161,9 +162,11 @@ GroupName = myGroup</p>
 		<td>No Match</td>
 	</tr>
 </table>
-<p>&nbsp;</p>
 <p>In the future, the SimpleTM engine will be replaced by more a powerful TM engine: 
 the Pensieve TM.</p>
+<h3>About the Pensieve TM</h3>
+<p>The Pensieve TM engine is Okapi&#39;s own TM engine. It is not ready for full 
+production work yet, but it is shipped with the Okapi tools and useable.</p>
 <h2><a name="processing"></a>Processing Details</h2>
 <p>The output of this utility varies depending on which type of package is 
 selected.</p>

@@ -393,15 +393,14 @@ public class Util {
 	}
 
 	/**
-	 * Copy one {@link Channel} to another.
-	 * 
-	 * @param inChannel
-	 *            - input Channel
-	 * @param outChannel
-	 *            - output Channel
-	 * @throws OkapiIOException
+	 * Copies a {@link ReadableByteChannel} to a {@link WritableByteChannel}.
+	 * @param inChannel the input Channel.
+	 * @param outChannel the output Channel.
+	 * @throws OkapiIOException if an error occurs.
 	 */
-	public static void copy(ReadableByteChannel inChannel, WritableByteChannel outChannel) {
+	public static void copy(ReadableByteChannel inChannel,
+		WritableByteChannel outChannel)
+	{
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
 		try {
 			while (inChannel.read(buffer) != -1) {
@@ -427,13 +426,10 @@ public class Util {
 	}
 
 	/**
-	 * Copy an {@link InputStream} to a File.
-	 * 
-	 * @param is
-	 *            input stream
-	 * @param outputFile
-	 *            output {@link File}
-	 * @throws OkapiIOException
+	 * Copies an {@link InputStream} to a File.
+	 * @param is the input stream.
+	 * @param outputFile the output {@link File}.
+	 * @throws OkapiIOException if an error occurs.
 	 */
 	public static void copy (InputStream is,
 		File outputFile)
@@ -442,15 +438,14 @@ public class Util {
 	}
 
 	/**
-	 * Copy an {@link InputStream} to a File.
-	 * 
-	 * @param is
-	 *            input stream
-	 * @param outputPath
-	 *            output path
-	 * @throws OkapiIOException
+	 * Copies an {@link InputStream} to a File.
+	 * @param is the input stream.
+	 * @param outputPath the output path.
+	 * @throws OkapiIOException if an error occurs.
 	 */
-	public static void copy(InputStream is, String outputPath) {
+	public static void copy(InputStream is,
+		String outputPath)
+	{
 		ReadableByteChannel inChannel = null;
 		WritableByteChannel outChannel = null;
 		try {
@@ -475,12 +470,9 @@ public class Util {
 
 	/**
 	 * Copies one file to another.
-	 * 
-	 * @param in
-	 *            input file
-	 * @param out
-	 *            output file
-	 * @throws OkapiIOException
+	 * @param in the input file.
+	 * @param out the output file.
+	 * @throws OkapiIOException if an error occurs.
 	 */
 	public static void copyFile (File in,
 		File out)
@@ -509,14 +501,10 @@ public class Util {
 
 	/**
 	 * Copies a file from one location to another.
-	 * 
-	 * @param fromPath
-	 *            The path of the file to copy.
-	 * @param toPath
-	 *            The path of the copy to make.
-	 * @param move
-	 *            True to move the file, false to copy it.
-	 * @throws OkapiIOException
+	 * @param fromPath the path of the file to copy.
+	 * @param toPath the path of the copy to make.
+	 * @param move true to move the file, false to copy it.
+	 * @throws OkapiIOException if an error occurs.
 	 */
 	public static void copyFile (String fromPath,
 		String toPath,
@@ -567,7 +555,7 @@ public class Util {
 	}
 
 	/**
-	 * Delete the content of a given directory, and if requested, the directory
+	 * Deletes the content of a given directory, and if requested, the directory
 	 * itself. Sub-directories and their content are part of the deleted
 	 * content.
 	 * 
