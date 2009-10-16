@@ -720,6 +720,16 @@ public class TextFragment implements Comparable<Object> {
 		Matcher m = MARKERS_REGEX.matcher(new String(text));
 		return m.replaceAll(""); 
 	}
+	
+	/**
+	 * Helper method that will take a coded string and return a text only version.
+	 * @param codedText - string with possible TextFragment codes
+	 * @return
+	 */
+	public static String getText(String codedText) {
+		Matcher m = MARKERS_REGEX.matcher(codedText);
+		return m.replaceAll(""); 
+	}
 
 	/**
 	 * Gets the coded text representation of the fragment.
