@@ -56,6 +56,7 @@ public class QueryManager {
 	private int maxHits = 5;
 	private int totalSegments;
 	private int leveragedSegments;
+	private boolean reorder = true;
 	
 	/**
 	 * Creates a new QueryManager object.
@@ -64,6 +65,26 @@ public class QueryManager {
 		resList = new LinkedHashMap<Integer, ResourceItem>();
 		results = new ArrayList<QueryResult>();
 		attributes = new LinkedHashMap<String, String>();
+	}
+	
+	/**
+	 * Sets the option to re-order the results of the queries when querying
+	 * multiple resources. 
+	 * @param reorder true to re-order the matches, false, to let them grouped
+	 * by resource.
+	 */
+	public void setReorder (boolean reorder) {
+		this.reorder = reorder;
+	}
+	
+	/**
+	 * Gets if this query manager re-order the results of the queries when
+	 * querying multiple resources.
+	 * @return true if the results are re-ordered, false if they are left 
+	 * grouped by resource. 
+	 */
+	public boolean getReorder () {
+		return reorder;
 	}
 	
 	/**
@@ -92,6 +113,7 @@ public class QueryManager {
 	 * @param params the parameters for this connector.
 	 * @return The identifier for the added translation resource. This identifier
 	 * can be used later to access specifically the added translation resource.
+	 * @throws RuntimeException if an error occurs.
 	 */
 	public int addAndInitializeResource (IQuery connector,
 		String resourceName,
@@ -113,6 +135,42 @@ public class QueryManager {
 			((ITMQuery)connector).setMaximumHits(maxHits);
 		}
 		return id;
+	}
+	
+	/**
+	 * Creates a translation resource and its parameters from their class names,
+	 * adds it to the manager and initializes it with the 
+	 * current source and target language of this manager, as well as any
+	 * attributes that is set, and the current threshold and maximum hits if it is relevant.
+	 * @param connectorClass the name of the class for the connector.
+	 * @param resourceName the name of the translation resource (can be null).
+	 * @param paramsClass the name of the class for the parameters for this connector.
+	 * @return The identifier for the added translation resource. This identifier
+	 * can be used later to access specifically the added translation resource.
+	 * @throws RuntimeException if an error occurs.
+	 */
+	public int addAndInitializeResource (String connectorClass,
+		String resourceName,
+		String paramsClass)
+	{
+		IQuery conn;
+		try {
+			conn = (IQuery)Class.forName(connectorClass).newInstance();
+		}
+		catch ( InstantiationException e ) {
+			throw new RuntimeException("Error creating connector.", e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException("Error creating connector.", e);
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new RuntimeException("Error creating connector.", e);
+		}
+		IParameters tmParams = conn.getParameters();
+		if ( tmParams != null ) { // Set the parameters only if the connector take some
+			tmParams.fromString(paramsClass);
+		}
+		return addAndInitializeResource(conn, ((resourceName==null) ? conn.getName() : resourceName), tmParams);
 	}
 	
 	/**
@@ -231,21 +289,25 @@ public class QueryManager {
 	public int query (String plainText) {
 		results.clear();
 		ResourceItem ri;
+		int resources = 0;
 		for ( int id : resList.keySet() ) {
 			ri = resList.get(id);
 			if ( !ri.enabled ) continue; // Skip disabled entries
 			if ( ri.query.query(plainText) > 0 ) {
-				QueryResult res;
+				QueryResult res = null;
 				while ( ri.query.hasNext() ) {
 					res = ri.query.next();
 					res.connectorId = id;
 					if ( res.score < threshold ) break; // Weed out MT if needed
 					results.add(res);
 				}
+				if ( res != null ) resources++;
 			}
 		}
 		if ( results.size() > 0 ) current = 0;
-		Collections.sort(results); // Sort by weights
+		if (( resources > 1 ) && reorder ) {
+			Collections.sort(results); // Sort by weights
+		}
 		return results.size();
 	}
 
@@ -257,21 +319,25 @@ public class QueryManager {
 	public int query (TextFragment text) {
 		results.clear();
 		ResourceItem ri;
+		int resources = 0;
 		for ( int id : resList.keySet() ) {
 			ri = resList.get(id);
 			if ( !ri.enabled ) continue; // Skip disabled entries
 			if ( ri.query.query(text) > 0 ) {
-				QueryResult res;
+				QueryResult res = null;
 				while ( ri.query.hasNext() ) {
 					res = ri.query.next();
 					if ( res.score < threshold ) break;
 					res.connectorId = id;
 					results.add(res);
 				}
+				if ( res != null ) resources++;
 			}
 		}
 		if ( results.size() > 0 ) current = 0;
-		Collections.sort(results); // Sort by weights
+		if (( resources > 1 ) && reorder ) {
+			Collections.sort(results); // Sort by weights
+		}
 		return results.size();
 	}
 
@@ -419,13 +485,13 @@ public class QueryManager {
 						}
 						// If we do: Use the first one and lower the score to 99%
 						scores.add(99);
-						segment.text = adjustNewFragment(segment.text, qr.target, true, tu);
+						segment.text = qr.target; //TODO: adjustNewFragment(segment.text, qr.target, true, tu);
 						leveraged++;
 						continue;
 					}
 					// Else: First is 100%, possibly several that have the same translations
 					scores.add(qr.score); // That's 100% then
-					segment.text = adjustNewFragment(segment.text, qr.target, true, tu);
+					segment.text = qr.target; //TODO: adjustNewFragment(segment.text, qr.target, true, tu);
 					leveraged++;
 					continue;
 				}
@@ -557,8 +623,8 @@ public class QueryManager {
 			oriCode = null;
 			for ( int j=0; j<oriIndices.length; j++ ) {
 				if ( oriIndices[j] == -1) continue; // Used already
-				if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() )
-					&& ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ))
+				if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ))
+					//TOFIX && ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ))
 				{
 					oriCode = oriCodes.get(oriIndices[j]);
 					oriIndices[j] = -1;
@@ -599,7 +665,7 @@ public class QueryManager {
 					if ( !code.isDeleteable() ) {
 						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
 							code.getId(), code.getData(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
-						logger.info("Source='"+parent.getSource().toString()+"'");
+						logger.info(String.format("Source='%s'\nTarget='%s'", oriFrag.toString(), newFrag.toString()));
 					}
 				}
 			}

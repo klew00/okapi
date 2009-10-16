@@ -37,7 +37,6 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
-import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryManager;
 
 public class Utility extends BaseFilterDrivenUtility {
@@ -96,25 +95,12 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( params.preTranslate ) {
 			qm = new QueryManager();
 			qm.setLanguages(srcLang, trgLang);
-			IQuery conn;
-			try {
-				conn = (IQuery)Class.forName(params.transResClass).newInstance();
-			}
-			catch ( InstantiationException e ) {
-				throw new RuntimeException("Error creating connector.", e);
-			}
-			catch ( IllegalAccessException e ) {
-				throw new RuntimeException("Error creating connector.", e);
-			}
-			catch ( ClassNotFoundException e ) {
-				throw new RuntimeException("Error creating connector.", e);
-			}
-			IParameters tmParams = conn.getParameters();
-			if ( tmParams != null ) { // Set the parameters only if the connector take some
-				tmParams.fromString(params.transResParams);
-			}
-			qm.addAndInitializeResource(conn, conn.getName(), tmParams);
 			qm.setThreshold(params.threshold);
+			qm.addAndInitializeResource(params.transResClass, null, params.transResParams);
+			if ( params.useTransRes2 ) {
+				qm.addAndInitializeResource(params.transResClass2, null, params.transResParams2);
+				qm.setReorder(false); // Keep results grouped by resources
+			}
 		}
 		
 		resolvedOutputDir = params.outputFolder + File.separator + params.pkgName;

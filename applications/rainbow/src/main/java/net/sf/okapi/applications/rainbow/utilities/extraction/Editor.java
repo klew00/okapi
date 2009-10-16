@@ -81,6 +81,8 @@ public class Editor implements IParametersEditor {
 	private IParameters xliffOptions;
 	private IContext context;
 	private ConnectorSelectionPanel connectorPanel;
+	private Button chkUseTransRes2;
+	private ConnectorSelectionPanel connectorPanel2;
 	private IConnectorList connectors;
 	
 	public boolean edit (IParameters params,
@@ -283,7 +285,7 @@ public class Editor implements IParametersEditor {
 		});
 		
 		connectorPanel = new ConnectorSelectionPanel(cmpTmp, SWT.NONE, connectors, context,
-			"Translation resource to use:");
+			"Primary translation resource to use:");
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
 		connectorPanel.setLayoutData(gdTmp);
@@ -308,6 +310,22 @@ public class Editor implements IParametersEditor {
 		spinThreshold.setMinimum(0);
 		spinThreshold.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
 		
+		chkUseTransRes2 = new Button(cmpTmp, SWT.CHECK);
+		chkUseTransRes2.setText("Use a secondary translation resource:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseTransRes2.setLayoutData(gdTmp);
+		chkUseTransRes2.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateUseTransRes2();
+			}
+		});
+		
+		connectorPanel2 = new ConnectorSelectionPanel(cmpTmp, SWT.NONE, connectors, context, null);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		connectorPanel2.setLayoutData(gdTmp);
+	
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -364,12 +382,24 @@ public class Editor implements IParametersEditor {
 		}
 	}
 	
+	private void updateUseTransRes2 () {
+		connectorPanel2.setEnabled(chkUseTransRes2.getSelection());
+	}
+	
 	private void updatePretranslate () {
-		connectorPanel.setEnabled(chkPreTranslate.getSelection());
-		chkUseFileName.setEnabled(chkPreTranslate.getSelection());
-		chkUseGroupName.setEnabled(chkPreTranslate.getSelection());
-		stThreshold.setEnabled(chkPreTranslate.getSelection());
-		spinThreshold.setEnabled(chkPreTranslate.getSelection());
+		boolean enabled = chkPreTranslate.getSelection();
+		connectorPanel.setEnabled(enabled);
+		chkUseFileName.setEnabled(enabled);
+		chkUseGroupName.setEnabled(enabled);
+		stThreshold.setEnabled(enabled);
+		spinThreshold.setEnabled(enabled);
+		chkUseTransRes2.setEnabled(enabled);
+		if ( enabled ) {
+			updateUseTransRes2();
+		}
+		else {
+			connectorPanel2.setEnabled(false);
+		}
 	}
 	
 	private boolean showDialog () {
@@ -403,6 +433,10 @@ public class Editor implements IParametersEditor {
 		chkUseFileName.setSelection(params.useFileName);
 		chkUseGroupName.setSelection(params.useGroupName);
 		spinThreshold.setSelection(params.threshold);
+
+		chkUseTransRes2.setSelection(params.useTransRes2);
+		connectorPanel2.setData(params.transResClass2, params.transResParams2);
+
 		// TODO: This needs to be a clone, not the object itself, or it will get saved on cancel
 		xliffOptions = params.xliffOptions;
 
@@ -444,6 +478,11 @@ public class Editor implements IParametersEditor {
 		params.useFileName = chkUseFileName.getSelection();
 		params.useGroupName = chkUseGroupName.getSelection();
 		params.threshold = spinThreshold.getSelection();
+
+		params.useTransRes2 = chkUseTransRes2.getSelection();
+		params.transResClass2 = connectorPanel2.getConnectorClass();
+		params.transResParams2 = connectorPanel2.getConnectorParameters();
+
 		params.xliffOptions = xliffOptions;
 		return true;
 	}

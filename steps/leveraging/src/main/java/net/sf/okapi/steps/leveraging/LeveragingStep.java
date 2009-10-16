@@ -30,8 +30,8 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryManager;
+import net.sf.okapi.lib.translation.ResourceItem;
 
 public class LeveragingStep extends BasePipelineStep {
 
@@ -72,34 +72,19 @@ public class LeveragingStep extends BasePipelineStep {
 
 	@Override
 	protected void handleStartBatch (Event event) {
-		try {
-			qm = new QueryManager();
-			qm.setLanguages(sourceLanguage, targetLanguage);
-			qm.setThreshold(params.getThreshold());
+		qm = new QueryManager();
+		qm.setLanguages(sourceLanguage, targetLanguage);
+		qm.setThreshold(params.getThreshold());
+		int id = qm.addAndInitializeResource(params.getResourceClassName(), null,
+			params.getResourceParameters());
+		ResourceItem res = qm.getResource(id);
+		logger.info("Leveraging settings: "+res.name);
+		logger.info(res.query.getSettingsDisplay());
 			
-			IQuery connector = (IQuery)Class.forName(params.getResourceClassName()).newInstance();
-			IParameters tmp = connector.getParameters();
-			if ( tmp != null ) {
-				tmp.fromString(params.getResourceParameters());
-			}
-			qm.addAndInitializeResource(connector, connector.getName(), tmp);
-			logger.info("Leveraging settings: "+connector.getName());
-			logger.info(connector.getSettingsDisplay());
-			
-			if ( params.getMakeTMX() ) {
-				tmxWriter = new TMXWriter(params.getTMXPath());
-				tmxWriter.writeStartDocument(sourceLanguage, targetLanguage,
-					getClass().getName(), "", "sentence", "undefined", "undefined");
-			}
-		}
-		catch ( InstantiationException e ) {
-			throw new RuntimeException("Error creating a connector.", e);
-		}
-		catch ( IllegalAccessException e ) {
-			throw new RuntimeException("Error creating a connector.", e);
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new RuntimeException("Error creating a connector.", e);
+		if ( params.getMakeTMX() ) {
+			tmxWriter = new TMXWriter(params.getTMXPath());
+			tmxWriter.writeStartDocument(sourceLanguage, targetLanguage,
+				getClass().getName(), "", "sentence", "undefined", "undefined");
 		}
 	}
 	

@@ -43,6 +43,9 @@ public class Parameters extends BaseParameters {
 	public int threshold;
 	public String transResClass;
 	public String transResParams;
+	public boolean useTransRes2;
+	public String transResClass2;
+	public String transResParams2;
 
 	public Parameters () {
 		reset();
@@ -64,6 +67,9 @@ public class Parameters extends BaseParameters {
 		threshold = 95;
 		transResClass = "net.sf.okapi.connectors.simpletm.SimpleTMConnector";
 		transResParams = null;
+		useTransRes2 = false;
+		transResClass2 = "net.sf.okapi.connectors.apertium.ApertiumMTConnector";
+		transResParams2 = null;
 	}
 
 	public void fromString(String data) {
@@ -84,6 +90,9 @@ public class Parameters extends BaseParameters {
 		threshold = buffer.getInteger("threshold", threshold);
 		transResClass = buffer.getString("transResClass", transResClass);
 		transResParams = buffer.getGroup("transResParams", transResParams);
+		useTransRes2 = buffer.getBoolean("useTransRes2", useTransRes2);
+		transResClass2 = buffer.getString("transResClass2", transResClass2);
+		transResParams2 = buffer.getGroup("transResParams2", transResParams2);
 	}
 
 	public String toString() {
@@ -103,6 +112,9 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger("threshold", threshold);
 		buffer.setString("transResClass", transResClass);
 		buffer.setGroup("transResParams", transResParams);
+		buffer.setBoolean("useTransRes2", useTransRes2);
+		buffer.setString("transResClass2", transResClass2);
+		buffer.setGroup("transResParams2", transResParams2);
 		
 		return buffer.toString();
 	}
