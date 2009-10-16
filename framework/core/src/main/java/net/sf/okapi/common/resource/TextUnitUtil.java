@@ -367,8 +367,8 @@ public class TextUnitUtil {
 		return textUnit;
 	}
 
+	public static GenericSkeleton forceSkeleton(TextUnit tu) {
 	//TODO: javadoc
-	public static GenericSkeleton forseSkeleton(TextUnit tu) {
 		
 		if (tu == null) return null;
 		
@@ -515,7 +515,7 @@ public class TextUnitUtil {
 		if (!trimLeading && !trimTrailing) return;
 		
 		TextContainer source = textUnit.getSource();
-		GenericSkeleton tuSkel = TextUnitUtil.forseSkeleton(textUnit);
+		GenericSkeleton tuSkel = TextUnitUtil.forceSkeleton(textUnit);
 		GenericSkeleton skel = new GenericSkeleton();
 		
 		if (trimLeading)						
@@ -546,7 +546,7 @@ public class TextUnitUtil {
 		
 		if (st.startsWith(qualifier) && st.endsWith(qualifier)) {
 			
-			GenericSkeleton tuSkel = TextUnitUtil.forseSkeleton(textUnit);
+			GenericSkeleton tuSkel = TextUnitUtil.forceSkeleton(textUnit);
 			GenericSkeleton skel = new GenericSkeleton();
 			
 			skel.add(qualifier);

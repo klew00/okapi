@@ -93,7 +93,7 @@ public class TokenMatcher extends AbstractLexer {
 	public Lexems process(String text, String language, Tokens tokens) {
 		
 		Lexems lexems = new Lexems();
-		Tokens wasteBin = new Tokens();
+		//Tokens wasteBin = new Tokens();
 		
 		for (LexerRule item : rules) {
 			
@@ -105,9 +105,12 @@ public class TokenMatcher extends AbstractLexer {
 			Pattern pattern = patterns.get(rule);
 			if (pattern == null) continue;
 			
-			for (Token token : tokens)			
-				if (inTokenIDs.contains(token.getTokenId())) {
+			for (Token token : tokens) {
 				
+				if (token.isDeleted()) continue;
+				
+				if (inTokenIDs.contains(token.getTokenId())) {
+					
 					Matcher matcher = pattern.matcher(token.getValue());
 					
 				    if (matcher.matches()) {
@@ -115,13 +118,15 @@ public class TokenMatcher extends AbstractLexer {
 				    	lexems.add(new Lexem(rule.getLexemId(), token.getValue(), token.getRange()));
 				    	
 				    	if (!rule.getKeepInput())
-				    		wasteBin.add(token); // Remove replaced token
+				    		//wasteBin.add(token); // Remove replaced token
+				    		token.delete(); // Remove replaced token
 				    }
 				}
+			}				
 		}
 		
-		for (Token token : wasteBin)			
-			tokens.remove(token);
+//		for (Token token : wasteBin)			
+//			tokens.remove(token);
 		
 		return lexems;
 	}

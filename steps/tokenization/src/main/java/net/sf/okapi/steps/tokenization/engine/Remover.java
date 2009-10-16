@@ -58,7 +58,7 @@ public class Remover extends AbstractLexer {
 
 		if (tokens == null) return null;
 				
-		Tokens wasteBin = new Tokens();
+		//Tokens wasteBin = new Tokens();
 		
 		for (LexerRule rule : getRules()) {
 
@@ -66,13 +66,19 @@ public class Remover extends AbstractLexer {
 			
 			List<Integer> inTokenIDs = rule.getInTokenIDs();
 			
-			for (Token token : tokens)			
+			for (Token token : tokens) {
+				
+				if (token.isDeleted()) continue;
+				
 				if (inTokenIDs.contains(token.getTokenId())) // Remove listed tokens
-					wasteBin.add(token);
+					//wasteBin.add(token);
+					token.delete();
+			}
+				
 		}
 		
-		for (Token token : wasteBin)
-			tokens.remove(token);
+//		for (Token token : wasteBin)
+//			tokens.remove(token);
 		
 		return null;
 	}

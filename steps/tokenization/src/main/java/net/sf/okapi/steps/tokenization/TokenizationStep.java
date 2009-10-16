@@ -33,6 +33,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.extra.Notification;
 import net.sf.okapi.lib.extra.steps.AbstractPipelineStep;
+import net.sf.okapi.steps.tokenization.common.Config;
 import net.sf.okapi.steps.tokenization.common.ILexer;
 import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
 import net.sf.okapi.steps.tokenization.common.Lexem;
@@ -98,10 +99,16 @@ public class TokenizationStep extends AbstractPipelineStep {
 		setName("Tokenization");
 		setDescription("Extracts tokens from the text units content of a document.");
 				
+		Config config = new Config();
+		if (config == null) return;
+		config.loadFromResource(this.getClass(), "config.tprm");		
+		
 		structureParams = new StructureParameters(); 
 		if (structureParams == null) return;
 		
-		if (!structureParams.loadFromResource(this.getClass(), "lexers.tprm"))
+		String structureLocation = config.getEngineConfig();
+		
+		if (Util.isEmpty(structureLocation) || !structureParams.loadFromResource(this.getClass(), structureLocation))
 			logMessage(Level.FINE, "Lexers' config file not found.");
 		
 		instantiateLexers();		

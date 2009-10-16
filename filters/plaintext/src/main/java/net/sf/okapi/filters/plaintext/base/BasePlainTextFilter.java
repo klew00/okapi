@@ -131,7 +131,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	protected final TextProcessingResult sendAsSource(TextUnit textUnit) {
 		
 		if (textUnit == null) return TextProcessingResult.REJECTED;
-		TextUnitUtil.forseSkeleton(textUnit);
+		TextUnitUtil.forceSkeleton(textUnit);
 		
 		if (!processTU(textUnit)) return TextProcessingResult.REJECTED;
 		
@@ -158,7 +158,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		GenericSkeleton skel = getActiveSkeleton();
 		if (skel == null) return TextProcessingResult.REJECTED;
 		
-		GenericSkeleton targetSkel = TextUnitUtil.forseSkeleton(target);
+		GenericSkeleton targetSkel = TextUnitUtil.forceSkeleton(target);
 		if (targetSkel == null) return TextProcessingResult.REJECTED;
 		
 		if (!processTU(target)) return TextProcessingResult.REJECTED;

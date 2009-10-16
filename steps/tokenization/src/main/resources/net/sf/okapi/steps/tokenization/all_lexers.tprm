@@ -57,22 +57,22 @@ StructureParametersItem10.description=RAWTEXT resolver.
 StructureParametersItem10.lexerClass=net.sf.okapi.steps.tokenization.engine.TokenMatcher
 StructureParametersItem10.rulesLocation=matcher_rawtext.tprm
 
-StructureParametersItem11.enabled.b=false
-StructureParametersItem11.description=Removes tokens, which ranges are within the range of a token produced by a later lexer.
-StructureParametersItem11.lexerClass=net.sf.okapi.steps.tokenization.engine.Replacer
+StructureParametersItem11.enabled.b=true
+StructureParametersItem11.description=Arranges tokens by their position in the text.
+StructureParametersItem11.lexerClass=net.sf.okapi.steps.tokenization.engine.Sorter
 StructureParametersItem11.rulesLocation=
 
 StructureParametersItem12.enabled.b=true
-StructureParametersItem12.description=Arranges tokens by their position in the text.
-StructureParametersItem12.lexerClass=net.sf.okapi.steps.tokenization.engine.Sorter
-StructureParametersItem12.rulesLocation=
+StructureParametersItem12.description=UNKNOWN-type tokens remover.
+StructureParametersItem12.lexerClass=net.sf.okapi.steps.tokenization.engine.Remover
+StructureParametersItem12.rulesLocation=remover_unknown.tprm
 
 StructureParametersItem13.enabled.b=true
-StructureParametersItem13.description=UNKNOWN-type tokens remover.
-StructureParametersItem13.lexerClass=net.sf.okapi.steps.tokenization.engine.Remover
-StructureParametersItem13.rulesLocation=remover_unknown.tprm
+StructureParametersItem13.description=Removes duplicate tokens. Handles token ranges inclusion. Sets scores.
+StructureParametersItem13.lexerClass=net.sf.okapi.steps.tokenization.engine.Reconciler
+StructureParametersItem13.rulesLocation=
 
-StructureParametersItem14.enabled.b=false
-StructureParametersItem14.description=Duplicate tokens cleaner.
-StructureParametersItem14.lexerClass=net.sf.okapi.steps.tokenization.engine.DuplicateCleaner
+StructureParametersItem14.enabled.b=true
+StructureParametersItem14.description=Removes tokens with the score of 0% ("deleted" by other lexers). A garbage collector.
+StructureParametersItem14.lexerClass=net.sf.okapi.steps.tokenization.engine.ZeroScoreCleaner
 StructureParametersItem14.rulesLocation=

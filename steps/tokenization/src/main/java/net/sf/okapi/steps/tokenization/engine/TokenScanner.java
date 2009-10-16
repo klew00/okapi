@@ -77,9 +77,12 @@ public class TokenScanner extends AbstractLexer {
 			Pattern pattern = patterns.get(rule);
 			if (pattern == null) continue;
 			
-			for (Token token : tokens)			
+			for (Token token : tokens) {
+				
+				if (token.isDeleted()) continue;
+			
 				if (inTokenIDs.contains(token.getTokenId())) {
-		
+					
 					Range r = token.getRange();
 					Matcher matcher = pattern.matcher(token.getValue());
 					int groupIndex = rule.getRegexGroup();
@@ -94,6 +97,7 @@ public class TokenScanner extends AbstractLexer {
 				    			r.start + start, r.start + end));
 				    }
 				}
+			}				
 		}
 		
 		return lexems;

@@ -53,7 +53,7 @@ public class Token {
 		
 		this.tokenId = tokenId;
 		this.lexem = lexem;
-		this.score = score;
+		setScore(score);
 	}
 
 	/**
@@ -119,6 +119,25 @@ public class Token {
 		return String.format("%-15s\t%d\t%3d%%\t%s", 
 				getName(), tokenId, score, lexem.toString());
 	}
-		
-}
 
+	public void setScore(int score) {
+		
+		if (score < 0)
+			score = 0;
+		
+		if (score > 100)
+			score = 100;
+		
+		this.score = score;
+	}	
+	
+	public boolean isDeleted() {
+		
+		return score == 0;
+	}
+	
+	public void delete() {
+		
+		score = 0;
+	}
+}

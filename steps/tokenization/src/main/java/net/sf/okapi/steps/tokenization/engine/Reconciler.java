@@ -27,7 +27,7 @@ import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class DuplicateCleaner extends AbstractLexer {
+public class Reconciler extends AbstractLexer {
 
 	@Override
 	protected boolean lexer_hasNext() {
@@ -37,6 +37,7 @@ public class DuplicateCleaner extends AbstractLexer {
 
 	@Override
 	protected void lexer_init() {
+
 
 	}
 
@@ -49,39 +50,65 @@ public class DuplicateCleaner extends AbstractLexer {
 	@Override
 	protected void lexer_open(String text, String language, Tokens tokens) {
 
+
 	}
 
-	private boolean checkEqual(Token token1, Token token2) {
-	
-		if (token1 == null || token2 == null) return false;
-		
-		Range r1 = token1.getRange();
-		Range r2 = token2.getRange();
-		
-		return r1.start == r2.start && r1.end == r2.end && token1.getTokenId() == token2.getTokenId();
+	/**
+	 * Returns true if range2 is within range.
+	 * @param range
+	 * @param range2
+	 * @return
+	 */
+	private boolean contains(Range range, Range range2) {
+
+		// Exact matches are dropped
+		return (range.start < range2.start && range.end >= range2.end) ||
+			(range.start <= range2.start && range.end > range2.end);
 	}
 
 	public Lexems process(String text, String language, Tokens tokens) {
-
-		// If 2 tokens are identical, destroy one.
-		// TODO Find something better than o(n2) 
-		Tokens wasteBin = new Tokens();
 		
-		for (Token token : tokens) {
-
-			if (wasteBin.indexOf(token) != -1) continue; // Skip the to be deleted
+		for (int i = 0; i < tokens.size(); i++) {
 			
-			for (Token token2 : tokens) {
-				
-				if (token2 == token) continue;
-				
-					if (checkEqual(token, token2))					
-						wasteBin.add(token2);
-			}
-		}
+			Token token1 = tokens.get(i);
+			if (token1.isDeleted()) continue;
+			
+			for (int j = 0; j < tokens.size(); j++) {
 		
-		for (Token token : wasteBin)			
-			tokens.remove(token);		
+				if (i >= j) continue;
+				
+				Token token2 = tokens.get(j);				
+				if (token2.isDeleted()) continue;
+				if (token2 == token1) continue;				
+			
+				Range r1 = token1.getRange();
+				Range r2 = token2.getRange();
+												
+				if (r1.start == r2.start && r1.end == r2.end) { // Same range
+					
+					if (token1.getTokenId() == token2.getTokenId()) { // Tokens are identical, remove duplication
+						
+						token2.delete();
+						continue;
+					}
+					
+					
+				}
+					
+					
+				
+				
+				
+				
+
+				// If the token's range includes other tokens' ranges, destroy those.
+//				if (//checkEqual(token, token2) || // Remove duplicate tokens 
+//				contains(token.getLexem().getRange(), token2.getLexem().getRange())) // Remove overlapped tokens					
+//				//wasteBin.add(token2);
+//				token2.delete();
+
+			}
+		}	
 
 		return null;
 	}
