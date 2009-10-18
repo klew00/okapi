@@ -35,6 +35,7 @@ import org.tempuri.Query;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -75,12 +76,12 @@ public class MyMemoryTMConnector implements ITMQuery {
 		throw new OkapiNotImplementedException("The export() method is not supported.");
 	}
 
-	public String getSourceLanguage () {
-		return toISOCode(srcLang);
+	public LocaleId getSourceLanguage () {
+		return LocaleId.fromString(srcLang);
 	}
 
-	public String getTargetLanguage () {
-		return toISOCode(trgLang);
+	public LocaleId getTargetLanguage () {
+		return LocaleId.fromString(trgLang);
 	}
 
 	public boolean hasNext () {
@@ -175,16 +176,16 @@ public class MyMemoryTMConnector implements ITMQuery {
 		//TODO: use domain
 	}
 
-	public void setLanguages (String sourceLang,
-		String targetLang)
+	public void setLanguages (LocaleId sourceLang,
+		LocaleId targetLang)
 	{
 		srcLang = toInternalCode(sourceLang);
 		trgLang = toInternalCode(targetLang);
 	}
 
-	private String toInternalCode (String standardCode) {
+	private String toInternalCode (LocaleId standardCode) {
 		// The expected language code is language-Region with region mandatory
-		String[] res = Util.splitLanguageCode(standardCode);
+		String[] res = Util.splitLanguageCode(standardCode.toString());
 		//TODO: Use a lookup table and a more complete one
 		res[0] = res[0].toLowerCase();
 		if ( !Util.isEmpty(res[1]) ) res[1] = res[1].toLowerCase();
@@ -204,10 +205,6 @@ public class MyMemoryTMConnector implements ITMQuery {
 		}
 		else res[1] = res[0];
 		return res[0]+"-"+res[1];
-	}
-
-	private String toISOCode (String internalCode) {
-		return internalCode;
 	}
 
 	/**

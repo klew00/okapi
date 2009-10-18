@@ -193,8 +193,8 @@ public class ManifestDialog {
 		edMergeInputRoot.setText(manifest.getMergeInputRoot());
 		edPkgType.setText(manifest.getPackageType());
 		edPkgID.setText(manifest.getPackageID());
-		edSource.setText(manifest.getSourceLanguage());
-		edTarget.setText(manifest.getTargetLanguage());
+		edSource.setText(manifest.getSourceLanguage().toString());
+		edTarget.setText(manifest.getTargetLanguage().toString());
 		edDate.setText(manifest.getDate());
 		chkUseApprovedOnly.setSelection(manifest.useApprovedOnly());
 		chkUpdateApprovedFlag.setSelection(manifest.updateApprovedFlag());

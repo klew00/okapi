@@ -25,6 +25,7 @@ import java.util.Map;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
 import org.junit.Before;
@@ -38,6 +39,7 @@ import static org.junit.Assert.*;
 public class OpenXMLConfigurationTest {
 	
 	private OpenXMLFilter filter;
+	private LocaleId locEN = LocaleId.fromString("en");
 
 	@Before
 	public void setUp() throws Exception {
@@ -91,7 +93,7 @@ public class OpenXMLConfigurationTest {
 		URL url = OpenXMLConfigurationTest.class.getResource("/BoldWorld.docx");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(url.getPath(), null),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 	
 }

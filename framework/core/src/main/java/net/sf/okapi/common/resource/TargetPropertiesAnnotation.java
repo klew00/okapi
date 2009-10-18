@@ -27,40 +27,41 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.annotation.IterableEnumeration;
+import net.sf.okapi.common.LocaleId;
 
 /**
  * The target properties associated to a set of source properties
  * in a resource.
  */
-public class TargetPropertiesAnnotation implements IAnnotation, Iterable<String> {
+public class TargetPropertiesAnnotation implements IAnnotation, Iterable<LocaleId> {
 
-	private ConcurrentHashMap<String, Hashtable<String, Property>> targets;
+	private ConcurrentHashMap<LocaleId, Hashtable<String, Property>> targets;
 
 	/**
 	 * Creates a new TargetPropertiesAnnotation object.
 	 */
 	public TargetPropertiesAnnotation () {
-		targets = new ConcurrentHashMap<String, Hashtable<String, Property>>();
+		targets = new ConcurrentHashMap<LocaleId, Hashtable<String, Property>>();
 	}
 
 	/**
-	 * Sets properties for a given target language.
-	 * @param language Code of the target language for this property.
+	 * Sets properties for a given target locale.
+	 * @param locId Code of the target locale for this property.
 	 * @param properties The properties to set.
 	 */
-	public void set (String language,
+	public void set (LocaleId locId,
 		Hashtable<String, Property> properties)
 	{
-		targets.put(language, properties);
+		targets.put(locId, properties);
 	}
 
 	/**
-	 * Gets the properties for a given target language.
-	 * @param language Code of the target language of the properties to retrieve. 
+	 * Gets the properties for a given target locale.
+	 * @param locId Code of the target locale of the properties to retrieve. 
 	 * @return The properties, or null if none has been found.
 	 */
-	public Hashtable<String, Property> get (String language) {
-		return targets.get(language);
+	public Hashtable<String, Property> get (LocaleId locId) {
+		return targets.get(locId);
 	}
 
 	/**
@@ -74,16 +75,16 @@ public class TargetPropertiesAnnotation implements IAnnotation, Iterable<String>
 	/**
 	 * Gets a new iterator for this annotation.
 	 */
-	public Iterator<String> iterator () {
-		IterableEnumeration<String> iterableLocales = new IterableEnumeration<String>(targets.keys());
+	public Iterator<LocaleId> iterator () {
+		IterableEnumeration<LocaleId> iterableLocales = new IterableEnumeration<LocaleId>(targets.keys());
 		return iterableLocales.iterator();
 	}
 
 	/**
-	 * Gets a set of the target languages available in this annotation.
-	 * @return A set of the target language codes in this annotation.
+	 * Gets a set of the target locales available in this annotation.
+	 * @return A set of the target locales in this annotation.
 	 */
-	public Set<String> getLanguages () {
+	public Set<LocaleId> getLocales () {
 		return targets.keySet();
 	}
 

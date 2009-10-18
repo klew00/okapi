@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -40,8 +41,8 @@ public class SegmentationStep extends BasePipelineStep {
 	private Parameters params;
 	private ISegmenter srcSeg;
 	private ISegmenter trgSeg;
-	private String sourceLanguage;
-	private String targetLanguage;
+	private LocaleId sourceLocale;
+	private LocaleId targetLocale;
 	private boolean initDone;
 
 	public SegmentationStep () {
@@ -50,13 +51,13 @@ public class SegmentationStep extends BasePipelineStep {
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LANGUAGE)
-	public void setSourceLanguage (String sourceLanguage) {
-		this.sourceLanguage = sourceLanguage;
+	public void setsourceLocale (LocaleId sourceLocale) {
+		this.sourceLocale = sourceLocale;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 	
 	public String getName () {
@@ -87,7 +88,7 @@ public class SegmentationStep extends BasePipelineStep {
 			src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
 			srxDoc.loadRules(src);
 			if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
-			srcSeg = srxDoc.compileLanguageRules(sourceLanguage, null);
+			srcSeg = srxDoc.compileLanguageRules(sourceLocale.toBCP47(), null);
 		}
 		if ( params.segmentTarget ) {
 			String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
@@ -96,7 +97,7 @@ public class SegmentationStep extends BasePipelineStep {
 				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			}
 		}
-		trgSeg = srxDoc.compileLanguageRules(targetLanguage, null);
+		trgSeg = srxDoc.compileLanguageRules(targetLocale.toBCP47(), null);
 	}
 	
 	@Override
@@ -106,9 +107,9 @@ public class SegmentationStep extends BasePipelineStep {
 		if ( !tu.isTranslatable() ) return;
 
 		TextContainer cont;
-		if ( tu.hasTarget(targetLanguage) ) {
+		if ( tu.hasTarget(targetLocale) ) {
 			if ( params.segmentTarget ) {
-				cont = tu.getTarget(targetLanguage);
+				cont = tu.getTarget(targetLocale);
 				if ( !cont.isSegmented() ) {
 					trgSeg.computeSegments(cont);
 					cont.createSegments(trgSeg.getRanges());
@@ -124,7 +125,7 @@ public class SegmentationStep extends BasePipelineStep {
 		}
 		
 		// Make sure we have target content
-		tu.createTarget(targetLanguage, false, IResource.COPY_ALL);
+		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 	}
 
 }

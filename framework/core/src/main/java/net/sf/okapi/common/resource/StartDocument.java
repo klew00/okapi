@@ -22,13 +22,14 @@ package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 
 /**
  * Resource associated with the filter event START_DOCUMENT.
  */
 public class StartDocument extends BaseNameable {
 
-	protected String language;
+	protected LocaleId locale;
 	protected String encoding;
 	protected boolean isMultilingual;
 	protected IParameters params;
@@ -42,21 +43,21 @@ public class StartDocument extends BaseNameable {
 	}
 	
 	/**
-	 * Gets the language of this document. If the document is multilingual this
-	 * is the source language.
-	 * @return the (source) language of the document.
+	 * Gets the locale of this document. If the document is multilingual this
+	 * is the source locale.
+	 * @return the (source) locale of the document.
 	 */
-	public String getLanguage () {
-		return language;
+	public LocaleId getLanguage () {
+		return locale;
 	}
 	
 	/**
-	 * Sets the language of the document. If the document is multilingual this
-	 * is the source language.
-	 * @param language (source) language of the document.
+	 * Sets the locale of the document. If the document is multilingual this
+	 * is the source locale.
+	 * @param locale (source) locale of the document.
 	 */
-	public void setLanguage (String language) {
-		this.language = language;
+	public void setLanguage (LocaleId locale) {
+		this.locale = locale;
 	}
 
 	/**

@@ -30,6 +30,7 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -51,8 +52,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	private Stack<StorageList> storageStack;
 	private LinkedHashMap<String, Referent> referents;
-	private String inputLang;
-	private String outputLang;
+	private LocaleId inputLang;
+	private LocaleId outputLang;
 	private String outputEncoding;
 	private boolean isMultilingual;
 	private ILayerProvider layer;
@@ -80,7 +81,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 	}
 	
-	public String processStartDocument (String outputLanguage,
+	public String processStartDocument (LocaleId outputLanguage,
 		String outputEncoding,
 		ILayerProvider layer,
 		EncoderManager encoderManager,
@@ -212,7 +213,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 		// Set the langToUse and the contextToUse parameters
 		// If lang==null: it's source, so use output language for monolingual
-		String langToUse = (part.language==null) ? outputLang : part.language;
+		LocaleId langToUse = (part.language==null) ? outputLang : part.language;
 		int contextToUse = context;
 		if ( isMultilingual ) {
 			langToUse = part.language;
@@ -251,7 +252,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	private String getString (INameable ref,
 		String propName,
-		String langToUse,
+		LocaleId langToUse,
 		int context)
 	{
 		if ( ref == null ) {
@@ -281,7 +282,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 * @return The string representation of the text unit. 
 	 */
 	private String getString (TextUnit tu,
-		String langToUse,
+		LocaleId langToUse,
 		int context)
 	{
 		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
@@ -300,13 +301,13 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	/**
 	 * Gets the original content of a given text unit.
 	 * @param tu The text unit to process.
-	 * @param langToUse Language to output. Use null for the source, or the language
-	 * code for the target languages.
+	 * @param locToUse locale to output. Use null for the source, or the locale
+	 * for the target locales.
 	 * @param content Context flag: 0=text, 1=skeleton, 2=inline.
 	 * @return The string representation of the text unit content.
 	 */
 	private String getContent (TextUnit tu,
-		String langToUse,
+		LocaleId locToUse,
 		int context) 
 	{
 		// Update the encoder from the TU's MIME type
@@ -317,8 +318,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Get the right text container
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = null;
-		if ( langToUse != null ) {
-			if ( (trgCont = tu.getTarget(langToUse)) == null ) {
+		if ( locToUse != null ) {
+			if ( (trgCont = tu.getTarget(locToUse)) == null ) {
 				if ( !srcCont.isSegmented() ) {
 					// Fall back to source, except when the source is segmented
 					trgCont = tu.getSource();
@@ -336,29 +337,29 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Check for segmentation
 		if ( srcCont.isSegmented() ) {
 			// Special case of segmented entry: source + target
-			return getSegmentedText(tu.getSource(), trgCont, langToUse, context);
+			return getSegmentedText(tu.getSource(), trgCont, locToUse, context);
 		}
 		else { // Normal case: use the calculated target
 			TextContainer cont;
-			if ( langToUse == null ) cont = srcCont;
+			if ( locToUse == null ) cont = srcCont;
 			else cont = trgCont;
 			
 			// Apply the layer if there is one
 			if ( layer == null ) {
-				return getContent(cont, langToUse, context);
+				return getContent(cont, locToUse, context);
 			}
 			else {
 				switch ( context ) {
 				case 1:
 					return layer.endCode()
-						+ getContent(cont, langToUse, 0)
+						+ getContent(cont, locToUse, 0)
 						+ layer.startCode();
 				case 2:
 					return layer.endInline()
-						+ getContent(cont, langToUse, 0)
+						+ getContent(cont, locToUse, 0)
 						+ layer.startInline();
 				default:
-					return getContent(cont, langToUse, context);
+					return getContent(cont, locToUse, context);
 				}
 			}
 		}
@@ -366,7 +367,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	private String getSegmentedText (TextContainer srcCont,
 		TextContainer trgCont,
-		String langToUse,
+		LocaleId langToUse,
 		int context)
 	{
 		StringBuilder tmp = new StringBuilder();
@@ -488,7 +489,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 
 	public String getContent (TextFragment tf,
-		String langToUse,
+		LocaleId langToUse,
 		int context)
 	{ // this needs to be public for an override in OpenXML
 		// Output simple text
@@ -584,7 +585,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 	
 	protected String expandCodeContent (Code code,
-		String langToUse,
+		LocaleId langToUse,
 		int context)
 	{ // this needs to be protected, not private, for OpenXML
 		String codeTmp = code.getOuterData();
@@ -639,7 +640,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 	
 	private String getString (StorageList list,
-		String langToUse,
+		LocaleId langToUse,
 		int context)
 	{
 		StringBuilder tmp = new StringBuilder();
@@ -665,7 +666,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	private String getPropertyValue (INameable resource,
 		String name,
-		String langToUse,
+		LocaleId langToUse,
 		int context)
 	{
 		// Update the encoder from the TU's MIME type
@@ -678,7 +679,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( langToUse == null ) { // Use the source
 			prop = resource.getSourceProperty(name);
 		}
-		else if ( langToUse.length() == 0 ) { // Use the resource-level properties
+		else if ( langToUse.equals(LocaleId.EMPTY) ) { // Use the resource-level properties
 			prop = resource.getProperty(name);
 		}
 		else { // Use the given target language if possible
@@ -700,8 +701,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( Property.LANGUAGE.equals(name) ) {
 			// If it is the input language, we change it with the output language
 			//TODO: Do we need an option to be region-insensitive? (en==en-gb)
-			if ( value.equalsIgnoreCase(inputLang) ) {
-				value = outputLang;
+			LocaleId lang = LocaleId.fromString(value);
+			if ( lang.equals(inputLang) ) {
+				value = outputLang.toString();
 			}
 		}
 		else if ( Property.ENCODING.equals(name) ) {

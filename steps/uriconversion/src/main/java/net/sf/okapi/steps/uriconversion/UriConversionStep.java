@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -43,14 +44,14 @@ public class UriConversionStep extends BasePipelineStep {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private Parameters params;
-	private String trgLang;
+	private LocaleId trgLang;
 	
 	public UriConversionStep () {
 		params = new Parameters();
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
+	public void setTargetLanguage (LocaleId targetLanguage) {
 		trgLang = targetLanguage;
 	}
 	
@@ -74,19 +75,15 @@ public class UriConversionStep extends BasePipelineStep {
 	
 	@Override
 	protected void handleTextUnit (Event event) {
-
-		String forceEscape = " * -,.";
-		
-		String tmp = null;
-		
-		StringBuilder sb = new StringBuilder();
-		StringBuilder sbTemp = new StringBuilder();
-
 		TextUnit tu = (TextUnit)event.getResource();
-		
 		// Skip non-translatable
 		if ( !tu.isTranslatable()) 
 			return;
+
+		String forceEscape = " * -,.";
+		String tmp = null;
+		StringBuilder sb = new StringBuilder();
+		StringBuilder sbTemp = new StringBuilder();
 
 		// Else: do the requested modifications
 		// Make sure we have a target where to set data

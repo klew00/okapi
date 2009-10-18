@@ -28,6 +28,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.LocaleId;
 
 /**
  * Basic unit of extraction from a filter and also the resource associated with the filter event TEXT_UNIT.
@@ -49,7 +50,7 @@ public class TextUnit implements INameable, IReferenceable {
 	private Annotations annotations;
 	private TextContainer source;
 	private String mimeType;
-	private ConcurrentHashMap<String, TextContainer> targets;
+	private ConcurrentHashMap<LocaleId, TextContainer> targets;
 
 	/**
 	 * Creates a new TextUnit object with its identifier.
@@ -106,7 +107,7 @@ public class TextUnit implements INameable, IReferenceable {
 		boolean isReferent,
 		String mimeType)
 	{
-		targets = new ConcurrentHashMap<String, TextContainer>(TARGETS_INITCAP);
+		targets = new ConcurrentHashMap<LocaleId, TextContainer>(TARGETS_INITCAP);
 		this.id = id;
 		refCount = (isReferent ? 1 : 0); 
 		this.mimeType = mimeType;
@@ -216,35 +217,35 @@ public class TextUnit implements INameable, IReferenceable {
 		return source.hasProperty(name);
 	}
 
-	public Property getTargetProperty (String language,
+	public Property getTargetProperty (LocaleId locId,
 		String name)
 	{
-		TextContainer tc = getTarget(language);
+		TextContainer tc = getTarget(locId);
 		if ( tc == null ) return null;
 		return tc.getProperty(name);
 	}
 
-	public Property setTargetProperty (String language,
+	public Property setTargetProperty (LocaleId locId,
 		Property property)
 	{
-		return createTarget(language, false, IResource.CREATE_EMPTY).setProperty(property);
+		return createTarget(locId, false, IResource.CREATE_EMPTY).setProperty(property);
 	}
 
-	public void removeTargetProperty (String language,
+	public void removeTargetProperty (LocaleId locId,
 		String name)
 	{
-		TextContainer tc = getTarget(language);
+		TextContainer tc = getTarget(locId);
 		if ( tc != null ) {
 			tc.removeProperty(name);
 		}
 	}
 	
-	public Set<String> getTargetPropertyNames (String language) {
-		TextContainer tc = createTarget(language, false, IResource.CREATE_EMPTY);
+	public Set<String> getTargetPropertyNames (LocaleId locId) {
+		TextContainer tc = createTarget(locId, false, IResource.CREATE_EMPTY);
 		return tc.getPropertyNames();
 	}
 
-	public boolean hasTargetProperty (String language,
+	public boolean hasTargetProperty (LocaleId language,
 		String name)
 	{
 		TextContainer tc = getTarget(language);
@@ -252,17 +253,17 @@ public class TextUnit implements INameable, IReferenceable {
 		return (tc.getProperty(name) != null);
 	}
 
-	public Set<String> getTargetLanguages () {
+	public Set<LocaleId> getTargetLanguages () {
 		return targets.keySet();
 	}
 
-	public Property createTargetProperty (String language,
+	public Property createTargetProperty (LocaleId locId,
 		String name,
 		boolean overwriteExisting,
 		int creationOptions)
 	{
 		// Get the target or create an empty one
-		TextContainer tc = createTarget(language, false, CREATE_EMPTY);
+		TextContainer tc = createTarget(locId, false, CREATE_EMPTY);
 		// Get the property if it exists
 		Property prop = tc.getProperty(name);
 		// If it does not exists or if we overwrite: create a new one
@@ -332,13 +333,13 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
     /**
-	 * Gets the target object for this TextUnit for a given language.
-	 * @param language the language to query.
-	 * @return the target object for this TextUnit for the given language, or null if
+	 * Gets the target object for this TextUnit for a given locale.
+	 * @param locId the locale to query.
+	 * @return the target object for this TextUnit for the given locale, or null if
 	 * it does not exist.
 	 */
-	public TextContainer getTarget (String language) {
-		return targets.get(language);
+	public TextContainer getTarget (LocaleId locId) {
+		return targets.get(locId);
 	}
 
     /**
@@ -346,39 +347,39 @@ public class TextUnit implements INameable, IReferenceable {
 	 * Any existing target object for the given language is overwritten.
 	 * To set a target object based on the source, use the
 	 * {@link #createTarget(String, boolean, int)} method.
-	 * @param language the target language.
+	 * @param locId the target language.
 	 * @param text the target object to set.
 	 * @return the target object that has been set.
 	 */
-	public TextContainer setTarget (String language,
+	public TextContainer setTarget (LocaleId locId,
 		TextContainer text)
 	{
-		targets.put(language, text);
+		targets.put(locId, text);
 		return text;
 	}
 
     /**
 	 * Removes a given target object from this TextUnit.
-	 * @param language the target language to remove.
+	 * @param locId the target language to remove.
 	 */
-	public void removeTarget (String language) {
-		if ( hasTarget(language) ) {
-			targets.remove(language);
+	public void removeTarget (LocaleId locId) {
+		if ( hasTarget(locId) ) {
+			targets.remove(locId);
 		}
 	}
 
     /**
 	 * Indicates if there is a target object for a given language for this TextUnit.
-	 * @param language the language to query.
+	 * @param locId the language to query.
 	 * @return true if a target object exists for the given language, false otherwise.
 	 */
-	public boolean hasTarget (String language) {
-		return (targets.get(language) != null);
+	public boolean hasTarget (LocaleId locId) {
+		return (targets.get(locId) != null);
 	}
 
     /**
 	 * Creates or get the target for this TextUnit.
-	 * @param language the target language.
+	 * @param locId the target locale.
 	 * @param overwriteExisting true to overwrite any existing target for the given language.
 	 * False to not create a new target object if one already exists for the given language.
 	 * @param creationOptions creation options:
@@ -388,11 +389,11 @@ public class TextUnit implements INameable, IReferenceable {
 	 * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES).</li></ul>
 	 * @return the target object that was created, or retrieved.
 	 */
-	public TextContainer createTarget (String language,
+	public TextContainer createTarget (LocaleId locId,
 		boolean overwriteExisting,
 		int creationOptions)
 	{
-		TextContainer trgCont = targets.get(language);
+		TextContainer trgCont = targets.get(locId);
 		if (( trgCont == null ) || overwriteExisting ) {
 			trgCont = getSource().clone(
                  // /TODO: find or write a test for this. I only see this one case (what happened to copy_all and copy_content?).
@@ -400,7 +401,7 @@ public class TextUnit implements INameable, IReferenceable {
 			if ( creationOptions == CREATE_EMPTY ) {
 				trgCont.clear();
 			}
-			targets.put(language, trgCont);
+			targets.put(locId, trgCont);
 		}
 		return trgCont;
 	}
@@ -429,26 +430,26 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	/**
-	 * Gets the content of the target for a given language for this TextUnit.
-	 * @param language the language to query.
-	 * @return the content of the target for the given language for this TextUnit.
+	 * Gets the content of the target for a given locale for this TextUnit.
+	 * @param locId the language to query.
+	 * @return the content of the target for the given locale for this TextUnit.
 	 */
-	public TextFragment getTargetContent (String language) {
-		TextContainer tc = getTarget(language);
+	public TextFragment getTargetContent (LocaleId locId) {
+		TextContainer tc = getTarget(locId);
 		if ( tc == null ) return null;
 		return tc.getContent();
 	}
 	
 	/**
 	 * Sets the content of the target for a given language for this TextUnit.
-	 * @param language the language to set.
+	 * @param locId the language to set.
 	 * @param content the new content to set.
 	 * @return the new content for the given target language for this text unit. 
 	 */
-	public TextFragment setTargetContent (String language,
+	public TextFragment setTargetContent (LocaleId locId,
 		TextFragment content)
 	{
-		TextContainer tc = createTarget(language, false, CREATE_EMPTY);
+		TextContainer tc = createTarget(locId, false, CREATE_EMPTY);
 		tc.setContent(content);
 		return tc;
 	}
@@ -476,5 +477,5 @@ public class TextUnit implements INameable, IReferenceable {
 	public void setPreserveWhitespaces (boolean value) {
 		preserveWS = value;
 	}
-	
+
 }

@@ -21,6 +21,7 @@
 package net.sf.okapi.connectors.pensieve;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -39,8 +40,8 @@ public class PensieveTMConnector implements ITMQuery {
 	private int threshold = 95;
 	private List<QueryResult> results;
 	private int current = -1;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	private Parameters params;
 	private ITmSeeker seeker;
 	private Metadata attrs;
@@ -169,19 +170,19 @@ public class PensieveTMConnector implements ITMQuery {
 		}
 	}
 
-	public void setLanguages (String sourceLang,
-		String targetLang)
+	public void setLanguages (LocaleId sourceLocale,
+		LocaleId targetLocale)
 	{
-		srcLang = sourceLang;
-		trgLang = targetLang;
+		srcLoc = sourceLocale;
+		trgLoc = targetLocale;
 	}
 
-	public String getSourceLanguage () {
-		return srcLang;
+	public LocaleId getSourceLanguage () {
+		return srcLoc;
 	}
 
-	public String getTargetLanguage () {
-		return trgLang;
+	public LocaleId getTargetLanguage () {
+		return trgLoc;
 	}
 
 	public void export (String outputPath) {

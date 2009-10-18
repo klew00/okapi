@@ -13,15 +13,18 @@ import net.sf.okapi.filters.html.HtmlUtils;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ExtractionComparisionTest {
+
 	private HtmlFilter htmlFilter;
 	private String[] testFileList;
 	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
 
 	@Before
 	public void setUp() throws Exception {
@@ -40,7 +43,7 @@ public class ExtractionComparisionTest {
 	public void testStartDocument() {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(htmlFilter,
 				new InputDocument(root + "324.html", null),
-				"UTF-8", "en", "en"));
+				"UTF-8", locEN, locEN));
 	}
 
 	// FIXME: Should move to integration project @Test
@@ -50,6 +53,6 @@ public class ExtractionComparisionTest {
 		for (String f : testFileList) {
 			list.add(new InputDocument(root + f, null));
 		}
-		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", "en", "en"));
+		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", locEN, locEN));
 	}
 }

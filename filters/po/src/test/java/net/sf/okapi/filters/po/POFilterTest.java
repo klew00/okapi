@@ -42,6 +42,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.filters.po.POFilter;
 
 import org.junit.Before;
@@ -52,6 +53,8 @@ public class POFilterTest {
 	
 	private POFilter filter;
 	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
 	
 	@Before
 	public void setUp() {
@@ -75,7 +78,7 @@ public class POFilterTest {
 			+ "\"Content-Transfer-Encoding: 8bit\\n\"\n"
 			+ "msgid \"Text\"\n"
 			+ "msgstr \"\"\n";
-		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, "en", "fr"), 1);
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(dp);
 
 		Property prop = dp.getProperty(Property.ENCODING);
@@ -104,7 +107,7 @@ public class POFilterTest {
 			+ "\"Plural-Forms: nplurals=2; plural=(n!=1);\\n\"\r\r"
 			+ "msgid \"Text\"\r"
 			+ "msgstr \"Texte\"\r";
-		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, "en", "fr"), 1);
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(dp);
 
 		Property prop = dp.getProperty(Property.ENCODING);
@@ -117,7 +120,7 @@ public class POFilterTest {
 		assertEquals("nplurals=2; plural=(n!=1);", prop.getValue());
 		assertFalse(prop.isReadOnly());
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(snippet, result);
 	}
 
@@ -131,7 +134,7 @@ public class POFilterTest {
 			+ "\"Plural-Forms: nplurzzzals=2; plural=(n!=1);\\n\"\n\n"
 			+ "msgid \"Text\"\n"
 			+ "msgstr \"\"\n";
-		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, "en", "fr"), 1);
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(dp);
 		// We should also get a warning about the nplurals field missing
 		Property prop = dp.getProperty(POFilter.PROPERTY_PLURALFORMS);
@@ -150,14 +153,14 @@ public class POFilterTest {
 	@Test
 	public void testPluralFormAccess () {
 		assertEquals("nplurals=2; plural= n==1 or n%10==1 ? 0 : 1;",
-			PluralForms.getExpression("mk"));
+			PluralForms.getExpression(LocaleId.fromString("mk")));
 		assertEquals(4, PluralForms.getNumber("cy"));
 	}
 
 	@Test
 	public void testPluralFormDefaults () {
 		assertEquals("nplurals=2; plural=(n!=1);",
-			PluralForms.getExpression("not-a-valid-code"));
+			PluralForms.getExpression(LocaleId.fromString("not-a-valid-code")));
 		assertEquals(2, PluralForms.getNumber("not-a-valid-code"));
 	}
 
@@ -165,7 +168,7 @@ public class POFilterTest {
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"Test01.po", null),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 	
 	@Test
@@ -173,7 +176,7 @@ public class POFilterTest {
 		String snippet = "#, c-format\r"
 			+ "msgid \"Text 1\"\r"
 			+ "msgstr \"Texte 1\"\r";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(result, snippet);
 	}
 		
@@ -182,7 +185,7 @@ public class POFilterTest {
 		String snippet = "#, c-format, fuzzy\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(result, snippet);
 	}
 		
@@ -190,11 +193,11 @@ public class POFilterTest {
 	public void testInlines () {
 		String snippet = "msgid \"Text %s and %d and %f\"\n"
 			+ "msgstr \"Texte %f et %d et %s\"\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
-		assertTrue(tu.hasTarget("fr"));
+		assertTrue(tu.hasTarget(locFR));
 		TextFragment src = tu.getSourceContent();
-		TextFragment trg = tu.getTargetContent("fr");
+		TextFragment trg = tu.getTargetContent(locFR);
 		assertEquals(3, src.getCodes().size());
 		assertEquals(src.getCodes().size(), trg.getCodes().size());
 		FilterTestDriver.checkCodeData(src, trg);
@@ -205,7 +208,7 @@ public class POFilterTest {
 		String snippet = "#, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(result, snippet);
 	}
 
@@ -214,7 +217,7 @@ public class POFilterTest {
 		String snippet = "#, x-stuff, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(result, snippet);
 	}
 	
@@ -224,7 +227,7 @@ public class POFilterTest {
 			+ "msgstr \"Texte 1\"\n";
 		String expect = "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr"));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR));
 	}
 	
 	@Test
@@ -233,14 +236,14 @@ public class POFilterTest {
 			+ "msgstr \"\"\n";
 		String expect = "msgid \"Text 1\"\n"
 			+ "msgstr \"Text 1\"\n";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr"));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR));
 	}
 	
 	@Test
 	public void testTUEmptyIDEntry () {
 		String snippet = "msgid \"\"\n"
 			+ "msgstr \"Some stuff\"\n";
-		assertEquals(null, FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 1));
+		assertEquals(null, FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1));
 	}
 	
 	@Test
@@ -252,14 +255,14 @@ public class POFilterTest {
 			+ "#| Context\n"
 			+ "msgid \"Source\"\n"
 			+ "msgstr \"Target\"\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 
 		assertNotNull(tu);
 		assertEquals("Source", tu.getSource().toString());
-		assertEquals("Target", tu.getTarget("fr").toString());
+		assertEquals("Target", tu.getTarget(locFR).toString());
 
-		assertTrue(tu.hasTargetProperty("fr", Property.APPROVED));
-		Property prop = tu.getTargetProperty("fr", Property.APPROVED);
+		assertTrue(tu.hasTargetProperty(locFR, Property.APPROVED));
+		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertEquals("no", prop.getValue());
 		assertFalse(prop.isReadOnly());
 		
@@ -281,31 +284,31 @@ public class POFilterTest {
 	
 	@Test
 	public void testTUPluralEntry_DefaultGroup () {
-		StartGroup sg = FilterTestDriver.getGroup(getEvents(makePluralEntry(), "en", "fr"), 1);
+		StartGroup sg = FilterTestDriver.getGroup(getEvents(makePluralEntry(), locEN, locFR), 1);
 		assertNotNull(sg);
 		assertEquals("x-gettext-plurals", sg.getType());
 	}
 
 	@Test
 	public void testTUPluralEntry_DefaultSingular () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), "en", "fr"), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), locEN, locFR), 1);
 		assertNotNull(tu);
 		assertEquals("untranslated-singular", tu.getSource().toString());
-		assertFalse(tu.hasTarget("fr"));
+		assertFalse(tu.hasTarget(locFR));
 	}
 
 	@Test
 	public void testTUPluralEntry_DefaultPlural () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), "en", "fr"), 2);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), locEN, locFR), 2);
 		assertNotNull(tu);
 		assertEquals("untranslated-plural", tu.getSource().toString());
-		assertFalse(tu.hasTarget("fr"));
+		assertFalse(tu.hasTarget(locFR));
 	}
 	
 	@Test
 	public void testOuputPluralEntry () {
 		String snippet = makePluralEntry();
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
 		String expected = "msgid \"untranslated-singular\"\n"
 			+ "msgid_plural \"untranslated-plural\"\n"
 			+ "msgstr[0] \"untranslated-singular\"\n"
@@ -317,18 +320,18 @@ public class POFilterTest {
 	public void testPluralEntryFuzzy () {
 		String snippet = makePluralEntryFuzzy();
 		// First TU
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
-		assertEquals("translation-singular", tu.getTarget("fr").toString());
-		Property prop = tu.getTargetProperty("fr", Property.APPROVED);
+		assertEquals("translation-singular", tu.getTarget(locFR).toString());
+		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("no", prop.getValue());
 		assertEquals(MimeTypeMapper.PO_MIME_TYPE, tu.getMimeType());
 		// Second TU
-		tu = FilterTestDriver.getTextUnit(getEvents(snippet, "en", "fr"), 2);
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertNotNull(tu);
-		assertEquals("translation-plural", tu.getTarget("fr").toString());
-		prop = tu.getTargetProperty("fr", Property.APPROVED);
+		assertEquals("translation-plural", tu.getTarget(locFR).toString());
+		prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("no", prop.getValue());
 	}
@@ -336,7 +339,7 @@ public class POFilterTest {
 	@Test
 	public void testOuputPluralEntryFuzzy () {
 		String snippet = makePluralEntryFuzzy();
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "en", "fr"), "fr");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(snippet, result);
 	}
 
@@ -357,12 +360,12 @@ public class POFilterTest {
 		list.add(new InputDocument(root+"POT-Test01.pot", null));
 	
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 
 	private ArrayList<Event> getEvents(String snippet,
-		String srcLang,
-		String trgLang)
+		LocaleId srcLang,
+		LocaleId trgLang)
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, srcLang, trgLang));

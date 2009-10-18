@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.resource.TextFragment;
@@ -82,7 +83,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	 */
 @Override
 	public String getContent (TextFragment tf,
-		String langToUse,
+		LocaleId langToUse,
 		int context)
 	{
 		String sTuff; // DWH 4-8-09

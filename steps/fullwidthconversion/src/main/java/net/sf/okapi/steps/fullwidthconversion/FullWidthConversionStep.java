@@ -23,6 +23,7 @@ package net.sf.okapi.steps.fullwidthconversion;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -33,15 +34,15 @@ import net.sf.okapi.common.resource.TextUnit;
 public class FullWidthConversionStep extends BasePipelineStep {
 
 	private Parameters params;
-	private String targetLanguage;
+	private LocaleId targetLocale;
 
 	public FullWidthConversionStep () {
 		params = new Parameters();
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 	
 	public String getName () {
@@ -63,7 +64,7 @@ public class FullWidthConversionStep extends BasePipelineStep {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 
-		TextContainer tc = tu.createTarget(targetLanguage, false, IResource.COPY_ALL);
+		TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 		String text = tc.getCodedText();
 		StringBuilder sb = new StringBuilder(text);
 

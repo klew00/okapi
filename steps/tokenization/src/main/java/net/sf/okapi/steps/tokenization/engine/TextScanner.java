@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
@@ -22,23 +23,20 @@ public class TextScanner extends AbstractLexer {
 	private LexerRules rules;
 	private HashMap<LexerRule, Pattern> patterns;
 	String text;
-	private String language;	
+	private LocaleId language;	
 		
 	@Override
 	protected Class<? extends LexerRules> lexer_getRulesClass() {
-
 		return RegexRules.class;
 	}
 	
 	@Override
 	protected boolean lexer_hasNext() {
-
 		return hasNext;
 	}
 
 	@Override
 	protected void lexer_init() {
-
 		queue = new LinkedList<Lexem>();
 		rulesQueue = new LinkedList<LexerRule>();
 		
@@ -46,7 +44,6 @@ public class TextScanner extends AbstractLexer {
 		rules = getRules();
 		
 		for (LexerRule item : rules) {
-			
 			RegexRule rule = (RegexRule) item;
 			
 			Pattern pattern = null;
@@ -59,7 +56,6 @@ public class TextScanner extends AbstractLexer {
 
 	@Override
 	protected Lexem lexer_next() {
-
 		if (!queue.isEmpty())
 			return queue.poll();
 		
@@ -108,21 +104,18 @@ public class TextScanner extends AbstractLexer {
 	}
 
 	@Override
-	protected void lexer_open(String text, String language, Tokens tokens) {
-
+	protected void lexer_open(String text, LocaleId language, Tokens tokens) {
 		this.text = text;
 		this.language = language;
 		
 		queue.clear();
-		
 		rulesQueue.clear();		
 		rulesQueue.addAll(rules);
 		
 		hasNext = true;
 	}
 
-	public Lexems process(String text, String language, Tokens tokens) {
-
+	public Lexems process(String text, LocaleId language, Tokens tokens) {
 		return null; // Not used
 	}
 

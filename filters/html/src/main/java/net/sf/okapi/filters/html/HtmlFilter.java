@@ -225,7 +225,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			break;
 		case GROUP_ELEMENT:
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag), getSrcLang(),
+				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag), getSrcLoc(),
 						propertyTextUnitPlaceholders);
 			} else {
 				// no attributes that need processing - just treat as skeleton

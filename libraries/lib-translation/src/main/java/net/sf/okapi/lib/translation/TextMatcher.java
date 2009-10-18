@@ -23,8 +23,8 @@ package net.sf.okapi.lib.translation;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 
 public class TextMatcher {
@@ -43,30 +43,21 @@ public class TextMatcher {
 
 	/**
 	 * Creates a new TextMatcher object.
-	 * @param language1 Language code of the first language.
-	 * @param language2 Language code of the second language.
+	 * @param locale1 locale of the first language.
+	 * @param locale2 locale of the second language.
 	 */
-	public TextMatcher (String language1,
-		String language2)
+	public TextMatcher (LocaleId locale1,
+		LocaleId locale2)
 	{
-		// Get the locale to use.
-		Locale loc;
-		String[] parts = net.sf.okapi.common.Util.splitLanguageCode(language1);
-		if ( parts[1].length() > 0 ) loc = new Locale(parts[0], parts[1]);
-		else loc = new Locale(parts[0]);
-
 		// Create the first breaker.
-		breaker1 = BreakIterator.getWordInstance(loc);
-		if ( language1.equals(language2) ) {
+		breaker1 = BreakIterator.getWordInstance(locale1.toJavaLocale());
+		if ( locale1.equals(locale2) ) {
 			// Use the same one if the second language is the same.
 			breaker2 = breaker1;
 		}
 		else {
 			// If two different languages: create a second breaker.
-			parts = net.sf.okapi.common.Util.splitLanguageCode(language1);
-			if ( parts[1].length() > 0 ) loc = new Locale(parts[0], parts[1]);
-			else loc = new Locale(parts[0]);
-			breaker2 = BreakIterator.getWordInstance(loc);
+			breaker2 = BreakIterator.getWordInstance(locale2.toJavaLocale());
 		}
 	}
 	

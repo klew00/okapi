@@ -22,6 +22,7 @@ package net.sf.okapi.filters.rtf;
 
 import java.io.InputStream;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.rtf.RTFFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
@@ -31,6 +32,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class RTFFilterTest {
+
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
 
 	@Before
 	public void setUp() {
@@ -43,17 +47,17 @@ public class RTFFilterTest {
 		try {
 			filter = new RTFFilter();
 			InputStream input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
-			filter.open(new RawDocument(input, "windows-1252", "en", "fr"));
+			filter.open(new RawDocument(input, "windows-1252", locEN, locFR));
 //TODO: replace with non-visual test			process1(filter);
 			filter.close();
 			
 			input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
-			filter.open(new RawDocument(input, "windows-1252", "en", "fr"));
+			filter.open(new RawDocument(input, "windows-1252", locEN, locFR));
 //TODO: replace with non-visual test			process2(filter);
 			filter.close();
 
 			input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
-			filter.open(new RawDocument(input, "windows-1252", "en", "fr"));
+			filter.open(new RawDocument(input, "windows-1252", locEN, locFR));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}
@@ -79,8 +83,8 @@ public class RTFFilterTest {
 //		TextUnit tu = new TextUnit("testid"); 
 //		while ( filter.getSegment(tu) ) {
 //			System.out.println("S="+tu.toString());
-//			if ( tu.hasTarget("fr") ) {
-//				System.out.println("T="+tu.getTargetContent("fr").toString());
+//			if ( tu.hasTarget(locFR) ) {
+//				System.out.println("T="+tu.getTargetContent(locFR).toString());
 //			}
 //		}
 //	}

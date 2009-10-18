@@ -39,6 +39,7 @@ import net.sf.okapi.filters.dtd.DTDFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +47,7 @@ import org.junit.Test;
 public class DTDFilterTest {
 
 	private DTDFilter filter;
+	private LocaleId locEN = LocaleId.fromString("en");
 
 	@Before
 	public void setUp() {
@@ -66,7 +68,7 @@ public class DTDFilterTest {
 		URL url = DTDFilterTest.class.getResource("/Test01.dtd");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(url.getPath(), null),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 	
 	@Test
@@ -111,7 +113,7 @@ public class DTDFilterTest {
 //	@Test
 //	public void testLineBreaks () {
 //		String snippet = "<!--Comment-->\r<!ENTITY e1 \"t1\">\r<!ENTITY e2 \"t2\">\r";
-//TODO		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+//TODO		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
 //	}
 	
 	@Test
@@ -124,12 +126,12 @@ public class DTDFilterTest {
 		list.add(new InputDocument(url.getPath(), null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN));
 	}
 
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, "en"));
+		filter.open(new RawDocument(snippet, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);

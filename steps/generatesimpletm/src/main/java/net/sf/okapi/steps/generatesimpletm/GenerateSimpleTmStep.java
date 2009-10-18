@@ -26,6 +26,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -40,7 +41,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 
 	private Database simpleTm = null;
 	private Parameters params;
-	private String targetLanguage;
+	private LocaleId targetLocale;
 	private String fileName;
 	private int countIsNotTranslatable;
 	private int countTuNotAdded;
@@ -53,8 +54,8 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 	
 	public String getName () {
@@ -81,7 +82,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	protected void handleStartBatchItem (Event event) {
 		if(simpleTm == null){
 			simpleTm = new Database();
-			simpleTm.create(params.getTmPath(), true, targetLanguage);
+			simpleTm.create(params.getTmPath(), true, targetLocale);
 		}
 	}
 	
@@ -137,8 +138,8 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 			return;
 		}
 		
-		if( !tu.hasTarget(targetLanguage) || ( tu.getTarget(targetLanguage)==null )){
-			logger.warning(String.format("TextUnit is missing '%s' target.", targetLanguage));
+		if( !tu.hasTarget(targetLocale) || ( tu.getTarget(targetLocale)==null )){
+			logger.warning(String.format("TextUnit is missing '%s' target.", targetLocale));
 			countTuNotAdded++;
 			return;
 		}

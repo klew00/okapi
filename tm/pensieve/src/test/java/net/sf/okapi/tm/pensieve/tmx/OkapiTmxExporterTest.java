@@ -20,6 +20,7 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
@@ -46,6 +47,10 @@ public class OkapiTmxExporterTest {
     TMXWriter mockTmxWriter;
     Iterator<TranslationUnit> mockIterator;
     PensieveSeeker mockSeeker;
+    LocaleId locEN = LocaleId.fromString("en");
+    LocaleId locFR = LocaleId.fromString("fr");
+    LocaleId locKR = LocaleId.fromString("kr");
+    LocaleId locProps = LocaleId.fromString("Props"); // Not sure what is this locale?
     
     ArgumentCaptor<TextUnit> tuCapture;
 
@@ -67,14 +72,14 @@ public class OkapiTmxExporterTest {
                 .thenReturn(true)
                 .thenReturn(true)
                 .thenReturn(false);
-        TranslationUnit tuWithMetadata = Helper.createTU("EN", "Props", "props_source", "props_target", "props_sourceid");
+        TranslationUnit tuWithMetadata = Helper.createTU(locEN, locProps, "props_source", "props_target", "props_sourceid");
         tuWithMetadata.setMetadataValue(MetadataType.GROUP_NAME, "PropsGroupName");
         tuWithMetadata.setMetadataValue(MetadataType.FILE_NAME, "PropsFileName");
 
         when(mockIterator.next())
-                .thenReturn(Helper.createTU("EN", "FR", "source", "target", "sourceid"))
-                .thenReturn(Helper.createTU("EN", "FR", "source2", "target2", "sourceid2"))
-                .thenReturn(Helper.createTU("EN", "KR", "kr_source", "kr_target", "kr_sourceid"))
+                .thenReturn(Helper.createTU(locEN, locFR, "source", "target", "sourceid"))
+                .thenReturn(Helper.createTU(locEN, locFR, "source2", "target2", "sourceid2"))
+                .thenReturn(Helper.createTU(locEN, locKR, "kr_source", "kr_target", "kr_sourceid"))
                 .thenReturn(tuWithMetadata)
                 .thenReturn(null);
 
@@ -83,9 +88,9 @@ public class OkapiTmxExporterTest {
 
     @Test
     public void exportTmxBehavior() throws IOException {
-        handler.exportTmx("EN", "FR", mockSeeker, mockTmxWriter);
+        handler.exportTmx(locEN, locFR, mockSeeker, mockTmxWriter);
 
-        verify(mockTmxWriter).writeStartDocument("EN", "FR", "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
+        verify(mockTmxWriter).writeStartDocument(locEN, locFR, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
         verify(mockTmxWriter, times(2)).writeTUFull((TextUnit) anyObject());
         verify(mockTmxWriter).writeEndDocument();
         verify(mockTmxWriter).close();
@@ -93,25 +98,25 @@ public class OkapiTmxExporterTest {
 
     @Test
     public void exportTmxTextUnitContentNoProps() throws IOException {
-        handler.exportTmx("EN", "FR", mockSeeker, mockTmxWriter);
+        handler.exportTmx(locEN, locFR, mockSeeker, mockTmxWriter);
 
         verify(mockTmxWriter, times(2)).writeTUFull(tuCapture.capture());
         assertEquals("source of first tu written", "source", tuCapture.getAllValues().get(0).getSourceContent().toString());
-        assertEquals("target of first tu written", "target", tuCapture.getAllValues().get(0).getTargetContent("FR").toString());
+        assertEquals("target of first tu written", "target", tuCapture.getAllValues().get(0).getTargetContent(locFR).toString());
         assertEquals("target of first tu written", "sourceid", tuCapture.getAllValues().get(0).getName());
         assertEquals("source of second tu written", "source2", tuCapture.getAllValues().get(1).getSourceContent().toString());
-        assertEquals("target of second tu written", "target2", tuCapture.getAllValues().get(1).getTargetContent("FR").toString());
+        assertEquals("target of second tu written", "target2", tuCapture.getAllValues().get(1).getTargetContent(locFR).toString());
         assertEquals("target of second tu written", "sourceid2", tuCapture.getAllValues().get(1).getName());
     }
 
     @Test
     public void exportTmxTextUnitContentWithProps() throws IOException {
-        handler.exportTmx("EN", "Props", mockSeeker, mockTmxWriter);
+        handler.exportTmx(locEN, locProps, mockSeeker, mockTmxWriter);
 
         verify(mockTmxWriter, times(1)).writeTUFull(tuCapture.capture());
         TextUnit capturedTU = tuCapture.getValue();
         assertEquals("source of first tu written", "props_source", capturedTU.getSourceContent().toString());
-        assertEquals("target of first tu written", "props_target", capturedTU.getTargetContent("Props").toString());
+        assertEquals("target of first tu written", "props_target", capturedTU.getTargetContent(locProps).toString());
         assertEquals("target of first tu written", "props_sourceid", capturedTU.getName());
         assertEquals("groupname metadata", "PropsGroupName", capturedTU.getProperty("Txt::GroupName").getValue());
         assertEquals("filename metadata", "PropsFileName", capturedTU.getProperty("Txt::FileName").getValue());
@@ -120,19 +125,19 @@ public class OkapiTmxExporterTest {
 
     @Test
     public void exportTmxAllTargetLang() throws IOException {
-        handler.exportTmx("EN", mockSeeker, mockTmxWriter);
+        handler.exportTmx(locEN, mockSeeker, mockTmxWriter);
         verify(mockTmxWriter, times(4)).writeTUFull((TextUnit) anyObject());
     }
 
     @Test
     public void exportTmxNoMatchingSourceLang() throws IOException {
-        handler.exportTmx("KR", "FR", mockSeeker, mockTmxWriter);
+        handler.exportTmx(locKR, locFR, mockSeeker, mockTmxWriter);
         verify(mockTmxWriter, never()).writeTUFull((TextUnit) anyObject());
     }
 
     @Test
     public void exportTmxSpecificTargetLang() throws IOException {
-        handler.exportTmx("EN", "KR", mockSeeker, mockTmxWriter);
+        handler.exportTmx(locEN, locKR, mockSeeker, mockTmxWriter);
         verify(mockTmxWriter, times(1)).writeTUFull(tuCapture.capture());
         assertEquals("target of first tu written", "kr_sourceid", tuCapture.getValue().getName());
     }
@@ -141,7 +146,7 @@ public class OkapiTmxExporterTest {
     public void exportTmxSeekerNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx("", "", null, mockTmxWriter);
+            handler.exportTmx(LocaleId.EMPTY, LocaleId.EMPTY, null, mockTmxWriter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -152,7 +157,7 @@ public class OkapiTmxExporterTest {
     public void exportTmxWriterNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx("", "", mockSeeker, null);
+            handler.exportTmx(LocaleId.EMPTY, LocaleId.EMPTY, mockSeeker, null);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -163,7 +168,7 @@ public class OkapiTmxExporterTest {
     public void exportTmxSourceLangNull() throws IOException {
         String errMsg = null;
         try {
-            handler.exportTmx(null, "", mockSeeker, mockTmxWriter);
+            handler.exportTmx(null, LocaleId.EMPTY, mockSeeker, mockTmxWriter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }

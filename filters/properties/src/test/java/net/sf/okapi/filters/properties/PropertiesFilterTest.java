@@ -33,6 +33,7 @@ import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +42,8 @@ import static org.junit.Assert.*;
 public class PropertiesFilterTest {
 	
 	private PropertiesFilter filter;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
 
 	@Before
 	public void setUp() {
@@ -70,7 +73,7 @@ public class PropertiesFilterTest {
 		list.add(new InputDocument(url.getPath(), "okf_properties@Test04.fprm"));
 	
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 
 	@Test
@@ -78,27 +81,27 @@ public class PropertiesFilterTest {
 		URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(url.getPath(), null),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 	
 	@Test
 	public void testLineBreaks_CR () {
 		String snippet = "Key1=Text1\rKey2=Text2\r";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet), "en");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), locEN);
 		assertEquals(snippet, result);
 	}
 
 	@Test
 	public void testineBreaks_CRLF () {
 		String snippet = "Key1=Text1\r\nKey2=Text2\r\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet), "en");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), locEN);
 		assertEquals(snippet, result);
 	}
 	
 	@Test
 	public void testLineBreaks_LF () {
 		String snippet = "Key1=Text1\n\n\nKey2=Text2\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet), "en");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet), locEN);
 		assertEquals(snippet, result);
 	}
 	
@@ -163,7 +166,7 @@ public class PropertiesFilterTest {
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, "en"));
+		filter.open(new RawDocument(snippet, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);

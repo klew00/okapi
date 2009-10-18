@@ -21,6 +21,8 @@
 package net.sf.okapi.filters.tmx;
 
 import javax.xml.stream.XMLStreamReader;
+
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -28,7 +30,7 @@ import net.sf.okapi.filters.tmx.TmxFilter.TuvXmlLang;
 
 public class TmxTuv {
 
-	String lang;											//tuv language
+	LocaleId lang;											//tuv language
 	TuvXmlLang trgType;										//SOURCE, TARGET, OTHER
 	int langCount;											// > 1 means duplicates
 	GenericSkeleton skelBefore = new GenericSkeleton();		
@@ -44,7 +46,7 @@ public class TmxTuv {
 	 * @param trgType TuvXmlLang.SOURCE, TuvXmlLang.TARGET, TuvXmlLang.OTHER 
 	 * @param counter Higher than 1 indicates the number of duplicate 
 	 */		
-	TmxTuv(String lang, TuvXmlLang trgType, int counter){
+	TmxTuv (LocaleId lang, TuvXmlLang trgType, int counter){
 		this.lang = lang;
 		this.trgType = trgType;
 		this.langCount= counter;

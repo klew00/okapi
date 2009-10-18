@@ -22,6 +22,8 @@ package net.sf.okapi.common;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.LocaleId;
+
 import org.w3c.dom.Node;
 
 import java.io.File;
@@ -914,6 +916,10 @@ public class Util {
 	 */
 	static public boolean isEmpty (String string) {
 		return (( string == null ) || ( string.length() == 0 ));
+	}
+	
+	static public boolean isNullOrEmpty (LocaleId locale) {
+		return (( locale == null ) || ( locale.equals(LocaleId.EMPTY) ));
 	}
 	
 	static public boolean isEmpty (String string, boolean ignoreWS) {

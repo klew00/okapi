@@ -20,6 +20,7 @@
 
 package net.sf.okapi.tm.pensieve.common;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -31,21 +32,20 @@ import static org.junit.Assert.*;
 public class TranslationUnitVariantTest {
 
     private final TextFragment content = new TextFragment();
-    private final String lang = "fb";
+    private final LocaleId locale = LocaleId.fromString("fb");
 
     @Test
     public void constructorNoArg() {
         TranslationUnitVariant tuv = new TranslationUnitVariant();
         assertNull("text fragment should be null", tuv.getContent());
-        assertNull("lang should be null", tuv.getLang());
+        assertNull("lang should be null", tuv.getLanguage());
     }
 
     @Test
     public void constructorTwoArgs() {
-
-        TranslationUnitVariant tuv = new TranslationUnitVariant(lang, content);
+        TranslationUnitVariant tuv = new TranslationUnitVariant(locale, content);
         assertSame("content", content, tuv.getContent());
-        assertSame("lang", lang, tuv.getLang());
+        assertSame("lang", locale, tuv.getLanguage());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class TranslationUnitVariantTest {
     @Test
     public void setLang() {
         TranslationUnitVariant tuv = new TranslationUnitVariant();
-        tuv.setLang(lang);
-        assertSame("content", lang, tuv.getLang());
+        tuv.setLocale(locale);
+        assertSame("content", locale, tuv.getLanguage());
     }
 }

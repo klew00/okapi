@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -47,6 +48,7 @@ import org.junit.Test;
  */
 
 public class OpenXMLSnippetsTest {
+
 	private static Logger LOGGER;
 	private OpenXMLContentFilter openXMLContentFilter;
 	public final static int MSWORD=1;
@@ -56,6 +58,7 @@ public class OpenXMLSnippetsTest {
 	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
 	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 	private String snappet;
+	private LocaleId locENUS = LocaleId.fromString("en-us");
 	
 	@Before
 	public void setUp()  {
@@ -73,7 +76,7 @@ public class OpenXMLSnippetsTest {
 
 	@Test
 	public void testInlineLanguageWithText() {
-		String snippet = "<w:p><w:r><w:lang w:val=\"en-US\"/><w:t>zorcon</w:t></w:r></w:p>";
+		String snippet = "<w:p><w:r><w:lang w:val=\"en-us\"/><w:t>zorcon</w:t></w:r></w:p>";
 		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
 		assertEquals(snappet, snippet);
 	}
@@ -94,14 +97,14 @@ public class OpenXMLSnippetsTest {
 
 	@Test
 	public void testOneWord() {
-		String snippet = "<w:p><w:r><w:rPr><w:lang w:val=\"en-US\"/><w:b/><w:bCs></w:rPr><w:t>zorcon</w:t></w:r></w:p>";
+		String snippet = "<w:p><w:r><w:rPr><w:lang w:val=\"en-us\"/><w:b/><w:bCs></w:rPr><w:t>zorcon</w:t></w:r></w:p>";
 		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
 		assertEquals(snappet, snippet);
 	}
 
 	@Test
 	public void testInlineLanguage() {
-		String snippet = "<w:p><w:r><w:lang w:val=\"en-US\"/></w:r></w:p>";
+		String snippet = "<w:p><w:r><w:lang w:val=\"en-us\"/></w:r></w:p>";
 		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
 		assertEquals(snappet, snippet);
 	}
@@ -115,7 +118,7 @@ public class OpenXMLSnippetsTest {
 
 	@Test
 	public void testLostDocParts() {
-		String snippet = "<w:p><w:r><w:rPr><w:lang w:val=\"en-US\" w:eastAsia=\"zh-TW\"/></w:rPr></w:r><wp:docPr name=\"Picture 1\"><pic:cNvPr name=\"Picture 1\"><a:stretch/></w:p>";				
+		String snippet = "<w:p><w:r><w:rPr><w:lang w:val=\"en-us\" w:eastAsia=\"zh-TW\"/></w:rPr></w:r><wp:docPr name=\"Picture 1\"><pic:cNvPr name=\"Picture 1\"><a:stretch/></w:p>";				
 		snappet = generateOutput(getEvents(snippet, MSWORD), snippet);
 		assertEquals(snappet, snippet);
 	}
@@ -187,7 +190,7 @@ public class OpenXMLSnippetsTest {
 		ArrayList<Event> list = new ArrayList<Event>();
 		openXMLContentFilter.setLogger(LOGGER);
 		openXMLContentFilter.setUpConfig(filetype);
-		openXMLContentFilter.open(new RawDocument(snippet, "en-US"));
+		openXMLContentFilter.open(new RawDocument(snippet, locENUS));
 		while (openXMLContentFilter.hasNext()) {
 			Event event = openXMLContentFilter.next();
 			openXMLContentFilter.displayOneEvent(event);
@@ -204,7 +207,7 @@ public class OpenXMLSnippetsTest {
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				writer.processStartDocument("en-US", "utf-8", null, new EncoderManager(),
+				writer.processStartDocument(locENUS, "utf-8", null, new EncoderManager(),
 					(StartDocument)event.getResource());
 				break;
 			case TEXT_UNIT:

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.wordcount;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -36,7 +37,7 @@ import net.sf.okapi.steps.wordcount.common.BaseCounter;
 public class WordCounter extends BaseCounter {
 
 	@Override
-	protected long doGetCount(String text, String language) {
+	protected long doGetCount(String text, LocaleId language) {
 		
 		Tokens tokens = Tokenizer.tokenize(text, language, getTokenName());		
 		if (tokens == null) return 0;
@@ -49,29 +50,24 @@ public class WordCounter extends BaseCounter {
 		return tokens.size();
 	}
 	
-	static public long getCount(TextUnit textUnit, String language) {
-		
+	static public long getCount(TextUnit textUnit, LocaleId language) {
 		return getCount(WordCounter.class, textUnit, language);		
 	}
 	
-	static public long getCount(TextContainer textContainer, String language) {
-		
+	static public long getCount(TextContainer textContainer, LocaleId language) {
 		return getCount(WordCounter.class, textContainer, language);		
 	}
 
-	static public long getCount(TextFragment textFragment, String language) {
-		
+	static public long getCount(TextFragment textFragment, LocaleId language) {
 		return getCount(WordCounter.class, textFragment, language);		
 	}
 	
-	static public long getCount(String string, String language) {
-		
+	static public long getCount(String string, LocaleId language) {
 		return getCount(WordCounter.class, string, language);		
 	}
 	
 	@Override
 	protected String getResourceName() {
-		
 		return "/word_counter.tprm";
 	}
 

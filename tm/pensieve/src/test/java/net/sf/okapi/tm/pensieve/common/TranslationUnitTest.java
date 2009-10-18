@@ -20,6 +20,7 @@
 
 package net.sf.okapi.tm.pensieve.common;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -33,8 +34,8 @@ import org.junit.Test;
 public class TranslationUnitTest {
 
     TranslationUnit tu;
-    final static TranslationUnitVariant SOURCE = new TranslationUnitVariant("EN", new TextFragment("Joe McMac"));
-    final static TranslationUnitVariant CONTENT = new TranslationUnitVariant("EN", new TextFragment("Some content that isn't very long"));
+    final static TranslationUnitVariant SOURCE = new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("Joe McMac"));
+    final static TranslationUnitVariant CONTENT = new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("Some content that isn't very long"));
 
     @Before
     public void setUp(){
@@ -103,13 +104,13 @@ public class TranslationUnitTest {
 
     @Test
     public void isSourceEmptyEmpty(){
-        tu.setSource(new TranslationUnitVariant("EN", new TextFragment("")));
+        tu.setSource(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("")));
         assertTrue("source should be empty", tu.isSourceEmpty());
     }
 
     @Test
     public void isSourceEmptyNotEmpty(){
-        tu.setSource(new TranslationUnitVariant("EN", new TextFragment("this is not empty")));
+        tu.setSource(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("this is not empty")));
         assertFalse("source should not be empty", tu.isSourceEmpty());
     }
 
@@ -120,13 +121,13 @@ public class TranslationUnitTest {
 
     @Test
     public void isTargetEmptyEmpty(){
-        tu.setTarget(new TranslationUnitVariant("EN", new TextFragment("")));
+        tu.setTarget(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("")));
         assertTrue("target should be empty", tu.isTargetEmpty());
     }
 
     @Test
     public void isTargetEmptyNotEmpty(){
-        tu.setTarget(new TranslationUnitVariant("EN", new TextFragment("this is not empty")));
+        tu.setTarget(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("this is not empty")));
         assertFalse("target should not be empty", tu.isTargetEmpty());
     }
 }

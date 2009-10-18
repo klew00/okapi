@@ -27,6 +27,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -50,6 +51,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	Property scoreProp;
 	long scoreTotal;
 	int itemCount;
+	LocaleId trgLangExtra;
 	
 	public Utility () {
 		params = new Parameters();
@@ -63,6 +65,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	public void preprocess () {
 		// Both strings are in the target language.
 		matcher = new TextMatcher(trgLang, trgLang);
+		trgLangExtra = LocaleId.fromString(trgLang.toString()+params.trgSuffix);
 		
 		// Start TMX writer (one for all input documents)
 		if ( params.generateTMX ) {
@@ -287,9 +290,9 @@ public class Utility extends BaseFilterDrivenUtility {
 				tmxTu.setSourceContent(srcFrag);
 			}
 			tmxTu.setTargetContent(trgLang, trgFrag1);
-			tmxTu.setTargetContent(trgLang+params.trgSuffix, trgFrag2);
+			tmxTu.setTargetContent(trgLangExtra, trgFrag2);
 			scoreProp.setValue(String.format("%03d", score));
-			tmxTu.setTargetProperty(trgLang+params.trgSuffix, scoreProp);
+			tmxTu.setTargetProperty(trgLangExtra, scoreProp);
 			tmx.writeTUFull(tmxTu);
 		}
 	}

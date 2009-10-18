@@ -20,6 +20,7 @@
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -31,11 +32,11 @@ public class PseudoTranslateStep extends BasePipelineStep {
 	private static final String OLDCHARS = "AaEeIiOoUuYyCcDdNn";
 	private static final String NEWCHARS = "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0\u00d1\u00f1";
 
-	private String trgLang;
+	private LocaleId trgLoc;
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		trgLang = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		trgLoc = targetLocale;
 	}
 	
 	public String getName () {
@@ -51,7 +52,7 @@ public class PseudoTranslateStep extends BasePipelineStep {
 		TextUnit tu = (TextUnit)event.getResource();
 		if ( !tu.isTranslatable() ) return;
 
-		TextFragment tf = tu.createTarget(trgLang, false, IResource.COPY_CONTENT);
+		TextFragment tf = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
 		StringBuilder text = new StringBuilder(tf.getCodedText());
 		int n;
 		for ( int i=0; i<text.length(); i++ ) {

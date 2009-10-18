@@ -41,6 +41,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -66,7 +67,7 @@ public class IDMLFilter implements IFilter {
 	private Enumeration<? extends ZipEntry> entries;
 	private int subDocId;
 	private LinkedList<Event> queue;
-	private String srcLang;
+	private LocaleId srcLoc;
 	private IDMLContentFilter filter;
 	private Parameters params;
 
@@ -165,7 +166,7 @@ public class IDMLFilter implements IFilter {
 		filter = new IDMLContentFilter();
 		filter.setParameters(params);
 
-		srcLang = input.getSourceLanguage();
+		srcLoc = input.getSourceLanguage();
 	}
 	
 	public void setParameters (IParameters params) {
@@ -183,7 +184,7 @@ public class IDMLFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(docId);
 			startDoc.setEncoding("UTF-8", false); // Default
 			startDoc.setName(docURI.getPath());
-			startDoc.setLanguage(srcLang);
+			startDoc.setLanguage(srcLoc);
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setLineBreak("\n");
 			startDoc.setFilterParameters(params);
@@ -223,7 +224,7 @@ public class IDMLFilter implements IFilter {
 		filter.close(); // Make sure the previous is closed
 		Event event;
 		try {
-			filter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLang));
+			filter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLoc));
 			event = filter.next(); // START_DOCUMENT
 		}
 		catch (IOException e) {

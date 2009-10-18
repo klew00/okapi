@@ -22,6 +22,7 @@ package net.sf.okapi.tm.simpletm;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -73,7 +74,7 @@ public class Database {
 
 	private Connection  conn = null;
 	private PreparedStatement qstm = null;
-	private String trgLang;
+	private LocaleId trgLoc;
 
 	public Database () {
 		try {
@@ -117,7 +118,7 @@ public class Database {
 	
 	public void create (String path,
 		boolean deleteExistingDB,
-		String targetLanguage)
+		LocaleId targetLocale)
 	{
 		Statement stm = null;
 		try {
@@ -148,7 +149,7 @@ public class Database {
 				+ NGRPNAME + " VARCHAR,"
 				+ NFILENAME + " VARCHAR,"
 				+ ")");
-			trgLang = targetLanguage;
+			trgLoc = targetLocale;
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -211,11 +212,11 @@ public class Database {
 		int count = 0;
 		PreparedStatement pstm = null;
 		try {
-			if ( !tu.hasTarget(trgLang) ) return 0;
+			if ( !tu.hasTarget(trgLoc) ) return 0;
 
 			// Store the data
 			TextContainer srcCont = tu.getSource();
-			TextContainer trgCont = tu.getTarget(trgLang);
+			TextContainer trgCont = tu.getTarget(trgLoc);
 
 			// Store the segments if possible
 			if ( srcCont.isSegmented() && trgCont.isSegmented() ) {
@@ -345,14 +346,14 @@ public class Database {
 	}
 
 	public void exportToTMX (String outputPath,
-		String sourceLanguage,
-		String targetLanguage) //TODO: lang should be in db
+		LocaleId sourceLocale,
+		LocaleId targetLocale)
 	{
 		Statement stm = null;
 		TMXWriter writer = null;
 		try {
 			writer = new TMXWriter(outputPath);
-			writer.writeStartDocument(sourceLanguage, targetLanguage,
+			writer.writeStartDocument(sourceLocale, targetLocale,
 				null, null, "sentence", "simpleTM", null);
 			stm = conn.createStatement();
 			ResultSet result = stm.executeQuery(String.format(
@@ -371,7 +372,7 @@ public class Database {
 					tc = new TextContainer();
 					tc.setCodedText(result.getString(6),
 						Code.stringToCodes(result.getString(7)), false);
-					tu.setTarget(targetLanguage, tc);
+					tu.setTarget(targetLocale, tc);
 					tu.setName(result.getString(1));
 					attributes.put(NGRPNAME, result.getString(2));
 					attributes.put(NFILENAME, result.getString(3));

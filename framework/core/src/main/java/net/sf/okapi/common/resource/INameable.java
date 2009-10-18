@@ -23,6 +23,7 @@ package net.sf.okapi.common.resource;
 import java.util.Set;
 
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 
 /**
  * Provides the methods common to all resources that can be named and have properties. 
@@ -137,59 +138,57 @@ public interface INameable extends IResource {
 	public boolean hasSourceProperty (String name);
 
 	/**
-	 * Gets the target property for a given name and target language.
-	 * @param language The language of the property to retrieve. The language code is case-sensitive.
+	 * Gets the target property for a given name and target locale.
+	 * @param locId the locale of the property to retrieve.
 	 * @param name The name of the property to retrieve. This name is case-sensitive.
 	 * @return The property or null if it does not exist.
 	 */
-	public Property getTargetProperty (String language,
+	public Property getTargetProperty (LocaleId locId,
 		String name);
 	
 	/**
 	 * Sets a target property. If a property already exists it is overwritten.
-	 * @param language The target language for which this property should be set. The language code
-	 * is case-sensitive.
+	 * @param locId The target locale for which this property should be set.
 	 * @param property The new property to set. This name is case-sensitive.
 	 * @return The property that has been set.
 	 */
-	public Property setTargetProperty (String language,
+	public Property setTargetProperty (LocaleId locId,
 		Property property);
 	
 	/**
 	 * Removes a target property of a given name. If the property does not exists
 	 * nothing happens.
-	 * @param language The target language for which this property should be set. The language code
-	 * is case-sensitive.
+	 * @param locId The target locale for which this property should be set.
 	 * @param name The name of the property to remove.
 	 */
-	public void removeTargetProperty (String language,
+	public void removeTargetProperty (LocaleId locId,
 		String name);
 	
 	/**
-	 * Gets the names of all the properties for a given target language in this resource.
-	 * @param language The target language to query. The language code is case-sensitive.
-	 * @return All the names of the target properties for the given language in this resource.
+	 * Gets the names of all the properties for a given target locale in this resource.
+	 * @param locId the target locale to query.
+	 * @return all the names of the target properties for the given locale in this resource.
 	 */
-	public Set<String> getTargetPropertyNames (String language);
+	public Set<String> getTargetPropertyNames (LocaleId locId);
 
 	/**
 	 * Gets the names of all the target languages for this resource.
 	 * @return All the names of the target languages for this resource.
 	 */
-	public Set<String> getTargetLanguages ();
+	public Set<LocaleId> getTargetLanguages ();
 	
 	/**
-	 * Indicates if a property exists for a given name and target language.
-	 * @param language The target language to query. The language code is case-sensitive.
+	 * Indicates if a property exists for a given name and target locale.
+	 * @param locId The target locale to query.
 	 * @param name The name of the property to query.
 	 * @return True if a property exists, false otherwise.
 	 */
-	public boolean hasTargetProperty (String language,
+	public boolean hasTargetProperty (LocaleId locId,
 		String name);
 
 	/**
 	 * Creates or get a target property based on the corresponding source.
-	 * @param language The target language to use. The language code is case-sensitive.
+	 * @param locId The target locale to use.
 	 * @param name The name of the property to create (or retrieve)
 	 * @param overwriteExisting True to overwrite any existing property.
 	 * False to not create a new property if one exists already. 
@@ -200,7 +199,7 @@ public interface INameable extends IResource {
 	 * the source.</li></ul>
 	 * @return The property that was created, or retrieved. 
 	 */
-	public Property createTargetProperty (String language,
+	public Property createTargetProperty (LocaleId locId,
 		String name,
 		boolean overwriteExisting,
 		int creationOptions);

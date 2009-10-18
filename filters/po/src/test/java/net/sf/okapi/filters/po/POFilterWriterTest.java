@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.po.POFilterWriter;
@@ -35,6 +36,8 @@ import org.junit.Test;
 
 public class POFilterWriterTest {
 	
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
 	private POFilter filter;
 	private String header = "#, fuzzy\nmsgid \"\"\nmsgstr \"\"\n"
 		+ "\"Content-Type: text/plain; charset=UTF-8\\n\"\n"
@@ -51,7 +54,7 @@ public class POFilterWriterTest {
 		String snippet = ""
 			+ "msgid \"Text 1\"\r"
 			+ "msgstr \"\"\r\r";
-		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		String result = rewrite(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(header.replace('\n', '\r')+snippet, result);
 	}
 		
@@ -60,7 +63,7 @@ public class POFilterWriterTest {
 		String snippet = ""
 			+ "msgid \"Text 1\"\r"
 			+ "msgstr \"Texte 1\"\r\r";
-		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		String result = rewrite(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(header.replace('\n', '\r')+snippet, result);
 	}
 	
@@ -74,7 +77,7 @@ public class POFilterWriterTest {
 			+ "\"line1trans\\n\"\n"
 			+ "\"line2trans\\n\"\n"
 			+ "\"line3trans\"\n\n";
-		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		String result = rewrite(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(header+snippet, result);
 	}
 		
@@ -85,7 +88,7 @@ public class POFilterWriterTest {
 			+ "msgid_plural \"source plural\"\n"
 			+ "msgstr[0] \"target singular\"\n"
 			+ "msgstr[1] \"target plural\"\n\n";
-		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		String result = rewrite(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(header+snippet, result);
 	}
 		
@@ -97,7 +100,7 @@ public class POFilterWriterTest {
 			+ "msgid_plural \"source plural\"\n"
 			+ "msgstr[0] \"target singular\"\n"
 			+ "msgstr[1] \"target plural\"\n\n";
-		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		String result = rewrite(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(header+snippet, result);
 	}
 		
@@ -106,13 +109,13 @@ public class POFilterWriterTest {
 		String snippet = "#, fuzzy\n"
 			+ "msgid \"source\"\n"
 			+ "msgstr \"target\"\n\n";
-		String result = rewrite(getEvents(snippet, "en", "fr"), "fr");
+		String result = rewrite(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(header+snippet, result);
 	}
 		
 	private ArrayList<Event> getEvents(String snippet,
-		String srcLang,
-		String trgLang)
+		LocaleId srcLang,
+		LocaleId trgLang)
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, srcLang, trgLang));
@@ -125,7 +128,7 @@ public class POFilterWriterTest {
 	}
 
 	private String rewrite (ArrayList<Event> list,
-		String trgLang)
+		LocaleId trgLang)
 	{
 		POFilterWriter writer = new POFilterWriter();
 		writer.setOptions(trgLang, "UTF-8");

@@ -21,16 +21,17 @@
 package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TextUnitTest {
 
-    TextUnit tu1;
-    private static final String FR = "fr";
-    private TextContainer tc1;
+    private static final LocaleId locFR = LocaleId.fromString("fr");
     private static final String TU1 = "tu1";
+    private TextContainer tc1;
+    TextUnit tu1;
 
     @Before
     public void setUp(){
@@ -63,53 +64,55 @@ public class TextUnitTest {
 
     @Test
     public void getTargetReturnsNullOnNoMatch(){
-        assertNull("When there is no match a null should be returned", tu1.getTarget(FR));
+        assertNull("When there is no match a null should be returned", tu1.getTarget(locFR));
     }
 
 	@Test
 	public void getSetTarget () {
-		tu1.setTarget(FR, tc1);
-		assertSame("The target should be TextContainer we just set", tc1, tu1.getTarget(FR));
+		tu1.setTarget(locFR, tc1);
+		assertSame("The target should be TextContainer we just set", tc1, tu1.getTarget(locFR));
 	}
 
     @Test
     public void hasTargetNo(){
-        assertFalse("No target should exist", tu1.hasTarget(FR));
+        assertFalse("No target should exist", tu1.hasTarget(locFR));
     }
 
     @Test
 	public void hasTargetYes () {
-		tu1.setTarget(FR, tc1);
-		assertTrue("TextUnit should now have a target", tu1.hasTarget(FR));
-		assertEquals(tu1.hasTarget("FR"), false);
+		tu1.setTarget(locFR, tc1);
+		assertTrue("TextUnit should now have a target", tu1.hasTarget(locFR));
 	}
 
     @Test
 	public void hasTargetCaseSensitive () {
-		tu1.setTarget(FR, tc1);
-		assertFalse("FR target is not set", tu1.hasTarget("FR"));
+		tu1.setTarget(locFR, tc1);
+		// Language is now *not* case sensitive
+		assertTrue(tu1.hasTarget(LocaleId.fromString("FR")));
+		// Still: "fr" different from "fr-fr"
+		assertTrue( ! tu1.hasTarget(LocaleId.fromString("fr-fr")));
 	}
 
     @Test
     public void removeTarget(){
-        tu1.setTarget(FR, tc1);
-        tu1.removeTarget(FR);
-        assertFalse("TextUnit should no longer have a target", tu1.hasTarget(FR));
+        tu1.setTarget(locFR, tc1);
+        tu1.removeTarget(locFR);
+        assertFalse("TextUnit should no longer have a target", tu1.hasTarget(locFR));
     }
 
     @Test
     public void createTargetSourceContentAndTargetContentSame(){
         tu1.setSource(tc1);
-        tu1.createTarget(FR, false, IResource.COPY_ALL);
-        assertEquals("Target text vs Source Text", tu1.getSource().toString(), tu1.getTarget(FR).toString());
+        tu1.createTarget(locFR, false, IResource.COPY_ALL);
+        assertEquals("Target text vs Source Text", tu1.getSource().toString(), tu1.getTarget(locFR).toString());
     }
 
     @Test
 	public void createTargetDoesntAlreadyExist () {
 		tu1.setSource(tc1);
-		TextContainer tc2 = tu1.createTarget(FR, false, IResource.COPY_ALL);
-		assertSame("Target should be the same as returned from createTarget", tc2, tu1.getTarget(FR));
-		assertNotSame("Target should have been cloned", tu1.getTarget(FR), tu1.getSource());
+		TextContainer tc2 = tu1.createTarget(locFR, false, IResource.COPY_ALL);
+		assertSame("Target should be the same as returned from createTarget", tc2, tu1.getTarget(locFR));
+		assertNotSame("Target should have been cloned", tu1.getTarget(locFR), tu1.getSource());
     }
 
     @Test
@@ -117,18 +120,18 @@ public class TextUnitTest {
 		// Do not override existing target
 		tu1.setSource(tc1);
 		TextContainer tc2 = new TextContainer("unique fr text");
-		tu1.setTarget(FR, tc2);
-		tu1.createTarget(FR, false, IResource.COPY_ALL);
-		assertSame("Target should not have been modified", tc2, tu1.getTarget(FR));
+		tu1.setTarget(locFR, tc2);
+		tu1.createTarget(locFR, false, IResource.COPY_ALL);
+		assertSame("Target should not have been modified", tc2, tu1.getTarget(locFR));
     }
 
     @Test
     public void createTargetAlreadyExistsOverwriteExisting () {
         tu1.setSource(tc1);
         TextContainer tc2 = new TextContainer("unique fr text");
-        tu1.setTarget(FR, tc2);
-        tu1.createTarget(FR, true, IResource.COPY_ALL);
-        assertNotSame("Target should not have been modified", tc2, tu1.getTarget(FR));
+        tu1.setTarget(locFR, tc2);
+        tu1.createTarget(locFR, true, IResource.COPY_ALL);
+        assertNotSame("Target should not have been modified", tc2, tu1.getTarget(locFR));
 	}
 
 	@Test
@@ -181,21 +184,21 @@ public class TextUnitTest {
 
 	@Test
 	public void targetPropertiesInitialization() {
-		assertEquals(tu1.getTargetPropertyNames(FR).size(), 0);
+		assertEquals(tu1.getTargetPropertyNames(locFR).size(), 0);
     }
 
     @Test
     public void getTargetPropertyNotFound() {
-		tu1.setTarget(FR, tc1);
-        assertNull("Target shoudln't be found", tu1.getTargetProperty(FR, "NAME"));
+		tu1.setTarget(locFR, tc1);
+        assertNull("Target shoudln't be found", tu1.getTargetProperty(locFR, "NAME"));
     }
 
     @Test
     public void getSetTargetProperty() {
-        tu1.setTarget(FR, tc1);
+        tu1.setTarget(locFR, tc1);
 		Property p1 = new Property("name", "value", true);
-		tu1.setTargetProperty(FR, p1);
-        assertSame("Properties should be the same", p1, tu1.getTargetProperty(FR, "name"));
+		tu1.setTargetProperty(locFR, p1);
+        assertSame("Properties should be the same", p1, tu1.getTargetProperty(locFR, "name"));
 	}
 	
 	@Test
@@ -212,8 +215,8 @@ public class TextUnitTest {
 	@Test
 	public void testGetSetTargetContent () {
 		TextFragment tf1 = new TextFragment("fr text");
-		tu1.setTargetContent(FR, tf1);
-		TextFragment tf2 = tu1.getTargetContent(FR);
+		tu1.setTargetContent(locFR, tf1);
+		TextFragment tf2 = tu1.getTargetContent(locFR);
 		//TODO: the tc is actually not the same!, because it uses insert()
 		// Do we need to 'fix' this? Probably.
 		//assertSame(tf1, tf2);

@@ -28,7 +28,7 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 
 import net.sf.okapi.applications.rainbow.utilities.BaseUtility;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 
 import org.eclipse.swt.widgets.Text;
 
@@ -171,24 +171,19 @@ public class Utils {
 		return sEncoding;
 	}
 
-	static public String getDefaultSourceLanguage ()
-	{
+	static public LocaleId getDefaultSourceLanguage () {
 		// In most case the 'source' language is English
 		// Even when we are on non-English machines
-		return "en-US";
+		return LocaleId.fromString("en-us");
 	}
 	
-	static public String getDefaultTargetLanguage ()
-	{
+	static public LocaleId getDefaultTargetLanguage () {
 		// Use the local language by default
-		Locale Loc = Locale.getDefault();
-		String sCode = Loc.getLanguage();
-		if ( Loc.getCountry().length() > 0 ) {
-			sCode = sCode + "-" + Loc.getCountry();
+		LocaleId lang = new LocaleId(Locale.getDefault());
+		if ( lang.sameLanguageAs(getDefaultSourceLanguage()) ) {
+			lang = new LocaleId("fr-fr", false);
 		}
-		// If it's the same as the source, use an arbitrary value.
-		if ( Util.isSameLanguage(sCode, getDefaultSourceLanguage(), true) ) return "fr-FR";
-		else return sCode;
+		return lang;
 	}
 
 	static public String getCurrentLanguage () {

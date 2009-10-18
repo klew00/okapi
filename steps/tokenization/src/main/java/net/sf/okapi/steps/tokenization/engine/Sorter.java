@@ -23,6 +23,7 @@ package net.sf.okapi.steps.tokenization.engine;
 import java.util.Collections;
 import java.util.Comparator;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
@@ -33,30 +34,23 @@ public class Sorter extends AbstractLexer {
 
 	@Override
 	protected boolean lexer_hasNext() {
-
 		return false;
 	}
 
 	@Override
 	protected void lexer_init() {
-
-
 	}
 
 	@Override
 	protected Lexem lexer_next() {
-
 		return null;
 	}
 
 	@Override
-	protected void lexer_open(String text, String language, Tokens tokens) {
-
-
+	protected void lexer_open(String text, LocaleId language, Tokens tokens) {
 	}
 
-	private Comparator<Token> rangeComparator = new Comparator<Token>()
-  {
+	private Comparator<Token> rangeComparator = new Comparator<Token>() {
       public int compare(Token token1, Token token2) {
 
       	int s1 = token1.getLexem().getRange().start;
@@ -77,10 +71,9 @@ public class Sorter extends AbstractLexer {
       	
       	return 0;
       }    
-  };
+	};
 
-	public Lexems process(String text, String language, Tokens tokens) {
-
+	public Lexems process(String text, LocaleId language, Tokens tokens) {
 		Collections.sort(tokens, rangeComparator);
 		return null;
 	}

@@ -22,6 +22,7 @@ package net.sf.okapi.tm.pensieve.tmx;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -45,6 +46,9 @@ public class OkapiTmxImporterTest {
     OkapiTmxImporter tmxImporter;
     ITmWriter mockTmWriter;
     IFilter mockFilter;
+    LocaleId locEN = LocaleId.fromString("EN");
+    LocaleId locFR = LocaleId.fromString("FR");
+    LocaleId locIT = LocaleId.fromString("IT");
 
     @Before
     public void setUp() throws URISyntaxException, IOException {
@@ -62,18 +66,18 @@ public class OkapiTmxImporterTest {
                 .thenReturn(true)
                 .thenReturn(false);
         when(mockFilter.next())
-                .thenReturn(createEvent("1", "hello", "ciao", "IT", properties))
-                .thenReturn(createEvent("2", "world", "mondo", "IT", null))
+                .thenReturn(createEvent("1", "hello", "ciao", locIT, properties))
+                .thenReturn(createEvent("2", "world", "mondo", locIT, null))
                 .thenReturn(new Event(EventType.DOCUMENT_PART, new TextUnit("holy cow")));
 
         sampleTMX = new URI("test.tmx");
-        tmxImporter = new OkapiTmxImporter("EN", mockFilter);
+        tmxImporter = new OkapiTmxImporter(locEN, mockFilter);
     }
 
 
     @Test
     public void importTMXMetadataWithData() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "IT", mockTmWriter);
+        tmxImporter.importTmx(sampleTMX, locIT, mockTmWriter);
         ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
         assertEquals("ID", "helloid", tuCapture.getAllValues().get(0).getMetadata().get(MetadataType.ID));
         assertEquals("TYPE", "plaintext", tuCapture.getAllValues().get(0).getMetadata().get(MetadataType.TYPE));
@@ -84,7 +88,7 @@ public class OkapiTmxImporterTest {
 
     @Test
     public void importTMXMetadataWithoutData() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "IT", mockTmWriter);
+        tmxImporter.importTmx(sampleTMX, locIT, mockTmWriter);
         ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
         assertEquals("# of metadata", 0, tuCapture.getAllValues().get(1).getMetadata().size());
     }
@@ -93,7 +97,7 @@ public class OkapiTmxImporterTest {
     public void importTmxNullFile() throws IOException {
         String errMsg = null;
         try {
-            tmxImporter.importTmx(null, "FR", mockTmWriter);
+            tmxImporter.importTmx(null, locFR, mockTmWriter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -115,7 +119,7 @@ public class OkapiTmxImporterTest {
     public void importTmxNullTmWriter() throws IOException {
         String errMsg = null;
         try {
-            tmxImporter.importTmx(sampleTMX, "FR", null);
+            tmxImporter.importTmx(sampleTMX, locFR, null);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -126,7 +130,7 @@ public class OkapiTmxImporterTest {
     public void constructorEmptySourceLang() {
         String errMsg = null;
         try {
-            new OkapiTmxImporter("", mockFilter);
+            new OkapiTmxImporter(LocaleId.EMPTY, mockFilter);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -137,7 +141,7 @@ public class OkapiTmxImporterTest {
     public void constructorEmptyFilter() {
         String errMsg = null;
         try {
-            new OkapiTmxImporter("EN", null);
+            new OkapiTmxImporter(locEN, null);
         } catch (IllegalArgumentException iae) {
             errMsg = iae.getMessage();
         }
@@ -146,7 +150,7 @@ public class OkapiTmxImporterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void importTMXEmptyTargetLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "", mockTmWriter);
+        tmxImporter.importTmx(sampleTMX, LocaleId.EMPTY, mockTmWriter);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -156,28 +160,28 @@ public class OkapiTmxImporterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void importTMXNullTMWriter() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "FR", null);
+        tmxImporter.importTmx(sampleTMX, locFR, null);
     }
 
     @Test
     public void importTmxExistingLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "IT", mockTmWriter);
+        tmxImporter.importTmx(sampleTMX, locIT, mockTmWriter);
         ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
         assertEquals("number of TUs", 2, tuCapture.getAllValues().size());
     }
 
     @Test
     public void importTmxNonExistingLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "FR", mockTmWriter);
+        tmxImporter.importTmx(sampleTMX, locFR, mockTmWriter);
         ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
         assertEquals("number of TUs", 2, tuCapture.getAllValues().size());
         assertNull("targets content should be null", tuCapture.getAllValues().get(0).getTarget().getContent());
-        assertEquals("target lang", "FR", tuCapture.getAllValues().get(0).getTarget().getLang());
+        assertEquals("target lang", locFR, tuCapture.getAllValues().get(0).getTarget().getLanguage());
     }
 
     @Test
     public void sourceAndTargetForExistingLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "IT", mockTmWriter);
+        tmxImporter.importTmx(sampleTMX, locIT, mockTmWriter);
         ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
         assertEquals("first match source", "hello", tuCapture.getAllValues().get(0).getSource().getContent().toString());
         assertEquals("first match target", "ciao", tuCapture.getAllValues().get(0).getTarget().getContent().toString());
@@ -185,7 +189,7 @@ public class OkapiTmxImporterTest {
 
     @Test
     public void sourceAndTargetForNonExistingLang() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "FR", mockTmWriter);
+        tmxImporter.importTmx(sampleTMX, locFR, mockTmWriter);
         ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
         assertEquals("first match source", "hello",
                 tuCapture.getAllValues().get(0).getSource().getContent().toString());
@@ -196,7 +200,7 @@ public class OkapiTmxImporterTest {
     //An example of a Stub. I will likely change this to a Mock later
     @Test
     public void importTMXDocCount() throws IOException {
-        tmxImporter.importTmx(sampleTMX, "EN", mockTmWriter);
+        tmxImporter.importTmx(sampleTMX, locEN, mockTmWriter);
         ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
         assertEquals("entries indexed", 2, tuCapture.getAllValues().size());
     }
@@ -207,7 +211,7 @@ public class OkapiTmxImporterTest {
         return tuCapture;
     }
 
-    private Event createEvent(String id, String source, String target, String targetLang, String[][] properties) {
+    private Event createEvent(String id, String source, String target, LocaleId targetLang, String[][] properties) {
         TextUnit tu = new TextUnit(id, source);
         tu.setTargetContent(targetLang, new TextFragment(target));
         //populate properties

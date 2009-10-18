@@ -38,6 +38,7 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -479,7 +480,7 @@ public class FilterTestDriver {
 	private void printTU(TextUnit tu) {
 		System.out.println("---Text Unit");
 		System.out.println("S=[" + tu.toString() + "]");
-		for (String lang : tu.getTargetLanguages()) {
+		for (LocaleId lang : tu.getTargetLanguages()) {
 			System.out.println("T(" + lang + ")=[" + tu.getTarget(lang).toString() + "]");
 		}
 	}
@@ -515,12 +516,12 @@ public class FilterTestDriver {
 		} else if (displayLevel > 1)
 			System.out.println("StartDocument encoding = " + tmp);
 
-		tmp = startDoc.getLanguage();
-		if ((tmp == null) || (tmp.length() == 0)) {
+		LocaleId locId = startDoc.getLanguage();
+		if ( Util.isNullOrEmpty(locId) ) {
 			System.err.println("WARNING: No language specified in StartDocument.");
 			warnings++;
 		} else if (displayLevel > 1)
-			System.out.println("StartDocument language = " + tmp);
+			System.out.println("StartDocument language = " + locId.toString());
 
 		tmp = startDoc.getName();
 		if ((tmp == null) || (tmp.length() == 0)) {
@@ -545,7 +546,7 @@ public class FilterTestDriver {
 	 * @return The generated output string
 	 */
 	public static String generateOutput (ArrayList<Event> list,
-		String trgLang)
+		LocaleId trgLang)
 	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
@@ -588,8 +589,8 @@ public class FilterTestDriver {
 	public static TextUnit getTextUnit (IFilter filter,
 		InputDocument doc,
 		String defaultEncoding,
-		String srcLang,
-		String trgLang,
+		LocaleId srcLang,
+		LocaleId trgLang,
 		int tuNumber)
 	{
 		try {
@@ -632,8 +633,8 @@ public class FilterTestDriver {
 	public static boolean testStartDocument (IFilter filter,
 		InputDocument doc,
 		String defaultEncoding,
-		String srcLang,
-		String trgLang)
+		LocaleId srcLang,
+		LocaleId trgLang)
 	{
 		try {
 			// Load parameters if needed

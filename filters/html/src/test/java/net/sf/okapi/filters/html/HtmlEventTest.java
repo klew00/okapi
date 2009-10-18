@@ -22,6 +22,7 @@ package net.sf.okapi.filters.html;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.*;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -33,8 +34,10 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class HtmlEventTest {
+
 	private HtmlFilter htmlFilter;
 	private URL parameters;
+	private LocaleId locEN = LocaleId.fromString("en");
 	
 	@Before
 	public void setUp() throws Exception {
@@ -581,7 +584,7 @@ public class HtmlEventTest {
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.setParametersFromURL(parameters);
-		htmlFilter.open(new RawDocument(snippet, "en"));
+		htmlFilter.open(new RawDocument(snippet, locEN));
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
 			list.add(event);

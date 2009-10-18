@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
@@ -46,12 +47,6 @@ import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.tokenization.locale.LanguageList;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
-
-/**
- * 
- * 
- * @version 0.1 06.07.2009
- */
 
 public class TokenizationStep extends AbstractPipelineStep {
 
@@ -358,7 +353,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 			}
 	}
 	
-	private void runLexers(List<ILexer> lexers, String text, String language, Tokens tokens, int textShift) {
+	private void runLexers(List<ILexer> lexers, String text, LocaleId language, Tokens tokens, int textShift) {
 	
 		for (ILexer lexer : lexers) {
 			
@@ -386,10 +381,9 @@ public class TokenizationStep extends AbstractPipelineStep {
 		}
 	}
 	
-	private Tokens tokenize(TextContainer tc, String language) {
-		
+	private Tokens tokenize (TextContainer tc, LocaleId language) {
 		if (tc == null) return null;
-		if (Util.isEmpty(language)) return null;
+		if (Util.isNullOrEmpty(language)) return null;
 		if (!languageFilter.contains(language)) return null;
 		
 		if (positions == null) return null;		
@@ -463,17 +457,12 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}	
 	
 	private void tokenizeTargets(TextUnit tu) {
-		
 		if (tu == null) return;
-		
-		for (String language : tu.getTargetLanguages()) {
-		
+		for ( LocaleId language : tu.getTargetLanguages() ) {
 			Tokens tokens = tokenize(tu.getTarget(language), language);
 			if (tokens == null) continue;
-			
 			// Attach to TU		
 			TokensAnnotation ta = TextUnitUtil.getTargetAnnotation(tu, language, TokensAnnotation.class);
-			
 			if (ta == null)
 				TextUnitUtil.setTargetAnnotation(tu, language, new TokensAnnotation(tokens));
 			else

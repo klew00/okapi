@@ -56,6 +56,7 @@ import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -553,8 +554,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				// add code and process actionable attributes
-				getEventBuilder().addToTextUnit(new Code(codeType, startTag.getName(), literalTag), getConfig()
-						.getElementType(tag),
+				getEventBuilder().addToTextUnit(new Code(codeType, startTag.getName(), literalTag),
+//TOFIX: get the proper parameter		
+//was:		getConfig().getElementType(tag),
+						getTrgLoc(),
+//end of TOFIX						
 						propertyTextUnitPlaceholders);
 			} else {
 				// no actionable attributes, just add the code as-is
@@ -714,9 +718,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		getEventBuilder().startGroup(startMarker, commonTagType);
 	}
 
-	protected void startGroup(GenericSkeleton startMarker, String commonTagType, String language,
-			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		getEventBuilder().startGroup(startMarker, commonTagType, language, propertyTextUnitPlaceholders);
+	protected void startGroup(GenericSkeleton startMarker,
+		String commonTagType,
+		LocaleId locale,
+		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
+	{
+		getEventBuilder().startGroup(startMarker, commonTagType, locale, propertyTextUnitPlaceholders);
 	}
 
 	protected void startTextUnit(GenericSkeleton startMarker) {

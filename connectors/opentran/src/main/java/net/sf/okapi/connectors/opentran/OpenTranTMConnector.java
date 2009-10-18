@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -53,8 +54,8 @@ public class OpenTranTMConnector implements ITMQuery {
 	private static boolean useREST = false;
 	
 	private XmlRpcClient client;
-	private String srcLang;
-	private String trgLang;
+	private String srcCode;
+	private String trgCode;
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 12;
@@ -93,12 +94,12 @@ public class OpenTranTMConnector implements ITMQuery {
 		throw new UnsupportedOperationException();
 	}
 
-	public String getSourceLanguage () {
-		return srcLang;
+	public LocaleId getSourceLanguage () {
+		return LocaleId.fromPOSIXLocale(srcCode);
 	}
 
-	public String getTargetLanguage () {
-		return trgLang;
+	public LocaleId getTargetLanguage () {
+		return LocaleId.fromPOSIXLocale(trgCode);
 	}
 
 	public boolean hasNext () {
@@ -144,7 +145,7 @@ public class OpenTranTMConnector implements ITMQuery {
 		current = -1;
 		try {
 			// Example: http://en.id.open-tran.eu/json/suggest/save%20as
-			URL url = new URL("http://" + srcLang + "." + trgLang + ".open-tran.eu/json/suggest/"
+			URL url = new URL("http://" + srcCode + "." + trgCode + ".open-tran.eu/json/suggest/"
 				+ URLEncoder.encode(plainText, "UTF-8").replace("+", "%20"));
 			URLConnection conn = url.openConnection();
 			
@@ -195,8 +196,8 @@ public class OpenTranTMConnector implements ITMQuery {
 			// Prepare the parameters
 			Object[] params = new Object[] {
 				new String(plainText),
-				new String(srcLang),
-				new String(trgLang),
+				new String(srcCode),
+				new String(trgCode),
 				new Integer(maxHits)};
 			
 			// Do the query
@@ -258,12 +259,12 @@ public class OpenTranTMConnector implements ITMQuery {
 		// Not used with this connector
 	}
 
-	public void setLanguages (String sourceLang,
-		String targetLang)
+	public void setLanguages (LocaleId sourceLocale,
+		LocaleId targetLocale)
 	{
-		matcher = new TextMatcher(sourceLang, sourceLang);
-		srcLang = toInternalCode(sourceLang);
-		trgLang = toInternalCode(targetLang);
+		matcher = new TextMatcher(sourceLocale, sourceLocale);
+		srcCode = toInternalCode(sourceLocale);
+		trgCode = toInternalCode(targetLocale);
 	}
 
 	public void setMaximumHits (int max) {
@@ -282,8 +283,8 @@ public class OpenTranTMConnector implements ITMQuery {
 		return threshold;
 	}
 
-	private String toInternalCode (String standardCode) {
-		String code = standardCode.toLowerCase().replace('-', '_');
+	private String toInternalCode (LocaleId locale) {
+		String code = locale.toPOSIXLocaleId();
 		if ( !code.startsWith("zh") && ( code.length() > 2 )) {
 			code = code.substring(0, 2);
 		}

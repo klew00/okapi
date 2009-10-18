@@ -28,6 +28,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.w3c.dom.Document;
@@ -130,10 +131,10 @@ public class LanguageManager {
 		return  -1; // Return -1 if not found
 	}
 	
-	public String getDefaultEncodingFromCode (String p_sCode,
+	public String getDefaultEncodingFromCode (LocaleId language,
 		int p_nPFType)
 	{
-		LanguageItem LI = GetItem(p_sCode);
+		LanguageItem LI = GetItem(language.toString());
 		if ( LI == null ) return "UTF-8";
 		return LI.getEncoding(p_nPFType);
 	}

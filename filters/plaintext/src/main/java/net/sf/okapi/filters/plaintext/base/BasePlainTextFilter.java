@@ -28,6 +28,7 @@ import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.InlineCodeFinder;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -143,44 +144,40 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	}
 	
 	protected final TextProcessingResult sendAsSource(TextContainer textContainer) {
-		
 		if (textContainer == null) return TextProcessingResult.REJECTED;
-		
-		return sendAsSource(TextUnitUtil.buildTU(null, "", textContainer, null, "", ""));
+		return sendAsSource(TextUnitUtil.buildTU(null, "", textContainer, null, LocaleId.EMPTY, ""));
 	}
 	
-	protected final TextProcessingResult sendAsTarget(TextUnit target, TextUnit source, String language) {
-		
-		if (target == null) return TextProcessingResult.REJECTED;
-		if (source == null) return TextProcessingResult.REJECTED;
-		if (language == null) return TextProcessingResult.REJECTED;
+	protected final TextProcessingResult sendAsTarget(TextUnit target,
+		TextUnit source,
+		LocaleId language)
+	{
+		if ( target == null ) return TextProcessingResult.REJECTED;
+		if ( source == null ) return TextProcessingResult.REJECTED;
+		if ( language == null ) return TextProcessingResult.REJECTED;
 		
 		GenericSkeleton skel = getActiveSkeleton();
 		if (skel == null) return TextProcessingResult.REJECTED;
 		
 		GenericSkeleton targetSkel = TextUnitUtil.forceSkeleton(target);
-		if (targetSkel == null) return TextProcessingResult.REJECTED;
-		
-		if (!processTU(target)) return TextProcessingResult.REJECTED;
+		if ( targetSkel == null ) return TextProcessingResult.REJECTED;
+		if ( !processTU(target) ) return TextProcessingResult.REJECTED;
 		
 		source.setTarget(language, target.getSource());
 	
 		int index = SkeletonUtil.findTuRefInSkeleton(targetSkel);
-		if (index != -1) {
-
-			// Replace target tu ref with a source ref
+		if ( index != -1 ) {
+			// Replace target tu reference with a source reference
 			GenericSkeleton tempSkel = new GenericSkeleton();
 			tempSkel.addContentPlaceholder(source, language);
 			SkeletonUtil.replaceSkeletonPart(targetSkel, index, tempSkel);
 		}
-		
 		skel.add(targetSkel);
 		
 		return TextProcessingResult.ACCEPTED;
 	}
 	
 	protected final TextProcessingResult sendAsSkeleton(TextUnit textUnit) {
-		
 //		if (!processTextUnit(textUnit)) return TextProcessingResult.REJECTED;
 		
 //		if (parentSkeleton == null)

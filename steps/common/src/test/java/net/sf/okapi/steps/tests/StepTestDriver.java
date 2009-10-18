@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.tests;
 
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
@@ -51,13 +52,13 @@ public class StepTestDriver {
 	 * Prepares the data to process.
 	 * @param srcText the source text to process
 	 * @param trgText the optional target text to process (can be null)
-	 * @param srcLang the source language.
-	 * @param trgLang the target language.
+	 * @param srcLoc the source locale.
+	 * @param trgLoc the target locale.
 	 */
 	public void prepareFilterEventsStep (String srcText,
 		String trgText,
-		String srcLang,
-		String trgLang)
+		LocaleId srcLoc,
+		LocaleId trgLoc)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(srcText);
@@ -65,7 +66,7 @@ public class StepTestDriver {
 			sb.append("\n");
 			sb.append(trgText);
 		}
-		rawDoc = new RawDocument(sb.toString(), srcLang, trgLang);
+		rawDoc = new RawDocument(sb.toString(), srcLoc, trgLoc);
 		rawDoc.setFilterConfigId("okf_dummy");
 	}
 	

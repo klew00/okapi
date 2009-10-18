@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.BaseContext;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
@@ -72,21 +73,21 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 	 * @param filterConfigId the filter configuration ID (can be null if not used)
 	 * @param outputURI the output URI (can be null if not used).
 	 * @param outputEncoding the output encoding (can be null if not used)
-	 * @param sourceLanguage the source language.
-	 * @param targetLanguage the target language.
+	 * @param sourceLocale the source locale.
+	 * @param targetLocale the target locale.
 	 */
 	public BatchItemContext (URI inputURI,
 		String defaultEncoding,
 		String filterConfigId,
 		URI outputURI,
 		String outputEncoding,
-		String sourceLanguage,
-		String targetLanguage)
+		LocaleId sourceLocale,
+		LocaleId targetLocale)
 	{
 		super();
 		list = new ArrayList<DocumentData>(INITIAL_CAPACITY);
 		DocumentData ddi = new DocumentData();
-		ddi.rawDocument = new RawDocument(inputURI, defaultEncoding, sourceLanguage, targetLanguage);
+		ddi.rawDocument = new RawDocument(inputURI, defaultEncoding, sourceLocale, targetLocale);
 		ddi.rawDocument.setFilterConfigId(filterConfigId);
 		ddi.outputURI = outputURI;
 		ddi.outputEncoding = outputEncoding;
@@ -139,12 +140,12 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 		return list.get(index).rawDocument;
 	}
 	
-	public String getSourceLanguage (int index) {
+	public LocaleId getSourceLocale (int index) {
 		if ( list.size() <= index ) return null;
 		return list.get(index).rawDocument.getSourceLanguage();
 	}
 
-	public String getTargetLanguage (int index) {
+	public LocaleId getTargetLocale (int index) {
 		if ( list.size() <= index ) return null;
 		return list.get(index).rawDocument.getTargetLanguage();
 	}

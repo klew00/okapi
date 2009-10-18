@@ -30,6 +30,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
@@ -46,6 +47,9 @@ public class FilterRoundtripTest {
 
 	private IPipelineDriver driver;
 	private IFilterConfigurationMapper fcMapper;
+	private LocaleId locEN = LocaleId.fromString("EN");
+	private LocaleId locES = LocaleId.fromString("ES");
+	private LocaleId locFR = LocaleId.fromString("FR");
 	
 	@Before
 	public void setUp() {
@@ -62,25 +66,25 @@ public class FilterRoundtripTest {
 		driver.clearItems();
 		RawDocument rd = new RawDocument(
 			"<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>",
-			"en", "es");
+			locEN, locES);
 		rd.setFilterConfigId("okf_html");
 		driver.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-8");
 		driver.processBatch();
 		assertEquals("spam",
 			getFirstTUSource(new RawDocument((new File("genericOutput.txt")).toURI(),
-				"UTF-8", "es")));
+				"UTF-8", locES)));
 	}
 
 	@Test
 	public void runPipelineFromStream() {
 		driver.clearItems();
-		RawDocument rd = new RawDocument("\nX\n\nY\n", "en", "fr");
+		RawDocument rd = new RawDocument("\nX\n\nY\n", locEN, locFR);
 		rd.setFilterConfigId("okf_html");
 		driver.addBatchItem(rd, (new File("genericOutput.txt")).toURI(), "UTF-8");
 		driver.processBatch();
 		assertEquals("X Y",
 			getFirstTUSource(new RawDocument((new File("genericOutput.txt")).toURI(),
-				"UTF-8", "fr")));
+				"UTF-8", locFR)));
 	}
 	
 	@Test
@@ -88,14 +92,14 @@ public class FilterRoundtripTest {
 		String snippet = "<b>TEST ME</b>";
 		// First pass
 		driver.clearItems();
-		RawDocument rd = new RawDocument(snippet, "en", "es");
+		RawDocument rd = new RawDocument(snippet, locEN, locES);
 		rd.setFilterConfigId("okf_html");
 		driver.addBatchItem(rd, (new File("output1.html")).toURI(), "UTF-8");
 		driver.processBatch();
 
 		// Second pass
 		driver.clearItems();
-		rd = new RawDocument((new File("output1.html")).toURI(), "UTF-8", "es", "en");
+		rd = new RawDocument((new File("output1.html")).toURI(), "UTF-8", locES, locEN);
 		rd.setFilterConfigId("okf_html");
 		driver.addBatchItem(rd, (new File("output2.html")).toURI(), "UTF-8");
 		driver.processBatch();
@@ -103,7 +107,7 @@ public class FilterRoundtripTest {
 		// Check result
 		assertEquals(snippet,
 			getFirstTUSource(new RawDocument((new File("output2.html")).toURI(),
-				"UTF-8", "es")));
+				"UTF-8", locES)));
 	}
 
 	private String getFirstTUSource (RawDocument rd) {

@@ -11,6 +11,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -28,8 +29,8 @@ public abstract class AbstractFilter implements IFilter {
 	private String documentName;
 	private String newlineType;
 	private String encoding;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	private String mimeType;
 	private IFilterWriter filterWriter;
 	private boolean generateSkeleton;
@@ -51,10 +52,10 @@ public abstract class AbstractFilter implements IFilter {
 	 * configuration that gives the {@link IFilter} the needed information to
 	 * properly parse the content.
 	 * 
-	 * @param sourceLanguage
-	 *            - source language of the input document
-	 * @param targetLanguage
-	 *            - target language if the input document is multilingual.
+	 * @param sourceLocale
+	 *            - source locale of the input document
+	 * @param targetLocale
+	 *            - target locale if the input document is multilingual.
 	 * @param defaultEncoding
 	 *            - assumed encoding of the input document. May be overriden if
 	 *            a different encoding is detected.
@@ -62,11 +63,14 @@ public abstract class AbstractFilter implements IFilter {
 	 *            - store skeleton (non-translatable parts of the document)
 	 *            along with the extracted text.
 	 */
-	public void setOptions(String sourceLanguage, String targetLanguage, String defaultEncoding,
-			boolean generateSkeleton) {
+	public void setOptions (LocaleId sourceLocale,
+		LocaleId targetLocale,
+		String defaultEncoding,
+		boolean generateSkeleton)
+	{
 		setEncoding(defaultEncoding);
-		setTrgLang(targetLanguage);
-		setSrcLang(sourceLanguage);
+		setTrgLoc(targetLocale);
+		setSrcLoc(sourceLocale);
 		setGenerateSkeleton(generateSkeleton);
 	}
 
@@ -76,7 +80,7 @@ public abstract class AbstractFilter implements IFilter {
 	protected Event createStartDocumentEvent() {
 		StartDocument startDocument = new StartDocument(createId(START_DOCUMENT, ++documentId));
 		startDocument.setEncoding(getEncoding(), isUtf8Encoding() && isUtf8Bom());
-		startDocument.setLanguage(getSrcLang());
+		startDocument.setLanguage(getSrcLoc());
 		startDocument.setMimeType(getMimeType());
 		startDocument.setLineBreak(getNewlineType());
 		startDocument.setFilterParameters(getParameters());
@@ -205,37 +209,37 @@ public abstract class AbstractFilter implements IFilter {
 	}
 
 	/**
-	 * Gets the input document source language.
+	 * Gets the input document source locale.
 	 * 
-	 * @return the src lang
+	 * @return the source locale
 	 */
-	public String getSrcLang() {
-		return srcLang;
+	public LocaleId getSrcLoc () {
+		return srcLoc;
 	}
 
 	/**
 	 * Sets the input document source language.
 	 * 
-	 * @param srcLang
-	 *            the new src lang
+	 * @param srcLoc
+	 *            the new source locale
 	 */
-	protected void setSrcLang(String srcLang) {
-		this.srcLang = srcLang;
+	protected void setSrcLoc (LocaleId srcLoc) {
+		this.srcLoc = srcLoc;
 	}
 
 	/**
-	 * @param trgLang
-	 *            the trgLang to set
+	 * @param trgLoc
+	 *            the target locale to set
 	 */
-	protected void setTrgLang(String trgLang) {
-		this.trgLang = trgLang;
+	protected void setTrgLoc (LocaleId trgLoc) {
+		this.trgLoc = trgLoc;
 	}
 
 	/**
 	 * @return the trgLang
 	 */
-	public String getTrgLang() {
-		return trgLang;
+	public LocaleId getTrgLoc () {
+		return trgLoc;
 	}
 
 	/**

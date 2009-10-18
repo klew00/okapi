@@ -44,6 +44,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -62,8 +63,10 @@ public class ParaPlainTextFilterTest {
 	private ParaPlainTextFilter filter;
 	private FilterTestDriver testDriver;
 	private Parameters params;
-    @SuppressWarnings("unused")
-	private String root;
+    private LocaleId locEN = LocaleId.fromString("en"); 
+    private LocaleId locFR = LocaleId.fromString("fr"); 
+//  private String root;
+    
 	
 	@Before
 	public void setUp() {
@@ -78,7 +81,7 @@ public class ParaPlainTextFilterTest {
 		
 		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
-        root = TestUtil.getParentDir(this.getClass(), "/crt.txt");
+//        root = TestUtil.getParentDir(this.getClass(), "/crt.txt");
 	}
 
 	@Test
@@ -88,7 +91,7 @@ public class ParaPlainTextFilterTest {
 		// Empty stream, OkapiBadFilterInputException expected, no other		
 		InputStream input = null;
 		try {
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -100,7 +103,7 @@ public class ParaPlainTextFilterTest {
 		// Empty URI, OkapiBadFilterInputException expected, no other
 		URI uri = null;
 		try {
-			filter.open(new RawDocument(uri, "UTF-8", "en"));
+			filter.open(new RawDocument(uri, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -112,7 +115,7 @@ public class ParaPlainTextFilterTest {
 		// Empty char seq, OkapiBadFilterInputException expected, no other		
 		String st = null;
 		try {
-			filter.open(new RawDocument(st, "UTF-8", "en"));
+			filter.open(new RawDocument(st, locEN, locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -147,7 +150,7 @@ public class ParaPlainTextFilterTest {
 		try {
 			filter.setParameters(null);						
 			InputStream input2 = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");
-			filter.open(new RawDocument(input2, "UTF-8", "en"));
+			filter.open(new RawDocument(input2, "UTF-8", locEN));
 			fail("OkapiBadFilterParametersException should've been trown");
 		}	
 		catch (OkapiBadFilterParametersException e) {
@@ -164,7 +167,7 @@ public class ParaPlainTextFilterTest {
 		
 		// Read lines from a file, check mime types 
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		while (filter.hasNext()) {
 			Event event = filter.next();
@@ -325,7 +328,7 @@ public class ParaPlainTextFilterTest {
 		assertNotNull(input);
 		
 //debug		System.out.println(filename);
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if (!testDriver.process(filter)) Assert.fail();
 		filter.close();
 	}
@@ -346,7 +349,7 @@ public class ParaPlainTextFilterTest {
 		list.add(new InputDocument(root + "lf.txt", "")); 
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, "fr"));
 	}
 
 	@Test
@@ -362,7 +365,7 @@ public class ParaPlainTextFilterTest {
 		list.add(new InputDocument(root + "crlfcrlfcrlf_end.txt", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, "fr"));
 	}
 	
 	@Test
@@ -375,7 +378,7 @@ public class ParaPlainTextFilterTest {
 		list.add(new InputDocument(root + "lgpl.txt", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, "fr"));
 	}
 */
 
@@ -387,7 +390,7 @@ public class ParaPlainTextFilterTest {
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");
 		assertNotNull(input);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
@@ -409,7 +412,7 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.NONE;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1", 1);
 		testEvent(EventType.TEXT_UNIT, "Line 2", 2);
@@ -426,7 +429,7 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = true;
 		params.wrapMode = WrapMode.NONE;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2", 1);
 		testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5", 4);
@@ -445,7 +448,7 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.NONE;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
 		testEvent(EventType.TEXT_UNIT, "Line 2");
@@ -462,7 +465,7 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.PLACEHOLDERS;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
 		testEvent(EventType.TEXT_UNIT, "Line 2");
@@ -479,7 +482,7 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.SPACES;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
 		testEvent(EventType.TEXT_UNIT, "Line 2");
@@ -497,7 +500,7 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = true;
 		params.wrapMode = WrapMode.NONE;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2");
 		testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5");
@@ -511,7 +514,7 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = true;
 		params.wrapMode = WrapMode.SPACES;		
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1 Line 2");
 		testEvent(EventType.TEXT_UNIT, "Line 3 Line 4 Line 5");
@@ -525,7 +528,7 @@ public class ParaPlainTextFilterTest {
 		params.extractParagraphs = true;
 		params.wrapMode = WrapMode.PLACEHOLDERS;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1\rLine 2");
 		testEvent(EventType.TEXT_UNIT, "Line 3\rLine 4\rLine 5");
@@ -542,7 +545,7 @@ public class ParaPlainTextFilterTest {
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
@@ -558,7 +561,7 @@ public class ParaPlainTextFilterTest {
 		assertNotNull(input);
 		
 		System.out.println(filename);
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}
@@ -639,10 +642,10 @@ public class ParaPlainTextFilterTest {
 		writer = filter.createFilterWriter();		
 		try {						
 			// Open the input
-			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", "en", "fr"));
+			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", locEN, locFR));
 			
 			// Prepare the output
-			writer.setOptions("fr", "UTF-16");
+			writer.setOptions(locFR, "UTF-16");
 			writerBuffer = new ByteArrayOutputStream();
 			writer.setOutput(writerBuffer);
 			

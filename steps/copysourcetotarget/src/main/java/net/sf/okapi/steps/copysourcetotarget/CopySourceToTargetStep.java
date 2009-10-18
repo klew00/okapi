@@ -5,6 +5,7 @@ import java.util.Set;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -37,17 +38,17 @@ public class CopySourceToTargetStep extends BasePipelineStep {
 	@Override
 	public void handleStartDocument(Event event) {
 		StartDocument sd = (StartDocument) event.getResource();
-		Set<String> tls = sd.getTargetLanguages();
+		Set<LocaleId> tls = sd.getTargetLanguages();
 		// if there is only one target language then use it as the default
 		// target to copy source to
 		if (tls.size() == 1) {
-			getParameters().targetLanguage = tls.iterator().next();
+			getParameters().targetLocale = tls.iterator().next();
 		}
 	}
 
 	@Override
 	public void handleTextUnit(Event event) {
 		TextUnit tu = (TextUnit) event.getResource();
-		tu.createTarget(getParameters().targetLanguage, false, IResource.COPY_ALL);
+		tu.createTarget(getParameters().targetLocale, false, IResource.COPY_ALL);
 	}
 }

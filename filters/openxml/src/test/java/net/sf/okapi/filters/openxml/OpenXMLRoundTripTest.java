@@ -22,6 +22,7 @@ package net.sf.okapi.filters.openxml;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -48,7 +49,10 @@ import java.util.logging.Logger;
  */
 
 public class OpenXMLRoundTripTest {
+
 	private ZipCompare zc=null;
+	private LocaleId locLA = LocaleId.fromString("la");
+	private LocaleId locENUS = LocaleId.fromString("en-us");
 
 	private static Logger LOGGER = Logger.getLogger(OpenXMLRoundTripTest.class.getName());
 	private boolean allGood=true;
@@ -115,18 +119,18 @@ public class OpenXMLRoundTripTest {
 			if (bPeeking)
 			{
 				if (bTranslating)
-					filter = new OpenXMLFilter(new CodePeekTranslator(),"en-US");
+					filter = new OpenXMLFilter(new CodePeekTranslator(), locENUS);
 				else
-					filter = new OpenXMLFilter(new TagPeekTranslator(),"en-US");
+					filter = new OpenXMLFilter(new TagPeekTranslator(), locENUS);
 			}
 			else if (bTranslating)
-				filter = new OpenXMLFilter(new PigLatinTranslator(),"pl");
+				filter = new OpenXMLFilter(new PigLatinTranslator(), locLA);
 			else
 				filter = new OpenXMLFilter();
 			
 			filter.setParameters(cparams);
 
-			filter.setOptions("en-US", "UTF-8", true);
+			filter.setOptions(locENUS, "UTF-8", true);
 //			filter.setLogLevel(Level.FINEST);
 //			filter.setLogLevel(Level.FINE);
 			
@@ -155,7 +159,7 @@ public class OpenXMLRoundTripTest {
 //				bis = new BufferedInputStream(new FileInputStream(filly));
 //				filter.open(new RawDocument(bis,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 6-09-09			
 
-				filter.open(new RawDocument(uri,"UTF-8","en-US"),true,bSquishy,Level.FINEST); // DWH 7-16-09 squishiness
+				filter.open(new RawDocument(uri,"UTF-8", locENUS),true,bSquishy,Level.FINEST); // DWH 7-16-09 squishiness
 			}
 			catch(Exception e)
 			{
@@ -166,11 +170,11 @@ public class OpenXMLRoundTripTest {
 			OpenXMLZipFilterWriter writer = new OpenXMLZipFilterWriter(); // DWH 4-8-09 was just ZipFilterWriter
 
 			if (bPeeking)
-				writer.setOptions("en-US", "UTF-8");
+				writer.setOptions(locENUS, "UTF-8");
 			else if (bTranslating)
-				writer.setOptions("pl", "UTF-8");
+				writer.setOptions(locLA, "UTF-8");
 			else
-				writer.setOptions("en-US", "UTF-8");
+				writer.setOptions(locENUS, "UTF-8");
 
 			writer.setOutput(sOutputPath+ (bPeeking ? (bTranslating ? "Peek" : "Tag") : (bTranslating ? "Tran" : "Out"))+filename);
 			

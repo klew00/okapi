@@ -20,6 +20,7 @@
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -35,17 +36,17 @@ import java.io.IOException;
 public class OkapiTmxImporter implements ITmxImporter {
 
     private IFilter tmxFilter;
-    private String sourceLang;
+    private LocaleId sourceLang;
 
     /**
      * Creates an instance of OkapiTMXHandler
-     * @param sourceLang The language to import as the source language
-     * @param tmxFilter The IFilter to use to parse the TMX
+     * @param sourceLang the language to import as the source language.
+     * @param tmxFilter the IFilter to use to parse the TMX
      */
-    public OkapiTmxImporter(String sourceLang, IFilter tmxFilter) {
+    public OkapiTmxImporter(LocaleId sourceLang, IFilter tmxFilter) {
         this.tmxFilter = tmxFilter;
         this.sourceLang = sourceLang;
-        if (Util.isEmpty(sourceLang)) {
+        if (Util.isNullOrEmpty(sourceLang)) {
             throw new IllegalArgumentException("'sourceLang' must be set");
         }
         if (tmxFilter == null) {
@@ -60,7 +61,7 @@ public class OkapiTmxImporter implements ITmxImporter {
      * @param tmWriter The TMWriter to use when writing to the TM
      * @throws java.io.IOException if there was a problem with the TMX import
      */
-    public void importTmx(URI tmxUri, String targetLang, ITmWriter tmWriter) throws IOException {
+    public void importTmx(URI tmxUri, LocaleId targetLang, ITmWriter tmWriter) throws IOException {
         checkImportTmxParams(tmxUri, targetLang, tmWriter);
         try {
             tmxFilter.open(new RawDocument(tmxUri, null, sourceLang, targetLang));
@@ -74,8 +75,11 @@ public class OkapiTmxImporter implements ITmxImporter {
         }
     }
 
-    private void checkImportTmxParams(URI tmxUri, String targetLang, ITmWriter tmWriter) {
-        if (Util.isEmpty(targetLang)) {
+    private void checkImportTmxParams(URI tmxUri,
+    	LocaleId targetLang,
+    	ITmWriter tmWriter)
+    {
+        if (Util.isNullOrEmpty(targetLang)) {
             throw new IllegalArgumentException("'targetLang' was not set");
         }
         if (tmxUri == null) {
@@ -87,7 +91,7 @@ public class OkapiTmxImporter implements ITmxImporter {
     }
 
 
-    private void indexEvent(String targetLang, ITmWriter tmWriter, Event event) throws IOException {
+    private void indexEvent(LocaleId targetLang, ITmWriter tmWriter, Event event) throws IOException {
         TranslationUnit tu;
         if (event.getEventType() == EventType.TEXT_UNIT) {
             tu = PensieveUtil.convertToTranslationUnit(sourceLang, targetLang, (TextUnit) event.getResource());

@@ -51,6 +51,7 @@ import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,10 +59,12 @@ import org.junit.Test;
 
 public class TabSeparatedValuesFilterTest {
 
-	//private TabSeparatedValuesFilter filter;
 	private IFilter filter;
 	private FilterTestDriver testDriver;
-	private String root; // for maven move; deletions marked with //m
+	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
+	private LocaleId locFRCA = LocaleId.fromString("fr-ca");
 	
 	@Before
 	public void setUp() {
@@ -73,7 +76,7 @@ public class TabSeparatedValuesFilterTest {
 		
 		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
-        root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt"); // maven
+        root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
 	}
 	
 	@Test
@@ -89,7 +92,7 @@ public class TabSeparatedValuesFilterTest {
 		params.columnNamesLineNum = 1;
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -131,7 +134,7 @@ public class TabSeparatedValuesFilterTest {
 		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
 		
 		input = TableFilterTest.class.getResourceAsStream("/csv_test9.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 				
 		testEvent(EventType.START_DOCUMENT, null);
 					
@@ -158,7 +161,7 @@ public class TabSeparatedValuesFilterTest {
 		params.columnNamesLineNum = 1;
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -185,7 +188,7 @@ public class TabSeparatedValuesFilterTest {
 		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
 		
 		input = TableFilterTest.class.getResourceAsStream("/TSV_test.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 				
 		testEvent(EventType.START_DOCUMENT, null);
 					
@@ -234,9 +237,7 @@ public class TabSeparatedValuesFilterTest {
 		
 		try {
 			snippet = streamAsString(input);
-			
 		} catch (IOException e) {
-			
 			e.printStackTrace();
 		}
 
@@ -245,13 +246,13 @@ public class TabSeparatedValuesFilterTest {
 		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
 		params.sourceColumns = "1";
 		params.targetColumns = "2";
-		params.targetLanguages = "FR-CA";
+		params.targetLanguages = "fr-ca";
 		params.targetSourceRefs = "1";
 		filter.setParameters(params);
 		
 		//System.out.println(snippet);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA), locFRCA);
 		//System.out.println(result);
 		assertEquals(snippet, result);
 	}
@@ -259,24 +260,17 @@ public class TabSeparatedValuesFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-//m		URL url = TableFilterTest.class.getResource("/csv_test9.txt");
-//m		String root = Util.getDirectoryName(url.getPath());
-//m		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
 		list.add(new InputDocument(root + "csv_test9.txt", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 
 
-// Helpers
+	// Helpers
 	private String getFullFileName(String fileName) {
-//m		URL url = TableFilterTest.class.getResource("/csv_test9.txt");
-//m		String root = Util.getDirectoryName(url.getPath());
-//m		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 
@@ -365,10 +359,10 @@ public class TabSeparatedValuesFilterTest {
 		writer = filter.createFilterWriter();		
 		try {						
 			// Open the input
-			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", "en", "fr"));
+			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", locEN, locFR));
 			
 			// Prepare the output
-			writer.setOptions("fr", "UTF-16");
+			writer.setOptions(locFR, "UTF-16");
 			writerBuffer = new ByteArrayOutputStream();
 			writer.setOutput(writerBuffer);
 			
@@ -401,17 +395,17 @@ public class TabSeparatedValuesFilterTest {
     }
 	
 	private ArrayList<Event> getEvents (String snippet,
-			String srcLang,
-			String trgLang)
-		{
-			ArrayList<Event> list = new ArrayList<Event>();
-			filter.open(new RawDocument(snippet, srcLang, trgLang));
-			while (filter.hasNext()) {
-				Event event = filter.next();
-				list.add(event);
-			}
-			filter.close();
-			return list;
+		LocaleId srcLang,
+		LocaleId trgLang)
+	{
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(snippet, srcLang, trgLang));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
 		}
+		filter.close();
+		return list;
+	}
 
 }

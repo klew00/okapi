@@ -8,6 +8,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -25,13 +26,13 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class RtfSnippetsTest {
+
 	private RTFFilter filter;
-	private URL parameters;
+	private LocaleId locEN = LocaleId.fromString("en");
 
 	@Before
 	public void setUp() {
 		filter = new RTFFilter();
-		//parameters = RtfSnippetsTest.class.getResource("testConfiguration1.yml");
 	}
 
 	@After
@@ -45,8 +46,7 @@ public class RtfSnippetsTest {
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		//filter.setParametersFromURL(parameters);
-		filter.open(new RawDocument(snippet, "en"));
+		filter.open(new RawDocument(snippet, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);
@@ -55,7 +55,7 @@ public class RtfSnippetsTest {
 		return list;
 	}
 
-	private String generateOutput(ArrayList<Event> list, String original, String trgLang) {
+	private String generateOutput(ArrayList<Event> list, String original, LocaleId trgLang) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
 		for (Event event : list) {

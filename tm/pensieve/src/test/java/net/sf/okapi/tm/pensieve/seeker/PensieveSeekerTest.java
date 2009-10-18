@@ -20,6 +20,7 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 package net.sf.okapi.tm.pensieve.seeker;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.tm.pensieve.Helper;
@@ -52,7 +53,7 @@ import java.util.List;
 public class PensieveSeekerTest {
 
     static final Directory DIR = new RAMDirectory();
-    static final TranslationUnitVariant TARGET = new TranslationUnitVariant("EN", new TextFragment("target text"));
+    static final TranslationUnitVariant TARGET = new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("target text"));
     static final String STR = "watch out for the killer rabbit";
     PensieveSeeker seeker;
     List<TmHit> tmhits;
@@ -174,10 +175,10 @@ public class PensieveSeekerTest {
         PensieveWriter writer = getWriter();
 
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out the killer rabbit")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(STR)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch for the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch out the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch rabbit")), TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, null);
@@ -188,10 +189,10 @@ public class PensieveSeekerTest {
     public void searchFuzzyWordOrder80Percent() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("rabbit killer the for out watch")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(STR)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("rabbit killer the for out watch")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch for the killer rabbit")), TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, null);
@@ -204,7 +205,7 @@ public class PensieveSeekerTest {
     public void searchFuzzyThresholdGreaterThan100() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch rabbit")), TARGET));
         writer.endIndex();
         seeker.searchFuzzy(new TextFragment(STR), 101, 10, null);
     }
@@ -213,7 +214,7 @@ public class PensieveSeekerTest {
     public void searchFuzzyThresholdLessThan0() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch rabbit")), TARGET));
         writer.endIndex();
         seeker.searchFuzzy(new TextFragment(STR), -1, 10, null);
     }
@@ -222,10 +223,10 @@ public class PensieveSeekerTest {
     public void searchFuzzyMiddleMatch80Percent() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch rabbit")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(STR)), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out the killer rabbit and some extra stuff")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch for the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(STR)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch out the killer rabbit and some extra stuff")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch for the killer rabbit")), TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, null);
@@ -238,11 +239,11 @@ public class PensieveSeekerTest {
     public void searchFuzzy80PercentWithMetadata() throws Exception {
         PensieveWriter writer = getWriter();
 
-        writer.indexTranslationUnit(Helper.createTU("EN", "KR", "watch rabbit", "something that is the same", "1", "some_file", "some_group", "nachotype"));
-        writer.indexTranslationUnit(Helper.createTU("EN", "KR", STR, "something that is the same", "2", "some_file", "some_group", "nachotype"));
-        writer.indexTranslationUnit(Helper.createTU("EN", "KR", "watch out the killer rabbit and some extra stuff", "something that is the same", "3", "some_file", "some_group", "nachotype"));
-        writer.indexTranslationUnit(Helper.createTU("EN", "KR", "watch for the killer rabbit", "something that is the same", "4", "some_file", "some_group", "nachotype"));
-        writer.indexTranslationUnit(Helper.createTU("EN", "KR", "watch for the killer rabbit", "something that is the same", "5", "nacho_file", "some_group", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU(LocaleId.fromString("EN"), LocaleId.fromString("KR"), "watch rabbit", "something that is the same", "1", "some_file", "some_group", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU(LocaleId.fromString("EN"), LocaleId.fromString("KR"), STR, "something that is the same", "2", "some_file", "some_group", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU(LocaleId.fromString("EN"), LocaleId.fromString("KR"), "watch out the killer rabbit and some extra stuff", "something that is the same", "3", "some_file", "some_group", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU(LocaleId.fromString("EN"), LocaleId.fromString("KR"), "watch for the killer rabbit", "something that is the same", "4", "some_file", "some_group", "nachotype"));
+        writer.indexTranslationUnit(Helper.createTU(LocaleId.fromString("EN"), LocaleId.fromString("KR"), "watch for the killer rabbit", "something that is the same", "5", "nacho_file", "some_group", "nachotype"));
 
         writer.endIndex();
         Metadata md = new Metadata();
@@ -264,10 +265,10 @@ public class PensieveSeekerTest {
             STR + " 3 words now"
         };
 
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[0])), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[1])), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[2])), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(testStrings[3])), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(testStrings[0])), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(testStrings[1])), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(testStrings[2])), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(testStrings[3])), TARGET));
         writer.endIndex();
         //If you add a threshold it changes the sort order
         tmhits = seeker.searchFuzzy(new TextFragment(STR), 0, 10, null);
@@ -349,7 +350,7 @@ public class PensieveSeekerTest {
         PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
         for (int i = 0; i < 5; i++) {
-            writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
+            writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(str)), TARGET));
         }
 
         writer.endIndex();
@@ -361,8 +362,8 @@ public class PensieveSeekerTest {
     public void searchExactDifferentStopWords() throws Exception {
         PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(str)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchExact(new TextFragment(str), 10, null);
@@ -373,8 +374,8 @@ public class PensieveSeekerTest {
     public void searchExactDifferentCases() throws Exception {
         PensieveWriter writer = getWriter();
         String str = "watch Out for The killEr rabbit";
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(str)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchExact(new TextFragment(str), 10, null);
@@ -385,8 +386,8 @@ public class PensieveSeekerTest {
     public void searchExactDifferentOrder() throws Exception {
         PensieveWriter writer = getWriter();
         String str = "watch out for the killer rabbit";
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("watch out for the the killer rabbit")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(str)), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
         tmhits = seeker.searchExact(new TextFragment("killer rabbit the for out watch"), 10, null);
@@ -403,8 +404,8 @@ public class PensieveSeekerTest {
     	frag.append(TagType.CLOSING, "b", "</b>");
     	frag.append(" rabbit");
     	
-    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
-    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(str)), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), frag), TARGET));
     	writer.endIndex();
     	
     	tmhits = seeker.searchExact(frag, 10, null);
@@ -422,8 +423,8 @@ public class PensieveSeekerTest {
     	frag.append(TagType.CLOSING, "b", "</b>");
     	frag.append(" rabbit");
     	
-    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str)), TARGET));
-    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(str)), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), frag), TARGET));
     	writer.endIndex();
     	
     	frag = new TextFragment("watch out for the killer rabbit");
@@ -443,9 +444,9 @@ public class PensieveSeekerTest {
     	frag.append(TagType.CLOSING, "b", "</b>");
     	frag.append(" rabbit");
     	
-    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str1)), TARGET));
-    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(str2)), TARGET));
-    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", frag), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(str1)), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(str2)), TARGET));
+    	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), frag), TARGET));
     	writer.endIndex();
     	
     	tmhits = seeker.searchFuzzy(frag, 5, 10, null);
@@ -459,24 +460,24 @@ public class PensieveSeekerTest {
     public void getTranslationUnitFields() throws Exception {
         final String source = "watch out for the killer rabbit";
         final String target = "j";
-        final String targetLang = "KR";
-        final String sourceLang = "EN";
+        final LocaleId targetLang = LocaleId.fromString("KR");
+        final LocaleId sourceLang = LocaleId.fromString("EN");
         Document doc = new Document();
         doc.add(new Field(TranslationUnitField.SOURCE_EXACT.name(), source,
                 Field.Store.NO, Field.Index.ANALYZED));
         doc.add(new Field(TranslationUnitField.SOURCE.name(), source,
                 Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field(TranslationUnitField.SOURCE_LANG.name(), sourceLang,
+        doc.add(new Field(TranslationUnitField.SOURCE_LANG.name(), sourceLang.toString(),
                 Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field(TranslationUnitField.TARGET.name(), target,
                 Field.Store.NO, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(TranslationUnitField.TARGET_LANG.name(), targetLang,
+        doc.add(new Field(TranslationUnitField.TARGET_LANG.name(), targetLang.toString(),
                 Field.Store.YES, Field.Index.ANALYZED));
         TranslationUnit tu = seeker.getTranslationUnit(doc);
         assertEquals("source field", source, tu.getSource().getContent().toString());
-        assertEquals("source lang", sourceLang, tu.getSource().getLang());
+        assertEquals("source lang", sourceLang, tu.getSource().getLanguage());
         assertEquals("target field", target, tu.getTarget().getContent().toString());
-        assertEquals("target lang", targetLang, tu.getTarget().getLang());
+        assertEquals("target lang", targetLang, tu.getTarget().getLanguage());
     }
 
     @Test
@@ -519,15 +520,15 @@ public class PensieveSeekerTest {
 
     void populateIndex(PensieveWriter writer, int numOfEntries, String source, String target) throws Exception {
         for (int i = 0; i < numOfEntries; i++) {
-            writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(source + i)), new TranslationUnitVariant("EN", new TextFragment(target))));
+            writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(source + i)), new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment(target))));
         }
-        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("something that in no way should ever match")), new TranslationUnitVariant("EN", new TextFragment("unittesttarget"))));
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("something that in no way should ever match")), new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("unittesttarget"))));
     }
 
     void populateIndex(PensieveWriter writer, int numOfEntries, String source, String target, String id,
             String filename, String groupname, String type) throws Exception {
         for (int i = 0; i < numOfEntries; i++) {
-            writer.indexTranslationUnit(Helper.createTU("EN", "KR", source, target, id+i, filename, groupname, type));
+            writer.indexTranslationUnit(Helper.createTU(LocaleId.fromString("EN"), LocaleId.fromString("KR"), source, target, id+i, filename, groupname, type));
         }
     }
 }

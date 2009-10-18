@@ -1,5 +1,6 @@
 package net.sf.okapi.tm.pensieve.tmx;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
@@ -22,15 +23,20 @@ import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 public class TmxHandlerImportTest {
 
     private final static String INDEX_DIR = "target/test-classes/";
+    private final static LocaleId locENUS = LocaleId.fromString("EN-US");
+    private final static LocaleId locDEDE = LocaleId.fromString("DE-DE");
+    private final static LocaleId locEN = LocaleId.fromString("EN");
+    private final static LocaleId locIT = LocaleId.fromString("IT");
+    private final static LocaleId locES = LocaleId.fromString("ES");
 
 //        @Test
     public void importTmx_exact_really_big_file() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();        
         
         ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(INDEX_DIR, true);
-        OkapiTmxImporter tmxImporter = new OkapiTmxImporter("EN-US", tmxFilter);
+        OkapiTmxImporter tmxImporter = new OkapiTmxImporter(locENUS, tmxFilter);
         long startTime = System.currentTimeMillis();
-        tmxImporter.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), "es", tmWriter);
+        tmxImporter.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), locES, tmWriter);
         long totalTime = System.currentTimeMillis() - startTime;
         System.out.println("total time to import TMX: " + totalTime);
 
@@ -72,9 +78,9 @@ public class TmxHandlerImportTest {
     public void importTmx_fuzzy_really_big_file() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(INDEX_DIR, true);
-        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("EN-US", tmxFilter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter(locENUS, tmxFilter);
         long startTime = System.currentTimeMillis();
-        tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), "es", tmWriter);
+        tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), locES, tmWriter);
         long totalTime = System.currentTimeMillis() - startTime;
         System.out.println("total time to import TMX: " + totalTime);
 
@@ -125,8 +131,8 @@ public class TmxHandlerImportTest {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
         ITmWriter tmWriter = new PensieveWriter(ramDir, true);
-        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("en-us", tmxFilter);
-        tmxHandler.importTmx(this.getClass().getResource("/Paragraph_TM.tmx").toURI(), "de-de", tmWriter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter(locENUS, tmxFilter);
+        tmxHandler.importTmx(this.getClass().getResource("/Paragraph_TM.tmx").toURI(), locDEDE, tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
         TranslationUnit tu = seeker.searchExact(new TextFragment("Pumps have been paused for 3 minutes. Consider starting a saline drip."), 2, null).get(0).getTu();
@@ -138,8 +144,8 @@ public class TmxHandlerImportTest {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
         ITmWriter tmWriter = new PensieveWriter(ramDir, true);
-        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("en", tmxFilter);
-        tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "it", tmWriter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter(locEN, tmxFilter);
+        tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), locIT, tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
         TranslationUnit tu = seeker.searchExact(new TextFragment("hello"), 2, null).get(0).getTu();
@@ -155,8 +161,8 @@ public class TmxHandlerImportTest {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
         ITmWriter tmWriter = new PensieveWriter(ramDir, true);
-        OkapiTmxImporter tmxHandler = new OkapiTmxImporter("en", tmxFilter);
-        tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "it", tmWriter);
+        OkapiTmxImporter tmxHandler = new OkapiTmxImporter(locEN, tmxFilter);
+        tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), locIT, tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
         TranslationUnit tu = seeker.searchExact(new TextFragment("hello"), 2, null).get(0).getTu();

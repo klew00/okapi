@@ -41,6 +41,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -73,7 +74,7 @@ public class JSONFilter implements IFilter {
 
 	private Parameters params;
 	private String encoding;
-	private String srcLang;
+	private LocaleId srcLoc;
 	private boolean hasUTF8BOM;
 	private String lineBreak;
 	private String inputText;
@@ -177,7 +178,7 @@ public class JSONFilter implements IFilter {
 			throw new OkapiUnsupportedEncodingException(
 				String.format("The encoding '%s' is not supported.", encoding), e);
 		}
-		srcLang = input.getSourceLanguage();
+		srcLoc = input.getSourceLanguage();
 		hasUTF8BOM = detector.hasUtf8Bom();
 		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
@@ -234,7 +235,7 @@ public class JSONFilter implements IFilter {
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
-		startDoc.setLanguage(srcLang);
+		startDoc.setLanguage(srcLoc);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setFilterWriter(createFilterWriter());

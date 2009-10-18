@@ -33,6 +33,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -84,7 +85,7 @@ public class XsltTransformStep extends BasePipelineStep {
 		ByteArrayInputStream transformedInput = new ByteArrayInputStream(tempStream.toByteArray());
 			
 		// overwrite our event to the new transformed content	
-		event.setResource(new RawDocument(transformedInput, "UTF-8", "en"));
+		event.setResource(new RawDocument(transformedInput, "UTF-8", new LocaleId("en")));
 		
 		// This step is done generating events
 		done = true;

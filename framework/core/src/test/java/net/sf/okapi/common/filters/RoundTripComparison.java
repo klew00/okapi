@@ -32,6 +32,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class RoundTripComparison {
@@ -42,8 +43,8 @@ public class RoundTripComparison {
 	private IFilterWriter writer;
 	private ByteArrayOutputStream writerBuffer;
 	private String defaultEncoding;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 
 	public RoundTripComparison () {
 		extraction1Events = new ArrayList<Event>();
@@ -53,14 +54,14 @@ public class RoundTripComparison {
 	public boolean executeCompare (IFilter filter,
 		List<InputDocument> inputDocs,
 		String defaultEncoding,
-		String srcLang,
-		String trgLang)
+		LocaleId srcLoc,
+		LocaleId trgLoc)
 	{
 		try {
 			this.filter = filter;
 			this.defaultEncoding = defaultEncoding;
-			this.srcLang = srcLang;
-			this.trgLang = trgLang;
+			this.srcLoc = srcLoc;
+			this.trgLoc = trgLoc;
 		
 			// Create the filter-writer for the provided filter
 			writer = filter.createFilterWriter();
@@ -99,15 +100,15 @@ public class RoundTripComparison {
 	public boolean executeCompare (IFilter filter,
 		List<InputDocument> inputDocs,
 		String defaultEncoding,
-		String srcLang,
-		String trgLang,
+		LocaleId srcLoc,
+		LocaleId trgLoc,
 		String outputDir)
 	{
 		try {
 			this.filter = filter;
 			this.defaultEncoding = defaultEncoding;
-			this.srcLang = srcLang;
-			this.trgLang = trgLang;
+			this.srcLoc = srcLoc;
+			this.trgLoc = trgLoc;
 		
 			// Create the filter-writer for the provided filter
 			writer = filter.createFilterWriter();
@@ -147,10 +148,10 @@ public class RoundTripComparison {
 	private void executeFirstExtraction (InputDocument doc) throws URISyntaxException {
 		try {
 			// Open the input
-			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLang, trgLang));
+			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLoc, trgLoc));
 			
 			// Prepare the output
-			writer.setOptions(trgLang, "UTF-16");
+			writer.setOptions(trgLoc, "UTF-16");
 			writerBuffer = new ByteArrayOutputStream();
 			writer.setOutput(writerBuffer);
 			
@@ -183,7 +184,7 @@ public class RoundTripComparison {
 		try {
 			// Set the input (from the output of first extraction)
 			String input = new String(writerBuffer.toByteArray(), "UTF-16");
-			filter.open(new RawDocument(input, srcLang, trgLang));
+			filter.open(new RawDocument(input, srcLoc, trgLoc));
 			
 			// Process the document
 			Event event;
@@ -214,10 +215,10 @@ public class RoundTripComparison {
 		String outPath = null;
 		try {
 			// Open the input
-			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLang, trgLang));
+			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLoc, trgLoc));
 			
 			// Prepare the output
-			writer.setOptions(trgLang, "UTF-8");
+			writer.setOptions(trgLoc, "UTF-8");
 			outPath = Util.getDirectoryName(doc.path);
 			outPath += (File.separator + outputDir + File.separator + Util.getFilename(doc.path, true));
 			writer.setOutput(outPath);
@@ -252,7 +253,7 @@ public class RoundTripComparison {
 		try {
 			// Set the input (from the output of first extraction)
 			File file = new File(input);
-			filter.open(new RawDocument(file.toURI(), "UTF-8", srcLang, trgLang));
+			filter.open(new RawDocument(file.toURI(), "UTF-8", srcLoc, trgLoc));
 			
 			// Process the document
 			Event event;

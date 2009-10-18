@@ -28,6 +28,7 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
@@ -66,7 +67,8 @@ public class Main {
 		driver.addStep(new FilterEventsWriterStep());
 
 		// Set the info for the input and output
-		RawDocument rawDoc = new RawDocument(inputXml.toURI(), "UTF-8", "en", "fr");
+		RawDocument rawDoc = new RawDocument(inputXml.toURI(), "UTF-8",
+			new LocaleId("en"), new LocaleId("fr"));
 		rawDoc.setFilterConfigId("okf_xml");
 		driver.addBatchItem(rawDoc, (new File("output.xml")).toURI(), "UTF-8");
 		

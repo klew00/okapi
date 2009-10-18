@@ -20,6 +20,7 @@
 
 package net.sf.okapi.tm.pensieve;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
@@ -49,7 +50,7 @@ public class Helper {
         return n;
     }
 
-    public static TranslationUnit createTU(String srcLang, String targetLang, String source, String target, String id){
+    public static TranslationUnit createTU(LocaleId srcLang, LocaleId targetLang, String source, String target, String id){
         TranslationUnitVariant tuvS = new TranslationUnitVariant(srcLang, new TextFragment(source));
         TranslationUnitVariant tuvT = new TranslationUnitVariant(targetLang, new TextFragment(target));
         TranslationUnit tu = new TranslationUnit(tuvS, tuvT);
@@ -57,8 +58,8 @@ public class Helper {
         return tu;
     }
 
-    public static TranslationUnit createTU(String srcLang,
-            String targetLang, String source, String target, String id,
+    public static TranslationUnit createTU(LocaleId srcLang,
+    		LocaleId targetLang, String source, String target, String id,
             String filename, String groupname, String type){
         TranslationUnitVariant tuvS = new TranslationUnitVariant(srcLang, new TextFragment(source));
         TranslationUnitVariant tuvT = new TranslationUnitVariant(targetLang, new TextFragment(target));

@@ -23,6 +23,7 @@ package net.sf.okapi.steps.simpletm2tmx;
 import java.io.File;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.tm.simpletm.Database;
@@ -64,8 +65,8 @@ public class SimpleTM2TMXStep extends BasePipelineStep {
 			RawDocument rd = (RawDocument)event.getResource(); 
 			String path = new File(rd.getInputURI()).getPath(); 
 			db.open(path);
-			String srcLang = rd.getSourceLanguage();
-			String trgLang = rd.getTargetLanguage();
+			LocaleId srcLang = rd.getSourceLanguage();
+			LocaleId trgLang = rd.getTargetLanguage();
 			String outPath = path+".tmx";
 			db.exportToTMX(outPath, srcLang, trgLang);
 			db.close();

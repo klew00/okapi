@@ -10,6 +10,7 @@ import java.io.InputStream;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.html.HtmlFilter;
@@ -19,7 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HtmlDetectBomTest {
+
 	private HtmlFilter htmlFilter;
+	private LocaleId locEN = LocaleId.fromString("en");
 	
 	@Before
 	public void setUp() throws Exception {
@@ -42,14 +45,14 @@ public class HtmlDetectBomTest {
 		assertFalse(bomDetector.hasUtf7Bom());
 		
 		
-		htmlFilter.open(new RawDocument(htmlStream, bomDetector.getEncoding(), "en"));
+		htmlFilter.open(new RawDocument(htmlStream, bomDetector.getEncoding(), locEN));
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();			
 			if (event.getEventType() == EventType.START_DOCUMENT) {
 				StartDocument sd = (StartDocument)event.getResource();
 				assertTrue(sd.hasUTF8BOM());
 				assertEquals("UTF-8", sd.getEncoding());
-				assertEquals("en", sd.getLanguage());
+				assertEquals(locEN, sd.getLanguage());
 				assertEquals("\r\n", sd.getLineBreak());
 			}
 		}
@@ -66,14 +69,14 @@ public class HtmlDetectBomTest {
 		assertFalse(bomDetector.hasUtf7Bom());
 		
 		
-		htmlFilter.open(new RawDocument(htmlStream, bomDetector.getEncoding(), "en"));
+		htmlFilter.open(new RawDocument(htmlStream, bomDetector.getEncoding(), locEN));
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();			
 			if (event.getEventType() == EventType.START_DOCUMENT) {
 				StartDocument sd = (StartDocument)event.getResource();
 				assertFalse(sd.hasUTF8BOM());
 				assertEquals("UTF-16LE", sd.getEncoding());
-				assertEquals("en", sd.getLanguage());
+				assertEquals(locEN, sd.getLanguage());
 				assertEquals("\r\n", sd.getLineBreak());
 			}
 		}
@@ -89,14 +92,14 @@ public class HtmlDetectBomTest {
 		assertTrue(bomDetector.hasUtf8Bom());
 		assertFalse(bomDetector.hasUtf7Bom());		
 		
-		htmlFilter.open(new RawDocument(htmlStream, bomDetector.getEncoding(), "en"));
+		htmlFilter.open(new RawDocument(htmlStream, bomDetector.getEncoding(), locEN));
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();		
 			if (event.getEventType() == EventType.START_DOCUMENT) {
 				StartDocument sd = (StartDocument)event.getResource();
 				assertFalse(sd.hasUTF8BOM());
 				assertEquals("UTF-8", sd.getEncoding());
-				assertEquals("en", sd.getLanguage());
+				assertEquals(locEN, sd.getLanguage());
 				assertEquals("\r\n", sd.getLineBreak());
 			}
 		}		

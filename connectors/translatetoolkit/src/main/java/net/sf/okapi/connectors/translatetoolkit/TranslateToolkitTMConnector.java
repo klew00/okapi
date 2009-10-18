@@ -37,6 +37,7 @@ import org.json.simple.parser.ParseException;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -74,12 +75,12 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		throw new UnsupportedOperationException();
 	}
 
-	public String getSourceLanguage () {
-		return srcLang;
+	public LocaleId getSourceLanguage () {
+		return LocaleId.fromString(srcLang);
 	}
 
-	public String getTargetLanguage () {
-		return trgLang;
+	public LocaleId getTargetLanguage () {
+		return LocaleId.fromString(trgLang);
 	}
 
 	public boolean hasNext () {
@@ -168,8 +169,8 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		// Not used with this connector
 	}
 
-	public void setLanguages (String sourceLang,
-		String targetLang)
+	public void setLanguages (LocaleId sourceLang,
+		LocaleId targetLang)
 	{
 		srcLang = toInternalCode(sourceLang);
 		trgLang = toInternalCode(targetLang);
@@ -191,9 +192,8 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		return threshold;
 	}
 
-	private String toInternalCode (String standardCode) {
-		String code = standardCode.toLowerCase().replace('-', '_');
-		return code;
+	private String toInternalCode (LocaleId standardCode) {
+		return standardCode.toPOSIXLocaleId();
 	}
 
 	public IParameters getParameters () {

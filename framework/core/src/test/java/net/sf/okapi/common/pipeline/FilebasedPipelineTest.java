@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URISyntaxException;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
@@ -30,7 +31,8 @@ public class FilebasedPipelineTest {
 		pipeline.addStep(new Consumer());
 
 		assertEquals(PipelineReturnValue.PAUSED, pipeline.getState());
-		pipeline.process(new RawDocument("<b>Test this resource</b>", "en"));	
+		pipeline.process(new RawDocument("<b>Test this resource</b>",
+			LocaleId.fromString("en")));	
 		pipeline.destroy();
 		assertEquals(PipelineReturnValue.DESTROYED, pipeline.getState());
 	}

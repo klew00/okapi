@@ -56,6 +56,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
@@ -96,7 +97,6 @@ public class TsFilter implements IFilter {
 		Stack<Integer> contextStack = new Stack<Integer>();
 		
 		public void resetAll(){
-
 			currentDocumentLocation = DocumentLocation.TS;
 			currentMessageLocation = MessageLocation.RESOURCE;
 			status = TranslationStatus.UNDETERMINED;
@@ -288,12 +288,10 @@ public class TsFilter implements IFilter {
 	Stack<String> elementStack = new Stack<String>();
 	ArrayList<XMLEvent> eventList = new ArrayList<XMLEvent>();
 	GenericSkeleton skel;
-	
 	XMLEventReader eventReader;
 
-
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private Parameters params;
 	private boolean hasNext;
 	private String docName;
@@ -465,7 +463,7 @@ public class TsFilter implements IFilter {
 			skel = new GenericSkeleton();
 			startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 			skel.append("<?xml version=\"1.0\" encoding=\"");
-			skel.addValuePlaceholder(startDoc, Property.ENCODING, "");
+			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
 			skel.append("\"?>");
 			startDoc.setSkeleton(skel);
 		}

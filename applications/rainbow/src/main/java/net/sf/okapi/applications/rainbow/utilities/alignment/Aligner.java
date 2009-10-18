@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.Property;
@@ -118,8 +119,8 @@ public class Aligner {
 	private boolean trimCodes = false;//TODO: take from SRX rules
 	private boolean trimWS = true;//TODO: take from SRX rules
 	private boolean manualCorrection;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private IHelp help;
 	private IQuery mtQuery;
 
@@ -565,8 +566,8 @@ public class Aligner {
 	public void setInfo (String targetSrxPath,
 		boolean checkSingleSegUnit,
 		boolean useAutoCorrection,
-		String sourceLanguage,
-		String targetLanguage)
+		LocaleId sourceLanguage,
+		LocaleId targetLanguage)
 	{
 		this.srcLang = sourceLanguage;
 		this.trgLang = targetLanguage;

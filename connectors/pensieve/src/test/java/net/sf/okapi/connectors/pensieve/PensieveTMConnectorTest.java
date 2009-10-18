@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 import java.net.URL;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -39,6 +40,8 @@ import org.junit.Test;
 public class PensieveTMConnectorTest {
 	
 	private ITMQuery connector;
+	private LocaleId locENUS = LocaleId.fromString("EN-US");
+	private LocaleId locFRFR = LocaleId.fromString("FR-FR");
 	
 	@Before
 	public void setUp() {
@@ -48,7 +51,7 @@ public class PensieveTMConnectorTest {
 		params.setDbDirectory(Util.getDirectoryName(url.getPath()));
 		connector.setParameters(params);
 		connector.open();
-		connector.setLanguages("EN-US", "FR-FR");
+		connector.setLanguages(locENUS, locFRFR);
 	}
 	
 	@After

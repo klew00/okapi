@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.List;
 
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
@@ -112,16 +113,16 @@ public interface IPipelineDriver {
 	 * @param filterConfigId
 	 *            the filter configuration ID of the document (can be null if
 	 *            not used).
-	 * @param srcLang
-	 *            the source language.
-	 * @param trgLang
-	 *            the target language.
+	 * @param srcLoc
+	 *            the source locale.
+	 * @param trgLoc
+	 *            the target locale.
 	 */
 	public void addBatchItem (URI inputURI,
 		String defaultEncoding,
 		String filterConfigId,
-		String srcLang,
-		String trgLang);
+		LocaleId srcLoc,
+		LocaleId trgLoc);
 
 	/**
 	 * Remove all the {@link IPipelineStep}s from the pipeline. Also calls the

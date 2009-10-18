@@ -24,13 +24,13 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
-import net.sf.okapi.steps.tokenization.locale.LocaleUtil;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 /**
@@ -50,14 +50,12 @@ public class Tokenizer {
 	 * @param tokenNames Optional list of token names. If omitted, all tokens will be extracted.
 	 * @return A list of Token objects.
 	 */
-	protected Tokens tokenizeString(String text, String language, String... tokenNames) {
+	protected Tokens tokenizeString(String text, LocaleId language, String... tokenNames) {
 			
 		Tokens res = new Tokens();
 		
 		if (ts == null)	return res;
 		
-		language = LocaleUtil.normalizeLanguageCode_Okapi(language); 
-			
 		Parameters params = (Parameters) ts.getParameters();
 		params.reset();
 		
@@ -65,7 +63,7 @@ public class Tokenizer {
 		params.tokenizeTargets = false;
 		
 		params.setLanguageMode(Parameters.LANGUAGES_ONLY_WHITE_LIST);
-		params.setLanguageWhiteList(ListUtil.stringAsList(language));
+		params.setLanguageWhiteList(ListUtil.stringAsLanguageList(language.toString()));
 		
 		if (Util.isEmpty(tokenNames))			
 			params.setTokenMode(Parameters.TOKENS_ALL);
@@ -100,61 +98,49 @@ public class Tokenizer {
 		return res;
 	}
 	
-	static private Tokens doTokenize(Object text, String language, String... tokenNames) {
+	static private Tokens doTokenize(Object text, LocaleId language, String... tokenNames) {
 		
-		if (text == null) return null;
-		if (Util.isEmpty(language)) return null;
+		if ( text == null ) return null;
+		if ( Util.isNullOrEmpty(language) ) return null;
 		
 		if (text instanceof TextUnit) {
-		
 			TextUnit tu = (TextUnit) text;
-			
-			if (tu.hasTarget(language))
+			if ( tu.hasTarget(language) )
 				return doTokenize(tu.getTarget(language), language, tokenNames);
 			else
 				return doTokenize(tu.getSource(), language, tokenNames);
 		}
 		else if (text instanceof TextContainer) {
-			
 			TextContainer tc = (TextContainer) text;
-			
 			return doTokenize(tc.getContent(), language, tokenNames);
-			
 		}
 		else if (text instanceof TextFragment) {
-			
 			TextFragment tf = (TextFragment) text;
-			
 			return doTokenize(TextUnitUtil.getText(tf), language, tokenNames);
 		}
 		else if (text instanceof String) {
-			
 			Tokenizer tokenizer = new Tokenizer();
 			if (tokenizer == null) return null;
-				
 			return tokenizer.tokenizeString((String) text, language, tokenNames);
 		}
 		
 		return null;		
 	}
 	
-	static public Tokens tokenize(TextUnit textUnit, String language, String... tokenNames) {
-		
+	static public Tokens tokenize(TextUnit textUnit, LocaleId language, String... tokenNames) {
 		return doTokenize(textUnit, language, tokenNames);		
 	}
 	
-	static public Tokens tokenize(TextContainer textContainer, String language, String... tokenNames) {
-		
+	static public Tokens tokenize(TextContainer textContainer, LocaleId language, String... tokenNames) {
 		return doTokenize(textContainer, language, tokenNames);		
 	}
 	
-	static public Tokens tokenize(TextFragment textFragment, String language, String... tokenNames) {
-		
+	static public Tokens tokenize(TextFragment textFragment, LocaleId language, String... tokenNames) {
 		return doTokenize(textFragment, language, tokenNames);		
 	}
 	
-	static public Tokens tokenize(String string, String language, String... tokenNames) {
-		
+	static public Tokens tokenize(String string, LocaleId language, String... tokenNames) {
 		return doTokenize(string, language, tokenNames);		
 	}
+
 }

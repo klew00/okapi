@@ -46,12 +46,12 @@ public enum StepParameterType {
 	OUTPUT_URI,
 	
 	/**
-	 * Source language code.
+	 * Source language.
 	 */
 	SOURCE_LANGUAGE,
 	
 	/**
-	 * Target language code.
+	 * Target language.
 	 */
 	TARGET_LANGUAGE,
 

@@ -21,6 +21,7 @@
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 
 import java.io.IOException;
@@ -33,20 +34,20 @@ public interface ITmxExporter {
 
     /**
      * Exports all Pensieve contents matching source and target language to TMX
-     * @param sourceLang The source language to export
-     * @param targetLang The target language to export
+     * @param sourceLocale The source locale to export
+     * @param targetLocale The target locale to export
      * @param tmSeeker The Seeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing to the TMX file
      * @throws IOException if there was a problem with the TMX export
      */
-    void exportTmx(String sourceLang, String targetLang, ITmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
+    void exportTmx(LocaleId sourceLocale, LocaleId targetLocale, ITmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
 
     /**
      * Exports all Pensieve contents matching source languages to TMX
-     * @param sourceLang The source language to export
+     * @param sourceLocale The source locale to export
      * @param tmSeeker The Seeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing to the TMX file
      * @throws IOException if there was a problem with the TMX export
      */
-    void exportTmx(String sourceLang, ITmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
+    void exportTmx(LocaleId sourceLocale, ITmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException;
 }

@@ -47,6 +47,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -121,8 +122,7 @@ public class RTFFilter implements IFilter {
 	
 	private BufferedReader reader;
 	private boolean canceled;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId trgLang;
 	private String passedEncoding;
 	private Hashtable<Integer, String> winCharsets;
 	private Hashtable<Integer, String> winCodepages;
@@ -359,7 +359,6 @@ public class RTFFilter implements IFilter {
 	{
 		try {
 			passedEncoding = input.getEncoding();
-			srcLang = input.getSourceLanguage();
 			trgLang = input.getTargetLanguage();
 			if ( input.getInputURI() != null ) {
 				docName = input.getInputURI().getPath();
@@ -372,7 +371,7 @@ public class RTFFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
 			startDoc.setEncoding(passedEncoding, false);
-			startDoc.setLanguage(srcLang);
+			startDoc.setLanguage(input.getSourceLanguage());
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setType("text/rtf");

@@ -32,6 +32,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -54,8 +55,8 @@ public class PensieveFilter implements IFilter {
 	
 	private Iterator<TranslationUnit> iterator;
 	private int state;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	private String docName;
 
 	public void cancel () {
@@ -112,7 +113,7 @@ public class PensieveFilter implements IFilter {
 			StartDocument sd = new StartDocument("sdID");
 			sd.setName(docName);
 			sd.setEncoding("UTF-8", false);
-			sd.setLanguage(srcLang);
+			sd.setLanguage(srcLoc);
 			sd.setFilterParameters(getParameters());
 			sd.setFilterWriter(createFilterWriter());
 			sd.setType(MIMETYPE);
@@ -134,7 +135,7 @@ public class PensieveFilter implements IFilter {
 			tu.setName(tu.getId()); // In this case resname == id
 			tu.setSourceContent(item.getSource().getContent());
 			if ( !item.isTargetEmpty() ) {
-				TextContainer tc = tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
+				TextContainer tc = tu.createTarget(trgLoc, false, IResource.CREATE_EMPTY);
 				tc.setContent(item.getTarget().getContent());
 			}
 			String data = item.getMetadata().get(MetadataType.TYPE);
@@ -157,8 +158,8 @@ public class PensieveFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
-		srcLang = input.getSourceLanguage();
-		trgLang = input.getTargetLanguage();
+		srcLoc = input.getSourceLanguage();
+		trgLoc = input.getTargetLanguage();
 		if ( input.getInputURI() == null ) {
 			throw new OkapiBadFilterInputException("Only input URI is supported for this filter.");
 		}

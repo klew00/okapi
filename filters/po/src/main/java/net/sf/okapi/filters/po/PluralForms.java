@@ -23,6 +23,8 @@ package net.sf.okapi.filters.po;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import net.sf.okapi.common.LocaleId;
+
 public class PluralForms {
 	
 	private static final String BUNDLE_NAME = "net.sf.okapi.filters.po.PluralForms";
@@ -34,9 +36,9 @@ public class PluralForms {
 	private PluralForms() {
 	}
 
-	public static String getExpression (String langCode) {
+	public static String getExpression (LocaleId language) {
 		try {
-			return RESOURCE_BUNDLE.getString(langCode.toLowerCase());
+			return RESOURCE_BUNDLE.getString(language.toString());
 		}
 		catch ( MissingResourceException e ) {
 			return DEFAULT_EXP; // Default fall-back

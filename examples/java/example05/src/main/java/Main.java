@@ -21,6 +21,7 @@
 import java.util.Scanner;
 
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
@@ -36,7 +37,7 @@ public class Main {
 			 * Okapi provide a connector to easily query the server.
 			 */
 			ITMQuery connector = new OpenTranTMConnector();
-			connector.setLanguages("en", "fr");
+			connector.setLanguages(LocaleId.fromString("en"), LocaleId.fromString("fr"));
 			connector.open();
 			String query = "Open the file";
 			connector.query(query);
@@ -82,7 +83,7 @@ public class Main {
 			System.out.print("Target language (e.g. fr) = ");
 			String trgLang = scanner.nextLine();
 			
-			connector.setLanguages(srcLang, trgLang);
+			connector.setLanguages(LocaleId.fromString(srcLang), LocaleId.fromString(trgLang));
 			connector.setParameters(params);
 			connector.open();
 			

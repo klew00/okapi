@@ -27,6 +27,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
@@ -64,7 +65,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	
 	protected List<String> columnNames;
 	protected List<String> sourceIdSuffixes;
-	protected List<String> targetLanguages;
+	protected List<LocaleId> targetLanguages;
 
 //	protected ArrayList<TextUnit> tuCache;
 	
@@ -109,7 +110,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		sourceIdColumns = ListUtil.stringAsIntList(params.sourceIdColumns);
 		sourceColumns = ListUtil.stringAsIntList(params.sourceColumns);
 		targetColumns = ListUtil.stringAsIntList(params.targetColumns);
-		targetLanguages = ListUtil.stringAsList(params.targetLanguages);
+		targetLanguages = ListUtil.stringAsLanguageList(params.targetLanguages);
 		commentColumns = ListUtil.stringAsIntList(params.commentColumns);
 		targetSourceRefs = ListUtil.stringAsIntList(params.targetSourceRefs);
 		commentSourceRefs = ListUtil.stringAsIntList(params.commentSourceRefs);
@@ -371,24 +372,19 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				}
 				
 				if (isTarget(colNumber)) {
-					
 					TextUnit tu = getSourceFromTargetRef(cells, colNumber);
-					if (tu == null) {
-						
+					if ( tu == null ) {
 						sendAsSkeleton(cell);
 						continue;
 					}
-					
-					String language = getLanguageFromTargetRef(colNumber);
-					if (Util.isEmpty(language)) {
-						
+					// Else:
+					LocaleId language = getLanguageFromTargetRef(colNumber);
+					if ( Util.isNullOrEmpty(language) ) {
 						sendAsSkeleton(cell);
-						continue;
 					}
-					
-					sendAsTarget(cell, tu, language);
-					
-					continue;
+					else {
+						sendAsTarget(cell, tu, language);
+					}
 				}
 				
 				// All other kinds of cells go to skeleton
@@ -459,12 +455,10 @@ public class BaseTableFilter extends BasePlainTextFilter {
 //		return tuCache.get(cacheIndex);
 //	}
 	
-	private String getLanguageFromTargetRef(int colNum) {
-		
-		if (targetColumns == null) return "";		
+	private LocaleId getLanguageFromTargetRef(int colNum) {
+		if ( targetColumns == null ) return LocaleId.EMPTY;		
 		int index = targetColumns.indexOf(colNum); 
-		
-		if (!Util.checkIndex(index, targetLanguages)) return "";
+		if ( !Util.checkIndex(index, targetLanguages) ) return LocaleId.EMPTY;
 		return targetLanguages.get(index);
 	}
 	

@@ -26,6 +26,7 @@ import java.util.Set;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Property;
@@ -99,7 +100,7 @@ class StorageList extends ArrayList<IResource>
 		startGroup.setAnnotation(annotation);
 	}
 
-	public Property createTargetProperty(String language,
+	public Property createTargetProperty(LocaleId language,
 		String name,
 		boolean overwrite,
 		int creationOptions)
@@ -107,16 +108,22 @@ class StorageList extends ArrayList<IResource>
 		return startGroup.createTargetProperty(language, name, overwrite, creationOptions);
 	}
 
-	public Property setTargetProperty (String language, Property property) {
+	public Property setTargetProperty (LocaleId language,
+		Property property)
+	{
 		// Not implemented: read-only info
 		return null;
 	}
 
-	public Property getTargetProperty (String language, String name) {
+	public Property getTargetProperty (LocaleId language,
+		String name)
+	{
 		return startGroup.getTargetProperty(language, name);
 	}
 
-	public boolean hasTargetProperty(String language, String name) {
+	public boolean hasTargetProperty (LocaleId language,
+		String name)
+	{
 		return startGroup.hasTargetProperty(language, name);
 	}
 
@@ -124,7 +131,7 @@ class StorageList extends ArrayList<IResource>
 		return startGroup.getPropertyNames();
 	}
 
-	public Set<String> getTargetPropertyNames (String language) {
+	public Set<String> getTargetPropertyNames (LocaleId language) {
 		return startGroup.getTargetPropertyNames(language);
 	}
 
@@ -136,7 +143,7 @@ class StorageList extends ArrayList<IResource>
 		return startGroup.getSourcePropertyNames();
 	}
 
-	public Set<String> getTargetLanguages () {
+	public Set<LocaleId> getTargetLanguages () {
 		return startGroup.getTargetLanguages();
 	}
 
@@ -169,11 +176,11 @@ class StorageList extends ArrayList<IResource>
 		// Not implemented: read-only info
 	}
 
-	public String getMimeType() {
+	public String getMimeType () {
 		return startGroup.getMimeType();
 	}
 
-	public void setMimeType(String value) {
+	public void setMimeType (String value) {
 		// Not implemented: read-only info		
 	}
 
@@ -181,7 +188,7 @@ class StorageList extends ArrayList<IResource>
 		return startGroup.hasProperty(name);
 	}
 
-	public boolean hasSourceProperty(String name) {
+	public boolean hasSourceProperty (String name) {
 		return startGroup.hasSourceProperty(name);
 	}
 
@@ -189,11 +196,13 @@ class StorageList extends ArrayList<IResource>
 		startGroup.removeProperty(name);
 	}
 
-	public void removeSourceProperty(String name) {
+	public void removeSourceProperty (String name) {
 		startGroup.removeSourceProperty(name);
 	}
 
-	public void removeTargetProperty(String language, String name) {
+	public void removeTargetProperty (LocaleId language,
+		String name)
+	{
 		startGroup.removeTargetProperty(language, name);
 	}
 

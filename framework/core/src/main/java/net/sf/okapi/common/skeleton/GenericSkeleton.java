@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.TextFragment;
@@ -199,14 +200,14 @@ public class GenericSkeleton implements ISkeleton {
 	 * Adds to this skeleton a placeholder for the content (in a given language) of the resource
 	 * to which this skeleton is attached.
 	 * @param textUnit the resource object.
-	 * @param language the language code; use null if the reference is the source.
+	 * @param locId the locale; use null if the reference is the source.
 	 */
 	public void addContentPlaceholder (TextUnit textUnit,
-		String language)
+		LocaleId locId)
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker("$self$"));
 		part.parent = textUnit;
-		part.language = language;
+		part.language = locId;
 		list.add(part);
 		// Flag that the next append() should start a new part
 		createNew = true;
@@ -217,15 +218,15 @@ public class GenericSkeleton implements ISkeleton {
 	 * of the resource to which this skeleton is attached.
 	 * @param referent the resource object.
 	 * @param propName the property name.
-	 * @param language the language code; use null for the source; empty string for resource-level property.
+	 * @param locId the locale; use null for the source; LocaleId.EMPTY for resource-level property.
 	 */
 	public void addValuePlaceholder (INameable referent,
 		String propName,
-		String language)
+		LocaleId locId)
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(
 			TextFragment.makeRefMarker("$self$", propName));
-		part.language = language;
+		part.language = locId;
 		part.parent = referent;
 		list.add(part);
 		// Flag that the next append() should start a new part

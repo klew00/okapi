@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 
 public class SkeletonUtil {
@@ -34,70 +35,63 @@ public class SkeletonUtil {
 	 * @return index in the list of skeleton parts for the skeleton part containing the reference 
 	 */
 	public static int findTuRefInSkeleton(GenericSkeleton skel) {
-		
 		return findTuRefInSkeleton(skel, null);
 	}
 	
 	/**
 	 * Finds either source or target reference in the skeleton. If language is specified, then its target reference is sought for.
-	 * @param skel the skeleton is being sought for the reference
-	 * @param language the language to search the ref for
-	 * @return index in the list of skeleton parts for the skeleton part containing the reference 
+	 * @param skel the skeleton is being sought for the reference.
+	 * @param language the language to search the reference for.
+	 * @return index in the list of skeleton parts for the skeleton part containing the reference. 
 	 */
-	public static int findTuRefInSkeleton(GenericSkeleton skel, String language) {
-
-		if (skel == null) return -1; 		
+	public static int findTuRefInSkeleton(GenericSkeleton skel,
+		LocaleId language)
+	{
+		if ( skel == null ) return -1; 		
 		List<GenericSkeletonPart> list = skel.getParts();
-		
 		String tuRef = TextFragment.makeRefMarker("$self$");
 		
-		for (int i = 0; i < list.size(); i++) {
-			
+		for ( int i=0; i<list.size(); i++ ) {
 			GenericSkeletonPart part = list.get(i);				
 			String st = part.toString();
-			
-			if (Util.isEmpty(st)) continue;
-			
-			if (st.equalsIgnoreCase(tuRef)) {
-				if (Util.isEmpty(language))
+			if ( Util.isEmpty(st) ) continue;
+			if ( st.equalsIgnoreCase(tuRef) ) {
+				if ( Util.isNullOrEmpty(language) ) {
 					return i;
-				else
-					if (language.equalsIgnoreCase(part.getLanguage()))
-						return i;
+				}
+				else if ( language.equals(part.getLanguage()) ) {
+					return i;
+				}
 			}
 		}
-		
 		return -1;
 	}
 		
-	public static boolean hasTuRef(GenericSkeleton skel) {
-		
+	public static boolean hasTuRef (GenericSkeleton skel) {
 		return findTuRefInSkeleton(skel) != -1;
 	}
 	
-	public static boolean hasTuRef(GenericSkeleton skel, String language) {
-		
+	public static boolean hasTuRef (GenericSkeleton skel, LocaleId language) {
 		return findTuRefInSkeleton(skel, language) != -1;
 	}
 	
-	public static boolean replaceSkeletonPart(GenericSkeleton skel, int index, GenericSkeleton replacement) {
-		
-		if (skel == null) return false;
-		if (replacement == null) return false;
+	public static boolean replaceSkeletonPart (GenericSkeleton skel,
+		int index,
+		GenericSkeleton replacement)
+	{
+		if ( skel == null ) return false;
+		if ( replacement == null ) return false;
 		
 		List<GenericSkeletonPart> list = skel.getParts();
-		if (!Util.checkIndex(index, list)) return false;
-		
+		if ( !Util.checkIndex(index, list) ) return false;
+
 		List<GenericSkeletonPart> list2 = (List<GenericSkeletonPart>) ListUtil.moveItems(list); // clears the original list
-		
 		for (int i = 0; i < list2.size(); i++) {
-			
-			if (i == index)						
+			if ( i == index )						
 				skel.add(replacement);
 			else
 				list.add(list2.get(i));
 		}
-		
 		return true;
 	}
 	

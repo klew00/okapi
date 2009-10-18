@@ -41,6 +41,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -67,7 +68,7 @@ public class MIFFilter implements IFilter {
 	private TextContainer cont;
 	private boolean canceled;
 	private LinkedList<Event> queue;
-	private String srcLang;
+	private LocaleId srcLang;
 	private GenericSkeleton skel;
 	private boolean hasNext;
 	
@@ -157,12 +158,12 @@ public class MIFFilter implements IFilter {
 		open(input.getStream());
 	}
 	
-	private void setOptions (String sourceLanguage,
-		String targetLanguage,
+	private void setOptions (LocaleId sourceLocale,
+		LocaleId targetLocale,
 		String defaultEncoding,
 		boolean generateSkeleton)
 	{
-		srcLang = sourceLanguage;
+		srcLang = sourceLocale;
 	}
 
 	private void open (InputStream input) {

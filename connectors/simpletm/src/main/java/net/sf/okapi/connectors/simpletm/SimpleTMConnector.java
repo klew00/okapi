@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -36,8 +37,8 @@ public class SimpleTMConnector implements ITMQuery {
 	private int threshold = 98;
 	private List<QueryResult> results;
 	private int current = -1;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	private LinkedHashMap<String, String> attributes;
 	private Parameters params;
 
@@ -127,23 +128,23 @@ public class SimpleTMConnector implements ITMQuery {
 		}
 	}
 
-	public void setLanguages (String sourceLang,
-		String targetLang)
+	public void setLanguages (LocaleId sourceLang,
+		LocaleId targetLang)
 	{
-		srcLang = sourceLang;
-		trgLang = targetLang;
+		srcLoc = sourceLang;
+		trgLoc = targetLang;
 	}
 
-	public String getSourceLanguage () {
-		return srcLang;
+	public LocaleId getSourceLanguage () {
+		return srcLoc;
 	}
 	
-	public String getTargetLanguage () {
-		return trgLang;
+	public LocaleId getTargetLanguage () {
+		return trgLoc;
 	}
 
 	public void export (String outputPath) {
-		db.exportToTMX(outputPath, srcLang, trgLang);
+		db.exportToTMX(outputPath, srcLoc, trgLoc);
 	}
 
 	public int getMaximumHits () {

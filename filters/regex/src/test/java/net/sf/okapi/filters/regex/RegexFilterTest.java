@@ -20,11 +20,17 @@
 
 package net.sf.okapi.filters.regex;
 
-import net.sf.okapi.common.*;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -43,6 +49,9 @@ public class RegexFilterTest {
 	
 	private RegexFilter filter;
 	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
+	private LocaleId locFRCA = LocaleId.fromString("fr-ca");
 	
 	@Before
 	public void setUp() {
@@ -54,7 +63,7 @@ public class RegexFilterTest {
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"Test01_stringinfo_en.info", null),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 	
 	@Test
@@ -70,11 +79,11 @@ public class RegexFilterTest {
 		list.add(new InputDocument(root+"TestRules05.txt", "okf_regex@TestRules05.fprm"));
 		list.add(new InputDocument(root+"TestRules06.txt", "okf_regex@TestRules06.fprm")); 
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 
 		list.clear();
 		list.add(new InputDocument(root+"TestFrenchISL.isl", "okf_regex@INI.fprm")); 
-		assertTrue(rtc.executeCompare(filter, list, "Windows-1252", "fr", "fr-ca"));
+		assertTrue(rtc.executeCompare(filter, list, "Windows-1252", locFR, locFRCA));
 	}
 
 	@Test
@@ -142,7 +151,7 @@ public class RegexFilterTest {
 
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, "en"));
+		filter.open(new RawDocument(snippet, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);
@@ -174,7 +183,7 @@ public class RegexFilterTest {
 		listEvents(inputText);
 		
 		// Test individual events
-		filter.open(new RawDocument(inputText, "en"));
+		filter.open(new RawDocument(inputText, locEN));
 		
 		testEvent(EventType.START_DOCUMENT, "");
 		testEvent(EventType.TEXT_UNIT, "Line 1");
@@ -191,7 +200,7 @@ public class RegexFilterTest {
 		//                   0123456 7890123 4 5678901 2 3 4567890 1 2 3 4 5  
 		//                   0          1           2            3
 		
-		filter.open(new RawDocument(inputText2, "en"));
+		filter.open(new RawDocument(inputText2, locEN));
 		
 		testEvent(EventType.START_DOCUMENT, "");
 		testEvent(EventType.TEXT_UNIT, "Line 1");
@@ -265,7 +274,7 @@ public class RegexFilterTest {
 		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
 		
-		filter.open(new RawDocument(inputText, "en"));
+		filter.open(new RawDocument(inputText, locEN));
 		if (!testDriver.process(filter)) Assert.fail();
 		filter.close();
 	}

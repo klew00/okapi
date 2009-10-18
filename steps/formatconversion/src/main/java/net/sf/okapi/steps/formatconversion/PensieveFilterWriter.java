@@ -31,6 +31,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -43,14 +44,14 @@ import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 /**
  * Implementation of the {@link IFilterWriter} interface for Pensieve TM.
- * The resources are expected to have a target entry for the given target language.
+ * The resources are expected to have a target entry for the given target locale.
  */
 public class PensieveFilterWriter implements IFilterWriter {
 
 	private ITmWriter writer;
 	private String directory;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	
 	public void cancel () {
 		//TODO: support cancel
@@ -92,13 +93,13 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 	/**
 	 * Sets the options for this writer.
-	 * @param language code of the output language.
+	 * @param locale code of the output locale.
 	 * @param defaultEncoding encoding is ignored for this writer (it can be null).
 	 */
-	public void setOptions (String language,
+	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
-		trgLang = language;
+		trgLoc = locale;
 		// Encoding is ignored in this writer
 	}
 
@@ -132,29 +133,29 @@ public class PensieveFilterWriter implements IFilterWriter {
 		// If one exists we pass false to append to it
 		writer = TmWriterFactory.createFileBasedTmWriter(directory, !file.exists());
 		StartDocument sd = (StartDocument)event.getResource();
-		srcLang = sd.getLanguage();
+		srcLoc = sd.getLanguage();
 	}
 	
 	private void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 
 		//TODO: What do we do with entries with empty/non-existing target?
-		if ( !tu.hasTarget(trgLang) ) return;
+		if ( !tu.hasTarget(trgLoc) ) return;
 		//if ( tu.getTarget(trgLang).isEmpty() ) return;
 
 		try {
 			TextContainer srcCont = tu.getSource();
 			// If not segmented: index the whole entry
 			if ( !srcCont.isSegmented() ) {
-				writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLang, trgLang, tu));
+				writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLoc, trgLoc, tu));
 				return;
 			}
 			
 			// Else: check if we have the same number of segments
-			List<Segment> trgList = tu.getTarget(trgLang).getSegments();
+			List<Segment> trgList = tu.getTarget(trgLoc).getSegments();
 			if ( trgList.size() != srcCont.getSegmentCount() ) {
 				// Fall back to full entry
-				writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLang, trgLang, tu));
+				writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLoc, trgLoc, tu));
 				//TODO: Log a warning
 				return;
 			}
@@ -162,8 +163,8 @@ public class PensieveFilterWriter implements IFilterWriter {
 			// Index each segment
 			int i = 0;
 			for ( Segment segment : srcCont.getSegments() ) {
-				TranslationUnitVariant source = new TranslationUnitVariant(srcLang, segment.text);
-				TranslationUnitVariant target = new TranslationUnitVariant(trgLang, trgList.get(i).text);
+				TranslationUnitVariant source = new TranslationUnitVariant(srcLoc, segment.text);
+				TranslationUnitVariant target = new TranslationUnitVariant(trgLoc, trgList.get(i).text);
 				TranslationUnit trUnit = new TranslationUnit(source, target);
 				//TODO: what do we do with properties? e.g. tuid should not be used as it
 				//PensieveUtil.populateMetaDataFromProperties(tu, trUnit);

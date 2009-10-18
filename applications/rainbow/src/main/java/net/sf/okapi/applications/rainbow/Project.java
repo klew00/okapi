@@ -25,6 +25,7 @@ import net.sf.okapi.applications.rainbow.lib.PathBuilder;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ui.UIUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,9 +48,9 @@ public class Project {
 	private Hashtable<String, String> utilityParams;
 	private boolean useOutputRoot;
 	private String outputRoot;
-	private String sourceLanguage;
+	private LocaleId sourceLanguage;
 	private String sourceEncoding;
-	private String targetLanguage;
+	private LocaleId targetLanguage;
 	private String targetEncoding;
 	private boolean useCustomParamsFolder;
 	private String customParamsFolder;
@@ -83,8 +84,8 @@ public class Project {
 		
 		pathBuilder = new PathBuilder();
 		pathBuilder.setExtension(".out"); //$NON-NLS-1$
-		sourceLanguage = Utils.getDefaultSourceLanguage().toUpperCase();
-		targetLanguage = Utils.getDefaultTargetLanguage().toUpperCase();
+		sourceLanguage = Utils.getDefaultSourceLanguage();
+		targetLanguage = Utils.getDefaultTargetLanguage();
 		sourceEncoding = lm.getDefaultEncodingFromCode(sourceLanguage, UIUtil.getPlatformType());
 		targetEncoding = lm.getDefaultEncodingFromCode(targetLanguage, UIUtil.getPlatformType());
 		isModified = false;
@@ -220,9 +221,9 @@ public class Project {
 			writer.writeEndElement(); // output
 
 			writer.writeStartElement("options"); //$NON-NLS-1$
-			writer.writeAttributeString("sourceLanguage", sourceLanguage); //$NON-NLS-1$
+			writer.writeAttributeString("sourceLanguage", sourceLanguage.toString()); //$NON-NLS-1$
 			writer.writeAttributeString("sourceEncoding", sourceEncoding); //$NON-NLS-1$
-			writer.writeAttributeString("targetLanguage", targetLanguage); //$NON-NLS-1$
+			writer.writeAttributeString("targetLanguage", targetLanguage.toString()); //$NON-NLS-1$
 			writer.writeAttributeString("targetEncoding", targetEncoding); //$NON-NLS-1$
 			writer.writeEndElement(); // options
 			
@@ -356,8 +357,8 @@ public class Project {
 
 			elem1 = getFirstElement(rootElem, "options"); //$NON-NLS-1$
 			if ( elem1 == null ) throw new Exception(Res.getString("Project.optionsMissing")); //$NON-NLS-1$
-			sourceLanguage = elem1.getAttribute("sourceLanguage"); //$NON-NLS-1$
-			targetLanguage = elem1.getAttribute("targetLanguage"); //$NON-NLS-1$
+			sourceLanguage = LocaleId.fromString(elem1.getAttribute("sourceLanguage")); //$NON-NLS-1$
+			targetLanguage = LocaleId.fromString(elem1.getAttribute("targetLanguage")); //$NON-NLS-1$
 			sourceEncoding = elem1.getAttribute("sourceEncoding"); //$NON-NLS-1$
 			targetEncoding = elem1.getAttribute("targetEncoding"); //$NON-NLS-1$
 			
@@ -463,14 +464,14 @@ public class Project {
 		return outputRoot;
 	}
 
-	public void setSourceLanguage (String newLanguage) {
+	public void setSourceLanguage (LocaleId newLanguage) {
 		if ( !sourceLanguage.equals(newLanguage) ) {
 			sourceLanguage = newLanguage;
 			isModified = true;
 		}
 	}
 	
-	public String getSourceLanguage () {
+	public LocaleId getSourceLanguage () {
 		return sourceLanguage;
 	}
 	
@@ -485,14 +486,14 @@ public class Project {
 		return sourceEncoding;
 	}
 	
-	public void setTargetLanguage (String newLanguage) {
+	public void setTargetLanguage (LocaleId newLanguage) {
 		if ( !targetLanguage.equals(newLanguage) ) {
 			targetLanguage = newLanguage;
 			isModified = true;
 		}
 	}
 	
-	public String getTargetLanguage () {
+	public LocaleId getTargetLanguage () {
 		return targetLanguage;
 	}
 	
@@ -564,8 +565,8 @@ public class Project {
 		return pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
 			inputRoot,
 			(useOutputRoot ? outputRoot : null ),
-			sourceLanguage,
-			targetLanguage);
+			sourceLanguage.toString(),
+			targetLanguage.toString());
 	}
 	
 	public String buildRelativeTargetPath (int listIndex,
@@ -575,8 +576,8 @@ public class Project {
 		String tmp = pathBuilder.getPath(inputRoot + File.separator + relativeSourcePath,
 			inputRoot,
 			(useOutputRoot ? outputRoot : null ),
-			sourceLanguage,
-			targetLanguage);
+			sourceLanguage.toString(),
+			targetLanguage.toString());
 		if ( useOutputRoot ) {
 			return tmp.substring(inputRoot.length());
 		}

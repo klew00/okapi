@@ -1,6 +1,7 @@
 package net.sf.okapi.applications.serval;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
@@ -329,57 +330,21 @@ public class ServalForm {
 		}
 	}
 
-	private String getDefaultSourceLanguage ()
-	{
+	private LocaleId getDefaultSourceLanguage () {
 		// In most case the 'source' language is English
 		// Even when we are on non-English machines
-		return "en-US";
+		return LocaleId.fromString("en-us");
 	}
 	
-	private String getDefaultTargetLanguage ()
+	private LocaleId getDefaultTargetLanguage ()
 	{
 		// Use the local language by default
-		Locale Loc = Locale.getDefault();
-		String sCode = Loc.getLanguage();
-		if ( Loc.getCountry().length() > 0 ) {
-			sCode = sCode + "-" + Loc.getCountry();
-		}
+		LocaleId locId = new LocaleId(Locale.getDefault());
 		// If it's the same as the source, use an arbitrary value.
-		if ( areSameLanguages(sCode, getDefaultSourceLanguage(), true) ) return "fr-FR";
-		else return sCode;
-	}
-
-	private boolean areSameLanguages (String p_sLanguage1,
-		String p_sLanguage2,
-		boolean p_bIgnoreSubLanguage)
-	{
-		String sL1;
-		String sL2;
-		if ( p_sLanguage1.length() == 0 ) return false;
-		if ( p_sLanguage2.length() == 0 ) return false;
-
-		p_sLanguage1 = p_sLanguage1.replace('_', '-');
-		p_sLanguage2 = p_sLanguage2.replace('_', '-');
-
-		if ( !p_bIgnoreSubLanguage ) {
-			sL1 = p_sLanguage1;
-			sL2 = p_sLanguage2;
+		if ( locId.sameLanguageAs(getDefaultSourceLanguage()) ) {
+			return LocaleId.fromString("fr-fr");
 		}
-		else { // Do not take the sub-language is account
-			if ( p_sLanguage1.length() > 2 ) {
-				sL1 = p_sLanguage1.substring(0, 3);
-				if ( sL1.charAt(2) == '-' ) sL1 = sL1.substring(0, 2);
-			}
-			else sL1 = p_sLanguage1.substring(0, 2);
-
-			if ( p_sLanguage2.length() > 2 ) {
-				sL2 = p_sLanguage2.substring(0, 3);
-				if ( sL2.charAt(2) == '-' ) sL2 = sL2.substring(0, 2);
-			}
-			else sL2 = p_sLanguage2.substring(0, 2);
-		}
-
-		return sL1.equalsIgnoreCase(sL2);
+		return locId;
 	}
 
 	/**
@@ -458,12 +423,12 @@ public class ServalForm {
 			if ( paths == null ) return;
 			
 			TmxFilter filter = new TmxFilter();
-			OkapiTmxImporter imp = new OkapiTmxImporter(langs[0], filter);
+			OkapiTmxImporter imp = new OkapiTmxImporter(LocaleId.fromString(langs[0]), filter);
 			
 			ITmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir, true);
 			
 			File file = new File(paths[0]);
-			imp.importTmx(file.toURI(), langs[1], writer);
+			imp.importTmx(file.toURI(), LocaleId.fromString(langs[1]), writer);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);

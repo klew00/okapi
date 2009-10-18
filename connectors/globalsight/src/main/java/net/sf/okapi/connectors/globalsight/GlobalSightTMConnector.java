@@ -49,6 +49,7 @@ import com.globalsight.www.webservices.AmbassadorWebServiceSoapBindingStub;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -97,12 +98,12 @@ public class GlobalSightTMConnector implements ITMQuery {
 		throw new OkapiNotImplementedException("The export() method is not supported.");
 	}
 
-	public String getSourceLanguage () {
-		return toISOCode(srcLang);
+	public LocaleId getSourceLanguage () {
+		return LocaleId.fromPOSIXLocale(srcLang);
 	}
 
-	public String getTargetLanguage () {
-		return toISOCode(trgLang);
+	public LocaleId getTargetLanguage () {
+		return LocaleId.fromPOSIXLocale(trgLang);
 	}
 
 	public boolean hasNext () {
@@ -438,21 +439,16 @@ public class GlobalSightTMConnector implements ITMQuery {
 	{
 	}
 
-	public void setLanguages (String sourceLang,
-		String targetLang)
+	public void setLanguages (LocaleId sourceLocale,
+		LocaleId targetLocale)
 	{
-		srcLang = toInternalCode(sourceLang);
-		trgLang = toInternalCode(targetLang);
+		srcLang = toInternalCode(sourceLocale);
+		trgLang = toInternalCode(targetLocale);
 	}
 
-	private String toInternalCode (String standardCode) {
+	private String toInternalCode (LocaleId locale) {
 		//TODO: Do we need to adjust the code to always have the country?
-		String code = standardCode.toLowerCase().replace('-', '_');
-		return code;
-	}
-
-	private String toISOCode (String internalCode) {
-		String code = internalCode.toLowerCase().replace('_', '-');
+		String code = locale.toPOSIXLocaleId();
 		return code;
 	}
 

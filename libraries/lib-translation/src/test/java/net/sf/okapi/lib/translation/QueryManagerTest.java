@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.translation;
 
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -33,6 +34,8 @@ public class QueryManagerTest {
 
 	private QueryManager qm;
 	private GenericContent fmt = new GenericContent();
+	private LocaleId locSrc = LocaleId.fromString("src");
+	private LocaleId locTrg = LocaleId.fromString("trg");
 	
 	@Before
 	public void setUp() {
@@ -41,9 +44,9 @@ public class QueryManagerTest {
 
 	@Test
 	public void testLanguages () {
-		qm.setLanguages("src", "trg");
-		assertEquals("src", qm.getSourceLanguage());
-		assertEquals("trg", qm.getTargetLanguage());
+		qm.setLanguages(locSrc, locTrg);
+		assertEquals(locSrc, qm.getSourceLanguage());
+		assertEquals(locTrg, qm.getTargetLanguage());
 	}
 
 //	@Test
@@ -59,7 +62,7 @@ public class QueryManagerTest {
 		TextUnit tu = new TextUnit("1", "src");
 		TextFragment newFrag = new TextFragment("trg");
 		qm.adjustNewFragment(tu.getSourceContent(), newFrag, false, tu);
-		assertEquals("trg", newFrag.toString());
+		assertEquals(locTrg, newFrag.toString());
 	}
 
 	@Test

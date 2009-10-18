@@ -39,6 +39,7 @@ import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -57,7 +58,7 @@ public class POFilterWriter implements IFilterWriter {
 	private String outputPath;
 	private OutputStreamWriter writer;
 	private File tempFile;
-	private String language;
+	private LocaleId language;
 	private String encoding;
 	private int group;
 	private int pluralGroup;
@@ -165,7 +166,7 @@ public class POFilterWriter implements IFilterWriter {
 		return event;
 	}
 	
-	public void setOptions (String language,
+	public void setOptions (LocaleId language,
 		String defaultEncoding)
 	{
 		this.language = language;

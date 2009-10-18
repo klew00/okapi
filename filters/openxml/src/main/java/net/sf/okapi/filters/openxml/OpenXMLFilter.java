@@ -45,6 +45,7 @@ import net.sf.okapi.common.exceptions.*;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -95,7 +96,7 @@ public class OpenXMLFilter implements IFilter {
 	private Enumeration<? extends ZipEntry> entries;
 	private int subDocId;
 	private LinkedList<Event> queue;
-	private String srcLang;
+	private LocaleId srcLang;
 	private OpenXMLContentFilter openXMLContentFilter;
 	private ConditionalParameters cparams=null; // DWH 6-16-09
 	private int nZipType=MSWORD;
@@ -103,7 +104,7 @@ public class OpenXMLFilter implements IFilter {
 	private Level nLogLevel=Level.FINE;
 	private boolean bSquishable=true;
 	private AbstractTranslator translator=null;
-	private String sOutputLanguage="en-US";
+	private LocaleId sOutputLanguage = LocaleId.fromString("en-us");
 	private boolean canceled = false;
 	private boolean bPreferenceTranslateDocProperties = true;
 	private boolean bPreferenceTranslateComments = true;
@@ -141,7 +142,7 @@ public class OpenXMLFilter implements IFilter {
 	 * @param translator the class that translates the text of a text fragment
 	 * @param sOutputLanguage the locale of the output language, in the form en-US
 	 */
-	public OpenXMLFilter(AbstractTranslator translator, String sOutputLanguage) {
+	public OpenXMLFilter(AbstractTranslator translator, LocaleId sOutputLanguage) {
 		this.translator = translator;
 		this.sOutputLanguage = sOutputLanguage;
 		cparams = new ConditionalParameters(); // DWH 6-16-09
@@ -450,7 +451,7 @@ public class OpenXMLFilter implements IFilter {
 	 * @param defaultEncoding encoding, such as "UTF-8"
 	 * @param generateSkeleton true if skeleton should be generated
 	 */
-	public void setOptions (String sourceLanguage,
+	public void setOptions (LocaleId sourceLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)
 	{
@@ -464,8 +465,8 @@ public class OpenXMLFilter implements IFilter {
 	 * @param defaultEncoding encoding, such as "UTF-8"
 	 * @param generateSkeleton true if skeleton should be generated
 	 */
-	public void setOptions (String sourceLanguage,
-		String targetLanguage,
+	public void setOptions (LocaleId sourceLanguage,
+		LocaleId targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)
 	{

@@ -39,6 +39,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
 import org.junit.Before;
@@ -50,6 +51,9 @@ public class XLIFFFilterTest {
 	private XLIFFFilter filter;
 	private GenericContent fmt;
 	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
+	private LocaleId locES = LocaleId.fromString("es");
 
 	@Before
 	public void setUp() {
@@ -72,7 +76,7 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		TextContainer cont = tu.getTarget("fr");
+		TextContainer cont = tu.getTarget(locFR);
 		assertEquals(2, cont.getSegmentCount());
 		assertEquals("t1.", cont.getSegments().get(0).text.toString());
 		assertEquals("t2", cont.getSegments().get(1).text.toString());
@@ -141,7 +145,7 @@ public class XLIFFFilterTest {
 			+ "</trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "fr"));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locFR));
 	}
 
 	@Test
@@ -163,7 +167,7 @@ public class XLIFFFilterTest {
 			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
 			+ "<target xml:lang=\"fr\">t1. t2</target>"
 			+ "\r</trans-unit></body></file></xliff>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "fr"));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locFR));
 	}
 
 	@Test
@@ -174,7 +178,7 @@ public class XLIFFFilterTest {
 		AltTransAnnotation annot = tu.getAnnotation(AltTransAnnotation.class);
 		assertNotNull(annot);
 		assertEquals("alt source {t1}", annot.getEntry().getSource().toString());
-		assertEquals("alt target {t1}", annot.getEntry().getTarget("fr").toString());
+		assertEquals("alt target {t1}", annot.getEntry().getTarget(locFR).toString());
 	}
 
 	@Test
@@ -191,7 +195,7 @@ public class XLIFFFilterTest {
 			+ "<body><trans-unit id=\"1\" resname=\"13\"><source><g id=\"1\">S1</g>, <g id=\"2\">S2</g></source>"
 			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
 			+ "</file></xliff>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), "en"));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
 	}
 
 	@Test
@@ -199,8 +203,8 @@ public class XLIFFFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(createApprovedTU(), 1);
 		assertNotNull(tu);
 		assertEquals("t1", tu.getSourceContent().toString());
-		assertEquals("translated t1", tu.getTargetContent("fr").toString());
-		Property prop = tu.getTargetProperty("fr", Property.APPROVED);
+		assertEquals("translated t1", tu.getTargetContent(locFR).toString());
+		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("yes", prop.getValue());
 	}
@@ -218,7 +222,7 @@ public class XLIFFFilterTest {
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"JMP-11-Test01.xlf", null),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 	
 	@Test
@@ -247,9 +251,9 @@ public class XLIFFFilterTest {
 		assertEquals("S1, S2", tu.getSource().toString());
 		fmt.setContent(tu.getSourceContent());
 		assertEquals("<1>S1</1>, <2>S2</2>", fmt.toString());
-		assertTrue(tu.hasTarget("fr"));
-		assertEquals("T2, T1", tu.getTarget("fr").toString());
-		fmt.setContent(tu.getTargetContent("fr"));
+		assertTrue(tu.hasTarget(locFR));
+		assertEquals("T2, T1", tu.getTarget(locFR).toString());
+		fmt.setContent(tu.getTargetContent(locFR));
 		assertEquals("<2>T2</2>, <1>T1</1>", fmt.toString());
 	}
 
@@ -257,9 +261,9 @@ public class XLIFFFilterTest {
 	public void testBilingualInlines () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createBilingualXLIFF(), 1);
 		assertNotNull(tu);
-		assertTrue(tu.hasTarget("fr"));
+		assertTrue(tu.hasTarget(locFR));
 		TextFragment src = tu.getSourceContent();
-		TextFragment trg = tu.getTargetContent("fr");
+		TextFragment trg = tu.getTargetContent(locFR);
 		assertEquals(4, src.getCodes().size());
 		assertEquals(src.getCodes().size(), trg.getCodes().size());
 		FilterTestDriver.checkCodeData(src, trg);
@@ -271,8 +275,8 @@ public class XLIFFFilterTest {
 		assertNotNull(tu);
 		fmt.setContent(tu.getSourceContent());
 		assertEquals("<1>S1</1>, <2>S2</2>", fmt.toString());
-		assertTrue(tu.hasTarget("fr"));
-		fmt.setContent(tu.getTargetContent("fr"));
+		assertTrue(tu.hasTarget(locFR));
+		fmt.setContent(tu.getTargetContent(locFR));
 		assertEquals("<2>T2</2>, <1>T1</1>", fmt.toString());
 	}
 
@@ -324,8 +328,8 @@ public class XLIFFFilterTest {
 	public void testComplexSUBInTarget () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createComplexSUBTypeXLIFF(), 1);
 		assertNotNull(tu);
-		tu.createTarget("fr", true, IResource.COPY_ALL);
-		Code code = tu.getTarget("fr").getCode(0);
+		tu.createTarget(locFR, true, IResource.COPY_ALL);
+		Code code = tu.getTarget(locFR).getCode(0);
 		assertEquals(code.getData(), "startCode<sub>[nested<ph id=\"2\">ph-in-sub</ph>still in sub]</sub>endCode");
 		assertEquals(code.getOuterData(), "<ph id=\"1\">startCode<sub>[nested<ph id=\"2\">ph-in-sub</ph>still in sub]</sub>endCode</ph>");
 	}
@@ -340,7 +344,7 @@ public class XLIFFFilterTest {
 		prop = tu.getSourceProperty(Property.NOTE);
 		assertNotNull(prop);
 		assertEquals("note src 1\n---\nnote src 2", prop.getValue());
-		prop = tu.getTargetProperty("fr", Property.NOTE);
+		prop = tu.getTargetProperty(locFR, Property.NOTE);
 		assertNotNull(prop);
 		assertEquals("note trg", prop.getValue());
 	}
@@ -359,13 +363,13 @@ public class XLIFFFilterTest {
 		list.add(new InputDocument(root+"BinUnitTest01.xlf", null));
 		list.add(new InputDocument(root+"Typo3Draft.xlf", null));
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 
 		list.clear();
 		list.add(new InputDocument(root+"SF-12-Test01.xlf", null));
 		list.add(new InputDocument(root+"SF-12-Test02.xlf", null));
 		rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "es"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locES));
 	}
 
 	private ArrayList<Event> createSimpleXLIFF () {
@@ -476,7 +480,7 @@ public class XLIFFFilterTest {
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, "en", "fr"));
+		filter.open(new RawDocument(snippet, locEN, locFR));
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			list.add(event);

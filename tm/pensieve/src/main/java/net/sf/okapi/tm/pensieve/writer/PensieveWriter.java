@@ -137,17 +137,19 @@ public class PensieveWriter implements ITmWriter {
 //    }
 
     Field createField(TranslationUnitField field,
-                  TextFragment frag,
-                  Field.Store store,
-                  Field.Index index){
+    	TextFragment frag,
+    	Field.Store store,
+    	Field.Index index)
+    {
         return new Field(field.name(), frag.toString(), store, index);
     }
 
     Field createField(TranslationUnitField field,
-                  TranslationUnitVariant tuv,
-                  Field.Store store,
-                  Field.Index index){
-        return new Field(field.name(), tuv.getLang(), store, index);
+    	TranslationUnitVariant tuv,
+    	Field.Store store,
+    	Field.Index index)
+    {
+        return new Field(field.name(), tuv.getLanguage().toString(), store, index);
     }
 
     void addMetadataToDocument(Document doc, Metadata metadata) {

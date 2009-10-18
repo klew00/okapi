@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -45,8 +46,8 @@ public class TMXWriter {
 
     private XMLWriter writer;
     private TMXContent tmxCont = new TMXContent();
-    private String srcLang;
-    private String trgLang;
+    private LocaleId srcLoc;
+    private LocaleId trgLoc;
     private int itemCount;
     private Pattern exclusionPattern = null;
 
@@ -125,30 +126,30 @@ public class TMXWriter {
 
     /**
      * Writes the start of the TMC document.
-     * @param sourceLanguage The source language (must be set).
-     * @param targetLanguage The target language (must be set).
+     * @param sourceLocale The source language (must be set).
+     * @param targetLocale The target language (must be set).
      * @param creationTool The identifier of the creation tool (can be null).
      * @param creationToolVersion The version of the creation tool (can be null).
      * @param segType The type of segments in the output.
      * @param originalTMFormat The identifier for the original TM engine (can be null).
      * @param dataType The type of data to output.
      */
-    public void writeStartDocument(String sourceLanguage,
-   		String targetLanguage,
+    public void writeStartDocument(LocaleId sourceLocale,
+   		LocaleId targetLocale,
    		String creationTool,
    		String creationToolVersion,
    		String segType,
    		String originalTMFormat,
    		String dataType)
     {
-    	if ( sourceLanguage == null ) {
+    	if ( sourceLocale == null ) {
     		throw new NullPointerException();
     	}
-    	if ( targetLanguage == null ) {
+    	if ( targetLocale == null ) {
     		throw new NullPointerException();
     	}
-    	this.srcLang = sourceLanguage;
-    	this.trgLang = targetLanguage;
+    	this.srcLoc = sourceLocale;
+    	this.trgLoc = targetLocale;
 
     	writer.writeStartDocument();
     	writer.writeStartElement("tmx");
@@ -164,7 +165,7 @@ public class TMXWriter {
     	writer.writeAttributeString("o-tmf",
     		(originalTMFormat == null) ? "unknown" : originalTMFormat);
     	writer.writeAttributeString("adminlang", "en");
-    	writer.writeAttributeString("srclang", srcLang);
+    	writer.writeAttributeString("srclang", srcLoc.toBCP47());
     	writer.writeAttributeString("datatype",
     		(dataType == null) ? "unknown" : dataType);
     	writer.writeEndElement(); // header
@@ -212,12 +213,12 @@ public class TMXWriter {
     	}
 
     	TextContainer srcTC = item.getSource();
-    	TextContainer trgTC = item.getTarget(trgLang);
+    	TextContainer trgTC = item.getTarget(trgLoc);
 
     	if (( trgTC == null ) && alternate ) {
     		// If we don't have a target but are in alternate mode: get the first
     		// available language in the list
-    		Iterator<String> iter = item.getTargetLanguages().iterator();
+    		Iterator<LocaleId> iter = item.getTargetLanguages().iterator();
     		if ( iter.hasNext() ) {
     			trgTC = item.getTarget(iter.next());
     		}
@@ -301,7 +302,7 @@ public class TMXWriter {
     	}
 
     	writer.writeStartElement("tuv");
-    	writer.writeAttributeString("xml:lang", srcLang);
+    	writer.writeAttributeString("xml:lang", srcLoc.toBCP47());
     	writer.writeStartElement("seg");
     	writer.writeRawXML(tmxCont.setContent(source).toString());
     	writer.writeEndElement(); // seg
@@ -309,7 +310,7 @@ public class TMXWriter {
 
     	if ( target != null ) {
     		writer.writeStartElement("tuv");
-    		writer.writeAttributeString("xml:lang", trgLang);
+    		writer.writeAttributeString("xml:lang", trgLoc.toBCP47());
     		writer.writeStartElement("seg");
     		writer.writeRawXML(tmxCont.setContent(target).toString());
     		writer.writeEndElement(); // seg
@@ -335,7 +336,7 @@ public class TMXWriter {
     	}
 
     	TextContainer srcCont = item.getSource();
-    	Set<String> langs = item.getTargetLanguages();
+    	Set<LocaleId> locales = item.getTargetLanguages();
 
     	//TODO: Support segmented output
     	if ( !srcCont.isSegmented() ) { // Source is not segmented
@@ -357,11 +358,11 @@ public class TMXWriter {
     		}
 
     		// Write source TUV
-    		writeTUV(srcCont, srcLang, srcCont);
+    		writeTUV(srcCont, srcLoc, srcCont);
 
     		// Write each target TUV
-    		for ( String lang : langs ) {
-    			writeTUV(item.getTarget(lang), lang, item.getTarget(lang));
+    		for ( LocaleId loc : locales ) {
+    			writeTUV(item.getTarget(loc), loc, item.getTarget(loc));
     		}
 
     		// Write end TU
@@ -373,16 +374,16 @@ public class TMXWriter {
      * Writes a TUV element.
      * @param frag The TextFragment for the content of this TUV. This can be
      * a segment of a TextContainer.
-     * @param language The language for this TUV.
+     * @param locale The language for this TUV.
      * @param contForProp The TextContainer that has the properties to write for
      * this TUV, or null for no properties.
      */
     private void writeTUV (TextFragment frag,
-   		String language,
+   		LocaleId locale,
    		TextContainer contForProp)
     {
     	writer.writeStartElement("tuv");
-    	writer.writeAttributeString("xml:lang", language);
+    	writer.writeAttributeString("xml:lang", locale.toBCP47());
     	writer.writeStartElement("seg");
     	writer.writeRawXML(tmxCont.setContent(frag).toString());
     	writer.writeEndElement(); // seg

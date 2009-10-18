@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.openxml.AbstractTranslator;
@@ -53,6 +54,7 @@ public class CodePeekTranslator extends AbstractTranslator {
 	static final String ppoff="</a:t></a:r>";
 	static final String lbrac="{";
 	static final String rbrac="}";
+	static final LocaleId locENUS = LocaleId.fromString("en-us");
 
 	public String translate(TextFragment tf, Logger LOGGER, int nFileType)
 	{
@@ -243,7 +245,7 @@ public class CodePeekTranslator extends AbstractTranslator {
 		String s,ss="";
 		int len;
 		char carrot;
-		s = expandCodeContent(code, "en-US", 1);
+		s = expandCodeContent(code, locENUS, 1);
 		len = s.length();
 		for(int i=0; i<len; i++)
 		{

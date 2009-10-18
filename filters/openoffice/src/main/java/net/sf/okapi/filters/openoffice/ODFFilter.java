@@ -81,7 +81,6 @@ public class ODFFilter implements IFilter {
 	private XMLStreamReader reader;
 	private int otherId;
 	private int tuId;
-	private String language;
 	private Parameters params;
 	private GenericSkeleton skel;
 	private TextFragment tf;
@@ -198,7 +197,6 @@ public class ODFFilter implements IFilter {
 		catch ( XMLStreamException e ) {
 			throw new OkapiIOException("Cannot create the XML stream.", e);
 		}
-		language = input.getSourceLanguage();
 		if ( input.getInputURI() != null ) {
 			docName = input.getInputURI().getPath();
 		}
@@ -210,7 +208,7 @@ public class ODFFilter implements IFilter {
 
 		queue = new LinkedList<Event>();
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
-		startDoc.setLanguage(language);
+		startDoc.setLanguage(input.getSourceLanguage());
 		startDoc.setName(docName);
 		startDoc.setMimeType(MIMETYPE);
 		startDoc.setType(startDoc.getMimeType());

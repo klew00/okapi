@@ -41,6 +41,7 @@ import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -58,7 +59,7 @@ public class Merger {
 	private IFilter inpFilter;
 	private IFilterWriter outFilter;
 	private RTFFilter rtfFilter;
-	private String trgLang;
+	private LocaleId trgLang;
 
 	public Merger () {
 		// Load the filter configurations

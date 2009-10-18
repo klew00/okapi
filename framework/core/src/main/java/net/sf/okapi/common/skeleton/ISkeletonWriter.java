@@ -22,6 +22,7 @@ package net.sf.okapi.common.skeleton;
 
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -41,14 +42,14 @@ public interface ISkeletonWriter {
 	
 	/**
 	 * Processes the START_DOCUMENT event.
-	 * @param outputLanguage the code of the output language. 
+	 * @param outputLocale the output locale. 
 	 * @param outputEncoding the name of the output charset encoding.
 	 * @param layer the layer provider to use.
 	 * @param encoderManager the encoder manager to use.
 	 * @param resource the StartDocument resource associated with the event.
 	 * @return the string output corresponding to this event.
 	 */
-	public String processStartDocument (String outputLanguage,
+	public String processStartDocument (LocaleId outputLocale,
 		String outputEncoding,
 		ILayerProvider layer,
 		EncoderManager encoderManager,

@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -38,8 +39,8 @@ public class LeveragingStep extends BasePipelineStep {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private Parameters params;
-	private String sourceLanguage;
-	private String targetLanguage;
+	private LocaleId sourceLocale;
+	private LocaleId targetLocale;
 	private QueryManager qm;
 	private TMXWriter tmxWriter;
 
@@ -48,13 +49,13 @@ public class LeveragingStep extends BasePipelineStep {
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LANGUAGE)
-	public void setSourceLanguage (String sourceLanguage) {
-		this.sourceLanguage = sourceLanguage;
+	public void setsourceLocale (LocaleId sourceLocale) {
+		this.sourceLocale = sourceLocale;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 	
 	public String getName () {
@@ -73,7 +74,7 @@ public class LeveragingStep extends BasePipelineStep {
 	@Override
 	protected void handleStartBatch (Event event) {
 		qm = new QueryManager();
-		qm.setLanguages(sourceLanguage, targetLanguage);
+		qm.setLanguages(sourceLocale, targetLocale);
 		qm.setThreshold(params.getThreshold());
 		int id = qm.addAndInitializeResource(params.getResourceClassName(), null,
 			params.getResourceParameters());
@@ -83,7 +84,7 @@ public class LeveragingStep extends BasePipelineStep {
 			
 		if ( params.getMakeTMX() ) {
 			tmxWriter = new TMXWriter(params.getTMXPath());
-			tmxWriter.writeStartDocument(sourceLanguage, targetLanguage,
+			tmxWriter.writeStartDocument(sourceLocale, targetLocale,
 				getClass().getName(), "", "sentence", "undefined", "undefined");
 		}
 	}
@@ -110,7 +111,7 @@ public class LeveragingStep extends BasePipelineStep {
 		if ( !tu.isTranslatable() ) return;
 
     	boolean approved = false;
-    	Property prop = tu.getTargetProperty(targetLanguage, Property.APPROVED);
+    	Property prop = tu.getTargetProperty(targetLocale, Property.APPROVED);
     	if ( prop != null ) {
     		if ( "yes".equals(prop.getValue()) ) approved = true;
     	}

@@ -29,6 +29,7 @@ import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -50,7 +51,7 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	private IFilterConfigurationMapper fcMapper;
 	private String filterConfigId;
 	private URI outputURI;
-	private String targetLanguage;
+	private LocaleId targetLocale;
 	private String outputEncoding;
 	private String documentsRoot;
 
@@ -87,10 +88,10 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
-	
+
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_ENCODING)
 	public void setOutputEncoding (String outputEncoding) {
 		this.outputEncoding = outputEncoding;
@@ -144,13 +145,13 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 					throw new OkapiFilterCreationException("Error when creating writer from filter.");
 				}
 				filterWriter = tmp.createFilterWriter();
-				filterWriter.setOptions(targetLanguage, outputEncoding);
+				filterWriter.setOptions(targetLocale, outputEncoding);
 				filterWriter.setParameters(tmp.getParameters());
 				filterWriter.setOutput(outputURI.getPath());
 			}
 			else { // If we have a custom writer, use it
 				filterWriter = customFilterWriter;
-				filterWriter.setOptions(targetLanguage, outputEncoding);
+				filterWriter.setOptions(targetLocale, outputEncoding);
 				filterWriter.setOutput(outputURI.getPath());
 				normalizeResourceName(event);
 			}

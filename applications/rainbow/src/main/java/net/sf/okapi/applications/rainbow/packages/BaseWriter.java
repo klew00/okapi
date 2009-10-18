@@ -24,6 +24,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
@@ -52,7 +53,7 @@ public abstract class BaseWriter implements IWriter {
 	protected String tmxPathAlternate;
 	protected TMXWriter tmxWriterLeverage;
 	protected String tmxPathLeverage;
-	protected String trgLang;
+	protected LocaleId trgLoc;
 	protected String encoding;
 	protected String outputPath;
 	protected boolean preSegmented;
@@ -67,17 +68,17 @@ public abstract class BaseWriter implements IWriter {
 		//TODO: implement cancel()
 	}
 	
-	public void setInformation (String sourceLanguage,
-		String targetLanguage,
+	public void setInformation (LocaleId sourceLocale,
+		LocaleId targetLocale,
 		String projectID,
 		String outputFolder,
 		String packageID,
 		String sourceRoot,
 		boolean preSegmented)
 	{
-		manifest.setSourceLanguage(sourceLanguage);
-		trgLang = targetLanguage;
-		manifest.setTargetLanguage(trgLang);
+		manifest.setSourceLanguage(sourceLocale);
+		trgLoc = targetLocale;
+		manifest.setTargetLanguage(trgLoc);
 		manifest.setProjectID(projectID);
 		manifest.setRoot(outputFolder);
 		manifest.setPackageID(packageID);
@@ -228,7 +229,7 @@ public abstract class BaseWriter implements IWriter {
 		String outputPath = manifest.getRoot() + File.separator
 			+ ((manifest.getSourceLocation().length() == 0 ) ? "" : (manifest.getSourceLocation() + File.separator)) 
 			+ relativeWorkPath;
-		setOptions(trgLang, targetEncoding);
+		setOptions(trgLoc, targetEncoding);
 		setOutput(outputPath);
 	}
 
@@ -256,10 +257,10 @@ public abstract class BaseWriter implements IWriter {
 		Util.copyFile(inputPath, outputPath, false);
 	}
 
-	public void setOptions (String language,
+	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
-		trgLang = language;
+		trgLoc = locale;
 		encoding = defaultEncoding;
 	}
 	
@@ -273,21 +274,21 @@ public abstract class BaseWriter implements IWriter {
 
 	public void writeTMXEntries (TextUnit tu) {
 		// Write the items in the TM if needed
-		TextContainer tc = tu.getTarget(trgLang);
+		TextContainer tc = tu.getTarget(trgLoc);
 		if (( tc != null ) && ( !tc.isEmpty() )) {
 			if ( tu.getSourceContent().isEmpty() ||
 				( tu.getSourceContent().hasText(false) && !tc.hasText(false) )) {
 				return; // Target has code and/or spaces only
 			}
 			boolean done = false;
-			if ( tu.hasTargetProperty(trgLang, Property.APPROVED) ) {
-				if ( tu.getTargetProperty(trgLang, Property.APPROVED).getValue().equals("yes") ) {
+			if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
+				if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
 					tmxWriterApproved.writeItem(tu, null);
 					done = true;
 				}
 			}
 			if ( !done ) {
-				ScoresAnnotation scores = tu.getTarget(trgLang).getAnnotation(ScoresAnnotation.class);
+				ScoresAnnotation scores = tu.getTarget(trgLoc).getAnnotation(ScoresAnnotation.class);
 				if ( scores != null ) {
 					writeScoredItem(tu, scores);
 				}

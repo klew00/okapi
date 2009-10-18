@@ -61,6 +61,7 @@ import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,7 +71,11 @@ public class FixedWidthColumnsFilterTest {
 
 	private FixedWidthColumnsFilter filter;
 	private FilterTestDriver testDriver;
-    private String root; // maven move; //m marks deletions
+    private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
+	private LocaleId locIT = LocaleId.fromString("it");
+	private LocaleId locGESW = LocaleId.fromString("ge-sw");
 	
 	@Before
 	public void setUp() {
@@ -95,7 +100,7 @@ public class FixedWidthColumnsFilterTest {
 		// Empty stream, OkapiBadFilterInputException expected, no other		
 		InputStream input = null;
 		try {			
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -107,7 +112,7 @@ public class FixedWidthColumnsFilterTest {
 		// Empty URI, OkapiBadFilterInputException expected, no other
 		URI uri = null;
 		try {
-			filter.open(new RawDocument(uri, "UTF-8", "en"));
+			filter.open(new RawDocument(uri, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -119,7 +124,7 @@ public class FixedWidthColumnsFilterTest {
 		// Empty char seq, OkapiBadFilterInputException expected, no other		
 		String st = null;
 		try {
-			filter.open(new RawDocument(st, "UTF-8", "en"));
+			filter.open(new RawDocument(st, locEN, locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -155,7 +160,7 @@ public class FixedWidthColumnsFilterTest {
 			
 			InputStream input2 = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		try {
-			filter.open(new RawDocument(input2, "UTF-8", "en"));
+			filter.open(new RawDocument(input2, "UTF-8", locEN));
 			fail("OkapiBadFilterParametersException should've been trown");
 		}
 		catch (OkapiBadFilterParametersException e) {
@@ -172,7 +177,7 @@ public class FixedWidthColumnsFilterTest {
 		
 		// Read lines from a file, check mime types 
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		while (filter.hasNext()) {
 			Event event = filter.next();
@@ -253,7 +258,7 @@ public class FixedWidthColumnsFilterTest {
 		assertEquals("11, 32, 62, 83, 97, 112, 133, 151", params.columnEndPositions);
 		
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		
 		// Check if parameters type is controlled
@@ -261,7 +266,7 @@ public class FixedWidthColumnsFilterTest {
 		filter.setParameters(new net.sf.okapi.filters.plaintext.base.Parameters());
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		try {
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			fail("OkapiBadFilterParametersException should've been trown");
 		}
 		catch (OkapiBadFilterParametersException e) {
@@ -272,7 +277,7 @@ public class FixedWidthColumnsFilterTest {
 		filter.setParameters(new net.sf.okapi.filters.table.fwc.Parameters());
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		try {
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 		}
 		catch (OkapiBadFilterParametersException e) {
 			fail("OkapiBadFilterParametersException should NOT have been trown");
@@ -308,18 +313,18 @@ public class FixedWidthColumnsFilterTest {
 		params.commentSourceRefs = "4";
 		params.recordIdColumn = 8;
 				
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Value24", "Value21", "Value27", "it", "Value25");
-		testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", "ge-sw", "");
+		testEvent(EventType.TEXT_UNIT, "Value24", "Value21", "Value27", locIT, "Value25");
+		testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", locGESW, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "Value37", "it", "Value35");
-		testEvent(EventType.TEXT_UNIT, "Value36", "recID2_descr", "Value32", "ge-sw", "");
+		testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "Value37", locIT, "Value35");
+		testEvent(EventType.TEXT_UNIT, "Value36", "recID2_descr", "Value32", locGESW, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -355,7 +360,7 @@ public class FixedWidthColumnsFilterTest {
 		params.commentSourceRefs = "4";
 		params.recordIdColumn = 8;
 				
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		
@@ -370,23 +375,23 @@ public class FixedWidthColumnsFilterTest {
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Value14", "Value11", "Value17", "it", "");
+		testEvent(EventType.TEXT_UNIT, "Value14", "Value11", "Value17", locIT, "");
 		//testEvent(EventType.TEXT_UNIT, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Value24", "Value28_name", "Value27", "it", "Value25");
-		testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", "ge-sw", "");
+		testEvent(EventType.TEXT_UNIT, "Value24", "Value28_name", "Value27", locIT, "Value25");
+		testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", locGESW, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "", "it", "");
+		testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "", locIT, "");
 		//testEvent(EventType.TEXT_UNIT, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Value44", "Value41", "Value47", "it", "Value45");
-		testEvent(EventType.TEXT_UNIT, "Value46", "Value48_descr", "Value42", "ge-sw", "");
+		testEvent(EventType.TEXT_UNIT, "Value44", "Value41", "Value47", locIT, "Value45");
+		testEvent(EventType.TEXT_UNIT, "Value46", "Value48_descr", "Value42", locGESW, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -433,7 +438,7 @@ public class FixedWidthColumnsFilterTest {
 		}
 		//System.out.println(snippet);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "ge-sw"), "ge-sw");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locGESW), locGESW);
 		assertEquals(snippet, result);
 	}
 	
@@ -457,7 +462,7 @@ public class FixedWidthColumnsFilterTest {
 		params.valuesStartLineNum = 2;
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -515,7 +520,7 @@ public class FixedWidthColumnsFilterTest {
 		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
 		
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 				
 		testEvent(EventType.START_DOCUMENT, null);
 					
@@ -537,7 +542,7 @@ public class FixedWidthColumnsFilterTest {
 		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
 		
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 				
 		testEvent(EventType.START_DOCUMENT, null);
 					
@@ -558,7 +563,7 @@ public class FixedWidthColumnsFilterTest {
 		params.sendHeaderMode = Parameters.SEND_HEADER_COLUMN_NAMES_ONLY;
 		
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 				
 		testEvent(EventType.START_DOCUMENT, null);
 					
@@ -591,7 +596,7 @@ public class FixedWidthColumnsFilterTest {
 		params.numColumns = 3;
 		
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 				
 		testEvent(EventType.START_DOCUMENT, null);
 					
@@ -612,7 +617,7 @@ public class FixedWidthColumnsFilterTest {
 		params.numColumns = 10;
 		
 		input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 				
 		testEvent(EventType.START_DOCUMENT, null);
 					
@@ -642,7 +647,7 @@ public class FixedWidthColumnsFilterTest {
 		assertNotNull(input);
 		
 		System.out.println(filename);
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}
@@ -668,7 +673,7 @@ public class FixedWidthColumnsFilterTest {
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		
@@ -725,7 +730,7 @@ public class FixedWidthColumnsFilterTest {
 		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 				
@@ -763,7 +768,7 @@ public class FixedWidthColumnsFilterTest {
 		params.sendHeaderMode = Parameters.SEND_HEADER_COLUMN_NAMES_ONLY;
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		
@@ -817,7 +822,7 @@ public class FixedWidthColumnsFilterTest {
 		params.sendHeaderMode = Parameters.SEND_HEADER_COLUMN_NAMES_ONLY;
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		
@@ -960,23 +965,14 @@ public class FixedWidthColumnsFilterTest {
 	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
-//m		URL url = TableFilterTest.class.getResource("/csv_test6.txt");
-//m		String root = Util.getDirectoryName(url.getPath());
-//m		root = Util.getDirectoryName(root) + "/data/";
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		
 		list.add(new InputDocument(root + "csv_test6.txt", ""));
-		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 
-// Helpers
+	// Helpers
 	private String getFullFileName(String fileName) {
-//m		URL url = TableFilterTest.class.getResource("/csv_test6.txt");
-//m		String root = Util.getDirectoryName(url.getPath());
-//m		root = Util.getDirectoryName(root) + "/data/";
 		return root + fileName;
 	}
 	
@@ -1160,45 +1156,39 @@ public class FixedWidthColumnsFilterTest {
 		}
 	}
 	
-	private void testEvent(EventType expectedType, String source, String expName, String target, String language, String comment) {
-		
+	private void testEvent(EventType expectedType,
+		String source,
+		String expName,
+		String target,
+		LocaleId language,
+		String comment)
+	{
 		assertNotNull(filter);
-		
 		Event event = filter.next();		
 		assertNotNull(event);
-		
 		assertTrue(event.getEventType() == expectedType);
 		
 		switch (event.getEventType()) {
-		
 		case TEXT_UNIT:
 			IResource res = event.getResource();
 			assertTrue(res instanceof TextUnit);
 			TextUnit tu = (TextUnit) res;
-			
 			assertEquals(source, tu.toString());
-			
 			Property prop = tu.getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
-			
-			if (!Util.isEmpty(expName)) {
+			if ( !Util.isEmpty(expName) ) {
 				assertEquals(expName, tu.getName());
 			}
-			
-			if (!Util.isEmpty(target) && !Util.isEmpty(language)) {
-				
+			if ( !Util.isEmpty(target) && !Util.isNullOrEmpty(language) ) {
 				TextContainer trg = tu.getTarget(language);
 				assertNotNull(trg);
 				assertEquals(target, trg.toString());
 			}
-			
-			if (!Util.isEmpty(comment)) {
-				
+			if ( !Util.isEmpty(comment) ) {
 				prop = tu.getProperty(Property.NOTE);
 				assertNotNull(prop);
 				assertEquals(comment, prop.toString());
 			}
-			
 			break;
 		}
 			
@@ -1271,10 +1261,10 @@ public class FixedWidthColumnsFilterTest {
 		writer = filter.createFilterWriter();		
 		try {						
 			// Open the input
-			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", "en", "fr"));
+			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", locEN, locFR));
 			
 			// Prepare the output
-			writer.setOptions("fr", "UTF-16");
+			writer.setOptions(locFR, "UTF-16");
 			writerBuffer = new ByteArrayOutputStream();
 			writer.setOutput(writerBuffer);
 			
@@ -1307,8 +1297,8 @@ public class FixedWidthColumnsFilterTest {
     }
 	
 	private ArrayList<Event> getEvents (String snippet,
-			String srcLang,
-			String trgLang)
+			LocaleId srcLang,
+			LocaleId trgLang)
 		{
 			ArrayList<Event> list = new ArrayList<Event>();
 			filter.open(new RawDocument(snippet, srcLang, trgLang));

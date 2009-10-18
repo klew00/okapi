@@ -42,6 +42,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -69,7 +70,7 @@ public class XMLFilter implements IFilter {
 
 	private String docName;
 	private String encoding;
-	private String srcLang;
+	private LocaleId srcLang;
 	private String lineBreak;
 	private Document doc;
 	private ITraversal trav;
@@ -300,7 +301,7 @@ public class XMLFilter implements IFilter {
 		skel = new GenericSkeleton();
 		skel.add("<?xml version=\"" + doc.getXmlVersion() + "\"");
 		skel.add(" encoding=\"");
-		skel.addValuePlaceholder(startDoc, Property.ENCODING, "");
+		skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
 		skel.add("\"");
 		startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 		if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
@@ -525,9 +526,7 @@ public class XMLFilter implements IFilter {
 					tmp.append("\"");
 				}
 				else if ( attr.getName().equals("xml:lang") ) { // xml:lang
-					if ( attr.getValue().equalsIgnoreCase(srcLang) ) {
-						//TODO
-					}
+					//TODO
 					tmp.append(Util.escapeToXML(attr.getNodeValue(), 3, false, null)
 						+ "\"");
 				}

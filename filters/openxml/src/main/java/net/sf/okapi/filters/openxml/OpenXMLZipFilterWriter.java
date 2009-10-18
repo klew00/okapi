@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -40,6 +39,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.*;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -70,7 +70,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	private ZipFile zipOriginal;
 	private ZipOutputStream zipOut;
 	private byte[] buffer;
-	private String outLang;
+	private LocaleId outLang;
 	private ZipEntry subDocEntry;
 	private IFilterWriter subDocWriter;
 	private File tempFile;
@@ -184,7 +184,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		return event;
 	}
 
-	public void setOptions (String language,
+	public void setOptions (LocaleId language,
 		String defaultEncoding)
 	{
 		outLang = language;

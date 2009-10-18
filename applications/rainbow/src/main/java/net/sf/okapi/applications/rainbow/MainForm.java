@@ -50,6 +50,7 @@ import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.BaseHelp;
 import net.sf.okapi.common.ui.CharacterInfoDialog;
@@ -1789,9 +1790,9 @@ public class MainForm { //implements IParametersProvider {
 		chkUseOutputRoot.setSelection(prj.getUseOutputRoot());
 		edOutputRoot.setText(prj.getOutputRoot());
 
-		edSourceLang.setText(prj.getSourceLanguage());
+		edSourceLang.setText(prj.getSourceLanguage().toString());
 		edSourceEnc.setText(prj.getSourceEncoding());
-		edTargetLang.setText(prj.getTargetLanguage());
+		edTargetLang.setText(prj.getTargetLanguage().toString());
 		edTargetEnc.setText(prj.getTargetEncoding());
 		
 		chkUseCustomParametersFolder.setSelection(prj.useCustomParametersFolder());
@@ -1827,7 +1828,7 @@ public class MainForm { //implements IParametersProvider {
 				+ Res.getString("MainForm.38"); //$NON-NLS-1$
 		}
 		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(0), sampleInput,
-			prj.getOutputRoot(), prj.getSourceLanguage(), prj.getSourceEncoding());
+			prj.getOutputRoot(), prj.getSourceLanguage().toString(), prj.getSourceEncoding());
 	}
 	
 	/**
@@ -1842,9 +1843,9 @@ public class MainForm { //implements IParametersProvider {
 	
 		prj.setUseOutputRoot(chkUseOutputRoot.getSelection());
 		prj.setOutputRoot(edOutputRoot.getText());
-		prj.setSourceLanguage(edSourceLang.getText());
+		prj.setSourceLanguage(LocaleId.fromString(edSourceLang.getText()));
 		prj.setSourceEncoding(edSourceEnc.getText());
-		prj.setTargetLanguage(edTargetLang.getText());
+		prj.setTargetLanguage(LocaleId.fromString(edTargetLang.getText()));
 		prj.setTargetEncoding(edTargetEnc.getText());
 		
 		prj.setUseCustomParametersFolder(chkUseCustomParametersFolder.getSelection());

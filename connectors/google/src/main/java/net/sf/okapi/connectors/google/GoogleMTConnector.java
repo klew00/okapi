@@ -32,6 +32,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -53,7 +54,6 @@ public class GoogleMTConnector implements IQuery {
 	
 	private String srcLang;
 	private String trgLang;
-	private String lastError;
 	private QueryResult result;
 	private int current = -1;
 	private String hostId;
@@ -104,7 +104,6 @@ public class GoogleMTConnector implements IQuery {
 	}
 	
 	public int query (TextFragment text) {
-		lastError = null;
 		current = -1;
 		return queryAjax(text);
 	}
@@ -153,7 +152,7 @@ public class GoogleMTConnector implements IQuery {
 			current = 0;
 		}
 		catch ( Throwable e ) {
-			lastError = e.getMessage();
+			throw new RuntimeException("Error querying the server.", e);
 		}
 		return ((current==0) ? 1 : 0);
 	}
@@ -318,19 +317,19 @@ public class GoogleMTConnector implements IQuery {
 		// Not used with this MT engine
 	}
 
-	public void setLanguages (String sourceLang,
-		String targetLang)
+	public void setLanguages (LocaleId sourceLocale,
+		LocaleId targetLocale)
 	{
-		srcLang = convertLangCode(sourceLang);
-		trgLang = convertLangCode(targetLang);
+		srcLang = toInternalCode(sourceLocale);
+		trgLang = toInternalCode(targetLocale);
 	}
 	
-	public String getSourceLanguage () {
-		return srcLang;
+	public LocaleId getSourceLanguage () {
+		return LocaleId.fromString(srcLang);
 	}
 	
-	public String getTargetLanguage () {
-		return trgLang;
+	public LocaleId getTargetLanguage () {
+		return LocaleId.fromString(trgLang);
 	}
 
 //	private String unescape (String text) {
@@ -342,8 +341,8 @@ public class GoogleMTConnector implements IQuery {
 //		return tmp.replace("&amp;", "&");
 //	}
 
-	private String convertLangCode (String standardCode) {
-		String code = standardCode.toLowerCase();
+	private String toInternalCode (LocaleId locale) {
+		String code = locale.toBCP47();
 		if ( !code.startsWith("zh") && ( code.length() > 2 )) {
 			code = code.substring(0, 2);
 		}

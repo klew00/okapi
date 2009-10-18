@@ -13,20 +13,24 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 
 public class TmxHandlerExportTest {
 
+	LocaleId locEN = LocaleId.fromString("EN");
+	LocaleId locIT = LocaleId.fromString("IT");
+	
     @Test
     public void exportTmx_sample_metadata() throws Exception {
         Directory ramDir = new RAMDirectory();
         ITmWriter tmWriter = new PensieveWriter(ramDir, true);
-        OkapiTmxImporter tmxImporter = new OkapiTmxImporter("en", new TmxFilter());
+        OkapiTmxImporter tmxImporter = new OkapiTmxImporter(locEN, new TmxFilter());
         OkapiTmxExporter tmxExporter = new OkapiTmxExporter();
-        tmxImporter.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), "it", tmWriter);
+        tmxImporter.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), locIT, tmWriter);
 
         ITmSeeker seeker = new PensieveSeeker(ramDir);
         StringWriter sWriter = new StringWriter();
-        tmxExporter.exportTmx("en", "it", seeker, new TMXWriter(new XMLWriter(sWriter)));
+        tmxExporter.exportTmx(locEN, locIT, seeker, new TMXWriter(new XMLWriter(sWriter)));
 
         String expectedTmx = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<tmx version=\"1.4\">" +

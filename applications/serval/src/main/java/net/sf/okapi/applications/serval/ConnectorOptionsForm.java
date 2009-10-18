@@ -1,6 +1,7 @@
 package net.sf.okapi.applications.serval;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
@@ -96,7 +97,8 @@ public class ConnectorOptionsForm {
 			if ( edTrgLang.getText().length() == 0 ) {
 				return false;
 			}
-			resItem.query.setLanguages(edSrcLang.getText(), edTrgLang.getText());
+			resItem.query.setLanguages(LocaleId.fromString(edSrcLang.getText()),
+				LocaleId.fromString(edTrgLang.getText()));
 			resItem.name = edName.getText();
 	
 			IParameters params = resItem.query.getParameters();
@@ -115,8 +117,8 @@ public class ConnectorOptionsForm {
 	public boolean showDialog (ResourceItem resItem) {
 		this.resItem = resItem;
 		edName.setText(resItem.name);
-		edSrcLang.setText(resItem.query.getSourceLanguage());
-		edTrgLang.setText(resItem.query.getTargetLanguage());
+		edSrcLang.setText(resItem.query.getSourceLanguage().toString());
+		edTrgLang.setText(resItem.query.getTargetLanguage().toString());
 		
 		IParameters params = resItem.query.getParameters();
 		if ( params == null ) edParams.setText("");

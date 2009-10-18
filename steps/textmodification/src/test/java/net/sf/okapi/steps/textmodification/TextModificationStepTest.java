@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.textmodification;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.tests.StepTestDriver;
 
@@ -30,6 +31,8 @@ import static org.junit.Assert.*;
 public class TextModificationStepTest {
 
 	private StepTestDriver driver;
+	private LocaleId locEN = LocaleId.fromString("EN");
+	private LocaleId locFR = LocaleId.fromString("Fr");
 
 	//TODO: Fix those test using a dummy filter, when we have stable step/pipeline architecture.
 	
@@ -41,34 +44,34 @@ public class TextModificationStepTest {
 	@Test
 	public void testTargetDefaults () {
 		String original = "This is the content #1 with %s.";
-		driver.prepareFilterEventsStep(original, original, "en", "fr");
+		driver.prepareFilterEventsStep(original, original, locEN, locFR);
 		TextModificationStep step = new TextModificationStep(); // Defaults
 		Parameters params = (Parameters)step.getParameters();
 		params.type = Parameters.TYPE_XNREPLACE;
 		driver.testFilterEventsStep(step);
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
-		assertTrue(res.hasTarget("fr"));
-		assertEquals(original, res.getTargetContent("fr").toString());
+		assertTrue(res.hasTarget(locFR));
+		assertEquals(original, res.getTargetContent(locFR).toString());
 	}
 
 	@Test
 	public void testDefaults () {
 		String original = "This is the content.";
-		driver.prepareFilterEventsStep(original, null, "en", "fr");
+		driver.prepareFilterEventsStep(original, null, locEN, locFR);
 		TextModificationStep step = new TextModificationStep(); // Defaults
 		driver.testFilterEventsStep(step);
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
-		assertTrue(res.hasTarget("fr"));
-		assertEquals(original, res.getTargetContent("fr").toString());
+		assertTrue(res.hasTarget(locFR));
+		assertEquals(original, res.getTargetContent(locFR).toString());
 	}
 
 	@Test
 	public void testWithPrefixSuffixMarkers () {
 		String original = "This is the content.";
 		String expected = "{_[This is the content.]_id1_}";
-		driver.prepareFilterEventsStep(original, null, "en", "fr");
+		driver.prepareFilterEventsStep(original, null, locEN, locFR);
 		TextModificationStep step = new TextModificationStep();
 		Parameters params = (Parameters)step.getParameters();
 		params.addPrefix = true;
@@ -80,23 +83,23 @@ public class TextModificationStepTest {
 		driver.testFilterEventsStep(step);
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
-		assertTrue(res.hasTarget("fr"));
-		assertEquals(expected, res.getTargetContent("fr").toString());
+		assertTrue(res.hasTarget(locFR));
+		assertEquals(expected, res.getTargetContent(locFR).toString());
 	}
 
 	@Test
 	public void testWithXandNs () {
 		String original = "This is the content #1 with %s.";
 		String expected = "Xxxx xx xxx xxxxxxx #N xxxx %x.";
-		driver.prepareFilterEventsStep(original, null, "en", "fr");
+		driver.prepareFilterEventsStep(original, null, locEN, locFR);
 		TextModificationStep step = new TextModificationStep();
 		Parameters params = (Parameters)step.getParameters();
 		params.type = Parameters.TYPE_XNREPLACE;
 		driver.testFilterEventsStep(step);
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
-		assertTrue(res.hasTarget("fr"));
-		assertEquals(expected, res.getTargetContent("fr").toString());
+		assertTrue(res.hasTarget(locFR));
+		assertEquals(expected, res.getTargetContent(locFR).toString());
 	}
 
 	@Test
@@ -105,37 +108,37 @@ public class TextModificationStepTest {
 		// "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0\u00d1\u00f1";
 		String original = "This is the content #1 with %s.";
 		String expected = "Th\u00ecs \u00ecs th\u00e8 \u00e7\u00f5\u00f1t\u00e8\u00f1t #1 w\u00ecth %s.";
-		driver.prepareFilterEventsStep(original, null, "en", "fr");
+		driver.prepareFilterEventsStep(original, null, locEN, locFR);
 		TextModificationStep step = new TextModificationStep();
 		Parameters params = (Parameters)step.getParameters();
 		params.type = Parameters.TYPE_EXTREPLACE;
 		driver.testFilterEventsStep(step);
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
-		assertTrue(res.hasTarget("fr"));
-		assertEquals(expected, res.getTargetContent("fr").toString());
+		assertTrue(res.hasTarget(locFR));
+		assertEquals(expected, res.getTargetContent(locFR).toString());
 	}
 
 	@Test
 	public void testKeepInlineCodes () {
 		String original = "This is the content #1 with '@#$0'.";
 		String expected = "@#$0";
-		driver.prepareFilterEventsStep(original, null, "en", "fr");
+		driver.prepareFilterEventsStep(original, null, locEN, locFR);
 		TextModificationStep step = new TextModificationStep();
 		Parameters params = (Parameters)step.getParameters();
 		params.type = Parameters.TYPE_KEEPINLINE;
 		driver.testFilterEventsStep(step);
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
-		assertTrue(res.hasTarget("fr"));
-		assertEquals(expected, res.getTargetContent("fr").toString());
+		assertTrue(res.hasTarget(locFR));
+		assertEquals(expected, res.getTargetContent(locFR).toString());
 	}
 
 	@Test
 	public void testTargetOverwriting () {
 		String original = "This is the content #1 with @#$0.";
 		String expected = "Xxxx xx xxx xxxxxxx #N xxxx @#$0.";
-		driver.prepareFilterEventsStep(original, original, "en", "fr");
+		driver.prepareFilterEventsStep(original, original, locEN, locFR);
 		TextModificationStep step = new TextModificationStep(); // Defaults
 		Parameters params = (Parameters)step.getParameters();
 		params.type = Parameters.TYPE_XNREPLACE;
@@ -143,8 +146,8 @@ public class TextModificationStepTest {
 		driver.testFilterEventsStep(step);
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
-		assertTrue(res.hasTarget("fr"));
-		assertEquals(expected, res.getTargetContent("fr").toString());
+		assertTrue(res.hasTarget(locFR));
+		assertEquals(expected, res.getTargetContent(locFR).toString());
 	}
 
 }

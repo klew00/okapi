@@ -45,6 +45,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -68,8 +69,8 @@ public class TmxFilter implements IFilter {
 	private String docName;
 	private int tuId;
 	private int otherId; 
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private LinkedList<Event> queue;	
 	private boolean canceled;
 	private GenericSkeleton skel;	
@@ -252,9 +253,9 @@ public class TmxFilter implements IFilter {
 
 			encoding = input.getEncoding(); // Real encoding
 			srcLang = input.getSourceLanguage();
-			if ( srcLang == null || srcLang.trim().equals("")) throw new NullPointerException("Source language not set.");
+			if ( Util.isNullOrEmpty(srcLang) ) throw new NullPointerException("Source language not set.");
 			trgLang = input.getTargetLanguage();
-			if ( trgLang == null  || trgLang.trim().equals("")) throw new NullPointerException("Target language not set.");
+			if ( Util.isNullOrEmpty(trgLang) ) throw new NullPointerException("Target language not set.");
 			hasUTF8BOM = detector.hasUtf8Bom();
 			lineBreak = detector.getNewlineType().toString();
 			if ( input.getInputURI() != null ) {
@@ -293,7 +294,7 @@ public class TmxFilter implements IFilter {
 			skel = new GenericSkeleton();
 			startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 			skel.append("<?xml version=\"1.0\" encoding=\"");
-			skel.addValuePlaceholder(startDoc, Property.ENCODING, "");
+			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
 			skel.append("\"?>");
 			startDoc.setSkeleton(skel);
 		}
@@ -630,7 +631,7 @@ public class TmxFilter implements IFilter {
 	 */		
 	private boolean processTranslationUnit(){
 		
-		String currentLang;
+		LocaleId currentLang;
 		TmxTu tmxTu = new TmxTu(srcLang, trgLang, lineBreak);	//create the TmxTu helper
 		tmxTu.parseStartElement(reader);						//add to TmxTu skelBefore
 
@@ -660,10 +661,6 @@ public class TmxFilter implements IFilter {
 					}else if(reader.getLocalName().equals("tuv")){
 						
 						currentLang = getXmlLangFromCurTuv();
-						
-						//TOFIX: temporary fix to replace with localeId
-						currentLang = currentLang.toLowerCase();
-						
 						tuvTrgType = getTuvTrgType(currentLang);
 						
 						TmxTuv tmxTuv = tmxTu.addTmxTuv(currentLang,tuvTrgType);
@@ -840,13 +837,14 @@ public class TmxFilter implements IFilter {
 	 * Gets the TuvXmlLang based on current language and source and specified target lang
 	 * @return 	TuvXmlLang.SOURCE, TuvXmlLang.TARGET, and TuvXmlLang.OTHER
 	 */		
-	private TuvXmlLang getTuvTrgType(String pLang){
-
-		if (pLang.equalsIgnoreCase(srcLang)){
+	private TuvXmlLang getTuvTrgType(LocaleId lang){
+		if ( lang.equals(srcLang) ) {
 			return TuvXmlLang.SOURCE; 
-		}else if (pLang.equalsIgnoreCase(trgLang)){
+		}
+		else if ( lang.equals(trgLang) ) {
 			return TuvXmlLang.TARGET;
-		}else{ 
+		}
+		else { 
 			return TuvXmlLang.OTHER;
 		}
 	}
@@ -857,14 +855,16 @@ public class TmxFilter implements IFilter {
 	 * @return the language value
 	 * @throws OkapiBadFilterInputException if xml:Lang or lang is missing
 	 */		
-	private String getXmlLangFromCurTuv(){
-		String lang = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
-		if ( lang != null ) return lang;
+	private LocaleId getXmlLangFromCurTuv(){
+		String tmp = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
+		if ( tmp != null ) {
+			return LocaleId.fromString(tmp);
+		}
 		// If xml:lang not found, fall back to lang (old TMX versions)
 		int count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
 			if ( reader.getAttributeLocalName(i).equals("lang")){
-				return reader.getAttributeValue(i);
+				return LocaleId.fromString(reader.getAttributeValue(i));
 			}
 		}
 		throw new OkapiBadFilterInputException("The required xml:lang or lang attribute is missing in <tuv>. The file is not valid TMX.");

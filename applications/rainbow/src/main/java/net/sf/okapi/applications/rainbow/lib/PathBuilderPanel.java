@@ -54,8 +54,8 @@ public class PathBuilderPanel extends Composite {
 	private PathBuilder m_TempPB;
 	private String m_sSrcRoot;
 	private String m_sTrgRoot;
-	private String srcLang;
-	private String trgLang;
+	private String srcLangStr;
+	private String trgLangStr;
 
 	public PathBuilderPanel (Composite p_Parent,
 		int p_nFlags)
@@ -204,8 +204,8 @@ public class PathBuilderPanel extends Composite {
 		m_TempPB.copyFrom(p_Data);
 		m_sSrcRoot = p_sSrcRoot;
 		m_sTrgRoot = p_sTrgRoot;
-		this.srcLang = srcLang;
-		this.trgLang = trgLang;
+		this.srcLangStr = srcLang;
+		this.trgLangStr = trgLang;
 		m_edBefore.setText(p_sSrcPath);
 		
 		m_chkUseSubdir.setSelection(p_Data.useSubfolder());
@@ -253,12 +253,12 @@ public class PathBuilderPanel extends Composite {
 	}
 
 	public void setSourceLanguage (String newLang) {
-		srcLang = newLang;
+		srcLangStr = newLang;
 		updateSample();
 	}
 	
 	public void setTargetLanguage (String newLang) {
-		trgLang = newLang;
+		trgLangStr = newLang;
 		updateSample();
 	}
 	
@@ -267,7 +267,7 @@ public class PathBuilderPanel extends Composite {
 		if ( initLevel > 0 ) return;
 	
 		saveData(m_TempPB);
-		String sTmp = m_TempPB.getPath(m_edBefore.getText(), m_sSrcRoot, m_sTrgRoot, srcLang, trgLang);
+		String sTmp = m_TempPB.getPath(m_edBefore.getText(), m_sSrcRoot, m_sTrgRoot, srcLangStr, trgLangStr);
 		m_edAfter.setText(sTmp);
 		
 		m_edSubdir.setEnabled(m_chkUseSubdir.getSelection());

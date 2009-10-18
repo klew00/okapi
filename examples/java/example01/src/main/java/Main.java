@@ -27,14 +27,15 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 
 public class Main {
 	
-	private static String srcLang = "en";
-	private static String trgLang = "fr";
+	private static LocaleId srcLang = LocaleId.fromString("en");
+	private static LocaleId trgLang = LocaleId.fromString("fr");
 	private static String inputEncoding = "UTF-8";
 	private static String outputEncoding = "UTF-8";
 	private static String inputPath = null;
@@ -51,8 +52,8 @@ public class Main {
 			}
 			// Get the parameters
 			for ( int i=0; i<args.length; i++ ) {
-				if ( args[i].equals("-sl") ) srcLang = args[++i];
-				else if ( args[i].equals("-tl") ) trgLang = args[++i];
+				if ( args[i].equals("-sl") ) srcLang = LocaleId.fromString(args[++i]);
+				else if ( args[i].equals("-tl") ) trgLang = LocaleId.fromString(args[++i]);
 				else if ( args[i].equals("-ie") ) inputEncoding = args[++i];
 				else if ( args[i].equals("-oe") ) outputEncoding = args[++i];
 				else if ( args[i].equals("-s") ) {

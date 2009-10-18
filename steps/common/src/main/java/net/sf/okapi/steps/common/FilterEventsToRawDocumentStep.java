@@ -28,6 +28,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -50,7 +51,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	private boolean isDone;
 	private File outputFile;
 	private URI outputURI;
-	private String targetLanguage;
+	private LocaleId targetLocale;
 	private String outputEncoding;
 
 	/**
@@ -65,8 +66,8 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_ENCODING)
@@ -119,7 +120,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 
 		// Return the RawDocument Event that is the end result of all
 		// previous Events
-		RawDocument input = new RawDocument(outputFile.toURI(), outputEncoding, targetLanguage);
+		RawDocument input = new RawDocument(outputFile.toURI(), outputEncoding, targetLocale);
 		isDone = true;
 		return new Event(EventType.RAW_DOCUMENT, input);
 	}
@@ -131,7 +132,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		if ( outputEncoding == null ) outputEncoding = startDoc.getEncoding();
 		
 		filterWriter = startDoc.getFilterWriter();
-		filterWriter.setOptions(targetLanguage, outputEncoding);
+		filterWriter.setOptions(targetLocale, outputEncoding);
 		
 		if ( isLastOutputStep() ) {
 			outputFile = new File(outputURI);

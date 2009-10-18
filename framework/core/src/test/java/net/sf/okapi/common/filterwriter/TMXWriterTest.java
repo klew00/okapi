@@ -30,6 +30,8 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -40,8 +42,12 @@ import net.sf.okapi.common.resource.TextUnit;
 public class TMXWriterTest {
 
     final static File TMX_File = new File("target/test-classes/tmxwritertest_tmxfile.tmx");
+
     TMXWriter tmxWriter;
     StringWriter strWriter;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
+	private LocaleId locKR = LocaleId.fromString("kr");
 
     @Before
     public void setUp() {
@@ -105,7 +111,7 @@ public class TMXWriterTest {
     @Test
     public void testTmxTuMultiLang() {
     	TextUnit tu = createTextUnit("id", "SourceContent", "TargetContent", new String[][]{{"prop1", "value1"}, {"prop2", "value2"}});
-    	tu.setTargetContent("KR", new TextFragment("KoreanTarget"));
+    	tu.setTargetContent(locKR, new TextFragment("KoreanTarget"));
     	tmxWriter.writeTUFull(tu);
     	testTu(tu, strWriter.toString());
     }
@@ -115,7 +121,7 @@ public class TMXWriterTest {
     	assertEquals("TMX Header", expectedHeaderTmx, tmx);
     }
 
-    private final static String expectedHeaderTmx = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tmx version=\"1.4\"><header creationtool=\"pensieve\" creationtoolversion=\"0.0.1\" segtype=\"sentence\" o-tmf=\"pensieve_format\" adminlang=\"en\" srclang=\"EN\" datatype=\"unknown\"></header><body>";
+    private final static String expectedHeaderTmx = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tmx version=\"1.4\"><header creationtool=\"pensieve\" creationtoolversion=\"0.0.1\" segtype=\"sentence\" o-tmf=\"pensieve_format\" adminlang=\"en\" srclang=\"en\" datatype=\"unknown\"></header><body>";
     private final static String expectedFooterTmx = "</body></tmx>";
 
     private void testTu(TextUnit tu, String tmx) {
@@ -126,7 +132,7 @@ public class TMXWriterTest {
     	String expectedTMX = 
     		"<tu tuid=\"" + tu.getName() + "\">" +
     		properties +
-    		"<tuv xml:lang=\"EN\">" +
+    		"<tuv xml:lang=\"en\">" +
     		"<seg>" + tu.getSourceContent().toString() + "</seg>" +
     		"</tuv>" +
     		targetTuvs +
@@ -144,7 +150,7 @@ public class TMXWriterTest {
 
     private String getTargetTuvs(TextUnit tu) {
     	String targetTuvs = "";
-    	for (String langName : tu.getTargetLanguages()) {
+    	for (LocaleId langName : tu.getTargetLanguages()) {
     		targetTuvs += "<tuv xml:lang=\"" + langName + "\">" + "<seg>" + tu.getTargetContent(langName).toString() + "</seg>" + "</tuv>";
     	}
     	return targetTuvs;
@@ -154,7 +160,7 @@ public class TMXWriterTest {
     	TextUnit tu = new TextUnit(id);
     	tu.setName(id);
     	tu.setSourceContent(new TextFragment(sourceContent));
-    	tu.setTargetContent("FR", new TextFragment(targetContent));
+    	tu.setTargetContent(locFR, new TextFragment(targetContent));
     	if (attributes != null) {
     		for (String[] kvp : attributes) {
     			tu.setProperty(new Property(kvp[0], kvp[1]));
@@ -164,7 +170,7 @@ public class TMXWriterTest {
     }
 
     private void createTmxHeader() {
-    	tmxWriter.writeStartDocument("EN", "FR", "pensieve", "0.0.1", "sentence", "pensieve_format", "unknown");
+    	tmxWriter.writeStartDocument(locEN, locFR, "pensieve", "0.0.1", "sentence", "pensieve_format", "unknown");
     }
 
     private String stripNewLinesAndReturns(String tmx) {

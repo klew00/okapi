@@ -173,8 +173,8 @@ public class Writer extends BaseWriter {
 			}
 		}
 		writer.writeAttributeString("SettingsPath", dir+DTD_SETTINGS_FILE);
-		writer.writeAttributeString("SourceLanguage", manifest.getSourceLanguage());
-		writer.writeAttributeString("TargetLanguage", manifest.getTargetLanguage());
+		writer.writeAttributeString("SourceLanguage", manifest.getSourceLanguage().toBCP47());
+		writer.writeAttributeString("TargetLanguage", manifest.getTargetLanguage().toBCP47());
 		writer.writeAttributeString("TargetDefaultFont", "");
 		writer.writeAttributeString("SourceDocumentPath", relativeSourcePath);
 		writer.writeAttributeString("SettingsRelativePath", getSettingsRelativePath());
@@ -215,18 +215,18 @@ public class Writer extends BaseWriter {
 			"<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"u\">&lt;u id='%s'%s&gt;</ut>",
 			item.getId(), (name.length()>0 ? " rn='"+name+"'" : "") ));
 		//TODO: MUST implement the <df> tag to set the font, otherwise non-ANSI display as ????
-		if ( item.hasTarget(trgLang) ) {
+		if ( item.hasTarget(trgLoc) ) {
 			//TODO: Info about the match
 			writer.writeStartElement("Tu");
 			//TODO: writer.writeAttributeString("Origin", "manual");
 			//TODO: writer.writeAttributeString("MatchPercent", "100");
 			writer.writeStartElement("Tuv");
-			writer.writeAttributeString("Lang", manifest.getSourceLanguage());
+			writer.writeAttributeString("Lang", manifest.getSourceLanguage().toBCP47());
 			writeContent(item.getSourceContent());
 			writer.writeEndElement(); //Tuv
 			writer.writeStartElement("Tuv");
-			writer.writeAttributeString("Lang", manifest.getTargetLanguage());
-			writeContent(item.getTargetContent(trgLang));
+			writer.writeAttributeString("Lang", manifest.getTargetLanguage().toBCP47());
+			writeContent(item.getTargetContent(trgLoc));
 			writer.writeEndElement(); //Tuv
 			writer.writeEndElement(); //Tu
 

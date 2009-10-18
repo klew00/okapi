@@ -53,7 +53,6 @@ import org.codehaus.stax2.XMLInputFactory2;
 
 public class IDMLContentFilter implements IFilter {
 
-	private String srcLang;
 	private String docName;
 	private XMLStreamReader reader;
 	private LinkedList<Event> queue;
@@ -177,7 +176,6 @@ public class IDMLContentFilter implements IFilter {
 		catch ( XMLStreamException e ) {
 			throw new OkapiIOException("Cannot create the XML stream.", e);
 		}
-		srcLang = input.getSourceLanguage();
 		if ( input.getInputURI() != null ) {
 			docName = input.getInputURI().getPath();
 		}
@@ -195,7 +193,7 @@ public class IDMLContentFilter implements IFilter {
 		//TODO: Fix the encoding as it is  not necessarily correct as the encoding is not retrieve from XMLStreamReader
 		// We should use reader.getEncoding() when it's set
 		startDoc.setEncoding("UTF-8", false); //TODO: UTF8BOM detection
-		startDoc.setLanguage(srcLang);
+		startDoc.setLanguage(input.getSourceLanguage());
 		startDoc.setFilterParameters(params);
 		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setType("text/xml");

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
@@ -41,6 +42,9 @@ import static org.junit.Assert.*;
 
 public class ResourcesTest {
 
+	LocaleId locEN = LocaleId.fromString("en");
+	LocaleId locSV = LocaleId.fromString("sv");
+
 	@Before
 	public void setUp () throws Exception {
 	}
@@ -53,7 +57,7 @@ public class ResourcesTest {
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
 		sd.setMultilingual(true);
-		sd.setLanguage("en");
+		sd.setLanguage(locEN);
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
 
@@ -77,7 +81,7 @@ public class ResourcesTest {
 		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test, "en"), test);
+		assertEquals(generateOutput(list, test, locEN), test);
 	}
 	
 	@Test
@@ -88,7 +92,7 @@ public class ResourcesTest {
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
 		sd.setMultilingual(true);
-		sd.setLanguage("en");
+		sd.setLanguage(locEN);
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
 
@@ -114,7 +118,7 @@ public class ResourcesTest {
 		list.add(new Event(EventType.TEXT_UNIT, tu2));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test, "en"), test);
+		assertEquals(generateOutput(list, test, locEN), test);
 	}
 	
 	@Test
@@ -125,7 +129,7 @@ public class ResourcesTest {
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
 		sd.setMultilingual(true);
-		sd.setLanguage("en");
+		sd.setLanguage(locEN);
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
 
@@ -157,7 +161,7 @@ public class ResourcesTest {
 		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test, "en"), test);
+		assertEquals(generateOutput(list, test, locEN), test);
 	}
 
 	@Test
@@ -168,7 +172,7 @@ public class ResourcesTest {
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
 		sd.setMultilingual(true);
-		sd.setLanguage("en");
+		sd.setLanguage(locEN);
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
 
@@ -200,7 +204,7 @@ public class ResourcesTest {
 		list.add(new Event(EventType.TEXT_UNIT, tu1));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test, "en"), test);
+		assertEquals(generateOutput(list, test, locEN), test);
 	}
 
 	@Test
@@ -211,7 +215,7 @@ public class ResourcesTest {
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
 		sd.setMultilingual(true);
-		sd.setLanguage("en");
+		sd.setLanguage(locEN);
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
 
@@ -220,12 +224,12 @@ public class ResourcesTest {
 		skel.add("<meta http-equiv=\"Content-Language\" content=\"");
 		skel.addValuePlaceholder(dp, "language", null);
 		skel.add("\"/>");
-		dp.setSourceProperty(new Property("language", "en", false));
+		dp.setSourceProperty(new Property("language", locEN.toString(), false));
 		dp.setSkeleton(skel);
 		list.add(new Event(EventType.DOCUMENT_PART, dp));
 
 		// Output and compare
-		assertEquals(generateOutput(list, test, "en"), test);
+		assertEquals(generateOutput(list, test, locEN), test);
 	}
 	
 	@Test
@@ -233,12 +237,11 @@ public class ResourcesTest {
 		String test = "<tu><tuv xml:lang='EN'><seg>T1-en<sub>Sub-en</sub>T2-en</seg></tuv>"
 			+"<tuv xml:lang='SV'><seg>T1-sv<sub>Sub-sv</sub>T2-sv</seg></tuv></tu>";
 		ArrayList<Event> list = new ArrayList<Event>();
-		String trgLang = "SV";
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-16", false);
 		sd.setMultilingual(true);
-		sd.setLanguage("EN");
+		sd.setLanguage(locEN);
 		sd.setLineBreak("\n");
 		list.add(new Event(EventType.START_DOCUMENT, sd));
 
@@ -273,13 +276,13 @@ public class ResourcesTest {
 		skel.add("</seg></tuv><tuv xml:lang='SV'><seg>");
 
 		// Create the target main content 
-		TextFragment trg = tu.setTargetContent(trgLang, new TextFragment());
+		TextFragment trg = tu.setTargetContent(locSV, new TextFragment());
 		trg.append("T1-sv");
 		
 		// Add the sub inline in the target
 		code = trg.append(TagType.PLACEHOLDER, null, "<sub>");
 		// Set the content of the target sub in the tu of the sub
-		tuSub.setTargetContent(trgLang, new TextFragment("Sub-sv"));
+		tuSub.setTargetContent(locSV, new TextFragment("Sub-sv"));
 		// Add the reference to the tu of the sub,
 		// because it's in the target fragment it will get the target 
 		code.appendReference("tuSub");
@@ -288,7 +291,7 @@ public class ResourcesTest {
 		
 		code.append("</sub>");
 		trg.append("T2-sv");
-		skel.addContentPlaceholder(tu, trgLang);
+		skel.addContentPlaceholder(tu, locSV);
 		skel.add("</seg></tuv></tu>");
 
 		// Send the tu of the sub
@@ -303,12 +306,12 @@ public class ResourcesTest {
 		//FAIL TEST: content of sub is en instead of sv
 		//This is a reported issue.
 		//assertEquals(generateOutput(list, test, trgLang), test);
-		generateOutput(list, test, trgLang);
+		generateOutput(list, test, locSV);
 	}
 	
 	private String generateOutput (ArrayList<Event> list,
 		String original,
-		String outputLang)
+		LocaleId outputLang)
 	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();

@@ -25,6 +25,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.filters.idml.IDMLFilter;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -38,6 +39,7 @@ public class IDMLFilterTest {
 
 	private IDMLFilter filter;
 	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
 
 	@Before
 	public void setUp() {
@@ -58,7 +60,7 @@ public class IDMLFilterTest {
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"Test01.idml", null),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 	
 	@Test
@@ -71,7 +73,7 @@ public class IDMLFilterTest {
 		list.add(new InputDocument(root+"ConditionalText.idml", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en", "output"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, "output"));
 	}
 
 }

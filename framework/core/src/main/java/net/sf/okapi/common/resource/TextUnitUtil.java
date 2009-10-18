@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
@@ -171,10 +172,10 @@ public class TextUnitUtil {
 	}
 	
 	//TODO: javadoc
-	public static String getTargetText(TextUnit textUnit, String language) {
+	public static String getTargetText(TextUnit textUnit, LocaleId language) {
 		
 		if (textUnit == null) return "";
-		if (Util.isEmpty(language)) return "";
+		if (Util.isNullOrEmpty(language)) return "";
 		
 		return getCodedText(textUnit.getTargetContent(language));
 	}
@@ -296,19 +297,16 @@ public class TextUnitUtil {
 				
 	//TODO: javadoc
 	public static boolean isEmpty(TextFragment textFragment) {
-		
 		return (textFragment == null || (textFragment != null && textFragment.isEmpty()));		
 	}
 	
 	//TODO: javadoc
 	public static TextUnit buildTU (TextContainer source) {
-			
-		return buildTU(null, "", source, null, "", "");
+		return buildTU(null, "", source, null, LocaleId.EMPTY, "");
 	}
 	
 	//TODO: javadoc
 	public static TextUnit buildTU (String source) {
-		
 		return buildTU(new TextContainer(source));
 	}
 	
@@ -338,16 +336,14 @@ public class TextUnitUtil {
 			String name, 
 			TextContainer source, 
 			TextContainer target, 
-			String language, 
+			LocaleId language, 
 			String comment) {
 		
 		if (textUnit == null) {
-			
 			textUnit = new TextUnit("");			
 		}
 		
 		if (textUnit.getSkeleton() == null) {
-			
 			GenericSkeleton skel = new GenericSkeleton();
 			textUnit.setSkeleton(skel);
 		}		
@@ -358,7 +354,7 @@ public class TextUnitUtil {
 		if (source != null)
 			textUnit.setSource(source);
 		
-		if (target != null && !Util.isEmpty(language))
+		if (target != null && !Util.isNullOrEmpty(language))
 			textUnit.setTarget(language, target);
 		
 		if (!Util.isEmpty(comment))
@@ -420,8 +416,8 @@ public class TextUnitUtil {
 			
 			if (st.equalsIgnoreCase(tuRef)) {
 				
-				String language = part.getLanguage();
-				if (Util.isEmpty(language))
+				LocaleId language = part.getLanguage();
+				if (Util.isNullOrEmpty(language))
 					res.add(TextUnitUtil.getSourceText(textUnit));
 				else
 					res.add(TextUnitUtil.getTargetText(textUnit, language));
@@ -466,20 +462,20 @@ public class TextUnitUtil {
 	}
 	
 	//TODO: javadoc
-	public static <A extends IAnnotation> A getTargetAnnotation(TextUnit textUnit, String language, Class<A> type) {
+	public static <A extends IAnnotation> A getTargetAnnotation(TextUnit textUnit, LocaleId language, Class<A> type) {
 		
 		if (textUnit == null) return null;
-		if (Util.isEmpty(language)) return null;
+		if (Util.isNullOrEmpty(language)) return null;
 		if (textUnit.getTarget(language) == null) return null;
 		
 		return textUnit.getTarget(language).getAnnotation(type);		
 	}
 	
 	//TODO: javadoc
-	public static void setTargetAnnotation(TextUnit textUnit, String language, IAnnotation annotation) {
+	public static void setTargetAnnotation(TextUnit textUnit, LocaleId language, IAnnotation annotation) {
 		
 		if (textUnit == null) return;
-		if (Util.isEmpty(language)) return;
+		if (Util.isNullOrEmpty(language)) return;
 		if (textUnit.getTarget(language) == null) return;
 		
 		textUnit.getTarget(language).setAnnotation(annotation);		
@@ -497,10 +493,10 @@ public class TextUnitUtil {
 	}
 	
 	//TODO: javadoc
-	public static void setTargetText(TextUnit textUnit, String language, String text) {
+	public static void setTargetText(TextUnit textUnit, LocaleId language, String text) {
 		
 		if (textUnit == null) return;
-		if (Util.isEmpty(language)) return;
+		if (Util.isNullOrEmpty(language)) return;
 		
 		TextFragment target = textUnit.getTargetContent(language); 
 		if (target == null) return;
@@ -520,9 +516,9 @@ public class TextUnitUtil {
 		
 		if (trimLeading)						
 			trimLeading(source, skel);
-		
+
 		skel.addContentPlaceholder(textUnit);
-					
+
 		if (trimTrailing) 
 			trimTrailing(source, skel);
 		

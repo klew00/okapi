@@ -35,6 +35,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -53,7 +54,7 @@ public class ZipFilterWriter implements IFilterWriter {
 	private ZipFile zipOriginal;
 	private ZipOutputStream zipOut;
 	private byte[] buffer;
-	private String outLang;
+	private LocaleId outLoc;
 	private ZipEntry subDocEntry;
 	private IFilterWriter subDocWriter;
 	private File tempFile;
@@ -155,10 +156,10 @@ public class ZipFilterWriter implements IFilterWriter {
 		return event;
 	}
 
-	public void setOptions (String language,
+	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
-		outLang = language;
+		outLoc = locale;
 	}
 
 	public void setOutput (String path) {
@@ -254,7 +255,7 @@ public class ZipFilterWriter implements IFilterWriter {
 		// Instantiate the filter writer for that entry
 		//TODO: replace this by transparent call
 		subDocWriter = new GenericFilterWriter(new GenericSkeletonWriter());
-		subDocWriter.setOptions(outLang, "UTF-8");
+		subDocWriter.setOptions(outLoc, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
 		
 		StartDocument sd = new StartDocument("sd");

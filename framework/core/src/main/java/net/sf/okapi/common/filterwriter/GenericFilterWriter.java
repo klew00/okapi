@@ -37,6 +37,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -55,7 +56,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	private OutputStream output;
 	private String outputPath;
 	private OutputStreamWriter writer;
-	private String language;
+	private LocaleId locale;
 	private String encoding;
 	private EncoderManager encoderManager;
 	private File tempFile;
@@ -137,7 +138,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		try {
 			switch ( event.getEventType() ) {
 			case START_DOCUMENT:
-				processStartDocument(language, encoding, null, encoderManager, (StartDocument)event.getResource());
+				processStartDocument(locale, encoding, null, encoderManager, (StartDocument)event.getResource());
 				break;
 			case END_DOCUMENT:
 				processEndDocument((Ending)event.getResource());
@@ -175,7 +176,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		return event;
 	}
 
-	private void processStartDocument(String outputLanguage,
+	private void processStartDocument(LocaleId outputLocale,
 		String outputEncoding,
 		ILayerProvider layer,
 		EncoderManager encoderManager,
@@ -183,7 +184,7 @@ public class GenericFilterWriter implements IFilterWriter {
 	{
 		// Create the output
 		createWriter(resource);
-		writer.write(skelWriter.processStartDocument(outputLanguage,
+		writer.write(skelWriter.processStartDocument(outputLocale,
 			outputEncoding, layer, encoderManager, resource));
 	}
 
@@ -215,10 +216,10 @@ public class GenericFilterWriter implements IFilterWriter {
 		writer.write(skelWriter.processDocumentPart(resource));
 	}
 
-	public void setOptions (String language,
+	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
-		this.language = language;
+		this.locale = locale;
 		this.encoding = defaultEncoding;
 	}
 

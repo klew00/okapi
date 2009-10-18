@@ -21,29 +21,30 @@
 package net.sf.okapi.steps.copysourcetotarget;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.LocaleId;
 
 public class Parameters extends BaseParameters {
 
-	public String targetLanguage;
+	public LocaleId targetLocale;
 	
 	public Parameters () {
 		reset();
 	}
 
 	public void reset () {
-		targetLanguage = null;
+		targetLocale = null;
 	}
 
 	public void fromString (String data) {
 		reset();
 		// Read the file content as a set of fields
 		buffer.fromString(data);
-		targetLanguage = buffer.getString("targetLanguage");		
+		targetLocale = LocaleId.fromString(buffer.getString("targetLocale"));		
 	}
 
 	public String toString() {
 		buffer.reset();
-		buffer.setString("targetLanguage", targetLanguage);				
+		buffer.setString("targetLocale", targetLocale.toString());				
 		return buffer.toString();
 	}
 }

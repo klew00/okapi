@@ -2,6 +2,7 @@ package net.sf.okapi.common.pipeline.integration;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
@@ -21,6 +22,7 @@ public class FilterEventsToRawDocumentStepTest {
 	private FilterEventsToRawDocumentStep eventToDoc;
 	private String htmlSnippet;
 	private HtmlFilter htmlFilter;
+	private LocaleId locEN = LocaleId.fromString("EN");
 
     @Before
 	public void setUp() throws Exception {
@@ -38,7 +40,7 @@ public class FilterEventsToRawDocumentStepTest {
 		Event event = null;
 		eventToDoc = new FilterEventsToRawDocumentStep();
 		
-		RawDocument rawDoc = new RawDocument(htmlSnippet, "en");
+		RawDocument rawDoc = new RawDocument(htmlSnippet, locEN);
 		File tmpFile = File.createTempFile("FilterEventsToRawDocumentStepTest", ".tmp");
 		eventToDoc.setOutputURI(tmpFile.toURI());
 		eventToDoc.setOutputEncoding("UTF-8");
@@ -60,7 +62,7 @@ public class FilterEventsToRawDocumentStepTest {
 	public void htmlEventsToRawDocument() throws IOException {
 		Event event = null;		
 		eventToDoc = new FilterEventsToRawDocumentStep();
-		RawDocument rawDoc = new RawDocument(htmlSnippet, "en");
+		RawDocument rawDoc = new RawDocument(htmlSnippet, locEN);
 		eventToDoc.setOutputEncoding("UTF-8");
 
 		htmlFilter.open(rawDoc);

@@ -38,6 +38,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.LocaleId;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +47,7 @@ public class JSONFilterTest {
 
 	private JSONFilter filter;
 	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
 
 	@Before
 	public void setUp() {
@@ -124,7 +126,7 @@ public class JSONFilterTest {
 		list.add(new InputDocument(root+"test06.json", null));
 
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN));
 	}
 
 	@Test
@@ -140,7 +142,7 @@ public class JSONFilterTest {
 	@Test
 	public void testSimpleEntrySkeleton () {
 		String snippet = "  {\r  \"key1\" :  \"Text1\"  } \r ";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet, null), "en"));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet, null), locEN));
 	}
 
 	@Test
@@ -160,7 +162,7 @@ public class JSONFilterTest {
 		else {
 			filter.setParameters(params);
 		}
-		filter.open(new RawDocument(snippet, "en"));
+		filter.open(new RawDocument(snippet, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);

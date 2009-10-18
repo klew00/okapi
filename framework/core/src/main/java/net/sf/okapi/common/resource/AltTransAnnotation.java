@@ -23,6 +23,7 @@ package net.sf.okapi.common.resource;
 import java.util.LinkedList;
 
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -35,11 +36,11 @@ public class AltTransAnnotation implements IAnnotation {
 	
 	private class AltTrans {
 
-		String srcLang;
-		String trgLang;
+		LocaleId srcLang;
+		LocaleId trgLang;
 		TextUnit tu;
 		
-		public AltTrans (String sourceLanguage,
+		public AltTrans (LocaleId sourceLanguage,
 			TextUnit textUnit)
 		{
 			srcLang = sourceLanguage;
@@ -62,17 +63,17 @@ public class AltTransAnnotation implements IAnnotation {
 	/**
 	 * Adds a new entry to this annotation. This method also set the current entry
 	 * of the iteration to the entry that was just added.
-	 * @param sourceLanguage code of the source language, or null.
+	 * @param sourceLocId source locale, or null.
 	 * @param sourceText text of the source element, or null.
 	 */
-	public void addNew (String sourceLanguage,
+	public void addNew (LocaleId sourceLocId,
 		TextContainer sourceText)
 	{
 		TextUnit tu = new TextUnit(String.valueOf(++id));
 		if ( sourceText != null ) {
 			tu.setSource(sourceText);
 		}
-		list.add(new AltTrans(sourceLanguage, tu));
+		list.add(new AltTrans(sourceLocId, tu));
 		current = list.size()-1;
 	}
 
@@ -80,10 +81,10 @@ public class AltTransAnnotation implements IAnnotation {
 	 * Sets the target text for the last entry added to this
 	 * annotation. If no entry exists yet, or if one exists but has its target
 	 * already set, a new entry with empty source is created automatically.
-	 * @param targetLanguage code of the target language.
+	 * @param targetLocId code of the target language.
 	 * @param targetText text of the target.
 	 */
-	public void setTarget (String targetLanguage,
+	public void setTarget (LocaleId targetLocId,
 		TextContainer targetText)
 	{
 		if ( list.size() == 0 ) {
@@ -94,8 +95,8 @@ public class AltTransAnnotation implements IAnnotation {
 			// We have an entry, but its target is already set: create a new one
 			addNew(null, null);
 		}
-		list.getLast().tu.setTarget(targetLanguage, targetText);
-		list.getLast().trgLang = targetLanguage;
+		list.getLast().tu.setTarget(targetLocId, targetText);
+		list.getLast().trgLang = targetLocId;
 	}
 
 	/**
@@ -153,18 +154,18 @@ public class AltTransAnnotation implements IAnnotation {
 	 * or null if the current entry is not set, or if there is no source
 	 * for this entry.
 	 */
-	public String getSourceLanguage () {
+	public LocaleId getSourceLanguage () {
 		if (( current == -1 ) && ( current < list.size() )) return null;
 		return list.get(current).srcLang;
 	}
 
 	/**
-	 * Gets the target language for the current entry of this annotation.
-	 * @return the code for the target language for the current entry,
+	 * Gets the target locale for the current entry of this annotation.
+	 * @return the target locale for the current entry,
 	 * or null if the current entry is not set, or if there is no target
 	 * for this entry.
 	 */
-	public String getTargetLanguage () {
+	public LocaleId getTargetLanguage () {
 		if (( current == -1 ) && ( current < list.size() )) return null;
 		return list.get(current).trgLang;
 	}

@@ -33,6 +33,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -114,11 +115,11 @@ public class Writer extends BaseWriter {
 	}
 
 	@Override
-	public void setOptions (String language,
+	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
 		//TODO: Fix encoding so we use a windows-enabled one (especially for UTF-16)
-		super.setOptions(language, defaultEncoding);
+		super.setOptions(locale, defaultEncoding);
 		layer = new LayerProvider();
 		layer.setOptions(null, encoding, null);
 	}
@@ -218,7 +219,7 @@ public class Writer extends BaseWriter {
 			Util.RTF_STARTCODE);
 
 		// Write the skeleton
-		writer.write(skelWriter.processStartDocument(trgLang, encoding, layer, encoderManager, resource));
+		writer.write(skelWriter.processStartDocument(trgLoc, encoding, layer, encoderManager, resource));
 	}
 
 	private void processEndDocument (Ending resource) { 

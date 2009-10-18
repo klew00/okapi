@@ -3,6 +3,7 @@ package net.sf.okapi.steps.tokenization.engine;
 import java.util.HashMap;
 import java.util.List;
 import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
@@ -46,11 +47,11 @@ public class LookUpLexer extends AbstractLexer {
 	}
 
 	@Override
-	protected void lexer_open(String text, String language, Tokens tokens) {
+	protected void lexer_open(String text, LocaleId language, Tokens tokens) {
 		
 	}
 
-	public Lexems process(String text, String language, Tokens tokens) {
+	public Lexems process(String text, LocaleId language, Tokens tokens) {
 
 		Lexems lexems = new Lexems();
 		//Tokens wasteBin = new Tokens();

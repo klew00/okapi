@@ -22,6 +22,7 @@ package net.sf.okapi.common.pipelinedriver;
 
 import java.net.URI;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
@@ -70,19 +71,19 @@ public interface IBatchItemContext {
 	public String getOutputEncoding (int index);
 	
 	/**
-	 * Gets the source language for a given input document of this batch item. 
+	 * Gets the source locale for a given input document of this batch item. 
 	 * @param index the zero-based index of the input document.
-	 * @return the source language of the given the input document,
-	 * or null if there is no source language for the given input.
+	 * @return the source locale of the given the input document,
+	 * or null if there is no source locale for the given input.
 	 */
-	public String getSourceLanguage (int index);
+	public LocaleId getSourceLocale (int index);
 	
 	/**
-	 * Gets the target language for a given input document of this batch item. 
+	 * Gets the target locale for a given input document of this batch item. 
 	 * @param index the zero-based index of the input document.
-	 * @return the target language of the given the input document,
-	 * or null if there is no target language for the given input.
+	 * @return the target locale of the given the input document,
+	 * or null if there is no target locale for the given input.
 	 */
-	public String getTargetLanguage (int index);
+	public LocaleId getTargetLocale (int index);
 	
 }

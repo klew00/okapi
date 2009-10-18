@@ -32,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.LocaleId;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -49,8 +50,8 @@ public class Manifest {
 	private String packageID;
 	private String packageType;
 	private String projectID;
-	private String sourceLang;
-	private String targetLang;
+	private LocaleId sourceLoc;
+	private LocaleId targetLoc;
 	private String originalDir;
 	private String sourceDir;
 	private String targetDir;
@@ -110,22 +111,22 @@ public class Manifest {
 		projectID = value;
 	}
 
-	public String getSourceLanguage () {
-		return sourceLang;
+	public LocaleId getSourceLanguage () {
+		return sourceLoc;
 	}
 	
-	public void setSourceLanguage (String value) {
+	public void setSourceLanguage (LocaleId value) {
 		if ( value == null ) throw new NullPointerException();
-		sourceLang = value;
+		sourceLoc = value;
 	}
 
-	public String getTargetLanguage () {
-		return targetLang;
+	public LocaleId getTargetLanguage () {
+		return targetLoc;
 	}
 	
-	public void setTargetLanguage (String value) {
+	public void setTargetLanguage (LocaleId value) {
 		if ( value == null ) throw new NullPointerException();
-		targetLang = value;
+		targetLoc = value;
 	}
 
 	public String getRoot () {
@@ -252,8 +253,8 @@ public class Manifest {
 			writer.writeAttributeString("its:translate", "no");
 			writer.writeAttributeString("projectID", projectID);
 			writer.writeAttributeString("packageID", packageID);
-			writer.writeAttributeString("sourceLang", sourceLang);
-			writer.writeAttributeString("targetLang", targetLang);
+			writer.writeAttributeString("sourceLang", sourceLoc.toBCP47());
+			writer.writeAttributeString("targetLang", targetLoc.toBCP47());
 			writer.writeAttributeString("packageType", packageType);
 			writer.writeAttributeString("readerClass", readerClass);
 			writer.writeAttributeString("originalDir", originalDir.replace('\\', '/'));
@@ -324,12 +325,12 @@ public class Manifest {
 		    tmp = elem.getAttribute("sourceLang");
 		    if (( tmp == null ) || ( tmp.length() == 0 ))
 		    	throw new RuntimeException("Missing sourceLang attribute.");
-		    else setSourceLanguage(tmp);
+		    else setSourceLanguage(LocaleId.fromString(tmp));
 		    
 		    tmp = elem.getAttribute("targetLang");
 		    if (( tmp == null ) || ( tmp.length() == 0 ))
 		    	throw new RuntimeException("Missing targetLang attribute.");
-		    else setTargetLanguage(tmp);
+		    else setTargetLanguage(LocaleId.fromString(tmp));
 
 		    tmp = elem.getAttribute("originalDir");
 		    setOriginalLocation(tmp.replace('/', File.separatorChar));

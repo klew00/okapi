@@ -66,10 +66,10 @@ public class LanguagesPage extends AbstractListAddRemoveTab {
 		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
 		
 		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)
-			list.setItems(ListUtil.listAsArray(params.getLanguageWhiteList()));
+			list.setItems(ListUtil.languageListAsStringArray(params.getLanguageWhiteList()));
 		
 		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
-			list.setItems(ListUtil.listAsArray(params.getLanguageBlackList()));
+			list.setItems(ListUtil.languageListAsStringArray(params.getLanguageBlackList()));
 			
 		selectListItem(0);			
 		
@@ -84,17 +84,16 @@ public class LanguagesPage extends AbstractListAddRemoveTab {
 		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
 		
 		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)			
-			params.setLanguageWhiteList(ListUtil.arrayAsList(list.getItems()));
+			params.setLanguageWhiteList(ListUtil.stringArrayAsLanguageList(list.getItems()));
 		
 		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
-			params.setLanguageBlackList(ListUtil.arrayAsList(list.getItems()));
+			params.setLanguageBlackList(ListUtil.stringArrayAsLanguageList(list.getItems()));
 		
 		return true;
 	}
 
 	@Override
 	protected String getItemDescription(int index) {
-		
 		return LanguageList.getDisplayName(list.getItem(index));
 	}
 	

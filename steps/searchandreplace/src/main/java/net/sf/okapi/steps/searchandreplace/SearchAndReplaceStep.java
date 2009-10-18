@@ -41,6 +41,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -57,7 +58,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	private Matcher matcher;
 	private Pattern patterns[];
 	private URI outputURI;
-	private String targetLanguage;
+	private LocaleId targetLocale;
 	
 	@Override
 	public void destroy () {
@@ -74,8 +75,8 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 	
 	public String getDescription () {
@@ -251,9 +252,9 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		try {
 			// Else: do the requested modifications
 			// Make sure we have a target where to set data
-			tu.createTarget(targetLanguage, false, IResource.COPY_ALL);
+			tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 
-			String result = tu.getTargetContent(targetLanguage).getCodedText();
+			String result = tu.getTargetContent(targetLocale).getCodedText();
 
         	if ( params.regEx ){
         		for(int i=0; i<params.rules.size();i++){
@@ -272,7 +273,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
     	        }
         	}
 			
-			TextContainer cnt = tu.getTarget(targetLanguage); 
+			TextContainer cnt = tu.getTarget(targetLocale); 
 			cnt.setCodedText(result);
 		}
 		catch ( Exception e ) {

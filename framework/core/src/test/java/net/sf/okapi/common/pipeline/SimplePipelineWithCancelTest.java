@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
@@ -44,7 +45,7 @@ public class SimplePipelineWithCancelTest {
 				pipeline.addStep(new ConsumerProducer());
 				pipeline.addStep(new Consumer());				
 				
-				pipeline.process(new RawDocument("DUMMY", "en"));
+				pipeline.process(new RawDocument("DUMMY", LocaleId.fromString("en")));
 			}
 		};
 

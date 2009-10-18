@@ -44,6 +44,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -73,8 +74,8 @@ public class XLIFFFilter implements IFilter {
 	private int tuId;
 	private int otherId;
 	private int groupId;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private LinkedList<Event> queue;
 	private boolean canceled;
 	private GenericSkeleton skel;
@@ -283,7 +284,7 @@ public class XLIFFFilter implements IFilter {
 			skel = new GenericSkeleton();
 			startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 			skel.append("<?xml version=\"1.0\" encoding=\"");
-			skel.addValuePlaceholder(startDoc, Property.ENCODING, "");
+			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
 			skel.append("\"?>");
 			startDoc.setSkeleton(skel);
 		}
@@ -397,17 +398,19 @@ public class XLIFFFilter implements IFilter {
 		// Check the source language
 		tmp = reader.getAttributeValue("", "source-language");
 		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'source-language'.");
-		if ( !Util.isSameLanguage(tmp, srcLang, false) ) { // Warn about source language
+		LocaleId tmpLang = LocaleId.fromString(tmp); 
+		if ( !tmpLang.equals(srcLang) ) { // Warn about source language
 			logger.warning(String.format("The source language declared in <file> is '%s' not '%s'.", tmp, srcLang));
 		}
 		
 		// Check the target language
 		Property prop = startSubDoc.getProperty("targetLanguage");
 		if ( prop != null ) {
-			if ( !Util.isSameLanguage(prop.getValue(), trgLang, false) ) { // Warn about target language
+			tmpLang = LocaleId.fromString(prop.getValue());
+			if ( !tmpLang.sameLanguageAs(trgLang) ) { // Warn about target language
 				logger.warning(String.format("The target language declared in <file> is '%s' not '%s'. '%s' will be used.",
 					prop.getValue(), trgLang, prop.getValue()));
-				trgLang = prop.getValue();
+				trgLang = tmpLang;
 			}
 		}
 		
@@ -492,7 +495,7 @@ public class XLIFFFilter implements IFilter {
 				hasTargetlanguage = true;
 				startSubDoc.setProperty(new Property("targetLanguage", reader.getAttributeValue(i), false));
 				skel.append(String.format(" %s=\"", attrName));
-				skel.addValuePlaceholder(startSubDoc, "targetLanguage", "");
+				skel.addValuePlaceholder(startSubDoc, "targetLanguage", LocaleId.EMPTY);
 				skel.append("\"");
 			}
 			else {
@@ -506,9 +509,9 @@ public class XLIFFFilter implements IFilter {
 		
 		if ( params.getAddTargetLanguage() && !hasTargetlanguage ) {
 			// Create the attribute (as a property) if not there yet
-			startSubDoc.setProperty(new Property("targetLanguage", trgLang, false));
+			startSubDoc.setProperty(new Property("targetLanguage", trgLang.toBCP47(), false));
 			skel.append(" target-language=\"");
-			skel.addValuePlaceholder(startSubDoc, "targetLanguage", "");
+			skel.addValuePlaceholder(startSubDoc, "targetLanguage", LocaleId.EMPTY);
 			skel.append("\"");
 		}
 		
@@ -662,8 +665,10 @@ public class XLIFFFilter implements IFilter {
 		TextContainer tc;
 		if ( sourceDone ) { // Case of an alt-trans entry
 			// Get the language
-			String lang = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
-			if ( lang == null ) lang = srcLang; // Use default
+			String tmp = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
+			LocaleId lang;
+			if ( tmp == null ) lang = srcLang; // Use default
+			else lang = LocaleId.fromString(tmp);
 			// Get the text content
 			tc = processContent(isSegSource ? "seg-source" : "source", true);
 			// Put the source in the alt-trans annotation
@@ -710,8 +715,10 @@ public class XLIFFFilter implements IFilter {
 		TextContainer tc;
 		if ( targetDone ) { // Case of an alt-trans entry
 			// Get the language
-			String lang = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
-			if ( lang == null ) lang = trgLang; // Use default
+			String tmp = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
+			LocaleId lang;
+			if ( tmp == null ) lang = trgLang; // Use default
+			else lang = LocaleId.fromString(tmp);
 			// Get the text content
 			tc = processContent("target", true);
 			// Put the target in the alt-trans annotation
@@ -765,7 +772,7 @@ public class XLIFFFilter implements IFilter {
 	private void addTargetIfNeeded () {
 		if ( targetDone ) return; // Nothing to add
 		// If the target language is the same as the source, we should not create new <target>
-		if ( Util.isSameLanguage(srcLang, trgLang, true) ) return; 
+		if ( srcLang.equals(trgLang) ) return; 
 		//Else: this trans-unit has no target, we add it here in the skeleton
 		// so we can merge target data in it when writing out the skeleton
 		skel.append(String.format("<target xml:lang=\"%s\">", trgLang));

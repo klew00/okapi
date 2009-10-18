@@ -34,6 +34,7 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.common.Token;
@@ -59,6 +60,8 @@ public class TokenizationTest {
     "<a href=\"http://www.jaguar.com/sales\" alt=\"Click here\">" +
     "Jaguar Sales</a> or contact xj-6@jaguar.com."+
     " See http://www.jaguar.com/sales, www.jaguar.com, AT&T, P&G, Johnson&Johnson, 192.168.0.5 for info 3.5pct.";
+	
+	private LocaleId locENUS = LocaleId.fromString("en-us");
 
 	//private String text = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
 //	private String text = "$120,000.00 on 05/30/2007 at 12.30PM is much better than $10.00 on 05/30/2007 at 22:30:15";
@@ -118,7 +121,7 @@ public class TokenizationTest {
 	    String text4 = "The quick (“brown”) fox can’t jump 32.3 feet, right?";
 		*/
 		
-		Tokens tokens = Tokenizer.tokenize(text, "en-us"); // All tokens
+		Tokens tokens = Tokenizer.tokenize(text, locENUS); // All tokens
 		//assertEquals(127, tokens.size());
 						
 		listTokens(tokens);

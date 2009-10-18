@@ -44,6 +44,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
@@ -102,8 +103,8 @@ public class POFilter implements IFilter {
 	private GenericSkeleton skel;
 	private TextUnit tu;
 	private String docName;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private boolean hasUTF8BOM;
 	private int nPlurals;
 	private int level;
@@ -535,7 +536,7 @@ public class POFilter implements IFilter {
 				Property prop = new Property(data.substring(0, mid),
 					data.substring(mid+1), false);
 				dp.setProperty(prop);
-				skel.addValuePlaceholder(dp, prop.getName(), "");
+				skel.addValuePlaceholder(dp, prop.getName(), LocaleId.EMPTY);
 				start = n2+1;
 			}
 			String end = tmp.substring(start).replace("\\n", "\\n\""+lineBreak+"\"");

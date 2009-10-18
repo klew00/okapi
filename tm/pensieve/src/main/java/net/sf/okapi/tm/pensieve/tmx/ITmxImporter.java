@@ -17,8 +17,10 @@
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.tm.pensieve.tmx;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 
 import java.net.URI;
@@ -29,10 +31,10 @@ public interface ITmxImporter {
     /**
      * Imports TMX to Pensieve
      * @param tmxUri The location of the TMX
-     * @param targetLang The target language to index
+     * @param targetLocale The target locale to index
      * @param tmWriter The TMWriter to use when writing to the TM
      * @throws java.io.IOException if there was a problem with the TMX import
      */
-    void importTmx(URI tmxUri, String targetLang, ITmWriter tmWriter) throws IOException;
+    void importTmx(URI tmxUri, LocaleId targetLocale, ITmWriter tmWriter) throws IOException;
     
 }

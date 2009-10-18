@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
@@ -32,8 +33,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class RtfEventTest {
+
 	private RTFFilter filter;
-		
+	private LocaleId locEN = LocaleId.fromString("en");
+
 	@Before
 	public void setUp() throws Exception {
 		filter = new RTFFilter();	
@@ -45,7 +48,7 @@ public class RtfEventTest {
 	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, "en"));
+		filter.open(new RawDocument(snippet, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);

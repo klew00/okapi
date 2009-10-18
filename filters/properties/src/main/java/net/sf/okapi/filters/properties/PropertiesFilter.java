@@ -80,7 +80,6 @@ public class PropertiesFilter implements IFilter {
 	private int parseState = 0;
 	private GenericSkeleton skel;
 	private String docName;
-	private String srcLang;
 	private boolean hasUTF8BOM;
 	
 	public PropertiesFilter () {
@@ -215,7 +214,6 @@ public class PropertiesFilter implements IFilter {
 			throw new OkapiUnsupportedEncodingException(
 				String.format("The encoding '%s' is not supported.", encoding), e);
 		}
-		srcLang = input.getSourceLanguage();
 		hasUTF8BOM = detector.hasUtf8Bom();
 		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
@@ -245,7 +243,7 @@ public class PropertiesFilter implements IFilter {
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
-		startDoc.setLanguage(srcLang);
+		startDoc.setLanguage(input.getSourceLanguage());
 		startDoc.setFilterParameters(params);
 		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setLineBreak(lineBreak);

@@ -40,6 +40,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXContent;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -61,7 +62,7 @@ public class TableFilterWriter implements IFilterWriter {
 	private OutputStreamWriter writer;
 	private OutputStream outputStream;
 	private String outputPath;
-	private String trgLang;
+	private LocaleId trgLoc;
 	private String encoding;
 	private File tempFile;
 	private String linebreak = System.getProperty("line.separator");
@@ -161,10 +162,10 @@ public class TableFilterWriter implements IFilterWriter {
 		return event;
 	}
 
-	public void setOptions (String language,
+	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
-		trgLang = language;
+		trgLoc = locale;
 		encoding = defaultEncoding;
 	}
 
@@ -267,7 +268,7 @@ public class TableFilterWriter implements IFilterWriter {
 		TextUnit tu = (TextUnit)event.getResource();
 
 		TextContainer srcCont = tu.getSource();
-		TextContainer trgCont = tu.getTarget(trgLang);
+		TextContainer trgCont = tu.getTarget(trgLoc);
 		if ( trgCont == null ) {
 			trgCont = new TextContainer(); // Empty
 		}

@@ -7,6 +7,7 @@ import java.net.URL;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
@@ -27,8 +28,12 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class MultistepPipelineTest {
+
 	private FilterConfigurationMapper fcMapper;
 	private IPipelineDriver driver;
+	private LocaleId locEN = LocaleId.fromString("EN");
+	private LocaleId locEUES = LocaleId.fromString("eu-ES");
+	private LocaleId locFR = LocaleId.fromString("FR");
 
 	@Before
 	public void setUp() throws Exception {
@@ -71,19 +76,19 @@ public class MultistepPipelineTest {
 		driver.addStep(step4);
 
 		// Set the info for the input and output
-		RawDocument rawDoc = new RawDocument(getUri("test01.xml"), "UTF-8", "en", "fr");
+		RawDocument rawDoc = new RawDocument(getUri("test01.xml"), "UTF-8", locEN, locFR);
 		rawDoc.setFilterConfigId("okf_xml");
 		driver.addBatchItem(rawDoc, getOutputUri("test01.xml"), "UTF-8");
 
-		rawDoc = new RawDocument(getUri("test02.xml"), "UTF-8", "en", "fr");
+		rawDoc = new RawDocument(getUri("test02.xml"), "UTF-8", locEN, locFR);
 		rawDoc.setFilterConfigId("okf_xml");
 		driver.addBatchItem(rawDoc, getOutputUri("test02.xml"), "UTF-8");
 
-		rawDoc = new RawDocument(getUri("test03.xml"), "UTF-8", "en", "fr");
+		rawDoc = new RawDocument(getUri("test03.xml"), "UTF-8", locEN, locFR);
 		rawDoc.setFilterConfigId("okf_xml");
 		driver.addBatchItem(rawDoc, getOutputUri("test03.xml"), "UTF-8");
 
-		rawDoc = new RawDocument(getUri("test04.xml"), "UTF-8", "en", "fr");
+		rawDoc = new RawDocument(getUri("test04.xml"), "UTF-8", locEN, locFR);
 		rawDoc.setFilterConfigId("okf_xml");
 		driver.addBatchItem(rawDoc, getOutputUri("test04.xml"), "UTF-8");
 
@@ -112,7 +117,7 @@ public class MultistepPipelineTest {
 		driver.addStep(step3);
 
 		// Set the info for the input and output
-		RawDocument rawDoc = new RawDocument(getUri("okapi_intro_test.html"), "UTF-8", "en", "fr");
+		RawDocument rawDoc = new RawDocument(getUri("okapi_intro_test.html"), "UTF-8", locEN, locFR);
 		rawDoc.setFilterConfigId("okf_html");
 		driver.addBatchItem(rawDoc);
 
@@ -142,7 +147,7 @@ public class MultistepPipelineTest {
 		driver.addStep(findStep);
 
 		// Set the info for the input and output
-		RawDocument rawDoc = new RawDocument(getUri("okapi_intro_test.html"), "UTF-8", "en", "fr");
+		RawDocument rawDoc = new RawDocument(getUri("okapi_intro_test.html"), "UTF-8", locEN, locFR);
 		rawDoc.setFilterConfigId("okf_html");
 		driver.addBatchItem(rawDoc, getOutputUri("okapi_intro_test.html"), "UTF-8");
 
@@ -158,20 +163,20 @@ public class MultistepPipelineTest {
 	public void copySourceToTargetPipeline() throws URISyntaxException {			
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		CopySourceToTargetStep copySourceToTargetStep = new CopySourceToTargetStep();
-		copySourceToTargetStep.getParameters().targetLanguage = "eu_ES";
+		copySourceToTargetStep.getParameters().targetLocale = locEUES;
 		driver.addStep(copySourceToTargetStep);
 		driver.addStep(new FilterEventsWriterStep());
 						
 		// Set the info for the input and output
-		RawDocument rawDoc = new RawDocument(getUri("Test01.properties"), "UTF-8", "en");
+		RawDocument rawDoc = new RawDocument(getUri("Test01.properties"), "UTF-8", locEN);
 		rawDoc.setFilterConfigId("okf_properties");
 		driver.addBatchItem(rawDoc, getOutputUri("Test01.properties"), "UTF-8");
 		
-		rawDoc = new RawDocument(getUri("Test02.properties"), "UTF-8", "en");
+		rawDoc = new RawDocument(getUri("Test02.properties"), "UTF-8", locEN);
 		rawDoc.setFilterConfigId("okf_properties");
 		driver.addBatchItem(rawDoc, getOutputUri("Test02.properties"), "UTF-8");
 		
-		rawDoc = new RawDocument(getUri("Test03.properties"), "UTF-8", "en");
+		rawDoc = new RawDocument(getUri("Test03.properties"), "UTF-8", locEN);
 		rawDoc.setFilterConfigId("okf_properties");
 		driver.addBatchItem(rawDoc, getOutputUri("Test03.properties"), "UTF-8");
 		
@@ -196,7 +201,7 @@ public class MultistepPipelineTest {
 		driver.addStep(new FilterEventsWriterStep());
 						
 		// Set the info for the input and output
-		RawDocument rawDoc = new RawDocument(getUri("Test01.properties"), "UTF-8", "en");
+		RawDocument rawDoc = new RawDocument(getUri("Test01.properties"), "UTF-8", locEN);
 		rawDoc.setFilterConfigId("okf_properties");
 		driver.addBatchItem(rawDoc, getOutputUri("Test01.properties"), "UTF-8");
 				

@@ -24,6 +24,7 @@ import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.filters.idml.IDMLContentFilter;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -61,7 +62,8 @@ public class IDMLContentFilterTest {
 		list.add(new InputDocument(root+"ConditionalText_Story_ud8.xml", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8",
+			LocaleId.fromString("en"), LocaleId.fromString("en")));
 	}
 
 }

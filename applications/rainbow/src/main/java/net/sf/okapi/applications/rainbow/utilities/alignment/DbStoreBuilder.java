@@ -28,6 +28,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -39,7 +40,7 @@ class DbStoreBuilder implements IFilterWriter {
 	private int lastGroupKey;
 	private DbStore dbs;
 	private ISegmenter segmenter;
-	private String language;
+	private LocaleId language;
 	private boolean useSource;
 
 	public DbStoreBuilder () {
@@ -88,7 +89,7 @@ class DbStoreBuilder implements IFilterWriter {
 		return event;
 	}
 
-	public void setOptions (String language,
+	public void setOptions (LocaleId language,
 		String defaultEncoding)
 	{
 		this.language = language;

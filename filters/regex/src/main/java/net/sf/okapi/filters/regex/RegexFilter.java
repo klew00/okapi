@@ -42,6 +42,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -71,8 +72,7 @@ public class RegexFilter implements IFilter {
 	private int startSearch;
 	private int startSkl;
 	private int parseState = 0;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId trgLang;
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	
@@ -255,7 +255,6 @@ public class RegexFilter implements IFilter {
 			throw new OkapiUnsupportedEncodingException(
 				String.format("The encoding '%s' is not supported.", encoding), e);
 		}
-		srcLang = input.getSourceLanguage();
 		trgLang = input.getTargetLanguage();
 		hasUTF8BOM = detector.hasUtf8Bom();
 		lineBreak = detector.getNewlineType().toString();
@@ -305,7 +304,7 @@ public class RegexFilter implements IFilter {
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
-		startDoc.setLanguage(srcLang);
+		startDoc.setLanguage(input.getSourceLanguage());
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setFilterWriter(createFilterWriter());

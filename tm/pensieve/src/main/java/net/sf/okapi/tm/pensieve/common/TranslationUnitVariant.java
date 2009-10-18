@@ -20,6 +20,7 @@
 
 package net.sf.okapi.tm.pensieve.common;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -27,7 +28,7 @@ import net.sf.okapi.common.resource.TextFragment;
  * @author HaslamJD
  */
 public class TranslationUnitVariant {
-    private String lang;
+    private LocaleId language;
     private TextFragment content;
 
     /**
@@ -37,11 +38,13 @@ public class TranslationUnitVariant {
 
     /**
      * Creates a TUV with the given language and content
-     * @param lang The language of the TUV
-     * @param content The content of the TUV
+     * @param language the language of the TUV
+     * @param content the content of the TUV
      */
-    public TranslationUnitVariant(String lang, TextFragment content) {
-        this.lang = lang;
+    public TranslationUnitVariant(LocaleId language,
+    	TextFragment content)
+    {
+        this.language = language;
         this.content = content;
     }
 
@@ -53,12 +56,12 @@ public class TranslationUnitVariant {
         this.content = content;
     }
 
-    public String getLang() {
-        return lang;
+    public LocaleId getLanguage () {
+        return language;
     }
 
-    public void setLang(String lang) {
-        this.lang = lang;
+    public void setLocale (LocaleId locale) {
+        this.language = locale;
     }
 
 }

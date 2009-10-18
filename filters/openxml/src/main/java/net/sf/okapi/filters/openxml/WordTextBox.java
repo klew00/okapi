@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
@@ -35,7 +36,7 @@ public class WordTextBox {
 	public WordTextBox() {
 		textBoxOpenXMLContentFilter = new OpenXMLContentFilter();	
 	}
-	public void open(String txbx, String sourceLanguage)
+	public void open(String txbx, LocaleId sourceLanguage)
 	{
 		textBoxOpenXMLContentFilter.open(
 				new RawDocument((CharSequence)txbx,sourceLanguage));

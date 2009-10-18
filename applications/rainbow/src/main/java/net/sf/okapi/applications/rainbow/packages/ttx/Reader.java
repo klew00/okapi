@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.packages.ttx;
 
 import net.sf.okapi.applications.rainbow.packages.IReader;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -43,8 +44,8 @@ public class Reader implements IReader {
 	}
 
 	public void openDocument (String path,
-		String sourceLanguage,
-		String targetLanguage)
+		LocaleId sourceLanguage,
+		LocaleId targetLanguage)
 	{
 		reader.open(path);
 	}

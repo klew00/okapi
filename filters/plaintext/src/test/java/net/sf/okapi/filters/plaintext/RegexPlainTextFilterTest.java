@@ -40,6 +40,7 @@ import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -61,6 +62,8 @@ public class RegexPlainTextFilterTest {
 	private RegexPlainTextFilter filter;
 	private FilterTestDriver testDriver;
     String root;
+    private LocaleId locEN = LocaleId.fromString("en"); 
+    private LocaleId locFR = LocaleId.fromString("fr"); 
 
 	@Before
 	public void setUp() {
@@ -82,7 +85,7 @@ public class RegexPlainTextFilterTest {
 		// Empty stream, OkapiBadFilterInputException expected, no other		
 		InputStream input = null;
 		try {
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -94,7 +97,7 @@ public class RegexPlainTextFilterTest {
 		// Empty URI, OkapiBadFilterInputException expected, no other
 		URI uri = null;
 		try {
-			filter.open(new RawDocument(uri, "UTF-8", "en"));
+			filter.open(new RawDocument(uri, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -106,7 +109,7 @@ public class RegexPlainTextFilterTest {
 		// Empty char seq, OkapiBadFilterInputException expected, no other		
 		String st = null;
 		try {
-			filter.open(new RawDocument(st, "UTF-8", "en"));
+			filter.open(new RawDocument(st, locEN, locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -142,7 +145,7 @@ public class RegexPlainTextFilterTest {
 			filter.setParameters(null);
 			
 			InputStream input2 = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");
-			filter.open(new RawDocument(input2, "UTF-8", "en"));
+			filter.open(new RawDocument(input2, "UTF-8", locEN));
 		}	
 		finally {
 			filter.close();
@@ -187,7 +190,7 @@ public class RegexPlainTextFilterTest {
 		params.save(paramsUrl.getPath());
 		
 		// Test the parameters are loaded into the internal regex and compiled
-		filter.open(new RawDocument("Line 1/r/nLine2 Test rule", "UTF-8", "en"), true);
+		filter.open(new RawDocument("Line 1/r/nLine2 Test rule", locEN, locEN), true);
 		
 		testEvent(EventType.START_DOCUMENT, "");
 		testEvent(EventType.DOCUMENT_PART, "Line 1/r/nLine2 ");
@@ -227,7 +230,7 @@ public class RegexPlainTextFilterTest {
 		
 		// Read lines from a file, check mime types 
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/cr.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		while (filter.hasNext()) {
 			Event event = filter.next();
@@ -287,7 +290,7 @@ public class RegexPlainTextFilterTest {
 		list.add(new InputDocument(root + "u2029.txt", "")); 
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 	
 	
@@ -300,7 +303,7 @@ public class RegexPlainTextFilterTest {
 		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1", 1);
@@ -320,7 +323,7 @@ public class RegexPlainTextFilterTest {
 		assertNotNull(input);
 		
 		System.out.println(filename);
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}

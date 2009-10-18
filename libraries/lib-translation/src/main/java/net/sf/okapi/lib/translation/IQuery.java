@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.translation;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -48,20 +49,20 @@ public interface IQuery {
 	 * @param sourceLang Code of the source language.
 	 * @param targetLang Code of the target language.
 	 */
-	public void setLanguages (String sourceLang,
-		String targetLang);
+	public void setLanguages (LocaleId sourceLang,
+		LocaleId targetLang);
 	
 	/**
 	 * Gets the current source language for this query engine.
 	 * @return Code of the source language.
 	 */
-	public String getSourceLanguage ();
+	public LocaleId getSourceLanguage ();
 	
 	/**
 	 * Gets the current target language for this query engine.
 	 * @return Code of the target language.
 	 */
-	public String getTargetLanguage ();
+	public LocaleId getTargetLanguage ();
 	
 	/**
 	 * Sets an attribute for this query engine.

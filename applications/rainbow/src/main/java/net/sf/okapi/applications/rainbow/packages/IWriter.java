@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.packages;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -36,16 +37,16 @@ public interface IWriter extends IFilterWriter {
 	
 	/**
 	 * Sets the global parameters of the package.
-	 * @param sourceLanguage the source language.
-	 * @param targetLanguage the target language.
+	 * @param sourceLocale the source language.
+	 * @param targetLocale the target language.
 	 * @param projectID the project identifier.
 	 * @param outputDir the root folder for the output.
 	 * @param packageID the package identifier.
 	 * @param sourceRoot the root folder of the original inputs.
 	 * @param preSegmented indicates if the files are pre-segmented.
 	 */
-	public void setInformation (String sourceLanguage,
-		String targetLanguage,
+	public void setInformation (LocaleId sourceLocale,
+		LocaleId targetLocale,
 		String projectID,
 		String outputDir,
 		String packageID,

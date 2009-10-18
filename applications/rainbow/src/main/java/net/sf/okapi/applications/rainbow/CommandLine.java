@@ -35,6 +35,7 @@ import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ui.BaseHelp;
 
 public class CommandLine {
@@ -115,10 +116,10 @@ public class CommandLine {
 				prj.setTargetEncoding(nextArg(args, ++i));
 			}
 			else if ( "-sl".equals(arg) ) { // Source language //$NON-NLS-1$
-				prj.setSourceLanguage(nextArg(args, ++i));
+				prj.setSourceLanguage(LocaleId.fromString(nextArg(args, ++i)));
 			}
 			else if ( "-tl".equals(arg) ) { // Target language //$NON-NLS-1$
-				prj.setTargetLanguage(nextArg(args, ++i));
+				prj.setTargetLanguage(LocaleId.fromString(nextArg(args, ++i)));
 			}
 			else if (( "-ir".equals(arg) ) || ( "-ir0".equals(arg) )) { // Input root list 0 //$NON-NLS-1$ //$NON-NLS-2$
 				prj.setInputRoot(0, nextArg(args, ++i), true);

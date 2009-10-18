@@ -135,8 +135,8 @@ public class Utility extends BaseUtility implements ISimpleUtility {
 		trans.clearParameters();
 		String value;
 		for ( String key : paramList.keySet() ) {
-			value = paramList.get(key).replace("${SrcLang}", srcLang); //$NON-NLS-1$
-			value = value.replace("${TrgLang}", trgLang); //$NON-NLS-1$
+			value = paramList.get(key).replace("${SrcLang}", srcLang.toBCP47()); //$NON-NLS-1$
+			value = value.replace("${TrgLang}", trgLang.toBCP47()); //$NON-NLS-1$
 			value = value.replace("${Input1}", Util.makeURIFromPath(getInputPath(0))); //$NON-NLS-1$
 			value = value.replace("${Output1}", Util.makeURIFromPath(getOutputPath(0))); //$NON-NLS-1$
 			if ( getInputPath(1) != null ) {

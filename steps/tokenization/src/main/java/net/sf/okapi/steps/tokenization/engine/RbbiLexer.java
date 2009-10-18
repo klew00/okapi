@@ -23,6 +23,7 @@ package net.sf.okapi.steps.tokenization.engine;
 import java.util.TreeMap;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
@@ -36,7 +37,7 @@ import com.ibm.icu.util.ULocale;
 public class RbbiLexer extends AbstractLexer {
 
 	// Cache for iterators reuse
-	private TreeMap <String, RuleBasedBreakIterator> iterators = new TreeMap <String, RuleBasedBreakIterator>();
+	private TreeMap <LocaleId, RuleBasedBreakIterator> iterators = new TreeMap <LocaleId, RuleBasedBreakIterator>();
 
 	private RuleBasedBreakIterator iterator = null;
 	private int start;
@@ -86,21 +87,19 @@ public class RbbiLexer extends AbstractLexer {
 	}
 	
 	@Override
-	public void lexer_open(String text, String language, Tokens tokens) {
-		
+	public void lexer_open(String text, LocaleId language, Tokens tokens) {
 		if (Util.isEmpty(text)) {
-			
 			cancel();
 			return;
 		}
-
 		this.text = text;
 		
-		if (iterators.containsKey(language))
+		if ( iterators.containsKey(language) ) {
 			iterator = iterators.get(language);
+		}
 		else {
-			
-			iterator = (RuleBasedBreakIterator) BreakIterator.getWordInstance(ULocale.createCanonical(language));
+			iterator = (RuleBasedBreakIterator)BreakIterator.getWordInstance(
+				ULocale.createCanonical(language.toString()));
 			String defaultRules = iterator.toString();
 			
 			// Collect rules for the language, combine with defaultRules
@@ -128,7 +127,7 @@ public class RbbiLexer extends AbstractLexer {
 			iterators.put(language, iterator);
 		}
 
-		if (iterator == null) return;		
+		if ( iterator == null ) return;		
 		iterator.setText(text);
 		
 		// Sets the current iteration position to the beginning of the text
@@ -136,8 +135,7 @@ public class RbbiLexer extends AbstractLexer {
 		end = start;
 	}
 
-	public Lexems process(String text, String language, Tokens tokens) {
-		
+	public Lexems process(String text, LocaleId language, Tokens tokens) {
 		return null;
 	}
 

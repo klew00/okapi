@@ -58,6 +58,7 @@ import net.sf.okapi.filters.table.tsv.TabSeparatedValuesFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -68,22 +69,18 @@ public class TableFilterTest {
 	private TableFilter filter;
 	private FilterTestDriver testDriver;
 	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
 	
 	@Before
 	public void setUp() {
 		filter = new TableFilter();
 		assertNotNull(filter);
-		
 		testDriver = new FilterTestDriver();
 		assertNotNull(testDriver);
-		
 		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
-
-//m		URL url = TableFilterTest.class.getResource("/csv_test1.txt");
-//m		root = Util.getDirectoryName(url.getPath());
-//m		root = Util.getDirectoryName(root) + "/data/";
-        root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt"); // maven
+        root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
 	}
 	
 		
@@ -95,7 +92,7 @@ public class TableFilterTest {
 		// Empty stream, OkapiBadFilterInputException expected, no other		
 		InputStream input = null;
 		try {			
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -107,7 +104,7 @@ public class TableFilterTest {
 		// Empty URI, OkapiBadFilterInputException expected, no other
 		URI uri = null;
 		try {
-			filter.open(new RawDocument(uri, "UTF-8", "en"));
+			filter.open(new RawDocument(uri, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -119,7 +116,7 @@ public class TableFilterTest {
 		// Empty char seq, OkapiBadFilterInputException expected, no other		
 		String st = null;
 		try {
-			filter.open(new RawDocument(st, "UTF-8", "en"));
+			filter.open(new RawDocument(st, locEN, locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -155,7 +152,7 @@ public class TableFilterTest {
 			
 			InputStream input2 = TableFilterTest.class.getResourceAsStream("/csv_test1.txt");
 		try {
-			filter.open(new RawDocument(input2, "UTF-8", "en"));
+			filter.open(new RawDocument(input2, "UTF-8", locEN));
 			fail("OkapiBadFilterParametersException should've been trown");
 		}
 		catch (OkapiBadFilterParametersException e) {
@@ -172,7 +169,7 @@ public class TableFilterTest {
 		
 		// Read lines from a file, check mime types 
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test1.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		while (filter.hasNext()) {
 			Event event = filter.next();
@@ -203,7 +200,7 @@ public class TableFilterTest {
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test1.txt");
 		assertNotNull(input);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		
@@ -257,7 +254,7 @@ public class TableFilterTest {
 		assertNotNull(input);
 		
 		// System.out.println(filename);
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}
@@ -278,7 +275,7 @@ public class TableFilterTest {
 			params.columnNamesLineNum = 1;
 			params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
 			
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			
 			testEvent(EventType.START_DOCUMENT, null);
 			
@@ -307,7 +304,7 @@ public class TableFilterTest {
 			assertNotNull(input);
 			
 			// System.out.println(filename);
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}
@@ -395,7 +392,7 @@ public class TableFilterTest {
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"csv_test1.txt", ""),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 */	
 	@Test
@@ -407,7 +404,7 @@ public class TableFilterTest {
 		list.add(new InputDocument(root + "csv_test2.txt", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 
 // Helpers
@@ -463,10 +460,10 @@ public class TableFilterTest {
 		writer = filter.createFilterWriter();		
 		try {						
 			// Open the input
-			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", "en", "fr"));
+			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", locEN, locFR));
 			
 			// Prepare the output
-			writer.setOptions("fr", "UTF-16");
+			writer.setOptions(locFR, "UTF-16");
 			writerBuffer = new ByteArrayOutputStream();
 			writer.setOutput(writerBuffer);
 			

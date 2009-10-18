@@ -53,6 +53,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -74,6 +75,8 @@ public class PlainTextFilterTest {
 	private PlainTextFilter filter;
 	private FilterTestDriver testDriver;
 	private String root;
+    private LocaleId locEN = LocaleId.fromString("en"); 
+    private LocaleId locFR = LocaleId.fromString("fr"); 
 	
 	@Before
 	public void setUp() {
@@ -96,7 +99,7 @@ public class PlainTextFilterTest {
 		// Empty stream, OkapiBadFilterInputException expected, no other		
 		InputStream input = null;
 		try {
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -108,7 +111,7 @@ public class PlainTextFilterTest {
 		// Empty URI, OkapiBadFilterInputException expected, no other
 		URI uri = null;
 		try {
-			filter.open(new RawDocument(uri, "UTF-8", "en"));
+			filter.open(new RawDocument(uri, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -120,7 +123,7 @@ public class PlainTextFilterTest {
 		// Empty char seq, OkapiBadFilterInputException expected, no other		
 		String st = null;
 		try {
-			filter.open(new RawDocument(st, "UTF-8", "en"));
+			filter.open(new RawDocument(st, locEN, locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -155,7 +158,7 @@ public class PlainTextFilterTest {
 		try {
 			filter.setParameters(null);						
 			InputStream input2 = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
-			filter.open(new RawDocument(input2, "UTF-8", "en"));
+			filter.open(new RawDocument(input2, "UTF-8", locEN));
 			fail("OkapiBadFilterParametersException should've been trown");
 		}	
 		catch (OkapiBadFilterParametersException e) {
@@ -172,7 +175,7 @@ public class PlainTextFilterTest {
 		
 		// Read lines from a file, check mime types 
 		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		while (filter.hasNext()) {
 			Event event = filter.next();
@@ -282,7 +285,7 @@ public class PlainTextFilterTest {
 		assertNotNull(input);
 		
 //debug		System.out.println(filename);
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if (!testDriver.process(filter)) Assert.fail();
 		filter.close();
 	}
@@ -291,7 +294,7 @@ public class PlainTextFilterTest {
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"cr.txt", null),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 
 	@Test
@@ -309,7 +312,7 @@ public class PlainTextFilterTest {
 		list.add(new InputDocument(root + "lf.txt", "")); 
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 	
 	@Test
@@ -319,7 +322,7 @@ public class PlainTextFilterTest {
 		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
 		assertNotNull(input);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
@@ -392,7 +395,7 @@ public class PlainTextFilterTest {
 		params.load(Util.toURI(root + "/test_params1.fprm"), false);
 
 		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 
 		IParameters params6 = filter.getActiveParameters();
 		assertTrue(params6 instanceof net.sf.okapi.filters.plaintext.spliced.Parameters);
@@ -401,7 +404,7 @@ public class PlainTextFilterTest {
 		params.load(Util.toURI(root + "/test_params2.fprm"), false);
 		
 		input = PlainTextFilterTest.class.getResourceAsStream("/cr.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		IParameters params7 = filter.getActiveParameters();
 		assertTrue(params7 instanceof net.sf.okapi.filters.plaintext.paragraphs.Parameters);
@@ -523,7 +526,7 @@ public class PlainTextFilterTest {
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.NONE;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1", 1);
 		testEvent(EventType.TEXT_UNIT, "Line 2", 2);
@@ -540,7 +543,7 @@ public class PlainTextFilterTest {
 		params.extractParagraphs = true;
 		params.wrapMode = WrapMode.NONE;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2", 1);
 		testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5", 4);
@@ -561,7 +564,7 @@ public class PlainTextFilterTest {
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.NONE;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
 		testEvent(EventType.TEXT_UNIT, "Line 2");
@@ -578,7 +581,7 @@ public class PlainTextFilterTest {
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.PLACEHOLDERS;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
 		testEvent(EventType.TEXT_UNIT, "Line 2");
@@ -595,7 +598,7 @@ public class PlainTextFilterTest {
 		params.extractParagraphs = false;
 		params.wrapMode = WrapMode.SPACES;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
 		testEvent(EventType.TEXT_UNIT, "Line 2");
@@ -613,7 +616,7 @@ public class PlainTextFilterTest {
 		params.extractParagraphs = true;
 		params.wrapMode = WrapMode.NONE;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1\nLine 2");
 		testEvent(EventType.TEXT_UNIT, "Line 3\nLine 4\nLine 5");
@@ -627,7 +630,7 @@ public class PlainTextFilterTest {
 		params.extractParagraphs = true;
 		params.wrapMode = WrapMode.SPACES;		
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1 Line 2");
 		testEvent(EventType.TEXT_UNIT, "Line 3 Line 4 Line 5");
@@ -641,7 +644,7 @@ public class PlainTextFilterTest {
 		params.extractParagraphs = true;
 		params.wrapMode = WrapMode.PLACEHOLDERS;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1\rLine 2");
 		testEvent(EventType.TEXT_UNIT, "Line 3\rLine 4\rLine 5");
@@ -665,7 +668,7 @@ public class PlainTextFilterTest {
 		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		filter.close();
 		
 		params2 = filter.getActiveParameters();
@@ -686,7 +689,7 @@ public class PlainTextFilterTest {
 		input = PlainTextFilterTest.class.getResourceAsStream("/test_paragraphs1.txt");
 		assertNotNull(input);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		filter.close();
 		
 		params2 = filter.getActiveParameters();
@@ -705,7 +708,7 @@ public class PlainTextFilterTest {
 		InputStream input = PlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1");
@@ -721,7 +724,7 @@ public class PlainTextFilterTest {
 		assertNotNull(input);
 		
 		System.out.println(filename);
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}
@@ -812,10 +815,10 @@ public class PlainTextFilterTest {
 		writer = filter.createFilterWriter();		
 		try {						
 			// Open the input
-			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", "en", "fr"));
+			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", locEN, locFR));
 			
 			// Prepare the output
-			writer.setOptions("fr", "UTF-16");
+			writer.setOptions(locFR, "UTF-16");
 			writerBuffer = new ByteArrayOutputStream();
 			writer.setOutput(writerBuffer);
 			

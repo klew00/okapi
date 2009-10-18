@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.HTMLCharacterEntities;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -76,12 +77,12 @@ public class ApertiumMTConnector implements IQuery {
 		throw new UnsupportedOperationException();
 	}
 
-	public String getSourceLanguage () {
-		return srcLang;
+	public LocaleId getSourceLanguage () {
+		return LocaleId.fromString(srcLang);
 	}
 
-	public String getTargetLanguage () {
-		return trgLang;
+	public LocaleId getTargetLanguage () {
+		return LocaleId.fromString(trgLang);
 	}
 
 	public boolean hasNext () {
@@ -181,16 +182,16 @@ public class ApertiumMTConnector implements IQuery {
 		}
 	}
 
-	public void setLanguages (String sourceLang,
-		String targetLang)
+	public void setLanguages (LocaleId sourceLocale,
+		LocaleId targetLocale)
 	{
-		srcLang = toInternalCode(sourceLang);
-		trgLang = toInternalCode(targetLang);
+		srcLang = toInternalCode(sourceLocale);
+		trgLang = toInternalCode(targetLocale);
 		pair = String.format("%s-%s", srcLang, trgLang);
 	}
 
-	private String toInternalCode (String standardCode) {
-		String[] codes = Util.splitLanguageCode(standardCode.toLowerCase());
+	private String toInternalCode (LocaleId standardCode) {
+		String[] codes = Util.splitLanguageCode(standardCode.toBCP47());
 		if ( codes[1] != null ) {
 			// Temporary fix for the Aranese case (until we get real LocaleID)
 			if ( codes[1].equals("aran") ) codes[0] += "_aran";

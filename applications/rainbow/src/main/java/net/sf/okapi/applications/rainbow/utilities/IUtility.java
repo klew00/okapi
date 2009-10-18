@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.utilities;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.LocaleId;
 
 /**
  * Provides a common way of executing an arbitrary utility.
@@ -74,8 +75,8 @@ public interface IUtility {
 	 * @param sourceLanguage Language code for the source.
 	 * @param targetLanguage Language code for the target.
 	 */
-	public void setOptions (String sourceLanguage,
-		String targetLanguage);
+	public void setOptions (LocaleId sourceLanguage,
+		LocaleId targetLanguage);
 
 	/**
 	 * Indicates if the utility has parameters.

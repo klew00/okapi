@@ -37,7 +37,7 @@
 		<module>uriconversion</module>
 		<module>uriconversion-ui</module>
         <module>formatconversion</module>
-        <module>wordcount</module>
+		<module>wordcount</module>
         <module>wordcount-ui</module>
         <module>xsltransform</module>
         <module>xsltransform-ui</module>

@@ -42,6 +42,7 @@ import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -58,6 +59,8 @@ public class SplicedLinesFilterTest {
 	private SplicedLinesFilter filter;
 	private FilterTestDriver testDriver;
     String root;
+    private LocaleId locEN = LocaleId.fromString("en"); 
+    private LocaleId locFR = LocaleId.fromString("fr"); 
 	
 	@Before
 	public void setUp() {
@@ -81,7 +84,7 @@ public class SplicedLinesFilterTest {
 		
 		// 1.
 		params.createPlaceholders = false;
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1 Line 2 Line 3", 1);
@@ -91,7 +94,7 @@ public class SplicedLinesFilterTest {
 		// 2.
 		params.createPlaceholders = true;
 		input = ParaPlainTextFilterTest.class.getResourceAsStream("/combined_lines.txt");				
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		testEvent(EventType.TEXT_UNIT, "Line 1 \\\rLine 2 \\\rLine 3");
@@ -109,7 +112,7 @@ public class SplicedLinesFilterTest {
 		list.add(new InputDocument(root + "combined_lines.txt", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 
 	@Test
@@ -253,10 +256,10 @@ public class SplicedLinesFilterTest {
 		writer = filter.createFilterWriter();		
 		try {						
 			// Open the input
-			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", "en", "fr"));
+			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", locEN, locFR));
 			
 			// Prepare the output
-			writer.setOptions("fr", "UTF-16");
+			writer.setOptions(locFR, "UTF-16");
 			writerBuffer = new ByteArrayOutputStream();
 			writer.setOutput(writerBuffer);
 			

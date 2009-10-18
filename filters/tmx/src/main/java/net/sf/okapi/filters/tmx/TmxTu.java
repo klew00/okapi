@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -42,8 +43,8 @@ class TmxTu {
 	TmxTuv curTuv;												//Get the current tuv being processed
 	boolean reachedTuvSection;									//flag helping determine if adding/appending to skelBefore or skelAfter
 	String lineBreak;
-	String srcLang;												//Redundant convenience variable
-	String trgLang;												//Redundant convenience variable
+	LocaleId srcLang;												//Redundant convenience variable
+	LocaleId trgLang;												//Redundant convenience variable
 	
 	
 	/**
@@ -51,7 +52,7 @@ class TmxTu {
 	 * @param srcLang The source language.
 	 * @param trgLang The target language. 
 	 */		
-	public TmxTu(String srcLang, String trgLang, String lineBreak){
+	public TmxTu (LocaleId srcLang, LocaleId trgLang, String lineBreak){
 		this.srcLang = srcLang;
 		this.trgLang = trgLang;
 		this.lineBreak = lineBreak;
@@ -64,8 +65,7 @@ class TmxTu {
 	 * @param trgType Indicates if it's TuvXmlLang.SOURCE, TuvXmlLang.TARGET, or TuvXmlLang.OTHER. 
 	 * @return The added TmxTuv.
 	 */	
-	TmxTuv addTmxTuv(String lang, TuvXmlLang trgType){
-		
+	TmxTuv addTmxTuv(LocaleId lang, TuvXmlLang trgType){
 		int counter = langCount(lang);
 		TmxTuv newTmxTuv = new TmxTuv(lang, trgType, ++counter);
 		
@@ -84,10 +84,10 @@ class TmxTu {
 	 * @param lang The language to be counted.
 	 * @return The number of <tuv>s. Result above 1 indicates a duplicate.
 	 */		
-	int langCount(String lang){
+	int langCount (LocaleId lang) {
 		int counter=0;
 		for (TmxTuv tmxTuv : tuvs){
-			if(tmxTuv.lang.equals(lang)){
+			if ( tmxTuv.lang.equals(lang) ) {
 				counter++;
 			}
 		}
@@ -324,13 +324,10 @@ class TmxTu {
 		}
 
 		for (TmxTuv tuv : tuvs){
-			
 			//--don't include duplicates--
 			if(tuv.langCount==1 || (tuv.trgType == TuvXmlLang.OTHER && !processAllTargets)){
-
 				//--1. tuv skel before--
 				tuSkel.add(tuv.skelBefore);
-				
 				if(tuv.trgType == TuvXmlLang.SOURCE){
 					//--add source container--
 					TmxTuv srcTuv = getSourceTuv();					

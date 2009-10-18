@@ -30,6 +30,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -49,7 +50,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	private boolean firstOutputCreated;
 	private int outputType;
 	private URI outputURI;
-	private String targetLanguage;
+	private LocaleId targetLocale;
 
 	public FormatConversionStep () {
 		params = new Parameters();
@@ -61,8 +62,8 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 	
 	public String getDescription () {
@@ -168,10 +169,10 @@ public class FormatConversionStep extends BasePipelineStep {
 		// If requested, overwrite the target
 		switch ( params.getTargetStyle() ) {
 		case Parameters.TRG_FORCEEMPTY:
-			tu.createTarget(targetLanguage, true, IResource.CREATE_EMPTY);
+			tu.createTarget(targetLocale, true, IResource.CREATE_EMPTY);
 			break;
 		case Parameters.TRG_FORCESOURCE:
-			tu.createTarget(targetLanguage, true, IResource.COPY_ALL);
+			tu.createTarget(targetLocale, true, IResource.COPY_ALL);
 			break;
 		}
 		writer.handleEvent(event);
@@ -204,7 +205,7 @@ public class FormatConversionStep extends BasePipelineStep {
 		}
 		// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
 		writer.setOutput(outFile.getPath());
-		writer.setOptions(targetLanguage, "UTF-8");
+		writer.setOptions(targetLocale, "UTF-8");
 		firstOutputCreated = true;
 	}
 
@@ -234,7 +235,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			outFile.deleteOnExit();
 		}
 		writer.setOutput(outFile.getPath());
-		writer.setOptions(targetLanguage, "UTF-8");
+		writer.setOptions(targetLocale, "UTF-8");
 		firstOutputCreated = true;
 	}
 
@@ -255,7 +256,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			}
 			// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
 			writer.setOutput(outFile.getPath());
-			writer.setOptions(targetLanguage, "UTF-8");
+			writer.setOptions(targetLocale, "UTF-8");
 		}
 		else {
 			try {
@@ -275,6 +276,6 @@ public class FormatConversionStep extends BasePipelineStep {
 
 	private void startPensieveOutput () {
 		writer.setOutput(params.getOutputPath());
-		writer.setOptions(targetLanguage, "UTF-8");
+		writer.setOptions(targetLocale, "UTF-8");
 	}
 }

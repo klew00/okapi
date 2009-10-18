@@ -23,8 +23,8 @@ package net.sf.okapi.applications.rainbow.utilities.transcomparison;
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 
 public class TextMatcher {
@@ -46,27 +46,18 @@ public class TextMatcher {
 	 * @param language1 Language code of the first language.
 	 * @param language2 Language code of the second language.
 	 */
-	public TextMatcher (String language1,
-		String language2)
+	public TextMatcher (LocaleId language1,
+		LocaleId language2)
 	{
-		// Get the locale to use.
-		Locale loc;
-		String[] parts = net.sf.okapi.common.Util.splitLanguageCode(language1);
-		if ( parts[1].length() > 0 ) loc = new Locale(parts[0], parts[1]);
-		else loc = new Locale(parts[0]);
-
 		// Create the first breaker.
-		breaker1 = BreakIterator.getWordInstance(loc);
+		breaker1 = BreakIterator.getWordInstance(language1.toJavaLocale());
 		if ( language1.equals(language2) ) {
 			// Use the same one if the second language is the same.
 			breaker2 = breaker1;
 		}
 		else {
 			// If two different languages: create a second breaker.
-			parts = net.sf.okapi.common.Util.splitLanguageCode(language1);
-			if ( parts[1].length() > 0 ) loc = new Locale(parts[0], parts[1]);
-			else loc = new Locale(parts[0]);
-			breaker2 = BreakIterator.getWordInstance(loc);
+			breaker2 = BreakIterator.getWordInstance(language2.toJavaLocale());
 		}
 	}
 	

@@ -23,10 +23,13 @@ package net.sf.okapi.common.filters;
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class AbstractBaseFilterTests {
 
+	private LocaleId locEN = LocaleId.fromString("en");
+	
 	@Test
 	public void testMultilingual () {
 		DummyBaseFilter filter = null;		
@@ -36,11 +39,11 @@ public class AbstractBaseFilterTests {
 			testDriver.setShowSkeleton(true);
 			filter = new DummyBaseFilter();
 
-			filter.open(new RawDocument("1", "en", "is"));
+			filter.open(new RawDocument("1", locEN, locEN));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 
-			filter.open(new RawDocument("2", "en", "is"));
+			filter.open(new RawDocument("2", locEN, locEN));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
 		}

@@ -36,6 +36,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -70,7 +71,7 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 	private String lineBreak;
 	private int parseState = 0;	
 	private String docName;
-	private String srcLang;
+	private LocaleId srcLang;
 	private boolean hasUTF8BOM;
 	private IFilterWriter filterWriter;
 	private boolean multilingual;

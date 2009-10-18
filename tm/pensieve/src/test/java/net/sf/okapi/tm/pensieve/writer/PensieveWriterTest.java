@@ -20,6 +20,7 @@
 
 package net.sf.okapi.tm.pensieve.writer;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -56,6 +57,9 @@ public class PensieveWriterTest {
     static final File GOOD_DIR = new File("../data/");
     static final File GOOD_FILE = new File(GOOD_DIR, "apache1.0.txt");
     RAMDirectory dir;
+    LocaleId locEN = LocaleId.fromString("EN");
+    LocaleId locFR = LocaleId.fromString("FR");
+    LocaleId locKR = LocaleId.fromString("KR");
 
     @Before
     public void init() throws IOException {
@@ -66,30 +70,30 @@ public class PensieveWriterTest {
 
     @Test
     public void constructorCreateNew() throws IOException {
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joe", "Jo","1"));
         tmWriter.endIndex();
         tmWriter = new PensieveWriter(dir, true);
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joseph", "Yosep","2"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joseph", "Yosep","2"));
         tmWriter.endIndex();
         assertEquals("# of docs in tm", 1, tmWriter.getIndexWriter().numDocs());
     }
 
     @Test
     public void constructorCreateNew2 () throws IOException {
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joe", "Jo","1"));
         tmWriter.endIndex();
         tmWriter = new PensieveWriter(dir, true);
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joseph", "Yosep","2"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joseph", "Yosep","2"));
         tmWriter.endIndex();
         assertEquals("# of docs in tm", 1, tmWriter.getIndexWriter().numDocs());
     }
 
     @Test
     public void constructorAppend() throws IOException {
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joe", "Jo","1"));
         tmWriter.endIndex();
         tmWriter = new PensieveWriter(dir, false);
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joseph", "Yosep","2"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joseph", "Yosep","2"));
         tmWriter.endIndex();
         assertEquals("# of docs in tm", 2, tmWriter.getIndexWriter().numDocs());
     }
@@ -101,8 +105,8 @@ public class PensieveWriterTest {
 
     @Test
     public void indexTranslationUnitMetaData() throws IOException, ParseException {
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Jane", "Jaen","2"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Jane", "Jaen","2"));
         writer.commit();
 
         assertEquals("# of docs found for id=1", 1, getNumOfHitsFor(MetadataType.ID.fieldName(), "1"));
@@ -121,8 +125,8 @@ public class PensieveWriterTest {
 
     @Test
     public void update() throws IOException, ParseException {
-        TranslationUnit tu1 = Helper.createTU("EN", "KR", "Joe", "Jo","1");
-        TranslationUnit tu2 = Helper.createTU("EN", "KR", "Jane", "Jaen","2");
+        TranslationUnit tu1 = Helper.createTU(locEN, locKR, "Joe", "Jo","1");
+        TranslationUnit tu2 = Helper.createTU(locEN, locKR, "Jane", "Jaen","2");
         tmWriter.indexTranslationUnit(tu1);
         tmWriter.indexTranslationUnit(tu2);
         writer.commit();
@@ -149,8 +153,8 @@ public class PensieveWriterTest {
 
     @Test
     public void deleteWithId() throws IOException, ParseException {
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Joe", "Jo","1"));
-        tmWriter.indexTranslationUnit(Helper.createTU("EN", "KR", "Jane", "Jaen","2"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joe", "Jo","1"));
+        tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Jane", "Jaen","2"));
         writer.commit();
 
         tmWriter.delete("1");
@@ -207,8 +211,8 @@ public class PensieveWriterTest {
     }
 
     public void endIndexCommits() throws IOException {
-        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN",
-                new TextFragment("dax")), new TranslationUnitVariant("ES", new TextFragment("is funny (sometimes)"))));
+        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(locEN,
+                new TextFragment("dax")), new TranslationUnitVariant(locKR, new TextFragment("is funny (sometimes)"))));
         tmWriter.endIndex();
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed after endIndex", 1, reader.maxDoc());
@@ -216,14 +220,14 @@ public class PensieveWriterTest {
 
     @Test(expected = NullPointerException.class)
     public void getDocumentNoSourceContent(){
-        tmWriter.createDocument(new TranslationUnit(null, new TranslationUnitVariant("EN",
+        tmWriter.createDocument(new TranslationUnit(null, new TranslationUnitVariant(locEN,
                 new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
     public void getDocumentEmptySourceContent(){
-        tmWriter.createDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("")),
-                new TranslationUnitVariant("EN", new TextFragment("some target"))));
+        tmWriter.createDocument(new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment("")),
+                new TranslationUnitVariant(locEN, new TextFragment("some target"))));
     }
 
     @Test(expected = NullPointerException.class)
@@ -234,16 +238,16 @@ public class PensieveWriterTest {
     @Test
     public void getDocumentValues(){
         String text = "blah blah blah";
-        TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment(text)),
-                new TranslationUnitVariant("FR", new TextFragment("someone")));
+        TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment(text)),
+                new TranslationUnitVariant(locFR, new TextFragment("someone")));
         Metadata md = tu.getMetadata();
         md.put(MetadataType.ID, "someId");
         Document doc = tmWriter.createDocument(tu);
         assertEquals("Document's content field", "blah blah blah", getFieldValue(doc, SOURCE.name()));
         assertEquals("Document's content exact field", "blah blah blah", getFieldValue(doc, SOURCE_EXACT.name()));
         assertEquals("Document's target field", "someone", getFieldValue(doc, TARGET.name()));
-        assertEquals("Document's source lang field", "EN", getFieldValue(doc, SOURCE_LANG.name()));
-        assertEquals("Document's target lang field", "FR", getFieldValue(doc, TARGET_LANG.name()));
+        assertEquals("Document's source lang field", locEN, getFieldValue(doc, SOURCE_LANG.name()));
+        assertEquals("Document's target lang field", locFR, getFieldValue(doc, TARGET_LANG.name()));
         assertEquals("Document's id field", "someId", getFieldValue(doc, MetadataType.ID.fieldName()));
     }
 
@@ -262,16 +266,16 @@ public class PensieveWriterTest {
     	String trgCT = trgFrag.getCodedText();
     	String trgCodes = Code.codesToString(trgFrag.getCodes());
 
-    	TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant("EN", srcFrag),
-   			new TranslationUnitVariant("FR", trgFrag));
+    	TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant(locEN, srcFrag),
+   			new TranslationUnitVariant(locFR, trgFrag));
     	Metadata md = tu.getMetadata();
     	md.put(MetadataType.ID, "someId");
     	Document doc = tmWriter.createDocument(tu);
     	assertEquals("Document's content field", srcCT, getFieldValue(doc, SOURCE.name()));
     	assertEquals("Document's content exact field", srcCT, getFieldValue(doc, SOURCE_EXACT.name()));
     	assertEquals("Document's target field", trgCT, getFieldValue(doc, TARGET.name()));
-    	assertEquals("Document's source lang field", "EN", getFieldValue(doc, SOURCE_LANG.name()));
-    	assertEquals("Document's target lang field", "FR", getFieldValue(doc, TARGET_LANG.name()));
+    	assertEquals("Document's source lang field", locEN, getFieldValue(doc, SOURCE_LANG.name()));
+    	assertEquals("Document's target lang field", locFR, getFieldValue(doc, TARGET_LANG.name()));
     	assertEquals("Document's id field", "someId", getFieldValue(doc, MetadataType.ID.fieldName()));
     	assertEquals("Document's source codes", srcCodes, getFieldValue(doc, SOURCE_CODES.name()));
     	assertEquals("Document's target codes", trgCodes, getFieldValue(doc, TARGET_CODES.name()));
@@ -279,7 +283,7 @@ public class PensieveWriterTest {
 
     @Test
     public void getDocumentNoTarget(){
-        Document doc = tmWriter.createDocument(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("blah blah blah")), null));
+        Document doc = tmWriter.createDocument(new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment("blah blah blah")), null));
         assertNull("Document's target field should be null", doc.getField(TARGET.name()));
     }
 
@@ -300,20 +304,20 @@ public class PensieveWriterTest {
 
     @Test
     public void indexTranslationUnitBeforeCommit() throws IOException {
-        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("dax")), new TranslationUnitVariant("EN", new TextFragment("is funny (sometimes)"))));
+        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment("dax")), new TranslationUnitVariant(locEN, new TextFragment("is funny (sometimes)"))));
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed before endIndex", 0, reader.maxDoc());
     }
 
     @Test
     public void indexTextUnit() throws IOException {
-        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("joe")), new TranslationUnitVariant("EN", new TextFragment("schmoe"))));
+        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment("joe")), new TranslationUnitVariant(locEN, new TextFragment("schmoe"))));
         assertEquals("num of docs indexed", 1, tmWriter.getIndexWriter().numDocs());
     }
 
     @Test
     public void indexTextUnit2() throws IOException {
-        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant("EN", new TextFragment("joe")), new TranslationUnitVariant("EN", new TextFragment("schmoe"))));
+        tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment("joe")), new TranslationUnitVariant(locEN, new TextFragment("schmoe"))));
         assertEquals("num of docs indexed", 1, tmWriter.getIndexWriter().numDocs());
     }
 

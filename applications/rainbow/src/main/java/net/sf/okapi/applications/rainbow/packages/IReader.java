@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.packages;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -35,8 +36,8 @@ public interface IReader {
 	 * @param targetLanguage The code of the target language.
 	 */
 	public void openDocument (String path,
-		String sourceLanguage,
-		String targetLanguage);
+		LocaleId sourceLanguage,
+		LocaleId targetLanguage);
 	
 	/**
 	 * Closes the document.

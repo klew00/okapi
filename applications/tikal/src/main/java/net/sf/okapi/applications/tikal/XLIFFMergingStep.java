@@ -31,6 +31,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -49,8 +50,7 @@ public class XLIFFMergingStep {
 	private String xliffPath;
 	private String outputPath;
 	private String outputEncoding;
-//	private String srcLang;
-	private String trgLang;
+	private LocaleId trgLoc;
 	
 	public XLIFFMergingStep (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
@@ -85,18 +85,18 @@ public class XLIFFMergingStep {
 	 */
 	public void handleRawDocument (RawDocument skelRawDoc) {
 		try {
-			trgLang = skelRawDoc.getTargetLanguage();
+			trgLoc = skelRawDoc.getTargetLanguage();
 			xlfReader = new XLIFFFilter();
 			File f = new File(xliffPath);
 			RawDocument xlfRawDoc = new RawDocument(f.toURI(), "UTF-8",
-				skelRawDoc.getSourceLanguage(), trgLang);
+				skelRawDoc.getSourceLanguage(), trgLoc);
 			xlfReader.open(xlfRawDoc);
 	
 			filter = fcMapper.createFilter(skelRawDoc.getFilterConfigId(), filter);
 			filter.open(skelRawDoc);
 
 			writer = filter.createFilterWriter();
-			writer.setOptions(trgLang, outputEncoding);
+			writer.setOptions(trgLoc, outputEncoding);
 			writer.setOutput(outputPath);
 			
 			Event event;
@@ -160,7 +160,7 @@ public class XLIFFMergingStep {
 			return; // Use the source
 		}
 
-		if ( !tuFromTrans.hasTarget(trgLang) ) {
+		if ( !tuFromTrans.hasTarget(trgLoc) ) {
 			// No translation in package
 			if ( !tu.isEmpty() ) {
 				logger.log(Level.WARNING,
@@ -182,7 +182,7 @@ public class XLIFFMergingStep {
 //		}
 
 		// Get the translated target, and un-segment it if needed
-		TextContainer fromTrans = tuFromTrans.getTarget(trgLang);
+		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSourceContent().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
@@ -197,7 +197,7 @@ public class XLIFFMergingStep {
 		}
 
 		// We create a new target if needed
-		TextContainer trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
+		TextContainer trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
 		
 		// Update 'approved' flag is requested
 //		if ( manifest.updateApprovedFlag() ) {
@@ -222,7 +222,7 @@ public class XLIFFMergingStep {
 			logger.log(Level.SEVERE,
 				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
 			// Use the source instead, continue the merge
-			tu.setTarget(trgLang, tu.getSource());
+			tu.setTarget(trgLoc, tu.getSource());
 		}
 	}
 

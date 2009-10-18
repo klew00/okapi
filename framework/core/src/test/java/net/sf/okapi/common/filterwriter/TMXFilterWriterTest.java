@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filters.DummyFilter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 
 import org.junit.Before;
@@ -35,7 +36,9 @@ import org.junit.Test;
 public class TMXFilterWriterTest {
 	
 	private DummyFilter filter;
-	
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
+
 	@Before
 	public void setUp() {
 		filter = new DummyFilter();
@@ -43,7 +46,7 @@ public class TMXFilterWriterTest {
 
 	@Test
 	public void testSimpleOutput () {
-		String result = rewrite(getEvents(null, "en", "fr"), "fr");
+		String result = rewrite(getEvents(null, locEN, locFR), locFR);
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<tmx version=\"1.4\"><header creationtool=\"unknown\" creationtoolversion=\"unknown\" segtype=\"paragraph\" o-tmf=\"unknown\" adminlang=\"en\" srclang=\"en\" datatype=\"text\"></header><body>"
 			+ "<tu tuid=\"autoID1\">"
@@ -59,8 +62,8 @@ public class TMXFilterWriterTest {
 	}
 		
 	private ArrayList<Event> getEvents(String snippet,
-		String srcLang,
-		String trgLang)
+		LocaleId srcLang,
+		LocaleId trgLang)
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument((CharSequence)null, srcLang, trgLang));
@@ -73,7 +76,7 @@ public class TMXFilterWriterTest {
 		}
 
 	private String rewrite (ArrayList<Event> list,
-		String trgLang)
+		LocaleId trgLang)
 	{
 		TMXFilterWriter writer = new TMXFilterWriter();
 		writer.setOptions(trgLang, null);

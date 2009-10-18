@@ -86,7 +86,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		// In OmegaT we put both the approved and exact match of the project_save.tmx (the 'approved' one). 
 		String tuid = item.getName();
 		TextContainer srcTC = item.getSource();
-		TextContainer trgTC = item.getTarget(trgLang);
+		TextContainer trgTC = item.getTarget(trgLoc);
 
 		if ( !srcTC.isSegmented() ) { // Source is not segmented
 			if ( scores.getScore(0) == 100 ) {
@@ -146,11 +146,11 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			XR.writeEndElementLineBreak(); // glossary_dir
 			
 			XR.writeStartElement("source_lang");
-			XR.writeRawXML(manifest.getSourceLanguage());
+			XR.writeRawXML(manifest.getSourceLanguage().toBCP47());
 			XR.writeEndElementLineBreak(); // source_lang
 
 			XR.writeStartElement("target_lang");
-			XR.writeRawXML(manifest.getTargetLanguage());
+			XR.writeRawXML(manifest.getTargetLanguage().toBCP47());
 			XR.writeEndElementLineBreak(); // target_lang
 
 			XR.writeStartElement("sentence_seg");

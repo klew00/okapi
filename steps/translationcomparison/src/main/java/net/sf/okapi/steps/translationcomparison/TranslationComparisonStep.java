@@ -29,6 +29,7 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -54,8 +55,9 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private long scoreTotal;
 	private int itemCount;
 	private IFilterConfigurationMapper fcMapper;
-	private String targetLanguage;
-	private String sourceLanguage;
+	private LocaleId targetLocale;
+	private LocaleId targetLocaleExtra;
+	private LocaleId sourceLocale;
 	private URI inputURI;
 	private RawDocument secondaryInput;
 
@@ -69,13 +71,13 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LANGUAGE)
-	public void setSourceLanguage (String sourceLanguage) {
-		this.sourceLanguage = sourceLanguage;
+	public void setsourceLocale (LocaleId sourceLocale) {
+		this.sourceLocale = sourceLocale;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
-	public void setTargetLanguage (String targetLanguage) {
-		this.targetLanguage = targetLanguage;
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.INPUT_URI)
@@ -109,7 +111,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	@Override
 	protected void handleStartBatch (Event event) {
 		// Both strings are in the target language.
-		matcher = new TextMatcher(targetLanguage, targetLanguage);
+		matcher = new TextMatcher(targetLocale, targetLocale);
 		
 		if ( params.isGenerateHTML() ) {
 			writer = new XMLWriter(getOutputFilename());
@@ -117,11 +119,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		// Start TMX writer (one for all input documents)
 		if ( params.isGenerateTMX() ) {
 			tmx = new TMXWriter(params.getTmxPath());
-			tmx.writeStartDocument(sourceLanguage, targetLanguage,
+			tmx.writeStartDocument(sourceLocale, targetLocale,
 				getClass().getName(), null, null, null, null);
 		}
 		pathToOpen = null;
 		scoreProp = new Property("Txt::Score", "", false);
+		targetLocaleExtra = LocaleId.fromString(targetLocale.toString()+params.getTargetSuffix());
 		
 		options = 0;
 		if ( !params.isCaseSensitive() ) options |= TextMatcher.IGNORE_CASE;
@@ -196,12 +199,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		
 		// Get the text for the base translation
 		TextFragment trgFrag1;
-		if ( isBaseMultilingual ) trgFrag1 = tu1.getTargetContent(targetLanguage);
+		if ( isBaseMultilingual ) trgFrag1 = tu1.getTargetContent(targetLocale);
 		else trgFrag1 = tu1.getSourceContent();
 
 		// Get the text for the to-compare translation
 		TextFragment trgFrag2;
-		if ( isToCompareMultilingual ) trgFrag2 = tu2.getTargetContent(targetLanguage);
+		if ( isToCompareMultilingual ) trgFrag2 = tu2.getTargetContent(targetLocale);
 		else trgFrag2 = tu2.getSourceContent();
 		
 		// Do we have a base translation?
@@ -259,10 +262,10 @@ public class TranslationComparisonStep extends BasePipelineStep {
 				// Otherwise at least try to use the content of tu2
 				tmxTu.setSourceContent(srcFrag);
 			}
-			tmxTu.setTargetContent(targetLanguage, trgFrag1);
-			tmxTu.setTargetContent(targetLanguage+params.getTargetSuffix(), trgFrag2);
+			tmxTu.setTargetContent(targetLocale, trgFrag1);
+			tmxTu.setTargetContent(targetLocaleExtra, trgFrag2);
 			scoreProp.setValue(String.format("%03d", score));
-			tmxTu.setTargetProperty(targetLanguage+params.getTargetSuffix(), scoreProp);
+			tmxTu.setTargetProperty(targetLocaleExtra, scoreProp);
 			tmx.writeTUFull(tmxTu);
 		}
 	}

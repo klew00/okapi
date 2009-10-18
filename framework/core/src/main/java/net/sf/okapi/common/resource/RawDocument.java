@@ -39,6 +39,7 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.LocaleId;
 
 /**
  * Resource that carries all the information needed for a filter to open a given
@@ -57,8 +58,8 @@ public class RawDocument implements IResource {
 	private String filterConfigId;
 	private String id;
 	private String encoding = UNKOWN_ENCODING;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private InputStream inputStream;
 	private URI inputURI;
 	private CharSequence inputCharSequence;
@@ -67,117 +68,147 @@ public class RawDocument implements IResource {
 
 	/**
 	 * Creates a new RawDocument object with a given CharSequence and a source
-	 * language.
+	 * locale.
 	 * 
 	 * @param inputCharSequence
 	 *            the CharSequence for this RawDocument.
-	 * @param sourceLanguage
-	 *            the source language for this RawDocument.
+	 * @param sourceLocale
+	 *            the source locale for this RawDocument.
 	 */
-	public RawDocument(CharSequence inputCharSequence, String sourceLanguage) {
-		create(inputCharSequence, sourceLanguage, null);
+	public RawDocument(CharSequence inputCharSequence,
+		LocaleId sourceLocale)
+	{
+		create(inputCharSequence, sourceLocale, null);
 	}
 
 	/**
 	 * Creates a new RawDocument object with a given CharSequence, a source
-	 * language and a target language.
+	 * locale and a target locale.
 	 * 
 	 * @param inputCharSequence
 	 *            the CharSequence for this RawDocument.
-	 * @param sourceLanguage
-	 *            the source language for this RawDocument.
-	 * @param targetLanguage
-	 *            the target language for this RawDocument.
+	 * @param sourceLocale
+	 *            the source locale for this RawDocument.
+	 * @param targetLocale
+	 *            the target locale for this RawDocument.
 	 */
-	public RawDocument(CharSequence inputCharSequence, String sourceLanguage, String targetLanguage) {
-		create(inputCharSequence, sourceLanguage, targetLanguage);
+	public RawDocument (CharSequence inputCharSequence,
+		LocaleId sourceLocale,
+		LocaleId targetLocale)
+	{
+		create(inputCharSequence, sourceLocale, targetLocale);
 	}
 
 	/**
 	 * Creates a new RawDocument object with a given URI, a default encoding and
-	 * a source language.
+	 * a source locale.
 	 * 
 	 * @param inputURI
 	 *            the URI for this RawDocument.
 	 * @param defaultEncoding
 	 *            the default encoding for this RawDocument.
-	 * @param sourceLanguage
-	 *            the source language for this RawDocument.
+	 * @param sourceLocale
+	 *            the source locale for this RawDocument.
 	 */
-	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage) {
-		create(inputURI, defaultEncoding, sourceLanguage, null);
+	public RawDocument (URI inputURI,
+		String defaultEncoding,
+		LocaleId sourceLocale)
+	{
+		create(inputURI, defaultEncoding, sourceLocale, null);
 	}
 
 	/**
 	 * Creates a new RawDocument object with a given URI, a default encoding, a
-	 * source language and a target language.
+	 * source locale and a target locale.
 	 * 
 	 * @param inputURI
 	 *            the URI for this RawDocument.
 	 * @param defaultEncoding
 	 *            the default encoding for this RawDocument.
-	 * @param sourceLanguage
-	 *            the source language for this RawDocument.
-	 * @param targetLanguage
-	 *            the target language for this RawDocument.
+	 * @param sourceLocale
+	 *            the source locale for this RawDocument.
+	 * @param targetLocale
+	 *            the target locale for this RawDocument.
 	 */
-	public RawDocument(URI inputURI, String defaultEncoding, String sourceLanguage, String targetLanguage) {
-		create(inputURI, defaultEncoding, sourceLanguage, targetLanguage);
+	public RawDocument (URI inputURI,
+		String defaultEncoding,
+		LocaleId sourceLocale,
+		LocaleId targetLocale)
+	{
+		create(inputURI, defaultEncoding, sourceLocale, targetLocale);
 	}
 
 	/**
 	 * Creates a new RawDocument object with a given InputStream, a default
-	 * encoding and a source language.
+	 * encoding and a source locale.
 	 * 
 	 * @param inputStream
 	 *            the InputStream for this RawDocument.
 	 * @param defaultEncoding
 	 *            the default encoding for this RawDocument.
-	 * @param sourceLanguage
-	 *            the source language for this RawDocument.
+	 * @param sourceLocale
+	 *            the source locale for this RawDocument.
 	 */
-	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage) {
-		create(inputStream, defaultEncoding, sourceLanguage, null);
+	public RawDocument (InputStream inputStream,
+		String defaultEncoding,
+		LocaleId sourceLocale)
+	{
+		create(inputStream, defaultEncoding, sourceLocale, null);
 	}
 
 	/**
 	 * Creates a new RawDocument object with a given InputStream, a default
-	 * encoding and a source language.
+	 * encoding and a source locale.
 	 * 
 	 * @param inputStream
 	 *            the InputStream for this RawDocument.
 	 * @param defaultEncoding
 	 *            the default encoding for this RawDocument.
-	 * @param sourceLanguage
-	 *            the source language for this RawDocument.
-	 * @param targetLanguage
-	 *            the target language for this RawDocument.
+	 * @param sourceLocale
+	 *            the source locale for this RawDocument.
+	 * @param targetLocale
+	 *            the target locale for this RawDocument.
 	 */
-	public RawDocument(InputStream inputStream, String defaultEncoding, String sourceLanguage, String targetLanguage) {
-		create(inputStream, defaultEncoding, sourceLanguage, targetLanguage);
+	public RawDocument (InputStream inputStream,
+		String defaultEncoding,
+		LocaleId sourceLocale,
+		LocaleId targetLocale)
+	{
+		create(inputStream, defaultEncoding, sourceLocale, targetLocale);
 	}
 
-	private void create(CharSequence inputCharSequence, String srcLang, String trgLang) {
+	private void create (CharSequence inputCharSequence,
+		LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
 		this.inputCharSequence = inputCharSequence;
 		this.encoding = "UTF-16";
-		this.srcLang = srcLang;
-		this.trgLang = trgLang;
+		this.srcLang = srcLoc;
+		this.trgLang = trgLoc;
 		hasGetReaderBeenCalled = false;
 	}
 
-	private void create(URI inputURI, String defaultEncoding, String srcLang, String trgLang) {
+	private void create (URI inputURI,
+		String defaultEncoding,
+		LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
 		this.inputURI = inputURI;
 		this.encoding = defaultEncoding;
-		this.srcLang = srcLang;
-		this.trgLang = trgLang;
+		this.srcLang = srcLoc;
+		this.trgLang = trgLoc;
 		hasGetReaderBeenCalled = false;
 	}
 
-	private void create(InputStream inputStream, String defaultEncoding, String srcLang, String trgLang) {
+	private void create (InputStream inputStream,
+		String defaultEncoding,
+		LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
 		this.inputStream = inputStream;
 		this.encoding = defaultEncoding;
-		this.srcLang = srcLang;
-		this.trgLang = trgLang;
+		this.srcLang = srcLoc;
+		this.trgLang = trgLoc;
 		hasGetReaderBeenCalled = false;
 	}
 
@@ -346,20 +377,18 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Gets the source language associated to this resource.
-	 * 
-	 * @return the source language associated to this resource.
+	 * Gets the source locale associated to this resource.
+	 * @return the source locale associated to this resource.
 	 */
-	public String getSourceLanguage() {
+	public LocaleId getSourceLanguage () {
 		return srcLang;
 	}
 
 	/**
-	 * Gets the target language associated to this resource.
-	 * 
-	 * @return the target language associated to this resource.
+	 * Gets the target locale associated to this resource.
+	 * @return the target locale associated to this resource.
 	 */
-	public String getTargetLanguage() {
+	public LocaleId getTargetLanguage () {
 		return trgLang;
 	}
 

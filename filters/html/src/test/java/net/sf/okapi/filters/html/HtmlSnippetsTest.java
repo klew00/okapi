@@ -4,6 +4,7 @@ package net.sf.okapi.filters.html;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.*;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -17,8 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HtmlSnippetsTest {
+
 	private HtmlFilter htmlFilter;
 	private URL parameters;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
 
 	@Before
 	public void setUp() {
@@ -44,118 +48,118 @@ public class HtmlSnippetsTest {
 	@Test
 	public void testMETATag1() {
 		String snippet = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testPWithAttributes() {
 		String snippet = "<p title='my title' dir='rtl'>Text of p</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testLang() {
 		String snippet = "<p lang='en'>Text of p</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testLangUpdate() {
 		String snippet = "<p lang='en'>Text <span lang='en'>text</span> text</p>";
-		assertEquals("<p lang='FR'>Text <span lang='FR'>text</span> text</p>", generateOutput(getEvents(snippet),
-				snippet, "FR"));
+		assertEquals("<p lang='fr'>Text <span lang='fr'>text</span> text</p>", generateOutput(getEvents(snippet),
+				snippet, locFR));
 	}
 
 	@Test
 	public void testMultilangUpdate() {
 		String snippet = "<p lang='en'>Text</p><p lang='ja'>JA text</p>";
-		assertEquals("<p lang='FR'>Text</p><p lang='ja'>JA text</p>", generateOutput(getEvents(snippet), snippet, "FR"));
+		assertEquals("<p lang='fr'>Text</p><p lang='ja'>JA text</p>", generateOutput(getEvents(snippet), snippet, locFR));
 	}
 
 	@Test
 	public void testComplexEmptyElement() {
 		String snippet = "<dummy write=\"w\" readonly=\"ro\" trans=\"tu1\" />";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testPWithInlines() {
 		String snippet = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testMETATag2() {
 		String snippet = "<meta http-equiv=\"Content-Language\" content=\"en\"/>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testPWithInlines2() {
 		String snippet = "<p>Before <img href=\"img.png\" alt=\"text\"/> after.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testPWithInlineTextOnly() {
 		String snippet = "<p>Before <img alt=\"text\"/> after.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testTableGroups() {
 		String snippet = "<table id=\"100\"><tr><td>text</td></tr></table>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testGroupInPara() {
 		String snippet = "<p>Text before list:" + "<ul>" + "<li>Text of item 1</li>" + "<li>Text of item 2</li>"
 				+ "</ul>" + "and text after the list.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testInput() {
 		String snippet = "<p>Before <input type=\"radio\" name=\"FavouriteFare\" value=\"spam\" checked=\"checked\"/> after.</p>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testCollapseWhitespaceWithPre() {
 		String snippet = "<pre>   \n   \n <x/>  \t    </pre>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testCollapseWhitespaceWithoutPre() {
 		String snippet = " <b>   text1\t\r\n\ftext2    </b> ";
-		assertEquals("<b> text1 text2 </b>", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("<b> text1 text2 </b>", generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testEscapedCodesInisdePre() {
 		String snippet = "<pre><code>&lt;b></code></pre>";
-		assertEquals("<pre><code>&lt;b></code></pre>", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("<pre><code>&lt;b></code></pre>", generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testCdataSection() {
 		String snippet = "<![CDATA[&lt;b>]]>";
-		assertEquals("<![CDATA[&lt;b>]]>", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("<![CDATA[&lt;b>]]>", generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testEscapes() {
 		String snippet = "<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>";
 		assertEquals("<p><b>Question</b>: When the &quot;<code>&lt;b></code>&quot; code was added</p>", generateOutput(
-				getEvents(snippet), snippet, "en"));
+				getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testEscapedEntities() {
 		String snippet = "&nbsp;M&#x0033;";
-		assertEquals("\u00A0M\u0033", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("\u00A0M\u0033", generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
@@ -163,32 +167,32 @@ public class HtmlSnippetsTest {
 		String snippet = "\r\nX\r\nY\r\n";
 		URL originalParameters = parameters;
 		parameters = HtmlSnippetsTest.class.getResource("/collapseWhitespaceOff.yml");
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 		parameters = originalParameters;
 	}
 
 	@Test
 	public void testNormalizeNewlinesInPre() {
 		String snippet = "<pre>\r\nX\r\nY\r\n</pre>";
-		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testSupplementalSupport() {
 		String snippet = "<p>[&#x20000;]=U+D840,U+DC00</p>";
-		assertEquals("<p>[\uD840\uDC00]=U+D840,U+DC00</p>", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("<p>[\uD840\uDC00]=U+D840,U+DC00</p>", generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testSimpleSupplementalSupport() {
 		String snippet = "&#x20000;";
-		assertEquals("\uD840\uDC00", generateOutput(getEvents(snippet), snippet, "en"));
+		assertEquals("\uD840\uDC00", generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.setParametersFromURL(parameters);
-		htmlFilter.open(new RawDocument(snippet, "en"));
+		htmlFilter.open(new RawDocument(snippet, locEN));
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
 			list.add(event);
@@ -197,7 +201,7 @@ public class HtmlSnippetsTest {
 		return list;
 	}
 
-	private String generateOutput(ArrayList<Event> list, String original, String trgLang) {
+	private String generateOutput(ArrayList<Event> list, String original, LocaleId trgLang) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
 		for (Event event : list) {

@@ -188,12 +188,12 @@ public class XSLTransformStep extends BasePipelineStep {
 		String value = null;
 		try {
 			for ( String key : paramList.keySet() ) {
-				value = paramList.get(key).replace("${SrcLang}", input.getSourceLanguage()); //$NON-NLS-1$
+				value = paramList.get(key).replace("${SrcLang}", input.getSourceLanguage().toBCP47()); //$NON-NLS-1$
 				if ( value.indexOf("${Input1}") > -1 ) {
 					value = value.replace("${Input1}", input.getInputURI().toString()); //$NON-NLS-1$
 				}
 				if ( value.indexOf("${TrgLang}") > -1 ) {
-					value = value.replace("${TrgLang}", input.getTargetLanguage()); //$NON-NLS-1$
+					value = value.replace("${TrgLang}", input.getTargetLanguage().toBCP47()); //$NON-NLS-1$
 				}
 				if ( value.indexOf("${Output1}") > -1 ) {
 					value = value.replace("${Output1}", outputURI.toString()); //$NON-NLS-1$

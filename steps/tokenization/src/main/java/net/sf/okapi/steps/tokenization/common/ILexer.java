@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.tokenization.common;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 /**
@@ -93,7 +94,7 @@ public interface ILexer {
 	 * @param language The language of the text
 	 * @param tokens The string to be processed
 	 */
-	void open(String text, String language, Tokens tokens);
+	void open(String text, LocaleId language, Tokens tokens);
 	
 	/**
 	 * Alternative non-iterator way of extracting lexems. In opposite to open()-hasNext()-next()-close(), 
@@ -103,7 +104,7 @@ public interface ILexer {
 	 * @param tokens The string to be processed
 	 * @return A list of extracted lexems
 	 */
-	Lexems process(String text, String language, Tokens tokens);
+	Lexems process(String text, LocaleId language, Tokens tokens);
 	
 	/**
 	 * Indicates if there is a lexem extracted.

@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.locale;
+package net.sf.okapi.common;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -31,6 +31,7 @@ import net.sf.okapi.common.Util;
  */
 public final class LocaleId implements Comparable<Object> {
 
+	public static LocaleId EMPTY = new LocaleId("", false); //TODO define empty
 	private String locId;
 	
 	private static final int ID_LANGUAGE = 5;

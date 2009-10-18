@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
@@ -62,6 +63,8 @@ public class OpenXMLRoundTripSequenceTest {
 	private ConditionalParameters cparams; // DWH 6-18-09
 	private boolean bSquishy=true; // DWH 7-16-09
 	private OpenXMLFilter filter=null;
+	private LocaleId locLA = LocaleId.fromString("la");
+	private LocaleId locENUS = LocaleId.fromString("en-us");
 
 	@Test
 	public void runTest () {
@@ -76,7 +79,7 @@ public class OpenXMLRoundTripSequenceTest {
 		themfiles.add("BoldWorld.docx");
 		themfiles.add("sample.docx");
 		
-		filter = new OpenXMLFilter(new PigLatinTranslator(),"pl");
+		filter = new OpenXMLFilter(new PigLatinTranslator(), locLA);
 		for(String s : themfiles)
 		{
 			runOneTest(s,filter); // English
@@ -94,7 +97,7 @@ public class OpenXMLRoundTripSequenceTest {
 		try {	
 			filter.setParameters(cparams);
 
-			filter.setOptions("en-US", "UTF-8", true);
+			filter.setOptions(locENUS, "UTF-8", true);
 //			filter.setLogLevel(Level.FINEST);
 //			filter.setLogLevel(Level.FINE);
 
@@ -115,7 +118,7 @@ public class OpenXMLRoundTripSequenceTest {
 //				bis = new BufferedInputStream(new FileInputStream(filly));
 //				filter.open(new RawDocument(bis,"UTF-8","en-US"),true,false,Level.FINEST); // DWH 6-09-09			
 
-				filter.open(new RawDocument(uri,"UTF-8","en-US"),true,bSquishy,Level.FINEST); // DWH 7-16-09 squishiness
+				filter.open(new RawDocument(uri,"UTF-8",locENUS),true,bSquishy,Level.FINEST); // DWH 7-16-09 squishiness
 			}
 			catch(Exception e)
 			{
@@ -125,7 +128,7 @@ public class OpenXMLRoundTripSequenceTest {
 			
 			OpenXMLZipFilterWriter writer = new OpenXMLZipFilterWriter(); // DWH 4-8-09 was just ZipFilterWriter
 
-			writer.setOptions("pl", "UTF-8");
+			writer.setOptions(locLA, "UTF-8");
 
 			writer.setOutput(sOutputPath+"Tran"+filename);
 			

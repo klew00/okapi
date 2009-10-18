@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -42,14 +43,14 @@ abstract public class BaseCounter {
 	protected static StructureParameters params;
 	protected static Logger logger = null;
 	
-	abstract protected long doGetCount(String text, String language);
+	abstract protected long doGetCount(String text, LocaleId language);
 	abstract protected String getResourceName();
 	
-	static protected long getCount(Class<?> classRef, Object text, String language) {
+	static protected long getCount(Class<?> classRef, Object text, LocaleId language) {
 	
 		if (classRef == null) return 0L;
 		if (text == null) return 0L;
-		if (Util.isEmpty(language)) return 0L;
+		if (Util.isNullOrEmpty(language)) return 0L;
 		
 		if (text instanceof TextUnit) {
 		

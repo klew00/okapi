@@ -34,6 +34,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -54,6 +55,10 @@ public class TsFilterTest {
 
 	private TsFilter filter;
 	private String root;
+	private LocaleId locENUS = LocaleId.fromString("en-us");
+	private LocaleId locFRFR = LocaleId.fromString("fr-fr");
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
 	
 	private FilterTestDriver testDriver;
 	
@@ -117,13 +122,13 @@ public class TsFilterTest {
 		
 	@Test
 	public void StartDocument() {
-		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(completeTs, "en-us", "fr-fr"));
+		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(completeTs, locENUS, locFRFR));
 		
 		assertEquals("Incorrect id","1", sd.getId());
 		assertEquals("Incorrect mimeType",MimeTypeMapper.TS_MIME_TYPE, sd.getMimeType());
 		assertNull("Name should be null", sd.getName());
 		assertEquals("Incorrect encoding", "utf-8", sd.getEncoding());
-		assertEquals("Incorrect src language", "en-us", sd.getLanguage());
+		assertEquals("Incorrect src language", locENUS, sd.getLanguage());
 		assertEquals("Incorrect linebreak", "\r", sd.getLineBreak());
 		assertEquals("Incorrect multilingual", true, sd.isMultilingual());
 		assertEquals("Incorrect utf8bom", false, sd.hasUTF8BOM());
@@ -136,12 +141,12 @@ public class TsFilterTest {
 	}	
 	@Test
 	public void DocumentPartTsPart() {
-		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(completeTs, "en-us", "fr-fr"), 1);
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(completeTs, locENUS, locFRFR), 1);
 		
 		assertEquals("2", dp.getId());
 		assertEquals("4.5.1", dp.getProperty("version").getValue());
-		assertEquals("en-us", dp.getProperty("sourcelanguage").getValue());
-		assertEquals("fr-fr", dp.getProperty("language").getValue());
+		assertEquals(locENUS, dp.getProperty("sourcelanguage").getValue());
+		assertEquals(locFRFR, dp.getProperty("language").getValue());
 		assertEquals( 
 				"\r<!DOCTYPE TS []>\r" +
 				"<!-- comment -->\r" +
@@ -154,7 +159,7 @@ public class TsFilterTest {
 	}	
 	@Test
 	public void StartGroupContextPart() {
-		StartGroup sg = FilterTestDriver.getGroup(getEvents(completeTs, "en-us", "fr-fr"), 1);
+		StartGroup sg = FilterTestDriver.getGroup(getEvents(completeTs, locENUS, locFRFR), 1);
 
 		assertEquals("3", sg.getId());
 		assertEquals("utf-8", sg.getProperty("encoding").getValue());
@@ -168,7 +173,7 @@ public class TsFilterTest {
 				sg.getSkeleton().toString());
 
 		
-		sg = FilterTestDriver.getGroup(getEvents(completeTs, "en-us", "fr-fr"), 2);
+		sg = FilterTestDriver.getGroup(getEvents(completeTs, locENUS, locFRFR), 2);
 
 		assertEquals("4", sg.getId());
 		assertEquals("utf-8", sg.getProperty("encoding").getValue());
@@ -182,7 +187,7 @@ public class TsFilterTest {
 	}	
 	@Test
 	public void TextUnitMessageUnfinished() {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, "en-us", "fr-fr"), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, locENUS, locFRFR), 1);
 
 		assertEquals("1", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
@@ -193,8 +198,8 @@ public class TsFilterTest {
 		assertEquals("utf-8", tu.getProperty("encoding").getValue());
 		assertEquals("no", tu.getProperty("numerus").getValue());
 		assertEquals(0, tu.getSourcePropertyNames().size());
-		assertEquals("no", tu.getTargetProperty("fr-fr", "variants").getValue());
-		assertEquals("no", tu.getTargetProperty("fr-fr", "approved").getValue());
+		assertEquals("no", tu.getTargetProperty(locFRFR, "variants").getValue());
+		assertEquals("no", tu.getTargetProperty(locFRFR, "approved").getValue());
 		assertEquals( 
 				"<message id=\"1\" encoding=\"utf-8\" numerus=\"no\">\r" +
 				"<location filename=\"test.ts\" line=\"55\"/>\r" +
@@ -256,8 +261,8 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 		
-		//System.out.println(FilterTestDriver.generateOutput(getEvents(snippet,"en-us","fr-fr"), "fr"));
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,"en-us","fr-fr"), "fr"));
+		//System.out.println(FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), "fr"));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), locFR));
 	}
 	
 	@Test
@@ -268,7 +273,7 @@ public class TsFilterTest {
 		assertTrue(sd.getName().startsWith(root));
 		assertTrue(sd.getName().endsWith("/Complete_valid_utf8_bom_crlf.ts"));
 		assertEquals("Incorrect encoding", "utf-8", sd.getEncoding());
-		assertEquals("Incorrect src language", "en-us", sd.getLanguage());
+		assertEquals("Incorrect src language", locENUS, sd.getLanguage());
 		assertEquals("Incorrect linebreak", "\r\n", sd.getLineBreak());
 		assertEquals("Incorrect multilingual", true, sd.isMultilingual());
 		assertEquals("Incorrect utf8bom", true, sd.hasUTF8BOM());
@@ -285,8 +290,8 @@ public class TsFilterTest {
 		
 		assertEquals("2", dp.getId());
 		assertEquals("4.5.1", dp.getProperty("version").getValue());
-		assertEquals("en-us", dp.getProperty("sourcelanguage").getValue());
-		assertEquals("fr-fr", dp.getProperty("language").getValue());
+		assertEquals(locENUS, dp.getProperty("sourcelanguage").getValue());
+		assertEquals(locFRFR, dp.getProperty("language").getValue());
 		assertEquals( 
 				"\r\n<!DOCTYPE TS []>\r\n" +
 				"<!-- comment -->\r\n" +
@@ -338,8 +343,8 @@ public class TsFilterTest {
 		assertEquals("utf-8", tu.getProperty("encoding").getValue());
 		assertEquals("no", tu.getProperty("numerus").getValue());
 		assertEquals(0, tu.getSourcePropertyNames().size());
-		assertEquals("no", tu.getTargetProperty("fr-fr", "variants").getValue());
-		assertEquals("no", tu.getTargetProperty("fr-fr", "approved").getValue());
+		assertEquals("no", tu.getTargetProperty(locFRFR, "variants").getValue());
+		assertEquals("no", tu.getTargetProperty(locFRFR, "approved").getValue());
 		assertEquals( 
 				"<message id=\"1\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
 				"<location filename=\"test.ts\" line=\"55\"/>\r\n" +
@@ -368,8 +373,8 @@ public class TsFilterTest {
 		assertEquals("utf-8", tu.getProperty("encoding").getValue());
 		assertEquals("no", tu.getProperty("numerus").getValue());
 		assertEquals(0, tu.getSourcePropertyNames().size());
-		assertEquals("no", tu.getTargetProperty("fr-fr", "variants").getValue());
-		assertEquals("yes", tu.getTargetProperty("fr-fr", "approved").getValue());
+		assertEquals("no", tu.getTargetProperty(locFRFR, "variants").getValue());
+		assertEquals("yes", tu.getTargetProperty(locFRFR, "approved").getValue());
 		
 		assertEquals( 
 				"\r\n<message id=\"3\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
@@ -394,7 +399,7 @@ public class TsFilterTest {
 		assertEquals("5", dp.getId());
 		assertEquals(0, dp.getPropertyNames().size());
 		assertEquals(0, dp.getSourcePropertyNames().size());
-		assertEquals(0, dp.getTargetPropertyNames("fr-fr").size());
+		assertEquals(0, dp.getTargetPropertyNames(locFRFR).size());
 		assertEquals( 
 				"\r\n<message id=\"2\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
 				"<location filename=\"test.ts\" line=\"55\"/>\r\n" +
@@ -423,8 +428,8 @@ public class TsFilterTest {
 		assertEquals("utf-8", tu.getProperty("encoding").getValue());
 		assertEquals("no", tu.getProperty("numerus").getValue());
 		assertEquals(0, tu.getSourcePropertyNames().size());
-		assertEquals("no", tu.getTargetProperty("fr-fr", "variants").getValue());
-		assertEquals("no", tu.getTargetProperty("fr-fr", "approved").getValue());
+		assertEquals("no", tu.getTargetProperty(locFRFR, "variants").getValue());
+		assertEquals("no", tu.getTargetProperty(locFRFR, "approved").getValue());
 	
 		assertEquals( 
 				"\r\n<message id=\"4\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
@@ -449,7 +454,7 @@ public class TsFilterTest {
 		assertEquals("6", dp.getId());
 		assertEquals(0, dp.getPropertyNames().size());
 		assertEquals(0, dp.getSourcePropertyNames().size());
-		assertEquals(0, dp.getTargetPropertyNames("fr-fr").size());
+		assertEquals(0, dp.getTargetPropertyNames(locFRFR).size());
 		assertEquals( 
 				"\r\n<message id=\"5\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
 				"<location filename=\"test.ts\" line=\"55\"/>\r\n" +
@@ -472,7 +477,7 @@ public class TsFilterTest {
 		assertEquals("7", dp.getId());
 		assertEquals(0, dp.getPropertyNames().size());
 		assertEquals(0, dp.getSourcePropertyNames().size());
-		assertEquals(0, dp.getTargetPropertyNames("fr-fr").size());
+		assertEquals(0, dp.getTargetPropertyNames(locFRFR).size());
 		assertEquals( 
 				"\r\n<message id=\"6\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
 				"<location filename=\"test.ts\" line=\"55\"/>\r\n" +
@@ -495,7 +500,7 @@ public class TsFilterTest {
 		assertEquals("8", dp.getId());
 		assertEquals(0, dp.getPropertyNames().size());
 		assertEquals(0, dp.getSourcePropertyNames().size());
-		assertEquals(0, dp.getTargetPropertyNames("fr-fr").size());
+		assertEquals(0, dp.getTargetPropertyNames(locFRFR).size());
 		assertEquals( 
 				"\r\n<message id=\"7\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
 				"<location filename=\"test.ts\" line=\"55\"/>\r\n" +
@@ -523,8 +528,8 @@ public class TsFilterTest {
 		assertEquals("utf-8", tu.getProperty("encoding").getValue());
 		assertEquals("no", tu.getProperty("numerus").getValue());
 		assertEquals(0, tu.getSourcePropertyNames().size());
-		assertEquals("no", tu.getTargetProperty("fr-fr", "variants").getValue());
-		assertEquals("no", tu.getTargetProperty("fr-fr", "approved").getValue());
+		assertEquals("no", tu.getTargetProperty(locFRFR, "variants").getValue());
+		assertEquals("no", tu.getTargetProperty(locFRFR, "approved").getValue());
 	
 		assertEquals( 
 				"\r\n<message id=\"8\" encoding=\"utf-8\" numerus=\"no\">\r\n" +
@@ -548,7 +553,7 @@ public class TsFilterTest {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Complete_valid_utf8_bom_crlf.ts", null));
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en-us", "fr-fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locFRFR));
 	}
 	
 	//TODO: split numerus forms
@@ -559,7 +564,7 @@ public class TsFilterTest {
 	//--methods--
 	@Test
 	public void testGetName() {
-		System.out.println(FilterTestDriver.generateOutput(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), "fr-fr"));
+		System.out.println(FilterTestDriver.generateOutput(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), locFRFR));
 		assertEquals("okf_ts", filter.getName());
 	}
 
@@ -576,46 +581,46 @@ public class TsFilterTest {
 
 	@Test (expected=NullPointerException.class)
 	public void testTargetLangNotSpecified() {
-		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us"));
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, locENUS));
 	}
 
 	@Test (expected=NullPointerException.class)
 	public void testTargetLangNotSpecified2() {
-		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us", null));
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, locENUS, null));
 	}
 	
 /*	@Test (expected=NullPointerException.class)
 	public void testSourceLangEmpty() {
-		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "","fr-fr"));
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "",locFRFR));
 	}*/	
 	
 /*	@Test (expected=NullPointerException.class)
 	public void testTargetLangEmpty() {
-		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us",""));
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, locENUS,""));
 	}*/	
 	
 	@Test
 	public void testInputStream() {
 		InputStream tsStream = TsFilterTest.class.getResourceAsStream("/alarm_ro.ts");
-		filter.open(new RawDocument(tsStream, "UTF-8", "en-us","fr-fr"));
+		filter.open(new RawDocument(tsStream, "UTF-8", locENUS,locFRFR));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}	
 
 	@Test
 	public void testConsolidatedStream() {
-		filter.open(new RawDocument(simpleSnippet, "en-us","fr-fr"));
+		filter.open(new RawDocument(simpleSnippet, locENUS,locFRFR));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
-		//System.out.println(FilterTestDriver.generateOutput(getEvents(simpleSnippet, "en-us","fr-fr"), simpleSnippet, "fr-fr"));
+		//System.out.println(FilterTestDriver.generateOutput(getEvents(simpleSnippet, locENUS,locFRFR), simpleSnippet, locFRFR));
 	}	
 
 	@Test
 	public void testTu() {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, "en-us", "fr-fr"), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, locENUS, locFRFR), 1);
 		assertNotNull(tu);
 		assertEquals("Add Entry To System Log", tu.getSourceContent().getCodedText());
-		assertEquals("Lagg till i system Loggen", tu.getTargetContent("fr-fr").getCodedText());
+		assertEquals("Lagg till i system Loggen", tu.getTargetContent(locFRFR).getCodedText());
 		
 		System.out.println(tu.getId());
 		System.out.println(tu.getMimeType());
@@ -625,8 +630,8 @@ public class TsFilterTest {
 		System.out.println(tu.getSkeleton());
 		System.out.println(tu.getTargetLanguages());
 		
-		tu.setTargetProperty("fr-fr", new Property(Property.APPROVED, "no", false));
-		System.out.println(tu.getTargetPropertyNames("fr-fr"));
+		tu.setTargetProperty(locFRFR, new Property(Property.APPROVED, "no", false));
+		System.out.println(tu.getTargetPropertyNames(locFRFR));
 		/*Property prop = dp.getProperty(Property.ENCODING);
 		assertNotNull(prop);
 		assertEquals("UTF-8", prop.getValue());
@@ -640,13 +645,13 @@ public class TsFilterTest {
 	/*
 	@Test
 	public void testOutputBasic_Comment () {
-		assertEquals(simpleBilingualSnippet, FilterTestDriver.generateOutput(getEvents(simpleBilingualSnippet,"en-us","fr-fr"), simpleSnippet, "fr-fr"));
-		System.out.println(FilterTestDriver.generateOutput(getEvents(simpleBilingualSnippet,"en-us","fr-fr"), simpleSnippet, "en"));
+		assertEquals(simpleBilingualSnippet, FilterTestDriver.generateOutput(getEvents(simpleBilingualSnippet,locENUS,locFRFR), simpleSnippet, locFRFR));
+		System.out.println(FilterTestDriver.generateOutput(getEvents(simpleBilingualSnippet,locENUS,locFRFR), simpleSnippet, "en"));
 	}*/	
 	
 	/*@Test
 	public void testStartDocument () {
-		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "en-us","fr-fr"));
+		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(simpleSnippet, locENUS,locFRFR));
 		assertNotNull(sd);
 		assertNotNull(sd.getEncoding());
 		assertNotNull(sd.getType());
@@ -657,7 +662,7 @@ public class TsFilterTest {
 	
 	/*@Test
 	public void testSimpleTransUnit () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, "en-us","fr-fr"), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, locENUS,locFRFR), 1);
 		assertNotNull(tu);
 		assertEquals("Hello World!", tu.getSource().toString());
 		assertEquals("tuid_1", tu.getName());
@@ -668,7 +673,7 @@ public class TsFilterTest {
 		URL url = TsFilterTest.class.getResource("/TSTest01.ts");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(url.getPath(), null),
-			"UTF-8", "en", "en"));
+			"UTF-8", locEN, locEN));
 	}
 	
 	@Test
@@ -678,7 +683,7 @@ public class TsFilterTest {
 		try {
 			filter = new TsFilter();
 			URL url = TsFilterTest.class.getResource("/TSTest01.ts");
-			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", "EN-US", "fr-fr"));			
+			filter.open(new RawDocument(new URI(url.toString()), "UTF-8", locENUS, locFRFR));			
 			if ( !testDriver.process(filter) ) Assert.fail();
 			//process(filter);
 			filter.close();
@@ -752,7 +757,7 @@ public class TsFilterTest {
 //		}
 //	}
 
-	private ArrayList<Event> getEvents(String snippet, String srcLang, String trgLang){
+	private ArrayList<Event> getEvents(String snippet, LocaleId srcLang, LocaleId trgLang){
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, srcLang, trgLang));
 		while ( filter.hasNext() ) {
@@ -764,7 +769,7 @@ public class TsFilterTest {
 	}
 	
 	//--without specifying target language--
-	private ArrayList<Event> getEvents(String snippet, String srcLang){
+	private ArrayList<Event> getEvents(String snippet, LocaleId srcLang){
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, srcLang));
 		while ( filter.hasNext() ) {
@@ -781,7 +786,7 @@ public class TsFilterTest {
 		URL url = TsFilterTest.class.getResource("/"+file);
 
 		try {
-			filter.open(new RawDocument(new URI(url.toString()), "utf-8", "en-us", "fr-fr"));
+			filter.open(new RawDocument(new URI(url.toString()), "utf-8", locENUS, locFRFR));
 			while ( filter.hasNext() ) {
 				Event event = filter.next();
 				list.add(event);

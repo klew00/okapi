@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
@@ -15,8 +16,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class HtmlFullFileTest {
+
 	private HtmlFilter htmlFilter;
 	private String[] testFileList;
+	private LocaleId locEN = LocaleId.fromString("en");
 
 	@Before
 	public void setUp() throws Exception {
@@ -36,7 +39,7 @@ public class HtmlFullFileTest {
 
 		for (String f : testFileList) {			
 			InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/" + f);
-			htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+			htmlFilter.open(new RawDocument(htmlStream, "UTF-8", locEN));
 			while (htmlFilter.hasNext()) {
 				event = htmlFilter.next();
 			}
@@ -46,7 +49,7 @@ public class HtmlFullFileTest {
 	@Test
 	public void testNonwellformed() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/nonwellformed.specialtest");
-		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", locEN));
 		while (htmlFilter.hasNext()) {
 			@SuppressWarnings("unused")
 			Event event = htmlFilter.next();
@@ -56,21 +59,21 @@ public class HtmlFullFileTest {
 	@Test
 	public void testEncodingShouldBeFound() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/withEncoding.html");
-		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", locEN));
 		assertEquals("windows-1252", htmlFilter.getEncoding());
 	}
 	
 	@Test
 	public void testEncodingShouldBeFound2() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/W3CHTMHLTest1.html");
-		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", locEN));
 		assertEquals("UTF-8", htmlFilter.getEncoding());		
 	}
 
 	@Test
 	public void testOkapiIntro() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html");
-		htmlFilter.open(new RawDocument(htmlStream, "windows-1252", "en"));
+		htmlFilter.open(new RawDocument(htmlStream, "windows-1252", locEN));
 		boolean foundText = false;
 		boolean first = true;
 		String lastText = "";
@@ -95,7 +98,7 @@ public class HtmlFullFileTest {
 	@Test
 	public void testSkippedScriptandStyleElements() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/testStyleScriptStylesheet.html");
-		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", locEN));
 		boolean foundText = false;
 		boolean first = true;
 		String firstText = "";

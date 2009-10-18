@@ -43,6 +43,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -73,7 +74,7 @@ public class OpenOfficeFilter implements IFilter {
 	private Enumeration<? extends ZipEntry> entries;
 	private int subDocId;
 	private LinkedList<Event> queue;
-	private String srcLang;
+	private LocaleId srcLoc;
 	private ODFFilter filter;
 	private Parameters params;
 	private String internalMimeType;
@@ -175,7 +176,7 @@ public class OpenOfficeFilter implements IFilter {
 		filter = new ODFFilter();
 		filter.setParameters(params);
 		
-		srcLang = input.getSourceLanguage();
+		srcLoc = input.getSourceLanguage();
 	}
 	
 	public void setParameters (IParameters params) {
@@ -217,7 +218,7 @@ public class OpenOfficeFilter implements IFilter {
 			
 			StartDocument startDoc = new StartDocument(docId);
 			startDoc.setName(docURI.getPath());
-			startDoc.setLanguage(srcLang);
+			startDoc.setLanguage(srcLoc);
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setFilterParameters(params);
 			startDoc.setFilterWriter(createFilterWriter());
@@ -260,7 +261,7 @@ public class OpenOfficeFilter implements IFilter {
 		filter.close();
 		Event event;
 		try {
-			filter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLang));
+			filter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLoc));
 			event = filter.next(); // START_DOCUMENT
 			filter.setContainerMimeType(internalMimeType);
 		}

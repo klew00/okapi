@@ -83,13 +83,13 @@ public class Utility extends BaseFilterDrivenUtility {
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(src);
 			if ( doc.hasWarning() ) logger.warning(doc.getWarning());
-			sourceSeg = doc.compileLanguageRules(srcLang, null);
+			sourceSeg = doc.compileLanguageRules(srcLang.toBCP47(), null);
 			//TODO: This is not working cross-platform!
 			if ( !src.equalsIgnoreCase(trg) ) {
 				doc.loadRules(trg);
 				if ( doc.hasWarning() ) logger.warning(doc.getWarning());
 			}
-			targetSeg = doc.compileLanguageRules(trgLang, null);
+			targetSeg = doc.compileLanguageRules(trgLang.toBCP47(), null);
 		}
 
 		if ( params.preTranslate ) {

@@ -30,6 +30,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -60,8 +61,8 @@ class TTXReader {
 
 	protected TextUnit item;
 	
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private TextContainer srcCont;
 	private TextContainer trgCont;
 	private int textType;
@@ -191,9 +192,9 @@ class TTXReader {
 	}
 	
 	private void processUserSettings () {
-		srcLang = ((Element)node).getAttribute("SourceLanguage");
+		srcLang = LocaleId.fromString(((Element)node).getAttribute("SourceLanguage"));
 		//TODO: check if targetlanguage exists, and handle case of null/empty
-		trgLang = ((Element)node).getAttribute("TargetLanguage");
+		trgLang = LocaleId.fromString(((Element)node).getAttribute("TargetLanguage"));
 	}
 
 	private boolean processOuterUT () {

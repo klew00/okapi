@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.LocaleId;
 
 public abstract class BaseUtility implements IUtility {
 
@@ -44,8 +45,8 @@ public abstract class BaseUtility implements IUtility {
 	protected ArrayList<OutputData> outputs;
 	protected String inputRoot;
 	protected String outputRoot;
-	protected String srcLang;
-	protected String trgLang;
+	protected LocaleId srcLang;
+	protected LocaleId trgLang;
 	protected String commonFolder;
 	protected String updateCommand;
 	protected String projectDir;
@@ -83,8 +84,8 @@ public abstract class BaseUtility implements IUtility {
 		commonFolder = null;
 	}
 
-	public void setOptions (String sourceLanguage,
-		String targetLanguage)
+	public void setOptions (LocaleId sourceLanguage,
+		LocaleId targetLanguage)
 	{
 		srcLang = sourceLanguage;
 		trgLang = targetLanguage;

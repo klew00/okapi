@@ -17,8 +17,10 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.tm.pensieve.seeker;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -115,10 +117,11 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      */
     TranslationUnit getTranslationUnit(Document doc) {
         //TODO Make sure metadata is supported here
-        TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.SOURCE_LANG),
-                new TextFragment(getFieldValue(doc, TranslationUnitField.SOURCE))),
-                new TranslationUnitVariant(getFieldValue(doc, TranslationUnitField.TARGET_LANG),
-                new TextFragment(getFieldValue(doc, TranslationUnitField.TARGET))));
+        TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant(
+        	getLocaleValue(doc, TranslationUnitField.SOURCE_LANG),
+        	new TextFragment(getFieldValue(doc, TranslationUnitField.SOURCE))),
+        	new TranslationUnitVariant(getLocaleValue(doc, TranslationUnitField.TARGET_LANG),
+        	new TextFragment(getFieldValue(doc, TranslationUnitField.TARGET))));
 
         for (MetadataType type : MetadataType.values()) {
             tu.setMetadataValue(type, getFieldValue(doc, type));
@@ -135,6 +138,10 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
      */
     String getFieldValue(Document doc, TranslationUnitField field) {
         return getFieldValue(doc, field.name());
+    }
+    
+    LocaleId getLocaleValue (Document doc, TranslationUnitField field) {
+    	return new LocaleId(getFieldValue(doc, field.name()), false);
     }
 
     /**
@@ -310,14 +317,16 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
     	TextFragment frag = new TextFragment();
     	frag.setCodedText(srcCodedText, srcCodes, false);
     	TranslationUnitVariant srcTuv = new TranslationUnitVariant(
-    		getFieldValue(doc, TranslationUnitField.SOURCE_LANG), frag);
+    		getLocaleValue(doc, TranslationUnitField.SOURCE_LANG),
+    		frag);
 
     	frag = new TextFragment();
     	List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
     	String codedText = getFieldValue(doc, TranslationUnitField.TARGET);
 		frag.setCodedText(codedText==null ? "" : codedText, codes, false);
     	TranslationUnitVariant trgTuv = new TranslationUnitVariant(
-   			getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
+    		getLocaleValue(doc, TranslationUnitField.TARGET_LANG),
+    		frag);
 
     	TranslationUnit tu = new TranslationUnit(srcTuv, trgTuv);
     	for ( MetadataType type : MetadataType.values() ) {
@@ -331,14 +340,16 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.SOURCE_CODES));
 		frag.setCodedText(getFieldValue(doc, TranslationUnitField.SOURCE), codes, false);
 		TranslationUnitVariant srcTuv = new TranslationUnitVariant(
-			getFieldValue(doc, TranslationUnitField.SOURCE_LANG), frag);
+			getLocaleValue(doc, TranslationUnitField.SOURCE_LANG),
+			frag);
 
 		frag = new TextFragment();
 		codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
 		String codedText = getFieldValue(doc, TranslationUnitField.TARGET);
 		frag.setCodedText(codedText==null ? "" : codedText, codes, false);
 		TranslationUnitVariant trgTuv = new TranslationUnitVariant(
-			getFieldValue(doc, TranslationUnitField.TARGET_LANG), frag);
+			getLocaleValue(doc, TranslationUnitField.TARGET_LANG),
+			frag);
 
 		TranslationUnit tu = new TranslationUnit(srcTuv, trgTuv);
 		for ( MetadataType type : MetadataType.values() ) {

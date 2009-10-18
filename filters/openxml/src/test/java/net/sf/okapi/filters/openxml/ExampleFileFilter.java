@@ -79,7 +79,7 @@ public class ExampleFileFilter extends FileFilter {
      * @see #addExtension
      */
     public ExampleFileFilter() {
-	this.filters = new Hashtable();
+    	this.filters = new Hashtable();
     }
 
     /**

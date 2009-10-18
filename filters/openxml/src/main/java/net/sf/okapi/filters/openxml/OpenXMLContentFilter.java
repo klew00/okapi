@@ -1276,7 +1276,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			{
 				wtb = new WordTextBox();
 				tboxcf = wtb.getTextBoxOpenXMLContentFilter();
-				wtb.open(sInsideTextBox, getSrcLang());
+				wtb.open(sInsideTextBox, getSrcLoc());
 				tboxcf.setUpConfig(MSWORD);
 				tboxcf.setTextUnitId(getTextUnitId());  // set min textUnitId so no overlap				
 				tboxcf.setDocumentPartId(getDocumentPartId()); // set min documentPartId so no overlap

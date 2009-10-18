@@ -32,6 +32,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -46,8 +47,8 @@ public class DummyFilter implements IFilter {
 
 	private boolean canceled;
 	private LinkedList<Event> queue;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private DummyParameters params;
 
 	public DummyFilter () {
@@ -116,8 +117,8 @@ public class DummyFilter implements IFilter {
 		}
 	}
 
-	private void setOptions (String sourceLanguage,
-		String targetLanguage,
+	private void setOptions (LocaleId sourceLanguage,
+		LocaleId targetLanguage,
 		String defaultEncoding,
 		boolean generateSkeleton)
 	{

@@ -22,6 +22,7 @@ package net.sf.okapi.steps.tokenization.engine;
 
 import java.util.List;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
@@ -33,41 +34,33 @@ public class Retainer extends AbstractLexer {
 
 	@Override
 	public boolean lexer_hasNext() {
-		
 		return false; // Iterator is not used
 	}
 
 	@Override
 	public void lexer_init() {
-
 	}
 
 	@Override
 	public Lexem lexer_next() {
-
 		return null; // Iterator is not used
 	}
 
 	@Override
-	public void lexer_open(String text, String language, Tokens tokens) {
-		
+	public void lexer_open(String text, LocaleId language, Tokens tokens) {
 		 // Iterator is not used
 	}
 
-	public Lexems process(String text, String language, Tokens tokens) {
-
+	public Lexems process(String text, LocaleId language, Tokens tokens) {
 		if (tokens == null) return null;
 				
 		//Tokens wasteBin = new Tokens();
 		
 		for (LexerRule rule : getRules()) {
-
 			if (!checkRule(rule, language)) continue;
-			
 			List<Integer> inTokenIDs = rule.getInTokenIDs();
 			
 			for (Token token : tokens) {
-				
 				if (token.isDeleted()) continue;
 				
 				if (!inTokenIDs.contains(token.getTokenId())) // Remove all tokens except those listed

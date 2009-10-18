@@ -31,6 +31,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -49,8 +50,8 @@ public class QueryManager {
 	private ArrayList<QueryResult> results;
 	private int current = -1;
 	private int lastId = 0;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	private LinkedHashMap<String, String> attributes;
 	private int threshold = 75;
 	private int maxHits = 5;
@@ -124,8 +125,8 @@ public class QueryManager {
 		// Set the parameters and open 
 		connector.setParameters(params);
 		connector.open();
-		if (( srcLang != null ) && ( trgLang != null )) {
-			connector.setLanguages(srcLang, trgLang);
+		if (( srcLoc != null ) && ( trgLoc != null )) {
+			connector.setLanguages(srcLoc, trgLoc);
 		}
 		for ( String name : attributes.keySet() ) {
 			connector.setAttribute(name, attributes.get(name));
@@ -380,35 +381,35 @@ public class QueryManager {
 	}
 	
 	/**
-	 * Sets the source and target languages for this manager and for all
+	 * Sets the source and target locales for this manager and for all
 	 * translation resources in this manager.
-	 * @param sourceLang Code of the source language to set.
-	 * @param targetLang Code of the target language to set.
+	 * @param sourceLocale Code of the source locale to set.
+	 * @param targetLocale Code of the target locale to set.
 	 */
-	public void setLanguages (String sourceLang,
-		String targetLang)
+	public void setLanguages (LocaleId sourceLocale,
+		LocaleId targetLocale)
 	{
-		srcLang = sourceLang;
-		trgLang = targetLang;
+		srcLoc = sourceLocale;
+		trgLoc = targetLocale;
 		for ( ResourceItem ri : resList.values() ) {
-			ri.query.setLanguages(srcLang, trgLang);
+			ri.query.setLanguages(srcLoc, trgLoc);
 		}
 	}
 
 	/**
-	 * Gets the current sourcelanguage for this manager.
-	 * @return Code of the current source language for this manager.
+	 * Gets the current source locale for this manager.
+	 * @return Code of the current source locale for this manager.
 	 */
-	public String getSourceLanguage () {
-		return srcLang;
+	public LocaleId getSourceLanguage () {
+		return srcLoc;
 	}
 
 	/**
-	 * Gets the current target language for this manager.
-	 * @return Code of the current target language for this manager.
+	 * Gets the current target locale for this manager.
+	 * @return Code of the current target locale for this manager.
 	 */
-	public String getTargetLanguage () {
-		return trgLang;
+	public LocaleId getTargetLanguage () {
+		return trgLoc;
 	}
 
 	/**
@@ -547,7 +548,7 @@ public class QueryManager {
 		if (( leveraged > 0 ) || makeSS ) {
 			// Set the target and attach the score
 			tc.setAnnotation(scores);
-			tu.setTarget(trgLang, tc);
+			tu.setTarget(trgLoc, tc);
 			if ( makeSS ) {
 				// Un-segmented entries that we have leveraged should be like
 				// a text unit with a single segment
@@ -560,7 +561,7 @@ public class QueryManager {
 				tmxWriter.writeItem(tu, null);
 			}
 			if ( !fillTarget ) {
-				tu.removeTarget(trgLang);
+				tu.removeTarget(trgLoc);
 			}
 		}	
 	}
@@ -585,8 +586,8 @@ public class QueryManager {
 		if ( !srcTc.hasText(false) ) return;
 		// Else create a single segment that is the whole content
 		srcTc.createSegment(0, -1);
-		TextContainer tc = tu.getTarget(trgLang);
-		if ( tc == null ) tc = tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
+		TextContainer tc = tu.getTarget(trgLoc);
+		if ( tc == null ) tc = tu.createTarget(trgLoc, false, IResource.CREATE_EMPTY);
 		tc.createSegment(0, -1);
 	}
 

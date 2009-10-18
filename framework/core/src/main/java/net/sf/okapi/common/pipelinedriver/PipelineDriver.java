@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
@@ -150,11 +151,11 @@ public class PipelineDriver implements IPipelineDriver {
 	public void addBatchItem (URI inputURI,
 		String defaultEncoding,
 		String filterConfigId,
-		String srcLang,
-		String trgLang)
+		LocaleId srcLoc,
+		LocaleId trgLoc)
 	{
 		DocumentData ddi = new DocumentData();
-		ddi.rawDocument = new RawDocument(inputURI, defaultEncoding, srcLang, trgLang);
+		ddi.rawDocument = new RawDocument(inputURI, defaultEncoding, srcLoc, trgLoc);
 		ddi.rawDocument.setFilterConfigId(filterConfigId);
 		BatchItemContext item = new BatchItemContext();
 		item.add(ddi);

@@ -20,6 +20,7 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 
 package net.sf.okapi.tm.pensieve.common;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.Property;
 
@@ -32,14 +33,17 @@ public final class PensieveUtil {
 
     /**
      * converts a TextUnit into a TranslationUnit
-     * @param sourceLang The source language to transform
-     * @param targetLang The target language to transform
-     * @param textUnit The textunit to convert
+     * @param sourceLoc The source locale to transform
+     * @param targetLoc The target locale to transform
+     * @param textUnit The text unit to convert
      * @return A TranslationUnit that represents the TextUnit
      */
-    public static TranslationUnit convertToTranslationUnit(String sourceLang, String targetLang, TextUnit textUnit) {
-        TranslationUnitVariant source = new TranslationUnitVariant(sourceLang, textUnit.getSourceContent());
-        TranslationUnitVariant target = new TranslationUnitVariant(targetLang, textUnit.getTargetContent(targetLang));
+    public static TranslationUnit convertToTranslationUnit (LocaleId sourceLoc,
+    	LocaleId targetLoc,
+    	TextUnit textUnit)
+    {
+        TranslationUnitVariant source = new TranslationUnitVariant(sourceLoc, textUnit.getSourceContent());
+        TranslationUnitVariant target = new TranslationUnitVariant(targetLoc, textUnit.getTargetContent(targetLoc));
         TranslationUnit tu = new TranslationUnit(source, target);
         populateMetaDataFromProperties(textUnit, tu);
         return tu;
@@ -50,7 +54,7 @@ public final class PensieveUtil {
      * @param tu The TranslationUnit to convert.
      * @return The converted TextUnit
      */
-    public static TextUnit convertToTextUnit(TranslationUnit tu) {
+    public static TextUnit convertToTextUnit (TranslationUnit tu) {
         TextUnit textUnit;
         String tuid = tu.getMetadata().get(MetadataType.ID);
 
@@ -59,7 +63,7 @@ public final class PensieveUtil {
             textUnit.setName(tuid);
         }
         textUnit.setSourceContent(tu.getSource().getContent());
-        textUnit.setTargetContent(tu.getTarget().getLang(), tu.getTarget().getContent());
+        textUnit.setTargetContent(tu.getTarget().getLanguage(), tu.getTarget().getContent());
         for (MetadataType type : tu.getMetadata().keySet()) {
             if (type != MetadataType.ID) {
                 textUnit.setProperty(new Property(type.fieldName(), tu.getMetadata().get(type)));
@@ -70,7 +74,9 @@ public final class PensieveUtil {
 
 
 
-    private static void populateMetaDataFromProperties(TextUnit textUnit, TranslationUnit tu) {
+    private static void populateMetaDataFromProperties (TextUnit textUnit,
+    	TranslationUnit tu)
+    {
         MetadataType mdt;
         for (String key : textUnit.getPropertyNames()) {
            mdt = MetadataType.findMetadataType(key);

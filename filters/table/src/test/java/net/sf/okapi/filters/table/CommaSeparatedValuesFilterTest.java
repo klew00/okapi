@@ -60,7 +60,8 @@ import net.sf.okapi.lib.extra.filters.WrapMode;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
-import net.sf.okapi.common.TestUtil; //maven
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.TestUtil;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -71,7 +72,11 @@ public class CommaSeparatedValuesFilterTest {
 
 	private CommaSeparatedValuesFilter filter;
 	private FilterTestDriver testDriver;
-	private String root; // for maven move; deletions marked with //m
+	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
+	private LocaleId locFRCA = LocaleId.fromString("fr-ca");
+	private LocaleId locFRFR = LocaleId.fromString("fr-fr");
 	
 	@Before
 	public void setUp() {
@@ -100,11 +105,11 @@ public class CommaSeparatedValuesFilterTest {
 		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
 		params.sourceColumns = "1";
 		params.targetColumns = "2";
-		params.targetLanguages = "FR-CA";
+		params.targetLanguages = locFRCA.toString();
 		params.targetSourceRefs = "1";
 		filter.setParameters(params);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA), locFRCA);
 		assertEquals(snippet, result);
 	}
 	
@@ -121,11 +126,11 @@ public class CommaSeparatedValuesFilterTest {
 		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
 		params.sourceColumns = "1";
 		params.targetColumns = "2";
-		params.targetLanguages = "FR-CA";
+		params.targetLanguages = locFRCA.toString();
 		params.targetSourceRefs = "1";
 		filter.setParameters(params);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");  
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA), locFRCA);  
 		assertEquals(snippet, result);
 	}
 	
@@ -158,7 +163,7 @@ public class CommaSeparatedValuesFilterTest {
 		
 		//System.out.println(snippet);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, "EN", "FR-CA"), "FR-CA");
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA), locFRCA);
 		//System.out.println(result);
 		assertEquals(snippet, result);
 	}
@@ -178,11 +183,11 @@ public class CommaSeparatedValuesFilterTest {
 		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
 		params.sourceColumns = "1";
 		params.targetColumns = "2";
-		params.targetLanguages = "FR-CA";
+		params.targetLanguages = locFRCA.toString();
 		params.targetSourceRefs = "1";
 		filter.setParameters(params);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -193,11 +198,11 @@ public class CommaSeparatedValuesFilterTest {
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "source1", "", "target1", "FR-CA", "");
+		testEvent(EventType.TEXT_UNIT, "source1", "", "target1", locFRCA, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "source2", "", "target2", "FR-CA", "");
+		testEvent(EventType.TEXT_UNIT, "source2", "", "target2", locFRCA, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -214,7 +219,7 @@ public class CommaSeparatedValuesFilterTest {
 		// Empty stream, OkapiBadFilterInputException expected, no other		
 		InputStream input = null;
 		try {			
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -226,7 +231,7 @@ public class CommaSeparatedValuesFilterTest {
 		// Empty URI, OkapiBadFilterInputException expected, no other
 		URI uri = null;
 		try {
-			filter.open(new RawDocument(uri, "UTF-8", "en"));
+			filter.open(new RawDocument(uri, "UTF-8", locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -238,7 +243,7 @@ public class CommaSeparatedValuesFilterTest {
 		// Empty char seq, OkapiBadFilterInputException expected, no other		
 		String st = null;
 		try {
-			filter.open(new RawDocument(st, "UTF-8", "en"));
+			filter.open(new RawDocument(st, locEN, locEN));
 			fail("OkapiIOException should've been trown");
 		}	
 		catch (OkapiIOException e) {
@@ -274,7 +279,7 @@ public class CommaSeparatedValuesFilterTest {
 			
 			InputStream input2 = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		try {
-			filter.open(new RawDocument(input2, "UTF-8", "en"));
+			filter.open(new RawDocument(input2, "UTF-8", locEN));
 			fail("OkapiBadFilterParametersException should've been trown");
 		}
 		catch (OkapiBadFilterParametersException e) {
@@ -291,7 +296,7 @@ public class CommaSeparatedValuesFilterTest {
 		
 		// Read lines from a file, check mime types 
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test1.txt");
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		while (filter.hasNext()) {
 			Event event = filter.next();
@@ -419,7 +424,7 @@ public class CommaSeparatedValuesFilterTest {
 		filter.setParameters(new net.sf.okapi.filters.plaintext.base.Parameters());
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test1.txt");
 		try {
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 			fail("OkapiBadFilterParametersException should've been trown");
 		}
 		catch (OkapiBadFilterParametersException e) {
@@ -430,7 +435,7 @@ public class CommaSeparatedValuesFilterTest {
 		filter.setParameters(new net.sf.okapi.filters.table.csv.Parameters());
 		input = TableFilterTest.class.getResourceAsStream("/csv_test1.txt");
 		try {
-			filter.open(new RawDocument(input, "UTF-8", "en"));
+			filter.open(new RawDocument(input, "UTF-8", locEN));
 		}
 		catch (OkapiBadFilterParametersException e) {
 			fail("OkapiBadFilterParametersException should NOT have been trown");
@@ -506,7 +511,7 @@ public class CommaSeparatedValuesFilterTest {
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test1.txt");
 		assertNotNull(input);
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		
@@ -560,7 +565,7 @@ public class CommaSeparatedValuesFilterTest {
 		assertNotNull(input);
 		
 		// System.out.println(filename);
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
 	}
@@ -581,7 +586,7 @@ public class CommaSeparatedValuesFilterTest {
 		params.trimLeading = false;
 		params.trimTrailing = false;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -624,7 +629,7 @@ public class CommaSeparatedValuesFilterTest {
 		//params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -669,7 +674,7 @@ public class CommaSeparatedValuesFilterTest {
 		params.trimLeading = true;
 		params.trimTrailing = false;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -688,7 +693,7 @@ public class CommaSeparatedValuesFilterTest {
 		params.trimLeading = true;
 		params.trimTrailing = true;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -718,7 +723,7 @@ public class CommaSeparatedValuesFilterTest {
 		} catch (URISyntaxException e) {
 		}
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -751,7 +756,7 @@ public class CommaSeparatedValuesFilterTest {
 		params.loadFromResource("/okf_table@copy-of-csv_96.fprm");
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -762,11 +767,11 @@ public class CommaSeparatedValuesFilterTest {
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", locFRFR, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", locFRFR, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -778,16 +783,16 @@ public class CommaSeparatedValuesFilterTest {
 		
 		params.loadFromResource("/okf_table@copy-of-csv_96.fprm");
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
+		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", locFRFR, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
+		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", locFRFR, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -806,7 +811,7 @@ public class CommaSeparatedValuesFilterTest {
 		params.loadFromResource("/okf_table@copy-of-csv_97.fprm");
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
@@ -819,13 +824,13 @@ public class CommaSeparatedValuesFilterTest {
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
-		testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", "FR-CA", "");
+		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", locFRFR, "");
+		testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", locFRCA, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
-		testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", "FR-CA", "");
+		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", locFRFR, "");
+		testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", locFRCA, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -838,18 +843,18 @@ public class CommaSeparatedValuesFilterTest {
 		
 		params.loadFromResource("/okf_table@copy-of-csv_97.fprm");
 		
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 						
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", "FR-FR", "");
-		testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", "FR-CA", "");
+		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", locFRFR, "");
+		testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", locFRCA, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", "FR-FR", "");
-		testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", "FR-CA", "");
+		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", locFRFR, "");
+		testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", locFRCA, "");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -870,7 +875,7 @@ public class CommaSeparatedValuesFilterTest {
 		assertNotNull(input);
 		
 		params.wrapMode = WrapMode.NONE; // !!!
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		
@@ -1040,7 +1045,7 @@ public class CommaSeparatedValuesFilterTest {
 		assertNotNull(input);
 		
 		params.wrapMode = WrapMode.SPACES; // !!!
-		filter.open(new RawDocument(input, "UTF-8", "en"));
+		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);
 		
@@ -1209,7 +1214,7 @@ public class CommaSeparatedValuesFilterTest {
 //		assertNotNull(input);
 //		
 //		params.wrapMode = WrapMode.SPACE;
-//		filter.open(new RawDocument(input, "UTF-8", "en"));
+//		filter.open(new RawDocument(input, "UTF-8", locEN));
 //		
 //		testEvent(EventType.START_DOCUMENT, null);
 //		
@@ -1374,10 +1379,8 @@ public class CommaSeparatedValuesFilterTest {
 		list.add(new InputDocument(root + "CSVTesting01.csv", ""));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "fr"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
-
-
 	
 	// Helpers
 	private String getFullFileName(String fileName) {
@@ -1417,13 +1420,16 @@ public class CommaSeparatedValuesFilterTest {
 		}
 	}
 	
-	private void testEvent(EventType expectedType, String source, String expName, String target, String language, String comment) {
-		
+	private void testEvent(EventType expectedType,
+		String source,
+		String expName,
+		String target,
+		LocaleId language,
+		String comment)
+	{
 		assertNotNull(filter);
-		
 		Event event = filter.next();		
 		assertNotNull(event);
-		
 		assertTrue(event.getEventType() == expectedType);
 		
 		switch (event.getEventType()) {
@@ -1442,15 +1448,13 @@ public class CommaSeparatedValuesFilterTest {
 				assertEquals(expName, tu.getName());
 			}
 			
-			if (!Util.isEmpty(target) && !Util.isEmpty(language)) {
-				
+			if ( !Util.isEmpty(target) && !Util.isNullOrEmpty(language) ) {
 				TextContainer trg = tu.getTarget(language);
 				assertNotNull(trg);
 				assertEquals(target, trg.toString());
 			}
 			
-			if (!Util.isEmpty(comment)) {
-				
+			if ( !Util.isEmpty(comment) ) {
 				prop = tu.getProperty(Property.NOTE);
 				assertNotNull(prop);
 				assertEquals(comment, prop.toString());
@@ -1477,10 +1481,10 @@ public class CommaSeparatedValuesFilterTest {
 		writer = filter.createFilterWriter();		
 		try {						
 			// Open the input
-			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", "en", "fr"));
+			filter.open(new RawDocument((new File(fileName)).toURI(), "UTF-8", locEN, locFR));
 			
 			// Prepare the output
-			writer.setOptions("fr", "UTF-16");
+			writer.setOptions(locFR, "UTF-16");
 			writerBuffer = new ByteArrayOutputStream();
 			writer.setOutput(writerBuffer);
 			
@@ -1513,8 +1517,8 @@ public class CommaSeparatedValuesFilterTest {
     }
 
 	private ArrayList<Event> getEvents (String snippet,
-		String srcLang,
-		String trgLang)
+		LocaleId srcLang,
+		LocaleId trgLang)
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, srcLang, trgLang));

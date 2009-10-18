@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 //import net.sf.okapi.filters.markupfilter.Parameters;
 //import net.sf.okapi.filters.openxml.OpenXMLContentFilter;
@@ -45,9 +46,12 @@ import static org.junit.Assert.*;
  */
 
 public class OpenXMLZipFullFileTest {
+
 	private static Logger LOGGER;
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locENUS = LocaleId.fromString("en-us");
 
 	@Before
 	public void setUp() throws Exception {
@@ -57,7 +61,7 @@ public class OpenXMLZipFullFileTest {
 		LOGGER.setLevel(Level.FINE);
 		if (LOGGER.getHandlers().length<1)
 			LOGGER.addHandler(new LogHandlerSystemOut());		
-		openXMLFilter.setOptions("en", "UTF-8", true);
+		openXMLFilter.setOptions(locEN, "UTF-8", true);
 
 		// read all files in the test html directory
 		URL url = OpenXMLZipFullFileTest.class.getResource("/BoldWorld.docx");
@@ -82,7 +86,7 @@ public class OpenXMLZipFullFileTest {
 			try {
 				URL url = OpenXMLZipFullFileTest.class.getResource("/"+f);
 				//URI uriFf = new URI(fff);
-				openXMLFilter.open(new RawDocument(url.toURI(), "UTF-8", "en-US"),true,true,Level.FINEST); // DWH 4-22-09
+				openXMLFilter.open(new RawDocument(url.toURI(), "UTF-8", locENUS),true,true,Level.FINEST); // DWH 4-22-09
 				while (openXMLFilter.hasNext()) {
 					openXMLFilter.next();
 				}

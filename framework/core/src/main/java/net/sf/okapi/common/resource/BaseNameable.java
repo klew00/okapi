@@ -28,6 +28,7 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.LocaleId;
 
 /**
  * Implements a nameable resource.
@@ -149,18 +150,18 @@ public class BaseNameable implements INameable {
 		return sourceProperties.containsKey(name);
 	}
 
-	public Property getTargetProperty (String language,
+	public Property getTargetProperty (LocaleId locId,
 		String name)
 	{
 		if ( annotations == null ) return null;
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
 		if ( tpa == null ) return null;
-		Map<String, Property> trgProps = tpa.get(language);
+		Map<String, Property> trgProps = tpa.get(locId);
 		if ( trgProps == null ) return null;
 		return trgProps.get(name);
 	}
 
-	public Property setTargetProperty (String language,
+	public Property setTargetProperty (LocaleId locId,
 		Property property)
 	{
 		if ( annotations == null ) annotations = new Annotations();
@@ -169,64 +170,64 @@ public class BaseNameable implements INameable {
 			tpa = new TargetPropertiesAnnotation();
 			annotations.set(tpa);
 		}
-		Map<String, Property> trgProps = tpa.get(language);
+		Map<String, Property> trgProps = tpa.get(locId);
 		if ( trgProps == null ) {
-			tpa.set(language, new Hashtable<String, Property>());
-			trgProps = tpa.get(language);
+			tpa.set(locId, new Hashtable<String, Property>());
+			trgProps = tpa.get(locId);
 		}
 		trgProps.put(property.getName(), property);
 		return property;
 	}
 
-	public Set<String> getTargetPropertyNames (String language) {
+	public Set<String> getTargetPropertyNames (LocaleId locId) {
 		if ( annotations == null ) annotations = new Annotations();
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
 		if ( tpa == null ) {
 			tpa = new TargetPropertiesAnnotation();
 			annotations.set(tpa);
 		}
-		Map<String, Property> trgProps = tpa.get(language);
+		Map<String, Property> trgProps = tpa.get(locId);
 		if ( trgProps == null ) {
-			tpa.set(language, new Hashtable<String, Property>());
-			trgProps = tpa.get(language);
+			tpa.set(locId, new Hashtable<String, Property>());
+			trgProps = tpa.get(locId);
 		}
 		return trgProps.keySet();
 	}
 
-	public void removeTargetProperty (String language,
+	public void removeTargetProperty (LocaleId locId,
 		String name)
 	{
 		if ( annotations != null ) {
 			TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
 			if ( tpa != null ) {
-				Map<String, Property> trgProps = tpa.get(language);
+				Map<String, Property> trgProps = tpa.get(locId);
 				trgProps.remove(name);
 			}
 		}
 	}
 	
-	public boolean hasTargetProperty (String language,
+	public boolean hasTargetProperty (LocaleId locId,
 		String name)
 	{
 		if ( annotations == null ) return false;
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
 		if ( tpa == null ) return false;
-		Map<String, Property> trgProps = tpa.get(language);
+		Map<String, Property> trgProps = tpa.get(locId);
 		if ( trgProps == null ) return false;
 		return (trgProps.get(name) != null);
 	}
 		
-	public Set<String> getTargetLanguages () {
+	public Set<LocaleId> getTargetLanguages () {
 		if ( annotations == null ) annotations = new Annotations();
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
 		if ( tpa == null ) {
 			tpa = new TargetPropertiesAnnotation();
 			annotations.set(tpa);
 		}
-		return tpa.getLanguages();
+		return tpa.getLocales();
 	}
 
-	public Property createTargetProperty (String language,
+	public Property createTargetProperty (LocaleId locId,
 		String name,
 		boolean overwriteExisting,
 		int creationOptions)
@@ -237,10 +238,10 @@ public class BaseNameable implements INameable {
 			tpa = new TargetPropertiesAnnotation();
 			annotations.set(tpa);
 		}
-		Map<String, Property> trgProps = tpa.get(language);
+		Map<String, Property> trgProps = tpa.get(locId);
 		if ( trgProps == null ) {
-			tpa.set(language, new Hashtable<String, Property>());
-			trgProps = tpa.get(language);
+			tpa.set(locId, new Hashtable<String, Property>());
+			trgProps = tpa.get(locId);
 		}
 		Property trgProp = trgProps.get(name);
 		if (( trgProp == null ) || overwriteExisting ) {

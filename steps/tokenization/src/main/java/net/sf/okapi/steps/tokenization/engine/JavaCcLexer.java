@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.logging.Level;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
@@ -100,7 +101,7 @@ public class JavaCcLexer extends AbstractLexer {
 	}
 
 	@Override
-	protected void lexer_open(String text, String language, Tokens tokens) {
+	protected void lexer_open (String text, LocaleId language, Tokens tokens) {
 		
 		StringReader sr = new StringReader(text);
 		stream = new SimpleCharStream(sr);
@@ -110,8 +111,7 @@ public class JavaCcLexer extends AbstractLexer {
 		hasNext = true;
 	}
 
-	public Lexems process(String text, String language, Tokens tokens) {
-		
+	public Lexems process(String text, LocaleId language, Tokens tokens) {
 		return null;
 	}
 

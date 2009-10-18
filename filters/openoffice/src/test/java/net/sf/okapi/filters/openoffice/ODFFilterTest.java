@@ -31,6 +31,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.openoffice.ODFFilter;
 
@@ -41,6 +42,7 @@ public class ODFFilterTest {
 	
 	private ODFFilter filter;
 	private String root;
+	private LocaleId locEN = LocaleId.fromString("en");
 
 	@Before
 	public void setUp() {
@@ -52,7 +54,7 @@ public class ODFFilterTest {
 	public void testFirstTextUnit () {
 		TextUnit tu = FilterTestDriver.getTextUnit(filter,
 			new InputDocument(root+"TestDocument01.odt_content.xml", null),
-			"UTF-8", "en", "en", 1);
+			"UTF-8", locEN, locEN, 1);
 		assertNotNull(tu);
 		assertEquals("Heading 1", tu.getSource().toString());
 	}
@@ -77,7 +79,7 @@ public class ODFFilterTest {
 		list.add(new InputDocument(root+"TestSpreadsheet01.ods_content.xml", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", "en", "en"));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN));
 	}
 
 

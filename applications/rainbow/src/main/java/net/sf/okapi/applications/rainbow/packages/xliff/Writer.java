@@ -27,6 +27,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.*;
 
 import java.io.File;
@@ -44,7 +45,7 @@ public class Writer extends BaseWriter {
 	private XLIFFContent xliffCont;
 	private boolean useSourceForTranslated = false;
 	private boolean inFile;
-	private String srcLang;
+	private LocaleId srcLang;
 	private String docMimeType;
 
 	public Writer () {
@@ -201,8 +202,8 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("file");
 		writer.writeAttributeString("original",
 			(original!=null) ? original : "unknown");
-		writer.writeAttributeString("source-language", srcLang);
-		writer.writeAttributeString("target-language", trgLang);
+		writer.writeAttributeString("source-language", srcLang.toBCP47());
+		writer.writeAttributeString("target-language", trgLoc.toBCP47());
 		
 		if ( contentType == null ) contentType = "x-undefined";
 		else if ( contentType.equals("text/html") ) contentType = "html";
@@ -253,7 +254,7 @@ public class Writer extends BaseWriter {
 	private void processTextUnit (TextUnit tu) {
 		// Check if we need to set the entry as non-translatable
 		if ( options.setApprovedAsNoTranslate ) {
-			Property prop = tu.getTargetProperty(trgLang, Property.APPROVED);
+			Property prop = tu.getTargetProperty(trgLoc, Property.APPROVED);
 			if (( prop != null ) && prop.getValue().equals("yes") ) {
 				tu.setIsTranslatable(false);
 			}
@@ -278,8 +279,8 @@ public class Writer extends BaseWriter {
 		if ( !tu.isTranslatable() )
 			writer.writeAttributeString("translate", "no");
 
-		if ( tu.hasTargetProperty(trgLang, Property.APPROVED) ) {
-			if ( tu.getTargetProperty(trgLang, Property.APPROVED).getValue().equals("yes") ) {
+		if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
+			if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
 				writer.writeAttributeString(Property.APPROVED, "yes");
 			}
 			// "no" is the default
@@ -296,7 +297,7 @@ public class Writer extends BaseWriter {
 		//--- Write the source
 		
 		writer.writeStartElement("source");
-		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage());
+		writer.writeAttributeString("xml:lang", manifest.getSourceLanguage().toBCP47());
 		// Write full source content (always without segments markers
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false,
 			options.gMode));
@@ -312,11 +313,11 @@ public class Writer extends BaseWriter {
 		//--- Write the target
 		
 		writer.writeStartElement("target");
-		writer.writeAttributeString("xml:lang", manifest.getTargetLanguage());
+		writer.writeAttributeString("xml:lang", manifest.getTargetLanguage().toBCP47());
 		
 		// At this point tc contains the source
 		// Do we have an available target to use instead?
-		tc = tu.getTarget(trgLang);
+		tc = tu.getTarget(trgLoc);
 		if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )
 			|| ( srcHasText && !tc.hasText(false) )) {
 			tc = tu.getSource(); // Go back to the source

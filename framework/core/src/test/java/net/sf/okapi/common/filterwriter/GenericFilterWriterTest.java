@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -40,6 +41,9 @@ import static org.junit.Assert.*;
 public class GenericFilterWriterTest {
 
 	public Event startDocEvent;
+
+	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locFR = LocaleId.fromString("fr");
 	
 	@Before
 	public void setUp() throws Exception {
@@ -49,21 +53,21 @@ public class GenericFilterWriterTest {
 	public void testSourceTargetSkeleton () {
 		TextUnit tu = new TextUnit("tu1");
 		tu.setSourceContent(new TextFragment("src"));
-		tu.setTargetContent("fr", new TextContainer("trg"));
+		tu.setTargetContent(locFR, new TextContainer("trg"));
 		Event textUnitEvent = new Event(EventType.TEXT_UNIT, tu);
 			
 		GenericSkeleton skel = new GenericSkeleton();
 		skel.add("[start]");
 		skel.addContentPlaceholder(tu);
 		skel.add("[middle]");
-		skel.addContentPlaceholder(tu, "fr");
+		skel.addContentPlaceholder(tu, locFR);
 		skel.add("[end]");
 		tu.setSkeleton(skel);
 			
 		GenericFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter());
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-		writer.setOptions("fr", "UTF-8");
+		writer.setOptions(locFR, "UTF-8");
 		writer.setOutput(output);
 		writer.handleEvent(createStartDocument(true));
 		writer.handleEvent(textUnitEvent);
@@ -88,7 +92,7 @@ public class GenericFilterWriterTest {
 		Event docPartEvent = new Event(EventType.DOCUMENT_PART, dp);
 			
 		GenericFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter());
-		writer.setOptions("en", "UTF-8");
+		writer.setOptions(locEN, "UTF-8");
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		writer.setOutput(output);
 			
@@ -104,7 +108,7 @@ public class GenericFilterWriterTest {
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-8", false);
 		sd.setLineBreak("\n");
-		sd.setLanguage("en");
+		sd.setLanguage(locEN);
 		sd.setMultilingual(multilingual);
 		startDocEvent = new Event(EventType.START_DOCUMENT, sd);
 		return startDocEvent;

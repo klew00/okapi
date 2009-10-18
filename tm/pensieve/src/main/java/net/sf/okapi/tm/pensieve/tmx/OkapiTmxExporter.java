@@ -17,9 +17,11 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
@@ -34,23 +36,27 @@ import net.sf.okapi.tm.pensieve.seeker.PensieveSeeker;
 public class OkapiTmxExporter implements ITmxExporter {
 
     /**
-     * Exports all target langs in Pensieve to TMX
-     * @param sourceLang The source language of desired tran
+     * Exports all target locales in Pensieve to TMX
+     * @param sourceLocale The source locale
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX
      */
-    public void exportTmx(String sourceLang, ITmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
-        exportTmx(sourceLang, null, tmSeeker, tmxWriter);
+    public void exportTmx(LocaleId sourceLocale, ITmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
+        exportTmx(sourceLocale, null, tmSeeker, tmxWriter);
     }
 
     /**
-     * Exports only specific target langs Pensieve to TMX
-     * @param sourceLang The source language of desired tran
-     * @param targetLang The target language of desired tran (or null for all target languages)
+     * Exports only a specific target locale Pensieve to TMX
+     * @param sourceLang The source language of desired translation
+     * @param targetLang The target language of desired translation (or null for all target languages)
      * @param tmSeeker The TMSeeker to use when reading from the TM
      * @param tmxWriter The TMXWriter to use when writing out the TMX
      */
-    public void exportTmx(String sourceLang, String targetLang, ITmSeeker tmSeeker, TMXWriter tmxWriter) throws IOException {
+    public void exportTmx(LocaleId sourceLang,
+    	LocaleId targetLang,
+    	ITmSeeker tmSeeker,
+    	TMXWriter tmxWriter)
+    throws IOException {
         checkExportTmxParams(sourceLang, tmSeeker, tmxWriter);
         try {
             tmxWriter.writeStartDocument(sourceLang, targetLang, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
@@ -68,11 +74,17 @@ public class OkapiTmxExporter implements ITmxExporter {
         }
     }
 
-    private static boolean isWriteTextUnit(String sourceLang, String targetLang, TranslationUnit tu) {
-        return sourceLang.equals(tu.getSource().getLang()) && (targetLang == null || targetLang.equals(tu.getTarget().getLang()));
+    private static boolean isWriteTextUnit(LocaleId sourceLang,
+    	LocaleId targetLang,
+    	TranslationUnit tu)
+    {
+        return sourceLang.equals(tu.getSource().getLanguage()) && (targetLang == null || targetLang.equals(tu.getTarget().getLanguage()));
     }
 
-    private void checkExportTmxParams(String sourceLang, ITmSeeker tmSeeker, TMXWriter tmxWriter) {
+    private void checkExportTmxParams(LocaleId sourceLang,
+    	ITmSeeker tmSeeker,
+    	TMXWriter tmxWriter)
+    {
         if (sourceLang == null) {
             throw new IllegalArgumentException("'sourceLang' was not set");
         }

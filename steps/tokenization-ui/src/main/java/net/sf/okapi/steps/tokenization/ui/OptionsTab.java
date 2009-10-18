@@ -296,8 +296,8 @@ public class OptionsTab extends Composite implements IDialogPage {
 			SWTUtil.setSelected(tokensAll, params.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL);								
 			SWTUtil.setSelected(tokens, params.getTokenMode() == LanguageAndTokenParameters.TOKENS_SELECTED);
 			
-			SWTUtil.setText(langWE, ListUtil.listAsString(params.getLanguageWhiteList()));
-			SWTUtil.setText(langBE, ListUtil.listAsString(params.getLanguageBlackList()));
+			SWTUtil.setText(langWE, ListUtil.languageListAsString(params.getLanguageWhiteList()));
+			SWTUtil.setText(langBE, ListUtil.languageListAsString(params.getLanguageBlackList()));
 			SWTUtil.setText(tokensE, ListUtil.listAsString(params.getTokenNames()));
 			
 //			if (filterParams != null) {
@@ -344,8 +344,8 @@ public class OptionsTab extends Composite implements IDialogPage {
 			if (SWTUtil.getSelected(tokens))
 				params.setTokenMode(LanguageAndTokenParameters.TOKENS_SELECTED);
 									
-			params.setLanguageWhiteList(ListUtil.stringAsList(langWE.getText()));
-			params.setLanguageBlackList(ListUtil.stringAsList(langBE.getText()));
+			params.setLanguageWhiteList(ListUtil.stringAsLanguageList(langWE.getText()));
+			params.setLanguageBlackList(ListUtil.stringAsLanguageList(langBE.getText()));
 			params.setTokenNames(ListUtil.stringAsList(tokensE.getText()));
 		}
 

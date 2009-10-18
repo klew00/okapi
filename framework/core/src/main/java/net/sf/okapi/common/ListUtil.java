@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.LocaleId;
+
 /**
  * Helper methods to manipulate lists.
  */
@@ -44,8 +46,70 @@ public class ListUtil {
 	 * @return a list of substrings.
 	 */
 	public static List<String> stringAsList(String st) {
-
 		return listTrimValues(stringAsList(st, ","));		
+	}
+	
+	/**
+	 * Converts an array of string representing languages into a list of languages.
+	 * @param array the array of strings to convert.
+	 * @return a list of languages for the given strings.
+	 */
+	public static List<LocaleId> stringArrayAsLanguageList (String[] array) {
+		List<LocaleId> list = new ArrayList<LocaleId>();
+		for ( int i=0; i<array.length; i++ ) {			
+			list.add(LocaleId.fromString(array[i]));
+		}
+		return list;
+	}
+
+	/**
+	 * Splits up a string of comma-separated substrings representing language codes into a string list of languages.
+	 * @param st string of comma-separated substrings. 
+	 * @return a list of languages.
+	 */
+	public static List<LocaleId> stringAsLanguageList (String input) {
+		if ( input == null ) return null;
+		List<LocaleId> res = new ArrayList<LocaleId>();
+		List<String> list = new ArrayList<String>();
+		stringAsList(list, input, ",");
+		for ( String lang : list ) {
+			lang = lang.trim();
+			if ( !Util.isEmpty(lang) ) {
+				res.add(LocaleId.fromString(lang));
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * Converts a list of languages into an array of strings.
+	 * @param list List of languages.
+	 * @return an array of strings for the given languages.
+	 */
+	public static String[] languageListAsStringArray (List<LocaleId> list) {
+		String[] res = new String[list.size()];
+		for ( int i=0; i<list.size(); i++ ) {			
+			res[i] = list.get(i).toString();
+		}
+		return res;
+	}
+	
+	/**
+	 * Creates a string output for a list of languages. The language identifiers
+	 * are separated by commas.
+	 * @param list the list of languages to convert.
+	 * @return the output string.
+	 */
+	public static String languageListAsString (List<LocaleId> list) {
+		if ( list == null ) return "";
+		StringBuilder tmp = new StringBuilder();
+		for ( int i=0; i<list.size(); i++ ) {
+			if ( i > 0 ) {
+				tmp.append(",");
+			}
+			tmp.append(list.get(i).toString());
+		}
+		return tmp.toString();
 	}
 	
 	/**
@@ -54,7 +118,6 @@ public class ListUtil {
 	 * @param st string of comma-separated substrings. 
 	 */
 	public static void stringAsList(List<String> list, String st) {
-
 		stringAsList(list, st, ",");
 		listTrimValues(list);
 	}
@@ -81,7 +144,6 @@ public class ListUtil {
 	 * @param delimiter a string delimiting substrings in the string.	  
 	 */
 	public static void stringAsList(List<String> list, String st, String delimiter) {
-
 		if (Util.isEmpty(st)) return;
 		if (list == null) return;
 		
@@ -115,7 +177,6 @@ public class ListUtil {
 	 * @return the generated array of strings.
 	 */
 	public static String[] stringAsArray(String st) {
-		
 		List<String> list = stringAsList(st);
 		
 		if (Util.isEmpty(list))
@@ -131,7 +192,6 @@ public class ListUtil {
 	 * @return the generated array of strings.
 	 */
 	public static String[] stringAsArray(String st, String delimiter) {
-		
 		List<String> list = stringAsList(st, delimiter);
 		
 		if (Util.isEmpty(list))
@@ -146,7 +206,6 @@ public class ListUtil {
 	 * @return a list of integers.
 	 */
 	public static List<Integer> stringAsIntList (String st) {
-		
 		return stringAsIntList(st, ",");
 	}
 	
@@ -157,7 +216,6 @@ public class ListUtil {
 	 * @return a list of integers 
 	 */
 	public static List<Integer> stringAsIntList(String st, String delimiter) {
-		
 		return stringAsIntList(st, delimiter, false);
 	}		
 	
@@ -169,7 +227,6 @@ public class ListUtil {
 	 * @return a list of integers 
 	 */
 	public static List<Integer> stringAsIntList(String st, String delimiter, boolean sortList) {
-					
 		List<Integer> res = new ArrayList<Integer>(); // Always create the list event if input string is empty
 		if (Util.isEmpty(st)) return res;
 		
@@ -208,9 +265,7 @@ public class ListUtil {
 	 */
 	//TODO: javadoc
 	public static List<String> listTrimValues(List<String> list) {
-		
-		if (list == null) return list;
-
+		if ( list == null ) return null;
 		List<String> res = new ArrayList<String>();
 		
 		for (String st : list)
@@ -228,7 +283,6 @@ public class ListUtil {
 	 * @return an array of strings.
 	 */
 	public static String[] listAsArray(List<String> list) {
-		
 		if (Util.isEmpty(list))
 			return new String[] {};
 		
@@ -237,7 +291,6 @@ public class ListUtil {
 	
 	//TODO: javadoc
 	public static <E> List<E> arrayAsList(E[] array) {
-		
 		//return Arrays.asList(array); // Fixed size, no clear() etc. possible
 		List<E> list = new ArrayList<E>();
 		
@@ -249,25 +302,21 @@ public class ListUtil {
 	
 	//TODO: javadoc
 	public static String arrayAsString(String[] array) {
-				
 		return arrayAsString(array, ",");
 	}
 	
 	//TODO: javadoc
 	public static String arrayAsString(String[] array, String delimiter) {
-		
 		return listAsString(Arrays.asList(array), delimiter);
 	}
 	
 	//TODO: javadoc
 	public static String listAsString(List<String> list) {
-		
 		return listAsString(list, ",");
 	}
 	
 	//TODO: javadoc
 	public static String listAsString(List<String> list, String delimiter) {
-		
 		if (list == null) return "";
 		String res = "";
 		
@@ -283,18 +332,15 @@ public class ListUtil {
 	
 	//TODO: javadoc
 	public static String intListAsString(List<Integer> list) {
-		
 		return intListAsString(list, ",");
 	}
 	
 	//TODO: javadoc
 	public static String intListAsString(List<Integer> list, String delimiter) {
-		
 		List<String> stList = new ArrayList<String>();
-
-		for (Integer value : list)
+		for (Integer value : list) {
 			stList.add(Util.intToStr(value));
-		
+		}
 		return listAsString(stList, delimiter);
 	}
 

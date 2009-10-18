@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -59,7 +60,7 @@ public class RtfTestUtils {
 	public static void printEvents(String file) {
 		RTFFilter filter = new RTFFilter();
 		InputStream htmlStream = RtfFullFileTest.class.getResourceAsStream("/" + file);
-		filter.open(new RawDocument(htmlStream, "UTF-8", "en"));
+		filter.open(new RawDocument(htmlStream, "UTF-8", LocaleId.fromString("en")));
 		try {
 			while (filter.hasNext()) {
 				Event event = filter.next();

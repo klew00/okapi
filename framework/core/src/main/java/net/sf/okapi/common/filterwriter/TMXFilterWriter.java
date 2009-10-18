@@ -29,6 +29,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -42,7 +43,7 @@ public class TMXFilterWriter implements IFilterWriter {
 	private TMXWriter writer;
 	private OutputStream outputStream;
 	private String outputPath;
-	private String language;
+	private LocaleId locale;
 	private boolean canceled;
 	private String segType;
 
@@ -90,13 +91,13 @@ public class TMXFilterWriter implements IFilterWriter {
 
 	/**
 	 * Sets the options for this writer.
-	 * @param language code of the output language.
+	 * @param locale output locale.
 	 * @param defaultEncoding this argument is ignored for this writer: the output is always UTF-8.
 	 */
-	public void setOptions (String language,
+	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
-		this.language = language;
+		this.locale = locale;
 		// encoding is ignore: we always use UTF-8
 	}
 
@@ -123,7 +124,7 @@ public class TMXFilterWriter implements IFilterWriter {
 				writer = new TMXWriter(new XMLWriter(
 					new OutputStreamWriter(outputStream, "UTF-8")));
 			}
-			writer.writeStartDocument(sd.getLanguage(), language,
+			writer.writeStartDocument(sd.getLanguage(), locale,
 				null, null, segType, "unknown", "text");
 		}
 		catch ( IOException e ) {

@@ -22,6 +22,7 @@ package net.sf.okapi.steps.tokenization.common;
 
 import java.util.logging.Level;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.lib.extra.Component;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
@@ -34,7 +35,7 @@ public abstract class AbstractLexer extends Component implements ILexer {
 	protected abstract void lexer_init();
 	protected abstract boolean lexer_hasNext();
 	protected abstract Lexem lexer_next();
-	protected abstract void lexer_open(String text, String language, Tokens tokens);
+	protected abstract void lexer_open(String text, LocaleId language, Tokens tokens);
 	
 	public AbstractLexer() {
 		
@@ -120,7 +121,7 @@ public abstract class AbstractLexer extends Component implements ILexer {
 		return lexer_next();
 	}
 	
-	public void open(String text, String language, Tokens tokens) {
+	public void open(String text, LocaleId language, Tokens tokens) {
 		
 		cancelled = false;
 		
@@ -137,9 +138,8 @@ public abstract class AbstractLexer extends Component implements ILexer {
 		this.rules = rules;
 	}
 	
-	protected boolean checkRule(LexerRule rule, String language) {
-		
-		return rule != null && rule.supportsLanguage(language) && rule.isEnabled();
+	protected boolean checkRule(LexerRule rule, LocaleId language) {
+		return (( rule != null ) && rule.supportsLanguage(language) && rule.isEnabled());
 	}
 	
 	protected boolean checkRule(LexerRule rule) {

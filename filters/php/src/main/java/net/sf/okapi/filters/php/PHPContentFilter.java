@@ -66,7 +66,6 @@ public class PHPContentFilter implements IFilter {
 	private static final int STRTYPE_MIXED = 4;
 	
 	private Parameters params;
-	private String srcLang;
 	private String lineBreak;
 	private String inputText;
 	private int tuId;
@@ -170,7 +169,6 @@ public class PHPContentFilter implements IFilter {
 			throw new OkapiUnsupportedEncodingException(
 				String.format("The encoding '%s' is not supported.", encoding), e);
 		}
-		srcLang = input.getSourceLanguage();
 		lineBreak = detector.getNewlineType().toString();
 		boolean hasUTF8BOM = detector.hasUtf8Bom();
 		String docName = null;
@@ -215,7 +213,7 @@ public class PHPContentFilter implements IFilter {
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
-		startDoc.setLanguage(srcLang);
+		startDoc.setLanguage(input.getSourceLanguage());
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setFilterWriter(createFilterWriter());

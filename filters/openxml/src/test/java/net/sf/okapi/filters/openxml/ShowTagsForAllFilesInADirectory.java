@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 //import net.sf.okapi.filters.markupfilter.Parameters;
 //import net.sf.okapi.filters.openxml.OpenXMLContentFilter;
@@ -37,14 +38,14 @@ import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 
 
 public class ShowTagsForAllFilesInADirectory {
+
 	private static Logger LOGGER;
 	private OpenXMLFilter openXMLFilter;
 	private String[] testFileList;
+	private LocaleId locENUS = LocaleId.fromString("en-us");
 
-	public void doAll()
-	{
-		try
-		{
+	public void doAll() {
+		try {
 			setUp();
 			testAll();
 			tearDown();
@@ -57,12 +58,12 @@ public class ShowTagsForAllFilesInADirectory {
 	
 	public void setUp() throws Exception {
 		LOGGER = Logger.getLogger(OpenXMLSnippetsTest.class.getName());
-		openXMLFilter = new OpenXMLFilter(new TagPeekTranslator(),"en-US");	
+		openXMLFilter = new OpenXMLFilter(new TagPeekTranslator(),locENUS);	
 		openXMLFilter.setLogger(LOGGER);
 		LOGGER.setLevel(Level.FINE);
 		if (LOGGER.getHandlers().length<1)
 			LOGGER.addHandler(new LogHandlerSystemOut());		
-		openXMLFilter.setOptions("en", "UTF-8", true);
+		openXMLFilter.setOptions(locENUS, "UTF-8", true);
     	    testFileList = new String[1]; // timporary
 
 	    JFileChooser chooser = new JFileChooser();
@@ -111,11 +112,11 @@ public class ShowTagsForAllFilesInADirectory {
 			flen = f.length()-5;
 			sOutputPath = f.substring(0,flen) + ".out" + f.substring(flen);
 			writer = new OpenXMLZipFilterWriter(); // DWH 4-8-09 was just ZipFilterWriter
-			writer.setOptions("en-US", "UTF-8");
+			writer.setOptions(locENUS, "UTF-8");
 			writer.setOutput(sOutputPath);
 			try {
 				URI uriFf = new URI(fff);
-				openXMLFilter.open(new RawDocument(uriFf,"UTF-8","en-US"),true,true,Level.FINEST); // DWH 4-22-09
+				openXMLFilter.open(new RawDocument(uriFf,"UTF-8",locENUS),true,true,Level.FINEST); // DWH 4-22-09
 				while (openXMLFilter.hasNext()) {
 					event = openXMLFilter.next();
 					if (event!=null)

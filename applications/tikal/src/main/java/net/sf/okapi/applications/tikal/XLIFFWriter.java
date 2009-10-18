@@ -25,6 +25,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
@@ -40,8 +41,8 @@ public class XLIFFWriter implements IFilterWriter {
 	
 	private XMLWriter writer;
 	private XLIFFContent xliffCont;
-	private String srcLang;
-	private String trgLang;
+	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private boolean inFile;
 	private String docMimeType;
 	private String docName;
@@ -100,10 +101,10 @@ public class XLIFFWriter implements IFilterWriter {
 		return event;
 	}
 
-	public void setOptions (String language,
+	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
-		trgLang = language;
+		trgLang = locale;
 		// ignore encoding: always use UTF-8
 	}
 
@@ -155,9 +156,9 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeStartElement("file");
 		writer.writeAttributeString("original",
 			(original!=null) ? original : "unknown");
-		writer.writeAttributeString("source-language", srcLang);
+		writer.writeAttributeString("source-language", srcLang.toBCP47());
 		if ( trgLang != null ) {
-			writer.writeAttributeString("target-language", trgLang);
+			writer.writeAttributeString("target-language", trgLang.toBCP47());
 		}
 		
 		if ( contentType == null ) contentType = "x-undefined";
@@ -257,7 +258,7 @@ public class XLIFFWriter implements IFilterWriter {
 
 		// Write the source
 		writer.writeStartElement("source");
-		writer.writeAttributeString("xml:lang", srcLang);
+		writer.writeAttributeString("xml:lang", srcLang.toBCP47());
 		// Write full source content (always without segments markers
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false, true));
 		writer.writeEndElementLineBreak(); // source
@@ -271,7 +272,7 @@ public class XLIFFWriter implements IFilterWriter {
 		// Write the target
 		if ( trgLang != null ) {
 			writer.writeStartElement("target");
-			writer.writeAttributeString("xml:lang", trgLang);
+			writer.writeAttributeString("xml:lang", trgLang.toBCP47());
 		
 			// At this point tc contains the source
 			// Do we have an available target to use instead?
