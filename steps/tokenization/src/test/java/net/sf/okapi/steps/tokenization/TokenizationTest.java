@@ -86,8 +86,7 @@ public class TokenizationTest {
 	
 	@Test
 	public void testLocaleUtil() {
-		
-		assertEquals("EN-US", LocaleUtil.normalizeLanguageCode_Okapi("en_US"));
+		assertEquals("en-us", LocaleUtil.normalizeLanguageCode_Okapi("en_US"));
 		assertEquals("en_US", LocaleUtil.normalizeLanguageCode_ICU("EN-US"));
 	}
 	

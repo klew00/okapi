@@ -46,20 +46,20 @@ public class LanguageParameters extends AbstractParameters {
 	 * Default: LANGUAGES_ALL
 	 */
 	private int languageMode = LANGUAGES_ALL; 
-	private List<LocaleId> languageWhiteList;
-	private List<LocaleId> languageBlackList;
+	private List<String> languageWhiteList;
+	private List<String> languageBlackList;
 		
 	@Override
 	protected void parameters_init() {
-		languageWhiteList = new ArrayList<LocaleId>();
-		languageBlackList = new ArrayList<LocaleId>();
+		languageWhiteList = new ArrayList<String>();
+		languageBlackList = new ArrayList<String>();
 	}
 	
 	@Override
 	protected void parameters_load(ParametersString buffer) {
 		languageMode = buffer.getInteger("languageMode", LANGUAGES_ALL);
-		setLanguageWhiteList(ListUtil.stringAsLanguageList(buffer.getString("languageWhiteList")));
-		setLanguageBlackList(ListUtil.stringAsLanguageList(buffer.getString("languageBlackList")));
+		setLanguageWhiteList(ListUtil.stringAsList(buffer.getString("languageWhiteList")));
+		setLanguageBlackList(ListUtil.stringAsList(buffer.getString("languageBlackList")));
 		if (( languageMode == LANGUAGES_ONLY_WHITE_LIST ) && Util.isEmpty(languageWhiteList) ) {
 			languageMode = LANGUAGES_ALL;
 		}
@@ -75,8 +75,8 @@ public class LanguageParameters extends AbstractParameters {
 	@Override
 	protected void parameters_save(ParametersString buffer) {
 		buffer.setInteger("languageMode", languageMode);
-		buffer.setString("languageWhiteList", ListUtil.languageListAsString(languageWhiteList));
-		buffer.setString("languageBlackList", ListUtil.languageListAsString(languageBlackList));
+		buffer.setString("languageWhiteList", ListUtil.listAsString(languageWhiteList));
+		buffer.setString("languageBlackList", ListUtil.listAsString(languageBlackList));
 	}
 
 	public int getLanguageMode() {
@@ -87,19 +87,19 @@ public class LanguageParameters extends AbstractParameters {
 		this.languageMode = languageMode;
 	}
 
-	public List<LocaleId> getLanguageWhiteList() {
+	public List<String> getLanguageWhiteList() {
 		return languageWhiteList;
 	}
 
-	public void setLanguageWhiteList(List<LocaleId> languageWhiteList) {
+	public void setLanguageWhiteList(List<String> languageWhiteList) {
 		this.languageWhiteList = languageWhiteList;
 	}
 
-	public List<LocaleId> getLanguageBlackList() {
+	public List<String> getLanguageBlackList() {
 		return languageBlackList;
 	}
 
-	public void setLanguageBlackList(List<LocaleId> languageBlackList) {
+	public void setLanguageBlackList(List<String> languageBlackList) {
 		this.languageBlackList = languageBlackList;
 	}
 

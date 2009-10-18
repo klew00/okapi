@@ -63,7 +63,7 @@ public class Tokenizer {
 		params.tokenizeTargets = false;
 		
 		params.setLanguageMode(Parameters.LANGUAGES_ONLY_WHITE_LIST);
-		params.setLanguageWhiteList(ListUtil.stringAsLanguageList(language.toString()));
+		params.setLanguageWhiteList(ListUtil.stringAsList(language.toString()));
 		
 		if (Util.isEmpty(tokenNames))			
 			params.setTokenMode(Parameters.TOKENS_ALL);

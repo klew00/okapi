@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.LocaleId;
-
 /**
  * Helper methods to manipulate lists.
  */
@@ -49,18 +47,18 @@ public class ListUtil {
 		return listTrimValues(stringAsList(st, ","));		
 	}
 	
-	/**
-	 * Converts an array of string representing languages into a list of languages.
-	 * @param array the array of strings to convert.
-	 * @return a list of languages for the given strings.
-	 */
-	public static List<LocaleId> stringArrayAsLanguageList (String[] array) {
-		List<LocaleId> list = new ArrayList<LocaleId>();
-		for ( int i=0; i<array.length; i++ ) {			
-			list.add(LocaleId.fromString(array[i]));
-		}
-		return list;
-	}
+//	/**
+//	 * Converts an array of string representing languages into a list of languages.
+//	 * @param array the array of strings to convert.
+//	 * @return a list of languages for the given strings.
+//	 */
+//	public static List<LocaleId> stringArrayAsLanguageList (String[] array) {
+//		List<LocaleId> list = new ArrayList<LocaleId>();
+//		for ( int i=0; i<array.length; i++ ) {			
+//			list.add(LocaleId.fromString(array[i]));
+//		}
+//		return list;
+//	}
 
 	/**
 	 * Splits up a string of comma-separated substrings representing language codes into a string list of languages.
@@ -81,36 +79,36 @@ public class ListUtil {
 		return res;
 	}
 
-	/**
-	 * Converts a list of languages into an array of strings.
-	 * @param list List of languages.
-	 * @return an array of strings for the given languages.
-	 */
-	public static String[] languageListAsStringArray (List<LocaleId> list) {
-		String[] res = new String[list.size()];
-		for ( int i=0; i<list.size(); i++ ) {			
-			res[i] = list.get(i).toString();
-		}
-		return res;
-	}
+//	/**
+//	 * Converts a list of languages into an array of strings.
+//	 * @param list List of languages.
+//	 * @return an array of strings for the given languages.
+//	 */
+//	public static String[] languageListAsStringArray (List<LocaleId> list) {
+//		String[] res = new String[list.size()];
+//		for ( int i=0; i<list.size(); i++ ) {			
+//			res[i] = list.get(i).toString();
+//		}
+//		return res;
+//	}
 	
-	/**
-	 * Creates a string output for a list of languages. The language identifiers
-	 * are separated by commas.
-	 * @param list the list of languages to convert.
-	 * @return the output string.
-	 */
-	public static String languageListAsString (List<LocaleId> list) {
-		if ( list == null ) return "";
-		StringBuilder tmp = new StringBuilder();
-		for ( int i=0; i<list.size(); i++ ) {
-			if ( i > 0 ) {
-				tmp.append(",");
-			}
-			tmp.append(list.get(i).toString());
-		}
-		return tmp.toString();
-	}
+//	/**
+//	 * Creates a string output for a list of languages. The language identifiers
+//	 * are separated by commas.
+//	 * @param list the list of languages to convert.
+//	 * @return the output string.
+//	 */
+//	public static String languageListAsString (List<LocaleId> list) {
+//		if ( list == null ) return "";
+//		StringBuilder tmp = new StringBuilder();
+//		for ( int i=0; i<list.size(); i++ ) {
+//			if ( i > 0 ) {
+//				tmp.append(",");
+//			}
+//			tmp.append(list.get(i).toString());
+//		}
+//		return tmp.toString();
+//	}
 	
 	/**
 	 * Splits up a string of comma-separated substrings into a string list of those substrings.

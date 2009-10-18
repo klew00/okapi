@@ -6,8 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.LocaleId;
-
 import org.junit.Test;
 
 public class ListUtilTest {
@@ -59,49 +57,49 @@ public class ListUtilTest {
 		assertEquals(0, list.size());
 	}
 	
-	@Test
-	public void testStringArrayAsLanguageList () {
-		String[] array = new String[]{"en","zU_ZA","CA-ES"};
-		List<LocaleId> list = ListUtil.stringArrayAsLanguageList(array);
-		assertEquals(3, list.size());
-		assertEquals("en", list.get(0).toString());
-		assertEquals("zu-za", list.get(1).toString());
-		assertEquals("ca-es", list.get(2).toString());
-	}
+//	@Test
+//	public void testStringArrayAsLanguageList () {
+//		String[] array = new String[]{"en","zU_ZA","CA-ES"};
+//		List<LocaleId> list = ListUtil.stringArrayAsLanguageList(array);
+//		assertEquals(3, list.size());
+//		assertEquals("en", list.get(0).toString());
+//		assertEquals("zu-za", list.get(1).toString());
+//		assertEquals("ca-es", list.get(2).toString());
+//	}
 	
-	@Test
-	public void testLanguageListAsStringArray () {
-		List<LocaleId> list = new ArrayList<LocaleId>();
-		list.add(LocaleId.fromString("cy"));
-		list.add(LocaleId.fromString("eu_fr"));
-		list.add(LocaleId.fromString("zh_CN"));
-		String[] array = ListUtil.languageListAsStringArray(list);
-		assertNotNull(array);
-		assertEquals(3, array.length);
-		assertEquals("cy", array[0]);
-		assertEquals("eu-fr", array[1]);
-		assertEquals("zh-cn", array[2]);
-	}
+//	@Test
+//	public void testLanguageListAsStringArray () {
+//		List<LocaleId> list = new ArrayList<LocaleId>();
+//		list.add(LocaleId.fromString("cy"));
+//		list.add(LocaleId.fromString("eu_fr"));
+//		list.add(LocaleId.fromString("zh_CN"));
+//		String[] array = ListUtil.languageListAsStringArray(list);
+//		assertNotNull(array);
+//		assertEquals(3, array.length);
+//		assertEquals("cy", array[0]);
+//		assertEquals("eu-fr", array[1]);
+//		assertEquals("zh-cn", array[2]);
+//	}
 	
-	@Test
-	public void testLanguageListAsString_Several () {
-		List<LocaleId> list = new ArrayList<LocaleId>();
-		list.add(LocaleId.fromString("en"));
-		list.add(LocaleId.fromString("zh_CN"));
-		list.add(LocaleId.fromString("FR-CA"));
-		String res = ListUtil.languageListAsString(list);
-		assertNotNull(res);
-		assertEquals("en,zh-cn,fr-ca", res);
-	}
+//	@Test
+//	public void testLanguageListAsString_Several () {
+//		List<LocaleId> list = new ArrayList<LocaleId>();
+//		list.add(LocaleId.fromString("en"));
+//		list.add(LocaleId.fromString("zh_CN"));
+//		list.add(LocaleId.fromString("FR-CA"));
+//		String res = ListUtil.languageListAsString(list);
+//		assertNotNull(res);
+//		assertEquals("en,zh-cn,fr-ca", res);
+//	}
 	
-	@Test
-	public void testLanguageListAsString_One () {
-		List<LocaleId> list = new ArrayList<LocaleId>();
-		list.add(LocaleId.fromString("zh_CN"));
-		String res = ListUtil.languageListAsString(list);
-		assertNotNull(res);
-		assertEquals("zh-cn", res);
-	}
+//	@Test
+//	public void testLanguageListAsString_One () {
+//		List<LocaleId> list = new ArrayList<LocaleId>();
+//		list.add(LocaleId.fromString("zh_CN"));
+//		String res = ListUtil.languageListAsString(list);
+//		assertNotNull(res);
+//		assertEquals("zh-cn", res);
+//	}
 	
 	@Test
 	public void testStringAsList() {

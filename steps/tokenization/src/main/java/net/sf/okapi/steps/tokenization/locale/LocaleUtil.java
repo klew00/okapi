@@ -30,7 +30,7 @@ import net.sf.okapi.common.Util;
 public class LocaleUtil {
 	
 	/**
-	 * Converts the language tag (language ID and an optional region/country part) to the Okapi format: upper case, delimited with a dash.
+	 * Converts the language tag (language ID and an optional region/country part) to the Okapi format: lower-case, delimited with a dash.
 	 * @param languageCode
 	 * @return languageCode in Okapi format
 	 */
@@ -41,10 +41,10 @@ public class LocaleUtil {
 		String[] parts = Util.splitLanguageCode(languageCode);		
 		StringBuilder res = new StringBuilder();
 		
-		res.append(parts[0].toUpperCase());  
+		res.append(parts[0].toLowerCase());  
 		if (!Util.isEmpty(parts[1])) {
 			res.append("-");
-			res.append(parts[1].toUpperCase());
+			res.append(parts[1].toLowerCase());
 		}
 		return res.toString();
 	}
