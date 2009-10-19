@@ -863,7 +863,7 @@ public class TextFragment implements Comparable<Object> {
 	 * @return true if the fragment is empty.
 	 */
 	public boolean isEmpty () {
-		return (text.length()==0);
+		return (text == null || text.length()==0);
 	}
 	
 	/**
