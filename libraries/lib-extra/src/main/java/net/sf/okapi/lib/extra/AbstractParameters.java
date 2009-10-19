@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.extra;
 
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
@@ -211,6 +212,7 @@ public abstract class AbstractParameters extends BaseParameters implements INoti
 		if (classRef == null) 
 			return loadFromResource(resourceLocation);
 		
+		//InputStream stream = classRef.getResourceAsStream(resourceLocation);
 		URL url = classRef.getResource(resourceLocation);
         if (url == null) return false;
         

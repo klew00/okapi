@@ -54,7 +54,6 @@ public class LookUpLexer extends AbstractLexer {
 	public Lexems process(String text, LocaleId language, Tokens tokens) {
 
 		Lexems lexems = new Lexems();
-		//Tokens wasteBin = new Tokens();
 		
 		for (LexerRule rule : rules) {
 			
@@ -72,14 +71,10 @@ public class LookUpLexer extends AbstractLexer {
 				    	lexems.add(new Lexem(rule.getLexemId(), token.getValue(), token.getRange()));
 				    	
 				    	if (!rule.getKeepInput())
-				    		//wasteBin.add(token); // Remove replaced token
 				    		token.delete(); // Remove replaced token
 				    }
 				}
 		}
-		
-//		for (Token token : wasteBin)			
-//			tokens.remove(token);
 		
 		return lexems;
 	}

@@ -34,43 +34,45 @@ public class Retainer extends AbstractLexer {
 
 	@Override
 	public boolean lexer_hasNext() {
+		
 		return false; // Iterator is not used
 	}
 
 	@Override
 	public void lexer_init() {
+
 	}
 
 	@Override
 	public Lexem lexer_next() {
+
 		return null; // Iterator is not used
 	}
 
 	@Override
 	public void lexer_open(String text, LocaleId language, Tokens tokens) {
+		
 		 // Iterator is not used
 	}
 
 	public Lexems process(String text, LocaleId language, Tokens tokens) {
+
 		if (tokens == null) return null;
 				
-		//Tokens wasteBin = new Tokens();
-		
 		for (LexerRule rule : getRules()) {
+
 			if (!checkRule(rule, language)) continue;
+			
 			List<Integer> inTokenIDs = rule.getInTokenIDs();
 			
 			for (Token token : tokens) {
+				
 				if (token.isDeleted()) continue;
 				
 				if (!inTokenIDs.contains(token.getTokenId())) // Remove all tokens except those listed
-					//wasteBin.add(token);
 					token.delete();
 			}			
 		}
-		
-//		for (Token token : wasteBin)
-//			tokens.remove(token);
 		
 		return null;
 	}

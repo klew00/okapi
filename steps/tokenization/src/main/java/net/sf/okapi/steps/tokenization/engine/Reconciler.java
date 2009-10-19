@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.tokenization.engine;
 
+import java.util.HashMap;
+
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
@@ -30,17 +32,23 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class Reconciler extends AbstractLexer {
 
+	private HashMap<String, Tokens> map;
+	
 	@Override
 	protected boolean lexer_hasNext() {
+
 		return false;
 	}
 
 	@Override
 	protected void lexer_init() {
+
+		map = new HashMap<String, Tokens>(); 
 	}
 
 	@Override
 	protected Lexem lexer_next() {
+
 		return null;
 	}
 
@@ -55,18 +63,66 @@ public class Reconciler extends AbstractLexer {
 	 * @return
 	 */
 	private boolean contains(Range range, Range range2) {
+
 		// Exact matches are dropped
 		return (range.start < range2.start && range.end >= range2.end) ||
 			(range.start <= range2.start && range.end > range2.end);
 	}
+	
+	private String formRangeId(Range range) {
+		
+		if (range == null) return null;
+		
+		return String.format("%d %d", range.start, range.end);
+	}
 
+	private void populateMap(Tokens tokens) {
+		
+		if (tokens == null) return;
+		if (map == null) return;
+		
+		map.clear();
+		
+		for (Token token : tokens) {
+			
+			if (token.isDeleted()) continue;
+			String rangeId = formRangeId(token.getRange());
+			
+			Tokens rangeTokens = map.get(rangeId);
+			if (rangeTokens == null) {
+				
+				rangeTokens = new Tokens();
+				map.put(rangeId, rangeTokens);
+			}
+			
+			rangeTokens.add(token);
+		}
+	}
+	
 	public Lexems process(String text, LocaleId language, Tokens tokens) {
 		
+		populateMap(tokens);
+		
+		// Set scores
+		for (Tokens list : map.values()) {
+			
+			int size = list.size();
+			
+			if (size > 0)
+				for (Token token : list) {
+					
+					//token.setScore(100 / size);
+					
+				}
+		}
+		
 		for (int i = 0; i < tokens.size(); i++) {
+			
 			Token token1 = tokens.get(i);
 			if (token1.isDeleted()) continue;
 			
 			for (int j = 0; j < tokens.size(); j++) {
+		
 				if (i >= j) continue;
 				
 				Token token2 = tokens.get(j);				
@@ -77,7 +133,9 @@ public class Reconciler extends AbstractLexer {
 				Range r2 = token2.getRange();
 												
 				if (r1.start == r2.start && r1.end == r2.end) { // Same range
+					
 					if (token1.getTokenId() == token2.getTokenId()) { // Tokens are identical, remove duplication
+						
 						token2.delete();
 						continue;
 					}

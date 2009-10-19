@@ -94,21 +94,26 @@ public class TokenizationStep extends AbstractPipelineStep {
 		setName("Tokenization");
 		setDescription("Extracts tokens from the text units content of a document.");
 				
+		setConfiguration(this.getClass(), "config.tprm");
+	}
+	
+	public void setConfiguration(Class<?> classRef, String configLocation) {
+		
 		Config config = new Config();
 		if (config == null) return;
-		config.loadFromResource(this.getClass(), "config.tprm");		
+		config.loadFromResource(classRef, configLocation);		
 		
 		structureParams = new StructureParameters(); 
 		if (structureParams == null) return;
 		
 		String structureLocation = config.getEngineConfig();
 		
-		if (Util.isEmpty(structureLocation) || !structureParams.loadFromResource(this.getClass(), structureLocation))
+		if (Util.isEmpty(structureLocation) || !structureParams.loadFromResource(classRef, structureLocation))
 			logMessage(Level.FINE, "Lexers' config file not found.");
 		
 		instantiateLexers();		
 		
-		setParameters(new Parameters());				
+		setParameters(new Parameters());
 	}
 
 	private void instantiateLexers() {
@@ -116,6 +121,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 		if (lexers == null) return;
 		
 		lexers.clear();
+		serviceLexers.clear();
 		
 		for (StructureParametersItem item : structureParams.getItems()) {
 			
@@ -457,17 +463,47 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}	
 	
 	private void tokenizeTargets(TextUnit tu) {
+		
 		if (tu == null) return;
-		for ( LocaleId language : tu.getTargetLanguages() ) {
+		
+		for (LocaleId language : tu.getTargetLanguages()) {
+		
 			Tokens tokens = tokenize(tu.getTarget(language), language);
 			if (tokens == null) continue;
+			
 			// Attach to TU		
 			TokensAnnotation ta = TextUnitUtil.getTargetAnnotation(tu, language, TokensAnnotation.class);
+			
 			if (ta == null)
 				TextUnitUtil.setTargetAnnotation(tu, language, new TokensAnnotation(tokens));
 			else
 				ta.addTokens(tokens);
 		}
+	}
+
+	public List<LexerRule> getIdleRules() {
+		
+		return idleRules;
+	}
+
+	public List<String> getLanguageFilter() {
+		
+		return languageFilter;
+	}
+
+	public List<Integer> getTokenFilter() {
+		
+		return tokenFilter;
+	}
+
+	public void setLexers(List<ILexer> lexers) {
+		
+		this.lexers = lexers;
+	}
+
+	public List<ILexer> getLexers() {
+		
+		return lexers;
 	}
 
 }
