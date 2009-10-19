@@ -554,11 +554,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				// add code and process actionable attributes
-				getEventBuilder().addToTextUnit(new Code(codeType, startTag.getName(), literalTag),
-//TOFIX: get the proper parameter		
-//was:		getConfig().getElementType(tag),
-						getTrgLoc(),
-//end of TOFIX						
+				getEventBuilder().addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag),
+						getTrgLoc(),						
 						propertyTextUnitPlaceholders);
 			} else {
 				// no actionable attributes, just add the code as-is
