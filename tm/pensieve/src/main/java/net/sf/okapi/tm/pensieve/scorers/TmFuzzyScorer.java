@@ -15,7 +15,7 @@ import org.apache.lucene.search.Similarity;
 public class TmFuzzyScorer extends Scorer {
 	// note that the ROUGH_THRESHOLD is the lowest accepted threshold
 	// TODO: externalize this
-	private static float ROUGH_THRESHOLD = 0.60f;
+	private static float ROUGH_THRESHOLD = 0.65f;
 	private List<Term> terms;
 	private MultipleTermPositions multiTermPositions;
 	private IndexReader reader;
@@ -87,7 +87,7 @@ public class TmFuzzyScorer extends Scorer {
 		TermFreqVector tv = reader.getTermFreqVector(currentDoc,
 				TranslationUnitField.SOURCE.name());
 		score = (float) ((2.0f * (float) multiTermPositions.freq()) / 
-					(float) (tv.size() + terms.size()));
+					(float) (tv.size() + terms.size())) * 100.0f;
 		return score;
 	}
 }

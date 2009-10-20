@@ -52,8 +52,8 @@ public class TmHitTest {
 				"prueba2"));
 		tu2 = new TranslationUnit(tuvSource2, tuvTarget2);
 
-		h1 = new TmHit(tu1, TmMatchType.EXACT, 0.8f);
-		h2 = new TmHit(tu2, TmMatchType.EXACT, 0.8f);
+		h1 = new TmHit(tu1, TmMatchType.EXACT, 100.0f);
+		h2 = new TmHit(tu2, TmMatchType.EXACT, 100.0f);
 	}
 
 	@Test
@@ -82,7 +82,7 @@ public class TmHitTest {
 	public void equals() {		
 		TmHit h = new TmHit();
 		h.setTu(tu1);
-		h.setScore(0.8f);
+		h.setScore(80.0f);
 		h.setMatchType(TmMatchType.EXACT);
 		assertTrue("equals", h1.equals(h));
 	}
@@ -96,7 +96,7 @@ public class TmHitTest {
 	public void compareToEquals() {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
-		h.setScore(0.8f);
+		h.setScore(100.0f);
 		h.setMatchType(TmMatchType.EXACT);
 		assertEquals(0, h1.compareTo(h1));
 	}
@@ -105,16 +105,16 @@ public class TmHitTest {
 	public void compareToGreaterThanScore() {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
-		h.setScore(0.5f);
+		h.setScore(50.0f);
 		h.setMatchType(TmMatchType.EXACT);
-		assertTrue(h1.compareTo(h) > 0);
+		assertTrue(h1.compareTo(h) < 0);
 	}
 	
 	@Test 
 	public void compareToLessThanScore() {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
-		h.setScore(1.0f);
+		h.setScore(80.0f);
 		h.setMatchType(TmMatchType.EXACT);
 		assertTrue(h1.compareTo(h) < 0);
 	}
@@ -123,7 +123,7 @@ public class TmHitTest {
 	public void compareToLessThanMatchType() {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
-		h.setScore(0.8f);
+		h.setScore(80.0f);
 		h.setMatchType(TmMatchType.FUZZY);
 		assertTrue(h1.compareTo(h) < 0);
 	}
@@ -132,7 +132,7 @@ public class TmHitTest {
 	public void compareToGreaterThanMatchType() {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
-		h.setScore(0.8f);
+		h.setScore(80.0f);
 		h.setMatchType(TmMatchType.EXACT_LOCAL_CONEXT);
 		assertTrue(h1.compareTo(h) > 0);
 	}
@@ -145,7 +145,7 @@ public class TmHitTest {
 		TranslationUnit tu = new TranslationUnit(tuvSource, tuvTarget);
 		
 		h.setTu(tu);
-		h.setScore(0.8f);
+		h.setScore(80.0f);
 		h.setMatchType(TmMatchType.FUZZY);
 		assertTrue(h1.compareTo(h) < 0);
 	}
@@ -159,7 +159,7 @@ public class TmHitTest {
 
 		
 		h.setTu(tu);
-		h.setScore(0.8f);
+		h.setScore(80.0f);
 		h.setMatchType(TmMatchType.EXACT_LOCAL_CONEXT);
 		assertTrue(h1.compareTo(h) > 0);
 	}

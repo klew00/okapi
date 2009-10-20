@@ -43,12 +43,12 @@ public class TmxHandlerImportTest {
         tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), locES, tmWriter);
         long totalTime = System.currentTimeMillis() - startTime;
         System.out.println("total time to import TMX: " + totalTime);
-		
+*/		
     	
-        seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR);*/
+        seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR);
     }
     
-    //@Test
+    @Test
     public void importTmx_exact_really_big_file() throws Exception {    
         long startTime = System.currentTimeMillis();
         List<TmHit> tus = seeker.searchExact(new TextFragment("All Rights Reserved."), null);
@@ -83,7 +83,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
     }
 
-    //@Test
+    @Test
     public void importTmx_fuzzy_really_big_file() throws Exception {
         long startTime = System.currentTimeMillis();
         List<TmHit> tus = seeker.searchFuzzy(new TextFragment("All Rights Reserved."), 80, 10, null);

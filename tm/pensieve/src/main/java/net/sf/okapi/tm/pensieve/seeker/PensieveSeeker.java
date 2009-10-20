@@ -79,8 +79,8 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 	private final static Similarity SIMILARITY = new TmFuzzySimilarity();
 
 	// TODO: externalize penalties in the future
-	private static float SINGLE_CODE_DIFF_PENALTY = 0.01f;
-	private static float WHITESPACE_OR_CASE_PENALTY = 0.05f;
+	private static float SINGLE_CODE_DIFF_PENALTY = 1.0f;
+	private static float WHITESPACE_OR_CASE_PENALTY = 5.0f;
 
 	private Directory indexDir;
 	private IndexReader indexReader;
@@ -261,13 +261,19 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				tmHit.setMatchType(TmMatchType.EXACT);
 				tmHit.setTu(createTranslationUnit(doc, tmCodedText, tmCodes));
 				tmhits.add(tmHit);
+				
+				/*System.out.println(queryFrag.toString());
+				System.out.println(tmHit.getScore());
+				System.out.println(tmHit.getTu().toString());
+				System.out.println();				 
+*/
 			}
 
 			// sort TmHits on TmMatchType, Score and Source String
 			Collections.sort(tmhits);
 
 			// remove duplicate hits
-			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));
+			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));			
 
 		} catch (IOException e) {
 			throw new OkapiIOException("Could not complete query.", e);
@@ -303,11 +309,11 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			throw new IllegalArgumentException("");
 		}
 
-		float searchThreshold = threshold / 100.0f;
+		float searchThreshold = (float)threshold;
 		if (threshold < 0)
 			searchThreshold = 0.0f;
 		if (threshold > 100)
-			searchThreshold = 1.0f;
+			searchThreshold = 100.0f;
 
 		String queryText = queryFrag.getText();
 
@@ -359,6 +365,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		IndexSearcher is = null;
 		List<TmHit> tmhits = new ArrayList<TmHit>();
 		List<Code> queryCodes = queryFrag.getCodes();
+		List<TmHit> noDups;
 		Filter filter = null;
 
 		try {
@@ -393,8 +400,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 				// These are 100%, but do they really match in whitespace and
 				// case?
-				if (score >= 100.0f
-						&& sourceTextOnly.equals(queryFrag.getText())) {
+				if (score >= 100.0f	&& sourceTextOnly.equals(queryFrag.getText())) {
 					matchType = TmMatchType.FUZZY_FULL_TEXT_MATCH;
 				} else if (score >= 100.0f) {
 					// must be a whitespace or case difference
@@ -403,9 +409,8 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 				// code penalty
 				if (queryCodes.size() != tmCodes.size()) {
-					score -= (SINGLE_CODE_DIFF_PENALTY * Math.abs(queryCodes
-							.size()
-							- tmCodes.size()));
+					score -= (SINGLE_CODE_DIFF_PENALTY * (float)Math.abs(queryCodes.size()
+							- (float)tmCodes.size()));
 					tmHit.setCodeMismatch(true);
 				}
 
@@ -414,17 +419,18 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 						tmCodedText, tmCodes));
 				tmHit.setMatchType(matchType);
 				tmhits.add(tmHit);
-
-				/*
-				 * System.out.println(queryFrag.toString());
-				 * System.out.println(tmHit.getScore());
-				 * System.out.println(tmHit.getTu().toString());
-				 * System.out.println();
-				 */
+				
+				/*System.out.println(queryFrag.toString());
+				System.out.println(tmHit.getScore());
+				System.out.println(tmHit.getTu().toString());
+				System.out.println();*/
 			}
 
 			// sort TmHits on TmMatchType, Score and Source String
-			Collections.sort(tmhits, Collections.reverseOrder());
+			Collections.sort(tmhits);
+			
+			// remove duplicate hits
+			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));				
 		} catch (IOException e) {
 			throw new OkapiIOException("Could not complete query.", e);
 		} finally {
@@ -436,7 +442,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			}
 		}
 
-		return tmhits;
+		return noDups;
 	}
 
 	/**

@@ -101,9 +101,9 @@ public class TmHit implements Comparable<TmHit> {
 			return comparison;
 
 		// compare score
-		if (this.score < other.getScore())
-			return BEFORE;
 		if (this.score > other.getScore())
+			return BEFORE;
+		if (this.score < other.getScore())
 			return AFTER;
 
 		// compare source strings with codes
