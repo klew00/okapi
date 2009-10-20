@@ -113,7 +113,7 @@ public class PensieveTMConnector implements ITMQuery {
 		current = -1;
 		List<TmHit> list;
 		if ( threshold >= 100 ) { 
-			list = seeker.searchExact(text, maxHits, attrs);
+			list = seeker.searchExact(text, attrs);
 		}
 		else {
 			list = seeker.searchFuzzy(text, threshold, maxHits, attrs);
