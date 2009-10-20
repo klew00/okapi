@@ -62,20 +62,6 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 	
 	public void preprocess () {
-		if ( params.pkgType.equals("xliff") ) {
-			writer = new net.sf.okapi.applications.rainbow.packages.xliff.Writer();
-			writer.setParameters(params.xliffOptions);
-		}
-		else if ( params.pkgType.equals("omegat") )
-			writer = new net.sf.okapi.applications.rainbow.packages.omegat.Writer();
-		else if ( params.pkgType.equals("ttx") )
-			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
-		else if ( params.pkgType.equals("rtf") )
-			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer(
-				new GenericSkeletonWriter());
-		else
-			throw new RuntimeException("Unknown package type: " + params.pkgType);
-		
 		// Load SRX file(s) and create segmenters if required
 		if ( params.preSegment ) {
 			String src = params.sourceSRX.replace(VAR_PROJDIR, projectDir);
@@ -102,6 +88,20 @@ public class Utility extends BaseFilterDrivenUtility {
 				qm.setReorder(false); // Keep results grouped by resources
 			}
 		}
+		
+		if ( params.pkgType.equals("xliff") ) {
+			writer = new net.sf.okapi.applications.rainbow.packages.xliff.Writer();
+			writer.setParameters(params.xliffOptions);
+		}
+		else if ( params.pkgType.equals("omegat") )
+			writer = new net.sf.okapi.applications.rainbow.packages.omegat.Writer();
+		else if ( params.pkgType.equals("ttx") )
+			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
+		else if ( params.pkgType.equals("rtf") )
+			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer(
+				new GenericSkeletonWriter());
+		else
+			throw new RuntimeException("Unknown package type: " + params.pkgType);
 		
 		resolvedOutputDir = params.outputFolder + File.separator + params.pkgName;
 		resolvedOutputDir = resolvedOutputDir.replace(VAR_PROJDIR, projectDir);

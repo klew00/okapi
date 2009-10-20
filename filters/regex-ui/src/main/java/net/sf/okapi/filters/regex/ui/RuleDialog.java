@@ -33,6 +33,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -63,6 +65,12 @@ public class RuleDialog {
 	private Rule rule = null;
 	private int regexOptions;
 	private IHelp help;
+	private Font largerFont;
+
+	@Override
+	protected void finalize () {
+		dispose();
+	}
 
 	public RuleDialog (Shell parent,
 		IHelp helpParam,
@@ -91,6 +99,12 @@ public class RuleDialog {
 				updateResults();
 			}
 		});
+		
+		Font font = edExpression.getFont();
+		FontData[] fontData = font.getFontData();
+		fontData[0].setHeight(fontData[0].getHeight()+3);
+		largerFont = new Font(font.getDevice(), fontData[0]);
+		edExpression.setFont(largerFont);
 		
 		Label label = new Label(grpTmp, SWT.NONE);
 		label.setText("Sample:");
@@ -231,12 +245,20 @@ public class RuleDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 
+	public void dispose () {
+		if ( largerFont != null ) {
+			largerFont.dispose();
+			largerFont = null;
+		}
+	}
+
 	public boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
+		dispose();
 		return result;
 	}
 

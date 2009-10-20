@@ -333,7 +333,7 @@ public class SRXEditor {
 
 		Font font = edSampleText.getFont();
 		FontData[] fontData = font.getFontData();
-		fontData[0].setHeight(10);
+		fontData[0].setHeight(fontData[0].getHeight()+2);
 		sampleFont = new Font(font.getDevice(), fontData[0]);
 		edSampleText.setFont(sampleFont);
 		
