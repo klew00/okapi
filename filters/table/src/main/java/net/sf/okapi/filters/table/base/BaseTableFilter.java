@@ -381,10 +381,11 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					LocaleId language = getLanguageFromTargetRef(colNumber);
 					if ( Util.isNullOrEmpty(language) ) {
 						sendAsSkeleton(cell);
+						continue;
 					}
-					else {
-						sendAsTarget(cell, tu, language);
-					}
+					
+					sendAsTarget(cell, tu, language);
+					continue;
 				}
 				
 				// All other kinds of cells go to skeleton
