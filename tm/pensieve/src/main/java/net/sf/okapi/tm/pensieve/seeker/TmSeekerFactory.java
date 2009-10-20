@@ -35,12 +35,14 @@ public final class TmSeekerFactory {
         try{
             File f = new File(indexDirectoryPath);
             if (!f.exists()){
-                throw new OkapiIOException(indexDirectoryPath + " does not exist");
+                throw new OkapiIOException(String.format("'%s' does not exist.", indexDirectoryPath));
             }
             dir = FSDirectory.open(f);
-        }catch(IOException ioe){
-            throw new OkapiIOException("Trouble creating FSDirectory with the given path: " +indexDirectoryPath, ioe);
-        }catch(NullPointerException npe) {
+        }
+        catch (IOException ioe) {
+            throw new OkapiIOException(String.format("Trouble creating FSDirectory with the path '%s'.", indexDirectoryPath), ioe);
+        }
+        catch (NullPointerException npe) {
             throw new OkapiIOException("'indexDirectoryPath' cannot be null");
         }
         return new PensieveSeeker(dir);

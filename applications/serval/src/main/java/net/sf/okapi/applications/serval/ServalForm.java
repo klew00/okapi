@@ -2,7 +2,9 @@ package net.sf.okapi.applications.serval;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
@@ -43,6 +45,7 @@ public class ServalForm {
 	private QueryManager queryMgt;
 	private Font displayFont;
 	private Button chkRawText;
+	private Button chkLeverage;
 	private Text edAttributes;
 	private Label stElapsedTime;
 	
@@ -67,7 +70,7 @@ public class ServalForm {
 	}
 	
 	private void createContent () {
-		GridLayout layTmp = new GridLayout(8, false);
+		GridLayout layTmp = new GridLayout(9, false);
 		shell.setLayout(layTmp);
 		
 		// Menus
@@ -114,7 +117,7 @@ public class ServalForm {
 		edQuery = new Text(shell, SWT.BORDER | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
-		gdTmp.horizontalSpan = 7;
+		gdTmp.horizontalSpan = 8;
 		edQuery.setLayoutData(gdTmp);
 
 		Font font = edQuery.getFont();
@@ -129,7 +132,7 @@ public class ServalForm {
 
 		edAttributes = new Text(shell, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 7;
+		gdTmp.horizontalSpan = 8;
 		edAttributes.setLayoutData(gdTmp);
 		
 		stTmp = new Label(shell, SWT.NONE); // Place-holder
@@ -144,6 +147,9 @@ public class ServalForm {
 		
 		chkRawText = new Button(shell, SWT.CHECK);
 		chkRawText.setText("Raw text");
+		
+		chkLeverage = new Button(shell, SWT.CHECK);
+		chkLeverage.setText("Leverage");
 		
 		stTmp = new Label(shell, SWT.NONE);
 		stTmp.setText("Threshold:");
@@ -171,7 +177,7 @@ public class ServalForm {
 		edTarget = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
-		gdTmp.horizontalSpan = 7;
+		gdTmp.horizontalSpan = 8;
 		edTarget.setLayoutData(gdTmp);
 		edTarget.setEditable(false);
 		edTarget.setFont(displayFont);
@@ -183,14 +189,14 @@ public class ServalForm {
 		edSource = new Text(shell, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
-		gdTmp.horizontalSpan = 7;
+		gdTmp.horizontalSpan = 8;
 		edSource.setLayoutData(gdTmp);
 		edSource.setEditable(false);
 		edSource.setFont(displayFont);
 		
 		tblResults = new Table(shell, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 8;
+		gdTmp.horizontalSpan = 9;
 		tblResults.setFont(displayFont);
 		tblResults.setLayoutData(gdTmp);
 		tblResults.setHeaderVisible(true);
@@ -262,13 +268,27 @@ public class ServalForm {
 			
 			if ( !setAttributes() ) return;
 
-			long start = System.nanoTime(); 
-			if ( chkRawText.getSelection() ) {
-				queryMgt.query(edQuery.getText());
+			long start = System.nanoTime();
+			
+			if ( chkLeverage.getSelection() ) {
+				TextUnit tu = new TextUnit("id");
+				if ( chkRawText.getSelection() ) {
+					tu.setSource(new TextContainer(edQuery.getText()));
+				}
+				else {
+					tu.setSourceContent(parseToTextFragment(edQuery.getText()));
+				}
+				queryMgt.leverage(tu, null, true);
 			}
 			else {
-				queryMgt.query(parseToTextFragment(edQuery.getText()));
+				if ( chkRawText.getSelection() ) {
+					queryMgt.query(edQuery.getText());
+				}
+				else {
+					queryMgt.query(parseToTextFragment(edQuery.getText()));
+				}
 			}
+			
 			long end = System.nanoTime(); 
 			modResults.updateTable(queryMgt);
 			updateCurrentHit(end-start);

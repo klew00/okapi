@@ -121,7 +121,7 @@ public class PensieveTMConnector implements ITMQuery {
 
 		// Convert to normalized results
 		for ( TmHit hit : list ) {
-			Float f = hit.getScore() * 100;
+			Float f = hit.getScore();
 			QueryResult qr = new QueryResult();
 			qr.score = f.intValue();
 			qr.source = hit.getTu().getSource().getContent();

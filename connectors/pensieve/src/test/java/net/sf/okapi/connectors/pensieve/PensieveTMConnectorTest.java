@@ -184,7 +184,7 @@ public class PensieveTMConnectorTest {
 	public void testGetAlmostExactMatchWithCodes () {
 		TextFragment tf = createElephantsFragment();
 		connector.setThreshold(99);
-		assertTrue(connector.query(tf) == 2);
+		assertTrue(connector.query(tf) > 1);
 		QueryResult qr = connector.next();
 		assertEquals(tf.toString(), qr.source.toString());
 		assertEquals("Les \u00e9l\u00e9phants <b>ne peuvent pas</b> voler.", qr.target.toString());
