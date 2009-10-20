@@ -260,7 +260,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 					TranslationUnitField.SOURCE_CODES));
 				tmCodedText = getFieldValue(is.doc(scoreDoc.doc), TranslationUnitField.SOURCE);
                 score = distanceCalc.getDistance(tmCodedText, queryCodedText);
-                if ( score < threshold ) break; // Done
+                if ( score < threshold ) continue; // Next hit
 				if (( queryCodes.size() > 0 ) && ( tmCodes.size() > 0 )) {
 					// If tmScrCodes is null, equals will return false
 					if ( !Code.sameCodes(queryCodes, tmCodes) ) {
