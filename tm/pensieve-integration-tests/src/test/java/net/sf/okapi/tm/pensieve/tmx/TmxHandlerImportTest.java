@@ -48,7 +48,9 @@ public class TmxHandlerImportTest {
         seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR);
     }
     
-    @Test
+    // Local test only on very large non-commited TM
+    // comment-out for commit
+    //@Test
     public void importTmx_exact_really_big_file() throws Exception {    
         long startTime = System.currentTimeMillis();
         List<TmHit> tus = seeker.searchExact(new TextFragment("All Rights Reserved."), null);
@@ -83,7 +85,9 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
     }
 
-    @Test
+    // Local test only on very large non-commited TM
+    // comment-out for commit
+    //@Test
     public void importTmx_fuzzy_really_big_file() throws Exception {
         long startTime = System.currentTimeMillis();
         List<TmHit> tus = seeker.searchFuzzy(new TextFragment("All Rights Reserved."), 80, 10, null);
@@ -126,7 +130,7 @@ public class TmxHandlerImportTest {
         assertTrue("Didn't find something", tus.size() > 0);
     }
 
-        @Test
+    @Test
     public void importTmx_paragraph_tmx_basics() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
@@ -139,7 +143,7 @@ public class TmxHandlerImportTest {
         assertEquals("tu target content", "Pumpen wurden 3 Minuten lang angehalten, ggf. NaCl-Infusion starten", tu.getTarget().getContent().toString());
     }
 
-        @Test
+    @Test
     public void importTmx_sample_tmx_basics() throws Exception {
         TmxFilter tmxFilter = new TmxFilter();
         Directory ramDir = new RAMDirectory();
