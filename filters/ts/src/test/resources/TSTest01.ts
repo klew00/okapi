@@ -2,8 +2,8 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr" sourcelanguage="en">
 <context>
-    <comment>Comment 1</comment>
     <name>Name 1</name>
+    <comment>Comment 1</comment>
     <message id="1">
         <source>Text number 1</source>
         <translation type="unfinished"></translation>

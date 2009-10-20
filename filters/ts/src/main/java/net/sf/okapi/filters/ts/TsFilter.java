@@ -40,9 +40,7 @@ import javax.xml.stream.events.DTD;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
 import org.codehaus.stax2.XMLInputFactory2;
-
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -399,7 +397,7 @@ public class TsFilter implements IFilter {
 		try {
 			close();
 			canceled = false;
-			
+
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
@@ -413,8 +411,8 @@ public class TsFilter implements IFilter {
 			//We could just not use BOMNewlineEncodingDetector, but then we would not have info on BOM and linebreak type.
 			input.setEncoding(detector.getEncoding());
 		
-			XMLStreamReader reader = fact.createXMLStreamReader(input.getReader());
-
+	        XMLStreamReader reader = fact.createXMLStreamReader(input.getReader());
+	        
 			String realEnc = reader.getCharacterEncodingScheme();
 			if ( realEnc != null ) 
 				encoding = realEnc;
@@ -483,7 +481,7 @@ public class TsFilter implements IFilter {
 		while ( eventReader.hasNext() ) {
 			
 			XMLEvent event = eventReader.nextEvent();
-
+			
 			//TODO: Validate before adding
 			eventList.add(event);
 			
@@ -547,6 +545,13 @@ public class TsFilter implements IFilter {
 						eventList.clear();
 						ts.reset();
 						
+					}else if (ts.numerusFormCount > 0) {
+
+						for( int i = 1; i <= ts.numerusFormCount; i++){
+							
+							StartElement se = getStartElement("numerusform", i);
+						}
+							
 					}else{
 						TextUnit tu = generateTu();
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
@@ -588,19 +593,42 @@ public class TsFilter implements IFilter {
 		return false;
 	}	
 
-	private StartElement getStartElement(String string) {
+	
+	/**
+	 * 
+	 * @param pElemName Name of start element to find
+	 * @param n The n:th instance of the element to find
+	 * @return Returns the start element 
+	 */
+	private StartElement getStartElement(String pElemName, int n ) {
 
+		int count = 0;
+		
 		for(XMLEvent event: eventList){
 			if(event.getEventType() == XMLEvent.START_ELEMENT){
 				StartElement startElement = event.asStartElement();
-				if( startElement.getName().getLocalPart().equals("message") ){
-					return startElement;
+				if( startElement.getName().getLocalPart().equals(pElemName) ){
+					count++;
+					if( count == n ){
+						return startElement;	
+					}
 				}
 			}
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param pElemName Name of start element to find
+	 * @param n The n:th instance of the element to find
+	 * @return Returns the start element 
+	 */
+	private StartElement getStartElement(String pElemName) {
+		return getStartElement(pElemName, 1);
+	}
 
+	
 	private boolean tsPartReady(String elemName) {
 		if(ts.currentDocumentLocation == DocumentLocation.TS){
 			if( elemName.equals("context") || elemName.equals("message") ){
@@ -649,7 +677,7 @@ public class TsFilter implements IFilter {
 
 				StartElement startElem = event.asStartElement();
 				String startElemName = startElem.getName().getLocalPart();
-				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem, startElemName);
+				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem);
 				
 				if( start && startElemName.equals("TS") ){
 					procStartElemTS(startElem, resource);
@@ -710,7 +738,7 @@ public class TsFilter implements IFilter {
 
 				StartElement startElem = event.asStartElement();
 				String startElemName = startElem.getName().getLocalPart();
-				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem, startElemName);
+				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem);
 
 				if(start && startElemName.equals("context") ){
 					procStartElemContext(startElem, resource);
@@ -756,7 +784,7 @@ public class TsFilter implements IFilter {
 				StartElement startElem = event.asStartElement();
 				String startElemName = startElem.getName().getLocalPart();
 				
-				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem, startElemName);
+				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem);
 				
 				if( startElemName.equals("message") ){
 					procStartElemMessage(startElem, tu);
@@ -890,9 +918,8 @@ public class TsFilter implements IFilter {
 			if(event.getEventType() == XMLEvent.START_ELEMENT){
 
 				StartElement startElem = event.asStartElement();
-				String startElemName = startElem.getName().getLocalPart();
 				
-				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem, startElemName);
+				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem);
 
 				if( startElem.getName().getLocalPart().equals("byte") ){
 					procStartElemByte(startElem);
@@ -1107,73 +1134,101 @@ public class TsFilter implements IFilter {
 		}
 	}
 	
-	
+	/**
+	 * Skeleton helper method to append the StartElement as generic content.
+	 * @param elem StartElement to append
+	 * @param nextIsSkippableEmpty 
+	 */
 	@SuppressWarnings("unchecked")
-	private void procStartElemGeneric(StartElement startElement, boolean nextIsSkippable) {
+	private void procStartElemGeneric(StartElement elem, boolean nextIsSkippableEmpty) {
 		
-		skel.append("<"+startElement.getName().getLocalPart());	
+		skel.append("<"+elem.getName().getLocalPart());	
 		
-		Iterator<Attribute> attributes = startElement.getAttributes();
+		Iterator<Attribute> attributes = elem.getAttributes();
 		while ( attributes.hasNext() ){
 			Attribute attribute = attributes.next();
 			skel.append(String.format(" %s=\"%s\"", attribute.getName().getLocalPart(), attribute.getValue()));
 		}
 		
-		if(nextIsSkippable){
+		if(nextIsSkippableEmpty){
 			skel.append("/>");
 		}else{
 			skel.append(">");
 		}
 	}
 	
-	private void procStartElemByte(StartElement startElement, TextUnit tu) {
+	/**
+	 * Skeleton helper method to append the byte (inside a message element) as skeleton. 
+	 * Decoded or not depending on the location. The decoded
+	 * @param elem StartElement to append
+	 * @param tu The tu whose TextContainer to populate if needed.
+	 */
+	private void procStartElemByte(StartElement elem, TextUnit tu) {
 		
 		if(ts.currentMessageLocation == MessageLocation.RESOURCE){
-			procStartElemByte(startElement);
+			procStartElemByte(elem);
 		}else if(ts.currentMessageLocation == MessageLocation.SOURCE){
+			
 			TextContainer tc = tu.getSource();
+			
+			//--This segment adds a tu placeholder assuming this is the first content that is added to the container  
 			if( !tc.hasText() ){
 				skel.addContentPlaceholder(tu);	
 			}
 			
 			if(params.decodeByteValues){
-				Attribute attr = startElement.getAttributeByName(new QName("value"));
+				Attribute attr = elem.getAttributeByName(new QName("value"));
 				tc.append(decodeByteValue(attr.getValue()));
 			}else{
-				tc.append("<byte value=\""+startElement.getAttributeByName(new QName("value")).getValue()+"\"/>");
+				tc.append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
 				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
 				//TODO: should it be text or code?
 			}
 
 		}else if(ts.currentMessageLocation == MessageLocation.TARGET){
+			
 			TextContainer tc = tu.getTarget(trgLang);
+			
+			//--This segment adds a tu placeholder assuming this is the first content that is added to the container
 			if( !tc.hasText() ){
 				skel.addContentPlaceholder(tu,trgLang);	
 			}
 			
 			if(params.decodeByteValues){
-				Attribute attr = startElement.getAttributeByName(new QName("value"));
+				Attribute attr = elem.getAttributeByName(new QName("value"));
 				tc.append(decodeByteValue(attr.getValue()));
 			}else{
-				tc.append("<byte value=\""+startElement.getAttributeByName(new QName("value")).getValue()+"\"/>");
+				tc.append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
 				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
 				//TODO: should it be text or code?
 			}
 		}
 	}
 		
-	
-	private void procStartElemByte(StartElement startElement) {
-		skel.append("<byte value=\""+startElement.getAttributeByName(new QName("value")).getValue()+"\"/>");
+	/**
+	 * Skeleton helper method to append the byte as skeleton (as is without decoding).
+	 * Generates both start and end part since it's a "skippable" empty. 
+	 * @param elem StartElement (and EndElement) to append
+	 */
+	private void procStartElemByte(StartElement elem) {
+		skel.append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
 	}
 	
-		
-	private void procEndElem(EndElement endElement) {
-		skel.append("</"+endElement.getName().getLocalPart()+">");				
+	/**
+	 * Skeleton helper method to append the EndElement to the skeleton.
+	 * @param elem EndElement to append
+	 */
+	private void procEndElem(EndElement elem) {
+		skel.append("</"+elem.getName().getLocalPart()+">");				
 	}
 	
 	
-	boolean elementShouldBeEmpty(String name){
+	/**
+	 * Helper method determining if an element should be empty.
+	 * @param name Element name
+	 * @return True if element should be empty
+	 */
+	private boolean elementShouldBeEmpty(String name){
 		if(name.equals("byte") || name.equals("location")){
 			return true;
 		}else{
@@ -1181,37 +1236,54 @@ public class TsFilter implements IFilter {
 		}
 	}
 	
-	boolean nextIsSkippableEmpty(StartElement curElem, String name){
-		if ( elementShouldBeEmpty(name) && nextIsEmpty(curElem) ){
+	/**
+	 * Helper method to determine if an element is empty and "skippable" such as <byte/> and <location/>, 
+	 * but not <source/> and <target/> otherwise there's not place to put the tu placeholder.  
+	 * @param elem Element to check
+	 * @return True if next element is a "skippable" empty
+	 */
+	boolean nextIsSkippableEmpty(StartElement elem){
+		String elemName = elem.getName().getLocalPart();
+		if ( elementShouldBeEmpty(elemName) && nextIsEmpty(elem) ){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	boolean nextIsEmpty(StartElement curElem){
-		int index = eventList.indexOf(curElem);
+	/**
+	 * Helper method to check if element is empty.
+	 * @param elem Element to check
+	 * @return True if element is empty
+	 */
+	private boolean nextIsEmpty(StartElement elem){
+		int index = eventList.indexOf(elem);
 		XMLEvent nextEvent = eventList.get(index+1);  
 		if(nextEvent != null){
 			if(nextEvent.isEndElement()){
 				EndElement nextEndElem = nextEvent.asEndElement();
-				if(curElem.getName().getLocalPart().equals(nextEndElem.getName().getLocalPart())){
+				if(elem.getName().getLocalPart().equals(nextEndElem.getName().getLocalPart())){
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-			
+	
+	/**
+	 * Helper method to decode a byte value.
+	 * @param str Byte value
+	 * @return Character as String
+	 */
 	private String decodeByteValue(String str){
 		try{
 			if(str.startsWith("x")){
 				str=str.substring(1, str.length());
-				int i= Integer.parseInt(str,16);
+				int i = Integer.parseInt(str,16);
 				char c = (char)i;
 				return ""+c;
 			}else{
-				int i= Integer.parseInt(str,16);
+				int i= Integer.parseInt(str);
 				char c = (char)i;
 				return ""+c;
 			}

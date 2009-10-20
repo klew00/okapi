@@ -24,12 +24,9 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.MimeTypeMapper;
@@ -48,7 +45,6 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class TsFilterTest {
@@ -112,14 +108,8 @@ public class TsFilterTest {
 		testDriver = new FilterTestDriver();
 		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
-		
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	      DocumentBuilder builder = factory.newDocumentBuilder();
-	      InputSource is = new InputSource(new StringReader("<hello><name>john</name></hello>"));
-	      builder.parse( is );
-		
 	}
-		
+	
 	@Test
 	public void StartDocument() {
 		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(completeTs, locENUS, locFRFR));
@@ -216,6 +206,238 @@ public class TsFilterTest {
 				tu.getSkeleton().toString());
 	}
 	@Test
+	public void TestDecodeByteFalse() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		params.decodeByteValues = false;
+		
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, locENUS, locFRFR), 1);
+
+		assertEquals("hello <byte value=\"79\"/>world", tu.getSourceContent().toString());
+		assertEquals("hejsan <byte value=\"79\"/>varlden", tu.getTargetContent(locFRFR).toString());
+	}
+	@Test
+	public void TestDecodeByteTrueDec() {
+		
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r" +
+		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+		"<defaultcodec>hello defaultcodec</defaultcodec>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"<context encoding=\"utf-8\">\r" +
+		"<message id=\"1\" encoding=\"utf-8\" numerus=\"no\">\r" +
+		"<source>hello <byte value=\"48\"/>world</source>\r" +
+		"<translation variants=\"no\">hejsan <byte value=\"48\"/>varlden</translation>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";		
+		
+		Parameters params = (Parameters) filter.getParameters();
+		params.decodeByteValues = true;
+		
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+
+		assertEquals("hello 0world", tu.getSourceContent().toString());
+		assertEquals("hejsan 0varlden", tu.getTargetContent(locFRFR).toString());
+	}
+	@Test
+	public void TestDecodeByteTrueHex() {
+		
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r" +
+		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+		"<defaultcodec>hello defaultcodec</defaultcodec>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"<context encoding=\"utf-8\">\r" +
+		"<message id=\"1\" encoding=\"utf-8\" numerus=\"no\">\r" +
+		"<source>hello <byte value=\"x31\"/>world</source>\r" +
+		"<translation variants=\"no\">hejsan <byte value=\"x31\"/>varlden</translation>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";		
+		
+		Parameters params = (Parameters) filter.getParameters();
+		params.decodeByteValues = true;
+		
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+
+		assertEquals("hello 1world", tu.getSourceContent().toString());
+		assertEquals("hejsan 1varlden", tu.getTargetContent(locFRFR).toString());
+	}
+	@Test
+	public void TestDecodeByteTrueHex2() {
+		
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r" +
+		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+		"<defaultcodec>hello defaultcodec</defaultcodec>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"<context encoding=\"utf-8\">\r" +
+		"<message id=\"1\" encoding=\"utf-8\" numerus=\"no\">\r" +
+		"<source>hello " +
+		"<byte value=\"x9\"/>" +
+		"<byte value=\"xA\"/>" +
+		"<byte value=\"xD\"/>" +
+		"<byte value=\"x20\"/>" +
+		"<byte value=\"xD7FF\"/>" +
+		"<byte value=\"xE000\"/>" +
+		"<byte value=\"xFFFD\"/>" +
+		/*"<byte value=\"x10000\"/>" +
+		"<byte value=\"x10FFFF\"/>" +*/
+		"world</source>\r" +
+		"<translation variants=\"no\">hejsan <byte value=\"x31\"/>varlden</translation>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";		
+		
+		Parameters params = (Parameters) filter.getParameters();
+		params.decodeByteValues = true;
+		
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		
+		String srcCheck = "hello " + 
+		"\u0009" + 
+		"\n" +
+		"\r" +
+		"\u0020" +
+		"\ud7ff" +
+		"\ue000" +
+		"\ufffd" +
+		"world"; 
+		
+		assertEquals(srcCheck, tu.getSourceContent().toString());
+	}
+	@Test
+	public void TestEncodeIncludedChars() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		params.decodeByteValues = true;
+		
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r" +
+		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+		"<defaultcodec>hello defaultcodec</defaultcodec>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"<context encoding=\"utf-8\">\r" +
+		"<name>context name 1</name>\r" +
+		"<comment>context comment 1</comment>\r" +
+		"<message id=\"1\" encoding=\"utf-8\" numerus=\"no\">\r" +
+		"<location filename=\"test.ts\" line=\"55\"/>\r" +
+
+		"<source>hello " +
+		"<byte value=\"x8\"/>" +
+		"<byte value=\"xb\"/>" +
+		"<byte value=\"xc\"/>" +
+		"<byte value=\"xe\"/>" +
+		"<byte value=\"x1f\"/>" +
+		"<byte value=\"xd800\"/>" +
+		"<byte value=\"xdfff\"/>" +
+		"<byte value=\"xfffe\"/>" +
+		"<byte value=\"xffff\"/>" +
+		//"<byte value=\"x10FFFE\"/>" +
+
+		"world</source>\r" +
+		"<comment>old hello <byte value=\"79\"/>comment</comment>\r" +
+		"<oldcomment>old hello old comment</oldcomment>\r" +
+		"<extracomment>old hello extra comment</extracomment>\r" +
+		"<translatorcomment>old hello translator comment</translatorcomment>\r" +
+		"<translation variants=\"no\">hejsan <byte value=\"x31\"/>varlden</translation>\r" +
+		"<userdata>hello userdata</userdata>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";
+		
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r" +
+		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+		"<defaultcodec>hello defaultcodec</defaultcodec>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"<context encoding=\"utf-8\">\r" +
+		"<name>context name 1</name>\r" +
+		"<comment>context comment 1</comment>\r" +
+		"<message id=\"1\" encoding=\"utf-8\" numerus=\"no\">\r" +
+		"<location filename=\"test.ts\" line=\"55\"/>\r" +
+		"<source>hello <byte value=\"x8\"><byte value=\"xb\"><byte value=\"xc\"><byte value=\"xe\"><byte value=\"x1f\"><byte value=\"xd800\"><byte value=\"xdfff\"><byte value=\"xfffe\"><byte value=\"xffff\">world</source>\r" +
+		"<comment>old hello <byte value=\"79\"/>comment</comment>\r" +
+		"<oldcomment>old hello old comment</oldcomment>\r" +
+		"<extracomment>old hello extra comment</extracomment>\r" +
+		"<translatorcomment>old hello translator comment</translatorcomment>\r" +
+		"<translation variants=\"no\">hejsan 1varlden</translation>\r" +
+		"<userdata>hello userdata</userdata>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";
+		
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), locFR));
+	}	
+	@Test
+	public void TestEncodeExcludedChars() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		params.decodeByteValues = true;
+		
+		String snippet = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r" +
+		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+		"<defaultcodec>hello defaultcodec</defaultcodec>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"<context encoding=\"utf-8\">\r" +
+		"<name>context name 1</name>\r" +
+		"<comment>context comment 1</comment>\r" +
+		"<message id=\"1\" encoding=\"utf-8\" numerus=\"no\">\r" +
+		"<location filename=\"test.ts\" line=\"55\"/>\r" +
+		
+		"<source>hello " +
+		"<byte value=\"x9\"/>" +
+		"<byte value=\"xA\"/>" +
+		"<byte value=\"xD\"/>" +
+		"<byte value=\"x20\"/>" +
+		"<byte value=\"xD7FF\"/>" +
+		"<byte value=\"xE000\"/>" +
+		"<byte value=\"xFFFD\"/>" +
+		//"<byte value=\"x10000\"/>" +
+		//"<byte value=\"x10FFFF\"/>" +
+
+		"world</source>\r" +
+		"<comment>old hello <byte value=\"79\"/>comment</comment>\r" +
+		"<oldcomment>old hello old comment</oldcomment>\r" +
+		"<extracomment>old hello extra comment</extracomment>\r" +
+		"<translatorcomment>old hello translator comment</translatorcomment>\r" +
+		"<translation variants=\"no\">hejsan <byte value=\"x31\"/>varlden</translation>\r" +
+		"<userdata>hello userdata</userdata>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";
+		
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r" +
+		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+		"<defaultcodec>hello defaultcodec</defaultcodec>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"<context encoding=\"utf-8\">\r" +
+		"<name>context name 1</name>\r" +
+		"<comment>context comment 1</comment>\r" +
+		"<message id=\"1\" encoding=\"utf-8\" numerus=\"no\">\r" +
+		"<location filename=\"test.ts\" line=\"55\"/>\r" +
+		"<source>hello " +
+		"\u0009" + 
+		"\n" +
+		"\r" +
+		"\u0020" +
+		"\ud7ff" +
+		"\ue000" +
+		"\ufffd" +
+		"world</source>\r" +
+		"<comment>old hello <byte value=\"79\"/>comment</comment>\r" +
+		"<oldcomment>old hello old comment</oldcomment>\r" +
+		"<extracomment>old hello extra comment</extracomment>\r" +
+		"<translatorcomment>old hello translator comment</translatorcomment>\r" +
+		"<translation variants=\"no\">hejsan 1varlden</translation>\r" +
+		"<userdata>hello userdata</userdata>\r" +
+		"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";
+		
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), locFR));
+	}	
+	@Test
 	public void AllEvents () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>\r" +
 		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
@@ -261,7 +483,6 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 		
-		//System.out.println(FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), "fr"));
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), locFR));
 	}
 	
@@ -546,8 +767,7 @@ public class TsFilterTest {
 				"</message>", 
 				tu.getSkeleton().toString());
 	}	
-	
-	
+		
 	@Test
 	public void testDoubleExtraction () {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
@@ -564,7 +784,6 @@ public class TsFilterTest {
 	//--methods--
 	@Test
 	public void testGetName() {
-		System.out.println(FilterTestDriver.generateOutput(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), locFRFR));
 		assertEquals("okf_ts", filter.getName());
 	}
 
@@ -622,16 +841,16 @@ public class TsFilterTest {
 		assertEquals("Add Entry To System Log", tu.getSourceContent().getCodedText());
 		assertEquals("Lagg till i system Loggen", tu.getTargetContent(locFRFR).getCodedText());
 		
-		System.out.println(tu.getId());
+		/*System.out.println(tu.getId());
 		System.out.println(tu.getMimeType());
 		System.out.println(tu.getName());
 		System.out.println(tu.getType());
 		System.out.println(tu.getPropertyNames());
 		System.out.println(tu.getSkeleton());
-		System.out.println(tu.getTargetLanguages());
+		System.out.println(tu.getTargetLanguages());*/
 		
 		tu.setTargetProperty(locFRFR, new Property(Property.APPROVED, "no", false));
-		System.out.println(tu.getTargetPropertyNames(locFRFR));
+		//System.out.println(tu.getTargetPropertyNames(locFRFR));
 		/*Property prop = dp.getProperty(Property.ENCODING);
 		assertNotNull(prop);
 		assertEquals("UTF-8", prop.getValue());

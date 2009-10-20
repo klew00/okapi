@@ -116,7 +116,6 @@
 <userdata>hello userdata</userdata>
 <extra-loc-blank>hello extra-loc-blank</extra-loc-blank>
 </message>
-<![CDATA[hello cdata]]>
 </context>
 </context>
 </TS>
