@@ -26,95 +26,115 @@ import net.sf.okapi.common.Util;
  * Represents a Unit of Translation.
  */
 public class TranslationUnit {
-    private TranslationUnitVariant source;
-    private TranslationUnitVariant target;
-    private Metadata metadata;
+	private TranslationUnitVariant source;
+	private TranslationUnitVariant target;
+	private Metadata metadata;
 
-    /**
-     * Creates a TU w/o an source or target defined
-     */
-    public TranslationUnit(){
-        metadata = new Metadata();
-    }
+	/**
+	 * Creates a TU w/o an source or target defined
+	 */
+	public TranslationUnit() {
+		metadata = new Metadata();
+	}
 
-    /**
-     * Creates a TU with the provided source and targets
-     * @param source The source of the TU
-     * @param target The target of the TU
-     */
-    public TranslationUnit(TranslationUnitVariant source, TranslationUnitVariant target) {
-        this();
-        this.source = source;
-        this.target = target;
-    }
+	/**
+	 * Creates a TU with the provided source and targets
+	 * 
+	 * @param source
+	 *            The source of the TU
+	 * @param target
+	 *            The target of the TU
+	 */
+	public TranslationUnit(TranslationUnitVariant source,
+			TranslationUnitVariant target) {
+		this();
+		this.source = source;
+		this.target = target;
+	}
 
-    /**
-     * Gets the metadata or attributes for this TU
-     * @return The Metadata of this TU
-     */
-    public Metadata getMetadata() {
-        return metadata;
-    }
-    //TODO: get rid of me
-    public void setMetadata(Metadata metadata) {
-        this.metadata = metadata;
-    }
+	/**
+	 * Gets the metadata or attributes for this TU
+	 * 
+	 * @return The Metadata of this TU
+	 */
+	public Metadata getMetadata() {
+		return metadata;
+	}
 
-    public TranslationUnitVariant getSource() {
-        return source;
-    }
+	// TODO: get rid of me
+	public void setMetadata(Metadata metadata) {
+		this.metadata = metadata;
+	}
 
-    public TranslationUnitVariant getTarget() {
-        return target;
-    }
+	public TranslationUnitVariant getSource() {
+		return source;
+	}
 
-    public void setSource(TranslationUnitVariant source) {
-        this.source = source;
-    }
+	public TranslationUnitVariant getTarget() {
+		return target;
+	}
 
-    public void setTarget(TranslationUnitVariant target) {
-        this.target = target;
-    }
+	public void setSource(TranslationUnitVariant source) {
+		this.source = source;
+	}
 
-    /**
-     * Checks to see if the the source is empty
-     * @return true if the source is empty
-     */
-    public boolean isSourceEmpty() {
-        return isFragmentEmpty(source);
-    }
+	public void setTarget(TranslationUnitVariant target) {
+		this.target = target;
+	}
 
-    /**
-     * Sets the value for a give metadata value field
-     * @param key the key for the data we want set
-     * @param value the vlaue to set the metadata to
-     */
-    public void setMetadataValue(MetadataType key, String value) {
-        if (Util.isEmpty(value)){
-            metadata.remove(key);
-        }else{
-            metadata.put(key, value);
-        }
-    }
+	/**
+	 * Checks to see if the the source is empty
+	 * 
+	 * @return true if the source is empty
+	 */
+	public boolean isSourceEmpty() {
+		return isFragmentEmpty(source);
+	}
 
-    /**
-     * Checks to see if the the target is empty
-     * @return true if the target is empty
-     */
-    public boolean isTargetEmpty() {
-        return isFragmentEmpty(target);
-    }
+	/**
+	 * Sets the value for a give metadata value field
+	 * 
+	 * @param key
+	 *            the key for the data we want set
+	 * @param value
+	 *            the vlaue to set the metadata to
+	 */
+	public void setMetadataValue(MetadataType key, String value) {
+		if (Util.isEmpty(value)) {
+			metadata.remove(key);
+		} else {
+			metadata.put(key, value);
+		}
+	}
 
-    /**
-     * Gets the value for a give metadata value field
-     * @param key the key for the data we want
-     * @return the value for a give metadata value field
-     */
-    public String getMetadataValue(MetadataType key) {
-        return metadata.get(key);
-    }
+	/**
+	 * Checks to see if the the target is empty
+	 * 
+	 * @return true if the target is empty
+	 */
+	public boolean isTargetEmpty() {
+		return isFragmentEmpty(target);
+	}
 
-    private static boolean isFragmentEmpty (TranslationUnitVariant frag){
-        return (( frag == null ) || frag.getContent().isEmpty() );
-    }
+	/**
+	 * Gets the value for a give metadata value field
+	 * 
+	 * @param key
+	 *            the key for the data we want
+	 * @return the value for a give metadata value field
+	 */
+	public String getMetadataValue(MetadataType key) {
+		return metadata.get(key);
+	}
+
+	private static boolean isFragmentEmpty(TranslationUnitVariant frag) {
+		return (frag == null || frag.getContent() == null || frag.getContent().isEmpty());
+	}
+
+	@Override
+	public String toString() {
+		return "Source: " + getSource().getContent().toString() + 
+			   "\nTarget: " + getTarget().getContent().toString();
+
+	}
 }

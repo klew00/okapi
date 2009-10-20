@@ -20,36 +20,130 @@
 
 package net.sf.okapi.tm.pensieve.common;
 
+import net.sf.okapi.common.HashCodeUtil;
+
 /**
- * Represents a TM Hit. This stores a reference to the TranslationUnit and its score.
+ * Represents a TM Hit. This stores a reference to the TranslationUnit and its
+ * score and {@link TmMatchType}
+ * 
  * @author HaslamJD
+ * @author HARGRAVEJE
  */
 public class TmHit implements Comparable<TmHit> {
+	private TranslationUnit tu;
+	private float score;
+	private TmMatchType matchType;
+	private boolean codeMismatch;
 
-    public TmHit() {
+	public TmHit() {
+		setMatchType(TmMatchType.NONE);
+		setCodeMismatch(false);
+	}
 
-    }
+	public TmHit(TranslationUnit tu, TmMatchType matchType, float score) {
+		setTu(tu);
+		setMatchType(matchType);
+		setScore(score);
+		setCodeMismatch(false);
+	}
 
-    private TranslationUnit tu;
-    private Float score;
+	public float getScore() {
+		return score;
+	}
 
-    public Float getScore() {
-        return score;
-    }
+	public void setScore(Float score) {
+		this.score = score;
+	}
 
-    public void setScore(Float score) {
-        this.score = score;
-    }
+	public TranslationUnit getTu() {
+		return tu;
+	}
 
-    public TranslationUnit getTu() {
-        return tu;
-    }
+	public void setTu(TranslationUnit tu) {
+		this.tu = tu;
+	}
 
-    public void setTu(TranslationUnit tu) {
-        this.tu = tu;
-    }
+	public void setMatchType(TmMatchType matchType) {
+		this.matchType = matchType;
+	}
 
-    public int compareTo(TmHit o) {
-        return score.compareTo(o.score);
-    }
+	public TmMatchType getMatchType() {
+		return matchType;
+	}
+
+	public void setCodeMismatch(boolean codeMismatch) {
+		this.codeMismatch = codeMismatch;
+	}
+
+	public boolean isCodeMismatch() {
+		return codeMismatch;
+	}
+
+	/**
+	 * This method implements a three way sort on (1) TmMatchType (2) score (3)
+	 * source string. TmMatchType is the primary key, score secondary and source
+	 * string tertiary.
+	 */
+	public int compareTo(TmHit other) {
+		final int BEFORE = -1;
+		final int EQUAL = 0;
+		final int AFTER = 1;
+
+		if (this == other)
+			return EQUAL;
+
+		String thisSource = this.tu.getSource().getContent().toString();
+		String otherSource = other.tu.getSource().getContent().toString();
+
+		// compare TmMatchType
+		int comparison = this.matchType.compareTo(other.getMatchType());
+		if (comparison != EQUAL)
+			return comparison;
+
+		// compare score
+		if (this.score < other.getScore())
+			return BEFORE;
+		if (this.score > other.getScore())
+			return AFTER;
+
+		// compare source strings with codes
+		comparison = thisSource.compareTo(otherSource);
+		if (comparison != EQUAL)
+			return comparison;
+
+		// default
+		return EQUAL;
+	}
+
+	/**
+	 * Define equality of state.
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (!(other instanceof TmHit))
+			return false;
+
+		TmHit otherHit = (TmHit) other;
+		return (this.matchType == otherHit.getMatchType())
+				&& (this.tu.getSource().getContent().toString().equals(otherHit
+						.getTu().getSource().getContent().toString()))
+				&& (this.tu.getTarget().getContent().toString().equals(otherHit
+						.getTu().getTarget().getContent().toString()));
+	}
+
+	/**
+	 * A class that overrides equals must also override hashCode.
+	 */
+	@Override
+	public int hashCode() {
+		int result = HashCodeUtil.SEED;
+		result = HashCodeUtil.hash(result, matchType);
+		result = HashCodeUtil.hash(result, tu.getSource().getContent()
+				.toString());
+		result = HashCodeUtil.hash(result, tu.getTarget().getContent()
+				.toString());
+		return result;
+	}
 }

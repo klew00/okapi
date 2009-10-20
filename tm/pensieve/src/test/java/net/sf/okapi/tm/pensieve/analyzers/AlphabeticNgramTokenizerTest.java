@@ -123,7 +123,7 @@ public class AlphabeticNgramTokenizerTest {
         assertEquals("First Token Value", "this should all be lowercas", getTermString());
     }
 
-    @Test
+    // we now attempt to lowercase every language and let icu4j decide what to do @Test
     public void IncrementTokenTypeValueArmenianLocaleNoLowerCase() throws Exception {
         Reader r = new StringReader("THIS SHOULD NOT BE LOWERCASE");
         ngramTk = new AlphabeticNgramTokenizer(r, 27, new Locale("hy"));

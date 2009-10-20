@@ -42,14 +42,6 @@ public interface ITmWriter {
      */
     //TODO: get rid of the IOException requirement
     void indexTranslationUnit(TranslationUnit tu) throws IOException;
-
-//    /**
-//     * Temporary method to indexes a given translation unit, taking inline codes into account.
-//     * @param tu the translation unit to index.
-//     * @throws IOException if the indexing cannot happen.
-//     */
-//    //TODO: get rid of the IOException requirement
-//    void indexTranslationUnit2 (TranslationUnit tu) throws IOException;
     
     /**
      * Deletes a TranslationUnit based on the id.

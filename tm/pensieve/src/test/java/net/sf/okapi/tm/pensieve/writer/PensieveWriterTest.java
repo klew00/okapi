@@ -136,7 +136,7 @@ public class PensieveWriterTest {
         writer.commit();
         Document doc1 = findDocument(MetadataType.ID.fieldName(), "1");
         Document doc2 = findDocument(MetadataType.ID.fieldName(), "2");
-        assertEquals("source text", tu1.getSource().getContent().toString(), doc1.getField(TranslationUnitField.SOURCE.name()).stringValue());
+        assertEquals("source text", tu1.getSource().getContent().toString(), doc1.getField(TranslationUnitField.SOURCE_EXACT.name()).stringValue());
         assertEquals("target text", tu1.getTarget().getContent().toString(), doc1.getField(TranslationUnitField.TARGET.name()).stringValue());
         assertEquals("target text", tu2.getTarget().getContent().toString(), doc2.getField(TranslationUnitField.TARGET.name()).stringValue());
     }
@@ -217,17 +217,15 @@ public class PensieveWriterTest {
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed after endIndex", 1, reader.maxDoc());
     }
-
-    @Test(expected = NullPointerException.class)
+   
     public void getDocumentNoSourceContent(){
-        tmWriter.createDocument(new TranslationUnit(null, new TranslationUnitVariant(locEN,
-                new TextFragment("some target"))));
+        assertNull(tmWriter.createDocument(new TranslationUnit(null, new TranslationUnitVariant(locEN,
+                new TextFragment("some target")))));
     }
 
-    @Test(expected = NullPointerException.class)
     public void getDocumentEmptySourceContent(){
-        tmWriter.createDocument(new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment("")),
-                new TranslationUnitVariant(locEN, new TextFragment("some target"))));
+    	assertNull(tmWriter.createDocument(new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment("")),
+                new TranslationUnitVariant(locEN, new TextFragment("some target")))));
     }
 
     @Test(expected = NullPointerException.class)
@@ -271,7 +269,7 @@ public class PensieveWriterTest {
     	Metadata md = tu.getMetadata();
     	md.put(MetadataType.ID, "someId");
     	Document doc = tmWriter.createDocument(tu);
-    	assertEquals("Document's content field", srcCT, getFieldValue(doc, SOURCE.name()));
+    	assertEquals("Document's content field", srcCT, getFieldValue(doc, SOURCE_EXACT.name()));
     	assertEquals("Document's content exact field", srcCT, getFieldValue(doc, SOURCE_EXACT.name()));
     	assertEquals("Document's target field", trgCT, getFieldValue(doc, TARGET.name()));
     	assertEquals("Document's source lang field", locEN, getFieldValue(doc, SOURCE_LANG.name()));

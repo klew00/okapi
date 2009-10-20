@@ -21,18 +21,146 @@
 package net.sf.okapi.tm.pensieve.common;
 
 import static org.junit.Assert.*;
+
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.TextFragment;
+
+import org.junit.Before;
 import org.junit.Test;
 
 /**
- *
+ * 
  * @author HaslamJD
+ * @author HARGRAVEJE
  */
 public class TmHitTest {
+	TmHit h1;
+	TmHit h2;
 
-    @Test
-    public void noArgConstructor() {
-        TmHit tmh = new TmHit();
-        assertNull(tmh.getTu());
-        assertNull(tmh.getScore());
-    }
+	TranslationUnitVariant tuvSource1, tuvTarget1, tuvSource2, tuvTarget2;
+	TranslationUnit tu1, tu2;
+
+	@Before
+	public void setUp() {
+		tuvSource1 = new TranslationUnitVariant(new LocaleId("en"), new TextFragment("test1"));
+		tuvTarget1 = new TranslationUnitVariant(new LocaleId("es"), new TextFragment(
+				"prueba1"));
+		tu1 = new TranslationUnit(tuvSource1, tuvTarget1);
+
+		tuvSource2 = new TranslationUnitVariant(new LocaleId("en"), new TextFragment("test2"));
+		tuvTarget2 = new TranslationUnitVariant(new LocaleId("es"), new TextFragment(
+				"prueba2"));
+		tu2 = new TranslationUnit(tuvSource2, tuvTarget2);
+
+		h1 = new TmHit(tu1, TmMatchType.EXACT, 0.8f);
+		h2 = new TmHit(tu2, TmMatchType.EXACT, 0.8f);
+	}
+
+	@Test
+	public void noArgConstructor() {
+		TmHit tmh = new TmHit();
+		assertNull(tmh.getTu());
+		assertEquals(0.0f, tmh.getScore(), 0.001f);
+		assertTrue(TmMatchType.NONE == tmh.getMatchType());
+	}
+
+	@Test
+	public void constructor() {
+		assertNotNull(h1.getTu());
+		assertNotNull(h1.getScore());
+		assertNotNull(h1.getMatchType());
+	}
+
+	@Test
+	public void instanceEquality() {
+		TmHit h1 = new TmHit();
+		TmHit h2 = h1;
+		assertTrue("instance equality", h1.equals(h2));
+	}
+
+	@Test
+	public void equals() {		
+		TmHit h = new TmHit();
+		h.setTu(tu1);
+		h.setScore(0.8f);
+		h.setMatchType(TmMatchType.EXACT);
+		assertTrue("equals", h1.equals(h));
+	}
+
+	@Test
+	public void notEquals() {
+		assertFalse("not equals", h1.equals(h2));
+	}
+	
+	@Test 
+	public void compareToEquals() {
+		TmHit h = new TmHit();
+		h.setTu(tu1);
+		h.setScore(0.8f);
+		h.setMatchType(TmMatchType.EXACT);
+		assertEquals(0, h1.compareTo(h1));
+	}
+	
+	@Test 
+	public void compareToGreaterThanScore() {
+		TmHit h = new TmHit();
+		h.setTu(tu1);
+		h.setScore(0.5f);
+		h.setMatchType(TmMatchType.EXACT);
+		assertTrue(h1.compareTo(h) > 0);
+	}
+	
+	@Test 
+	public void compareToLessThanScore() {
+		TmHit h = new TmHit();
+		h.setTu(tu1);
+		h.setScore(1.0f);
+		h.setMatchType(TmMatchType.EXACT);
+		assertTrue(h1.compareTo(h) < 0);
+	}
+	
+	@Test 
+	public void compareToLessThanMatchType() {
+		TmHit h = new TmHit();
+		h.setTu(tu1);
+		h.setScore(0.8f);
+		h.setMatchType(TmMatchType.FUZZY);
+		assertTrue(h1.compareTo(h) < 0);
+	}
+	
+	@Test 
+	public void compareToGreaterThanMatchType() {
+		TmHit h = new TmHit();
+		h.setTu(tu1);
+		h.setScore(0.8f);
+		h.setMatchType(TmMatchType.EXACT_LOCAL_CONEXT);
+		assertTrue(h1.compareTo(h) > 0);
+	}
+	
+	@Test 
+	public void compareToLessThanSource() {
+		TmHit h = new TmHit();
+		TranslationUnitVariant tuvSource = new TranslationUnitVariant(new LocaleId("en"), new TextFragment("aest1"));
+		TranslationUnitVariant tuvTarget = new TranslationUnitVariant(new LocaleId("es"), new TextFragment("prueba1"));
+		TranslationUnit tu = new TranslationUnit(tuvSource, tuvTarget);
+		
+		h.setTu(tu);
+		h.setScore(0.8f);
+		h.setMatchType(TmMatchType.FUZZY);
+		assertTrue(h1.compareTo(h) < 0);
+	}
+	
+	@Test 
+	public void compareToGreaterThanSource() {
+		TmHit h = new TmHit();
+		TranslationUnitVariant tuvSource = new TranslationUnitVariant(new LocaleId("en"), new TextFragment("zest1"));
+		TranslationUnitVariant tuvTarget = new TranslationUnitVariant(new LocaleId("es"), new TextFragment("prueba1"));
+		TranslationUnit tu = new TranslationUnit(tuvSource, tuvTarget);
+
+		
+		h.setTu(tu);
+		h.setScore(0.8f);
+		h.setMatchType(TmMatchType.EXACT_LOCAL_CONEXT);
+		assertTrue(h1.compareTo(h) > 0);
+	}
 }

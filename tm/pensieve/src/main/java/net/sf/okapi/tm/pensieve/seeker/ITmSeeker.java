@@ -42,9 +42,10 @@ public interface ITmSeeker {
      * @return a list of exact matches
      * @throws net.sf.okapi.common.exceptions.OkapiIOException if the search cannot be completed due to I/O problems
      */
-    List<TmHit> searchExact(TextFragment query, int max, Metadata metadata);    
+    List<TmHit> searchExact(TextFragment query, Metadata metadata);    
     
     /**
+     * 
      * Get a list of fuzzy matches for a given text fragment, taking inline codes in account.
      * @param query the fragment to search for.
      * @param threshold the minimal score value to return.

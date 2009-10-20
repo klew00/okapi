@@ -312,7 +312,7 @@ public class PensieveSeekerTest {
 
         writer.endIndex();
         //Fuzzy or phrase matching would return "watch out for the killer rabbit1" & "watch out for the killer rabbit11"
-        tmhits = seeker.searchExact(new TextFragment(str + 1), 10, null);
+        tmhits = seeker.searchExact(new TextFragment(str + 1), null);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -326,7 +326,7 @@ public class PensieveSeekerTest {
         writer.endIndex();
         Metadata metadata = new Metadata();
         metadata.put(MetadataType.ID, "ID1");
-        tmhits = seeker.searchExact(new TextFragment(str), 20, metadata);
+        tmhits = seeker.searchExact(new TextFragment(str), metadata);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -341,8 +341,8 @@ public class PensieveSeekerTest {
         writer.endIndex();
         Metadata metadata = new Metadata();
         metadata.put(MetadataType.TYPE, "nachotype");
-        tmhits = seeker.searchExact(new TextFragment(str), 20, metadata);
-        assertEquals("number of docs found", 5, tmhits.size());
+        tmhits = seeker.searchExact(new TextFragment(str), metadata);
+        assertEquals("number of docs found", 1, tmhits.size());
     }
 
     @Test
@@ -354,8 +354,8 @@ public class PensieveSeekerTest {
         }
 
         writer.endIndex();
-        tmhits = seeker.searchExact(new TextFragment(str), 10, null);
-        assertEquals("number of docs found", 5, tmhits.size());
+        tmhits = seeker.searchExact(new TextFragment(str), null);
+        assertEquals("number of docs found", 1, tmhits.size());
     }
 
     @Test
@@ -366,7 +366,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchExact(new TextFragment(str), 10, null);
+        tmhits = seeker.searchExact(new TextFragment(str), null);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -378,7 +378,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchExact(new TextFragment(str), 10, null);
+        tmhits = seeker.searchExact(new TextFragment(str), null);
         assertEquals("number of docs found", 1, tmhits.size());
     }
 
@@ -390,7 +390,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("watch out for the the killer rabbit")), TARGET));
 
         writer.endIndex();
-        tmhits = seeker.searchExact(new TextFragment("killer rabbit the for out watch"), 10, null);
+        tmhits = seeker.searchExact(new TextFragment("killer rabbit the for out watch"), null);
         assertEquals("number of docs found", 0, tmhits.size());
     }
 
@@ -408,7 +408,7 @@ public class PensieveSeekerTest {
     	writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), frag), TARGET));
     	writer.endIndex();
     	
-    	tmhits = seeker.searchExact(frag, 10, null);
+    	tmhits = seeker.searchExact(frag, null);
     	assertEquals("number of docs found", 1, tmhits.size());
     	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
     }
@@ -428,7 +428,7 @@ public class PensieveSeekerTest {
     	writer.endIndex();
     	
     	frag = new TextFragment("watch out for the killer rabbit");
-    	tmhits = seeker.searchExact(frag, 10, null);
+    	tmhits = seeker.searchExact(frag, null);
     	assertEquals("number of docs found", 1, tmhits.size());
     	assertEquals("watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
     }

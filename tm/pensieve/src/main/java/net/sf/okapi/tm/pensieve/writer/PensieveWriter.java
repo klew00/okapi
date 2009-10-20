@@ -25,8 +25,10 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.*;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
@@ -63,6 +65,7 @@ public class PensieveWriter implements ITmWriter {
         //TODO: make a close method that is separate from this and rename this to commitIndex.
         try{
             indexWriter.commit();
+            indexWriter.optimize();
         } catch (IOException e) {
             throw new OkapiIOException(e);  //To change body of catch statement use File | Settings | File Templates.
         } catch(AlreadyClosedException ignored){
@@ -91,7 +94,10 @@ public class PensieveWriter implements ITmWriter {
         if (tu == null){
             throw new NullPointerException("TextUnit can not be null");
         }
-        indexWriter.addDocument(createDocument(tu));
+        Document doc = createDocument(tu);
+        if (doc != null) {
+        	indexWriter.addDocument(doc);
+        }
     }
 
     /**
@@ -120,22 +126,6 @@ public class PensieveWriter implements ITmWriter {
         indexTranslationUnit(tu);
     }
 
-//    Document getDocument(TranslationUnit tu) {
-//        if (tu == null || tu.isSourceEmpty()){
-//            throw new NullPointerException("source content not set");
-//        }
-//        Document doc = new Document();
-//        doc.add(createField(TranslationUnitField.SOURCE, tu.getSource().getContent(), Field.Store.YES, Field.Index.ANALYZED));
-//        doc.add(createField(TranslationUnitField.SOURCE_LANG, tu.getSource(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-//        doc.add(createField(TranslationUnitField.SOURCE_EXACT, tu.getSource().getContent(), Field.Store.NO, Field.Index.NOT_ANALYZED));
-//        if (!tu.isTargetEmpty()){
-//            doc.add(createField(TranslationUnitField.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
-//            doc.add(createField(TranslationUnitField.TARGET_LANG, tu.getTarget(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-//        }
-//        addMetadataToDocument(doc, tu.getMetadata());
-//        return doc;
-//    }
-
     Field createField(TranslationUnitField field,
     	TextFragment frag,
     	Field.Store store,
@@ -158,58 +148,57 @@ public class PensieveWriter implements ITmWriter {
         }
     }
 
-    
-    //=== Added for try out on inline code handling
-
-//    /**
-//     * Adds a {@link TranslationUnit} to the index.
-//     * @param tu the translation unit to index.
-//     * @throws IOException if the translation unit cannot be indexed.
-//     */
-//    public void indexTranslationUnit2 (TranslationUnit tu) throws IOException {
-//    	if ( tu == null ) {
-//    		throw new NullPointerException("TextUnit can not be null");
-//    	}
-//    	indexWriter.addDocument(createDocument(tu));
-//    }
-
     /**
      * Creates a document for a given translation unit, including inline codes.
      * @param tu the translation unit used to create the document.
      * @return a new document.
      */
     Document createDocument (TranslationUnit tu) {
-    	if (tu == null || tu.isSourceEmpty()){
+    	if (tu == null){
     		throw new NullPointerException("source content not set");
     	}
+    	
+    	// an empty source is not fatal just skip it
+    	if (tu.isSourceEmpty()){
+    		return null;
+    	}
+    	
     	Document doc = new Document();
     	doc.add(createField(TranslationUnitField.SOURCE_LANG, tu.getSource(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-    	doc.add(createCodedTextField(TranslationUnitField.SOURCE_EXACT, tu.getSource().getContent(), Field.Store.NO, Field.Index.NOT_ANALYZED));
-    	doc.add(createCodedTextField(TranslationUnitField.SOURCE, tu.getSource().getContent(), Field.Store.YES, Field.Index.ANALYZED));
+    	doc.add(createRawCodedTextField(TranslationUnitField.SOURCE_EXACT, tu.getSource().getContent(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+    	// ANALYZED_NO_NORMS: We don't need Lucene to manage this for us, we will implement our own scoring and normalization.
+    	doc.add(createIndexedTextField(TranslationUnitField.SOURCE, tu.getSource().getContent(), Field.Store.NO, Field.Index.ANALYZED_NO_NORMS));
     	doc.add(createCodesField(TranslationUnitField.SOURCE_CODES, tu.getSource().getContent(), Field.Store.YES, Field.Index.NOT_ANALYZED));
     	if ( !tu.isTargetEmpty() ) {
     		doc.add(createField(TranslationUnitField.TARGET_LANG, tu.getTarget(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-    		doc.add(createCodedTextField(TranslationUnitField.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
+    		doc.add(createRawCodedTextField(TranslationUnitField.TARGET, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
     		doc.add(createCodesField(TranslationUnitField.TARGET_CODES, tu.getTarget().getContent(), Field.Store.YES, Field.Index.NO));
     	}
     	addMetadataToDocument(doc, tu.getMetadata());
     	return doc;
     }
 
-    private Field createCodedTextField (TranslationUnitField fieldType,
-   		TextFragment frag,
-   		Field.Store store,
-    	Field.Index index)
+    private Field createIndexedTextField (TranslationUnitField fieldType,
+       		TextFragment frag,
+       		Field.Store store,
+        	Field.Index index)
     {
-    	return new Field(fieldType.name(), frag.getCodedText(), store, index);
+        	return new Field(fieldType.name(), frag.getText(), store, index, TermVector.YES);
+    }
+    
+    private Field createRawCodedTextField (TranslationUnitField fieldType,
+       		TextFragment frag,
+       		Field.Store store,
+        	Field.Index index)
+    {
+        	return new Field(fieldType.name(), frag.getCodedText(), store, index);
     }
     
     private Field createCodesField (TranslationUnitField field,
     	TextFragment frag,
     	Field.Store store,
     	Field.Index index)
-    {
+    {    	
     	return new Field(field.name(), Code.codesToString(frag.getCodes()), store, index);
     }
-
 }
