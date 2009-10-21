@@ -681,8 +681,8 @@ public class Main {
 			stepMrg.setXliffPath(input);
 			stepMrg.setOutputPath(output);
 			stepMrg.setOutputEncoding(outputEncoding);
-			ps.println("Source locale: "+srcLoc);
-			ps.println("Target locale: "+trgLoc);
+			ps.println("Source language: "+srcLoc);
+			ps.println("Target language: "+trgLoc);
 			ps.println("Default input encoding: "+inputEncoding);
 			ps.println("Output encoding: "+outputEncoding);
 			ps.println("Filter configuration: "+configId);
@@ -728,11 +728,10 @@ public class Main {
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc);
 			rd.setFilterConfigId(configId);
 			
-			ps.println("Source locale: "+srcLoc);
-			ps.println("Target locale: "+trgLoc);
+			ps.println("Source language: "+srcLoc);
+			ps.println("Target language: "+trgLoc);
 			ps.println("Default input encoding: "+inputEncoding);
 			ps.println("Filter configuration: "+configId);
-			ps.println("Input: "+input);
 			ps.println("Output: "+output);
 			
 			convertFile(rd, outputURI);
@@ -788,37 +787,37 @@ public class Main {
 		ps.println("Edits or view filter configurations (UI-dependent command):");
 		ps.println("   -e [[-fc] configId]");
 		ps.println("Extracts a file to XLIFF (and optionally segment and pre-translate):");
-		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl sourceLoc]");
-		ps.println("      [-tl targetLoc] [-seg [srxFile]] [-tt hostname[:port]");
+		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
+		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
 		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-oe encoding] [-sl sourceLoc] [-tl targetLoc]");
+		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
 		ps.println("Translates a file:");
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
-		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-seg [srxFile]] [-tt hostname[:port]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
 		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Queries translation resources:");
-		ps.println("   -q \"source text\" [-sl sourceLoc] [-tl targetLoc] [-google] [-opentran]");
+		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
 		ps.println("      [-apertium [serverURL]] [-opt threshold[:maxhits]]");
 		ps.println("Converts to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-generic] [-trgsource|-trgempty]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-generic] [-trgsource|-trgempty]");
 		ps.println("Converts to TMX format:");
 		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-trgsource|-trgempty]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
 		ps.println("Converts to table format:");
 		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-trgsource|-trgempty]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
 		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic]");
 		ps.println("Imports to Pensieve TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl sourceLoc] [-tl targetLoc] [-trgsource|-trgempty]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
 		ps.println("Export Pensieve TM as TMX:");
-		ps.println("   -exp tmDirectory1 [tmDirectory2...] [-sl sourceLoc] [-tl targetLoc]");
+		ps.println("   -exp tmDirectory1 [tmDirectory2...] [-sl srcLang] [-tl trgLang]");
 		ps.println("      [-trgsource|-trgempty]");
 	}
 
@@ -1101,8 +1100,8 @@ public class Main {
 		tmp += ".xlf";
 		driver.addBatchItem(rd, new File(tmp).toURI(), outputEncoding);
 
-		ps.println("Source locale: "+srcLoc);
-		ps.println("Target locale: "+trgLoc);
+		ps.println("Source language: "+srcLoc);
+		ps.println("Target language: "+trgLoc);
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Filter configuration: "+configId);
 		ps.println("Output: "+tmp);
@@ -1144,8 +1143,8 @@ public class Main {
 		int n = tmp.lastIndexOf('.');
 		output = tmp.substring(0, n) + ".out" + ext;
 
-		ps.println("Source locale: "+srcLoc);
-		ps.println("Target locale: "+trgLoc);
+		ps.println("Source language: "+srcLoc);
+		ps.println("Target language: "+trgLoc);
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Output encoding: "+outputEncoding);
 		ps.println("Filter configuration: "+configId);

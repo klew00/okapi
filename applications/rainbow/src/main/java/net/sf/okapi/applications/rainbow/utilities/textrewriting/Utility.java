@@ -141,9 +141,9 @@ public class Utility extends BaseFilterDrivenUtility {
 	}
 	
     private void processStartDocument (StartDocument resource) {
-    	if ( tmQ != null ) {
-    		tmQ.setAttribute("FileName", Util.getFilename(resource.getName(), true));
-    	}
+//    	if ( tmQ != null ) {
+//    		tmQ.setAttribute("FileName", Util.getFilename(resource.getName(), true));
+//    	}
     }
 	
 	private void processTextUnit (TextUnit tu) {
@@ -288,7 +288,9 @@ public class Utility extends BaseFilterDrivenUtility {
 		try {
 			// Target is set if needed
 			QueryResult qr;
-			tmQ.setAttribute("GroupName", tu.getName());
+//			if ( tu.getName() != null ) {
+//				tmQ.setAttribute("GroupName", tu.getName());
+//			}
 			TextContainer tc = tu.getTarget(trgLang);
 			if ( tc.isSegmented() ) {
 				int segIndex = 0;

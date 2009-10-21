@@ -486,19 +486,19 @@ public class QueryManager {
 						}
 						// If we do: Use the first one and lower the score to 99%
 						scores.add(99);
-						segment.text = qr.target; //TODO: adjustNewFragment(segment.text, qr.target, true, tu);
+						segment.text = adjustNewFragment(segment.text, qr.source, qr.target, true, tu); //qr.target; 
 						leveraged++;
 						continue;
 					}
 					// Else: First is 100%, possibly several that have the same translations
 					scores.add(qr.score); // That's 100% then
-					segment.text = qr.target; //TODO: adjustNewFragment(segment.text, qr.target, true, tu);
+					segment.text = adjustNewFragment(segment.text, qr.source, qr.target, true, tu); //qr.target;
 					leveraged++;
 					continue;
 				}
 				// First is not 100%: use it and move on
 				scores.add(qr.score);
-				segment.text = adjustNewFragment(segment.text, qr.target, true, tu);
+				segment.text = adjustNewFragment(segment.text, qr.source, qr.target, true, tu);
 				leveraged++;
 			}
 		}
@@ -546,6 +546,7 @@ public class QueryManager {
 
 		// Set the scores only if there is something to report
 		if (( leveraged > 0 ) || makeSS ) {
+			rewind();
 			// Set the target and attach the score
 			tc.setAnnotation(scores);
 			tu.setTarget(trgLoc, tc);
@@ -593,28 +594,37 @@ public class QueryManager {
 
 	/**
 	 * Adjusts the inline codes of a new text fragment based on an original one.
-	 * @param oriFrag the original text fragment.
-	 * @param newFrag the new text fragment.
+	 * @param oriSrc the original source text fragment.
+	 * @param newSrc the new source text fragment.
+	 * @param newTrg the new target text fragment.
 	 * @param parent the parent text unit (used for error information only)
 	 * @return the new text fragment
 	 */
-	public TextFragment  adjustNewFragment (TextFragment oriFrag,
-		TextFragment newFrag,
+	public TextFragment  adjustNewFragment (TextFragment oriSrc,
+		TextFragment newSrc,
+		TextFragment newTrg,
 		boolean removeExtra,
 		TextUnit parent)
 	{
 		// If both new and original have no code, return the new fragment
-		if ( !newFrag.hasCode() && !oriFrag.hasCode() ) {
-			return newFrag;
+		if ( !newTrg.hasCode() && !oriSrc.hasCode() ) {
+			return newTrg;
 		}
-		List<Code> oriCodes = oriFrag.getCodes();
-		List<Code> newCodes = newFrag.getCodes();
+		
+//		TextFragment workOri = oriSrc.clone();
+//		workOri.renumberCodes();
+//		TextFragment workNew = newTrg.clone();
+//		workNew.renumberCodes();
+
+		List<Code> oriCodes = oriSrc.getCodes();
+		List<Code> newCodes = newTrg.getCodes();
 		
 		int[] oriIndices = new int[oriCodes.size()];
 		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
 		
 		int done = 0;
 		Code newCode, oriCode;
+		int oriIndex = -1;
 
 		for ( int i=0; i<newCodes.size(); i++ ) {
 			newCode = newCodes.get(i);
@@ -624,9 +634,10 @@ public class QueryManager {
 			oriCode = null;
 			for ( int j=0; j<oriIndices.length; j++ ) {
 				if ( oriIndices[j] == -1) continue; // Used already
-				if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ))
+				//if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ))
 					//TOFIX && ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ))
-				{
+				if ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ) {
+					oriIndex = oriIndices[j];
 					oriCode = oriCodes.get(oriIndices[j]);
 					oriIndices[j] = -1;
 					done++;
@@ -648,6 +659,7 @@ public class QueryManager {
 				newCode.setData(oriCode.getData());
 				newCode.setOuterData(oriCode.getOuterData());
 				newCode.setReferenceFlag(oriCode.hasReference());
+				
 			}
 		}
 		
@@ -666,15 +678,15 @@ public class QueryManager {
 					if ( !code.isDeleteable() ) {
 						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
 							code.getId(), code.getData(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
-						logger.info(String.format("Source='%s'\nTarget='%s'", oriFrag.toString(), newFrag.toString()));
+						logger.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toString(), newTrg.toString()));
 					}
 				}
 			}
 		}
 		
-		return newFrag;
+		return newTrg;
 	}
-
+	
 	public void resetCounters () {
 		totalSegments = 0;
 		leveragedSegments = 0;

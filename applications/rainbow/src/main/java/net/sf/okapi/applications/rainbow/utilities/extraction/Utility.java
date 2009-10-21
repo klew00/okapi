@@ -239,11 +239,12 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		// Compute the statistics
 		int n = tu.getSource().getSegmentCount();
+		//TODO: Redo the report based on leveraging counts
 		htmlRpt.addSegmentCount(n==0 ? 1 : n);
 
 		// Leverage if requested
 		if (( qm != null ) && !approved ) {
-			if ( params.useGroupName ) {
+			if ( params.useGroupName && ( tu.getName() != null )) {
 				qm.setAttribute("GroupName", tu.getName());
 			}
 			qm.leverage(tu, null, true);

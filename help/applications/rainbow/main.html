@@ -78,10 +78,22 @@ value for each input document in the <cite>
 target language. This is the default target encoding. You can overwrite this 
 value for each input document in the <cite>
 <a href="inputDocProp.html">Input Document Properties</a></cite> dialog.</p>
-<p>The names of each encoding must be one of the IANA charset names. You can 
+<p>You can 
 obtain a list of all encodings supported by your system with the <cite>
 <a href="commands.html#ListEncodings">List Available Encodings</a></cite> 
 command.</p>
+<p>The language codes can be any type of BCP-47 code, or POSIX locales.</p>
+<blockquote>
+	<p><b>Note:</b> Locale and Languages. Nowadays there is not many difference 
+	between a language code and a locale code, as the new language tags of the 
+	BCP-47 includes sub-tags that represent various regional or special 
+	variants, as well as script difference. For example, <code>ES-005</code> 
+	stands for Latin-America Spanish, <code>zh-Hant-tw</code> for Traditional 
+	Chinese used in Taiwan, etc. For more information about BCP-47 see
+	<a href="http://www.w3.org/International/articles/bcp47/">
+	http://www.w3.org/International/articles/bcp47</a>. The terms <b>locale</b> 
+	and <b>language</b> used interchangeably in Rainbow&#39;s interface.</p>
+</blockquote>
 <p>When used as an input encoding, the encoding defined here and in the <cite>
 <a href="inputDocProp.html">Input Document Properties</a></cite> dialog, may be 
 superseded by the encoding automatically detected in the input file.</p>

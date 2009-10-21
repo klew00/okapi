@@ -162,7 +162,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 						break;
 					case TextFragment.MARKER_CLOSING:
 						code = frag.getCode(text.charAt(++i));
-						tmp.append(String.format("<ept i=\"%d\"/>", code.getId()));
+						tmp.append(String.format("<ept i=\"%d\"/>", code.getId()-1));
 						break;
 					case TextFragment.MARKER_ISOLATED:
 						code = frag.getCode(text.charAt(++i));
@@ -224,83 +224,83 @@ public class GlobalSightTMConnector implements ITMQuery {
 		return results.size();
 	}
 
-	public int queryV5 (TextFragment frag) {
-		/* The GlobalSight TM Web service does not support query with inline codes
-		 * for the time being (v7.1.3), so we query plain text to get the best match 
-		 * possible. But queries with codes will never get an exact match even if one 
-		 * exists in the TM.
-		 */
-		results.clear();
-		if ( !frag.hasText() ) return 0;
-		try {
-			String qtext = frag.getCodedText();
-			StringBuilder tmpCodes = new StringBuilder();
-			if ( frag.hasCode() ) {
-				StringBuilder tmpText = new StringBuilder();
-				for ( int i=0; i<qtext.length(); i++ ) {
-					switch ( qtext.charAt(i) ) {
-					case TextFragment.MARKER_OPENING:
-					case TextFragment.MARKER_CLOSING:
-					case TextFragment.MARKER_ISOLATED:
-					case TextFragment.MARKER_SEGMENT:
-						tmpCodes.append(qtext.charAt(i));
-						tmpCodes.append(qtext.charAt(++i));
-						break;
-					default:
-						tmpText.append(qtext.charAt(i));
-					}
-				}
-				qtext = tmpText.toString();
-			}
-
-			String xmlRes = gsWS.searchEntries(gsToken, gsTmProfile, qtext, srcLang);
-			Document doc = docBuilder.parse(new InputSource(new StringReader(xmlRes)));
-			NodeList list1 = doc.getElementsByTagName("entry");
-			Element elem;
-			NodeList list2;
-			NodeList list3;
-			QueryResult res;
-			for ( int i=0; i<list1.getLength(); i++ ) {
-				if ( i >= maxHits ) break;
-				
-				elem = (Element)list1.item(i);
-				list2 = elem.getElementsByTagName("percentage");
-				res = new QueryResult();
-				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
-				if ( res.score < threshold ) continue;
-				
-				list2 = elem.getElementsByTagName("source");
-				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
-				res.source = readSegment((Element)list3.item(0), frag);
-
-				list2 = elem.getElementsByTagName("target");
-				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
-				res.target = readSegment((Element)list3.item(0), frag);
-				
-				// Query is done without codes, so any exact match result from a text
-				// with codes should be down-graded
-				if ( frag.hasCode() && res.score >= 100 ) {
-					res.score = 99;
-				}
-				results.add(res);
-			}
-
-		}
-		catch ( WebServiceException e ) {
-			throw new RuntimeException("Error querying TM.", e);
-		}
-		catch ( RemoteException e ) {
-			throw new RuntimeException("Error querying TM.", e);
-		}
-		catch ( SAXException e ) {
-			throw new RuntimeException("Error with query results.", e);
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException("Error with query results.", e);
-		}
-		if ( results.size() > 0 ) current = 0;
-		return results.size();
-	}
+//	public int queryV5 (TextFragment frag) {
+//		/* The GlobalSight TM Web service does not support query with inline codes
+//		 * for the time being (v7.1.3), so we query plain text to get the best match 
+//		 * possible. But queries with codes will never get an exact match even if one 
+//		 * exists in the TM.
+//		 */
+//		results.clear();
+//		if ( !frag.hasText() ) return 0;
+//		try {
+//			String qtext = frag.getCodedText();
+//			StringBuilder tmpCodes = new StringBuilder();
+//			if ( frag.hasCode() ) {
+//				StringBuilder tmpText = new StringBuilder();
+//				for ( int i=0; i<qtext.length(); i++ ) {
+//					switch ( qtext.charAt(i) ) {
+//					case TextFragment.MARKER_OPENING:
+//					case TextFragment.MARKER_CLOSING:
+//					case TextFragment.MARKER_ISOLATED:
+//					case TextFragment.MARKER_SEGMENT:
+//						tmpCodes.append(qtext.charAt(i));
+//						tmpCodes.append(qtext.charAt(++i));
+//						break;
+//					default:
+//						tmpText.append(qtext.charAt(i));
+//					}
+//				}
+//				qtext = tmpText.toString();
+//			}
+//
+//			String xmlRes = gsWS.searchEntries(gsToken, gsTmProfile, qtext, srcLang);
+//			Document doc = docBuilder.parse(new InputSource(new StringReader(xmlRes)));
+//			NodeList list1 = doc.getElementsByTagName("entry");
+//			Element elem;
+//			NodeList list2;
+//			NodeList list3;
+//			QueryResult res;
+//			for ( int i=0; i<list1.getLength(); i++ ) {
+//				if ( i >= maxHits ) break;
+//				
+//				elem = (Element)list1.item(i);
+//				list2 = elem.getElementsByTagName("percentage");
+//				res = new QueryResult();
+//				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
+//				if ( res.score < threshold ) continue;
+//				
+//				list2 = elem.getElementsByTagName("source");
+//				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
+//				res.source = readSegment((Element)list3.item(0), frag);
+//
+//				list2 = elem.getElementsByTagName("target");
+//				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
+//				res.target = readSegment((Element)list3.item(0), frag);
+//				
+//				// Query is done without codes, so any exact match result from a text
+//				// with codes should be down-graded
+//				if ( frag.hasCode() && res.score >= 100 ) {
+//					res.score = 99;
+//				}
+//				results.add(res);
+//			}
+//
+//		}
+//		catch ( WebServiceException e ) {
+//			throw new RuntimeException("Error querying TM.", e);
+//		}
+//		catch ( RemoteException e ) {
+//			throw new RuntimeException("Error querying TM.", e);
+//		}
+//		catch ( SAXException e ) {
+//			throw new RuntimeException("Error with query results.", e);
+//		}
+//		catch ( IOException e ) {
+//			throw new RuntimeException("Error with query results.", e);
+//		}
+//		if ( results.size() > 0 ) current = 0;
+//		return results.size();
+//	}
 
 	public int query (String plainText) {
 		try {
