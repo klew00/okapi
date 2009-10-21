@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Pensieve TM
 Bundle-SymbolicName: net.sf.okapi.tm.pensieve
-Bundle-Version: 0.0.1-SNAPSHOT
+Bundle-Version: 0.0.1
 Require-Bundle: org.apache.lucene;bundle-version="2.9.0",
  net.sf.okapi.common;bundle-version="1.0.0"
 Export-Package: net.sf.okapi.tm.pensieve.common,
