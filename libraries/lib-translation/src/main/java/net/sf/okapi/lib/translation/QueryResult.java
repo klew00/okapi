@@ -53,6 +53,13 @@ public class QueryResult implements Comparable<QueryResult> {
 	public int connectorId;
 
 	/**
+	 * String indicating the origin of the result (e.g. name of a TM).
+	 * This value can be null and depends on each type of resource.
+	 * It should be set to {@link IQuery.ORIGIN_MT} for results of machine translation. 
+	 */
+	public String origin;
+	
+	/**
 	 * Compares this QueryResult with another one.
 	 * The weight is used for the comparison.
 	 * @param other The other QueryResult to compare this one with.

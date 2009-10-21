@@ -160,6 +160,7 @@ public class ApertiumMTConnector implements IQuery {
 	        
 	        result = new QueryResult();
 	        result.score = 95; // Fixed score for MT
+	        result.origin = IQuery.ORIGIN_MT;
         	result.source = frag;
 			if ( frag.hasCode() ) {
 				result.target = new TextFragment(store.fromCodedHTML(transText, frag),

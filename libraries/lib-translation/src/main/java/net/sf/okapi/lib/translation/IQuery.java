@@ -29,6 +29,11 @@ import net.sf.okapi.common.resource.TextFragment;
  * that can be queried for translating text units. 
  */
 public interface IQuery {
+
+	/**
+	 * Shared flag indicating a result that was generated using machine translation.
+	 */
+	public static final String ORIGIN_MT = "MT!";
 	
 	/**
 	 * Gets the name of the connector.

@@ -60,8 +60,8 @@ public class Parameters extends BaseParameters {
 		sourceSRX = "";
 		targetSRX = "";
 		preTranslate = false;
-		useFileName = true;
-		useGroupName = true;
+		useFileName = false;
+		useGroupName = false;
 		protectAccepted = true;
 		xliffOptions = new Options();
 		threshold = 95;

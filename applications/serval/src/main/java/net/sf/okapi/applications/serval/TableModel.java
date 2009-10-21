@@ -41,7 +41,8 @@ public class TableModel {
 			qr = qm.next();
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(0, String.format("%d", qr.score));
-			item.setText(1, qm.getName(qr.connectorId));
+			item.setText(1, String.format("%s (%s)", qm.getName(qr.connectorId),
+				(qr.origin==null ? "" : qr.origin)));
 			item.setText(2, fmt.setContent(qr.source).toString());
 			item.setText(3, fmt.setContent(qr.target).toString());
 		}

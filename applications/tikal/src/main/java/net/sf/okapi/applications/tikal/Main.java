@@ -847,7 +847,7 @@ public class Main {
 			QueryResult qr;
 			while ( conn.hasNext() ) {
 				qr = conn.next();
-				ps.println(String.format("score: %d", qr.score));
+				ps.println(String.format("score: %d, origin: '%s'", qr.score, (qr.origin==null ? "" : qr.origin)));
 				ps.println(String.format("  Source: \"%s\"", qr.source.toString()));
 				ps.println(String.format("  Target: \"%s\"", qr.target.toString()));
 			}

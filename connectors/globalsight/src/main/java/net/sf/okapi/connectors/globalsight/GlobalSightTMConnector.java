@@ -184,8 +184,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 			Document doc = docBuilder.parse(new InputSource(new StringReader(xmlRes)));
 			NodeList list1 = doc.getElementsByTagName("entry");
 			Element elem;
-			NodeList list2;
-			NodeList list3;
+			NodeList list2, list3;
 			QueryResult res;
 			for ( int i=0; i<list1.getLength(); i++ ) {
 				if ( i >= maxHits ) break;
@@ -196,6 +195,9 @@ public class GlobalSightTMConnector implements ITMQuery {
 				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
 				if ( res.score < threshold ) continue;
 				
+				list2 = elem.getElementsByTagName("tm");
+				res.origin = Util.getTextContent(list2.item(0));
+
 				list2 = elem.getElementsByTagName("source");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
 				res.source = readSegment((Element)list3.item(0), frag);
@@ -203,6 +205,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 				list2 = elem.getElementsByTagName("target");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
 				res.target = readSegment((Element)list3.item(0), frag);
+
 
 				results.add(res);
 			}

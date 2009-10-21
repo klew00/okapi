@@ -149,6 +149,7 @@ public class GoogleMTConnector implements IQuery {
 				return 0;
 			}
 			result.score = 95; // Arbitrary score for MT
+			result.origin = IQuery.ORIGIN_MT;
 			current = 0;
 		}
 		catch ( Throwable e ) {
