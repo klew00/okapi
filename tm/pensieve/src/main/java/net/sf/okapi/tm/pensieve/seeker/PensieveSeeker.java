@@ -428,7 +428,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 			// sort TmHits on TmMatchType, Score and Source String
 			Collections.sort(tmhits);
-			
 			// remove duplicate hits
 			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));				
 		} catch (IOException e) {

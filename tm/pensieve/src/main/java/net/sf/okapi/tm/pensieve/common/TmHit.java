@@ -101,10 +101,9 @@ public class TmHit implements Comparable<TmHit> {
 			return comparison;
 
 		// compare score
-		if (this.score > other.getScore())
-			return BEFORE;
-		if (this.score < other.getScore())
-			return AFTER;
+		comparison = Float.compare(this.score, other.getScore());
+		if (comparison != EQUAL)
+			return comparison * -1;;  // we want to reverse the normal score sort
 
 		// compare source strings with codes
 		comparison = thisSource.compareTo(otherSource);
