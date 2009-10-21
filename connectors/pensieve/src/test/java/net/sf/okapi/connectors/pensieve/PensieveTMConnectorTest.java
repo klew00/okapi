@@ -184,14 +184,19 @@ public class PensieveTMConnectorTest {
 	public void testGetAlmostExactMatchWithCodes () {
 		TextFragment tf = createElephantsFragment();
 		connector.setThreshold(99);
-		assertTrue(connector.query(tf) > 1);
+		assertTrue(connector.query(tf) == 3);
+
+		// First exact
 		QueryResult qr = connector.next();
-		assertEquals(tf.toString(), qr.source.toString());
-		assertEquals("Les \u00e9l\u00e9phants <b>ne peuvent pas</b> voler.", qr.target.toString());
 		assertEquals(100, qr.score);
+		
+		// Second exact
 		qr = connector.next();
-		assertEquals("Les \u00e9l\u00e9phants <g0>ne peuvent pas</g0> voler.", qr.target.toString());
-		assertEquals(99, qr.score);
+		assertEquals(100, qr.score);
+		
+		// Fuzzy
+		qr = connector.next();
+		assertTrue(qr.score!=100);
 	}
 
 	private TextFragment createElephantsFragment () {
