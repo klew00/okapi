@@ -27,6 +27,7 @@ localization-related utilities:</p>
 	<li><a href="#conv2table">Convert to Table Format</a></li>
 	<li><a href="#penImport">Import into Pensieve TM</a></li>
 	<li><a href="#penExport">Export TMX from Pensieve TM</a></li>
+	<li><a href="#transResDetails">Translation Resources Details</a></li>
 </ul>
 <p>Note: The command <code>-e</code> (Edit Filter Configurations) requires 
 access to UI editors that are available only if you have one of the <b>okapi-apps</b> platform-specific distributions. It is not 
@@ -92,11 +93,17 @@ XLIFF 1.2 specifications</a>.</p>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-pen tmDirectory|<br>
 		-tt hostname[:port]|<br>
+		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
 		-apertium&nbsp;[serverURL]</code></td>
 		<td align="left" valign="top">A translation resource to use to 
-		pre-translate the extracted document. The leveraging occurs after 
+		translate the document: <a href="#pensieve"><code>-pen</code> for a 
+		Pensieve TM</a>, <a href="#translatetoolkit"><code>-tt</code> for a 
+		Translate Toolkit TM</a>, <a href="#globalsight"><code>-gs</code> for a 
+		GlobalSight TM</a>, <a href="#mymemory"><code>-mm</code> for MyMemory 
+		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>, 
+		and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -236,11 +243,17 @@ file must be in SRX format.</p>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-pen tmDirectory|<br>
 		-tt hostname[:port]|<br>
+		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
 		-apertium&nbsp;[serverURL]</code></td>
 		<td align="left" valign="top">A translation resource to use to 
-		translate the document. The leveraging occurs after 
+		translate the document: <a href="#pensieve"><code>-pen</code> for a 
+		Pensieve TM</a>, <a href="#translatetoolkit"><code>-tt</code> for a 
+		Translate Toolkit TM</a>, <a href="#globalsight"><code>-gs</code> for a 
+		GlobalSight TM</a>, <a href="#mymemory"><code>-mm</code> for MyMemory 
+		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>, 
+		and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -268,13 +281,13 @@ directory, using the default Apertium MT demonstration server. No segmentation
 is used.</p>
 <h2><a name="query"></a>Query Translation Resources</h2>
 <p>This command queries one or more translation resources for a given text. By 
-default the query is sent to the <a href="http://www.google.com/language_tools">
-Google MT engine</a>, but you can also query the <a href="http://open-tran.eu/">
-Open-Tran repository</a>, the <a href="http://mymemory.translated.net/">MyMemory 
-repository</a>, as well as any
-<a href="http://translate.sourceforge.net/wiki/toolkit/tmserver">Translate 
-Toolkit TM server</a>. The three first require an Internet 
-connection. The last can be access locally if the server runs on your machine.</p>
+default the query is sent to the <a href="#google">Google MT engine</a>, but you can also query
+<a href="#pensieve">Pensieve TMs</a>, <a href="#globalsight">GlobalSight TMs</a>,
+<a href="#translatetoolkit">Translate Toolkit TMs</a>, the <a href="#opentran">Open-Tran repository</a>, the 
+<a href="#mymemory">MyMemory 
+repository</a>, as well as any <a href="#apertium">Apertium MT server</a>. See 
+the section <a href="#transResDetails">Translation Resources Details</a> for 
+more information.</p>
 <p>You can query 
 all resources at once. When querying several resources, the results are shown 
 per resource, not sorted by best score as a whole.</p>
@@ -293,34 +306,40 @@ per resource, not sorted by best score as a whole.</p>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-pen directory</code></td>
-		<td align="left" valign="top">Query a Pensieve TM stored in a given 
+		<td align="left" valign="top">Query a <a href="#pensieve">Pensieve TM</a> stored in a given 
 		directory.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-opentran</code></td>
-		<td align="left" valign="top">Query the OpenTran translation repository. This requires Internet 
+		<td align="left" valign="top">Query the <a href="#opentran">OpenTran translation repository</a>. This requires Internet 
 		access.</td>
 	</tr>
 	<tr>
+		<td align="left" valign="top" nowrap><code>-gs configFile</code></td>
+		<td align="left" valign="top">Query a <a href="#globalsight">GlobalSight 
+		TM server</a>. This requires Internet access.</td>
+	</tr>
+	<tr>
 		<td align="left" valign="top" nowrap><code>-tt hostname[:port]</code></td>
-		<td align="left" valign="top">Query the specified Translate Toolkit TM server. This assumes you 
+		<td align="left" valign="top">Query the specified 
+		<a href="#translatetoolkit">Translate Toolkit TM server</a>. This assumes you 
 		have access to the server (local or remote).</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-mm key</code></td>
-		<td align="left" valign="top">Query the MyMemory translation repository 
+		<td align="left" valign="top">Query the <a href="#mymemory">MyMemory translation repository</a> 
 		with a given key access (use <code>mmDemo123</code> for demo). This 
 		requires Internet access.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-google</code></td>
-		<td align="left" valign="top">Query the Google MT system. If no other type of resource is 
+		<td align="left" valign="top">Query the <a href="#google">Google MT system</a>. If no other type of resource is 
 		specified, this is used by default. This requires Internet access.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-apertium [serverURL]</code></td>
 		<td align="left" valign="top">
-		<p dir="ltr">Query the specified Apertium MT server (local or remote). A 
+		<p dir="ltr">Query the specified <a href="#apertium">Apertium MT server</a> (local or remote). A 
 		default remote server is provided.</td>
 	</tr>
 	<tr>
@@ -341,7 +360,6 @@ codes: For example, in &quot;<code>Open the &lt;x&gt;window&lt;/x&gt;&lt;x/&gt;.
 closing and placeholder inline codes, and the query processed as such. When 
 querying resources that are not inline code-aware, the tags are treated as plain 
 text.</p>
-<p>The resources that are inline code-aware are: Pensieve, GlobalSight, Apertium and Google</p>
 <p>For example:</p>
 <pre>tikal -q &quot;open file&quot; -sl en</pre>
 <p>Queries the default translation resource (Google MT system) for the text 
@@ -608,6 +626,88 @@ TM entries in table, TMX or PO format using the filter configuration <code>
 okf_pensieve</code>. For instance, the example above can be also execute using 
 the following command:</p>
 <pre>tikal -2tmx myProjectTM -fc okf_pensieve -sl en -tl IT</pre>
+<h2><a name="transResDetails"></a>Translation Resources Details</h2>
+<p>Tikal provides access to several translation resources, some are machine 
+translation system (MT), some are translation memory system, or some kind or 
+other searchable translation repository. Some of these resources are Web-based, 
+other can be installed and used locally.</p>
+<h3><a name="pensieve"></a>Pensieve TM</h3>
+<p>This is the framework&#39;s own TM engine. This is still under development, but 
+can be used. This resource is indicated by the&nbsp; option <code>-pen</code> in 
+Tikal and takes one argument: the directory of the TM:</p>
+<pre>tikal -q &quot;text to search&quot; -pen myTmDir</pre>
+<h3><a name="translatetoolkit"></a>Translate Toolkit TM</h3>
+<p>The Translate Toolkit TM is an engine that comes with the Translate Toolkit, 
+a nicely designed and well supported set of open-source localization tools. You 
+can run the tool called <code>tmserver</code> on your own machine, or use it 
+through the Web. You can find more information about the Translate Toolkit here:
+<a href="http://translate.sourceforge.net/wiki/toolkit/index">
+http://translate.sourceforge.net/wiki/toolkit/index</a> and the help for <code>
+tmserver</code> is here:
+<a href="http://translate.sourceforge.net/wiki/toolkit/tmserver">
+http://translate.sourceforge.net/wiki/toolkit/tmserver</a>.</p>
+<p>Note that the Translate Toolkit TM can take PO files as input. You can create 
+such PO file from TMX or other formats using the <a href="#conv2po">Convert to 
+PO Format command</a>.</p>
+<p>This resource is indicated by the option <code>-tt</code> in Tikal and takes 
+one argument: the host of the server, and optionally the port to use. Use <code>
+localhost</code> for a server running locally. If the port is omitted it is set 
+to 8080 by default.</p>
+<pre>tikal -q &quot;text to search&quot; -tt localhost</pre>
+<h3><a name="globalsight"></a>GlobalSight TM</h3>
+<p>The GlobalSight TM engine is part of the open-source GlobalSight System. You 
+need to have access to server with the system installed in order to use this 
+resource. You can find more information about the GlobalSight TMS here:
+<a href="http://www.globalsight.com/">http://www.globalsight.com/</a></p>
+<p>This resource indicated by the option <code>-gs</code> in Tikal and takes one 
+argument: a configuration file that contains the information about the server to 
+connect to, username and password, as well as the TM profile to use. The 
+configuration file must look like this:</p>
+<pre>#v1
+username=myusername
+password=mypassword
+serverURL=http://myhost:8080/globalsight/services/AmbassadorWebService?wsdl
+tmProfile=myprofile</pre>
+<h3><a name="opentran"></a>Open-Tran Translation Repository</h3>
+<p dir="ltr">The Open-Tran project is a open-source repository of translations 
+of open-source software. It provides access to its entries through Web services. 
+You can find more information about Open-Tran here:
+<a href="http://open-tran.eu/">http://open-tran.eu/</a></p>
+<p dir="ltr">This resource is indicated by the option <code>-opentran</code> in 
+Tikal (without argument). Note that the results returned by the Open-Tran server 
+have no meangingful scores from a TM viewpoint, so the Okapi connector 
+recalculate, re-sort and re-filter the results. Note also that this resource is 
+available only for the <a href="#query">Query command</a>, it would be too slow 
+to use for the other commands.</p>
+<pre dir="ltr">tikal -q &quot;text to search&quot; -opentran</pre>
+<h3><a name="mymemory"></a>MyMemory TM</h3>
+<p>The MyMemory project is a central repository of public and private TMs. It 
+offers access through a Web service interface, and can provide MT fall-back 
+translation when no good matches are found. You can find more information about 
+MyMemory here: <a href="http://mymemory.translated.net/">
+http://mymemory.translated.net/</a></p>
+<p>This resources is indicated by the option <code>-mm</code> and takes one 
+argument: an access key. You can use the default access key <code>mmDemo123</code> 
+for testing the resource. For real work you may want to open an account at 
+MyMemory.</p>
+<pre>tikal -q &quot;text to search&quot; -mm mmDemo123</pre>
+<h3><a name="google"></a>Google MT</h3>
+<p>The Google MT engine is well-known and widely used. Okapi provides a 
+connector for the Ajax API. You can find more information about Google MT here:
+<a href="http://code.google.com/apis/ajaxlanguage/">
+http://code.google.com/apis/ajaxlanguage/</a>.</p>
+<p>This resource is indicated by the option <code>-google</code> in Tikal 
+(without argument). It is the default for the <a href="#query">Query command</a>.</p>
+<pre>tikal -q &quot;text to search&quot; -google</pre>
+<h3><a name="apertium"></a>Apertium MT</h3>
+<p>Apertium is an open-source Rule-based MT project. It provides translation for 
+many language pairs, including for less-common languages such as Catalan, 
+Galician, Welsh, Esperanto, Occitan, etc. You can find more information about 
+Apertium here: <a href="http://wiki.apertium.org/">http://wiki.apertium.org/</a>.</p>
+<p>This resource is indicated by the option <code>-apertium</code> and takes one 
+optional argument: the URL of the server. If the argument is omitted, the 
+default server is set to use the main public apertium.org server.</p>
+<pre>tikal -q &quot;text to search&quot; -apertium</pre>
 <p>&nbsp;</p>
 
 </body>

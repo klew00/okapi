@@ -154,18 +154,18 @@ public class XLIFFFilterTest {
 			+ "<xliff version=\"1.2\">"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "\r<body>"
-			+ "<trans-unit id=\"1\">"
-			+ "<source>t1. t2</source>"
-			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
+			+ "<trans-unit id=\"1\" xml:space=\"preserve\">"
+			+ "<source>t1.   t2</source>"
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
 			+ "</trans-unit></body></file></xliff>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "\r<body>"
-			+ "<trans-unit id=\"1\">"
-			+ "<source>t1. t2</source>"
-			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
-			+ "<target xml:lang=\"fr\">t1. t2</target>"
+			+ "<trans-unit id=\"1\" xml:space=\"preserve\">"
+			+ "<source>t1.   t2</source>"
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
+			+ "<target xml:lang=\"fr\">t1.   t2</target>"
 			+ "\r</trans-unit></body></file></xliff>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locFR));
 	}
