@@ -331,13 +331,6 @@
 		<echo file="tmpJars" append="yes"> ${jar020}</echo>
 		<copy todir="${distLib}" file="${dep020}/${jar020}"/>
 
-		<property name="dep021" value="${mavenStore}/org/apache/lucene/lucene-queries/2.9.0"/>
-		<fileset id="list.contents" dir="${dep021}"
-		 includes="**/*2.9.0.jar"/>
-		<property name="jar021" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar021}</echo>
-		<copy todir="${distLib}" file="${dep021}/${jar021}"/>
-
 		<!-- Create the manifest file -->
 		<property file="tmpJars"/>
 		<copy todir="${tmp}/META-INF">

@@ -33,6 +33,7 @@ import org.json.simple.parser.JSONParser;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -149,7 +150,7 @@ public class GoogleMTConnector implements IQuery {
 				return 0;
 			}
 			result.score = 95; // Arbitrary score for MT
-			result.origin = IQuery.ORIGIN_MT;
+			result.origin = Util.ORIGIN_MT;
 			current = 0;
 		}
 		catch ( Throwable e ) {

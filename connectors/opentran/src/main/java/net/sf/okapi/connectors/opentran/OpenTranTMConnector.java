@@ -70,7 +70,7 @@ public class OpenTranTMConnector implements ITMQuery {
 	}
 	
 	public String getName () {
-		return "OpenTran-Repository";
+		return "OpenTran";
 	}
 
 	public String getSettingsDisplay () {

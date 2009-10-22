@@ -472,7 +472,7 @@ public class QueryManager {
 				
 				// Process results
 				if ( count == 0 ) {
-					scores.add(0);
+					scores.add(0, null);
 					continue;
 				}
 				qr = next();
@@ -481,23 +481,23 @@ public class QueryManager {
 					// Check if they are several and if they have the same translation
 					if ( !exactsHaveSameTranslation() ) {
 						if ( threshold == 100 ) {
-							scores.add(0);
+							scores.add(0, null);
 							continue;
 						}
 						// If we do: Use the first one and lower the score to 99%
-						scores.add(99);
+						scores.add(99, qr.origin);
 						segment.text = adjustNewFragment(segment.text, qr.source, qr.target, true, tu); //qr.target; 
 						leveraged++;
 						continue;
 					}
 					// Else: First is 100%, possibly several that have the same translations
-					scores.add(qr.score); // That's 100% then
+					scores.add(qr.score, qr.origin); // That's 100% then
 					segment.text = adjustNewFragment(segment.text, qr.source, qr.target, true, tu); //qr.target;
 					leveraged++;
 					continue;
 				}
 				// First is not 100%: use it and move on
-				scores.add(qr.score);
+				scores.add(qr.score, qr.origin);
 				segment.text = adjustNewFragment(segment.text, qr.source, qr.target, true, tu);
 				leveraged++;
 			}
@@ -512,13 +512,13 @@ public class QueryManager {
 			
 			// Process results
 			if ( count == 0 ) {
-				scores.add(0);
+				scores.add(0, null);
 			}
 			else {
 				qr = next();
 				// First is not 100%: use it and move on
 				if ( qr.score < 100 ) {
-					scores.add(qr.score);
+					scores.add(qr.score, qr.origin);
 					tc.setCodedText(qr.target.getCodedText(), false);
 					makeSS = true;
 				}
@@ -526,18 +526,18 @@ public class QueryManager {
 				// Check if they are several and if they have the same translation
 				else if ( !exactsHaveSameTranslation() ) {
 					if ( threshold >= 100 ) {
-						scores.add(0);
+						scores.add(0, null);
 					}
 					else {
 						// If we do: Use the first one and lower the score to 99%
-						scores.add(99);
+						scores.add(99, qr.origin);
 						tc.setCodedText(qr.target.getCodedText(), false);
 						makeSS = true;
 					}
 				}
 				// Else: Only one 100% or several that have the same translations
 				else {
-					scores.add(qr.score); // That's 100% then
+					scores.add(qr.score, qr.origin); // That's 100% then
 					tc.setCodedText(qr.target.getCodedText(), false);
 					makeSS = true;
 				}

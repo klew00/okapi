@@ -31,11 +31,6 @@ import net.sf.okapi.common.resource.TextFragment;
 public interface IQuery {
 
 	/**
-	 * Shared flag indicating a result that was generated using machine translation.
-	 */
-	public static final String ORIGIN_MT = "MT!";
-	
-	/**
 	 * Gets the name of the connector.
 	 * @return the name of the connector.
 	 */

@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.annotation.ScoreInfo;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
@@ -246,17 +247,35 @@ public class TMXWriter {
     		// Write the segments
     		List<Segment> srcList = srcTC.getSegments();
     		List<Segment> trgList = trgTC.getSegments();
+    		ScoreInfo si;
     		for ( int i = 0; i < srcList.size(); i++ ) {
     			if ( scores != null ) {
     				// Skip segments not leveraged
-    				if ( scores.getScore(i) == 0 ) {
+    				si = scores.get(i);
+    				if ( si.score == 0 ) {
     					continue;
     				}
+    				if (( si.origin != null ) && si.origin.equals(Util.ORIGIN_MT) ) {
+    					TextFragment tf = srcList.get(i).text.clone();
+    					tf.setCodedText(Util.ORIGIN_MT+" "+tf.getCodedText());
+            			writeTU(tf,
+               				(i > trgList.size() - 1) ? null : trgList.get(i).text,
+               				String.format("%s_s%02d", tuid, i + 1),
+               				attributes);
+    				}
+    				else {
+    					writeTU(srcList.get(i).text,
+    						(i > trgList.size() - 1) ? null : trgList.get(i).text,
+    						String.format("%s_s%02d", tuid, i + 1),
+    						attributes);
+    				}
     			}
-    			writeTU(srcList.get(i).text,
-    				(i > trgList.size() - 1) ? null : trgList.get(i).text,
-    				String.format("%s_s%02d", tuid, i + 1),
-    				attributes);
+    			else {
+    				writeTU(srcList.get(i).text,
+    					(i > trgList.size() - 1) ? null : trgList.get(i).text,
+    					String.format("%s_s%02d", tuid, i + 1),
+    					attributes);
+    			}
     		}
     	}
     	// Else no TMX output needed for source segmented but not target

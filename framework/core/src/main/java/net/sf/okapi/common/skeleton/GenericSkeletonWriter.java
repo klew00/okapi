@@ -399,15 +399,27 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 					trgFrag = trgSegs.get(n).text;
 					if ( scores != null ) lev = scores.getScore(n);
 				}
-				//TODO: Else, source/target segments do not match
+				if ( trgFrag == null ) { // No target available: use the source
+					trgFrag = srcSegs.get(n).text;
+				}
 				// Write it
 				if ( layer == null ) {
-					if ( trgFrag == null ) {
-						tmp.append(getContent(srcSegs.get(n).text, null, context));
+					// Get the inter-segment characters at the end of the segment
+					// So derived writers can treat all chars in getContent()
+					// i currently points to the index of the segment marker
+					int j; // Move forward until we found a marker or the end of the text
+					for ( j=1; i+j<text.length(); j++ ) {
+						if ( TextFragment.isMarker(text.charAt(i+j)) ) {
+							break;
+						}
+					} // Now j-1 should be the number of characters to add
+					if ( j > 1 ) {
+						trgFrag = trgFrag.clone(); // Make sure we don't change the original
+						trgFrag.append(text.substring(i+1, i+j));
+						i += (j-1); // Move the pointer at the last char we put in the segment
 					}
-					else { // No target available: use the source
-						tmp.append(getContent(trgFrag, langToUse, context));
-					}
+					// Now get the content for the segment
+					tmp.append(getContent(trgFrag, langToUse, context));
 				}
 				else {
 					switch ( context ) {

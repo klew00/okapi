@@ -28,6 +28,7 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Writer {
@@ -102,14 +103,16 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			List<Segment> srcList = srcTC.getSegments();
 			List<Segment> trgList = trgTC.getSegments();
 			for ( int i=0; i<srcList.size(); i++ ) {
-				if ( scores.getScore(i) == 100 ) {
+				if ( scores.getScore(i) >= 100 ) {
 					tmxWriterApproved.writeTU(srcList.get(i).text,
 						(i>trgList.size()-1) ? null : trgList.get(i).text,
 						String.format("%s_s%02d", tuid, i+1),
 						null);
 				}
 				else if ( scores.getScore(i) > 0 ) {
-					tmxWriterLeverage.writeTU(srcList.get(i).text,
+					TextFragment tf = srcList.get(i).text.clone();
+					tf.setCodedText(Util.ORIGIN_MT+" "+tf.getCodedText());
+					tmxWriterLeverage.writeTU(tf,
 						(i>trgList.size()-1) ? null : trgList.get(i).text,
 						String.format("%s_s%02d", tuid, i+1),
 						null);

@@ -27,6 +27,7 @@ import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.ScoreInfo;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.Property;
@@ -254,9 +255,9 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( cont != null ) {
 				ScoresAnnotation scores = cont.getAnnotation(ScoresAnnotation.class);
 				if ( scores != null ) {
-					for ( int score : scores.getList() ) {
-						if ( score > 99 ) htmlRpt.addExactMatch(1);
-						else if ( score != 0 ) htmlRpt.addFuzzyMatch(1);
+					for ( ScoreInfo si : scores.getList() ) {
+						if ( si.score > 99 ) htmlRpt.addExactMatch(1);
+						else if ( si.score != 0 ) htmlRpt.addFuzzyMatch(1);
 					}
 				}
 			}

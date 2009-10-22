@@ -68,6 +68,12 @@ public class Util {
 
 	private static final String NEWLINES_REGEX = "\r(\n)?";
 	private static final Pattern NEWLINES_REGEX_PATTERN = Pattern.compile(NEWLINES_REGEX);
+	
+	/**
+	 * Shared flag indicating a translation that was generated using machine translation.
+	 */
+	public static final String ORIGIN_MT = "MT!";
+	
 
 	// Used by openURL()
 	private static final String[] browsers = { "firefox", "opera", "konqueror", "epiphany",

@@ -37,7 +37,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
@@ -133,7 +132,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 					if ( ++i > maxHits ) break; // Maximum reached
 					res = new QueryResult();
 					if ( match.getTranslator().equals("MT!") ) {
-						res.origin = IQuery.ORIGIN_MT;
+						res.origin = Util.ORIGIN_MT;
 						res.score = 95; // Standard score for MT
 					}
 					else res.score = match.getScore();

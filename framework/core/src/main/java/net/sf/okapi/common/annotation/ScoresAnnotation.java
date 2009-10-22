@@ -31,21 +31,23 @@ import net.sf.okapi.common.annotation.IAnnotation;
  */
 public class ScoresAnnotation implements IAnnotation {
 
-	private List<Integer> list;
+	private List<ScoreInfo> list;
 	
 	/**
 	 * Creates a new ScoresAnnotation object.
 	 */
 	public ScoresAnnotation () {
-		list = new ArrayList<Integer>();
+		list = new ArrayList<ScoreInfo>();
 	}
 	
 	/**
 	 * Adds a new score to the list.
 	 * @param value The score to add.
 	 */
-	public void add (int value) {
-		list.add(value);
+	public void add (int value,
+		String origin)
+	{
+		list.add(new ScoreInfo(value, origin));
 	}
 	
 	/**
@@ -54,21 +56,39 @@ public class ScoresAnnotation implements IAnnotation {
 	public void clear () {
 		list.clear();
 	}
+
+	/**
+	 * Gets the score information for a given index.
+	 * @param index the index of the score to query.
+	 * @return the score information for the score to query.
+	 */
+	public ScoreInfo get (int index) {
+		return list.get(index);
+	}
 	
 	/**
 	 * Gets the score for a given index.
-	 * @param index The index of the score to query.
-	 * @return The score for the given index.
+	 * @param index the index of the score to query.
+	 * @return the score for the given index.
 	 */
 	public int getScore (int index) {
-		return list.get(index);
+		return list.get(index).score;
+	}
+	
+	/**
+	 * Gets the origin of a score for a given index. 
+	 * @param index the index of the score to query.
+	 * @return the origin for the given index, or null if there is no origin defined.
+	 */
+	public String getOrigin (int index) {
+		return list.get(index).origin;
 	}
 
 	/**
 	 * Gets the list of scores.
 	 * @return the list of scores.
 	 */
-	public List<Integer> getList () {
+	public List<ScoreInfo> getList () {
 		return list;
 	}
 
