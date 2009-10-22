@@ -65,7 +65,7 @@ public class NgramAnalyzer extends Analyzer {
 	@Override
 	public TokenStream tokenStream(String fieldName, Reader reader) {
 		if (locale.getLanguage().equalsIgnoreCase("en")) {
-			return new StopFilter(true, new AlphabeticNgramTokenizer(reader,
+			return new StopFilter(false, new AlphabeticNgramTokenizer(reader,
 					ngramLength, locale), stopNgrams);
 		}
 		return new AlphabeticNgramTokenizer(reader, ngramLength, locale);
