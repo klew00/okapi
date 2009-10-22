@@ -410,7 +410,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	    		  if (tug.equals("<w:p/>"))
 	    		  {
 	    			  bInap = false; // DWH 5-30-09
-	    			  offp += tug; // DWH 5-30-09
+	    			  offp = ""; // DWH 5-30-09
 	    			  streamTheCurrentStuff();
 	    		  }
 	    		  else
