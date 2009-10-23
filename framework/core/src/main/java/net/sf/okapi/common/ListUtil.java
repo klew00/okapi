@@ -62,7 +62,7 @@ public class ListUtil {
 
 	/**
 	 * Splits up a string of comma-separated substrings representing language codes into a string list of languages.
-	 * @param st string of comma-separated substrings. 
+	 * @param input string of comma-separated substrings. 
 	 * @return a list of languages.
 	 */
 	public static List<LocaleId> stringAsLanguageList (String input) {

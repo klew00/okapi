@@ -44,7 +44,7 @@ public class TableFilter extends CompoundFilter {
 		super();
 		
 		setName(FILTER_NAME);
-		setDisplayName("Table Filter (BETA)");
+		setDisplayName("Table Filter");
 		setMimeType(FILTER_MIME);
 		setParameters(new Parameters());	// Table Filter parameters
 

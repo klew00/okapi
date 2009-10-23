@@ -125,7 +125,7 @@ public class TmxFilter implements IFilter {
 	}
 	
 	public String getDisplayName () {
-		return "TMX Filter (BETA)";
+		return "TMX Filter";
 	}
 
 	public String getMimeType () {

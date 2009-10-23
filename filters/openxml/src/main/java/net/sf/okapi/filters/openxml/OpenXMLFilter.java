@@ -223,7 +223,7 @@ public class OpenXMLFilter implements IFilter {
 	}
 
 	public String getDisplayName () {
-		return "OpenXML Filter (BETA)";
+		return "OpenXML Filter";
 	}
 
 	public String getMimeType () {

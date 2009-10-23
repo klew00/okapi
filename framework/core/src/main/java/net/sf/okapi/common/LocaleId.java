@@ -391,7 +391,7 @@ public final class LocaleId implements Comparable<Object> {
 	/**
 	 * Indicates if a given string has the same language as the one of this LocaleId.
 	 * For example: "en" and "en-us" returns true, "es-es" and "ca-es" return false.
-	 * @param other the string to compare.
+	 * @param langCode the string to compare.
 	 * @return true if the languages of both objects are the same.
 	 */
 	public boolean sameLanguageAs (String langCode) {

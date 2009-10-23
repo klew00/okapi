@@ -65,6 +65,7 @@ public class POFilterWriter implements IFilterWriter {
 	private String linebreak;
 	private GenericContent fmt;
 	private ArrayList<TextUnit> plurals;
+	private static final String ESCAPEABLE = "\\\'\"tvabfnr"; 
 	
 	public POFilterWriter () {
 		params = new Parameters();
@@ -317,10 +318,10 @@ public class POFilterWriter implements IFilterWriter {
 
 			String tmp;
 			if ( params.outputGeneric ) {
-				tmp = fmt.setContent(tc.getContent()).toString();
+				tmp = escapeIfNeeded(fmt.setContent(tc.getContent()).toString());
 			}
 			else {
-				tmp = tc.toString();
+				tmp = escapeIfNeeded(tc.toString());
 			}
 			
 			if ( !params.wrapContent || ( tmp.indexOf("\\n") == -1 )) {
@@ -349,6 +350,42 @@ public class POFilterWriter implements IFilterWriter {
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error writing a quoted text.", e);
 		}
+	}
+
+	// We assume that if a bslash id followed by a valid escapeable char
+	// it is a valid escape.
+	// This means unescaped paths won't be escaped in some cases:
+	// c:\abc should be c:\\abc but won't because \a is valid escape
+	private String escapeIfNeeded (String in) {
+		char prev = '\0';
+		StringBuilder tmp = new StringBuilder(in.length());
+		for ( int i=0; i<in.length(); i++ ) {
+			switch ( in.charAt(i) ) {
+			case '\\':
+				if (( i < in.length()-1 ) && ( ESCAPEABLE.indexOf(in.charAt(i+1)) != -1 )) {
+					// We assume it's an escape
+					tmp.append('\\');
+					tmp.append(in.charAt(i+1));
+					i++;
+				}
+				else { // It's an isolated '\'
+					tmp.append("\\\\");
+				}
+				prev = '\0';
+				continue;
+			case '"':
+			case '\'':
+				if ( prev != '\\' ) {
+					tmp.append('\\');
+				}
+				// Fall thru
+			default:
+				tmp.append(in.charAt(i));
+				break;
+			}
+			prev = in.charAt(i);
+		}
+		return tmp.toString();
 	}
 
 	private void createWriter (StartDocument startDoc) {
@@ -398,7 +435,8 @@ public class POFilterWriter implements IFilterWriter {
 				// If the original was UTF-8 too
 				if ( "utf-8".equalsIgnoreCase(originalEnc) ) {
 					// Check whether it had a BOM or not
-					useUTF8BOM = startDoc.hasUTF8BOM();
+					// Most PO-aware tools are Linux and do not like BOM
+					useUTF8BOM = false; // startDoc.hasUTF8BOM();
 				}
 			}
 			// Write out the BOM if needed

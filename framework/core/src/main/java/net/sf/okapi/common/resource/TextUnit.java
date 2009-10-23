@@ -346,7 +346,7 @@ public class TextUnit implements INameable, IReferenceable {
 	 * Sets the target object for this TextUnit for a given language.
 	 * Any existing target object for the given language is overwritten.
 	 * To set a target object based on the source, use the
-	 * {@link #createTarget(String, boolean, int)} method.
+	 * {@link #createTarget(LocaleId, boolean, int)} method.
 	 * @param locId the target language.
 	 * @param text the target object to set.
 	 * @return the target object that has been set.

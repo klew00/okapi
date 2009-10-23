@@ -404,6 +404,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				}
 				// Write it
 				if ( layer == null ) {
+//TODO: deal with not-in segment leading text
+//TODO: deal with not-in-segment codes
 					// Get the inter-segment characters at the end of the segment
 					// So derived writers can treat all chars in getContent()
 					// i currently points to the index of the segment marker

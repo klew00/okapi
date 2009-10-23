@@ -712,8 +712,8 @@ public class TextFragment implements Comparable<Object> {
 	 * Get the text of the fragment (all codes are removed)
 	 * @return the content of fragment without codes
 	 */
-	public String getText() {		
-		if (!hasCode()) {
+	public String getText () {		
+		if ( !hasCode() ) {
 			return text.toString();
 		}
 		Matcher m = MARKERS_REGEX.matcher(new String(text));
@@ -722,10 +722,10 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Helper method that will take a coded string and return a text only version.
-	 * @param codedText - string with possible TextFragment codes
-	 * @return
+	 * @param codedText string with possible TextFragment codes.
+	 * @return the given string stripped out of any codes.
 	 */
-	public static String getText(String codedText) {
+	public static String getText (String codedText) {
 		Matcher m = MARKERS_REGEX.matcher(codedText);
 		return m.replaceAll(""); 
 	}
