@@ -44,6 +44,7 @@ public interface IWriter extends IFilterWriter {
 	 * @param packageID the package identifier.
 	 * @param sourceRoot the root folder of the original inputs.
 	 * @param preSegmented indicates if the files are pre-segmented.
+	 * @param creationTool the tool that creates the package.
 	 */
 	public void setInformation (LocaleId sourceLocale,
 		LocaleId targetLocale,
@@ -51,7 +52,8 @@ public interface IWriter extends IFilterWriter {
 		String outputDir,
 		String packageID,
 		String sourceRoot,
-		boolean preSegmented);
+		boolean preSegmented,
+		String creationTool);
 	
 	public void writeStartPackage ();
 	

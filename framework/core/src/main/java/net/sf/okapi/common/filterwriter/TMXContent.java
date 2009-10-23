@@ -21,6 +21,7 @@
 package net.sf.okapi.common.filterwriter;
 
 import java.util.List;
+import java.util.Stack;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
@@ -34,6 +35,7 @@ public class TMXContent {
 	private String codedText;
 	private List<Code> codes;
 	private boolean withTradosWorkarounds = false;
+	private boolean withOmegaTWorkarounds = false;
 	private int defaultQuoteMode = 1;
 
 	/**
@@ -55,11 +57,29 @@ public class TMXContent {
 	 * Sets the flag that indicates if the TMX generated should use workarounds so the
 	 * output can be read in some versions of Trados Translators' Workbench that have
 	 * bugs leading to the lose of data.
-	 * @param value True to use workarounds, false to not use workarounds.
+	 * @param value true to use workarounds, false to not use workarounds.
 	 */
 	public void setTradosWorkarounds (boolean value) {
 		withTradosWorkarounds = value;
 	}
+	
+	/**
+	 * Sets the flag that indicates if the TMX generated should use workarounds so the
+	 * output can be read by OmegaT. Note that for OmegaT to take the work-around
+	 * into account, the attribute <code>creationtool</code> must be set to "OmegaT".
+	 * @param value true to use workarounds, false to not use workarounds.
+	 */
+	public void setOmegaTWorkarounds (boolean value) {
+		withOmegaTWorkarounds = value;
+	}
+	
+	/**
+	 * Indicates if this formatter is set to output work-arounds specific to OmegaT.
+	 * @return true if the formatter is set for OmegaT.
+	 */
+    public boolean getOmegaTWorkarounds () {
+    	return withOmegaTWorkarounds;
+    }
 	
 	/**
 	 * Sets the default quote mode. This value is used when using {@link #toString()}
@@ -107,6 +127,11 @@ public class TMXContent {
 		int index;
 		int id;
 		Code code;
+		
+		// Variables for OmegaT work-around
+		Stack<Integer> otStack = new Stack<Integer>();
+		int otId = 0;
+
 		for ( int i=0; i<codedText.length(); i++ ) {
 			//TODO: output attribute 'type' whenever possible
 			switch ( codedText.codePointAt(i) ) {
@@ -116,20 +141,29 @@ public class TMXContent {
 				if ( code.hasAnnotation("protected") ) {
 					tmp.append("<hi type=\"protected\">");
 				}
-				//if ( code.hasData() ) {
+				else {
 					tmp.append(String.format("<bpt i=\"%d\">", code.getId()));
-					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
+					if ( withOmegaTWorkarounds ) {
+						otStack.push(otId++);
+						tmp.append(Util.escapeToXML(String.format("<g%d>", otStack.peek()), quoteMode, escapeGT, null));
+					}
+					else {
+						tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
+					}
 					tmp.append("</bpt>");
-				//}
+				}
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
-				//if ( code.hasData() ) {
-					tmp.append(String.format("<ept i=\"%d\">", code.getId()));
+				tmp.append(String.format("<ept i=\"%d\">", code.getId()));
+				if ( withOmegaTWorkarounds ) {
+					tmp.append(Util.escapeToXML(String.format("</g%d>", otStack.pop()), quoteMode, escapeGT, null));
+				}
+				else {
 					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
-					tmp.append("</ept>");
-				//}
+				}
+				tmp.append("</ept>");
 				if ( code.hasAnnotation("protected") ) {
 					tmp.append("</hi>");
 				}
@@ -153,18 +187,33 @@ public class TMXContent {
 					}
 					else {
 						tmp.append(String.format("<ph x=\"%d\">", id));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						if ( withOmegaTWorkarounds ) {
+							tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+						}
+						else {
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						}
 						tmp.append("</ph>");
 					}
 					break;
 				case OPENING:
 					tmp.append(String.format("<it x=\"%d\" pos=\"begin\">", id));
-					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+					if ( withOmegaTWorkarounds ) {
+						tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+					}
+					else {
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+					}
 					tmp.append("</it>");
 					break;
 				case CLOSING:
 					tmp.append(String.format("<it x=\"%d\" pos=\"end\">", id));
-					tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+					if ( withOmegaTWorkarounds ) {
+						tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+					}
+					else {
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+					}
 					tmp.append("</it>");
 					break;
 				case SEGMENTHOLDER: // Should not really be used

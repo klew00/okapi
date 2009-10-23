@@ -55,20 +55,20 @@ public class POFilterWriterTest {
 			+ "msgid \"'\"\\\"\r"
 			+ "msgstr \"'\"\\\"\r\r";
 		String expected = ""
-			+ "msgid \"\\'\\\"\\\\\"\r"
-			+ "msgstr \"\\'\\\"\\\\\"\r\r";
+			+ "msgid \"'\\\"\\\\\"\r"
+			+ "msgstr \"'\\\"\\\\\"\r\r";
 		String result = rewrite(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(header.replace('\n', '\r')+expected, result);
 	}
-		
+
 	@Test
 	public void testEscapesAmongAlreadyEscaped () {
 		String snippet = ""
 			+ "msgid \"' \\\\ \" \\\\\\\"\r"
 			+ "msgstr \"' \\\\ \" \\\\\\\"\r\r";
 		String expected = ""
-			+ "msgid \"\\' \\\\ \\\" \\\\\\\\\"\r"
-			+ "msgstr \"\\' \\\\ \\\" \\\\\\\\\"\r\r";
+			+ "msgid \"' \\\\ \\\" \\\\\\\\\"\r"
+			+ "msgstr \"' \\\\ \\\" \\\\\\\\\"\r\r";
 		String result = rewrite(getEvents(snippet, locEN, locFR), locFR);
 		assertEquals(header.replace('\n', '\r')+expected, result);
 	}

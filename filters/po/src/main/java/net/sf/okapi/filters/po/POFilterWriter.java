@@ -65,7 +65,7 @@ public class POFilterWriter implements IFilterWriter {
 	private String linebreak;
 	private GenericContent fmt;
 	private ArrayList<TextUnit> plurals;
-	private static final String ESCAPEABLE = "\\\'\"tvabfnr"; 
+	private static final String ESCAPEABLE = "\\\"abfnrtv"; 
 	
 	public POFilterWriter () {
 		params = new Parameters();
@@ -374,7 +374,6 @@ public class POFilterWriter implements IFilterWriter {
 				prev = '\0';
 				continue;
 			case '"':
-			case '\'':
 				if ( prev != '\\' ) {
 					tmp.append('\\');
 				}

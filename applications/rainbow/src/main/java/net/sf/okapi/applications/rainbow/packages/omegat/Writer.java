@@ -45,8 +45,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 	}
 	
 	@Override
-	public void writeStartPackage ()
-	{
+	public void writeStartPackage () {
 		// Set any non-default folders before calling the base class method.
 		manifest.setSourceLocation("source");
 		manifest.setTargetLocation("target");
@@ -58,8 +57,17 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			+ "alternate.tmx";
 		tmxPathLeverage = manifest.getRoot() + File.separator + "tm" + File.separator
 			+ "leverage.tmx";
+
+		// Force the creation tool setting (needed for TMX with OmegaT workarounds)
+		creationTool = "OmegaT";
+
 		// Call the base class method
 		super.writeStartPackage();
+		
+		tmxWriterApproved.setOmegaTWorkarounds(true);
+		tmxWriterUnApproved.setOmegaTWorkarounds(true);
+		tmxWriterAlternate.setOmegaTWorkarounds(true);
+		tmxWriterLeverage.setOmegaTWorkarounds(true);
 
 		// Force OmegaT-specific settings
 		options.gMode = true;

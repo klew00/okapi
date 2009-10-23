@@ -96,12 +96,21 @@ public class TMXWriter {
     /**
      * Sets the flag indicating whether the writer should output
      * workaround codes specific for Trados.
-     * @param value True to output Trados-specific workarounds. False otherwise.
+     * @param value true to output Trados-specific workarounds. False otherwise.
      */
     public void setTradosWorkarounds (boolean value) {
     	tmxCont.setTradosWorkarounds(value);
     }
 
+    /**
+     * Sets the flag indicating whether the writer should output
+     * workaround codes specific for OmegaT.
+     * @param value true to output OmegaT-specific workarounds. False otherwise.
+     */
+    public void setOmegaTWorkarounds (boolean value) {
+    	tmxCont.setOmegaTWorkarounds(value);
+    }
+    
     /**
      * Sets a pattern oc content to not output. The given pattern is matched against
      * the source content of each item, if it matches, the item is not written.
@@ -151,6 +160,11 @@ public class TMXWriter {
     	}
     	this.srcLoc = sourceLocale;
     	this.trgLoc = targetLocale;
+
+    	if ( tmxCont.getOmegaTWorkarounds() ) {
+    		// If OmegaT mode is set, we need to overwrite the creationtool attribute
+    		creationTool = "OmegaT";
+    	}
 
     	writer.writeStartDocument();
     	writer.writeStartElement("tmx");

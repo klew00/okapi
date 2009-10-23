@@ -27,5 +27,5 @@ msgid "One entry in the TM."
 msgstr "Une entrée dans la MT (no file, no group)"
 
 msgid "Close the <b>application</b>."
-msgstr "Fermer <b>l\'application</b>."
+msgstr "Fermer <b>l'application</b>."
 

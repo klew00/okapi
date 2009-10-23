@@ -57,6 +57,7 @@ public abstract class BaseWriter implements IWriter {
 	protected String encoding;
 	protected String outputPath;
 	protected boolean preSegmented;
+	protected String creationTool;
 	
 	
 	public BaseWriter () {
@@ -74,7 +75,8 @@ public abstract class BaseWriter implements IWriter {
 		String outputFolder,
 		String packageID,
 		String sourceRoot,
-		boolean preSegmented)
+		boolean preSegmented,
+		String creationTool)
 	{
 		manifest.setSourceLanguage(sourceLocale);
 		trgLoc = targetLocale;
@@ -85,6 +87,7 @@ public abstract class BaseWriter implements IWriter {
 		manifest.setPackageType(getPackageType());
 		this.inputRoot = sourceRoot;
 		this.preSegmented = preSegmented;
+		this.creationTool = creationTool;
 	}
 
 	public void writeStartPackage () {
@@ -115,7 +118,7 @@ public abstract class BaseWriter implements IWriter {
 		}
 		tmxWriterApproved = new TMXWriter(tmxPathApproved);
 		tmxWriterApproved.writeStartDocument(manifest.getSourceLanguage(),
-			manifest.getTargetLanguage(), null, null, null, null, null);
+			manifest.getTargetLanguage(), creationTool, null, null, null, null);
 
 		// Create the reference TMX (un-approved pre-translations found in the source files)
 		if ( tmxPathUnApproved == null ) {
@@ -123,7 +126,7 @@ public abstract class BaseWriter implements IWriter {
 		}
 		tmxWriterUnApproved = new TMXWriter(tmxPathUnApproved);
 		tmxWriterUnApproved.writeStartDocument(manifest.getSourceLanguage(),
-			manifest.getTargetLanguage(), null, null, null, null, null);
+			manifest.getTargetLanguage(), creationTool, null, null, null, null);
 
 		// Create the reference TMX (alternate found in the source files)
 		if ( tmxPathAlternate == null ) {
@@ -131,7 +134,7 @@ public abstract class BaseWriter implements IWriter {
 		}
 		tmxWriterAlternate = new TMXWriter(tmxPathAlternate);
 		tmxWriterAlternate.writeStartDocument(manifest.getSourceLanguage(),
-			manifest.getTargetLanguage(), null, null, null, null, null);
+			manifest.getTargetLanguage(), creationTool, null, null, null, null);
 
 		// Create the reference TMX (pre-translation TM)
 		if ( tmxPathLeverage == null ) {
@@ -139,7 +142,7 @@ public abstract class BaseWriter implements IWriter {
 		}
 		tmxWriterLeverage = new TMXWriter(tmxPathLeverage);
 		tmxWriterLeverage.writeStartDocument(manifest.getSourceLanguage(),
-			manifest.getTargetLanguage(), null, null, null, null, null);
+			manifest.getTargetLanguage(), creationTool, null, null, null, null);
 	}
 
 	public void writeEndPackage (boolean createZip) {
