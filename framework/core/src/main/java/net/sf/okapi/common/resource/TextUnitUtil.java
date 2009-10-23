@@ -30,26 +30,24 @@ import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
 
 /**
- * Helper methods to manipulate {@link TextFragment} objects. 
+ * Helper methods to manipulate {@link TextFragment}, {@link TextContainer}, and {@link TextUnit} objects. 
  */
 public class TextUnitUtil {
 	
 	/**
-	 * 
-	 * @param textFragment
+	 * Removes leading whitespaces from a given text fragment.
+	 * @param textFragment the text fragment which leading whitespaces are to be removed.
 	 */
-	//TODO: javadoc
 	public static void trimLeading(TextFragment textFragment) {
 		
 		trimLeading(textFragment, null);
 	}
 	
 	/**
-	 * 
-	 * @param textFragment
-	 * @param skel
+	 * Removes leading whitespaces from a given text fragment, puts removed whitespaces to the given skeleton.
+	 * @param textFragment the text fragment which leading whitespaces are to be removed.
+	 * @param skel the skeleton to put the removed whitespaces.
 	 */
-	//TODO: javadoc
 	public static void trimLeading(TextFragment textFragment, GenericSkeleton skel) {
 		
 		if (textFragment == null) return;
@@ -75,20 +73,18 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * 
-	 * @param textFragment
+	 * Removes trailing whitespaces from a given text fragment.
+	 * @param textFragment the text fragment which trailing whitespaces are to be removed.
 	 */
-	//TODO: javadoc
 	public static void trimTrailing(TextFragment textFragment) {
 		trimTrailing(textFragment, null);
 	}
 	
 	/**
-	 * 
-	 * @param textFragment
-	 * @param skel
+	 * Removes trailing whitespaces from a given text fragment, puts removed whitespaces to the given skeleton.
+	 * @param textFragment the text fragment which trailing whitespaces are to be removed.
+	 * @param skel the skeleton to put the removed whitespaces.
 	 */
-	//TODO: javadoc
 	public static void trimTrailing(TextFragment textFragment, GenericSkeleton skel) {
 		
 		if (textFragment == null) return;
@@ -134,25 +130,45 @@ public class TextUnitUtil {
 		return st.lastIndexOf(substr) == pos - substr.length() + 1;
 	}
 
-	//TODO: javadoc
+	/**
+	 * Indicates if a given text unit resource is null, or its source part is null or empty.
+	 * @param textUnit the text unit to check.
+	 * @return true if the given text unit resource is null, or its source part is null or empty.
+	 */
 	public static boolean isEmpty(TextUnit textUnit) {
 		
 		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit)));
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Indicates if a given text unit resource is null, or its source part is null or empty. Whitespaces are not 
+	 * taken into account, e.g. if the text unit contains only whitespaces, it's considered empty.
+	 * @param textUnit the text unit to check.
+	 * @return true if the given text unit resource is null, or its source part is null or empty. 
+	 */
 	public static boolean hasSource(TextUnit textUnit) {
 		
 		return !isEmpty(textUnit, true);
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Indicates if a given text unit resource is null, or its source part is null or empty. Whitespaces are not 
+	 * taken into account, if ignoreWS = true, e.g. if the text unit contains only whitespaces,
+	 * it's considered empty.
+	 * @param textUnit the text unit to check.
+	 * @param ignoreWS if true and the text unit contains only whitespaces, then the text unit is considered empty.
+	 * @return true if the given text unit resource is null, or its source part is null or empty. 
+	 */	
 	public static boolean isEmpty(TextUnit textUnit, boolean ignoreWS) {
 		
 		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit), ignoreWS));
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Gets text of the source part of a given text unit resource.
+	 * @param textUnit the text unit resource which source text should be returned.
+	 * @return the source part of the given text unit resource.
+	 */
 	public static String getSourceText(TextUnit textUnit) {
 		
 		if (textUnit == null) return "";
@@ -160,7 +176,13 @@ public class TextUnitUtil {
 		return getCodedText(textUnit.getSourceContent());
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Gets text of the source part of a given text unit resource. If removeCodes = false, and the text contains inline codes,
+	 * then the codes will be removed. 
+	 * @param textUnit the text unit resource which source text should be returned.
+	 * @param removeCodes true if possible inline codes should be removed.  
+	 * @return the source part of the given text unit resource.
+	 */
 	public static String getSourceText(TextUnit textUnit, boolean removeCodes) {
 		
 		if (textUnit == null) return "";
@@ -171,7 +193,13 @@ public class TextUnitUtil {
 			return getCodedText(textUnit.getSourceContent());
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Gets text of the target part of a given text unit resource in the given language.
+	 * @param textUnit the text unit resource which source text should be returned.
+	 * @param language LocaleID object describing the language of the target part being sought.
+	 * @return the target part of the given text unit resource in the given language, or an empty string if the 
+	 * text unit doesn't contain one.
+	 */
 	public static String getTargetText(TextUnit textUnit, LocaleId language) {
 		
 		if (textUnit == null) return "";
@@ -180,7 +208,11 @@ public class TextUnitUtil {
 		return getCodedText(textUnit.getTargetContent(language));
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Gets text of a given text fragment object possibly containing inline codes. 
+	 * @param textFragment the given text fragment object.
+	 * @return the text of the given text fragment object possibly containing inline codes.
+	 */
 	public static String getCodedText(TextFragment textFragment) {
 		
 		if (textFragment == null) return "";
@@ -278,14 +310,17 @@ public class TextUnitUtil {
 		
 		textFragment.remove(pos, pos + 1);
 	}
-		
+			
 	/**
-	 * 
-	 * @param textFragment
-	 * @param findWhat
-	 * @return
-	 */
-	//TODO: javadoc
+     * Returns the index (within a given text fragment object) of the rightmost occurrence
+     * of the specified substring.
+     * @param the text fragment to examine.
+     * @param findWhat the substring to search for.
+     * @return if the string argument occurs one or more times as a substring
+     *          within this object, then the index of the first character of
+     *          the last such substring is returned. If it does not occur as
+     *          a substring, <code>-1</code> is returned.
+     */
 	public static int lastIndexOf(TextFragment textFragment, String findWhat) {
 		
 		if (textFragment == null) return -1;
@@ -294,28 +329,41 @@ public class TextUnitUtil {
 		
 		return (textFragment.getCodedText()).lastIndexOf(findWhat);
 	}
-				
-	//TODO: javadoc
+	
+	/**
+	 * Indicates if a given text fragment object is null, or the text it contains is null or empty.
+	 * @param textFragment the text fragment to examine.
+	 * @return true if the given text fragment object is null, or the text it contains is null or empty.
+	 */
 	public static boolean isEmpty(TextFragment textFragment) {
 		return (textFragment == null || (textFragment != null && textFragment.isEmpty()));		
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Creates a new text unit resource based on a given text container object becoming the source part of the text unit. 
+	 * @param source the given text container becoming the source part of the text unit.
+	 * @return a new text unit resource with the given text container object being its source part.
+	 */
 	public static TextUnit buildTU (TextContainer source) {
 		return buildTU(null, "", source, null, LocaleId.EMPTY, "");
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Creates a new text unit resource based a given string becoming the source text of the text unit. 
+	 * @param source the given string becoming the source text of the text unit.
+	 * @return a new text unit resource with the given string being its source text.
+	 */
 	public static TextUnit buildTU (String source) {
 		return buildTU(new TextContainer(source));
 	}
 	
 	/**
-	 * @param srcPart
-	 * @param skelPart
-	 * @return
+	 * Creates a new text unit resource based on a given string becoming the source text of the text unit, and a skeleton string,
+	 * which gets appended to the new text unit's skeleton.
+	 * @param srcPart the given string becoming the source text of the created text unit.
+	 * @param skelPart the skeleton string appended to the new text unit's skeleton.
+	 * @return a new text unit resource with the given string being its source text, and the skeleton string in the skeleton.
 	 */
-	//TODO: javadoc
 	public static TextUnit buildTU(String srcPart, String skelPart) {
 		
 		TextUnit res = buildTU(srcPart);
@@ -330,7 +378,17 @@ public class TextUnitUtil {
 		return res;
 	}	
 	
-	//TODO: javadoc
+	/**
+	 * Creates a new text unit resource or updates the one passed as the parameter. You can use this method to 
+	 * create a new text unit or modify existing one (adding or modifying its fields' values).
+	 * @param textUnit the text unit to be modified, or null to create a new text unit.
+	 * @param name name of the new text unit, or a new name for the existing one.
+	 * @param source the text container object becoming the source part of the text unit. 
+	 * @param target the text container object becoming the target part of the text unit.
+	 * @param language the language of the target part (passed in the target parameter).
+	 * @param comment the optional comment becoming a NOTE property of the text unit. 
+	 * @return a reference to the original or newly created text unit. 
+	 */
 	public static TextUnit buildTU(
 			TextUnit textUnit, 
 			String name, 
@@ -363,8 +421,13 @@ public class TextUnitUtil {
 		return textUnit;
 	}
 
+	/**
+	 * Makes sure that a given text unit contains a skeleton. If there's no skeleton already attached to the text unit,
+	 * a new skeleton object is created and attached to the text unit.    
+	 * @param tu the given text unit to have a skeleton. 
+	 * @return the skeleton of the text unit.
+	 */
 	public static GenericSkeleton forceSkeleton(TextUnit tu) {
-	//TODO: javadoc
 		
 		if (tu == null) return null;
 		
@@ -384,11 +447,11 @@ public class TextUnitUtil {
 	}
 
 	/**
-	 * 
-	 * @param textUnit
-	 * @return
+	 * Copies source and target text of a given text unit into a newly created skeleton. The original text unit remains intact,
+	 * and plays a role of a pattern for a newly created skeleton's contents.
+	 * @param textUnit the text unit to be copied into a skeleton.  
+	 * @return the newly created skeleton, which contents reflect the given text unit.
 	 */
-	//TODO: javadoc
 	public static GenericSkeleton convertToSkeleton(TextUnit textUnit) {
 		
 		if (textUnit == null) return null;
@@ -428,22 +491,15 @@ public class TextUnitUtil {
 			list2.add(part);
 		}
 		
-//		GenericSkeletonWriter writer = new GenericSkeletonWriter();
-//		if (writer == null) return null;
-		
-//		return new GenericSkeleton(writer.processTextUnit(textUnit));
-		
-		
-//		if (textUnit == null) return null;
-//		
-//		GenericSkeleton skel = (GenericSkeleton) textUnit.getSkeleton();
-//		if (skel == null) return null;
-//		
-//		return new GenericSkeleton(skel.toString());
 		return res;
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Gets an annotation attached to the source part of a given text unit resource.
+	 * @param textUnit the given text unit resource.
+	 * @param type reference to the requested annotation type.
+	 * @return the annotation or null if not found.
+	 */
 	public static <A extends IAnnotation> A getSourceAnnotation(TextUnit textUnit, Class<A> type) {
 	
 		if (textUnit == null) return null;
@@ -451,8 +507,12 @@ public class TextUnitUtil {
 		
 		return textUnit.getSource().getAnnotation(type);		
 	}
-	
-	//TODO: javadoc
+
+	/**
+	 * Attaches an annotation to the source part of a given text unit resource.
+	 * @param textUnit the given text unit resource.
+	 * @param annotation the annotation to be attached to the source part of the text unit.
+	 */
 	public static void setSourceAnnotation(TextUnit textUnit, IAnnotation annotation) {
 		
 		if (textUnit == null) return;
@@ -461,7 +521,13 @@ public class TextUnitUtil {
 		textUnit.getSource().setAnnotation(annotation);		
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Gets an annotation attached to the target part of a given text unit resource in a given language.
+	 * @param textUnit the given text unit resource.
+	 * @param language LocaleID object describing the language of the target part being sought.
+	 * @param type reference to the requested annotation type. 
+	 * @return the annotation or null if not found.
+	 */
 	public static <A extends IAnnotation> A getTargetAnnotation(TextUnit textUnit, LocaleId language, Class<A> type) {
 		
 		if (textUnit == null) return null;
@@ -470,8 +536,13 @@ public class TextUnitUtil {
 		
 		return textUnit.getTarget(language).getAnnotation(type);		
 	}
-	
-	//TODO: javadoc
+
+	/**
+	 * Attaches an annotation to the target part of a given text unit resource in a given language.
+	 * @param textUnit the given text unit resource.
+	 * @param language LocaleID object describing the language of the target part being attached to.
+	 * @param annotation the annotation to be attached to the target part of the text unit.
+	 */
 	public static void setTargetAnnotation(TextUnit textUnit, LocaleId language, IAnnotation annotation) {
 		
 		if (textUnit == null) return;
@@ -481,7 +552,11 @@ public class TextUnitUtil {
 		textUnit.getTarget(language).setAnnotation(annotation);		
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Sets the coded text of the the source part of a given text unit resource.
+	 * @param textUnit the given text unit resource.
+	 * @param text the text to be set.
+	 */
 	public static void setSourceText(TextUnit textUnit, String text) {
 		
 		if (textUnit == null) return;
@@ -492,7 +567,12 @@ public class TextUnitUtil {
 		source.setCodedText(text);
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Sets the coded text of the the target part of a given text unit resource in a given language.
+	 * @param textUnit the given text unit resource.
+	 * @param language LocaleID object describing the language of the target part being set.
+	 * @param text the text to be set.
+	 */
 	public static void setTargetText(TextUnit textUnit, LocaleId language, String text) {
 		
 		if (textUnit == null) return;
@@ -504,7 +584,12 @@ public class TextUnitUtil {
 		target.setCodedText(text);
 	}
 
-	//TODO: javadoc
+	/**
+	 * Removes leading and/or trailing whitespaces from the source part of a given text unit resource.
+	 * @param textUnit the given text unit resource. 
+	 * @param trimLeading true to remove leading whitespaces if there are any.
+	 * @param trimTrailing true to remove trailing whitespaces if there are any.
+	 */
 	public static void trimTU(TextUnit textUnit, boolean trimLeading, boolean trimTrailing) {
 		
 		if (textUnit == null) return;
@@ -529,27 +614,35 @@ public class TextUnitUtil {
 			tuSkel.add(skel);
 	}
 	
-	//TODO: javadoc
-	public static void removeQualifiers(TextUnit textUnit, String qualifier) {
+	/**
+	 * Removes from the source part of a given text unit resource qualifiers (parenthesis, quotation marks etc.) around text.
+	 * This method is useful when the starting and ending qualifiers are different.
+	 * @param textUnit the given text unit resource.
+	 * @param startQualifier the qualifier to be removed before source text.
+	 * @param endQualifier the qualifier to be removed after source text.
+	 */
+	public static void removeQualifiers(TextUnit textUnit, String startQualifier, String endQualifier) {
 		
 		if (textUnit == null) return;		
-		if (Util.isEmpty(qualifier)) return;
+		if (Util.isEmpty(startQualifier)) return;
+		if (Util.isEmpty(endQualifier)) return;
 		
 		String st = getSourceText(textUnit);
 		if (st == null) return;
 		
-		int qualifierLen = qualifier.length();
+		int startQualifierLen = startQualifier.length();
+		int endQualifierLen = endQualifier.length();
 		
-		if (st.startsWith(qualifier) && st.endsWith(qualifier)) {
+		if (st.startsWith(startQualifier) && st.endsWith(endQualifier)) {
 			
 			GenericSkeleton tuSkel = TextUnitUtil.forceSkeleton(textUnit);
 			GenericSkeleton skel = new GenericSkeleton();
 			
-			skel.add(qualifier);
+			skel.add(startQualifier);
 			skel.addContentPlaceholder(textUnit);
-			skel.add(qualifier);
+			skel.add(endQualifier);
 			
-			setSourceText(textUnit, st.substring(qualifierLen, Util.getLength(st) - qualifierLen));
+			setSourceText(textUnit, st.substring(startQualifierLen, Util.getLength(st) - endQualifierLen));
 			
 			int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
 			if (index != -1)
@@ -557,6 +650,16 @@ public class TextUnitUtil {
 			else
 				tuSkel.add(skel);
 		}
+	}
+	
+	/**
+	 * Removes from the source part of a given text unit resource qualifiers (quotation marks etc.) around text.
+	 * @param textUnit the given text unit resource.
+	 * @param qualifier the qualifier to be removed before and after source text.
+	 */
+	public static void removeQualifiers(TextUnit textUnit, String qualifier) {
+		
+		removeQualifiers(textUnit, qualifier, qualifier);
 	}
 
 }

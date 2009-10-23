@@ -22,9 +22,11 @@ package net.sf.okapi.common.resource;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
@@ -33,6 +35,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 
 import org.junit.Test;
 
@@ -195,5 +198,31 @@ public class TextUnitUtilTest {
 		
 		st = "abcdefghijklmn";
 		assertEquals(st, TextUnitUtil.getText(new TextFragment(st)));
+	}
+	
+	@Test
+	public void testRemoveQualifiers() {
+		
+		TextUnit tu = TextUnitUtil.buildTU("\"qualified text\"");
+		TextUnitUtil.removeQualifiers(tu, "\"");
+		assertEquals("qualified text", TextUnitUtil.getSourceText(tu));
+		
+		TextUnitUtil.setSourceText(tu, "((({[qualified text]})))");
+		assertEquals("((({[qualified text]})))", TextUnitUtil.getSourceText(tu));
+		TextUnitUtil.removeQualifiers(tu, "((({", "})))");
+		assertEquals("[qualified text]", TextUnitUtil.getSourceText(tu));
+		
+		GenericSkeleton tuSkel = (GenericSkeleton) tu.getSkeleton();
+		assertNotNull(tuSkel);
+		List<GenericSkeletonPart> parts = tuSkel.getParts();
+		assertEquals(5, parts.size());
+		
+		String tuRef = TextFragment.makeRefMarker("$self$");
+		
+		assertEquals("\"", parts.get(0).toString());
+		assertEquals("((({", parts.get(1).toString());
+		assertEquals(tuRef, parts.get(2).toString());
+		assertEquals("})))", parts.get(3).toString());
+		assertEquals("\"", parts.get(4).toString());
 	}
 }

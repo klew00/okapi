@@ -23,12 +23,18 @@ package net.sf.okapi.common;
 import net.sf.okapi.common.Util;
 
 /**
- * Helper methods to manupulate strings.
+ * Helper methods to manipulate strings.
  */
 public class StringUtil {
 
 	// String formatting
-	//TODO: javadoc
+	
+	/**
+	 * Returns a title-case representation of a given string. The first character is capitalized, following
+	 * characters are in lower case.
+	 * @param st the give string.
+	 * @return a copy of the given string normalized to the title case. 
+	 */
 	public static String titleCase(String st) {
 		if (Util.isEmpty(st)) 
 			return st;
@@ -36,7 +42,12 @@ public class StringUtil {
 		return st.substring(0,1).toUpperCase() + st.substring(1);
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Removes qualifiers (quotation marks etc.) around text in a given string. 
+	 * @param st the given string.
+	 * @param qualifier the qualifier to be removed before and after text in the string.
+	 * @return a copy of the given string without qualifiers.
+	 */
 	public static String removeQualifiers(String st, String qualifier) {
 	
 		if (Util.isEmpty(st) || Util.isEmpty(qualifier))
@@ -50,13 +61,21 @@ public class StringUtil {
 		return st;
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Removes quotation marks around text in a given string. 
+	 * @param st the given string.
+	 * @return a copy of the given string without quotation marks.
+	 */
 	public static String removeQualifiers(String st) {
 	
 		return removeQualifiers(st, "\""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	//TODO: javadoc
+	/**
+	 * Converts line breaks in a given string to the Unix standard (\n).
+	 * @param string the given string.
+	 * @return a copy of the given string, all line breaks are \n.
+	 */
 	public static String normalizeLineBreaks(String string) {
 		
 		String res = string;

@@ -257,11 +257,11 @@ public class ListUtil {
 	}
 	
 	/**
-	 * Trim all values of the given list. Empty elements remain on the list, non-empty are trimmed from both sides.
-	 * @param list
+	 * Creates a list, containing all trimmed values of a given list of strings. Empty elements remain on the 
+	 * list, non-empty ones are trimmed from both sides. The given list is not changed.
+	 * @param list the given list of strings.
 	 * @return the list with trimmed elements.
 	 */
-	//TODO: javadoc
 	public static List<String> listTrimValues(List<String> list) {
 		if ( list == null ) return null;
 		List<String> res = new ArrayList<String>();
@@ -287,7 +287,12 @@ public class ListUtil {
 		return (String[]) list.toArray(new String[] {});
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Converts a given array to a list containing all elements of the original array. The resulting list is 
+	 * not backed by the given array. (Changes to the returned list DO NOT "write through" to the array and vice versa.)  
+	 * @param array the given array.
+	 * @return the list of all elements contained in the given array.
+	 */
 	public static <E> List<E> arrayAsList(E[] array) {
 		//return Arrays.asList(array); // Fixed size, no clear() etc. possible
 		List<E> list = new ArrayList<E>();
@@ -298,22 +303,44 @@ public class ListUtil {
 		return list;
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Returns a string, representing a given array of strings. Array elements are separated with a comma in 
+	 * the resulting string.
+	 * @param array the given array of strings.
+	 * @return the string with comma-separated elements of the given array.
+	 */
 	public static String arrayAsString(String[] array) {
 		return arrayAsString(array, ",");
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Returns a string, representing a given array of strings. Array elements in the resulting string are separated with a given 
+	 * delimiter.
+	 * @param array the given array of strings.
+	 * @param delimiter the given delimiter.
+	 * @return the string with delimited elements of the given array.
+	 */
 	public static String arrayAsString(String[] array, String delimiter) {
 		return listAsString(Arrays.asList(array), delimiter);
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Returns a string, representing a given list of strings. List elements are separated with a comma in 
+	 * the resulting string.
+	 * @param list the given list of strings.
+	 * @return the string with comma-separated elements of the given list.
+	 */
 	public static String listAsString(List<String> list) {
 		return listAsString(list, ",");
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Returns a string, representing a given list of strings. List elements in the resulting string are separated with a given 
+	 * delimiter.
+	 * @param list the given list of strings.
+	 * @param delimiter the given delimiter.
+	 * @return the string with delimited elements of the given list.
+	 */
 	public static String listAsString(List<String> list, String delimiter) {
 		if (list == null) return "";
 		String res = "";
@@ -328,12 +355,23 @@ public class ListUtil {
 		return res;
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Returns a string, representing a given list of integers. List elements are converted into strings ("12" for 12 etc.) and
+	 * separated with a comma in the resulting string.
+	 * @param list the given list of integers.
+	 * @return the string with comma-separated converted elements of the given list.
+	 */
 	public static String intListAsString(List<Integer> list) {
 		return intListAsString(list, ",");
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Returns a string, representing a given list of integers. List elements are converted into strings ("12" for 12 etc.) and 
+	 * separated with a given delimiter.
+	 * @param list the given list of integers.
+	 * @param delimiter the given delimiter.
+	 * @return the string with delimited converted elements of the given list.
+	 */
 	public static String intListAsString(List<Integer> list, String delimiter) {
 		List<String> stList = new ArrayList<String>();
 		for (Integer value : list) {
@@ -342,7 +380,12 @@ public class ListUtil {
 		return listAsString(stList, delimiter);
 	}
 
-	//TODO: javadoc
+	/**
+	 * Removes a range of elements from a given list.
+	 * @param list the given list.
+	 * @param start the start index (inclusive) to be removed.
+	 * @param end the end index (exclusive) to be removed.
+	 */
 	public static <E> void remove(List<E> list, int start, int end) {
 		
 		if (list == null) return;
@@ -354,8 +397,14 @@ public class ListUtil {
 			
 	}
 
+	/**
+	 * Creates a new list from a range of elements of a given list.
+	 * @param list the given list.
+	 * @param start the start index (inclusive) to be included in the resulting list.
+	 * @param end the end index (exclusive) to be included in the resulting list.
+	 * @return a new list, containing all elements in the specified range of the given list.
+	 */
 	@SuppressWarnings("unchecked") 
-	//TODO: javadoc
 	public static <E> List<E> copyItems(List<E> list, int start, int end) {
 		// No way to determine the actual type of E at compile time to cast newInstance(), so @SuppressWarnings("unchecked") 
 	
@@ -383,7 +432,14 @@ public class ListUtil {
 		return res;
 	}
 		
-	//TODO: javadoc
+	/**
+	 * Creates a new list and moves therein a range of elements from a given list. The given list won't contain
+	 * the moved elements anymore.
+	 * @param list the given list.
+	 * @param start the start index (inclusive) to be included in the resulting list.
+	 * @param end the end index (exclusive) to be included in the resulting list.
+	 * @return a new list, containing all elements in the specified range of the given list.
+	 */
 	public static <E> List<E> moveItems(List<E> buffer, int start, int end) {
 	
 		List<E> res = copyItems(buffer, start, end);
@@ -394,7 +450,12 @@ public class ListUtil {
 		return res;
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Moves all items from a given list to a newly created list. The given list won't contain
+	 * the moved elements anymore.
+	 * @param buffer the given list.
+	 * @return the resulting list, containing all elements of the given list.
+	 */
 	public static <E> List<E> moveItems(List<E> buffer) {
 		
 		List<E> res = copyItems(buffer, 0, buffer.size() - 1);
@@ -405,7 +466,11 @@ public class ListUtil {
 		return res;
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Gets a first non-null element of a given list.
+	 * @param list the given list.
+	 * @return the found element or null if nothing found (all elements are null, or the list is empty).
+	 */
 	public static <E> E getFirstNonNullItem(List<E> list) {
 		
 		if (Util.isEmpty(list)) return null;
@@ -416,14 +481,18 @@ public class ListUtil {
 		return null;		
 	}
 	
-	//TODO: javadoc
 	protected static void logMessage (Level level, String text) {
 		
 		if (logger != null)
 			logger.log(level, text);
 	}
 
-	//TODO: javadoc
+	/**
+	 * Creates a new list of strings and fills it with the data read from a given resource.
+	 * @param classRef reference to a class associated with the given resource.
+	 * @param resourceLocation the name of resource.
+	 * @return the new list loaded from the resource. 
+	 */
 	public static List<String> loadList(Class<?> classRef, String resourceLocation) {
 		
 		List<String> res = new ArrayList<String>();
@@ -432,7 +501,12 @@ public class ListUtil {
 		return res;
 	}
 	
-	//TODO: javadoc
+	/**
+	 * Fills in an existing list of strings with the data read from a given resource.
+	 * @param list the given list of strings.
+	 * @param classRef reference to a class associated with the given resource.
+	 * @param resourceLocation the name of resource.
+	 */
 	public static void loadList(List<String> list, Class<?> classRef, String resourceLocation) {
 
 		if (list == null) return;
@@ -451,6 +525,8 @@ public class ListUtil {
 		}
 		
 		try {
+			list.clear();
+			
 			while (reader.ready()) {
 				
 				String line = reader.readLine();

@@ -27,11 +27,14 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 
+/**
+ * Helper methods to manipulate skeleton objects. 
+ */
 public class SkeletonUtil {
 
 	/**
 	 * Finds source reference in the skeleton.
-	 * @param skel the skeleton is being sought for the reference
+	 * @param skel the skeleton being sought for the reference
 	 * @return index in the list of skeleton parts for the skeleton part containing the reference 
 	 */
 	public static int findTuRefInSkeleton(GenericSkeleton skel) {
@@ -40,7 +43,7 @@ public class SkeletonUtil {
 	
 	/**
 	 * Finds either source or target reference in the skeleton. If language is specified, then its target reference is sought for.
-	 * @param skel the skeleton is being sought for the reference.
+	 * @param skel the skeleton being sought for the reference.
 	 * @param language the language to search the reference for.
 	 * @return index in the list of skeleton parts for the skeleton part containing the reference. 
 	 */
@@ -67,14 +70,32 @@ public class SkeletonUtil {
 		return -1;
 	}
 		
+	/**
+	 * Determines if a given skeleton contains a source reference in it.
+	 * @param skel the skeleton being sought for the reference. 
+	 * @return true if the given skeleton contains such a reference.
+	 */
 	public static boolean hasTuRef (GenericSkeleton skel) {
 		return findTuRefInSkeleton(skel) != -1;
 	}
 	
+	/**
+	 * Determines if a given skeleton contains a target reference in a given language.
+	 * @param skel the skeleton being sought for the reference. 
+	 * @param language LocaleID object describing the language of the target part being sought.
+	 * @return true if the given skeleton contains such a reference.
+	 */
 	public static boolean hasTuRef (GenericSkeleton skel, LocaleId language) {
 		return findTuRefInSkeleton(skel, language) != -1;
 	}
 	
+	/**
+	 * Replaces a part of a given skeleton with another given skeleton part.
+	 * @param skel the skeleton which part is being replaced.
+	 * @param index the index of the skeleton part to be replaced.
+	 * @param replacement the given new skeleton part to replace the existing one.
+	 * @return true if replacement succeeded.
+	 */
 	public static boolean replaceSkeletonPart (GenericSkeleton skel,
 		int index,
 		GenericSkeleton replacement)
