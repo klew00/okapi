@@ -36,6 +36,7 @@ import java.util.Map;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -219,9 +220,13 @@ public class OpenTranTMConnector implements ITMQuery {
 					qr = new QueryResult();
 					qr.target = new TextContainer();
 					qr.target.append(trgText);
-					String srcText = (String)map2.get("orig_phrase");
+					String tmp = (String)map2.get("orig_phrase");
 					qr.source = new TextContainer();
-					qr.source.append(srcText);
+					qr.source.append(tmp);
+					tmp = (String)map2.get("path");
+					if ( !Util.isEmpty(tmp) ) {
+						qr.origin = tmp;
+					}
 					results.add(qr);
 					// suggest3 maximum parameters limits the number of
 					// level-1 object returned, not the total number
