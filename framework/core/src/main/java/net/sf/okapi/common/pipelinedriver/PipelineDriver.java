@@ -208,10 +208,10 @@ public class PipelineDriver implements IPipelineDriver {
 							method.invoke(p.getStep(), item.getOutputURI(0));
 						}
 						break;
-					case TARGET_LANGUAGE:
+					case TARGET_LOCALE:
 						method.invoke(p.getStep(), input.getTargetLocale());
 						break;
-					case SOURCE_LANGUAGE:
+					case SOURCE_LOCALE:
 						method.invoke(p.getStep(), input.getSourceLocale());
 						break;
 					case OUTPUT_ENCODING:

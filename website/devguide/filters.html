@@ -63,7 +63,7 @@ information:</p>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#hasUTF8BOM()">hasUTF8BOM()</a></code> indicates if the input document is encoded in UTF-8 
 	and has a Byte-Order-Mark.</li>
 	<li><code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLanguage()">getLanguage()</a></code> gives the code of the source language of the 
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLocale()">getLocale()</a></code> gives the code of the source locale of the 
 	document (the same as the one specified when opening the document).</li>
 	<li><code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#isMultilingual()">isMultilingual()</a></code> indicates if the document is multilingual (See 
@@ -166,8 +166,18 @@ and after the last inline code.</p>
 <p>The documents a filter processes can be monolingual or multilingual. The 
 filter is responsible for knowing if it processes a monolingual or a 
 multilingual document.</p>
+<p><b>Note:</b> Locale and Languages. Nowadays there is not many difference 
+	between a language code and a locale code, as the new language tags of the 
+	BCP-47 includes sub-tags that represent various regional or special 
+	variants, as well as script difference. For example, <code>ES-419</code> 
+	stands for Spanish for Latin-America and the Caribbean, <code>zh-Hant-tw</code> for Traditional 
+	Chinese used in Taiwan, etc. For more information about BCP-47 see
+	<a href="http://www.w3.org/International/articles/bcp47/">
+	http://www.w3.org/International/articles/bcp47</a>. The terms <b>locale</b> 
+	and <b>language</b> are sometimes used interchangeably in this 
+documentation.</p>
 <h3><a name="monolingual"></a>Monolingual Documents</h3>
-<p>Monolingual documents have their content in a single main language. In such 
+<p>Monolingual documents have their content in a single main language/locale. In such 
 document any target data replaces the source data. Examples of monolingual 
 documents are Java properties file and OpenDocument files. Note that such 
 documents may contain text in different languages (like citations), but their 
@@ -179,12 +189,12 @@ structure is designed to have a single main language.</p>
 </ul>
 <p>When sending the <code>START_DOCUMENT</code> event:</p>
 <ul>
-	<li>The filter must indicate the source language of the document in the <code>
+	<li>The filter must indicate the source locale of the document in the <code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
 	resource, using <code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLanguage(java.lang.String)">StartDocument.setLanguage()</a></code>. The caller of the 
-	filter can retrieve the source language by calling <code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLanguage()">StartDocument.getLanguage()</a></code>.</li>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLocale(net.sf.okapi.common.LocaleId)">StartDocument.setLocale()</a></code>. The caller of the 
+	filter can retrieve the source locale by calling <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLocale()">StartDocument.getLocale()</a></code>.</li>
 </ul>
 <p>At any time when sending an event:</p>
 <ul>
@@ -214,20 +224,20 @@ and XLIFF files.</p>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setMultilingual(boolean)">StartDocument.setMultilingual()</a></code>. 
 	The caller of the filter can retrieve that information using the <code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#isMultilingual()">StartDocument.isMultilingual()</a></code>.</li>
-	<li>The filter must indicate the source language in the <code>
+	<li>The filter must indicate the source locale in the <code>
 	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html">StartDocument</a></code> 
 	resource using <code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLanguage(java.lang.String)">StartDocument.setLanguage()</a></code>.&nbsp; 
-	The caller of the filter can retrieve the source language by calling <code>
-	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLanguage()">StartDocument.getLanguage()</a></code>.</li>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#setLanguage(net.sf.okapi.common.LocaleId)">StartDocument.setLocale()</a></code>.&nbsp; 
+	The caller of the filter can retrieve the source locale by calling <code>
+	<a href="../javadoc/net/sf/okapi/common/resource/StartDocument.html#getLocale()">StartDocument.getLocale()</a></code>.</li>
 </ul>
 <p>At any time when sending an event:</p>
 <ul>
 	<li>The filter should try to capture any information where the source 
-	language is defined and create a modifiable property for it. This will allow 
-	the writer to update the language settings of the output to the target 
-	language. The filter should create read-only properties for language 
-	information that are not source language.</li>
+	locale is defined and create a modifiable property for it. This will allow 
+	the writer to update the locale settings of the output to the target 
+	language. The filter should create read-only properties for locale 
+	information that are not source locale.</li>
 </ul>
 <h2><a name="encodings"></a>Encodings</h2>
 <h3>Input</h3>

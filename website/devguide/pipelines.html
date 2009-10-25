@@ -106,7 +106,7 @@ fcMapper.addConfigurations(&quot;net.sf.okapi.filters.properties.PropertiesFilte
 fcMapper.addConfigurations(&quot;net.sf.okapi.filters.xml.XMLFilter&quot;);</pre>
 <p>The last task is the associate the mapper to the pipeline:</p>
 <pre>// Set the filter configuration mapper
-driver.getPipeline().getContext().setFilterConfigurationMapper(fcMapper);</pre>
+driver.setFilterConfigurationMapper(fcMapper);</pre>
 <p>Now the driver is all set up to process your documents. Executing the 
 pipeline for a given input document is done by first providing the document and 
 its parameters, and then by invoking the driver.</p>
@@ -138,8 +138,8 @@ driver.addBatchItem(
       &quot;okf_html&quot;, // Filter configuration of the document
       (new File(&quot;myFile.out.html&quot;)).toURI(), // Output
       &quot;UTF-8&quot;, // Encoding for the output
-      LocaleId.fromString(&quot;en&quot;), // Source language
-      LocaleId.fromString(&quot;fr&quot;) // Target language
+      LocaleId.fromString(&quot;en&quot;), // Source locale
+      LocaleId.fromString(&quot;fr&quot;) // Target locale
    )
 );</pre>
 <p>We are now ready to execute the pipeline for the given input document. This 
@@ -184,19 +184,19 @@ case we just need to override one: <code>
 <a href="../javadoc/net/sf/okapi/common/pipeline/BasePipelineStep.html#handleTextUnit(net.sf.okapi.common.Event)">
 BasePipelineSetp.handleTextUnit()</code></a>.</p>
 <p dir="ltr">The code below shows our new step class. It intercepts the 
-TEXT_UNIT events and performs a simple pseudo-translation by replacing some ASCII characters by 
+<code>TEXT_UNIT</code> events and performs a simple pseudo-translation by replacing some ASCII characters by 
 the same ones with accents, so the text <code>&quot;A goose quill is more dangerous 
 than a lion's claw&quot;</code> becomes <code>&quot;A gõõsè qüìll ìs mõrè ðåñgèrõüs thåñ å 
 lìõñ's çlåw&quot;</code>.</p>
 <p>In order to create the target text in the text unit, the class needs to know what the 
-target language is. This information is accessible using one of the methods of 
-the <code>
+target language is. A pipeline step publishes the runtime parameters it needs 
+using the standard JavaBean pattern, along with a special Java annotation. In 
+our case, we declare a <code>setTargetLocale()</code> method. The pipeline 
+driver will introspect the steps and provide the proper parameters from the
+<code>
 <a href="../javadoc/net/sf/okapi/common/pipeline/IBatchItemContext.html">
-IBatchItemContext</a></code> interface that is implemented by the <code>
-<a href="../javadoc/net/sf/okapi/common/pipeline/PipelineContext.html">
-PipelineContext</a></code>: <code>getContext().getTargetLanguage(0)</code>. The 
-argument 0 is used because we are taking the information from the main (and here 
-only) input document in the batch item. The other parts of the code deal with changing the text 
+IBatchItemContext</a></code> interface.</p>
+<p>The other parts of the code deal with changing the text 
 unit content itself. See the section
 <a href="gettingstarted.html#TextUnits">Working with Text Units</a> for more 
 details on how to modify text units.</p>
@@ -204,6 +204,13 @@ details on how to modify text units.</p>
 
    private static final String OLDCHARS = &quot;aeiouycdn&quot;;
    private static final String NEWCHARS = &quot;\u00e5\u00e8\u00ec\u00f5\u00fc\u00ff\u00e7\u00f0\u00f1&quot;;
+
+   private LocaleId trgLoc;
+
+   @StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+   public void setTargetLocale (LocaleId targetLocale) {
+      trgLoc = targetLocale;
+   }
 
    public String getName () {
       return &quot;Pseudo-Translation&quot;;
@@ -217,8 +224,7 @@ details on how to modify text units.</p>
       TextUnit tu = (TextUnit)event.getResource();
       if ( !tu.isTranslatable() ) return;
 
-      TextFragment tf = tu.createTarget(getContext().getTargetLanguage(0),
-         false, IResource.COPY_CONTENT);
+      TextFragment tf = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
       StringBuilder text = new StringBuilder(tf.getCodedText());
       int n;
       for ( int i=0; i&lt;text.length(); i++ ) {

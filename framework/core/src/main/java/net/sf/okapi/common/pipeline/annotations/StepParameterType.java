@@ -46,14 +46,14 @@ public enum StepParameterType {
 	OUTPUT_URI,
 	
 	/**
-	 * Source language.
+	 * Source locale.
 	 */
-	SOURCE_LANGUAGE,
-	
+	SOURCE_LOCALE,
+
 	/**
-	 * Target language.
+	 * Target locale.
 	 */
-	TARGET_LANGUAGE,
+	TARGET_LOCALE,
 
 	/**
 	 * Filter configuration identifier for the main input document.

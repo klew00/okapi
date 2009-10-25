@@ -63,7 +63,7 @@ object and load or set the SRX rules to use.</p>
 <pre dir="ltr">SRXDocument doc = new SRXDocument();
 doc.load(myRules.srx);</pre>
 <p>Then you can obtain a segmenter for a given language.</p>
-<pre>ISegmenter segmenter = doc.compileLanguageRules(&quot;en&quot;, null);</pre>
+<pre>ISegmenter segmenter = doc.compileLanguageRules(LocaleId.fromString(&quot;en&quot;), null);</pre>
 <p>The second parameter of <code>
 <a href="../javadoc/net/sf/okapi/lib/segmentation/SRXDocument.html#compileLanguageRules(java.lang.String, net.sf.okapi.lib.segmentation.ISegmenter)">
 compileLanguageRules()</a></code> is an optional segmenter object, in case you 

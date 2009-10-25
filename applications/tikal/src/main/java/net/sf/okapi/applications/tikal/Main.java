@@ -1000,10 +1000,12 @@ public class Main {
 		}
 		
 		params.setSingleOutput(command==CMD_CONV2PEN);
+		
+		// These options may or may not be used depending on the output format
 		params.setUseGenericCodes(genericOutput);
 		params.setTargetStyle(convTargetStyle);
-		driver.addStep(fcStep);
 		
+		driver.addStep(fcStep);
 		driver.addBatchItem(rd, outputURI, outputEncoding);
 		driver.processBatch();
 	}

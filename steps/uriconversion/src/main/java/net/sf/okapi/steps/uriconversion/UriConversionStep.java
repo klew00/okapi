@@ -50,7 +50,7 @@ public class UriConversionStep extends BasePipelineStep {
 		params = new Parameters();
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLanguage (LocaleId targetLanguage) {
 		trgLang = targetLanguage;
 	}

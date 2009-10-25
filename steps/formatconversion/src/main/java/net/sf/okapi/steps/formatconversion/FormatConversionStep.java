@@ -61,7 +61,7 @@ public class FormatConversionStep extends BasePipelineStep {
 		this.outputURI = outputURI;
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
 	}

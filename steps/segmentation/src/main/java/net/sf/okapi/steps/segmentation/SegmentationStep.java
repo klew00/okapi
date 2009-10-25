@@ -50,12 +50,12 @@ public class SegmentationStep extends BasePipelineStep {
 		srcSeg = null;
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LANGUAGE)
+	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
 	public void setsourceLocale (LocaleId sourceLocale) {
 		this.sourceLocale = sourceLocale;
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
 	}

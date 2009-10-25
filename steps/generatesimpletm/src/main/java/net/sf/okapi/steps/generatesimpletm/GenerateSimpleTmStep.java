@@ -53,7 +53,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 		params = new Parameters();
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
 	}

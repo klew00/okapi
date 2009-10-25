@@ -31,7 +31,7 @@ public class UppercaseStep extends BasePipelineStep {
 
 	private LocaleId trgLoc;
 	
-	@StepParameterMapping(parameterType = StepParameterType.TARGET_LANGUAGE)
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		trgLoc = targetLocale;
 	}

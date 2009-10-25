@@ -31,6 +31,9 @@ import net.sf.okapi.common.Util;
  */
 public final class LocaleId implements Comparable<Object> {
 
+	/**
+	 * An empty locale.
+	 */
 	public static LocaleId EMPTY = new LocaleId("", false);
 	
 	private String locId;
@@ -43,9 +46,9 @@ public final class LocaleId implements Comparable<Object> {
 	private static final int POSIX_REGION = 3;
 	private static final int POSIX_VARIANT = 7;
 	
-	// Java-Locale to LocaleID mapping
+	// Java-Locale to LocaleId mapping
 	private static final String[][] JAVALOCMAP = {
-	//	{ Java ID,      LocaleID,
+	//	{ Java ID,      LocaleId,
 		{ "ja_JP_JP",   "ja-jp-x-calja"},
 		{ "no_NO_NY",   "nn-no"},
 		{ "th_TH_TH",   "th-th-x-numth"}
@@ -67,7 +70,7 @@ public final class LocaleId implements Comparable<Object> {
 	private static final Pattern POSIXPATTERN = Pattern.compile("\\A(\\p{Alpha}{2,3})"
 		+ "(_(\\p{Alpha}*?))?(\\.([\\p{Alnum}_-]*?))?(@([\\p{Alnum}_-]*?))?\\z");
 
-	// Pattern to parse/validate LocaleID identifier
+	// Pattern to parse/validate LocaleId
 	// We may want to allow additional fields if needed, for now it's like BCP-47
 	private static final Pattern ID_PATTERN = Pattern.compile(
     	"(\\A[xX]([\\x2d]\\p{Alnum}{1,8})*\\z)"
@@ -80,8 +83,8 @@ public final class LocaleId implements Comparable<Object> {
     	+ "([\\x2d][xX]([\\x2d]\\p{Alnum}{1,8})*)?)\\z");
 	
 	/**
-	 * Creates a new LocaleID object from a locale identifier.
-	 * @param locId a LocaleID string
+	 * Creates a new LocaleId object from a locale identifier.
+	 * @param locId a LocaleId string
 	 * @param normalize true if it needs to be normalized the string,
 	 * false to use as-it. When use as-it, the identifier is expected to be in lower-cases and use '-'
 	 * for separator.
@@ -95,7 +98,7 @@ public final class LocaleId implements Comparable<Object> {
 	/**
 	 * Creates a new LocaleId for a given language code.
 	 * This constructor does not take a locale identifier as argument, just a language identifier.
-	 * Use {@link #LocaleId(String, boolean)} to create a new LocaleID from a locale identifier.
+	 * Use {@link #LocaleId(String, boolean)} to create a new LocaleId from a locale identifier.
 	 * @param language the language code (e.g. "de" for German).
 	 * @throws IllegalArgumentException if the argument in invalid.
 	 */
@@ -144,17 +147,30 @@ public final class LocaleId implements Comparable<Object> {
         locId = normalize(tmp);
 	}
 	
+	/**
+	 * Gets the string representation of the LocaleId.
+	 * @return the string representation of the LocaleId.
+	 */
 	@Override
 	public String toString () {
 		return locId;
 	}
 	
+	/**
+	 * Returns a clone of this LocaleId. Because LocaleId are immutable objects
+	 * this method returns the same LocaleId.
+	 * @return the same LocaleId (because it is immutable).
+	 */
 	@Override
 	public LocaleId clone () {
 		// No need to duplicate since the object is immutable
 		return this;
 	}
 
+	/**
+	 * Returns a hash code value for this LocaleId.
+	 * @return the hash code value for this LocaleId.
+	 */
 	@Override
     public int hashCode() {
         return locId.hashCode();
@@ -211,8 +227,8 @@ public final class LocaleId implements Comparable<Object> {
 	
 	/**
 	 * Normalizes a LocaleId.
-	 * @param locId the LocaleId to normalize.
-	 * @return the normalized LocaleId.
+	 * @param locId the LocaleId identifier to normalize.
+	 * @return the normalized LocaleId identifier.
 	 */
 	private String normalize (String locId) {
 		if ( Util.isEmpty(locId) ) {
@@ -230,8 +246,8 @@ public final class LocaleId implements Comparable<Object> {
 	}
 
 	/**
-	 * Creates a new LocaleId from a locale identifier. calling this method is the same as calling
-	 * <code>new LocaleId(locId, true);</code>
+	 * Creates a new LocaleId from a locale identifier (and validate it).
+	 * Calling this method is the same as calling <code>new LocaleId(locId, true);</code>
 	 * @param locId the locale identifier to use (it will be normalized).
 	 * @return a new localeId object from the given identifier.
 	 * @throws IllegalArgumentException if the argument in invalid.
@@ -280,6 +296,11 @@ public final class LocaleId implements Comparable<Object> {
 		}
 	}
 	
+	/**
+	 * Gets a POSIX locale identifier for this LocaleId.
+	 * For example: "af-za" returns "af_ZA". 
+	 * @return the corresponding POSIX locale identifier for this LocaleId.
+	 */
 	public String toPOSIXLocaleId () {
 		//TODO: Make it simpler, and complete it
 		String tmp = getLanguage();
@@ -290,7 +311,7 @@ public final class LocaleId implements Comparable<Object> {
 	}
 	
 	/**
-	 * Creates a new LocaleId from a BCP-47 language tag. 
+	 * Creates a new LocaleId from a BCP-47 language tag.
 	 * @param langtag the language tag to use (e.g. "fr-CA")
 	 * @return a new LocaleId, or null if an error occurred.
 	 */
@@ -452,7 +473,9 @@ public final class LocaleId implements Comparable<Object> {
 	}
 
 	/**
-	 * Splits a given ISO language tag into its components.
+	 * Splits a given ISO language tag (e.g. "fr-ca") into its components.
+	 * Use this method when working directly with an {@link LocaleId} object is not desirable.
+	 * This method supports only simple ISO codes (not complex BCP-47 tags).
 	 * @param language the language code to process.
 	 * @return an array of two strings: 0=language, 1=region/country (or empty)
 	 */
@@ -465,7 +488,8 @@ public final class LocaleId implements Comparable<Object> {
 		if (n > -1) {
 			parts[0] = language.substring(0, n);
 			parts[1] = language.substring(n + 1);
-		} else {
+		}
+		else {
 			parts[0] = language;
 			parts[1] = "";
 		}
