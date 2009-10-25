@@ -574,7 +574,7 @@ public class TmxFilter implements IFilter {
 					}
 					
 					if(curLocalName.equals("ut") && !skipUtWarning){
-						logger.warning("<ut> is been DEPRECATED in tmx 1.4.");
+						logger.warning("<ut> is been deprecated in tmx 1.4.");
 						skipUtWarning=true;
 					}
 					elemStack.push(curLocalName);
@@ -751,7 +751,7 @@ public class TmxFilter implements IFilter {
 					}
 					
 					if(localName.equals("ut") && !skipUtWarning){
-						logger.warning("<ut> is been DEPRECATED in tmx 1.4.");
+						logger.warning("<ut> is been deprecated in tmx 1.4.");
 						skipUtWarning=true;
 					}
 					elemStack.push(localName);
