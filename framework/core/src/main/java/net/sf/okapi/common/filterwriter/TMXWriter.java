@@ -317,7 +317,7 @@ public class TMXWriter {
 
     	itemCount++;
     	writer.writeStartElement("tu");
-    	if (( tuid != null ) && ( tuid.length() > 0 )) {
+    	if ( !Util.isEmpty(tuid) ) {
     		writer.writeAttributeString("tuid", tuid);
     	}
     	writer.writeLineBreak();

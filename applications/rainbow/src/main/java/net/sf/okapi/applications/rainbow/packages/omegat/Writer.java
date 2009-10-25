@@ -114,7 +114,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 				if ( scores.getScore(i) >= 100 ) {
 					tmxWriterApproved.writeTU(srcList.get(i).text,
 						(i>trgList.size()-1) ? null : trgList.get(i).text,
-						String.format("%s_s%02d", tuid, i+1),
+						((tuid==null) ? null : String.format("%s_s%02d", tuid, i+1)),
 						null);
 				}
 				else if ( scores.getScore(i) > 0 ) {
@@ -122,7 +122,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 					tf.setCodedText(Util.ORIGIN_MT+" "+tf.getCodedText());
 					tmxWriterLeverage.writeTU(tf,
 						(i>trgList.size()-1) ? null : trgList.get(i).text,
-						String.format("%s_s%02d", tuid, i+1),
+						((tuid==null) ? null : String.format("%s_s%02d", tuid, i+1)),
 						null);
 				}
 			}
