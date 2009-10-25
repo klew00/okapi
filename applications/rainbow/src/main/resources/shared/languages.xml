@@ -1267,10 +1267,10 @@ SU-ID|SU|SUN|1|Sundanese|-1|windows-1252|flg_ID|ansi
  <language code='es-VE' lcid='8202' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1' flag='flagVE'>
   <name>Spanish (Venezuela)</name>
  </language>
- <language code='x-es-LatAm' lcid='-1' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1'>
-  <name>Spanish (Latin America)</name>
+ <language code='es-419' lcid='-1' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1'>
+  <name>Spanish (Latin American &amp; the Caribbean)</name>
  </language>
- <language code='x-es-Modern' lcid='3082' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1'>
+ <language code='es-x-Modern' lcid='3082' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1'>
   <name>Spanish (Modern Sort)</name>
  </language>
 

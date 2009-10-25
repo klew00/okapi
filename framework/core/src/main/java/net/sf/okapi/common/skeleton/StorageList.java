@@ -100,12 +100,12 @@ class StorageList extends ArrayList<IResource>
 		startGroup.setAnnotation(annotation);
 	}
 
-	public Property createTargetProperty(LocaleId language,
+	public Property createTargetProperty(LocaleId locId,
 		String name,
 		boolean overwrite,
 		int creationOptions)
 	{
-		return startGroup.createTargetProperty(language, name, overwrite, creationOptions);
+		return startGroup.createTargetProperty(locId, name, overwrite, creationOptions);
 	}
 
 	public Property setTargetProperty (LocaleId language,
@@ -143,8 +143,8 @@ class StorageList extends ArrayList<IResource>
 		return startGroup.getSourcePropertyNames();
 	}
 
-	public Set<LocaleId> getTargetLanguages () {
-		return startGroup.getTargetLanguages();
+	public Set<LocaleId> getTargetLocales () {
+		return startGroup.getTargetLocales();
 	}
 
 	public Property setSourceProperty (Property property) {

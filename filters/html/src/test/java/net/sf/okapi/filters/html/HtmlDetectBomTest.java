@@ -52,7 +52,7 @@ public class HtmlDetectBomTest {
 				StartDocument sd = (StartDocument)event.getResource();
 				assertTrue(sd.hasUTF8BOM());
 				assertEquals("UTF-8", sd.getEncoding());
-				assertEquals(locEN, sd.getLanguage());
+				assertEquals(locEN, sd.getLocale());
 				assertEquals("\r\n", sd.getLineBreak());
 			}
 		}
@@ -76,7 +76,7 @@ public class HtmlDetectBomTest {
 				StartDocument sd = (StartDocument)event.getResource();
 				assertFalse(sd.hasUTF8BOM());
 				assertEquals("UTF-16LE", sd.getEncoding());
-				assertEquals(locEN, sd.getLanguage());
+				assertEquals(locEN, sd.getLocale());
 				assertEquals("\r\n", sd.getLineBreak());
 			}
 		}
@@ -99,7 +99,7 @@ public class HtmlDetectBomTest {
 				StartDocument sd = (StartDocument)event.getResource();
 				assertFalse(sd.hasUTF8BOM());
 				assertEquals("UTF-8", sd.getEncoding());
-				assertEquals(locEN, sd.getLanguage());
+				assertEquals(locEN, sd.getLocale());
 				assertEquals("\r\n", sd.getLineBreak());
 			}
 		}		

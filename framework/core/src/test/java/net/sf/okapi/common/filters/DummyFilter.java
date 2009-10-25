@@ -106,7 +106,7 @@ public class DummyFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+		setOptions(input.getSourceLocale(), input.getTargetLocale(),
 			input.getEncoding(), generateSkeleton);
 		if ( input.getInputCharSequence() != null ) {
 			reset(input.getInputCharSequence().toString());
@@ -144,7 +144,7 @@ public class DummyFilter implements IFilter {
 		String[] parts = data.split("\n", 0);
 
 		StartDocument sd = new StartDocument("sd1");
-		sd.setLanguage(srcLang);
+		sd.setLocale(srcLang);
 		sd.setMultilingual(parts.length>1);
 		sd.setMimeType("text");
 		queue.add(new Event(EventType.START_DOCUMENT, sd));
@@ -181,7 +181,7 @@ public class DummyFilter implements IFilter {
 		queue = new LinkedList<Event>();
 
 		StartDocument sd = new StartDocument("sd1");
-		sd.setLanguage(srcLang);
+		sd.setLocale(srcLang);
 		sd.setMultilingual(true);
 		sd.setMimeType("text/xml");
 		GenericSkeleton skel = new GenericSkeleton("<doc>\n");

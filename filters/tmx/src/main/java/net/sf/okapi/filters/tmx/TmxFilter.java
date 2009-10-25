@@ -252,9 +252,9 @@ public class TmxFilter implements IFilter {
 			reader = fact.createXMLStreamReader(input.getReader());
 
 			encoding = input.getEncoding(); // Real encoding
-			srcLang = input.getSourceLanguage();
+			srcLang = input.getSourceLocale();
 			if ( Util.isNullOrEmpty(srcLang) ) throw new NullPointerException("Source language not set.");
-			trgLang = input.getTargetLanguage();
+			trgLang = input.getTargetLocale();
 			if ( Util.isNullOrEmpty(trgLang) ) throw new NullPointerException("Target language not set.");
 			hasUTF8BOM = detector.hasUtf8Bom();
 			lineBreak = detector.getNewlineType().toString();
@@ -280,7 +280,7 @@ public class TmxFilter implements IFilter {
 			String realEnc = reader.getCharacterEncodingScheme();
 			if ( realEnc != null ) encoding = realEnc;
 			startDoc.setEncoding(encoding, hasUTF8BOM); //TODO: UTF8 BOM detection
-			startDoc.setLanguage(srcLang);
+			startDoc.setLocale(srcLang);
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setType("text/x-tmx");

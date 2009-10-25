@@ -22,14 +22,15 @@ package net.sf.okapi.applications.rainbow.lib;
 
 import java.io.File;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.Util;
 
 public class PathBuilder {
 
-	public static final int       EXTTYPE_PREPEND     = 0;
-	public static final int       EXTTYPE_APPEND      = 1;
-	public static final int       EXTTYPE_REPLACE     = 2;
+	public static final int EXTTYPE_PREPEND     = 0;
+	public static final int EXTTYPE_APPEND      = 1;
+	public static final int EXTTYPE_REPLACE     = 2;
 
 	private boolean useSubFolder;
 	private String subFolder;
@@ -59,14 +60,14 @@ public class PathBuilder {
 		input = input.replace("${TrgLang}", trgLang);
 
 		if ( input.indexOf("${SrcLoc") != -1 ) {
-			String[] res = Util.splitLanguageCode(srcLang);
+			String[] res = LocaleId.splitLanguageCode(srcLang);
 			input = input.replace("${SrcLoc}", srcLang.replace('-', '_'));
 			input = input.replace("${SrcLocLang}", res[0]);
 			input = input.replace("${SrcLocReg}", res[1]);
 		}
 		
 		if ( input.indexOf("${TrgLoc") != -1 ) {
-			String[] res = Util.splitLanguageCode(trgLang);
+			String[] res = LocaleId.splitLanguageCode(trgLang);
 			input = input.replace("${TrgLoc}", trgLang.replace('-', '_'));
 			input = input.replace("${TrgLocLang}", res[0]);
 			input = input.replace("${TrgLocReg}", res[1]);

@@ -118,7 +118,7 @@ public class TsFilterTest {
 		assertEquals("Incorrect mimeType",MimeTypeMapper.TS_MIME_TYPE, sd.getMimeType());
 		assertNull("Name should be null", sd.getName());
 		assertEquals("Incorrect encoding", "utf-8", sd.getEncoding());
-		assertEquals("Incorrect src language", locENUS, sd.getLanguage());
+		assertEquals("Incorrect src language", locENUS, sd.getLocale());
 		assertEquals("Incorrect linebreak", "\r", sd.getLineBreak());
 		assertEquals("Incorrect multilingual", true, sd.isMultilingual());
 		assertEquals("Incorrect utf8bom", false, sd.hasUTF8BOM());
@@ -494,7 +494,7 @@ public class TsFilterTest {
 		assertTrue(sd.getName().startsWith(root));
 		assertTrue(sd.getName().endsWith("/Complete_valid_utf8_bom_crlf.ts"));
 		assertEquals("Incorrect encoding", "utf-8", sd.getEncoding());
-		assertEquals("Incorrect src language", locENUS, sd.getLanguage());
+		assertEquals("Incorrect src language", locENUS, sd.getLocale());
 		assertEquals("Incorrect linebreak", "\r\n", sd.getLineBreak());
 		assertEquals("Incorrect multilingual", true, sd.isMultilingual());
 		assertEquals("Incorrect utf8bom", true, sd.hasUTF8BOM());

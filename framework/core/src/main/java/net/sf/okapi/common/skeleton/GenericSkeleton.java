@@ -190,14 +190,14 @@ public class GenericSkeleton implements ISkeleton {
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker("$self$"));
 		part.parent = textUnit;
-		part.language = null;
+		part.locId = null;
 		list.add(part);
 		// Flag that the next append() should start a new part
 		createNew = true;
 	}
 	
 	/**
-	 * Adds to this skeleton a placeholder for the content (in a given language) of the resource
+	 * Adds to this skeleton a placeholder for the content (in a given locale) of the resource
 	 * to which this skeleton is attached.
 	 * @param textUnit the resource object.
 	 * @param locId the locale; use null if the reference is the source.
@@ -207,14 +207,14 @@ public class GenericSkeleton implements ISkeleton {
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker("$self$"));
 		part.parent = textUnit;
-		part.language = locId;
+		part.locId = locId;
 		list.add(part);
 		// Flag that the next append() should start a new part
 		createNew = true;
 	}
 
 	/**
-	 * Adds to this skeleton a place-holder for the value of a property (in a given language)
+	 * Adds to this skeleton a place-holder for the value of a property (in a given locale)
 	 * of the resource to which this skeleton is attached.
 	 * @param referent the resource object.
 	 * @param propName the property name.
@@ -226,7 +226,7 @@ public class GenericSkeleton implements ISkeleton {
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(
 			TextFragment.makeRefMarker("$self$", propName));
-		part.language = locId;
+		part.locId = locId;
 		part.parent = referent;
 		list.add(part);
 		// Flag that the next append() should start a new part
@@ -254,7 +254,7 @@ public class GenericSkeleton implements ISkeleton {
 	public void addReference (IReferenceable referent) {
 		GenericSkeletonPart part = new GenericSkeletonPart(
 			TextFragment.makeRefMarker(((IResource)referent).getId()));
-			part.language = null;
+			part.locId = null;
 			part.parent = null; // This is a reference to a real referent
 			list.add(part);
 			// Flag that the next append() should start a new part

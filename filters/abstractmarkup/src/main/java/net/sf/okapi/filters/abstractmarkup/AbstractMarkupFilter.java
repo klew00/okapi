@@ -254,7 +254,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		try {
 			input.setEncoding(detectedEncoding);
-			setOptions(input.getSourceLanguage(), input.getTargetLanguage(), detectedEncoding, generateSkeleton);
+			setOptions(input.getSourceLocale(), input.getTargetLocale(), detectedEncoding, generateSkeleton);
 			document = new StreamedSource(input.getReader());
 		} catch (IOException e) {
 			throw new OkapiIOException("Filter could not open input stream", e);

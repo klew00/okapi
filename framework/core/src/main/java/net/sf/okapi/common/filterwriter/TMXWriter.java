@@ -136,8 +136,8 @@ public class TMXWriter {
 
     /**
      * Writes the start of the TMC document.
-     * @param sourceLocale The source language (must be set).
-     * @param targetLocale The target language (must be set).
+     * @param sourceLocale The source locale (must be set).
+     * @param targetLocale The target locale (must be set).
      * @param creationTool The identifier of the creation tool (can be null).
      * @param creationToolVersion The version of the creation tool (can be null).
      * @param segType The type of segments in the output.
@@ -214,7 +214,7 @@ public class TMXWriter {
      * @param item the text unit to output.
      * @param attributes the optional set of attribute to put along with the entry.
      * @param alternate indicates if this item is an 'alternate'. If it is an alternate, if the
-     * target language does not have any entry in this item, the first found entry is used
+     * target locale does not have any entry in this item, the first found entry is used
      * instead. This is to allow getting for example FR-CA translations for an FR project.
      */
     public void writeItem (TextUnit item,
@@ -232,8 +232,8 @@ public class TMXWriter {
 
     	if (( trgTC == null ) && alternate ) {
     		// If we don't have a target but are in alternate mode: get the first
-    		// available language in the list
-    		Iterator<LocaleId> iter = item.getTargetLanguages().iterator();
+    		// available locale in the list
+    		Iterator<LocaleId> iter = item.getTargetLocales().iterator();
     		if ( iter.hasNext() ) {
     			trgTC = item.getTarget(iter.next());
     		}
@@ -369,7 +369,7 @@ public class TMXWriter {
     	}
 
     	TextContainer srcCont = item.getSource();
-    	Set<LocaleId> locales = item.getTargetLanguages();
+    	Set<LocaleId> locales = item.getTargetLocales();
 
     	//TODO: Support segmented output
     	if ( !srcCont.isSegmented() ) { // Source is not segmented
@@ -405,10 +405,10 @@ public class TMXWriter {
 
     /**
      * Writes a TUV element.
-     * @param frag The TextFragment for the content of this TUV. This can be
+     * @param frag the TextFragment for the content of this TUV. This can be
      * a segment of a TextContainer.
-     * @param locale The language for this TUV.
-     * @param contForProp The TextContainer that has the properties to write for
+     * @param locale the locale for this TUV.
+     * @param contForProp the TextContainer that has the properties to write for
      * this TUV, or null for no properties.
      */
     private void writeTUV (TextFragment frag,

@@ -193,7 +193,7 @@ public class IDMLContentFilter implements IFilter {
 		//TODO: Fix the encoding as it is  not necessarily correct as the encoding is not retrieve from XMLStreamReader
 		// We should use reader.getEncoding() when it's set
 		startDoc.setEncoding("UTF-8", false); //TODO: UTF8BOM detection
-		startDoc.setLanguage(input.getSourceLanguage());
+		startDoc.setLocale(input.getSourceLocale());
 		startDoc.setFilterParameters(params);
 		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setType("text/xml");

@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextContainer;
@@ -672,7 +673,8 @@ public class SRXEditor {
 					if ( edSampleLanguage.getText().length() == 0 ) {
 						edSampleLanguage.setText("en"); //$NON-NLS-1$
 					}
-					segmenter = srxDoc.compileLanguageRules(edSampleLanguage.getText(),
+					segmenter = srxDoc.compileLanguageRules(
+						LocaleId.fromString(edSampleLanguage.getText()),
 						(forceReset ? null : segmenter));
 				}
 			}

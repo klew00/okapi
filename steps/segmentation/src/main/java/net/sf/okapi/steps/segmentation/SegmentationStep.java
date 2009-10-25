@@ -88,7 +88,7 @@ public class SegmentationStep extends BasePipelineStep {
 			src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
 			srxDoc.loadRules(src);
 			if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
-			srcSeg = srxDoc.compileLanguageRules(sourceLocale.toBCP47(), null);
+			srcSeg = srxDoc.compileLanguageRules(sourceLocale, null);
 		}
 		if ( params.segmentTarget ) {
 			String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
@@ -97,7 +97,7 @@ public class SegmentationStep extends BasePipelineStep {
 				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			}
 		}
-		trgSeg = srxDoc.compileLanguageRules(targetLocale.toBCP47(), null);
+		trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
 	}
 	
 	@Override

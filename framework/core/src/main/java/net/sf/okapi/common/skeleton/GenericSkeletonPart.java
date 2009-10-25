@@ -23,11 +23,14 @@ package net.sf.okapi.common.skeleton;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 
+/**
+ * Part of {@link GenericSkeleton} object.
+ */
 public class GenericSkeletonPart { // public for OpenXML
 
 	StringBuilder data;
 	IResource parent = null;
-	LocaleId language = null;
+	LocaleId locId = null;
 	
 	public GenericSkeletonPart (String data) {
 		this.data = new StringBuilder(data);
@@ -47,8 +50,8 @@ public class GenericSkeletonPart { // public for OpenXML
 		this.data.append(data);
 	}
 
-	public LocaleId getLanguage () {
-		return language;
+	public LocaleId getLocale () {
+		return locId;
 	}
 
 }

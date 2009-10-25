@@ -178,7 +178,7 @@ public class JSONFilter implements IFilter {
 			throw new OkapiUnsupportedEncodingException(
 				String.format("The encoding '%s' is not supported.", encoding), e);
 		}
-		srcLoc = input.getSourceLanguage();
+		srcLoc = input.getSourceLocale();
 		hasUTF8BOM = detector.hasUtf8Bom();
 		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
@@ -235,7 +235,7 @@ public class JSONFilter implements IFilter {
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
-		startDoc.setLanguage(srcLoc);
+		startDoc.setLocale(srcLoc);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setFilterWriter(createFilterWriter());

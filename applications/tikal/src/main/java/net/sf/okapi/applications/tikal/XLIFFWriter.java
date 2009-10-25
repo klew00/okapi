@@ -123,7 +123,7 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( writer != null ) writer.close();
 		writer = new XMLWriter(outputPath);
 
-		srcLang = resource.getLanguage();
+		srcLang = resource.getLocale();
 		writer.writeStartDocument();
 		writer.writeStartElement("xliff");
 		writer.writeAttributeString("version", "1.2");

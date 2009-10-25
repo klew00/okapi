@@ -217,7 +217,7 @@ public class BaseNameable implements INameable {
 		return (trgProps.get(name) != null);
 	}
 		
-	public Set<LocaleId> getTargetLanguages () {
+	public Set<LocaleId> getTargetLocales () {
 		if ( annotations == null ) annotations = new Annotations();
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
 		if ( tpa == null ) {

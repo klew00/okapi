@@ -48,9 +48,9 @@ public class ListUtil {
 	}
 	
 //	/**
-//	 * Converts an array of string representing languages into a list of languages.
+//	 * Converts an array of string representing locales into a list of locales.
 //	 * @param array the array of strings to convert.
-//	 * @return a list of languages for the given strings.
+//	 * @return a list of locales for the given strings.
 //	 */
 //	public static List<LocaleId> stringArrayAsLanguageList (String[] array) {
 //		List<LocaleId> list = new ArrayList<LocaleId>();
@@ -61,9 +61,10 @@ public class ListUtil {
 //	}
 
 	/**
-	 * Splits up a string of comma-separated substrings representing language codes into a string list of languages.
+	 * Splits up a string of comma-separated substrings representing locale codes into a
+	 * string list of {@link LocaleId} objects.
 	 * @param input string of comma-separated substrings. 
-	 * @return a list of languages.
+	 * @return a list of {@link LocaleId} objects.
 	 */
 	public static List<LocaleId> stringAsLanguageList (String input) {
 		if ( input == null ) return null;
@@ -435,7 +436,7 @@ public class ListUtil {
 	/**
 	 * Creates a new list and moves therein a range of elements from a given list. The given list won't contain
 	 * the moved elements anymore.
-	 * @param list the given list.
+	 * @param buffer the given list.
 	 * @param start the start index (inclusive) to be included in the resulting list.
 	 * @param end the end index (exclusive) to be included in the resulting list.
 	 * @return a new list, containing all elements in the specified range of the given list.

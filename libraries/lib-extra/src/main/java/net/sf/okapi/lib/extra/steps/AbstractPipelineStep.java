@@ -178,7 +178,7 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 		
 		StartDocument sd = (StartDocument) event.getResource();
 		
-		if (sd != null) language = sd.getLanguage();
+		if (sd != null) language = sd.getLocale();
 	}
 
 	/**

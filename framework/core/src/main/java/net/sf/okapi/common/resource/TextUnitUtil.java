@@ -57,7 +57,7 @@ public class TextUnitUtil {
 		int pos = TextFragment.indexOfFirstNonWhitespace(st, 0, -1, true, true, true, true);		
 		if (pos == -1) { // Whole string is whitespaces
 			skelTF = new TextFragment(st);
-			textFragment.setCodedText("");			
+			textFragment.setCodedText("");
 		}
 		else {
 			skelTF = textFragment.subSequence(0, pos);
@@ -194,18 +194,18 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * Gets text of the target part of a given text unit resource in the given language.
+	 * Gets text of the target part of a given text unit resource in the given locale.
 	 * @param textUnit the text unit resource which source text should be returned.
-	 * @param language LocaleID object describing the language of the target part being sought.
-	 * @return the target part of the given text unit resource in the given language, or an empty string if the 
+	 * @param locId the locale the target part being sought.
+	 * @return the target part of the given text unit resource in the given loacle, or an empty string if the 
 	 * text unit doesn't contain one.
 	 */
-	public static String getTargetText(TextUnit textUnit, LocaleId language) {
+	public static String getTargetText(TextUnit textUnit, LocaleId locId) {
 		
 		if (textUnit == null) return "";
-		if (Util.isNullOrEmpty(language)) return "";
+		if (Util.isNullOrEmpty(locId)) return "";
 		
-		return getCodedText(textUnit.getTargetContent(language));
+		return getCodedText(textUnit.getTargetContent(locId));
 	}
 	
 	/**
@@ -314,7 +314,7 @@ public class TextUnitUtil {
 	/**
      * Returns the index (within a given text fragment object) of the rightmost occurrence
      * of the specified substring.
-     * @param the text fragment to examine.
+     * @param textFragment the text fragment to examine.
      * @param findWhat the substring to search for.
      * @return if the string argument occurs one or more times as a substring
      *          within this object, then the index of the first character of
@@ -385,7 +385,7 @@ public class TextUnitUtil {
 	 * @param name name of the new text unit, or a new name for the existing one.
 	 * @param source the text container object becoming the source part of the text unit. 
 	 * @param target the text container object becoming the target part of the text unit.
-	 * @param language the language of the target part (passed in the target parameter).
+	 * @param locId the locale of the target part (passed in the target parameter).
 	 * @param comment the optional comment becoming a NOTE property of the text unit. 
 	 * @return a reference to the original or newly created text unit. 
 	 */
@@ -394,7 +394,7 @@ public class TextUnitUtil {
 			String name, 
 			TextContainer source, 
 			TextContainer target, 
-			LocaleId language, 
+			LocaleId locId, 
 			String comment) {
 		
 		if (textUnit == null) {
@@ -412,8 +412,8 @@ public class TextUnitUtil {
 		if (source != null)
 			textUnit.setSource(source);
 		
-		if (target != null && !Util.isNullOrEmpty(language))
-			textUnit.setTarget(language, target);
+		if (target != null && !Util.isNullOrEmpty(locId))
+			textUnit.setTarget(locId, target);
 		
 		if (!Util.isEmpty(comment))
 			textUnit.setProperty(new Property(Property.NOTE, comment));
@@ -479,11 +479,11 @@ public class TextUnitUtil {
 			
 			if (st.equalsIgnoreCase(tuRef)) {
 				
-				LocaleId language = part.getLanguage();
-				if (Util.isNullOrEmpty(language))
+				LocaleId locId = part.getLocale();
+				if (Util.isNullOrEmpty(locId))
 					res.add(TextUnitUtil.getSourceText(textUnit));
 				else
-					res.add(TextUnitUtil.getTargetText(textUnit, language));
+					res.add(TextUnitUtil.getTargetText(textUnit, locId));
 				
 				continue;
 			}
@@ -522,34 +522,34 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * Gets an annotation attached to the target part of a given text unit resource in a given language.
+	 * Gets an annotation attached to the target part of a given text unit resource in a given locale.
 	 * @param textUnit the given text unit resource.
-	 * @param language LocaleID object describing the language of the target part being sought.
+	 * @param locId the locale of the target part being sought.
 	 * @param type reference to the requested annotation type. 
 	 * @return the annotation or null if not found.
 	 */
-	public static <A extends IAnnotation> A getTargetAnnotation(TextUnit textUnit, LocaleId language, Class<A> type) {
+	public static <A extends IAnnotation> A getTargetAnnotation(TextUnit textUnit, LocaleId locId, Class<A> type) {
 		
 		if (textUnit == null) return null;
-		if (Util.isNullOrEmpty(language)) return null;
-		if (textUnit.getTarget(language) == null) return null;
+		if (Util.isNullOrEmpty(locId)) return null;
+		if (textUnit.getTarget(locId) == null) return null;
 		
-		return textUnit.getTarget(language).getAnnotation(type);		
+		return textUnit.getTarget(locId).getAnnotation(type);		
 	}
 
 	/**
 	 * Attaches an annotation to the target part of a given text unit resource in a given language.
 	 * @param textUnit the given text unit resource.
-	 * @param language LocaleID object describing the language of the target part being attached to.
+	 * @param locId the locale of the target part being attached to.
 	 * @param annotation the annotation to be attached to the target part of the text unit.
 	 */
-	public static void setTargetAnnotation(TextUnit textUnit, LocaleId language, IAnnotation annotation) {
+	public static void setTargetAnnotation(TextUnit textUnit, LocaleId locId, IAnnotation annotation) {
 		
 		if (textUnit == null) return;
-		if (Util.isNullOrEmpty(language)) return;
-		if (textUnit.getTarget(language) == null) return;
+		if (Util.isNullOrEmpty(locId)) return;
+		if (textUnit.getTarget(locId) == null) return;
 		
-		textUnit.getTarget(language).setAnnotation(annotation);		
+		textUnit.getTarget(locId).setAnnotation(annotation);		
 	}
 	
 	/**
@@ -570,15 +570,15 @@ public class TextUnitUtil {
 	/**
 	 * Sets the coded text of the the target part of a given text unit resource in a given language.
 	 * @param textUnit the given text unit resource.
-	 * @param language LocaleID object describing the language of the target part being set.
+	 * @param locId the locale of the target part being set.
 	 * @param text the text to be set.
 	 */
-	public static void setTargetText(TextUnit textUnit, LocaleId language, String text) {
+	public static void setTargetText(TextUnit textUnit, LocaleId locId, String text) {
 		
 		if (textUnit == null) return;
-		if (Util.isNullOrEmpty(language)) return;
+		if (Util.isNullOrEmpty(locId)) return;
 		
-		TextFragment target = textUnit.getTargetContent(language); 
+		TextFragment target = textUnit.getTargetContent(locId); 
 		if (target == null) return;
 		
 		target.setCodedText(text);

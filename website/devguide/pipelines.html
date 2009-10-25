@@ -138,8 +138,8 @@ driver.addBatchItem(
       &quot;okf_html&quot;, // Filter configuration of the document
       (new File(&quot;myFile.out.html&quot;)).toURI(), // Output
       &quot;UTF-8&quot;, // Encoding for the output
-      &quot;en&quot;, // Source language
-      &quot;fr&quot; // Target language
+      LocaleId.fromString(&quot;en&quot;), // Source language
+      LocaleId.fromString(&quot;fr&quot;) // Target language
    )
 );</pre>
 <p>We are now ready to execute the pipeline for the given input document. This 

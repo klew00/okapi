@@ -42,13 +42,13 @@ public class SkeletonUtil {
 	}
 	
 	/**
-	 * Finds either source or target reference in the skeleton. If language is specified, then its target reference is sought for.
+	 * Finds either source or target reference in the skeleton. If locId is specified, then its target reference is sought for.
 	 * @param skel the skeleton being sought for the reference.
-	 * @param language the language to search the reference for.
+	 * @param locId the locale to search the reference for.
 	 * @return index in the list of skeleton parts for the skeleton part containing the reference. 
 	 */
 	public static int findTuRefInSkeleton(GenericSkeleton skel,
-		LocaleId language)
+		LocaleId locId)
 	{
 		if ( skel == null ) return -1; 		
 		List<GenericSkeletonPart> list = skel.getParts();
@@ -59,10 +59,10 @@ public class SkeletonUtil {
 			String st = part.toString();
 			if ( Util.isEmpty(st) ) continue;
 			if ( st.equalsIgnoreCase(tuRef) ) {
-				if ( Util.isNullOrEmpty(language) ) {
+				if ( Util.isNullOrEmpty(locId) ) {
 					return i;
 				}
-				else if ( language.equals(part.getLanguage()) ) {
+				else if ( locId.equals(part.getLocale()) ) {
 					return i;
 				}
 			}
@@ -80,15 +80,15 @@ public class SkeletonUtil {
 	}
 	
 	/**
-	 * Determines if a given skeleton contains a target reference in a given language.
+	 * Determines if a given skeleton contains a target reference in a given locale.
 	 * @param skel the skeleton being sought for the reference. 
-	 * @param language LocaleID object describing the language of the target part being sought.
+	 * @param locId the locale of the target part being sought.
 	 * @return true if the given skeleton contains such a reference.
 	 */
-	public static boolean hasTuRef (GenericSkeleton skel, LocaleId language) {
-		return findTuRefInSkeleton(skel, language) != -1;
+	public static boolean hasTuRef (GenericSkeleton skel, LocaleId locId) {
+		return findTuRefInSkeleton(skel, locId) != -1;
 	}
-	
+
 	/**
 	 * Replaces a part of a given skeleton with another given skeleton part.
 	 * @param skel the skeleton which part is being replaced.

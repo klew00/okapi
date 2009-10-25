@@ -192,14 +192,15 @@ public class ApertiumMTConnector implements IQuery {
 	}
 
 	private String toInternalCode (LocaleId standardCode) {
-		String[] codes = Util.splitLanguageCode(standardCode.toBCP47());
-		if ( codes[1] != null ) {
+		String lang = standardCode.getLanguage();
+		String reg = standardCode.getRegion();
+		if ( reg != null ) {
 			// Temporary fix for the Aranese case (until we get real LocaleID)
-			if ( codes[1].equals("aran") ) codes[0] += "_aran";
+			if ( reg.equals("aran") ) lang += "_aran";
 			// Temporary fix for the Brazilian Portuguese case (until we get real LocaleID)
-			if ( codes[1].equals("br") ) codes[0] += "_BR";
+			if ( reg.equals("br") ) lang += "_BR";
 		}
-		return codes[0];
+		return lang;
 	}
 
 	public IParameters getParameters () {

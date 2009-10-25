@@ -85,11 +85,11 @@ public class XLIFFMergingStep {
 	 */
 	public void handleRawDocument (RawDocument skelRawDoc) {
 		try {
-			trgLoc = skelRawDoc.getTargetLanguage();
+			trgLoc = skelRawDoc.getTargetLocale();
 			xlfReader = new XLIFFFilter();
 			File f = new File(xliffPath);
 			RawDocument xlfRawDoc = new RawDocument(f.toURI(), "UTF-8",
-				skelRawDoc.getSourceLanguage(), trgLoc);
+				skelRawDoc.getSourceLocale(), trgLoc);
 			xlfReader.open(xlfRawDoc);
 	
 			filter = fcMapper.createFilter(skelRawDoc.getFilterConfigId(), filter);

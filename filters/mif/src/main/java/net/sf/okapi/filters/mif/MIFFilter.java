@@ -148,7 +148,7 @@ public class MIFFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+		setOptions(input.getSourceLocale(), input.getTargetLocale(),
 			input.getEncoding(), generateSkeleton);
 		
 		if (input.getInputURI() != null) {
@@ -188,7 +188,7 @@ public class MIFFilter implements IFilter {
 			startDoc.setName(docName);
 			startDoc.setLineBreak("\n");
 			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
-			startDoc.setLanguage(srcLang);
+			startDoc.setLocale(srcLang);
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setType(getMimeType());

@@ -185,7 +185,7 @@ public class BOMConversionStep extends BasePipelineStep {
 			output.close();
 			// Creates the new RawDocument
 			event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
-				rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
+				rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("IO error while converting.", e);

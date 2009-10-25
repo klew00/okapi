@@ -22,6 +22,7 @@ package net.sf.okapi.lib.segmentation;
 
 import java.util.List;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
 
@@ -82,6 +83,6 @@ public interface ISegmenter {
 	 * @return the language code used to apply the rules, or null, if none has
 	 * been specified.
 	 */
-	public String getLanguage ();
+	public LocaleId getLanguage ();
 
 }

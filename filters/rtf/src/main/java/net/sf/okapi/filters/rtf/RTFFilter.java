@@ -359,7 +359,7 @@ public class RTFFilter implements IFilter {
 	{
 		try {
 			passedEncoding = input.getEncoding();
-			trgLang = input.getTargetLanguage();
+			trgLang = input.getTargetLocale();
 			if ( input.getInputURI() != null ) {
 				docName = input.getInputURI().getPath();
 			}
@@ -371,7 +371,7 @@ public class RTFFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
 			startDoc.setEncoding(passedEncoding, false);
-			startDoc.setLanguage(input.getSourceLanguage());
+			startDoc.setLocale(input.getSourceLocale());
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setType("text/rtf");

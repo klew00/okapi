@@ -197,7 +197,7 @@ public class DTDFilter implements IFilter {
 			//TODO: check if DTDParser is BOM-aware
 			DTDParser parser = new DTDParser(input.getReader());
 			
-			srcLang = input.getSourceLanguage();
+			srcLang = input.getSourceLocale();
 			hasUTF8BOM = detector.hasUtf8Bom();
 			lineBreak = detector.getNewlineType().toString();
 			if ( input.getInputURI() != null ) {
@@ -229,7 +229,7 @@ public class DTDFilter implements IFilter {
 		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLineBreak(lineBreak);
-		startDoc.setLanguage(srcLang);
+		startDoc.setLocale(srcLang);
 		startDoc.setMimeType(MimeTypeMapper.DTD_MIME_TYPE);
 		startDoc.setName(docName);
 		parseState = 2;

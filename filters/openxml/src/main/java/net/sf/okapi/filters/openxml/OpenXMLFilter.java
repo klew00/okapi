@@ -299,7 +299,7 @@ public class OpenXMLFilter implements IFilter {
 	{
 		if (input==null)
 			throw new RuntimeException("RawDocument is null");
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+		setOptions(input.getSourceLocale(), input.getTargetLocale(),
 			input.getEncoding(), generateSkeleton);
 		if ( input.getInputCharSequence() != null ) {
 			open(input.getInputCharSequence());
@@ -328,7 +328,7 @@ public class OpenXMLFilter implements IFilter {
 	{
 		if (input==null)
 			throw new RuntimeException("RawDocument is null");
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+		setOptions(input.getSourceLocale(), input.getTargetLocale(),
 			input.getEncoding(), generateSkeleton);
 		if ( input.getInputCharSequence() != null ) {
 			open(input.getInputCharSequence());
@@ -362,7 +362,7 @@ public class OpenXMLFilter implements IFilter {
 	public void open (RawDocument input,
 			boolean generateSkeleton, boolean bSquishable, Level nLogLevel)
 	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
+		setOptions(input.getSourceLocale(), input.getTargetLocale(),
 			input.getEncoding(), generateSkeleton);
 		if ( input.getInputCharSequence() != null ) {
 			open(input.getInputCharSequence());
@@ -547,7 +547,7 @@ public class OpenXMLFilter implements IFilter {
 			
 			StartDocument startDoc = new StartDocument(docId);
 			startDoc.setName(docURI.getPath());
-			startDoc.setLanguage(srcLang);
+			startDoc.setLocale(srcLang);
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setFilterParameters(getParameters());

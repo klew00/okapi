@@ -245,15 +245,15 @@ public class TextUnit implements INameable, IReferenceable {
 		return tc.getPropertyNames();
 	}
 
-	public boolean hasTargetProperty (LocaleId language,
+	public boolean hasTargetProperty (LocaleId locId,
 		String name)
 	{
-		TextContainer tc = getTarget(language);
+		TextContainer tc = getTarget(locId);
 		if ( tc == null ) return false;
 		return (tc.getProperty(name) != null);
 	}
 
-	public Set<LocaleId> getTargetLanguages () {
+	public Set<LocaleId> getTargetLocales () {
 		return targets.keySet();
 	}
 
@@ -343,11 +343,11 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
     /**
-	 * Sets the target object for this TextUnit for a given language.
-	 * Any existing target object for the given language is overwritten.
+	 * Sets the target object for this TextUnit for a given locale.
+	 * Any existing target object for the given locale is overwritten.
 	 * To set a target object based on the source, use the
 	 * {@link #createTarget(LocaleId, boolean, int)} method.
-	 * @param locId the target language.
+	 * @param locId the target locale.
 	 * @param text the target object to set.
 	 * @return the target object that has been set.
 	 */
@@ -360,7 +360,7 @@ public class TextUnit implements INameable, IReferenceable {
 
     /**
 	 * Removes a given target object from this TextUnit.
-	 * @param locId the target language to remove.
+	 * @param locId the target locale to remove.
 	 */
 	public void removeTarget (LocaleId locId) {
 		if ( hasTarget(locId) ) {
@@ -369,9 +369,9 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
     /**
-	 * Indicates if there is a target object for a given language for this TextUnit.
-	 * @param locId the language to query.
-	 * @return true if a target object exists for the given language, false otherwise.
+	 * Indicates if there is a target object for a given locale for this TextUnit.
+	 * @param locId the locale to query.
+	 * @return true if a target object exists for the given locale, false otherwise.
 	 */
 	public boolean hasTarget (LocaleId locId) {
 		return (targets.get(locId) != null);
@@ -380,8 +380,8 @@ public class TextUnit implements INameable, IReferenceable {
     /**
 	 * Creates or get the target for this TextUnit.
 	 * @param locId the target locale.
-	 * @param overwriteExisting true to overwrite any existing target for the given language.
-	 * False to not create a new target object if one already exists for the given language.
+	 * @param overwriteExisting true to overwrite any existing target for the given locale.
+	 * False to not create a new target object if one already exists for the given locale.
 	 * @param creationOptions creation options:
 	 * <ul><li>CREATE_EMPTY: Create an empty target object.</li>
 	 * <li>COPY_CONTENT: Copy the text of the source (and any associated in-line code).</li>
@@ -431,7 +431,7 @@ public class TextUnit implements INameable, IReferenceable {
 
 	/**
 	 * Gets the content of the target for a given locale for this TextUnit.
-	 * @param locId the language to query.
+	 * @param locId the locale to query.
 	 * @return the content of the target for the given locale for this TextUnit.
 	 */
 	public TextFragment getTargetContent (LocaleId locId) {
@@ -441,10 +441,10 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 	
 	/**
-	 * Sets the content of the target for a given language for this TextUnit.
-	 * @param locId the language to set.
+	 * Sets the content of the target for a given locale for this TextUnit.
+	 * @param locId the locale to set.
 	 * @param content the new content to set.
-	 * @return the new content for the given target language for this text unit. 
+	 * @return the new content for the given target locale for this text unit. 
 	 */
 	public TextFragment setTargetContent (LocaleId locId,
 		TextFragment content)

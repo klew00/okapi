@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -40,7 +41,7 @@ public class SRXSegmenter implements ISegmenter {
 	private boolean includeStartCodes;
 	private boolean includeEndCodes;
 	private boolean includeIsolatedCodes;
-	private String currentLanguageCode;
+	private LocaleId currentLanguageCode;
 	private boolean oneSegmentIncludesAll;
 	private boolean trimLeadingWS;
 	private boolean trimTrailingWS;
@@ -433,7 +434,7 @@ public class SRXSegmenter implements ISegmenter {
 		return list;
 	}
 	
-	public String getLanguage () {
+	public LocaleId getLanguage () {
 		return currentLanguageCode;
 	}
 	
@@ -441,7 +442,7 @@ public class SRXSegmenter implements ISegmenter {
 	 * Sets the language used to apply the rules.
 	 * @param languageCode Code of the language to use to apply the rules.
 	 */
-	protected void setLanguage (String languageCode) {
+	protected void setLanguage (LocaleId languageCode) {
 		currentLanguageCode = languageCode;
 	}
 	

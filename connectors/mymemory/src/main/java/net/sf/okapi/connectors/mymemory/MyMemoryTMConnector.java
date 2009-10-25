@@ -188,26 +188,26 @@ public class MyMemoryTMConnector implements ITMQuery {
 
 	private String toInternalCode (LocaleId standardCode) {
 		// The expected language code is language-Region with region mandatory
-		String[] res = Util.splitLanguageCode(standardCode.toString());
+		String lang = standardCode.getLanguage();
+		String reg = standardCode.getRegion();
+		
 		//TODO: Use a lookup table and a more complete one
-		res[0] = res[0].toLowerCase();
-		if ( !Util.isEmpty(res[1]) ) res[1] = res[1].toLowerCase();
-		if ( res[0].equals("en") ) res[1] = "us";
-		else if ( res[0].equals("pt") ) res[1] = "br";
-		else if ( res[0].equals("el") ) res[1] = "gr";
-		else if ( res[0].equals("he") ) res[1] = "il";
-		else if ( res[0].equals("ja") ) res[1] = "jp";
-		else if ( res[0].equals("ko") ) res[1] = "kr";
-		else if ( res[0].equals("ms") ) res[1] = "my";
-		else if ( res[0].equals("sl") ) res[1] = "si";
-		else if ( res[0].equals("sq") ) res[1] = "al";
-		else if ( res[0].equals("sv") ) res[1] = "se";
-		else if ( res[0].equals("vi") ) res[1] = "vn";
-		else if ( res[0].equals("zh") ) {
-			if ( Util.isEmpty(res[1]) ) res[1] = "cn";
+		if ( lang.equals("en") ) reg = "us";
+		else if ( lang.equals("pt") ) reg = "br";
+		else if ( lang.equals("el") ) reg = "gr";
+		else if ( lang.equals("he") ) reg = "il";
+		else if ( lang.equals("ja") ) reg = "jp";
+		else if ( lang.equals("ko") ) reg = "kr";
+		else if ( lang.equals("ms") ) reg = "my";
+		else if ( lang.equals("sl") ) reg = "si";
+		else if ( lang.equals("sq") ) reg = "al";
+		else if ( lang.equals("sv") ) reg = "se";
+		else if ( lang.equals("vi") ) reg = "vn";
+		else if ( lang.equals("zh") ) {
+			if ( reg != null ) reg = "cn";
 		}
-		else res[1] = res[0];
-		return res[0]+"-"+res[1];
+		else reg = lang;
+		return lang+"-"+reg;
 	}
 
 	/**

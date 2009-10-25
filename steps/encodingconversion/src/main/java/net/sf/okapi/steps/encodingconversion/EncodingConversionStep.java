@@ -336,7 +336,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			// Set the new raw-document URI and the encoding (in case one was auto-detected)
 			// Other info stays the same
 			RawDocument newDoc = new RawDocument(outFile.toURI(), outputEncoding,
-				rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage());
+				rawDoc.getSourceLocale(), rawDoc.getTargetLocale());
 			event.setResource(newDoc);
 			
 		}

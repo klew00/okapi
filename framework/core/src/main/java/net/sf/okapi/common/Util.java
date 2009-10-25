@@ -807,29 +807,6 @@ public class Util {
 	}
 
 	/**
-	 * Splits a given ISO language tag into its components.
-	 * 
-	 * @param language
-	 *            The language code to process.
-	 * @return An array of two strings: 0=language, 1=region/country (or empty)
-	 */
-	public static String[] splitLanguageCode(String language) {
-		if ((language == null) || (language.length() == 0))
-			return null;
-		String[] parts = new String[2];
-		language = language.replace('_', '-');
-		int n = language.indexOf('-');
-		if (n > -1) {
-			parts[0] = language.substring(0, n);
-			parts[1] = language.substring(n + 1);
-		} else {
-			parts[0] = language;
-			parts[1] = "";
-		}
-		return parts;
-	}
-
-	/**
 	 * Gets the text content of the first TEXT child of an element node. This is
 	 * to use instead of node.getTextContent() which does not work with some
 	 * Macintosh Java VMs. Note this work-around get <b>only the first TEXT

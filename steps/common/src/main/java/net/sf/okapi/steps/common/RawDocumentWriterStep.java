@@ -102,7 +102,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 			// Set the new raw-document URI and the encoding (in case one was auto-detected)
 			// Other info stays the same
 			event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
-					rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
+					rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));
 			isDone = true;
 		}
 		catch ( Throwable e ) {

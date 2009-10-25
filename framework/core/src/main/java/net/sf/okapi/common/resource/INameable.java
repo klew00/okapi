@@ -172,16 +172,16 @@ public interface INameable extends IResource {
 	public Set<String> getTargetPropertyNames (LocaleId locId);
 
 	/**
-	 * Gets the names of all the target languages for this resource.
-	 * @return All the names of the target languages for this resource.
+	 * Gets all the target locales for this resource.
+	 * @return all the target locales for this resource.
 	 */
-	public Set<LocaleId> getTargetLanguages ();
+	public Set<LocaleId> getTargetLocales ();
 	
 	/**
 	 * Indicates if a property exists for a given name and target locale.
-	 * @param locId The target locale to query.
-	 * @param name The name of the property to query.
-	 * @return True if a property exists, false otherwise.
+	 * @param locId the target locale to query.
+	 * @param name the name of the property to query.
+	 * @return true if a property exists, false otherwise.
 	 */
 	public boolean hasTargetProperty (LocaleId locId,
 		String name);

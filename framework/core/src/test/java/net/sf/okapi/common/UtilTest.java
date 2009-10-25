@@ -224,30 +224,6 @@ public class UtilTest {
 	}
 	
 	@Test
-	public void testSplitLanguageCode () {
-		String in = "en";
-		String[] res = Util.splitLanguageCode(in);
-		assertEquals(res[0], "en");
-		assertEquals(res[1], "");
-	}
-
-	@Test
-	public void testSplitLanguageCode_4Letters () {
-		String in = "en-BZ";
-		String[] res = Util.splitLanguageCode(in);
-		assertEquals(res[0], "en");
-		assertEquals(res[1], "BZ");
-	}
-
-	@Test
-	public void testSplitLanguageCode_Underline () {
-		String in = "en_BZ";
-		String[] res = Util.splitLanguageCode(in);
-		assertEquals(res[0], "en");
-		assertEquals(res[1], "BZ");
-	}
-
-	@Test
 	public void testGetPercentage () {
 		assertEquals(45, Util.getPercentage(450, 1000));
 	}

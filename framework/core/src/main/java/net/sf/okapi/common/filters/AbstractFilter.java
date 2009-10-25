@@ -80,7 +80,7 @@ public abstract class AbstractFilter implements IFilter {
 	protected Event createStartDocumentEvent() {
 		StartDocument startDocument = new StartDocument(createId(START_DOCUMENT, ++documentId));
 		startDocument.setEncoding(getEncoding(), isUtf8Encoding() && isUtf8Bom());
-		startDocument.setLanguage(getSrcLoc());
+		startDocument.setLocale(getSrcLoc());
 		startDocument.setMimeType(getMimeType());
 		startDocument.setLineBreak(getNewlineType());
 		startDocument.setFilterParameters(getParameters());
@@ -218,7 +218,7 @@ public abstract class AbstractFilter implements IFilter {
 	}
 
 	/**
-	 * Sets the input document source language.
+	 * Sets the input document source locale.
 	 * 
 	 * @param srcLoc
 	 *            the new source locale
@@ -236,7 +236,7 @@ public abstract class AbstractFilter implements IFilter {
 	}
 
 	/**
-	 * @return the trgLang
+	 * @return the trgLoc
 	 */
 	public LocaleId getTrgLoc () {
 		return trgLoc;

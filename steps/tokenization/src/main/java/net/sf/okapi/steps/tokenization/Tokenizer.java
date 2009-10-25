@@ -79,7 +79,7 @@ public class Tokenizer {
 		ts.handleEvent(new Event(EventType.START_BATCH)); // Calls component_init();
 		
 		StartDocument startDoc = new StartDocument("tokenization");
-		startDoc.setLanguage(language);
+		startDoc.setLocale(language);
 		startDoc.setMultilingual(false);		
 		Event event = new Event(EventType.START_DOCUMENT, startDoc);		
 		ts.handleEvent(event);

@@ -256,7 +256,7 @@ public class XMLFilter implements IFilter {
 		if ( encoding == null ) {
 			encoding = detector.getEncoding();
 		}
-		srcLang = input.getSourceLanguage();
+		srcLang = input.getSourceLocale();
 		if ( srcLang == null ) throw new NullPointerException("Source language not set.");
 		hasUTF8BOM = detector.hasUtf8Bom();
 		lineBreak = detector.getNewlineType().toString();
@@ -291,7 +291,7 @@ public class XMLFilter implements IFilter {
 		if ( realEnc != null ) encoding = realEnc;
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLineBreak(lineBreak);
-		startDoc.setLanguage(srcLang);
+		startDoc.setLocale(srcLang);
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setType(MimeTypeMapper.XML_MIME_TYPE);

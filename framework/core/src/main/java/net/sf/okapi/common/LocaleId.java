@@ -31,14 +31,15 @@ import net.sf.okapi.common.Util;
  */
 public final class LocaleId implements Comparable<Object> {
 
-	public static LocaleId EMPTY = new LocaleId("", false); //TODO define empty
+	public static LocaleId EMPTY = new LocaleId("", false);
+	
 	private String locId;
 	
 	private static final int ID_LANGUAGE = 5;
 	private static final int ID_REGION = 10;
 	private static final int ID_USER = 18;
-	
-	private static final int POSIX_LANGUAGE= 1;
+
+	private static final int POSIX_LANGUAGE = 1;
 	private static final int POSIX_REGION = 3;
 	private static final int POSIX_VARIANT = 7;
 	
@@ -251,9 +252,11 @@ public final class LocaleId implements Comparable<Object> {
 		}
 		Matcher m = POSIXPATTERN.matcher(locId);
 		if ( m.find() ) {
+//DEBUG
 //			for ( int i=1; i<m.groupCount(); i++ ) {
 //				System.out.println(String.format("g=%d [%s]", i, m.group(i)));
 //			}
+//END DEBUG
 			StringBuilder tag = new StringBuilder();
 			String tmp = m.group(POSIX_LANGUAGE);
 			if ( !Util.isEmpty(tmp) ) {
@@ -297,9 +300,11 @@ public final class LocaleId implements Comparable<Object> {
 		}
 		Matcher m = BCP_PATTERN.matcher(langtag);
 		if ( m.find() ) {
+//DEBUG
 //			for ( int i=1; i<m.groupCount(); i++ ) {
 //				System.out.println(String.format("g=%d [%s]", i, m.group(i)));
 //			}
+//END DEBUG
 			// Because LocaleId is a sub-set of BCP-47 we can just normalize the cases
 			// and create the object without re-checking.
 			return new LocaleId(langtag.toLowerCase(), false);
@@ -442,6 +447,27 @@ public final class LocaleId implements Comparable<Object> {
 			parts[0] = m.group(ID_LANGUAGE);
 			parts[1] = m.group(ID_REGION);
 			parts[2] = m.group(ID_USER);
+		}
+		return parts;
+	}
+
+	/**
+	 * Splits a given ISO language tag into its components.
+	 * @param language the language code to process.
+	 * @return an array of two strings: 0=language, 1=region/country (or empty)
+	 */
+	public static String[] splitLanguageCode (String language) {
+		if ((language == null) || (language.length() == 0))
+			return null;
+		String[] parts = new String[2];
+		language = language.replace('_', '-');
+		int n = language.indexOf('-');
+		if (n > -1) {
+			parts[0] = language.substring(0, n);
+			parts[1] = language.substring(n + 1);
+		} else {
+			parts[0] = language;
+			parts[1] = "";
 		}
 		return parts;
 	}

@@ -25,6 +25,7 @@ import java.util.List;
 
 import com.ibm.icu.util.ULocale;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 
 public class LocaleUtil {
@@ -38,7 +39,7 @@ public class LocaleUtil {
 		if (Util.isEmpty(languageCode))
 			return null;
 		
-		String[] parts = Util.splitLanguageCode(languageCode);		
+		String[] parts = LocaleId.splitLanguageCode(languageCode);		
 		StringBuilder res = new StringBuilder();
 		
 		res.append(parts[0].toLowerCase());  

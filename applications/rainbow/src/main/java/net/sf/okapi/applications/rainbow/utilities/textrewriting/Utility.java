@@ -66,12 +66,12 @@ public class Utility extends BaseFilterDrivenUtility {
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(src);
 			if ( doc.hasWarning() ) logger.warning(doc.getWarning());
-			srcSeg = doc.compileLanguageRules(srcLang.toBCP47(), null);
+			srcSeg = doc.compileLanguageRules(srcLang, null);
 			if ( !src.equals(trg) ) {
 				doc.loadRules(trg);
 				if ( doc.hasWarning() ) logger.warning(doc.getWarning());
 			}
-			trgSeg = doc.compileLanguageRules(trgLang.toBCP47(), null);
+			trgSeg = doc.compileLanguageRules(trgLang, null);
 		}
 		
 		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {

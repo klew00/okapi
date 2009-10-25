@@ -480,7 +480,7 @@ public class FilterTestDriver {
 	private void printTU(TextUnit tu) {
 		System.out.println("---Text Unit");
 		System.out.println("S=[" + tu.toString() + "]");
-		for (LocaleId lang : tu.getTargetLanguages()) {
+		for (LocaleId lang : tu.getTargetLocales()) {
 			System.out.println("T(" + lang + ")=[" + tu.getTarget(lang).toString() + "]");
 		}
 	}
@@ -516,7 +516,7 @@ public class FilterTestDriver {
 		} else if (displayLevel > 1)
 			System.out.println("StartDocument encoding = " + tmp);
 
-		LocaleId locId = startDoc.getLanguage();
+		LocaleId locId = startDoc.getLocale();
 		if ( Util.isNullOrEmpty(locId) ) {
 			System.err.println("WARNING: No language specified in StartDocument.");
 			warnings++;
@@ -660,7 +660,7 @@ public class FilterTestDriver {
 				assertNotNull("Name is null", sd.getName());
 				assertNotNull("Encoding is null", sd.getEncoding());
 				assertNotNull("ID is null", sd.getId());
-				assertNotNull("Language is null", sd.getLanguage());
+				assertNotNull("Language is null", sd.getLocale());
 				assertNotNull("Linebreak is null", sd.getLineBreak());
 				assertNotNull("Filter Parameters is null", sd.getFilterParameters());
 				assertNotNull("FilterWriter is null", sd.getFilterWriter());

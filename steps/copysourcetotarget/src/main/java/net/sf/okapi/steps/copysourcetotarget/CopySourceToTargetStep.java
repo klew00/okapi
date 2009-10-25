@@ -38,7 +38,7 @@ public class CopySourceToTargetStep extends BasePipelineStep {
 	@Override
 	public void handleStartDocument(Event event) {
 		StartDocument sd = (StartDocument) event.getResource();
-		Set<LocaleId> tls = sd.getTargetLanguages();
+		Set<LocaleId> tls = sd.getTargetLocales();
 		// if there is only one target language then use it as the default
 		// target to copy source to
 		if (tls.size() == 1) {

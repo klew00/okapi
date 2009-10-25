@@ -166,7 +166,7 @@ public class IDMLFilter implements IFilter {
 		filter = new IDMLContentFilter();
 		filter.setParameters(params);
 
-		srcLoc = input.getSourceLanguage();
+		srcLoc = input.getSourceLocale();
 	}
 	
 	public void setParameters (IParameters params) {
@@ -184,7 +184,7 @@ public class IDMLFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(docId);
 			startDoc.setEncoding("UTF-8", false); // Default
 			startDoc.setName(docURI.getPath());
-			startDoc.setLanguage(srcLoc);
+			startDoc.setLocale(srcLoc);
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setLineBreak("\n");
 			startDoc.setFilterParameters(params);

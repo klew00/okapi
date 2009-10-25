@@ -58,8 +58,8 @@ public class RawDocument implements IResource {
 	private String filterConfigId;
 	private String id;
 	private String encoding = UNKOWN_ENCODING;
-	private LocaleId srcLang;
-	private LocaleId trgLang;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	private InputStream inputStream;
 	private URI inputURI;
 	private CharSequence inputCharSequence;
@@ -183,8 +183,8 @@ public class RawDocument implements IResource {
 	{
 		this.inputCharSequence = inputCharSequence;
 		this.encoding = "UTF-16";
-		this.srcLang = srcLoc;
-		this.trgLang = trgLoc;
+		this.srcLoc = srcLoc;
+		this.trgLoc = trgLoc;
 		hasGetReaderBeenCalled = false;
 	}
 
@@ -195,8 +195,8 @@ public class RawDocument implements IResource {
 	{
 		this.inputURI = inputURI;
 		this.encoding = defaultEncoding;
-		this.srcLang = srcLoc;
-		this.trgLang = trgLoc;
+		this.srcLoc = srcLoc;
+		this.trgLoc = trgLoc;
 		hasGetReaderBeenCalled = false;
 	}
 
@@ -207,8 +207,8 @@ public class RawDocument implements IResource {
 	{
 		this.inputStream = inputStream;
 		this.encoding = defaultEncoding;
-		this.srcLang = srcLoc;
-		this.trgLang = trgLoc;
+		this.srcLoc = srcLoc;
+		this.trgLoc = trgLoc;
 		hasGetReaderBeenCalled = false;
 	}
 
@@ -287,20 +287,15 @@ public class RawDocument implements IResource {
 		return aStream;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.resource.IResource#getAnnotation(java.lang.Class)
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.resource.IResource#getAnnotation(java.lang.Class)
 	 */
 	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
 		if ( annotations == null ) return null;
 		return annotationType.cast(annotations.get(annotationType) );
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.resource.IResource#getId()
 	 */
 	public String getId() {
@@ -317,11 +312,8 @@ public class RawDocument implements IResource {
 		throw new OkapiNotImplementedException("The RawDocument resource does not have skeketon");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.resource.IResource#setAnnotation(net.sf.okapi.common
+	/* (non-Javadoc)
+	 * @see net.sf.okapi.common.resource.IResource#setAnnotation(net.sf.okapi.common
 	 * .annotation.IAnnotation)
 	 */
 	public void setAnnotation(IAnnotation annotation) {
@@ -331,12 +323,10 @@ public class RawDocument implements IResource {
 		annotations.set(annotation);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see net.sf.okapi.common.resource.IResource#setId(java.lang.String)
 	 */
-	public void setId(String id) {
+	public void setId (String id) {
 		this.id = id;
 	}
 
@@ -380,16 +370,16 @@ public class RawDocument implements IResource {
 	 * Gets the source locale associated to this resource.
 	 * @return the source locale associated to this resource.
 	 */
-	public LocaleId getSourceLanguage () {
-		return srcLang;
+	public LocaleId getSourceLocale () {
+		return srcLoc;
 	}
 
 	/**
 	 * Gets the target locale associated to this resource.
 	 * @return the target locale associated to this resource.
 	 */
-	public LocaleId getTargetLanguage () {
-		return trgLang;
+	public LocaleId getTargetLocale () {
+		return trgLoc;
 	}
 
 	/**

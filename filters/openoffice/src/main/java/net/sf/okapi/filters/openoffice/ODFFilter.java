@@ -208,7 +208,7 @@ public class ODFFilter implements IFilter {
 
 		queue = new LinkedList<Event>();
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
-		startDoc.setLanguage(input.getSourceLanguage());
+		startDoc.setLocale(input.getSourceLocale());
 		startDoc.setName(docName);
 		startDoc.setMimeType(MIMETYPE);
 		startDoc.setType(startDoc.getMimeType());

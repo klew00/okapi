@@ -142,12 +142,12 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 	
 	public LocaleId getSourceLocale (int index) {
 		if ( list.size() <= index ) return null;
-		return list.get(index).rawDocument.getSourceLanguage();
+		return list.get(index).rawDocument.getSourceLocale();
 	}
 
 	public LocaleId getTargetLocale (int index) {
 		if ( list.size() <= index ) return null;
-		return list.get(index).rawDocument.getTargetLanguage();
+		return list.get(index).rawDocument.getTargetLocale();
 	}
 
 }

@@ -65,8 +65,8 @@ public class SimpleTM2TMXStep extends BasePipelineStep {
 			RawDocument rd = (RawDocument)event.getResource(); 
 			String path = new File(rd.getInputURI()).getPath(); 
 			db.open(path);
-			LocaleId srcLang = rd.getSourceLanguage();
-			LocaleId trgLang = rd.getTargetLanguage();
+			LocaleId srcLang = rd.getSourceLocale();
+			LocaleId trgLang = rd.getTargetLocale();
 			String outPath = path+".tmx";
 			db.exportToTMX(outPath, srcLang, trgLang);
 			db.close();

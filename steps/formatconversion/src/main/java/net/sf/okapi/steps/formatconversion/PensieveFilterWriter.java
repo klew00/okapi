@@ -133,7 +133,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 		// If one exists we pass false to append to it
 		writer = TmWriterFactory.createFileBasedTmWriter(directory, !file.exists());
 		StartDocument sd = (StartDocument)event.getResource();
-		srcLoc = sd.getLanguage();
+		srcLoc = sd.getLocale();
 	}
 	
 	private void handleTextUnit (Event event) {

@@ -47,7 +47,7 @@ public class StartDocument extends BaseNameable {
 	 * is the source locale.
 	 * @return the (source) locale of the document.
 	 */
-	public LocaleId getLanguage () {
+	public LocaleId getLocale () {
 		return locale;
 	}
 	
@@ -56,7 +56,7 @@ public class StartDocument extends BaseNameable {
 	 * is the source locale.
 	 * @param locale (source) locale of the document.
 	 */
-	public void setLanguage (LocaleId locale) {
+	public void setLocale (LocaleId locale) {
 		this.locale = locale;
 	}
 

@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -120,7 +121,8 @@ public class SRXDocumentTest {
 		doc.addLanguageMap(new LanguageMap("en.*", "english"));
 		doc.addLanguageMap(new LanguageMap(".*", "default"));
 
-		SRXSegmenter seg = (SRXSegmenter)doc.compileLanguageRules("en", null);
+		SRXSegmenter seg = (SRXSegmenter)doc.compileLanguageRules(
+			LocaleId.fromString("en"), null);
 		assertNotNull(seg);
 		assertEquals(seg.getLanguage(), "en");
 		assertNull(seg.getRanges()); // Null set yet

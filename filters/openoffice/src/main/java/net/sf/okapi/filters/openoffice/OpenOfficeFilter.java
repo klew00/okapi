@@ -176,7 +176,7 @@ public class OpenOfficeFilter implements IFilter {
 		filter = new ODFFilter();
 		filter.setParameters(params);
 		
-		srcLoc = input.getSourceLanguage();
+		srcLoc = input.getSourceLocale();
 	}
 	
 	public void setParameters (IParameters params) {
@@ -218,7 +218,7 @@ public class OpenOfficeFilter implements IFilter {
 			
 			StartDocument startDoc = new StartDocument(docId);
 			startDoc.setName(docURI.getPath());
-			startDoc.setLanguage(srcLoc);
+			startDoc.setLocale(srcLoc);
 			startDoc.setMimeType(MIMETYPE);
 			startDoc.setFilterParameters(params);
 			startDoc.setFilterWriter(createFilterWriter());

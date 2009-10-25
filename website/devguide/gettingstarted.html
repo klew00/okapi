@@ -232,7 +232,7 @@ needs to open the input document:</p>
 	<li>an <code>InputStream</code> object.</li>
 </ul></li>
 	<li>The default encoding of the document to process.</li>
-	<li>The language of the text to extract.</li>
+	<li>The language/locale of the text to extract.</li>
 	<li>And, optionally, the target language to work with (for multilingual 
 	formats).</li>
 </ul>
@@ -241,7 +241,7 @@ same standard language tag identifiers you would use with HTML and XML (BCP-47).
 We set the default encoding to UTF-8. Note that some filters will be able to
 automatically detect the correct encoding of the input and ignore this value.</p>
 <pre>// Creates the RawDocument object
-RawDocument res = new RawDocument(myInputStream, &quot;UTF-8&quot;, &quot;en&quot;);
+RawDocument res = new RawDocument(myInputStream, &quot;UTF-8&quot;, LocaleId.fromString(&quot;en&quot;));
 // Opens the document
 filter.open(res);</pre>
 <p>By default a filter generates the 
@@ -269,7 +269,7 @@ Adobe Photoshop PSD files does not support <code>CharSequence</code> input
 objects, as PSD files are binary.</p>
 <p>In our example we want to open a <code>String</code>-based document:</p>
 <pre>// Creates the RawDocument object
-RawDocument res = new RawDocument(&quot;key1=Text1\nkey2=Text2&quot;, &quot;en&quot;);
+RawDocument res = new RawDocument(&quot;key1=Text1\nkey2=Text2&quot;, LocaleId.fromString(&quot;en&quot;));
 // Opens the document
 filter.open(res);</pre>
 <p>This is equivalent to opening a physical properties file on the disk that has the 
@@ -374,7 +374,7 @@ the <code>
 <p>We need to set the output language. In this case we will use French. We also need to indicate which 
 encoding to use for the out output. In our example, we will choose Latin-1.</p>
 <pre>// Set the filter writer's options
-writer.setOptions(&quot;fr&quot;, &quot;iso-8859-1&quot;);</pre>
+writer.setOptions(LocaleId.fromString(&quot;fr&quot;), &quot;iso-8859-1&quot;);</pre>
 <p>We also need to set where the output will be generated. The type of object 
 used for output can be different from the one used for the input. For example, 
 here we will use a string as the input document, and write the output to a 
@@ -403,7 +403,7 @@ filter.open(new RawDocument(&quot;&lt;html&gt;&lt;head&gt;\n&quot;
    + &quot;&lt;meta http-equiv='Content-Language' content='en'&gt;&lt;/head&gt;\n&quot;
    + &quot;&lt;body&gt;\n&quot;
    + &quot;&lt;p&gt;Text in &lt;b&gt;bold&lt;/b&gt;.&lt;/p&gt;&quot;
-   + &quot;&lt;/body&gt;&lt;/html&gt;&quot;, &quot;en&quot;));</pre>
+   + &quot;&lt;/body&gt;&lt;/html&gt;&quot;, LocaleId.fromString(&quot;en&quot;)));</pre>
 <h3><a name="processDocWithoutDhanges"></a>Processing the Document Without Making Changes</h3>
 <p>Now that all is set, we can process the document.</p>
 <p>Re-writing the input document is achieved simply: You call the <code>
@@ -478,15 +478,15 @@ parameters:</p>
 	<li>A flag indicating what to copy from the source. Use <code>
 	IResource.COPY_ALL</code> to copy everything.</li>
 </ul>
-<pre>   TextContainer tc = tu.createTarget(&quot;fr&quot;, false, IResource.COPY_ALL);</pre>
+<pre>   TextContainer tc = tu.createTarget(LocaleId.fromString(&quot;fr&quot;), false, IResource.COPY_ALL);</pre>
 <p>The result is a <code>
 <a href="../javadoc/net/sf/okapi/common/resource/TextContainer.html">
 TextContainer</a></code> object, that holds all the target-related data: text, as 
 well a properties, annotations, etc.</p>
 <p class="question"><b>Question:</b> Is the language code case-sensitive?</p>
-<p class="answer"><b>Answer</b>: Yes it is. Currently &quot;<code>fr</code>&quot; and &quot;<code>FR</code>&quot; 
-are seen as different languages. It is the responsibility of the developers to 
-normalize the codes how they see fit.</p>
+<p class="answer"><b>Answer</b>: No. When a language or a locale identifier is 
+set to a <code>LocaleId</code> object, it is normalized, so &quot;<code>fr</code>&quot; and &quot;<code>FR</code>&quot; 
+are seen as the same language.</p>
 <p>To make any modification to the content you need to work with a string of 
 <a href="glossary.html#codedText">coded text</a>. It is a string with some special characters that markup 
 <a href="glossary.html#inlineCode">inline 

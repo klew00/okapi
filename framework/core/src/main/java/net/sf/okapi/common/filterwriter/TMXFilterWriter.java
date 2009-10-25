@@ -124,7 +124,7 @@ public class TMXFilterWriter implements IFilterWriter {
 				writer = new TMXWriter(new XMLWriter(
 					new OutputStreamWriter(outputStream, "UTF-8")));
 			}
-			writer.writeStartDocument(sd.getLanguage(), locale,
+			writer.writeStartDocument(sd.getLocale(), locale,
 				null, null, segType, "unknown", "text");
 		}
 		catch ( IOException e ) {

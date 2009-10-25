@@ -170,7 +170,7 @@ public class Writer extends BaseWriter {
 	}
 
 	private void processStartDocument (StartDocument resource) {
-		srcLang = resource.getLanguage();
+		srcLang = resource.getLocale();
 		writer.writeStartDocument();
 		writer.writeStartElement("xliff");
 		writer.writeAttributeString("version", "1.2");

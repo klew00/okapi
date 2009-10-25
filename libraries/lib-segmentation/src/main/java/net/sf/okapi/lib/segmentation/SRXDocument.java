@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.segmentation;
 
 import net.sf.okapi.common.DefaultEntityResolver;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.NSContextManager;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
@@ -536,7 +537,7 @@ public class SRXDocument {
 	 * Use null for not re-using anything.
 	 * @return the instance of the segmenter with the new compiled rules.
 	 */
-	public ISegmenter compileLanguageRules (String languageCode,
+	public ISegmenter compileLanguageRules (LocaleId languageCode,
 		ISegmenter existingSegmenter)
 	{
 		SRXSegmenter segmenter = null;
@@ -563,7 +564,7 @@ public class SRXDocument {
 			trimLeadingWS, trimTrailingWS);
 		
 		for ( LanguageMap langMap : langMaps ) {
-			if ( Pattern.matches(langMap.pattern, languageCode) ) {
+			if ( Pattern.matches(langMap.pattern, languageCode.toString()) ) {
 				compileRules(segmenter, langMap.ruleName);
 				if ( !segmenter.cascade() ) break; // Stop at the first matching map
 			}
@@ -591,7 +592,7 @@ public class SRXDocument {
 		if ( segmenter != null ) {
 			// Check if we really need to re-compile
 			if ( ruleName != null ) {
-				if ( ("__"+ruleName).equals(segmenter.getLanguage()) )
+				if ( segmenter.getLanguage().equals("__"+ruleName) )
 					return segmenter;
 			}
 			segmenter.reset();
@@ -604,7 +605,7 @@ public class SRXDocument {
 			includeEndCodes, includeIsolatedCodes, oneSegmentIncludesAll,
 			trimLeadingWS, trimTrailingWS);
 		compileRules(segmenter, ruleName);
-		segmenter.setLanguage("__"+ruleName);
+		segmenter.setLanguage(LocaleId.fromString("__"+ruleName));
 		return segmenter;
 	}
 

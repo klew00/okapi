@@ -198,7 +198,7 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
 		encoding = detector.getEncoding();
-		srcLang = input.getSourceLanguage();
+		srcLang = input.getSourceLocale();
 		hasUTF8BOM = detector.hasUtf8Bom();
 		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
@@ -245,7 +245,7 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
-		startDoc.setLanguage(srcLang);
+		startDoc.setLocale(srcLang);
 		startDoc.setFilterParameters(getParameters());		
 		startDoc.setFilterWriter(getFilterWriter());		
 		startDoc.setLineBreak(lineBreak);

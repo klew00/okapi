@@ -108,7 +108,7 @@ public class GenericFilterWriterTest {
 		StartDocument sd = new StartDocument("sd");
 		sd.setEncoding("UTF-8", false);
 		sd.setLineBreak("\n");
-		sd.setLanguage(locEN);
+		sd.setLocale(locEN);
 		sd.setMultilingual(multilingual);
 		startDocEvent = new Event(EventType.START_DOCUMENT, sd);
 		return startDocEvent;

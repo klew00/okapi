@@ -7,7 +7,7 @@ import java.lang.reflect.Array;
  * 
  * Example use case:
  * 
- * <pre><code>
+ * <pre>
  * public int hashCode() {
  * 	int result = HashCodeUtil.SEED;
  * 	//collect the contributions of various fields
@@ -16,7 +16,7 @@ import java.lang.reflect.Array;
  * 	result = HashCodeUtil.hash(result, fArray);
  * 	return result;
  * }
- * </code></pre>
+ * </pre>
  */
 public final class HashCodeUtil {
 

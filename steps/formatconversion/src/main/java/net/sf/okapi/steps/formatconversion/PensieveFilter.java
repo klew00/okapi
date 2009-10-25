@@ -113,7 +113,7 @@ public class PensieveFilter implements IFilter {
 			StartDocument sd = new StartDocument("sdID");
 			sd.setName(docName);
 			sd.setEncoding("UTF-8", false);
-			sd.setLanguage(srcLoc);
+			sd.setLocale(srcLoc);
 			sd.setFilterParameters(getParameters());
 			sd.setFilterWriter(createFilterWriter());
 			sd.setType(MIMETYPE);
@@ -158,8 +158,8 @@ public class PensieveFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
-		srcLoc = input.getSourceLanguage();
-		trgLoc = input.getTargetLanguage();
+		srcLoc = input.getSourceLocale();
+		trgLoc = input.getTargetLocale();
 		if ( input.getInputURI() == null ) {
 			throw new OkapiBadFilterInputException("Only input URI is supported for this filter.");
 		}

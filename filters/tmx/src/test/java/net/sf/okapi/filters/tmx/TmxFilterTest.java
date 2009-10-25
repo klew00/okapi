@@ -276,7 +276,7 @@ public class TmxFilterTest {
 		assertNotNull(sd.getEncoding());
 		assertNotNull(sd.getType());
 		assertNotNull(sd.getMimeType());
-		assertNotNull(sd.getLanguage());
+		assertNotNull(sd.getLocale());
 		assertEquals("\r", sd.getLineBreak());
 	}
 	
@@ -295,7 +295,7 @@ public class TmxFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Hello", tu.getSource().toString());
-		assertEquals(3, tu.getTargetLanguages().size());
+		assertEquals(3, tu.getTargetLocales().size());
 		assertTrue(tu.hasTarget(locFR));
 		assertEquals("Bonjour", tu.getTarget(locFR).toString());
 		assertTrue(tu.hasTarget(locDE));
@@ -306,7 +306,7 @@ public class TmxFilterTest {
 		tu = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu);
 		assertEquals("Hello", tu.getSource().toString());
-		assertEquals(1, tu.getTargetLanguages().size());
+		assertEquals(1, tu.getTargetLocales().size());
 		assertTrue(tu.hasTarget(locFR));
 		assertEquals("Salut", tu.getTarget(locFR).toString());
 	}

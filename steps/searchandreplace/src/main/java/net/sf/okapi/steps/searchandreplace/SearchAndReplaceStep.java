@@ -210,7 +210,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			writer.close();
 			
 			event.setResource(new RawDocument(outFile.toURI(), encoding,
-				rawDoc.getSourceLanguage(), rawDoc.getTargetLanguage()));
+				rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));
 		}
 		catch ( FileNotFoundException e ) {
 			throw new RuntimeException(e);

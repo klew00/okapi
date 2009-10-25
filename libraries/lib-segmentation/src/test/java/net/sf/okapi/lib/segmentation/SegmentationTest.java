@@ -23,6 +23,7 @@ package net.sf.okapi.lib.segmentation;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -38,8 +39,9 @@ import static org.junit.Assert.*;
 
 public class SegmentationTest {
 
-	ISegmenter segmenter;
-	ISegmenter segmenterTrim;
+	private ISegmenter segmenter;
+	private ISegmenter segmenterTrim;
+	private LocaleId locEN = LocaleId.fromString("en");
 	
 	@Before
 	public void setUp() {
@@ -53,7 +55,7 @@ public class SegmentationTest {
 		// Add the ruls to the document
 		doc1.addLanguageRule("default", langRules);
 		// Create the segmenter
-		segmenter = doc1.compileLanguageRules("en", null);
+		segmenter = doc1.compileLanguageRules(locEN, null);
 
 		SRXDocument doc2 = new SRXDocument();
 		doc2.addLanguageMap(langMap);
@@ -61,7 +63,7 @@ public class SegmentationTest {
 		doc2.setTrimLeadingWhitespaces(true);
 		doc2.setTrimTrailingWhitespaces(true);
 		// Create the segmenter
-		segmenterTrim = doc2.compileLanguageRules("en", null);
+		segmenterTrim = doc2.compileLanguageRules(locEN, null);
 	}
 
 	@Test

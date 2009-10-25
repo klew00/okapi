@@ -162,7 +162,7 @@ public class XMLFilterTest {
 		assertNotNull(sd.getEncoding());
 		assertNotNull(sd.getType());
 		assertNotNull(sd.getMimeType());
-		assertNotNull(sd.getLanguage());
+		assertNotNull(sd.getLocale());
 		assertEquals("\r", sd.getLineBreak());
 	}
 	

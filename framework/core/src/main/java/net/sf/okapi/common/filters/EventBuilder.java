@@ -442,9 +442,9 @@ public class EventBuilder {
 	private void embeddedReadonlyProp(INameable resource,
 		PropertyTextUnitPlaceholder propOrText,
 		String tag,
-		LocaleId language)
+		LocaleId locId)
 	{
-		setPropertyBasedOnLocale(resource, language, new Property(propOrText
+		setPropertyBasedOnLocale(resource, locId, new Property(propOrText
 				.getName(), propOrText.getValue(), true));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(),
 				propOrText.getMainEndPos()));
@@ -757,7 +757,7 @@ public class EventBuilder {
 		/*
 		 * The ability to add internal placeholders to end tags is not currently
 		 * supported if (endMarker != null && propertyTextUnitPlaceholders !=
-		 * null) { processAllEmbedded(endMarker.toString(), language,
+		 * null) { processAllEmbedded(endMarker.toString(), locale,
 		 * propertyTextUnitPlaceholders, false); }
 		 */
 		tempTextUnit = popTempEvent();

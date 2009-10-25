@@ -20,6 +20,7 @@
 
 import java.io.File;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
@@ -39,7 +40,7 @@ public class Main {
 			doc.loadRules(f.getAbsolutePath());
 			
 			// Obtain a segmenter for English
-			ISegmenter segmenter = doc.compileLanguageRules("en", null);
+			ISegmenter segmenter = doc.compileLanguageRules(LocaleId.fromString("en"), null);
 
 			// Plain text case
 			int count = segmenter.computeSegments("Part 1. Part 2.");

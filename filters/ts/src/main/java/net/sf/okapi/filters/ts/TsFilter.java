@@ -421,9 +421,9 @@ public class TsFilter implements IFilter {
 			
 			eventReader = fact.createXMLEventReader(reader);
 			
-			srcLang = input.getSourceLanguage();
+			srcLang = input.getSourceLocale();
 			if ( srcLang == null ) throw new NullPointerException("Source language not set.");
-			trgLang = input.getTargetLanguage();
+			trgLang = input.getTargetLocale();
 			if ( trgLang == null ) throw new NullPointerException("Target language not set.");
 			hasUTF8BOM = detector.hasUtf8Bom();
 			lineBreak = detector.getNewlineType().toString();
@@ -446,7 +446,7 @@ public class TsFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(String.valueOf(++ts.resourceId));
 			startDoc.setName(docName);
 			startDoc.setEncoding(encoding, hasUTF8BOM);
-			startDoc.setLanguage(srcLang);
+			startDoc.setLocale(srcLang);
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setFilterWriter(createFilterWriter());
 

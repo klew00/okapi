@@ -25,7 +25,6 @@ package net.sf.okapi.steps.tokenization;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -102,7 +101,7 @@ public class TokenizationTest {
 		ts.handleEvent(new Event(EventType.START_BATCH)); // Calls component_init();
 		
 		StartDocument startDoc = new StartDocument("tokenization");
-		startDoc.setLanguage(locENUS);
+		startDoc.setLocale(locENUS);
 		startDoc.setMultilingual(false);		
 		Event event = new Event(EventType.START_DOCUMENT, startDoc);		
 		ts.handleEvent(event);

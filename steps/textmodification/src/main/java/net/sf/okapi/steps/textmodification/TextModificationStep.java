@@ -100,12 +100,12 @@ public class TextModificationStep extends BasePipelineStep {
 			SRXDocument srxDoc = new SRXDocument();
 			srxDoc.loadRules(src);
 			if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
-			srcSeg = srxDoc.compileLanguageRules(sourceLocale.toBCP47(), null);
+			srcSeg = srxDoc.compileLanguageRules(sourceLocale, null);
 			if ( !src.equals(trg) ) {
 				srxDoc.loadRules(trg);
 				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			}
-			trgSeg = srxDoc.compileLanguageRules(targetLocale.toBCP47(), null);
+			trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
 		}
 		initDone = true;
 	}

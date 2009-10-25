@@ -52,8 +52,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	private Stack<StorageList> storageStack;
 	private LinkedHashMap<String, Referent> referents;
-	private LocaleId inputLang;
-	private LocaleId outputLang;
+	private LocaleId inputLoc;
+	private LocaleId outputLoc;
 	private String outputEncoding;
 	private boolean isMultilingual;
 	private ILayerProvider layer;
@@ -81,7 +81,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 	}
 	
-	public String processStartDocument (LocaleId outputLanguage,
+	public String processStartDocument (LocaleId outputLocale,
 		String outputEncoding,
 		ILayerProvider layer,
 		EncoderManager encoderManager,
@@ -90,8 +90,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		referents = new LinkedHashMap<String, Referent>();
 		storageStack = new Stack<StorageList>();
 
-		this.inputLang = resource.getLanguage();
-		this.outputLang = outputLanguage;
+		this.inputLoc = resource.getLocale();
+		this.outputLoc = outputLocale;
 		this.encoderManager = encoderManager;
 		this.outputEncoding = outputEncoding;
 		this.layer = layer;
@@ -159,7 +159,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			storageStack.peek().add(resource);
 			return "";
 		}
-		return getString(resource, outputLang, 1);
+		return getString(resource, outputLoc, 1);
 	}
 
 	public String processDocumentPart (DocumentPart resource) {
@@ -208,24 +208,24 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// If we have a property name: It's a reference to a property of 
 		// the resource holding this skeleton
 		if ( propName != null ) { // Reference to the content of the referent
-			return getString((INameable)part.parent, propName, part.language, context);
+			return getString((INameable)part.parent, propName, part.locId, context);
 		}
 
-		// Set the langToUse and the contextToUse parameters
-		// If lang==null: it's source, so use output language for monolingual
-		LocaleId langToUse = (part.language==null) ? outputLang : part.language;
+		// Set the locToUse and the contextToUse parameters
+		// If locToUse==null: it's source, so use output locale for monolingual
+		LocaleId locToUse = (part.locId==null) ? outputLoc : part.locId;
 		int contextToUse = context;
 		if ( isMultilingual ) {
-			langToUse = part.language;
-			// If lang==null: it's source, so not text in multilingual
-			contextToUse = (langToUse==null) ? 0 : context;
+			locToUse = part.locId;
+			// If locToUse==null: it's source, so not text in multilingual
+			contextToUse = (locToUse==null) ? 0 : context;
 		}
 		
 		// If a parent if set, it's a reference to the content of the resource
 		// holding this skeleton. And it's always a TextUnit
 		if ( part.parent != null ) {
 			if ( part.parent instanceof TextUnit ) {
-				return getContent((TextUnit)part.parent, langToUse, contextToUse);
+				return getContent((TextUnit)part.parent, locToUse, contextToUse);
 			}
 			else {
 				throw new RuntimeException("The self-reference to this skeleton part must be a text-unit.");
@@ -238,13 +238,13 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			return "-ERR:REF-NOT-FOUND-";
 		}
 		if ( ref instanceof TextUnit ) {
-			return getString((TextUnit)ref, langToUse, contextToUse); //TODO: Test langToUse
+			return getString((TextUnit)ref, locToUse, contextToUse); //TODO: Test locToUse
 		}
 		if ( ref instanceof GenericSkeletonPart ) {
 			return getString((GenericSkeletonPart)ref, contextToUse);
 		}
 		if ( ref instanceof StorageList ) { // == StartGroup
-			return getString((StorageList)ref, langToUse, contextToUse); //TODO: Test langToUse
+			return getString((StorageList)ref, locToUse, contextToUse); //TODO: Test locToUse
 		}
 		// Else: DocumentPart, StartDocument, StartSubDocument 
 		return getString((GenericSkeleton)((IResource)ref).getSkeleton(), context);
@@ -252,23 +252,23 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	private String getString (INameable ref,
 		String propName,
-		LocaleId langToUse,
+		LocaleId locToUse,
 		int context)
 	{
 		if ( ref == null ) {
 			return "-ERR:NULL-REF-";
 		}
 		if ( propName != null ) {
-			return getPropertyValue((INameable)ref, propName, langToUse, context);
+			return getPropertyValue((INameable)ref, propName, locToUse, context);
 		}
 		if ( ref instanceof TextUnit ) {
-			return getString((TextUnit)ref, langToUse, context);
+			return getString((TextUnit)ref, locToUse, context);
 		}
 		if ( ref instanceof DocumentPart ) {
 			return getString((GenericSkeleton)((IResource)ref).getSkeleton(), context);
 		}
 		if ( ref instanceof StorageList ) {
-			return getString((StorageList)ref, langToUse, context);
+			return getString((StorageList)ref, locToUse, context);
 		}
 		return "-ERR:INVALID-REFTYPE-";
 	}
@@ -276,18 +276,18 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	/**
 	 * Gets the skeleton and the original content of a given text unit.
 	 * @param tu The text unit to process.
-	 * @param langToUse Language to output. Use null for the source, or the language
-	 * code for the target languages.
+	 * @param locToUse locale to output. Use null for the source, or a LocaleId
+	 * object for the target locales.
 	 * @param content Context flag: 0=text, 1=skeleton, 2=in-line.
 	 * @return The string representation of the text unit. 
 	 */
 	private String getString (TextUnit tu,
-		LocaleId langToUse,
+		LocaleId locToUse,
 		int context)
 	{
 		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
 		if ( skel == null ) { // No skeleton
-			return getContent(tu, langToUse, context);
+			return getContent(tu, locToUse, context);
 		}
 		// Else: process the skeleton parts, one of them should
 		// refer to the text-unit content itself
@@ -367,7 +367,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	private String getSegmentedText (TextContainer srcCont,
 		TextContainer trgCont,
-		LocaleId langToUse,
+		LocaleId locToUse,
 		int context)
 	{
 		StringBuilder tmp = new StringBuilder();
@@ -421,7 +421,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 						i += (j-1); // Move the pointer at the last char we put in the segment
 					}
 					// Now get the content for the segment
-					tmp.append(getContent(trgFrag, langToUse, context));
+					tmp.append(getContent(trgFrag, locToUse, context));
 				}
 				else {
 					switch ( context ) {
@@ -430,7 +430,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 							+ layer.startSegment()
 							+ getContent(srcSegs.get(n).text, null, 0)
 							+ layer.midSegment(lev)
-							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, 0))
+							+ ((trgFrag==null) ? "" : getContent(trgFrag, locToUse, 0))
 							+ layer.endSegment()
 							+ layer.startCode());
 						break;
@@ -439,7 +439,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 							+ layer.startSegment()
 							+ getContent(srcSegs.get(n).text, null, 0)
 							+ layer.midSegment(lev)
-							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, 0))
+							+ ((trgFrag==null) ? "" : getContent(trgFrag, locToUse, 0))
 							+ layer.endSegment()
 							+ layer.startInline());
 						break;
@@ -447,7 +447,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 						tmp.append(layer.startSegment()
 							+ getContent(srcSegs.get(n).text, null, context)
 							+ layer.midSegment(lev)
-							+ ((trgFrag==null) ? "" : getContent(trgFrag, langToUse, context))
+							+ ((trgFrag==null) ? "" : getContent(trgFrag, locToUse, context))
 							+ layer.endSegment());
 						break;
 					}
@@ -503,7 +503,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 
 	public String getContent (TextFragment tf,
-		LocaleId langToUse,
+		LocaleId locToUse,
 		int context)
 	{ // this needs to be public for an override in OpenXML
 		// Output simple text
@@ -538,16 +538,16 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			switch ( ch ) {
 			case TextFragment.MARKER_OPENING:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, langToUse, context));
+				tmp.append(expandCodeContent(code, locToUse, context));
 				break;
 			case TextFragment.MARKER_CLOSING:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, langToUse, context));
+				tmp.append(expandCodeContent(code, locToUse, context));
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
-				tmp.append(expandCodeContent(code, langToUse, context));
+				tmp.append(expandCodeContent(code, locToUse, context));
 				break;
 			default:
 				if ( Character.isHighSurrogate(ch) ) {
@@ -599,7 +599,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 	
 	protected String expandCodeContent (Code code,
-		LocaleId langToUse,
+		LocaleId locToUse,
 		int context)
 	{ // this needs to be protected, not private, for OpenXML
 		String codeTmp = code.getOuterData();
@@ -635,16 +635,16 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			}
 			else if ( propName != null ) {
 				tmp.replace(start, end,
-					getPropertyValue((INameable)ref, propName, langToUse, 2));
+					getPropertyValue((INameable)ref, propName, locToUse, 2));
 			}
 			else if ( ref instanceof TextUnit ) {
-				tmp.replace(start, end, getString((TextUnit)ref, langToUse, 2));
+				tmp.replace(start, end, getString((TextUnit)ref, locToUse, 2));
 			}
 			else if ( ref instanceof GenericSkeletonPart ) {
 				tmp.replace(start, end, getString((GenericSkeletonPart)ref, 2));
 			}
 			else if ( ref instanceof StorageList ) { // == StartGroup
-				tmp.replace(start, end, getString((StorageList)ref, langToUse, 2));
+				tmp.replace(start, end, getString((StorageList)ref, locToUse, 2));
 			}
 			else { // DocumentPart, StartDocument, StartSubDocument 
 				tmp.replace(start, end, getString((GenericSkeleton)((IResource)ref).getSkeleton(), 2));
@@ -654,7 +654,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 	
 	private String getString (StorageList list,
-		LocaleId langToUse,
+		LocaleId locToUse,
 		int context)
 	{
 		StringBuilder tmp = new StringBuilder();
@@ -663,10 +663,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Then treat the list itself
 		for ( IResource res : list ) {
 			if ( res instanceof TextUnit ) {
-				tmp.append(getString((TextUnit)res, langToUse, context));
+				tmp.append(getString((TextUnit)res, locToUse, context));
 			}
 			else if ( res instanceof StorageList ) {
-				tmp.append(getString((StorageList)res, langToUse, context));
+				tmp.append(getString((StorageList)res, locToUse, context));
 			}
 			else if ( res instanceof DocumentPart ) {
 				tmp.append(getString((GenericSkeleton)res.getSkeleton(), context));
@@ -680,7 +680,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	private String getPropertyValue (INameable resource,
 		String name,
-		LocaleId langToUse,
+		LocaleId locToUse,
 		int context)
 	{
 		// Update the encoder from the TU's MIME type
@@ -688,17 +688,17 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			encoderManager.updateEncoder(resource.getMimeType());
 		}
 
-		// Get the value based on the output language
+		// Get the value based on the output locale
 		Property prop;
-		if ( langToUse == null ) { // Use the source
+		if ( locToUse == null ) { // Use the source
 			prop = resource.getSourceProperty(name);
 		}
-		else if ( langToUse.equals(LocaleId.EMPTY) ) { // Use the resource-level properties
+		else if ( locToUse.equals(LocaleId.EMPTY) ) { // Use the resource-level properties
 			prop = resource.getProperty(name);
 		}
-		else { // Use the given target language if possible
-			if ( resource.hasTargetProperty(langToUse, name) ) {
-				prop = resource.getTargetProperty(langToUse, name);
+		else { // Use the given target locale if possible
+			if ( resource.hasTargetProperty(locToUse, name) ) {
+				prop = resource.getTargetProperty(locToUse, name);
 			}
 			else { // Fall back to source if there is no target
 				prop = resource.getSourceProperty(name);				
@@ -713,11 +713,11 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Else: We got the property value
 		// Check if it needs to be auto-modified
 		if ( Property.LANGUAGE.equals(name) ) {
-			// If it is the input language, we change it with the output language
+			// If it is the input locale, we change it with the output locale
 			//TODO: Do we need an option to be region-insensitive? (en==en-gb)
-			LocaleId lang = LocaleId.fromString(value);
-			if ( lang.equals(inputLang) ) {
-				value = outputLang.toString();
+			LocaleId locId = LocaleId.fromString(value);
+			if ( locId.equals(inputLoc) ) {
+				value = outputLoc.toString();
 			}
 		}
 		else if ( Property.ENCODING.equals(name) ) {
