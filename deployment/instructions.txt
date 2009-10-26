@@ -11,6 +11,9 @@ Deploying
 Do a full rebuild of the Maven build:
 mvn clean install from /trunk
 
+-- 1.1) Make sure platform-specific dependencies are downloaded:
+from /trunk/framework/core-ui run
+mvn -PWIN_SWT -POSX_SWT -PLinux_x86_swt -PLinux_x86_64_swt dependency:resolve
 
 --- 2) Make sure the following files have the proper version and release numbers for this release:
 
