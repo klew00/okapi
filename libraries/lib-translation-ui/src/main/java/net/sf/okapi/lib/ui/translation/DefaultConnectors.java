@@ -38,24 +38,24 @@ public class DefaultConnectors implements IConnectorList {
 		list.add(trc);
 		
 		trc = new ConnectorInfo();
-		trc.description = "MyMemory TM Web Services (Beta)";
+		trc.description = "MyMemory TM Web Services (Beta connector)";
 		trc.connectorClass = "net.sf.okapi.connectors.mymemory.MyMemoryTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.mymemory.ParametersUI";
 		list.add(trc);
 
 		trc = new ConnectorInfo();
-		trc.description = "OpenTran Web Repository (Beta)";
+		trc.description = "OpenTran Web Repository";
 		trc.connectorClass = "net.sf.okapi.connectors.opentran.OpenTranTMConnector";
 		list.add(trc);
 
 		trc = new ConnectorInfo();
-		trc.description = "Translate Toolkit TM Server (Beta)";
+		trc.description = "Translate Toolkit TM Server (Beta connector)";
 		trc.connectorClass = "net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.translatetoolkit.ParametersUI";
 		list.add(trc);
 
 		trc = new ConnectorInfo();
-		trc.description = "Apertium MT Server (Beta)";
+		trc.description = "Apertium MT Server";
 		trc.connectorClass = "net.sf.okapi.connectors.apertium.ApertiumMTConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.apertium.Parameters";
 		list.add(trc);
