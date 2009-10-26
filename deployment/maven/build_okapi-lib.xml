@@ -193,140 +193,140 @@
 		
 		<property name="dep001" value="${mavenStore}/dtdparser/dtdparser/1.21"/>
 		<fileset id="list.contents" dir="${dep001}"
-		 includes="**/*.jar"/>
+		 includes="**/dtdparser-1.21.jar"/>
 		<property name="jar001" refid="list.contents"/>
 		<echo file="tmpJars" append="yes">${jar001}</echo>
 		<copy todir="${distLib}" file="${dep001}/${jar001}"/>
 
 		<property name="dep002" value="${mavenStore}/net/htmlparser/jericho/jericho-html/3.1"/>
 		<fileset id="list.contents" dir="${dep002}"
-		 includes="**/*.jar"/>
+		 includes="**/jericho-html-3.1.jar"/>
 		<property name="jar002" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar002}</echo>
 		<copy todir="${distLib}" file="${dep002}/${jar002}"/>
 
 		<property name="dep003" value="${mavenStore}/org/yaml/snakeyaml/1.4"/>
 		<fileset id="list.contents" dir="${dep003}"
-		 includes="**/*.jar"/>
+		 includes="**/snakeyaml-1.4.jar"/>
 		<property name="jar003" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar003}</echo>
 		<copy todir="${distLib}" file="${dep003}/${jar003}"/>
 
 		<property name="dep004" value="${mavenStore}/org/codehaus/woodstox/wstx-lgpl/3.2.8"/>
 		<fileset id="list.contents" dir="${dep004}"
-		 includes="**/*.jar"/>
+		 includes="**/wstx-lgpl-3.2.8.jar"/>
 		<property name="jar004" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar004}</echo>
 		<copy todir="${distLib}" file="${dep004}/${jar004}"/>
 
 		<property name="dep005" value="${mavenStore}/com/h2database/h2/1.1.103"/>
 		<fileset id="list.contents" dir="${dep005}"
-		 includes="**/*.jar"/>
+		 includes="**/h2-1.1.103.jar"/>
 		<property name="jar005" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar005}</echo>
 		<copy todir="${distLib}" file="${dep005}/${jar005}"/>
 
 		<property name="dep006" value="${mavenStore}/org/apache/ws/commons/util/ws-commons-util/1.0.2"/>
 		<fileset id="list.contents" dir="${dep006}"
-		 includes="**/*.jar"/>
+		 includes="**/ws-commons-util-1.0.2.jar"/>
 		<property name="jar006" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar006}</echo>
 		<copy todir="${distLib}" file="${dep006}/${jar006}"/>
 
 		<property name="dep007" value="${mavenStore}/org/apache/xmlrpc/xmlrpc-client/3.1"/>
 		<fileset id="list.contents" dir="${dep007}"
-		 includes="**/*.jar"/>
+		 includes="**/xmlrpc-client-3.1.jar"/>
 		<property name="jar007" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar007}</echo>
 		<copy todir="${distLib}" file="${dep007}/${jar007}"/>
 
 		<property name="dep008" value="${mavenStore}/org/apache/xmlrpc/xmlrpc-common/3.1"/>
 		<fileset id="list.contents" dir="${dep008}"
-		 includes="**/*.jar"/>
+		 includes="**/xmlrpc-common-3.1.jar"/>
 		<property name="jar008" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar008}</echo>
 		<copy todir="${distLib}" file="${dep008}/${jar008}"/>
 
 		<property name="dep009" value="${mavenStore}/com/googlecode/json-simple/json-simple/1.1"/>
 		<fileset id="list.contents" dir="${dep009}"
-		 includes="**/*.jar"/>
+		 includes="**/json-simple-1.1.jar"/>
 		<property name="jar009" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar009}</echo>
 		<copy todir="${distLib}" file="${dep009}/${jar009}"/>
 
 		<property name="dep010" value="${mavenStore}/org/apache/axis/axis/1.4"/>
 		<fileset id="list.contents" dir="${dep010}"
-		 includes="**/*.jar"/>
+		 includes="**/axis-1.4.jar"/>
 		<property name="jar010" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar010}</echo>
 		<copy todir="${distLib}" file="${dep010}/${jar010}"/>
 
 		<property name="dep011" value="${mavenStore}/commons-discovery/commons-discovery/0.2"/>
 		<fileset id="list.contents" dir="${dep011}"
-		 includes="**/*.jar"/>
+		 includes="**/commons-discovery-0.2.jar"/>
 		<property name="jar011" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar011}</echo>
 		<copy todir="${distLib}" file="${dep011}/${jar011}"/>
 
 		<property name="dep012" value="${mavenStore}/commons-logging/commons-logging/1.0.4"/>
 		<fileset id="list.contents" dir="${dep012}"
-		 includes="**/*.jar"/>
+		 includes="**/commons-logging-1.0.4.jar"/>
 		<property name="jar012" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar012}</echo>
 		<copy todir="${distLib}" file="${dep012}/${jar012}"/>
 
 		<property name="dep013" value="${mavenStore}/org/apache/axis/axis-jaxrpc/1.4"/>
 		<fileset id="list.contents" dir="${dep013}"
-		 includes="**/*.jar"/>
+		 includes="**/axis-jaxrpc-1.4.jar"/>
 		<property name="jar013" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar013}</echo>
 		<copy todir="${distLib}" file="${dep013}/${jar013}"/>
 
 		<property name="dep014" value="${mavenStore}/org/apache/axis/axis-saaj/1.4"/>
 		<fileset id="list.contents" dir="${dep014}"
-		 includes="**/*.jar"/>
+		 includes="**/axis-saaj-1.4.jar"/>
 		<property name="jar014" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar014}</echo>
 		<copy todir="${distLib}" file="${dep014}/${jar014}"/>
 
 		<property name="dep015" value="${mavenStore}/axis/axis-wsdl4j/1.5.1"/>
 		<fileset id="list.contents" dir="${dep015}"
-		 includes="**/*.jar"/>
+		 includes="**/axis-wsdl4j-1.5.1.jar"/>
 		<property name="jar015" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar015}</echo>
 		<copy todir="${distLib}" file="${dep015}/${jar015}"/>
 
 		<property name="dep016" value="${mavenStore}/org/codehaus/woodstox/wstx-lgpl/3.2.8"/>
 		<fileset id="list.contents" dir="${dep016}"
-		 includes="**/*.jar"/>
+		 includes="**/wstx-lgpl-3.2.8.jar"/>
 		<property name="jar016" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar016}</echo>
 		<copy todir="${distLib}" file="${dep016}/${jar016}"/>
 
 		<property name="dep017" value="${mavenStore}/stax/stax-api/1.0.1"/>
 		<fileset id="list.contents" dir="${dep017}"
-		 includes="**/*.jar"/>
+		 includes="**/stax-api-1.0.1.jar"/>
 		<property name="jar017" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar017}</echo>
 		<copy todir="${distLib}" file="${dep017}/${jar017}"/>
 
 		<property name="dep018" value="${mavenStore}/org/apache/lucene/lucene-core/2.9.0"/>
 		<fileset id="list.contents" dir="${dep018}"
-		 includes="**/*2.9.0.jar"/>
+		 includes="**/lucene-core-2.9.0.jar"/>
 		<property name="jar018" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar018}</echo>
 		<copy todir="${distLib}" file="${dep018}/${jar018}"/>
 
 		<property name="dep019" value="${mavenStore}/org/apache/lucene/lucene-spellchecker/2.9.0"/>
 		<fileset id="list.contents" dir="${dep019}"
-		 includes="**/*2.9.0.jar"/>
+		 includes="**/lucene-spellchecker-2.9.0.jar"/>
 		<property name="jar019" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar019}</echo>
 		<copy todir="${distLib}" file="${dep019}/${jar019}"/>
 
 		<property name="dep020" value="${mavenStore}/com/ibm/icu/icu4j/4.0.1"/>
 		<fileset id="list.contents" dir="${dep020}"
-		 includes="**/*.jar"/>
+		 includes="**/icu4j-4.0.1.jar"/>
 		<property name="jar020" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar020}</echo>
 		<copy todir="${distLib}" file="${dep020}/${jar020}"/>
