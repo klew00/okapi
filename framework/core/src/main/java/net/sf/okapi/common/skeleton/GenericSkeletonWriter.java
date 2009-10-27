@@ -306,9 +306,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 * @param content Context flag: 0=text, 1=skeleton, 2=inline.
 	 * @return The string representation of the text unit content.
 	 */
-	private String getContent (TextUnit tu,
+	protected String getContent (TextUnit tu,
 		LocaleId locToUse,
-		int context) 
+		int context) // protected for OpenXML
 	{
 		// Update the encoder from the TU's MIME type
 		if ( encoderManager != null ) {
