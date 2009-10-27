@@ -117,8 +117,9 @@ public class TokenMatcher extends AbstractLexer {
 				    	
 				    	lexems.add(new Lexem(rule.getLexemId(), token.getValue(), token.getRange()));
 				    	
-				    	if (!rule.getKeepInput())
-				    		token.delete(); // Remove replaced token
+				    	// All input deletion is done in Reconciler
+//				    	if (!rule.getKeepInput())
+//				    		token.delete(); // Remove replaced token
 				    }
 				}
 			}				

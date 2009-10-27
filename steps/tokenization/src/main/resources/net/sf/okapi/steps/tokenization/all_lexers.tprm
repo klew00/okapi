@@ -1,6 +1,6 @@
 #v1
 description=Lexers of the tokenization step (in the order of invocation) 
-StructureParametersItemCount.i=15
+StructureParametersItemCount.i=16
 
 StructureParametersItem0.enabled.b=true
 StructureParametersItem0.description=Internal RuleBasedBreakIterator rules of RbbiLexer.
@@ -73,6 +73,11 @@ StructureParametersItem13.lexerClass=net.sf.okapi.steps.tokenization.engine.Reco
 StructureParametersItem13.rulesLocation=
 
 StructureParametersItem14.enabled.b=true
-StructureParametersItem14.description=Removes tokens with the score of 0% ("deleted" by other lexers). A garbage collector.
-StructureParametersItem14.lexerClass=net.sf.okapi.steps.tokenization.engine.ZeroScoreCleaner
-StructureParametersItem14.rulesLocation=
+StructureParametersItem14.description=RAWTEXT-type tokens remover.
+StructureParametersItem14.lexerClass=net.sf.okapi.steps.tokenization.engine.Remover
+StructureParametersItem14.rulesLocation=remover_rawtext.tprm
+
+StructureParametersItem15.enabled.b=true
+StructureParametersItem15.description=Removes tokens with the score of 0% ("deleted" by other lexers). A garbage collector.
+StructureParametersItem15.lexerClass=net.sf.okapi.steps.tokenization.engine.ZeroScoreCleaner
+StructureParametersItem15.rulesLocation=

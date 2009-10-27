@@ -46,6 +46,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -918,6 +919,10 @@ public class Util {
 
 	static public <E> boolean isEmpty(List <E> e) {
 		return (e == null ||(e != null && e.isEmpty()));
+	}
+	
+	public static <K, V> boolean isEmpty(Map<K, V> map) {		
+		return (map == null || (map != null && map.isEmpty()));
 	}
 	
 	static public boolean isEmpty(Object[] e) {

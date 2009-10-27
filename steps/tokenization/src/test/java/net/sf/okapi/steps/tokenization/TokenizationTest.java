@@ -69,7 +69,8 @@ public class TokenizationTest {
     "<a href=\"http://www.jaguar.com/sales\" alt=\"Click here\">" +
     "Jaguar Sales</a> or contact xj-6@jaguar.com."+
     " See http://www.jaguar.com/sales, www.jaguar.com, AT&T, P&G, Johnson&Johnson, 192.168.0.5 for info 3.5pct.";
-	
+
+//	private String text = "U.S.";
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 
 	//private String text = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
@@ -162,20 +163,21 @@ public class TokenizationTest {
 		}
 	}
 	
-	@Test
-	public void listTokenizerOutput() {
-		/* 
-	    String text2 = "Test word count is correct.";
-	    String text3 = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
-	    String text4 = "The quick (“brown”) fox can’t jump 32.3 feet, right?";
-		*/
-		
-		Tokens tokens = Tokenizer.tokenize(text, locENUS); // All tokens
-		//assertEquals(127, tokens.size());
-						
-		//listTokens(tokens);
-		System.out.println(tokens.size());
-	}
+//	@Test
+//	public void listTokenizerOutput() {
+//		/* 
+//	    String text2 = "Test word count is correct.";
+//	    String text3 = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
+//	    String text4 = "The quick (“brown”) fox can’t jump 32.3 feet, right?";
+//		*/
+//		
+//		Tokens tokens = Tokenizer.tokenize(text, locENUS); // All tokens
+//		//assertEquals(127, tokens.size());
+//						
+//		listTokens(tokens);
+//		System.out.println(tokens.size());
+//		System.out.println(ts.getConfigInfo());
+//	}
 	
 	@Test
 	public void testFilters() {
@@ -310,13 +312,13 @@ public class TokenizationTest {
 			//System.out.println(((Manager)tokenizer.token_source).input_stream.getBeginColumn());
 			//System.out.println(jj_input_stream.getBeginColumn());	
 						
-			System.out.println(String.format("%d  %15s (%d, %d - %d, %d)\t%d - %d", token.kind, token.image, 
-					stream.getBeginColumn(), 
-					stream.getBeginLine(), 
-					stream.getEndColumn(), 
-					stream.getEndLine(),
-					stream.bufpos + 1 - token.image.length(),
-					stream.bufpos + 1));
+//			System.out.println(String.format("%d  %15s (%d, %d - %d, %d)\t%d - %d", token.kind, token.image, 
+//					stream.getBeginColumn(), 
+//					stream.getBeginLine(), 
+//					stream.getEndColumn(), 
+//					stream.getEndLine(),
+//					stream.bufpos + 1 - token.image.length(),
+//					stream.bufpos + 1));
 			
 			
 		} while (token != null);

@@ -54,6 +54,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 	
 	private Parameters params;
 	private StructureParameters structureParams;
+	private Config config = new Config();
 	
 	/**
 	 * Lexers generating lexems
@@ -98,8 +99,10 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}
 	
 	public void setConfiguration(Class<?> classRef, String configLocation) {
+				
+		if (config == null) 
+			config = new Config();
 		
-		Config config = new Config();
 		if (config == null) return;
 		config.loadFromResource(classRef, configLocation);		
 		
@@ -504,6 +507,13 @@ public class TokenizationStep extends AbstractPipelineStep {
 	public List<ILexer> getLexers() {
 		
 		return lexers;
+	}
+
+	public String getConfigInfo() {
+		
+		if (config == null) return "";
+		
+		return config.getEngineConfig();
 	}
 
 }

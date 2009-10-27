@@ -62,7 +62,7 @@ public class LexerRule extends LanguageParameters {
 	private String sample;
 	
 	/**
-	 * True if the input tokens (ones on the inTokens list) should be kept, are removed otherwise.
+	 * True if the input tokens (ones on the inTokens list) should be kept. Removed otherwise.
 	 */
 	private boolean keepInput;
 	
