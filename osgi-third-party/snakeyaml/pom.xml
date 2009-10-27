@@ -9,15 +9,15 @@
     </parent>
     
     <properties>
-        <OriginalGroupId>net.htmlparser.jericho</OriginalGroupId>
-        <OriginalArtifactId>jericho-html</OriginalArtifactId>
-        <OriginalVersion>3.1</OriginalVersion>
+        <OriginalGroupId>org.yaml</OriginalGroupId>
+        <OriginalArtifactId>snakeyaml</OriginalArtifactId>
+        <OriginalVersion>1.4</OriginalVersion>
     </properties>
+    <name>OSGI SnakeYAML</name>
 
     <groupId>osgi.${OriginalGroupId}</groupId>
     <artifactId>${OriginalArtifactId}</artifactId>
-    <name>OSGI Jericho HTML Parser</name>
-    <version>${OriginalVersion}</version>    
+    <version>${OriginalVersion}</version>
 
     <dependencies>
         <dependency>

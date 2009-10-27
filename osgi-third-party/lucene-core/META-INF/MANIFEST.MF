@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.7.1
+Created-By: 1.5.0_20-b02 (Sun Microsystems Inc.)
+Specification-Title: Lucene Search Engine: spellchecker
+Specification-Version: 2.9.0
+Specification-Vendor: The Apache Software Foundation
+Implementation-Title: org.apache.lucene
+Implementation-Version: 2.9.0 817268 - 2009-09-21 10:29:50
+Implementation-Vendor: The Apache Software Foundation
+X-Compile-Source-JDK: 1.4
+X-Compile-Target-JDK: 1.4
+Bundle-ManifestVersion: 2
+Bundle-Name: Lucene Core
+Bundle-SymbolicName: org.apache.lucene-core
+Bundle-Version: 2.9.0
+Export-Package: org.apache.lucene,
+ org.apache.lucene.analysis,
+ org.apache.lucene.analysis.standard,
+ org.apache.lucene.analysis.tokenattributes,
+ org.apache.lucene.document,
+ org.apache.lucene.index,
+ org.apache.lucene.messages,
+ org.apache.lucene.queryParser,
+ org.apache.lucene.search,
+ org.apache.lucene.search.function,
+ org.apache.lucene.search.payloads,
+ org.apache.lucene.search.spans,
+ org.apache.lucene.store,
+ org.apache.lucene.util,
+ org.apache.lucene.util.cache
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+

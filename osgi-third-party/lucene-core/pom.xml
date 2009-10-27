@@ -9,15 +9,16 @@
     </parent>
     
     <properties>
-        <OriginalGroupId>net.htmlparser.jericho</OriginalGroupId>
-        <OriginalArtifactId>jericho-html</OriginalArtifactId>
-        <OriginalVersion>3.1</OriginalVersion>
+        <OriginalGroupId>org.apache.lucene</OriginalGroupId>
+        <OriginalArtifactId>lucene-core</OriginalArtifactId>
+        <OriginalVersion>2.9.0</OriginalVersion>
     </properties>
 
     <groupId>osgi.${OriginalGroupId}</groupId>
     <artifactId>${OriginalArtifactId}</artifactId>
-    <name>OSGI Jericho HTML Parser</name>
-    <version>${OriginalVersion}</version>    
+    <name>OSGI Lucene Core</name>
+    <version>${OriginalVersion}</version>
+    <description>OSGI Apache Lucene Java Core</description>
 
     <dependencies>
         <dependency>
