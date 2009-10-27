@@ -131,6 +131,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 //				else if (context-nTextBoxLevel==1 && configurationType==MSWORD) // DWH 10-27-09 nTextBoxLevel
 				else if (context==nTextBoxLevel+1 && context-nContentDepth==0 && configurationType==MSWORD) // DWH 10-27-09 nTextBoxLevel
 				{ // context has to be one more than nTextBoxLevel; if more, it is in an attribute
+				  
 					bHasBlankInText = ((text.indexOf(' ')>-1) || (text.indexOf('\u00A0')>-1)); // DWH 5-28-09
 					if (bHasBlankInText)
 						sPreserve = " xml:space=\"preserve\""; // DWH 5-28-09
@@ -286,7 +287,8 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 			}
 			else if (context==nTextBoxLevel+1 && context-nContentDepth==0 && configurationType==MSWORD)
 //			else if (context-nTextBoxLevel==1 && configurationType==MSWORD)
-			{
+			{ // each TextBox only adds 1 to context
+			  // nContentDepth is how embedded the text is
 				bInBlankText = false;
 				tmp.append(encody("</w:t></w:r>",context));				
 			}
