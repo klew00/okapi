@@ -483,6 +483,7 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 		
+		//System.out.println(FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), locFR));
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), locFR));
 	}
 	
@@ -497,7 +498,7 @@ public class TsFilterTest {
 		assertEquals("Incorrect src language", locENUS, sd.getLocale());
 		assertEquals("Incorrect linebreak", "\r\n", sd.getLineBreak());
 		assertEquals("Incorrect multilingual", true, sd.isMultilingual());
-		assertEquals("Incorrect utf8bom", true, sd.hasUTF8BOM());
+		assertEquals("Incorrect utf8bom", false, sd.hasUTF8BOM());
 		assertNotNull(sd.getFilterParameters());
 		assertTrue(sd.getFilterWriter() instanceof GenericFilterWriter);
 		assertEquals("utf-8", sd.getProperty("encoding").getValue());
@@ -769,16 +770,61 @@ public class TsFilterTest {
 	}	
 		
 	@Test
+	public void StartGroupNumerusPart_FromFile() {
+		StartGroup sg = FilterTestDriver.getGroup(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 3);
+		
+		assertEquals("9", sg.getId());
+		assertEquals("9", sg.getName());
+		assertEquals("yes", sg.getTargetProperty(locFRFR, "approved").getValue());
+	
+		assertEquals( 
+				"\r\n<message id=\"9\" encoding=\"utf-8\" numerus=\"yes\">\r\n" +
+				"<location filename=\"test.ts\" line=\"55\"/>\r\n" +
+				"<source>hello <byte value=\"79\"/>world</source>\r\n" +
+				"<oldsource>old hello world</oldsource>\r\n" +
+				"<comment>old hello <byte value=\"79\"/>comment</comment>\r\n" +
+				"<oldcomment>old hello old comment</oldcomment>\r\n" +
+				"<extracomment>old hello extra comment</extracomment>\r\n" +
+				"<translatorcomment>old hello translator comment</translatorcomment>\r\n" +
+				"<translation variants=\"yes\"[#$$self$@%approved]>\r\n",
+				sg.getSkeleton().toString());
+	}	
+	@Test
+	public void TextUnitNumerus_FromFile() {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 5);
+		
+		assertEquals("5", tu.getId());
+		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
+		assertFalse(tu.isEmpty());
+		assertEquals("hello <byte value=\"79\"/>world", tu.getSourceContent().toString());
+		assertEquals("Numerus<byte value=\"79\"/> 1", tu.getTargetContent(locFRFR).toString());
+		assertEquals( 
+				"<numerusform variants=\"no\">[#$$self$]</numerusform>", 
+				tu.getSkeleton().toString());
+		
+
+		tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 6);
+		
+		assertEquals("6", tu.getId());
+		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
+		assertFalse(tu.isEmpty());
+		assertEquals("hello <byte value=\"79\"/>world", tu.getSourceContent().toString());
+		assertEquals("Numerus<byte value=\"79\"/> 2", tu.getTargetContent(locFRFR).toString());
+		assertEquals( 
+				"\r\n<numerusform variants=\"no\">[#$$self$]</numerusform>", 
+				tu.getSkeleton().toString());
+				
+		
+	}	
+	
+	
+	@Test
 	public void testDoubleExtraction () {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Complete_valid_utf8_bom_crlf.ts", null));
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locFRFR));
 	}
-	
-	//TODO: split numerus forms
-	//TODO: PO attributes
-
 	
 	
 	//--methods--

@@ -57,11 +57,13 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -280,7 +282,7 @@ public class TsFilter implements IFilter {
 	TS ts = new TS(); 
 	
 	static enum DocumentLocation {TS, CONTEXT, MESSAGE};
-	static enum MessageLocation {RESOURCE, SOURCE, TARGET};
+	static enum MessageLocation {RESOURCE, SOURCE, TARGET, NUMERUS};
 	static enum TranslationStatus {UNDETERMINED, UNFINISHED, OBSOLETE, APPROVED, OTHER};
 
 	Stack<String> elementStack = new Stack<String>();
@@ -547,16 +549,20 @@ public class TsFilter implements IFilter {
 						
 					}else if (ts.numerusFormCount > 0) {
 
-						for( int i = 1; i <= ts.numerusFormCount; i++){
-							
-							StartElement se = getStartElement("numerusform", i);
-						}
-							
+						generateNumerusFormTu();
+						eventList.clear();
+						ts.reset();
+						skel = new GenericSkeleton();
+						
+						return true;
+						
 					}else{
 						TextUnit tu = generateTu();
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
 						eventList.clear();
 						ts.reset();
+						skel = new GenericSkeleton();
+
 						return true;
 					}
 					
@@ -864,7 +870,9 @@ public class TsFilter implements IFilter {
 
 		if ( params.useCodeFinder )
 			params.codeFinder.process(tu.getSourceContent());
-
+		if ( params.useCodeFinder )
+			params.codeFinder.process(tu.getTargetContent(trgLang));
+		
 		tu.setSkeleton(skel);
 		tu.setMimeType(MimeTypeMapper.TS_MIME_TYPE);
 		if(ts.messageId != null){
@@ -873,6 +881,168 @@ public class TsFilter implements IFilter {
 		return tu;
 	}
 
+
+	
+	
+	void generateNumerusFormTu(){
+		
+		boolean nextIsSkippableEmpty = false;
+
+		TextFragment source = new TextFragment();
+		StartGroup sg = new StartGroup(null,String.valueOf(++ts.resourceId));
+		Ending end = new Ending(String.valueOf(++ts.resourceId));
+		TextUnit tf_target = null; 
+		
+		int numerus_counter = 0;
+		
+		for(XMLEvent event: eventList){
+			
+			if( nextIsSkippableEmpty ){
+				nextIsSkippableEmpty = false;
+				continue;
+			}
+			
+			if(event.getEventType() == XMLEvent.START_ELEMENT){
+
+				StartElement startElem = event.asStartElement();
+				String startElemName = startElem.getName().getLocalPart();
+				
+				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem);
+				
+				if( startElemName.equals("message") ){
+					procStartElemMessage(startElem, sg);
+					
+					Attribute msgId = startElem.getAttributeByName(new QName("id"));
+					if(msgId != null){
+						ts.messageId = msgId.getValue(); 
+					}
+					
+				}else if( startElemName.equals("source") ){
+					ts.currentMessageLocation = MessageLocation.SOURCE;
+					addStartElemToSkel(startElem);
+				}else if( startElemName.equals("translation") ){
+					procStartElemTarget(startElem, sg);
+				}else if( startElemName.equals("numerusform") ){
+					ts.currentMessageLocation = MessageLocation.TARGET;
+
+					//--send start group when encountering first numerus instance
+					if (numerus_counter==0){
+						sg.setSkeleton(skel);
+
+						if(ts.messageId != null){
+							sg.setName(ts.messageId);
+						}
+
+						queue.add(new Event(EventType.START_GROUP, sg));
+						skel = new GenericSkeleton();
+					}
+					numerus_counter++;
+					
+					addStartElemToSkel(startElem);
+					tf_target = new TextUnit(String.valueOf(++ts.tuId));
+					tf_target.setSourceContent(source);
+					tf_target.createTarget(trgLang, false, TextUnit.CREATE_EMPTY);
+					
+				}else if( startElemName.equals("lengthvariant") ){
+					//TODO Handle lengthvariant
+					if(ts.currentMessageLocation == MessageLocation.RESOURCE){
+						addStartElemToSkel(startElem);
+					}else if (ts.currentMessageLocation == MessageLocation.TARGET){
+						procStartElemAddToTuContent(startElem, tf_target);	
+					}
+					
+				}else if( startElemName.equals("byte") ){
+					//TODO Handle byte within numberus and lengthvariant
+					
+					if(ts.currentMessageLocation == MessageLocation.RESOURCE){
+						procStartElemByte(startElem);
+					}else if(ts.currentMessageLocation == MessageLocation.SOURCE){
+						
+						procStartElemByte(startElem);
+						if(params.decodeByteValues){
+							Attribute attr = startElem.getAttributeByName(new QName("value"));
+							source.append(decodeByteValue(attr.getValue()));
+						}else{
+							source.append("<byte value=\""+startElem.getAttributeByName(new QName("value")).getValue()+"\"/>");
+							//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
+							//TODO: should it be text or code?
+						}
+
+					}else if(ts.currentMessageLocation == MessageLocation.TARGET){
+
+						procStartElemByte(startElem, tf_target);
+					}
+					
+				}else{
+					procStartElemGeneric(startElem, nextIsSkippableEmpty);
+				}
+				
+			}else if(event.getEventType() == XMLEvent.END_ELEMENT){
+
+				EndElement endElem = event.asEndElement();
+				String endElemName = endElem.getName().getLocalPart();
+				
+				if( endElemName.equals("source") ){
+					ts.currentMessageLocation = MessageLocation.RESOURCE;
+					procEndElem(endElem);
+					
+				}else if( endElemName.equals("numerusform") ){
+					
+					ts.currentMessageLocation = MessageLocation.RESOURCE;
+					
+					//TODO: Put empty placeholder if the numerusform elem is empty
+					procEndElem(endElem);
+
+					if ( params.useCodeFinder )
+						params.codeFinder.process(tf_target.getSourceContent());
+					if ( params.useCodeFinder )
+						params.codeFinder.process(tf_target.getTargetContent(trgLang));
+					
+					tf_target.setSkeleton(skel);
+					tf_target.setMimeType(MimeTypeMapper.TS_MIME_TYPE);
+					
+					queue.add(new Event(EventType.TEXT_UNIT, tf_target));
+					skel = new GenericSkeleton();
+
+				}else if( endElemName.equals("lengthvariant") ){
+					//TODO Handle lengthvariant
+					if(ts.currentMessageLocation == MessageLocation.RESOURCE){
+						procEndElem(endElem);
+					}else if (ts.currentMessageLocation == MessageLocation.TARGET){
+						procEndElemAddToTuContent(endElem, tf_target);
+					}
+				}else{
+					procEndElem(endElem);
+				}
+				
+			}else if(event.getEventType() == XMLEvent.CHARACTERS){
+				
+				Characters chars = event.asCharacters();
+			
+				if(ts.currentMessageLocation == MessageLocation.RESOURCE){
+					
+					procCharacters(chars);
+				
+				}else if(ts.currentMessageLocation == MessageLocation.SOURCE){
+
+					source.append(chars.getData());
+					procCharacters(chars);
+					
+				}else if(ts.currentMessageLocation == MessageLocation.TARGET){
+
+					TextContainer tc = tf_target.getTarget(trgLang);
+					if( !tc.hasText() ){
+						skel.addContentPlaceholder(tf_target, trgLang);	
+					}
+					tc.append(chars.getData());
+				}
+			}
+		}
+
+		end.setSkeleton(skel);
+		queue.add(new Event(EventType.END_GROUP, end));
+		skel = new GenericSkeleton();
+	}
 	
 	private void addTargetSection(TextUnit tu) {
 		skel.append(lineBreak);
@@ -1018,8 +1188,10 @@ public class TsFilter implements IFilter {
 		addStartElemToSkel(startElement);
 	}
 	@SuppressWarnings("unchecked")
-	private void procStartElemTarget(StartElement startElement, TextUnit tu) {
+	private void procStartElemTarget(StartElement startElement, IResource resource) {
 
+		INameable nameable = (INameable) resource;
+		
 		boolean typeFound = false;
 		
 		skel.append("<"+startElement.getName().getLocalPart());				
@@ -1032,22 +1204,22 @@ public class TsFilter implements IFilter {
 				typeFound = true;
 				
 				if(attribute.getValue().equals("unfinished")){
-					skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
-					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
+					skel.addValuePlaceholder(nameable, Property.APPROVED, trgLang);
+					nameable.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
 				}else{
 					skel.append(String.format(" %s=\"%s\"", attribute.getName().getLocalPart(), attribute.getValue()));
 					Property prop = new Property(attribute.getName().getLocalPart(), attribute.getValue());
-					tu.setTargetProperty(trgLang, prop);
+					nameable.setTargetProperty(trgLang, prop);
 				}
 			}else{
 				skel.append(String.format(" %s=\"%s\"", attribute.getName().getLocalPart(), attribute.getValue()));
 				Property prop = new Property(attribute.getName().getLocalPart(), attribute.getValue());
-				tu.setTargetProperty(trgLang, prop);
+				nameable.setTargetProperty(trgLang, prop);
 			}
 		}
 		if(!typeFound){
-			skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
-			tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
+			skel.addValuePlaceholder(nameable, Property.APPROVED, trgLang);
+			nameable.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
 		}
 		skel.append(">");
 	}

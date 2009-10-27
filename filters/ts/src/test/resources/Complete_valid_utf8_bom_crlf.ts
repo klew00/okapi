@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <!DOCTYPE TS>
 <!-- comment -->
 <TS version="4.5.1" sourcelanguage="en-us" language="fr-fr">
@@ -101,7 +101,7 @@
 <userdata>hello userdata</userdata>
 <extra-loc-blank>hello extra-loc-blank</extra-loc-blank>
 </message>
-<message id="9" encoding="utf-8" numerus="no">
+<message id="9" encoding="utf-8" numerus="yes">
 <location filename="test.ts" line="55"/>
 <source>hello <byte value="79"/>world</source>
 <oldsource>old hello world</oldsource>
@@ -109,9 +109,9 @@
 <oldcomment>old hello old comment</oldcomment>
 <extracomment>old hello extra comment</extracomment>
 <translatorcomment>old hello translator comment</translatorcomment>
-<translation variants="no">
-<numerusform variants="no">Numerus 1</numerusform>
-<numerusform variants="no">Numerus 2</numerusform>
+<translation variants="yes">
+<numerusform variants="no">Numerus<byte value="79"/> 1</numerusform>
+<numerusform variants="no">Numerus<byte value="79"/> 2</numerusform>
 </translation>
 <userdata>hello userdata</userdata>
 <extra-loc-blank>hello extra-loc-blank</extra-loc-blank>
