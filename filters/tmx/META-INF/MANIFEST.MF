@@ -4,5 +4,8 @@ Bundle-Name: TMX Filter
 Bundle-SymbolicName: net.sf.okapi.filters.tmx
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.filters.tmx
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
+ com.ctc.wstx;bundle-version="3.2.8",
+ com.springsource.javax.xml.stream;bundle-version="1.0.1"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ClassPath: .,target/classes,src/main/resources
