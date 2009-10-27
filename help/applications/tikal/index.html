@@ -444,6 +444,13 @@ create new configurations.</p>
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
 	</tr>
+	<tr>
+		<td valign="top" align="left" nowrap><code>-all</code></td>
+		<td align="left" valign="top">Allows entries that have no text to be 
+		converted. If this option is not set, the entries that are empty, or 
+		contains only codes or whitespaces are not included in the output file. 
+		If this option is set all entries are included in the output.</td>
+	</tr>
 </table>
 <p>For example:</p>
 <pre>tikal -2po data.tmx -sl EN -tl ZU</pre>
@@ -481,6 +488,14 @@ language will be English and the target Zulu.</p>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
+	</tr>
+	<tr>
+		<td valign="top" align="left" nowrap><code>-all</code></td>
+		<td align="left" valign="top">Allows entries that have no text to be 
+		converted. If this option is not set (the default), the entries that are 
+		empty, or contains only codes or whitespaces are not included in the 
+		output file. If this option is set all entries are included in the 
+		output.</td>
 	</tr>
 	</table>
 <p>For example:</p>
@@ -539,6 +554,13 @@ elements for the German will be empty.</p>
 		XLIFF with g/x notation, <code>tmx</code> for TMX, or <code>generic</code> 
 		for generic placeholders.</td>
 	</tr>
+	<tr>
+		<td valign="top" align="left" nowrap><code>-all</code></td>
+		<td align="left" valign="top">Allows entries that have no text to be 
+		converted. If this option is not set, the entries that are empty, or 
+		contains only codes or whitespaces are not included in the output file. 
+		If this option is set all entries are included in the output.</td>
+	</tr>
 	</table>
 <p>For example:</p>
 <pre>tikal -2tbl data.tmx -sl EN -tl ZU</pre>
@@ -587,6 +609,14 @@ are added to it.</p>
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
 	</tr>
+	<tr>
+		<td valign="top" align="left" nowrap><code>-all</code></td>
+		<td align="left" valign="top">Allows entries that have no text to be 
+		imported. If this option is not set (the default), the entries that are 
+		empty, or contains only codes or whitespaces are not included in the 
+		output file. If this option is set all entries are included in the 
+		output.</td>
+	</tr>
 	</table>
 <p>For example:</p>
 <pre>tikal -imp myTMdir data.po -sl JA -tl FR</pre>
@@ -614,6 +644,14 @@ source language of the PO file is Japanese and the target French.</p>
 		<td align="left" valign="top">Forces the content of the output target 
 		field to be either a copy of the source or empty. If neither option is 
 		set the content of the target field is the target text or empty.</td>
+	</tr>
+	<tr>
+		<td valign="top" align="left" nowrap><code>-all</code></td>
+		<td align="left" valign="top">Allows entries that have no text to be 
+		exported. If this option is not set (the default), the entries that are 
+		empty, or contains only codes or whitespaces are not included in the 
+		output file. If this option is set all entries are included in the 
+		output.</td>
 	</tr>
 	</table>
 <p>For example:</p>

@@ -251,7 +251,7 @@ public class Main {
 				else if ( arg.equals("-tmx") ) {
 					prog.tableConvCodes = TableFilterWriterParameters.INLINE_TMX;
 				}
-				else if ( arg.equals("-includenotext") ) {
+				else if ( arg.equals("-all") ) {
 					prog.convSkipEntriesWithoutText = false;
 				}
 				else if ( arg.equals("-nofill") ) {
@@ -808,22 +808,21 @@ public class Main {
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
 		ps.println("      [-apertium [serverURL]] [-opt threshold[:maxhits]]");
 		ps.println("Converts to PO format:");
-		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-generic] [-trgsource|-trgempty]");
-		ps.println("      [-includenotext]");
 		ps.println("Converts to TMX format:");
 		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-includenotext]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all]");
 		ps.println("Converts to table format:");
 		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
-		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic] [-includenotext]");
+		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic] [-all]");
 		ps.println("Imports to Pensieve TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all]");
 		ps.println("Export Pensieve TM as TMX:");
 		ps.println("   -exp tmDirectory1 [tmDirectory2...] [-sl srcLang] [-tl trgLang]");
-		ps.println("      [-trgsource|-trgempty]");
+		ps.println("      [-trgsource|-trgempty] [-all]");
 	}
 
 	private void displayQuery (IQuery conn,
