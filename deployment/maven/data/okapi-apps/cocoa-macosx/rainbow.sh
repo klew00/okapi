@@ -1,5 +1,5 @@
 #!/bin/bash
-java -XstartOnFirstThread -jar lib/rainbow.jar
+java -d32 -XstartOnFirstThread -jar lib/rainbow.jar
 # You can also use the following options:
 # org.eclipse.swt.internal.carbon.smallFonts
 # org.eclipse.swt.internal.carbon.noFocusRing

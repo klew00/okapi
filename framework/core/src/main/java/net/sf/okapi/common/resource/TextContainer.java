@@ -131,6 +131,50 @@ public class TextContainer extends TextFragment {
 		}
 	}
 
+	/**
+	 * Indicates if this container contains at least one character
+	 * Inline codes and annotation markers do not count as characters. If the text contain segment markers,
+	 * if the option lookInSegments is set each segment is looked up, otherwise the segment is
+	 * treated as a marker and not considered text.
+	 * @param lookInSegments indicates if the possible segments in this containers should be
+	 * looked at. If this parameter is set to false, the segment marker are treated as codes.
+	 * @param whiteSpacesAreText indicates if whitespaces should be considered 
+	 * characters or not for the purpose of checking if this fragment is empty.
+	 * @return true if this container contains at least one character (that character could
+	 * be a whitespace if whiteSpacesAreText is set to true, and could be in a segment if
+	 * lookInSegments is set to true).
+	 */
+	public boolean hasText (boolean lookInSegments,
+		boolean whiteSpacesAreText)
+	{
+		for ( int i=0; i<text.length(); i++ ) {
+			switch (text.charAt(i)) {
+			case MARKER_OPENING:
+			case MARKER_CLOSING:
+			case MARKER_ISOLATED:
+				i++; // Skip over the marker, they are not text
+				continue;
+			case MARKER_SEGMENT:
+				if ( lookInSegments ) {
+					int n = TextFragment.toIndex(text.charAt(++i));
+					if ( segments.get(n).text.hasText(whiteSpacesAreText) ) {
+						return true;
+					}
+				}
+				else {
+					i++; // Skip over the marker, they are not text
+				}
+				continue;
+			}
+			// Not a marker
+			// If we count whitespaces as text, then we have text
+			if ( whiteSpacesAreText ) return true;
+			// Otherwise we have text if it's not a whitespace
+			if ( !Character.isWhitespace(text.charAt(i)) ) return true;
+		}
+		return false;
+	}
+	
 	public boolean hasProperty (String name) {
 		return (getProperty(name) != null);
 	}

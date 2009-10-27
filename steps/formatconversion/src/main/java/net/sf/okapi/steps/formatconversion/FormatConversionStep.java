@@ -166,6 +166,12 @@ public class FormatConversionStep extends BasePipelineStep {
 
 	protected void processTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
+		
+		// Skip empty or code-only entries
+		if ( params.getSkipEntriesWithoutText() ) {
+			if ( !tu.getSource().hasText(true, false) ) return;
+		}
+		
 		// If requested, overwrite the target
 		switch ( params.getTargetStyle() ) {
 		case Parameters.TRG_FORCEEMPTY:

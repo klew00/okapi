@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tmx version="1.4"><header creationtool="unknown" creationtoolversion="unknown" segtype="paragraph" o-tmf="unknown" adminlang="en" srclang="en" datatype="text"></header><body>
-<tu tuid="P3E36B801">
-<prop type="references">/src/string.h:201</prop>
-<tuv xml:lang="en"><seg><ph x="1">%1s</ph> <ph x="2">%2s</ph></seg></tuv>
-<tuv xml:lang="fr"><seg><ph x="1">%1s</ph> <ph x="2">%2s</ph></seg></tuv>
-</tu>
 <tu tuid="N93745AA6">
 <tuv xml:lang="en"><seg>Text with an approved translation <ph x="1">%s</ph></seg></tuv>
 <tuv xml:lang="fr"><seg>Text with an approved translation <ph x="1">%s</ph></seg></tuv>
@@ -52,11 +47,6 @@
 <tu tuid="P68A1DB2F-1">
 <tuv xml:lang="en"><seg><ph x="1">%d</ph> directories left</seg></tuv>
 <tuv xml:lang="fr"><seg><ph x="1">%d</ph> directories left</seg></tuv>
-</tu>
-<tu tuid="P5437ECD7">
-<prop type="references">/src/string.h:203</prop>
-<tuv xml:lang="en"><seg><ph x="1">%1s</ph> <ph x="2">%2s</ph> <ph x="3">%3d</ph></seg></tuv>
-<tuv xml:lang="fr"><seg><ph x="1">%1s</ph> <ph x="2">%2s</ph> <ph x="3">%3d</ph></seg></tuv>
 </tu>
 </body>
 </tmx>

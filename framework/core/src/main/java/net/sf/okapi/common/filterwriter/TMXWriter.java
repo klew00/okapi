@@ -371,36 +371,49 @@ public class TMXWriter {
     	TextContainer srcCont = item.getSource();
     	Set<LocaleId> locales = item.getTargetLocales();
 
-    	//TODO: Support segmented output
-    	if ( !srcCont.isSegmented() ) { // Source is not segmented
-    		// Write start TU
-    		writer.writeStartElement("tu");
-   			writer.writeAttributeString("tuid", tuid);
-    		writer.writeLineBreak();
-
-    		// Write any resource-level properties
-    		Set<String> names = item.getPropertyNames();
-    		for ( String name : names ) {
-    			// Filter out attributes (temporary solution)
-    			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
-    			// Write out the property
-    			writer.writeStartElement("prop");
-    			writer.writeAttributeString("type", name);
-    			writer.writeString(item.getProperty(name).getValue());
-    			writer.writeEndElementLineBreak(); // prop
-    		}
-
-    		// Write source TUV
-    		writeTUV(srcCont, srcLoc, srcCont);
-
-    		// Write each target TUV
-    		for ( LocaleId loc : locales ) {
-    			writeTUV(item.getTarget(loc), loc, item.getTarget(loc));
-    		}
-
-    		// Write end TU
-    		writer.writeEndElementLineBreak(); // tu
+    	// If the source is segmented, un-segment it
+    	//TODO: Support output of segmented text unit
+    	if ( srcCont.isSegmented() ) {
+    		srcCont = srcCont.clone();
+    		srcCont.mergeAllSegments();
     	}
+    	
+    	// Assumes source is not segmented at this point
+    	
+		// Write start TU
+		writer.writeStartElement("tu");
+		writer.writeAttributeString("tuid", tuid);
+		writer.writeLineBreak();
+
+		// Write any resource-level properties
+		Set<String> names = item.getPropertyNames();
+		for ( String name : names ) {
+			// Filter out attributes (temporary solution)
+			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
+			// Write out the property
+			writer.writeStartElement("prop");
+			writer.writeAttributeString("type", name);
+			writer.writeString(item.getProperty(name).getValue());
+			writer.writeEndElementLineBreak(); // prop
+		}
+
+		// Write source TUV
+		writeTUV(srcCont, srcLoc, srcCont);
+
+		TextContainer trgCont;
+		// Write each target TUV
+		for ( LocaleId loc : locales ) {
+			trgCont = item.getTarget(loc);
+			// For now we support only un-segmented output
+			if ( trgCont.isSegmented() ) {
+				trgCont = trgCont.clone();
+				trgCont.mergeAllSegments();
+			}
+			writeTUV(trgCont, loc, trgCont);
+		}
+
+		// Write end TU
+		writer.writeEndElementLineBreak(); // tu
     }
 
     /**

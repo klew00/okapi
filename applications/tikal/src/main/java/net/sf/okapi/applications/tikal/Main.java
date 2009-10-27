@@ -118,6 +118,7 @@ public class Main {
 	protected String tableConvFormat;
 	protected String tableConvCodes;
 	protected int convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_TARGETOREMPTY;
+	protected boolean convSkipEntriesWithoutText = true;
 	protected String segRules;
 	protected boolean showTraceHint = true;
 	protected String tmOptions;
@@ -249,6 +250,9 @@ public class Main {
 				}
 				else if ( arg.equals("-tmx") ) {
 					prog.tableConvCodes = TableFilterWriterParameters.INLINE_TMX;
+				}
+				else if ( arg.equals("-includenotext") ) {
+					prog.convSkipEntriesWithoutText = false;
 				}
 				else if ( arg.equals("-nofill") ) {
 					prog.levOptFillTarget = false;
@@ -806,13 +810,14 @@ public class Main {
 		ps.println("Converts to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-generic] [-trgsource|-trgempty]");
+		ps.println("      [-includenotext]");
 		ps.println("Converts to TMX format:");
 		ps.println("   -2tmx inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-includenotext]");
 		ps.println("Converts to table format:");
 		ps.println("   -2tbl inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
-		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic]");
+		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic] [-includenotext]");
 		ps.println("Imports to Pensieve TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty]");
@@ -1004,6 +1009,7 @@ public class Main {
 		// These options may or may not be used depending on the output format
 		params.setUseGenericCodes(genericOutput);
 		params.setTargetStyle(convTargetStyle);
+		params.setSkipEntriesWithoutText(convSkipEntriesWithoutText);
 		
 		driver.addStep(fcStep);
 		driver.addBatchItem(rd, outputURI, outputEncoding);

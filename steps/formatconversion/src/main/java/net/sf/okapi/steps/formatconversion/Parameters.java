@@ -39,6 +39,7 @@ public class Parameters extends BaseParameters {
 	static final String OUTPUTFORMAT = "outputFormat";
 	static final String FORMATOPTIONS = "formatOptions";
 	static final String USEGENERICCODES = "useGenericCodes";
+	static final String SKIPENTRIESWITHOUTTEXT = "skipEntriesWithoutText";
 	
 	private boolean singleOutput;
 	private String outputPath;
@@ -46,6 +47,7 @@ public class Parameters extends BaseParameters {
 	private String outputFormat;
 	private boolean useGenericCodes;
 	private String formatOptions;
+	private boolean skipEntriesWithoutText;
 	
 	public Parameters () {
 		reset();
@@ -87,16 +89,24 @@ public class Parameters extends BaseParameters {
 		return useGenericCodes;
 	}
 
+	public void setUseGenericCodes (boolean useGenericCodes) {
+		this.useGenericCodes = useGenericCodes;
+	}
+
 	public String getFormatOptions () {
 		return formatOptions;
 	}
 
-	public void setFormatOptions (String formatOptions) {
-		this.formatOptions = formatOptions;
+	public boolean getSkipEntriesWithoutText () {
+		return skipEntriesWithoutText;
 	}
 
-	public void setUseGenericCodes (boolean useGenericCodes) {
-		this.useGenericCodes = useGenericCodes;
+	public void setSkipEntriesWithoutText (boolean skipEntriesWithoutText) {
+		this.skipEntriesWithoutText = skipEntriesWithoutText;
+	}
+
+	public void setFormatOptions (String formatOptions) {
+		this.formatOptions = formatOptions;
 	}
 
 	public void reset () {
@@ -106,6 +116,7 @@ public class Parameters extends BaseParameters {
 		outputFormat = FORMAT_TMX;
 		formatOptions = null;
 		useGenericCodes = false;
+		skipEntriesWithoutText = true;
 	}
 
 	public void fromString (String data) {
@@ -117,6 +128,7 @@ public class Parameters extends BaseParameters {
 		outputFormat = buffer.getString(OUTPUTFORMAT, outputFormat);
 		formatOptions = buffer.getGroup(FORMATOPTIONS, formatOptions);
 		useGenericCodes = buffer.getBoolean(USEGENERICCODES, useGenericCodes);
+		skipEntriesWithoutText = buffer.getBoolean(SKIPENTRIESWITHOUTTEXT, skipEntriesWithoutText);
 	}
 
 	public String toString() {
@@ -127,6 +139,7 @@ public class Parameters extends BaseParameters {
 		buffer.setString(OUTPUTFORMAT, outputFormat);
 		buffer.setGroup(FORMATOPTIONS, formatOptions);
 		buffer.setBoolean(USEGENERICCODES, useGenericCodes);
+		buffer.setBoolean(SKIPENTRIESWITHOUTTEXT, skipEntriesWithoutText);
 		return buffer.toString();
 	}
 

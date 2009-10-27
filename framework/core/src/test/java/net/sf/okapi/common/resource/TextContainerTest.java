@@ -106,6 +106,76 @@ public class TextContainerTest {
 	}
 
 	@Test
+	public void testHasTextWithText () {
+		tc1.append("text");
+		assertTrue(tc1.hasText(true, false));
+		assertTrue(tc1.hasText(true, true));
+		assertTrue(tc1.hasText(false, true));
+		assertTrue(tc1.hasText(false, false));
+	}
+
+	@Test
+	public void testHasTextNoText () {
+		tc1.append("");
+		assertFalse(tc1.hasText(true, false));
+		assertFalse(tc1.hasText(true, true));
+		assertFalse(tc1.hasText(false, true));
+		assertFalse(tc1.hasText(false, false));
+	}
+
+	@Test
+	public void testHasTextSpaces () {
+		tc1.append("  \t");
+		// White spaces are not text
+		assertFalse(tc1.hasText(false, false));
+		assertFalse(tc1.hasText(true, false));
+		// White spaces are text
+		assertTrue(tc1.hasText(true, true));
+		assertTrue(tc1.hasText(false, true));
+	}
+
+	@Test
+	public void testHasTextCodeOnly () {
+		tc1.append(TagType.PLACEHOLDER, "br", "<br/>");
+		assertFalse(tc1.hasText(false, false));
+		assertFalse(tc1.hasText(true, false));
+		assertFalse(tc1.hasText(true, true));
+		assertFalse(tc1.hasText(false, true));
+	}
+
+	@Test
+	public void testHasTextSpacesAndCode () {
+		tc1.append("  \t");
+		tc1.append(TagType.PLACEHOLDER, "br", "<br/>");
+		// White spaces are not text
+		assertFalse(tc1.hasText(false, false));
+		assertFalse(tc1.hasText(true, false));
+		// White spaces are text
+		assertTrue(tc1.hasText(true, true));
+		assertTrue(tc1.hasText(false, true));
+	}
+
+	@Test
+	public void testHasTextWithSegmentWithText () {
+		tc1.append("text");
+		tc1.createSegment(0, 4);
+		assertFalse(tc1.hasText(false, false));
+		assertTrue(tc1.hasText(true, false));
+		assertTrue(tc1.hasText(true, true));
+		assertFalse(tc1.hasText(false, true));
+	}
+
+	@Test
+	public void testHasTextWithSegmentSpaces () {
+		tc1.append("    ");
+		tc1.createSegment(0, 4);
+		assertFalse(tc1.hasText(false, false));
+		assertFalse(tc1.hasText(true, false));
+		assertTrue(tc1.hasText(true, true));
+		assertFalse(tc1.hasText(false, true));
+	}
+
+	@Test
 	public void testGetSetProperties () {
 		Set<String> list = tc1.getPropertyNames();
 		assertNotNull(list);

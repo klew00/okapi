@@ -1,2 +1,2 @@
 #!/bin/bash
-java -XstartOnFirstThread -jar lib/ratel.jar
+java -d32 -XstartOnFirstThread -jar lib/ratel.jar

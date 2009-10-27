@@ -868,8 +868,7 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Indicates if this fragment contains at least one character other than a whitespace.
-	 * (inline code and annotation markers do not count as characters).
-	 * 
+	 * (inline codes, segment markers, and annotation markers do not count as characters).
 	 * @return true if this fragment contains at least one character, excluding whitespaces.
 	 */
 	public boolean hasText () {
@@ -878,7 +877,7 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Indicates if this fragment contains at least one character
-	 * (inline code and annotation markers do not count as characters).
+	 * (inline codes, segment markers, and annotation markers do not count as characters).
 	 * @param whiteSpacesAreText indicates if whitespaces should be considered 
 	 * characters or not for the purpose of checking if this fragment is empty.
 	 * @return true if this fragment contains at least one character (that character could
@@ -895,7 +894,7 @@ public class TextFragment implements Comparable<Object> {
 				continue;
 			}
 			// Not a marker
-			// If we count ws as text, then we have text
+			// If we count whitespaces as text, then we have text
 			if ( whiteSpacesAreText ) return true;
 			// Otherwise we have text if it's not a whitespace
 			if ( !Character.isWhitespace(text.charAt(i)) ) return true;

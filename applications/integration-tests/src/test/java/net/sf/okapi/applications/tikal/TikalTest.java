@@ -316,15 +316,15 @@ public class TikalTest {
     public void testConvertToTable () throws IOException, InterruptedException {
     	// Test csv conversion
     	assertTrue(deleteOutputFile("potest.po.txt"));
-    	assertEquals(0, runTikal("-2tbl potest.po -csv"));
+    	assertEquals(0, runTikal("-2tbl potest.po -csv -includenotext"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.normal.csv", "UTF-8"));
     	// Test csv conversion (codes=generic)
     	assertTrue(deleteOutputFile("potest.po.txt"));
-    	assertEquals(0, runTikal("-2tbl potest.po -csv -generic"));
+    	assertEquals(0, runTikal("-2tbl potest.po -csv -generic -includenotext"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.generic.csv", "UTF-8"));
     	// Test csv conversion (codes=tmx)
     	assertTrue(deleteOutputFile("potest.po.txt"));
-    	assertEquals(0, runTikal("-2tbl potest.po -csv -tmx"));
+    	assertEquals(0, runTikal("-2tbl potest.po -csv -tmx -includenotext"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.tmx.csv", "UTF-8"));
     	// Test table conversion
     	assertTrue(deleteOutputFile("potest.po.txt"));
@@ -332,11 +332,11 @@ public class TikalTest {
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.normal.tab", "UTF-8"));
     	// Test table conversion (codes=generic)
     	assertTrue(deleteOutputFile("potest.po.txt"));
-    	assertEquals(0, runTikal("-2tbl potest.po -tab -generic"));
+    	assertEquals(0, runTikal("-2tbl potest.po -tab -generic -includenotext"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.generic.tab", "UTF-8"));
     	// Test table conversion (codes=xliffgx)
     	assertTrue(deleteOutputFile("potest.po.txt"));
-    	assertEquals(0, runTikal("-2tbl potest.po -tab -xliffgx"));
+    	assertEquals(0, runTikal("-2tbl potest.po -tab -xliffgx -includenotext"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.po.txt", "potest.po.xliffgx.tab", "UTF-8"));
     }
 
