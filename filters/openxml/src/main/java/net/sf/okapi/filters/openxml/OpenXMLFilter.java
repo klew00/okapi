@@ -813,8 +813,7 @@ public class OpenXMLFilter implements IFilter {
 						TextFragment tfSource = tu.getSourceContent();
 						String torg = translator.translate(tfSource,LOGGER,nFileType); // DWH 5-7-09 nFileType
 						TextFragment tfTarget = tfSource.clone();
-//						tfTarget.setCodedText(torg);
-						tfTarget.setCodedText(/*"GLUNK "+*/torg); // DWH 4-8-09 testing 1 2 3 
+						tfTarget.setCodedText(torg);
 						TextContainer tc = new TextContainer();
 						tc.setContent(tfTarget);
 						tu.setTarget(sOutputLanguage, tc);

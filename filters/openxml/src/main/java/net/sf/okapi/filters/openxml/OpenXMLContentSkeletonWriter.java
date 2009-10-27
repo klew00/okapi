@@ -26,6 +26,8 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -60,6 +62,10 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	private int configurationType; // DWH 4-10-09
 	private ILayerProvider layer;
 	private EncoderManager encoderManager;
+	private int nTextBoxLevel=0; // DWH 10-27-09
+	private boolean bInBlankText=false; // DWH 10-27-09
+	private int nContentDepth=0;
+
 	
 	public OpenXMLContentSkeletonWriter(int configurationType) // DWH 4-8-09
 	{
@@ -87,8 +93,9 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		int context)
 	{
 		String sTuff; // DWH 4-8-09
-		String text=tf.toString(); // DWH 5-18-09
-		boolean bInBlankText=false; // DWH 4-8-09
+//		String text=tf.toString(); // DWH 5-18-09 commented 10-27-09
+		String text=tf.getCodedText(); // DWH 10-27-09 they changed toString to show all text
+		bInBlankText=false; // DWH 4-8-09
 		boolean bHasBlankInText=false; // DWH 5-28-09
 		int nSurroundingCodes=0; // DWH 4-8-09
 		String sPreserve=""; // DWH 5-28-09 xml:space="preserve" if there is a space
@@ -116,12 +123,18 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 						sPreserve = " xml:space=\"preserve\""; // DWH 5-28-09
 					if (configurationType==MSWORD)
 						text = "<w:r><w:t"+sPreserve+">"+sTuff+"</w:t></w:r>"; // DWH 4-8-09
-//						text = "<w:r><w:t xml:space=\"preserve\">"+sTuff+"</w:t></w:r>"; // DWH 4-8-09
 					else if (configurationType==MSPOWERPOINT)
 						text = "<a:r><a:t"+sPreserve+">"+sTuff+"</a:t></a:r>"; // DWH 4-8-09
-//						text = "<a:r><a:t xml:space=\"preserve\">"+sTuff+"</a:t></a:r>"; // DWH 4-8-09
 					else
 						text = sTuff;
+				}
+//				else if (context-nTextBoxLevel==1 && configurationType==MSWORD) // DWH 10-27-09 nTextBoxLevel
+				else if (context==nTextBoxLevel+1 && context-nContentDepth==0 && configurationType==MSWORD) // DWH 10-27-09 nTextBoxLevel
+				{ // context has to be one more than nTextBoxLevel; if more, it is in an attribute
+					bHasBlankInText = ((text.indexOf(' ')>-1) || (text.indexOf('\u00A0')>-1)); // DWH 5-28-09
+					if (bHasBlankInText)
+						sPreserve = " xml:space=\"preserve\""; // DWH 5-28-09
+					text = "<w:r><w:t"+sPreserve+">"+sTuff+"</w:t></w:r>"; // DWH 4-8-09
 				}
 				else
 					text = sTuff; // DWH 5-22-09
@@ -141,38 +154,20 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 			ch = text.charAt(i);
 			switch ( ch ) {
 			case TextFragment.MARKER_OPENING:
-				if (context==1 && bInBlankText && (nSurroundingCodes<=0)) { // DWH 4-13-09 whole if
-					bInBlankText = false;
-					if (configurationType==MSWORD)
-						tmp.append(encody("</w:t></w:r>",context));
-					else if (configurationType==MSPOWERPOINT)
-						tmp.append(encody("</a:t></a:r>",context));
-				}
+				tmp = blankEnd(context,nSurroundingCodes,tmp);
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				tmp.append(expandCodeContent(code, langToUse, context));
 				nSurroundingCodes++;
 				break;
 			case TextFragment.MARKER_CLOSING:
-				if (context==1 && bInBlankText && (nSurroundingCodes<=0)) { // DWH 4-13-09 whole if
-					bInBlankText = false;
-					if (configurationType==MSWORD)
-						tmp.append(encody("</w:t></w:r>",context));
-					else if (configurationType==MSPOWERPOINT)
-						tmp.append(encody("</a:t></a:r>",context));
-				}
+				tmp = blankEnd(context,nSurroundingCodes,tmp);
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				tmp.append(expandCodeContent(code, langToUse, context));
 				nSurroundingCodes--;
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
-				if (context==1 && bInBlankText && (nSurroundingCodes<=0)) { // DWH 4-13-09 whole if
-					bInBlankText = false;
-					if (configurationType==MSWORD)
-						tmp.append(encody("</w:t></w:r>",context));
-					else if (configurationType==MSPOWERPOINT)
-						tmp.append(encody("</a:t></a:r>",context));
-				}
+				tmp = blankEnd(context,nSurroundingCodes,tmp);
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				if (code.getTagType()==TextFragment.TagType.OPENING)
 					nSurroundingCodes++;
@@ -181,14 +176,21 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				tmp.append(expandCodeContent(code, langToUse, context));
 				break;
 			default:
-				if (context==1 && !bInBlankText && (nSurroundingCodes<=0)) { // DWH 4-13-09 whole if
-					bInBlankText = true;
-					if (configurationType==MSWORD)
-//						tmp.append(encody("<w:r><w:t xml:space=\"preserve\">",context));
-						tmp.append(encody("<w:r><w:t xml:space=\"preserve\">",context));
-					else if (configurationType==MSPOWERPOINT)
-//						tmp.append(encody("<a:r><a:t xml:space=\"preserve\">",context));
-						tmp.append(encody("<a:r><a:t>",context));
+				if (!bInBlankText && (nSurroundingCodes<=0))
+				{
+					if (context==1) { // DWH 4-13-09 whole if
+						bInBlankText = true;
+						if (configurationType==MSWORD)
+							tmp.append(encody("<w:r><w:t xml:space=\"preserve\">",context));
+						else if (configurationType==MSPOWERPOINT)
+							tmp.append(encody("<a:r><a:t>",context));
+					}
+//					else if (context-nTextBoxLevel==1 && configurationType==MSWORD) // DWH 10-27-09
+					else if (context==nTextBoxLevel+1 && context-nContentDepth==0 && configurationType==MSWORD) // DWH 10-27-09
+					{ // only add codes around blank text if context is one above nTextBoxLevel, otherwise inside attributes
+						bInBlankText = true;
+						tmp.append(encody("<w:r><w:t xml:space=\"preserve\">",context));						
+					}
 				}
 				if ( Character.isHighSurrogate(ch) ) {
 					int cp = text.codePointAt(i);
@@ -235,13 +237,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				break;
 			}
 		}
-		if (context==1 && bInBlankText && (nSurroundingCodes<=0)) { // DWH 4-13-09 whole if
-			bInBlankText = false;
-			if (configurationType==MSWORD)
-				tmp.append(encody("</w:t></w:r>",context));
-			else if (configurationType==MSPOWERPOINT)
-				tmp.append(encody("</a:t></a:r>",context));
-		}
+		tmp = blankEnd(context,nSurroundingCodes,tmp);
 		return tmp.toString();
 	}
 	/**
@@ -272,5 +268,49 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 			}
 		}
 */
+	}
+	public void setNTextBoxLevel(int nTextBoxLevel)
+	{
+		this.nTextBoxLevel = nTextBoxLevel;
+	}
+	private StringBuilder blankEnd(int context, int nSurroundingCodes, StringBuilder tmp)
+	{
+		if (bInBlankText && (nSurroundingCodes<=0))
+		{
+			if (context==1) { // DWH 4-13-09 whole if
+				bInBlankText = false;
+				if (configurationType==MSWORD)
+					tmp.append(encody("</w:t></w:r>",context));
+				else if (configurationType==MSPOWERPOINT)
+					tmp.append(encody("</a:t></a:r>",context));
+			}
+			else if (context==nTextBoxLevel+1 && context-nContentDepth==0 && configurationType==MSWORD)
+//			else if (context-nTextBoxLevel==1 && configurationType==MSWORD)
+			{
+				bInBlankText = false;
+				tmp.append(encody("</w:t></w:r>",context));				
+			}
+		}
+		return tmp;
+	}
+	protected String getContent (TextUnit tu,
+			LocaleId locToUse,
+			int context) 
+	{
+		String result;
+		Property prop = tu.getProperty("TextBoxLevel");
+		nTextBoxLevel = 0;
+		if (prop!=null)
+		{
+			try
+			{
+				nTextBoxLevel = Integer.parseInt(prop.getValue());
+			}
+			catch(Exception e) {}
+		}
+		nContentDepth++;
+		result = super.getContent(tu,locToUse,context);
+		nContentDepth--;
+		return result;
 	}
 }

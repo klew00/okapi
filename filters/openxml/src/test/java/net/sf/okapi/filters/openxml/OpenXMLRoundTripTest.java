@@ -88,11 +88,12 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("TextBoxes.docx");
 		themfiles.add("ExcelColors.xlsx");
 		themfiles.add("UTF8.docx");
-		themfiles.add("Practice2.docx");
 		themfiles.add("commentTable.xlsx");
 		themfiles.add("InsertText.pptx");
 		themfiles.add("Endpara.pptx");
-
+		themfiles.add("Practice2.docx");
+		themfiles.add("OutOfTheTextBox.docx");
+		
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");

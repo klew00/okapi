@@ -1179,6 +1179,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		ArrayList<Event> textBoxEventList=null; // DWH 7-23-09 textbox
 		Event event; // DWH 7-23-09 textbox
 		OpenXMLContentFilter tboxcf; // DWH 7-23-09
+		int nTextBoxLevel; // DWH 1-27-09
 		if (endTag==null) // DWH 4-14-09
 			return;
 		sTagName = endTag.getName(); // DWH 2-26-09
@@ -1284,6 +1285,24 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 				for(Iterator<Event> it=textBoxEventList.iterator() ; it.hasNext();)
 				{
 					event = it.next();
+					if (event.getEventType()==EventType.TEXT_UNIT) // DWH 10-27-09 property for being in text box
+					{
+						TextUnit txu = (TextUnit) event.getResource();
+						Property prop = txu.getProperty("TextBoxLevel");
+						if (prop==null)
+							txu.setProperty(new Property("TextBoxLevel","1",false));
+						else
+						{
+							nTextBoxLevel = 0;
+							try
+							{
+								nTextBoxLevel = Integer.parseInt(prop.getValue());
+							}
+							catch(Exception e) {}
+							nTextBoxLevel++; // if it was already in a text box, increase the level by 1
+							prop.setValue((new Integer(nTextBoxLevel)).toString());						
+						}
+					}
 					addFilterEvent(event); // add events from WordTextBox before EndGroup event
 				}
 				setTextUnitId(tboxcf.getTextUnitId());

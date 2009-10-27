@@ -42,8 +42,10 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
 //import net.sf.okapi.filters.abstractmarkup.Parameters;
 
@@ -73,6 +75,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	private LocaleId outLang;
 	private ZipEntry subDocEntry;
 	private IFilterWriter subDocWriter;
+	private OpenXMLContentSkeletonWriter subSkelWriter;
 	private File tempFile;
 	private File tempZip;
 	private YamlParameters params; // DWH 7-16-09
@@ -176,6 +179,23 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		case TEXT_UNIT:
 		case START_GROUP:
 		case END_GROUP:
+/* now done in OpenXMLContentSkeletonWriter.getContent(TextUnit,LocaleId,int) DWH 10-27-09
+			if (event.getEventType()==EventType.TEXT_UNIT) // DWH 10-27-09 if in a Text box
+			{
+				TextUnit txu = (TextUnit) event.getResource();
+				Property prop = txu.getProperty("TextBoxLevel");
+				int nTextBoxLevel = 0;
+				if (prop!=null)
+				{
+					try
+					{
+						nTextBoxLevel = Integer.parseInt(prop.getValue());
+					}
+					catch(Exception e) {}
+				}
+				subSkelWriter.setNTextBoxLevel(nTextBoxLevel); // DWH 10-27-09 add getSkelWriter to GenericFilterWriter
+			}
+*/
 			subDocWriter.handleEvent(event);
 			break;
 		case CANCELED:
@@ -323,7 +343,8 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		} // leave the zip type as 0 = unknown
 */
 		nZipType = ((ConditionalParameters)res.getFilterParameters()).nFileType; // DWH 6-27-09
-		subDocWriter = new GenericFilterWriter(new OpenXMLContentSkeletonWriter(nZipType)); // DWH 4-8-09
+		subSkelWriter = new OpenXMLContentSkeletonWriter(nZipType); // DWH 10-27-09 subSkelWriter
+		subDocWriter = new GenericFilterWriter(subSkelWriter); // DWH 10-27-09
 		subDocWriter.setOptions(outLang, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
 		
