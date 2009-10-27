@@ -50,6 +50,7 @@
                 <os>
                     <family>unix</family>
                     <name>mac os x</name>
+					<arch>i386</arch>
                 </os>
             </activation>
             <dependencies>
