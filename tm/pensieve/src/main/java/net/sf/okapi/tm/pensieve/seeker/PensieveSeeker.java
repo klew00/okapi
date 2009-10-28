@@ -261,19 +261,20 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				tmHit.setMatchType(TmMatchType.EXACT);
 				tmHit.setTu(createTranslationUnit(doc, tmCodedText, tmCodes));
 				tmhits.add(tmHit);
-				
-				/*System.out.println(queryFrag.toString());
-				System.out.println(tmHit.getScore());
-				System.out.println(tmHit.getTu().toString());
-				System.out.println();				 
-*/
+
+				/*
+				 * System.out.println(queryFrag.toString());
+				 * System.out.println(tmHit.getScore());
+				 * System.out.println(tmHit.getTu().toString());
+				 * System.out.println();
+				 */
 			}
 
 			// sort TmHits on TmMatchType, Score and Source String
 			Collections.sort(tmhits);
 
 			// remove duplicate hits
-			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));			
+			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));
 
 		} catch (IOException e) {
 			throw new OkapiIOException("Could not complete query.", e);
@@ -309,7 +310,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			throw new IllegalArgumentException("");
 		}
 
-		float searchThreshold = (float)threshold;
+		float searchThreshold = (float) threshold;
 		if (threshold < 0)
 			searchThreshold = 0.0f;
 		if (threshold > 100)
@@ -325,13 +326,11 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		TermAttribute termAtt = (TermAttribute) queryTokenStream
 				.addAttribute(TermAttribute.class);
 		TmFuzzyQuery fQuery = new TmFuzzyQuery(searchThreshold);
-		//BooleanQuery bQuery = new BooleanQuery(true);
 		try {
 			queryTokenStream.reset();
 			while (queryTokenStream.incrementToken()) {
 				Term t = new Term(TranslationUnitField.SOURCE.name(), termAtt
 						.term());
-				//bQuery.add(new TermQuery(t), BooleanClause.Occur.SHOULD);
 				fQuery.add(t);
 			}
 			queryTokenStream.end();
@@ -370,6 +369,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 		try {
 			is = getIndexSearcher();
+			is.setSimilarity(new TmFuzzySimilarity());
 			if (metadata != null && !metadata.isEmpty()) {
 				filter = new QueryWrapperFilter(createQuery(metadata));
 			}
@@ -383,6 +383,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 			for (int j = 0; j < hits.scoreDocs.length; j++) {
 				scoreDoc = hits.scoreDocs[j];
+
 				tmHit = new TmHit();
 				tmCodes = Code
 						.stringToCodes(getFieldValue(is.doc(scoreDoc.doc),
@@ -398,9 +399,13 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				score = scoreDoc.score;
 				tmHit.setCodeMismatch(false);
 
-				// These are 100%, but do they really match in whitespace and
-				// case?
-				if (score >= 100.0f	&& sourceTextOnly.equals(queryFrag.getText())) {
+				// These are 100%, adjust match type and penalize for whitespace
+				// and case difference
+				if (score >= 100.0f
+						&& tmCodedText.equals(queryFrag.getCodedText())) {
+					matchType = TmMatchType.EXACT;
+				} else if (score >= 100.0f
+						&& sourceTextOnly.equals(queryFrag.getText())) {
 					matchType = TmMatchType.FUZZY_FULL_TEXT_MATCH;
 				} else if (score >= 100.0f) {
 					// must be a whitespace or case difference
@@ -409,8 +414,8 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 				// code penalty
 				if (queryCodes.size() != tmCodes.size()) {
-					score -= (SINGLE_CODE_DIFF_PENALTY * (float)Math.abs(queryCodes.size()
-							- (float)tmCodes.size()));
+					score -= (SINGLE_CODE_DIFF_PENALTY * (float) Math
+							.abs(queryCodes.size() - (float) tmCodes.size()));
 					tmHit.setCodeMismatch(true);
 				}
 
@@ -418,10 +423,17 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				tmHit.setTu(createTranslationUnit(is.doc(scoreDoc.doc),
 						tmCodedText, tmCodes));
 				tmHit.setMatchType(matchType);
+
+				// check if the penalties have pushed the match below threshold
+				if (tmHit.getScore() < threshold) {
+					continue;
+				}
+
 				tmhits.add(tmHit);
-				
+
 				/*System.out.println(queryFrag.toString());
 				System.out.println(tmHit.getScore());
+				System.out.println(tmHit.getMatchType());
 				System.out.println(tmHit.getTu().toString());
 				System.out.println();*/
 			}
@@ -429,7 +441,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			// sort TmHits on TmMatchType, Score and Source String
 			Collections.sort(tmhits);
 			// remove duplicate hits
-			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));				
+			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));
 		} catch (IOException e) {
 			throw new OkapiIOException("Could not complete query.", e);
 		} finally {

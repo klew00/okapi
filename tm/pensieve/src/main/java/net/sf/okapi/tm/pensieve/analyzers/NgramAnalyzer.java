@@ -45,7 +45,25 @@ public class NgramAnalyzer extends Analyzer {
 			" con", "our ", " our", "your", " or ", " can", "can ", " is ",
 			"is l", "ment", " are", "are ", "with", " wit", " pro", "ions",
 			"in t", "lect ", " too", "too ", "of t", "ight", "ting", "ing,",
-			" as " };
+			" as ", "pro ", " an", " use", " onl", "f th", " com", "e to",
+			" inc", "ent ", "form", "ith ", " col", "s in", "age ", "ou c",
+			"e an", "s th", "ick ", "s an", "he c", "u ca", "e on", "s to",
+			"sing", "he p", "he a", "from", "on t", " pho", "e pr", "opti",
+			"use ", "ptio", "rom ", "ng t", "ine ", " fro", " opt", "usin",
+			"comm", "ents", "lor ", "s of", "able", "es a", "t to", "ayer",
+			"inte", " lay", "an i", "on o", "ble ", "nd t", "to t", "oose",
+			" pre", "tosh", " ele", "g th", "ated", "ons ", " res", "appl",
+			"n im", "he i", "e im", " sel", "be o", "e re", "ers ", "e fo",
+			"ecti", "nter", "d in", "ther", "ate ", "e of", "leme", " dis",
+			"ctio", "es t", "ages", "all ", "to c", " tra", "elem", "info",
+			" inf", "e ad", "s ar", "d to", "ed t", "s yo", "nd c", "nts ",
+			"red ", "r co", "ding", "nfor", "he l", "or t", "t co", "ette",
+			"sion", "ool ", "incl", "ion.", "ide ", "ed i", "o th", "pale",
+			" sta", "alet", "s, a", " be ", "se t", " pal", "h th", "her ",
+			"of a", " int", "e la", "e fi", "he r", "ess ", "ges ", "he t",
+			"he f", "ght ", "op e", "ates", "nt t", "icat", "ppli", "rati",
+			"p el", ", yo", ", or", "twar", "plic"};
+	
 	private Set<String> stopNgrams;
 
 	private Locale locale;
