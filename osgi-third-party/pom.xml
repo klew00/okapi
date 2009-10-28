@@ -15,6 +15,7 @@
         <module>lucene-spellchecker</module>
         <module>jericho-html</module>
         <module>snakeyaml</module>
+        <module>download-osgi</module>
     </modules>
     <build>
         <plugins>
