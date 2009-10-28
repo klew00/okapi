@@ -144,7 +144,8 @@ public class PensieveTMConnectorTest {
 	@Test
 	public void testGetNoMatch () {
 		connector.setThreshold(1);
-		assertTrue(connector.query("Otters can swim.") == 0);
+		int n = connector.query("Otters can swim.");
+		assertTrue(n == 0);
 		assertTrue(connector.query("") == 0);
 		String tmp = null;
 		assertTrue(connector.query(tmp) == 0);
