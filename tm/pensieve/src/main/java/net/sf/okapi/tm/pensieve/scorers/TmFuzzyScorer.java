@@ -97,6 +97,9 @@ public class TmFuzzyScorer extends Scorer {
 		// test for first time
 		if (docPointerIterator == null) {
 			calculateScores();
+			if (docPointerIterator == null) {
+				return NO_MORE_DOCS;
+			}
 		}
 
 		while (true) {
