@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -64,8 +65,6 @@ import org.codehaus.stax2.XMLInputFactory2;
  */
 public class ODFFilter implements IFilter {
 
-	private static final String MIMETYPE = "text/x-odf";
-	
 	protected static final String NSURI_TEXT = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
 	protected static final String NSURI_XLINK = "http://www.w3.org/1999/xlink";
 	
@@ -210,7 +209,7 @@ public class ODFFilter implements IFilter {
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setLocale(input.getSourceLocale());
 		startDoc.setName(docName);
-		startDoc.setMimeType(MIMETYPE);
+		startDoc.setMimeType(MimeTypeMapper.ODF_MIME_TYPE);
 		startDoc.setType(startDoc.getMimeType());
 		//TODO: Fix the encoding as it is  not necessarily correct as the encoding is not retrieve from XMLStreamReader
 		// We should use reader.getEncoding() when it's set
@@ -240,13 +239,13 @@ public class ODFFilter implements IFilter {
 	}
 
 	public String getMimeType () {
-		return MIMETYPE;
+		return MimeTypeMapper.ODF_MIME_TYPE;
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
-			MIMETYPE,
+			MimeTypeMapper.ODF_MIME_TYPE,
 			getClass().getName(),
 			"OpenDocument",
 			"XML OpenDocument files (e.g. use inside OpenOffice.org documents)."));
@@ -402,7 +401,7 @@ public class ODFFilter implements IFilter {
 						TextUnit tu = new TextUnit(String.valueOf(++tuId));
 						tu.setSourceContent(new TextFragment(text));
 						tu.setIsReferent(true);
-						tu.setMimeType(MIMETYPE);
+						tu.setMimeType(MimeTypeMapper.ODF_MIME_TYPE);
 						tu.setType("x-"+qualName);
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
 						tmp.append(String.format(" %s=\"", qualName));
@@ -653,7 +652,7 @@ public class ODFFilter implements IFilter {
 			if ( tu.getId() == null ) tu.setId(String.valueOf(++tuId));
 			tu.setSourceContent(tf);
 			tu.setSkeleton(skel);
-			tu.setMimeType(MIMETYPE);
+			tu.setMimeType(MimeTypeMapper.ODF_MIME_TYPE);
 			// Add closing tag to the fragment or skeleton
 			// Add line break because ODF files don't have any
 			// They are needed for example in RTF output

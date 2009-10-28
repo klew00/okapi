@@ -90,6 +90,9 @@ public class Main {
 			ext = ext.substring(1); // No dot.
 			String mimeType = MimeTypeMapper.getMimeType(ext);
 			FilterConfiguration cfg = fcMapper.getDefaultConfiguration(mimeType);
+			if ( cfg == null ) {
+				throw new RuntimeException(String.format("No configuration defined for the MIME type '%s'.", mimeType));
+			}
 			
 			// Display the parsed options
 			System.out.println("            input file: " + inputPath);

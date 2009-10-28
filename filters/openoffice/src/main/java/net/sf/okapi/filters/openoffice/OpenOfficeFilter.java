@@ -36,6 +36,7 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -64,7 +65,6 @@ public class OpenOfficeFilter implements IFilter {
 		OPENZIP, NEXTINZIP, NEXTINSUBDOC, DONE
 	}
 
-	private final String MIMETYPE = "application/x-openoffice";
 	private final String docId = "sd";
 	
 	private ZipFile zipFile;
@@ -117,13 +117,13 @@ public class OpenOfficeFilter implements IFilter {
 	}
 
 	public String getMimeType () {
-		return MIMETYPE;
+		return MimeTypeMapper.OPENOFFICE_MIME_TYPE;
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
-			MIMETYPE,
+			MimeTypeMapper.OPENOFFICE_MIME_TYPE,
 			getClass().getName(),
 			"OpenOffice.org Documents",
 			"OpenOffice.org ODT, ODS, ODP, ODG, OTT, OTS, OTP, OTG documents"));
@@ -219,7 +219,7 @@ public class OpenOfficeFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(docId);
 			startDoc.setName(docURI.getPath());
 			startDoc.setLocale(srcLoc);
-			startDoc.setMimeType(MIMETYPE);
+			startDoc.setMimeType(MimeTypeMapper.OPENOFFICE_MIME_TYPE);
 			startDoc.setFilterParameters(params);
 			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setLineBreak("\n"); // forced

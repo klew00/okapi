@@ -164,7 +164,7 @@ public interface IFilterConfigurationMapper extends IParametersEditorMapper {
 	/**
 	 * Gets the first filter configuration for a given MIME type.
 	 * @param mimeType MIME type to search for.
-	 * @return the filter configuration for the given MIME type.
+	 * @return the filter configuration for the given MIME type, or null if none is found.
 	 */
 	public FilterConfiguration getDefaultConfiguration (String mimeType);
 	
