@@ -6,8 +6,8 @@ Bundle-Version: 0.0.1
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  org.apache.lucene-core;bundle-version="2.9.0",
  org.apache.lucene-spellchecker;bundle-version="2.9.0",
- com.springsource.com.ibm.icu;bundle-version="3.8.1",
- net.sf.okapi.filters.tmx;bundle-version="1.0.0"
+ net.sf.okapi.filters.tmx;bundle-version="1.0.0",
+ com.ibm.icu;bundle-version="4.0.1"
 Export-Package: net.sf.okapi.tm.pensieve.common,
  net.sf.okapi.tm.pensieve.seeker,
  net.sf.okapi.tm.pensieve.writer,
