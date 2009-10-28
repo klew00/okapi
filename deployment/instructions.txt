@@ -2,8 +2,7 @@ Deploying
 =========
 
 --- 0) Keep track of the changes between release in the Changes Log
-
-- trunk/deployment/shared/changes.html
+in trunk/deployment/shared/changes.html
 
 
 --- 1) Make sure all unit tests pass
@@ -11,23 +10,25 @@ Deploying
 Do a full rebuild of the Maven build:
 mvn clean install from /trunk
 
--- 1.1) Make sure platform-specific dependencies are downloaded:
+
+--- 2) Make sure platform-specific dependencies are downloaded:
 from /trunk/framework/core-ui run
 mvn -PWIN_SWT -POSX_SWT -POSX_tiger_SWT -PLinux_x86_swt -PLinux_x86_64_swt dependency:resolve
 
---- 2) Make sure the following files have the proper version and release numbers for this release:
+
+--- 3) Make sure the following files have the proper version and release numbers for this release:
 
 - All the POM.XML files
 - trunk/deployment/shared/release.properties
 
 
---- 3) Make also sure the readme files are up-to-date:
+--- 4) Make also sure the readme files are up-to-date:
 
-- trunk/deployment/maven/okapi-lib/readme.html
-- trunk/deployment/maven/okapi-apps/readme.html
+- trunk/deployment/maven/data/okapi-lib/readme.html
+- trunk/deployment/maven/data/okapi-apps/readme.html
 
 
---- 4) Rebuild all
+--- 5) Rebuild all
 
 /trunk> mvn clean install
 /trunk/deployment/maven> ant
@@ -39,16 +40,18 @@ Then run the integration tests for the applications
 (The skip option is because you don't need to re-run the unit tests)
 
 
---- Update the Okapi Public repository with the proper JARs
+--- 6) Update the Okapi Public repository with the proper JARs
 (So the examples can be build using Maven)
 
 
-TO-UPDATE: --- 5) Go to trunk/deployment/rainbow/tests and run the build.xml there. It runs the integration tests for Rainbow and exercises many of the components of the library.
-
+--- 6.bis) If you have trunk/deployment/utils/tests
+Go there and run the batch file
+This will run additional integration tests.
 The file _tests_results.txt shows any differences between the expected results and the curren ones. Note that some differences may be fine if they are coming from a fix or a new feature. Update the gold files if it is the case.
+//TODO: Port those tests to applications integration tests
 
 
---- 6) Post each packge (.zip or .gz) of the distributions to the GoogleCode download area.
+--- 7) Post each packge (.zip or .gz) of the distributions to the GoogleCode download area.
 Use the following summary, in this order:
 Okapi Libraries for all platforms (GZIP)
 Okapi Libraries for all platforms (ZIP)
@@ -58,7 +61,7 @@ Okapi Applications for Linux 64-bit
 Okapi Applications for Linux
 Okapi Applications for Windows
 
---- 7) Update the Web site with any files that was modified in trunk/website. Usually at least the JavaDoc, the updates.html and the downloads.html should be updated.
+--- 8) Update the Web site with any files that was modified in trunk/website. Usually at least the JavaDoc, the updates.html and the downloads.html should be updated.
 
 Host: ftp.opentag.com
 Username: same as for the shared documents
@@ -68,6 +71,18 @@ Start directory: okapi
 The structure in the okapi directory is the same as in trunk/website
 
 
---- 8) Post a notification that a new release is available.
+--- 9) Commit all changed files
+This revision is the one for this release.
+
+
+--- 10) Post notifications that a new release is available.
+At least here: http://tech.groups.yahoo.com/group/okapitools/
+
+
+--- 11) Update the versions numbers in the files for the next version
+- All the POM.XML files
+- trunk/deployment/shared/release.properties
+Now any new build will be a snapshot of the next release
+
 
 -end-

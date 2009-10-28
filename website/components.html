@@ -77,6 +77,7 @@ own code:</p>
 <p>The Java code below opens a properties file or an OpenOffice.org document and 
 display all the translatable text inside.</p>
 <pre>import java.io.File;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
@@ -96,7 +97,7 @@ public class Main {
          }
          // Open the document to process
          filter.open(new RawDocument(new File(args[0]).toURI(),
-            &quot;UTF-8&quot;, &quot;en&quot;));
+            &quot;UTF-8&quot;, LocaleId.fromString(&quot;en&quot;)));
          // Create a formatter to display text unit more prettily.
          GenericContent fmt = new GenericContent();
          // Process the input document
