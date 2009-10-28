@@ -184,7 +184,7 @@ public class PensieveTMConnectorTest {
 	public void testGetAlmostExactMatchWithCodes () {
 		TextFragment tf = createElephantsFragment();
 		connector.setThreshold(99);
-		assertTrue(connector.query(tf) == 3);
+		assertEquals(3, connector.query(tf));
 
 		// First exact
 		QueryResult qr = connector.next();
