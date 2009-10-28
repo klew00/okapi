@@ -183,7 +183,7 @@ public class PensieveTMConnectorTest {
 	@Test
 	public void testGetAlmostExactMatchWithCodes () {
 		TextFragment tf = createElephantsFragment();
-		connector.setThreshold(99);
+		connector.setThreshold(98);
 		assertEquals(3, connector.query(tf));
 
 		// First exact
