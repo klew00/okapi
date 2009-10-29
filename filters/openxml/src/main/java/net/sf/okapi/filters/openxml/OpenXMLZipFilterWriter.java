@@ -230,7 +230,9 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		try {
 			buffer = new byte[2048];
 			ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
-			zipOriginal = skel.getOriginal();
+			zipOriginal = skel.getOriginal(); // if OpenXML filter was closed, this ZipFile has been marked for close
+			File fZip = new File(zipOriginal.getName()); // so get its name
+			zipOriginal = new ZipFile(fZip,ZipFile.OPEN_READ); // and re-open it
 			
 			tempZip = null;
 			// Create the output stream from the path provided
@@ -271,13 +273,17 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	 */
 	private void processDocumentPart (Event event) {
 		// Treat top-level ZipSkeleton events
+		String naym;
+		ZipEntry entree;
 		DocumentPart res = (DocumentPart)event.getResource();
 		if ( res.getSkeleton() instanceof ZipSkeleton ) {
 			ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
 			ZipEntry entry = skel.getEntry();
 			// Copy the entry data
 			try {
-				zipOut.putNextEntry(new ZipEntry(entry.getName()));
+				naym = entry.getName();
+				entree = new ZipEntry(naym);
+				zipOut.putNextEntry(entree);
 				InputStream input = zipOriginal.getInputStream(entry); 
 				int len;
 				while ( (len = input.read(buffer)) > 0 ) {

@@ -495,7 +495,7 @@ public class OpenXMLFilter implements IFilter {
 		try
 		{
 			fZip = new File(docURI.getPath());
-			zipFile = new ZipFile(fZip);
+			zipFile = new ZipFile(fZip,ZipFile.OPEN_READ);
 			entries = zipFile.entries();
 
 			nZipType = -1;
