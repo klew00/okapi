@@ -3,7 +3,7 @@ This module is to help with the automated Tycho build process.
 Currently, the idea is to do the following steps:
 
 - Build all of okapi (mvn clean install).
-   You must install the libraries.
+   You must package (mvn package or mvn install which in turn calls package) the libraries.
 - Build this module which does the following:
     - Backs up the eclipse.build.location\plugins directory, creating a plugins.zip file.
     - Copies all libraries installed under the "net.sf.okapi" groupId to the eclipse.build.location/plugins

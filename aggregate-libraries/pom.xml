@@ -47,8 +47,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <property name="okapi.repo" value="${settings.localRepository}/OkapiRepository"/>
-                                <property name="third.party.bundles.dir" value="${settings.localRepository}/OkapiEclipseTargetPlatform"/>
+                                <property name="maven.repo" value="${settings.localRepository}"/>
                                 <ant antfile="logic-that-maven-cant-do.xml">
                                     <target name="copyOkapiRepo"/>
                                     <target name="copyThirdPartyBundles"/>

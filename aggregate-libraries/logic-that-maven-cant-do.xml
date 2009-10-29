@@ -3,17 +3,18 @@
     <property name="eclipse.dir" value="${eclipse.build.location}"/>
     <property name="eclipse.plugins.dir" value="${eclipse.dir}/plugins"/>
     <property name="plugins.zip" value="${eclipse.plugins.dir}.zip"/>
+    <property name="third.party.bundles.dir" value="${maven.repo}/OkapiEclipseTargetPlatform"/>
+
 
     <target name="verify">
         <available file="${plugins.zip}" property="plugins.zip.exists"/>
-        <available file="${okapi.repo}" property="okapi.repo.exists"/>
         <available file="${third.party.bundles.dir}" property="third.party.bundles.dir.exists"/>
         <available file="${eclipse.dir}" property="eclipse.dir.exists"/>
         <available file="${eclipse.plugins.dir}" property="eclipse.plugins.dir.exists"/>
         <fail unless="eclipse.dir.exists">.
 
             -Declipse.build.location was not specified
-            </fail>
+        </fail>
     </target>
 
     <target name="zipPlugins" depends="verify" unless="plugins.zip.exists">
@@ -29,11 +30,11 @@
         <unzip src="${plugins.zip}" dest="${eclipse.plugins.dir}"/>
     </target>
 
-    <target name="copyOkapiRepo" depends="verify, zipPlugins" if="okapi.repo.exists">
-        <echo>Copying okapi repo stuff</echo>
-        <copy todir="${eclipse.plugins.dir}">
-            <fileset dir="${okapi.repo}">
-                <include name="*.jar"/>
+    <target name="copyOkapiRepo" depends="verify, zipPlugins">
+        <echo>Copying okapi jars</echo>
+        <copy todir="${eclipse.plugins.dir}" flatten="true">
+            <fileset dir="../">
+                <include name="**/target/*.jar"/>
             </fileset>
         </copy>
     </target>
