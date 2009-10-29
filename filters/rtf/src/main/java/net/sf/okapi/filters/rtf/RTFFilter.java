@@ -187,6 +187,7 @@ public class RTFFilter implements IFilter {
 		winCodepages.put(437, "IBM437");
 		winCodepages.put(850, "IBM850");
 		winCodepages.put(852, "IBM852");
+		winCodepages.put(932, "Shift_JIS");
 		winCodepages.put(1250, "windows-1250");
 		winCodepages.put(1251, "windows-1251");
 		winCodepages.put(1252, "windows-1252");
@@ -877,7 +878,7 @@ public class RTFFilter implements IFilter {
 						// We were waiting for the second byte
 						waitingSecondByte = false;
 						// Convert the DBCS char into Unicode
-						byteBuffer.put(1, byteData);
+						byteBuffer.put(1, (byte)chCurrent);
 						CharBuffer charBuf;
 						try {
 							charBuf = currentCSDec.decode(byteBuffer);
