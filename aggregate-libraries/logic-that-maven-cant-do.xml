@@ -1,0 +1,50 @@
+<project name="stuff-that-maven-can-not-do">
+
+    <property name="eclipse.dir" value="${tycho.targetPlatform}"/>
+    <property name="eclipse.plugins.dir" value="${tycho.targetPlatform}/plugins"/>
+    <property name="plugins.zip" value="${eclipse.plugins.dir}.zip"/>
+
+    <target name="verify">
+        <available file="${plugins.zip}" property="plugins.zip.exists"/>
+        <available file="${okapi.repo}" property="okapi.repo.exists"/>
+        <available file="${third.party.bundles.dir}" property="third.party.bundles.dir.exists"/>
+        <available file="${eclipse.dir}" property="eclipse.dir.exists"/>
+        <available file="${eclipse.plugins.dir}" property="eclipse.plugins.dir.exists"/>
+        <fail unless="eclipse.dir.exists">.
+
+            -Dtycho.targetPlatform was not specified
+            </fail>
+    </target>
+
+    <target name="zipPlugins" depends="verify" unless="plugins.zip.exists">
+        <echo>Zipping ${plugins.zip}</echo>
+        <zip basedir="${eclipse.plugins.dir}" destfile="${eclipse.plugins.dir}.zip"/>
+    </target>
+
+    <target name="cleanPlugins" depends="verify,zipPlugins" if="plugins.zip.exists">
+        <fail message="${eclipse.plugins.dir} does not exist. Build will not work w/o it" unless="eclipse.plugins.dir.exists"/>
+        <delete dir="${eclipse.plugins.dir}"/>
+        <sleep seconds="1"/>
+        <mkdir dir="${eclipse.plugins.dir}"/>
+        <unzip src="${plugins.zip}" dest="${eclipse.plugins.dir}"/>
+    </target>
+
+    <target name="copyOkapiRepo" depends="verify, zipPlugins" if="okapi.repo.exists">
+        <echo>Copying okapi repo stuff</echo>
+        <copy todir="${eclipse.plugins.dir}">
+            <fileset dir="${okapi.repo}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="copyThirdPartyBundles" depends="verify, zipPlugins" if="third.party.bundles.dir.exists">
+        <echo>Copying okapi required 3rd party OSGi bundles to ${tycho.targetPlatform}</echo>
+        <copy todir="${eclipse.plugins.dir}">
+            <fileset dir="${third.party.bundles.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+    
+</project>

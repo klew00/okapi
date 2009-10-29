@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>okapi-aggregate-libraries</artifactId>
+    <groupId>net.sf.okapi</groupId>
+    <version>0.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>zip task</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <ant antfile="logic-that-maven-cant-do.xml">
+                                    <target name="zipPlugins"/>
+                                </ant>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>clean task</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <ant antfile="logic-that-maven-cant-do.xml">
+                                    <target name="cleanPlugins"/>
+                                </ant>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy task</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <property name="okapi.repo" value="${settings.localRepository}/OkapiRepository"/>
+                                <property name="third.party.bundles.dir" value="${settings.localRepository}/OkapiEclipseTargetPlatform"/>
+                                <ant antfile="logic-that-maven-cant-do.xml">
+                                    <target name="copyOkapiRepo"/>
+                                    <target name="copyThirdPartyBundles"/>
+                                </ant>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
