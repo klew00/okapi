@@ -737,6 +737,8 @@ public class OpenXMLFilter implements IFilter {
 		PipedOutputStream pios=null;
 		BufferedInputStream bis; // DWH 3-5-09
 		InputStream isInputStream;
+		String naym;
+		ConditionalParameters cparamNew;
 		openXMLContentFilter.close(); // Make sure the previous is closed
 		openXMLContentFilter.setParameters(yparams); // DWH 7-16-09 YamlParameters
 		  // needed for cases where subDocs are read in different orders
@@ -783,9 +785,12 @@ public class OpenXMLFilter implements IFilter {
 		
 		// Change the START_DOCUMENT event to START_SUBDOCUMENT
 		StartSubDocument sd = new StartSubDocument(docId, String.valueOf(++subDocId));
-		sd.setName(entry.getName());
+		naym = entry.getName();
+		sd.setName(naym);
 		cparams.nFileType = nFileType; // DWH 6-27-09 record File Type for the OpenXMLContentSkeletonWriter
-		sd.setFilterParameters(cparams); // DWH 6-27-09 StartSubdocument will have conditional parameter info
+		cparamNew = cparams.clone(); // DWH 10-29-09 copy current cparams into a new copy so subDocs don't share the same nFileType
+		sd.setFilterParameters(cparamNew); // DWH 10-29-09 cparamNew StartSubdocument will have conditional parameter info
+		  // DWH 10-29-09 each subDoc gets its own ConditionalParameters else they share the same one with wrong nFileType
 //		sd.setEncoding(encoding,false)); // subdoc doesn't have this
 		nextAction = NextAction.NEXTINSUBDOC;
 		ZipSkeleton skel = new ZipSkeleton(

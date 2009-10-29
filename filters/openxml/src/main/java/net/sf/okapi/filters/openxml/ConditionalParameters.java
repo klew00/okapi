@@ -211,4 +211,12 @@ public class ConditionalParameters extends BaseParameters {
 				aBuf = null;
 			}
 		}
+	
+	public ConditionalParameters clone()
+	{
+		ConditionalParameters cpnew = new ConditionalParameters();
+		cpnew.fromString(this.toString()); // copy values from current ConditionalParameters to new one
+		cpnew.nFileType = nFileType; // nFileType is not currently part of toString and fromString 
+		return cpnew;
+	}
 }
