@@ -48,7 +48,8 @@
 		<module>applications</module>
 		<module>examples/java</module>
 		<module>test-utilities</module>
-                <module>aggregate-libraries</module>
+        <!-- aggregate-libraries Needs to always be the last module built --> 
+        <module>aggregate-libraries</module>
 	</modules>
 	<dependencies>
 		<dependency>
