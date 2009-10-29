@@ -164,10 +164,10 @@ public class RTFFilter implements IFilter {
 		winCharsets.put(3, "invalid-fcharset");
 		winCharsets.put(77, "MacRoman");
 		winCharsets.put(128, "Shift_JIS"); // Japanese, DBCS
-		winCharsets.put(129, "windows949"); // Korean 
+		winCharsets.put(129, "windows949"); // Korean (no dash)
 		winCharsets.put(130, "johab"); // Korean, DBCS
-		winCharsets.put(134, "gb2312");
-		winCharsets.put(136, "Big5");
+		winCharsets.put(134, "windows-936");  // Simplified Chinese
+		winCharsets.put(136, "Big5"); // Traditional Chinese
 		winCharsets.put(161, "windows-1253"); // Greek
 		winCharsets.put(162, "windows-1254"); // Turkish
 		winCharsets.put(163, "windows-1258"); // Vietnamese
@@ -188,6 +188,9 @@ public class RTFFilter implements IFilter {
 		winCodepages.put(850, "IBM850");
 		winCodepages.put(852, "IBM852");
 		winCodepages.put(932, "Shift_JIS");
+		winCodepages.put(936, "windows-936");
+		winCodepages.put(949, "windows949"); // (No dash)
+		winCodepages.put(950, "Big5");
 		winCodepages.put(1250, "windows-1250");
 		winCodepages.put(1251, "windows-1251");
 		winCodepages.put(1252, "windows-1252");
@@ -1311,13 +1314,21 @@ public class RTFFilter implements IFilter {
 		// Load the new encoding
 		currentCSDec = Charset.forName(encodingName).newDecoder();
 		currentCSName = encodingName;
-		if ( currentCSName.compareTo("Shift_JIS") == 0 ) {
+		if ( currentCSName.compareToIgnoreCase("shift_jis") == 0 ) {
 			currentDBCSCodepage = 932;
 		}
-		else if ( currentCSName.compareTo("windows949") == 0 ) {
+		else if ( currentCSName.compareToIgnoreCase("windows949") == 0 ) {
 			currentDBCSCodepage = 949;
 		}
-		//TODO: Other DBCS encoding
+		else if ( currentCSName.compareToIgnoreCase("gbk") == 0 ) {
+			currentDBCSCodepage = 936;
+		}
+		else if ( currentCSName.compareToIgnoreCase("windows-936") == 0 ) {
+			currentDBCSCodepage = 936;
+		}
+		else if ( currentCSName.compareToIgnoreCase("big5") == 0 ) {
+			currentDBCSCodepage = 950;
+		}
 		else {
 			currentDBCSCodepage = 0; // Not DBCS
 		}
