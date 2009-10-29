@@ -72,7 +72,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	private ZipFile zipOriginal;
 	private ZipOutputStream zipOut;
 	private byte[] buffer;
-	private LocaleId outLang;
+	private LocaleId outTargetLang;
 	private ZipEntry subDocEntry;
 	private IFilterWriter subDocWriter;
 	private OpenXMLContentSkeletonWriter subSkelWriter;
@@ -207,7 +207,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	public void setOptions (LocaleId language,
 		String defaultEncoding)
 	{
-		outLang = language;
+		outTargetLang = language;
 	}
 
 	public void setOutput (String path) {
@@ -351,7 +351,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		nZipType = ((ConditionalParameters)res.getFilterParameters()).nFileType; // DWH 6-27-09
 		subSkelWriter = new OpenXMLContentSkeletonWriter(nZipType); // DWH 10-27-09 subSkelWriter
 		subDocWriter = new GenericFilterWriter(subSkelWriter); // DWH 10-27-09
-		subDocWriter.setOptions(outLang, "UTF-8");
+		subDocWriter.setOptions(outTargetLang, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
 		
 		StartDocument sd = new StartDocument("sd");
