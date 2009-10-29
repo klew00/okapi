@@ -1298,7 +1298,7 @@ public class RTFFilter implements IFilter {
 
 	private void loadEncoding (String encodingName) {
 		if ( currentCSDec != null ) {
-			if ( currentCSName.compareTo(encodingName) == 0 )
+			if ( currentCSName.compareToIgnoreCase(encodingName) == 0 )
 				return; // Same encoding: No change needed
 		}
 		// check for special cases
@@ -1313,20 +1313,20 @@ public class RTFFilter implements IFilter {
 		}
 		// Load the new encoding
 		currentCSDec = Charset.forName(encodingName).newDecoder();
-		currentCSName = encodingName;
-		if ( currentCSName.compareToIgnoreCase("shift_jis") == 0 ) {
+		currentCSName = encodingName.toLowerCase();
+		if ( currentCSName.compareTo("shift_jis") == 0 ) {
 			currentDBCSCodepage = 932;
 		}
-		else if ( currentCSName.compareToIgnoreCase("windows949") == 0 ) {
+		else if ( currentCSName.compareTo("windows949") == 0 ) {
 			currentDBCSCodepage = 949;
 		}
-		else if ( currentCSName.compareToIgnoreCase("gbk") == 0 ) {
+		else if ( currentCSName.compareTo("gbk") == 0 ) {
 			currentDBCSCodepage = 936;
 		}
-		else if ( currentCSName.compareToIgnoreCase("windows-936") == 0 ) {
+		else if ( currentCSName.compareTo("windows-936") == 0 ) {
 			currentDBCSCodepage = 936;
 		}
-		else if ( currentCSName.compareToIgnoreCase("big5") == 0 ) {
+		else if ( currentCSName.compareTo("big5") == 0 ) {
 			currentDBCSCodepage = 950;
 		}
 		else {
