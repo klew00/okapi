@@ -233,7 +233,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 			zipOriginal = skel.getOriginal(); // if OpenXML filter was closed, this ZipFile has been marked for close
 			File fZip = new File(zipOriginal.getName()); // so get its name
 			zipOriginal = new ZipFile(fZip,ZipFile.OPEN_READ); // and re-open it
-			
+              // *** this might not work if the ZipFile was from a URI that was not a normal file path ***			
 			tempZip = null;
 			// Create the output stream from the path provided
 			boolean useTemp = false;
