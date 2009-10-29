@@ -5,7 +5,6 @@
     <property name="plugins.zip" value="${eclipse.plugins.dir}.zip"/>
     <property name="third.party.bundles.dir" value="${maven.repo}/OkapiEclipseTargetPlatform"/>
 
-
     <target name="verify">
         <available file="${plugins.zip}" property="plugins.zip.exists"/>
         <available file="${third.party.bundles.dir}" property="third.party.bundles.dir.exists"/>
@@ -13,7 +12,7 @@
         <available file="${eclipse.plugins.dir}" property="eclipse.plugins.dir.exists"/>
         <fail unless="eclipse.dir.exists">.
 
-            -Declipse.build.location was not specified
+            ${eclipse.build.location} does not exist
         </fail>
     </target>
 
