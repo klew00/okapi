@@ -25,10 +25,10 @@ import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
-	protected static String USERNAME = "username";
-	protected static String PASSWORD = "password";
-	protected static String SERVERURL = "serverURL";
-	protected static String TMPROFILE = "tmProfile";
+	protected static final String USERNAME = "username";
+	protected static final String PASSWORD = "password";
+	protected static final String SERVERURL = "serverURL";
+	protected static final String TMPROFILE = "tmProfile";
 	
 	private String username;
 	private String password;

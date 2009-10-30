@@ -24,7 +24,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.Authenticator;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -125,6 +127,14 @@ public class ProMTConnector implements IQuery {
 		if ( !pair.equals("en_fr") ) return 0;
 
 		try {
+			// Try to authenticate if needed
+			if ( !Util.isEmpty(params.getUsername()) ) {
+				Authenticator.setDefault(new Authenticator() {
+				    protected PasswordAuthentication getPasswordAuthentication() {
+				        return new PasswordAuthentication(params.getUsername(), params.getPassword().toCharArray());
+				    }
+				});
+			}
 			// Open a connection
 			URLConnection conn = url.openConnection();
 			
@@ -163,10 +173,11 @@ public class ProMTConnector implements IQuery {
 	        }
 		}
 		catch ( MalformedURLException e ) {
-			e.printStackTrace();
+			throw new RuntimeException("Error during the query.", e);
 		}
 		catch ( IOException e ) {
-			e.printStackTrace();
+e.printStackTrace();			
+			throw new RuntimeException("Error during the query.", e);
 		}
 		finally {
         	try {
