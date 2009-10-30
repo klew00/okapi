@@ -33,7 +33,14 @@
         <echo>Copying okapi jars</echo>
         <copy todir="${eclipse.plugins.dir}" flatten="true">
             <fileset dir="../">
-                <include name="**/target/*.jar"/>
+                <exclude name="**/*test*.jar"/>
+                <exclude name="**/*-ui-*.jar"/>
+                <include name="**/target/okapi-core*.jar"/>
+                <include name="**/target/okapi-filter-abstract*.jar"/>
+                <include name="**/target/okapi-filter-openxml*.jar"/>
+                <include name="**/target/okapi-filter-tmx*.jar"/>
+                <include name="**/target/okapi-filter-regex*.jar"/>
+                <include name="**/target/okapi-tm-pensieve*.jar"/>
             </fileset>
         </copy>
     </target>
