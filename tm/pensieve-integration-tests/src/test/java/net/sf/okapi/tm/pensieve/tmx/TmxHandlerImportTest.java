@@ -45,8 +45,8 @@ public class TmxHandlerImportTest {
 		tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), locES, tmWriter);
 		long totalTime = System.currentTimeMillis() - startTime;
 		System.out.println("total time to import TMX: " + totalTime);
-*/		
-		seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR);
+		
+		seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR); */
 	}
 
 	// Local test only on very large non-commited TM
