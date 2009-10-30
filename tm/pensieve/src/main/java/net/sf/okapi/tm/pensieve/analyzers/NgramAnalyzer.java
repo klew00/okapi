@@ -35,6 +35,7 @@ import org.apache.lucene.analysis.TokenStream;
 /**
  * 
  * @author HaslamJD
+ * @author HARGRAVEJE
  */
 public class NgramAnalyzer extends Analyzer {
 	private static final String[] ENGLISH_STOP_NGRAMS = { "the ", " the",
