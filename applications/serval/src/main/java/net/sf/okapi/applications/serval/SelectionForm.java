@@ -10,6 +10,7 @@ import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
+import net.sf.okapi.connectors.promt.ProMTConnector;
 import net.sf.okapi.connectors.simpletm.SimpleTMConnector;
 import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
 
@@ -51,6 +52,7 @@ public class SelectionForm {
 		lbResources.add("MyMemory TM (Internet)");
 		lbResources.add("Pensieve TM");
 		lbResources.add("Apertium MT (remote or local)");
+		lbResources.add("ProMT (Internet)");
 		lbResources.setSelection(0);
 		
 		// Dialog-level buttons
@@ -86,6 +88,9 @@ public class SelectionForm {
 						break;
 					case 7: // Apertium MT
 						result = new ApertiumMTConnector();
+						break;
+					case 8: // ProMT
+						result = new ProMTConnector();
 						break;
 					}
 				}

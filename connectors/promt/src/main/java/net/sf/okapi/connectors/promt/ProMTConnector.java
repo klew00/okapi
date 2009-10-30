@@ -28,8 +28,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.Charset;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
@@ -42,13 +43,15 @@ import net.sf.okapi.lib.translation.QueryResult;
 public class ProMTConnector implements IQuery {
 
 	private static final String SERVICE = "/pts8/services/ptservice.asmx/TranslateText";
+    private static final Pattern RESULTPATTERN = Pattern.compile("<string(.*?)>(.*?)</string>");
 	
 	private String srcLang;
 	private String trgLang;
-	private List<QueryResult> results;
+	private QueryResult result;
 	private int current = -1;
 	private Parameters params;
 	private URL url;
+	private String pair;
 
 	public ProMTConnector () {
 		params = new Parameters();
@@ -78,25 +81,18 @@ public class ProMTConnector implements IQuery {
 	}
 
 	public boolean hasNext () {
-		if ( results == null ) return false;
-		if ( current >= results.size() ) {
-			current = -1;
-		}
-		return (current > -1);
+		return (current>-1);
 	}
-
-	public QueryResult next () {
-		if ( results == null ) return null;
-		if (( current > -1 ) && ( current < results.size() )) {
-			current++;
-			return results.get(current-1);
+	
+	public QueryResult next() {
+		if ( current > -1 ) { // Only one result
+			current = -1;
+			return result;
 		}
-		current = -1;
 		return null;
 	}
 
 	public void open () {
-		results = new ArrayList<QueryResult>();
 		String tmp = params.getServerURL();
 		// Make sure the URL does not end with separator
 		if ( tmp.endsWith("/") ) tmp = tmp.substring(0, tmp.length()-1);
@@ -111,22 +107,23 @@ public class ProMTConnector implements IQuery {
 	}
 
 	public int query (String text) {
-		results.clear();
-		current = -1;
 		if ( Util.isEmpty(text) ) return 0;
 		return queryPost(text);
 	}
 
 	public int query (TextFragment frag) {
-		results.clear();
-		current = -1;
 		if ( !frag.hasText(false) ) return 0;
 		return queryPost(frag.toString());
 	}
 	
 	private int queryPost (String text) {
+		current = -1;
 		OutputStreamWriter wr = null;
 		BufferedReader rd = null;
+
+//Only EN-FR for now			
+		if ( !pair.equals("en_fr") ) return 0;
+
 		try {
 			// Open a connection
 			URLConnection conn = url.openConnection();
@@ -144,15 +141,26 @@ public class ProMTConnector implements IQuery {
 			wr.flush();
 	        
 	        // Get the response
-	        rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-	        String line;
+	        rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), Charset.forName("UTF-8")));
+	        String buffer;
 	        StringBuilder tmp = new StringBuilder();
-	        while (( line = rd.readLine() ) != null ) {
-	            tmp.append(line);
+	        while (( buffer = rd.readLine() ) != null ) {
+	            tmp.append(buffer);
 	        }
 	        
 	        // Treat the output 
-	        line = tmp.toString();
+	        Matcher m = RESULTPATTERN.matcher(tmp.toString());
+	        if ( m.find() ) {
+	        	buffer = m.group(2);
+	        	if ( !Util.isEmpty(buffer) ) {
+	        		result = new QueryResult();
+	        		result.source = new TextFragment(text);
+	        		result.target = new TextFragment(buffer);
+	        		result.score = 95; // Arbitrary score for MT
+	        		result.origin = Util.ORIGIN_MT;
+	    			current = 0;
+	        	}
+	        }
 		}
 		catch ( MalformedURLException e ) {
 			e.printStackTrace();
@@ -169,7 +177,7 @@ public class ProMTConnector implements IQuery {
        			// Ignore this exception
 	        }
 		}
-		return 0;
+		return current+1;
 	}
 	
 	public void removeAttribute (String name) {
@@ -191,6 +199,7 @@ public class ProMTConnector implements IQuery {
 	{
 		srcLang = toInternalCode(sourceLocale);
 		trgLang = toInternalCode(targetLocale);
+		pair = srcLang + "_" + trgLang; 
 	}
 		
 	private String toInternalCode (LocaleId locale) {
@@ -206,11 +215,5 @@ public class ProMTConnector implements IQuery {
 		params = (Parameters)params;
 	}
 
-	public static void main(String[] args) {
-		ProMTConnector conn = new ProMTConnector();
-		conn.open();
-		conn.query("Hello World!");
-	}
-	
 }
 
