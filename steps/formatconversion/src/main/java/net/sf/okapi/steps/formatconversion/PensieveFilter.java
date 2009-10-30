@@ -155,6 +155,7 @@ public class PensieveFilter implements IFilter {
 		open(input, true);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{

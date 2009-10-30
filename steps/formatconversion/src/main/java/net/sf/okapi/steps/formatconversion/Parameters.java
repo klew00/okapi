@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.formatconversion;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
@@ -143,16 +144,19 @@ public class Parameters extends BaseParameters {
 		return buffer.toString();
 	}
 
-//	@Override
-//	public ParametersDescription getParametersDescription () {
-//		ParametersDescription desc = new ParametersDescription(this);
-//		desc.add(SINGLEOUTPUT, "Create a single output document", null);
-//		desc.add(OUTPUTPATH, "Output path", "Full path of the single output document to generate");
-//		desc.add(OUTPUTFORMAT, "Output format", "Format to generate in output");
-//		desc.add(USEGENERICCODES, "Output generic inline codes", null);
-//		return desc;
-//	}
-//
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(SINGLEOUTPUT, "Create a single output document", null);
+		desc.add(OUTPUTPATH, "Output path", "Full path of the single output document to generate");
+		desc.add(OUTPUTFORMAT, "Output format", "Format to generate in output");
+		desc.add(USEGENERICCODES, "Output generic inline codes", null);
+		desc.add(TARGETSTYLE, "Target content", "Type of content to put in the target");
+		desc.add(SKIPENTRIESWITHOUTTEXT, "Do not output entries without text", null);
+		desc.add(FORMATOPTIONS, "Format options", null); // Not used for display 
+		return desc;
+	}
+
 //	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
 //		EditorDescription desc = new EditorDescription("Format Conversion", true, false);
 //
