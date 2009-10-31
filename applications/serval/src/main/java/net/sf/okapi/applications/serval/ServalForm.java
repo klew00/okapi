@@ -114,7 +114,7 @@ public class ServalForm {
 		stTmp.setText("Query:");
 		stTmp.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 	
-		edQuery = new Text(shell, SWT.BORDER | SWT.V_SCROLL);
+		edQuery = new Text(shell, SWT.BORDER | SWT.WRAP);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
 		gdTmp.horizontalSpan = 8;

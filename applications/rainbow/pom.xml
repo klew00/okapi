@@ -70,6 +70,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-promt</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-translation</artifactId>
 			<version>${project.version}</version>

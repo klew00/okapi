@@ -31,6 +31,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +42,7 @@ import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.lib.translation.QueryUtil;
 
 public class ProMTConnector implements IQuery {
 
@@ -53,10 +55,14 @@ public class ProMTConnector implements IQuery {
 	private int current = -1;
 	private Parameters params;
 	private URL url;
-	private String pair;
+	private long dirId;
+	private HashMap<String, Long> dirIdentifiers;
+	private QueryUtil qutil;
 
 	public ProMTConnector () {
 		params = new Parameters();
+		initializePairs();
+		qutil = new QueryUtil();
 	}
 
 	public String getName () {
@@ -64,10 +70,11 @@ public class ProMTConnector implements IQuery {
 	}
 
 	public String getSettingsDisplay () {
-		return String.format("Server: %s", params.getServerURL());
+		return String.format("Server: %s", params.getHost());
 	}
 	
 	public void close () {
+		// Nothing to do
 	}
 
 	public void export (String outputPath) {
@@ -95,7 +102,7 @@ public class ProMTConnector implements IQuery {
 	}
 
 	public void open () {
-		String tmp = params.getServerURL();
+		String tmp = params.getHost();
 		// Make sure the URL does not end with separator
 		if ( tmp.endsWith("/") ) tmp = tmp.substring(0, tmp.length()-1);
 		else if ( tmp.endsWith("\\") ) tmp = tmp.substring(0, tmp.length()-1);
@@ -110,22 +117,31 @@ public class ProMTConnector implements IQuery {
 
 	public int query (String text) {
 		if ( Util.isEmpty(text) ) return 0;
-		return queryPost(text);
+		return queryUsingPOST(null, text);
 	}
 
 	public int query (TextFragment frag) {
 		if ( !frag.hasText(false) ) return 0;
-		return queryPost(frag.toString());
+		return queryUsingPOST(frag, null);
 	}
 	
-	private int queryPost (String text) {
+	// Either frag or plainText must be null
+	private int queryUsingPOST (TextFragment frag,
+		String plainText)
+	{
 		current = -1;
 		OutputStreamWriter wr = null;
 		BufferedReader rd = null;
+		
+		String text;
+		if ( frag != null ) {
+			text = qutil.separateCodesFromText(frag);
+		}
+		else {
+			text = plainText;
+		}
 
-//Only EN-FR for now			
-		if ( !pair.equals("en_fr") ) return 0;
-
+		if ( dirId == -1L ) return 0;
 		try {
 			// Try to authenticate if needed
 			if ( !Util.isEmpty(params.getUsername()) ) {
@@ -135,14 +151,21 @@ public class ProMTConnector implements IQuery {
 				    }
 				});
 			}
+			
 			// Open a connection
 			URLConnection conn = url.openConnection();
+//TODO: handle user/password
+//			if ( !Util.isEmpty(params.getUsername()) ) {
+//				String buf = String.format("%s:%s", params.getUsername(), params.getPassword());
+//				BASE64Encoder enc = new BASE64Encoder();
+//				conn.setRequestProperty("Authorization", "Basic " + enc.encode(buf.getBytes()));
+//			}
 			
-			// Set the parameters
+			// Set the data
 			//DirId=string&TplId=string&Text=string
 			//524289
-			String data = String.format("DirId=%s&TplId=%s&Text=%s",
-				"524289", "General", URLEncoder.encode(text, "UTF-8"));
+			String data = String.format("DirId=%d&TplId=%s&Text=%s",
+				dirId, "General", URLEncoder.encode(text, "UTF-8"));
 
 			// Post the data
 			conn.setDoOutput(true);
@@ -164,8 +187,22 @@ public class ProMTConnector implements IQuery {
 	        	buffer = m.group(2);
 	        	if ( !Util.isEmpty(buffer) ) {
 	        		result = new QueryResult();
-	        		result.source = new TextFragment(text);
-	        		result.target = new TextFragment(buffer);
+//TODO: replace by shared method	        		
+	        		buffer = buffer.replace("&#39;", "'");
+	        		buffer = buffer.replace("&lt;", "<");
+	        		buffer = buffer.replace("&gt;", ">");
+	        		buffer = buffer.replace("&quot;", "\"");
+	        		buffer = buffer.replace("&amp;", "&");
+	        		
+	        		if ( frag != null ) {
+	        			result.source = frag;
+	        			result.target = qutil.createNewFragmentWithCodes(buffer);
+	        		}
+	        		else { // Was plain text
+	        			result.source = new TextFragment(text);
+	        			result.target = new TextFragment(buffer);
+	        		}
+	        		
 	        		result.score = 95; // Arbitrary score for MT
 	        		result.origin = Util.ORIGIN_MT;
 	    			current = 0;
@@ -176,7 +213,7 @@ public class ProMTConnector implements IQuery {
 			throw new RuntimeException("Error during the query.", e);
 		}
 		catch ( IOException e ) {
-e.printStackTrace();			
+e.printStackTrace();
 			throw new RuntimeException("Error during the query.", e);
 		}
 		finally {
@@ -210,11 +247,15 @@ e.printStackTrace();
 	{
 		srcLang = toInternalCode(sourceLocale);
 		trgLang = toInternalCode(targetLocale);
-		pair = srcLang + "_" + trgLang; 
+		String pair = srcLang + "_" + trgLang;
+		if ( dirIdentifiers.containsKey(pair) ) {
+			dirId = dirIdentifiers.get(pair);
+		}
+		else dirId = -1L;
 	}
 		
 	private String toInternalCode (LocaleId locale) {
-		// Reduce the locale code to its language part
+		// Reduce the locale code to its base language part
 		return locale.getLanguage();
 	}
 
@@ -224,6 +265,36 @@ e.printStackTrace();
 
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
+	}
+
+	private void initializePairs () {
+//TODO: Get the list from /pts8/services/ptservice.asmx/GetPTServiceDataSet		
+		dirId = -1L;
+		dirIdentifiers = new HashMap<String, Long>();
+		dirIdentifiers.put("en_ru", 131073L);
+		dirIdentifiers.put("ru_en", 65538L);
+		dirIdentifiers.put("de_ru", 131076L);
+		dirIdentifiers.put("ru_de", 262146L);
+		dirIdentifiers.put("fr_ru", 131080L);
+		dirIdentifiers.put("ru_fr", 524290L);
+		dirIdentifiers.put("es_ru", 131104L);
+		dirIdentifiers.put("ru_es", 2097154L);
+		dirIdentifiers.put("en_de", 262145L);
+		dirIdentifiers.put("de_en", 65540L);
+		dirIdentifiers.put("en_fr", 524289L);
+		dirIdentifiers.put("fr_en", 65544L);
+		dirIdentifiers.put("de_fr", 524292L);
+		dirIdentifiers.put("fr_de", 262152L);
+		dirIdentifiers.put("en_it", 1048577L);
+		dirIdentifiers.put("it_en", 65552L);
+		dirIdentifiers.put("en_es", 2097153L);
+		dirIdentifiers.put("es_en", 65568L);
+		dirIdentifiers.put("de_es", 2097156L);
+		dirIdentifiers.put("es_de", 262176L);
+		dirIdentifiers.put("fr_es", 2097160L);
+		dirIdentifiers.put("es_fr", 524320L);
+		dirIdentifiers.put("en_pt", 4194305L);
+		dirIdentifiers.put("pt_en", 65600L);
 	}
 
 }

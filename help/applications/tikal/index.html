@@ -96,14 +96,15 @@ XLIFF 1.2 specifications</a>.</p>
 		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
-		-apertium&nbsp;[serverURL]</code></td>
+		-apertium&nbsp;[serverURL]|<br>
+		-promt [configFile]</code></td>
 		<td align="left" valign="top">A translation resource to use to 
 		translate the document: <a href="#pensieve"><code>-pen</code> for a 
 		Pensieve TM</a>, <a href="#translatetoolkit"><code>-tt</code> for a 
 		Translate Toolkit TM</a>, <a href="#globalsight"><code>-gs</code> for a 
 		GlobalSight TM</a>, <a href="#mymemory"><code>-mm</code> for MyMemory 
 		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>, 
-		and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
+		<a href="#promt"><code>-promt</code> for a ProMT server</a>, and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -163,7 +164,7 @@ and the merged file will be <code>myFile.out.html</code>.</p>
 	<tr>
 		<td align="left" valign="top"><code>-fc configId</code></td>
 		<td align="left" valign="top">The identifier of the filter configuration to use for the 
-		extraction.</td>
+		re-extraction of the original file.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top"><code>-ie encoding</code></td>
@@ -246,14 +247,15 @@ file must be in SRX format.</p>
 		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
-		-apertium&nbsp;[serverURL]</code></td>
+		-apertium&nbsp;[serverURL]|<br>
+		-promt [configFile]</code></td>
 		<td align="left" valign="top">A translation resource to use to 
 		translate the document: <a href="#pensieve"><code>-pen</code> for a 
 		Pensieve TM</a>, <a href="#translatetoolkit"><code>-tt</code> for a 
 		Translate Toolkit TM</a>, <a href="#globalsight"><code>-gs</code> for a 
 		GlobalSight TM</a>, <a href="#mymemory"><code>-mm</code> for MyMemory 
 		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>, 
-		and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
+		<a href="#promt"><code>-promt</code> for a ProMT server</a>, and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -306,41 +308,46 @@ per resource, not sorted by best score as a whole.</p>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-pen directory</code></td>
-		<td align="left" valign="top">Query a <a href="#pensieve">Pensieve TM</a> stored in a given 
+		<td align="left" valign="top">Queries a <a href="#pensieve">Pensieve TM</a> stored in a given 
 		directory.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-opentran</code></td>
-		<td align="left" valign="top">Query the <a href="#opentran">OpenTran translation repository</a>. This requires Internet 
+		<td align="left" valign="top">Queries the <a href="#opentran">OpenTran translation repository</a>. This requires Internet 
 		access.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-gs configFile</code></td>
-		<td align="left" valign="top">Query a <a href="#globalsight">GlobalSight 
+		<td align="left" valign="top">Queries a <a href="#globalsight">GlobalSight 
 		TM server</a>. This requires Internet access.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-tt hostname[:port]</code></td>
-		<td align="left" valign="top">Query the specified 
+		<td align="left" valign="top">Queries the specified 
 		<a href="#translatetoolkit">Translate Toolkit TM server</a>. This assumes you 
 		have access to the server (local or remote).</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-mm key</code></td>
-		<td align="left" valign="top">Query the <a href="#mymemory">MyMemory translation repository</a> 
+		<td align="left" valign="top">Queries the <a href="#mymemory">MyMemory translation repository</a> 
 		with a given key access (use <code>mmDemo123</code> for demo). This 
 		requires Internet access.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-google</code></td>
-		<td align="left" valign="top">Query the <a href="#google">Google MT system</a>. If no other type of resource is 
+		<td align="left" valign="top">Queries the <a href="#google">Google MT system</a>. If no other type of resource is 
 		specified, this is used by default. This requires Internet access.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-apertium [serverURL]</code></td>
 		<td align="left" valign="top">
-		<p dir="ltr">Query the specified <a href="#apertium">Apertium MT server</a> (local or remote). A 
+		<p dir="ltr">Queries the specified <a href="#apertium">Apertium MT server</a> (local or remote). A 
 		default remote server is provided.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top" nowrap><code>-promt [configFile]</code></td>
+		<td align="left" valign="top">
+		Queries a <a href="#promt">ProMT server</a>.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-opt threshold[:maxhits]</code></td>
@@ -676,6 +683,7 @@ other searchable translation repository. the following resources are available:<
 	<li><a href="#mymemory">MyMemory TM</a></li>
 	<li><a href="#google">Google MT</a></li>
 	<li><a href="#apertium">Apertium MT</a></li>
+	<li><a href="#promt">ProMT MT</a></li>
 </ul>
 <p>Note that some of these resources are Web-based and require an internet 
 connection, others can be installed and used locally.</p>
@@ -756,6 +764,18 @@ Apertium here: <a href="http://wiki.apertium.org/">http://wiki.apertium.org/</a>
 optional argument: the URL of the server. If the argument is omitted, the 
 default server is set to use the main public apertium.org server.</p>
 <pre>tikal -q &quot;text to search&quot; -apertium</pre>
+<h3><a name="promt"></a>ProMT MT</h3>
+<p>ProMT is a commercial MT system that provides machine translation in many 
+language pairs.</p>
+<p>This resource indicated by the option <code>-promt</code> in Tikal and takes one 
+optional argument: a configuration file that contains the information about the server to 
+connect to, username and password. If the configuration file is not specify, the 
+default configuration is used. The 
+configuration file must look like this:</p>
+<pre>#v1
+host=http://ptsdemo.promt.ru/
+username=myusername
+password=mypassword</pre>
 <p>&nbsp;</p>
 
 </body>

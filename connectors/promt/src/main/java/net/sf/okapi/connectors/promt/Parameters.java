@@ -28,20 +28,20 @@ import net.sf.okapi.common.uidescription.TextInputPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	protected static final String SERVERURL = "serverURL";
+	protected static final String HOST = "host";
 	protected static final String USERNAME = "username";
 	protected static final String PASSWORD = "password";
 	
-	private String serverURL;
+	private String host;
 	private String username;
 	private String password;
 	
-	public String getServerURL () {
-		return serverURL;
+	public String getHost () {
+		return host;
 	}
 
-	public void setServerURL (String serverURL) {
-		this.serverURL = serverURL;
+	public void setHost (String host) {
+		this.host = host;
 	}
 
 	public String getUsername () {
@@ -72,13 +72,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		serverURL = buffer.getString(SERVERURL, serverURL);
+		host = buffer.getString(HOST, host);
 		username = buffer.getString(USERNAME, username);
 		password = buffer.getString(PASSWORD, password);
 	}
 
 	public void reset () {
-		serverURL = "http://ptsdemo.promt.ru/";
+		host = "http://ptsdemo.promt.ru/";
 		username = "";
 		password = "";
 	}
@@ -86,7 +86,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setString(SERVERURL, serverURL);
+		buffer.setString(HOST, host);
 		buffer.setString(USERNAME, username);
 		buffer.setString(PASSWORD, password);
 		return buffer.toString();
@@ -95,18 +95,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(SERVERURL, "Server URL", "The root URL of the MTserver (e.g. http://ptsdemo.promt.ru/");
-		desc.add(USERNAME, "User name", "The login name to use");
-		desc.add(PASSWORD, "Password", "The password for the given user name");
+		desc.add(HOST, "Host server", "The root URL of the host server (e.g. http://ptsdemo.promt.ru/");
+		desc.add(USERNAME, "User name (optional)", "The login name to use");
+		desc.add(PASSWORD, "Password (if needed)", "The password for the given user name");
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("ProMT Connector Settings");
-		desc.addTextInputPart(paramsDesc.get(SERVERURL));
-		desc.addTextInputPart(paramsDesc.get(USERNAME));
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(PASSWORD));
+		desc.addTextInputPart(paramsDesc.get(HOST));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(USERNAME));
+		tip.setAllowEmpty(true); // Username is optional
+		tip = desc.addTextInputPart(paramsDesc.get(PASSWORD));
 		tip.setPassword(true);
+		tip.setAllowEmpty(true); // Password is optional
 		return desc;
 	}
 
