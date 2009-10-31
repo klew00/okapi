@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
@@ -32,9 +33,22 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -46,22 +60,25 @@ import net.sf.okapi.lib.translation.QueryUtil;
 
 public class ProMTConnector implements IQuery {
 
-	private static final String SERVICE = "/pts8/services/ptservice.asmx/TranslateText";
+	private static final String SERVICE = "/pts8/services/ptservice.asmx/";
+	private static final String TRANSLATETEXT = "TranslateText";
+	private static final String GETPTSERVICEDATASET = "GetPTServiceDataSet";
     private static final Pattern RESULTPATTERN = Pattern.compile("<string(.*?)>(.*?)</string>");
 	
 	private String srcLang;
+	private Locale srcLoc;
 	private String trgLang;
+	private Locale trgLoc;
 	private QueryResult result;
 	private int current = -1;
 	private Parameters params;
 	private URL url;
-	private long dirId;
-	private HashMap<String, Long> dirIdentifiers;
+	private String dirId;
+	private HashMap<String, String> dirIdentifiers;
 	private QueryUtil qutil;
 
 	public ProMTConnector () {
 		params = new Parameters();
-		initializePairs();
 		qutil = new QueryUtil();
 	}
 
@@ -101,17 +118,23 @@ public class ProMTConnector implements IQuery {
 		return null;
 	}
 
-	public void open () {
+	private String getHost () {
 		String tmp = params.getHost();
-		// Make sure the URL does not end with separator
-		if ( tmp.endsWith("/") ) tmp = tmp.substring(0, tmp.length()-1);
-		else if ( tmp.endsWith("\\") ) tmp = tmp.substring(0, tmp.length()-1);
+		// Make sure the host ends with a separator
+		if ( !tmp.endsWith("/") && tmp.endsWith("\\") ) {
+			return tmp + "/";
+		}
+		return tmp;
+	}
+	
+	public void open () {
+		initializePairsFromServer();
 		// Set the full URL for the service
 		try {
-			url = new URL(tmp+SERVICE);
+			url = new URL(getHost()+SERVICE+TRANSLATETEXT);
 		}
 		catch ( MalformedURLException e ) {
-			throw new RuntimeException(String.format("Cannot open the connection to '%s'", tmp+SERVICE), e); 
+			throw new RuntimeException(String.format("Cannot open the connection to '%s'", getHost()+SERVICE), e); 
 		}
 	}
 
@@ -141,7 +164,7 @@ public class ProMTConnector implements IQuery {
 			text = plainText;
 		}
 
-		if ( dirId == -1L ) return 0;
+		if ( dirId == null ) return 0;
 		try {
 			// Try to authenticate if needed
 			if ( !Util.isEmpty(params.getUsername()) ) {
@@ -164,7 +187,7 @@ public class ProMTConnector implements IQuery {
 			// Set the data
 			//DirId=string&TplId=string&Text=string
 			//524289
-			String data = String.format("DirId=%d&TplId=%s&Text=%s",
+			String data = String.format("DirId=%s&TplId=%s&Text=%s",
 				dirId, "General", URLEncoder.encode(text, "UTF-8"));
 
 			// Post the data
@@ -242,16 +265,39 @@ e.printStackTrace();
 		//TODO: use domain
 	}
 
+	/**
+	 * Sets the dirId value if possible. This will not be set if
+	 * either the lookup table is not created or the locales are not set,
+	 * allowing to call setLanguages() or open() in any order.
+	 */
+	private void setDirectionId () {
+		// Initialize to 'no support'
+		dirId = null;
+		
+		// If the lookup table is not yet initialized it's ok
+		// It means the direction id will be set on open()
+		if ( dirIdentifiers == null ) return;
+		
+		// Create the name to lookup
+		if (( srcLoc != null ) && ( trgLoc != null )) {
+			// getDisplayLanguage will not return null
+			String pair = srcLoc.getDisplayLanguage(Locale.ENGLISH)
+				+ "-" + trgLoc.getDisplayLanguage(Locale.ENGLISH);
+			// Get the dirId (or null if not found)
+			dirId = dirIdentifiers.get(pair);
+		}
+	}
+	
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
+		// Convert the codes
 		srcLang = toInternalCode(sourceLocale);
 		trgLang = toInternalCode(targetLocale);
-		String pair = srcLang + "_" + trgLang;
-		if ( dirIdentifiers.containsKey(pair) ) {
-			dirId = dirIdentifiers.get(pair);
-		}
-		else dirId = -1L;
+		srcLoc = sourceLocale.toJavaLocale();
+		trgLoc = targetLocale.toJavaLocale();
+		// Try to set the direction
+		setDirectionId();
 	}
 		
 	private String toInternalCode (LocaleId locale) {
@@ -267,34 +313,111 @@ e.printStackTrace();
 		params = (Parameters)params;
 	}
 
-	private void initializePairs () {
-//TODO: Get the list from /pts8/services/ptservice.asmx/GetPTServiceDataSet		
-		dirId = -1L;
-		dirIdentifiers = new HashMap<String, Long>();
-		dirIdentifiers.put("en_ru", 131073L);
-		dirIdentifiers.put("ru_en", 65538L);
-		dirIdentifiers.put("de_ru", 131076L);
-		dirIdentifiers.put("ru_de", 262146L);
-		dirIdentifiers.put("fr_ru", 131080L);
-		dirIdentifiers.put("ru_fr", 524290L);
-		dirIdentifiers.put("es_ru", 131104L);
-		dirIdentifiers.put("ru_es", 2097154L);
-		dirIdentifiers.put("en_de", 262145L);
-		dirIdentifiers.put("de_en", 65540L);
-		dirIdentifiers.put("en_fr", 524289L);
-		dirIdentifiers.put("fr_en", 65544L);
-		dirIdentifiers.put("de_fr", 524292L);
-		dirIdentifiers.put("fr_de", 262152L);
-		dirIdentifiers.put("en_it", 1048577L);
-		dirIdentifiers.put("it_en", 65552L);
-		dirIdentifiers.put("en_es", 2097153L);
-		dirIdentifiers.put("es_en", 65568L);
-		dirIdentifiers.put("de_es", 2097156L);
-		dirIdentifiers.put("es_de", 262176L);
-		dirIdentifiers.put("fr_es", 2097160L);
-		dirIdentifiers.put("es_fr", 524320L);
-		dirIdentifiers.put("en_pt", 4194305L);
-		dirIdentifiers.put("pt_en", 65600L);
+//	private void initializePairs () {
+//		dirId = null;
+//		dirIdentifiers = new HashMap<String, String>();
+//		dirIdentifiers.put("en_ru", "131073");
+//		dirIdentifiers.put("ru_en", "65538");
+//		dirIdentifiers.put("de_ru", "131076");
+//		dirIdentifiers.put("ru_de", "262146");
+//		dirIdentifiers.put("fr_ru", "131080");
+//		dirIdentifiers.put("ru_fr", "524290");
+//		dirIdentifiers.put("es_ru", "131104");
+//		dirIdentifiers.put("ru_es", "2097154");
+//		dirIdentifiers.put("en_de", "262145");
+//		dirIdentifiers.put("de_en", "65540");
+//		dirIdentifiers.put("en_fr", "524289");
+//		dirIdentifiers.put("fr_en", "65544");
+//		dirIdentifiers.put("de_fr", "524292");
+//		dirIdentifiers.put("fr_de", "262152");
+//		dirIdentifiers.put("en_it", "1048577");
+//		dirIdentifiers.put("it_en", "65552");
+//		dirIdentifiers.put("en_es", "2097153");
+//		dirIdentifiers.put("es_en", "65568");
+//		dirIdentifiers.put("de_es", "2097156");
+//		dirIdentifiers.put("es_de", "262176");
+//		dirIdentifiers.put("fr_es", "2097160");
+//		dirIdentifiers.put("es_fr", "524320");
+//		dirIdentifiers.put("en_pt", "4194305");
+//		dirIdentifiers.put("pt_en", "65600");
+//	}
+
+	private void initializePairsFromServer () {
+		dirId = null;
+		dirIdentifiers = new HashMap<String, String>();
+		OutputStreamWriter wr = null;
+		BufferedReader rd = null;
+		try {
+			// Open a connection
+			URL url = new URL(getHost()+SERVICE+GETPTSERVICEDATASET);
+			URLConnection conn = url.openConnection();
+			
+			// Post the data
+			conn.setDoOutput(true);
+			wr = new OutputStreamWriter(conn.getOutputStream());
+			wr.write("");
+			wr.flush();
+	        
+	        // Get the response
+	        rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), Charset.forName("UTF-8")));
+	        String buffer;
+	        StringBuilder tmp = new StringBuilder();
+	        while (( buffer = rd.readLine() ) != null ) {
+	            tmp.append(buffer);
+	        }
+	        
+	        // Treat the result
+			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
+			Fact.setValidating(false);
+			Fact.setNamespaceAware(true);
+			DocumentBuilder docBuilder = Fact.newDocumentBuilder();
+			docBuilder.setEntityResolver(new DefaultEntityResolver());
+			Document doc;
+			doc = docBuilder.parse(new InputSource(new StringReader(tmp.toString())));
+	        NodeList nodes = doc.getElementsByTagName("Directions");
+	        for ( int i=0; i<nodes.getLength(); i++ ) {
+	        	Element elem = (Element)nodes.item(i);
+				NodeList dirs = elem.getChildNodes();
+				String name = null;
+				String id = null;
+				// Gather the id and name
+				for ( int j=0; j<dirs.getLength(); j++ ) {
+					Node node = dirs.item(j);
+					if ( "id".equals(node.getLocalName()) ) {
+						id = Util.getTextContent(node);
+					}
+					else if ( "Name".equals(node.getLocalName()) ) {
+						name = Util.getTextContent(node); 
+					}
+				}
+				// Add the entry if we can
+				if ( !Util.isEmpty(id) && !Util.isEmpty(name) ) {
+					dirIdentifiers.put(name, id);
+				}
+	        }
+		}
+		catch ( MalformedURLException e ) {
+			throw new RuntimeException("Error during the initialization.", e);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException("Error during the initialization.", e);
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException("Error during the initialization.", e);
+		}
+		catch ( SAXException e ) {
+			throw new RuntimeException("Error during the initialization.", e);
+		}
+		finally {
+			setDirectionId();
+        	try {
+        		if ( wr != null ) wr.close();
+    	        if ( rd != null ) rd.close();
+   	        }
+       		catch ( IOException e ) {
+       			// Ignore this exception
+	        }
+		}
 	}
 
 }

@@ -715,7 +715,7 @@ to 8080 by default.</p>
 need to have access to server with the system installed in order to use this 
 resource. You can find more information about the GlobalSight TMS here:
 <a href="http://www.globalsight.com/">http://www.globalsight.com/</a></p>
-<p>This resource indicated by the option <code>-gs</code> in Tikal and takes one 
+<p>This resource is indicated by the option <code>-gs</code> in Tikal and takes one 
 argument: a configuration file that contains the information about the server to 
 connect to, username and password, as well as the TM profile to use. The 
 configuration file must look like this:</p>
@@ -766,8 +766,9 @@ default server is set to use the main public apertium.org server.</p>
 <pre>tikal -q &quot;text to search&quot; -apertium</pre>
 <h3><a name="promt"></a>ProMT MT</h3>
 <p>ProMT is a commercial MT system that provides machine translation in many 
-language pairs.</p>
-<p>This resource indicated by the option <code>-promt</code> in Tikal and takes one 
+language pairs. The connector support the Web service access to ProMT servers 
+using the PTService API.</p>
+<p>This resource is indicated by the option <code>-promt</code> in Tikal and takes one 
 optional argument: a configuration file that contains the information about the server to 
 connect to, username and password. If the configuration file is not specify, the 
 default configuration is used. The 
