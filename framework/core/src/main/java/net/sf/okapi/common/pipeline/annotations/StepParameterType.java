@@ -31,9 +31,14 @@ public enum StepParameterType {
 	INPUT_RAWDOC,
 	
 	/**
-	 * RawDocument object of the secondary input document.
+	 * RawDocument object of the second input document.
 	 */
-	SECONDARY_INPUT_RAWDOC,
+	SECOND_INPUT_RAWDOC,
+	
+	/**
+	 * RawDocument object of the third input document.
+	 */
+	THIRD_INPUT_RAWDOC,
 	
 	/**
 	 * URI of the main input document.

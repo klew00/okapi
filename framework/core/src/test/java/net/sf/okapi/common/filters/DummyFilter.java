@@ -103,6 +103,12 @@ public class DummyFilter implements IFilter {
 		open(input, true);
 	}
 	
+	/**
+	 * Opens the document with pre-defined entries. Use a CharSequence==null for
+	 * default events. Use Charsequence="##seg##" for default segmented entries,
+	 * use your own CharSequence otherwise: it will be split by \n and the sequences 
+	 * "@#$" will be replaced by inline codes. 
+	 */
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
@@ -139,6 +145,11 @@ public class DummyFilter implements IFilter {
 	}
 
 	private void reset (String data) {
+		if ( data.equalsIgnoreCase("##seg##") ) {
+			resetWithSegments();
+			return;
+		}
+		
 		close();
 		queue = new LinkedList<Event>();
 		String[] parts = data.split("\n", 0);
@@ -173,6 +184,41 @@ public class DummyFilter implements IFilter {
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 
 		Ending ending = new Ending("ed1");
+		queue.add(new Event(EventType.END_DOCUMENT, ending));
+	}
+	
+	private void resetWithSegments () {
+		close();
+		queue = new LinkedList<Event>();
+
+		StartDocument sd = new StartDocument("sd1");
+		sd.setLocale(srcLang);
+		sd.setMultilingual(true);
+		sd.setMimeType("text/xml");
+		GenericSkeleton skel = new GenericSkeleton("<doc>\n");
+		sd.setSkeleton(skel);
+		queue.add(new Event(EventType.START_DOCUMENT, sd));
+		
+		TextUnit tu = new TextUnit("tu1");
+		TextContainer tc = tu.getSource();
+		tc.append("First segment for SRC. Second segment for SRC");
+		tc.createSegment(23, -1);
+		tc.createSegment(0, 22);
+		
+		tc = tu.setTarget(trgLang, new TextContainer());
+		tc.append("First segment for TRG. Second segment for TRG");
+		tc.createSegment(23, -1);
+		tc.createSegment(0, 22);
+
+		skel = new GenericSkeleton("<text>\n<s>First segment for SRC. Second segment for SRC</s>\n<t>");
+		skel.addContentPlaceholder(tu, trgLang);
+		skel.append("<t>\n</text>\n");
+		tu.setSkeleton(skel);
+		queue.add(new Event(EventType.TEXT_UNIT, tu));
+		
+		Ending ending = new Ending("ed1");
+		skel = new GenericSkeleton("</doc>\n");
+		ending.setSkeleton(skel);
 		queue.add(new Event(EventType.END_DOCUMENT, ending));
 	}
 	

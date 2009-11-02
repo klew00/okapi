@@ -53,7 +53,7 @@ public class XSLTransformStep extends BasePipelineStep {
 	private boolean isDone;
 	private URI outputURI;
 	private RawDocument input;
-	private RawDocument secondaryInput;
+	private RawDocument secondInput;
 	
 	public XSLTransformStep () {
 		params = new Parameters();
@@ -77,9 +77,9 @@ public class XSLTransformStep extends BasePipelineStep {
 		this.input = input;
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.SECONDARY_INPUT_RAWDOC)
-	public void setSecondaryInput (RawDocument secondaryInput) {
-		this.secondaryInput = secondaryInput;
+	@StepParameterMapping(parameterType = StepParameterType.SECOND_INPUT_RAWDOC)
+	public void setSecondInput (RawDocument secondInput) {
+		this.secondInput = secondInput;
 	}
 	
 	public String getDescription () {
@@ -199,7 +199,7 @@ public class XSLTransformStep extends BasePipelineStep {
 					value = value.replace("${Output1}", outputURI.toString()); //$NON-NLS-1$
 				}
 				if ( value.indexOf("${Input2}") > -1 ) {
-					value = value.replace("${Input2}", secondaryInput.getInputURI().toString()); //$NON-NLS-1$
+					value = value.replace("${Input2}", secondInput.getInputURI().toString()); //$NON-NLS-1$
 				}
 //				if ( value.indexOf("${Output2}") > -1 ) {
 //					value = value.replace("${Output2}", getContext().getOutputURI(1).toString()); //$NON-NLS-1$

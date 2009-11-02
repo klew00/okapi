@@ -61,12 +61,26 @@ public class TMXFilterWriterTest {
 		assertEquals(expected, result.replaceAll("[\\r\\n]", ""));
 	}
 		
+	@Test
+	public void testSegmentedOutput () {
+		String result = rewrite(getEvents("##seg##", locEN, locFR), locFR);
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<tmx version=\"1.4\"><header creationtool=\"unknown\" creationtoolversion=\"unknown\" segtype=\"paragraph\" o-tmf=\"unknown\" adminlang=\"en\" srclang=\"en\" datatype=\"text\"></header><body>"
+			+ "<tu tuid=\"autoID1\">"
+			+ "<tuv xml:lang=\"en\"><seg>First segment for SRC. Second segment for SRC</seg></tuv>"
+			+ "<tuv xml:lang=\"fr\"><seg>First segment for TRG. Second segment for TRG</seg></tuv>"
+			+ "</tu>"
+			+ "</body>"
+			+ "</tmx>";
+		assertEquals(expected, result.replaceAll("[\\r\\n]", ""));
+	}
+		
 	private ArrayList<Event> getEvents(String snippet,
 		LocaleId srcLang,
 		LocaleId trgLang)
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument((CharSequence)null, srcLang, trgLang));
+		filter.open(new RawDocument((CharSequence)snippet, srcLang, trgLang));
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			list.add(event);

@@ -43,7 +43,7 @@ import net.sf.okapi.lib.translation.TextMatcher;
 public class TranslationComparisonStep extends BasePipelineStep {
 
 	private Parameters params;
-	private IFilter inputToCompare;
+	private IFilter input1ToCompare;
 	private TextMatcher matcher;
 	private XMLWriter writer;
 	private TMXWriter tmx;
@@ -59,7 +59,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private LocaleId targetLocaleExtra;
 	private LocaleId sourceLocale;
 	private URI inputURI;
-	private RawDocument secondaryInput;
+	private RawDocument secondInput;
 
 	public TranslationComparisonStep () {
 		params = new Parameters();
@@ -85,9 +85,9 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		this.inputURI = inputURI;
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.SECONDARY_INPUT_RAWDOC)
-	public void setSecondaryInput (RawDocument secondaryInput) {
-		this.secondaryInput = secondaryInput;
+	@StepParameterMapping(parameterType = StepParameterType.SECOND_INPUT_RAWDOC)
+	public void setSecondInput (RawDocument secondInput) {
+		this.secondInput = secondInput;
 	}
 	
 	public String getName () {
@@ -95,7 +95,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Compare the translated text units between two documents.";
+		return "Compare the translated text units between several documents.";
 	}
 
 	@Override
@@ -164,8 +164,8 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	
 	@Override
 	protected void handleEndDocument (Event event) {
-    	if ( inputToCompare != null ) {
-    		inputToCompare.close();
+    	if ( input1ToCompare != null ) {
+    		input1ToCompare.close();
     	}
     	if ( params.isGenerateHTML() ) {
 			writer.writeEndElement(); // table
@@ -276,18 +276,18 @@ public class TranslationComparisonStep extends BasePipelineStep {
 
 	private void initializeDocumentData () {
 		// Initialize the filter to read the translation to compare
-		inputToCompare = fcMapper.createFilter(
-			secondaryInput.getFilterConfigId(), inputToCompare);
+		input1ToCompare = fcMapper.createFilter(
+			secondInput.getFilterConfigId(), input1ToCompare);
 		
 		// Open the second input for this batch item
-		inputToCompare.open(secondaryInput);
+		input1ToCompare.open(secondInput);
 			
 		// Start HTML output
 		if ( writer != null ) writer.close();
 		if ( params.isGenerateHTML() ) {
 			// Use the to-compare file for the output name
 			if ( pathToOpen == null ) {
-				pathToOpen = secondaryInput.getInputURI().toString();
+				pathToOpen = secondInput.getInputURI().toString();
 				pathToOpen += ".html";
 			}
 			writer = new XMLWriter(getOutputFilename()); //$NON-NLS-1$
@@ -303,7 +303,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeEndElement();
 			writer.writeStartElement("p"); //$NON-NLS-1$
 			writer.writeString(String.format("Comparing %s (T2) against %s (T1).",
-				secondaryInput.getInputURI(), inputURI));
+				secondInput.getInputURI(), inputURI));
 			writer.writeEndElement();
 			writer.writeStartElement("table"); //$NON-NLS-1$
 		}
@@ -312,8 +312,8 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private Event synchronize (EventType untilType) {
 		boolean found = false;
 		Event event = null;
-		while ( !found && inputToCompare.hasNext() ) {
-			event = inputToCompare.next();
+		while ( !found && input1ToCompare.hasNext() ) {
+			event = input1ToCompare.next();
 			found = (event.getEventType() == untilType);
     	}
    		if ( !found ) {

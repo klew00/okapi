@@ -91,8 +91,11 @@ public class PipelineDriver implements IPipelineDriver {
 				lastOutputStep = step;
 				lastOutputStep.setLastOutputStep(true);
 			}
-			else if ( p.getParameterType() == StepParameterType.SECONDARY_INPUT_RAWDOC ) {
+			else if ( p.getParameterType() == StepParameterType.SECOND_INPUT_RAWDOC ) {
 				maxInputCount = 2;
+			}
+			else if ( p.getParameterType() == StepParameterType.THIRD_INPUT_RAWDOC ) {
+				maxInputCount = 3;
 			}
 		}
 	}
@@ -229,8 +232,11 @@ public class PipelineDriver implements IPipelineDriver {
 					case INPUT_RAWDOC:
 						method.invoke(p.getStep(), input);
 						break;
-					case SECONDARY_INPUT_RAWDOC:
+					case SECOND_INPUT_RAWDOC:
 						method.invoke(p.getStep(), item.getRawDocument(1));
+						break;
+					case THIRD_INPUT_RAWDOC:
+						method.invoke(p.getStep(), item.getRawDocument(2));
 						break;
 					default:
 						throw new OkapiBadStepInputException(String.format(
