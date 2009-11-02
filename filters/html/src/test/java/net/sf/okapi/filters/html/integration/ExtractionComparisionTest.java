@@ -29,6 +29,7 @@ public class ExtractionComparisionTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
+		//htmlFilter.setParametersFromURL(ExtractionComparisionTest.class.getResource("/testConfiguration1.yml"));
 		testFileList = HtmlUtils.getHtmlTestFiles();
 
 		URL url = ExtractionComparisionTest.class.getResource("/324.html");
@@ -45,8 +46,16 @@ public class ExtractionComparisionTest {
 				new InputDocument(root + "324.html", null),
 				"UTF-8", locEN, locEN));
 	}
-
-	// FIXME: Should move to integration project @Test
+	
+	//@Test
+	public void testDoubleExtractionSingle() throws URISyntaxException {
+		RoundTripComparison rtc = new RoundTripComparison();
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root + "W3CHTMHLTest1.html", null));
+		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", locEN, locEN));
+	}
+	
+	@Test
 	public void testDoubleExtraction() throws URISyntaxException {
 		RoundTripComparison rtc = new RoundTripComparison();
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
