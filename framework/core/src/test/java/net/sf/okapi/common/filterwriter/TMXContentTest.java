@@ -55,6 +55,47 @@ public class TMXContentTest {
 	}
 
 	@Test
+	public void testSimple_OmegaTUsingCodeMode () {
+		TextFragment tf = createTextUnit();
+		assertEquals(tf.getCodes().size(), 5);
+		fmt.setCodeMode(TMXContent.CODEMODE_OMEGAT);
+		fmt.setContent(tf);
+		assertEquals("t1<bpt i=\"1\">&lt;g0&gt;</bpt><bpt i=\"2\">&lt;g1&gt;</bpt><ph x=\"3\">&lt;x2/&gt;</ph>t2<ept i=\"2\">&lt;/g1&gt;</ept><ept i=\"1\">&lt;/g0&gt;</ept>t3",
+			fmt.toString());
+	}
+
+	@Test
+	public void testSimple_EmptyCodes () {
+		TextFragment tf = createTextUnit();
+		assertEquals(tf.getCodes().size(), 5);
+		fmt.setCodeMode(TMXContent.CODEMODE_EMPTY);
+		fmt.setContent(tf);
+		assertEquals("t1<bpt i=\"1\"></bpt><bpt i=\"2\"></bpt><ph x=\"3\"></ph>t2<ept i=\"2\"></ept><ept i=\"1\"></ept>t3",
+			fmt.toString());
+	}
+
+	@Test
+	public void testSimple_GenericCodes () {
+		TextFragment tf = createTextUnit();
+		assertEquals(tf.getCodes().size(), 5);
+		fmt.setCodeMode(TMXContent.CODEMODE_GENERIC);
+		fmt.setContent(tf);
+		assertEquals("t1<bpt i=\"1\">&lt;0&gt;</bpt><bpt i=\"2\">&lt;1&gt;</bpt><ph x=\"3\">&lt;2/&gt;</ph>t2<ept i=\"2\">&lt;/1&gt;</ept><ept i=\"1\">&lt;/0&gt;</ept>t3",
+				fmt.toString());
+	}
+
+	@Test
+	public void testSimple_OriginalCodes () {
+		TextFragment tf = createTextUnit();
+		assertEquals(tf.getCodes().size(), 5);
+		fmt.setCodeMode(TMXContent.CODEMODE_ORIGINAL);
+		fmt.setContent(tf);
+		// Same as default
+		assertEquals("t1<bpt i=\"1\">&lt;b1&gt;</bpt><bpt i=\"2\">&lt;b2&gt;</bpt><ph x=\"3\">{\\x1\\}</ph>t2<ept i=\"2\">&lt;/b2&gt;</ept><ept i=\"1\">&lt;/b1&gt;</ept>t3",
+			fmt.setContent(tf).toString());
+	}
+
+	@Test
 	public void testSimple_Trados () {
 		TextFragment tf = createTextUnit();
 		assertEquals(tf.getCodes().size(), 5);

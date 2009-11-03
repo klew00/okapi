@@ -32,11 +32,31 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 public class TMXContent {
 
+	/**
+	 * Indicates that the inline codes should contain the original code.
+	 */
+	public static final int CODEMODE_ORIGINAL = 0;
+
+	/**
+	 * Indicates that the inline codes should contain nothing.
+	 */
+	public static final int CODEMODE_EMPTY = 1;
+	
+	/**
+	 * Indicates that the inline codes should contain generic codes (e.g. <1>,</1>,<2/>)
+	 */
+	public static final int CODEMODE_GENERIC = 2;
+	
+	/**
+	 * Indicates that the inline codes should contain OmegaT-like codes (e.g. <g0>,</g0>,<x1/>)
+	 */
+	public static final int CODEMODE_OMEGAT = 3;
+	
 	private String codedText;
 	private List<Code> codes;
 	private boolean withTradosWorkarounds = false;
-	private boolean withOmegaTWorkarounds = false;
 	private int defaultQuoteMode = 1;
+	private int codeMode = CODEMODE_ORIGINAL;
 
 	/**
 	 * Creates a new TMXContent object without any content.
@@ -70,7 +90,7 @@ public class TMXContent {
 	 * @param value true to use workarounds, false to not use workarounds.
 	 */
 	public void setOmegaTWorkarounds (boolean value) {
-		withOmegaTWorkarounds = value;
+		codeMode = CODEMODE_OMEGAT;
 	}
 	
 	/**
@@ -78,7 +98,7 @@ public class TMXContent {
 	 * @return true if the formatter is set for OmegaT.
 	 */
     public boolean getOmegaTWorkarounds () {
-    	return withOmegaTWorkarounds;
+    	return (codeMode == CODEMODE_OMEGAT);
     }
 	
 	/**
@@ -89,6 +109,22 @@ public class TMXContent {
 	 */
 	public void setQuoteMode (int quoteMode) {
 		defaultQuoteMode = quoteMode;
+	}
+	
+	/**
+	 * Sets the type of content the inline codes should be output.
+	 * @param codeMode the code for the inline code mode: one of the <code>CODEMODE_...</code> codes.
+	 */
+	public void setCodeMode (int codeMode) {
+		this.codeMode = codeMode;
+	}
+	
+	/**
+	 * Gets the flag for the code mode currently set.
+	 * @return the code mode currently set: one of the <code>CODEMODE_...</code> codes.
+	 */
+	public int getCodeMode () {
+		return codeMode;
 	}
 	
 	/**
@@ -143,13 +179,29 @@ public class TMXContent {
 				}
 				else {
 					tmp.append(String.format("<bpt i=\"%d\">", code.getId()));
-					if ( withOmegaTWorkarounds ) {
+					switch ( codeMode ) {
+					case CODEMODE_GENERIC:
+						otStack.push(otId++);
+						tmp.append(Util.escapeToXML(String.format("<%d>", otStack.peek()), quoteMode, escapeGT, null));
+						break;
+					case CODEMODE_OMEGAT:
 						otStack.push(otId++);
 						tmp.append(Util.escapeToXML(String.format("<g%d>", otStack.peek()), quoteMode, escapeGT, null));
-					}
-					else {
+						break;
+					case CODEMODE_EMPTY:
+						// Nothing to output
+						break;
+					default:
 						tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
+						break;
 					}
+//					if ( withOmegaTWorkarounds ) {
+//						otStack.push(otId++);
+//						tmp.append(Util.escapeToXML(String.format("<g%d>", otStack.peek()), quoteMode, escapeGT, null));
+//					}
+//					else {
+//						tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
+//					}
 					tmp.append("</bpt>");
 				}
 				break;
@@ -157,12 +209,26 @@ public class TMXContent {
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<ept i=\"%d\">", code.getId()));
-				if ( withOmegaTWorkarounds ) {
+				switch ( codeMode ) {
+				case CODEMODE_GENERIC:
+					tmp.append(Util.escapeToXML(String.format("</%d>", otStack.pop()), quoteMode, escapeGT, null));
+					break;
+				case CODEMODE_OMEGAT:
 					tmp.append(Util.escapeToXML(String.format("</g%d>", otStack.pop()), quoteMode, escapeGT, null));
-				}
-				else {
+					break;
+				case CODEMODE_EMPTY:
+					// Nothing to output
+					break;
+				default:
 					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
+					break;
 				}
+//				if ( withOmegaTWorkarounds ) {
+//					tmp.append(Util.escapeToXML(String.format("</g%d>", otStack.pop()), quoteMode, escapeGT, null));
+//				}
+//				else {
+//					tmp.append(Util.escapeToXML(codes.get(index).toString(), quoteMode, escapeGT, null));
+//				}
 				tmp.append("</ept>");
 				if ( code.hasAnnotation("protected") ) {
 					tmp.append("</hi>");
@@ -187,33 +253,75 @@ public class TMXContent {
 					}
 					else {
 						tmp.append(String.format("<ph x=\"%d\">", id));
-						if ( withOmegaTWorkarounds ) {
+						switch ( codeMode ) {
+						case CODEMODE_GENERIC:
+							tmp.append(Util.escapeToXML(String.format("<%d/>", otId++), quoteMode, escapeGT, null));
+							break;
+						case CODEMODE_OMEGAT:
 							tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
-						}
-						else {
+							break;
+						case CODEMODE_EMPTY:
+							// Nothing to output
+							break;
+						default:
 							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							break;
 						}
+//						if ( withOmegaTWorkarounds ) {
+//							tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+//						}
+//						else {
+//							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+//						}
 						tmp.append("</ph>");
 					}
 					break;
 				case OPENING:
 					tmp.append(String.format("<it x=\"%d\" pos=\"begin\">", id));
-					if ( withOmegaTWorkarounds ) {
+					switch ( codeMode ) {
+					case CODEMODE_GENERIC:
+						tmp.append(Util.escapeToXML(String.format("<%d/>", otId++), quoteMode, escapeGT, null));
+						break;
+					case CODEMODE_OMEGAT:
 						tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
-					}
-					else {
+						break;
+					case CODEMODE_EMPTY:
+						// Nothing to output
+						break;
+					default:
 						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						break;
 					}
+//					if ( withOmegaTWorkarounds ) {
+//						tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+//					}
+//					else {
+//						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+//					}
 					tmp.append("</it>");
 					break;
 				case CLOSING:
 					tmp.append(String.format("<it x=\"%d\" pos=\"end\">", id));
-					if ( withOmegaTWorkarounds ) {
+					switch ( codeMode ) {
+					case CODEMODE_GENERIC:
+						tmp.append(Util.escapeToXML(String.format("<%d/>", otId++), quoteMode, escapeGT, null));
+						break;
+					case CODEMODE_OMEGAT:
 						tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
-					}
-					else {
+						break;
+					case CODEMODE_EMPTY:
+						// Nothing to output
+						break;
+					default:
 						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						break;
 					}
+//					if ( withOmegaTWorkarounds ) {
+//						tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+//					}
+//					else {
+//						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+//					}
 					tmp.append("</it>");
 					break;
 				case SEGMENTHOLDER: // Should not really be used
