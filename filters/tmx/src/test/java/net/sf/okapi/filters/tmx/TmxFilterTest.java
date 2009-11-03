@@ -129,6 +129,26 @@ public class TmxFilterTest {
 	public void testGetMimeType() {
 		assertEquals("text/x-tmx", filter.getMimeType());
 	}	
+
+	@Test
+	public void testLang11 () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.1\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body>"
+			+ "<tu tuid=\"tuid_1\"><tuv lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		assertNotNull(tu);
+		assertTrue(tu.hasTarget(locFRFR));
+	}
+
+	@Test
+	public void testXmlLangOverLang () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.1\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body>"
+			+ "<tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\" lang=\"de-de\"><seg>Hello World!</seg></tuv><tuv lang=\"it-it\" xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		assertNotNull(tu);
+		assertTrue(tu.hasTarget(locFRFR));
+	}
 	
 	@Test
 	public void testCancel() {
