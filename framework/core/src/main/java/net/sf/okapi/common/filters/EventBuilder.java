@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
-import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -477,7 +477,7 @@ public class EventBuilder {
 		boolean text = false;
 		boolean nontext = false;
 		for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
-			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
+			if (propOrText.getAccessType() == PlaceholderAccessType.TRANSLATABLE) {
 				text = true;
 			} else {
 				nontext = true;
@@ -541,14 +541,14 @@ public class EventBuilder {
 						.getMainStartPos()));
 			}
 
-			if (propOrText.getType() == PlaceholderType.TRANSLATABLE) {
+			if (propOrText.getAccessType() == PlaceholderAccessType.TRANSLATABLE) {
 				TextUnit tu = embeddedTextUnit(propOrText, tag);
 				currentSkeleton.addReference(tu);
 				referencableFilterEvents
 						.add(new Event(EventType.TEXT_UNIT, tu));
-			} else if (propOrText.getType() == PlaceholderType.WRITABLE_PROPERTY) {
+			} else if (propOrText.getAccessType() == PlaceholderAccessType.WRITABLE_PROPERTY) {
 				embeddedWritableProp(resource, propOrText, tag, locale);
-			} else if (propOrText.getType() == PlaceholderType.READ_ONLY_PROPERTY) {
+			} else if (propOrText.getAccessType() == PlaceholderAccessType.READ_ONLY_PROPERTY) {
 				embeddedReadonlyProp(resource, propOrText, tag, locale);
 			} else {
 				throw new OkapiIllegalFilterOperationException(

@@ -68,6 +68,9 @@ public class TaggedFilterConfiguration {
 	private static final String ATTRIBUTE_READONLY = "ATTRIBUTE_READONLY";
 	private static final String ATTRIBUTES_ONLY = "ATTRIBUTES_ONLY";
 
+	private static final String ALL_ELEMENTS_EXCEPT = "allElementsExcept";
+	private static final String ONLY_THESE_ELEMENTS = "onlyTheseElements";
+
 	private static final String EQUALS = "EQUALS";
 	private static final String NOT_EQUALS = "NOT_EQUALS";
 	private static final String MATCH = "MATCH";
@@ -102,7 +105,8 @@ public class TaggedFilterConfiguration {
 	}
 
 	public boolean collapseWhitespace() {
-		return ((Boolean) configReader.getProperty(COLLAPSE_WHITSPACE)).booleanValue();
+		return ((Boolean) configReader.getProperty(COLLAPSE_WHITSPACE))
+				.booleanValue();
 	}
 
 	private RULE_TYPE convertRuleAsStringToRuleType(String ruleType) {
@@ -161,7 +165,7 @@ public class TaggedFilterConfiguration {
 		List ruleTypes = (List) rule.get("ruleTypes");
 		for (Object r : ruleTypes) {
 			String rt = (String) r;
-			if (convertRuleAsStringToRuleType(rt) == ruleType) {
+			if (convertRuleAsStringToRuleType(rt).equals(ruleType)) {
 				return true;
 			}
 		}
@@ -199,7 +203,8 @@ public class TaggedFilterConfiguration {
 	@SuppressWarnings("unchecked")
 	public boolean isAttributeRule(String ruleName) {
 		Map rule = configReader.getRule(ruleName);
-		if (rule != null && getMainRuleType(ruleName) == RULE_TYPE.ATTRIBUTE_TRANS
+		if (rule != null
+				&& getMainRuleType(ruleName) == RULE_TYPE.ATTRIBUTE_TRANS
 				|| getMainRuleType(ruleName) == RULE_TYPE.ATTRIBUTE_WRITABLE
 				|| getMainRuleType(ruleName) == RULE_TYPE.ATTRIBUTE_READONLY) {
 			return true;
@@ -207,23 +212,33 @@ public class TaggedFilterConfiguration {
 		return false;
 	}
 
-	public boolean isTranslatableAttribute(String elementName, String attribute, Map<String, String> attributes) {
-		return isActionableAttribute("translatableAttributes", elementName, attribute, attributes)
-				|| isActionableAttribute("translatableAttributes", elementName, attribute, attributes)
-				|| isActionableAttribute("translatableAttributes", elementName, attribute, attributes);
+	public boolean isTranslatableAttribute(String elementName,
+			String attribute, Map<String, String> attributes) {
+		return isActionableAttribute("translatableAttributes", elementName,
+				attribute, attributes);
 	}
 
-	public boolean isReadOnlyLocalizableAttribute(String elementName, String attribute, Map<String, String> attributes) {
-		return isActionableAttribute("readOnlyLocalizableAttributes", elementName, attribute, attributes);
+	public boolean isReadOnlyLocalizableAttribute(String elementName,
+			String attribute, Map<String, String> attributes) {
+		return isActionableAttribute("readOnlyLocalizableAttributes",
+				elementName, attribute, attributes);
 	}
 
-	public boolean isWritableLocalizableAttribute(String elementName, String attribute, Map<String, String> attributes) {
-		return isActionableAttribute("writableLocalizableAttributes", elementName, attribute, attributes);
+	public boolean isWritableLocalizableAttribute(String elementName,
+			String attribute, Map<String, String> attributes) {
+		return isActionableAttribute("writableLocalizableAttributes",
+				elementName, attribute, attributes);
+	}
+
+	public boolean isIdAttribute(String elementName, String attribute,
+			Map<String, String> attributes) {
+		return isActionableAttribute("idAttributes", elementName, attribute,
+				attributes);
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean isActionableAttribute(String type, String elementName, String attribute,
-			Map<String, String> attributes) {
+	private boolean isActionableAttribute(String type, String elementName,
+			String attribute, Map<String, String> attributes) {
 
 		Map elementRule = configReader.getRule(elementName);
 		if (elementRule == null) {
@@ -238,7 +253,8 @@ public class TaggedFilterConfiguration {
 
 		if (ta instanceof List) {
 			List actionableAttributes = (List) elementRule.get(type);
-			for (Iterator<String> i = actionableAttributes.iterator(); i.hasNext();) {
+			for (Iterator<String> i = actionableAttributes.iterator(); i
+					.hasNext();) {
 				String a = i.next();
 				if (a.equals(attribute)) {
 					return true;
@@ -269,9 +285,7 @@ public class TaggedFilterConfiguration {
 					}
 					return applyConditions(condition, attribute, attributes);
 				}
-
 			}
-
 		}
 
 		// catch attributes that may appear on any element
@@ -287,8 +301,10 @@ public class TaggedFilterConfiguration {
 	 * @param type
 	 * @return
 	 */
-	private boolean isActionableAttributeRule(String elementName, String attrName, String type) {
-		if (type.equals("translatableAttributes") && getMainRuleType(attrName) == RULE_TYPE.ATTRIBUTE_TRANS) {
+	private boolean isActionableAttributeRule(String elementName,
+			String attrName, String type) {
+		if (type.equals("translatableAttributes")
+				&& getMainRuleType(attrName) == RULE_TYPE.ATTRIBUTE_TRANS) {
 			if (isListedElement(elementName, attrName, type)) {
 				return true;
 			}
@@ -303,7 +319,7 @@ public class TaggedFilterConfiguration {
 				return true;
 			}
 		}
-
+		
 		return false;
 	}
 
@@ -312,30 +328,52 @@ public class TaggedFilterConfiguration {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private boolean isListedElement(String elementName, String attrName, String type) {
+	private boolean isListedElement(String elementName, String attrName,
+			String type) {
+		List excludedElements;
+		List onlyTheseElements;
 		Map elementRule = configReader.getRule(attrName);
+
 		if (elementRule == null) {
 			return false;
 		}
 
-		List excludedElements = (List) elementRule.get("allElementsExcept");
+		excludedElements = (List) elementRule.get(ALL_ELEMENTS_EXCEPT);
+		onlyTheseElements = (List) elementRule.get(ONLY_THESE_ELEMENTS);
 
-		if (excludedElements == null) {
+		if (excludedElements == null && onlyTheseElements == null) {
 			// means no exceptions - all tags can have this attribute/rule
 			return true;
 		}
 
-		for (int i = 0; i <= excludedElements.size() - 1; i++) {
-			String elem = (String) excludedElements.get(i);
-			if (elem.equals(elementName)) {
-				return false;
+		// ALL_ELEMENTS_EXCEPT and ONLY_THESE_ELEMENTS are mutually exclusive
+		// categories, either one or the other must be true , not both
+		if (excludedElements != null) {
+			for (int i = 0; i <= excludedElements.size() - 1; i++) {
+				String elem = (String) excludedElements.get(i);
+				if (elem.equals(elementName)) {
+					return false;
+				}
 			}
+			// default
+			return true;
+		} else if (onlyTheseElements != null) {
+			for (int i = 0; i <= onlyTheseElements.size() - 1; i++) {
+				String elem = (String) onlyTheseElements.get(i);
+				if (elem.equals(elementName)) {
+					return true;
+				}
+			}
+			// default
+			return false;
 		}
+
 		return true;
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean applyConditions(List<?> condition, String attribute, Map<String, String> attributes) {
+	private boolean applyConditions(List<?> condition, String attribute,
+			Map<String, String> attributes) {
 		String conditionalAttribute = null;
 		conditionalAttribute = (String) condition.get(0);
 
@@ -353,18 +391,22 @@ public class TaggedFilterConfiguration {
 
 			// multiple condition values of type NOT_EQUAL are AND'ed together
 			if (compareType.equals(NOT_EQUALS)) {
-				for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
+				for (Iterator<String> i = conditionValues.iterator(); i
+						.hasNext();) {
 					String value = i.next();
-					if (applyCondition(attributes.get(conditionalAttribute), compareType, value)) {
+					if (applyCondition(attributes.get(conditionalAttribute),
+							compareType, value)) {
 						return false;
 					}
 				}
 				return true;
 			} else { // multiple condition values of type EQUAL or MATCH are
 				// OR'ed together
-				for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
+				for (Iterator<String> i = conditionValues.iterator(); i
+						.hasNext();) {
 					String value = i.next();
-					if (applyCondition(attributes.get(conditionalAttribute), compareType, value)) {
+					if (applyCondition(attributes.get(conditionalAttribute),
+							compareType, value)) {
 						return true;
 					}
 				}
@@ -373,15 +415,18 @@ public class TaggedFilterConfiguration {
 		// single condition
 		else if (condition.get(2) instanceof String) {
 			String conditionValue = (String) condition.get(2);
-			return applyCondition(attributes.get(conditionalAttribute), compareType, conditionValue);
+			return applyCondition(attributes.get(conditionalAttribute),
+					compareType, conditionValue);
 		} else {
-			throw new RuntimeException("Error reading attributes from config file");
+			throw new RuntimeException(
+					"Error reading attributes from config file");
 		}
 
 		return false;
 	}
 
-	private boolean applyCondition(String attributeValue, String compareType, String conditionValue) {
+	private boolean applyCondition(String attributeValue, String compareType,
+			String conditionValue) {
 		if (compareType.equals(EQUALS)) {
 			return attributeValue.equalsIgnoreCase(conditionValue);
 		} else if (compareType.equals(NOT_EQUALS)) {

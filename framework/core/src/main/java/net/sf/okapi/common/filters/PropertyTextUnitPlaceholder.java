@@ -13,16 +13,19 @@ import net.sf.okapi.common.resource.TextUnit;
  * {@link AbstractFilter} to automatically generate proper attribute-based
  * {@link IResource}s
  */
-public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitPlaceholder> {
-	public enum PlaceholderType {
+public class PropertyTextUnitPlaceholder implements
+		Comparable<PropertyTextUnitPlaceholder> {
+	public enum PlaceholderAccessType {
 		TRANSLATABLE, READ_ONLY_PROPERTY, WRITABLE_PROPERTY
 	}
 
-	private PlaceholderType type;
+	private PlaceholderAccessType accessType;
 
 	private String name;
 	private String value;
 	private String mimeType;
+	private boolean id;
+	private String elementType;
 
 	private int mainStartPos;
 	private int mainEndPos;
@@ -34,14 +37,15 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 	 * for creating placeholders for read-only {@link Property}s
 	 * 
 	 * @param type
-	 *            - a {@link PlaceholderType}
+	 *            - a {@link PlaceholderAccessType}
 	 * @param name
 	 *            - attribute name
 	 * @param value
 	 *            - attribute value
 	 */
-	public PropertyTextUnitPlaceholder(PlaceholderType type, String name, String value) {
-		this(type, name, value, -1, -1, -1, -1);
+	public PropertyTextUnitPlaceholder(PlaceholderAccessType accessType, String name,
+			String value) {
+		this(accessType, name, value, -1, -1, -1, -1);
 	}
 
 	/**
@@ -50,7 +54,7 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 	 * formatting
 	 * 
 	 * @param type
-	 *            - a {@link PlaceholderType}
+	 *            - a {@link PlaceholderAccessType}
 	 * @param name
 	 *            - attribute name
 	 * @param value
@@ -60,9 +64,10 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 	 * @param valueEndPos
 	 *            - ending offset of the value
 	 */
-	public PropertyTextUnitPlaceholder(PlaceholderType type, String name, String value, int valueStartPos,
-			int valueEndPos) {
-		this(type, name, value, valueStartPos, valueEndPos, valueStartPos, valueEndPos);
+	public PropertyTextUnitPlaceholder(PlaceholderAccessType accessType, String name,
+			String value, int valueStartPos, int valueEndPos) {
+		this(accessType, name, value, valueStartPos, valueEndPos, valueStartPos,
+				valueEndPos);
 	}
 
 	/**
@@ -71,7 +76,7 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 	 * mainStartPos, the offset 'v' in value is the valueStartPos.
 	 * 
 	 * @param type
-	 *            - a {@link PlaceholderType}
+	 *            - a {@link PlaceholderAccessType}
 	 * @param name
 	 *            - attribute name
 	 * @param value
@@ -85,9 +90,10 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 	 * @param valueEndPos
 	 *            - ending offset of the value
 	 */
-	public PropertyTextUnitPlaceholder(PlaceholderType type, String name, String value, int mainStartPos,
-			int mainEndPos, int valueStartPos, int valueEndPos) {
-		this.type = type;
+	public PropertyTextUnitPlaceholder(PlaceholderAccessType accessType, String name,
+			String value, int mainStartPos, int mainEndPos, int valueStartPos,
+			int valueEndPos) {
+		this.accessType = accessType;
 		this.name = name;
 		this.value = value;
 		this.mainStartPos = mainStartPos;
@@ -97,23 +103,23 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 	}
 
 	/**
-	 * Get the placeholder {@link PlaceholderType}.
+	 * Get the placeholder {@link PlaceholderAccessType}.
 	 * 
 	 * @return one of TRANSLATABLE, READ_ONLY_PROPERTY, WRITABLE_PROPERTY
 	 */
-	public PlaceholderType getType() {
-		return type;
+	public PlaceholderAccessType getAccessType() {
+		return accessType;
 	}
 
 	/**
-	 * Set the {@link PlaceholderType}
+	 * Set the {@link PlaceholderAccessType}
 	 * 
 	 * @param type
 	 *            - the type, one of TRANSLATABLE, READ_ONLY_PROPERTY,
 	 *            WRITABLE_PROPERTY
 	 */
-	public void setType(PlaceholderType type) {
-		this.type = type;
+	public void setAccessType(PlaceholderAccessType accessType) {
+		this.accessType = accessType;
 	}
 
 	/**
@@ -247,6 +253,22 @@ public class PropertyTextUnitPlaceholder implements Comparable<PropertyTextUnitP
 	 */
 	public String getMimeType() {
 		return mimeType;
+	}
+
+	public void setId(boolean id) {
+		this.id = id;
+	}
+
+	public boolean isId() {
+		return id;
+	}
+
+	public void setElementType(String elementType) {
+		this.elementType = elementType;
+	}
+
+	public String getElementType() {
+		return elementType;
 	}
 
 	/**

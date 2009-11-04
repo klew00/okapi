@@ -29,7 +29,7 @@ import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
-import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -100,7 +100,7 @@ public class DummyBaseFilter extends AbstractFilter {
 		eventBuilder.addFilterEvent(createStartDocumentEvent());
 
 		ArrayList<PropertyTextUnitPlaceholder> list = new ArrayList<PropertyTextUnitPlaceholder>();
-		list.add(new PropertyTextUnitPlaceholder(PlaceholderType.WRITABLE_PROPERTY, "attr", "val1", 10, 14));
+		list.add(new PropertyTextUnitPlaceholder(PlaceholderAccessType.WRITABLE_PROPERTY, "attr", "val1", 10, 14));
 		
 		//TODO: Skeleton should be GenericSkeleton since BaseFilter uses only that one
 		eventBuilder.startTextUnit("Before ", new GenericSkeleton("<tu attr='val1'>"), list);

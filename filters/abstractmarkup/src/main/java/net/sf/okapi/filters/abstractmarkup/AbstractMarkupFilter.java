@@ -55,7 +55,7 @@ import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
-import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
@@ -574,7 +574,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	/**
 	 * For the given Jericho {@link StartTag} parse out all the actionable
 	 * attributes and and store them as {@link PropertyTextUnitPlaceholder}.
-	 * {@link PlaceholderType} are set based on the filter configuration for
+	 * {@link PlaceholderAccessType} are set based on the filter configuration for
 	 * each attribute. for the attribute name and value.
 	 * 
 	 * @param startTag
@@ -590,17 +590,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		Map<String, String> attrs = startTag.getAttributes().populateMap(new HashMap<String, String>(), true);
 		for (Attribute attribute : startTag.parseAttributes()) {
 			if (getConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
-				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(PlaceholderType.TRANSLATABLE,
+				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(PlaceholderAccessType.TRANSLATABLE,
 						attribute.getName(), attribute.getValue(), startTag, attribute));
 			} else {
 
 				if (getConfig().isReadOnlyLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
 					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-							PlaceholderType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+							PlaceholderAccessType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
 							attribute));
 				} else if (getConfig().isWritableLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
 					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-							PlaceholderType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+							PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
 							attribute));
 				}
 			}
@@ -614,7 +614,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * name and Jericho {@link Tag} and {@link Attribute}.
 	 * 
 	 * @param type
-	 *            - {@link PlaceholderType} is one of TRANSLATABLE,
+	 *            - {@link PlaceholderAccessType} is one of TRANSLATABLE,
 	 *            READ_ONLY_PROPERTY, WRITABLE_PROPERTY
 	 * @param name
 	 *            - attribute name
@@ -626,7 +626,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 *            - attribute as a Jericho {@link Attribute}
 	 * @return a {@link PropertyTextUnitPlaceholder} representing the attribute
 	 */
-	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderType type, String name,
+	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderAccessType type, String name,
 			String value, Tag tag, Attribute attribute) {
 		// offset of attribute
 		int mainStartPos = attribute.getBegin() - tag.getBegin();

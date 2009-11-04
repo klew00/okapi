@@ -27,7 +27,7 @@ public class WordTextBox {
 	 * for creating placeholders for read-only {@link Property}s
 	 * 
 	 * @param type
-	 *            - a {@link PlaceholderType}
+	 *            - a {@link PlaceholderAccessType}
 	 * @param name
 	 *            - attribute name
 	 * @param value

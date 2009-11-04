@@ -52,11 +52,9 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
-import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
@@ -68,7 +66,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 
 /**
  * <p>Filters Microsoft Office Word, Excel, and Powerpoint Documents.
