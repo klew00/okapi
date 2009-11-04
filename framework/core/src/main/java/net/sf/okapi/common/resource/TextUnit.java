@@ -37,6 +37,11 @@ import net.sf.okapi.common.LocaleId;
  */
 public class TextUnit implements INameable, IReferenceable {
 
+	public static final String TYPE_PARA = "paragraph";
+	public static final String TYPE_LIST_ELEMENT = "list_element";
+	public static final String TYPE_TITLE = "title";
+	public static final String TYPE_HEADER = "header";
+	
 	private static final int TARGETS_INITCAP = 2;
 	
 	private String id;
