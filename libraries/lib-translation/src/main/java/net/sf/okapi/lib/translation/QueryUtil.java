@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -40,9 +41,11 @@ public class QueryUtil {
 
 	private StringBuilder codesMarkers;
 	private List<Code> codes;
+	private XLIFFContent fmt;
 	
 	public QueryUtil () {
 		codesMarkers = new StringBuilder();
+		fmt = new XLIFFContent();
 	}
 	
 	/**
@@ -187,4 +190,15 @@ public class QueryUtil {
 		return sb.toString();
 	}
 
+	/**
+	 * Converts from coded text to XLIFF.
+	 * @param fragment the fragment to convert.
+	 * @return The resulting XLIFF string.
+	 */
+	public String toXLIFF (TextFragment fragment) {
+		if ( fragment == null ) return "";
+		fmt.setContent(fragment);
+		return fmt.toString();
+	}
+	
 }

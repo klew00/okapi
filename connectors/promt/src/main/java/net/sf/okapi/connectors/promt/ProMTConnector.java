@@ -54,6 +54,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
@@ -144,8 +145,8 @@ public class ProMTConnector implements IQuery {
 		initializePairsFromServer();
 		// Set the full URL for the service
 		try {
-			serviceURL = new URL(getHost()+PTS8_SERVICE+TRANSLATETEXT);
-			//serviceURL = new URL(getHost()+PTSXLIFF_SERVICE+TRANSLATEFORMATTEDTEXT);
+			//serviceURL = new URL(getHost()+PTS8_SERVICE+TRANSLATETEXT);
+			serviceURL = new URL(getHost()+PTSXLIFF_SERVICE+TRANSLATEFORMATTEDTEXT);
 		}
 		catch ( MalformedURLException e ) {
 			throw new RuntimeException(String.format("Cannot open the connection to '%s'", getHost()+PTS8_SERVICE), e); 
@@ -173,7 +174,7 @@ public class ProMTConnector implements IQuery {
 		String text;
 		if ( frag != null ) {
 			//text = qutil.separateCodesFromText(frag);
-			text = qutil.toCodedHTML(frag);
+			text = qutil.toXLIFF(frag);
 		}
 		else {
 			text = plainText;
@@ -192,12 +193,12 @@ public class ProMTConnector implements IQuery {
 			
 			// Set the data
 			//DirId=string&TplId=string&Text=string
-			String data = String.format("DirId=%s&TplId=%s&Text=%s",
-				dirId, "General", URLEncoder.encode(text, "UTF-8"));
+//			String data = String.format("DirId=%s&TplId=%s&Text=%s",
+//				dirId, "General", URLEncoder.encode(text, "UTF-8"));
 
 			// DirId=string&TplId=string&strText=string&FileType=string
-//			String data = String.format("DirId=%s&TplId=%s&strText=%s&FileType=html",
-//				dirId, "General", URLEncoder.encode(text, "UTF-8"));
+			String data = String.format("DirId=%s&TplId=%s&strText=%s&FileType=text/xliff",
+				dirId, "General", URLEncoder.encode(text, "UTF-8"));
 
 			// Post the data
 			conn.setDoOutput(true);
@@ -220,7 +221,7 @@ public class ProMTConnector implements IQuery {
 	        	if ( !Util.isEmpty(buffer) ) {
 	        		result = new QueryResult();
 //TODO: replace by shared method	        		
-	        		buffer = buffer.replace("&#39;", "'");
+	        		buffer = buffer.replace("&apos;", "'");
 	        		buffer = buffer.replace("&lt;", "<");
 	        		buffer = buffer.replace("&gt;", ">");
 	        		buffer = buffer.replace("&quot;", "\"");
@@ -435,7 +436,10 @@ e.printStackTrace();
 		con.setLanguages(LocaleId.fromString("en"), LocaleId.fromString("fr"));
 		con.open();
 		
-		con.query("This is an example.");
+		TextFragment frag = new TextFragment("This <b>is an</b> example.");
+		frag.changeToCode(13, 17, TagType.CLOSING, "b");
+		frag.changeToCode(5, 8, TagType.OPENING, "b");
+		con.query(frag);
 		if ( con.hasNext() ) {
 			System.out.println(con.next().target.toString());
 		}
