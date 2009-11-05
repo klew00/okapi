@@ -60,11 +60,15 @@ import net.sf.okapi.lib.translation.QueryUtil;
 
 public class ProMTConnector implements IQuery {
 
-	private static final String SERVICE = "/pts8/services/ptservice.asmx/";
+	private static final String PTS8_SERVICE = "pts8/services/ptservice.asmx/";
 	private static final String TRANSLATETEXT = "TranslateText";
 	private static final String GETPTSERVICEDATASET = "GetPTServiceDataSet";
-    private static final Pattern RESULTPATTERN = Pattern.compile("<string(.*?)>(.*?)</string>");
-	
+
+	private static final String PTSXLIFF_SERVICE = "ptsxliff/PTSXLIFFTranslator.asmx/";
+	private static final String TRANSLATEFORMATTEDTEXT = "TranslateFormattedText";
+
+	private static final Pattern RESULTPATTERN = Pattern.compile("<string(.*?)>(.*?)</string>");
+
 	private String srcLang;
 	private Locale srcLoc;
 	private String trgLang;
@@ -72,7 +76,7 @@ public class ProMTConnector implements IQuery {
 	private QueryResult result;
 	private int current = -1;
 	private Parameters params;
-	private URL url;
+	private URL serviceURL;
 	private String dirId;
 	private HashMap<String, String> dirIdentifiers;
 	private QueryUtil qutil;
@@ -128,13 +132,23 @@ public class ProMTConnector implements IQuery {
 	}
 	
 	public void open () {
+		// Try to authenticate if needed
+		if ( !Util.isEmpty(params.getUsername()) ) {
+			Authenticator.setDefault(new Authenticator() {
+			    protected PasswordAuthentication getPasswordAuthentication() {
+			        return new PasswordAuthentication(params.getUsername(), params.getPassword().toCharArray());
+			    }
+			});
+		}
+		
 		initializePairsFromServer();
 		// Set the full URL for the service
 		try {
-			url = new URL(getHost()+SERVICE+TRANSLATETEXT);
+			serviceURL = new URL(getHost()+PTS8_SERVICE+TRANSLATETEXT);
+			//serviceURL = new URL(getHost()+PTSXLIFF_SERVICE+TRANSLATEFORMATTEDTEXT);
 		}
 		catch ( MalformedURLException e ) {
-			throw new RuntimeException(String.format("Cannot open the connection to '%s'", getHost()+SERVICE), e); 
+			throw new RuntimeException(String.format("Cannot open the connection to '%s'", getHost()+PTS8_SERVICE), e); 
 		}
 	}
 
@@ -158,7 +172,8 @@ public class ProMTConnector implements IQuery {
 		
 		String text;
 		if ( frag != null ) {
-			text = qutil.separateCodesFromText(frag);
+			//text = qutil.separateCodesFromText(frag);
+			text = qutil.toCodedHTML(frag);
 		}
 		else {
 			text = plainText;
@@ -166,17 +181,8 @@ public class ProMTConnector implements IQuery {
 
 		if ( dirId == null ) return 0;
 		try {
-			// Try to authenticate if needed
-			if ( !Util.isEmpty(params.getUsername()) ) {
-				Authenticator.setDefault(new Authenticator() {
-				    protected PasswordAuthentication getPasswordAuthentication() {
-				        return new PasswordAuthentication(params.getUsername(), params.getPassword().toCharArray());
-				    }
-				});
-			}
-			
 			// Open a connection
-			URLConnection conn = url.openConnection();
+			URLConnection conn = serviceURL.openConnection();
 //TODO: handle user/password
 //			if ( !Util.isEmpty(params.getUsername()) ) {
 //				String buf = String.format("%s:%s", params.getUsername(), params.getPassword());
@@ -186,9 +192,12 @@ public class ProMTConnector implements IQuery {
 			
 			// Set the data
 			//DirId=string&TplId=string&Text=string
-			//524289
 			String data = String.format("DirId=%s&TplId=%s&Text=%s",
 				dirId, "General", URLEncoder.encode(text, "UTF-8"));
+
+			// DirId=string&TplId=string&strText=string&FileType=string
+//			String data = String.format("DirId=%s&TplId=%s&strText=%s&FileType=html",
+//				dirId, "General", URLEncoder.encode(text, "UTF-8"));
 
 			// Post the data
 			conn.setDoOutput(true);
@@ -349,7 +358,7 @@ e.printStackTrace();
 		BufferedReader rd = null;
 		try {
 			// Open a connection
-			URL url = new URL(getHost()+SERVICE+GETPTSERVICEDATASET);
+			URL url = new URL(getHost()+PTS8_SERVICE+GETPTSERVICEDATASET);
 			URLConnection conn = url.openConnection();
 			
 			// Post the data
@@ -420,5 +429,17 @@ e.printStackTrace();
 		}
 	}
 
+
+	public static void main (String args[]) {
+		ProMTConnector con = new ProMTConnector();
+		con.setLanguages(LocaleId.fromString("en"), LocaleId.fromString("fr"));
+		con.open();
+		
+		con.query("This is an example.");
+		if ( con.hasNext() ) {
+			System.out.println(con.next().target.toString());
+		}
+		
+	}
 }
 
