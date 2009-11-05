@@ -7,7 +7,7 @@
 # PRESERVE_WHITESPACE turn on preserve whitespace.
 # SCRIPT Embedded scripting languatge - pass to another extractor
 # SERVER Embedded server language tags such as JSP, PHP, Mason etc.
-# ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY these rules list an attribute, not an element
+# ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTE_ID these rules list an attribute, not an element
 # ATTRIBUTES_ONLY only attribute is translatable or localizable 
 
 #********************************************************************************************* 
@@ -47,7 +47,7 @@ lang:
   
 'xml:lang':
   ruleTypes: [ATTRIBUTE_WRITABLE]
-  
+    
 # only attributes are localizable or translatable - no PCDATA
 # ATTRIBUTES_ONLY with translatableAttributes implies the tag will be a TEXTUNIT
 # with embedded skeleton 
@@ -79,7 +79,7 @@ optgroup:
   
 th:
   ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [abbr]
+  translatableAttributes: [abbr]  
 
 # inline tags
 a:

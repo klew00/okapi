@@ -38,7 +38,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
-import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderType;
+import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
@@ -404,7 +404,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	}
 
 	@Override
-	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderType type, String name,
+	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderAccessType type, String name,
 			String value, Tag tag, Attribute attribute) {
 
 		String normalizeAttributeName = normalizeAttributeName(name, value, tag);
