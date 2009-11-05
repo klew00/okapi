@@ -268,7 +268,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Queue up Jericho tokens until we can buld an Okapi {@link Event} and
+	 * Queue up Jericho tokens until we can build an Okapi {@link Event} and
 	 * return it.
 	 */
 	public Event next() {
@@ -286,20 +286,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
-
-				// We just hit a tag that could close the current TextUnit, but
-				// only if it was not opened with a TextUnit tag (i.e., complex
-				// TextUnits such as <p> etc.)
-				boolean inlineTag = false;
-				if (getEventBuilder().isInsideTextRun()
-						&& (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
-								|| tag.getTagType() == StartTagType.COMMENT || tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))
-					inlineTag = true;
-
-				if (getEventBuilder().isCurrentTextUnit() && !getEventBuilder().isCurrentComplexTextUnit()
-						&& !inlineTag) {
-					getEventBuilder().endTextUnit();
-				}
 
 				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
 					handleStartTag((StartTag) tag);
