@@ -110,6 +110,10 @@ public class Writer extends BaseWriter {
 		return getClass().getName();
 	}
 
+	public EncoderManager getEncoderManager () {
+		return encoderManager;
+	}
+	
 	public IParameters getParameters () {
 		return null;
 	}

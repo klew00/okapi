@@ -36,6 +36,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
@@ -123,6 +124,10 @@ public class ZipFilterWriter implements IFilterWriter {
 		return "ZipFilterWriter";
 	}
 
+	public EncoderManager getEncoderManager () {
+		return null;
+	}
+	
 	public IParameters getParameters () {
 		// TODO Auto-generated method stub
 		return null;

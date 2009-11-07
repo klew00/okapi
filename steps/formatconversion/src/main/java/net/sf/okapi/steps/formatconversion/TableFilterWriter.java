@@ -35,6 +35,7 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -140,6 +141,10 @@ public class TableFilterWriter implements IFilterWriter {
 		return "TableFilterWriter";
 	}
 
+	public EncoderManager getEncoderManager () {
+		return null;
+	}
+	
 	public IParameters getParameters () {
 		return params;
 	}

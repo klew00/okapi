@@ -23,6 +23,7 @@ package net.sf.okapi.applications.tikal;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.LocaleId;
@@ -69,6 +70,10 @@ public class XLIFFWriter implements IFilterWriter {
 		return getClass().getName();
 	}
 
+	public EncoderManager getEncoderManager () {
+		return null;
+	}
+	
 	public IParameters getParameters () {
 		return null;
 	}

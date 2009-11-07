@@ -28,6 +28,7 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -72,6 +73,10 @@ public class PensieveFilterWriter implements IFilterWriter {
 		return "PensieveFilterWriter";
 	}
 
+	public EncoderManager getEncoderManager () {
+		return null;
+	}
+	
 	public IParameters getParameters () {
 		return null;
 	}

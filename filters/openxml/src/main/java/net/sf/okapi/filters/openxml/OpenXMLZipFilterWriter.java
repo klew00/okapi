@@ -36,6 +36,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.*;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -154,6 +155,10 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		return "OpenXMLZipFilterWriter"; 
 	}
 
+	public EncoderManager getEncoderManager () {
+		return null;
+	}
+	
 	/**
 	 * Handles an event.  Passes all but START_DOCUMENT, END_DOCUMENT,
                * and DOCUMENT_PART to subdocument processing.

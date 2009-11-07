@@ -28,6 +28,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.StartDocument;
@@ -67,6 +68,10 @@ public class TMXFilterWriter implements IFilterWriter {
 		return "TMXFilterWriter";
 	}
 
+	public EncoderManager getEncoderManager () {
+		return null;
+	}
+	
 	public IParameters getParameters () {
 		return null;
 	}

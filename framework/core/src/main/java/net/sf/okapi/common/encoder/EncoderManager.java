@@ -66,12 +66,12 @@ public class EncoderManager implements IEncoder {
 	}
 	
 	/**
-	 * Adds a mapping to the manager. If a mapping for this MIME type exists already
+	 * Sets a mapping in the manager. If a mapping for this MIME type exists already
 	 * in the manager, it will be overridden by this new one.
 	 * @param mimeType The MIME type identifier for this mapping.
 	 * @param className The class name of the encoder to use.
 	 */
-	public void addMapping (String mimeType,
+	public void setMapping (String mimeType,
 		String className)
 	{
 		mimeMap.put(mimeType, className);

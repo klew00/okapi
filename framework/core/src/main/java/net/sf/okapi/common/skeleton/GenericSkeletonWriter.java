@@ -61,7 +61,6 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	private IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
-		//IReferenceable ref = referents.get(id);
 		Referent ref = referents.get(id);
 		// Remove the object found from the list
 		if (( ref != null ) && ( (--ref.count)==0 )) {
@@ -99,7 +98,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( this.encoderManager != null ) {
 			this.encoderManager.setDefaultOptions(resource.getFilterParameters(), outputEncoding,
 				resource.getLineBreak());
-			encoderManager.updateEncoder(resource.getMimeType());
+			this.encoderManager.updateEncoder(resource.getMimeType());
 		}
 		
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);

@@ -130,6 +130,10 @@ public class GenericFilterWriter implements IFilterWriter {
 		return "GenericFilterWriter";
 	}
 
+	public EncoderManager getEncoderManager () {
+		return encoderManager;
+	}
+	
 	public IParameters getParameters () {
 		return null;
 	}
@@ -138,7 +142,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		try {
 			switch ( event.getEventType() ) {
 			case START_DOCUMENT:
-				processStartDocument(locale, encoding, null, encoderManager, (StartDocument)event.getResource());
+				processStartDocument(locale, encoding, (StartDocument)event.getResource());
 				break;
 			case END_DOCUMENT:
 				processEndDocument((Ending)event.getResource());
@@ -178,14 +182,12 @@ public class GenericFilterWriter implements IFilterWriter {
 
 	private void processStartDocument(LocaleId outputLocale,
 		String outputEncoding,
-		ILayerProvider layer,
-		EncoderManager encoderManager,
 		StartDocument resource) throws IOException
 	{
 		// Create the output
 		createWriter(resource);
 		writer.write(skelWriter.processStartDocument(outputLocale,
-			outputEncoding, layer, encoderManager, resource));
+			outputEncoding, null, encoderManager, resource));
 	}
 
 	private void processEndDocument(Ending resource) throws IOException {

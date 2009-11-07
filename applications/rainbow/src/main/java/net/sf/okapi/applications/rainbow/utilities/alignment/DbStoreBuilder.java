@@ -27,6 +27,7 @@ import java.util.Stack;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.StartDocument;
@@ -67,6 +68,10 @@ class DbStoreBuilder implements IFilterWriter {
 		return getClass().getName();
 	}
 
+	public EncoderManager getEncoderManager () {
+		return null;
+	}
+	
 	public IParameters getParameters () {
 		return null;
 	}
