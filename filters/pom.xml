@@ -41,6 +41,7 @@
         <module>xml</module>
         <module>json</module>
         <module>json-ui</module>
+        <module>ttx</module>
     </modules>
 
     <build>

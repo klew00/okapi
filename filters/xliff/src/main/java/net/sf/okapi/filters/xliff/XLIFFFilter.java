@@ -131,7 +131,7 @@ public class XLIFFFilter implements IFilter {
 			MimeTypeMapper.XLIFF_MIME_TYPE,
 			getClass().getName(),
 			"XLIFF",
-			"Configuration for XML Localisation Interchange File Format (XLIFF) document."));
+			"Configuration for XML Localisation Interchange File Format (XLIFF) documents."));
 		return list;
 	}
 	
@@ -786,8 +786,6 @@ public class XLIFFFilter implements IFilter {
 	 * Processes a segment content.
 	 * @param tagName the name of the element content that is being processed.
 	 * @param store true if the data must be stored in the skeleton. This is used to merge later on.
-	 * @param inlineCodes array where to save the in-line codes. Do not save if this parameter
-	 * is set to null.
 	 * @return a new TextContainer object with the parsed content.
 	 */
 	private TextContainer processContent (String tagName,
@@ -970,14 +968,12 @@ public class XLIFFFilter implements IFilter {
 	
 	/**
 	 * Appends a code, using the content of the node. Do not use for <g>-type tags.
-	 * @param type The type of in-line code.
+	 * @param tagType The type of in-line code.
 	 * @param id the id of the code to add.
 	 * @param tagName the tag name of the in-line element to process.
 	 * @param type the type of code (bpt and ept must use the same one so they can match!) 
 	 * @param store true if we need to store the data in the skeleton.
 	 * @param content the object where to put the code.
-	 * @param inlineCodes array where to save the original in-line code.
-	 * Do not save if this parameter is null.
 	 */
 	private void appendCode (TagType tagType,
 		int id,

@@ -194,6 +194,11 @@
 			<artifactId>okapi-filter-php</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-ttx</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
