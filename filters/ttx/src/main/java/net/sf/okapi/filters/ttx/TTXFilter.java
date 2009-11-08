@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -75,6 +75,7 @@ public class TTXFilter implements IFilter {
 	private int otherId;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
+	private String trgLangCode;
 	private LinkedList<Event> queue;
 	private boolean canceled;
 	private GenericSkeleton skel;
@@ -205,6 +206,8 @@ public class TTXFilter implements IFilter {
 			if ( srcLoc == null ) throw new NullPointerException("Source language not set.");
 			trgLoc = input.getTargetLocale();
 			if ( trgLoc == null ) throw new NullPointerException("Target language not set.");
+			trgLangCode = trgLoc.toString().toUpperCase(); // Default to create new entries
+			
 			hasUTF8BOM = detector.hasUtf8Bom();
 			lineBreak = detector.getNewlineType().toString();
 			if ( input.getInputURI() != null ) {
@@ -226,8 +229,8 @@ public class TTXFilter implements IFilter {
 			startDoc.setLocale(srcLoc);
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setFilterWriter(createFilterWriter());
-			startDoc.setType(MimeTypeMapper.XLIFF_MIME_TYPE);
-			startDoc.setMimeType(MimeTypeMapper.XLIFF_MIME_TYPE);
+			startDoc.setType(MimeTypeMapper.TTX_MIME_TYPE);
+			startDoc.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
 			startDoc.setMultilingual(true);
 			startDoc.setLineBreak(lineBreak);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
@@ -274,6 +277,9 @@ public class TTXFilter implements IFilter {
 //				if ( "ut".equals(name) ) {
 //					processTopUT();
 //				}
+				else if ( "UserSettings".equals(name) ){
+					processUserSettings();
+				}
 				else {
 					storeStartElement();
 				}
@@ -366,6 +372,31 @@ public class TTXFilter implements IFilter {
 		preserveSpaces.pop();
 	}
 
+	private void processUserSettings () {
+		// Check source language
+		String tmp = reader.getAttributeValue("", "SourceLanguage");
+		if ( !Util.isEmpty(tmp) ) {
+			 if ( !srcLoc.equals(tmp) ) {
+				 logger.warning(String.format("Specified source was '%s' but source language in the file is '%s'.\nUsing '%s'.",
+					srcLoc.toString(), tmp, tmp));
+				 srcLoc = LocaleId.fromString(tmp);
+			 }
+		}
+
+		// Check target language
+		tmp = reader.getAttributeValue("", "TargetLanguage");
+		if ( !Util.isEmpty(tmp) ) {
+			 if ( !trgLoc.equals(tmp) ) {
+				 logger.warning(String.format("Specified target was '%s' but target language in the file is '%s'.\nUsing '%s'.",
+					trgLoc.toString(), tmp, tmp));
+				 trgLoc = LocaleId.fromString(tmp);
+				 trgLangCode = tmp;
+			 }
+		}
+		
+		storeStartElement();
+	}
+	
 	// Case of a UT element outside a TUV, that is an un-segmented/translate code.
 	private void processTopUT () {
 		String tmp = reader.getAttributeValue("", "Style");
@@ -412,15 +443,10 @@ public class TTXFilter implements IFilter {
 						processTUV();
 						storeEndElement();
 					}
-					else {
-						addTargetIfNeeded();
-						storeStartElement();
-					}
 					break;
 				
 				case XMLStreamConstants.END_ELEMENT:
 					name = reader.getLocalName();
-					//addTargetIfNeeded();
 					if ( "Tu".equals(name) ) {
 						addTargetIfNeeded();
 						storeEndElement();
@@ -515,10 +541,9 @@ public class TTXFilter implements IFilter {
 		if ( srcLoc.equals(trgLoc) ) return; 
 		//Else: this trans-unit has no target, we add it here in the skeleton
 		// so we can merge target data in it when writing out the skeleton
-		skel.append(String.format("<Tuv Lang=\"%s\">", trgLoc));
+		skel.append(String.format("<Tuv Lang=\"%s\">", trgLangCode));
 		skel.addContentPlaceholder(tu, trgLoc);
 		skel.append("</Tuv>");
-		skel.append(lineBreak);
 		targetDone = true;
 	}
 	

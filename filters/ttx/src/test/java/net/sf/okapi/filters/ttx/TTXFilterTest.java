@@ -84,6 +84,26 @@ public class TTXFilterTest {
 	}
 
 	@Test
+	public void testBasicTwoUT () {
+		String snippet = STARTFILE
+			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 es</Tuv></Tu>"
+			+ "  <Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 es</Tuv></Tu>"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		assertEquals("text1 en", cont.toString());
+		cont = tu.getTarget(locESEM);
+		assertEquals("text1 es", cont.toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNotNull(tu);
+		cont = tu.getSource();
+		assertEquals("text2 en", cont.toString());
+		cont = tu.getTarget(locESEM);
+		assertEquals("text2 es", cont.toString());
+	}
+
+	@Test
 	public void testBasicWithUT () {
 		String snippet = STARTFILE
 			+ "<Tu>"
@@ -114,6 +134,36 @@ public class TTXFilterTest {
 			+ "<Tuv Lang=\"EN-US\">text en</Tuv>"
 			+ "<Tuv Lang=\"ES-EM\">text es</Tuv>"
 			+ "</Tu>"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locESEM));
+	}
+	
+	@Test
+	public void testTwoTUOutput () {
+		String snippet = STARTFILE
+			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 es</Tuv></Tu>\n"
+			+ "  <ut Style=\"external\">some code</ut>  "
+			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 es</Tuv></Tu>\n"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILE
+			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 es</Tuv></Tu>\n"
+			+ "  <ut Style=\"external\">some code</ut>  "
+			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 es</Tuv></Tu>\n"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locESEM));
+	}
+	
+	@Test
+	public void testOutputWithOriginalWithoutTraget () {
+		String snippet = STARTFILE
+			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv></Tu>\n"
+			+ "  <ut Style=\"external\">some code</ut>  "
+			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv></Tu>\n"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILE
+			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 en</Tuv></Tu>\n"
+			+ "  <ut Style=\"external\">some code</ut>  "
+			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 en</Tuv></Tu>\n"
 			+ "</Raw></Body></TRADOStag>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locESEM));
 	}
