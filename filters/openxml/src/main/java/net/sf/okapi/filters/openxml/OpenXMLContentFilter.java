@@ -312,6 +312,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	      boolean bIntag=false,bGotname=false,bInap=false,bHavr1=false;
 	      boolean bInsideTextMarkers=false,bInr=false,bB4text=true,bInInnerR=false;
 	      boolean bInsideNastyTextBox=false; // DWH 7-16-09
+	      boolean bHaveACRInsideR=false; // DWH 11-09-09 don't collapse if have a carriage return in style
 	      public void run()
 	      {
 	        try
@@ -420,6 +421,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		    		  bHavr1 = false;
 		    		  bB4text = false;
 	    		  }
+	    		  bHaveACRInsideR = false; // DWH 11-09-09
 	    	  }
 	    	  else if (tugname.equals("/w:p") || tugname.equals("/a:p"))
 	    	  {
@@ -435,6 +437,11 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	    	  else if (tugname.equals("/w:t") || tugname.equals("/a:t")) // DWH 5-18-09
 	    	  {
 	    		  bInsideTextMarkers = false;
+	    		  innanar(tug);
+	    	  }
+	    	  else if (tugname.equals("w:cr"))
+	    	  {
+	    		  bHaveACRInsideR = true;
 	    		  innanar(tug);
 	    	  }
 	    	  else if (bInap)
@@ -457,6 +464,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		    			  bInr = true;
 		    			  bB4text = true;
 		    		  }
+		    		  bHaveACRInsideR = false; // DWH 11-09-09
 		    	  }
 		    	  else if (tugname.equals("/w:r") ||
 		    			   tugname.equals("/a:r") || tugname.equals("/a:fld")) // DWH 5-27-09 a:fld
@@ -477,7 +485,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			    			  {
 			    				  bCollapsing = false;
 			    				  b4text = r1b4text;
-			    				  if (r1b4text.equals(r2b4text))
+			    				  if (r1b4text.equals(r2b4text) && !bHaveACRInsideR) // DWH 11-09-09 bHaveACRInsideR
 			    					  bCollapsing = true;
 			    				  else
 			    				  {

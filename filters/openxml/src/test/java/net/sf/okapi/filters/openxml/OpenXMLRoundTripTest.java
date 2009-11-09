@@ -93,6 +93,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("TestDako2.docx");
 		themfiles.add("TextBoxes.docx");
 		themfiles.add("OutOfTheTextBox.docx");
+		themfiles.add("MissingPara.docx");
 
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
