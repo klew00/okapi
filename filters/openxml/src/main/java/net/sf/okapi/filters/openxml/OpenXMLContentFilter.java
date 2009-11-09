@@ -167,6 +167,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	private EncoderManager encoderManager; // to handle text not to be translated
 	private String endpara="";  // DWH 8-17-09
 	private boolean bInPowerpointEndPara; // DWH 8-17-09
+	private String sEndTxbxContent=""; // DWH 10-23-09
 	
 	public OpenXMLContentFilter() {
 		super(); // 1-6-09
@@ -933,7 +934,10 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		sTagElementType = getConfig().getElementType(sTagName); // DWH 6-13-09
 		if (bInTextBox) // DWH 7-23-09 textbox
 		{
-			sInsideTextBox += sTagString;
+			if (sTagName.equals("w:txbxcontent")) // DWH 10-22-09 so this won't be an inline code
+				appendToFirstSkeletonPart(sTagString); // DWH 10-23-09 adds to skeleton of Group element
+			else
+				sInsideTextBox += sTagString;
 			return;
 		}
 		if (bInPowerpointEndPara) // DWH 8-27-09  skip everything in a:endParaRpr
@@ -1212,7 +1216,10 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		}
 		if (bInTextBox && getConfig().getMainRuleType(sTagName)!=RULE_TYPE.GROUP_ELEMENT)
 		{
-			sInsideTextBox += sTagString;
+			if (sTagName.equals("w:txbxcontent")) // DWH 10-22-09 so this won't be an inline code
+				sEndTxbxContent = sTagString;
+			else
+				sInsideTextBox += sTagString;
 			return;
 		}
 		if (bInPowerpointEndPara) // DWH 8-27-09  skip everything in a:endParaRpr
@@ -1313,7 +1320,8 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			bInTextBox = false;
 			sInsideTextBox = "";
 			getRuleState().popGroupRule();
-			endGroup(new GenericSkeleton(sTagString));
+			endGroup(new GenericSkeleton(sEndTxbxContent+sTagString)); // DWH 10-23-09 added sEndTxbxContent
+			sEndTxbxContent = ""; // DWH 10-23-09
 			break;
 		case EXCLUDED_ELEMENT:
 			getRuleState().popExcludedIncludedRule();
