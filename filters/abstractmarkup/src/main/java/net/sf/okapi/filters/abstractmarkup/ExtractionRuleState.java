@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.abstractmarkup;
 
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
@@ -130,5 +131,15 @@ public class ExtractionRuleState {
 
 	public void popTextUnitRule() {
 		textUnitRuleStack.pop();
+	}
+	
+	public String getTextUnitElementName() {
+		String n = "";
+		try {
+			n = textUnitRuleStack.peek().ruleName;
+		} catch (EmptyStackException e) {
+			// eat exception
+		}
+		return n;
 	}
 }
