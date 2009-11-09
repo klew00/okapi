@@ -124,7 +124,14 @@ public class ProMTConnector implements IQuery {
 	}
 
 	private String getHost () {
-		String tmp = params.getHost();
+		String tmp;
+		if ( !Util.isEmpty(params.getUsername()) ) {
+			//tmp = "http://"+params.getUsername()+":"+params.getPassword()+"@"+params.getHost();
+			tmp = "http://"+params.getHost();
+		}
+		else {
+			tmp = "http://"+params.getHost();
+		}
 		// Make sure the host ends with a separator
 		if ( !tmp.endsWith("/") && tmp.endsWith("\\") ) {
 			return tmp + "/";
@@ -145,11 +152,12 @@ public class ProMTConnector implements IQuery {
 		initializePairsFromServer();
 		// Set the full URL for the service
 		try {
-			//serviceURL = new URL(getHost()+PTS8_SERVICE+TRANSLATETEXT);
+//			serviceURL = new URL(getHost()+PTS8_SERVICE+TRANSLATETEXT);
 			serviceURL = new URL(getHost()+PTSXLIFF_SERVICE+TRANSLATEFORMATTEDTEXT);
 		}
 		catch ( MalformedURLException e ) {
-			throw new RuntimeException(String.format("Cannot open the connection to '%s'", getHost()+PTS8_SERVICE), e); 
+//			throw new RuntimeException(String.format("Cannot open the connection to '%s'", getHost()+PTS8_SERVICE), e); 
+			throw new RuntimeException(String.format("Cannot open the connection to '%s'", getHost()+PTSXLIFF_SERVICE), e); 
 		}
 	}
 
@@ -184,12 +192,6 @@ public class ProMTConnector implements IQuery {
 		try {
 			// Open a connection
 			URLConnection conn = serviceURL.openConnection();
-//TODO: handle user/password
-//			if ( !Util.isEmpty(params.getUsername()) ) {
-//				String buf = String.format("%s:%s", params.getUsername(), params.getPassword());
-//				BASE64Encoder enc = new BASE64Encoder();
-//				conn.setRequestProperty("Authorization", "Basic " + enc.encode(buf.getBytes()));
-//			}
 			
 			// Set the data
 			//DirId=string&TplId=string&Text=string
@@ -220,20 +222,14 @@ public class ProMTConnector implements IQuery {
 	        	buffer = m.group(2);
 	        	if ( !Util.isEmpty(buffer) ) {
 	        		result = new QueryResult();
-//TODO: replace by shared method	        		
-	        		buffer = buffer.replace("&apos;", "'");
-	        		buffer = buffer.replace("&lt;", "<");
-	        		buffer = buffer.replace("&gt;", ">");
-	        		buffer = buffer.replace("&quot;", "\"");
-	        		buffer = buffer.replace("&amp;", "&");
-	        		
+
 	        		if ( frag != null ) {
 	        			result.source = frag;
-	        			result.target = qutil.createNewFragmentWithCodes(buffer);
+	        			result.target = new TextFragment(qutil.fromXLIFF(buffer, frag), frag.getCodes());
 	        		}
 	        		else { // Was plain text
 	        			result.source = new TextFragment(text);
-	        			result.target = new TextFragment(buffer);
+	        			result.target = new TextFragment(qutil.fromXLIFF(buffer, frag));
 	        		}
 	        		
 	        		result.score = 95; // Arbitrary score for MT
@@ -430,15 +426,17 @@ e.printStackTrace();
 		}
 	}
 
-
 	public static void main (String args[]) {
 		ProMTConnector con = new ProMTConnector();
 		con.setLanguages(LocaleId.fromString("en"), LocaleId.fromString("fr"));
 		con.open();
 		
-		TextFragment frag = new TextFragment("This <b>is an</b> example.");
-		frag.changeToCode(13, 17, TagType.CLOSING, "b");
-		frag.changeToCode(5, 8, TagType.OPENING, "b");
+//		TextFragment frag = new TextFragment("This <b>is an</b> example.");
+//		frag.changeToCode(13, 17, TagType.CLOSING, "b");
+//		frag.changeToCode(5, 8, TagType.OPENING, "b");
+		
+		TextFragment frag = new TextFragment("This is an example.");
+		
 		con.query(frag);
 		if ( con.hasNext() ) {
 			System.out.println(con.next().target.toString());

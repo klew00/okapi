@@ -34,10 +34,11 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 public class QueryUtil {
 
-	private static final String CLOSING_CODE = "</s>";
-	private static final int CLOSING_CODE_LENGTH = CLOSING_CODE.length();
-	private static final Pattern opening = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>");
-	private static final Pattern isolated = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
+	private static final String HTML_CLOSING_CODE = "</s>";
+	private static final int HTML_CLOSING_CODE_LENGTH = HTML_CLOSING_CODE.length();
+	
+	private static final Pattern HTML_OPENING = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>");
+	private static final Pattern HTML_ISOLATED = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
 
 	private StringBuilder codesMarkers;
 	private List<Code> codes;
@@ -161,7 +162,7 @@ public class QueryUtil {
 		StringBuilder sb = new StringBuilder();
 		sb.append(text.replace("&amp;", "&"));
 
-		Matcher m = opening.matcher(sb.toString());
+		Matcher m = HTML_OPENING.matcher(sb.toString());
         while ( m.find() ) {
         	// Replace the HTML fake code by the coded text markers
         	int id = Util.strToInt(m.group(2), -1);
@@ -169,22 +170,22 @@ public class QueryUtil {
         		TextFragment.toChar(fragment.getIndex(id)));
         	sb.replace(m.start(), m.end(), markers);
         	// Search corresponding closing part
-        	int n = sb.toString().indexOf(CLOSING_CODE);
+        	int n = sb.toString().indexOf(HTML_CLOSING_CODE);
         	// Replace closing code by the coded text markers for closing
         	markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
         		TextFragment.toChar(fragment.getIndexForClosing(id)));
-        	sb.replace(n, n+CLOSING_CODE_LENGTH, markers);
-        	m = opening.matcher(sb.toString());
+        	sb.replace(n, n+HTML_CLOSING_CODE_LENGTH, markers);
+        	m = HTML_OPENING.matcher(sb.toString());
         }
         
-		m = isolated.matcher(sb.toString());
+		m = HTML_ISOLATED.matcher(sb.toString());
         while ( m.find() ) {
         	// Replace the HTML fake code by the coded text markers
         	int id = Util.strToInt(m.group(2), -1);
         	String markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
         		TextFragment.toChar(fragment.getIndex(id)));
         	sb.replace(m.start(), m.end(), markers);
-        	m = isolated.matcher(sb.toString());
+        	m = HTML_ISOLATED.matcher(sb.toString());
         }
 
 		return sb.toString();
@@ -199,6 +200,26 @@ public class QueryUtil {
 		if ( fragment == null ) return "";
 		fmt.setContent(fragment);
 		return fmt.toString();
+	}
+	
+	/**
+	 * Converts back an XLIFF text to a coded text.
+	 * @param text the XLIFF text to convert back.
+	 * @param fragment the original text fragment.
+	 * @return the coded text with its code markers.
+	 */
+	public String fromXLIFF (String text,
+		TextFragment fragment)
+	{
+		if ( Util.isEmpty(text) ) return "";
+		text = text.replace("&amp;", "&");
+		text = text.replace("&apos;", "'");
+		text = text.replace("&lt;", "<");
+		text = text.replace("&gt;", ">");
+		text = text.replace("&quot;", "\"");
+
+		//TODO: code conversion
+		return text;
 	}
 	
 }

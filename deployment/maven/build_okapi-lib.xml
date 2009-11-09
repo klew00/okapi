@@ -110,6 +110,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../filters/tmx/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../filters/ttx/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../filters/ts/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../filters/xliff/target/classes"

@@ -78,9 +78,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	public void reset () {
-		host = "http://ptsdemo.promt.ru/"; // "http://promtamericas.com/"; // http://ptsdemo.promt.ru/";
-		username = "pts-demo\\test2";
-		password = "test2";
+//		host = "promtamericas.com/";
+//		username = "pts-demo\\test2";
+//		password = "test2";
+		host = "ptsdemo.promt.ru/";
+		username = "";
+		password = "";
 	}
 
 	@Override

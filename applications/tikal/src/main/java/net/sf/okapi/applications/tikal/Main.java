@@ -492,6 +492,9 @@ public class Main {
 		extensionsMap.put(".csv", "okf_table_csv");
 		filtersMap.put("okf_table", "net.sf.okapi.filters.table.TableFilter");
 
+		extensionsMap.put(".ttx", "okf_ttx");
+		filtersMap.put("okf_ttx", "net.sf.okapi.filters.ttx.TTXFilter");
+
 		extensionsMap.put(".json", "okf_json");
 		filtersMap.put("okf_json", "net.sf.okapi.filters.json.JSONFilter");
 
