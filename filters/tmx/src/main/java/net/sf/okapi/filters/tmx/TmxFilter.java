@@ -235,7 +235,8 @@ public class TmxFilter implements IFilter {
 			
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+//     		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+// DWH an error message says Property org.codehaus.stax2.reportPrologWhitespace is not supported
 			
 			//fact.setXMLResolver(new DefaultXMLResolver());
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
