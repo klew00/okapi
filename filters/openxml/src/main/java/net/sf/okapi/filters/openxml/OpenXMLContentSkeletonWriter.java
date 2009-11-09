@@ -155,20 +155,20 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 			ch = text.charAt(i);
 			switch ( ch ) {
 			case TextFragment.MARKER_OPENING:
-				tmp = blankEnd(context,nSurroundingCodes,tmp);
+				tmp = addSurroundingCodes(tmp,true,context,nSurroundingCodes,false);
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				tmp.append(expandCodeContent(code, langToUse, context));
 				nSurroundingCodes++;
 				break;
 			case TextFragment.MARKER_CLOSING:
-				tmp = blankEnd(context,nSurroundingCodes,tmp);
+				tmp = addSurroundingCodes(tmp,true,context,nSurroundingCodes,false);
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				tmp.append(expandCodeContent(code, langToUse, context));
 				nSurroundingCodes--;
 				break;
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
-				tmp = blankEnd(context,nSurroundingCodes,tmp);
+				tmp = addSurroundingCodes(tmp,true,context,nSurroundingCodes,false);
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				if (code.getTagType()==TextFragment.TagType.OPENING)
 					nSurroundingCodes++;
@@ -177,6 +177,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				tmp.append(expandCodeContent(code, langToUse, context));
 				break;
 			default:
+				tmp = addSurroundingCodes(tmp,false,context,nSurroundingCodes,false);
 				if (!bInBlankText && (nSurroundingCodes<=0))
 				{
 					if (context==1) { // DWH 4-13-09 whole if
@@ -238,7 +239,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				break;
 			}
 		}
-		tmp = blankEnd(context,nSurroundingCodes,tmp);
+		tmp = addSurroundingCodes(tmp,true,context,nSurroundingCodes,false);
 		return tmp.toString();
 	}
 	/**
@@ -247,7 +248,24 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	 * @return context same as context variable in getContent in GenericSkeletonWriter
 	 * @param s string to be expanded
 	 */
-	private String encody(String s, int context)
+
+	private StringBuilder addSurroundingCodes(StringBuilder tmp, boolean end, int context, 
+									int nSurroundingCodes,	boolean preserve)
+	{
+		String sTheEnd = end ? "/" : "";
+		String sPreserve = preserve ? " xml:space=\"preserve\"" : "";
+	    boolean bBlankLook = end ? bInBlankText : !bInBlankText;
+		if (context==1 && bBlankLook && (nSurroundingCodes<=0))
+		{
+			bInBlankText = !end;
+			if (configurationType==MSWORD)
+				tmp.append(encody("<"+sTheEnd+"w:t"+sPreserve+"><"+sTheEnd+"w:r>",context));
+			else if (configurationType==MSPOWERPOINT)
+				tmp.append(encody("<"+sTheEnd+"a:t><"+sTheEnd+"a:r>",context));
+		}
+		return tmp;
+	}
+    private String encody(String s, int context)
 	{
 		return(s); // DWH 5-14-09 no encoding is necessary for tags
 /*
