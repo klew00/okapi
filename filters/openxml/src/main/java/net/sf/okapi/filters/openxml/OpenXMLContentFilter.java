@@ -1946,27 +1946,4 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			return tu;
 		}
 */
-
-	@Override
-	protected void preProcess(Segment segment) {
-		if (segment instanceof Tag) {
-			final Tag tag = (Tag) segment;
-			// We just hit a tag that could close the current TextUnit, but
-			// only if it was not opened with a TextUnit tag (i.e., complex
-			// TextUnits such as <p> etc.)
-			boolean inlineTag = false;
-			if (getEventBuilder().isInsideTextRun()
-					&& (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
-							|| tag.getTagType() == StartTagType.COMMENT || tag
-							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))
-				inlineTag = true;
-
-			if (getEventBuilder().isCurrentTextUnit()
-					&& !getEventBuilder().isCurrentComplexTextUnit()
-					&& !inlineTag) {
-				getEventBuilder().endTextUnit();
-			}
-		}
-	}
-	
-	}
+}

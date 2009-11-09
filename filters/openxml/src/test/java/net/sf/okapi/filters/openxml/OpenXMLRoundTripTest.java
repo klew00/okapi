@@ -84,8 +84,6 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("OpenXML_text_reference_v1_2.docx");
 		themfiles.add("Mauris.docx");
 		themfiles.add("Hidden.docx");
-		themfiles.add("TestDako2.docx");
-		themfiles.add("TextBoxes.docx");
 		themfiles.add("ExcelColors.xlsx");
 		themfiles.add("UTF8.docx");
 		themfiles.add("commentTable.xlsx");
@@ -93,6 +91,8 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("Endpara.pptx");
 		themfiles.add("Practice2.docx");
 		themfiles.add("OutOfTheTextBox.docx");
+		themfiles.add("TestDako2.docx");
+		themfiles.add("TextBoxes.docx");
 
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
