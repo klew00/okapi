@@ -7,7 +7,7 @@
 # PRESERVE_WHITESPACE turn on preserve whitespace.
 # SCRIPT Embedded scripting languatge - pass to another extractor
 # SERVER Embedded server language tags such as JSP, PHP, Mason etc.
-# ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY these rules list an attribute, not an element
+# ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTE_ID these rules list an attribute, not an element
 # ATTRIBUTES_ONLY only attribute is translatable or localizable 
 
 #********************************************************************************************* 
@@ -33,33 +33,59 @@
 
 collapse_whitespace: true
 
-# test read-only, writable attributes
-dummy: 
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [trans]  
-  writableLocalizableAttributes: [write]
-  readOnlyLocalizableAttributes: [readonly]
+# attributes that occur on many elements
+title:
+  ruleTypes: [ATTRIBUTE_TRANS]
+  allElementsExcept: [base, basefront, head, html, meta, param, script, title]
 
-# Group rules
+dir:
+  ruleTypes: [ATTRIBUTE_WRITABLE]
+  allElementsExcept: [base, basefront, head, html, meta, param, script]
+
+lang:
+  ruleTypes: [ATTRIBUTE_WRITABLE]
+  
+'xml:lang':
+  ruleTypes: [ATTRIBUTE_WRITABLE]
+    
+# only attributes are localizable or translatable - no PCDATA
+# ATTRIBUTES_ONLY with translatableAttributes implies the tag will be a TEXTUNIT
+# with embedded skeleton 
+meta:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: {content: [[http-equiv, EQUALS, keywords], [name, EQUALS, keywords], [name, EQUALS, description]]}
+  writableLocalizableAttributes: {content: [[http-equiv, EQUALS, content-language],[http-equiv, EQUALS, content-type]] }
+  readOnlyLocalizableAttributes: {content: [name, EQUALS, [generator, author, progid, date]]}
+  
+area:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [accesskey, area]
+  
+isindex:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [prompt]
+  
+legend:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [accesskey]
+
+option:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [label, value]
+  
+optgroup:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [label]
+  
+th:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [abbr]
+
+# Group rules: only Groups which may be embedded within a TextUnit.
 dl:
   ruleTypes: [GROUP]
 
-div:
-  ruleTypes: [GROUP]
-    
-form:
-  ruleTypes: [GROUP]
-  
 menu:
-  ruleTypes: [GROUP]
-
-noembed:
-  ruleTypes: [GROUP]
-
-noframes:
-  ruleTypes: [GROUP]
-
-noscript:
   ruleTypes: [GROUP]
 
 ol:
@@ -89,117 +115,90 @@ tr:
 
 ul:
   ruleTypes: [GROUP]
-                         
+                          
 # complex TextUnit rules
 address:
-  ruleTypes: [TEXTUNIT]  
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]  
 
 dd:
   ruleTypes: [TEXTUNIT]  
-
+  idAttributes: [id]
+  
 dt:
   ruleTypes: [TEXTUNIT]  
-
+  idAttributes: [id]
+  
 fieldset:
   ruleTypes: [TEXTUNIT]
-  
+  idAttributes: [id]
+    
 h1:
   ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
   
 h2:
   ruleTypes: [TEXTUNIT]
-
+  idAttributes: [id]
+  
 h3:
   ruleTypes: [TEXTUNIT]
-
+  idAttributes: [id]
+  
 h4:
   ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
 
 h5:
   ruleTypes: [TEXTUNIT]
-
+  idAttributes: [id]
+  
 h6:
   ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
 
 legend:
   ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
 
 li:
   ruleTypes: [TEXTUNIT]
   translatableAttributes: [value] 
+  idAttributes: [id]
 
 listing:
   ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
 
 marquee:
   ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
 
 p:
   ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+  elementType: paragraph
   
 pre:
   ruleTypes: [TEXTUNIT, PRESERVE_WHITESPACE]
+  idAttributes: [id]
 
 object:
   ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
 
 td:
   ruleTypes: [TEXTUNIT]
   translatableAttributes: [abbr]
+  idAttributes: [id]
 
 th:
   ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
 
 xml:
   ruleTypes: [TEXTUNIT]
-      
-# attributes that occur on many elements
-title:
-  ruleTypes: [ATTRIBUTE_TRANS]
-  allElementsExcept: [base, basefront, head, html, meta, param, script, title]
-
-dir:
-  ruleTypes: [ATTRIBUTE_WRITABLE]
-  allElementsExcept: [base, basefront, head, html, meta, param, script]
-
-lang:
-  ruleTypes: [ATTRIBUTE_WRITABLE]
-  
-'xml:lang':
-  ruleTypes: [ATTRIBUTE_WRITABLE]
-
-# only attributes are localizable or translatable - no PCDATA
-# ATTRIBUTES_ONLY with translatableAttributes implies the tag will be a TEXTUNIT
-# with embedded skeketon 
-meta:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: {content: [[http-equiv, EQUALS, keywords], [name, EQUALS, keywords], [name, EQUALS, description]]}
-  writableLocalizableAttributes: {content: [[http-equiv, EQUALS, content-language],[http-equiv, EQUALS, content-type]] }
-  readOnlyLocalizableAttributes: {content: [name, EQUALS, [generator, author, progid, date]]}
-    
-area:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [accesskey, area]
-  
-isindex:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [prompt]
-  
-legend:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [accesskey]
-
-option:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [label, value]
-  
-optgroup:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [label]
-  
-th:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [abbr]
+  idAttributes: [id]      
 
 # inline tags
 a:
@@ -227,7 +226,7 @@ acronym:
 b:
   ruleTypes: [INLINE]
   elementType: bold
-    
+  
 bdo:
   ruleTypes: [INLINE]
 
@@ -299,6 +298,10 @@ label:
   ruleTypes: [INLINE]
   translatableAttributes: [accesskey]
  
+li:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [value]
+
 map:
   ruleTypes: [INLINE]
 
@@ -349,6 +352,10 @@ sup:
 symbol:
   ruleTypes: [INLINE]
  
+table:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [summary]
+ 
 textarea:
   ruleTypes: [INLINE]
   translatableAttributes: [accesskey]
@@ -356,10 +363,14 @@ textarea:
 tt:
   ruleTypes: [INLINE]
  
+td:
+  ruleTypes: [ATTRIBUTES_ONLY]
+  translatableAttributes: [abbr]
+ 
 u:
   ruleTypes: [INLINE]
   elementType: underlined
-  
+
 var:
   ruleTypes: [INLINE]
  
@@ -405,4 +416,3 @@ stylesheet:
 # javascript etc.
 script:
   ruleTypes: [EXCLUDE]
-
