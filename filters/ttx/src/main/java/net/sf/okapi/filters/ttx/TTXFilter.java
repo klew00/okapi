@@ -76,6 +76,7 @@ public class TTXFilter implements IFilter {
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private String trgLangCode;
+	private String trgDefFont;
 	private LinkedList<Event> queue;
 	private boolean canceled;
 	private GenericSkeleton skel;
@@ -89,6 +90,7 @@ public class TTXFilter implements IFilter {
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	private StringBuilder buffer;
+	private boolean useDF;
 	
 	public TTXFilter () {
 		params = new Parameters();
@@ -129,7 +131,7 @@ public class TTXFilter implements IFilter {
 			MimeTypeMapper.TTX_MIME_TYPE,
 			getClass().getName(),
 			"TTX",
-			"Configuration for Trados Translation eXchange (TTX) documents."));
+			"Configuration for Trados TTX documents."));
 		return list;
 	}
 	
@@ -222,6 +224,15 @@ public class TTXFilter implements IFilter {
 			hasNext = true;
 			queue = new LinkedList<Event>();
 			buffer = new StringBuilder();
+			trgDefFont = null;
+			
+			useDF = false;
+			// By default, for now, use DF for CJK only
+			if ( trgLoc.sameLanguageAs("ko")
+				|| trgLoc.sameLanguageAs("zh")
+				|| trgLoc.sameLanguageAs("ja") ) {
+				useDF = true;
+			}
 			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
@@ -393,7 +404,12 @@ public class TTXFilter implements IFilter {
 				 trgLangCode = tmp;
 			 }
 		}
-		
+
+		trgDefFont = reader.getAttributeValue("", "TargetDefaultFont");
+		if ( Util.isEmpty(trgDefFont) ) {
+			trgDefFont = "Arial"; // Default
+		}
+
 		storeStartElement();
 	}
 	
@@ -542,7 +558,16 @@ public class TTXFilter implements IFilter {
 		//Else: this trans-unit has no target, we add it here in the skeleton
 		// so we can merge target data in it when writing out the skeleton
 		skel.append(String.format("<Tuv Lang=\"%s\">", trgLangCode));
+		
+		// target placeholder, with optional df around it if requested
+		if ( useDF ) {
+			skel.append(String.format("<df Font=\"%s\">", trgDefFont));
+		}
 		skel.addContentPlaceholder(tu, trgLoc);
+		if ( useDF ) {
+			skel.append("</df>");
+		}
+
 		skel.append("</Tuv>");
 		targetDone = true;
 	}

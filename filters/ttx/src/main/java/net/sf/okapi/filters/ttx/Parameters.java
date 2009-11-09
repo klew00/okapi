@@ -27,52 +27,13 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	private boolean fallbackToID;
 	private boolean escapeGT;
-	private boolean addTargetLanguage;
-	// Not used for now
-	private boolean useStateValues;
-	private boolean extractOnlyMatchingValues;
-	private String stateValues;
-	private boolean extractNoState;
 
 	public Parameters () {
 		reset();
 		toString(); // fill the list
 	}
 	
-	public boolean getUseStateValues () {
-		return useStateValues;
-	}
-
-	public void setUseStateValues (boolean useStateValues) {
-		this.useStateValues = useStateValues;
-	}
-
-	public boolean getExtractOnlyMatchingValues () {
-		return extractOnlyMatchingValues;
-	}
-
-	public void setExtractOnlyMatchingValues (boolean extractOnlyMatchingValues) {
-		this.extractOnlyMatchingValues = extractOnlyMatchingValues;
-	}
-
-	public String getStateValues () {
-		return stateValues;
-	}
-
-	public void setStateValues (String stateValues) {
-		this.stateValues = stateValues;
-	}
-
-	public boolean getExtractNoState () {
-		return extractNoState;
-	}
-
-	public void setExtractNoState (boolean extractNoState) {
-		this.extractNoState = extractNoState;
-	}
-
 	public boolean getEscapeGT () {
 		return escapeGT;
 	}
@@ -81,72 +42,33 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.escapeGT = escapeGT;
 	}
 
-	public boolean getFallbackToID() {
-		return fallbackToID;
-	}
-
-	public void setFallbackToID(boolean fallbackToID) {
-		this.fallbackToID = fallbackToID;
-	}
-
-	public boolean getAddTargetLanguage () {
-		return addTargetLanguage;
-	}
-
-	public void setAddTargetLanguage (boolean addTargetLanguage) {
-		this.addTargetLanguage = addTargetLanguage;
-	}
-
 	public void reset () {
-		useStateValues = true;
-		stateValues = "new|needs-translation";
-		extractOnlyMatchingValues = true;
-		extractNoState = true;
-		fallbackToID = false;
-		escapeGT = false;
-		addTargetLanguage = true;
+		escapeGT = true;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		useStateValues = buffer.getBoolean("useStateValues", useStateValues);
-		extractOnlyMatchingValues = buffer.getBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		stateValues = buffer.getString("stateValues", stateValues);
-		extractNoState = buffer.getBoolean("extractNoState", extractNoState);
-		fallbackToID = buffer.getBoolean("fallbackToID", fallbackToID);
 		escapeGT = buffer.getBoolean("escapeGT", escapeGT);
-		addTargetLanguage = buffer.getBoolean("addTargetLanguage", addTargetLanguage);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean("useStateValues", useStateValues);
-		buffer.setBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		buffer.setString("stateValues", stateValues);
-		buffer.setBoolean("extractNoState", extractNoState);
-		
-		buffer.setBoolean("fallbackToID", fallbackToID);
 		buffer.setBoolean("escapeGT", escapeGT);
-		buffer.setBoolean("addTargetLanguage", addTargetLanguage);
 		return buffer.toString();
 	}
 	
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("fallbackToID", "Use the trans-unit id attribute for the text unit name if there is no resname", null);
 		desc.add("escapeGT", "Escape the greater-than characters", null);
-		desc.add("addTargetLanguage", "Add the target-language attribute if not present", null);
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
-		EditorDescription desc = new EditorDescription("XLIFF Filter Parameters", true, false);
-		desc.addCheckboxPart(paramDesc.get("fallbackToID"));
+		EditorDescription desc = new EditorDescription("TTX Filter Parameters", true, false);
 		desc.addCheckboxPart(paramDesc.get("escapeGT"));
-		desc.addCheckboxPart(paramDesc.get("addTargetLanguage"));
 		return desc;
 	}
 

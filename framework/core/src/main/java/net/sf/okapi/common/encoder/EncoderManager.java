@@ -56,6 +56,7 @@ public class EncoderManager implements IEncoder {
 		mimeMap.put(MimeTypeMapper.DTD_MIME_TYPE, "net.sf.okapi.common.encoder.DTDEncoder");
 		mimeMap.put(MimeTypeMapper.TS_MIME_TYPE, "net.sf.okapi.common.encoder.TSEncoder");		
 		mimeMap.put(MimeTypeMapper.PHP_MIME_TYPE, "net.sf.okapi.common.encoder.PHPContentEncoder");		
+		mimeMap.put(MimeTypeMapper.TTX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
 	}
 
 	/**

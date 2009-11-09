@@ -53,11 +53,18 @@ public class TTXFilterTest {
 	private String root;
 	private LocaleId locENUS = LocaleId.fromString("en");
 	private LocaleId locESEM = LocaleId.fromString("es-em");
+	private LocaleId locKOKR = LocaleId.fromString("ko-kr");
 	
 	private static final String STARTFILE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		+ "<TRADOStag Version=\"2.0\"><FrontMatter>\n"
 		+ "<ToolSettings CreationDate=\"20070508T094743Z\" CreationTool=\"TRADOS TagEditor\" CreationToolVersion=\"7.0.0.615\"></ToolSettings>\n"
 		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"ES-EM\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"
+		+ "</FrontMatter><Body><Raw>\n";
+
+	private static final String STARTFILEKO = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		+ "<TRADOStag Version=\"2.0\"><FrontMatter>\n"
+		+ "<ToolSettings CreationDate=\"20070508T094743Z\" CreationTool=\"TRADOS TagEditor\" CreationToolVersion=\"7.0.0.615\"></ToolSettings>\n"
+		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"KO-KR\" TargetDefaultFont=\"\ubd7e\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"
 		+ "</FrontMatter><Body><Raw>\n";
 
 	@Before
@@ -75,7 +82,7 @@ public class TTXFilterTest {
 			+ "<Tuv Lang=\"ES-EM\">text es</Tuv>"
 			+ "</Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("text en", cont.toString());
@@ -89,13 +96,13 @@ public class TTXFilterTest {
 			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 es</Tuv></Tu>"
 			+ "  <Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 es</Tuv></Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("text1 en", cont.toString());
 		cont = tu.getTarget(locESEM);
 		assertEquals("text1 es", cont.toString());
-		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 2);
 		assertNotNull(tu);
 		cont = tu.getSource();
 		assertEquals("text2 en", cont.toString());
@@ -111,7 +118,7 @@ public class TTXFilterTest {
 			+ "<Tuv Lang=\"ES-EM\">TEXT <ut DisplayText=\"br\">&lt;br/&gt;</ut>ES <ut Type=\"start\">&lt;b></ut>BOLD<ut Type=\"end\">&lt;/b></ut>.</Tuv>"
 			+ "</Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("text <br/>en <b>bold</b>.", cont.toString());
@@ -135,7 +142,7 @@ public class TTXFilterTest {
 			+ "<Tuv Lang=\"ES-EM\">text es</Tuv>"
 			+ "</Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locESEM));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM));
 	}
 	
 	@Test
@@ -150,7 +157,7 @@ public class TTXFilterTest {
 			+ "  <ut Style=\"external\">some code</ut>  "
 			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 es</Tuv></Tu>\n"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locESEM));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM));
 	}
 	
 	@Test
@@ -165,7 +172,22 @@ public class TTXFilterTest {
 			+ "  <ut Style=\"external\">some code</ut>  "
 			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 en</Tuv></Tu>\n"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locESEM));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM));
+	}
+
+	@Test
+	public void testOutputWithOriginalWithoutTragetKO () {
+		String snippet = STARTFILEKO
+			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv></Tu>\n"
+			+ "  <ut Style=\"external\">some code</ut>  "
+			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv></Tu>\n"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILEKO
+			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"KO-KR\"><df Font=\"\ubd7e\">text1 en</df></Tuv></Tu>\n"
+			+ "  <ut Style=\"external\">some code</ut>  "
+			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"KO-KR\"><df Font=\"\ubd7e\">text2 en</df></Tuv></Tu>\n"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locKOKR), locKOKR));
 	}
 	
 //	@Test
@@ -177,9 +199,9 @@ public class TTXFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locESEM));
 	}
 
-	private ArrayList<Event> getEvents(String snippet) {
+	private ArrayList<Event> getEvents(String snippet, LocaleId trgLocId) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, locENUS, locESEM));
+		filter.open(new RawDocument(snippet, locENUS, trgLocId));
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			list.add(event);
