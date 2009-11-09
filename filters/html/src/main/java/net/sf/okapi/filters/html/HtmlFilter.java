@@ -1,22 +1,15 @@
-/*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
------------------------------------------------------------------------------
-  This library is free software; you can redistribute it and/or modify it 
-  under the terms of the GNU Lesser General Public License as published by 
-  the Free Software Foundation; either version 2.1 of the License, or (at 
-  your option) any later version.
-
-  This library is distributed in the hope that it will be useful, but 
-  WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
-  General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License 
-  along with this library; if not, write to the Free Software Foundation, 
-  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-===========================================================================*/
+/*
+ * =========================================================================== Copyright (C) 2008-2009 by the Okapi
+ * Framework contributors ----------------------------------------------------------------------------- This library is
+ * free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details. You should have received a copy of the GNU Lesser General Public License along with this library; if not,
+ * write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA See also the full
+ * LGPL text here: http://www.gnu.org/copyleft/lesser.html
+ * ===========================================================================
+ */
 
 package net.sf.okapi.filters.html;
 
@@ -64,10 +57,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		setParameters(new Parameters());
 		setName("okf_html"); //$NON-NLS-1$
 		setDisplayName("HTML/XHTML Filter"); //$NON-NLS-1$
-		addConfiguration(new FilterConfiguration(getName(), 
-				MimeTypeMapper.HTML_MIME_TYPE, 
-				getClass().getName(),
-				"HTML/XHTML", "HTML and XHTML documents",   //$NON-NLS-1$//$NON-NLS-2$
+		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.HTML_MIME_TYPE, getClass().getName(),
+				"HTML/XHTML", "HTML and XHTML documents", //$NON-NLS-1$//$NON-NLS-2$
 				Parameters.getDefualtParameterFile()));
 	}
 
@@ -111,6 +102,22 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		// reset buffer for next pass
 		bufferedWhitespace.setLength(0);
 		bufferedWhitespace.trimToSize();
+
+		if (segment instanceof Tag) {
+			// We just hit a tag that could close the current TextUnit, but
+			// only if it was not opened with a TextUnit tag (i.e., complex
+			// TextUnits such as <p> etc.)
+			final Tag tag = (Tag) segment;
+			boolean inlineTag = false;
+			if (getEventBuilder().isInsideTextRun()
+					&& (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
+							|| tag.getTagType() == StartTagType.COMMENT || tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))
+				inlineTag = true;
+
+			if (getEventBuilder().isCurrentTextUnit() && !getEventBuilder().isCurrentComplexTextUnit() && !inlineTag) {
+				getEventBuilder().endTextUnit();
+			}
+		}
 	}
 
 	@Override
@@ -210,8 +217,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	}
 
 	/*
-	 * catch tags which are not listed in the config but have attributes that
-	 * require processing
+	 * catch tags which are not listed in the config but have attributes that require processing
 	 */
 	private void handleAttributesThatAppearAnywhere(List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
 			StartTag tag) {
@@ -308,9 +314,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleComment(net.
-	 * htmlparser.jericho.Tag)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleComment(net. htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleComment(Tag tag) {
@@ -323,12 +327,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * 
-	 * 
-	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleDocTypeDeclaration
-	 * (net.htmlparser.jericho.Tag)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleDocTypeDeclaration (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleDocTypeDeclaration(Tag tag) {
@@ -337,10 +336,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleMarkupDeclaration
-	 * (net.htmlparser.jericho.Tag)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleMarkupDeclaration (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleMarkupDeclaration(Tag tag) {
@@ -349,12 +345,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * 
-	 * 
-	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleProcessingInstruction
-	 * (net.htmlparser.jericho.Tag)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleProcessingInstruction (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleProcessingInstruction(Tag tag) {
@@ -367,10 +358,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommon(
-	 * net.htmlparser.jericho.Tag)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommon( net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleServerCommon(Tag tag) {
@@ -379,12 +367,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * 
-	 * 
-	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommonEscaped
-	 * (net.htmlparser.jericho.Tag)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleServerCommonEscaped (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleServerCommonEscaped(Tag tag) {
@@ -393,10 +376,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleXmlDeclaration
-	 * (net.htmlparser.jericho.Tag)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#handleXmlDeclaration (net.htmlparser.jericho.Tag)
 	 */
 	@Override
 	protected void handleXmlDeclaration(Tag tag) {
@@ -479,10 +459,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#normalizeName(java.
-	 * lang.String)
+	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#normalizeName(java. lang.String)
 	 */
 	@Override
 	protected String normalizeAttributeName(String attrName, String attrValue, Tag tag) {
@@ -535,10 +512,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common
-	 * .IParameters)
+	 * @see net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common .IParameters)
 	 */
 	public void setParameters(IParameters params) {
 		this.parameters = (Parameters) params;
@@ -546,7 +520,6 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
 	 */
 	public IParameters getParameters() {

@@ -141,9 +141,16 @@ public class HtmlConfigurationTest {
 		assertEquals(rules.getElementType("i"), "italic");
 		assertEquals(rules.getElementType("u"), "underlined");
 		assertEquals(rules.getElementType("img"), "image");
-		assertEquals(rules.getElementType("a"), "link");
-		assertEquals(rules.getElementType("p"), "paragraph");
+		assertEquals(rules.getElementType("a"), "link");		
 		assertEquals(rules.getElementType("x"), "x");
+	}
+	
+	@Test
+	public void textUnitCodeTypes() {
+		URL url = HtmlFilter.class
+				.getResource("/net/sf/okapi/filters/html/maximalistConfiguration.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		assertEquals(rules.getElementType("p"), "paragraph");	
 	}
 
 	@Test
@@ -203,7 +210,7 @@ public class HtmlConfigurationTest {
 	@Test
 	public void attributeID() {
 		URL url = HtmlFilter.class
-				.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
+				.getResource("/net/sf/okapi/filters/html/maximalistConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 
 		Map<String, String> attributes = new HashMap<String, String>();
