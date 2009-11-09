@@ -32,7 +32,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
  * 
  */
 public class Parameters extends BaseParameters {
-	private static final String DEFAULT_PARAMETERS = "defaultConfiguration.yml";
+	private static final String DEFAULT_PARAMETERS = "nonwellformedConfiguration.yml";
 
 	public static String getDefualtParameterFile() {
 		return DEFAULT_PARAMETERS;

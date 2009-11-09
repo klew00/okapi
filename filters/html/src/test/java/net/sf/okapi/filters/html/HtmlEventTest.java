@@ -48,7 +48,7 @@ public class HtmlEventTest {
 	@Test
 	public void testWithDefaultConfig() {
 		URL originalParameters = parameters;
-		parameters = HtmlFilter.class.getResource("defaultConfiguration.yml");
+		parameters = HtmlFilter.class.getResource("nonwellformedConfiguration.yml");
 		
 		testMetaTagContent();
 		testLang();
@@ -62,7 +62,7 @@ public class HtmlEventTest {
 	@Test
 	public void testHtmlKeywordsNotExtracted() {
 		URL originalParameters = parameters;
-		parameters = HtmlFilter.class.getResource("defaultConfiguration.yml");
+		parameters = HtmlFilter.class.getResource("nonwellformedConfiguration.yml");
 		
 		String snippet = "<meta http-equiv=\"keywords\" content=\"keyword text\"/>";
 		ArrayList<Event> events = new ArrayList<Event>();
@@ -306,7 +306,7 @@ public class HtmlEventTest {
 	@Test
 	public void testPWithComment() {
 		URL originalParameters = parameters;
-		parameters = HtmlFilter.class.getResource("minimalistConfiguration.yml");
+		parameters = HtmlFilter.class.getResource("nonwellformedConfiguration.yml");
 		
 		String snippet = "<p>Before <!--comment--> after.</p>";
 		ArrayList<Event> events = new ArrayList<Event>();
@@ -331,7 +331,7 @@ public class HtmlEventTest {
 	@Test
 	public void testPWithProcessingInstruction() {
 		URL originalParameters = parameters;
-		parameters = HtmlFilter.class.getResource("minimalistConfiguration.yml");
+		parameters = HtmlFilter.class.getResource("nonwellformedConfiguration.yml");
 
 		String snippet = "<p>Before <?PI?> after.</p>";
 		ArrayList<Event> events = new ArrayList<Event>();
