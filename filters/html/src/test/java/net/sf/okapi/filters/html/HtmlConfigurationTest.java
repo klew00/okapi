@@ -50,8 +50,7 @@ public class HtmlConfigurationTest {
 				TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
 		assertEquals(rules.getMainRuleType("script"),
 				TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
-		assertEquals(rules.getMainRuleType("pre"),
-				TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
+		assertTrue(rules.isRuleType("pre", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 		assertEquals(rules.getMainRuleType("meta"),
 				TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
 	}
@@ -94,8 +93,7 @@ public class HtmlConfigurationTest {
 				.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 
-		assertEquals(rules.getMainRuleType("pre"),
-				TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE);
+		assertTrue(rules.isRuleType("pre", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 		assertEquals(rules.getMainRuleType("style"),
 				TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
 		assertTrue(rules.isRuleType("pre",
@@ -144,7 +142,7 @@ public class HtmlConfigurationTest {
 		assertEquals(rules.getElementType("u"), "underlined");
 		assertEquals(rules.getElementType("img"), "image");
 		assertEquals(rules.getElementType("a"), "link");
-		//assertEquals(rules.getElementType("p"), "paragraph");
+		assertEquals(rules.getElementType("p"), "paragraph");
 		assertEquals(rules.getElementType("x"), "x");
 	}
 
@@ -202,7 +200,7 @@ public class HtmlConfigurationTest {
 		assertTrue(rules.isTranslatableAttribute("input", "title", attributes));
 	}
 
-	//@Test
+	@Test
 	public void attributeID() {
 		URL url = HtmlFilter.class
 				.getResource("/net/sf/okapi/filters/html/defaultConfiguration.yml");
