@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.7.0
+Created-By: 11.3-b02-83 (Apple Inc.)
+Built-By: reden
+Implementation-Title: GNU Trove for Java
+Implementation-Version: 2.1.0
+Implementation-URL: http://trove4j.sourceforge.net/
+Sealed: false
+Bundle-Vendor: reden
+Bundle-Classpath: .
+Bundle-Version: 2.1.0
+Bundle-Name: GNU Trove for Java
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: gnu.trove
+Export-Package: gnu.trove,gnu.trove.decorator
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+
+

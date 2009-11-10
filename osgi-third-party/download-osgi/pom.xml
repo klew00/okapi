@@ -42,11 +42,11 @@
     </build>
 
     <dependencies>
-        <dependency>
+        <!-- Using customized apache service mix stax-api<dependency>
             <groupId>javax.xml.stream</groupId>
             <artifactId>com.springsource.javax.xml.stream</artifactId>
             <version>1.0.1</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>com.springsource.slf4j.api</artifactId>
@@ -76,6 +76,6 @@
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>com.springsource.com.ctc.wstx</artifactId>
             <version>3.2.8</version>
-        </dependency>        
+        </dependency>
     </dependencies>
 </project>

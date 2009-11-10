@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>net.sf.okapi.osgi</groupId>
+        <artifactId>osgi-helper</artifactId>
+        <version>0.4-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <OriginalGroupId>gnu.trove</OriginalGroupId>
+        <OriginalArtifactId>trov4j</OriginalArtifactId>
+        <OriginalVersion>2.1.0</OriginalVersion>
+    </properties>
+    <name>OSGI Trov4J</name>
+
+    <groupId>osgi.${OriginalGroupId}</groupId>
+    <artifactId>${OriginalArtifactId}</artifactId>
+    <version>${OriginalVersion}</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>${OriginalGroupId}</groupId>
+            <artifactId>${OriginalArtifactId}</artifactId>
+            <version>${OriginalVersion}</version>
+        </dependency>       
+    </dependencies>
+
+</project>
