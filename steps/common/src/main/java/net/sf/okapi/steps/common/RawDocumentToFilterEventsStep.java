@@ -70,7 +70,7 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 
 	// This is redundant with the other parameters
 	// So it is not part of the 'published' parameters, but remain
-	// accessible to manula coder
+	// accessible to manual coder
 	public void setFilter (IFilter filter) {
 		filterfromSetFilter = true;
 		this.filter = filter;
@@ -124,7 +124,7 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 			}
 			isDone = false;
 			// Open the document
-			filter.open((RawDocument) event.getResource());
+			filter.open((RawDocument)event.getResource());
 			// Return the first event from the filter
 			return filter.next();
 		}
