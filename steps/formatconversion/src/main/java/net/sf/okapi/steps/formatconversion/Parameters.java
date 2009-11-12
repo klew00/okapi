@@ -22,8 +22,13 @@ package net.sf.okapi.steps.formatconversion;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.ListSelectionPart;
+import net.sf.okapi.common.uidescription.PathInputPart;
 
-public class Parameters extends BaseParameters {
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	public static final String FORMAT_TMX = "tmx";
 	public static final String FORMAT_PO = "po";
@@ -157,21 +162,21 @@ public class Parameters extends BaseParameters {
 		return desc;
 	}
 
-//	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
-//		EditorDescription desc = new EditorDescription("Format Conversion", true, false);
-//
-//		String[] choices = {FORMAT_PO, FORMAT_TMX, FORMAT_TABLE, FORMAT_PENSIEVE};
-//		String[] choicesLabels = {"PO File", "TMX Document", "Tab-Delimited Table", "Pensieve TM"};
-//		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTFORMAT), choices);
-//		lsp.setChoicesLabels(choicesLabels);
-//		
-//		desc.addCheckboxPart(paramDesc.get(USEGENERICCODES));
-//
-//		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(SINGLEOUTPUT));
-//		PathInputPart pip = desc.addPathInputPart(paramDesc.get(OUTPUTPATH), "Output File", true);
-//		pip.setMasterPart(cbp, true);
-//		
-//		return desc;
-//	}
+	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("Format Conversion", true, false);
+
+		String[] choices = {FORMAT_PO, FORMAT_TMX, FORMAT_TABLE, FORMAT_PENSIEVE};
+		String[] choicesLabels = {"PO File", "TMX Document", "Tab-Delimited Table", "Pensieve TM"};
+		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTFORMAT), choices);
+		lsp.setChoicesLabels(choicesLabels);
+		
+		desc.addCheckboxPart(paramDesc.get(USEGENERICCODES));
+
+		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(SINGLEOUTPUT));
+		PathInputPart pip = desc.addPathInputPart(paramDesc.get(OUTPUTPATH), "Output File", true);
+		pip.setMasterPart(cbp, true);
+		
+		return desc;
+	}
 
 }

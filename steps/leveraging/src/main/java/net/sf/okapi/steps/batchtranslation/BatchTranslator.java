@@ -31,14 +31,21 @@ import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.QueryUtil;
+import net.sf.okapi.tm.pensieve.common.PensieveUtil;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.writer.ITmWriter;
+import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 public class BatchTranslator {
 
@@ -49,6 +56,9 @@ public class BatchTranslator {
 	private File htmlSourceFile;
 	private File htmlTargetFile;
 	private Parameters params;
+	private ITmWriter tmWriter;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	
 	public BatchTranslator (IFilterConfigurationMapper fcMapper,
 		Parameters params)
@@ -66,6 +76,9 @@ public class BatchTranslator {
 		String filterConfigId)
 	{
 		rawDoc = rd;
+		srcLoc = rawDoc.getSourceLocale();
+		trgLoc = rawDoc.getTargetLocale();
+		
 		filter = fcMapper.createFilter(filterConfigId, filter);
 		if ( filter == null ) {
 			throw new RuntimeException("Unsupported filter type.");
@@ -103,17 +116,17 @@ public class BatchTranslator {
 			// Process
 			Event event;
 			int subDocId = 0;
+			int currentSubDocId = 0;
 			
 			while ( filter.hasNext() ) {
 				event = filter.next();
 				switch ( event.getEventType() ) {
 				case START_SUBDOCUMENT:
-					subDocId++;
-					htmlWriter.writeStartElement("div");
+					currentSubDocId = ++subDocId;
 					break;
 					
 				case END_SUBDOCUMENT:
-					htmlWriter.writeEndElement(); // div
+					currentSubDocId = 0; // Top-level
 					break;
 					
 				case TEXT_UNIT:
@@ -125,7 +138,7 @@ public class BatchTranslator {
 					}
 					else {
 						htmlWriter.writeStartElement("p");
-						htmlWriter.writeAttributeString("id", String.format("%d:%s", subDocId, tu.getId()));
+						htmlWriter.writeAttributeString("id", String.format("%d:%s:", currentSubDocId, tu.getId()));
 						htmlWriter.writeRawXML(qutil.toCodedHTML(tc.getContent()));
 						htmlWriter.writeEndElement(); // p
 					}
@@ -176,25 +189,109 @@ public class BatchTranslator {
 	
 	private void retrieveTranslation () {
 		Source html = null;
+		tmWriter = null;
 		try {
+			// Open the TM if needed
+			if ( params.getMakeTM() ) {
+				String tmDir = params.getTmDirectory();
+				Util.createDirectories(tmDir+File.separator);
+				//TODO: Move this check at the pensieve package level
+				File file = new File(tmDir+File.separator+"segments.gen");
+				// Create a new index only if one does not exists yet
+				// If one exists we pass false to append to it
+				tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, !file.exists());
+			}
+			
+			// Open the original document
+			filter.open(rawDoc);
+
 			// Open the translated file
 			html = new Source(htmlTargetFile.toURI().toURL());
 			html.fullSequentialParse();
-			
-			// Process
+			// Get the elements
 			List<Element> paragraphs = html.getAllElements(HTMLElementName.P);
+
+			// Process
+			// The element should be in the same order as the event of the original file
+			int subDocId = 0;
+			int currentSubDocId = 0;
+			TextUnit tu = null;
+			
 			for ( Element elem : paragraphs ) {
 				String id = elem.getAttributeValue("id");
 				if ( id == null ) continue; // No id means we can't match
+				// Decompose the html id in its sub-doc, tu and seg parts
+				String parts[] = id.split(":", -1);
+				int htmlSubDocId = Integer.valueOf(parts[0]);
+				String htmlTuId = parts[1];
+				String htmlSegId = parts[2];
 				
-				//Segment seg = elem.getContent();
-				System.out.println(elem.getContent().toString());
+				// Look for the source
+				Event event;
+				boolean found = false;
+				while ( filter.hasNext() ) {
+					event = filter.next();
+					switch ( event.getEventType() ) {
+					case START_SUBDOCUMENT:
+						currentSubDocId = ++subDocId;
+						continue; // Keep looking for next text unit
+					case END_SUBDOCUMENT:
+						currentSubDocId = 0; // Top-level
+						continue; // Keep looking for next text unit
+					case TEXT_UNIT:
+						tu = (TextUnit)event.getResource();
+						if ( !tu.isTranslatable() ) continue;
+						if (( htmlSubDocId == currentSubDocId ) && htmlTuId.equals(tu.getId()) ) {
+							found = true;
+						}
+						// In all case we break here, as the first TU should be the good one
+						// If it is not, we are not synchronized anymore.
+						break;
+					default:
+						continue; // Skip other events
+					}
+					
+					// Things are not synchronized any more
+					if ( found ) {
+						TextFragment frag = tu.getSourceContent();
+						String ctext = qutil.fromCodedHTML(elem.getContent().toString(), frag);
+						tu.setTargetContent(trgLoc, new TextFragment(ctext, frag.getCodes()));
+						
+						if ( tmWriter != null ) {
+							tmWriter.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(
+								srcLoc, trgLoc, tu));							
+						}
+//						
+//						System.out.println("");
+//						System.out.println("SRC="+tu.getSource().toString());
+//						System.out.println("TRG="+tu.getTarget(trgLoc).toString());
+					}
+					else {
+						// Error
+					}
+					
+					// In all cases we leave this loop
+					break; 
+				}
+				
+				if ( !found ) {
+					break; // No need to continue
+				}
 			}
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException("Error reading the translations.");
 		}
 		finally {
+			if ( tmWriter != null ) {
+				try {
+					tmWriter.endIndex();
+				}
+				catch ( IOException e ) {
+					// Ignore this error
+				}
+			}
+			if ( filter != null ) filter.close();
 			if ( html != null ) html.clearCache();
 			htmlTargetFile.deleteOnExit();
 		}

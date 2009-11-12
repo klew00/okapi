@@ -21,13 +21,20 @@
 package net.sf.okapi.lib.translation;
 
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
  * Collection of helper method for preparing and querying translation resources.
@@ -37,8 +44,10 @@ public class QueryUtil {
 	private static final String HTML_CLOSING_CODE = "</s>";
 	private static final int HTML_CLOSING_CODE_LENGTH = HTML_CLOSING_CODE.length();
 	
-	private static final Pattern HTML_OPENING = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>");
-	private static final Pattern HTML_ISOLATED = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
+	private static final Pattern HTML_OPENING = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>", Pattern.CASE_INSENSITIVE);
+	private static final Pattern HTML_ISOLATED = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>", Pattern.CASE_INSENSITIVE);
+
+	private static final Pattern HTML_SPAN = Pattern.compile("\\<span\\s(.*?)>|\\</span>", Pattern.CASE_INSENSITIVE);
 
 	private StringBuilder codesMarkers;
 	private List<Code> codes;
@@ -188,6 +197,14 @@ public class QueryUtil {
         	m = HTML_ISOLATED.matcher(sb.toString());
         }
 
+        // Remove any span elements that may have been added
+        // (some MT engines mark up their output with extra info)
+        m = HTML_SPAN.matcher(sb.toString());
+        while ( m.find() ) {
+        	sb.replace(m.start(), m.end(), "");
+        	m = HTML_SPAN.matcher(sb.toString());
+        }
+        
 		return sb.toString();
 	}
 
@@ -212,14 +229,85 @@ public class QueryUtil {
 		TextFragment fragment)
 	{
 		if ( Util.isEmpty(text) ) return "";
-		text = text.replace("&amp;", "&");
+		// Un-escape first layer
 		text = text.replace("&apos;", "'");
 		text = text.replace("&lt;", "<");
 		text = text.replace("&gt;", ">");
 		text = text.replace("&quot;", "\"");
+		text = text.replace("&amp;", "&");
+		// Now we have XLIFF valid content
+		
+		// Read it to XML parser
+		// Un-escape XML
 
 		//TODO: code conversion
 		return text;
+	}
+	
+	// The original parameter can be null
+	public TextFragment fromXLIFF (Element elem,
+		TextFragment original)
+	{
+		NodeList list = elem.getChildNodes();
+		int lastId = -1;
+		int id = -1;
+		Node node;
+		Stack<Integer> stack = new Stack<Integer>();
+		StringBuilder buffer = new StringBuilder();
+		
+		// Note that this parsing assumes non-overlapping codes.
+		for ( int i=0; i<list.getLength(); i++ ) {
+			node = list.item(i);
+			switch ( node.getNodeType() ) {
+			case Node.TEXT_NODE:
+				buffer.append(node.getNodeValue());
+				break;
+			case Node.ELEMENT_NODE:
+				NamedNodeMap map = node.getAttributes();
+				Node attr = map.getNamedItem("type");
+				if ( node.getNodeName().equals("bpt") ) {
+					id = getRawIndex(lastId, map.getNamedItem("id"));
+					stack.push(id);
+					buffer.append(String.format("%c%c", TextFragment.MARKER_OPENING,
+	            		TextFragment.toChar(original.getIndex(id))));
+				}
+				else if ( node.getNodeName().equals("ept") ) {
+					buffer.append(String.format("%c%c", TextFragment.MARKER_CLOSING,
+			        	TextFragment.toChar(original.getIndexForClosing(stack.pop()))));
+				}
+				else if ( node.getNodeName().equals("ph") ) {
+					id = getRawIndex(lastId, map.getNamedItem("id"));
+					buffer.append(String.format("%c%c", TextFragment.MARKER_ISOLATED,
+		            	TextFragment.toChar(original.getIndex(id))));
+				}
+				else if ( node.getNodeName().equals("it") ) {
+					Node pos = map.getNamedItem("pos");
+					if ( pos == null ) { // Error, but just treat it as a placeholder
+						id = getRawIndex(lastId, map.getNamedItem("id"));
+						buffer.append(String.format("%c%c", TextFragment.MARKER_ISOLATED,
+			            	TextFragment.toChar(original.getIndex(id))));
+					}
+					else if ( pos.getNodeValue().equals("begin") ) {
+						id = getRawIndex(lastId, map.getNamedItem("id"));
+						buffer.append(String.format("%c%c", TextFragment.MARKER_OPENING,
+		            		TextFragment.toChar(original.getIndex(id))));
+					}
+					else { // Assumes 'end'
+						id = getRawIndex(lastId, map.getNamedItem("id"));
+						buffer.append(String.format("%c%c", TextFragment.MARKER_CLOSING,
+				        	TextFragment.toChar(original.getIndexForClosing(id))));
+					}
+				}
+				break;
+			}
+		}
+
+		return new TextFragment(buffer.toString(), original.getCodes());
+	}
+
+	private int getRawIndex (int lastIndex, Node attr) {
+		if ( attr == null ) return ++lastIndex;
+		return Integer.valueOf(attr.getNodeValue());
 	}
 	
 }

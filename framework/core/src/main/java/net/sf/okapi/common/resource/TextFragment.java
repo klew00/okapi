@@ -806,6 +806,7 @@ public class TextFragment implements Comparable<Object> {
 		ArrayList<Code> tmpCodes = new ArrayList<Code>();
 		if ( codes == null ) return tmpCodes;
 		if ( codes.isEmpty() ) return tmpCodes;
+		if ( !isBalanced ) balanceMarkers();
 		checkPositionForMarker(start);
 		checkPositionForMarker(end);
 
@@ -832,6 +833,7 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	public int getIndex (int id) {
 		if ( codes == null ) return -1;
+		if ( !isBalanced ) balanceMarkers();
 		int i = 0;
 		for ( Code code : codes ) {
 			if ( code.id == id ) return i;
@@ -848,6 +850,7 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	public int getIndexForClosing (int id) {
 		if ( codes == null ) return -1;
+		if ( !isBalanced ) balanceMarkers();
 		int i = 0;
 		for ( Code code : codes ) {
 			if (( code.tagType == TagType.CLOSING ) && ( code.id == id )) {

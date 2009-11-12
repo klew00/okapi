@@ -134,10 +134,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(MAKETM));
 		TextInputPart tip = desc.addTextInputPart(paramDesc.get(TMDIRECTORY));
 		tip.setMasterPart(cbp, true);
-		
-		cbp = desc.addCheckboxPart(paramDesc.get(MAKETMX));
-		PathInputPart pip = desc.addPathInputPart(paramDesc.get(TMXPATH), "TMX Path", true);
-		pip.setMasterPart(cbp, true);
+
+//TODO: to implement		
+//		cbp = desc.addCheckboxPart(paramDesc.get(MAKETMX));
+//		PathInputPart pip = desc.addPathInputPart(paramDesc.get(TMXPATH), "TMX Path", true);
+//		pip.setMasterPart(cbp, true);
 		
 		return desc;
 	}

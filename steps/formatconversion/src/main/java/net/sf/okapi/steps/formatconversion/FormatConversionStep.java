@@ -112,6 +112,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			if ( params.isSingleOutput() ) {
 				Ending ending = new Ending("end");
 				writer.handleEvent(new Event(EventType.END_DOCUMENT, ending));
+				writer.close();
 			}
 			break;
 			
@@ -138,6 +139,7 @@ public class FormatConversionStep extends BasePipelineStep {
 		case END_DOCUMENT:
 			if ( !params.isSingleOutput() ) {
 				writer.handleEvent(event);
+				writer.close();
 			}
 			// Else: Do nothing
 			break;
