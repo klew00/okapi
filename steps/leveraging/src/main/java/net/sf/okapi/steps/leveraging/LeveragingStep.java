@@ -72,6 +72,11 @@ public class LeveragingStep extends BasePipelineStep {
 	}
 
 	@Override
+	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
+	}
+
+	@Override
 	protected void handleStartBatch (Event event) {
 		qm = new QueryManager();
 		qm.setLanguages(sourceLocale, targetLocale);

@@ -22,8 +22,16 @@ package net.sf.okapi.steps.batchtranslation;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Logger;
 
+import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.HTMLElementName;
+import net.htmlparser.jericho.Segment;
+import net.htmlparser.jericho.Source;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -75,7 +83,17 @@ public class BatchTranslator {
 
 			htmlSourceFile = File.createTempFile("hft_", ".html");
 			htmlWriter = new XMLWriter(htmlSourceFile.getPath());
+
+			// Set the output name and make sure it's deleted
+			String path = htmlSourceFile.getAbsolutePath();
+			path = Util.getDirectoryName(path) + File.separator + Util.getFilename(path, false) + ".trg.html";
+			htmlTargetFile = new File(path);
 			
+			if ( htmlTargetFile.exists() ) {
+				htmlTargetFile.delete();
+			}
+			
+			// Start building the source file
 			htmlWriter.writeStartElement("html");
 			htmlWriter.writeStartElement("meta");
 			htmlWriter.writeAttributeString("http-equiv", "Content-Type");
@@ -124,7 +142,7 @@ public class BatchTranslator {
 			}
 		}
 		catch ( IOException e ) {
-e.printStackTrace();
+			throw new RuntimeException("Error when creating the input of the batch process.", e);
 		}
 		finally {
 			if ( htmlWriter != null ) htmlWriter.close();
@@ -135,18 +153,51 @@ e.printStackTrace();
 	private void runBatchTranslation () {
 		try {
 			String cmd = params.getCommand();
+
 			cmd = cmd.replace("${input}", htmlSourceFile.getPath());
 			cmd = cmd.replace("${output}", htmlTargetFile.getPath());
-			//TODO: ${srcloc}, etc.
+			
+			Locale loc = rawDoc.getSourceLocale().toJavaLocale();
+			cmd = cmd.replace("${srcLangName}", loc.getDisplayLanguage(Locale.ENGLISH));
+			
+			loc = rawDoc.getTargetLocale().toJavaLocale();
+			cmd = cmd.replace("${trgLangName}", loc.getDisplayLanguage(Locale.ENGLISH));
+			
 			Process p = Runtime.getRuntime().exec(cmd);
+	    	p.waitFor();
 		}
 		catch ( IOException e ) {
-e.printStackTrace();
+			throw new RuntimeException("Error during the batch translation.", e);
+		}
+		catch ( InterruptedException e ) {
+			throw new RuntimeException("Program interrupted.", e);
 		}
 	}
 	
 	private void retrieveTranslation () {
-		
+		Source html = null;
+		try {
+			// Open the translated file
+			html = new Source(htmlTargetFile.toURI().toURL());
+			html.fullSequentialParse();
+			
+			// Process
+			List<Element> paragraphs = html.getAllElements(HTMLElementName.P);
+			for ( Element elem : paragraphs ) {
+				String id = elem.getAttributeValue("id");
+				if ( id == null ) continue; // No id means we can't match
+				
+				//Segment seg = elem.getContent();
+				System.out.println(elem.getContent().toString());
+			}
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException("Error reading the translations.");
+		}
+		finally {
+			if ( html != null ) html.clearCache();
+			htmlTargetFile.deleteOnExit();
+		}
 	}
 
 }

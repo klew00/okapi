@@ -62,11 +62,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.makeTMX = makeTMX;
 	}
 
-	public String getTMXPath () {
+	public String getTmxPath () {
 		return tmxPath;
 	}
 
-	public void setTMXPath (String tmxPath) {
+	public void setTmxPath (String tmxPath) {
 		this.tmxPath = tmxPath;
 	}
 
@@ -78,16 +78,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.makeTM = makeTM;
 	}
 
-	public String getTMDirectory () {
+	public String getTmDirectory () {
 		return tmDirectory;
 	}
 
-	public void setTMDirectory (String tmDirectory) {
+	public void setTmDirectory (String tmDirectory) {
 		this.tmDirectory = tmDirectory;
 	}
 
 	public void reset() {
-		command = "translate ${input} /o ${output}";
+		command = "\"C:\\Program Files\\PRMT8\\FILETRANS\\FileTranslator.exe\" \"${input}\" /as /ac \"/o:${output}\" /d:${srcLangName}-${trgLangName}";
 		makeTM = false;
 		tmDirectory = "mttm";
 		makeTMX = false;

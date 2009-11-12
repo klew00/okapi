@@ -22,26 +22,25 @@ package net.sf.okapi.steps.batchtranslation;
 
 import java.util.logging.Logger;
 
+import net.htmlparser.jericho.Source;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.translation.QueryManager;
-import net.sf.okapi.lib.translation.ResourceItem;
+import net.sf.okapi.common.resource.RawDocument;
 
 public class BatchTranslationStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
-	
 	private Parameters params;
+	private boolean isDone;
+	private BatchTranslator trans;
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
-	private TMXWriter tmxWriter;
+	private IFilterConfigurationMapper fcMapper;
+	private String filterConfigId;
 
 	public BatchTranslationStep () {
 		params = new Parameters();
@@ -57,6 +56,16 @@ public class BatchTranslationStep extends BasePipelineStep {
 		this.targetLocale = targetLocale;
 	}
 	
+	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_ID)
+	public void setFilterConfigurationId (String filterConfigId) {
+		this.filterConfigId = filterConfigId;
+	}
+	
 	public String getName () {
 		return "Batch Translation";
 	}
@@ -64,58 +73,39 @@ public class BatchTranslationStep extends BasePipelineStep {
 	public String getDescription () {
 		return "Creates a batch translation for a given input document.";
 	}
+	
+	@Override
+	public boolean isDone () {
+		return isDone;
+	}
+
+	@Override
+	protected void handleStartBatch (Event event) {
+		isDone = true;
+		trans = new BatchTranslator(fcMapper, params);
+	}
+	
+	@Override
+	protected void handleStartBatchItem (Event event) {
+		// To get the raw document
+		isDone = false;
+	}
+
+	@Override
+	protected void handleRawDocument (Event event) {
+		trans.processDocument((RawDocument)event.getResource(), filterConfigId);
+		// Can move on to the next step
+		isDone = true;
+	}
 
 	@Override
 	public IParameters getParameters () {
 		return params;
 	}
-
-	@Override
-	protected void handleStartBatch (Event event) {
-		if ( params.getMakeTMX() ) {
-			tmxWriter = new TMXWriter(params.getTMXPath());
-			tmxWriter.writeStartDocument(sourceLocale, targetLocale,
-				getClass().getName(), "", "sentence", "undefined", "undefined");
-		}
-	}
 	
 	@Override
-	protected void handleEndBatch (Event event) {
-		destroy();
-	}
-	
-//	@Override
-//	protected void handleStartDocument (Event event) {
-//	}
-
-//	@Override
-//	protected void handleEndDocument (Event event) {
-//		logger.info(String.format("Segments with text = %d", qm.getTotalSegments()));
-//		logger.info(String.format("Segments leveraged = %d", qm.getLeveragedSegments()));
-//	}
-	
-	@Override
-	protected void handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
-		if ( !tu.isTranslatable() ) return;
-
-    	boolean approved = false;
-    	Property prop = tu.getTargetProperty(targetLocale, Property.APPROVED);
-    	if ( prop != null ) {
-    		if ( "yes".equals(prop.getValue()) ) approved = true;
-    	}
-    	if ( approved ) return; // Do not leverage pre-approved entries
-
-	//TODO
-	}
-
-	@Override
-	public void destroy () {
-		if ( tmxWriter != null ) {
-			tmxWriter.writeEndDocument();
-			tmxWriter.close();
-			tmxWriter = null;
-		}
+	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
 	}
 
 }
