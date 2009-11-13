@@ -5,3 +5,4 @@ Bundle-SymbolicName: net.sf.okapi.filters.ttx
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.filters.ttx
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

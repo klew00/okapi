@@ -5,3 +5,4 @@ Bundle-SymbolicName: net.sf.okapi.filters.xliff
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.filters.xliff
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

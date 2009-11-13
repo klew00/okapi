@@ -67,6 +67,35 @@ public class TTXFilterTest {
 	}
 
 	@Test
+	public void testBasicNoExtractableData () {
+		String snippet = STARTFILE
+			+ " <ut Style=\"external\">some &amp; code</ut>\n\n  <!-- comments-->"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		assertNull(tu);
+	}
+
+	@Test
+	public void testOutputNoExtractableData () {
+		String snippet = STARTFILE
+			+ " <ut Style=\"external\">some &amp; code</ut>\n\n  <!-- comments-->"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM));
+	}
+
+//	@Test
+//	public void testBasicNoTU () {
+//		String snippet = STARTFILE
+//			+ "text"
+//			+ "</Raw></Body></TRADOStag>";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+//		assertNotNull(tu);
+//		TextContainer cont = tu.getSource();
+//		assertEquals("text", cont.toString());
+//		assertFalse(tu.hasTarget(locESEM));
+//	}
+
+	@Test
 	public void testBasicNoUT () {
 		String snippet = STARTFILE
 			+ "<Tu>"
@@ -183,13 +212,13 @@ public class TTXFilterTest {
 	}
 	
 //	@Test
-	public void testDoubleExtraction () {
-		// Read all files in the data directory
-		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root+"Test01.rtf.xlf", null));
-		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locESEM));
-	}
+//	public void testDoubleExtraction () {
+//		// Read all files in the data directory
+//		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+//		list.add(new InputDocument(root+"Test01.rtf.xlf", null));
+//		RoundTripComparison rtc = new RoundTripComparison();
+//		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locESEM));
+//	}
 
 	private ArrayList<Event> getEvents(String snippet, LocaleId trgLocId) {
 		ArrayList<Event> list = new ArrayList<Event>();

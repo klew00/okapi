@@ -270,20 +270,19 @@ public class TTXFilter implements IFilter {
 
 	private boolean read () throws XMLStreamException {
 		skel = new GenericSkeleton();
-		int eventType;
 		buffer.setLength(0);
 		
-		while ( reader.hasNext() ) {
-			eventType = reader.next();
-			switch ( eventType ) {
+		while ( true ) {
+			switch ( reader.getEventType() ) {
 			case XMLStreamConstants.START_ELEMENT:
 				String name = reader.getLocalName();
 				if ( "Tu".equals(name) ) {
 					return processTU();
 				}
-//				if ( "ut".equals(name) ) {
-//					processTopUT();
-//				}
+				if ( "ut".equals(name) ) {
+					processTopUT();
+					continue; // next() was called
+				}
 				else if ( "UserSettings".equals(name) ){
 					processUserSettings();
 				}
@@ -328,8 +327,10 @@ public class TTXFilter implements IFilter {
 			case XMLStreamConstants.END_DOCUMENT:
 				break;
 			}
+			
+			if ( reader.hasNext() ) reader.next();
+			else return false;
 		}
-		return false;
 	}
 
 	private void storeStartElement () {
@@ -411,13 +412,68 @@ public class TTXFilter implements IFilter {
 	
 	// Case of a UT element outside a TUV, that is an un-segmented/translate code.
 	private void processTopUT () {
-		String tmp = reader.getAttributeValue(null, "Style");
-		// Default is internal
-		boolean isExternal = false;
-		if ( tmp != null ) {
-			isExternal = "external".equals(tmp);
+		try {
+			boolean isExternal = isExternal();
+			if ( isExternal ) {
+				// Keep copying into the skeleton until end of element
+				storeStartElement();
+				storeUntilEndElement("ut");
+				return;
+			}
+			// Else: it's internal, and not in a TU/TUV yet
+			
 		}
+		catch ( XMLStreamException e) {
+			throw new OkapiIOException("Error processing top-level ut element.", e);
+		}
+	}
+	
+	private void createTUElement () {
+		skel.append("<Tu>");
 		
+	}
+	
+	private void storeUntilEndElement (String name) throws XMLStreamException {
+		int eventType;
+		while ( reader.hasNext() ) {
+			eventType = reader.next();
+			switch ( eventType ) {
+			case XMLStreamConstants.START_ELEMENT:
+				storeStartElement();
+				break;
+			case XMLStreamConstants.END_ELEMENT:
+				if ( name.equals(reader.getLocalName()) ) {
+					storeEndElement();
+					reader.next(); // Move forward
+					return;
+				}
+				// Else: just store the end
+				storeEndElement();
+				break;
+			case XMLStreamConstants.SPACE:
+			case XMLStreamConstants.CDATA:
+			case XMLStreamConstants.CHARACTERS:
+				//TODO: escape unsupported chars
+				skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.getEscapeGT(), null));
+				break;
+			case XMLStreamConstants.COMMENT:
+				//addTargetIfNeeded();
+				skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
+				break;
+			case XMLStreamConstants.PROCESSING_INSTRUCTION:
+				skel.append("<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
+				break;
+			}
+		}
+	}
+
+	private boolean isExternal () {
+		String tmp = reader.getAttributeValue(null, "Style");
+		if ( tmp != null ) {
+			return "external".equals(tmp);
+		}
+		// Default is internal
+		return false;
 	}
 	
 	private boolean processTU () {
@@ -427,8 +483,8 @@ public class TTXFilter implements IFilter {
 			// This allows to have only the Tu skeleton parts with the TextUnit event
 			if ( !skel.isEmpty(true) ) {
 				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
-				skel = new GenericSkeleton(); // And create a new skeleton for the next event
 				queue.add(new Event(EventType.DOCUMENT_PART, dp));
+				skel = new GenericSkeleton(); // And create a new skeleton for the next event
 			}
 			
 			// Process Tu
@@ -465,6 +521,7 @@ public class TTXFilter implements IFilter {
 						tu.setSkeleton(skel);
 						tu.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
+						reader.next(); // Move the cursor forward
 						return true;
 					}
 					// Else: just store the end
