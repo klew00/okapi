@@ -20,6 +20,11 @@
             <artifactId>okapi-lib-translation</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.sf.okapi.tm</groupId>
+            <artifactId>okapi-tm-pensieve</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
+        </dependency>        
 		<dependency>
 			<groupId>net.htmlparser.jericho</groupId>
 			<artifactId>jericho-html</artifactId>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="windows-1252" ?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd"><?encoding UTF-8?><file datatype="x-office" original="/home/rmraya/workspace/Swordfish/docs/swordfish.odt" source-language="en" target-language="fr">
 <header>
    <skl>
@@ -9,13 +9,14 @@
 <body>
    <trans-unit approved="no" id="1" xml:space="preserve">
       <source xml:lang="en">Swordfish User Guide</source>
+      <source xml:lang="fr">Traduction avec des accents: ·, Û, Ì, etc.</source>
    </trans-unit>
 <trans-unit approved="no" id="2" xml:space="preserve">
-      <source xml:lang="en">Copyright <ph ctype="x-font" id="0">&lt;text:span text:style-name="T1"&gt;</ph>¬©<ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T3"&gt;</ph> 2007-2008 Maxprograms<ph id="3">&lt;/text:span&gt;</ph></source>
+      <source xml:lang="en">Copyright <ph ctype="x-font" id="0">&lt;text:span text:style-name="T1"&gt;</ph>©<ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T3"&gt;</ph> 2007-2008 Maxprograms<ph id="3">&lt;/text:span&gt;</ph></source>
    <alt-trans match-quality="88" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469364?>
-<source xml:lang="en">Copyright ¬© 2004-2006 Maxprograms</source>
-<target xml:lang="fr">Copyright ¬© 2004-2006 Maxprograms</target>
+<source xml:lang="en">Copyright © 2004-2006 Maxprograms</source>
+<target xml:lang="fr">Copyright © 2004-2006 Maxprograms</target>
 </alt-trans></trans-unit>   <trans-unit approved="no" id="3" xml:space="preserve">
       <source xml:lang="en">All rights reserved.</source>
    </trans-unit>
@@ -399,7 +400,7 @@
    </trans-unit><trans-unit approved="no" id="148" xml:space="preserve">
       <source xml:lang="en"><ph id="0">&lt;draw:image xlink:actuate="onLoad" xlink:href="Pictures/10000000000001350000017D9F0ED449.jpg" xlink:show="embed" xlink:type="simple"/&gt;</ph><ph id="1">&lt;/draw:frame&gt;</ph>Enter a meaningful name for the main TM database in the <ph ctype="x-font" id="2">&lt;text:span text:style-name="T10"&gt;</ph>Database Name<ph id="3">&lt;/text:span&gt;</ph> text box.</source>
    </trans-unit><trans-unit approved="no" id="149" xml:space="preserve">
-      <source xml:lang="en"> Then select ‚ÄúInternal DB‚Äù in the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T10"&gt;</ph>Database Type<ph id="1">&lt;/text:span&gt;</ph> drop-down list and finally click on <ph ctype="x-font" id="2">&lt;text:span text:style-name="T5"&gt;</ph>Create<ph id="3">&lt;/text:span&gt;</ph> button.</source>
+      <source xml:lang="en"> Then select ìInternal DBî in the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T10"&gt;</ph>Database Type<ph id="1">&lt;/text:span&gt;</ph> drop-down list and finally click on <ph ctype="x-font" id="2">&lt;text:span text:style-name="T5"&gt;</ph>Create<ph id="3">&lt;/text:span&gt;</ph> button.</source>
    </trans-unit>   <trans-unit approved="no" id="150" xml:space="preserve">
       <source xml:lang="en"> A confirmation will appear after the database is created.</source>
    </trans-unit>
@@ -470,24 +471,24 @@
    </trans-unit><trans-unit approved="no" id="178" xml:space="preserve">
       <source xml:lang="en">Source formatting is represented with green marks with a number (i<ph ctype="x-font" id="0">&lt;text:span text:style-name="T16"&gt;</ph>.e.<ph id="1">&lt;/text:span&gt;</ph>:</source>
    </trans-unit><trans-unit approved="no" id="179" xml:space="preserve">
-      <source xml:lang="en"> <ph ctype="x-font" id="0">&lt;text:span text:style-name="T13"&gt;</ph>¬´6¬ª<ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T14"&gt;</ph>)<ph id="3">&lt;/text:span&gt;</ph> in source text.</source>
+      <source xml:lang="en"> <ph ctype="x-font" id="0">&lt;text:span text:style-name="T13"&gt;</ph>´6ª<ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T14"&gt;</ph>)<ph id="3">&lt;/text:span&gt;</ph> in source text.</source>
    </trans-unit><trans-unit approved="no" id="180" xml:space="preserve">
-      <source xml:lang="en"> To insert green marks, also known as <ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>tags<ph id="1">&lt;/text:span&gt;</ph>, press ‚Äú<ph ctype="x-font" id="2">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="3">&lt;text:span text:style-name="T11"&gt;</ph>Ctrl +<ph id="4">&lt;/text:span&gt;</ph><ph id="5">&lt;/text:span&gt;</ph><ph ctype="x-font" id="6">&lt;text:span text:style-name="User_20_Entry"&gt;</ph> <ph id="7">&lt;/text:span&gt;</ph><ph ctype="x-font" id="8">&lt;text:span text:style-name="T6"&gt;</ph>N<ph id="9">&lt;/text:span&gt;</ph><ph ctype="x-font" id="10">&lt;text:span text:style-name="T11"&gt;</ph>‚Äù<ph id="11">&lt;/text:span&gt;</ph><ph ctype="x-font" id="12">&lt;text:span text:style-name="T6"&gt;</ph>, <ph id="13">&lt;/text:span&gt;</ph><ph ctype="x-font" id="14">&lt;text:span text:style-name="T11"&gt;</ph>where <ph id="15">&lt;/text:span&gt;</ph><ph ctype="x-font" id="16">&lt;text:span text:style-name="T6"&gt;</ph>N<ph id="17">&lt;/text:span&gt;</ph><ph ctype="x-font" id="18">&lt;text:span text:style-name="T11"&gt;</ph> is the number in the mark.</source>
+      <source xml:lang="en"> To insert green marks, also known as <ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>tags<ph id="1">&lt;/text:span&gt;</ph>, press ì<ph ctype="x-font" id="2">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="3">&lt;text:span text:style-name="T11"&gt;</ph>Ctrl +<ph id="4">&lt;/text:span&gt;</ph><ph id="5">&lt;/text:span&gt;</ph><ph ctype="x-font" id="6">&lt;text:span text:style-name="User_20_Entry"&gt;</ph> <ph id="7">&lt;/text:span&gt;</ph><ph ctype="x-font" id="8">&lt;text:span text:style-name="T6"&gt;</ph>N<ph id="9">&lt;/text:span&gt;</ph><ph ctype="x-font" id="10">&lt;text:span text:style-name="T11"&gt;</ph>î<ph id="11">&lt;/text:span&gt;</ph><ph ctype="x-font" id="12">&lt;text:span text:style-name="T6"&gt;</ph>, <ph id="13">&lt;/text:span&gt;</ph><ph ctype="x-font" id="14">&lt;text:span text:style-name="T11"&gt;</ph>where <ph id="15">&lt;/text:span&gt;</ph><ph ctype="x-font" id="16">&lt;text:span text:style-name="T6"&gt;</ph>N<ph id="17">&lt;/text:span&gt;</ph><ph ctype="x-font" id="18">&lt;text:span text:style-name="T11"&gt;</ph> is the number in the mark.</source>
    </trans-unit><trans-unit approved="no" id="181" xml:space="preserve">
       <source xml:lang="en"> You can also use the <ph id="0">&lt;/text:span&gt;</ph><ph ctype="x-font" id="1">&lt;text:span text:style-name="T10"&gt;</ph>Insert Tag<ph id="2">&lt;/text:span&gt;</ph><ph ctype="x-font" id="3">&lt;text:span text:style-name="T11"&gt;</ph> button from the <ph id="4">&lt;/text:span&gt;</ph><ph ctype="x-link" id="5">&lt;text:a xlink:href="#4.1.2.Translation Panel|outline" xlink:type="simple"&gt;</ph><ph ctype="x-font" id="6">&lt;text:span text:style-name="T11"&gt;</ph>Translation Panel<ph id="7">&lt;/text:span&gt;</ph><ph id="8">&lt;/text:a&gt;</ph><ph ctype="x-link" id="9">&lt;text:a xlink:href="#4.1.2.Translation Panel|outline" xlink:type="simple"&gt;</ph> <ph id="10">&lt;/text:a&gt;</ph><ph ctype="x-font" id="11">&lt;text:span text:style-name="T11"&gt;</ph>to display a dialog that asks for a tag number or one of the the Insert Tag options from <ph id="12">&lt;/text:span&gt;</ph><ph ctype="x-link" id="13">&lt;text:a xlink:href="#4.3.2. Edit Menu|outline" xlink:type="simple"&gt;</ph><ph ctype="x-font" id="14">&lt;text:span text:style-name="T11"&gt;</ph>Edit Menu<ph id="15">&lt;/text:span&gt;</ph><ph id="16">&lt;/text:a&gt;</ph><ph ctype="x-link" id="17">&lt;text:a xlink:href="#4.3.2. Edit Menu|outline" xlink:type="simple"&gt;</ph> <ph id="18">&lt;/text:a&gt;</ph><ph ctype="x-link" id="19">&lt;text:a xlink:href="#4.3.2. Edit Menu|outline" xlink:type="simple"&gt;</ph><ph ctype="x-font" id="20">&lt;text:span text:style-name="T12"&gt;</ph>.<ph id="21">&lt;/text:span&gt;</ph><ph id="22">&lt;/text:a&gt;</ph><ph ctype="x-link" id="23">&lt;text:a xlink:href="#4.3.2. Edit Menu|outline" xlink:type="simple"&gt;</ph> <ph id="24">&lt;/text:a&gt;</ph></source>
    </trans-unit><trans-unit approved="no" id="182" xml:space="preserve">
-      <source xml:lang="en"><ph ctype="x-font" id="0">&lt;text:span text:style-name="T20"&gt;</ph>When the segment is fully translated, press <ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T18"&gt;</ph>‚Äú<ph id="3">&lt;/text:span&gt;</ph><ph ctype="x-font" id="4">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="5">&lt;text:span text:style-name="T17"&gt;</ph>Ctrl + E<ph id="6">&lt;/text:span&gt;</ph><ph id="7">&lt;/text:span&gt;</ph><ph ctype="x-font" id="8">&lt;text:span text:style-name="User_20_Entry"&gt;</ph>‚Äù<ph id="9">&lt;/text:span&gt;</ph><ph ctype="x-font" id="10">&lt;text:span text:style-name="T18"&gt;</ph> <ph id="11">&lt;/text:span&gt;</ph><ph ctype="x-font" id="12">&lt;text:span text:style-name="T20"&gt;</ph>or click on the <ph id="13">&lt;/text:span&gt;</ph><ph ctype="x-font" id="14">&lt;text:span text:style-name="T21"&gt;</ph>A<ph id="15">&lt;/text:span&gt;</ph><ph ctype="x-font" id="16">&lt;text:span text:style-name="T22"&gt;</ph>pproved <ph id="17">&lt;/text:span&gt;</ph><ph ctype="x-font" id="18">&lt;text:span text:style-name="T20"&gt;</ph>check box that is below the target.</source>
+      <source xml:lang="en"><ph ctype="x-font" id="0">&lt;text:span text:style-name="T20"&gt;</ph>When the segment is fully translated, press <ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T18"&gt;</ph>ì<ph id="3">&lt;/text:span&gt;</ph><ph ctype="x-font" id="4">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="5">&lt;text:span text:style-name="T17"&gt;</ph>Ctrl + E<ph id="6">&lt;/text:span&gt;</ph><ph id="7">&lt;/text:span&gt;</ph><ph ctype="x-font" id="8">&lt;text:span text:style-name="User_20_Entry"&gt;</ph>î<ph id="9">&lt;/text:span&gt;</ph><ph ctype="x-font" id="10">&lt;text:span text:style-name="T18"&gt;</ph> <ph id="11">&lt;/text:span&gt;</ph><ph ctype="x-font" id="12">&lt;text:span text:style-name="T20"&gt;</ph>or click on the <ph id="13">&lt;/text:span&gt;</ph><ph ctype="x-font" id="14">&lt;text:span text:style-name="T21"&gt;</ph>A<ph id="15">&lt;/text:span&gt;</ph><ph ctype="x-font" id="16">&lt;text:span text:style-name="T22"&gt;</ph>pproved <ph id="17">&lt;/text:span&gt;</ph><ph ctype="x-font" id="18">&lt;text:span text:style-name="T20"&gt;</ph>check box that is below the target.</source>
    </trans-unit><trans-unit approved="no" id="183" xml:space="preserve">
       <source xml:lang="en"> When you approve the segment, its translation is stored in the selected Default TM Database and is also automatically propagated to all similar unapproved segments.</source>
    </trans-unit><trans-unit approved="no" id="184" xml:space="preserve">
-      <source xml:lang="en"><ph ctype="x-font" id="0">&lt;text:span text:style-name="T20"&gt;</ph>Use<ph id="1">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="2">&lt;text:span text:style-name="T18"&gt;</ph>‚Äú<ph id="3">&lt;/text:span&gt;</ph><ph ctype="x-font" id="4">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="5">&lt;text:span text:style-name="T17"&gt;</ph>PgUp<ph id="6">&lt;/text:span&gt;</ph><ph id="7">&lt;/text:span&gt;</ph><ph ctype="x-font" id="8">&lt;text:span text:style-name="User_20_Entry"&gt;</ph>‚Äù<ph id="9">&lt;/text:span&gt;</ph><ph ctype="x-font" id="10">&lt;text:span text:style-name="T18"&gt;</ph> <ph id="11">&lt;/text:span&gt;</ph><ph ctype="x-font" id="12">&lt;text:span text:style-name="T20"&gt;</ph>and<ph id="13">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="14">&lt;text:span text:style-name="T18"&gt;</ph>‚Äú<ph id="15">&lt;/text:span&gt;</ph><ph ctype="x-font" id="16">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="17">&lt;text:span text:style-name="T17"&gt;</ph>PgDn<ph id="18">&lt;/text:span&gt;</ph><ph id="19">&lt;/text:span&gt;</ph><ph ctype="x-font" id="20">&lt;text:span text:style-name="User_20_Entry"&gt;</ph>‚Äù<ph id="21">&lt;/text:span&gt;</ph><ph ctype="x-font" id="22">&lt;text:span text:style-name="T18"&gt;</ph> <ph id="23">&lt;/text:span&gt;</ph><ph ctype="x-font" id="24">&lt;text:span text:style-name="T20"&gt;</ph>keys or the blue arrows in the <ph id="25">&lt;/text:span&gt;</ph><ph ctype="x-link" id="26">&lt;text:a xlink:href="#4.1.2.Translation Panel|outline" xlink:type="simple"&gt;</ph><ph ctype="x-font" id="27">&lt;text:span text:style-name="T20"&gt;</ph>Translation Panel<ph id="28">&lt;/text:span&gt;</ph><ph id="29">&lt;/text:a&gt;</ph><ph ctype="x-link" id="30">&lt;text:a xlink:href="#4.1.2.Translation Panel|outline" xlink:type="simple"&gt;</ph> <ph id="31">&lt;/text:a&gt;</ph><ph ctype="x-font" id="32">&lt;text:span text:style-name="T20"&gt;</ph>to move to the next or <ph id="33">&lt;/text:span&gt;</ph><ph ctype="x-link" id="34">&lt;text:a xlink:href="#4.3.2. Edit Menu|outline" xlink:type="simple"&gt;</ph><ph ctype="x-font" id="35">&lt;text:span text:style-name="T15"&gt;</ph>previous segments and translate them.<ph id="36">&lt;/text:span&gt;</ph><ph id="37">&lt;/text:a&gt;</ph><ph ctype="x-link" id="38">&lt;text:a xlink:href="#4.3.2. Edit Menu|outline" xlink:type="simple"&gt;</ph> <ph id="39">&lt;/text:a&gt;</ph></source>
+      <source xml:lang="en"><ph ctype="x-font" id="0">&lt;text:span text:style-name="T20"&gt;</ph>Use<ph id="1">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="2">&lt;text:span text:style-name="T18"&gt;</ph>ì<ph id="3">&lt;/text:span&gt;</ph><ph ctype="x-font" id="4">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="5">&lt;text:span text:style-name="T17"&gt;</ph>PgUp<ph id="6">&lt;/text:span&gt;</ph><ph id="7">&lt;/text:span&gt;</ph><ph ctype="x-font" id="8">&lt;text:span text:style-name="User_20_Entry"&gt;</ph>î<ph id="9">&lt;/text:span&gt;</ph><ph ctype="x-font" id="10">&lt;text:span text:style-name="T18"&gt;</ph> <ph id="11">&lt;/text:span&gt;</ph><ph ctype="x-font" id="12">&lt;text:span text:style-name="T20"&gt;</ph>and<ph id="13">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="14">&lt;text:span text:style-name="T18"&gt;</ph>ì<ph id="15">&lt;/text:span&gt;</ph><ph ctype="x-font" id="16">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="17">&lt;text:span text:style-name="T17"&gt;</ph>PgDn<ph id="18">&lt;/text:span&gt;</ph><ph id="19">&lt;/text:span&gt;</ph><ph ctype="x-font" id="20">&lt;text:span text:style-name="User_20_Entry"&gt;</ph>î<ph id="21">&lt;/text:span&gt;</ph><ph ctype="x-font" id="22">&lt;text:span text:style-name="T18"&gt;</ph> <ph id="23">&lt;/text:span&gt;</ph><ph ctype="x-font" id="24">&lt;text:span text:style-name="T20"&gt;</ph>keys or the blue arrows in the <ph id="25">&lt;/text:span&gt;</ph><ph ctype="x-link" id="26">&lt;text:a xlink:href="#4.1.2.Translation Panel|outline" xlink:type="simple"&gt;</ph><ph ctype="x-font" id="27">&lt;text:span text:style-name="T20"&gt;</ph>Translation Panel<ph id="28">&lt;/text:span&gt;</ph><ph id="29">&lt;/text:a&gt;</ph><ph ctype="x-link" id="30">&lt;text:a xlink:href="#4.1.2.Translation Panel|outline" xlink:type="simple"&gt;</ph> <ph id="31">&lt;/text:a&gt;</ph><ph ctype="x-font" id="32">&lt;text:span text:style-name="T20"&gt;</ph>to move to the next or <ph id="33">&lt;/text:span&gt;</ph><ph ctype="x-link" id="34">&lt;text:a xlink:href="#4.3.2. Edit Menu|outline" xlink:type="simple"&gt;</ph><ph ctype="x-font" id="35">&lt;text:span text:style-name="T15"&gt;</ph>previous segments and translate them.<ph id="36">&lt;/text:span&gt;</ph><ph id="37">&lt;/text:a&gt;</ph><ph ctype="x-link" id="38">&lt;text:a xlink:href="#4.3.2. Edit Menu|outline" xlink:type="simple"&gt;</ph> <ph id="39">&lt;/text:a&gt;</ph></source>
    </trans-unit><trans-unit approved="no" id="185" xml:space="preserve">
-      <source xml:lang="en">When all segments have been translated, press ‚Äú<ph ctype="x-font" id="0">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="1">&lt;text:span text:style-name="T11"&gt;</ph>F5<ph id="2">&lt;/text:span&gt;</ph><ph id="3">&lt;/text:span&gt;</ph>‚Äù or use the <ph ctype="x-font" id="4">&lt;text:span text:style-name="T5"&gt;</ph>Preview Translation<ph id="5">&lt;/text:span&gt;</ph> option from <ph ctype="x-link" id="6">&lt;text:a xlink:href="#4.3.10. QA Menu|outline" xlink:type="simple"&gt;</ph>QA Menu<ph id="7">&lt;/text:a&gt;</ph> to review your translations.</source>
+      <source xml:lang="en">When all segments have been translated, press ì<ph ctype="x-font" id="0">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="1">&lt;text:span text:style-name="T11"&gt;</ph>F5<ph id="2">&lt;/text:span&gt;</ph><ph id="3">&lt;/text:span&gt;</ph>î or use the <ph ctype="x-font" id="4">&lt;text:span text:style-name="T5"&gt;</ph>Preview Translation<ph id="5">&lt;/text:span&gt;</ph> option from <ph ctype="x-link" id="6">&lt;text:a xlink:href="#4.3.10. QA Menu|outline" xlink:type="simple"&gt;</ph>QA Menu<ph id="7">&lt;/text:a&gt;</ph> to review your translations.</source>
    </trans-unit>   <trans-unit approved="no" id="186" xml:space="preserve">
       <source xml:lang="en"> Note any segment with errors and correct them.</source>
    </trans-unit>
 <trans-unit approved="no" id="187" xml:space="preserve">
-      <source xml:lang="en">To visit a segment knowing its number, you can type the number in the text box that contains current segment number (the one between the blue arrows) and press ‚Äú<ph ctype="x-font" id="0">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="1">&lt;text:span text:style-name="T11"&gt;</ph>Enter<ph id="2">&lt;/text:span&gt;</ph><ph id="3">&lt;/text:span&gt;</ph><ph ctype="x-font" id="4">&lt;text:span text:style-name="User_20_Entry"&gt;</ph>‚Äù<ph id="5">&lt;/text:span&gt;</ph>.</source>
+      <source xml:lang="en">To visit a segment knowing its number, you can type the number in the text box that contains current segment number (the one between the blue arrows) and press ì<ph ctype="x-font" id="0">&lt;text:span text:style-name="User_20_Entry"&gt;</ph><ph ctype="x-font" id="1">&lt;text:span text:style-name="T11"&gt;</ph>Enter<ph id="2">&lt;/text:span&gt;</ph><ph id="3">&lt;/text:span&gt;</ph><ph ctype="x-font" id="4">&lt;text:span text:style-name="User_20_Entry"&gt;</ph>î<ph id="5">&lt;/text:span&gt;</ph>.</source>
    </trans-unit><trans-unit approved="no" id="188" xml:space="preserve">
       <source xml:lang="en">Finally, use the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Tag Analysis<ph id="1">&lt;/text:span&gt;</ph> option from <ph ctype="x-link" id="2">&lt;text:a xlink:href="#4.3.10. QA Menu|outline" xlink:type="simple"&gt;</ph>QA Menu<ph id="3">&lt;/text:a&gt;</ph> to check that your file is properly translated.</source>
    </trans-unit>   <trans-unit approved="no" id="189" xml:space="preserve">
@@ -537,7 +538,7 @@
 <trans-unit approved="no" id="206" xml:space="preserve">
       <source xml:lang="en">To create a project in <ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Swordfish<ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T8"&gt;</ph> select<ph id="3">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="4">&lt;text:span text:style-name="T5"&gt;</ph>Create New Project<ph id="5">&lt;/text:span&gt;</ph> option in <ph ctype="x-link" id="6">&lt;text:a xlink:href="#4.3.3. Project Menu|outline" xlink:type="simple"&gt;</ph>Project<ph id="7">&lt;/text:a&gt;</ph> menu and a file selection dialog will appear.</source>
    </trans-unit><trans-unit approved="no" id="207" xml:space="preserve">
-      <source xml:lang="en"> Enter a name for the new project file, using <ph ctype="x-font" id="0">&lt;text:span text:style-name="T11"&gt;</ph>‚Äú.xlp‚Äù<ph id="1">&lt;/text:span&gt;</ph> as file extension.</source>
+      <source xml:lang="en"> Enter a name for the new project file, using <ph ctype="x-font" id="0">&lt;text:span text:style-name="T11"&gt;</ph>ì.xlpî<ph id="1">&lt;/text:span&gt;</ph> as file extension.</source>
    </trans-unit>   <trans-unit approved="no" id="208" xml:space="preserve">
       <source xml:lang="en"> An empty project will be created and the following dialog will appear:</source>
    </trans-unit>
@@ -696,7 +697,7 @@
       <source xml:lang="en">The amount of context information displayed by the program is controlled using the context text box:</source>
    </trans-unit>
 <trans-unit approved="no" id="271" xml:space="preserve">
-      <source xml:lang="en">Use the ‚Äú<ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>Approved<ph id="1">&lt;/text:span&gt;</ph>‚Äù check box to mark the status of the segment as approved or unapproved.</source>
+      <source xml:lang="en">Use the ì<ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>Approved<ph id="1">&lt;/text:span&gt;</ph>î check box to mark the status of the segment as approved or unapproved.</source>
    </trans-unit>   <trans-unit approved="no" id="272" xml:space="preserve">
       <source xml:lang="en">Buttons:</source>
    </trans-unit>
@@ -731,7 +732,7 @@
       <source xml:lang="en">Display a dialog for selecting the segments that will be visible in the translation panel.</source>
    </trans-unit>
 <trans-unit approved="no" id="283" xml:space="preserve">
-      <source xml:lang="en">Toggle <ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>Translation Panel<ph id="1">&lt;/text:span&gt;</ph> layout between ‚Äúside by side‚Äù and ‚Äútop/bottom‚Äù.</source>
+      <source xml:lang="en">Toggle <ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>Translation Panel<ph id="1">&lt;/text:span&gt;</ph> layout between ìside by sideî and ìtop/bottomî.</source>
    </trans-unit><trans-unit approved="no" id="284" xml:space="preserve">
       <source xml:lang="en">TM Matches</source>
    </trans-unit><trans-unit approved="no" id="285" xml:space="preserve">
@@ -747,7 +748,7 @@
       <source xml:lang="en">Add a mark to the corresponding database entry of the translation displayed in the TM Matches panel.</source>
    </trans-unit>
 <trans-unit approved="no" id="290" xml:space="preserve">
-      <source xml:lang="en">The displayed ‚Äú<ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>Origin<ph id="1">&lt;/text:span&gt;</ph>‚Äù of an entry indicates the name of the database from which the match was extracted or ‚ÄúautoFuzzy‚Äù if the match was propagated from another segment within the document.</source>
+      <source xml:lang="en">The displayed ì<ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>Origin<ph id="1">&lt;/text:span&gt;</ph>î of an entry indicates the name of the database from which the match was extracted or ìautoFuzzyî if the match was propagated from another segment within the document.</source>
    </trans-unit>   <trans-unit approved="no" id="291" xml:space="preserve">
       <source xml:lang="en">Auto-Translation</source>
    </trans-unit>
@@ -792,7 +793,7 @@
    <alt-trans match-quality="54" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469365?>
 <source xml:lang="en">Remove Selected</source>
-<target xml:lang="fr">Supprimer s√©lection</target>
+<target xml:lang="fr">Supprimer sÈlection</target>
 </alt-trans></trans-unit>
    <trans-unit approved="no" id="307" xml:space="preserve">
       <source xml:lang="en">Menus</source>
@@ -871,7 +872,7 @@
       <source xml:lang="en">Merge XLIFF Files</source>
    </trans-unit>
 <trans-unit approved="no" id="326" xml:space="preserve">
-      <source xml:lang="en">Insert the translations from 2 or more XLIFF files generated with ‚Äú<ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>Split XLIFF File<ph id="1">&lt;/text:span&gt;</ph>‚Äù option back into the original XLIFF document and save it under a new name.</source>
+      <source xml:lang="en">Insert the translations from 2 or more XLIFF files generated with ì<ph ctype="x-font" id="0">&lt;text:span text:style-name="T6"&gt;</ph>Split XLIFF File<ph id="1">&lt;/text:span&gt;</ph>î option back into the original XLIFF document and save it under a new name.</source>
    </trans-unit>   <trans-unit approved="no" id="327" xml:space="preserve">
       <source xml:lang="en">Exit</source>
    <alt-trans match-quality="100" origin="Plugins" tool="TM Search" xml:space="default">
@@ -992,7 +993,7 @@
 </alt-trans><alt-trans match-quality="51" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469365?>
 <source xml:lang="en">Remove Selected</source>
-<target xml:lang="fr">Supprimer s√©lection</target>
+<target xml:lang="fr">Supprimer sÈlection</target>
 </alt-trans></trans-unit>
    <trans-unit approved="no" id="364" xml:space="preserve">
       <source xml:lang="en">Remove all tags present in target text.</source>
@@ -1287,7 +1288,7 @@
 </alt-trans><alt-trans match-quality="54" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469368?>
 <source xml:lang="en">Select Languages</source>
-<target xml:lang="fr">S√©lectionner les langues</target>
+<target xml:lang="fr">SÈlectionner les langues</target>
 </alt-trans></trans-unit>
 <trans-unit approved="no" id="460" xml:space="preserve">
       <source xml:lang="en">Display a dialog for editing the existing language codes supported by the <ph id="0">&lt;text:soft-page-break/&gt;</ph>application.</source>
@@ -1320,7 +1321,7 @@
    <alt-trans match-quality="50" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469302?>
 <source xml:lang="en">&amp;Tasks</source>
-<target xml:lang="fr">&amp;T√¢ches</target>
+<target xml:lang="fr">&amp;T‚ches</target>
 </alt-trans></trans-unit>   <trans-unit approved="no" id="470" xml:space="preserve">
       <source xml:lang="en">Change Language Codes</source>
    <alt-trans match-quality="50" origin="Plugins" tool="TM Search" xml:space="default">
@@ -1511,7 +1512,7 @@
    <alt-trans match-quality="54" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469365?>
 <source xml:lang="en">Remove Selected</source>
-<target xml:lang="fr">Supprimer s√©lection</target>
+<target xml:lang="fr">Supprimer sÈlection</target>
 </alt-trans></trans-unit>
    <trans-unit approved="no" id="532" xml:space="preserve">
       <source xml:lang="en">Copy to target the term currently selected in the Terminology panel.</source>
@@ -1746,7 +1747,7 @@
    <alt-trans match-quality="100" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137153850593?>
 <source xml:lang="en">About...</source>
-<target xml:lang="fr">√Ä propos de...</target>
+<target xml:lang="fr">¿ propos de...</target>
 </alt-trans></trans-unit>
    <trans-unit approved="no" id="603" xml:space="preserve">
       <source xml:lang="en">Display a dialog with license status and program version information.</source>
@@ -1822,7 +1823,7 @@
       <source xml:lang="en">Name of the Oracle server instance that will hold the database.</source>
    </trans-unit>
 <trans-unit approved="no" id="632" xml:space="preserve">
-      <source xml:lang="en">Default instance name for Oracle Express is ‚ÄúXE‚Äù</source>
+      <source xml:lang="en">Default instance name for Oracle Express is ìXEî</source>
    </trans-unit>   <trans-unit approved="no" id="633" xml:space="preserve">
       <source xml:lang="en">Server Name</source>
    </trans-unit>
@@ -1897,13 +1898,13 @@
       <source xml:lang="en">Terminology data can be imported in these formats:</source>
    </trans-unit>
    <trans-unit approved="no" id="660" xml:space="preserve">
-      <source xml:lang="en">TMX ‚Äì aligned sets of terms in two or more languages</source>
+      <source xml:lang="en">TMX ñ aligned sets of terms in two or more languages</source>
    </trans-unit>
    <trans-unit approved="no" id="661" xml:space="preserve">
-      <source xml:lang="en">CSV ‚Äì aligned sets of terms with no attributes</source>
+      <source xml:lang="en">CSV ñ aligned sets of terms with no attributes</source>
    </trans-unit>
 <trans-unit approved="no" id="662" xml:space="preserve">
-      <source xml:lang="en"><ph ctype="x-link" id="0">&lt;text:a xlink:href="#TBX" xlink:type="simple"&gt;</ph>TBX<ph id="1">&lt;/text:a&gt;</ph> (TermBase eXchange) ‚Äì aligned sets of terms in two or more languages with support for advanced terminological information</source>
+      <source xml:lang="en"><ph ctype="x-link" id="0">&lt;text:a xlink:href="#TBX" xlink:type="simple"&gt;</ph>TBX<ph id="1">&lt;/text:a&gt;</ph> (TermBase eXchange) ñ aligned sets of terms in two or more languages with support for advanced terminological information</source>
    </trans-unit>   <trans-unit approved="no" id="663" xml:space="preserve">
       <source xml:lang="en">Import TMX Files</source>
    <alt-trans match-quality="52" origin="Plugins" tool="TM Search" xml:space="default">
@@ -1935,7 +1936,7 @@
 <trans-unit approved="no" id="671" xml:space="preserve">
       <source xml:lang="en">the program searches for duplicates or similar existing segments and updates them in the database.</source>
    </trans-unit><trans-unit approved="no" id="672" xml:space="preserve">
-      <source xml:lang="en"> The TMX file must have source language set to a real language code, not ‚Äú*all*‚Äù.</source>
+      <source xml:lang="en"> The TMX file must have source language set to a real language code, not ì*all*î.</source>
    </trans-unit>   <trans-unit approved="no" id="673" xml:space="preserve">
       <source xml:lang="en">You can optionally associate your TM data to a given project, customer or subject at import time.</source>
    </trans-unit>
@@ -1970,7 +1971,7 @@
    <alt-trans match-quality="94" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469380?>
 <source xml:lang="en">Column Separator</source>
-<target xml:lang="fr">S√©parateur de colonnes</target>
+<target xml:lang="fr">SÈparateur de colonnes</target>
 </alt-trans></trans-unit>
 <trans-unit approved="no" id="680" xml:space="preserve">
       <source xml:lang="en">the character used to separate data columns in the CSV file.</source>
@@ -1981,7 +1982,7 @@
    <alt-trans match-quality="93" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469383?>
 <source xml:lang="en">Text Delimiter</source>
-<target xml:lang="fr">D√©limiteur de texte</target>
+<target xml:lang="fr">DÈlimiteur de texte</target>
 </alt-trans></trans-unit>
 <trans-unit approved="no" id="683" xml:space="preserve">
       <source xml:lang="en">characters used to enclose column data.</source>
@@ -2041,7 +2042,7 @@
       <source xml:lang="en">Optionally, select the languages that you want to export in the languages list.</source>
    </trans-unit>
    <trans-unit approved="no" id="708" xml:space="preserve">
-      <source xml:lang="en"> Press and hold the ‚ÄúCtrl‚Äù key when clicking languages to select multiple options.</source>
+      <source xml:lang="en"> Press and hold the ìCtrlî key when clicking languages to select multiple options.</source>
    </trans-unit>
 <trans-unit approved="no" id="709" xml:space="preserve">
       <source xml:lang="en">Check the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Export as TMX Level 1 (No Tags)<ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T8"&gt;</ph> box if you don't want to export formatting codes from your database.</source>
@@ -2052,7 +2053,7 @@
    </trans-unit><trans-unit approved="no" id="712" xml:space="preserve">
       <source xml:lang="en">Select the source language for your TMX file using the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Source Language<ph id="1">&lt;/text:span&gt;</ph> drop-down list.</source>
    </trans-unit><trans-unit approved="no" id="713" xml:space="preserve">
-      <source xml:lang="en"> Notice that only CAT tools that can translate in any direction support the standard ‚Äú<ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>*all*<ph id="1">&lt;/text:span&gt;</ph>‚Äù option.</source>
+      <source xml:lang="en"> Notice that only CAT tools that can translate in any direction support the standard ì<ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>*all*<ph id="1">&lt;/text:span&gt;</ph>î option.</source>
    </trans-unit>   <trans-unit approved="no" id="714" xml:space="preserve">
       <source xml:lang="en"> Some translation tools only support TMX files with 2 languages and require one of them to be marked as source language.</source>
    </trans-unit>
@@ -2083,7 +2084,7 @@
 <trans-unit approved="no" id="724" xml:space="preserve">
       <source xml:lang="en">All databases are exported by default.</source>
    </trans-unit><trans-unit approved="no" id="725" xml:space="preserve">
-      <source xml:lang="en"> You can select the databases to export pressing and holding the ‚Äú<ph ctype="x-font" id="0">&lt;text:span text:style-name="Source_20_Text"&gt;</ph>Ctrl<ph id="1">&lt;/text:span&gt;</ph>‚Äù key while you click on the relevant row of the database list.</source>
+      <source xml:lang="en"> You can select the databases to export pressing and holding the ì<ph ctype="x-font" id="0">&lt;text:span text:style-name="Source_20_Text"&gt;</ph>Ctrl<ph id="1">&lt;/text:span&gt;</ph>î key while you click on the relevant row of the database list.</source>
    </trans-unit><trans-unit approved="no" id="726" xml:space="preserve">
       <source xml:lang="en"><ph id="0">&lt;text:soft-page-break/&gt;</ph>Enter the name of a folder where <ph ctype="x-font" id="1">&lt;text:span text:style-name="T5"&gt;</ph>Swordfish<ph id="2">&lt;/text:span&gt;</ph> will store the TMX files for each database in the <ph ctype="x-font" id="3">&lt;text:span text:style-name="T5"&gt;</ph>Output Folder<ph id="4">&lt;/text:span&gt;</ph> text box or use the <ph ctype="x-font" id="5">&lt;text:span text:style-name="T5"&gt;</ph>Browse...<ph id="6">&lt;/text:span&gt;</ph> button next to it to select a location.</source>
    </trans-unit><trans-unit approved="no" id="727" xml:space="preserve">
@@ -2103,7 +2104,7 @@
    </trans-unit><trans-unit approved="no" id="733" xml:space="preserve">
       <source xml:lang="en"><ph id="0">&lt;draw:image xlink:actuate="onLoad" xlink:href="Pictures/10000000000001A8000001751831E673.jpg" xlink:show="embed" xlink:type="simple"/&gt;</ph><ph id="1">&lt;/draw:frame&gt;</ph>Select the databases that will be used for searching translations and click on <ph ctype="x-font" id="2">&lt;text:span text:style-name="T5"&gt;</ph>Enable Selected DB<ph id="3">&lt;/text:span&gt;</ph> button.</source>
    </trans-unit><trans-unit approved="no" id="734" xml:space="preserve">
-      <source xml:lang="en"> Press and hold the ‚Äú<ph ctype="x-font" id="0">&lt;text:span text:style-name="Source_20_Text"&gt;</ph>Ctrl<ph id="1">&lt;/text:span&gt;</ph>‚Äù key while clicking on the database list to select multiple entries at a time.</source>
+      <source xml:lang="en"> Press and hold the ì<ph ctype="x-font" id="0">&lt;text:span text:style-name="Source_20_Text"&gt;</ph>Ctrl<ph id="1">&lt;/text:span&gt;</ph>î key while clicking on the database list to select multiple entries at a time.</source>
    </trans-unit><trans-unit approved="no" id="735" xml:space="preserve">
       <source xml:lang="en"><ph ctype="x-font" id="0">&lt;text:span text:style-name="T9"&gt;</ph>To tell <ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T10"&gt;</ph>Swordfish<ph id="3">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="4">&lt;text:span text:style-name="T9"&gt;</ph>where to write your translations when you approve segments, select a database from the <ph id="5">&lt;/text:span&gt;</ph><ph ctype="x-font" id="6">&lt;text:span text:style-name="T10"&gt;</ph>Write-enabled Database<ph id="7">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="8">&lt;text:span text:style-name="T9"&gt;</ph>drop-down list.</source>
    </trans-unit><trans-unit approved="no" id="736" xml:space="preserve">
@@ -2117,7 +2118,7 @@
    </trans-unit><trans-unit approved="no" id="740" xml:space="preserve">
       <source xml:lang="en">Select the databases that will be used for searching terms to display in the <ph ctype="x-link" id="0">&lt;text:a xlink:href="#5.1.5.Terminology|outline" xlink:type="simple"&gt;</ph>Terminology<ph id="1">&lt;/text:a&gt;</ph> panel or to be used by the Auto-Translation engine and click on the <ph ctype="x-font" id="2">&lt;text:span text:style-name="T5"&gt;</ph>Enable Selected DB<ph id="3">&lt;/text:span&gt;</ph> button.</source>
    </trans-unit><trans-unit approved="no" id="741" xml:space="preserve">
-      <source xml:lang="en"> Press and hold the ‚Äú<ph ctype="x-font" id="0">&lt;text:span text:style-name="Source_20_Text"&gt;</ph>Ctrl<ph id="1">&lt;/text:span&gt;</ph>‚Äù key while clicking on the database list to select multiple entries at a time.</source>
+      <source xml:lang="en"> Press and hold the ì<ph ctype="x-font" id="0">&lt;text:span text:style-name="Source_20_Text"&gt;</ph>Ctrl<ph id="1">&lt;/text:span&gt;</ph>î key while clicking on the database list to select multiple entries at a time.</source>
    </trans-unit><trans-unit approved="no" id="742" xml:space="preserve">
       <source xml:lang="en"><ph ctype="x-font" id="0">&lt;text:span text:style-name="T9"&gt;</ph>To tell <ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T10"&gt;</ph>Swordfish<ph id="3">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="4">&lt;text:span text:style-name="T9"&gt;</ph>where to write terms that you add on the fly, select a database from the <ph id="5">&lt;/text:span&gt;</ph><ph ctype="x-font" id="6">&lt;text:span text:style-name="T10"&gt;</ph>Write-enabled Database<ph id="7">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="8">&lt;text:span text:style-name="T9"&gt;</ph>drop-down list.</source>
    </trans-unit><trans-unit approved="no" id="743" xml:space="preserve">
@@ -2178,7 +2179,7 @@
    </trans-unit><trans-unit approved="no" id="761" xml:space="preserve">
       <source xml:lang="en">The picture on the left side shows the dialog for Windows or Linux.</source>
    </trans-unit><trans-unit approved="no" id="762" xml:space="preserve">
-      <source xml:lang="en"> The picture on the right side shows the dialog on Mac OS X, which includes support for the standard ‚Äú<ph id="0">&lt;/text:span&gt;</ph><ph ctype="x-font" id="1">&lt;text:span text:style-name="Source_20_Text"&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T8"&gt;</ph>Cmd<ph id="3">&lt;/text:span&gt;</ph><ph id="4">&lt;/text:span&gt;</ph><ph ctype="x-font" id="5">&lt;text:span text:style-name="Source_20_Text"&gt;</ph>‚Äù<ph id="6">&lt;/text:span&gt;</ph><ph ctype="x-font" id="7">&lt;text:span text:style-name="T8"&gt;</ph> (Command) key.<ph id="8">&lt;/text:span&gt;</ph> </source>
+      <source xml:lang="en"> The picture on the right side shows the dialog on Mac OS X, which includes support for the standard ì<ph id="0">&lt;/text:span&gt;</ph><ph ctype="x-font" id="1">&lt;text:span text:style-name="Source_20_Text"&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T8"&gt;</ph>Cmd<ph id="3">&lt;/text:span&gt;</ph><ph id="4">&lt;/text:span&gt;</ph><ph ctype="x-font" id="5">&lt;text:span text:style-name="Source_20_Text"&gt;</ph>î<ph id="6">&lt;/text:span&gt;</ph><ph ctype="x-font" id="7">&lt;text:span text:style-name="T8"&gt;</ph> (Command) key.<ph id="8">&lt;/text:span&gt;</ph> </source>
    </trans-unit>   <trans-unit approved="no" id="763" xml:space="preserve">
       <source xml:lang="en">All commands available in the different menus are listed in the Shortcuts Configuration dialog.</source>
    </trans-unit>
@@ -2228,14 +2229,14 @@
 </alt-trans><alt-trans match-quality="54" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469368?>
 <source xml:lang="en">Select Languages</source>
-<target xml:lang="fr">S√©lectionner les langues</target>
+<target xml:lang="fr">SÈlectionner les langues</target>
 </alt-trans></trans-unit>
 <trans-unit approved="no" id="780" xml:space="preserve">
       <source xml:lang="en"><ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Swordfish<ph id="1">&lt;/text:span&gt;</ph> uses by default language and country codes in the formats recommended by ISO<ph ctype="x-font" id="2">&lt;text:span text:style-name="T2"&gt;</ph> <ph id="3">&lt;/text:span&gt;</ph>639-1, ISO<ph ctype="x-font" id="4">&lt;text:span text:style-name="T2"&gt;</ph> <ph id="5">&lt;/text:span&gt;</ph>639-2 and ISO<ph ctype="x-font" id="6">&lt;text:span text:style-name="T2"&gt;</ph> <ph id="7">&lt;/text:span&gt;</ph>3166-1 specifications.</source>
    </trans-unit><trans-unit approved="no" id="781" xml:space="preserve">
-      <source xml:lang="en">Language codes should normally have the formats ‚Äúxx-YY‚Äù or ‚Äúxxx-YY‚Äù where ‚Äúxx‚Äù or ‚Äúxxx‚Äù are language codes in lower case (as established by ISO<ph ctype="x-font" id="0">&lt;text:span text:style-name="T2"&gt;</ph> <ph id="1">&lt;/text:span&gt;</ph>639-1 and ISO<ph ctype="x-font" id="2">&lt;text:span text:style-name="T2"&gt;</ph> <ph id="3">&lt;/text:span&gt;</ph>639-2) and ‚ÄúYY‚Äù is an optional country code in capitals, as prescribed by ISO<ph ctype="x-font" id="4">&lt;text:span text:style-name="T2"&gt;</ph> <ph id="5">&lt;/text:span&gt;</ph>3166-1 specification.</source>
+      <source xml:lang="en">Language codes should normally have the formats ìxx-YYî or ìxxx-YYî where ìxxî or ìxxxî are language codes in lower case (as established by ISO<ph ctype="x-font" id="0">&lt;text:span text:style-name="T2"&gt;</ph> <ph id="1">&lt;/text:span&gt;</ph>639-1 and ISO<ph ctype="x-font" id="2">&lt;text:span text:style-name="T2"&gt;</ph> <ph id="3">&lt;/text:span&gt;</ph>639-2) and ìYYî is an optional country code in capitals, as prescribed by ISO<ph ctype="x-font" id="4">&lt;text:span text:style-name="T2"&gt;</ph> <ph id="5">&lt;/text:span&gt;</ph>3166-1 specification.</source>
    </trans-unit><trans-unit approved="no" id="782" xml:space="preserve">
-      <source xml:lang="en"><ph id="0">&lt;text:soft-page-break/&gt;</ph>For compatibility with other applications, <ph ctype="x-font" id="1">&lt;text:span text:style-name="T5"&gt;</ph>Swordfish<ph id="2">&lt;/text:span&gt;</ph><ph ctype="x-font" id="3">&lt;text:span text:style-name="T8"&gt;</ph> allows changing language codes to other <ph id="4">&lt;/text:span&gt;</ph><ph ctype="x-font" id="5">&lt;text:span text:style-name="T8"&gt;</ph>formats, like ‚ÄúXX-YY‚Äù (all capitals).</source>
+      <source xml:lang="en"><ph id="0">&lt;text:soft-page-break/&gt;</ph>For compatibility with other applications, <ph ctype="x-font" id="1">&lt;text:span text:style-name="T5"&gt;</ph>Swordfish<ph id="2">&lt;/text:span&gt;</ph><ph ctype="x-font" id="3">&lt;text:span text:style-name="T8"&gt;</ph> allows changing language codes to other <ph id="4">&lt;/text:span&gt;</ph><ph ctype="x-font" id="5">&lt;text:span text:style-name="T8"&gt;</ph>formats, like ìXX-YYî (all capitals).</source>
    </trans-unit><trans-unit approved="no" id="783" xml:space="preserve">
       <source xml:lang="en"> To change a language code or to add a new one to the list of supported languages, select <ph id="0">&lt;/text:span&gt;</ph><ph ctype="x-font" id="1">&lt;text:span text:style-name="T5"&gt;</ph>Language Codes<ph id="2">&lt;/text:span&gt;</ph><ph ctype="x-font" id="3">&lt;text:span text:style-name="T8"&gt;</ph> from <ph id="4">&lt;/text:span&gt;</ph><ph ctype="x-link" id="5">&lt;text:a xlink:href="#4.3.6. Options Menu|outline" xlink:type="simple"&gt;</ph><ph ctype="x-font" id="6">&lt;text:span text:style-name="T8"&gt;</ph>Options<ph id="7">&lt;/text:span&gt;</ph><ph id="8">&lt;/text:a&gt;</ph><ph ctype="x-link" id="9">&lt;text:a xlink:href="#4.3.6. Options Menu|outline" xlink:type="simple"&gt;</ph> <ph id="10">&lt;/text:a&gt;</ph><ph ctype="x-font" id="11">&lt;text:span text:style-name="T8"&gt;</ph>menu and this dialog will appear:<ph id="12">&lt;/text:span&gt;</ph></source>
    </trans-unit><trans-unit approved="no" id="784" xml:space="preserve">
@@ -2295,7 +2296,7 @@
    </trans-unit><trans-unit approved="no" id="810" xml:space="preserve">
       <source xml:lang="en"><ph id="0">&lt;draw:image xlink:actuate="onLoad" xlink:href="Pictures/10000000000001E300000170BD6D4092.jpg" xlink:show="embed" xlink:type="simple"/&gt;</ph><ph id="1">&lt;/draw:frame&gt;</ph> <ph ctype="x-font" id="2">&lt;text:span text:style-name="T8"&gt;</ph>Enter the path to the Aspell executable in the top text box or use the <ph id="3">&lt;/text:span&gt;</ph><ph ctype="x-font" id="4">&lt;text:span text:style-name="T5"&gt;</ph>Browse...<ph id="5">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="6">&lt;text:span text:style-name="T8"&gt;</ph>button next to it to locate the program.</source>
    </trans-unit><trans-unit approved="no" id="811" xml:space="preserve">
-      <source xml:lang="en"> On Linux it is usually enough to type ‚Äúaspell‚Äù in the text box.</source>
+      <source xml:lang="en"> On Linux it is usually enough to type ìaspellî in the text box.</source>
    </trans-unit><trans-unit approved="no" id="812" xml:space="preserve">
       <source xml:lang="en"><ph id="0">&lt;text:soft-page-break/&gt;</ph><ph ctype="x-font" id="1">&lt;text:span text:style-name="T8"&gt;</ph>Check the <ph id="2">&lt;/text:span&gt;</ph><ph ctype="x-font" id="3">&lt;text:span text:style-name="T5"&gt;</ph>Use UTF-8<ph id="4">&lt;/text:span&gt;</ph> <ph ctype="x-font" id="5">&lt;text:span text:style-name="T8"&gt;</ph>box if you experiment problems during spell checking.</source>
    </trans-unit><trans-unit approved="no" id="813" xml:space="preserve">
@@ -2404,7 +2405,7 @@
 <trans-unit approved="no" id="857" xml:space="preserve">
       <source xml:lang="en"><ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>ignore:<ph id="1">&lt;/text:span&gt;</ph> ignore this element and do not include its text in the XLIFF file.</source>
    </trans-unit><trans-unit approved="no" id="858" xml:space="preserve">
-      <source xml:lang="en">If the element type is set to ‚Äúinline‚Äù, you must indicate the kind of markup that this element represents using the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Inline Type<ph id="1">&lt;/text:span&gt;</ph> drop-down list.</source>
+      <source xml:lang="en">If the element type is set to ìinlineî, you must indicate the kind of markup that this element represents using the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Inline Type<ph id="1">&lt;/text:span&gt;</ph> drop-down list.</source>
    </trans-unit>   <trans-unit approved="no" id="859" xml:space="preserve">
       <source xml:lang="en"> Available options are:</source>
    </trans-unit>
@@ -2472,7 +2473,7 @@
 </alt-trans><alt-trans match-quality="60" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469368?>
 <source xml:lang="en">Select Languages</source>
-<target xml:lang="fr">S√©lectionner les langues</target>
+<target xml:lang="fr">SÈlectionner les langues</target>
 </alt-trans><alt-trans match-quality="57" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469326?>
 <source xml:lang="en">Language</source>
@@ -2541,7 +2542,7 @@
       <source xml:lang="en">You can setup an optional shortcut for launching the plugin.</source>
    </trans-unit>
 <trans-unit approved="no" id="912" xml:space="preserve">
-      <source xml:lang="en"> Check the ‚ÄúCtrl‚Äù, ‚ÄúShift‚Äù or ‚ÄúAlt‚Äù boxes as modifiers and type a shortcut character or select an option from the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Shortcuts<ph id="1">&lt;/text:span&gt;</ph> drop-down list.</source>
+      <source xml:lang="en"> Check the ìCtrlî, ìShiftî or ìAltî boxes as modifiers and type a shortcut character or select an option from the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Shortcuts<ph id="1">&lt;/text:span&gt;</ph> drop-down list.</source>
    </trans-unit><trans-unit approved="no" id="913" xml:space="preserve">
       <source xml:lang="en">Use the <ph ctype="x-font" id="0">&lt;text:span text:style-name="T5"&gt;</ph>Processes<ph id="1">&lt;/text:span&gt;</ph> option to tell <ph ctype="x-font" id="2">&lt;text:span text:style-name="T5"&gt;</ph>Swordfish<ph id="3">&lt;/text:span&gt;</ph> what data to pass to the plugin:</source>
    </trans-unit><trans-unit approved="no" id="914" xml:space="preserve">
@@ -2579,7 +2580,7 @@
    <alt-trans match-quality="100" origin="Plugins" tool="TM Search" xml:space="default">
 <?id 1137162469384?>
 <source xml:lang="en">Character Set</source>
-<target xml:lang="fr">Jeu de caract√®res</target>
+<target xml:lang="fr">Jeu de caractËres</target>
 </alt-trans></trans-unit>   <trans-unit approved="no" id="928" xml:space="preserve">
       <source xml:lang="en">A character set (sometimes referred to as code page) is a collection of characters that are associated with a sequence of natural numbers in order to facilitate the storage of text in computers and the transmission of text through telecommunication networks.</source>
    </trans-unit>

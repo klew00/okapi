@@ -62,8 +62,6 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-import org.codehaus.stax2.XMLInputFactory2;
-
 public class XLIFFFilter implements IFilter {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -176,48 +174,6 @@ public class XLIFFFilter implements IFilter {
 		open(input, true);
 	}
 	
-/*	public void open (RawDocument input,
-		boolean generateSkeleton)
-	{
-		setOptions(input.getSourceLanguage(), input.getTargetLanguage(),
-			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			open(input.getInputCharSequence());
-		}
-		else if ( input.getInputURI() != null ) {
-			open(input.getInputURI());
-		}
-		else if ( input.getInputStream() != null ) {
-			open(input.getInputStream());
-		}
-		else {
-			throw new OkapiBadFilterInputException("RawDocument has no input defined.");
-		}
-	}
-	
-	private void open (InputStream input) {
-		commonOpen(0, input);
-	}
-	
-	private void open (CharSequence inputText) {
-		docName = null;
-		encoding = "UTF-16";
-		hasUTF8BOM = false;
-		lineBreak = BOMNewlineEncodingDetector.getNewlineType(inputText).toString();
-		commonOpen(1, new StringReader(inputText.toString()));
-	}
-
-	private void open (URI inputURI) {
-		try {
-			docName = inputURI.getPath();
-			commonOpen(0, inputURI.toURL().openStream());
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException(e);
-		}
-	}
-*/
-	
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
@@ -227,7 +183,7 @@ public class XLIFFFilter implements IFilter {
 
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+//Removed for Java 1.6			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			
 			//fact.setXMLResolver(new DefaultXMLResolver());
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
@@ -237,10 +193,14 @@ public class XLIFFFilter implements IFilter {
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
-//TODO: We need to let the XMLStreamReader detect its encoding, only provide a fall back.
-//We could just not use BOMNewlineEncodingDetector, but then we would not have info on BOM and linebreak type.
-			input.setEncoding(detector.getEncoding());
-			reader = fact.createXMLStreamReader(input.getReader());
+//			input.setEncoding(detector.getEncoding());
+//old for Woodstox			reader = fact.createXMLStreamReader(input.getReader());
+			if ( detector.isAutodetected() ) {
+				reader = fact.createXMLStreamReader(input.getStream(), detector.getEncoding());
+			}
+			else {
+				reader = fact.createXMLStreamReader(input.getStream());
+			}
 
 			String realEnc = reader.getCharacterEncodingScheme();
 			if ( realEnc != null ) encoding = realEnc;
@@ -391,12 +351,12 @@ public class XLIFFFilter implements IFilter {
 		StartSubDocument startSubDoc = new StartSubDocument(String.valueOf(++otherId));
 		storeStartElementFile(startSubDoc);
 		
-		String tmp = reader.getAttributeValue("", "original");
+		String tmp = reader.getAttributeValue(null, "original");
 		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'original'.");
 		else startSubDoc.setName(tmp);
 		
 		// Check the source language
-		tmp = reader.getAttributeValue("", "source-language");
+		tmp = reader.getAttributeValue(null, "source-language");
 		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'source-language'.");
 		LocaleId tmpLang = LocaleId.fromString(tmp); 
 		if ( !tmpLang.equals(srcLang) ) { // Warn about source language
@@ -548,27 +508,27 @@ public class XLIFFFilter implements IFilter {
 			tu = new TextUnit(String.valueOf(++tuId));
 			storeStartElement();
 
-			String tmp = reader.getAttributeValue("", "translate");
+			String tmp = reader.getAttributeValue(null, "translate");
 			if ( tmp != null ) tu.setIsTranslatable(tmp.equals("yes"));
 
-			tmp = reader.getAttributeValue("", "id");
+			tmp = reader.getAttributeValue(null, "id");
 			if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'id'.");
 			tu.setId(tmp);
 			
-			tmp = reader.getAttributeValue("", "resname");
+			tmp = reader.getAttributeValue(null, "resname");
 			if ( tmp != null ) tu.setName(tmp);
 			else if ( params.getFallbackToID() ) {
 				tu.setName(tu.getId());
 			}
 
 			approved = false;
-			tmp = reader.getAttributeValue("", Property.APPROVED);
+			tmp = reader.getAttributeValue(null, Property.APPROVED);
 			if (( tmp != null ) && tmp.equals("yes") ) {
 				approved = true;
 			}
 
 			// Set restype (can be null)
-			tu.setType(reader.getAttributeValue("", "restype"));
+			tu.setType(reader.getAttributeValue(null, "restype"));
 			
 			// Get the content
 			int eventType;
@@ -698,7 +658,7 @@ public class XLIFFFilter implements IFilter {
 		}
 		else {
 			// Get the coord attribute if available
-			String tmp = reader.getAttributeValue("", "coord");
+			String tmp = reader.getAttributeValue(null, "coord");
 			if ( tmp != null ) {
 				tu.setSourceProperty(new Property(Property.COORDINATES, tmp, false));
 			}
@@ -729,9 +689,9 @@ public class XLIFFFilter implements IFilter {
 		else {
 			// Get the state attribute if available
 			//TODO: Need to standardize target-state properties
-			String stateValue = reader.getAttributeValue("", "state");
+			String stateValue = reader.getAttributeValue(null, "state");
 			// Get the coord attribute if available
-			String coordValue = reader.getAttributeValue("", Property.COORDINATES);
+			String coordValue = reader.getAttributeValue(null, Property.COORDINATES);
 
 			// Get the target itself
 			skel.addContentPlaceholder(tu, trgLang);
@@ -1084,7 +1044,7 @@ public class XLIFFFilter implements IFilter {
 		//TODO: Handle 'annotates', etc.
 		try {
 			// Check the destination of the property
-			String dest = reader.getAttributeValue("", "annotates");
+			String dest = reader.getAttributeValue(null, "annotates");
 			if ( dest == null ) dest = ""; // like 'general'
 			Property prop = null;
 			StringBuilder tmp = new StringBuilder();
@@ -1144,7 +1104,7 @@ public class XLIFFFilter implements IFilter {
 	private boolean processStartGroup () {
 		storeStartElement();
 		// Check if it's a 'merge-trans' group (v1.2)
-		String tmp = reader.getAttributeValue("", "merge-trans");
+		String tmp = reader.getAttributeValue(null, "merge-trans");
 		if ( tmp != null ) {
 			// If it's a 'merge-trans' group we do not treat it as a normal group.
 			// The group element was not generated by the extractor.
@@ -1162,14 +1122,14 @@ public class XLIFFFilter implements IFilter {
 		queue.add(new Event(EventType.START_GROUP, group));
 
 		// Get resname (can be null)
-		tmp = reader.getAttributeValue("", "resname");
+		tmp = reader.getAttributeValue(null, "resname");
 		if ( tmp != null ) group.setName(tmp);
 		else if ( params.getFallbackToID() ) {
-			group.setName(reader.getAttributeValue("", "id"));
+			group.setName(reader.getAttributeValue(null, "id"));
 		}
 
 		// Get restype (can be null)
-		group.setType(reader.getAttributeValue("", "restype"));
+		group.setType(reader.getAttributeValue(null, "restype"));
 		return true;
 	}
 	
@@ -1191,7 +1151,7 @@ public class XLIFFFilter implements IFilter {
 	private boolean processStartBinUnit () {
 		storeStartElement();
 
-		String tmp = reader.getAttributeValue("", "id");
+		String tmp = reader.getAttributeValue(null, "id");
 		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'id'.");
 
 		StartGroup group = new StartGroup(parentIds.peek().toString(),
@@ -1201,14 +1161,14 @@ public class XLIFFFilter implements IFilter {
 		queue.add(new Event(EventType.START_GROUP, group));
 
 		// Get id for resname
-		tmp = reader.getAttributeValue("", "resname");
+		tmp = reader.getAttributeValue(null, "resname");
 		if ( tmp != null ) group.setName(tmp);
 		else if ( params.getFallbackToID() ) {
-			group.setName(reader.getAttributeValue("", "id"));
+			group.setName(reader.getAttributeValue(null, "id"));
 		}
 
 		// Get restype (can be null)
-		group.setType(reader.getAttributeValue("", "restype"));
+		group.setType(reader.getAttributeValue(null, "restype"));
 		return true;
 	}
 

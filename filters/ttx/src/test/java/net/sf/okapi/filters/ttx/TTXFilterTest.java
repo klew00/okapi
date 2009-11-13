@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,20 +21,12 @@
 package net.sf.okapi.filters.ttx;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.resource.AltTransAnnotation;
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
@@ -55,13 +47,13 @@ public class TTXFilterTest {
 	private LocaleId locESEM = LocaleId.fromString("es-em");
 	private LocaleId locKOKR = LocaleId.fromString("ko-kr");
 	
-	private static final String STARTFILE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	private static final String STARTFILE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		+ "<TRADOStag Version=\"2.0\"><FrontMatter>\n"
 		+ "<ToolSettings CreationDate=\"20070508T094743Z\" CreationTool=\"TRADOS TagEditor\" CreationToolVersion=\"7.0.0.615\"></ToolSettings>\n"
 		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"ES-EM\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"
 		+ "</FrontMatter><Body><Raw>\n";
 
-	private static final String STARTFILEKO = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	private static final String STARTFILEKO = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		+ "<TRADOStag Version=\"2.0\"><FrontMatter>\n"
 		+ "<ToolSettings CreationDate=\"20070508T094743Z\" CreationTool=\"TRADOS TagEditor\" CreationToolVersion=\"7.0.0.615\"></ToolSettings>\n"
 		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"KO-KR\" TargetDefaultFont=\"\ubd7e\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"

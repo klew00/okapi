@@ -38,22 +38,18 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -61,8 +57,6 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
-
-import org.codehaus.stax2.XMLInputFactory2;
 
 public class TTXFilter implements IFilter {
 
@@ -185,7 +179,7 @@ public class TTXFilter implements IFilter {
 
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+//Removed for Java 1.6			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			
 			//fact.setXMLResolver(new DefaultXMLResolver());
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
@@ -195,10 +189,12 @@ public class TTXFilter implements IFilter {
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
-//TODO: We need to let the XMLStreamReader detect its encoding, only provide a fall back.
-//We could just not use BOMNewlineEncodingDetector, but then we would not have info on BOM and linebreak type.
-			input.setEncoding(detector.getEncoding());
-			reader = fact.createXMLStreamReader(input.getReader());
+			if ( detector.isAutodetected() ) {
+				reader = fact.createXMLStreamReader(input.getStream(), detector.getEncoding());
+			}
+			else {
+				reader = fact.createXMLStreamReader(input.getStream());
+			}
 
 			String realEnc = reader.getCharacterEncodingScheme();
 			if ( realEnc != null ) encoding = realEnc;
@@ -385,7 +381,7 @@ public class TTXFilter implements IFilter {
 
 	private void processUserSettings () {
 		// Check source language
-		String tmp = reader.getAttributeValue("", "SourceLanguage");
+		String tmp = reader.getAttributeValue(null, "SourceLanguage");
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !srcLoc.equals(tmp) ) {
 				 logger.warning(String.format("Specified source was '%s' but source language in the file is '%s'.\nUsing '%s'.",
@@ -395,7 +391,7 @@ public class TTXFilter implements IFilter {
 		}
 
 		// Check target language
-		tmp = reader.getAttributeValue("", "TargetLanguage");
+		tmp = reader.getAttributeValue(null, "TargetLanguage");
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !trgLoc.equals(tmp) ) {
 				 logger.warning(String.format("Specified target was '%s' but target language in the file is '%s'.\nUsing '%s'.",
@@ -405,7 +401,7 @@ public class TTXFilter implements IFilter {
 			 }
 		}
 
-		trgDefFont = reader.getAttributeValue("", "TargetDefaultFont");
+		trgDefFont = reader.getAttributeValue(null, "TargetDefaultFont");
 		if ( Util.isEmpty(trgDefFont) ) {
 			trgDefFont = "Arial"; // Default
 		}
@@ -415,7 +411,7 @@ public class TTXFilter implements IFilter {
 	
 	// Case of a UT element outside a TUV, that is an un-segmented/translate code.
 	private void processTopUT () {
-		String tmp = reader.getAttributeValue("", "Style");
+		String tmp = reader.getAttributeValue(null, "Style");
 		// Default is internal
 		boolean isExternal = false;
 		if ( tmp != null ) {
@@ -441,7 +437,7 @@ public class TTXFilter implements IFilter {
 			tu = new TextUnit(String.valueOf(++tuId));
 			storeStartElement();
 
-			String tmp = reader.getAttributeValue("", "PercentageMatch");
+			String tmp = reader.getAttributeValue(null, "PercentageMatch");
 			if ( tmp != null ) {
 				//TODO
 			}
@@ -517,7 +513,7 @@ public class TTXFilter implements IFilter {
 		// Detect whether it is source or target 
 		LocaleId locId;
 		boolean isTarget = sourceDone;
-		String tmp = reader.getAttributeValue("", "Lang");
+		String tmp = reader.getAttributeValue(null, "Lang");
 		if ( tmp != null ) {
 			locId = LocaleId.fromString(tmp);
 		}
@@ -623,7 +619,7 @@ public class TTXFilter implements IFilter {
 						TagType tagType = TagType.PLACEHOLDER;
 						String type = "ph";
 						int idToUse = ++id;
-						tmp = reader.getAttributeValue("", "Type");
+						tmp = reader.getAttributeValue(null, "Type");
 						if ( tmp != null ) {
 							if ( tmp.equals("start") ) {
 								tagType = TagType.OPENING;
