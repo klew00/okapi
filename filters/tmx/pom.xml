@@ -8,13 +8,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>okapi-filter-tmx</artifactId>
 	<name>Okapi Filter for TMX</name>
-	<repositories>
+<!--	<repositories>
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
 		</repository>
-	</repositories>
+	</repositories> -->
 
 	<dependencies>
 		<dependency>
@@ -35,7 +35,7 @@
 			<groupId>stax</groupId>
 			<artifactId>stax-api</artifactId>
 			<version>1.0</version>
-		</dependency> -->
+		</dependency>
         <dependency>
 			<groupId>org.apache.servicemix.specs</groupId>
 			<artifactId>org.apache.servicemix.specs.stax-api-1.0</artifactId>
@@ -45,7 +45,7 @@
 			<groupId>org.codehaus.woodstox</groupId>
 			<artifactId>com.springsource.com.ctc.wstx</artifactId>
 			<version>3.2.8</version>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 </project>
 

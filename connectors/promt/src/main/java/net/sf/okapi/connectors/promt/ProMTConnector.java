@@ -81,10 +81,19 @@ public class ProMTConnector implements IQuery {
 	private String dirId;
 	private HashMap<String, String> dirIdentifiers;
 	private QueryUtil qutil;
+	private DocumentBuilder docBuilder;
 
 	public ProMTConnector () {
 		params = new Parameters();
 		qutil = new QueryUtil();
+		DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
+		Fact.setValidating(false);
+		try {
+			docBuilder = Fact.newDocumentBuilder();
+		}
+		catch ( ParserConfigurationException e ) {
+			throw new RuntimeException("Error creating document builder.", e);
+		}
 	}
 
 	public String getName () {
@@ -225,11 +234,11 @@ public class ProMTConnector implements IQuery {
 
 	        		if ( frag != null ) {
 	        			result.source = frag;
-	        			result.target = new TextFragment(qutil.fromXLIFF(buffer, frag), frag.getCodes());
+	        			result.target = qutil.fromXLIFF(prepareXLIFF(buffer), frag);
 	        		}
 	        		else { // Was plain text
 	        			result.source = new TextFragment(text);
-	        			result.target = new TextFragment(qutil.fromXLIFF(buffer, frag));
+	        			result.target = qutil.fromXLIFF(prepareXLIFF(buffer), frag);
 	        		}
 	        		
 	        		result.score = 95; // Arbitrary score for MT
@@ -255,6 +264,25 @@ e.printStackTrace();
 	        }
 		}
 		return current+1;
+	}
+	
+	private Element prepareXLIFF (String data) {
+		try {
+			// Un-escape first layer
+			data = data.replace("&apos;", "'");
+			data = data.replace("&lt;", "<");
+			data = data.replace("&gt;", ">");
+			data = data.replace("&quot;", "\"");
+			data = data.replace("&amp;", "&");
+			Document doc = docBuilder.parse(new InputSource(new StringReader("<s>"+data+"</s>")));
+			return doc.getDocumentElement();
+		}
+		catch ( SAXException e ) {
+			throw new RuntimeException("Error when parsing result.", e);
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException("Error when parsing result.", e);
+		}
 	}
 	
 	public void removeAttribute (String name) {
@@ -431,11 +459,11 @@ e.printStackTrace();
 		con.setLanguages(LocaleId.fromString("en"), LocaleId.fromString("fr"));
 		con.open();
 		
-//		TextFragment frag = new TextFragment("This <b>is an</b> example.");
-//		frag.changeToCode(13, 17, TagType.CLOSING, "b");
-//		frag.changeToCode(5, 8, TagType.OPENING, "b");
+		TextFragment frag = new TextFragment("This is an <b>example</b>.");
+		frag.changeToCode(21, 25, TagType.CLOSING, "b");
+		frag.changeToCode(11, 14, TagType.OPENING, "b");
 		
-		TextFragment frag = new TextFragment("This is an example.");
+//		TextFragment frag = new TextFragment("This is an example.");
 		
 		con.query(frag);
 		if ( con.hasNext() ) {

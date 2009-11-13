@@ -193,8 +193,6 @@ public class XLIFFFilter implements IFilter {
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
-//			input.setEncoding(detector.getEncoding());
-//old for Woodstox			reader = fact.createXMLStreamReader(input.getReader());
 			if ( detector.isAutodetected() ) {
 				reader = fact.createXMLStreamReader(input.getStream(), detector.getEncoding());
 			}

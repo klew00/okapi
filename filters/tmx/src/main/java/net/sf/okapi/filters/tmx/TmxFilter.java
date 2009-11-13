@@ -58,8 +58,6 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-import org.codehaus.stax2.XMLInputFactory2;
-
 public class TmxFilter implements IFilter {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -235,24 +233,28 @@ public class TmxFilter implements IFilter {
 			
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-//     		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
-// DWH an error message says Property org.codehaus.stax2.reportPrologWhitespace is not supported
+//Removed for Java 1.6     		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			
 			//fact.setXMLResolver(new DefaultXMLResolver());
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);			
 
+			// Determine encoding based on BOM, if any
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
-			
-			// determine encoding based on BOM, if any
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
-			input.setEncoding(detector.getEncoding());
+			if ( detector.isAutodetected() ) {
+				input.setEncoding(detector.getEncoding());
+				reader = fact.createXMLStreamReader(input.getStream(), detector.getEncoding());
+			}
+			else {
+				reader = fact.createXMLStreamReader(input.getStream());
+			}
 			
-			//TODO: How does this filter auto detect the encoding??
-			reader = fact.createXMLStreamReader(input.getReader());
-
-			encoding = input.getEncoding(); // Real encoding
+			String realEnc = reader.getCharacterEncodingScheme();
+			if ( realEnc != null ) encoding = realEnc;
+			else encoding = input.getEncoding();
+			
 			srcLang = input.getSourceLocale();
 			if ( Util.isNullOrEmpty(srcLang) ) throw new NullPointerException("Source language not set.");
 			trgLang = input.getTargetLocale();
@@ -278,8 +280,6 @@ public class TmxFilter implements IFilter {
 			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
-			String realEnc = reader.getCharacterEncodingScheme();
-			if ( realEnc != null ) encoding = realEnc;
 			startDoc.setEncoding(encoding, hasUTF8BOM); //TODO: UTF8 BOM detection
 			startDoc.setLocale(srcLang);
 			startDoc.setFilterParameters(getParameters());

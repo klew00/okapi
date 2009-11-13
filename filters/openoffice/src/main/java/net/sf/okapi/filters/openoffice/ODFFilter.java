@@ -54,8 +54,6 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-import org.codehaus.stax2.XMLInputFactory2;
-
 /**
  * This class implements IFilter for XML documents in Open-Document format (ODF).
  * The expected input is the XML document itself. It can be used on ODF documents
@@ -186,8 +184,8 @@ public class ODFFilter implements IFilter {
 		XMLInputFactory fact = XMLInputFactory.newInstance();
 		fact.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
 		fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
-		fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
+//Removed for Java 1.6		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+//Removed for Java 1.6		fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 
 		try {
 			input.setEncoding("UTF-8"); // Force UTF-8 as the default encoding
