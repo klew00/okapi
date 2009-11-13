@@ -15,7 +15,7 @@
         <module>lucene-spellchecker</module>
         <module>jericho-html</module>
         <module>snakeyaml</module>        
-        <module>apache-stax-api-1-0</module>
+        <!--<module>apache-stax-api-1-0</module>-->
         <module>trov4j</module>
         <module>download-osgi</module>
     </modules>
