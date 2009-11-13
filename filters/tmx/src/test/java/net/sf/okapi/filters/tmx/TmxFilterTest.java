@@ -44,6 +44,9 @@ public class TmxFilterTest {
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 	private LocaleId locFRFR = LocaleId.fromString("fr-fr");
 	
+	String simpleSnippetWithDTD = "<?xml version=\"1.0\"?>\r"
+		+ "<!DOCTYPE tmx SYSTEM \"tmx14.dtd\"><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_2\"><tuv xml:lang=\"en-us\"><seg>Hello Universe!</seg></tuv></tu></body></tmx>\r";
+
 	String simpleSnippet = "<?xml version=\"1.0\"?>\r"
 		+ "<!-- document level comment --><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>Hello Universe!</seg></tuv></tu></body></tmx>\r";
 
@@ -298,6 +301,14 @@ public class TmxFilterTest {
 		assertNotNull(sd.getMimeType());
 		assertNotNull(sd.getLocale());
 		assertEquals("\r", sd.getLineBreak());
+	}
+	
+	@Test
+	public void testDTDHandling () {
+		TextUnit tu = FilterTestDriver.getTextUnit(
+			getEvents(simpleSnippetWithDTD, locENUS, locFRFR), 2);
+		assertNotNull(tu);
+		assertEquals("Hello Universe!", tu.getSourceContent().toString());
 	}
 	
 	@Test

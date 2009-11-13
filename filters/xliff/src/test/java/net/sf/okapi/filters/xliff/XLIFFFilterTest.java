@@ -245,6 +245,14 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testWithNamespaces () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createInputWithNamespace(), 1);
+		assertNotNull(tu);
+		assertEquals("t1", tu.getSource().toString());
+		assertEquals("translated t1", tu.getTarget(locFR).toString());
+	}
+	
+	@Test
 	public void testBilingualTransUnit () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createBilingualXLIFF(), 1);
 		assertNotNull(tu);
@@ -458,6 +466,18 @@ public class XLIFFFilterTest {
 			+ "<target>translated t1</target></trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";
+		return getEvents(snippet);
+	}
+	
+	private ArrayList<Event> createInputWithNamespace () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<x:xliff version=\"1.2\" xmlns:x=\"'urn:oasis:names:tc:xliff:document:1.2'\">\r"
+			+ "<x:file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<x:body>"
+			+ "<x:trans-unit id=\"1\" approved=\"yes\"><x:source>t1</x:source>"
+			+ "<x:target>translated t1</x:target></x:trans-unit>"
+			+ "</x:body>"
+			+ "</x:file></x:xliff>";
 		return getEvents(snippet);
 	}
 	
