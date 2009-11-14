@@ -421,7 +421,9 @@ public class TTXFilter implements IFilter {
 				return;
 			}
 			// Else: it's internal, and not in a TU/TUV yet
-			
+			//store it for now
+			storeStartElement();
+			reader.next();
 		}
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException("Error processing top-level ut element.", e);
