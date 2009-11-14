@@ -40,7 +40,6 @@ import javax.xml.stream.events.DTD;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import org.codehaus.stax2.XMLInputFactory2;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -401,8 +400,7 @@ public class TsFilter implements IFilter {
 			canceled = false;
 
 			XMLInputFactory fact = XMLInputFactory.newInstance();
-			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+			fact.setProperty(XMLInputFactory.IS_COALESCING, false);
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 					
 			// Determine encoding based on BOM, if any
@@ -464,7 +462,7 @@ public class TsFilter implements IFilter {
 			startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 			skel.append("<?xml version=\"1.0\" encoding=\"");
 			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
-			skel.append("\"?>");
+			skel.append("\"?>"+lineBreak);
 			startDoc.setSkeleton(skel);
 		}
 		catch ( XMLStreamException e) {
@@ -576,10 +574,13 @@ public class TsFilter implements IFilter {
 
 				break;
 			
-			/*case XMLStreamConstants.START_DOCUMENT:
+			case XMLStreamConstants.START_DOCUMENT:
 			case XMLStreamConstants.CHARACTERS:
 			case XMLStreamConstants.DTD:
+				break;
 			case XMLStreamConstants.SPACE:
+				System.out.println("space: ");
+				break;
 			case XMLStreamConstants.ENTITY_REFERENCE:
 			case XMLStreamConstants.CDATA:
 			case XMLStreamConstants.COMMENT:
@@ -588,7 +589,8 @@ public class TsFilter implements IFilter {
 			case XMLStreamConstants.NAMESPACE:
 			case XMLStreamConstants.NOTATION_DECLARATION:
 			case XMLStreamConstants.ATTRIBUTE:
-			case XMLStreamConstants.END_DOCUMENT:*/
+			case XMLStreamConstants.END_DOCUMENT:
+				
 			}
 		}
 
@@ -675,7 +677,7 @@ public class TsFilter implements IFilter {
 			}else if(event.getEventType() == XMLEvent.END_DOCUMENT){
 				
 			}else if(event.getEventType() == XMLEvent.DTD){
-				procDTD(event);
+				//procDTD(event);
 			}else if(event.getEventType() == XMLEvent.COMMENT){
 				procComment(event);
 
@@ -703,6 +705,8 @@ public class TsFilter implements IFilter {
 				Characters chars = event.asCharacters();
 				procCharacters(chars);
 
+			}else{
+				System.out.println("Leftover");
 			}
 		}
 		resource.setSkeleton(skel);
@@ -1153,7 +1157,7 @@ public class TsFilter implements IFilter {
 
 	private void procComment(XMLEvent event) {
 		Comment comment = (Comment)event;
-		skel.append("<!--"+comment.getText().replace("\n", lineBreak)+"-->");
+		skel.append("<!--"+comment.getText().replace("\n", lineBreak)+"-->"+lineBreak);
 		
 	}
 	

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<!DOCTYPE TS>
 <!-- comment -->
 <TS version="4.5.1" sourcelanguage="en-us" language="fr-fr">
 <defaultcodec>hello defaultcodec</defaultcodec>
