@@ -43,7 +43,7 @@ public class TTXFilterTest {
 	private TTXFilter filter;
 	private GenericContent fmt;
 	private String root;
-	private LocaleId locENUS = LocaleId.fromString("en");
+	private LocaleId locENUS = LocaleId.fromString("en-us");
 	private LocaleId locESEM = LocaleId.fromString("es-em");
 	private LocaleId locKOKR = LocaleId.fromString("ko-kr");
 	
@@ -83,17 +83,17 @@ public class TTXFilterTest {
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM));
 	}
 
-//	@Test
-//	public void testBasicNoTU () {
-//		String snippet = STARTFILE
-//			+ "text"
-//			+ "</Raw></Body></TRADOStag>";
-//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
-//		assertNotNull(tu);
-//		TextContainer cont = tu.getSource();
-//		assertEquals("text", cont.toString());
-//		assertFalse(tu.hasTarget(locESEM));
-//	}
+	@Test
+	public void testBasicNoTU () {
+		String snippet = STARTFILE
+			+ "text"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		assertEquals("\ntext", cont.toString());
+		assertFalse(tu.hasTarget(locESEM));
+	}
 
 	@Test
 	public void testBasicNoUT () {
