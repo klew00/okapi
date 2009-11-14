@@ -407,12 +407,16 @@ public class TsFilter implements IFilter {
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
-			//TODO: We need to let the XMLStreamReader detect its encoding, only provide a fall back.
-			//We could just not use BOMNewlineEncodingDetector, but then we would not have info on BOM and linebreak type.
-			input.setEncoding(detector.getEncoding());
-		
-	        XMLStreamReader reader = fact.createXMLStreamReader(input.getReader());
-	        
+
+			XMLStreamReader reader;
+			if ( detector.isAutodetected() ) {
+				input.setEncoding(detector.getEncoding());
+				reader = fact.createXMLStreamReader(input.getStream(), detector.getEncoding());
+			}
+			else {
+				reader = fact.createXMLStreamReader(input.getStream());
+			}
+
 			String realEnc = reader.getCharacterEncodingScheme();
 			if ( realEnc != null ) 
 				encoding = realEnc;
