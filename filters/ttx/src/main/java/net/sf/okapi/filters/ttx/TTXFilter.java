@@ -23,7 +23,6 @@ package net.sf.okapi.filters.ttx;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -48,13 +47,13 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class TTXFilter implements IFilter {
@@ -76,15 +75,15 @@ public class TTXFilter implements IFilter {
 	private GenericSkeleton skel;
 	private TextUnit tu;
 	private Parameters params;
-	private boolean sourceDone;
-	private boolean targetDone;
+	//private boolean sourceDone;
+	//private boolean targetDone;
 	private String encoding;
-	private Stack<Boolean> preserveSpaces;
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	private StringBuilder buffer;
 	private boolean useDF;
 	private boolean insideContent;
+	private TTXSkeletonWriter skelwriter;
 	
 	public TTXFilter () {
 		params = new Parameters();
@@ -200,12 +199,18 @@ public class TTXFilter implements IFilter {
 			if ( realEnc != null ) encoding = realEnc;
 			else encoding = input.getEncoding();
 
+			// Set the language codes for the skeleton writer
+			if ( skelwriter == null ) skelwriter = new TTXSkeletonWriter();
+
 			srcLoc = input.getSourceLocale();
 			if ( srcLoc == null ) throw new NullPointerException("Source language not set.");
 			srcLangCode = srcLoc.toString().toUpperCase();
+			skelwriter.setSourceLanguageCode(srcLangCode);
+			
 			trgLoc = input.getTargetLocale();
 			if ( trgLoc == null ) throw new NullPointerException("Target language not set.");
 			trgLangCode = trgLoc.toString().toUpperCase(); // Default to create new entries
+			skelwriter.setTargetLanguageCode(trgLangCode);
 			
 			hasUTF8BOM = detector.hasUtf8Bom();
 			lineBreak = detector.getNewlineType().toString();
@@ -214,8 +219,6 @@ public class TTXFilter implements IFilter {
 			}
 
 			insideContent = false;
-			preserveSpaces = new Stack<Boolean>();
-			preserveSpaces.push(false);
 			tuId = 0;
 			otherId = 0;
 			// Set the start event
@@ -263,7 +266,8 @@ public class TTXFilter implements IFilter {
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {
-		return new GenericSkeletonWriter();
+		if ( skelwriter == null ) skelwriter = new TTXSkeletonWriter();
+		return skelwriter;
 	}
 
 	public IFilterWriter createFilterWriter () {
@@ -285,12 +289,11 @@ public class TTXFilter implements IFilter {
 			switch ( reader.getEventType() ) {
 			case XMLStreamConstants.START_ELEMENT:
 				String name = reader.getLocalName();
-				if ( "Tu".equals(name) ) {
-					return processTU();
-				}
-				if ( "ut".equals(name) ) {
-					processTopUT();
-					continue; // next() was called
+				if ( "Tu".equals(name) || "ut".equals(name) || "df".equals(name) ) {
+					if ( processTextUnit(name) ) return true;
+					storeStartElement();
+					storeUntilEndElement(name);
+					continue; // reader.next() was called
 				}
 				else if ( "UserSettings".equals(name) ){
 					processUserSettings();
@@ -315,7 +318,7 @@ public class TTXFilter implements IFilter {
 			case XMLStreamConstants.CHARACTERS:
 			case XMLStreamConstants.CDATA:
 				if ( insideContent && !whitespacesOnly(reader.getText()) ) {
-					processNewTU();
+					if ( processTextUnit(null) ) return true;
 					continue; // next() was called
 				}
 				else {
@@ -353,6 +356,162 @@ public class TTXFilter implements IFilter {
 		}
 	}
 
+	/* A text unit starts with either non-whitespace text, internal ut, df, or Tu.
+	 * It ends with end of Raw, external ut, or end of df not corresponding to 
+	 * a df included in the text unit. Tuv elements are segments.
+	 */
+	// Returns true if it is a text unit we need to return now
+	private boolean processTextUnit (String startTag) {
+		try {
+			// Send any previous tag as document part
+			createDocumentPartIfNeeded();
+
+			// Initialize variable for this text unit
+//			boolean inSegment = false;
+			boolean inTarget = false;
+			tu = new TextUnit(null); // No id yet
+			TextContainer srcCont = tu.getSource();
+			TextFragment srcSegFrag = null;
+			TextFragment trgSegFrag = null;
+			TextFragment current = srcCont.getContent();
+			ArrayList<Segment> trgSegments = new ArrayList<Segment>();
+			boolean returnAfterTextUnitDone = true;
+
+			String tmp;
+			String name;
+			boolean moveToNext = false;
+			int dfCount = 0;
+			int srcId = 0;
+			int trgId = 0;
+			boolean done = false;
+			
+			while ( !done ) {
+				// Move to next event if required 
+				if ( moveToNext ) reader.next();
+				else moveToNext = true;
+				
+				// Process the event
+				switch ( reader.getEventType() ) {
+				
+				case XMLStreamConstants.CHARACTERS:
+				case XMLStreamConstants.CDATA:
+				case XMLStreamConstants.SPACE:
+					current.append(reader.getText());
+					break;
+					
+				case XMLStreamConstants.START_ELEMENT:
+					name = reader.getLocalName();
+					if ( name.equals("ut") ) {
+						if ( !isInline(name) ) { // Non-inline ut
+							done = true;
+							returnAfterTextUnitDone = false;
+							continue;
+						}
+					}
+					else if ( name.equals("Tu") ) { // New segment
+//						inSegment = true;
+						inTarget = false;
+						srcSegFrag = new TextFragment();
+						trgSegFrag = new TextFragment();
+						current = srcSegFrag;
+						trgSegFrag = null;
+						//TODO: match info, etc.
+						continue;
+					}
+					else if ( name.equals("Tuv") ) { // New language content
+						tmp = reader.getAttributeValue(null, "Lang");
+						if ( tmp != null ) {
+							inTarget = trgLoc.equals(tmp);
+						}
+						else { // Just in case we don't have Lang
+							inTarget = !inTarget;
+						}
+						if ( inTarget ) {
+							trgSegFrag = new TextFragment();
+							current = trgSegFrag;
+						}
+						// Else: source is already set
+						continue;
+					}
+					else if ( name.equals("df") ) {
+						dfCount++;
+						//Skip df
+						//TODO: find a solution for internal/external storage
+						continue;
+					}
+					// Inline to include in this segment
+					TagType tagType = TagType.PLACEHOLDER;
+					String type = "ph";
+					int idToUse = (inTarget ? ++trgId : ++srcId);
+					tmp = reader.getAttributeValue(null, "Type");
+					if ( tmp != null ) {
+						if ( tmp.equals("start") ) {
+							tagType = TagType.OPENING;
+							type = "Xpt";
+						}
+						else if ( tmp.equals("end") ) {
+							tagType = TagType.CLOSING;
+							type = "Xpt";
+							idToUse = -1;
+							if ( inTarget ) trgId--;
+							else srcId--;
+						}
+					}
+					appendCode(tagType, idToUse, name, type, false, current);
+					break;
+
+				case XMLStreamConstants.END_ELEMENT:
+					name = reader.getLocalName();
+					if ( name.equals("Raw") ) { // End of document
+						done = true;
+					}
+					else if ( name.equals("df") ) {
+						if ( --dfCount < 0 ) { // External DF
+							done = true;
+						}
+					}
+					// Possible end of segment
+					if ( done || name.equals("Tu") ) {
+						if ( srcSegFrag != null ) { // Add the segment if we have one
+							srcCont.appendSegment(srcSegFrag);
+							trgSegments.add(new Segment(String.valueOf(srcCont.getSegmentCount()-1), trgSegFrag));
+							srcSegFrag = null;
+							trgSegFrag = null;
+							current = srcCont.getContent();
+						}
+					}
+					if ( done ) continue; // Stop here
+					break;
+				}
+			}
+
+			// Check if this it is worth sending as text unit
+			if ( !tu.getSource().hasText(true, false) ) {
+				// Not really a text unit: convert to skeleton
+		//TODO: to skel conversion
+				return false; // No return from filter
+			}
+			
+			// Else genuine text unit, finalize and send
+			TextContainer cont = tu.getSource().clone();
+			if ( cont.isSegmented() ) {
+				cont.setSegments(trgSegments);
+				tu.setTarget(trgLoc, cont);
+			}
+			tu.setId(String.valueOf(++tuId));
+			skel.addContentPlaceholder(tu); // Used by the TTXFilterWriter
+			tu.setSkeleton(skel);
+			tu.setPreserveWhitespaces(true);
+			tu.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
+			queue.add(new Event(EventType.TEXT_UNIT, tu));
+			skel = new GenericSkeleton();
+			return returnAfterTextUnitDone;
+		}
+		catch ( XMLStreamException e) {
+			throw new OkapiIOException("Error processing top-level ut element.", e);
+		}
+	}
+	
 	private void storeStartElement () {
 		String prefix = reader.getPrefix();
 		if (( prefix == null ) || ( prefix.length()==0 )) {
@@ -370,7 +529,6 @@ public class TTXFilter implements IFilter {
 				reader.getNamespaceURI(i)));
 		}
 		String attrName;
-		boolean ps = preserveSpaces.peek();
 		
 		count = reader.getAttributeCount();
 		for ( int i=0; i<count; i++ ) {
@@ -381,12 +539,8 @@ public class TTXFilter implements IFilter {
 				reader.getAttributeLocalName(i));
 			skel.append(String.format(" %s=\"%s\"", attrName,
 				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
-			if ( attrName.equals("xml:space") ) {
-				ps = reader.getAttributeValue(i).equals("preserve");
-			}
 		}
 		skel.append(">");
-		preserveSpaces.push(ps);
 	}
 	
 	private void storeEndElement () {
@@ -397,7 +551,6 @@ public class TTXFilter implements IFilter {
 		else {
 			skel.append("</"+reader.getLocalName()+">");
 		}
-		preserveSpaces.pop();
 	}
 
 	private void processUserSettings () {
@@ -420,6 +573,9 @@ public class TTXFilter implements IFilter {
 					trgLoc.toString(), tmp, tmp));
 				 trgLoc = LocaleId.fromString(tmp);
 				 trgLangCode = tmp;
+				 // Update skeleton writer value
+				 if ( skelwriter == null ) skelwriter = new TTXSkeletonWriter();
+				 skelwriter.setSourceLanguageCode(srcLangCode);
 			 }
 		}
 
@@ -430,27 +586,32 @@ public class TTXFilter implements IFilter {
 
 		storeStartElement();
 	}
-	
+
 	// Case of a UT element outside a TUV, that is an un-segmented/translate code.
-	private void processTopUT () {
-		try {
-			boolean isInline = isInline();
-			if ( isInline ) {
-				// It's internal, and not in a TU/TUV yet
-				//store it for now
-				storeStartElement();
-				reader.next();
-			}
-			else { // UT that should not be inline
-				// Keep copying into the skeleton until end of element
-				storeStartElement();
-				storeUntilEndElement("ut"); // Includes the closing tag
-			}
-		}
-		catch ( XMLStreamException e) {
-			throw new OkapiIOException("Error processing top-level ut element.", e);
-		}
-	}
+//	private void processTopSpecialElement (String tagName) {
+//		try {
+//			boolean isInline = isInline(tagName);
+//			if ( isInline ) {
+//				// It's internal, and not in a TU/TUV yet
+//				processNewTU();
+//				// reader.next() has been called already 
+//			}
+//			else {
+//				if ( tagName.equals("ut") ) { // UT that should not be inline
+//					// Keep copying into the skeleton until end of element
+//					storeStartElement();
+//					storeUntilEndElement("ut"); // Includes the closing tag
+//				}
+//				else { // DF external
+//					storeStartElement();
+//					reader.next();
+//				}
+//			}
+//		}
+//		catch ( XMLStreamException e) {
+//			throw new OkapiIOException("Error processing top-level ut element.", e);
+//		}
+//	}
 	
 	private void storeUntilEndElement (String name) throws XMLStreamException {
 		int eventType;
@@ -486,21 +647,22 @@ public class TTXFilter implements IFilter {
 		}
 	}
 
-	private boolean isInline () {
-		boolean inline = false;
+	private boolean isInline (String tagName) {
+		if ( tagName.equals("df") ) {
+			return false; //TODO: decide df in or out
+		}
 		String tmp = reader.getAttributeValue(null, "Style");
 		if ( tmp != null ) {
-			inline = !"external".equals(tmp);
+			return  !"external".equals(tmp);
 		}
 		else {
 			// If no Style attribute: check for Class as some are indicator of external type.
 			tmp = reader.getAttributeValue(null, "Class");
 			if ( tmp != null ) {
-				inline = !"procinstr".equals(tmp);
+				return !"procinstr".equals(tmp);
 			}
 		}
-		// Default is internal
-		return inline;
+		return true; // Default is internal
 	}
 
 	private void createDocumentPartIfNeeded () {
@@ -514,169 +676,172 @@ public class TTXFilter implements IFilter {
 		}
 	}
 	
-	private void processNewTU () {
-		createDocumentPartIfNeeded();
-		skel.append("<Tu PercentageMatch=\"0\">"); // Start segment
-		skel.append(String.format("<Tuv Lang=\"%s\">", srcLangCode));
-
-		tu = new TextUnit(String.valueOf(++tuId));
-		// Get the content. We should stop when we reach
-		// any of the following: </Raw>, <Tu>, or non-inline <ut>
-		TextContainer tc = processContent(null, false);
-		tu.setSource(tc);
-		// Note that upon this return we have reader.next() already called
-		// So we need to make sure it is not called again
-
-		skel.append("</Tuv>"); // End source
-		
-		targetDone = false; // Add the target
-		addTargetIfNeeded();
-		skel.append("</Tu>"); // End =segment
-
-		tu.setSkeleton(skel);
-		tu.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
-		queue.add(new Event(EventType.TEXT_UNIT, tu));
-	}
+//	private void processNewTU () {
+//		createDocumentPartIfNeeded();
+//		skel.append("<Tu PercentageMatch=\"0\">"); // Start segment
+//		skel.append(String.format("<Tuv Lang=\"%s\">", srcLangCode));
+//
+//		tu = new TextUnit(String.valueOf(++tuId));
+//		// Get the content. We should stop when we reach
+//		// any of the following: </Raw>, <Tu>, or non-inline <ut>,
+//		// or </df> of external <df>
+////TODO: resolev the DF dilema
+//		TextContainer tc = processContent(null, true);
+//		tu.setSource(tc);
+//		// Note that upon this return we have reader.next() already called
+//		// So we need to make sure it is not called again
+//
+//		skel.append("</Tuv>"); // End source
+//		
+//		targetDone = false; // Add the target
+//		addTargetIfNeeded();
+//		skel.append("</Tu>"); // End =segment
+//
+//		tu.setSkeleton(skel);
+//		tu.setPreserveWhitespaces(true);
+//		tu.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
+//		queue.add(new Event(EventType.TEXT_UNIT, tu));
+//		skel = new GenericSkeleton();
+//	}
 	
-	private boolean processTU () {
-		try {
-			createDocumentPartIfNeeded();
-			// Process Tu
-			sourceDone = false;
-			targetDone = false;
-			tu = new TextUnit(String.valueOf(++tuId));
-			storeStartElement();
-
-			String tmp = reader.getAttributeValue(null, "PercentageMatch");
-			if ( tmp != null ) {
-				//TODO
-			}
-
-			// Get the content
-			int eventType;
-			while ( reader.hasNext() ) {
-				eventType = reader.next();
-				String name;
-				switch ( eventType ) {
-				case XMLStreamConstants.START_ELEMENT:
-					name = reader.getLocalName();
-					if ( "Tuv".equals(name) ) {
-						storeStartElement();
-						processTUV();
-						storeEndElement();
-					}
-					//TODO: Deal with df
-					break;
-				
-				case XMLStreamConstants.END_ELEMENT:
-					name = reader.getLocalName();
-					if ( "Tu".equals(name) ) {
-						addTargetIfNeeded();
-						storeEndElement();
-						tu.setSkeleton(skel);
-						tu.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
-						queue.add(new Event(EventType.TEXT_UNIT, tu));
-						reader.next(); // Move the cursor forward
-						return true;
-					}
-					// Else: just store the end
-					storeEndElement();
-					break;
-				
-				case XMLStreamConstants.SPACE:
-				case XMLStreamConstants.CDATA:
-				case XMLStreamConstants.CHARACTERS:
-					if ( !targetDone ) {
-						tmp = reader.getText();
-						for ( int i=0; i<tmp.length(); i++ ) {
-							if ( !Character.isWhitespace(tmp.charAt(i)) ) {
-								addTargetIfNeeded();
-								break;
-							}
-						}
-					}
-					//TODO: escape unsupported chars
-					skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.getEscapeGT(), null));
-					break;
-					
-				case XMLStreamConstants.COMMENT:
-					//addTargetIfNeeded();
-					skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
-					break;
-				
-				case XMLStreamConstants.PROCESSING_INSTRUCTION:
-					//addTargetIfNeeded();
-					skel.append("<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
-					break;
-				}
-			}
-		}
-		catch ( XMLStreamException e) {
-			throw new OkapiIOException("Error processing Tu element.", e);
-		}
-		return false;
-	}
+//	private boolean processTU () {
+//		try {
+//			createDocumentPartIfNeeded();
+//			// Process Tu
+//			sourceDone = false;
+//			targetDone = false;
+//			tu = new TextUnit(String.valueOf(++tuId));
+//			storeStartElement();
+//
+//			String tmp = reader.getAttributeValue(null, "PercentageMatch");
+//			if ( tmp != null ) {
+//				//TODO
+//			}
+//
+//			// Get the content
+//			int eventType;
+//			while ( reader.hasNext() ) {
+//				eventType = reader.next();
+//				String name;
+//				switch ( eventType ) {
+//				case XMLStreamConstants.START_ELEMENT:
+//					name = reader.getLocalName();
+//					if ( "Tuv".equals(name) ) {
+//						storeStartElement();
+//						processTUV();
+//						storeEndElement();
+//					}
+//					//TODO: Deal with df
+//					break;
+//				
+//				case XMLStreamConstants.END_ELEMENT:
+//					name = reader.getLocalName();
+//					if ( "Tu".equals(name) ) {
+//						addTargetIfNeeded();
+//						storeEndElement();
+//						tu.setSkeleton(skel);
+//						tu.setPreserveWhitespaces(true);
+//						tu.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
+//						queue.add(new Event(EventType.TEXT_UNIT, tu));
+//						reader.next(); // Move the cursor forward
+//						return true;
+//					}
+//					// Else: just store the end
+//					storeEndElement();
+//					break;
+//				
+//				case XMLStreamConstants.SPACE:
+//				case XMLStreamConstants.CDATA:
+//				case XMLStreamConstants.CHARACTERS:
+//					if ( !targetDone ) {
+//						tmp = reader.getText();
+//						for ( int i=0; i<tmp.length(); i++ ) {
+//							if ( !Character.isWhitespace(tmp.charAt(i)) ) {
+//								addTargetIfNeeded();
+//								break;
+//							}
+//						}
+//					}
+//					//TODO: escape unsupported chars
+//					skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.getEscapeGT(), null));
+//					break;
+//					
+//				case XMLStreamConstants.COMMENT:
+//					//addTargetIfNeeded();
+//					skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
+//					break;
+//				
+//				case XMLStreamConstants.PROCESSING_INSTRUCTION:
+//					//addTargetIfNeeded();
+//					skel.append("<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
+//					break;
+//				}
+//			}
+//		}
+//		catch ( XMLStreamException e) {
+//			throw new OkapiIOException("Error processing Tu element.", e);
+//		}
+//		return false;
+//	}
 	
-	private void processTUV () {
-		TextContainer tc;
-
-		// Detect whether it is source or target 
-		LocaleId locId;
-		boolean isTarget = sourceDone;
-		String tmp = reader.getAttributeValue(null, "Lang");
-		if ( tmp != null ) {
-			locId = LocaleId.fromString(tmp);
-		}
-		else {
-			if ( isTarget ) locId = trgLoc;
-			else locId = srcLoc;
-		}
-		//TODO: check actual languages against expected languages
-		
-		// Add the placeholder for the content
-		if ( isTarget ) {
-			skel.addContentPlaceholder(tu, locId);
-		}
-		else {
-			skel.addContentPlaceholder(tu);
-		}
-
-		// Get the content
-		tc = processContent("Tuv", false);
-		
-		// Finalize the content
-		if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
-		tu.setPreserveWhitespaces(preserveSpaces.peek());
-		if ( isTarget ) {
-			tu.setTarget(locId, tc);
-			targetDone = true;
-		}
-		else {
-			tu.setSource(tc);
-			sourceDone = true;
-		}
-	}
+//	private void processTUV () {
+//		TextContainer tc;
+//
+//		// Detect whether it is source or target 
+//		LocaleId locId;
+//		boolean isTarget = sourceDone;
+//		String tmp = reader.getAttributeValue(null, "Lang");
+//		if ( tmp != null ) {
+//			locId = LocaleId.fromString(tmp);
+//		}
+//		else {
+//			if ( isTarget ) locId = trgLoc;
+//			else locId = srcLoc;
+//		}
+//		//TODO: check actual languages against expected languages
+//		
+//		// Add the placeholder for the content
+//		if ( isTarget ) {
+//			skel.addContentPlaceholder(tu, locId);
+//		}
+//		else {
+//			skel.addContentPlaceholder(tu);
+//		}
+//
+//		// Get the content
+//		tc = processContent("Tuv", false);
+//		
+//		// Finalize the content
+//		if ( isTarget ) {
+//			tu.setTarget(locId, tc);
+//			targetDone = true;
+//		}
+//		else {
+//			tu.setSource(tc);
+//			sourceDone = true;
+//		}
+//	}
 	
-	private void addTargetIfNeeded () {
-		if ( targetDone ) return; // Nothing to add
-		// If the target language is the same as the source, we should not create new <target>
-		if ( srcLoc.equals(trgLoc) ) return; 
-		//Else: this trans-unit has no target, we add it here in the skeleton
-		// so we can merge target data in it when writing out the skeleton
-		skel.append(String.format("<Tuv Lang=\"%s\">", trgLangCode));
-		
-		// target placeholder, with optional df around it if requested
-		if ( useDF ) {
-			skel.append(String.format("<df Font=\"%s\">", trgDefFont));
-		}
-		skel.addContentPlaceholder(tu, trgLoc);
-		if ( useDF ) {
-			skel.append("</df>");
-		}
-
-		skel.append("</Tuv>");
-		targetDone = true;
-	}
+//	private void addTargetIfNeeded () {
+//		if ( targetDone ) return; // Nothing to add
+//		// If the target language is the same as the source, we should not create new <target>
+//		if ( srcLoc.equals(trgLoc) ) return; 
+//		//Else: this trans-unit has no target, we add it here in the skeleton
+//		// so we can merge target data in it when writing out the skeleton
+//		skel.append(String.format("<Tuv Lang=\"%s\">", trgLangCode));
+//		
+//		// target placeholder, with optional df around it if requested
+//		if ( useDF ) {
+//			skel.append(String.format("<df Font=\"%s\">", trgDefFont));
+//		}
+//		skel.addContentPlaceholder(tu, trgLoc);
+//		if ( useDF ) {
+//			skel.append("</df>");
+//		}
+//
+//		skel.append("</Tuv>");
+//		targetDone = true;
+//	}
 	
 	/**
 	 * Processes a segment content.
@@ -685,98 +850,111 @@ public class TTXFilter implements IFilter {
 	 * @param store true if the data must be stored in the skeleton. This is used to merge later on.
 	 * @return a new TextContainer object with the parsed content.
 	 */
-	private TextContainer processContent (String tagName,
-		boolean store)
-	{
-		try {
-			TextContainer cont = new TextContainer();
-			TextFragment current = cont.getContent();
-			int id = 0;
-			Stack<Integer> idStack = new Stack<Integer>();
-			idStack.push(id);
-			String name;
-			String tmp;
-			boolean moveToNext = (tagName != null); 
-			
-			while ( reader.hasNext() ) {
-				
-				if ( moveToNext ) {
-					reader.next();
-				}
-				else {
-					moveToNext = true;
-				}
-				
-				switch ( reader.getEventType() ) {
-				case XMLStreamConstants.CHARACTERS:
-				case XMLStreamConstants.CDATA:
-				case XMLStreamConstants.SPACE:
-					current.append(reader.getText());
-					if ( store ) { //TODO: escape unsupported chars
-						skel.append(Util.escapeToXML(reader.getText(), 0, params.getEscapeGT(), null));
-					}
-					break;
-		
-				case XMLStreamConstants.END_ELEMENT:
-					name = reader.getLocalName();
-					if ( tagName == null ) { // new segment case
-						if ( name.equals("Raw") ) {
-							// End of document
-							return cont;
-						}
-					}
-					else {
-						if ( name.equals(tagName) ) {
-							return cont;
-						}
-					}
-					break;
-					
-				case XMLStreamConstants.START_ELEMENT:
-					name = reader.getLocalName();
-					if ( name.equals("ut") ) {
-						if ( tagName == null ) { // New segment
-							if ( !isInline() ) {
-								// Stop the new segment here
-								return cont;
-							}
-							// Else: inline to include in this segment
-						}
-						TagType tagType = TagType.PLACEHOLDER;
-						String type = "ph";
-						int idToUse = ++id;
-						tmp = reader.getAttributeValue(null, "Type");
-						if ( tmp != null ) {
-							if ( tmp.equals("start") ) {
-								tagType = TagType.OPENING;
-								type = "Xpt";
-							}
-							else if ( tmp.equals("end") ) {
-								tagType = TagType.CLOSING;
-								type = "Xpt";
-								idToUse = -1; id--;
-							}
-						}
-						appendCode(tagType, idToUse, name, type, store, current);
-					}
-					else if ( tagName == null ) { // New segment
-						if ( name.equals("Tu") ) {
-							// Another segment starts
-							return cont;
-						}
-					}
-					if ( store ) storeStartElement();
-					break;
-				}
-			}
-			
-			// current should be content at the end
-			return cont;
-		}
-		catch ( XMLStreamException e) {
-			throw new OkapiIOException(e);
-		}
-	}
+//	private TextContainer processContent (String tagName,
+//		boolean store)
+//	{
+//		try {
+//			TextContainer cont = new TextContainer();
+//			TextFragment current = cont.getContent();
+//			int id = 0;
+//			Stack<Integer> idStack = new Stack<Integer>();
+//			idStack.push(id);
+//			String name;
+//			String tmp;
+//			boolean moveToNext = (tagName != null);
+//			int dfCount = 0;
+//			
+//			while ( reader.hasNext() ) {
+//				
+//				if ( moveToNext ) {
+//					reader.next();
+//				}
+//				else {
+//					moveToNext = true;
+//				}
+//				
+//				switch ( reader.getEventType() ) {
+//				
+//				case XMLStreamConstants.CHARACTERS:
+//				case XMLStreamConstants.CDATA:
+//				case XMLStreamConstants.SPACE:
+//					current.append(reader.getText());
+//					if ( store ) { //TODO: escape unsupported chars
+//						skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.getEscapeGT(), null));
+//					}
+//					break;
+//		
+//				case XMLStreamConstants.END_ELEMENT:
+//					name = reader.getLocalName();
+//					if ( tagName == null ) { // new segment case
+//						if ( name.equals("Raw") ) {
+//							// End of document
+//							return cont;
+//						}
+//						if ( name.equals("df") ) {
+//							if ( --dfCount < 0 ) {
+//								// External DF
+//								return cont;
+//							}
+//						}
+//					}
+//					else {
+//						if ( name.equals(tagName) ) {
+//							return cont;
+//						}
+//						if ( name.equals("df") ) {
+//							dfCount--;
+//						}
+//					}
+//					// TODO: df
+//					break;
+//					
+//				case XMLStreamConstants.START_ELEMENT:
+//					name = reader.getLocalName();
+//					if ( name.equals("ut") ) {
+//						if ( tagName == null ) { // New segment
+//							if ( !isInline(name) ) {
+//								// Stop the new segment here
+//								return cont;
+//							}
+//							// Else: inline to include in this segment
+//						}
+//						TagType tagType = TagType.PLACEHOLDER;
+//						String type = "ph";
+//						int idToUse = ++id;
+//						tmp = reader.getAttributeValue(null, "Type");
+//						if ( tmp != null ) {
+//							if ( tmp.equals("start") ) {
+//								tagType = TagType.OPENING;
+//								type = "Xpt";
+//							}
+//							else if ( tmp.equals("end") ) {
+//								tagType = TagType.CLOSING;
+//								type = "Xpt";
+//								idToUse = -1; id--;
+//							}
+//						}
+//						if ( store ) storeStartElement();
+//						appendCode(tagType, idToUse, name, type, store, current);
+//					}
+//					else if ( tagName == null ) { // New segment
+//						if ( name.equals("Tu") ) {
+//							// Another segment starts
+//							return cont;
+//						}
+//					}
+//					if ( name.equals("df") ) dfCount++;
+//					break;
+//				}
+//			}
+//			
+//			// current should be content at the end
+//			return cont;
+//		}
+//		catch ( XMLStreamException e) {
+//			throw new OkapiIOException(e);
+//		}
+//	}
 
 	/**
 	 * Appends a code, using the content of the node. Do not use for <g>-type tags.
@@ -818,10 +996,7 @@ public class TTXFilter implements IFilter {
 				case XMLStreamConstants.START_ELEMENT:
 					if ( store ) storeStartElement();
 					StringBuilder tmpg = new StringBuilder();
-					if ( reader.getLocalName().equals("sub") ) {
-						logger.warning("A <sub> element was detected. It will be included in its parent code as <sub> is currently not supported.");
-					}
-					else if ( tagName.equals(reader.getLocalName()) ) {
+					if ( tagName.equals(reader.getLocalName()) ) {
 						endStack++; // Take embedded elements into account 
 					}
 					prefix = reader.getPrefix();

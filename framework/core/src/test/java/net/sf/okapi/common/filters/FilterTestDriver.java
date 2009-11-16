@@ -54,6 +54,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Driver to test filter output.
@@ -583,6 +584,54 @@ public class FilterTestDriver {
 			}
 		}
 		writer.close();
+		return tmp.toString();
+	}
+
+	/**
+	 * Creates a string output from a list of events, using a given ISkeletonWriter.
+	 * @param list the list of events.
+	 * @param trgLang code of the target (output) language.
+	 * @param skelWriter the ISkeletonWriter to use. 
+	 * @return The generated output string.
+	 */
+	public static String generateOutput (ArrayList<Event> list,
+		LocaleId trgLang,
+		ISkeletonWriter skelWriter)
+	{
+		StringBuilder tmp = new StringBuilder();
+		for (Event event : list) {
+			switch (event.getEventType()) {
+			case START_DOCUMENT:
+				tmp.append(skelWriter.processStartDocument(trgLang, "UTF-8", null, new EncoderManager(),
+					(StartDocument) event.getResource()));
+				break;
+			case END_DOCUMENT:
+				tmp.append(skelWriter.processEndDocument((Ending)event.getResource()));
+				break;
+			case START_SUBDOCUMENT:
+				tmp.append(skelWriter.processStartSubDocument((StartSubDocument)event.getResource()));
+				break;
+			case END_SUBDOCUMENT:
+				tmp.append(skelWriter.processEndSubDocument((Ending)event.getResource()));
+				break;
+			case TEXT_UNIT:
+				TextUnit tu = (TextUnit)event.getResource();
+				tmp.append(skelWriter.processTextUnit(tu));
+				break;
+			case DOCUMENT_PART:
+				DocumentPart dp = (DocumentPart)event.getResource();
+				tmp.append(skelWriter.processDocumentPart(dp));
+				break;
+			case START_GROUP:
+				StartGroup startGroup = (StartGroup)event.getResource();
+				tmp.append(skelWriter.processStartGroup(startGroup));
+				break;
+			case END_GROUP:
+				tmp.append(skelWriter.processEndGroup((Ending) event.getResource()));
+				break;
+			}
+		}
+		skelWriter.close();
 		return tmp.toString();
 	}
 

@@ -50,13 +50,14 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class GenericSkeletonWriter implements ISkeletonWriter {
 
-	private Stack<StorageList> storageStack;
+	protected LocaleId inputLoc;
+	protected LocaleId outputLoc;
+	protected ILayerProvider layer;
+	
 	private LinkedHashMap<String, Referent> referents;
-	private LocaleId inputLoc;
-	private LocaleId outputLoc;
+	private Stack<StorageList> storageStack;
 	private String outputEncoding;
 	private boolean isMultilingual;
-	private ILayerProvider layer;
 	private EncoderManager encoderManager;
 	
 	private IReferenceable getReference (String id) {
