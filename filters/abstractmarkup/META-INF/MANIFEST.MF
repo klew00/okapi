@@ -7,6 +7,6 @@ Export-Package: net.sf.okapi.filters.abstractmarkup,
  net.sf.okapi.filters.yaml
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.htmlparser.jericho;bundle-version="3.1.0",
- org.yaml.snakeyaml;bundle-version="1.4.0"
+ org.yaml.snakeyaml;bundle-version="1.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,target/classes,src/main/resources

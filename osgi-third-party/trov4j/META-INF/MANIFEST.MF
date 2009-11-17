@@ -13,6 +13,6 @@ Bundle-Name: GNU Trove for Java
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: gnu.trove
 Export-Package: gnu.trove,gnu.trove.decorator
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 
 

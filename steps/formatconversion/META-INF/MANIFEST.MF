@@ -3,6 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Copy Source To Target Plug-in
 Bundle-SymbolicName: net.sf.okapi.steps.formatconversion
 Bundle-Version: 1.0.0
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
 Export-Package: net.sf.okapi.steps.formatconversion

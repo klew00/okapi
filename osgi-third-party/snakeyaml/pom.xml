@@ -11,7 +11,7 @@
     <properties>
         <OriginalGroupId>org.yaml</OriginalGroupId>
         <OriginalArtifactId>snakeyaml</OriginalArtifactId>
-        <OriginalVersion>1.4</OriginalVersion>
+        <OriginalVersion>1.5</OriginalVersion>
     </properties>
     <name>OSGI SnakeYAML</name>
 

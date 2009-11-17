@@ -4,11 +4,11 @@ Bundle-Name: Pensieve TM
 Bundle-SymbolicName: net.sf.okapi.tm.pensieve
 Bundle-Version: 0.0.1
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- org.apache.lucene-core;bundle-version="2.9.0",
- org.apache.lucene-spellchecker;bundle-version="2.9.0",
  net.sf.okapi.filters.tmx;bundle-version="1.0.0",
  com.ibm.icu;bundle-version="4.0.1",
- gnu.trove;bundle-version="2.1.0"
+ gnu.trove;bundle-version="2.1.0",
+ org.apache.lucene-core;bundle-version="2.9.1",
+ org.apache.lucene-spellchecker;bundle-version="2.9.1"
 Export-Package: net.sf.okapi.tm.pensieve.common,
  net.sf.okapi.tm.pensieve.seeker,
  net.sf.okapi.tm.pensieve.writer,

@@ -10,4 +10,4 @@ Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
  net.sf.okapi.lib.segmentation;bundle-version="1.0.0",
  net.sf.okapi.tm.simpletm;bundle-version="1.0.0",
  net.sf.okapi.pipelinedriver;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

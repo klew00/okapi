@@ -8,14 +8,13 @@
     <artifactId>osgi-helper</artifactId>
     <name>OSGI Third Party Helper</name>
     <version>0.4-SNAPSHOT</version>
-    <description>OSGI Third Party Helper</description>
+    <description>OSGi Third Party Helper</description>
     <packaging>pom</packaging>
     <modules>
         <module>lucene-core</module>
         <module>lucene-spellchecker</module>
         <module>jericho-html</module>
         <module>snakeyaml</module>        
-        <!--<module>apache-stax-api-1-0</module>-->
         <module>trov4j</module>
         <module>download-osgi</module>
     </modules>
