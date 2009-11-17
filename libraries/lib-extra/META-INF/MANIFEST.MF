@@ -7,4 +7,4 @@ Export-Package: net.sf.okapi.lib.extra,
  net.sf.okapi.lib.extra.filters,
  net.sf.okapi.lib.extra.steps
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

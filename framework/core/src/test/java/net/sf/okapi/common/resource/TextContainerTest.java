@@ -214,6 +214,18 @@ public class TextContainerTest {
 		return tc1;
 	}
 	
+	private TextContainer createMultiSegmentContentWithCodes () {
+		TextFragment tf = new TextFragment("text1");
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		tc1.appendSegment(tf);
+		tc1.append(' ');
+		
+		tf = new TextFragment("text2");
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		tc1.appendSegment(tf);
+		return tc1;
+	}
+	
 	@Test
 	public void testAppendSeveralSegments () {
 		tc1 = createMultiSegmentContent();
@@ -230,6 +242,19 @@ public class TextContainerTest {
 		assertEquals(0, tc1.getSegmentCount());
 		assertNull(tc1.getSegments());
 		assertEquals("text1 text2", tc1.toString());
+	}
+	
+	@Test
+	public void testMergingSegmentsWithCodes () {
+		tc1 = createMultiSegmentContentWithCodes();
+		tc1.mergeAllSegments();
+		assertEquals(0, tc1.getSegmentCount());
+		assertNull(tc1.getSegments());
+		assertEquals("text1<br/> text2<br/>", tc1.toString());
+		List<Code> codes = tc1.getCodes();
+		assertEquals(2, codes.size());
+		assertEquals(1, codes.get(0).id);
+		assertEquals(2, codes.get(1).id);
 	}
 	
 	@Test

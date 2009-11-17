@@ -24,26 +24,23 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.HTMLElementName;
-import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.Source;
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.QueryUtil;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
-import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
@@ -134,9 +131,15 @@ public class BatchTranslator {
 					if ( !tu.isTranslatable() ) continue;
 					TextContainer tc = tu.getSource();
 					if ( tc.isSegmented() ) {
-//TODO: segmented entries						
+						List<Segment> segments = tc.getSegments();
+						for ( Segment seg : segments ) {
+							htmlWriter.writeStartElement("p");
+							htmlWriter.writeAttributeString("id", String.format("%d:%s:%s", currentSubDocId, tu.getId(), seg.id));
+							htmlWriter.writeRawXML(qutil.toCodedHTML(seg.text));
+							htmlWriter.writeEndElement(); // p
+						}
 					}
-					else {
+					else { // Not segmented
 						htmlWriter.writeStartElement("p");
 						htmlWriter.writeAttributeString("id", String.format("%d:%s:", currentSubDocId, tu.getId()));
 						htmlWriter.writeRawXML(qutil.toCodedHTML(tc.getContent()));
@@ -241,6 +244,7 @@ public class BatchTranslator {
 					case TEXT_UNIT:
 						tu = (TextUnit)event.getResource();
 						if ( !tu.isTranslatable() ) continue;
+						
 						if (( htmlSubDocId == currentSubDocId ) && htmlTuId.equals(tu.getId()) ) {
 							found = true;
 						}
