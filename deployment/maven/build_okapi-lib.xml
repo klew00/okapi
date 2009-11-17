@@ -209,20 +209,13 @@
 		<echo file="tmpJars" append="yes"> ${jar002}</echo>
 		<copy todir="${distLib}" file="${dep002}/${jar002}"/>
 
-		<property name="dep003" value="${mavenStore}/org/yaml/snakeyaml/1.4"/>
+		<property name="dep003" value="${mavenStore}/org/yaml/snakeyaml/1.5"/>
 		<fileset id="list.contents" dir="${dep003}"
-		 includes="**/snakeyaml-1.4.jar"/>
+		 includes="**/snakeyaml-1.5.jar"/>
 		<property name="jar003" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar003}</echo>
 		<copy todir="${distLib}" file="${dep003}/${jar003}"/>
 
-<!--		<property name="dep004" value="${mavenStore}/org/codehaus/woodstox/wstx-lgpl/3.2.8"/>
-		<fileset id="list.contents" dir="${dep004}"
-		 includes="**/wstx-lgpl-3.2.8.jar"/>
-		<property name="jar004" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar004}</echo>
-		<copy todir="${distLib}" file="${dep004}/${jar004}"/>
--->
 		<property name="dep005" value="${mavenStore}/com/h2database/h2/1.1.103"/>
 		<fileset id="list.contents" dir="${dep005}"
 		 includes="**/h2-1.1.103.jar"/>
@@ -300,20 +293,6 @@
 		<echo file="tmpJars" append="yes"> ${jar015}</echo>
 		<copy todir="${distLib}" file="${dep015}/${jar015}"/>
 
-<!--		<property name="dep016" value="${mavenStore}/org/codehaus/woodstox/wstx-lgpl/3.2.8"/>
-		<fileset id="list.contents" dir="${dep016}"
-		 includes="**/wstx-lgpl-3.2.8.jar"/>
-		<property name="jar016" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar016}</echo>
-		<copy todir="${distLib}" file="${dep016}/${jar016}"/>
-
-		<property name="dep017" value="${mavenStore}/stax/stax-api/1.0.1"/>
-		<fileset id="list.contents" dir="${dep017}"
-		 includes="**/stax-api-1.0.1.jar"/>
-		<property name="jar017" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar017}</echo>
-		<copy todir="${distLib}" file="${dep017}/${jar017}"/>
--->
 		<property name="dep018" value="${mavenStore}/org/apache/lucene/lucene-core/2.9.1"/>
 		<fileset id="list.contents" dir="${dep018}"
 		 includes="**/lucene-core-2.9.1.jar"/>
