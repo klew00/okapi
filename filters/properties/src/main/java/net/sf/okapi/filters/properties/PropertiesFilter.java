@@ -37,6 +37,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -132,6 +133,12 @@ public class PropertiesFilter implements IFilter {
 		return list;
 	}
 
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.PROPERTIES_MIME_TYPE, "net.sf.okapi.common.encoder.PropertiesEncoder");
+		return em;
+	}
+	
 	public IParameters getParameters () {
 		return params;
 	}
@@ -247,8 +254,8 @@ public class PropertiesFilter implements IFilter {
 		startDoc.setFilterParameters(params);
 		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setLineBreak(lineBreak);
-		startDoc.setType("text/x-properties");
-		startDoc.setMimeType("text/x-properties");
+		startDoc.setType(MimeTypeMapper.PROPERTIES_MIME_TYPE);
+		startDoc.setMimeType(MimeTypeMapper.PROPERTIES_MIME_TYPE);
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
 
@@ -411,7 +418,7 @@ public class PropertiesFilter implements IFilter {
 					tuRes = new TextUnit(String.valueOf(++tuId),
 						unescape(value));
 					tuRes.setName(key);
-					tuRes.setMimeType("text/x-properties");
+					tuRes.setMimeType(MimeTypeMapper.PROPERTIES_MIME_TYPE);
 					tuRes.setPreserveWhitespaces(true);
 					if ( note.length() > 0 ) {
 						tuRes.setProperty(new Property(Property.NOTE, note, true));

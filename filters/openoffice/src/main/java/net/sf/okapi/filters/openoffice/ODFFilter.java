@@ -250,6 +250,12 @@ public class ODFFilter implements IFilter {
 		return list;
 	}
 	
+//	public EncoderManager createEncoderManager () {
+//	EncoderManager em = new EncoderManager();
+//	em.setMapping();
+//	return em;
+//}
+
 	public IParameters getParameters () {
 		return params;
 	}

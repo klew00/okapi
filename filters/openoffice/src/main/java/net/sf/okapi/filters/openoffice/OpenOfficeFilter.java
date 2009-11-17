@@ -37,6 +37,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -129,6 +130,12 @@ public class OpenOfficeFilter implements IFilter {
 			"OpenOffice.org ODT, ODS, ODP, ODG, OTT, OTS, OTP, OTG documents"));
 		return list;
 	}
+	
+//	public EncoderManager createEncoderManager () {
+//		EncoderManager em = new EncoderManager();
+//		em.setMapping();
+//		return em;
+//	}
 	
 	public IParameters getParameters () {
 		// Should be the same as the internal ODF filter already 

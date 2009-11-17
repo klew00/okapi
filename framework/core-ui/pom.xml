@@ -48,7 +48,24 @@
 		</profile>
 		
         <profile>
-            <id>OSX_SWT</id>
+            <id>COCOA_64_SWT</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>mac os x</name>
+					<arch>x64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.swt.cocoa</groupId>
+                    <artifactId>macosx-x86_64</artifactId>
+                    <version>3.5.1</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>COCOA_SWT</id>
             <activation>
                 <os>
                     <family>unix</family>
@@ -61,23 +78,6 @@
                     <artifactId>macosx</artifactId>
                     <version>3.5.1</version>
                 </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>OSX_tiger_SWT</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <name>mac os x</name>
-					<arch>i386</arch>
-                </os>
-            </activation>
-            <dependencies>
-				<dependency>
-					<groupId>org.eclipse.swt.carbon</groupId>
-					<artifactId>macosx</artifactId>
-					<version>3.5.1</version>
-				</dependency>
             </dependencies>
         </profile>
         <profile>
@@ -113,6 +113,7 @@
             </dependencies>
         </profile>
     </profiles>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -124,39 +125,8 @@
         	<artifactId>okapi-lib-extra</artifactId>
         	<version>0.5-SNAPSHOT</version>
         </dependency>
-
-		<!-- Forces dependencies for the supported platforms so we can plus everything -->
-		<!--TODO: Find a solution outside the POm for this, otherwise we get 
-		multiple refernces of the same methods in in IDE
-		
-		<dependency>
-			<groupId>org.eclipse.swt.win32.win32</groupId>
-			<artifactId>x86</artifactId>
-			<version>3.5.0-v3550b</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.swt.carbon</groupId>
-			<artifactId>macosx</artifactId>
-			<version>3.5.0-v3550b</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.swt.cocoa</groupId>
-			<artifactId>macosx</artifactId>
-			<version>3.5.0-v3550b</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.swt.gtk2.linux</groupId>
-			<artifactId>x86</artifactId>
-			<version>3.5.0-v3550b</version>
-		</dependency>
-			<dependency>
-			<groupId>org.eclipse.swt.gtk2.linux</groupId>
-			<artifactId>x86_64</artifactId>
-			<version>3.5.0-v3550b</version>
-		</dependency>
-		-->
-
     </dependencies>
+
     <dependencyManagement>
     	<dependencies>
     	</dependencies>

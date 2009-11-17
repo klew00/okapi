@@ -38,6 +38,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -133,6 +134,12 @@ public class XLIFFFilter implements IFilter {
 		return list;
 	}
 	
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.XLIFF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		return em;
+	}
+
 	public IParameters getParameters () {
 		return params;
 	}

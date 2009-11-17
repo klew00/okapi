@@ -23,8 +23,8 @@
 	<condition property="swtdep" value="cocoa/macosx/3.5.1">
 		<equals arg1="${platform}" arg2="cocoa-macosx"/>
 	</condition>
-	<condition property="swtdep" value="carbon/macosx/3.5.1">
-		<equals arg1="${platform}" arg2="carbon-macosx"/>
+	<condition property="swtdep" value="cocoa/macosx-x86_64/3.5.1">
+		<equals arg1="${platform}" arg2="cocoa-macosx-x86_64"/>
 	</condition>
 	<condition property="swtdep" value="gtk2/linux/x86/3.5.1">
 		<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
@@ -35,12 +35,15 @@
 
 	<!-- Set flags for what dstribution is being built -->
 	<condition property="building-windows">
-		<equals arg1="${platform}" arg2="win32-x86"/>
+		<or>
+			<equals arg1="${platform}" arg2="win32-x86"/>
+			<equals arg1="${platform}" arg2="win32-x86_64"/>
+		</or>
 	</condition>
 	<condition property="building-mac">
 		<or>
 			<equals arg1="${platform}" arg2="cacoa-macosx"/>
-			<equals arg1="${platform}" arg2="carbon-macosx"/>
+			<equals arg1="${platform}" arg2="cacoa-macosx-x86_64"/>
 		</or>
 	</condition>
 	<condition property="building-linux">

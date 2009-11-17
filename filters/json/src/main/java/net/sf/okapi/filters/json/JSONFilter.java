@@ -35,6 +35,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -122,6 +123,12 @@ public class JSONFilter implements IFilter {
 			"Configuration for JSON files"));
 		return list;
 	}
+
+//	public EncoderManager createEncoderManager () {
+//		EncoderManager em = new EncoderManager();
+//		em.setMapping();
+//		return em;
+//	}
 
 	public String getDisplayName () {
 		return "JSON Filter (BETA)";
