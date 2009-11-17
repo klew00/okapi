@@ -54,10 +54,17 @@
 </trans-unit>
 
 <trans-unit id="11">
-<source xml:lang="en">Sentence 1. Sentence 2</source>
+<source xml:lang="en">Sentence 1. Sentence 2.</source>
 <!-- Segmented data --> <?abc def ?>
 <seg-source><mrk mid='0' mtype='seg'>Sentence 1.</mrk>
 <mrk mid='1' mtype='seg'>Sentence 2.</mrk></seg-source>
+</trans-unit>
+
+<trans-unit id="11withWarning"> <!-- should generate a segmentation warning -->
+<source xml:lang="en">Sentence 1. Sentence 2.</source>
+<!-- Segmented data --> <?abc def ?>
+<seg-source><mrk mid='0' mtype='seg'>Sentence 1.</mrk>
+<mrk mid='1' mtype='seg'>Sentence 2+diff.</mrk></seg-source>
 </trans-unit>
 
 <trans-unit id="12">

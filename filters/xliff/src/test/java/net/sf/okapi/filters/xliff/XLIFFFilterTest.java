@@ -108,7 +108,7 @@ public class XLIFFFilterTest {
 			+ "<xliff version=\"1.2\">"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "<body>"
-			+ "<trans-unit id=\"1\">"
+			+ "<trans-unit id=\"1withWarning\">"
 			+ "<source>t1. x t2</source>" // Extra x in source
 			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
 			+ "<target xml:lang=\"fr\">t1. t2</target>"

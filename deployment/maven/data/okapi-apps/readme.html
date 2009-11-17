@@ -61,7 +61,7 @@ on-line, at the <a href="http://okapi.opentag.com/">Okapi Framework Web site</a>
 <hr>
 <h2><a name="SetupWindows"></a>Windows Platform</h2>
 <h3>Requirements</h3>
-<p>In order to run the Okapi applications on Windows you must have a running installation of Java&nbsp;1.5 or 
+<p>In order to run the Okapi applications on Windows you must have a running installation of Java&nbsp;1.6 or 
 later. Sun Java, or an OpenJDK VM is recommended.</p>
 <h3>Installation</h3>
 <p>To install the Okapi applications on Windows:</p>
@@ -91,7 +91,7 @@ the user and called <code>.Rainbow</code>.</li>
 <hr>
 <h2><a name="SetupLinux"></a>Linux Platforms</h2>
 <h4>Requirements</h4>
-<p>In order to run the Okapi applications on Linux you must have a running installation of Java&nbsp;1.5 or 
+<p>In order to run the Okapi applications on Linux you must have a running installation of Java&nbsp;1.6 or 
 later. Sun Java, or an OpenJDK VM is recommended.</p>
 <h3>Installation</h3>
 <p>To install the Okapi applications on Linux (32- and 64-bit):</p>
@@ -120,11 +120,18 @@ the user and called <code>.Rainbow</code> and <code>.Ratel</code>.</li>
 <hr>
 <h2><a name="SetupMac"></a>Macintosh Platform</h2>
 <h3>Requirements</h3>
-<p>Use the <b>Cocoa</b> distribution for Macintsoh OS X 10.5 (Leopard). Use the
-<b>Carbon</b> distribution for Macintosh OS X 10.4 (Tiger) or 10.5 (Leopard). 
-Both with Java 1.4.2 or Java 1.5.x (not Java 1.6, which runs only on 64-bit).</p>
+<p>In order to run Okapi applications on Macintsoh you must have Java 1.6 
+installed. Apple does not provide Java 1.6 for all versions and architectures of 
+the Mac. </p>
+<ul>
+	<li>If you have a 32-bit machine, you can run Java 1.6 only on Mac OS X 10.6 
+	(Snow Leopard) using the 32-bit mode.</li>
+	<li>If you have a 64-bit machine, you can run Java 1.6 on either Mac OS X 
+	10.5 (Leopard) or Mac OS X 10.5 (Leopard) using either the 32-bit or the 
+	64-bit mode.</li>
+</ul>
 <h3>Installation</h3>
-<p>To install the Okapi applications on Macintosh:</p>
+<p>To install the Okapi applications on Macintosh (32- and 64-bit):</p>
 <ol>
 	<li>Download the ZIP file of the Macintosh distribution.</li>
 	<li>Extract the file on any location. For example <code>
@@ -140,12 +147,14 @@ Both with Java 1.4.2 or Java 1.5.x (not Java 1.6, which runs only on 64-bit).</p
 		/Users/admin/Desktop/Okapi</code>.</li>
 		<li>Execute the following command:</li>
 	</ol>
-	<pre>java -XstartOnFirstThread -jar lib/rainbow.jar</pre>
+	<pre>./rainbow.sh</pre>
 	</li>
 </ol>
-<p>You <b>MUST</b> specify the <code>-XstartOnFirstThread</code> option or the 
+<p>You can modify the shell file to fit your own parameters. In all cases you <b>MUST</b> specify the <code>-XstartOnFirstThread</code> option or the 
 application may 
-not work properly.</p>
+not work properly. You can make sure to run the Java VM in a specific mode using 
+the <code>-d32</code> and <code>-d64</code> flags. For example:</p>
+<pre>$ java -d64 -XstartOnFirstThread -jar lib/rainbow.jar</pre>
 <h3>Uninstallation</h3>
 <p>To uninstall:</p>
 <ol>

@@ -9,7 +9,7 @@
 <body>
    <trans-unit approved="no" id="1" xml:space="preserve">
       <source xml:lang="en">Swordfish User Guide</source>
-      <source xml:lang="fr">Traduction avec des accents: á, ó, í, etc.</source>
+      <target xml:lang="fr">Traduction avec des accents: á, ó, í, etc.</target>
    </trans-unit>
 <trans-unit approved="no" id="2" xml:space="preserve">
       <source xml:lang="en">Copyright <ph ctype="x-font" id="0">&lt;text:span text:style-name="T1"&gt;</ph>©<ph id="1">&lt;/text:span&gt;</ph><ph ctype="x-font" id="2">&lt;text:span text:style-name="T3"&gt;</ph> 2007-2008 Maxprograms<ph id="3">&lt;/text:span&gt;</ph></source>

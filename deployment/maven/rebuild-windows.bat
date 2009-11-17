@@ -1,5 +1,6 @@
 cd ../../
-call mvn clean install
+call mvn clean
+call mvn install
 if ERRORLEVEL 1 goto end
 
 cd deployment/maven
