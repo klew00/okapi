@@ -119,10 +119,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(COMMAND, "Command line", "Command line to execute the batch translation");
-		desc.add(MAKETM, "Create a Pensieve TM", null);
-		desc.add(TMDIRECTORY, "TM directory", "Location of the TM to create");
+		desc.add(MAKETM, "Import into a Pensieve TM", null);
+		desc.add(TMDIRECTORY, "TM directory", "Location of the TM to create or use");
 		desc.add(MAKETMX, "Create a TMX document", null);
-		desc.add(TMXPATH, "TMX path", "Full path of the TMX document to create");
+		desc.add(TMXPATH, "TMX path", "Full path of the new TMX document to create");
 		return desc;
 	}
 
@@ -135,10 +135,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		TextInputPart tip = desc.addTextInputPart(paramDesc.get(TMDIRECTORY));
 		tip.setMasterPart(cbp, true);
 
-//TODO: to implement		
-//		cbp = desc.addCheckboxPart(paramDesc.get(MAKETMX));
-//		PathInputPart pip = desc.addPathInputPart(paramDesc.get(TMXPATH), "TMX Path", true);
-//		pip.setMasterPart(cbp, true);
+		cbp = desc.addCheckboxPart(paramDesc.get(MAKETMX));
+		PathInputPart pip = desc.addPathInputPart(paramDesc.get(TMXPATH), "TMX Path", true);
+		pip.setMasterPart(cbp, true);
 		
 		return desc;
 	}

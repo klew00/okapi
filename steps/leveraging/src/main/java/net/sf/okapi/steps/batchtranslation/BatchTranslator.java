@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.HTMLElementName;
@@ -34,17 +35,21 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.QueryUtil;
-import net.sf.okapi.tm.pensieve.common.PensieveUtil;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 public class BatchTranslator {
+
+	private static final Logger LOGGER = Logger.getLogger(BatchTranslator.class.getName());
 
 	private IFilterConfigurationMapper fcMapper;
 	private IFilter filter;
@@ -54,9 +59,17 @@ public class BatchTranslator {
 	private File htmlTargetFile;
 	private Parameters params;
 	private ITmWriter tmWriter;
+	private TMXWriter tmxWriter;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
-	
+	private int subDocId;
+	private int currentSubDocId;
+	private int htmlSubDocId;
+	private String htmlTuId;
+	private String htmlSegId;
+	private TextUnit oriTu;
+	private boolean initDone;
+
 	public BatchTranslator (IFilterConfigurationMapper fcMapper,
 		Parameters params)
 	{
@@ -67,16 +80,41 @@ public class BatchTranslator {
 			this.params = new Parameters();
 		}
 		qutil = new QueryUtil();
+		initDone = false;
 	}
 	
-	public void processDocument (RawDocument rd,
-		String filterConfigId)
-	{
+	protected void finalize () {
+		endBatch();
+	}
+	
+	public void endBatch () {
+		if ( tmxWriter != null ) {
+			tmxWriter.writeEndDocument();
+			tmxWriter.close();
+			tmxWriter = null;
+		}
+		initDone = false;
+	}
+
+	// Call this method at the first document
+	private void initialize () {
+		if ( params.getMakeTMX() ) {
+			tmxWriter = new TMXWriter(params.getTmxPath());
+			tmxWriter.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", "sentence", "MT-based", "unknown");
+		}
+		initDone = true;
+	}
+	
+	public void processDocument (RawDocument rd) {
 		rawDoc = rd;
 		srcLoc = rawDoc.getSourceLocale();
 		trgLoc = rawDoc.getTargetLocale();
 		
-		filter = fcMapper.createFilter(filterConfigId, filter);
+		if ( !initDone ) {
+			initialize();
+		}
+		
+		filter = fcMapper.createFilter(rd.getFilterConfigId(), filter);
 		if ( filter == null ) {
 			throw new RuntimeException("Unsupported filter type.");
 		}
@@ -108,12 +146,12 @@ public class BatchTranslator {
 			htmlWriter.writeStartElement("meta");
 			htmlWriter.writeAttributeString("http-equiv", "Content-Type");
 			htmlWriter.writeAttributeString("content", "text/html; charset=UTF-8");
-			htmlWriter.writeEndElement();
+			htmlWriter.writeEndElementLineBreak();
 
 			// Process
 			Event event;
-			int subDocId = 0;
-			int currentSubDocId = 0;
+			subDocId = 0;
+			currentSubDocId = 0;
 			
 			while ( filter.hasNext() ) {
 				event = filter.next();
@@ -136,14 +174,14 @@ public class BatchTranslator {
 							htmlWriter.writeStartElement("p");
 							htmlWriter.writeAttributeString("id", String.format("%d:%s:%s", currentSubDocId, tu.getId(), seg.id));
 							htmlWriter.writeRawXML(qutil.toCodedHTML(seg.text));
-							htmlWriter.writeEndElement(); // p
+							htmlWriter.writeEndElementLineBreak(); // p
 						}
 					}
 					else { // Not segmented
 						htmlWriter.writeStartElement("p");
 						htmlWriter.writeAttributeString("id", String.format("%d:%s:", currentSubDocId, tu.getId()));
 						htmlWriter.writeRawXML(qutil.toCodedHTML(tc.getContent()));
-						htmlWriter.writeEndElement(); // p
+						htmlWriter.writeEndElementLineBreak(); // p
 					}
 				}
 			}
@@ -216,71 +254,54 @@ public class BatchTranslator {
 
 			// Process
 			// The element should be in the same order as the event of the original file
-			int subDocId = 0;
-			int currentSubDocId = 0;
-			TextUnit tu = null;
+			subDocId = 0;
+			currentSubDocId = 0;
 			
 			for ( Element elem : paragraphs ) {
 				String id = elem.getAttributeValue("id");
 				if ( id == null ) continue; // No id means we can't match
 				// Decompose the html id in its sub-doc, tu and seg parts
 				String parts[] = id.split(":", -1);
-				int htmlSubDocId = Integer.valueOf(parts[0]);
-				String htmlTuId = parts[1];
-				String htmlSegId = parts[2];
+				htmlSubDocId = Integer.valueOf(parts[0]);
+				htmlTuId = parts[1];
+				htmlSegId = parts[2];
 				
-				// Look for the source
-				Event event;
-				boolean found = false;
-				while ( filter.hasNext() ) {
-					event = filter.next();
-					switch ( event.getEventType() ) {
-					case START_SUBDOCUMENT:
-						currentSubDocId = ++subDocId;
-						continue; // Keep looking for next text unit
-					case END_SUBDOCUMENT:
-						currentSubDocId = 0; // Top-level
-						continue; // Keep looking for next text unit
-					case TEXT_UNIT:
-						tu = (TextUnit)event.getResource();
-						if ( !tu.isTranslatable() ) continue;
-						
-						if (( htmlSubDocId == currentSubDocId ) && htmlTuId.equals(tu.getId()) ) {
-							found = true;
-						}
-						// In all case we break here, as the first TU should be the good one
-						// If it is not, we are not synchronized anymore.
-						break;
-					default:
-						continue; // Skip other events
-					}
-					
-					// Things are not synchronized any more
-					if ( found ) {
-						TextFragment frag = tu.getSourceContent();
-						String ctext = qutil.fromCodedHTML(elem.getContent().toString(), frag);
-						tu.setTargetContent(trgLoc, new TextFragment(ctext, frag.getCodes()));
-						
-						if ( tmWriter != null ) {
-							tmWriter.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(
-								srcLoc, trgLoc, tu));							
-						}
-//						
-//						System.out.println("");
-//						System.out.println("SRC="+tu.getSource().toString());
-//						System.out.println("TRG="+tu.getTarget(trgLoc).toString());
-					}
-					else {
-						// Error
-					}
-					
-					// In all cases we leave this loop
-					break; 
-				}
-				
-				if ( !found ) {
+				if ( !getNextFromOriginal() ) {
+					// Not found, out of synchronization
 					break; // No need to continue
 				}
+				TextFragment srcFrag;
+				TextFragment trgFrag;
+				if ( Util.isEmpty(htmlSegId) ) {
+					srcFrag = oriTu.getSourceContent();
+				}
+				else { // Segmented text unit
+					srcFrag = oriTu.getSource().getSegments().get(Integer.valueOf(htmlSegId)).text;
+				}
+				try {
+					String ctext = qutil.fromCodedHTML(elem.getContent().toString(), srcFrag);
+					trgFrag = new TextFragment(ctext, srcFrag.getCodes());
+				}
+				catch ( Throwable e ) {
+					// Catch issues with inline codes
+					LOGGER.warning(e.toString());
+					continue; // Skip this entry
+				}
+
+				if ( tmWriter != null ) {
+					TranslationUnit unit = new TranslationUnit(
+						new TranslationUnitVariant(srcLoc, srcFrag),
+						new TranslationUnitVariant(trgLoc, trgFrag));
+					tmWriter.indexTranslationUnit(unit);							
+				}
+				
+				if ( tmxWriter != null ) {
+					tmxWriter.writeTU(srcFrag, trgFrag, null, null);
+				}
+				
+//				System.out.println("");
+//				System.out.println("SRC="+srcFrag.toString());
+//				System.out.println("TRG="+trgFrag.toString());
 			}
 		}
 		catch ( IOException e ) {
@@ -299,6 +320,56 @@ public class BatchTranslator {
 			if ( html != null ) html.clearCache();
 			htmlTargetFile.deleteOnExit();
 		}
+	}
+
+	private boolean getNextFromOriginal () {
+		boolean found = false;
+		// If we are not on the proper text unit, we look for it
+		if (( oriTu == null ) || ( htmlSubDocId != currentSubDocId ) || !htmlTuId.equals(oriTu.getId()) ) {
+			Event event;
+			boolean stop = false;
+			while ( filter.hasNext() && !found && !stop ) {
+				event = filter.next();
+				switch ( event.getEventType() ) {
+				case START_SUBDOCUMENT:
+					currentSubDocId = ++subDocId;
+					continue; // Keep looking for next text unit
+				case END_SUBDOCUMENT:
+					currentSubDocId = 0; // Top-level
+					continue; // Keep looking for next text unit
+				case TEXT_UNIT:
+					oriTu = (TextUnit)event.getResource();
+					if ( !oriTu.isTranslatable() ) continue;
+					if (( htmlSubDocId == currentSubDocId ) && htmlTuId.equals(oriTu.getId()) ) {
+						found = true;
+						stop = true;
+					}
+					// In all case we break here, as the first TU should be the good one
+					// If it is not, we are not synchronized anymore.
+					break;
+				default:
+					continue; // Skip other events
+				}
+			}
+			
+			if ( !found ) { // No corresponding text unit
+				return false;
+			}
+		}
+		
+		// We are on the correct TU
+		// Now get the segment, if we are dealing with segments
+		if ( !Util.isEmpty(htmlSegId) ) {
+			found = false;
+			for ( Segment seg : oriTu.getSource().getSegments() ) {
+				if ( htmlSegId.equals(seg.id) ) {
+					found = true;
+					break;
+				}
+			}
+		}
+		
+		return found;
 	}
 
 }

@@ -20,12 +20,8 @@
 
 package net.sf.okapi.steps.batchtranslation;
 
-import java.util.logging.Logger;
-
-import net.htmlparser.jericho.Source;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
@@ -37,33 +33,15 @@ public class BatchTranslationStep extends BasePipelineStep {
 	private Parameters params;
 	private boolean isDone;
 	private BatchTranslator trans;
-	private LocaleId sourceLocale;
-	private LocaleId targetLocale;
 	private IFilterConfigurationMapper fcMapper;
-	private String filterConfigId;
 
 	public BatchTranslationStep () {
 		params = new Parameters();
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
-	public void setsourceLocale (LocaleId sourceLocale) {
-		this.sourceLocale = sourceLocale;
-	}
-	
-	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
-	public void setTargetLocale (LocaleId targetLocale) {
-		this.targetLocale = targetLocale;
-	}
-	
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
-	}
-	
-	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_ID)
-	public void setFilterConfigurationId (String filterConfigId) {
-		this.filterConfigId = filterConfigId;
 	}
 	
 	public String getName () {
@@ -86,6 +64,13 @@ public class BatchTranslationStep extends BasePipelineStep {
 	}
 	
 	@Override
+	protected void handleEndBatch (Event event) {
+		if ( trans != null ) {
+			trans.endBatch();
+		}
+	}
+	
+	@Override
 	protected void handleStartBatchItem (Event event) {
 		// To get the raw document
 		isDone = false;
@@ -93,7 +78,7 @@ public class BatchTranslationStep extends BasePipelineStep {
 
 	@Override
 	protected void handleRawDocument (Event event) {
-		trans.processDocument((RawDocument)event.getResource(), filterConfigId);
+		trans.processDocument((RawDocument)event.getResource());
 		// Can move on to the next step
 		isDone = true;
 	}
