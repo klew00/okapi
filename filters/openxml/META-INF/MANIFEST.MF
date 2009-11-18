@@ -12,4 +12,3 @@ Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.filters.abstractmarkup;bundle-version="1.0.0",
  net.htmlparser.jericho;bundle-version="3.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: .,target/classes,src/main/resources
