@@ -90,6 +90,8 @@ public class CommaSeparatedValuesFilterTest {
 		testDriver.setShowSkeleton(true);
 		
         root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
+        Parameters params = (Parameters) filter.getParameters();
+        setDefaults(params);
 	}
 
 	@Test
@@ -178,6 +180,7 @@ public class CommaSeparatedValuesFilterTest {
 	
 		// Set the parameters
 		Parameters params = new Parameters();
+		setDefaults(params);
 		params.fieldDelimiter = ",";
 		params.textQualifier = "\"";
 		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
@@ -210,7 +213,70 @@ public class CommaSeparatedValuesFilterTest {
 		
 	}
 	
+	@Test
+	public void testFileEvents96_3() {
+		
+		//Parameters params = (Parameters) filter.getParameters();
+			
+		InputStream input = TableFilterTest.class.getResourceAsStream("/CSVTest_96_2.txt"); // issue 96
+		assertNotNull(input);
 	
+		// Set the parameters
+		Parameters params = new Parameters();
+		setDefaults(params);
+		params.fieldDelimiter = ",";
+		params.textQualifier = "\"";
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		params.sourceColumns = "1";
+		params.targetColumns = "2";
+		params.targetLanguages = ""; //locFRCA.toString();
+		params.targetSourceRefs = "1";
+		filter.setParameters(params);
+		
+		filter.open(new RawDocument(input, "UTF-8", locEN, locFRCA));
+		
+		testEvent(EventType.START_DOCUMENT, null);
+						
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "src");
+		testEvent(EventType.TEXT_UNIT, "trg");
+		testEvent(EventType.TEXT_UNIT, "data");
+		testEvent(EventType.END_GROUP, null);
+		
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1", "", "target1", locFRCA, "");
+		testEvent(EventType.END_GROUP, null);
+		
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source2", "", "target2", locFRCA, "");
+		testEvent(EventType.END_GROUP, null);
+		
+		testEvent(EventType.END_DOCUMENT, null);
+				filter.close();		
+	}	
+	
+	public static void setDefaults(net.sf.okapi.filters.table.base.Parameters params) {
+		
+		if (params == null) return;
+		
+		params.columnNamesLineNum = 1;
+		params.valuesStartLineNum = 2;
+		params.sourceIdSuffixes = "";
+		params.sourceIdSourceRefs = "";
+		params.targetColumns = "";
+		params.targetSourceRefs = "";
+		params.targetLanguages = "";
+		params.commentColumns = "";
+		params.commentSourceRefs = "";
+		params.columnNamesLineNum = 1;
+		params.valuesStartLineNum = 2;
+		params.sendHeaderMode = Parameters.SEND_HEADER_COLUMN_NAMES_ONLY;
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_ALL;
+		params.sourceColumns = "";
+		params.targetColumns = "";
+		params.targetSourceRefs = "";
+	}
+
 	@Test
 	public void testEmptyInput() {
 		
@@ -1461,8 +1527,7 @@ public class CommaSeparatedValuesFilterTest {
 			}
 			
 			break;
-		}
-			
+		}			
 	}
 
 	private Parameters getParameters() {

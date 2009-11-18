@@ -77,12 +77,15 @@ public class TabSeparatedValuesFilterTest {
 		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
         root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
+        
+        Parameters params = (Parameters) filter.getParameters();
+        CommaSeparatedValuesFilterTest.setDefaults(params);
 	}
 	
 	@Test
 	public void testFileEvents() {
 		
-		Parameters params = (Parameters) filter.getParameters();
+		Parameters params = (Parameters) filter.getParameters();		
 		
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test9.txt");
 		assertNotNull(input);

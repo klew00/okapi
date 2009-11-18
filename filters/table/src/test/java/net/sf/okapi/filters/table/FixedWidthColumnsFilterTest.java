@@ -89,7 +89,9 @@ public class FixedWidthColumnsFilterTest {
 		testDriver.setShowSkeleton(true);
 		
         root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
-
+        
+        Parameters params = (Parameters) filter.getParameters();
+        CommaSeparatedValuesFilterTest.setDefaults(params);
 	}
 			
 	@Test
@@ -459,6 +461,7 @@ public class FixedWidthColumnsFilterTest {
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test6.txt");
 		assertNotNull(input);
 		
+		CommaSeparatedValuesFilterTest.setDefaults(params);
 		params.valuesStartLineNum = 2;
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;
 		
@@ -646,7 +649,7 @@ public class FixedWidthColumnsFilterTest {
 		input = TableFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
-		System.out.println(filename);
+		//debug				System.out.println(filename);
 		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
@@ -668,6 +671,7 @@ public class FixedWidthColumnsFilterTest {
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_test8.txt");
 		assertNotNull(input);
 		
+		CommaSeparatedValuesFilterTest.setDefaults(params);
 		params.valuesStartLineNum = 7;
 		params.columnNamesLineNum = 4;
 		params.sendHeaderMode = Parameters.SEND_HEADER_ALL;

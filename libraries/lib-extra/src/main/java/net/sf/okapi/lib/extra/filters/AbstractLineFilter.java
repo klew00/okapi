@@ -72,6 +72,7 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 	private int parseState = 0;	
 	private String docName;
 	private LocaleId srcLang;
+	private LocaleId trgLang;
 	private boolean hasUTF8BOM;
 	private IFilterWriter filterWriter;
 	private boolean multilingual;
@@ -128,7 +129,7 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 	
 	@Override
 	protected void component_init() {
-		
+				
 		setFilterWriter(createFilterWriter());
 	}
 	
@@ -199,6 +200,7 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		input.setEncoding(detector.getEncoding());
 		encoding = detector.getEncoding();
 		srcLang = input.getSourceLocale();
+		trgLang = input.getTargetLocale();
 		hasUTF8BOM = detector.hasUtf8Bom();
 		lineBreak = detector.getNewlineType().toString();
 		if ( input.getInputURI() != null ) {
@@ -280,6 +282,11 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		}
 		
 		return null;
+	}
+	
+	protected LocaleId getTargetLocale() {
+	
+		return trgLang;
 	}
 	
 	public Event next() {

@@ -459,7 +459,10 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	private LocaleId getLanguageFromTargetRef(int colNum) {
 		if ( targetColumns == null ) return LocaleId.EMPTY;		
 		int index = targetColumns.indexOf(colNum); 
-		if ( !Util.checkIndex(index, targetLanguages) ) return LocaleId.EMPTY;
+		if ( !Util.checkIndex(index, targetLanguages) ) 
+			//return LocaleId.EMPTY;
+			return getTargetLocale();
+		
 		return targetLanguages.get(index);
 	}
 	

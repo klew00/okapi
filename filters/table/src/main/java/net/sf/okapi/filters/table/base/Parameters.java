@@ -151,7 +151,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 * sourceIdSuffixes. The source IDs become names of TU resources.<p>
 	 * Default: Empty 
 	 */
-	public String sourceIdSuffixes = "";
+	public String sourceIdSuffixes;
 	
 	/**
 	 * Indicates which source columns the source ID columns on the sourceIdSourceRefs list correspond to.  
@@ -160,7 +160,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text<p>
 	 * Default: Empty
 	 */	
-	public String sourceIdSourceRefs = "";
+	public String sourceIdSourceRefs;
 	
 	/** 
 	 * Indicates which columns contain target text. Can be represented by one of the following strings:
@@ -168,7 +168,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing target text<p>
 	 * Default: Empty
 	 */
-	public String targetColumns = "";		
+	public String targetColumns;		
 	
 	/**
 	 * Indicates which source columns the target columns on the targetColumns list correspond to.  
@@ -177,7 +177,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text<p>
 	 * Default: Empty
 	 */
-	public String targetSourceRefs = "";
+	public String targetSourceRefs;
 	
 	/** 
 	 * Indicates which languages should be used in target columns. Can be represented by one of the following strings:
@@ -185,7 +185,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 *<li>"fr, it, ge, fr" - target text in 1-st and 4-th columns is French, 2-nd - Italian, 3-rd - German<p>
 	 * Default: Empty
 	 */
-	public String targetLanguages = "";
+	public String targetLanguages;
 	
 	/** 
 	 * Indicates which columns contain comments. Can be represented by one of the following string types:
@@ -193,7 +193,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing comments<p>
 	 * Default: Empty
 	 */
-	public String commentColumns = "";
+	public String commentColumns;
 	
 	/**
 	 * Indicates which source columns the comment columns on the commentColumns list correspond to.
@@ -204,7 +204,7 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 	 *<li>"1,2,5" - comma-delimited list (1-based) of indexes of the columns, containing source text.<p>
 	 * Default: Empty
 	 */	
-	public String commentSourceRefs = "";
+	public String commentSourceRefs;
 	
 //----------------------------------------------------------------------------------------------------------------------------	
 	
@@ -213,23 +213,23 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 
 		super.parameters_load(buffer);
 		
-		columnNamesLineNum = buffer.getInteger("columnNamesLineNum", 1);
-		valuesStartLineNum = buffer.getInteger("valuesStartLineNum", 2);
+		columnNamesLineNum = buffer.getInteger("columnNamesLineNum", 0);
+		valuesStartLineNum = buffer.getInteger("valuesStartLineNum", 1);
 		detectColumnsMode = buffer.getInteger("detectColumnsMode", DETECT_COLUMNS_NONE);
-		numColumns = buffer.getInteger("numColumns", 1);
-		sendHeaderMode = buffer.getInteger("sendHeaderMode", SEND_HEADER_COLUMN_NAMES_ONLY);
+		numColumns = buffer.getInteger("numColumns", 2);
+		sendHeaderMode = buffer.getInteger("sendHeaderMode", SEND_HEADER_NONE);
 		trimMode = buffer.getInteger("trimMode", TRIM_NONQUALIFIED_ONLY);		
-		sendColumnsMode = buffer.getInteger("sendColumnsMode", SEND_COLUMNS_ALL);
+		sendColumnsMode = buffer.getInteger("sendColumnsMode", SEND_COLUMNS_LISTED);
 		sourceIdColumns = buffer.getString("sourceIdColumns", "");
-		sourceColumns = buffer.getString("sourceColumns", "");
-		targetColumns = buffer.getString("targetColumns", "");
+		sourceColumns = buffer.getString("sourceColumns", "1");
+		targetColumns = buffer.getString("targetColumns", "2");
 		commentColumns = buffer.getString("commentColumns", "");
 		commentSourceRefs = buffer.getString("commentSourceRefs", "");
 		recordIdColumn = buffer.getInteger("recordIdColumn", 0);
 		sourceIdSourceRefs = buffer.getString("sourceIdSourceRefs", "");
 		sourceIdSuffixes = buffer.getString("sourceIdSuffixes", "");
 		targetLanguages = buffer.getString("targetLanguages", "");
-		targetSourceRefs = buffer.getString("targetSourceRefs", "");
+		targetSourceRefs = buffer.getString("targetSourceRefs", "1");
 		
 		if (trimMode != TRIM_NONE) {
 		
@@ -244,23 +244,23 @@ public class Parameters extends net.sf.okapi.filters.plaintext.base.Parameters {
 		
 		super.parameters_reset();
 		
-		columnNamesLineNum = 1;
-		valuesStartLineNum = 2;
+		columnNamesLineNum = 0;
+		valuesStartLineNum = 1;
 		detectColumnsMode = DETECT_COLUMNS_NONE;
-		numColumns = 1;
-		sendHeaderMode = SEND_HEADER_COLUMN_NAMES_ONLY;
+		numColumns = 2;
+		sendHeaderMode = SEND_HEADER_NONE;
 		trimMode = TRIM_NONQUALIFIED_ONLY;
-		sendColumnsMode = SEND_COLUMNS_ALL;
+		sendColumnsMode = SEND_COLUMNS_LISTED;
 		sourceIdColumns = "";
-		sourceColumns = "";
-		targetColumns = "";
+		sourceColumns = "1";
+		targetColumns = "2";
 		commentColumns = "";
 		commentSourceRefs = "";
 		recordIdColumn = 0;
 		sourceIdSourceRefs = "";
 		sourceIdSuffixes = "";
 		targetLanguages = "";
-		targetSourceRefs = "";
+		targetSourceRefs = "1";
 		
 		trimLeading = true;
 		trimTrailing = true;

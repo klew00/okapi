@@ -560,7 +560,7 @@ public class ParaPlainTextFilterTest {
 		input = ParaPlainTextFilterTest.class.getResourceAsStream("/" + filename);
 		assertNotNull(input);
 		
-		System.out.println(filename);
+		//debug				System.out.println(filename);
 		filter.open(new RawDocument(input, "UTF-8", locEN));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();

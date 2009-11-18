@@ -81,6 +81,9 @@ public class TableFilterTest {
 		testDriver.setDisplayLevel(0);
 		testDriver.setShowSkeleton(true);
         root = TestUtil.getParentDir(this.getClass(), "/csv_test1.txt");
+        
+        Parameters params = (Parameters) filter.getActiveParameters();
+        CommaSeparatedValuesFilterTest.setDefaults(params);
 	}
 	
 		
