@@ -449,6 +449,9 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			
 			else if (names.getSelection())
 				params.detectColumnsMode = Parameters.DETECT_COLUMNS_COL_NAMES;
+			
+			else 
+				params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
 		
 			// -----------------
 						
