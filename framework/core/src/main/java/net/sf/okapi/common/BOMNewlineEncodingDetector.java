@@ -567,19 +567,18 @@ public final class BOMNewlineEncodingDetector {
 				if (b2 == 0x6F && b3 == 0xA7 && b4 == 0x94)
 					return setEncoding(EBCDIC, "default EBCDIC encoding (<?xml...> detected)"); // first
 				/*
-				 * four bytes are "<?xm" in EBCDIC ("Lo§”" in Windows-1252)
+				 * four bytes are "<?xm" in EBCDIC
 				 */
 				if (b2 == 0x5A && b3 == 0xC4 && b4 == 0xD6)
 					return setEncoding(EBCDIC, "default EBCDIC encoding (<!DOCTYPE...> detected)"); // first
 				/*
-				 * four bytes are "<!DO" in EBCDIC ("LZÄÖ" in Windows-1252)
+				 * four bytes are "<!DO" in EBCDIC
 				 */
 				if ((b2 & b3 & b4 & 0x80) != 0)
 					return setEncoding(EBCDIC, "default EBCDIC-compatible encoding (HTML element detected)"); // all
 				/*
 				 * of the 3 bytes after the '<' have the high-order bit set,
-				 * indicating EBCDIC letters such as "<HTM" ("LÈãÔ" in
-				 * Windows-1252), or "<htm" ("Lˆ£”" in Windows-1252) although
+				 * indicating EBCDIC letters such as "<HTM", or "<htm" although
 				 * this is not an exhaustive check for EBCDIC, it is safer to
 				 * assume a more common preliminary encoding if none of these
 				 * conditions are met.

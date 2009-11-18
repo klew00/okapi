@@ -52,6 +52,7 @@ public class LogForm implements ILog {
 	private boolean inProgress = false;
 	private IHelp help;
 	private String helpPath;
+	private long startTime;
 	
 	public LogForm (Shell p_Parent) {
 		shell = new Shell(p_Parent, SWT.BORDER | SWT.RESIZE | SWT.TITLE
@@ -150,6 +151,7 @@ public class LogForm implements ILog {
 	public boolean beginProcess (String p_sText) {
 		if ( inProgress() ) return false;
 		clear();
+		startTime = System.currentTimeMillis();
 		edLog.append(Res.getString("LogForm.startProcess")); //$NON-NLS-1$
 		if (( p_sText != null ) && ( p_sText.length() > 0 ))
 			setLog(LogType.MESSAGE, 0, p_sText);
@@ -190,12 +192,24 @@ public class LogForm implements ILog {
 		edLog.setText(""); //$NON-NLS-1$
 	}
 
+	private String toHMSMS (long millis) {
+		long hours = millis/3600000;
+		millis = millis - (hours*3600000);
+		long minutes = millis/60000;
+		millis = millis-(minutes*60000);
+		long seconds = millis/1000;
+		millis = millis-(seconds*1000);
+		return String.format("%dh %dm %ds %dms", hours, minutes, seconds, millis);
+	}
+	
 	public void endProcess (String p_sText) {
 		if ( inProgress ) {
 			if (( p_sText != null ) && ( p_sText.length() > 0 ))
 				setLog(LogType.MESSAGE, 0, p_sText);
 			edLog.append(String.format(Res.getString("LogForm.errorCount"), errorCount)); //$NON-NLS-1$
 			edLog.append(String.format(Res.getString("LogForm.warningCount"), warningCount)); //$NON-NLS-1$
+			edLog.append(String.format(Res.getString("LogForm.duration"), //$NON-NLS-1$
+				toHMSMS(System.currentTimeMillis()-startTime)));
 			edLog.append(Res.getString("LogForm.endProcess")); //$NON-NLS-1$
 		}
 		inProgress = false;
