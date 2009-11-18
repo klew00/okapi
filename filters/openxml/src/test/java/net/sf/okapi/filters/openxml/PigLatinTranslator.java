@@ -40,7 +40,7 @@ public class PigLatinTranslator extends AbstractTranslator {
 	static final String CONS="BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";
 	static final String NUM="0123456789";
 	static final String PUNC=" 	`~!#$%^&*()_+[{]}\\;:\",<.>?";
-	static final String PUNCNL=" 	`~!#$%^&*()_+[{]}\\;:\",<.>?òó›";
+	static final String PUNCNL=" 	`~!#$%^&*()_+[{]}\\;:\",<.>?Ã²Ã³â€º";
 	static final String PUNCDNL="- 	`~!#$%^&*()_+[{]}\\;:\",<.>";
 	static final String UPR="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static final String LWR="abcdefghijklmnopqrstuvwxyz";
