@@ -168,7 +168,6 @@ public class TokenizationTest {
 //		/* 
 //	    String text2 = "Test word count is correct.";
 //	    String text3 = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
-//	    String text4 = "The quick (“brown”) fox can’t jump 32.3 feet, right?";
 //		*/
 //		
 //		Tokens tokens = Tokenizer.tokenize(text, locENUS); // All tokens
