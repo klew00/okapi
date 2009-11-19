@@ -42,8 +42,8 @@
 	</condition>
 	<condition property="building-mac">
 		<or>
-			<equals arg1="${platform}" arg2="cacoa-macosx"/>
-			<equals arg1="${platform}" arg2="cacoa-macosx-x86_64"/>
+			<equals arg1="${platform}" arg2="cocoa-macosx"/>
+			<equals arg1="${platform}" arg2="cocoa-macosx-x86_64"/>
 		</or>
 	</condition>
 	<condition property="building-linux">
