@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import net.sf.okapi.common.FileCompare;
+import net.sf.okapi.common.ZipFileCompare;
 import net.sf.okapi.common.StreamGobbler;
 import net.sf.okapi.common.Util;
 
@@ -18,6 +19,7 @@ public class TikalTest {
 	private String root;
 	private File rootAsFile;
 	private FileCompare fc = new FileCompare();
+	private ZipFileCompare zfc = new ZipFileCompare();
 
 	@Before
 	public void setUp () throws URISyntaxException {
@@ -166,7 +168,7 @@ public class TikalTest {
     	assertTrue("File different from gold", compareWithGoldFile("odttest.odt.xlf", "UTF-8"));
     	// Merge
     	assertEquals(0, runTikal("-m -sl en -tl fr odttest.odt.xlf"));
-//TODO: zip    	assertTrue("File different from gold", compareWithGoldFile("odttest.out.odt"));
+    	assertTrue("File different from gold", compareZipWithGoldFile("odttest.out.odt"));
     }
 
     @Test
@@ -179,7 +181,7 @@ public class TikalTest {
     	assertTrue("File different from gold", compareWithGoldFile("docxtest.docx.xlf", "UTF-8"));
     	// Merge
     	assertEquals(0, runTikal("-m -sl en -tl fr docxtest.docx.xlf"));
-//TODO: zip    	assertTrue("File different from gold", compareWithGoldFile("odttest.out.odt"));
+    	assertTrue("File different from gold", compareZipWithGoldFile("docxtest.out.docx"));
     }
 
     @Test
@@ -378,6 +380,20 @@ public class TikalTest {
     		System.err.println("This may be due to connection issues, or to real API problems with one of the connectors. Please check.");
     		System.err.println("=======================================");
     	}
+    }
+
+    
+    
+    private boolean compareZipWithGoldFile (String outputBase) {
+    	
+    	String outputPath = root + File.separator + outputBase;
+    	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
+
+    	System.err.println("\n=============== ZIP TEST ===============");
+    	System.err.println(" Out File: "+outputPath);
+    	System.err.println("Gold File: "+goldPath+"\n");
+    	
+    	return zfc.compareFilesPerLines(outputPath, goldPath, "UTF-8", true);
     }
 
     

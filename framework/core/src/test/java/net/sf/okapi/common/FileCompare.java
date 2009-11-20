@@ -96,55 +96,88 @@ public class FileCompare {
 		InputStream gis,
 		String encoding)
 	{
-		BufferedReader obr = null;
-		BufferedReader gbr = null;
-		try {
-			obr = new BufferedReader(new InputStreamReader(ois, encoding));
-			gbr = new BufferedReader(new InputStreamReader(gis, encoding));
-			
-			String oLine;
-			String gLine;
-			while ( true ) {
-				oLine = obr.readLine();
-				gLine = gbr.readLine();
-				if (( oLine == null ) && ( gLine != null )) {
-					System.err.println("Extra line in gold file:" + gLine);
-					return false;
-				}
-				if (( oLine != null ) && ( gLine == null )) {
-					System.err.println("Extra line in output file:" + oLine);
-					return false;
-				}
-				if (( oLine == null ) && ( gLine == null )) {
-					return true; // Done
-				}
-				if ( !oLine.equals(gLine) )  {
-					System.err.println("Difference in line:");
-					System.err.println(" out: \""+oLine+"\"");
-					System.err.println("gold: \""+gLine+"\"");
-					return false;
-				}
-			}
-		}
-		catch ( UnsupportedEncodingException e ) {
-			e.printStackTrace();
-			return false;
-		}
-		catch ( IOException e ) {
-			e.printStackTrace();
-			return false;
-		}
-		finally {
+		return compareFilesPerLines(ois,gis, encoding, false);
+	}
+	
+	
+	public boolean compareFilesPerLines (InputStream ois,
+			InputStream gis,
+			String encoding, boolean ignoreInitialEmptyLines)
+		{
+			BufferedReader obr = null;
+			BufferedReader gbr = null;
 			try {
-				if ( obr != null ) obr.close();
-				if ( gbr != null ) gbr.close();
+				obr = new BufferedReader(new InputStreamReader(ois, encoding));
+				gbr = new BufferedReader(new InputStreamReader(gis, encoding));
+				
+				String oLine;
+				String gLine;
+				
+				boolean oFirstLine = true;
+				boolean gFirstLine = true;
+				
+				while ( true ) {
+					oLine = obr.readLine();
+					gLine = gbr.readLine();
+					
+					if(ignoreInitialEmptyLines){
+						while( oFirstLine && oLine != null && oLine.equals("") ){
+							System.err.println("    NOTE: Ignoring initial blank line in out file." + gLine);
+							oLine = obr.readLine();
+						}
+
+						while( gFirstLine && gLine != null && gLine.equals("") ){
+							System.err.println("    NOTE: Ignoring initial blank line in gold file." + gLine);
+							gLine = gbr.readLine();
+						}
+
+						if(oFirstLine == true){
+							oFirstLine = false;
+						}
+						if(gFirstLine == true){
+							gFirstLine = false;
+						}
+					}
+					
+					if (( oLine == null ) && ( gLine != null )) {
+						System.err.println("Extra line in gold file:" + gLine);
+						return false;
+					}
+					if (( oLine != null ) && ( gLine == null )) {
+						System.err.println("Extra line in output file:" + oLine);
+						return false;
+					}
+					if (( oLine == null ) && ( gLine == null )) {
+						return true; // Done
+					}
+					if ( !oLine.equals(gLine) )  {
+						System.err.println("Difference in line:");
+						System.err.println(" out: \""+oLine+"\"");
+						System.err.println("gold: \""+gLine+"\"");
+						return false;
+					}
+				}
 			}
-			catch (IOException e) {
+			catch ( UnsupportedEncodingException e ) {
 				e.printStackTrace();
 				return false;
 			}
+			catch ( IOException e ) {
+				e.printStackTrace();
+				return false;
+			}
+			finally {
+				try {
+					if ( obr != null ) obr.close();
+					if ( gbr != null ) gbr.close();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+					return false;
+				}
+			}
 		}
-	}
+
 	
 	public boolean filesExactlyTheSame (InputStream ois,
 		InputStream gis)
