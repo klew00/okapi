@@ -158,7 +158,7 @@ public class FilterTestDriver {
 					return false;
 				}
 			}
-			else if ( tmp.equals(gtu.getName()) ) {
+			else if ( !tmp.equals(gtu.getName()) ) {
 				return false;
 			}
 			
@@ -168,7 +168,7 @@ public class FilterTestDriver {
 					return false;
 				}
 			}
-			else if ( tmp.equals(gtu.getType()) ) {
+			else if ( !tmp.equals(gtu.getType()) ) {
 				return false;
 			}
 			
