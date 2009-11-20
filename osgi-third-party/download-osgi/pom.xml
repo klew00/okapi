@@ -78,6 +78,12 @@
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>com.springsource.com.ctc.wstx</artifactId>
             <version>3.2.8</version>
-        </dependency>-->
+        </dependency>
+        <dependency>
+            <groupId>org.w3c.tidy</groupId>
+            <artifactId>com.springsource.org.w3c.tidy</artifactId>
+            <version>0.0.0</version>
+        </dependency>
+        -->
     </dependencies>
 </project>
