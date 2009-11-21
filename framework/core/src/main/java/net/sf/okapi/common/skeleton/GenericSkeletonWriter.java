@@ -63,8 +63,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
 		Referent ref = referents.get(id);
+		if ( ref == null ) return null;
 		// Remove the object found from the list
-		if (( ref != null ) && ( (--ref.count)==0 )) {
+		if ( (--ref.count) == 0 ) {
 			referents.remove(id);
 		}
 		return ref.ref;

@@ -388,11 +388,9 @@ public class TikalTest {
     	
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
-
-    	System.err.println("\n=============== ZIP TEST ===============");
-    	System.err.println(" Out File: "+outputPath);
-    	System.err.println("Gold File: "+goldPath+"\n");
-    	
+    	System.out.println("Zipped file comparison");
+    	System.out.println("Output File: "+outputPath);
+    	System.out.println("Gold File: "+goldPath+"\n");
     	return zfc.compareFilesPerLines(outputPath, goldPath, "UTF-8", true);
     }
 

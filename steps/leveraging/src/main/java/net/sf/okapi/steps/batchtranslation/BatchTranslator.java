@@ -22,8 +22,10 @@ package net.sf.okapi.steps.batchtranslation;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import net.htmlparser.jericho.Element;
@@ -69,6 +71,7 @@ public class BatchTranslator {
 	private String htmlSegId;
 	private TextUnit oriTu;
 	private boolean initDone;
+	private Map<String, String> attributes;
 
 	public BatchTranslator (IFilterConfigurationMapper fcMapper,
 		Parameters params)
@@ -81,6 +84,8 @@ public class BatchTranslator {
 		}
 		qutil = new QueryUtil();
 		initDone = false;
+		attributes = new Hashtable<String, String>();
+		attributes.put("creationid", Util.ORIGIN_MT);
 	}
 	
 	protected void finalize () {
@@ -101,6 +106,9 @@ public class BatchTranslator {
 		if ( params.getMakeTMX() ) {
 			tmxWriter = new TMXWriter(params.getTmxPath());
 			tmxWriter.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", "sentence", "MT-based", "unknown");
+		}
+		if ( !Util.isEmpty(params.getOrigin()) ) {
+			attributes.put("Txt::Origin", params.getOrigin());
 		}
 		initDone = true;
 	}
@@ -284,7 +292,8 @@ public class BatchTranslator {
 				}
 				catch ( Throwable e ) {
 					// Catch issues with inline codes
-					LOGGER.warning(e.toString());
+					LOGGER.warning(String.format("Skipping entry '%d:%s:%s'.\n", htmlSubDocId, htmlTuId, htmlSegId)
+						+ e.getMessage());
 					continue; // Skip this entry
 				}
 
@@ -296,9 +305,8 @@ public class BatchTranslator {
 				}
 				
 				if ( tmxWriter != null ) {
-					tmxWriter.writeTU(srcFrag, trgFrag, null, null);
+					tmxWriter.writeTU(srcFrag, trgFrag, null, attributes);
 				}
-				
 //				System.out.println("");
 //				System.out.println("SRC="+srcFrag.toString());
 //				System.out.println("TRG="+trgFrag.toString());

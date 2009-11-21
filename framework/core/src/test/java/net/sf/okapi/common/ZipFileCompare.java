@@ -108,7 +108,7 @@ public class ZipFileCompare {
 				ZipEntry oze= outZipMap.get(filename);
 				ZipEntry gze= goldZipMap.get(filename);
 
-				System.err.println("Comparing file: "+filename);
+				System.out.println("Comparing file: "+filename);
 				
 				InputStream ois = outZipFile.getInputStream(oze);
 				InputStream gis = goldZipFile.getInputStream(gze);
@@ -137,7 +137,7 @@ public class ZipFileCompare {
 		}
 
 		if( !failure ){
-			System.err.println("\nAll "+identicals+" pass comparison.\n");
+			System.out.println("\nAll "+identicals+" pass comparison.\n");
 			return true;
 		}else{
 			return false;

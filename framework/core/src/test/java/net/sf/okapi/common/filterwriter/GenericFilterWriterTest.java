@@ -21,16 +21,22 @@
 package net.sf.okapi.common.filterwriter;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
@@ -49,6 +55,72 @@ public class GenericFilterWriterTest {
 	public void setUp() throws Exception {
 	}
 
+	@Test
+	public void testEmbeddedGroups () {
+		String expected = "<p>Text before list:"
+			+ "<ul>"
+			+ "<li>Text of item 1</li>"
+			+ "<li>Text of item 2</li>"
+			+ "</ul>"
+            + "and text after the list.</p>";
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		StartDocument sd = new StartDocument("sd1");
+		sd.setLineBreak("\n");
+		events.add(new Event(EventType.START_DOCUMENT, sd));
+		
+		GenericSkeleton skel_tu3 = new GenericSkeleton("<p>");
+		TextUnit tu3 = new TextUnit("tu3", "Text before list:");
+		tu3.setSkeleton(skel_tu3);
+		skel_tu3.addContentPlaceholder(tu3);
+	
+		GenericSkeleton skel_sg1 = new GenericSkeleton("<ul>");
+		StartGroup sg1 = new StartGroup(tu3.getId(), "sg1");
+		sg1.setSkeleton(skel_sg1);
+		sg1.setIsReferent(true);
+
+		GenericSkeleton skel_tu1 = new GenericSkeleton("<li>");
+		TextUnit tu1 = new TextUnit("tu1", "Text of item 1");		
+		tu1.setSkeleton(skel_tu1);
+		skel_tu1.addContentPlaceholder(tu1);
+		skel_tu1.append("</li>");
+		tu1.setIsReferent(true);
+		skel_sg1.addReference(tu1);
+		events.add(new Event(EventType.TEXT_UNIT, tu1));
+				
+		GenericSkeleton skel_tu2 = new GenericSkeleton("<li>");
+		TextUnit tu2 = new TextUnit("tu2", "Text of item 2");		
+		tu2.setSkeleton(skel_tu2);
+		skel_tu2.addContentPlaceholder(tu2);
+		skel_tu2.append("</li>");
+		tu2.setIsReferent(true);
+		skel_sg1.addReference(tu2);
+		events.add(new Event(EventType.TEXT_UNIT, tu2));
+		
+		TextFragment tf_tu3 = tu3.getSourceContent();
+		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker(sg1.getId()));
+		c.setReferenceFlag(true);
+		tf_tu3.append(c);
+		events.add(new Event(EventType.START_GROUP, sg1));
+		
+		GenericSkeleton skel_eg1 = new GenericSkeleton("</ul>");
+		Ending eg1 = new Ending("eg1");
+		eg1.setSkeleton(skel_eg1);
+		events.add(new Event(EventType.END_GROUP, eg1));
+		
+		tf_tu3.append("and text after the list.");
+		skel_tu3.append("</p>");
+		
+		events.add(new Event(EventType.TEXT_UNIT, tu3));
+
+		Ending ed1 = new Ending("ed1"); 
+		events.add(new Event(EventType.END_DOCUMENT, ed1));
+
+		String result = FilterTestDriver.generateOutput(events, locFR);
+		assertEquals(expected, result);
+		
+	}
+	
 	@Test
 	public void testSourceTargetSkeleton () {
 		TextUnit tu = new TextUnit("tu1");

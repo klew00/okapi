@@ -31,12 +31,14 @@ import net.sf.okapi.common.uidescription.TextInputPart;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String COMMAND = "command";
+	private static final String ORIGIN = "origin";
 	private static final String MAKETM = "makeTM";
 	private static final String TMDIRECTORY = "tmDirectory";
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
 	
 	private String command;
+	private String origin;
 	private boolean makeTM;
 	private String tmDirectory;
 	private boolean makeTMX;
@@ -52,6 +54,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void setCommand (String command) {
 		this.command = command;
+	}
+
+	public String getOrigin () {
+		return origin;
+	}
+
+	public void setOrigin (String origin) {
+		this.origin = origin;
 	}
 
 	public boolean getMakeTMX () {
@@ -88,6 +98,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void reset() {
 		command = "\"C:\\Program Files\\PRMT8\\FILETRANS\\FileTranslator.exe\" \"${input}\" /as /ac \"/o:${output}\" /d:${srcLangName}-${trgLangName}";
+		origin = "promt";
 		makeTM = false;
 		tmDirectory = "mttm";
 		makeTMX = false;
@@ -98,6 +109,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		command = buffer.getString(COMMAND, command);
+		origin = buffer.getString(ORIGIN, origin);
 		makeTM = buffer.getBoolean(MAKETM, makeTM);
 		tmDirectory = buffer.getString(TMDIRECTORY, tmDirectory);
 		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
@@ -108,6 +120,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public String toString() {
 		buffer.reset();
 		buffer.setString(COMMAND, command);
+		buffer.setString(ORIGIN, origin);
 		buffer.setBoolean(MAKETM, makeTM);
 		buffer.setString(TMDIRECTORY, tmDirectory);
 		buffer.setBoolean(MAKETMX, makeTMX);
@@ -119,6 +132,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(COMMAND, "Command line", "Command line to execute the batch translation");
+		desc.add(ORIGIN, "Origin identifier", "String that identifies the origin of the translation");
 		desc.add(MAKETM, "Import into a Pensieve TM", null);
 		desc.add(TMDIRECTORY, "TM directory", "Location of the TM to create or use");
 		desc.add(MAKETMX, "Create a TMX document", null);
@@ -130,9 +144,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("Batch Translation", true, false);
 
 		desc.addTextInputPart(paramDesc.get(COMMAND));
+
+		TextInputPart tip = desc.addTextInputPart(paramDesc.get(ORIGIN));
+		tip.setAllowEmpty(true);
 		
 		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(MAKETM));
-		TextInputPart tip = desc.addTextInputPart(paramDesc.get(TMDIRECTORY));
+		tip = desc.addTextInputPart(paramDesc.get(TMDIRECTORY));
 		tip.setMasterPart(cbp, true);
 
 		cbp = desc.addCheckboxPart(paramDesc.get(MAKETMX));

@@ -42,9 +42,11 @@ import net.sf.okapi.common.resource.TextUnit;
 public class TMXWriter {
 
     private static final String ATTR_NAMES = ";lang;tuid;o-encoding;datatype;usagecount;"
-    	+ "lastusagedate;creationtool;creationtoolversion;creationdate;creationid"
+    	+ "lastusagedate;creationtool;creationtoolversion;creationdate;creationid;"
     	+ "changedate;segtype;changeid;o-tmf;srclang;";
 
+    private static final String CREATIONID = "creationid";
+    
     private XMLWriter writer;
     private TMXContent tmxCont = new TMXContent();
     private LocaleId srcLoc;
@@ -322,10 +324,13 @@ public class TMXWriter {
     	}
     	writer.writeLineBreak();
 
+    	// Write properties
     	if (( attributes != null ) && ( attributes.size() > 0 )) {
     		for ( String name : attributes.keySet() ) {
-    			// Filter out attributes (temporary solution)
-    			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
+    			// Filter out standard attributes
+    			if ( ATTR_NAMES.contains(";"+name+";") ) {
+    				continue;
+    			}
     			// Write out the property
     			writer.writeStartElement("prop");
     			writer.writeAttributeString("type", name);
@@ -344,6 +349,12 @@ public class TMXWriter {
     	if ( target != null ) {
     		writer.writeStartElement("tuv");
     		writer.writeAttributeString("xml:lang", trgLoc.toBCP47());
+        	// Write creationid if available
+        	if ( attributes != null ) {
+        		if ( attributes.containsKey(CREATIONID) ) {
+        			writer.writeAttributeString(CREATIONID, attributes.get(CREATIONID));
+        		}
+        	}
     		writer.writeStartElement("seg");
     		writer.writeRawXML(tmxCont.setContent(target).toString());
     		writer.writeEndElement(); // seg

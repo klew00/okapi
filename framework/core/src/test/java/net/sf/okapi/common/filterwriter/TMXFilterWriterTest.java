@@ -87,7 +87,7 @@ public class TMXFilterWriterTest {
 		}
 		filter.close();
 		return list;
-		}
+	}
 
 	private String rewrite (ArrayList<Event> list,
 		LocaleId trgLang)
