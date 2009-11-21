@@ -79,13 +79,19 @@ public class GenericFilterWriterTest {
 		sg1.setSkeleton(skel_sg1);
 		sg1.setIsReferent(true);
 
+		TextFragment tf_tu3 = tu3.getSourceContent();
+		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker(sg1.getId()));
+		c.setReferenceFlag(true);
+		tf_tu3.append(c);
+		events.add(new Event(EventType.START_GROUP, sg1));
+
 		GenericSkeleton skel_tu1 = new GenericSkeleton("<li>");
 		TextUnit tu1 = new TextUnit("tu1", "Text of item 1");		
 		tu1.setSkeleton(skel_tu1);
 		skel_tu1.addContentPlaceholder(tu1);
 		skel_tu1.append("</li>");
-		tu1.setIsReferent(true);
-		skel_sg1.addReference(tu1);
+//		tu1.setIsReferent(true);
+//		skel_sg1.addReference(tu1);
 		events.add(new Event(EventType.TEXT_UNIT, tu1));
 				
 		GenericSkeleton skel_tu2 = new GenericSkeleton("<li>");
@@ -93,15 +99,9 @@ public class GenericFilterWriterTest {
 		tu2.setSkeleton(skel_tu2);
 		skel_tu2.addContentPlaceholder(tu2);
 		skel_tu2.append("</li>");
-		tu2.setIsReferent(true);
-		skel_sg1.addReference(tu2);
+//		tu2.setIsReferent(true);
+//		skel_sg1.addReference(tu2);
 		events.add(new Event(EventType.TEXT_UNIT, tu2));
-		
-		TextFragment tf_tu3 = tu3.getSourceContent();
-		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker(sg1.getId()));
-		c.setReferenceFlag(true);
-		tf_tu3.append(c);
-		events.add(new Event(EventType.START_GROUP, sg1));
 		
 		GenericSkeleton skel_eg1 = new GenericSkeleton("</ul>");
 		Ending eg1 = new Ending("eg1");
