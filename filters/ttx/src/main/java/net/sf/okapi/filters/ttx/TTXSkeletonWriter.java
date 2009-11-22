@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;

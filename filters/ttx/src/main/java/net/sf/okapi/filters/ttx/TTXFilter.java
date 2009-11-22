@@ -23,6 +23,7 @@ package net.sf.okapi.filters.ttx;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -291,7 +292,7 @@ public class TTXFilter implements IFilter {
 				String name = reader.getLocalName();
 				if ( "Tu".equals(name) || "ut".equals(name) || "df".equals(name) ) {
 					if ( processTextUnit(name) ) return true;
-					storeStartElement();
+					buildStartElement(true);
 					storeUntilEndElement(name);
 					continue; // reader.next() was called
 				}
@@ -300,15 +301,15 @@ public class TTXFilter implements IFilter {
 				}
 				else if ( "Raw".equals(name) ) {
 					insideContent = true;
-					storeStartElement();
+					buildStartElement(true);
 				}
 				else {
-					storeStartElement();
+					buildStartElement(true);
 				}
 				break;
 				
 			case XMLStreamConstants.END_ELEMENT:
-				storeEndElement();
+				buildEndElement(true);
 				break;
 				
 			case XMLStreamConstants.SPACE: // Non-significant spaces
@@ -367,7 +368,6 @@ public class TTXFilter implements IFilter {
 			createDocumentPartIfNeeded();
 
 			// Initialize variable for this text unit
-//			boolean inSegment = false;
 			boolean inTarget = false;
 			tu = new TextUnit(null); // No id yet
 			TextContainer srcCont = tu.getSource();
@@ -375,7 +375,8 @@ public class TTXFilter implements IFilter {
 			TextFragment trgSegFrag = null;
 			TextFragment current = srcCont.getContent();
 			ArrayList<Segment> trgSegments = new ArrayList<Segment>();
-			boolean returnAfterTextUnitDone = true;
+			boolean returnValueAfterTextUnitDone = true;
+			Stack<Integer> idStack = new Stack<Integer>();
 
 			String tmp;
 			String name;
@@ -404,7 +405,7 @@ public class TTXFilter implements IFilter {
 					if ( name.equals("ut") ) {
 						if ( !isInline(name) ) { // Non-inline ut
 							done = true;
-							returnAfterTextUnitDone = false;
+							returnValueAfterTextUnitDone = false;
 							continue;
 						}
 					}
@@ -435,8 +436,9 @@ public class TTXFilter implements IFilter {
 					}
 					else if ( name.equals("df") ) {
 						dfCount++;
-						//Skip df
-						//TODO: find a solution for internal/external storage
+						idStack.push((inTarget ? ++trgId : ++srcId));
+						Code code = current.append(TagType.OPENING, "x-df", "", idStack.peek());
+						code.setOuterData(buildStartElement(false));
 						continue;
 					}
 					// Inline to include in this segment
@@ -469,18 +471,27 @@ public class TTXFilter implements IFilter {
 						if ( --dfCount < 0 ) { // External DF
 							done = true;
 						}
+						else {
+							Code code = current.append(TagType.CLOSING, "x-df", "", idStack.pop());
+							code.setOuterData(buildEndElement(false));
+						}
+						continue;
 					}
 					// Possible end of segment
-					if ( done || name.equals("Tu") ) {
+					if ( name.equals("Tu") ) {
+						done = true;
+					}
+					if ( done ) {
 						if ( srcSegFrag != null ) { // Add the segment if we have one
 							srcCont.appendSegment(srcSegFrag);
 							trgSegments.add(new Segment(String.valueOf(srcCont.getSegmentCount()-1), trgSegFrag));
 							srcSegFrag = null;
 							trgSegFrag = null;
 							current = srcCont.getContent();
+							reader.next(); // Move to the next tag
 						}
+						continue; // Stop here
 					}
-					if ( done ) continue; // Stop here
 					break;
 				}
 			}
@@ -505,26 +516,27 @@ public class TTXFilter implements IFilter {
 			tu.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 			skel = new GenericSkeleton();
-			return returnAfterTextUnitDone;
+			return returnValueAfterTextUnitDone;
 		}
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException("Error processing top-level ut element.", e);
 		}
 	}
 	
-	private void storeStartElement () {
+	private String buildStartElement (boolean store) {
+		StringBuilder tmp = new StringBuilder();
 		String prefix = reader.getPrefix();
 		if (( prefix == null ) || ( prefix.length()==0 )) {
-			skel.append("<"+reader.getLocalName());
+			tmp.append("<"+reader.getLocalName());
 		}
 		else {
-			skel.append("<"+prefix+":"+reader.getLocalName());
+			tmp.append("<"+prefix+":"+reader.getLocalName());
 		}
 
 		int count = reader.getNamespaceCount();
 		for ( int i=0; i<count; i++ ) {
 			prefix = reader.getNamespacePrefix(i);
-			skel.append(String.format(" xmlns%s=\"%s\"",
+			tmp.append(String.format(" xmlns%s=\"%s\"",
 				((prefix!=null) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
@@ -537,20 +549,25 @@ public class TTXFilter implements IFilter {
 			attrName = String.format("%s%s",
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 				reader.getAttributeLocalName(i));
-			skel.append(String.format(" %s=\"%s\"", attrName,
+			tmp.append(String.format(" %s=\"%s\"", attrName,
 				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
 		}
-		skel.append(">");
+		tmp.append(">");
+		if ( store ) skel.append(tmp.toString());
+		return tmp.toString();
 	}
 	
-	private void storeEndElement () {
+	private String buildEndElement (boolean store) {
+		StringBuilder tmp = new StringBuilder();
 		String prefix = reader.getPrefix();
 		if (( prefix != null ) && ( prefix.length()>0 )) {
-			skel.append("</"+prefix+":"+reader.getLocalName()+">");
+			tmp.append("</"+prefix+":"+reader.getLocalName()+">");
 		}
 		else {
-			skel.append("</"+reader.getLocalName()+">");
+			tmp.append("</"+reader.getLocalName()+">");
 		}
+		if ( store ) skel.append(tmp.toString());
+		return tmp.toString();
 	}
 
 	private void processUserSettings () {
@@ -584,7 +601,7 @@ public class TTXFilter implements IFilter {
 			trgDefFont = "Arial"; // Default
 		}
 
-		storeStartElement();
+		buildStartElement(true);
 	}
 
 	// Case of a UT element outside a TUV, that is an un-segmented/translate code.
@@ -619,16 +636,16 @@ public class TTXFilter implements IFilter {
 			eventType = reader.next();
 			switch ( eventType ) {
 			case XMLStreamConstants.START_ELEMENT:
-				storeStartElement();
+				buildStartElement(true);
 				break;
 			case XMLStreamConstants.END_ELEMENT:
 				if ( name.equals(reader.getLocalName()) ) {
-					storeEndElement();
+					buildEndElement(true);
 					reader.next(); // Move forward
 					return;
 				}
 				// Else: just store the end
-				storeEndElement();
+				buildEndElement(true);
 				break;
 			case XMLStreamConstants.SPACE:
 			case XMLStreamConstants.CDATA:
@@ -649,7 +666,7 @@ public class TTXFilter implements IFilter {
 
 	private boolean isInline (String tagName) {
 		if ( tagName.equals("df") ) {
-			return false; //TODO: decide df in or out
+			return true;
 		}
 		String tmp = reader.getAttributeValue(null, "Style");
 		if ( tmp != null ) {
@@ -994,7 +1011,7 @@ public class TTXFilter implements IFilter {
 				eventType = reader.next();
 				switch ( eventType ) {
 				case XMLStreamConstants.START_ELEMENT:
-					if ( store ) storeStartElement();
+					if ( store ) buildStartElement(store);
 					StringBuilder tmpg = new StringBuilder();
 					if ( tagName.equals(reader.getLocalName()) ) {
 						endStack++; // Take embedded elements into account 
@@ -1028,7 +1045,7 @@ public class TTXFilter implements IFilter {
 					break;
 					
 				case XMLStreamConstants.END_ELEMENT:
-					if ( store ) storeEndElement();
+					if ( store ) buildEndElement(store);
 					if ( tagName.equals(reader.getLocalName()) ) {
 						if ( --endStack == 0 ) {
 							Code code = content.append(tagType, type, innerCode.toString(), id);

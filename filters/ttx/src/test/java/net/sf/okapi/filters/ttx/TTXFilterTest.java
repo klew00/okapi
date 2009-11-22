@@ -130,18 +130,18 @@ public class TTXFilterTest {
 		assertFalse(tu.hasTarget(locESEM));
 	}
 
-//	@Test
-//	public void testOutputBasicNoTUWithDF () {
-//		String snippet = STARTFILENOLB
-//			+ "<df Size=\"16\">text</df>"
-//			+ "</Raw></Body></TRADOStag>";
-//		String expected = STARTFILENOLB
-//			+ "<df Size=\"16\"><Tu PercentageMatch=\"0\"><Tuv Lang=\"EN-US\">text</Tuv>"
-//			+ "<Tuv Lang=\"ES-EM\">text</Tuv></Tu></df>"
-//			+ "</Raw></Body></TRADOStag>";
-//		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-//			filter.createSkeletonWriter()));
-//	}
+	@Test
+	public void testOutputBasicNoTUWithDF () {
+		String snippet = STARTFILENOLB
+			+ "<df Size=\"16\">text</df>"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "<Tu PercentageMatch=\"0\"><Tuv Lang=\"EN-US\"><df Size=\"16\">text</df></Tuv>"
+			+ "<Tuv Lang=\"ES-EM\"><df Size=\"16\">text</df></Tuv></Tu>"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
+			filter.createSkeletonWriter()));
+	}
 
 	@Test
 	public void testWithPINoTU () {
@@ -281,7 +281,7 @@ public class TTXFilterTest {
 	}
 
 	@Test
-	public void testBasicTwoUT () {
+	public void testBasicTwoTU () {
 		String snippet = STARTFILE
 			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 es</Tuv></Tu>"
 			+ "  <Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 es</Tuv></Tu>"
@@ -289,15 +289,24 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals(2, cont.getSegmentCount());
+		assertEquals(1, cont.getSegmentCount());
 		assertEquals("text1 en", cont.getSegments().get(0).text.toString());
-		assertEquals("text2 en", cont.getSegments().get(1).text.toString());
-		assertEquals("0  1", cont.toString());
+		assertEquals("0", cont.toString());
 		cont = tu.getTarget(locESEM);
-		assertEquals(2, cont.getSegmentCount());
+		assertEquals(1, cont.getSegmentCount());
 		assertEquals("text1 es", cont.getSegments().get(0).text.toString());
-		assertEquals("text2 es", cont.getSegments().get(1).text.toString());
-//TODO		assertEquals("0  1", cont.toString());
+		assertEquals("0", cont.toString());
+
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 2);
+		assertNotNull(tu);
+		cont = tu.getSource();
+		assertEquals(1, cont.getSegmentCount());
+		assertEquals("text2 en", cont.getSegments().get(0).text.toString());
+		assertEquals("0", cont.toString());
+		cont = tu.getTarget(locESEM);
+		assertEquals(1, cont.getSegmentCount());
+		assertEquals("text2 es", cont.getSegments().get(0).text.toString());
+		assertEquals("0", cont.toString());
 	}
 
 	@Test
@@ -356,35 +365,37 @@ public class TTXFilterTest {
 			filter.createSkeletonWriter()));
 	}
 	
-//	@Test
-//	public void testOutputWithOriginalWithoutTraget () {
-//		String snippet = STARTFILE
-//			+ "<Tu PercentageMatch=\"0\">"
-//			+ "<Tuv Lang=\"EN-US\">text1 en</Tuv></Tu>\n"
-//			+ "  <ut Style=\"external\">some code</ut>  "
-//			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv></Tu>\n"
-//			+ "</Raw></Body></TRADOStag>";
-//		String expected = STARTFILE
-//			+ "<Tu PercentageMatch=\"0\">"
-//			+ "<Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 en</Tuv></Tu>\n"
-//			+ "  <ut Style=\"external\">some code</ut>  "
-//			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 en</Tuv></Tu>\n"
-//			+ "</Raw></Body></TRADOStag>";
-//		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-//			filter.createSkeletonWriter()));
-//	}
+	@Test
+	public void testOutputWithOriginalWithoutTraget () {
+		String snippet = STARTFILE
+			+ "<Tu PercentageMatch=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">text1 en</Tuv></Tu>\n"
+			+ "  <ut Style=\"external\">some code</ut>  "
+			+ "<Tu PercentageMatch=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">text2 en</Tuv></Tu>\n"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILE
+			+ "<Tu PercentageMatch=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 en</Tuv></Tu>\n"
+			+ "  <ut Style=\"external\">some code</ut>  "
+			+ "<Tu PercentageMatch=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 en</Tuv></Tu>\n"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
+			filter.createSkeletonWriter()));
+	}
 
 //	@Test
-//	public void testOutputWithOriginalWithoutTragetKO () {
+//	public void testOutputWithOriginalWithoutTargetKO () {
 //		String snippet = STARTFILEKO
 //			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv></Tu>\n"
 //			+ "  <ut Style=\"external\">some code</ut>  "
 //			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv></Tu>\n"
 //			+ "</Raw></Body></TRADOStag>";
 //		String expected = STARTFILEKO
-//			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"KO-KR\"><df Font=\"\ubd7e\">text1 en</df></Tuv></Tu>\n"
+//			+ "<Tu PercentageMatch=\"0\"><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"KO-KR\"><df Font=\"\ubd7e\">text1 en</df></Tuv></Tu>\n"
 //			+ "  <ut Style=\"external\">some code</ut>  "
-//			+ "<Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"KO-KR\"><df Font=\"\ubd7e\">text2 en</df></Tuv></Tu>\n"
+//			+ "<Tu PercentageMatch=\"0\"><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"KO-KR\"><df Font=\"\ubd7e\">text2 en</df></Tuv></Tu>\n"
 //			+ "</Raw></Body></TRADOStag>";
 //		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locKOKR), locKOKR,
 //			filter.createSkeletonWriter()));
