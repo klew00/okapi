@@ -33,6 +33,7 @@ public final class MimeTypeMapper {
 	public static final String XML_MIME_TYPE = "text/xml";
 	public static final String ODF_MIME_TYPE = "text/x-odf";
 	public static final String HTML_MIME_TYPE = "text/html";
+	public static final String XHTML_MIME_TYPE = "text/xhtml";
 	public static final String PO_MIME_TYPE = "application/x-gettext";
 	public static final String XLIFF_MIME_TYPE = "application/x-xliff+xml";
 	public static final String RTF_MIME_TYPE = "text/rtf";
@@ -65,6 +66,7 @@ public final class MimeTypeMapper {
 		extensionToMimeMap.put("odf", ODF_MIME_TYPE);
 		extensionToMimeMap.put("html", HTML_MIME_TYPE);
 		extensionToMimeMap.put("htm", HTML_MIME_TYPE);
+		extensionToMimeMap.put("xhtml", XHTML_MIME_TYPE);
 		extensionToMimeMap.put("po", PO_MIME_TYPE);
 		extensionToMimeMap.put("rtf", RTF_MIME_TYPE);
 		extensionToMimeMap.put("doc", MS_DOC_MIME_TYPE);
