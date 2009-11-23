@@ -300,8 +300,9 @@ public class FilterTestDriver {
 			
 			
 		case TEXT_UNIT:
-			if ( !compareTextUnit((TextUnit)manual.getResource(), (TextUnit)generated.getResource()) ) {
-				System.err.println("Text unit difference");
+			TextUnit tu = (TextUnit)manual.getResource();
+			if ( !compareTextUnit(tu, (TextUnit)generated.getResource()) ) {
+				System.err.println("Text unit difference, tu id="+tu.getId());
 				return false;
 			}
 			break;
@@ -1096,6 +1097,8 @@ public class FilterTestDriver {
 		List<Code> codes2 = tf2.getCodes();
 		if ( codes1.size() != codes2.size() ) {
 			System.err.println("Number of codes difference");
+			System.err.println("original codes="+codes1.toString());
+			System.err.println("     new codes="+codes2.toString());
 			return false;
 		}
 		for ( int i=0; i<codes1.size(); i++ ) {

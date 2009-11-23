@@ -113,7 +113,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 
 		StringBuilder tmp = new StringBuilder();
 //TODO: Tu attributes		
-		tmp.append("<Tu PercentageMatch=\"0\">");
+		tmp.append("<Tu MatchPercent=\"0\">");
 		
 		tmp.append(String.format("<Tuv Lang=\"%s\">", srcLangCode));
 		tmp.append(processFragment(srcFrag));
@@ -127,7 +127,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		return tmp.toString();
 	}
 
-	private String processFragment (TextFragment frag) {
+	protected String processFragment (TextFragment frag) {
 		StringBuilder tmp = new StringBuilder();
 		String text = frag.getCodedText();
 

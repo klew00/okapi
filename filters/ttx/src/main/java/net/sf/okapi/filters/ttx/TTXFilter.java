@@ -85,6 +85,7 @@ public class TTXFilter implements IFilter {
 	private boolean useDF;
 	private boolean insideContent;
 	private TTXSkeletonWriter skelwriter;
+	private TTXSkeletonWriter specialWriter;
 	
 	public TTXFilter () {
 		params = new Parameters();
@@ -293,6 +294,9 @@ public class TTXFilter implements IFilter {
 				if ( "Tu".equals(name) || "ut".equals(name) || "df".equals(name) ) {
 					if ( processTextUnit(name) ) return true;
 					buildStartElement(true);
+					// The element at the exit may be different than at the call
+					// so we refresh the name here to store the correct ending
+					name = reader.getLocalName(); 
 					storeUntilEndElement(name);
 					continue; // reader.next() was called
 				}
@@ -478,17 +482,14 @@ public class TTXFilter implements IFilter {
 						continue;
 					}
 					// Possible end of segment
-					if ( name.equals("Tu") ) {
-						done = true;
-					}
-					if ( done ) {
+					if ( done || name.equals("Tu") ) {
 						if ( srcSegFrag != null ) { // Add the segment if we have one
 							srcCont.appendSegment(srcSegFrag);
 							trgSegments.add(new Segment(String.valueOf(srcCont.getSegmentCount()-1), trgSegFrag));
 							srcSegFrag = null;
 							trgSegFrag = null;
 							current = srcCont.getContent();
-							reader.next(); // Move to the next tag
+							// A Tu stops the current segment, but not the text unit
 						}
 						continue; // Stop here
 					}
@@ -498,8 +499,14 @@ public class TTXFilter implements IFilter {
 
 			// Check if this it is worth sending as text unit
 			if ( !tu.getSource().hasText(true, false) ) {
+				if ( specialWriter == null ) {
+					specialWriter = new TTXSkeletonWriter();
+				}
 				// Not really a text unit: convert to skeleton
-		//TODO: to skel conversion
+				// Use the skeleton writer processFragment() to get the output
+				// so any outer data is generated.
+				skel.append(specialWriter.processFragment(tu.getSourceContent()).replace("\n", lineBreak));
+				tu = null;
 				return false; // No return from filter
 			}
 			
