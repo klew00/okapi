@@ -16,7 +16,7 @@ import net.sf.okapi.common.resource.TextUnit;
 public class PropertyTextUnitPlaceholder implements
 		Comparable<PropertyTextUnitPlaceholder> {
 	public enum PlaceholderAccessType {
-		TRANSLATABLE, READ_ONLY_PROPERTY, WRITABLE_PROPERTY
+		TRANSLATABLE, READ_ONLY_PROPERTY, WRITABLE_PROPERTY, NAME
 	}
 
 	private PlaceholderAccessType accessType;
@@ -24,7 +24,6 @@ public class PropertyTextUnitPlaceholder implements
 	private String name;
 	private String value;
 	private String mimeType;
-	private boolean id;
 	private String elementType;
 
 	private int mainStartPos;
@@ -253,14 +252,6 @@ public class PropertyTextUnitPlaceholder implements
 	 */
 	public String getMimeType() {
 		return mimeType;
-	}
-
-	public void setId(boolean id) {
-		this.id = id;
-	}
-
-	public boolean isId() {
-		return id;
 	}
 
 	public void setElementType(String elementType) {
