@@ -55,5 +55,9 @@ public class DocumentPart extends BaseReferenceable {
 		this.refCount = (isReferent ? 1 : 0);
 		setSkeleton(skeleton);
 	}
-	
+
+	@Override
+	public String toString() {
+		return getSkeleton().toString();
+	}	
 }
