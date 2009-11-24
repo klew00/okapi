@@ -128,7 +128,7 @@ public class TTXFilter implements IFilter {
 			getClass().getName(),
 			"TTX",
 			"Configuration for Trados TTX documents."));
-		list.add(new FilterConfiguration(getName()+"-textBlock",
+		list.add(new FilterConfiguration(getName()+"-forcedSegmentedOutput",
 			MimeTypeMapper.TTX_MIME_TYPE,
 			getClass().getName(),
 			"TTX (Forced segmented output)",

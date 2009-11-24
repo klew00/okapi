@@ -135,7 +135,7 @@ public class TmxFilter implements IFilter {
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
-			"text/x-tmx",
+			MimeTypeMapper.TMX_MIME_TYPE,
 			getClass().getName(),
 			"TMX",
 			"Configuration for Translation Memory eXchange (TMX) documents."));

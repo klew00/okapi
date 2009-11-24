@@ -131,11 +131,12 @@ public class OpenOfficeFilter implements IFilter {
 		return list;
 	}
 	
-//	public EncoderManager createEncoderManager () {
-//		EncoderManager em = new EncoderManager();
-//		em.setMapping();
-//		return em;
-//	}
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		// For ODFFilter:
+		em.setMapping(MimeTypeMapper.ODF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		return em;
+	}
 	
 	public IParameters getParameters () {
 		// Should be the same as the internal ODF filter already 

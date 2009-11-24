@@ -36,7 +36,7 @@ public final class MimeTypeMapper {
 	public static final String XHTML_MIME_TYPE = "text/xhtml";
 	public static final String PO_MIME_TYPE = "application/x-gettext";
 	public static final String XLIFF_MIME_TYPE = "application/x-xliff+xml";
-	public static final String RTF_MIME_TYPE = "text/rtf";
+	public static final String RTF_MIME_TYPE = "application/rtf";
 	public static final String MS_DOC_MIME_TYPE = "application/msword";
 	public static final String MS_EXCEL_MIME_TYPE = "application/vnd.ms-excel";
 	public static final String MS_POWERPOINT_MIME_TYPE = "application/vnd.ms-powerpoint";

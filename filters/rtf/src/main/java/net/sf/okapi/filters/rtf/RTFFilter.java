@@ -39,7 +39,9 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -301,17 +303,23 @@ public class RTFFilter implements IFilter {
 	}
 
 	public String getMimeType () {
-		return "text/rtf"; //TODO: check
+		return MimeTypeMapper.RTF_MIME_TYPE;
 	}
 	
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
-			"text/rtf",
+			MimeTypeMapper.RTF_MIME_TYPE,
 			getClass().getName(),
 			"RTF",
 			"Configuration for Rich Text Format (RTF) files."));
 		return list;
+	}
+	
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		// No specific mapping for RTF
+		return em;
 	}
 	
 	public IParameters getParameters () {
@@ -378,8 +386,8 @@ public class RTFFilter implements IFilter {
 			startDoc.setLocale(input.getSourceLocale());
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setFilterWriter(createFilterWriter());
-			startDoc.setType("text/rtf");
-			startDoc.setMimeType("text/rtf");
+			startDoc.setType(MimeTypeMapper.RTF_MIME_TYPE);
+			startDoc.setMimeType(MimeTypeMapper.RTF_MIME_TYPE);
 			startDoc.setMultilingual(true);
 			startDoc.setLineBreak(Util.LINEBREAK_DOS);
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));

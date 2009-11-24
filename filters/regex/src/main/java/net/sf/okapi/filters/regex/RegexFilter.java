@@ -35,6 +35,8 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -129,6 +131,13 @@ public class RegexFilter implements IFilter {
 		return list;
 	}
 
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		// Use all known mappings since the MIME type can be user-defined
+		em.setAllKnownMappings();
+		return em;
+	}
+	
 	public IParameters getParameters () {
 		return params;
 	}
@@ -485,7 +494,7 @@ public class RegexFilter implements IFilter {
 		// Move the skeleton start for next read
 		startSkl = result.end();
 		
-		tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
+		tuRes.setMimeType(MIMETYPE); //TODO: work-out something for escapes in regex
 		if ( rule.preserveWS ) {
 			tuRes.setPreserveWhitespaces(true);
 		}
@@ -582,7 +591,7 @@ public class RegexFilter implements IFilter {
 				// Item to extract
 				tuRes = new TextUnit(String.valueOf(++tuId),
 					data.substring(start, end));
-				tuRes.setMimeType("text/x-regex"); //TODO: work-out something for escapes in regex
+				tuRes.setMimeType(MIMETYPE); //TODO: work-out something for escapes in regex
 				if ( rule.preserveWS ) {
 					tuRes.setPreserveWhitespaces(true);
 				}

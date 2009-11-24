@@ -36,6 +36,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -184,8 +185,6 @@ public class ODFFilter implements IFilter {
 		XMLInputFactory fact = XMLInputFactory.newInstance();
 		fact.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
 		fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-//Removed for Java 1.6		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
-//Removed for Java 1.6		fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 
 		try {
 			input.setEncoding("UTF-8"); // Force UTF-8 as the default encoding
@@ -250,11 +249,11 @@ public class ODFFilter implements IFilter {
 		return list;
 	}
 	
-//	public EncoderManager createEncoderManager () {
-//	EncoderManager em = new EncoderManager();
-//	em.setMapping();
-//	return em;
-//}
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.ODF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		return em;
+	}
 
 	public IParameters getParameters () {
 		return params;

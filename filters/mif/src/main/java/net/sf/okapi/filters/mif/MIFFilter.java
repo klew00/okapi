@@ -34,6 +34,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -133,6 +134,12 @@ public class MIFFilter implements IFilter {
 		return list;
 	}
 	
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.MIF_MIME_TYPE, "net.sf.okapi.common.encoder.MIFEncoder");
+		return em;
+	}
+
 	public IParameters getParameters () {
 		return null;
 	}
