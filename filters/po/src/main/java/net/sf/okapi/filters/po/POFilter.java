@@ -37,6 +37,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -169,6 +170,12 @@ public class POFilter implements IFilter {
 		return list;
 	}
 
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.PO_MIME_TYPE, "net.sf.okapi.common.encoder.POEncoder");
+		return em;
+	}
+	
 	public IParameters getParameters () {
 		return params;
 	}

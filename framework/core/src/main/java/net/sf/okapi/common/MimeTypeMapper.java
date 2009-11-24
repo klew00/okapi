@@ -60,6 +60,7 @@ public final class MimeTypeMapper {
 	public static final String PHP_MIME_TYPE = "application/x-php";
 	public static final String OPENOFFICE_MIME_TYPE = "application/x-openoffice";
 	public static final String TTX_MIME_TYPE = "application/x-ttx+xml";
+	public static final String TMX_MIME_TYPE = "application/x-tmx+xml";
 
 	static {
 		extensionToMimeMap.put("xml", XML_MIME_TYPE);

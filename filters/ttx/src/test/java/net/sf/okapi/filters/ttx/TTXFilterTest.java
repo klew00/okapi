@@ -28,8 +28,8 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.LocaleId;
@@ -41,14 +41,14 @@ import static org.junit.Assert.*;
 
 public class TTXFilterTest {
 
-	private TTXFilter filter;
+	private TTXFilter filter1;
+	private TTXFilter filter2;
 	private GenericContent fmt;
 	private String root;
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 	private LocaleId locESEM = LocaleId.fromString("es-em");
 	private LocaleId locFRFR = LocaleId.fromString("fr-fr");
 	private LocaleId locKOKR = LocaleId.fromString("ko-kr");
-	private ISkeletonWriter skelWriter;
 	
 	private static final String STARTFILE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		+ "<TRADOStag Version=\"2.0\"><FrontMatter>\n"
@@ -70,9 +70,13 @@ public class TTXFilterTest {
 
 	@Before
 	public void setUp() {
-		filter = new TTXFilter();
+		filter1 = new TTXFilter();
 		fmt = new GenericContent();
 		root = TestUtil.getParentDir(this.getClass(), "/Test01.html.ttx");
+
+		filter2 = new TTXFilter();
+		Parameters params = (Parameters)filter2.getParameters();
+		params.setForcesegments(true);
 	}
 
 	@Test
@@ -80,7 +84,7 @@ public class TTXFilterTest {
 		String snippet = STARTFILE
 			+ " <ut Style=\"external\">some &amp; code</ut>\n\n  <!-- comments-->"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNull(tu);
 	}
 
@@ -89,8 +93,8 @@ public class TTXFilterTest {
 		String snippet = STARTFILE
 			+ " <ut Style=\"external\">some &amp; code</ut>\n\n  <!-- comments-->"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
 	}
 
 	@Test
@@ -98,7 +102,7 @@ public class TTXFilterTest {
 		String snippet = STARTFILE
 			+ "text"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("\ntext", cont.toString());
@@ -111,11 +115,23 @@ public class TTXFilterTest {
 			+ "text"
 			+ "</Raw></Body></TRADOStag>";
 		String expected = STARTFILENOLB
+			+ "text"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
+	}
+
+	@Test
+	public void testOutputBasicNoTUWithSegmentationOption () {
+		String snippet = STARTFILENOLB
+			+ "text"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
 			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text</Tuv>"
 			+ "<Tuv Lang=\"ES-EM\">text</Tuv></Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
+			filter2.createSkeletonWriter()));
 	}
 
 	@Test
@@ -123,7 +139,7 @@ public class TTXFilterTest {
 		String snippet = STARTFILENOLB
 			+ "<df Size=\"16\">text</df>"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("text", cont.toString());
@@ -131,7 +147,7 @@ public class TTXFilterTest {
 	}
 
 	@Test
-	public void testOutputBasicNoTUWithDF () {
+	public void testOutputBasicNoTUWithDFWithSegementation () {
 		String snippet = STARTFILENOLB
 			+ "<df Size=\"16\">text</df>"
 			+ "</Raw></Body></TRADOStag>";
@@ -139,8 +155,37 @@ public class TTXFilterTest {
 			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\"><df Size=\"16\">text</df></Tuv>"
 			+ "<Tuv Lang=\"ES-EM\"><df Size=\"16\">text</df></Tuv></Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
+			filter2.createSkeletonWriter()));
+	}
+
+	@Test
+	public void testWithMixedSegmentation () {
+		String snippet = STARTFILENOLB
+			+ "<Tu Matchpercent=\"0\"><Tuv lang=\"EN-US\">text</Tuv></Tu>"
+			+ " more text"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		assertEquals("0 more text", cont.toString());
+		cont = tu.getTarget(locESEM);
+		assertNotNull(cont);
+		assertEquals("0 more text", cont.toString());
+	}
+
+	@Test
+	public void testOutputWithMixedSegmentation () {
+		String snippet = STARTFILENOLB
+			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text</Tuv></Tu>"
+			+ " more text"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text</Tuv><Tuv Lang=\"ES-EM\">text</Tuv></Tu>"
+			+ " more text"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
 	}
 
 	@Test
@@ -148,7 +193,7 @@ public class TTXFilterTest {
 		String snippet = STARTFILE
 			+ "<ut Class=\"procinstr\">pi</ut>text"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("text", cont.toString());
@@ -160,7 +205,7 @@ public class TTXFilterTest {
 		String snippet = STARTFILE
 			+ "text<ut Class=\"procinstr\">pi</ut>"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("\ntext", cont.toString());
@@ -172,7 +217,7 @@ public class TTXFilterTest {
 		String snippet = STARTFILENOLB
 			+ "before <ut Type=\"start\">[</ut>in<ut Type=\"end\">]</ut> after"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("before [in] after", cont.toString());
@@ -185,11 +230,23 @@ public class TTXFilterTest {
 			+ "before <ut Type=\"start\">[</ut>in<ut Type=\"end\">]</ut> after"
 			+ "</Raw></Body></TRADOStag>";
 		String expected = STARTFILENOLB
+			+ "before <ut Type=\"start\">[</ut>in<ut Type=\"end\">]</ut> after"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
+	}
+
+	@Test
+	public void testOutputNoTUContentWithUTWithSegmentation () {
+		String snippet = STARTFILENOLB
+			+ "before <ut Type=\"start\">[</ut>in<ut Type=\"end\">]</ut> after"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
 			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">before <ut Type=\"start\">[</ut>in<ut Type=\"end\">]</ut> after</Tuv>"
 			+ "<Tuv Lang=\"ES-EM\">before <ut Type=\"start\">[</ut>in<ut Type=\"end\">]</ut> after</Tuv></Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
+			filter2.createSkeletonWriter()));
 	}
 
 	@Test
@@ -197,7 +254,7 @@ public class TTXFilterTest {
 		String snippet = STARTFILENOLB
 			+ "<df Font=\"Arial\"><ut Style=\"external\">code</ut>text<ut Style=\"external\">code</ut></df>"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("text", cont.toString());
@@ -209,13 +266,25 @@ public class TTXFilterTest {
 			+ "<df Font=\"Arial\"><ut Style=\"external\">code</ut>text<ut Style=\"external\">code</ut></df>"
 			+ "</Raw></Body></TRADOStag>";
 		String expected = STARTFILENOLB
+			+ "<df Font=\"Arial\"><ut Style=\"external\">code</ut>text<ut Style=\"external\">code</ut></df>"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
+	}
+
+	@Test
+	public void testOutputForExternalDFwithSegmentation () {
+		String snippet = STARTFILENOLB
+			+ "<df Font=\"Arial\"><ut Style=\"external\">code</ut>text<ut Style=\"external\">code</ut></df>"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
 			+ "<df Font=\"Arial\"><ut Style=\"external\">code</ut>"
 			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text</Tuv>"
 			+ "<Tuv Lang=\"ES-EM\">text</Tuv></Tu>"
 			+ "<ut Style=\"external\">code</ut></df>"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-				filter.createSkeletonWriter()));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
+			filter2.createSkeletonWriter()));
 	}
 
 	@Test
@@ -223,11 +292,11 @@ public class TTXFilterTest {
 		String snippet = STARTFILENOLB
 			+ "text1<ut Style=\"external\">code</ut>text2"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("text1", cont.toString());
-		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 2);
+		tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 2);
 		assertNotNull(tu);
 		cont = tu.getSource();
 		assertEquals("text2", cont.toString());
@@ -239,13 +308,25 @@ public class TTXFilterTest {
 			+ "text1<ut Style=\"external\">code</ut>text2"
 			+ "</Raw></Body></TRADOStag>";
 		String expected = STARTFILENOLB
-			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text1</Tuv><Tuv Lang=\"ES-EM\">text1</Tuv></Tu>"
-			+ "<ut Style=\"external\">code</ut>"
-			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text2</Tuv><Tuv Lang=\"ES-EM\">text2</Tuv></Tu>"
+			+ "text1<ut Style=\"external\">code</ut>text2"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
 	}
+
+//	@Test
+//	public void testOutputForTwoTUsWithSegmentation () {
+//		String snippet = STARTFILENOLB
+//			+ "text1<ut Style=\"external\">code</ut>text2"
+//			+ "</Raw></Body></TRADOStag>";
+//		String expected = STARTFILENOLB
+//			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text1</Tuv><Tuv Lang=\"ES-EM\">text1</Tuv></Tu>"
+//			+ "<ut Style=\"external\">code</ut>"
+//			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text2</Tuv><Tuv Lang=\"ES-EM\">text2</Tuv></Tu>"
+//			+ "</Raw></Body></TRADOStag>";
+//		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
+//			filter.createSkeletonWriter()));
+//	}
 
 	@Test
 	public void testOutputWithPINoTU () {
@@ -253,12 +334,24 @@ public class TTXFilterTest {
 			+ "<ut Class=\"procinstr\">pi</ut>text"
 			+ "</Raw></Body></TRADOStag>";
 		String expected = STARTFILENOLB
-			+ "<ut Class=\"procinstr\">pi</ut><Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text</Tuv>"
-			+ "<Tuv Lang=\"ES-EM\">text</Tuv></Tu>"
+			+ "<ut Class=\"procinstr\">pi</ut>text"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
 	}
+
+//	@Test
+//	public void testOutputWithPINoTUWithSegmentation () {
+//		String snippet = STARTFILENOLB
+//			+ "<ut Class=\"procinstr\">pi</ut>text"
+//			+ "</Raw></Body></TRADOStag>";
+//		String expected = STARTFILENOLB
+//			+ "<ut Class=\"procinstr\">pi</ut><Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text</Tuv>"
+//			+ "<Tuv Lang=\"ES-EM\">text</Tuv></Tu>"
+//			+ "</Raw></Body></TRADOStag>";
+//		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
+//			filter.createSkeletonWriter()));
+//	}
 
 	@Test
 	public void testBasicNoUT () {
@@ -268,7 +361,7 @@ public class TTXFilterTest {
 			+ "<Tuv Lang=\"ES-EM\">text es</Tuv>"
 			+ "</Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals(1, cont.getSegmentCount());
@@ -286,7 +379,7 @@ public class TTXFilterTest {
 			+ "<Tu><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 es</Tuv></Tu>"
 			+ "  <Tu><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 es</Tuv></Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals(2, cont.getSegmentCount());
@@ -299,7 +392,7 @@ public class TTXFilterTest {
 		assertEquals("text2 es", cont.getSegments().get(1).text.toString());
 		assertEquals("0  1", cont.toString());
 
-		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 2);
+		tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 2);
 		assertNull(tu);
 	}
 
@@ -309,8 +402,8 @@ public class TTXFilterTest {
 			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text1 en</Tuv><Tuv Lang=\"ES-EM\">text1 es</Tuv></Tu>"
 			+ "  <Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 es</Tuv></Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
 	}
 
 	@Test
@@ -321,7 +414,7 @@ public class TTXFilterTest {
 			+ "<Tuv Lang=\"ES-EM\">TEXT <ut DisplayText=\"br\">&lt;br/&gt;</ut>ES <ut Type=\"start\">&lt;b></ut>BOLD<ut Type=\"end\">&lt;/b></ut>.</Tuv>"
 			+ "</Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locESEM), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals(1, cont.getSegmentCount());
@@ -347,8 +440,8 @@ public class TTXFilterTest {
 			+ "<Tuv Lang=\"ES-EM\">text es</Tuv>"
 			+ "</Tu>"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
 	}
 
 	@Test
@@ -365,8 +458,8 @@ public class TTXFilterTest {
 			+ "  <ut Style=\"external\">some code</ut>  "
 			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 es</Tuv></Tu>\n"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
 	}
 	
 	@Test
@@ -385,8 +478,8 @@ public class TTXFilterTest {
 			+ "<Tu MatchPercent=\"0\">"
 			+ "<Tuv Lang=\"EN-US\">text2 en</Tuv><Tuv Lang=\"ES-EM\">text2 en</Tuv></Tu>\n"
 			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-			filter.createSkeletonWriter()));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
 	}
 
 //	@Test
@@ -409,14 +502,14 @@ public class TTXFilterTest {
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-//		list.add(new InputDocument(root+"Test01.html.ttx", null));
+		list.add(new InputDocument(root+"Test01.html.ttx", null));
 //		list.add(new InputDocument(root+"Test02_noseg.html.ttx", null));
 //		list.add(new InputDocument(root+"Test02_allseg.html.ttx", null));
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locFRFR));
+		assertTrue(rtc.executeCompare(filter1, list, "UTF-8", locENUS, locFRFR));
 	}
 
-	private ArrayList<Event> getEvents(String snippet, LocaleId trgLocId) {
+	private ArrayList<Event> getEvents(IFilter filter, String snippet, LocaleId trgLocId) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, locENUS, trgLocId));
 		while ( filter.hasNext() ) {

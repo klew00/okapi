@@ -38,7 +38,9 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -127,7 +129,7 @@ public class TmxFilter implements IFilter {
 	}
 
 	public String getMimeType () {
-		return "text/x-tmx";
+		return MimeTypeMapper.TMX_MIME_TYPE;
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
@@ -138,6 +140,12 @@ public class TmxFilter implements IFilter {
 			"TMX",
 			"Configuration for Translation Memory eXchange (TMX) documents."));
 		return list;
+	}
+	
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.TMX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		return em;
 	}
 	
 	public IParameters getParameters () {
@@ -284,8 +292,8 @@ public class TmxFilter implements IFilter {
 			startDoc.setLocale(srcLang);
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setFilterWriter(createFilterWriter());
-			startDoc.setType("text/x-tmx");
-			startDoc.setMimeType("text/x-tmx");
+			startDoc.setType(MimeTypeMapper.TMX_MIME_TYPE);
+			startDoc.setMimeType(MimeTypeMapper.TMX_MIME_TYPE);
 			startDoc.setMultilingual(true);
 			startDoc.setLineBreak(lineBreak);			
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));			

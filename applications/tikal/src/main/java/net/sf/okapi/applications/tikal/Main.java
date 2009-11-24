@@ -794,7 +794,7 @@ public class Main {
 		path += "/help/applications/tikal/index.html"; //$NON-NLS-1$
 		// Opens the file
 		ps.println("Help: "+path);
-		Util.openURL((new File(path)).toURL().toString());
+		Util.openURL((new File(path)).toURI().toURL().toString());
 	}
 	
 	private void printUsage () {

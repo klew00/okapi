@@ -47,6 +47,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -172,7 +173,6 @@ public class TsFilter implements IFilter {
 			}
 		}
 		
-		
 		boolean missingSourceAndTarget(){
 			if ( !ts.sourceExists && !ts.targetExists ){
 				return true;
@@ -291,7 +291,6 @@ public class TsFilter implements IFilter {
 
 	private LocaleId srcLang;
 	private LocaleId trgLang;
-	private Parameters params;
 	private boolean hasNext;
 	private String docName;
 	private boolean canceled;
@@ -299,6 +298,7 @@ public class TsFilter implements IFilter {
 	private String lineBreak;
 	private String encoding;
 	private boolean hasUTF8BOM;
+	private Parameters params;
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -342,6 +342,12 @@ public class TsFilter implements IFilter {
 		return list;
 	}
 
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.TS_MIME_TYPE, "net.sf.okapi.common.encoder.TSEncoder");
+		return em;
+	}
+	
 	public String getMimeType() {
 		return MimeTypeMapper.TS_MIME_TYPE;
 	}

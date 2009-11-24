@@ -124,11 +124,12 @@ public class JSONFilter implements IFilter {
 		return list;
 	}
 
-//	public EncoderManager createEncoderManager () {
-//		EncoderManager em = new EncoderManager();
-//		em.setMapping();
-//		return em;
-//	}
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		//TODO: We may have to change this
+		em.setMapping(MIMETYPE, "net.sf.okapi.common.encoder.DefaultEncoder");
+		return em;
+	}
 
 	public String getDisplayName () {
 		return "JSON Filter (BETA)";
@@ -477,6 +478,7 @@ public class JSONFilter implements IFilter {
 			skel.append(inputText.substring(endString, current+1).replace("\n", lineBreak));
 		}
 		tu.setSkeleton(skel);
+		tu.setMimeType(MIMETYPE);
 		
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		return true;

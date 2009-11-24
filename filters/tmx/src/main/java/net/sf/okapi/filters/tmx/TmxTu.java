@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
@@ -365,12 +366,11 @@ class TmxTu {
 		
 		//--add the resname based on tuid--
 		Property tuidProp = getProp("tuid"); 
-		if(tuidProp!=null){
+		if ( tuidProp != null ) {
 			tu.setName(tuidProp.getValue());
-		}		
-		
+		}
 		tu.setSkeleton(tuSkel);
-		tu.setMimeType("text/xml");
+		tu.setMimeType(MimeTypeMapper.TMX_MIME_TYPE);
 
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 
@@ -417,12 +417,11 @@ class TmxTu {
 				
 				//--add the resname based on tuid--
 				Property tuidProp = getProp("tuid"); 
-				if(tuidProp!=null){
+				if ( tuidProp != null ) {
 					dupTu.setName(tuidProp.getValue());
 				}
-				
 				dupTu.setSkeleton(dupTuSkel);
-				dupTu.setMimeType("text/xml");
+				dupTu.setMimeType(MimeTypeMapper.TMX_MIME_TYPE);
 				
 				queue.add(new Event(EventType.TEXT_UNIT, dupTu));
 			}

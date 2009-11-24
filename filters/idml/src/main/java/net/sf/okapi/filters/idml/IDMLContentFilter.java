@@ -32,7 +32,9 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -106,19 +108,25 @@ public class IDMLContentFilter implements IFilter {
 	}
 
 	public String getMimeType () {
-		return "text/xml";
+		return MimeTypeMapper.XML_MIME_TYPE;
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
-			"text/xml",
+			MimeTypeMapper.XML_MIME_TYPE,
 			getClass().getName(),
 			"IDML Content",
 			"XML story files inside Adobe InDesign IDML documents"));
 		return list;
 	}
 	
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		return em;
+	}
+
 	public IParameters getParameters () {
 		return params;
 	}
@@ -164,8 +172,6 @@ public class IDMLContentFilter implements IFilter {
 
 		XMLInputFactory fact = XMLInputFactory.newInstance();
 		fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-//Removed for Java 1.6		fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
-//Removed for Java 1.6		fact.setProperty(XMLInputFactory2.P_AUTO_CLOSE_INPUT, true);
 
 		try {
 			input.setEncoding("UTF-8"); // Force UTF-8 as the default encoding
@@ -194,8 +200,8 @@ public class IDMLContentFilter implements IFilter {
 		startDoc.setLocale(input.getSourceLocale());
 		startDoc.setFilterParameters(params);
 		startDoc.setFilterWriter(createFilterWriter());
-		startDoc.setType("text/xml");
-		startDoc.setMimeType("text/xml");
+		startDoc.setType(MimeTypeMapper.XML_MIME_TYPE);
+		startDoc.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 		startDoc.setLineBreak("\n");
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 
@@ -252,7 +258,7 @@ public class IDMLContentFilter implements IFilter {
 						if ( --stack == 0 ) {
 							TextUnit tu = new TextUnit(String.valueOf(++tuId));
 							tu.setSourceContent(frag);
-							tu.setMimeType("text/xml");
+							tu.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 							skel.addContentPlaceholder(tu);
 							skel.append(buildEndElement());
 							return new Event(EventType.TEXT_UNIT, tu, skel);

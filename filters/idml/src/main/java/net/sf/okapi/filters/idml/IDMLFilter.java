@@ -34,6 +34,8 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -98,6 +100,14 @@ public class IDMLFilter implements IFilter {
 	
 	public IFilterWriter createFilterWriter () {
 		return new ZipFilterWriter();
+	}
+
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		// No specific encoder for IDMLFilter
+		// But this for IDMLContentFilter
+		em.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		return em;
 	}
 
 	public String getName () {

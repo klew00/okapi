@@ -25,9 +25,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.TreeSet;
 
 /**
  * This class compares two zip files to see if they have
@@ -49,13 +47,16 @@ public class ZipFileCompare {
 		fc = new FileCompare();
 	}
 	
-	public boolean compareFiles(String type, String out, String gold, String encoding, boolean ignoreEmtpyLines)
+	public boolean compareFiles (String type,
+		String out, 
+		String gold, 
+		String encoding,
+		boolean ignoreEmtpyLines)
 	{
 		ZipFile outZipFile,goldZipFile;
 		Enumeration<? extends ZipEntry> outEntries=null;
 		Enumeration<? extends ZipEntry> goldEntries=null;
 		
-		HashMap test = new HashMap();
 		HashMap<String, ZipEntry> outZipMap = new HashMap<String, ZipEntry>();
 		HashMap<String, ZipEntry> goldZipMap = new HashMap<String, ZipEntry>();
 		

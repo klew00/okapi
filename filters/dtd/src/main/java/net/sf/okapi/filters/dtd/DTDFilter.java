@@ -43,6 +43,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.encoder.DTDEncoder;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -169,6 +170,12 @@ public class DTDFilter implements IFilter {
 			"DTD (Document Type Definition)",
 			"Configuration for XML DTD documents (entities content)"));
 		return list;
+	}
+
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.DTD_MIME_TYPE, "net.sf.okapi.common.encoder.DTDEncoder");
+		return em;
 	}
 
 	public void open (RawDocument input,

@@ -37,6 +37,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -84,7 +85,7 @@ public class TTXFilter implements IFilter {
 	private StringBuilder buffer;
 	private boolean useDF;
 	private boolean insideContent;
-	private TTXSkeletonWriter skelwriter;
+	private TTXSkeletonWriter skelWriter;
 	private TTXSkeletonWriter specialWriter;
 	
 	public TTXFilter () {
@@ -127,7 +128,19 @@ public class TTXFilter implements IFilter {
 			getClass().getName(),
 			"TTX",
 			"Configuration for Trados TTX documents."));
+		list.add(new FilterConfiguration(getName()+"-textBlock",
+			MimeTypeMapper.TTX_MIME_TYPE,
+			getClass().getName(),
+			"TTX (Forced segmented output)",
+			"Configuration for Trados TTX documents with forced segmented output.",
+			"forcedSegmentedOutput.fprm"));
 		return list;
+	}
+	
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.TTX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		return em;
 	}
 	
 	public IParameters getParameters () {
@@ -202,17 +215,19 @@ public class TTXFilter implements IFilter {
 			else encoding = input.getEncoding();
 
 			// Set the language codes for the skeleton writer
-			if ( skelwriter == null ) skelwriter = new TTXSkeletonWriter();
+			if ( skelWriter == null ) {
+				skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+			}
 
 			srcLoc = input.getSourceLocale();
 			if ( srcLoc == null ) throw new NullPointerException("Source language not set.");
 			srcLangCode = srcLoc.toString().toUpperCase();
-			skelwriter.setSourceLanguageCode(srcLangCode);
+			skelWriter.setSourceLanguageCode(srcLangCode);
 			
 			trgLoc = input.getTargetLocale();
 			if ( trgLoc == null ) throw new NullPointerException("Target language not set.");
 			trgLangCode = trgLoc.toString().toUpperCase(); // Default to create new entries
-			skelwriter.setTargetLanguageCode(trgLangCode);
+			skelWriter.setTargetLanguageCode(trgLangCode);
 			
 			hasUTF8BOM = detector.hasUtf8Bom();
 			lineBreak = detector.getNewlineType().toString();
@@ -268,8 +283,10 @@ public class TTXFilter implements IFilter {
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {
-		if ( skelwriter == null ) skelwriter = new TTXSkeletonWriter();
-		return skelwriter;
+		if ( skelWriter == null ) {
+			skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+		}
+		return skelWriter;
 	}
 
 	public IFilterWriter createFilterWriter () {
@@ -327,7 +344,7 @@ public class TTXFilter implements IFilter {
 					continue; // next() was called
 				}
 				else {
-					skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.getEscapeGT(), null));
+					skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, true, null));
 				}
 				break;
 				
@@ -500,7 +517,7 @@ public class TTXFilter implements IFilter {
 			// Check if this it is worth sending as text unit
 			if ( !tu.getSource().hasText(true, false) ) {
 				if ( specialWriter == null ) {
-					specialWriter = new TTXSkeletonWriter();
+					specialWriter = new TTXSkeletonWriter(params.getForceSegments());
 				}
 				// Not really a text unit: convert to skeleton
 				// Use the skeleton writer processFragment() to get the output
@@ -557,7 +574,7 @@ public class TTXFilter implements IFilter {
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 				reader.getAttributeLocalName(i));
 			tmp.append(String.format(" %s=\"%s\"", attrName,
-				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
+				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, true, null)));
 		}
 		tmp.append(">");
 		if ( store ) skel.append(tmp.toString());
@@ -598,8 +615,10 @@ public class TTXFilter implements IFilter {
 				 trgLoc = LocaleId.fromString(tmp);
 				 trgLangCode = tmp;
 				 // Update skeleton writer value
-				 if ( skelwriter == null ) skelwriter = new TTXSkeletonWriter();
-				 skelwriter.setSourceLanguageCode(srcLangCode);
+				 if ( skelWriter == null ) {
+					 skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+				 }
+				 skelWriter.setSourceLanguageCode(srcLangCode);
 			 }
 		}
 
@@ -658,7 +677,7 @@ public class TTXFilter implements IFilter {
 			case XMLStreamConstants.CDATA:
 			case XMLStreamConstants.CHARACTERS:
 				//TODO: escape unsupported chars
-				skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.getEscapeGT(), null));
+				skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, true, null));
 				break;
 			case XMLStreamConstants.COMMENT:
 				//addTargetIfNeeded();
@@ -1078,9 +1097,9 @@ public class TTXFilter implements IFilter {
 				case XMLStreamConstants.CDATA:
 				case XMLStreamConstants.SPACE:
 					innerCode.append(reader.getText());//TODO: escape unsupported chars
-					outerCode.append(Util.escapeToXML(reader.getText(), 0, params.getEscapeGT(), null));
+					outerCode.append(Util.escapeToXML(reader.getText(), 0, true, null));
 					if ( store ) //TODO: escape unsupported chars
-						skel.append(Util.escapeToXML(reader.getText(), 0, params.getEscapeGT(), null));
+						skel.append(Util.escapeToXML(reader.getText(), 0, true, null));
 					break;
 				}
 			}

@@ -27,42 +27,44 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	private boolean escapeGT;
+	protected static final String FORCESEGMENTS = "forceSegments";
+	
+	private boolean forceSegments;
 
 	public Parameters () {
 		reset();
 		toString(); // fill the list
 	}
 	
-	public boolean getEscapeGT () {
-		return escapeGT;
+	public boolean getForceSegments () {
+		return forceSegments;
 	}
 
-	public void setEscapeGT (boolean escapeGT) {
-		this.escapeGT = escapeGT;
+	public void setForcesegments (boolean forceSegments) {
+		this.forceSegments = forceSegments;
 	}
 
 	public void reset () {
-		escapeGT = true;
+		forceSegments = false;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		escapeGT = buffer.getBoolean("escapeGT", escapeGT);
+		forceSegments = buffer.getBoolean(FORCESEGMENTS, forceSegments);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean("escapeGT", escapeGT);
+		buffer.setBoolean(FORCESEGMENTS, forceSegments);
 		return buffer.toString();
 	}
 	
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("escapeGT", "Escape the greater-than characters", null);
+		desc.add(FORCESEGMENTS, "Force un-segmented entries to be output as a segment", null);
 		return desc;
 	}
 

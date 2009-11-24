@@ -12,6 +12,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -130,7 +131,7 @@ public class TmxFilterTest {
 
 	@Test
 	public void testGetMimeType() {
-		assertEquals("text/x-tmx", filter.getMimeType());
+		assertEquals(MimeTypeMapper.TMX_MIME_TYPE, filter.getMimeType());
 	}	
 
 	@Test

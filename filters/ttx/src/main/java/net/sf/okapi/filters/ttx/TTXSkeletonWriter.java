@@ -22,24 +22,22 @@ package net.sf.okapi.filters.ttx;
 
 import java.util.List;
 
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 public class TTXSkeletonWriter extends GenericSkeletonWriter {
 
 	private String srcLangCode;
 	private String trgLangCode;
+	private boolean forceSegmentedOutput;
+	
+	public TTXSkeletonWriter (boolean forceSegments) {
+		forceSegmentedOutput = forceSegments;
+	}
 	
 	public void setSourceLanguageCode (String langCode) {
 		srcLangCode = langCode;
@@ -56,7 +54,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		
 		TextContainer srcCont = tu.getSource();
 		TextFragment srcFrag;
-		if ( !srcCont.isSegmented() ) {
+		if ( forceSegmentedOutput && !srcCont.isSegmented() ) {
 			srcCont = srcCont.clone();
 			srcCont.createSegment(0, -1);
 		}
