@@ -2,28 +2,27 @@
 RuleCount.i=2
 
 Rule0.name=Abbreviations1
-Rule0.description=Abbreviations like 3.3pct, extraction of the numeric part. 
+Rule0.description=Abbreviations like U.S.
 Rule0.inTokens=WORD
-Rule0.outTokens=NUMBER,WORD
+Rule0.outTokens=ABBREVIATION,WORD
 Rule0.userTokens=
 Rule0.lexemId.i=0
-Rule0.pattern=(\d+(\.\d+)?)([a-z]+)
+Rule0.pattern=[A-Z](\.[A-Z])+\.?
 Rule0.regexOptions.i=0
-Rule0.regexGroup.i=1
+Rule0.regexGroup.i=0
 Rule0.languageMode.i=1
 Rule0.languageWhiteList=EN,EN-AU,EN-VI,EN-BZ,EN-BE,EN-BW,EN-GB,EN-HK,EN-ZW,EN-IN,EN-IE,EN-CA,EN-MT,EN-MH,EN-NA,EN-NZ,EN-PK,EN-US,EN-US-POSIX,EN-SG,EN-TT,EN-PH,EN-ZA,EN-JM
 Rule0.languageBlackList=
 
 Rule1.name=Abbreviations2
-Rule1.description=Abbreviations like 3.3pct, extraction of the abbreviation part. 
+Rule1.description=Abbreviations like MD, USA
 Rule1.inTokens=WORD
 Rule1.outTokens=ABBREVIATION,WORD
 Rule1.userTokens=
 Rule1.lexemId.i=0
-Rule1.pattern=(\d+(\.\d+)?)([a-z]+)
+Rule1.pattern=[A-Z]+
 Rule1.regexOptions.i=0
-Rule1.regexGroup.i=3
+Rule1.regexGroup.i=0
 Rule1.languageMode.i=1
 Rule1.languageWhiteList=EN,EN-AU,EN-VI,EN-BZ,EN-BE,EN-BW,EN-GB,EN-HK,EN-ZW,EN-IN,EN-IE,EN-CA,EN-MT,EN-MH,EN-NA,EN-NZ,EN-PK,EN-US,EN-US-POSIX,EN-SG,EN-TT,EN-PH,EN-ZA,EN-JM
 Rule1.languageBlackList=
-

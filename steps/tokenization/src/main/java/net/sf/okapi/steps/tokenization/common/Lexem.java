@@ -21,6 +21,8 @@
 package net.sf.okapi.steps.tokenization.common;
 
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.annotation.Annotations;
+import net.sf.okapi.common.annotation.IAnnotation;
 
 public class Lexem {
 
@@ -46,6 +48,18 @@ public class Lexem {
 	 * !!! Non-serializable.
 	 */
 	private int lexerId;
+	
+	private Annotations annotations;
+	
+	/**
+	 * True if the lexem is considered deleted.
+	 */
+	private boolean deleted;
+	
+	/**
+	 * True if the lexem cannot be deleted.
+	 */
+	private boolean immutable;
 	
 	//public Lexem(int id, String value, Range range, int lexerId) {
 	public Lexem(int id, String value, Range range) {
@@ -95,11 +109,53 @@ public class Lexem {
 		this.lexerId = lexerId;
 	}
 	
+	public <A extends IAnnotation> A getAnnotation (Class<A> type) {
+		
+		if (annotations == null) return null;
+		
+		return annotations.get(type);
+	}
+
+	public void setAnnotation (IAnnotation annotation) {
+		
+		if (annotations == null) 
+			annotations = new Annotations();
+		
+		annotations.set(annotation);
+	}
+
+	public <A extends IAnnotation> A removeAnnotation (Class<A> type) {
+		
+		if (annotations == null) return null;
+		
+		return annotations.remove(type);
+	}
+	
 	@Override
 	public String toString() {
 		
 		return String.format("%-20s%4d\t%4d, %4d\t%4d", 
 				value, id, range.start, range.end, lexerId);
+	}
+
+	public boolean isDeleted() {
+		
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		
+		this.deleted = deleted;
+	}
+
+	public boolean isImmutable() {
+		
+		return immutable;
+	}
+
+	public void setImmutable(boolean immutable) {
+		
+		this.immutable = immutable;
 	}
 	
 }

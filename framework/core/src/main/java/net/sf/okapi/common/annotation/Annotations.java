@@ -59,5 +59,15 @@ public class Annotations {
 	public void clear () {
 		annotations.clear();
 	}
+	
+	/**
+	 * Removes the annotation of a given type.
+	 * @param annotationType Type of the annotation to remove.
+	 * @return The removed annotation, or null if no annotation of the given type was found. 
+	 */
+	public <A extends IAnnotation> A remove (Class<A> annotationType) {
+		
+		return annotationType.cast(annotations.remove(annotationType));
+	}
 
 }

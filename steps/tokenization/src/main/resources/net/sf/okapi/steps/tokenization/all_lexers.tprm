@@ -1,6 +1,6 @@
 #v1
 description=Lexers of the tokenization step (in the order of invocation) 
-StructureParametersItemCount.i=16
+StructureParametersItemCount.i=17
 
 StructureParametersItem0.enabled.b=true
 StructureParametersItem0.description=Internal RuleBasedBreakIterator rules of RbbiLexer.
@@ -48,36 +48,41 @@ StructureParametersItem8.lexerClass=net.sf.okapi.steps.tokenization.engine.Token
 StructureParametersItem8.rulesLocation=matcher_main.tprm
 
 StructureParametersItem9.enabled.b=true
-StructureParametersItem9.description=MARKUP resolver. Extracts tokens from markup.
-StructureParametersItem9.lexerClass=net.sf.okapi.steps.tokenization.engine.TokenScanner
-StructureParametersItem9.rulesLocation=scanner_markup.tprm
+StructureParametersItem9.description=ABBREVIATION resolver.
+StructureParametersItem9.lexerClass=net.sf.okapi.steps.tokenization.engine.TokenMatcher
+StructureParametersItem9.rulesLocation=matcher_abbreviation_en.tprm
 
 StructureParametersItem10.enabled.b=true
-StructureParametersItem10.description=RAWTEXT resolver.
-StructureParametersItem10.lexerClass=net.sf.okapi.steps.tokenization.engine.TokenMatcher
-StructureParametersItem10.rulesLocation=matcher_rawtext.tprm
+StructureParametersItem10.description=MARKUP resolver. Extracts tokens from markup.
+StructureParametersItem10.lexerClass=net.sf.okapi.steps.tokenization.engine.TokenScanner
+StructureParametersItem10.rulesLocation=scanner_markup.tprm
 
 StructureParametersItem11.enabled.b=true
-StructureParametersItem11.description=Arranges tokens by their position in the text.
-StructureParametersItem11.lexerClass=net.sf.okapi.steps.tokenization.engine.Sorter
-StructureParametersItem11.rulesLocation=
+StructureParametersItem11.description=RAWTEXT resolver.
+StructureParametersItem11.lexerClass=net.sf.okapi.steps.tokenization.engine.TokenMatcher
+StructureParametersItem11.rulesLocation=matcher_rawtext.tprm
 
 StructureParametersItem12.enabled.b=true
-StructureParametersItem12.description=UNKNOWN-type tokens remover.
-StructureParametersItem12.lexerClass=net.sf.okapi.steps.tokenization.engine.Remover
-StructureParametersItem12.rulesLocation=remover_unknown.tprm
+StructureParametersItem12.description=Arranges tokens by their position in the text.
+StructureParametersItem12.lexerClass=net.sf.okapi.steps.tokenization.engine.Sorter
+StructureParametersItem12.rulesLocation=
 
 StructureParametersItem13.enabled.b=true
-StructureParametersItem13.description=Removes duplicate tokens. Handles token ranges inclusion. Sets scores.
-StructureParametersItem13.lexerClass=net.sf.okapi.steps.tokenization.engine.Reconciler
-StructureParametersItem13.rulesLocation=
+StructureParametersItem13.description=UNKNOWN-type tokens remover.
+StructureParametersItem13.lexerClass=net.sf.okapi.steps.tokenization.engine.Remover
+StructureParametersItem13.rulesLocation=remover_unknown.tprm
 
 StructureParametersItem14.enabled.b=true
-StructureParametersItem14.description=RAWTEXT-type tokens remover.
-StructureParametersItem14.lexerClass=net.sf.okapi.steps.tokenization.engine.Remover
-StructureParametersItem14.rulesLocation=remover_rawtext.tprm
+StructureParametersItem14.description=Removes duplicate tokens. Handles token ranges inclusion. Sets scores.
+StructureParametersItem14.lexerClass=net.sf.okapi.steps.tokenization.engine.Reconciler
+StructureParametersItem14.rulesLocation=
 
 StructureParametersItem15.enabled.b=true
-StructureParametersItem15.description=Removes tokens with the score of 0% ("deleted" by other lexers). A garbage collector.
-StructureParametersItem15.lexerClass=net.sf.okapi.steps.tokenization.engine.ZeroScoreCleaner
-StructureParametersItem15.rulesLocation=
+StructureParametersItem15.description=RAWTEXT-type tokens remover.
+StructureParametersItem15.lexerClass=net.sf.okapi.steps.tokenization.engine.Remover
+StructureParametersItem15.rulesLocation=remover_rawtext.tprm
+
+StructureParametersItem16.enabled.b=true
+StructureParametersItem16.description=Removes the tokens marked as deleted from the token list.
+StructureParametersItem16.lexerClass=net.sf.okapi.steps.tokenization.engine.GarbageCollector
+StructureParametersItem16.rulesLocation=

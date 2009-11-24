@@ -88,6 +88,7 @@ public class RbbiLexer extends AbstractLexer {
 	
 	@Override
 	public void lexer_open(String text, LocaleId language, Tokens tokens) {
+		
 		if (Util.isEmpty(text)) {
 			cancel();
 			return;
@@ -136,6 +137,7 @@ public class RbbiLexer extends AbstractLexer {
 	}
 
 	public Lexems process(String text, LocaleId language, Tokens tokens) {
+		
 		return null;
 	}
 

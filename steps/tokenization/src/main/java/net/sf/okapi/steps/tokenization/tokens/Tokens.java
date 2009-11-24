@@ -215,4 +215,10 @@ public class Tokens extends ArrayList<Token> {
 		return idList; 
 	}
 	
+	public void setImmutable(boolean immutable) {
+		
+		for (Token token : this)
+			token.setImmutable(immutable);
+	}
+	
 }

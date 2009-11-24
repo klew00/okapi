@@ -1,6 +1,6 @@
 package net.sf.okapi.steps.tokenization.engine;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,8 +21,8 @@ public class TextScanner extends AbstractLexer {
 	private LinkedList<LexerRule> rulesQueue;
 	private boolean hasNext;
 	private LexerRules rules;
-	private HashMap<LexerRule, Pattern> patterns;
-	String text;
+	private LinkedHashMap<LexerRule, Pattern> patterns;
+	private String text;
 	private LocaleId language;	
 		
 	@Override
@@ -40,7 +40,7 @@ public class TextScanner extends AbstractLexer {
 		queue = new LinkedList<Lexem>();
 		rulesQueue = new LinkedList<LexerRule>();
 		
-		patterns = new HashMap<LexerRule, Pattern>();
+		patterns = new LinkedHashMap<LexerRule, Pattern>();
 		rules = getRules();
 		
 		for (LexerRule item : rules) {

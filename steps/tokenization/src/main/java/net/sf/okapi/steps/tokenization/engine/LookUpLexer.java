@@ -1,10 +1,12 @@
 package net.sf.okapi.steps.tokenization.engine;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
+import net.sf.okapi.steps.tokenization.common.InputTokenAnnotation;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.common.LexerRule;
@@ -15,7 +17,7 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 public class LookUpLexer extends AbstractLexer {
 
 	private LexerRules rules;
-	private HashMap<LexerRule, List<String>> dictionaries;
+	private LinkedHashMap<LexerRule, List<String>> dictionaries;
 	
 	@Override
 	protected boolean lexer_hasNext() {
@@ -27,7 +29,7 @@ public class LookUpLexer extends AbstractLexer {
 	protected void lexer_init() {
 		
 		rules = getRules();
-		dictionaries = new HashMap<LexerRule, List<String>>(); 
+		dictionaries = new LinkedHashMap<LexerRule, List<String>>(); 
 		
 		for (LexerRule rule : rules) {
 			
@@ -67,11 +69,14 @@ public class LookUpLexer extends AbstractLexer {
 				if (inTokenIDs.contains(token.getTokenId())) {
 				
 					if (dictionary.contains(token.getValue())) {
-					
-				    	lexems.add(new Lexem(rule.getLexemId(), token.getValue(), token.getRange()));
+
+						Lexem lexem = new Lexem(rule.getLexemId(), token.getValue(), token.getRange());
+						lexem.setAnnotation(new InputTokenAnnotation(token));
+				    	lexems.add(lexem);
 				    	
-				    	if (!rule.getKeepInput())
-				    		token.delete(); // Remove replaced token
+				    	// All input deletion is done in Reconciler
+//				    	if (!rule.getKeepInput())
+//				    		token.delete(); // Remove replaced token
 				    }
 				}
 		}

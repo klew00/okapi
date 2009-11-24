@@ -27,7 +27,7 @@ import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public class ZeroScoreCleaner extends AbstractLexer {
+public class GarbageCollector extends AbstractLexer {
 
 	@Override
 	protected boolean lexer_hasNext() {

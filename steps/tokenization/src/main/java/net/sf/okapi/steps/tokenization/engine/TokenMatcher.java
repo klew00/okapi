@@ -20,13 +20,14 @@
 
 package net.sf.okapi.steps.tokenization.engine;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
+import net.sf.okapi.steps.tokenization.common.InputTokenAnnotation;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Lexems;
 import net.sf.okapi.steps.tokenization.common.LexerRule;
@@ -39,7 +40,7 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 public class TokenMatcher extends AbstractLexer {
 	 
 	private LexerRules rules;
-	private HashMap<LexerRule, Pattern> patterns;  
+	private LinkedHashMap<LexerRule, Pattern> patterns;  
 	  
 	@Override
 		protected Class<? extends LexerRules> lexer_getRulesClass() {
@@ -65,7 +66,7 @@ public class TokenMatcher extends AbstractLexer {
 //			patterns.put(rule, pattern);
 //		}
 		
-		patterns = new HashMap<LexerRule, Pattern>();
+		patterns = new LinkedHashMap<LexerRule, Pattern>();
 		rules = getRules();
 		
 		for (LexerRule item : rules) {
@@ -107,7 +108,7 @@ public class TokenMatcher extends AbstractLexer {
 			
 			for (Token token : tokens) {
 				
-				if (token.isDeleted()) continue;
+				//if (token.isDeleted()) continue;
 				
 				if (inTokenIDs.contains(token.getTokenId())) {
 					
@@ -115,11 +116,12 @@ public class TokenMatcher extends AbstractLexer {
 					
 				    if (matcher.matches()) {
 				    	
-				    	lexems.add(new Lexem(rule.getLexemId(), token.getValue(), token.getRange()));
+				    	Lexem lexem = new Lexem(rule.getLexemId(), token.getValue(), token.getRange());
+				    	lexem.setAnnotation(new InputTokenAnnotation(token));
+				    	lexems.add(lexem);
 				    	
-				    	// All input deletion is done in Reconciler
-//				    	if (!rule.getKeepInput())
-//				    		token.delete(); // Remove replaced token
+				    	if (!rule.getKeepInput())
+				    		token.delete(); // Remove replaced token				    	
 				    }
 				}
 			}				

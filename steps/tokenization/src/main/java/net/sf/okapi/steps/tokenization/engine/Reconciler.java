@@ -20,10 +20,11 @@
 
 package net.sf.okapi.steps.tokenization.engine;
 
-import java.util.HashMap;
-
-import net.sf.okapi.common.Range;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.steps.tokenization.common.AbstractLexer;
 import net.sf.okapi.steps.tokenization.common.Lexem;
@@ -33,10 +34,11 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class Reconciler extends AbstractLexer {
 
-	private HashMap<String, Tokens> sameRangeMap;
-	private HashMap<Token, Tokens> sameScoreMap;
-	private HashMap<Token, Tokens> reverseSameScoreMap;
-	
+	private LinkedHashMap<String, List<Integer>> sameRangeMap;
+	private LinkedHashMap<Integer, List<Integer>> sameScoreMap; 
+	private LinkedHashMap<Integer, List<Integer>> reverseSameScoreMap;
+	private Tokens deletedTokens;
+
 	@Override
 	protected boolean lexer_hasNext() {
 
@@ -46,9 +48,10 @@ public class Reconciler extends AbstractLexer {
 	@Override
 	protected void lexer_init() {
 
-		sameRangeMap = new HashMap<String, Tokens>(); 
-		sameScoreMap = new HashMap<Token, Tokens>();
-		reverseSameScoreMap = new HashMap<Token, Tokens>();
+		sameRangeMap = new LinkedHashMap<String, List<Integer>>(); 
+		sameScoreMap = new LinkedHashMap<Integer, List<Integer>>();
+		reverseSameScoreMap = new LinkedHashMap<Integer, List<Integer>>();
+		deletedTokens = new Tokens();
 	}
 
 	@Override
@@ -83,26 +86,28 @@ public class Reconciler extends AbstractLexer {
 
 	private void setSameRangeMap(Tokens tokens) {
 		
-		// Create a map of lists of tokens with equal ranges
+		// Create a map of lists of indices of tokens with equal ranges
 		if (tokens == null) return;
 		if (sameRangeMap == null) return;
 		
 		sameRangeMap.clear();
 		
-		for (Token token : tokens) {
+		for (int index = 0; index < tokens.size(); index++) {
 			
+			Token token = tokens.get(index);
+			if (token == null) continue;
 			if (token.isDeleted()) continue;
-			String rangeId = formRangeId(token.getRange());
 			
-			Tokens rangeTokens = sameRangeMap.get(rangeId);
-			if (rangeTokens == null) {
+			String rangeId = formRangeId(token.getRange());
+			List<Integer> list = sameRangeMap.get(rangeId);
+			if (list == null) {
 				
-				rangeTokens = new Tokens();
-				sameRangeMap.put(rangeId, rangeTokens);
+				list = new ArrayList<Integer>();
+				sameRangeMap.put(rangeId, list);
 			}
 			
-			rangeTokens.add(token);
-		}
+			list.add(index);
+		}		
 	}
 	
 	private	boolean getSameTokenIds(Token token1, Token token2) {
@@ -128,18 +133,23 @@ public class Reconciler extends AbstractLexer {
 		reverseSameScoreMap.clear();
 		
 		// Create the direct and reverse same-score maps
-		for (Tokens rangeTokens : sameRangeMap.values())			
-			for (int i = 0; i < rangeTokens.size(); i++) {
+		for (List<Integer> list : sameRangeMap.values())
+			for (int i = 0; i < list.size(); i++) {
 				
-				Token token1 = rangeTokens.get(i);
+				int index1 = list.get(i);
+				Token token1 = tokens.get(index1);
+				if (token1 == null) continue;
 				if (token1.isDeleted()) continue;
 				
-				for (int j = 0; j < rangeTokens.size(); j++) {
+				for (int j = 0; j < list.size(); j++) {
 					
 					if (i >= j) continue;
 					
-					Token token2 = rangeTokens.get(j);				
+					int index2 = list.get(j);
+					Token token2 = tokens.get(index2);
+					if (token2 == null) continue;					
 					if (token2.isDeleted()) continue;
+					
 					if (token2 == token1) continue;
 					
 					boolean sameTokenIds = getSameTokenIds(token1, token2);
@@ -150,47 +160,60 @@ public class Reconciler extends AbstractLexer {
 						(sameTokenIds && !sameRules)) { // 2 different rules recognize this range as the same token
 			
 						// Update token1 group
-						Tokens groupTokens = sameScoreMap.get(token1);
-						if (groupTokens == null) {
+						List<Integer> groupIndices = sameScoreMap.get(index1);
+						if (groupIndices == null) {
 							
-							groupTokens = new Tokens();
-							sameScoreMap.put(token1, groupTokens);
+							groupIndices = new ArrayList<Integer>();
+							sameScoreMap.put(index1, groupIndices); // token1 index
 						}
 						
-						if (!groupTokens.contains(token2))
-							groupTokens.add(token2);
+						if (!groupIndices.contains(index2))
+							groupIndices.add(index2);
 						
 						// Update token2 group
-						Tokens groupTokens2 = reverseSameScoreMap.get(token2);
-						if (groupTokens2 == null) {
+						List<Integer> groupIndices2 = reverseSameScoreMap.get(index2);
+						if (groupIndices2 == null) {
 							
-							groupTokens2 = new Tokens();
-							reverseSameScoreMap.put(token2, groupTokens2);
+							groupIndices2 = new ArrayList<Integer>();
+							reverseSameScoreMap.put(index2, groupIndices2); // token2 index
 						}
 						
-						if (!groupTokens2.contains(token1))
-							groupTokens2.add(token1);
+						if (!groupIndices2.contains(index1))
+							groupIndices2.add(index1);
 					}					
 				}
 			}
-		
+				
 		// Merge 2 maps together (Okapi-B 45**)
-		for (Token key : sameScoreMap.keySet()) {
+		for (Integer key : sameScoreMap.keySet()) {
 		
-			Tokens groupTokens = sameScoreMap.get(key);
-			if (groupTokens == null) continue;
+			List<Integer> groupIndices = sameScoreMap.get(key);
+			if (groupIndices == null) continue;
 			
-			for (int i = groupTokens.size() - 1; i >= 0; i--) {
+			for (int i = groupIndices.size() - 1; i >= 0; i--) {
 				
-				Token token = groupTokens.get(i);
+				int index = groupIndices.get(i);
+				//Token token = tokens.get(index);
+								
+				List<Integer> groupIndices2 = sameScoreMap.get(index);
+				if (groupIndices2 != null) {
 				
-				Tokens reverseTokens = reverseSameScoreMap.get(token);
-				if (reverseTokens == null) continue;
+					for (int index2 : groupIndices2) {
+						
+						if (index2 == index) continue;
+						if (groupIndices.contains(index2)) continue; 
+						groupIndices.add(index2);
+					}
+				}
 				
-				for (Token token2 : reverseTokens) {
+				List<Integer> reverseIndices = reverseSameScoreMap.get(index);
+				if (reverseIndices == null) continue;
+				
+				for (int index2 : reverseIndices) {
 					
-					if (token2 == key) continue;
-					groupTokens.add(token2);
+					if (index2 == key) continue;
+					if (groupIndices.contains(index2)) continue;
+					groupIndices.add(index2);
 				}
 			}
 		}
@@ -221,6 +244,17 @@ public class Reconciler extends AbstractLexer {
 		((token1.getLexerId() == token2.getLexerId()) && (token1.getLexemId() > token2.getLexemId()));
 	}
 	
+	private void BiggerEatsSmaller(Token bigger, Token smaller) {
+		
+		if (bigger == null) return;
+		if (smaller == null) return;
+		
+		if (bigger.isDeleted()) return;
+		if (!bigger.isImmutable() && smaller.isImmutable()) return; // Only immutables can eat immutables
+		
+		smaller.delete();
+	}
+	
 	public Lexems process(String text, LocaleId language, Tokens tokens) {
 		
 //		tokens.remove(8);
@@ -231,43 +265,130 @@ public class Reconciler extends AbstractLexer {
 		
 		setSameRangeMap(tokens);
 		setSameScoreMap(tokens);
+					
+		// Remove tokens included in other tokens etc. (Okapi-B 43)
+		
+		for (int i = 0; i < tokens.size(); i++) {
 			
+			Token token1 = tokens.get(i);
+			if (token1.isDeleted()) continue;
+			
+			for (int j = 0; j < tokens.size(); j++) {
+				
+				if (i >= j) continue;
+				
+				Token token2 = tokens.get(j);				
+				if (token2.isDeleted()) continue;
+				if (token2 == token1) continue;				
+			
+				Range r1 = token1.getRange();
+				Range r2 = token2.getRange();
+												
+				if (r1.start == r2.start && r1.end == r2.end) { // Equal ranges
+					
+					// Tokens are identical, remove duplication
+					if (token1.getTokenId() == token2.getTokenId()) { 
+						
+						if (firstIsNewer(token1, token2))
+							token2.delete();
+						else
+							token1.delete();
+						
+						continue;
+					}
+					
+					// One of the tokens is on the other's InTokens list; delete if KeepInput=false, keep if KeepInput=true 
+					
+					
+				}
+				else { // One of the ranges contains the other, or no overlapping
+				
+					//Range bigger, smaller;
+					
+					if (contains(r1, r2)) {
+						
+//						bigger = r1;
+//						smaller = r2;
+						
+						// token2.delete();
+						BiggerEatsSmaller(token1, token2);
+					}
+					else if (contains(r2, r1)) {
+						
+//						bigger = r2;
+//						smaller = r1;
+						
+						// token1.delete();
+						BiggerEatsSmaller(token2, token1);
+					}
+					else
+						continue; // The two ranges don't overlap
+				}
+				
+				// If the token's range includes other tokens' ranges, destroy those.
+//				if (//checkEqual(token, token2) || // Remove duplicate tokens 
+//				contains(token.getLexem().getRange(), token2.getLexem().getRange())) // Remove overlapped tokens					
+//				//wasteBin.add(token2);
+//				token2.delete();
 
+			}
+		}
+				
 		// Set scores for equal range tokens (Okapi-B 45*)
 		
-		// 1. Temporarily *delete* tokens of all same-score groups to exclude them at step 2
-		// The key token of the group is not touched. It never appears in other tokens' groups and thus keeps its score.
-//		setSameRangeMap(tokens);
-//		setSameScoreMap(tokens);
-		
-		for (Token key : sameScoreMap.keySet()) {
+		// Step 1. Temporarily *delete* tokens of all same-score groups to exclude them at step 2
+		// First create a list of already deleted tokens not to set them the score > 0% at step 3
+		deletedTokens.clear();
+		for (Token token : tokens) {
 			
-			if (key == null) continue;
-			if (key.isDeleted()) continue;
-			
-			Tokens list = sameScoreMap.get(key);
-			for (Token token : list)
-				if (token != null)
-					token.delete();
+			if (token == null) continue;
+			if (token.isDeleted())
+				deletedTokens.add(token);
 		}
 		
-		// 2. Count valid tokens in same-range lists 
-		for (Tokens list : sameRangeMap.values()) { 
+		for (Integer key : sameScoreMap.keySet()) {
+			
+			Token token = tokens.get(key);
+			if (token == null) continue;
+			if (token.isDeleted()) continue;
+			
+			List<Integer> list = sameScoreMap.get(key);
+			for (Integer index2 : list) {
+				
+				token = tokens.get(index2);
+				if (token != null)
+					token.delete();
+			}				
+		}
+		
+//		for (Tokens list : sameScoreMap.values()) {
+//			
+//			for (Token token : list)
+//				if (token != null)
+//					token.delete()
+//					;
+//		}
+		
+		// Step 2. Count valid tokens in same-range lists 
+		for (List<Integer> list : sameRangeMap.values()) { 
 			
 			int size = 0;
-			for (Token token : list) {
+			for (Integer index : list) {
 				
+				Token token = tokens.get(index);
 				if (token == null) continue;
 				if (token.isDeleted()) continue;
 				size++;
 			}
 			
-			for (Token token : list) {
+			for (Integer index : list) {
 				
+				Token token = tokens.get(index);	
 				if (token == null) continue;
 				if (token.isDeleted()) continue;
 				
 				token.setScore(100 / size);
+				token.undelete();
 			}
 			
 //			int size = list.size();
@@ -304,91 +425,35 @@ public class Reconciler extends AbstractLexer {
 //			}
 		}
 		
-		// 3. Fix same-score groups
-		for (Token token : sameScoreMap.keySet()) {
+		// Step 3. Fix same-score groups
+		for (Integer index : sameScoreMap.keySet()) {
 			
+			Token token = tokens.get(index);
 			if (token == null) continue;
 			//if (token.isDeleted()) continue;
+			if (deletedTokens.contains(token)) continue;
 			
 			int score = token.getScore();
 			
 			// Set the same score to all tokens in its same-score group
-			Tokens groupTokens = sameScoreMap.get(token);
-			if (groupTokens == null) continue;
+			List<Integer> groupIndices = sameScoreMap.get(index);
+			if (groupIndices == null) continue;
 			
-			for (Token groupToken : groupTokens)
+			for (Integer groupIndex : groupIndices) {
+				
+				Token groupToken = tokens.get(groupIndex);
 				//if (!groupToken.isDeleted())
-					groupToken.setScore(score);
+				if (deletedTokens.contains(groupToken)) continue;
+				groupToken.setScore(score);
+				groupToken.undelete();
+			}				
 		}
 
-		
-		// Remove tokens included in other tokens etc. (Okapi-B 43)
-		
-		for (int i = 0; i < tokens.size(); i++) {
-			
-			Token token1 = tokens.get(i);
-			if (token1.isDeleted()) continue;
-			
-			for (int j = 0; j < tokens.size(); j++) {
-				
-				if (i >= j) continue;
-				
-				Token token2 = tokens.get(j);				
-				if (token2.isDeleted()) continue;
-				if (token2 == token1) continue;				
-			
-				Range r1 = token1.getRange();
-				Range r2 = token2.getRange();
-												
-				if (r1.start == r2.start && r1.end == r2.end) { // Equal ranges
-					
-					// Tokens are identical, remove duplication
-					if (token1.getTokenId() == token2.getTokenId()) { 
-						
-						if (firstIsNewer(token1, token2))
-							token2.delete();
-						else
-							token1.delete();
-						
-						continue;
-					}
-					
-					
-				}
-				else { // One of the ranges contains the other, or no overlapping
-				
-					//Range bigger, smaller;
-					
-					if (contains(r1, r2)) {
-						
-//						bigger = r1;
-//						smaller = r2;
-						
-						token2.delete();
-					}
-					else if (contains(r2, r1)) {
-						
-//						bigger = r2;
-//						smaller = r1;
-						
-						token1.delete();
-					}
-					else
-						continue; // The two ranges don't overlap
-				}
-				
-				// If the token's range includes other tokens' ranges, destroy those.
-//				if (//checkEqual(token, token2) || // Remove duplicate tokens 
-//				contains(token.getLexem().getRange(), token2.getLexem().getRange())) // Remove overlapped tokens					
-//				//wasteBin.add(token2);
-//				token2.delete();
-
-			}
-		}
+//		System.out.println(sameRangeMap.size());
+//		System.out.println(sameScoreMap.size());
+//		System.out.println(reverseSameScoreMap.size());
 		
 		return null;
 	}
 
-
 }
-

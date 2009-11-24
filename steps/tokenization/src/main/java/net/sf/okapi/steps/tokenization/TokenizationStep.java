@@ -62,7 +62,8 @@ public class TokenizationStep extends AbstractPipelineStep {
 	private List<ILexer> lexers = new ArrayList<ILexer>();
 	
 	/**
-	 * Lexers not generating lexems, but rather performing sorting, cleaning etc. service tasks
+	 * Lexers not generating lexems, but rather performing sorting, cleaning etc. service tasks. 
+	 * Either have no lexer rules assigned, or the rules have outTokens empty.
 	 */
 	private List<ILexer> serviceLexers = new ArrayList<ILexer>();
 	
@@ -362,6 +363,19 @@ public class TokenizationStep extends AbstractPipelineStep {
 			}
 	}
 	
+//	private void listTokens(Tokens tokens) {
+//		
+//		if (tokens == null) return;
+//		if (tokens.size() < 21) return;
+//		
+//		for (Token token : tokens.subList(0, 20)) {	
+//			
+//			System.out.println(token.toString());
+//		}
+//	}
+//	
+	//public boolean logTokens = false;
+	
 	private void runLexers(List<ILexer> lexers, String text, LocaleId language, Tokens tokens, int textShift) {
 	
 		for (ILexer lexer : lexers) {
@@ -372,6 +386,15 @@ public class TokenizationStep extends AbstractPipelineStep {
 			// Single-call way
 			Lexems lexems = lexer.process(text, language, tokens);
 
+//			if (logTokens) {
+//				System.out.println();
+//				System.out.println();
+//				System.out.println("--------------------");
+//				System.out.println(lexer.getClass());
+//				System.out.println("--------------------");
+//			}
+
+			
 			if (lexems != null)
 				for (Lexem lexem : lexems)
 					processLexem(lexem, lexer, tokens, 0); // 0 - token ranges don't need shifting
@@ -386,7 +409,10 @@ public class TokenizationStep extends AbstractPipelineStep {
 			finally {
 				
 				lexer.close();
-			}			
+			}
+			
+//			if (logTokens)
+//				listTokens(tokens);
 		}
 	}
 	
@@ -407,7 +433,8 @@ public class TokenizationStep extends AbstractPipelineStep {
 		String text = TextUnitUtil.getText(tc.getContent(), positions);
 		
 		allowNewRawText = true;
-		runLexers(lexers, text, language, tokens, textShift);		
+		runLexers(lexers, text, language, tokens, textShift);
+		//logTokens = true;
 		runLexers(serviceLexers, text, language, tokens, textShift);
 		allowNewRawText = false;
 		
@@ -436,6 +463,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 				textShift = lexem.getRange().start;
 				
 				runLexers(lexers, text, language, tempTokens, textShift);
+				tempTokens.setImmutable(true);
 				tokens.addAll(tempTokens);
 			}
 						

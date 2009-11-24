@@ -131,13 +131,43 @@ public class Token {
 		this.score = score;
 	}	
 	
+	public boolean isImmutable() {
+		
+		if (lexem == null) return false;
+		
+		return lexem.isImmutable();
+	}
+
+	public void setImmutable(boolean immutable) {
+		
+		if (lexem == null) return;
+
+		lexem.setImmutable(immutable);
+	}
+
+	public void setDeleted(boolean deleted) {
+		
+		if (lexem == null) return;
+
+		lexem.setDeleted(deleted);
+	}
+
 	public boolean isDeleted() {
 		
-		return score == 0;
+		if (lexem == null) return false;
+		
+		return lexem.isDeleted();
+		//return this.score == 0;		
 	}
-	
+
 	public void delete() {
 		
-		score = 0;
+		setDeleted(true);
+		//this.score = 0;
+	}
+	
+	public void undelete() {
+	
+		setDeleted(false);
 	}
 }
