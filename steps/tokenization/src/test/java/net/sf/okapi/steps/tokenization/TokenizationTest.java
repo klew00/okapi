@@ -154,6 +154,7 @@ public class TokenizationTest {
 		ts.handleEvent(new Event(EventType.END_BATCH));
 	}
 	
+	@SuppressWarnings("unused")
 	private void listTokens(Tokens tokens) {
 		
 		if (tokens == null) return;

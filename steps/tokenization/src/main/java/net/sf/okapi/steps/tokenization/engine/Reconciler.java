@@ -220,21 +220,6 @@ public class Reconciler extends AbstractLexer {
 		
 	}
 	
-//	private void setTokenScore(Token token, int score) {
-//		
-//		if (token == null) return;
-//		if (Util.isEmpty(sameScoreMap)) return;
-//		
-//		token.setScore(score);
-//		
-//		// Set the same score to all tokens in its same-score group
-//		Tokens groupTokens = sameScoreMap.get(token);
-//		if (groupTokens == null) return;
-//		
-//		for (Token groupToken : groupTokens)
-//			groupToken.setScore(score);
-//	}
-	
 	private boolean firstIsNewer(Token token1, Token token2) {
 		
 		if (token1 == null) return false;
@@ -244,7 +229,7 @@ public class Reconciler extends AbstractLexer {
 		((token1.getLexerId() == token2.getLexerId()) && (token1.getLexemId() > token2.getLexemId()));
 	}
 	
-	private void BiggerEatsSmaller(Token bigger, Token smaller) {
+	private void biggerEatsSmaller(Token bigger, Token smaller) {
 		
 		if (bigger == null) return;
 		if (smaller == null) return;
@@ -256,12 +241,6 @@ public class Reconciler extends AbstractLexer {
 	}
 	
 	public Lexems process(String text, LocaleId language, Tokens tokens) {
-		
-//		tokens.remove(8);
-//		tokens.remove(0);
-//		tokens.remove(0);
-//		tokens.remove(0);
-//		tokens.remove(0);
 		
 		setSameRangeMap(tokens);
 		setSameScoreMap(tokens);
@@ -303,34 +282,16 @@ public class Reconciler extends AbstractLexer {
 				}
 				else { // One of the ranges contains the other, or no overlapping
 				
-					//Range bigger, smaller;
+					if (contains(r1, r2))						
+						biggerEatsSmaller(token1, token2);
 					
-					if (contains(r1, r2)) {
-						
-//						bigger = r1;
-//						smaller = r2;
-						
-						// token2.delete();
-						BiggerEatsSmaller(token1, token2);
-					}
-					else if (contains(r2, r1)) {
-						
-//						bigger = r2;
-//						smaller = r1;
-						
-						// token1.delete();
-						BiggerEatsSmaller(token2, token1);
-					}
+					else if (contains(r2, r1))						
+						biggerEatsSmaller(token2, token1);
+					
 					else
 						continue; // The two ranges don't overlap
 				}
 				
-				// If the token's range includes other tokens' ranges, destroy those.
-//				if (//checkEqual(token, token2) || // Remove duplicate tokens 
-//				contains(token.getLexem().getRange(), token2.getLexem().getRange())) // Remove overlapped tokens					
-//				//wasteBin.add(token2);
-//				token2.delete();
-
 			}
 		}
 				
@@ -361,14 +322,6 @@ public class Reconciler extends AbstractLexer {
 			}				
 		}
 		
-//		for (Tokens list : sameScoreMap.values()) {
-//			
-//			for (Token token : list)
-//				if (token != null)
-//					token.delete()
-//					;
-//		}
-		
 		// Step 2. Count valid tokens in same-range lists 
 		for (List<Integer> list : sameRangeMap.values()) { 
 			
@@ -389,40 +342,7 @@ public class Reconciler extends AbstractLexer {
 				
 				token.setScore(100 / size);
 				token.undelete();
-			}
-			
-//			int size = list.size();
-//			
-//			if (size > 0)
-//				for (Token token : list) {
-//					
-//					//setTokenScore(token, 100 / size);
-//					
-//				}
-			
-//			// All the tokens being compared have the same range
-//			for (int i = 0; i < list.size(); i++) {
-//				
-//				Token token1 = list.get(i);
-//				if (token1.isDeleted()) continue;
-//				
-//				for (int j = 0; j < list.size(); j++) {
-//					
-//					if (i >= j) continue;
-//					
-//					Token token2 = list.get(j);				
-//					if (token2.isDeleted()) continue;
-//					if (token2 == token1) continue;
-//					
-//					boolean sameTokenIds = getSameTokenIds(token1, token2);
-//					boolean sameRules = getSameRules(token1, token2);
-//					
-//					if (!sameTokenIds && !sameRules) { // Only this case changes scores
-//						
-//						
-//					}
-//				}
-//			}
+			}			
 		}
 		
 		// Step 3. Fix same-score groups
@@ -449,10 +369,6 @@ public class Reconciler extends AbstractLexer {
 			}				
 		}
 
-//		System.out.println(sameRangeMap.size());
-//		System.out.println(sameScoreMap.size());
-//		System.out.println(reverseSameScoreMap.size());
-		
 		return null;
 	}
 

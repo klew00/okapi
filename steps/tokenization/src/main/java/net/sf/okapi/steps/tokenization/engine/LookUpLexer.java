@@ -74,9 +74,8 @@ public class LookUpLexer extends AbstractLexer {
 						lexem.setAnnotation(new InputTokenAnnotation(token));
 				    	lexems.add(lexem);
 				    	
-				    	// All input deletion is done in Reconciler
-//				    	if (!rule.getKeepInput())
-//				    		token.delete(); // Remove replaced token
+				    	if (!rule.getKeepInput())
+				    		token.delete(); // Remove replaced token
 				    }
 				}
 		}

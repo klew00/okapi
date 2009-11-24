@@ -105,19 +105,12 @@ public class RbbiLexer extends AbstractLexer {
 			
 			// Collect rules for the language, combine with defaultRules
 			String newRules = defaultRules;			
-			//boolean addCaption = true;
 			
 			for (LexerRule rule : getRules()) {
 				
 				boolean isInternal = Util.isEmpty(rule.getPattern());
 				
 				if (checkRule(rule, language) && !isInternal) {
-					
-//					if (addCaption) {
-//						
-//						//@@@ newRules = formatCaption(newRules, "Custom rules");
-//						addCaption = false;
-//					}
 					
 					newRules = formatRule(newRules, rule.getName(), rule.getDescription(), rule.getPattern(), rule.getLexemId());
 				}					
