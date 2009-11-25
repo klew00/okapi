@@ -4,7 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,11 +14,9 @@ import net.sf.okapi.filters.html.HtmlUtils;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
-import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.LocaleId;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,7 +51,7 @@ public class ExtractionComparisionTest {
 	public void testDoubleExtractionSingle() throws URISyntaxException, MalformedURLException {
 		RoundTripComparison rtc = new RoundTripComparison();
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root + "msg00058.html", null));
+		list.add(new InputDocument(root + "World'sWorstWebsite.htm", null));
 		
 //		FilterTestDriver testDriver = new FilterTestDriver();
 //		testDriver.setDisplayLevel(2);
