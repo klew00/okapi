@@ -129,7 +129,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION)))
 				inlineTag = true;
 
-			// if its an inline code or TEXTUNIT or GROUP let the handlers deal with it
+			// if its an inline code let the handlers deal with it
 			if (getEventBuilder().isCurrentTextUnit() && !inlineTag) {
 				getEventBuilder().endTextUnit();
 			}
