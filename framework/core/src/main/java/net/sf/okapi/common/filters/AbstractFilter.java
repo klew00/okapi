@@ -9,6 +9,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -134,6 +135,14 @@ public abstract class AbstractFilter implements IFilter {
 					fc.parametersLocation));
 
 		return configs;
+	}
+
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		// By default we set all known mapping.
+		// It's up to each implementation to set up their own.
+		em.setAllKnownMappings();
+		return em;
 	}
 
 	public void addConfiguration(FilterConfiguration configuration) {
