@@ -32,14 +32,15 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
  * 
  */
 public class Parameters extends BaseParameters {
-	private static final String DEFAULT_PARAMETERS = "nonwellformedConfiguration.yml";
-
-	public static String getDefualtParameterFile() {
-		return DEFAULT_PARAMETERS;
-	}
-
+	
+	public static final String NONWELLFORMED_PARAMETERS = "nonwellformedConfiguration.yml";
+	public static final String WELLFORMED_PARAMETERS = "wellformedConfiguration.yml";
+		
 	private TaggedFilterConfiguration taggedConfig;
 
+	/**
+	 * Default constructor loads nonwellformed configuration
+	 */
 	public Parameters() {
 		reset();
 	}
@@ -76,7 +77,7 @@ public class Parameters extends BaseParameters {
 	 * @see net.sf.okapi.common.IParameters#reset()
 	 */
 	public void reset() {		
-		taggedConfig = new TaggedFilterConfiguration(HtmlFilter.class.getResource(DEFAULT_PARAMETERS));
+		taggedConfig = new TaggedFilterConfiguration(HtmlFilter.class.getResource(NONWELLFORMED_PARAMETERS));
 	}
 
 	public TaggedFilterConfiguration getTaggedConfig() {
@@ -88,5 +89,5 @@ public class Parameters extends BaseParameters {
 	 */
 	public void setTaggedConfig(TaggedFilterConfiguration taggedConfig) {
 		this.taggedConfig = taggedConfig;
-	}	
+	}
 }

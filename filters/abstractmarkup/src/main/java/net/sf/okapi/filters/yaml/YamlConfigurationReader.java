@@ -87,7 +87,7 @@ public class YamlConfigurationReader  {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Map getRule(String ruleName) {
+	public Map getRule(String ruleName) {		
 		return (Map)config.get(ruleName);
 	}
 	

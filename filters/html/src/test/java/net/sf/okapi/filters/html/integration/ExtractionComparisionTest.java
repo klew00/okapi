@@ -3,6 +3,8 @@ package net.sf.okapi.filters.html.integration;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -13,9 +15,11 @@ import net.sf.okapi.filters.html.HtmlUtils;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.LocaleId;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +33,6 @@ public class ExtractionComparisionTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
-		//htmlFilter.setParametersFromURL(ExtractionComparisionTest.class.getResource("/testConfiguration1.yml"));
 		testFileList = HtmlUtils.getHtmlTestFiles();
 
 		URL url = ExtractionComparisionTest.class.getResource("/324.html");
@@ -47,11 +50,20 @@ public class ExtractionComparisionTest {
 				"UTF-8", locEN, locEN));
 	}
 	
-	//@Test
-	public void testDoubleExtractionSingle() throws URISyntaxException {
+	@Test
+	public void testDoubleExtractionSingle() throws URISyntaxException, MalformedURLException {
 		RoundTripComparison rtc = new RoundTripComparison();
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root + "W3CHTMHLTest1.html", null));
+		list.add(new InputDocument(root + "msg00058.html", null));
+		
+//		FilterTestDriver testDriver = new FilterTestDriver();
+//		testDriver.setDisplayLevel(2);
+//		testDriver.setShowSkeleton(true);
+//		
+//		URI i = new File(root + "msg00058.html").toURI();
+//		htmlFilter.open(new RawDocument(i, "UTF-8", locEN));
+//		if ( !testDriver.process(htmlFilter) ) Assert.fail();
+//		htmlFilter.close();
 		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", locEN, locEN));
 	}
 	
@@ -59,8 +71,8 @@ public class ExtractionComparisionTest {
 	public void testDoubleExtraction() throws URISyntaxException {
 		RoundTripComparison rtc = new RoundTripComparison();
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		for (String f : testFileList) {
-			list.add(new InputDocument(root + f, null));
+		for (String f : testFileList) {			
+			list.add(new InputDocument(root + f, null));			
 		}
 		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", locEN, locEN));
 	}

@@ -1056,11 +1056,14 @@ public class FilterTestDriver {
 				Segment seg1 = segs1.get(i);
 				Segment seg2 = segs1.get(i);
 				if ( seg1.id == null ) {
-					if ( seg2.id != null ) return false;
+					if ( seg2.id != null ) 
+						return false;
 				}
 				else {
-					if ( seg2.id == null ) return false;
-					if ( !seg1.id.equals(seg2.id) ) return false;
+					if ( seg2.id == null ) 
+						return false;
+					if ( !seg1.id.equals(seg2.id) ) 
+						return false;
 				}
 				if ( !compareTextFragment(seg1.text, seg2.text) ) {
 					System.err.println("Text fragment difference");

@@ -27,7 +27,7 @@ public class HtmlSnippetsTest {
 	@Before
 	public void setUp() {
 		htmlFilter = new HtmlFilter();
-		parameters = HtmlSnippetsTest.class.getResource("/testConfiguration1.yml");
+		parameters = HtmlSnippetsTest.class.getResource("wellformedConfiguration.yml");
 	}
 
 	@After
@@ -127,7 +127,7 @@ public class HtmlSnippetsTest {
 
 	@Test
 	public void testCollapseWhitespaceWithPre() {
-		String snippet = "<pre>   \n   \n <x/>  \t    </pre>";
+		String snippet = "<pre>   \n   \n   \t    </pre>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
@@ -189,6 +189,50 @@ public class HtmlSnippetsTest {
 		assertEquals("\uD840\uDC00", generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
+	@Test
+	public void textUnitsInARow() {
+		String snippet = "<td><p><h1>para text in a table element</h1></p></td>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+
+	@Test
+	public void textUnitsInARowWithTwoHeaders() {
+		String snippet = "<td><p><h1>header one</h1><h2>header two</h2></p></td>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	
+	@Test
+	public void twoTextUnitsInARowNonWellformed() {
+		String snippet = "<td><p><h1>para text in a table element</td>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	
+	@Test
+	public void textUnitName() {
+		String snippet = "<p id=\"logo\">para text in a table element</p>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+
+	@Test
+	public void textUnitStartedWithText() {
+		String snippet = "this is some text<x/>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	
+	@Test
+	public void table() {
+		String snippet = 
+		"<table>" +
+		"<tbody><tr valign=\"baseline\">" +
+		"<th align=\"right\">" +
+		"<strong>Subject</strong>:</th>" +
+		"<td align=\"left\">" +
+		"ugly <a id=\"KonaLink0\" target=\"top\" class=\"kLink\">stuff</a></td>" +
+		"</tr>" +
+		"</tbody></table>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.setParametersFromURL(parameters);

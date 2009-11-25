@@ -31,13 +31,11 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
+assumeWellformed: false
+
 collapse_whitespace: true
 
 # attributes that occur on many elements
-title:
-  ruleTypes: [ATTRIBUTE_TRANS]
-  allElementsExcept: [base, basefront, head, html, meta, param, script, title]
-
 dir:
   ruleTypes: [ATTRIBUTE_WRITABLE]
   allElementsExcept: [base, basefront, head, html, meta, param, script]
@@ -48,9 +46,9 @@ lang:
 'xml:lang':
   ruleTypes: [ATTRIBUTE_WRITABLE]
   
-id:
-  ruleTypes: [ATTRIBUTE_ID]
-  onlyTheseElements: [address, dd, dt, html, fieldset, h1, h2, h3, h4, h5, h6, legend, li, listing, marquee, p, pre, object, td, th, xml]
+#id:
+#  ruleTypes: [ATTRIBUTE_ID]
+#  onlyTheseElements: [address, dt, h1, h2, h3, h4, h5, h6, legend, li, marquee, p, pre, td, th]
   
 # only attributes are localizable or translatable - no PCDATA
 # ATTRIBUTES_ONLY with translatableAttributes implies the tag will be a TEXTUNIT
@@ -69,9 +67,9 @@ isindex:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [prompt]
   
-legend:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [accesskey]
+#legend:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [accesskey]
 
 option:
   ruleTypes: [ATTRIBUTES_ONLY]
@@ -81,9 +79,81 @@ optgroup:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [label]
   
-th:
-  ruleTypes: [ATTRIBUTES_ONLY]
+#th:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [abbr]
+
+# complex TextUnit rules
+address:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]  
+
+dt:
+  ruleTypes: [TEXTUNIT]  
+  idAttributes: [id]
+  
+h1:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+  
+h2:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+  
+h3:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+  
+h4:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+
+h5:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+  
+h6:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+
+legend:
+  ruleTypes: [TEXTUNIT]
+  translatableAttributes: [accesskey]
+  idAttributes: [id]
+
+li:
+  ruleTypes: [TEXTUNIT]
+  translatableAttributes: [value] 
+  idAttributes: [id]
+
+marquee:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+
+p:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+  elementType: paragraph
+  
+pre:
+  ruleTypes: [TEXTUNIT, PRESERVE_WHITESPACE]
+  idAttributes: [id]
+
+td:
+  ruleTypes: [TEXTUNIT]
   translatableAttributes: [abbr]
+  idAttributes: [id]
+
+th:
+  ruleTypes: [TEXTUNIT]
+  idAttributes: [id]
+  translatableAttributes: [abbr]
+
+# title is also an attribute
+title:
+  ruleTypes: [TEXTUNIT, ATTRIBUTE_TRANS]
+  idAttributes: [id]
+  allElementsExcept: [base, basefront, head, html, meta, param, script, title]
   
 # inline tags
 a:
@@ -183,9 +253,9 @@ label:
   ruleTypes: [INLINE]
   translatableAttributes: [accesskey]
  
-li:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [value]
+#li:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [value]
 
 map:
   ruleTypes: [INLINE]
@@ -248,9 +318,9 @@ textarea:
 tt:
   ruleTypes: [INLINE]
  
-td:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [abbr]
+#td:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [abbr]
  
 u:
   ruleTypes: [INLINE]
@@ -303,5 +373,5 @@ script:
   ruleTypes: [EXCLUDE]
 
 # preserve whitespace
-pre:
-  ruleTypes: [PRESERVE_WHITESPACE]
+#pre:
+#  ruleTypes: [PRESERVE_WHITESPACE]

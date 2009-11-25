@@ -31,13 +31,11 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
+assumeWellformed: true
+
 collapse_whitespace: true
 
 # attributes that occur on many elements
-title:
-  ruleTypes: [ATTRIBUTE_TRANS]
-  allElementsExcept: [base, basefront, head, html, meta, param, script, title]
-
 dir:
   ruleTypes: [ATTRIBUTE_WRITABLE]
   allElementsExcept: [base, basefront, head, html, meta, param, script]
@@ -47,6 +45,10 @@ lang:
   
 'xml:lang':
   ruleTypes: [ATTRIBUTE_WRITABLE]
+  
+#id:
+#  ruleTypes: [ATTRIBUTE_ID]
+#  onlyTheseElements: [address, dt, h1, h2, h3, h4, h5, h6, legend, li, marquee, p, pre, td, th]
     
 # only attributes are localizable or translatable - no PCDATA
 # ATTRIBUTES_ONLY with translatableAttributes implies the tag will be a TEXTUNIT
@@ -65,23 +67,23 @@ isindex:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [prompt]
   
-legend:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [accesskey]
+#legend:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [accesskey]
 
 option:
   ruleTypes: [ATTRIBUTES_ONLY]
   translatableAttributes: [label, value]
   
-optgroup:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [label]
+#optgroup:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [label]
   
-th:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [abbr]
+#th:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [abbr]
 
-# Group rules: only Groups which may be embedded within a TextUnit.
+# Group rules
 dl:
   ruleTypes: [GROUP]
 
@@ -93,6 +95,7 @@ ol:
 
 optgroup:
   ruleTypes: [GROUP]
+  translatableAttributes: [label]
   
 select:
   ruleTypes: [GROUP]
@@ -121,18 +124,10 @@ address:
   ruleTypes: [TEXTUNIT]
   idAttributes: [id]  
 
-dd:
-  ruleTypes: [TEXTUNIT]  
-  idAttributes: [id]
-  
 dt:
   ruleTypes: [TEXTUNIT]  
   idAttributes: [id]
   
-fieldset:
-  ruleTypes: [TEXTUNIT]
-  idAttributes: [id]
-    
 h1:
   ruleTypes: [TEXTUNIT]
   idAttributes: [id]
@@ -159,15 +154,12 @@ h6:
 
 legend:
   ruleTypes: [TEXTUNIT]
+  translatableAttributes: [accesskey]
   idAttributes: [id]
 
 li:
   ruleTypes: [TEXTUNIT]
   translatableAttributes: [value] 
-  idAttributes: [id]
-
-listing:
-  ruleTypes: [TEXTUNIT]
   idAttributes: [id]
 
 marquee:
@@ -183,10 +175,6 @@ pre:
   ruleTypes: [TEXTUNIT, PRESERVE_WHITESPACE]
   idAttributes: [id]
 
-object:
-  ruleTypes: [TEXTUNIT]
-  idAttributes: [id]
-
 td:
   ruleTypes: [TEXTUNIT]
   translatableAttributes: [abbr]
@@ -196,10 +184,12 @@ th:
   ruleTypes: [TEXTUNIT]
   idAttributes: [id]
 
-xml:
-  ruleTypes: [TEXTUNIT]
-  idAttributes: [id]      
-
+# title is also an attribute
+title:
+  ruleTypes: [TEXTUNIT, ATTRIBUTE_TRANS]
+  idAttributes: [id]
+  allElementsExcept: [base, basefront, head, html, meta, param, script, title]
+    
 # inline tags
 a:
   ruleTypes: [INLINE]
@@ -298,9 +288,9 @@ label:
   ruleTypes: [INLINE]
   translatableAttributes: [accesskey]
  
-li:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [value]
+#li:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [value]
 
 map:
   ruleTypes: [INLINE]
@@ -328,8 +318,8 @@ samp:
 small:
   ruleTypes: [INLINE]
 
-select:
-  ruleTypes: [INLINE]
+#select:
+#  ruleTypes: [INLINE]
  
 span:
   ruleTypes: [INLINE]
@@ -352,9 +342,9 @@ sup:
 symbol:
   ruleTypes: [INLINE]
  
-table:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [summary]
+#table:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [summary]
  
 textarea:
   ruleTypes: [INLINE]
@@ -363,9 +353,9 @@ textarea:
 tt:
   ruleTypes: [INLINE]
  
-td:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [abbr]
+#td:
+#  ruleTypes: [ATTRIBUTES_ONLY]
+#  translatableAttributes: [abbr]
  
 u:
   ruleTypes: [INLINE]

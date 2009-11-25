@@ -42,8 +42,9 @@ public class HtmlConfigurationTest {
 		URL url = HtmlFilter.class
 				.getResource("/net/sf/okapi/filters/html/nonwellformedConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		assertTrue(rules.isRuleType("title", TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTE_TRANS));
 		assertEquals(rules.getMainRuleType("title"),
-				TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTE_TRANS);
+				TaggedFilterConfiguration.RULE_TYPE.TEXT_UNIT_ELEMENT);
 		assertEquals(rules.getMainRuleType("abbr"),
 				TaggedFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
 		assertEquals(rules.getMainRuleType("area"),

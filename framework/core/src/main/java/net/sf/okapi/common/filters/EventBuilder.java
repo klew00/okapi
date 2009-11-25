@@ -1,26 +1,18 @@
-/*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
------------------------------------------------------------------------------
-  This library is free software; you can redistribute it and/or modify it 
-  under the terms of the GNU Lesser General Public License as published by 
-  the Free Software Foundation; either version 2.1 of the License, or (at 
-  your option) any later version.
-
-  This library is distributed in the hope that it will be useful, but 
-  WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
-  General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License 
-  along with this library; if not, write to the Free Software Foundation, 
-  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-===========================================================================*/
+/*
+ * =========================================================================== Copyright (C) 2008-2009 by the Okapi
+ * Framework contributors ----------------------------------------------------------------------------- This library is
+ * free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details. You should have received a copy of the GNU Lesser General Public License along with this library; if not,
+ * write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA See also the full
+ * LGPL text here: http://www.gnu.org/copyleft/lesser.html
+ * ===========================================================================
+ */
 
 package net.sf.okapi.common.filters;
 
-import java.security.acl.Group;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,21 +39,17 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
- * EventBuilder provides a simplified API for filter writers that hides the low
- * level resource API.
+ * EventBuilder provides a simplified API for filter writers that hides the low level resource API.
  * <p>
- * EventBuilder allows filter writers to think in terms of start and end calls.
- * For example, to produce a non-translatable {@link Event} you would use
- * startDocumentPart() and endDocumentPart(). For a text-based {@link Event} you
- * would use startTextUnit() and endTextUnit().
+ * EventBuilder allows filter writers to think in terms of start and end calls. For example, to produce a
+ * non-translatable {@link Event} you would use startDocumentPart() and endDocumentPart(). For a text-based
+ * {@link Event} you would use startTextUnit() and endTextUnit().
  * <p>
- * More complex cases such as tags with embedded translatable text can also be
- * handled. See the AbstractMarkupFilter, HtmlFilter and OpenXmlFilter for
- * examples of using EventBuilder.
+ * More complex cases such as tags with embedded translatable text can also be handled. See the AbstractMarkupFilter,
+ * HtmlFilter and OpenXmlFilter for examples of using EventBuilder.
  */
 public class EventBuilder {
-	private static final Logger LOGGER = Logger.getLogger(EventBuilder.class
-			.getName());
+	private static final Logger LOGGER = Logger.getLogger(EventBuilder.class.getName());
 
 	private static final String START_GROUP = "sg"; //$NON-NLS-1$
 	private static final String END_GROUP = "eg"; //$NON-NLS-1$
@@ -138,8 +126,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Cancel current processing and add the CANCELED {@link Event} to the event
-	 * queue.
+	 * Cancel current processing and add the CANCELED {@link Event} to the event queue.
 	 */
 	public void cancel() {
 		// flush out all pending events
@@ -211,18 +198,14 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Is the current buffered {@link Event} a complex {@link TextUnit}? A
-	 * complex TextUnit is one which carries along with it it's surrounding
-	 * formatting or skeleton such &lt;p> text &lt;/p> or &lt;title> text
-	 * &lt;/title>
+	 * Is the current buffered {@link Event} a complex {@link TextUnit}? A complex TextUnit is one which carries along
+	 * with it it's surrounding formatting or skeleton such &lt;p> text &lt;/p> or &lt;title> text &lt;/title>
 	 * 
-	 * @return true, if current {@link Event} is a complex text unit, false
-	 *         otherwise.
+	 * @return true, if current {@link Event} is a complex text unit, false otherwise.
 	 */
 	public boolean isCurrentComplexTextUnit() {
 		Event e = peekTempEvent();
-		if (e != null && e.getEventType() == EventType.TEXT_UNIT
-				&& e.getResource().getSkeleton() != null) {
+		if (e != null && e.getEventType() == EventType.TEXT_UNIT && e.getResource().getSkeleton() != null) {
 			return true;
 		}
 		return false;
@@ -251,9 +234,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Can we start new {@link TextUnit}? A new {@link TextUnit} can only be
-	 * started if the current one has been ended with endTextUnit. Or no
-	 * {@link TextUnit} has been created yet.
+	 * Can we start new {@link TextUnit}? A new {@link TextUnit} can only be started if the current one has been ended
+	 * with endTextUnit. Or no {@link TextUnit} has been created yet.
 	 * 
 	 * @return true, if can start a new {@link TextUnit}
 	 */
@@ -265,8 +247,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Are there any queued events? We queue events in the correct order as
-	 * expected by the Okapi filter writers (IWriter).
+	 * Are there any queued events? We queue events in the correct order as expected by the Okapi filter writers
+	 * (IWriter).
 	 * 
 	 * @return true, if successful
 	 */
@@ -282,13 +264,17 @@ public class EventBuilder {
 	 * 
 	 * @return the filter event
 	 */
-	public Event peekMostRecentGroup() {
+	public StartGroup peekMostRecentGroup() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
-		for (Event fe : tempFilterEventStack) {
+		// the normal stack iterator gives the elements in the
+		int lastIndex = tempFilterEventStack.size() - 1;
+		for (int i = lastIndex; i >= 0; i--) {
+			Event fe = tempFilterEventStack.get(i);
 			if (fe.getEventType() == EventType.START_GROUP) {
-				return fe;
+				StartGroup g = (StartGroup) fe.getResource();
+				return g;
 			}
 		}
 		return null;
@@ -299,13 +285,17 @@ public class EventBuilder {
 	 * 
 	 * @return the filter event
 	 */
-	public Event peekMostRecentTextUnit() {
+	public TextUnit peekMostRecentTextUnit() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
-		for (Event fe : tempFilterEventStack) {
+		// the normal stack iterator gives the elements in the
+		int lastIndex = tempFilterEventStack.size() - 1;
+		for (int i = lastIndex; i >= 0; i--) {
+			Event fe = tempFilterEventStack.get(i);
 			if (fe.getEventType() == EventType.TEXT_UNIT) {
-				return fe;
+				TextUnit tu = (TextUnit) fe.getResource();
+				return tu;
 			}
 		}
 		return null;
@@ -344,8 +334,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Reset {@link IFilter} for a new input. Callers should reset the
-	 * EventBuilder for each input.
+	 * Reset {@link IFilter} for a new input. Callers should reset the EventBuilder for each input.
 	 */
 	public void reset() {
 		startGroupId = 0;
@@ -379,20 +368,17 @@ public class EventBuilder {
 			endDocumentPart();
 		}
 
-		StartSubDocument startSubDocument = new StartSubDocument(createId(
-				START_SUBDOCUMENT, ++subDocumentId));
+		StartSubDocument startSubDocument = new StartSubDocument(createId(START_SUBDOCUMENT, ++subDocumentId));
 		Event event = new Event(EventType.START_SUBDOCUMENT, startSubDocument);
 		filterEvents.add(event);
-		LOGGER.log(Level.FINE, "Start Sub-Document for "
-				+ startSubDocument.getId());
+		LOGGER.log(Level.FINE, "Start Sub-Document for " + startSubDocument.getId());
 	}
 
 	/**
 	 * Add the END_SUBDOCUMENT {@link Event} to the event queue.
 	 */
 	public void endSubDocument() {
-		Ending endDocument = new Ending(createId(END_SUBDOCUMENT,
-				++subDocumentId));
+		Ending endDocument = new Ending(createId(END_SUBDOCUMENT, ++subDocumentId));
 		Event event = new Event(EventType.END_SUBDOCUMENT, endDocument);
 		filterEvents.add(event);
 		LOGGER.log(Level.FINE, "End Sub-Document for " + endDocument.getId());
@@ -403,57 +389,40 @@ public class EventBuilder {
 	// tags
 	// ////////////////////////////////////////////////////////////////////////
 
-	private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText,
-			String tag) {
-		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId),
-				propOrText.getValue());
+	private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
+		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
 		tu.setPreserveWhitespaces(this.preserveWhitespace);
 
 		tu.setMimeType(propOrText.getMimeType());
 		tu.setIsReferent(true);
+		tu.setName(propOrText.getName());
+		// TODO: tu.setType(propOrText.getElementType());
 
 		GenericSkeleton skel = new GenericSkeleton();
 
-		skel.add(tag.substring(propOrText.getMainStartPos(), propOrText
-				.getValueStartPos()));
+		skel.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
 		skel.addContentPlaceholder(tu);
-		skel.add(tag.substring(propOrText.getValueEndPos(), propOrText
-				.getMainEndPos()));
+		skel.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
 		tu.setSkeleton(skel);
 
 		return tu;
 	}
 
-	private void embeddedWritableProp(INameable resource,
-		PropertyTextUnitPlaceholder propOrText,
-		String tag,
-		LocaleId locale)
-	{
-		setPropertyBasedOnLocale(resource, locale, new Property(propOrText
-				.getName(), propOrText.getValue(), false));
-		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(),
-				propOrText.getValueStartPos()));
-		currentSkeleton.addValuePlaceholder(resource, propOrText.getName(),
-				locale);
-		currentSkeleton.add(tag.substring(propOrText.getValueEndPos(),
-				propOrText.getMainEndPos()));
+	private void embeddedWritableProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
+			LocaleId locale) {
+		setPropertyBasedOnLocale(resource, locale, new Property(propOrText.getName(), propOrText.getValue(), false));
+		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getValueStartPos()));
+		currentSkeleton.addValuePlaceholder(resource, propOrText.getName(), locale);
+		currentSkeleton.add(tag.substring(propOrText.getValueEndPos(), propOrText.getMainEndPos()));
 	}
 
-	private void embeddedReadonlyProp(INameable resource,
-		PropertyTextUnitPlaceholder propOrText,
-		String tag,
-		LocaleId locId)
-	{
-		setPropertyBasedOnLocale(resource, locId, new Property(propOrText
-				.getName(), propOrText.getValue(), true));
-		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(),
-				propOrText.getMainEndPos()));
+	private void embeddedReadonlyProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
+			LocaleId locId) {
+		setPropertyBasedOnLocale(resource, locId, new Property(propOrText.getName(), propOrText.getValue(), true));
+		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
 	}
 
-	private INameable setPropertyBasedOnLocale(INameable resource,
-		LocaleId locale,
-		Property property)
-	{
+	private INameable setPropertyBasedOnLocale(INameable resource, LocaleId locale, Property property) {
 		if (locale == null) {
 			resource.setSourceProperty(property);
 		} else if (locale.equals(LocaleId.EMPTY)) {
@@ -466,14 +435,11 @@ public class EventBuilder {
 	}
 
 	private boolean processAllEmbedded(String tag, LocaleId locale,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
-		boolean inlineCode)
-	{
-		return processAllEmbedded(tag, locale, propertyTextUnitPlaceholders,
-			inlineCode, null);
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders, boolean inlineCode) {
+		return processAllEmbedded(tag, locale, propertyTextUnitPlaceholders, inlineCode, null);
 	}
 
-	private boolean isTextPlaceHoldersOnly (List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	private boolean isTextPlaceHoldersOnly(List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		boolean text = false;
 		boolean nontext = false;
 		for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
@@ -488,12 +454,8 @@ public class EventBuilder {
 
 	}
 
-	private boolean processAllEmbedded(String tag,
-		LocaleId locale,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
-		boolean inlineCode,
-		TextUnit parentTu)
-	{
+	private boolean processAllEmbedded(String tag, LocaleId locale,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders, boolean inlineCode, TextUnit parentTu) {
 		int propOrTextId = -1;
 		boolean textPlaceholdersOnly = isTextPlaceHoldersOnly(propertyTextUnitPlaceholders);
 		INameable resource = null;
@@ -509,8 +471,7 @@ public class EventBuilder {
 			if (textPlaceholdersOnly) {
 				resource = parentTu;
 			} else {
-				resource = new DocumentPart(createId(DOCUMENT_PART,
-						++documentPartId), inlineCode);
+				resource = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), inlineCode);
 			}
 		} else {
 			if (parentTu != null) {
@@ -531,34 +492,29 @@ public class EventBuilder {
 			propOrTextId++;
 
 			// add the markup between the props or text
-			if (propOrTextId >= 1
-					&& propOrTextId < propertyTextUnitPlaceholders.size()) {
-				PropertyTextUnitPlaceholder pt1 = propertyTextUnitPlaceholders
-						.get(propOrTextId - 1);
-				PropertyTextUnitPlaceholder pt2 = propertyTextUnitPlaceholders
-						.get(propOrTextId);
-				currentSkeleton.add(tag.substring(pt1.getMainEndPos(), pt2
-						.getMainStartPos()));
+			if (propOrTextId >= 1 && propOrTextId < propertyTextUnitPlaceholders.size()) {
+				PropertyTextUnitPlaceholder pt1 = propertyTextUnitPlaceholders.get(propOrTextId - 1);
+				PropertyTextUnitPlaceholder pt2 = propertyTextUnitPlaceholders.get(propOrTextId);
+				currentSkeleton.add(tag.substring(pt1.getMainEndPos(), pt2.getMainStartPos()));
 			}
 
 			if (propOrText.getAccessType() == PlaceholderAccessType.TRANSLATABLE) {
 				TextUnit tu = embeddedTextUnit(propOrText, tag);
 				currentSkeleton.addReference(tu);
-				referencableFilterEvents
-						.add(new Event(EventType.TEXT_UNIT, tu));
+				referencableFilterEvents.add(new Event(EventType.TEXT_UNIT, tu));
 			} else if (propOrText.getAccessType() == PlaceholderAccessType.WRITABLE_PROPERTY) {
 				embeddedWritableProp(resource, propOrText, tag, locale);
 			} else if (propOrText.getAccessType() == PlaceholderAccessType.READ_ONLY_PROPERTY) {
 				embeddedReadonlyProp(resource, propOrText, tag, locale);
+			} else if (propOrText.getAccessType() == PlaceholderAccessType.NAME) {
+				embeddedReadonlyProp(resource, propOrText, tag, locale);
 			} else {
-				throw new OkapiIllegalFilterOperationException(
-						"Unkown Property or TextUnit type");
+				throw new OkapiIllegalFilterOperationException("Unkown Property or TextUnit type");
 			}
 		}
 
 		// add the remaining markup after the last prop or text
-		pt = propertyTextUnitPlaceholders.get(propertyTextUnitPlaceholders
-				.size() - 1);
+		pt = propertyTextUnitPlaceholders.get(propertyTextUnitPlaceholders.size() - 1);
 		currentSkeleton.add(tag.substring(pt.getMainEndPos()));
 
 		// setup references based on type
@@ -568,8 +524,7 @@ public class EventBuilder {
 				resource.setSkeleton(currentSkeleton);
 				// we needed to create a document part to hold the
 				// writable/localizables
-				referencableFilterEvents.add(new Event(EventType.DOCUMENT_PART,
-						resource));
+				referencableFilterEvents.add(new Event(EventType.DOCUMENT_PART, resource));
 			} else {
 				// all text - the parent TU hold the references instead of a
 				// DocumentPart
@@ -585,8 +540,7 @@ public class EventBuilder {
 	// TextUnit Methods
 	// ////////////////////////////////////////////////////////////////////////
 	/**
-	 * Start and end a {@link TextUnit}. Also create a TextUnit {@link Event}
-	 * and add it to the event queue.
+	 * Start and end a {@link TextUnit}. Also create a TextUnit {@link Event} and add it to the event queue.
 	 * 
 	 * @param text
 	 *            the text used to prime the {@link TextUnit}
@@ -597,8 +551,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Start a {@link TextUnit}. Also create a TextUnit {@link Event} and add it
-	 * to the event queue.
+	 * Start a {@link TextUnit}. Also create a TextUnit {@link Event} and add it to the event queue.
 	 * 
 	 * @param text
 	 *            the text used to prime the {@link TextUnit}
@@ -608,16 +561,14 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Start a {@link TextUnit}. Also create a TextUnit {@link Event} and add it
-	 * to the event queue.
+	 * Start a {@link TextUnit}. Also create a TextUnit {@link Event} and add it to the event queue.
 	 */
 	public void startTextUnit() {
 		startTextUnit(null, null, null, null);
 	}
 
 	/**
-	 * Start a complex {@link TextUnit}. Also create a TextUnit {@link Event}
-	 * and add it to the event queue.
+	 * Start a complex {@link TextUnit}. Also create a TextUnit {@link Event} and add it to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag that begins the complex {@link TextUnit}
@@ -627,15 +578,13 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Start a complex {@link TextUnit} with actionable (translatable, writable
-	 * or read-only) attributes. Also create a TextUnit {@link Event} and add it
-	 * to the event queue.
+	 * Start a complex {@link TextUnit} with actionable (translatable, writable or read-only) attributes. Also create a
+	 * TextUnit {@link Event} and add it to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag that begins the complex {@link TextUnit}
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 */
 	public void startTextUnit(GenericSkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -643,15 +592,13 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Start a complex {@link TextUnit} with actionable (translatable, writable
-	 * or read-only) attributes. Also create a TextUnit {@link Event} and add it
-	 * to the event queue.
+	 * Start a complex {@link TextUnit} with actionable (translatable, writable or read-only) attributes. Also create a
+	 * TextUnit {@link Event} and add it to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag that begins the complex {@link TextUnit}
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 * @param text
 	 *            the text used to prime the {@link TextUnit}
 	 */
@@ -661,9 +608,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Start a complex {@link TextUnit} with actionable (translatable, writable
-	 * or read-only) attributes. Also create a TextUnit {@link Event} and add it
-	 * to the event queue.
+	 * Start a complex {@link TextUnit} with actionable (translatable, writable or read-only) attributes. Also create a
+	 * TextUnit {@link Event} and add it to the event queue.
 	 * 
 	 * @param startMarker
 	 *            the tag that begins the complex {@link TextUnit}
@@ -672,35 +618,42 @@ public class EventBuilder {
 	 * @param locale
 	 *            the locale of the text
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 */
-	public void startTextUnit(String text,
-		GenericSkeleton startMarker,
-		LocaleId locale,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
-	{
+	public void startTextUnit(String text, GenericSkeleton startMarker, LocaleId locale,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		}
 
-		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
+		TextUnit tu;
+		tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
 		tu.setMimeType(this.mimeType);
 		tu.setPreserveWhitespaces(this.preserveWhitespace);
 
+		// test for pre-existing parent TextUnit and set the current TextUnit as a child
+		Event e = peekTempEvent();
+		if (e != null && e.getEventType() == EventType.TEXT_UNIT) {
+			TextUnit parentTu = (TextUnit) e.getResource();
+			tu.setIsReferent(true);
+			GenericSkeleton skel = (GenericSkeleton) parentTu.getSkeleton();
+			if (skel == null) {
+				skel = new GenericSkeleton();
+			}
+			skel.addReference(tu);
+			parentTu.setSkeleton(skel);
+		}
+
 		if (startMarker != null && propertyTextUnitPlaceholders != null) {
 			currentSkeleton = new GenericSkeleton();
-			processAllEmbedded(startMarker.toString(), locale,
-					propertyTextUnitPlaceholders, false, tu);
+			processAllEmbedded(startMarker.toString(), locale, propertyTextUnitPlaceholders, false, tu);
 			tu.setSkeleton(currentSkeleton);
 			currentSkeleton.addContentPlaceholder(tu);
-			tempFilterEventStack.push(new Event(EventType.TEXT_UNIT, tu,
-					currentSkeleton));
+			tempFilterEventStack.push(new Event(EventType.TEXT_UNIT, tu, currentSkeleton));
 			currentSkeleton = null;
 			return;
 		} else if (startMarker != null) {
-			GenericSkeleton skel = new GenericSkeleton(
-					(GenericSkeleton) startMarker);
+			GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) startMarker);
 			skel.addContentPlaceholder(tu);
 			tempFilterEventStack.push(new Event(EventType.TEXT_UNIT, tu, skel));
 			return;
@@ -710,16 +663,14 @@ public class EventBuilder {
 	}
 
 	/**
-	 * End the current {@link TextUnit} and place the {@link Event} on the event
-	 * queue.
+	 * End the current {@link TextUnit} and place the {@link Event} on the event queue.
 	 */
 	public TextUnit endTextUnit() {
 		return endTextUnit(null, null, null);
 	}
 
 	/**
-	 * End the current {@link TextUnit} and place the {@link Event} on the event
-	 * queue.
+	 * End the current {@link TextUnit} and place the {@link Event} on the event queue.
 	 * 
 	 * @param endMarker
 	 *            the tag that ends the complex {@link TextUnit}
@@ -729,47 +680,42 @@ public class EventBuilder {
 	}
 
 	/**
-	 * End the current {@link TextUnit} and place the {@link Event} on the event
-	 * queue.
+	 * End the current {@link TextUnit} and place the {@link Event} on the event queue.
 	 * 
 	 * @param endMarker
 	 *            the tag that ends the complex {@link TextUnit}
 	 * @param locale
 	 *            the locale of the text
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public TextUnit endTextUnit(GenericSkeleton endMarker,
-		LocaleId locale,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
-	{
+	public TextUnit endTextUnit(GenericSkeleton endMarker, LocaleId locale,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		Event tempTextUnit;
-		// String sourceString; // for testing to see if there is embedded text
 
 		if (!isCurrentTextUnit()) {
-			throw new OkapiIllegalFilterOperationException(
-					"Trying to end a TextUnit that does not exist.");
+			if (endMarker != null) {
+				addDocumentPart(endMarker.toString());
+			}
+			LOGGER.log(Level.FINE, "Trying to end a TextUnit that does not exist.");
+			return null;
 		}
 
-		/*
-		 * The ability to add internal placeholders to end tags is not currently
-		 * supported if (endMarker != null && propertyTextUnitPlaceholders !=
-		 * null) { processAllEmbedded(endMarker.toString(), locale,
-		 * propertyTextUnitPlaceholders, false); }
-		 */
 		tempTextUnit = popTempEvent();
 
 		if (endMarker != null) {
-			GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource()
-					.getSkeleton();
+			GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource().getSkeleton();
+			// need this to handle non-wellformed cases such as a
+			// TextUnit started with text but ending with a TextUnit tag
+			if (skel == null) {
+				skel = new GenericSkeleton();
+			}
 			skel.add((GenericSkeleton) endMarker);
 		}
 
-		tempTextUnit.setResource(postProcessTextUnit(
-			(TextUnit)tempTextUnit.getResource()));
+		tempTextUnit.setResource(postProcessTextUnit((TextUnit) tempTextUnit.getResource()));
 		filterEvents.add(tempTextUnit);
 		return (TextUnit) tempTextUnit.getResource();
 	}
@@ -784,76 +730,94 @@ public class EventBuilder {
 	 */
 	public void addToTextUnit(String text) {
 		if (!isCurrentTextUnit()) {
-			throw new OkapiIllegalFilterOperationException(
-					"Trying to add text to a TextUnit that does not exist.");
+			throw new OkapiIllegalFilterOperationException("Trying to add text to a TextUnit that does not exist.");
 		}
 
-		Event tempTextUnit = peekTempEvent();
-		TextUnit tu = (TextUnit) tempTextUnit.getResource();
+		TextUnit tu = peekMostRecentTextUnit();
 		tu.getSource().append(text);
 	}
 
 	/**
-	 * Add a {@link Code} to the current {@link TextUnit}. Nothing is actionable
-	 * within the tag (i.e., no properties or translatable, localizable text)
+	 * Adds a TextUnit to the current {@link TextUnit}
+	 * 
+	 * @param text
+	 *            the text
+	 * 
+	 * @throws OkapiIllegalFilterOperationException
+	 */
+	public void addToTextUnit(TextUnit textUnit) {
+		if (!isCurrentTextUnit()) {
+			throw new OkapiIllegalFilterOperationException(
+					"Trying to add a TextUnit to a TextUnit that does not exist.");
+		}
+
+		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId));
+		tu.setPreserveWhitespaces(this.preserveWhitespace);
+		tu.setMimeType(this.mimeType);
+		tu.setIsReferent(true);
+
+		TextUnit parentTU = peekMostRecentTextUnit();
+
+		GenericSkeleton skel = (GenericSkeleton) parentTU.getSkeleton();
+		if (skel == null) {
+			skel = new GenericSkeleton();
+		}
+		skel.addReference(tu);
+	}
+
+	/**
+	 * Add a {@link Code} to the current {@link TextUnit}. Nothing is actionable within the tag (i.e., no properties or
+	 * translatable, localizable text)
 	 * 
 	 * @param code
 	 *            the code type
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void addToTextUnit (Code code) {
+	public void addToTextUnit(Code code) {
 		if (!isCurrentTextUnit()) {
-			throw new OkapiIllegalFilterOperationException(
-				"Trying to add a Code to a TextUnit that does not exist.");
+			throw new OkapiIllegalFilterOperationException("Trying to add a Code to a TextUnit that does not exist.");
 		}
+
 		startCode(code);
 		endCode();
 	}
 
 	/**
-	 * Add a {@link Code} to the current {@link TextUnit}. The Code contains
-	 * actionable (i.e., translatable, localizable) attributes.
+	 * Add a {@link Code} to the current {@link TextUnit}. The Code contains actionable (i.e., translatable,
+	 * localizable) attributes.
 	 * 
 	 * @param code
 	 *            the code
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 */
-	public void addToTextUnit (Code code,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
-	{
+	public void addToTextUnit(Code code, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		addToTextUnit(code, null, propertyTextUnitPlaceholders);
 	}
 
 	/**
-	 * Add a {@link Code} to the current {@link TextUnit}. The Code contains
-	 * actionable (i.e., translatable, localizable) attributes.
+	 * Add a {@link Code} to the current {@link TextUnit}. The Code contains actionable (i.e., translatable,
+	 * localizable) attributes.
 	 * 
 	 * @param code
 	 *            the code
 	 * @param locale
 	 *            the language of the text
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void addToTextUnit (Code code,
-		LocaleId locale,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	public void addToTextUnit(Code code, LocaleId locale, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentTextUnit()) {
-			throw new OkapiIllegalFilterOperationException(
-					"Trying to add Codes to a TextUnit that does not exist.");
+			throw new OkapiIllegalFilterOperationException("Trying to add Codes to a TextUnit that does not exist.");
 		}
 
 		currentSkeleton = new GenericSkeleton();
-		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
+		TextUnit tu = peekMostRecentTextUnit();
 		startCode(code);
-		processAllEmbedded(code.toString(), locale,
-				propertyTextUnitPlaceholders, true, tu);
+		processAllEmbedded(code.toString(), locale, propertyTextUnitPlaceholders, true, tu);
 		endCode();
 
 		currentSkeleton = null;
@@ -869,8 +833,7 @@ public class EventBuilder {
 	 */
 	public void appendToFirstSkeletonPart(String text) {
 		Event tempTextUnit = peekTempEvent();
-		GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource()
-				.getSkeleton();
+		GenericSkeleton skel = (GenericSkeleton) tempTextUnit.getResource().getSkeleton();
 		skel.appendToFirstPart(text);
 	}
 
@@ -900,17 +863,12 @@ public class EventBuilder {
 	 * @param locale
 	 *            the language of any actionable items
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 */
-	public void startGroup(GenericSkeleton startMarker,
-		String commonTagType,
-		LocaleId locale,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
-	{
+	public void startGroup(GenericSkeleton startMarker, String commonTagType, LocaleId locale,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		if (startMarker == null) {
-			throw new OkapiIllegalFilterOperationException(
-					"startMarker for Group is null");
+			throw new OkapiIllegalFilterOperationException("startMarker for Group is null");
 		}
 
 		if (hasUnfinishedSkeleton()) {
@@ -918,29 +876,26 @@ public class EventBuilder {
 		}
 
 		if (startMarker != null && propertyTextUnitPlaceholders != null) {
-			processAllEmbedded(startMarker.toString(), locale,
-					propertyTextUnitPlaceholders, false);
+			processAllEmbedded(startMarker.toString(), locale, propertyTextUnitPlaceholders, false);
 		}
 
 		String parentId = createId(START_SUBDOCUMENT, subDocumentId);
-		Event parentGroup = peekMostRecentGroup();
+		StartGroup parentGroup = peekMostRecentGroup();
 		if (parentGroup != null) {
-			parentId = parentGroup.getResource().getId();
+			parentId = parentGroup.getId();
 		}
 
 		String gid = createId(START_GROUP, ++startGroupId);
 		StartGroup g = new StartGroup(parentId, gid);
 
-		GenericSkeleton skel = new GenericSkeleton(
-				(GenericSkeleton) startMarker);
+		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) startMarker);
 
 		Event fe = new Event(EventType.START_GROUP, g, skel);
 
-		if (isCurrentComplexTextUnit()) {
+		if (isCurrentTextUnit()) {
 			// add this group as a code of the complex TextUnit
 			g.setIsReferent(true);
-			Code c = new Code(TagType.PLACEHOLDER, commonTagType, TextFragment
-					.makeRefMarker(gid));
+			Code c = new Code(TagType.PLACEHOLDER, commonTagType, TextFragment.makeRefMarker(gid));
 			c.setReferenceFlag(true);
 			startCode(c);
 			endCode();
@@ -953,8 +908,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Create a {@link Ending} {@link Event} of type END_GROUP and add it to the
-	 * event queue.
+	 * Create a {@link Ending} {@link Event} of type END_GROUP and add it to the event queue.
 	 * 
 	 * @param endMarker
 	 *            the tags that ends the {@link Group}
@@ -964,33 +918,31 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Create a {@link Ending} {@link Event} of type END_GROUP and add it to the
-	 * event queue.
+	 * Create a {@link Ending} {@link Event} of type END_GROUP and add it to the event queue.
 	 * 
 	 * @param endMarker
 	 *            the tags that ends the {@link Group}
 	 * @param locale
 	 *            the language of any actionable items
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void endGroup (GenericSkeleton endMarker,
-		LocaleId locale,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
-	{
+	public void endGroup(GenericSkeleton endMarker, LocaleId locale,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		if (!isCurrentGroup()) {
-			throw new OkapiIllegalFilterOperationException(
-				"Trying end a Group that does not exist. Can be cuased by unbalanced Group tags.");
+			if (endMarker != null) {
+				addDocumentPart(endMarker.toString());
+			}
+			LOGGER.log(Level.FINE, "Trying to end a Group that does not exist.  Possible unbalanced Group tags.");
+			return;
 		}
 
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) endMarker);
 
 		if (endMarker != null && propertyTextUnitPlaceholders != null) {
-			processAllEmbedded(endMarker.toString(), locale,
-					propertyTextUnitPlaceholders, false);
+			processAllEmbedded(endMarker.toString(), locale, propertyTextUnitPlaceholders, false);
 		}
 
 		popTempEvent();
@@ -1018,7 +970,7 @@ public class EventBuilder {
 					"Trying to end a Code that does not exist. Did you call startCode?");
 		}
 
-		TextUnit tu = (TextUnit) peekMostRecentTextUnit().getResource();
+		TextUnit tu = peekMostRecentTextUnit();
 		tu.getSourceContent().append(currentCode);
 		currentCode = null;
 	}
@@ -1028,8 +980,7 @@ public class EventBuilder {
 	// ////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Create a single {@link DocumentPart} and add a {@link DocumentPart}
-	 * {@link Event} to the queue.
+	 * Create a single {@link DocumentPart} and add a {@link DocumentPart} {@link Event} to the queue.
 	 * 
 	 * @param part
 	 *            the {@link DocumentPart} (aka skeleton)
@@ -1049,24 +1000,25 @@ public class EventBuilder {
 
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
+		}  else if (isCurrentTextUnit()) {
+			endTextUnit();
 		}
+		
 		currentSkeleton = new GenericSkeleton(part);
-		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART,
-				++documentPartId), false);
+		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		currentDocumentPart.setSkeleton(currentSkeleton);
 	}
 
 	/**
-	 * Create a {@link DocumentPart} that references actionable (i.e.,
-	 * translatable, localizable) properties and store it for later processing.
+	 * Create a {@link DocumentPart} that references actionable (i.e., translatable, localizable) properties and store
+	 * it for later processing.
 	 * 
 	 * @param part
 	 *            the {@link DocumentPart} (aka skeleton)
 	 * @param name
 	 *            the name
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 */
 	public void startDocumentPart(String part, String name,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
@@ -1074,8 +1026,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Create a {@link DocumentPart} that references actionable (i.e.,
-	 * translatable, localizable) properties and store it for later processing.
+	 * Create a {@link DocumentPart} that references actionable (i.e., translatable, localizable) properties and store
+	 * it for later processing.
 	 * 
 	 * @param part
 	 *            the {@link DocumentPart} (aka skeleton)
@@ -1084,46 +1036,40 @@ public class EventBuilder {
 	 * @param locale
 	 *            the language of any actionable items
 	 * @param propertyTextUnitPlaceholders
-	 *            the list of actionable {@link TextUnit} or {@link Properties}
-	 *            with offset information into the tag.
+	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 */
-	public void startDocumentPart (String part,
-		String name,
-		LocaleId locale,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
-	{
+	public void startDocumentPart(String part, String name, LocaleId locale,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
+		} else if (isCurrentTextUnit()) {
+			endTextUnit();
 		}
 
 		currentSkeleton = new GenericSkeleton();
-		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART,
-			++documentPartId), false);
+		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		currentDocumentPart.setSkeleton(currentSkeleton);
-		
+
 		processAllEmbedded(part, locale, propertyTextUnitPlaceholders, false);
 	}
 
 	/**
-	 * End the current {@link DocumentPart} and finalize the {@link Event}.
-	 * Place the {@link Event} on the event queue.
+	 * End the current {@link DocumentPart} and finalize the {@link Event}. Place the {@link Event} on the event queue.
 	 * 
 	 * @param part
 	 *            the {@link DocumentPart} (aka skeleton)
 	 */
-	public void endDocumentPart (String part) {
+	public void endDocumentPart(String part) {
 		if (part != null) {
 			currentSkeleton.append(part);
 		}
-		filterEvents
-				.add(new Event(EventType.DOCUMENT_PART, currentDocumentPart));
+		filterEvents.add(new Event(EventType.DOCUMENT_PART, currentDocumentPart));
 		currentSkeleton = null;
 		currentDocumentPart = null;
 	}
 
 	/**
-	 * End the {@link DocumentPart} and finalize the {@link Event}. Place the
-	 * {@link Event} on the event queue.
+	 * End the {@link DocumentPart} and finalize the {@link Event}. Place the {@link Event} on the event queue.
 	 */
 	public void endDocumentPart() {
 		endDocumentPart(null);
@@ -1135,7 +1081,7 @@ public class EventBuilder {
 	 * @param part
 	 *            the {@link DocumentPart} as a String.
 	 */
-	public void addToDocumentPart(String part) {
+	public void addToDocumentPart(String part) {	
 		if (currentSkeleton == null) {
 			startDocumentPart(part);
 			return;
@@ -1173,15 +1119,40 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Set the current textUnitId. Note that using this method overrides the
-	 * built-in id creation algorithm. Useful for some callers that wish to
-	 * create custom ids.
+	 * Set the current textUnitId. Note that using this method overrides the built-in id creation algorithm. Useful for
+	 * some callers that wish to create custom ids.
 	 * 
 	 * @param id
 	 *            the initial value for the textUnitId
 	 */
 	public void setTextUnitId(int id) {
 		this.textUnitId = id;
+	}
+
+	/**
+	 * Set the current {@link TextUnit} name.
+	 * 
+	 * @param name
+	 *            the name (resname in XLIFF) of the {@link TextUnit}
+	 * @throws NullPointerException
+	 *             if there is no current {@link TextUnit}
+	 */
+	public void setTextUnitName(String name) {
+		TextUnit tu = peekMostRecentTextUnit();
+		tu.setName(name);
+	}
+
+	/**
+	 * Set the current {@link TextUnit} type. If there is no defined type the type is the element name.
+	 * 
+	 * @param name
+	 *            the name (resname in XLIFF) of the {@link TextUnit}
+	 * @throws NullPointerException
+	 *             if there is no current {@link TextUnit}
+	 */
+	public void setTextUnitType(String type) {
+		TextUnit tu = peekMostRecentTextUnit();
+		tu.setType(type);
 	}
 
 	/**
@@ -1194,9 +1165,8 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Set the current custom {@link DocumentPart} id. Note that using this
-	 * method overrides the built-in id creation algorithm. Useful for some
-	 * callers that wish to create custom ids.
+	 * Set the current custom {@link DocumentPart} id. Note that using this method overrides the built-in id creation
+	 * algorithm. Useful for some callers that wish to create custom ids.
 	 * 
 	 * @param id
 	 *            the initial value for the textUnitId
@@ -1206,12 +1176,21 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Do any required post-processing on the TextUnit after endTextUnit is
-	 * called. Default implementation leaves TextUnit unchanged. Override this
-	 * method if you need to do format specific handing such as collapsing
-	 * whitespace.
+	 * Do any required post-processing on the TextUnit after endTextUnit is called. Default implementation leaves
+	 * TextUnit unchanged. Override this method if you need to do format specific handing such as collapsing whitespace.
 	 */
 	protected TextUnit postProcessTextUnit(TextUnit textUnit) {
 		return textUnit;
+	}
+
+	public boolean isTextUnitWithSameType(String type) {
+		Event e = peekTempEvent();
+		if (e != null && e.getEventType() == EventType.TEXT_UNIT) {
+			TextUnit tu = (TextUnit) e.getResource();
+			if (tu != null && tu.getType() != null && tu.getType().equals(type)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

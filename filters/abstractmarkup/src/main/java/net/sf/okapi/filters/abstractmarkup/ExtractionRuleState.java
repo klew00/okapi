@@ -23,6 +23,8 @@ package net.sf.okapi.filters.abstractmarkup;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
+import net.htmlparser.jericho.StartTag;
+import net.htmlparser.jericho.Tag;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 /**
@@ -31,16 +33,17 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
  */
 public class ExtractionRuleState {
 
-	private static final class RuleType {
+	public final class RuleType {
 
 		public String ruleName;
 		public RULE_TYPE ruleType;
-
-		public RuleType(String ruleName, RULE_TYPE ruleType) {
+		public String idValue;
+		
+		public RuleType(String ruleName, RULE_TYPE ruleType, String idValue) {
 			this.ruleName = ruleName;
 			this.ruleType = ruleType;
+			this.idValue = idValue;
 		}
-
 	}
 
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
@@ -98,39 +101,63 @@ public class ExtractionRuleState {
 	}
 
 	public void pushPreserverWhitespaceRule(String ruleName) {
-		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE));
+		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE, null));
+	}
+	
+	public void pushPreserverWhitespaceRule(String ruleName, String idValue) {
+		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE, idValue));
 	}
 
-	public void popPreserverWhitespaceRule() {
-		preserveWhiteSpaceRuleStack.pop();
+	public RuleType popPreserverWhitespaceRule() {
+		return preserveWhiteSpaceRuleStack.pop();
 	}
 
 	public void pushExcludedRule(String ruleName) {
-		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.EXCLUDED_ELEMENT));
+		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.EXCLUDED_ELEMENT, null));
+	}
+
+	public void pushExcludedRule(String ruleName, String idValue) {
+		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.EXCLUDED_ELEMENT, idValue));
 	}
 
 	public void pushIncludedRule(String ruleName) {
-		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.INCLUDED_ELEMENT));
+		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.INCLUDED_ELEMENT, null));
+	}
+	
+	public void pushIncludedRule(String ruleName, String idValue) {
+		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.INCLUDED_ELEMENT, idValue));
 	}
 
 	public void pushGroupRule(String ruleName) {
-		groupRuleStack.push(new RuleType(ruleName, RULE_TYPE.GROUP_ELEMENT));
+		groupRuleStack.push(new RuleType(ruleName, RULE_TYPE.GROUP_ELEMENT, null));
+	}
+	
+	public void pushGroupRule(String ruleName, String idValue) {
+		groupRuleStack.push(new RuleType(ruleName, RULE_TYPE.GROUP_ELEMENT, idValue));
 	}
 
 	public void pushTextUnitRule(String ruleName) {
-		textUnitRuleStack.push(new RuleType(ruleName, RULE_TYPE.TEXT_UNIT_ELEMENT));
+		textUnitRuleStack.push(new RuleType(ruleName, RULE_TYPE.TEXT_UNIT_ELEMENT, null));
+	}
+	
+	public void pushTextUnitRule(String ruleName, String idValue) {
+		textUnitRuleStack.push(new RuleType(ruleName, RULE_TYPE.TEXT_UNIT_ELEMENT, idValue));
 	}
 
-	public void popExcludedIncludedRule() {
-		excludedIncludedRuleStack.pop();
+	public RuleType popExcludedIncludedRule() {
+		return excludedIncludedRuleStack.pop();
 	}
 
-	public void popGroupRule() {
-		groupRuleStack.pop();
+	public RuleType popGroupRule() {
+		return groupRuleStack.pop();
 	}
 
-	public void popTextUnitRule() {
-		textUnitRuleStack.pop();
+	public RuleType popTextUnitRule() {
+		return textUnitRuleStack.pop();
+	}
+	
+	public void clearTextUnitRules() {
+		textUnitRuleStack.clear();
 	}
 	
 	public String getTextUnitElementName() {

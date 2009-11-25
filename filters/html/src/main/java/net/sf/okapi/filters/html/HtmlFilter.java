@@ -1,15 +1,22 @@
-/*
- * =========================================================================== Copyright (C) 2008-2009 by the Okapi
- * Framework contributors ----------------------------------------------------------------------------- This library is
- * free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details. You should have received a copy of the GNU Lesser General Public License along with this library; if not,
- * write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA See also the full
- * LGPL text here: http://www.gnu.org/copyleft/lesser.html
- * ===========================================================================
- */
+/*===========================================================================
+  Copyright (C) 2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
 
 package net.sf.okapi.filters.html;
 
@@ -35,6 +42,7 @@ import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccess
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
@@ -58,8 +66,11 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		setName("okf_html"); //$NON-NLS-1$
 		setDisplayName("HTML/XHTML Filter"); //$NON-NLS-1$
 		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.HTML_MIME_TYPE, getClass().getName(),
-				"HTML/XHTML", "HTML and XHTML documents", //$NON-NLS-1$//$NON-NLS-2$
-				Parameters.getDefualtParameterFile()));
+				"HTML", "HTML documents", //$NON-NLS-1$//$NON-NLS-2$
+				Parameters.NONWELLFORMED_PARAMETERS));
+		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.XHTML_MIME_TYPE, getClass().getName(),
+				"XHTML", "XHTML documents", //$NON-NLS-1$//$NON-NLS-2$
+				Parameters.WELLFORMED_PARAMETERS));
 	}
 
 	/**
@@ -102,19 +113,24 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		// reset buffer for next pass
 		bufferedWhitespace.setLength(0);
 		bufferedWhitespace.trimToSize();
+		
+		// let the handlers deal with wellformed content
+		if (getConfig().isWellformed()) {
+			return;
+		}
 
+		// otherwise we can't assume a valid end tag and we must close any TextUnits when we see a non inline tag
 		if (segment instanceof Tag) {
-			// We just hit a tag that could close the current TextUnit, but
-			// only if it was not opened with a TextUnit tag (i.e., complex
-			// TextUnits such as <p> etc.)
+			// We just hit a tag that could close the current TextUnit
 			final Tag tag = (Tag) segment;
 			boolean inlineTag = false;
-			if (getEventBuilder().isInsideTextRun()
-					&& (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
-							|| tag.getTagType() == StartTagType.COMMENT || tag.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION))
+			if (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
+					|| (getEventBuilder().isInsideTextRun() && (tag.getTagType() == StartTagType.COMMENT || tag
+							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION)))
 				inlineTag = true;
 
-			if (getEventBuilder().isCurrentTextUnit() && !getEventBuilder().isCurrentComplexTextUnit() && !inlineTag) {
+			// if its an inline code or TEXTUNIT or GROUP let the handlers deal with it
+			if (getEventBuilder().isCurrentTextUnit() && !inlineTag) {
 				getEventBuilder().endTextUnit();
 			}
 		}
@@ -164,10 +180,6 @@ public class HtmlFilter extends AbstractMarkupFilter {
 				case INCLUDED_ELEMENT:
 					getRuleState().pushIncludedRule(startTag.getName());
 					break;
-				case PRESERVE_WHITESPACE:
-					getRuleState().pushPreserverWhitespaceRule(startTag.getName());
-					setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-					break;
 				}
 				return;
 			}
@@ -200,18 +212,35 @@ public class HtmlFilter extends AbstractMarkupFilter {
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 				break;
 			case TEXT_UNIT_ELEMENT:
-				getRuleState().pushTextUnitRule(startTag.getName());
+				// search for an idAttribute and set it on the newly created TextUnit if found
+				String idValue = null;
+				for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
+					if (propOrText.getAccessType() == PlaceholderAccessType.NAME) {
+						idValue = propOrText.getValue();
+						break;
+					}
+				}
+				getRuleState().pushTextUnitRule(startTag.getName(), idValue);
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
-				break;
-			case PRESERVE_WHITESPACE:
-				getRuleState().pushPreserverWhitespaceRule(startTag.getName());
-				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				setTextUnitName(idValue);
+				setTextUnitType(getConfig().getElementType(startTag.getName()));
 				break;
 			default:
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 			}
 		} finally {
+			// does this tag have a PRESERVE_WHITESPACE rule?
+			if (getConfig().isRuleType(startTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
+				getRuleState().pushPreserverWhitespaceRule(startTag.getName());
+				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+			}
+
+			// A TextUnit may have already been created. Update its preserveWS field
+			if (getEventBuilder().isCurrentTextUnit()) {
+				TextUnit tu = getEventBuilder().peekMostRecentTextUnit();
+				tu.setPreserveWhitespaces(getRuleState().isPreserveWhitespaceState());
+			}
+
 			eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 		}
 	}
@@ -222,6 +251,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	private void handleAttributesThatAppearAnywhere(List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
 			StartTag tag) {
 		switch (getConfig().getMainRuleType(tag.getName())) {
+
 		case TEXT_UNIT_ELEMENT:
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				startTextUnit(new GenericSkeleton(tag.toString()), propertyTextUnitPlaceholders);
@@ -265,10 +295,6 @@ public class HtmlFilter extends AbstractMarkupFilter {
 				case INCLUDED_ELEMENT:
 					getRuleState().popExcludedIncludedRule();
 					break;
-				case PRESERVE_WHITESPACE:
-					getRuleState().popPreserverWhitespaceRule();
-					setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-					break;
 				}
 				return;
 			}
@@ -296,17 +322,16 @@ public class HtmlFilter extends AbstractMarkupFilter {
 				getRuleState().popTextUnitRule();
 				endTextUnit(new GenericSkeleton(endTag.toString()));
 				break;
-			case PRESERVE_WHITESPACE:
-				getRuleState().popPreserverWhitespaceRule();
-				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-
-				addToDocumentPart(endTag.toString());
-				break;
 			default:
 				addToDocumentPart(endTag.toString());
 				break;
 			}
 		} finally {
+			// does this tag have a PRESERVE_WHITESPACE rule?
+			if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
+				getRuleState().popPreserverWhitespaceRule();
+				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+			}
 			eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 		}
 

@@ -42,7 +42,7 @@ public class HtmlEventTest {
 	@Before
 	public void setUp() throws Exception {
 		htmlFilter = new HtmlFilter();
-		parameters = HtmlEventTest.class.getResource("/testConfiguration1.yml");
+		parameters = HtmlEventTest.class.getResource("wellformedConfiguration.yml");
 	}
 	
 	@Test
@@ -146,6 +146,7 @@ public class HtmlEventTest {
 
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Text of p");
+		tu1.setType("paragraph");
 		skel.add("<p ");
 		skel.addReference(tu2);
 		skel.add(" dir='");
@@ -226,6 +227,9 @@ public class HtmlEventTest {
 
 	@Test
 	public void testComplexEmptyElement() {
+		URL originalParameters = parameters;
+		parameters = HtmlFilter.class.getResource("/dummyConfiguration.yml");
+		
 		String snippet = "<dummy write=\"w\" readonly=\"ro\" trans=\"tu1\"/>";
 		ArrayList<Event> events = new ArrayList<Event>();
 
@@ -238,7 +242,7 @@ public class HtmlEventTest {
 		skel.addContentPlaceholder(tu);
 		skel.add("\"");
 		tu.setIsReferent(true);
-		tu.setName("content");
+		tu.setName("trans");
 		tu.setSkeleton(skel);
 		events.add(new Event(EventType.TEXT_UNIT, tu));
 
@@ -257,6 +261,8 @@ public class HtmlEventTest {
 		addEndEvents(events);
 
 		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
+		
+		parameters = originalParameters;
 	}
 
 	@Test
@@ -278,6 +284,7 @@ public class HtmlEventTest {
 
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSourceContent();
 		Code code = new Code(TagType.OPENING, "b", "<b>");
 		code.setType(Code.TYPE_BOLD);
@@ -305,52 +312,57 @@ public class HtmlEventTest {
 
 	@Test
 	public void testPWithComment() {
-		URL originalParameters = parameters;
-		parameters = HtmlFilter.class.getResource("nonwellformedConfiguration.yml");
-		
 		String snippet = "<p>Before <!--comment--> after.</p>";
 		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
-		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp1",false, new GenericSkeleton("<p>"))));
+		GenericSkeleton skel = new GenericSkeleton();
+		
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSourceContent();
 		Code code = new Code(TagType.PLACEHOLDER, Code.TYPE_COMMENT, "<!--comment-->");
 		tf.append(code);
 		tf.append(" after.");
+		
+		skel.append("<p>");
+		skel.addContentPlaceholder(tu1);
+		skel.append("</p>");
+		tu1.setSkeleton(skel);
+		
 		events.add(new Event(EventType.TEXT_UNIT, tu1));
-		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp2",false, new GenericSkeleton("</p>"))));		
+		
 		
 		addEndEvents(events);
 
 		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
-		parameters = originalParameters;
 	}
 
 	@Test
 	public void testPWithProcessingInstruction() {
-		URL originalParameters = parameters;
-		parameters = HtmlFilter.class.getResource("nonwellformedConfiguration.yml");
-
 		String snippet = "<p>Before <?PI?> after.</p>";
 		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
 
-		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp1",false, new GenericSkeleton("<p>"))));
+		GenericSkeleton skel = new GenericSkeleton();
+		
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSourceContent();
 		Code code = new Code(TagType.PLACEHOLDER, Code.TYPE_XML_PROCESSING_INSTRUCTION, "<?PI?>");		
 		tf.append(code);
 		tf.append(" after.");
-		events.add(new Event(EventType.TEXT_UNIT, tu1));
-		events.add(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp2",false, new GenericSkeleton("</p>"))));
+		skel.append("<p>");
+		skel.addContentPlaceholder(tu1);
+		skel.append("</p>");
+		tu1.setSkeleton(skel);
+		events.add(new Event(EventType.TEXT_UNIT, tu1));		
 		
 		addEndEvents(events);
 
 		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
-		parameters = originalParameters;
 	}
 
 	@Test
@@ -428,6 +440,7 @@ public class HtmlEventTest {
 
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSourceContent();
 		Code code = new Code(TagType.OPENING, "b", "<b>");
 		code.setType(Code.TYPE_BOLD);
@@ -466,18 +479,19 @@ public class HtmlEventTest {
 
 		StartGroup g2 = new StartGroup("sg1", "sg2");
 		g2.setSkeleton(new GenericSkeleton("<tr>"));
-		events.add(new Event(EventType.START_GROUP, g2));
+		events.add(new Event(EventType.START_GROUP, g2));		
 
-		StartGroup g3 = new StartGroup("sg2", "sg3");
-		g3.setSkeleton(new GenericSkeleton("<td>"));
-		events.add(new Event(EventType.START_GROUP, g3));
-
-		events.add(new Event(EventType.TEXT_UNIT, new TextUnit("tu1", "text")));
-
-		Ending e1 = new Ending("eg1");
-		e1.setSkeleton(new GenericSkeleton("</td>"));
-		events.add(new Event(EventType.END_GROUP, e1));
-
+		GenericSkeleton skel = new GenericSkeleton();
+		TextUnit tu = new TextUnit("tu1", "text");
+		tu.setType("td");
+		
+		skel.append("<td>");
+		skel.addContentPlaceholder(tu);
+		skel.append("</td>");
+		tu.setSkeleton(skel);
+		events.add(new Event(EventType.TEXT_UNIT, tu));
+		
+		
 		Ending e2 = new Ending("eg2");
 		e2.setSkeleton(new GenericSkeleton("</tr>"));
 		events.add(new Event(EventType.END_GROUP, e2));
@@ -501,50 +515,48 @@ public class HtmlEventTest {
 		ArrayList<Event> events = new ArrayList<Event>();
 
 		addStartEvents(events);
-		
-		GenericSkeleton skel = new GenericSkeleton();
+
+		GenericSkeleton tu3skel = new GenericSkeleton("<p>");
 		TextUnit tu3 = new TextUnit("tu3", "Text before list:");
-		
-		// embedded groups
-		StartGroup g1 = new StartGroup("tu3", "sg1");
+		tu3.setSkeleton(tu3skel);
+		tu3skel.addContentPlaceholder(tu3);
+		tu3.setType("paragraph");
+				
+		// embedded list
+		StartGroup g1 = new StartGroup(tu3.getId(), "sg1");
 		g1.setIsReferent(true);
-		g1.setSkeleton(new GenericSkeleton("<ul>"));
+		g1.setSkeleton(new GenericSkeleton("<ul>"));		
+
+		TextFragment tf = tu3.getSourceContent();
+		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker("sg1"));
+		c.setReferenceFlag(true);
+		tf.append(c);		
 		events.add(new Event(EventType.START_GROUP, g1));
 
-		StartGroup g2 = new StartGroup("sg1", "sg2");
-		g2.setSkeleton(new GenericSkeleton("<li>"));
-		events.add(new Event(EventType.START_GROUP, g2));
-
-		events.add(new Event(EventType.TEXT_UNIT, new TextUnit("tu1", "Text of item 1")));
-		
-		Ending e1 = new Ending("eg1");
-		e1.setSkeleton(new GenericSkeleton("</li>"));
-		events.add(new Event(EventType.END_GROUP, e1));
-
-		StartGroup g3 = new StartGroup("sg1", "sg3");
-		g3.setSkeleton(new GenericSkeleton("<li>"));
-		events.add(new Event(EventType.START_GROUP, g3));
-
-		events.add(new Event(EventType.TEXT_UNIT, new TextUnit("tu2", "Text of item 2")));
-
-		Ending e2 = new Ending("eg2");
-		e2.setSkeleton(new GenericSkeleton("</li>"));
-		events.add(new Event(EventType.END_GROUP, e2));
+		GenericSkeleton tu1skel = new GenericSkeleton();
+		TextUnit tu1 = new TextUnit("tu1", "Text of item 1");		
+		tu1.setType("li");		
+		tu1skel.append("<li>");
+		tu1skel.addContentPlaceholder(tu1);
+		tu1skel.append("</li>");
+		tu1.setSkeleton(tu1skel);		
+		events.add(new Event(EventType.TEXT_UNIT, tu1));
+				
+		GenericSkeleton tu2skel = new GenericSkeleton();
+		TextUnit tu2 = new TextUnit("tu2", "Text of item 2");		
+		tu2.setType("li");
+		tu2skel.append("<li>");
+		tu2skel.addContentPlaceholder(tu2);
+		tu2skel.append("</li>");
+		tu2.setSkeleton(tu2skel);
+		events.add(new Event(EventType.TEXT_UNIT, tu2));
 
 		Ending e3 = new Ending("eg3");
 		e3.setSkeleton(new GenericSkeleton("</ul>"));
 		events.add(new Event(EventType.END_GROUP, e3));
-		
-		TextFragment tf = tu3.getSourceContent();
-		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker("sg1"));
-		c.setReferenceFlag(true);
-		tf.append(c);
-		
-		tf.append("and text after the list.");
-		skel.add("<p>");
-		skel.addContentPlaceholder(tu3);
-		skel.append("</p>");
-		tu3.setSkeleton(skel);
+				
+		tf.append("and text after the list.");				
+		tu3skel.append("</p>");		
 		events.add(new Event(EventType.TEXT_UNIT, tu3));
 		
 		addEndEvents(events);
@@ -560,21 +572,16 @@ public class HtmlEventTest {
 		addStartEvents(events);
 		
 		GenericSkeleton skel = new GenericSkeleton();		
-		DocumentPart dp = new DocumentPart("dp1", false);
-		
-		events.add(new Event(EventType.DOCUMENT_PART, dp));
-		skel.add("<pre>");
-		dp.setSkeleton(skel);
 		
 		TextUnit tu = new TextUnit("tu1", "\twhitespace is preserved");
+		tu.setType("pre");
 		tu.setPreserveWhitespaces(true);
+		skel.append("<pre>");
+		skel.addContentPlaceholder(tu);
+		skel.append("</pre>");
+		tu.setSkeleton(skel);
+	
 		events.add(new Event(EventType.TEXT_UNIT, tu));
-		
-		skel = new GenericSkeleton();
-		dp = new DocumentPart("dp2", false);
-		events.add(new Event(EventType.DOCUMENT_PART, dp));
-		skel.add("</pre>");
-		dp.setSkeleton(skel);
 		
 		addEndEvents(events);
 

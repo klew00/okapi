@@ -37,7 +37,7 @@ public class HtmlFullFileTest {
 		@SuppressWarnings("unused")
 		Event event = null;
 
-		for (String f : testFileList) {			
+		for (String f : testFileList) {				
 			InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/" + f);
 			htmlFilter.open(new RawDocument(htmlStream, "UTF-8", locEN));
 			while (htmlFilter.hasNext()) {
@@ -94,7 +94,7 @@ public class HtmlFullFileTest {
 		assertEquals("Okapi Framework", firstText);
 		assertEquals("\u00A0", lastText);
 	}
-
+	
 	@Test
 	public void testSkippedScriptandStyleElements() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/testStyleScriptStylesheet.html");

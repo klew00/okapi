@@ -67,6 +67,7 @@ public class RoundTripComparison {
 			writer = filter.createFilterWriter();
 		
 			for ( InputDocument doc : inputDocs ) {
+				// DEBUG: System.out.println(doc.path);
 				// Reset the event lists
 				extraction1Events.clear();
 				extraction2Events.clear();

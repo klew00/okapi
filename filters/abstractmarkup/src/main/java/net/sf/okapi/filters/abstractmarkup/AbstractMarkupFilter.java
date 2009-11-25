@@ -65,7 +65,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
-import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 /**
  * Abstract class useful for creating an {@link IFilter} around the Jericho
@@ -283,12 +282,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			Segment segment = nodeIterator.next();
 
 			preProcess(segment);
-
+			
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
 
 				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
-					handleStartTag((StartTag) tag);
+					handleStartTag((StartTag)tag);					
 				} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
 					handleEndTag((EndTag) tag);
 				} else if (tag.getTagType() == StartTagType.DOCTYPE_DECLARATION) {
@@ -309,7 +308,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 					handleServerCommonEscaped(tag);
 				} else { // not classified explicitly by Jericho
 					if (tag instanceof StartTag) {
-						handleStartTag((StartTag) tag);
+						handleStartTag((StartTag) tag);						
 					} else if (tag instanceof EndTag) {
 						handleEndTag((EndTag) tag);
 					} else {
@@ -367,6 +366,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * is to do nothing.
 	 * 
 	 * @param segment
+	 * @return true if the normal handlers can be skipped, false otherwise
 	 */
 	protected void preProcess(Segment segment) {
 	}
@@ -588,6 +588,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 							PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
 							attribute));
+				} else if (getConfig().isIdAttribute(startTag.getName(), attribute.getName(), attrs)) {
+					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+							PlaceholderAccessType.NAME, attribute.getName(), attribute.getValue(), startTag,
+							attribute));
 				}
 			}
 		}
@@ -670,7 +674,15 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void startTextUnit(String text) {
 		getEventBuilder().startTextUnit(text);
 	}
+	
+	protected void setTextUnitName(String name) {
+		getEventBuilder().setTextUnitName(name);
+	}
 
+	protected void setTextUnitType(String type) {
+		getEventBuilder().setTextUnitType(type);
+	}
+	
 	protected boolean canStartNewTextUnit() {
 		return getEventBuilder().canStartNewTextUnit();
 	}
