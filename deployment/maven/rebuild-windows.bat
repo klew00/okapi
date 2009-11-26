@@ -1,5 +1,6 @@
 cd ../../
 call mvn clean
+if ERRORLEVEL 1 goto end
 call mvn install
 if ERRORLEVEL 1 goto end
 

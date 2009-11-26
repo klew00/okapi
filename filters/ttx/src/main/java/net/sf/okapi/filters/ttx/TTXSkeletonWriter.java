@@ -20,8 +20,14 @@
 
 package net.sf.okapi.filters.ttx;
 
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.List;
 
+import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.encoder.IEncoder;
+import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -50,6 +56,11 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 	@Override
 	public String processTextUnit (TextUnit tu) {
 		if ( tu == null ) return "";
+		// Update the encoder from the TU's MIME type
+		if ( encoderManager != null ) {
+			encoderManager.updateEncoder(tu.getMimeType());
+		}
+
 		StringBuilder tmp = new StringBuilder();
 		
 		TextContainer srcCont = tu.getSource();
@@ -94,7 +105,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 				break;
 
 			default:
-				tmp.append(text.charAt(i));
+				tmp.append(encoderManager.encode(text.charAt(i), 0));
 				break;
 			}
 		}
@@ -125,22 +136,36 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		return tmp.toString();
 	}
 
+	/**
+	 * Verifies that this skeleton writer can be used for internal purpose by the TTXFilter
+	 * for outputting skeleton chunks.
+	 * @param lineBreak the type of line-break to use.
+	 */
+	protected void checkForFilterInternalUse (String lineBreak) {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.TTX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+			encoderManager.setDefaultOptions(null, "US-ASCII", lineBreak); // Make sure we escape extended
+			encoderManager.updateEncoder(MimeTypeMapper.TTX_MIME_TYPE);
+		}
+	}
+	
 	protected String processFragment (TextFragment frag) {
 		StringBuilder tmp = new StringBuilder();
 		String text = frag.getCodedText();
 
 		// No MARKER_SEGMENT at this stage
 		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
+			char ch = text.charAt(i);
+			switch ( ch ) {
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_OPENING:
 			case TextFragment.MARKER_CLOSING:
 				tmp.append(expandCode(frag.getCode(text.charAt(++i))));
-				break;
-				
+				continue;
 			default:
-				tmp.append(text.charAt(i));
-				break;
+				tmp.append(encoderManager.encode(ch, 0));
+				continue;
 			}
 		}
 		

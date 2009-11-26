@@ -53,12 +53,12 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	protected LocaleId inputLoc;
 	protected LocaleId outputLoc;
 	protected ILayerProvider layer;
+	protected EncoderManager encoderManager;
 	
 	private LinkedHashMap<String, Referent> referents;
 	private Stack<StorageList> storageStack;
 	private String outputEncoding;
 	private boolean isMultilingual;
-	private EncoderManager encoderManager;
 	
 	private IReferenceable getReference (String id) {
 		if ( referents == null ) return null;

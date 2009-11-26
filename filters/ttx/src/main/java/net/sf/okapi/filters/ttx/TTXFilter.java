@@ -86,7 +86,6 @@ public class TTXFilter implements IFilter {
 	private boolean useDF;
 	private boolean insideContent;
 	private TTXSkeletonWriter skelWriter;
-	private TTXSkeletonWriter specialWriter;
 	
 	public TTXFilter () {
 		params = new Parameters();
@@ -516,13 +515,14 @@ public class TTXFilter implements IFilter {
 
 			// Check if this it is worth sending as text unit
 			if ( !tu.getSource().hasText(true, false) ) {
-				if ( specialWriter == null ) {
-					specialWriter = new TTXSkeletonWriter(params.getForceSegments());
-				}
+				 if ( skelWriter == null ) {
+					 skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+				 }
+				 skelWriter.checkForFilterInternalUse(lineBreak);
 				// Not really a text unit: convert to skeleton
 				// Use the skeleton writer processFragment() to get the output
 				// so any outer data is generated.
-				skel.append(specialWriter.processFragment(tu.getSourceContent()).replace("\n", lineBreak));
+				skel.append(skelWriter.processFragment(tu.getSourceContent()));
 				tu = null;
 				return false; // No return from filter
 			}

@@ -80,6 +80,29 @@ public class TTXFilterTest {
 	}
 
 	@Test
+	public void testBasicWithEscapes () {
+		String snippet = STARTFILENOLB
+			+ "&lt;=lt, &amp;=amp, &gt;=gt, &quot;=quot."
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		assertEquals("<=lt, &=amp, >=gt, \"=quot.", cont.toString());
+	}
+
+	@Test
+	public void testOutputBasicWithEscapes () {
+		String snippet = STARTFILENOLB
+			+ "&lt;=lt, &amp;=amp, &gt;=gt, &quot;=quot."
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "&lt;=lt, &amp;=amp, >=gt, &quot;=quot."
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
+	}
+
+	@Test
 	public void testBasicNoExtractableData () {
 		String snippet = STARTFILE
 			+ " <ut Style=\"external\">some &amp; code</ut>\n\n  <!-- comments-->"
