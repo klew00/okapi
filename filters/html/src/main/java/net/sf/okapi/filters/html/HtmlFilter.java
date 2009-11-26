@@ -66,10 +66,11 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		setName("okf_html"); //$NON-NLS-1$
 		setDisplayName("HTML/XHTML Filter"); //$NON-NLS-1$
 		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.HTML_MIME_TYPE, getClass().getName(),
-				"HTML", "HTML documents", //$NON-NLS-1$//$NON-NLS-2$
+				"HTML", "HTML or XHTML documents", //$NON-NLS-1$
 				Parameters.NONWELLFORMED_PARAMETERS));
-		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.XHTML_MIME_TYPE, getClass().getName(),
-				"XHTML", "XHTML documents", //$NON-NLS-1$//$NON-NLS-2$
+		addConfiguration(new FilterConfiguration(getName()+"-wellFormed",
+				MimeTypeMapper.XHTML_MIME_TYPE, getClass().getName(),
+				"Well-Formed HTML", "XHTML and well-formed HTML documents", //$NON-NLS-1$
 				Parameters.WELLFORMED_PARAMETERS));
 	}
 
