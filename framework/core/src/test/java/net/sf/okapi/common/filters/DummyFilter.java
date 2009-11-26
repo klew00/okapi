@@ -28,6 +28,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
@@ -142,6 +143,12 @@ public class DummyFilter implements IFilter {
 
 	public IFilterWriter createFilterWriter () {
 		return new GenericFilterWriter(createSkeletonWriter());
+	}
+
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setAllKnownMappings();
+		return em;
 	}
 
 	private void reset (String data) {

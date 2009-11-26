@@ -41,6 +41,8 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.*;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -86,7 +88,7 @@ public class OpenXMLFilter implements IFilter {
 	public final static int MSWORDCHART=4; // DWH 4-16-09
 	public final static int MSEXCELCOMMENT=5; // DWH 5-13-09
 	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
-	private final String MIMETYPE = "text/xml";
+	private final String MIMETYPE = MimeTypeMapper.XML_MIME_TYPE;
 	private final String docId = "sd";
 	
 	private ZipFile zipFile;
@@ -216,6 +218,12 @@ public class OpenXMLFilter implements IFilter {
 	 */
 	public IFilterWriter createFilterWriter () {
 		return new OpenXMLZipFilterWriter();
+	}
+
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		em.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		return em;
 	}
 
 	public String getName () {

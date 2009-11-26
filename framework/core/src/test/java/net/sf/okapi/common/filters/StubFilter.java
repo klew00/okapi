@@ -3,6 +3,7 @@ package net.sf.okapi.common.filters;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -82,7 +83,14 @@ public class StubFilter implements IFilter {
 		return list;
     }
 
-    class ParametersStub implements IParameters{
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		// All available encoders by default
+		em.setAllKnownMappings();
+		return em;
+	}
+
+	class ParametersStub implements IParameters{
 
         public void reset() {
             //To change body of implemented methods use File | Settings | File Templates.

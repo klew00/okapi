@@ -28,6 +28,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -85,6 +86,12 @@ public class PensieveFilter implements IFilter {
 			"Pensieve TM",
 			"Configuration for Pensieve translation memories."));
 		return list;
+	}
+
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		// No mapping needed
+		return em;
 	}
 
 	public String getDisplayName () {

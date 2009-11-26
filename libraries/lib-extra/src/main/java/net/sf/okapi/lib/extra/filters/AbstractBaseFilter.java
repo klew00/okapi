@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.lib.extra.OkapiComponent;
@@ -67,6 +68,13 @@ public abstract class AbstractBaseFilter extends OkapiComponent implements IFilt
 		return displayName;
 	}
 	
+	public EncoderManager createEncoderManager () {
+		EncoderManager em = new EncoderManager();
+		// All available encoders by default
+		em.setAllKnownMappings();
+		return em;
+	}
+
 	protected boolean addConfiguration(			
 			boolean clearAllExisting,
 			String configId,

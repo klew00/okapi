@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -123,6 +124,13 @@ public interface IFilter {
 	 */
 	public IFilterWriter createFilterWriter ();
 
+	/**
+	 * Creates a new EncoderManager object for this filter. This encoder manager should
+	 * also provided the mappings to the different MIME types used by the filter.
+	 * @return a new EncoderManager for this filter.
+	 */
+	public EncoderManager createEncoderManager ();
+	
 	/**
 	 * Gets the MIME type of the format supported by this filter.
 	 * @return The MIME type of the format supported by this filter.

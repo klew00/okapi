@@ -38,7 +38,19 @@ import java.io.File;
  */
 public class Writer extends BaseWriter {
 	
-	private static final String   EXTENSION = ".xlf";
+	private static final String EXTENSION = ".xlf";
+	
+	private static final String RESTYPEVALUES = 
+		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
+		+ "checkbox;checkboxmenuitem;checkedlistbox;colorchooser;combobox;comboboxexitem;"
+		+ "comboboxitem;component;contextmenu;ctext;cursor;datetimepicker;defpushbutton;"
+		+ "dialog;dlginit;edit;file;filechooser;fn;font;footer;frame;grid;groupbox;"
+		+ "header;heading;hedit;hscrollbar;icon;iedit;keywords;label;linklabel;list;"
+		+ "listbox;listitem;ltext;menu;menubar;menuitem;menuseparator;message;monthcalendar;"
+		+ "numericupdown;panel;popupmenu;pushbox;pushbutton;radio;radiobuttonmenuitem;rcdata;"
+		+ "row;rtext;scrollpane;separator;shortcut;spinner;splitter;state3;statusbar;string;"
+		+ "tabcontrol;table;textbox;togglebutton;toolbar;tooltip;trackbar;tree;uri;userbutton;"
+		+ "usercontrol;var;versioninfo;vscrollbar;window;";
 
 	protected Options options;
 
@@ -246,8 +258,13 @@ public class Writer extends BaseWriter {
 			writer.writeAttributeString("resname", tmp);
 		}
 		tmp = resource.getType();
-		if (( tmp != null ) && ( tmp.length() != 0 )) {
-			writer.writeAttributeString("restype", tmp);
+		if ( !Util.isEmpty(tmp) ) {
+			if ( tmp.startsWith("x-") || ( RESTYPEVALUES.contains(";"+tmp+";")) ) {
+				writer.writeAttributeString("restype", tmp);
+			}
+			else { // Make sure the value is valid
+				writer.writeAttributeString("restype", "x-"+tmp);
+			}
 		}
 		writer.writeLineBreak();
 	}
@@ -278,8 +295,13 @@ public class Writer extends BaseWriter {
 			writer.writeAttributeString("resname", tmp);
 		}
 		tmp = tu.getType();
-		if (( tmp != null ) && ( tmp.length() != 0 )) {
-			writer.writeAttributeString("restype", tmp);
+		if ( !Util.isEmpty(tmp) ) {
+			if ( tmp.startsWith("x-") || ( RESTYPEVALUES.contains(";"+tmp+";")) ) {
+				writer.writeAttributeString("restype", tmp);
+			}
+			else { // Make sure the value is valid
+				writer.writeAttributeString("restype", "x-"+tmp);
+			}
 		}
 		if ( !tu.isTranslatable() )
 			writer.writeAttributeString("translate", "no");
