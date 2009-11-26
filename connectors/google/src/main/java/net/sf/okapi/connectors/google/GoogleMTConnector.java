@@ -41,18 +41,9 @@ import net.sf.okapi.lib.translation.QueryUtil;
 
 public class GoogleMTConnector implements IQuery {
 
-//	private static final String addressSite = "http://translate.google.com/translate_t";
-//	private static final String baseQuerySite = "?text=%s&hl=en&ie=UTF8&langpair=%s|%s&oe=UTF8";
-//	private static final Pattern patternSite = Pattern.compile("<div\\sid=result_box .*?>(.*?)</div>");
-
 	private static final String addressAjax = "http://ajax.googleapis.com/ajax/services/language/translate";
 	private static final String baseQueryAjax = "?v=1.0&q=%s&langpair=%s|%s";
 
-//	private static final String CLOSING_CODE = "</s>";
-//	private static final int CLOSING_CODE_LENGTH = CLOSING_CODE.length();
-//	private static final Pattern opening = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>");
-//	private static final Pattern isolated = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
-	
 	private String srcLang;
 	private String trgLang;
 	private QueryResult result;
@@ -160,152 +151,6 @@ public class GoogleMTConnector implements IQuery {
 		return ((current==0) ? 1 : 0);
 	}
 
-	/**
-	 * Converts from coded text to coded HTML.
-	 * @param fragment the fragment to convert.
-	 * @return The resulting HTML string.
-	 */
-//	private String toCodedHTML (TextFragment fragment) {
-//		if ( fragment == null ) return "";
-//		Code code;
-//		StringBuilder sb = new StringBuilder();
-//		String text = fragment.getCodedText();
-//		for ( int i=0; i<text.length(); i++ ) {
-//			switch ( text.charAt(i) ) {
-//			case TextFragment.MARKER_OPENING:
-//				code = fragment.getCode(text.charAt(++i));
-//				sb.append(String.format("<s id='%d'>", code.getId()));
-//				break;
-//			case TextFragment.MARKER_CLOSING:
-//				i++;
-//				sb.append("</s>");
-//				break;
-//			case TextFragment.MARKER_ISOLATED:
-//				code = fragment.getCode(text.charAt(++i));
-//				sb.append(String.format("<br id='%d'/>", code.getId()));
-//				break;
-//			case TextFragment.MARKER_SEGMENT:
-//				// Segment-holder text not supported
-//				throw new RuntimeException("Fragment with segment markers are not supported by the Google connector. Send the segments instead.");
-//			case '&':
-//				sb.append("&amp;");
-//				break;
-//			case '<':
-//				sb.append("&lt;");
-//				break;
-//			default:
-//				sb.append(text.charAt(i));
-//			}
-//		}
-//		return sb.toString();
-//	}
-	
-	/**
-	 * Converts back a coded HTML to a coded text.
-	 * @param text the coded HTML to convert back.
-	 * @return the coded text with its code markers.
-	 */
-//	private String fromCodedHTML (String text,
-//		TextFragment fragment)
-//	{
-//		if ( Util.isEmpty(text) ) return "";
-//		text = text.toString().replace("&#39;", "'");
-//		text = text.replace("&lt;", "<");
-//		text = text.replace("&gt;", ">");
-//		text = text.replace("&quot;", "\"");
-//		StringBuilder sb = new StringBuilder();
-//		sb.append(text.replace("&amp;", "&"));
-//
-//		Matcher m = opening.matcher(sb.toString());
-//        while ( m.find() ) {
-//        	// Replace the HTML fake code by the coded text markers
-//        	int id = Util.strToInt(m.group(2), -1);
-//        	String markers = String.format("%c%c", TextFragment.MARKER_OPENING,
-//        		TextFragment.toChar(fragment.getIndex(id)));
-//        	sb.replace(m.start(), m.end(), markers);
-//        	// Search corresponding closing part
-//        	int n = sb.toString().indexOf(CLOSING_CODE);
-//        	// Replace closing code by the coded text markers for closing
-//        	markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
-//        		TextFragment.toChar(fragment.getIndexForClosing(id)));
-//        	sb.replace(n, n+CLOSING_CODE_LENGTH, markers);
-//        	m = opening.matcher(sb.toString());
-//        }
-//        
-//		m = isolated.matcher(sb.toString());
-//        while ( m.find() ) {
-//        	// Replace the HTML fake code by the coded text markers
-//        	int id = Util.strToInt(m.group(2), -1);
-//        	String markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
-//        		TextFragment.toChar(fragment.getIndex(id)));
-//        	sb.replace(m.start(), m.end(), markers);
-//        	m = isolated.matcher(sb.toString());
-//        }
-//
-//		return sb.toString();
-//	}
-
-// Old query, scraping the result page
-//	public int querySite (TextFragment text) {
-//		try {
-//			String qtext = text.getCodedText();
-//			StringBuilder tmpCodes = new StringBuilder();
-//			if ( text.hasCode() ) {
-//				StringBuilder tmpText = new StringBuilder();
-//				for ( int i=0; i<qtext.length(); i++ ) {
-//					switch ( qtext.charAt(i) ) {
-//					case TextFragment.MARKER_OPENING:
-//					case TextFragment.MARKER_CLOSING:
-//					case TextFragment.MARKER_ISOLATED:
-//					case TextFragment.MARKER_SEGMENT:
-//						tmpCodes.append(qtext.charAt(i));
-//						tmpCodes.append(qtext.charAt(++i));
-//						break;
-//					default:
-//						tmpText.append(qtext.charAt(i));
-//					}
-//				}
-//				qtext = tmpText.toString();
-//			}
-//
-//			URL url = new URL(addressSite + String.format(baseQuerySite,
-//				URLEncoder.encode(qtext, "UTF-8"), srcLang, trgLang));
-//			URLConnection conn = url.openConnection();
-//			// Make sure we send a user-agent property, otherwise we get 403 error
-//			conn.setRequestProperty("User-Agent", getClass().getName());
-//
-//			// Get the response
-//	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-//	        StringBuilder res = new StringBuilder();
-//			char[] buf = new char[2048];
-//			int count = 0;
-//			while (( count = rd.read(buf)) != -1 ) {
-//				res.append(buf, 0, count);
-//			}
-//	        rd.close();
-//	        
-//	        Matcher m = patternSite.matcher(res.toString());
-//	        if ( m.find() ) {
-//				result = new QueryResult();
-//				result.source = text;
-//				if ( text.hasCode() ) {
-//					result.target = new TextFragment(unescape(m.group(1))+tmpCodes.toString(),
-//						text.getCodes());
-//				}
-//				else {
-//					result.target = new TextFragment(unescape(m.group(1)));
-//				}
-//				result.score = (text.hasCode() ? 98 : 99);
-//				current = 0;
-//	        }
-//		}
-//		catch ( Throwable e ) {
-//			lastError = e.getMessage();
-//		}
-//
-//		return ((current==0) ? 1 : 0);
-//	}
-	
 	public void setAttribute (String name,
 		String value)
 	{
@@ -334,15 +179,6 @@ public class GoogleMTConnector implements IQuery {
 	public LocaleId getTargetLanguage () {
 		return LocaleId.fromString(trgLang);
 	}
-
-//	private String unescape (String text) {
-//		if ( text == null ) return "";
-//		String tmp = text.replace("&#39;", "'");
-//		tmp = tmp.replace("&lt;", "<");
-//		tmp = tmp.replace("&gt;", ">");
-//		tmp = tmp.replace("&quot;", "\"");
-//		return tmp.replace("&amp;", "&");
-//	}
 
 	private String toInternalCode (LocaleId locale) {
 		String code = locale.toBCP47();

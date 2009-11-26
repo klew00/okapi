@@ -172,9 +172,17 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Make sure we have target content
 		tu.createTarget(trgLang, false, IResource.COPY_ALL);
 
-		// Translate is done before we merge possible segments
-		if ( params.type == Parameters.TYPE_TRANSLATEEXACTMATCHES ) {
+		// Actions done before merging all segments
+		switch ( params.type ) {
+		case Parameters.TYPE_XNREPLACE:
+			replaceWithXN(tu);
+			break;
+		case Parameters.TYPE_TRANSLATEEXACTMATCHES:
 			translate(tu);
+			break;
+		case Parameters.TYPE_EXTREPLACE:
+			replaceWithExtendedChars(tu);
+			break;
 		}
 
 		// Merge all segments if needed
@@ -186,12 +194,6 @@ public class Utility extends BaseFilterDrivenUtility {
 
 		// Other text modification are done after merging all segments
 		switch ( params.type ) {
-		case Parameters.TYPE_XNREPLACE:
-			replaceWithXN(tu);
-			break;
-		case Parameters.TYPE_EXTREPLACE:
-			replaceWithExtendedChars(tu);
-			break;
 		case Parameters.TYPE_KEEPINLINE:
 			removeText(tu);
 			break;
@@ -287,9 +289,6 @@ public class Utility extends BaseFilterDrivenUtility {
 		try {
 			// Target is set if needed
 			QueryResult qr;
-//			if ( tu.getName() != null ) {
-//				tmQ.setAttribute("GroupName", tu.getName());
-//			}
 			TextContainer tc = tu.getTarget(trgLang);
 			if ( tc.isSegmented() ) {
 				int segIndex = 0;
@@ -309,57 +308,76 @@ public class Utility extends BaseFilterDrivenUtility {
 					tu.setTarget(trgLang, tc);
 				}
 			}
-			
 		}
 		catch ( Throwable e ) {
 			logger.log(Level.WARNING, "Error while translating: ", e);
 		}
 	}
 	
-	/**
-	 * Replaces letters with Xs and digits with Ns.
-	 * @param tu the text unit to process.
-	 */
 	private void replaceWithXN (TextUnit tu) {
-		String tmp = null;
+		TextContainer tc = tu.getTarget(trgLang);
 		try {
-			tmp = tu.getTarget(trgLang).getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
-			tmp = tmp.replaceAll("\\p{Ll}", "x");
-			tmp = tmp.replaceAll("\\d", "N");
-			TextContainer cnt = tu.getTarget(trgLang); 
-			cnt.setCodedText(tmp, tu.getTargetContent(trgLang).getCodes(), false);
+			if ( tc.isSegmented() ) {
+				int segIndex = 0;
+				for ( Segment seg : tc.getSegments() ) {
+					seg.text.setCodedText(replaceWithXN(seg.text.getCodedText()));
+					segIndex++;
+				}
+			}
+			else {
+				tc.setCodedText(replaceWithXN(tc.getCodedText()));
+			}
 		}
 		catch ( Throwable e ) {
-			logger.log(Level.WARNING, "Error when updating content: '"+tmp+"'", e);
+			logger.log(Level.WARNING, "Error when updating content: '"+tc.toString()+"'", e);
 		}
+	}
+
+	private String replaceWithXN (String codedText) {
+		codedText = codedText.replaceAll("\\p{Lu}|\\p{Lo}", "X");
+		codedText = codedText.replaceAll("\\p{Ll}", "x");
+		codedText = codedText.replaceAll("\\d", "N");
+		return codedText;
 	}
 	
 	private void replaceWithExtendedChars (TextUnit tu) {
-		StringBuilder tmp = new StringBuilder();
+		TextContainer tc = tu.getTarget(trgLang);
 		try {
-			tmp.append(tu.getTarget(trgLang).getCodedText());
-			int n;
-			for ( int i=0; i<tmp.length(); i++ ) {
-				switch ( tmp.charAt(i) ) {
-				case TextContainer.MARKER_OPENING:
-				case TextContainer.MARKER_CLOSING:
-				case TextContainer.MARKER_ISOLATED:
-				case TextContainer.MARKER_SEGMENT:
-					i++; // Normal skip
-					break;
-				default:
-					if ( (n = OLDCHARS.indexOf(tmp.charAt(i))) > -1 ) {
-						tmp.setCharAt(i, NEWCHARS.charAt(n));
-					}
-					break;
+			if ( tc.isSegmented() ) {
+				int segIndex = 0;
+				for ( Segment seg : tc.getSegments() ) {
+					seg.text.setCodedText(replaceWithExtendedChars(seg.text.getCodedText()));
+					segIndex++;
 				}
 			}
-			TextContainer cnt = tu.getTarget(trgLang); 
-			cnt.setCodedText(tmp.toString(), tu.getTargetContent(trgLang).getCodes(), false);
+			else {
+				tc.setCodedText(replaceWithExtendedChars(tc.getCodedText()));
+			}
 		}
 		catch ( Throwable e ) {
-			logger.log(Level.WARNING, "Error when updating content: '"+tmp.toString()+"'", e);
+			logger.log(Level.WARNING, "Error when updating content: '"+tc.toString()+"'", e);
 		}
+	}
+	
+	private String replaceWithExtendedChars (String codedText) {
+		StringBuilder tmp = new StringBuilder(codedText);
+		int n;
+		for ( int i=0; i<tmp.length(); i++ ) {
+			switch ( tmp.charAt(i) ) {
+			case TextContainer.MARKER_OPENING:
+			case TextContainer.MARKER_CLOSING:
+			case TextContainer.MARKER_ISOLATED:
+			case TextContainer.MARKER_SEGMENT:
+				i++; // Normal skip
+				break;
+			default:
+				if ( (n = OLDCHARS.indexOf(tmp.charAt(i))) > -1 ) {
+					tmp.setCharAt(i, NEWCHARS.charAt(n));
+				}
+				break;
+			}
+		}
+		return tmp.toString();
 	}
 	
 	/**
