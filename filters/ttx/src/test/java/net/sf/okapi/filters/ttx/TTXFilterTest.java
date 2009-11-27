@@ -158,6 +158,20 @@ public class TTXFilterTest {
 	}
 
 	@Test
+	public void testOutputEscapesInSkeleton () {
+		String snippet = STARTFILENOLB
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"![if !IE]&gt;&lt;p&gt;Text &lt;b&gt;&lt;u&gt;non-validating&lt;/u&gt; downlevel-revealed conditional comment&lt;/b&gt; etc &lt;/p&gt;&lt;![\">code</ut>"
+			+ "text"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"![if !IE]&gt;&lt;p&gt;Text &lt;b&gt;&lt;u&gt;non-validating&lt;/u&gt; downlevel-revealed conditional comment&lt;/b&gt; etc &lt;/p&gt;&lt;![\">code</ut>"
+			+ "text"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
+	}
+
+	@Test
 	public void testBasicNoTUWithDF () {
 		String snippet = STARTFILENOLB
 			+ "<df Size=\"16\">text</df>"
@@ -180,6 +194,79 @@ public class TTXFilterTest {
 			+ "</Raw></Body></TRADOStag>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
 			filter2.createSkeletonWriter()));
+	}
+
+	@Test
+	public void testVariousTags () {
+		String snippet = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">&lt;p&gt;</ut>paragraph <df Italic=\"on\">"
+			+ "<ut Type=\"start\">&lt;i&gt;</ut>text</df><ut Type=\"end\">&lt;/i&gt;</ut>"
+			+ "<ut Type=\"end\" Style=\"external\">&lt;/ul&gt;</ut>"
+			+ "<ut Type=\"start\" Style=\"external\">&lt;P&gt;</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		assertEquals("paragraph <1/><2>text<3/></2>", fmt.setContent(cont).toString());
+	}
+	
+	@Test
+	public void testOutputVariousTags () {
+		String snippet = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">&lt;p&gt;</ut>paragraph <df Italic=\"on\">"
+			+ "<ut Type=\"start\">&lt;i&gt;</ut>text</df><ut Type=\"end\">&lt;/i&gt;</ut>"
+			+ "<ut Type=\"end\" Style=\"external\">&lt;/ul&gt;</ut>"
+			+ "<ut Type=\"start\" Style=\"external\">&lt;P&gt;</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">&lt;p&gt;</ut>paragraph <df Italic=\"on\">"
+			+ "<ut Type=\"start\">&lt;i&gt;</ut>text</df><ut Type=\"end\">&lt;/i&gt;</ut>"
+			+ "<ut Type=\"end\" Style=\"external\">&lt;/ul&gt;</ut>"
+			+ "<ut Type=\"start\" Style=\"external\">&lt;P&gt;</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM), locESEM,
+			filter1.createSkeletonWriter()));
+	}
+	
+	@Test
+	public void testOutputVariousTagsWithSegmentation () {
+		String snippet = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">&lt;p&gt;</ut>paragraph <df Italic=\"on\">"
+			+ "<ut Type=\"start\">&lt;i&gt;</ut>text</df><ut Type=\"end\">&lt;/i&gt;</ut>"
+			+ "<ut Type=\"end\" Style=\"external\">&lt;/ul&gt;</ut>"
+			+ "<ut Type=\"start\" Style=\"external\">&lt;P&gt;</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">&lt;p&gt;</ut>"
+			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">paragraph <df Italic=\"on\">"
+			+ "<ut Type=\"start\">&lt;i&gt;</ut>text</df><ut Type=\"end\">&lt;/i&gt;</ut>"
+			+ "</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">paragraph <df Italic=\"on\">"
+			+ "<ut Type=\"start\">&lt;i&gt;</ut>text</df><ut Type=\"end\">&lt;/i&gt;</ut>"
+			+ "</Tuv></Tu>"
+			+ "<ut Type=\"end\" Style=\"external\">&lt;/ul&gt;</ut>"
+			+ "<ut Type=\"start\" Style=\"external\">&lt;P&gt;</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
+			filter2.createSkeletonWriter()));
+	}
+	
+	@Test
+	public void testBadlyNestedTags () {
+		String snippet = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">&lt;p&gt;</ut>"
+			+ "Before <df Size=\"8\"><ut Type=\"start\">&lt;FONT face=Arial size=2&gt;</ut>After"
+			+ "<ut Type=\"start\" Style=\"external\">&lt;p style=&quot;background-color: #e0e0e0&quot;&gt;</ut>"
+			+ "Next</df><ut Type=\"end\">&lt;/FONT&gt;</ut>Last."
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		assertEquals("Before <1/><2/>After", fmt.setContent(cont).toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 2);
+		assertNotNull(tu);
+		cont = tu.getSource();
+//TODO		assertEquals("Next <1/><2/>Last.", fmt.setContent(cont).toString());
 	}
 
 	@Test
@@ -526,7 +613,7 @@ public class TTXFilterTest {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.html.ttx", null));
-//		list.add(new InputDocument(root+"Test02_noseg.html.ttx", null));
+		list.add(new InputDocument(root+"Test02_noseg.html.ttx", null));
 //		list.add(new InputDocument(root+"Test02_allseg.html.ttx", null));
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter1, list, "UTF-8", locENUS, locFRFR));

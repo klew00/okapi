@@ -192,7 +192,6 @@ public class TTXFilter implements IFilter {
 
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-//Removed for Java 1.6			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			
 			//fact.setXMLResolver(new DefaultXMLResolver());
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
@@ -302,7 +301,7 @@ public class TTXFilter implements IFilter {
 	private boolean read () throws XMLStreamException {
 		skel = new GenericSkeleton();
 		buffer.setLength(0);
-		
+
 		while ( true ) {
 			switch ( reader.getEventType() ) {
 			case XMLStreamConstants.START_ELEMENT:
@@ -455,16 +454,16 @@ public class TTXFilter implements IFilter {
 						continue;
 					}
 					else if ( name.equals("df") ) {
+						// We have to use placeholder for df because they don't match ut nesting order
 						dfCount++;
-						idStack.push((inTarget ? ++trgId : ++srcId));
-						Code code = current.append(TagType.OPENING, "x-df", "", idStack.peek());
+						Code code = current.append(TagType.PLACEHOLDER, "x-df", "", -1); //(inTarget ? ++trgId : ++srcId));
 						code.setOuterData(buildStartElement(false));
 						continue;
 					}
 					// Inline to include in this segment
 					TagType tagType = TagType.PLACEHOLDER;
 					String type = "ph";
-					int idToUse = (inTarget ? ++trgId : ++srcId);
+					int idToUse = -1; //(inTarget ? ++trgId : ++srcId);
 					tmp = reader.getAttributeValue(null, "Type");
 					if ( tmp != null ) {
 						if ( tmp.equals("start") ) {
@@ -488,13 +487,14 @@ public class TTXFilter implements IFilter {
 						done = true;
 					}
 					else if ( name.equals("df") ) {
-						if ( --dfCount < 0 ) { // External DF
-							done = true;
-						}
-						else {
-							Code code = current.append(TagType.CLOSING, "x-df", "", idStack.pop());
+//						if ( --dfCount < 0 ) { // External DF
+//							done = true;
+//						}
+//						else {
+							// We have to use placeholder for df because they don't match ut nesting order
+							Code code = current.append(TagType.PLACEHOLDER, "x-df", "", -1); //(inTarget ? ++trgId : ++srcId));
 							code.setOuterData(buildEndElement(false));
-						}
+//						}
 						continue;
 					}
 					// Possible end of segment
@@ -1028,7 +1028,7 @@ public class TTXFilter implements IFilter {
 				outerCode.append(String.format(" %s%s=\"%s\"",
 					(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 					reader.getAttributeLocalName(i),
-					reader.getAttributeValue(i)));
+					Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, true, null)));
 			}
 			outerCode.append(">");
 			
@@ -1063,7 +1063,7 @@ public class TTXFilter implements IFilter {
 						tmpg.append(String.format(" %s%s=\"%s\"",
 							(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 							reader.getAttributeLocalName(i),
-							reader.getAttributeValue(i)));
+							Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, true, null)));
 					}
 					tmpg.append(">");
 					innerCode.append(tmpg.toString());
