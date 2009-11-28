@@ -80,6 +80,7 @@ class ManifestTableModel {
 		ManifestItem mi;
 		for ( int i=0; i<table.getItemCount(); i++ ) {
 			mi = manifest.getItem(i+1); // docID are 1-based
+			if ( mi == null ) continue; // Could be a non-extractable file
 			mi.setSelected(table.getItem(i).getChecked());
 		}
 	}
