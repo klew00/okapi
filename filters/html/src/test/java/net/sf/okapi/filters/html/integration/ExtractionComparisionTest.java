@@ -14,6 +14,7 @@ import net.sf.okapi.filters.html.HtmlUtils;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.LocaleId;
 
 import org.junit.After;
@@ -46,6 +47,17 @@ public class ExtractionComparisionTest {
 				new InputDocument(root + "324.html", null),
 				"UTF-8", locEN, locEN));
 	}
+	
+//TODO: This test does not pass
+//	@Test
+//	public void testOpenTwice () throws URISyntaxException {
+//		File file = new File(root + "324.html");
+//		RawDocument rawDoc = new RawDocument(file.toURI(), "windows-1252", locEN);
+//		htmlFilter.open(rawDoc);
+//		htmlFilter.close();
+//		htmlFilter.open(rawDoc);
+//		htmlFilter.close();
+//	}
 	
 	@Test
 	public void testDoubleExtractionSingle() throws URISyntaxException, MalformedURLException {
