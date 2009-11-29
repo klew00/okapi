@@ -70,7 +70,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 				Parameters.NONWELLFORMED_PARAMETERS));
 		addConfiguration(new FilterConfiguration(getName()+"-wellFormed",
 				MimeTypeMapper.XHTML_MIME_TYPE, getClass().getName(),
-				"Well-Formed HTML", "XHTML and well-formed HTML documents", //$NON-NLS-1$
+				"HTML (Well-Formed)", "XHTML and well-formed HTML documents", //$NON-NLS-1$
 				Parameters.WELLFORMED_PARAMETERS));
 	}
 
