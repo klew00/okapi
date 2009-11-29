@@ -355,15 +355,11 @@ public class TextContainer extends TextFragment {
 		
 		// Remove it from the main content
 		int width = end-start;
-		if ( width > 2 ) {
-			if ( TextFragment.isMarker(text.charAt(end-3)) ) {
-				// We would split a marker, so delete all and insert two chars
-				remove(start, end);
-				insert(start, new TextFragment("ZZ"));
-			}
-			else { // We can re-use the text chars
-				remove(start, end-2);
-			}
+		if ( width >= 2 ) {
+			// Remove the text (and codes) to take out
+			remove(start, end);
+			// Insert room for the segment marker
+			insert(start, new TextFragment("ZZ"));
 		}
 		else if ( width == 1 ) {
 			insert(start, new TextFragment("Z"));
@@ -371,7 +367,6 @@ public class TextContainer extends TextFragment {
 		else if ( width == 0 ) {
 			insert(start, new TextFragment("ZZ"));
 		}
-		// Else width == 2 : Do nothing
 			
 		// Set the segment marker and its corresponding code
 		text.setCharAt(start, (char)MARKER_SEGMENT);

@@ -57,6 +57,7 @@ public class RoundTripComparison {
 		LocaleId srcLoc,
 		LocaleId trgLoc)
 	{
+		String path = null;
 		try {
 			this.filter = filter;
 			this.defaultEncoding = defaultEncoding;
@@ -67,6 +68,7 @@ public class RoundTripComparison {
 			writer = filter.createFilterWriter();
 		
 			for ( InputDocument doc : inputDocs ) {
+				path = doc.path;
 				// DEBUG: System.out.println(doc.path);
 				// Reset the event lists
 				extraction1Events.clear();
@@ -92,6 +94,7 @@ public class RoundTripComparison {
 			}
 		}
 		catch ( Throwable e ) {
+			System.err.println(path);
 			System.err.println(e.getMessage());
 			return false;
 		}

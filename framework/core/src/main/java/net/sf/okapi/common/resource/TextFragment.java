@@ -362,7 +362,8 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Unwraps the content of a TextFragment. All sequences of consecutive white spaces
 	 * are replaced by a single space characters, and any white spaces at the head or
-	 * the end of the text is trimmed out. White spaces here are: space, tab, CR and LF. 
+	 * the end of the text is trimmed out. White spaces here are: space, tab, CR and LF.
+	 * Existing segments are not unwrapped. 
 	 * @param frag the text fragment to unwrap.
 	 */
 	public static void unwrap (TextFragment frag) {
@@ -379,7 +380,7 @@ public class TextFragment implements Comparable<Object> {
 				tmp.append(text.charAt(i));
 				tmp.append(text.charAt(++i));
 				wasWS = false;
-				//TODO: Do we need to do somthing for inline between WS?
+				//TODO: Do we need to do something for inline between WS?
 				break;
 			case ' ':
 			case '\t':
@@ -688,7 +689,7 @@ public class TextFragment implements Comparable<Object> {
 		if ( offset < 0 ) text.append(tmp);
 		else text.insert(offset, tmp);
 		// If there was new codes we will need to re-number and re-balance
-		if ( newCodes.size() > 0 ) renumberCodes(); // renumberCodes() set isBalanced to false
+		//if ( newCodes.size() > 0 ) renumberCodes(); // renumberCodes() set isBalanced to false
 	}
 
 	/**
@@ -980,12 +981,15 @@ public class TextFragment implements Comparable<Object> {
 				case MARKER_SEGMENT:
 					tmpCodes.add(codes.get(toIndex(tmpText.charAt(++i))).clone());
 					tmpText.setCharAt(i, toChar(tmpCodes.size()-1));
+					if ( sub.lastCodeID < tmpCodes.get(tmpCodes.size()-1).id ) {
+						sub.lastCodeID = tmpCodes.get(tmpCodes.size()-1).id;
+					}
 					break;
 				}
 			}
 		}
 		sub.setCodedText(tmpText.toString(), tmpCodes, false);
-		sub.lastCodeID = lastCodeID;
+//		sub.lastCodeID = lastCodeID;
 		return sub;
 	}
 	
@@ -1506,18 +1510,25 @@ public class TextFragment implements Comparable<Object> {
 	
 	/**
 	 * Balances the markers based on the tag type of the codes.
+	 * Closing codes can have -1 as their ID, they will get the Id of their
+	 * matching opening, or a new ID if they are isolated. Closing codes with
+	 * and existing id that found themselves isolated keep the same id.
+	 * This method also reset the last code id value to the highest code id found.
 	 */
 	private void balanceMarkers () {
 		if ( codes == null ) return;
 		lastCodeID = 0;
+		int[] closingIds = new int[codes.size()];
+		int i = 0;
 		for ( Code item : codes ) {
-			// Void all IDs of closing codes
-			if ( item.tagType == TagType.CLOSING ) item.id = -1;
+			// Keep a copy of the original IDs of closing tags
+			if ( item.tagType == TagType.CLOSING ) closingIds[i] = item.id;
 			// And get the highest ID value used
 			if ( item.id > lastCodeID ) lastCodeID = item.id;
+			i++;
 		}
 		// Process the markers
-		for ( int i=0; i<text.length(); i++ ) {
+		for ( i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
@@ -1546,6 +1557,8 @@ public class TextFragment implements Comparable<Object> {
 							else if ( codes.get(j).tagType == TagType.CLOSING ) {
 								if ( --stack == 0 ) {
 									codes.get(j).id = code.id;
+									// Mark this closing code as used (==-99)
+									closingIds[j] = -99;
 									found = true;
 									break;
 								}
@@ -1556,13 +1569,19 @@ public class TextFragment implements Comparable<Object> {
 					else text.setCharAt(i, (char)MARKER_ISOLATED);
 					break;
 				case CLOSING:
-					// If Id is -1, this closing code has no corresponding opening
-					// otherwise its ID is already set
-					if ( code.id == -1 ) {
+					// If id in closingIds is -99: it has been matched (and therefore has id)
+					if ( closingIds[index] == -99 ) {
+						text.setCharAt(i, (char)MARKER_CLOSING);
+					}
+					// If id in closingIds  is -1: it has not been matched and as no id
+					else if ( closingIds[index] == -1 ) {
 						text.setCharAt(i, (char)MARKER_ISOLATED);
 						code.id = ++lastCodeID;
 					}
-					else text.setCharAt(i, (char)MARKER_CLOSING);
+					// otherwise: it has not been matched but it has an id
+					else {
+						text.setCharAt(i, (char)MARKER_ISOLATED);
+					}
 				}
 				i++; // Skip index part of the code marker
 				break;
@@ -1578,7 +1597,7 @@ public class TextFragment implements Comparable<Object> {
 	 * An example of usage is when source and target fragments have codes generated
 	 * from regular expressions and not in the same order.
 	 * For example if the source is <code>%d equals %s</code> and the target is
-	 * <code>%s equals %d</code> and <code>%d</code> and <code>%d</code> are codes.
+	 * <code>%s equals %d</code> and <code>%s</code> and <code>%d</code> are codes.
 	 * You want their IDs to match for the code with the same content.
 	 * @param base the fragment to use as the base for the synchronization.
 	 */

@@ -23,7 +23,6 @@ package net.sf.okapi.filters.ttx;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -127,12 +126,12 @@ public class TTXFilter implements IFilter {
 			getClass().getName(),
 			"TTX",
 			"Configuration for Trados TTX documents."));
-		list.add(new FilterConfiguration(getName()+"-forcedSegmentedOutput",
+		list.add(new FilterConfiguration(getName()+"-noForcedTuv",
 			MimeTypeMapper.TTX_MIME_TYPE,
 			getClass().getName(),
-			"TTX (Forced segmented output)",
-			"Configuration for Trados TTX documents with forced segmented output.",
-			"forcedSegmentedOutput.fprm"));
+			"TTX (without forced Tuv in output)",
+			"Configuration for Trados TTX documents without forcing Tuv in output.",
+			"noForcedTuv.fprm"));
 		return list;
 	}
 	
@@ -395,14 +394,11 @@ public class TTXFilter implements IFilter {
 			TextFragment current = srcCont.getContent();
 			ArrayList<Segment> trgSegments = new ArrayList<Segment>();
 			boolean returnValueAfterTextUnitDone = true;
-			Stack<Integer> idStack = new Stack<Integer>();
 
 			String tmp;
 			String name;
 			boolean moveToNext = false;
 			int dfCount = 0;
-			int srcId = 0;
-			int trgId = 0;
 			boolean done = false;
 			
 			while ( !done ) {
@@ -429,7 +425,6 @@ public class TTXFilter implements IFilter {
 						}
 					}
 					else if ( name.equals("Tu") ) { // New segment
-//						inSegment = true;
 						inTarget = false;
 						srcSegFrag = new TextFragment();
 						trgSegFrag = new TextFragment();
@@ -456,14 +451,14 @@ public class TTXFilter implements IFilter {
 					else if ( name.equals("df") ) {
 						// We have to use placeholder for df because they don't match ut nesting order
 						dfCount++;
-						Code code = current.append(TagType.PLACEHOLDER, "x-df", "", -1); //(inTarget ? ++trgId : ++srcId));
+						Code code = current.append(TagType.PLACEHOLDER, "x-df", "", -1);
 						code.setOuterData(buildStartElement(false));
 						continue;
 					}
 					// Inline to include in this segment
 					TagType tagType = TagType.PLACEHOLDER;
 					String type = "ph";
-					int idToUse = -1; //(inTarget ? ++trgId : ++srcId);
+					int idToUse = -1;
 					tmp = reader.getAttributeValue(null, "Type");
 					if ( tmp != null ) {
 						if ( tmp.equals("start") ) {
@@ -474,8 +469,6 @@ public class TTXFilter implements IFilter {
 							tagType = TagType.CLOSING;
 							type = "Xpt";
 							idToUse = -1;
-							if ( inTarget ) trgId--;
-							else srcId--;
 						}
 					}
 					appendCode(tagType, idToUse, name, type, false, current);
@@ -541,6 +534,9 @@ public class TTXFilter implements IFilter {
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 			skel = new GenericSkeleton();
 			return returnValueAfterTextUnitDone;
+		}
+		catch ( IndexOutOfBoundsException e ) {
+			throw new OkapiIOException("Out of bounds.", e);
 		}
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException("Error processing top-level ut element.", e);

@@ -21,6 +21,7 @@
 package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -31,7 +32,9 @@ import java.util.List;
 import java.util.Set;
 
 public class TextContainerTest {
+	
     private TextContainer tc1;
+    private GenericContent fmt = new GenericContent();
 
     @Before
     public void setUp(){
@@ -156,6 +159,71 @@ public class TextContainerTest {
 	}
 
 	@Test
+	public void testSubSequence () {
+		TextContainer tc = new TextContainer("t1");
+		tc.append(TagType.PLACEHOLDER, "BR1", "<br1/>");
+		tc.append("t2");
+		tc.append(TagType.PLACEHOLDER, "BR2", "<br2/>");
+		assertEquals("t1<br1/>t2<br2/>", tc.toString());
+		TextFragment tf = tc.subSequence(4, -1);
+		assertEquals("t2<br2/>", tf.toString());
+		assertEquals("t2<2/>", fmt.setContent(tf).toString());
+		assertEquals("t1<1/>t2<2/>", fmt.setContent(tc).toString());
+	}
+	
+	@Test
+	public void testCreateSegmentWithPHCodes () {
+		TextContainer tc = new TextContainer("t1");
+		tc.append(TagType.PLACEHOLDER, "BR1", "<br1/>");
+		tc.append("t2");
+		tc.append(TagType.PLACEHOLDER, "BR2", "<br2/>");
+		assertEquals("t1<br1/>t2<br2/>", tc.toString());
+		tc.createSegment(4, -1);
+		assertEquals("t1<br1/>0", tc.toString());
+		assertEquals("t2<2/>", fmt.setContent(tc.getSegments().get(0).text).toString());
+	}
+	
+	@Test
+	public void testCreateSegmentWithPairedCodes () {
+		TextContainer tc = new TextContainer("t1");
+		tc.append(TagType.OPENING, "b", "<b>");
+		tc.append("t2");
+		tc.append(TagType.CLOSING, "b", "</b>");
+		assertEquals("t1<b>t2</b>", tc.toString());
+		tc.createSegment(2, -1);
+		assertEquals("t10", tc.toString());
+		assertEquals("<1>t2</1>", fmt.setContent(tc.getSegments().get(0).text).toString());
+	}
+	
+	@Test
+	public void testCreateSegmentWithSplitCodes () {
+		TextContainer tc = new TextContainer("t1");
+		tc.append(TagType.OPENING, "b", "<b>");
+		tc.append("t2");
+		tc.append(TagType.CLOSING, "b", "</b>");
+		assertEquals("t1<b>t2</b>", tc.toString());
+		tc.createSegment(4, -1);
+		assertEquals("t1<b>0", tc.toString());
+		assertEquals("t2<1/>", fmt.setContent(tc.getSegments().get(0).text).toString());
+	}
+	
+	@Test
+	public void testCreateMultiSegmentsWithSplitCodes () {
+		TextContainer tc = new TextContainer("t1");
+		tc.append(TagType.OPENING, "b", "<b>");
+		tc.append("t2");
+		tc.append(TagType.CLOSING, "b", "</b>");
+		tc.append("t3");
+		tc.append(TagType.PLACEHOLDER, "br", "<br/>");
+		assertEquals("t1<1>t2</1>t3<2/>", fmt.setContent(tc).toString());
+		tc.createSegment(0, 4);
+		assertEquals("<-1/>t2<1/>t3<2/>", fmt.setContent(tc).toString());
+		tc.createSegment(2, -1);
+		assertEquals("t1<1/>", fmt.setContent(tc.getSegments().get(0).text).toString());
+		assertEquals("t2<1/>t3<2/>", fmt.setContent(tc.getSegments().get(1).text).toString());
+	}
+	
+	@Test
 	public void testHasTextWithSegmentWithText () {
 		tc1.append("text");
 		tc1.createSegment(0, 4);
@@ -213,15 +281,17 @@ public class TextContainerTest {
 		tc1.appendSegment(tf);
 		return tc1;
 	}
-	
+
 	private TextContainer createMultiSegmentContentWithCodes () {
 		TextFragment tf = new TextFragment("text1");
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		tc1.appendSegment(tf);
 		tc1.append(' ');
-		
 		tf = new TextFragment("text2");
-		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		Code code = tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		// Segmented text have continuous code IDs sequence across segments
+		// they do not restart at 1 for each segment
+		code.id = 2;
 		tc1.appendSegment(tf);
 		return tc1;
 	}

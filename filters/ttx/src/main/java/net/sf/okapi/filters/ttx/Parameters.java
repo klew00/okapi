@@ -45,7 +45,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	public void reset () {
-		forceSegments = false;
+		forceSegments = true;
 	}
 
 	public void fromString (String data) {

@@ -35,6 +35,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -355,6 +356,16 @@ public class XMLFilterTest {
 		assertEquals("value 1", tu.getSource().toString());
 	}
 	
+	@Test
+	public void testOpenTwice () throws URISyntaxException {
+		File file = new File(root+"test01.xml");
+		RawDocument rawDoc = new RawDocument(file.toURI(), "windows-1252", locEN);
+		filter.open(rawDoc);
+		filter.close();
+		filter.open(rawDoc);
+		filter.close();
+	}
+
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {
 		// Read all files in the data directory

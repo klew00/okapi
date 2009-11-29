@@ -637,7 +637,14 @@ public class XLIFFFilter implements IFilter {
 			// Get the text content
 			tc = processContent(isSegSource ? "seg-source" : "source", true);
 			// Put the source in the alt-trans annotation
-			if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+			if ( !preserveSpaces.peek() ) {
+				TextFragment.unwrap(tc.getContent());
+				if ( isSegSource && tc.isSegmented() ) { // Un-wrap segments content as well
+					for ( int i=0; i<tc.getSegmentCount(); i++ ) {
+						TextFragment.unwrap(tc.getSegments().get(i).text);
+					}
+				}
+			}
 			// Store in altTrans only when we are within alt-trans
 			if ( altTrans != null ) {
 				if ( isSegSource ) {
@@ -831,7 +838,7 @@ public class XLIFFFilter implements IFilter {
 					}
 					// Other cases
 					if ( name.equals("g") || name.equals("mrk") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
 						idStack.push(id);
 						code = current.append(TagType.OPENING, name, "", id);
 						// Get the outer code
@@ -863,32 +870,33 @@ public class XLIFFFilter implements IFilter {
 						code.setOuterData(tmpg.toString());
 					}
 					else if ( name.equals("x") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
 						appendCode(TagType.PLACEHOLDER, id, name, name, store, current);
 					}
 					else if ( name.equals("bx") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
 						appendCode(TagType.OPENING, id, name, "Xpt", store, current);
 					}
 					else if ( name.equals("ex") ) {
-						// No support for overlapping codes yet
-						appendCode(TagType.CLOSING, -1, name, "Xpt", store, current);
+						// No support for overlapping codes (use -1 as default)
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), true);
+						appendCode(TagType.CLOSING, id, name, "Xpt", store, current);
 					}
 					else if ( name.equals("bpt") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
 						appendCode(TagType.OPENING, id, name, "Xpt", store, current);
 					}
 					else if ( name.equals("ept") ) {
-						// We assume balanced codes for now, so we use the current one
-						//TODO: Change this to handle overlapping cases
-						appendCode(TagType.CLOSING, -1, name, "Xpt", store, current);
+						// No support for overlapping codes (use -1 as default)
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), true);
+						appendCode(TagType.CLOSING, id, name, "Xpt", store, current);
 					}
 					else if ( name.equals("ph") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
 						appendCode(TagType.PLACEHOLDER, id, name, name, store, current);
 					}
 					else if ( name.equals("it") ) {
-						id = retrieveId(id, reader.getAttributeValue(null, "id"));
+						id = retrieveId(id, reader.getAttributeValue(null, "id"), false);
 						tmp = reader.getAttributeValue(null, "pos");
 						TagType tt = TagType.PLACEHOLDER;
 						if ( tmp == null ) {
@@ -918,9 +926,12 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	private int retrieveId (int currentIdValue,
-		String id)
+		String id,
+		boolean useMinusOneasDefault)
 	{
-		if (( id == null ) || ( id.length() == 0 )) return ++currentIdValue;
+		if (( id == null ) || ( id.length() == 0 )) {
+			return (useMinusOneasDefault ? -1 : ++currentIdValue);
+		}
 		try {
 			return Integer.valueOf(id);
 		}
