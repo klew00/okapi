@@ -57,7 +57,7 @@ public class RainbowTest {
     public void testRewriting () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputFile("potest.rbout.po"));
-    	assertEquals(0, runRainbow("-np -x oku_textrewriting potest.po -o potest.rbout.po -opt rewriting.opt"));
+    	assertEquals(0, runRainbow("-np -x oku_textrewriting potest.po -o potest.rbout.po -te windows-1252 -opt rewriting.opt"));
     	assertTrue("File different from gold", compareWithGoldFile("potest.rbout.po"));
     }
 
