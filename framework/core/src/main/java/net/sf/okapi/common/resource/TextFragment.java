@@ -1548,32 +1548,84 @@ public class TextFragment implements Comparable<Object> {
 				case OPENING:
 					// Search for corresponding closing code
 					boolean found = false;
-					int stack = 1;
+					boolean fixupMode = false;
+					int candidate = -1;
+					int stackElem = 1;
+					int stackType = 1;
 					for ( int j=index+1; j<codes.size(); j++ ) {
 						if ( codes.get(j).type.equals(code.type) ) {
 							if ( codes.get(j).tagType == TagType.OPENING ) {
-								stack++;
+								stackElem++;
+								stackType++;
 							}
 							else if ( codes.get(j).tagType == TagType.CLOSING ) {
-								if ( --stack == 0 ) {
-									codes.get(j).id = code.id;
-									// Mark this closing code as used (==-99)
-									closingIds[j] = -99;
-									found = true;
-									break;
+								stackElem--;
+								stackType--;
+								if ( fixupMode ) { // Searching for closing code after overlapping is detected
+									//if (( candidate == -1 ) && ( closingIds[j] == -1 )) candidate = j;
+									if ( stackType == 0 ){
+										candidate = j;
+										// Stop now, but do not set this as 'found' 
+										break;
+									}
+									continue;
+								}
+								// Else: Normal process
+								if ( stackElem == 0 ) {
+									if ( stackType == 0 ) {
+										codes.get(j).id = code.id;
+										// Mark this closing code as used (==-99)
+										closingIds[j] = -99;
+										found = true;
+										break;
+									}
+									// Else: Not the proper element order
+									fixupMode = true;
+								}
+								else if ( stackElem > 0 ) {
+									// Remember possible closing code candidate in case of overlapping
+									//if (( candidate == -1 ) && ( closingIds[j] == -1 )) candidate = j;
+									if ( stackType == 0 ) candidate = j;
+								}
+								else { // stack < 0 (we are past the proper spot)
+									// Do we have a candidate available?
+									if ( candidate != -1 ) break; // Stop now, but do not set this as 'found'
+									// Starting with this one
+									//if (( candidate == -1 ) && ( closingIds[j] == -1 )) {
+									if ( stackType == 0 ) {
+										candidate = j;
+										break;
+									}
+									// Else: no candidate yet, try to find one
+									fixupMode = true; 
 								}
 							}
 						}
+						else { // Different types
+							if ( codes.get(j).tagType == TagType.OPENING ) stackElem++;
+							else if ( codes.get(j).tagType == TagType.CLOSING ) stackElem--;
+							if ( stackElem == 0 ) {
+								fixupMode = true;
+							}
+						}
 					}
-					if ( found ) text.setCharAt(i, (char)MARKER_OPENING);
-					else text.setCharAt(i, (char)MARKER_ISOLATED);
+					if ( found ) {
+						text.setCharAt(i, (char)MARKER_OPENING);
+					}
+					else {
+						if ( candidate != -1 ) {
+							codes.get(candidate).id = code.id;
+							closingIds[candidate] = -88;
+						}
+						text.setCharAt(i, (char)MARKER_ISOLATED);
+					}
 					break;
 				case CLOSING:
 					// If id in closingIds is -99: it has been matched (and therefore has id)
 					if ( closingIds[index] == -99 ) {
 						text.setCharAt(i, (char)MARKER_CLOSING);
 					}
-					// If id in closingIds  is -1: it has not been matched and as no id
+					// If id in closingIds is -1: it has not been matched and as no id
 					else if ( closingIds[index] == -1 ) {
 						text.setCharAt(i, (char)MARKER_ISOLATED);
 						code.id = ++lastCodeID;

@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -93,6 +94,10 @@ public class XLIFFMergingStep {
 			xlfReader.open(xlfRawDoc);
 	
 			filter = fcMapper.createFilter(skelRawDoc.getFilterConfigId(), filter);
+			if ( filter == null ) {
+				throw new OkapiFilterCreationException(String.format("Cannot create the filter or load the configuration for '%s'",
+					skelRawDoc.getFilterConfigId()));
+			}
 			filter.open(skelRawDoc);
 
 			writer = filter.createFilterWriter();

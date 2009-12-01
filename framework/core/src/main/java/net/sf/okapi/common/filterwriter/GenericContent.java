@@ -30,6 +30,7 @@ import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.InvalidPositionException;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
  * Handles the conversion between a coded text object and a generic markup string.
@@ -41,6 +42,8 @@ public class GenericContent {
 	private Pattern patternOpening = Pattern.compile("\\<(\\d*?)\\>");
 	private Pattern patternClosing = Pattern.compile("\\</(\\d*?)\\>");
 	private Pattern patternIsolated = Pattern.compile("\\<(\\d*?)/\\>");
+	private Pattern patternIsolatedB = Pattern.compile("\\<b(\\d*?)/\\>");
+	private Pattern patternIsolatedE = Pattern.compile("\\<e(\\d*?)/\\>");
 
 	public GenericContent () {
 		codedText = "";
@@ -103,7 +106,17 @@ public class GenericContent {
 			case TextFragment.MARKER_ISOLATED:
 				code = container.getCode(text.charAt(++i));
 				if ( normalText ) tmp.append(code.toString());
-				else tmp.append(String.format("<%d/>", code.getId()));
+				else {
+					if ( code.getTagType() == TagType.OPENING ) {
+						tmp.append(String.format("<b%d/>", code.getId()));
+					}
+					else if ( code.getTagType() == TagType.CLOSING ) {
+						tmp.append(String.format("<e%d/>", code.getId()));
+					}
+					else {
+						tmp.append(String.format("<%d/>", code.getId()));
+					}
+				}
 				break;
 			case TextFragment.MARKER_SEGMENT:
 				code = container.getCode(text.charAt(++i));
@@ -154,7 +167,17 @@ public class GenericContent {
 			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				if ( normalText ) tmp.append(codes.get(index).toString());
-				else tmp.append(String.format("<%d/>", codes.get(index).getId()));
+				else {
+					if ( codes.get(index).getTagType() == TagType.OPENING ) {
+						tmp.append(String.format("<b%d/>", codes.get(index).getId()));
+					}
+					else if ( codes.get(index).getTagType() == TagType.CLOSING ) {
+						tmp.append(String.format("<e%d/>", codes.get(index).getId()));
+					}
+					else {
+						tmp.append(String.format("<%d/>", codes.get(index).getId()));
+					}
+				}
 				break;
 			default:
 				tmp.append(codedText.charAt(i));
@@ -190,7 +213,15 @@ public class GenericContent {
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
-				genericPos += String.format("<%d/>", codes.get(index).getId()).length();
+				if ( codes.get(index).getTagType() == TagType.OPENING ) {
+					genericPos += String.format("<b%d/>", codes.get(index).getId()).length();
+				}
+				else if ( codes.get(index).getTagType() == TagType.CLOSING ) {
+					genericPos += String.format("<e%d/>", codes.get(index).getId()).length();
+				}
+				else {
+					genericPos += String.format("<%d/>", codes.get(index).getId()).length();
+				}
 				codedPos += 2;
 				break;
 			default:
@@ -269,6 +300,30 @@ public class GenericContent {
 		}
 		start = diff = 0;
 		m = patternIsolated.matcher(tmp.toString());
+		while ( m.find(start) ) {
+			n = m.start();
+			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			if ( index == -1 )
+				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		start = diff = 0;
+		m = patternIsolatedB.matcher(tmp.toString());
+		while ( m.find(start) ) {
+			n = m.start();
+			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			if ( index == -1 )
+				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		start = diff = 0;
+		m = patternIsolatedE.matcher(tmp.toString());
 		while ( m.find(start) ) {
 			n = m.start();
 			index = fragment.getIndex(Integer.valueOf(m.group(1)));

@@ -109,7 +109,7 @@ public class QueryManagerTest {
 		qm.adjustNewFragment(tu.getSourceContent(), tf, tf, false, tu);
 		assertEquals("T <b>BOLD T <br/><EXTRA/>", tf.toString());
 		fmt.setContent(tf);
-		assertEquals("T <1/>BOLD T <2/><3/>", fmt.toString());
+		assertEquals("T <b1/>BOLD T <2/><3/>", fmt.toString());
 	}
 
 	private TextUnit createTextUnit1 () {

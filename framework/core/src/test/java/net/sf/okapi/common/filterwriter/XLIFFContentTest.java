@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common.filterwriter;
 
-import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -28,33 +27,61 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class GenericContentTest {
+public class XLIFFContentTest {
 
-	private GenericContent fmt;
-	
+	private XLIFFContent fmt;
+
 	@Before
 	public void setUp() throws Exception {
-		fmt = new GenericContent();
+		fmt = new XLIFFContent();
 	}
 	
 	@Test
-	public void testSimple_Default () {
+	public void testSimpleDefault () {
 		TextFragment tf = createTextUnit();
 		assertEquals(tf.getCodes().size(), 5);
-		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf).toString());
+		assertEquals("t1<bpt id=\"1\">&lt;b1&gt;</bpt><bpt id=\"2\">&lt;b2&gt;</bpt><ph id=\"3\">{\\x1\\}</ph>t2<ept id=\"2\">&lt;/b2&gt;</ept><ept id=\"1\">&lt;/b1&gt;</ept>t3",
+			fmt.setContent(tf).toString());
 	}
 	
 	@Test
-	public void testSimple_WithOption () {
+	public void testSimpleGX () {
 		TextFragment tf = createTextUnit();
 		assertEquals(tf.getCodes().size(), 5);
-		fmt.setContent(tf);
-		assertEquals("t1<b1><b2><x1/>t2</b2></b1>t3", fmt.toString(true));
-		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.toString(false));
+		assertEquals("t1<g id=\"1\"><g id=\"2\"><x id=\"3\"/>t2</g></g>t3",
+			fmt.setContent(tf).toString(true));
+	}
+
+	@Test
+	public void testMisOrderedGX () {
+		TextFragment tf = createMisOrderedTextUnit();
+		assertEquals(tf.getCodes().size(), 4);
+		assertEquals("t1<bx id=\"1\"/>t2<bx id=\"2\"/>t3<ex id=\"1\"/>t4<ex id=\"2\"/>t5",
+			fmt.setContent(tf).toString(true));
 	}
 	
 	@Test
-	public void testMisOrderedCodes () {
+	public void testMisOrderedComplexGX () {
+		TextFragment tf = createMisOrderedComplexTextUnit();
+		assertEquals(tf.getCodes().size(), 8);
+		assertEquals("<bx id=\"1\"/><bx id=\"2\"/><g id=\"3\"></g><ex id=\"1\"/><bx id=\"4\"/><ex id=\"2\"/><ex id=\"4\"/>",
+			fmt.setContent(tf).toString(true));
+	}
+	
+	private TextFragment createTextUnit () {
+		TextFragment tf = new TextFragment();
+		tf.append("t1");
+		tf.append(TagType.OPENING, "b1", "<b1>");
+		tf.append(TagType.OPENING, "b2", "<b2>");
+		tf.append(TagType.PLACEHOLDER, "x1", "{\\x1\\}");
+		tf.append("t2");
+		tf.append(TagType.CLOSING, "b2", "</b2>");
+		tf.append(TagType.CLOSING, "b1", "</b1>");
+		tf.append("t3");
+		return tf;
+	}
+	
+	private TextFragment createMisOrderedTextUnit () {
 		TextFragment tf = new TextFragment();
 		tf.append("t1");
 		tf.append(TagType.OPENING, "b1", "<b1>");
@@ -65,22 +92,19 @@ public class GenericContentTest {
 		tf.append("t4");
 		tf.append(TagType.CLOSING, "b2", "</b2>");
 		tf.append("t5");
-		fmt.setContent(tf);
-		// Not real XML so mis-ordering is OK
-		assertEquals("t1<b1>t2<b2>t3</b1>t4</b2>t5", fmt.toString(true));
-		assertEquals("t1<b1/>t2<b2/>t3<e1/>t4<e2/>t5", fmt.toString(false));
+		return tf;
 	}
-	
-	private TextFragment createTextUnit () {
+
+	private TextFragment createMisOrderedComplexTextUnit () {
 		TextFragment tf = new TextFragment();
-		tf.append("t1");
 		tf.append(TagType.OPENING, "b1", "<b1>");
 		tf.append(TagType.OPENING, "b2", "<b2>");
-		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
-		tf.append("t2");
+		tf.append(TagType.OPENING, "b2", "<b2>");
 		tf.append(TagType.CLOSING, "b2", "</b2>");
 		tf.append(TagType.CLOSING, "b1", "</b1>");
-		tf.append("t3");
+		tf.append(TagType.OPENING, "b3", "<b3>");
+		tf.append(TagType.CLOSING, "b2", "</b2>");
+		tf.append(TagType.CLOSING, "b3", "</b3>");
 		return tf;
 	}
 	

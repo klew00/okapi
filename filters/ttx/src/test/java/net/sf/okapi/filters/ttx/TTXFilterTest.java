@@ -262,7 +262,7 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals("Before <1/><2/>After", fmt.setContent(cont).toString());
+		assertEquals("Before <1/><b2/>After", fmt.setContent(cont).toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 2);
 		assertNotNull(tu);
 		cont = tu.getSource();

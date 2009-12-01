@@ -204,7 +204,7 @@ public class TextContainerTest {
 		assertEquals("t1<b>t2</b>", tc.toString());
 		tc.createSegment(4, -1);
 		assertEquals("t1<b>0", tc.toString());
-		assertEquals("t2<1/>", fmt.setContent(tc.getSegments().get(0).text).toString());
+		assertEquals("t2<e1/>", fmt.setContent(tc.getSegments().get(0).text).toString());
 	}
 	
 	@Test
@@ -217,10 +217,10 @@ public class TextContainerTest {
 		tc.append(TagType.PLACEHOLDER, "br", "<br/>");
 		assertEquals("t1<1>t2</1>t3<2/>", fmt.setContent(tc).toString());
 		tc.createSegment(0, 4);
-		assertEquals("<-1/>t2<1/>t3<2/>", fmt.setContent(tc).toString());
+		assertEquals("<-1/>t2<e1/>t3<2/>", fmt.setContent(tc).toString());
 		tc.createSegment(2, -1);
-		assertEquals("t1<1/>", fmt.setContent(tc.getSegments().get(0).text).toString());
-		assertEquals("t2<1/>t3<2/>", fmt.setContent(tc.getSegments().get(1).text).toString());
+		assertEquals("t1<b1/>", fmt.setContent(tc.getSegments().get(0).text).toString());
+		assertEquals("t2<e1/>t3<2/>", fmt.setContent(tc.getSegments().get(1).text).toString());
 	}
 	
 	@Test
