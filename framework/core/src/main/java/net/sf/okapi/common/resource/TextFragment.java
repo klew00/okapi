@@ -1522,7 +1522,7 @@ public class TextFragment implements Comparable<Object> {
 		int i = 0;
 		for ( Code item : codes ) {
 			// Keep a copy of the original IDs of closing tags
-			if ( item.tagType == TagType.CLOSING ) closingIds[i] = item.id;
+			closingIds[i] = item.id;
 			// And get the highest ID value used
 			if ( item.id > lastCodeID ) lastCodeID = item.id;
 			i++;
@@ -1548,6 +1548,21 @@ public class TextFragment implements Comparable<Object> {
 				case OPENING:
 					// Search for corresponding closing code
 					boolean found = false;
+					// First look for a closing code with the same id/type
+					for ( int j=index+1; j<codes.size(); j++ ) {
+						if (( codes.get(j).tagType == TagType.CLOSING ) && codes.get(j).type.equals(code.type) ) {
+							if ( codes.get(j).id == code.id ) {
+								// Found it
+								found = true;
+								// Mark this closing code as used (==-99)
+								closingIds[j] = -99;
+								text.setCharAt(i, (char)MARKER_OPENING);
+								break;
+							}
+						}
+					}
+					if ( found ) break; // Done for this code
+					//===== If not found: try to balance the opening
 					boolean fixupMode = false;
 					int candidate = -1;
 					int stackElem = 1;
@@ -1563,7 +1578,7 @@ public class TextFragment implements Comparable<Object> {
 								stackType--;
 								if ( fixupMode ) { // Searching for closing code after overlapping is detected
 									//if (( candidate == -1 ) && ( closingIds[j] == -1 )) candidate = j;
-									if ( stackType == 0 ){
+									if (( stackType == 0 ) && ( closingIds[j] != -99 )) {
 										candidate = j;
 										// Stop now, but do not set this as 'found' 
 										break;
@@ -1572,7 +1587,7 @@ public class TextFragment implements Comparable<Object> {
 								}
 								// Else: Normal process
 								if ( stackElem == 0 ) {
-									if ( stackType == 0 ) {
+									if (( stackType == 0 ) && ( closingIds[j] != -99 )) {
 										codes.get(j).id = code.id;
 										// Mark this closing code as used (==-99)
 										closingIds[j] = -99;
@@ -1584,15 +1599,15 @@ public class TextFragment implements Comparable<Object> {
 								}
 								else if ( stackElem > 0 ) {
 									// Remember possible closing code candidate in case of overlapping
-									//if (( candidate == -1 ) && ( closingIds[j] == -1 )) candidate = j;
-									if ( stackType == 0 ) candidate = j;
+									if (( stackType == 0 ) && ( closingIds[j] != -99 )) {
+										candidate = j;
+									}
 								}
 								else { // stack < 0 (we are past the proper spot)
 									// Do we have a candidate available?
 									if ( candidate != -1 ) break; // Stop now, but do not set this as 'found'
 									// Starting with this one
-									//if (( candidate == -1 ) && ( closingIds[j] == -1 )) {
-									if ( stackType == 0 ) {
+									if (( stackType == 0 ) && ( closingIds[j] != -99 )) {
 										candidate = j;
 										break;
 									}
@@ -1609,6 +1624,7 @@ public class TextFragment implements Comparable<Object> {
 							}
 						}
 					}
+					// Now set the result
 					if ( found ) {
 						text.setCharAt(i, (char)MARKER_OPENING);
 					}

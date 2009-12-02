@@ -62,6 +62,23 @@ public class XLIFFFilterTest {
 		root = TestUtil.getParentDir(this.getClass(), "/JMP-11-Test01.xlf");
 	}
 
+//TODO	@Test
+//	public void testMisOrderedCodes () {
+//		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+//			+ "<xliff version=\"1.2\">"
+//			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+//			+ "<body>"
+//			+ "<trans-unit id=\"1\"><source>"
+//			+ "<g id=\"1\"><g id=\"2\"></g></g><bx id=\"3\"/><x id=\"4\"/><bx id=\"5\"/><ex id=\"3\"/><bx id=\"6\"/>"
+//			+ "</source></trans-unit>"
+//			+ "</body>"
+//			+ "</file></xliff>";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		assertNotNull(tu);
+//		assertEquals("<1><2></2></1><b3/><4/><b5/><e3/><b6/>",
+//			fmt.setContent(tu.getSourceContent()).toString());
+//	}
+
 	@Test
 	public void testSegmentedTarget () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"

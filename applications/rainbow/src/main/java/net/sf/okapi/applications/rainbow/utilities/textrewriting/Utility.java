@@ -169,8 +169,11 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 		
 		// Else: do the requested modifications
-		// Make sure we have target content
-		tu.createTarget(trgLang, true, IResource.COPY_ALL);
+		tu.createTarget(trgLang, false, IResource.COPY_ALL);
+		// If the target is empty we use the source
+		if ( tu.getTarget(trgLang).isEmpty() ) {
+			tu.createTarget(trgLang, true, IResource.COPY_ALL);
+		}
 
 		// Actions done before merging all segments
 		switch ( params.type ) {

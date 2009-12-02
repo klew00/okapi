@@ -135,8 +135,11 @@ public class TextModificationStep extends BasePipelineStep {
 		}
 		
 		// Else: do the requested modifications
-		// Make sure we have target content
-		tu.createTarget(targetLocale, true, IResource.COPY_ALL);
+		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
+		// If the target is empty we use the source
+		if ( tu.getTarget(targetLocale).isEmpty() ) {
+			tu.createTarget(targetLocale, true, IResource.COPY_ALL);
+		}
 
 		// Merge all segments if needed
 		if ( params.segment || params.markSegments ) {
