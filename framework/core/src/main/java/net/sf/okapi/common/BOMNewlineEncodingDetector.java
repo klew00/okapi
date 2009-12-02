@@ -1,42 +1,26 @@
-// Jericho HTML Parser - Java based library for analysing and manipulating HTML
-// Version 3.0-beta1
-// Copyright (C) 2007 Martin Jericho
-// http://jerichohtml.sourceforge.net/
-//
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of either one of the following licences:
-//
-// 1. The Eclipse Public License (EPL) version 1.0,
-// included in this distribution in the file licence-epl-1.0.html
-// or available at http://www.eclipse.org/legal/epl-v10.html
-//
-// 2. The GNU Lesser General Public License (LGPL) version 2.1 or later,
-// included in this distribution in the file licence-lgpl-2.1.txt
-// or available at http://www.gnu.org/licenses/lgpl.txt
-//
-// This library is distributed on an "AS IS" basis,
-// WITHOUT WARRANTY OF ANY KIND, either express or implied.
-// See the individual licence texts for more details.
+/*
+ * Jericho HTML Parser - Java based library for analysing and manipulating HTML Version 3.0-beta1 Copyright (C) 2007
+ * Martin Jericho http://jerichohtml.sourceforge.net/ This library is free software; you can redistribute it and/or
+ * modify it under the terms of either one of the following licences: 1. The Eclipse Public License (EPL) version 1.0,
+ * included in this distribution in the file licence-epl-1.0.html or available at
+ * http://www.eclipse.org/legal/epl-v10.html 2. The GNU Lesser General Public License (LGPL) version 2.1 or later,
+ * included in this distribution in the file licence-lgpl-2.1.txt or available at http://www.gnu.org/licenses/lgpl.txt
+ * This library is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * individual licence texts for more details.
+ */
 
-/*===========================================================================
- Copyright (C) 2008-2009 by the Okapi Framework contributors
- -----------------------------------------------------------------------------
- This library is free software; you can redistribute it and/or modify it 
- under the terms of the GNU Lesser General Public License as published by 
- the Free Software Foundation; either version 2.1 of the License, or (at 
- your option) any later version.
-
- This library is distributed in the hope that it will be useful, but 
- WITHOUT ANY WARRANTY; without even the implied warranty of 
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
- General Public License for more details.
-
- You should have received a copy of the GNU Lesser General Public License 
- along with this library; if not, write to the Free Software Foundation, 
- Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
- See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
- ===========================================================================*/
+/*
+ * =========================================================================== Additonal changes Copyright (C) 2008-2009
+ * by the Okapi Framework contributors -----------------------------------------------------------------------------
+ * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version. This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details. You should have received a copy of the GNU Lesser General Public License along with this
+ * library; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+ * ===========================================================================
+ */
 
 package net.sf.okapi.common;
 
@@ -46,11 +30,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 
 /**
- * Helper class to detect byte-order-mark and other easily guessed of encodings,
- * as well as the type of line-break used in a given input. Based on information
- * in: http://www.w3.org/TR/REC-xml/#sec-guessing-no-ext-info
+ * Helper class to detect byte-order-mark and other easily guessed of encodings, as well as the type of line-break used
+ * in a given input. Based on information in: http://www.w3.org/TR/REC-xml/#sec-guessing-no-ext-info
  * http://www.w3.org/TR/html401/charset.html#h-5.2
  */
 public final class BOMNewlineEncodingDetector {
@@ -88,7 +72,17 @@ public final class BOMNewlineEncodingDetector {
 			public String toString() {
 				return "\r\n";
 			}
+		},
+		
+		/**
+		 * UNKOWN
+		 */
+		UNKOWN {
+			public String toString() {
+				return null;
+			}
 		}
+		
 	}
 
 	/**
@@ -162,34 +156,45 @@ public final class BOMNewlineEncodingDetector {
 	private boolean hasUtf8Bom;
 	private boolean hasUtf7Bom;
 	private boolean hasBom;
-	private int maxLookahead = MAX_LOOKAHEAD;
 	private boolean autodetected;
+	private NewlineType newlineType = NewlineType.UNKOWN;
 
 	/**
-	 * Create a new BOMNewlineEncodingDetector from an {@link InputStream}.
-	 * Cannot detect {@link NewlineType} unless a valid encoding is detected.
+	 * Create a new BOMNewlineEncodingDetector from an {@link InputStream}. Cannot detect {@link NewlineType} unless a
+	 * valid encoding is detected.
 	 * 
 	 * @param inputStream
 	 */
 	public BOMNewlineEncodingDetector(final InputStream inputStream) {
-		this.inputStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
-		inputStream.mark(4);
+		if (inputStream.markSupported()) {
+			this.inputStream = inputStream;
+		} else {
+			this.inputStream = new BufferedInputStream(inputStream);
+		}
+
+		inputStream.mark(8192);
 		autodetected = false;
 		bomSize = 0;
 	}
 
 	/**
-	 * Create a new BOMNewlineEncodingDetector from an {@link InputStream} and a
-	 * user provided encoding. This BOMNewlineEncodingDetector can convert the
-	 * input bytes to Unicode for detection of the {@link NewlineType}
+	 * Create a new BOMNewlineEncodingDetector from an {@link InputStream} and a user provided encoding. This
+	 * BOMNewlineEncodingDetector can convert the input bytes to Unicode for detection of the {@link NewlineType}
 	 * 
 	 * @param inputStream
-	 * @param defaultEncoding	
+	 * @param defaultEncoding
 	 */
-	public BOMNewlineEncodingDetector(final InputStream inputStream, String defaultEncoding)  {
+	public BOMNewlineEncodingDetector(final InputStream inputStream, String defaultEncoding) {
 		this.defaultEncoding = defaultEncoding;
-		this.inputStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
-		inputStream.mark(4);
+
+		if (inputStream.markSupported()) {
+			this.inputStream = inputStream;
+		} else {
+			this.inputStream = new BufferedInputStream(inputStream);
+			inputStream.mark(MAX_LOOKAHEAD);
+		}
+
+		inputStream.mark(8192);
 		autodetected = false;
 		bomSize = 0;
 	}
@@ -221,46 +226,39 @@ public final class BOMNewlineEncodingDetector {
 
 	}
 
-	public NewlineType getNewlineType(int maxLookahead) {
-		this.maxLookahead = maxLookahead;
-		NewlineType newlineType = getNewlineType();
-		this.maxLookahead = MAX_LOOKAHEAD;
-		return newlineType;
-	}
-
-	/**
-	 * Detects newline type using the inputStream itself.
-	 * 
-	 * @return the detected or guessed {@link NewlineType}
-	 */
-	public NewlineType getNewlineType() {
+	private void setNewlineType() {
 		int c;
 		int count = 0;
 		Reader reader = null;
-		inputStream.mark(maxLookahead);
 		try {
 			reader = openReader();
 			while ((c = reader.read()) != -1) {
 				// passed our buffer size if we didn't find any new lines yet
 				// then set the default and warn.
-				if (++count > maxLookahead) {
+				if (++count > MAX_LOOKAHEAD) {
 					LOGGER.log(Level.WARNING,
 							"Could not find newlines within lookahead buffer. Setting default newline type.");
 					break;
 				}
 
-				if (c == '\n')
-					return NewlineType.LF;
+				if (c == '\n') {
+					newlineType = NewlineType.LF;
+					return;
+				}
 				if (c == '\r') {
 					int c2 = reader.read();
-					if (c2 == -1)
-						return NewlineType.CR;
-					else
-						return ((char) c2 == '\n') ? NewlineType.CRLF : NewlineType.CR;
+					if (c2 == -1) {
+						newlineType = NewlineType.CR;
+						return;
+					}
+					else {
+						newlineType = ((char) c2 == '\n') ? NewlineType.CRLF : NewlineType.CR;
+						return;
+					}
 				}
 			}
 		} catch (IOException e) {
-			throw new OkapiIOException("I/O Error getting newline type", e);			
+			throw new OkapiUnsupportedEncodingException("I/O Error getting newline type", e);
 		} finally {
 			try {
 				inputStream.reset();
@@ -271,12 +269,27 @@ public final class BOMNewlineEncodingDetector {
 
 		// must guess the newline type, none detected
 		if (System.getProperty("line.separator").equals("\r\n")) {
-			return NewlineType.CRLF;
+			newlineType = NewlineType.CRLF;
+			return;
 		}
 		if (System.getProperty("line.separator").equals("\n")) {
-			return NewlineType.LF;
+			newlineType = NewlineType.LF;
+			return;
 		}
-		return NewlineType.CR;
+
+		newlineType = NewlineType.CR;
+	}
+
+	/**
+	 * Detects newline type using the inputStream itself.
+	 * 
+	 * @return the detected or guessed {@link NewlineType}
+	 */
+	public NewlineType getNewlineType() {
+		if (newlineType == NewlineType.UNKOWN) {
+			setNewlineType();
+		}
+		return newlineType;
 	}
 
 	/**
@@ -289,9 +302,8 @@ public final class BOMNewlineEncodingDetector {
 	}
 
 	/**
-	 * Get the guessed encoding or if encoding couldn't be guessed return the
-	 * user supplied encoding. If no user supplied encoding is found use
-	 * ISO_8859_1.
+	 * Get the guessed encoding or if encoding couldn't be guessed return the user supplied encoding. If no user
+	 * supplied encoding is found use ISO_8859_1.
 	 * 
 	 * @return the guessed or user supplied encoding.
 	 */
@@ -311,16 +323,14 @@ public final class BOMNewlineEncodingDetector {
 	/**
 	 * Are we confident of the document encoding?
 	 * 
-	 * @return true if the encoding is obvious from the BOM or bytes, false if
-	 *         the encoding must be guessed.
+	 * @return true if the encoding is obvious from the BOM or bytes, false if the encoding must be guessed.
 	 */
 	public boolean isDifinitive() {
 		return definitive;
 	}
 
 	private Reader openReader() throws UnsupportedEncodingException {
-		// encoding==null only if input stream is empty so use an arbitrary
-		// encoding.
+		// encoding==null only if input stream is empty so use an arbitrary encoding.
 		if (encoding == null)
 			return new InputStreamReader(inputStream, ISO_8859_1);
 		if (!Charset.isSupported(encoding))
@@ -337,6 +347,11 @@ public final class BOMNewlineEncodingDetector {
 	public void detectBom() {
 		try {
 			detectBomInternal();
+			try {
+				setNewlineType();
+			} catch (OkapiUnsupportedEncodingException e) {
+				// skip if encoding not recognized
+			}
 		} catch (IOException e) {
 			throw new OkapiIOException("Error detecting Byte Order Mark (BOM)", e);
 		}
@@ -345,11 +360,17 @@ public final class BOMNewlineEncodingDetector {
 	public void detectAndRemoveBom() {
 		try {
 			detectBomInternal();
-			if (hasBom()) {								
-					long skipped = inputStream.skip(getBomSize()); // skip bom bytes	
-					if (skipped != getBomSize()) {
-						throw new IOException("The number of bytes skipped is not equal to the expected BOM size");
-					}                   
+			try {
+				setNewlineType();
+			} catch (OkapiUnsupportedEncodingException e) {
+				// skip if encoding not recognized
+			}
+			if (hasBom()) {
+				long skipped = inputStream.skip(getBomSize()); // skip bom bytes
+				inputStream.mark(8192);
+				if (skipped != getBomSize()) {
+					throw new IOException("The number of bytes skipped is not equal to the expected BOM size");
+				}
 			}
 		} catch (IOException e) {
 			throw new OkapiIOException("Error detecting Byte Order Mark (BOM)", e);
@@ -362,7 +383,6 @@ public final class BOMNewlineEncodingDetector {
 		hasBom = false;
 
 		try {
-			inputStream.mark(5);
 			final int b1 = inputStream.read();
 			if (b1 == -1) {
 				return setEncoding(null, "empty input stream");
@@ -447,37 +467,27 @@ public final class BOMNewlineEncodingDetector {
 			LOGGER.log(Level.FINE, "BOM not found. Now trying to guess document encoding.");
 
 			/*
-			 * The best we can do is to provide an encoding that reflects the
-			 * correct number and ordering of bytes for characters in the ASCII
-			 * range. The result will be one of ISO_8859_1, EBCDIC, UTF_16BE,
-			 * UTF_16LE, UTF_32BE or UTF_32LE. Assumes 00 bytes indicate
-			 * multi-byte encodings rather than the presence of NUL characters
-			 * or characters with a code that is a multiple of 0x100.
+			 * The best we can do is to provide an encoding that reflects the correct number and ordering of bytes for
+			 * characters in the ASCII range. The result will be one of ISO_8859_1, EBCDIC, UTF_16BE, UTF_16LE, UTF_32BE
+			 * or UTF_32LE. Assumes 00 bytes indicate multi-byte encodings rather than the presence of NUL characters or
+			 * characters with a code that is a multiple of 0x100.
 			 */
 			if (b4 == -1) {
 				/*
-				 * The stream contains between 1 and 3 bytes. This means the
-				 * document can't possibly specify the encoding, so make a best
-				 * guess based on the first 3 bytes.
-				 * 
-				 * It might be possible to rule out some encodings based on
-				 * these bytes, but it is impossible to make a definite
-				 * determination. The main thing to determine is whether it is
-				 * an 8-bit or 16-bit encoding. In order to guess the most
-				 * likely encoding, assume that the text contains only ASCII
-				 * characters, and that any 00 bytes indicate a 16-bit encoding.
-				 * The only strictly 8-bit encoding guaranteed to be supported
-				 * on all java platforms is ISO-8859-1 (UTF-8 uses a variable
-				 * number of bytes per character). If no 00 bytes are present it
-				 * is safest to assume ISO-8859-1, as this accepts the full
-				 * range of values 00-FF in every byte.
+				 * The stream contains between 1 and 3 bytes. This means the document can't possibly specify the
+				 * encoding, so make a best guess based on the first 3 bytes. It might be possible to rule out some
+				 * encodings based on these bytes, but it is impossible to make a definite determination. The main thing
+				 * to determine is whether it is an 8-bit or 16-bit encoding. In order to guess the most likely
+				 * encoding, assume that the text contains only ASCII characters, and that any 00 bytes indicate a
+				 * 16-bit encoding. The only strictly 8-bit encoding guaranteed to be supported on all java platforms is
+				 * ISO-8859-1 (UTF-8 uses a variable number of bytes per character). If no 00 bytes are present it is
+				 * safest to assume ISO-8859-1, as this accepts the full range of values 00-FF in every byte.
 				 */
 				if (b2 == -1 || b3 != -1)
 					return setEncoding(ISO_8859_1, "default 8-bit ASCII-compatible encoding (stream 3 bytes long)"); // The
 				/*
-				 * stream contains exactly 1 or 3 bytes, so assume an 8-bit
-				 * encoding regardless of whether any 00 bytes are present. The
-				 * stream contains exactly 2 bytes.
+				 * stream contains exactly 1 or 3 bytes, so assume an 8-bit encoding regardless of whether any 00 bytes
+				 * are present. The stream contains exactly 2 bytes.
 				 */
 				if (b1 == 0)
 					return setEncoding(UTF_16BE,
@@ -489,27 +499,22 @@ public final class BOMNewlineEncodingDetector {
 				return setEncoding(defaultEncoding, "default encoding: " + defaultEncoding);
 			}
 			/*
-			 * Stream contains at least 4 bytes. The patterns used for
-			 * documentation are made up of: 0 - zero byte X - non-zero byte ? -
-			 * byte value not yet determined
+			 * Stream contains at least 4 bytes. The patterns used for documentation are made up of: 0 - zero byte X -
+			 * non-zero byte ? - byte value not yet determined
 			 */
 			if (b1 == 0) {
 				// pattern 0???
 				if (b2 == 0)
 					return setEncoding(UTF_32BE, "default 32-bit BE encoding (byte stream starts with 00 00)"); // pattern
 				/*
-				 * 00?? most likely indicates UTF-32BE pattern 0X?? Regardless
-				 * of the final two bytes, assume that the first two bytes
-				 * indicate a 16-bit BE encoding. There are many circumstances
-				 * where this could be an incorrect assumption, for example: -
-				 * UTF-16LE encoding with first character U+0100 (or any other
-				 * character whose code is a multiple of 100Hex) - any encoding
-				 * with first character NUL - UTF-32BE encoding with first
-				 * character outside of Basic Multilingual Plane (BMP) Checking
-				 * the final two bytes might give some clues as to whether any
-				 * of these other situations are more likely, but none of the
-				 * clues will yield less than a 50% chance that the encoding is
-				 * in fact UTF-16BE as suggested by the first two bytes.
+				 * 00?? most likely indicates UTF-32BE pattern 0X?? Regardless of the final two bytes, assume that the
+				 * first two bytes indicate a 16-bit BE encoding. There are many circumstances where this could be an
+				 * incorrect assumption, for example: - UTF-16LE encoding with first character U+0100 (or any other
+				 * character whose code is a multiple of 100Hex) - any encoding with first character NUL - UTF-32BE
+				 * encoding with first character outside of Basic Multilingual Plane (BMP) Checking the final two bytes
+				 * might give some clues as to whether any of these other situations are more likely, but none of the
+				 * clues will yield less than a 50% chance that the encoding is in fact UTF-16BE as suggested by the
+				 * first two bytes.
 				 */
 				return setEncoding(UTF_16BE, "default 16-bit BE encoding (byte stream starts with 00)"); // >=50%
 				/*
@@ -527,25 +532,19 @@ public final class BOMNewlineEncodingDetector {
 				 */
 				return setEncoding(UTF_16LE, "default 16-bit LE encoding (byte stream stars with pattern XX ?? XX 00)"); // Regardless
 				/*
-				 * of the second byte, assume the fourth 00 byte indicates
-				 * UTF-16LE.
+				 * of the second byte, assume the fourth 00 byte indicates UTF-16LE.
 				 */
 			}
 			// pattern X??X
 			if (b2 == 0) {
 				/*
-				 * pattern X0?X Assuming the second 00 byte doesn't indicate a
-				 * NUL character, and that it is very unlikely that this is a
-				 * 32-bit encoding of a character outside of the BMP, we can
-				 * assume that it indicates a 16-bit encoding. If the pattern is
-				 * X00X, there is a 50/50 chance that the encoding is BE or LE,
-				 * with one of the characters have a code that is a multiple of
-				 * 0x100. This should be a very rare occurrence, and there is no
-				 * more than a 50% chance that the encoding will be different to
-				 * that assumed (UTF-16LE) without checking for this occurrence,
-				 * so don't bother checking for it. If the pattern is X0XX, this
-				 * is likely to indicate a 16-bit LE encoding with the second
-				 * character > U+00FF.
+				 * pattern X0?X Assuming the second 00 byte doesn't indicate a NUL character, and that it is very
+				 * unlikely that this is a 32-bit encoding of a character outside of the BMP, we can assume that it
+				 * indicates a 16-bit encoding. If the pattern is X00X, there is a 50/50 chance that the encoding is BE
+				 * or LE, with one of the characters have a code that is a multiple of 0x100. This should be a very rare
+				 * occurrence, and there is no more than a 50% chance that the encoding will be different to that
+				 * assumed (UTF-16LE) without checking for this occurrence, so don't bother checking for it. If the
+				 * pattern is X0XX, this is likely to indicate a 16-bit LE encoding with the second character > U+00FF.
 				 */
 				return setEncoding(UTF_16LE, "default 16-bit LE encoding (byte stream starts with pattern XX 00 ?? XX)");
 			}
@@ -553,11 +552,9 @@ public final class BOMNewlineEncodingDetector {
 			if (b3 == 0)
 				return setEncoding(UTF_16BE, "default 16-bit BE encoding (byte stream starts with pattern XX XX 00 XX)"); // pattern
 			/*
-			 * XX0X likely to indicate a 16-bit BE encoding with the first
-			 * character > U+00FF. pattern XXXX Although it is still possible
-			 * that this is a 16-bit encoding with the first two characters >
-			 * U+00FF Assume the more likely case of four 8-bit characters <=
-			 * U+00FF. Check whether it fits some common EBCDIC strings that
+			 * XX0X likely to indicate a 16-bit BE encoding with the first character > U+00FF. pattern XXXX Although it
+			 * is still possible that this is a 16-bit encoding with the first two characters > U+00FF Assume the more
+			 * likely case of four 8-bit characters <= U+00FF. Check whether it fits some common EBCDIC strings that
 			 * might be found at the start of a document:
 			 */
 			if (b1 == 0x4C) { // first character is EBCDIC '<' (ASCII 'L'),
@@ -577,25 +574,19 @@ public final class BOMNewlineEncodingDetector {
 				if ((b2 & b3 & b4 & 0x80) != 0)
 					return setEncoding(EBCDIC, "default EBCDIC-compatible encoding (HTML element detected)"); // all
 				/*
-				 * of the 3 bytes after the '<' have the high-order bit set,
-				 * indicating EBCDIC letters such as "<HTM", or "<htm" although
-				 * this is not an exhaustive check for EBCDIC, it is safer to
-				 * assume a more common preliminary encoding if none of these
-				 * conditions are met.
+				 * of the 3 bytes after the '<' have the high-order bit set, indicating EBCDIC letters such as "<HTM",
+				 * or "<htm" although this is not an exhaustive check for EBCDIC, it is safer to assume a more common
+				 * preliminary encoding if none of these conditions are met.
 				 */
 			}
 
 			/*
-			 * Now confident that it is not EBCDIC, but some other 8-bit
-			 * encoding. Most other 8-bit encodings are compatible with ASCII.
-			 * Since a document specified encoding requires only ASCII
-			 * characters, just choose an arbitrary 8-bit preliminary encoding.
-			 * UTF-8 is however not a good choice as it is not strictly an 8-bit
-			 * encoding. UTF-8 bytes with a value >= 0x80 indicate the presence
-			 * of a multi-byte character, and there are many byte values that
-			 * are illegal. Therefore, choose the only true 8-bit encoding that
-			 * accepts all byte values and is guaranteed to be available on all
-			 * java implementations.
+			 * Now confident that it is not EBCDIC, but some other 8-bit encoding. Most other 8-bit encodings are
+			 * compatible with ASCII. Since a document specified encoding requires only ASCII characters, just choose an
+			 * arbitrary 8-bit preliminary encoding. UTF-8 is however not a good choice as it is not strictly an 8-bit
+			 * encoding. UTF-8 bytes with a value >= 0x80 indicate the presence of a multi-byte character, and there are
+			 * many byte values that are illegal. Therefore, choose the only true 8-bit encoding that accepts all byte
+			 * values and is guaranteed to be available on all java implementations.
 			 */
 			return setEncoding(defaultEncoding, "default encoding: " + defaultEncoding);
 		} finally {
@@ -633,8 +624,7 @@ public final class BOMNewlineEncodingDetector {
 	/**
 	 * Indicates if the guessed encoding is UTF-8 and this file has a BOM.
 	 * 
-	 * @return True if the guessed encoding is UTF-8 and this file has a BOM,
-	 *         false otherwise.
+	 * @return True if the guessed encoding is UTF-8 and this file has a BOM, false otherwise.
 	 */
 	public boolean hasUtf8Bom() {
 		return hasUtf8Bom;
@@ -650,8 +640,7 @@ public final class BOMNewlineEncodingDetector {
 	}
 
 	/**
-	 * Indicates if the guessed encoding was auto-detected. If not it is the
-	 * default encoding that was provided.
+	 * Indicates if the guessed encoding was auto-detected. If not it is the default encoding that was provided.
 	 * 
 	 * @return True if the guessed encoding was auto-detected, false if not.
 	 */
@@ -667,7 +656,7 @@ public final class BOMNewlineEncodingDetector {
 	public int getBomSize() {
 		return bomSize;
 	}
-	
+
 	public boolean hasUtf8Encoding() {
 		return getEncoding().equals(BOMNewlineEncodingDetector.UTF_8) ? true : false;
 	}

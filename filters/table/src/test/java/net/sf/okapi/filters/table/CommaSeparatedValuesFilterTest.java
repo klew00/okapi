@@ -286,9 +286,9 @@ public class CommaSeparatedValuesFilterTest {
 		InputStream input = null;
 		try {			
 			filter.open(new RawDocument(input, "UTF-8", locEN));
-			fail("OkapiIOException should've been trown");
+			fail("IllegalArgumentException should've been trown");
 		}	
-		catch (OkapiIOException e) {
+		catch (IllegalArgumentException e) {
 		}
 		finally {
 			filter.close();
@@ -298,9 +298,9 @@ public class CommaSeparatedValuesFilterTest {
 		URI uri = null;
 		try {
 			filter.open(new RawDocument(uri, "UTF-8", locEN));
-			fail("OkapiIOException should've been trown");
+			fail("IllegalArgumentException should've been trown");
 		}	
-		catch (OkapiIOException e) {
+		catch (IllegalArgumentException e) {
 		}
 		finally {
 			filter.close();
@@ -310,9 +310,9 @@ public class CommaSeparatedValuesFilterTest {
 		String st = null;
 		try {
 			filter.open(new RawDocument(st, locEN, locEN));
-			fail("OkapiIOException should've been trown");
+			fail("IllegalArgumentException should've been trown");
 		}	
-		catch (OkapiIOException e) {
+		catch (IllegalArgumentException e) {
 		}
 		finally {
 			filter.close();

@@ -233,7 +233,7 @@ public class TmxFilterTest {
 		FilterTestDriver.getStartDocument(getEvents(invalidElementInsidePlaceholderSnippet, locENUS,locFRFR));
 	}
 	
-	@Test (expected=OkapiIOException.class)
+	@Test(expected=IllegalArgumentException.class)
 	public void testOpenInvalidInputStream() {
 		InputStream nullStream=null;
 		filter.open(new RawDocument(nullStream,"UTF-8",locENUS,locFRFR));			

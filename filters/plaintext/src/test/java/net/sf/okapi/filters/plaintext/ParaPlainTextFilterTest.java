@@ -92,9 +92,9 @@ public class ParaPlainTextFilterTest {
 		InputStream input = null;
 		try {
 			filter.open(new RawDocument(input, "UTF-8", locEN));
-			fail("OkapiIOException should've been trown");
+			fail("IllegalArgumentException should've been trown");
 		}	
-		catch (OkapiIOException e) {
+		catch (IllegalArgumentException e) {
 		}
 		finally {
 			filter.close();
@@ -104,9 +104,9 @@ public class ParaPlainTextFilterTest {
 		URI uri = null;
 		try {
 			filter.open(new RawDocument(uri, "UTF-8", locEN));
-			fail("OkapiIOException should've been trown");
+			fail("IllegalArgumentException should've been trown");
 		}	
-		catch (OkapiIOException e) {
+		catch (IllegalArgumentException e) {
 		}
 		finally {
 			filter.close();
@@ -116,9 +116,9 @@ public class ParaPlainTextFilterTest {
 		String st = null;
 		try {
 			filter.open(new RawDocument(st, locEN, locEN));
-			fail("OkapiIOException should've been trown");
+			fail("IllegalArgumentException should've been trown");
 		}	
-		catch (OkapiIOException e) {
+		catch (IllegalArgumentException e) {
 		}
 		finally {
 			filter.close();
@@ -578,7 +578,8 @@ public class ParaPlainTextFilterTest {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
 			assertTrue(res instanceof TextUnit);
-			
+			System.out.println(res.toString());
+			System.out.println(expectedText);
 			assertEquals(expectedText, res.toString());
 			break;
 			

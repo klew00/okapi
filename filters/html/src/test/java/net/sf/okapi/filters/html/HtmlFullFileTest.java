@@ -1,11 +1,14 @@
 package net.sf.okapi.filters.html;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
@@ -23,7 +26,7 @@ public class HtmlFullFileTest {
 
 	@Before
 	public void setUp() throws Exception {
-		htmlFilter = new HtmlFilter();		
+		htmlFilter = new HtmlFilter();
 		testFileList = HtmlUtils.getHtmlTestFiles();
 	}
 
@@ -37,7 +40,7 @@ public class HtmlFullFileTest {
 		@SuppressWarnings("unused")
 		Event event = null;
 
-		for (String f : testFileList) {				
+		for (String f : testFileList) {
 			InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/" + f);
 			htmlFilter.open(new RawDocument(htmlStream, "UTF-8", locEN));
 			while (htmlFilter.hasNext()) {
@@ -55,19 +58,19 @@ public class HtmlFullFileTest {
 			Event event = htmlFilter.next();
 		}
 	}
-	
+
 	@Test
 	public void testEncodingShouldBeFound() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/withEncoding.html");
 		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", locEN));
 		assertEquals("windows-1252", htmlFilter.getEncoding());
 	}
-	
+
 	@Test
 	public void testEncodingShouldBeFound2() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/W3CHTMHLTest1.html");
 		htmlFilter.open(new RawDocument(htmlStream, "UTF-8", locEN));
-		assertEquals("UTF-8", htmlFilter.getEncoding());		
+		assertEquals("UTF-8", htmlFilter.getEncoding());
 	}
 
 	@Test
@@ -94,7 +97,7 @@ public class HtmlFullFileTest {
 		assertEquals("Okapi Framework", firstText);
 		assertEquals("\u00A0", lastText);
 	}
-	
+
 	@Test
 	public void testSkippedScriptandStyleElements() {
 		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/testStyleScriptStylesheet.html");
@@ -115,5 +118,32 @@ public class HtmlFullFileTest {
 		}
 		assertTrue(foundText);
 		assertEquals("First Text", firstText);
+	}
+
+	@Test
+	public void testOpenTwiceWithString() {
+		RawDocument rawDoc = new RawDocument("<b>bolded html</b>", locEN);
+		htmlFilter.open(rawDoc);
+		htmlFilter.open(rawDoc);
+		htmlFilter.close();
+	}
+	
+	@Test
+	public void testOpenTwiceWithURI() throws URISyntaxException {
+		URL url = HtmlFullFileTest.class.getResource("/okapi_intro_test.html");
+		RawDocument rawDoc = new RawDocument(url.toURI(), "windows-1252", locEN);
+		htmlFilter.open(rawDoc);
+		htmlFilter.open(rawDoc);
+		htmlFilter.close();
+	}
+
+	@Test(expected=OkapiIOException.class)
+	public void testOpenTwiceWithStream() throws URISyntaxException {
+		InputStream htmlStream = HtmlFullFileTest.class.getResourceAsStream("/okapi_intro_test.html");
+		RawDocument rawDoc = new RawDocument(htmlStream, "windows-1252", locEN);
+		htmlFilter.open(rawDoc);
+		htmlFilter.close();
+		htmlFilter.open(rawDoc);
+		htmlFilter.close();
 	}
 }

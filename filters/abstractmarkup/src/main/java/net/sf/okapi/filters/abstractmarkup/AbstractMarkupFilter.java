@@ -169,8 +169,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * in XML or HTML files
 	 */
 	private Source getParsedHeader(final InputStream inputStream) {
-		try {
-			inputStream.mark(PREVIEW_BYTE_COUNT);
+		try {			
 			final byte[] bytes = new byte[PREVIEW_BYTE_COUNT];
 			int i;
 			for (i = 0; i < PREVIEW_BYTE_COUNT; i++) {
@@ -224,8 +223,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 
 		if (input.getInputURI() != null) {
-			// YS Sep-27-09: change from tostring() to getPath()
-			// to match other filters. But toString() may be better ultimately
 			setDocumentName(input.getInputURI().getPath());
 		}
 
