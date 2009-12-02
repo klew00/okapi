@@ -80,6 +80,21 @@ public class TTXFilterTest {
 	}
 
 	@Test
+	public void testSegmentedSurroundedByInternalCodes () {
+		String snippet = STARTFILENOLB
+			+ "<ut Type=\"start\">bc</ut><Tu MatchPercent=\"100\"><Tuv Lang=\"EN-US\">en1</Tuv><Tuv Lang=\"ES-EM\">es1</Tuv></Tu><ut Type=\"end\">ec</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		assertEquals(1, cont.getSegmentCount());
+		assertEquals("en1", cont.getSegments().get(0).toString());
+		cont = tu.getTarget(locESEM);
+		assertEquals(1, cont.getSegmentCount());
+		assertEquals("es1", cont.getSegments().get(0).toString());
+	}
+
+	@Test
 	public void testBasicWithEscapes () {
 		String snippet = STARTFILENOLB
 			+ "&lt;=lt, &amp;=amp, &gt;=gt, &quot;=quot."
@@ -620,11 +635,21 @@ public class TTXFilterTest {
 	}
 
 	// Disable this test for SVN commit
-	//@Test
+	@Test
 	public void __LOCALTEST_ONLY_testDoubleExtractionPrivateFiles () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		RoundTripComparison rtc = new RoundTripComparison();
+
+		list.clear();
+		list.add(new InputDocument(root+"private/set01/file04.mif.rtf.ttx", null));
+		LocaleId locJA = LocaleId.fromString("JA");
+		assertTrue(rtc.executeCompare(filter2, list, "UTF-8", locENUS, locJA));
+		list.clear();
+//		list.add(new InputDocument(root+"private/set01/file01.xml.ttx", null));
+//		list.add(new InputDocument(root+"private/set01/file02.xml.ttx", null));
+//		list.add(new InputDocument(root+"private/set01/file03.xml.ttx", null));
+		assertTrue(rtc.executeCompare(filter2, list, "UTF-8", locENUS, locFRFR));
 
 		list.clear();
 		list.add(new InputDocument(root+"private/set02/file01.xml.ttx", null));
@@ -633,14 +658,14 @@ public class TTXFilterTest {
 		list.add(new InputDocument(root+"private/set02/file04.xml.ttx", null));
 		list.add(new InputDocument(root+"private/set02/file05.xml.ttx", null));
 		LocaleId locFRCA = LocaleId.fromString("FR-CA");
-		assertTrue(rtc.executeCompare(filter1, list, "UTF-8", locENUS, locFRCA));
+		assertTrue(rtc.executeCompare(filter2, list, "UTF-8", locENUS, locFRCA));
 
 		list.clear();
 		list.add(new InputDocument(root+"private/set04/file01.mif.rtf.ttx", null));
 		list.add(new InputDocument(root+"private/set04/file02.mif.rtf.ttx", null));
 		list.add(new InputDocument(root+"private/set04/file03.mif.rtf.ttx", null));
 		LocaleId locENGB = LocaleId.fromString("EN-GB");
-		assertTrue(rtc.executeCompare(filter1, list, "UTF-8", locENGB, locFRFR));
+		assertTrue(rtc.executeCompare(filter2, list, "UTF-8", locENGB, locFRFR));
 
 		list.clear();
 //		list.add(new InputDocument(root+"private/set05/file01.rtf.ttx", null));
@@ -658,7 +683,7 @@ public class TTXFilterTest {
 //		list.add(new InputDocument(root+"private/set05/file13.rtf.ttx", null));
 //		list.add(new InputDocument(root+"private/set05/file14.rtf.ttx", null));
 		LocaleId locPL = LocaleId.fromString("PL");
-		assertTrue(rtc.executeCompare(filter1, list, "UTF-8", locENGB, locPL));
+		assertTrue(rtc.executeCompare(filter2, list, "UTF-8", locENGB, locPL));
 	}
 
 	private ArrayList<Event> getEvents(IFilter filter, String snippet, LocaleId trgLocId) {

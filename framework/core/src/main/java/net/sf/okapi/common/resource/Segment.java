@@ -60,7 +60,7 @@ public class Segment {
 	 */
 	@Override
 	public Segment clone () {
-		return new Segment(id, text);
+		return new Segment(id, text.clone());
 	}
 	
 	/**

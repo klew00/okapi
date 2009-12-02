@@ -535,9 +535,9 @@ public class TTXFilter implements IFilter {
 			skel = new GenericSkeleton();
 			return returnValueAfterTextUnitDone;
 		}
-		catch ( IndexOutOfBoundsException e ) {
-			throw new OkapiIOException("Out of bounds.", e);
-		}
+//		catch ( IndexOutOfBoundsException e ) {
+//			throw new OkapiIOException("Out of bounds.", e);
+//		}
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException("Error processing top-level ut element.", e);
 		}

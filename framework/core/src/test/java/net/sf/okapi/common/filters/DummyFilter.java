@@ -105,7 +105,7 @@ public class DummyFilter implements IFilter {
 	}
 	
 	/**
-	 * Opens the document with pre-defined entries. Use a CharSequence==null for
+	 * Opens the document with pre-defined entries. Use a CharSequence==##def## for
 	 * default events. Use Charsequence="##seg##" for default segmented entries,
 	 * use your own CharSequence otherwise: it will be split by \n and the sequences 
 	 * "@#$" will be replaced by inline codes. 
@@ -115,12 +115,11 @@ public class DummyFilter implements IFilter {
 	{
 		setOptions(input.getSourceLocale(), input.getTargetLocale(),
 			input.getEncoding(), generateSkeleton);
-		if ( input.getInputCharSequence() != null ) {
-			reset(input.getInputCharSequence().toString());
+		if ( input.getInputCharSequence().equals("##def##") ) {
+			reset();
 		}
 		else {
-			// In all other case: Use the default events
-			reset();
+			reset(input.getInputCharSequence().toString());
 		}
 	}
 

@@ -157,6 +157,7 @@ public class TextContainer extends TextFragment {
 			case MARKER_SEGMENT:
 				if ( lookInSegments ) {
 					int n = TextFragment.toIndex(text.charAt(++i));
+					n = Integer.parseInt(codes.get(n).data);
 					if ( segments.get(n).text.hasText(whiteSpacesAreText) ) {
 						return true;
 					}

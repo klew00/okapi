@@ -44,11 +44,9 @@ public class TMXFilterWriterTest {
 		filter = new DummyFilter();
 	}
 
-	//@Test
-	// FIXME: This test depends on sending a null value to RawDocument. 
-	// This is no longer allowed and will throw an IllegalArgument exception.
+	@Test
 	public void testSimpleOutput () {
-		String result = rewrite(getEvents(null, locEN, locFR), locFR);
+		String result = rewrite(getEvents("##def##", locEN, locFR), locFR);
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<tmx version=\"1.4\"><header creationtool=\"unknown\" creationtoolversion=\"unknown\" segtype=\"paragraph\" o-tmf=\"unknown\" adminlang=\"en\" srclang=\"en\" datatype=\"text\"></header><body>"
 			+ "<tu tuid=\"autoID1\">"
