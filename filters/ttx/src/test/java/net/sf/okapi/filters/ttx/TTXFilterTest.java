@@ -635,7 +635,7 @@ public class TTXFilterTest {
 	}
 
 	// Disable this test for SVN commit
-	@Test
+//	@Test
 	public void __LOCALTEST_ONLY_testDoubleExtractionPrivateFiles () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
