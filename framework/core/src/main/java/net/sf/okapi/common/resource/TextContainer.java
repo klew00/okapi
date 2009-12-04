@@ -292,7 +292,7 @@ public class TextContainer extends TextFragment {
 			return segments.size();
 		}
 	}
-	
+
 	/**
 	 * Creates a new segment from a section of the container text.
 	 * Any existing segmentation remains in place, but the section 
@@ -397,12 +397,51 @@ public class TextContainer extends TextFragment {
 	
 	/**
 	 * Merges back together all segments of this TextContainer object, and clear the 
+	 * list of segments. Convenience method that calls <code>mergeAllSegments(null)</code>.
+	 * @see #mergeAllSegments(List)
+	 */
+	public void mergeAllSegments () {
+		// Merge but don't remember the ranges
+		mergeAllSegments(null);
+//		if ( !isSegmented() ) return;
+//		Code code;
+//		for ( int i=0; i<text.length(); i++ ) {
+//			switch ( text.charAt(i) ) {
+//			case MARKER_OPENING:
+//			case MARKER_CLOSING:
+//			case MARKER_ISOLATED:
+//				i++; // Skip
+//				break;
+//			case MARKER_SEGMENT:
+//				code = getCode(text.charAt(++i));
+//				int index = Integer.parseInt(code.data);
+//				int add = segments.get(index).text.getCodedText().length();
+//				// Remove the segment marker
+//				remove(i-1, i+1);
+//				// Insert the segment
+//				insert(i-1, segments.get(index).text);
+//				// Adjust the value of i so it is at the end of the new segment
+//				i += (add-2); // -2 = size of code marker
+//				break;
+//			}
+//		}
+//		
+//		// Re-initialize the list of segments
+//		segments.clear();
+//		segments = null;
+	}
+	
+	/**
+	 * Merges back together all segments of this TextContainer object, and clear the 
 	 * list of segments.
+	 * @param ranges a list of Ranges where to save the segments ranges, use null to 
+	 * not save the ranges.
 	 * Note that the merging is driven by the coded text of the object, so any 
 	 * segments without a corresponding marker in the coded text will not be merge 
 	 * and will be lost.
 	 */
-	public void mergeAllSegments () {
+	public void mergeAllSegments (List<Range> ranges) {
+		if ( ranges != null ) ranges.clear();
 		if ( !isSegmented() ) return;
 		Code code;
 		for ( int i=0; i<text.length(); i++ ) {
@@ -413,6 +452,7 @@ public class TextContainer extends TextFragment {
 				i++; // Skip
 				break;
 			case MARKER_SEGMENT:
+				int start = i; // Start of the range
 				code = getCode(text.charAt(++i));
 				int index = Integer.parseInt(code.data);
 				int add = segments.get(index).text.getCodedText().length();
@@ -422,6 +462,10 @@ public class TextContainer extends TextFragment {
 				insert(i-1, segments.get(index).text);
 				// Adjust the value of i so it is at the end of the new segment
 				i += (add-2); // -2 = size of code marker
+				// Add the range if requested
+				if ( ranges != null ) {
+					ranges.add(new Range(start, start+add));
+				}
 				break;
 			}
 		}
@@ -430,7 +474,7 @@ public class TextContainer extends TextFragment {
 		segments.clear();
 		segments = null;
 	}
-	
+
 	/**
 	 * Merges a given segment back into the main coded text.
 	 * @param segmentIndex Index of the segment to merge.

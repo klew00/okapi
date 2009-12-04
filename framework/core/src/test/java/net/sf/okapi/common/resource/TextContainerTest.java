@@ -315,6 +315,21 @@ public class TextContainerTest {
 	}
 	
 	@Test
+	public void testMergingAndResplitting () {
+		tc1 = createMultiSegmentContent();
+		ArrayList<Range> ranges = new ArrayList<Range>();
+		tc1.mergeAllSegments(ranges);
+		assertEquals(0, tc1.getSegmentCount());
+		assertNull(tc1.getSegments());
+		assertEquals("text1 text2", tc1.toString());
+		tc1.createSegments(ranges);
+		assertEquals(2, tc1.getSegmentCount());
+		assertNotNull(tc1.getSegments());
+		assertEquals("text1", tc1.getSegments().get(0).toString());
+		assertEquals("text2", tc1.getSegments().get(1).toString());
+	}
+	
+	@Test
 	public void testMergingSegmentsWithCodes () {
 		tc1 = createMultiSegmentContentWithCodes();
 		tc1.mergeAllSegments();
@@ -325,6 +340,25 @@ public class TextContainerTest {
 		assertEquals(2, codes.size());
 		assertEquals(1, codes.get(0).id);
 		assertEquals(2, codes.get(1).id);
+	}
+
+	@Test
+	public void testMergingAndResplittingWithCodes () {
+		tc1 = createMultiSegmentContentWithCodes();
+		ArrayList<Range> ranges = new ArrayList<Range>();
+		tc1.mergeAllSegments(ranges);
+		assertEquals(0, tc1.getSegmentCount());
+		assertNull(tc1.getSegments());
+		assertEquals("text1<br/> text2<br/>", tc1.toString());
+		List<Code> codes = tc1.getCodes();
+		assertEquals(2, codes.size());
+		assertEquals(1, codes.get(0).id);
+		assertEquals(2, codes.get(1).id);
+		tc1.createSegments(ranges);
+		assertEquals(2, tc1.getSegmentCount());
+		assertNotNull(tc1.getSegments());
+		assertEquals("text1<br/>", tc1.getSegments().get(0).toString());
+		assertEquals("text2<br/>", tc1.getSegments().get(1).toString());
 	}
 	
 	@Test

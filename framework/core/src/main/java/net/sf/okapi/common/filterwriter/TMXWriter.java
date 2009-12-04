@@ -20,6 +20,7 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 
 package net.sf.okapi.common.filterwriter;
 
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,8 @@ public class TMXWriter {
     private LocaleId trgLoc;
     private int itemCount;
     private Pattern exclusionPattern = null;
+    private Hashtable<String, String> MTattribute;
+    private boolean useMTPrefix = true;
 
     /**
      * Creates a new TMXWriter object.
@@ -65,6 +68,8 @@ public class TMXWriter {
     		throw new IllegalArgumentException("path must be set");
     	}
     	writer = new XMLWriter(path);
+    	MTattribute = new Hashtable<String, String>();
+    	MTattribute.put(CREATIONID, Util.ORIGIN_MT);
     }
 
     /**
@@ -272,8 +277,24 @@ public class TMXWriter {
     					continue;
     				}
     				if (( si.origin != null ) && si.origin.equals(Util.ORIGIN_MT) ) {
-    					TextFragment tf = srcList.get(i).text.clone();
-    					tf.setCodedText(Util.ORIGIN_MT+" "+tf.getCodedText());
+    					// Set the MT flag attribute
+    		        	if ( attributes != null ) {
+    		        		if ( !attributes.containsKey(CREATIONID) ) {
+    		        			attributes.put(CREATIONID, Util.ORIGIN_MT);
+    		        		}
+    		        	}
+    		        	else {
+    		        		attributes = MTattribute;
+    		        	}
+    		        	TextFragment tf;
+    		        	// Add the flag prefix if requested (that's why we clone)
+    		        	if ( useMTPrefix ) {
+    		        		tf = srcList.get(i).text.clone();
+    		        		tf.setCodedText(Util.ORIGIN_MT+" "+tf.getCodedText());
+    		        	}
+    		        	else {
+    		        		tf = srcList.get(i).text;
+    		        	}
             			writeTU(tf,
                				(i > trgList.size() - 1) ? null : trgList.get(i).text,
                				String.format("%s_s%02d", tuid, i + 1),

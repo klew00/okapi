@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +37,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -259,6 +262,7 @@ public class Merger {
 			}
 		}
 
+		// Process the "approved" property
 		boolean isTransApproved = false;
 		Property prop = tuFromTrans.getTargetProperty(trgLang, Property.APPROVED);
 		if ( prop != null ) {
@@ -271,7 +275,8 @@ public class Merger {
 			return; // Use the source
 		}
 
-		// Get the translated target, and un-segment it if needed
+		// Get the translated target
+		//TODO: handle case of empty or non-existent target
 		TextContainer fromTrans = tuFromTrans.getTarget(trgLang);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSourceContent().isEmpty() ) return;
@@ -280,15 +285,34 @@ public class Merger {
 				String.format("Item id='%s': No target in XLIFF; using source instead.", tu.getId()));
 			return; // Use the source
 		}
+
+		// Do we need to preserve the segmentation for merging (e.g. TTX case)
+		boolean mergeAsSegments = (( tu.getMimeType() != null ) 
+			&& ( !tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE) ));
 		
-//TODO: handle case of empty or non-existent target		
+		// Un-segment if needed (and remember the ranges if we will need to re-split after)
+		// Merging the segments allow to check/transfer the codes at the text unit level
+		ArrayList<Range> ranges = null;
+		if ( mergeAsSegments ) ranges = new ArrayList<Range>();
 		if ( fromTrans.isSegmented() ) {
-			fromTrans.mergeAllSegments();
+			fromTrans.mergeAllSegments(ranges);
+		}
+		
+		// Get the source (as a clone if we need to change the segments)
+		TextContainer srcCont;
+		if ( tu.getSource().isSegmented() ) {
+			srcCont  = tu.getSource().clone();
+			srcCont.mergeAllSegments();
+		}
+		else {
+			srcCont = tu.getSource();
 		}
 
+		// Adjust the codes to use the appropriate ones
+		List<Code> transCodes = transferCodes(fromTrans, srcCont, tu);
+		
 		// We create a new target if needed
 		TextContainer trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
-		
 		// Update 'approved' flag is requested
 		if ( manifest.updateApprovedFlag() ) {
 			prop = trgCont.getProperty(Property.APPROVED);
@@ -299,14 +323,13 @@ public class Merger {
 			prop.setValue("yes");
 		}
 
-		// Adjust the codes to use the appropriate ones
-		List<Code> transCodes = fromTrans.getCodes();
-		// Use the ones in translated target, but if empty, take it from source
-		transCodes = transferCodes(transCodes, tu.getSourceContent().getCodes(), tu);
-		
 		// Now set the target coded text and the target codes
 		try {
 			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
+			// Re-set the ranges on the translated entry
+			if ( mergeAsSegments ) {
+				trgCont.createSegments(ranges);
+			}
 		}
 		catch ( RuntimeException e ) {
 			logger.log(Level.SEVERE,
@@ -314,17 +337,148 @@ public class Merger {
 			// Use the source instead, continue the merge
 			tu.setTarget(trgLang, tu.getSource());
 		}
+		
+		
+////TODO: handle case of empty or non-existent target		
+//		if ( fromTrans.isSegmented() ) {
+//			fromTrans.mergeAllSegments();
+//		}
+//
+//		// We create a new target if needed
+//		TextContainer trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
+//		
+//		// Update 'approved' flag is requested
+//		if ( manifest.updateApprovedFlag() ) {
+//			prop = trgCont.getProperty(Property.APPROVED);
+//			if ( prop == null ) {
+//				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
+//			}
+//			//TODO: Option to set the flag based on isTransApproved
+//			prop.setValue("yes");
+//		}
+//
+//		// Adjust the codes to use the appropriate ones
+//		List<Code> transCodes = fromTrans.getCodes();
+//		// Use the ones in translated target, but if empty, take it from source
+//		transCodes = transferCodes(transCodes, tu.getSourceContent().getCodes(), tu);
+//		
+//		// Now set the target coded text and the target codes
+//		try {
+//			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
+//		}
+//		catch ( RuntimeException e ) {
+//			logger.log(Level.SEVERE,
+//				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
+//			// Use the source instead, continue the merge
+//			tu.setTarget(trgLang, tu.getSource());
+//		}
 	}
 
+	private void mergeAsTextUnit (TextContainer fromTrans,
+		TextUnit original,
+		Property prop)
+	{
+		//TODO: handle case of empty or non-existent target		
+		if ( fromTrans.isSegmented() ) {
+			fromTrans.mergeAllSegments();
+		}
+
+		TextContainer srcCont;
+		if ( original.getSource().isSegmented() ) {
+			srcCont  = original.getSource().clone();
+			srcCont.mergeAllSegments();
+		}
+		else {
+			srcCont = original.getSource();
+		}
+		
+		// Adjust the codes to use the appropriate ones
+		List<Code> transCodes = transferCodes(fromTrans, srcCont, original);
+		
+		// We create a new target if needed
+		TextContainer trgCont = original.createTarget(trgLang, false, IResource.COPY_ALL);
+		// Update 'approved' flag is requested
+		if ( manifest.updateApprovedFlag() ) {
+			prop = trgCont.getProperty(Property.APPROVED);
+			if ( prop == null ) {
+				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
+			}
+			//TODO: Option to set the flag based on isTransApproved
+			prop.setValue("yes");
+		}
+
+		// Now set the target coded text and the target codes
+		try {
+			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
+		}
+		catch ( RuntimeException e ) {
+			logger.log(Level.SEVERE,
+				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), original.getId()));
+			// Use the source instead, continue the merge
+			original.setTarget(trgLang, original.getSource());
+		}
+	}
+	
+	private void mergeAsSegments (TextContainer fromTrans,
+		TextUnit original,
+		Property prop)
+	{
+		//TODO: handle case of empty or non-existent target
+		ArrayList<Range> ranges = new ArrayList<Range>();
+		if ( fromTrans.isSegmented() ) {
+			fromTrans.mergeAllSegments(ranges);
+		}
+
+		TextContainer srcCont;
+		if ( original.getSource().isSegmented() ) {
+			srcCont  = original.getSource().clone();
+			srcCont.mergeAllSegments();
+		}
+		else {
+			srcCont = original.getSource();
+		}
+
+		// Adjust the codes to use the appropriate ones
+		List<Code> transCodes = transferCodes(fromTrans, srcCont, original);
+		
+		// We create a new target if needed
+		TextContainer trgCont = original.createTarget(trgLang, false, IResource.COPY_ALL);
+		// Update 'approved' flag is requested
+		if ( manifest.updateApprovedFlag() ) {
+			prop = trgCont.getProperty(Property.APPROVED);
+			if ( prop == null ) {
+				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
+			}
+			//TODO: Option to set the flag based on isTransApproved
+			prop.setValue("yes");
+		}
+
+		// Now set the target coded text and the target codes
+		try {
+			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
+			// Re-set the ranges on the translated entry
+			trgCont.createSegments(ranges);
+		}
+		catch ( RuntimeException e ) {
+			logger.log(Level.SEVERE,
+				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), original.getId()));
+			// Use the source instead, continue the merge
+			original.setTarget(trgLang, original.getSource());
+		}
+	}
+	
 	/*
 	 * Checks the codes in the translated entry, uses the original data if there is
 	 * none in the code coming from XLIFF, and generates a non-stopping error if
 	 * a non-deletable code is missing.
 	 */
-	private List<Code> transferCodes (List<Code> transCodes,
-		List<Code> oriCodes,
+	private List<Code> transferCodes (TextContainer fromTrans,
+		TextContainer srcCont, // Can be a clone of the original content
 		TextUnit tu)
 	{
+		List<Code> transCodes = fromTrans.getCodes();
+		List<Code> oriCodes = srcCont.getCodes();
+		
 		// Check if we have at least one code
 		if ( transCodes.size() == 0 ) {
 			if ( oriCodes.size() == 0 ) return transCodes;
