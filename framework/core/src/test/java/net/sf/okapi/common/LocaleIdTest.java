@@ -180,17 +180,21 @@ public class LocaleIdTest {
 		locId = LocaleId.fromPOSIXLocale("de_AT");
 		assertEquals("de", locId.getLanguage());
 		assertEquals("at", locId.getRegion());
+		assertEquals(null, locId.getUserPart());
 		
 		locId = LocaleId.fromPOSIXLocale("de_AT.UTF-8");
 		assertEquals("de", locId.getLanguage());
 		assertEquals("at", locId.getRegion());
+		assertEquals(null, locId.getUserPart());
 
 		locId = LocaleId.fromPOSIXLocale("de_AT.UTF-8@ATS");
 		assertEquals("de", locId.getLanguage());
 		assertEquals("at", locId.getRegion());
+		assertEquals("ats", locId.getUserPart());
 
 		locId = LocaleId.fromPOSIXLocale("sr@latin");
 		assertEquals("sr", locId.getLanguage());
+		assertEquals("latin", locId.getUserPart());
 	}
 	
 	@Test
@@ -301,6 +305,100 @@ public class LocaleIdTest {
 	}
 	
 	@Test
+	public void testSameRegionWithLocaleId () {
+		LocaleId locId1 = new LocaleId("fi-fi", false);
+		LocaleId locId2 = new LocaleId("sv-fi", false);
+		assertTrue(locId1.sameRegionAs(locId2));
+
+		locId1 = new LocaleId("fi-fi", false);
+		locId2 = new LocaleId("sv_FI", true);
+		assertTrue(locId1.sameRegionAs(locId2));
+
+		locId1 = new LocaleId("fi-fi", false);
+		locId2 = new LocaleId("sv_FI", false);
+		assertFalse(locId1.sameRegionAs(locId2));
+	}
+
+	@Test
+	public void testSameRegionWithString () {
+		LocaleId locId = new LocaleId("fi-fi", false);
+		assertTrue(locId.sameRegionAs("sv-fi"));
+
+		locId = new LocaleId("fi-fi", false);
+		assertTrue(locId.sameRegionAs("sv_FI"));
+
+		locId = new LocaleId("sv_FI", false);
+		assertFalse(locId.sameRegionAs("fi-fi"));
+	}
+
+	@Test
+	public void testDifferentRegions () {
+		LocaleId locId1 = new LocaleId("sv-se", false);
+		LocaleId locId2 = new LocaleId("sv-fi", true);
+		assertFalse(locId1.sameRegionAs(locId2));
+	}
+	
+	@Test
+	public void testSameUserPartWithLocaleId () {
+		// No user parts
+		LocaleId locId1 = new LocaleId("fi-fi", false);
+		LocaleId locId2 = new LocaleId("sv-fi", false);
+		assertTrue(locId1.sameUserPartAs(locId2));
+
+		locId1 = new LocaleId("fi-fi", false);
+		locId2 = new LocaleId("sv_FI", true);
+		assertTrue(locId1.sameUserPartAs(locId2));
+
+		locId1 = new LocaleId("fi-fi", false);
+		locId2 = new LocaleId("sv_FI", false);
+		assertTrue(locId1.sameUserPartAs(locId2));
+		
+		// Same user parts
+		locId1 = new LocaleId("es-us-x-win", false);
+		locId2 = LocaleId.fromPOSIXLocale("en_us@win");
+		assertTrue(locId1.sameUserPartAs(locId2));
+		
+		// Different user parts
+		locId1 = LocaleId.fromPOSIXLocale("es_us@mac");
+		locId2 = LocaleId.fromPOSIXLocale("en_us@win");
+		assertFalse(locId1.sameUserPartAs(locId2));
+	}
+
+	@Test
+	public void testSameUserPartWithString () {
+		// No user parts
+		LocaleId locId = new LocaleId("fi-fi", false);
+		assertTrue(locId.sameUserPartAs("sv-fi"));
+
+		locId = new LocaleId("fi-fi", false);
+		assertTrue(locId.sameUserPartAs("sv_FI"));
+
+		locId = new LocaleId("sv_FI", false);
+		assertTrue(locId.sameUserPartAs("fi-fi"));
+		
+		// Same user parts
+		locId = new LocaleId("es-us-x-win", false);
+		assertTrue(locId.sameUserPartAs("en-x-win"));
+		
+		// Different user parts
+		locId = LocaleId.fromPOSIXLocale("es_us@mac");
+		assertFalse(locId.sameUserPartAs("es_us-x-win"));
+	}
+
+	@Test
+	public void testDifferentUserParts () {
+		// No user parts
+		LocaleId locId1 = new LocaleId("sv-se", false);
+		LocaleId locId2 = new LocaleId("sv-fi", true);
+		assertTrue(locId1.sameUserPartAs(locId2));
+		
+		// Different user parts
+		locId1 = new LocaleId("es-us-x-win", false);
+		locId2 = new LocaleId("es-us-x-mac", false);
+		assertFalse(locId1.sameUserPartAs(locId2));
+	}
+	
+	@Test
 	public void testSplitLanguageCode () {
 		String in = "en";
 		String[] res = LocaleId.splitLanguageCode(in);
@@ -322,6 +420,34 @@ public class LocaleIdTest {
 		String[] res = LocaleId.splitLanguageCode(in);
 		assertEquals(res[0], "en");
 		assertEquals(res[1], "BZ");
+	}
+	
+	@Test
+	public void testRegionAndUserPart () {
+		LocaleId locId = new LocaleId("ja-jp-x-calja", true);
+		assertEquals("ja", locId.getLanguage());
+		assertEquals("jp", locId.getRegion());
+		assertEquals("calja", locId.getUserPart());
+		
+		locId = new LocaleId("ar-Latn-EG", true);
+		assertEquals("eg", locId.getRegion());
+		assertEquals(null, locId.getUserPart());
+		
+		locId = new LocaleId("zh-Hant-TW", true);
+		assertEquals("tw", locId.getRegion());
+		assertEquals(null, locId.getUserPart());
+		
+		locId = new LocaleId("zh-Latn-TW-pinyin", true);
+		assertEquals("tw", locId.getRegion());
+		assertEquals(null, locId.getUserPart());
+		
+		locId = new LocaleId("de-CH-1996", true);
+		assertEquals("ch", locId.getRegion());
+		assertEquals(null, locId.getUserPart());
+		
+		locId = new LocaleId("ja-Latn-hepburn", true);
+		assertEquals(null, locId.getRegion());
+		assertEquals(null, locId.getUserPart());
 	}
 
 }
