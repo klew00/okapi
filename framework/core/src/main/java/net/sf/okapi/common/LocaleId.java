@@ -24,8 +24,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.Util;
-
 /**
  * Holds the normalized identifier for a given language/locale. 
  */
@@ -402,6 +400,27 @@ public final class LocaleId implements Comparable<Object> {
 	}
 	
 	/**
+	 * Gets the user part of this LocaleId.
+	 * @return the user part or null if there is none or if an error occurs.
+	 */
+	public String getUserPart () {
+		String tmp = null;
+		try {
+			Matcher m = ID_PATTERN.matcher(locId);
+			m.find();
+			tmp = m.group(ID_USER);
+		}
+		catch ( Throwable e ) {
+			return null;
+		}
+		
+		if (tmp == null) return null;
+		
+		int n = tmp.indexOf("-x-");
+		return (n >= 0) ? tmp.substring(n + 3) : null;
+	}
+	
+	/**
 	 * Indicates if the language of a given LocaleId is the same as the one of this LocaleId.
 	 * For example: "en" and "en-us" returns true, "es-es" and "ca-es" return false.
 	 * @param other the LocaleId object to compare.
@@ -448,6 +467,66 @@ public final class LocaleId implements Comparable<Object> {
 		return true;
 	}
 	
+	/**
+	 * Indicates if the region of a given LocaleId is the same as the one of this LocaleId.
+	 * For example: "es-us" and "en-us" returns true, "es-es" and "es-us" return false.
+	 * @param other the LocaleId object to compare.
+	 * @return true if the region parts of two given LocaleIds are the same.
+	 */
+    public boolean sameRegionAs (LocaleId other) {
+    	if ( other == null )
+			return false; // locId is not null
+
+    	String region1 = this.getRegion();
+    	String region2 = other.getRegion();
+    	
+    	if (region1 == null && region2 == null) 
+    		return true;
+    	
+    	if (region1 == null) return false;
+    	return region1.equals(region2);
+    }
+    
+	/**
+	 * Indicates if a given string has the same region as the one of this LocaleId.
+	 * For example: "es-us" and "en-us" returns true, "es-es" and "es-us" return false.
+	 * @param langCode the string to compare.
+	 * @return true if the region parts of both objects are the same.
+	 */
+    public boolean sameRegionAs (String langCode) {
+    	return sameRegionAs(new LocaleId(langCode, true));
+    }
+
+    /**
+	 * Indicates if the user part of a given LocaleId is the same as the one of this LocaleId.
+	 * For example: "es-us-x-win" and "en_us@win" returns true, "es_us@mac" and "es_us@ats" return false.
+	 * @param other the LocaleId object to compare.
+	 * @return true if the region parts of two given LocaleIds are the same.
+	 */
+    public boolean sameUserPartAs (LocaleId other) {
+    	if ( other == null )
+			return false; // locId is not null
+    	
+    	String userPart1 = this.getUserPart();
+    	String userPart2 = other.getUserPart();
+    	
+    	if (userPart1 == null && userPart2 == null) 
+    		return true;
+    	
+    	if (userPart1 == null) return false;
+    	return userPart1.equals(userPart2);
+    }
+    
+	/**
+	 * Indicates if a given string has the same user part as the one of this LocaleId.
+	 * For example: "es-us-x-win" and "en-us@win" returns true, "es-us@mac" and "es-us@ats" return false.
+	 * @param langCode the string to compare.
+	 * @return true if the region parts of both objects are the same.
+	 */
+    public boolean sameUserPartAs (String langCode) {
+    	return sameUserPartAs(new LocaleId(langCode, true));
+    }
+    
 	/**
 	 * Gets an array of the LocaleId objects for all the Java locales installed on the system.
 	 * @return an array of the LocaleId objects for all the available Java locales.

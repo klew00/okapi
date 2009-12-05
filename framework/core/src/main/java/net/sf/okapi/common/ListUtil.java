@@ -138,6 +138,21 @@ public class ListUtil {
 	
 	/**
 	 * Splits up a string of delimited substrings into a string list of those substrings.
+	 * @param st string of delimited substrings.
+	 * @param delimiter a character delimiting substrings in the string. 
+	 * @return a list of substrings.
+	 */
+	public static List<String> stringAsList(String st, char delimiter) {
+
+		ArrayList<String> res = new ArrayList<String>();
+		if (res == null) return null;
+
+		stringAsList(res, st, Character.toString(delimiter));		
+		return res;		
+	}
+	
+	/**
+	 * Splits up a string of delimited substrings into a string list of those substrings.
 	 * @param list a list to put the substrings.
 	 * @param st string of delimited substrings.
 	 * @param delimiter a string delimiting substrings in the string.	  
