@@ -307,11 +307,14 @@ public class TTXFilter implements IFilter {
 				String name = reader.getLocalName();
 				if ( "Tu".equals(name) || "ut".equals(name) || "df".equals(name) ) {
 					if ( processTextUnit(name) ) return true;
-					buildStartElement(true);
-					// The element at the exit may be different than at the call
-					// so we refresh the name here to store the correct ending
-					name = reader.getLocalName(); 
-					storeUntilEndElement(name);
+					// We may return on an end-tag (e.g. Raw), so check for it
+					if ( reader.getEventType() == XMLStreamConstants.START_ELEMENT ) { 
+						buildStartElement(true);
+						// The element at the exit may be different than at the call
+						// so we refresh the name here to store the correct ending
+						name = reader.getLocalName(); 
+						storeUntilEndElement(name);
+					}
 					continue; // reader.next() was called
 				}
 				else if ( "UserSettings".equals(name) ){
@@ -400,6 +403,7 @@ public class TTXFilter implements IFilter {
 			boolean moveToNext = false;
 			int dfCount = 0;
 			boolean done = false;
+			boolean inTU = false;
 			
 			while ( !done ) {
 				// Move to next event if required 
@@ -417,7 +421,7 @@ public class TTXFilter implements IFilter {
 					
 				case XMLStreamConstants.START_ELEMENT:
 					name = reader.getLocalName();
-					if ( name.equals("ut") ) {
+					if ( !inTU && name.equals("ut") ) {
 						if ( !isInline(name) ) { // Non-inline ut
 							done = true;
 							returnValueAfterTextUnitDone = false;
@@ -425,6 +429,7 @@ public class TTXFilter implements IFilter {
 						}
 					}
 					else if ( name.equals("Tu") ) { // New segment
+						inTU = true;
 						inTarget = false;
 						srcSegFrag = new TextFragment();
 						trgSegFrag = new TextFragment();
@@ -500,6 +505,7 @@ public class TTXFilter implements IFilter {
 							current = srcCont.getContent();
 							// A Tu stops the current segment, but not the text unit
 						}
+						inTU = false;
 						continue; // Stop here
 					}
 					break;
