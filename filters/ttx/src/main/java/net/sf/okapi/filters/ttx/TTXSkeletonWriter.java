@@ -20,14 +20,13 @@
 
 package net.sf.okapi.filters.ttx;
 
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.util.List;
 
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.ScoreInfo;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.encoder.IEncoder;
-import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -72,10 +71,12 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		List<Segment> srcSegments = srcCont.getSegments();
 		String text = srcCont.getCodedText();
 
+		ScoresAnnotation scores = null;
 		TextFragment trgFrag;
 		List<Segment> trgSegments = null;
 		if ( tu.hasTarget(outputLoc) ) {
 			TextContainer trgCont = tu.getTarget(outputLoc);
+			scores = trgCont.getAnnotation(ScoresAnnotation.class);
 			if ( !trgCont.isSegmented() ) {
 				trgCont = trgCont.clone();
 				trgCont.createSegment(0, -1);
@@ -101,7 +102,12 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 				// Get segments source/target
 				srcFrag = srcSegments.get(n).text;
 				trgFrag = trgSegments.get(n).text;
-				tmp.append(processSegment(srcFrag, trgFrag));
+				// Get score info if possible
+				ScoreInfo si = null;
+				if ( scores != null ) {
+					si = scores.get(n);
+				}
+				tmp.append(processSegment(srcFrag, trgFrag, si));
 				break;
 
 			default:
@@ -114,15 +120,27 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 	}
 	
 	private String processSegment (TextFragment srcFrag,
-		TextFragment trgFrag)
+		TextFragment trgFrag,
+		ScoreInfo scoreInfo)
 	{
 		if ( trgFrag == null ) { // No target available: use the source
 			trgFrag = srcFrag;
 		}
 
 		StringBuilder tmp = new StringBuilder();
-//TODO: Tu attributes		
-		tmp.append("<Tu MatchPercent=\"0\">");
+
+		if ( scoreInfo != null ) {
+			if ( !Util.isEmpty(scoreInfo.origin) ) {
+				tmp.append("<Tu Origin=\""+scoreInfo.origin+"\" ");
+			}
+			else {
+				tmp.append("<Tu ");
+			}
+			tmp.append(String.format("MatchPercent=\"%d\">", scoreInfo.score));
+		}
+		else {
+			tmp.append("<Tu MatchPercent=\"0\">");
+		}
 		
 		tmp.append(String.format("<Tuv Lang=\"%s\">", srcLangCode));
 		tmp.append(processFragment(srcFrag));

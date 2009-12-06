@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -343,7 +344,7 @@ public class TTXFilterTest {
 	@Test
 	public void testWithMixedSegmentation () {
 		String snippet = STARTFILENOLB
-			+ "<Tu Matchpercent=\"0\"><Tuv lang=\"EN-US\">text</Tuv></Tu>"
+			+ "<Tu Matchpercent=\"50\"><Tuv Lang=\"EN-US\">text</Tuv></Tu>"
 			+ " more text"
 			+ "</Raw></Body></TRADOStag>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
@@ -358,12 +359,39 @@ public class TTXFilterTest {
 	@Test
 	public void testOutputWithMixedSegmentation () {
 		String snippet = STARTFILENOLB
-			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text</Tuv></Tu>"
+			+ "<Tu MatchPercent=\"50\"><Tuv Lang=\"EN-US\">text</Tuv></Tu>"
 			+ " more text"
 			+ "</Raw></Body></TRADOStag>";
 		String expected = STARTFILENOLB
-			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text</Tuv><Tuv Lang=\"ES-EM\">text</Tuv></Tu>"
+			+ "<Tu MatchPercent=\"50\"><Tuv Lang=\"EN-US\">text</Tuv><Tuv Lang=\"ES-EM\">text</Tuv></Tu>"
 			+ " more text"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
+			filter2.createSkeletonWriter()));
+	}
+
+	@Test
+	public void testTUInfo () {
+		String snippet = STARTFILENOLB
+			+ "<Tu Origin=\"abc\" MatchPercent=\"50\"><Tuv Lang=\"EN-US\">en</Tuv><Tuv Lang=\"ES-EM\">es</Tuv></Tu>"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getTarget(locESEM);
+		assertNotNull(cont);
+		ScoresAnnotation scores = cont.getAnnotation(ScoresAnnotation.class);
+		assertNotNull(scores);
+		assertEquals("abc", scores.get(0).origin);
+		assertEquals(50, scores.get(0).score);
+	}
+
+	@Test
+	public void testOutputTUInfo () {
+		String snippet = STARTFILENOLB
+			+ "<Tu Origin=\"abc\" MatchPercent=\"50\"><Tuv Lang=\"EN-US\">en</Tuv><Tuv Lang=\"ES-EM\">es</Tuv></Tu>"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "<Tu Origin=\"abc\" MatchPercent=\"50\"><Tuv Lang=\"EN-US\">en</Tuv><Tuv Lang=\"ES-EM\">es</Tuv></Tu>"
 			+ "</Raw></Body></TRADOStag>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
 			filter2.createSkeletonWriter()));

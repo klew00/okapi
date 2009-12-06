@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.ttx;
 
+import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -58,6 +60,9 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class TTXFilter implements IFilter {
+
+	public final static String MATCHPERCENT = "MatchPercent";
+	public final static String ORIGIN = "Origin";
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -397,6 +402,7 @@ public class TTXFilter implements IFilter {
 			TextFragment current = srcCont.getContent();
 			ArrayList<Segment> trgSegments = new ArrayList<Segment>();
 			boolean returnValueAfterTextUnitDone = true;
+			ScoresAnnotation scores = null;
 
 			String tmp;
 			String name;
@@ -435,7 +441,24 @@ public class TTXFilter implements IFilter {
 						trgSegFrag = new TextFragment();
 						current = srcSegFrag;
 						trgSegFrag = null;
-						//TODO: match info, etc.
+						// Get Tu info
+						tmp = reader.getAttributeValue(null, MATCHPERCENT);
+						String origin = reader.getAttributeValue(null, ORIGIN);
+						if (( tmp != null ) || ( origin != null )) {
+							if ( scores == null ) {
+								scores = new ScoresAnnotation();
+							}
+							int value = 0;
+							if ( tmp != null ) {
+								try {
+									value = Integer.valueOf(tmp);
+								}
+								catch ( Throwable e ) {
+									logger.warning(String.format("Unexpected value in %s attribute (%s)", MATCHPERCENT, tmp));
+								}
+							}
+							scores.add(value, origin);
+						}
 						continue;
 					}
 					else if ( name.equals("Tuv") ) { // New language content
@@ -444,6 +467,7 @@ public class TTXFilter implements IFilter {
 							inTarget = trgLoc.equals(tmp);
 						}
 						else { // Just in case we don't have Lang
+							logger.warning(String.format("Attribute Lang is missing in Tuv (after text unit '%d'", tuId));
 							inTarget = !inTarget;
 						}
 						if ( inTarget ) {
@@ -531,6 +555,9 @@ public class TTXFilter implements IFilter {
 			if ( cont.isSegmented() ) {
 				cont.setSegments(trgSegments);
 				tu.setTarget(trgLoc, cont);
+				if ( scores != null ) {
+					cont.setAnnotation(scores);
+				}
 			}
 			tu.setId(String.valueOf(++tuId));
 			skel.addContentPlaceholder(tu); // Used by the TTXFilterWriter

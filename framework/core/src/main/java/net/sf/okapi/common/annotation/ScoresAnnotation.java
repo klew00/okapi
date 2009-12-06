@@ -60,27 +60,32 @@ public class ScoresAnnotation implements IAnnotation {
 	/**
 	 * Gets the score information for a given index.
 	 * @param index the index of the score to query.
-	 * @return the score information for the score to query.
+	 * @return the score information for the score to query, or null
+	 * if index is out of bounds.
 	 */
 	public ScoreInfo get (int index) {
+		if (( index < 0 ) || ( index >= list.size() )) return null;
 		return list.get(index);
 	}
 	
 	/**
 	 * Gets the score for a given index.
 	 * @param index the index of the score to query.
-	 * @return the score for the given index.
+	 * @return the score for the given index, or 0 if index is out of bounds.
 	 */
 	public int getScore (int index) {
+		if (( index < 0 ) || ( index >= list.size() )) return 0;
 		return list.get(index).score;
 	}
 	
 	/**
 	 * Gets the origin of a score for a given index. 
 	 * @param index the index of the score to query.
-	 * @return the origin for the given index, or null if there is no origin defined.
+	 * @return the origin for the given index, or null if there is no origin defined or
+	 * index is out of bounds.
 	 */
 	public String getOrigin (int index) {
+		if (( index < 0 ) || ( index >= list.size() )) return null;
 		return list.get(index).origin;
 	}
 
