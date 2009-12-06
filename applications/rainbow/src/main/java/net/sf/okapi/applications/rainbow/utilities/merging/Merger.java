@@ -374,98 +374,98 @@ public class Merger {
 //		}
 	}
 
-	private void mergeAsTextUnit (TextContainer fromTrans,
-		TextUnit original,
-		Property prop)
-	{
-		//TODO: handle case of empty or non-existent target		
-		if ( fromTrans.isSegmented() ) {
-			fromTrans.mergeAllSegments();
-		}
-
-		TextContainer srcCont;
-		if ( original.getSource().isSegmented() ) {
-			srcCont  = original.getSource().clone();
-			srcCont.mergeAllSegments();
-		}
-		else {
-			srcCont = original.getSource();
-		}
-		
-		// Adjust the codes to use the appropriate ones
-		List<Code> transCodes = transferCodes(fromTrans, srcCont, original);
-		
-		// We create a new target if needed
-		TextContainer trgCont = original.createTarget(trgLang, false, IResource.COPY_ALL);
-		// Update 'approved' flag is requested
-		if ( manifest.updateApprovedFlag() ) {
-			prop = trgCont.getProperty(Property.APPROVED);
-			if ( prop == null ) {
-				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
-			}
-			//TODO: Option to set the flag based on isTransApproved
-			prop.setValue("yes");
-		}
-
-		// Now set the target coded text and the target codes
-		try {
-			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
-		}
-		catch ( RuntimeException e ) {
-			logger.log(Level.SEVERE,
-				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), original.getId()));
-			// Use the source instead, continue the merge
-			original.setTarget(trgLang, original.getSource());
-		}
-	}
-	
-	private void mergeAsSegments (TextContainer fromTrans,
-		TextUnit original,
-		Property prop)
-	{
-		//TODO: handle case of empty or non-existent target
-		ArrayList<Range> ranges = new ArrayList<Range>();
-		if ( fromTrans.isSegmented() ) {
-			fromTrans.mergeAllSegments(ranges);
-		}
-
-		TextContainer srcCont;
-		if ( original.getSource().isSegmented() ) {
-			srcCont  = original.getSource().clone();
-			srcCont.mergeAllSegments();
-		}
-		else {
-			srcCont = original.getSource();
-		}
-
-		// Adjust the codes to use the appropriate ones
-		List<Code> transCodes = transferCodes(fromTrans, srcCont, original);
-		
-		// We create a new target if needed
-		TextContainer trgCont = original.createTarget(trgLang, false, IResource.COPY_ALL);
-		// Update 'approved' flag is requested
-		if ( manifest.updateApprovedFlag() ) {
-			prop = trgCont.getProperty(Property.APPROVED);
-			if ( prop == null ) {
-				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
-			}
-			//TODO: Option to set the flag based on isTransApproved
-			prop.setValue("yes");
-		}
-
-		// Now set the target coded text and the target codes
-		try {
-			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
-			// Re-set the ranges on the translated entry
-			trgCont.createSegments(ranges);
-		}
-		catch ( RuntimeException e ) {
-			logger.log(Level.SEVERE,
-				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), original.getId()));
-			// Use the source instead, continue the merge
-			original.setTarget(trgLang, original.getSource());
-		}
-	}
+//	private void mergeAsTextUnit (TextContainer fromTrans,
+//		TextUnit original,
+//		Property prop)
+//	{
+//		//TODO: handle case of empty or non-existent target		
+//		if ( fromTrans.isSegmented() ) {
+//			fromTrans.mergeAllSegments();
+//		}
+//
+//		TextContainer srcCont;
+//		if ( original.getSource().isSegmented() ) {
+//			srcCont  = original.getSource().clone();
+//			srcCont.mergeAllSegments();
+//		}
+//		else {
+//			srcCont = original.getSource();
+//		}
+//		
+//		// Adjust the codes to use the appropriate ones
+//		List<Code> transCodes = transferCodes(fromTrans, srcCont, original);
+//		
+//		// We create a new target if needed
+//		TextContainer trgCont = original.createTarget(trgLang, false, IResource.COPY_ALL);
+//		// Update 'approved' flag is requested
+//		if ( manifest.updateApprovedFlag() ) {
+//			prop = trgCont.getProperty(Property.APPROVED);
+//			if ( prop == null ) {
+//				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
+//			}
+//			//TODO: Option to set the flag based on isTransApproved
+//			prop.setValue("yes");
+//		}
+//
+//		// Now set the target coded text and the target codes
+//		try {
+//			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
+//		}
+//		catch ( RuntimeException e ) {
+//			logger.log(Level.SEVERE,
+//				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), original.getId()));
+//			// Use the source instead, continue the merge
+//			original.setTarget(trgLang, original.getSource());
+//		}
+//	}
+//	
+//	private void mergeAsSegments (TextContainer fromTrans,
+//		TextUnit original,
+//		Property prop)
+//	{
+//		//TODO: handle case of empty or non-existent target
+//		ArrayList<Range> ranges = new ArrayList<Range>();
+//		if ( fromTrans.isSegmented() ) {
+//			fromTrans.mergeAllSegments(ranges);
+//		}
+//
+//		TextContainer srcCont;
+//		if ( original.getSource().isSegmented() ) {
+//			srcCont  = original.getSource().clone();
+//			srcCont.mergeAllSegments();
+//		}
+//		else {
+//			srcCont = original.getSource();
+//		}
+//
+//		// Adjust the codes to use the appropriate ones
+//		List<Code> transCodes = transferCodes(fromTrans, srcCont, original);
+//		
+//		// We create a new target if needed
+//		TextContainer trgCont = original.createTarget(trgLang, false, IResource.COPY_ALL);
+//		// Update 'approved' flag is requested
+//		if ( manifest.updateApprovedFlag() ) {
+//			prop = trgCont.getProperty(Property.APPROVED);
+//			if ( prop == null ) {
+//				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
+//			}
+//			//TODO: Option to set the flag based on isTransApproved
+//			prop.setValue("yes");
+//		}
+//
+//		// Now set the target coded text and the target codes
+//		try {
+//			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
+//			// Re-set the ranges on the translated entry
+//			trgCont.createSegments(ranges);
+//		}
+//		catch ( RuntimeException e ) {
+//			logger.log(Level.SEVERE,
+//				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), original.getId()));
+//			// Use the source instead, continue the merge
+//			original.setTarget(trgLang, original.getSource());
+//		}
+//	}
 	
 	/*
 	 * Checks the codes in the translated entry, uses the original data if there is

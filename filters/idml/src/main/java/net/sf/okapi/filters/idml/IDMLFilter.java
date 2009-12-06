@@ -72,6 +72,7 @@ public class IDMLFilter implements IFilter {
 	private LocaleId srcLoc;
 	private IDMLContentFilter filter;
 	private Parameters params;
+	private EncoderManager encoderManager;
 
 	public IDMLFilter () {
 		params = new Parameters();
@@ -102,12 +103,12 @@ public class IDMLFilter implements IFilter {
 		return new ZipFilterWriter();
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		// No specific encoder for IDMLFilter
-		// But this for IDMLContentFilter
-		em.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		}
+		return encoderManager;
 	}
 
 	public String getName () {

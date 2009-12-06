@@ -69,6 +69,7 @@ public class IDMLContentFilter implements IFilter {
 	private Parameters params;
 	private boolean wasEmpty;
 	private boolean forSkel;
+	private EncoderManager encoderManager;
 
 	public IDMLContentFilter () {
 		params = new Parameters();
@@ -121,10 +122,12 @@ public class IDMLContentFilter implements IFilter {
 		return list;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		}
+		return encoderManager;
 	}
 
 	public IParameters getParameters () {

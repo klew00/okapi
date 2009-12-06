@@ -88,6 +88,7 @@ public class ODFFilter implements IFilter {
 	private Stack<Context> context;
 	private String lineBreak = "\n";
 	private String containerMimeType;
+	private EncoderManager encoderManager;
 
 	public ODFFilter () {
 		toExtract = new Hashtable<String, ElementRule>();
@@ -249,10 +250,12 @@ public class ODFFilter implements IFilter {
 		return list;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.ODF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.ODF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		}
+		return encoderManager;
 	}
 
 	public IParameters getParameters () {

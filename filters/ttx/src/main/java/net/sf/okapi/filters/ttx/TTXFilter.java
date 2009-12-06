@@ -90,6 +90,7 @@ public class TTXFilter implements IFilter {
 	private boolean useDF;
 	private boolean insideContent;
 	private TTXSkeletonWriter skelWriter;
+	private EncoderManager encoderManager;
 	
 	public TTXFilter () {
 		params = new Parameters();
@@ -140,10 +141,12 @@ public class TTXFilter implements IFilter {
 		return list;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.TTX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.TTX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		}
+		return encoderManager;
 	}
 	
 	public IParameters getParameters () {

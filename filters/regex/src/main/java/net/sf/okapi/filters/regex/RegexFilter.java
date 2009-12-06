@@ -35,7 +35,6 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -77,6 +76,7 @@ public class RegexFilter implements IFilter {
 	private LocaleId trgLang;
 	private String lineBreak;
 	private boolean hasUTF8BOM;
+	private EncoderManager encoderManager;
 	
 	public RegexFilter () {
 		params = new Parameters();
@@ -131,11 +131,12 @@ public class RegexFilter implements IFilter {
 		return list;
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		// Use all known mappings since the MIME type can be user-defined
-		em.setAllKnownMappings();
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setAllKnownMappings();
+		}
+		return encoderManager;
 	}
 	
 	public IParameters getParameters () {

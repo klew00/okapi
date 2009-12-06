@@ -84,6 +84,7 @@ public class XMLFilter implements IFilter {
 	private boolean canceled;
 	private Parameters params;
 	private boolean hasUTF8BOM;
+	private EncoderManager encoderManager;
 
 	public XMLFilter () {
 		params = new Parameters();
@@ -156,10 +157,12 @@ public class XMLFilter implements IFilter {
 		return list;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		}
+		return encoderManager;
 	}
 
 	public IParameters getParameters () {

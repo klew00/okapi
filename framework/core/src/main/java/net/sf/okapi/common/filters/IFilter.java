@@ -125,11 +125,11 @@ public interface IFilter {
 	public IFilterWriter createFilterWriter ();
 
 	/**
-	 * Creates a new EncoderManager object for this filter. This encoder manager should
-	 * also provided the mappings to the different MIME types used by the filter.
-	 * @return a new EncoderManager for this filter.
+	 * Gets the EncoderManager object for this filter. This encoder manager should
+	 * provided the mappings to the different MIME types used by the filter.
+	 * @return the EncoderManager for this filter.
 	 */
-	public EncoderManager createEncoderManager ();
+	public EncoderManager getEncoderManager ();
 	
 	/**
 	 * Gets the MIME type of the format supported by this filter.

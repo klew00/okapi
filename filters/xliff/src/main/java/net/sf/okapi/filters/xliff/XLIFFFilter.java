@@ -90,6 +90,7 @@ public class XLIFFFilter implements IFilter {
 	private Stack<Boolean> preserveSpaces;
 	private String lineBreak;
 	private boolean hasUTF8BOM;
+	private EncoderManager encoderManager;
 	
 	public XLIFFFilter () {
 		params = new Parameters();
@@ -134,10 +135,12 @@ public class XLIFFFilter implements IFilter {
 		return list;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.XLIFF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.XLIFF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		}
+		return encoderManager;
 	}
 
 	public IParameters getParameters () {

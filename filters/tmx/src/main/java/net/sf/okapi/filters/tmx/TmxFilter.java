@@ -85,11 +85,11 @@ public class TmxFilter implements IFilter {
 	
 	
 	public enum TuvXmlLang {UNDEFINED,SOURCE,TARGET,OTHER}
-	private TuvXmlLang tuvTrgType = TuvXmlLang.UNDEFINED;
 
-	
+	private TuvXmlLang tuvTrgType = TuvXmlLang.UNDEFINED;
 	private HashMap<String,String> rulesMap = new HashMap<String,String>();
 	private Stack<String> elemStack=new Stack<String>();
+	private EncoderManager encoderManager;
 	
 	public TmxFilter () {
 		params = new Parameters();
@@ -142,12 +142,14 @@ public class TmxFilter implements IFilter {
 		return list;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.TMX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.TMX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		}
+		return encoderManager;
 	}
-	
+
 	public IParameters getParameters () {
 		return params;
 	}

@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
 import net.sf.okapi.common.encoder.EncoderManager;
@@ -38,6 +39,7 @@ public abstract class AbstractFilter implements IFilter {
 	private boolean multilingual;
 	private String name;
 	private String displayName;
+	private EncoderManager encoderManager;
 
 	/**
 	 * Default constructor
@@ -137,12 +139,14 @@ public abstract class AbstractFilter implements IFilter {
 		return configs;
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		// By default we set all known mapping.
-		// It's up to each implementation to set up their own.
-		em.setAllKnownMappings();
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			// By default we set all known mapping.
+			// It's up to each implementation to set up their own.
+			encoderManager.setAllKnownMappings();
+		}
+		return encoderManager;
 	}
 
 	public void addConfiguration(FilterConfiguration configuration) {

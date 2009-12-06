@@ -59,6 +59,7 @@ public class PensieveFilter implements IFilter {
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private String docName;
+	private EncoderManager encoderManager;
 
 	public void cancel () {
 		// TODO Auto-generated method stub
@@ -88,10 +89,12 @@ public class PensieveFilter implements IFilter {
 		return list;
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		// No mapping needed
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			// No mapping needed
+		}
+		return encoderManager;
 	}
 
 	public String getDisplayName () {

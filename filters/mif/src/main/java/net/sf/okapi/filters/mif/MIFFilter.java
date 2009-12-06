@@ -72,6 +72,7 @@ public class MIFFilter implements IFilter {
 	private LocaleId srcLang;
 	private GenericSkeleton skel;
 	private boolean hasNext;
+	private EncoderManager encoderManager;
 	
 	private static Hashtable<String, Character> initCharTable () {
 		Hashtable<String, Character> table = new Hashtable<String, Character>();
@@ -134,10 +135,12 @@ public class MIFFilter implements IFilter {
 		return list;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.MIF_MIME_TYPE, "net.sf.okapi.common.encoder.MIFEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.MIF_MIME_TYPE, "net.sf.okapi.common.encoder.MIFEncoder");
+		}
+		return encoderManager;
 	}
 
 	public IParameters getParameters () {

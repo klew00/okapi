@@ -21,27 +21,24 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
-import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 public class TmxHandlerImportTest {
 
-	private final static String INDEX_DIR = "target/test-classes/";
 	private final static LocaleId locENUS = LocaleId.fromString("EN-US");
 	private final static LocaleId locDEDE = LocaleId.fromString("DE-DE");
 	private final static LocaleId locEN = LocaleId.fromString("EN");
 	private final static LocaleId locIT = LocaleId.fromString("IT");
-	private final static LocaleId locES = LocaleId.fromString("ES");
 	private ITmSeeker seeker;
 
 	@Before
 	public void setUP() throws IOException, URISyntaxException {
 
 /*		TmxFilter tmxFilter = new TmxFilter();
-		ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(INDEX_DIR,
-				true);
+ 		String INDEX_DIR = "target/test-classes/";
+		ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(INDEX_DIR, true);
 		OkapiTmxImporter tmxHandler = new OkapiTmxImporter(locENUS, tmxFilter);
 		long startTime = System.currentTimeMillis();
+		LocaleId locES = LocaleId.fromString("ES");
 		tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), locES, tmWriter);
 		long totalTime = System.currentTimeMillis() - startTime;
 		System.out.println("total time to import TMX: " + totalTime);

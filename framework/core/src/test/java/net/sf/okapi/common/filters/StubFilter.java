@@ -20,8 +20,11 @@ import java.util.List;
  * Time: 12:41:47 PM
  */
 public class StubFilter implements IFilter {
-    private static final String MIMETYPE = "text/foo";
 
+	private static final String MIMETYPE = "text/foo";
+
+	private EncoderManager encoderManager;
+	
     public String getName() {
         return "foobar";
     }
@@ -83,11 +86,12 @@ public class StubFilter implements IFilter {
 		return list;
     }
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		// All available encoders by default
-		em.setAllKnownMappings();
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setAllKnownMappings();
+		}
+		return encoderManager;
 	}
 
 	class ParametersStub implements IParameters{

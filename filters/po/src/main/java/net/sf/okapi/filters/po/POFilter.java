@@ -119,6 +119,7 @@ public class POFilter implements IFilter {
 	private String msgIDPlural;
 	private String domain;
 	private boolean hasFuzzyFlag;
+	private EncoderManager encoderManager;
 	
 	public POFilter () {
 		params = new Parameters();
@@ -170,10 +171,12 @@ public class POFilter implements IFilter {
 		return list;
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.PO_MIME_TYPE, "net.sf.okapi.common.encoder.POEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.PO_MIME_TYPE, "net.sf.okapi.common.encoder.POEncoder");
+		}
+		return encoderManager;
 	}
 	
 	public IParameters getParameters () {

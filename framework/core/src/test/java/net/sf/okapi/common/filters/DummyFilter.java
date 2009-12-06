@@ -51,6 +51,7 @@ public class DummyFilter implements IFilter {
 	private LocaleId srcLang;
 	private LocaleId trgLang;
 	private DummyParameters params;
+	private EncoderManager encoderManager;
 
 	public DummyFilter () {
 		params = new DummyParameters();
@@ -144,10 +145,12 @@ public class DummyFilter implements IFilter {
 		return new GenericFilterWriter(createSkeletonWriter());
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setAllKnownMappings();
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setAllKnownMappings();
+		}
+		return encoderManager;
 	}
 
 	private void reset (String data) {

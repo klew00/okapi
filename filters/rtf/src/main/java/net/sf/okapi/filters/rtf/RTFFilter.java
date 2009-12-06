@@ -157,6 +157,7 @@ public class RTFFilter implements IFilter {
 	private String docName;
 	private int tuId;
 	private int otherId;
+	private EncoderManager encoderManager;
 	
 	public RTFFilter () {
 		winCharsets = new Hashtable<Integer, String>();
@@ -316,10 +317,12 @@ public class RTFFilter implements IFilter {
 		return list;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		// No specific mapping for RTF
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			// No specific mapping for RTF
+		}
+		return encoderManager;
 	}
 	
 	public IParameters getParameters () {

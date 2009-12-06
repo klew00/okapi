@@ -14,7 +14,6 @@ import net.sf.okapi.filters.html.HtmlUtils;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
-import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.LocaleId;
 
 import org.junit.After;

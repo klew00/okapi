@@ -82,6 +82,7 @@ public class PropertiesFilter implements IFilter {
 	private GenericSkeleton skel;
 	private String docName;
 	private boolean hasUTF8BOM;
+	private EncoderManager encoderManager;
 	
 	public PropertiesFilter () {
 		params = new Parameters();
@@ -133,10 +134,12 @@ public class PropertiesFilter implements IFilter {
 		return list;
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.PROPERTIES_MIME_TYPE, "net.sf.okapi.common.encoder.PropertiesEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.PROPERTIES_MIME_TYPE, "net.sf.okapi.common.encoder.PropertiesEncoder");
+		}
+		return encoderManager;
 	}
 	
 	public IParameters getParameters () {

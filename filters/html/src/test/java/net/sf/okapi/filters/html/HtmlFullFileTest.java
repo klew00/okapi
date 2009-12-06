@@ -1,6 +1,5 @@
 package net.sf.okapi.filters.html;
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;

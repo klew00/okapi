@@ -84,6 +84,7 @@ public class DTDFilter implements IFilter {
 	private Pattern pattern;
 	private Hashtable<String, Character> charEntities;
 	private DTDEncoder encoder;
+	private EncoderManager encoderManager;
 	
 	public DTDFilter () {
 		params = new Parameters();
@@ -172,10 +173,12 @@ public class DTDFilter implements IFilter {
 		return list;
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.DTD_MIME_TYPE, "net.sf.okapi.common.encoder.DTDEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.DTD_MIME_TYPE, "net.sf.okapi.common.encoder.DTDEncoder");
+		}
+		return encoderManager;
 	}
 
 	public void open (RawDocument input,

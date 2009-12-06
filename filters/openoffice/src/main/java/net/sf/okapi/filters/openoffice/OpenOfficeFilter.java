@@ -79,6 +79,7 @@ public class OpenOfficeFilter implements IFilter {
 	private ODFFilter filter;
 	private Parameters params;
 	private String internalMimeType;
+	private EncoderManager encoderManager;
 
 	public OpenOfficeFilter () {
 		params = new Parameters();
@@ -131,11 +132,12 @@ public class OpenOfficeFilter implements IFilter {
 		return list;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		// For ODFFilter:
-		em.setMapping(MimeTypeMapper.ODF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.ODF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		}
+		return encoderManager;
 	}
 	
 	public IParameters getParameters () {

@@ -129,6 +129,7 @@ public class OpenXMLFilter implements IFilter {
 	private String sCurrentExcelSheet=""; // DWH 6-25-09 current sheet number
 	private YamlParameters yparams=null;
 	private String encoding="UTF-8"; // DWH 8-10-09 issue 104
+	private EncoderManager encoderManager;
 
 	public OpenXMLFilter () {
 		cparams = new ConditionalParameters(); // DWH 6-16-09
@@ -220,10 +221,12 @@ public class OpenXMLFilter implements IFilter {
 		return new OpenXMLZipFilterWriter();
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		}
+		return encoderManager;
 	}
 
 	public String getName () {

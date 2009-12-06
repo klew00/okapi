@@ -83,6 +83,7 @@ public class PHPContentFilter implements IFilter {
 	private GenericSkeleton srcSkel;
 	private int resType;
 	private HTMLCharacterEntities cerList;
+	private EncoderManager encoderManager;
 	
 	public PHPContentFilter () {
 		params = new Parameters();
@@ -116,10 +117,12 @@ public class PHPContentFilter implements IFilter {
 		return list;
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.PHP_MIME_TYPE, "net.sf.okapi.common.encoder.PHPContentEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.PHP_MIME_TYPE, "net.sf.okapi.common.encoder.PHPContentEncoder");
+		}
+		return encoderManager;
 	}
 	
 	public String getDisplayName () {

@@ -23,8 +23,6 @@ package net.sf.okapi.filters.abstractmarkup;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
-import net.htmlparser.jericho.StartTag;
-import net.htmlparser.jericho.Tag;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 /**

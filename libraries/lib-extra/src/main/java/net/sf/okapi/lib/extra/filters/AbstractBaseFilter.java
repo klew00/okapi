@@ -23,6 +23,7 @@ package net.sf.okapi.lib.extra.filters;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -39,7 +40,10 @@ public abstract class AbstractBaseFilter extends OkapiComponent implements IFilt
 	
 	private String mimeType;
 	private String displayName;
+	
 	List<FilterConfiguration> configList = new ArrayList<FilterConfiguration>();
+	EncoderManager encoderManager;
+
 
 //	@Override
 //	protected void component_create() {
@@ -68,11 +72,12 @@ public abstract class AbstractBaseFilter extends OkapiComponent implements IFilt
 		return displayName;
 	}
 	
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		// All available encoders by default
-		em.setAllKnownMappings();
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setAllKnownMappings();
+		}
+		return encoderManager;
 	}
 
 	protected boolean addConfiguration(			

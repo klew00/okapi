@@ -93,6 +93,7 @@ public class JSONFilter implements IFilter {
 	private int endString;
 	private boolean hasNext;
 	private Pattern exceptions;
+	private EncoderManager encoderManager;
 	
 	public JSONFilter () {
 		params = new Parameters();
@@ -124,11 +125,12 @@ public class JSONFilter implements IFilter {
 		return list;
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		//TODO: We may have to change this
-		em.setMapping(MIMETYPE, "net.sf.okapi.common.encoder.DefaultEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MIMETYPE, "net.sf.okapi.common.encoder.DefaultEncoder");
+		}
+		return encoderManager;
 	}
 
 	public String getDisplayName () {

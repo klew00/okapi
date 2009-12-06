@@ -299,6 +299,7 @@ public class TsFilter implements IFilter {
 	private String encoding;
 	private boolean hasUTF8BOM;
 	private Parameters params;
+	private EncoderManager encoderManager;
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -342,10 +343,12 @@ public class TsFilter implements IFilter {
 		return list;
 	}
 
-	public EncoderManager createEncoderManager () {
-		EncoderManager em = new EncoderManager();
-		em.setMapping(MimeTypeMapper.TS_MIME_TYPE, "net.sf.okapi.common.encoder.TSEncoder");
-		return em;
+	public EncoderManager getEncoderManager () {
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			encoderManager.setMapping(MimeTypeMapper.TS_MIME_TYPE, "net.sf.okapi.common.encoder.TSEncoder");
+		}
+		return encoderManager;
 	}
 	
 	public String getMimeType() {
