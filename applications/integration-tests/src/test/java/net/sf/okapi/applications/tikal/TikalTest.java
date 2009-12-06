@@ -185,6 +185,19 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractSegmentMergeDOCX () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("docxsegtest.docx.xlf"));
+    	assertTrue(deleteOutputFile("docxsegtest.out.docx"));
+    	// Extract
+    	assertEquals(0, runTikal("-x -sl en -tl fr docxsegtest.docx -seg -ie windows-1252"));
+    	assertTrue("File different from gold", compareWithGoldFile("docxsegtest.docx.xlf", "UTF-8"));
+    	// Merge
+    	assertEquals(0, runTikal("-m -sl en -tl fr docxsegtest.docx.xlf"));
+    	assertTrue("File different from gold", compareZipWithGoldFile("docxsegtest.out.docx"));
+    }
+
+    @Test
     public void testExtractMergeTMX () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputFile("tmxtest-attributes.tmx.xlf"));

@@ -1130,8 +1130,8 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Compares an object with this TextFragment. If the object is also a TextFragment,
-	 * the method returns the comparison between the coded text strings of both text fragments.
-	 * Note that inline codes are not compared with this method.
+	 * the method returns the same results as <code>compareTo(fragment, false)</code>
+	 * (Note that inline codes are not compared with this method).
 	 * If the object is not a TextFragment, the method returns the comparison between the two
 	 * toString() results of the two objects.
 	 * @param object the object to compare with this TextFragment.
@@ -1140,7 +1140,7 @@ public class TextFragment implements Comparable<Object> {
 	public int compareTo (Object object) {
 		if ( object == null ) return -1;
 		if ( object instanceof TextFragment ) {
-			return getCodedText().compareTo(((TextFragment)object).getCodedText());
+			return compareTo((TextFragment)object, false);
 		}
 		// Else, compare string representation
 		return toString().compareTo(object.toString());
@@ -1148,7 +1148,7 @@ public class TextFragment implements Comparable<Object> {
 
 	/**
 	 * Compares a TextFragment with this one. The method returns the comparison between
-	 * the coded text strings of both text fragments, and if specified, between their 
+	 * the text parts of both text fragments, and if specified, between their 
 	 * inline codes.
 	 * @param frag the TextFragment to compare with this one.
 	 * @param codeSensitive true if the codes need to be compared as well.
@@ -1158,8 +1158,32 @@ public class TextFragment implements Comparable<Object> {
 		boolean codeSensitive)
 	{
 		if ( frag == null ) return -1;
-		int n = getCodedText().compareTo((frag).getCodedText());
-		if ( n != 0 ) return n;
+		String fragText = frag.getCodedText();
+		if ( !isBalanced ) balanceMarkers();
+		
+		// Compare char by char avoiding codes
+		char ch1, ch2;
+		for ( int i=0, j=0; i<text.length(); i++ ) {
+			ch1 = text.charAt(i);
+			if ( TextFragment.isMarker(ch1) ) {
+				++i; // Skip index
+			}
+			else { // Get the next character, skip codes, check length
+				while ( true ) {
+					if ( j >= fragText.length() ) return -1;
+					ch2 = fragText.charAt(j);
+					j++; // For next time
+					if ( !TextFragment.isMarker(ch2) ) {
+						break;
+					}
+					j++; // Skip index
+				}
+				// Compare the characters
+				if ( ch1 != ch2 ) return (ch1-ch2); 
+			}
+		}
+		
+		// Compare codes if requested
 		if ( codeSensitive ) {
 			if ( hasCode() ) {
 				if ( !frag.hasCode() ) return 1;

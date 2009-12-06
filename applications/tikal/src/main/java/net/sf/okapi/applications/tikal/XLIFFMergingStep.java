@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.tikal;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +29,8 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -186,7 +189,7 @@ public class XLIFFMergingStep {
 //			return; // Use the source
 //		}
 
-		// Get the translated target, and un-segment it if needed
+		// Get the translated target
 		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSourceContent().isEmpty() ) return;
@@ -196,32 +199,41 @@ public class XLIFFMergingStep {
 			return; // Use the source
 		}
 		
-//TODO: handle case of empty or non-existent target		
+		// Do we need to preserve the segmentation for merging (e.g. TTX case)
+		boolean mergeAsSegments = (( tu.getMimeType() != null ) 
+			&& ( tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE) ));
+		
+		// Un-segment if needed (and remember the ranges if we will need to re-split after)
+		// Merging the segments allow to check/transfer the codes at the text unit level
+		ArrayList<Range> ranges = null;
+		if ( mergeAsSegments ) ranges = new ArrayList<Range>();
 		if ( fromTrans.isSegmented() ) {
-			fromTrans.mergeAllSegments();
+			fromTrans.mergeAllSegments(ranges);
 		}
+		
+		// Get the source (as a clone if we need to change the segments)
+		TextContainer srcCont;
+		if ( tu.getSource().isSegmented() ) {
+			srcCont  = tu.getSource().clone();
+			srcCont.mergeAllSegments();
+		}
+		else {
+			srcCont = tu.getSource();
+		}
+
+		// Adjust the codes to use the appropriate ones
+		List<Code> transCodes = transferCodes(fromTrans, srcCont, tu);
 
 		// We create a new target if needed
 		TextContainer trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
 		
-		// Update 'approved' flag is requested
-//		if ( manifest.updateApprovedFlag() ) {
-//			prop = trgCont.getProperty(Property.APPROVED);
-//			if ( prop == null ) {
-//				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
-//			}
-//			//TODO: Option to set the flag based on isTransApproved
-//			prop.setValue("yes");
-//		}
-
-		// Adjust the codes to use the appropriate ones
-		List<Code> transCodes = fromTrans.getCodes();
-		// Use the ones in translated target, but if empty, take it from source
-		transCodes = transferCodes(transCodes, tu.getSourceContent().getCodes(), tu);
-		
 		// Now set the target coded text and the target codes
 		try {
 			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
+			// Re-set the ranges on the translated entry
+			if ( mergeAsSegments ) {
+				trgCont.createSegments(ranges);
+			}
 		}
 		catch ( RuntimeException e ) {
 			logger.log(Level.SEVERE,
@@ -229,6 +241,7 @@ public class XLIFFMergingStep {
 			// Use the source instead, continue the merge
 			tu.setTarget(trgLoc, tu.getSource());
 		}
+		
 	}
 
 	/*
@@ -236,10 +249,13 @@ public class XLIFFMergingStep {
 	 * none in the code coming from XLIFF, and generates a non-stopping error if
 	 * a non-deletable code is missing.
 	 */
-	private List<Code> transferCodes (List<Code> transCodes,
-		List<Code> oriCodes,
+	private List<Code> transferCodes (TextContainer fromTrans,
+		TextContainer srcCont, // Can be a clone of the original content
 		TextUnit tu)
 	{
+		List<Code> transCodes = fromTrans.getCodes();
+		List<Code> oriCodes = srcCont.getCodes();
+		
 		// Check if we have at least one code
 		if ( transCodes.size() == 0 ) {
 			if ( oriCodes.size() == 0 ) return transCodes;
@@ -249,7 +265,6 @@ public class XLIFFMergingStep {
 		int[] oriIndices = new int[oriCodes.size()];
 		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
 		int done = 0;
-		boolean orderWarning;
 		
 		Code transCode, oriCode;
 		for ( int i=0; i<transCodes.size(); i++ ) {
@@ -258,7 +273,6 @@ public class XLIFFMergingStep {
 
 			// Get the data from the original code (match on id)
 			oriCode = null;
-			orderWarning = true;
 			for ( int j=0; j<oriIndices.length; j++ ) {
 				if ( oriIndices[j] == -1) continue; // Used already
 				if ( oriCodes.get(oriIndices[j]).getId() == transCode.getId() ) {
@@ -266,11 +280,6 @@ public class XLIFFMergingStep {
 					oriIndices[j] = -1;
 					done++;
 					break;
-				}
-				if ( orderWarning ) {
-					logger.warning(String.format("The target code id='%d' has been moved (item id='%s', name='%s')",
-						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
-					orderWarning = false; 
 				}
 			}
 			if ( oriCode == null ) { // Not found in original (extra in target)
@@ -310,5 +319,85 @@ public class XLIFFMergingStep {
 		
 		return transCodes;
 	}
+	
+//	/*
+//	 * Checks the codes in the translated entry, uses the original data if there is
+//	 * none in the code coming from XLIFF, and generates a non-stopping error if
+//	 * a non-deletable code is missing.
+//	 */
+//	private List<Code> transferCodes (List<Code> transCodes,
+//		List<Code> oriCodes,
+//		TextUnit tu)
+//	{
+//		// Check if we have at least one code
+//		if ( transCodes.size() == 0 ) {
+//			if ( oriCodes.size() == 0 ) return transCodes;
+//			// Else: fall thru and get missing codes errors
+//		}
+//		
+//		int[] oriIndices = new int[oriCodes.size()];
+//		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
+//		int done = 0;
+//		boolean orderWarning;
+//		
+//		Code transCode, oriCode;
+//		for ( int i=0; i<transCodes.size(); i++ ) {
+//			transCode = transCodes.get(i);
+//			transCode.setOuterData(null); // Remove XLIFF outer codes
+//
+//			// Get the data from the original code (match on id)
+//			oriCode = null;
+//			orderWarning = true;
+//			for ( int j=0; j<oriIndices.length; j++ ) {
+//				if ( oriIndices[j] == -1) continue; // Used already
+//				if ( oriCodes.get(oriIndices[j]).getId() == transCode.getId() ) {
+//					oriCode = oriCodes.get(oriIndices[j]);
+//					oriIndices[j] = -1;
+//					done++;
+//					break;
+//				}
+//				if ( orderWarning ) {
+//					logger.warning(String.format("The target code id='%d' has been moved (item id='%s', name='%s')",
+//						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
+//					orderWarning = false; 
+//				}
+//			}
+//			if ( oriCode == null ) { // Not found in original (extra in target)
+//				if (( transCode.getData() == null )
+//					|| ( transCode.getData().length() == 0 )) {
+//					// Leave it like that
+//					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
+//						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
+//				}
+//			}
+//			else { // Get the data from the original
+//				if ( transCode.getOuterData() != null ) {
+//					transCode.setOuterData(oriCode.getOuterData());
+//				}
+//				else if (( transCode.getData() == null )
+//					|| ( transCode.getData().length() == 0 )) {
+//					transCode.setData(oriCode.getData());
+//				}
+//				transCode.setReferenceFlag(oriCode.hasReference());
+//			}
+//		}
+//		
+//		// If needed, check for missing codes in translation
+//		if ( oriCodes.size() > done ) {
+//			// Any index > -1 in source means it was was deleted in target
+//			for ( int i=0; i<oriIndices.length; i++ ) {
+//				if ( oriIndices[i] != -1 ) {
+//					Code code = oriCodes.get(oriIndices[i]);
+//					if ( !code.isDeleteable() ) {
+//						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+//							code.getId(), code.getData(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
+//						logger.info("Source='"+tu.getSource().toString()+"'");
+//					}
+//				}
+//			}
+//		}
+//		
+//		return transCodes;
+//	}
 	
 }

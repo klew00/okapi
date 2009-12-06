@@ -62,7 +62,7 @@ public class Merger {
 	private IFilter inpFilter;
 	private IFilterWriter outFilter;
 	private RTFFilter rtfFilter;
-	private LocaleId trgLang;
+	private LocaleId trgLoc;
 
 	public Merger () {
 		// Load the filter configurations
@@ -79,7 +79,7 @@ public class Merger {
 		}
 		// Set the manifest and the options
 		this.manifest = manifest;
-		trgLang = manifest.getTargetLanguage();
+		trgLoc = manifest.getTargetLanguage();
 	}
 	
 	public void execute (int docId) {
@@ -185,13 +185,13 @@ public class Merger {
 			// Initializes the input
 			File f = new File(originalFile);
 			inpFilter.open(new RawDocument(f.toURI(), item.getInputEncoding(),
-				manifest.getSourceLanguage(), trgLang));
+				manifest.getSourceLanguage(), trgLoc));
 			
 			// Initializes the output
 			String outputFile = manifest.getFileToGeneratePath(docId);
 			Util.createDirectories(outputFile);
 			outFilter = inpFilter.createFilterWriter();
-			outFilter.setOptions(trgLang, item.getOutputEncoding());
+			outFilter.setOptions(trgLoc, item.getOutputEncoding());
 			outFilter.setOutput(outputFile);
 			
 			// Process the document
@@ -253,7 +253,7 @@ public class Merger {
 			return; // Use the source
 		}
 
-		if ( !tuFromTrans.hasTarget(trgLang) ) {
+		if ( !tuFromTrans.hasTarget(trgLoc) ) {
 			// No translation in package
 			if ( !tu.isEmpty() ) {
 				logger.log(Level.WARNING,
@@ -264,7 +264,7 @@ public class Merger {
 
 		// Process the "approved" property
 		boolean isTransApproved = false;
-		Property prop = tuFromTrans.getTargetProperty(trgLang, Property.APPROVED);
+		Property prop = tuFromTrans.getTargetProperty(trgLoc, Property.APPROVED);
 		if ( prop != null ) {
 			isTransApproved = prop.getValue().equals("yes");
 		}
@@ -277,7 +277,7 @@ public class Merger {
 
 		// Get the translated target
 		//TODO: handle case of empty or non-existent target
-		TextContainer fromTrans = tuFromTrans.getTarget(trgLang);
+		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSourceContent().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
@@ -288,7 +288,7 @@ public class Merger {
 
 		// Do we need to preserve the segmentation for merging (e.g. TTX case)
 		boolean mergeAsSegments = (( tu.getMimeType() != null ) 
-			&& ( !tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE) ));
+			&& ( tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE) ));
 		
 		// Un-segment if needed (and remember the ranges if we will need to re-split after)
 		// Merging the segments allow to check/transfer the codes at the text unit level
@@ -312,7 +312,7 @@ public class Merger {
 		List<Code> transCodes = transferCodes(fromTrans, srcCont, tu);
 		
 		// We create a new target if needed
-		TextContainer trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
+		TextContainer trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
 		// Update 'approved' flag is requested
 		if ( manifest.updateApprovedFlag() ) {
 			prop = trgCont.getProperty(Property.APPROVED);
@@ -335,7 +335,7 @@ public class Merger {
 			logger.log(Level.SEVERE,
 				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
 			// Use the source instead, continue the merge
-			tu.setTarget(trgLang, tu.getSource());
+			tu.setTarget(trgLoc, tu.getSource());
 		}
 		
 		

@@ -501,20 +501,30 @@ public class TextFragmentTest {
 		TextFragment tf1 = new TextFragment("text of the fragment");
 		TextFragment tf2 = new TextFragment("text of the fragment");
 		assertEquals(0, tf1.compareTo(tf2));
+		assertEquals(0, tf1.compareTo(tf2, true));
     }
 	
 	@Test
     public void testCompareToDifferentFragment () {
 		TextFragment tf1 = new TextFragment("text of the fragment");
-		TextFragment tf2 = new TextFragment("Text Of The Fragment");
+		TextFragment tf2 = new TextFragment("text Of The Fragment");
 		assertFalse(0==tf1.compareTo(tf2));
+		assertFalse(0==tf1.compareTo(tf2, true));
     }
-	
+
 	@Test
     public void testCompareToSameFragmentWithSameCodes () {
 		TextFragment tf1 = makeFragment1();
 		TextFragment tf2 = makeFragment1();
 		assertEquals(0, tf1.compareTo(tf2, true));
+    }
+	
+	@Test
+    public void testCompareToWithNoCodesAndCodes () {
+		TextFragment tf1 = makeFragment1();
+		TextFragment tf2 = new TextFragment("ABC");
+		assertEquals(0, tf1.compareTo(tf2, false));
+		assertTrue(0!=tf1.compareTo(tf2, true));
     }
 	
 	@Test
