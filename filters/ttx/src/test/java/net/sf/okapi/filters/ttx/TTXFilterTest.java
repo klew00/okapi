@@ -77,7 +77,7 @@ public class TTXFilterTest {
 
 		filter2 = new TTXFilter();
 		Parameters params = (Parameters)filter2.getParameters();
-		params.setForcesegments(false);
+		params.setForceSegments(false);
 	}
 
 	@Test

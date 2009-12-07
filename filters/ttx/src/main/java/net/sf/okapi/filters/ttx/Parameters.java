@@ -40,7 +40,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return forceSegments;
 	}
 
-	public void setForcesegments (boolean forceSegments) {
+	public void setForceSegments (boolean forceSegments) {
 		this.forceSegments = forceSegments;
 	}
 
@@ -70,7 +70,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("TTX Filter Parameters", true, false);
-		desc.addCheckboxPart(paramDesc.get("escapeGT"));
+		desc.addCheckboxPart(paramDesc.get(FORCESEGMENTS));
 		return desc;
 	}
 
