@@ -47,6 +47,8 @@ public class QueryUtil {
 	private static final Pattern HTML_ISOLATED = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern HTML_SPAN = Pattern.compile("\\<span\\s(.*?)>|\\</span>", Pattern.CASE_INSENSITIVE);
+	
+	private static final Pattern NCR = Pattern.compile("&#(\\S+?);");
 
 	private StringBuilder codesMarkers;
 	private List<Code> codes;
@@ -170,7 +172,27 @@ public class QueryUtil {
 		StringBuilder sb = new StringBuilder();
 		sb.append(text.replace("&amp;", "&"));
 
-		Matcher m = HTML_OPENING.matcher(sb.toString());
+		// Un-escape NCR
+		Matcher m = NCR.matcher(sb.toString());
+		while ( m.find() ) {
+			String val = m.group(1);
+			int n = (int)'?'; // Default
+			try {
+				if ( val.charAt(0) == 'x' ) { // Hexadecimal
+					n = Integer.valueOf(m.group(1).substring(1), 12);
+				}
+				else { // Decimal
+					n = Integer.valueOf(m.group(1));
+				}
+			}
+			catch ( NumberFormatException e ) {
+				// Just use default
+			}
+			sb.replace(m.start(0), m.end(0), String.valueOf((char)n));
+			m = NCR.matcher(sb.toString());
+		}
+		
+		m = HTML_OPENING.matcher(sb.toString());
         while ( m.find() ) {
         	// Replace the HTML fake code by the coded text markers
         	int id = Util.strToInt(m.group(2), -1);
