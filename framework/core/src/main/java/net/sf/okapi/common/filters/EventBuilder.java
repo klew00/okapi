@@ -1,15 +1,22 @@
-/*
- * =========================================================================== Copyright (C) 2008-2009 by the Okapi
- * Framework contributors ----------------------------------------------------------------------------- This library is
- * free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details. You should have received a copy of the GNU Lesser General Public License along with this library; if not,
- * write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA See also the full
- * LGPL text here: http://www.gnu.org/copyleft/lesser.html
- * ===========================================================================
- */
+/*===========================================================================
+  Copyright (C) 2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
 
 package net.sf.okapi.common.filters;
 
@@ -664,6 +671,8 @@ public class EventBuilder {
 
 	/**
 	 * End the current {@link TextUnit} and place the {@link Event} on the event queue.
+	 * 
+	 * @return the ended {@link TextUnit}
 	 */
 	public TextUnit endTextUnit() {
 		return endTextUnit(null, null, null);
@@ -674,6 +683,7 @@ public class EventBuilder {
 	 * 
 	 * @param endMarker
 	 *            the tag that ends the complex {@link TextUnit}
+	 * @return the ended {@link TextUnit}
 	 */
 	public TextUnit endTextUnit(GenericSkeleton endMarker) {
 		return endTextUnit(endMarker, null, null);
@@ -688,6 +698,7 @@ public class EventBuilder {
 	 *            the locale of the text
 	 * @param propertyTextUnitPlaceholders
 	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
+	 * @return the ended {@link TextUnit}
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
@@ -738,10 +749,9 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Adds a TextUnit to the current {@link TextUnit}
+	 * Adds a child TextUnit to the current (parent) {@link TextUnit}
 	 * 
-	 * @param text
-	 *            the text
+	 * @param textUnit
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
@@ -1000,10 +1010,10 @@ public class EventBuilder {
 
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
-		}  else if (isCurrentTextUnit()) {
+		} else if (isCurrentTextUnit()) {
 			endTextUnit();
 		}
-		
+
 		currentSkeleton = new GenericSkeleton(part);
 		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
 		currentDocumentPart.setSkeleton(currentSkeleton);
@@ -1081,7 +1091,7 @@ public class EventBuilder {
 	 * @param part
 	 *            the {@link DocumentPart} as a String.
 	 */
-	public void addToDocumentPart(String part) {	
+	public void addToDocumentPart(String part) {
 		if (currentSkeleton == null) {
 			startDocumentPart(part);
 			return;
@@ -1145,10 +1155,8 @@ public class EventBuilder {
 	/**
 	 * Set the current {@link TextUnit} type. If there is no defined type the type is the element name.
 	 * 
-	 * @param name
-	 *            the name (resname in XLIFF) of the {@link TextUnit}
-	 * @throws NullPointerException
-	 *             if there is no current {@link TextUnit}
+	 * @param type
+	 *            - the TextUnit type.
 	 */
 	public void setTextUnitType(String type) {
 		TextUnit tu = peekMostRecentTextUnit();
@@ -1183,6 +1191,13 @@ public class EventBuilder {
 		return textUnit;
 	}
 
+	/**
+	 * Is the current TextUnit of the specified type?
+	 * 
+	 * @param type
+	 *            a {@link TextUnit} type.
+	 * @return true if the current {@link TextUnit} type is the same as the parameter type.
+	 */
 	public boolean isTextUnitWithSameType(String type) {
 		Event e = peekTempEvent();
 		if (e != null && e.getEventType() == EventType.TEXT_UNIT) {
