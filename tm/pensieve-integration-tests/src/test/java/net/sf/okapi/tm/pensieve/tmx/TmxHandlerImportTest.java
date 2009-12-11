@@ -15,6 +15,7 @@ import org.apache.lucene.store.RAMDirectory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,6 +46,13 @@ public class TmxHandlerImportTest {
 		
 		seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR); */
 	}
+	
+	@After
+    public void tearDown() {
+		if (seeker != null) {
+			seeker.close();
+		}
+    }
 
 	// Local test only on very large non-commited TM
 	// comment-out for commit

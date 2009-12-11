@@ -27,5 +27,6 @@ import java.util.HashMap;
  * @author HaslamJD
  */
 public class Metadata extends HashMap<MetadataType, String> {
+	private static final long serialVersionUID = -1049971493479356457L;
 
 }

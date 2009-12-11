@@ -21,42 +21,38 @@
 package net.sf.okapi.tm.pensieve.writer;
 
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
-import java.io.IOException;
 
 /**
  *
  * @author HaslamJD
+ * @author HARGRAVEJE
  */
 public interface ITmWriter {
 
     /**
      * Closes the index and forces a commit against the index.
-     * @throws IOException if the commit can not happen
+     * @throws OkapiIOException if the commit can not happen
      */
-    void endIndex() throws IOException;
+    void close();
 
     /**
      * Indexes a given translation unit.
      * @param tu the translation unit to index.
-     * @throws IOException if the indexing cannot happen.
+     * @throws OkapiIOException if the indexing cannot happen.
      */
-    //TODO: get rid of the IOException requirement
-    void indexTranslationUnit(TranslationUnit tu) throws IOException;
+    void indexTranslationUnit(TranslationUnit tu);
     
     /**
      * Deletes a TranslationUnit based on the id.
      * @param id The Unique ID of the TU to delete
-     * @throws IOException if the delete can not happen
+     * @throws OkapiIOException if the delete can not happen
      */
-    //TODO: get rid of the IOException requirement
-    void delete(String id) throws IOException;
+    void delete(String id);
 
     /**
      * Updates a TranslationUnit.
      * @param tu The TranslationUnit to update
-     * @throws IOException if the update can not happen
+     * @throws OkapiIOException if the update can not happen
      */
-    //TODO: get rid of the IOException requirement
-    public void update(TranslationUnit tu) throws IOException;
-
+    public void update(TranslationUnit tu);
 }

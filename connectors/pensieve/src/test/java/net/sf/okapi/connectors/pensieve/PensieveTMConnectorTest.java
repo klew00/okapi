@@ -126,7 +126,7 @@ public class PensieveTMConnectorTest {
 		tu.setTarget(tuv);
 		writer.indexTranslationUnit(tu);
 
-		writer.endIndex();
+		writer.close();
 	}
 
 	@Test

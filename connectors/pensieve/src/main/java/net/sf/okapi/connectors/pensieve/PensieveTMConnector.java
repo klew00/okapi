@@ -73,7 +73,7 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 
 	public void close () {
-		seeker = null;
+		seeker.close();
 	}
 
 	public boolean hasNext () {

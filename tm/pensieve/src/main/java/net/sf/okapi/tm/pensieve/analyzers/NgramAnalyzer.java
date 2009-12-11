@@ -65,12 +65,11 @@ public class NgramAnalyzer extends Analyzer {
 			"he f", "ght ", "op e", "ates", "nt t", "icat", "ppli", "rati",
 			"p el", ", yo", ", or", "twar", "plic"};
 	
-	private Set<String> stopNgrams;
+	private Set<Object> stopNgrams;
 
 	private Locale locale;
 	private int ngramLength;
 
-	@SuppressWarnings("unchecked")
 	public NgramAnalyzer(Locale locale, int ngramLength) {
 		if (ngramLength <= 0) {
 			throw new IllegalArgumentException(

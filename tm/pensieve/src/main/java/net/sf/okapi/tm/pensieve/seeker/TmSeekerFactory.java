@@ -26,10 +26,18 @@ import org.apache.lucene.store.FSDirectory;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author HARGRAVEJE
+ *
+ */
 public final class TmSeekerFactory {
 
     private TmSeekerFactory(){}
 
+    /**
+     * @param indexDirectoryPath
+     * @return a {@link ITmSeeker} initialized for searching a file based index
+     */
     public static ITmSeeker createFileBasedTmSeeker(String indexDirectoryPath) {
         Directory dir;
         try{

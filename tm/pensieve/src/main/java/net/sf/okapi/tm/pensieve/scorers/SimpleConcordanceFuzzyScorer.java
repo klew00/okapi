@@ -8,7 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
+import net.sf.okapi.tm.pensieve.queries.SimpleConcordanceFuzzyQuery;
 
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -19,14 +19,12 @@ import org.apache.lucene.util.OpenBitSet;
 import org.apache.lucene.util.OpenBitSetIterator;
 
 /**
+ * A Lucene {@link Scorer} that generates scored documents for the {@link SimpleConcordanceFuzzyQuery}
+ * 
  * @author HARGRAVEJE
- *
+ * 
  */
-public class TmFuzzyScorer extends Scorer {
-	// note that the ROUGH_THRESHOLD is the lowest accepted threshold
-	// TODO: externalize this
-	private static float ROUGH_CUTOFF = 0.50f;
-
+public class SimpleConcordanceFuzzyScorer extends Scorer {
 	private List<Term> terms;
 	private IndexReader reader;
 	private float threshold;
@@ -38,18 +36,24 @@ public class TmFuzzyScorer extends Scorer {
 	private int uniqueTermSize;
 
 	/**
+	 * Creates a SimpleConcordanceFuzzyScorer with the supplied parameters.
+	 * 
 	 * @param threshold
+	 *            - value between 0.0 and 1.0, where 1.0 is a perfect match and 0.0 is no match.
 	 * @param similarity
+	 *            - Lucene {@link Similarity}
 	 * @param terms
+	 *            list of {@link Term}s
 	 * @param reader
+	 *            - current {@link IndexReader}
 	 * @throws IOException
 	 */
-	public TmFuzzyScorer(float threshold, Similarity similarity,
-			List<Term> terms, IndexReader reader) throws IOException {
+	public SimpleConcordanceFuzzyScorer(float threshold, Similarity similarity, List<Term> terms,
+			IndexReader reader) throws IOException {
 		super(similarity);
 		this.reader = reader;
 		this.threshold = threshold;
-		this.terms = terms;
+		this.terms = terms;		
 		this.scoredDocs = new TIntIntHashMap();
 		this.currentDoc = 0;
 	}
@@ -58,10 +62,10 @@ public class TmFuzzyScorer extends Scorer {
 		// initialize buffers
 		OpenBitSet docPointers = new OpenBitSet(reader.maxDoc());
 		TermPositions tp = null;
-		
+
 		List<Term> uniqueTerms = new LinkedList<Term>(new LinkedHashSet<Term>(terms));
 		uniqueTermSize = uniqueTerms.size();
-		this.roughThresholdFreq = (int) (uniqueTermSize * ROUGH_CUTOFF);
+		roughThresholdFreq = (int) (uniqueTermSize * (threshold*0.01f));
 		for (Iterator<Term> iter = uniqueTerms.iterator(); iter.hasNext();) {
 			try {
 				tp = reader.termPositions(iter.next());
@@ -90,9 +94,9 @@ public class TmFuzzyScorer extends Scorer {
 			return NO_MORE_DOCS;
 		}
 
-		while((currentDoc = nextDoc()) < target) {		
+		while ((currentDoc = nextDoc()) < target) {
 		}
-		
+
 		return currentDoc;
 	}
 
@@ -103,6 +107,7 @@ public class TmFuzzyScorer extends Scorer {
 
 	/**
 	 * Are the docs scored out of order?
+	 * 
 	 * @return true if docs are scored out of order
 	 */
 	public boolean scoresDocsOutOfOrder() {
@@ -125,18 +130,15 @@ public class TmFuzzyScorer extends Scorer {
 			if (currentDoc == NO_MORE_DOCS) {
 				return currentDoc;
 			}
-			
+
 			if (calculateScore() >= threshold) {
 				return currentDoc;
-			} 
+			}
 		}
 	}
-	
+
 	private float calculateScore() throws IOException {
-		score = (float) ((2.0f * (float) scoredDocs.get(currentDoc)) / (float) (reader
-				.getTermFreqVector(currentDoc, TranslationUnitField.SOURCE.name()).size() 
-				+ uniqueTermSize)) * 100.0f;
-		
+		score = ((float) scoredDocs.get(currentDoc) / (float) uniqueTermSize) * 100.0f;
 		return score;
 	}
 

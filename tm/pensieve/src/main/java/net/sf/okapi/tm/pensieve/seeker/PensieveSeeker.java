@@ -1,22 +1,23 @@
 /*===========================================================================
-Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
-This library is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2.1 of the License, or (at
-your option) any later version.
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
 
-This library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
-General Public License for more details.
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with this library; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.tm.pensieve.seeker;
 
 import java.io.IOException;
@@ -25,9 +26,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -41,8 +43,8 @@ import net.sf.okapi.tm.pensieve.common.TmMatchType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
+import net.sf.okapi.tm.pensieve.queries.SimpleConcordanceFuzzyQuery;
 import net.sf.okapi.tm.pensieve.queries.TmFuzzyQuery;
-import net.sf.okapi.tm.pensieve.scorers.TmFuzzySimilarity;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
@@ -53,15 +55,13 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.spell.LevensteinDistance;
 import org.apache.lucene.search.spell.StringDistance;
 import org.apache.lucene.store.Directory;
@@ -73,17 +73,21 @@ import org.apache.lucene.store.Directory;
  * @author HARGRAVEJE
  */
 public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
+	private static final Logger LOGGER = Logger.getLogger(PensieveSeeker.class.getName());
+
 	private final static StringDistance defaultDistanceCalc = new LevensteinDistance();
-	private final static NgramAnalyzer defaultFuzzyAnalyzer = new NgramAnalyzer(
-			Locale.ENGLISH, 4);
-	private final static Similarity SIMILARITY = new TmFuzzySimilarity();
-
+	private final static NgramAnalyzer defaultFuzzyAnalyzer = new NgramAnalyzer(Locale.ENGLISH, 4);
+	private final static float MAX_HITS_CONSTANT = 0.001f;
+	private final static int MIN_MAX_HITS_CONSTANT = 100;
 	// TODO: externalize penalties in the future
-	private static float SINGLE_CODE_DIFF_PENALTY = 1.0f;
-	private static float WHITESPACE_OR_CASE_PENALTY = 5.0f;
+	private static float SINGLE_CODE_DIFF_PENALTY = 0.5f;
+	private static float WHITESPACE_OR_CASE_PENALTY = 2.0f;
 
+	// maxTopDocuments = indexReader.maxDoc * MAX_HITS_CONSTANT
+	private int maxTopDocuments;
 	private Directory indexDir;
 	private IndexReader indexReader;
+	private IndexSearcher indexSearcher;
 
 	/**
 	 * Creates an instance of TMSeeker
@@ -94,7 +98,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 	 *             If the indexDir is not set
 	 */
 	public PensieveSeeker(Directory indexDir) throws IllegalArgumentException {
-		// TODO - Change indexDir to some other non-lucene class.
 		if (indexDir == null) {
 			throw new IllegalArgumentException("'indexDir' cannot be null!");
 		}
@@ -111,6 +114,11 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		return new TranslationUnitIterator();
 	}
 
+	/**
+	 * Get the current Lucene {@link Directory}
+	 * 
+	 * @return the current Lucene {@link Directory}
+	 */
 	public Directory getIndexDir() {
 		return indexDir;
 	}
@@ -127,8 +135,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 		if (metadata != null) {
 			for (MetadataType type : metadata.keySet()) {
-				bQuery.add(new TermQuery(new Term(type.fieldName(), metadata
-						.get(type))), BooleanClause.Occur.MUST);
+				bQuery.add(new TermQuery(new Term(type.fieldName(), metadata.get(type))), BooleanClause.Occur.MUST);
 			}
 		}
 		return bQuery;
@@ -143,17 +150,13 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 	 * 
 	 * @param doc
 	 *            The Document to translate
-	 * @return a TranslationUnit that represents what was returned in the
-	 *         document.
+	 * @return a TranslationUnit that represents what was returned in the document.
 	 */
 	TranslationUnit getTranslationUnit(Document doc) {
 		// TODO Make sure metadata is supported here
-		TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant(
-				getLocaleValue(doc, TranslationUnitField.SOURCE_LANG),
-				new TextFragment(
-						getFieldValue(doc, TranslationUnitField.SOURCE))),
-				new TranslationUnitVariant(getLocaleValue(doc,
-						TranslationUnitField.TARGET_LANG), new TextFragment(
+		TranslationUnit tu = new TranslationUnit(new TranslationUnitVariant(getLocaleValue(doc,
+				TranslationUnitField.SOURCE_LANG), new TextFragment(getFieldValue(doc, TranslationUnitField.SOURCE))),
+				new TranslationUnitVariant(getLocaleValue(doc, TranslationUnitField.TARGET_LANG), new TextFragment(
 						getFieldValue(doc, TranslationUnitField.TARGET))));
 
 		for (MetadataType type : MetadataType.values()) {
@@ -210,15 +213,66 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		return new LocaleId(getFieldValue(doc, field.name()), false);
 	}
 
-	protected IndexSearcher getIndexSearcher() throws IOException {
-		return new IndexSearcher(indexDir, true);
+	protected IndexSearcher createIndexSearcher() throws CorruptIndexException, IOException {
+		return new IndexSearcher(openIndexReader());
 	}
 
-	protected IndexReader openIndexReader() throws IOException {
+	protected IndexSearcher getIndexSearcher() throws CorruptIndexException, IOException {
+		if (indexSearcher != null) {
+			return indexSearcher;
+		}
+		indexSearcher = createIndexSearcher();
+		return indexSearcher;
+	}
+
+	protected IndexReader openIndexReader() throws CorruptIndexException, IOException {
 		if (indexReader == null) {
 			indexReader = IndexReader.open(indexDir, true);
+			maxTopDocuments = (int) ((float) indexReader.maxDoc() * MAX_HITS_CONSTANT);
+			if (maxTopDocuments < MIN_MAX_HITS_CONSTANT) {
+				maxTopDocuments = MIN_MAX_HITS_CONSTANT;
+			}
 		}
 		return indexReader;
+	}
+
+	private List<TmHit> getTopHits(Query query, Metadata metadata) throws IOException {
+		IndexSearcher is = getIndexSearcher();
+		QueryWrapperFilter filter = null;
+		int maxHits = 0;
+		List<TmHit> tmHitCandidates = new ArrayList<TmHit>(maxTopDocuments);
+
+		// create a filter based on the specified metadata
+		if (metadata != null && !metadata.isEmpty()) {
+			filter = new QueryWrapperFilter(createQuery(metadata));
+		}
+
+		// collect hits in increments of maxTopDocuments until we have all the possible candidate hits
+		TopScoreDocCollector topCollector;
+		do {
+			maxHits += maxTopDocuments;
+			topCollector = TopScoreDocCollector.create(maxHits, true);
+			is.search(query, filter, topCollector);
+		} while (topCollector.getTotalHits() >= maxHits);
+
+		// Go through the candidates and create TmHits from them
+		TopDocs topDocs = topCollector.topDocs();
+		for (int i = 0; i < topDocs.scoreDocs.length; i++) {
+			ScoreDoc scoreDoc = topDocs.scoreDocs[i];
+			TmHit tmHit = new TmHit();
+			tmHit.setDocId(scoreDoc.doc);
+			tmHit.setScore(scoreDoc.score);
+			
+			List<Code> tmCodes = Code.stringToCodes(getFieldValue(getIndexSearcher().doc(tmHit.getDocId()),
+					TranslationUnitField.SOURCE_CODES));
+			String tmCodedText = getFieldValue(getIndexSearcher().doc(tmHit.getDocId()),
+					TranslationUnitField.SOURCE_EXACT);
+
+			tmHit.setTu(createTranslationUnit(getIndexSearcher().doc(tmHit.getDocId()), tmCodedText, tmCodes));			
+			tmHitCandidates.add(tmHit);
+		}
+
+		return tmHitCandidates;
 	}
 
 	/**
@@ -232,60 +286,34 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 	 *            any associated attributes to use for filter.
 	 * @return the list of hits of the given argument.
 	 */
-	public List<TmHit> searchExact(TextFragment queryFrag, Metadata metadata) {
-		TermQuery query = new TermQuery(new Term(
-				TranslationUnitField.SOURCE_EXACT.name(), queryFrag
-						.getCodedText()));
-		IndexSearcher is = null;
-		List<TmHit> tmhits = new LinkedList<TmHit>();
+	public List<TmHit> searchExact(TextFragment query, Metadata metadata) {
+		TermQuery termQuery = new TermQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(), query.getCodedText()));
+		List<TmHit> tmHitCandidates;
 		List<TmHit> noDups;
-		BooleanQuery bQuery = createQuery(metadata, query);
+		BooleanQuery bQuery = createQuery(metadata, termQuery);
 
 		try {
-			is = getIndexSearcher();
-			// TODO: Fix this before Lucene 3.0
-			Hits hits = is.search(bQuery);
-			List<Code> tmCodes;
-			String tmCodedText;
-			Document doc;
-			TmHit tmHit;
-
-			for (int j = 0; j < hits.length(); j++) {
-				doc = hits.doc(j);
-				tmCodes = Code.stringToCodes(getFieldValue(doc,
-						TranslationUnitField.SOURCE_CODES));
-				tmCodedText = getFieldValue(doc,
-						TranslationUnitField.SOURCE_EXACT);
-				tmHit = new TmHit();
-				tmHit.setScore(100.0f);
-				tmHit.setMatchType(TmMatchType.EXACT);
-				tmHit.setTu(createTranslationUnit(doc, tmCodedText, tmCodes));
-				tmhits.add(tmHit);
-
-				/*
-				 * System.out.println(queryFrag.toString());
-				 * System.out.println(tmHit.getScore());
-				 * System.out.println(tmHit.getTu().toString());
-				 * System.out.println();
-				 */
-			}
-
-			// sort TmHits on TmMatchType, Score and Source String
-			Collections.sort(tmhits);
+			tmHitCandidates = getTopHits(bQuery, metadata);
 
 			// remove duplicate hits
-			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));
+			noDups = new ArrayList<TmHit>(new LinkedHashSet<TmHit>(tmHitCandidates));
 
+			for (TmHit tmHit : noDups) {
+				tmHit.setScore(100.0f);
+				tmHit.setMatchType(TmMatchType.EXACT);
+			}
+
+			/*
+			 * System.out.println(queryFrag.toString()); System.out.println(tmHit.getScore());
+			 * System.out.println(tmHit.getTu().toString()); System.out.println();
+			 */
+
+			// sort TmHits on TmMatchType, Score and Source String
+			Collections.sort(noDups);
 		} catch (IOException e) {
 			throw new OkapiIOException("Could not complete query.", e);
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException ignored) {
-				}
-			}
 		}
+
 		return noDups;
 	}
 
@@ -304,8 +332,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 	 * @throws IllegalArgumentException
 	 *             If threshold is greater than 100 or less than 0
 	 */
-	public List<TmHit> searchFuzzy(TextFragment queryFrag, int threshold,
-			int max, Metadata metadata) {
+	public List<TmHit> searchFuzzy(TextFragment query, int threshold, int max, Metadata metadata) {
 		if (threshold < 0 || threshold > 100) {
 			throw new IllegalArgumentException("");
 		}
@@ -316,21 +343,18 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		if (threshold > 100)
 			searchThreshold = 100.0f;
 
-		String queryText = queryFrag.getText();
+		String queryText = query.getText();
 
 		// create basic ngram analyzer to tokenize query
-		TokenStream queryTokenStream = defaultFuzzyAnalyzer
-				.tokenStream(TranslationUnitField.SOURCE.name(),
-						new StringReader(queryText));
+		TokenStream queryTokenStream = defaultFuzzyAnalyzer.tokenStream(TranslationUnitField.SOURCE.name(),
+				new StringReader(queryText));
 		// get the TermAttribute from the TokenStream
-		TermAttribute termAtt = (TermAttribute) queryTokenStream
-				.addAttribute(TermAttribute.class);
+		TermAttribute termAtt = (TermAttribute) queryTokenStream.addAttribute(TermAttribute.class);
 		TmFuzzyQuery fQuery = new TmFuzzyQuery(searchThreshold);
 		try {
 			queryTokenStream.reset();
 			while (queryTokenStream.incrementToken()) {
-				Term t = new Term(TranslationUnitField.SOURCE.name(), termAtt
-						.term());
+				Term t = new Term(TranslationUnitField.SOURCE.name(), termAtt.term());
 				fQuery.add(t);
 			}
 			queryTokenStream.end();
@@ -339,12 +363,44 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			throw new OkapiIOException(e.getMessage(), e);
 		}
 
-		return getFuzzyHits(max, searchThreshold, fQuery, queryFrag, metadata);
+		return getFuzzyHits(max, searchThreshold, fQuery, query, metadata);
+	}
+
+	@Override
+	public List<TmHit> searchSimpleConcordance(String query, int threshold, int max, Metadata metadata) {
+		if (threshold < 0 || threshold > 100) {
+			throw new IllegalArgumentException("");
+		}
+
+		float searchThreshold = (float) threshold;
+		if (threshold < 0)
+			searchThreshold = 0.0f;
+		if (threshold > 100)
+			searchThreshold = 100.0f;
+
+		// create basic ngram analyzer to tokenize query
+		TokenStream queryTokenStream = defaultFuzzyAnalyzer.tokenStream(TranslationUnitField.SOURCE.name(),
+				new StringReader(query));
+		// get the TermAttribute from the TokenStream
+		TermAttribute termAtt = (TermAttribute) queryTokenStream.addAttribute(TermAttribute.class);
+		SimpleConcordanceFuzzyQuery fQuery = new SimpleConcordanceFuzzyQuery(searchThreshold);
+		try {
+			queryTokenStream.reset();
+			while (queryTokenStream.incrementToken()) {
+				Term t = new Term(TranslationUnitField.SOURCE.name(), termAtt.term());
+				fQuery.add(t);
+			}
+			queryTokenStream.end();
+			queryTokenStream.close();
+		} catch (IOException e) {
+			throw new OkapiIOException(e.getMessage(), e);
+		}
+
+		return getConcordanceHits(max, fQuery, query, metadata);
 	}
 
 	/**
-	 * /** Search for fuzzy matches and adjust hit type and score based on
-	 * differences with whitespace, codes and casing.
+	 * Search for fuzzy matches and adjust hit type and score based on differences with whitespace, codes and casing.
 	 * 
 	 * 
 	 * @param threshold
@@ -359,53 +415,40 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 	 *            any associated attributes to use for filter.
 	 * @return the list of hits found for the given arguments (never null).
 	 */
-	List<TmHit> getFuzzyHits(int max, float threshold, Query query,
-			TextFragment queryFrag, Metadata metadata) {
-		IndexSearcher is = null;
-		List<TmHit> tmhits = new ArrayList<TmHit>();
+	List<TmHit> getFuzzyHits(int max, float threshold, Query query, TextFragment queryFrag, Metadata metadata) {
+		List<TmHit> tmHitCandidates;
 		List<Code> queryCodes = queryFrag.getCodes();
 		List<TmHit> noDups;
-		Filter filter = null;
 
 		try {
-			is = getIndexSearcher();
-			is.setSimilarity(new TmFuzzySimilarity());
-			if (metadata != null && !metadata.isEmpty()) {
-				filter = new QueryWrapperFilter(createQuery(metadata));
-			}
-			TopDocs hits = is.search(query, filter, max);
-			List<Code> tmCodes;
-			String tmCodedText;
-			ScoreDoc scoreDoc;
-			TmHit tmHit;
-			String sourceTextOnly;
-			float score;
+			tmHitCandidates = getTopHits(query, metadata);
 
-			for (int j = 0; j < hits.scoreDocs.length; j++) {
-				scoreDoc = hits.scoreDocs[j];
+			// remove duplicate hits
+			noDups = new ArrayList<TmHit>(new LinkedHashSet<TmHit>(tmHitCandidates));
 
-				tmHit = new TmHit();
-				tmCodes = Code
-						.stringToCodes(getFieldValue(is.doc(scoreDoc.doc),
-								TranslationUnitField.SOURCE_CODES));
-				tmCodedText = getFieldValue(is.doc(scoreDoc.doc),
+			for (TmHit tmHit : noDups) {
+				List<Code> tmCodes = Code.stringToCodes(getFieldValue(getIndexSearcher().doc(tmHit.getDocId()),
+						TranslationUnitField.SOURCE_CODES));
+				String tmCodedText = getFieldValue(getIndexSearcher().doc(tmHit.getDocId()),
 						TranslationUnitField.SOURCE_EXACT);
 
 				// remove codes so we can compare text only
-				sourceTextOnly = TextFragment.getText(tmCodedText);
+				String sourceTextOnly = TextFragment.getText(tmCodedText);
 
-				// default hit values
+				tmHit.setTu(createTranslationUnit(getIndexSearcher().doc(tmHit.getDocId()), tmCodedText, tmCodes));
+
 				TmMatchType matchType = TmMatchType.FUZZY;
-				score = scoreDoc.score;
+				Float score = tmHit.getScore();
 				tmHit.setCodeMismatch(false);
+				if (queryCodes.size() != tmCodes.size()) {
+					tmHit.setCodeMismatch(true);
+				}
 
 				// These are 100%, adjust match type and penalize for whitespace
 				// and case difference
-				if (score >= 100.0f
-						&& tmCodedText.equals(queryFrag.getCodedText())) {
+				if (score >= 100.0f && tmCodedText.equals(queryFrag.getCodedText())) {
 					matchType = TmMatchType.EXACT;
-				} else if (score >= 100.0f
-						&& sourceTextOnly.equals(queryFrag.getText())) {
+				} else if (score >= 100.0f && sourceTextOnly.equals(queryFrag.getText())) {
 					matchType = TmMatchType.FUZZY_FULL_TEXT_MATCH;
 				} else if (score >= 100.0f) {
 					// must be a whitespace or case difference
@@ -414,46 +457,85 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 				// code penalty
 				if (queryCodes.size() != tmCodes.size()) {
-					score -= (SINGLE_CODE_DIFF_PENALTY * (float) Math
-							.abs(queryCodes.size() - (float) tmCodes.size()));
-					tmHit.setCodeMismatch(true);
+					score -= (SINGLE_CODE_DIFF_PENALTY * (float) Math.abs(queryCodes.size() - (float) tmCodes.size()));
 				}
 
 				tmHit.setScore(score);
-				tmHit.setTu(createTranslationUnit(is.doc(scoreDoc.doc),
-						tmCodedText, tmCodes));
 				tmHit.setMatchType(matchType);
 
 				// check if the penalties have pushed the match below threshold
 				if (tmHit.getScore() < threshold) {
-					continue;
+					noDups.remove(tmHit);
 				}
 
-				tmhits.add(tmHit);
-
-				/*System.out.println(queryFrag.toString());
-				System.out.println(tmHit.getScore());
-				System.out.println(tmHit.getMatchType());
-				System.out.println(tmHit.getTu().toString());
-				System.out.println();*/
 			}
+
+			/*
+			 * System.out.println(queryFrag.toString()); System.out.println(tmHit.getScore());
+			 * System.out.println(tmHit.getMatchType()); System.out.println(tmHit.getTu().toString());
+			 * System.out.println();
+			 */
 
 			// sort TmHits on TmMatchType, Score and Source String
-			Collections.sort(tmhits);
-			// remove duplicate hits
-			noDups = new LinkedList<TmHit>(new LinkedHashSet<TmHit>(tmhits));
+			Collections.sort(noDups);
 		} catch (IOException e) {
 			throw new OkapiIOException("Could not complete query.", e);
-		} finally {
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException ignored) {
-				}
-			}
 		}
 
-		return noDups;
+		int lastHitIndex = max;
+		if (max >= noDups.size()) {
+			lastHitIndex = noDups.size();
+		}
+		return noDups.subList(0, lastHitIndex);
+	}
+
+	/**
+	 * Search for concordance matches
+	 * 
+	 * 
+	 * @param threshold
+	 *            the minumum score to return (between 0.0 and 1.0)
+	 * @param query
+	 *            the query
+	 * @param queryFrag
+	 *            the text fragment for the query.
+	 * @param metadata
+	 *            any associated attributes to use for filter.
+	 * @return the list of hits found for the given arguments (never null).
+	 */
+	List<TmHit> getConcordanceHits(int max, Query query, String queryFrag, Metadata metadata) {
+		List<TmHit> tmHitCandidates;
+		List<TmHit> noDups;
+
+		try {
+			tmHitCandidates = getTopHits(query, metadata);
+
+			// remove duplicate hits
+			noDups = new ArrayList<TmHit>(new LinkedHashSet<TmHit>(tmHitCandidates));
+
+			for (TmHit tmHit : noDups) {				
+				tmHit.setScore(tmHit.getScore());
+				tmHit.setMatchType(TmMatchType.SIMPLE_CONCORDANCE);
+			}
+
+			/*
+			 * System.out.println(queryFrag.toString()); System.out.println(tmHit.getScore());
+			 * System.out.println(tmHit.getMatchType()); System.out.println(tmHit.getTu().toString());
+			 * System.out.println();
+			 */
+
+			// sort TmHits on TmMatchType, Score and Source String
+			Collections.sort(noDups);
+			
+		} catch (IOException e) {
+			throw new OkapiIOException("Could not complete query.", e);
+		}
+
+		int lastHitIndex = max;
+		if (max >= noDups.size()) {
+			lastHitIndex = noDups.size();
+		}
+		return noDups.subList(0, lastHitIndex);		
 	}
 
 	/**
@@ -467,16 +549,14 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 	 *            the source codes to re-use.
 	 * @return a new translation unit for the given document.
 	 */
-	private TranslationUnit createTranslationUnit(Document doc,
-			String srcCodedText, List<Code> srcCodes) {
+	private TranslationUnit createTranslationUnit(Document doc, String srcCodedText, List<Code> srcCodes) {
 		TextFragment frag = new TextFragment();
 		frag.setCodedText(srcCodedText, srcCodes, false);
 		TranslationUnitVariant srcTuv = new TranslationUnitVariant(
 				getLocaleValue(doc, TranslationUnitField.SOURCE_LANG), frag);
 
 		frag = new TextFragment();
-		List<Code> codes = Code.stringToCodes(getFieldValue(doc,
-				TranslationUnitField.TARGET_CODES));
+		List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
 		String codedText = getFieldValue(doc, TranslationUnitField.TARGET);
 		frag.setCodedText(codedText == null ? "" : codedText, codes, false);
 		TranslationUnitVariant trgTuv = new TranslationUnitVariant(
@@ -491,17 +571,13 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 	private TranslationUnit createTranslationUnit(Document doc) {
 		TextFragment frag = new TextFragment();
-		List<Code> codes = Code.stringToCodes(getFieldValue(doc,
-				TranslationUnitField.SOURCE_CODES));
-		frag.setCodedText(
-				getFieldValue(doc, TranslationUnitField.SOURCE_EXACT), codes,
-				false);
+		List<Code> codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.SOURCE_CODES));
+		frag.setCodedText(getFieldValue(doc, TranslationUnitField.SOURCE_EXACT), codes, false);
 		TranslationUnitVariant srcTuv = new TranslationUnitVariant(
 				getLocaleValue(doc, TranslationUnitField.SOURCE_LANG), frag);
 
 		frag = new TextFragment();
-		codes = Code.stringToCodes(getFieldValue(doc,
-				TranslationUnitField.TARGET_CODES));
+		codes = Code.stringToCodes(getFieldValue(doc, TranslationUnitField.TARGET_CODES));
 		String codedText = getFieldValue(doc, TranslationUnitField.TARGET);
 		frag.setCodedText(codedText == null ? "" : codedText, codes, false);
 		TranslationUnitVariant trgTuv = new TranslationUnitVariant(
@@ -556,6 +632,21 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		public void remove() {
 			throw new UnsupportedOperationException(
 					"Will not support remove method - Please remove items via ITmSeeker interface");
+		}
+	}
+
+	@Override
+	public void close() {
+		try {
+			if (indexSearcher != null) {
+				indexSearcher.close();
+			}
+
+			if (indexReader != null) {
+				indexReader.close();
+			}
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Exception closing Pensieve index.", e); //$NON-NLS-1$
 		}
 	}
 }

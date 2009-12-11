@@ -71,30 +71,30 @@ public class PensieveWriterTest {
     @Test
     public void constructorCreateNew() throws IOException {
         tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joe", "Jo","1"));
-        tmWriter.endIndex();
+        tmWriter.close();
         tmWriter = new PensieveWriter(dir, true);
         tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joseph", "Yosep","2"));
-        tmWriter.endIndex();
+        tmWriter.close();
         assertEquals("# of docs in tm", 1, tmWriter.getIndexWriter().numDocs());
     }
 
     @Test
     public void constructorCreateNew2 () throws IOException {
         tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joe", "Jo","1"));
-        tmWriter.endIndex();
+        tmWriter.close();
         tmWriter = new PensieveWriter(dir, true);
         tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joseph", "Yosep","2"));
-        tmWriter.endIndex();
+        tmWriter.close();
         assertEquals("# of docs in tm", 1, tmWriter.getIndexWriter().numDocs());
     }
 
     @Test
     public void constructorAppend() throws IOException {
         tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joe", "Jo","1"));
-        tmWriter.endIndex();
+        tmWriter.close();
         tmWriter = new PensieveWriter(dir, false);
         tmWriter.indexTranslationUnit(Helper.createTU(locEN, locKR, "Joseph", "Yosep","2"));
-        tmWriter.endIndex();
+        tmWriter.close();
         assertEquals("# of docs in tm", 2, tmWriter.getIndexWriter().numDocs());
     }
 
@@ -200,20 +200,20 @@ public class PensieveWriterTest {
 
     @Test(expected = AlreadyClosedException.class)
     public void endIndexClosesWriter() throws IOException {
-        tmWriter.endIndex();
+        tmWriter.close();
         tmWriter.getIndexWriter().commit();
     }
 
     @Test
     public void endIndexThrowsNoException() throws IOException {
-        tmWriter.endIndex();
-        tmWriter.endIndex();
+        tmWriter.close();
+        tmWriter.close();
     }
 
     public void endIndexCommits() throws IOException {
         tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(locEN,
                 new TextFragment("dax")), new TranslationUnitVariant(locKR, new TextFragment("is funny (sometimes)"))));
-        tmWriter.endIndex();
+        tmWriter.close();
         IndexReader reader = IndexReader.open(dir, true);
         assertEquals("num of docs indexed after endIndex", 1, reader.maxDoc());
     }

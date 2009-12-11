@@ -38,7 +38,9 @@ public enum MetadataType {
     private String fieldName;
 
     private static Map<String, MetadataType> mapping = new HashMap<String, MetadataType>() {
-        {
+        private static final long serialVersionUID = 2838020991609251445L;
+
+		{
             put("Txt::GroupName", GROUP_NAME);
             put("Txt::FileName", FILE_NAME);
             put("datatype", TYPE);

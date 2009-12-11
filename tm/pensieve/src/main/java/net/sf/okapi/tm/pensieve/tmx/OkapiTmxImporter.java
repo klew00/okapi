@@ -71,7 +71,7 @@ public class OkapiTmxImporter implements ITmxImporter {
             }
         } finally {
             tmxFilter.close();
-            tmWriter.endIndex();
+            tmWriter.close();
         }
     }
 

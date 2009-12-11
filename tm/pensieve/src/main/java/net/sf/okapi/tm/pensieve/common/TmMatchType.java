@@ -36,6 +36,11 @@ public enum TmMatchType {
 	 * Matches both text and codes partially.
 	 */
 	FUZZY,
+	
+	/**
+	 * Matches phrases without codes
+	 */
+	SIMPLE_CONCORDANCE,
 
 	/**
 	 * Default NULL match type

@@ -2,6 +2,10 @@ package net.sf.okapi.tm.pensieve.scorers;
 
 import org.apache.lucene.search.Similarity;
 
+/**
+ * @author HARGRAVEJE
+ *
+ */
 public class TmFuzzySimilarity extends Similarity {
 	private static final long serialVersionUID = -6299053650170316232L;
 	

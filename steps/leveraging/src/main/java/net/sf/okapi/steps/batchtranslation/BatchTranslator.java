@@ -316,13 +316,8 @@ public class BatchTranslator {
 			throw new RuntimeException("Error reading the translations.");
 		}
 		finally {
-			if ( tmWriter != null ) {
-				try {
-					tmWriter.endIndex();
-				}
-				catch ( IOException e ) {
-					// Ignore this error
-				}
+			if ( tmWriter != null ) {				
+				tmWriter.close();				
 			}
 			if ( filter != null ) filter.close();
 			if ( html != null ) html.clearCache();
