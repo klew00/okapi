@@ -338,7 +338,7 @@ public class TTXFilterTest {
 		tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 2);
 		assertNotNull(tu);
 		cont = tu.getSource();
-//TODO		assertEquals("Next <1/><2/>Last.", fmt.setContent(cont).toString());
+//		assertEquals("Next <1/><2/>Last.", fmt.setContent(cont).toString());
 	}
 
 	@Test
@@ -533,8 +533,8 @@ public class TTXFilterTest {
 //			+ "<ut Style=\"external\">code</ut>"
 //			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text2</Tuv><Tuv Lang=\"ES-EM\">text2</Tuv></Tu>"
 //			+ "</Raw></Body></TRADOStag>";
-//		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locESEM), locESEM,
-//			filter.createSkeletonWriter()));
+//		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
+//			filter2.createSkeletonWriter()));
 //	}
 
 	@Test
@@ -713,9 +713,20 @@ public class TTXFilterTest {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.html.ttx", null));
 		list.add(new InputDocument(root+"Test02_noseg.html.ttx", null));
-//		list.add(new InputDocument(root+"Test02_allseg.html.ttx", null));
+		list.add(new InputDocument(root+"Test02_allseg.html.ttx", null));
 		RoundTripComparison rtc = new RoundTripComparison();
+		// Use non-forced segmentation output
 		assertTrue(rtc.executeCompare(filter2, list, "UTF-8", locENUS, locFRFR));
+	}
+	
+	@Test
+	public void textDoubleExtractionOriginalAllSegmented () {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Test02_allseg.html.ttx", null));
+		RoundTripComparison rtc = new RoundTripComparison();
+		// Use the output with forced segmentation, since all is segmented 
+		// in the input file we should not add any.
+		assertTrue(rtc.executeCompare(filter1, list, "UTF-8", locENUS, locFRFR));
 	}
 
 	// Disable this test for SVN commit

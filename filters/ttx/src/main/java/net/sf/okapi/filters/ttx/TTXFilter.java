@@ -62,6 +62,7 @@ public class TTXFilter implements IFilter {
 
 	public final static String MATCHPERCENT = "MatchPercent";
 	public final static String ORIGIN = "Origin";
+	public final static String TTXNOTEXTCHARS = "\u00a0~`!@#$%^&*()_+=-{[}]|\\:;\"'<,>.?/";
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -539,7 +540,7 @@ public class TTXFilter implements IFilter {
 			}
 
 			// Check if this it is worth sending as text unit
-			if ( !tu.getSource().hasText(true, false) ) {
+			if ( !hasText(tu.getSource()) ) {
 				 if ( skelWriter == null ) {
 					 skelWriter = new TTXSkeletonWriter(params.getForceSegments());
 				 }
@@ -576,6 +577,56 @@ public class TTXFilter implements IFilter {
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException("Error processing top-level ut element.", e);
 		}
+	}
+	
+	private boolean hasText (TextContainer tc) {
+		String text = tc.getCodedText();
+		for ( int i=0; i<text.length(); i++ ) {
+			switch (text.charAt(i)) {
+			case TextFragment.MARKER_OPENING:
+			case TextFragment.MARKER_CLOSING:
+			case TextFragment.MARKER_ISOLATED:
+				i++; // Skip over the marker, they are not text
+				continue;
+			case TextFragment.MARKER_SEGMENT:
+				int n = Integer.parseInt(tc.getCode(text.charAt(++i)).getData());
+				Segment seg = tc.getSegments().get(n);
+				if ( hasText(seg.text) ) return true;
+				continue; // Else: move to next character
+			}
+			// Not a marker: test the type of character
+			if ( !Character.isWhitespace(text.charAt(i)) ) {
+				// Extra TTX-no-text specific checks
+				if ( TTXNOTEXTCHARS.indexOf(text.charAt(i)) == -1 ) {
+					// Not a non-white-space that is not a TTX-no-text: that's text
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean hasText (TextFragment frag) {
+		String text = frag.getCodedText();
+		for ( int i=0; i<text.length(); i++ ) {
+			switch (text.charAt(i)) {
+			case TextFragment.MARKER_OPENING:
+			case TextFragment.MARKER_CLOSING:
+			case TextFragment.MARKER_ISOLATED:
+			case TextFragment.MARKER_SEGMENT:
+				i++; // Skip over the marker, they are not text
+				continue;
+			}
+			// Not a marker: test the type of character
+			if ( !Character.isWhitespace(text.charAt(i)) ) {
+				// Extra TTX-no-text specific checks
+				if ( TTXNOTEXTCHARS.indexOf(text.charAt(i)) == -1 ) {
+					// Not a non-white-space that is not a TTX-no-text: that's text
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	private String buildStartElement (boolean store) {
