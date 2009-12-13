@@ -54,6 +54,7 @@ public class XLIFFFilterTest {
 	private LocaleId locEN = LocaleId.fromString("en");
 	private LocaleId locFR = LocaleId.fromString("fr");
 	private LocaleId locES = LocaleId.fromString("es");
+	private LocaleId locDE = LocaleId.fromString("de");
 
 	@Before
 	public void setUp() {
@@ -375,7 +376,7 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
-	public void testDoubleExtraction () {
+	public void testDoubleExtractionFR () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"JMP-11-Test01.xlf", null));
@@ -386,14 +387,25 @@ public class XLIFFFilterTest {
 		list.add(new InputDocument(root+"SF-12-Test03.xlf", null));
 		list.add(new InputDocument(root+"NSTest01.xlf", null));
 		list.add(new InputDocument(root+"BinUnitTest01.xlf", null));
-		list.add(new InputDocument(root+"Typo3Draft.xlf", null));
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
+	}
+	
+	@Test
+	public void testDoubelextractionDE () {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Typo3Draft.xlf", null));
+		list.add(new InputDocument(root+"Xslt-Test01.xlf", null));
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locDE));
+	}
 
-		list.clear();
+	@Test
+	public void testDoubelextractionES () {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"SF-12-Test01.xlf", null));
 		list.add(new InputDocument(root+"SF-12-Test02.xlf", null));
-		rtc = new RoundTripComparison();
+		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locES));
 	}
 
