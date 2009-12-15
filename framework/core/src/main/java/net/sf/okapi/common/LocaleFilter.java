@@ -42,17 +42,12 @@ public final class LocaleFilter {
 		None,
 		
 		/**
-		 * The filter allows only locales matching the filter's configuration. 
-		 */
-		Lookup,
-		
-		/**
 		 * The filter allows any locale.
 		 */
 		Any;
 	}
 
-	private FilterType type;
+	private final FilterType type;
 	
 	private final List<LocaleId> includes;
 	private final List<LocaleId> excludes;
@@ -122,11 +117,11 @@ public final class LocaleFilter {
 	 * @param localeIds
 	 * @return
 	 */
-	public static LocaleFilter anyOf(LocaleId ... localeIds) {
+	public static LocaleFilter only(LocaleId ... localeIds) {
 		
-		if (Util.isEmpty(localeIds)) return any();
+		if (Util.isEmpty(localeIds)) return none();
 		
-		LocaleFilter filter = new LocaleFilter(FilterType.Lookup);		
+		LocaleFilter filter = none();		
 		filter.include(localeIds);
 		
 		return filter;
@@ -139,9 +134,7 @@ public final class LocaleFilter {
 	 */
 	public static LocaleFilter anyExcept(LocaleId ... localeIds) {
 		
-		if (Util.isEmpty(localeIds)) return any();
-		
-		LocaleFilter filter = new LocaleFilter(FilterType.Lookup);
+		LocaleFilter filter = any();
 		filter.exclude(localeIds);
 		
 		return filter;
@@ -156,7 +149,6 @@ public final class LocaleFilter {
 		
 		if (localeId == null) return this;
 		
-		this.type = FilterType.Lookup;			
 		this.includes.add(0, localeId); // Later added are attended first in matches()
 		
 		return this;
@@ -166,7 +158,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(localeIds)) return this;
 		
-		this.type = FilterType.Lookup;		
 		for (LocaleId localeId : localeIds)
 			include(localeId);
 				
@@ -177,8 +168,6 @@ public final class LocaleFilter {
 		
 		if (localeIds == null) return this;
 		
-		this.type = FilterType.Lookup;		
-		
 		for (LocaleId localeId : localeIds)
 			include(localeId);
 		
@@ -188,8 +177,6 @@ public final class LocaleFilter {
 	public LocaleFilter include(LocaleFilter filter) {
 		
 		if (filter == null) return this;
-		
-		this.type = FilterType.Lookup;		
 		
 		includes.addAll(0, filter.getIncludes());
 		
@@ -206,7 +193,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(regex)) return this;
 		
-		this.type = FilterType.Lookup;		
 		includePatterns.add(0, Pattern.compile(regex, flags));
 		
 		return this;
@@ -221,8 +207,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(languages)) return this;
 		
-		this.type = FilterType.Lookup;
-		
 		for (String language : languages)
 			includeLanguage(language);
 
@@ -236,7 +220,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(language)) return this;
 		
-		this.type = FilterType.Lookup;		
 		this.languageIncludes.add(language);
 		
 		return this;
@@ -251,8 +234,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(regions)) return this;
 		
-		this.type = FilterType.Lookup;
-		
 		for (String region : regions)
 			includeRegion(region);
 
@@ -266,7 +247,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(region)) return this;
 		
-		this.type = FilterType.Lookup;		
 		this.regionIncludes.add(region);
 		
 		return this;
@@ -281,8 +261,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(userParts)) return this;
 		
-		this.type = FilterType.Lookup;
-		
 		for (String userPart : userParts)
 			includeUserPart(userPart);
 
@@ -296,7 +274,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(userPart)) return this;
 		
-		this.type = FilterType.Lookup;		
 		this.userPartIncludes.add(userPart);
 		
 		return this;
@@ -311,7 +288,6 @@ public final class LocaleFilter {
 		
 		if (localeId == null) return this;
 		
-		this.type = FilterType.Lookup;				
 		this.excludes.add(0, localeId); // Later added are attended first in matches()
 		
 		return this;
@@ -320,8 +296,6 @@ public final class LocaleFilter {
 	public LocaleFilter exclude(LocaleId ... localeIds) {
 		
 		if (Util.isEmpty(localeIds)) return this;
-		
-		this.type = FilterType.Lookup;
 		
 		for (LocaleId localeId : localeIds)
 			exclude(localeId);
@@ -333,8 +307,6 @@ public final class LocaleFilter {
 		
 		if (localeIds == null) return this;
 		
-		this.type = FilterType.Lookup;
-		
 		for (LocaleId localeId : localeIds)
 			exclude(localeId);
 				
@@ -344,8 +316,6 @@ public final class LocaleFilter {
 	public LocaleFilter exclude(LocaleFilter filter) {
 		
 		if (filter == null) return this;
-		
-		this.type = FilterType.Lookup;		
 		
 		excludes.addAll(0, filter.getIncludes());
 		
@@ -362,7 +332,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(regex)) return this;
 		
-		this.type = FilterType.Lookup;		
 		excludePatterns.add(0, Pattern.compile(regex, flags));
 		
 		return this;
@@ -378,8 +347,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(languages)) return this;
 		
-		this.type = FilterType.Lookup;
-		
 		for (String language : languages)
 			excludeLanguage(language);
 
@@ -393,7 +360,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(language)) return this;
 		
-		this.type = FilterType.Lookup;		
 		this.languageExcludes.add(language);
 		
 		return this;
@@ -408,8 +374,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(regions)) return this;
 		
-		this.type = FilterType.Lookup;
-		
 		for (String region : regions)
 			excludeRegion(region);
 
@@ -423,7 +387,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(region)) return this;
 		
-		this.type = FilterType.Lookup;		
 		this.regionExcludes.add(region);
 		
 		return this;
@@ -438,8 +401,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(userParts)) return this;
 		
-		this.type = FilterType.Lookup;
-		
 		for (String userPart : userParts)
 			excludeUserPart(userPart);
 
@@ -453,7 +414,6 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(userPart)) return this;
 		
-		this.type = FilterType.Lookup;		
 		this.userPartExcludes.add(userPart);
 		
 		return this;
@@ -466,67 +426,64 @@ public final class LocaleFilter {
 	 */
 	public boolean matches(LocaleId localeId) {
 		
-		switch(type) {
+		// Excludes
+		for (LocaleId item : excludes)				
+			if (item.equals(localeId))
+				return false;
+		
+		for (Pattern pattern : excludePatterns) {
+			
+			Matcher matcher = pattern.matcher(localeId.toString());			
+			if (matcher.matches())
+				return false;				
+		}
+		
+		for (String language : languageExcludes)
+			if (localeId.sameLanguageAs(language))
+				return false;
+		
+		for (String region : regionExcludes)
+			if (localeId.sameRegionAs(region))
+				return false;
+		
+		for (String userPart : userPartExcludes)
+			if (localeId.sameUserPartAs(userPart))
+				return false;			
+		
+		
+		// Includes
+		for (LocaleId item : includes)				
+			if (item.equals(localeId))
+				return true;
+		
+		for (Pattern pattern : includePatterns) {
+			
+			Matcher matcher = pattern.matcher(localeId.toString());			
+			if (matcher.matches())
+				return true;				
+		}
+		
+		for (String language : languageIncludes)
+			if (localeId.sameLanguageAs(language))
+				return true;
+		
+		for (String region : regionIncludes)
+			if (localeId.sameRegionAs(region))
+				return true;
+		
+		for (String userPart : userPartIncludes)
+			if (localeId.sameUserPartAs(userPart))
+				return true;
+		
+		switch (type) {
 		
 		case Any:
 			return true;
 			
 		case None:
 			return false;
-			
-		case Lookup: {
-			
-			// Excludes
-			for (LocaleId item : excludes)				
-				if (item.equals(localeId))
-					return false;
-			
-			for (Pattern pattern : excludePatterns) {
-				
-				Matcher matcher = pattern.matcher(localeId.toString());			
-				if (matcher.matches())
-					return false;				
-			}
-			
-			for (String language : languageExcludes)
-				if (localeId.sameLanguageAs(language))
-					return false;
-			
-			for (String region : regionExcludes)
-				if (localeId.sameRegionAs(region))
-					return false;
-			
-			for (String userPart : userPartExcludes)
-				if (localeId.sameUserPartAs(userPart))
-					return false;			
-			
-			
-			// Includes
-			for (LocaleId item : includes)				
-				if (item.equals(localeId))
-					return true;
-			
-			for (Pattern pattern : includePatterns) {
-				
-				Matcher matcher = pattern.matcher(localeId.toString());			
-				if (matcher.matches())
-					return true;				
-			}
-			
-			for (String language : languageIncludes)
-				if (localeId.sameLanguageAs(language))
-					return true;
-			
-			for (String region : regionIncludes)
-				if (localeId.sameRegionAs(region))
-					return true;
-			
-			for (String userPart : userPartIncludes)
-				if (localeId.sameUserPartAs(userPart))
-					return true;
 		}
-			
-		}
+		
 		return false;
 	}
 	
