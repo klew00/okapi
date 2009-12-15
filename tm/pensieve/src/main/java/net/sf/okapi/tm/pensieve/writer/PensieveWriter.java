@@ -20,11 +20,21 @@
 
 package net.sf.okapi.tm.pensieve.writer;
 
+import java.io.IOException;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.tm.pensieve.common.*;
+import net.sf.okapi.lib.search.lucene.analysis.NgramAnalyzer;
+import net.sf.okapi.tm.pensieve.common.Metadata;
+import net.sf.okapi.tm.pensieve.common.MetadataType;
+import net.sf.okapi.tm.pensieve.common.TranslationUnit;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
+import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -32,15 +42,8 @@ import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.AlreadyClosedException;
-
-import java.io.IOException;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import net.sf.okapi.tm.pensieve.analyzers.NgramAnalyzer;
+import org.apache.lucene.store.Directory;
 
 /**
  * Used to write, delete and update the index.

@@ -82,7 +82,4 @@ public class Helper {
         field.setAccessible(true);
         return field.get(instance);
     }
-
-  
-
 }

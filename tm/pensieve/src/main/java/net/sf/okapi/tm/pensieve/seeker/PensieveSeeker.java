@@ -35,7 +35,9 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.tm.pensieve.analyzers.NgramAnalyzer;
+import net.sf.okapi.lib.search.lucene.analysis.NgramAnalyzer;
+import net.sf.okapi.lib.search.lucene.query.SimpleConcordanceFuzzyQuery;
+import net.sf.okapi.lib.search.lucene.query.TmFuzzyQuery;
 import net.sf.okapi.tm.pensieve.common.Metadata;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TmHit;
@@ -43,8 +45,6 @@ import net.sf.okapi.tm.pensieve.common.TmMatchType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
-import net.sf.okapi.tm.pensieve.queries.SimpleConcordanceFuzzyQuery;
-import net.sf.okapi.tm.pensieve.queries.TmFuzzyQuery;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.TermAttribute;
@@ -62,8 +62,6 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopScoreDocCollector;
-import org.apache.lucene.search.spell.LevensteinDistance;
-import org.apache.lucene.search.spell.StringDistance;
 import org.apache.lucene.store.Directory;
 
 /**
@@ -75,7 +73,6 @@ import org.apache.lucene.store.Directory;
 public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 	private static final Logger LOGGER = Logger.getLogger(PensieveSeeker.class.getName());
 
-	private final static StringDistance defaultDistanceCalc = new LevensteinDistance();
 	private final static NgramAnalyzer defaultFuzzyAnalyzer = new NgramAnalyzer(Locale.ENGLISH, 4);
 	private final static float MAX_HITS_RATIO = 0.01f;
 	private final static int MIN_MAX_HITS = 500;
@@ -140,10 +137,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			}
 		}
 		return bQuery;
-	}
-
-	protected float calcEditDistance(String actual, String target) {
-		return defaultDistanceCalc.getDistance(actual, target);
 	}
 
 	/**
@@ -342,7 +335,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				.name(), new StringReader(queryText));
 		// get the TermAttribute from the TokenStream
 		TermAttribute termAtt = (TermAttribute) queryTokenStream.addAttribute(TermAttribute.class);
-		TmFuzzyQuery fQuery = new TmFuzzyQuery(searchThreshold);
+		TmFuzzyQuery fQuery = new TmFuzzyQuery(searchThreshold, TranslationUnitField.SOURCE.name());
 		try {
 			queryTokenStream.reset();
 			while (queryTokenStream.incrementToken()) {
