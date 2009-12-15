@@ -11,7 +11,7 @@
     <properties>
         <OriginalGroupId>org.apache.lucene</OriginalGroupId>
         <OriginalArtifactId>lucene-core</OriginalArtifactId>
-        <OriginalVersion>2.9.1</OriginalVersion>
+        <OriginalVersion>3.0.0</OriginalVersion>
     </properties>
 
     <groupId>osgi.${OriginalGroupId}</groupId>
