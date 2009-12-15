@@ -27,7 +27,7 @@ import org.apache.lucene.analysis.Token;
  * @author  HargraveJE
  */
 public class SortableToken
-implements Comparable
+implements Comparable<SortableToken>
 {
     private int start;
     private int end;
@@ -38,7 +38,7 @@ implements Comparable
     {
         start = p_token.startOffset();
         end = p_token.endOffset();
-        term = p_token.termText();
+        term = p_token.term();
     }
     
     public int getStart()
@@ -71,7 +71,8 @@ implements Comparable
         term = p_term;
     }
     
-    public int compareTo(Object o)
+    @Override
+    public int compareTo(SortableToken o)
     {
         SortableToken t = (SortableToken)o;
         if (t.getStart() < getStart())

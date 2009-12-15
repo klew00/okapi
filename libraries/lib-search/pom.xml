@@ -17,21 +17,77 @@
 		</dependency>
 
 		<dependency>
+			<groupId>net.java.dev.javacc</groupId>
+			<artifactId>javacc</artifactId>
+			<version>4.1</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>com.ibm.icu</groupId>
 			<artifactId>icu4j</artifactId>
 			<version>4.0.1</version>
 		</dependency>
 
-                <dependency>
+        <dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>2.9.1</version>
+			<version>3.0.0</version>
+		</dependency>
+
+        <!--
+        PLEASE DO NOT REMOVE!!!!!
+        <dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analyzers</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+
+        <dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-snowball</artifactId>
+			<version>3.0.0</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>net.java.dev.javacc</groupId>
-			<artifactId>javacc</artifactId>
-			<version>4.1</version>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-surround</artifactId>
+			<version>3.0.0</version>
 		</dependency>
-	</dependencies>
+		
+		 <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-spellchecker</artifactId>
+            <version>3.0.0</version>
+        </dependency>      
+
+		<dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-fast-vector-highlighter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+		<dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-highlighter</artifactId>
+            <version>3.0.0</version>
+        </dependency>                      
+        
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queries</artifactId>
+            <version>3.0.0</version>
+        </dependency>                      
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-collation</artifactId>
+            <version>3.0.0</version>
+        </dependency>     
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-memory</artifactId>
+            <version>3.0.0</version>
+        </dependency>                               				
+	--></dependencies>
 </project>
