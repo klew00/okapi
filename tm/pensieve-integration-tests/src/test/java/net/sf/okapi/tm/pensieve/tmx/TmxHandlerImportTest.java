@@ -8,8 +8,11 @@ import net.sf.okapi.tm.pensieve.common.TmHit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.seeker.PensieveSeeker;
 import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
+import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
 import net.sf.okapi.tm.pensieve.writer.PensieveWriter;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
+import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
+
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import static org.junit.Assert.assertEquals;
@@ -33,18 +36,17 @@ public class TmxHandlerImportTest {
 
 	@Before
 	public void setUP() throws IOException, URISyntaxException {
-
+		String INDEX_DIR = "target/test-classes/";
+		
 /*		TmxFilter tmxFilter = new TmxFilter();
- 		String INDEX_DIR = "target/test-classes/";
 		ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(INDEX_DIR, true);
 		OkapiTmxImporter tmxHandler = new OkapiTmxImporter(locENUS, tmxFilter);
 		long startTime = System.currentTimeMillis();
 		LocaleId locES = LocaleId.fromString("ES");
 		tmxHandler.importTmx(this.getClass().getResource("/HalfMillionEntries.tmx").toURI(), locES, tmWriter);
 		long totalTime = System.currentTimeMillis() - startTime;
-		System.out.println("total time to import TMX: " + totalTime);
-		
-		seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR); */
+		System.out.println("total time to import TMX: " + totalTime);*/
+		seeker = TmSeekerFactory.createFileBasedTmSeeker(INDEX_DIR);
 	}
 	
 	@After
@@ -160,7 +162,7 @@ public class TmxHandlerImportTest {
 		System.out.println("fuzzy query time " + totalTime);
 		System.out.println("number found " + tus.size());
 		System.out.println("score " + tus.get(0).getScore());
-		assertTrue("Didn't find something", tus.size() > 0);
+		assertTrue("Didn't find something", tus.size() > 0); 
 	}
 
 	@Test

@@ -55,7 +55,7 @@ public class SimpleConcordanceFuzzyScorer extends Scorer {
 		this.threshold = threshold;
 		this.terms = terms;		
 		this.scoredDocs = new TIntIntHashMap();
-		this.currentDoc = 0;
+		this.currentDoc = -1;
 	}
 
 	private void calculateScores() throws IOException {

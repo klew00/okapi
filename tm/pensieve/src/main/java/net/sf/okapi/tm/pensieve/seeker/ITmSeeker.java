@@ -32,8 +32,6 @@ public interface ITmSeeker {
 	 * 
 	 * @param query
 	 *            the fragment to search for
-	 * @param max
-	 *            the max number of results.
 	 * @param metadata
 	 *            the metadata attributes to also match against, null for no metadata.
 	 * @return a list of exact matches
@@ -50,7 +48,7 @@ public interface ITmSeeker {
 	 *            the fragment to search for.
 	 * @param threshold
 	 *            the minimal score value to return.
-	 * @param max
+	 * @param maxHits
 	 *            the max number of hits returned.
 	 * @param metadata
 	 *            the metadata attributes to also match against, null for no metadata.
@@ -58,7 +56,7 @@ public interface ITmSeeker {
 	 * @throws net.sf.okapi.common.exceptions.OkapiIOException
 	 *             if the search cannot be completed do to I/O problems
 	 */
-	List<TmHit> searchFuzzy(TextFragment query, int threshold, int max, Metadata metadata);
+	List<TmHit> searchFuzzy(TextFragment query, int threshold, int maxHits, Metadata metadata);
 
 	/**
 	 * 
@@ -69,15 +67,15 @@ public interface ITmSeeker {
 	 *            the string to search for.
 	 * @param threshold
 	 *            the minimal score value to return.
-	 * @param max
+	 * @param maxHits
 	 *            the max number of hits returned
 	 * @param metadata
 	 *            the metadata attributes to also match against, null for no metadata.
-	 * @return a list of exact or fuzzy matches.
+	 * @return a list of exact or fuzzy concordance marches.
 	 * @throws net.sf.okapi.common.exceptions.OkapiIOException
 	 *             if the search cannot be completed do to I/O problems
 	 */
-	List<TmHit> searchSimpleConcordance(String query, int threshold, int max, Metadata metadata);
+	List<TmHit> searchSimpleConcordance(String query, int threshold, int maxHits, Metadata metadata);
 
 	/**
 	 * Close the searcher

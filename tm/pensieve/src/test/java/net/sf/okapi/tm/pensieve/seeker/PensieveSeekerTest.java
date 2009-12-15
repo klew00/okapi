@@ -258,12 +258,9 @@ public class PensieveSeekerTest {
         md.put(MetadataType.GROUP_NAME, "some_group");
         md.put(MetadataType.TYPE, "nachotype");
         tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, md);
-        System.out.println(tmhits.size());
         assertEquals("number of docs found", 2, tmhits.size());
         assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
-        System.out.println(tmhits.get(0).getTu().getSource().getContent().toString());
         assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
-        System.out.println(tmhits.get(1).getTu().getSource().getContent().toString());
     }
 
     @Test
