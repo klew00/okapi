@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.search.lucene.query;
+package net.sf.okapi.lib.search.lucene.scorer;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +30,7 @@ import org.apache.lucene.index.TermPositions;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Similarity;
 
-final class ConcordanceFuzzyScorer extends Scorer {
+public class ConcordanceFuzzyScorer extends Scorer {
 	private static int max(int x1, int x2) {
 		return (x1 > x2 ? x1 : x2);
 	}
@@ -48,7 +48,7 @@ final class ConcordanceFuzzyScorer extends Scorer {
 	private int matches = 0;
 	private float threshold;
 
-	ConcordanceFuzzyScorer(float threshold, Similarity similarity, List<Term> terms,
+	public ConcordanceFuzzyScorer(float threshold, Similarity similarity, List<Term> terms,
 			TermPositions[] tps, MultipleTermPositions mtp, IndexReader reader) throws IOException {
 		super(similarity);
 		this.threshold = threshold;

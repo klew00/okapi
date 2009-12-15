@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.lib.search.lucene.scorer.ConcordanceFuzzyScorer;
+
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultipleTermPositions;
 import org.apache.lucene.index.Term;
