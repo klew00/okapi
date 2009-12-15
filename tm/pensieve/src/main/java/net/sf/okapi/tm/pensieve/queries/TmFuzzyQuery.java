@@ -1,6 +1,7 @@
 package net.sf.okapi.tm.pensieve.queries;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +24,7 @@ public class TmFuzzyQuery extends Query {
 
 	public TmFuzzyQuery(float threshold) {
 		this.threshold = threshold;
-		terms = new LinkedList<Term>();
+		terms = new ArrayList<Term>();
 	}
 
 	public void add(Term term) {
