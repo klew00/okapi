@@ -424,9 +424,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				// remove codes so we can compare text only
 				String sourceTextOnly = TextFragment.getText(tmCodedText);
 
-				tmHit.setTu(createTranslationUnit(getIndexSearcher().doc(tmHit.getDocId()),
-						tmCodedText, tmCodes));
-
 				TmMatchType matchType = TmMatchType.FUZZY;
 				Float score = tmHit.getScore();
 				tmHit.setCodeMismatch(false);
