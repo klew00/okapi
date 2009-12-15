@@ -74,7 +74,7 @@ public class PensieveWriter implements ITmWriter {
 	public void close() {
 		try {
 			indexWriter.commit();
-			//indexWriter.optimize();
+			indexWriter.optimize();
 		} catch (IOException e) {
 			throw new OkapiIOException(e); // To change body of catch statement use File | Settings | File Templates.
 		} catch (AlreadyClosedException ignored) {
