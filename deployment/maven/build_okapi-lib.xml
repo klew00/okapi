@@ -126,6 +126,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../libraries/lib-extra/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../libraries/lib-search/target/classes"
+			 excludes="**/META-INF/**"/>
 			
 			<!-- tm -->
 			<fileset dir="../../tm/simpletm/target/classes"
