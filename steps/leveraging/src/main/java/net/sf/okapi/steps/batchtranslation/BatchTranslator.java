@@ -225,7 +225,14 @@ public class BatchTranslator {
 			loc = rawDoc.getTargetLocale().toJavaLocale();
 			cmd = cmd.replace("${trgLangName}", loc.getDisplayLanguage(Locale.ENGLISH));
 			
+			LOGGER.info(cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
+			
+			StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), "err", LOGGER);            
+			StreamGobbler outputGobbler = new StreamGobbler(p.getInputStream(), "out", LOGGER);
+	    	errorGobbler.start();
+	    	outputGobbler.start();
+	    	
 	    	p.waitFor();
 		}
 		catch ( IOException e ) {
