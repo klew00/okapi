@@ -31,6 +31,8 @@ import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Similarity;
 
 public class ConcordanceFuzzyScorer extends Scorer {
+	private static float ROUGH_THRSHOLD = 0.50f;
+
 	private static int max(int x1, int x2) {
 		return (x1 > x2 ? x1 : x2);
 	}
@@ -39,77 +41,58 @@ public class ConcordanceFuzzyScorer extends Scorer {
 		return max(max(x1, x2), max(x3, x4));
 	}
 
-	private List<Term> terms;
-	private MultipleTermPositions mtp;
-	private TermPositions[] tps;
+	private MultipleTermPositions multiTermPositions;
+	private TermPositions[] termPositions;
 	private IndexReader reader;
 	private float score;
 	private int[] query;
 	private int matches = 0;
 	private float threshold;
+	private int currentDoc;
+	private List<Term> terms;
 
 	public ConcordanceFuzzyScorer(float threshold, Similarity similarity, List<Term> terms,
-			TermPositions[] tps, MultipleTermPositions mtp, IndexReader reader) throws IOException {
+			TermPositions[] termPositions, MultipleTermPositions multiTermPositions,
+			IndexReader reader) throws IOException {
 		super(similarity);
 		this.threshold = threshold;
-		this.terms = terms;
-		this.mtp = mtp;
-		this.tps = tps;
+		this.multiTermPositions = multiTermPositions;
+		this.termPositions = termPositions;
 		this.reader = reader;
+		this.currentDoc = -1;
+		this.terms = terms;
 
-		// initialize term symbols for locale alignment
+		// initialize term symbols for local alignment
 		query = new int[terms.size()];
 		for (int i = 1; i < terms.size(); i++) {
 			query[i] = i;
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.apache.lucene.search.Scorer#next()
-	 */
-	public boolean next() throws IOException {
-		if (!mtp.next()) {
-			mtp.close();
-			return false;
-		}
-
-		return findNext();
-	}
-
-	private boolean findNext() throws IOException {
-		// quick and dirty measure for bad matches
+	private int findNext() throws IOException {
+		// calculateSimpleFilter() is a quick and dirty measure for bad matches
 		while (true) {
-			if (calculateSimpleFilter() > threshold && (calculateScore(mtp.doc())) > threshold) {
+			if (calculateSimpleFilter() >= ROUGH_THRSHOLD
+					&& (calculateScore(multiTermPositions.doc())) >= threshold) {
 				break; // we found a match
 			} else {
-				if (mtp.next())
+				if (multiTermPositions.next())
 					continue;
 				else
-					return false;
+					return NO_MORE_DOCS;
 			}
 		}
-		return true;
+
+		return multiTermPositions.doc();
 	}
 
-	public int doc() {
-		return mtp.doc();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.apache.lucene.search.Scorer#score()
-	 */
+	@Override
 	public float score() throws IOException {
 		return score;
 	}
 
-	/*
-	 * DWH 9-14-09 deprecated in Lucene 2.9 but not used anyway public boolean skipTo(int doc) throws IOException {
-	 * return mtp.skipTo(doc); }
-	 */
 	private float calculateSimpleFilter() {
-		return (float) mtp.freq() / (float) terms.size();
+		return (float) multiTermPositions.freq() / (float) terms.size();
 	}
 
 	private float calculateScore(int d) throws IOException {
@@ -119,9 +102,9 @@ public class ConcordanceFuzzyScorer extends Scorer {
 		int minpos = 0;
 
 		// find maximum position in the hit
-		minpos = mtp.nextPosition();
-		for (int i = 1; i < mtp.freq(); i++) {
-			maxpos = mtp.nextPosition();
+		minpos = multiTermPositions.nextPosition();
+		for (int i = 1; i < multiTermPositions.freq(); i++) {
+			maxpos = multiTermPositions.nextPosition();
 		}
 
 		int size = (maxpos - minpos) + 1;
@@ -132,20 +115,19 @@ public class ConcordanceFuzzyScorer extends Scorer {
 
 		for (int i = 0; i < terms.size(); i++) {
 			query[i] = i + 1;
-			TermPositions tp = tps[i];
+			TermPositions tp = termPositions[i];
 			if (tp == null)
 				continue; // already reached the end
 			if (!tp.skipTo(d)) // end of the line, no more docs for this term
 			{
-				tps[i].close();
-				tps[i] = null;
+				termPositions[i].close();
+				termPositions[i] = null;
 				continue;
 			}
 
 			if (tp.doc() != d) {
-				tps[i] = reader.termPositions(terms.get(i));
-				// start over. TODO how to restart without creating a new
-				// stream?
+				// start over
+				termPositions[i] = reader.termPositions(terms.get(i));
 				continue; // this term must not be in our document
 			}
 
@@ -153,15 +135,13 @@ public class ConcordanceFuzzyScorer extends Scorer {
 				int p = tp.nextPosition();
 				hit[p - minpos] = i + 1;
 			}
-
 		}
-		float score = editDistance(hit, query);
+		score = editDistance(hit, query);
 		return score;
 	}
 
 	private class TraceBack {
 		public int i;
-
 		public int j;
 
 		public TraceBack(int i, int j) {
@@ -170,6 +150,7 @@ public class ConcordanceFuzzyScorer extends Scorer {
 		}
 	}
 
+	// TODO: JEH this LCS algorithm could be optimized in both time and space complexity
 	private float editDistance(int[] seq1, int[] seq2) {
 		int d = 1;
 		int n = seq1.length, m = seq2.length;
@@ -217,7 +198,6 @@ public class ConcordanceFuzzyScorer extends Scorer {
 				matches++;
 		}
 		return (float) matches / (float) terms.size();
-		// return (float) mtp.freq() / (float) matches; // for queries whose text is large or equal to the hits
 	}
 
 	private TraceBack next(TraceBack tb, TraceBack[][] tba) {
@@ -227,19 +207,30 @@ public class ConcordanceFuzzyScorer extends Scorer {
 
 	@Override
 	public int advance(int target) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		if (target == NO_MORE_DOCS) {
+			currentDoc = NO_MORE_DOCS;
+			return NO_MORE_DOCS;
+		}
+
+		while ((currentDoc = nextDoc()) < target) {
+		}
+
+		return currentDoc;
 	}
 
 	@Override
 	public int docID() {
-		// TODO Auto-generated method stub
-		return 0;
+		return currentDoc;
 	}
 
 	@Override
 	public int nextDoc() throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+		if (!multiTermPositions.next()) {
+			multiTermPositions.close();
+			return NO_MORE_DOCS;
+		}
+
+		currentDoc = findNext();
+		return currentDoc;
 	}
 }
