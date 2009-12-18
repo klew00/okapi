@@ -18,7 +18,6 @@ public class AbstractTranslator extends GenericSkeletonWriter implements ITransl
 	}
 	
 	public String translate(TextFragment tf, Logger lgr, int nFileType) {
-		// TODO Auto-generated method stub
 		return null;
 	}	
 }

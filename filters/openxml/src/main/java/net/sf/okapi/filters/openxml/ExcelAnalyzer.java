@@ -21,16 +21,12 @@
 package net.sf.okapi.filters.openxml;
 
 import java.awt.Point;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -41,15 +37,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import net.htmlparser.jericho.Attribute;
-import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
-import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.StreamedSource;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState;
 //import net.sf.okapi.filters.abstractmarkup.Parameters;
 //import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
@@ -62,8 +55,6 @@ public class ExcelAnalyzer
 
 	private ZipFile zipFile;
 	private ZipEntry entry;
-	private URI docURI;
-	private URI zipURI;
 	private Enumeration<? extends ZipEntry> entries;
 	private InputStream is;
 	private TreeMap<Integer,Point> tmCells;	
@@ -72,11 +63,10 @@ public class ExcelAnalyzer
 	private YamlParameters parameters; // DWH 7-16-09
 	private Iterator<Segment> nodeIterator;
 	private StreamedSource document;
-	private RawDocument input;
+//	private RawDocument input;
 
 	public ExcelAnalyzer(URI zipURI)
 	{
-		this.zipURI = zipURI;
 		try
 		{
 			File fZip = new File(zipURI.getPath());
@@ -93,7 +83,7 @@ public class ExcelAnalyzer
 		this.zipFile = zipFile;
 	}
 	
-	public TreeMap analyzeExcelGetSheetSizes()
+	public TreeMap<Integer,Point> analyzeExcelGetSheetSizes()
 	{
 		String sEntryName;
 		String sDim;
