@@ -161,6 +161,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 		TextInputPart tip = desc.addTextInputPart(paramDesc.get(BLOCKSIZE));
 		tip.setVertical(false);
+		tip.setRange(1, Integer.MAX_VALUE);
 		
 		tip = desc.addTextInputPart(paramDesc.get(ORIGIN));
 		tip.setAllowEmpty(true);

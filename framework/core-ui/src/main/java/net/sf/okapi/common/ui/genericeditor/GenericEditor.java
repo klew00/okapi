@@ -493,6 +493,14 @@ public class GenericEditor {
 					if ( text.getText().length() > 0 ) { 
 						n = Integer.valueOf(text.getText());
 					}
+					if (( n < desc.getMinimumValue() ) || ( n > desc.getMaximumValue() )) {
+						Dialogs.showError(shell,
+							String.format("The value must be between %d and %d (both included).",
+								desc.getMinimumValue(), desc.getMaximumValue()), null);
+						text.setFocus();
+						text.selectAll();
+						return false;
+					}
 					desc.getWriteMethod().invoke(desc.getParent(), n);
 				}
 				catch ( NumberFormatException e ) {

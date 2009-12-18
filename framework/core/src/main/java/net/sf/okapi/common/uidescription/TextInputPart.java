@@ -35,6 +35,8 @@ public class TextInputPart extends AbstractPart {
 
 	private boolean allowEmpty = false;
 	private boolean password = false;
+	private int minimumValue = Integer.MIN_VALUE;
+	private int maximumValue = Integer.MAX_VALUE;
 
 	/**
 	 * Creates a new TextInputPart object with a given parameter descriptor.
@@ -85,4 +87,45 @@ public class TextInputPart extends AbstractPart {
 		this.password = password;
 	}
 
+	/**
+	 * Gets the minimum value allowed (for integer input).
+	 * @return the minimum value allowed.
+	 */
+	public int getMinimumValue () {
+		return minimumValue;
+	}
+	
+	/**
+	 * Gets the maximum value allowed (for integer input).
+	 * @return the maximum value allowed.
+	 */
+	public int getMaximumValue () {
+		return maximumValue;
+	}
+	
+	/**
+	 * Sets the minimum and maximum values allowed (for integer input).
+	 * If the values are lesser or greater than the minimum and maximum
+	 * values allowed by an Integer, they are reset to those values.
+	 * If the maximum is less than the minimum it is reset to the minimum.
+	 * @param minimumValue the minimum value allowed.
+	 * @param maximumValue the maximum value allowed.
+	 */
+	public void setRange (int minimumValue,
+		int maximumValue)
+	{
+		if ( minimumValue < Integer.MIN_VALUE ) {
+			minimumValue = Integer.MIN_VALUE;
+		}
+		this.minimumValue = minimumValue;
+		
+		if ( maximumValue < minimumValue ) {
+			maximumValue = minimumValue;
+		}
+		if ( maximumValue > Integer.MAX_VALUE ) {
+			maximumValue = Integer.MAX_VALUE;
+		}
+		this.maximumValue = maximumValue;
+	}
+	
 }

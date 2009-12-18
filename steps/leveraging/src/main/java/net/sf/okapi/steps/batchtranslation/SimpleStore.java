@@ -77,6 +77,10 @@ class SimpleStore {
 		}
 	}
 	
+	/**
+	 * Writes a text container's content. Supports segmented entries.
+	 * @param tc the text container to write out.
+	 */
 	public void write (TextContainer tc) {
 		try {
 			if ( tc.isSegmented() ) {
@@ -97,8 +101,8 @@ class SimpleStore {
 	}
 
 	/**
-	 * Reads the next text container in the store.
-	 * @return the next text container in the store, or null if the end is reached.
+	 * Reads the next text fragment in the store.
+	 * @return the next text fragment in the store, or null if the end is reached.
 	 */
 	public TextFragment readNext () {
 		try {
