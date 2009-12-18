@@ -1,15 +1,22 @@
-/*
- * =========================================================================== Copyright (C) 2008-2009 by the Okapi
- * Framework contributors ----------------------------------------------------------------------------- This library is
- * free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details. You should have received a copy of the GNU Lesser General Public License along with this library; if not,
- * write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA See also the full
- * LGPL text here: http://www.gnu.org/copyleft/lesser.html
- * ===========================================================================
- */
+/*===========================================================================
+  Copyright (C) 2009 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
 
 package net.sf.okapi.common.resource;
 
@@ -56,6 +63,7 @@ public class RawDocument implements IResource {
 	private InputStream createdStream;
 	private URI inputURI;
 	private CharSequence inputCharSequence;
+	private boolean hasReaderBeenCalled;
 
 	/**
 	 * Creates a new RawDocument object with a given CharSequence and a source locale.
@@ -66,6 +74,7 @@ public class RawDocument implements IResource {
 	 *            the source locale for this RawDocument.
 	 */
 	public RawDocument(CharSequence inputCharSequence, LocaleId sourceLocale) {
+		this.hasReaderBeenCalled = false;
 		create(inputCharSequence, sourceLocale, null);
 	}
 
@@ -80,6 +89,7 @@ public class RawDocument implements IResource {
 	 *            the target locale for this RawDocument.
 	 */
 	public RawDocument(CharSequence inputCharSequence, LocaleId sourceLocale, LocaleId targetLocale) {
+		this.hasReaderBeenCalled = false;
 		create(inputCharSequence, sourceLocale, targetLocale);
 	}
 
@@ -94,6 +104,7 @@ public class RawDocument implements IResource {
 	 *            the source locale for this RawDocument.
 	 */
 	public RawDocument(URI inputURI, String defaultEncoding, LocaleId sourceLocale) {
+		this.hasReaderBeenCalled = false;
 		create(inputURI, defaultEncoding, sourceLocale, null);
 	}
 
@@ -109,7 +120,9 @@ public class RawDocument implements IResource {
 	 * @param targetLocale
 	 *            the target locale for this RawDocument.
 	 */
-	public RawDocument(URI inputURI, String defaultEncoding, LocaleId sourceLocale, LocaleId targetLocale) {
+	public RawDocument(URI inputURI, String defaultEncoding, LocaleId sourceLocale,
+			LocaleId targetLocale) {
+		this.hasReaderBeenCalled = false;
 		create(inputURI, defaultEncoding, sourceLocale, targetLocale);
 	}
 
@@ -124,6 +137,7 @@ public class RawDocument implements IResource {
 	 *            the source locale for this RawDocument.
 	 */
 	public RawDocument(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale) {
+		this.hasReaderBeenCalled = false;
 		create(inputStream, defaultEncoding, sourceLocale, null);
 	}
 
@@ -139,7 +153,9 @@ public class RawDocument implements IResource {
 	 * @param targetLocale
 	 *            the target locale for this RawDocument.
 	 */
-	public RawDocument(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale, LocaleId targetLocale) {
+	public RawDocument(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale,
+			LocaleId targetLocale) {
+		this.hasReaderBeenCalled = false;
 		create(inputStream, defaultEncoding, sourceLocale, targetLocale);
 	}
 
@@ -163,7 +179,8 @@ public class RawDocument implements IResource {
 		this.trgLoc = trgLoc;
 	}
 
-	private void create(InputStream inputStream, String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc) {
+	private void create(InputStream inputStream, String defaultEncoding, LocaleId srcLoc,
+			LocaleId trgLoc) {
 		if (inputStream == null) {
 			throw new IllegalArgumentException("inputStream cannot be null");
 		}
@@ -191,9 +208,10 @@ public class RawDocument implements IResource {
 		try {
 			reader = new InputStreamReader(createStream(), getEncoding());
 		} catch (UnsupportedEncodingException e) {
-			throw new OkapiUnsupportedEncodingException(String.format("The encoding '%s' is not supported.",
-					getEncoding()), e);
+			throw new OkapiUnsupportedEncodingException(String.format(
+					"The encoding '%s' is not supported.", getEncoding()), e);
 		}
+		hasReaderBeenCalled = true;
 		return reader;
 	}
 
@@ -217,10 +235,11 @@ public class RawDocument implements IResource {
 		// streams from the original resource if possible.
 		if (getInputCharSequence() != null) {
 			try {
-				inputStream = new ByteArrayInputStream(inputCharSequence.toString().getBytes(getEncoding()));
+				inputStream = new ByteArrayInputStream(inputCharSequence.toString().getBytes(
+						getEncoding()));
 			} catch (UnsupportedEncodingException e) {
-				throw new OkapiUnsupportedEncodingException(String.format("The encoding '%s' is not supported.",
-						getEncoding()), e);
+				throw new OkapiUnsupportedEncodingException(String.format(
+						"The encoding '%s' is not supported.", getEncoding()), e);
 			}
 		} else if (getInputURI() != null) {
 			URL url = null;
@@ -244,7 +263,8 @@ public class RawDocument implements IResource {
 				inputStream = new BufferedInputStream(inputStream);
 			} else {
 				// createStream.reset() didn't work above so we throw an exception. No way to safely reset this stream
-				throw new OkapiIOException("Second call to getStream() with InputStream. Cannot reset stream");				
+				throw new OkapiIOException(
+						"Second call to getStream() with InputStream. Cannot reset stream");
 			}
 		}
 
@@ -378,9 +398,18 @@ public class RawDocument implements IResource {
 	public void setEncoding(String encoding) {
 		// Cannot reset an encoding on a CharSequence document
 		if (inputCharSequence != null) {
-			LOGGER.log(Level.FINE, "Cannot reset an encoding on a CharSequence input in RawDocument");
+			LOGGER.log(Level.FINE,
+					"Cannot reset an encoding on a CharSequence input in RawDocument");
 			return;
 		}
+
+		if (hasReaderBeenCalled) {
+			LOGGER.log(Level.WARNING,
+							"Setting an encoding after getReader() has been called is not recommened. "
+							+ "Subsequent calls to getReader() may use the old encoding if the stream can be reset" 
+							+ " instead of recreated.");
+		}
+
 		this.encoding = encoding;
 	}
 
