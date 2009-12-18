@@ -21,6 +21,7 @@
         <module>google</module>
         <module>apertium</module>
         <module>promt</module>
+        <module>crosslanguage</module>
     </modules>
 
     <build>
