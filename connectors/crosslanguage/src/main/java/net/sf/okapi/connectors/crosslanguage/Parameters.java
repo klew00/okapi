@@ -22,6 +22,7 @@ package net.sf.okapi.connectors.crosslanguage;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.TextInputPart;
@@ -29,7 +30,7 @@ import net.sf.okapi.common.uidescription.TextInputPart;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	protected static final String SERVERURL = "serverURL";
-	protected static final String USER = "username";
+	protected static final String USER = "user";
 	protected static final String APIKEY = "apiKey";
 	protected static final String DEPATMENTID = "departmentId";
 	protected static final String DICTIONARY = "dictionary";
@@ -170,7 +171,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			"Naval/Maritime", "Photography/Optics", "Physics/AtomicEnergy", "Political science"};
 		desc.addListSelectionPart(paramsDesc.get(DICTIONARY), choices);
 		
-		desc.addCheckboxPart(paramsDesc.get(POLITEFORM));
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(POLITEFORM));
+		cbp.setVertical(true);
 		return desc;
 	}
 

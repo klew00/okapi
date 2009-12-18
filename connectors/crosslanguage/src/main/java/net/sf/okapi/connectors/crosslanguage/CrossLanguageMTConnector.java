@@ -31,6 +31,7 @@ import com.crosslang.ws.ArrayOfstring;
 import com.crosslang.ws.Gateway;
 import com.crosslang.ws.IGateway;
 
+import net.sf.okapi.common.Base64;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -39,6 +40,9 @@ import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 
+/**
+ * Connector for the CrossLanguage MT Gateway Web services.
+ */
 public class CrossLanguageMTConnector implements IQuery {
 
 	private Parameters params;
@@ -72,7 +76,7 @@ public class CrossLanguageMTConnector implements IQuery {
 		return (current>-1);
 	}
 	
-	public QueryResult next() {
+	public QueryResult next () {
 		if ( current > -1 ) { // Only one result
 			current = -1;
 			return result;
@@ -104,31 +108,25 @@ public class CrossLanguageMTConnector implements IQuery {
 	}
 
 	public int query (String plainText) {
-		TextFragment tf = new TextFragment(plainText);
-		return query(tf);
+		return queryString(plainText);
 	}
 	
 	public int query (TextFragment text) {
+		return queryFile(text);
+	}
+	
+	public int queryString (String text) {
 		current = -1;
 		try {
-			// Check if there is actually text to translate
-			if ( !text.hasText(false) ) return 0;
-			// Convert the fragment to coded HTML
-			String qtext = util.separateCodesFromText(text);
 			// Call the service
 			String res = gateway.getTranslatedStringWithOptions(params.getUser(), params.getApiKey(),
-				params.getDepartmentId(), qtext, options);
+				params.getDepartmentId(), text, options);
 			if ( res == null ) return 0;
 			
 			// Process the result
 			result = new QueryResult();
-			result.source = text;
-			if ( text.hasCode() ) {
-				result.target = util.createNewFragmentWithCodes(res);
-			}
-			else {
-				result.target = new TextFragment(res);
-			}
+			result.source = new TextFragment(text);
+			result.target = new TextFragment(res);
 			result.score = 95; // Arbitrary score for MT
 			result.origin = Util.ORIGIN_MT;
 			current = 0;
@@ -139,16 +137,14 @@ public class CrossLanguageMTConnector implements IQuery {
 		return ((current==0) ? 1 : 0);
 	}
 
-	public int queryFILE (TextFragment text) {
+	private int queryFile (TextFragment text) {
 		current = -1;
 		try {
 			// Check if there is actually text to translate
 			if ( !text.hasText(false) ) return 0;
 			// Convert the fragment to coded HTML
 			String qtext = util.toCodedHTML(text);
-			byte[] bytes = qtext.getBytes(csUTF8);
-//TODO: Base64			
-			String data = "";//Convert.ToBase64String(bytes);
+			String data = Base64.encodeString(qtext);
 			// Call the service
 			String res = gateway.getTranslatedFileWithOptions(params.getUser(), params.getApiKey(),
 				params.getDepartmentId(), data, "html", options);
@@ -158,7 +154,7 @@ public class CrossLanguageMTConnector implements IQuery {
 			result = new QueryResult();
 			result.source = text;
 			if ( text.hasCode() ) {
-				result.target = new TextFragment(util.fromCodedHTML(res, text),
+				result.target = new TextFragment(util.fromCodedHTML(Base64.decodeString(res), text),
 					text.getCodes());
 			}
 			else {
@@ -191,6 +187,7 @@ public class CrossLanguageMTConnector implements IQuery {
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
+		// Just used for get methods in this MT engine
 		srcLoc = sourceLocale;
 		trgLoc = targetLocale;
 	}
@@ -204,12 +201,11 @@ public class CrossLanguageMTConnector implements IQuery {
 	}
 
 	public IParameters getParameters () {
-		// No parameters are used with this connector
-		return null;
+		return params;
 	}
 
 	public void setParameters (IParameters params) {
-		// No parameters are used with this connector
+		params = (Parameters)params;
 	}
 
 }

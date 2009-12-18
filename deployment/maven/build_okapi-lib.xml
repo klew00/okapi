@@ -154,6 +154,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../connectors/promt/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../connectors/crosslanguage/target/classes"
+			 excludes="**/META-INF/**"/>
 
 			 <!-- steps -->
 			<fileset dir="../../steps/bomconversion/target/classes"

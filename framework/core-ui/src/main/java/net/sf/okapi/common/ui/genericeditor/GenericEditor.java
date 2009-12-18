@@ -763,6 +763,7 @@ public class GenericEditor {
 				}
 				if ( found > -1 ) {
 					list.select(found);
+					list.showSelection();
 				}
 			}
 			else if ( desc.getType().equals(int.class) ) {
@@ -773,6 +774,7 @@ public class GenericEditor {
 				int current = (Integer)desc.getReadMethod().invoke(desc.getParent());
 				if (( current > -1 ) && ( current < list.getItemCount() )) {
 					list.select(current);
+					list.showSelection();
 				}
 			}
 			else {

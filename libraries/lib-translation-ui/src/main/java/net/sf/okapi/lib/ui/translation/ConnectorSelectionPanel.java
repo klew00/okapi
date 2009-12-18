@@ -96,6 +96,7 @@ public class ConnectorSelectionPanel extends Composite {
 		}
 
 		cbConnectors = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
+		cbConnectors.setVisibleItemCount(10);
 		cbConnectors.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateConnector();
