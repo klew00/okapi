@@ -458,8 +458,7 @@ public class TikalTest {
     	StreamGobbler outputGobbler = new StreamGobbler(p.getInputStream(), "out");
     	errorGobbler.start();
     	outputGobbler.start();
-    	p.waitFor();
-    	return p.exitValue();
+    	return p.waitFor();
     }
 
 }

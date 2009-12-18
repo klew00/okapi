@@ -36,6 +36,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String TMDIRECTORY = "tmDirectory";
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
+	private static final String BLOCKSIZE = "blockSize";
 	
 	private String command;
 	private String origin;
@@ -43,6 +44,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String tmDirectory;
 	private boolean makeTMX;
 	private String tmxPath;
+	private int blockSize;
 	
 	public Parameters () {
 		reset();
@@ -96,6 +98,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.tmDirectory = tmDirectory;
 	}
 
+	public int getBlockSize () {
+		return blockSize;
+	}
+
+	public void setBlockSize (int blockSize) {
+		this.blockSize = blockSize;
+	}
+
 	public void reset() {
 		command = "\"C:\\Program Files\\PRMT8\\FILETRANS\\FileTranslator.exe\" \"${input}\" /as /ac \"/o:${output}\" /d:${srcLangName}-${trgLangName}";
 		origin = "promt";
@@ -103,6 +113,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tmDirectory = "mttm";
 		makeTMX = false;
 		tmxPath = "pretrans.tmx";
+		blockSize = 1000;
 	}
 
 	public void fromString (String data) {
@@ -114,6 +125,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tmDirectory = buffer.getString(TMDIRECTORY, tmDirectory);
 		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
+		blockSize = buffer.getInteger(BLOCKSIZE, blockSize);
 	}
 
 	@Override
@@ -125,6 +137,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(TMDIRECTORY, tmDirectory);
 		buffer.setBoolean(MAKETMX, makeTMX);
 		buffer.setString(TMXPATH, tmxPath);
+		buffer.setInteger(BLOCKSIZE, blockSize);
 		return buffer.toString();
 	}
 
@@ -133,6 +146,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(COMMAND, "Command line", "Command line to execute the batch translation");
 		desc.add(ORIGIN, "Origin identifier", "String that identifies the origin of the translation");
+		desc.add(BLOCKSIZE, "Block size", "Maximum number of text units to process together");
 		desc.add(MAKETM, "Import into a Pensieve TM", null);
 		desc.add(TMDIRECTORY, "TM directory", "Location of the TM to create or use");
 		desc.add(MAKETMX, "Create a TMX document", null);
@@ -145,8 +159,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 		desc.addTextInputPart(paramDesc.get(COMMAND));
 
-		TextInputPart tip = desc.addTextInputPart(paramDesc.get(ORIGIN));
+		TextInputPart tip = desc.addTextInputPart(paramDesc.get(BLOCKSIZE));
+		tip.setVertical(false);
+		
+		tip = desc.addTextInputPart(paramDesc.get(ORIGIN));
 		tip.setAllowEmpty(true);
+		tip.setVertical(false);
 		
 		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(MAKETM));
 		tip = desc.addTextInputPart(paramDesc.get(TMDIRECTORY));

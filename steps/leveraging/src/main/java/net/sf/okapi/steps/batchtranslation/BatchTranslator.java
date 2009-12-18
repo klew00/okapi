@@ -59,6 +59,7 @@ public class BatchTranslator {
 	private QueryUtil qutil;
 	private File htmlSourceFile;
 	private File htmlTargetFile;
+	private File originalStoreFile;
 	private Parameters params;
 	private ITmWriter tmWriter;
 	private TMXWriter tmxWriter;
@@ -66,12 +67,14 @@ public class BatchTranslator {
 	private LocaleId trgLoc;
 	private int subDocId;
 	private int currentSubDocId;
-	private int htmlSubDocId;
-	private String htmlTuId;
-	private String htmlSegId;
-	private TextUnit oriTu;
+//	private int htmlSubDocId;
+//	private String htmlTuId;
+//	private String htmlSegId;
+//	private TextUnit oriTu;
 	private boolean initDone;
 	private Map<String, String> attributes;
+	private SimpleStore store;
+	private int blockCount;
 
 	public BatchTranslator (IFilterConfigurationMapper fcMapper,
 		Parameters params)
@@ -111,6 +114,7 @@ public class BatchTranslator {
 			attributes.put("Txt::Origin", params.getOrigin());
 		}
 		initDone = true;
+		store = new SimpleStore();
 	}
 	
 	public void processDocument (RawDocument rd) {
@@ -124,43 +128,53 @@ public class BatchTranslator {
 		
 		filter = fcMapper.createFilter(rd.getFilterConfigId(), filter);
 		if ( filter == null ) {
-			throw new RuntimeException("Unsupported filter type.");
+			throw new RuntimeException(String.format(
+				"No filter available for the configuration '%s'.",
+				rd.getFilterConfigId()));
 		}
-		createBatchInput();
-		runBatchTranslation();
-		retrieveTranslation();
+//TEST		
+		processInput();
+//END TEST		
+//		createBatchInput();
+//		runBatchTranslation();
+//		OLDretrieveTranslation();
 	}
-
-	private void createBatchInput () {
+	
+	private void processInput () {
 		XMLWriter htmlWriter = null;
 		try {
 			// Open the document
 			filter.open(rawDoc);
 
+			// Create initial temporary file
 			htmlSourceFile = File.createTempFile("hft_", ".html");
-			htmlWriter = new XMLWriter(htmlSourceFile.getPath());
-
-			// Set the output name and make sure it's deleted
-			String path = htmlSourceFile.getAbsolutePath();
-			path = Util.getDirectoryName(path) + File.separator + Util.getFilename(path, false) + ".trg.html";
-			htmlTargetFile = new File(path);
-			
-			if ( htmlTargetFile.exists() ) {
-				htmlTargetFile.delete();
+			if ( htmlSourceFile != null ) {
+				htmlSourceFile.deleteOnExit();
 			}
-			
-			// Start building the source file
-			htmlWriter.writeStartElement("html");
-			htmlWriter.writeStartElement("meta");
-			htmlWriter.writeAttributeString("http-equiv", "Content-Type");
-			htmlWriter.writeAttributeString("content", "text/html; charset=UTF-8");
-			htmlWriter.writeEndElementLineBreak();
 
-			// Process
+			// Open the TM if needed
+			if ( tmWriter != null ) {				
+				tmWriter.close();
+				tmWriter = null;
+			}
+			if ( params.getMakeTM() ) {
+				String tmDir = params.getTmDirectory();
+				Util.createDirectories(tmDir+File.separator);
+				//TODO: Move this check at the pensieve package level
+				File file = new File(tmDir+File.separator+"segments.gen");
+				// Create a new index only if one does not exists yet
+				// If one exists we pass false to append to it
+				tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, !file.exists());
+			}
+
+			// Process blocks for N entries
+			blockCount = 0;
+			int count = 0;
+			int maxCount = params.getBlockSize();
 			Event event;
 			subDocId = 0;
 			currentSubDocId = 0;
-			
+
 			while ( filter.hasNext() ) {
 				event = filter.next();
 				switch ( event.getEventType() ) {
@@ -175,7 +189,15 @@ public class BatchTranslator {
 				case TEXT_UNIT:
 					TextUnit tu = (TextUnit)event.getResource();
 					if ( !tu.isTranslatable() ) continue;
+					// If we have no files ready yet, create them
+					if ( htmlWriter == null ) {
+						htmlWriter = startTemporaryFiles();
+					}
+					// Write out the data
 					TextContainer tc = tu.getSource();
+					// Write out the original entry for later use 
+					store.write(tc);
+					// Write out to source input
 					if ( tc.isSegmented() ) {
 						List<Segment> segments = tc.getSegments();
 						for ( Segment seg : segments ) {
@@ -191,26 +213,170 @@ public class BatchTranslator {
 						htmlWriter.writeRawXML(qutil.toCodedHTML(tc.getContent()));
 						htmlWriter.writeEndElementLineBreak(); // p
 					}
+					count++;
+				}
+				
+				// Check if we reached the number of entries per block
+				if ( count >= maxCount ) {
+					// Close the temporary files
+					finishTemporaryFiles(htmlWriter);
+					// Run the batch process
+					runBatchTranslation();
+					// Retrieve the translations
+					retrieveTranslation();
+					// Reset the counter for next block
+					count = 0;
+					htmlWriter = null;
 				}
 			}
-			
-			if ( htmlWriter != null ) {
-				htmlWriter.writeEndElement(); // html
-				htmlWriter.writeEndDocument();
-				htmlWriter.close();
-			}
-			if ( htmlSourceFile != null ) {
-				htmlSourceFile.deleteOnExit();
+
+			// Process the last block if needed
+			if ( count > 0 ) {
+				// Close the temporary files
+				finishTemporaryFiles(htmlWriter);
+				htmlWriter = null;
+				// Run the batch process
+				runBatchTranslation();
+				// Retrieve the translations
+				retrieveTranslation();
 			}
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException("Error when creating the input of the batch process.", e);
+			throw new RuntimeException("IO Error when processing a file.", e);
 		}
 		finally {
-			if ( htmlWriter != null ) htmlWriter.close();
-			if ( filter != null ) filter.close();
+			if ( htmlWriter != null ) {
+				finishTemporaryFiles(htmlWriter);
+			}
+			if ( filter != null ) {
+				filter.close();
+			}
+			if ( tmWriter != null ) {
+				tmWriter.close();
+			}
 		}
 	}
+	
+	private XMLWriter startTemporaryFiles () {
+		// Create the HTML source file
+		XMLWriter htmlWriter = new XMLWriter(htmlSourceFile.getPath());
+		// Start building the source file
+		htmlWriter.writeStartElement("html");
+		htmlWriter.writeStartElement("meta");
+		htmlWriter.writeAttributeString("http-equiv", "Content-Type");
+		htmlWriter.writeAttributeString("content", "text/html; charset=UTF-8");
+		htmlWriter.writeEndElementLineBreak();
+
+		// Set the output name and make sure it's deleted
+		String path = htmlSourceFile.getAbsolutePath();
+		path = Util.getDirectoryName(path) + File.separator + Util.getFilename(path, false) + ".trg.html";
+		htmlTargetFile = new File(path);
+		if ( htmlTargetFile.exists() ) {
+			htmlTargetFile.delete();
+		}
+
+		// Create the store for the original source
+		path = htmlSourceFile.getAbsolutePath();
+		path = Util.getDirectoryName(path) + File.separator + Util.getFilename(path, false) + ".ori.bin";
+		originalStoreFile = new File(path);
+		store.create(originalStoreFile);
+		
+		return htmlWriter;
+	}
+
+	private void finishTemporaryFiles (XMLWriter htmlWriter) {
+		// Close the temporary source input
+		if ( htmlWriter != null ) {
+			htmlWriter.writeEndElement(); // html
+			htmlWriter.writeEndDocument();
+			htmlWriter.close();
+			// htmlWriter should be reset to null by the caller 
+		}
+		
+		// Close the original entry store
+		if ( store != null ) {
+			store.close();
+		}
+	}
+	
+//	private void createBatchInput () {
+//		XMLWriter htmlWriter = null;
+//		try {
+//			// Open the document
+//			filter.open(rawDoc);
+//
+//			htmlSourceFile = File.createTempFile("hft_", ".html");
+//			htmlWriter = new XMLWriter(htmlSourceFile.getPath());
+//
+//			// Set the output name and make sure it's deleted
+//			String path = htmlSourceFile.getAbsolutePath();
+//			path = Util.getDirectoryName(path) + File.separator + Util.getFilename(path, false) + ".trg.html";
+//			htmlTargetFile = new File(path);
+//			
+//			if ( htmlTargetFile.exists() ) {
+//				htmlTargetFile.delete();
+//			}
+//			
+//			// Start building the source file
+//			htmlWriter.writeStartElement("html");
+//			htmlWriter.writeStartElement("meta");
+//			htmlWriter.writeAttributeString("http-equiv", "Content-Type");
+//			htmlWriter.writeAttributeString("content", "text/html; charset=UTF-8");
+//			htmlWriter.writeEndElementLineBreak();
+//
+//			// Process
+//			Event event;
+//			subDocId = 0;
+//			currentSubDocId = 0;
+//			
+//			while ( filter.hasNext() ) {
+//				event = filter.next();
+//				switch ( event.getEventType() ) {
+//				case START_SUBDOCUMENT:
+//					currentSubDocId = ++subDocId;
+//					break;
+//					
+//				case END_SUBDOCUMENT:
+//					currentSubDocId = 0; // Top-level
+//					break;
+//					
+//				case TEXT_UNIT:
+//					TextUnit tu = (TextUnit)event.getResource();
+//					if ( !tu.isTranslatable() ) continue;
+//					TextContainer tc = tu.getSource();
+//					if ( tc.isSegmented() ) {
+//						for ( Segment seg : tc.getSegments() ) {
+//							htmlWriter.writeStartElement("p");
+//							htmlWriter.writeAttributeString("id", String.format("%d:%s:%s", currentSubDocId, tu.getId(), seg.id));
+//							htmlWriter.writeRawXML(qutil.toCodedHTML(seg.text));
+//							htmlWriter.writeEndElementLineBreak(); // p
+//						}
+//					}
+//					else { // Not segmented
+//						htmlWriter.writeStartElement("p");
+//						htmlWriter.writeAttributeString("id", String.format("%d:%s:", currentSubDocId, tu.getId()));
+//						htmlWriter.writeRawXML(qutil.toCodedHTML(tc.getContent()));
+//						htmlWriter.writeEndElementLineBreak(); // p
+//					}
+//				}
+//			}
+//			
+//			if ( htmlWriter != null ) {
+//				htmlWriter.writeEndElement(); // html
+//				htmlWriter.writeEndDocument();
+//			}
+//			if ( htmlSourceFile != null ) {
+//				htmlSourceFile.deleteOnExit();
+//			}
+//		}
+//		catch ( IOException e ) {
+//			throw new RuntimeException("Error when creating the input of the batch process.", e);
+//		}
+//		finally {
+//			if ( htmlWriter != null ) htmlWriter.close();
+//			if ( filter != null ) filter.close();
+//		}
+//	}
 
 	private void runBatchTranslation () {
 		try {
@@ -225,14 +391,10 @@ public class BatchTranslator {
 			loc = rawDoc.getTargetLocale().toJavaLocale();
 			cmd = cmd.replace("${trgLangName}", loc.getDisplayLanguage(Locale.ENGLISH));
 			
-			LOGGER.info(cmd);
+			blockCount++;
+			//LOGGER.info(String.format("Block %d: ", blockCount) + cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
 			
-			StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), "err", LOGGER);            
-			StreamGobbler outputGobbler = new StreamGobbler(p.getInputStream(), "out", LOGGER);
-	    	errorGobbler.start();
-	    	outputGobbler.start();
-	    	
 	    	p.waitFor();
 		}
 		catch ( IOException e ) {
@@ -245,21 +407,9 @@ public class BatchTranslator {
 	
 	private void retrieveTranslation () {
 		Source html = null;
-		tmWriter = null;
 		try {
-			// Open the TM if needed
-			if ( params.getMakeTM() ) {
-				String tmDir = params.getTmDirectory();
-				Util.createDirectories(tmDir+File.separator);
-				//TODO: Move this check at the pensieve package level
-				File file = new File(tmDir+File.separator+"segments.gen");
-				// Create a new index only if one does not exists yet
-				// If one exists we pass false to append to it
-				tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, !file.exists());
-			}
-			
-			// Open the original document
-			filter.open(rawDoc);
+			// Open the original store for read
+			store.openForRead(originalStoreFile);
 
 			// Open the translated file
 			html = new Source(htmlTargetFile.toURI().toURL());
@@ -269,8 +419,11 @@ public class BatchTranslator {
 
 			// Process
 			// The element should be in the same order as the event of the original file
-			subDocId = 0;
-			currentSubDocId = 0;
+			//int subDocId = 0;
+			//int currentSubDocId = 0;
+			int htmlSubDocId;
+			String htmlTuId;
+			String htmlSegId;
 			
 			for ( Element elem : paragraphs ) {
 				String id = elem.getAttributeValue("id");
@@ -281,18 +434,13 @@ public class BatchTranslator {
 				htmlTuId = parts[1];
 				htmlSegId = parts[2];
 				
-				if ( !getNextFromOriginal() ) {
+				TextFragment srcFrag = store.readNext();
+				if ( srcFrag == null ) {
 					// Not found, out of synchronization
 					break; // No need to continue
 				}
-				TextFragment srcFrag;
+				
 				TextFragment trgFrag;
-				if ( Util.isEmpty(htmlSegId) ) {
-					srcFrag = oriTu.getSourceContent();
-				}
-				else { // Segmented text unit
-					srcFrag = oriTu.getSource().getSegments().get(Integer.valueOf(htmlSegId)).text;
-				}
 				try {
 					String ctext = qutil.fromCodedHTML(elem.getContent().toString(), srcFrag);
 					trgFrag = new TextFragment(ctext, srcFrag.getCodes());
@@ -320,66 +468,152 @@ public class BatchTranslator {
 			}
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException("Error reading the translations.");
+			throw new RuntimeException("Error reading the translations.", e);
 		}
 		finally {
-			if ( tmWriter != null ) {				
-				tmWriter.close();				
-			}
-			if ( filter != null ) filter.close();
 			if ( html != null ) html.clearCache();
 			htmlTargetFile.deleteOnExit();
+			store.close();
 		}
 	}
+	
+//	private void OLDretrieveTranslation () {
+//		Source html = null;
+//		tmWriter = null;
+//		try {
+//			// Open the TM if needed
+//			if ( params.getMakeTM() ) {
+//				String tmDir = params.getTmDirectory();
+//				Util.createDirectories(tmDir+File.separator);
+//				//TODO: Move this check at the pensieve package level
+//				File file = new File(tmDir+File.separator+"segments.gen");
+//				// Create a new index only if one does not exists yet
+//				// If one exists we pass false to append to it
+//				tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, !file.exists());
+//			}
+//			
+//			// Open the original document
+//			filter.open(rawDoc);
+//
+//			// Open the translated file
+//			html = new Source(htmlTargetFile.toURI().toURL());
+//			html.fullSequentialParse();
+//			// Get the elements
+//			List<Element> paragraphs = html.getAllElements(HTMLElementName.P);
+//
+//			// Process
+//			// The element should be in the same order as the event of the original file
+//			subDocId = 0;
+//			currentSubDocId = 0;
+//			
+//			for ( Element elem : paragraphs ) {
+//				String id = elem.getAttributeValue("id");
+//				if ( id == null ) continue; // No id means we can't match
+//				// Decompose the html id in its sub-doc, tu and seg parts
+//				String parts[] = id.split(":", -1);
+//				htmlSubDocId = Integer.valueOf(parts[0]);
+//				htmlTuId = parts[1];
+//				htmlSegId = parts[2];
+//				
+//				if ( !getNextFromOriginal() ) {
+//					// Not found, out of synchronization
+//					break; // No need to continue
+//				}
+//				TextFragment srcFrag;
+//				TextFragment trgFrag;
+//				if ( Util.isEmpty(htmlSegId) ) {
+//					srcFrag = oriTu.getSourceContent();
+//				}
+//				else { // Segmented text unit
+//					srcFrag = oriTu.getSource().getSegments().get(Integer.valueOf(htmlSegId)).text;
+//				}
+//				try {
+//					String ctext = qutil.fromCodedHTML(elem.getContent().toString(), srcFrag);
+//					trgFrag = new TextFragment(ctext, srcFrag.getCodes());
+//				}
+//				catch ( Throwable e ) {
+//					// Catch issues with inline codes
+//					LOGGER.warning(String.format("Skipping entry '%d:%s:%s'.\n", htmlSubDocId, htmlTuId, htmlSegId)
+//						+ e.getMessage());
+//					continue; // Skip this entry
+//				}
+//
+//				if ( tmWriter != null ) {
+//					TranslationUnit unit = new TranslationUnit(
+//						new TranslationUnitVariant(srcLoc, srcFrag),
+//						new TranslationUnitVariant(trgLoc, trgFrag));
+//					tmWriter.indexTranslationUnit(unit);							
+//				}
+//				
+//				if ( tmxWriter != null ) {
+//					tmxWriter.writeTU(srcFrag, trgFrag, null, attributes);
+//				}
+////				System.out.println("");
+////				System.out.println("SRC="+srcFrag.toString());
+////				System.out.println("TRG="+trgFrag.toString());
+//			}
+//		}
+//		catch ( IOException e ) {
+//			throw new RuntimeException("Error reading the translations.", e);
+//		}
+//		finally {
+//			if ( tmWriter != null ) {				
+//				tmWriter.close();				
+//			}
+//			if ( filter != null ) filter.close();
+//			if ( html != null ) html.clearCache();
+//			htmlTargetFile.deleteOnExit();
+//		}
+//	}
 
-	private boolean getNextFromOriginal () {
-		boolean found = false;
-		// If we are not on the proper text unit, we look for it
-		if (( oriTu == null ) || ( htmlSubDocId != currentSubDocId ) || !htmlTuId.equals(oriTu.getId()) ) {
-			Event event;
-			boolean stop = false;
-			while ( filter.hasNext() && !found && !stop ) {
-				event = filter.next();
-				switch ( event.getEventType() ) {
-				case START_SUBDOCUMENT:
-					currentSubDocId = ++subDocId;
-					continue; // Keep looking for next text unit
-				case END_SUBDOCUMENT:
-					currentSubDocId = 0; // Top-level
-					continue; // Keep looking for next text unit
-				case TEXT_UNIT:
-					oriTu = (TextUnit)event.getResource();
-					if ( !oriTu.isTranslatable() ) continue;
-					if (( htmlSubDocId == currentSubDocId ) && htmlTuId.equals(oriTu.getId()) ) {
-						found = true;
-						stop = true;
-					}
-					// In all case we break here, as the first TU should be the good one
-					// If it is not, we are not synchronized anymore.
-					break;
-				default:
-					continue; // Skip other events
-				}
-			}
-			
-			if ( !found ) { // No corresponding text unit
-				return false;
-			}
-		}
-		
-		// We are on the correct TU
-		// Now get the segment, if we are dealing with segments
-		if ( !Util.isEmpty(htmlSegId) ) {
-			found = false;
-			for ( Segment seg : oriTu.getSource().getSegments() ) {
-				if ( htmlSegId.equals(seg.id) ) {
-					found = true;
-					break;
-				}
-			}
-		}
-		
-		return found;
-	}
+//	private boolean getNextFromOriginal () {
+//		boolean found = false;
+//		// If we are not on the proper text unit, we look for it
+//		if (( oriTu == null ) || ( htmlSubDocId != currentSubDocId ) || !htmlTuId.equals(oriTu.getId()) ) {
+//			Event event;
+//			boolean stop = false;
+//			while ( filter.hasNext() && !found && !stop ) {
+//				event = filter.next();
+//				switch ( event.getEventType() ) {
+//				case START_SUBDOCUMENT:
+//					currentSubDocId = ++subDocId;
+//					continue; // Keep looking for next text unit
+//				case END_SUBDOCUMENT:
+//					currentSubDocId = 0; // Top-level
+//					continue; // Keep looking for next text unit
+//				case TEXT_UNIT:
+//					oriTu = (TextUnit)event.getResource();
+//					if ( !oriTu.isTranslatable() ) continue;
+//					if (( htmlSubDocId == currentSubDocId ) && htmlTuId.equals(oriTu.getId()) ) {
+//						found = true;
+//						stop = true;
+//					}
+//					// In all case we break here, as the first TU should be the good one
+//					// If it is not, we are not synchronized anymore.
+//					break;
+//				default:
+//					continue; // Skip other events
+//				}
+//			}
+//			
+//			if ( !found ) { // No corresponding text unit
+//				return false;
+//			}
+//		}
+//		
+//		// We are on the correct TU
+//		// Now get the segment, if we are dealing with segments
+//		if ( !Util.isEmpty(htmlSegId) ) {
+//			found = false;
+//			for ( Segment seg : oriTu.getSource().getSegments() ) {
+//				if ( htmlSegId.equals(seg.id) ) {
+//					found = true;
+//					break;
+//				}
+//			}
+//		}
+//		
+//		return found;
+//	}
 
 }
