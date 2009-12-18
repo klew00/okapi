@@ -5,7 +5,8 @@ Bundle-SymbolicName: net.sf.okapi.tm.pensieve
 Bundle-Version: 0.0.1
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.filters.tmx;bundle-version="1.0.0",
- net.sf.okapi.lib.search;bundle-version="1.0.0"
+ net.sf.okapi.lib.search;bundle-version="1.0.0",
+ org.apache.lucene-core;bundle-version="3.0.0"
 Export-Package: net.sf.okapi.tm.pensieve.common,
  net.sf.okapi.tm.pensieve.seeker,
  net.sf.okapi.tm.pensieve.writer,

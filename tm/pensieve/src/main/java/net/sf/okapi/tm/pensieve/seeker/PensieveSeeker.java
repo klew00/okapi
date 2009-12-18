@@ -273,7 +273,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		return noDups;
 	}
 
-	@Override
 	public List<TmHit> searchExact(TextFragment query, Metadata metadata) {
 		TermQuery termQuery = new TermQuery(new Term(TranslationUnitField.SOURCE_EXACT.name(),
 				query.getCodedText()));
@@ -351,7 +350,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		return getFuzzyHits(max, searchThreshold, fQuery, query, metadata);
 	}
 
-	@Override
 	public List<TmHit> searchSimpleConcordance(String query, int threshold, int max,
 			Metadata metadata) {
 		if (threshold < 0 || threshold > 100) {
@@ -613,7 +611,6 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 		}
 	}
 
-	@Override
 	public void close() {
 		try {
 			if (indexSearcher != null) {

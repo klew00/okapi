@@ -146,7 +146,6 @@ public class TmHit implements Comparable<TmHit> {
 	 * 
 	 * @param other - the TmHot we are comparing against.
 	 */
-	@Override
 	public int compareTo(TmHit other) {
 		final int EQUAL = 0;
 
