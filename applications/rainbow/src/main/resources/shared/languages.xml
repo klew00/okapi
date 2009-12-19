@@ -512,7 +512,7 @@
  </language>
 
  <language code='gl' lcid='-1' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1'>
-  <name>Gallegan</name>
+  <name>Galician</name>
  </language>
  <language code='gl-ES' lcid='-1' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1' flag='flagXGL'>
   <name>Gallegan (*Spain)</name>
