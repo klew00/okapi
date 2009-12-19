@@ -28,10 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import net.sf.okapi.common.HTMLCharacterEntities;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
@@ -48,15 +45,10 @@ public class ApertiumMTConnector implements IQuery {
 	private String pair;
 	private boolean hasNext;
 	private QueryResult result;
-	private Pattern cerPattern;
-	private HTMLCharacterEntities entities;
 	private QueryUtil store;
 	
 	public ApertiumMTConnector () {
 		params = new Parameters();
-		cerPattern = Pattern.compile("(&\\w*?;)");
-		entities = new HTMLCharacterEntities();
-		entities.ensureInitialization(true);
 		store = new QueryUtil();
 	}
 	
@@ -142,21 +134,6 @@ public class ApertiumMTConnector implements IQuery {
 	        	// Most likely this pair is not supported
 	        	return 0;
 	        }
-	        
-	        // Unescape the CERs if needed
-			Matcher m;
-			while ( true ) {
-				m = cerPattern.matcher(transText);
-				if ( !m.find() ) break;
-				int val = entities.lookupReference(m.group(0));
-				if ( val != -1 ) {
-					transText = transText.replace(m.group(0), String.valueOf((char)val));
-				}
-				else { // Unknown entity
-					//TODO: replace by something meaningful to allow continuing the replacements
-					break; // Temporary, to avoid infinite loop
-				}
-			}
 	        
 	        result = new QueryResult();
 	        result.score = 95; // Fixed score for MT

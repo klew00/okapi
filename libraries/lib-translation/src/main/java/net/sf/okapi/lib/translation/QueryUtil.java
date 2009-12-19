@@ -30,6 +30,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import net.sf.okapi.common.HTMLCharacterEntities;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.resource.Code;
@@ -49,10 +50,12 @@ public class QueryUtil {
 	private static final Pattern HTML_SPAN = Pattern.compile("\\<span\\s(.*?)>|\\</span>", Pattern.CASE_INSENSITIVE);
 	
 	private static final Pattern NCR = Pattern.compile("&#(\\S+?);");
+	private static final Pattern CER = Pattern.compile("(&\\w*?;)");
 
 	private StringBuilder codesMarkers;
 	private List<Code> codes;
 	private XLIFFContent fmt;
+	private HTMLCharacterEntities entities; 
 	
 	public QueryUtil () {
 		codesMarkers = new StringBuilder();
@@ -165,21 +168,40 @@ public class QueryUtil {
 		TextFragment fragment)
 	{
 		if ( Util.isEmpty(text) ) return "";
-		text = text.toString().replace("&#39;", "'");
+		text = text.toString().replace("&apos;", "'");
 		text = text.replace("&lt;", "<");
 		text = text.replace("&gt;", ">");
 		text = text.replace("&quot;", "\"");
 		StringBuilder sb = new StringBuilder();
 		sb.append(text.replace("&amp;", "&"));
+		if ( entities == null ) {
+			entities = new HTMLCharacterEntities();
+			entities.ensureInitialization(false);
+		}
 
-		// Un-escape NCR
-		Matcher m = NCR.matcher(sb.toString());
+		// Un-escape character entity references
+		Matcher m;
+		while ( true ) {
+			m = CER.matcher(sb.toString());
+			if ( !m.find() ) break;
+			int val = entities.lookupReference(m.group(0));
+			if ( val != -1 ) {
+				sb.replace(m.start(0), m.end(0), String.valueOf((char)val));
+			}
+			else { // Unknown entity
+				//TODO: replace by something meaningful to allow continuing the replacements
+				break; // Temporary, to avoid infinite loop
+			}
+		}
+		
+		// Un-escape numeric character references
+		m = NCR.matcher(sb.toString());
 		while ( m.find() ) {
 			String val = m.group(1);
 			int n = (int)'?'; // Default
 			try {
 				if ( val.charAt(0) == 'x' ) { // Hexadecimal
-					n = Integer.valueOf(m.group(1).substring(1), 12);
+					n = Integer.valueOf(m.group(1).substring(1), 16);
 				}
 				else { // Decimal
 					n = Integer.valueOf(m.group(1));
@@ -285,7 +307,6 @@ public class QueryUtil {
 				break;
 			case Node.ELEMENT_NODE:
 				NamedNodeMap map = node.getAttributes();
-				Node attr = map.getNamedItem("type");
 				if ( node.getNodeName().equals("bpt") ) {
 					id = getRawIndex(lastId, map.getNamedItem("id"));
 					stack.push(id);

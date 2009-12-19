@@ -83,7 +83,16 @@ public class QueryUtilTest {
 		codedText = codedText.toUpperCase();
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("A & < > \" \' <b>BOLD</b> T <br/> Z", resFrag.toString());
-		
+	}
+	
+	@Test
+	public void testWithEscapes () {
+		TextFragment tf = makeFragment();
+		String htmlText = qu.toCodedHTML(tf);
+		htmlText = htmlText + "&aacute;&amp;&#39;&#x0152;&apos;";
+		String codedText = qu.fromCodedHTML(htmlText, tf);
+		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
+		assertEquals("a & < > \" \' <b>bold</b> t <br/> z\u00e1&'\u0152'", resFrag.toString());
 	}
 	
 	private TextFragment makeFragment () {
