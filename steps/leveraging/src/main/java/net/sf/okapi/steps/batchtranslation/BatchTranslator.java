@@ -79,6 +79,11 @@ public class BatchTranslator {
 	private int blockCount;
 	private ITmSeeker existingTm;
 	private ITmSeeker currentTm;
+	private int docInternalMatches;
+	private int totalInternalMatches;
+	private int docExternalMatches;
+	private int totalExternalMatches;
+	
 
 	public BatchTranslator (IFilterConfigurationMapper fcMapper,
 		Parameters params)
@@ -109,6 +114,10 @@ public class BatchTranslator {
 			existingTm.close();
 			existingTm = null;
 		}
+		if ( currentTm != null ) {
+			currentTm.close();
+			currentTm = null;
+		}
 		initDone = false;
 	}
 
@@ -123,6 +132,8 @@ public class BatchTranslator {
 		}
 		initDone = true;
 		store = new SimpleStore();
+		totalInternalMatches = 0;
+		totalExternalMatches = 0;
 
 		// Initialize existing TM if needed
 		if ( params.getCheckExistingTm() ) {
@@ -174,9 +185,19 @@ public class BatchTranslator {
 				// Create a new index only if one does not exists yet
 				// If one exists we pass false to append to it
 				tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, !file.exists());
+				
+				// Open TM seeker to check for repetitions
+				// We have to close and re-open to take into account new entry from previous document
+				// We currently cannot found entry being added before a close of the TM writer.
+				if ( currentTm != null ) {
+					currentTm.close();
+				}
+				currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 			}
 
 			// Process blocks for N entries
+			docInternalMatches = 0;
+			docExternalMatches = 0;
 			blockCount = 0;
 			int count = 0;
 			int maxCount = params.getBlockSize();
@@ -210,9 +231,17 @@ public class BatchTranslator {
 						List<Segment> segments = tc.getSegments();
 						for ( Segment seg : segments ) {
 							// If needed, check if the entry is in the existing TM
+							if ( currentTm != null ) {
+								if ( currentTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
+									// If we have a hit, no need to query the MT
+									docInternalMatches++;
+									continue;
+								}
+							}
 							if ( existingTm != null ) {
 								if ( existingTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
 									// If we have a hit, no need to query the MT
+									docExternalMatches++;
 									continue;
 								}
 							}
@@ -226,9 +255,17 @@ public class BatchTranslator {
 					}
 					else { // Not segmented
 						// If needed, check if the entry is in the existing TM
+						if ( currentTm != null ) {
+							if ( currentTm.searchFuzzy(tc.getContent(), 95, 1, null).size() > 0 ) {
+								// If we have a hit, no need to query the MT
+								docInternalMatches++;
+								continue;
+							}
+						}
 						if ( existingTm != null ) {
 							if ( existingTm.searchFuzzy(tc.getContent(), 95, 1, null).size() > 0 ) {
 								// If we have a hit, no need to query the MT
+								docExternalMatches++;
 								continue;
 							}
 						}
@@ -273,7 +310,7 @@ public class BatchTranslator {
 				htmlWriter = null;
 			}
 		}
-		catch ( IOException e ) {
+		catch ( Throwable e ) {
 			throw new RuntimeException("IO Error when processing a file.", e);
 		}
 		finally {
@@ -286,6 +323,12 @@ public class BatchTranslator {
 			if ( tmWriter != null ) {
 				tmWriter.close();
 			}
+			if ( currentTm != null ) {
+				LOGGER.info(String.format("Number of existing matches from TM being built = %d", docInternalMatches));
+				LOGGER.info(String.format("Number of existing matches from existing TM = %d", docExternalMatches));
+			}
+			totalInternalMatches += docInternalMatches;
+			totalExternalMatches += docExternalMatches;
 		}
 	}
 	

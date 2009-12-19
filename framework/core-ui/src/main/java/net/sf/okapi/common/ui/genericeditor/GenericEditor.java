@@ -477,9 +477,11 @@ public class GenericEditor {
 	
 	private boolean saveInputControl (Text text, TextInputPart desc) {
 		try {
+			if ( !text.isEnabled() ) return true; // Don't save disabled input
 			if ( !desc.isAllowEmpty() ) {
 				if ( text.getText().length() == 0 ) {
-					Dialogs.showError(shell, "Empty entry not allowed.", null);
+					Dialogs.showError(shell,
+						String.format("Empty entry not allowed for '%s'.", desc.getDisplayName()), null);
 					text.setFocus();
 					return false;
 				}
@@ -495,8 +497,8 @@ public class GenericEditor {
 					}
 					if (( n < desc.getMinimumValue() ) || ( n > desc.getMaximumValue() )) {
 						Dialogs.showError(shell,
-							String.format("The value must be between %d and %d (both included).",
-								desc.getMinimumValue(), desc.getMaximumValue()), null);
+							String.format("The value must be between %d and %d (both included) for '%s'.",
+								desc.getMinimumValue(), desc.getMaximumValue(), desc.getDisplayName()), null);
 						text.setFocus();
 						text.selectAll();
 						return false;
@@ -504,7 +506,8 @@ public class GenericEditor {
 					desc.getWriteMethod().invoke(desc.getParent(), n);
 				}
 				catch ( NumberFormatException e ) {
-					Dialogs.showError(shell, "Invalid integer value. "+e.getMessage(), null);
+					Dialogs.showError(shell,
+						String.format("Invalid integer value for '%s'.\n", desc.getDisplayName())+e.getMessage(), null);
 					text.setFocus();
 					text.selectAll();
 					return false;
@@ -532,6 +535,7 @@ public class GenericEditor {
 	
 	private boolean saveCheckboxControl (Button button, CheckboxPart desc) {
 		try {
+			if ( !button.isEnabled() ) return true; // Don't save disabled input
 			if ( desc.getType().equals(boolean.class) ) {
 				desc.getWriteMethod().invoke(desc.getParent(), button.getSelection());
 			}
@@ -563,6 +567,7 @@ public class GenericEditor {
 	
 	private boolean saveTextAndBrowseControl (TextAndBrowsePanel ctrl, PathInputPart desc) {
 		try {
+			if ( !ctrl.isEnabled() ) return true; // Don't save disabled input
 			if ( desc.getType().equals(String.class) ) {
 				if ( ctrl.getText().length() == 0 ) {
 					Dialogs.showError(shell, "You must specify a path.", null);
@@ -593,6 +598,7 @@ public class GenericEditor {
 	
 	private boolean saveCodeFinderControl (InlineCodeFinderPanel ctrl, CodeFinderPart desc) {
 		try {
+			if ( !ctrl.isEnabled() ) return true; // Don't save disabled input
 			if ( desc.getType().equals(String.class) ) {
 				String tmp = ctrl.getRules();
 				desc.getWriteMethod().invoke(desc.getParent(), tmp);
@@ -619,6 +625,7 @@ public class GenericEditor {
 	
 	private boolean saveListControl (List list, ListSelectionPart desc) {
 		try {
+			if ( !list.isEnabled() ) return true; // Don't save disabled input
 			int n = list.getSelectionIndex();
 			if ( n > -1 ) {
 				if ( desc.getType().equals(String.class) ) {
@@ -650,6 +657,7 @@ public class GenericEditor {
 
 	private boolean saveComboControl (Combo combo, ListSelectionPart desc) {
 		try {
+			if ( !combo.isEnabled() ) return true; // Don't save disabled input
 			int n = combo.getSelectionIndex();
 			if ( n > -1 ) {
 				// Get the value from the user-data list
