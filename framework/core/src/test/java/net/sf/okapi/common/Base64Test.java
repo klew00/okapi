@@ -68,4 +68,10 @@ public class Base64Test {
 		}
 	}
 
+    @Test(expected = RuntimeException.class)
+	public void testBadInput () {
+    	// Input not in a length multiple of 4
+		Base64.decode("123");
+	}
+
 }

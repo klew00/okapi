@@ -37,6 +37,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
 	private static final String BLOCKSIZE = "blockSize";
+	private static final String CHECKEXISTINGTM = "checkExistingTm";
+	private static final String EXISTINGTM = "existingTm";
 	
 	private String command;
 	private String origin;
@@ -45,6 +47,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean makeTMX;
 	private String tmxPath;
 	private int blockSize;
+	private boolean checkExistingTm;
+	private String existingTm;
 	
 	public Parameters () {
 		reset();
@@ -106,6 +110,22 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.blockSize = blockSize;
 	}
 
+	public boolean getCheckExistingTm () {
+		return checkExistingTm;
+	}
+
+	public void setCheckExistingTm (boolean chekExistingTm) {
+		this.checkExistingTm = chekExistingTm;
+	}
+
+	public String getExistingTm () {
+		return existingTm;
+	}
+
+	public void setExistingTm (String existingTm) {
+		this.existingTm = existingTm;
+	}
+
 	public void reset() {
 		command = "\"C:\\Program Files\\PRMT8\\FILETRANS\\FileTranslator.exe\" \"${input}\" /as /ac \"/o:${output}\" /d:${srcLangName}-${trgLangName}";
 		origin = "promt";
@@ -114,6 +134,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		makeTMX = false;
 		tmxPath = "pretrans.tmx";
 		blockSize = 1000;
+		checkExistingTm = false;
+		existingTm = "";
 	}
 
 	public void fromString (String data) {
@@ -126,6 +148,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		blockSize = buffer.getInteger(BLOCKSIZE, blockSize);
+		checkExistingTm = buffer.getBoolean(CHECKEXISTINGTM, checkExistingTm);
+		existingTm = buffer.getString(EXISTINGTM, existingTm);
 	}
 
 	@Override
@@ -138,6 +162,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(MAKETMX, makeTMX);
 		buffer.setString(TMXPATH, tmxPath);
 		buffer.setInteger(BLOCKSIZE, blockSize);
+		buffer.setBoolean(CHECKEXISTINGTM, checkExistingTm);
+		buffer.setString(EXISTINGTM, existingTm);
 		return buffer.toString();
 	}
 
@@ -148,9 +174,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(ORIGIN, "Origin identifier", "String that identifies the origin of the translation");
 		desc.add(BLOCKSIZE, "Block size", "Maximum number of text units to process together");
 		desc.add(MAKETM, "Import into a Pensieve TM", null);
-		desc.add(TMDIRECTORY, "TM directory", "Location of the TM to create or use");
+		desc.add(TMDIRECTORY, "Directory of the TM where to import", "Location of the TM to create or use");
 		desc.add(MAKETMX, "Create a TMX document", null);
 		desc.add(TMXPATH, "TMX path", "Full path of the new TMX document to create");
+		desc.add(CHECKEXISTINGTM, "Check for existing entries in a given TM", null);
+		desc.add(EXISTINGTM, "Directory of the existing TM", "Location of the TM to lookup first");
 		return desc;
 	}
 
@@ -175,6 +203,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		PathInputPart pip = desc.addPathInputPart(paramDesc.get(TMXPATH), "TMX Path", true);
 		pip.setMasterPart(cbp, true);
 		
+		cbp = desc.addCheckboxPart(paramDesc.get(CHECKEXISTINGTM));
+		tip = desc.addTextInputPart(paramDesc.get(EXISTINGTM));
+		tip.setMasterPart(cbp, true);
+
 		return desc;
 	}
 

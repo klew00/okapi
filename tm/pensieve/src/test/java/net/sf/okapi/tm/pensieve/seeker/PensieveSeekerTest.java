@@ -71,6 +71,21 @@ public class PensieveSeekerTest {
     }
 
     @Test
+    public void testShortEntries () throws Exception {
+        PensieveWriter writer = getWriter();
+        writer.indexTranslationUnit(new TranslationUnit(
+           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abcd")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(
+           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abc")), TARGET));
+        writer.close();
+
+        List<TmHit> list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, null);
+        assertEquals("number of docs found", 1, list.size());
+        list = seeker.searchFuzzy(new TextFragment("abc"), 100, 1, null);
+//TOFIX: We get 0 instead of 1        assertEquals("number of docs found", 1, list.size());
+    }
+
+    @Test
     public void translationUnitIterator() throws Exception {
         PensieveWriter writer = getWriter();
         populateIndex(writer, 12, "patents are evil", "unittest");

@@ -29,8 +29,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -78,22 +76,13 @@ class SimpleStore {
 	}
 	
 	/**
-	 * Writes a text container's content. Supports segmented entries.
-	 * @param tc the text container to write out.
+	 * Writes a text fragment.
+	 * @param tf the text fragment to write out.
 	 */
-	public void write (TextContainer tc) {
+	public void write (TextFragment tf) {
 		try {
-			if ( tc.isSegmented() ) {
-				for ( Segment seg : tc.getSegments() ) {
-					dos.writeUTF(seg.text.getCodedText());
-					dos.writeUTF(Code.codesToString(seg.text.getCodes()));
-				}
-			}
-			else {
-				TextFragment tf = tc.getContent();
-				dos.writeUTF(tf.getCodedText());
-				dos.writeUTF(Code.codesToString(tf.getCodes()));
-			}
+			dos.writeUTF(tf.getCodedText());
+			dos.writeUTF(Code.codesToString(tf.getCodes()));
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException("Error while writing.", e);

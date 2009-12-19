@@ -46,6 +46,8 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.QueryUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
+import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
+import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
@@ -75,6 +77,8 @@ public class BatchTranslator {
 	private Map<String, String> attributes;
 	private SimpleStore store;
 	private int blockCount;
+	private ITmSeeker existingTm;
+	private ITmSeeker currentTm;
 
 	public BatchTranslator (IFilterConfigurationMapper fcMapper,
 		Parameters params)
@@ -101,6 +105,10 @@ public class BatchTranslator {
 			tmxWriter.close();
 			tmxWriter = null;
 		}
+		if ( existingTm != null ) {
+			existingTm.close();
+			existingTm = null;
+		}
 		initDone = false;
 	}
 
@@ -115,6 +123,11 @@ public class BatchTranslator {
 		}
 		initDone = true;
 		store = new SimpleStore();
+
+		// Initialize existing TM if needed
+		if ( params.getCheckExistingTm() ) {
+			existingTm = TmSeekerFactory.createFileBasedTmSeeker(params.getExistingTm());
+		}
 	}
 	
 	public void processDocument (RawDocument rd) {
@@ -132,12 +145,8 @@ public class BatchTranslator {
 				"No filter available for the configuration '%s'.",
 				rd.getFilterConfigId()));
 		}
-//TEST		
+
 		processInput();
-//END TEST		
-//		createBatchInput();
-//		runBatchTranslation();
-//		OLDretrieveTranslation();
 	}
 	
 	private void processInput () {
@@ -189,18 +198,26 @@ public class BatchTranslator {
 				case TEXT_UNIT:
 					TextUnit tu = (TextUnit)event.getResource();
 					if ( !tu.isTranslatable() ) continue;
+
+					TextContainer tc = tu.getSource();
 					// If we have no files ready yet, create them
 					if ( htmlWriter == null ) {
 						htmlWriter = startTemporaryFiles();
 					}
-					// Write out the data
-					TextContainer tc = tu.getSource();
-					// Write out the original entry for later use 
-					store.write(tc);
+					
 					// Write out to source input
 					if ( tc.isSegmented() ) {
 						List<Segment> segments = tc.getSegments();
 						for ( Segment seg : segments ) {
+							// If needed, check if the entry is in the existing TM
+							if ( existingTm != null ) {
+								if ( existingTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
+									// If we have a hit, no need to query the MT
+									continue;
+								}
+							}
+							// Store
+							store.write(seg.text);
 							htmlWriter.writeStartElement("p");
 							htmlWriter.writeAttributeString("id", String.format("%d:%s:%s", currentSubDocId, tu.getId(), seg.id));
 							htmlWriter.writeRawXML(qutil.toCodedHTML(seg.text));
@@ -208,6 +225,15 @@ public class BatchTranslator {
 						}
 					}
 					else { // Not segmented
+						// If needed, check if the entry is in the existing TM
+						if ( existingTm != null ) {
+							if ( existingTm.searchFuzzy(tc.getContent(), 95, 1, null).size() > 0 ) {
+								// If we have a hit, no need to query the MT
+								continue;
+							}
+						}
+						// Store
+						store.write(tc.getContent());
 						htmlWriter.writeStartElement("p");
 						htmlWriter.writeAttributeString("id", String.format("%d:%s:", currentSubDocId, tu.getId()));
 						htmlWriter.writeRawXML(qutil.toCodedHTML(tc.getContent()));
@@ -239,6 +265,12 @@ public class BatchTranslator {
 				runBatchTranslation();
 				// Retrieve the translations
 				retrieveTranslation();
+			}
+			else {
+				// Close the temporary files
+				// But no need to process them
+				finishTemporaryFiles(htmlWriter);
+				htmlWriter = null;
 			}
 		}
 		catch ( IOException e ) {
@@ -394,6 +426,11 @@ public class BatchTranslator {
 			blockCount++;
 			//LOGGER.info(String.format("Block %d: ", blockCount) + cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
+			
+	    	StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(), "err");            
+	    	StreamGobbler outputGobbler = new StreamGobbler(p.getInputStream(), "out");
+	    	errorGobbler.start();
+	    	outputGobbler.start();
 			
 	    	p.waitFor();
 		}

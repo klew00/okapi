@@ -22,7 +22,6 @@ package net.sf.okapi.connectors.crosslanguage;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -53,7 +52,6 @@ public class CrossLanguageMTConnector implements IQuery {
 	private int current = -1;
 	private QueryUtil util;
 	private ArrayOfstring options;
-	private Charset csUTF8;
 
 	public CrossLanguageMTConnector () {
 		params = new Parameters();
@@ -99,8 +97,6 @@ public class CrossLanguageMTConnector implements IQuery {
 			}
 			list.add("Formality");
 			list.add(params.getPoliteForm() ? "FormalOrPolite" : "Informal");
-			
-			csUTF8 = Charset.forName("UTF8");
 		}
 		catch ( MalformedURLException e ) {
 			throw new RuntimeException("URL error when creating service.", e);
