@@ -117,7 +117,7 @@ public final class LocaleFilter {
 	 * @param localeIds
 	 * @return
 	 */
-	public static LocaleFilter only(LocaleId ... localeIds) {
+	public static LocaleFilter anyOf(LocaleId ... localeIds) {
 		
 		if (Util.isEmpty(localeIds)) return none();
 		
@@ -198,6 +198,11 @@ public final class LocaleFilter {
 		return this;
 	}
 	
+	public LocaleFilter include(String regex) {
+		
+		return include(regex, 0);
+	}
+	
 	/**
 	 * Filter configuration method.
 	 * @param languages
@@ -247,7 +252,7 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(region)) return this;
 		
-		this.regionIncludes.add(region);
+		this.regionIncludes.add("xx-" + region);
 		
 		return this;
 	}
@@ -274,7 +279,7 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(userPart)) return this;
 		
-		this.userPartIncludes.add(userPart);
+		this.userPartIncludes.add("xx-xx-x-" + userPart);
 		
 		return this;
 	}
@@ -336,7 +341,11 @@ public final class LocaleFilter {
 		
 		return this;
 	}
-
+	
+	public LocaleFilter exclude(String regex) {
+		
+		return exclude(regex, 0);
+	}
 	
 	/**
 	 * Filter configuration method.
@@ -387,7 +396,7 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(region)) return this;
 		
-		this.regionExcludes.add(region);
+		this.regionExcludes.add("xx-" + region);
 		
 		return this;
 	}
@@ -414,7 +423,26 @@ public final class LocaleFilter {
 		
 		if (Util.isEmpty(userPart)) return this;
 		
-		this.userPartExcludes.add(userPart);
+		this.userPartExcludes.add("xx-xx-x-" + userPart);
+		
+		return this;
+	}
+
+	public LocaleFilter reset() {
+		
+		includes.clear();
+		excludes.clear();
+		
+		languageIncludes.clear();
+		regionIncludes.clear();
+		userPartIncludes.clear();
+		
+		languageExcludes.clear();
+		regionExcludes.clear();
+		userPartExcludes.clear();
+		
+		includePatterns.clear(); 
+		excludePatterns.clear();
 		
 		return this;
 	}
@@ -496,17 +524,13 @@ public final class LocaleFilter {
 		
 		Set<LocaleId> locales = new HashSet<LocaleId>();
 		
-		for (LocaleId localeId : locales)
+		for (LocaleId localeId : localeIds)
 			if (matches(localeId))
 				locales.add(localeId);
 
 		return locales;
 	}
-
-	public FilterType getType() {
-		return type;
-	}
-
+	
 	public List<LocaleId> getIncludes() {
 		return includes;
 	}
