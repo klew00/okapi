@@ -86,6 +86,17 @@ public class PensieveSeekerTest {
     }
 
     @Test
+    public void testPenaltyDifferentSpaces () throws Exception {
+        PensieveWriter writer = getWriter();
+        writer.indexTranslationUnit(new TranslationUnit(
+           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abcdef")), TARGET));
+        writer.close();
+
+//TOFIX: throw concurrent modif exceptio        List<TmHit> list = seeker.searchFuzzy(new TextFragment("abCdef"), 100, 1, null);
+//        assertEquals("number of docs found", 0, list.size());
+    }
+
+    @Test
     public void translationUnitIterator() throws Exception {
         PensieveWriter writer = getWriter();
         populateIndex(writer, 12, "patents are evil", "unittest");
