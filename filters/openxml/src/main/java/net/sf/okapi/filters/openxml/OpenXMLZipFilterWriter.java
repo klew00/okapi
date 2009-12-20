@@ -35,6 +35,7 @@ import java.util.zip.ZipOutputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.*;
@@ -81,6 +82,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	private File tempZip;
 	private YamlParameters params; // DWH 7-16-09
 	private static final Logger LOGGER = Logger.getLogger(OpenXMLZipFilterWriter.class.getName());
+	private EncoderManager encoderManager;
 
 	/**
 	 * Cancels processing of a filter; yet to be implemented.
@@ -156,7 +158,12 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 	}
 
 	public EncoderManager getEncoderManager () {
-		return null;
+		if ( encoderManager == null ) {
+			encoderManager = new EncoderManager();
+			//TOFIX: set only the needed mappings
+			encoderManager.setAllKnownMappings();
+		}
+		return encoderManager;
 	}
 	
 	/**
@@ -355,7 +362,7 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 */
 		nZipType = ((ConditionalParameters)res.getFilterParameters()).nFileType; // DWH 6-27-09
 		subSkelWriter = new OpenXMLContentSkeletonWriter(nZipType); // DWH 10-27-09 subSkelWriter
-		subDocWriter = new GenericFilterWriter(subSkelWriter); // DWH 10-27-09
+		subDocWriter = new GenericFilterWriter(subSkelWriter, getEncoderManager()); // YS 12-20-09
 		subDocWriter.setOptions(outTargetLang, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
 		

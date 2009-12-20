@@ -120,7 +120,8 @@ public class POFilterTest {
 		assertEquals("nplurals=2; plural=(n!=1);", prop.getValue());
 		assertFalse(prop.isReadOnly());
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR);
 		assertEquals(snippet, result);
 	}
 
@@ -176,7 +177,8 @@ public class POFilterTest {
 		String snippet = "#, c-format\r"
 			+ "msgid \"Text 1\"\r"
 			+ "msgstr \"Texte 1\"\r";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR);
 		assertEquals(result, snippet);
 	}
 		
@@ -185,7 +187,8 @@ public class POFilterTest {
 		String snippet = "#, c-format, fuzzy\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR);
 		assertEquals(result, snippet);
 	}
 		
@@ -208,7 +211,8 @@ public class POFilterTest {
 		String snippet = "#, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR);
 		assertEquals(result, snippet);
 	}
 
@@ -217,7 +221,8 @@ public class POFilterTest {
 		String snippet = "#, x-stuff, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR);
 		assertEquals(result, snippet);
 	}
 	
@@ -227,7 +232,8 @@ public class POFilterTest {
 			+ "msgstr \"Texte 1\"\n";
 		String expect = "msgid \"Text 1\"\n"
 			+ "msgstr \"Texte 1\"\n";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR));
 	}
 	
 	@Test
@@ -236,7 +242,8 @@ public class POFilterTest {
 			+ "msgstr \"\"\n";
 		String expect = "msgid \"Text 1\"\n"
 			+ "msgstr \"Text 1\"\n";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR));
 	}
 	
 	@Test
@@ -308,7 +315,8 @@ public class POFilterTest {
 	@Test
 	public void testOuputPluralEntry () {
 		String snippet = makePluralEntry();
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR);
 		String expected = "msgid \"untranslated-singular\"\n"
 			+ "msgid_plural \"untranslated-plural\"\n"
 			+ "msgstr[0] \"untranslated-singular\"\n"
@@ -339,7 +347,8 @@ public class POFilterTest {
 	@Test
 	public void testOuputPluralEntryFuzzy () {
 		String snippet = makePluralEntryFuzzy();
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR), locFR);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR);
 		assertEquals(snippet, result);
 	}
 

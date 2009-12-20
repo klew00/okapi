@@ -107,7 +107,7 @@ public class OpenOfficeFilter implements IFilter {
 	}
 	
 	public IFilterWriter createFilterWriter () {
-		return new ZipFilterWriter();
+		return new ZipFilterWriter(getEncoderManager());
 	}
 
 	public String getName () {

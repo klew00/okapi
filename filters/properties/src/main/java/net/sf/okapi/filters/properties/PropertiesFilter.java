@@ -201,7 +201,7 @@ public class PropertiesFilter implements IFilter {
 	}
 
 	public IFilterWriter createFilterWriter () {
-		return new GenericFilterWriter(createSkeletonWriter());
+		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
 	public void open (RawDocument input,

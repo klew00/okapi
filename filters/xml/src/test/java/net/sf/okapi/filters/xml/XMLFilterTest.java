@@ -64,7 +64,8 @@ public class XMLFilterTest {
 			+ "<doc>"
 			+ "<p>&lt;=lt &gt;=gt &quot;=quot &apos;=apos</p>"
 			+ "</doc>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -173,7 +174,8 @@ public class XMLFilterTest {
 			+ "<doc><!--c--></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><!--c--></doc>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -182,7 +184,8 @@ public class XMLFilterTest {
 			+ "<doc><?pi ?></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><?pi ?></doc>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -191,7 +194,8 @@ public class XMLFilterTest {
 			+ "<doc>T</doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc>T</doc>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -200,7 +204,8 @@ public class XMLFilterTest {
 			+ "<doc/>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc/>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -209,7 +214,8 @@ public class XMLFilterTest {
 			+ "<doc><p>test</p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>test</p></doc>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 
 	@Test
@@ -218,7 +224,8 @@ public class XMLFilterTest {
 			+ "<doc><p>&amp;=amp, &lt;=lt, &quot;=quot..</p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>&amp;=amp, &lt;=lt, &quot;=quot..</p></doc>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	//TODO: Implement language handling
@@ -238,7 +245,8 @@ public class XMLFilterTest {
 			+ "<p>[&#x20000;]=U+D840,U+DC00</p>";
 		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<p>[\uD840\uDC00]=U+D840,U+DC00</p>";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -256,7 +264,8 @@ public class XMLFilterTest {
 			+ "<doc><p><![CDATA[&=amp, <=lt, &#xaaa;=not-a-ncr]]></p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>&amp;=amp, &lt;=lt, &amp;#xaaa;=not-a-ncr</p></doc>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 
 	@Test
@@ -274,7 +283,8 @@ public class XMLFilterTest {
 			+ "<doc><p>t1 <!--comment--> t2</p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>t1 <!--comment--> t2</p></doc>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 
 	@Test
@@ -292,7 +302,8 @@ public class XMLFilterTest {
 			+ "<doc><p>t1 <?abc attr=\"value\"?> t2</p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>t1 <?abc attr=\"value\"?> t2</p></doc>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 
 	@Test
@@ -303,7 +314,8 @@ public class XMLFilterTest {
 		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>part 1 part 2</p>"
 			+ "<p xml:space=\"preserve\">part 1\npart 2</p></doc>";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -312,7 +324,8 @@ public class XMLFilterTest {
 			+ "<p>part 1\npart 2\n  part3\n\t part4</p>";
 		String expect = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<p>part 1 part 2 part3 part4</p>";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -325,7 +338,8 @@ public class XMLFilterTest {
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\" xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
 			+ "<its:translateRule itsx:whiteSpaces=\"preserve\" selector=\"//pre\" translate=\"yes\"/></its:rules>"
 			+ "<p>[ ]</p><pre>[  \t]</pre></doc>";
-		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test

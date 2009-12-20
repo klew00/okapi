@@ -142,7 +142,8 @@ public class JSONFilterTest {
 	@Test
 	public void testSimpleEntrySkeleton () {
 		String snippet = "  {\r  \"key1\" :  \"Text1\"  } \r ";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet, null), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet, null),
+			filter.getEncoderManager(), locEN));
 	}
 
 	@Test

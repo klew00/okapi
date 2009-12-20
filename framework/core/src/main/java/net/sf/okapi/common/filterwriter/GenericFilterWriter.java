@@ -61,9 +61,11 @@ public class GenericFilterWriter implements IFilterWriter {
 	private EncoderManager encoderManager;
 	private File tempFile;
 	
-	public GenericFilterWriter (ISkeletonWriter skelWriter) {
+	public GenericFilterWriter (ISkeletonWriter skelWriter,
+		EncoderManager encoderManager)
+	{
 		this.skelWriter = skelWriter;
-		encoderManager = new EncoderManager();
+		this.encoderManager = encoderManager;
 	}
 	
 	public void cancel () {

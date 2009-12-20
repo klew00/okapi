@@ -47,7 +47,6 @@ import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
-import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
@@ -440,7 +439,8 @@ public class FixedWidthColumnsFilterTest {
 		}
 		//System.out.println(snippet);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locGESW), locGESW);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locGESW),
+			filter.getEncoderManager(), locGESW);
 		assertEquals(snippet, result);
 	}
 	

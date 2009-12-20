@@ -74,15 +74,12 @@ public class TmxFilter implements IFilter {
 	private LinkedList<Event> queue;	
 	private boolean canceled;
 	private GenericSkeleton skel;	
-	//private TextUnit tu;
 	private String encoding;	
 	private Parameters params;
 	private Stack<Boolean> preserveSpaces;
 	private String lineBreak;
 	private boolean hasUTF8BOM;
-	
 	private boolean skipUtWarning;
-	
 	
 	public enum TuvXmlLang {UNDEFINED,SOURCE,TARGET,OTHER}
 
@@ -323,7 +320,7 @@ public class TmxFilter implements IFilter {
 	}
 
 	public IFilterWriter createFilterWriter () {
-		return new GenericFilterWriter(createSkeletonWriter());
+		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
 	private boolean read () throws XMLStreamException {

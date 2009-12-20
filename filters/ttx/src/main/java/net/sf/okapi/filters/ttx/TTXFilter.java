@@ -295,7 +295,7 @@ public class TTXFilter implements IFilter {
 	}
 
 	public IFilterWriter createFilterWriter () {
-		return new GenericFilterWriter(createSkeletonWriter());
+		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
 	private boolean whitespacesOnly (String text) {

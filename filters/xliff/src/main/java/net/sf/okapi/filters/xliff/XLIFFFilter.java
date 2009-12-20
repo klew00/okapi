@@ -270,7 +270,7 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	public IFilterWriter createFilterWriter () {
-		return new GenericFilterWriter(createSkeletonWriter());
+		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
 	private boolean read () throws XMLStreamException {

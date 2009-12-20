@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -115,8 +116,10 @@ public class GenericFilterWriterTest {
 
 		Ending ed1 = new Ending("ed1"); 
 		events.add(new Event(EventType.END_DOCUMENT, ed1));
-
-		String result = FilterTestDriver.generateOutput(events, locFR);
+		
+		EncoderManager encoderManager = new EncoderManager();
+		encoderManager.setAllKnownMappings();
+		String result = FilterTestDriver.generateOutput(events, encoderManager, locFR);
 		assertEquals(expected, result);
 		
 	}
@@ -135,8 +138,10 @@ public class GenericFilterWriterTest {
 		skel.addContentPlaceholder(tu, locFR);
 		skel.add("[end]");
 		tu.setSkeleton(skel);
-			
-		GenericFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter());
+		
+		EncoderManager encMgt = new EncoderManager();
+		encMgt.setAllKnownMappings();
+		GenericFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter(), encMgt);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 		writer.setOptions(locFR, "UTF-8");
@@ -162,8 +167,10 @@ public class GenericFilterWriterTest {
 		DocumentPart dp = new DocumentPart("id1", false);
 		dp.setSkeleton(skel);
 		Event docPartEvent = new Event(EventType.DOCUMENT_PART, dp);
-			
-		GenericFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter());
+		
+		EncoderManager encMgt = new EncoderManager();
+		encMgt.setAllKnownMappings();
+		GenericFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter(), encMgt);
 		writer.setOptions(locEN, "UTF-8");
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		writer.setOutput(output);

@@ -60,7 +60,12 @@ public class ZipFilterWriter implements IFilterWriter {
 	private IFilterWriter subDocWriter;
 	private File tempFile;
 	private File tempZip;
+	private EncoderManager encoderManager;
 
+	public ZipFilterWriter (EncoderManager encoderManager) {
+		this.encoderManager = encoderManager;
+	}
+	
 	public void cancel () {
 		//TODO: implement cancel()
 	}
@@ -125,7 +130,7 @@ public class ZipFilterWriter implements IFilterWriter {
 	}
 
 	public EncoderManager getEncoderManager () {
-		return null;
+		return encoderManager;
 	}
 	
 	public IParameters getParameters () {
@@ -259,7 +264,7 @@ public class ZipFilterWriter implements IFilterWriter {
 		
 		// Instantiate the filter writer for that entry
 		//TODO: replace this by transparent call
-		subDocWriter = new GenericFilterWriter(new GenericSkeletonWriter());
+		subDocWriter = new GenericFilterWriter(new GenericSkeletonWriter(), getEncoderManager());
 		subDocWriter.setOptions(outLoc, "UTF-8");
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
 		

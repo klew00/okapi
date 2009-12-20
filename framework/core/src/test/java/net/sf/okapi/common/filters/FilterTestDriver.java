@@ -548,6 +548,7 @@ public class FilterTestDriver {
 	 * @return The generated output string
 	 */
 	public static String generateOutput (ArrayList<Event> list,
+		EncoderManager encoderManager,
 		LocaleId trgLang)
 	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
@@ -555,7 +556,7 @@ public class FilterTestDriver {
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				tmp.append(writer.processStartDocument(trgLang, "UTF-8", null, new EncoderManager(),
+				tmp.append(writer.processStartDocument(trgLang, "UTF-8", null, encoderManager,
 					(StartDocument) event.getResource()));
 				break;
 			case END_DOCUMENT:
@@ -597,13 +598,14 @@ public class FilterTestDriver {
 	 */
 	public static String generateOutput (ArrayList<Event> list,
 		LocaleId trgLang,
-		ISkeletonWriter skelWriter)
+		ISkeletonWriter skelWriter,
+		EncoderManager encoderManager)
 	{
 		StringBuilder tmp = new StringBuilder();
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				tmp.append(skelWriter.processStartDocument(trgLang, "UTF-8", null, new EncoderManager(),
+				tmp.append(skelWriter.processStartDocument(trgLang, "UTF-8", null, encoderManager,
 					(StartDocument) event.getResource()));
 				break;
 			case END_DOCUMENT:

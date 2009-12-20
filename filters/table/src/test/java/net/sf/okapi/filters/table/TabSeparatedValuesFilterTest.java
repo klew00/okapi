@@ -255,7 +255,8 @@ public class TabSeparatedValuesFilterTest {
 		
 		//System.out.println(snippet);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA), locFRCA);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA),
+			filter.getEncoderManager(), locFRCA);
 		//System.out.println(result);
 		assertEquals(snippet, result);
 	}

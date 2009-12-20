@@ -364,7 +364,8 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 		
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), locFR));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR),
+			filter.getEncoderManager(), locFR));
 	}	
 	@Test
 	public void TestEncodeExcludedChars() {
@@ -434,7 +435,8 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), locFR));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR),
+			filter.getEncoderManager(), locFR));
 	}	
 	@Test
 	public void AllEvents () {
@@ -482,7 +484,8 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 		
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR), locFR));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR),
+			filter.getEncoderManager(), locFR));
 	}
 	
 	@Test

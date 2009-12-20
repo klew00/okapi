@@ -275,7 +275,8 @@ public class PHPContentFilterTest {
 	@Test
 	public void testOutputLinefeedCodes () {
 		String snippet = "$a='\\n\\n';";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -477,7 +478,8 @@ public class PHPContentFilterTest {
 		// Should be empty so no TU
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu==null);
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -486,31 +488,36 @@ public class PHPContentFilterTest {
 		// No text so no TU
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu==null);
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
 	public void testOutputSimple () {
 		String snippet = "$a='abc';\n$b=\"def\";";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
 	public void testLineBreakType () {
 		String snippet = "$a='abc';\r\n$b=\"def\";\r\n";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
 	public void testOutputWithNoStrings () {
 		String snippet = "echo $a=$b; and other dummy code";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
 	public void testOutputHeredoc () {
 		String snippet = "$a=<<<EOT\ntext\nEOT \n EOT \n\nEOT;\n";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -518,7 +525,8 @@ public class PHPContentFilterTest {
 		String snippet = "$a=<<<EOT\ntext\nEOT \n EOT \n\nEOT;\n"
 			+ "$b=\"abc\"\n// 'comments'\n$c = 'def';\n"
 			+ "/* $c=\"abc\" */";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -572,7 +580,8 @@ public class PHPContentFilterTest {
 	@Test
 	public void testOutputArrayKeys () {
 		String snippet = "$arr1[\"foo\"]; $arr2[  'foo' ] = 'text';";
-		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test

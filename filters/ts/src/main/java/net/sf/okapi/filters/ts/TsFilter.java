@@ -326,7 +326,7 @@ public class TsFilter implements IFilter {
 	}
 
 	public IFilterWriter createFilterWriter() {
-		return new GenericFilterWriter(createSkeletonWriter());
+		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {

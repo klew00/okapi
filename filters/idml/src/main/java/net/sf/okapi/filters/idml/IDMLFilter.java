@@ -100,7 +100,7 @@ public class IDMLFilter implements IFilter {
 	}
 	
 	public IFilterWriter createFilterWriter () {
-		return new ZipFilterWriter();
+		return new ZipFilterWriter(getEncoderManager());
 	}
 
 	public EncoderManager getEncoderManager () {

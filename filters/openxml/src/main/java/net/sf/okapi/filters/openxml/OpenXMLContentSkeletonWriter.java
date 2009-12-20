@@ -61,7 +61,9 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 	private int configurationType; // DWH 4-10-09
 	private ILayerProvider layer;
-	private EncoderManager encoderManager;
+	// If we comment out this variable, encoderManager become the protected variable
+	// of GenericSkeletonWriter, but all tests fail. Not sure why.
+	private EncoderManager encoderManager; //TODO: Maybe use the one of GenericSkeletonWriter
 	private int nTextBoxLevel=0; // DWH 10-27-09
 	private boolean bInBlankText=false; // DWH 10-27-09
 	private int nContentDepth=0;
@@ -72,6 +74,8 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		super();
 		this.configurationType = configurationType; // DWH 4-10-09
 		encoderManager = new EncoderManager(); // DWH 5-14-09
+		//TODO: set only needed mappings 
+		//encoderManager.setAllKnownMappings(); // YS 12-20-09
 		encoderManager.setDefaultOptions(null, "utf-8", "\n"); // DWH 5-14-09
 		encoderManager.updateEncoder(MimeTypeMapper.DOCX_MIME_TYPE); // DWH 5-14-09
 	}

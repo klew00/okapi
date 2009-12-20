@@ -155,6 +155,18 @@ public class TmxFilterTest {
 	}
 	
 	@Test
+	public void testEscapes () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.1\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body>"
+			+ "<tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>\"\'&amp;&lt;></seg></tuv><tuv xml:lang=\"fr-fr\"><seg>\"\'&amp;&lt;></seg></tuv></tu></body></tmx>\r";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tmx version=\"1.1\">"
+			+ "<header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body>"
+			+ "<tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\"><seg>&quot;&apos;&amp;&lt;></seg></tuv><tuv xml:lang=\"fr-fr\"><seg>&quot;&apos;&amp;&lt;></seg></tuv></tu></body></tmx>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locENUS, locFRFR),
+			filter.getEncoderManager(), locFRFR));
+	}
+	
+	@Test
 	public void testCancel() {
 		Event event;
 		filter.open(new RawDocument(simpleSnippet,locENUS,locFRFR));			

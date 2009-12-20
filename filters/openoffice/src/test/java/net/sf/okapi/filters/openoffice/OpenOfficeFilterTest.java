@@ -79,8 +79,6 @@ public class OpenOfficeFilterTest {
 	
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {
-		// Read all files in the data directory
-		
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"TestSpreadsheet01.ods", null));
 		list.add(new InputDocument(root+"TestDocument01.odt", null));

@@ -163,7 +163,8 @@ public class XLIFFFilterTest {
 			+ "</trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locFR));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locFR));
 	}
 
 	@Test
@@ -185,7 +186,8 @@ public class XLIFFFilterTest {
 			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
 			+ "<target xml:lang=\"fr\">t1.   t2</target>"
 			+ "\r</trans-unit></body></file></xliff>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locFR));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locFR));
 	}
 
 	@Test
@@ -213,7 +215,8 @@ public class XLIFFFilterTest {
 			+ "<body><trans-unit id=\"1\" resname=\"13\"><source><g id=\"1\">S1</g>, <g id=\"2\">S2</g></source>"
 			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
 			+ "</file></xliff>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 
 	@Test

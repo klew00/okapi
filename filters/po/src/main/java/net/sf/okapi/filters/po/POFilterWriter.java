@@ -139,6 +139,7 @@ public class POFilterWriter implements IFilterWriter {
 	}
 
 	public EncoderManager getEncoderManager () {
+		// This writer does not use skeleton
 		return null;
 	}
 	

@@ -45,7 +45,6 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
-import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
@@ -111,7 +110,8 @@ public class CommaSeparatedValuesFilterTest {
 		params.targetSourceRefs = "1";
 		filter.setParameters(params);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA), locFRCA);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA),
+			filter.getEncoderManager(), locFRCA);
 		assertEquals(snippet, result);
 	}
 	
@@ -132,7 +132,8 @@ public class CommaSeparatedValuesFilterTest {
 		params.targetSourceRefs = "1";
 		filter.setParameters(params);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA), locFRCA);  
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA),
+			filter.getEncoderManager(), locFRCA);  
 		assertEquals(snippet, result);
 	}
 	
@@ -165,7 +166,8 @@ public class CommaSeparatedValuesFilterTest {
 		
 		//System.out.println(snippet);
 		
-		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA), locFRCA);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFRCA),
+			filter.getEncoderManager(), locFRCA);
 		//System.out.println(result);
 		assertEquals(snippet, result);
 	}
