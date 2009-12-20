@@ -20,11 +20,15 @@
 
 package net.sf.okapi.common.encoder;
 
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.encoder.DTDEncoder;
 import net.sf.okapi.common.encoder.DefaultEncoder;
 import net.sf.okapi.common.encoder.HtmlEncoder;
 import net.sf.okapi.common.encoder.PropertiesEncoder;
 import net.sf.okapi.common.encoder.XMLEncoder;
+import net.sf.okapi.common.filters.DummyFilter;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.resource.Property;
 
 import org.junit.Test;
@@ -147,5 +151,29 @@ public class EncodersTest {
 		assertEquals("&#37;", enc.encode((int)'%', 0));
 	}
 
+	@Test
+	public void changeEncoderTest () {
+		IFilter filter = new DummyFilter();
+		EncoderManager em1 = filter.getEncoderManager();
+		assertNotNull(em1);
+		em1.setDefaultOptions(null, "UTF-8", "\n");
+		em1.updateEncoder(MimeTypeMapper.XML_MIME_TYPE);
+		assertEquals("net.sf.okapi.common.encoder.XMLEncoder", em1.getEncoder().getClass().getName());
+		
+		GenericFilterWriter gfw = new GenericFilterWriter(filter.createSkeletonWriter(),
+			filter.getEncoderManager());
+		EncoderManager em2 = gfw.getEncoderManager();
+		assertSame(em1, em2);
+
+		// Bogus MIME type result in default encoder 
+		em2.updateEncoder("bogus");
+		assertEquals("net.sf.okapi.common.encoder.DefaultEncoder", em2.getEncoder().getClass().getName());
+		
+		// Now change the mapping
+		em2.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.PropertiesEncoder");
+		em2.updateEncoder(MimeTypeMapper.XML_MIME_TYPE);
+		assertEquals("net.sf.okapi.common.encoder.PropertiesEncoder", em2.getEncoder().getClass().getName());
+		assertEquals("net.sf.okapi.common.encoder.PropertiesEncoder", em1.getEncoder().getClass().getName());
+	}
 	
 }
