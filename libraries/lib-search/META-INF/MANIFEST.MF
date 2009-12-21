@@ -3,7 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Search Library
 Bundle-SymbolicName: net.sf.okapi.lib.search
 Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.lib.search
+Export-Package: net.sf.okapi.lib.search,
+ net.sf.okapi.lib.search.lucene.analysis,
+ net.sf.okapi.lib.search.lucene.query,
+ net.sf.okapi.lib.search.lucene.scorer
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- org.apache.lucene-core;bundle-version="3.0.0"
+ org.apache.lucene-core;bundle-version="3.0.0",
+ com.ibm.icu;bundle-version="4.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
