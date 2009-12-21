@@ -317,9 +317,10 @@ public class RawDocument implements IResource {
 	}
 
 	/**
-	 * Returns always null as there is never a skeleton associated to a RawDocument.
+	 * Always throws an exception as there is never a skeleton associated with a RawDocument.
 	 * 
-	 * @return always null.
+	 * @return never returns.
+	 * @throws OkapiNotImplementedException
 	 */
 	public ISkeleton getSkeleton() {
 		throw new OkapiNotImplementedException("The RawDocument resource does not have skeketon");
@@ -346,6 +347,7 @@ public class RawDocument implements IResource {
 
 	/**
 	 * This method has no effect as there is never a skeleton for a RawDocument.
+	 * @throws OkapiNotImplementedException
 	 */
 	public void setSkeleton(ISkeleton skeleton) {
 		throw new OkapiNotImplementedException("RawDcoument has no skeleton");
