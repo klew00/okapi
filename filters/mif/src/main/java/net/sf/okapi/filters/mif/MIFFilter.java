@@ -158,6 +158,8 @@ public class MIFFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
+		close();
+		
 		setOptions(input.getSourceLocale(), input.getTargetLocale(),
 			input.getEncoding(), generateSkeleton);
 		
@@ -178,7 +180,6 @@ public class MIFFilter implements IFilter {
 
 	private void open (InputStream input) {
 		try {
-			close();
 			// Detect encoding
 			String encoding = guessEncoding(input);
 			reader = new BufferedReader(

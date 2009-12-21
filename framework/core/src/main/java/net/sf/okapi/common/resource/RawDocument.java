@@ -64,6 +64,7 @@ public class RawDocument implements IResource {
 	private URI inputURI;
 	private CharSequence inputCharSequence;
 	private boolean hasReaderBeenCalled;
+	private Reader reader;
 
 	/**
 	 * Creates a new RawDocument object with a given CharSequence and a source locale.
@@ -204,7 +205,7 @@ public class RawDocument implements IResource {
 			throw new OkapiUnsupportedEncodingException("Encoding has not been set");
 		}
 
-		Reader reader = null;
+		reader = null;
 		try {
 			reader = new InputStreamReader(createStream(), getEncoding());
 		} catch (UnsupportedEncodingException e) {
@@ -406,8 +407,8 @@ public class RawDocument implements IResource {
 		if (hasReaderBeenCalled) {
 			LOGGER.log(Level.WARNING,
 							"Setting an encoding after getReader() has been called is not recommened. "
-							+ "Subsequent calls to getReader() may use the old encoding if the stream can be reset" 
-							+ " instead of recreated.");
+									+ "Subsequent calls to getReader() may use the old encoding if the stream can be reset"
+									+ " instead of recreated.");
 		}
 
 		this.encoding = encoding;
@@ -430,5 +431,34 @@ public class RawDocument implements IResource {
 	 */
 	public String getFilterConfigId() {
 		return filterConfigId;
+	}
+
+	/**
+	 * Close the underlying stream of this RawDocument. Calling getStream or getReader after calling close may still
+	 * generate a valid stream as long as RawDocument is not based on a raw {@link InputStream}
+	 */
+	public void close() {
+		if (createdStream != null) {
+			try {
+				createdStream.close();
+				// help free up resources
+				createdStream = null;
+			} catch (IOException e) {
+				LOGGER.log(Level.WARNING,
+				"Error closing the stream created by RawDocument.", e);
+		
+			}
+		}		
+		if (reader != null) {
+			try {
+				reader.close();
+				// help free up resources
+				reader = null;
+			} catch (IOException e) {
+				LOGGER.log(Level.WARNING,
+				"Error closing the reader created by RawDocument.", e);
+		
+			}
+		}		
 	}
 }

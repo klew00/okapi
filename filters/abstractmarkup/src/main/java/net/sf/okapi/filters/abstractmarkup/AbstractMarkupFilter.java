@@ -90,6 +90,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private boolean hasUtf8Encoding;
 	private boolean preserveWhitespace;
 	private EventBuilder eventBuilder;
+	private RawDocument currentRawDocument;
 
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -153,6 +154,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * Close the filter and all used resources.
 	 */
 	public void close() {
+		if (currentRawDocument != null) {
+			currentRawDocument.close();
+		}
+		
 		try {
 			if (document != null) {
 				document.close();
@@ -217,11 +222,16 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @throws OkapiIOException
 	 */
 	public void open(RawDocument input, boolean generateSkeleton) {
+		// close RawDocument from previous run
+		close();
+		
 		// close StreamedSource from previous run
 		if (document != null) {
 			close();
 		}
 
+		currentRawDocument = input;
+		
 		if (input.getInputURI() != null) {
 			setDocumentName(input.getInputURI().getPath());
 		}
