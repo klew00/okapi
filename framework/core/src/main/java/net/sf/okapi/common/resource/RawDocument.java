@@ -205,7 +205,17 @@ public class RawDocument implements IResource {
 			throw new OkapiUnsupportedEncodingException("Encoding has not been set");
 		}
 
-		reader = null;
+		// clean up any previous readers that were created
+		if (reader != null) {
+			try {
+				reader.close();
+				reader = null;
+			} catch (IOException e) {	
+				LOGGER.log(Level.WARNING,
+						"Error closing the reader created by RawDocument.", e);
+			}
+		}
+		
 		try {
 			reader = new InputStreamReader(createStream(), getEncoding());
 		} catch (UnsupportedEncodingException e) {
