@@ -39,6 +39,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String BLOCKSIZE = "blockSize";
 	private static final String CHECKEXISTINGTM = "checkExistingTm";
 	private static final String EXISTINGTM = "existingTm";
+	private static final String SEGMENT = "segment";
+	private static final String SRXPATH = "srxPath";
 	
 	private String command;
 	private String origin;
@@ -49,6 +51,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private int blockSize;
 	private boolean checkExistingTm;
 	private String existingTm;
+	private boolean segment;
+	private String srxPath;
 	
 	public Parameters () {
 		reset();
@@ -125,17 +129,36 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setExistingTm (String existingTm) {
 		this.existingTm = existingTm;
 	}
+	
+	public boolean getSegment () {
+		return segment;
+	}
+
+	public void setSegment (boolean segment) {
+		this.segment = segment;
+	}
+	
+	public String getSrxPath () {
+		return srxPath;
+	}
+
+	public void setSrxPath (String srxPath) {
+		this.srxPath = srxPath;
+	}
 
 	public void reset() {
-		command = "\"C:\\Program Files\\PRMT8\\FILETRANS\\FileTranslator.exe\" \"${input}\" /as /ac \"/o:${output}\" /d:${srcLangName}-${trgLangName}";
-		origin = "promt";
+		// ProMT command = "\"C:\\Program Files\\PRMT8\\FILETRANS\\FileTranslator.exe\" \"${input}\" /as /ac \"/o:${output}\" /d:${srcLangName}-${trgLangName}";
+		command = "";
+		origin = "";
 		makeTM = false;
-		tmDirectory = "mttm";
+		tmDirectory = "";
 		makeTMX = false;
-		tmxPath = "pretrans.tmx";
+		tmxPath = "";
 		blockSize = 1000;
 		checkExistingTm = false;
 		existingTm = "";
+		segment = false;
+		srxPath = "";
 	}
 
 	public void fromString (String data) {
@@ -150,6 +173,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		blockSize = buffer.getInteger(BLOCKSIZE, blockSize);
 		checkExistingTm = buffer.getBoolean(CHECKEXISTINGTM, checkExistingTm);
 		existingTm = buffer.getString(EXISTINGTM, existingTm);
+		segment = buffer.getBoolean(SEGMENT, segment);
+		srxPath = buffer.getString(SRXPATH, srxPath);
 	}
 
 	@Override
@@ -164,6 +189,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setInteger(BLOCKSIZE, blockSize);
 		buffer.setBoolean(CHECKEXISTINGTM, checkExistingTm);
 		buffer.setString(EXISTINGTM, existingTm);
+		buffer.setBoolean(SEGMENT, segment);
+		buffer.setString(SRXPATH, srxPath);
 		return buffer.toString();
 	}
 
@@ -173,6 +200,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(COMMAND, "Command line", "Command line to execute the batch translation");
 		desc.add(ORIGIN, "Origin identifier", "String that identifies the origin of the translation");
 		desc.add(BLOCKSIZE, "Block size", "Maximum number of text units to process together");
+		desc.add(SEGMENT, "Pre-segment the entries", null);
+		desc.add(SRXPATH, "SRX path", "Full path of the segmentation rules file to use");
 		desc.add(MAKETM, "Import into a Pensieve TM", null);
 		desc.add(TMDIRECTORY, "Directory of the TM where to import", "Location of the TM to create or use");
 		desc.add(MAKETMX, "Create a TMX document", null);
@@ -195,12 +224,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tip.setAllowEmpty(true);
 		tip.setVertical(false);
 		
-		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(MAKETM));
+		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(SEGMENT));
+		PathInputPart pip = desc.addPathInputPart(paramDesc.get(SRXPATH), "SRX Path", false);
+		pip.setBrowseFilters("SRX Documents (*.srx)\tAll Files (*.*)", "*.srx\t*.*");
+		pip.setMasterPart(cbp, true);
+
+		cbp = desc.addCheckboxPart(paramDesc.get(MAKETM));
 		tip = desc.addTextInputPart(paramDesc.get(TMDIRECTORY));
 		tip.setMasterPart(cbp, true);
 
 		cbp = desc.addCheckboxPart(paramDesc.get(MAKETMX));
-		PathInputPart pip = desc.addPathInputPart(paramDesc.get(TMXPATH), "TMX Path", true);
+		pip = desc.addPathInputPart(paramDesc.get(TMXPATH), "TMX Path", true);
+		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setMasterPart(cbp, true);
 		
 		cbp = desc.addCheckboxPart(paramDesc.get(CHECKEXISTINGTM));

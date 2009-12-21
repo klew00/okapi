@@ -43,6 +43,8 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.segmentation.ISegmenter;
+import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
@@ -80,6 +82,7 @@ public class BatchTranslator {
 	private int totalExternalMatches;
 	private int docEntries;
 	private int totalEntries;
+	private ISegmenter segmenter;
 
 	public BatchTranslator (IFilterConfigurationMapper fcMapper,
 		Parameters params)
@@ -148,6 +151,14 @@ public class BatchTranslator {
 		if ( params.getCheckExistingTm() ) {
 			existingTm = TmSeekerFactory.createFileBasedTmSeeker(params.getExistingTm());
 		}
+		
+		segmenter = null;
+		if ( params.getSegment() ) {
+			SRXDocument srxDoc = new SRXDocument();
+			srxDoc.loadRules(params.getSrxPath());
+			//if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
+			segmenter = srxDoc.compileLanguageRules(srcLoc, null);
+		}
 	}
 	
 	public void processDocument (RawDocument rd) {
@@ -203,7 +214,7 @@ public class BatchTranslator {
 				}
 				currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 			}
-
+			
 			// Process blocks for N entries
 			docInternalMatches = 0;
 			docExternalMatches = 0;
@@ -230,6 +241,14 @@ public class BatchTranslator {
 					if ( !tu.isTranslatable() ) continue;
 
 					TextContainer tc = tu.getSource();
+
+					// Segment if needed
+					if ( segmenter != null ) {
+						if ( segmenter.computeSegments(tc) > 1 ) {
+							tc.createSegments(segmenter.getRanges());
+						}
+					}
+
 					// If we have no files ready yet, create them
 					if ( htmlWriter == null ) {
 						htmlWriter = startTemporaryFiles();
@@ -325,7 +344,8 @@ public class BatchTranslator {
 			}
 		}
 		catch ( Throwable e ) {
-			throw new RuntimeException("Error when processing a file.", e);
+			throw new RuntimeException(String.format("Error when processing a file.\nSource='%s'\nTarget='%s'",
+				htmlSourceFile.toURI(), htmlTargetFile.toURI()), e);
 		}
 		finally {
 			if ( htmlWriter != null ) {
@@ -394,9 +414,8 @@ public class BatchTranslator {
 	
 
 	private void runBatchTranslation () {
+		String cmd = params.getCommand();
 		try {
-			String cmd = params.getCommand();
-
 			cmd = cmd.replace("${input}", htmlSourceFile.getPath());
 			cmd = cmd.replace("${output}", htmlTargetFile.getPath());
 			
@@ -420,7 +439,7 @@ public class BatchTranslator {
 	    	p.waitFor();
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException("Error during the batch translation.", e);
+			throw new RuntimeException("Error during the batch translation.\nCommand line was:\n"+cmd, e);
 		}
 		catch ( InterruptedException e ) {
 			throw new RuntimeException("Program interrupted.", e);
@@ -488,7 +507,8 @@ public class BatchTranslator {
 			}
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException("Error reading the translations.", e);
+			throw new RuntimeException(String.format("Error reading the translations.\nSource='%s'\nTarget='%s'",
+				htmlSourceFile.toURI(), htmlTargetFile.toURI()), e);
 		}
 		finally {
 			if ( html != null ) html.clearCache();

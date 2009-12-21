@@ -40,6 +40,7 @@ import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.LogForm;
 import net.sf.okapi.applications.rainbow.lib.PathBuilderPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.applications.rainbow.pipeline.BatchTranslationPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.ExportTMPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.ImportTMPipeline;
@@ -1361,6 +1362,13 @@ public class MainForm { //implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				executePipeline(new ExportTMPipeline());
+			}
+		});
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.batchtranslation"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new BatchTranslationPipeline());
 			}
 		});
 		
