@@ -311,12 +311,6 @@ public class PipelineEditor {
 		Dialogs.centerWindow(shell, parent);
 	}
 
-	private String getId (String listEntry) {
-		int pos = listEntry.indexOf('[');
-		if ( pos == -1 ) return listEntry;
-		return listEntry.substring(pos+1, listEntry.length()-1);
-	}
-
 	private void updateStepDisplay () {
 		int n = lbSteps.getSelectionIndex();
 		if ( n < 0 ) {
@@ -346,7 +340,7 @@ public class PipelineEditor {
 		}
 		lbSteps.removeAll();
 		for ( StepInfo step : workSteps ) {
-			lbSteps.add(String.format("%s  - [%s]", step.name, step.id));
+			lbSteps.add(step.name);
 		}
 		if ( index != -1 ) {
 			if (( index < 0 ) || ( index > lbSteps.getItemCount() )) {
@@ -391,11 +385,11 @@ public class PipelineEditor {
 	private void addStep () {
 		try {
 			StepPicker dlg = new StepPicker(shell, availableSteps, help);
-			String display = dlg.showDialog();
-			if ( display == null ) return;
-			String id = getId(display);
-			workSteps.add(availableSteps.get(id).clone());
-			lbSteps.add(display);
+			String id = dlg.showDialog();
+			if ( id == null ) return;
+			StepInfo info = availableSteps.get(id).clone();
+			workSteps.add(info);
+			lbSteps.add(info.name);
 			lbSteps.select(lbSteps.getItemCount()-1);
 			updateStepDisplay();
 		}

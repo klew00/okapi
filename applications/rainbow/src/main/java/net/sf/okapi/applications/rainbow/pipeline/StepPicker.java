@@ -77,7 +77,7 @@ class StepPicker {
 		availableSteps = new ArrayList<StepInfo>(); 
 		for ( String id : steps.keySet() ) {
 			step = steps.get(id);
-			lbUtilities.add(String.format("%s  - [%s]", step.name, step.id));
+			lbUtilities.add(String.format("%s   - [%s]", step.name, step.id));
 			availableSteps.add(step);
 		}
 		lbUtilities.addSelectionListener(new SelectionAdapter() {
@@ -147,8 +147,14 @@ class StepPicker {
 	private boolean saveData () {
 		int n = lbUtilities.getSelectionIndex();
 		if ( n == -1 ) return false;
-		result = lbUtilities.getItem(n);
+		result = getId(lbUtilities.getItem(n));
 		return true;
+	}
+
+	private String getId (String listEntry) {
+		int pos = listEntry.indexOf('[');
+		if ( pos == -1 ) return listEntry;
+		return listEntry.substring(pos+1, listEntry.length()-1);
 	}
 
 }
