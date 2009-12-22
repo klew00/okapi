@@ -20,6 +20,10 @@ public class Document implements IResource, Iterable<IResource> {
 		documentResources = new ArrayList<IResource>(100);
 	}
 
+	public void addResource(IResource resource) {
+		documentResources.add(resource);
+	}
+	
 	@Override
 	public <A extends IAnnotation> A getAnnotation(Class<A> annotationType) {
 		if (annotations == null)
