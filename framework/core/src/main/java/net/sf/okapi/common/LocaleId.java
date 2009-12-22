@@ -35,6 +35,54 @@ public final class LocaleId implements Comparable<Object> {
 	static public LocaleId EMPTY = new LocaleId("", false);
 	/** Useful constant for language.
      */
+
+	private String locId;
+	
+	private static final int ID_LANGUAGE = 5;
+	private static final int ID_REGION = 10;
+	private static final int ID_USER = 18;
+
+	private static final int POSIX_LANGUAGE = 1;
+	private static final int POSIX_REGION = 3;
+	private static final int POSIX_VARIANT = 7;
+	
+	// Java-Locale to LocaleId mapping
+	private static final String[][] JAVALOCMAP = {
+	//	{ Java ID,      LocaleId,
+		{ "ja_JP_JP",   "ja-jp-x-calja"},
+		{ "no_NO_NY",   "nn-no"},
+		{ "th_TH_TH",   "th-th-x-numth"}
+	};
+
+	// Pattern to parser/validate BCP-47 language tags
+	// From Addison Phillips (http://www.langtag.net/)
+	private static final Pattern BCP_PATTERN = Pattern.compile(
+    	"(\\A[xX]([\\x2d]\\p{Alnum}{1,8})*\\z)"
+    	+ "|(((\\A\\p{Alpha}{2,8}(?=\\x2d|\\z)){1}"
+    	+ "(([\\x2d]\\p{Alpha}{3})(?=\\x2d|\\z)){0,3}"
+    	+ "([\\x2d]\\p{Alpha}{4}(?=\\x2d|\\z))?"
+    	+ "([\\x2d](\\p{Alpha}{2}|\\d{3})(?=\\x2d|\\z))?"
+    	+ "([\\x2d](\\d\\p{Alnum}{3}|\\p{Alnum}{5,8})(?=\\x2d|\\z))*)"
+    	+ "(([\\x2d]([a-wyzA-WYZ](?=\\x2d))([\\x2d](\\p{Alnum}{2,8})+)*))*"
+    	+ "([\\x2d][xX]([\\x2d]\\p{Alnum}{1,8})*)?)\\z");
+
+	// Pattern to parse/validate POSIX locale identifiers
+	private static final Pattern POSIXPATTERN = Pattern.compile("\\A(\\p{Alpha}{2,3})"
+		+ "(_(\\p{Alpha}*?))?(\\.([\\p{Alnum}_-]*?))?(@([\\p{Alnum}_-]*?))?\\z");
+
+	// Pattern to parse/validate LocaleId
+	// We may want to allow additional fields if needed, for now it's like BCP-47
+	private static final Pattern ID_PATTERN = Pattern.compile(
+    	"(\\A[xX]([\\x2d]\\p{Alnum}{1,8})*\\z)"
+    	+ "|(((\\A\\p{Alpha}{2,8}(?=\\x2d|\\z)){1}"
+    	+ "(([\\x2d]\\p{Alpha}{3})(?=\\x2d|\\z)){0,3}"
+    	+ "([\\x2d]\\p{Alpha}{4}(?=\\x2d|\\z))?"
+    	+ "([\\x2d](\\p{Alpha}{2}|\\d{3})(?=\\x2d|\\z))?"
+    	+ "([\\x2d](\\d\\p{Alnum}{3}|\\p{Alnum}{5,8})(?=\\x2d|\\z))*)"
+    	+ "(([\\x2d]([a-wyzA-WYZ](?=\\x2d))([\\x2d](\\p{Alnum}{2,8})+)*))*"
+    	+ "([\\x2d][xX]([\\x2d]\\p{Alnum}{1,8})*)?)\\z");
+
+	// Needs to be after JAVALOCMAP declaration
     static public final LocaleId ENGLISH = new LocaleId(Locale.ENGLISH);
     /** Useful constant for language.
      */
@@ -96,52 +144,6 @@ public final class LocaleId implements Comparable<Object> {
     /** Useful constant for country.
      */
     static public final LocaleId CANADA_FRENCH = new LocaleId(Locale.CANADA_FRENCH);
-	
-	private String locId;
-	
-	private static final int ID_LANGUAGE = 5;
-	private static final int ID_REGION = 10;
-	private static final int ID_USER = 18;
-
-	private static final int POSIX_LANGUAGE = 1;
-	private static final int POSIX_REGION = 3;
-	private static final int POSIX_VARIANT = 7;
-	
-	// Java-Locale to LocaleId mapping
-	private static final String[][] JAVALOCMAP = {
-	//	{ Java ID,      LocaleId,
-		{ "ja_JP_JP",   "ja-jp-x-calja"},
-		{ "no_NO_NY",   "nn-no"},
-		{ "th_TH_TH",   "th-th-x-numth"}
-	};
-
-	// Pattern to parser/validate BCP-47 language tags
-	// From Addison Phillips (http://www.langtag.net/)
-	private static final Pattern BCP_PATTERN = Pattern.compile(
-    	"(\\A[xX]([\\x2d]\\p{Alnum}{1,8})*\\z)"
-    	+ "|(((\\A\\p{Alpha}{2,8}(?=\\x2d|\\z)){1}"
-    	+ "(([\\x2d]\\p{Alpha}{3})(?=\\x2d|\\z)){0,3}"
-    	+ "([\\x2d]\\p{Alpha}{4}(?=\\x2d|\\z))?"
-    	+ "([\\x2d](\\p{Alpha}{2}|\\d{3})(?=\\x2d|\\z))?"
-    	+ "([\\x2d](\\d\\p{Alnum}{3}|\\p{Alnum}{5,8})(?=\\x2d|\\z))*)"
-    	+ "(([\\x2d]([a-wyzA-WYZ](?=\\x2d))([\\x2d](\\p{Alnum}{2,8})+)*))*"
-    	+ "([\\x2d][xX]([\\x2d]\\p{Alnum}{1,8})*)?)\\z");
-
-	// Pattern to parse/validate POSIX locale identifiers
-	private static final Pattern POSIXPATTERN = Pattern.compile("\\A(\\p{Alpha}{2,3})"
-		+ "(_(\\p{Alpha}*?))?(\\.([\\p{Alnum}_-]*?))?(@([\\p{Alnum}_-]*?))?\\z");
-
-	// Pattern to parse/validate LocaleId
-	// We may want to allow additional fields if needed, for now it's like BCP-47
-	private static final Pattern ID_PATTERN = Pattern.compile(
-    	"(\\A[xX]([\\x2d]\\p{Alnum}{1,8})*\\z)"
-    	+ "|(((\\A\\p{Alpha}{2,8}(?=\\x2d|\\z)){1}"
-    	+ "(([\\x2d]\\p{Alpha}{3})(?=\\x2d|\\z)){0,3}"
-    	+ "([\\x2d]\\p{Alpha}{4}(?=\\x2d|\\z))?"
-    	+ "([\\x2d](\\p{Alpha}{2}|\\d{3})(?=\\x2d|\\z))?"
-    	+ "([\\x2d](\\d\\p{Alnum}{3}|\\p{Alnum}{5,8})(?=\\x2d|\\z))*)"
-    	+ "(([\\x2d]([a-wyzA-WYZ](?=\\x2d))([\\x2d](\\p{Alnum}{2,8})+)*))*"
-    	+ "([\\x2d][xX]([\\x2d]\\p{Alnum}{1,8})*)?)\\z");
 	
 	/**
 	 * Creates a new LocaleId object from a locale identifier.
