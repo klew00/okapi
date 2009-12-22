@@ -9,5 +9,7 @@ Export-Package: net.sf.okapi.lib.search,
  net.sf.okapi.lib.search.lucene.scorer
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  org.apache.lucene-core;bundle-version="3.0.0",
- com.ibm.icu;bundle-version="4.0.1"
+ com.ibm.icu;bundle-version="4.0.1",
+ gnu.trove;bundle-version="2.1.0"
+ 
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
