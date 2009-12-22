@@ -36,6 +36,8 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
+import net.sf.okapi.common.ui.genericeditor.GenericEditor;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
@@ -87,6 +89,9 @@ public class OkapiGUITester {
 			net.sf.okapi.steps.uriconversion.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.wordcount.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.xsltransform.ui.ParametersEditor.class.getName(),
+			
+			// Descriptors
+			net.sf.okapi.steps.batchtranslation.Parameters.class.getName(),
 		};
 
 	private Group grpParameters;
@@ -316,8 +321,48 @@ public class OkapiGUITester {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-				
-		if (IParametersEditor.class.isAssignableFrom(c)) {
+		
+		// Check if it's an IEditorDescriptionProvider class
+		if ( IEditorDescriptionProvider.class.isAssignableFrom(c) ) {
+			if ( !IParameters.class.isAssignableFrom(c) ) {
+				Dialogs.showWarning(shell, "The class must implements both IParameters and IEditorDescriptionProvider to be displayed.", null);
+				return;
+			}
+			// If it is: create a GenericEditor from it
+			// and use that class for the display
+			GenericEditor ged = new GenericEditor();
+
+			IContext context = new BaseContext();
+			context.setObject("shell", shell);
+			try {
+				Object obj = c.newInstance();
+				params = (IParameters)obj; 
+				if ( !Util.isEmpty(text_1.getText()) ) {
+					params.fromString(text_1.getText());
+				}
+				else if ( !Util.isEmpty(text.getText()) ) {
+					params.load(Util.toURI(text.getText()), true);
+				}
+				else {
+					Dialogs.showWarning(shell, "No parameters loaded, defaults used.", null);
+				}
+				if ( ged.edit(params, (IEditorDescriptionProvider)obj, false, context) ) {
+					if ( params != null ) {
+						text_1.setText(params.toString());
+					}
+				}
+				else {
+					params = null;
+				}
+			}
+			catch (InstantiationException e) {
+				e.printStackTrace();
+			}
+			catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+		else if (IParametersEditor.class.isAssignableFrom(c)) {
 			
 			IParametersEditor editor = null;
 			try {
@@ -358,7 +403,6 @@ public class OkapiGUITester {
 				params = null;
 		}
 		else if (IDialogPage.class.isAssignableFrom(c)) {
-			
 			InputQueryDialog dlg = new InputQueryDialog();
 			dlg.run(shell, c, shell.getText(), "Input a value:", null, null);
 		}
