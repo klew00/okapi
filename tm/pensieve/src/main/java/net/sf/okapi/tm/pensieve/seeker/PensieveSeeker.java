@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -402,6 +403,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 	List<TmHit> getFuzzyHits(int max, float threshold, Query query, TextFragment queryFrag,
 			Metadata metadata) {
 		List<TmHit> tmHitCandidates;
+		List<TmHit> tmHitsToRemove = new LinkedList<TmHit>();
 		List<Code> queryCodes = queryFrag.getCodes();
 
 		try {
@@ -443,10 +445,14 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				tmHit.setMatchType(matchType);
 
 				// check if the penalties have pushed the match below threshold
+				// add any such hits to a list for later removal
 				if (tmHit.getScore() < threshold) {
-					tmHitCandidates.remove(tmHit);
+					tmHitsToRemove.add(tmHit);
 				}
 			}
+			
+			// remove hits that went below the threshold						
+			tmHitCandidates.removeAll(tmHitsToRemove);
 
 			/*
 			 * System.out.println(queryFrag.toString()); System.out.println(tmHit.getScore());
