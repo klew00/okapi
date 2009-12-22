@@ -32,7 +32,70 @@ public final class LocaleId implements Comparable<Object> {
 	/**
 	 * An empty locale.
 	 */
-	public static LocaleId EMPTY = new LocaleId("", false);
+	static public LocaleId EMPTY = new LocaleId("", false);
+	/** Useful constant for language.
+     */
+    static public final LocaleId ENGLISH = new LocaleId(Locale.ENGLISH);
+    /** Useful constant for language.
+     */
+    static public final LocaleId FRENCH = new LocaleId(Locale.FRENCH);
+    /** Useful constant for language.
+     */
+    static public final LocaleId GERMAN = new LocaleId(Locale.GERMAN);
+    /** Useful constant for language.
+     */
+    static public final LocaleId ITALIAN = new LocaleId(Locale.ITALIAN);
+    /** Useful constant for language.
+     */
+    static public final LocaleId JAPANESE = new LocaleId(Locale.JAPANESE);
+    /** Useful constant for language.
+     */
+    static public final LocaleId KOREAN = new LocaleId(Locale.KOREAN);
+    /** Useful constant for language.
+     */
+    static public final LocaleId CHINESE = new LocaleId(Locale.CHINESE);
+    /** Useful constant for language.
+     */
+    static public final LocaleId SIMPLIFIED_CHINESE = new LocaleId(Locale.SIMPLIFIED_CHINESE);
+    /** Useful constant for language.
+     */
+    static public final LocaleId TRADITIONAL_CHINESE = new LocaleId(Locale.TRADITIONAL_CHINESE);
+    /** Useful constant for country.
+     */
+    static public final LocaleId FRANCE = new LocaleId(Locale.FRANCE);
+    /** Useful constant for country.
+     */
+    static public final LocaleId GERMANY = new LocaleId(Locale.GERMANY);
+    /** Useful constant for country.
+     */
+    static public final LocaleId ITALY = new LocaleId(Locale.ITALY);
+    /** Useful constant for country.
+     */
+    static public final LocaleId JAPAN = new LocaleId(Locale.JAPAN);
+    /** Useful constant for country.
+     */
+    static public final LocaleId KOREA = new LocaleId(Locale.KOREA);
+    /** Useful constant for country.
+     */
+    static public final LocaleId CHINA = SIMPLIFIED_CHINESE;
+    /** Useful constant for country.
+     */
+    static public final LocaleId PRC = SIMPLIFIED_CHINESE;
+    /** Useful constant for country.
+     */
+    static public final LocaleId TAIWAN = TRADITIONAL_CHINESE;
+    /** Useful constant for country.
+     */
+    static public final LocaleId UK = new LocaleId(Locale.UK);
+    /** Useful constant for country.
+     */
+    static public final LocaleId US = new LocaleId(Locale.US);
+    /** Useful constant for country.
+     */
+    static public final LocaleId CANADA = new LocaleId(Locale.CANADA);
+    /** Useful constant for country.
+     */
+    static public final LocaleId CANADA_FRENCH = new LocaleId(Locale.CANADA_FRENCH);
 	
 	private String locId;
 	
