@@ -25,6 +25,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
@@ -39,11 +40,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
-public class ParametersEditor implements IParametersEditor {
+public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
 
 	private Shell shell;
 	private boolean result = false;
@@ -59,6 +58,7 @@ public class ParametersEditor implements IParametersEditor {
 	private Text edTargetSRX;
 	private IHelp help;
 	private String projectDir;
+	private Composite mainComposite;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -88,6 +88,28 @@ public class ParametersEditor implements IParametersEditor {
 		return new Parameters();
 	}
 	
+	@Override
+	public Composite getComposite () {
+		return mainComposite;
+	}
+
+	@Override
+	public void initializeEmbeddableEditor (Composite parent,
+		IParameters paramsObject,
+		IContext context)
+	{
+		params = (Parameters)paramsObject; 
+		shell = (Shell)context.getObject("shell");
+		createComposite(parent);
+		setData();
+	}
+
+	@Override
+	public String validateAndSaveParameters () {
+		if ( !saveData() ) return null;
+		return params.toString();
+	}
+	
 	private void create (Shell parent,
 		boolean readOnly)
 	{
@@ -98,77 +120,8 @@ public class ParametersEditor implements IParametersEditor {
 		layTmp.verticalSpacing = 0;
 		shell.setLayout(layTmp);
 
-		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
-		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		createComposite(shell);
 
-		//--- Options tab
-
-		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout(3, false));
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
-		tiTmp.setControl(cmpTmp);
-
-		chkSegmentSource = new Button(cmpTmp, SWT.CHECK);
-		chkSegmentSource.setText("Segment the source text using the following SRX rules:");
-		GridData gdTmp = new GridData();
-		gdTmp.horizontalSpan = 3;
-		chkSegmentSource.setLayoutData(gdTmp);
-		chkSegmentSource.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				updateSourceDisplay();
-			}
-		});
-
-		edSourceSRX = new Text(cmpTmp, SWT.BORDER);
-		edSourceSRX.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-		
-		btGetSourceSRX = new Button(cmpTmp, SWT.PUSH);
-		btGetSourceSRX.setText("...");
-		btGetSourceSRX.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				getSRXFile(edSourceSRX);
-			}
-		});
-		
-		btEditSourceSRX = new Button(cmpTmp, SWT.PUSH);
-		btEditSourceSRX.setText("Edit...");
-		btEditSourceSRX.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				editSRXFile(edSourceSRX);
-			}
-		});
-		
-		chkSegmentTarget = new Button(cmpTmp, SWT.CHECK);
-		chkSegmentTarget.setText("Segment existing target text using the following SRX rules:");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 3;
-		chkSegmentTarget.setLayoutData(gdTmp);
-		chkSegmentTarget.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				updateTargetDisplay();
-			}
-		});
-
-		edTargetSRX = new Text(cmpTmp, SWT.BORDER);
-		edTargetSRX.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-
-		btGetTargetSRX = new Button(cmpTmp, SWT.PUSH);
-		btGetTargetSRX.setText("...");
-		btGetTargetSRX.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				getSRXFile(edTargetSRX);
-			}
-		});
-		
-		btEditTargetSRX = new Button(cmpTmp, SWT.PUSH);
-		btEditTargetSRX.setText("Edit...");
-		btEditTargetSRX.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				editSRXFile(edTargetSRX);
-			}
-		});
-		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -198,6 +151,73 @@ public class ParametersEditor implements IParametersEditor {
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	private void createComposite (Composite parent) {
+		mainComposite = new Composite(parent, SWT.BORDER);
+		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		mainComposite.setLayout(new GridLayout(3, false));
+
+		chkSegmentSource = new Button(mainComposite, SWT.CHECK);
+		chkSegmentSource.setText("Segment the source text using the following SRX rules:");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 3;
+		chkSegmentSource.setLayoutData(gdTmp);
+		chkSegmentSource.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateSourceDisplay();
+			}
+		});
+
+		edSourceSRX = new Text(mainComposite, SWT.BORDER);
+		edSourceSRX.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+		
+		btGetSourceSRX = new Button(mainComposite, SWT.PUSH);
+		btGetSourceSRX.setText("...");
+		btGetSourceSRX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				getSRXFile(edSourceSRX);
+			}
+		});
+		
+		btEditSourceSRX = new Button(mainComposite, SWT.PUSH);
+		btEditSourceSRX.setText("Edit...");
+		btEditSourceSRX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editSRXFile(edSourceSRX);
+			}
+		});
+		
+		chkSegmentTarget = new Button(mainComposite, SWT.CHECK);
+		chkSegmentTarget.setText("Segment existing target text using the following SRX rules:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 3;
+		chkSegmentTarget.setLayoutData(gdTmp);
+		chkSegmentTarget.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateTargetDisplay();
+			}
+		});
+
+		edTargetSRX = new Text(mainComposite, SWT.BORDER);
+		edTargetSRX.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+
+		btGetTargetSRX = new Button(mainComposite, SWT.PUSH);
+		btGetTargetSRX.setText("...");
+		btGetTargetSRX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				getSRXFile(edTargetSRX);
+			}
+		});
+		
+		btEditTargetSRX = new Button(mainComposite, SWT.PUSH);
+		btEditTargetSRX.setText("Edit...");
+		btEditTargetSRX.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editSRXFile(edTargetSRX);
+			}
+		});
+		
+	}
+		
 	private boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {

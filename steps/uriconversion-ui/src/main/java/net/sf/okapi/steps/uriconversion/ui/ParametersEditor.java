@@ -25,6 +25,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.uriconversion.Parameters;
@@ -40,12 +41,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
-public class ParametersEditor implements IParametersEditor {
+public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
 
 	private Shell shell;
 	private boolean result = false;
@@ -58,6 +57,7 @@ public class ParametersEditor implements IParametersEditor {
 	private Button btnFirstOption;
 	private Button btnSecondOption;
 	private IHelp help;
+	private Composite mainComposite;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -87,6 +87,28 @@ public class ParametersEditor implements IParametersEditor {
 		return new Parameters();
 	}
 	
+	@Override
+	public Composite getComposite () {
+		return mainComposite;
+	}
+
+	@Override
+	public void initializeEmbeddableEditor (Composite parent,
+		IParameters paramsObject,
+		IContext context)
+	{
+		params = (Parameters)paramsObject; 
+		shell = (Shell)context.getObject("shell");
+		createComposite(parent);
+		setData();
+	}
+
+	@Override
+	public String validateAndSaveParameters () {
+		if ( !saveData() ) return null;
+		return params.toString();
+	}
+	
 	private void create (Shell parent,
 		boolean readOnly)
 	{
@@ -98,110 +120,8 @@ public class ParametersEditor implements IParametersEditor {
 		layTmp.verticalSpacing = 0;
 		shell.setLayout(layTmp);
 		
-		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
-		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		createComposite(shell);
 		
-		Composite cmpTmp0 = new Composite(tfTmp, SWT.NONE);
-		cmpTmp0.setLayout(new GridLayout(2, false));
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
-		tiTmp.setControl(cmpTmp0);		
-	
-		chkUnescape = new Button (cmpTmp0, SWT.RADIO);
-		chkUnescape.setText("Un-escape the URI escape sequence");
-		chkUnescape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
-		chkUnescape.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				if(chkUnescape.getSelection()){
-					table.setEnabled(false);
-					chkUpdateAll.setEnabled(false);
-					btnFirstOption.setEnabled(false);
-					btnSecondOption.setEnabled(false);
-				}
-			}
-		});		
-	
-		chkEscape = new Button (cmpTmp0, SWT.RADIO);
-		chkEscape.setText("Escape content to URI escape sequence");
-		chkEscape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
-		chkEscape.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				if(chkEscape.getSelection()){
-					table.setEnabled(true);
-					chkUpdateAll.setEnabled(true);
-					btnFirstOption.setEnabled(true);
-					btnSecondOption.setEnabled(true);					
-				}
-			}
-		});		
-		
-		Label lblList = new Label (cmpTmp0,SWT.LEFT);
-		lblList.setText ("List of the characters to escape:");
-		GridData gdTmp = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1);
-		int indent = 16;
-		gdTmp.horizontalIndent = indent;
-		lblList.setLayoutData(gdTmp);
-
-		table = new Table (cmpTmp0, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		gdTmp = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
-		gdTmp.horizontalIndent = indent;
-		table.setLayoutData(gdTmp);
-
-		//--click updates button states--
-		table.addListener (SWT.Selection, new Listener () {
-			public void handleEvent (Event event) {
-				if ( event.detail!=SWT.CHECK ) {
-					
-				}
-			}
-		});		
-		
-		chkUpdateAll = new Button(cmpTmp0, SWT.CHECK);
-		chkUpdateAll.setText("Escape all extended characters");
-		gdTmp = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1);
-		gdTmp.horizontalIndent = indent;
-		chkUpdateAll.setLayoutData(gdTmp);
-
-		int buttonWidth = 170;
-		btnFirstOption = new Button(cmpTmp0, SWT.PUSH);
-		btnFirstOption.setText("All But URI-Marks");
-		gdTmp = new GridData();
-		gdTmp.horizontalIndent = indent;
-		btnFirstOption.setLayoutData(gdTmp);
-		UIUtil.ensureWidth(btnFirstOption, buttonWidth);
-		btnFirstOption.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String selectList = " `@#$^&+={}|[]\\:\";<>,?/";
-				for ( int i=0; i<table.getItemCount(); i++ ) {
-					TableItem ti = table.getItem(i);
-					if(selectList.contains(ti.getText(0))){
-						ti.setChecked(true);
-					}else{
-						ti.setChecked(false);
-					}
-				};
-			}
-		});		
-
-		btnSecondOption = new Button(cmpTmp0, SWT.PUSH);
-		btnSecondOption.setText("All But Marks And Reserved");
-		gdTmp = new GridData();
-		btnSecondOption.setLayoutData(gdTmp);
-		UIUtil.ensureWidth(btnSecondOption, buttonWidth);
-		btnSecondOption.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String selectList = " `#^{}|[]\\\"<>";
-				for ( int i=0; i<table.getItemCount(); i++ ) {
-					TableItem ti = table.getItem(i);
-					if(selectList.contains(ti.getText(0))){
-						ti.setChecked(true);
-					}else{
-						ti.setChecked(false);
-					}
-				};
-			}
-		});	
-
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -234,6 +154,108 @@ public class ParametersEditor implements IParametersEditor {
 		setData();
 	}
 	
+	private void createComposite (Composite parent) {
+		mainComposite = new Composite(parent, SWT.BORDER);
+		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		mainComposite.setLayout(new GridLayout(2, false));
+		
+		chkUnescape = new Button (mainComposite, SWT.RADIO);
+		chkUnescape.setText("Un-escape the URI escape sequence");
+		chkUnescape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
+		chkUnescape.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if(chkUnescape.getSelection()){
+					table.setEnabled(false);
+					chkUpdateAll.setEnabled(false);
+					btnFirstOption.setEnabled(false);
+					btnSecondOption.setEnabled(false);
+				}
+			}
+		});		
+	
+		chkEscape = new Button (mainComposite, SWT.RADIO);
+		chkEscape.setText("Escape content to URI escape sequence");
+		chkEscape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
+		chkEscape.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if(chkEscape.getSelection()){
+					table.setEnabled(true);
+					chkUpdateAll.setEnabled(true);
+					btnFirstOption.setEnabled(true);
+					btnSecondOption.setEnabled(true);					
+				}
+			}
+		});		
+		
+		Label lblList = new Label (mainComposite,SWT.LEFT);
+		lblList.setText ("List of the characters to escape:");
+		GridData gdTmp = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1);
+		int indent = 16;
+		gdTmp.horizontalIndent = indent;
+		lblList.setLayoutData(gdTmp);
+
+		table = new Table (mainComposite, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		gdTmp = new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1);
+		gdTmp.horizontalIndent = indent;
+		gdTmp.heightHint = 250; // To avoid filling down the screen
+		table.setLayoutData(gdTmp);
+
+		//--click updates button states--
+		table.addListener (SWT.Selection, new Listener () {
+			public void handleEvent (Event event) {
+				if ( event.detail!=SWT.CHECK ) {
+					
+				}
+			}
+		});		
+		
+		chkUpdateAll = new Button(mainComposite, SWT.CHECK);
+		chkUpdateAll.setText("Escape all extended characters");
+		gdTmp = new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1);
+		gdTmp.horizontalIndent = indent;
+		chkUpdateAll.setLayoutData(gdTmp);
+
+		int buttonWidth = 170;
+		btnFirstOption = new Button(mainComposite, SWT.PUSH);
+		btnFirstOption.setText("All But URI-Marks");
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = indent;
+		btnFirstOption.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btnFirstOption, buttonWidth);
+		btnFirstOption.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String selectList = " `@#$^&+={}|[]\\:\";<>,?/";
+				for ( int i=0; i<table.getItemCount(); i++ ) {
+					TableItem ti = table.getItem(i);
+					if(selectList.contains(ti.getText(0))){
+						ti.setChecked(true);
+					}else{
+						ti.setChecked(false);
+					}
+				};
+			}
+		});		
+
+		btnSecondOption = new Button(mainComposite, SWT.PUSH);
+		btnSecondOption.setText("All But Marks And Reserved");
+		gdTmp = new GridData();
+		btnSecondOption.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btnSecondOption, buttonWidth);
+		btnSecondOption.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String selectList = " `#^{}|[]\\\"<>";
+				for ( int i=0; i<table.getItemCount(); i++ ) {
+					TableItem ti = table.getItem(i);
+					if(selectList.contains(ti.getText(0))){
+						ti.setChecked(true);
+					}else{
+						ti.setChecked(false);
+					}
+				};
+			}
+		});	
+
+	}
 	
 	private boolean showDialog () {
 		shell.open();
@@ -243,7 +265,6 @@ public class ParametersEditor implements IParametersEditor {
 		}
 		return result;
 	}
-
 
 	private void setData () {
 		if(params.conversionType==0){

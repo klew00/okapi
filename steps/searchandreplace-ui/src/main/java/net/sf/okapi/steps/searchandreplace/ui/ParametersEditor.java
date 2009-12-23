@@ -156,15 +156,6 @@ public class ParametersEditor implements IParametersEditor, IEmbeddableParameter
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		mainComposite.setLayout(new GridLayout());
 		
-//		TabFolder tfTmp = new TabFolder(mainComposite, SWT.NONE);
-//		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-//		
-//		Composite cmpTmp0 = new Composite(tfTmp, SWT.NONE);
-//		cmpTmp0.setLayout(new GridLayout());
-//		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-//		tiTmp.setText("Options");
-//		tiTmp.setControl(cmpTmp0);		
-		
 		// Search and replace grid items
 		table = new Table (mainComposite, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table.setHeaderVisible (true);

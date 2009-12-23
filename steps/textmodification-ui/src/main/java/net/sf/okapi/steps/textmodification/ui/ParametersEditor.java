@@ -166,15 +166,6 @@ public class ParametersEditor implements IParametersEditor, IEmbeddableParameter
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		mainComposite.setLayout(new GridLayout());
 		
-//		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
-//		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-//
-//		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-//		cmpTmp.setLayout(new GridLayout(2, true));
-//		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-//		tiTmp.setText("Options");
-//		tiTmp.setControl(cmpTmp);
-
 		Label stTmp = new Label(mainComposite, SWT.NONE);
 		stTmp.setText("Type of change to perform:");
 		GridData gdTmp = new GridData();

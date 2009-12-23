@@ -81,6 +81,7 @@ public class PipelineEditor {
 	private Composite optionsHolder;
 	private Composite noParametersPanel;
 	private Composite noStepsPanel;
+	private Point minSize;
 	
 	public int edit (Shell parent,
 		Map<String, StepInfo> availableSteps,
@@ -343,9 +344,10 @@ public class PipelineEditor {
 		shell.setDefaultButton(pnlActions.btOK);
 
 		shell.pack();
-		shell.setMinimumSize(shell.getSize());
+		minSize = shell.getSize();
+		shell.setMinimumSize(minSize);
 		Point startSize = shell.getMinimumSize();
-		if ( startSize.x < 550 ) startSize.x = 550;
+		if ( startSize.x < 750 ) startSize.x = 750;
 		if ( startSize.y < 350 ) startSize.y = 350;
 		shell.setSize(startSize);
 		Dialogs.centerWindow(shell, parent);
@@ -390,12 +392,20 @@ public class PipelineEditor {
 			if (( ctrl == null ) || !ctrl.equals(panel.getComposite()) ) {
 				((StackLayout)optionsHolder.getLayout()).topControl = panel.getComposite();
 				optionsHolder.layout();
-				Point pt = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+				Point needed = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 				// For some reason pack()/layout()/computeSize() add +16 than needed
 				// Maybe some scroll-bar side effect?
-				pt.x -= 16; // So, for now, we correct manually
-				shell.setSize(pt);
-				shell.setMinimumSize(shell.getSize());
+				needed.x -= 16; // So, for now, we correct manually
+				// Get the current size (may be user-specified)
+				Point size = shell.getSize();
+				// Adjust as needed
+				if ( size.x < needed.x ) size.x = needed.x;
+				if ( size.y < needed.y ) size.y = needed.y;
+				shell.setSize(size);
+				// Update the minimum size required
+				if ( minSize.x < needed.x ) minSize.x = needed.x;
+				if ( minSize.y < needed.y ) minSize.y = needed.y;
+				//shell.setMinimumSize(minSize);
 			}
 		}
 		
