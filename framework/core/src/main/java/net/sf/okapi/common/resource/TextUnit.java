@@ -22,6 +22,7 @@ package net.sf.okapi.common.resource;
 
 import java.util.Hashtable;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.okapi.common.IResource;
@@ -129,6 +130,45 @@ public class TextUnit implements INameable, IReferenceable {
 	@Override
 	public String toString () {
 		return source.toString();
+	}
+	
+	/**
+	 * Clones this TextUnit.
+	 * @return A new TextUnit object that is a copy of this one. 
+	 */
+	@Override
+	public TextUnit clone () {
+		TextUnit tu = new TextUnit(getId());
+		tu.setAnnotations(this.annotations);
+		tu.setIsReferent(isReferent());
+		tu.setIsTranslatable(isTranslatable);
+		tu.setMimeType(getMimeType());
+		tu.setName(getName());
+		tu.setPreserveWhitespaces(preserveWS);
+		tu.setReferenceCount(getReferenceCount());
+		tu.setSkeleton(getSkeleton());
+		tu.setSource(getSource());
+		tu.setType(getType());
+		
+		// set all the main level properties
+		for (Property prop : properties.values()) {
+			tu.setProperty(prop);
+		}
+		
+		// set all the targets
+		for (Entry<LocaleId, TextContainer> entry : targets.entrySet()) {
+			tu.setTarget(entry.getKey(), entry.getValue());
+		}
+		
+		return tu;
+	}
+	
+	/**
+	 * Used by TextUnit clone method to copy over all annotations at once. 
+	 * @param annotations
+	 */
+	protected void setAnnotations(Annotations annotations) {
+		this.annotations = annotations;
 	}
 	
 	public String getId () {

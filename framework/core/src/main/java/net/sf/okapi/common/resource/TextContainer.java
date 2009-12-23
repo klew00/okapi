@@ -37,7 +37,7 @@ public class TextContainer extends TextFragment {
 
 	private Hashtable<String, Property> properties;
 	private Annotations annotations;
-	private ArrayList<Segment> segments;
+	private List<Segment> segments;
 
 	/**
 	 * Creates a new empty TextContainer object.
@@ -594,7 +594,7 @@ public class TextContainer extends TextFragment {
 	 * place-holder itself, so it must already match the given list.
 	 * @param segments The new list of segments.
 	 */
-	public void setSegments (ArrayList<Segment> segments) {
+	public void setSegments (List<Segment> segments) {
 		this.segments = segments;
 	}
 
