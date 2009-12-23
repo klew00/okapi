@@ -75,7 +75,7 @@ public class OkapiGUITester {
 			net.sf.okapi.filters.regex.ui.Editor.class.getName(),
 			net.sf.okapi.filters.table.ui.Editor.class.getName(),
 			net.sf.okapi.filters.ts.ui.Editor.class.getName(),
-			
+
 			// steps
 			net.sf.okapi.steps.tokenization.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.bomconversion.ui.ParametersEditor.class.getName(),
@@ -89,11 +89,12 @@ public class OkapiGUITester {
 			net.sf.okapi.steps.uriconversion.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.wordcount.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.xsltransform.ui.ParametersEditor.class.getName(),
-			
+
 			// Descriptors
 			net.sf.okapi.steps.batchtranslation.Parameters.class.getName(),
 			net.sf.okapi.steps.linebreakconversion.Parameters.class.getName(),
-		};
+			// net.sf.okapi.steps.gcaligner.Parameters.class.getName()
+	};
 
 	private Group grpParameters;
 	private FormData formData_1;
@@ -109,11 +110,12 @@ public class OkapiGUITester {
 	private Button btnClear;
 	private Button button;
 	private FormData formData_4;
-	
+
 	protected Shell shell;
 
 	/**
 	 * Launch the application.
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -148,13 +150,14 @@ public class OkapiGUITester {
 		shell.setLayout(new FormLayout());
 		shell.setSize(576, 534);
 		shell.setText("Okapi GUI Tester");
-		
+
 		URL url = OkapiGUITester.class.getResource("/Rainbow.png");
-		if (url == null) return;
-		
-		String root = Util.getDirectoryName(url.getPath());		
+		if (url == null)
+			return;
+
+		String root = Util.getDirectoryName(url.getPath());
 		shell.setImage(new Image(Display.getCurrent(), root + "/Rainbow.png"));
-		
+
 		{
 			grpParameters = new Group(shell, SWT.NONE);
 			grpParameters.setLayout(new FormLayout());
@@ -183,16 +186,15 @@ public class OkapiGUITester {
 				button_1 = new Button(grpParameters, SWT.NONE);
 				button_1.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						
-						String[] selected = Dialogs.browseFilenames(shell, "Open", false, null, 
-								"Filter Parameters (*.fprm)\tAll Files (*.*)",
-								"*.fprm\t*.*"); 
-						
-				        if (selected != null && selected.length > 0 && !Util.isEmpty(selected[0])) {
-				        	text.setText(selected[0]);
-				        	text_1.setText(fileAsString(selected[0]));
-				        	text_1.setFocus();
-				        }
+
+						String[] selected = Dialogs.browseFilenames(shell, "Open", false, null,
+								"Filter Parameters (*.fprm)\tAll Files (*.*)", "*.fprm\t*.*");
+
+						if (selected != null && selected.length > 0 && !Util.isEmpty(selected[0])) {
+							text.setText(selected[0]);
+							text_1.setText(fileAsString(selected[0]));
+							text_1.setFocus();
+						}
 					}
 				});
 				{
@@ -207,23 +209,22 @@ public class OkapiGUITester {
 				button = new Button(grpParameters, SWT.NONE);
 				button.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						
-						String selected = Dialogs.browseFilenamesForSave(shell, "Save As", text.getText(), 
-								"Filter Parameters (*.fprm)\tAll Files (*.*)",
+
+						String selected = Dialogs.browseFilenamesForSave(shell, "Save As", text
+								.getText(), "Filter Parameters (*.fprm)\tAll Files (*.*)",
 								"*.fprm\t*.*");
-						
-				        if (!Util.isEmpty(selected)) {
-				        	
-				        	text.setText(selected);
-				        	
-				        	if (params == null) {
-				        		if (!Util.isEmpty(text_1.getText()))
-				        			writeToFile(selected, text_1.getText());
-				        	}
-				        	else
-				        		params.save(selected);
-				        }
-				        	
+
+						if (!Util.isEmpty(selected)) {
+
+							text.setText(selected);
+
+							if (params == null) {
+								if (!Util.isEmpty(text_1.getText()))
+									writeToFile(selected, text_1.getText());
+							} else
+								params.save(selected);
+						}
+
 					}
 				});
 				{
@@ -236,10 +237,10 @@ public class OkapiGUITester {
 				button.setText("Save As...");
 			}
 		}
-		
+
 		grpParameterEditors = new Group(shell, SWT.NONE);
 		formData_1.top = new FormAttachment(grpParameterEditors, 4);
-		
+
 		text_1 = new Text(grpParameters, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
 		FormData formData_7 = new FormData();
 		formData_7.left = new FormAttachment(0, 10);
@@ -252,12 +253,12 @@ public class OkapiGUITester {
 		FormData formData = new FormData();
 		formData.right = new FormAttachment(100, -17);
 		formData.left = new FormAttachment(0, 14);
-		
+
 		btnClear = new Button(grpParameters, SWT.NONE);
 		formData_5.top = new FormAttachment(btnClear, 4);
 		btnClear.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-//				SWTUtil.inputQuery(shell, "caption", "Input a value prompt:", 1, null);
+				// SWTUtil.inputQuery(shell, "caption", "Input a value prompt:", 1, null);
 				text.setText("");
 				text_1.setText("");
 			}
@@ -272,12 +273,12 @@ public class OkapiGUITester {
 		formData.height = 207;
 		formData.width = 531;
 		grpParameterEditors.setLayoutData(formData);
-		
+
 		list = new List(grpParameterEditors, SWT.BORDER | SWT.V_SCROLL);
 		list.addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent e) {
 				if (list.getSelectionCount() > 0)
-						displayEditor(list.getSelection()[0]);
+					displayEditor(list.getSelection()[0]);
 			}
 		});
 		FormData formData_6 = new FormData();
@@ -286,10 +287,10 @@ public class OkapiGUITester {
 		formData_6.right = new FormAttachment(100, -91);
 		formData_6.left = new FormAttachment(0, 4);
 		list.setLayoutData(formData_6);
-		
+
 		list.setItems(GUI_CLASSES);
 		list.select(0);
-		
+
 		button_2 = new Button(grpParameterEditors, SWT.NONE);
 		button_2.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -306,27 +307,33 @@ public class OkapiGUITester {
 
 		shell.pack();
 		Rectangle Rect = shell.getBounds();
-		if (Rect.height < 600) Rect.height = 600; 
+		if (Rect.height < 600)
+			Rect.height = 600;
 		shell.setMinimumSize(Rect.width, Rect.height);
 		Dialogs.centerWindow(shell, null);
 	}
 
 	@SuppressWarnings("unchecked")
 	private void displayEditor(String editorClass) {
-		
-		if (Util.isEmpty(editorClass)) return;
-		
+
+		if (Util.isEmpty(editorClass))
+			return;
+
 		Class c = null;
 		try {
 			c = Class.forName(editorClass);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 		// Check if it's an IEditorDescriptionProvider class
-		if ( IEditorDescriptionProvider.class.isAssignableFrom(c) ) {
-			if ( !IParameters.class.isAssignableFrom(c) ) {
-				Dialogs.showWarning(shell, "The class must implements both IParameters and IEditorDescriptionProvider to be displayed.", null);
+		if (IEditorDescriptionProvider.class.isAssignableFrom(c)) {
+			if (!IParameters.class.isAssignableFrom(c)) {
+				Dialogs
+						.showWarning(
+								shell,
+								"The class must implements both IParameters and IEditorDescriptionProvider to be displayed.",
+								null);
 				return;
 			}
 			// If it is: create a GenericEditor from it
@@ -337,79 +344,72 @@ public class OkapiGUITester {
 			context.setObject("shell", shell);
 			try {
 				Object obj = c.newInstance();
-				params = (IParameters)obj; 
-				if ( !Util.isEmpty(text_1.getText()) ) {
+				params = (IParameters) obj;
+				if (!Util.isEmpty(text_1.getText())) {
 					params.fromString(text_1.getText());
-				}
-				else if ( !Util.isEmpty(text.getText()) ) {
+				} else if (!Util.isEmpty(text.getText())) {
 					params.load(Util.toURI(text.getText()), true);
-				}
-				else {
+				} else {
 					Dialogs.showWarning(shell, "No parameters loaded, defaults used.", null);
 				}
-				if ( ged.edit(params, (IEditorDescriptionProvider)obj, false, context) ) {
-					if ( params != null ) {
+				if (ged.edit(params, (IEditorDescriptionProvider) obj, false, context)) {
+					if (params != null) {
 						text_1.setText(params.toString());
 					}
-				}
-				else {
+				} else {
 					params = null;
 				}
-			}
-			catch (InstantiationException e) {
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
-			catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
-		else if (IParametersEditor.class.isAssignableFrom(c)) {
-			
+		} else if (IParametersEditor.class.isAssignableFrom(c)) {
+
 			IParametersEditor editor = null;
 			try {
 				editor = (IParametersEditor) c.newInstance();
-				
+
 			} catch (InstantiationException e) {
-				
+
 				e.printStackTrace();
-				
+
 			} catch (IllegalAccessException e) {
-				
+
 				e.printStackTrace();
-			}		
+			}
 			IContext context = new BaseContext();
 			context.setObject("shell", shell);
-			
+
 			params = editor.createParameters();
 			if (params == null)
-				
+
 				Dialogs.showWarning(shell, "Parameters were not created.", null);
 			else {
-			
+
 				if (!Util.isEmpty(text_1.getText()))
 					params.fromString(text_1.getText());
-				
+
 				else if (!Util.isEmpty(text.getText()))
 					params.load(Util.toURI(text.getText()), true);
-				
-				else Dialogs.showWarning(shell, "No parameters loaded, defaults used.", null);
+
+				else
+					Dialogs.showWarning(shell, "No parameters loaded, defaults used.", null);
 			}
-			
+
 			if (editor.edit(params, false, context)) {
-				
+
 				if (params != null)
 					text_1.setText(params.toString());
-			}
-			else
+			} else
 				params = null;
-		}
-		else if (IDialogPage.class.isAssignableFrom(c)) {
+		} else if (IDialogPage.class.isAssignableFrom(c)) {
 			InputQueryDialog dlg = new InputQueryDialog();
 			dlg.run(shell, c, shell.getText(), "Input a value:", null, null);
 		}
-		
+
 	}
-	
+
 	private String fileAsString(String fileName) {
 		BufferedReader reader = null;
 		try {
@@ -422,30 +422,29 @@ public class OkapiGUITester {
 		char[] buf = new char[2048];
 		int count = 0;
 		try {
-			while (( count = reader.read(buf)) != -1 ) {
+			while ((count = reader.read(buf)) != -1) {
 				tmp.append(buf, 0, count);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-        return tmp.toString();
-    }
-	
-	private boolean writeToFile(String fileName, String st) {
-		
-		try {
-	        BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
-	        out.write(st);
-	        out.close();
-	        
-	    } catch (IOException e) {
-	    	
-	    	return false;
-	    }
 
-		return true;		
+		return tmp.toString();
+	}
+
+	private boolean writeToFile(String fileName, String st) {
+
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
+			out.write(st);
+			out.close();
+
+		} catch (IOException e) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 }
-
