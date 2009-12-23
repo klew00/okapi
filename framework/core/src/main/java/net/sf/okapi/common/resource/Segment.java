@@ -55,6 +55,14 @@ public class Segment {
 	}
 
 	/**
+	 * Get the {@link TextFragment} used by the Segment.
+	 * @return a {@link TextFragment}.
+	 */
+	public TextFragment getTextFragment() {
+		return text;
+	}
+	
+	/**
 	 * Clones this segment.
 	 * @return a copy of this segment. 
 	 */
