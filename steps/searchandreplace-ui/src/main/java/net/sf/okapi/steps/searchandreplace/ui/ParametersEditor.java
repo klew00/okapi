@@ -27,6 +27,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.searchandreplace.Parameters;
@@ -45,14 +46,12 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-public class ParametersEditor implements IParametersEditor {
+public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
 
 	public static final int ADD_ITEM    = 1;
 	public static final int EDIT_ITEM   = 2;
@@ -75,6 +74,7 @@ public class ParametersEditor implements IParametersEditor {
 	private Button chkMultiLine;
 	private int updateType;
 	private IHelp help;
+	private Composite mainComposite;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -104,7 +104,29 @@ public class ParametersEditor implements IParametersEditor {
 		return new Parameters();
 	}
 	
-	public void updateUpDownBtnState(){
+	@Override
+	public Composite getComposite () {
+		return mainComposite;
+	}
+
+	@Override
+	public void initializeEmbeddableEditor (Composite parent,
+		IParameters paramsObject,
+		IContext context)
+	{
+		params = (Parameters)paramsObject; 
+		shell = (Shell)context.getObject("shell");
+		createComposite(parent);
+		setData();
+	}
+
+	@Override
+	public String validateAndSaveParameters () {
+		if ( !saveData() ) return null;
+		return params.toString();
+	}
+	
+	private void updateUpDownBtnState(){
 
 		int index = table.getSelectionIndex();
 		int items = table.getItemCount();
@@ -128,29 +150,23 @@ public class ParametersEditor implements IParametersEditor {
         	btMoveUp.setEnabled(false);
         }
 	}
-	
-	private void create (Shell parent,
-		boolean readOnly)
-	{
-		shell.setText("Search And Replace");
-		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 
-		GridLayout layTmp = new GridLayout();
-		layTmp.marginBottom = 0;
-		layTmp.verticalSpacing = 0;
-		shell.setLayout(layTmp);
+	private void createComposite (Composite parent) {
+		mainComposite = new Composite(parent, SWT.BORDER);
+		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		mainComposite.setLayout(new GridLayout());
 		
-		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
-		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
-		Composite cmpTmp0 = new Composite(tfTmp, SWT.NONE);
-		cmpTmp0.setLayout(new GridLayout());
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
-		tiTmp.setControl(cmpTmp0);		
+//		TabFolder tfTmp = new TabFolder(mainComposite, SWT.NONE);
+//		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+//		
+//		Composite cmpTmp0 = new Composite(tfTmp, SWT.NONE);
+//		cmpTmp0.setLayout(new GridLayout());
+//		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+//		tiTmp.setText("Options");
+//		tiTmp.setControl(cmpTmp0);		
 		
 		// Search and replace grid items
-		table = new Table (cmpTmp0, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		table = new Table (mainComposite, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table.setHeaderVisible (true);
 		table.setLinesVisible (true);
 		table.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -196,8 +212,8 @@ public class ParametersEditor implements IParametersEditor {
 		// Buttons
 		int standardWidth = 80;
 		// Add, edit, delete, move-up, move-down
-		Composite cmpTmp = new Composite(cmpTmp0, SWT.NONE);
-		layTmp = new GridLayout(5, true);
+		Composite cmpTmp = new Composite(mainComposite, SWT.NONE);
+		GridLayout layTmp = new GridLayout(5, true);
 		layTmp.marginHeight = layTmp.marginWidth = 0;
 		cmpTmp.setLayout(layTmp);
 		
@@ -302,11 +318,11 @@ public class ParametersEditor implements IParametersEditor {
 			}
 		});			
 		
-		chkPlainText = new Button(cmpTmp0, SWT.CHECK);
+		chkPlainText = new Button(mainComposite, SWT.CHECK);
 		chkPlainText.setText("Process the files as plain text (not using filters)");
 		chkPlainText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
 		
-		chkRegEx = new Button(cmpTmp0, SWT.CHECK);
+		chkRegEx = new Button(mainComposite, SWT.CHECK);
 		chkRegEx.setText("Use regular expression");
 		chkRegEx.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
 		chkRegEx.addSelectionListener(new SelectionAdapter() {
@@ -317,7 +333,7 @@ public class ParametersEditor implements IParametersEditor {
 			}
 		});
 		
-		Group group = new Group(cmpTmp0, SWT.NONE);
+		Group group = new Group(mainComposite, SWT.NONE);
 		group.setLayout(new GridLayout(2, false));
 		group.setText("Regular expression options");
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -330,8 +346,21 @@ public class ParametersEditor implements IParametersEditor {
 		
 		chkIgnoreCase = new Button(group, SWT.CHECK);
 		chkIgnoreCase.setText("Ignore case differences");
-		
+	}
+	
+	private void create (Shell parent,
+		boolean readOnly)
+	{
+		shell.setText("Search And Replace");
+		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 
+		GridLayout layTmp = new GridLayout();
+		layTmp.marginBottom = 0;
+		layTmp.verticalSpacing = 0;
+		shell.setLayout(layTmp);
+
+		createComposite(shell);
+		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {

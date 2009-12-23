@@ -49,7 +49,7 @@ public class BatchTranslationStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Creates a batch translation for a given input document.";
+		return "Creates translations from an external program for a given input document.";
 	}
 	
 	@Override

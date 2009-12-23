@@ -24,6 +24,12 @@ import net.sf.okapi.common.pipeline.IPipeline;
 
 public interface IPredefinedPipeline extends IPipeline {
 
+	public String getId ();
+	
 	public String getTitle ();
+	
+	public String getParameters ();
+	
+	public void setParameters (String data);
 
 }

@@ -142,6 +142,7 @@ public class PipelineWrapper {
 			if ( params != null ) {
 				step.paramsData = params.toString();
 				peMapper.addEditor("net.sf.okapi.steps.linebreakconversion.ui.ParametersEditor", step.paramsClass);
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.linebreakconversion.Parameters", step.paramsClass);
 			}
 			map.put(step.id, step);
 

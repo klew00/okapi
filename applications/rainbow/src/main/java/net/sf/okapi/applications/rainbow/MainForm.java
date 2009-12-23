@@ -1188,15 +1188,30 @@ public class MainForm { //implements IParametersProvider {
 			
 			// If we have a predefined pipeline: set it
 			if ( predefinedPipeline != null ) {
+				// Get the parameters data from the project
+				predefinedPipeline.setParameters(prj.getUtilityParameters(predefinedPipeline.getId()));
+				// Load the pipeline
 				wrapper.loadPipeline(predefinedPipeline, null);
 			}
-			
+
 			PipelineEditor dlg = new PipelineEditor();
-			if ( !dlg.edit(shell, wrapper.availableSteps, wrapper,
+			int res = dlg.edit(shell, wrapper.availableSteps, wrapper,
 				(predefinedPipeline==null) ? null : predefinedPipeline.getTitle(),
-				null, null) ) {
+				null, null);
+			
+			if ( res == PipelineEditor.RESULT_CANCEL ) {
+				return; // No execution, no save
+			}
+
+			// If it's a predefined pipeline: save the parameters
+			if ( predefinedPipeline != null ) {
+				prj.setUtilityParameters(predefinedPipeline.getId(), predefinedPipeline.getParameters());
+			}
+			
+			if ( res == PipelineEditor.RESULT_CLOSE ) {
 				return; // No execution
 			}
+
 			// Else: execute
 			startWaiting(Res.getString("MainForm.startWaiting"), true); //$NON-NLS-1$
 			wrapper.execute(prj);

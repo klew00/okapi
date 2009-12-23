@@ -25,6 +25,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.encodingconversion.Parameters;
@@ -44,7 +45,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
-public class ParametersEditor implements IParametersEditor {
+public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
 	
 	private Shell shell;
 	private boolean result = false;
@@ -68,7 +69,9 @@ public class ParametersEditor implements IParametersEditor {
 	private Button chkBOMonUTF8;
 	private Button chkReportUnsupported;
 	private IHelp help;
+	private Composite mainComposite;
 
+	@Override
 	public boolean edit (IParameters params,
 		boolean readOnly,
 		IContext context)
@@ -93,8 +96,31 @@ public class ParametersEditor implements IParametersEditor {
 		return bRes;
 	}
 	
+	@Override
 	public IParameters createParameters () {
 		return new Parameters();
+	}
+	
+	@Override
+	public Composite getComposite () {
+		return mainComposite;
+	}
+
+	@Override
+	public void initializeEmbeddableEditor (Composite parent,
+		IParameters paramsObject,
+		IContext context)
+	{
+		params = (Parameters)paramsObject; 
+		shell = (Shell)context.getObject("shell");
+		createComposite(parent);
+		setData();
+	}
+
+	@Override
+	public String validateAndSaveParameters () {
+		if ( !saveData() ) return null;
+		return params.toString();
 	}
 	
 	private void create (Shell parent,
@@ -107,7 +133,43 @@ public class ParametersEditor implements IParametersEditor {
 		layTmp.verticalSpacing = 0;
 		shell.setLayout(layTmp);
 
-		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
+		createComposite(shell);
+
+		//--- Dialog-level buttons
+
+		SelectionAdapter OKCancelActions = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				result = false;
+				if ( e.widget.getData().equals("h") ) {
+					if ( help != null ) help.showTopic(this, "index");
+					return;
+				}
+				if ( e.widget.getData().equals("o") ) {
+					if ( !saveData() ) return;
+				}
+				shell.close();
+			};
+		};
+		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		pnlActions.btOK.setEnabled(!readOnly);
+		if ( !readOnly ) {
+			shell.setDefaultButton(pnlActions.btOK);
+		}
+
+		setData();
+		
+		shell.pack();
+		shell.setMinimumSize(shell.getSize());
+		Dialogs.centerWindow(shell, parent);
+	}
+	
+	private void createComposite (Composite parent) {
+		mainComposite = new Composite(parent, SWT.NONE);
+		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		mainComposite.setLayout(new GridLayout());
+		
+		TabFolder tfTmp = new TabFolder(mainComposite, SWT.NONE);
 		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		//--- Input tab
@@ -210,36 +272,6 @@ public class ParametersEditor implements IParametersEditor {
 		
 		chkReportUnsupported = new Button(group, SWT.CHECK);
 		chkReportUnsupported.setText("List characters not supported by the output encoding");
-
-		//--- Dialog-level buttons
-
-		SelectionAdapter OKCancelActions = new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				result = false;
-				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "index");
-					return;
-				}
-				if ( e.widget.getData().equals("o") ) saveData();
-				shell.close();
-			};
-		};
-		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
-		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		pnlActions.btOK.setEnabled(!readOnly);
-		if ( !readOnly ) {
-			shell.setDefaultButton(pnlActions.btOK);
-		}
-
-		setData();
-		
-		updateUserOutput();
-		edUserFormat.setEnabled(rdEscapeToUserFormat.getSelection());
-		chkUseBytes.setEnabled(rdEscapeToUserFormat.getSelection());
-		
-		shell.pack();
-		shell.setMinimumSize(shell.getSize());
-		Dialogs.centerWindow(shell, parent);
 	}
 
 	private void updateUserOutput () {
@@ -300,6 +332,10 @@ public class ParametersEditor implements IParametersEditor {
 		rdEscapeUnsupported.setSelection(!params.escapeAll);
 		chkBOMonUTF8.setSelection(params.BOMonUTF8);
 		chkReportUnsupported.setSelection(params.reportUnsupported);
+		
+		updateUserOutput();
+		edUserFormat.setEnabled(rdEscapeToUserFormat.getSelection());
+		chkUseBytes.setEnabled(rdEscapeToUserFormat.getSelection());
 	}
 
 	private boolean saveData () {
@@ -334,5 +370,5 @@ public class ParametersEditor implements IParametersEditor {
 		// Else and if ( rdEscapeToNCRHexaU.getSelection() )
 		return Parameters.ESCAPE_NCRHEXAU;
 	}
-	
+
 }

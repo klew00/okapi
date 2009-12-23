@@ -20,14 +20,39 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
-import net.sf.okapi.steps.batchtranslation.BatchTranslationStep;
+import net.sf.okapi.common.pipeline.Pipeline;
 
-public class BatchTranslationPipeline extends PredefinedPipeline {
+public abstract class PredefinedPipeline extends Pipeline implements IPredefinedPipeline {
+	
+	private String id;
+	private String title;
+	private String paramData;
 
-	public BatchTranslationPipeline () {
-		super("BatchTranslationPipeline",
-			"Create Translations in Batch Mode");
-		addStep(new BatchTranslationStep());
+	public PredefinedPipeline (String id,
+		String title)
+	{
+		this.id = id;
+		this.title = title;
+	}
+	
+	@Override
+	public String getId () {
+		return id;
+	}
+	
+	@Override
+	public String getTitle() {
+		return title;
+	}
+
+	@Override
+	public String getParameters () {
+		return paramData;
+	}
+
+	@Override
+	public void setParameters (String data) {
+		paramData = data;
 	}
 
 }

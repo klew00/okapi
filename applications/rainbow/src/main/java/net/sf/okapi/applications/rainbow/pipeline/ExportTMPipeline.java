@@ -20,17 +20,14 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
-import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.steps.simpletm2tmx.SimpleTM2TMXStep;
 
-public class ExportTMPipeline extends Pipeline implements IPredefinedPipeline {
+public class ExportTMPipeline extends PredefinedPipeline {
 
 	public ExportTMPipeline () {
+		super("ExportTMPipeline",
+			"Create TMX files for SimpleTM Databases");
 		addStep(new SimpleTM2TMXStep());
-	}
-
-	public String getTitle() {
-		return "Create TMX files for SimpleTM Databases";
 	}
 	
 }

@@ -29,22 +29,24 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
+import net.sf.okapi.common.ui.DefaultEmbeddableEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.InputDialog;
+import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.common.ui.genericeditor.GenericEditor;
+import net.sf.okapi.common.ui.genericeditor.GenericEmbeddableEditor;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
@@ -52,12 +54,17 @@ import org.eclipse.swt.widgets.Text;
 
 public class PipelineEditor {
 
+	public static final int RESULT_CANCEL = 0;
+	public static final int RESULT_CLOSE = 1;
+	public static final int RESULT_EXECUTE = 2;
+	
 	private Shell shell;
-	private boolean result;
+	private int result;
 	private IHelp help;
 	private PipelineWrapper wrapper;
 	private Map<String, StepInfo> availableSteps;
 	private ArrayList<StepInfo> workSteps;
+	private ArrayList<IEmbeddableParametersEditor> panels;
 	private Text edPath;
 	private List lbSteps;
 	private Button btLoad;
@@ -68,13 +75,14 @@ public class PipelineEditor {
 	private Button btRemoveStep;
 	private Button btMoveStepUp;
 	private Button btMoveStepDown;
-	private Button btEditStep;
 	private Text edDescription;
 	private BaseContext context;
-	private GenericEditor gedit;
 	private String predefined;
+	private Composite optionsHolder;
+	private Composite noParametersPanel;
+	private Composite noStepsPanel;
 	
-	public boolean edit (Shell parent,
+	public int edit (Shell parent,
 		Map<String, StepInfo> availableSteps,
 		PipelineWrapper wrapper,
 		String predefined, // null if not predefined, title otherwise
@@ -85,13 +93,13 @@ public class PipelineEditor {
 		context.setObject("shell", parent);
 		this.predefined = predefined;
 		
-		boolean result = false;
+		int result = RESULT_CANCEL;
 		try {
 			this.availableSteps = availableSteps;
 			this.wrapper = wrapper;
 			this.help = helpParam;
-			setDataFromWrapper();
 			create(parent);
+			setDataFromWrapper();
 			populate(0);
 			
 			// Set focus on steps if possible
@@ -111,7 +119,7 @@ public class PipelineEditor {
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
-			result = false;
+			result = RESULT_CANCEL;
 		}
 		finally {
 			// Dispose of the shell, but not of the display
@@ -122,12 +130,14 @@ public class PipelineEditor {
 
 	private void setDataFromWrapper () {
 		workSteps = new ArrayList<StepInfo>();
+		panels = new ArrayList<IEmbeddableParametersEditor>();
 		for ( StepInfo step : wrapper.getSteps() ) {
 			workSteps.add(step.clone());
+			panels.add(createPanel(step));
 		}
 	}
 	
-	private boolean showDialog () {
+	private int showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
@@ -138,157 +148,187 @@ public class PipelineEditor {
 
 	private void create (Shell parent) {
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Edit / Execute Pipeline");
+		
+		if ( predefined == null ) {
+			shell.setText("Edit / Execute Pipeline");
+		}
+		else { // Pre-defined pipeline
+			shell.setText("Pre-defined Pipeline");
+		}
+		
 		UIUtil.inheritIcon(shell, parent);
-		GridLayout layTmp = new GridLayout(2, false);
-		shell.setLayout(layTmp);
+		shell.setLayout(new GridLayout());
 		
 		edPath = new Text(shell, SWT.BORDER);
 		edPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edPath.setEditable(false);
 
 		int width = 100;
-
-		btLoad = new Button(shell, SWT.PUSH);
-		btLoad.setText("Load...");
-		GridData gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btLoad.setLayoutData(gdTmp);
-		btLoad.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				load(null);
-			}
-		});
 		
-		lbSteps = new List(shell, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 9;
+		Composite cmpTmp = new Composite(shell, SWT.NONE);
+		GridLayout layTmp = new GridLayout(2, false);
+		layTmp.marginHeight = 0;
+		layTmp.marginWidth = 0;
+		cmpTmp.setLayout(layTmp);
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		cmpTmp.setLayoutData(gdTmp);
+
+		lbSteps = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		gdTmp = new GridData(GridData.FILL_VERTICAL);
+		gdTmp.widthHint = 175;
+		gdTmp.heightHint = 300;
 		lbSteps.setLayoutData(gdTmp);
 		lbSteps.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateStepDisplay();
 			}
 		});
-		lbSteps.addMouseListener(new MouseListener() {
-			public void mouseDoubleClick(MouseEvent e) {
-				editStepParameters();
-			}
-			public void mouseDown(MouseEvent e) {}
-			public void mouseUp(MouseEvent e) {}
-		});
+		
+		// Second part of the sash form
+		optionsHolder = new Composite(cmpTmp, SWT.NONE);
+		optionsHolder.setLayoutData(new GridData(GridData.FILL_BOTH));
+		StackLayout stkTmp = new StackLayout();
+		stkTmp.marginHeight = 0;
+		stkTmp.marginWidth = 0;
+		optionsHolder.setLayout(stkTmp);
 
-		btNew = new Button(shell, SWT.PUSH);
-		btNew.setText("New");
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btNew.setLayoutData(gdTmp);
-		btNew.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				newPipeline();
-			}
-		});
-		
-		btSave = new Button(shell, SWT.PUSH);
-		btSave.setText("Save");
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btSave.setLayoutData(gdTmp);
-		btSave.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				// Like save as if it is a predefined pipeline
-				save((predefined==null) ? edPath.getText() : null);
-			}
-		});
-		
-		btSaveAs = new Button(shell, SWT.PUSH);
-		btSaveAs.setText("Save As...");
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btSaveAs.setLayoutData(gdTmp);
-		btSaveAs.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				save(null);
-			}
-		});
+		// Panel to use for no-parameters steps
+		noParametersPanel = new Composite(optionsHolder, SWT.BORDER);
+		noParametersPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+		noParametersPanel.setLayout(new GridLayout());
+		Label stTmp = new Label(noParametersPanel, SWT.NONE);
+		stTmp.setText("This step has no parameters");
 
-		new Label(shell, SWT.NONE);
+		// Panel to use for when there are no steps
+		noStepsPanel = new Composite(optionsHolder, SWT.BORDER);
+		noStepsPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+		noStepsPanel.setLayout(new GridLayout());
+		stTmp = new Label(noStepsPanel, SWT.NONE);
+		stTmp.setText("Click on \"Add Step\" to start");
 		
-		btAddStep = new Button(shell, SWT.PUSH);
-		btAddStep.setText("Add Step...");
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btAddStep.setLayoutData(gdTmp);
-		btAddStep.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				addStep();
-			}
-		});
+		// Bottom part
+		if ( predefined == null ) {
+			cmpTmp = new Composite(shell, SWT.NONE);
+			cmpTmp.setLayout(new GridLayout(4, false));
+			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+			cmpTmp.setLayoutData(gdTmp);
 		
-		btRemoveStep = new Button(shell, SWT.PUSH);
-		btRemoveStep.setText("Remove Step");
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btRemoveStep.setLayoutData(gdTmp);
-		btRemoveStep.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				removeStep();
-			}
-		});
+			// Buttons
+			btAddStep = new Button(cmpTmp, SWT.PUSH);
+			btAddStep.setText("Add Step...");
+			gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+			gdTmp.widthHint = width;
+			btAddStep.setLayoutData(gdTmp);
+			btAddStep.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					addStep();
+				}
+			});
+			
+			btRemoveStep = new Button(cmpTmp, SWT.PUSH);
+			btRemoveStep.setText("Remove Step");
+			gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+			gdTmp.widthHint = width;
+			btRemoveStep.setLayoutData(gdTmp);
+			btRemoveStep.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					removeStep();
+				}
+			});
+			
+			btMoveStepUp = new Button(cmpTmp, SWT.PUSH);
+			btMoveStepUp.setText("Move Up");
+			gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+			gdTmp.widthHint = width;
+			btMoveStepUp.setLayoutData(gdTmp);
+			btMoveStepUp.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					moveStepUp();
+				}
+			});
+			
+			btMoveStepDown = new Button(cmpTmp, SWT.PUSH);
+			btMoveStepDown.setText("Move Down");
+			gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+			gdTmp.widthHint = width;
+			btMoveStepDown.setLayoutData(gdTmp);
+			btMoveStepDown.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					moveStepDown();
+				}
+			});
+			
+			// Pipeline buttons
+			btLoad = new Button(cmpTmp, SWT.PUSH);
+			btLoad.setText("Load...");
+			gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+			gdTmp.widthHint = width;
+			btLoad.setLayoutData(gdTmp);
+			btLoad.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					load(null);
+				}
+			});
+			
+			btNew = new Button(cmpTmp, SWT.PUSH);
+			btNew.setText("New");
+			gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+			gdTmp.widthHint = width;
+			btNew.setLayoutData(gdTmp);
+			btNew.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					newPipeline();
+				}
+			});
+			
+			btSave = new Button(cmpTmp, SWT.PUSH);
+			btSave.setText("Save");
+			gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+			gdTmp.widthHint = width;
+			btSave.setLayoutData(gdTmp);
+			btSave.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					// Like save as if it is a predefined pipeline
+					save((predefined==null) ? edPath.getText() : null);
+				}
+			});
+			
+			btSaveAs = new Button(cmpTmp, SWT.PUSH);
+			btSaveAs.setText("Save As...");
+			gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+			gdTmp.widthHint = width;
+			btSaveAs.setLayoutData(gdTmp);
+			btSaveAs.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					save(null);
+				}
+			});
 		
-		btMoveStepUp = new Button(shell, SWT.PUSH);
-		btMoveStepUp.setText("Move Up");
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btMoveStepUp.setLayoutData(gdTmp);
-		btMoveStepUp.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				moveStepUp();
-			}
-		});
+		} // End of "if predefined"
 		
-		btMoveStepDown = new Button(shell, SWT.PUSH);
-		btMoveStepDown.setText("Move Down");
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btMoveStepDown.setLayoutData(gdTmp);
-		btMoveStepDown.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				moveStepDown();
-			}
-		});
-		
-		btEditStep = new Button(shell, SWT.PUSH);
-		btEditStep.setText("Edit Options...");
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btEditStep.setLayoutData(gdTmp);
-		btEditStep.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				editStepParameters();
-			}
-		});
 		
 		edDescription = new Text(shell, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 45;
-		gdTmp.horizontalSpan = 2;
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.heightHint = 32;
+		//gdTmp.horizontalSpan = 2;
 		edDescription.setLayoutData(gdTmp);
 		edDescription.setEditable(false);
 
 		// Dialog-level buttons
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				result = false;
+				result = RESULT_CANCEL;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					//if ( help != null ) help.showTopic(this, "index", "inputDocProp.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
+					result = RESULT_CLOSE;
 				}
 				if ( e.widget.getData().equals("x") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
-					result = true;
+					result = RESULT_EXECUTE;
 				}
 				shell.close();
 			};
@@ -313,22 +353,52 @@ public class PipelineEditor {
 
 	private void updateStepDisplay () {
 		int n = lbSteps.getSelectionIndex();
+		Control ctrl = ((StackLayout)optionsHolder.getLayout()).topControl;
 		if ( n < 0 ) {
 			edDescription.setText("");
-			btAddStep.setEnabled((predefined==null) ? true : false);
-			btRemoveStep.setEnabled(false);
-			btMoveStepUp.setEnabled(false);
-			btMoveStepDown.setEnabled(false);
-			btEditStep.setEnabled(false);
+			if ( predefined == null ) {
+				btAddStep.setEnabled(true);
+				btRemoveStep.setEnabled(false);
+				btMoveStepUp.setEnabled(false);
+				btMoveStepDown.setEnabled(false);
+			}
+			if (( ctrl == null ) || !ctrl.equals(noStepsPanel) ) {
+				((StackLayout)optionsHolder.getLayout()).topControl = noStepsPanel;
+				optionsHolder.layout();
+			}
+			optionsHolder.layout();
+			optionsHolder.getParent().layout();
 			return; 
 		}
 		StepInfo step = workSteps.get(n);
 		edDescription.setText(step.description);
-		btAddStep.setEnabled((predefined==null) ? true : false);
-		btRemoveStep.setEnabled((predefined==null) ? true : false);
-		btMoveStepUp.setEnabled((predefined==null) ? (n>0) : false);
-		btMoveStepDown.setEnabled((predefined==null) ? (n<workSteps.size()-1) : false);
-		btEditStep.setEnabled(step.paramsData!=null);
+		if ( predefined == null ) {
+			btAddStep.setEnabled(true);
+			btRemoveStep.setEnabled(true);
+			btMoveStepUp.setEnabled(n>0);
+			btMoveStepDown.setEnabled(n<workSteps.size()-1);
+		}
+
+		IEmbeddableParametersEditor panel = panels.get(n);
+		if ( panel.getComposite() == null ) {
+			if (( ctrl == null ) || !ctrl.equals(noParametersPanel) ) {
+				((StackLayout)optionsHolder.getLayout()).topControl = noParametersPanel;
+				optionsHolder.layout();
+			}
+		}
+		else {
+			if (( ctrl == null ) || !ctrl.equals(panel.getComposite()) ) {
+				((StackLayout)optionsHolder.getLayout()).topControl = panel.getComposite();
+				optionsHolder.layout();
+				Point pt = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+				// For some reason pack()/layout()/computeSize() add +16 than needed
+				// Maybe some scroll-bar side effect?
+				pt.x -= 16; // So, for now, we correct manually
+				shell.setSize(pt);
+				shell.setMinimumSize(shell.getSize());
+			}
+		}
+		
 	}
 	
 	private void populate (int index) {
@@ -359,8 +429,11 @@ public class PipelineEditor {
 			int n = lbSteps.getSelectionIndex();
 			if ( n <= 0 ) return;
 			StepInfo tmp = workSteps.get(n-1);
+			IEmbeddableParametersEditor tmpPanel = panels.get(n-1);
 			workSteps.set(n-1, workSteps.get(n));
+			panels.set(n-1, panels.get(n));
 			workSteps.set(n, tmp);
+			panels.set(n, tmpPanel);
 			populate(n-1); // New position
 		}
 		catch ( Throwable e ) {
@@ -373,8 +446,11 @@ public class PipelineEditor {
 			int n = lbSteps.getSelectionIndex();
 			if ( n > lbSteps.getItemCount()-1 ) return;
 			StepInfo tmp = workSteps.get(n+1);
+			IEmbeddableParametersEditor tmpPanel = panels.get(n+1);
 			workSteps.set(n+1, workSteps.get(n));
+			panels.set(n+1, panels.get(n));
 			workSteps.set(n, tmp);
+			panels.set(n, tmpPanel);
 			populate(n+1); // New position
 		}
 		catch ( Throwable e ) {
@@ -389,72 +465,10 @@ public class PipelineEditor {
 			if ( id == null ) return;
 			StepInfo info = availableSteps.get(id).clone();
 			workSteps.add(info);
+			panels.add(createPanel(info));
 			lbSteps.add(info.name);
 			lbSteps.select(lbSteps.getItemCount()-1);
 			updateStepDisplay();
-		}
-		catch ( Throwable e ) {
-			Dialogs.showError(shell, e.getMessage(), null);
-		}
-	}
-	
-	private void editStepParameters () {
-		try {
-			int n = lbSteps.getSelectionIndex();
-			if ( n < 0 ) return;
-			StepInfo step = workSteps.get(n);
-			if ( step.paramsData == null ) {
-				// No parameters data for this step
-				return;
-			}
-			if ( step.paramsClass == null ) {
-				// No parameters class defined
-				return;
-			}
-
-			// Instantiate a Parameters object for this step
-			IParameters params = (IParameters)Class.forName(step.paramsClass).newInstance();
-			
-			// Instantiate an editor object
-			IParametersEditor editor = null;
-			try { // Catch creation error so we can fall-back to default editor
-				editor = wrapper.getEditorMapper().createParametersEditor(step.paramsClass);
-			}
-			catch ( OkapiEditorCreationException e ) {
-				Dialogs.showError(shell, e.getMessage(), null);
-			}
-			if ( editor != null ) {
-				// Set it with the data from this step
-				params.fromString(step.paramsData);
-				// Edit the data
-				if ( !editor.edit(params, false, context) ) return; // Cancel
-				// Save the data
-				step.paramsData = params.toString();
-				return;
-			}
-			
-			// Else: Try to use the generic editor
-			IEditorDescriptionProvider descProv = wrapper.getEditorMapper().getDescriptionProvider(step.paramsClass);
-			if ( descProv != null ) {
-				if ( gedit == null ) gedit = new GenericEditor();
-				// Set it with the data from this step
-				params.fromString(step.paramsData);
-				// Edit the data
-				if ( !gedit.edit(params, descProv, false, context) ) return; // Cancel
-				// Save the data
-				step.paramsData = params.toString();
-				return;
-			}
-
-			// Else: Try the properties-like editor
-			InputDialog dlg  = new InputDialog(shell,
-				"Step Options ("+step.name+")",
-				"Parameters:",
-				step.paramsData, null, 0, 200, 500);
-			String data = dlg.showDialog();
-			if ( data == null ) return;
-			data = data.replace("\r\n", "\n");
-			step.paramsData = data.replace("\r", "\n");
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -466,6 +480,7 @@ public class PipelineEditor {
 			int n = lbSteps.getSelectionIndex();
 			if ( n < 0 ) return;
 			workSteps.remove(n);
+			panels.remove(n);
 			if ( n >= workSteps.size() ) n = workSteps.size()-1;
 			populate(n);
 		}
@@ -474,11 +489,81 @@ public class PipelineEditor {
 		}
 	}
 	
+	private IEmbeddableParametersEditor createPanel (StepInfo step) {
+		try {
+			if ( step.paramsData == null ) {
+				// No parameters data for this step
+				return new DefaultEmbeddableEditor();
+			}
+			if ( step.paramsClass == null ) {
+				// No parameters class defined
+				return null;
+			}
+
+			// Instantiate a Parameters object for this step
+			IParameters params = (IParameters)Class.forName(step.paramsClass).newInstance();
+			// Set it with the data from this step
+			params.fromString(step.paramsData);
+			
+			// Instantiate an editor object
+			IParametersEditor editor = null;
+			try { // Catch creation error so we can fall-back to default editor
+				editor = wrapper.getEditorMapper().createParametersEditor(step.paramsClass);
+			}
+			catch ( OkapiEditorCreationException e ) {
+				Dialogs.showError(shell, e.getMessage(), null);
+			}
+			if (( editor != null )
+				&& IEmbeddableParametersEditor.class.isAssignableFrom(editor.getClass()) ) {
+				((IEmbeddableParametersEditor)editor).initializeEmbeddableEditor(optionsHolder, params, context);
+				return (IEmbeddableParametersEditor)editor;
+			}
+			
+			// Else: Try to use the generic editor
+			IEditorDescriptionProvider descProv = wrapper.getEditorMapper().getDescriptionProvider(step.paramsClass);
+			if ( descProv != null ) {
+				GenericEmbeddableEditor geedit = new GenericEmbeddableEditor(descProv);
+				geedit.initializeEmbeddableEditor(optionsHolder, params, context);
+				return geedit;
+			}
+			
+			// Default, last fall-back option
+			DefaultEmbeddableEditor defEditor = new DefaultEmbeddableEditor();
+			defEditor.initializeEmbeddableEditor(optionsHolder, params, context);
+			return defEditor;
+			
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		// No usable editor
+		return null;
+	}
+	
 	private boolean saveData () {
+		// Validate and save data from panels to each work-steps
+		StepInfo step;
+		IEmbeddableParametersEditor panel;
+		for ( int i=0; i<workSteps.size(); i++ ) {
+			step = workSteps.get(i);
+			panel = panels.get(i);
+			if ( panel != null ) {
+				String data = panel.validateAndSaveParameters();
+				if ( data == null ) {
+					// Select the panel with the problem
+					lbSteps.select(i);
+					updateStepDisplay();
+					// Cancel save
+					return false;
+				}
+				step.paramsData = data;
+			}
+		}		
+		
 		// Copy the work steps to the real object
 		wrapper.clear();
-		for ( StepInfo step : workSteps ) {
-			wrapper.addStep(step);
+		for ( StepInfo step2 : workSteps ) {
+			wrapper.addStep(step2);
 		}
 		return true;
 	}

@@ -21,32 +21,69 @@
 package net.sf.okapi.steps.linebreakconversion;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.ListSelectionPart;
 
-public class Parameters extends BaseParameters {
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	public String lineBreak;
+	private static final String LINEBREAK = "lineBreak";
+
+	private String lineBreak;
+
+	public String getLineBreak () {
+		return lineBreak;
+	}
+
+	public void setLineBreak (String lineBreak) {
+		this.lineBreak = lineBreak;
+	}
 
 	public Parameters () {
 		reset();
 	}
 	
 	public void reset() {
-		if ( (lineBreak = System.getProperty("line.separator") )
-			== null ) lineBreak = Util.LINEBREAK_DOS;
+		if ( (lineBreak = System.getProperty("line.separator") ) == null ) {
+			lineBreak = Util.LINEBREAK_DOS;
+		}
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		lineBreak = buffer.getString("lineBreak", lineBreak);
+		lineBreak = buffer.getString(LINEBREAK, lineBreak);
 	}
 
 	@Override
 	public String toString() {
 		buffer.reset();
-		buffer.setString("lineBreak", lineBreak);
+		buffer.setString(LINEBREAK, lineBreak);
 		return buffer.toString();
+	}
+
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(LINEBREAK, "New type of line-break", "Type of line-break to conver to");
+		return desc;
+	}
+	
+	@Override
+	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("Line-Break Conversion", true, false);
+
+		String[] choices = {
+			"DOS/Windows (Carriage-Return + Line-Feed, \\r\\n, 0x0D+0x0A)",
+			"Unix/Linux (Line-Feed, \\n, 0x0A)",
+			"Macintosh (Carriage-Return, \\r, 0x0D)"
+		};
+		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(LINEBREAK), choices);
+		lsp.setListType(ListSelectionPart.LISTTYPE_SIMPLE);
+
+		return desc;
 	}
 	
 }

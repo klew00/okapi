@@ -28,6 +28,14 @@ import static org.junit.Assert.*;
 public class LocaleIdTest {
 
 	@Test
+	public void testIdentity () {
+		LocaleId locId1 = LocaleId.ENGLISH;
+		LocaleId locId2 = new LocaleId("en", true);
+		assertEquals(0, locId1.compareTo(locId2));
+		assertEquals(locId1.hashCode(), locId2.hashCode());
+	}
+	
+	@Test
 	public void testConstructorFromIdentifier () {
 		LocaleId locId = new LocaleId("en-CA", true);
 		assertEquals("en", locId.getLanguage());

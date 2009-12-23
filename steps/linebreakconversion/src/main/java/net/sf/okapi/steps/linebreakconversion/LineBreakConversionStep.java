@@ -140,13 +140,13 @@ public class LineBreakConversionStep extends BasePipelineStep {
 					if ( buf[i] == '\n') {
 						if (( i != 0 ) || ( done == 0 )) {
 							writer.write(buf, start, i-start);
-							writer.write(params.lineBreak);
+							writer.write(params.getLineBreak());
 						}
 						start = i+1;
 					}
 					else if ( buf[i] == '\r') {
 						writer.write(buf, start, i-start);
-						writer.write(params.lineBreak);
+						writer.write(params.getLineBreak());
 						// Check if it's a \r\n
 						if ( i+1 < length ) {
 							if ( buf[i+1] == '\n' ) {

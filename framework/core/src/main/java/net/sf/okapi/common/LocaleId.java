@@ -33,8 +33,48 @@ public final class LocaleId implements Comparable<Object> {
 	 * An empty locale.
 	 */
 	static public LocaleId EMPTY = new LocaleId("", false);
-	/** Useful constant for language.
-     */
+	
+	// Default for a few locales used often
+	/**
+	 * LocaleId constant for "ar".
+	 */
+    static public final LocaleId ARABIC = new LocaleId("ar", false);
+	/**
+	 * LocaleId constant for "zh-cn".
+	 */
+    static public final LocaleId CHINA_CHINESE = new LocaleId("zh-cn", false);
+	/**
+	 * LocaleId constant for "zh-tw".
+	 */
+    static public final LocaleId TAIWAN_CHINESE = new LocaleId("zh-tw", false);
+    /**
+	 * LocaleId constant for "en".
+	 */
+	static public final LocaleId ENGLISH = new LocaleId("en", false);
+	/**
+	 * LocaleId constant for "fr".
+	 */
+    static public final LocaleId FRENCH = new LocaleId("fr", false);
+	/**
+	 * LocaleId constant for "de".
+	 */
+    static public final LocaleId GERMAN = new LocaleId("de", false);
+	/**
+	 * LocaleId constant for "it".
+	 */
+    static public final LocaleId ITALIAN = new LocaleId("it", false);
+	/**
+	 * LocaleId constant for "ja".
+	 */
+    static public final LocaleId JAPANESE = new LocaleId("ja", false);
+	/**
+	 * LocaleId constant for "ru".
+	 */
+    static public final LocaleId RUSSIAN = new LocaleId("ru", false);
+	/**
+	 * LocaleId constant for "es".
+	 */
+    static public final LocaleId SPANISH = new LocaleId("es", false);
 
 	private String locId;
 	
@@ -67,7 +107,7 @@ public final class LocaleId implements Comparable<Object> {
     	+ "([\\x2d][xX]([\\x2d]\\p{Alnum}{1,8})*)?)\\z");
 
 	// Pattern to parse/validate POSIX locale identifiers
-	private static final Pattern POSIXPATTERN = Pattern.compile("\\A(\\p{Alpha}{2,3})"
+	private static final Pattern POSIX_PATTERN = Pattern.compile("\\A(\\p{Alpha}{2,3})"
 		+ "(_(\\p{Alpha}*?))?(\\.([\\p{Alnum}_-]*?))?(@([\\p{Alnum}_-]*?))?\\z");
 
 	// Pattern to parse/validate LocaleId
@@ -82,69 +122,6 @@ public final class LocaleId implements Comparable<Object> {
     	+ "(([\\x2d]([a-wyzA-WYZ](?=\\x2d))([\\x2d](\\p{Alnum}{2,8})+)*))*"
     	+ "([\\x2d][xX]([\\x2d]\\p{Alnum}{1,8})*)?)\\z");
 
-	// Needs to be after JAVALOCMAP declaration
-    static public final LocaleId ENGLISH = new LocaleId(Locale.ENGLISH);
-    /** Useful constant for language.
-     */
-    static public final LocaleId FRENCH = new LocaleId(Locale.FRENCH);
-    /** Useful constant for language.
-     */
-    static public final LocaleId GERMAN = new LocaleId(Locale.GERMAN);
-    /** Useful constant for language.
-     */
-    static public final LocaleId ITALIAN = new LocaleId(Locale.ITALIAN);
-    /** Useful constant for language.
-     */
-    static public final LocaleId JAPANESE = new LocaleId(Locale.JAPANESE);
-    /** Useful constant for language.
-     */
-    static public final LocaleId KOREAN = new LocaleId(Locale.KOREAN);
-    /** Useful constant for language.
-     */
-    static public final LocaleId CHINESE = new LocaleId(Locale.CHINESE);
-    /** Useful constant for language.
-     */
-    static public final LocaleId SIMPLIFIED_CHINESE = new LocaleId(Locale.SIMPLIFIED_CHINESE);
-    /** Useful constant for language.
-     */
-    static public final LocaleId TRADITIONAL_CHINESE = new LocaleId(Locale.TRADITIONAL_CHINESE);
-    /** Useful constant for country.
-     */
-    static public final LocaleId FRANCE = new LocaleId(Locale.FRANCE);
-    /** Useful constant for country.
-     */
-    static public final LocaleId GERMANY = new LocaleId(Locale.GERMANY);
-    /** Useful constant for country.
-     */
-    static public final LocaleId ITALY = new LocaleId(Locale.ITALY);
-    /** Useful constant for country.
-     */
-    static public final LocaleId JAPAN = new LocaleId(Locale.JAPAN);
-    /** Useful constant for country.
-     */
-    static public final LocaleId KOREA = new LocaleId(Locale.KOREA);
-    /** Useful constant for country.
-     */
-    static public final LocaleId CHINA = SIMPLIFIED_CHINESE;
-    /** Useful constant for country.
-     */
-    static public final LocaleId PRC = SIMPLIFIED_CHINESE;
-    /** Useful constant for country.
-     */
-    static public final LocaleId TAIWAN = TRADITIONAL_CHINESE;
-    /** Useful constant for country.
-     */
-    static public final LocaleId UK = new LocaleId(Locale.UK);
-    /** Useful constant for country.
-     */
-    static public final LocaleId US = new LocaleId(Locale.US);
-    /** Useful constant for country.
-     */
-    static public final LocaleId CANADA = new LocaleId(Locale.CANADA);
-    /** Useful constant for country.
-     */
-    static public final LocaleId CANADA_FRENCH = new LocaleId(Locale.CANADA_FRENCH);
-	
 	/**
 	 * Creates a new LocaleId object from a locale identifier.
 	 * @param locId a LocaleId string
@@ -329,7 +306,7 @@ public final class LocaleId implements Comparable<Object> {
 		if ( Util.isEmpty(locId) ) {
 			throw new IllegalArgumentException("The locale identifier cannot be null or empty.");
 		}
-		Matcher m = POSIXPATTERN.matcher(locId);
+		Matcher m = POSIX_PATTERN.matcher(locId);
 		if ( m.find() ) {
 //DEBUG
 //			for ( int i=1; i<m.groupCount(); i++ ) {

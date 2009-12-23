@@ -151,9 +151,9 @@ public class ParametersEditor implements IParametersEditor {
 	}
 
 	private void setData () {
-		if ( params.lineBreak.equals(Util.LINEBREAK_MAC) )
+		if ( params.getLineBreak().equals(Util.LINEBREAK_MAC) )
 			rdMac.setSelection(true);
-		else if ( params.lineBreak.equals(Util.LINEBREAK_UNIX) )
+		else if ( params.getLineBreak().equals(Util.LINEBREAK_UNIX) )
 			rdUnix.setSelection(true);
 		else
 			rdDos.setSelection(true);
@@ -161,11 +161,11 @@ public class ParametersEditor implements IParametersEditor {
 
 	private boolean saveData () {
 		if ( rdDos.getSelection() )
-			params.lineBreak = Util.LINEBREAK_DOS;
+			params.setLineBreak(Util.LINEBREAK_DOS);
 		else if ( rdUnix.getSelection() )
-			params.lineBreak = Util.LINEBREAK_UNIX;
+			params.setLineBreak(Util.LINEBREAK_UNIX);
 		else
-			params.lineBreak = Util.LINEBREAK_MAC;
+			params.setLineBreak(Util.LINEBREAK_MAC);
 		result = true;
 		return true;
 	}

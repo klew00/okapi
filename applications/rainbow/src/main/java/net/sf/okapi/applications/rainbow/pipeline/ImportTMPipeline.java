@@ -20,19 +20,16 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
-import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.generatesimpletm.GenerateSimpleTmStep;
 
-public class ImportTMPipeline extends Pipeline implements IPredefinedPipeline {
+public class ImportTMPipeline extends PredefinedPipeline {
 
 	public ImportTMPipeline () {
+		super("ImportTMPipeline",
+			"Generate SimpleTM Database");
 		addStep(new RawDocumentToFilterEventsStep());
 		addStep(new GenerateSimpleTmStep());
-	}
-
-	public String getTitle() {
-		return "Generate SimpleTM Database";
 	}
 	
 }

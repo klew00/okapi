@@ -619,8 +619,13 @@ public class Project {
 		String parameters)
 	{
 		String prev = utilityParams.get(utilityID);
-		if ( prev != null ) {
-			if ( !prev.equals(parameters) ) isModified = true;
+		if ( Util.isEmpty(prev) ) {
+			// Did not exist before
+			isModified = true;
+		}
+		else if ( !prev.equals(parameters) ) {
+			// Existed and was different
+			isModified = true;
 		}
 		utilityParams.put(utilityID, parameters);
 	}

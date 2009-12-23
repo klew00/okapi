@@ -25,6 +25,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.ui.segmentation.SegmentationPanel;
@@ -42,11 +43,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
-public class ParametersEditor implements IParametersEditor {
+public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
 
 	private Shell shell;
 	private boolean result = false;
@@ -65,6 +64,7 @@ public class ParametersEditor implements IParametersEditor {
 	private SegmentationPanel pnlSegmentation;
 	private IHelp help;
 	private String projectDir;
+	private Composite mainComposite;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -95,6 +95,29 @@ public class ParametersEditor implements IParametersEditor {
 		return new Parameters();
 	}
 	
+	@Override
+	public Composite getComposite () {
+		return mainComposite;
+	}
+
+	@Override
+	public void initializeEmbeddableEditor (Composite parent,
+		IParameters paramsObject,
+		IContext context)
+	{
+		params = (Parameters)paramsObject; 
+		shell = (Shell)context.getObject("shell");
+		createComposite(parent);
+		setData();
+		inInit = false;
+	}
+
+	@Override
+	public String validateAndSaveParameters () {
+		if ( !saveData() ) return null;
+		return params.toString();
+	}
+	
 	private void create (Shell parent,
 		boolean readOnly)
 	{
@@ -105,89 +128,7 @@ public class ParametersEditor implements IParametersEditor {
 		layTmp.verticalSpacing = 0;
 		shell.setLayout(layTmp);
 
-		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
-		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		//--- Options tab
-
-		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout(2, true));
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
-		tiTmp.setControl(cmpTmp);
-
-		Label stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Type of change to perform:");
-		GridData gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		stTmp.setLayoutData(gdTmp);
-
-		lbTypes = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
-		lbTypes.add("Keep the original text");
-		lbTypes.add("Replace letters by Xs and digits by Ns");
-		lbTypes.add("Remove text but keep inline codes");
-		lbTypes.add("Replace selected ASCII letters by extended characters");
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 70;
-		gdTmp.horizontalSpan = 2;
-		lbTypes.setLayoutData(gdTmp);
-
-		chkAddPrefix = new Button(cmpTmp, SWT.CHECK);
-		chkAddPrefix.setText("Add the following prefix:");
-		chkAddPrefix.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				edPrefix.setEnabled(chkAddPrefix.getSelection());
-			}
-		});
-		
-		chkAddSuffix = new Button(cmpTmp, SWT.CHECK);
-		chkAddSuffix.setText("Add the following suffix:");
-		chkAddSuffix.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				edSuffix.setEnabled(chkAddSuffix.getSelection());
-			}
-		});
-		
-		edPrefix = new Text(cmpTmp, SWT.BORDER);
-		edPrefix.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		edSuffix = new Text(cmpTmp, SWT.BORDER);
-		edSuffix.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
-		chkAddName = new Button(cmpTmp, SWT.CHECK);
-		chkAddName.setText("Append the name of the item.");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkAddName.setLayoutData(gdTmp);
-
-		chkAddID = new Button(cmpTmp, SWT.CHECK);
-		chkAddID.setText("Append the extraction ID of the item.");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkAddID.setLayoutData(gdTmp);
-
-		chkApplyToExistingTarget = new Button(cmpTmp, SWT.CHECK);
-		chkApplyToExistingTarget.setText("Modify also the items with an exiting translation.");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkApplyToExistingTarget.setLayoutData(gdTmp);
-		
-		chkMarkSegments = new Button(cmpTmp, SWT.CHECK);
-		chkMarkSegments.setText("Mark segments with '[' and ']' delimiters");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkMarkSegments.setLayoutData(gdTmp);
-
-		Group grpTmp = new Group(cmpTmp, SWT.NONE);
-		grpTmp.setText("Segmentation");
-		grpTmp.setLayout(new GridLayout(4, false));
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
-		grpTmp.setLayoutData(gdTmp);
-		
-		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Apply the following segmentation rules:", null, projectDir);
-		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		createComposite(shell);
 		
 		//--- Dialog-level buttons
 
@@ -214,9 +155,99 @@ public class ParametersEditor implements IParametersEditor {
 		Point startSize = shell.getMinimumSize();
 		if ( startSize.x < 600 ) startSize.x = 600;
 		shell.setSize(startSize);
+		
 		setData();
 		inInit = false;
 		Dialogs.centerWindow(shell, parent);
+	}
+
+	private void createComposite (Composite parent) {
+		mainComposite = new Composite(parent, SWT.BORDER);
+		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		mainComposite.setLayout(new GridLayout());
+		
+//		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
+//		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+//
+//		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
+//		cmpTmp.setLayout(new GridLayout(2, true));
+//		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+//		tiTmp.setText("Options");
+//		tiTmp.setControl(cmpTmp);
+
+		Label stTmp = new Label(mainComposite, SWT.NONE);
+		stTmp.setText("Type of change to perform:");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		stTmp.setLayoutData(gdTmp);
+
+		lbTypes = new List(mainComposite, SWT.BORDER | SWT.V_SCROLL);
+		lbTypes.add("Keep the original text");
+		lbTypes.add("Replace letters by Xs and digits by Ns");
+		lbTypes.add("Remove text but keep inline codes");
+		lbTypes.add("Replace selected ASCII letters by extended characters");
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 70;
+		gdTmp.horizontalSpan = 2;
+		lbTypes.setLayoutData(gdTmp);
+
+		chkAddPrefix = new Button(mainComposite, SWT.CHECK);
+		chkAddPrefix.setText("Add the following prefix:");
+		chkAddPrefix.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edPrefix.setEnabled(chkAddPrefix.getSelection());
+			}
+		});
+		
+		chkAddSuffix = new Button(mainComposite, SWT.CHECK);
+		chkAddSuffix.setText("Add the following suffix:");
+		chkAddSuffix.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edSuffix.setEnabled(chkAddSuffix.getSelection());
+			}
+		});
+		
+		edPrefix = new Text(mainComposite, SWT.BORDER);
+		edPrefix.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		edSuffix = new Text(mainComposite, SWT.BORDER);
+		edSuffix.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		chkAddName = new Button(mainComposite, SWT.CHECK);
+		chkAddName.setText("Append the name of the item.");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkAddName.setLayoutData(gdTmp);
+
+		chkAddID = new Button(mainComposite, SWT.CHECK);
+		chkAddID.setText("Append the extraction ID of the item.");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkAddID.setLayoutData(gdTmp);
+
+		chkApplyToExistingTarget = new Button(mainComposite, SWT.CHECK);
+		chkApplyToExistingTarget.setText("Modify also the items with an exiting translation.");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkApplyToExistingTarget.setLayoutData(gdTmp);
+		
+		chkMarkSegments = new Button(mainComposite, SWT.CHECK);
+		chkMarkSegments.setText("Mark segments with '[' and ']' delimiters");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkMarkSegments.setLayoutData(gdTmp);
+
+		Group grpTmp = new Group(mainComposite, SWT.NONE);
+		grpTmp.setText("Segmentation");
+		grpTmp.setLayout(new GridLayout(4, false));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		grpTmp.setLayoutData(gdTmp);
+		
+		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
+			"Apply the following segmentation rules:", null, projectDir);
+		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
 	}
 	
 	private boolean showDialog () {
