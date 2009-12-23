@@ -147,17 +147,17 @@ public class TextUnit implements INameable, IReferenceable {
 		tu.setPreserveWhitespaces(preserveWS);
 		tu.setReferenceCount(getReferenceCount());
 		tu.setSkeleton(getSkeleton());
-		tu.setSource(getSource());
+		tu.setSource(getSource().clone());
 		tu.setType(getType());
 		
 		// set all the main level properties
 		for (Property prop : properties.values()) {
-			tu.setProperty(prop);
+			tu.setProperty(prop.clone());
 		}
 		
 		// set all the targets
 		for (Entry<LocaleId, TextContainer> entry : targets.entrySet()) {
-			tu.setTarget(entry.getKey(), entry.getValue());
+			tu.setTarget(entry.getKey(), entry.getValue().clone());
 		}
 		
 		return tu;
