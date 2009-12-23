@@ -69,5 +69,19 @@ public class Annotations {
 		
 		return annotationType.cast(annotations.remove(annotationType));
 	}
-
+	
+	@Override
+	public Annotations clone() {
+		Annotations a = new Annotations();
+		a.setAnnotations(this.annotations);
+		return a;		
+	}
+	
+	/**
+	 * Used by clone method to copy over all annotations at once. 
+	 * @param annotations
+	 */
+	protected void setAnnotations(ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation> annotations) {
+		this.annotations = annotations;
+	}
 }

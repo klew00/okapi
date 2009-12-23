@@ -139,7 +139,7 @@ public class TextUnit implements INameable, IReferenceable {
 	@Override
 	public TextUnit clone () {
 		TextUnit tu = new TextUnit(getId());
-		tu.setAnnotations(this.annotations);
+		tu.setAnnotations(this.annotations.clone());
 		tu.setIsReferent(isReferent());
 		tu.setIsTranslatable(isTranslatable);
 		tu.setMimeType(getMimeType());
