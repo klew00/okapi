@@ -25,6 +25,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.bomconversion.Parameters;
@@ -39,10 +40,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 
-public class ParametersEditor implements IParametersEditor {
+public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
 	
 	private Shell shell;
 	private boolean result = false;
@@ -54,6 +53,7 @@ public class ParametersEditor implements IParametersEditor {
 	private Label stRemove;
 	private Button chkAlsoNonUTF8;
 	private IHelp help;
+	private Composite mainComposite;
 
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -83,6 +83,28 @@ public class ParametersEditor implements IParametersEditor {
 		return new Parameters();
 	}
 	
+	@Override
+	public Composite getComposite () {
+		return mainComposite;
+	}
+
+	@Override
+	public void initializeEmbeddableEditor (Composite parent,
+		IParameters paramsObject,
+		IContext context)
+	{
+		params = (Parameters)paramsObject; 
+		shell = (Shell)context.getObject("shell");
+		createComposite(parent);
+		setData();
+	}
+
+	@Override
+	public String validateAndSaveParameters () {
+		if ( !saveData() ) return null;
+		return params.toString();
+	}
+	
 	private void create (Shell parent,
 		boolean readOnly)
 	{
@@ -93,18 +115,40 @@ public class ParametersEditor implements IParametersEditor {
 		layTmp.verticalSpacing = 0;
 		shell.setLayout(layTmp);
 
-		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
-		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		createComposite(shell);
+		
+		//--- Dialog-level buttons
 
-		//--- Options tab
+		SelectionAdapter OKCancelActions = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				result = false;
+				if ( e.widget.getData().equals("h") ) {
+					if ( help != null ) help.showTopic(this, "index");
+					return;
+				}
+				if ( e.widget.getData().equals("o") ) saveData();
+				shell.close();
+			};
+		};
+		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		pnlActions.btOK.setEnabled(!readOnly);
+		if ( !readOnly ) {
+			shell.setDefaultButton(pnlActions.btOK);
+		}
 
-		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout());
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
-		tiTmp.setControl(cmpTmp);
+		setData();
+		shell.pack();
+		shell.setMinimumSize(shell.getSize());
+		Dialogs.centerWindow(shell, parent);
+	}
+	
+	private void createComposite (Composite parent) {
+		mainComposite = new Composite(parent, SWT.BORDER);
+		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		mainComposite.setLayout(new GridLayout());
 
-		Group group = new Group(cmpTmp, SWT.NONE);
+		Group group = new Group(mainComposite, SWT.NONE);
 		group.setLayout(new GridLayout());
 		group.setText("Action on the Byte-Order-Mark");
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -142,31 +186,6 @@ public class ParametersEditor implements IParametersEditor {
 				updateNotes();
 			}
 		});
-
-		//--- Dialog-level buttons
-
-		SelectionAdapter OKCancelActions = new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				result = false;
-				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "index");
-					return;
-				}
-				if ( e.widget.getData().equals("o") ) saveData();
-				shell.close();
-			};
-		};
-		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
-		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		pnlActions.btOK.setEnabled(!readOnly);
-		if ( !readOnly ) {
-			shell.setDefaultButton(pnlActions.btOK);
-		}
-
-		setData();
-		shell.pack();
-		shell.setMinimumSize(shell.getSize());
-		Dialogs.centerWindow(shell, parent);
 	}
 	
 	private void updateNotes () {

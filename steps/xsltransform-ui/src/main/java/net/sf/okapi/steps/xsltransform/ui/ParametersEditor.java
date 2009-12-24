@@ -36,6 +36,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.NSContextManager;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
@@ -49,14 +50,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class ParametersEditor implements IParametersEditor {
+public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
 	
 	private Shell shell;
 	private boolean result = false;
@@ -66,6 +65,7 @@ public class ParametersEditor implements IParametersEditor {
 	private Text edParameters;
 	private IHelp help;
 	private String projectDir;
+	private Composite mainComposite;
 
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -96,6 +96,28 @@ public class ParametersEditor implements IParametersEditor {
 		return new Parameters();
 	}
 	
+	@Override
+	public Composite getComposite () {
+		return mainComposite;
+	}
+
+	@Override
+	public void initializeEmbeddableEditor (Composite parent,
+		IParameters paramsObject,
+		IContext context)
+	{
+		params = (Parameters)paramsObject; 
+		shell = (Shell)context.getObject("shell");
+		createComposite(parent);
+		setData();
+	}
+
+	@Override
+	public String validateAndSaveParameters () {
+		if ( !saveData() ) return null;
+		return params.toString();
+	}
+	
 	private void create (Shell parent,
 		boolean readOnly)
 	{
@@ -106,76 +128,8 @@ public class ParametersEditor implements IParametersEditor {
 		layTmp.verticalSpacing = 0;
 		shell.setLayout(layTmp);
 
-		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
-		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		createComposite(shell);
 
-		//--- Options tab
-
-		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout(4, false));
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText(Res.getString("editor.tabOptions")); //$NON-NLS-1$
-		tiTmp.setControl(cmpTmp);
-
-		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText(Res.getString("editor.stXsltPath")); //$NON-NLS-1$
-		GridData gdTmp = new GridData();
-		gdTmp.horizontalSpan = 4;
-		label.setLayoutData(gdTmp);
-
-		edXsltPath = new Text(cmpTmp, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 3;
-		edXsltPath.setLayoutData(gdTmp);
-		
-		Button btGetPath = new Button(cmpTmp, SWT.PUSH);
-		btGetPath.setText("..."); //$NON-NLS-1$
-		btGetPath.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
-		btGetPath.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String[] paths = Dialogs.browseFilenames(shell,
-					Res.getString("editor.captionSelectTemplate"), //$NON-NLS-1$
-					false, null,
-					Res.getString("editor.filterSelectTemplate"), //$NON-NLS-1$
-					"*.xsl;*.xslt\t*.*"); //$NON-NLS-1$
-				if ( paths == null ) return;
-				UIUtil.checkProjectFolderAfterPick(paths[0], edXsltPath, projectDir);
-			}
-		});
-
-		label = new Label(cmpTmp, SWT.NONE);
-		label.setText(Res.getString("editor.stParameters")); //$NON-NLS-1$
-		
-		int wideButtonWidth = Res.getInt("editor.wideButtonWidth"); //$NON-NLS-1$
-		Button btGetDefaults = new Button(cmpTmp, SWT.PUSH);
-		btGetDefaults.setText(Res.getString("editor.btGetDefaults")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		btGetDefaults.setLayoutData(gdTmp);
-		UIUtil.ensureWidth(btGetDefaults, wideButtonWidth);
-		btGetDefaults.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				getParametersFromTemplate();
-			}
-		});
-		
-		Button btOpenFile = new Button(cmpTmp, SWT.PUSH);
-		btOpenFile.setText(Res.getString("editor.btOpenTemplate")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		btOpenFile.setLayoutData(gdTmp);
-		UIUtil.ensureWidth(btOpenFile, wideButtonWidth);
-		btOpenFile.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				Program.launch(edXsltPath.getText()); 
-			}
-		});
-		
-		edParameters = new Text(cmpTmp, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.heightHint = 70;
-		gdTmp.horizontalSpan = 4;
-		edParameters.setLayoutData(gdTmp);
-		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -204,6 +158,71 @@ public class ParametersEditor implements IParametersEditor {
 		setData();
 	}
 	
+	private void createComposite (Composite parent) {
+		mainComposite = new Composite(parent, SWT.BORDER);
+		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		mainComposite.setLayout(new GridLayout(4, false));
+		
+		Label label = new Label(mainComposite, SWT.NONE);
+		label.setText(Res.getString("editor.stXsltPath")); //$NON-NLS-1$
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 4;
+		label.setLayoutData(gdTmp);
+
+		edXsltPath = new Text(mainComposite, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 3;
+		edXsltPath.setLayoutData(gdTmp);
+		
+		Button btGetPath = new Button(mainComposite, SWT.PUSH);
+		btGetPath.setText("..."); //$NON-NLS-1$
+		btGetPath.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		btGetPath.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String[] paths = Dialogs.browseFilenames(shell,
+					Res.getString("editor.captionSelectTemplate"), //$NON-NLS-1$
+					false, null,
+					Res.getString("editor.filterSelectTemplate"), //$NON-NLS-1$
+					"*.xsl;*.xslt\t*.*"); //$NON-NLS-1$
+				if ( paths == null ) return;
+				UIUtil.checkProjectFolderAfterPick(paths[0], edXsltPath, projectDir);
+			}
+		});
+
+		label = new Label(mainComposite, SWT.NONE);
+		label.setText(Res.getString("editor.stParameters")); //$NON-NLS-1$
+		
+		int wideButtonWidth = Res.getInt("editor.wideButtonWidth"); //$NON-NLS-1$
+		Button btGetDefaults = new Button(mainComposite, SWT.PUSH);
+		btGetDefaults.setText(Res.getString("editor.btGetDefaults")); //$NON-NLS-1$
+		gdTmp = new GridData();
+		btGetDefaults.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btGetDefaults, wideButtonWidth);
+		btGetDefaults.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				getParametersFromTemplate();
+			}
+		});
+		
+		Button btOpenFile = new Button(mainComposite, SWT.PUSH);
+		btOpenFile.setText(Res.getString("editor.btOpenTemplate")); //$NON-NLS-1$
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		btOpenFile.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btOpenFile, wideButtonWidth);
+		btOpenFile.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Program.launch(edXsltPath.getText()); 
+			}
+		});
+		
+		edParameters = new Text(mainComposite, SWT.MULTI | SWT.V_SCROLL | SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 70;
+		gdTmp.horizontalSpan = 4;
+		edParameters.setLayoutData(gdTmp);
+	}
+	
 	private boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -221,6 +240,7 @@ public class ParametersEditor implements IParametersEditor {
 
 	private boolean saveData () {
 		if ( edXsltPath.getText().length() == 0 ) {
+			Dialogs.showError(shell, "You must specify a path for the XSLT file.", null);
 			edXsltPath.setFocus();
 			return false;
 		}

@@ -408,7 +408,6 @@ public class PipelineEditor {
 				//shell.setMinimumSize(minSize);
 			}
 		}
-		
 	}
 	
 	private void populate (int index) {

@@ -139,12 +139,15 @@ public class CrossLanguageMTConnector implements IQuery {
 			// Check if there is actually text to translate
 			if ( !text.hasText(false) ) return 0;
 			// Convert the fragment to coded HTML
-			String qtext = util.toCodedHTML(text);
+			String qtext = "<html>"+util.toCodedHTML(text)+"</html>";
 			String data = Base64.encodeString(qtext);
 			// Call the service
 			String res = gateway.getTranslatedFileWithOptions(params.getUser(), params.getApiKey(),
-				params.getDepartmentId(), data, "html", options);
+				params.getDepartmentId(), data, "HTML", options);
 			if ( res == null ) return 0;
+			if ( res.startsWith("TransError") ) {
+				throw new RuntimeException("Error querying the server: " + res);
+			}
 			
 			// Process the result
 			result = new QueryResult();

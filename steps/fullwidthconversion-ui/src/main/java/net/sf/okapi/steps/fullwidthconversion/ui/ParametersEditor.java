@@ -25,6 +25,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.fullwidthconversion.Parameters;
@@ -37,10 +38,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 
-public class ParametersEditor implements IParametersEditor {
+public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
 	
 	private Shell shell;
 	private boolean result = false;
@@ -50,6 +49,7 @@ public class ParametersEditor implements IParametersEditor {
 	private Button rdToFullWidth;
 	private Button rdToHalfWidth;
 	private Button chkAsciiOnly;
+	private Composite mainComposite;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -79,6 +79,28 @@ public class ParametersEditor implements IParametersEditor {
 		return new Parameters();
 	}
 	
+	@Override
+	public Composite getComposite () {
+		return mainComposite;
+	}
+
+	@Override
+	public void initializeEmbeddableEditor (Composite parent,
+		IParameters paramsObject,
+		IContext context)
+	{
+		params = (Parameters)paramsObject; 
+		shell = (Shell)context.getObject("shell");
+		createComposite(parent);
+		setData();
+	}
+
+	@Override
+	public String validateAndSaveParameters () {
+		if ( !saveData() ) return null;
+		return params.toString();
+	}
+	
 	private void create (Shell parent,
 		boolean readOnly)
 	{
@@ -89,37 +111,7 @@ public class ParametersEditor implements IParametersEditor {
 		layTmp.verticalSpacing = 0;
 		shell.setLayout(layTmp);
 
-		TabFolder tfTmp = new TabFolder(shell, SWT.NONE);
-		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		//--- Options tab
-
-		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout());
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("Options");
-		tiTmp.setControl(cmpTmp);
-
-		rdToHalfWidth = new Button(cmpTmp, SWT.RADIO);
-		rdToHalfWidth.setText("Convert full width characters to half-width (or ASCII) equivalents");
-		
-		rdToFullWidth = new Button(cmpTmp, SWT.RADIO);
-		rdToFullWidth.setText("Convert half-width characters to full width equivalents");
-		
-		chkAsciiOnly = new Button(cmpTmp, SWT.CHECK);
-		chkAsciiOnly.setText("Convert only the ASCII characters");
-		
-		int indent = 16;
-		GridData gdTmp = new GridData();
-		gdTmp = new GridData();
-		gdTmp.horizontalIndent = indent;
-		chkAsciiOnly.setLayoutData(gdTmp);
-
-		rdToFullWidth.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				updateChkBox();
-			}
-		});
+		createComposite(shell);
 
 		//--- Dialog-level buttons
 
@@ -145,6 +137,33 @@ public class ParametersEditor implements IParametersEditor {
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		Dialogs.centerWindow(shell, parent);
+	}
+	
+	private void createComposite (Composite parent) {
+		mainComposite = new Composite(parent, SWT.BORDER);
+		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		mainComposite.setLayout(new GridLayout());
+		
+		rdToHalfWidth = new Button(mainComposite, SWT.RADIO);
+		rdToHalfWidth.setText("Convert full width characters to half-width (or ASCII) equivalents");
+		
+		rdToFullWidth = new Button(mainComposite, SWT.RADIO);
+		rdToFullWidth.setText("Convert half-width characters to full width equivalents");
+		
+		chkAsciiOnly = new Button(mainComposite, SWT.CHECK);
+		chkAsciiOnly.setText("Convert only the ASCII characters");
+		
+		int indent = 16;
+		GridData gdTmp = new GridData();
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = indent;
+		chkAsciiOnly.setLayoutData(gdTmp);
+
+		rdToFullWidth.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateChkBox();
+			}
+		});
 	}
 	
 	private void updateChkBox() {
