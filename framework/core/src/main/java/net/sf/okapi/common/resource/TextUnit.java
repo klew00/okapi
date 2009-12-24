@@ -139,7 +139,9 @@ public class TextUnit implements INameable, IReferenceable {
 	@Override
 	public TextUnit clone () {
 		TextUnit tu = new TextUnit(getId());
-		tu.setAnnotations(this.annotations.clone());
+		if ( annotations != null ) {
+			tu.setAnnotations(annotations.clone());
+		}
 		tu.setIsReferent(isReferent());
 		tu.setIsTranslatable(isTranslatable);
 		tu.setMimeType(getMimeType());
@@ -150,9 +152,11 @@ public class TextUnit implements INameable, IReferenceable {
 		tu.setSource(getSource().clone());
 		tu.setType(getType());
 		
-		// set all the main level properties
-		for (Property prop : properties.values()) {
-			tu.setProperty(prop.clone());
+		// Set all the main level properties
+		if ( properties != null ) {
+			for (Property prop : properties.values()) {
+				tu.setProperty(prop.clone());
+			}
 		}
 		
 		// set all the targets

@@ -28,6 +28,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
@@ -224,5 +226,25 @@ public class TextUnitUtilTest {
 		assertEquals(tuRef, parts.get(2).toString());
 		assertEquals("})))", parts.get(3).toString());
 		assertEquals("\"", parts.get(4).toString());
+	}
+
+	@Test
+	public void testCreateBilingualTextUnit () {
+		TextUnit ori = new TextUnit("id", "Seg1. Seg2");
+		ori.createTarget(LocaleId.ITALIAN, true, IResource.COPY_ALL);
+		TextContainer tc = ori.getSource();
+		tc.createSegment(6, 10);
+		tc.createSegment(0, 5);
+		tc = ori.getTarget(LocaleId.ITALIAN);
+		tc.createSegment(6, 10);
+		tc.createSegment(0, 5);
+		
+		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori,
+			ori.getSource().getSegments().get(0),
+			ori.getTarget(LocaleId.ITALIAN).getSegments().get(0),
+			LocaleId.ITALIAN);
+		assertEquals(ori.getId(), res.getId());
+		assertEquals("Seg1.", res.getSource().toString());
+		assertEquals("Seg1.", res.getTarget(LocaleId.ITALIAN).toString());
 	}
 }

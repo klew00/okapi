@@ -658,8 +658,41 @@ public class TextUnitUtil {
 	 * @param qualifier the qualifier to be removed before and after source text.
 	 */
 	public static void removeQualifiers(TextUnit textUnit, String qualifier) {
-		
 		removeQualifiers(textUnit, qualifier, qualifier);
 	}
 
+	/**
+	 * Creates a new text unit based on an existing text unit, with its
+	 * content set to the content of a source and a target segment. All other 
+	 * targets are removed.
+	 * @param srcTextUnit text unit to use for origin. 
+	 * @param srcSegment source segment.
+	 * @param trgSegment target segment.
+	 * @param trgLocaleId target locale.
+	 * @return a new text unit with its content set to the given source and 
+	 * target segment.
+	 */
+	public static TextUnit createBilingualTextUnit (TextUnit srcTextUnit,
+		Segment srcSegment,
+		Segment trgSegment,
+		LocaleId trgLocaleId)
+	{
+		// Clone the original
+		TextUnit tu = srcTextUnit.clone();
+		// Empty the source content
+		tu.getSource().clear();
+		// Set the new source content: the given source segment
+		tu.setSourceContent(srcSegment.getContent());
+		// Removes all targets
+		for (LocaleId locId : tu.getTargetLocales()) {
+			tu.removeTarget(locId);
+		}
+		// Create a new target with all the source data
+		tu.createTarget(trgLocaleId, true, TextUnit.COPY_ALL);
+		// Set the new target content: the given target segment
+		tu.setTargetContent(trgLocaleId, trgSegment.getContent());
+		// Return the result
+		return tu;
+	}
+	
 }

@@ -55,10 +55,10 @@ public class Segment {
 	}
 
 	/**
-	 * Get the {@link TextFragment} used by the Segment.
-	 * @return a {@link TextFragment}.
+	 * Gets the {@link TextFragment} for this segment.
+	 * @return the {@link TextFragment} for this segment.
 	 */
-	public TextFragment getTextFragment() {
+	public TextFragment getContent () {
 		return text;
 	}
 	
