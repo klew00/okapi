@@ -75,12 +75,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("Line-Break Conversion", true, false);
 
-		String[] choices = {
+		String[] values = {
+			Util.LINEBREAK_DOS,
+			Util.LINEBREAK_UNIX,
+			Util.LINEBREAK_MAC
+		};
+		String[] labels = {
 			"DOS/Windows (Carriage-Return + Line-Feed, \\r\\n, 0x0D+0x0A)",
 			"Unix/Linux (Line-Feed, \\n, 0x0A)",
 			"Macintosh (Carriage-Return, \\r, 0x0D)"
 		};
-		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(LINEBREAK), choices);
+		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(LINEBREAK), values);
+		lsp.setChoicesLabels(labels);
 		lsp.setListType(ListSelectionPart.LISTTYPE_SIMPLE);
 
 		return desc;

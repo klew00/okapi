@@ -506,7 +506,7 @@ public class PipelineEditor {
 			}
 			if ( step.paramsClass == null ) {
 				// No parameters class defined
-				return null;
+				return new DefaultEmbeddableEditor();
 			}
 
 			// Instantiate a Parameters object for this step
@@ -546,33 +546,38 @@ public class PipelineEditor {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		// No usable editor
-		return null;
+		return new DefaultEmbeddableEditor();
 	}
 	
 	private boolean saveData () {
-		// Validate and save data from panels to each work-steps
-		StepInfo step;
-		IEmbeddableParametersEditor panel;
-		for ( int i=0; i<workSteps.size(); i++ ) {
-			step = workSteps.get(i);
-			panel = panels.get(i);
-			if ( panel != null ) {
-				String data = panel.validateAndSaveParameters();
-				if ( data == null ) {
-					// Select the panel with the problem
-					lbSteps.select(i);
-					updateStepDisplay();
-					// Cancel save
-					return false;
+		try {
+			// Validate and save data from panels to each work-steps
+			StepInfo step;
+			IEmbeddableParametersEditor panel;
+			for ( int i=0; i<workSteps.size(); i++ ) {
+				step = workSteps.get(i);
+				panel = panels.get(i);
+				if ( panel.getComposite() != null ) {
+					String data = panel.validateAndSaveParameters();
+					if ( data == null ) {
+						// Select the panel with the problem
+						lbSteps.select(i);
+						updateStepDisplay();
+						// Cancel save
+						return false;
+					}
+					step.paramsData = data;
 				}
-				step.paramsData = data;
+			}		
+			
+			// Copy the work steps to the real object
+			wrapper.clear();
+			for ( StepInfo step2 : workSteps ) {
+				wrapper.addStep(step2);
 			}
-		}		
-		
-		// Copy the work steps to the real object
-		wrapper.clear();
-		for ( StepInfo step2 : workSteps ) {
-			wrapper.addStep(step2);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 		return true;
 	}

@@ -159,7 +159,7 @@ public class TextUnit implements INameable, IReferenceable {
 			}
 		}
 		
-		// set all the targets
+		// Set all the targets
 		for (Entry<LocaleId, TextContainer> entry : targets.entrySet()) {
 			tu.setTarget(entry.getKey(), entry.getValue().clone());
 		}

@@ -167,7 +167,10 @@ public class ParametersEditor implements IParametersEditor, IEmbeddableParameter
 	private void createComposite (Composite parent) {
 		mainComposite = new Composite(parent, SWT.NONE);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
-		mainComposite.setLayout(new GridLayout());
+		GridLayout layTmp = new GridLayout();
+		layTmp.marginHeight = 0;
+		layTmp.marginWidth = 0;
+		mainComposite.setLayout(layTmp);
 		
 		TabFolder tfTmp = new TabFolder(mainComposite, SWT.NONE);
 		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));

@@ -393,7 +393,7 @@ public class ParametersEditor implements IParametersEditor, IEmbeddableParameter
 	}
 
 	private boolean showAddItemsDialog () {
-		dialog = new Shell (shell);
+		dialog = new Shell (mainComposite.getShell());
 		dialog.setText ("Search And Replace Item");
 		dialog.setSize (400, 200);
 
