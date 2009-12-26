@@ -21,7 +21,12 @@
 package net.sf.okapi.applications.rainbow.pipeline;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,6 +35,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.IParameters;
@@ -44,15 +50,40 @@ import net.sf.okapi.common.pipeline.Pipeline;
 public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 
 	private String path;
-	
-	public void setPath (String fullPath) {
-		path = fullPath;
+	private StringWriter strWriter;
+	private CharSequence inputData;
+
+	public PipelineStorage () {
+		path = null;
 	}
 	
+	public PipelineStorage (String path) {
+		this.path = path;
+	}
+
+	public PipelineStorage (CharSequence inputData) {
+		this.inputData = inputData;
+	}
+	
+	public String getStringOutput () {
+		return strWriter.toString();
+	}
+	
+	@Override
 	public void write (IPipeline pipeline) {
 		XMLWriter writer = null;
 		try {
-			writer = new XMLWriter(path);
+			// Select the destination
+			if ( path == null ) {
+				// Use string writer
+				strWriter = new StringWriter();
+				writer = new XMLWriter(strWriter);
+			}
+			else {
+				// File writer
+				writer = new XMLWriter(new FileWriter(path));
+			}
+
 			writer.writeStartDocument();
 			writer.writeStartElement("rainbowPipeline");
 			writer.writeAttributeString("version", "1");
@@ -65,6 +96,9 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 				}
 				writer.writeEndElementLineBreak(); // step
 			}
+		}
+		catch ( IOException e ) {
+			throw new RuntimeException(e);
 		}
 		finally {
 			if ( writer != null ) {
@@ -79,10 +113,20 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);
-			Document Doc = Fact.newDocumentBuilder().parse(new File(path));
-			//TODO: check root and version
+
+			// Select the type of input
+			Document doc;
+			if ( path == null ) {
+				// From a CharSequence
+				InputSource is = new InputSource(new StringReader(inputData.toString()));
+				doc = Fact.newDocumentBuilder().parse(is);
+			}
+			else {
+				// From a path
+				doc = Fact.newDocumentBuilder().parse(new File(path));
+			}
 			
-			NodeList nodes = Doc.getElementsByTagName("step");
+			NodeList nodes = doc.getElementsByTagName("step");
 			Pipeline pipeline = new Pipeline();
 			
 			for ( int i=0; i<nodes.getLength(); i++ ) {

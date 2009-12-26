@@ -1205,7 +1205,9 @@ public class MainForm { //implements IParametersProvider {
 
 			// If it's a predefined pipeline: save the parameters
 			if ( predefinedPipeline != null ) {
-				prj.setUtilityParameters(predefinedPipeline.getId(), predefinedPipeline.getParameters());
+				wrapper.copyParametersToPipeline(predefinedPipeline);
+				prj.setUtilityParameters(predefinedPipeline.getId(),
+					predefinedPipeline.getParameters());
 			}
 			
 			if ( res == PipelineEditor.RESULT_CLOSE ) {
@@ -1221,6 +1223,7 @@ public class MainForm { //implements IParametersProvider {
 		}
 		finally {
 			stopWaiting();
+			if ( log.getErrorAndWarningCount() > 0 ) log.show();
 		}
 	}
 

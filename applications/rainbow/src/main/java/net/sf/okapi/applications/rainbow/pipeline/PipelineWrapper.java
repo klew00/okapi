@@ -329,6 +329,7 @@ public class PipelineWrapper {
 		this.fcMapper = fcMapper;
 		steps = new ArrayList<StepInfo>();
 		driver = new PipelineDriver();
+		driver.setFilterConfigurationMapper(this.fcMapper);
 		//TODO: use register system for this
 		availableSteps = buildStepList();
 	}
@@ -372,15 +373,13 @@ public class PipelineWrapper {
 	}
 	
 	public void load (String path) {
-		PipelineStorage store = new PipelineStorage();
-		store.setPath(path);
+		PipelineStorage store = new PipelineStorage(path);
 		loadPipeline(store.read(), path);
 	}
 	
 	public void save (String path) {
-		PipelineStorage store = new PipelineStorage();
+		PipelineStorage store = new PipelineStorage(path);
 		copyInfoStepsToPipeline();
-		store.setPath(path);
 		store.write(driver.getPipeline());
 		this.path = path;
 	}
@@ -389,7 +388,6 @@ public class PipelineWrapper {
 		try {
 			// Build the pipeline
 			driver.setPipeline(new Pipeline());
-			driver.setFilterConfigurationMapper(fcMapper);
 			for ( StepInfo stepInfo : steps ) {
 				IPipelineStep step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
 				// Update the parameters with the one in the pipeline storage
@@ -408,6 +406,19 @@ public class PipelineWrapper {
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public void copyParametersToPipeline (IPipeline pipeline) {
+		List<IPipelineStep> destSteps = pipeline.getSteps();
+		if ( destSteps.size() != steps.size() ) {
+			throw new RuntimeException("Parameters and destination do not match.");
+		}
+		StepInfo stepInfo;
+		for ( int i=0; i<destSteps.size(); i++ ) {
+			stepInfo = steps.get(i);
+			IParameters params = destSteps.get(i).getParameters(); 
+			params.fromString(stepInfo.paramsData);
 		}
 	}
 
