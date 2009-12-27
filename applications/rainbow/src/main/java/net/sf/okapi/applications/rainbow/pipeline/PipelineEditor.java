@@ -310,7 +310,7 @@ public class PipelineEditor {
 		
 		edDescription = new Text(shell, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.heightHint = 32;
+		gdTmp.heightHint = 36;
 		//gdTmp.horizontalSpan = 2;
 		edDescription.setLayoutData(gdTmp);
 		edDescription.setEditable(false);
@@ -320,7 +320,9 @@ public class PipelineEditor {
 			public void widgetSelected(SelectionEvent e) {
 				result = RESULT_CANCEL;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					//if ( help != null ) help.showTopic(this, "index", "inputDocProp.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					if ( help != null ) {
+						help.showTopic(this, "../index", "pipeline/editOrExecutePipeline.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -336,7 +338,7 @@ public class PipelineEditor {
 		};
 		
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE,
-			OKCancelActions, false, "Close", "Execute"); //TODO: Add help
+			OKCancelActions, true, "Close", "Execute"); //TODO: Add help
 
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;

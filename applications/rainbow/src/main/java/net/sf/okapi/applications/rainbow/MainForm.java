@@ -1197,7 +1197,7 @@ public class MainForm { //implements IParametersProvider {
 			PipelineEditor dlg = new PipelineEditor();
 			int res = dlg.edit(shell, wrapper.availableSteps, wrapper,
 				(predefinedPipeline==null) ? null : predefinedPipeline.getTitle(),
-				null, null);
+				help, null);
 			
 			if ( res == PipelineEditor.RESULT_CANCEL ) {
 				return; // No execution, no save

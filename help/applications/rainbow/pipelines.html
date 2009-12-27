@@ -1,0 +1,84 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Rainbow - Pipelines</title>
+<link rel="stylesheet" type="text/css" href="../../help.css">
+</head>
+<body>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tr class="head">
+		<td class="head" colspan="2"><h1 class="head">Rainbow</h1>
+		<h2 class="head2">Pipelines</h2></td>
+	</tr>
+</table>
+
+<ul>
+	<li><a href="#Overview">Overview</a></li>
+	<li><a href="#BasicDocDriven">Basic Raw Document-Base Pipeline</a></li>
+	<li><a href="#BasicFilterDriven">Basic Filter-Driven Pipeline</a></li>
+	<li><a href="#MultiTasks">Multi-Tasks Pipelines</a></li>
+	<li><a href="#FAQ">Frequently Asked Questions</a></li>
+</ul>
+<h2><a name="Overview"></a>Overview</h2>
+<p>A pipeline is a customizable set of steps that take the input documents 
+provided in the input lists of Rainbow and execute each step in sequential 
+order.</p>
+<p>A step is a small unit of execution. It take a specific input, perform its 
+task on it and send a specific output to the next step in the pipeline.</p>
+<h2><a name="BasicDocDriven"></a>Basic Raw Document-Base Pipeline</h2>
+<p>Some step act directly on the raw document without going through 
+extraction/merging, for example when they perform tasks on the fille as a whole 
+rather than its translatable text.</p>
+<p>For example, the step named &quot;Encoding Conversion&quot; reads a text file (without 
+any filter) in a given encoding, and re-writes it in a different one. This step 
+can be used in a one-step pipeline:</p>
+<ol>
+	<li>Encoding Conversion</li>
+</ol>
+<h2><a name="BasicFilterDriven"></a>Basic Filter-Driven Pipeline</h2>
+<p>For example, the step named &quot;Full-Width Conversion&quot;:</p>
+<ul>
+	<li>Its input is a set of filter events.</li>
+	<li>Its taks is to convert the content of the extracted text that is send 
+	through text unit events in either full-width Japanese character, or 
+	half-width ASCII/ depending on what option is selected.</li>
+	<li>Its output is the same filter events it recieved, with the modified text 
+	in the case of the text unit events.</li>
+</ul>
+<p>This step is not design to work alone: it needs to be fed filter events, and 
+the text it modifies needs to be written out somewhere.</p>
+<p>To fed a step with filter events you simply need a step just before that 
+output filter events. This could be the &quot;Raw Document to Filter Events&quot; step 
+which takes a normal file and creates the extracted data using the filters.</p>
+<p>To re-write the filter events modified by the step you simply need one of the 
+step that takes filter events as input and produce a raw document as output. 
+This could be the &quot;Filter Events to Raw Document&quot; step which takes the filter 
+events and create an output file in the original file format.</p>
+<p>So you useable pipeline to convert the content of any input file that can be 
+filtered will be made of three steps:</p>
+<ol>
+	<li>Raw Document to Filter Events</li>
+	<li>Full-Width Conversion</li>
+	<li>Filter events to Raw Document</li>
+</ol>
+<p>&nbsp;</p>
+<h2><a name="MultiTasks"></a>Multi-Tasks Pipelines</h2>
+<p>The real power of pipelines really comes to light when you chain multiple 
+steps without having to re-extract the text, or perform different raw-document 
+taks one after the other automatically.</p>
+<h2><a name="FAQ"></a>Frequently Asked Questions</h2>
+<p>Q: How do I specify what filter configuration to use with &quot;Raw Document to 
+Filter Events&quot;?<br>
+A: In the Rainbow Input List tabs, you associate one filter configuration per 
+input file.</p>
+<p>Q: How do I specify the name of the output file?<br>
+A: In the Rainbow&#39;s Output tab, you can define the names and locations of all 
+the input files based on their input file paths.</p>
+<p>Q: How many steps can I chain together?<br>
+A: There is no specific limit to the number of steps in a pipeline, only the 
+available memory will limit what you can do (and pipelines do not take up a lof 
+of memory).</p>
+<p>&nbsp;</p>
+</body>
+</html>
