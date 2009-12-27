@@ -59,7 +59,8 @@ public class CharListingStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Generate a list of all the characters in the source content of a set of documents.";
+		return "Generate a list of all the characters in the source content of a set of documents."
+			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	public String getName () {

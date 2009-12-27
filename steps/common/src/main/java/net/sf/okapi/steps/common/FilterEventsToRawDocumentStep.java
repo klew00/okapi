@@ -80,7 +80,8 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	}
 
 	public String getDescription() {
-		return "Combine filter events into a full document and pass it along as a RawDocument.";
+		return "Combine filter events into a full document and pass it along as a raw document."
+			+ " Expects: filter events. Sends back: raw document.";
 	}
 
 	/**

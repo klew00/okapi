@@ -67,7 +67,8 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 	
 	public String getDescription () {
-		return "Converts the output of a filter into a specified file format.";
+		return "Converts the output of a filter into a specified file format."
+			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	public String getName () {

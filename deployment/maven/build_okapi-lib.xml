@@ -162,6 +162,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/charlisting/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../steps/codeshandling/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/common/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/copysourcetotarget/target/classes"

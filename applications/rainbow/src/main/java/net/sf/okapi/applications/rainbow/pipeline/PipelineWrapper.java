@@ -274,6 +274,18 @@ public class PipelineWrapper {
 			}
 			map.put(step.id, step);
 					
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.codesremoval.CodesRemovalStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(),
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.codesremoval.Parameters", step.paramsClass);
+			}
+			map.put(step.id, step);
+				
 			
 //			ps = (IPipelineStep)Class.forName(
 //			 	"net.sf.okapi.steps.leveraging.LeveragingStep").newInstance();

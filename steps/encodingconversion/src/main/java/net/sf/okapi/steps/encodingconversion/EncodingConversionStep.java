@@ -94,7 +94,8 @@ public class EncodingConversionStep extends BasePipelineStep {
 	}
 	
 	public String getDescription () {
-		return "Convert the character set encoding of a text-based file.";
+		return "Convert the character set encoding of a text-based file."
+			+ " Expects: raw document. Sends back: raw document.";
 	}
 
 	public String getName () {

@@ -63,7 +63,8 @@ public class LeveragingStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Leverage existing translation into the text units content of a document.";
+		return "Leverage existing translation into the text units content of a document."
+			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override

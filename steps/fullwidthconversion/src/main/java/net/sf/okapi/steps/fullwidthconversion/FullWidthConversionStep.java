@@ -50,7 +50,8 @@ public class FullWidthConversionStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Convert the text units content of a document to or from full-width characters (zenkaku).";
+		return "Convert the text units content of a document to or from full-width characters (zenkaku)."
+			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override

@@ -49,7 +49,8 @@ public class BatchTranslationStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Creates translations from an external program for a given input document.";
+		return "Creates translations from an external program for a given input document."
+			+ " Expects: raw document. Sends back: raw document.";
 	}
 	
 	@Override

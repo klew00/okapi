@@ -41,6 +41,7 @@
         <module>wordcount-ui</module>
         <module>xsltransform</module>
         <module>xsltransform-ui</module>
+        <module>codeshandling</module>
     </modules>
 
     <build>
