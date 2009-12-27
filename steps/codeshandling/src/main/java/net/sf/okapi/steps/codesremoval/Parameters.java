@@ -24,14 +24,23 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.ListSelectionPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 	
+	public static final int REMOVECODE_KEEPCONTENT = 0;
+	public static final int KEEPCODE_REMOVECONTENT = 1;
+	public static final int REMOVECODE_REMOVECONTENT = 2;
+	
 	private static final String STRIPSOURCE = "stripSource";
 	private static final String STRIPTARGET = "stripTarget";
+	private static final String MODE = "mode";
+	private static final String INCLUDENONTRANSLATABLE = "includeNonTranslatable";
 	
 	private boolean stripSource;
 	private boolean stripTarget;
+	private int mode;
+	private boolean includeNonTranslatable;
 	
 	public Parameters () {
 		reset();
@@ -53,9 +62,27 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.stripTarget = stripTarget;
 	}
 
+	public int getMode () {
+		return mode;
+	}
+	
+	public void setMode (int mode) {
+		this.mode = mode;
+	}
+
+	public boolean getIncludeNonTranslatable () {
+		return includeNonTranslatable;
+	}
+
+	public void setIncludeNonTranslatable (boolean includeNonTranslatable) {
+		this.includeNonTranslatable = includeNonTranslatable;
+	}
+
 	public void reset() {
 		stripSource = true;
 		stripTarget = true;
+		mode = REMOVECODE_REMOVECONTENT;
+		includeNonTranslatable = true;
 	}
 
 	public void fromString (String data) {
@@ -63,6 +90,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		stripSource = buffer.getBoolean(STRIPSOURCE, stripSource);
 		stripTarget = buffer.getBoolean(STRIPTARGET, stripTarget);
+		mode = buffer.getInteger(MODE, mode);
+		includeNonTranslatable = buffer.getBoolean(INCLUDENONTRANSLATABLE, includeNonTranslatable);
 	}
 
 	@Override
@@ -70,23 +99,37 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setBoolean(STRIPSOURCE, stripSource);
 		buffer.setBoolean(STRIPTARGET, stripTarget);
+		buffer.setInteger(MODE, mode);
+		buffer.setBoolean(INCLUDENONTRANSLATABLE, includeNonTranslatable);
 		return buffer.toString();
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(MODE, "What to remove", "Select what parts of the inline codes to remove");
 		desc.add(STRIPSOURCE, "Strip codes in the source text", null);
 		desc.add(STRIPTARGET, "Strip codes in the target text", null);
+		desc.add(INCLUDENONTRANSLATABLE, "Include non-translatable text units", null);
 		return desc;
 	}
 	
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
-		EditorDescription desc = new EditorDescription("Codes Removal");
+		EditorDescription desc = new EditorDescription("Codes Removal", true, false);
+
+		String[] values = {"0", "1", "2"};
+		String[] labels = {
+			"Remove code marker, but keep code content",
+			"Remove code content, but keep code marker",
+			"Remove code marker and code content",
+		};
+		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(MODE), values);
+		lsp.setChoicesLabels(labels);
 
 		desc.addCheckboxPart(paramDesc.get(STRIPSOURCE));
 		desc.addCheckboxPart(paramDesc.get(STRIPTARGET));
-
+		desc.addCheckboxPart(paramDesc.get(INCLUDENONTRANSLATABLE));
+		
 		return desc;
 	}
 

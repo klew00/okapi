@@ -2,7 +2,8 @@
 
 cd ../..
 svn update
-mvn clean install
+mvn clean
+mvn install
 
 cd deployment/maven
 ant -f build_okapi-lib.xml

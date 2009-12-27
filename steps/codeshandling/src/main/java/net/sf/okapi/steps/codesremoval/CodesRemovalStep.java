@@ -20,23 +20,20 @@
 
 package net.sf.okapi.steps.codesremoval;
 
-import java.util.List;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class CodesRemovalStep extends BasePipelineStep {
 
 	private Parameters params;
 	private LocaleId targetLocale;
+	private CodesRemover remover;
+	
 
 	public CodesRemovalStep () {
 		params = new Parameters();
@@ -52,7 +49,8 @@ public class CodesRemovalStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Removes inline codes from text units content of a document.";
+		return "Removes inline codes from the text units content of a document."
+			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
@@ -61,53 +59,15 @@ public class CodesRemovalStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
-		// Skip non-translatable
-		//TODO: make it an option
-		if ( !tu.isTranslatable() ) return;
-
-		// Process source if needed
-		if ( params.getStripSource() ) {
-			processContainer(tu.getSource());
-		}
-		
-		// Process target if needed
-		if ( params.getStripTarget() ) {
-			if ( tu.hasTarget(targetLocale) ) {
-				processContainer(tu.getTarget(targetLocale));
-			}
-		}
-	}
-
-	private void processContainer (TextContainer tc) {
-		if ( tc.isSegmented() ) {
-			List<Segment> segments = tc.getSegments();
-			for ( Segment seg :segments ) {
-				processFragment(seg.text);
-			}
-		}
-		else {
-			processFragment(tc.getContent());
+	protected void handleStartBatch (Event event) {
+		if ( remover == null ) {
+			remover = new CodesRemover(params, targetLocale);
 		}
 	}
 	
-	private void processFragment (TextFragment tf) {
-		//TODO: direct cahnge of codes instead of calling tf.remove() each time
-		String text = tf.getCodedText();
-		int comp = 0;
-		for ( int i=0; i<text.length(); i++) {
-			switch ( text.charAt(i) ) {
-			case TextFragment.MARKER_OPENING:
-			case TextFragment.MARKER_CLOSING:
-			case TextFragment.MARKER_ISOLATED:
-			// Do not remove segment markers!
-				tf.remove(i-comp, (i-comp)+2);
-				i++;
-				comp += 2; // Compensate for removed marker
-				break;
-			}
-		}
+	@Override
+	protected void handleTextUnit (Event event) {
+		remover.processTextUnit((TextUnit)event.getResource());
 	}
 
 }
