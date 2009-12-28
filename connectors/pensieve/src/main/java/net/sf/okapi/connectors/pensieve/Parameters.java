@@ -66,7 +66,7 @@ public class Parameters extends BaseParameters {
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(DBDIRECTORY, "Directory", "Directory of the database");
+		desc.add(DBDIRECTORY, "TM Directory", "Directory of the TM database");
 		return desc;
 	}
 

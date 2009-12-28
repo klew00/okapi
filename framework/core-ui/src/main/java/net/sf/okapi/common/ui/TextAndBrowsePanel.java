@@ -155,6 +155,7 @@ public class TextAndBrowsePanel extends Composite {
 			DirectoryDialog dlg = new DirectoryDialog(getShell());
 			dlg.setMessage("Please, select a folder.");
 			dlg.setFilterPath(edText.getText());
+			dlg.setText(title);
 			String dir = dlg.open();
 			if (  dir == null ) return;
 			edText.setText(dir);

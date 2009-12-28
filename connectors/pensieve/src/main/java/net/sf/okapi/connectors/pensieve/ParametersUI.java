@@ -27,8 +27,8 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Pensieve TM Connector Settings");
-		desc.addTextInputPart(paramsDesc.get(Parameters.DBDIRECTORY));
+		EditorDescription desc = new EditorDescription("Pensieve TM Connector Settings", true, false);
+		desc.addFolderInputPart(paramsDesc.get(Parameters.DBDIRECTORY), "TM Directory");
 		return desc;
 	}
 

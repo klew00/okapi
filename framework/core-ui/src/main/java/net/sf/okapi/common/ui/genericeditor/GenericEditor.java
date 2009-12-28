@@ -48,6 +48,7 @@ import net.sf.okapi.common.uidescription.AbstractPart;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.CodeFinderPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.FolderInputPart;
 import net.sf.okapi.common.uidescription.IContainerPart;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.ListSelectionPart;
@@ -231,6 +232,19 @@ public class GenericEditor {
 				ctrl.setSaveAs(d.isForSaveAs());
 				ctrl.setTitle(d.getBrowseTitle());
 				ctrl.setBrowseFilters(d.getFilterNames(), d.getFilterExtensions());
+				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+				if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
+				ctrl.setLayoutData(gdTmp);
+				controls.put(d.getName(), ctrl);
+				ctrl.setEditable(d.getWriteMethod()!=null);
+				hasPathInput = true;
+			}
+			else if ( part instanceof FolderInputPart ) {
+				FolderInputPart d = (FolderInputPart)part;
+				cmp = lookupParent(d.getContainer());
+				if ( d.isWithLabel() ) setLabel(cmp, d, 0);
+				TextAndBrowsePanel ctrl = new TextAndBrowsePanel(cmp, SWT.NONE, true);
+				ctrl.setTitle(d.getBrowseTitle());
 				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 				if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
 				ctrl.setLayoutData(gdTmp);
@@ -569,6 +583,10 @@ public class GenericEditor {
 				PathInputPart d = (PathInputPart)part;
 				setPathControl((TextAndBrowsePanel)controls.get(d.getName()), d);
 			}
+			else if ( part instanceof FolderInputPart ) {
+				FolderInputPart d = (FolderInputPart)part;
+				setFolderControl((TextAndBrowsePanel)controls.get(d.getName()), d);
+			}
 			else if ( part instanceof ListSelectionPart ) {
 				ListSelectionPart d = (ListSelectionPart)part;
 				if ( d.getListType() == ListSelectionPart.LISTTYPE_DROPDOWN ) {
@@ -622,6 +640,11 @@ public class GenericEditor {
 			else if ( ctrl instanceof TextAndBrowsePanel ) {
 				if ( description.getDescriptor(name) instanceof PathInputPart ) {
 					if ( !saveTextAndBrowseControl((TextAndBrowsePanel)ctrl, (PathInputPart)description.getDescriptor(name)) ) {
+						return false;
+					}
+				}
+				else if ( description.getDescriptor(name) instanceof FolderInputPart ) {
+					if ( !saveFolderControl((TextAndBrowsePanel)ctrl, (FolderInputPart)description.getDescriptor(name)) ) {
 						return false;
 					}
 				}
@@ -747,6 +770,38 @@ public class GenericEditor {
 			if ( desc.getType().equals(String.class) ) {
 				if ( ctrl.getText().length() == 0 ) {
 					Dialogs.showError(shell, String.format("You must specify a path for '%s'.",
+						desc.getDisplayName()), null);
+					ctrl.setFocus();
+					return false;
+				}
+				desc.getWriteMethod().invoke(desc.getParent(), ctrl.getText());
+			}
+			else {
+				throw new OkapiEditorCreationException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean saveFolderControl (TextAndBrowsePanel ctrl, FolderInputPart desc) {
+		try {
+			if ( !ctrl.isEnabled() ) return true; // Don't save disabled input
+			if ( desc.getType().equals(String.class) ) {
+				if ( ctrl.getText().length() == 0 ) {
+					Dialogs.showError(shell, String.format("You must specify a directory for '%s'.",
 						desc.getDisplayName()), null);
 					ctrl.setFocus();
 					return false;
@@ -1065,6 +1120,28 @@ public class GenericEditor {
 	}
 	
 	private void setPathControl (TextAndBrowsePanel ctrl, PathInputPart desc) {
+		try {
+			if ( desc.getType().equals(String.class) ) {
+				String tmp = (String)desc.getReadMethod().invoke(desc.getParent());
+				ctrl.setText((tmp==null) ? "" : tmp);
+			}
+			else {
+				throw new OkapiEditorCreationException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void setFolderControl (TextAndBrowsePanel ctrl, FolderInputPart desc) {
 		try {
 			if ( desc.getType().equals(String.class) ) {
 				String tmp = (String)desc.getReadMethod().invoke(desc.getParent());

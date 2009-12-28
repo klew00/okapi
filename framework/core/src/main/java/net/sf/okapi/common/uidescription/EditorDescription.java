@@ -162,6 +162,22 @@ public class EditorDescription {
 	}
 
 	/**
+	 * Adds a folder input field UI part to this editor description.
+	 * @param paramDescriptor the parameter descriptor for this UI part.
+	 * @param browseTitle the title to use for the directory browsing dialog.
+	 * @return the UI part created by this call.
+	 */
+	public FolderInputPart addFolderInputPart (ParameterDescriptor paramDescriptor,
+		String browseTitle)
+	{
+		FolderInputPart desc = new FolderInputPart(paramDescriptor, browseTitle);
+		desc.setVertical(defaultVertical);
+		desc.setLabelFlushed(defaultLabelFlushed);
+		descriptors.put(desc.getName(), desc);
+		return desc;
+	}
+
+	/**
 	 * Adds a code-finder panel part to this editor description.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
 	 * @return the UI part created by this call.
