@@ -41,12 +41,8 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 public class QueryUtil {
 
-	private static final String HTML_CLOSING_CODE = "</s>";
-	private static final int HTML_CLOSING_CODE_LENGTH = HTML_CLOSING_CODE.length();
-	
-	private static final Pattern HTML_OPENING = Pattern.compile("\\<s(\\s+)id=['\"](.*?)['\"]>", Pattern.CASE_INSENSITIVE);
+	private static final Pattern HTML_OPENCLOSE = Pattern.compile("(\\<s(\\s+)id=['\"](.*?)['\"]>)|(\\</s\\>)", Pattern.CASE_INSENSITIVE);
 	private static final Pattern HTML_ISOLATED = Pattern.compile("\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>", Pattern.CASE_INSENSITIVE);
-
 	private static final Pattern HTML_SPAN = Pattern.compile("\\<span\\s(.*?)>|\\</span>", Pattern.CASE_INSENSITIVE);
 	
 	private static final Pattern NCR = Pattern.compile("&#(\\S+?);");
@@ -214,27 +210,34 @@ public class QueryUtil {
 			m = NCR.matcher(sb.toString());
 		}
 		
-		m = HTML_OPENING.matcher(sb.toString());
+		// Opening/closing markers
+		// This assume no-overlapping tags and no empty elements
+		m = HTML_OPENCLOSE.matcher(sb.toString());
+		Stack<Integer> stack = new Stack<Integer>();
+		String markers;
         while ( m.find() ) {
-        	// Replace the HTML fake code by the coded text markers
-        	int id = Util.strToInt(m.group(2), -1);
-        	String markers = String.format("%c%c", TextFragment.MARKER_OPENING,
-        		TextFragment.toChar(fragment.getIndex(id)));
-        	sb.replace(m.start(), m.end(), markers);
-        	// Search corresponding closing part
-        	int n = sb.toString().indexOf(HTML_CLOSING_CODE);
-        	// Replace closing code by the coded text markers for closing
-        	markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
-        		TextFragment.toChar(fragment.getIndexForClosing(id)));
-        	sb.replace(n, n+HTML_CLOSING_CODE_LENGTH, markers);
-        	m = HTML_OPENING.matcher(sb.toString());
+        	if ( m.group(1) != null ) {
+        		// It's an opening tag
+            	int id = Util.strToInt(m.group(3), -1);
+            	markers = String.format("%c%c", TextFragment.MARKER_OPENING,
+            		TextFragment.toChar(fragment.getIndex(id)));
+            	sb.replace(m.start(), m.end(), markers);
+            	stack.push(id);
+        	}
+        	else {
+        		// It's a closing tag
+            	markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
+               		TextFragment.toChar(fragment.getIndexForClosing(stack.pop())));
+            	sb.replace(m.start(), m.end(), markers);
+        	}
+        	m = HTML_OPENCLOSE.matcher(sb.toString());
         }
         
 		m = HTML_ISOLATED.matcher(sb.toString());
         while ( m.find() ) {
         	// Replace the HTML fake code by the coded text markers
         	int id = Util.strToInt(m.group(2), -1);
-        	String markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
+        	markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
         		TextFragment.toChar(fragment.getIndex(id)));
         	sb.replace(m.start(), m.end(), markers);
         	m = HTML_ISOLATED.matcher(sb.toString());

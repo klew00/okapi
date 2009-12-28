@@ -25,20 +25,38 @@
 <p>A pipeline is a customizable set of steps that take the input documents 
 provided in the input lists of Rainbow and execute each step in sequential 
 order.</p>
-<p>A step is a small unit of execution. It take a specific input, perform its 
-task on it and send a specific output to the next step in the pipeline.</p>
+<p>A step is a small unit of execution. It take a specific input (e.g a raw 
+document), perform a specific 
+task (e.g. parse the document extract text units out of it) on it and send a specific output 
+(e.g. filter events) to the next step in the pipeline.</p>
+<p>The steps communiicate through their input and output. There are two main 
+types of input and output:</p>
+<ol>
+	<li>Raw document, which is simply a file.</li>
+	<li>Filter events, which are the content of a raw document broken down into 
+	standardized parts that include text units, start and end group, etc.</li>
+</ol>
+<p>Any step that takes a raw document as input can be placed at the top of the 
+pipeline or after any step that output a raw document. Any stsp that takes 
+filter evenst as input needs to be placed after a step that output filter 
+events.</p>
+<p>The step <b>Raw document to Filter Events</b> provides a way to get a filter 
+events output from a raw document input. And the step <b>Filter Events to Raw 
+Document</b> provides a way to create a raw document from an input of filter 
+events.</p>
 <h2><a name="BasicDocDriven"></a>Basic Raw Document-Base Pipeline</h2>
-<p>Some step act directly on the raw document without going through 
-extraction/merging, for example when they perform tasks on the fille as a whole 
+<p>Some steps act directly on the raw document and output a raw document, for example when they perform tasks on the fille as a whole 
 rather than its translatable text.</p>
-<p>For example, the step named &quot;Encoding Conversion&quot; reads a text file (without 
+<p>For example, the step <b>Encoding Conversion</b> reads a text file (without 
 any filter) in a given encoding, and re-writes it in a different one. This step 
 can be used in a one-step pipeline:</p>
 <ol>
-	<li>Encoding Conversion</li>
+	<li>raw document ==&gt; <b>Encoding Conversion</b> ==&gt; raw document</li>
 </ol>
 <h2><a name="BasicFilterDriven"></a>Basic Filter-Driven Pipeline</h2>
-<p>For example, the step named &quot;Full-Width Conversion&quot;:</p>
+<p>Many steps work on text units and therefore require, at the least, an 
+extraction step first.</p>
+<p>For example, the step named <b>Full-Width Conversion</b>:</p>
 <ul>
 	<li>Its input is a set of filter events.</li>
 	<li>Its taks is to convert the content of the extracted text that is send 
@@ -50,26 +68,34 @@ can be used in a one-step pipeline:</p>
 <p>This step is not design to work alone: it needs to be fed filter events, and 
 the text it modifies needs to be written out somewhere.</p>
 <p>To fed a step with filter events you simply need a step just before that 
-output filter events. This could be the &quot;Raw Document to Filter Events&quot; step 
+output filter events. This could be the <b>Raw Document to Filter Events</b> step 
 which takes a normal file and creates the extracted data using the filters.</p>
 <p>To re-write the filter events modified by the step you simply need one of the 
 step that takes filter events as input and produce a raw document as output. 
-This could be the &quot;Filter Events to Raw Document&quot; step which takes the filter 
+This could be the <b>Filter Events to Raw Document</b> step which takes the filter 
 events and create an output file in the original file format.</p>
-<p>So you useable pipeline to convert the content of any input file that can be 
+<p>So your useable pipeline to convert the content of any input file that can be 
 filtered will be made of three steps:</p>
 <ol>
-	<li>Raw Document to Filter Events</li>
-	<li>Full-Width Conversion</li>
-	<li>Filter events to Raw Document</li>
+	<li>raw document ==&gt; <b>Raw Document to Filter Events</b> ==&gt; filter events</li>
+	<li>filter events ==&gt; <b>Full-Width Conversion</b> ==&gt; filter events</li>
+	<li>filter events ==&gt; <b>Filter Events to Raw Document</b> == raw document</li>
 </ol>
+<p>In this case we use the <b>Filter Events to Raw Document</b> step to create 
+the output in the same format as the input, but you could use other steps to 
+generate different outputs. For instance, the step <b>Format Conversion</b> 
+allows you to choose between different bilingual formats (such as TMX, PO, etc.) 
+for the output.</p>
+<p>Some steps, such as <b>Search And Replace</b>, can take either a raw document 
+or filter events as input and output either as well, depending on the step&#39;s 
+options.</p>
 <h2><a name="MultiTasks"></a>Multi-Tasks Pipelines</h2>
 <p>The real power of pipelines really comes to light when you chain multiple 
 steps without having to re-extract the text, or perform different raw-document 
 taks one after the other automatically.</p>
 <h2><a name="FAQ"></a>Frequently Asked Questions</h2>
-<p>Q: How do I specify what filter configuration to use with &quot;Raw Document to 
-Filter Events&quot;?<br>
+<p>Q: How do I specify what filter configuration to use with the <b>Raw Document to 
+Filter Events</b> step?<br>
 A: In the Rainbow Input List tabs, you associate one filter configuration per 
 input file.</p>
 <p>Q: How do I specify the name of the output file?<br>

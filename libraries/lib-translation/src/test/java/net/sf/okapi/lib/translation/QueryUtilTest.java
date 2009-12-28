@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.translation;
 
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -30,10 +31,12 @@ import static org.junit.Assert.*;
 public class QueryUtilTest {
 
 	private QueryUtil qu;
+	private GenericContent fmt;
 	
 	@Before
 	public void setUp() {
 		qu = new QueryUtil();
+		fmt = new GenericContent();
 	}
 
 	@Test
@@ -86,6 +89,29 @@ public class QueryUtilTest {
 	}
 	
 	@Test
+	public void testFromSameHTMLComplex () {
+		TextFragment tf = makeComplexFragment();
+		String htmlText = qu.toCodedHTML(tf);
+		String codedText = qu.fromCodedHTML(htmlText, tf);
+		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
+		assertEquals("t1<1><2>bs1</2></1>t2<3>b1</3>", fmt.setContent(resFrag).toString());
+	}
+	
+	@Test
+	public void testFromHTMLComplexWithMovedCodes () {
+		TextFragment tf = makeComplexFragment();
+		String htmlText = qu.toCodedHTML(tf);
+		// What we send:
+		assertEquals("t1<s id='1'><s id='2'>bs1</s></s>t2<s id='3'>b1</s>", htmlText);
+		// What we get back from the translation:
+		htmlText = "t1<s id='2'><s id='3'><s id='1'>t2</s></s>t3</s>";
+		String codedText = qu.fromCodedHTML(htmlText, tf);
+		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
+		assertEquals("t1<2><3><1>t2</1></3>t3</2>", fmt.setContent(resFrag).toString());
+		assertEquals("t1<s><b><b>t2</b></b>t3</s>", resFrag.toString());
+	}
+	
+	@Test
 	public void testWithEscapes () {
 		TextFragment tf = makeFragment();
 		String htmlText = qu.toCodedHTML(tf);
@@ -105,4 +131,19 @@ public class QueryUtilTest {
 		tf.append(" z");
 		return tf;
 	}
+
+	private TextFragment makeComplexFragment () {
+		TextFragment tf = new TextFragment("t1");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "s", "<s>");
+		tf.append("bs1");
+		tf.append(TagType.CLOSING, "s", "</s>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("t2");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("b1");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		return tf;
+	}
+
 }
