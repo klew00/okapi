@@ -23,6 +23,7 @@
 		<module>fullwidthconversion-ui</module>
 		<module>generatesimpletm</module>
 		<module>leveraging</module>
+		<module>leveraging-ui</module>
 		<module>linebreakconversion</module>
         <module>linebreakconversion-ui</module>
 		<module>searchandreplace</module>

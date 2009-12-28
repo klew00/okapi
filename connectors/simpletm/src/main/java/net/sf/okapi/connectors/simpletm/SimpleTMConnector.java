@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -53,7 +54,9 @@ public class SimpleTMConnector implements ITMQuery {
 	}
 
 	public String getSettingsDisplay () {
-		return "Database: "+params.getDbPath();
+		return "Database: " + (Util.isEmpty(params.getDbPath())
+			? "<To be specified>"
+			: params.getDbPath());
 	}
 	
 	public void setMaximumHits (int max) {

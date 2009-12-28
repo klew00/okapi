@@ -22,6 +22,7 @@ package net.sf.okapi.connectors.pensieve;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -56,7 +57,9 @@ public class PensieveTMConnector implements ITMQuery {
 	}
 
 	public String getSettingsDisplay () {
-		return "Database: " + params.getDbDirectory();
+		return "Database: " + (Util.isEmpty(params.getDbDirectory())
+			? "<To be specified>"
+			: params.getDbDirectory());
 	}
 
 	public void setMaximumHits (int max) {

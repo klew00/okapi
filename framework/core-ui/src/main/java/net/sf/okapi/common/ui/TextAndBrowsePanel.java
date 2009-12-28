@@ -62,6 +62,14 @@ public class TextAndBrowsePanel extends Composite {
 		createContent(isFolder, buttonLabel);
 	}
 	
+	/**
+	 * Creates a new TextAndBrowsePanel object with given arguments and a button
+	 * with a label set to "...".
+	 * @param parent the parent of the panel.
+	 * @param flags the style of the panel.
+	 * @param isFolder true for a directory/folder browse button, false
+	 * for a file browse button.
+	 */
 	public TextAndBrowsePanel (Composite parent,
 		int flags,
 		boolean isFolder)

@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: LeveragingStep Parameters Editor
+Bundle-SymbolicName: net.sf.okapi.ui.steps.leveraging
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.steps.ui.leveraging
+Require-Bundle: net.sf.okapi.steps.leveraging;bundle-version="1.0.0",
+ net.sf.okapi.common;bundle-version="1.0.0",
+ net.sf.okapi.ui.common;bundle-version="1.0.0",
+ net.sf.okapi.ui.lib.translation;bundle-version="1.0.0",
+ org.eclipse.swt;bundle-version="3.4.2"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

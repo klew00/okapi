@@ -292,6 +292,11 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-leveraging-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-codeshandling</artifactId>
 			<version>${project.version}</version>
 		</dependency>

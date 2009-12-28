@@ -144,7 +144,7 @@ public class QueryUtil {
 				break;
 			case TextFragment.MARKER_SEGMENT:
 				// Segment-holder text not supported
-				throw new RuntimeException("Fragment with segment markers are not supported by the Google connector. Send the segments instead.");
+				throw new RuntimeException("Fragment with segment markers are not supported. Use the segments instead.");
 			case '&':
 				sb.append("&amp;");
 				break;
