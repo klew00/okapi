@@ -94,16 +94,16 @@ public class PathInputPart extends AbstractPart {
 	}
 
 	/**
-	 * Gets the title of the path browse dialog.
-	 * @return the title of the path browse dialog.
+	 * Gets the title of the path browsing dialog.
+	 * @return the title of the path browsing dialog.
 	 */
 	public String getBrowseTitle () {
 		return browseTitle;
 	}
 
 	/**
-	 * Sets the title of the path browse dialog.
-	 * @param browseTitle the new title of the path browse dialog.
+	 * Sets the title of the path browsing dialog.
+	 * @param browseTitle the new title of the path browsing dialog.
 	 */
 	public void setBrowseTitle (String browseTitle) {
 		this.browseTitle = browseTitle;

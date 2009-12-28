@@ -24,6 +24,7 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.FolderInputPart;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
 import net.sf.okapi.common.uidescription.TextInputPart;
@@ -230,8 +231,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		pip.setMasterPart(cbp, true);
 
 		cbp = desc.addCheckboxPart(paramDesc.get(MAKETM));
-		tip = desc.addTextInputPart(paramDesc.get(TMDIRECTORY));
-		tip.setMasterPart(cbp, true);
+		FolderInputPart fip = desc.addFolderInputPart(paramDesc.get(TMDIRECTORY), "TM Directory");
+		fip.setMasterPart(cbp, true);
 
 		cbp = desc.addCheckboxPart(paramDesc.get(MAKETMX));
 		pip = desc.addPathInputPart(paramDesc.get(TMXPATH), "TMX Path", true);
@@ -239,8 +240,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		pip.setMasterPart(cbp, true);
 		
 		cbp = desc.addCheckboxPart(paramDesc.get(CHECKEXISTINGTM));
-		tip = desc.addTextInputPart(paramDesc.get(EXISTINGTM));
-		tip.setMasterPart(cbp, true);
+		fip = desc.addFolderInputPart(paramDesc.get(EXISTINGTM), "TM Directory");
+		fip.setMasterPart(cbp, true);
 
 		return desc;
 	}

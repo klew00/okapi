@@ -71,7 +71,7 @@ public class GenericEditor {
 	private EditorDescription description;
 	private Hashtable<String, Control> controls;
 	private Hashtable<Control, MasterItem> masters;
-	private boolean hasPathInput;
+	private boolean hasLongField;
 	
 	/**
 	 * Internal class to store master control and its slaves.
@@ -191,7 +191,7 @@ public class GenericEditor {
 		mainComposite.setLayout(layTmp);
 
 		// Create the UI parts
-		hasPathInput = false;
+		hasLongField = false;
 		Composite cmp;
 		GridData gdTmp;
 		
@@ -237,7 +237,7 @@ public class GenericEditor {
 				ctrl.setLayoutData(gdTmp);
 				controls.put(d.getName(), ctrl);
 				ctrl.setEditable(d.getWriteMethod()!=null);
-				hasPathInput = true;
+				hasLongField = true;
 			}
 			else if ( part instanceof FolderInputPart ) {
 				FolderInputPart d = (FolderInputPart)part;
@@ -250,7 +250,7 @@ public class GenericEditor {
 				ctrl.setLayoutData(gdTmp);
 				controls.put(d.getName(), ctrl);
 				ctrl.setEditable(d.getWriteMethod()!=null);
-				hasPathInput = true;
+				hasLongField = true;
 			}
 			else if ( part instanceof ListSelectionPart ) {
 				ListSelectionPart d = (ListSelectionPart)part;
@@ -341,7 +341,7 @@ public class GenericEditor {
 
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
-		if ( hasPathInput ) {
+		if ( hasLongField ) {
 			Point startSize = shell.getMinimumSize();
 			if ( startSize.x < 600 ) startSize.x = 600; 
 			shell.setSize(startSize);
