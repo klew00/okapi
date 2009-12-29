@@ -117,6 +117,12 @@
         </dependency>
         <dependency>
         	<groupId>net.sf.okapi.filters</groupId>
+        	<artifactId>okapi-filter-pensieve</artifactId>
+        	<version>${project.version}</version>
+        	<scope>compile</scope>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.filters</groupId>
         	<artifactId>okapi-filter-html</artifactId>
         	<version>${project.version}</version>
         	<scope>compile</scope>

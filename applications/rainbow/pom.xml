@@ -204,6 +204,11 @@
 			<artifactId>okapi-filter-ttx</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-pensieve</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>

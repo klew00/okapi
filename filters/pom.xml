@@ -22,6 +22,7 @@
         <module>openoffice-ui</module>
         <module>openxml</module>
         <module>openxml-ui</module>
+        <module>pensieve</module>
         <module>plaintext</module>
         <module>plaintext-ui</module>
         <module>po</module>

@@ -499,7 +499,8 @@ public class Main {
 		filtersMap.put("okf_json", "net.sf.okapi.filters.json.JSONFilter");
 
 		filtersMap.put("okf_phpcontent", "net.sf.okapi.filters.php.PHPContentFilter");
-		filtersMap.put("okf_pensieve", "net.sf.okapi.steps.formatconversion.PensieveFilter");
+
+		filtersMap.put("okf_pensieve", "net.sf.okapi.filters.pensieve.PensieveFilter");
 	}
 	
 	private String getConfigurationId (String ext) {

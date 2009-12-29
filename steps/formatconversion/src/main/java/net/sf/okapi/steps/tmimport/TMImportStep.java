@@ -27,7 +27,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.steps.formatconversion.PensieveFilterWriter;
+import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 
 public class TMImportStep extends BasePipelineStep {
 
