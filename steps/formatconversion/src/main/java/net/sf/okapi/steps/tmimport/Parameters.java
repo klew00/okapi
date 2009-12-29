@@ -18,51 +18,62 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.generatesimpletm;
+package net.sf.okapi.steps.tmimport;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+
+	private static final String TMDIRECTORY = "tmDirectory";
 	
-	private String tmPath;
+	private String tmDirectory;
 	
 	public Parameters () {
 		reset();
 	}
-	
-	public String getTmPath () {
-		return tmPath;
+
+	public String getTmDirectory () {
+		return tmDirectory;
 	}
 
-	public void setTmPath (String tmPath) {
-		this.tmPath = tmPath;
+	public void setTmDirectory (String tmDirectory) {
+		this.tmDirectory = tmDirectory;
 	}
 
 	@Override
-	public void reset() {
-		tmPath = "";
+	public void reset () {
+		tmDirectory = "";
 	}
 
 	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		tmPath = buffer.getString("tmPath", tmPath);
+		tmDirectory = buffer.getString(TMDIRECTORY, tmDirectory);
 	}
 
 	@Override
 	public String toString() {
 		buffer.reset();
-		buffer.setString("tmPath", tmPath);
+		buffer.setString(TMDIRECTORY, tmDirectory);
 		return buffer.toString();
 	}
-	
+
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("tmPath", "Path of the TM", "Full path of the TM to generate.");
+		desc.add(TMDIRECTORY, "Directory of the TM where to import",
+			"Full path of directory of the TM where to import");
 		return desc;
 	}
-	
+
+	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("TM Import", true, false);
+		desc.addFolderInputPart(paramDesc.get(TMDIRECTORY), "TM Directory");
+		return desc;
+	}
+
 }

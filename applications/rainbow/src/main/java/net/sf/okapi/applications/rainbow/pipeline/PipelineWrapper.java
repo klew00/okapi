@@ -298,6 +298,17 @@ public class PipelineWrapper {
 			}
 			map.put(step.id, step);
 
+			ps = (IPipelineStep)Class.forName(
+		 		"net.sf.okapi.steps.tmimport.TMImportStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(),
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.tmimport.Parameters", step.paramsClass);
+			}
+			map.put(step.id, step);
 			
 /*			ps = (IPipelineStep)Class.forName(
 			"net.sf.okapi.steps.tokenization.TokenizationStep").newInstance();
@@ -429,8 +440,10 @@ public class PipelineWrapper {
 		StepInfo stepInfo;
 		for ( int i=0; i<destSteps.size(); i++ ) {
 			stepInfo = steps.get(i);
-			IParameters params = destSteps.get(i).getParameters(); 
-			params.fromString(stepInfo.paramsData);
+			IParameters params = destSteps.get(i).getParameters();
+			if ( params != null ) {
+				params.fromString(stepInfo.paramsData);
+			}
 		}
 	}
 

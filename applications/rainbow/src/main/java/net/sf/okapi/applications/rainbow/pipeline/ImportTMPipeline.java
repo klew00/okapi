@@ -21,15 +21,15 @@
 package net.sf.okapi.applications.rainbow.pipeline;
 
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
-import net.sf.okapi.steps.generatesimpletm.GenerateSimpleTmStep;
+import net.sf.okapi.steps.tmimport.TMImportStep;
 
 public class ImportTMPipeline extends PredefinedPipeline {
 
 	public ImportTMPipeline () {
 		super("ImportTMPipeline",
-			"Generate SimpleTM Database");
+			"Import Into Pensieve TM");
 		addStep(new RawDocumentToFilterEventsStep());
-		addStep(new GenerateSimpleTmStep());
+		addStep(new TMImportStep());
 	}
 	
 }
