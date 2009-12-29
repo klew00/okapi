@@ -203,12 +203,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(BLOCKSIZE, "Block size", "Maximum number of text units to process together");
 		desc.add(SEGMENT, "Pre-segment the entries", null);
 		desc.add(SRXPATH, "SRX path", "Full path of the segmentation rules file to use");
-		desc.add(MAKETM, "Import into a Pensieve TM", null);
+		desc.add(MAKETM, "Import into a TM", null);
 		desc.add(TMDIRECTORY, "Directory of the TM where to import", "Location of the TM to create or use");
 		desc.add(MAKETMX, "Create a TMX document", null);
 		desc.add(TMXPATH, "TMX path", "Full path of the new TMX document to create");
-		desc.add(CHECKEXISTINGTM, "Check for existing entries in a given TM", null);
-		desc.add(EXISTINGTM, "Directory of the existing TM", "Location of the TM to lookup first");
+		desc.add(CHECKEXISTINGTM, "Check for existing entries in an existing TM", null);
+		desc.add(EXISTINGTM, "Directory of the existing TM", "Location of the TM to lookup");
 		return desc;
 	}
 

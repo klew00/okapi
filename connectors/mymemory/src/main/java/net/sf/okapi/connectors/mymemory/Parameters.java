@@ -22,8 +22,11 @@ package net.sf.okapi.connectors.mymemory;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
-public class Parameters extends BaseParameters {
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	public static final String KEY = "key";
 	public static final String USEMT = "useMT";
@@ -56,6 +59,7 @@ public class Parameters extends BaseParameters {
 		this.useMT = useMT;
 	}
 
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
@@ -63,6 +67,7 @@ public class Parameters extends BaseParameters {
 		useMT = buffer.getInteger(Parameters.USEMT, useMT);
 	}
 
+	@Override
 	public void reset () {
 		key = "mmDemo123";
 		useMT = 1;
@@ -84,4 +89,12 @@ public class Parameters extends BaseParameters {
 		return desc;
 	}
 
+	@Override
+	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("MyMemory TM Connector Settings");
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.KEY));
+		tip.setPassword(true);
+		desc.addCheckboxPart(paramsDesc.get(Parameters.USEMT));
+		return desc;
+	}
 }

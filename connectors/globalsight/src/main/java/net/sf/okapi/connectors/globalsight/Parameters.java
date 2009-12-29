@@ -22,13 +22,16 @@ package net.sf.okapi.connectors.globalsight;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
-public class Parameters extends BaseParameters {
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	protected static final String USERNAME = "username";
-	protected static final String PASSWORD = "password";
-	protected static final String SERVERURL = "serverURL";
-	protected static final String TMPROFILE = "tmProfile";
+	private static final String USERNAME = "username";
+	private static final String PASSWORD = "password";
+	private static final String SERVERURL = "serverURL";
+	private static final String TMPROFILE = "tmProfile";
 	
 	private String username;
 	private String password;
@@ -76,6 +79,7 @@ public class Parameters extends BaseParameters {
 		this.tmProfile = tmProfile;
 	}
 
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
@@ -85,6 +89,7 @@ public class Parameters extends BaseParameters {
 		tmProfile = buffer.getString(Parameters.TMPROFILE, tmProfile);
 	}
 
+	@Override
 	public void reset () {
 		username = "";
 		password = "";
@@ -115,4 +120,16 @@ public class Parameters extends BaseParameters {
 			"TM profile", "The name of the TM profile to use");
 		return desc;
 	}
+
+	@Override
+	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("GlobalSight TM Connector Settings");
+		desc.addTextInputPart(paramsDesc.get(Parameters.SERVERURL));
+		desc.addTextInputPart(paramsDesc.get(Parameters.USERNAME));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.PASSWORD));
+		tip.setPassword(true);
+		desc.addTextInputPart(paramsDesc.get(Parameters.TMPROFILE));
+		return desc;
+	}
+
 }

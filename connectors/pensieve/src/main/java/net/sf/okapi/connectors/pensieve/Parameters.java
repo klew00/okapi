@@ -22,10 +22,12 @@ package net.sf.okapi.connectors.pensieve;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	public static final String DBDIRECTORY = "dbDirectory";
+	private static final String DBDIRECTORY = "dbDirectory";
 
 	private String dbDirectory;
 	
@@ -46,12 +48,14 @@ public class Parameters extends BaseParameters {
 		this.dbDirectory = dbDirectory;
 	}
 
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		dbDirectory = buffer.getString(DBDIRECTORY, dbDirectory);
 	}
 
+	@Override
 	public void reset () {
 		dbDirectory = "";
 	}
@@ -67,6 +71,13 @@ public class Parameters extends BaseParameters {
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(DBDIRECTORY, "TM Directory", "Directory of the TM database");
+		return desc;
+	}
+
+	@Override
+	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Pensieve TM Connector Settings", true, false);
+		desc.addFolderInputPart(paramsDesc.get(Parameters.DBDIRECTORY), "TM Directory");
 		return desc;
 	}
 

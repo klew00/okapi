@@ -17,7 +17,7 @@ public class DefaultConnectors implements IConnectorList {
 		ConnectorInfo trc = new ConnectorInfo();
 		trc.description = "Pensieve TM Engine (Beta)";
 		trc.connectorClass = "net.sf.okapi.connectors.pensieve.PensieveTMConnector";
-		trc.descriptionProviderClass = "net.sf.okapi.connectors.pensieve.ParametersUI";
+		trc.descriptionProviderClass = "net.sf.okapi.connectors.pensieve.Parameters";
 		list.add(trc);
 		
 		trc = new ConnectorInfo();
@@ -29,7 +29,7 @@ public class DefaultConnectors implements IConnectorList {
 		trc = new ConnectorInfo();
 		trc.description = "GlobalSight TM Web Services";
 		trc.connectorClass = "net.sf.okapi.connectors.globalsight.GlobalSightTMConnector";
-		trc.descriptionProviderClass = "net.sf.okapi.connectors.globalsight.ParametersUI";
+		trc.descriptionProviderClass = "net.sf.okapi.connectors.globalsight.Parameters";
 		list.add(trc);
 		
 		trc = new ConnectorInfo();
@@ -40,7 +40,7 @@ public class DefaultConnectors implements IConnectorList {
 		trc = new ConnectorInfo();
 		trc.description = "MyMemory TM Web Services (Beta connector)";
 		trc.connectorClass = "net.sf.okapi.connectors.mymemory.MyMemoryTMConnector";
-		trc.descriptionProviderClass = "net.sf.okapi.connectors.mymemory.ParametersUI";
+		trc.descriptionProviderClass = "net.sf.okapi.connectors.mymemory.Parameters";
 		list.add(trc);
 
 		trc = new ConnectorInfo();
@@ -51,7 +51,7 @@ public class DefaultConnectors implements IConnectorList {
 		trc = new ConnectorInfo();
 		trc.description = "Translate Toolkit TM Server";
 		trc.connectorClass = "net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector";
-		trc.descriptionProviderClass = "net.sf.okapi.connectors.translatetoolkit.ParametersUI";
+		trc.descriptionProviderClass = "net.sf.okapi.connectors.translatetoolkit.Parameters";
 		list.add(trc);
 
 		trc = new ConnectorInfo();

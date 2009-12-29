@@ -22,8 +22,10 @@ package net.sf.okapi.connectors.translatetoolkit;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private String host;
 	private int port;
@@ -37,6 +39,7 @@ public class Parameters extends BaseParameters {
 		fromString(initialData);
 	}
 	
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
@@ -44,6 +47,7 @@ public class Parameters extends BaseParameters {
 		port = buffer.getInteger("port", port);
 	}
 
+	@Override
 	public void reset () {
 		host = "localhost";
 		port = 8080;
@@ -82,4 +86,13 @@ public class Parameters extends BaseParameters {
 			"Port", "The port number of the TM server (e.g. 8080)");
 		return desc;
 	}
+
+	@Override
+	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Translation Toolkit TM Connector Settings");
+		desc.addTextInputPart(paramsDesc.get("host"));
+		desc.addTextInputPart(paramsDesc.get("port"));
+		return desc;
+	}
+
 }

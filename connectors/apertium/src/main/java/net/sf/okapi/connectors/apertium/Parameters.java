@@ -27,7 +27,7 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	static final String SERVER = "server";
+	private static final String SERVER = "server";
 	
 	private String server;
 	
@@ -39,7 +39,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public Parameters (String initialData) {
 		fromString(initialData);
 	}
-	
+
 	public String getServer () {
 		return server;
 	}
@@ -48,12 +48,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.server = server;
 	}
 
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		server = buffer.getString(SERVER, server);
 	}
 
+	@Override
 	public void reset () {
 		// Default
 		server = "http://xixona.dlsi.ua.es:80/webservice/ws.php";
@@ -73,6 +75,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return desc;
 	}
 
+	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Apertium MT Connector Settings");
 		desc.addTextInputPart(paramsDesc.get(SERVER));
