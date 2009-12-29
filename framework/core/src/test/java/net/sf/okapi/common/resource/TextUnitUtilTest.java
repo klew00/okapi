@@ -247,4 +247,33 @@ public class TextUnitUtilTest {
 		assertEquals("Seg1.", res.getSource().toString());
 		assertEquals("Seg1.", res.getTarget(LocaleId.ITALIAN).toString());
 	}
+
+	@Test
+	public void testCreateBilingualTextUnitNM () {
+		ArrayList<Segment> srcSegs = new ArrayList<Segment>();
+		srcSegs.add(new Segment("1", new TextFragment("sSeg1.")));
+		srcSegs.add(new Segment("2", new TextFragment("sSeg2.")));
+		ArrayList<Segment> trgSegs = new ArrayList<Segment>();
+		trgSegs.add(new Segment("2", new TextFragment("tSeg2.")));
+		trgSegs.add(new Segment("1", new TextFragment("tSeg1.")));
+		trgSegs.add(new Segment("3", new TextFragment("tSeg3.")));
+		TextUnit ori = new TextUnit("id", "text");
+		ori.createTarget(LocaleId.ARABIC, true, IResource.COPY_ALL);
+		
+		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori,
+			srcSegs, trgSegs, LocaleId.ITALIAN, "  ");
+		
+		assertEquals(ori.getId(), res.getId());
+		assertEquals("1  2", res.getSource().toString());
+		assertEquals("2  1  3", res.getTarget(LocaleId.ITALIAN).toString());
+		
+		assertEquals(2, res.getSource().getSegmentCount());
+		assertEquals("sSeg1.", res.getSource().getSegments().get(0).toString());
+		
+		assertEquals(3, res.getTarget(LocaleId.ITALIAN).getSegmentCount());
+		Segment seg = res.getTarget(LocaleId.ITALIAN).getSegments().get(0);
+		assertEquals("tSeg2.", seg.toString());
+		assertEquals("2", seg.id);
+	}
+
 }

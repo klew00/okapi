@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
@@ -695,4 +696,85 @@ public class TextUnitUtil {
 		return tu;
 	}
 	
+	/**
+	 * Creates a new text unit based on an existing text unit, with its
+	 * content set to the content of a list of source and a list of target
+	 * segments. All other targets are removed. The segments Ids are
+	 * preserved, so they must be valid, and matching between source and
+	 * target, when appropriate. 
+	 * @param srcTextUnit text unit to use for origin. 
+	 * @param srcSegments list of source segments.
+	 * @param trgSegments list of target segments.
+	 * @param trgLocaleId target locale.
+	 * @param interSegmentSpace the string to add between each segments
+	 * (use null or empty for nothing between segments).
+	 * @return a new text unit with its content set to the given source and 
+	 * target segments.
+	 */
+	public static TextUnit createBilingualTextUnit (TextUnit srcTextUnit,
+		List<Segment> srcSegments,
+		List<Segment> trgSegments,
+		LocaleId trgLocaleId,
+		String interSegmentSpace)
+	{
+		// Clone the original
+		TextUnit tu = srcTextUnit.clone();
+		if ( interSegmentSpace == null ) interSegmentSpace = "";
+
+		// Add by building the markers so we can preserve the segment ids
+		TextContainer tc = tu.getSource();
+		tc.clear();
+		for ( Segment seg : srcSegments ) {
+			// Add 'space' between segments
+			if ( !tc.isEmpty() ) {
+				tc.append(interSegmentSpace);
+			}
+			// Add marker
+			tc.append(TagType.SEGMENTHOLDER, TextFragment.CODETYPE_SEGMENT, seg.id);
+		}
+		// Now set the corresponding list of segments
+		tc.setSegments(srcSegments);
+
+		// Removes all targets
+		for (LocaleId locId : tu.getTargetLocales()) {
+			tu.removeTarget(locId);
+		}
+		// Create a new target with all the source data
+		tc = tu.createTarget(trgLocaleId, true, TextUnit.COPY_ALL);
+		tc.clear();
+		// Add by building the markers so we can preserve the segment ids
+		for ( Segment seg : trgSegments ) {
+			// Add 'space' between segments
+			if ( !tc.isEmpty() ) {
+				tc.append(interSegmentSpace);
+			}
+			// Add marker
+			tc.append(TagType.SEGMENTHOLDER, TextFragment.CODETYPE_SEGMENT, seg.id);
+		}
+		// Now set the corresponding list of segments
+		tc.setSegments(trgSegments);
+
+		// Return the result
+		return tu;
+	}
+
+	/**
+	 * Convenience method that calls
+	 * {@link #createBilingualTextUnit(TextUnit, List, List, LocaleId, String)}
+	 * with <code>" "</code> as the space between segments.
+	 * @param srcTextUnit text unit to use for origin. 
+	 * @param srcSegments list of source segments.
+	 * @param trgSegments list of target segments.
+	 * @param trgLocaleId target locale.
+	 * @return a new text unit with its content set to the given source and 
+	 * target segments.
+	 */
+	public static TextUnit createBilingualTextUnit (TextUnit srcTextUnit,
+		List<Segment> srcSegments,
+		List<Segment> trgSegments,
+		LocaleId trgLocaleId)
+	{
+		return createBilingualTextUnit(srcTextUnit, srcSegments, trgSegments,
+			trgLocaleId, " ");
+	}	
 }
