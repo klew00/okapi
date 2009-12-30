@@ -256,7 +256,7 @@ public class RawDocument implements IResource {
 			URL url = null;
 			try {
 				url = getInputURI().toURL();
-				inputStream = new BufferedInputStream(getInputURI().toURL().openStream());
+				inputStream = new BufferedInputStream(url.openStream());
 			} catch (IllegalArgumentException e) {
 				throw new OkapiIOException("Could not open the URI. The URI must be absolute: "
 						+ ((url == null) ? "URL is null" : url.toString()), e);
