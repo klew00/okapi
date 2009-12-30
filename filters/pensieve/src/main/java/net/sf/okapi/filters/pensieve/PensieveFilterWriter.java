@@ -52,29 +52,35 @@ public class PensieveFilterWriter implements IFilterWriter {
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 
-	public void cancel() {
+	@Override
+	public void cancel () {
 		// TODO: support cancel
 	}
 
-	public void close() {
+	@Override
+	public void close () {
 		if (writer != null) {
 			writer.close();
 		}
 	}
 
-	public String getName() {
+	@Override
+	public String getName () {
 		return "PensieveFilterWriter";
 	}
 
-	public EncoderManager getEncoderManager() {
+	@Override
+	public EncoderManager getEncoderManager () {
 		return null;
 	}
 
-	public IParameters getParameters() {
+	@Override
+	public IParameters getParameters () {
 		return null;
 	}
 
-	public Event handleEvent(Event event) {
+	@Override
+	public Event handleEvent (Event event) {
 		switch (event.getEventType()) {
 		case START_DOCUMENT:
 			handleStartDocument(event);
@@ -89,43 +95,32 @@ public class PensieveFilterWriter implements IFilterWriter {
 		return event;
 	}
 
-	/**
-	 * Sets the options for this writer.
-	 * 
-	 * @param locale
-	 *            code of the output locale.
-	 * @param defaultEncoding
-	 *            encoding is ignored for this writer (it can be null).
-	 */
-	public void setOptions(LocaleId locale, String defaultEncoding) {
+	@Override
+	public void setOptions (LocaleId locale,
+		String defaultEncoding)
+	{
 		trgLoc = locale;
 		// Encoding is ignored in this writer
 	}
 
-	/**
-	 * Sets the output directory for the TM
-	 * 
-	 * @param path
-	 *            full path of the output directory.
-	 */
-	public void setOutput(String path) {
+	@Override
+	public void setOutput (String path) {
 		File f = new File(path);
 		// We need to make sure this is absolute
 		directory = f.getAbsolutePath(); // We assume it is a directory
 	}
 
-	/**
-	 * This method is not supported by this writer and will throw and exception if called.
-	 */
-	public void setOutput(OutputStream output) {
+	@Override
+	public void setOutput (OutputStream output) {
 		throw new OkapiNotImplementedException("Output type not supported.");
 	}
 
-	public void setParameters(IParameters params) {
+	@Override
+	public void setParameters (IParameters params) {
 		// No parameters for now.
 	}
 
-	private void handleStartDocument(Event event) {
+	private void handleStartDocument (Event event) {
 		Util.createDirectories(directory + File.separator);
 		// TODO: Move this check at the pensieve package level
 		File file = new File(directory + File.separator + "segments.gen");
@@ -136,7 +131,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 		srcLoc = sd.getLocale();
 	}
 
-	private void handleTextUnit(Event event) {
+	private void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit) event.getResource();
 
 		// TODO: What do we do with entries with empty/non-existing target?
@@ -172,4 +167,5 @@ public class PensieveFilterWriter implements IFilterWriter {
 			i++;
 		}
 	}
+
 }

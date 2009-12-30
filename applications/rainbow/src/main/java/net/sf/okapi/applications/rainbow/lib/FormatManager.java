@@ -72,6 +72,7 @@ public class FormatManager {
 		pairs.put(".srt", "okf_regex-srt");
 		pairs.put(".json", "okf_json");
 		pairs.put(".ttx", "okf_ttx");
+		pairs.put(".pentm", "okf_pensieve");
 	}
 	
 	/**
@@ -80,9 +81,13 @@ public class FormatManager {
 	 * @return An array of string: 0=guessed encoding or null,
 	 * 1=guessed filter settings or null,
 	 */
-	public String[] guessFormat (String p_sPath) {
+	public String[] guessFormat (String p_sPath,
+		boolean tryDetectingEncoding)
+	{
 		String[] aRes = new String[2];
-		aRes[0] = Utils.detectEncoding(p_sPath);
+		if ( tryDetectingEncoding ) {
+			aRes[0] = Utils.detectEncoding(p_sPath);
+		}
 		String sExt = Util.getExtension(p_sPath).toLowerCase();
 		aRes[1] = pairs.get(sExt);
 		return aRes;

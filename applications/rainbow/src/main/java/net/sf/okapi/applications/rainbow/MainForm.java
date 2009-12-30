@@ -107,12 +107,13 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class MainForm { //implements IParametersProvider {
 	
-	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
-	
 	public static final String OPT_ALLOWDUPINPUT = "allowDupInput"; //$NON-NLS-1$
 	public static final String OPT_LOADMRU       = "loadMRU"; //$NON-NLS-1$
 	public static final String OPT_BOUNDS        = "bounds"; //$NON-NLS-1$
 	public static final String OPT_LOGLEVEL      = "logLevel"; //$NON-NLS-1$
+	
+	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
+	protected static final String NOEXPAND_EXTENSIONS = ";.pentm;"; //$NON-NLS-1$
 
 	private int currentInput;
 	private ArrayList<Table> inputTables;
@@ -1916,11 +1917,15 @@ public class MainForm { //implements IParametersProvider {
 				path = dir + File.separator + path;
 			}
 			File f = new File(path);
-			if ( f.isDirectory() ) {
+			// Prevent expand of directories in some cases
+			boolean allowExpand = (NOEXPAND_EXTENSIONS.indexOf(Util.getExtension(path))==-1);
+			
+			// Expand (for directories) or add (for files)
+			if ( allowExpand && f.isDirectory() ) {
 				n += doAddDocuments(f.list(), path);
 			}
 			else {
-				String[] res = fm.guessFormat(path);
+				String[] res = fm.guessFormat(path, allowExpand);
 				
 				// If project is not saved and it's the first added file:
 				if (( prj.path == null )

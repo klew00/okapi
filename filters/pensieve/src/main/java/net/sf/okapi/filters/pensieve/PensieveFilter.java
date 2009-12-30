@@ -61,24 +61,28 @@ public class PensieveFilter implements IFilter {
 	private String docName;
 	private EncoderManager encoderManager;
 
+	@Override
 	public void cancel () {
-		// TODO Auto-generated method stub
+		// TODO: implement cancel
 	}
 
+	@Override
 	public void close() {
 		// Nothing to do
 		state = 0;
 	}
 
+	@Override
 	public IFilterWriter createFilterWriter () {
-		// TODO Auto-generated method stub
-		return null;
+		return new PensieveFilterWriter();
 	}
 
+	@Override
 	public ISkeletonWriter createSkeletonWriter () {
 		return null; // No skeleton for this filter
 	}
 
+	@Override
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
@@ -89,6 +93,7 @@ public class PensieveFilter implements IFilter {
 		return list;
 	}
 
+	@Override
 	public EncoderManager getEncoderManager () {
 		if ( encoderManager == null ) {
 			encoderManager = new EncoderManager();
@@ -97,27 +102,33 @@ public class PensieveFilter implements IFilter {
 		return encoderManager;
 	}
 
+	@Override
 	public String getDisplayName () {
 		return "Pensieve TM Filter";
 	}
 
+	@Override
 	public String getMimeType () {
 		return MIMETYPE;
 	}
 
+	@Override
 	public String getName () {
 		return "okf_pensieve";
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return null;
 	}
 
-	public boolean hasNext() {
+	@Override
+	public boolean hasNext () {
 		return (state > 0);
 	}
 
-	public Event next() {
+	@Override
+	public Event next () {
 		switch ( state ) {
 		case 1: // Send start of document
 			StartDocument sd = new StartDocument("sdID");
@@ -161,11 +172,13 @@ public class PensieveFilter implements IFilter {
 		}			
 	}
 
+	@Override
 	public void open (RawDocument input) {
 		open(input, true);
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
@@ -182,6 +195,7 @@ public class PensieveFilter implements IFilter {
 		state = 1;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 	}
 
