@@ -34,6 +34,7 @@ public class LocaleFilterTest {
 
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 	private LocaleId locENGB = LocaleId.fromString("en-gb");
+	private LocaleId locENNZ = LocaleId.fromString("en-nz");
 	private LocaleId locESEQ = LocaleId.fromString("es-eq");
 	private LocaleId locESUS = LocaleId.fromString("es-us");	
 	private LocaleId locFRFR = LocaleId.fromString("fr-fr");
@@ -42,6 +43,9 @@ public class LocaleFilterTest {
 	private LocaleId locFRBE = LocaleId.fromString("fr-be");
 	private LocaleId locDEDE = LocaleId.fromString("de-de");
 	private LocaleId locDECH = LocaleId.fromString("de-ch");
+	private LocaleId locENUS_WIN = new LocaleId("en", "us", "win");
+	private LocaleId locDECH_WIN = new LocaleId("de", "ch", "win");
+	private LocaleId locDECH_MAC = new LocaleId("de", "ch", "mac");
 	
 	@Test
 	public void testMatches() {
@@ -59,6 +63,12 @@ public class LocaleFilterTest {
 		
 		assertFalse(LocaleFilter.none().matches(locESUS));
 		assertFalse(LocaleFilter.none().matches(locENUS));
+		
+		filter = LocaleFilter.none().include(locENUS, locDECH_WIN).includeLanguage("fr");
+		assertFalse(filter.matches(locDEDE));
+		
+		filter = LocaleFilter.any().include(locENUS, locDECH_WIN).includeLanguage("fr");
+		assertTrue(filter.matches(locDEDE));
 	}
 	
 	@Test
@@ -100,31 +110,31 @@ public class LocaleFilterTest {
 		
 		filter.reset();
 		
-		filter.include("en-.*");
+		filter.includePattern("en-.*");
 		assertTrue(filter.matches(locENUS));		
 		assertTrue(filter.matches(locENGB));
 		assertFalse(filter.matches(locFRCA));
 		assertFalse(filter.matches(locESUS));
 		assertFalse(filter.matches(locESEQ));
-		assertEquals(1, filter.getIncludePatterns().size());
+		assertEquals(1, filter.getPatternIncludes().size());
 		
-		filter.include(".*-us");
+		filter.includePattern(".*-us");
 		assertTrue(filter.matches(locENUS));
 		assertTrue(filter.matches(locESUS));
 		assertTrue(filter.matches(locENGB)); // From the previous regex
 		assertFalse(filter.matches(locESEQ));
-		assertEquals(2, filter.getIncludePatterns().size());
+		assertEquals(2, filter.getPatternIncludes().size());
 		
 		filter.reset();
-		assertEquals(0, filter.getIncludePatterns().size());
+		assertEquals(0, filter.getPatternIncludes().size());
 		
-		filter.include("e.*-us");
+		filter.includePattern("e.*-us");
 		assertTrue(filter.matches(locENUS));
 		assertTrue(filter.matches(locESUS));
 		assertFalse(filter.matches(locENGB));
 		assertFalse(filter.matches(locESEQ));
 		assertFalse(filter.matches(locFRCA));
-		assertEquals(1, filter.getIncludePatterns().size());
+		assertEquals(1, filter.getPatternIncludes().size());
 		
 		filter.reset();
 		filter.includeLanguage("en");
@@ -205,31 +215,31 @@ public class LocaleFilterTest {
 		
 		filter.reset();
 		
-		filter.exclude("en-.*");
+		filter.excludePattern("en-.*");
 		assertFalse(filter.matches(locENUS));		
 		assertFalse(filter.matches(locENGB));
 		assertTrue(filter.matches(locFRCA));
 		assertTrue(filter.matches(locESUS));
 		assertTrue(filter.matches(locESEQ));
-		assertEquals(1, filter.getExcludePatterns().size());
+		assertEquals(1, filter.getPatternExcludes().size());
 		
-		filter.exclude(".*-us");
+		filter.excludePattern(".*-us");
 		assertFalse(filter.matches(locENUS));
 		assertFalse(filter.matches(locESUS));
 		assertFalse(filter.matches(locENGB)); // From the previous regex
 		assertTrue(filter.matches(locESEQ));
-		assertEquals(2, filter.getExcludePatterns().size());
+		assertEquals(2, filter.getPatternExcludes().size());
 		
 		filter.reset();
-		assertEquals(0, filter.getExcludePatterns().size());
+		assertEquals(0, filter.getPatternExcludes().size());
 		
-		filter.exclude("e.*-us");
+		filter.excludePattern("e.*-us");
 		assertFalse(filter.matches(locENUS));
 		assertFalse(filter.matches(locESUS));
 		assertTrue(filter.matches(locENGB));
 		assertTrue(filter.matches(locESEQ));
 		assertTrue(filter.matches(locFRCA));
-		assertEquals(1, filter.getExcludePatterns().size());
+		assertEquals(1, filter.getPatternExcludes().size());
 		
 		filter.reset();
 		filter.excludeLanguage("en");
@@ -287,4 +297,219 @@ public class LocaleFilterTest {
 		filter.exclude(filter2);
 		assertFalse(filter.matches(locENUS));
 	}
+	
+	@Test
+	public void testFromString() {
+		
+		LocaleFilter filter = new LocaleFilter();
+		//filter.fromString("item1, @item{2,5}+, !item3");
+		
+		// Masks
+		filter.fromString("*");
+		assertTrue(filter.matches(locENUS));
+		
+		filter.fromString("!*");
+		assertFalse(filter.matches(locENUS));
+		
+		filter.fromString("en");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locENGB));
+		assertFalse(filter.matches(locESUS));
+		
+		filter.fromString("*-*");
+		assertTrue(filter.matches(locENUS));
+		
+		filter.fromString("!*-*");
+		assertFalse(filter.matches(locENUS));
+		
+		filter.fromString("*-us");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locESUS));
+		assertFalse(filter.matches(locENGB));
+		
+		filter.fromString("en-*");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locENGB));
+		assertFalse(filter.matches(locESUS));		
+		
+		filter.fromString("en-us");
+		assertTrue(filter.matches(locENUS));
+		assertFalse(filter.matches(locENGB));
+		
+		filter.fromString("*-*-*");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locDECH_WIN));
+		assertTrue(filter.matches(locDECH_MAC));
+		
+		filter.fromString("!*-*-*");
+		assertFalse(filter.matches(locENUS));
+		
+		filter.fromString("*-*-win");
+		assertTrue(filter.matches(locDECH_WIN));
+		assertTrue(filter.matches(locENUS_WIN));
+		assertFalse(filter.matches(locDECH_MAC));
+		
+		filter.fromString("*-ch-*");
+		assertTrue(filter.matches(locDECH_WIN));
+		assertTrue(filter.matches(locDECH_MAC));
+		assertFalse(filter.matches(locENUS_WIN));
+		
+		filter.fromString("*-ch-win");
+		assertTrue(filter.matches(locDECH_WIN));
+		assertFalse(filter.matches(locDECH_MAC));
+		
+		filter.fromString("de-*-*");
+		assertTrue(filter.matches(locDECH_WIN));
+		assertTrue(filter.matches(locDECH_MAC));
+		assertFalse(filter.matches(locENUS_WIN));
+		
+		filter.fromString("de-*-win");
+		assertTrue(filter.matches(locDECH_WIN));
+		assertFalse(filter.matches(locDECH_MAC));
+		assertFalse(filter.matches(locENUS_WIN));
+		
+		filter.fromString("de-ch-*");
+		assertTrue(filter.matches(locDECH_WIN));
+		assertTrue(filter.matches(locDECH_MAC));
+		assertFalse(filter.matches(locENUS_WIN));
+		
+		filter.fromString("de-ch-win");
+		assertTrue(filter.matches(locDECH_WIN));
+		assertFalse(filter.matches(locDECH_MAC));
+		assertFalse(filter.matches(locENUS_WIN));
+		
+		// Chains
+		filter.fromString("en !en-nz");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locENGB));
+		assertTrue(filter.matches(locENUS_WIN));
+		assertFalse(filter.matches(locENNZ));
+		assertFalse(filter.matches(locDECH));
+		
+		filter.fromString("!en-nz");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locENGB));
+		assertTrue(filter.matches(locENUS_WIN));
+		assertFalse(filter.matches(locENNZ));
+		assertTrue(filter.matches(locDECH));
+		assertTrue(filter.matches(locDEDE));
+		assertTrue(filter.matches(locDECH_WIN));
+		
+		filter.fromString("en !en-nz en-nz");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locENGB));
+		assertTrue(filter.matches(locENUS_WIN));
+		assertTrue(filter.matches(locENNZ));
+		assertFalse(filter.matches(locDECH));
+		assertFalse(filter.matches(locDEDE));
+		assertFalse(filter.matches(locDECH_WIN));
+		
+		filter.fromString("!en-nz en-nz");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locENGB));
+		assertTrue(filter.matches(locENUS_WIN));
+		assertTrue(filter.matches(locENNZ));
+		assertTrue(filter.matches(locDECH));
+		assertTrue(filter.matches(locDEDE));
+		assertTrue(filter.matches(locDECH_WIN));
+		
+		// Regex
+		filter.fromString("@e[ns]-.+");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locENGB));
+		assertTrue(filter.matches(locENUS_WIN));
+		assertTrue(filter.matches(locESUS));
+		assertTrue(filter.matches(locENNZ));
+		assertFalse(filter.matches(locDECH));
+		assertFalse(filter.matches(locDEDE));
+		assertFalse(filter.matches(locDECH_WIN));
+		
+		filter.fromString("!@e[ns]-.+");
+		assertFalse(filter.matches(locENUS));
+		assertFalse(filter.matches(locENGB));
+		assertFalse(filter.matches(locENUS_WIN));
+		assertFalse(filter.matches(locESUS));
+		assertFalse(filter.matches(locENNZ));
+		assertTrue(filter.matches(locDECH));
+		assertTrue(filter.matches(locDEDE));
+		assertTrue(filter.matches(locDECH_WIN));
+		
+		filter.fromString("@en-.+ @es-.+");
+		assertTrue(filter.matches(locENUS));
+		assertTrue(filter.matches(locENGB));
+		assertTrue(filter.matches(locENUS_WIN));
+		assertTrue(filter.matches(locESUS));
+		assertTrue(filter.matches(locENNZ));
+		assertFalse(filter.matches(locDECH));
+		assertFalse(filter.matches(locDEDE));
+		assertFalse(filter.matches(locDECH_WIN));
+		
+		filter.fromString("!@en-.+ !@es-.+");
+		assertFalse(filter.matches(locENUS));
+		assertFalse(filter.matches(locENGB));
+		assertFalse(filter.matches(locENUS_WIN));
+		assertFalse(filter.matches(locESUS));
+		assertFalse(filter.matches(locENNZ));
+		assertTrue(filter.matches(locDECH));
+		assertTrue(filter.matches(locDEDE));
+		assertTrue(filter.matches(locDECH_WIN));
+	}
+	
+	@Test
+	public void testToString() {
+		
+		assertEquals("", LocaleFilter.any().toString());
+		assertEquals("!*", LocaleFilter.none().toString());
+		assertEquals("* en-us", LocaleFilter.any().include(locENUS).toString());
+		
+		assertEquals("!en-us !de-ch-win", LocaleFilter.anyExcept(locENUS, locDECH_WIN).toString());
+		assertEquals("en-us de-ch-win", LocaleFilter.anyOf(locENUS, locDECH_WIN).toString());
+		assertEquals("en-us de-ch-win", LocaleFilter.build("en-us !de-ch-win de-ch-win").toString());
+		assertEquals("en-us de-ch-win !de-ch", LocaleFilter.build("en-us !de-ch de-ch-win").toString());
+		
+		assertEquals("en-us de-ch-win fr", LocaleFilter.none().include(locENUS, locDECH_WIN).includeLanguage("fr").toString());
+		assertEquals("* en-us de-ch-win fr", LocaleFilter.any().include(locENUS, locDECH_WIN).includeLanguage("fr").toString());
+		assertEquals("!en-us !de-ch-win fr", LocaleFilter.any().exclude(locENUS, locDECH_WIN).includeLanguage("fr").toString());
+		assertEquals("fr !en-us !de-ch-win", LocaleFilter.none().exclude(locENUS, locDECH_WIN).includeLanguage("fr").toString());
+		assertEquals("!* !en-us !de-ch-win", LocaleFilter.none().exclude(locENUS, locDECH_WIN).toString());
+		
+		assertEquals("@pattern", LocaleFilter.none().includePattern("pattern").toString());
+		assertEquals("@pattern ^8", LocaleFilter.none().includePattern("pattern", 8).toString());
+		assertEquals("!@pattern", LocaleFilter.any().excludePattern("pattern").toString());
+		assertEquals("!@pattern ^8", LocaleFilter.any().excludePattern("pattern", 8).toString());
+		assertEquals("!@pattern1 ^8 !@pattern2 !@pattern3 ^2", LocaleFilter.any().excludePattern("pattern1", 8).excludePattern("pattern2").excludePattern("pattern3", 2).toString());
+	}
+	
+	@Test
+	public void testIncludeAfterExclude() {
+		
+		LocaleFilter filter = new LocaleFilter();
+		
+		assertTrue(filter.matches(locENUS));
+		filter.exclude(locENUS);
+		assertFalse(filter.matches(locENUS));
+		filter.include(locENUS);
+		assertTrue(filter.matches(locENUS));
+		
+		filter.excludeLanguage("en");
+		assertFalse(filter.matches(locENUS));
+		filter.includeLanguage("en");
+		assertTrue(filter.matches(locENUS));
+		
+		filter.excludeRegion("us");
+		assertFalse(filter.matches(locENUS));
+		filter.includeRegion("us");
+		assertTrue(filter.matches(locENUS));
+		
+		filter.excludeUserPart("mac");
+		assertFalse(filter.matches(LocaleId.fromPOSIXLocale("es_us@mac")));
+		filter.includeUserPart("mac");
+		assertTrue(filter.matches(LocaleId.fromPOSIXLocale("es_us@mac")));
+		
+		filter.excludePattern("en-.*");
+		assertFalse(filter.matches(locENUS));
+		filter.includePattern("en-.*");
+		assertTrue(filter.matches(locENUS));
+	}
+	
 }

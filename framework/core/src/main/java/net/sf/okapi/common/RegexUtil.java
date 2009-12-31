@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,35 +18,33 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tokenization.ui.locale;
+package net.sf.okapi.common;
 
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import net.sf.okapi.common.ListUtil;
-import net.sf.okapi.common.ui.abstracteditor.InputQueryDialog;
+public class RegexUtil {
 
-import org.eclipse.swt.widgets.Shell;
-
-public class LanguageSelector {
-
-	public static void main(String[] args) {
-		
-		select();
-	}
-
-	public static String[] select() {
-		
-		return select(null, LanguageSelectorPage.class, null); 
-	}
+	public static String replaceAll(String string, String regex, int group, String replacement) {
 	
-	public static String[] select(Shell parent, Class<? extends LanguageSelectorPage> classRef, String initialData) {
-		
-		InputQueryDialog dlg = new InputQueryDialog();
-		List<String> list = ListUtil.stringAsList(initialData, " ");
-		
-		dlg.run(parent, classRef, "Languages", "", list, null);
-			
-		return list.toArray(new String[] {}); 
+		Pattern pattern = Pattern.compile(regex);
+	    Matcher matcher = pattern.matcher(string);
+	    
+	    // Replace all occurrences of pattern in input
+	    StringBuffer buf = new StringBuffer();
+	    
+	    int start = 0;
+	    int end = 0;
+	    
+	    while (matcher.find()) {
+	    
+	        start = matcher.start(group);
+	        buf.append(string.substring(end, start));
+	        buf.append(replacement);
+	        end = matcher.end(group);
+	    }
+	    
+	    buf.append(string.substring(end));
+	    return buf.toString();
 	}
-
 }

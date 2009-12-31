@@ -22,7 +22,7 @@ package net.sf.okapi.steps.tokenization;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.common.LocaleFilter;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.StartDocument;
@@ -56,25 +56,14 @@ public class Tokenizer {
 		
 		if (ts == null)	return res;
 		
-		Parameters params = (Parameters) ts.getParameters();
+		Parameters params = (Parameters) ts.getParameters();		
 		params.reset();
 		
 		params.tokenizeSource = true;
 		params.tokenizeTargets = false;
 		
-		params.setLanguageMode(Parameters.LANGUAGES_ONLY_WHITE_LIST);
-		params.setLanguageWhiteList(ListUtil.stringAsList(language.toString()));
-		
-		if (Util.isEmpty(tokenNames))			
-			params.setTokenMode(Parameters.TOKENS_ALL);
-			
-		else {
-		
-			params.setTokenMode(Parameters.TOKENS_SELECTED);
-			//params.setTokenNames(ListUtil.stringAsList(tokenNames.toString()));
-			//params.setTokenNames(Arrays.asList(tokenNames));
-			params.setTokenNames(ListUtil.arrayAsList(tokenNames));
-		}
+		params.setLocaleFilter(LocaleFilter.anyOf(language));		
+		params.setTokenNames(tokenNames);
 					
 		ts.handleEvent(new Event(EventType.START_BATCH)); // Calls component_init();
 		

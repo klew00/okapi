@@ -215,6 +215,52 @@ public class ListUtil {
 	}
 	
 	/**
+	 * Merges specified elements of a given string array into a single string. The merged elements are joined with a given joiner.
+	 * @param array the given array of strings.
+	 * @param start index of the start element to be merged.
+	 * @param end index of the end element (inclusive) to be merged.
+	 * @param joiner string to join elements in the resulting string.
+	 * @return the string of merged elements.
+	 */
+	public static String merge(String[] array, int start, int end, String joiner) {		
+		//return merge(Arrays.asList(array), start, end, joiner);
+		
+		if (!Util.checkIndex(start, array) && !Util.checkIndex(end, array))
+			return "";
+			
+		if (start < 0 && Util.checkIndex(end, array))
+			start = 0;
+		
+		if (Util.checkIndex(start, array) && end >= array.length)
+			end = array.length - 1;
+		
+		if (start >= end) return "";
+		
+		StringBuilder tmp = new StringBuilder(array[start]);
+		
+		for (int i = start + 1; i < end + 1; i++) {
+			
+			tmp.append(joiner);
+			tmp.append(array[i]);			
+		}
+		
+		return tmp.toString();
+	}
+	
+	/**
+	 * Merges specified items of a given string list into a single string. The merged items are joined with a given joiner.
+	 * @param list the given list of strings.
+	 * @param start index of the start item to be merged.
+	 * @param end index of the end item (inclusive) to be merged.
+	 * @param joiner string to join items in the resulting string.
+	 * @return the string of merged items.
+	 */
+	public static String merge(List<String> list, int start, int end, String joiner) {
+		
+		return merge(listAsArray(list), start, end, joiner);		
+	}
+	
+	/**
 	 * Converts a string of comma-separated numbers into a list of integers.
 	 * @param st string of comma-separated numbers. 
 	 * @return a list of integers.
@@ -396,6 +442,32 @@ public class ListUtil {
 		return listAsString(stList, delimiter);
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <E> List<E> invert(List<E> list) {
+		
+		if (list == null) return null;
+		
+		List<E> res = null;
+			try {
+				res = list.getClass().newInstance();
+				
+			} catch (InstantiationException e) {
+				
+				logMessage(Level.FINE, "List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				return null;
+				
+			} catch (IllegalAccessException e) {
+				
+				logMessage(Level.FINE, "List instantiation failed in ListUtil.copyItems(): " + e.getMessage());
+				return null;
+			}
+			
+			for (E e : list)
+				res.add(0, e);
+										
+		return res;
+	}
+	
 	/**
 	 * Removes a range of elements from a given list.
 	 * @param list the given list.
@@ -425,8 +497,6 @@ public class ListUtil {
 		// No way to determine the actual type of E at compile time to cast newInstance(), so @SuppressWarnings("unchecked") 
 	
 		if (list == null) return null;
-		if (Util.isEmpty(list)) return null;
-		if (list.getClass() == null) return null;
 		
 		List<E> res = null;
 			try {
@@ -443,7 +513,8 @@ public class ListUtil {
 				return null;
 			}
 			
-			res.addAll(list.subList(start, end + 1));		
+			if (Util.checkIndex(start, list) && Util.checkIndex(end, list))
+				res.addAll(list.subList(start, end + 1));		
 					
 		return res;
 	}

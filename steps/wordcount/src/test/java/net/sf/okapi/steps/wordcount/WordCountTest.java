@@ -18,9 +18,7 @@ public class WordCountTest {
 		assertEquals(9, WordCounter.getCount("The quick (\u201Cbrown\u201D) fox can\u2019t jump 32.3 feet, right?", locEN));
 
 		assertEquals(4, WordCounter.getCount("Words in a sentence", locEN));
-		
-		//Does not pass because es-005 is not in ULocale list
-		//assertEquals(4, WordCounter.getCount("Words in a sentence", locES005));
+		assertEquals(4, WordCounter.getCount("Words in a sentence", locES005));
 	}
 	
 }

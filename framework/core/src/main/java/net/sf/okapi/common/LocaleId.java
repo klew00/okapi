@@ -169,6 +169,34 @@ public final class LocaleId implements Comparable<Object> {
 	}
 	
 	/**
+	 * Creates a new LocaleId for a given language code, region code, and a user part.
+	 * @param language the language code (e.g. "es" for Spanish).
+	 * @param region the region code (e.g. "es" for Spain or "005" for South America.
+	 * @param userPart the user part of locale.
+	 * The latter two parameters are ignored if null or empty.
+	 * @throws IllegalArgumentException if the argument in invalid.
+	 */
+	public LocaleId (String language,
+		String region,
+		String userPart)
+	{
+		if ( Util.isEmpty(language) ) {
+			throw new IllegalArgumentException("The language cannot be null or empty.");
+		}
+		StringBuilder tmp = new StringBuilder(language);
+		if ( !Util.isEmpty(region) ) {
+			tmp.append("-");
+			tmp.append(region);
+			
+			if ( !Util.isEmpty(userPart) ) {
+				tmp.append("-x-");
+				tmp.append(userPart);
+			}
+		}
+		locId = normalize(tmp.toString());
+	}
+	
+	/**
 	 * Creates a new LocaleId for the given Java Locale.
 	 * @param loc the Java Locale object to use.
 	 * @throws IllegalArgumentException if the argument in invalid.

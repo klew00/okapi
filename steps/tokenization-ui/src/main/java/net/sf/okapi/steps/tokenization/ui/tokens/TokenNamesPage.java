@@ -20,9 +20,7 @@
 
 package net.sf.okapi.steps.tokenization.ui.tokens;
 
-import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ui.abstracteditor.AbstractListAddRemoveTab;
-import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 import org.eclipse.swt.widgets.Composite;
@@ -65,25 +63,25 @@ public class TokenNamesPage extends AbstractListAddRemoveTab {
 
 	public boolean load(Object data) {
 
-		if (!(data instanceof LanguageAndTokenParameters)) return false;
-		
-		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;		
-		if (params.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL) return false;		
-		
-		list.setItems(ListUtil.listAsArray(params.getTokenNames()));		
-		selectListItem(0);			
+//		if (!(data instanceof LanguageAndTokenParameters)) return false;
+//		
+//		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;		
+//		if (params.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL) return false;		
+//		
+//		list.setItems(ListUtil.listAsArray(params.getTokenNames()));		
+//		selectListItem(0);			
 		
 		return true;
 	}
 
 	public boolean save(Object data) {
 		
-		if (!(data instanceof LanguageAndTokenParameters)) return false;
-		
-		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;
-		if (params.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL) return false;
-		
-		params.setTokenNames(ListUtil.arrayAsList(list.getItems()));
+//		if (!(data instanceof LanguageAndTokenParameters)) return false;
+//		
+//		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;
+//		if (params.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL) return false;
+//		
+//		params.setTokenNames(ListUtil.arrayAsList(list.getItems()));
 		
 		return true;
 	}

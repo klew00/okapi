@@ -32,9 +32,9 @@ import java.util.regex.Pattern;
  * TODO Methods Javadoc
  * TODO Tests
  */
-public final class LocaleFilter {
+public class LocaleFilter {
 	
-	private static enum FilterType{
+	protected static enum FilterType{
 		
 		/**
 		 * The filter allows no locale. 
@@ -47,7 +47,7 @@ public final class LocaleFilter {
 		Any;
 	}
 
-	private final FilterType type;
+	private FilterType type;
 	
 	private final List<LocaleId> includes;
 	private final List<LocaleId> excludes;
@@ -60,12 +60,12 @@ public final class LocaleFilter {
 	private final List<String> regionExcludes;
 	private final List<String> userPartExcludes;
 	
-	private final List<Pattern> includePatterns; 
-	private final List<Pattern> excludePatterns; 
+	private final List<Pattern> patternIncludes; 
+	private final List<Pattern> patternExcludes; 
 		
 	/**
 	 * Private constructor.
-	 * @param type
+	 * @param type filter type, either None or Any. 
 	 */
 	private LocaleFilter(FilterType type) {
 		
@@ -80,14 +80,14 @@ public final class LocaleFilter {
 		regionExcludes = new ArrayList<String>();
 		userPartExcludes = new ArrayList<String>();
 		
-		includePatterns = new ArrayList<Pattern>();
-		excludePatterns = new ArrayList<Pattern>();
+		patternIncludes = new ArrayList<Pattern>();
+		patternExcludes = new ArrayList<Pattern>();
 		
 		this.type = type;
 	}
 	
 	/**
-	 * Public constructor.
+	 * Public constructor. Sets filter type to Any. 
 	 */
 	public LocaleFilter() {
 		
@@ -95,8 +95,18 @@ public final class LocaleFilter {
 	}
 	
 	/**
+	 * Public constructor. Constructs filter from a string.
+	 * @param string the configuration string of locale filter. See {@link #fromString} for details.
+	 */
+	public LocaleFilter(String string) {
+		
+		this();
+		fromString(string);
+	}
+	
+	/**
 	 * Creates a filter of the Any type.
-	 * @return
+	 * @return a newly created locale filter.
 	 */
 	public static LocaleFilter any() {
 		
@@ -105,7 +115,7 @@ public final class LocaleFilter {
 	
 	/**
 	 * Creates a filter of the None type.
-	 * @return
+	 * @return a newly created locale filter.
 	 */
 	public static LocaleFilter none() {
 		
@@ -113,9 +123,9 @@ public final class LocaleFilter {
 	}
 	
 	/**
-	 * Creates a filter of the Lookup type. Only the given locales will match.
-	 * @param localeIds
-	 * @return
+	 * Creates a filter allowing only the given locales.
+	 * @param localeIds an array of allowed LocaleId objects.
+	 * @return a newly created locale filter.
 	 */
 	public static LocaleFilter anyOf(LocaleId ... localeIds) {
 		
@@ -128,9 +138,9 @@ public final class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param localeIds
-	 * @return
+	 * Creates a filter filtering out the given locales.
+	 * @param localeIds an array of the LocaleId objects to disallow.
+	 * @return a newly created locale filter.
 	 */
 	public static LocaleFilter anyExcept(LocaleId ... localeIds) {
 		
@@ -138,6 +148,126 @@ public final class LocaleFilter {
 		filter.exclude(localeIds);
 		
 		return filter;
+	}
+
+	/**
+	 * Builds a filter from a configuration string. See {@link #fromString} for details on the string format.
+	 * @param string the parameters string.
+	 * @return a newly created locale filter object.
+	 */
+	public static LocaleFilter build(String string) {
+		
+		return new LocaleFilter(string);
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void removeFromExcludes(LocaleId localeId) {
+	
+		for (int i = excludes.size() - 1; i >= 0; i--) {
+			
+			LocaleId item = excludes.get(i);
+			if (item == null) continue;
+			
+			if (item.equals(localeId))
+				excludes.remove(i);
+		}
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void removeFromExcludes(List<LocaleId> localeIds) {
+		
+		if (localeIds == null) return;
+		
+		for (LocaleId localeId : localeIds)
+			removeFromExcludes(localeId);
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void removeFromLanguageExcludes(String languageMask) {
+		
+		languageExcludes.remove(languageMask);  // ArrayList.remove() uses equals() to compare objects
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void removeFromLanguageExcludes(List<String> languageMasks) {
+		
+		if (languageMasks == null) return;
+		
+		for (String languageMask : languageMasks)
+			removeFromLanguageExcludes(languageMask);
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void removeFromRegionExcludes(String regionMask) {
+		
+		regionExcludes.remove(regionMask);  // ArrayList.remove() uses equals() to compare objects
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void removeFromRegionExcludes(List<String> regionMasks) {
+		
+		if (regionMasks == null) return;
+		
+		for (String regionMask : regionMasks)
+			removeFromRegionExcludes(regionMask);
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void removeFromUserPartExcludes(String userPartMask) {
+		
+		userPartExcludes.remove(userPartMask);  // ArrayList.remove() uses equals() to compare objects
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void removeFromUserPartExcludes(List<String> userPartMasks) {
+		
+		if (userPartMasks == null) return;
+		
+		for (String userPartMask : userPartMasks)
+			removeFromUserPartExcludes(userPartMask);
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void removeFromPatternExcludes(String regex, int flags) {
+		
+		for (int i = patternExcludes.size() - 1; i >= 0; i--) {
+			
+			Pattern item = patternExcludes.get(i);
+			if (item == null) continue;
+			
+			if (item.toString().equals(regex) && (item.flags() == flags))
+				patternExcludes.remove(i);
+		}
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void removeFromPatternExcludes(List<Pattern> patterns) {
+		
+		if (patterns == null) return;
+		
+		for (Pattern pattern : patterns)
+			if (pattern != null)
+				removeFromPatternExcludes(pattern.toString(), pattern.flags());
 	}
 	
 	/**
@@ -149,11 +279,17 @@ public final class LocaleFilter {
 		
 		if (localeId == null) return this;
 		
-		this.includes.add(0, localeId); // Later added are attended first in matches()
+		removeFromExcludes(localeId);
+		this.includes.add(0, localeId); // Later-added are attended first in matches()
 		
 		return this;
 	}
 	
+	/**
+	 * 
+	 * @param localeIds
+	 * @return
+	 */
 	public LocaleFilter include(LocaleId ... localeIds) {
 		
 		if (Util.isEmpty(localeIds)) return this;
@@ -164,6 +300,11 @@ public final class LocaleFilter {
 		return this;
 	}
 	
+	/**
+	 * 
+	 * @param localeIds
+	 * @return
+	 */
 	public LocaleFilter include(Set<LocaleId> localeIds) {
 		
 		if (localeIds == null) return this;
@@ -174,33 +315,72 @@ public final class LocaleFilter {
 		return this;
 	}
 	
+	/**
+	 * 
+	 * @param localeIds
+	 * @return
+	 */
+	public LocaleFilter include(List<LocaleId> localeIds) {
+		
+		if (localeIds == null) return this;
+		
+		for (LocaleId localeId : localeIds)
+			include(localeId);
+		
+		return this;
+	}
+	
+	/**
+	 * 
+	 * @param filter
+	 * @return
+	 */
 	public LocaleFilter include(LocaleFilter filter) {
 		
 		if (filter == null) return this;
 		
 		includes.addAll(0, filter.getIncludes());
+		removeFromExcludes(filter.getIncludes());
 		
 		languageIncludes.addAll(0, filter.getLanguageIncludes());
-		regionIncludes.addAll(0, filter.getRegionIncludes());
-		userPartIncludes.addAll(0, filter.getUserPartIncludes());
+		removeFromLanguageExcludes(filter.getLanguageIncludes());
 		
-		includePatterns.addAll(0, filter.getIncludePatterns()); 
+		regionIncludes.addAll(0, filter.getRegionIncludes());
+		removeFromRegionExcludes(filter.getRegionIncludes());
+		
+		userPartIncludes.addAll(0, filter.getUserPartIncludes());
+		removeFromUserPartExcludes(filter.getUserPartIncludes());
+				
+		patternIncludes.addAll(0, filter.getPatternIncludes());
+		removeFromPatternExcludes(filter.getPatternIncludes());
 		
 		return this;
 	}
 	
-	public LocaleFilter include(String regex, int flags) {
+	/**
+	 * 
+	 * @param regex
+	 * @param flags
+	 * @return
+	 */
+	public LocaleFilter includePattern(String regex, int flags) {
 		
 		if (Util.isEmpty(regex)) return this;
 		
-		includePatterns.add(0, Pattern.compile(regex, flags));
+		removeFromPatternExcludes(regex, flags);
+		patternIncludes.add(0, Pattern.compile(regex, flags));
 		
 		return this;
 	}
 	
-	public LocaleFilter include(String regex) {
+	/**
+	 * 
+	 * @param regex
+	 * @return
+	 */
+	public LocaleFilter includePattern(String regex) {
 		
-		return include(regex, 0);
+		return includePattern(regex, 0);
 	}
 	
 	/**
@@ -220,12 +400,16 @@ public final class LocaleFilter {
 	
 	/**
 	 * 
+	 * @param language
+	 * @return
 	 */
 	public LocaleFilter includeLanguage(String language) {
 		
 		if (Util.isEmpty(language)) return this;
 		
-		this.languageIncludes.add(language);
+		String languageMask = language;
+		removeFromLanguageExcludes(languageMask);
+		this.languageIncludes.add(languageMask);
 		
 		return this;
 	}
@@ -247,12 +431,16 @@ public final class LocaleFilter {
 	
 	/**
 	 * 
+	 * @param region
+	 * @return
 	 */
 	public LocaleFilter includeRegion(String region) {
 		
 		if (Util.isEmpty(region)) return this;
 		
-		this.regionIncludes.add("xx-" + region);
+		String regionMask = "xx-" + region;
+		removeFromRegionExcludes(regionMask);
+		this.regionIncludes.add(regionMask);
 		
 		return this;
 	}
@@ -274,30 +462,39 @@ public final class LocaleFilter {
 	
 	/**
 	 * 
+	 * @param userPart
+	 * @return
 	 */
 	public LocaleFilter includeUserPart(String userPart) {
 		
 		if (Util.isEmpty(userPart)) return this;
 		
-		this.userPartIncludes.add("xx-xx-x-" + userPart);
+		String userPartMask = "xx-xx-x-" + userPart;
+		removeFromUserPartExcludes(userPartMask);
+		this.userPartIncludes.add(userPartMask);
+		
+		return this;
+	}
+	
+	/**
+	 * Disallows a given LocaleId object.
+	 * @param localeId the given LocaleId object to disallow.
+	 * @return this locale filter.
+	 */
+	public LocaleFilter exclude(LocaleId localeId) {
+		
+		if (localeId == null) return this;
+		
+		this.excludes.add(0, localeId); // Later-added are attended first in matches()
 		
 		return this;
 	}
 	
 	/**
 	 * 
-	 * @param localeId
+	 * @param localeIds
 	 * @return
 	 */
-	public LocaleFilter exclude(LocaleId localeId) {
-		
-		if (localeId == null) return this;
-		
-		this.excludes.add(0, localeId); // Later added are attended first in matches()
-		
-		return this;
-	}
-	
 	public LocaleFilter exclude(LocaleId ... localeIds) {
 		
 		if (Util.isEmpty(localeIds)) return this;
@@ -308,6 +505,11 @@ public final class LocaleFilter {
 		return this;
 	}
 	
+	/**
+	 * 
+	 * @param localeIds
+	 * @return
+	 */
 	public LocaleFilter exclude(Set<LocaleId> localeIds) {
 		
 		if (localeIds == null) return this;
@@ -318,6 +520,26 @@ public final class LocaleFilter {
 		return this;
 	}
 	
+	/**
+	 * Disallows a given list of LocaleId objects.
+	 * @param localeIds the given list of LocaleId objects.
+	 * @return this locale filter.
+	 */
+	public LocaleFilter exclude(List<LocaleId> localeIds) {
+		
+		if (localeIds == null) return this;
+		
+		for (LocaleId localeId : localeIds)
+			exclude(localeId);
+				
+		return this;
+	}
+	
+	/**
+	 * Disallows in this filter everything allowed in a given filter.
+	 * @param filter the given filter.
+	 * @return this locale filter.
+	 */
 	public LocaleFilter exclude(LocaleFilter filter) {
 		
 		if (filter == null) return this;
@@ -328,23 +550,34 @@ public final class LocaleFilter {
 		regionExcludes.addAll(0, filter.getRegionIncludes());
 		userPartExcludes.addAll(0, filter.getUserPartIncludes());
 		
-		excludePatterns.addAll(0, filter.getIncludePatterns());
+		patternExcludes.addAll(0, filter.getPatternIncludes());
 		
 		return this;
 	}
 	
-	public LocaleFilter exclude(String regex, int flags) {
+	/**
+	 * 
+	 * @param regex
+	 * @param flags
+	 * @return
+	 */
+	public LocaleFilter excludePattern(String regex, int flags) {
 		
 		if (Util.isEmpty(regex)) return this;
 		
-		excludePatterns.add(0, Pattern.compile(regex, flags));
+		patternExcludes.add(0, Pattern.compile(regex, flags));
 		
 		return this;
 	}
 	
-	public LocaleFilter exclude(String regex) {
+	/**
+	 * 
+	 * @param regex
+	 * @return
+	 */
+	public LocaleFilter excludePattern(String regex) {
 		
-		return exclude(regex, 0);
+		return excludePattern(regex, 0);
 	}
 	
 	/**
@@ -364,6 +597,8 @@ public final class LocaleFilter {
 	
 	/**
 	 * 
+	 * @param language
+	 * @return
 	 */
 	public LocaleFilter excludeLanguage(String language) {
 		
@@ -391,6 +626,8 @@ public final class LocaleFilter {
 	
 	/**
 	 * 
+	 * @param region
+	 * @return
 	 */
 	public LocaleFilter excludeRegion(String region) {
 		
@@ -418,6 +655,8 @@ public final class LocaleFilter {
 	
 	/**
 	 * 
+	 * @param userPart
+	 * @return
 	 */
 	public LocaleFilter excludeUserPart(String userPart) {
 		
@@ -428,6 +667,10 @@ public final class LocaleFilter {
 		return this;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public LocaleFilter reset() {
 		
 		includes.clear();
@@ -441,8 +684,8 @@ public final class LocaleFilter {
 		regionExcludes.clear();
 		userPartExcludes.clear();
 		
-		includePatterns.clear(); 
-		excludePatterns.clear();
+		patternIncludes.clear(); 
+		patternExcludes.clear();
 		
 		return this;
 	}
@@ -459,7 +702,7 @@ public final class LocaleFilter {
 			if (item.equals(localeId))
 				return false;
 		
-		for (Pattern pattern : excludePatterns) {
+		for (Pattern pattern : patternExcludes) {
 			
 			Matcher matcher = pattern.matcher(localeId.toString());			
 			if (matcher.matches())
@@ -484,7 +727,7 @@ public final class LocaleFilter {
 			if (item.equals(localeId))
 				return true;
 		
-		for (Pattern pattern : includePatterns) {
+		for (Pattern pattern : patternIncludes) {
 			
 			Matcher matcher = pattern.matcher(localeId.toString());			
 			if (matcher.matches())
@@ -531,44 +774,666 @@ public final class LocaleFilter {
 		return locales;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public List<LocaleId> getIncludes() {
 		return includes;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<LocaleId> getExcludes() {
 		return excludes;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<String> getLanguageIncludes() {
 		return languageIncludes;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<String> getRegionIncludes() {
 		return regionIncludes;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<String> getUserPartIncludes() {
 		return userPartIncludes;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<String> getLanguageExcludes() {
 		return languageExcludes;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<String> getRegionExcludes() {
 		return regionExcludes;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<String> getUserPartExcludes() {
 		return userPartExcludes;
 	}
 
-	public List<Pattern> getIncludePatterns() {
-		return includePatterns;
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Pattern> getPatternIncludes() {
+		return patternIncludes;
 	}
 
-	public List<Pattern> getExcludePatterns() {
-		return excludePatterns;
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Pattern> getPatternExcludes() {
+		return patternExcludes;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
+	protected FilterType getType() {
+		return type;
+	}
+	
+	/**
+	 * 
+	 * @param type
+	 */
+	protected void setType(FilterType type) {
+		this.type = type;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isEmpty() {
+		
+		return 
+			Util.isEmpty(includes) &&
+			Util.isEmpty(excludes) &&
+			
+			Util.isEmpty(languageIncludes) && 
+			Util.isEmpty(regionIncludes) && 
+			Util.isEmpty(userPartIncludes) &&
+			
+			Util.isEmpty(languageExcludes) && 
+			Util.isEmpty(regionExcludes) && 
+			Util.isEmpty(userPartExcludes) &&
+			
+			Util.isEmpty(patternIncludes) && 
+			Util.isEmpty(patternExcludes); 
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void setFilterType(boolean excludeMode) {
+		
+		if (excludeMode)
+			setType(FilterType.None);
+		else
+			setType(FilterType.Any);
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void setLanguage(boolean excludeMode, String language) {
+		
+		if (Util.isEmpty(language)) return;
+		
+		if (excludeMode)
+			excludeLanguage(language);
+		else
+			includeLanguage(language);
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void setRegion(boolean excludeMode, String region) {
+		
+		if (Util.isEmpty(region)) return;
+		
+		if (excludeMode)
+			excludeRegion(region);
+		else
+			includeRegion(region);
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void setUserPart(boolean excludeMode, String userPart) {
+		
+		if (Util.isEmpty(userPart)) return;
+		
+		if (excludeMode)
+			excludeUserPart(userPart);
+		else
+			includeUserPart(userPart);
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void setPattern(boolean excludeMode, String pattern, int flags) {
+		
+		if (Util.isEmpty(pattern)) return;
+		
+		if (excludeMode)
+			excludePattern(pattern, flags);
+		else
+			includePattern(pattern, flags);
+	}
+	
+	private void setLocale(boolean excludeMode, String language, String region) {
+		
+		if (Util.isEmpty(language)) return;
+		if (Util.isEmpty(region)) return;
+		
+		if (excludeMode)
+			exclude(new LocaleId(language, region));
+		else
+			include(new LocaleId(language, region));
+	}
+	
+	/**
+	 * Helper method.
+	 */
+	private void setLocale(boolean excludeMode, String language, String region, String userPart) {
+		
+		if (Util.isEmpty(language)) return;
+		if (Util.isEmpty(region)) return;
+		if (Util.isEmpty(userPart)) return;
+		
+		if (excludeMode)
+			exclude(new LocaleId(language, region, userPart));
+		else
+			include(new LocaleId(language, region, userPart));
+	}
+	
+	/**
+	 * 
+	 * @param string
+	 * The string consists of chunks. The chunks are delimited with a comma or space.<p>
+	 * <b>*</b> -- field mask, can be used in either language, region, or user part fields.<br>  
+	 * <b>!</b> -- exclude prefix.<br>
+	 * <b>@</b> -- regex prefix.<br>
+	 * <b>^</b> -- regex flags prefix.<p>
+	 * <b>Examples:</b>
+	 * 
+	 * <li>all locales except English: <b>!en</b><br>
+	 * <li>only English locales except en-nz: <b>en !en-nz</b><br>
+	 * <li>all locales except US region: <b>!*-us</b><br>
+	 * <li>only locales with "win" as user part: <b>*-*-win</b><br>
+	 * <li>regular expression with flags: <b>@e.?-us ^8</b>
+	 *   
+	 */
+	public LocaleFilter fromString(String string) {
+			
+		String commaPlaceholder = "<comma>";
+		
+		// Protect commas in regex
+		string = RegexUtil.replaceAll(string, "\\{.*?(,).*?\\}", 1, commaPlaceholder);
+		
+		String[] commaChunks = StringUtil.split(string, ",\\p{Space}*");
+		String[] spaceChunks = StringUtil.split(string, "[^,\\p{Space}](\\p{Space}+)", 1);
+		String[] chunks = commaChunks;
+		
+		if (commaChunks.length < spaceChunks.length)
+			chunks = spaceChunks;
+		
+		for (int i = 0; i < chunks.length; i++) {
+			
+			if (chunks[i].contains(commaPlaceholder))
+				// Restore commas
+				chunks[i] = chunks[i].replaceAll(commaPlaceholder, ",");
+		}
+		
+		reset();
+		
+		// The filter type is figured out from the first chunk, always Any if no chunks are found (an empty string)
+		if (chunks.length > 0 && !chunks[0].startsWith("!"))
+			setType(FilterType.None);
+		else
+			setType(FilterType.Any);
+		
+		for (int i = 0; i < chunks.length; i++) {
+		
+			String chunk = chunks[i];
+			
+			boolean excludeMode = chunk.startsWith("!");
+			if (excludeMode)
+				chunk = chunk.substring(1);
+			
+			boolean regexMode = chunk.startsWith("@");
+			if (regexMode)
+				chunk = chunk.substring(1);
+			
+			if (!regexMode) {
+				
+				String[] fields = chunk.split("-");
+				
+				String language = "";
+				String region = "";
+				String userPart = "";
+				
+				if (fields.length > 3) // Dash in user part
+					fields[2] = ListUtil.merge(fields, 2, fields.length - 1, "-");
+				
+				if (fields.length > 0) language = fields[0];
+				if (fields.length > 1) region = fields[1];
+				if (fields.length > 2) userPart = fields[2];
+					
+				boolean anyLanguage = language.equals("*"); 
+				boolean anyRegion = region.equals("*");
+				boolean anyUserPart = userPart.equals("*");
+				
+				// en
+				if (fields.length == 1) {
+									
+					if (anyLanguage) // 0				
+						// Explicit filter type setting: * = Any, !* = None
+						setFilterType(excludeMode);						
+					else // 1						
+						setLanguage(excludeMode, language);
+					
+				// en-us
+				} else if (fields.length == 2) {
+					
+					if (anyLanguage && anyRegion) // 00					
+						// Explicit filter type setting: *-* = Any, !*-* = None
+						setFilterType(excludeMode);
+						
+					else if (anyLanguage && !anyRegion) // 01						
+						setRegion(excludeMode, region);
+						
+					else if (!anyLanguage && anyRegion) // 10						
+						setLanguage(excludeMode, language);
+						
+					else if (!anyLanguage && !anyRegion) // 11						
+						setLocale(excludeMode, language, region);
+					
+				// en-us-win
+				} else if (fields.length == 3) {
+						
+					if (anyLanguage && anyRegion && anyUserPart) // 000						
+						// Explicit filter type setting: *-*-* = Any, !*-*-* = None
+						setFilterType(excludeMode);
+					
+					else if (anyLanguage && anyRegion && !anyUserPart) // 001						
+						setUserPart(excludeMode, userPart);
+						
+					else if (anyLanguage && !anyRegion && anyUserPart) // 010
+						setRegion(excludeMode, region);
+						
+					else if (anyLanguage && !anyRegion && !anyUserPart) { // 011
+						
+						setPattern(excludeMode, "[^-]+-" + region + "-x-" + userPart, 0);
+						
+					} else if (!anyLanguage && anyRegion && anyUserPart) // 100
+						setLanguage(excludeMode, language);
+					
+					else if (!anyLanguage && anyRegion && !anyUserPart) { // 101
+						
+						setPattern(excludeMode, language + "-[^-]+-x-" + userPart, 0);
+						
+					} else if (!anyLanguage && !anyRegion && anyUserPart) // 110
+						setPattern(excludeMode, language + "-" + region + "-x-[^-]+", 0);
+						
+					else if (!anyLanguage && !anyRegion && !anyUserPart) // 111
+						setLocale(excludeMode, language, region, userPart);					
+				}				
+				
+			} else { // regexMode
+				
+				if (i < chunks.length - 1) { // Not the last chunk
+					
+					String flagsChunk = chunks[i + 1];
+					
+					int flags = 0;
+					if (flagsChunk.startsWith("^")) {
+						
+						flags = Util.strToInt(flagsChunk.substring(1), 0);
+						i++; // Skip the flags chunk
+					}
+					
+					setPattern(excludeMode, chunk, flags);
+				} else
+					setPattern(excludeMode, chunk, 0);
+				 
+			}
+		}
+		
+		return this;
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public String toString() {
+		
+		StringBuilder sb = new StringBuilder();
+		
+		boolean hasIncludes = (includes.size() != 0) ||				
+				(patternIncludes.size() != 0) || 
+				(languageIncludes.size() != 0) || 
+				(regionIncludes.size() != 0) ||
+				(userPartIncludes.size() != 0);
+				
+		boolean hasExcludes = (excludes.size() != 0) || 
+				(patternExcludes.size() != 0) ||
+				(languageExcludes.size() != 0) || 
+				(regionExcludes.size() != 0) ||
+				(userPartExcludes.size() != 0);
+		
+		switch (type) {
+		
+		case Any:
+			
+			// Explicitly specify the filter type if fromString() won't be able to figure it out correctly
+			if (!hasExcludes && hasIncludes) {
+				
+				sb.append("*");
+				sb.append(" ");
+			}
+							
+			processExcludes(sb);
+			processPatternExcludes(sb);
+			processLanguageExcludes(sb);
+			processRegionExcludes(sb);
+			processUserPartExcludes(sb);
+			processIncludes(sb);
+			processPatternIncludes(sb);
+			processLanguageIncludes(sb);
+			processRegionIncludes(sb);
+			processUserPartIncludes(sb);
+						
+			break;
+						
+		case None:
+			
+			// Explicitly specify the filter type if fromString() won't be able to figure it out correctly
+			if (!hasIncludes) {
+				
+				sb.append("!*");
+				sb.append(" ");
+			}
+			
+			processIncludes(sb);
+			processPatternIncludes(sb);
+			processLanguageIncludes(sb);
+			processRegionIncludes(sb);
+			processUserPartIncludes(sb);
+			processExcludes(sb);
+			processPatternExcludes(sb);
+			processLanguageExcludes(sb);
+			processRegionExcludes(sb);
+			processUserPartExcludes(sb);			
+		}
+		
+		return sb.toString().trim();
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processUserPartIncludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (String userPart : ListUtil.invert(userPartIncludes)) {
+			
+			sb.append("*-*-");
+			sb.append(userPart);
+			sb.append(" ");
+		}		
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processRegionIncludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (String region : ListUtil.invert(regionIncludes)) {
+			
+			sb.append("*-");
+			sb.append(region);
+			sb.append(" ");
+		}
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processLanguageIncludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (String language : ListUtil.invert(languageIncludes)) {
+			
+			sb.append(language);
+			sb.append(" ");
+		}
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processPatternIncludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (Pattern pattern : ListUtil.invert(patternIncludes)) {
+			
+			sb.append("@");
+			sb.append(pattern.toString());
+			sb.append(" ");
+			
+			if (pattern.flags() != 0) {
+				
+				sb.append("^");
+				sb.append(pattern.flags());
+				sb.append(" ");
+			}
+		}
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processIncludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (LocaleId localeId : ListUtil.invert(includes)) {
+			
+			sb.append(localeId.getLanguage());
+			
+			if (!Util.isEmpty(localeId.getRegion())) {
+				
+				sb.append("-");
+				sb.append(localeId.getRegion());
+				
+				if (!Util.isEmpty(localeId.getUserPart())) {
+					sb.append("-");
+					sb.append(localeId.getUserPart());
+				}
+			}
+			
+			sb.append(" ");
+		}
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processUserPartExcludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (String userPart : ListUtil.invert(userPartExcludes)) {
+			
+			sb.append("!");
+			sb.append("*-*-");
+			sb.append(userPart);
+			sb.append(" ");
+		}
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processRegionExcludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (String region : ListUtil.invert(regionExcludes)) {
+		
+			sb.append("!");
+			sb.append("*-");
+			sb.append(region);
+			sb.append(" ");
+		}
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processLanguageExcludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (String language : ListUtil.invert(languageExcludes)) {
+			
+			sb.append("!");
+			sb.append(language);
+			sb.append(" ");
+		}
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processPatternExcludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (Pattern pattern : ListUtil.invert(patternExcludes)) {
+			
+			sb.append("!");
+			sb.append("@");
+			sb.append(pattern.toString());
+			sb.append(" ");
+			
+			if (pattern.flags() != 0) {
+				
+				sb.append("^");
+				sb.append(pattern.flags());
+				sb.append(" ");
+			}
+		}
+	}
+
+	/**
+	 * Helper method.
+	 */
+	private void processExcludes(StringBuilder sb) {
+		
+		if (sb == null) return;
+		
+		for (LocaleId localeId : ListUtil.invert(excludes)) {
+			
+			sb.append("!");
+			sb.append(localeId.getLanguage());
+			
+			if (!Util.isEmpty(localeId.getRegion())) {
+			
+				sb.append("-");
+				sb.append(localeId.getRegion());
+				
+				if (!Util.isEmpty(localeId.getUserPart())) {
+					sb.append("-");
+					sb.append(localeId.getUserPart());
+				}
+			}
+						
+			sb.append(" ");
+		}
+	}
+
+	/**
+	 * If the filter contains only explicitly listed locale IDs (no regex patterns or masks), then return the list of those locale ID.
+	 * If there's at least one mask or pattern, an empty list is returned.
+	 * @return
+	 */
+	public List<String> getExplicitLocaleIds() {
+
+		List<String> res = new ArrayList<String>(); 
+		
+		// Return an empty list if there are patterns or masks
+		if ((patternIncludes.size() != 0) || 
+				(regionIncludes.size() != 0) || 
+				(userPartIncludes.size() != 0) ||				
+				(excludes.size() != 0) || 
+				(patternExcludes.size() != 0) ||
+				(languageExcludes.size() != 0) || 
+				(regionExcludes.size() != 0) ||
+				(userPartExcludes.size() != 0)) 
+			return res; 
+
+		for (LocaleId localeId : includes)
+			res.add(localeId.toString());
+			
+		for (String language : languageIncludes)
+			res.add(language);
+
+		return res;
+	}
+
+	/**
+	 * Determines if a given string contains only explicitly listed locale IDs.
+	 * If the given strin contains only explicitly listed locale IDs (no regex patterns or masks), then returns 
+	 * a string with a space-delimited list of those locale ID.
+	 * If there's at least one mask or pattern, an empty string is returned.
+	 * @param string the given locale filter configuration string. See {@link #fromString} for details.
+	 * @return
+	 */
+	public static String getExplicitLocaleIds(String string) {
+		
+		LocaleFilter filter = new LocaleFilter(string);
+		return ListUtil.listAsString(filter.getExplicitLocaleIds(), " ");
+	}
 }

@@ -34,17 +34,17 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.common.LocaleFilter;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.common.ILexer;
-import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.tokenization.engine.RbbiLexer;
@@ -72,6 +72,9 @@ public class TokenizationTest {
 
 //	private String text = "U.S.";
 	private LocaleId locENUS = LocaleId.fromString("en-us");
+	private LocaleId locENGB = LocaleId.fromString("en-gb");
+	private LocaleId locDEDE = LocaleId.fromString("de-de");
+	private LocaleId locDECH = LocaleId.fromString("de-ch");
 
 	//private String text = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
 //	private String text = "$120,000.00 on 05/30/2007 at 12.30PM is much better than $10.00 on 05/30/2007 at 22:30:15";
@@ -164,15 +167,11 @@ public class TokenizationTest {
 		}
 	}
 	
+// DEBUG	
 //	@Test
 //	public void listTokenizerOutput() {
-//		/* 
-//	    String text2 = "Test word count is correct.";
-//	    String text3 = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
-//		*/
 //		
 //		Tokens tokens = Tokenizer.tokenize(text, locENUS); // All tokens
-//		//assertEquals(127, tokens.size());
 //						
 //		listTokens(tokens);
 //		System.out.println(tokens.size());
@@ -182,98 +181,59 @@ public class TokenizationTest {
 	@Test
 	public void testFilters() {
 
-		// Defaults, filters not empty		
 		Parameters params = new Parameters();
 		ts.setParameters(params);
 		
-		List<String> languageFilter = ts.getLanguageFilter();
+		LocaleFilter languageFilter = params.getLocaleFilter();
 		assertNotNull(languageFilter);
-		assertTrue(languageFilter.size() > 0);
+		assertTrue(params.supportsLanguage(locENUS));
 		
-		List<Integer> tokenFilter = ts.getTokenFilter();
-		assertNotNull(tokenFilter);
-		assertTrue(tokenFilter.size() > 0);
+		assertTrue(params.supportsToken("FAKE_TOKEN"));
+		assertTrue(params.supportsToken(Integer.MAX_VALUE));
+				
+		params.setLocaleFilter("");
+		assertTrue(params.supportsLanguage(locENUS));
+		assertTrue(params.supportsLanguage(locENGB));
+		assertTrue(params.supportsLanguage(locDEDE));
+		assertTrue(params.supportsLanguage(locDECH));
 		
-		// LANGUAGES_ALL, language filter not empty
-		params = new Parameters();
-		params.setLanguageMode(LanguageAndTokenParameters.LANGUAGES_ALL);
-		ts.setParameters(params);
+		params.setLocaleFilter("en !en-gb de-*-* !de-ch");
+		assertTrue(params.supportsLanguage(locENUS));
+		assertFalse(params.supportsLanguage(locENGB));
+		assertTrue(params.supportsLanguage(locDEDE));
+		assertFalse(params.supportsLanguage(locDECH));
 		
-		languageFilter = ts.getLanguageFilter();
-		assertNotNull(languageFilter);
-		assertTrue(languageFilter.size() > 0);
+		params.setTokenNames((String[]) null);
+		assertTrue(params.supportsToken("FAKE_TOKEN"));
+		assertTrue(params.supportsToken(Integer.MAX_VALUE));
 		
-		// LANGUAGES_ONLY_WHITE_LIST, test size & elements
-		params = new Parameters();
-		params.setLanguageMode(LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST);
-		params.setLanguageWhiteList(ListUtil.arrayAsList((new String[] {"en-us", "EN-CA", "en-IE", "EN-sg", "eN-Jm", 
-				"en_pk", "EN_NA", "en_GB", "EN_nz", "eN-mH"})));
-		ts.setParameters(params);
+		params.setTokenNames("WORD", "PUNKTUATION");
+		assertFalse(params.supportsToken("FAKE_TOKEN"));
+		assertFalse(params.supportsToken(Integer.MAX_VALUE));
+		assertTrue(params.supportsToken("WORD"));
 		
-		languageFilter = ts.getLanguageFilter();
-		assertNotNull(languageFilter);
-//		assertTrue(languageFilter.size() == 10);
-//		
-//		assertEquals("EN-CA", languageFilter.get(0));
-//		assertEquals("EN-IE", languageFilter.get(2));
-//		assertEquals("EN-US", languageFilter.get(9));
-//		
-//		assertNotSame("en-us", languageFilter.get(0));
-//		assertNotSame("en-sg", languageFilter.get(3));
-		
-		assertTrue(languageFilter.size() == 1);
-		assertEquals("en-us", languageFilter.get(0));
-		
-		// LANGUAGES_ALL_EXCEPT_BLACK_LIST, white list still not empty, test size & elements
-		params.setLanguageMode(LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST);
-		params.setLanguageBlackList(ListUtil.arrayAsList((new String[] {"en-us", "EN-CA", "en-IE"})));
-		ts.setParameters(params);
-		
-		languageFilter = ts.getLanguageFilter();
-		assertNotNull(languageFilter);
-		assertTrue(languageFilter.size() > 0);
-		
-		assertFalse(languageFilter.contains("EN-CA"));
-		assertFalse(languageFilter.contains("EN-IE"));
-		assertFalse(languageFilter.contains("EN-US"));
-		
-		//assertTrue(languageFilter.contains("EN"));
-		//assertTrue(languageFilter.contains("FR-CA"));
-		
-		// TOKENS_ALL, token filter not empty
-		params.setTokenMode(LanguageAndTokenParameters.TOKENS_ALL);
-		tokenFilter = ts.getTokenFilter();
-		assertNotNull(tokenFilter);
-		assertTrue(tokenFilter.size() > 0);
-		
-		// TOKENS_SELECTED, resets to TOKENS_ALL at start batch if token list is not set 
-		params.setTokenMode(LanguageAndTokenParameters.TOKENS_SELECTED);
-		tokenFilter = ts.getTokenFilter();
-		assertNotNull(tokenFilter);
-		assertTrue(tokenFilter.size() > 0);		
-		
+		params = (Parameters) ts.getParameters();
 		ts.handleEvent(new Event(EventType.START_BATCH));
-		assertEquals(LanguageAndTokenParameters.TOKENS_ALL, params.getTokenMode());
-		ts.handleEvent(new Event(EventType.END_BATCH));
 		
-		params.setTokenMode(LanguageAndTokenParameters.TOKENS_SELECTED);		
-		params.setTokenNames(ListUtil.arrayAsList((new String[] {"WORD", "NUMBER", "PUNCTUATION"})));
-		ts.handleEvent(new Event(EventType.START_BATCH));
-		assertEquals(LanguageAndTokenParameters.TOKENS_SELECTED, params.getTokenMode());
+		assertTrue(params.supportsLanguage(locENUS));
+		assertFalse(params.supportsLanguage(locENGB));
+		assertTrue(params.supportsLanguage(locDEDE));
+		assertFalse(params.supportsLanguage(locDECH));
+		
+		assertFalse(params.supportsToken("FAKE_TOKEN"));
+		assertFalse(params.supportsToken(Integer.MAX_VALUE));
+		assertTrue(params.supportsToken("WORD"));
+		
 		ts.handleEvent(new Event(EventType.END_BATCH));
-		tokenFilter = ts.getTokenFilter();
-		assertNotNull(tokenFilter);
-		assertEquals(3, tokenFilter.size());
 	}
 	
 	@Test
 	public void testTokenizer1() {
 		
 		ts.setConfiguration(this.getClass(), "test_config1.tprm");
-		//Parameters params = (Parameters) ts.getParameters();
+		Parameters params = (Parameters) ts.getParameters();
 		
-		assertNotNull(ts.getTokenFilter().size());
-		assertTrue(ts.getTokenFilter().size() > 0);
+		assertTrue(params.supportsToken("WORD"));
 		
 		List<ILexer> lexers = ts.getLexers();
 		assertEquals(1, lexers.size());
@@ -281,7 +241,7 @@ public class TokenizationTest {
 		tokens = tokenizeText();
 		assertEquals(183, tokens.size());
 		
-		// listTokens(tokens);
+		// DEBUG listTokens(tokens);
 	}
 	
 	@Test
@@ -309,9 +269,11 @@ public class TokenizationTest {
 			}
 			
 			if (token == null) break;
-			//System.out.println(((Manager)tokenizer.token_source).input_stream.getBeginColumn());
-			//System.out.println(jj_input_stream.getBeginColumn());	
-						
+			
+//			DEBUG
+//			System.out.println(((Manager)tokenizer.token_source).input_stream.getBeginColumn());
+//			System.out.println(jj_input_stream.getBeginColumn());	
+//						
 //			System.out.println(String.format("%d  %15s (%d, %d - %d, %d)\t%d - %d", token.kind, token.image, 
 //					stream.getBeginColumn(), 
 //					stream.getBeginLine(), 
@@ -319,7 +281,6 @@ public class TokenizationTest {
 //					stream.getEndLine(),
 //					stream.bufpos + 1 - token.image.length(),
 //					stream.bufpos + 1));
-			
 			
 		} while (token != null);
 	}
@@ -364,8 +325,6 @@ public class TokenizationTest {
 		try {
 			expected = Util.normalizeNewlines(streamAsString(this.getClass().getResourceAsStream("rbbi_custom.txt")));
 			rules = streamAsString(this.getClass().getResourceAsStream("rbbi_default.txt"));
-			
-			//rules = RbbiLexer.formatCaption(rules, "Custom rules");
 			
 			rules = RbbiLexer.formatRule(rules, 
 					"Abbreviation", 

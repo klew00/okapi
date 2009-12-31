@@ -111,6 +111,41 @@ public class LocaleIdTest {
 		assertNull(locId.getRegion());
 	}
 	
+	@Test
+	public void testConstructorFromLanguageRegionUserPart () {
+		LocaleId locId = new LocaleId("de", "CH", "win");
+		assertEquals("de", locId.getLanguage());
+		assertEquals("ch", locId.getRegion());
+		assertEquals("win", locId.getUserPart());
+		assertEquals("de-ch-x-win", locId.toString());
+		
+		locId = new LocaleId("de", "CH", "WIN");
+		assertEquals("de", locId.getLanguage());
+		assertEquals("ch", locId.getRegion());
+		assertEquals("win", locId.getUserPart());
+		assertEquals("de-ch-x-win", locId.toString());
+
+		locId = new LocaleId("DE", null, null);
+		assertEquals("de", locId.getLanguage());
+		assertNull(locId.getRegion());
+		assertNull(locId.getUserPart());
+		
+		locId = new LocaleId("DE", null, "win");
+		assertEquals("de", locId.getLanguage());
+		assertNull(locId.getRegion());
+		assertNull(locId.getUserPart());
+
+		locId = new LocaleId("DE", "", "");
+		assertEquals("de", locId.getLanguage());
+		assertNull(locId.getRegion());
+		assertNull(locId.getUserPart());
+		
+		locId = new LocaleId("DE", "", "win");
+		assertEquals("de", locId.getLanguage());
+		assertNull(locId.getRegion());
+		assertNull(locId.getUserPart());
+	}
+	
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorFromNullJavaLocale () {
 		new LocaleId((Locale)null);

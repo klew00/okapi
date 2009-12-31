@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import net.sf.okapi.common.Util;
 
 /**
@@ -39,7 +42,29 @@ public class StringUtil {
 		if (Util.isEmpty(st)) 
 			return st;
 		
-		return st.substring(0,1).toUpperCase() + st.substring(1);
+		return st.substring(0,1).toUpperCase() + st.substring(1).toLowerCase();
+	}
+	
+	/**
+	 * Removes qualifiers (quotation marks etc.) around text in a given string. 
+	 * @param st the given string.
+	 * @param startQualifier the qualifier to be removed before the given string.
+	 * @param endQualifier the qualifier to be removed after the given string.
+	 * @return a copy of the given string without qualifiers.
+	 */
+	public static String removeQualifiers(String st, String startQualifier, String endQualifier) {
+	
+		if (Util.isEmpty(st)) return st; 
+		if (Util.isEmpty(startQualifier)) return st;
+		if (Util.isEmpty(endQualifier)) return st;
+		
+		int startQualifierLen = startQualifier.length();
+		int endQualifierLen = endQualifier.length();
+		
+		if (st.startsWith(startQualifier) && st.endsWith(endQualifier))
+			return st.substring(startQualifierLen, Util.getLength(st) - endQualifierLen);
+			
+		return st;
 	}
 	
 	/**
@@ -90,4 +115,58 @@ public class StringUtil {
 		return res;
 	}
 
+	private static boolean checkRegex(String regex) {
+		
+		try {			
+			Pattern.compile(regex);		
+		} 
+		catch (PatternSyntaxException e) {			
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Converts shell wildcards (e.g. * and ?) in a given string to its Java regex representation.
+	 * @param string the given string.
+	 * @return a copy of the given string, all wildcards are converted into a correct Java regular expression. 
+	 * The result is checked for being a correct regex pattern. If it is not, then the given original string is returned as
+	 * being most likely already a regex pattern.
+	 */
+	public static String normalizeWildcards(String string) {
+
+		if (Util.isEmpty(string)) return string;
+		if (!containsWildcards(string)) return string;
+						
+		String normalized = string.replaceAll("\\?", ".").replaceAll("\\*", ".*?");
+		
+		// Make sure we're not normalizing a correct regex thus damaging it
+		return checkRegex(normalized) ? normalized : string;
+	}
+	
+	/**
+	 * Detects if a given string contains shell wildcard characters (e.g. * and ?).
+	 * @param string the given string.
+	 * @return true if the string contains the asterisk (*) or question mark (?).
+	 */
+	public static boolean containsWildcards(String string) {
+	
+		if (Util.isEmpty(string)) return false;
+	
+		return string.indexOf('*') != -1 || string.indexOf('?') != -1;
+	}
+
+	public static String[] split(String string, String delimRegex, int group) {
+		
+		String delimPlaceholder = "<delimiter>";
+		
+		string = RegexUtil.replaceAll(string, delimRegex, group, delimPlaceholder);
+		return ListUtil.stringAsArray(string, delimPlaceholder);
+	}
+	
+	public static String[] split(String string, String delimRegex) {
+		
+		return split(string, delimRegex, 0);
+	}
 }

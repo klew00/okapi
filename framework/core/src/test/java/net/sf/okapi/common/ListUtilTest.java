@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -131,4 +132,22 @@ public class ListUtilTest {
 		assertEquals("", s[4]);
 	}
 
+	@Test
+	public void testMerge() {	
+		List<String> list = Arrays.asList("aaaa", "bbb", "cccc", "ddddd");
+		assertEquals("", ListUtil.merge(list, -1, -1, "-"));
+		assertEquals("", ListUtil.merge(list, 100, 200, "-"));
+		assertEquals("", ListUtil.merge(list, 3, 2, "-"));
+		assertEquals("bbb-cccc", ListUtil.merge(list, 1, 2, "-"));
+		assertEquals("bbb-cccc-ddddd", ListUtil.merge(list, 1, 3, "-"));
+		assertEquals("cccc-ddddd", ListUtil.merge(list, 2, 5, "-"));
+		
+		String[] array = new String[] {"aaaa", "bbb", "cccc", "ddddd"};
+		assertEquals("", ListUtil.merge(array, -1, -1, "-"));
+		assertEquals("", ListUtil.merge(array, 100, 200, "-"));
+		assertEquals("", ListUtil.merge(array, 3, 2, "-"));
+		assertEquals("bbb-cccc", ListUtil.merge(array, 1, 2, "-"));
+		assertEquals("bbb-cccc-ddddd", ListUtil.merge(array, 1, 3, "-"));
+		assertEquals("cccc-ddddd", ListUtil.merge(array, 2, 5, "-"));		
+	}
 }

@@ -10,7 +10,5 @@ Rule0.lexemId.i=0
 Rule0.pattern=\$([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)
 Rule0.regexOptions.i=0
 Rule0.regexGroup.i=0
-Rule0.languageMode.i=1
-Rule0.languageWhiteList=
-Rule0.languageBlackList=
+Rule0.languages=
 

@@ -42,10 +42,11 @@ public class WordCounter extends BaseCounter {
 		Tokens tokens = Tokenizer.tokenize(text, language, getTokenName());		
 		if (tokens == null) return 0;
 		
-		System.out.println(String.format("Tokens: %d (%s)", tokens.size(), text));
-		System.out.println();
-		System.out.println(tokens.toString());
-		System.out.println();
+		// DEBUG
+//		System.out.println(String.format("Tokens: %d (%s)", tokens.size(), text));
+//		System.out.println();
+//		System.out.println(tokens.toString());
+//		System.out.println();
 		
 		return tokens.size();
 	}

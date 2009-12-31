@@ -20,10 +20,6 @@
 
 package net.sf.okapi.steps.tokenization.ui;
 
-import static org.junit.Assert.assertEquals;
-
-import net.sf.okapi.steps.tokenization.ui.mapping.Mapper;
-
 import org.junit.Test;
 
 

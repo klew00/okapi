@@ -970,8 +970,13 @@ public class Util {
 	}
 
 // List helpers	
+	/**
+	 * Returns true if a given index is within the list bounds.
+	 * @param index the given index.
+	 * @param list the given list.
+	 */
 	public static <E> boolean checkIndex(int index, List<E> list) {
-		return ((list != null) && (index >= 0) && (index < list.size()));
+		return (list != null) && (index >= 0) && (index < list.size());
 	}
 
 	/**
@@ -1019,6 +1024,15 @@ public class Util {
 			return null;
 	}
 
+	/**
+	 * Returns true if a given index is within the array bounds.
+	 * @param index the given index.
+	 * @param list the given list.
+	 */
+	public static <T> boolean checkIndex(int index, T[] array) {
+		return (array != null) && (index >= 0) && (index < array.length);
+	}
+	
 	/**
 	 * Indicates whether a byte-flag is set or not in a given value. 
 	 * @param value the value to check.

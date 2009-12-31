@@ -20,92 +20,67 @@
 
 package net.sf.okapi.steps.tokenization.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.okapi.common.ListUtil;
-import net.sf.okapi.common.ParametersString;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.LocaleFilter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.lib.extra.AbstractParameters;
 
 public class LanguageParameters extends AbstractParameters {
 
-	/**
-	 * @see languageMode;
-	 */
-	final public static int LANGUAGES_ALL = 0;
-	final public static int LANGUAGES_ONLY_WHITE_LIST = 1;
-	final public static int LANGUAGES_ALL_EXCEPT_BLACK_LIST = 2;
-	
-	/**
-	 * The set of languages is specified by languageMode:
-	 * <li>LANGUAGES_ALL = 0 - all languages  
-	 * <li>LANGUAGES_ONLY_WHITE_LIST = 1 - only the languages listed on languagesWhiteList 
-	 * <li>LANGUAGES_ALL_EXCEPT_BLACK_LIST = 2 - all languages except those not listed on languagesBlackList<p>
-	 * Default: LANGUAGES_ALL
-	 */
-	private int languageMode = LANGUAGES_ALL; 
-	private List<String> languageWhiteList;
-	private List<String> languageBlackList;
+	private LocaleFilter localeFilter;
 		
 	@Override
 	protected void parameters_init() {
-		languageWhiteList = new ArrayList<String>();
-		languageBlackList = new ArrayList<String>();
+		
+		localeFilter = new LocaleFilter();
 	}
 	
 	@Override
 	protected void parameters_load(ParametersString buffer) {
-		languageMode = buffer.getInteger("languageMode", LANGUAGES_ALL);
-		setLanguageWhiteList(ListUtil.stringAsList(buffer.getString("languageWhiteList")));
-		setLanguageBlackList(ListUtil.stringAsList(buffer.getString("languageBlackList")));
-		if (( languageMode == LANGUAGES_ONLY_WHITE_LIST ) && Util.isEmpty(languageWhiteList) ) {
-			languageMode = LANGUAGES_ALL;
-		}
+		
+		if (localeFilter == null) return;		
+		localeFilter.fromString(buffer.getString("languages"));
 	}
 
 	@Override
 	protected void parameters_reset() {
-		languageMode = LANGUAGES_ALL;
-		languageWhiteList.clear();
-		languageBlackList.clear();
+		
+		if (localeFilter == null) return;
+		localeFilter.reset();
 	}
 
 	@Override
 	protected void parameters_save(ParametersString buffer) {
-		buffer.setInteger("languageMode", languageMode);
-		buffer.setString("languageWhiteList", ListUtil.listAsString(languageWhiteList));
-		buffer.setString("languageBlackList", ListUtil.listAsString(languageBlackList));
-	}
-
-	public int getLanguageMode() {
-		return languageMode;
-	}
-
-	public void setLanguageMode(int languageMode) {
-		this.languageMode = languageMode;
-	}
-
-	public List<String> getLanguageWhiteList() {
-		return languageWhiteList;
-	}
-
-	public void setLanguageWhiteList(List<String> languageWhiteList) {
-		this.languageWhiteList = languageWhiteList;
-	}
-
-	public List<String> getLanguageBlackList() {
-		return languageBlackList;
-	}
-
-	public void setLanguageBlackList(List<String> languageBlackList) {
-		this.languageBlackList = languageBlackList;
+		
+		if (localeFilter == null) return;
+		buffer.setString("languages", localeFilter.toString());
 	}
 
 	public boolean supportsLanguage(LocaleId language) {
-		if (languageMode == LANGUAGES_ALL_EXCEPT_BLACK_LIST && languageBlackList.contains(language)) return false;
-		if (languageMode == LANGUAGES_ONLY_WHITE_LIST && !languageWhiteList.contains(language)) return false;
-		return true;
+		
+		if (localeFilter == null) return false;		
+		return localeFilter.matches(language);
+	}
+
+	public LocaleFilter getLocaleFilter() {
+		
+		return localeFilter;
+	}
+	
+	public String getLanguages() {
+		
+		if (localeFilter == null) return "";
+		return localeFilter.toString();
+	}
+
+	public void setLocaleFilter(LocaleFilter localeFilter) {
+		
+		this.localeFilter = localeFilter;
 	}		
+	
+	public void setLocaleFilter(String string) {
+		
+		if (localeFilter == null) return;
+		this.localeFilter.fromString(string);
+	}
 }

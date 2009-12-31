@@ -206,11 +206,12 @@ public class Tokens extends ArrayList<Token> {
 	 * @return List of token IDs.
 	 */
 	public static List<Integer> getTokenIDs(List<String> tokenNames) {
-	
+			
 		List<Integer> idList = new ArrayList<Integer>(); 
-		
-		for (String tokenName : tokenNames)			
-			idList.add(Tokens.getTokenId(tokenName));
+	
+		if (tokenNames != null)
+			for (String tokenName : tokenNames)			
+				idList.add(Tokens.getTokenId(tokenName));
 		
 		return idList; 
 	}

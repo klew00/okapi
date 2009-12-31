@@ -21,15 +21,17 @@
 package net.sf.okapi.steps.tokenization.ui;
 
 import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.common.LocaleFilter;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.abstracteditor.IDialogPage;
 import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
 import net.sf.okapi.steps.tokenization.Parameters;
-import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
 import net.sf.okapi.steps.tokenization.ui.locale.LanguageSelector;
 import net.sf.okapi.steps.tokenization.ui.locale.LanguageSelectorPePage;
 import net.sf.okapi.steps.tokenization.ui.tokens.TokenSelector;
 import net.sf.okapi.steps.tokenization.ui.tokens.TokenSelectorPePage;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
@@ -46,20 +48,15 @@ public class OptionsTab extends Composite implements IDialogPage {
 	private Group grpTokenizeInThe;
 	private Button source;
 	private Button targets;
-	private Button langWC;
+	private Button langC;
 	private Button tokensC;
 //	private LanguageAndTokenParameters filterParams = new LanguageAndTokenParameters();
 	private Group grpLanguagesToTokenize;
-	private Button langAll;
-	private Button tokensAll;
-	private Button langW;
-	private Button tokens;
-	private Button langB;
-	private Button langBC;
-	private Text langWE;
-	private Text langBE;
+	private Text langE;
 	private Text tokensE;
 	private Label label_2;
+	private Label languages;
+	private Label tokens;
 
 	/**
 	 * Create the composite.
@@ -93,94 +90,52 @@ public class OptionsTab extends Composite implements IDialogPage {
 		
 		grpLanguagesToTokenize = new Group(this, SWT.NONE);
 		grpLanguagesToTokenize.setText("Languages");
-		grpLanguagesToTokenize.setLayout(new GridLayout(3, false));
+		grpLanguagesToTokenize.setLayout(new GridLayout(2, false));
 		grpLanguagesToTokenize.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-		
-		langAll = new Button(grpLanguagesToTokenize, SWT.RADIO);
-		langAll.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-		langAll.setText("Tokenize all languages");
-		langAll.setData("name", "langAll");
-		new Label(grpLanguagesToTokenize, SWT.NONE);
 				
-				langW = new Button(grpLanguagesToTokenize, SWT.RADIO);
-				GridData gridData_2 = new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1);
-				gridData_2.widthHint = 200;
-				langW.setLayoutData(gridData_2);
-				langW.setText("Tokenize only these languages:");
-				langW.setData("name", "langW");
-				new Label(grpLanguagesToTokenize, SWT.NONE);
-				Label label = new Label(grpLanguagesToTokenize, SWT.NONE);
-				label.setText("    ");
-				label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+				languages = new Label(grpLanguagesToTokenize, SWT.NONE);
+				languages.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+				languages.setData("name", "languages");
+				languages.setText("Select languages, or specify a locale filter string (empty = all languages):");
 				
-				langWE = new Text(grpLanguagesToTokenize, SWT.BORDER);
-				langWE.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-				langWE.setData("name", "langWE");
-				langWE.addVerifyListener(new VerifyListener() {
+				langE = new Text(grpLanguagesToTokenize, SWT.BORDER);
+				GridData gridData_2 = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+				gridData_2.widthHint = 311;
+				langE.setLayoutData(gridData_2);
+				langE.setData("name", "langE");
+				langE.addVerifyListener(new VerifyListener() {
 					public void verifyText(VerifyEvent e) {
 						
-						e.text = e.text.toUpperCase();
+						e.text = e.text.toLowerCase();
 					}
 				});
 				
-				langWC = new Button(grpLanguagesToTokenize, SWT.NONE);
+				langC = new Button(grpLanguagesToTokenize, SWT.NONE);
 				{
 					GridData gridData_1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
 					gridData_1.widthHint = 70;
-					langWC.setLayoutData(gridData_1);
+					langC.setLayoutData(gridData_1);
 				}
-				langWC.setData("name", "langWC");
-				langWC.setText("Select...");
-				
-				langB = new Button(grpLanguagesToTokenize, SWT.RADIO);
-				langB.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 2, 1));
-				langB.setData("name", "langB");
-				langB.setText("Tokenize all languages except these:");
-				new Label(grpLanguagesToTokenize, SWT.NONE);
-				Label label_1 = new Label(grpLanguagesToTokenize, SWT.NONE);
-				label_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-				
-				langBE = new Text(grpLanguagesToTokenize, SWT.BORDER);
-				langBE.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-				langBE.setData("name", "langBE");
-				langBE.addVerifyListener(new VerifyListener() {
-					public void verifyText(VerifyEvent e) {
-						
-						e.text = e.text.toUpperCase();
-					}
-				});
-				
-				langBC = new Button(grpLanguagesToTokenize, SWT.NONE);
-				GridData gridData_6 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-				gridData_6.widthHint = 70;
-				langBC.setLayoutData(gridData_6);
-				langBC.setText("Select...");
-				langBC.setData("name", "langBC");
+				langC.setData("name", "langC");
+				langC.setText("Select...");
 		{
 			Group grpTokensToCapture = new Group(this, SWT.NONE);
 			grpTokensToCapture.setText("Tokens");
-			grpTokensToCapture.setLayout(new GridLayout(3, false));
+			grpTokensToCapture.setLayout(new GridLayout(2, false));
 			GridData gridData_3 = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
-			gridData_3.widthHint = 600;
+			gridData_3.heightHint = 100;
+			gridData_3.widthHint = 500;
 			grpTokensToCapture.setLayoutData(gridData_3);
 			
-			tokensAll = new Button(grpTokensToCapture, SWT.RADIO);
-			tokensAll.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-			tokensAll.setText("Capture all tokens");
-			tokensAll.setData("name", "tokensAll");
-			new Label(grpTokensToCapture, SWT.NONE);
-					
-			tokens = new Button(grpTokensToCapture, SWT.RADIO);
-			GridData gridData = new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1);
-			gridData.widthHint = 200;
-			tokens.setLayoutData(gridData);
-			tokens.setText("Capture only these tokens:");
+			tokens = new Label(grpTokensToCapture, SWT.NONE);
+			tokens.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
 			tokens.setData("name", "tokens");
-			new Label(grpTokensToCapture, SWT.NONE);
-			new Label(grpTokensToCapture, SWT.NONE);
+			tokens.setText("Select tokens to extract (empty = all tokens):");
 			
 			tokensE = new Text(grpTokensToCapture, SWT.BORDER);
-			tokensE.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+			GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
+			gridData.widthHint = 296;
+			tokensE.setLayoutData(gridData);
 			tokensE.setData("name", "tokensE");
 			tokensE.addVerifyListener(new VerifyListener() {
 				public void verifyText(VerifyEvent e) {
@@ -226,37 +181,54 @@ public class OptionsTab extends Composite implements IDialogPage {
 			SWTUtil.setSelected(targets, true);
 		}
 
-		SWTUtil.setEnabled(langWC, SWTUtil.getSelected(langW));
-		SWTUtil.setEnabled(langBC, SWTUtil.getSelected(langB));
-		SWTUtil.setEnabled(tokensC, SWTUtil.getSelected(tokens));
+//		SWTUtil.setEnabled(langC, SWTUtil.getSelected(langW));
+//		SWTUtil.setEnabled(langBC, SWTUtil.getSelected(langB));
+//		SWTUtil.setEnabled(tokensC, SWTUtil.getSelected(tokens));
+//		
+//		SWTUtil.setEnabled(langE, SWTUtil.getSelected(langW));
+//		SWTUtil.setEnabled(langBE, SWTUtil.getSelected(langB));
+//		SWTUtil.setEnabled(tokensE, SWTUtil.getSelected(tokens));
 		
-		SWTUtil.setEnabled(langWE, SWTUtil.getSelected(langW));
-		SWTUtil.setEnabled(langBE, SWTUtil.getSelected(langB));
-		SWTUtil.setEnabled(tokensE, SWTUtil.getSelected(tokens));
-		
-		if (speaker == langWC) {
+		if (speaker == langC) {
 
 //			filterParams.languageMode = LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST;
 //			filterParams.languageWhiteList = langWE.getText();
 			
 			// No result analysis needed, the LanguagesPage will change filterParams only if its dialog was OK-ed
 			//SWTUtil.inputQuery(LanguagesPage.class, getShell(), "Languages to tokenize", filterParams, null);
-			String[] res = LanguageSelector.select(getShell(), LanguageSelectorPePage.class, langWE.getText());
+			
+			String explicitLocales = LocaleFilter.getExplicitLocaleIds(langE.getText());
+			if (!Util.isEmpty(explicitLocales))
+				SWTUtil.setText(langE, explicitLocales);
+			
+			String res = ListUtil.arrayAsString(LanguageSelector.select(getShell(), LanguageSelectorPePage.class, 
+					explicitLocales), " ");
 			//SWTUtil.setText(langWE, filterParams.languageWhiteList);
-			SWTUtil.setText(langWE, ListUtil.arrayAsString(res));
+			
+			// explicitLocales <> "" if there's a list of locale IDs in it, can be safely replaced with the result
+			if (Util.isEmpty(explicitLocales) && !Util.isEmpty(langE.getText())) {
+			
+				if (!Util.isEmpty(res))
+					SWTUtil.setText(langE, langE.getText() + " " + res);
+			}							
+			else 
+				SWTUtil.setText(langE, res);
+			
+			langE.setFocus();
+			langE.setSelection(langE.getText().length());
 		}
 		
-		if (speaker == langBC) {
-
-//			filterParams.languageMode = LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST;
-//			filterParams.languageBlackList = langBE.getText();
-			
-			// No result analysis needed, the LanguagesPage will change filterParams only if its dialog was OK-ed
-			//SWTUtil.inputQuery(LanguagesPage.class, getShell(), "Languages NOT to tokenize (exceptions)", filterParams, null);
-			String[] res = LanguageSelector.select(getShell(), LanguageSelectorPePage.class, langBE.getText());
-			//SWTUtil.setText(langBE, filterParams.languageBlackList);
-			SWTUtil.setText(langBE, ListUtil.arrayAsString(res));
-		}
+//		if (speaker == langBC) {
+//
+////			filterParams.languageMode = LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST;
+////			filterParams.languageBlackList = langBE.getText();
+//			
+//			// No result analysis needed, the LanguagesPage will change filterParams only if its dialog was OK-ed
+//			//SWTUtil.inputQuery(LanguagesPage.class, getShell(), "Languages NOT to tokenize (exceptions)", filterParams, null);
+//			String[] res = LanguageSelector.select(getShell(), LanguageSelectorPePage.class, langBE.getText());
+//			//SWTUtil.setText(langBE, filterParams.languageBlackList);
+//			SWTUtil.setText(langBE, ListUtil.arrayAsString(res));
+//		}
 		
 		if (speaker == tokensC) {
 			
@@ -268,16 +240,17 @@ public class OptionsTab extends Composite implements IDialogPage {
 			String[] res = TokenSelector.select(getShell(), TokenSelectorPePage.class, tokensE.getText());
 			//SWTUtil.setText(tokensE, filterParams.tokenNames);
 			SWTUtil.setText(tokensE, ListUtil.arrayAsString(res));
+			tokensE.setFocus();
 		}
 		
-		if (speaker == langW)
-			langWE.setFocus();
-		
-		if (speaker == langB)
-			langBE.setFocus();
-			
-		if (speaker == tokens)
-			tokensE.setFocus();
+//		if (speaker == langW)
+//			langE.setFocus();
+//		
+//		if (speaker == langB)
+//			langBE.setFocus();
+//			
+//		if (speaker == tokens)
+//			tokensE.setFocus();
 	}
 
 	public boolean load(Object data) {
@@ -288,34 +261,12 @@ public class OptionsTab extends Composite implements IDialogPage {
 			
 			SWTUtil.setSelected(source, params.tokenizeSource);
 			SWTUtil.setSelected(targets, params.tokenizeTargets);
-			
-			SWTUtil.setSelected(langAll, params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL);
-			SWTUtil.setSelected(langW, params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST);
-			SWTUtil.setSelected(langB, params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST);
-			
-			SWTUtil.setSelected(tokensAll, params.getTokenMode() == LanguageAndTokenParameters.TOKENS_ALL);								
-			SWTUtil.setSelected(tokens, params.getTokenMode() == LanguageAndTokenParameters.TOKENS_SELECTED);
-			
-			SWTUtil.setText(langWE, ListUtil.listAsString(params.getLanguageWhiteList()));
-			SWTUtil.setText(langBE, ListUtil.listAsString(params.getLanguageBlackList()));
+			SWTUtil.setText(langE, params.getLanguages());
 			SWTUtil.setText(tokensE, ListUtil.listAsString(params.getTokenNames()));
-			
-//			if (filterParams != null) {
-//				
-//				filterParams.languageMode = params.languageMode;
-//				filterParams.languageBlackList = params.languageBlackList;
-//				filterParams.languageWhiteList = params.languageWhiteList;
-//				
-//				filterParams.tokenMode = params.tokenMode;
-//				filterParams.tokenNames = params.tokenNames;
-//				
-//				SWTUtil.setText(langWE, filterParams.languageWhiteList);
-//				SWTUtil.setText(langBE, filterParams.languageBlackList);
-//				SWTUtil.setText(tokensE, filterParams.tokenNames);
-//			}
 		}
 		
-		SWTUtil.addSpeakers(this, source, targets, langWC, langBC, tokensC, langAll, tokensAll, langW, langB, tokens); 
+		SWTUtil.addSpeakers(this, source, targets, langC, langE, tokensC, tokensE);
+		langE.setFocus();
 		
 		return true;
 	}
@@ -328,25 +279,8 @@ public class OptionsTab extends Composite implements IDialogPage {
 			
 			params.tokenizeSource = SWTUtil.getSelected(source);
 			params.tokenizeTargets = SWTUtil.getSelected(targets);
-			
-			if (SWTUtil.getSelected(langAll))
-				params.setLanguageMode(LanguageAndTokenParameters.LANGUAGES_ALL);
-			
-			if (SWTUtil.getSelected(langW))
-				params.setLanguageMode(LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST);
-			
-			if (SWTUtil.getSelected(langB))
-				params.setLanguageMode(LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST);
-			
-			if (SWTUtil.getSelected(tokensAll))
-				params.setTokenMode(LanguageAndTokenParameters.TOKENS_ALL);
-			
-			if (SWTUtil.getSelected(tokens))
-				params.setTokenMode(LanguageAndTokenParameters.TOKENS_SELECTED);
-									
-			params.setLanguageWhiteList(ListUtil.stringAsList(langWE.getText()));
-			params.setLanguageBlackList(ListUtil.stringAsList(langBE.getText()));
-			params.setTokenNames(ListUtil.stringAsList(tokensE.getText()));
+			params.setLocaleFilter(langE.getText());
+			params.setTokenNames(ListUtil.stringAsArray(tokensE.getText(), " "));
 		}
 
 		return true;

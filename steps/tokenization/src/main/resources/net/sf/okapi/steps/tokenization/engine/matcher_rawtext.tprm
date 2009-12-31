@@ -11,6 +11,4 @@ Rule0.pattern=.+
 Rule0.regexOptions.i=0
 Rule0.regexGroup.i=0
 Rule0.keepInput.b=false
-Rule0.languageMode.i=1
-Rule0.languageWhiteList=
-Rule0.languageBlackList=
+Rule0.languages=

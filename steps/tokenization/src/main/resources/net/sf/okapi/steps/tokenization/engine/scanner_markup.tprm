@@ -11,9 +11,7 @@ Rule0.lexemId.i=0
 Rule0.pattern=<a href="(.+)" alt="(.+)">
 Rule0.regexOptions.i=0
 Rule0.regexGroup.i=1
-Rule0.languageMode.i=1
-Rule0.languageWhiteList=
-Rule0.languageBlackList=
+Rule0.languages=
 
 Rule1.name=A-tag2
 Rule1.description=Extracts alt-text part from A-tags  
@@ -25,6 +23,4 @@ Rule1.lexemId.i=0
 Rule1.pattern=<a href="(.+)" alt="(.+)">
 Rule1.regexOptions.i=0
 Rule1.regexGroup.i=2
-Rule1.languageMode.i=1
-Rule1.languageWhiteList=
-Rule1.languageBlackList=
+Rule1.languages=

@@ -25,23 +25,12 @@ import java.util.List;
 
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class LanguageAndTokenParameters extends LanguageParameters {
-
-	/**
-	 * @see tokenMode;
-	 */
-	final public static int TOKENS_ALL = 0;
-	final public static int TOKENS_SELECTED = 1;
 	
-	/**
-	 * The set of tokens is specified by tokenMode:
-	 * <li>TOKENS_ALL = 0 - all registered token names  
-	 * <li>TOKENS_ONLY_LISTED = 1 - only the token names listed on tokenNames<p> 
-	 * Default: TOKENS_ALL
-	 */
-	private int tokenMode = TOKENS_ALL;
 	private List<String> tokenNames;
+	private List<Integer> tokenIds;
 
 	@Override
 	protected void parameters_init() {
@@ -49,6 +38,7 @@ public class LanguageAndTokenParameters extends LanguageParameters {
 		super.parameters_init();
 		
 		tokenNames = new ArrayList<String>();
+		tokenIds = new ArrayList<Integer>();
 	}
 	
 	@Override
@@ -56,8 +46,9 @@ public class LanguageAndTokenParameters extends LanguageParameters {
 		
 		super.parameters_load(buffer);
 		
-		tokenMode = buffer.getInteger("tokenMode", TOKENS_ALL);
-		ListUtil.stringAsList(tokenNames, buffer.getString("tokenNames"));		
+//		ListUtil.stringAsList(tokenNames, buffer.getString("tokens"));
+//		tokenIds = Tokens.getTokenIDs(tokenNames);
+		setTokenNames(buffer.getString("tokens"));
 	}
 
 	@Override
@@ -65,8 +56,8 @@ public class LanguageAndTokenParameters extends LanguageParameters {
 		
 		super.parameters_reset();
 		
-		tokenMode = TOKENS_ALL;
 		tokenNames.clear();
+		tokenIds.clear();
 	}
 
 	@Override
@@ -74,34 +65,37 @@ public class LanguageAndTokenParameters extends LanguageParameters {
 		
 		super.parameters_save(buffer);
 		
-		buffer.setInteger("tokenMode", tokenMode);
-		buffer.setString("tokenNames", ListUtil.listAsString(tokenNames));
+		buffer.setString("tokens", ListUtil.listAsString(tokenNames));
 	}
 
-	public int getTokenMode() {
+	public boolean supportsToken(String tokenName) {
 		
-		return tokenMode;
+		return (tokenNames != null) && (tokenNames.contains(tokenName) || (tokenNames.size() == 0));
+	}
+	
+	public boolean supportsToken(int tokenId) {
+		
+		return (tokenIds != null) && (tokenIds.contains(tokenId) || (tokenIds.size() == 0));
 	}
 
-	public void setTokenMode(int tokenMode) {
+//	public void setTokenNames(List<String> tokenNames) {
+//		
+//		this.tokenNames = tokenNames;
+//		tokenIds = Tokens.getTokenIDs(this.tokenNames);
+//	}
+	
+	public void setTokenNames(String... tokenNames) {
 		
-		this.tokenMode = tokenMode;
+		//setTokenNames(ListUtil.arrayAsList(tokenNames));
+		if (tokenNames != null)
+			this.tokenNames = ListUtil.arrayAsList(tokenNames);
+		
+		tokenIds = Tokens.getTokenIDs(this.tokenNames);
 	}
 
 	public List<String> getTokenNames() {
 		
 		return tokenNames;
 	}
-
-	public void setTokenNames(List<String> tokenNames) {
-		
-		this.tokenNames = tokenNames;
-	}
-
-	public boolean supportsTokenName(String tokenName) {
-		
-		if (tokenMode == TOKENS_SELECTED && !tokenNames.contains(tokenName)) return false;
-		
-		return true;
-	}
+	
 }

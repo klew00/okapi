@@ -20,7 +20,6 @@
 
 package net.sf.okapi.steps.tokenization.ui.locale;
 
-import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ui.abstracteditor.AbstractListAddRemoveTab;
 import net.sf.okapi.steps.tokenization.common.LanguageAndTokenParameters;
 import net.sf.okapi.steps.tokenization.locale.LanguageList;
@@ -61,17 +60,17 @@ public class LanguagesPage extends AbstractListAddRemoveTab {
 		
 		if (!(data instanceof LanguageAndTokenParameters)) return false;
 		
-		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;
-		
-		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
-		
-		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)
-			list.setItems(ListUtil.listAsArray(params.getLanguageWhiteList()));
-		
-		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
-			list.setItems(ListUtil.listAsArray(params.getLanguageBlackList()));
-			
-		selectListItem(0);			
+//		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;
+//		
+//		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
+//		
+//		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)
+//			list.setItems(ListUtil.listAsArray(params.getLanguageWhiteList()));
+//		
+//		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
+//			list.setItems(ListUtil.listAsArray(params.getLanguageBlackList()));
+//			
+//		selectListItem(0);			
 		
 		return true;
 	}
@@ -80,14 +79,14 @@ public class LanguagesPage extends AbstractListAddRemoveTab {
 		
 		if (!(data instanceof LanguageAndTokenParameters)) return false;
 		
-		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;
-		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
-		
-		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)			
-			params.setLanguageWhiteList(ListUtil.arrayAsList(list.getItems()));
-		
-		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
-			params.setLanguageBlackList(ListUtil.arrayAsList(list.getItems()));
+//		LanguageAndTokenParameters params = (LanguageAndTokenParameters) data;
+//		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL) return false;
+//		
+//		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ONLY_WHITE_LIST)			
+//			params.setLanguageWhiteList(ListUtil.arrayAsList(list.getItems()));
+//		
+//		if (params.getLanguageMode() == LanguageAndTokenParameters.LANGUAGES_ALL_EXCEPT_BLACK_LIST)
+//			params.setLanguageBlackList(ListUtil.arrayAsList(list.getItems()));
 		
 		return true;
 	}
