@@ -30,6 +30,9 @@ import org.eclipse.swt.widgets.Shell;
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
+import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.Util;
@@ -51,6 +54,7 @@ public class CommandLine {
 	private BatchLog log;
 	private LogHandler logHandler;
 	private String utilityId;
+	private String pipelineFile;
 	private String optionsFile;
 	private boolean promptForOptions = true;
 	private BaseHelp help;
@@ -65,8 +69,14 @@ public class CommandLine {
 			if ( !parseArguments(args) ) {
 				return;
 			}
+			
+			// Launch either a utility
 			if ( utilityId != null ) {
 				launchUtility();
+			}
+			// Or a pipeline
+			else if ( pipelineFile != null ) {
+				launchPipeline();
 			}
 		}
 		catch ( Throwable e ) {
@@ -93,6 +103,7 @@ public class CommandLine {
 		boolean setOutSearch = false;
 		int inpList = -1;
 		optionsFile = null;
+		pipelineFile = null;
 		
 		for ( int i=0; i<args.length; i++ ) {
 			arg = args[i];
@@ -130,6 +141,10 @@ public class CommandLine {
 			}
 			else if ( "-opt".equals(arg) ) { //$NON-NLS-1$
 				optionsFile = nextArg(args, ++i);
+			}
+			else if ( "-pln".equals(arg) ) {
+				pipelineFile = nextArg(args, ++i);
+				continueAfter = true;
 			}
 			else if ( "-fc".equals(arg) ) { //$NON-NLS-1$
 				Input inp = prj.getLastItem(inpList);
@@ -222,7 +237,6 @@ public class CommandLine {
 	}
 	
 	private void launchUtility () {
-		if ( utilityId == null ) return;
 		// Create the utility driver if needed
 		if ( ud == null ) {
 			mapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
@@ -256,4 +270,50 @@ public class CommandLine {
 		ud.execute(shell);
 	}
 
+	private void launchPipeline () {
+		// Save any pending data
+//		saveSurfaceData();
+//		updateCustomConfigurations();
+
+		mapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
+		mapper.updateCustomConfigurations();
+		PipelineWrapper wrapper = new PipelineWrapper(mapper);
+		
+		IPredefinedPipeline predefinedPipeline = null;
+		
+//		// If we have a predefined pipeline: set it
+//		if ( predefinedPipeline != null ) {
+//			// Get the parameters data from the project
+//			predefinedPipeline.setParameters(prj.getUtilityParameters(predefinedPipeline.getId()));
+//			// Load the pipeline
+//			wrapper.loadPipeline(predefinedPipeline, null);
+//		}
+		wrapper.load(pipelineFile);
+
+		if ( promptForOptions ) {
+			PipelineEditor dlg = new PipelineEditor();
+			int res = dlg.edit(shell, wrapper.availableSteps, wrapper,
+				(predefinedPipeline==null) ? null : predefinedPipeline.getTitle(),
+				help, null);
+		
+			if ( res == PipelineEditor.RESULT_CANCEL ) {
+				return; // No execution, no save
+			}
+
+//			// If it's a predefined pipeline: save the parameters
+//			if ( predefinedPipeline != null ) {
+//				wrapper.copyParametersToPipeline(predefinedPipeline);
+//				prj.setUtilityParameters(predefinedPipeline.getId(),
+//					predefinedPipeline.getParameters());
+//			}
+		
+			if ( res == PipelineEditor.RESULT_CLOSE ) {
+				return; // No execution
+			}
+		}
+		
+		// Else: execute
+//		startWaiting(Res.getString("MainForm.startWaiting"), true); //$NON-NLS-1$
+		wrapper.execute(prj);
+	}
 }

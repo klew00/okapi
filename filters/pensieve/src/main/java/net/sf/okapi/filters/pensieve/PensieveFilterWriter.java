@@ -42,8 +42,8 @@ import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 /**
- * Implementation of the {@link IFilterWriter} interface for Pensieve TM. The resources are expected to have a target
- * entry for the given target locale.
+ * Implementation of the {@link IFilterWriter} interface for Pensieve TM.
+ * The resources are expected to have a target entry for the given target locale.
  */
 public class PensieveFilterWriter implements IFilterWriter {
 
@@ -133,22 +133,18 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 	private void handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit) event.getResource();
-
-		// TODO: What do we do with entries with empty/non-existing target?
-		if (!tu.hasTarget(trgLoc))
-			return;
-		// if ( tu.getTarget(trgLang).isEmpty() ) return;
+		if ( !tu.hasTarget(trgLoc) ) return;
 
 		TextContainer srcCont = tu.getSource();
 		// If not segmented: index the whole entry
-		if (!srcCont.isSegmented()) {
+		if ( !srcCont.isSegmented() ) {
 			writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLoc, trgLoc, tu));
 			return;
 		}
 
 		// Else: check if we have the same number of segments
 		List<Segment> trgList = tu.getTarget(trgLoc).getSegments();
-		if (trgList.size() != srcCont.getSegmentCount()) {
+		if ( trgList.size() != srcCont.getSegmentCount() ) {
 			// Fall back to full entry
 			writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLoc, trgLoc, tu));
 			// TODO: Log a warning
@@ -157,7 +153,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 		// Index each segment
 		int i = 0;
-		for (Segment segment : srcCont.getSegments()) {
+		for ( Segment segment : srcCont.getSegments() ) {
 			TranslationUnitVariant source = new TranslationUnitVariant(srcLoc, segment.text);
 			TranslationUnitVariant target = new TranslationUnitVariant(trgLoc, trgList.get(i).text);
 			TranslationUnit trUnit = new TranslationUnit(source, target);

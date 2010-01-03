@@ -63,7 +63,9 @@ class StepPicker {
 		label.setText("Available steps:");
 		
 		lbUtilities = new List(shell, SWT.BORDER | SWT.V_SCROLL);
-		lbUtilities.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.heightHint = 350;
+		lbUtilities.setLayoutData(gdTmp);
 		lbUtilities.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {
 				if ( !saveData() ) return;
@@ -87,7 +89,7 @@ class StepPicker {
 		});
 		
 		edDescription = new Text(shell, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
-		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_END);
 		gdTmp.heightHint = 45;
 		gdTmp.horizontalSpan = 2;
 		edDescription.setLayoutData(gdTmp);
