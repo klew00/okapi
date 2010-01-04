@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -524,10 +524,18 @@ public class PipelineEditor {
 			catch ( OkapiEditorCreationException e ) {
 				Dialogs.showError(shell, e.getMessage(), null);
 			}
-			if (( editor != null )
-				&& IEmbeddableParametersEditor.class.isAssignableFrom(editor.getClass()) ) {
-				((IEmbeddableParametersEditor)editor).initializeEmbeddableEditor(optionsHolder, params, context);
-				return (IEmbeddableParametersEditor)editor;
+			if ( editor != null ) {
+				if ( IEmbeddableParametersEditor.class.isAssignableFrom(editor.getClass()) ) {
+					// Use directly the embedded panel
+					((IEmbeddableParametersEditor)editor).initializeEmbeddableEditor(optionsHolder, params, context);
+					return (IEmbeddableParametersEditor)editor;
+				}
+				else { // If we have a dedicated editor, use a button in an embedded panel
+					// to access it and edit the parameters from there
+					IEmbeddableParametersEditor tmp = new EmbeddableEditorButton(editor);
+					tmp.initializeEmbeddableEditor(optionsHolder, params, context);
+					return tmp;
+				}
 			}
 			
 			// Else: Try to use the generic editor

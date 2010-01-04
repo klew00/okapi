@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -310,8 +310,8 @@ public class PipelineWrapper {
 			}
 			map.put(step.id, step);
 			
-/*			ps = (IPipelineStep)Class.forName(
-			"net.sf.okapi.steps.tokenization.TokenizationStep").newInstance();
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.tokenization.TokenizationStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
 				ps.getName(), ps.getDescription(), ps.getClass().getName(),
@@ -321,7 +321,7 @@ public class PipelineWrapper {
 				peMapper.addEditor("net.sf.okapi.steps.tokenization.ui.ParametersEditor", step.paramsClass);
 			}
 			map.put(step.id, step);
-					
+/*					
 
 			ps = (IPipelineStep)Class.forName(
 			"net.sf.okapi.steps.wordcount.WordCountStep").newInstance();
