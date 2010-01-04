@@ -479,9 +479,10 @@ public class PipelineEditor {
 		if ( help == null ) return;
 		int n = lbSteps.getSelectionIndex();
 		if ( n > lbSteps.getItemCount()-1 ) return;
-		StepInfo tmp = workSteps.get(n);
+	//	StepInfo tmp = workSteps.get(n);
 		// Step name, all lowercase
-		String a = tmp.stepClass;
+//		String a = tmp.stepClass;
+		Dialogs.showError(shell, "Not implemented yet", null);
 //TODO		
 		//help.showTopic(this, "../index", "pipeline/editOrExecutePipeline.html");
 	}

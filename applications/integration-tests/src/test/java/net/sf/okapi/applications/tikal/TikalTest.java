@@ -294,21 +294,21 @@ public class TikalTest {
     @Test
     public void testImportExportPensieve () throws IOException, InterruptedException {
     	// Delete previous output
-    	assertTrue(deleteOutputDir("pensieveTM", true));
+    	assertTrue(deleteOutputDir("pensieveTM.pentm", true));
     	// Import
-    	assertEquals(0, runTikal("-imp pensieveTM tmxtest-attributes.tmx -sl EN-US -tl FR-FR"));
+    	assertEquals(0, runTikal("-imp pensieveTM.pentm tmxtest-attributes.tmx -sl EN-US -tl FR-FR"));
     	// Check if we can query the TM (does not check the result)
-    	assertEquals(0, runTikal("-q \"One entry in the TM.\" -pen pensieveTM -sl EN-US -tl FR-FR"));
+    	assertEquals(0, runTikal("-q \"One entry in the TM.\" -pen pensieveTM.pentm -sl EN-US -tl FR-FR"));
     	
     	// Export now
     	assertTrue(deleteOutputFile("pensieveTM.tmx"));
-    	assertEquals(0, runTikal("-2tmx pensieveTM -fc okf_pensieve -sl EN-US -tl FR-FR"));
-    	assertTrue("File different from gold", compareWithGoldFile("pensieveTM.tmx", "UTF-8"));
+    	assertEquals(0, runTikal("-2tmx pensieveTM.pentm -fc okf_pensieve -sl EN-US -tl FR-FR"));
+    	assertTrue("File different from gold", compareWithGoldFile("pensieveTM.pentm.tmx", "UTF-8"));
 
     	// Export again, using -exp 
     	assertTrue(deleteOutputFile("pensieveTM.tmx"));
-    	assertEquals(0, runTikal("-exp pensieveTM -sl EN-US -tl FR-FR"));
-    	assertTrue("File different from gold", compareWithGoldFile("pensieveTM.tmx", "UTF-8"));
+    	assertEquals(0, runTikal("-exp pensieveTM.pentm -sl EN-US -tl FR-FR"));
+    	assertTrue("File different from gold", compareWithGoldFile("pensieveTM.pentm.tmx", "UTF-8"));
     }
 
     @Test

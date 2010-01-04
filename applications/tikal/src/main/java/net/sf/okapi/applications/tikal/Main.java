@@ -277,6 +277,8 @@ public class Main {
 				else if ( arg.equals("-imp") ) {
 					prog.command = CMD_CONV2PEN;
 					prog.pensieveDir = prog.getArgument(args, ++i);
+					String ext = Util.getExtension(prog.pensieveDir);
+					if ( Util.isEmpty(ext) ) prog.pensieveDir += ".pentm";
 				}
 				else if ( arg.equals("-exp") ) {
 					prog.command = CMD_CONV2TMX;
@@ -338,6 +340,8 @@ public class Main {
 				else if ( arg.equals("-pen") ) {
 					prog.usePensieve = true;
 					prog.pensieveDir = prog.getArgument(args, ++i);
+					String ext = Util.getExtension(prog.pensieveDir);
+					if ( Util.isEmpty(ext) ) prog.pensieveDir += ".pentm";
 				}
 				else if ( arg.endsWith("-listconf") || arg.equals("-lfc") ) {
 					prog.showAllConfigurations();
@@ -500,6 +504,7 @@ public class Main {
 
 		filtersMap.put("okf_phpcontent", "net.sf.okapi.filters.php.PHPContentFilter");
 
+		extensionsMap.put(".pentm", "okf_pensieve");
 		filtersMap.put("okf_pensieve", "net.sf.okapi.filters.pensieve.PensieveFilter");
 	}
 	
@@ -646,7 +651,6 @@ public class Main {
 	}
 	
 	private void guessMergingArguments (String input) {
-		
 		String ext = Util.getExtension(input);
 		if ( !ext.equals(".xlf") ) {
 			throw new RuntimeException(String.format(
