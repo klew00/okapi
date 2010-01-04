@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -39,13 +39,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public static final int TRG_FORCESOURCE = 1; 
 	public static final int TRG_FORCEEMPTY = 2; 
 
-	static final String SINGLEOUTPUT = "singleOutput";
-	static final String OUTPUTPATH = "outputPath";
-	static final String TARGETSTYLE = "targetStyle";
-	static final String OUTPUTFORMAT = "outputFormat";
-	static final String FORMATOPTIONS = "formatOptions";
-	static final String USEGENERICCODES = "useGenericCodes";
-	static final String SKIPENTRIESWITHOUTTEXT = "skipEntriesWithoutText";
+	private static final String SINGLEOUTPUT = "singleOutput";
+	private static final String OUTPUTPATH = "outputPath";
+	private static final String TARGETSTYLE = "targetStyle";
+	private static final String OUTPUTFORMAT = "outputFormat";
+	private static final String FORMATOPTIONS = "formatOptions";
+	private static final String USEGENERICCODES = "useGenericCodes";
+	private static final String SKIPENTRIESWITHOUTTEXT = "skipEntriesWithoutText";
 	
 	private boolean singleOutput;
 	private String outputPath;
@@ -118,7 +118,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void reset () {
 		singleOutput = true;
 		targetStyle = TRG_TARGETOREMPTY;
-		outputPath = "output";
+		outputPath = "";
 		outputFormat = FORMAT_TMX;
 		formatOptions = null;
 		useGenericCodes = false;

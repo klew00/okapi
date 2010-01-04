@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,14 +20,16 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
-import net.sf.okapi.steps.simpletm2tmx.SimpleTM2TMXStep;
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.formatconversion.FormatConversionStep;
 
-public class ExportTMPipeline extends PredefinedPipeline {
+public class FormatConversionPipeline extends PredefinedPipeline {
 
-	public ExportTMPipeline () {
-		super("ExportTMPipeline",
-			"Create TMX files for SimpleTM Databases");
-		addStep(new SimpleTM2TMXStep());
+	public FormatConversionPipeline () {
+		super("FormatConversionPipeline",
+			"Convert File Format");
+		addStep(new RawDocumentToFilterEventsStep());
+		addStep(new FormatConversionStep());
 	}
 	
 }

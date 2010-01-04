@@ -27,13 +27,17 @@ Framework between the previous one (M4) and this release (M5).</p>
 	<li>Replaced the utility &quot;Generate SimpleTM Dabase&quot; by the utility &quot;Import 
 	Into Pensieve TM&quot; (the previous utility&#39;s functionality is still available 
 	using a custom pipeline).</li>
+	<li>Replaced the utility &quot;Export SimpleTM Database&quot; by the utility &quot;Convert 
+	File Format&quot; (the previous utility&#39;s functionality is still available using 
+	a custom pipeline).</li>
+	<li>Fixed issue with Text Rewriting and empty &lt;target&gt; for XLIFF input.</li>
 </ul>
 	</li>
-	<li>Steps and Rainbow Utilities:<ul>
-	<li>Fixed issue with Text Rewriting and empty &lt;target&gt; for XLIFF input.</li>
+	<li>Steps:<ul>
 	<li>Added Batch Translation step (tested with ProMT and Apertium).</li>
 	<li>Added Codes Removal step</li>
 	<li>Added Leveraging step</li>
+	<li>Completed initial Tokenization and Word-Counter steps.</li>
 </ul>
 	</li>
 	<li>Translation resources:<ul>
@@ -47,7 +51,7 @@ Framework between the previous one (M4) and this release (M5).</p>
 	<li>Fixed RTF parser issue with \&#39;HHc being read as \&#39;HH\&#39;HH in some cases.</li>
 	<li>Added support for additional DBCS encodings in RTF parser.</li>
 	<li>Added TTX Filter for Trados TagEditor documents.</li>
-	<li>Added pre-defined configuration for well-formed HTML, providing groups 
+	<li>Added pre-defined configuration for well-formed files in HTML Filter, providing groups 
 	and extra meta-data.</li>
 </ul>
 	</li>

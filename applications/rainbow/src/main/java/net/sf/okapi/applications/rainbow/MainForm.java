@@ -41,7 +41,7 @@ import net.sf.okapi.applications.rainbow.lib.LogForm;
 import net.sf.okapi.applications.rainbow.lib.PathBuilderPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.pipeline.BatchTranslationPipeline;
-import net.sf.okapi.applications.rainbow.pipeline.ExportTMPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.FormatConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.ImportTMPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
@@ -1377,10 +1377,10 @@ public class MainForm { //implements IParametersProvider {
 			}
 		});
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.exporttm"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "utilities.formatconversion"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new ExportTMPipeline());
+				executePipeline(new FormatConversionPipeline());
 			}
 		});
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);

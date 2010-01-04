@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -196,22 +195,11 @@ public class FormatConversionStep extends BasePipelineStep {
 	
 	private void startPOOutput () {
 		File outFile;
-		if ( isLastOutputStep() ) {
-			if ( params.isSingleOutput() ) {
-				outFile = new File(params.getOutputPath());
-			}
-			else {
-				outFile = new File(outputURI);
-			}
+		if ( params.isSingleOutput() ) {
+			outFile = new File(params.getOutputPath());
 		}
 		else {
-			try {
-				outFile = File.createTempFile("okp-fc_", ".tmp");
-			}
-			catch ( Throwable e ) {
-				throw new OkapiIOException("Cannot create temporary output.", e);
-			}
-			outFile.deleteOnExit();
+			outFile = new File(outputURI);
 		}
 		// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
 		writer.setOutput(outFile.getPath());
@@ -227,22 +215,11 @@ public class FormatConversionStep extends BasePipelineStep {
 	
 	private void startTMXOutput () {
 		File outFile;
-		if ( isLastOutputStep() ) {
-			if ( params.isSingleOutput() ) {
-				outFile = new File(params.getOutputPath());
-			}
-			else {
-				outFile = new File(outputURI);
-			}
+		if ( params.isSingleOutput() ) {
+			outFile = new File(params.getOutputPath());
 		}
 		else {
-			try {
-				outFile = File.createTempFile("okp-fc_", ".tmp");
-			}
-			catch ( Throwable e ) {
-				throw new OkapiIOException("Cannot create temporary output.", e);
-			}
-			outFile.deleteOnExit();
+			outFile = new File(outputURI);
 		}
 		writer.setOutput(outFile.getPath());
 		writer.setOptions(targetLocale, "UTF-8");
@@ -257,26 +234,15 @@ public class FormatConversionStep extends BasePipelineStep {
 	
 	private void startTableOutput () {
 		File outFile;
-		if ( isLastOutputStep() ) {
-			if ( params.isSingleOutput() ) {
-				outFile = new File(params.getOutputPath());
-			}
-			else {
-				outFile = new File(outputURI);
-			}
-			// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
-			writer.setOutput(outFile.getPath());
-			writer.setOptions(targetLocale, "UTF-8");
+		if ( params.isSingleOutput() ) {
+			outFile = new File(params.getOutputPath());
 		}
 		else {
-			try {
-				outFile = File.createTempFile("okp-fc_", ".tmp");
-			}
-			catch ( Throwable e ) {
-				throw new OkapiIOException("Cannot create temporary output.", e);
-			}
-			outFile.deleteOnExit();
+			outFile = new File(outputURI);
 		}
+		// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
+		writer.setOutput(outFile.getPath());
+		writer.setOptions(targetLocale, "UTF-8");
 		firstOutputCreated = true;
 	}
 
@@ -288,4 +254,5 @@ public class FormatConversionStep extends BasePipelineStep {
 		writer.setOutput(params.getOutputPath());
 		writer.setOptions(targetLocale, "UTF-8");
 	}
+
 }

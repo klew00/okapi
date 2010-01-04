@@ -75,6 +75,7 @@ public class PipelineEditor {
 	private Button btRemoveStep;
 	private Button btMoveStepUp;
 	private Button btMoveStepDown;
+	private Button btStepInfo;
 	private Text edDescription;
 	private BaseContext context;
 	private String predefined;
@@ -154,7 +155,7 @@ public class PipelineEditor {
 			shell.setText("Edit / Execute Pipeline");
 		}
 		else { // Pre-defined pipeline
-			shell.setText("Pre-defined Pipeline");
+			shell.setText("Pre-Defined Pipeline : "+predefined);
 		}
 		
 		UIUtil.inheritIcon(shell, parent);
@@ -208,12 +209,13 @@ public class PipelineEditor {
 		stTmp.setText("Click on \"Add Step\" to start");
 		
 		// Bottom part
-		if ( predefined == null ) {
-			cmpTmp = new Composite(shell, SWT.NONE);
-			cmpTmp.setLayout(new GridLayout(4, false));
-			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-			cmpTmp.setLayoutData(gdTmp);
+		cmpTmp = new Composite(shell, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout(5, false));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		cmpTmp.setLayoutData(gdTmp);
 		
+		// Pipeline buttons are for normal pipeline only
+		if ( predefined == null ) {
 			// Buttons
 			btAddStep = new Button(cmpTmp, SWT.PUSH);
 			btAddStep.setText("Add Step...");
@@ -258,7 +260,22 @@ public class PipelineEditor {
 					moveStepDown();
 				}
 			});
-			
+		}
+
+		// Info button is for all types of pipeline
+		btStepInfo = new Button(cmpTmp, SWT.PUSH);
+		btStepInfo.setText("Step Info");
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.widthHint = width;
+		btStepInfo.setLayoutData(gdTmp);
+		btStepInfo.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				showStepInfo();
+			}
+		});
+		
+		// Pipeline buttons are for normal pipeline only
+		if ( predefined == null ) {
 			// Pipeline buttons
 			btLoad = new Button(cmpTmp, SWT.PUSH);
 			btLoad.setText("Load...");
@@ -304,6 +321,9 @@ public class PipelineEditor {
 					save(null);
 				}
 			});
+			
+			// Place-holder
+			new Label(cmpTmp, SWT.NONE);
 		
 		} // End of "if predefined"
 		
@@ -365,6 +385,7 @@ public class PipelineEditor {
 				btRemoveStep.setEnabled(false);
 				btMoveStepUp.setEnabled(false);
 				btMoveStepDown.setEnabled(false);
+				btStepInfo.setEnabled(false);
 			}
 			if (( ctrl == null ) || !ctrl.equals(noStepsPanel) ) {
 				((StackLayout)optionsHolder.getLayout()).topControl = noStepsPanel;
@@ -382,6 +403,8 @@ public class PipelineEditor {
 			btMoveStepUp.setEnabled(n>0);
 			btMoveStepDown.setEnabled(n<workSteps.size()-1);
 		}
+		// Info in all cases (if there is a help object)
+		btStepInfo.setEnabled(help!=null);
 
 		IEmbeddableParametersEditor panel = panels.get(n);
 		if ( panel.getComposite() == null ) {
@@ -450,6 +473,17 @@ public class PipelineEditor {
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
+	}
+	
+	private void showStepInfo () {
+		if ( help == null ) return;
+		int n = lbSteps.getSelectionIndex();
+		if ( n > lbSteps.getItemCount()-1 ) return;
+		StepInfo tmp = workSteps.get(n);
+		// Step name, all lowercase
+		String a = tmp.stepClass;
+//TODO		
+		//help.showTopic(this, "../index", "pipeline/editOrExecutePipeline.html");
 	}
 	
 	private void moveStepDown () {

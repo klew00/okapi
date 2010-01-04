@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -87,6 +87,8 @@ public class POFilterWriter implements IFilterWriter {
 			// Close the output
 			writer.close();
 			writer = null;
+			output.close();
+			output = null;
 
 			// If it was in a temporary file, copy it over the existing one
 			// If the IFilter.close() is called before IFilterWriter.close()
@@ -187,6 +189,7 @@ public class POFilterWriter implements IFilterWriter {
 
 	public void setOutput (OutputStream output) {
 		close(); // Make sure previous is closed
+		this.outputPath = null; // If we use the stream, we can't use the path
 		this.output = output; // then assign the new stream
 	}
 
