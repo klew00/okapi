@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Extra Library
+Bundle-SymbolicName: net.sf.okapi.lib.extra
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.lib.extra,
+ net.sf.okapi.lib.extra.filters,
+ net.sf.okapi.lib.extra.steps
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

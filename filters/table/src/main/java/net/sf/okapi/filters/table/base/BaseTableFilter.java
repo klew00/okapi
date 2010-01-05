@@ -26,6 +26,7 @@ import java.util.List;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.NonPluggable;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
@@ -43,7 +44,7 @@ import net.sf.okapi.lib.extra.filters.TextProcessingResult;
  * 
  * @version 0.1, 09.06.2009
  */
-
+@NonPluggable() // This filter is for internal use only
 public class BaseTableFilter extends BasePlainTextFilter {
 	
 	public static final String FILTER_NAME		= "okf_csv";

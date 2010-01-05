@@ -22,6 +22,7 @@ package net.sf.okapi.filters.table.tsv;
 
 import java.util.List;
 
+import net.sf.okapi.common.NonPluggable;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -34,7 +35,7 @@ import net.sf.okapi.lib.extra.filters.TextProcessingResult;
  * 
  * @version 0.1, 09.06.2009
  */
-
+@NonPluggable() // This filter is for internal use only
 public class TabSeparatedValuesFilter  extends BaseTableFilter {
 	
 	public static final String FILTER_NAME		= "okf_table_tsv";

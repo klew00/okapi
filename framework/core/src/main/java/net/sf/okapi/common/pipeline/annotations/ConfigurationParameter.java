@@ -40,11 +40,9 @@ public class ConfigurationParameter {
 		this.method = method;
 	}
 
-
 	public Method getMethod() {
 		return method;
 	}
-
 
 	public void setParameterType(StepParameterType parameterType) {
 		this.parameterType = parameterType;

@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.NonPluggable;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.LocaleId;
@@ -43,7 +44,7 @@ import net.sf.okapi.lib.extra.filters.TextProcessingResult;
  * 
  * @version 0.1, 09.06.2009
  */
-
+@NonPluggable() // This filter is for internal use only
 public class BasePlainTextFilter extends AbstractLineFilter {	
 	
 	public static final String FILTER_NAME				= "okf_plaintext";

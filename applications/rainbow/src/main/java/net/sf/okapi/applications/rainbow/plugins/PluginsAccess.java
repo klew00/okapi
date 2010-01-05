@@ -24,11 +24,16 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.lib.plugins.PluginsManager;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -157,4 +162,29 @@ public class PluginsAccess {
 	public PluginItem getItem (String id) {
 		return items.get(id);
 	}
+
+//	public static void main (String[] args) {
+//		PluginsManager mgt = new PluginsManager();
+//		mgt.reset(new File("C:\\OkapiJava\\trunk\\deployment\\maven\\dist_win32-x86\\dropins\\okapi-lib-0.5-SNAPSHOT.jar"));
+//		
+//		System.out.println("--- Filters");
+//		List<String> list = mgt.getList(PluginsManager.PLUGINTYPE_IFILTER);
+//		for ( String tmp : list ) {
+//			System.out.println(tmp);
+//			IFilter filter = mgt.createIFilter(tmp);
+//			List<FilterConfiguration> configs = filter.getConfigurations();
+//			for ( FilterConfiguration config : configs ) {
+//				System.out.println("  conf="+config.configId);
+//			}
+//		}
+//		
+//		System.out.println("--- Steps");
+//		list = mgt.getList(PluginsManager.PLUGINTYPE_IPIPELINESTEP);
+//		for ( String tmp : list ) {
+//			System.out.println(tmp);
+//			IPipelineStep step = mgt.createIPipelineStep(tmp);
+//			System.out.println(step.getDescription());
+//		}
+//	}
+
 }

@@ -54,6 +54,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.NonPluggable;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
@@ -111,7 +112,7 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
  * in worksheet, sharedString, and comment files respectively.  These tags
  * work like TEXT_UNIT, TEXT_RUN, and TEXT_MARKER elements combined.
  */
-
+@NonPluggable() // This filter is for internal use only
 public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	
 	private Logger LOGGER=null;

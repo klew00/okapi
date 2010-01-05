@@ -23,6 +23,7 @@ package net.sf.okapi.filters.plaintext.spliced;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.NonPluggable;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
@@ -37,7 +38,7 @@ import net.sf.okapi.lib.extra.filters.TextProcessingResult;
  * 
  * @version 0.1, 09.06.2009
  */
-
+@NonPluggable() // This filter is for internal use only
 public class SplicedLinesFilter extends BasePlainTextFilter {
 
 	public static final String FILTER_NAME				= "okf_plaintext_spliced";
