@@ -23,7 +23,6 @@ package net.sf.okapi.lib.extra.filters;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfiguration;

@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.extra;
 
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
