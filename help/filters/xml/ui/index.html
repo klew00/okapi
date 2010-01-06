@@ -107,35 +107,56 @@ is listed below.</p>
 <p>The filter supports extensions to the ITS specification.</p>
 <p>These extension use 
 the namespace URI <code><a href="http://www.w3.org/2008/12/its-extensions">http://www.w3.org/2008/12/its-extensions</a></code>.</p>
-<h3>idPointer and xml:id</h3>
+<h3>idValue and xml:id</h3>
 <p>When the attribute <code>xml:id</code> is found on a translatable element, it 
 is used as the name of the text unit generated for that element.</p>
 <p>For example, in the example below, the resource name associated with the text 
 unit for the <code>&lt;p&gt;</code> element is &quot;<code>id1</code>&quot;.</p>
 <pre>&lt;p xml:id=&quot;id1&quot;&gt;Text&lt;/p&gt;</pre>
-<p>The attribute <code>idPointer</code> used in the ITS <code>translateRule</code> 
-element allows you to define an XPath expression--relative to the selection for 
-that element-- pointing to the node that holds the identifier value for the 
-given selection.</p>
+<p>The attribute <code>idValue</code> used in the ITS <code>translateRule</code> 
+element allows you to define an XPath expression that correspeonds to the identifier value for the 
+given selection. The value of <code>idValue</code> must be an expression that 
+can return a string. A node location is a valid expression: it will return the 
+value of the first node at the given location.</p>
 <p>For example, in the example below, the resource name associated with the text 
 unit for the <code>&lt;p&gt;</code> element is &quot;<code>id1</code>&quot;.</p>
 <pre>&lt;doc&gt;
  &lt;its:rules version=&quot;1.0&quot; xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
   xmlns:itsx=&quot;http://www.w3.org/2008/12/its-extensions&quot;&gt;
-  &lt;its:translateRule selector=&quot;//p&quot; translate=&quot;yes&quot; itsx:idPointer=&quot;@name&quot;/&gt;
+  &lt;its:translateRule selector=&quot;//p&quot; translate=&quot;yes&quot; itsx:idValue=&quot;@name&quot;/&gt;
  &lt;/its:rules&gt;
- &lt;p name=\&quot;id1\&quot;&gt;text 1&lt;/p&gt;
+ &lt;p name=&quot;id1&quot;&gt;text 1&lt;/p&gt;
 &lt;/doc&gt;</pre>
-<p>Note that <code>xml:id</code> has precedence over <code>idPointer</code> 
+<p>Note that <code>xml:id</code> has precedence over <code>idValue</code> 
 declaration. For example, in the example below, the resource name associated 
 with the text unit for the <code>&lt;p&gt;</code> element is &quot;<code>xid1</code>&quot;, not 
 &quot;<code>id1</code>&quot;.</p>
 <pre>&lt;doc&gt;
  &lt;its:rules version=&quot;1.0&quot; xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
   xmlns:itsx=&quot;http://www.w3.org/2008/12/its-extensions&quot;&gt;
-  &lt;its:translateRule selector=&quot;//p&quot; translate=&quot;yes&quot; itsx:idPointer=&quot;@name&quot;/&gt;
+  &lt;its:translateRule selector=&quot;//p&quot; translate=&quot;yes&quot; itsx:idValue=&quot;@name&quot;/&gt;
  &lt;/its:rules&gt;
- &lt;p xml:id=&quot;xid1&quot; name=\&quot;id1\&quot;&gt;text 1&lt;/p&gt;
+ &lt;p xml:id=&quot;xid1&quot; name=&quot;id1&quot;&gt;text 1&lt;/p&gt;
+&lt;/doc&gt;</pre>
+<p>You can build complex ID based on different attributes, element or event 
+hard-coded text. Any of the String functions offered by XPath can be used.</p>
+<p>For example, in the file below, the two elements <code>&lt;text&gt;</code> and
+<code>&lt;desc&gt;</code> are translatable, but they have only one corresponding ID, 
+the <code>name</code> attribute in their parent element. To make sure you have a 
+unique identifier for both the content of <code>&lt;text&gt;</code> and the content of
+<code>&lt;desc&gt;</code>, you can use the rules set in the example. The XPath 
+expression &quot;<code>contact(../@name, &#39;_t&#39;)</code>&quot; will give the ID &quot;<code>id1_t</code>&quot; 
+and the expression &quot;<code>contact(../@name, &#39;_d&#39;)</code>&quot; will give the ID &quot;<code>id1_d</code>&quot;.</p>
+<pre>&lt;doc&gt;
+ &lt;its:rules version=&quot;1.0&quot; xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
+  xmlns:itsx=&quot;http://www.w3.org/2008/12/its-extensions&quot;&gt;
+  &lt;its:translateRule selector=&quot;//text&quot; translate=&quot;yes&quot; itsx:idValue=&quot;contact(../@name, &#39;_t&#39;)&quot;/&gt;
+  &lt;its:translateRule selector=&quot;//desc&quot; translate=&quot;yes&quot; itsx:idValue=&quot;contact(../@name, &#39;_d&#39;)&quot;/&gt;
+ &lt;/its:rules&gt;
+ &lt;msg name=&quot;id1&quot;&gt;
+  &lt;text&gt;Value of text&lt;/text&gt;
+  &lt;desc&gt;Value of desc&lt;/desc&gt;
+ &lt;/msg&gt;
 &lt;/doc&gt;</pre>
 <h3>whiteSpaces</h3>
 <p>The extension attribute <code>whiteSpaces</code> allows you to apply globally 

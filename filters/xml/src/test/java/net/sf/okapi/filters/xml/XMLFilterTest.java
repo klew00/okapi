@@ -69,12 +69,12 @@ public class XMLFilterTest {
 	}
 	
 	@Test
-	public void testComplexIdPointer () {
+	public void testComplexIdValue () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
 			+ "<its:translateRule selector=\"//doc\" translate=\"no\"/>"
-			+ "<its:translateRule selector=\"//src\" translate=\"yes\" itsx:idPointer=\"../../name/@id\"/>"
+			+ "<its:translateRule selector=\"//src\" translate=\"yes\" itsx:idValue=\"../../name/@id\"/>"
 			+ "</its:rules>"
 			+ "<grp><name id=\"id1\" /><u><src>text 1</src></u></grp>"
 			+ "<grp><name id=\"id1\" /><u><src xml:id=\"xid2\">text 2</src></u></grp>"
@@ -89,11 +89,11 @@ public class XMLFilterTest {
 	}
 	
 	@Test
-	public void testIdPointer () {
+	public void testIdValue () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
 			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
-			+ "<its:translateRule selector=\"//p\" translate=\"yes\" itsx:idPointer=\"@name\"/>"
+			+ "<its:translateRule selector=\"//p\" translate=\"yes\" itsx:idValue=\"@name\"/>"
 			+ "</its:rules>"
 			+ "<p name=\"id1\">text 1</p>"
 			+ "<p xml:id=\"xid2\">text 2</p>"

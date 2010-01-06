@@ -48,7 +48,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	private static final int      FP_LOCNOTE_DATA          = 1;
 	private static final int      FP_LANGINFO_DATA         = 2;
 	private static final int      FP_TRGPOINTER_DATA       = 3;
-	private static final int      FP_IDPOINTER_DATA        = 4;
+	private static final int      FP_IDVALUE_DATA          = 4;
 	
 	private static final int      TERMINFOTYPE_POINTER     = 1;
 	private static final int      TERMINFOTYPE_REF         = 2;
@@ -279,7 +279,7 @@ public class ITSEngine implements IProcessor, ITraversal
 			rule.infoType = TRANSLATE_TRGPOINTER; 
 		}
 
-		value = elem.getAttributeNS(ITSX_NS_URI, "idPointer");
+		value = elem.getAttributeNS(ITSX_NS_URI, "idValue");
 		if ( value.length() > 0 ) {
 			rule.idPointer = value;
 		}
@@ -528,7 +528,7 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( data.charAt(FP_TRANSLATE) != '?' ) {
 			trace.peek().translate = (data.charAt(FP_TRANSLATE) == 'y');
 			trace.peek().targetPointer = getFlagData(data, FP_TRGPOINTER_DATA);
-			trace.peek().idPointer = getFlagData(data, FP_IDPOINTER_DATA);
+			trace.peek().idPointer = getFlagData(data, FP_IDVALUE_DATA);
 		}
 		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
@@ -625,7 +625,7 @@ public class ITSEngine implements IProcessor, ITraversal
 							setFlag(NL.item(i), FP_TRGPOINTER_DATA, rule.info, true);							
 						}
 						if ( rule.idPointer != null ) {
-							setFlag(NL.item(i), FP_IDPOINTER_DATA, resolvePointer(NL.item(i), rule.idPointer), true);							
+							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpression(NL.item(i), rule.idPointer), true);							
 						}
 						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
 						break;
@@ -812,7 +812,7 @@ public class ITSEngine implements IProcessor, ITraversal
 				attr = (Attr)NL.item(i);
 				String value = attr.getValue();
 				if (( value != null ) && ( value.length() > 0 )) {
-					setFlag(attr.getOwnerElement(), FP_IDPOINTER_DATA,
+					setFlag(attr.getOwnerElement(), FP_IDVALUE_DATA,
 						value, attr.getSpecified());
 				}
 			}
@@ -862,6 +862,20 @@ public class ITSEngine implements IProcessor, ITraversal
 		return "pointer("+pointer+")";
 	}
 	
+	private String resolveExpression (Node node,
+		String expression)
+	{
+		String res = "";
+		try {
+			XPathExpression expr = xpath.compile(expression);
+			res = (String)expr.evaluate(node, XPathConstants.STRING);
+		}
+		catch (XPathExpressionException e) {
+			return "Bab XPath expression \""+expression+"\".";
+		}
+		return res;
+	}
+		
 	/**
 	 * Sets the flag for a given node.
 	 * @param node The node to flag.

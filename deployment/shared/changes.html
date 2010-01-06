@@ -48,11 +48,19 @@ Framework between the previous one (M4) and this release (M5).</p>
 </ul>
 	</li>
 	<li>Filters:<ul>
-	<li>Fixed RTF parser issue with \&#39;HHc being read as \&#39;HH\&#39;HH in some cases.</li>
-	<li>Added support for additional DBCS encodings in RTF parser.</li>
+	<li>In the RTF parser:<ul>
+	<li>Fixed the issue with \&#39;HHc being read as \&#39;HH\&#39;HH in some cases.</li>
+	<li>Added support for additional DBCS encodings.</li>
+</ul>
+	</li>
 	<li>Added TTX Filter for Trados TagEditor documents.</li>
 	<li>Added pre-defined configuration for well-formed files in HTML Filter, providing groups 
 	and extra meta-data.</li>
+	<li>In the XML Filter: Changed the ITS extension <code>idPointer</code> to
+	<code>idValue</code> and modified its behavior to allow ID values to be 
+	generated from the expression, not just from the content pointed by the 
+	expression. The values are backward compatible, but existing parameters file 
+	will have to rename any reference to <code>idPointer</code> by <code>idValue</code>.</li>
 </ul>
 	</li>
 </ul>
