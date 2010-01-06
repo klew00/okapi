@@ -3,5 +3,5 @@
  xmlns:itsx="http://www.w3.org/2008/12/its-extensions">
 <!-- See ITS specification at: http://www.w3.org/TR/its/ -->
  <its:translateRule selector="/properties" translate="no"/>
- <its:translateRule selector="//entry" itsx:idPointer="@key" translate="yes"/>
+ <its:translateRule selector="//entry" itsx:idValue="@key" translate="yes"/>
 </its:rules>

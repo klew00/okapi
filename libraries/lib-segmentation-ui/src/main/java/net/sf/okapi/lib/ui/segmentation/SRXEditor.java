@@ -714,9 +714,9 @@ public class SRXEditor {
 	}
 	
 	private void updateRules (int selection,
-		boolean forceReset) {
-		rulesTableMod.setLanguageRules(
-			srxDoc.getLanguageRules(cbGroup.getText()));
+		boolean forceReset)
+	{
+		rulesTableMod.setLanguageRules(srxDoc.getLanguageRules(cbGroup.getText()));
 		rulesTableMod.updateTable(selection);
 		updateResults(forceReset);
 		updateRulesButtons();

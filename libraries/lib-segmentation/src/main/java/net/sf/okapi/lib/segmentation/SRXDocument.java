@@ -592,7 +592,7 @@ public class SRXDocument {
 		if ( segmenter != null ) {
 			// Check if we really need to re-compile
 			if ( ruleName != null ) {
-				if ( segmenter.getLanguage().equals("__"+ruleName) )
+				if ( segmenter.getLanguage().equals(LocaleId.EMPTY) )
 					return segmenter;
 			}
 			segmenter.reset();
@@ -605,7 +605,7 @@ public class SRXDocument {
 			includeEndCodes, includeIsolatedCodes, oneSegmentIncludesAll,
 			trimLeadingWS, trimTrailingWS);
 		compileRules(segmenter, ruleName);
-		segmenter.setLanguage(LocaleId.fromString("__"+ruleName));
+		segmenter.setLanguage(LocaleId.EMPTY);
 		return segmenter;
 	}
 
