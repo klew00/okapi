@@ -23,6 +23,7 @@ package net.sf.okapi.lib.plugins;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -32,10 +33,14 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 import net.sf.okapi.common.DefaultFilenameFilter;
+import net.sf.okapi.common.EditorFor;
+import net.sf.okapi.common.IEmbeddableParametersEditor;
+import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.NonPluggable;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 /**
  * Provides a way to discover and list plug-ins for a given location or file.   
@@ -44,6 +49,9 @@ public class PluginsManager {
 
 	public static final int PLUGINTYPE_IFILTER = 0;
 	public static final int PLUGINTYPE_IPIPELINESTEP = 1;
+	public static final int PLUGINTYPE_IPARAMETERSEDITOR = 2;
+	public static final int PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER = 3;
+	public static final int PLUGINTYPE_IEMBEDDABLEOARAMETERSEDITOR = 4;
 	
 	private ArrayList<URL> urls;
 	private List<PluginItem> plugins;
@@ -54,33 +62,82 @@ public class PluginsManager {
 	 * @param input the directory or file to inspect.
 	 */
 	public void reset (File input) {
-		urls = new ArrayList<URL>();
-		plugins = new ArrayList<PluginItem>();
-		loader = null;
-
-		// Inspect either all the .jar files if input is a directory
-		if ( input.isDirectory() ) {
-			File[] files = input.listFiles(new DefaultFilenameFilter(".jar"));
-			for ( File file : files ) {
-				inspectFile(file);
+		try {
+			urls = new ArrayList<URL>();
+			plugins = new ArrayList<PluginItem>();
+			loader = null;
+	
+			// Inspect either all the .jar files if input is a directory
+			if ( input.isDirectory() ) {
+				File[] files = input.listFiles(new DefaultFilenameFilter(".jar"));
+				for ( File file : files ) {
+					inspectFile(file);
+				}
+			}
+			else { // Or inspect the given file itself
+				inspectFile(input);
+			}
+	
+			if ( urls.size() > 0 ) {
+				URL[] tmp = new URL[urls.size()];
+				for ( int i=0; i<urls.size(); i++ ) {
+					tmp[i] = urls.get(i);
+				}
+				loader = new URLClassLoader(tmp);
+			}
+			
+			// Associate the editor-type plugins with their action-type plugins
+			for ( PluginItem item1 : plugins ) {
+				Class<?> cls1 = Class.forName(item1.className, false, loader);
+				switch ( item1.type ) {
+				case PLUGINTYPE_IFILTER:
+				case PLUGINTYPE_IPIPELINESTEP:
+					// Get the getParameters() method
+					Method m = cls1.getMethod("getParameters");
+					if ( m == null ) continue;
+					// Look at all plug-ins to see if any can be associated with that type
+					for ( PluginItem item2 : plugins ) {
+						switch ( item2.type ) {
+						case PLUGINTYPE_IPARAMETERSEDITOR:
+						case PLUGINTYPE_IEMBEDDABLEOARAMETERSEDITOR:
+						case PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER:
+							Class<?> cls2 = Class.forName(item2.className, false, loader);
+							// Get the type of parameters for which this editor works  
+							EditorFor ann = cls2.getAnnotation(EditorFor.class);
+							if ( ann == null ) continue;
+							System.out.println(String.format("%s==%s", m.getReturnType(), ann.value()));
+							if ( m.getReturnType().equals(ann.value()) ) {
+								if ( IParametersEditor.class.isAssignableFrom(cls2) ) {
+									item1.paramsEditor = item2.className;
+								}
+								if ( IEmbeddableParametersEditor.class.isAssignableFrom(cls2) ) {
+									item1.embeddableParamsEditor = item2.className;
+								}
+								if ( IEditorDescriptionProvider.class.isAssignableFrom(cls2) ) {
+									item1.editorDescriptionProvider = item2.className;
+								}
+							}
+							break;
+						}
+					}
+					break;
+				}
 			}
 		}
-		else { // Or inspect the given file itself
-			inspectFile(input);
+		catch (ClassNotFoundException e) {
+			throw new RuntimeException("Class not found", e);
 		}
-
-		if ( urls.size() > 0 ) {
-			URL[] tmp = new URL[urls.size()];
-			for ( int i=0; i<urls.size(); i++ ) {
-				tmp[i] = urls.get(i);
-			}
-			loader = new URLClassLoader(tmp);
+		catch ( SecurityException e ) {
+			throw new RuntimeException("Error when looking for getParameters() method.", e);
+		}
+		catch ( NoSuchMethodException e ) {
+			throw new RuntimeException("Error when looking for getParameters() method.", e);
 		}
 	}
 	
 	/**
-	 * Gets the list of all available plug-ins of a given type
-	 * currently available in this manager.
+	 * Gets the list of the class names of all available plug-ins 
+	 * of a given type currently available in this manager.
 	 * The method {@link #reset(File)} must be called once before
 	 * calling this method.
 	 * @param type the tyep of plug-ins to list.
@@ -92,6 +149,25 @@ public class PluginsManager {
 			if ( item.type == type ) list.add(item.className);
 		}
 		return list;
+	}
+
+	/**
+	 * Gets the list of all the plug-ins currently in this manager.
+	 * @return the list of all the plug-ins currently in this manager.
+	 */
+	public List<PluginItem> getList () {
+		return plugins;
+	}
+
+	/**
+	 * Gets the URLClassLoader to use for creating new instance of the
+	 * components listed in this manager. 
+	 * The method {@link #reset(File)} must be called once before
+	 * calling this method.
+	 * @return the URLClassLoader for this manager.
+	 */
+	public URLClassLoader getClassLoader () {
+		return loader;
 	}
 	
 	/**
@@ -179,12 +255,25 @@ public class PluginsManager {
 							if ( !urls.contains(url) ) urls.add(url);
 							plugins.add(new PluginItem(PLUGINTYPE_IPIPELINESTEP, name));
 						}
+						else if ( IParametersEditor.class.isAssignableFrom(cls) ) {
+							if ( !urls.contains(url) ) urls.add(url);
+							plugins.add(new PluginItem(PLUGINTYPE_IPARAMETERSEDITOR, name));
+						}
+						else if ( IEmbeddableParametersEditor.class.isAssignableFrom(cls) ) {
+							if ( !urls.contains(url) ) urls.add(url);
+							plugins.add(new PluginItem(PLUGINTYPE_IEMBEDDABLEOARAMETERSEDITOR, name));
+						}
+						else if ( IEditorDescriptionProvider.class.isAssignableFrom(cls) ) {
+							if ( !urls.contains(url) ) urls.add(url);
+							plugins.add(new PluginItem(PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER, name));
+						}
 					}
 					catch ( Throwable e ) {
 						// If the class cannot be create for some reason, we skip it silently
 					}
 				}
 			}
+			
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException("IO error when inspecting a file for plugins.", e);

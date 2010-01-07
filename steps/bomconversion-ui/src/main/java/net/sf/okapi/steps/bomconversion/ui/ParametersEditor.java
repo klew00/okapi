@@ -25,7 +25,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
+import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.bomconversion.Parameters;
@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
+public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 	
 	private Shell shell;
 	private boolean result = false;

@@ -1196,7 +1196,7 @@ public class MainForm { //implements IParametersProvider {
 			}
 
 			PipelineEditor dlg = new PipelineEditor();
-			int res = dlg.edit(shell, wrapper.availableSteps, wrapper,
+			int res = dlg.edit(shell, wrapper.getAvailableSteps(), wrapper,
 				(predefinedPipeline==null) ? null : predefinedPipeline.getTitle(),
 				help, null);
 			

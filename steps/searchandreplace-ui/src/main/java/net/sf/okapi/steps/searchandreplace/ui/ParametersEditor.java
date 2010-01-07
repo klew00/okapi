@@ -27,7 +27,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
+import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.searchandreplace.Parameters;
@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
+public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 
 	public static final int ADD_ITEM    = 1;
 	public static final int EDIT_ITEM   = 2;

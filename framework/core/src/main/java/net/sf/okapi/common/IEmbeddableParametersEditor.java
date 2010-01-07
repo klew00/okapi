@@ -18,44 +18,20 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.ui.genericeditor;
+package net.sf.okapi.common;
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Shell;
+/**
+ * Common way to embed in a dialog box an editor to modify the 
+ * parameters of a component. The parameters are implemented
+ * through the {@link net.sf.okapi.common.IParameters} interface. 
+ */
+public interface IEmbeddableParametersEditor {
 
-import net.sf.okapi.common.IContext;
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
-import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
-
-public class GenericEmbeddableEditor extends GenericEditor implements ISWTEmbeddableParametersEditor {
-
-	private IEditorDescriptionProvider descProvider;
-	
-	public GenericEmbeddableEditor (IEditorDescriptionProvider descProvider) {
-		this.descProvider = descProvider;
-	}
-
-	@Override
-	public void initializeEmbeddableEditor (Composite parent,
-		IParameters paramsObject,
-		IContext context)
-	{
-		params = paramsObject; 
-		shell = (Shell)context.getObject("shell");
-		createComposite(parent, descProvider);
-		setData();
-	}
-
-	@Override
-	public Composite getComposite () {
-		return mainComposite;
-	}
-	
-	@Override
-	public String validateAndSaveParameters () {
-		if ( !saveData() ) return null;
-		return params.toString();
-	}
+	/**
+	 * Validates and save the current parameters for this editor.
+	 * @return the string storage of the saved parameter, the same 
+	 * string as the one returned by IParameters.toString() 
+	 */
+	public String validateAndSaveParameters ();
 
 }

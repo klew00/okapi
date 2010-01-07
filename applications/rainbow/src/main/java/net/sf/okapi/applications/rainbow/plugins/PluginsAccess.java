@@ -163,28 +163,46 @@ public class PluginsAccess {
 		return items.get(id);
 	}
 
-//	public static void main (String[] args) {
-//		PluginsManager mgt = new PluginsManager();
-//		mgt.reset(new File("C:\\OkapiJava\\trunk\\deployment\\maven\\dist_win32-x86\\dropins\\okapi-lib-0.5-SNAPSHOT.jar"));
-//		
-//		System.out.println("--- Filters");
-//		List<String> list = mgt.getList(PluginsManager.PLUGINTYPE_IFILTER);
-//		for ( String tmp : list ) {
-//			System.out.println(tmp);
-//			IFilter filter = mgt.createIFilter(tmp);
-//			List<FilterConfiguration> configs = filter.getConfigurations();
-//			for ( FilterConfiguration config : configs ) {
-//				System.out.println("  conf="+config.configId);
-//			}
-//		}
-//		
-//		System.out.println("--- Steps");
-//		list = mgt.getList(PluginsManager.PLUGINTYPE_IPIPELINESTEP);
-//		for ( String tmp : list ) {
-//			System.out.println(tmp);
-//			IPipelineStep step = mgt.createIPipelineStep(tmp);
-//			System.out.println(step.getDescription());
-//		}
-//	}
+	public static void main (String[] args) {
+		PluginsManager mgt = new PluginsManager();
+		mgt.reset(new File("C:\\OkapiJava\\trunk\\deployment\\maven\\dist_win32-x86\\dropins\\okapi-lib-0.5-SNAPSHOT.jar"));
+		
+		System.out.println("--- Filters");
+		List<net.sf.okapi.lib.plugins.PluginItem> list = mgt.getList();
+		for ( net.sf.okapi.lib.plugins.PluginItem tmp : list ) {
+			System.out.println("---"+tmp.getClassName());
+			switch ( tmp.getType() ) {
+			case PluginsManager.PLUGINTYPE_IFILTER:
+				System.out.println("=Filter");
+				System.out.println("  ParamsEditor="+tmp.getParamsEditor());
+				System.out.println("  EmbeddableParamsEditor="+tmp.getEmbeddableParamsEditor());
+				System.out.println("  EditorDescriptionProvider="+tmp.getEditorDescriptionProvider());
+				IFilter filter = mgt.createIFilter(tmp.getClassName());
+				List<FilterConfiguration> configs = filter.getConfigurations();
+				for ( FilterConfiguration config : configs ) {
+					System.out.println("  conf="+config.configId);
+				}
+				break;
+			case PluginsManager.PLUGINTYPE_IPIPELINESTEP:
+				System.out.println("=PipelineStep");
+				System.out.println("  ParamsEditor="+tmp.getParamsEditor());
+				System.out.println("  EmbeddableParamsEditor="+tmp.getEmbeddableParamsEditor());
+				System.out.println("  EditorDescriptionProvider="+tmp.getEditorDescriptionProvider());
+				IPipelineStep step = mgt.createIPipelineStep(tmp.getClassName());
+				System.out.println(step.getDescription());
+				break;
+			case PluginsManager.PLUGINTYPE_IPARAMETERSEDITOR:
+				System.out.println("=ParametersEditor");
+				break;
+			case PluginsManager.PLUGINTYPE_IEMBEDDABLEOARAMETERSEDITOR:
+				System.out.println("=EmbeddableParametersEditor");
+				break;
+			case PluginsManager.PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER:
+				System.out.println("=EditorDescriptionProvider");
+				break;
+			}
+			
+		}
+	}
 
 }

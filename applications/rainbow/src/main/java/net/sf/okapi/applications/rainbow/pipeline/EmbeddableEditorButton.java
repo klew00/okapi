@@ -24,7 +24,7 @@ import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
+import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -34,7 +34,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-public class EmbeddableEditorButton implements IEmbeddableParametersEditor {
+public class EmbeddableEditorButton implements ISWTEmbeddableParametersEditor {
 
 	private Composite mainComposite;
 	private Button btEdit;

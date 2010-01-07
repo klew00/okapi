@@ -21,16 +21,16 @@
 package net.sf.okapi.common.ui;
 
 import net.sf.okapi.common.IContext;
+import net.sf.okapi.common.IEmbeddableParametersEditor;
 import net.sf.okapi.common.IParameters;
 
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * Common way to embed in a dialog box an editor to modify the 
- * parameters of a component. The parameters are implemented
- * through the {@link net.sf.okapi.common.IParameters} interface. 
+ * Common way for SWT-based UI to implement an embedded panel defined 
+ * through {@link IEmbeddableParametersEditor} interface. 
  */
-public interface IEmbeddableParametersEditor {
+public interface ISWTEmbeddableParametersEditor extends IEmbeddableParametersEditor {
 
 	/**
 	 * Initializes the object to be used as embedded editor.
@@ -50,11 +50,4 @@ public interface IEmbeddableParametersEditor {
 	 */
 	public Composite getComposite ();
 	
-	/**
-	 * Validates and save the current parameters for this editor.
-	 * @return the string storage of the saved parameter, the same 
-	 * string as the one returned by IParameters.toString() 
-	 */
-	public String validateAndSaveParameters ();
-
 }

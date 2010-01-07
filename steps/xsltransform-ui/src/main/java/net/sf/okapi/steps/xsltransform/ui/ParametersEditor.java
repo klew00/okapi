@@ -36,7 +36,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.NSContextManager;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
+import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 
@@ -55,7 +55,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
+public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 	
 	private Shell shell;
 	private boolean result = false;

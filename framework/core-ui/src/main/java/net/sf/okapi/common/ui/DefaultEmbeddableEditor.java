@@ -23,7 +23,7 @@ package net.sf.okapi.common.ui;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
+import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -32,12 +32,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Provides a very basic implementation {@link IEmbeddableParametersEditor}.
+ * Provides a very basic implementation {@link ISWTEmbeddableParametersEditor}.
  * This implementation offers only a plain text edit box where the string
  * representation of the parameters can be manually edited. No validation
  * is provided, except checking that the string is not empty.
  */
-public class DefaultEmbeddableEditor implements IEmbeddableParametersEditor {
+public class DefaultEmbeddableEditor implements ISWTEmbeddableParametersEditor {
 
 	private Composite mainComposite;
 	private IParameters params;

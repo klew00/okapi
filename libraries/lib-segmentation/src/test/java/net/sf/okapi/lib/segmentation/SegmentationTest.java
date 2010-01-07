@@ -20,10 +20,14 @@
 
 package net.sf.okapi.lib.segmentation;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Range;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -175,6 +179,50 @@ public class SegmentationTest {
 		assertEquals("b.", tc.getSegments().get(2).toString());
 	}
 
+	@Test
+	public void testTrimOptionsSetting () {
+		SRXDocument srxDoc = new SRXDocument();
+		srxDoc.setTrimLeadingWhitespaces(true);
+		srxDoc.setTrimTrailingWhitespaces(true);
+		ISegmenter segter = srxDoc.compileLanguageRules(LocaleId.ENGLISH, null);
+		segter.computeSegments(" a ");
+		List<Range> list = segter.getRanges();
+		assertEquals(1, list.get(0).start);
+		assertEquals(2, list.get(0).end);
+		
+		URL url = SegmentationTest.class.getResource("/Test01.srx");
+		String tmpPath = Util.getDirectoryName(url.getPath())+File.separator+"tmp.srx";
+		srxDoc.saveRules(tmpPath, true, true);
+
+		srxDoc.resetAll();
+		segter = srxDoc.compileLanguageRules(LocaleId.ENGLISH, null);
+		segter.computeSegments(" a ");
+		list = segter.getRanges();
+		assertEquals(0, list.get(0).start);
+		assertEquals(3, list.get(0).end);
+
+		srxDoc.loadRules(tmpPath);
+		segter = srxDoc.compileLanguageRules(LocaleId.ENGLISH, null);
+		segter.computeSegments(" a ");
+		list = segter.getRanges();
+		assertEquals(1, list.get(0).start);
+		assertEquals(2, list.get(0).end);
+	}
+
+	@Test
+	public void testTrimOptionsSettingFromFile () {
+		SRXDocument srxDoc = new SRXDocument();
+		// Trim options are 'true' in this file (inverse of default)
+		URL url = SegmentationTest.class.getResource("/Test01.srx");
+		srxDoc.loadRules(url.getPath());
+		ISegmenter segter = srxDoc.compileLanguageRules(LocaleId.ENGLISH, null);
+		segter.computeSegments(" a ");
+		// Trim options worked
+		List<Range> list = segter.getRanges();
+		assertEquals(1, list.get(0).start);
+		assertEquals(2, list.get(0).end);
+	}
+	
 	private TextContainer createSegmentedContainer () {
 		TextContainer tc = new TextContainer();
 		tc.append(TagType.OPENING, "s", "<s>");

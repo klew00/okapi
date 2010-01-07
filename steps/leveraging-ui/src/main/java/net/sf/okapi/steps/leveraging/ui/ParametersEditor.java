@@ -20,13 +20,14 @@
 
 package net.sf.okapi.steps.leveraging.ui;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
+import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
@@ -47,7 +48,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 
-public class ParametersEditor implements IParametersEditor, IEmbeddableParametersEditor {
+@EditorFor(Parameters.class)
+public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 
 	private Shell shell;
 	private boolean result = false;

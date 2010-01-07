@@ -31,7 +31,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
 import net.sf.okapi.common.ui.DefaultEmbeddableEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.IEmbeddableParametersEditor;
+import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.genericeditor.GenericEmbeddableEditor;
@@ -64,7 +64,7 @@ public class PipelineEditor {
 	private PipelineWrapper wrapper;
 	private Map<String, StepInfo> availableSteps;
 	private ArrayList<StepInfo> workSteps;
-	private ArrayList<IEmbeddableParametersEditor> panels;
+	private ArrayList<ISWTEmbeddableParametersEditor> panels;
 	private Text edPath;
 	private List lbSteps;
 	private Button btLoad;
@@ -132,7 +132,7 @@ public class PipelineEditor {
 
 	private void setDataFromWrapper () {
 		workSteps = new ArrayList<StepInfo>();
-		panels = new ArrayList<IEmbeddableParametersEditor>();
+		panels = new ArrayList<ISWTEmbeddableParametersEditor>();
 		for ( StepInfo step : wrapper.getSteps() ) {
 			workSteps.add(step.clone());
 			panels.add(createPanel(step));
@@ -406,7 +406,7 @@ public class PipelineEditor {
 		// Info in all cases (if there is a help object)
 		btStepInfo.setEnabled(help!=null);
 
-		IEmbeddableParametersEditor panel = panels.get(n);
+		ISWTEmbeddableParametersEditor panel = panels.get(n);
 		if ( panel.getComposite() == null ) {
 			if (( ctrl == null ) || !ctrl.equals(noParametersPanel) ) {
 				((StackLayout)optionsHolder.getLayout()).topControl = noParametersPanel;
@@ -463,7 +463,7 @@ public class PipelineEditor {
 			int n = lbSteps.getSelectionIndex();
 			if ( n <= 0 ) return;
 			StepInfo tmp = workSteps.get(n-1);
-			IEmbeddableParametersEditor tmpPanel = panels.get(n-1);
+			ISWTEmbeddableParametersEditor tmpPanel = panels.get(n-1);
 			workSteps.set(n-1, workSteps.get(n));
 			panels.set(n-1, panels.get(n));
 			workSteps.set(n, tmp);
@@ -492,7 +492,7 @@ public class PipelineEditor {
 			int n = lbSteps.getSelectionIndex();
 			if ( n > lbSteps.getItemCount()-1 ) return;
 			StepInfo tmp = workSteps.get(n+1);
-			IEmbeddableParametersEditor tmpPanel = panels.get(n+1);
+			ISWTEmbeddableParametersEditor tmpPanel = panels.get(n+1);
 			workSteps.set(n+1, workSteps.get(n));
 			panels.set(n+1, panels.get(n));
 			workSteps.set(n, tmp);
@@ -535,7 +535,7 @@ public class PipelineEditor {
 		}
 	}
 	
-	private IEmbeddableParametersEditor createPanel (StepInfo step) {
+	private ISWTEmbeddableParametersEditor createPanel (StepInfo step) {
 		try {
 			if ( step.paramsData == null ) {
 				// No parameters data for this step
@@ -560,14 +560,14 @@ public class PipelineEditor {
 				Dialogs.showError(shell, e.getMessage(), null);
 			}
 			if ( editor != null ) {
-				if ( IEmbeddableParametersEditor.class.isAssignableFrom(editor.getClass()) ) {
+				if ( ISWTEmbeddableParametersEditor.class.isAssignableFrom(editor.getClass()) ) {
 					// Use directly the embedded panel
-					((IEmbeddableParametersEditor)editor).initializeEmbeddableEditor(optionsHolder, params, context);
-					return (IEmbeddableParametersEditor)editor;
+					((ISWTEmbeddableParametersEditor)editor).initializeEmbeddableEditor(optionsHolder, params, context);
+					return (ISWTEmbeddableParametersEditor)editor;
 				}
 				else { // If we have a dedicated editor, use a button in an embedded panel
 					// to access it and edit the parameters from there
-					IEmbeddableParametersEditor tmp = new EmbeddableEditorButton(editor);
+					ISWTEmbeddableParametersEditor tmp = new EmbeddableEditorButton(editor);
 					tmp.initializeEmbeddableEditor(optionsHolder, params, context);
 					return tmp;
 				}
@@ -598,7 +598,7 @@ public class PipelineEditor {
 		try {
 			// Validate and save data from panels to each work-steps
 			StepInfo step;
-			IEmbeddableParametersEditor panel;
+			ISWTEmbeddableParametersEditor panel;
 			for ( int i=0; i<workSteps.size(); i++ ) {
 				step = workSteps.get(i);
 				panel = panels.get(i);

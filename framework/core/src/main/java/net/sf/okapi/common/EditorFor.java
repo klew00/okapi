@@ -16,43 +16,22 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
-package net.sf.okapi.lib.plugins;
+package net.sf.okapi.common;
 
-public class PluginItem {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-	protected int type;
-	protected String className;
-	protected String paramsEditor;
-	protected String embeddableParamsEditor;
-	protected String editorDescriptionProvider;
-
-	public PluginItem (int type,
-		String className)
-	{
-		this.type = type;
-		this.className = className;
-	}
-	
-	public int getType () {
-		return type;
-	}
-	
-	public String getClassName () {
-		return className;
-	}
-	
-	public String getParamsEditor () {
-		return paramsEditor;
-	}
-	
-	public String getEmbeddableParamsEditor () {
-		return embeddableParamsEditor;
-	}
-	
-	public String getEditorDescriptionProvider () {
-		return editorDescriptionProvider;
-	}
-
+/**
+ * Annotation to use on classes implementing one of the interfaces
+ * allowing to edit parameters, to indicate which parameters class
+ * the editor supports or describes.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface EditorFor {
+	Class<?> value();
 }
