@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -46,6 +47,7 @@ import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
+@UsingParameters(Parameters.class)
 public class TokenizationStep extends AbstractPipelineStep {
 
 	public static final int RAWTEXT = -1;

@@ -23,7 +23,6 @@ package net.sf.okapi.lib.plugins;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -35,8 +34,9 @@ import java.util.jar.JarInputStream;
 import net.sf.okapi.common.DefaultFilenameFilter;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IEmbeddableParametersEditor;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
-import net.sf.okapi.common.NonPluggable;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -50,16 +50,18 @@ public class PluginsManager {
 	public static final int PLUGINTYPE_IFILTER = 0;
 	public static final int PLUGINTYPE_IPIPELINESTEP = 1;
 	public static final int PLUGINTYPE_IPARAMETERSEDITOR = 2;
-	public static final int PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER = 3;
-	public static final int PLUGINTYPE_IEMBEDDABLEOARAMETERSEDITOR = 4;
+	public static final int PLUGINTYPE_IEMBEDDABLEPARAMETERSEDITOR = 3;
+	public static final int PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER = 4;
 	
 	private ArrayList<URL> urls;
 	private List<PluginItem> plugins;
 	private URLClassLoader loader;
 	
 	/**
-	 * Initializes this object with a given type of plug-ins.
-	 * @param input the directory or file to inspect.
+	 * Initializes the manager with the plug-ins in the given
+	 * file or directory.
+	 * @param input the directory or file to inspect. If a directory
+	 * is specified, all .jar files of that directory will be inspected.
 	 */
 	public void reset (File input) {
 		try {
@@ -93,20 +95,21 @@ public class PluginsManager {
 				case PLUGINTYPE_IFILTER:
 				case PLUGINTYPE_IPIPELINESTEP:
 					// Get the getParameters() method
-					Method m = cls1.getMethod("getParameters");
-					if ( m == null ) continue;
+					UsingParameters usingParams = cls1.getAnnotation(UsingParameters.class);
+					if ( usingParams == null ) continue;
+					// Skip if the class does not use parameters
+					if ( usingParams.value().equals(IParameters.class) ) continue;
 					// Look at all plug-ins to see if any can be associated with that type
 					for ( PluginItem item2 : plugins ) {
 						switch ( item2.type ) {
 						case PLUGINTYPE_IPARAMETERSEDITOR:
-						case PLUGINTYPE_IEMBEDDABLEOARAMETERSEDITOR:
+						case PLUGINTYPE_IEMBEDDABLEPARAMETERSEDITOR:
 						case PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER:
 							Class<?> cls2 = Class.forName(item2.className, false, loader);
 							// Get the type of parameters for which this editor works  
-							EditorFor ann = cls2.getAnnotation(EditorFor.class);
-							if ( ann == null ) continue;
-							System.out.println(String.format("%s==%s", m.getReturnType(), ann.value()));
-							if ( m.getReturnType().equals(ann.value()) ) {
+							EditorFor editorFor = cls2.getAnnotation(EditorFor.class);
+							if ( editorFor == null ) continue;
+							if ( editorFor.value().equals(usingParams.value()) ) {
 								if ( IParametersEditor.class.isAssignableFrom(cls2) ) {
 									item1.paramsEditor = item2.className;
 								}
@@ -128,9 +131,6 @@ public class PluginsManager {
 			throw new RuntimeException("Class not found", e);
 		}
 		catch ( SecurityException e ) {
-			throw new RuntimeException("Error when looking for getParameters() method.", e);
-		}
-		catch ( NoSuchMethodException e ) {
 			throw new RuntimeException("Error when looking for getParameters() method.", e);
 		}
 	}
@@ -244,14 +244,16 @@ public class PluginsManager {
 						if ( cls.isInterface() ) continue;
 						// Skip abstract
 						if ( Modifier.isAbstract(cls.getModifiers()) ) continue;
-						// Skip classes that should not be use directly
-						if ( cls.getAnnotation(NonPluggable.class) != null ) continue;
 						// Check class type
 						if ( IFilter.class.isAssignableFrom(cls) ) {
+							// Skip IFilter classes that should not be use directly
+							if ( cls.getAnnotation(UsingParameters.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
 							plugins.add(new PluginItem(PLUGINTYPE_IFILTER, name));
 						}
 						else if ( IPipelineStep.class.isAssignableFrom(cls) ) {
+							// Skip IPipelineStep classes that should not be use directly
+							if ( cls.getAnnotation(UsingParameters.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
 							plugins.add(new PluginItem(PLUGINTYPE_IPIPELINESTEP, name));
 						}
@@ -261,7 +263,7 @@ public class PluginsManager {
 						}
 						else if ( IEmbeddableParametersEditor.class.isAssignableFrom(cls) ) {
 							if ( !urls.contains(url) ) urls.add(url);
-							plugins.add(new PluginItem(PLUGINTYPE_IEMBEDDABLEOARAMETERSEDITOR, name));
+							plugins.add(new PluginItem(PLUGINTYPE_IEMBEDDABLEPARAMETERSEDITOR, name));
 						}
 						else if ( IEditorDescriptionProvider.class.isAssignableFrom(cls) ) {
 							if ( !urls.contains(url) ) urls.add(url);

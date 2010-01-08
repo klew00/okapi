@@ -29,7 +29,6 @@ import java.util.logging.Level;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.NonPluggable;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -44,7 +43,6 @@ import net.sf.okapi.lib.extra.Notification;
  * 
  * @version 0.1, 10.06.2009
  */
-@NonPluggable() // This filter is for internal use only 
 public class CompoundFilter extends AbstractBaseFilter {
 
 	private LinkedList<IFilter> subFilters = new LinkedList<IFilter>();

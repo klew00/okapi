@@ -36,6 +36,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
@@ -63,6 +64,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 /**
  * Implements the IFilter interface for PO files.
  */
+@UsingParameters(Parameters.class)
 public class POFilter implements IFilter {
 
 	public static final String PROPERTY_PLURALFORMS = "pluralforms";

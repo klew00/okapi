@@ -27,6 +27,7 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
@@ -50,6 +51,7 @@ import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
 /**
  * Implementation of the {@link IFilter} interface for Pensieve TM.
  */
+@UsingParameters() // No parameters
 public class PensieveFilter implements IFilter {
 
 	private static final String MIMETYPE = "application/x-pensieve-tm";

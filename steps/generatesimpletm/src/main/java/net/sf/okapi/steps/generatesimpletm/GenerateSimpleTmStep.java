@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.LocaleId;
@@ -35,6 +36,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.simpletm.Database;
 
+@UsingParameters(Parameters.class)
 public class GenerateSimpleTmStep extends BasePipelineStep {
 
 	protected final Logger logger = Logger.getLogger(getClass().getName());

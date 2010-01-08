@@ -36,6 +36,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -67,6 +68,7 @@ import org.w3c.its.ITraversal;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+@UsingParameters(Parameters.class)
 public class XMLFilter implements IFilter {
 
 	private String docName;

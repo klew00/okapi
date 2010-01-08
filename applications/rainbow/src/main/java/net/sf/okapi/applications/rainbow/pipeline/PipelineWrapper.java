@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.pipeline;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +41,8 @@ import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.lib.plugins.PluginItem;
+import net.sf.okapi.lib.plugins.PluginsManager;
 
 public class PipelineWrapper {
 	
@@ -50,23 +53,36 @@ public class PipelineWrapper {
 	private IFilterConfigurationMapper fcMapper;
 	private IParametersEditorMapper peMapper;
 
-//	public Map<String, StepInfo> buildStepList (List<String> classNames,
-//		URLClassLoader classLoader) throws InstantiationException, IllegalAccessException, ClassNotFoundException
-//	{
-//		LinkedHashMap<String, StepInfo> map = new LinkedHashMap<String, StepInfo>();
-//		for ( String className : classNames ) {
-//			IPipelineStep ps = (IPipelineStep)Class.forName(className, true, classLoader).newInstance();
-//			StepInfo step = new StepInfo(ps.getClass().getSimpleName(),
-//					ps.getName(), ps.getDescription(), ps.getClass().getName(), null);
-//			IParameters params = ps.getParameters();
-//			if ( params != null ) {
-//				step.paramsData = params.toString();
-//			}
-//			map.put(step.id, step);
-//		}
-//		
-//		return map;
-//	}
+	public void buildStepList (List<PluginItem> plugins,
+		URLClassLoader classLoader)
+	{
+		try {
+			availableSteps = new LinkedHashMap<String, StepInfo>();
+			peMapper = new ParametersEditorMapper();
+			for ( PluginItem item : plugins ) {
+				if ( item.getType() != PluginsManager.PLUGINTYPE_IPIPELINESTEP ) continue;
+				
+				IPipelineStep ps = (IPipelineStep)Class.forName(item.getClassName(), true, classLoader).newInstance();
+				IParameters params = ps.getParameters();
+				StepInfo step = new StepInfo(ps.getClass().getSimpleName(),
+					ps.getName(), ps.getDescription(), ps.getClass().getName(),
+					(params==null) ? null : params.getClass().getName());
+				if ( params != null ) {
+					step.paramsData = params.toString();
+					if ( item.getEditorDescriptionProvider() != null ) {
+						peMapper.addDescriptionProvider(item.getEditorDescriptionProvider(), step.paramsClass);
+					}
+					if ( item.getParamsEditor() != null ) {
+						peMapper.addEditor(item.getParamsEditor(), step.paramsClass);
+					}
+				}
+				availableSteps.put(step.id, step);
+			}
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error when creating the plug-ins lists.", e);
+		}
+	}
 	
 	// Temporary class to create a list of available steps
 	//TODO: replace with plugin manager
@@ -368,6 +384,11 @@ public class PipelineWrapper {
 		steps = new ArrayList<StepInfo>();
 		driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(this.fcMapper);
+		
+//		PluginsManager mgt = new PluginsManager();
+//		mgt.reset(new File("C:\\OkapiJava\\trunk\\deployment\\maven\\dist_win32-x86\\dropins"));
+//		buildStepList(mgt.getList(), mgt.getClassLoader());
+		
 		buildStepList();
 	}
 	

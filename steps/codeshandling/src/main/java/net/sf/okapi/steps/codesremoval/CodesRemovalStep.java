@@ -23,11 +23,13 @@ package net.sf.okapi.steps.codesremoval;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.TextUnit;
 
+@UsingParameters(Parameters.class)
 public class CodesRemovalStep extends BasePipelineStep {
 
 	private Parameters params;

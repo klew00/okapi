@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.po.ui;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -43,6 +44,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 
+@EditorFor(Parameters.class)
 public class Editor implements IParametersEditor {
 	
 	private Shell shell;

@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.formatconversion;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
@@ -28,6 +29,7 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.ListSelectionPart;
 import net.sf.okapi.common.uidescription.PathInputPart;
 
+@EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	public static final String FORMAT_TMX = "tmx";

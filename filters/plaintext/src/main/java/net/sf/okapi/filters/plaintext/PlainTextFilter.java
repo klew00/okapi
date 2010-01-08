@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.plaintext;
 
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.filters.plaintext.paragraphs.ParaPlainTextFilter;
 import net.sf.okapi.filters.plaintext.Parameters;
@@ -37,7 +38,7 @@ import net.sf.okapi.lib.extra.filters.CompoundFilter;
  * 
  * @version 0.1, 09.06.2009
  */
-
+@UsingParameters(Parameters.class)
 public class PlainTextFilter extends CompoundFilter{
 
 	public static final String FILTER_NAME	= "okf_plaintext";

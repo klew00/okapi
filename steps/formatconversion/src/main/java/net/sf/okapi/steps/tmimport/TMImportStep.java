@@ -22,6 +22,7 @@ package net.sf.okapi.steps.tmimport;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -29,6 +30,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 
+@UsingParameters(Parameters.class)
 public class TMImportStep extends BasePipelineStep {
 
 	private Parameters params;

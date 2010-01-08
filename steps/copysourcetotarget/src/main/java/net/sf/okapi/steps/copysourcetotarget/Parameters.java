@@ -22,6 +22,7 @@ package net.sf.okapi.steps.copysourcetotarget;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 
 public class Parameters extends BaseParameters {
 
@@ -32,14 +33,16 @@ public class Parameters extends BaseParameters {
 	}
 
 	public void reset () {
-		targetLocale = null;
+		targetLocale = LocaleId.EMPTY;
 	}
 
 	public void fromString (String data) {
 		reset();
 		// Read the file content as a set of fields
 		buffer.fromString(data);
-		targetLocale = LocaleId.fromString(buffer.getString("targetLocale"));		
+		String tmp = buffer.getString("targetLocale");
+		if ( Util.isEmpty(tmp) ) targetLocale = LocaleId.EMPTY;
+		else targetLocale = LocaleId.fromString(tmp);
 	}
 
 	public String toString() {

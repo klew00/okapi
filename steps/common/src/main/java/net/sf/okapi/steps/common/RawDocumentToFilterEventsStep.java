@@ -22,6 +22,7 @@ package net.sf.okapi.steps.common;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -40,6 +41,7 @@ import net.sf.okapi.common.resource.RawDocument;
  * @see FilterEventsToRawDocumentStep
  * @see FilterEventsWriterStep
  */
+@UsingParameters() // No parameters
 public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 
 	private IFilter filter;

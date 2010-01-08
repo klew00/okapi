@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.tokenization.ui;
 
 import net.sf.okapi.common.BaseContext;
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
 import net.sf.okapi.steps.tokenization.Parameters;
@@ -28,6 +29,7 @@ import net.sf.okapi.steps.tokenization.Parameters;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Widget;
 
+@EditorFor(Parameters.class)
 public class ParametersEditor extends AbstractParametersEditor {
 
 	public static void main(String[] args) {

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.textmodification.ui;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -45,6 +46,7 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+@EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 
 	private Shell shell;

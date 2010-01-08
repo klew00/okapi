@@ -27,6 +27,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -38,6 +39,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POFilterWriter;
 
+@UsingParameters(Parameters.class)
 public class FormatConversionStep extends BasePipelineStep {
 
 	private static final int PO_OUTPUT = 0;

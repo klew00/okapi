@@ -24,6 +24,7 @@ import java.io.File;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -37,6 +38,7 @@ import net.sf.okapi.common.resource.RawDocument;
  * interface for a step that takes a {@link RawDocument} and creates an output 
  * file from it. The generated file is passed on through a new {@link RawDocument}.
  */
+@UsingParameters() // No parameters
 public class RawDocumentWriterStep extends BasePipelineStep {
 
 	private boolean isDone;

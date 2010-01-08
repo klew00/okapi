@@ -28,7 +28,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
-import net.sf.okapi.common.NonPluggable;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -52,7 +51,6 @@ import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
  * <li>Paragraph separator character ("\u2029").</ul><p>
  * @version 0.1, 09.06.2009  
  */
-@NonPluggable() // This filter is for internal use only
 public class RegexPlainTextFilter extends AbstractBaseFilter {
 
 	public static final String FILTER_NAME				= "okf_plaintext_regex";

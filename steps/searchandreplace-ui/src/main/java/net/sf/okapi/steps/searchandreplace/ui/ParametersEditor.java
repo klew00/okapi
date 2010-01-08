@@ -22,6 +22,7 @@ package net.sf.okapi.steps.searchandreplace.ui;
 
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -51,6 +52,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+@EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 
 	public static final int ADD_ITEM    = 1;

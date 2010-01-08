@@ -42,6 +42,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.*;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -73,7 +74,7 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
  * the associated writer for this filter.  OpenXMLZipFilterWriter instantiates
  * OpenXMLContentSkeletonWriter. 
  */
-
+@UsingParameters(ConditionalParameters.class)
 public class OpenXMLFilter implements IFilter {
 	
 	private Logger LOGGER = Logger.getLogger(OpenXMLFilter.class.getName());

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.table.ui;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.abstracteditor.SWTUtil;
@@ -36,7 +37,7 @@ import org.eclipse.swt.widgets.Widget;
  * 
  * @version 0.1, 19.06.2009
  */
-
+@EditorFor(net.sf.okapi.filters.table.Parameters.class)
 public class Editor extends FilterParametersEditor {
 
 	@Override

@@ -24,10 +24,12 @@ import java.io.File;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.tm.simpletm.Database;
 
+@UsingParameters() // No parameters
 public class SimpleTM2TMXStep extends BasePipelineStep {
 
 	private Database db;

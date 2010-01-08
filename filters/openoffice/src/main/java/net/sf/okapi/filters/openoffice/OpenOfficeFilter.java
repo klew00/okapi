@@ -37,6 +37,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
@@ -60,6 +61,7 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
  * (ODT, ODP, ODS, and ODG files). It expects the ZIP files as input, and calls the
  * ODFFilter as needed to process the embedded documents.
  */
+@UsingParameters(Parameters.class)
 public class OpenOfficeFilter implements IFilter {
 
 	private enum NextAction {

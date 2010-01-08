@@ -26,13 +26,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to use on classes implementing pluggable interfaces
- * such as IFilter or IPipelineStep to indicates that the given class
- * should not be directly used from by a user. For example such class
- * should not be included in a list of available filters in a UI. 
+ * Annotation to use on plug-in classes such as the implementations
+ * of IFilter or IPipelineStep to indicate what parameters class
+ * they use. Classes that should not be used directly as plug-ins
+ * (e.g. abstract classes) must not set this annotation.
+ * Class that use no parameters must leave the default annotation's
+ * value. That default value is IParameters.class but may change.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface NonPluggable {
-	// No attributes needed
+public @interface UsingParameters {
+	Class<?> value() default IParameters.class;
 }

@@ -42,6 +42,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.DTDEncoder;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -65,6 +66,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 /**
  * Implements the IFilter interface for DTD files.
  */
+@UsingParameters(Parameters.class)
 public class DTDFilter implements IFilter {
 
 	private Parameters params;

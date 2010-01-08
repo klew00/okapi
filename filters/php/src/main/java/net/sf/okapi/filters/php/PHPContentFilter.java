@@ -34,6 +34,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.HTMLCharacterEntities;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -58,6 +59,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * Implements the IFilter interface for PHP content. This filter is
  * expected to be called from a parent filter that processed the container.
  */
+@UsingParameters(Parameters.class)
 public class PHPContentFilter implements IFilter {
 
 	private static final int STRTYPE_SINGLEQUOTED = 0;

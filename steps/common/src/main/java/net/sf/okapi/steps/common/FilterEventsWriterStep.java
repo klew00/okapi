@@ -24,6 +24,7 @@ import java.io.File;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
@@ -44,6 +45,7 @@ import net.sf.okapi.common.resource.INameable;
  * @see RawDocumentToFilterEventsStep
  * @see FilterEventsToRawDocumentStep 
  */
+@UsingParameters() // No parameters
 public class FilterEventsWriterStep extends BasePipelineStep {
 
 	private IFilterWriter filterWriter;

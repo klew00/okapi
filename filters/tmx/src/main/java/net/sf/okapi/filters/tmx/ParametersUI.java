@@ -20,10 +20,12 @@
 
 package net.sf.okapi.filters.tmx;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
+@EditorFor(Parameters.class)
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {

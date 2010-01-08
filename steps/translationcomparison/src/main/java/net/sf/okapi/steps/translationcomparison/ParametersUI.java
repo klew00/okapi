@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.translationcomparison;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
@@ -27,6 +28,7 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
 import net.sf.okapi.common.uidescription.TextInputPart;
 
+@EditorFor(Parameters.class)
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {

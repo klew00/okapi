@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.table;
 
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.filters.table.Parameters;
 import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
 import net.sf.okapi.filters.table.fwc.FixedWidthColumnsFilter;
@@ -32,7 +33,7 @@ import net.sf.okapi.lib.extra.filters.CompoundFilter;
  * 
  * @version 0.1, 09.06.2009
  */
-
+@UsingParameters(Parameters.class)
 public class TableFilter extends CompoundFilter {
 		
 	public static final String FILTER_NAME		= "okf_table";

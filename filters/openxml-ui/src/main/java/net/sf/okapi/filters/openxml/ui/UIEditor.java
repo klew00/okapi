@@ -20,7 +20,9 @@
 
 package net.sf.okapi.filters.openxml.ui;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.filters.openxml.ConditionalParameters;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -39,6 +41,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Control;
 
+@EditorFor(ConditionalParameters.class)
 public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 
 	protected Object result;

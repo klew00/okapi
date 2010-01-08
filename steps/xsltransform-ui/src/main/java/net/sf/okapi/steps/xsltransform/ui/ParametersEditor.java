@@ -29,6 +29,7 @@ import javax.xml.xpath.XPathFactory;
 import net.sf.okapi.steps.xsltransform.Parameters;
 
 import net.sf.okapi.common.ConfigurationString;
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -55,6 +56,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+@EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 	
 	private Shell shell;

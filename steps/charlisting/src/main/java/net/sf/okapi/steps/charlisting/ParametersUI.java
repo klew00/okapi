@@ -20,11 +20,13 @@
 
 package net.sf.okapi.steps.charlisting;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
 
+@EditorFor(Parameters.class)
 public class ParametersUI implements IEditorDescriptionProvider {
 
 	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {

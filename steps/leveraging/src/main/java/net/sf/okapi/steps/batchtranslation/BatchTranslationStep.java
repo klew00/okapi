@@ -22,12 +22,14 @@ package net.sf.okapi.steps.batchtranslation;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
+@UsingParameters(Parameters.class)
 public class BatchTranslationStep extends BasePipelineStep {
 
 	private Parameters params;
