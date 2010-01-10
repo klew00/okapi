@@ -43,6 +43,7 @@
         <module>json</module>
         <module>json-ui</module>
         <module>ttx</module>
+        <module>vignette</module>
     </modules>
 
     <build>

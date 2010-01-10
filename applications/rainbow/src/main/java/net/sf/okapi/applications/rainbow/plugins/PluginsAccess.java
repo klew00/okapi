@@ -165,7 +165,8 @@ public class PluginsAccess {
 
 //	public static void main (String[] args) {
 //		PluginsManager mgt = new PluginsManager();
-//		mgt.reset(new File("C:\\OkapiJava\\trunk\\deployment\\maven\\dist_win32-x86\\dropins")); //\\okapi-lib-0.5-SNAPSHOT.jar"));
+//		mgt.discover(new File("C:\\OkapiJava\\trunk\\deployment\\maven\\dist_win32-x86\\dropins\\okapi-lib-0.5-SNAPSHOT.jar"), false);
+//		mgt.discover(new File("C:\\OkapiJava\\trunk\\deployment\\maven\\dist_win32-x86\\dropins\\okapi-lib-ui-0.5-SNAPSHOT.jar"), true);
 //		
 //		List<net.sf.okapi.lib.plugins.PluginItem> list = mgt.getList();
 //		for ( net.sf.okapi.lib.plugins.PluginItem tmp : list ) {

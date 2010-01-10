@@ -506,6 +506,8 @@ public class Main {
 
 		extensionsMap.put(".pentm", "okf_pensieve");
 		filtersMap.put("okf_pensieve", "net.sf.okapi.filters.pensieve.PensieveFilter");
+
+		filtersMap.put("okf_vignette", "net.sf.okapi.filters.vignette.VignetteFilter");
 	}
 	
 	private String getConfigurationId (String ext) {
