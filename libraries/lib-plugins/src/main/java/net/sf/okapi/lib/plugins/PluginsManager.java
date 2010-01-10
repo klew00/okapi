@@ -58,15 +58,25 @@ public class PluginsManager {
 	private URLClassLoader loader;
 	
 	/**
-	 * Initializes the manager with the plug-ins in the given
-	 * file or directory.
+	 * Explores the given file or directory for plug-ins and add them to
+	 * this manager.
 	 * @param input the directory or file to inspect. If a directory
 	 * is specified, all .jar files of that directory will be inspected.
+	 * @param append true to preserve any plug-ins already existing in this
+	 * manager, false to reset and start with no plug-in.
 	 */
-	public void reset (File input) {
+	public void discover (File input,
+		boolean append)
+	{
 		try {
+			if ( plugins == null ) {
+				plugins = new ArrayList<PluginItem>();
+			}
+			ArrayList<URL> existingUrls = new ArrayList<URL>();
+			if ( append && ( urls != null )) {
+				existingUrls.addAll(urls);
+			}
 			urls = new ArrayList<URL>();
-			plugins = new ArrayList<PluginItem>();
 			loader = null;
 	
 			// Inspect either all the .jar files if input is a directory
@@ -79,7 +89,11 @@ public class PluginsManager {
 			else { // Or inspect the given file itself
 				inspectFile(input);
 			}
-	
+
+			// Add existing URLs, make sure they are unique 
+			existingUrls.removeAll(urls);
+			urls.addAll(existingUrls);
+			// Set the loader
 			if ( urls.size() > 0 ) {
 				URL[] tmp = new URL[urls.size()];
 				for ( int i=0; i<urls.size(); i++ ) {
@@ -138,7 +152,7 @@ public class PluginsManager {
 	/**
 	 * Gets the list of the class names of all available plug-ins 
 	 * of a given type currently available in this manager.
-	 * The method {@link #reset(File)} must be called once before
+	 * The method {@link #discover(File)} must be called once before
 	 * calling this method.
 	 * @param type the tyep of plug-ins to list.
 	 * @return the list of available plug-ins for the given type.
@@ -162,7 +176,7 @@ public class PluginsManager {
 	/**
 	 * Gets the URLClassLoader to use for creating new instance of the
 	 * components listed in this manager. 
-	 * The method {@link #reset(File)} must be called once before
+	 * The method {@link #discover(File)} must be called once before
 	 * calling this method.
 	 * @return the URLClassLoader for this manager.
 	 */
@@ -275,7 +289,6 @@ public class PluginsManager {
 					}
 				}
 			}
-			
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException("IO error when inspecting a file for plugins.", e);
