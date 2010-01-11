@@ -236,7 +236,7 @@ public final class BOMNewlineEncodingDetector {
 				// passed our buffer size if we didn't find any new lines yet
 				// then set the default and warn.
 				if (++count > MAX_LOOKAHEAD) {
-					LOGGER.log(Level.WARNING,
+					LOGGER.log(Level.FINE,
 							"Could not find newlines within lookahead buffer. Setting default newline type.");
 					break;
 				}
