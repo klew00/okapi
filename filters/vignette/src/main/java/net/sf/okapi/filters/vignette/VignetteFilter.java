@@ -56,7 +56,6 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -149,7 +148,7 @@ public class VignetteFilter implements IFilter {
 	}
 
 	public IFilterWriter createFilterWriter () {
-		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
+		return new VignetteFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
@@ -286,8 +285,8 @@ public class VignetteFilter implements IFilter {
 	}
 	
 	private void internalOpen (RawDocument input) {
-		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(),
-			input.getEncoding());
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(
+			input.getStream(), "UTF-8"); // UTF-8 for encoding
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
 		String encoding = input.getEncoding();
@@ -621,14 +620,19 @@ public class VignetteFilter implements IFilter {
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 		}
 		else {
-			StartGroup sg = new StartGroup(String.valueOf(subDocId), String.valueOf(++otherId));
-			sg.setType("x-"+partName);
-			queue.add(new Event(EventType.START_GROUP, sg));
-			
 			subFilter.close();
 			subFilter.open(new RawDocument(data, srcLoc));
 			Event event = subFilter.next(); // START_DOCUMENT
 
+			// Change the START_DOCUMENT to START_GROUP
+			StartDocument sd = (StartDocument)event.getResource();
+			StartGroup sg = new StartGroup(String.valueOf(subDocId), String.valueOf(++otherId));
+			sg.setType("x-"+partName);
+			sg.setMimeType(sd.getMimeType());
+			sg.setSkeleton(sd.getSkeleton());
+			sg.setAnnotation(new SubFilterAnnotation());
+			queue.add(new Event(EventType.START_GROUP, sg));
+			
 			while ( subFilter.hasNext() ) {
 				event = subFilter.next();
 				if ( event.getEventType() == EventType.END_DOCUMENT ) {
@@ -637,8 +641,11 @@ public class VignetteFilter implements IFilter {
 				queue.add(event);
 			}
 			subFilter.close();
-			
+
+			// Change the END_DOCUMENT to END_GROUP
 			Ending ending = new Ending(String.valueOf(++otherId));
+			ending.setSkeleton(event.getResource().getSkeleton());
+			ending.setAnnotation(new SubFilterAnnotation());
 			queue.add(new Event(EventType.END_GROUP, ending));
 		}
 	}

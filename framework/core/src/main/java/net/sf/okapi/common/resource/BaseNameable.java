@@ -92,7 +92,7 @@ public class BaseNameable implements INameable {
 	}
 
 	public void setAnnotation (IAnnotation annotation) {
-		if ( annotation == null ) annotations = new Annotations();
+		if ( annotations == null ) annotations = new Annotations();
 		annotations.set(annotation);
 	}
 

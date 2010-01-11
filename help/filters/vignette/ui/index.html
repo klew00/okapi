@@ -34,12 +34,7 @@ Vignette.</p>
 
 <h2><a name="processing"></a>Processing Details</h2>
 <h3>Encodings</h3>
-<p>The input encoding is automatically detected.</p>
-<p>Any user-specified encoding is ignored by these filters. they always use 
-UTF-8.</p>
-<h3>Line-Breaks</h3>
-<p>The type of line-breaks of the output is always set to a simple linefeed 
-(LF).</p>
+<p>The input and output encodings are forced to UTF-8.</p>
 <h3>Entries to Extract</h3>
 <p>The entries to extract are defined by the value of the <code>name</code> 
 attribute of the <code>attribute</code> element that contains the corresponding 
@@ -57,8 +52,26 @@ data. Entries that have only a <code>importContentInstance</code> for the source
 will not be extracted (but will be listed as warning). Conversely, entries that 
 have no <code>importContentInstance</code> for the source will not be extracted, 
 and will be listed as warning.</p>
+<p>The relationship between the source and the target <code>importContentInstance</code> 
+blocks is done with the source ID: both block must have the same.</p>
+<p>While corresponding blocks for different locales can be in any oder, the 
+blocks for a given locale must be in the same sequence as the source blocks.</p>
 <h2><a name="parameters"></a>Parameters</h2>
-<p><span style="background-color: #FFFF00">TODO</span></p>
+<p><cite>Names of the parts to extract</cite> -- Enter the list of the values 
+for the name of the entries to extract. The list must be comma-separated.</p>
+<p><cite>Corresponding filter configurations</cite> -- Enter the list of the 
+filter configurations to use for each extractable part. This list must be 
+comma-separated, and must contains the same number of entries as the list of 
+parts names. Use &#39;<code>default</code>&#39; to indicate no specific filter.</p>
+<p><cite>Name of the content ID part</cite> -- Enter the value for the <code>
+name</code> attribute of the <code>&lt;attribute&gt;</code> element that hold the 
+content ID for a given block.</p>
+<p><cite>Name of the source ID part</cite> -- Enter the value for the <code>name</code> 
+attribute of the <code>&lt;attribute&gt;</code> element that hold the source ID for a 
+given block.</p>
+<p><cite>Name of the locale ID part</cite> -- Enter the value for the <code>name</code> 
+attribute of the <code>&lt;attribute&gt;</code> element that hold the locale ID for a 
+given block.</p>
 <p>&nbsp;</p>
 
 </body>

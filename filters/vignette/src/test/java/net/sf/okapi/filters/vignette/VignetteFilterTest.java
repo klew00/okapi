@@ -45,7 +45,8 @@ public class VignetteFilterTest {
 	private VignetteFilter filter;
 	private String root;
 	private GenericContent fmt;
-	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locENUS = LocaleId.fromString("en-us");
+	private LocaleId locESES = LocaleId.fromString("es-es");
 
 	@Before
 	public void setUp() {
@@ -64,7 +65,7 @@ public class VignetteFilterTest {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.xml", null));
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, ""));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locESES, ""));
 	}
 	
 //	private ArrayList<Event> getEvents(String snippet) {
