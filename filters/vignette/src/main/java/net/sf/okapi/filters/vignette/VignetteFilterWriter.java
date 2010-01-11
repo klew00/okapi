@@ -60,12 +60,12 @@ public class VignetteFilterWriter extends GenericFilterWriter {
 		return event;
 	}
 
+	@Override
 	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
-		this.locale = locale;
 		// Force UTF-8
-		this.encoding = "UTF-8";
+		super.setOptions(locale, "UTF-8");
 	}
 
 }

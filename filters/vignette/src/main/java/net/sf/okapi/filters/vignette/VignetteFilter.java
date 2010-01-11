@@ -213,6 +213,7 @@ public class VignetteFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
+		logger.info("- Pre-processing pass");
 		partsNames = params.getPartsNamesAsList();
 		partsConfigurations = params.getPartsConfigurationsAsList();
 		if ( !params.checkData() ) {
@@ -278,6 +279,7 @@ public class VignetteFilter implements IFilter {
 		}
 
 		// Second pass: extraction
+		logger.info("- Processing pass");
 		preprocessing = false;
 		internalOpen(input);
 		store.openForRead(storeFile);		
@@ -434,6 +436,7 @@ public class VignetteFilter implements IFilter {
 			// Get first 'contentInstance' element
 			NodeList nodes = doc.getElementsByTagName("contentInstance");
 			Element elem = (Element)nodes.item(0);
+			logger.info("Part: "+elem.getAttribute("vcmId"));
 			// Get all 'attribute' elements in 'contentInstance' 
 			nodes = elem.getElementsByTagName("attribute");
 
@@ -461,7 +464,7 @@ public class VignetteFilter implements IFilter {
 				// Warn on pre-processing, then treat as document part
 				if ( preprocessing ) {
 					logger.warning(String.format(
-						"Entry with incomplete data, %s occurrence %d: \nlocale='%s' source ID='%s'\ncontent ID='%s'",
+						"Entry with incomplete data at %s number %d\nlocale='%s' source ID='%s' content ID='%s'",
 						STARTBLOCK, counter, localeId, sourceId, contentId));
 					return false;
 				}
@@ -475,13 +478,13 @@ public class VignetteFilter implements IFilter {
 			
 			if ( preprocessing ) {
 				if ( srcLoc.toPOSIXLocaleId().equals(localeId) ) {
-					// For a source block: update list, store and move on
+					// For a source block: update the list, store the data and move on
 					updateDocumentList(contentId, sourceId, true);
 					store.writeBlock(sourceId, content);
 					return false;
 				}
 				else if ( trgLoc.toPOSIXLocaleId().equals(localeId) ) {
-					// For a target block: update list and skip
+					// For a target block: update the list and skip
 					updateDocumentList(contentId, sourceId, false);
 					return false;
 				}
@@ -493,22 +496,25 @@ public class VignetteFilter implements IFilter {
 			else {
 				// Else, in extract mode: skip if not a target block
 				boolean extract = true;
-				if ( !trgLoc.toPOSIXLocaleId().equals(localeId) ) {
-					extract = false;
+				if ( trgLoc.toPOSIXLocaleId().equals(localeId) ) {
+					// If it's a target
+					// Find its corresponding entry in the store
+					String[] data = docs.get(sourceId);
+					if ( data == null ) {
+						extract = false;
+					}
+					else if ( Util.isEmpty(data[0]) ) {
+						// No corresponding source was detected
+						extract = false;
+					}
 				}
-				// If it's a target
-				// Find its corresponding entry in the store
-				String[] data = docs.get(sourceId);
-				if ( data == null ) {
-					extract = false;
-				}
-				else if ( Util.isEmpty(data[0]) ) {
-					// No corresponding source was detected
+				else { // Not a target: skip
 					extract = false;
 				}
 				
+				// If we don't extract
 				if ( !extract ) {
-					// In all other cases, just send as document part
+					// Just send as document part
 					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 					dp.setSkeleton(new GenericSkeleton(content.replace("\n", lineBreak)));
 					queue.add(new Event(EventType.DOCUMENT_PART, dp));
@@ -519,14 +525,14 @@ public class VignetteFilter implements IFilter {
 			
 			// Find its corresponding entry in the store
 			// Parse the block into a DOM-tree
-			String[] tmp = store.readNext();
-			if ( !sourceId.equals(tmp[0]) ) {
+			String tmp = findOriginalInStore(sourceId);
+			if ( tmp == null ) {
 				throw new OkapiIOException(String.format(
-					"Source ID mismatch: target='%s' source='%s'.", sourceId, tmp[0]));
+					"Source ID not found ('%s').", sourceId));
 			}
 
 			// Parse the source content
-			Document oriDoc = docBuilder.parse(new InputSource(new StringReader(tmp[1])));
+			Document oriDoc = docBuilder.parse(new InputSource(new StringReader(tmp)));
 			// Get first 'contentInstance' element
 			NodeList oriNodes = oriDoc.getElementsByTagName("contentInstance");
 			elem = (Element)oriNodes.item(0);
@@ -564,6 +570,38 @@ public class VignetteFilter implements IFilter {
 		catch ( Throwable e ) {
 			throw new OkapiIOException(
 				String.format("XML parsing error in block starting at character %d.", start), e);
+		}
+	}
+
+	private String findOriginalInStore (String sourceId) {
+		boolean rewund = false;
+		String stop = null;
+		while ( true ) {
+			String tmp[] = store.readNext();
+			if ( tmp == null ) {
+				if ( rewund ) return null; // Not found
+				// Else: rewind the store
+				store.close();
+				store.openForRead(storeFile);
+				rewund = true;
+			}
+			else {
+				if ( tmp[0].equals(sourceId) ) {
+					return tmp[1]; // Found
+				}
+				else {
+					if ( stop != null ) {
+						if ( tmp[0].equals(stop) ) {
+							return null; // Stop here, not found
+						}
+						// Move to next
+					}
+					else {
+						// Remember where to stop later
+						stop = tmp[0];
+					}
+				}
+			}
 		}
 	}
 	

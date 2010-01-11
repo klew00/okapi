@@ -53,9 +53,9 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 public class GenericFilterWriter implements IFilterWriter {
 
 	protected OutputStreamWriter writer;
-	protected LocaleId locale;
-	protected String encoding;
 
+	private LocaleId locale;
+	private String encoding;
 	private ISkeletonWriter skelWriter;
 	private OutputStream output;
 	private String outputPath;

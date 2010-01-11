@@ -84,7 +84,7 @@ class TemporaryStore {
 		}
 	}
 
-	// Return String[0] = contentId, String[1] = data 
+	// Return String[0] = sourceId, String[1] = data 
 	public String[] readNext () {
 		try {
 			String[] res = new String[2];

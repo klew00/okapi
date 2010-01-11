@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.vignette;
 
+import java.io.ByteArrayOutputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +31,8 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
-import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -44,7 +44,6 @@ public class VignetteFilterTest {
 	
 	private VignetteFilter filter;
 	private String root;
-	private GenericContent fmt;
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 	private LocaleId locESES = LocaleId.fromString("es-es");
 
@@ -52,14 +51,104 @@ public class VignetteFilterTest {
 	public void setUp() {
 		filter = new VignetteFilter();
 		root = TestUtil.getParentDir(this.getClass(), "/Test01.xml");
-		fmt = new GenericContent();
 	}
 
 	@Test
-	public void testDefine () {
-		assertTrue(filter.getParameters()!=null);
+	public void testDefaultInfo () {
+		assertNotNull(filter.getParameters());
+		assertNotNull(filter.getName());
+		List<FilterConfiguration> list = filter.getConfigurations();
+		assertNotNull(list);
+		assertTrue(list.size()>0);
 	}
 	
+	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"Test01.xml", null),
+			"UTF-8", locENUS, locESES));
+	}
+	
+	@Test
+	public void testSimpleEntry () {
+		String snippet = createSimpleDoc();
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locESES), 1);
+		assertNotNull(tu);
+		assertEquals("ENtext", tu.getSource().toString());
+	}
+
+	@Test
+	public void testSimpleEntryOutput () {
+		String snippet = createSimpleDoc();
+		String expected = "<importProject>"
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1ES</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB><![CDATA[<p>ENtext</p>]]></valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>es_ES</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			+ "<stuff/>"
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>&lt;p&gt;ENtext&lt;/p&gt;</valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>en_US</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			+ "<importProject>";
+		String result = generateOutput(getEvents(snippet, locENUS, locESES));
+		assertEquals(expected, result);		
+	}
+
+	@Test
+	public void testComplexEntry () {
+		String snippet = createComplexDoc();
+		// Order is driven by the targets
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locESES), 1);
+		assertNotNull(tu);
+		assertEquals("EN-id1", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locESES), 2);
+		assertNotNull(tu);
+		assertEquals("EN-id2", tu.getSource().toString());
+	}
+
+	@Test
+	public void testComplexEntryOutput () {
+		String snippet = createComplexDoc();
+		String expected = "<importProject>"
+			// ES id1
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1ES</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB><![CDATA[EN-id1]]></valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>es_ES</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			// EN id2
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id2</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>EN-id2</valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id2</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>en_US</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			+ "<importProject>"
+			// ES id2
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id2ES</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB><![CDATA[EN-id2]]></valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id2</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>es_ES</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			// EN id1
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>EN-id1</valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>en_US</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			+ "<importProject>";
+		String result = generateOutput(getEvents(snippet, locENUS, locESES));
+		assertEquals(expected, result);		
+	}
+
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
@@ -68,23 +157,82 @@ public class VignetteFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locESES, ""));
 	}
 	
-//	private ArrayList<Event> getEvents(String snippet) {
-//		return getEvents(snippet, null);
-//	}
-//	
-//	private ArrayList<Event> getEvents(String snippet, Parameters params) {
-//		ArrayList<Event> list = new ArrayList<Event>();
-//		filter.open(new RawDocument(snippet, locEN));
-//		
-//		if ( params == null ) filter.getParameters().reset();
-//		else filter.setParameters(params);
-//		
-//		while (filter.hasNext()) {
-//			Event event = filter.next();
-//			list.add(event);
-//		}
-//		filter.close();
-//		return list;
-//	}
+	private String createSimpleDoc () {
+		return "<importProject>"
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1ES</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>&lt;p&gt;ES&lt;/p&gt;</valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>es_ES</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			+ "<stuff/>"
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>&lt;p&gt;ENtext&lt;/p&gt;</valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>en_US</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			+ "<importProject>";
+	}
+
+	private String createComplexDoc () {
+		return "<importProject>"
+			// ES id1
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1ES</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>ES-id1</valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>es_ES</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			// EN id2
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id2</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>EN-id2</valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id2</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>en_US</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			+ "<importProject>"
+			// ES id2
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id2ES</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>ES-id2</valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id2</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>es_ES</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			// EN id1
+			+ "<importContentInstance><contentInstance>"
+			+ "<attribute name=\"SMCCONTENT-CONTENT-ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"SMCCONTENT-BODY\"><valueCLOB>EN-id1</valueCLOB></attribute>"
+			+ "<attribute name=\"SOURCE_ID\"><valueString>id1</valueString></attribute>"
+			+ "<attribute name=\"LOCALE_ID\"><valueString>en_US</valueString></attribute>"
+			+ "</contentInstance></importContentInstance>"
+			+ "<importProject>";
+	}
+
+	private String generateOutput (List<Event> list) {
+		IFilterWriter writer = filter.createFilterWriter();
+		writer.setOptions(locESES, "UTF-8");
+		ByteArrayOutputStream writerBuffer = new ByteArrayOutputStream();
+		writer.setOutput(writerBuffer);
+		for (Event event : list) {
+			writer.handleEvent(event);
+		}
+		writer.close();
+		return writerBuffer.toString();
+	}
+	
+	private ArrayList<Event> getEvents (String snippet,
+		LocaleId srcLang,
+		LocaleId trgLang)
+	{
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(snippet, srcLang, trgLang));
+		while ( filter.hasNext() ) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
+	}
 
 }
