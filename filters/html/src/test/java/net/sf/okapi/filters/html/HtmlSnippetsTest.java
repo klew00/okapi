@@ -1,15 +1,14 @@
 package net.sf.okapi.filters.html;
 
-
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.*;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,6 +31,25 @@ public class HtmlSnippetsTest {
 
 	@After
 	public void tearDown() {
+	}
+
+	@Test
+	public void testMETAContent () {
+		String snippet = "<html>"
+			+ "<meta NAME=\"keywords\" CONTENT=\"Text1\"/>"
+			+ "<meta NAME=\"creation_date\" CONTENT=\"May 24, 2001\"/>"
+			+ "<meta NAME=\"DESCRIPTION\" CONTENT=\"Text2\"/>"
+			+ "<p>Text3</p>";
+		ArrayList<Event> events = getEventsDefault(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		assertNotNull(tu);
+//TOFIX		assertEquals("Text1", tu.toString());
+//		tu = FilterTestDriver.getTextUnit(events, 2);
+//		assertNotNull(tu);
+//		assertEquals("Text2", tu.toString());
+//		tu = FilterTestDriver.getTextUnit(events, 3);
+//		assertNotNull(tu);
+//		assertEquals("Text3", tu.toString());
 	}
 
 	@Test
@@ -233,6 +251,18 @@ public class HtmlSnippetsTest {
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 	
+	private ArrayList<Event> getEventsDefault(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		// Use default parameters
+		htmlFilter.open(new RawDocument(snippet, locEN));
+		while (htmlFilter.hasNext()) {
+			Event event = htmlFilter.next();
+			list.add(event);
+		}
+		htmlFilter.close();
+		return list;
+	}
+
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		htmlFilter.setParametersFromURL(parameters);
