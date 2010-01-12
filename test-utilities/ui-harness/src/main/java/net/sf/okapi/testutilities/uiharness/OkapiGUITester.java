@@ -93,7 +93,7 @@ public class OkapiGUITester {
 			// Descriptors
 			net.sf.okapi.steps.batchtranslation.Parameters.class.getName(),
 			net.sf.okapi.steps.linebreakconversion.Parameters.class.getName(),
-			// net.sf.okapi.steps.gcaligner.Parameters.class.getName()
+			net.sf.okapi.steps.gcaligner.Parameters.class.getName()
 	};
 
 	private Group grpParameters;

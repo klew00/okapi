@@ -125,10 +125,10 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!--
-			<dependency> <groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-gc-aligner</artifactId>
-			<version>${project.version}</version> </dependency>
-		-->
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-sentence-aligner</artifactId>
+			<version>0.5-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>
