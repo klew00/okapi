@@ -60,9 +60,7 @@ public class SentenceAlignerStep extends BasePipelineStep {
 	private ISegmenter targetSegmenter;
 
 	public SentenceAlignerStep() {
-		params = new Parameters();
-		sourceLocale = params.getSourceLocale();
-		targetLocale = params.getTargetLocale();
+		params = new Parameters();		
 		sentenceAligner = new SentenceAligner();
 	}
 
@@ -73,14 +71,12 @@ public class SentenceAlignerStep extends BasePipelineStep {
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
 	public void setSourceLocale(LocaleId sourceLocale) {
-		this.sourceLocale = sourceLocale;
-		params.setSourceLocale(sourceLocale);
+		this.sourceLocale = sourceLocale;		
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale(LocaleId targetLocale) {
-		this.targetLocale = targetLocale;
-		params.setTargetLocale(targetLocale);
+		this.targetLocale = targetLocale;	
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SECOND_INPUT_RAWDOC)

@@ -44,15 +44,14 @@ public class SentenceAlignPipelineStepTest {
 	}
 	
 	@Test
-	public void sentenceEnglishEnglishAlign() throws URISyntaxException {		
-		pipeline.startBatch();
-		
+	public void sentenceEnglishEnglishAlign() throws URISyntaxException {
 		RawDocument t = new RawDocument(this.getClass().getResourceAsStream("/src.txt"), "UTF-8", LocaleId.ENGLISH);
-		t.setFilterConfigId("okf_plaintext");
-		
+		t.setFilterConfigId("okf_plaintext");		
 		aligner.setSecondInput(t);		
 		aligner.setSourceLocale(LocaleId.ENGLISH);
 		aligner.setTargetLocale(LocaleId.ENGLISH);
+		
+		pipeline.startBatch();		
 		
 		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/src.txt"), "UTF-8", LocaleId.ENGLISH));
 
@@ -60,15 +59,15 @@ public class SentenceAlignPipelineStepTest {
 	}
 
 	@Test
-	public void sentenceAlignMultimatch() throws URISyntaxException {		
-		pipeline.startBatch();
-		
+	public void sentenceAlignMultimatch() throws URISyntaxException {
 		RawDocument t = new RawDocument(this.getClass().getResourceAsStream("/trgMultimatch.txt"), "UTF-8", LocaleId.fromString("pt"));
 		t.setFilterConfigId("okf_plaintext");
 		
 		aligner.setSecondInput(t);		
 		aligner.setSourceLocale(LocaleId.ENGLISH);
 		aligner.setTargetLocale(LocaleId.PORTUGUESE);
+		
+		pipeline.startBatch();				
 		
 		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/srcMultimatch.txt"), "UTF-8", LocaleId.ENGLISH));
 
