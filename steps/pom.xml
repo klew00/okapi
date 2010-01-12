@@ -43,6 +43,7 @@
         <module>xsltransform</module>
         <module>xsltransform-ui</module>
         <module>codeshandling</module>
+        <module>sentence-aligner</module>
     </modules>
 
     <build>
