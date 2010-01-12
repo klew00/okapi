@@ -72,9 +72,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add("tmxPath",	"TMX output path", "Full path of the output TMX file");
-		desc.add("generateTMX",	"Generate TMX?", "If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");
-		desc.add("sourceLocale", "Source document locale", "ISO code for source document locale");
-		desc.add("targetLocale", "Target document locale", "ISO code for target document locale");
+		desc.add("generateTMX",	"Generate TMX?", "If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");		
 		return desc;
 	}
 	
