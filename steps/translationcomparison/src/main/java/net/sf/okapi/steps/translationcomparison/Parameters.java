@@ -25,6 +25,15 @@ import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
+	public static final String GENERATETMX = "generateTMX";
+	public static final String TMXPATH = "tmxPath"; 
+	public static final String GENERATEHTML = "generateHTML";
+	public static final String TARGET2SUFFIX = "target2Suffix";
+	public static final String TARGET3SUFFIX = "target3Suffix";
+	public static final String DOCUMENT1LABEL = "document1Label";
+	public static final String DOCUMENT2LABEL = "document2Label";
+	public static final String DOCUMENT3LABEL = "document3Label";
+	
 	private boolean generateTMX;
 	private String tmxPath;
 	private boolean generateHTML;
@@ -32,7 +41,11 @@ public class Parameters extends BaseParameters {
 	private boolean caseSensitive;
 	private boolean whitespaceSensitive;
 	private boolean punctuationSensitive;
-	private String targetSuffix;
+	private String target2Suffix;
+	private String target3Suffix;
+	private String document1Label;
+	private String document2Label;
+	private String document3Label;
 
 	public Parameters () {
 		reset();
@@ -94,14 +107,47 @@ public class Parameters extends BaseParameters {
 		this.punctuationSensitive = punctuationSensitive;
 	}
 
-	public String getTargetSuffix () {
-		return targetSuffix;
+	public String getTarget2Suffix () {
+		return target2Suffix;
 	}
 
-	public void setTargetSuffix (String targetSuffix) {
-		this.targetSuffix = targetSuffix;
+	public void setTarget2Suffix (String target2Suffix) {
+		this.target2Suffix = target2Suffix;
 	}
 
+	public String getTarget3Suffix () {
+		return target3Suffix;
+	}
+
+	public void setTarget3Suffix (String target3Suffix) {
+		this.target3Suffix = target3Suffix;
+	}
+
+	public String getDocument1Label () {
+		return document1Label;
+	}
+
+	public void setDocument1Label (String document1Label) {
+		this.document1Label = document1Label;
+	}
+
+	public String getDocument2Label () {
+		return document2Label;
+	}
+
+	public void setDocument2Label (String document2Label) {
+		this.document2Label = document2Label;
+	}
+
+	public String getDocument3Label () {
+		return document3Label;
+	}
+
+	public void setDocument3Label (String document3Label) {
+		this.document3Label = document3Label;
+	}
+
+	@Override
 	public void reset() {
 		generateTMX = false;
 		tmxPath = "comparison.tmx"; // "${ProjDir}"+File.separator+"output.tmx";
@@ -110,47 +156,73 @@ public class Parameters extends BaseParameters {
 		caseSensitive = true;
 		whitespaceSensitive = true;
 		punctuationSensitive = true;
-		targetSuffix = "-mt";
+		target2Suffix = "-t2";
+		target3Suffix = "-t3";
+		document1Label = "Base";
+		document2Label = "Trans1";
+		document3Label = "Trans2";
 	}
 
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		generateTMX = buffer.getBoolean("generateTMX", generateTMX);
-		tmxPath = buffer.getString("tmxPath", tmxPath);
-		generateHTML = buffer.getBoolean("generateHTML", generateHTML);
+		generateTMX = buffer.getBoolean(GENERATETMX, generateTMX);
+		tmxPath = buffer.getString(TMXPATH, tmxPath);
+		generateHTML = buffer.getBoolean(GENERATEHTML, generateHTML);
 		autoOpen = buffer.getBoolean("autoOpen", autoOpen);
 		caseSensitive = buffer.getBoolean("caseSensitive", caseSensitive);
 		whitespaceSensitive = buffer.getBoolean("whitespaceSensitive", whitespaceSensitive);
 		punctuationSensitive = buffer.getBoolean("punctuationSensitive", punctuationSensitive);
-		targetSuffix = buffer.getString("targetSuffix", targetSuffix);
+		target2Suffix = buffer.getString(TARGET2SUFFIX, target2Suffix);
+		target3Suffix = buffer.getString(TARGET3SUFFIX, target3Suffix);
+		document1Label = buffer.getString(DOCUMENT1LABEL, document1Label);
+		document2Label = buffer.getString(DOCUMENT2LABEL, document2Label);
+		document3Label = buffer.getString(DOCUMENT3LABEL, document3Label);
 	}
 
+	@Override
 	public String toString() {
 		buffer.reset();
-		buffer.setParameter("generateTMX", generateTMX);
-		buffer.setParameter("tmxPath", tmxPath);
-		buffer.setParameter("generateHTML", generateHTML);
+		buffer.setParameter(GENERATETMX, generateTMX);
+		buffer.setParameter(TMXPATH, tmxPath);
+		buffer.setParameter(GENERATEHTML, generateHTML);
 		buffer.setParameter("autoOpen", autoOpen);
 		buffer.setParameter("caseSensitive", caseSensitive);
 		buffer.setParameter("whitespaceSensitive", whitespaceSensitive);
 		buffer.setParameter("punctuationSensitive", punctuationSensitive);
-		buffer.setParameter("targetSuffix", targetSuffix);
+		buffer.setParameter(TARGET2SUFFIX, target2Suffix);
+		buffer.setParameter(TARGET3SUFFIX, target3Suffix);
+		buffer.setParameter(DOCUMENT1LABEL, document1Label);
+		buffer.setParameter(DOCUMENT2LABEL, document2Label);
+		buffer.setParameter(DOCUMENT3LABEL, document3Label);
 		return buffer.toString();
 	}
 
+	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("generateTMX",
+		desc.add(GENERATETMX,
 			"Generate a TMX output document", "Generates an output document in TMX");
-		desc.add("tmxPath",
+		desc.add(TMXPATH,
 			"TMX output path", "Full path of the output TMX file");
-		desc.add("generateHTML",
+		desc.add(GENERATEHTML,
 			"Generate output tables in HTML", "Generates output tables in HTML");
 		desc.add("autoOpen",
 			"Opens the first HTML output after completion", null);
-		desc.add("targetSuffix",
-			"Suffix for the second target language code", null);
+		
+		desc.add(TARGET2SUFFIX,
+			"Suffix for target language code of document 2", null);
+		desc.add(TARGET3SUFFIX,
+			"Suffix for target language code of document 3", null);
+			
+		desc.add(DOCUMENT1LABEL,
+			"Label for the document 1", null);
+		desc.add(DOCUMENT2LABEL,
+			"Label for the document 2", null);
+		desc.add(DOCUMENT3LABEL,
+			"Label for the document 3", null);
+			
 		desc.add("caseSensitive",
 			"Take into account case differences", "Takes into account case differences");
 		desc.add("whitespaceSensitive",

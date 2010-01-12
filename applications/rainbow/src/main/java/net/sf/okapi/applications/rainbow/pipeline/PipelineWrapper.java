@@ -526,14 +526,19 @@ public class PipelineWrapper {
 				// Do we have a corresponding input?
 				if ( 3 > f ) {
 					// Data is available
-					Input item2 = prj.getList(j).get(f);
-					// Input
-					outURI = (new File(prj.buildTargetPath(j, item2.relativePath))).toURI();
-					inpURI = (new File(prj.getInputRoot(j) + File.separator + item2.relativePath)).toURI();
-					rawDoc = new RawDocument(inpURI, prj.buildSourceEncoding(item),
-						prj.getSourceLanguage(), prj.getTargetLanguage());
-					rawDoc.setFilterConfigId(item2.filterConfigId);
-					bic.add(rawDoc, outURI, prj.buildTargetEncoding(item2));
+					List<Input> list = prj.getList(j);
+					// Make sure we have an entry for that list
+					if ( list.size() > f ) {
+						Input item2 = list.get(f);
+						// Input
+						outURI = (new File(prj.buildTargetPath(j, item2.relativePath))).toURI();
+						inpURI = (new File(prj.getInputRoot(j) + File.separator + item2.relativePath)).toURI();
+						rawDoc = new RawDocument(inpURI, prj.buildSourceEncoding(item),
+							prj.getSourceLanguage(), prj.getTargetLanguage());
+						rawDoc.setFilterConfigId(item2.filterConfigId);
+						bic.add(rawDoc, outURI, prj.buildTargetEncoding(item2));
+					}
+					// If no entry for that list: it'll be null
 				}
 				// Else: don't add anything
 				// The lists will return null and that is up to the utility to check.

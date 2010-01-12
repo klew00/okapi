@@ -35,18 +35,30 @@ public class ParametersUI implements IEditorDescriptionProvider {
 		EditorDescription desc = new EditorDescription("Translation Comparison", true, false);
 		
 		//TODO: "HTML Output" group
-		CheckboxPart cbp1 = desc.addCheckboxPart(paramsDesc.get("generateHTML"));
+		CheckboxPart cbpHTML = desc.addCheckboxPart(paramsDesc.get("generateHTML"));
 		CheckboxPart cbp2 = desc.addCheckboxPart(paramsDesc.get("autoOpen"));
-		cbp2.setMasterPart(cbp1, true);
+		cbp2.setMasterPart(cbpHTML, true);
 		
 		//TODO: "TMX Output" group
-		cbp1 = desc.addCheckboxPart(paramsDesc.get("generateTMX"));
+		CheckboxPart cbpTMX = desc.addCheckboxPart(paramsDesc.get("generateTMX"));
 		PathInputPart pip = desc.addPathInputPart(paramsDesc.get("tmxPath"), "TMX Document", true);
 		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
-		pip.setMasterPart(cbp1, true);
+		pip.setMasterPart(cbpTMX, true);
 		pip.setWithLabel(false);
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get("targetSuffix"));
-		tip.setMasterPart(cbp1, true);
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.TARGET2SUFFIX));
+		tip.setMasterPart(cbpTMX, true);
+		tip = desc.addTextInputPart(paramsDesc.get(Parameters.TARGET3SUFFIX));
+		tip.setMasterPart(cbpTMX, true);
+		
+		// HTML group
+		tip = desc.addTextInputPart(paramsDesc.get(Parameters.DOCUMENT1LABEL));
+		tip.setMasterPart(cbpHTML, true);
+		tip.setVertical(false);
+		tip = desc.addTextInputPart(paramsDesc.get(Parameters.DOCUMENT2LABEL));
+		tip.setMasterPart(cbpHTML, true);
+		tip.setVertical(false);
+		tip = desc.addTextInputPart(paramsDesc.get(Parameters.DOCUMENT3LABEL));
+		tip.setMasterPart(cbpHTML, true);
 		tip.setVertical(false);
 		
 		//TODO: "Comparison Options" group

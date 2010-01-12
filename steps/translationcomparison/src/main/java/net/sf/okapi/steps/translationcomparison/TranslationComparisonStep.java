@@ -45,23 +45,28 @@ import net.sf.okapi.lib.translation.TextMatcher;
 public class TranslationComparisonStep extends BasePipelineStep {
 
 	private Parameters params;
-	private IFilter input1ToCompare;
+	private IFilter filter2;
+	private IFilter filter3;
 	private TextMatcher matcher;
 	private XMLWriter writer;
 	private TMXWriter tmx;
 	private boolean isBaseMultilingual;
-	private boolean isToCompareMultilingual;
+	private boolean isInput2Multilingual;
+	private boolean isInput3Multilingual;
 	private String pathToOpen;
 	private int options;
-	private Property scoreProp;
+	private Property score1to2Prop;
+	private Property score1to3Prop;
 	private long scoreTotal;
 	private int itemCount;
 	private IFilterConfigurationMapper fcMapper;
 	private LocaleId targetLocale;
-	private LocaleId targetLocaleExtra;
+	private LocaleId targetLocale2Extra;
+	private LocaleId targetLocale3Extra;
 	private LocaleId sourceLocale;
 	private URI inputURI;
-	private RawDocument secondInput;
+	private RawDocument rawDoc2;
+	private RawDocument rawDoc3;
 
 	public TranslationComparisonStep () {
 		params = new Parameters();
@@ -89,7 +94,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	
 	@StepParameterMapping(parameterType = StepParameterType.SECOND_INPUT_RAWDOC)
 	public void setSecondInput (RawDocument secondInput) {
-		this.secondInput = secondInput;
+		this.rawDoc2 = secondInput;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.THIRD_INPUT_RAWDOC)
+	public void setThirdInput (RawDocument thirdInput) {
+		this.rawDoc3 = thirdInput;
 	}
 	
 	public String getName () {
@@ -125,8 +135,10 @@ public class TranslationComparisonStep extends BasePipelineStep {
 				getClass().getName(), null, null, null, null);
 		}
 		pathToOpen = null;
-		scoreProp = new Property("Txt::Score", "", false);
-		targetLocaleExtra = LocaleId.fromString(targetLocale.toString()+params.getTargetSuffix());
+		score1to2Prop = new Property("Txt::Score", "", false);
+		targetLocale2Extra = LocaleId.fromString(targetLocale.toString()+params.getTarget2Suffix());
+		score1to3Prop = new Property("Txt::Score1to3", "", false);
+		targetLocale3Extra = LocaleId.fromString(targetLocale.toString()+params.getTarget3Suffix());
 		
 		options = 0;
 		if ( !params.isCaseSensitive() ) options |= TextMatcher.IGNORE_CASE;
@@ -156,18 +168,30 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		StartDocument startDoc1 = (StartDocument)event1.getResource();
 		initializeDocumentData();
 		isBaseMultilingual = startDoc1.isMultilingual();
-		// Move to start document
-		Event event2 = synchronize(EventType.START_DOCUMENT);
+		
+		// Move to start document for second input
+		Event event2 = synchronize(filter2, EventType.START_DOCUMENT);
 		StartDocument startDoc2 = (StartDocument)event2.getResource();
-		isToCompareMultilingual = startDoc2.isMultilingual();
+		isInput2Multilingual = startDoc2.isMultilingual();
+		
+		// Move to start document for third input
+		if ( filter3 != null ) {
+			Event event3 = synchronize(filter3, EventType.START_DOCUMENT);
+			StartDocument startDoc3 = (StartDocument)event3.getResource();
+			isInput3Multilingual = startDoc3.isMultilingual();
+		}
+		
 		scoreTotal = 0;
 		itemCount = 0;
 	}
 	
 	@Override
 	protected void handleEndDocument (Event event) {
-    	if ( input1ToCompare != null ) {
-    		input1ToCompare.close();
+    	if ( filter2 != null ) {
+    		filter2.close();
+    	}
+    	if ( filter3 != null ) {
+    		filter3.close();
     	}
     	if ( params.isGenerateHTML() ) {
 			writer.writeEndElement(); // table
@@ -186,17 +210,31 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	protected void handleTextUnit (Event event1) {
 		TextUnit tu1 = (TextUnit)event1.getResource();
 		// Move to the next TU
-		Event event2 = synchronize(EventType.TEXT_UNIT);
+		Event event2 = synchronize(filter2, EventType.TEXT_UNIT);
+		Event event3 = null;
+		if ( filter3 != null ) {
+			event3 = synchronize(filter3, EventType.TEXT_UNIT);
+		}
 		// Skip non-translatable
 		if ( !tu1.isTranslatable() ) return;
 		
 		TextUnit tu2 = (TextUnit)event2.getResource();
+		TextUnit tu3 = null;
+		if ( event3 != null ) {
+			tu3 = (TextUnit)event3.getResource();
+		}
+
 		TextFragment srcFrag = null;
 		if ( isBaseMultilingual ) {
 			srcFrag = tu1.getSourceContent();
 		}
 		else {
-			if ( isToCompareMultilingual ) srcFrag = tu2.getSourceContent();
+			if ( isInput2Multilingual ) {
+				srcFrag = tu2.getSourceContent();
+			}
+			else if (( tu3 != null ) && isInput3Multilingual ) {
+				srcFrag = tu3.getSourceContent();
+			}
 		}
 		
 		// Get the text for the base translation
@@ -204,10 +242,17 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		if ( isBaseMultilingual ) trgFrag1 = tu1.getTargetContent(targetLocale);
 		else trgFrag1 = tu1.getSourceContent();
 
-		// Get the text for the to-compare translation
+		// Get the text for the to-compare translation 1
 		TextFragment trgFrag2;
-		if ( isToCompareMultilingual ) trgFrag2 = tu2.getTargetContent(targetLocale);
+		if ( isInput2Multilingual ) trgFrag2 = tu2.getTargetContent(targetLocale);
 		else trgFrag2 = tu2.getSourceContent();
+		
+		// Get the text for the to-compare translation 2
+		TextFragment trgFrag3 = null;
+		if ( tu3 != null ) {
+			if ( isInput3Multilingual ) trgFrag3 = tu3.getTargetContent(targetLocale);
+			else trgFrag3 = tu3.getSourceContent();
+		}
 		
 		// Do we have a base translation?
 		if ( trgFrag1 == null ) {
@@ -219,11 +264,24 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			// Create and empty entry
 			trgFrag2 = new TextFragment();
 		}
+		if ( event3 != null ) {
+			if ( trgFrag3 == null ) {
+				// Create and empty entry
+				trgFrag3 = new TextFragment();
+			}
+		}
 		
 		// Compute the distance
-		int score = matcher.compare(trgFrag1, trgFrag2, options);
+		int score1to2 = matcher.compare(trgFrag1, trgFrag2, options);
+		int score1to3 = -1;
+		int score2to3 = -1;
+		if ( event3 != null ) {
+			score1to3 = matcher.compare(trgFrag1, trgFrag3, options);
+			score2to3 = matcher.compare(trgFrag2, trgFrag3, options);
+		}
+		
 		// Store the scores for the average
-		scoreTotal += score;
+		scoreTotal += score1to2;
 		itemCount++;
 
 		// Output in HTML
@@ -238,21 +296,37 @@ public class TranslationComparisonStep extends BasePipelineStep {
 				writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
 				writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			}
-			writer.writeString("T1:");
+			writer.writeString(params.getDocument1Label()+":");
 			writer.writeRawXML("</td>"); //$NON-NLS-1$
 			if ( srcFrag != null ) writer.writeRawXML("<td>"); //$NON-NLS-1$
 			else writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
 			writer.writeString(trgFrag1.toString());
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
+			// T2
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
-			writer.writeString("T2:");
+			writer.writeString(params.getDocument2Label()+":");
 			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
 			writer.writeString(trgFrag2.toString());
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
+			// T3
+			if ( filter3 != null ) {
+				writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
+				writer.writeString(params.getDocument3Label()+":");
+				writer.writeRawXML("</td><td>"); //$NON-NLS-1$
+				writer.writeString(trgFrag3.toString());
+				writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
+			}
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
-			writer.writeString("Score:");
+			writer.writeString("Scores:");
 			writer.writeRawXML("</td><td><b>"); //$NON-NLS-1$
-			writer.writeString(String.valueOf(score));
+			writer.writeString(String.format("%s to %s = %d",
+				params.getDocument1Label(), params.getDocument2Label(), score1to2));
+			if ( score1to3 > -1 ) {
+				writer.writeString(String.format(",  %s to %s = %d",
+					params.getDocument1Label(), params.getDocument3Label(), score1to3));
+				writer.writeString(String.format(",  %s to %s = %d",
+					params.getDocument2Label(), params.getDocument3Label(), score2to3));
+			}
 			writer.writeRawXML("</b></td></tr>\n"); //$NON-NLS-1$
 		}
 
@@ -265,9 +339,14 @@ public class TranslationComparisonStep extends BasePipelineStep {
 				tmxTu.setSourceContent(srcFrag);
 			}
 			tmxTu.setTargetContent(targetLocale, trgFrag1);
-			tmxTu.setTargetContent(targetLocaleExtra, trgFrag2);
-			scoreProp.setValue(String.format("%03d", score));
-			tmxTu.setTargetProperty(targetLocaleExtra, scoreProp);
+			tmxTu.setTargetContent(targetLocale2Extra, trgFrag2);
+			score1to2Prop.setValue(String.format("%03d", score1to2));
+			tmxTu.setTargetProperty(targetLocale2Extra, score1to2Prop);
+			if ( filter3 != null ) {
+				tmxTu.setTargetContent(targetLocale3Extra, trgFrag3);
+				score1to3Prop.setValue(String.format("%03d", score1to3));
+				tmxTu.setTargetProperty(targetLocale3Extra, score1to3Prop);
+			}
 			tmx.writeTUFull(tmxTu);
 		}
 	}
@@ -277,19 +356,26 @@ public class TranslationComparisonStep extends BasePipelineStep {
     }
 
 	private void initializeDocumentData () {
-		// Initialize the filter to read the translation to compare
-		input1ToCompare = fcMapper.createFilter(
-			secondInput.getFilterConfigId(), input1ToCompare);
-		
+		// Initialize the filter to read the translation 1 to compare
+		filter2 = fcMapper.createFilter(
+			rawDoc2.getFilterConfigId(), filter2);
 		// Open the second input for this batch item
-		input1ToCompare.open(secondInput);
+		filter2.open(rawDoc2);
+
+		if ( rawDoc3 != null ) {
+			// Initialize the filter to read the translation 2 to compare
+			filter3 = fcMapper.createFilter(
+				rawDoc3.getFilterConfigId(), filter3);
+			// Open the third input for this batch item
+			filter3.open(rawDoc3);
+		}
 			
 		// Start HTML output
 		if ( writer != null ) writer.close();
 		if ( params.isGenerateHTML() ) {
 			// Use the to-compare file for the output name
 			if ( pathToOpen == null ) {
-				pathToOpen = secondInput.getInputURI().toString();
+				pathToOpen = rawDoc2.getInputURI().toString();
 				pathToOpen += ".html";
 			}
 			writer = new XMLWriter(getOutputFilename()); //$NON-NLS-1$
@@ -304,18 +390,25 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeString("Translation Comparison");
 			writer.writeEndElement();
 			writer.writeStartElement("p"); //$NON-NLS-1$
-			writer.writeString(String.format("Comparing %s (T2) against %s (T1).",
-				secondInput.getInputURI(), inputURI));
+			writer.writeString(String.format("Comparing %s (%s) against %s (%s)",
+				rawDoc2.getInputURI(), params.getDocument1Label(), inputURI, params.getDocument2Label()));
+			if ( rawDoc3 != null ) {
+				writer.writeString(String.format(" and %s (%s)",
+					rawDoc3.getInputURI(), params.getDocument3Label()));
+			}
+			writer.writeString(".");
 			writer.writeEndElement();
 			writer.writeStartElement("table"); //$NON-NLS-1$
 		}
 	}
 
-	private Event synchronize (EventType untilType) {
+	private Event synchronize (IFilter filter,
+		EventType untilType)
+	{
 		boolean found = false;
 		Event event = null;
-		while ( !found && input1ToCompare.hasNext() ) {
-			event = input1ToCompare.next();
+		while ( !found && filter.hasNext() ) {
+			event = filter.next();
 			found = (event.getEventType() == untilType);
     	}
    		if ( !found ) {

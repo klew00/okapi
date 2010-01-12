@@ -1,13 +1,17 @@
 package net.sf.okapi.steps.gcaligner;
 
+import java.io.File;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.plaintext.PlainTextFilter;
+import net.sf.okapi.lib.segmentation.SegmentationTest;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 import org.junit.After;
@@ -45,7 +49,8 @@ public class SentenceAlignPipelineStepTest {
 	
 	@Test
 	public void sentenceEnglishEnglishAlign() throws URISyntaxException {
-		RawDocument t = new RawDocument(this.getClass().getResourceAsStream("/src.txt"), "UTF-8", LocaleId.ENGLISH);
+		URL url = SentenceAlignPipelineStepTest.class.getResource("/src.txt");
+		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH);
 		t.setFilterConfigId("okf_plaintext");		
 		aligner.setSecondInput(t);		
 		aligner.setSourceLocale(LocaleId.ENGLISH);
@@ -60,7 +65,8 @@ public class SentenceAlignPipelineStepTest {
 
 	@Test
 	public void sentenceAlignMultimatch() throws URISyntaxException {
-		RawDocument t = new RawDocument(this.getClass().getResourceAsStream("/trgMultimatch.txt"), "UTF-8", LocaleId.fromString("pt"));
+		URL url = SentenceAlignPipelineStepTest.class.getResource("/trgMultimatch.txt");
+		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.fromString("pt"));
 		t.setFilterConfigId("okf_plaintext");
 		
 		aligner.setSecondInput(t);		

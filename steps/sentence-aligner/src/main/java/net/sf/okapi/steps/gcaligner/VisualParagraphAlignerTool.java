@@ -1,10 +1,7 @@
 package net.sf.okapi.steps.gcaligner;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
