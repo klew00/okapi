@@ -33,9 +33,7 @@ import net.sf.okapi.common.uidescription.PathInputPart;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private String tmxOutputPath;
-	private boolean generateTMX = true;
-	private LocaleId sourceLocale;
-	private LocaleId targetLocale;
+	private boolean generateTMX = true;	
 
 	public Parameters () {
 		reset();
@@ -53,8 +51,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void reset() {
 		tmxOutputPath = "aligned.tmx";
 		generateTMX = true;
-		sourceLocale = LocaleId.ENGLISH;
-		targetLocale = LocaleId.FRENCH;
 	}
 
 	@Override
@@ -63,8 +59,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		tmxOutputPath = buffer.getString("tmxPath", tmxOutputPath);
 		generateTMX = buffer.getBoolean("generateTMX");
-		sourceLocale = LocaleId.fromString(buffer.getString("sourceLocale"));
-		targetLocale = LocaleId.fromString(buffer.getString("targetLocale"));
 	}
 
 	@Override
@@ -72,8 +66,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setParameter("tmxPath", tmxOutputPath);
 		buffer.setBoolean("generateTMX", generateTMX);
-		buffer.setParameter("sourceLocale", sourceLocale.toString());
-		buffer.setParameter("targetLocale", targetLocale.toString());
 		return buffer.toString();
 	}
 
@@ -95,10 +87,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setWithLabel(false);
 		pip.setMasterPart(cbp, true);
-//LocaleId are not supported in generic UI yet
-//YS: I believe they are not needed here anyway
-//		desc.addTextInputPart(paramsDesc.get("sourceLocale"));
-//		desc.addTextInputPart(paramsDesc.get("targetLocale"));
 		return desc;
 	}
 
@@ -110,20 +98,4 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 //	public void setGenerateTMX (boolean generateTMX) {
 //		this.generateTMX = generateTMX;
 //	}
-
-	public LocaleId getSourceLocale() {
-		return sourceLocale;
-	}
-
-	public LocaleId getTargetLocale() {
-		return targetLocale;
-	}
-	
-	public void setSourceLocale(LocaleId sourceLocale) {
-		this.sourceLocale = sourceLocale;
-	}
-
-	public void setTargetLocale(LocaleId targetLocale) {
-		this.targetLocale = targetLocale;
-	}
 }
