@@ -27,6 +27,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.tokenization.Tokenizer;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
+import net.sf.okapi.steps.wordcount.common.StructureParameters;
 
 /**
  * Word Count engine. Contains static methods to calculate number of words in a given text fragment. 
@@ -36,6 +37,18 @@ import net.sf.okapi.steps.wordcount.common.BaseCounter;
 
 public class WordCounter extends BaseCounter {
 
+	private static StructureParameters params;
+	
+	protected static void loadParameters() {
+		
+		if (params != null) return; // Already loaded
+		
+		params = new StructureParameters();
+		if (params == null) return;
+		
+		params.loadFromResource("/word_counter.tprm");
+	}
+	
 	@Override
 	protected long doGetCount(String text, LocaleId language) {
 		
@@ -51,25 +64,28 @@ public class WordCounter extends BaseCounter {
 		return tokens.size();
 	}
 	
-	static public long getCount(TextUnit textUnit, LocaleId language) {
+	public static long getCount(TextUnit textUnit, LocaleId language) {
 		return getCount(WordCounter.class, textUnit, language);		
 	}
 	
-	static public long getCount(TextContainer textContainer, LocaleId language) {
+	public static long getCount(TextContainer textContainer, LocaleId language) {
 		return getCount(WordCounter.class, textContainer, language);		
 	}
 
-	static public long getCount(TextFragment textFragment, LocaleId language) {
+	public static long getCount(TextFragment textFragment, LocaleId language) {
 		return getCount(WordCounter.class, textFragment, language);		
 	}
 	
-	static public long getCount(String string, LocaleId language) {
+	public static long getCount(String string, LocaleId language) {
 		return getCount(WordCounter.class, string, language);		
 	}
 	
-	@Override
-	protected String getResourceName() {
-		return "/word_counter.tprm";
+	public static String getTokenName() {
+		
+		loadParameters();
+		
+		if (params == null) return "";
+		return params.getTokenName();
 	}
 
 }

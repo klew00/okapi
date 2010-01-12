@@ -39,16 +39,13 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 
 abstract public class BaseCounter {
 	
-	private static BaseCounter counter = null;
-	protected static StructureParameters params;
-	protected static Logger logger = null;
+	private static BaseCounter counter = null;	
+	private static Logger logger = null;
 	
 	abstract protected long doGetCount(String text, LocaleId language);
-	abstract protected String getResourceName();
 	
-	static protected long getCount(Class<?> classRef, Object text, LocaleId language) {
+	protected static long getCount(Class<? extends BaseCounter> classRef, Object text, LocaleId language) {
 	
-		if (classRef == null) return 0L;
 		if (text == null) return 0L;
 		if (Util.isNullOrEmpty(language)) return 0L;
 		
@@ -57,7 +54,7 @@ abstract public class BaseCounter {
 			TextUnit tu = (TextUnit) text;
 			
 			if (tu.hasTarget(language))
-				return getCount(classRef,tu.getTarget(language), language);
+				return getCount(classRef, tu.getTarget(language), language);
 			else
 				return getCount(classRef, tu.getSource(), language);
 		} 
@@ -76,25 +73,7 @@ abstract public class BaseCounter {
 		}
 		else if (text instanceof String) {
 			
-			if (counter == null)				
-				try {
-					counter = (BaseCounter) classRef.newInstance();
-					params = new StructureParameters();
-					params.loadFromResource(counter.getResourceName());
-					
-				} catch (InstantiationException e) {
-					
-					//e.printStackTrace();
-					logMessage(classRef, Level.FINE, "Counter instantiation failed: " + e.getMessage());
-					return 0L;
-					
-				} catch (IllegalAccessException e) {
-					
-					//e.printStackTrace();
-					logMessage(classRef, Level.FINE, "Counter instantiation failed: " + e.getMessage());
-					return 0L;
-				}
-				
+			instantiateCounter(classRef);
 			if (counter == null) return 0L;
 			
 			return counter.doGetCount((String) text, language);
@@ -103,12 +82,24 @@ abstract public class BaseCounter {
 		return 0;		
 	}
 	
-	public static String getTokenName() {
+	protected static void instantiateCounter(Class<? extends BaseCounter> classRef) {
 		
-		return params.getTokenName();
+		if (counter != null) return; // Already instantiated
+		
+		try {
+			counter = (BaseCounter) classRef.newInstance();
+			
+		} catch (InstantiationException e) {
+			
+			logMessage(classRef, Level.FINE, "Counter instantiation failed: " + e.getMessage());
+			
+		} catch (IllegalAccessException e) {
+			
+			logMessage(classRef, Level.FINE, "Counter instantiation failed: " + e.getMessage());
+		}
 	}
 	
-	protected static void logMessage (Class<?> classRef, Level level, String text) {
+	protected static void logMessage(Class<? extends BaseCounter> classRef, Level level, String text) {
 		
 		if (logger == null) 
 			logger = Logger.getLogger(ClassUtil.getClassName(classRef));
@@ -116,4 +107,5 @@ abstract public class BaseCounter {
 		if (logger != null)
 			logger.log(level, text);
 	}
+	
 }
