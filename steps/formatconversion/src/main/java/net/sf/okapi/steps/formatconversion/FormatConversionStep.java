@@ -135,8 +135,8 @@ public class FormatConversionStep extends BasePipelineStep {
 					startPensieveOutput();
 					break;
 				}
+				writer.handleEvent(event);
 			}
-			writer.handleEvent(event);
 			break;
 			
 		case END_DOCUMENT:
