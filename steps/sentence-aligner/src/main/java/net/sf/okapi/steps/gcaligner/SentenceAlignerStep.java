@@ -43,10 +43,16 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
+/**
+ * Align sentences between two source and target paragraphs (TextUnits) and produce a TMX file with aligned sentences.
+ * 
+ * @author HARGRAVEJE
+ * 
+ */
 @UsingParameters(Parameters.class)
 public class SentenceAlignerStep extends BasePipelineStep {
 	private static final Logger LOGGER = Logger.getLogger(SentenceAlignerStep.class.getName());
-	
+
 	private Parameters params;
 	private IFilter filter;
 	private XMLWriter writer;
@@ -60,7 +66,7 @@ public class SentenceAlignerStep extends BasePipelineStep {
 	private ISegmenter targetSegmenter;
 
 	public SentenceAlignerStep() {
-		params = new Parameters();		
+		params = new Parameters();
 		sentenceAligner = new SentenceAligner();
 	}
 
@@ -71,12 +77,12 @@ public class SentenceAlignerStep extends BasePipelineStep {
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
 	public void setSourceLocale(LocaleId sourceLocale) {
-		this.sourceLocale = sourceLocale;		
+		this.sourceLocale = sourceLocale;
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale(LocaleId targetLocale) {
-		this.targetLocale = targetLocale;	
+		this.targetLocale = targetLocale;
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SECOND_INPUT_RAWDOC)
@@ -127,8 +133,7 @@ public class SentenceAlignerStep extends BasePipelineStep {
 			tmx.writeEndDocument();
 			tmx.close();
 			tmx = null;
-		}
-		Runtime.getRuntime().gc();
+		}		
 	}
 
 	@Override
@@ -152,7 +157,7 @@ public class SentenceAlignerStep extends BasePipelineStep {
 		Event targetEvent = synchronize(EventType.TEXT_UNIT);
 
 		// Skip non-translatable
-		if (!sourceTu.isTranslatable()) 
+		if (!sourceTu.isTranslatable())
 			return;
 
 		TextUnit targetTu = Utils.segmentSource((TextUnit) targetEvent.getResource(),
@@ -169,7 +174,7 @@ public class SentenceAlignerStep extends BasePipelineStep {
 
 		// send the aligned TU to the TMX file
 		if (params.isGenerateTMX()) {
-			for (TextUnit alignedTextUnit : alignedTextUnits) {				
+			for (TextUnit alignedTextUnit : alignedTextUnits) {
 				tmx.writeTUFull(alignedTextUnit);
 			}
 		} else { // otherwise send each aligned TextUnit downstream as an event

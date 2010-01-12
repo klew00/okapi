@@ -8,6 +8,12 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 
+/**
+ * Helper methods for creating bilingual {@link TextUnit}s from {@link Segment}s. Methods to aid in segmentation.
+ * 
+ * @author HARGRAVEJE
+ * 
+ */
 public final class Utils {
 
 	/**
@@ -107,28 +113,28 @@ public final class Utils {
 	 */
 	public static TextUnit makeBilingualTextUnit(TextUnit srcTextUnit, List<Segment> srcSegments,
 			List<Segment> trgSegments, LocaleId trgLocaleId) {
-		TextUnit tu = srcTextUnit.clone();		
-		
+		TextUnit tu = srcTextUnit.clone();
+
 		// source
-		tu.getSource().clear();	
-		for (Segment segment : srcSegments) {			
-			tu.getSourceContent().append(segment.getContent());			
-		}			
+		tu.getSource().clear();
+		for (Segment segment : srcSegments) {
+			tu.getSourceContent().append(segment.getContent());
+		}
 		tu.getSourceContent().trim();
 		tu.getSourceContent().renumberCodes();
 
 		// target
 		for (LocaleId localeId : tu.getTargetLocales()) {
-			tu.getTarget(localeId).clear();		
+			tu.getTarget(localeId).clear();
 		}
 		tu.createTarget(trgLocaleId, true, TextUnit.CREATE_EMPTY);
-		
+
 		for (Segment segment : trgSegments) {
-			tu.getTargetContent(trgLocaleId).append(segment.getContent());			
-		}								
+			tu.getTargetContent(trgLocaleId).append(segment.getContent());
+		}
 		tu.getTarget(trgLocaleId).renumberCodes();
 		tu.getTarget(trgLocaleId).trim();
-		
+
 		return tu;
 	}
 

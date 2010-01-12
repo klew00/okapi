@@ -22,7 +22,6 @@ package net.sf.okapi.steps.gcaligner;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
