@@ -33,6 +33,7 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
@@ -195,6 +196,10 @@ public class PensieveFilter implements IFilter {
 		//TODO: Not very clean way to get the iterator, maybe ITmSeeker should just includes Iterable methods
 		iterator = ((Iterable<TranslationUnit>)seeker).iterator();
 		state = 1;
+	}
+
+	@Override
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 	}
 
 	@Override

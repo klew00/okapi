@@ -109,6 +109,14 @@ public interface IFilter {
 	public void setParameters (IParameters params);
 
 	/**
+	 * Sets the filter configuration mapper for this filter. This object is
+	 * used by this filter if it needs to instantiate sub-filters. The implementations
+	 * of IFilter that do not use sub-filters can use an empty stub for this method. 
+	 * @param fcMapper the mapper to set.
+	 */
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper);
+
+	/**
 	 * Creates a new ISkeletonWriter object that corresponds to the type of skeleton 
 	 * this filter uses.
 	 * @return A new instance of ISkeletonWriter for the type of skeleton this filter

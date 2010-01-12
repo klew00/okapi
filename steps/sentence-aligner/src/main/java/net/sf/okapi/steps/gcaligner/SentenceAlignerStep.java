@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
@@ -42,6 +43,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
+@UsingParameters(Parameters.class)
 public class SentenceAlignerStep extends BasePipelineStep {
 	private static final Logger LOGGER = Logger.getLogger(SentenceAlignerStep.class.getName());
 	
@@ -93,7 +95,7 @@ public class SentenceAlignerStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription() {
-		return "Aligns setences within paragraphs (TextUnits). Produces sentence alignments as bilingual TextUnits or a TMX file.";
+		return "Aligns sentences within paragraphs (TextUnits). Produces sentence alignments as bilingual TextUnits or a TMX file.";
 	}
 
 	@Override

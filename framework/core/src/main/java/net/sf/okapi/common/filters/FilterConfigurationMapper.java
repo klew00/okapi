@@ -115,6 +115,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		IFilter filter = null;
 		try {
 			filter = (IFilter)Class.forName(filterClass).newInstance();
+			filter.setFilterConfigurationMapper(this);
 		}
 		catch ( InstantiationException e ) {
 			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
@@ -501,6 +502,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		if ( filter == null ) {
 			try {
 				filter = (IFilter)Class.forName(config.filterClass).newInstance();
+				filter.setFilterConfigurationMapper(this);
 			}
 			catch ( InstantiationException e ) {
 				throw new OkapiFilterCreationException(

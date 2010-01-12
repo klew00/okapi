@@ -76,6 +76,9 @@ public class DummyBaseFilter extends AbstractFilter {
 	public void setParameters (IParameters params) {
 	}
 
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+	}
+
 	private void createCase1 () {
 		setMimeType("text/xml");
 		

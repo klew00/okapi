@@ -28,6 +28,7 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -50,6 +51,9 @@ public class VignetteFilterTest {
 	@Before
 	public void setUp() {
 		filter = new VignetteFilter();
+		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+		filter.setFilterConfigurationMapper(fcMapper);
 		root = TestUtil.getParentDir(this.getClass(), "/Test01.xml");
 	}
 

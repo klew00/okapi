@@ -27,6 +27,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.lib.extra.OkapiComponent;
 
 /**
@@ -53,6 +54,11 @@ public abstract class AbstractBaseFilter extends OkapiComponent implements IFilt
 	
 	public AbstractBaseFilter() {
 		super();
+	}
+
+	@Override
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		//TODO: Implement if derived filters need sub-filters
 	}
 
 	protected void setMimeType(String mimeType) {

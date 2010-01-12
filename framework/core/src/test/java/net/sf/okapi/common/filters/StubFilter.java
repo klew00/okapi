@@ -58,6 +58,9 @@ public class StubFilter implements IFilter {
     public void setParameters(IParameters params) {
     }
 
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+	}
+
     public ISkeletonWriter createSkeletonWriter() {
         return null;
     }

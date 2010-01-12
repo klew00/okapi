@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,17 +21,20 @@
 package net.sf.okapi.steps.gcaligner;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
 
+@EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+
 	private String tmxOutputPath;
 	private boolean generateTMX = true;
 	private LocaleId sourceLocale;
-	
 	private LocaleId targetLocale;
 
 	public Parameters () {
@@ -51,7 +54,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tmxOutputPath = "aligned.tmx";
 		generateTMX = true;
 		sourceLocale = LocaleId.ENGLISH;
-		targetLocale = LocaleId.EMPTY;
+		targetLocale = LocaleId.FRENCH;
 	}
 
 	@Override
@@ -87,18 +90,26 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Gale and Church Sentence Aligner", true, false);	
-		desc.addCheckboxPart(paramsDesc.get("generateTMX"));
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get("generateTMX"));
 		PathInputPart pip = desc.addPathInputPart(paramsDesc.get("tmxPath"), "TMX Document", true);
-		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");		
+		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setWithLabel(false);
-		desc.addTextInputPart(paramsDesc.get("sourceLocale"));
-		desc.addTextInputPart(paramsDesc.get("targetLocale"));
+		pip.setMasterPart(cbp, true);
+//LocaleId are not supported in generic UI yet
+//YS: I believe they are not needed here anyway
+//		desc.addTextInputPart(paramsDesc.get("sourceLocale"));
+//		desc.addTextInputPart(paramsDesc.get("targetLocale"));
 		return desc;
 	}
 
 	public boolean isGenerateTMX() {
 		return generateTMX;
 	}
+	
+//TODO: Uncomment when streaming TU output is implemented
+//	public void setGenerateTMX (boolean generateTMX) {
+//		this.generateTMX = generateTMX;
+//	}
 
 	public LocaleId getSourceLocale() {
 		return sourceLocale;

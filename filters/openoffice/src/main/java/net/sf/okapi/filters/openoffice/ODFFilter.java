@@ -41,6 +41,7 @@ import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
@@ -281,6 +282,9 @@ public class ODFFilter implements IFilter {
 		return queue.poll();
 	}
 	
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+	}
+
 	public void setParameters (IParameters newParams) {
 		params = (Parameters)newParams;
 	}

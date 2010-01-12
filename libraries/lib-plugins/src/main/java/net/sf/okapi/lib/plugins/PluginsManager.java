@@ -194,6 +194,7 @@ public class PluginsManager {
 		IFilter filter;
 		try {
 			filter = (IFilter)Class.forName(className, true, loader).newInstance();
+			//TODO: set the filter.setFilterConfigurationMapper(null);
 			return filter;
 		}
 		catch ( InstantiationException e ) {

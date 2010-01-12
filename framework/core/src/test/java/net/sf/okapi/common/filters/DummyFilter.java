@@ -137,6 +137,9 @@ public class DummyFilter implements IFilter {
 		this.params = (DummyParameters)params;
 	}
 
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+	}
+
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
 	}

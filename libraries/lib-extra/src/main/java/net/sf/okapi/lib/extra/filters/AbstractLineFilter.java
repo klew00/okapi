@@ -34,6 +34,7 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -95,6 +96,11 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		catch (IOException e) {
 			throw new OkapiIOException(e);
 		}
+	}
+
+	@Override
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		//TODO: Implement if derived filters need sub-filters
 	}
 
 	public IFilterWriter createFilterWriter() {

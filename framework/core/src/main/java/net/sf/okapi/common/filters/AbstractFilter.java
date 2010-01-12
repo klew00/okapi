@@ -59,6 +59,7 @@ public abstract class AbstractFilter implements IFilter {
 	private String name;
 	private String displayName;
 	private EncoderManager encoderManager;
+	private IFilterConfigurationMapper fcMapper;
 
 	/**
 	 * Default constructor
@@ -158,6 +159,10 @@ public abstract class AbstractFilter implements IFilter {
 		return configs;
 	}
 
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
+	}
+
 	public EncoderManager getEncoderManager () {
 		if ( encoderManager == null ) {
 			encoderManager = new EncoderManager();
@@ -181,6 +186,15 @@ public abstract class AbstractFilter implements IFilter {
 	 */
 	private String createId(String name, int number) {
 		return String.format("%s%d", name, number); //$NON-NLS-1$
+	}
+
+	/**
+	 * Gets the filter configuration mapper if available. This mapper can
+	 * be used to instantiate sub-filters based on filter configurations.
+	 * @return the filter configuration mapper.
+	 */
+	protected IFilterConfigurationMapper getFilterConfigurationMapper () {
+		return fcMapper;
 	}
 
 	/**

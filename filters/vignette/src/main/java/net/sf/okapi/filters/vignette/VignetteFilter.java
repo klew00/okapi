@@ -56,6 +56,7 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -68,7 +69,6 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
-import net.sf.okapi.filters.html.HtmlFilter;
 
 /**
  * Implements the IFilter interface for Vignette export/import content.
@@ -103,6 +103,7 @@ public class VignetteFilter implements IFilter {
 	private TemporaryStore store;
 	private File storeFile;
 	private int counter;
+	private IFilterConfigurationMapper fcMapper;
 	
 	public VignetteFilter () {
 		params = new Parameters();
@@ -168,7 +169,11 @@ public class VignetteFilter implements IFilter {
 		}
 		return encoderManager;
 	}
-	
+
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
+	}
+
 	public String getDisplayName () {
 		return "Vignette Filter (ALPHA)";
 	}
@@ -314,7 +319,6 @@ public class VignetteFilter implements IFilter {
 		tuId = 0;
 		subDocId = 0;
 		otherId = 0;
-		subFilter = new HtmlFilter();
 
 		// Set the start event
 		queue = new LinkedList<Event>();
@@ -658,6 +662,7 @@ public class VignetteFilter implements IFilter {
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 		}
 		else {
+			subFilter = fcMapper.createFilter(partConfiguration, subFilter);
 			subFilter.close();
 			subFilter.open(new RawDocument(data, srcLoc));
 			Event event = subFilter.next(); // START_DOCUMENT
