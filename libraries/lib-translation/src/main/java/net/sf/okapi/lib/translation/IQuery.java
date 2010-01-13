@@ -46,11 +46,11 @@ public interface IQuery {
 
 	/**
 	 * Sets the source and target languages for this query engine.
-	 * @param sourceLang Code of the source language.
-	 * @param targetLang Code of the target language.
+	 * @param sourceLocale Code of the source locale.
+	 * @param targetLocale Code of the target locale.
 	 */
-	public void setLanguages (LocaleId sourceLang,
-		LocaleId targetLang);
+	public void setLanguages (LocaleId sourceLocale,
+		LocaleId targetLocale);
 	
 	/**
 	 * Gets the current source language for this query engine.
@@ -102,7 +102,7 @@ public interface IQuery {
 	public void open ();
 	
 	/**
-	 * Closes this conector.
+	 * Closes this connector.
 	 */
 	public void close ();
 	

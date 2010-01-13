@@ -339,7 +339,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addDescriptionProvider("net.sf.okapi.steps.translationcomparison.ParametersUI", step.paramsClass);
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.translationcomparison.Parameters", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
 

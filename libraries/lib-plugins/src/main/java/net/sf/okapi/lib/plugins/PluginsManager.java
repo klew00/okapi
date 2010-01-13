@@ -154,7 +154,7 @@ public class PluginsManager {
 	 * of a given type currently available in this manager.
 	 * The method {@link #discover(File)} must be called once before
 	 * calling this method.
-	 * @param type the tyep of plug-ins to list.
+	 * @param type the type of plug-ins to list.
 	 * @return the list of available plug-ins for the given type.
 	 */
 	public List<String> getList (int type) {
@@ -182,59 +182,6 @@ public class PluginsManager {
 	 */
 	public URLClassLoader getClassLoader () {
 		return loader;
-	}
-	
-	/**
-	 * Creates a IFilter object for the given class.
-	 * @param className the class to instantiate, it must be listed
-	 * in this manager.
-	 * @return the instantiated filter.
-	 */
-	public IFilter createIFilter (String className) {
-		IFilter filter;
-		try {
-			filter = (IFilter)Class.forName(className, true, loader).newInstance();
-			//TODO: set the filter.setFilterConfigurationMapper(null);
-			return filter;
-		}
-		catch ( InstantiationException e ) {
-			throw new OkapiFilterCreationException(String.format(
-				"Error creating filter for '%s'", className), e);
-		}
-		catch ( IllegalAccessException e ) {
-			throw new OkapiFilterCreationException(String.format(
-				"Error creating filter for '%s'", className), e);
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new OkapiFilterCreationException(String.format(
-				"Error creating filter for '%s'", className), e);
-		}
-	}
-	
-	/**
-	 * Creates a IPipelineStep object for the given class.
-	 * @param className the class to instantiate, it must be listed
-	 * in this manager.
-	 * @return the instantiated step.
-	 */
-	public IPipelineStep createIPipelineStep (String className) {
-		IPipelineStep step;
-		try {
-			step = (IPipelineStep)Class.forName(className, true, loader).newInstance();
-			return step;
-		}
-		catch ( InstantiationException e ) {
-			throw new RuntimeException(String.format(
-				"Error creating step for '%s'", className), e);
-		}
-		catch ( IllegalAccessException e ) {
-			throw new RuntimeException(String.format(
-				"Error creating step for '%s'", className), e);
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new RuntimeException(String.format(
-				"Error creating step for '%s'", className), e);
-		}
 	}
 	
 	private void inspectFile (File file) {

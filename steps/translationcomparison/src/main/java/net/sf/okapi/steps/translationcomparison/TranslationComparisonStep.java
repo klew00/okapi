@@ -20,12 +20,14 @@
 
 package net.sf.okapi.steps.translationcomparison;
 
+import java.io.File;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -159,7 +161,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		}
 		Runtime.getRuntime().gc();
 		if ( params.isAutoOpen() && ( pathToOpen != null )) {
-			//TODO: Replace this: getContext().setString("outputFile",  pathToOpen);
+			Util.openURL((new File(pathToOpen)).getAbsolutePath());
 		}
 	}
 	
@@ -375,8 +377,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		if ( params.isGenerateHTML() ) {
 			// Use the to-compare file for the output name
 			if ( pathToOpen == null ) {
-				pathToOpen = rawDoc2.getInputURI().toString();
-				pathToOpen += ".html";
+				pathToOpen = getOutputFilename();
 			}
 			writer = new XMLWriter(getOutputFilename()); //$NON-NLS-1$
 			writer.writeStartDocument();

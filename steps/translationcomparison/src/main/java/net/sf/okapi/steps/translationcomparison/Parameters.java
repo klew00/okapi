@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,13 +21,21 @@
 package net.sf.okapi.steps.translationcomparison;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.PathInputPart;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
-public class Parameters extends BaseParameters {
+@EditorFor(Parameters.class)
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	public static final String GENERATETMX = "generateTMX";
 	public static final String TMXPATH = "tmxPath"; 
 	public static final String GENERATEHTML = "generateHTML";
+	public static final String AUTOOPEN = "autoOpen"; 
 	public static final String TARGET2SUFFIX = "target2Suffix";
 	public static final String TARGET3SUFFIX = "target3Suffix";
 	public static final String DOCUMENT1LABEL = "document1Label";
@@ -150,7 +158,7 @@ public class Parameters extends BaseParameters {
 	@Override
 	public void reset() {
 		generateTMX = false;
-		tmxPath = "comparison.tmx"; // "${ProjDir}"+File.separator+"output.tmx";
+		tmxPath = "comparison.tmx";
 		generateHTML = true;
 		autoOpen = true;
 		caseSensitive = true;
@@ -158,9 +166,9 @@ public class Parameters extends BaseParameters {
 		punctuationSensitive = true;
 		target2Suffix = "-t2";
 		target3Suffix = "-t3";
-		document1Label = "Base";
-		document2Label = "Trans1";
-		document3Label = "Trans2";
+		document1Label = "Trans1";
+		document2Label = "Trans2";
+		document3Label = "Trans3";
 	}
 
 	@Override
@@ -170,7 +178,7 @@ public class Parameters extends BaseParameters {
 		generateTMX = buffer.getBoolean(GENERATETMX, generateTMX);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		generateHTML = buffer.getBoolean(GENERATEHTML, generateHTML);
-		autoOpen = buffer.getBoolean("autoOpen", autoOpen);
+		autoOpen = buffer.getBoolean(AUTOOPEN, autoOpen);
 		caseSensitive = buffer.getBoolean("caseSensitive", caseSensitive);
 		whitespaceSensitive = buffer.getBoolean("whitespaceSensitive", whitespaceSensitive);
 		punctuationSensitive = buffer.getBoolean("punctuationSensitive", punctuationSensitive);
@@ -187,7 +195,7 @@ public class Parameters extends BaseParameters {
 		buffer.setParameter(GENERATETMX, generateTMX);
 		buffer.setParameter(TMXPATH, tmxPath);
 		buffer.setParameter(GENERATEHTML, generateHTML);
-		buffer.setParameter("autoOpen", autoOpen);
+		buffer.setParameter(AUTOOPEN, autoOpen);
 		buffer.setParameter("caseSensitive", caseSensitive);
 		buffer.setParameter("whitespaceSensitive", whitespaceSensitive);
 		buffer.setParameter("punctuationSensitive", punctuationSensitive);
@@ -208,7 +216,7 @@ public class Parameters extends BaseParameters {
 			"TMX output path", "Full path of the output TMX file");
 		desc.add(GENERATEHTML,
 			"Generate output tables in HTML", "Generates output tables in HTML");
-		desc.add("autoOpen",
+		desc.add(AUTOOPEN,
 			"Opens the first HTML output after completion", null);
 		
 		desc.add(TARGET2SUFFIX,
@@ -229,6 +237,45 @@ public class Parameters extends BaseParameters {
 			"Take into account whitespace differences", "Takes into account whitespace differences");
 		desc.add("punctuationSensitive",
 			"Take into account punctuation differences", "Takes into account punctuation differences");
+		return desc;
+	}
+
+	@Override
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Translation Comparison", true, false);
+		
+		//TODO: "HTML Output" group
+		CheckboxPart cbpHTML = desc.addCheckboxPart(paramsDesc.get("generateHTML"));
+		CheckboxPart cbp2 = desc.addCheckboxPart(paramsDesc.get("autoOpen"));
+		cbp2.setMasterPart(cbpHTML, true);
+		
+		//TODO: "TMX Output" group
+		CheckboxPart cbpTMX = desc.addCheckboxPart(paramsDesc.get("generateTMX"));
+		PathInputPart pip = desc.addPathInputPart(paramsDesc.get("tmxPath"), "TMX Document", true);
+		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
+		pip.setMasterPart(cbpTMX, true);
+		pip.setWithLabel(false);
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.TARGET2SUFFIX));
+		tip.setMasterPart(cbpTMX, true);
+		tip = desc.addTextInputPart(paramsDesc.get(Parameters.TARGET3SUFFIX));
+		tip.setMasterPart(cbpTMX, true);
+		
+		// HTML group
+		tip = desc.addTextInputPart(paramsDesc.get(Parameters.DOCUMENT1LABEL));
+		tip.setMasterPart(cbpHTML, true);
+		tip.setVertical(false);
+		tip = desc.addTextInputPart(paramsDesc.get(Parameters.DOCUMENT2LABEL));
+		tip.setMasterPart(cbpHTML, true);
+		tip.setVertical(false);
+		tip = desc.addTextInputPart(paramsDesc.get(Parameters.DOCUMENT3LABEL));
+		tip.setMasterPart(cbpHTML, true);
+		tip.setVertical(false);
+		
+		//TODO: "Comparison Options" group
+		desc.addCheckboxPart(paramsDesc.get("caseSensitive"));
+		desc.addCheckboxPart(paramsDesc.get("whitespaceSensitive"));
+		desc.addCheckboxPart(paramsDesc.get("punctuationSensitive"));
+		
 		return desc;
 	}
 
