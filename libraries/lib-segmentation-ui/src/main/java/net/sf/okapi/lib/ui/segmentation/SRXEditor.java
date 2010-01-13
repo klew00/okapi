@@ -225,7 +225,8 @@ public class SRXEditor {
 		});
 		tblRules.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (e.detail == SWT.CHECK) {
+				if ( e.detail == SWT.CHECK ) {
+					tblRules.setSelection((TableItem)e.item); // Force selection to move if needed
 					int n = tblRules.getSelectionIndex();
 					if ( n < 0 ) return;
 					String ruleName = cbGroup.getItem(cbGroup.getSelectionIndex());
