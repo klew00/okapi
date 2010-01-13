@@ -31,6 +31,8 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
+# ELEMENT AND ATTIBUTE NAMES MUST BE LOWER CASED!!!!!!
+
 assumeWellformed: true
 
 collapse_whitespace: true
@@ -55,8 +57,8 @@ lang:
 # with embedded skeleton 
 meta:
   ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: {content: [[http-equiv, EQUALS, keywords], [name, EQUALS, keywords], [name, EQUALS, description]]}
-  writableLocalizableAttributes: {content: [[http-equiv, EQUALS, content-language],[http-equiv, EQUALS, content-type]] }
+  translatableAttributes: {content: [[http-equiv, EQUALS, keywords], [name, EQUALS, [keywords, description]]]}
+  writableLocalizableAttributes: {content: [http-equiv, EQUALS, [content-language, content-type]] }
   readOnlyLocalizableAttributes: {content: [name, EQUALS, [generator, author, progid, date]]}
   
 area:

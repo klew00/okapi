@@ -36,7 +36,7 @@ public class HtmlSnippetsTest {
 	}
 
 	@Test
-	public void testMETAContent () {
+	public void testMultipleMETA() {
 		String snippet = "<html>"
 			+ "<meta NAME=\"keywords\" CONTENT=\"Text1\"/>"
 			+ "<meta NAME=\"creation_date\" CONTENT=\"May 24, 2001\"/>"
@@ -45,13 +45,13 @@ public class HtmlSnippetsTest {
 		ArrayList<Event> events = getEventsDefault(snippet);
 		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
-//TOFIX		assertEquals("Text1", tu.toString());
-//		tu = FilterTestDriver.getTextUnit(events, 2);
-//		assertNotNull(tu);
-//		assertEquals("Text2", tu.toString());
-//		tu = FilterTestDriver.getTextUnit(events, 3);
-//		assertNotNull(tu);
-//		assertEquals("Text3", tu.toString());
+		assertEquals("Text1", tu.toString());
+		tu = FilterTestDriver.getTextUnit(events, 2);
+		assertNotNull(tu);
+		assertEquals("Text2", tu.toString());
+		tu = FilterTestDriver.getTextUnit(events, 3);
+		assertNotNull(tu);
+		assertEquals("Text3", tu.toString());
 	}
 
 	@Test
