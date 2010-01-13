@@ -76,6 +76,8 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 				// Use string writer
 				strWriter = new StringWriter();
 				writer = new XMLWriter(strWriter);
+				// Force "\n" to avoid conversion of "\r\n" to "\r\r\n" later
+				writer.setLineBreak(Util.LINEBREAK_UNIX);
 			}
 			else {
 				// File writer

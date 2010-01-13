@@ -45,6 +45,7 @@ import net.sf.okapi.applications.rainbow.pipeline.FormatConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.ImportTMPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
+import net.sf.okapi.applications.rainbow.pipeline.PipelineStorage;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
@@ -111,6 +112,8 @@ public class MainForm { //implements IParametersProvider {
 	public static final String OPT_LOADMRU       = "loadMRU"; //$NON-NLS-1$
 	public static final String OPT_BOUNDS        = "bounds"; //$NON-NLS-1$
 	public static final String OPT_LOGLEVEL      = "logLevel"; //$NON-NLS-1$
+	
+	protected static final String PRJPIPELINEID = "currentProjectPipeline";
 	
 	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
 	protected static final String NOEXPAND_EXTENSIONS = ";.pentm;"; //$NON-NLS-1$
@@ -1183,12 +1186,19 @@ public class MainForm { //implements IParametersProvider {
 			// Save any pending data
 			saveSurfaceData();
 			updateCustomConfigurations();
+			boolean initialCall = false;
 			if ( wrapper == null ) {
 				wrapper = new PipelineWrapper(fcMapper);
+				initialCall = true;
 			}
-			
-			// If we have a predefined pipeline: set it
-			if ( predefinedPipeline != null ) {
+
+			if ( predefinedPipeline == null ) {
+				if ( initialCall ) {
+					wrapper.loadFromStringStorage(prj.getUtilityParameters(PRJPIPELINEID));
+				}
+			}
+			else {
+				// If we have a predefined pipeline: set it
 				// Get the parameters data from the project
 				predefinedPipeline.setParameters(prj.getUtilityParameters(predefinedPipeline.getId()));
 				// Load the pipeline
@@ -1204,8 +1214,13 @@ public class MainForm { //implements IParametersProvider {
 				return; // No execution, no save
 			}
 
-			// If it's a predefined pipeline: save the parameters
-			if ( predefinedPipeline != null ) {
+			
+			// Save the pipeline info as default pipeline for the project
+			if ( predefinedPipeline == null ) {
+				prj.setUtilityParameters(PRJPIPELINEID,
+					wrapper.getStringStorage());
+			}
+			else { // If it's a predefined pipeline: save the parameters
 				wrapper.copyParametersToPipeline(predefinedPipeline);
 				prj.setUtilityParameters(predefinedPipeline.getId(),
 					predefinedPipeline.getParameters());

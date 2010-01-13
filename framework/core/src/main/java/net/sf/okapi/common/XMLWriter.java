@@ -39,7 +39,7 @@ public class XMLWriter {
     private PrintWriter writer = null;
     private boolean inStartTag;
     private Stack<String> elements = new Stack<String>();
-    private final String lineBreak = System.getProperty("line.separator");
+    private String lineBreak = System.getProperty("line.separator");
 
     /**
      * Creates a new XML document on disk.
@@ -66,6 +66,19 @@ public class XMLWriter {
     public XMLWriter (Writer writer) {
     	this.writer = new PrintWriter(writer);
     }
+    
+    /**
+     * Sets the type of line-break to use when writing out the
+     * document. By default, the type is the one of the platform.
+     * This method can be used for example, to force the line-breaks
+     * to be "\n" instead of "\r\n" when writing out on a string that
+     * will be later written out on a file where "\n" will be converted
+     * to "\r\n" (therefore avoiding to end up with "\r\r\n").
+     * @param lineBreak the new type of line-break to use.
+     */
+    public void setLineBreak (String lineBreak) {
+    	this.lineBreak = lineBreak;
+    }
 
     /**
      * Closes the writer and release any associated resources.
@@ -85,7 +98,7 @@ public class XMLWriter {
      * Writes the start of the document. This method generate the XML declaration.
      */
     public void writeStartDocument () {
-    	writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+    	writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+lineBreak);
     }
 
     /**

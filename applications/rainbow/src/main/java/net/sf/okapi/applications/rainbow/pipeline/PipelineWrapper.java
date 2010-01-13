@@ -33,6 +33,7 @@ import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditorMapper;
 import net.sf.okapi.common.ParametersEditorMapper;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -421,6 +422,19 @@ public class PipelineWrapper {
 	
 	public Map<String, StepInfo> getAvailableSteps () {
 		return availableSteps;
+	}
+	
+	public String getStringStorage () {
+		copyInfoStepsToPipeline();
+		PipelineStorage store = new PipelineStorage();
+		store.write(driver.getPipeline());
+		return store.getStringOutput();
+	}
+	
+	public void loadFromStringStorage (String data) {
+		if ( Util.isEmpty(data) ) return;
+		PipelineStorage store = new PipelineStorage((CharSequence)data);
+		loadPipeline(store.read(), null);
 	}
 	
 	public void loadPipeline (IPipeline newPipeline,
