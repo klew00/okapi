@@ -650,8 +650,10 @@ public class SRXDocument {
 	
 	/**
 	 * Loads an SRX document from a CharSequence object.
+	 * Calling this method resets all settings and rules to their default
+	 * state and then populate them with the data stored in the document being loaded. 
 	 * The rules can be embedded inside another vocabulary.
-	 * @param data the character sequence to load.
+	 * @param data the string containing the SRX document to load.
 	 */
 	public void loadRules (CharSequence data) {
 		loadRules(data, 1);
@@ -660,6 +662,8 @@ public class SRXDocument {
 	
 	/**
 	 * Loads an SRX document from a file.
+	 * Calling this method resets all settings and rules to their default
+	 * state and then populate them with the data stored in the document being loaded. 
 	 * The rules can be embedded inside another vocabulary.
 	 * @param pathOrURL The full path or URL of the document to load.
 	 */

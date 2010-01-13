@@ -10,7 +10,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.plaintext.PlainTextFilter;
 
 public class VisualParagraphAlignerTool {
 	private static IFilter srcFilter;
@@ -21,10 +20,14 @@ public class VisualParagraphAlignerTool {
 	/**
 	 * @param args
 	 * @throws UnsupportedEncodingException
+	 * @throws ClassNotFoundException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	public static void main(String[] args) throws UnsupportedEncodingException {
-		srcFilter = new PlainTextFilter(); // change to the filter needed by your format
-		trgFilter = new PlainTextFilter(); // change to the filter needed by your format
+	public static void main(String[] args) throws UnsupportedEncodingException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+		// Instantiate without forcing dependencies on the whole sentence-aligner project
+		srcFilter = (IFilter)Class.forName("net.sf.okapi.filters.plaintext.PlainTextFilter").newInstance(); // change to the filter needed by your format
+		trgFilter = (IFilter)Class.forName("net.sf.okapi.filters.plaintext.PlainTextFilter").newInstance(); // change to the filter needed by your format
 		sourceRoot = "D:\\OKAPI\\build-okapi\\steps\\sentence-aligner\\src\\test\\resources\\"; // change to root path of your source file
 		targetRoot = "D:\\OKAPI\\build-okapi\\steps\\sentence-aligner\\src\\test\\resources\\"; // change to root path of your target file
 

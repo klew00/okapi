@@ -1,17 +1,14 @@
 package net.sf.okapi.steps.gcaligner;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.plaintext.PlainTextFilter;
-import net.sf.okapi.lib.segmentation.SegmentationTest;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 import org.junit.After;
