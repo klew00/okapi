@@ -2,12 +2,16 @@ package net.sf.okapi.steps.gcaligner;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.plaintext.PlainTextFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
@@ -19,18 +23,22 @@ import static org.junit.Assert.*;
 public class SentenceAlignPipelineStepTest {	
 	private Pipeline pipeline;
 	private SentenceAlignerStep aligner;
+	private EventObserver eventObserver;
 
 	@Before
 	public void setUp() throws Exception {
 		// create pipeline
 		pipeline = new Pipeline();
+		eventObserver = new EventObserver();
+		pipeline.addObserver(eventObserver);
 		
 		// add filter step
 		IFilter filter = new PlainTextFilter();
 		pipeline.addStep(new RawDocumentToFilterEventsStep(filter));
 		
 		// add aligner step
-		aligner = new SentenceAlignerStep();			
+		aligner = new SentenceAlignerStep();
+		
 		aligner.setParameters(new Parameters());		
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.plaintext.PlainTextFilter");
@@ -57,7 +65,19 @@ public class SentenceAlignPipelineStepTest {
 		
 		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/src.txt"), "UTF-8", LocaleId.ENGLISH));
 
-		pipeline.endBatch();						
+		pipeline.endBatch();			
+		
+		// test we observed the correct events
+		List<Event> el = eventObserver.getResult();  
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
+		Event e = (el.remove(0));
+		TextUnit tu = e.getTextUnit();
+		assertEquals(EventType.TEXT_UNIT, e.getEventType());
+		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
 	}
 
 	@Test
@@ -74,6 +94,19 @@ public class SentenceAlignPipelineStepTest {
 		
 		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/srcMultimatch.txt"), "UTF-8", LocaleId.ENGLISH));
 
-		pipeline.endBatch();						
+		pipeline.endBatch();
+		
+		// test we observed the correct events
+		List<Event> el = eventObserver.getResult();  
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
+		Event e = (el.remove(0));
+		TextUnit tu = e.getTextUnit();
+		assertEquals(EventType.TEXT_UNIT, e.getEventType());
+		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
+
 	}
 }

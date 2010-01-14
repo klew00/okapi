@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.gcaligner;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -35,6 +36,8 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.observer.IObservable;
+import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -50,7 +53,7 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
  * 
  */
 @UsingParameters(Parameters.class)
-public class SentenceAlignerStep extends BasePipelineStep {
+public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	private static final Logger LOGGER = Logger.getLogger(SentenceAlignerStep.class.getName());
 
 	private Parameters params;
@@ -64,10 +67,14 @@ public class SentenceAlignerStep extends BasePipelineStep {
 	private SentenceAligner sentenceAligner;
 	private ISegmenter sourceSegmenter;
 	private ISegmenter targetSegmenter;
+//	private List<Event> inputEventBuffer;
+//	private List<Event> outputEventBuffer;
 
 	public SentenceAlignerStep() {
 		params = new Parameters();
 		sentenceAligner = new SentenceAligner();
+//		inputEventBuffer = new ArrayList<Event>();
+//		outputEventBuffer = new ArrayList<Event>();
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
@@ -133,7 +140,7 @@ public class SentenceAlignerStep extends BasePipelineStep {
 			tmx.writeEndDocument();
 			tmx.close();
 			tmx = null;
-		}		
+		}
 	}
 
 	@Override
@@ -165,7 +172,8 @@ public class SentenceAlignerStep extends BasePipelineStep {
 
 		if (!sourceTu.getSource().isSegmented() || !targetTu.getSource().isSegmented()) {
 			// we must have hit some empty content that did not segment
-			LOGGER.warning("Found unsegmented TextUnit. Possibly a TextUnit with empty content. Returning without aligning.");
+			LOGGER.warning("Found unsegmented TextUnit. " +
+					"Possibly a TextUnit with empty content. Returning without aligning.");
 			return;
 		}
 
@@ -220,5 +228,9 @@ public class SentenceAlignerStep extends BasePipelineStep {
 			parentDir = Util.getDirectoryName(url.getPath()) + "/";
 		}
 		return parentDir;
+	}
+
+	@Override
+	public void update(IObservable o, Object event) {
 	}
 }
