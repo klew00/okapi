@@ -33,13 +33,24 @@ public interface IParametersEditorMapper {
 
 	/**
 	 * Adds a new parameters editor mapping to this mapper.
-	 * @param editorClass the class name of the editor to add.
-	 * @param parametersClass the class name of the parameters this editor can edit.
+	 * @param editorClass the class information of the editor to add.
+	 * @param parametersClassName the class name of the parameters this editor can edit.
 	 * If this class name is already listed, the exiting entry will be replaced by
 	 * this one.
 	 */
-	public void addEditor (String editorClass,
-		String parametersClass);
+	public void addEditor (ClassInfo editorClass,
+		String parametersClassName);
+	
+	/**
+	 * Adds a new parameters editor mapping to this mapper. This is the same as
+	 * calling <code>addEditor(new ClassInfo(editorClassName))</code>.
+	 * @param editorClassName the class name of the editor to add.
+	 * @param parametersClassName the class name of the parameters this editor can edit.
+	 * If this class name is already listed, the exiting entry will be replaced by
+	 * this one.
+	 */
+	public void addEditor (String editorClassName,
+		String parametersClassName);
 	
 	/**
 	 * Removes a given editor from this mapper.
@@ -54,13 +65,26 @@ public interface IParametersEditorMapper {
 
 	/**
 	 * Adds a new editor description provider mapping to this mapper.
-	 * @param descriptionProviderClass the class name of the editor description provider to add.
-	 * @param parametersClass the class name of the parameters this editor can edit.
+	 * @param descriptionProviderClass the class information of the editor description
+	 * provider to add.
+	 * @param parametersClassName the class name of the parameters this editor can edit.
 	 * If this class name is already listed, the exiting entry will be replaced by
 	 * this one.
 	 */
-	public void addDescriptionProvider (String descriptionProviderClass,
-		String parametersClass);
+	public void addDescriptionProvider (ClassInfo descriptionProviderClass,
+		String parametersClassName);
+	
+	/**
+	 * Adds a new editor description provider mapping to this mapper. This is the same
+	 * as calling <code>addDescriptionProvider(new ClassInfo(descriptionProviderClassName))</code>.
+	 * @param descriptionProviderClassName the class name of the editor description
+	 * provider to add.
+	 * @param parametersClassName the class name of the parameters this editor can edit.
+	 * If this class name is already listed, the exiting entry will be replaced by
+	 * this one.
+	 */
+	public void addDescriptionProvider (String descriptionProviderClassName,
+		String parametersClassName);
 	
 	/**
 	 * Removes a given editor description provider from this mapper.
@@ -75,19 +99,19 @@ public interface IParametersEditorMapper {
 
 	/**
 	 * Creates an instance of the parameters editor for a given parameters class name. 
-	 * @param parametersClass the parameters class name to use for lookup.
+	 * @param parametersClassName the parameters class name to use for lookup.
 	 * @return a new IParametersEditor object for the given
 	 * class name, or null if no editor is available or if
 	 * the object could not be created.
 	 * @throws OkapiEditorCreationException if the editor could not be created.
 	 */
-	public IParametersEditor createParametersEditor (String parametersClass);
+	public IParametersEditor createParametersEditor (String parametersClassName);
 	
 	/**
 	 * Gets an object that can provide the UI description to use with a generic editor. 
-	 * @param parametersClass the name of the class for which to get the description provider.
+	 * @param parametersClassName the name of the class for which to get the description provider.
 	 * @return an editor description provider or null if none is set for this class.
 	 */
-	public IEditorDescriptionProvider getDescriptionProvider (String parametersClass);
+	public IEditorDescriptionProvider getDescriptionProvider (String parametersClassName);
 
 }

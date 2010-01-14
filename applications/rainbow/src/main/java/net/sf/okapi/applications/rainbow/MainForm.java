@@ -45,7 +45,6 @@ import net.sf.okapi.applications.rainbow.pipeline.FormatConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.ImportTMPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
-import net.sf.okapi.applications.rainbow.pipeline.PipelineStorage;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
@@ -1188,7 +1187,7 @@ public class MainForm { //implements IParametersProvider {
 			updateCustomConfigurations();
 			boolean initialCall = false;
 			if ( wrapper == null ) {
-				wrapper = new PipelineWrapper(fcMapper);
+				wrapper = new PipelineWrapper(fcMapper, rootFolder);
 				initialCall = true;
 			}
 
@@ -1200,7 +1199,8 @@ public class MainForm { //implements IParametersProvider {
 			else {
 				// If we have a predefined pipeline: set it
 				// Get the parameters data from the project
-				predefinedPipeline.setParameters(prj.getUtilityParameters(predefinedPipeline.getId()));
+				predefinedPipeline.setParameters(wrapper.getAvailableSteps(),
+					prj.getUtilityParameters(predefinedPipeline.getId()));
 				// Load the pipeline
 				wrapper.loadPipeline(predefinedPipeline, null);
 			}

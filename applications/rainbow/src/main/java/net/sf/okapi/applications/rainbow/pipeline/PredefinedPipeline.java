@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.rainbow.pipeline;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -53,17 +54,20 @@ public abstract class PredefinedPipeline extends Pipeline implements IPredefined
 	@Override
 	public String getParameters () {
 		// Save the data from pipeline into a string
-		PipelineStorage store = new PipelineStorage();
+		// OK to pass null to availableSteps because that is not used for writing
+		PipelineStorage store = new PipelineStorage(null);
 		store.write(this);
 		paramData = store.getStringOutput();
 		return paramData;
 	}
 
 	@Override
-	public void setParameters (String data) {
+	public void setParameters (Map<String, StepInfo> availableSteps,
+		String data)
+	{
 		// Create a temporary pipeline from the storage
 		if ( Util.isEmpty(data) ) return; // Nothing to read
-		PipelineStorage store = new PipelineStorage((CharSequence)data);
+		PipelineStorage store = new PipelineStorage(availableSteps, (CharSequence)data);
 		IPipeline tmp = store.read();
 		if ( tmp.getSteps().size() != getSteps().size() ) {
 			throw new RuntimeException("The pipeline created from the data does not match the expected one.");

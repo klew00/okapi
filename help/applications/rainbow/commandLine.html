@@ -13,21 +13,31 @@
 	</tr>
 </table>
 
-<p>If Rainbow is started with just one argument and that argument does not start 
-with a &#39;-&#39;, it starts in normal mode, and takes the argument as a project file 
-to be loaded.</p>
-<p>If Rainbow is started with more than one argument, or with one argument that 
-starts with a &#39;-&#39;, it starts in command-line mode and interprets all the 
-arguments of the command-line as described in the following table:</p>
+<p>When starting Rainbow has different behaviors depending on the arguments on 
+its command-line:</p>
+<ul>
+	<li>If Rainbow is started with just one argument: it starts in normal mode and takes the argument as a project file 
+to be loaded.</li>
+	<li>If Rainbow is started with more than one argument: it starts in 
+	command-line mode and interprets the arguments as described in the table 
+	below.</li>
+</ul>
+<p>The 
+arguments of the command-line can be the following:</p>
 <table border="1" id="table1" cellspacing="0" cellpadding="4">
 	<tr>
 		<td nowrap align="left" valign="top"><code>-p &lt;projectFilename&gt;</code></td>
-		<td>Loads an existing project file <code>&lt;projectFilename&gt;</code></td>
+		<td>Loads an existing project file <code>&lt;projectFilename&gt;</code>.</td>
 	</tr>
 	<tr>
 		<td nowrap align="left" valign="top"><code>-x &lt;utilityId&gt;</code></td>
 		<td>Executes the utility with the ID <code>&lt;utilityId&gt;</code>. This is done after all 
 		arguments of the command line have been processed.</td>
+	</tr>
+	<tr>
+		<td nowrap align="left" valign="top"><code>-pln &lt;pipelineFilename&gt;</code></td>
+		<td>Loads and execute the specified pipeline stored in <code>
+		&lt;pipelineFilename&gt;</code>.</td>
 	</tr>
 	<tr>
 		<td nowrap align="left" valign="top"><code>-se &lt;encoding&gt;</code></td>

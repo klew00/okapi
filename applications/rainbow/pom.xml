@@ -277,20 +277,15 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-wordcount-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+	 	<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-charlisting</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+	 	<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-translationcomparison</artifactId>
 			<version>${project.version}</version>
@@ -315,11 +310,13 @@
 			<artifactId>okapi-step-leveraging-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+<!-- Plugins 
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-codeshandling</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+-->
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-tokenization</artifactId>

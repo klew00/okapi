@@ -168,8 +168,10 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/charlisting/target/classes"
 			 excludes="**/META-INF/**"/>
+<!--Plugin
 			<fileset dir="../../steps/codeshandling/target/classes"
 			 excludes="**/META-INF/**"/>
+-->			 
 			<fileset dir="../../steps/common/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/copysourcetotarget/target/classes"
@@ -200,8 +202,10 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/uriconversion/target/classes"
 			 excludes="**/META-INF/**"/>
+<!--Plugin
 			<fileset dir="../../steps/wordcount/target/classes"
 			 excludes="**/META-INF/**"/>
+-->
 			<fileset dir="../../steps/xsltransform/target/classes"
 			 excludes="**/META-INF/**"/>
 		</copy>

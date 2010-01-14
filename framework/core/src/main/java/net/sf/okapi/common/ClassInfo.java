@@ -16,45 +16,46 @@
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-============================================================================*/
+===========================================================================*/
 
-package net.sf.okapi.lib.plugins;
+package net.sf.okapi.common;
 
-import net.sf.okapi.common.ClassInfo;
+/**
+ * Stores a class name and its class-loader, for dynamic loading.
+ */
+public class ClassInfo {
 
-public class PluginItem {
+	/**
+	 * Full name of the class.
+	 */
+	public String name;
+	/**
+	 * Class loader for this class, or null if the default
+	 * class loader should be used.
+	 */
+	public ClassLoader loader;
 
-	protected int type;
-	protected String className;
-	protected ClassInfo paramsEditor;
-	protected ClassInfo embeddableParamsEditor;
-	protected ClassInfo editorDescriptionProvider;
-
-	public PluginItem (int type,
-		String className)
+	/**
+	 * Creates a new ClassInfo object for a given class name and loader.
+	 * @param name the full name of the class.
+	 * @param loader the class loader for this class, or null to use the
+	 * default class loader.
+	 */
+	public ClassInfo (String name,
+		ClassLoader loader)
 	{
-		this.type = type;
-		this.className = className;
+		this.name = name;
+		this.loader = loader;
 	}
 	
-	public int getType () {
-		return type;
-	}
-	
-	public String getClassName () {
-		return className;
-	}
-	
-	public ClassInfo getParamsEditor () {
-		return paramsEditor;
-	}
-	
-	public ClassInfo getEmbeddableParamsEditor () {
-		return embeddableParamsEditor;
-	}
-	
-	public ClassInfo getEditorDescriptionProvider () {
-		return editorDescriptionProvider;
+	/**
+	 * Convenience method to create a new ClassInfo object for a given
+	 * class name. This is the same as calling {@link #ClassInfo(String, ClassLoader)}
+	 * with the class loader set to null.
+	 * @param name the full name of the class.
+	 */
+	public ClassInfo (String name) {
+		this.name = name;
 	}
 
 }

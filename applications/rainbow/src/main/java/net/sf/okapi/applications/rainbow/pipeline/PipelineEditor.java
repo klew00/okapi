@@ -535,26 +535,33 @@ public class PipelineEditor {
 		}
 	}
 	
-	private ISWTEmbeddableParametersEditor createPanel (StepInfo step) {
+	private ISWTEmbeddableParametersEditor createPanel (StepInfo stepInfo) {
 		try {
-			if ( step.paramsData == null ) {
+			if ( stepInfo.paramsData == null ) {
 				// No parameters data for this step
 				return new DefaultEmbeddableEditor();
 			}
-			if ( step.paramsClass == null ) {
+			if ( stepInfo.paramsClass == null ) {
 				// No parameters class defined
 				return new DefaultEmbeddableEditor();
 			}
 
 			// Instantiate a Parameters object for this step
-			IParameters params = (IParameters)Class.forName(step.paramsClass).newInstance();
+			IParameters params;
+			if ( stepInfo.loader == null ) {
+				params = (IParameters)Class.forName(stepInfo.paramsClass).newInstance();
+			}
+			else {
+				params = (IParameters)Class.forName(stepInfo.paramsClass,
+					true, stepInfo.loader).newInstance();
+			}
 			// Set it with the data from this step
-			params.fromString(step.paramsData);
+			params.fromString(stepInfo.paramsData);
 			
 			// Instantiate an editor object
 			IParametersEditor editor = null;
 			try { // Catch creation error so we can fall-back to default editor
-				editor = wrapper.getEditorMapper().createParametersEditor(step.paramsClass);
+				editor = wrapper.getEditorMapper().createParametersEditor(stepInfo.paramsClass);
 			}
 			catch ( OkapiEditorCreationException e ) {
 				Dialogs.showError(shell, e.getMessage(), null);
@@ -574,7 +581,7 @@ public class PipelineEditor {
 			}
 			
 			// Else: Try to use the generic editor
-			IEditorDescriptionProvider descProv = wrapper.getEditorMapper().getDescriptionProvider(step.paramsClass);
+			IEditorDescriptionProvider descProv = wrapper.getEditorMapper().getDescriptionProvider(stepInfo.paramsClass);
 			if ( descProv != null ) {
 				GenericEmbeddableEditor geedit = new GenericEmbeddableEditor(descProv);
 				geedit.initializeEmbeddableEditor(optionsHolder, params, context);

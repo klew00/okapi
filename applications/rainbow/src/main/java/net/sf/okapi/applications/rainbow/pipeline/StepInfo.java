@@ -26,6 +26,7 @@ public class StepInfo {
 	public String name;
 	public String description;
 	public String stepClass;
+	public ClassLoader loader;
 	public String paramsClass;
 	public String paramsData;
 
@@ -33,6 +34,7 @@ public class StepInfo {
 		String name,
 		String description,
 		String stepClass,
+		ClassLoader loader,
 		String parametersClass)
 	{
 		this.id = id;
@@ -40,11 +42,12 @@ public class StepInfo {
 		this.description = description;
 		this.stepClass = stepClass;
 		this.paramsClass = parametersClass;
+		this.loader = loader;
 	}
 
 	@Override
 	public StepInfo clone () {
-		StepInfo newStep = new StepInfo(id, name, description, stepClass, paramsClass);
+		StepInfo newStep = new StepInfo(id, name, description, stepClass, loader, paramsClass);
 		newStep.paramsData = paramsData;
 		return newStep;
 	}

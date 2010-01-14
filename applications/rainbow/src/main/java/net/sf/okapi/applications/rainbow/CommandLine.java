@@ -277,7 +277,7 @@ public class CommandLine {
 
 		mapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 		mapper.updateCustomConfigurations();
-		PipelineWrapper wrapper = new PipelineWrapper(mapper);
+		PipelineWrapper wrapper = new PipelineWrapper(mapper, rootFolder);
 		
 		IPredefinedPipeline predefinedPipeline = null;
 		

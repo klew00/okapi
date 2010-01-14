@@ -33,45 +33,64 @@ public class ParametersEditorMapper implements IParametersEditorMapper {
 	/**
 	 * Map of the editors for this mapper.
 	 */
-	protected LinkedHashMap<String, String> editorMap;
+	protected LinkedHashMap<String, ClassInfo> editorMap;
 	
 	/**
 	 * Map of the editor descriptions for this mapper.
 	 */
-	protected LinkedHashMap<String, String> descMap;
+	protected LinkedHashMap<String, ClassInfo> descMap;
 
 	/**
 	 * Creates an empty ParametersEditorMapper object.
 	 */
 	public ParametersEditorMapper () {
-		editorMap = new LinkedHashMap<String, String>();
-		descMap = new LinkedHashMap<String, String>();
+		editorMap = new LinkedHashMap<String, ClassInfo>();
+		descMap = new LinkedHashMap<String, ClassInfo>();
 	}
 	
-	public void addEditor (String editorClass,
-		String parametersClass)
+	@Override
+	public void addEditor (ClassInfo editorClass,
+		String parametersClassName)
 	{
-		editorMap.put(parametersClass, editorClass);
+		editorMap.put(parametersClassName, editorClass);
 	}
 
-	public void addDescriptionProvider (String descriptionProviderClass,
-		String parametersClass)
+	@Override
+	public void addEditor (String editorClassName,
+		String parametersClassName)
 	{
-		descMap.put(parametersClass, descriptionProviderClass);
+		editorMap.put(parametersClassName, new ClassInfo(editorClassName));
 	}
 
+	@Override
+	public void addDescriptionProvider (ClassInfo descriptionProviderClass,
+		String parametersClassName)
+	{
+		descMap.put(parametersClassName, descriptionProviderClass);
+	}
+
+	@Override
+	public void addDescriptionProvider (String descriptionProviderClassName,
+		String parametersClassName)
+	{
+		descMap.put(parametersClassName, new ClassInfo(descriptionProviderClassName));
+	}
+
+	@Override
 	public void clearEditors () {
 		editorMap.clear();
 	}
 
+	@Override
 	public void clearDescriptionProviders () {
 		descMap.clear();
 	}
 
+	@Override
 	public void removeEditor (String className) {
 		String found = null;
 		for ( String key : editorMap.keySet() ) {
-			if ( editorMap.get(key).equals(className) ) {
+			if ( editorMap.get(key).name.equals(className) ) {
 				found = key;
 				break;
 			}
@@ -82,10 +101,11 @@ public class ParametersEditorMapper implements IParametersEditorMapper {
 	}
 
 
+	@Override
 	public void removeDescriptionProvider (String className) {
 		String found = null;
 		for ( String key : descMap.keySet() ) {
-			if ( descMap.get(key).equals(className) ) {
+			if ( descMap.get(key).name.equals(className) ) {
 				found = key;
 				break;
 			}
@@ -95,48 +115,62 @@ public class ParametersEditorMapper implements IParametersEditorMapper {
 		}
 	}
 
-	public IParametersEditor createParametersEditor (String parametersClass) {
-		String editorClass = editorMap.get(parametersClass);
-		if ( editorClass == null ) return null;
+	@Override
+	public IParametersEditor createParametersEditor (String parametersClassName) {
+		ClassInfo ci = editorMap.get(parametersClassName);
+		if ( ci == null ) return null;
 		// Else: instantiate the editor
 		IParametersEditor editor = null;
 		try {
-			editor = (IParametersEditor)Class.forName(editorClass).newInstance();
+			if ( ci.loader == null ) {
+				editor = (IParametersEditor)Class.forName(ci.name).newInstance();
+			}
+			else {
+				editor = (IParametersEditor)Class.forName(ci.name,
+					true, ci.loader).newInstance();
+			}
 		}
 		catch ( InstantiationException e ) {
 			throw new OkapiEditorCreationException(
-				String.format("Cannot instantiate the editor '%s'", editorClass), e);
+				String.format("Cannot instantiate the editor '%s'", ci.name), e);
 		}
 		catch ( IllegalAccessException e ) {
 			throw new OkapiEditorCreationException(
-				String.format("Cannot instantiate the editor '%s'", editorClass), e);
+				String.format("Cannot instantiate the editor '%s'", ci.name), e);
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new OkapiEditorCreationException(
-				String.format("Cannot instantiate the editor '%s'", editorClass), e);
+				String.format("Cannot instantiate the editor '%s'", ci.name), e);
 		}
 		return editor;
 	}
 
-	public IEditorDescriptionProvider getDescriptionProvider(String parametersClass) {
-		String className = descMap.get(parametersClass);
-		if ( className == null ) return null;
+	@Override
+	public IEditorDescriptionProvider getDescriptionProvider (String parametersClassName) {
+		ClassInfo ci = descMap.get(parametersClassName);
+		if ( ci == null ) return null;
 		// Else: instantiate the description provider
 		IEditorDescriptionProvider descProv = null;
 		try {
-			descProv = (IEditorDescriptionProvider)Class.forName(className).newInstance();
+			if ( ci.loader == null ) {
+				descProv = (IEditorDescriptionProvider)Class.forName(ci.name).newInstance();
+			}
+			else {
+				descProv = (IEditorDescriptionProvider)Class.forName(ci.name,
+					true, ci.loader).newInstance();
+			}
 		}
 		catch ( InstantiationException e ) {
 			throw new OkapiEditorCreationException(
-				String.format("Cannot instantiate the description provider '%s'", className), e);
+				String.format("Cannot instantiate the description provider '%s'", ci.name), e);
 		}
 		catch ( IllegalAccessException e ) {
 			throw new OkapiEditorCreationException(
-				String.format("Cannot instantiate the description provider '%s'", className), e);
+				String.format("Cannot instantiate the description provider '%s'", ci.name), e);
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new OkapiEditorCreationException(
-				String.format("Cannot instantiate the description provider '%s'", className), e);
+				String.format("Cannot instantiate the description provider '%s'", ci.name), e);
 		}
 		return descProv;
 	}

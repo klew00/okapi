@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,6 +37,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import net.sf.okapi.common.ClassInfo;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
@@ -50,16 +52,24 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 	private String path;
 	private StringWriter strWriter;
 	private CharSequence inputData;
+	private Map<String, StepInfo> availableSteps;
 
-	public PipelineStorage () {
+	public PipelineStorage (Map<String, StepInfo> availableSteps) {
+		this.availableSteps = availableSteps;
 		path = null;
 	}
 	
-	public PipelineStorage (String path) {
+	public PipelineStorage (Map<String, StepInfo> availableSteps,
+		String path)
+	{
+		this.availableSteps = availableSteps;
 		this.path = path;
 	}
 
-	public PipelineStorage (CharSequence inputData) {
+	public PipelineStorage (Map<String, StepInfo> availableSteps,
+		CharSequence inputData)
+	{
+		this.availableSteps = availableSteps;
 		this.inputData = inputData;
 	}
 	
@@ -136,7 +146,24 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 					throw new RuntimeException("The attribute 'class' is missing.");
 				}
 				// Create the class
-				IPipelineStep step = (IPipelineStep)Class.forName(node.getNodeValue()).newInstance();
+				// Check if we can use the available steps (and their loaders)
+				String className = node.getNodeValue();
+				String stepName = className;
+				int n = stepName.lastIndexOf('.');
+				if ( n > -1 ) stepName = stepName.substring(n+1);
+				StepInfo stepInfo = availableSteps.get(stepName);
+				if ( stepInfo == null ) {
+					// The pipeline has a step that is not currently in the available steps
+					throw new RuntimeException(String.format(
+						"The step '%s' is not among the steps currently available.", className));
+				}
+				IPipelineStep step;
+				if ( stepInfo.loader == null ) {
+					step = (IPipelineStep)Class.forName(stepInfo.stepClass).newInstance();
+				}
+				else {
+					step = (IPipelineStep)Class.forName(stepInfo.stepClass, true, stepInfo.loader).newInstance();
+				}
 				// Load the parameters if needed
 				IParameters params = step.getParameters();
 				if ( params != null ) {

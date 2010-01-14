@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
+import java.util.Map;
+
 import net.sf.okapi.common.pipeline.IPipeline;
 
 public interface IPredefinedPipeline extends IPipeline {
@@ -27,9 +29,10 @@ public interface IPredefinedPipeline extends IPipeline {
 	public String getId ();
 	
 	public String getTitle ();
-	
+
 	public String getParameters ();
 	
-	public void setParameters (String data);
+	public void setParameters (Map<String, StepInfo> availableSteps,
+		String data);
 
 }

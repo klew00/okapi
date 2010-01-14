@@ -31,13 +31,13 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
+import net.sf.okapi.common.ClassInfo;
 import net.sf.okapi.common.DefaultFilenameFilter;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IEmbeddableParametersEditor;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.UsingParameters;
-import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
@@ -62,6 +62,7 @@ public class PluginsManager {
 	 * this manager.
 	 * @param input the directory or file to inspect. If a directory
 	 * is specified, all .jar files of that directory will be inspected.
+	 * If the specified file or directory does not exist, nothing happens.
 	 * @param append true to preserve any plug-ins already existing in this
 	 * manager, false to reset and start with no plug-in.
 	 */
@@ -125,13 +126,13 @@ public class PluginsManager {
 							if ( editorFor == null ) continue;
 							if ( editorFor.value().equals(usingParams.value()) ) {
 								if ( IParametersEditor.class.isAssignableFrom(cls2) ) {
-									item1.paramsEditor = item2.className;
+									item1.paramsEditor = new ClassInfo(item2.className, loader);
 								}
 								if ( IEmbeddableParametersEditor.class.isAssignableFrom(cls2) ) {
-									item1.embeddableParamsEditor = item2.className;
+									item1.embeddableParamsEditor = new ClassInfo(item2.className, loader);
 								}
 								if ( IEditorDescriptionProvider.class.isAssignableFrom(cls2) ) {
-									item1.editorDescriptionProvider = item2.className;
+									item1.editorDescriptionProvider = new ClassInfo(item2.className, loader);
 								}
 							}
 							break;
@@ -186,6 +187,9 @@ public class PluginsManager {
 	
 	private void inspectFile (File file) {
 		try {
+			// Make sure there is something to discover
+			if (( file == null ) || !file.exists() ) return;
+			
 			// Create a temporary class loader
 			URL[] tmpUrls = new URL[1]; 
 			URL url = file.toURI().toURL();
@@ -220,14 +224,20 @@ public class PluginsManager {
 							plugins.add(new PluginItem(PLUGINTYPE_IPIPELINESTEP, name));
 						}
 						else if ( IParametersEditor.class.isAssignableFrom(cls) ) {
+							// Skip IParametersEditor classes that should not be use directly
+							if ( cls.getAnnotation(EditorFor.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
 							plugins.add(new PluginItem(PLUGINTYPE_IPARAMETERSEDITOR, name));
 						}
 						else if ( IEmbeddableParametersEditor.class.isAssignableFrom(cls) ) {
+							// Skip IEmbeddableParametersEditor classes that should not be use directly
+							if ( cls.getAnnotation(EditorFor.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
 							plugins.add(new PluginItem(PLUGINTYPE_IEMBEDDABLEPARAMETERSEDITOR, name));
 						}
 						else if ( IEditorDescriptionProvider.class.isAssignableFrom(cls) ) {
+							// Skip IEditorDescriptionProvider classes that should not be use directly
+							if ( cls.getAnnotation(EditorFor.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
 							plugins.add(new PluginItem(PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER, name));
 						}
