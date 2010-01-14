@@ -35,18 +35,21 @@ import net.sf.okapi.common.resource.RawDocument;
  * Default implementations of the {@link IPipeline} interface.
  */
 public class Pipeline implements IPipeline, IObservable, IObserver {
+	public static final String DEFAULT_ID = "DEFAULT ID";
 
 	private LinkedList<IPipelineStep> steps;
 	private LinkedList<IPipelineStep> finishedSteps;
 	private volatile PipelineReturnValue state;
+	private String id;
 
 	/**
 	 * Creates a new Pipeline object.
-	 */
+	 */	
 	public Pipeline() {
 		steps = new LinkedList<IPipelineStep>();
 		finishedSteps = new LinkedList<IPipelineStep>();
 		state = PipelineReturnValue.PAUSED;
+		id = DEFAULT_ID;
 	}
 
 	private void initialize() {
@@ -57,18 +60,20 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		finishedSteps.clear();
 	}
 
+	@Override
 	public void startBatch() {
 		state = PipelineReturnValue.RUNNING;
-		
-		initialize();		
-		
+
+		initialize();
+
 		Event event = new Event(EventType.START_BATCH);
 		for (IPipelineStep step : steps) {
 			step.handleEvent(event);
-		}		
+		}
 		notifyObservers(event);
 	}
 
+	@Override
 	public void endBatch() {
 		// Non-terminal steps will return END_BATCH after receiving END_BATCH
 		// Terminal steps return an event which may be anything,
@@ -78,27 +83,30 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		Event event = Event.END_BATCH_EVENT;
 		for (IPipelineStep step : finishedSteps) {
 			step.handleEvent(Event.END_BATCH_EVENT);
-		}				
+		}
 		notifyObservers(event);
-		
-		state = PipelineReturnValue.SUCCEDED;		
+
+		state = PipelineReturnValue.SUCCEDED;
 	}
 
+	@Override
 	public void addStep(IPipelineStep step) {
 		steps.add(step);
 	}
 
+	@Override
 	public List<IPipelineStep> getSteps() {
 		return new ArrayList<IPipelineStep>(steps);
 	}
 
-	public void cancel() {	
+	@Override
+	public void cancel() {
 		state = PipelineReturnValue.CANCELLED;
 	}
-
+	
 	private Event execute(Event event) {
 		state = PipelineReturnValue.RUNNING;
-		
+
 		// loop through the events until we run out of steps or hit cancel
 		while (!steps.isEmpty() && !(state == PipelineReturnValue.CANCELLED)) {
 			// cycle through the steps in order, pulling off steps that run out
@@ -108,7 +116,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 				// the event returned is used as input to the next pass
 				for (IPipelineStep step : steps) {
 					event = step.handleEvent(event);
-				}				
+				}
 				// notify observers that the final step has sent an Event
 				notifyObservers(event);
 			}
@@ -116,18 +124,21 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 			// on to the next
 			finishedSteps.add(steps.remove());
 		}
-		
+
 		return event;
 	}
 
+	@Override
 	public PipelineReturnValue getState() {
 		return state;
 	}
 
-	public Event process(RawDocument input) {		
-		return process(new Event(EventType.RAW_DOCUMENT, input));		
+	@Override
+	public Event process(RawDocument input) {
+		return process(new Event(EventType.RAW_DOCUMENT, input));
 	}
 
+	@Override
 	public Event process(Event input) {
 		state = PipelineReturnValue.RUNNING;
 		initialize();
@@ -141,7 +152,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 
 		// Prime the pipeline with the input Event and run it to completion.
 		Event finalEvent = execute(input);
-		
+
 		// Copy any remaining steps into finishedSteps - makes initialization
 		// process easier down the road if we use the pipeline again
 		for (IPipelineStep step : steps) {
@@ -153,12 +164,13 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		e = new Event(EventType.END_BATCH_ITEM);
 		for (IPipelineStep step : finishedSteps) {
 			step.handleEvent(e);
-		}		
+		}
 		notifyObservers(e);
-		
+
 		return finalEvent;
 	}
 
+	@Override
 	public void destroy() {
 		for (IPipelineStep step : finishedSteps) {
 			step.destroy();
@@ -166,12 +178,24 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		state = PipelineReturnValue.DESTROYED;
 	}
 
+	@Override
 	public void clearSteps() {
 		destroy();
 		steps.clear();
 		finishedSteps.clear();
 	}
 	
+	@Override
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
+
+
 	//
 	// implements IObserver interface
 	//
@@ -179,11 +203,11 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	public void update(IObservable o, Object arg) {
 		notifyObservers();
 	}
-	
+
 	//
 	// implements IObservable interface
 	//
-	
+
 	/**
 	 * Implements multiple inheritance via delegate pattern to an inner class
 	 * 
@@ -219,5 +243,4 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	public List<IObserver> getObservers() {
 		return delegatedObservable.getObservers();
 	}
-
 }

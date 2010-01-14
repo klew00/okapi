@@ -26,15 +26,14 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
- * Common set of methods to drive an event-driven process. A pipeline is made of
- * a chain of {@link IPipelineStep} objects through which documents are
- * processed.
+ * Common set of methods to drive an event-driven process. A pipeline is made of a chain of {@link IPipelineStep}
+ * objects through which documents are processed.
  */
 public interface IPipeline {
 
 	/**
-	 * Starts {@link IPipeline} processing with a {@link RawDocument} as input.
-	 * This is a convenience method that calls {@link #process(Event)}.
+	 * Starts {@link IPipeline} processing with a {@link RawDocument} as input. This is a convenience method that calls
+	 * {@link #process(Event)}.
 	 * 
 	 * @param input
 	 *            the RawDocument to process.
@@ -62,8 +61,7 @@ public interface IPipeline {
 	public void cancel();
 
 	/**
-	 * Adds a step to this pipeline. Steps are executed in the order they are
-	 * added.
+	 * Adds a step to this pipeline. Steps are executed in the order they are added.
 	 * 
 	 * @param step
 	 *            the step to add.
@@ -94,9 +92,19 @@ public interface IPipeline {
 	public void destroy();
 
 	/**
-	 * Remove all the {@link IPipelineStep}s from the pipeline. Also calls the
-	 * destroy() method on each step.
+	 * Remove all the {@link IPipelineStep}s from the pipeline. Also calls the destroy() method on each step.
 	 */
 	public void clearSteps();
 
+	/**
+	 * Set the pipelines identifier.
+	 */
+	public void setId(String id);
+
+	/**
+	 * Get the Pipelines identifier.
+	 * 
+	 * @return String identifier
+	 */
+	public String getId();
 }
