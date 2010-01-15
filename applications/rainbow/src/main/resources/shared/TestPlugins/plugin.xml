@@ -174,19 +174,6 @@
  </plugin>
 
  <plugin type="utility"
-   id="oku_transcomparison"
-   version="1.0"
-   pluginClass="net.sf.okapi.applications.rainbow.utilities.transcomparison.Utility"
-   editorClass="net.sf.okapi.applications.rainbow.utilities.transcomparison.Editor"
-   updateUri="http://okapi.opentag.com/updates.html">
-   <info>
-    <name>Translation Comparison</name>
-    <description>Compare two sets of translations.</description>
-    <provider>Okapi Framework</provider>
-   </info>
-  </plugin>
-  
- <plugin type="utility"
    id="oku_ttxchecker"
    version="1.0"
    pluginClass="net.sf.okapi.applications.rainbow.utilities.ttxchecker.Utility"

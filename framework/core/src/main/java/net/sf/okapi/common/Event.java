@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,9 +20,6 @@
 
 package net.sf.okapi.common;
 
-import java.security.acl.Group;
-
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.exceptions.OkapiUnexpectedResourceTypeException;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -56,7 +53,7 @@ public class Event {
 	 * Creates a new event with an associated resource.
 	 * 
 	 * @param filterEventType
-	 *            The type of event to create.
+	 *            the type of event to create.
 	 * @param resource
 	 *            the resource to associate to the event.
 	 */
@@ -69,13 +66,16 @@ public class Event {
 	 * Creates a new event with an associated resource and a skeleton object.
 	 * 
 	 * @param filterEventType
-	 *            The type of event to create.
+	 *            the type of event to create.
 	 * @param resource
 	 *            the resource to associate to the event.
 	 * @param skeleton
 	 *            the skeleton to associate to the event.
 	 */
-	public Event(EventType filterEventType, IResource resource, ISkeleton skeleton) {
+	public Event(EventType filterEventType,
+		IResource resource,
+		ISkeleton skeleton)
+	{
 		this.filterEventType = filterEventType;
 		this.resource = resource;
 		this.resource.setSkeleton(skeleton);
@@ -84,25 +84,25 @@ public class Event {
 	/**
 	 * Gets the type of this event.
 	 * 
-	 * @return The type of this event.
+	 * @return the type of this event.
 	 */
-	public EventType getEventType() {
+	public EventType getEventType () {
 		return filterEventType;
 	}
 
 	/**
 	 * Gets the resource associated to this event.
 	 * 
-	 * @return The resource associated to this event, or null if there is none.
+	 * @return the resource associated to this event, or null if there is none.
 	 */
-	public IResource getResource() {
+	public IResource getResource () {
 		return resource;
 	}
 
 	/**
 	 * Sets the resource associated to this event.
 	 */
-	public void setResource(IResource resource) {
+	public void setResource (IResource resource) {
 		this.resource = resource;
 	}
 
@@ -111,7 +111,7 @@ public class Event {
 	 * 
 	 * @return true if {@link TextUnit}, false otherwise
 	 */
-	public boolean isTextUnit() {
+	public boolean isTextUnit () {
 		return (filterEventType == EventType.TEXT_UNIT);
 	}
 
@@ -120,7 +120,7 @@ public class Event {
 	 * 
 	 * @return true if {@link DocumentPart}, false otherwise
 	 */
-	public boolean isDocumentPart() {
+	public boolean isDocumentPart () {
 		return (filterEventType == EventType.DOCUMENT_PART);
 	}
 
@@ -129,7 +129,7 @@ public class Event {
 	 * 
 	 * @return true if {@link StartGroup}, false otherwise
 	 */
-	public boolean isStartGroup() {
+	public boolean isStartGroup () {
 		return (filterEventType == EventType.START_GROUP);
 	}
 
@@ -138,7 +138,7 @@ public class Event {
 	 * 
 	 * @return true if {@link Group} {@link Ending}, false otherwise
 	 */
-	public boolean isEndGroup() {
+	public boolean isEndGroup () {
 		return (filterEventType == EventType.END_GROUP);
 	}
 
@@ -147,77 +147,81 @@ public class Event {
 	 * 
 	 * @return true if {@link RawDocument}, false otherwise
 	 */
-	public boolean isRawDocument() {
+	public boolean isRawDocument () {
 		return (filterEventType == EventType.RAW_DOCUMENT);
 	}
 
 	/**
-	 * Convenience method returns the {@link IResource} as a {@link TextUnit}. The caller should confirm the
-	 * {@link Event} type using isTextUnit before calling this method.
+	 * Convenience method returns the {@link IResource} as a {@link TextUnit}.
+	 * The caller should confirm the {@link Event} type using isTextUnit before
+	 * calling this method.
 	 * 
 	 * @return the {@link TextUnit}
 	 * 
 	 * @throws OkapiUnexpectedResourceTypeException
 	 *             if the {@link IResource} is not a {@link TextUnit}
 	 */
-	public TextUnit getTextUnit() {
-		if (isTextUnit()) {
+	public TextUnit getTextUnit () {
+		if ( isTextUnit() ) {
 			return (TextUnit) resource;
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not a TextUnit");
 	}
 
 	/**
-	 * Convenience method returns the {@link IResource} as a {@link DocumentPart}. The caller should confirm the
-	 * {@link Event} type using isDocumentPart before calling this method.
+	 * Convenience method returns the {@link IResource} as a {@link DocumentPart}.
+	 * The caller should confirm the {@link Event} type using isDocumentPart before calling
+	 * this method.
 	 * 
 	 * @return the {@link DocumentPart}
 	 * 
 	 * @throws OkapiUnexpectedResourceTypeException
-	 *             if the {@link IResource} is not a {@link DocumentPart}
+	 * 		if the {@link IResource} is not a {@link DocumentPart}
 	 */
-	public DocumentPart getDocumentPart() {
-		if (isDocumentPart()) {
+	public DocumentPart getDocumentPart () {
+		if ( isDocumentPart() ) {
 			return (DocumentPart) resource;
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not a DocumentPart");
 	}
 	
 	/**
-	 * Convenience method returns the {@link IResource} as a {@link StartGroup}. The caller should confirm the
-	 * {@link Event} type using isStartGroup before calling this method.
+	 * Convenience method returns the {@link IResource} as a {@link StartGroup}. The 
+	 * caller should confirm the {@link Event} type using isStartGroup before calling this
+	 * method.
 	 * 
 	 * @return the {@link StartGroup}
 	 * 
 	 * @throws OkapiUnexpectedResourceTypeException
 	 *             if the {@link IResource} is not a {@link StartGroup}
 	 */
-	public StartGroup getStartGroup() {
-		if (isStartGroup()) {
+	public StartGroup getStartGroup () {
+		if ( isStartGroup() ) {
 			return (StartGroup) resource;
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not a StartGroup");
 	}
 	
 	/**
-	 * Convenience method returns the {@link IResource} as a {@link Ending}. The caller should confirm the
-	 * {@link Event} type using isEndGroup before calling this method.
+	 * Convenience method returns the {@link IResource} as a {@link Ending}. The caller
+	 * should confirm the {@link Event} type using isEndGroup before calling this method.
 	 * 
 	 * @return the {@link Ending}
 	 * 
 	 * @throws OkapiUnexpectedResourceTypeException
 	 *             if the {@link IResource} is not a {@link Ending}
 	 */
-	public Ending getEndGroup() {
-		if (isEndGroup()) {
+	public Ending getEndGroup () {
+		if ( isEndGroup() ) {
 			return (Ending) resource;
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not an Ending");
 	}
 	
 	/**
-	 * Convenience method returns the {@link IResource} as a {@link RawDocument}. The caller should confirm the
-	 * {@link Event} type using isRawDocument before calling this method.
+	 * Convenience method returns the {@link IResource} as a {@link RawDocument}. The
+	 * caller should confirm the {@link Event} type using isRawDocument before calling
+	 * this method.
 	 * 
 	 * @return the {@link RawDocument}
 	 * 
@@ -225,9 +229,10 @@ public class Event {
 	 *             if the {@link IResource} is not a {@link RawDocument}
 	 */
 	public RawDocument getRawDocument() {
-		if (isRawDocument()) {
+		if ( isRawDocument() ) {
 			return (RawDocument) resource;
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not a RawDocument");
 	}
+
 }

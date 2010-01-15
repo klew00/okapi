@@ -46,6 +46,7 @@ import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.ImportTMPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
+import net.sf.okapi.applications.rainbow.pipeline.TranslationComparisonPipeline;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.Util;
@@ -1384,6 +1385,14 @@ public class MainForm { //implements IParametersProvider {
 		
 		// Add pre-defined pipelines
 		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.transcomparison"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new TranslationComparisonPipeline());
+			}
+		});
+
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "utilities.importtm"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
