@@ -59,7 +59,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 	@Override
 	public void close () {
-		if (writer != null) {
+		if ( writer != null ) {
 			writer.close();
 		}
 	}
@@ -81,7 +81,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 	@Override
 	public Event handleEvent (Event event) {
-		switch (event.getEventType()) {
+		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			handleStartDocument(event);
 			break;

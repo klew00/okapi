@@ -1,0 +1,45 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Steps - TM Import</title>
+<link rel="stylesheet" type="text/css" href="../help.css">
+</head>
+<body>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tr class="head">
+		<td class="head" colspan="2"><h1 class="head">Okapi Framework - Steps</h1>
+		<h2 class="head2">TM Import Step</h2></td>
+	</tr>
+	<tr>
+		<td class="smalltoc">
+		- <a href="#overview">Overview</a><br>
+		- <a href="#parameters">Parameters</a></td>
+		<td class="hmenu">
+			<div class="hmenu"><table align="right"><tr>
+				<td><a href="index.html">Steps</a></td>
+				<td><a href="http://okapi.opentag.com/devguide/index.html">Developer&#39;s Guide</a></td>
+				<td><a href="http://okapi.opentag.com">Okapi Framework</a></td>
+			</tr></table></div>
+		</td>
+	</tr>
+</table>
+
+<h2><a name="overview"></a>Overview</h2>
+<p>This step imports the text units of an input document into a Pensieve TM.</p>
+<p>Takes: Filter events<br>
+Sends: Filter events</p>
+<p>Each text unit is imported into the specified TM. If the text unit is 
+segmented, each segment is imported.</p>
+<p>If the text unit does not have text for the specified target locale, that 
+text unit is not imported. In other words.</p>
+<p>In a text unit segmented, if the number of segments is different between the 
+source and the target, the whole text unit is imported instead of the segments.</p>
+<h2><a name="parameters"></a>Parameters</h2>
+<p><cite>Directory of the TM where to import</cite> -- Enter the directory of 
+the TM where to import the text unit. If the TM does not exist it will be 
+created. If the TM exists already the entries will be added to the existing 
+ones.</p>
+<p>&nbsp;</p>
+</body>
+</html>

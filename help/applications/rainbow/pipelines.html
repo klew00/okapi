@@ -27,7 +27,10 @@ order.</p>
 document), perform a specific 
 task (e.g. parse the document extract text units out of it) on it and send a specific output 
 (e.g. filter events) to the next step in the pipeline.</p>
-<p>The steps communiicate through their input and output. There are two main 
+<p>The Okapi distribution comes with a set of <a href="../../steps/index.html">
+pre-existing steps you can use right out of the box</a>, and you may have 
+additional plugin steps as well.</p>
+<p>The steps communicate through their input and output. There are two main 
 types of input and output:</p>
 <ol>
 	<li>Raw document, which is simply a file.</li>
@@ -51,7 +54,7 @@ made of:</p>
 <p>To perform any kind of action that modify the extracted content, you simply 
 add the necessary step or steps between those two. For example, imgine that you 
 would want to make sure the Japanese text of a file uses full-width characters 
-and never half-width ones, you would use the Full-Width Conversion step that 
+and never half-width ones, you would use the <b>Full-Width Conversion</b> step that 
 allows you to convert the extacted text from half-width characters to full-width 
 characters. You would have the following pipeline:</p>
 <ol>
