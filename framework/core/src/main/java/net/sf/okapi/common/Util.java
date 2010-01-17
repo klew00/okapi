@@ -36,6 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -94,48 +95,47 @@ public class Util {
 	 * Removes from the start of a string any of the specified characters.
 	 * 
 	 * @param text
-	 *            String to trim.
+	 *            string to trim.
 	 * @param chars
-	 *            List of the characters to trim.
+	 *            list of the characters to trim.
 	 * @return The trimmed string.
 	 */
-	static public String trimStart(String text, String chars) {
-		if (text == null)
-			return text;
+	static public String trimStart (String text,
+		String chars)
+	{
+		if ( text == null ) return text;
 		int n = 0;
-		while (n < text.length()) {
-			if (chars.indexOf(text.charAt(n)) == -1)
+		while ( n < text.length() ) {
+			if ( chars.indexOf(text.charAt(n)) == -1 ) {
 				break;
+			}
 			n++;
 		}
-		if (n >= text.length())
-			return "";
-		if (n > 0)
-			return text.substring(n);
+		if ( n >= text.length() ) return "";
+		if ( n > 0 ) return text.substring(n);
 		return text;
 	}
 
 	/**
 	 * Removes from the end of a string any of the specified characters.
 	 * @param text
-	 *            String to trim.
+	 *            string to trim.
 	 * @param chars
-	 *            List of the characters to trim.
-	 * @return The trimmed string.
+	 *            list of the characters to trim.
+	 * @return the trimmed string.
 	 */
-	static public String trimEnd (String text, String chars) {
-		if (text == null)
-			return text;
+	static public String trimEnd (String text,
+		String chars)
+	{
+		if ( text == null ) return text;
 		int n = text.length() - 1;
-		while (n >= 0) {
+		while ( n >= 0 ) {
 			if (chars.indexOf(text.charAt(n)) == -1)
 				break;
 			n--;
 		}
-		if (n < 0)
-			return "";
-		if (n > 0)
-			return text.substring(0, n + 1);
+		if ( n < 0 ) return "";
+		if ( n > 0 ) return text.substring(0, n + 1);
 		return text;
 	}
 
@@ -143,40 +143,34 @@ public class Util {
 	 * Gets the directory name of a full path.
 	 * 
 	 * @param path
-	 *            Full path from where to extract the directory name. The path
-	 *            can be a URL path (e.g. "/C:/test/file.ext").
+	 *         full path from where to extract the directory name. The path
+	 *         can be a URL path (e.g. "/C:/test/file.ext").
 	 * @return The directory name (without the final separator), or an empty
 	 *         string if path is a filename.
 	 */
 	static public String getDirectoryName (String path) {
 		String tmp = path.replace('\\', '/'); // Normalize separators (some path are mixed)
 		int n = tmp.lastIndexOf('/'); // Try generic first
-//		if (n == -1) { // Then try Windows
-//			n = path.lastIndexOf('\\');
-//		}
-		if (n > 0)
+		if ( n > 0 ) {
 			return path.substring(0, n);
-		else
+		}
+		else {
 			return "";
+		}
 	}
 
 	/**
 	 * Creates the directory tree for the give full path (dir+filename)
 	 * 
 	 * @param path
-	 *            Directory and filename. If you want to pass only a directory
-	 *            name make sure it has a trailing separator (e.g.
-	 *            "c:\project\tmp\"). The path can be a URL path (e.g.
-	 *            "/C:/test/file.ext").
+	 *            directory to create and filename. If you want to pass only a directory
+	 *            name make sure it has a trailing separator (e.g. "c:\project\tmp\").
+	 *            The path can be a URL path (e.g. "/C:/test/file.ext").
 	 */
 	static public void createDirectories (String path) {
 		String tmp = path.replace('\\', '/'); // Normalize separators (some path are mixed)
 		int n = tmp.lastIndexOf('/'); // Try generic first
-//		if (n == -1) { // Then try Windows
-//			n = path.lastIndexOf('\\');
-//		}
-		if (n == -1)
-			return; // Nothing to do
+		if ( n == -1 ) return; // Nothing to do
 		// Else, use the directory part and create the tree
 		String dir = path.substring(0, n);
 		File F = new File(dir);
@@ -187,27 +181,26 @@ public class Util {
 	 * Escapes a string for XML.
 	 * 
 	 * @param text
-	 *            String to escape.
+	 *            string to escape.
 	 * @param quoteMode
 	 *            0=no quote escaped, 1=apos and quot, 2=#39 and quot, and
 	 *            3=quot only.
 	 * @param escapeGT
-	 *            True to always escape '>' to gt
+	 *            true to always escape '>' to gt
 	 * @param encoder
-	 *            The character set encoder to use to detect un-supported
+	 *            the character set encoder to use to detect un-supported
 	 *            character, or null to never escape normal characters.
-	 * @return The escaped string.
+	 * @return the escaped string.
 	 */
 	static public String escapeToXML (String text,
 		int quoteMode,
 		boolean escapeGT,
 		CharsetEncoder encoder)
 	{
-		if (text == null)
-			return "";
+		if ( text == null ) return "";
 		StringBuffer sbTmp = new StringBuffer(text.length());
 		char ch;
-		for (int i = 0; i < text.length(); i++) {
+		for ( int i = 0; i < text.length(); i++ ) {
 			ch = text.charAt(i);
 			switch (ch) {
 			case '<':
@@ -217,23 +210,27 @@ public class Util {
 				if (escapeGT)
 					sbTmp.append("&gt;");
 				else {
-					if ((i > 0) && (text.charAt(i - 1) == ']'))
+					if (( i > 0 ) && ( text.charAt(i - 1) == ']' )) {
 						sbTmp.append("&gt;");
-					else
+					}
+					else {
 						sbTmp.append('>');
+					}
 				}
 				continue;
 			case '&':
 				sbTmp.append("&amp;");
 				continue;
 			case '"':
-				if (quoteMode > 0)
+				if ( quoteMode > 0 ) {
 					sbTmp.append("&quot;");
-				else
+				}
+				else {
 					sbTmp.append('"');
+				}
 				continue;
 			case '\'':
-				switch (quoteMode) {
+				switch ( quoteMode ) {
 				case 1:
 					sbTmp.append("&apos;");
 					break;
@@ -246,23 +243,26 @@ public class Util {
 				}
 				continue;
 			default:
-				if (text.charAt(i) > 127) { // Extended chars
-					if (Character.isHighSurrogate(ch)) {
+				if ( text.charAt(i) > 127 ) { // Extended chars
+					if ( Character.isHighSurrogate(ch) ) {
 						int cp = text.codePointAt(i++);
 						String tmp = new String(Character.toChars(cp));
-						if ((encoder != null) && !encoder.canEncode(tmp)) {
+						if (( encoder != null ) && !encoder.canEncode(tmp) ) {
 							sbTmp.append(String.format("&#x%x;", cp));
 						} else {
 							sbTmp.append(tmp);
 						}
-					} else {
-						if ((encoder != null) && (!encoder.canEncode(text.charAt(i)))) {
+					}
+					else {
+						if (( encoder != null ) && !encoder.canEncode(text.charAt(i)) ) {
 							sbTmp.append(String.format("&#x%04x;", text.codePointAt(i)));
-						} else { // No encoder or char is supported
+						}
+						else { // No encoder or char is supported
 							sbTmp.append(text.charAt(i));
 						}
 					}
-				} else { // ASCII chars
+				}
+				else { // ASCII chars
 					sbTmp.append(text.charAt(i));
 				}
 				continue;
@@ -412,7 +412,7 @@ public class Util {
 	{
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
 		try {
-			while (inChannel.read(buffer) != -1) {
+			while ( inChannel.read(buffer) != -1 ) {
 				// prepare the buffer to be drained
 				buffer.flip();
 				// write to the channel, may block
@@ -429,7 +429,7 @@ public class Util {
 				outChannel.write(buffer);
 			}
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			throw new OkapiIOException(e);
 		}
 	}
@@ -452,7 +452,7 @@ public class Util {
 	 * @param outputPath the output path.
 	 * @throws OkapiIOException if an error occurs.
 	 */
-	public static void copy(InputStream is,
+	public static void copy (InputStream is,
 		String outputPath)
 	{
 		ReadableByteChannel inChannel = null;
@@ -462,16 +462,15 @@ public class Util {
 			outChannel = new FileOutputStream(new File(outputPath)).getChannel();
 			copy(inChannel, outChannel);
 		}
-		catch (FileNotFoundException e) {
+		catch ( FileNotFoundException e ) {
 			throw new OkapiIOException(e);
 		}
 		finally {
 			try {
-				if (inChannel != null)
-					inChannel.close();
-				if (outChannel != null)
-					outChannel.close();
-			} catch (IOException e) {
+				if (inChannel != null) inChannel.close();
+				if (outChannel != null) outChannel.close();
+			}
+			catch ( IOException e ) {
 				throw new OkapiIOException(e);
 			}
 		}
@@ -493,16 +492,15 @@ public class Util {
 			outChannel = new FileOutputStream(out).getChannel();
 			copy(inChannel, outChannel);
 		}
-		catch (IOException e) {
+		catch ( IOException e ) {
 			throw new OkapiIOException(e);
 		}
 		finally {
 			try {
-				if (inChannel != null)
-					inChannel.close();
-				if (outChannel != null)
-					outChannel.close();
-			} catch (IOException e) {
+				if ( inChannel != null ) inChannel.close();
+				if ( outChannel != null ) outChannel.close();
+			}
+			catch ( IOException e ) {
 				throw new OkapiIOException(e);
 			}
 		}
@@ -526,21 +524,22 @@ public class Util {
 			ic = new FileInputStream(fromPath).getChannel();
 			oc = new FileOutputStream(toPath).getChannel();
 			copy(ic, oc);
-			if (move) {
+			if ( move ) {
 				ic.close();
 				ic = null;
 				File file = new File(fromPath);
 				file.delete();
 			}
-		} catch (IOException e) {
+		}
+		catch ( IOException e ) {
 			throw new OkapiIOException(e);
-		} finally {
+		}
+		finally {
 			try {
-				if (ic != null)
-					ic.close();
-				if (oc != null)
-					oc.close();
-			} catch (IOException e) {
+				if ( ic != null ) ic.close();
+				if ( oc != null ) oc.close();
+			}
+			catch ( IOException e ) {
 				throw new OkapiIOException(e);
 			}
 		}
@@ -552,7 +551,7 @@ public class Util {
 	 * directory.
 	 * 
 	 * @param directory
-	 *            Directory of the content to delete.
+	 *            directory of the content to delete.
 	 */
 	private static void deleteDirectory (File directory) {
 		for ( File f : directory.listFiles() ) {
@@ -848,10 +847,10 @@ public class Util {
 	 * Creates a string ID based on the hash code of the given text.
 	 * 
 	 * @param text
-	 *            The text to make an ID for.
+	 *            the text to make an ID for.
 	 * @return The string ID for the given text.
 	 */
-	public static String makeID(String text) {
+	public static String makeID (String text) {
 		int n = text.hashCode();
 		return String.format("%s%X", ((n > 0) ? 'P' : 'N'), n);
 	}
@@ -1083,4 +1082,27 @@ public class Util {
 		}
 	}
 
+	/**
+	 * Gets the directory location of a given class. The value returned can be the directory
+	 * where the .class file is located, or, if the class in a JAR file, the directory
+	 * where the .jar file is located.    
+	 * @param theClass the class to query.
+	 * @return the directory location of the given class, or null if an error occurs.
+	 */
+	public static String getClassLocation (Class<?> theClass) {
+		String res = null;
+    	try {
+    		File file = new File(theClass.getProtectionDomain().getCodeSource().getLocation().getFile());
+				res = URLDecoder.decode(file.getAbsolutePath(), "UTF-8");
+	    	// Remove the JAR file if necessary
+	    	if ( res.endsWith(".jar") ) {
+		    	res = getDirectoryName(res);
+	    	}
+		}
+    	catch ( Throwable e ) {
+    		throw new RuntimeException("Error trying to get the location of a class", e);
+		}
+		return res;
+	}
+	
 }

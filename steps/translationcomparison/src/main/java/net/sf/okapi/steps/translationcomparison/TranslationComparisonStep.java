@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -104,10 +104,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		this.rawDoc3 = thirdInput;
 	}
 	
+	@Override
 	public String getName () {
 		return "Translation Comparison";
 	}
 
+	@Override
 	public String getDescription () {
 		return "Compare the translated text units between several documents.";
 	}
@@ -148,6 +150,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		if ( !params.isPunctuationSensitive() ) options |= TextMatcher.IGNORE_PUNCTUATION;
 	}
 	
+	@Override
 	protected void handleEndBatch (Event event) {
 		matcher = null;
 		if ( params.isGenerateHTML() && ( writer != null )) {
@@ -210,7 +213,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	
 	@Override
 	protected void handleTextUnit (Event event1) {
-		TextUnit tu1 = (TextUnit)event1.getResource();
+		TextUnit tu1 = event1.getTextUnit();
 		// Move to the next TU
 		Event event2 = synchronize(filter2, EventType.TEXT_UNIT);
 		Event event3 = null;
@@ -359,8 +362,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 
 	private void initializeDocumentData () {
 		// Initialize the filter to read the translation 1 to compare
-		filter2 = fcMapper.createFilter(
-			rawDoc2.getFilterConfigId(), filter2);
+		filter2 = fcMapper.createFilter(rawDoc2.getFilterConfigId(), filter2);
 		// Open the second input for this batch item
 		filter2.open(rawDoc2);
 

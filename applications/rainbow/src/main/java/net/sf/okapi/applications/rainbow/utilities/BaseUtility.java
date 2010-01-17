@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -63,6 +64,10 @@ public abstract class BaseUtility implements IUtility {
 
 	public void removeCancelListener (CancelListener listener) {
 		listenerList.remove(CancelListener.class, listener);
+	}
+
+	public String getHelpLocation () {
+		return ".." + File.separator + "help" + File.separator + "steps";
 	}
 
 	public String getDescription() {

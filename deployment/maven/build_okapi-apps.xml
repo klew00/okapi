@@ -272,8 +272,6 @@
 			<fileset dir="data/okapi-apps/${platform}"/>
 		</copy>
 
-		<mkdir dir="${dist}/dropins"/>
-		
 		<!-- Copy shared resources -->
 		<!--TODO: fix this to have it outside the jar -->
 		<copy todir="${distLib}/shared">

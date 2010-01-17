@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.rainbow.utilities;
 
+import java.io.File;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -37,6 +39,10 @@ public class UtilityStep implements IPipelineStep {
 		return event;
 	}
 	
+	public String getHelpLocation () {
+		return ".." + File.separator + "help" + File.separator + "steps";
+	}
+
 	public void cancel () {
 		// Cancel needed here
 	}

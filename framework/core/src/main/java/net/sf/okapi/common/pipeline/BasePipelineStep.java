@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.pipeline;
 
+import java.io.File;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 
@@ -30,18 +32,27 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	private boolean isLastOutputStep = false;
 
+	@Override
 	public IParameters getParameters () {
 		return null;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		// No parameters by default
 	}
 
+	@Override
 	public boolean isDone () {
 		return true;
 	}
 
+	@Override
+	public String getHelpLocation () {
+		return ".." + File.separator + "help" + File.separator + "steps";
+	}
+	
+	@Override
 	public Event handleEvent(Event event) {
 		switch (event.getEventType()) {
 		case START_BATCH:
@@ -95,13 +106,16 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	public void cancel() {
 	}
 
+	@Override
 	public void destroy() {
 	}
 
+	@Override
 	public boolean isLastOutputStep () {
 		return isLastOutputStep;
 	}
 
+	@Override
 	public void setLastOutputStep (boolean isLastStep) {
 		this.isLastOutputStep = isLastStep;
 	}

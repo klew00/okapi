@@ -158,11 +158,12 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../connectors/apertium/target/classes"
 			 excludes="**/META-INF/**"/>
+<!--not ready yet
 			<fileset dir="../../connectors/promt/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../connectors/crosslanguage/target/classes"
 			 excludes="**/META-INF/**"/>
-
+-->
 			 <!-- steps -->
 			<fileset dir="../../steps/bomconversion/target/classes"
 			 excludes="**/META-INF/**"/>
@@ -355,6 +356,9 @@
 		 manifest="${tmp}/MANIFEST.MF"
 		 excludes="MANIFEST.MF" />
 
+		<!-- Create directory for dropins -->
+		<mkdir dir="${dist}/dropins"/>
+
 		<!-- Copy examples -->
 		<copy todir="${dist}/examples">
 			<fileset dir="../../examples/java">
@@ -364,7 +368,7 @@
 				<exclude name="**/target/maven-archiver/**"/>
 			</fileset>
 		</copy>
-		<!-- Delete normal pon file -->
+		<!-- Delete normal pom file -->
 		<delete file="${dist}/examples/pom.xml" quiet="true"/>
 		<!-- And replace it with the one for deployment -->
 		<rename src="${dist}/examples/pomForDeployment.xml" dest="${dist}/examples/pom.xml"/>
@@ -386,6 +390,7 @@
 			<fileset dir="../../help">
 				<exclude name="**/applications/rainbow/**"/>
 				<exclude name="**/tutorials/**"/>
+				<exclude name="**/plugins/**"/>
 			</fileset>
 		</copy>
 

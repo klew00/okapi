@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.ui.DefaultEmbeddableEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
@@ -75,7 +77,7 @@ public class PipelineEditor {
 	private Button btRemoveStep;
 	private Button btMoveStepUp;
 	private Button btMoveStepDown;
-	private Button btStepInfo;
+	private Button btStepHelp;
 	private Text edDescription;
 	private BaseContext context;
 	private String predefined;
@@ -263,14 +265,14 @@ public class PipelineEditor {
 		}
 
 		// Info button is for all types of pipeline
-		btStepInfo = new Button(cmpTmp, SWT.PUSH);
-		btStepInfo.setText("Step Info");
+		btStepHelp = new Button(cmpTmp, SWT.PUSH);
+		btStepHelp.setText("Step Help");
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gdTmp.widthHint = width;
-		btStepInfo.setLayoutData(gdTmp);
-		btStepInfo.addSelectionListener(new SelectionAdapter() {
+		btStepHelp.setLayoutData(gdTmp);
+		btStepHelp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				showStepInfo();
+				showStepHelp();
 			}
 		});
 		
@@ -385,7 +387,7 @@ public class PipelineEditor {
 				btRemoveStep.setEnabled(false);
 				btMoveStepUp.setEnabled(false);
 				btMoveStepDown.setEnabled(false);
-				btStepInfo.setEnabled(false);
+				btStepHelp.setEnabled(false);
 			}
 			if (( ctrl == null ) || !ctrl.equals(noStepsPanel) ) {
 				((StackLayout)optionsHolder.getLayout()).topControl = noStepsPanel;
@@ -404,7 +406,7 @@ public class PipelineEditor {
 			btMoveStepDown.setEnabled(n<workSteps.size()-1);
 		}
 		// Info in all cases (if there is a help object)
-		btStepInfo.setEnabled(help!=null);
+		btStepHelp.setEnabled(help!=null);
 
 		ISWTEmbeddableParametersEditor panel = panels.get(n);
 		if ( panel.getComposite() == null ) {
@@ -475,16 +477,28 @@ public class PipelineEditor {
 		}
 	}
 	
-	private void showStepInfo () {
-		if ( help == null ) return;
-		int n = lbSteps.getSelectionIndex();
-		if ( n > lbSteps.getItemCount()-1 ) return;
-	//	StepInfo tmp = workSteps.get(n);
-		// Step name, all lowercase
-//		String a = tmp.stepClass;
-		Dialogs.showError(shell, "Not implemented yet", null);
-//TODO		
-		//help.showTopic(this, "../index", "pipeline/editOrExecutePipeline.html");
+	private void showStepHelp () {
+		try {
+			if ( help == null ) return;
+			int n = lbSteps.getSelectionIndex();
+			if ( n == -1 ) return;
+			StepInfo si = workSteps.get(n);
+			IPipelineStep step;
+			if ( si.loader == null ) {
+				step = (IPipelineStep)Class.forName(si.stepClass).newInstance();
+			}
+			else {
+				step = (IPipelineStep)Class.forName(si.stepClass, true, si.loader).newInstance();
+			}
+			String path = Util.getClassLocation(step.getClass());
+			if ( Util.isEmpty(path) ) return; // No help available
+			path += File.separator + step.getHelpLocation() + File.separator;
+			n = si.stepClass.lastIndexOf('.');
+			Util.openURL(path+si.stepClass.substring(n+1).toLowerCase()+".html");
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}	
 	}
 	
 	private void moveStepDown () {

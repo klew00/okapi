@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.extra.steps;
 
+import java.io.File;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -50,6 +52,10 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 		// Do nothing by default
 	}
 
+	public String getHelpLocation () {
+		return ".." + File.separator + "help";
+	}
+	
 	public Event handleEvent(Event event) {
 		
 		if (event == null) return null;

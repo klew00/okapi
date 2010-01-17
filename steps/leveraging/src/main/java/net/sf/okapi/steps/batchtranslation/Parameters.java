@@ -150,7 +150,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	public void reset() {
-		// ProMT command = "\"C:\\Program Files\\PRMT8\\FILETRANS\\FileTranslator.exe\" \"${input}\" /as /ac \"/o:${output}\" /d:${srcLangName}-${trgLangName}";
 		command = "";
 		origin = "";
 		makeTM = false;
@@ -203,7 +202,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(COMMAND, "Command line", "Command line to execute the batch translation");
 		desc.add(ORIGIN, "Origin identifier", "String that identifies the origin of the translation");
 		desc.add(BLOCKSIZE, "Block size", "Maximum number of text units to process together");
-		desc.add(SEGMENT, "Pre-segment the entries", null);
+		desc.add(SEGMENT, "Segment the text units", null);
 		desc.add(SRXPATH, "SRX path", "Full path of the segmentation rules file to use");
 		desc.add(MAKETM, "Import into a TM", null);
 		desc.add(TMDIRECTORY, "Directory of the TM where to import", "Location of the TM to create or use");

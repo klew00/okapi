@@ -121,7 +121,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "fullwidthconversion/index");
+					if ( help != null ) help.showTopic(this, "fullwidthconversionstep");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) saveData();
@@ -147,10 +147,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		mainComposite.setLayout(new GridLayout());
 		
 		rdToHalfWidth = new Button(mainComposite, SWT.RADIO);
-		rdToHalfWidth.setText("Convert full width characters to half-width (or ASCII) equivalents");
+		rdToHalfWidth.setText("Convert full-width characters to half-width or ASCII equivalents");
 		
 		rdToFullWidth = new Button(mainComposite, SWT.RADIO);
-		rdToFullWidth.setText("Convert half-width characters to full width equivalents");
+		rdToFullWidth.setText("Convert half-width and ASCII characters to full-width equivalents");
 		
 		chkAsciiOnly = new Button(mainComposite, SWT.CHECK);
 		chkAsciiOnly.setText("Convert only the ASCII characters");

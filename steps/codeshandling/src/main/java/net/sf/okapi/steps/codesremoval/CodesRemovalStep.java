@@ -45,11 +45,11 @@ public class CodesRemovalStep extends BasePipelineStep {
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
 	}
-	
+
 	public String getName () {
 		return "Inline Codes Removal";
 	}
-
+	
 	public String getDescription () {
 		return "Removes inline codes from the text units content of a document."
 			+ " Expects: filter events. Sends back: filter events.";

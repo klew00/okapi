@@ -60,6 +60,12 @@ public interface IPipelineStep {
 	public String getDescription();
 
 	/**
+	 * Gets the relative directory location for the help of this step.
+	 * @return the relative directory location for the help of this step.
+	 */
+	public String getHelpLocation();
+
+	/**
 	 * Processes each event sent though the pipeline.
 	 * 
 	 * @param event
@@ -70,8 +76,7 @@ public interface IPipelineStep {
 
 	/**
 	 * Steps that can generate {@link Event}s such as {@link IFilter}s return
-	 * false until
-	 * no more events can be created.
+	 * false until no more events can be created.
 	 * Steps which do not create {@link Event}s always return true.
 	 * 
 	 * @return false if can generate more events, true otherwise.
