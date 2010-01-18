@@ -270,6 +270,13 @@
 			<artifactId>okapi-step-tokenization-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+<!-- Plugin
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-wordcount-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+-->
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-uriconversion-ui</artifactId>
@@ -310,7 +317,7 @@
 			<artifactId>okapi-step-leveraging-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!-- Plugins 
+<!-- Plugin 
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-codeshandling</artifactId>
@@ -322,6 +329,12 @@
 			<artifactId>okapi-step-tokenization</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+<!-- Plugin
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-wordcount</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+-->
 	</dependencies>
 </project>

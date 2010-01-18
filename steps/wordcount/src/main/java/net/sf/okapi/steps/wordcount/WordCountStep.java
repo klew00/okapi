@@ -20,7 +20,9 @@
 
 package net.sf.okapi.steps.wordcount;
 
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.steps.wordcount.common.GMX;
+import net.sf.okapi.steps.wordcount.common.Parameters;
 import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 
 /**
@@ -31,7 +33,7 @@ import net.sf.okapi.steps.wordcount.common.TokenCountStep;
  * 
  * @version 0.1 06.07.2009
  */
-
+@UsingParameters(Parameters.class)
 public class WordCountStep extends TokenCountStep {
 	
 	public WordCountStep() {

@@ -23,10 +23,12 @@ package net.sf.okapi.steps.wordcount.ui;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Widget;
 
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.steps.wordcount.common.Parameters;
 import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
 
+@EditorFor(Parameters.class)
 public class ParametersEditor extends AbstractParametersEditor {
 
 	@Override

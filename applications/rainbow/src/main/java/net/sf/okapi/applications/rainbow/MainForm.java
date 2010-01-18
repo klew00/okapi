@@ -1186,16 +1186,12 @@ public class MainForm { //implements IParametersProvider {
 			// Save any pending data
 			saveSurfaceData();
 			updateCustomConfigurations();
-			boolean initialCall = false;
 			if ( wrapper == null ) {
 				wrapper = new PipelineWrapper(fcMapper, rootFolder);
-				initialCall = true;
 			}
 
 			if ( predefinedPipeline == null ) {
-				if ( initialCall ) {
-					wrapper.loadFromStringStorage(prj.getUtilityParameters(PRJPIPELINEID));
-				}
+				wrapper.loadFromStringStorageOrReset(prj.getUtilityParameters(PRJPIPELINEID));
 			}
 			else {
 				// If we have a predefined pipeline: set it

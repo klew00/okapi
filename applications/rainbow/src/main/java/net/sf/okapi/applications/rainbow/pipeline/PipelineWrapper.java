@@ -358,7 +358,7 @@ public class PipelineWrapper {
 			}
 			availableSteps.put(step.id, step);
 
-//Plugin
+// Plugin
 //			ps = (IPipelineStep)Class.forName(
 //				"net.sf.okapi.steps.wordcount.WordCountStep").newInstance();
 //			params = ps.getParameters();
@@ -412,7 +412,7 @@ public class PipelineWrapper {
 	}
 	
 	public void clear () {
-		steps.clear();
+		steps.clear();		
 	}
 	
 	public String getPath () {
@@ -438,8 +438,17 @@ public class PipelineWrapper {
 		return store.getStringOutput();
 	}
 	
-	public void loadFromStringStorage (String data) {
-		if ( Util.isEmpty(data) ) return;
+	public void reset () {
+		clear();
+		path = null;
+		driver.setPipeline(new Pipeline());
+	}
+	
+	public void loadFromStringStorageOrReset (String data) {
+		if ( Util.isEmpty(data) ) {
+			reset();
+			return;
+		}
 		PipelineStorage store = new PipelineStorage(availableSteps, (CharSequence)data);
 		loadPipeline(store.read(), null);
 	}
