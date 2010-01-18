@@ -24,12 +24,14 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.ResourceItem;
@@ -113,7 +115,7 @@ public class LeveragingStep extends BasePipelineStep {
 	
 	@Override
 	protected void handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
+		TextUnit tu = event.getTextUnit();
 		if ( !tu.isTranslatable() ) return;
 
     	boolean approved = false;
@@ -122,10 +124,17 @@ public class LeveragingStep extends BasePipelineStep {
     		if ( "yes".equals(prop.getValue()) ) approved = true;
     	}
     	if ( approved ) return; // Do not leverage pre-approved entries
+    	
+    	// Check if this entry has been leveraged once already
+    	// (this allows to have several Leveraging steps in the same pipeline)
+    	TextContainer tc = tu.getTarget(targetLocale);
+    	if ( tc != null ) {
+    		ScoresAnnotation scores = tc.getAnnotation(ScoresAnnotation.class);
+    		if ( scores != null ) return; // Don't overwrite existing leverage
+    	}
 
     	// Leverage
 		qm.leverage(tu, tmxWriter, params.getFillTarget());
-		
 	}
 
 	@Override

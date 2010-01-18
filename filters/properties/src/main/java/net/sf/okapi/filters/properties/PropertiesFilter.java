@@ -134,6 +134,12 @@ public class PropertiesFilter implements IFilter {
 			"Java Properties (Output not escaped)",
 			"Java properties files (Characters in the output encoding are not escaped)",
 			"outputNotEscaped.fprm"));
+		list.add(new FilterConfiguration(getName()+"-skypeLang",
+			MimeTypeMapper.PROPERTIES_MIME_TYPE,
+			getClass().getName(),
+			"Skype Language Files",
+			"Skype language properties files (including support for HTML codes)",
+			"skypeLang.fprm"));
 		return list;
 	}
 

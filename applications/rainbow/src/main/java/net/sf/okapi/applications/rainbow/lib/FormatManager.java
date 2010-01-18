@@ -38,6 +38,7 @@ public class FormatManager {
 		pairs.put(".html", "okf_html");
 		pairs.put(".htm", "okf_html");
 		pairs.put(".properties", "okf_properties");
+		pairs.put(".lang", "okf_properties-skypeLang");
 		pairs.put(".tmx", "okf_tmx");
 		pairs.put(".mif", "okf_mif");
 		pairs.put(".rtf", "okf_rtf");

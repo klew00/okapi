@@ -212,11 +212,11 @@ public class PipelineEditor {
 		
 		// Bottom part
 		cmpTmp = new Composite(shell, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout(5, false));
+		cmpTmp.setLayout(new GridLayout(4, false));
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		cmpTmp.setLayoutData(gdTmp);
 		
-		// Pipeline buttons are for normal pipeline only
+		// Pipeline and step buttons are for normal pipeline only
 		if ( predefined == null ) {
 			// Buttons
 			btAddStep = new Button(cmpTmp, SWT.PUSH);
@@ -262,22 +262,7 @@ public class PipelineEditor {
 					moveStepDown();
 				}
 			});
-		}
 
-		// Info button is for all types of pipeline
-		btStepHelp = new Button(cmpTmp, SWT.PUSH);
-		btStepHelp.setText("Step Help");
-		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
-		gdTmp.widthHint = width;
-		btStepHelp.setLayoutData(gdTmp);
-		btStepHelp.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				showStepHelp();
-			}
-		});
-		
-		// Pipeline buttons are for normal pipeline only
-		if ( predefined == null ) {
 			// Pipeline buttons
 			btLoad = new Button(cmpTmp, SWT.PUSH);
 			btLoad.setText("Load...");
@@ -324,16 +309,24 @@ public class PipelineEditor {
 				}
 			});
 			
-			// Place-holder
-			new Label(cmpTmp, SWT.NONE);
-		
 		} // End of "if predefined"
 		
-		
-		edDescription = new Text(shell, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
+		// Info button is for all types of pipeline
+		btStepHelp = new Button(cmpTmp, SWT.PUSH);
+		btStepHelp.setText("Step Help");
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.widthHint = width;
+		btStepHelp.setLayoutData(gdTmp);
+		btStepHelp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				showStepHelp();
+			}
+		});
+
+		edDescription = new Text(cmpTmp, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 36;
-		//gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 3;
 		edDescription.setLayoutData(gdTmp);
 		edDescription.setEditable(false);
 

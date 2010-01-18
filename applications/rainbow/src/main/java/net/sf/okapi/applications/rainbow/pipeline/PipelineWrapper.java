@@ -109,26 +109,28 @@ public class PipelineWrapper {
 				step.paramsData = params.toString();
 			}
 			availableSteps.put(step.id, step);
-							
-			ps = (IPipelineStep)Class.forName(
-					"net.sf.okapi.steps.common.FilterEventsWriterStep").newInstance();
-			params = ps.getParameters();
-			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
-			if ( params != null ) {
-				step.paramsData = params.toString();
-			}
-			availableSteps.put(step.id, step);
 
-			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.common.RawDocumentWriterStep").newInstance();
-			params = ps.getParameters();
-			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
-			if ( params != null ) {
-				step.paramsData = params.toString();
-			}
-			availableSteps.put(step.id, step);
+// Usable only via script			
+//			ps = (IPipelineStep)Class.forName(
+//					"net.sf.okapi.steps.common.FilterEventsWriterStep").newInstance();
+//			params = ps.getParameters();
+//			step = new StepInfo(ps.getClass().getSimpleName(),
+//				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+//			if ( params != null ) {
+//				step.paramsData = params.toString();
+//			}
+//			availableSteps.put(step.id, step);
+
+// Usable only via script			
+//			ps = (IPipelineStep)Class.forName(
+//				"net.sf.okapi.steps.common.RawDocumentWriterStep").newInstance();
+//			params = ps.getParameters();
+//			step = new StepInfo(ps.getClass().getSimpleName(),
+//				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+//			if ( params != null ) {
+//				step.paramsData = params.toString();
+//			}
+//			availableSteps.put(step.id, step);
 									
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.encodingconversion.EncodingConversionStep").newInstance();

@@ -183,13 +183,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		spnThreshold.setPageIncrement(10);
 
 		chkFillTarget = new Button(mainComposite, SWT.CHECK);
-		chkFillTarget.setText("Fill the target if a leverageable match is found");
+		chkFillTarget.setText("Fill the target with the leveraged translation");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkFillTarget.setLayoutData(gdTmp);
 
 		chkMakeTMX = new Button(mainComposite, SWT.CHECK);
-		chkMakeTMX.setText("Generate a TMX document with the leverageable matches");
+		chkMakeTMX.setText("Generate a TMX document");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkMakeTMX.setLayoutData(gdTmp);

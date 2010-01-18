@@ -471,6 +471,7 @@ public class Main {
 		filtersMap.put("okf_tmx", "net.sf.okapi.filters.tmx.TmxFilter");
 		
 		extensionsMap.put(".properties", "okf_properties");
+		extensionsMap.put(".lang", "okf_properties-skypeLang");
 		filtersMap.put("okf_properties", "net.sf.okapi.filters.properties.PropertiesFilter");
 		
 		extensionsMap.put(".po", "okf_po");

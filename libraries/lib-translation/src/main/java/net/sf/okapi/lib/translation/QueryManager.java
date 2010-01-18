@@ -624,7 +624,7 @@ public class QueryManager {
 		
 		int done = 0;
 		Code newCode, oriCode;
-		int oriIndex = -1;
+//		int oriIndex = -1;
 
 		for ( int i=0; i<newCodes.size(); i++ ) {
 			newCode = newCodes.get(i);
@@ -637,7 +637,7 @@ public class QueryManager {
 				//if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ))
 					//TOFIX && ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ))
 				if ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ) {
-					oriIndex = oriIndices[j];
+					//oriIndex = oriIndices[j];
 					oriCode = oriCodes.get(oriIndices[j]);
 					oriIndices[j] = -1;
 					done++;

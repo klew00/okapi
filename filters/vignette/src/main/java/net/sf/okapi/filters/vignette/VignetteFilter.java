@@ -157,7 +157,7 @@ public class VignetteFilter implements IFilter {
 		list.add(new FilterConfiguration(getName(),
 			MimeTypeMapper.XML_MIME_TYPE,
 			getClass().getName(),
-			"Vignette Export/Import Content",
+			"Vignette Export/Import Content (Alpha)",
 			"Default Vignette Export/Import Content configuration."));
 		return list;
 	}
