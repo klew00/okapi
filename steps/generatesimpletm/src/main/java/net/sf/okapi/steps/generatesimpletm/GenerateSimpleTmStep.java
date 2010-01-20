@@ -122,7 +122,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	protected void handleTextUnit (Event event) {
 		
 		//--skip file if not multilingual.
-		if(!isMultilingual){
+		if ( !isMultilingual ) {
 			countTuNotAdded++;
 			return;
 		} 
@@ -134,7 +134,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 			return;
 		} 
 		
-		if(tu.getSource()==null){
+		if ( tu.getSource() == null ) {
 			logger.warning("TextUnit is missing source content.");
 			countTuNotAdded++;
 			return;
