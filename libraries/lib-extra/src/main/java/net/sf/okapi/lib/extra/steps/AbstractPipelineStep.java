@@ -53,7 +53,7 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 	}
 
 	public String getHelpLocation () {
-		return ".." + File.separator + "help";
+		return ".." + File.separator + "help" + File.separator + "steps";
 	}
 	
 	public Event handleEvent(Event event) {

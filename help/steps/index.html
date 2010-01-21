@@ -32,6 +32,8 @@ takes and what type it sends. RD=Raw Document, FE=Filter Events.</p>
 	<li><cite><a href="batchtranslationstep.html">Batch Translation</a></cite> 
 	(RD &gt; RD) - 
 	Creates translation memories using external tools.</li>
+	<li><cite><a href="codesremovalstep.html">Codes Removal</a></cite> (FE &gt; FE) 
+	- Removes markers and/or content of inline codes from text units.</li>
 	<li><cite><a href="filtereventstorawdocumentstep.html">Filter Events to Raw 
 	Document</a></cite> (FE &gt; RD) - Merges filter events back into the original 
 	file format.</li>
@@ -40,7 +42,7 @@ takes and what type it sends. RD=Raw Document, FE=Filter Events.</p>
 	<li><cite><a href="fullwidthconversionstep.html">Full-Width Conversion</a></cite> 
 	(FE &gt; FE) 
 	- Converts to or from full-width characters</li>
-	<li><b><a href="generatesimpletmstep.html">Generate SimpelTM</a></b> (FE &gt; 
+	<li><b><a href="generatesimpletmstep.html">Generate SimpleTM</a></b> (FE &gt; 
 	FE) Creates a SimpleTM TM from the text units of a set of bilingual 
 	documents.</li>
 	<li><cite><a href="leveragingstep.html">Leveraging</a></cite> (FE &gt; FE) - 
@@ -52,10 +54,16 @@ takes and what type it sends. RD=Raw Document, FE=Filter Events.</p>
 	- Segments extracted text.</li>
 	<li><cite><a href="sentencealignerstep.html">Sentence Alignment</a></cite> 
 	(RD &gt; RD) - Align the sentences of the text units of two documents.</li>
+	<li><cite><a href="simpletm2tmxstep.html">SimpleTM to TMX</a></cite> (RD &gt; 
+	RD) - Converts a SimpleTM TM into a TMX document.</li>
 	<li><cite><a href="tmimportstep.html">TM Import</a></cite> (FE &gt; FE) - 
 	Imports text units into a Pensieve TM.</li>
+	<li><cite><a href="tokenizationstep.html">Tokenization</a></cite> (FE &gt; FE) 
+	- Tokenizes the text units content into different forms.</li>
 	<li><cite><a href="translationcomparisonstep.html">Translation Comparison</a></cite> 
 	(FE &gt; FE) - Compares the translations of the same entries between several files.</li>
+	<li><cite><a href="wordcountstep.html">Word Count</a></cite> (FE &gt; FE) - 
+	Perfoms word counts on text units.</li>
 </ul>
 <p>You may have additional steps available as plug-ins. For more information 
 about those steps, look in the <a href="../../dropins"><code>dropins</code> 

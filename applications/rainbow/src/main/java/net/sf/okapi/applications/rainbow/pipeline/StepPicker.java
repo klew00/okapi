@@ -20,10 +20,13 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
 import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
@@ -105,7 +108,7 @@ class StepPicker {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					//if ( help != null ) help.showTopic(this, "index", "inputDocProp.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					showStepHelp();
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -115,7 +118,8 @@ class StepPicker {
 			};
 		};
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE,
-			OKCancelActions, false); //TODO: Add help
+			OKCancelActions, true);
+		pnlActions.btHelp.setText("Step Help");
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		//gdTmp.horizontalSpan = 2;
 		pnlActions.setLayoutData(gdTmp);
@@ -127,6 +131,29 @@ class StepPicker {
 		Dialogs.centerWindow(shell, parent);
 	}
 
+	private void showStepHelp () {
+		try {
+			int n = lbUtilities.getSelectionIndex();
+			if ( n == -1 ) return;
+			StepInfo si = availableSteps.get(n);
+			IPipelineStep step;
+			if ( si.loader == null ) {
+				step = (IPipelineStep)Class.forName(si.stepClass).newInstance();
+			}
+			else {
+				step = (IPipelineStep)Class.forName(si.stepClass, true, si.loader).newInstance();
+			}
+			String path = Util.getClassLocation(step.getClass());
+			if ( Util.isEmpty(path) ) return; // No help available
+			path += File.separator + step.getHelpLocation() + File.separator;
+			n = si.stepClass.lastIndexOf('.');
+			Util.openURL(path+si.stepClass.substring(n+1).toLowerCase()+".html");
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}	
+	}
+	
 	private void updateStepDisplay () {
 		int n = lbUtilities.getSelectionIndex();
 		if ( n < 0 ) {

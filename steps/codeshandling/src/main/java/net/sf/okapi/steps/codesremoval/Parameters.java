@@ -112,7 +112,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(MODE, "What to remove", "Select what parts of the inline codes to remove");
 		desc.add(STRIPSOURCE, "Strip codes in the source text", null);
 		desc.add(STRIPTARGET, "Strip codes in the target text", null);
-		desc.add(INCLUDENONTRANSLATABLE, "Include non-translatable text units", null);
+		desc.add(INCLUDENONTRANSLATABLE, "Apply to non-translatable text units", null);
 		return desc;
 	}
 	
