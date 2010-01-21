@@ -53,13 +53,21 @@ public class RainbowTest {
 		javaRainbow = "java -jar " + libDir + "rainbow.jar";
 	}
 	
-    @Test
-    public void testRewriting () throws IOException, InterruptedException {
-    	// Delete previous output
-    	assertTrue(deleteOutputFile("potest.rbout.po"));
-    	assertEquals(0, runRainbow("-np -x oku_textrewriting potest.po -o potest.rbout.po -te windows-1252 -opt rewriting.opt"));
-    	assertTrue("File different from gold", compareWithGoldFile("potest.rbout.po"));
-    }
+   @Test
+   public void testRewriting () throws IOException, InterruptedException {
+   	// Delete previous output
+   	assertTrue(deleteOutputFile("potest.rbout.po"));
+   	assertEquals(0, runRainbow("-np -x oku_textrewriting potest.po -o potest.rbout.po -te windows-1252 -opt rewriting.opt"));
+   	assertTrue("File different from gold", compareWithGoldFile("potest.rbout.po"));
+   }
+
+   @Test
+   public void testPipeline01 () throws IOException, InterruptedException {
+   	// Delete previous output
+   	assertTrue(deleteOutputFile("pipelines/input01.out.html"));
+   	assertEquals(0, runRainbow("-np -p pipelines/test01.rnb -pln pipelines/test01.pln"));
+   	assertTrue("File different from gold", compareWithGoldFile("pipelines/input01.out.html"));
+   }
 
     private boolean compareWithGoldFile (String outputBase) {
     	String outputPath = root + File.separator + outputBase;

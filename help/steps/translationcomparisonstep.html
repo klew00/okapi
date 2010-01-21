@@ -32,8 +32,8 @@ Sends: Filter events</p>
 <p>The input is two or three documents, the first document contains the base 
 translations, the second one (and optionally the third one, contain the translations to compare to the base translations. The 
 input 
-documents <b>must have the same number of entries</b> and the <b>entries must be in the same 
-order</b>.</p>
+documents <b>must have the same number of text units</b> and the <b>text units must be in the same 
+order</b> (but you can have different events between text units).</p>
 <p>For each entry the step compares the translated texts and calculates a 
 score that measures how similar the text of the second document (and optionally 
 the third one) is to the 
@@ -45,7 +45,7 @@ and <a href="http://en.wikipedia.org/wiki/Levenshtein_distance">
 http://en.wikipedia.org/wiki/Levenshtein_distance</a>.</p>
 <p>The utility outputs an HTML document for each input documents. The HTML
 document lists the source text, the translation text and the resulting scores. You can also generate a 
-TMX documentcontaining the same information.</p>
+TMX document containing the same information.</p>
 <h2><a name="parameters"></a>Parameters</h2>
 <p><cite>Generate output tables in HTML</cite> -- Set this option to create one 
 HTML file for each input document, where the results of the comparisons 
