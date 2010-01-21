@@ -312,7 +312,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});			
 		
 		chkPlainText = new Button(mainComposite, SWT.CHECK);
-		chkPlainText.setText("Process the files as plain text (not using filters)");
+		chkPlainText.setText("Process the documents as plain text (not using filters)");
 		chkPlainText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
 		
 		chkRegEx = new Button(mainComposite, SWT.CHECK);

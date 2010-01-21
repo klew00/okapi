@@ -60,7 +60,9 @@ public interface IPipelineStep {
 	public String getDescription();
 
 	/**
-	 * Gets the relative directory location for the help of this step.
+	 * Gets the relative directory location for the help of this step. The main help file
+	 * for the step must be at that location and its name must be the name of the class
+	 * implementing the step in lowercase with a .html extension.
 	 * @return the relative directory location for the help of this step.
 	 */
 	public String getHelpLocation();
