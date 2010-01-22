@@ -33,13 +33,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	static final String PARTSCONFIGURATIONS = "partsConfigurations";
 	static final String PARTSNAMES = "partsNames";
-	static final String CONTENTID = "contentId";
 	static final String SOURCEID = "sourceId";
 	static final String LOCALEID = "localeId";
 	
 	private String partsConfigurations;
 	private String partsNames;
-	private String contentId;
 	private String sourceId;
 	private String localeId;
 
@@ -67,14 +65,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.partsConfigurations = partsConfigurations;
 	}
 	
-	public String getContentId () {
-		return contentId;
-	}
-
-	public void setContentId (String contentId) {
-		this.contentId = contentId;
-	}
-
 	public String getSourceId () {
 		return sourceId;
 	}
@@ -104,9 +94,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	@Override
 	public void reset () {
-		partsNames = "SMCCONTENT-TITLE, SMCCONTENT-ABSTRACT, SMCCONTENT-BODY";
-		partsConfigurations = "default, okf_html, okf_html";
-		contentId = "SMCCONTENT-CONTENT-ID";
+		partsNames = "SMCCONTENT-TITLE, SMCCONTENT-ABSTRACT, SMCCONTENT-BODY, SMCCONTENT-ALT, "
+			+ "SMCCHANNELDESCRIPTOR-TITLE, SMCCHANNELDESCRIPTOR-ABSTRACT, SMCCHANNELDESCRIPTOR-ALT, "
+			+ "SMCLINKCOLLECTIONS-LINKCOLLECTION-TITLE, SMCLINKCOLLECTIONS-LINKCOLLECTION-DESCRIPTION, "
+			+ "SMCLINKS-TITLE, SMCLINKS-ABSTRACT, SMCLINKS-BODY, SMCLINKS-ALT";
+		partsConfigurations = "default, okf_html, okf_html, default, "
+			+ "default, okf_html, default, "
+			+ "default, okf_html, "
+			+ "default, okf_html, okf_html, default";
 		sourceId = "SOURCE_ID";
 		localeId = "LOCALE_ID";
 	}
@@ -116,7 +111,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setString(PARTSNAMES, partsNames);
 		buffer.setString(PARTSCONFIGURATIONS, partsConfigurations);
-		buffer.setString(CONTENTID, contentId);
 		buffer.setString(SOURCEID, sourceId);
 		buffer.setString(LOCALEID, localeId);
 		return buffer.toString();
@@ -128,7 +122,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		partsNames = buffer.getString(PARTSNAMES, partsNames);
 		partsConfigurations = buffer.getString(PARTSCONFIGURATIONS, partsConfigurations);
-		contentId = buffer.getString(CONTENTID, contentId);
 		sourceId = buffer.getString(SOURCEID, sourceId);
 		localeId = buffer.getString(LOCALEID, localeId);
 	}
@@ -140,8 +133,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			"Comma-separated list of the names of the parts to extract.");
 		desc.add(PARTSCONFIGURATIONS, "Corresponding filter configurations (or 'default')",
 			"Comma-separated list of the filter configurations to use, use 'default' for none");
-		desc.add(CONTENTID, "Name of the content ID part",
-			"Name of the element containing the content ID");
 		desc.add(SOURCEID, "Name of the source ID part",
 			"Name of the element containing the source ID");
 		desc.add(LOCALEID, "Name of the locale ID part",
@@ -154,9 +145,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("Vignette Filter Parameters", true, false);
 		desc.addTextInputPart(paramDesc.get(Parameters.PARTSNAMES));
 		desc.addTextInputPart(paramDesc.get(Parameters.PARTSCONFIGURATIONS));
-		TextInputPart tip = desc.addTextInputPart(paramDesc.get(Parameters.CONTENTID));
-		tip.setVertical(false);
-		tip = desc.addTextInputPart(paramDesc.get(Parameters.SOURCEID));
+		TextInputPart tip = desc.addTextInputPart(paramDesc.get(Parameters.SOURCEID));
 		tip.setVertical(false);
 		tip = desc.addTextInputPart(paramDesc.get(Parameters.LOCALEID));
 		tip.setVertical(false);

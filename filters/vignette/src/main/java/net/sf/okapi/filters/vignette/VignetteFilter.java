@@ -368,16 +368,17 @@ public class VignetteFilter implements IFilter {
 		}
 	}
 
-	private void updateDocumentList (String contentId,
-		String sourceId,
+	private void updateDocumentList (String sourceId,
 		boolean isSource)
 	{
 		if ( !docs.containsKey(sourceId) ) {
 			docs.put(sourceId, new String[2]);
 		}
 		String[] data = docs.get(sourceId);
-		if ( isSource ) data[0] = contentId;
-		else data[1] = contentId;
+		// Source is at index 0, target at index 1
+		// We just place the sourceId there for both
+		if ( isSource ) data[0] = sourceId;
+		else data[1] = sourceId;
 	}
 
 	private void processBlock ()
@@ -433,14 +434,13 @@ public class VignetteFilter implements IFilter {
 			String content = inputText.substring(start, end);
 			Document doc = docBuilder.parse(new InputSource(new StringReader(content)));
 			
-			String contentId = null;
 			String sourceId = null;
 			String localeId = null;
 
 			// Get first 'contentInstance' element
 			NodeList nodes = doc.getElementsByTagName("contentInstance");
 			Element elem = (Element)nodes.item(0);
-			logger.info("Part: "+elem.getAttribute("vcmId"));
+			logger.info("contentInstance vcmId="+elem.getAttribute("vcmId"));
 			// Get all 'attribute' elements in 'contentInstance' 
 			nodes = elem.getElementsByTagName("attribute");
 
@@ -448,48 +448,45 @@ public class VignetteFilter implements IFilter {
 			for ( int i=0; i<nodes.getLength(); i++ ) {
 				elem = (Element)nodes.item(i);
 				String name = elem.getAttribute("name");
-				if ( name.equals(params.getContentId()) ) {
-					contentId = getValueString(elem);
-				}
-				else if ( name.equals(params.getLocaleId()) ) {
+				if ( name.equals(params.getLocaleId()) ) {
 					localeId = getValueString(elem);
 				}
 				else if ( name.equals(params.getSourceId()) ) {
 					sourceId = getValueString(elem);
 				}
-				if (( contentId != null ) && ( sourceId != null ) && ( localeId != null )) {
-					break;
+				if (( sourceId != null ) && ( localeId != null )) {
+					break; // We are done
 				}
 			}
 			
 			// Skip block, if not all info is available
-			if ( Util.isEmpty(contentId) || Util.isEmpty(localeId) 
-				|| Util.isEmpty(sourceId) ) {
-				// Warn on pre-processing, then treat as document part
+			if ( Util.isEmpty(localeId) || Util.isEmpty(sourceId) ) {
+				// Warn during pre-processing, then treat as document part
 				if ( preprocessing ) {
 					logger.warning(String.format(
-						"Entry with incomplete data at %s number %d\nlocale='%s' source ID='%s' content ID='%s'",
-						STARTBLOCK, counter, localeId, sourceId, contentId));
+						"Entry with incomplete data at %s number %d\nlocale='%s' sourceId='%s'",
+						STARTBLOCK, counter, localeId, sourceId));
 					return false;
 				}
 				else {
+					logger.warning("Missing data, this section is skipped.");
 					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
 					dp.setSkeleton(new GenericSkeleton(content.replace("\n", lineBreak)));
 					queue.add(new Event(EventType.DOCUMENT_PART, dp));
 					return true;
 				}
 			}
-			
+
 			if ( preprocessing ) {
 				if ( srcLoc.toPOSIXLocaleId().equals(localeId) ) {
 					// For a source block: update the list, store the data and move on
-					updateDocumentList(contentId, sourceId, true);
+					updateDocumentList(sourceId, true);
 					store.writeBlock(sourceId, content);
 					return false;
 				}
 				else if ( trgLoc.toPOSIXLocaleId().equals(localeId) ) {
 					// For a target block: update the list and skip
-					updateDocumentList(contentId, sourceId, false);
+					updateDocumentList(sourceId, false);
 					return false;
 				}
 				else {
@@ -516,6 +513,9 @@ public class VignetteFilter implements IFilter {
 					extract = false;
 				}
 				
+				logger.info(String.format("   LocaleId='%s', extract=%s, sourceId='%s'",
+					localeId, (extract ? "Yes" : "No"), sourceId));
+
 				// If we don't extract
 				if ( !extract ) {
 					// Just send as document part
@@ -532,7 +532,7 @@ public class VignetteFilter implements IFilter {
 			String tmp = findOriginalInStore(sourceId);
 			if ( tmp == null ) {
 				throw new OkapiIOException(String.format(
-					"Source ID not found ('%s').", sourceId));
+					"The sourceId attribute was not found ('%s').", sourceId));
 			}
 
 			// Parse the source content
