@@ -46,6 +46,20 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class XSLTransformStep extends BasePipelineStep {
 
+	private static final String FACTORY_PROP = "javax.xml.transform.TransformerFactory";
+	private static final String VAR_SRCLANG = "${srcLang}"; 
+	private static final String VAR_TRGLANG = "${trgLang}"; 
+	private static final String VAR_INPUTPATH = "${inputPath}"; 
+	private static final String VAR_INPUTURI = "${inputURI}"; 
+	private static final String VAR_OUTPUTPATH = "${outputPath}"; 
+	private static final String VAR_INPUTPATH1 = "${inputPath1}"; 
+	private static final String VAR_INPUTURI1 = "${inputURI1}"; 
+	private static final String VAR_OUTPUTPATH1 = "${outputPath1}"; 
+	private static final String VAR_INPUTPATH2 = "${inputPath2}"; 
+	private static final String VAR_INPUTURI2 = "${inputURI2}"; 
+	private static final String VAR_INPUTPATH3 = "${inputPath3}"; 
+	private static final String VAR_INPUTURI3 = "${inputURI3}"; 
+
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private Parameters params;
@@ -54,12 +68,15 @@ public class XSLTransformStep extends BasePipelineStep {
 	private Transformer trans;
 	private boolean isDone;
 	private URI outputURI;
-	private RawDocument input;
-	private RawDocument secondInput;
+	private RawDocument input1;
+	private RawDocument input2;
+	private RawDocument input3;
+	private String originalProcessor;
 	
 	public XSLTransformStep () {
 		params = new Parameters();
 		trans = null;
+		originalProcessor = System.getProperty(FACTORY_PROP);
 	}
 	
 	@Override
@@ -76,12 +93,17 @@ public class XSLTransformStep extends BasePipelineStep {
 	
 	@StepParameterMapping(parameterType = StepParameterType.INPUT_RAWDOC)
 	public void setInput (RawDocument input) {
-		this.input = input;
+		input1 = input;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.SECOND_INPUT_RAWDOC)
 	public void setSecondInput (RawDocument secondInput) {
-		this.secondInput = secondInput;
+		input2 = secondInput;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.THIRD_INPUT_RAWDOC)
+	public void setThirdInput (RawDocument thridInput) {
+		input3 = thridInput;
 	}
 	
 	public String getDescription () {
@@ -120,13 +142,25 @@ public class XSLTransformStep extends BasePipelineStep {
 				new File(params.xsltPath)); //TODO: .replace(VAR_PROJDIR, projectDir)));
 			
 			// Create an instance of TransformerFactory
-			javax.xml.transform.TransformerFactory fact =
-				javax.xml.transform.TransformerFactory.newInstance();
+			if ( params.useCustomTransformer ) {
+				System.setProperty(FACTORY_PROP, params.factoryClass);
+			}
+			javax.xml.transform.TransformerFactory fact
+				= javax.xml.transform.TransformerFactory.newInstance();
+
 			trans = fact.newTransformer(xsltInput);
+			logger.info("Factory used: " + fact.getClass().getCanonicalName());
+			logger.info("Transformer used: " + trans.getClass().getCanonicalName());
 			isDone = true;
 		}
 		catch ( TransformerConfigurationException e ) {
 			throw new OkapiIOException("Error in XSLT input.", e);
+		}
+		finally {
+			// Make sure to reset the original property
+			if ( params.useCustomTransformer ) {
+				System.setProperty(FACTORY_PROP, originalProcessor);
+			}
 		}
 	}
 	
@@ -191,29 +225,67 @@ public class XSLTransformStep extends BasePipelineStep {
 		String value = null;
 		try {
 			for ( String key : paramList.keySet() ) {
-				value = paramList.get(key).replace("${SrcLang}", input.getSourceLocale().toBCP47()); //$NON-NLS-1$
-				if ( value.indexOf("${Input1}") > -1 ) {
-					value = value.replace("${Input1}", input.getInputURI().toString()); //$NON-NLS-1$
+				// Try to find the replacement(s)
+				value = paramList.get(key).replace(VAR_SRCLANG, input1.getSourceLocale().getLanguage());
+				if ( value.indexOf(VAR_TRGLANG) > -1 ) {
+					value = value.replace(VAR_TRGLANG, input1.getTargetLocale().getLanguage());
 				}
-				if ( value.indexOf("${TrgLang}") > -1 ) {
-					value = value.replace("${TrgLang}", input.getTargetLocale().toBCP47()); //$NON-NLS-1$
+
+				if ( value.indexOf(VAR_INPUTPATH) > -1 ) {
+					value = value.replace(VAR_INPUTPATH, input1.getInputURI().getPath());
 				}
-				if ( value.indexOf("${Output1}") > -1 ) {
-					value = value.replace("${Output1}", outputURI.toString()); //$NON-NLS-1$
+				if ( value.indexOf(VAR_INPUTURI) > -1 ) {
+					value = value.replace(VAR_INPUTURI, input1.getInputURI().toString());
 				}
-				if ( value.indexOf("${Input2}") > -1 ) {
-					value = value.replace("${Input2}", secondInput.getInputURI().toString()); //$NON-NLS-1$
+				if ( value.indexOf(VAR_OUTPUTPATH) > -1 ) {
+					value = value.replace(VAR_OUTPUTPATH, outputURI.getPath());
 				}
-//				if ( value.indexOf("${Output2}") > -1 ) {
-//					value = value.replace("${Output2}", getContext().getOutputURI(1).toString()); //$NON-NLS-1$
-//				}
-//				if ( value.indexOf("${Input3}") > -1 ) {
-//					value = value.replace("${Input3}", getContext().getRawDocument(2).getInputURI().toString()); //$NON-NLS-1$
-//				}
-//				if ( value.indexOf("${Output3}") > -1 ) {
-//					value = value.replace("${Output3}", getContext().getOutputURI(2).toString()); //$NON-NLS-1$
-//				}
-				value = paramList.get(key);
+				
+				if ( value.indexOf(VAR_INPUTPATH1) > -1 ) { // Same as VAR_INPUTPATH
+					value = value.replace(VAR_INPUTPATH1, input1.getInputURI().getPath());
+				}
+				if ( value.indexOf(VAR_INPUTURI1) > -1 ) {
+					value = value.replace(VAR_INPUTURI1, input1.getInputURI().toString());
+				}
+				if ( value.indexOf(VAR_OUTPUTPATH1) > -1 ) { // Same as VAR_OUTPUTPATH
+					value = value.replace(VAR_OUTPUTPATH1, outputURI.getPath());
+				}
+				
+				if ( value.indexOf(VAR_INPUTPATH2) > -1 ) {
+					if ( input2 == null ) {
+						value = value.replace(VAR_INPUTPATH2, "null");
+					}
+					else {
+						value = value.replace(VAR_INPUTPATH2, input2.getInputURI().getPath());
+					}
+				}
+				if ( value.indexOf(VAR_INPUTURI2) > -1 ) {
+					if ( input2 == null ) {
+						value = value.replace(VAR_INPUTURI2, "null");
+					}
+					else {
+						value = value.replace(VAR_INPUTURI2, input2.getInputURI().toString());
+					}
+				}
+				
+				if ( value.indexOf(VAR_INPUTPATH3) > -1 ) {
+					if ( input3 == null ) {
+						value = value.replace(VAR_INPUTPATH3, "null");
+					}
+					else {
+						value = value.replace(VAR_INPUTPATH3, input3.getInputURI().getPath());
+					}
+				}
+				if ( value.indexOf(VAR_INPUTURI3) > -1 ) {
+					if ( input3 == null ) {
+						value = value.replace(VAR_INPUTURI3, "null");
+					}
+					else {
+						value = value.replace(VAR_INPUTURI3, input3.getInputURI().toString());
+					}
+				}
+				
+				// Assign the variable
 				trans.setParameter(key, value);
 			}
 		}

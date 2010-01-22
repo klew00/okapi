@@ -416,8 +416,9 @@ public class BatchTranslator {
 	private void runBatchTranslation () {
 		String cmd = params.getCommand();
 		try {
-			cmd = cmd.replace("${input}", htmlSourceFile.getPath());
-			cmd = cmd.replace("${output}", htmlTargetFile.getPath());
+			cmd = cmd.replace("${inputURI}", htmlSourceFile.toString());
+			cmd = cmd.replace("${inputPath}", htmlSourceFile.getPath());
+			cmd = cmd.replace("${outputPath}", htmlTargetFile.getPath());
 			
 			Locale loc = rawDoc.getSourceLocale().toJavaLocale();
 			cmd = cmd.replace("${srcLangName}", loc.getDisplayLanguage(Locale.ENGLISH));

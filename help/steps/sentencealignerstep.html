@@ -38,25 +38,20 @@ Guide</a></td>
 <p>This step aligns the sentences of each text unit from two documents.</p>
 <p>Takes: Filter events<span style="background-color: rgb(255, 255, 0);"></span><br>
 Sends: Because of a bug in the pipeline only the original events are
-sent, not the generated aligned TextUnits. <span
+sent, not the generated aligned text units. <span
  style="background-color: rgb(255, 255, 0);"></span>This will be fixed
 in a future version. <span style="font-weight: bold;">For this reason
-this step can only be used at the end of a pipeline (terminal step),</span><br>
-</p>
-TextUnits from the source and target documents must be perfectly
+this step can only be used at the end of a pipeline (terminal step),</span></p>
+Text units from the source and target documents must be perfectly
 synchronized (aligned). For example, if the source document has more
-TextUnits than the target document an error will be generated. The step
-segments both source and target TextUnits as they are processed using
+text units than the target document an error will be generated. The step
+segments both source and target text units as they are processed using
 an internal SRX file. In future versions the segmentation rules will be
-configurable. <br>
-<br>
-The aligner algorithm takes the sentences in the source and target
-TextUnits and finds the best possible alignment based on the character
-lengths of the sentences. Internal parameters take into account that
-some languages translate into fewer (or more) characters. Possible
-match types produced are: 1-1, 2-1, 1-2, 0-1, 1-0, 2-0, 2-3, 3-2
-etc.&nbsp; <br>
-<br>
+configurable.<p>The aligner algorithm takes the sentences in the source and 
+target TextUnits and finds the best possible alignment based on the character 
+lengths of the sentences. Internal parameters take into account that some 
+languages translate into fewer (or more) characters. Possible match types 
+produced are: 1-1, 2-1, 1-2, 0-1, 1-0, 2-0, 2-3, 3-2 etc.</p>
 <h2><a name="parameters"></a>Parameters</h2>
 <p><cite>TMX output path</cite> -- Enter the directory of the TMX
 document to generate. If the file already exists it will be overwritten.</p>

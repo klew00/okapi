@@ -45,8 +45,8 @@ allowing tools with limitation to translate very large documents.</p>
 rules if needed.</p>
 <h2><a name="parameters"></a>Parameters</h2>
 <p><cite>Command line</cite> -- Enter the command-line to use. The command line 
-must take the temporary HTML document named <code>${input}</code> and generate 
-an output document in the same format named <code>${output}</code>. You can use 
+must take the temporary HTML document named <code>${inputPath}</code> and generate 
+an output document in the same format named <code>${outputPath}</code>. You can use 
 the following variables in the command line:</p>
 <table border="1" cellspacing="0" cellpadding="4">
 	<tr>
@@ -55,12 +55,17 @@ the following variables in the command line:</p>
 		<th>Example</th>
 	</tr>
 	<tr>
-		<td><code>${input}</code></td>
+		<td><code>${inputPath}</code></td>
 		<td>The full path of the input document.</td>
 		<td>&nbsp;</td>
 	</tr>
 	<tr>
-		<td><code>${output}</code></td>
+		<td><code>${inputURI}</code></td>
+		<td>The URI of the input document</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><code>${outputPath}</code></td>
 		<td>The full path of the output document.</td>
 		<td>&nbsp;</td>
 	</tr>
@@ -87,10 +92,10 @@ the following variables in the command line:</p>
 </table>
 <p>Example 1: The following command-line uses the open-source Apertium program 
 under Linux to translate the temporary HTML document.</p>
-<pre>apertium -d /home/apmodes/apertium-${srcLang}-${trgLang} -f html ${srcLang}-${trgLang} ${input} ${output}</pre>
+<pre>apertium -d /home/apmodes/apertium-${srcLang}-${trgLang} -f html ${srcLang}-${trgLang} ${inputPath} ${outputPath}</pre>
 <p>Example 2: The following command-line uses the commercial ProMT application 
 under Windows to translate the temporary HTML document.</p>
-<pre>&quot;C:\Program Files\PRMT8\FILETRANS\FileTranslator.exe&quot; ${input} /as /ac /o:${output} /d:${srcLangName}-${trgLangName}</pre>
+<pre>&quot;C:\Program Files\PRMT8\FILETRANS\FileTranslator.exe&quot; ${inputPath} /as /ac /o:${outputPath} /d:${srcLangName}-${trgLangName}</pre>
 <p><cite>Block size</cite> -- Enter the maximum number of text units that should 
 be passed at the same time to the external tool. This allows you to process a 
 very large input document even with external tools that can only process small 

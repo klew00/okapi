@@ -26,7 +26,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import net.sf.okapi.steps.xsltransform.Parameters;
 
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.EditorFor;
@@ -40,6 +39,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.steps.xsltransform.Parameters;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -63,6 +63,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private boolean result = false;
 	private OKCancelPanel pnlActions;
 	private Parameters params;
+	private Button chkUseCustomTransformer;
+	private Text edFactoryClass;
 	private Text edXsltPath;
 	private Text edParameters;
 	private IHelp help;
@@ -223,6 +225,22 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 4;
 		edParameters.setLayoutData(gdTmp);
+		
+		chkUseCustomTransformer = new Button(mainComposite, SWT.CHECK);
+		chkUseCustomTransformer.setText(Res.getString("editor.useCustomTransformer")); //$NON-NLS-1$
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 4;
+		chkUseCustomTransformer.setLayoutData(gdTmp);
+		chkUseCustomTransformer.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
+			}
+		});
+		
+		edFactoryClass = new Text(mainComposite, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 4;
+		edFactoryClass.setLayoutData(gdTmp);
 	}
 	
 	private boolean showDialog () {
@@ -235,9 +253,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 
 	private void setData () {
+		chkUseCustomTransformer.setSelection(params.useCustomTransformer);
+		edFactoryClass.setText(params.factoryClass);
 		edXsltPath.setText(params.xsltPath);
 		ConfigurationString tmp = new ConfigurationString(params.paramList);
 		edParameters.setText(tmp.toString());
+		edFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
 	}
 
 	private boolean saveData () {
@@ -246,6 +267,19 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			edXsltPath.setFocus();
 			return false;
 		}
+		if ( chkUseCustomTransformer.getSelection() ) {
+			if ( edFactoryClass.getText().length() == 0 ) {
+				Dialogs.showError(shell, "You must specify a factory class.", null);
+				edFactoryClass.setFocus();
+				return false;
+			}
+		}
+
+		params.useCustomTransformer = chkUseCustomTransformer.getSelection();
+		if ( params.useCustomTransformer ) {
+			params.factoryClass = edFactoryClass.getText();
+		}
+
 		params.xsltPath = edXsltPath.getText();
 		ConfigurationString tmp = new ConfigurationString(edParameters.getText());
 		params.paramList = tmp.toString();
