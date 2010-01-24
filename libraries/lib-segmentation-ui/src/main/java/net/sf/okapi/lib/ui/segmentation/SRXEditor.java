@@ -359,6 +359,7 @@ public class SRXEditor {
 		
 		edSampleLanguage = new Text(cmpSample, SWT.BORDER | SWT.SINGLE);
 		gdTmp = new GridData();
+		gdTmp.widthHint = 40; // Make it wide enough for 3-letter codes
 		edSampleLanguage.setLayoutData(gdTmp);
 		edSampleLanguage.addModifyListener(new ModifyListener () {
 			public void modifyText(ModifyEvent e) {
