@@ -13,38 +13,43 @@
 	</tr>
 </table>
 
-<p>This dialog box allows you to create, modify and execute pipelines.</p>
-<p>For more detailed information about what pipelines are, see the
-<a href="../pipelines.html">Pipelines</a> section.</p>
+<p>This dialog box allows you to create, modify and execute pipelines. For more detailed information about what pipelines are, see the
+<a href="../pipelines.html">Pipelines section</a>.</p>
 <p>The top text field shows the name of the current pipeline. It is empty if the 
-pipeline is not saved.</p>
+pipeline is not saved to a pipeline file. Note that the last pipeline used is 
+always saved along with the current project file.</p>
 <p>The left-hand list is a list of all the steps that make up the current 
-pipeline. The steps are executes from top to botton in the order shown in this 
+pipeline. The steps are executed from top to botton, in the order shown in this 
 list.</p>
 <p>The right-hand panel shows the options associated with the step currently 
 selected in the left-hand list. Some steps may not have any option, in that case 
-the panel simply shows the message &quot;This step has no parameters&quot;.</p>
-<p>Step commands:</p>
-<p><cite>Add Step</cite> -- Click this button to add a new step in the current 
-pipeline. The Okapi distribution comes with a set of
+the panel simply shows the message &quot;<code>This step has no parameters</code>&quot;.</p>
+<p><cite>Add Step</cite> -- Click this button to add a new step at the end of the current 
+pipeline. You can move the new step anywhere in the list using the <cite>Move Up</cite> 
+and <cite>Move Down</cite> buttons. The Okapi distribution comes with a set of
 <a href="../../../steps/index.html">pre-existing steps you can use right out of 
 the box</a>, and you may have additional plugin steps as well.</p>
 <p><cite>Remove Step</cite> -- Click this button to remove the selected step 
 from the current pipeline.</p>
 <p><cite>Move Up</cite> -- Click this button to move the selected step upward 
-(the step executed first is the one at the top of the list).</p>
+(the step executed first is the one at the top of the list). In Rainbow the 
+first step of a pipeline should always be a step that takes a raw document as 
+input. the raw documents are provided from files listed in the <cite>
+<a href="../main.html#InputLists">Input List 1</a></cite>.</p>
 <p><cite>Move Down</cite> -- Click this button to move the selected step 
 downward (the step executed last is the one at the bottom of the list).</p>
-<p>Pipeline commands:</p>
-<p><cite>Load</cite> -- Click this button to load an existing pipeline.</p>
+<p><cite>Load</cite> -- Click this button to load an existing pipeline from a 
+pipeline file.</p>
 <p><cite>New</cite> -- Click this button to start a new pipeline.</p>
-<p><cite>Save</cite> -- Click this button to save the current pipeline. If the 
+<p><cite>Save</cite> -- Click this button to save the current pipeline to a 
+pipeline file. If the 
 current pipeline has no name yet, you will be prompted to provide a file name 
-and location.</p>
+and a location.</p>
 <p><cite>Save As</cite> -- Click this button to save the current pipeline under 
 a new file name or at a new location.</p>
-<p>Below the buttons a text field displays the description of the step currently 
-selected.</p>
+<p><cite>Step Help</cite> -- Click this button to open the help file for the 
+step currently selected. The text field after the button shows a short 
+description of that step.</p>
 <p>&nbsp;</p>
 </body>
 </html>

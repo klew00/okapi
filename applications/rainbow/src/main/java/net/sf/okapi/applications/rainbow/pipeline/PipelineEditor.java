@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
+import net.sf.okapi.applications.rainbow.MainForm;
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
@@ -51,6 +52,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -644,7 +646,9 @@ public class PipelineEditor {
 	private void save (String path) {
 		try {
 			if ( Util.isEmpty(path) ) {
-				path = Dialogs.browseFilenamesForSave(shell, "Save Pipeline As", null, null, null);
+				path = Dialogs.browseFilenamesForSave(shell, "Save Pipeline As", null,
+					"Pipeline Files (*.pln)\tAll Files (*.*)",
+					"*.pln\t*.*");
 				if ( path == null ) return;
 			}
 			if ( !saveData() ) return;
@@ -667,7 +671,11 @@ public class PipelineEditor {
 	private void load (String path) {
 		try {
 			if (( path == null ) || ( path.length() == 0 )) {
-				String[] paths = Dialogs.browseFilenames(shell, "Load Pipeline", false, null, null, null);
+				String[] paths = Dialogs.browseFilenames(shell,
+					"Load Pipeline",
+					false, null,
+					"Pipeline Files (*.pln)\tAll Files (*.*)",
+					"*.pln\t*.*");
 				if ( paths == null ) return;
 				else path = paths[0];
 			}
@@ -681,9 +689,20 @@ public class PipelineEditor {
 	}
 
 	private void newPipeline () {
+		// Ask confirmation to the user (if needed)
+		if ( lbSteps.getItemCount() > 0 ) {
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setText(MainForm.APPNAME);
+			dlg.setMessage("This command will delete all the steps in the current pipeline.\n"
+				+"Do you want to proceed?");
+			if ( dlg.open() != SWT.YES ) return;
+		}
+		
+		// Create the new pipeline
 		wrapper.setPath(null);
 		wrapper.clear();
 		setDataFromWrapper();
 		populate(-1);
 	}
+
 }

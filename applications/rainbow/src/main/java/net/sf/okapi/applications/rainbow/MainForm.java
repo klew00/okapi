@@ -110,13 +110,12 @@ import org.eclipse.swt.widgets.ToolItem;
 public class MainForm { //implements IParametersProvider {
 	
 	public static final String OPT_ALLOWDUPINPUT = "allowDupInput"; //$NON-NLS-1$
-	public static final String OPT_LOADMRU       = "loadMRU"; //$NON-NLS-1$
-	public static final String OPT_BOUNDS        = "bounds"; //$NON-NLS-1$
-	public static final String OPT_LOGLEVEL      = "logLevel"; //$NON-NLS-1$
+	public static final String OPT_LOADMRU = "loadMRU"; //$NON-NLS-1$
+	public static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
+	public static final String OPT_LOGLEVEL = "logLevel"; //$NON-NLS-1$
+	public static final String APPNAME = "Rainbow"; //$NON-NLS-1$
 	
-	protected static final String PRJPIPELINEID = "currentProjectPipeline";
-	
-	protected static final String APPNAME = "Rainbow"; //$NON-NLS-1$
+	protected static final String PRJPIPELINEID = "currentProjectPipeline"; //$NON-NLS-1$
 	protected static final String NOEXPAND_EXTENSIONS = ";.pentm;"; //$NON-NLS-1$
 
 	private int currentInput;
