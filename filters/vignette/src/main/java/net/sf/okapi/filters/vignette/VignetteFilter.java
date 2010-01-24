@@ -429,152 +429,181 @@ public class VignetteFilter implements IFilter {
 	private boolean processXMLBlock (int start,
 		int end)
 	{
+		boolean eventFound = false;
 		try {
 			// Parse the block into a DOM-tree
 			String content = inputText.substring(start, end);
 			Document doc = docBuilder.parse(new InputSource(new StringReader(content)));
 			
-			String sourceId = null;
-			String localeId = null;
-
 			// Get first 'contentInstance' element
 			NodeList nodes = doc.getElementsByTagName("contentInstance");
 			Element elem = (Element)nodes.item(0);
 			logger.info("contentInstance vcmId="+elem.getAttribute("vcmId"));
+
 			// Get all 'attribute' elements in 'contentInstance' 
-			nodes = elem.getElementsByTagName("attribute");
-
-			// Get info
-			for ( int i=0; i<nodes.getLength(); i++ ) {
-				elem = (Element)nodes.item(i);
-				String name = elem.getAttribute("name");
-				if ( name.equals(params.getLocaleId()) ) {
-					localeId = getValueString(elem);
-				}
-				else if ( name.equals(params.getSourceId()) ) {
-					sourceId = getValueString(elem);
-				}
-				if (( sourceId != null ) && ( localeId != null )) {
-					break; // We are done
-				}
-			}
+			if ( processList(elem, content) ) eventFound = true;
 			
-			// Skip block, if not all info is available
-			if ( Util.isEmpty(localeId) || Util.isEmpty(sourceId) ) {
-				// Warn during pre-processing, then treat as document part
-				if ( preprocessing ) {
-					logger.warning(String.format(
-						"Entry with incomplete data at %s number %d\nlocale='%s' sourceId='%s'",
-						STARTBLOCK, counter, localeId, sourceId));
-					return false;
-				}
-				else {
-					logger.warning("Missing data, this section is skipped.");
-					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
-					dp.setSkeleton(new GenericSkeleton(content.replace("\n", lineBreak)));
-					queue.add(new Event(EventType.DOCUMENT_PART, dp));
-					return true;
-				}
-			}
-
-			if ( preprocessing ) {
-				if ( srcLoc.toPOSIXLocaleId().equals(localeId) ) {
-					// For a source block: update the list, store the data and move on
-					updateDocumentList(sourceId, true);
-					store.writeBlock(sourceId, content);
-					return false;
-				}
-				else if ( trgLoc.toPOSIXLocaleId().equals(localeId) ) {
-					// For a target block: update the list and skip
-					updateDocumentList(sourceId, false);
-					return false;
-				}
-				else {
-					// For other locales, just skip them
-					return false;
-				}
-			}
-			else {
-				// Else, in extract mode: skip if not a target block
-				boolean extract = true;
-				if ( trgLoc.toPOSIXLocaleId().equals(localeId) ) {
-					// If it's a target
-					// Find its corresponding entry in the store
-					String[] data = docs.get(sourceId);
-					if ( data == null ) {
-						extract = false;
-					}
-					else if ( Util.isEmpty(data[0]) ) {
-						// No corresponding source was detected
-						extract = false;
-					}
-				}
-				else { // Not a target: skip
-					extract = false;
-				}
-				
-				logger.info(String.format("   LocaleId='%s', extract=%s, sourceId='%s'",
-					localeId, (extract ? "Yes" : "No"), sourceId));
-
-				// If we don't extract
-				if ( !extract ) {
-					// Just send as document part
-					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
-					dp.setSkeleton(new GenericSkeleton(content.replace("\n", lineBreak)));
-					queue.add(new Event(EventType.DOCUMENT_PART, dp));
-					return true;
-				}
-				// Else: extract
-			}
-			
-			// Find its corresponding entry in the store
-			// Parse the block into a DOM-tree
-			String tmp = findOriginalInStore(sourceId);
-			if ( tmp == null ) {
-				throw new OkapiIOException(String.format(
-					"The sourceId attribute was not found ('%s').", sourceId));
-			}
-
-			// Parse the source content
-			Document oriDoc = docBuilder.parse(new InputSource(new StringReader(tmp)));
-			// Get first 'contentInstance' element
-			NodeList oriNodes = oriDoc.getElementsByTagName("contentInstance");
-			elem = (Element)oriNodes.item(0);
-			// Get all 'attribute' elements in 'contentInstance' 
-			oriNodes = elem.getElementsByTagName("attribute");
-			
-			int last = 0;
-			int[] pos;
-
-			// Start of sub-document
-			StartSubDocument ssd = new StartSubDocument(String.valueOf(++subDocId));
-			ssd.setName(sourceId);
-			queue.add(new Event(EventType.START_SUBDOCUMENT, ssd));
-			
-			for ( int j=0; j<partsNames.length; j++ ) {
-				String data = getContent(oriNodes, partsNames[j]);
-				if ( Util.isEmpty(data) ) continue;
-				// Get the range of the content in the target block
-				pos = getRange(content, last, partsNames[j]);
-				// Create the document part skeleton for the data before
-				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
-				dp.setSkeleton(new GenericSkeleton(content.substring(last, pos[0]).replace("\n", lineBreak)));
-				queue.add(new Event(EventType.DOCUMENT_PART, dp));
-				last = pos[1]; // For next part
-				// Create the event from the original block
-				processContent(data, partsNames[j], partsConfigurations[j]);
-			}
-			
-			// End of group, and attached the skeleton for the end too
-			Ending ending = new Ending(String.valueOf(++otherId));
-			ending.setSkeleton(new GenericSkeleton(content.substring(last).replace("\n", lineBreak)));			
-			queue.add(new Event(EventType.END_SUBDOCUMENT, ending));
-			return true;
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException(
 				String.format("XML parsing error in block starting at character %d.", start), e);
 		}
+		return eventFound;
+	}
+	
+	private boolean processList (Element elem,
+		String content) throws SAXException, IOException
+	{
+		String sourceId = null;
+		String localeId = null;
+
+		// Get all 'attribute' elements in 'contentInstance' 
+		NodeList nodes = elem.getElementsByTagName("attribute");
+		// Get info
+		for ( int i=0; i<nodes.getLength(); i++ ) {
+			elem = (Element)nodes.item(i);
+			String name = elem.getAttribute("name");
+			if ( name.equals(params.getLocaleId()) ) {
+				localeId = getValueString(elem);
+			}
+			else if ( name.equals(params.getSourceId()) ) {
+				sourceId = getValueString(elem);
+			}
+			if (( sourceId != null ) && ( localeId != null )) {
+				break; // We are done
+			}
+		}
+		
+		// Skip block, if not all info is available
+		if ( Util.isEmpty(localeId) || Util.isEmpty(sourceId) ) {
+			// Warn during pre-processing, then treat as document part
+			if ( preprocessing ) {
+				logger.warning(String.format(
+					"Entry with incomplete data at %s number %d\nlocale='%s' sourceId='%s'",
+					STARTBLOCK, counter, localeId, sourceId));
+				return false;
+			}
+			else {
+				logger.warning("Missing data, this section is skipped.");
+				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+				dp.setSkeleton(new GenericSkeleton(content.replace("\n", lineBreak)));
+				queue.add(new Event(EventType.DOCUMENT_PART, dp));
+				return true;
+			}
+		}
+
+		if ( preprocessing ) {
+			if ( srcLoc.toPOSIXLocaleId().equals(localeId) ) {
+				// For a source block: update the list, store the data and move on
+				updateDocumentList(sourceId, true);
+				store.writeBlock(sourceId, content);
+				return false;
+			}
+			else if ( trgLoc.toPOSIXLocaleId().equals(localeId) ) {
+				// For a target block: update the list and skip
+				updateDocumentList(sourceId, false);
+				return false;
+			}
+			else {
+				// For other locales, just skip them
+				return false;
+			}
+		}
+		else {
+			// Else, in extract mode: skip if not a target block
+			boolean extract = true;
+			if ( trgLoc.toPOSIXLocaleId().equals(localeId) ) {
+				// If it's a target
+				// Find its corresponding entry in the store
+				String[] data = docs.get(sourceId);
+				if ( data == null ) {
+					extract = false;
+				}
+				else if ( Util.isEmpty(data[0]) ) {
+					// No corresponding source was detected
+					extract = false;
+				}
+			}
+			else { // Not a target: skip
+				extract = false;
+			}
+			
+			logger.info(String.format("   LocaleId='%s', extract=%s, sourceId='%s'",
+				localeId, (extract ? "Yes" : "No"), sourceId));
+
+			// If we don't extract
+			if ( !extract ) {
+				// Just send as document part
+				DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+				dp.setSkeleton(new GenericSkeleton(content.replace("\n", lineBreak)));
+				queue.add(new Event(EventType.DOCUMENT_PART, dp));
+				return true;
+			}
+			// Else: extract
+		}
+		
+		// Find its corresponding entry in the store
+		// Parse the block into a DOM-tree
+		String tmp = findOriginalInStore(sourceId);
+		if ( tmp == null ) {
+			throw new OkapiIOException(String.format(
+				"The sourceId attribute was not found ('%s').", sourceId));
+		}
+
+		// Parse the source content
+		Document oriDoc = docBuilder.parse(new InputSource(new StringReader(tmp)));
+		// Get first 'contentInstance' element
+		NodeList oriNodes = oriDoc.getElementsByTagName("contentInstance");
+		elem = (Element)oriNodes.item(0);
+
+		// Get all 'attribute' elements in 'contentInstance' 
+		oriNodes = elem.getElementsByTagName("attribute");
+
+		int last = 0;
+		int[] pos;
+
+		// Start of sub-document
+		StartSubDocument ssd = new StartSubDocument(String.valueOf(++subDocId));
+		ssd.setName(sourceId);
+		queue.add(new Event(EventType.START_SUBDOCUMENT, ssd));
+		
+		for ( int i=0; i<oriNodes.getLength(); i++ ) {
+			Element tmpElem = (Element)oriNodes.item(i);
+			String name = tmpElem.getAttribute("name");
+			
+			// See if the name is in the list of the parts to extract
+			//TODO: We could have a faster way to detect if the name is listed and get j
+			boolean found = false;
+			int j;
+			for ( j=0; j<partsNames.length; j++ ) {
+				if ( name.equals(partsNames[j]) ) {
+					found = true;
+					break;
+				}
+			}
+			if ( !found ) continue; // Not an attribute element to extract
+			
+			tmpElem = getFirstElement(tmpElem);
+			String data = tmpElem.getTextContent();
+			if ( Util.isEmpty(data) ) continue;
+			
+			// Get the range of the content in the target block
+			pos = getRange(content, last, partsNames[j]);
+			// Create the document part skeleton for the data before
+			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+			dp.setSkeleton(new GenericSkeleton(content.substring(last, pos[0]).replace("\n", lineBreak)));
+			queue.add(new Event(EventType.DOCUMENT_PART, dp));
+			last = pos[1]; // For next part
+			// Create the event from the original block
+			processContent(data, partsNames[j], partsConfigurations[j]);
+
+		}
+		
+		// End of group, and attached the skeleton for the end too
+		Ending ending = new Ending(String.valueOf(++otherId));
+		ending.setSkeleton(new GenericSkeleton(content.substring(last).replace("\n", lineBreak)));			
+		queue.add(new Event(EventType.END_SUBDOCUMENT, ending));
+		return true;
 	}
 
 	private String findOriginalInStore (String sourceId) {
@@ -609,19 +638,19 @@ public class VignetteFilter implements IFilter {
 		}
 	}
 	
-	private String getContent (NodeList nodes,
-		String partName)
-	{
-		for ( int i=0; i<nodes.getLength(); i++ ) {
-			Element elem = (Element)nodes.item(i);
-			String name = elem.getAttribute("name");
-			if ( name.equals(partName) ) {
-				elem = getFirstElement(elem);
-				return elem.getTextContent();
-			}
-		}
-		return null;
-	}
+//	private String getContent (NodeList nodes,
+//		String partName)
+//	{
+//		for ( int i=0; i<nodes.getLength(); i++ ) {
+//			Element elem = (Element)nodes.item(i);
+//			String name = elem.getAttribute("name");
+//			if ( name.equals(partName) ) {
+//				elem = getFirstElement(elem);
+//				return elem.getTextContent();
+//			}
+//		}
+//		return null;
+//	}
 	
 	// Returns from start of attribute element for the given part name,
 	// 0=start of the attribute element

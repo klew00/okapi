@@ -37,17 +37,17 @@ Guide</a></td>
 <h2><a name="overview"></a>Overview</h2>
 <p>This step aligns the sentences of each text unit from two documents.</p>
 <p>Takes: Filter events<span style="background-color: rgb(255, 255, 0);"></span><br>
-Sends: Because of a bug in the pipeline only the original events are
-sent, not the generated aligned text units. <span
- style="background-color: rgb(255, 255, 0);"></span>This will be fixed
-in a future version. <span style="font-weight: bold;">For this reason
-this step can only be used at the end of a pipeline (terminal step),</span></p>
-Text units from the source and target documents must be perfectly
+Sends: Filter events</p>
+<p>Currently the events sends by this step are the same as the events it 
+received (and not the generated aligned text units). This will be implemented in 
+a future version.</p>
+<p>Text units from the source and target documents must be perfectly
 synchronized (aligned). For example, if the source document has more
 text units than the target document an error will be generated. The step
 segments both source and target text units as they are processed using
 an internal SRX file. In future versions the segmentation rules will be
-configurable.<p>The aligner algorithm takes the sentences in the source and 
+configurable.</p>
+<p>The aligner algorithm takes the sentences in the source and 
 target TextUnits and finds the best possible alignment based on the character 
 lengths of the sentences. Internal parameters take into account that some 
 languages translate into fewer (or more) characters. Possible match types 
