@@ -35,12 +35,12 @@ public class PropertyTextUnitPlaceholder implements
 	 * Constructor for {@link Property} only. All offsets are the same, useful
 	 * for creating placeholders for read-only {@link Property}s
 	 * 
-	 * @param type
-	 *            - a {@link PlaceholderAccessType}
+	 * @param accessType
+	 *            a {@link PlaceholderAccessType}
 	 * @param name
-	 *            - attribute name
+	 *            attribute name
 	 * @param value
-	 *            - attribute value
+	 *            attribute value
 	 */
 	public PropertyTextUnitPlaceholder(PlaceholderAccessType accessType, String name,
 			String value) {
@@ -52,16 +52,16 @@ public class PropertyTextUnitPlaceholder implements
 	 * offsets. This is useful for cases where values are not delimited by any
 	 * formatting
 	 * 
-	 * @param type
-	 *            - a {@link PlaceholderAccessType}
+	 * @param accessType
+	 *            a {@link PlaceholderAccessType}
 	 * @param name
-	 *            - attribute name
+	 *            attribute name
 	 * @param value
-	 *            - attribute value
+	 *            attribute value
 	 * @param valueStartPos
-	 *            - start offset of the value
+	 *            start offset of the value
 	 * @param valueEndPos
-	 *            - ending offset of the value
+	 *            ending offset of the value
 	 */
 	public PropertyTextUnitPlaceholder(PlaceholderAccessType accessType, String name,
 			String value, int valueStartPos, int valueEndPos) {
@@ -74,20 +74,20 @@ public class PropertyTextUnitPlaceholder implements
 	 * by formatting (i.e., name="value"). The offset 'n' in name is the
 	 * mainStartPos, the offset 'v' in value is the valueStartPos.
 	 * 
-	 * @param type
-	 *            - a {@link PlaceholderAccessType}
+	 * @param accessType
+	 *            a {@link PlaceholderAccessType}
 	 * @param name
-	 *            - attribute name
+	 *            attribute name
 	 * @param value
-	 *            - attribute value
+	 *            attribute value
 	 * @param mainStartPos
-	 *            - start offset of the value delimiter
+	 *            start offset of the value delimiter
 	 * @param mainEndPos
-	 *            - end offset of the entire attribute
+	 *            end offset of the entire attribute
 	 * @param valueStartPos
-	 *            - start offset of the value
+	 *            start offset of the value
 	 * @param valueEndPos
-	 *            - ending offset of the value
+	 *            ending offset of the value
 	 */
 	public PropertyTextUnitPlaceholder(PlaceholderAccessType accessType, String name,
 			String value, int mainStartPos, int mainEndPos, int valueStartPos,
@@ -114,7 +114,7 @@ public class PropertyTextUnitPlaceholder implements
 	 * Set the {@link PlaceholderAccessType}
 	 * 
 	 * @param type
-	 *            - the type, one of TRANSLATABLE, READ_ONLY_PROPERTY,
+	 *            the type, one of TRANSLATABLE, READ_ONLY_PROPERTY,
 	 *            WRITABLE_PROPERTY
 	 */
 	public void setAccessType(PlaceholderAccessType accessType) {
@@ -134,7 +134,7 @@ public class PropertyTextUnitPlaceholder implements
 	 * Set the offset to the beginning of the attribute.
 	 * 
 	 * @param mainStartPos
-	 *            - the offset as int
+	 *            the offset as integer
 	 */
 	public void setMainStartPos(int mainStartPos) {
 		this.mainStartPos = mainStartPos;
@@ -143,7 +143,7 @@ public class PropertyTextUnitPlaceholder implements
 	/**
 	 * Get the ending offset of the attribute
 	 * 
-	 * @return offset as int
+	 * @return offset as integer
 	 */
 	public int getMainEndPos() {
 		return mainEndPos;
@@ -153,7 +153,7 @@ public class PropertyTextUnitPlaceholder implements
 	 * Set the ending offset of the attribute
 	 * 
 	 * @param mainEndPos
-	 *            - the ending offset as an int
+	 *            the ending offset as an integer
 	 */
 	public void setMainEndPos(int mainEndPos) {
 		this.mainEndPos = mainEndPos;
@@ -163,7 +163,7 @@ public class PropertyTextUnitPlaceholder implements
 	 * Set the attribute name
 	 * 
 	 * @param name
-	 *            - the attribute name
+	 *            the attribute name
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -182,7 +182,7 @@ public class PropertyTextUnitPlaceholder implements
 	 * Set the attribute value
 	 * 
 	 * @param value
-	 *            - the attribute value
+	 *            the attribute value
 	 */
 	public void setValue(String value) {
 		this.value = value;
@@ -210,7 +210,7 @@ public class PropertyTextUnitPlaceholder implements
 	 * Set the starting offset of the attribute value.
 	 * 
 	 * @param valueStartPos
-	 *            - the start offset as int
+	 *            the start offset as int
 	 */
 	public void setValueStartPos(int valueStartPos) {
 		this.valueStartPos = valueStartPos;
@@ -229,7 +229,7 @@ public class PropertyTextUnitPlaceholder implements
 	 * Set the ending offset of the attribute value
 	 * 
 	 * @param valueEndPos
-	 *            - the ending offset as int
+	 *            the ending offset as int
 	 */
 	public void setValueEndPos(int valueEndPos) {
 		this.valueEndPos = valueEndPos;
@@ -269,7 +269,7 @@ public class PropertyTextUnitPlaceholder implements
 	 * input
 	 * 
 	 * @param aThat
-	 *            - the {@link PropertyTextUnitPlaceholder} used to compare to
+	 *            the {@link PropertyTextUnitPlaceholder} used to compare to
 	 *            this object
 	 */
 	public int compareTo(PropertyTextUnitPlaceholder aThat) {
@@ -296,7 +296,7 @@ public class PropertyTextUnitPlaceholder implements
 	 * attribute.
 	 * 
 	 * @param aThat
-	 *            - the {@link PropertyTextUnitPlaceholder} that is compared to
+	 *            the {@link PropertyTextUnitPlaceholder} that is compared to
 	 *            this object
 	 */
 	@Override

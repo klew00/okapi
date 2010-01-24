@@ -1026,7 +1026,8 @@ public class Util {
 	/**
 	 * Returns true if a given index is within the array bounds.
 	 * @param index the given index.
-	 * @param list the given list.
+	 * @param array the given list.
+	 * @return true if a given index is within the array bounds.
 	 */
 	public static <T> boolean checkIndex(int index, T[] array) {
 		return (array != null) && (index >= 0) && (index < array.length);

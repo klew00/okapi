@@ -54,6 +54,12 @@ have no <code>importContentInstance</code> for the source will not be extracted,
 and will be listed as warning.</p>
 <p>The relationship between the source and the target <code>importContentInstance</code> 
 blocks is done with the source ID: both block must have the same.</p>
+<h3>Known Issues</h3>
+<p>Currently an XLIFF document generated using this filter is likely to be 
+technically invalid because it contains duplicated values for <code>&lt;trans-unit&gt;</code>
+<code>id</code> attributes. This will be fixed in upcoming update, and does not 
+prevent opening the document in most XLIFF editors, or merging bcak the data 
+into Vignette&#39;s export/import file format.</p>
 <h2><a name="parameters"></a>Parameters</h2>
 <p><cite>Names of the parts to extract</cite> -- Enter the list of the values 
 for the name of the entries to extract. The list must be comma-separated.</p>

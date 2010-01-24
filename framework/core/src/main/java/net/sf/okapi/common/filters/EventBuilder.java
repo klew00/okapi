@@ -219,9 +219,9 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Is the current buffered {@link Event} a {@link Group}?
+	 * Is the current buffered {@link Event} a {@link StartGroup}?
 	 * 
-	 * @return true, if current {@link Event} is a {@link Group}
+	 * @return true, if current {@link Event} is a {@link StartGroup}
 	 */
 	public boolean isCurrentGroup() {
 		Event e = peekTempEvent();
@@ -267,7 +267,7 @@ public class EventBuilder {
 	}
 
 	/**
-	 * Peek at the most recently created {@link Group}.
+	 * Peek at the most recently created {@link StartGroup}.
 	 * 
 	 * @return the filter event
 	 */
@@ -855,7 +855,7 @@ public class EventBuilder {
 	 * Create a {@link StartGroup} {@link Event} and add it to the event queue.
 	 * 
 	 * @param startMarker
-	 *            the tag which starts the {@link Group}
+	 *            the tag which starts the group
 	 * @param commonTagType
 	 *            the tag name or abstract type for this group.
 	 */
@@ -867,7 +867,7 @@ public class EventBuilder {
 	 * Create a {@link StartGroup} {@link Event} and add it to the event queue.
 	 * 
 	 * @param startMarker
-	 *            the tag which starts the {@link Group}
+	 *            the tag which starts the group.
 	 * @param commonTagType
 	 *            the tag name or abstract type for this group.
 	 * @param locale
@@ -921,7 +921,7 @@ public class EventBuilder {
 	 * Create a {@link Ending} {@link Event} of type END_GROUP and add it to the event queue.
 	 * 
 	 * @param endMarker
-	 *            the tags that ends the {@link Group}
+	 *            the tags that ends the group.
 	 */
 	public void endGroup(GenericSkeleton endMarker) {
 		endGroup(endMarker, null, null);
@@ -931,7 +931,7 @@ public class EventBuilder {
 	 * Create a {@link Ending} {@link Event} of type END_GROUP and add it to the event queue.
 	 * 
 	 * @param endMarker
-	 *            the tags that ends the {@link Group}
+	 *            the tags that ends the group.
 	 * @param locale
 	 *            the language of any actionable items
 	 * @param propertyTextUnitPlaceholders

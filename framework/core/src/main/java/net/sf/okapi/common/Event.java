@@ -134,9 +134,9 @@ public class Event {
 	}
 
 	/**
-	 * Convenience method to tell if this Event carries a {@link Group} {@link Ending}
+	 * Convenience method to tell if this Event carries a group {@link Ending}
 	 * 
-	 * @return true if {@link Group} {@link Ending}, false otherwise
+	 * @return true if group {@link Ending}, false otherwise
 	 */
 	public boolean isEndGroup () {
 		return (filterEventType == EventType.END_GROUP);
