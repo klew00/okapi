@@ -44,6 +44,7 @@
         <module>xsltransform-ui</module>
         <module>codeshandling</module>
         <module>sentence-aligner</module>
+        <module>xliffkit</module>
     </modules>
 
     <build>
