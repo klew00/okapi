@@ -30,6 +30,7 @@ import net.sf.okapi.common.ParameterDescriptor;
  * <p>Use {@link #setPassword(boolean)} to specify if the text should be treated
  * as a password text (e.g. hidden on input). By default the text is not treated
  * as a password.
+ * <p>Use {@link #setHeight(int) to specify a height for the field (-1 sets the default).
  */
 public class TextInputPart extends AbstractPart {
 
@@ -37,7 +38,8 @@ public class TextInputPart extends AbstractPart {
 	private boolean password = false;
 	private int minimumValue = Integer.MIN_VALUE;
 	private int maximumValue = Integer.MAX_VALUE;
-
+	private int height = -1;
+	
 	/**
 	 * Creates a new TextInputPart object with a given parameter descriptor.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
@@ -127,5 +129,21 @@ public class TextInputPart extends AbstractPart {
 		}
 		this.maximumValue = maximumValue;
 	}
-	
+
+	/**
+	 * Gets the suggested height of this part (-1 for default)
+	 * @return the suggested height of this part or -1 for default.
+	 */
+	public int getHeight () {
+		return height;
+	}
+
+	/**
+	 * Sets the suggested height of this part (-1 for default)
+	 * @param height the suggested height of this part (use -1 for default)
+	 */
+	public void setHeight (int height) {
+		this.height = height;
+	}
+
 }

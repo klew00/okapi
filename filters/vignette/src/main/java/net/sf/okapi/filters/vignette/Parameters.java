@@ -143,12 +143,19 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("Vignette Filter Parameters", true, false);
-		desc.addTextInputPart(paramDesc.get(Parameters.PARTSNAMES));
-		desc.addTextInputPart(paramDesc.get(Parameters.PARTSCONFIGURATIONS));
-		TextInputPart tip = desc.addTextInputPart(paramDesc.get(Parameters.SOURCEID));
+		
+		TextInputPart tip = desc.addTextInputPart(paramDesc.get(Parameters.PARTSNAMES));
+		tip.setHeight(60);
+		
+		tip = desc.addTextInputPart(paramDesc.get(Parameters.PARTSCONFIGURATIONS));
+		tip.setHeight(60);
+		
+		tip = desc.addTextInputPart(paramDesc.get(Parameters.SOURCEID));
 		tip.setVertical(false);
+		
 		tip = desc.addTextInputPart(paramDesc.get(Parameters.LOCALEID));
 		tip.setVertical(false);
+		
 		return desc;
 	}
 	

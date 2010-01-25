@@ -201,9 +201,17 @@ public class GenericEditor {
 				TextInputPart d = (TextInputPart)part;
 				cmp = lookupParent(d.getContainer());
 				if ( d.isWithLabel() ) setLabel(cmp, d, 0);
-				Text text = new Text(cmp, SWT.BORDER);
+				Text text;
+				if ( d.getHeight() > -1 ) {
+					text = new Text(cmp, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+					gdTmp = new GridData(GridData.FILL_BOTH);
+					gdTmp.heightHint = d.getHeight();
+				}
+				else {
+					text = new Text(cmp, SWT.BORDER);
+					gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+				}
 				controls.put(d.getName(), text);
-				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 				if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
 				text.setLayoutData(gdTmp);
 				text.setEditable(d.getWriteMethod()!=null);
