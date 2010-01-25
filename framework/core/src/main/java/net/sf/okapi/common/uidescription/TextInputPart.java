@@ -30,7 +30,7 @@ import net.sf.okapi.common.ParameterDescriptor;
  * <p>Use {@link #setPassword(boolean)} to specify if the text should be treated
  * as a password text (e.g. hidden on input). By default the text is not treated
  * as a password.
- * <p>Use {@link #setHeight(int) to specify a height for the field (-1 sets the default).
+ * <p>Use {@link #setHeight(int)} to specify a height for the field (-1 sets the default).
  */
 public class TextInputPart extends AbstractPart {
 

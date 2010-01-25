@@ -113,7 +113,7 @@ public class PropertyTextUnitPlaceholder implements
 	/**
 	 * Set the {@link PlaceholderAccessType}
 	 * 
-	 * @param type
+	 * @param accessType
 	 *            the type, one of TRANSLATABLE, READ_ONLY_PROPERTY,
 	 *            WRITABLE_PROPERTY
 	 */
