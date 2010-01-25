@@ -66,8 +66,8 @@
 </trans-unit>
 <trans-unit id="tu12" xml:space="preserve">
 <source xml:lang="en">This paragraph has some <g id="1">bold</g>, <g id="2">itaclics</g>, and <g id="3">underlined</g> text. And here are a lot more different types of formatting: <g id="4">Font </g><g id="5">type</g><g id="6">, and size</g>, and <g id="7">ｏｔｈｅｒ　ｄｅｃｏｒａｔｉｏｎｓ</g>.</source>
-<seg-source><mrk mid="0" mtype="seg">This paragraph has some <g id="1">bold</g>, <g id="2">itaclics</g>, and <g id="3">underlined</g> text.</mrk> <mrk mid="1" mtype="seg">And here are a lot more different types of formatting: <g id="4">Font </g><g id="5">type</g><g id="6">, and size</g>, and <g id="7">ｏｔｈｅｒ　ｄｅｃｏｒａｔｉｏｎｓ</g>.</mrk></seg-source>
-<target xml:lang="fr"><mrk mid="0" mtype="seg">This paragraph has some <g id="1">bold</g>, <g id="2">itaclics</g>, and <g id="3">underlined</g> text.</mrk> <mrk mid="1" mtype="seg">And here are a lot more different types of formatting: <g id="4">Font </g><g id="5">type</g><g id="6">, and size</g>, and <g id="7">ｏｔｈｅｒ　ｄｅｃｏｒａｔｉｏｎｓ</g>.</mrk></target>
+<seg-source><mrk mid="0" mtype="seg">This paragraph has some <g id="1">bold</g>, <g id="2">itaclics</g>, and <g id="3">underlined</g> text.</mrk> <mrk mid="1" mtype="seg">And here are a lot more different types of formatting:</mrk> <mrk mid="2" mtype="seg"><g id="4">Font </g><g id="5">type</g><g id="6">, and size</g>, and <g id="7">ｏｔｈｅｒ　ｄｅｃｏｒａｔｉｏｎｓ</g>.</mrk></seg-source>
+<target xml:lang="fr"><mrk mid="0" mtype="seg">This paragraph has some <g id="1">bold</g>, <g id="2">itaclics</g>, and <g id="3">underlined</g> text.</mrk> <mrk mid="1" mtype="seg">And here are a lot more different types of formatting:</mrk> <mrk mid="2" mtype="seg"><g id="4">Font </g><g id="5">type</g><g id="6">, and size</g>, and <g id="7">ｏｔｈｅｒ　ｄｅｃｏｒａｔｉｏｎｓ</g>.</mrk></target>
 </trans-unit>
 <trans-unit id="tu13" xml:space="preserve">
 <source xml:lang="en">There is a footnote here<x id="1"/>. And some <x id="2"/>comments<x id="3"/><x id="4"/>.</source>
