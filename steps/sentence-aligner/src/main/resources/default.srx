@@ -53,7 +53,7 @@
 			
 			<languagerule languagerulename="khmer">
 				<rule break="yes">					
-					<beforebreak>[\u17D4]</beforebreak>
+					<beforebreak>[\u17D4\u17D5]</beforebreak>
 					<afterbreak>\s+</afterbreak>
 				</rule>
 			</languagerule>
@@ -68,7 +68,7 @@
 				languagerulename="cjk"></languagemap>
 			<languagemap languagepattern="[Tt][Hh].*"
 				languagerulename="thai"></languagemap>
-			<languagemap languagepattern="[Kk][Hh][Mm].*"
+			<languagemap languagepattern="[Kk]([Hh]?)[Mm].*"
 				languagerulename="khmer"></languagemap>
 			<languagemap languagepattern=".*" languagerulename="default"></languagemap>
 		</maprules>
