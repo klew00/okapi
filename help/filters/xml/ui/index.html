@@ -145,13 +145,13 @@ hard-coded text. Any of the String functions offered by XPath can be used.</p>
 the <code>name</code> attribute in their parent element. To make sure you have a 
 unique identifier for both the content of <code>&lt;text&gt;</code> and the content of
 <code>&lt;desc&gt;</code>, you can use the rules set in the example. The XPath 
-expression &quot;<code>contact(../@name, &#39;_t&#39;)</code>&quot; will give the ID &quot;<code>id1_t</code>&quot; 
-and the expression &quot;<code>contact(../@name, &#39;_d&#39;)</code>&quot; will give the ID &quot;<code>id1_d</code>&quot;.</p>
+expression &quot;<code>concat(../@name, &#39;_t&#39;)</code>&quot; will give the ID &quot;<code>id1_t</code>&quot; 
+and the expression &quot;<code>concat(../@name, &#39;_d&#39;)</code>&quot; will give the ID &quot;<code>id1_d</code>&quot;.</p>
 <pre>&lt;doc&gt;
  &lt;its:rules version=&quot;1.0&quot; xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
   xmlns:itsx=&quot;http://www.w3.org/2008/12/its-extensions&quot;&gt;
-  &lt;its:translateRule selector=&quot;//text&quot; translate=&quot;yes&quot; itsx:idValue=&quot;contact(../@name, &#39;_t&#39;)&quot;/&gt;
-  &lt;its:translateRule selector=&quot;//desc&quot; translate=&quot;yes&quot; itsx:idValue=&quot;contact(../@name, &#39;_d&#39;)&quot;/&gt;
+  &lt;its:translateRule selector=&quot;//text&quot; translate=&quot;yes&quot; itsx:idValue=&quot;concat(../@name, &#39;_t&#39;)&quot;/&gt;
+  &lt;its:translateRule selector=&quot;//desc&quot; translate=&quot;yes&quot; itsx:idValue=&quot;concat(../@name, &#39;_d&#39;)&quot;/&gt;
  &lt;/its:rules&gt;
  &lt;msg name=&quot;id1&quot;&gt;
   &lt;text&gt;Value of text&lt;/text&gt;

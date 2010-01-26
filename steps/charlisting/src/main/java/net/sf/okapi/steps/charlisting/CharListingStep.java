@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.charlisting;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -42,7 +43,6 @@ public class CharListingStep extends BasePipelineStep {
 
 	private Parameters params;
 	private Hashtable<Character, Integer> charList;
-	private String outputPath;
 
 	public CharListingStep () {
 		params = new Parameters();
@@ -56,23 +56,23 @@ public class CharListingStep extends BasePipelineStep {
 		}
 	}
 	
-	public String getOutputPath () {
-		return outputPath;
-	}
-
+	@Override
 	public String getDescription () {
 		return "Generate a list of all the characters in the source content of a set of documents."
 			+ " Expects: filter events. Sends back: filter events.";
 	}
 
+	@Override
 	public String getName () {
 		return "Used Characters Listing";
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
@@ -113,14 +113,15 @@ public class CharListingStep extends BasePipelineStep {
 		}
 		catch ( UnsupportedEncodingException e ) {
 			logger.log(Level.SEVERE,
-				String.format("Error with '%s'.", params.getOutputPath()), e);
+				String.format("Encoding error with '%s'.", params.getOutputPath()), e);
 		}
 		finally {
 			if ( writer != null ) {
 				writer.close();
 				writer = null;
+				// Open the output if requested
 				if ( params.isAutoOpen() ) {
-					outputPath = params.getOutputPath();
+					Util.openURL((new File(params.getOutputPath())).getAbsolutePath());
 				}
 			}
 		}

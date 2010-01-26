@@ -148,19 +148,6 @@
  <plugin type="separator"/>
 
  <plugin type="utility"
-  id="oku_charlisting"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.charlisting.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.charlisting.Editor"
-  updateUri="http://okapi.opentag.com/updates.html">
-  <info>
-   <name>Used Characters Listing</name>
-   <description>Provides a list of all characters used in the translatable parts of the input file.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
-
- <plugin type="utility"
    id="oku_ttxchecker"
    version="1.0"
    pluginClass="net.sf.okapi.applications.rainbow.utilities.ttxchecker.Utility"

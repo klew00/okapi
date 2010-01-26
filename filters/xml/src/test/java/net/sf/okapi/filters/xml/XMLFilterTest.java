@@ -109,6 +109,27 @@ public class XMLFilterTest {
 		assertNotNull(tu);
 		assertEquals("xid3", tu.getName()); // xml:id overrides global rule
 	}
+	
+	@Test
+	public void testIdComplexValue () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " xmlns:itsx=\"http://www.w3.org/2008/12/its-extensions\">"
+			+ "<its:translateRule selector=\"//text\" translate=\"yes\" itsx:idValue=\"concat(../@name, '_t')\"/>"
+			+ "<its:translateRule selector=\"//desc\" translate=\"yes\" itsx:idValue=\"concat(../@name, '_d')\"/>"
+			+ "</its:rules>"
+			+ "<msg name=\"id1\">"
+			+ "<text>Value of text</text>"
+			+ "<desc>Value of desc</desc>"
+			+ "</msg></doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("id1_t", tu.getName());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("id1_d", tu.getName());
+	}
 
 //TODO: Must fix entity handing for all XML parser	
 //	@Test

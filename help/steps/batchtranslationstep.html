@@ -30,15 +30,23 @@
 using an external tool to provide the translation.</p>
 <p>Takes: Raw document<br>
 Sends: Raw document</p>
-<p>The step takes a raw document and extracts its content using its associated 
-filter. The result of the extraction is put in a temporary HTML document where 
-each paragraph corresponds to a source segment. The external tool is then 
+<p>Here is the sequence of the different actions this steps performs:</p>
+<ul>
+	<li>The step takes a raw document and extracts its content using its associated 
+filter.</li>
+	<li>The result of the extraction is put in a temporary HTML document where 
+each paragraph corresponds to a source segment (or a source text unit if the 
+	text units are not segmented).</li>
+	<li>The external tool is then 
 invoked using a user-defined command-line. This allows the external tool to take 
 the temporary HTML document, translate it, and creates a translated output for 
-it. Once the command-line is excuted, the step takes the translated output and 
+it.</li>
+	<li>Once the command-line is excuted, the step takes the translated output and 
 build a set of aligned entries with the source of each extracted segment and the 
-translation provided by the external tool. The translated entries are placed in 
-either or both a Pensieve TM or a TMX document.</p>
+translation provided by the external tool.</li>
+	<li>The translated entries are placed in 
+either or both a Pensieve TM or a TMX document.</li>
+</ul>
 <p>Each input document can be processed using one or more temporary HTML files, 
 allowing tools with limitation to translate very large documents.</p>
 <p>The text unit extracted from the input document can be segmented using SRX 

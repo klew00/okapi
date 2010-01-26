@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,10 +21,18 @@
 package net.sf.okapi.steps.charlisting;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.PathInputPart;
 
-public class Parameters extends BaseParameters {
+@EditorFor(Parameters.class)
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider{
 
+	private static String OUTPUTPATH = "outputPath";
+	private static String AUTOOPEN = "autoOpen";
+	
 	private String outputPath;
 	private boolean autoOpen;
 
@@ -48,34 +56,48 @@ public class Parameters extends BaseParameters {
 		this.autoOpen = autoOpen;
 	}
 
+	@Override
 	public void reset() {
 		outputPath = "charlist.txt";
 		autoOpen = true;
 	}
 
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		outputPath = buffer.getString("outputPath", outputPath);
-		autoOpen = buffer.getBoolean("autoOpen", autoOpen);
+		outputPath = buffer.getString(OUTPUTPATH, outputPath);
+		autoOpen = buffer.getBoolean(AUTOOPEN, autoOpen);
 	}
 
 	@Override
 	public String toString() {
 		buffer.reset();
-		buffer.setParameter("outputPath", outputPath);
-		buffer.setParameter("autoOpen", autoOpen);
+		buffer.setParameter(OUTPUTPATH, outputPath);
+		buffer.setParameter(AUTOOPEN, autoOpen);
 		return buffer.toString();
 	}
 	
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("outputPath",
+		desc.add(OUTPUTPATH,
 			"Path of the result file", "Full path of the result file.");
-		desc.add("autoOpen",
+		desc.add(AUTOOPEN,
 			"Open the result file after completion", null);
 		return desc;
 	}
 
+	@Override
+	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("Used Characters Listing", true, false);
+
+		PathInputPart part = desc.addPathInputPart(paramDesc.get(OUTPUTPATH), "Result File", true);
+		part.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
+		
+		desc.addCheckboxPart(paramDesc.get(AUTOOPEN));
+		
+		return desc;
+	}
+	
 }
