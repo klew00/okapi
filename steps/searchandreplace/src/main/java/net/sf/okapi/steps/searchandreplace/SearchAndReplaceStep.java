@@ -82,7 +82,8 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	}
 	
 	public String getDescription () {
-		return "Performs search and replace on the entire file or the text units.";
+		return "Performs search and replace on the entire file or the text units. "
+			+ "Expects raw document or filter events. Sends back: raw document or filter events.";
 	}
 
 	public String getName () {

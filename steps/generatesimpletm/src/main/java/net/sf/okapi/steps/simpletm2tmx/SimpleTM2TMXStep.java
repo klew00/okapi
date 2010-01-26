@@ -36,7 +36,8 @@ public class SimpleTM2TMXStep extends BasePipelineStep {
 	private boolean isDone;
 
 	public String getDescription() {
-		return "Generates a TMX document from a SimpleTM file";
+		return "Generates a TMX document from a SimpleTM database. "
+			+ "Expects: raw document. Sends back: raw document.";
 	}
 
 	public String getName() {

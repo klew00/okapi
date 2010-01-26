@@ -65,7 +65,8 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	}
 
 	public String getDescription () {
-		return "Generates a SimpleTM translation memory from multilingual input files.";
+		return "Generates a SimpleTM translation memory from multilingual input files. "
+			+ "Expects filter events. Sends back: filter events.";
 	}
 
 	@Override

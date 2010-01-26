@@ -86,7 +86,8 @@ public class TokenizationStep extends AbstractPipelineStep {
 		super();
 				
 		setName("Tokenization");
-		setDescription("Extracts tokens from the text units content of a document.");
+		setDescription("Extracts tokens from the text units content of a document. "
+			+ "Expects: filter events. Sends back: filter events.");
 				
 		setConfiguration(this.getClass(), "config.tprm");
 	}

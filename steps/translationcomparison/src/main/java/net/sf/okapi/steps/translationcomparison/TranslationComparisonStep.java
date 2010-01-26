@@ -111,7 +111,8 @@ public class TranslationComparisonStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription () {
-		return "Compare the translated text units between several documents.";
+		return "Compare the translated text units between several documents. "
+			+ "Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override

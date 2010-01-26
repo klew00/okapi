@@ -30,8 +30,9 @@ import java.lang.annotation.Target;
  * of IFilter or IPipelineStep to indicate what parameters class
  * they use. Classes that should not be used directly as plug-ins
  * (e.g. abstract classes) must not set this annotation.
- * Class that use no parameters must leave the default annotation's
- * value. That default value is IParameters.class but may change.
+ * Classes that use no parameters but need to be visible as plug-ins
+ * must leave the default annotation's value.
+ * That default value is IParameters.class but may change.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
