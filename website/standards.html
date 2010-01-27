@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Language" content="en-us">
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <title>Okapi Framework</title>
-<meta name="keywords" content="localization standard SRX ITS TMX XLIFF tools translation CAT filter Okapi cross-platform open-source java xml l10n i18n internationalization">
+<meta name="keywords" content="localization standard SRX ITS TMX GMX XLIFF tools translation CAT filter Okapi cross-platform open-source java xml l10n i18n internationalization">
 <link rel="stylesheet" type="text/css" href="okapi.css">
 </head>
 
@@ -41,6 +41,7 @@ possible. Some of them are:</p>
 <li><a href="#tmx">TMX - Translation Memory eXchange</a></li>
 	<li><a href="#its">ITS - Internationalization Tag Set</a></li>
 <li><a href="#srx">SRX - Segmentation Rules eXchange</a></li>
+<li><a href="#gmx">GMX - Global information management Metrics eXchange</a></li>
 </ul>
 <h2><a name="xliff"></a>XLIFF - XML Localisation Interchange File Format</h2>
 <p>Maintained by the XLIFF Technical Committee at OASIS, XLIFF provides a common 
@@ -94,8 +95,31 @@ version 2.0 of SRX has been implemented with better consistency.</p>
 <a href="devguide/segmentation.html">Segmentation page of the Developer's Guide</a> for more details. In addition,
 <a href="help/lib/segmentation/ui/index.html">Ratel is an editor to create and 
 maintain SRX documents</a>.</p>
-<p>&nbsp;</p>
 
+<h2><a name="gmx"></a>GMX - Global information management Metrics eXchange</h2>
+<p>Maintained by the OSCAR Committee at LISA, GMX is a family of standards of globalization- 
+and localization-related metrics. The three components of GMX are:</p>
+<ul>
+    <li><b>Volume (V)</b> Global Information Management Metrics Volume addresses the issue of quantifying the workload 
+    for a given localization or translation task. GMX-V provides a standard and more precise definition of the 
+    statistics necessary for to assess the quantity of text (and costs) associated with language-related 
+    globalization tasks.</li>
+    <li><b>Complexity (C) (proposed)</b>. GMX-C will provide a standard metric for the assessment of textual complexity 
+    with regard to globalization tasks. This format has not yet been defined.</li>
+    <li><b>Quality (Q) (proposed)</b>. GMX-Q will provide a standard format for the specification of quality requirements 
+    for globalization tasks, thus allowing quality expectations to be specified in contracts and other agreements 
+    and verified. This format has not yet been defined.</li>
+</ul>    
+</p>
+
+<p>The <a href="help/steps/wordcountstep.html">word count step</a> provided in the framework implements GMX-V&nbsp;1.0.</p>
+<ul>
+	<li><a href="http://www.lisa.org/fileadmin/standards/GMX-V.html">GMX-V 1.0 specification</a></li>
+	<li><a href="http://www.lisa.org/Global-information-m.105.0.html">GMX-V main 
+	page at LISA</a></li>
+</ul>
+
+<p>&nbsp;</p>
 </body>
 
 </html>
