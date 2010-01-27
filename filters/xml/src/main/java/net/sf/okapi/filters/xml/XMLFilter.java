@@ -281,6 +281,10 @@ public class XMLFilter implements IFilter {
 			docName = input.getInputURI().getPath();
 		}
 		
+		if ( params.useCodeFinder ) {
+			params.codeFinder.compile();
+		}
+
 		// Create the ITS engine
 		ITSEngine itsEng;
 		itsEng = new ITSEngine(doc, input.getInputURI());
@@ -703,8 +707,22 @@ public class XMLFilter implements IFilter {
 		// Create the unit
 		TextUnit tu = new TextUnit(String.valueOf(++tuId));
 		tu.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
+		
+		// Deal with inline codes if needed
+		
+		if ( params.useCodeFinder ) {
+			params.codeFinder.process(frag);
+			// Escape inline code content
+			List<Code> codes = frag.getCodes();
+			for ( Code code : codes ) {
+				if ( code.getData().equals("&#10;") ) continue; // Do not re-escape escaped line-breaks
+				code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGt, null));
+			}
+			frag.setCodedText(frag.getCodedText(), codes);
+		}
+		
 		tu.setSourceContent(frag);
-
+		
 		String locNote = context.peek().locNote;
 		if ( locNote != null ) {
 			//TODO: implement real notes

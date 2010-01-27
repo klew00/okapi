@@ -67,6 +67,7 @@ public class Parameters implements IParameters {
 	private static final String ESCAPELINEBREAK = "escapeLineBreak";
 	private static final String PROTECTENTITYREF = "protectEntityRef";
 	private static final String LINEBREAKASCODE = "lineBreakAsCode";
+	private static final String USECODEFINDER = "useCodeFinder";
 
 	private static final String OKP_NS_PREFIX = "okp";
 	private static final String OKP_NS_URI = "okapi-framework:xmlfilter-options";
@@ -152,7 +153,7 @@ public class Parameters implements IParameters {
 		path = null;
 		try {
 			doc = docBuilder.parse(new InputSource(new StringReader(data)));
-			getCustomOptions();
+			getFilterOptions();
 		}
 		catch ( SAXException e ) {
 			throw new OkapiIOException(e);
@@ -191,7 +192,7 @@ public class Parameters implements IParameters {
 			}
 			path = inputURI.getPath();
 			docURI = inputURI;
-			getCustomOptions();
+			getFilterOptions();
 		}
 		catch ( MalformedURLException e ) {
 			throw new OkapiIOException(e);
@@ -301,12 +302,12 @@ public class Parameters implements IParameters {
 		return null;
 	}
 
-	private void getCustomOptions () throws XPathExpressionException {
-		// Get the custom options for the document
+	private void getFilterOptions () throws XPathExpressionException {
+		// Read the options element
 		NodeList nl = (NodeList)xpath.evaluate("//"+OKP_NS_PREFIX+":options", doc, XPathConstants.NODESET);
-		if ( nl == null ) return;
-		for ( int i=0; i<nl.getLength(); i++ ) {
-			Element elem = (Element)nl.item(i);
+		if ( nl.getLength() > 0 ) {
+		// One element only
+			Element elem = (Element)nl.item(0);
 			String tmp = elem.getAttribute(ESCAPELINEBREAK);
 			if ( !Util.isEmpty(tmp) ) {
 				escapeLineBreak = tmp.equals("yes");
@@ -327,6 +328,19 @@ public class Parameters implements IParameters {
 			if ( !Util.isEmpty(tmp) ) {
 				protectEntityRef = tmp.equals("yes");
 			}
+		}
+		// Get the code finder data
+		nl = (NodeList)xpath.evaluate("//"+OKP_NS_PREFIX+":codeFinder", doc, XPathConstants.NODESET);
+		if ( nl.getLength() > 0 ) {
+			// One element only
+			Element elem = (Element)nl.item(0);
+			String tmp = elem.getAttribute(USECODEFINDER);
+			if ( !Util.isEmpty(tmp) ) {
+				useCodeFinder = tmp.equals("yes");
+			}
+			tmp = Util.getTextContent(elem);
+			if ( tmp == null ) tmp = "";
+			codeFinder.fromString(tmp);
 		}
 	}
 

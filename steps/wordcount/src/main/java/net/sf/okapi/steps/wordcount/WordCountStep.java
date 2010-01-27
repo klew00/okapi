@@ -57,11 +57,12 @@ public class WordCountStep extends TokenCountStep {
 		return WordCounter.getTokenName();
 	}
 
-	@Override
-	public String getHelpLocation() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+// Currently the getHelpLocation() in AbstractPipelineStep provides the default 
+//	@Override
+//	public String getHelpLocation() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 			
 }

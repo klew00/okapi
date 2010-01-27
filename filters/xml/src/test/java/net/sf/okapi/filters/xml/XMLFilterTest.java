@@ -147,10 +147,10 @@ public class XMLFilterTest {
 //		assertEquals("line 1.&#10;line 2.", tu.toString());
 //	}
 	
-//TODO: Must fix entity handing for all XML parser	
+//TODO: Must fix entity handing for all XML parser
 //	@Test
 //	public void testSimpleEntities () {
-//		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r"
+//		String snippet = "<?xml version=\"1.0\" ?>\r"
 //			+ "<!DOCTYPE doc ["
 //			+ "<!ENTITY aWithRingAndAcute '&#x01fb;'>\r"
 //			+ "<!ENTITY text 'TEXT'>\r"
@@ -159,7 +159,21 @@ public class XMLFilterTest {
 //			+ "<p>&aWithRingAndAcute;=e1</p>"
 //			+ "<p>&text;=e2</p>"
 //			+ "</doc>";
-//		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet), locEN));
+//		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r"
+//			+ "<!DOCTYPE doc ["
+//			+ "<!ENTITY aWithRingAndAcute '&#x01fb;'>\r"
+//			+ "<!ENTITY text 'TEXT'>\r"
+//			+ "]>\r"
+//			+ "<doc>"
+//			+ "<p>&aWithRingAndAcute;=e1</p>"
+//			+ "<p>&text;=e2</p>"
+//			+ "</doc>";
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		assertNotNull(tu);
+//		assertEquals("<1/>=e1", fmt.setContent(tu.getSourceContent()).toString());
+//		
+//		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+//			filter.getEncoderManager(), locEN));
 //	}
 //
 //	@Test
