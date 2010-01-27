@@ -72,7 +72,7 @@ public class SegmentAlignmentFunction implements DpFunction {
 		m_scorerList = new ArrayList<SegmentAlignmentScorer>();
 
 		try {
-			ResourceBundle res = ResourceBundle.getBundle("Scorer");
+			ResourceBundle res = ResourceBundle.getBundle("net/sf/okapi/steps/gcaligner/Scorer");
 			Enumeration<?> keys = res.getKeys();
 			while (keys.hasMoreElements()) {
 				String scorerClass = (String) keys.nextElement();

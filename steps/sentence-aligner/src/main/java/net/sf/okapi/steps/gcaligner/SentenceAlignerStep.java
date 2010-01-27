@@ -66,14 +66,10 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	private SentenceAligner sentenceAligner;
 	private ISegmenter sourceSegmenter;
 	private ISegmenter targetSegmenter;
-//	private List<Event> inputEventBuffer;
-//	private List<Event> outputEventBuffer;
 
 	public SentenceAlignerStep() {
 		params = new Parameters();
 		sentenceAligner = new SentenceAligner();
-//		inputEventBuffer = new ArrayList<Event>();
-//		outputEventBuffer = new ArrayList<Event>();
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
@@ -120,7 +116,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	protected void handleStartBatch(Event event) {
 		SRXDocument srxDocument = new SRXDocument();
 		srxDocument.setTrimLeadingWhitespaces(false);
-		srxDocument.loadRules(getParentDir("/default.srx") + "default.srx");
+		srxDocument.loadRules(getParentDir("default.srx") + "default.srx");
 		srxDocument.setTrimLeadingWhitespaces(false);
 		sourceSegmenter = srxDocument.compileLanguageRules(sourceLocale, null);
 		targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
@@ -171,8 +167,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 		if (!sourceTu.getSource().isSegmented() || !targetTu.getSource().isSegmented()) {
 			// we must have hit some empty content that did not segment
-			LOGGER.warning("Found unsegmented TextUnit. " +
-					"Possibly a TextUnit with empty content. Returning without aligning.");
+			LOGGER.warning("Found unsegmented TextUnit. Possibly a TextUnit with empty content.");
 			return;
 		}
 
@@ -221,7 +216,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	}
 
 	private String getParentDir(String filepath) {
-		URL url = this.getClass().getResource(filepath);
+		URL url = SentenceAlignerStep.class.getResource(filepath);
 		String parentDir = null;
 		if (url != null) {
 			parentDir = Util.getDirectoryName(url.getPath()) + "/";

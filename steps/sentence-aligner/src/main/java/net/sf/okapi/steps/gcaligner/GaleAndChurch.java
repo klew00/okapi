@@ -239,7 +239,7 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 		String lang = p_locale.getLanguage();
 		String locale = p_locale.toString();
 
-		ResourceBundle res = ResourceBundle.getBundle("CharDist");
+		ResourceBundle res = ResourceBundle.getBundle("net/sf/okapi/steps/gcaligner/CharDist");
 
 		String charDistStr = null;
 		try {
