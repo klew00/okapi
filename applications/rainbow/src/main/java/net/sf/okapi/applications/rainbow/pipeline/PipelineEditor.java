@@ -415,9 +415,9 @@ public class PipelineEditor {
 				((StackLayout)optionsHolder.getLayout()).topControl = panel.getComposite();
 				optionsHolder.layout();
 				Point needed = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-				// For some reason pack()/layout()/computeSize() add +16 than needed
+				// For some reason pack()/layout()/computeSize() add +16 (or more on Mac) than needed
 				// Maybe some scroll-bar side effect?
-				needed.x -= 16; // So, for now, we correct manually
+				needed.x -= 32; // So, for now, we correct manually
 				// Get the current size (may be user-specified)
 				Point size = shell.getSize();
 				// Adjust as needed
