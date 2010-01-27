@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -40,25 +40,44 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.its.ITSEngine;
+import org.w3c.its.NSContextManager;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 
 public class Parameters implements IParameters {
 	
-	private final static String DEFAULTS = "<?xml version='1.0' encoding='UTF-8'?>\n"
+	private static final String ESCAPEGT = "escapeGt";
+	private static final String ESCAPENBSP = "escapeNbsp";
+	private static final String ESCAPELINEBREAK = "escapeLineBreak";
+	private static final String PROTECTENTITYREF = "protectEntityRef";
+	private static final String LINEBREAKASCODE = "lineBreakAsCode";
+
+	private static final String OKP_NS_PREFIX = "okp";
+	private static final String OKP_NS_URI = "okapi-framework:xmlfilter-options";
+	
+	private final static String DEFAULTS = "<?xml version='1.0' ?>\n"
 		+ "<its:rules version='1.0'\n"
-		+ " xmlns:its='http://www.w3.org/2005/11/its'\n"
-		+ " xmlns:xlink='http://www.w3.org/1999/xlink'\n"
-		+ " xmlns:itsx='http://www.w3.org/2008/12/its-extensions'\n"
-		+ ">"
+		+ " xmlns:its='"+ITSEngine.ITS_NS_URI+"'\n"
+		+ " xmlns:"+ITSEngine.XLINK_NS_URI+"='"+ITSEngine.XLINK_NS_URI+"'\n"
+		+ " xmlns:"+ITSEngine.ITSX_NS_PREFIX+"='"+ITSEngine.ITSX_NS_URI+"'\n"
+		+ " xmlns:"+OKP_NS_PREFIX+"='"+OKP_NS_URI+"'\n"
+		+ ">\n"
 		+ "<!-- See ITS specification at: http://www.w3.org/TR/its/ -->\n"
 		+ "</its:rules>\n";
 	
@@ -66,12 +85,15 @@ public class Parameters implements IParameters {
 	private URI docURI;
 	private Document doc;
 	private DocumentBuilder docBuilder;
+	private XPath xpath;
 
 	public boolean useCodeFinder;
 	public InlineCodeFinder codeFinder;
 	public boolean escapeGt;
 	public boolean escapeNbsp;
 	public boolean protectEntityRef;
+	public boolean escapeLineBreak;
+	public boolean lineBreakAsCode;
 	
 	public Parameters () {
 		reset();
@@ -88,6 +110,18 @@ public class Parameters implements IParameters {
 		}
 		
 		docBuilder.setEntityResolver(new DefaultEntityResolver());
+
+		// Macintosh work-around
+		// When you use -XstartOnFirstThread as a java -Xarg on Leopard, your ContextClassloader gets set to null.
+		// That is not the case on 10.4 or with Windows or Linux flavors
+		// This allows XPathFactory.newInstance() to have a non-null context
+		Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+		// end work-around
+		XPathFactory xpFact = XPathFactory.newInstance();
+		xpath = xpFact.newXPath();
+		NSContextManager nsContext = new NSContextManager();
+		nsContext.addNamespace(OKP_NS_PREFIX, OKP_NS_URI);
+		xpath.setNamespaceContext(nsContext);
 	}
 
 	@Override
@@ -112,11 +146,13 @@ public class Parameters implements IParameters {
 		return sw.toString();
 	}
 	
+	@Override
 	public void fromString (String data) {
 		docURI = null;
 		path = null;
 		try {
 			doc = docBuilder.parse(new InputSource(new StringReader(data)));
+			getCustomOptions();
 		}
 		catch ( SAXException e ) {
 			throw new OkapiIOException(e);
@@ -124,16 +160,22 @@ public class Parameters implements IParameters {
 		catch ( IOException e ) {
 			throw new OkapiIOException(e);
 		}
+		catch ( XPathExpressionException e ) {
+			throw new OkapiIOException(e);
+		}
 	}
 
+	@Override
 	public String getPath () {
 		return path;
 	}
 	
+	@Override
 	public void setPath (String filePath) {
 		path = filePath;
 	}
 
+	@Override
 	public void load (URI inputURI,
 		boolean ignoreErrors)
 	{
@@ -142,27 +184,28 @@ public class Parameters implements IParameters {
 			String tmp = inputURI.toString();
 			if ( tmp.startsWith("jar:") ) {
 				URL url = inputURI.toURL();
-//				sr = new InputStreamReader(
-//					new BufferedInputStream(url.openStream()), "UTF-8");
-//				doc = docBuilder.parse(new InputSource(sr));
 				doc = docBuilder.parse(url.openStream());
-						
 			}
 			else {
 				doc = docBuilder.parse(inputURI.toString());
 			}
 			path = inputURI.getPath();
 			docURI = inputURI;
+			getCustomOptions();
 		}
 		catch ( MalformedURLException e ) {
 			throw new OkapiIOException(e);
 		}
 		catch ( UnsupportedEncodingException e ) {
+			throw new OkapiIOException(e);
 		}
 		catch ( SAXException e ) {
 			throw new OkapiIOException(e);
 		}
 		catch ( IOException e ) {
+			throw new OkapiIOException(e);
+		}
+		catch ( XPathExpressionException e ) {
 			throw new OkapiIOException(e);
 		}
 		finally {
@@ -177,18 +220,21 @@ public class Parameters implements IParameters {
 		}
 	}
 
+	@Override
 	public void reset () {
 		doc = null;
 		docURI = null;
-
 		codeFinder = new InlineCodeFinder();
 		useCodeFinder = false;
 		codeFinder.reset();
 		escapeGt = true;
 		escapeNbsp = true;
 		protectEntityRef = true;
+		escapeLineBreak = false;
+		lineBreakAsCode = false;
 	}
 
+	@Override
 	public void save (String filePath) {
 		Result result = null;
 		Transformer trans = null;
@@ -230,24 +276,58 @@ public class Parameters implements IParameters {
 		return docURI;
 	}
 
+	@Override
 	public boolean getBoolean (String name) {
-		//TODO: Use DOM to store these
-		if ( name.equals("escapeGt") ) return escapeGt;
-		if ( name.equals("escapeNbsp") ) return escapeNbsp;
-		if ( name.equals("protectEntityRef") ) return protectEntityRef;
+		if ( name.equals(ESCAPEGT) ) return escapeGt;
+		if ( name.equals(ESCAPENBSP) ) return escapeNbsp;
+		if ( name.equals(PROTECTENTITYREF) ) return protectEntityRef;
+		if ( name.equals(ESCAPELINEBREAK) ) return escapeLineBreak;
+		if ( name.equals(LINEBREAKASCODE) ) return lineBreakAsCode;
 		return false;
 	}
 
+	@Override
 	public String getString (String name) {
 		return null;
 	}
 
+	@Override
 	public int getInteger (String name) {
 		return 0;
 	}
 
+	@Override
 	public ParametersDescription getParametersDescription () {
 		return null;
+	}
+
+	private void getCustomOptions () throws XPathExpressionException {
+		// Get the custom options for the document
+		NodeList nl = (NodeList)xpath.evaluate("//"+OKP_NS_PREFIX+":options", doc, XPathConstants.NODESET);
+		if ( nl == null ) return;
+		for ( int i=0; i<nl.getLength(); i++ ) {
+			Element elem = (Element)nl.item(i);
+			String tmp = elem.getAttribute(ESCAPELINEBREAK);
+			if ( !Util.isEmpty(tmp) ) {
+				escapeLineBreak = tmp.equals("yes");
+			}
+			tmp = elem.getAttribute(ESCAPENBSP);
+			if ( !Util.isEmpty(tmp) ) {
+				escapeNbsp = tmp.equals("yes");
+			}
+			tmp = elem.getAttribute(LINEBREAKASCODE);
+			if ( !Util.isEmpty(tmp) ) {
+				lineBreakAsCode = tmp.equals("yes");
+			}
+			tmp = elem.getAttribute(ESCAPEGT);
+			if ( !Util.isEmpty(tmp) ) {
+				escapeGt = tmp.equals("yes");
+			}
+			tmp = elem.getAttribute(PROTECTENTITYREF);
+			if ( !Util.isEmpty(tmp) ) {
+				protectEntityRef = tmp.equals("yes");
+			}
+		}
 	}
 
 }

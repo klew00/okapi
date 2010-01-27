@@ -131,6 +131,22 @@ public class XMLFilterTest {
 		assertEquals("id1_d", tu.getName());
 	}
 
+// Cannot test with internal rules, works with external only
+//	@Test
+//	public void testLineBreakAsCode () {
+//		String snippet = "<?xml version=\"1.0\"?>\n"
+//			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+//			+ " xmlns:okp=\"okapi-framework:xmlfilter-options\">"
+//			+ "<okp:options lineBreakAsCode=\"yes\"/>"
+//			+ "</its:rules>"
+//			+ "<p>line 1&#10;line 2.</p>"
+//			+ "</doc>";
+//		ArrayList<Event> list = getEvents(snippet);
+//		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+//		assertNotNull(tu);
+//		assertEquals("line 1.&#10;line 2.", tu.toString());
+//	}
+	
 //TODO: Must fix entity handing for all XML parser	
 //	@Test
 //	public void testSimpleEntities () {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -413,11 +413,12 @@ public class XMLFilter implements IFilter {
 				}
 				else {
 					if ( trav.translate() ) {
-						frag.append(node.getNodeValue());
+						if ( params.lineBreakAsCode ) escapeAndAppend(frag, node.getNodeValue());
+						else frag.append(node.getNodeValue());
 					}
 					else {//TODO: escape unsupported chars
 						frag.append(TagType.PLACEHOLDER, null, Util.escapeToXML(
-							node.getNodeValue().replace("\n", lineBreak), 0, false, null));
+							node.getNodeValue().replace("\n", (params.escapeLineBreak ? "&#10;" : lineBreak)), 0, false, null));
 					}
 				}
 				break;
@@ -470,17 +471,29 @@ public class XMLFilter implements IFilter {
 			case Node.DOCUMENT_TYPE_NODE:
 				// Handled in the start document process
 				break;
-				
 			case Node.NOTATION_NODE:
 				//TODO: handle notation nodes
 				break;
 			case Node.ENTITY_NODE:
-				//TODO: handle enity nodes
+				//TODO: handle entity nodes
 				break;
 			}
 		}
 	}
 
+	private void escapeAndAppend (TextFragment frag,
+		String text) 
+	{
+		for ( int i=0; i<text.length(); i++ ) {
+			if ( text.charAt(i) == '\n' ) {
+				frag.append(TagType.PLACEHOLDER, "lb", "&#10;");
+			}
+			else {
+				frag.append(text.charAt(i)); 
+			}
+		}
+	}
+	
 	private void addStartTagToSkeleton (Node node) {
 		StringBuilder tmp = new StringBuilder();
 		tmp.append("<"
@@ -678,7 +691,7 @@ public class XMLFilter implements IFilter {
 		// Create a unit only if needed
 		if ( !frag.hasCode() && !frag.hasText(false) ) {
 			if ( !frag.isEmpty() ) { // Nothing but white spaces
-				skel.add(frag.toString().replace("\n", lineBreak)); // Pass them as skeleton
+				skel.add(frag.toString().replace("\n", (params.escapeLineBreak ? "&#10;" : lineBreak))); // Pass them as skeleton
 			}
 			frag = null;
 			if ( popStack ) {

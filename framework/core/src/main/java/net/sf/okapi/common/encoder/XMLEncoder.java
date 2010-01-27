@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -34,16 +34,17 @@ public class XMLEncoder implements IEncoder {
 	private String lineBreak;
 	private boolean escapeGt;
 	private boolean escapeNbsp;
+	private boolean escapeLineBreak;
 	
 	/**
 	 * Sets the options for this encoder. This encoder supports the following
 	 * parameters:
 	 * <ul><li>escapeGt=true to converts '>' characters to to <code>&amp;gt;</code>.</li>
-	 * <li>escapeNbsp=true to converts non-breaking space to <code>&amp;nbsp;</code>.</li>
+	 * <li>escapeNbsp=true to converts non-breaking space to <code>&amp;#x00a0;</code>.</li>
 	 * </ul>
 	 * @param params the parameters object with all the configuration information 
 	 * specific to this encoder.
-	 * @param encoding the name of the charset encoding to use.
+	 * @param encoding the name of the character set encoding to use.
 	 * @param lineBreak the type of line break to use.
 	 */
 	public void setOptions (IParameters params,
@@ -63,6 +64,7 @@ public class XMLEncoder implements IEncoder {
 		if ( params != null ) {
 			escapeGt = params.getBoolean("escapeGt");
 			escapeNbsp = params.getBoolean("escapeNbsp");
+			escapeLineBreak = params.getBoolean("escapeLineBreak");
 		}
 	}
 
@@ -108,7 +110,12 @@ public class XMLEncoder implements IEncoder {
 				}
 				continue;
 			case '\n':
-				sbTmp.append(lineBreak);
+				if ( escapeLineBreak ) {
+					sbTmp.append("&#10;");
+				}
+				else {
+					sbTmp.append(lineBreak);
+				}
 				break;
 			case '\u00A0':
 				if ( escapeNbsp ) {
@@ -161,7 +168,8 @@ public class XMLEncoder implements IEncoder {
 			if ( escapeGt ) return "&gt;";
 			else return ">";
 		case '\n':
-			return lineBreak;
+			if ( escapeLineBreak ) return "&#10;";
+			else return lineBreak;
 		case '\u00A0':
 			if ( escapeNbsp ) {
 				return "&#x00a0;";
@@ -198,7 +206,8 @@ public class XMLEncoder implements IEncoder {
 			if ( escapeGt ) return "&gt;";
 			else return ">";
 		case '\n':
-			return lineBreak;
+			if ( escapeLineBreak ) return "&#10;";
+			else return lineBreak;
 		case '\u00A0':
 			if ( escapeNbsp ) {
 				return "&#x00a0;";
