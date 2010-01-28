@@ -129,14 +129,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(PARTSNAMES, "Names of the parts to extract",
-			"Comma-separated list of the names of the parts to extract.");
+		desc.add(PARTSNAMES, "Names of the <attribute> elements to extract",
+			"Comma-separated list of the names of the <attribute> elements to extract.");
 		desc.add(PARTSCONFIGURATIONS, "Corresponding filter configurations (or 'default')",
 			"Comma-separated list of the filter configurations to use, use 'default' for none");
-		desc.add(SOURCEID, "Name of the source ID part",
-			"Name of the element containing the source ID");
-		desc.add(LOCALEID, "Name of the locale ID part",
-			"Name of the element containing the locale ID");
+		desc.add(SOURCEID, "Name for source ID element",
+			"Name of the <attribute> element containing the source ID");
+		desc.add(LOCALEID, "Name for locale ID element",
+			"Name of the <attribute> element containing the locale ID");
 		return desc;
 	}
 

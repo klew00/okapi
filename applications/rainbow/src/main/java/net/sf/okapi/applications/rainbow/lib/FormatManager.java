@@ -87,7 +87,9 @@ public class FormatManager {
 	{
 		String[] aRes = new String[2];
 		if ( tryDetectingEncoding ) {
-			aRes[0] = Utils.detectEncoding(p_sPath);
+			// The only encodings detectEncoding() detect are UTF-n
+			// Which will be detected anyway by the filters, so let's skip the overhead
+			aRes[0] = null; // = Utils.detectEncoding(p_sPath);
 		}
 		String sExt = Util.getExtension(p_sPath).toLowerCase();
 		aRes[1] = pairs.get(sExt);

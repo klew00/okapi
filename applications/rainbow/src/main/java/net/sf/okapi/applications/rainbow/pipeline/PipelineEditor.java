@@ -181,7 +181,7 @@ public class PipelineEditor {
 
 		lbSteps = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		gdTmp = new GridData(GridData.FILL_VERTICAL);
-		gdTmp.widthHint = 175;
+		gdTmp.widthHint = 185;
 		gdTmp.heightHint = 300;
 		lbSteps.setLayoutData(gdTmp);
 		lbSteps.addSelectionListener(new SelectionAdapter() {

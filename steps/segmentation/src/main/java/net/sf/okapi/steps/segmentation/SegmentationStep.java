@@ -63,7 +63,7 @@ public class SegmentationStep extends BasePipelineStep {
 	}
 	
 	public String getName () {
-		return "SRX Segmentation";
+		return "Segmentation";
 	}
 
 	public String getDescription () {

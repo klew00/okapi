@@ -98,7 +98,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 	@Override
 	public String getDescription() {
-		return "Aligns sentences within paragraphs (TextUnits). Produces sentence alignments as bilingual TextUnits or a TMX file.";
+		return "Aligns sentences within text units (paragraphs). Produces sentence alignments as bilingual text units or a TMX file.";
 	}
 
 	@Override

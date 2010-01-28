@@ -1952,7 +1952,7 @@ public class MainForm { //implements IParametersProvider {
 			}
 			File f = new File(path);
 			// Prevent expand of directories in some cases
-			boolean allowExpand = (NOEXPAND_EXTENSIONS.indexOf(Util.getExtension(path))==-1);
+			boolean allowExpand = (Util.isEmpty(Util.getExtension(path)) || (NOEXPAND_EXTENSIONS.indexOf(Util.getExtension(path))==-1));
 			
 			// Expand (for directories) or add (for files)
 			if ( allowExpand && f.isDirectory() ) {
