@@ -27,11 +27,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * TODO Class Javadoc
- * TODO Methods Javadoc
- * TODO Tests
- */
 public class LocaleFilter {
 	
 	protected static enum FilterType{
@@ -271,9 +266,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param localeId
-	 * @return
+	 * Allows a given locale.
+	 * @param localeId the given locale.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter include(LocaleId localeId) {
 		
@@ -286,9 +281,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param localeIds
-	 * @return
+	 * Allows the locales from a given array of locales.
+	 * @param localeIds the given array of locales.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter include(LocaleId ... localeIds) {
 		
@@ -301,9 +296,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param localeIds
-	 * @return
+	 * Allows the locales from a given set of locales.
+	 * @param localeIds the given set of locales.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter include(Set<LocaleId> localeIds) {
 		
@@ -316,9 +311,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param localeIds
-	 * @return
+	 * Allows the locales from a given list of locales.
+	 * @param localeIds the given list of locales.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter include(List<LocaleId> localeIds) {
 		
@@ -331,9 +326,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param filter
-	 * @return
+	 * Allows all locales allowed in a given locale filter.
+	 * @param filter the given locale filter.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter include(LocaleFilter filter) {
 		
@@ -358,10 +353,10 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param regex
-	 * @param flags
-	 * @return
+	 * Allows all locales matching a given regular expression with a given set of regex flags.
+	 * @param regex the given regular expression.
+	 * @param flags the given set of regex flags.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter includePattern(String regex, int flags) {
 		
@@ -374,9 +369,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param regex
-	 * @return
+	 * Allows all locales matching a given regular expression.
+	 * @param regex the given regular expression.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter includePattern(String regex) {
 		
@@ -384,9 +379,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * Filter configuration method.
-	 * @param languages
-	 * @return
+	 * Allows the locales which language matches any of the languages from a given array.
+	 * @param languages the given array of languages.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter includeLanguage(String ... languages) {
 		
@@ -399,9 +394,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param language
-	 * @return
+	 * Allows the locales which language matches a given language.
+	 * @param language the given language.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter includeLanguage(String language) {
 		
@@ -415,9 +410,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * Filter configuration method.
-	 * @param languages
-	 * @return
+	 * Allows the locales which region matches any of the regions from a given array.
+	 * @param regions the given array of regions.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter includeRegion(String ... regions) {
 		
@@ -430,9 +425,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param region
-	 * @return
+	 * Allows the locales which region matches a given region.
+	 * @param region the given region.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter includeRegion(String region) {
 		
@@ -446,9 +441,9 @@ public class LocaleFilter {
 	}
 		
 	/**
-	 * Filter configuration method.
-	 * @param languages
-	 * @return
+	 * Allows the locales which user part matches any of the user parts from a given array.
+	 * @param userParts the given array of user parts.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter includeUserPart(String ... userParts) {
 		
@@ -461,9 +456,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param userPart
-	 * @return
+	 * Allows the locales which user part matches a given user part.
+	 * @param userPart the given user part.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter includeUserPart(String userPart) {
 		
@@ -477,8 +472,8 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * Disallows a given LocaleId object.
-	 * @param localeId the given LocaleId object to disallow.
+	 * Disallows a given locale.
+	 * @param localeId the given locale.
 	 * @return this locale filter.
 	 */
 	public LocaleFilter exclude(LocaleId localeId) {
@@ -491,9 +486,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param localeIds
-	 * @return
+	 * Disallows the locales from a given array of locales.
+	 * @param localeIds the given array of locales.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter exclude(LocaleId ... localeIds) {
 		
@@ -506,9 +501,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param localeIds
-	 * @return
+	 * Disallows the locales from a given set of locales.
+	 * @param localeIds the given set of locales.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter exclude(Set<LocaleId> localeIds) {
 		
@@ -521,8 +516,8 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * Disallows a given list of LocaleId objects.
-	 * @param localeIds the given list of LocaleId objects.
+	 * Disallows the locales from a given list of locales.
+	 * @param localeIds the given list of locales.
 	 * @return this locale filter.
 	 */
 	public LocaleFilter exclude(List<LocaleId> localeIds) {
@@ -536,8 +531,8 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * Disallows in this filter everything allowed in a given filter.
-	 * @param filter the given filter.
+	 * Disallows all locales allowed in a given locale filter.
+	 * @param filter the given locale filter.
 	 * @return this locale filter.
 	 */
 	public LocaleFilter exclude(LocaleFilter filter) {
@@ -556,10 +551,10 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param regex
-	 * @param flags
-	 * @return
+	 * Disallows all locales matching a given regular expression with a given set of regex flags.
+	 * @param regex the given regular expression.
+	 * @param flags the given set of regex flags.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter excludePattern(String regex, int flags) {
 		
@@ -571,9 +566,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param regex
-	 * @return
+	 * Disallows all locales matching a given regular expression.
+	 * @param regex the given regular expression.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter excludePattern(String regex) {
 		
@@ -581,9 +576,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * Filter configuration method.
-	 * @param languages
-	 * @return
+	 * Disallows the locales which language matches any of the languages from a given array.
+	 * @param languages the given array of languages.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter excludeLanguage(String ... languages) {
 		
@@ -596,9 +591,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param language
-	 * @return
+	 * Disallows the locales which language matches a given language.
+	 * @param language the given language.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter excludeLanguage(String language) {
 		
@@ -610,9 +605,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * Filter configuration method.
-	 * @param languages
-	 * @return
+	 * Disallows the locales which region matches any of the regions from a given array.
+	 * @param regions the given array of regions.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter excludeRegion(String ... regions) {
 		
@@ -625,9 +620,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param region
-	 * @return
+	 * Disallows the locales which region matches a given region.
+	 * @param region the given region.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter excludeRegion(String region) {
 		
@@ -639,9 +634,9 @@ public class LocaleFilter {
 	}
 		
 	/**
-	 * Filter configuration method.
-	 * @param languages
-	 * @return
+	 * Disallows the locales which user part matches any of the user parts from a given array.
+	 * @param userParts the given array of user parts.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter excludeUserPart(String ... userParts) {
 		
@@ -654,9 +649,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param userPart
-	 * @return
+	 * Disallows the locales which user part matches a given user part.
+	 * @param userPart the given user part.
+	 * @return this locale filter.
 	 */
 	public LocaleFilter excludeUserPart(String userPart) {
 		
@@ -668,8 +663,9 @@ public class LocaleFilter {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Resets this locale filter to its original right-after-construction state (all settings made with includeXX(), 
+	 * excludeXX() are neglected). 
+	 * @return this locale filter.
 	 */
 	public LocaleFilter reset() {
 		
@@ -691,9 +687,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param localeId
-	 * @return
+	 * Returns true if a given locale is allowed by this locale filter.
+	 * @param localeId the given locale.
+	 * @return true if the given locale is allowed, false otherwise.
 	 */
 	public boolean matches(LocaleId localeId) {
 		
@@ -759,9 +755,9 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param localeIds
-	 * @return
+	 * Creates a subset of the locales from a given array, which are allowed by this locale filter.
+	 * @param localeIds the given array.
+	 * @return a set of allowed locales.
 	 */
 	public Set<LocaleId> filter(LocaleId ... localeIds) {
 		
@@ -775,104 +771,104 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Gets a list of allowed locales.
+	 * @return the list of allowed locales.
 	 */
 	public List<LocaleId> getIncludes() {
 		return includes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Gets a list of disallowed locales.
+	 * @return the list of disallowed locales.
 	 */
 	public List<LocaleId> getExcludes() {
 		return excludes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Gets a list of allowed languages.
+	 * @return the list of allowed languages.
 	 */
 	public List<String> getLanguageIncludes() {
 		return languageIncludes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Gets a list of allowed regions.
+	 * @return the list of allowed regions.
 	 */
 	public List<String> getRegionIncludes() {
 		return regionIncludes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Gets a list of allowed user parts.
+	 * @return the list of allowed user parts.
 	 */
 	public List<String> getUserPartIncludes() {
 		return userPartIncludes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Gets a list of disallowed languages.
+	 * @return the list of disallowed languages.
 	 */
 	public List<String> getLanguageExcludes() {
 		return languageExcludes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Gets a list of disallowed regions.
+	 * @return the list of disallowed regions.
 	 */
 	public List<String> getRegionExcludes() {
 		return regionExcludes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Gets a list of disallowed user parts.
+	 * @return the list of disallowed user parts.
 	 */
 	public List<String> getUserPartExcludes() {
 		return userPartExcludes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Gets a list of compiled regular expressions for allowed locales.
+	 * @return the list of compiled regular expressions.
 	 */
 	public List<Pattern> getPatternIncludes() {
 		return patternIncludes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Gets a list of compiled regular expressions for disallowed locales.
+	 * @return the list of compiled regular expressions.
 	 */
 	public List<Pattern> getPatternExcludes() {
 		return patternExcludes;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Helper method. Gets the locale filter type (either None or Any).
+	 * @return None or Any locale filter type.
 	 */
 	protected FilterType getType() {
 		return type;
 	}
 	
 	/**
-	 * 
-	 * @param type
+	 * Helper method. Sets the locale filter type (either None or Any).
+	 * @param type None or Any locale filter type.
 	 */
 	protected void setType(FilterType type) {
 		this.type = type;
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Detects if after construction this locale filter was configured with includeXX(), excludeXX(). 
+	 * @return true if the locale filter was not configured after construction.
 	 */
 	public boolean isEmpty() {
 		
@@ -982,10 +978,10 @@ public class LocaleFilter {
 	}
 	
 	/**
-	 * 
-	 * @param string
-	 * The string consists of chunks. The chunks are delimited with a comma or space.<p>
-	 * <b>*</b> -- field mask, can be used in either language, region, or user part fields.<br>  
+	 * Configures this locale filter from a given configuration string. 
+	 * @param string the given configuration string.
+	 * The string consists of locale descriptors. The locale descriptors are delimited with a comma or space.<p>
+	 * <b>*</b> -- field mask, can be used in either language, region, or user part fields of a locale descriptor.<br>  
 	 * <b>!</b> -- exclude prefix.<br>
 	 * <b>@</b> -- regex prefix.<br>
 	 * <b>^</b> -- regex flags prefix.<p>
@@ -997,6 +993,7 @@ public class LocaleFilter {
 	 * <li>only locales with "win" as user part: <b>*-*-win</b><br>
 	 * <li>regular expression with flags: <b>@e.?-us ^8</b>
 	 *   
+	 * @return this locale filter.
 	 */
 	public LocaleFilter fromString(String string) {
 			
@@ -1137,8 +1134,10 @@ public class LocaleFilter {
 		return this;
 	}
 	
+	
 	/**
-	 * 
+	 * Constructs a configuration string for this locale filter.
+	 * @return the configuration string for this locale filter.
 	 */
 	@Override
 	public String toString() {
@@ -1395,9 +1394,10 @@ public class LocaleFilter {
 	}
 
 	/**
-	 * If the filter contains only explicitly listed locale IDs (no regex patterns or masks), then return the list of those locale ID.
+	 * If the filter contains only explicitly listed locales (no regex patterns or masks), then returns the list of 
+	 * locale tags of those locales.
 	 * If there's at least one mask or pattern, an empty list is returned.
-	 * @return
+	 * @return the list of locale tags.
 	 */
 	public List<String> getExplicitLocaleIds() {
 
@@ -1424,12 +1424,12 @@ public class LocaleFilter {
 	}
 
 	/**
-	 * Determines if a given string contains only explicitly listed locale IDs.
-	 * If the given strin contains only explicitly listed locale IDs (no regex patterns or masks), then returns 
-	 * a string with a space-delimited list of those locale ID.
+	 * Determines if a given string contains only explicitly listed locales.
+	 * If the given strin contains only explicitly listed locales (no regex patterns or masks), then returns 
+	 * a string with a space-delimited list of locale tags of those locales.
 	 * If there's at least one mask or pattern, an empty string is returned.
 	 * @param string the given locale filter configuration string. See {@link #fromString} for details.
-	 * @return
+	 * @return a string with a space-delimited list of locale tags allowed by this locale filter. 
 	 */
 	public static String getExplicitLocaleIds(String string) {
 		
