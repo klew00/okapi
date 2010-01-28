@@ -37,7 +37,7 @@
 
 package net.sf.okapi.steps.gcaligner;
 
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 /**
  * DpMatrixCell is a cell of DpMatrix. It records the score of the
@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 
 public class DpMatrixCell
 {
-	private static final Logger LOGGER = Logger.getLogger(DpMatrixCell.class.getName());
+//	private static final Logger LOGGER = Logger.getLogger(DpMatrixCell.class.getName());
 	
     private DpMatrixCell m_backLink;
     private int m_xPos;

@@ -45,6 +45,7 @@ import javax.xml.xpath.XPathFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -671,6 +672,17 @@ public class SRXDocument {
 		loadRules(pathOrURL, 0);
 	}			
 
+	/**
+	 * Loads an SRX document from an input stream.
+	 * Calling this method resets all settings and rules to their default
+	 * state and then populate them with the data stored in the document being loaded. 
+	 * The rules can be embedded inside another vocabulary.
+	 * @param inputStream the input stream to read from.
+	 */
+	public void loadRules (InputStream inputStream) {
+		loadRules(inputStream, 2);
+	}
+	
 	private void loadRules (Object input,
 		int inputType )
 	{
@@ -688,9 +700,12 @@ public class SRXDocument {
 				//doc = docBuilder.parse(Util.makeURIFromPath(pathOrURL));
 				doc = docBuilder.parse(new File(pathOrURL));
 			}
-			else {
+			else if ( inputType == 1 ) {
 				CharSequence data = (CharSequence)input;
 				doc = docBuilder.parse(new InputSource(new StringReader(data.toString())));
+			}
+			else {
+				doc = docBuilder.parse((InputStream)input);
 			}
 
 			resetAll();

@@ -40,7 +40,7 @@ public class WordCountStep extends TokenCountStep {
 		
 		super();
 		
-		setName("Word Counter");
+		setName("Word Count");
 		setDescription("Count the number of words in the text units of a set of documents or/and in its parts. "
 			+ "Expects: filter events. Sends back: filter events.");		
 	}

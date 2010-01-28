@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,6 +30,7 @@ import static org.junit.Assert.*;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.LanguageMap;
@@ -182,6 +183,31 @@ public class SRXDocumentTest {
 		assertEquals("([A-Z]\\.){2,}", rules.get(0).getBefore());
 		assertEquals("\\s", rules.get(0).getAfter());
 		assertFalse(rules.get(0).isBreak());
+	}
+	
+	@Test
+	public void testLoadRulesFromStream () {
+		SRXDocument doc = createDocument();
+		// Use the SRX in the package tree
+		doc.loadRules(SRXDocumentTest.class.getResourceAsStream("Test02.srx"));
+		Map<String, ArrayList<Rule>> list = doc.getAllLanguageRules();
+		assertNotNull(list);
+		ArrayList<Rule> rules = list.get("default");
+		assertNotNull(rules);
+		assertEquals(2, rules.size());
+	}
+	
+	@Test
+	public void testLoadRulesFromPath () {
+		SRXDocument doc = createDocument();
+		// Use the Test01.srx at the root level (not in the package tree)
+		String root = TestUtil.getParentDir(getClass(), "/Test01.srx");
+		doc.loadRules(root+"Test01.srx");
+		Map<String, ArrayList<Rule>> list = doc.getAllLanguageRules();
+		assertNotNull(list);
+		ArrayList<Rule> rules = list.get("default");
+		assertNotNull(rules);
+		assertEquals(2, rules.size());
 	}
 	
 	private SRXDocument createDocument () {

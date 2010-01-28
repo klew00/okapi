@@ -20,7 +20,7 @@
 
 package net.sf.okapi.steps.gcaligner;
 
-import java.net.URL;
+import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,7 +28,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filters.IFilter;
@@ -116,7 +115,8 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	protected void handleStartBatch(Event event) {
 		SRXDocument srxDocument = new SRXDocument();
 		srxDocument.setTrimLeadingWhitespaces(false);
-		srxDocument.loadRules(getParentDir("default.srx") + "default.srx");
+		InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
+		srxDocument.loadRules(is);
 		srxDocument.setTrimLeadingWhitespaces(false);
 		sourceSegmenter = srxDocument.compileLanguageRules(sourceLocale, null);
 		targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
@@ -215,14 +215,14 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		return event;
 	}
 
-	private String getParentDir(String filepath) {
-		URL url = SentenceAlignerStep.class.getResource(filepath);
-		String parentDir = null;
-		if (url != null) {
-			parentDir = Util.getDirectoryName(url.getPath()) + "/";
-		}
-		return parentDir;
-	}
+//	private String getParentDir(String filepath) {
+//		URL url = SentenceAlignerStep.class.getResource(filepath);
+//		String parentDir = null;
+//		if (url != null) {
+//			parentDir = Util.getDirectoryName(url.getPath()) + "/";
+//		}
+//		return parentDir;
+//	}
 
 	@Override
 	public void update(IObservable o, Object event) {

@@ -40,7 +40,7 @@ package net.sf.okapi.steps.gcaligner;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
@@ -53,7 +53,7 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 
 public class SentenceAligner {
-	private static final Logger LOGGER = Logger.getLogger(SentenceAligner.class.getName());
+//	private static final Logger LOGGER = Logger.getLogger(SentenceAligner.class.getName());
 	private static final long MAX_CELL_SIZE = 80000L;
 
 	public List<TextUnit> align(TextUnit sourceParagraph, TextUnit targetParagraph,

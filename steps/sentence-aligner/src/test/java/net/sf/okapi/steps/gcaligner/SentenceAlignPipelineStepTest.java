@@ -74,6 +74,7 @@ public class SentenceAlignPipelineStepTest {
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
 		Event e = (el.remove(0));
 		TextUnit tu = e.getTextUnit();
+		assertNotNull(tu);
 		assertEquals(EventType.TEXT_UNIT, e.getEventType());
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
@@ -103,6 +104,7 @@ public class SentenceAlignPipelineStepTest {
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
 		Event e = (el.remove(0));
 		TextUnit tu = e.getTextUnit();
+		assertNotNull(tu);
 		assertEquals(EventType.TEXT_UNIT, e.getEventType());
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
