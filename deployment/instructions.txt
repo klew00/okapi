@@ -56,11 +56,11 @@ The file _tests_results.txt shows any differences between the expected results a
 Use the following summary, in this order:
 Okapi Libraries for all platforms (GZIP)
 Okapi Libraries for all platforms (ZIP)
-Okapi Applications for Macintosh Cocoa 64-bit
-Okapi Applications for Macintosh Cocoa
-Okapi Applications for Linux 64-bit
-Okapi Applications for Linux
-Okapi Applications for Windows
+Okapi Applications for Macintosh Cocoa 64-bit (Includes Libraries)
+Okapi Applications for Macintosh Cocoa (Includes Libraries)
+Okapi Applications for Linux 64-bit (Includes Libraries)
+Okapi Applications for Linux (Includes Libraries)
+Okapi Applications for Windows (Includes Libraries)
 
 --- 8) Update the Web site with any files that was modified in trunk/website.
 Usually at least the JavaDoc, the updates.html and the downloads.html should be updated.
@@ -85,6 +85,8 @@ At least here: http://tech.groups.yahoo.com/group/okapitools/
 - All the POM.XML files
 - trunk/deployment/shared/release.properties
 Now any new build will be a snapshot of the next release
+
+Also reset the changes.html log
 
 
 -end-
