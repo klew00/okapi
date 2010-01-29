@@ -32,15 +32,17 @@ public class XMLEncoder implements IEncoder {
 
 	private CharsetEncoder chsEnc;
 	private String lineBreak;
-	private boolean escapeGt;
-	private boolean escapeNbsp;
-	private boolean escapeLineBreak;
+	private boolean escapeGt = false;
+	private boolean escapeNbsp = false;
+	private boolean escapeLineBreak = false;
+	private int quoteMode = 1;
 	
 	/**
 	 * Sets the options for this encoder. This encoder supports the following
 	 * parameters:
 	 * <ul><li>escapeGt=true to converts '>' characters to to <code>&amp;gt;</code>.</li>
 	 * <li>escapeNbsp=true to converts non-breaking space to <code>&amp;#x00a0;</code>.</li>
+	 * <li>escapeLineBreak=true to converts line-breaks to <code>&amp;#10;</code>.</li>
 	 * </ul>
 	 * @param params the parameters object with all the configuration information 
 	 * specific to this encoder.
@@ -65,6 +67,9 @@ public class XMLEncoder implements IEncoder {
 			escapeGt = params.getBoolean("escapeGt");
 			escapeNbsp = params.getBoolean("escapeNbsp");
 			escapeLineBreak = params.getBoolean("escapeLineBreak");
+			if ( params.getBoolean("quoteModeDefined") ) {
+				quoteMode = params.getInteger("quoteMode");
+			}
 		}
 	}
 
@@ -72,7 +77,6 @@ public class XMLEncoder implements IEncoder {
 		int context)
 	{
 		if ( text == null ) return "";
-		int quoteMode = 1;
 		
 		StringBuffer sbTmp = new StringBuffer(text.length());
 		char ch;

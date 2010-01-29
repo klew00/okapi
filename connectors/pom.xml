@@ -22,6 +22,7 @@
         <module>apertium</module>
         <module>promt</module>
         <module>crosslanguage</module>
+        <module>microsoft</module>
     </modules>
 
     <build>

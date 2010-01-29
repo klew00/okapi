@@ -130,7 +130,7 @@ public abstract class BaseParameters implements IParameters {
 	
 	public int getInteger (String name) {
 		if ( buffer == null ) return 0;
-		else return Integer.parseInt(buffer.getString(name));
+		else return buffer.getInteger(name); //Integer.parseInt(buffer.getString(name));
 	}
 
 	public ParametersDescription getParametersDescription () {

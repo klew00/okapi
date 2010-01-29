@@ -35,6 +35,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	static final String PARTSNAMES = "partsNames";
 	static final String SOURCEID = "sourceId";
 	static final String LOCALEID = "localeId";
+	static final String QUOTEMODEDEFINED = "quoteModeDefined";
+	static final String QUOTEMODE = "quoteMode";
 	
 	private String partsConfigurations;
 	private String partsNames;
@@ -113,6 +115,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(PARTSCONFIGURATIONS, partsConfigurations);
 		buffer.setString(SOURCEID, sourceId);
 		buffer.setString(LOCALEID, localeId);
+		// Plus two *write-only* parameters: always set to true and 0
+		// This is used by the encoder to know how it needs to escape the quotes
+		// It must not be 0 if one of the data part to extract is an attribute
+		// here we can use 0 because all extracted text comes from elements.
+		buffer.setBoolean(QUOTEMODEDEFINED, true);
+		buffer.setInteger(QUOTEMODE, 0);
 		return buffer.toString();
 	}
 	

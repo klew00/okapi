@@ -38,6 +38,7 @@ public class HtmlEncoder implements IEncoder {
 
 	private CharsetEncoder chsEnc;
 	private String lineBreak;
+	private int quoteMode = 1;
 
 	public void setOptions (IParameters params,
 		String encoding,
@@ -52,6 +53,14 @@ public class HtmlEncoder implements IEncoder {
 		else {
 			chsEnc = Charset.forName(encoding).newEncoder();
 		}
+
+		// Get options from the filter's configuration
+		if ( params != null ) {
+			if ( params.getBoolean("quoteModeDefined") ) {
+				quoteMode = params.getInteger("quoteMode");
+			}
+		}
+		
 	}
 
 	public String encode (String text,
@@ -59,7 +68,6 @@ public class HtmlEncoder implements IEncoder {
 	{
 		if ( text == null ) return "";
 		boolean escapeGT = false;
-		int quoteMode = 1;
 		
 		StringBuffer sbTmp = new StringBuffer(text.length());
 		char ch;
@@ -136,9 +144,11 @@ public class HtmlEncoder implements IEncoder {
 		case '<':
 			return "&lt;";
 		case '\"':
-			return "&quot;";
+			if ( quoteMode > 0 ) return "&quot;";
+			else  return "\"";
 		case '\'':
-			return "&#39;";
+			if ( quoteMode > 0 ) return "&#39;";
+			else return "\'";
 		case '&':
 			return "&amp;";
 		case '\n':
@@ -165,9 +175,11 @@ public class HtmlEncoder implements IEncoder {
 		case '<':
 			return "&lt;";
 		case '\"':
-			return "&quot;";
+			if ( quoteMode > 0 ) return "&quot;";
+			else  return "\"";
 		case '\'':
-			return "&#39;";
+			if ( quoteMode > 0 ) return "&#39;";
+			else return "\'";
 		case '&':
 			return "&amp;";
 		case '\n':
