@@ -96,15 +96,14 @@ XLIFF 1.2 specifications</a>.</p>
 		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
-		-apertium&nbsp;[serverURL]|<br>
-		-promt [configFile]</code></td>
+		-apertium&nbsp;[serverURL]</code></td>
 		<td align="left" valign="top">A translation resource to use to 
 		translate the document: <a href="#pensieve"><code>-pen</code> for a 
 		Pensieve TM</a>, <a href="#translatetoolkit"><code>-tt</code> for a 
 		Translate Toolkit TM</a>, <a href="#globalsight"><code>-gs</code> for a 
 		GlobalSight TM</a>, <a href="#mymemory"><code>-mm</code> for MyMemory 
 		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>, 
-		<a href="#promt"><code>-promt</code> for a ProMT server</a>, and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
+		and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -247,15 +246,14 @@ file must be in SRX format.</p>
 		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
-		-apertium&nbsp;[serverURL]|<br>
-		-promt [configFile]</code></td>
+		-apertium&nbsp;[serverURL]</code></td>
 		<td align="left" valign="top">A translation resource to use to 
 		translate the document: <a href="#pensieve"><code>-pen</code> for a 
 		Pensieve TM</a>, <a href="#translatetoolkit"><code>-tt</code> for a 
 		Translate Toolkit TM</a>, <a href="#globalsight"><code>-gs</code> for a 
 		GlobalSight TM</a>, <a href="#mymemory"><code>-mm</code> for MyMemory 
 		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>, 
-		<a href="#promt"><code>-promt</code> for a ProMT server</a>, and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
+		and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -343,11 +341,6 @@ per resource, not sorted by best score as a whole.</p>
 		<td align="left" valign="top">
 		<p dir="ltr">Queries the specified <a href="#apertium">Apertium MT server</a> (local or remote). A 
 		default remote server is provided.</td>
-	</tr>
-	<tr>
-		<td align="left" valign="top" nowrap><code>-promt [configFile]</code></td>
-		<td align="left" valign="top">
-		Queries a <a href="#promt">ProMT server</a>.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-opt threshold[:maxhits]</code></td>
@@ -683,7 +676,6 @@ other searchable translation repository. the following resources are available:<
 	<li><a href="#mymemory">MyMemory TM</a></li>
 	<li><a href="#google">Google MT</a></li>
 	<li><a href="#apertium">Apertium MT</a></li>
-	<li><a href="#promt">ProMT MT</a></li>
 </ul>
 <p>Note that some of these resources are Web-based and require an internet 
 connection, others can be installed and used locally.</p>
@@ -761,22 +753,12 @@ many language pairs, including for less-common languages such as Catalan,
 Galician, Welsh, Esperanto, Occitan, etc. You can find more information about 
 Apertium here: <a href="http://wiki.apertium.org/">http://wiki.apertium.org/</a>.</p>
 <p>This resource is indicated by the option <code>-apertium</code> and takes one 
-optional argument: the URL of the server. If the argument is omitted, the 
-default server is set to use the main public apertium.org server.</p>
+optional argument: the URL of the server.</p>
+<p>If the argument is omitted, the 
+default server is set to use the main public apertium.org server. Note that you 
+may need to have your IP address registered with the team running the server to 
+be able to access it.</p>
 <pre>tikal -q &quot;text to search&quot; -apertium</pre>
-<h3><a name="promt"></a>ProMT MT</h3>
-<p>ProMT is a commercial MT system that provides machine translation in many 
-language pairs. The connector support the Web service access to ProMT servers 
-using the PTService API.</p>
-<p>This resource is indicated by the option <code>-promt</code> in Tikal and takes one 
-optional argument: a configuration file that contains the information about the server to 
-connect to, username and password. If the configuration file is not specify, the 
-default configuration is used. The 
-configuration file must look like this:</p>
-<pre>#v1
-host=http://ptsdemo.promt.ru/
-username=myusername
-password=mypassword</pre>
 <p>&nbsp;</p>
 
 </body>

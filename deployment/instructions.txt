@@ -41,6 +41,7 @@ Then run the integration tests for the applications
 
 
 --- 6) Update the Okapi Public repository with the proper JARs
+Site: http://okapi.opentag.com/maven2/
 (So the examples can be build using Maven)
 
 
@@ -55,13 +56,14 @@ The file _tests_results.txt shows any differences between the expected results a
 Use the following summary, in this order:
 Okapi Libraries for all platforms (GZIP)
 Okapi Libraries for all platforms (ZIP)
-Okapi Applications for Macintosh Carbon
+Okapi Applications for Macintosh Cocoa 64-bit
 Okapi Applications for Macintosh Cocoa
 Okapi Applications for Linux 64-bit
 Okapi Applications for Linux
 Okapi Applications for Windows
 
---- 8) Update the Web site with any files that was modified in trunk/website. Usually at least the JavaDoc, the updates.html and the downloads.html should be updated.
+--- 8) Update the Web site with any files that was modified in trunk/website.
+Usually at least the JavaDoc, the updates.html and the downloads.html should be updated.
 
 Host: ftp.opentag.com
 Username: same as for the shared documents

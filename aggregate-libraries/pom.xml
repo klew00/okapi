@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>okapi-aggregate-libraries</artifactId>
     <groupId>net.sf.okapi</groupId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.5</version>
     <name>Okapi Aggregate Libraries</name>
     <description>
         Helps with the automated Tycho build process. This build should always be run last and is to be run by the

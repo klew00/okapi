@@ -75,7 +75,7 @@ public class Parameters implements IParameters {
 	private final static String DEFAULTS = "<?xml version='1.0' ?>\n"
 		+ "<its:rules version='1.0'\n"
 		+ " xmlns:its='"+ITSEngine.ITS_NS_URI+"'\n"
-		+ " xmlns:"+ITSEngine.XLINK_NS_URI+"='"+ITSEngine.XLINK_NS_URI+"'\n"
+		+ " xmlns:"+ITSEngine.XLINK_NS_PREFIX+"='"+ITSEngine.XLINK_NS_URI+"'\n"
 		+ " xmlns:"+ITSEngine.ITSX_NS_PREFIX+"='"+ITSEngine.ITSX_NS_URI+"'\n"
 		+ " xmlns:"+OKP_NS_PREFIX+"='"+OKP_NS_URI+"'\n"
 		+ ">\n"
