@@ -4,6 +4,10 @@
 	<property file="../shared/release.properties" />
 	<property name="dist" value="dist"/>
  
+	<tstamp>
+	 <format property="TODAY" pattern="MMM-dd-yyyy"/>
+	</tstamp>
+
 	<target name="all"> 
 	
 		<delete dir="${dist}" failonerror="false"/>
@@ -21,6 +25,8 @@
 		<replace file="${dist}/downloads.html" token="@ratelVersion@" value="${ratelVersion}"/>
 		<replace file="${dist}/downloads.html" token="@tikalVersion@" value="${tikalVersion}"/>
 		
+		<copy todir="${dist}" file="../shared/changes.html"/>
+		<replace file="${dist}/changes.html" token="@date@" value="${TODAY}"/>
 		
 		<copy todir="${dist}/help">
 			<fileset dir="../../help">

@@ -609,6 +609,11 @@ public class Main {
 			// Configuration ID is a default one:
 			// Add its filter to the configuration mapper
 			fcMapper.addConfigurations(filtersMap.get(configId));
+			// Hard code case: okf_vignette requires okgf_html to be also loaded
+			//TODO: Find a better way to hanlde sub-filter cases
+			if ( configId.equals("okf_vignette") ) {
+				fcMapper.addConfigurations(filtersMap.get("okf_html"));
+			}
 			return true;
 		}
 		
