@@ -26,12 +26,10 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 @UsingParameters()
 public class XLIFFKitReaderStep extends BasePipelineStep {
 
-	@Override
 	public String getDescription () {
 		return "Generate an XLIFF translation kit. Expects: Raw document. Sends back: filter events.";
 	}
 
-	@Override
 	public String getName () {
 		return "XLIFF Kit Reader";
 	}

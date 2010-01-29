@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.reader;
+package net.sf.okapi.steps.xliffkit;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
@@ -46,7 +46,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.createZipFile = createZipFile;
 	}
 
-	@Override
 	public void reset () {
 		createZipFile = false;
 	}
@@ -58,7 +57,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return buffer.toString();
 	}
 	
-	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
@@ -72,7 +70,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return desc;
 	}
 	
-	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Kit Writer Options", true, false);	
 		desc.addCheckboxPart(paramsDesc.get(CREATEZIPFILE));
