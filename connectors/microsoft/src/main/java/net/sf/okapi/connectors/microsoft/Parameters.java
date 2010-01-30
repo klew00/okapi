@@ -69,13 +69,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(APPID,
-			"Microsft LiveSearch Application ID", "The appID to identify the application/user.");
+			"Microsft LiveSearch Application ID", "The AppID to identify the application/user.");
 		return desc;
 	}
 
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Microsoft MT Connector Settings");
+		EditorDescription desc = new EditorDescription("Microsoft MT Connector Settings", true, false);
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(APPID));
 		tip.setPassword(true);
 		return desc;

@@ -11,6 +11,7 @@ public class Manual {
 	public static void main (String[] args) {
 		
 		IQuery conn = new MicrosoftMTConnector();
+		((Parameters)conn.getParameters()).setAppId("appId goes here");
 		conn.open();
 		conn.setLanguages(LocaleId.ENGLISH, LocaleId.FRENCH);
 		
