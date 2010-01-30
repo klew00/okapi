@@ -20,6 +20,7 @@
 
 package net.sf.okapi.connectors.microsoft;
 
+import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 import com.microsofttranslator.api.v1.soap.LanguageService;
 import com.microsofttranslator.api.v1.soap.Soap;
 
@@ -81,12 +82,16 @@ public class MicrosoftMTConnector implements IQuery {
 	public void open () {
 		Soap soap = new Soap();
 		service = soap.getBasicHttpBindingLanguageService();
+		
+		ArrayOfstring res = service.getLanguages(params.getAppId());
+		System.out.println(res.getString().toString());
 	}
 
 	@Override
 	public int query (String plainText) {
 		current = -1;
 		result = null;
+		if ( Util.isEmpty(plainText) ) return 0;
 		String res = service.translate(params.getAppId(), plainText, srcLang, trgLang);
 		if ( Util.isEmpty(res) ) return 0;
 		result = new QueryResult();
@@ -102,6 +107,7 @@ public class MicrosoftMTConnector implements IQuery {
 	public int query (TextFragment text) {
 		current = -1;
 		result = null;
+		if ( !text.hasText(false) ) return 0;
 		String res = service.translate(params.getAppId(), util.separateCodesFromText(text), srcLang, trgLang);
 		if ( Util.isEmpty(res) ) return 0;
 		result = new QueryResult();
@@ -150,21 +156,26 @@ public class MicrosoftMTConnector implements IQuery {
 
 	private String toInternalCode (LocaleId locale) {
 		String code = locale.toBCP47();
-		if ( !code.startsWith("zh") && ( code.length() > 2 )) {
-			code = code.substring(0, 2);
+		if ( code.equals("zh-tw") || code.equals("zh-hant") || code.equals("zh-cht") ) {
+			code = "zh-CHT";
+		}
+		else if ( code.startsWith("zh") ) { // zh-cn, zh-hans, zh-..
+			code = "zh-CHS";
+		}
+		else { // Use just the language otherwise
+			code = locale.getLanguage(); 
 		}
 		return code;
 	}
 
 	@Override
 	public IParameters getParameters () {
-		// No parameters are used with this connector
-		return null;
+		return params;
 	}
 
 	@Override
 	public void setParameters (IParameters params) {
-		// No parameters are used with this connector
+		this.params = (Parameters)params;
 	}
 
 }

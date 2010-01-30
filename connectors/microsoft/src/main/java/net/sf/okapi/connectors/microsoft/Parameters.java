@@ -37,10 +37,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		toString();
 	}
 	
-	public Parameters (String initialData) {
-		fromString(initialData);
-	}
-	
 	public String getAppId () {
 		return appId;
 	}

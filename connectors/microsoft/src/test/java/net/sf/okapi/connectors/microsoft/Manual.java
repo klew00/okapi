@@ -6,7 +6,7 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 
-public class ManualTest {
+public class Manual {
 
 	public static void main (String[] args) {
 		

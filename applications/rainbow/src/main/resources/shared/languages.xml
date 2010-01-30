@@ -254,6 +254,13 @@
   <name>Corsican (*France)</name>
  </language>
 
+ <language code='ht' lcid='-1' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1'>
+  <name>Haitian Creole</name>
+ </language>
+ <language code='ht-HT' lcid='-1' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1' flag='flagCOS'>
+  <name>Haitian Creole (*Haiti)</name>
+ </language>
+
  <language code='hr' lcid='26' encoding='windows-1250' macEncoding='MacCentralEurope' unixEncoding='iso-8859-2'>
   <name>Croatian</name>
  </language>

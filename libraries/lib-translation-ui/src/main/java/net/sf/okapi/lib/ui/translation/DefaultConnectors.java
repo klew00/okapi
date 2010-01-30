@@ -60,6 +60,12 @@ public class DefaultConnectors implements IConnectorList {
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.apertium.Parameters";
 		list.add(trc);
 
+		trc = new ConnectorInfo();
+		trc.description = "Microsoft MT Server";
+		trc.connectorClass = "net.sf.okapi.connectors.microsoft.MicrosoftMTConnector";
+		trc.descriptionProviderClass = "net.sf.okapi.connectors.microsoft.Parameters";
+		list.add(trc);
+
 //Not ready yet
 //		trc = new ConnectorInfo();
 //		trc.description = "ProMT MT Server (Beta connector)";

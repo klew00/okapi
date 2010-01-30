@@ -158,6 +158,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../connectors/apertium/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../connectors/microsoft/target/classes"
+			 excludes="**/META-INF/**"/>
 <!--not ready yet
 			<fileset dir="../../connectors/promt/target/classes"
 			 excludes="**/META-INF/**"/>
