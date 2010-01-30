@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -92,6 +92,7 @@ public class LeveragingStep extends BasePipelineStep {
 			
 		if ( params.getMakeTMX() ) {
 			tmxWriter = new TMXWriter(params.getTMXPath());
+			tmxWriter.setUseMTPrefix(params.getUseMTPrefix());
 			tmxWriter.writeStartDocument(sourceLocale, targetLocale,
 				getClass().getName(), "", "sentence", "undefined", "undefined");
 		}

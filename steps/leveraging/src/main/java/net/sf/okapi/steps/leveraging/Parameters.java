@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,6 +27,7 @@ public class Parameters extends BaseParameters {
 	private static final String FILLTARGET = "fillTarget";
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
+	private static final String USEMTPREFIX = "useMTPrefix";
 	
 	private String resourceClassName;
 	private String resourceParameters;
@@ -34,7 +35,8 @@ public class Parameters extends BaseParameters {
 	private boolean fillTarget;
 	private boolean makeTMX;
 	private String tmxPath;
-	
+	private boolean useMTPrefix;
+
 	public Parameters () {
 		reset();
 	}
@@ -87,15 +89,26 @@ public class Parameters extends BaseParameters {
 		this.tmxPath = tmxPath;
 	}
 
+	public boolean getUseMTPrefix () {
+		return useMTPrefix;
+	}
+	
+	public void setUseMTPrefix (boolean useMTPrefix) {
+		this.useMTPrefix = useMTPrefix;
+	}
+
+	@Override
 	public void reset() {
 		resourceClassName = "net.sf.okapi.connectors.pensieve.PensieveTMConnector";
 		resourceParameters = null;
 		threshold = 95;
 		fillTarget = true;
 		makeTMX = false;
-		tmxPath = "pretrans.tmx";
+		tmxPath = "";
+		useMTPrefix = true;
 	}
 
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
@@ -105,6 +118,7 @@ public class Parameters extends BaseParameters {
 		fillTarget = buffer.getBoolean(FILLTARGET, fillTarget);
 		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
+		useMTPrefix = buffer.getBoolean(USEMTPREFIX, useMTPrefix);
 	}
 
 	@Override
@@ -116,6 +130,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(FILLTARGET, fillTarget);
 		buffer.setBoolean(MAKETMX, makeTMX);
 		buffer.setString(TMXPATH, tmxPath);
+		buffer.setBoolean(USEMTPREFIX, useMTPrefix);
 		return buffer.toString();
 	}
 

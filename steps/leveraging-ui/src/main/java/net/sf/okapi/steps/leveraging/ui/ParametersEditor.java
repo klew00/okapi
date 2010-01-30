@@ -64,6 +64,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkFillTarget;
 	private Button chkMakeTMX;
 	private TextAndBrowsePanel pnlTMXPath;
+	private Button chkUseMTPrefix;
 	
 	public ParametersEditor () {
 		connectors = new DefaultConnectors();
@@ -196,6 +197,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkMakeTMX.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				pnlTMXPath.setEnabled(chkMakeTMX.getSelection());
+				chkUseMTPrefix.setEnabled(chkMakeTMX.getSelection());
 			}
 		});
 		
@@ -205,6 +207,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlTMXPath.setLayoutData(gdTmp);
+		
+		chkUseMTPrefix = new Button(mainComposite, SWT.CHECK);
+		chkUseMTPrefix.setText("Add a prefix to the source text");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseMTPrefix.setLayoutData(gdTmp);
 	}
 	
 	private boolean showDialog () {
@@ -222,13 +230,16 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkFillTarget.setSelection(params.getFillTarget());
 		chkMakeTMX.setSelection(params.getMakeTMX());
 		pnlTMXPath.setText(params.getTMXPath());
+		chkUseMTPrefix.setSelection(params.getUseMTPrefix());
+
 		pnlTMXPath.setEnabled(chkMakeTMX.getSelection());
+		chkUseMTPrefix.setEnabled(chkMakeTMX.getSelection());
 	}
 
 	private boolean saveData () {
 		result = false;
 		if ( chkMakeTMX.getSelection() ) {
-			if ( !Util.isEmpty(pnlTMXPath.getText()) ) {
+			if ( Util.isEmpty(pnlTMXPath.getText()) ) {
 				Dialogs.showError(shell,
 					"You must provide a path for the TMX output.", null);
 				return false;
@@ -240,6 +251,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setFillTarget(chkFillTarget.getSelection());
 		params.setMakeTMX(chkMakeTMX.getSelection());
 		params.setTMXPath(pnlTMXPath.getText());
+		params.setUseMTPrefix(chkUseMTPrefix.getSelection());
 		result = true;
 		return true;
 	}
