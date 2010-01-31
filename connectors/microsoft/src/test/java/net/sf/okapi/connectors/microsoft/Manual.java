@@ -11,11 +11,17 @@ public class Manual {
 	public static void main (String[] args) {
 		
 		IQuery conn = new MicrosoftMTConnector();
-		((Parameters)conn.getParameters()).setAppId("appId goes here");
+		((Parameters)conn.getParameters()).setAppId("AppID goes here");
 		conn.open();
 		conn.setLanguages(LocaleId.ENGLISH, LocaleId.FRENCH);
 		
-		conn.query("The big red and blue car. This <span translate=\"no\">is a</span> test");
+		conn.query("The big red and blue car. This is a simple test");
+		if ( conn.hasNext() ) {
+			QueryResult qr = conn.next();
+			System.out.println("\n"+qr.source.toString()+"\n"+qr.target.toString());
+		}
+		
+		conn.query("The <span id='1'>big</span> red and blue car. This <span id='2'>is a simple</span> test");
 		if ( conn.hasNext() ) {
 			QueryResult qr = conn.next();
 			System.out.println("\n"+qr.source.toString()+"\n"+qr.target.toString());

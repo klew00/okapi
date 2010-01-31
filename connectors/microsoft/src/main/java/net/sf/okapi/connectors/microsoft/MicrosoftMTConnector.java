@@ -82,9 +82,6 @@ public class MicrosoftMTConnector implements IQuery {
 	public void open () {
 		Soap soap = new Soap();
 		service = soap.getBasicHttpBindingLanguageService();
-		
-		ArrayOfstring res = service.getLanguages(params.getAppId());
-		System.out.println(res.getString().toString());
 	}
 
 	@Override

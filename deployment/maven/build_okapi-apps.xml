@@ -75,6 +75,7 @@
 	<property name="dist" value="dist_${platform}"/>
 	<property name="done" value="done"/>
 	<property name="distLib" value="${dist}/lib"/>
+	<property name="distLicenses" value="${distLib}/licenses"/>
 	<property name="distName" value="${okapiappsName}_${platform}_${okapiappsStamp}" />
 	<property name="mavenStore" value="${user.home}/.m2/repository"/>
 
@@ -87,6 +88,7 @@
 			<fileset dir="${dist}"/>
 		</delete>
 		<mkdir dir="${distLib}"/>
+		<mkdir dir="${distLicenses}"/>
 		<mkdir dir="${done}"/>
 		
 		<!-- Copy the okapi-lib common distribution
@@ -178,6 +180,9 @@
 		<property name="jar101" refid="list.contents"/>
 		<echo file="tmpJars" append="yes">${jar101}</echo>
 		<copy todir="${distLib}" file="${dep101}/${jar101}"/>
+		<copy todir="${distLicenses}">
+		   <fileset dir="../shared/licenses" includes="**/swt-*"/>
+		</copy>
 
 		<property name="dep102" value="${mavenStore}/swing2swt/swing2swt/1.0"/>
 		<fileset id="list.contents" dir="${dep102}"
