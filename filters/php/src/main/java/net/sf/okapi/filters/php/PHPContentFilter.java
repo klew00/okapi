@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -43,6 +43,7 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.LocalizationDirectives;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
@@ -87,10 +88,12 @@ public class PHPContentFilter implements IFilter {
 	private int resType;
 	private HTMLCharacterEntities cerList;
 	private EncoderManager encoderManager;
+	private LocalizationDirectives locDir;
 	
 	public PHPContentFilter () {
 		params = new Parameters();
 		cerList = new HTMLCharacterEntities();
+		locDir = new LocalizationDirectives();
 	}
 	
 	public void cancel () {
@@ -169,6 +172,9 @@ public class PHPContentFilter implements IFilter {
 	{
 		close(); // Just in case resources need to be freed
 		
+		locDir.reset();
+		locDir.setOptions(params.getUseDirectives(), params.getExtractOutsideDirectives());
+
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
@@ -345,7 +351,7 @@ public class PHPContentFilter implements IFilter {
 			case 2: // In single-line comment, wait for EOL/EOS
 				if ( ch == '\n' ) {
 					// Process the comment for directives
-					params.locDir.process(buf.toString());
+					locDir.process(buf.toString());
 					// And go back to previous state
 					state = prevState;
 					continue;
@@ -371,7 +377,7 @@ public class PHPContentFilter implements IFilter {
 			case 5: // After '*', expect slash (from multi-line comment)
 				if ( ch == '/' ) {
 					// Process the comment for directives
-					params.locDir.process(buf.toString());
+					locDir.process(buf.toString());
 					// And go back to previous state
 					state = prevState;
 					continue;
@@ -590,11 +596,11 @@ public class PHPContentFilter implements IFilter {
 		// Check for directives
 		if ( extract ) {
 			// Do the directive check after auto-skipped strings
-			if ( params.locDir.isWithinScope() ) {
-				if ( !params.locDir.isLocalizable(true) ) extract = false; 
+			if ( locDir.isWithinScope() ) {
+				if ( !locDir.isLocalizable(true) ) extract = false; 
 			}
 			else { // Outside directive scope: check if we extract text outside
-				if ( !params.locDir.localizeOutside() ) extract = false;
+				if ( !locDir.localizeOutside() ) extract = false;
 			}
 		}
 		

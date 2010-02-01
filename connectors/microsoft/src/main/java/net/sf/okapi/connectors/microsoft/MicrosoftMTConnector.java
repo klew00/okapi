@@ -20,7 +20,6 @@
 
 package net.sf.okapi.connectors.microsoft;
 
-import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 import com.microsofttranslator.api.v1.soap.LanguageService;
 import com.microsofttranslator.api.v1.soap.Soap;
 

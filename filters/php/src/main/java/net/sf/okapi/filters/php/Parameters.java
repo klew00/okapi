@@ -24,7 +24,6 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.filters.InlineCodeFinder;
-import net.sf.okapi.common.filters.LocalizationDirectives;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.CodeFinderPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
@@ -40,11 +39,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	private boolean useCodeFinder;
 	private InlineCodeFinder codeFinder;
-	public LocalizationDirectives locDir;
-	private boolean concatenate;
+	private boolean useDirectives;
+	private boolean extractOutsideDirectives;
 
 	public Parameters () {
-		locDir = new LocalizationDirectives();
 		codeFinder = new InlineCodeFinder();
 		reset();
 		toString(); // fill the list
@@ -70,16 +68,26 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		codeFinder.fromString(codeFinderRules);
 	}
 
-	public boolean getConcatenate () {
-		return concatenate;
+	public boolean getUseDirectives () {
+		return useDirectives;
 	}
-
-	public void setConcatenate (boolean concatenate) {
-		this.concatenate = concatenate;
+	
+	public void setUseDirectives (boolean useDirectives) {
+		this.useDirectives = useDirectives;
+	}
+	
+	public boolean getExtractOutsideDirectives () {
+		return extractOutsideDirectives;
+	}
+	
+	public void setExtractOutsideDirectives (boolean extractOutsideDirectives) {
+		this.extractOutsideDirectives = extractOutsideDirectives;
 	}
 
 	public void reset () {
-		locDir.reset();
+		useDirectives = true;
+		extractOutsideDirectives = true;
+		
 		useCodeFinder = true;
 		codeFinder.reset();
 		codeFinder.setSample("... attr='val'> text <br/> text \\n text <a att='val'> text [VAR1] text\n{VAR2} text <a att='val' ...");
@@ -93,36 +101,32 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		codeFinder.addRule("(\\w[-._\\w]*\\w@\\w[-._\\w]*\\w\\.\\w{2,3})");
 		// [var] and {var} variables
 		codeFinder.addRule("[\\[{][\\w_$]+?[}\\]]");
-		concatenate = true;
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean(USEDIRECTIVES, locDir.useLD());
-		buffer.setBoolean(EXTRACTOUTSIDEDIRECTIVES, locDir.localizeOutside());
+		buffer.setBoolean(USEDIRECTIVES, useDirectives);
+		buffer.setBoolean(EXTRACTOUTSIDEDIRECTIVES, extractOutsideDirectives);
 		buffer.setBoolean(USECODEFINDER, useCodeFinder);
 		buffer.setGroup(CODEFINDERRULES, codeFinder.toString());
-		buffer.setBoolean("concatenate", concatenate);
 		return buffer.toString();
 	}
 	
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		boolean tmpBool1 = buffer.getBoolean(USEDIRECTIVES, locDir.useLD());
-		boolean tmpBool2 = buffer.getBoolean(EXTRACTOUTSIDEDIRECTIVES, locDir.localizeOutside());
-		locDir.setOptions(tmpBool1, tmpBool2);
+		useDirectives = buffer.getBoolean(USEDIRECTIVES, useDirectives);
+		extractOutsideDirectives = buffer.getBoolean(EXTRACTOUTSIDEDIRECTIVES, extractOutsideDirectives);
 		useCodeFinder = buffer.getBoolean(USECODEFINDER, useCodeFinder);
 		codeFinder.fromString(buffer.getGroup(CODEFINDERRULES, ""));
-		buffer.getBoolean("concatenate", concatenate);
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-//		desc.add(USEDIRECTIVES, "Use localization directives", null);
-//		desc.add(EXTRACTOUTSIDEDIRECTIVES, "Extract outside the scope of the directives", null);
+		desc.add(USEDIRECTIVES, "Use localization directives", null);
+		desc.add(EXTRACTOUTSIDEDIRECTIVES, "Extract outside the scope of the directives", null);
 		desc.add(USECODEFINDER, "Has inline codes as defined below:", null);
 		desc.add(CODEFINDERRULES, null, "Rules for inline codes");
 		return desc;
@@ -131,10 +135,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("PHP Filter Parameters", true, false);
 
-		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(Parameters.USECODEFINDER));
-		
+		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(USEDIRECTIVES));
+		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(EXTRACTOUTSIDEDIRECTIVES));
+		cbp2.setMasterPart(cbp1, true);
+
+		cbp1 = desc.addCheckboxPart(paramDesc.get(Parameters.USECODEFINDER));
 		CodeFinderPart cfp = desc.addCodeFinderPart(paramDesc.get(Parameters.CODEFINDERRULES));
-		cfp.setMasterPart(cbp, true);
+		cfp.setMasterPart(cbp1, true);
 		
 		return desc;
 	}

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -384,7 +384,8 @@ public class PHPContentFilterTest {
 	public void testSkipOutsideDirective () {
 		String snippet = "$a='skip'; /*_btext*/ $b='textB';";
 		Parameters params = (Parameters)filter.getParameters();
-		params.locDir.setOptions(true, false);
+		params.setUseDirectives(true);
+		params.setExtractOutsideDirectives(false);
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
 		assertTrue(tu!=null);
 		assertEquals("textB", tu.getSource().toString());
@@ -394,7 +395,8 @@ public class PHPContentFilterTest {
 	public void testDisabledDirectives () {
 		String snippet = "/*_skip*/ $a='textA'; $b='textB';";
 		Parameters params = (Parameters)filter.getParameters();
-		params.locDir.setOptions(false, false);
+		params.setUseDirectives(false);
+		params.setExtractOutsideDirectives(false);
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
 		assertTrue(tu!=null);
 		assertEquals("textA", tu.getSource().toString());

@@ -313,7 +313,8 @@ public class VignetteFilter implements IFilter {
 			docName = input.getInputURI().getPath();
 		}
 		
-		TESTreadData();
+		//TODO: We may have to work with buffered block to handle very large files
+		readAllData();
 		
 		// Set the input string
 		tuId = 0;
@@ -341,7 +342,7 @@ public class VignetteFilter implements IFilter {
 		this.params = (Parameters)params;
 	}
 
-	private void TESTreadData () {
+	private void readAllData () {
 		StringBuilder tmp = new StringBuilder();
 		char[] buf = new char[2048];
 		int count = 0;

@@ -9,7 +9,7 @@
 <table border="0" width="100%" cellspacing="0" cellpadding="0">
 	<tr class="head">
 		<td class="head" colspan="2"><h1 class="head">Okapi Framework - Filters</h1>
-		<h2 class="head2">PHP Content Filter (ALPHA)</h2></td>
+		<h2 class="head2">PHP Content Filter (BETA)</h2></td>
 	</tr>
 	<tr>
 		<td class="smalltoc"><p>
@@ -102,8 +102,16 @@ selected for the output.</p>
 <p>The type of line-breaks of the output is the same as the one of the original 
 input.</p>
 <h2><a name="parameters"></a>Parameters</h2>
-<h3>Options Tab</h3>
-<h3>Inline Codes Tab</h3>
+<h3>Localization directives</h3>
+<p>Localization directives are special comments you can use to override the 
+default behavior of the filter regarding the parts to extract. The syntax and 
+behavior of the directives are the same across all Okapi filters.Note that the directives override key conditions.</p>
+<p><cite>Use localization directives when they are present</cite> -- Set this 
+option to enable the filter to recognize localization directives. If this option 
+is not set, any localization directive in the input file will be ignored (and 
+all extractable string will be extracted).</p>
+<p><cite>Extract items outside the scope of localization directives</cite> -- Set this option to extract any translatable item that is not within the scope of a localization directive. Selecting to extract or not outside localization directives allows you to mark up fewer parts of the source document. This option is enabled only when the <cite>Use localization directives when they are present</cite> option is set.</p>
+<h3>Inline Codes</h3>
 <p><cite>Has inline codes as defined below:</cite> -- Set this option to use the specified regular expression to be use against the text of the extracted items. Any match will be converted to an inline code. By default the expression is:</p>
 <pre>(\A[^&lt;]*?&gt;)|(&lt;[\w!?/].*?(&gt;|\Z))
 |(\\a|\\b|\\f|\\n|\\r|\\t|\\v)
