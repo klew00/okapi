@@ -85,19 +85,21 @@ public class BOMConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		buffer = new byte[1024*2];
 		isDone = false;
+		return event;
 	}
 
 	@Override
-	protected void handleEndBatchItem (Event event) {
+	protected Event handleEndBatchItem (Event event) {
 		// Release the buffer
 		buffer = null;
+		return event;
 	}
 	
 	@Override
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
 		RawDocument rawDoc;
 		InputStream input = null;
 		FileOutputStream output = null;
@@ -209,6 +211,8 @@ public class BOMConversionStep extends BasePipelineStep {
 				throw new OkapiIOException("IO error while closing.", e);
 			}
 		}
+		
+		return event;
 	}
 
 	/**

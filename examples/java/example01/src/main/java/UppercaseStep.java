@@ -45,12 +45,13 @@ public class UppercaseStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		if ( tu.isTranslatable() ) {
 			TextFragment tf = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
 			tf.setCodedText(tf.getCodedText().toUpperCase());
 		}
+		return event;
 	}
 
 }

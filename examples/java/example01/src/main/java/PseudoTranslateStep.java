@@ -48,9 +48,9 @@ public class PseudoTranslateStep extends BasePipelineStep {
 	}
 	
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
-		if ( !tu.isTranslatable() ) return;
+		if ( !tu.isTranslatable() ) return event;
 
 		TextFragment tf = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
 		StringBuilder text = new StringBuilder(tf.getCodedText());
@@ -66,6 +66,8 @@ public class PseudoTranslateStep extends BasePipelineStep {
 			}
 		}
 		tf.setCodedText(text.toString());
+		
+		return event;
 	}
 
 }

@@ -76,11 +76,11 @@ public class UriConversionStep extends BasePipelineStep {
 	}
 	
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
 		if ( !tu.isTranslatable()) 
-			return;
+			return event;
 
 		String forceEscape = " * -,.";
 		String tmp = null;
@@ -169,5 +169,7 @@ public class UriConversionStep extends BasePipelineStep {
 		catch ( Exception e ) {
 			logger.log(Level.WARNING, "Error when updating content: '"+tmp+"'", e);
 		}
+		
+		return event;
 	}		
 }

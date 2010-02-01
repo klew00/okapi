@@ -111,7 +111,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	}
  
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		if ( params.regEx ){
 			
 			int flags = 0;
@@ -131,20 +131,23 @@ public class SearchAndReplaceStep extends BasePipelineStep {
  	        	//}        	
         	 }
 		}
+		
+		return event;
 	}	
 		
 	
 	@Override
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		if ( !params.plainText ) { // RawDocument mode
 			isDone = false;
 		}		
+		return event;
 	}	
 	
 	@Override
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
 		if ( !params.plainText ) {
-			return; // Options set to use on text units only, so we just skip this event
+			return event; // Options set to use on text units only, so we just skip this event
 		}
 		RawDocument rawDoc;
 		String encoding = null;
@@ -237,11 +240,13 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				throw new RuntimeException(e);
 			}
 		}
+		
+		return event;
 	}
 
 	
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		//--Limit the textunit handler to running in filter-mode--
 		if ( params.plainText ) {
 			throw new OkapiBadStepInputException("Search and Replace cannot be performed on the entire file (non-filter mode) in the current pipeline configuration. \nPlease re-configure the pipeline or modify Search and Replace to use the filter-mode option. ");
@@ -249,7 +254,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
-		if ( !tu.isTranslatable() ) return;
+		if ( !tu.isTranslatable() ) return event;
 		
 		String tmp = null;
 		try {
@@ -282,6 +287,8 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		catch ( Exception e ) {
 			logger.log(Level.WARNING,
 				String.format("Error when updating content: '%s'.", tmp), e);
-		}		
+		}
+		
+		return event;
 	}
 }

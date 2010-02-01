@@ -110,6 +110,11 @@ public enum EventType {
 	 * should be associated with this event.
 	 */
 	RAW_DOCUMENT,
+	
+	/**
+	 * An Event which holds multiple related Events, possibly of different types.
+	 */
+	MULTI_EVENT,
 
 	/**
 	 * A custom event type used when steps need to exchange non-resource based

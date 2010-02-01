@@ -70,17 +70,19 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		isDone = true;
+		return event;
 	}
 	
 	@Override
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		isDone = false;
+		return event;
 	}
 
 	@Override
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
 		RawDocument rawDoc = (RawDocument)event.getResource();
 		try {
 			File outFile;
@@ -110,6 +112,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error writing or copying a RawDocument.", e);
 		}
+		
+		return event;
 	}
-
 }

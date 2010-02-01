@@ -40,13 +40,15 @@ public class Producer extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleEndBatchItem (Event event) {		
+	protected Event handleEndBatchItem (Event event) {		
 		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
+		return event;
 	}
 
 	@Override
-	protected void handleStartBatchItem (Event event) {		
+	protected Event handleStartBatchItem (Event event) {		
 		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
+		return event;
 	}
 	
 	@Override

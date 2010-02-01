@@ -58,7 +58,7 @@ public class XsltTransformStep extends BasePipelineStep {
 	 * handler takes a 
 	 */
 	@Override
-	protected void handleRawDocument(Event event) {
+	protected Event handleRawDocument(Event event) {
 		
 		ByteArrayOutputStream tempStream = new ByteArrayOutputStream();
 
@@ -89,6 +89,8 @@ public class XsltTransformStep extends BasePipelineStep {
 		
 		// This step is done generating events
 		done = true;
+		
+		return event;
 	}
 
 	@Override

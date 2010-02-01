@@ -23,6 +23,7 @@ package net.sf.okapi.common.pipeline;
 import java.io.File;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -33,69 +34,72 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	private boolean isLastOutputStep = false;
 
 	@Override
-	public IParameters getParameters () {
+	public IParameters getParameters() {
 		return null;
 	}
 
 	@Override
-	public void setParameters (IParameters params) {
+	public void setParameters(IParameters params) {
 		// No parameters by default
 	}
 
 	@Override
-	public boolean isDone () {
+	public boolean isDone() {
 		return true;
 	}
 
 	@Override
-	public String getHelpLocation () {
+	public String getHelpLocation() {
 		return ".." + File.separator + "help" + File.separator + "steps";
 	}
-	
+
 	@Override
 	public Event handleEvent(Event event) {
 		switch (event.getEventType()) {
 		case START_BATCH:
-			handleStartBatch(event);
+			event = handleStartBatch(event);
 			break;
 		case END_BATCH:
-			handleEndBatch(event);
+			event = handleEndBatch(event);
 			break;
 		case START_BATCH_ITEM:
-			handleStartBatchItem(event);
+			event = handleStartBatchItem(event);
 			break;
 		case END_BATCH_ITEM:
-			handleEndBatchItem(event);
+			event = handleEndBatchItem(event);
 			break;
 		case RAW_DOCUMENT:
-			handleRawDocument(event);
+			event = handleRawDocument(event);
 			break;
 		case START_DOCUMENT:
-			handleStartDocument(event);
+			event = handleStartDocument(event);
 			break;
 		case END_DOCUMENT:
-			handleEndDocument(event);
+			event = handleEndDocument(event);
 			break;
 		case START_SUBDOCUMENT:
-			handleStartSubDocument(event);
+			event = handleStartSubDocument(event);
 			break;
 		case END_SUBDOCUMENT:
-			handleEndSubDocument(event);
+			event = handleEndSubDocument(event);
 			break;
 		case START_GROUP:
-			handleStartGroup(event);
+			event = handleStartGroup(event);
 			break;
 		case END_GROUP:
-			handleEndGroup(event);
+			event = handleEndGroup(event);
 			break;
 		case TEXT_UNIT:
-			handleTextUnit(event);
+			event = handleTextUnit(event);
 			break;
 		case DOCUMENT_PART:
-			handleDocumentPart(event);
+			event = handleDocumentPart(event);
 			break;
 		case CUSTOM:
-			handleCustom(event);
+			event = handleCustom(event);
+			break;
+		case MULTI_EVENT:
+			event = handleMultiEvent(event);
 			break;
 		// default:
 		// Just pass it through
@@ -111,12 +115,12 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	}
 
 	@Override
-	public boolean isLastOutputStep () {
+	public boolean isLastOutputStep() {
 		return isLastOutputStep;
 	}
 
 	@Override
-	public void setLastOutputStep (boolean isLastStep) {
+	public void setLastOutputStep(boolean isLastStep) {
 		this.isLastOutputStep = isLastStep;
 	}
 
@@ -129,7 +133,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleStartBatch(Event event) {
+	protected Event handleStartBatch(Event event) {
+		return event;
 	}
 
 	/**
@@ -138,7 +143,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleEndBatch(Event event) {
+	protected Event handleEndBatch(Event event) {
+		return event;
 	}
 
 	/**
@@ -147,7 +153,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleStartBatchItem(Event event) {
+	protected Event handleStartBatchItem(Event event) {
+		return event;
 	}
 
 	/**
@@ -156,7 +163,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleEndBatchItem(Event event) {
+	protected Event handleEndBatchItem(Event event) {
+		return event;
 	}
 
 	/**
@@ -165,7 +173,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleRawDocument(Event event) {
+	protected Event handleRawDocument(Event event) {
+		return event;
 	}
 
 	/**
@@ -174,7 +183,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleStartDocument(Event event) {
+	protected Event handleStartDocument(Event event) {
+		return event;
 	}
 
 	/**
@@ -183,17 +193,18 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleEndDocument(Event event) {
+	protected Event handleEndDocument(Event event) {
+		return event;
 	}
 
 	/**
-	 * Handles the {@link net.sf.okapi.common.EventType#START_SUBDOCUMENT}
-	 * event.
+	 * Handles the {@link net.sf.okapi.common.EventType#START_SUBDOCUMENT} event.
 	 * 
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleStartSubDocument(Event event) {
+	protected Event handleStartSubDocument(Event event) {
+		return event;
 	}
 
 	/**
@@ -202,7 +213,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleEndSubDocument(Event event) {
+	protected Event handleEndSubDocument(Event event) {
+		return event;
 	}
 
 	/**
@@ -211,7 +223,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleStartGroup(Event event) {
+	protected Event handleStartGroup(Event event) {
+		return event;
 	}
 
 	/**
@@ -220,7 +233,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleEndGroup(Event event) {
+	protected Event handleEndGroup(Event event) {
+		return event;
 	}
 
 	/**
@@ -229,7 +243,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleTextUnit(Event event) {
+	protected Event handleTextUnit(Event event) {
+		return event;
 	}
 
 	/**
@@ -238,7 +253,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleDocumentPart(Event event) {
+	protected Event handleDocumentPart(Event event) {
+		return event;
 	}
 
 	/**
@@ -247,6 +263,17 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	 * @param event
 	 *            the event itself.
 	 */
-	protected void handleCustom(Event event) {
+	protected Event handleCustom(Event event) {
+		return event;
+	}
+
+	/**
+	 * Handles the {@link EventType#MULTI_EVENT} event.
+	 * 
+	 * @param event
+	 * @return event the event itself
+	 */
+	protected Event handleMultiEvent(Event event) {
+		return event;
 	}
 }

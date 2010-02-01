@@ -78,12 +78,13 @@ public class CharListingStep extends BasePipelineStep {
 	}
  
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		charList = new Hashtable<Character, Integer>();
+		return event;
 	}
 	
 	@Override
-	protected void handleEndBatch (Event event) {
+	protected Event handleEndBatch (Event event) {
 		// Generate the report
 		PrintWriter writer = null;
 		try {
@@ -125,13 +126,15 @@ public class CharListingStep extends BasePipelineStep {
 				}
 			}
 		}
+		
+		return event;
 	}
 
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
-		if ( !tu.isTranslatable() ) return;
+		if ( !tu.isTranslatable() ) return event;
 		// Get the coded text and detect the used characters
 		String text = tu.getSourceContent().getCodedText();
 		for ( int i=0; i<text.length(); i++ ) {
@@ -147,6 +150,8 @@ public class CharListingStep extends BasePipelineStep {
 				}
 			}
 		}
+		
+		return event;
 	}
 
 }

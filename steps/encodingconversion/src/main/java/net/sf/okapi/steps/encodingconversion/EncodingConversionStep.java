@@ -120,7 +120,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		buffer = CharBuffer.allocate(MAXBUF);
 		// Pre-compile the patterns for declaration detection
 		xmlEncDecl = Pattern.compile("((<\\?xml)(.*?)(encoding(\\s*?)=(\\s*?)(\\'|\\\")))", Pattern.DOTALL);
@@ -176,15 +176,18 @@ public class EncodingConversionStep extends BasePipelineStep {
 			outFormat = "&#x%X;";
 			break;
 		}
+		
+		return event;
 	}
 	
 	@Override
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		isDone = false;
+		return event;
 	}
 
 	@Override
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
 		RawDocument rawDoc = (RawDocument)event.getResource();
 		BufferedReader reader = null;
 		OutputStreamWriter writer = null;
@@ -365,6 +368,8 @@ public class EncodingConversionStep extends BasePipelineStep {
 				throw new RuntimeException(e);
 			}
 		}
+		
+		return event;
 	}
 
 	private String checkDeclaration (String defEncoding) {

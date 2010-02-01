@@ -91,8 +91,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return generateTMX;
 	}
 	
-//TODO: Uncomment when streaming TU output is implemented
-//	public void setGenerateTMX (boolean generateTMX) {
-//		this.generateTMX = generateTMX;
-//	}
+	public void setGenerateTMX (boolean generateTMX) {
+		this.generateTMX = generateTMX;
+	}
 }

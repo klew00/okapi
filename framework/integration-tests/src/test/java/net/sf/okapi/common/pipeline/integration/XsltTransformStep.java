@@ -39,17 +39,19 @@ public class XsltTransformStep extends BasePipelineStep {
 	}
 	
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		done = true;
+		return event;
 	}
 	
 	@Override
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		done = false;
+		return event;
 	}
 	
 	@Override
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
 		
 		ByteArrayOutputStream tempStream = new ByteArrayOutputStream();
 
@@ -80,6 +82,8 @@ public class XsltTransformStep extends BasePipelineStep {
 		
 		// this step is done generating events
 		done = true;
+		
+		return event;
 	}
 
 	public boolean isDone() {

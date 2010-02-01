@@ -38,7 +38,7 @@ public class CopySourceToTargetStep extends BasePipelineStep {
 	}
 
 	@Override
-	public void handleStartDocument(Event event) {
+	public Event handleStartDocument(Event event) {
 		StartDocument sd = (StartDocument) event.getResource();
 		Set<LocaleId> tls = sd.getTargetLocales();
 		// if there is only one target language then use it as the default
@@ -46,11 +46,15 @@ public class CopySourceToTargetStep extends BasePipelineStep {
 		if (tls.size() == 1) {
 			getParameters().targetLocale = tls.iterator().next();
 		}
+		
+		return event;
 	}
 
 	@Override
-	public void handleTextUnit(Event event) {
+	public Event handleTextUnit(Event event) {
 		TextUnit tu = (TextUnit) event.getResource();
 		tu.createTarget(getParameters().targetLocale, false, IResource.COPY_ALL);
+		
+		return event;
 	}
 }

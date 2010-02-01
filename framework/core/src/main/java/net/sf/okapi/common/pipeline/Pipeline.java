@@ -29,6 +29,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.observer.BaseObservable;
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
+import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.RawDocument;
 
 /**
@@ -44,7 +45,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 
 	/**
 	 * Creates a new Pipeline object.
-	 */	
+	 */
 	public Pipeline() {
 		steps = new LinkedList<IPipelineStep>();
 		finishedSteps = new LinkedList<IPipelineStep>();
@@ -103,10 +104,11 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	public void cancel() {
 		state = PipelineReturnValue.CANCELLED;
 	}
-	
-	private Event execute(Event event) {
-		state = PipelineReturnValue.RUNNING;
 
+	private Event execute(Event event) {
+		boolean notifiedObserver = false;
+		state = PipelineReturnValue.RUNNING;
+		
 		// loop through the events until we run out of steps or hit cancel
 		while (!steps.isEmpty() && !(state == PipelineReturnValue.CANCELLED)) {
 			// cycle through the steps in order, pulling off steps that run out
@@ -114,11 +116,35 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 			while (!steps.getFirst().isDone() && !(state == PipelineReturnValue.CANCELLED)) {
 				// go to each active step and call handleEvent
 				// the event returned is used as input to the next pass
-				for (IPipelineStep step : steps) {
+				notifiedObserver = false;
+				for (IPipelineStep step : steps) {		
 					event = step.handleEvent(event);
+					// We send each of the events in MULTI_EVENT down the pipeline before
+					// processing any other events but only if the event is configured for multi-event propagation
+					if (event.getEventType() == EventType.MULTI_EVENT
+							&& !(((MultiEvent) event.getResource()).isPropagateAsSingleEvent())) {
+						// add the remaining steps to a temp list - these are the steps that will receive the expanded
+						// MULT_EVENTS
+						List<IPipelineStep> remainingSteps = steps.subList(steps.indexOf(step) + 1,
+								steps.size());
+						for (Event e : ((MultiEvent) event.getResource())) {
+							event = e;
+							// send the current event from MULTI_EVENT down the remaining steps in the pipeline
+							for (IPipelineStep remainingStep : remainingSteps) {
+								event = remainingStep.handleEvent(event);
+							}
+							// notify observers that the final step has sent an Event
+							notifyObservers(event);
+							notifiedObserver = true;
+						}
+						break;
+					}
 				}
+
 				// notify observers that the final step has sent an Event
-				notifyObservers(event);
+				if (!notifiedObserver) {
+					notifyObservers(event);
+				}
 			}
 			// As each step exhausts its events remove it from the list and move
 			// on to the next
@@ -184,7 +210,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		steps.clear();
 		finishedSteps.clear();
 	}
-	
+
 	@Override
 	public String getId() {
 		return id;
@@ -194,7 +220,6 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	public void setId(String id) {
 		this.id = id;
 	}
-
 
 	//
 	// implements IObserver interface

@@ -83,12 +83,13 @@ public class LineBreakConversionStep extends BasePipelineStep {
 	}
  
 	@Override
-	protected void handleStartBatchItem (Event event) {
-		isDone = false;
+	protected Event handleStartBatchItem (Event event) {
+		isDone = false;		
+		return event;
 	}
 
 	@Override
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
 		RawDocument rawDoc;
 		BufferedReader reader = null;
 		OutputStreamWriter writer = null;
@@ -189,6 +190,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 				throw new OkapiIOException("IO error while closing.", e);
 			}
 		}
+		
+		return event;
 	}
-
 }

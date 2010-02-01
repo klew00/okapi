@@ -89,13 +89,14 @@ public class TextModificationStep extends BasePipelineStep {
 		params = (Parameters)params;
 	}
  
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		initDone = false;
+		return event;
 	}
 	
 	@Override
-	protected void handleStartBatchItem (Event event) {
-		if ( initDone ) return; // Initialize once per batch
+	protected Event handleStartBatchItem (Event event) {
+		if ( initDone ) return event; // Initialize once per batch
 		if ( params.segment ) {
 			String src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
 			String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
@@ -110,15 +111,17 @@ public class TextModificationStep extends BasePipelineStep {
 			trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
 		}
 		initDone = true;
+		
+		return event;
 	}
 	
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
-		if ( !tu.isTranslatable() ) return;
+		if ( !tu.isTranslatable() ) return event;
 		// Skip if already translate (only if required)
-		if ( !params.applyToExistingTarget && tu.hasTarget(targetLocale) ) return;
+		if ( !params.applyToExistingTarget && tu.hasTarget(targetLocale) ) return event;
 		
 		// Apply the segmentation and/or segment marks if requested
 		if ( params.segment || params.markSegments ) {
@@ -166,6 +169,8 @@ public class TextModificationStep extends BasePipelineStep {
 		if ( params.addPrefix || params.addSuffix || params.addName || params.addID ) {
 			addText(tu);
 		}
+		
+		return event;
 	}
 
 	/**

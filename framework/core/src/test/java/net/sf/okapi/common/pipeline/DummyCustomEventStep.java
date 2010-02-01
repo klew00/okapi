@@ -15,10 +15,10 @@ public class DummyCustomEventStep extends BasePipelineStep {
 		return "DummyStep";
 	}
 	
-	protected void handleCustom(Event event) {
+	protected Event handleCustom(Event event) {			
 		isDone = true;
+		return event;
 	}
-
 	
 	public boolean isDone() {
 		return isDone;

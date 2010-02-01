@@ -131,7 +131,7 @@ public class XSLTransformStep extends BasePipelineStep {
 	}
  
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		try {
 			// Create the parameters map
 			ConfigurationString cfgString = new ConfigurationString(params.paramList);
@@ -162,15 +162,18 @@ public class XSLTransformStep extends BasePipelineStep {
 				System.setProperty(FACTORY_PROP, originalProcessor);
 			}
 		}
+		
+		return event;
 	}
 	
 	@Override
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		isDone = false;
+		return event;
 	}
 
 	@Override
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
 		try {
 			RawDocument rawDoc = (RawDocument)event.getResource();
 			trans.reset();
@@ -218,6 +221,8 @@ public class XSLTransformStep extends BasePipelineStep {
 		finally {
 			isDone = true;
 		}
+		
+		return event;
 	}
 
 	private void fillParameters () {

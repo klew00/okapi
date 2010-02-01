@@ -129,7 +129,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	}
 	
 	@Override
-	protected void handleStartDocument (Event event) {
+	protected Event handleStartDocument (Event event) {
 
 		StartDocument startDoc = (StartDocument)event.getResource();
 		if ( outputEncoding == null ) outputEncoding = startDoc.getEncoding();
@@ -154,6 +154,8 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		filterWriter.setOutput(outputFile.getAbsolutePath());
 		filterWriter.handleEvent(event);
 		isDone = false;
+		
+		return event;
 	}
 
 	public boolean isDone() {

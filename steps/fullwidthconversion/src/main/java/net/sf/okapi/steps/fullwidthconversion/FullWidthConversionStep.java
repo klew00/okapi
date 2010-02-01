@@ -62,10 +62,10 @@ public class FullWidthConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
-		if ( !tu.isTranslatable() ) return;
+		if ( !tu.isTranslatable() ) return event;
 
 		TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 		String text = tc.getCodedText();
@@ -275,6 +275,8 @@ public class FullWidthConversionStep extends BasePipelineStep {
 
 		// Set back the modified text
 		tc.setCodedText(sb.toString());
+		
+		return event;
 	}
 
 }

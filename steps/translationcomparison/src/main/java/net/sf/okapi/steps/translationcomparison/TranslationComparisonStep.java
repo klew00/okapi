@@ -126,7 +126,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	}
  
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		// Both strings are in the target language.
 		matcher = new TextMatcher(targetLocale, targetLocale);
 		
@@ -149,10 +149,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		if ( !params.isCaseSensitive() ) options |= TextMatcher.IGNORE_CASE;
 		if ( !params.isWhitespaceSensitive() ) options |= TextMatcher.IGNORE_WHITESPACES;
 		if ( !params.isPunctuationSensitive() ) options |= TextMatcher.IGNORE_PUNCTUATION;
+		
+		return event;
 	}
 	
 	@Override
-	protected void handleEndBatch (Event event) {
+	protected Event handleEndBatch (Event event) {
 		matcher = null;
 		if ( params.isGenerateHTML() && ( writer != null )) {
 			writer.close();
@@ -167,10 +169,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		if ( params.isAutoOpen() && ( pathToOpen != null )) {
 			Util.openURL((new File(pathToOpen)).getAbsolutePath());
 		}
+		
+		return event;
 	}
 	
 	@Override
-	protected void handleStartDocument (Event event1) {
+	protected Event handleStartDocument (Event event1) {
 		StartDocument startDoc1 = (StartDocument)event1.getResource();
 		initializeDocumentData();
 		isBaseMultilingual = startDoc1.isMultilingual();
@@ -189,10 +193,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		
 		scoreTotal = 0;
 		itemCount = 0;
+		
+		return event1;
 	}
 	
 	@Override
-	protected void handleEndDocument (Event event) {
+	protected Event handleEndDocument (Event event) {
     	if ( filter2 != null ) {
     		filter2.close();
     	}
@@ -210,10 +216,12 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeEndElement(); // html
     		writer.close();
     	}
+    	
+    	return event;
 	}
 	
 	@Override
-	protected void handleTextUnit (Event event1) {
+	protected Event handleTextUnit (Event event1) {
 		TextUnit tu1 = event1.getTextUnit();
 		// Move to the next TU
 		Event event2 = synchronize(filter2, EventType.TEXT_UNIT);
@@ -222,7 +230,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			event3 = synchronize(filter3, EventType.TEXT_UNIT);
 		}
 		// Skip non-translatable
-		if ( !tu1.isTranslatable() ) return;
+		if ( !tu1.isTranslatable() ) return event1;
 		
 		TextUnit tu2 = (TextUnit)event2.getResource();
 		TextUnit tu3 = null;
@@ -263,7 +271,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		// Do we have a base translation?
 		if ( trgFrag1 == null ) {
 			// No comparison if there is no base translation
-			return;
+			return event1;
 		}
 		// Do we have a translation to compare to?
 		if ( trgFrag2 == null ) {
@@ -355,6 +363,8 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			}
 			tmx.writeTUFull(tmxTu);
 		}
+		
+		return event1;
 	}
 
     private String getOutputFilename(){

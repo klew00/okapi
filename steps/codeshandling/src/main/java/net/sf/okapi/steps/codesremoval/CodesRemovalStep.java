@@ -61,15 +61,18 @@ public class CodesRemovalStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		if ( remover == null ) {
 			remover = new CodesRemover(params, targetLocale);
 		}
+		
+		return event;
 	}
 	
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		remover.processTextUnit((TextUnit)event.getResource());
+		return event;
 	}
 
 }

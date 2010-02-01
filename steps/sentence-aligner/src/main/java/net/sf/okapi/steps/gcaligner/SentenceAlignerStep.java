@@ -29,7 +29,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.XMLWriter;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.TMXWriter;
@@ -39,6 +38,7 @@ import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.ISegmenter;
@@ -112,7 +112,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	}
 
 	@Override
-	protected void handleStartBatch(Event event) {
+	protected Event handleStartBatch(Event event) {
 		SRXDocument srxDocument = new SRXDocument();
 		srxDocument.setTrimLeadingWhitespaces(false);
 		InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
@@ -128,30 +128,36 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			tmx.writeStartDocument(sourceLocale, targetLocale, getClass().getName(), null,
 					"sentence", null, "text/plain");
 		}
+		
+		return event;
 	}
 
-	protected void handleEndBatch(Event event) {
+	protected Event handleEndBatch(Event event) {
 		if (params.isGenerateTMX() && (tmx != null)) {
 			tmx.writeEndDocument();
 			tmx.close();
 			tmx = null;
 		}
+		
+		return event;
 	}
 
 	@Override
-	protected void handleStartDocument(Event event1) {
+	protected Event handleStartDocument(Event event1) {
 		initializeFilter();
+		return event1;
 	}
 
 	@Override
-	protected void handleEndDocument(Event event) {
+	protected Event handleEndDocument(Event event) {
 		if (filter != null) {
 			filter.close();
 		}
+		return event;
 	}
 
 	@Override
-	protected void handleTextUnit(Event sourceEvent) {
+	protected Event handleTextUnit(Event sourceEvent) {
 		TextUnit sourceTu = Utils.segmentSource((TextUnit) sourceEvent.getResource(),
 				sourceSegmenter);
 
@@ -160,7 +166,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 		// Skip non-translatable
 		if (!sourceTu.isTranslatable())
-			return;
+			return sourceEvent;
 
 		TextUnit targetTu = Utils.segmentSource((TextUnit) targetEvent.getResource(),
 				targetSegmenter);
@@ -168,7 +174,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		if (!sourceTu.getSource().isSegmented() || !targetTu.getSource().isSegmented()) {
 			// we must have hit some empty content that did not segment
 			LOGGER.warning("Found unsegmented TextUnit. Possibly a TextUnit with empty content.");
-			return;
+			return sourceEvent;
 		}
 
 		List<TextUnit> alignedTextUnits = sentenceAligner.align(sourceTu, targetTu, sourceLocale,
@@ -179,9 +185,16 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			for (TextUnit alignedTextUnit : alignedTextUnits) {
 				tmx.writeTUFull(alignedTextUnit);
 			}
-		} else { // otherwise send each aligned TextUnit downstream as an event
-			throw new OkapiNotImplementedException("Streaming aligned TextUnits not supported yet");
+		} else { // otherwise send each aligned TextUnit downstream as a multi event
+			MultiEvent me = new MultiEvent();
+			for (TextUnit tu : alignedTextUnits) {
+				me.addEvent(new Event(EventType.TEXT_UNIT, tu));				
+			}			
+			Event e = new Event(EventType.MULTI_EVENT, me);
+			return e;
 		}
+		
+		return sourceEvent;
 	}
 
 	private void initializeFilter() {

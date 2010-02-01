@@ -40,23 +40,27 @@ public class Consumer extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleEndBatchItem (Event event) {		
+	protected Event handleEndBatchItem (Event event) {		
 		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
+		return event;
 	}
 
 	@Override
-	protected void handleStartBatchItem (Event event) {		
+	protected Event handleStartBatchItem (Event event) {		
 		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
+		return event;
 	}
 	
 	@Override
-	protected void handleTextUnit(Event event) {
+	protected Event handleTextUnit(Event event) {
 		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
+		return event;
 	}
 	
 	@Override
-	protected void handleRawDocument(Event event) {		
+	protected Event handleRawDocument(Event event) {		
 		LOGGER.log(Level.FINEST, "EventType: " + event.getEventType().name());
+		return event;
 	}
 
 }

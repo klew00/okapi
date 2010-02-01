@@ -39,20 +39,23 @@ public class ConsumerProducer extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleEndBatchItem (Event event) {		
+	protected Event handleEndBatchItem (Event event) {		
 		LOGGER.log(Level.FINEST, getName() + " end-batch-item");
+		return event;
 	}
 
 	@Override
-	protected void handleStartBatchItem (Event event) {		
+	protected Event handleStartBatchItem (Event event) {		
 		LOGGER.log(Level.FINEST, getName() + " start-batch-item");
+		return event;
 	}
 	
 	@Override
-	protected void handleTextUnit(Event event) {
+	protected Event handleTextUnit(Event event) {
 		try {
 			Thread.sleep(200);
 		} catch (InterruptedException e) {}
+		return event;
 	}
 
 }

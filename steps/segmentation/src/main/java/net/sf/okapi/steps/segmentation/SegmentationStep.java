@@ -77,13 +77,14 @@ public class SegmentationStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		initDone = false;
+		return event;
 	}
 	
 	@Override
-	protected void handleStartBatchItem (Event event) {
-		if ( initDone ) return; // Initialize once per batch
+	protected Event handleStartBatchItem (Event event) {
+		if ( initDone ) return event; // Initialize once per batch
 		//TODO: implement projDir
 		SRXDocument srxDoc = new SRXDocument();
 		String src = null;
@@ -101,13 +102,15 @@ public class SegmentationStep extends BasePipelineStep {
 			}
 		}
 		trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
+		
+		return event;
 	}
 	
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
-		if ( !tu.isTranslatable() ) return;
+		if ( !tu.isTranslatable() ) return event;
 
 		TextContainer cont;
 		if ( tu.hasTarget(targetLocale) ) {
@@ -129,6 +132,8 @@ public class SegmentationStep extends BasePipelineStep {
 		
 		// Make sure we have target content
 		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
+		
+		return event;
 	}
 
 }

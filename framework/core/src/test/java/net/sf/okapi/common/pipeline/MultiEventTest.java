@@ -18,39 +18,40 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.tests;
+package net.sf.okapi.common.pipeline;
+
+import java.util.List;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.observer.IObservable;
 
-/**
- * Generic step to capture the last text unit for a set of filter events.
- */
-public class CaptureStep extends BasePipelineStep {
+public class MultiEventTest {
 
-	private TextUnit tu;
-	
-	public String getDescription() {
-		return "Capturing step for testing.";
+	@Test
+	public void pipelineObserverWithMultiEvent() {		
+		IPipeline p = new Pipeline();
+		
+		// add our event observer
+		EventObserver o = new EventObserver();
+		((IObservable)p).addObserver(o);
+		
+		p.addStep(new DummyMultiCustomEventStep());
+		
+		p.startBatch();		
+		p.process(new Event(EventType.CUSTOM));				
+		p.endBatch();
+		
+		// test we observed the correct events
+		List<Event> el = o.getResult();  
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());
+		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());		
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
 	}
-
-	public String getName() {
-		return "Capture";
-	}
-
-	@Override
-	protected Event handleTextUnit (Event event) {
-		tu = (TextUnit)event.getResource();
-		return event;
-	}
-	
-	public TextUnit getLastTextUnit () {
-		return tu;
-	}
-
-	public void reset () {
-		tu = null;
-	}
-
 }
