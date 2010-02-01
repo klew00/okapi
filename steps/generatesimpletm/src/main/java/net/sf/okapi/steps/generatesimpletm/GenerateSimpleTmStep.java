@@ -75,31 +75,34 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		if ( Util.isEmpty(params.getTmPath()) ) {
 			throw new OkapiBadStepInputException("Please provide a valid path and name for the TM.");
 		}
+		return event;
 	}
 	
 	@Override
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		if(simpleTm == null){
 			simpleTm = new Database();
 			simpleTm.create(params.getTmPath(), true, targetLocale);
-		}
+		}		
+		return event;
 	}
 	
 	@Override
-	protected void handleEndBatchItem (Event event) {
+	protected Event handleEndBatchItem (Event event) {
 		logger.info(String.format("\nSIMPLE TM GENERATION FILE: %s", fileName ));
 		logger.info(String.format("Untranslatable text units = %d",countIsNotTranslatable));
 		logger.info(String.format("Translatable text units but failed to add = %d", countTuNotAdded));
 		logger.info(String.format("Text units added = %d", countTusAdded));
 		logger.info(String.format("Segments added = %d",countSegsAdded));
+		return event;
 	}
 
 	@Override
-	protected void handleEndBatch (Event event) {
+	protected Event handleEndBatch (Event event) {
 		logger.info(String.format("\nSIMPLE TM GENERATION: "));
 		logger.info(String.format("Total untranslatable text units = %d",countIsNotTranslatable));
 		logger.info(String.format("Total text units (Translatable) that failed to add = %d", countTuNotAdded));
@@ -107,44 +110,47 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 		logger.info(String.format("Total segments added = %d",countSegsAdded));
 		logger.info(String.format("Total entries in generated simpleTm = %d",simpleTm.getEntryCount()));
 		simpleTm.close();
+		return event;		
 	}
 
 	@Override
-	protected void handleStartDocument (Event event) {
+	protected Event handleStartDocument (Event event) {
 		StartDocument sd = (StartDocument)event.getResource();
 		fileName = Util.getFilename(sd.getName(), true);
 		isMultilingual = sd.isMultilingual();
 		if(!isMultilingual){
 			logger.warning("File "+fileName+ " is not processed as a multiLingual file and cannot be used to populate the SimpleTm.");
 		} 
+		
+		return event;
 	}
 	
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		
 		//--skip file if not multilingual.
 		if ( !isMultilingual ) {
 			countTuNotAdded++;
-			return;
+			return event;
 		} 
 		
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ){
 			countIsNotTranslatable++;
-			return;
+			return event;
 		} 
 		
 		if ( tu.getSource() == null ) {
 			logger.warning("TextUnit is missing source content.");
 			countTuNotAdded++;
-			return;
+			return event;
 		}
 		
 		if( !tu.hasTarget(targetLocale) || ( tu.getTarget(targetLocale)==null )){
 			logger.warning(String.format("TextUnit is missing '%s' target.", targetLocale));
 			countTuNotAdded++;
-			return;
+			return event;
 		}
 		
 		// Check if the attributes for GroupName and FileName are available from the input
@@ -165,5 +171,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 			countTusAdded++;
 			countSegsAdded+=added;
 		}
+		
+		return event;
 	}
 }

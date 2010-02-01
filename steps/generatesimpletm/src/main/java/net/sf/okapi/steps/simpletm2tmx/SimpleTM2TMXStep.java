@@ -50,12 +50,13 @@ public class SimpleTM2TMXStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		isDone = false;
+		return event;
 	}
 
 	@Override
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
 		try {
 			if ( db == null ) { // Create the db if needed
 				db = new Database();
@@ -82,6 +83,8 @@ public class SimpleTM2TMXStep extends BasePipelineStep {
 		finally {
 			isDone = true;
 		}
+		
+		return event;
 	}
 	
 }
