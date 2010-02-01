@@ -104,6 +104,8 @@ public class VignetteFilter implements IFilter {
 	private File storeFile;
 	private int counter;
 	private IFilterConfigurationMapper fcMapper;
+	private String currentVFullPath;
+	private List<String> listOfPaths;
 	
 	public VignetteFilter () {
 		params = new Parameters();
@@ -203,6 +205,9 @@ public class VignetteFilter implements IFilter {
 			Event event = queue.poll();
 			if ( event.getEventType() == EventType.END_DOCUMENT ) {
 				hasNext = false;
+				if ( !preprocessing ) {
+					generateListOfPaths();
+				}
 			}
 			return event;
 		}
@@ -231,6 +236,7 @@ public class VignetteFilter implements IFilter {
 			throw new RuntimeException("You must specify a target locale.");
 		}
 		
+		listOfPaths = new ArrayList();
 		store = new TemporaryStore();
 		try {
 			storeFile = File.createTempFile("vgnflt_", null);
@@ -439,7 +445,10 @@ public class VignetteFilter implements IFilter {
 			// Get first 'contentInstance' element
 			NodeList nodes = doc.getElementsByTagName("contentInstance");
 			Element elem = (Element)nodes.item(0);
-			logger.info("contentInstance vcmId="+elem.getAttribute("vcmId"));
+			currentVFullPath = elem.getAttribute("vcmLogicalPath") + "/" + elem.getAttribute("vcmName");
+			if ( !preprocessing ) {
+				logger.info("contentInstance vcmLogicalPath="+currentVFullPath);
+			}
 
 			// Get all 'attribute' elements in 'contentInstance' 
 			if ( processList(elem, content) ) eventFound = true;
@@ -562,6 +571,8 @@ public class VignetteFilter implements IFilter {
 
 		int last = 0;
 		int[] pos;
+		
+		listOfPaths.add(currentVFullPath);
 
 		// Start of sub-document
 		StartSubDocument ssd = new StartSubDocument(String.valueOf(++subDocId));
@@ -754,4 +765,12 @@ public class VignetteFilter implements IFilter {
 			node = node.getNextSibling();
 		}
 	}
+
+	private void generateListOfPaths () {
+		logger.info(String.format("\nNumber of parts to localize = %d", listOfPaths.size()));
+		for ( String tmp : listOfPaths ) {
+			logger.info(tmp);
+		}
+	}
+
 }
