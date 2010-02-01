@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,11 +30,13 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.TabItem;
-import swing2swt.layout.BorderLayout;
+//import swing2swt.layout.BorderLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Label;
@@ -115,50 +117,12 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 	 */
 	protected void createContents() { // DWH 6-17-09 was private
 		shlOfficeFilter = new Shell(getParent(), getStyle());
-		shlOfficeFilter.setLayout(new BorderLayout(0, 0));
-		shlOfficeFilter.setSize(450, 300);
+		shlOfficeFilter.setLayout(new GridLayout()); //new BorderLayout(0, 0));
+		//shlOfficeFilter.setSize(450, 300);
 		shlOfficeFilter.setText("Office 2007 Filter Parameters");
 		{
-			compositeOKCancel = new Composite(shlOfficeFilter, SWT.NONE);
-			FillLayout fillLayout = new FillLayout(SWT.HORIZONTAL);
-			fillLayout.spacing = 3;
-			fillLayout.marginWidth = 3;
-			fillLayout.marginHeight = 3;
-			compositeOKCancel.setLayout(fillLayout);
-			compositeOKCancel.setLayoutData(BorderLayout.SOUTH);
-			{
-				btnHelp = new Button(compositeOKCancel, SWT.NONE);
-				btnHelp.addSelectionListener(new SelectionAdapter() {
-					public void widgetDefaultSelected(SelectionEvent e) {
-						int iii = 1;
-						iii = iii+2;
-					}
-				});
-				btnHelp.setText("Help");
-			}
-			{
-				Label label = new Label(compositeOKCancel, SWT.NONE);
-			}
-			{
-				btnOk = new Button(compositeOKCancel, SWT.NONE);
-				btnOk.setText("OK");
-			}
-			{
-				btnCancel = new Button(compositeOKCancel, SWT.NONE);
-				btnCancel.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {
-					}
-				});
-				btnCancel.setText("Cancel");
-			}
-			if ( UIUtil.getPlatformType() == UIUtil.PFTYPE_WIN )
-				compositeOKCancel.setTabList(new Control[]{btnOk, btnCancel, btnHelp});
-			else
-				compositeOKCancel.setTabList(new Control[]{btnCancel, btnOk, btnHelp});
-		}
-		{
 			TabFolder tabFolder = new TabFolder(shlOfficeFilter, SWT.NONE);
-			tabFolder.setLayoutData(BorderLayout.CENTER);
+			//tabFolder.setLayoutData(BorderLayout.CENTER);
 			{
 				TabItem tbtmGeneralOptions_1 = new TabItem(tabFolder, SWT.NONE);
 				tbtmGeneralOptions_1.setText("General Options");
@@ -207,7 +171,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 					}
 					{
 						Composite compositeWordStyles = new Composite(composite, SWT.NONE);
-						compositeWordStyles.setLayoutData(new RowData(292, 67));
+						//compositeWordStyles.setLayoutData(new RowData(292, 67));
 //						{
 //							btnStylesFromDocument = new Button(compositeWordStyles, SWT.NONE);
 //							btnStylesFromDocument.setBounds(269, 8, 146, 23);
@@ -221,7 +185,7 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 						{
 							listExcludedWordStyles = new List(compositeWordStyles, SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 							listExcludedWordStyles.setItems(new String[] {"Emphasis", "ExcludeCharacterStyle", "ExcludeParagraphStyle", "Heading1", "Heading2", "Normal", "Title", "Strong", "Subtitle", "tw4winExternal"});
-							listExcludedWordStyles.setBounds(10, 0, 156, 68);
+							listExcludedWordStyles.setBounds(10, 0, 156, 120);
 						}
 					}
 				}
@@ -327,5 +291,47 @@ public class UIEditor extends org.eclipse.swt.widgets.Dialog {
 			}
 		}
 
+		{
+			compositeOKCancel = new Composite(shlOfficeFilter, SWT.NONE);
+			FillLayout fillLayout = new FillLayout(SWT.HORIZONTAL);
+			fillLayout.spacing = 3;
+			fillLayout.marginWidth = 3;
+			fillLayout.marginHeight = 3;
+			compositeOKCancel.setLayout(fillLayout);
+			//compositeOKCancel.setLayoutData(BorderLayout.SOUTH);
+			GridData gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+			compositeOKCancel.setLayoutData(gdTmp);
+			{
+				btnHelp = new Button(compositeOKCancel, SWT.NONE);
+				btnHelp.addSelectionListener(new SelectionAdapter() {
+					public void widgetDefaultSelected(SelectionEvent e) {
+						int iii = 1;
+						iii = iii+2;
+					}
+				});
+				btnHelp.setText("Help");
+			}
+			{
+				Label label = new Label(compositeOKCancel, SWT.NONE);
+			}
+			{
+				btnOk = new Button(compositeOKCancel, SWT.NONE);
+				btnOk.setText("OK");
+			}
+			{
+				btnCancel = new Button(compositeOKCancel, SWT.NONE);
+				btnCancel.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+					}
+				});
+				btnCancel.setText("Cancel");
+			}
+			if ( UIUtil.getPlatformType() == UIUtil.PFTYPE_WIN )
+				compositeOKCancel.setTabList(new Control[]{btnOk, btnCancel, btnHelp});
+			else
+				compositeOKCancel.setTabList(new Control[]{btnCancel, btnOk, btnHelp});
+		}
+		
+		shlOfficeFilter.pack();
 	}
 }
