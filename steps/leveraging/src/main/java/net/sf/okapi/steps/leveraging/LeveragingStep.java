@@ -80,7 +80,7 @@ public class LeveragingStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		qm = new QueryManager();
 		qm.setLanguages(sourceLocale, targetLocale);
 		qm.setThreshold(params.getThreshold());
@@ -96,46 +96,53 @@ public class LeveragingStep extends BasePipelineStep {
 			tmxWriter.writeStartDocument(sourceLocale, targetLocale,
 				getClass().getName(), "", "sentence", "undefined", "undefined");
 		}
+		
+		return event;
 	}
 	
 	@Override
-	protected void handleEndBatch (Event event) {
+	protected Event handleEndBatch (Event event) {
 		destroy();
+		return event;
 	}
 	
 	@Override
-	protected void handleStartDocument (Event event) {
+	protected Event handleStartDocument (Event event) {
 		qm.resetCounters();
+		return event;
 	}
 
 	@Override
-	protected void handleEndDocument (Event event) {
+	protected Event handleEndDocument (Event event) {
 		logger.info(String.format("Segments with text = %d", qm.getTotalSegments()));
 		logger.info(String.format("Segments leveraged = %d", qm.getLeveragedSegments()));
+		return event;
 	}
 	
 	@Override
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
 		TextUnit tu = event.getTextUnit();
-		if ( !tu.isTranslatable() ) return;
+		if ( !tu.isTranslatable() ) return event;
 
     	boolean approved = false;
     	Property prop = tu.getTargetProperty(targetLocale, Property.APPROVED);
     	if ( prop != null ) {
     		if ( "yes".equals(prop.getValue()) ) approved = true;
     	}
-    	if ( approved ) return; // Do not leverage pre-approved entries
+    	if ( approved ) return event; // Do not leverage pre-approved entries
     	
     	// Check if this entry has been leveraged once already
     	// (this allows to have several Leveraging steps in the same pipeline)
     	TextContainer tc = tu.getTarget(targetLocale);
     	if ( tc != null ) {
     		ScoresAnnotation scores = tc.getAnnotation(ScoresAnnotation.class);
-    		if ( scores != null ) return; // Don't overwrite existing leverage
+    		if ( scores != null ) return event; // Don't overwrite existing leverage
     	}
 
     	// Leverage
 		qm.leverage(tu, tmxWriter, params.getFillTarget());
+		
+		return event;
 	}
 
 	@Override

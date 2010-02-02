@@ -61,29 +61,33 @@ public class BatchTranslationStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
 		isDone = true;
 		trans = new BatchTranslator(fcMapper, params);
+		return event;
 	}
 	
 	@Override
-	protected void handleEndBatch (Event event) {
+	protected Event handleEndBatch (Event event) {
 		if ( trans != null ) {
 			trans.endBatch();
 		}
+		return event;
 	}
 	
 	@Override
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
 		// To get the raw document
 		isDone = false;
+		return event;
 	}
 
 	@Override
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
 		trans.processDocument((RawDocument)event.getResource());
 		// Can move on to the next step
 		isDone = true;
+		return event;
 	}
 
 	@Override
