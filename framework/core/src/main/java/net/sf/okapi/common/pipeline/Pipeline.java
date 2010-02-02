@@ -122,7 +122,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 					// We send each of the events in MULTI_EVENT down the pipeline before
 					// processing any other events but only if the event is configured for multi-event propagation
 					if (event.getEventType() == EventType.MULTI_EVENT
-							&& !(((MultiEvent) event.getResource()).isPropagateAsSingleEvent())) {
+							&& !(((MultiEvent)event.getResource()).isPropagateAsSingleEvent())) {
 						// add the remaining steps to a temp list - these are the steps that will receive the expanded
 						// MULT_EVENTS
 						List<IPipelineStep> remainingSteps = steps.subList(steps.indexOf(step) + 1,
