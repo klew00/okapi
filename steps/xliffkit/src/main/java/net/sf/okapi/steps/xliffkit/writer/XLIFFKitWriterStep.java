@@ -103,39 +103,46 @@ public class XLIFFKitWriterStep extends BasePipelineStep implements IFilterWrite
 	}
 
 	@Override
-	protected void handleStartDocument(Event event) {
+	protected Event handleStartDocument(Event event) {
 		processStartDocument((StartDocument)event.getResource());
+		return event;
 	}
 	
 	@Override
-	protected void handleEndDocument(Event event) {
+	protected Event handleEndDocument(Event event) {
 		processEndDocument();
 		close();
+		return event;
 	}
 	
 	@Override
-	protected void handleStartGroup(Event event) {
+	protected Event handleStartGroup(Event event) {
 		processStartGroup((StartGroup)event.getResource());
+		return event;
 	}
 	
 	@Override
-	protected void handleEndGroup(Event event) {
+	protected Event handleEndGroup(Event event) {
 		processEndGroup((Ending)event.getResource());
+		return event;
 	}
 	
 	@Override
-	protected void handleStartSubDocument(Event event) {
+	protected Event handleStartSubDocument(Event event) {
 		processStartSubDocument((StartSubDocument)event.getResource());
+		return event;
 	}
 	
 	@Override
-	protected void handleEndSubDocument(Event event) {
+	protected Event handleEndSubDocument(Event event) {
 		processEndSubDocument((Ending)event.getResource());
+		return event;
 	}
 
 	@Override
-	protected void handleTextUnit(Event event) {
+	protected Event handleTextUnit(Event event) {
 		processTextUnit((TextUnit)event.getResource());
+		return event;
 	}
 	
 	private void processStartDocument (StartDocument resource) {
