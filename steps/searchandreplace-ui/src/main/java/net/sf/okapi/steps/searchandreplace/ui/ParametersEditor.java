@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -395,9 +395,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 
 	private boolean showAddItemsDialog () {
-		dialog = new Shell (mainComposite.getShell());
+		dialog = new Shell (mainComposite.getShell(), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		dialog.setText ("Search And Replace Item");
-		dialog.setSize (400, 200);
+		dialog.setMinimumSize (400, 200);
+		dialog.setSize(dialog.getMinimumSize());
 
 		dialog.setLayout(new GridLayout());
 
@@ -405,7 +406,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		Label label = new Label(dialog, SWT.NONE);
 		label.setText("Search Expression:");
 		
-		searchText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.SINGLE);
+		searchText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL);
 		GridData gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;
@@ -416,7 +417,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		label = new Label(dialog, SWT.NONE);
 		label.setText("Replacement Expression:");
 
-		replacementText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.SINGLE);
+		replacementText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL);
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;
