@@ -389,6 +389,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			case TextFragment.MARKER_CLOSING:
 			case TextFragment.MARKER_ISOLATED:
 				//TODO: Handle codes outside the segments!!!
+				code = srcCont.getCode(text.charAt(++i));
+				tmp.append(expandCodeContent(code, locToUse, context));
 				break;
 			case TextFragment.MARKER_SEGMENT:
 				code = srcCont.getCode(text.charAt(++i));

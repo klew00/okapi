@@ -184,14 +184,6 @@
 		   <fileset dir="../shared/licenses" includes="**/swt-*"/>
 		</copy>
 
-		<property name="dep102" value="${mavenStore}/swing2swt/swing2swt/1.0"/>
-		<fileset id="list.contents" dir="${dep102}"
-		 includes="**/*.jar"/>
-		<property name="jar102" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar102}</echo>
-		<copy todir="${distLib}" file="${dep102}/${jar102}"/>
-
-		<!-- Create the manifest -->
 		<property file="tmpJars"/>
 		<manifest file="${tmp}/MANIFEST.MF">
 			<attribute name="Implementation-Title" value="${okapilibuiName}"/>

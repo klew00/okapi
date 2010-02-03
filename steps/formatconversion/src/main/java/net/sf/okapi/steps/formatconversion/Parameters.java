@@ -42,6 +42,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public static final int TRG_FORCEEMPTY = 2; 
 
 	private static final String SINGLEOUTPUT = "singleOutput";
+	private static final String AUTOEXTENSIONS = "autoExtensions";
 	private static final String OUTPUTPATH = "outputPath";
 	private static final String TARGETSTYLE = "targetStyle";
 	private static final String OUTPUTFORMAT = "outputFormat";
@@ -50,6 +51,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String SKIPENTRIESWITHOUTTEXT = "skipEntriesWithoutText";
 	
 	private boolean singleOutput;
+	private boolean autoExtensions;
 	private String outputPath;
 	private int targetStyle;
 	private String outputFormat;
@@ -69,12 +71,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.targetStyle = targetStyle;
 	}
 
-	public boolean isSingleOutput () {
+	public boolean getSingleOutput () {
 		return singleOutput;
 	}
 
 	public void setSingleOutput (boolean singleOutput) {
 		this.singleOutput = singleOutput;
+	}
+
+	public boolean getAutoExtensions () {
+		return autoExtensions;
+	}
+
+	public void setAutoExtensions (boolean autoExtensions) {
+		this.autoExtensions = autoExtensions;
 	}
 
 	public String getOutputPath () {
@@ -119,6 +129,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void reset () {
 		singleOutput = true;
+		autoExtensions = false;
 		targetStyle = TRG_TARGETOREMPTY;
 		outputPath = "";
 		outputFormat = FORMAT_TMX;
@@ -131,6 +142,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		singleOutput = buffer.getBoolean(SINGLEOUTPUT, singleOutput);
+		autoExtensions = buffer.getBoolean(AUTOEXTENSIONS, autoExtensions);
 		targetStyle = buffer.getInteger(TARGETSTYLE, targetStyle);
 		outputPath = buffer.getString(OUTPUTPATH, outputPath);
 		outputFormat = buffer.getString(OUTPUTFORMAT, outputFormat);
@@ -142,6 +154,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public String toString() {
 		buffer.reset();
 		buffer.setBoolean(SINGLEOUTPUT, singleOutput);
+		buffer.setBoolean(AUTOEXTENSIONS, autoExtensions);
 		buffer.setInteger(TARGETSTYLE, targetStyle);
 		buffer.setString(OUTPUTPATH, outputPath);
 		buffer.setString(OUTPUTFORMAT, outputFormat);
@@ -155,6 +168,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(SINGLEOUTPUT, "Create a single output document", null);
+		desc.add(AUTOEXTENSIONS, "Output paths are the input paths plus the new format extension", null);
 		desc.add(OUTPUTPATH, "Output path", "Full path of the single output document to generate");
 		desc.add(OUTPUTFORMAT, "Output format", "Format to generate in output");
 		desc.add(USEGENERICCODES, "Output generic inline codes", null);
@@ -174,10 +188,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		
 		desc.addCheckboxPart(paramDesc.get(USEGENERICCODES));
 
-		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(SINGLEOUTPUT));
+		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(SINGLEOUTPUT));
 		PathInputPart pip = desc.addPathInputPart(paramDesc.get(OUTPUTPATH), "Output File", true);
-		pip.setMasterPart(cbp, true);
+		pip.setMasterPart(cbp1, true);
 		
+//		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(AUTOEXTENSIONS));
+//		cbp2.setMasterPart(cbp1, false);
+
 		return desc;
 	}
 

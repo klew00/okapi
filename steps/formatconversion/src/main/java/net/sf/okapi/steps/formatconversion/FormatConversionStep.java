@@ -51,6 +51,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	private IFilterWriter writer;
 	private boolean firstOutputCreated;
 	private int outputType;
+	private URI inputURI;
 	private URI outputURI;
 	private LocaleId targetLocale;
 
@@ -58,6 +59,11 @@ public class FormatConversionStep extends BasePipelineStep {
 		params = new Parameters();
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_URI)
+	public void setInputURI (URI inputURI) {
+		this.inputURI = inputURI;
+	}
+	
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
 	public void setOutputURI (URI outputURI) {
 		this.outputURI = outputURI;
@@ -112,7 +118,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			break;
 			
 		case END_BATCH:
-			if ( params.isSingleOutput() ) {
+			if ( params.getSingleOutput() ) {
 				Ending ending = new Ending("end");
 				writer.handleEvent(new Event(EventType.END_DOCUMENT, ending));
 				writer.close();
@@ -120,7 +126,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			break;
 			
 		case START_DOCUMENT:
-			if ( !firstOutputCreated || !params.isSingleOutput() ) {
+			if ( !firstOutputCreated || !params.getSingleOutput() ) {
 				switch ( outputType ) {
 				case PO_OUTPUT:
 					startPOOutput();
@@ -140,7 +146,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			break;
 			
 		case END_DOCUMENT:
-			if ( !params.isSingleOutput() ) {
+			if ( !params.getSingleOutput() ) {
 				writer.handleEvent(event);
 				writer.close();
 			}
@@ -196,15 +202,18 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 	
 	private void startPOOutput () {
-		File outFile;
-		if ( params.isSingleOutput() ) {
-			outFile = new File(params.getOutputPath());
+		if ( params.getSingleOutput() ) {
+			writer.setOutput(params.getOutputPath());
 		}
 		else {
-			outFile = new File(outputURI);
+			if ( params.getAutoExtensions() ) {
+				writer.setOutput(inputURI.getPath() + ".po");
+			}
+			else {
+				writer.setOutput(outputURI.getPath());
+			}
 		}
 		// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
-		writer.setOutput(outFile.getPath());
 		writer.setOptions(targetLocale, "UTF-8");
 		firstOutputCreated = true;
 	}
@@ -217,11 +226,16 @@ public class FormatConversionStep extends BasePipelineStep {
 	
 	private void startTMXOutput () {
 		File outFile;
-		if ( params.isSingleOutput() ) {
+		if ( params.getSingleOutput() ) {
 			outFile = new File(params.getOutputPath());
 		}
 		else {
-			outFile = new File(outputURI);
+			if ( params.getAutoExtensions() ) {
+				outFile = new File(inputURI.getPath() + ".tmx");
+			}
+			else {
+				outFile = new File(outputURI);
+			}
 		}
 		writer.setOutput(outFile.getPath());
 		writer.setOptions(targetLocale, "UTF-8");
@@ -236,11 +250,16 @@ public class FormatConversionStep extends BasePipelineStep {
 	
 	private void startTableOutput () {
 		File outFile;
-		if ( params.isSingleOutput() ) {
+		if ( params.getSingleOutput() ) {
 			outFile = new File(params.getOutputPath());
 		}
 		else {
-			outFile = new File(outputURI);
+			if ( params.getAutoExtensions() ) {
+				outFile = new File(inputURI.getPath() + ".txt");
+			}
+			else {
+				outFile = new File(outputURI);
+			}
 		}
 		// Not needed, writer does this: Util.createDirectories(outFile.getAbsolutePath());
 		writer.setOutput(outFile.getPath());
@@ -253,7 +272,17 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	private void startPensieveOutput () {
-		writer.setOutput(params.getOutputPath());
+		if ( params.getSingleOutput() ) {
+			writer.setOutput(params.getOutputPath());
+		}
+		else {
+			if ( params.getAutoExtensions() ) {
+				writer.setOutput(inputURI.getPath() + ".pentm");
+			}
+			else {
+				writer.setOutput(outputURI.getPath());
+			}
+		}
 		writer.setOptions(targetLocale, "UTF-8");
 	}
 

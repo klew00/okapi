@@ -399,6 +399,7 @@ public class XLIFFFilterTest {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Typo3Draft.xlf", null));
 		list.add(new InputDocument(root+"Xslt-Test01.xlf", null));
+		list.add(new InputDocument(root+"TS09-12-Test01.sdlxliff", null));
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locDE));
 	}

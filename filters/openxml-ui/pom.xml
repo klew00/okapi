@@ -20,10 +20,5 @@
         <artifactId>okapi-core-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>swing2swt</groupId>
-        <artifactId>swing2swt</artifactId>
-        <version>1.0</version>
-      </dependency>
    </dependencies>
 </project>

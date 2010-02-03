@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -88,9 +88,13 @@ public class TableFilterWriter implements IFilterWriter {
 		InputStream orig = null;
 		OutputStream dest = null;
 		try {
-			// Close the output
+			// And writer
 			writer.close();
 			writer = null;
+			if ( outputStream != null ) {
+				outputStream.close();
+				outputStream = null;
+			}
 
 			// If it was in a temporary file, copy it over the existing one
 			// If the IFilter.close() is called before IFilterWriter.close()
