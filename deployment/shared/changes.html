@@ -1,298 +1,349 @@
-﻿<html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Rainbow ReadMe</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Rainbow ReadMe</title>
 </head>
 <body>
 <h1>Okapi Framework Changes Log - @date@</h1>
-<p>Note this document is common to both the <b>okapi-lib</b> distribution and 
-the <b>okapi-apps</b> distribution. The information pertaining to 
-applications other than Tikal are relevant only for the <b>okapi-apps</b> 
+<p>Note this document is common to both the <b>okapi-lib</b>
+distribution and the <b>okapi-apps</b> distribution. The information
+pertaining to applications other than Tikal are relevant only for the <b>okapi-apps</b>
 distribution.</p>
 <ul>
-	<li>Download page: <a href="http://okapi.opentag.com/downloads.html">
-	http://okapi.opentag.com/downloads.html</a></li>
-	<li>Main Web site: <a href="http://okapi.opentag.com">
-	http://okapi.opentag.com</a></li>
-	<li>Google Code Project site: <a href="http://code.google.com/p/okapi/">
-	http://code.google.com/p/okapi/</a></li>
+  <li>Download page: <a href="http://okapi.opentag.com/downloads.html">
+http://okapi.opentag.com/downloads.html</a></li>
+  <li>Main Web site: <a href="http://okapi.opentag.com">
+http://okapi.opentag.com</a></li>
+  <li>Google Code Project site: <a
+ href="http://code.google.com/p/okapi/"> http://code.google.com/p/okapi/</a></li>
 </ul>
 <h2>M5 to this release (M6)</h2>
-<p>The following list enumerates the most important changes in the Okapi 
-Framework between the previous one (M5) and this release (M6).</p>
+<p>The following list enumerates the most important changes in the
+Okapi Framework between the previous one (M5) and this release (M6).</p>
 <ul>
-	<li>Tikal:<ul>
-	<li>Fixed the issue of not having the HTML filter mapped when using the 
-	Vignette filter.</li>
-</ul>
-	</li>
-	<li>Translation resources:<ul>
-	<li>Added a connector for Microsoft MT Web services (<a href="http://api.microsofttranslator.com/V1/SOAP.svc">http://api.microsofttranslator.com/V1/SOAP.svc</a>), 
-	a Microsoft Bing AppID is needed to use it. You can obtain one at
-	<a href="http://www.bing.com/developers/appids.aspx">
-	http://www.bing.com/developers/appids.aspx</a>.</li>
-</ul>
-	</li>
-	<li>Steps:<ul>
-	<li>Leveraging step:<ul>
-	<li>Fixed the bug preventing to enter a TMX path.</li>
-	<li>Made adding an <code>MT!</code> prefix to the TMX entries an option.</li>
-</ul>
-	</li>
-</ul>
-	</li>
-	<li>Filters:<ul>
-	<li>PHP Content filter: Added UI for the localization directives options 
-	(default behaviour is the same).</li>
-</ul>
-	</li>
+  <li>Tikal:
+    <ul>
+      <li>Fixed the issue of not having the HTML filter mapped when
+using the Vignette filter.</li>
+    </ul>
+  </li>
+  <li>Translation resources:
+    <ul>
+      <li>Added a connector for Microsoft MT Web services (<a
+ href="http://api.microsofttranslator.com/V1/SOAP.svc">http://api.microsofttranslator.com/V1/SOAP.svc</a>),
+a Microsoft Bing AppID is needed to use it. You can obtain one at <a
+ href="http://www.bing.com/developers/appids.aspx">
+http://www.bing.com/developers/appids.aspx</a>.</li>
+    </ul>
+  </li>
+  <li>Steps:</li>
+  <li>
+    <ul>
+      <li>Add MULTI_EVENT (new resource and Event) handling to pipeline</li>
+    </ul>
+    <ul>
+      <li>Step handlers now return Event by default.<br>
+      </li>
+      <li>Leveraging step:
+        <ul>
+          <li>Fixed the bug preventing to enter a TMX path.</li>
+          <li>Made adding an <code>MT!</code> prefix to the TMX
+entries an option.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Filters:
+    <ul>
+      <li>PHP Content filter: Added UI for the localization directives
+options (default behaviour is the same).</li>
+    </ul>
+    <br>
+  </li>
 </ul>
 <h2>M4 to M5</h2>
-<p>The following list enumerates the most important changes in the Okapi Framework between release 
-M4 and release M5.</p>
+<p>The following list enumerates the most important changes in the
+Okapi Framework between release M4 and release M5.</p>
 <ul>
-	<li>Libraries:<ul>
-	<li>Changed minimum requirement to Java 1.6 instead of Java 1.5.</li>
-	<li>Removed distribution for Mac Carbon, added distribution for Mac 
-	Cocoa-64-bit.</li>
-	<li>Updated to Lucene 3.0.0</li>
-	<li>Refactored Pensieve TM engine, added new API.</li>
-</ul>
-	<li>Rainbow:<ul>
-	<li>Added the duration of the process in the log.</li>
-	<li>Updated the UI of the Pipeline Edit / Execute facility to make the 
-	panels of each step accessible without clicking.</li>
-	<li>Replaced the utility &quot;Generate SimpleTM Dabase&quot; by the 
-	pre-defined pipeline &quot;Import 
-	Into Pensieve TM&quot; (the previous utility&#39;s functionality is still available 
-	using a custom pipeline).</li>
-	<li>Replaced the utility &quot;Export SimpleTM Database&quot; by the 
-	pre-defined pipeline &quot;Convert 
-	File Format&quot; (the previous utility&#39;s functionality is still available using 
-	a custom pipeline).</li>
-	<li>Fixed issue with Text Rewriting and empty &lt;target&gt; for XLIFF input.</li>
-	<li>Replaced the utility &quot;Translation Comparison&quot; by the pre-defined 
-	pipeline &quot;Translation Comparison&quot;.</li>
-	<li>Added the pre-defined pipeline &quot;Create Translations in Batch Mode&quot;</li>
-	<li>Replaced the utility &quot;XSL Transformation&quot; by the pre-defined pipeline 
-	&quot;XSL Transformation&quot;.</li>
-	<li>Replaced the utility &quot;Used Characters Listing&quot; by the pre-defined 
-	pipeline &quot;Used Characters Listing&quot;.</li>
-</ul>
-	</li>
-	<li>Ratel:<ul>
-	<li>Fixed selection bug in UI.</li>
-	<li>Updated the default segmentation rules.</li>
-</ul>
-	</li>
-	<li>Steps:<ul>
-	<li>Added Batch Translation step (tested with ProMT and Apertium).</li>
-	<li>Added Codes Removal step</li>
-	<li>Added Leveraging step</li>
-	<li>Completed initial Tokenization and Word-Count steps.</li>
-	<li>Added the Sentence Alignment step.</li>
-</ul>
-	</li>
-	<li>Translation resources:<ul>
-		<li>Fixed issue with score &gt; 100 in Pensieve TM.</li>
-		<li>Added NCR support for Apertium connector.</li>
-	</ul>
-	</li>
-	<li>Filters:<ul>
-	<li>In the Properties Filter: Added pre-defined configuration for Skype&#39;s 
-	.lang format.</li>
-	<li>In the RTF parser:<ul>
-	<li>Fixed the issue with \&#39;HHc being read as \&#39;HH\&#39;HH in some cases.</li>
-	<li>Added support for additional DBCS encodings.</li>
-</ul>
-	</li>
-	<li>Added TTX Filter for Trados TagEditor documents (Beta).</li>
-	<li>In the HTML Filter: Added pre-defined configuration for well-formed files, providing groups 
-	and extra meta-data.</li>
-	<li>In the XML Filter: Changed the ITS extension <code>idPointer</code> to
-	<code>idValue</code> and modified its behavior to allow ID values to be 
-	generated from the expression, not just from the content pointed by the 
-	expression. The values are backward compatible, but existing parameters file 
-	will have to rename any reference to <code>idPointer</code> by <code>idValue</code>.</li>
-	<li>Added the Vignette Filter for Vignette export XML documents (Alpha)</li>
-	<li>Added the Pensieve Filter for reading and writing Pensieve translation 
-	memories.</li>
-</ul>
-	</li>
+  <li>Libraries:
+    <ul>
+      <li>Changed minimum requirement to Java 1.6 instead of Java 1.5.</li>
+      <li>Removed distribution for Mac Carbon, added distribution for
+Mac Cocoa-64-bit.</li>
+      <li>Updated to Lucene 3.0.0</li>
+      <li>Refactored Pensieve TM engine, added new API.</li>
+    </ul>
+  </li>
+  <li>Rainbow:
+    <ul>
+      <li>Added the duration of the process in the log.</li>
+      <li>Updated the UI of the Pipeline Edit / Execute facility to
+make the panels of each step accessible without clicking.</li>
+      <li>Replaced the utility "Generate SimpleTM Dabase" by the
+pre-defined pipeline "Import Into Pensieve TM" (the previous utility's
+functionality is still available using a custom pipeline).</li>
+      <li>Replaced the utility "Export SimpleTM Database" by the
+pre-defined pipeline "Convert File Format" (the previous utility's
+functionality is still available using a custom pipeline).</li>
+      <li>Fixed issue with Text Rewriting and empty &lt;target&gt; for
+XLIFF input.</li>
+      <li>Replaced the utility "Translation Comparison" by the
+pre-defined pipeline "Translation Comparison".</li>
+      <li>Added the pre-defined pipeline "Create Translations in Batch
+Mode"</li>
+      <li>Replaced the utility "XSL Transformation" by the pre-defined
+pipeline "XSL Transformation".</li>
+      <li>Replaced the utility "Used Characters Listing" by the
+pre-defined pipeline "Used Characters Listing".</li>
+    </ul>
+  </li>
+  <li>Ratel:
+    <ul>
+      <li>Fixed selection bug in UI.</li>
+      <li>Updated the default segmentation rules.</li>
+    </ul>
+  </li>
+  <li>Steps:
+    <ul>
+      <li>Added Batch Translation step (tested with ProMT and Apertium).</li>
+      <li>Added Codes Removal step</li>
+      <li>Added Leveraging step</li>
+      <li>Completed initial Tokenization and Word-Count steps.</li>
+      <li>Added the Sentence Alignment step.</li>
+    </ul>
+  </li>
+  <li>Translation resources:
+    <ul>
+      <li>Fixed issue with score &gt; 100 in Pensieve TM.</li>
+      <li>Added NCR support for Apertium connector.</li>
+    </ul>
+  </li>
+  <li>Filters:
+    <ul>
+      <li>In the Properties Filter: Added pre-defined configuration for
+Skype's .lang format.</li>
+      <li>In the RTF parser:
+        <ul>
+          <li>Fixed the issue with \'HHc being read as \'HH\'HH in some
+cases.</li>
+          <li>Added support for additional DBCS encodings.</li>
+        </ul>
+      </li>
+      <li>Added TTX Filter for Trados TagEditor documents (Beta).</li>
+      <li>In the HTML Filter: Added pre-defined configuration for
+well-formed files, providing groups and extra meta-data.</li>
+      <li>In the XML Filter: Changed the ITS extension <code>idPointer</code>
+to <code>idValue</code> and modified its behavior to allow ID values
+to be generated from the expression, not just from the content pointed
+by the expression. The values are backward compatible, but existing
+parameters file will have to rename any reference to <code>idPointer</code>
+by <code>idValue</code>.</li>
+      <li>Added the Vignette Filter for Vignette export XML documents
+(Alpha)</li>
+      <li>Added the Pensieve Filter for reading and writing Pensieve
+translation memories.</li>
+    </ul>
+  </li>
 </ul>
 <h2>M3 to M4</h2>
-<p>The following list enumerates the most important changes in the Okapi Framework between release 
-M3 and release M4.</p>
+<p>The following list enumerates the most important changes in the
+Okapi Framework between release M3 and release M4.</p>
 <ul>
-	<li>Filters:<ul>
-	<li>XLIFF filter: Added property for target-language and option to add it. 
-	Changed some of the language selection behaviors and set fall-back to ID 
-	option to false.</li>
-	<li>Fixed several bugs in the OpenXML filter (MS Office 2007 documents)</li>
-	<li>The JSON Filter has been added, to support for example AJAX or Palm 
-	WebOS applications.</li>
-	<li>The PHP Content Filter has been added, to support PHP include files.</li>
-	<li>Added default DITA configuration to the XML Filter.</li>
-	<li>Fixed several issues with the TS, Table, TMX, and XLIFF filters.</li>
-	<li>Added <code>whiteSpaces</code> ITS extension support in the XML Filter.</li>
-	<li>The PHP Content Filter has been added.</li>
-</ul>
-	</li>
-	<li>Library, Translation resources:<ul>
-		<li>All the TM and MT connectors have been moved to the package 
-		<code>net.sf.okapi.connectors</code>.</li>
-		<li>Modified the OpenTran connector to use the REST interface instead of 
-		RCP.</li>
-		<li>Added the connector to the MyMemory server (<a href="http://mymemory.translated.net/">http://mymemory.translated.net</a>)</li>
-		<li>Improved Google MT connector.</li>
-		<li>Improved GlobalSight TM connector for inline codes, and adjusted it for 
-		GS version 7.1.6.</li>
-		<li>Added Pensieve TM engine and its connector.</li>
-		<li>Added the connector for the open-source Apertium MT system web 
-		service (<a href="http://wiki.apertium.org/wiki/Main_Page">http://wiki.apertium.org/wiki/Main_Page</a>)</li>
-		<li>Changed language identification from String to LocaleId objects 
-		across the whole framework.</li>
-	</ul>
-	</li>
-	<li>Steps and Rainbow utilities:<ul>
-		<li>Added the SimpleTM2TMX step.</li>
-		<li>Added Import and Export utilities for SimpleTM files.</li>
-		<li>Continued improving the Tokenization and WordCount steps.</li>
-		<li>Implement an option to select the XSLT processor to use with the 
-		<cite>XSL 
-		Transformation</cite> utility.</li>
-		<li>Updated the <cite>Translation Package Creation</cite> utility to 
-		select from several resources for the pre-translation options, and to 
-		allow specifying threshold instead &quot;exact match only&quot;.</li>
-		<li>Updated the <cite>Text Rewriting</cite> utility to select from 
-		several resources for the translation options.</li>
-		<li>Added the FormatConversion step.</li>
-		<li>Improved inline compatibility in projects generated for OmegaT.</li>
-	</ul>
-	</li>
-	<li>Tikal:<ul>
-	<li>Added support for accessing the MyMemory repository (<code>-mm</code> option)</li>
-	<li>Corrected display of extended characters on the console for some 
-	languages/platforms.</li>
-	<li>Added threshold and max-hits options for TM query command (<code>-opt</code> 
-	option)</li>
-	<li>Added a command to create PO files from any input (<code>-2po</code> 
-	command).</li>
-	<li>Added a command to create TMX files from any input (<code>-2tmx</code> 
-	command).</li>
-	<li>Added a command to create Table files from any input (<code>-2tbl</code> 
-	command).</li>
-	<li>Added capability to query a Pensieve TM (<code>-pen</code> option).</li>
-	<li>Added support for accessing GlobalSight TM servers (<code>-gs</code> option).</li>
-	<li>Added support for accessing Apertium MT servers (<code>-apertium</code> option).</li>
-	<li>Added segmentation and leveraging options for the extraction command.</li>
-	<li>Added a commands to import any file into a Pensieve TM (<code>-imp</code> 
-	command).</li>
-	<li>Added a command to export a Pensieve TM to a TMX file (<code>-exp</code> 
-	command).</li>
-</ul>
-	</li>
+  <li>Filters:
+    <ul>
+      <li>XLIFF filter: Added property for target-language and option
+to add it. Changed some of the language selection behaviors and set
+fall-back to ID option to false.</li>
+      <li>Fixed several bugs in the OpenXML filter (MS Office 2007
+documents)</li>
+      <li>The JSON Filter has been added, to support for example AJAX
+or Palm WebOS applications.</li>
+      <li>The PHP Content Filter has been added, to support PHP include
+files.</li>
+      <li>Added default DITA configuration to the XML Filter.</li>
+      <li>Fixed several issues with the TS, Table, TMX, and XLIFF
+filters.</li>
+      <li>Added <code>whiteSpaces</code> ITS extension support in the
+XML Filter.</li>
+      <li>The PHP Content Filter has been added.</li>
+    </ul>
+  </li>
+  <li>Library, Translation resources:
+    <ul>
+      <li>All the TM and MT connectors have been moved to the package <code>net.sf.okapi.connectors</code>.</li>
+      <li>Modified the OpenTran connector to use the REST interface
+instead of RCP.</li>
+      <li>Added the connector to the MyMemory server (<a
+ href="http://mymemory.translated.net/">http://mymemory.translated.net</a>)</li>
+      <li>Improved Google MT connector.</li>
+      <li>Improved GlobalSight TM connector for inline codes, and
+adjusted it for GS version 7.1.6.</li>
+      <li>Added Pensieve TM engine and its connector.</li>
+      <li>Added the connector for the open-source Apertium MT system
+web service (<a href="http://wiki.apertium.org/wiki/Main_Page">http://wiki.apertium.org/wiki/Main_Page</a>)</li>
+      <li>Changed language identification from String to LocaleId
+objects across the whole framework.</li>
+    </ul>
+  </li>
+  <li>Steps and Rainbow utilities:
+    <ul>
+      <li>Added the SimpleTM2TMX step.</li>
+      <li>Added Import and Export utilities for SimpleTM files.</li>
+      <li>Continued improving the Tokenization and WordCount steps.</li>
+      <li>Implement an option to select the XSLT processor to use with
+the <cite>XSL Transformation</cite> utility.</li>
+      <li>Updated the <cite>Translation Package Creation</cite>
+utility to select from several resources for the pre-translation
+options, and to allow specifying threshold instead "exact match only".</li>
+      <li>Updated the <cite>Text Rewriting</cite> utility to select
+from several resources for the translation options.</li>
+      <li>Added the FormatConversion step.</li>
+      <li>Improved inline compatibility in projects generated for
+OmegaT.</li>
+    </ul>
+  </li>
+  <li>Tikal:
+    <ul>
+      <li>Added support for accessing the MyMemory repository (<code>-mm</code>
+option)</li>
+      <li>Corrected display of extended characters on the console for
+some languages/platforms.</li>
+      <li>Added threshold and max-hits options for TM query command (<code>-opt</code>
+option)</li>
+      <li>Added a command to create PO files from any input (<code>-2po</code>
+command).</li>
+      <li>Added a command to create TMX files from any input (<code>-2tmx</code>
+command).</li>
+      <li>Added a command to create Table files from any input (<code>-2tbl</code>
+command).</li>
+      <li>Added capability to query a Pensieve TM (<code>-pen</code>
+option).</li>
+      <li>Added support for accessing GlobalSight TM servers (<code>-gs</code>
+option).</li>
+      <li>Added support for accessing Apertium MT servers (<code>-apertium</code>
+option).</li>
+      <li>Added segmentation and leveraging options for the extraction
+command.</li>
+      <li>Added a commands to import any file into a Pensieve TM (<code>-imp</code>
+command).</li>
+      <li>Added a command to export a Pensieve TM to a TMX file (<code>-exp</code>
+command).</li>
+    </ul>
+  </li>
 </ul>
 <h2>M2 to M3</h2>
-<p>The following list enumerates the most important changes in the Okapi Framework between 
-release M2 and release M3.</p>
+<p>The following list enumerates the most important changes in the
+Okapi Framework between release M2 and release M3.</p>
 <ul>
-	<li>The build system has been completely redone and now uses Maven as its 
-	main builder. This has resulted in several changes in the structure of the 
-	Okapi classes, and in the way the files are distributed.</li>
-	<li>Filters:<ul>
-		<li>Added the TS Filter (beta) for Qt translation files.</li>
-		<li>Fixed handling of fuzzy flag for plural entries in the PO filter.</li>
-		<li>Fixed handling of <code>approved</code>, <code>state</code> and
-		<code>coord</code> properties in the XLIFF 
-		Filter.</li>
-		<li>Improved XML Filter:<ul>
-		<li>Improved rewriting of document type subset declaration.</li>
-		<li>Added support for protecting custom entity references.</li>
-		<li>Added support for ID defined using <code>xml:id</code> or the <code>
-		idPointer</code> ITS extension feature.</li>
-	</ul>
-		</li>
-		<li>Properties Filter:<ul>
-		<li>Change the default configuration to always escape output.</li>
-		<li>Added pre-defined configuration for non-escaped output.</li>
-	</ul>
-		</li>
-		<li>Fixed various issues in the OpenXML Filter (docx, pptx, etc.), and 
-		PO Filter.</li>
-	</ul>
-	</li>
-	<li>Libraries:<ul>
-		<li>The Google MT connector has been enhanced to have the inline codes taken 
-	into account, not simply pushed to the end of the text.</li>
-		<li>Fixed one error in default segmentation rules.</li>
-		<li>Added a connector component for the Translate Toolkit TM server.</li>
-		<li>Added steps such as Word-count and Tokenizer.</li>
-	</ul>
-	</li>
-	<li>The command-line tool Tikal has been added.</li>
-	<li>Rainbow <i>(okapi-apps distribution only)</i>:<ul>
-		<li>Improved handling of un-approved translations in TMX generated 
-		during a translation package creation.</li>
-		<li>Added option to choose to merge only approved translations in 
-		translation package post-processing.</li>
-	</ul>
-	</li>
+  <li>The build system has been completely redone and now uses Maven as
+its main builder. This has resulted in several changes in the structure
+of the Okapi classes, and in the way the files are distributed.</li>
+  <li>Filters:
+    <ul>
+      <li>Added the TS Filter (beta) for Qt translation files.</li>
+      <li>Fixed handling of fuzzy flag for plural entries in the PO
+filter.</li>
+      <li>Fixed handling of <code>approved</code>, <code>state</code>
+and <code>coord</code> properties in the XLIFF Filter.</li>
+      <li>Improved XML Filter:
+        <ul>
+          <li>Improved rewriting of document type subset declaration.</li>
+          <li>Added support for protecting custom entity references.</li>
+          <li>Added support for ID defined using <code>xml:id</code>
+or the <code> idPointer</code> ITS extension feature.</li>
+        </ul>
+      </li>
+      <li>Properties Filter:
+        <ul>
+          <li>Change the default configuration to always escape output.</li>
+          <li>Added pre-defined configuration for non-escaped output.</li>
+        </ul>
+      </li>
+      <li>Fixed various issues in the OpenXML Filter (docx, pptx,
+etc.), and PO Filter.</li>
+    </ul>
+  </li>
+  <li>Libraries:
+    <ul>
+      <li>The Google MT connector has been enhanced to have the inline
+codes taken into account, not simply pushed to the end of the text.</li>
+      <li>Fixed one error in default segmentation rules.</li>
+      <li>Added a connector component for the Translate Toolkit TM
+server.</li>
+      <li>Added steps such as Word-count and Tokenizer.</li>
+    </ul>
+  </li>
+  <li>The command-line tool Tikal has been added.</li>
+  <li>Rainbow <i>(okapi-apps distribution only)</i>:
+    <ul>
+      <li>Improved handling of un-approved translations in TMX
+generated during a translation package creation.</li>
+      <li>Added option to choose to merge only approved translations in
+translation package post-processing.</li>
+    </ul>
+  </li>
 </ul>
 <h2>M1 to M2</h2>
-<p>The following list enumerates the most important changes in the Okapi Framework between 
-release M1 and release M2.</p>
+<p>The following list enumerates the most important changes in the
+Okapi Framework between release M1 and release M2.</p>
 <ul>
-	<li>Filters:<ul>
-		<li>The DTD Filter has been added.</li>
-		<li>The PlainText Filter has been added.</li>
-		<li>The Table Filter has been added.</li>
-		<li>Several pre-defined filter configurations have been added or updated: 
-	Mozilla-RDF, XML Android Strings, XML Java properties, RESX, Monoligual PO, 
-	SRT (Sub-titles), plain-text lines, plain-text paragraphs, CSV, etc.</li>
-		<li>The OpenXML Filter (DOCX, PPTX, XSLX files) has been improved and now 
-	provides much inline code simplification.</li>
-		<li>The definition of the parameters for the RegEx Filter have been modified 
-	to allow the support of target text, ID, etc. This new format is not 
-	compatible with the one of M1.</li>
-		<li>Other filters (HTML, Properties, XLIFF, TMX, PO, and OpenDocument 
-	filters) have been improved.</li>
-	</ul>
-	</li>
-	<li>Libraries:<ul>
-		<li>A new TM connector to query remote GlobalSight TM servers has been 
-	added. (See the Java Example05 of the okapi-lib distribution for an 
-	illustration on how to use this component).</li>
-		<li>A connector to query the remote OpenTran server has been added. (See the 
-	Java Example05 of the okapi-lib distribution for an illustration on how to 
-	use this component).</li>
-		<li>New <code>RawDocument</code> object model.</li>
-		<li>The events mechanism has been augmented to work with batch items in the 
-	pipeline.</li>
-		<li>The encoding detection and handling of BOM has been modified in most 
-	filters and utilities.</li>
-		<li>The pipeline mechanism has been extensively re-written.</li>
-		<li>Many steps for the pipeline have been created, they are experimental for 
-	now.</li>
-	</ul>
-	</li>
-	<li>Rainbow:<ul>
-		<li>The selection of the filter settings is now done using the new filter 
-	configuration mapping system integrated in the library.</li>
-		<li>An experimental interface for creating and executing pipelines has been 
-	added (see Utilities &gt; Edit / Execute Pipeline)</li>
-		<li>The creation of OmegaT, XLIFF and RTF translation packages has been modified to handle 
-	pre-segmentation and pre-leveraging.</li>
-		<li dir="ltr">
-		<p dir="ltr">Uses the latest libraries.</li>
-	</ul>
-	</li>
-	<li>Ratel:<ul>
-		<li>Better preservation of comments in SRX files; and capability to add 
-	comments from within Ratel.</li>
-		<li>Uses the latest libraries.</li>
-	</ul>
-	</li>
+  <li>Filters:
+    <ul>
+      <li>The DTD Filter has been added.</li>
+      <li>The PlainText Filter has been added.</li>
+      <li>The Table Filter has been added.</li>
+      <li>Several pre-defined filter configurations have been added or
+updated: Mozilla-RDF, XML Android Strings, XML Java properties, RESX,
+Monoligual PO, SRT (Sub-titles), plain-text lines, plain-text
+paragraphs, CSV, etc.</li>
+      <li>The OpenXML Filter (DOCX, PPTX, XSLX files) has been improved
+and now provides much inline code simplification.</li>
+      <li>The definition of the parameters for the RegEx Filter have
+been modified to allow the support of target text, ID, etc. This new
+format is not compatible with the one of M1.</li>
+      <li>Other filters (HTML, Properties, XLIFF, TMX, PO, and
+OpenDocument filters) have been improved.</li>
+    </ul>
+  </li>
+  <li>Libraries:
+    <ul>
+      <li>A new TM connector to query remote GlobalSight TM servers has
+been added. (See the Java Example05 of the okapi-lib distribution for
+an illustration on how to use this component).</li>
+      <li>A connector to query the remote OpenTran server has been
+added. (See the Java Example05 of the okapi-lib distribution for an
+illustration on how to use this component).</li>
+      <li>New <code>RawDocument</code> object model.</li>
+      <li>The events mechanism has been augmented to work with batch
+items in the pipeline.</li>
+      <li>The encoding detection and handling of BOM has been modified
+in most filters and utilities.</li>
+      <li>The pipeline mechanism has been extensively re-written.</li>
+      <li>Many steps for the pipeline have been created, they are
+experimental for now.</li>
+    </ul>
+  </li>
+  <li>Rainbow:
+    <ul>
+      <li>The selection of the filter settings is now done using the
+new filter configuration mapping system integrated in the library.</li>
+      <li>An experimental interface for creating and executing
+pipelines has been added (see Utilities &gt; Edit / Execute Pipeline)</li>
+      <li>The creation of OmegaT, XLIFF and RTF translation packages
+has been modified to handle pre-segmentation and pre-leveraging.</li>
+      <li dir="ltr">
+        <p dir="ltr">Uses the latest libraries. </p>
+      </li>
+    </ul>
+  </li>
+  <li>Ratel:
+    <ul>
+      <li>Better preservation of comments in SRX files; and capability
+to add comments from within Ratel.</li>
+      <li>Uses the latest libraries.</li>
+    </ul>
+  </li>
 </ul>
 <p>&nbsp;</p>
 </body>
