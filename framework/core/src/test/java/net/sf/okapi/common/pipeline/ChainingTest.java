@@ -28,7 +28,6 @@ import static org.junit.Assert.*;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.observer.IObservable;
-import net.sf.okapi.common.resource.MultiEvent;
 
 public class ChainingTest {
 

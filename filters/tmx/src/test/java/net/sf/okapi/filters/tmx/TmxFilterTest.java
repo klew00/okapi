@@ -144,6 +144,22 @@ public class TmxFilterTest {
 		assertTrue(tu.hasTarget(locFRFR));
 	}
 
+//TOFIX:	@Test
+//	public void testLineBreaks () {
+//		String snippet = "<?xml version=\"1.0\"?>\r"
+//			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header>\r<body>\r"
+//			+ "<tu tuid=\"tuid_1\">\r<tuv xml:lang=\"en-us\">\r<seg>Hello World!</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>Bonjour le monde!</seg>\r</tuv>\r</tu>\r"
+//			+ "<tu>\r<tuv xml:lang=\"en-us\">\r<seg>t2</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>t2-fr</seg>\r</tuv>\r</tu>\r"
+//			+ "</body>\r</tmx>\r<!--after-->\r";
+//		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+//			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header>\r<body>\r"
+//			+ "<tu tuid=\"tuid_1\">\r<tuv xml:lang=\"en-us\">\r<seg>Hello World!</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>Bonjour le monde!</seg>\r</tuv>\r</tu>\r"
+//			+ "<tu>\r<tuv xml:lang=\"en-us\">\r<seg>t2</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>t2-fr</seg>\r</tuv>\r</tu>\r"
+//			+ "</body>\r</tmx>\r<!--after-->\r";
+//		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, locENUS, locFRFR),
+//			filter.getEncoderManager(), locFRFR));
+//	}
+	
 	@Test
 	public void testXmlLangOverLang () {
 		String snippet = "<?xml version=\"1.0\"?>\r"

@@ -31,6 +31,11 @@ Framework between the previous one (M5) and this release (M6).</p>
 	a Microsoft Bing AppID is needed to use it. You can obtain one at
 	<a href="http://www.bing.com/developers/appids.aspx">
 	http://www.bing.com/developers/appids.aspx</a>.</li>
+	<li>Google MT: made it consistent with other connector when result 
+	is same as target, now the result is returned.</li>
+	<li>SimpleTM: Added made the feature &quot;penalize exact matches when target has 
+	different codes than the query&quot; an option. (default is true, backward 
+	compatible).</li>
 </ul>
 	</li>
 	<li>Libraries:<ul>
@@ -48,7 +53,7 @@ Framework between the previous one (M5) and this release (M6).</p>
 	<li>Search and Replace step: Improved the behavior of the dialog box for 
 	add/edit item.</li>
 	<li>Format Conversion step: Fixed bug where the table-delimited output was 
-	not closed properly for one output per input option.</li>
+	not closed properly for &quot;one output per input&quot; use case.</li>
 </ul>
 	</li>
 	<li>Filters:<ul>

@@ -75,6 +75,7 @@ public class Database {
 	private Connection  conn = null;
 	private PreparedStatement qstm = null;
 	private LocaleId trgLoc;
+	private boolean penalizeTargetWithDifferentCodes = true;
 
 	public Database () {
 		try {
@@ -102,6 +103,10 @@ public class Database {
 		}
 	}
 
+	public void setPenalizeTargetWithDifferentCodes (boolean penalizeTargetWithDifferentCodes) {
+		this.penalizeTargetWithDifferentCodes = penalizeTargetWithDifferentCodes;
+	}
+	
 	private void deleteFiles (String pathAndPattern) {
 		class WildcharFilenameFilter implements FilenameFilter {
 			public boolean accept(File dir, String name) {
@@ -330,9 +335,14 @@ public class Database {
 					Code.stringToCodes(result.getString(4)), false);
 				
 				// Tune-down the score if the content or order of the codes are different
-				String trgCodes = qr.target.getCodes().toString();
-				if ( queryCodes.equals(trgCodes) ) qr.score = 100;
-				else qr.score = 99;
+				if ( penalizeTargetWithDifferentCodes ) {
+					String trgCodes = qr.target.getCodes().toString();
+					if ( queryCodes.equals(trgCodes) ) qr.score = 100;
+					else qr.score = 99;
+				}
+				else {
+					qr.score = 100;
+				}
 				
 				if ( qr.score >= threshold ) {
 					list.add(qr);

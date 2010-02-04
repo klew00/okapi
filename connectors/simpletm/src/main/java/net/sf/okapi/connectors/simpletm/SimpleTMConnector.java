@@ -54,9 +54,9 @@ public class SimpleTMConnector implements ITMQuery {
 	}
 
 	public String getSettingsDisplay () {
-		return "Database: " + (Util.isEmpty(params.getDbPath())
-			? "<To be specified>"
-			: params.getDbPath());
+		return String.format("Database: %s\nPenalize exact matches with different codes in target: %s",
+			(Util.isEmpty(params.getDbPath()) ? "<To be specified>" : params.getDbPath()),
+			(params.getPenalizeTargetWithDifferentCodes() ? "Yes" : "No"));
 	}
 	
 	public void setMaximumHits (int max) {
@@ -92,6 +92,7 @@ public class SimpleTMConnector implements ITMQuery {
 
 	public void open () {
 		db.open(params.getDbPath());
+		db.setPenalizeTargetWithDifferentCodes(params.getPenalizeTargetWithDifferentCodes());
 	}
 
 	public int query (String plainText) {

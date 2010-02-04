@@ -25,12 +25,16 @@ import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
+	static final String DBPATH = "dbPath";
+	static final String PENALIZETARGETWITHDIFFERENTCODES = "penalizeTargetWithDifferentCodes";
+	
 	 /** 
 	  * The full path of the database name to open.
 	  * The path can have the extension ".data.db" or not extension.
 	  */
 	private String dbPath;
-	
+	private boolean penalizeTargetWithDifferentCodes;
+
 	public Parameters () {
 		reset();
 		toString();
@@ -51,25 +55,38 @@ public class Parameters extends BaseParameters {
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		dbPath = buffer.getString("dbPath", dbPath);
+		dbPath = buffer.getString(DBPATH, dbPath);
+		penalizeTargetWithDifferentCodes = buffer.getBoolean(PENALIZETARGETWITHDIFFERENTCODES, penalizeTargetWithDifferentCodes);
 	}
-
+	
+	public boolean getPenalizeTargetWithDifferentCodes () {
+		return penalizeTargetWithDifferentCodes;
+	}
+	
+	public void setPenalizeTargetWithDifferentCodes (boolean penalizeTargetWithDifferentCodes) {
+		this.penalizeTargetWithDifferentCodes = penalizeTargetWithDifferentCodes;
+	}
+	
 	public void reset () {
 		dbPath = "";
+		penalizeTargetWithDifferentCodes = true;
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setString("dbPath", dbPath);
+		buffer.setString(DBPATH, dbPath);
+		buffer.setBoolean(PENALIZETARGETWITHDIFFERENTCODES, penalizeTargetWithDifferentCodes);
 		return buffer.toString();
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("dbPath",
+		desc.add(DBPATH,
 			"Path of the Database file", "Full path of the database file (.data.db)");
+		desc.add(PENALIZETARGETWITHDIFFERENTCODES,
+			"Penalize exact matches when the target has different codes than the query", null);
 		return desc;
 	}
 
