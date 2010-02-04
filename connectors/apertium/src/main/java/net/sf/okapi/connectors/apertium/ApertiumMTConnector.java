@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -120,25 +120,24 @@ public class ApertiumMTConnector implements IQuery {
 			URLConnection conn = url.openConnection();
 
 			// Get the response
-	        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-	        StringBuilder res = new StringBuilder();
+			BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			StringBuilder res = new StringBuilder();
 			String transText;
 			while (( transText = rd.readLine()) != null ) {
 				if ( res.length() > 0 ) res.append("\n");
 				res.append(transText);
 			}
-	        rd.close();
-	        transText = res.toString();
-
-	        if ( transText.startsWith("Error: Mode ") ) {
-	        	// Most likely this pair is not supported
-	        	return 0;
-	        }
+			rd.close();
+			transText = res.toString();
+			if ( transText.startsWith("Error: Mode ") ) {
+				// Most likely this pair is not supported
+				return 0;
+			}
 	        
-	        result = new QueryResult();
-	        result.score = 95; // Fixed score for MT
-	        result.origin = Util.ORIGIN_MT;
-        	result.source = frag;
+			result = new QueryResult();
+			result.score = 95; // Fixed score for MT
+			result.origin = Util.ORIGIN_MT;
+			result.source = frag;
 			if ( frag.hasCode() ) {
 				result.target = new TextFragment(store.fromCodedHTML(transText, frag),
 					frag.getCodes());

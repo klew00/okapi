@@ -144,7 +144,7 @@ public class TMXWriter {
     /**
      * Sets the flag indicating if entries originating from MT should be written with a special
      * prefix in the source text (forcing a fuzzy match). An entry is deemed originating from
-     * MT when its <code>creationid</code> attribute is set to <code>{@link ORIGIN_MT}</code>. 
+     * MT when its <code>creationid</code> attribute is set to <code>{@link Util#ORIGIN_MT}</code>. 
      * @param useMTPrefix true to use a prefix for entries originating from MT.
      */
     public void setUseMTPrefix (boolean useMTPrefix) {

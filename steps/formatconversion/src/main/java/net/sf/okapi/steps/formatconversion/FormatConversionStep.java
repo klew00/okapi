@@ -284,6 +284,7 @@ public class FormatConversionStep extends BasePipelineStep {
 			}
 		}
 		writer.setOptions(targetLocale, "UTF-8");
+		firstOutputCreated = true;
 	}
 
 }

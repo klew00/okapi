@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -121,12 +121,12 @@ public class GoogleMTConnector implements IQuery {
 			conn.setRequestProperty("Referer", hostId); // With one 'r' for official RFC error
 
 			// Get the response
-	        JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-	        @SuppressWarnings("unchecked")
-	        Map<String, Object> map = (Map<String, Object>)object;
+			JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = (Map<String, Object>)object;
 	    	@SuppressWarnings("unchecked")
-	        Map<String, Object> data = (Map<String, Object>)map.get("responseData");
-	        String res = (String)data.get("translatedText");
+	    	Map<String, Object> data = (Map<String, Object>)map.get("responseData");
+	    	String res = (String)data.get("translatedText");
 	        
 			result = new QueryResult();
 			result.source = fragment;
@@ -136,10 +136,6 @@ public class GoogleMTConnector implements IQuery {
 			}
 			else {
 				result.target = new TextFragment(util.fromCodedHTML(res, fragment));
-			}
-			// If query and translated result are the same: don't see this as a translation
-			if ( result.target.equals(fragment) ) { // Test ignore codes content
-				return 0;
 			}
 			result.score = 95; // Arbitrary score for MT
 			result.origin = Util.ORIGIN_MT;
