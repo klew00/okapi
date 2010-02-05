@@ -343,7 +343,7 @@ public class TmxFilter implements IFilter {
 					// Make a document part with skeleton between the previous event and now.
 					// Spaces can go with trans-unit to reduce the number of events.
 					// This allows to have only the trans-unit skeleton parts with the TextUnit event
-					if ( !skel.isEmpty(true) ) {
+					if ( !skel.isEmpty(false) ) {
 						DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
 						skel = new GenericSkeleton(); // And create a new skeleton for the next event
 						queue.add(new Event(EventType.DOCUMENT_PART, dp));
@@ -665,7 +665,7 @@ public class TmxFilter implements IFilter {
 				case XMLStreamConstants.CHARACTERS: 
 					//TODO: Check if it's ok to not check for unsupported chars
 					//appends to either TmxTu or TmxTuv depending on tuvTrgType and skelBefore or skelAfter depending on flags					
-					tmxTu.smartAppendToSkel(tuvTrgType, Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));					
+					tmxTu.smartAppendToSkel(tuvTrgType, Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, params.escapeGT, null));					
 					break;
 				case XMLStreamConstants.START_ELEMENT:
 
