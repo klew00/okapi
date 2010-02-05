@@ -12,7 +12,9 @@
 <tuv xml:lang="FR-FR">
 <seg>Une entrée dans la MT (file1, group1)</seg>
 </tuv>
-</tu><tu>
+</tu>
+
+<tu>
 <prop type="Txt::FileName">file1</prop>
 <tuv xml:lang="EN-US">
 <seg>One entry in the TM.</seg>
@@ -20,7 +22,9 @@
 <tuv xml:lang="FR-FR">
 <seg>Une entrée dans la MT (file1, no group)</seg>
 </tuv>
-</tu><tu>
+</tu>
+
+<tu>
 <prop type="Txt::GroupName">group1</prop>
 <tuv xml:lang="EN-US">
 <seg>One entry in the TM.</seg>
@@ -28,7 +32,9 @@
 <tuv xml:lang="FR-FR">
 <seg>Une entrée dans la MT (no file, group1)</seg>
 </tuv>
-</tu><tu>
+</tu>
+
+<tu>
 <prop type="Txt::FileName">file1</prop>
 <prop type="Txt::GroupName">group2</prop>
 <tuv xml:lang="EN-US">
@@ -37,7 +43,9 @@
 <tuv xml:lang="FR-FR">
 <seg>Une entrée dans la MT (file1, group2)</seg>
 </tuv>
-</tu><tu>
+</tu>
+
+<tu>
 <prop type="Txt::FileName">file2</prop>
 <prop type="Txt::GroupName">group2</prop>
 <tuv xml:lang="EN-US">
@@ -46,7 +54,9 @@
 <tuv xml:lang="FR-FR">
 <seg>Une entrée dans la MT (file2, group2)</seg>
 </tuv>
-</tu><tu>
+</tu>
+
+<tu>
 <prop type="Txt::FileName">file2</prop>
 <prop type="Txt::GroupName">group1</prop>
 <tuv xml:lang="EN-US">
@@ -55,14 +65,18 @@
 <tuv xml:lang="FR-FR">
 <seg>Une entrée dans la MT (file2, group1)</seg>
 </tuv>
-</tu><tu>
+</tu>
+
+<tu>
 <tuv xml:lang="EN-US">
 <seg>One entry in the TM.</seg>
 </tuv>
 <tuv xml:lang="FR-FR">
 <seg>Une entrée dans la MT (no file, no group)</seg>
 </tuv>
-</tu><tu>
+</tu>
+
+<tu>
 <tuv xml:lang="EN-US">
 <seg>Close the <bpt i="0" x="0">&lt;b></bpt>application<ept i="0">&lt;/b></ept>.</seg>
 </tuv>

@@ -154,7 +154,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			isDone = true;
 		}
 		catch ( TransformerConfigurationException e ) {
-			throw new OkapiIOException("Error in XSLT input.", e);
+			throw new OkapiIOException("Error in XSLT input.\n" + e.getMessage(), e);
 		}
 		finally {
 			// Make sure to reset the original property
@@ -216,7 +216,7 @@ public class XSLTransformStep extends BasePipelineStep {
 				rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));
 		}
 		catch ( TransformerException e ) {
-			throw new OkapiIOException("Transformation error.", e);
+			throw new OkapiIOException("Transformation error.\n" + e.getMessage(), e);
 		}
 		finally {
 			isDone = true;

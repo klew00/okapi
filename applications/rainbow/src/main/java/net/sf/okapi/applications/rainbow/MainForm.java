@@ -1232,7 +1232,7 @@ public class MainForm { //implements IParametersProvider {
 			startWaiting(Res.getString("MainForm.startWaiting"), true); //$NON-NLS-1$
 			wrapper.execute(prj);
 		}
-		catch ( Exception e ) {
+		catch ( Throwable e ) {
 			log.error(e.getMessage());
 		}
 		finally {
