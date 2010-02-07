@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -124,18 +124,16 @@ public class FilterEventsWriterStep extends BasePipelineStep {
 		}
 	}
 
+	@Override
 	public String getName() {
 		return "Filter Events Writer";
 	}
 
+	@Override
 	public String getDescription () {
 		return "Write out filter events into a document.";
 	}
 
-	public boolean needsOutput (int inputIndex) {
-		return (inputIndex == 0);
-	}
-	
 	@Override
 	public Event handleEvent(Event event) {
 		switch ( event.getEventType() ) {

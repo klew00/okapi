@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -56,10 +56,12 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 		this.outputURI = outputURI;
 	}
 	
+	@Override
 	public String getDescription() {
 		return "Write a RawDocument to an output file.";
 	}
 
+	@Override
 	public String getName () {
 		return "RawDocument Writer";
 	}
@@ -112,7 +114,7 @@ public class RawDocumentWriterStep extends BasePipelineStep {
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error writing or copying a RawDocument.", e);
 		}
-		
 		return event;
 	}
+
 }

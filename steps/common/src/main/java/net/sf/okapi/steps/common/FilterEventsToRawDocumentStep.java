@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -77,10 +77,12 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		this.outputEncoding = outputEncoding;
 	}
 	
+	@Override
 	public String getName() {
 		return "Filter Events to RawDocument";
 	}
 
+	@Override
 	public String getDescription() {
 		return "Combine filter events into a full document and pass it along as a raw document."
 			+ " Expects: filter events. Sends back: raw document.";
@@ -158,6 +160,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		return event;
 	}
 
+	@Override
 	public boolean isDone() {
 		return isDone;
 	}

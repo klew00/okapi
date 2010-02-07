@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -55,11 +55,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private boolean result = false;
 	private OKCancelPanel pnlActions;
 	private Parameters params;
+	private Button chkLeverage;
 	private ConnectorSelectionPanel pnlConnector;
 	private IConnectorList connectors;
 	private IHelp help;
 	private Composite mainComposite;
 	private IContext context;
+	private Label stThreshold;
 	private Spinner spnThreshold;
 	private Button chkFillTarget;
 	private Button chkMakeTMX;
@@ -169,13 +171,24 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		mainComposite.setLayout(new GridLayout(2, false));
 
+		chkLeverage = new Button(mainComposite, SWT.CHECK);
+		chkLeverage.setText("Leverage the text units with existing translations");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkLeverage.setLayoutData(gdTmp);
+		chkLeverage.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateOptionsDisplay();
+			}
+		});
+		
 		pnlConnector = new ConnectorSelectionPanel(mainComposite, SWT.NONE, connectors, context, null);
-		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
 		pnlConnector.setLayoutData(gdTmp);
 		
-		Label stTmp = new Label(mainComposite, SWT.NONE);
-		stTmp.setText("Leverage only if the match is equal or above this score:");
+		stThreshold = new Label(mainComposite, SWT.NONE);
+		stThreshold.setText("Leverage only if the match is equal or above this score:");
 		
 		spnThreshold = new Spinner(mainComposite, SWT.BORDER);
 		spnThreshold.setMinimum(0);
@@ -223,21 +236,45 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		}
 		return result;
 	}
+	
+	private void updateOptionsDisplay () {
+		boolean enabled = chkLeverage.getSelection();
+		pnlConnector.setEnabled(enabled);
+		stThreshold.setEnabled(enabled);
+		spnThreshold.setEnabled(enabled);
+		chkFillTarget.setEnabled(enabled);
+		chkMakeTMX.setEnabled(enabled);
+		if ( enabled ) {
+			pnlTMXPath.setEnabled(chkMakeTMX.getSelection());
+			chkUseMTPrefix.setEnabled(chkMakeTMX.getSelection());
+		}
+		else {
+			pnlTMXPath.setEnabled(false);
+			chkUseMTPrefix.setEnabled(false);
+		}
+	}
 
 	private void setData () {
+		chkLeverage.setSelection(params.getLeverage());
 		pnlConnector.setData(params.getResourceClassName(), params.getResourceParameters());
 		spnThreshold.setSelection(params.getThreshold());
 		chkFillTarget.setSelection(params.getFillTarget());
 		chkMakeTMX.setSelection(params.getMakeTMX());
 		pnlTMXPath.setText(params.getTMXPath());
 		chkUseMTPrefix.setSelection(params.getUseMTPrefix());
-
-		pnlTMXPath.setEnabled(chkMakeTMX.getSelection());
-		chkUseMTPrefix.setEnabled(chkMakeTMX.getSelection());
+		
+		updateOptionsDisplay();
+//		pnlTMXPath.setEnabled(chkMakeTMX.getSelection());
+//		chkUseMTPrefix.setEnabled(chkMakeTMX.getSelection());
 	}
 
 	private boolean saveData () {
 		result = false;
+		params.setLeverage(chkLeverage.getSelection());
+		if ( !chkLeverage.getSelection() ) {
+			result = true;
+			return true; // Save only that option
+		}
 		if ( chkMakeTMX.getSelection() ) {
 			if ( Util.isEmpty(pnlTMXPath.getText()) ) {
 				Dialogs.showError(shell,

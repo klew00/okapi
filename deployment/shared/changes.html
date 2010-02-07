@@ -41,6 +41,8 @@ Framework between the previous one (M5) and this release (M6).</p>
 	<li>Libraries:<ul>
 	<li>Fixed issue with GenericSkeletonWriter and in-line codes in segmented 
 	text unit that were outside any segment.</li>
+	<li>Fixed issue with GenericFilterWriter output stream not nullified in 
+	close() (causing for example no output using FilterEventsToRawDocument).</li>
 </ul>
 	</li>
 	<li>Steps / Pipeline:<ul>
@@ -49,11 +51,13 @@ Framework between the previous one (M5) and this release (M6).</p>
 	<li>Leveraging step:<ul>
 		<li>Fixed the bug preventing to enter a TMX path.</li>
 		<li>Made adding an <code>MT!</code> prefix to the TMX entries an option.</li>
+		<li>Added an option to enabled/disable the step.</li>
 	</ul></li>
 	<li>Search and Replace step: Improved the behavior of the dialog box for 
 	add/edit item.</li>
 	<li>Format Conversion step: Fixed bug where the table-delimited output was 
 	not closed properly for &quot;one output per input&quot; use case.</li>
+	<li>Added Text Modification step.</li>
 </ul>
 	</li>
 	<li>Filters:<ul>

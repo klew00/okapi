@@ -33,7 +33,7 @@ public class IdGenerator {
 	private long seq;
 	private String root;
 	private String prefix;
-
+	
 	/**
 	 * Creates a generator with a given root and no prefix.
 	 * @param root

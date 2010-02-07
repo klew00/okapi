@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -68,11 +68,13 @@ public class GenericFilterWriter implements IFilterWriter {
 		this.skelWriter = skelWriter;
 		this.encoderManager = encoderManager;
 	}
-	
+
+	@Override
 	public void cancel () {
 		//TODO: implement cancel()
 	}
 	
+	@Override
 	public void close () {
 		if ( writer == null ) return;
 		if ( skelWriter != null ) skelWriter.close();
@@ -83,6 +85,8 @@ public class GenericFilterWriter implements IFilterWriter {
 			// Close the output
 			writer.close();
 			writer = null;
+			// Nullify the output stream
+			output = null;
 
 			// If it was in a temporary file, copy it over the existing one
 			// If the IFilter.close() is called before IFilterWriter.close()
@@ -129,18 +133,22 @@ public class GenericFilterWriter implements IFilterWriter {
 		}
 	}
 
+	@Override
 	public String getName () {
 		return "GenericFilterWriter";
 	}
 
+	@Override
 	public EncoderManager getEncoderManager () {
 		return encoderManager;
 	}
 	
+	@Override
 	public IParameters getParameters () {
 		return null;
 	}
 
+	@Override
 	public Event handleEvent (Event event) {
 		try {
 			switch ( event.getEventType() ) {
@@ -221,6 +229,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		writer.write(skelWriter.processDocumentPart(resource));
 	}
 
+	@Override
 	public void setOptions (LocaleId locale,
 		String defaultEncoding)
 	{
@@ -228,16 +237,19 @@ public class GenericFilterWriter implements IFilterWriter {
 		this.encoding = defaultEncoding;
 	}
 
+	@Override
 	public void setOutput (String path) {
 		close(); // Make sure previous is closed
 		this.outputPath = path;
 	}
 
+	@Override
 	public void setOutput (OutputStream output) {
 		close(); // Make sure previous is closed
 		this.output = output; // then assign the new stream
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 	}
 

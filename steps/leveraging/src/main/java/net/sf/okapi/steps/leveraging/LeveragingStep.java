@@ -81,6 +81,10 @@ public class LeveragingStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleStartBatch (Event event) {
+		// If we don't really use this step, just move on
+		if ( !params.getLeverage() ) return event;
+		
+		// Else: initialize the global variables
 		qm = new QueryManager();
 		qm.setLanguages(sourceLocale, targetLocale);
 		qm.setThreshold(params.getThreshold());
@@ -108,12 +112,14 @@ public class LeveragingStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleStartDocument (Event event) {
+		if ( !params.getLeverage() ) return event;
 		qm.resetCounters();
 		return event;
 	}
 
 	@Override
 	protected Event handleEndDocument (Event event) {
+		if ( !params.getLeverage() ) return event;
 		logger.info(String.format("Segments with text = %d", qm.getTotalSegments()));
 		logger.info(String.format("Segments leveraged = %d", qm.getLeveragedSegments()));
 		return event;
@@ -121,6 +127,7 @@ public class LeveragingStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleTextUnit (Event event) {
+		if ( !params.getLeverage() ) return event;
 		TextUnit tu = event.getTextUnit();
 		if ( !tu.isTranslatable() ) return event;
 

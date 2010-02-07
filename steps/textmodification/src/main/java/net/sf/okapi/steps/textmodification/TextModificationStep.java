@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -71,12 +71,15 @@ public class TextModificationStep extends BasePipelineStep {
 		this.targetLocale = targetLocale;
 	}
 	
+	@Override
 	public String getName () {
 		return "Text Modification";
 	}
 
+	@Override
 	public String getDescription () {
-		return "Apply various modifications to the text units content of a document.";
+		return "Apply various modifications to the text units content of a document."
+			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override

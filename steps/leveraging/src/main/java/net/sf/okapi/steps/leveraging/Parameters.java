@@ -24,6 +24,7 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 
+	private static final String LEVERAGE = "leverage";
 	private static final String FILLTARGET = "fillTarget";
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
@@ -36,11 +37,20 @@ public class Parameters extends BaseParameters {
 	private boolean makeTMX;
 	private String tmxPath;
 	private boolean useMTPrefix;
+	private boolean leverage;
 
 	public Parameters () {
 		reset();
 	}
 	
+	public boolean getLeverage () {
+		return leverage;
+	}
+	
+	public void setLeverage (boolean leverage) {
+		this.leverage = leverage;
+	}
+
 	public String getResourceClassName () {
 		return resourceClassName;
 	}
@@ -99,6 +109,7 @@ public class Parameters extends BaseParameters {
 
 	@Override
 	public void reset() {
+		leverage = true;
 		resourceClassName = "net.sf.okapi.connectors.pensieve.PensieveTMConnector";
 		resourceParameters = null;
 		threshold = 95;
@@ -119,6 +130,7 @@ public class Parameters extends BaseParameters {
 		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		useMTPrefix = buffer.getBoolean(USEMTPREFIX, useMTPrefix);
+		leverage = buffer.getBoolean(LEVERAGE, leverage);
 	}
 
 	@Override
@@ -131,6 +143,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(MAKETMX, makeTMX);
 		buffer.setString(TMXPATH, tmxPath);
 		buffer.setBoolean(USEMTPREFIX, useMTPrefix);
+		buffer.setBoolean(LEVERAGE, leverage);
 		return buffer.toString();
 	}
 
