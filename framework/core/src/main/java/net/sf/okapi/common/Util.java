@@ -844,13 +844,13 @@ public class Util {
 	}
 
 	/**
-	 * Creates a string ID based on the hash code of the given text.
+	 * Creates a string Identifier based on the hash code of the given text.
 	 * 
 	 * @param text
-	 *            the text to make an ID for.
-	 * @return The string ID for the given text.
+	 *		the text to make an ID for.
+	 * @return The string identifier for the given text.
 	 */
-	public static String makeID (String text) {
+	public static String makeId (String text) {
 		int n = text.hashCode();
 		return String.format("%s%X", ((n > 0) ? 'P' : 'N'), n);
 	}

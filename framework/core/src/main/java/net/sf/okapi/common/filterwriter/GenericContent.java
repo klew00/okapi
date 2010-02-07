@@ -39,11 +39,11 @@ public class GenericContent {
 
 	private String codedText;
 	private List<Code> codes;
-	private Pattern patternOpening = Pattern.compile("\\<(\\d*?)\\>");
-	private Pattern patternClosing = Pattern.compile("\\</(\\d*?)\\>");
-	private Pattern patternIsolated = Pattern.compile("\\<(\\d*?)/\\>");
-	private Pattern patternIsolatedB = Pattern.compile("\\<b(\\d*?)/\\>");
-	private Pattern patternIsolatedE = Pattern.compile("\\<e(\\d*?)/\\>");
+	private final Pattern patternOpening = Pattern.compile("\\<(\\d*?)\\>");
+	private final Pattern patternClosing = Pattern.compile("\\</(\\d*?)\\>");
+	private final Pattern patternIsolated = Pattern.compile("\\<(\\d*?)/\\>");
+	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d*?)/\\>");
+	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d*?)/\\>");
 
 	public GenericContent () {
 		codedText = "";

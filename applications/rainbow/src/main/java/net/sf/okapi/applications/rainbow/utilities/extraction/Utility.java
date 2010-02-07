@@ -111,7 +111,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		id = 0;
 		String pkgId = params.makePackageID();
 		// Use the hashcode of the input root for project ID, just to have one
-		writer.setInformation(srcLang, trgLang, Util.makeID(inputRoot),
+		writer.setInformation(srcLang, trgLang, Util.makeId(inputRoot),
 			resolvedOutputDir, pkgId, inputRoot, params.preSegment,
 			"rainbow");
 		writer.writeStartPackage();

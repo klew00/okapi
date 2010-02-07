@@ -600,10 +600,10 @@ public class POFilter implements IFilter {
 			if ( params.makeID ) {
 				// Note we always use msgID for resname, not msgIDPlural
 				if ( pluralMode == 0 ) {
-					tu.setName(Util.makeID(domain+DOMAIN_SEP+msgID));
+					tu.setName(Util.makeId(domain+DOMAIN_SEP+msgID));
 				}
 				else {
-					tu.setName(Util.makeID(domain+DOMAIN_SEP+msgID)
+					tu.setName(Util.makeId(domain+DOMAIN_SEP+msgID)
 						+ String.format("-%d", pluralCount-1));
 				}
 			}
