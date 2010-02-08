@@ -75,6 +75,11 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	}
 
 	@Override
+	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
+	}
+
+	@Override
 	protected Event handleStartBatch (Event event) {
 		if ( Util.isEmpty(params.getTmPath()) ) {
 			throw new OkapiBadStepInputException("Please provide a valid path and name for the TM.");

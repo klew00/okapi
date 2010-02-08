@@ -89,7 +89,7 @@ public class TextModificationStep extends BasePipelineStep {
 
 	@Override
 	public void setParameters (IParameters params) {
-		params = (Parameters)params;
+		this.params = (Parameters)params;
 	}
  
 	protected Event handleStartBatch (Event event) {

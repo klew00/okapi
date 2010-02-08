@@ -59,6 +59,11 @@ public class CodesRemovalStep extends BasePipelineStep {
 	public IParameters getParameters () {
 		return params;
 	}
+	
+	@Override
+	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
+	}
 
 	@Override
 	protected Event handleStartBatch (Event event) {

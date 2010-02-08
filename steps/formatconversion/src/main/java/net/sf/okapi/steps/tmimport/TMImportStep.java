@@ -59,7 +59,7 @@ public class TMImportStep extends BasePipelineStep {
 
 	@Override
 	public void setParameters (IParameters params) {
-		this.params = (Parameters) params;
+		this.params = (Parameters)params;
 	}
 
 	@Override

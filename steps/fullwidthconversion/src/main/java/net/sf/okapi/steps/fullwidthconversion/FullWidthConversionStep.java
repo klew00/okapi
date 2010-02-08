@@ -62,6 +62,11 @@ public class FullWidthConversionStep extends BasePipelineStep {
 	}
 
 	@Override
+	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
+	}
+
+	@Override
 	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable

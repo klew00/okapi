@@ -116,7 +116,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 
 	@Override
 	public void setParameters (IParameters params) {
-		params = (Parameters)params;
+		this.params = (Parameters)params;
 	}
 
 	@Override
