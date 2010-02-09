@@ -47,8 +47,10 @@ import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.ImportTMPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
+import net.sf.okapi.applications.rainbow.pipeline.SnRWithFilterPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TranslationComparisonPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XSLTransformPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.SnRWithoutFilterPipeline;
 import net.sf.okapi.applications.rainbow.plugins.PluginItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.Util;
@@ -1424,7 +1426,23 @@ public class MainForm { //implements IParametersProvider {
 				executePipeline(new BatchTranslationPipeline());
 			}
 		});
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.snrwithfilter"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new SnRWithFilterPipeline());
+			}
+		});
 
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.snrwithoutfilter"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new SnRWithoutFilterPipeline());
+			}
+		});
+
+		
 	}
 
 	public void run () {
