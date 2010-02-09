@@ -49,12 +49,11 @@ public class Writer extends BaseWriter {
 	private ISkeletonWriter skelWriter;
 	private ILayerProvider layer;
 	private PrintWriter writer;
-	private EncoderManager encoderManager;
 	
-	public Writer (ISkeletonWriter skelWriter) {
+	public Writer (ISkeletonWriter skelWriter)
+	{
 		super();
 		this.skelWriter = skelWriter;
-		encoderManager = new EncoderManager();
 	}
 	
 	public String getPackageType () {
@@ -81,8 +80,10 @@ public class Writer extends BaseWriter {
 		String sourceEncoding,
 		String targetEncoding,
 		String filtersettings,
-		IParameters filterParams)
+		IParameters filterParams,
+		EncoderManager encoderManager)
 	{
+		this.encoderManager = encoderManager;
 		relativeWorkPath = relativeSourcePath;
 		relativeWorkPath += EXTENSION;
 

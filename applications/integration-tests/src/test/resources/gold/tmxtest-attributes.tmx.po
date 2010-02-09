@@ -5,6 +5,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
+msgid "Test char: &=amp, <=lt, '=apos, \"=quot"
+msgstr "Test charactères: &=amp, <=lt, '=apos, \"=quot"
+
 msgid "One entry in the TM."
 msgstr "Une entrée dans la MT (file1, group1)"
 

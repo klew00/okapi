@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,7 @@ package net.sf.okapi.applications.rainbow.packages;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.AltTransAnnotation;
@@ -58,7 +59,7 @@ public abstract class BaseWriter implements IWriter {
 	protected String outputPath;
 	protected boolean preSegmented;
 	protected String creationTool;
-	
+	protected EncoderManager encoderManager;
 	
 	public BaseWriter () {
 		manifest = new Manifest();
@@ -90,6 +91,10 @@ public abstract class BaseWriter implements IWriter {
 		this.creationTool = creationTool;
 	}
 
+	public void setEncoderManager (EncoderManager encoderManager) {
+		this.encoderManager = encoderManager;
+	}
+	
 	public void writeStartPackage () {
 		// Create the root directory
 		Util.createDirectories(manifest.getRoot());

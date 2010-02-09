@@ -10,8 +10,8 @@
 <target xml:lang="fr">Paragraphe (approved translation)</target>
 </trans-unit>
 <trans-unit id="3">
-<source xml:lang="en">Text to translate.</source>
-<target xml:lang="fr">Text to translate.</target>
+<source xml:lang="en">Text to translate. &amp;=amp, &lt;=lt, '=apos, "=quot</source>
+<target xml:lang="fr">Text to translate. &amp;=amp, &lt;=lt, '=apos, "=quot</target>
 </trans-unit>
 <trans-unit id="4">
 <source xml:lang="en">Other text to translate.</source>

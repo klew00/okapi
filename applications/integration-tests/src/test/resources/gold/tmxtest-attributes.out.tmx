@@ -5,6 +5,16 @@
 
 <tu>
 <prop type="Txt::FileName">file1</prop>
+<tuv xml:lang="EN-US">
+<seg>Test char: &amp;=amp, &lt;=lt, &apos;=apos, &quot;=quot</seg>
+</tuv>
+<tuv xml:lang="FR-FR">
+<seg>Test charactères: &amp;=amp, &lt;=lt, &apos;=apos, &quot;=quot</seg>
+</tuv>
+</tu>
+
+<tu>
+<prop type="Txt::FileName">file1</prop>
 <prop type="Txt::GroupName">group1</prop>
 <tuv xml:lang="EN-US">
 <seg>One entry in the TM.</seg>

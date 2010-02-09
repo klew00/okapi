@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -104,8 +104,10 @@ public class Writer extends BaseWriter {
 		String sourceEncoding,
 		String targetEncoding,
 		String filterID,
-		IParameters filterParams)
+		IParameters filterParams,
+		EncoderManager encoderManager)
 	{
+		this.encoderManager = encoderManager;
 		relativeWorkPath = relativeSourcePath + EXTENSION; 
 		super.createOutput(docID, relativeSourcePath, relativeTargetPath,
 			sourceEncoding, targetEncoding, filterID, filterParams);

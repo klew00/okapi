@@ -2,34 +2,38 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="tmxtest-attributes.tmx" source-language="en-us" target-language="fr-fr" datatype="x-application/x-tmx+xml" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="utf-8" x:configId="">
 <body>
 <trans-unit id="1">
-<source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file1, group1)</target>
+<source xml:lang="en-us">Test char: &amp;=amp, &lt;=lt, '=apos, "=quot</source>
+<target xml:lang="fr-fr">Test charactères: &amp;=amp, &lt;=lt, '=apos, "=quot</target>
 </trans-unit>
 <trans-unit id="2">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file1, no group)</target>
+<target xml:lang="fr-fr">Une entrée dans la MT (file1, group1)</target>
 </trans-unit>
 <trans-unit id="3">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (no file, group1)</target>
+<target xml:lang="fr-fr">Une entrée dans la MT (file1, no group)</target>
 </trans-unit>
 <trans-unit id="4">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file1, group2)</target>
+<target xml:lang="fr-fr">Une entrée dans la MT (no file, group1)</target>
 </trans-unit>
 <trans-unit id="5">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file2, group2)</target>
+<target xml:lang="fr-fr">Une entrée dans la MT (file1, group2)</target>
 </trans-unit>
 <trans-unit id="6">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (file2, group1)</target>
+<target xml:lang="fr-fr">Une entrée dans la MT (file2, group2)</target>
 </trans-unit>
 <trans-unit id="7">
 <source xml:lang="en-us">One entry in the TM.</source>
-<target xml:lang="fr-fr">Une entrée dans la MT (no file, no group)</target>
+<target xml:lang="fr-fr">Une entrée dans la MT (file2, group1)</target>
 </trans-unit>
 <trans-unit id="8">
+<source xml:lang="en-us">One entry in the TM.</source>
+<target xml:lang="fr-fr">Une entrée dans la MT (no file, no group)</target>
+</trans-unit>
+<trans-unit id="9">
 <source xml:lang="en-us">Close the <g id="1">application</g>.</source>
 <target xml:lang="fr-fr">Fermer <g id="1">l'application</g>.</target>
 </trans-unit>

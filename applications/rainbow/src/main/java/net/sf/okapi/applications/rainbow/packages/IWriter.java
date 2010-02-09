@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.packages;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextUnit;
@@ -65,7 +66,8 @@ public interface IWriter extends IFilterWriter {
 		String sourceEncoding,
 		String targetEncoding,
 		String filterSettings,
-		IParameters filterParams);
+		IParameters filterParams,
+		EncoderManager encoderManager);
 
 	public void createCopies (int docID,
 		String relativeSourcePath);

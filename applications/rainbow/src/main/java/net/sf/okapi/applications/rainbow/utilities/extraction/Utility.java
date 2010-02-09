@@ -110,7 +110,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		id = 0;
 		String pkgId = params.makePackageID();
-		// Use the hashcode of the input root for project ID, just to have one
+		// Use the hash code of the input root for project ID, just to have one
 		writer.setInformation(srcLang, trgLang, Util.makeId(inputRoot),
 			resolvedOutputDir, pkgId, inputRoot, params.preSegment,
 			"rainbow");
@@ -200,9 +200,10 @@ public class Utility extends BaseFilterDrivenUtility {
 		String relativeInput = getInputPath(0).substring(inputRoot.length()+1);
 		String relativeOutput = getOutputPath(0).substring(outputRoot.length()+1);
 		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(getInputFilterSettings(0));
+
 		writer.createOutput(++id, relativeInput, relativeOutput,
 			getInputEncoding(0), getOutputEncoding(0),
-			res[0], resource.getFilterParameters());
+			res[0], resource.getFilterParameters(), resource.getFilterWriter().getEncoderManager());
     }
 	
     private void processTextUnit (TextUnit tu) {
