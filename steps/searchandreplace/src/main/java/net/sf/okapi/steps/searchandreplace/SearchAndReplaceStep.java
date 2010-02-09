@@ -40,7 +40,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -61,6 +60,12 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	private Pattern patterns[];
 	private URI outputURI;
 	private LocaleId targetLocale;
+	
+	public enum ProcType {
+		   UNSPECIFIED, PLAINTEXT, FILTER;
+		}
+	private boolean firstEventDone = false; 
+	private ProcType procType = ProcType.UNSPECIFIED;
 	
 	@Override
 	public void destroy () {
@@ -92,7 +97,10 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 
 	@Override
 	public boolean isDone () {
-		if ( params.plainText ) { // Expects RawDocument
+
+		if ( procType == ProcType.UNSPECIFIED ){
+			return false;
+		}else if ( procType == ProcType.PLAINTEXT ) { // Expects RawDocument
 			return isDone;
 		}
 		else { 
@@ -124,11 +132,9 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			
         	for(int i=0; i<params.rules.size();i++){
         		String s[] = params.rules.get(i);
- 	        	//if ( s[0].equals("true") ) {
-	        		if ( params.regEx ){
-	        			patterns[i]= Pattern.compile(s[1], flags);
- 		        	}
- 	        	//}        	
+	        	if ( params.regEx ){
+	        		patterns[i]= Pattern.compile(s[1], flags);
+	        	}
         	 }
 		}
 		
@@ -138,17 +144,20 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleStartBatchItem (Event event) {
-		if ( !params.plainText ) { // RawDocument mode
-			isDone = false;
-		}		
+		isDone = false;
 		return event;
 	}	
+
 	
 	@Override
 	protected Event handleRawDocument (Event event) {
-		if ( !params.plainText ) {
-			return event; // Options set to use on text units only, so we just skip this event
+		
+		//--first event determines processing type--
+		if (!firstEventDone) {
+			procType = ProcType.PLAINTEXT;
+			firstEventDone=true;
 		}
+
 		RawDocument rawDoc;
 		String encoding = null;
 		BufferedReader reader = null;
@@ -247,9 +256,11 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleTextUnit (Event event) {
-		//--Limit the textunit handler to running in filter-mode--
-		if ( params.plainText ) {
-			throw new OkapiBadStepInputException("Search and Replace cannot be performed on the entire file (non-filter mode) in the current pipeline configuration. \nPlease re-configure the pipeline or modify Search and Replace to use the filter-mode option. ");
+		
+		//--first event determines processing type--
+		if (!firstEventDone) {
+			procType = ProcType.FILTER;
+			firstEventDone=true;
 		}
 		
 		TextUnit tu = (TextUnit)event.getResource();

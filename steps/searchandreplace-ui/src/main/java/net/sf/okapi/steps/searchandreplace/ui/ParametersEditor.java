@@ -69,7 +69,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Text replacementText;
 	private Button btMoveUp;
 	private Button btMoveDown;
-	private Button chkPlainText;
 	private Button chkRegEx;
 	private Button chkDotAll;
 	private Button chkIgnoreCase;
@@ -311,10 +310,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		});			
 		
-		chkPlainText = new Button(mainComposite, SWT.CHECK);
-		chkPlainText.setText("Process the documents as plain text (not using filters)");
-		chkPlainText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
-		
 		chkRegEx = new Button(mainComposite, SWT.CHECK);
 		chkRegEx.setText("Use regular expression");
 		chkRegEx.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
@@ -499,7 +494,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	
 	private void setData () {
 		
-		chkPlainText.setSelection(params.plainText);
 		chkRegEx.setSelection(params.regEx);
 		chkDotAll.setSelection(params.dotAll);
 		chkIgnoreCase.setSelection(params.ignoreCase);
@@ -543,7 +537,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
         	params.addRule(s);
 		};
 	
-		params.plainText = chkPlainText.getSelection();		
 		params.regEx = chkRegEx.getSelection();
 		params.dotAll = chkDotAll.getSelection();		
 		params.ignoreCase = chkIgnoreCase.getSelection();
