@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,10 +37,7 @@ public class Parameters extends BaseParameters {
 	public boolean applyToExistingTarget;
 	public boolean addName;
 	public boolean addID;
-	public boolean segment;
 	public boolean markSegments;
-	public String sourceSrxPath;
-	public String targetSrxPath;
 	
 	public Parameters () {
 		reset();
@@ -55,10 +52,7 @@ public class Parameters extends BaseParameters {
 		applyToExistingTarget = false;
 		addName = false;
 		addID = false;
-		segment = false;
 		markSegments = false;
-		sourceSrxPath = "";
-		targetSrxPath = "";
 	}
 
 	public void fromString (String data) {
@@ -72,10 +66,7 @@ public class Parameters extends BaseParameters {
 		applyToExistingTarget = buffer.getBoolean("applyToExistingTarget", applyToExistingTarget);
 		addName = buffer.getBoolean("addName", addName);
 		addID = buffer.getBoolean("addID", addID);
-		segment = buffer.getBoolean("segment", segment);
 		markSegments = buffer.getBoolean("markSegments", markSegments);
-		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
-		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
 	}
 
 	@Override
@@ -89,10 +80,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("applyToExistingTarget", applyToExistingTarget);
 		buffer.setBoolean("addName", addName);
 		buffer.setBoolean("addID", addID);
-		buffer.setBoolean("segment", segment);
 		buffer.setBoolean("markSegments", markSegments);
-		buffer.setString("sourceSrxPath", sourceSrxPath);
-		buffer.setString("targetSrxPath", targetSrxPath);
 		return buffer.toString();
 	}
 	

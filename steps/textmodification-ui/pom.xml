@@ -15,10 +15,10 @@
             <artifactId>okapi-step-textmodification</artifactId>
             <version>${project.version}</version>
         </dependency>        
-        <dependency>
-            <groupId>net.sf.okapi.lib</groupId>
-            <artifactId>okapi-lib-segmentation-ui</artifactId>
-            <version>${project.version}</version>
-        </dependency>        
+		<dependency>
+			<groupId>net.sf.okapi</groupId>
+			<artifactId>okapi-core-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>        
     </dependencies>
 </project>

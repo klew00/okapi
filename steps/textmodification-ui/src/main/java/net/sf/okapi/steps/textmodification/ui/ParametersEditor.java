@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,7 +29,6 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.lib.ui.segmentation.SegmentationPanel;
 import net.sf.okapi.steps.textmodification.Parameters;
 
 import org.eclipse.swt.SWT;
@@ -63,9 +62,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkAddID;
 	private Button chkAddName;
 	private Button chkMarkSegments;
-	private SegmentationPanel pnlSegmentation;
 	private IHelp help;
-	private String projectDir;
 	private Composite mainComposite;
 	
 	public boolean edit (IParameters params,
@@ -75,7 +72,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		boolean bRes = false;
 		try {
 			shell = null;
-			this.projectDir = context.getString("projDir");
 			help = (IHelp)context.getObject("help");
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -192,6 +188,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		});
 		
+		edPrefix = new Text(mainComposite, SWT.BORDER);
+		edPrefix.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
 		chkAddSuffix = new Button(mainComposite, SWT.CHECK);
 		chkAddSuffix.setText("Add the following suffix:");
 		chkAddSuffix.addSelectionListener(new SelectionAdapter() {
@@ -199,9 +198,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				edSuffix.setEnabled(chkAddSuffix.getSelection());
 			}
 		});
-		
-		edPrefix = new Text(mainComposite, SWT.BORDER);
-		edPrefix.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		edSuffix = new Text(mainComposite, SWT.BORDER);
 		edSuffix.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -230,17 +226,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.horizontalSpan = 2;
 		chkMarkSegments.setLayoutData(gdTmp);
 
-		Group grpTmp = new Group(mainComposite, SWT.NONE);
-		grpTmp.setText("Segmentation");
-		grpTmp.setLayout(new GridLayout(4, false));
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
-		grpTmp.setLayoutData(gdTmp);
-		
-		pnlSegmentation = new SegmentationPanel(grpTmp, SWT.NONE,
-			"Apply the following segmentation rules:", null, projectDir);
-		pnlSegmentation.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		
 	}
 	
 	private boolean showDialog () {
@@ -265,7 +250,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		edPrefix.setEnabled(chkAddPrefix.getSelection());
 		edSuffix.setEnabled(chkAddSuffix.getSelection());
-		pnlSegmentation.setData(params.segment, params.sourceSrxPath, params.targetSrxPath);
 	}
 
 	private boolean saveData () {
@@ -279,9 +263,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.addName = chkAddName.getSelection();
 		params.addID = chkAddID.getSelection();
 		params.markSegments = chkMarkSegments.getSelection();
-		params.segment = pnlSegmentation.getSegment();
-		params.sourceSrxPath = pnlSegmentation.getSourceSRX();
-		params.targetSrxPath = pnlSegmentation.getTargetSRX();
 		result = true;
 		return true;
 	}

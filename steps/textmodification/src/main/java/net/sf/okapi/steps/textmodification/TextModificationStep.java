@@ -34,8 +34,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.segmentation.ISegmenter;
-import net.sf.okapi.lib.segmentation.SRXDocument;
 
 @UsingParameters(Parameters.class)
 public class TextModificationStep extends BasePipelineStep {
@@ -50,20 +48,11 @@ public class TextModificationStep extends BasePipelineStep {
 	private static final String NEWCHARS = "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0\u00d1\u00f1";
 
 	private Parameters params;
-	private ISegmenter srcSeg;
-	private ISegmenter trgSeg;
-	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
-	private boolean initDone;
 	
 
 	public TextModificationStep () {
 		params = new Parameters();
-	}
-	
-	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
-	public void setsourceLocale (LocaleId sourceLocale) {
-		this.sourceLocale = sourceLocale;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
@@ -92,32 +81,6 @@ public class TextModificationStep extends BasePipelineStep {
 		this.params = (Parameters)params;
 	}
  
-	protected Event handleStartBatch (Event event) {
-		initDone = false;
-		return event;
-	}
-	
-	@Override
-	protected Event handleStartBatchItem (Event event) {
-		if ( initDone ) return event; // Initialize once per batch
-		if ( params.segment ) {
-			String src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
-			String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
-			SRXDocument srxDoc = new SRXDocument();
-			srxDoc.loadRules(src);
-			if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
-			srcSeg = srxDoc.compileLanguageRules(sourceLocale, null);
-			if ( !src.equals(trg) ) {
-				srxDoc.loadRules(trg);
-				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
-			}
-			trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
-		}
-		initDone = true;
-		
-		return event;
-	}
-	
 	@Override
 	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
@@ -127,20 +90,20 @@ public class TextModificationStep extends BasePipelineStep {
 		if ( !params.applyToExistingTarget && tu.hasTarget(targetLocale) ) return event;
 		
 		// Apply the segmentation and/or segment marks if requested
-		if ( params.segment || params.markSegments ) {
-			if ( tu.hasTarget(targetLocale) ) {
-				if ( params.segment ) {
-					trgSeg.computeSegments(tu.getTarget(targetLocale));
-					tu.getTarget(targetLocale).createSegments(trgSeg.getRanges());
-				}
-			}
-			else {
-				if ( params.segment ) {
-					srcSeg.computeSegments(tu.getSource());
-					tu.getSource().createSegments(srcSeg.getRanges());
-				}
-			}
-		}
+//		if ( params.segment || params.markSegments ) {
+//			if ( tu.hasTarget(targetLocale) ) {
+//				if ( params.segment ) {
+//					trgSeg.computeSegments(tu.getTarget(targetLocale));
+//					tu.getTarget(targetLocale).createSegments(trgSeg.getRanges());
+//				}
+//			}
+//			else {
+//				if ( params.segment ) {
+//					srcSeg.computeSegments(tu.getSource());
+//					tu.getSource().createSegments(srcSeg.getRanges());
+//				}
+//			}
+//		}
 		
 		// Else: do the requested modifications
 		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
@@ -150,7 +113,7 @@ public class TextModificationStep extends BasePipelineStep {
 		}
 
 		// Merge all segments if needed
-		if ( params.segment || params.markSegments ) {
+		if ( params.markSegments ) {
 			mergeSegments(tu.getTarget(targetLocale));
 			// Merge also the source to be in synch.
 			tu.getSource().mergeAllSegments();

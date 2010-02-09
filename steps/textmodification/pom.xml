@@ -16,11 +16,6 @@
             <artifactId>okapi-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>net.sf.okapi.lib</groupId>
-            <artifactId>okapi-lib-segmentation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!--  For tests -->        
         <dependency>
             <groupId>net.sf.okapi.steps</groupId>
