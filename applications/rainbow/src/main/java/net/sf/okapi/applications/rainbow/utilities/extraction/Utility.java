@@ -99,8 +99,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		else if ( params.pkgType.equals("ttx") )
 			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
 		else if ( params.pkgType.equals("rtf") )
-			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer(
-				new GenericSkeletonWriter());
+			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer();
 		else
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
 		
@@ -200,6 +199,11 @@ public class Utility extends BaseFilterDrivenUtility {
 		String relativeInput = getInputPath(0).substring(inputRoot.length()+1);
 		String relativeOutput = getOutputPath(0).substring(outputRoot.length()+1);
 		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(getInputFilterSettings(0));
+		
+		if ( params.pkgType.equals("rtf") ) {
+			((net.sf.okapi.applications.rainbow.packages.rtf.Writer)writer).setSkeletonWriter(
+				filter.createSkeletonWriter());
+		}
 
 		writer.createOutput(++id, relativeInput, relativeOutput,
 			getInputEncoding(0), getOutputEncoding(0),

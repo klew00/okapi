@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -207,7 +206,8 @@ public class OpenXMLSnippetsTest {
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				writer.processStartDocument(locENUS, "utf-8", null, new EncoderManager(),
+				writer.processStartDocument(locENUS, "utf-8", null,
+					openXMLContentFilter.getEncoderManager(),
 					(StartDocument)event.getResource());
 				break;
 			case TEXT_UNIT:

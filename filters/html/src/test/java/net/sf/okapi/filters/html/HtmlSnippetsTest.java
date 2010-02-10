@@ -343,7 +343,7 @@ public class HtmlSnippetsTest {
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				writer.processStartDocument(trgLang, "utf-8", null, new EncoderManager(), (StartDocument) event
+				writer.processStartDocument(trgLang, "utf-8", null, htmlFilter.getEncoderManager(), (StartDocument) event
 						.getResource());
 				break;
 			case TEXT_UNIT:

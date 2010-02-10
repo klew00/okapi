@@ -227,6 +227,8 @@ public class OpenXMLFilter implements IFilter {
 		if ( encoderManager == null ) {
 			encoderManager = new EncoderManager();
 			encoderManager.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+			encoderManager.setMapping(MimeTypeMapper.DOCX_MIME_TYPE, "net.sf.okapi.common.encoder.OpenXMLEncoder");
+//			encoderManager.setAllKnownMappings();
 		}
 		return encoderManager;
 	}

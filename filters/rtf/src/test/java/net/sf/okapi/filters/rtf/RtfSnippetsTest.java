@@ -1,29 +1,22 @@
 package net.sf.okapi.filters.rtf;
 
-
-
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+//import static org.junit.Assert.*;
 
 public class RtfSnippetsTest {
 
@@ -61,8 +54,8 @@ public class RtfSnippetsTest {
 		for (Event event : list) {
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				writer.processStartDocument(trgLang, "utf-8", null, new EncoderManager(), (StartDocument) event
-						.getResource());
+				writer.processStartDocument(trgLang, "utf-8", null, filter.getEncoderManager(),
+					(StartDocument) event.getResource());
 				break;
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit) event.getResource();

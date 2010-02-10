@@ -22,6 +22,8 @@ package net.sf.okapi.common.encoder;
 
 import java.security.InvalidParameterException;
 import java.util.Hashtable;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
@@ -32,9 +34,11 @@ import net.sf.okapi.common.MimeTypeMapper;
  */
 public class EncoderManager implements IEncoder {
 
+	private static final Logger LOGGER = Logger.getLogger(EncoderManager.class.getName());
+	
+	private Hashtable<String, String> mimeMap;
 	private String mimeType = "";
 	private IEncoder encoder;
-	private Hashtable<String, String> mimeMap;
 	private String defEncoding;
 	private String defLineBreak;
 	private IParameters defParams;
@@ -44,8 +48,8 @@ public class EncoderManager implements IEncoder {
 	 */
 	public EncoderManager () {
 		mimeMap = new Hashtable<String, String>();
-		//TODO: Remove when all the filters are ready
-		setAllKnownMappings();
+		// All the filters have their mapping, all mapping should be explicite only
+		// Not needed anymore: setAllKnownMappings();
 	}
 
 	/**
@@ -96,15 +100,41 @@ public class EncoderManager implements IEncoder {
 	}
 	
 	/**
+	 * Adds the mappings of a given encoder manager into this manager.
+	 * If, for a given MIME type, both encoder manager have a different mapping, the original
+	 * mapping of this manager remains unchanged and a warning is generated.
+	 * @param otherManager the other encoder manager.
+	 */
+	public void mergeMappings (EncoderManager otherManager) {
+		for ( Entry<String, String> entry : otherManager.mimeMap.entrySet() ) {
+			// Check if the MIME type is already mapped
+			if ( mimeMap.containsKey(entry.getKey()) ) {
+				if ( !mimeMap.get(entry.getKey()).equals(entry.getValue()) ) {
+					// Same MIME type, but different encoder:
+					// Generate a warning, and keep the current mapping
+					LOGGER.warning(String.format("The MIME type '%s' is currently mapped to '%s', but conflicts with another mapping ('%s').",
+						entry.getKey(), mimeMap.get(entry.getKey()), entry.getValue()));
+				}
+				// Else: Same mapping, nothing to do
+			}
+			else { // Add the mapping
+				setMapping(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+	
+	/**
 	 * Updates the current cached encoder for this manager.
+	 * The method {@link #setDefaultOptions(IParameters, String, String)} must have been called
+	 * before calling this method.
 	 * @param newMimeType The MIME type identifier for the encoder to use now. If there is no mapping for the
 	 * given MIME type, the cache is cleared and no encoder is active.
 	 */
 	public void updateEncoder (String newMimeType) {
 		try {
 			if ( newMimeType == null ) return;
-			// Check if the current encoder is for the same mime-type
-			if ( mimeType.compareTo(newMimeType) == 0 ) return;
+			// Check if the current encoder is for the same MIME-type
+			if ( mimeType.equals(newMimeType) ) return;
 		
 			// If not: lookup what encoder to use
 			mimeType = newMimeType;

@@ -22,9 +22,14 @@ distribution.</p>
 Framework between the previous one (M5) and this release (M6).</p>
 <ul>
 	<li>Rainbow:<ul>
-	<li>Translation Package Creation: Fixed the bug where the encoder manager 
+	<li>Translation Package Creation:<ul>
+	<li>Fixed the bug where the encoder manager 
 	for RTF output was not properly set and cause some formats like HTML, TMX, 
 	etc. to have un-escaped characters.</li>
+	<li>Changed the RTF writer to allow other skeleton writers than 
+	GenericSkeletonWriter.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Tikal:<ul>
@@ -75,6 +80,7 @@ Framework between the previous one (M5) and this release (M6).</p>
 	of BorderLayout.</li>
 	<li>TMX filter: Fixed losing original line-breaks between &lt;tu&gt; when 
 	re-writing.</li>
+	<li>Vignette filter: Fixed bug of un-escaped and non-CDATA RTF output.</li>
 </ul>
 	</li>
 	<li>Installation:<ul>

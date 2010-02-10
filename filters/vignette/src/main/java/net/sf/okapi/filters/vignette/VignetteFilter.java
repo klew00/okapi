@@ -57,6 +57,7 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -67,7 +68,6 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -119,10 +119,12 @@ public class VignetteFilter implements IFilter {
 		}
 	}
 	
+	@Override
 	public void cancel () {
 		// TODO: Support cancel
 	}
 
+	@Override
 	public void close () {
 		try {
 			if ( reader != null ) {
@@ -146,14 +148,17 @@ public class VignetteFilter implements IFilter {
 		hasNext = false;
 	}
 
+	@Override
 	public ISkeletonWriter createSkeletonWriter() {
-		return new GenericSkeletonWriter();
+		return new VignetteSkeletonWriter();
 	}
 
+	@Override
 	public IFilterWriter createFilterWriter () {
-		return new VignetteFilterWriter(createSkeletonWriter(), getEncoderManager());
+		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
+	@Override
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
@@ -164,6 +169,7 @@ public class VignetteFilter implements IFilter {
 		return list;
 	}
 
+	@Override
 	public EncoderManager getEncoderManager () {
 		if ( encoderManager == null ) {
 			encoderManager = new EncoderManager();
@@ -172,30 +178,37 @@ public class VignetteFilter implements IFilter {
 		return encoderManager;
 	}
 
+	@Override
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
 	}
 
+	@Override
 	public String getDisplayName () {
 		return "Vignette Filter (ALPHA)";
 	}
 
+	@Override
 	public String getMimeType () {
 		return MimeTypeMapper.XML_MIME_TYPE;
 	}
 
+	@Override
 	public String getName () {
 		return "okf_vignette";
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public boolean hasNext () {
 		return hasNext;
 	}
 
+	@Override
 	public Event next () {
 		try {
 			if ( !hasNext ) return null;
@@ -216,10 +229,12 @@ public class VignetteFilter implements IFilter {
 		}
 	}
 
+	@Override
 	public void open (RawDocument input) {
 		open(input, true);
 	}
 
+	@Override
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
@@ -236,7 +251,7 @@ public class VignetteFilter implements IFilter {
 			throw new RuntimeException("You must specify a target locale.");
 		}
 		
-		listOfPaths = new ArrayList();
+		listOfPaths = new ArrayList<String>();
 		store = new TemporaryStore();
 		try {
 			storeFile = File.createTempFile("vgnflt_", null);
@@ -344,6 +359,7 @@ public class VignetteFilter implements IFilter {
 		hasNext = true;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
@@ -704,6 +720,7 @@ public class VignetteFilter implements IFilter {
 		}
 		else {
 			subFilter = fcMapper.createFilter(partConfiguration, subFilter);
+			encoderManager.mergeMappings(subFilter.getEncoderManager());
 			subFilter.close();
 			subFilter.open(new RawDocument(data, srcLoc));
 			Event event = subFilter.next(); // START_DOCUMENT

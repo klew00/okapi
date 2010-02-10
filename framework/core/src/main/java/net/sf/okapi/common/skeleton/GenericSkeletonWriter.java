@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -54,9 +54,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	protected LocaleId outputLoc;
 	protected ILayerProvider layer;
 	protected EncoderManager encoderManager;
+	protected Stack<StorageList> storageStack;
 	
 	private LinkedHashMap<String, Referent> referents;
-	private Stack<StorageList> storageStack;
 	private String outputEncoding;
 	private boolean isMultilingual;
 	

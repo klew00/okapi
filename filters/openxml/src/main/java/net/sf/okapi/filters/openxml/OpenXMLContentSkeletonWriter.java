@@ -61,9 +61,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	public final static int MSWORDDOCPROPERTIES=6; // DWH 5-25-09
 	private int configurationType; // DWH 4-10-09
 	private ILayerProvider layer;
-	// If we comment out this variable, encoderManager become the protected variable
-	// of GenericSkeletonWriter, but all tests fail. Not sure why.
-	private EncoderManager encoderManager; //TODO: Maybe use the one of GenericSkeletonWriter
+	private EncoderManager internalEncoderManager; // The encoderManager of the super class is not used
 	private int nTextBoxLevel=0; // DWH 10-27-09
 	private boolean bInBlankText=false; // DWH 10-27-09
 	private int nContentDepth=0;
@@ -73,11 +71,12 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	{
 		super();
 		this.configurationType = configurationType; // DWH 4-10-09
-		encoderManager = new EncoderManager(); // DWH 5-14-09
-		//TODO: set only needed mappings 
-		//encoderManager.setAllKnownMappings(); // YS 12-20-09
-		encoderManager.setDefaultOptions(null, "utf-8", "\n"); // DWH 5-14-09
-		encoderManager.updateEncoder(MimeTypeMapper.DOCX_MIME_TYPE); // DWH 5-14-09
+		internalEncoderManager = new EncoderManager(); // DWH 5-14-09
+		internalEncoderManager.setMapping(MimeTypeMapper.XML_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+		internalEncoderManager.setMapping(MimeTypeMapper.DOCX_MIME_TYPE, "net.sf.okapi.common.encoder.OpenXMLEncoder");
+//		internalEncoderManager.setAllKnownMappings();
+		internalEncoderManager.setDefaultOptions(null, "utf-8", "\n"); // DWH 5-14-09
+		internalEncoderManager.updateEncoder(MimeTypeMapper.DOCX_MIME_TYPE); // DWH 5-14-09
 	}
 	
 	/**
@@ -108,7 +107,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 			if (text.length()>0)
 			{
 				sTuff = text; // DWH 5-22-09
-				if ( encoderManager == null ) // DWH 5-22-09 whole if-else: encode first
+				if ( internalEncoderManager == null ) // DWH 5-22-09 whole if-else: encode first
 				{
 					if ( layer != null )
 						sTuff = layer.encode(text, context);
@@ -116,9 +115,9 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				else
 				{	
 					if ( layer == null )
-						sTuff = encoderManager.encode(text, context);
+						sTuff = internalEncoderManager.encode(text, context);
 					else
-						sTuff = layer.encode(encoderManager.encode(sTuff, context), context);
+						sTuff = layer.encode(internalEncoderManager.encode(sTuff, context), context);
 				}
 				if (context==1) // DWH 5-22-09 add unencoded tags if needed
 				{
@@ -200,7 +199,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				if ( Character.isHighSurrogate(ch) ) {
 					int cp = text.codePointAt(i);
 					i++; // Skip low-surrogate
-					if ( encoderManager == null ) {
+					if ( internalEncoderManager == null ) {
 						if ( layer == null ) {
 							tmp.append(new String(Character.toChars(cp)));
 						}
@@ -210,17 +209,17 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 					}
 					else {
 						if ( layer == null ) {
-							tmp.append(encoderManager.encode(cp, context));
+							tmp.append(internalEncoderManager.encode(cp, context));
 						}
 						else {
 							tmp.append(layer.encode(
-								encoderManager.encode(cp, context),
+									internalEncoderManager.encode(cp, context),
 								context));
 						}
 					}
 				}
 				else { // Non-supplemental case
-					if ( encoderManager == null ) {
+					if ( internalEncoderManager == null ) {
 						if ( layer == null ) {
 							tmp.append(ch);
 						}
@@ -230,11 +229,11 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 					}
 					else {
 						if ( layer == null ) {
-							tmp.append(encoderManager.encode(ch, context));
+							tmp.append(internalEncoderManager.encode(ch, context));
 						}
 						else {
 							tmp.append(layer.encode(
-								encoderManager.encode(ch, context),
+									internalEncoderManager.encode(ch, context),
 								context));
 						}
 					}
@@ -255,7 +254,7 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 	{
 		return(s); // DWH 5-14-09 no encoding is necessary for tags
 /*
-		if ( encoderManager == null ) {
+		if ( internalEncoderManager == null ) {
 			if ( layer == null ) {
 				return s; // DWH 4-8-09 replaced tf.toString() with sTuff
 			}
@@ -265,11 +264,11 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 		}
 		else {
 			if ( layer == null ) {
-				return encoderManager.encode(s, context); // DWH 4-8-09 replaced tf.toString() with sTuff
+				return internalEncoderManager.encode(s, context); // DWH 4-8-09 replaced tf.toString() with sTuff
 			}
 			else {
 				return layer.encode(
-					encoderManager.encode(s, context), context); // DWH 4-8-09 replaced tf.toString() with sTuff
+					internalEncoderManager.encode(s, context), context); // DWH 4-8-09 replaced tf.toString() with sTuff
 			}
 		}
 */

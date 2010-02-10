@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -50,16 +50,16 @@ public class Writer extends BaseWriter {
 	private ILayerProvider layer;
 	private PrintWriter writer;
 	
-	public Writer (ISkeletonWriter skelWriter)
-	{
-		super();
+	public void setSkeletonWriter (ISkeletonWriter skelWriter) {
 		this.skelWriter = skelWriter;
 	}
 	
+	@Override
 	public String getPackageType () {
 		return "rtf";
 	}
 	
+	@Override
 	public String getReaderClass () {
 		return "none"; // RTF use a non-reader-driven post-processing mode
 	}
@@ -96,6 +96,7 @@ public class Writer extends BaseWriter {
 		Util.createDirectories(path);
 	}
 
+	@Override
 	public void close () {
 		// Do not nullify the skelWriter as it is not created in this class
 		if ( skelWriter != null ) {
@@ -107,14 +108,17 @@ public class Writer extends BaseWriter {
 		}
 	}
 
+	@Override
 	public String getName () {
 		return getClass().getName();
 	}
 
+	@Override
 	public EncoderManager getEncoderManager () {
 		return encoderManager;
 	}
 	
+	@Override
 	public IParameters getParameters () {
 		return null;
 	}
@@ -129,10 +133,12 @@ public class Writer extends BaseWriter {
 		layer.setOptions(null, encoding, null);
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		// Nothing to do
 	}
 
+	@Override
 	public Event handleEvent (Event event) {
 		try {
 			switch ( event.getEventType() ) {
