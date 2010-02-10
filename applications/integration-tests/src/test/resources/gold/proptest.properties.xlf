@@ -2,20 +2,20 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="proptest.properties" source-language="en" target-language="fr" datatype="x-text/x-properties" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
 <body>
 <trans-unit id="1" resname="tricky3" xml:space="preserve">
-<source xml:lang="en">:</source>
-<target xml:lang="fr">:</target>
+<source xml:lang="en">\:</source>
+<target xml:lang="fr">\:</target>
 </trans-unit>
 <trans-unit id="2" resname="tricky4" xml:space="preserve">
-<source xml:lang="en">=</source>
-<target xml:lang="fr">=</target>
+<source xml:lang="en">\=</source>
+<target xml:lang="fr">\=</target>
 </trans-unit>
 <trans-unit id="3" resname="tricky5" xml:space="preserve">
 <source xml:lang="en">\\</source>
 <target xml:lang="fr">\\</target>
 </trans-unit>
 <trans-unit id="4" resname="tricky6\=" xml:space="preserve">
-<source xml:lang="en">=</source>
-<target xml:lang="fr">=</target>
+<source xml:lang="en">\=</source>
+<target xml:lang="fr">\=</target>
 </trans-unit>
 <trans-unit id="5" resname="key1" xml:space="preserve">
 <source xml:lang="en">Text 1</source>

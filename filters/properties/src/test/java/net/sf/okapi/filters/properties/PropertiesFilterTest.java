@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -165,6 +165,22 @@ public class PropertiesFilterTest {
 		// No next TU because of _bskip
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertNull(tu);
+	}
+	
+	@Test
+	public void testSpecialChars () {
+		String snippet = "Key1:Text1\\n=lf, \\t=tab, \\w=w, \\r=cr, \\\\=bs\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu); // Convert the \n
+		assertEquals("Text1\n=lf, \t=tab, \\w=w, \\r=cr, \\\\=bs", tu.getSource().toString());
+	}
+
+	@Test
+	public void testSpecialCharsOutput () {
+		String snippet = "Key1:Text1\\n=lf, \\t=tab \\w=w, \\r=cr, \\\\=bs\n";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN);
+		assertEquals(snippet, result);
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {

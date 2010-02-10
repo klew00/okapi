@@ -64,6 +64,7 @@ public class Editor implements IParametersEditor {
 	private Button chkUseCodeFinder;
 	private InlineCodeFinderPanel pnlCodeFinder;
 	private IHelp help;
+	private Button chkConvertLFAndTab;
 
 	public boolean edit (IParameters p_Options,
 		boolean readOnly,
@@ -164,6 +165,9 @@ public class Editor implements IParametersEditor {
 		chkCommentsAreNotes = new Button(cmpTmp, SWT.CHECK);
 		chkCommentsAreNotes.setText(Res.getString("chkCommentsAreNotes"));
 		
+		chkConvertLFAndTab = new Button(cmpTmp, SWT.CHECK);
+		chkConvertLFAndTab.setText(Res.getString("chkConvertLFAndTab"));
+		
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText(Res.getString("tabOptions"));
 		tiTmp.setControl(cmpTmp);
@@ -262,6 +266,7 @@ public class Editor implements IParametersEditor {
 		chkEscapeExtendedChars.setSelection(params.escapeExtendedChars);
 		chkUseCodeFinder.setSelection(params.useCodeFinder);
 		pnlCodeFinder.setRules(params.codeFinder.toString());
+		chkConvertLFAndTab.setSelection(params.convertLFandTab);
 		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
@@ -285,6 +290,7 @@ public class Editor implements IParametersEditor {
 		params.commentsAreNotes = chkCommentsAreNotes.getSelection();
 		params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
 		params.useCodeFinder = chkUseCodeFinder.getSelection();
+		params.convertLFandTab = chkConvertLFAndTab.getSelection();
 		return true;
 	}
 	

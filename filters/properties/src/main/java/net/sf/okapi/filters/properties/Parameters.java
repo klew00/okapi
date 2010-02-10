@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -35,6 +35,7 @@ public class Parameters extends BaseParameters {
 	public boolean extraComments;
 	public boolean commentsAreNotes;
 	public LocalizationDirectives locDir;
+	public boolean convertLFandTab;
 
 	public Parameters () {
 		locDir = new LocalizationDirectives();
@@ -46,6 +47,8 @@ public class Parameters extends BaseParameters {
 	public void reset () {
 		locDir.reset();
 		escapeExtendedChars = true;
+		
+		convertLFandTab = true;
 
 		useCodeFinder = true;
 		codeFinder.reset();
@@ -68,6 +71,7 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString () {
 		buffer.reset();
+		buffer.setBoolean("convertLFandTab", convertLFandTab);
 		buffer.setBoolean("useLD", locDir.useLD());
 		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
 		buffer.setBoolean("useKeyCondition", useKeyCondition);
@@ -84,6 +88,7 @@ public class Parameters extends BaseParameters {
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
+		convertLFandTab = buffer.getBoolean("convertLFandTab", convertLFandTab);
 		boolean tmpBool1 = buffer.getBoolean("useLD", locDir.useLD());
 		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());
 		locDir.setOptions(tmpBool1, tmpBool2);

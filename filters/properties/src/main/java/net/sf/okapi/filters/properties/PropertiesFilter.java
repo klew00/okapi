@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -500,7 +500,6 @@ public class PropertiesFilter implements IFilter {
 	 * @param text The string to convert.
 	 * @return The converted string.
 	 */
-	//TODO: Deal with escape ctrl, etc. \n should be converted
 	private String unescape (String text) {
 		if ( text.indexOf('\\') == -1 ) return text;
 		StringBuilder tmpText = new StringBuilder();
@@ -527,17 +526,26 @@ public class PropertiesFilter implements IFilter {
 							text.substring(i+2)));
 					}
 					break;
-				case '\\':
-					tmpText.append("\\\\");
-					i++;
-					continue;
 				case 'n':
-					tmpText.append("\n");
+					if ( params.convertLFandTab ) {
+						tmpText.append("\n");
+					}
+					else {
+						tmpText.append("\\n");
+					}
 					i++;
 					continue;
 				case 't':
-					tmpText.append("\t");
+					if ( params.convertLFandTab ) {
+						tmpText.append("\t");
+					}
+					else {
+						tmpText.append("\\t");
+					}
 					i++;
+					continue;
+				default: // b-slash, f, v, etc. all other
+					tmpText.append("\\"+text.charAt(++i));
 					continue;
 				}
 			}
