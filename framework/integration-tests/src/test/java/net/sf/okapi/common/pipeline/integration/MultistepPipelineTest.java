@@ -109,7 +109,7 @@ public class MultistepPipelineTest {
 		IPipelineStep step2 = new SearchAndReplaceStep();
 		((net.sf.okapi.steps.searchandreplace.Parameters) step2.getParameters()).addRule(new String[] { "true",
 				"Okapi Framework", "Big Foot" });
-		((net.sf.okapi.steps.searchandreplace.Parameters) step2.getParameters()).plainText = false;
+//		((net.sf.okapi.steps.searchandreplace.Parameters) step2.getParameters()).plainText = false;
 		FindStringStep step3 = new FindStringStep("Big Foot");
 
 		driver.addStep(step1);
@@ -138,7 +138,7 @@ public class MultistepPipelineTest {
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		
 		IPipelineStep searchReplaceStep = new SearchAndReplaceStep();
-		((net.sf.okapi.steps.searchandreplace.Parameters) searchReplaceStep.getParameters()).plainText = false;
+//		((net.sf.okapi.steps.searchandreplace.Parameters) searchReplaceStep.getParameters()).plainText = false;
 		((net.sf.okapi.steps.searchandreplace.Parameters) searchReplaceStep.getParameters()).addRule(new String[] { "true",
 				"Okapi Framework", "Big Foot" });
 		driver.addStep(searchReplaceStep);
