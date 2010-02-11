@@ -31,9 +31,9 @@
   </info>
  </plugin>
 
- <plugin type="separator"/>
+<!--  <plugin type="separator"/> -->
   
- <plugin type="utility"
+<!-- <plugin type="utility"
   id="oku_textrewriting"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Utility"
@@ -52,7 +52,8 @@
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
- 
+-->
+
  <plugin type="utility"
   id="oku_alignment"
   version="1.0"
@@ -79,7 +80,7 @@
   </info>
  </plugin>
  
- <plugin type="separator"/>
+<!--  <plugin type="separator"/> -->
   
  <plugin type="utility"
   id="oku_encodingconversion"
@@ -145,9 +146,9 @@
    </info>
   </plugin>
 
- <plugin type="separator"/>
+ <!--  <plugin type="separator"/> -->
 
- <plugin type="utility"
+ <!-- <plugin type="utility"
    id="oku_ttxchecker"
    version="1.0"
    pluginClass="net.sf.okapi.applications.rainbow.utilities.ttxchecker.Utility"
@@ -158,6 +159,7 @@
     <provider>Okapi Framework</provider>
    </info>
   </plugin>  
+-->
 
 <!-- <plugin type="utility"
   id="oku_twbbatchanalysis"

@@ -52,13 +52,12 @@ public class RainbowTest {
 			File.separator, File.separator, File.separator, distDir, File.separator, File.separator);
 		javaRainbow = "java -jar " + libDir + "rainbow.jar";
 	}
-	
+
    @Test
    public void testRewriting () throws IOException, InterruptedException {
-   	// Delete previous output
    	assertTrue(deleteOutputFile("potest.rbout.po"));
-   	assertEquals(0, runRainbow("-np -x oku_textrewriting potest.po -o potest.rbout.po -te windows-1252 -opt rewriting.opt"));
-   	assertTrue("File different from gold", compareWithGoldFile("potest.rbout.po"));
+   	assertEquals(0, runRainbow("-np -p pipelines/textrewriting.rnb -pln pipelines/textrewriting.pln"));
+   	assertTrue("File different from gold", compareWithGoldFile("pipelines/potest.rbout.po"));
    }
 
    @Test
