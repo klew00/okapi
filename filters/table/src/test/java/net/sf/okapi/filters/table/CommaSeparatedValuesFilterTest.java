@@ -814,6 +814,130 @@ public class CommaSeparatedValuesFilterTest {
 	}
 	
 	@Test
+	public void testFileEvents118() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/test2cols.csv"); // issue 118
+		assertNotNull(input);
+		
+		URL paramsUrl = TableFilterTest.class.getResource("/okf_table@2Cols_ID_Text.fprm");
+		assertNotNull(paramsUrl);  
+		
+		try {
+			params.load(paramsUrl.toURI(), false);
+		} catch (URISyntaxException e) {
+		}
+		
+//		params.valuesStartLineNum = 2;
+//		params.sendHeaderMode = 0;
+		
+		filter.open(new RawDocument(input, "UTF-8", locEN));
+		
+		testEvent(EventType.START_DOCUMENT, null);
+						
+		// Line 1
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "814", null, null, null, null);
+		testEvent(EventType.TEXT_UNIT, "text", null, null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Lines 2, 3
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "works \"\"text\"\" and \"\"text\"\" text\n", "815", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 4
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "works \"\"text\"\", and \"\"text\"\" text", "815", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Lines 5, 6
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "does not work \"\"text\"\", and \"\"text\"\" text\n", "815", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 7
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "text", "816", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 8
+		testEvent(EventType.START_GROUP, null);		
+		testEvent(EventType.TEXT_UNIT, "works \"text\" and \"text\"", "817", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Lines 9, 10
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "works \"text\" and \"text\"\n", "817", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+				
+		// Line 11
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "works \"text\", and \"text\"", "817", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Lines 12, 13
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "works \"text\", and \"text\"\n", "817", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 14
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "\"text\" and text", "818", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 15
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "text, \"text\" text", "818", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 16
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "text \"text\", text", "818", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Lines 17, 18
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "text \"text\", text\n", "818", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 19
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "text \"text, text\", text", "819", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Lines 20, 21
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "text \"text, text\", text\n", "819", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 22
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "\"text, text\" text", "820", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 23
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "text, text", "820", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 24
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "text \"text, text\" text", "820", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 25
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "\"text\"text \"text", "820", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+	}
+	
+	@Test
 	public void testFileEvents96() {
 		
 		Parameters params = (Parameters) filter.getParameters();
@@ -943,6 +1067,11 @@ public class CommaSeparatedValuesFilterTest {
 		assertNotNull(input);
 		
 		params.wrapMode = WrapMode.NONE; // !!!
+		
+//		params.valuesStartLineNum = 9;
+//		params.sendHeaderMode = 0;
+
+		
 		filter.open(new RawDocument(input, "UTF-8", locEN));
 		
 		testEvent(EventType.START_DOCUMENT, null);

@@ -169,4 +169,27 @@ public class StringUtil {
 		
 		return split(string, delimRegex, 0);
 	}
+	
+	/**
+	 * Returns a number of occurrences of a given substring in a given string.
+	 * @param str the given string.
+	 * @param substr the given substring being sought.
+	 * @return the number of occurrences of the substring in the string.
+	 */
+	public static int getNumOccurrences(String str, String substr){
+		
+	    String temp = str;
+		int count = 0;
+		int i = temp.indexOf(substr);
+		
+		while(i >= 0){
+			
+		    count++;
+		    temp = temp.substring(i + 1);
+		    i = temp.indexOf(substr);
+		}
+		
+		return count;
+	}
+	
 }

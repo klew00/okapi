@@ -20,14 +20,29 @@
 
 package net.sf.okapi.common;
 
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexUtil {
+	
+	private static HashMap<String, Pattern> patternCache = new HashMap<String, Pattern>();
 
+	private static Pattern getPattern(String regex) {
+		
+		Pattern pattern = patternCache.get(regex);
+		if (pattern == null) {
+			
+			pattern = Pattern.compile(regex);
+			patternCache.put(regex, pattern);
+		}
+		
+		return pattern;
+	}
+	
 	public static String replaceAll(String string, String regex, int group, String replacement) {
 	
-		Pattern pattern = Pattern.compile(regex);
+		Pattern pattern = getPattern(regex);
 	    Matcher matcher = pattern.matcher(string);
 	    
 	    // Replace all occurrences of pattern in input
@@ -47,4 +62,36 @@ public class RegexUtil {
 	    buf.append(string.substring(end));
 	    return buf.toString();
 	}
+	
+	public static int countMatches(String string, String regex) {
+				
+	    return countMatches(string, regex, 0);
+	}
+	
+	public static int countMatches(String string, String regex, int matchLen) {
+	
+		Pattern pattern = getPattern(regex);
+	    Matcher matcher = pattern.matcher(string);
+	    
+	    int count = 0;
+	    
+	    while (matcher.find())
+	    	if (matchLen == 0)
+	    		count++;
+	    	else
+	    		count += string.substring(matcher.start(0), matcher.end(0)).length() / matchLen;
+	    
+	    return count;
+	}
+	
+	public static int countLeadingQualifiers(String string, String qualifier) {
+		
+		return countMatches(string, qualifier + "+\\b", qualifier.length());
+	}
+	
+	public static int countTrailingQualifiers(String string, String qualifier) {
+		
+		return countMatches(string, "\\b" + qualifier + "+", qualifier.length());
+	}
+	
 }

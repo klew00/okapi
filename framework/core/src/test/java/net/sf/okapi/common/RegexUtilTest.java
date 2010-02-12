@@ -32,4 +32,21 @@ public class RegexUtilTest {
 		
 		assertEquals("e{1@^}ddddd{2@^5}+", RegexUtil.replaceAll("e{1,}ddddd{2,5}+", "\\{.*?(,).*?\\}", 1, "@^"));
 	}
+	
+	@Test
+	public void testCountMatches() {
+		
+		assertEquals(3, RegexUtil.countMatches("1 text 2 text 1 text 1 text 2", "1"));
+		assertEquals(2, RegexUtil.countMatches("1 text 2 text 1 text 1 text 2", "2"));
+	}
+	
+	@Test
+	public void testCountQualifiers() {
+		
+		assertEquals(3, RegexUtil.countLeadingQualifiers("\"text, \"text\", text,\"text\"\"\"", "\""));
+		assertEquals(4, RegexUtil.countTrailingQualifiers("\"text, \"text\", text,\"text\"\"\"", "\""));
+		assertEquals(3, RegexUtil.countLeadingQualifiers("\"вавы, \"ывываывва\", ывааа,\"ыфывы\"\"\"", "\""));
+		assertEquals(4, RegexUtil.countTrailingQualifiers("\"вавы, \"ывываывва\", ывааа,\"ыфывы\"\"\"", "\""));
+	}
+	
 }
