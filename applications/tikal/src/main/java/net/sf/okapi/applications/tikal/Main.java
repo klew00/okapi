@@ -70,6 +70,7 @@ import net.sf.okapi.steps.segmentation.SegmentationStep;
 import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
+import net.sf.okapi.connectors.microsoft.MicrosoftMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
@@ -115,6 +116,8 @@ public class Main {
 	protected String apertiumServer;
 	protected boolean usePensieve;
 	protected String pensieveDir;
+	protected boolean useMicrosoft;
+	protected String microsoftParams;
 //	protected boolean useProMT;
 //	protected String proMTParams;
 	protected boolean genericOutput = false;
@@ -316,6 +319,14 @@ public class Main {
 				else if ( arg.equals("-gs") ) {
 					prog.useGlobalSight = true;
 					prog.globalSightParams = prog.getArgument(args, ++i);
+				}
+				else if ( arg.equals("-ms") ) {
+					prog.useMicrosoft = true;
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							prog.microsoftParams = args.get(++i);
+						}
+					}
 				}
 //				else if ( arg.equals("-promt") ) {
 //					prog.useProMT = true;
@@ -820,20 +831,20 @@ public class Main {
 		ps.println("Extracts a file to XLIFF (and optionally segment and pre-translate):");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]-mm key");
-		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
-		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
+		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
+		ps.println("      |-ms configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
 		ps.println("Translates a file:");
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]");
-		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]]");
-		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
+		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
+		ps.println("      |-ms configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
-		ps.println("      [-apertium [serverURL]] [-opt threshold[:maxhits]]");
+		ps.println("      [-apertium [serverURL]] [-ms configFile] [-opt threshold[:maxhits]]");
 		ps.println("Converts to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-generic] [-trgsource|-trgempty]");
@@ -892,7 +903,7 @@ public class Main {
 	
 	private void processQuery () {
 		if ( !useGoogle && !useOpenTran && !useTransToolkit && !useMyMemory
-			&& !usePensieve && !useGlobalSight && !useApertium ) {
+			&& !usePensieve && !useGlobalSight && !useApertium && !useMicrosoft ) {
 			useGoogle = true; // Default if none is specified
 		}
 		// Query options
@@ -934,6 +945,14 @@ public class Main {
 			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
 			displayQuery(conn, true);
+			conn.close();
+		}
+		if ( useMicrosoft ) {
+			conn = new MicrosoftMTConnector();
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
+			conn.setLanguages(srcLoc, trgLoc);
+			conn.open();
+			displayQuery(conn, false);
 			conn.close();
 		}
 //		if ( useProMT ) {
@@ -1092,6 +1111,9 @@ public class Main {
 		else if ( useGlobalSight ) {
 			levParams.setResourceClassName(GlobalSightTMConnector.class.getName());
 		}
+		else if ( useMicrosoft ) {
+			levParams.setResourceClassName(MicrosoftMTConnector.class.getName());
+		}
 //		else if ( useProMT ) {
 //			levParams.setResourceClassName(ProMTConnector.class.getName());
 //		}
@@ -1239,7 +1261,18 @@ public class Main {
 			params.load(paramURI, false);
 			return params;
 		}
-		
+
+		if ( connectorClassName.equals(MicrosoftMTConnector.class.getName()) ) {
+			net.sf.okapi.connectors.microsoft.Parameters params
+				= new net.sf.okapi.connectors.microsoft.Parameters();
+			// Use the specified parameters if available, otherwise use the default
+			if ( microsoftParams != null ) {
+				URI paramURI = (new File(microsoftParams).toURI());
+				params.load(paramURI, false);
+			}
+			return params;
+	}
+
 //		if ( connectorClassName.equals(ProMTConnector.class.getName()) ) {
 //			net.sf.okapi.connectors.promt.Parameters params
 //				= new net.sf.okapi.connectors.promt.Parameters();

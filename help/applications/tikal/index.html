@@ -96,14 +96,15 @@ XLIFF 1.2 specifications</a>.</p>
 		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
-		-apertium&nbsp;[serverURL]</code></td>
+		-apertium&nbsp;[serverURL]<br>
+		-ms configFile</code></td>
 		<td align="left" valign="top">A translation resource to use to 
 		translate the document: <a href="#pensieve"><code>-pen</code> for a 
 		Pensieve TM</a>, <a href="#translatetoolkit"><code>-tt</code> for a 
 		Translate Toolkit TM</a>, <a href="#globalsight"><code>-gs</code> for a 
 		GlobalSight TM</a>, <a href="#mymemory"><code>-mm</code> for MyMemory 
-		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>, 
-		and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
+		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>,&nbsp; <a href="#apertium"><code>-apertium</code> for an Apertium server</a>., 
+		and <a href="#microsoft"><code>-ms</code> for Microsoft MT</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -246,14 +247,16 @@ file must be in SRX format.</p>
 		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
-		-apertium&nbsp;[serverURL]</code></td>
+		-apertium&nbsp;[serverURL]<br>
+		-ms configFile</code></td>
 		<td align="left" valign="top">A translation resource to use to 
 		translate the document: <a href="#pensieve"><code>-pen</code> for a 
 		Pensieve TM</a>, <a href="#translatetoolkit"><code>-tt</code> for a 
 		Translate Toolkit TM</a>, <a href="#globalsight"><code>-gs</code> for a 
 		GlobalSight TM</a>, <a href="#mymemory"><code>-mm</code> for MyMemory 
 		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>, 
-		and <a href="#apertium"><code>-apertium</code> for an Apertium server</a>. The leveraging occurs after 
+		<a href="#apertium"><code>-apertium</code> for an Apertium server</a>, 
+		and <a href="#microsoft"><code>-ms</code> for Microsoft MT</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -333,7 +336,8 @@ per resource, not sorted by best score as a whole.</p>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-google</code></td>
-		<td align="left" valign="top">Queries the <a href="#google">Google MT system</a>. If no other type of resource is 
+		<td align="left" valign="top">Queries the <a href="#google">Google MT 
+		server</a>. If no other type of resource is 
 		specified, this is used by default. This requires Internet access.</td>
 	</tr>
 	<tr>
@@ -341,6 +345,12 @@ per resource, not sorted by best score as a whole.</p>
 		<td align="left" valign="top">
 		<p dir="ltr">Queries the specified <a href="#apertium">Apertium MT server</a> (local or remote). A 
 		default remote server is provided.</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top" nowrap><code>-ms configFile</code></td>
+		<td align="left" valign="top">
+		Queries the <a href="#microsoft">Microsoft MT server</a>. This requires 
+		Internet access.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-opt threshold[:maxhits]</code></td>
@@ -676,6 +686,7 @@ other searchable translation repository. the following resources are available:<
 	<li><a href="#mymemory">MyMemory TM</a></li>
 	<li><a href="#google">Google MT</a></li>
 	<li><a href="#apertium">Apertium MT</a></li>
+	<li><a href="#microsoft">Microsoft MT</a></li>
 </ul>
 <p>Note that some of these resources are Web-based and require an internet 
 connection, others can be installed and used locally.</p>
@@ -683,7 +694,7 @@ connection, others can be installed and used locally.</p>
 <p>This is the framework&#39;s own TM engine. It is still under development, but 
 can be used. This resource is indicated by the&nbsp; option <code>-pen</code> in 
 Tikal and takes one argument: the directory of the TM:</p>
-<pre>tikal -q &quot;text to search&quot; -pen myTmDir</pre>
+<pre>tikal -q &quot;text to translate&quot; -pen myTmDir</pre>
 <h3><a name="translatetoolkit"></a>Translate Toolkit TM</h3>
 <p>The Translate Toolkit TM is an engine that comes with the Translate Toolkit, 
 a nicely designed and well supported set of open-source localization tools. You 
@@ -701,7 +712,7 @@ PO Format command</a>.</p>
 one argument: the host of the server, and optionally the port to use. Use <code>
 localhost</code> for a server running locally. If the port is omitted it is set 
 to 8080 by default.</p>
-<pre>tikal -q &quot;text to search&quot; -tt localhost</pre>
+<pre>tikal -q &quot;text to translate&quot; -tt localhost</pre>
 <h3><a name="globalsight"></a>GlobalSight TM</h3>
 <p>The GlobalSight TM engine is part of the open-source GlobalSight System. You 
 need to have access to server with the system installed in order to use this 
@@ -727,7 +738,7 @@ have no meangingful scores from a TM viewpoint, so the Okapi connector
 recalculate, re-sort and re-filter the results. Note also that this resource is 
 available only for the <a href="#query">Query command</a>, it would be too slow 
 to use for the other commands.</p>
-<pre dir="ltr">tikal -q &quot;text to search&quot; -opentran</pre>
+<pre dir="ltr">tikal -q &quot;text to translate&quot; -opentran</pre>
 <h3><a name="mymemory"></a>MyMemory TM</h3>
 <p>The MyMemory project is a central repository of public and private TMs. It 
 offers access through a Web service interface, and can provide MT fall-back 
@@ -738,7 +749,7 @@ http://mymemory.translated.net/</a></p>
 argument: an access key. You can use the default access key <code>mmDemo123</code> 
 for testing the resource. For real work you may want to open an account at 
 MyMemory.</p>
-<pre>tikal -q &quot;text to search&quot; -mm mmDemo123</pre>
+<pre>tikal -q &quot;text to translate&quot; -mm mmDemo123</pre>
 <h3><a name="google"></a>Google MT</h3>
 <p>The Google MT engine is well-known and widely used. Okapi provides a 
 connector for the Ajax API. You can find more information about Google MT here:
@@ -746,7 +757,7 @@ connector for the Ajax API. You can find more information about Google MT here:
 http://code.google.com/apis/ajaxlanguage/</a>.</p>
 <p>This resource is indicated by the option <code>-google</code> in Tikal 
 (without argument). It is the default for the <a href="#query">Query command</a>.</p>
-<pre>tikal -q &quot;text to search&quot; -google</pre>
+<pre>tikal -q &quot;text to translate&quot; -google</pre>
 <h3><a name="apertium"></a>Apertium MT</h3>
 <p>Apertium is an open-source Rule-based MT project. It provides translation for 
 many language pairs, including for less-common languages such as Catalan, 
@@ -758,7 +769,25 @@ optional argument: the URL of the server.</p>
 default server is set to use the main public apertium.org server. Note that you 
 may need to have your IP address registered with the team running the server to 
 be able to access it.</p>
-<pre>tikal -q &quot;text to search&quot; -apertium</pre>
+<pre>tikal -q &quot;text to translate&quot; -apertium</pre>
+<h3><a name="microsoft"></a>Microsoft MT</h3>
+<p>The Microsoft MT engine is freely available from Microsoft (<a href="http://www.microsofttranslator.com/">http://www.microsofttranslator.com/</a>). 
+Okapi provides a connector for the SOAP API. You can get more information about 
+this API and its terms here: <a href="http://sdk.microsofttranslator.com/">
+http://sdk.microsofttranslator.com/</a>. To use this connector you need a AppID 
+from Microsoft. You can get one at
+<a href="http://www.bing.com/developers/appids.aspx">
+http://www.bing.com/developers/appids.aspx</a>.</p>
+
+<p>This resource is indicated by the option <code>-ms</code> in Tikal and takes one 
+argument: a configuration file that contains the information to connectand use 
+the Microsoft MT service. The 
+configuration file must look like this:</p>
+<pre>#v1
+appId=mypersonalappid</pre>
+<p>To use the Microsoft MT engine call Tikal like this (where <code>myMS.cfg</code> 
+is you configuration file).</p>
+<pre>tikal -q &quot;text to translate&quot; -ms myMS.cfg</pre>
 <p>&nbsp;</p>
 
 </body>

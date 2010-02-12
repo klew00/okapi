@@ -33,6 +33,17 @@ Sends: Raw document or Filter events</p>
 <p>The step provides a way to define a list of search entries and corresponding 
 replacement. You can use regular expressions if needed.</p>
 <p>The step can take ither as input either a raw document, or filter events.</p>
+<ul>
+	<li>If the step recieves filter events, the search and replace is done on 
+	the content of the text units, and the step sends updated filter events to 
+	the next step.</li>
+	<li>If the step recieves a raw document, the search and replace is done on 
+	the whole file, and the step sends an updated raw document to the next step. 
+	Note that in this case, the raw document must be in some text-based file 
+	format for the search and replace to work: The document is seen exactly like 
+	it would be in a text editor (no conversion of escaped characters is done 
+	for example).</li>
+</ul>
 <h2><a name="parameters"></a>Parameters</h2>
 <p>The items list contains three columns:
 <ul>
@@ -48,12 +59,6 @@ replacement. You can use regular expressions if needed.</p>
 <p><cite>Remove</cite> -- Click this button to remove the item currently selected from the list.</p>
 <p><cite>Move Up</cite> -- Click this button to move the item currently selected upward.</p>
 <p><cite>Move Down</cite> -- Click this button to move the item currently selected downward.</p>
-<p><cite>Process the documents as plain text</cite> -- Set this option to process the input 
-documents as plain text, that is without reading them through a filter.</p>
-<p>When this option is set: The step expects a raw document as input and passes 
-back a modified raw document. All parts of the file are searched, also the file is seen exactly like it would be in a text editor (no conversion of escaped characters is done for example).</p>
-<p>When this option is not set: The step expects filter events as input and 
-passes back modified filter events. Only the text extracted in text units the filter associated with the input file will be modified.</p>
 <p><cite>Use regular expressions</cite> -- Set this option to enable the 
 <a href="http://java.sun.com/j2se/1.6.0/docs/api/java/util/regex/Pattern.html">Regular Expressions</a> mode.</p>
 <h4>Regular expression options</h4>
