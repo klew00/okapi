@@ -45,8 +45,14 @@ public class RegexUtilTest {
 		
 		assertEquals(3, RegexUtil.countLeadingQualifiers("\"text, \"text\", text,\"text\"\"\"", "\""));
 		assertEquals(4, RegexUtil.countTrailingQualifiers("\"text, \"text\", text,\"text\"\"\"", "\""));
-		assertEquals(3, RegexUtil.countLeadingQualifiers("\"вавы, \"ывываывва\", ывааа,\"ыфывы\"\"\"", "\""));
-		assertEquals(4, RegexUtil.countTrailingQualifiers("\"вавы, \"ывываывва\", ывааа,\"ыфывы\"\"\"", "\""));
+		assertEquals(3, RegexUtil.countLeadingQualifiers("\"\u0432\u0430\u0432\u044b, " +
+				"\"\u044b\u0432\u044b\u0432\u0430\u044b\u0432\u0432\u0430\", \u044b\u0432\u0430\u0430\u0430," +
+				"\"\u044b\u0444\u044b\u0432\u044b\"\"\"", 
+				"\""));
+		assertEquals(4, RegexUtil.countTrailingQualifiers("\"\u0432\u0430\u0432\u044b, " +
+				"\"\u044b\u0432\u044b\u0432\u0430\u044b\u0432\u0432\u0430\", \u044b\u0432\u0430\u0430\u0430," +
+				"\"\u044b\u0444\u044b\u0432\u044b\"\"\"",
+				"\""));
 	}
 	
 }
