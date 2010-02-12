@@ -582,7 +582,7 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 					allT.setSelection(false);
 				}
 				
-				else if (params.sendHeaderMode == Parameters.TRIM_ALL) {
+				else if (params.trimMode == Parameters.TRIM_ALL) {
 					
 					trim.setEnabled(true);
 					trim.setSelection(true);
@@ -590,7 +590,7 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 					allT.setSelection(true);
 				}
 				
-				else if (params.sendHeaderMode == Parameters.TRIM_NONE) {
+				else if (params.trimMode == Parameters.TRIM_NONE) {
 					
 					trim.setSelection(false);
 					nqualif.setSelection(false);
