@@ -107,7 +107,7 @@ import org.junit.Test;
 	}
 	
 	@Test
-	public void GetNumOccurrences() {
+	public void testGetNumOccurrences() {
 		
 		assertEquals(3, StringUtil.getNumOccurrences("1 text 2 text 1 text 1 text 2", "1"));
 		assertEquals(2, StringUtil.getNumOccurrences("1 text 2 text 1 text 1 text 2", "2"));
