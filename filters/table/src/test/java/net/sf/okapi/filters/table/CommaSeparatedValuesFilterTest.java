@@ -829,7 +829,8 @@ public class CommaSeparatedValuesFilterTest {
 		} catch (URISyntaxException e) {
 		}
 		
-//		params.valuesStartLineNum = 2;
+// DEBUG		
+//		params.valuesStartLineNum = 12;
 //		params.sendHeaderMode = 0;
 		
 		filter.open(new RawDocument(input, "UTF-8", locEN));
@@ -930,6 +931,31 @@ public class CommaSeparatedValuesFilterTest {
 		// Line 25
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "\"text\"text \"text", "820", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 26
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "X <x>xxxxN</x> xxxxN <X>xxxxN</X>, text4.", "999", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 27
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "A <b>text1</b> text2 <B>text3</B>, text4.", "999", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 28
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "A <b>text1</b> text2 <B>text3</B>, text4 ", "999", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 29
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "text \"text, text.\", text", "819", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 30
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "text \"text, text \", text", "819", null, null, null);
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);

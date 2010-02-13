@@ -183,9 +183,14 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 //						{cancelMerging(); buffer.add(chunk); continue;}
 //				}
 				
+				int saveLevel = level;
+				
 				level += numLeadingQ - numTrailingQ;
+				boolean endsQualified = trimmedChunk.endsWith(params.textQualifier);
+				if (level == saveLevel && endsQualified && numTrailingQ == 0) level--;
+				
 				buffer.add(chunk);
-				if (numLeadingQ < numTrailingQ)
+				if (numLeadingQ <= numTrailingQ)
 					if (level <= 0) 
 						endMerging();
 				//continue;

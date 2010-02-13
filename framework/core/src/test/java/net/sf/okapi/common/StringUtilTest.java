@@ -105,4 +105,11 @@ import org.junit.Test;
 		assertEquals("item3", chunks[1]);
 		assertEquals("item4", chunks[2]);
 	}
+	
+	@Test
+	public void GetNumOccurrences() {
+		
+		assertEquals(3, StringUtil.getNumOccurrences("1 text 2 text 1 text 1 text 2", "1"));
+		assertEquals(2, StringUtil.getNumOccurrences("1 text 2 text 1 text 1 text 2", "2"));
+	}
 }
