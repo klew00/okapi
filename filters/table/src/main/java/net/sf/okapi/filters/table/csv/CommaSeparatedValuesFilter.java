@@ -149,9 +149,10 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 				}					
 			}
 			else {
-				//int numQ = StringUtil.getNumOccurrences(trimmedChunk, params.textQualifier);
+				int numQ = StringUtil.getNumOccurrences(trimmedChunk, params.textQualifier);
 				numLeadingQ = RegexUtil.countLeadingQualifiers(trimmedChunk, params.textQualifier);
 				numTrailingQ = RegexUtil.countTrailingQualifiers(trimmedChunk, params.textQualifier);
+				int numUndetectedQ = numQ - (numLeadingQ + numTrailingQ); 
 		
 				// Nested qualified fragments are allowed only within a line; when a new line is started to be analyzed, no nesting is 
 				// allowed, and an attempt to increase the level causes canceling of merging.				
@@ -159,9 +160,14 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 				
 				if (merging && level > 0 && startsQualified && !allowNesting)		
 					cancelMerging();
+				
+				if (numUndetectedQ > 0)					
+					if (merging) 
+						numTrailingQ += numUndetectedQ;
+					else
+						numLeadingQ += numUndetectedQ;					
 			}
-			
-			
+						
 			if (merging) {
 				
 //				if (numLeadingQ == numTrailingQ) // == 0 is included

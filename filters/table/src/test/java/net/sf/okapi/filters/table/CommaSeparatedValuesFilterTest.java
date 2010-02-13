@@ -830,7 +830,7 @@ public class CommaSeparatedValuesFilterTest {
 		}
 		
 // DEBUG		
-//		params.valuesStartLineNum = 12;
+//		params.valuesStartLineNum = 32;
 //		params.sendHeaderMode = 0;
 		
 		filter.open(new RawDocument(input, "UTF-8", locEN));
@@ -956,6 +956,21 @@ public class CommaSeparatedValuesFilterTest {
 		// Line 30
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text \"text, text \", text", "819", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 31
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Text", "111", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 32
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, " text1 \"\"text2\"\" text3, text4, text5.", "222", null, null, null);
+		testEvent(EventType.END_GROUP, null);
+		
+		// Line 33
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "Text", "333", null, null, null);
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
