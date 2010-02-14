@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidParameterException;
 
 import net.sf.okapi.applications.rainbow.packages.BaseWriter;
 import net.sf.okapi.applications.rainbow.packages.ManifestItem;
@@ -51,6 +52,10 @@ public class Writer extends BaseWriter {
 	private PrintWriter writer;
 	
 	public void setSkeletonWriter (ISkeletonWriter skelWriter) {
+		if ( skelWriter == null ) {
+			throw new InvalidParameterException("You cannot use the RTF writer with no skeleton writer.\n"
+				+ "The filter you are trying to use may be incompatible with an RTF output.");
+		}
 		this.skelWriter = skelWriter;
 	}
 	

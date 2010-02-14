@@ -135,8 +135,10 @@ public class SegmentationStep extends BasePipelineStep {
 			}
 		}
 		
-		// Make sure we have target content
-		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
+		// Make sure we have target content if needed
+		if ( tu.hasTarget(targetLocale) ) {
+			tu.createTarget(targetLocale, false, IResource.COPY_ALL);
+		}
 		
 		return event;
 	}
