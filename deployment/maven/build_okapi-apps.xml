@@ -40,16 +40,12 @@
 			<equals arg1="${platform}" arg2="win32-x86_64"/>
 		</or>
 	</condition>
-	<condition property="building-mac">
-		<or>
-			<equals arg1="${platform}" arg2="cocoa-macosx"/>
-			<equals arg1="${platform}" arg2="cocoa-macosx-x86_64"/>
-		</or>
-	</condition>
-	<condition property="building-linux">
+	<condition property="building-linuxmac">
 		<or>
 			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
 			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
+			<equals arg1="${platform}" arg2="cocoa-macosx"/>
+			<equals arg1="${platform}" arg2="cocoa-macosx-x86_64"/>
 		</or>
 	</condition>
 
@@ -266,7 +262,7 @@
 		 excludes="MANIFEST.MF" />
 
 		<copy todir="${dist}" overwrite="true">
-			<fileset dir="data/okapi-apps/${platform}"/>
+			<fileset dir="data/okapi-apps/${platform}" includes="**/**"/>
 		</copy>
 
 		<!-- Copy shared resources -->
@@ -308,20 +304,16 @@
 		<delete file="${dist}/tikal.sh"/>
 	</target>
 
-	<target name="zipAll" unless="building-linux">
+	<target name="zipAll" unless="building-linuxmac">
 		<zip destfile="${done}/${distName}.zip" basedir="${dist}"/>
 	</target>
 
-	<target name="gzipAll" if="building-linux">
-		<!--
-		TODO: Here we copy the dist dir to a new dir to match the name of the tar file
-		      we could build it directly into such a directory 
-		-->
+	<target name="gzipAll" if="building-linuxmac">
 		<mkdir dir="${dist}/${distName}"/>
 		<copy todir="${dist}/${distName}">
 			<fileset dir="${dist}" excludes="${distName}"/>
 		</copy>
-
+		<!-- tar the files and set the executable flag on the shell scripts -->
 		<tar destfile="${done}/${distName}.tar.gz" compression="gzip">
 			<tarfileset filemode="755" dir="${dist}">
 				<include name="${distName}/**/*.sh"/>

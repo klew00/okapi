@@ -100,7 +100,7 @@ later. Sun Java, or an OpenJDK VM is recommended.</p>
 <h3>Installation</h3>
 <p>To install the Okapi applications on Linux (32- and 64-bit):</p>
 <ol>
-	<li>Download the ZIP file of the Linux distribution you need (there is one 
+	<li>Download the GZ file of the Linux distribution you need (there is one 
 	for 32-bit and one for 64-bit).</li>
 	<li>Extract the GunZip file on any location.</li>
 	<li>Make sure the execution rights are set for the files called <code>rainbow.sh</code> 
@@ -125,7 +125,7 @@ the user and called <code>.Rainbow</code> and <code>.Ratel</code>.</li>
 <h2><a name="SetupMac"></a>Macintosh Platform</h2>
 <h3>Requirements</h3>
 <p>In order to run Okapi applications on Macintsoh you must have Java 1.6 
-installed. Apple does not provide Java 1.6 for all versions and architectures of 
+installed. Note that Apple does not provide Java 1.6 for all versions and architectures of 
 the Mac. </p>
 <ul>
 	<li>If you have a 32-bit machine, you can run Java 1.6 only on Mac OS X 10.6 
@@ -137,28 +137,23 @@ the Mac. </p>
 <h3>Installation</h3>
 <p>To install the Okapi applications on Macintosh (32- and 64-bit):</p>
 <ol>
-	<li>Download the ZIP file of the Macintosh distribution.</li>
-	<li>Extract the file on any location. For example <code>
+	<li>Download the GZ file of the Macintosh distribution you need (See above).</li>
+	<li>Extract the GunZip file on any location. For example <code>
 	/Users/admin/Desktop/Okapi</code>.</li>
 </ol>
 <p>To run, for example, Rainbow:</p>
 <ol>
-	<li>Try double-clicking on the <code>rainbow.sh</code> shell script that is in 
-	the main directory of the distribution.</li>
-	<li>If this does not work:<ol>
-		<li>Open a terminal window.</li>
-		<li>Go to the main directory of the distribution, for example <code>
-		/Users/admin/Desktop/Okapi</code>.</li>
-		<li>Execute the following command:</li>
-	</ol>
-	<pre>./rainbow.sh</pre>
-	</li>
+	<li>The main directory of the distribution contains a <code>Rainbow</code> 
+	application bundle (Rainbow.app): simply double-click on it.</li>
+	<li>If you run the application for the first time since you downloaded it, 
+	you may be prompted to confirm you want to run it.</li>
 </ol>
-<p>You can modify the shell file to fit your own parameters. In all cases you <b>MUST</b> specify the <code>-XstartOnFirstThread</code> option or the 
+<p>You can modify the shell file <code>rainbow.sh</code> that is in the <code>
+/Contents/MacOS</code> folder of the application bundle to fit your own parameters. In all cases you <b>MUST</b> specify the <code>-XstartOnFirstThread</code> option or the 
 application may 
 not work properly. You can make sure to run the Java VM in a specific mode using 
-the <code>-d32</code> and <code>-d64</code> flags. For example:</p>
-<pre>$ java -d64 -XstartOnFirstThread -jar lib/rainbow.jar</pre>
+the <code>-d32</code> and <code>-d64</code> flags.</p>
+<p>Tikal is a command-line tool and should be invoked from a Terminal window.</p>
 <h3>Uninstallation</h3>
 <p>To uninstall:</p>
 <ol>
