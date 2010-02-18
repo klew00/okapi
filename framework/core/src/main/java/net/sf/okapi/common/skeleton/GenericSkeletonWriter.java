@@ -59,6 +59,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private LinkedHashMap<String, Referent> referents;
 	private String outputEncoding;
 	private boolean isMultilingual;
+	private int referentCopies = 1; // Number of copies to have for the referents (min=1)
 	
 	private IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
@@ -82,6 +83,17 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 	}
 	
+	/**
+	 * Sets the number of copies to keep for a referent. By default one copy is kept
+	 * and discarded after it is referenced. Some layout may need to refer to the referent
+	 * more than once, for example when they output both source and target.
+	 * @param referentCopies the number of copies to hold (must be at least 1).
+	 */
+	public void setReferentCopies (int referentCopies) {
+		if ( referentCopies < 1 ) this.referentCopies = 1; 
+		else this.referentCopies = referentCopies;
+	}
+
 	public String processStartDocument (LocaleId outputLocale,
 		String outputEncoding,
 		ILayerProvider layer,
@@ -129,7 +141,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	public String processStartGroup (StartGroup resource) {
 		if ( resource.isReferent() ) {
 			StorageList sl = new StorageList(resource);
-			referents.put(sl.getId(), new Referent(sl));
+			referents.put(sl.getId(), new Referent(sl, referentCopies));
 			storageStack.push(sl);
 			return "";
 		}
@@ -153,7 +165,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	
 	public String processTextUnit (TextUnit resource) {
 		if ( resource.isReferent() ) {
-			referents.put(resource.getId(), new Referent(resource));
+			referents.put(resource.getId(), new Referent(resource, referentCopies));
 			return "";
 		}
 		if ( storageStack.size() > 0 ) {
@@ -165,7 +177,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 	public String processDocumentPart (DocumentPart resource) {
 		if ( resource.isReferent() ) {
-			referents.put(resource.getId(), new Referent(resource));
+			referents.put(resource.getId(), new Referent(resource, referentCopies));
 			return "";
 		}
 		if ( storageStack.size() > 0 ) {
@@ -736,38 +748,35 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			else return layer.encode(encoderManager.toNative(name, value), context);
 		}
 	}
-	public void addToReferents(Event event) // for OpenXML, so referents can stay private
-	{
+	
+	public void addToReferents (Event event) { // for OpenXML, so referents can stay private
 		IResource resource;
-		if (event!=null)
-		{
-			if (referents==null)
-			{
+		if ( event != null ) {
+			if ( referents == null ) {
 				referents = new LinkedHashMap<String, Referent>();
 				storageStack = new Stack<StorageList>();
 			}
 			resource = event.getResource();
-			if (resource!=null)
-			{
-				switch(event.getEventType())
-				{
-					case TEXT_UNIT:
-						if (((TextUnit)resource).isReferent())
-							referents.put(resource.getId(), new Referent((TextUnit)resource));
-						break;
-					case DOCUMENT_PART:
-						if (((DocumentPart)resource).isReferent())
-							referents.put(resource.getId(), new Referent((DocumentPart)resource));
-						break;
-					case START_GROUP:
-						if (((StartGroup)resource).isReferent())
-						{
-							StorageList sl = new StorageList((StartGroup)resource);
-							referents.put(sl.getId(), new Referent(sl));
-						}
-						break;
-					default:
-						break;
+			if ( resource != null ) {
+				switch( event.getEventType() ) {
+				case TEXT_UNIT:
+					if ( ((TextUnit)resource).isReferent() ) {
+						referents.put(resource.getId(), new Referent((TextUnit)resource, referentCopies));
+					}
+					break;
+				case DOCUMENT_PART:
+					if ( ((DocumentPart)resource).isReferent() ) {
+						referents.put(resource.getId(), new Referent((DocumentPart)resource, referentCopies));
+					}
+					break;
+				case START_GROUP:
+					if ( ((StartGroup)resource).isReferent() ) {
+						StorageList sl = new StorageList((StartGroup)resource);
+						referents.put(sl.getId(), new Referent(sl, referentCopies));
+					}
+					break;
+				default:
+					break;
 				}
 			}
 		}

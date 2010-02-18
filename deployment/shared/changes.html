@@ -10,12 +10,15 @@ the <b>okapi-apps</b> distribution. The information pertaining to
 applications other than Tikal are relevant only for the <b>okapi-apps</b> 
 distribution.</p>
 <ul>
-	<li>Download page: <a href="http://okapi.opentag.com/downloads.html">
+	<li>Download page for latest stable release: <a href="http://okapi.opentag.com/downloads.html">
 	http://okapi.opentag.com/downloads.html</a></li>
 	<li>Main Web site: <a href="http://okapi.opentag.com">
 	http://okapi.opentag.com</a></li>
 	<li>Google Code Project site: <a href="http://code.google.com/p/okapi/">
 	http://code.google.com/p/okapi/</a></li>
+	<li>Download page for latest development snapshots:
+	<a href="http://okapi.opentag.com/snapshots">
+	http://okapi.opentag.com/snapshots</a></li>
 </ul>
 <h2>Changes from M5 (0.5.1) to M6-SNAPSHOT</h2>
 <ul>
@@ -26,9 +29,17 @@ distribution.</p>
 	flag of the shell scripts.</li>
 </ul>
 	</li>
+	<li>Rainbow:<ul>
+	<li>Translation package Creation: Fixed the issue where pre-segmented RTF 
+	output was losing referents in target.</li>
+</ul>
+	</li>
 	<li>Libraries:<ul>
 	<li>Changed QueryManager to allow code changes in target for the 
 	non-segmented queries.</li>
+	<li>Added setReferentCopies() to GenericSkeletonWriter to allow correct 
+	output for writers refering more than once to the referents (e.g. when 
+	creating pre-segmented RTF with source and target).</li>
 </ul>
 	</li>
 </ul>

@@ -41,6 +41,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class Writer extends BaseWriter {
@@ -57,6 +58,10 @@ public class Writer extends BaseWriter {
 				+ "The filter you are trying to use may be incompatible with an RTF output.");
 		}
 		this.skelWriter = skelWriter;
+		// Keep 2 copies of the referents for RTF: source and target
+		if ( this.skelWriter instanceof GenericSkeletonWriter ) {
+			((GenericSkeletonWriter)this.skelWriter).setReferentCopies(2);
+		}
 	}
 	
 	@Override

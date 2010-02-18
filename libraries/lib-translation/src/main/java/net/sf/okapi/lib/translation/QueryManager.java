@@ -519,7 +519,7 @@ public class QueryManager {
 				// First is not 100%: use it and move on
 				if ( qr.score < 100 ) {
 					scores.add(qr.score, qr.origin);
-					tu.setTargetContent(trgLoc, adjustNewFragment(tc, qr.source, qr.target, tu));
+					tc.setContent(adjustNewFragment(tc, qr.source, qr.target, tu));
 					makeSS = true;
 				}
 				// Else: one or more matches, first is 100%
@@ -531,14 +531,14 @@ public class QueryManager {
 					else {
 						// If we do: Use the first one and lower the score to 99%
 						scores.add(99, qr.origin);
-						tu.setTargetContent(trgLoc, adjustNewFragment(tc, qr.source, qr.target, tu));
+						tc.setContent(adjustNewFragment(tc, qr.source, qr.target, tu));
 						makeSS = true;
 					}
 				}
 				// Else: Only one 100% or several that have the same translations
 				else {
 					scores.add(qr.score, qr.origin); // That's 100% then
-					tu.setTargetContent(trgLoc, adjustNewFragment(tc, qr.source, qr.target, tu));
+					tc.setContent(adjustNewFragment(tc, qr.source, qr.target, tu));
 					makeSS = true;
 				}
 			}
