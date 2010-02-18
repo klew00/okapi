@@ -486,19 +486,19 @@ public class QueryManager {
 						}
 						// If we do: Use the first one and lower the score to 99%
 						scores.add(99, qr.origin);
-						segment.text = adjustNewFragment(segment.text, qr.source, qr.target, true, tu); //qr.target; 
+						segment.text = adjustNewFragment(segment.text, qr.source, qr.target, tu); 
 						leveraged++;
 						continue;
 					}
 					// Else: First is 100%, possibly several that have the same translations
 					scores.add(qr.score, qr.origin); // That's 100% then
-					segment.text = adjustNewFragment(segment.text, qr.source, qr.target, true, tu); //qr.target;
+					segment.text = adjustNewFragment(segment.text, qr.source, qr.target, tu);
 					leveraged++;
 					continue;
 				}
 				// First is not 100%: use it and move on
 				scores.add(qr.score, qr.origin);
-				segment.text = adjustNewFragment(segment.text, qr.source, qr.target, true, tu);
+				segment.text = adjustNewFragment(segment.text, qr.source, qr.target, tu);
 				leveraged++;
 			}
 		}
@@ -519,7 +519,7 @@ public class QueryManager {
 				// First is not 100%: use it and move on
 				if ( qr.score < 100 ) {
 					scores.add(qr.score, qr.origin);
-					tc.setCodedText(qr.target.getCodedText(), false);
+					tu.setTargetContent(trgLoc, adjustNewFragment(tc, qr.source, qr.target, tu));
 					makeSS = true;
 				}
 				// Else: one or more matches, first is 100%
@@ -531,14 +531,14 @@ public class QueryManager {
 					else {
 						// If we do: Use the first one and lower the score to 99%
 						scores.add(99, qr.origin);
-						tc.setCodedText(qr.target.getCodedText(), false);
+						tu.setTargetContent(trgLoc, adjustNewFragment(tc, qr.source, qr.target, tu));
 						makeSS = true;
 					}
 				}
 				// Else: Only one 100% or several that have the same translations
 				else {
 					scores.add(qr.score, qr.origin); // That's 100% then
-					tc.setCodedText(qr.target.getCodedText(), false);
+					tu.setTargetContent(trgLoc, adjustNewFragment(tc, qr.source, qr.target, tu));
 					makeSS = true;
 				}
 			}
@@ -596,14 +596,13 @@ public class QueryManager {
 	 * Adjusts the inline codes of a new text fragment based on an original one.
 	 * @param oriSrc the original source text fragment.
 	 * @param newSrc the new source text fragment.
-	 * @param newTrg the new target text fragment.
+	 * @param newTrg the new target text fragment (this is the fragment that will be adjusted).
 	 * @param parent the parent text unit (used for error information only)
-	 * @return the new text fragment
+	 * @return the newTrg parameter adjusted
 	 */
 	public TextFragment  adjustNewFragment (TextFragment oriSrc,
 		TextFragment newSrc,
 		TextFragment newTrg,
-		boolean removeExtra,
 		TextUnit parent)
 	{
 		// If both new and original have no code, return the new fragment

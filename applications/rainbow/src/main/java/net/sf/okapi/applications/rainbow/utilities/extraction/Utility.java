@@ -211,7 +211,6 @@ public class Utility extends BaseFilterDrivenUtility {
 	
     private void processTextUnit (TextUnit tu) {
     	// Do not process non-translatable text units
-    	//TODO: Do we need to still make sure we have a target copy?
     	if ( !tu.isTranslatable() ) return;
     	
     	boolean approved = false;
