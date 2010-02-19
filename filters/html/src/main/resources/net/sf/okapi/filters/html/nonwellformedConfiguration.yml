@@ -31,7 +31,7 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-# ELEMENT AND ATTIBUTE NAMES MUST BE LOWER CASED!!!!!!
+# ELEMENT AND ATTRIBUTE NAMES MUST BE LOWER CASED!!!!!!
 
 assumeWellformed: false
 
