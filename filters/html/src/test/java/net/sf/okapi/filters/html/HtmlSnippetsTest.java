@@ -1,7 +1,6 @@
 package net.sf.okapi.filters.html;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
@@ -10,6 +9,7 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import org.junit.After;
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -248,6 +248,20 @@ public class HtmlSnippetsTest {
 		URL originalParameters = parameters;
 		parameters = HtmlSnippetsTest.class.getResource("/collapseWhitespaceOff.yml");
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+		parameters = originalParameters;
+	}
+
+	@Test
+	public void testCodeFinder () {
+		String snippet = "<p>text notVAR1 VAR2<p>";
+		URL originalParameters = parameters;
+		parameters = HtmlSnippetsTest.class.getResource("/withCodeFinderRules.yml");
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		List<Code> list = tu.getSourceContent().getCodes();
+		assertEquals(2, list.size());
+		assertEquals("e", list.get(0).getData());
+		assertEquals("VAR2", list.get(1).getData());
 		parameters = originalParameters;
 	}
 

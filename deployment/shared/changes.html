@@ -25,13 +25,14 @@ distribution.</p>
 	<li>Installation:<ul>
 	<li>Updated the Macintosh distributions with application bundles for Rainbow 
 	and Ratel.</li>
-	<li>Changed the Macintosh distributions to GZIP files to preserve executable 
+	<li>Changed the Macintosh distributions to GunZIP files to preserve executable 
 	flag of the shell scripts.</li>
 </ul>
 	</li>
 	<li>Rainbow:<ul>
 	<li>Translation package Creation: Fixed the issue where pre-segmented RTF 
 	output was losing referents in target.</li>
+	<li>Added English-India in the locale list.</li>
 </ul>
 	</li>
 	<li>Libraries:<ul>
@@ -40,6 +41,10 @@ distribution.</p>
 	<li>Added setReferentCopies() to GenericSkeletonWriter to allow correct 
 	output for writers refering more than once to the referents (e.g. when 
 	creating pre-segmented RTF with source and target).</li>
+</ul>
+	</li>
+	<li>Filters:<ul>
+	<li>HTML filter: Added support for inline codes using regular expressions.</li>
 </ul>
 	</li>
 </ul>

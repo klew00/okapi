@@ -82,9 +82,9 @@ public class Util {
 		"seamonkey", "galeon", "kazehakase", "mozilla", "netscape" };
 
 	/**
-	 * Convert all .r\n and \r to linefeed (\n)
-	 * 
-	 * @param text
+	 * Converts all \r\n and \r to linefeed (\n)
+	 * @param text 
+	 *      the text to convert
 	 * @return converted string
 	 */
 	static public String normalizeNewlines(String text) {

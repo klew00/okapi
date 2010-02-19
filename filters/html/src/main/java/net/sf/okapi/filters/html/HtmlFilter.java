@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -88,6 +88,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			LOGGER.log(Level.FINE,
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
 		}
+		eventBuilder.initializeCodeFinder(getConfig().getUseCodeFinder(), getConfig().getCodeFinderRules());
 	}
 
 	@Override

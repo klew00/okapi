@@ -1,3 +1,23 @@
+/*===========================================================================
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.filters.yaml;
 
 import java.io.File;
@@ -73,6 +93,8 @@ public class TaggedFilterConfiguration {
 	private static final String ELEMENT_TYPE = "elementType";
 	private static final String ELEMENT_ID = "idAttributes";
 	private static final String WELLFORMED = "assumeWellformed";
+	private static final String USECODEFINDER = "useCodeFinder";
+	private static final String CODEFINDERRULES = "codeFinderRules";
 
 	public static enum RULE_TYPE {
 		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, TEXT_MARKER_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, ATTRIBUTE_ID, UNKOWN
@@ -95,7 +117,7 @@ public class TaggedFilterConfiguration {
 	public TaggedFilterConfiguration(String configurationScript) {
 		configReader = new YamlConfigurationReader(configurationScript);
 	}
-
+	
 	@Override
 	public String toString() {
 		return configReader.toString();
@@ -115,6 +137,16 @@ public class TaggedFilterConfiguration {
 			return false;
 		}
 		return wf.booleanValue();
+	}
+	
+	public boolean getUseCodeFinder () {
+		Boolean useCF = (Boolean)configReader.getProperty(USECODEFINDER);
+		if ( useCF == null ) return false;
+		else return useCF;
+	}
+
+	public String getCodeFinderRules () {
+		return (String)configReader.getProperty(CODEFINDERRULES);
 	}
 
 	private RULE_TYPE convertRuleAsStringToRuleType(String ruleType) {
@@ -448,4 +480,5 @@ public class TaggedFilterConfiguration {
 			throw new IllegalConditionalAttributeException("Unkown match type");
 		}
 	}
+
 }

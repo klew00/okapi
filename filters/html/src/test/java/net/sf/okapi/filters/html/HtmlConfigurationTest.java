@@ -19,9 +19,11 @@
 package net.sf.okapi.filters.html;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 
@@ -165,6 +167,22 @@ public class HtmlConfigurationTest {
 				.getResource("/collapseWhitespaceOff.yml");
 		rules = new TaggedFilterConfiguration(url);
 		assertFalse(rules.collapseWhitespace());
+	}
+
+	@Test
+	public void testCodeFinderRules () {
+		URL url = HtmlConfigurationTest.class
+			.getResource("/withCodeFinderRules.yml");
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		assertTrue(rules.getUseCodeFinder());
+		InlineCodeFinder cf = new InlineCodeFinder();
+		cf.fromString(rules.getCodeFinderRules());
+		cf.compile();
+		ArrayList<String> list = cf.getRules();
+		assertNotNull(list);
+		assertEquals(2, list.size());
+		assertEquals("[eE]", list.get(0));
+		assertEquals("\\bVAR\\d\\b", list.get(1));
 	}
 
 	@Test

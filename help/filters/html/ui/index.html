@@ -177,6 +177,19 @@ text units carry their surrounding tags along with any extracted text.</td>
 		</tr>
 	</table>
 
+<h3>Inline Code Finder</h3>
+<p>You can define a set of regular expressions to capture span of extracted text 
+that should be treated as inline codes. For example, some element content may 
+have variables that need to be protected from modification and 
+treated as codes. Use the <code>useCodeFinder</code> and <code>codeFinderRules</code> 
+options for this.</p>
+<pre>useCodeFinder: true
+codeFinderRules: &quot;#v1\ncount.i=1\nrule0=\\bVAR\\d\\b&quot;</pre>
+<p>The options above will set the text &quot;<code>VAR1</code>&quot; as in-line code in 
+the follwoing HTML:</p>
+<pre>&lt;p&gt;Number of files = VAR1&lt;/p&gt;</pre>
+<p>Note that the regular expression is &quot;<code>\bVAR\d\b</code>&quot; but you must 
+escape the back-slash in the YAML notation as well.</p>
 <p>&nbsp;</p>
 </body>
 </html>

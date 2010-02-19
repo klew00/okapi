@@ -344,6 +344,9 @@
  <language code='en-IE' lcid='6153' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1' flag='flagIE'>
   <name>English (Ireland)</name>
  </language>
+ <language code='en-IN' lcid='-1' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1' flag='flagIN'>
+  <name>English (India)</name>
+ </language>
  <language code='en-JM' lcid='8201' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1' flag='flagJM'>
   <name>English (Jamaica)</name>
  </language>
