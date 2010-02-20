@@ -288,16 +288,25 @@ public class TableFilterWriter implements IFilterWriter {
 			return;
 		}
 
-		// Else: check if we have the same number of segments
+		// Else: check we have a target
 		List<Segment> trgList = trgCont.getSegments();
-		if ( trgList.size() != srcCont.getSegmentCount() ) {
-			// Fall back to full entry
+		if ( trgList == null ) {
+			// If not: output all source segments, and empty targets
+			for ( Segment segment : srcCont.getSegments() ) {
+				writeRow(segment.text, null);
+			}
+			return;
+		}
+		
+		// Else: check if we have the same number of segments
+		if ( trgList.size() != srcCont.getSegmentCount() ) { 
+			// If not: Fall back to full entry
 			writeRow(srcCont.getContent(), trgCont.getContent());
 			//TODO: Log a warning
 			return;
 		}
-			
-		// Index each segment
+		// If we do have the same number of segments:
+		// Output each of them
 		int i = 0;
 		for ( Segment segment : srcCont.getSegments() ) {
 			writeRow(segment.text, trgList.get(i).text);
@@ -313,7 +322,7 @@ public class TableFilterWriter implements IFilterWriter {
 			writer.write(format(srcFrag));
 			if ( useDQ ) writer.write("\""+params.getSeparator()+"\"");
 			else writer.write(params.getSeparator());
-			writer.write(format(trgFrag));
+			if ( trgFrag != null ) writer.write(format(trgFrag));
 			if ( useDQ ) writer.write("\"");			
 			writer.write(linebreak);
 		}
