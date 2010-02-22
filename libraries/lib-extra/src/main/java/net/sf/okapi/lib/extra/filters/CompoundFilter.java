@@ -28,12 +28,14 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.lib.extra.Notification;
 
@@ -294,7 +296,15 @@ public class CompoundFilter extends AbstractBaseFilter {
 
 	public Event next() {
 		
-		return (activeSubFilter != null) ? activeSubFilter.next() : null;
+		Event event = (activeSubFilter != null) ? activeSubFilter.next() : null;
+		
+		if (event != null && event.getEventType() == EventType.START_DOCUMENT) {
+
+			// Fix START_DOCUMENT to return compound filter parameters, and not the activeSubFilter's
+			StartDocument startDoc = (StartDocument) event.getResource();
+			startDoc.setFilterParameters(getParameters());
+		}
+		return event; 
 	}
 
 	public void open(RawDocument input) {
@@ -306,7 +316,7 @@ public class CompoundFilter extends AbstractBaseFilter {
 	public void open(RawDocument input, boolean generateSkeleton) {
 		
 //		updateSubfilter();
-		if (activeSubFilter != null) activeSubFilter.open(input, generateSkeleton);		
+		if (activeSubFilter != null) activeSubFilter.open(input, generateSkeleton);
 	}
 
 	private void updateSubfilter() {

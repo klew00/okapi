@@ -34,6 +34,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
@@ -47,6 +49,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.table.TableFilter;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
@@ -409,6 +412,35 @@ public class TableFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 
+	@Test
+	public void testIssue124() {
+		
+		IParameters prms = filter.getParameters();
+		assertEquals(net.sf.okapi.filters.table.Parameters.class, prms.getClass());
+		
+		net.sf.okapi.filters.table.Parameters params = (net.sf.okapi.filters.table.Parameters) filter.getParameters();
+		
+		URL paramsUrl = TableFilterTest.class.getResource("/okf_table@test124.fprm");
+		assertNotNull(paramsUrl);  
+		
+		try {
+			params.load(paramsUrl.toURI(), false);
+		} catch (URISyntaxException e) {
+		}
+		
+		filter.open(new RawDocument("", locEN, locFR));
+		assertEquals("net.sf.okapi.filters.table.tsv.Parameters", params.getParametersClassName());
+		
+		Event event = filter.next();		
+		assertNotNull(event);
+		
+		assertTrue(event.getEventType() == EventType.START_DOCUMENT);
+		
+		StartDocument startDoc = (StartDocument) event.getResource();
+		IParameters sdps = startDoc.getFilterParameters();
+		assertEquals(net.sf.okapi.filters.table.Parameters.class, sdps.getClass());
+	}
+		
 // Helpers
 	private String getFullFileName(String fileName) {
 //m		URL url = TableFilterTest.class.getResource("/csv_test1.txt");

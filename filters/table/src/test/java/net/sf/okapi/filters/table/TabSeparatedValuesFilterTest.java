@@ -272,7 +272,6 @@ public class TabSeparatedValuesFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 
-
 	// Helpers
 	private String getFullFileName(String fileName) {
 		return root + fileName;

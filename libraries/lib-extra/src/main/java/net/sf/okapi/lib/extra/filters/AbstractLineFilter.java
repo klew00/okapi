@@ -190,8 +190,6 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 
 	public void open (RawDocument input) {
 		
-		if (input == null) throw new OkapiBadFilterInputException("RawDocument is not defined in open(RawDocument).");
-		
 		open(input, true);
 	}
 	
@@ -247,14 +245,12 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 		queue = new LinkedList<Event>();
 		
 		component_init(); // Initialize the filter with implementation-specific parameters (protected method)
-		
-		// TODO setIsMultilingual()
-		// Send start event
+				
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLocale(srcLang);
-		startDoc.setFilterParameters(getParameters());		
+		startDoc.setFilterParameters(getParameters());	// this.getClass()	this.getParametersClassName()
 		startDoc.setFilterWriter(getFilterWriter());		
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(getMimeType());
