@@ -47,6 +47,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
@@ -69,6 +70,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.filters.html.HtmlFilter;
 
 /**
  * Implements the IFilter interface for Vignette export/import content.
@@ -84,7 +86,8 @@ public class VignetteFilter implements IFilter {
 	private Parameters params;
 	private String lineBreak;
 	private int tuId;
-	private int subDocId;
+	private IdGenerator subDocId;
+	private IdGenerator groupId;
 	private int otherId;
 	private LinkedList<Event> queue;
 	private boolean hasNext;
@@ -106,6 +109,7 @@ public class VignetteFilter implements IFilter {
 	private IFilterConfigurationMapper fcMapper;
 	private String currentVFullPath;
 	private List<String> listOfPaths;
+	private String rootId;
 	
 	public VignetteFilter () {
 		params = new Parameters();
@@ -337,11 +341,14 @@ public class VignetteFilter implements IFilter {
 		//TODO: We may have to work with buffered block to handle very large files
 		readAllData();
 		
-		// Set the input string
-		tuId = 0;
-		subDocId = 0;
-		otherId = 0;
+		if ( docName != null ) rootId = docName;
+		else rootId = "noDocName";
 
+		tuId = 0;
+		subDocId = new IdGenerator(rootId, "sd");
+		groupId = new IdGenerator(rootId, "g");
+		otherId = 0;
+		
 		// Set the start event
 		queue = new LinkedList<Event>();
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
@@ -591,7 +598,7 @@ public class VignetteFilter implements IFilter {
 		listOfPaths.add(currentVFullPath);
 
 		// Start of sub-document
-		StartSubDocument ssd = new StartSubDocument(String.valueOf(++subDocId));
+		StartSubDocument ssd = new StartSubDocument(subDocId.createId());
 		ssd.setName(sourceId);
 		queue.add(new Event(EventType.START_SUBDOCUMENT, ssd));
 		
@@ -722,12 +729,19 @@ public class VignetteFilter implements IFilter {
 			subFilter = fcMapper.createFilter(partConfiguration, subFilter);
 			encoderManager.mergeMappings(subFilter.getEncoderManager());
 			subFilter.close();
-			subFilter.open(new RawDocument(data, srcLoc));
-			Event event = subFilter.next(); // START_DOCUMENT
-
+			groupId.createId(); // Create new Id for this group
+			if ( subFilter instanceof HtmlFilter ) { // For IdGenerator try-out
+				// The root id of is made of: rootId + subDocId + groupId
+				((HtmlFilter)subFilter).open(new RawDocument(data, srcLoc), true, rootId+subDocId+groupId);
+			}
+			else {
+				subFilter.open(new RawDocument(data, srcLoc));
+			}
+			
 			// Change the START_DOCUMENT to START_GROUP
+			Event event = subFilter.next(); // START_DOCUMENT
 			StartDocument sd = (StartDocument)event.getResource();
-			StartGroup sg = new StartGroup(String.valueOf(subDocId), String.valueOf(++otherId));
+			StartGroup sg = new StartGroup(subDocId.getLastId(), groupId.getLastId()); // Group id already created
 			sg.setType("x-"+partName);
 			sg.setMimeType(sd.getMimeType());
 			sg.setSkeleton(sd.getSkeleton());
@@ -744,7 +758,7 @@ public class VignetteFilter implements IFilter {
 			subFilter.close();
 
 			// Change the END_DOCUMENT to END_GROUP
-			Ending ending = new Ending(String.valueOf(++otherId));
+			Ending ending = new Ending(groupId.createId());
 			ending.setSkeleton(event.getResource().getSkeleton());
 			ending.setAnnotation(new SubFilterAnnotation());
 			queue.add(new Event(EventType.END_GROUP, ending));

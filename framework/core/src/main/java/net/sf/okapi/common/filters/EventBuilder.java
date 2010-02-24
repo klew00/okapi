@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.LocaleId;
@@ -72,6 +73,8 @@ public class EventBuilder {
 	private int textUnitId = 0;
 	private int subDocumentId = 0;
 	private int documentPartId = 0;
+	
+	private IdGenerator idGen;
 
 	private Stack<Event> tempFilterEventStack;
 
@@ -144,11 +147,24 @@ public class EventBuilder {
 		filterEvents.add(event);
 	}
 
+	/**
+	 * Sets the root of the identifiers for this event builder.
+	 * @param idRoot the root (cannot be null or empty)
+	 */
+	public void setIdRoot (String idRoot) {
+		idGen = new IdGenerator(idRoot);
+	}
+	
 	/*
 	 * Create a formatted ID for named resources.
 	 */
 	private String createId(String name, int number) {
-		return String.format("%s%d", name, number); //$NON-NLS-1$
+		if ( idGen == null ) {
+			return String.format("%s%d", name, number); //$NON-NLS-1$
+		}
+		else {
+			return idGen.createId();
+		}
 	}
 
 	/*

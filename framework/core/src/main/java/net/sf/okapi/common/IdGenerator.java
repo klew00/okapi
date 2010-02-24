@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,7 +30,7 @@ import java.security.InvalidParameterException;
  */
 public class IdGenerator {
 	
-	private long seq;
+	private long seq = 0;
 	private String root;
 	private String prefix;
 	
@@ -57,12 +57,36 @@ public class IdGenerator {
 	}
 
 	/**
-	 * Creates the next identifier.
-	 * @return
-	 * 	the next identifier.
+	 * Returns the same value as {@link #getLastId()}. 
 	 */
-	public String createNextId () {
+	@Override
+	public String toString () {
+		return getLastId();
+	}
+	
+	/**
+	 * Creates a new identifier.
+	 * @return
+	 *  the new identifier.
+	 */
+	public String createId () {
 		return root + "-" + prefix + Long.toString(++seq);
+	}
+	
+	/**
+	 * Gets the last identifier generated.
+	 * This method allows you to get the last identifier that was returned by {@link #createId()}.
+	 * @return
+	 *  the last identifier generated.
+	 * @throws
+	 *  RuntimeException if the method {@link #createId()} has not been called at least once
+	 *  before call this method. 
+	 */
+	public String getLastId () {
+		if ( seq <= 0 ) {
+			throw new RuntimeException("The method createId() has not been called yet.");
+		}
+		return root + "-" + prefix + Long.toString(seq);
 	}
 
 	private void create (String root,

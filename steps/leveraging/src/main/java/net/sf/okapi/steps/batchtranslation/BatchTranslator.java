@@ -428,6 +428,7 @@ public class BatchTranslator {
 			cmd = cmd.replace("${trgLangName}", loc.getDisplayLanguage(Locale.ENGLISH));
 			cmd = cmd.replace("${trgLang}", rawDoc.getTargetLocale().getLanguage());
 			
+			LOGGER.info("Command line: "+cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
 			
 			// Make sure we empty the output buffers 

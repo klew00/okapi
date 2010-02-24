@@ -208,6 +208,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		LOGGER.log(Level.FINE, getName() + " has opened an input document");
 	}
 
+	// TRY for IdGenerator implementation
+	public void open (RawDocument input, boolean generateSkeleton, String idRoot) {
+		getEventBuilder().setIdRoot(idRoot);
+		open(input, generateSkeleton);
+	}
+	
+	
 	/**
 	 * Start a new {@link IFilter} using the supplied {@link RawDocument}.
 	 * 

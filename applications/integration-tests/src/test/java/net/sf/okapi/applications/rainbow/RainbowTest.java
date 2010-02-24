@@ -53,34 +53,46 @@ public class RainbowTest {
 		javaRainbow = "java -jar " + libDir + "rainbow.jar";
 	}
 
-   @Test
-   public void testRewriting () throws IOException, InterruptedException {
-   	assertTrue(deleteOutputFile("potest.rbout.po"));
-   	assertEquals(0, runRainbow("-np -p pipelines/textrewriting.rnb -pln pipelines/textrewriting.pln"));
-   	assertTrue("File different from gold", compareWithGoldFile("pipelines/potest.rbout.po"));
-   }
+	@Test
+	public void testRewriting() throws IOException, InterruptedException {
+		assertTrue(deleteOutputFile("potest.rbout.po"));
+		assertEquals(0, runRainbow("-np -p pipelines/textrewriting.rnb -pln pipelines/textrewriting.pln"));
+		assertTrue("File different from gold",
+			compareWithGoldFile("pipelines/potest.rbout.po"));
+	}
 
-   @Test
-   public void testPipeline01 () throws IOException, InterruptedException {
-   	// Delete previous output
-   	assertTrue(deleteOutputFile("pipelines/input01.out.html"));
-   	assertEquals(0, runRainbow("-np -p pipelines/test01.rnb -pln pipelines/test01.pln"));
-   	assertTrue("File different from gold", compareWithGoldFile("pipelines/input01.out.html"));
-   }
+	@Test
+	public void testPipeline01 () throws IOException, InterruptedException {
+		// Delete previous output
+		assertTrue(deleteOutputFile("pipelines/input01.out.html"));
+		assertEquals(0, runRainbow("-np -p pipelines/test01.rnb -pln pipelines/test01.pln"));
+		assertTrue("File different from gold",
+			compareWithGoldFile("pipelines/input01.out.html"));
+	}
+
+	@Test
+	public void testVignetteFilter () throws IOException, InterruptedException {
+		// Delete previous output
+		assertTrue(deleteOutputFile("pipelines/vignettePack1/done/vignetteTest01.out.xml"));
+		assertEquals(0, runRainbow("-np -p pipelines/vignetteTestPart1.rnb -x oku_extraction"));
+		assertEquals(0, runRainbow("-np -p pipelines/vignetteTestPart2.rnb -x oku_merging"));
+		assertTrue("File different from gold",
+			compareWithGoldFile("pipelines/vignettePack1/done/vignetteTest01.out.xml", "pipelines/vignetteTest01.out.xml"));
+	}
 
     private boolean compareWithGoldFile (String outputBase) {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
     	return fc.filesExactlyTheSame(outputPath, goldPath);
     }
-    
-//    private boolean compareWithGoldFile (String outputBase,
-//    	String goldBase)
-//    {
-//    	String outputPath = root + File.separator + outputBase;
-//    	String goldPath = root + File.separator + "gold" + File.separator + goldBase; 
-//    	return fc.filesExactlyTheSame(outputPath, goldPath);
-//    }
+
+    private boolean compareWithGoldFile (String outputBase,
+    	String goldBase)
+    {
+		String outputPath = root + File.separator + outputBase;
+		String goldPath = root + File.separator + "gold" + File.separator + goldBase;
+		return fc.filesExactlyTheSame(outputPath, goldPath);
+	}        
     
     private boolean deleteOutputFile (String filename) {
     	File f = new File(root + File.separator + filename);
