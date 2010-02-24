@@ -9,7 +9,7 @@
    <trans-unit id="1">
       <source xml:lang="en">Text number 1</source>
    </trans-unit>
-   <bin-unit id="img1" mime-type="x-type">
+   <bin-unit id="img1" mime-type="image">
 	<bin-source>
 		<external-file href="image1.png"/>
 	</bin-source>

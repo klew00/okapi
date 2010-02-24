@@ -33,6 +33,21 @@
 <source xml:lang="en">Text with <g id="2"><x id="1"/></g> and more text.</source>
 <target xml:lang="fr">Text with <g id="2"><x id="1"/></g> and more text.</target>
 </trans-unit>
+
+<trans-unit id="11">
+<source xml:lang="en">Sentence 1. Sentence 2.</source>
+<!-- Segmented data --> <?abc def ?>
+<seg-source><mrk mid='0' mtype='seg'>Sentence 1.</mrk>
+<mrk mid='1' mtype='seg'>Sentence 2.</mrk></seg-source>
+</trans-unit>
+
+<trans-unit id="11withWarning"> <!-- should generate a segmentation warning -->
+<source xml:lang="en">Sentence 1. Sentence 2.</source>
+<!-- Segmented data --> <?abc def ?>
+<seg-source><mrk mid='0' mtype='seg'>Sentence 1.</mrk>
+<mrk mid='1' mtype='seg'>Sentence 2+diff.</mrk></seg-source>
+</trans-unit>
+
 </body>
 </file>
 </xliff>
