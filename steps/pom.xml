@@ -45,6 +45,7 @@
         <module>codeshandling</module>
         <module>sentence-aligner</module>
         <module>xliffkit</module>
+        <module>diffleverage</module>
     </modules>
 
     <build>
