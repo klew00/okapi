@@ -24,4 +24,16 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
+
+	@Override
+	public void fromString(String data) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
 }

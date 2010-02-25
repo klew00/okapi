@@ -20,6 +20,20 @@
 
 package net.sf.okapi.steps.diffleverage;
 
+import net.sf.okapi.common.pipeline.BasePipelineStep;
+
 public class DiffLeverageStep extends BasePipelineStep {
+
+	@Override
+	public String getDescription() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
