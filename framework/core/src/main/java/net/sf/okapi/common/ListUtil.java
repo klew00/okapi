@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -347,6 +348,34 @@ public class ListUtil {
 			return new String[] {};
 		
 		return (String[]) list.toArray(new String[] {});
+	}
+	
+	/**
+	 * Converts a list of class references into an array of those class references.
+	 * @param list List of class references.
+	 * @return An array of class references.
+	 */
+	public static Class<?>[] listAsArray(List<Class<?>> list) {
+		if (Util.isEmpty(list))
+			return null;
+		
+		Class<?>[] res = (Class<?>[]) Array.newInstance(Class.class, list.size());
+		for (int i = 0; i < list.size(); i++) 
+			res[i] = list.get(i);
+		
+		return res;
+	}
+	
+	/**
+	 * Converts a list of objects into an array of those objects.
+	 * @param list List of objects.
+	 * @return an array of objects.
+	 */
+	public static Object[] listAsArray(List<Object> list) {
+		if (Util.isEmpty(list))
+			return null;
+		
+		return list.toArray();
 	}
 	
 	/**

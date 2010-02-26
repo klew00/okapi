@@ -19,8 +19,26 @@ public class ListUtilTest {
 		list.add("Dumbo");
 		list.add("");
 		assertEquals(4, list.size());
-		String[] sl = (String[]) list.toArray(new String[] {});
+		String[] sl = ListUtil.listAsArray(list);
 		assertEquals(4, sl.length);
+		
+		List<Object> list2 = new ArrayList<Object>();
+		list2.add(new String());
+		list2.add(new Integer(2));
+		list2.add(new Boolean(false));
+		list2.add(null);
+		assertEquals(4, list2.size());
+		Object[] ol = ListUtil.listAsArray(list2);
+		assertEquals(4, ol.length);
+		
+		List<Class<?>> list3 = new ArrayList<Class<?>>();
+		list3.add(String.class);
+		list3.add(Integer.class);
+		list3.add(Boolean.class);
+		list3.add(null);
+		assertEquals(4, list3.size());
+		Class<?>[] cl = (Class<?>[]) ListUtil.listAsArray(list3);
+		assertEquals(4, cl.length);
 	}
 
 	@Test

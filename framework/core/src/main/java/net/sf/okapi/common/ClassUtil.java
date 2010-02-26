@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 public class ClassUtil {
 	
 	/**
@@ -172,4 +175,149 @@ public class ClassUtil {
 		
 		return qualifyName(sibling.getClass(), shortClassName);
 	}
+	
+	/**
+	 * Creates a new instance of a given class.
+	 * @param classRef The given class.
+	 * @return a newly created instance of the given class. 
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	public static <T> T instantiateClass(Class<T> classRef) 
+		throws InstantiationException, IllegalAccessException {
+
+		if (classRef == null) return null;
+		return classRef.cast(classRef.newInstance());
+	}
+	
+	/**
+	 * Creates a new instance of the class with a given class name.
+	 * @param className The given class name.
+	 * @return a newly created instance of the class with the given class name.
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 */
+	public static Object instantiateClass(String className)
+		throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+
+		if (Util.isEmpty(className)) return null;		
+		return instantiateClass(Class.forName(className));
+	}
+	
+	/**
+	 * Creates a new instance of the class with a given class name using a given class loader.
+	 * @param className The given class name.
+	 * @param classLoader The class loader from which the class must be loaded.
+	 * @return A newly created instance of the desired class.
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException
+	 */
+	public static Object instantiateClass(String className, ClassLoader classLoader) 
+		throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+
+		if (Util.isEmpty(className)) return null;
+		if (classLoader == null) return null;
+		
+		Class<?> ref = Class.forName(className, true, classLoader);
+		return ref.cast(ref.newInstance());
+	}
+	
+	/**
+	 * Creates a new instance of the class using a given class loader and initialization parameters.
+	 * @param classRef The given class.
+	 * @param constructorParameters The initialization parameters for the class constructor.
+	 * @return A newly created instance of the desired class.
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws IllegalArgumentException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 */
+	public static <T> T instantiateClass(Class<T> classRef, Object... constructorParameters) 
+		throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
+			InstantiationException, IllegalAccessException, InvocationTargetException { 
+
+		if (classRef == null) return null;
+		if (constructorParameters == null) return null;
+				
+		// Find a constructor matching the given parameters (constructors' ambiguity is impossible)
+		Constructor<?>[] constructors = classRef.getConstructors();
+		
+		for (Constructor<?> constructor : constructors) {
+			
+			if (constructor == null) continue;
+			
+			Class<?>[] parameterTypes = constructor.getParameterTypes();			
+			if (parameterTypes.length != constructorParameters.length) continue;
+
+			boolean matches = true;
+			for (int i = 0; i < parameterTypes.length; i++) {
+				
+				Class<?> paramType = parameterTypes[i];
+				Object constructorParameter = constructorParameters[i];
+				
+				if (!paramType.isInstance(constructorParameter)) {
+					
+					matches = false;
+					break;
+				}
+			}
+			
+			if (matches)
+				return classRef.cast(constructor.newInstance(constructorParameters));
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Creates a new instance of the class with a given class name and initialization parameters.
+	 * @param className The given class name.
+	 * @param constructorParameters The initialization parameters for the class constructor.
+	 * @return A newly created instance of the desired class.
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws IllegalArgumentException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 * @throws ClassNotFoundException
+	 */
+	public static Object instantiateClass(String className, Object... constructorParameters) 
+		throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
+			InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+		
+		if (Util.isEmpty(className)) return null;
+		
+		Class<?> ref = Class.forName(className);		
+		return ref.cast(instantiateClass(ref, constructorParameters));
+	}
+
+	/**
+	 * Creates a new instance of the class with a given class name and initialization parameters using a given class loader.
+	 * @param className The given class name.
+	 * @param classLoader The given class loader.
+	 * @param constructorParameters The initialization parameters for the class constructor.
+	 * @return A newly created instance of the desired class.
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws IllegalArgumentException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws InvocationTargetException
+	 * @throws ClassNotFoundException
+	 */
+	public static Object instantiateClass(String className, ClassLoader classLoader, Object... constructorParameters) 
+	throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
+		InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+	
+	if (Util.isEmpty(className)) return null;
+	if (classLoader == null) return null;
+	
+	Class<?> ref = classLoader.loadClass(className); 		
+	return ref.cast(instantiateClass(ref, constructorParameters));
+}
 }
