@@ -25,6 +25,7 @@ import java.io.File;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.gcaligner.SentenceAlignerStep;
 import net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep;
 import net.sf.okapi.steps.textmodification.TextModificationStep;
 import net.sf.okapi.steps.wordcount.WordCountStep;
@@ -181,7 +182,7 @@ public class PipelineBuilderTest {
 													 LocaleId.CHINA_CHINESE)),
 									new RawDocumentToFilterEventsStep())
 					),					
-					new TestAlignerStep(),
+					new SentenceAlignerStep(),
 					new FilterEventsWriterStep()
 			);
 					
