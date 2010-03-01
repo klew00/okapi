@@ -56,13 +56,8 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 		URI outputURI,
 		String outputEncoding)
 	{
-		super();
-		list = new ArrayList<DocumentData>(INITIAL_CAPACITY);
-		DocumentData ddi = new DocumentData();
-		ddi.rawDocument = rawDoc;
-		ddi.outputURI = outputURI;
-		ddi.outputEncoding = outputEncoding;
-		list.add(ddi);
+		this();
+		add(rawDoc, outputURI, outputEncoding);
 	}
 	
 	/**
@@ -84,8 +79,7 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 		LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
-		super();
-		list = new ArrayList<DocumentData>(INITIAL_CAPACITY);
+		this();
 		DocumentData ddi = new DocumentData();
 		ddi.rawDocument = new RawDocument(inputURI, defaultEncoding, sourceLocale, targetLocale);
 		ddi.rawDocument.setFilterConfigId(filterConfigId);

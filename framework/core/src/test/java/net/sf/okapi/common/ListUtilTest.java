@@ -26,19 +26,22 @@ public class ListUtilTest {
 		list2.add(new String());
 		list2.add(new Integer(2));
 		list2.add(new Boolean(false));
+		list2.add(new Boolean(true));
 		list2.add(null);
-		assertEquals(4, list2.size());
+		list2.add(new Character('A'));
+		assertEquals(6, list2.size());
 		Object[] ol = ListUtil.listAsArray(list2);
-		assertEquals(4, ol.length);
+		assertEquals(6, ol.length);
 		
 		List<Class<?>> list3 = new ArrayList<Class<?>>();
 		list3.add(String.class);
 		list3.add(Integer.class);
 		list3.add(Boolean.class);
 		list3.add(null);
-		assertEquals(4, list3.size());
+		list3.add(Character.class);
+		assertEquals(5, list3.size());
 		Class<?>[] cl = (Class<?>[]) ListUtil.listAsArray(list3);
-		assertEquals(4, cl.length);
+		assertEquals(5, cl.length);
 	}
 
 	@Test
