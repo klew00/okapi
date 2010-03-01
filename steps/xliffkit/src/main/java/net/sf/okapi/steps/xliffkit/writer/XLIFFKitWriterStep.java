@@ -102,46 +102,31 @@ public class XLIFFKitWriterStep extends BasePipelineStep implements IFilterWrite
 		// TODO: implement stream		
 	}
 
-	@Override
-	protected Event handleStartDocument(Event event) {
-		processStartDocument((StartDocument)event.getResource());
-		return event;
-	}
-	
-	@Override
-	protected Event handleEndDocument(Event event) {
-		processEndDocument();
-		close();
-		return event;
-	}
-	
-	@Override
-	protected Event handleStartGroup(Event event) {
-		processStartGroup((StartGroup)event.getResource());
-		return event;
-	}
-	
-	@Override
-	protected Event handleEndGroup(Event event) {
-		processEndGroup((Ending)event.getResource());
-		return event;
-	}
-	
-	@Override
-	protected Event handleStartSubDocument(Event event) {
-		processStartSubDocument((StartSubDocument)event.getResource());
-		return event;
-	}
-	
-	@Override
-	protected Event handleEndSubDocument(Event event) {
-		processEndSubDocument((Ending)event.getResource());
-		return event;
-	}
-
-	@Override
-	protected Event handleTextUnit(Event event) {
-		processTextUnit((TextUnit)event.getResource());
+	public Event handleEvent (Event event) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+			processStartDocument((StartDocument)event.getResource());
+			break;
+		case END_DOCUMENT:
+			processEndDocument();
+			close();
+			break;
+		case START_SUBDOCUMENT:
+			processStartSubDocument((StartSubDocument)event.getResource());
+			break;
+		case END_SUBDOCUMENT:
+			processEndSubDocument((Ending)event.getResource());
+			break;
+		case START_GROUP:
+			processStartGroup((StartGroup)event.getResource());
+			break;
+		case END_GROUP:
+			processEndGroup((Ending)event.getResource());
+			break;
+		case TEXT_UNIT:
+			processTextUnit((TextUnit)event.getResource());
+			break;
+		}
 		return event;
 	}
 	

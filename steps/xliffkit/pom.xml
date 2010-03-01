@@ -14,6 +14,31 @@
             <groupId>net.sf.okapi</groupId>
             <artifactId>okapi-core</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.apache.poi</groupId>
+        	<artifactId>poi-ooxml</artifactId>
+        	<version>3.6</version>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.steps</groupId>
+        	<artifactId>okapi-step-common</artifactId>
+        	<version>${project.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.steps</groupId>
+        	<artifactId>okapi-step-textmodification</artifactId>
+        	<version>${project.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.steps</groupId>
+        	<artifactId>okapi-step-wordcount</artifactId>
+        	<version>${project.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.okapi.steps</groupId>
+        	<artifactId>okapi-step-searchandreplace</artifactId>
+        	<version>${project.version}</version>
         </dependency>        
     </dependencies>
 </project>
