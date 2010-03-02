@@ -29,7 +29,7 @@ class ITSRule {
 	int value;
 	String info;
 	int infoType;
-	String idPointer;
+	String idValue;
 	boolean preserveWS;
 
 	public ITSRule (int type) {

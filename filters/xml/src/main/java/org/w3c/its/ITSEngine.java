@@ -1,5 +1,4 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -302,7 +301,7 @@ public class ITSEngine implements IProcessor, ITraversal
 
 		value = elem.getAttributeNS(ITSX_NS_URI, "idValue");
 		if ( value.length() > 0 ) {
-			rule.idPointer = value;
+			rule.idValue = value;
 		}
 		
 		value = elem.getAttributeNS(ITSX_NS_URI, "whiteSpaces");
@@ -549,8 +548,8 @@ public class ITSEngine implements IProcessor, ITraversal
 		if ( data.charAt(FP_TRANSLATE) != '?' ) {
 			trace.peek().translate = (data.charAt(FP_TRANSLATE) == 'y');
 			trace.peek().targetPointer = getFlagData(data, FP_TRGPOINTER_DATA);
-			trace.peek().idPointer = getFlagData(data, FP_IDVALUE_DATA);
 		}
+		trace.peek().idValue = getFlagData(data, FP_IDVALUE_DATA);
 		
 		if ( data.charAt(FP_DIRECTIONALITY) != '?' ) {
 			switch ( data.charAt(FP_DIRECTIONALITY) ) {
@@ -645,8 +644,8 @@ public class ITSEngine implements IProcessor, ITraversal
 						if ( rule.infoType == TRANSLATE_TRGPOINTER ) {
 							setFlag(NL.item(i), FP_TRGPOINTER_DATA, rule.info, true);							
 						}
-						if ( rule.idPointer != null ) {
-							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpression(NL.item(i), rule.idPointer), true);							
+						if ( rule.idValue != null ) {
+							setFlag(NL.item(i), FP_IDVALUE_DATA, resolveExpression(NL.item(i), rule.idValue), true);							
 						}
 						setFlag(NL.item(i), FP_PRESERVEWS, (rule.preserveWS ? 'y' : '?'), true);
 						break;
@@ -982,8 +981,8 @@ public class ITSEngine implements IProcessor, ITraversal
 		return trace.peek().targetPointer;
 	}
 	
-	public String getIdPointer () {
-		return trace.peek().idPointer;
+	public String getIdValue () {
+		return trace.peek().idValue;
 	}
 	
 	public int getDirectionality () {

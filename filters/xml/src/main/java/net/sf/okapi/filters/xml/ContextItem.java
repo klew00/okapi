@@ -39,7 +39,7 @@ class ContextItem {
 		// Context is always an element node
 		this.translate = trav.translate();
 		this.trgPointer = trav.getTargetPointer();
-		this.idPointer = trav.getIdPointer();
+		this.idPointer = trav.getIdValue();
 		this.locNote = trav.getNote();
 		this.preserveWS = trav.preserveWS();
 	}

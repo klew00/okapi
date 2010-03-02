@@ -43,7 +43,7 @@ public class Main {
 
 	public static void main (String[] args) {
 		try {
-			System.out.println("ITSTest version 1.7");
+			System.out.println("ITSTest");
 			
 			File inputFile;
 			if ( args.length > 0 ) inputFile = new File(args[0]);
@@ -99,7 +99,7 @@ public class Main {
 						// Show the language
 						element.appendChild(doc.createTextNode(" + lang="+ trav.getLanguage()));
 						// Show idPointer
-						element.appendChild(doc.createTextNode(" + idPointer="+ trav.getIdPointer()));
+						element.appendChild(doc.createTextNode(" + idValue="+ trav.getIdValue()));
 						// Show white spaces
 						element.appendChild(doc.createTextNode(" + ws="+ (trav.preserveWS() ? "preserve" : "default")));
 					}

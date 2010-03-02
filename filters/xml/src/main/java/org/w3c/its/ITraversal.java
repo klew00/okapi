@@ -77,12 +77,11 @@ public interface ITraversal {
 	public String getTargetPointer ();
 	
 	/**
-	 * Gets the id pointer for the current element of the traversal. This method
+	 * Gets the id value for the current element of the traversal. This method
 	 * is used for an extension to ITS 1.0.
-	 * @return The XPath relative to the current element to the node where the
-	 * translation should be placed.
+	 * @return The value of the identifier for this node.
 	 */
-	public String getIdPointer ();
+	public String getIdValue ();
 	
 	/**
 	 * Gets the directionality for the text of the current node of the
