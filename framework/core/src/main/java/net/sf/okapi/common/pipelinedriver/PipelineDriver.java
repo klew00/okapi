@@ -71,7 +71,22 @@ public class PipelineDriver implements IPipelineDriver {
 	}
 
 	public void setPipeline (IPipeline pipeline) {
-		this.pipeline = pipeline;
+		if (this.pipeline != null)
+			this.pipeline.cancel();	// Cancel processing of the current pipeline
+		
+		if (pipeline != null)
+			pipeline.cancel();		// Cancel processing of the new pipeline
+				
+		this.pipeline = new Pipeline();
+		clearSteps();
+		
+		if (pipeline != null)
+			for (IPipelineStep step : pipeline.getSteps()) 	// Steps are added to the newly created pipeline to be later 
+				addStep(step);								// lost, but the goal is to populate paramList.
+             		
+		this.pipeline = pipeline; 	// The newly created pipeline with added steps is lost, but the 
+									// references in paramList are valid (referencing the given pipline's steps).
+									// Also observers of the given pipeline are in place.
 	}
 
 	public IPipeline getPipeline () {
