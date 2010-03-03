@@ -20,19 +20,20 @@
 
 package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.gcaligner.SentenceAlignerStep;
 import net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep;
 import net.sf.okapi.steps.textmodification.TextModificationStep;
 import net.sf.okapi.steps.wordcount.WordCountStep;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Pipeline;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.PipelineStep;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.PipelineType;
 
 import org.junit.Test;
 
@@ -185,13 +186,32 @@ public class PipelineBuilderTest {
 					new SentenceAlignerStep(),
 					new FilterEventsWriterStep()
 			);
-					
-											
-		
+																	
 //		p1.execute();
 //		p2.execute();
 //		p3.execute();
 //		p4.execute();
 //		p5.execute();
-	}	
+		
+		// Tests of PipelineDriver.setPipeline()
+		PipelineDriver pd = new PipelineDriver();
+		assertNotNull(pd.getPipeline());
+		assertEquals(0, pd.getPipeline().getSteps().size());
+		
+		pd.setPipeline(null);
+		assertNull(pd.getPipeline());
+		
+		pd.setPipeline(p3);
+		assertNotNull(pd.getPipeline());
+		assertEquals(5, pd.getPipeline().getSteps().size());
+		
+		pd.setPipeline(p4);
+		assertNotNull(pd.getPipeline());
+		assertEquals(3, pd.getPipeline().getSteps().size());
+		
+		pd.setPipeline(p5);
+		assertNotNull(pd.getPipeline());
+		assertEquals(3, pd.getPipeline().getSteps().size());
+	}
+		
 }

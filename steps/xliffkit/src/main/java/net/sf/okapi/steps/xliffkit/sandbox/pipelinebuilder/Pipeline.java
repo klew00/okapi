@@ -64,9 +64,7 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 		if (batch == null) return getState();
 		
 		PipelineDriver pd = new PipelineDriver();
-
-		for (IPipelineStep step : this.getSteps())
-			pd.addStep(step);
+		pd.setPipeline(this);
 				
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		pd.setFilterConfigurationMapper(fcMapper);
