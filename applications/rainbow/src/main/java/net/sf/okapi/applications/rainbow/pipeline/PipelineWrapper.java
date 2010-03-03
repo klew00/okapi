@@ -59,7 +59,7 @@ public class PipelineWrapper {
 	{
 		try {
 			for ( PluginItem item : plugins ) {
-				if ( item.getType() != PluginsManager.PLUGINTYPE_IPIPELINESTEP ) continue;
+				if ( item.getType() != PluginItem.TYPE_IPIPELINESTEP ) continue;
 				
 				IPipelineStep ps = (IPipelineStep)Class.forName(item.getClassName(), true, classLoader).newInstance();
 				IParameters params = ps.getParameters();
@@ -575,7 +575,7 @@ public class PipelineWrapper {
 				// Does the utility requests this list?
 				if ( j >= inputRequested ) break; // No need to loop more
 				// Do we have a corresponding input?
-				if ( 3 > f ) {
+				if ( 3 > j ) {
 					// Data is available
 					List<Input> list = prj.getList(j);
 					// Make sure we have an entry for that list
