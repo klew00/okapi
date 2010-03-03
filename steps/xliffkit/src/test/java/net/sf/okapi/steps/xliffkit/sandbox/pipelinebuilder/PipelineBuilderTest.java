@@ -188,10 +188,10 @@ public class PipelineBuilderTest {
 					
 											
 		
-		p1.execute();
-		p2.execute();
-		p3.execute();
-		p4.execute();
-		p5.execute();
+//		p1.execute();
+//		p2.execute();
+//		p3.execute();
+//		p4.execute();
+//		p5.execute();
 	}	
 }
