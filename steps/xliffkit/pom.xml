@@ -44,6 +44,36 @@
         	<groupId>net.sf.okapi.steps</groupId>
         	<artifactId>okapi-step-sentence-aligner</artifactId>
         	<version>${project.version}</version>
+        </dependency>    
+        <dependency>
+            <groupId>net.sf.okapi.steps</groupId>
+            <artifactId>okapi-step-xsltransform</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+                <dependency>
+            <groupId>net.sf.okapi.filters</groupId>
+            <artifactId>okapi-filter-openxml</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.okapi.filters</groupId>
+            <artifactId>okapi-filter-properties</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.okapi.filters</groupId>
+            <artifactId>okapi-filter-html</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.okapi.filters</groupId>
+            <artifactId>okapi-filter-xml</artifactId>
+            <version>${project.version}</version>
+        </dependency>    
+        <dependency>
+            <groupId>net.sf.okapi.filters</groupId>
+            <artifactId>okapi-filter-openoffice</artifactId>
+            <version>${project.version}</version>
         </dependency>        
     </dependencies>
 </project>

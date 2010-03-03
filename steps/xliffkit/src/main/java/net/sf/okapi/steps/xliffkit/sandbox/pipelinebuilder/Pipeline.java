@@ -64,14 +64,24 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 		if (batch == null) return getState();
 		
 		PipelineDriver pd = new PipelineDriver();
-		pd.setPipeline(this);
+
+		for (IPipelineStep step : this.getSteps())
+			pd.addStep(step);
+				
+		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		pd.setFilterConfigurationMapper(fcMapper);
 		
-		// TODO Registration of filter configs in the FilterConfigurationMapper
-		pd.setFilterConfigurationMapper(new FilterConfigurationMapper());		 
+		// TODO Registration of filter configs in the FilterConfigurationMapper, not here
+		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");
 		
 		for (IBatchItemContext item : batch.getItems())
 			pd.addBatchItem(item);
 
+		pd.processBatch();
 		return getState();		
 	}
 	
