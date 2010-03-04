@@ -449,6 +449,7 @@ public class XMLFilterTest {
 		list.add(new InputDocument(root+"LocNote-6.xml", null));
 		list.add(new InputDocument(root+"AndroidTest1.xml", "okf_xml@AndroidStrings.fprm"));
 		list.add(new InputDocument(root+"AndroidTest2.xml", "okf_xml@AndroidStrings.fprm"));
+		list.add(new InputDocument(root+"AndroidTest3.xml", "okf_xml@AndroidStrings.fprm"));
 		list.add(new InputDocument(root+"JavaProperties.xml", "okf_xml@JavaProperties.fprm"));
 		list.add(new InputDocument(root+"TestMultiLang.xml", null));
 		list.add(new InputDocument(root+"Test01.resx", "okf_xml@RESX.fprm"));
