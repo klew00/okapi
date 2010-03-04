@@ -32,6 +32,8 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
@@ -90,8 +92,13 @@ public class XLIFFKitWriterStep extends BasePipelineStep implements IFilterWrite
 	}
 
 	public void setOptions(LocaleId locale, String defaultEncoding) {
-		trgLang = locale;
+		setTargetLocale(locale);
 		// ignore encoding: always use UTF-8		
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.trgLang = targetLocale;
 	}
 
 	public void setOutput(String path) {

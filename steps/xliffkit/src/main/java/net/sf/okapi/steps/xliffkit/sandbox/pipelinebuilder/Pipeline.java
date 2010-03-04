@@ -34,6 +34,20 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 	private PipelineAsStepImpl stepImpl = new PipelineAsStepImpl();
 	private PipelineType type;
 	private Batch batch;
+	private PipelineDriver pd;
+	private FilterConfigurationMapper fcMapper;
+	
+	{
+		fcMapper = new FilterConfigurationMapper();
+		
+		// TODO Registration of filter configs in the FilterConfigurationMapper, not here
+		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");
+		fcMapper.addConfigurations(net.sf.okapi.filters.plaintext.PlainTextFilter.class.getName());
+	}
 	
 	public Pipeline(String description, IPipeline pipeline) {
 		this(description, pipeline.getSteps().toArray(new IPipelineStep[] {}));
@@ -45,10 +59,18 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 	}
 	
 	public Pipeline(String description, PipelineType type, IPipelineStep... steps) {
+		this(description, type, true, steps);
+	}
+	
+	private Pipeline(String description, PipelineType type, boolean buildPipeline, IPipelineStep... steps) {
 		stepImpl.setDescription(description);
 		this.type = type;
+		
 		for (IPipelineStep step : steps)
 			this.addStep(step);
+		
+		if (buildPipeline)
+			recreatePipeline();
 	}
 	
 	public Pipeline(String description, Batch batch, IPipelineStep... steps) {		
@@ -56,29 +78,31 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 	}
 	
 	public Pipeline(String description, Batch batch, PipelineType type, IPipelineStep... steps) {
-		this(description, type, steps);
-		this.batch = batch;		
+		this(description, type, false, steps);
+		setBatch(batch);		
+	}
+	
+	private void recreatePipeline(){
+		pd = new PipelineDriver();
+		//pd.setPipeline(this); // Commented, need to handle PipelineStep class to get annotations of the internal class, not the wraper's
+		
+		for (IPipelineStep step : this.getSteps())
+			if (step instanceof PipelineStep)
+				pd.addStep(((PipelineStep) step).getStep());
+			else
+				pd.addStep(step);
+						
+		pd.setFilterConfigurationMapper(fcMapper);
+		
+		if (batch == null) return;
+		for (IBatchItemContext item : batch.getItems())
+			pd.addBatchItem(item);
 	}
 	
 	public PipelineReturnValue execute() {				
 		if (batch == null) return getState();
+		if (pd == null) return getState();
 		
-		PipelineDriver pd = new PipelineDriver();
-		pd.setPipeline(this);
-				
-		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
-		pd.setFilterConfigurationMapper(fcMapper);
-		
-		// TODO Registration of filter configs in the FilterConfigurationMapper, not here
-		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");
-		
-		for (IBatchItemContext item : batch.getItems())
-			pd.addBatchItem(item);
-
 		pd.processBatch();
 		return getState();		
 	}
@@ -122,6 +146,7 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 
 	public void setBatch(Batch batch) {
 		this.batch = batch;
+		recreatePipeline();
 	}
 
 	public String getDescription() {

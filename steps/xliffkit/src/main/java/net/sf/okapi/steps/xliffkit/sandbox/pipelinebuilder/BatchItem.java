@@ -47,6 +47,7 @@ public class BatchItem  {
 		fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");
+		fcMapper.addConfigurations(net.sf.okapi.filters.plaintext.PlainTextFilter.class.getName());
 	}
 	
 	public BatchItem(URI inputURI, String defaultEncoding, String filterConfigId,

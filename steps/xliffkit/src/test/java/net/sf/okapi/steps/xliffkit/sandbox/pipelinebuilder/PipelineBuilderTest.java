@@ -31,9 +31,11 @@ import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.gcaligner.SentenceAlignerStep;
+import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep;
 import net.sf.okapi.steps.textmodification.TextModificationStep;
 import net.sf.okapi.steps.wordcount.WordCountStep;
+import net.sf.okapi.steps.xliffkit.writer.XLIFFKitWriterStep;
 
 import org.junit.Test;
 
@@ -186,12 +188,45 @@ public class PipelineBuilderTest {
 					new SentenceAlignerStep(),
 					new FilterEventsWriterStep()
 			);
-																	
+					
+		//----------------------------------------------------------------
+		Pipeline p6 =
+			new Pipeline(
+					"Test pipeline with step parameters",
+					new Batch(
+							new BatchItem(
+									this.getClass().getResource("test.txt"),
+									"UTF-8",
+									LocaleId.ENGLISH,
+									LocaleId.FRENCH)),
+									
+					new RawDocumentToFilterEventsStep(),
+					
+					new PipelineStep(new LeveragingStep(), 
+							new Parameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+							new Parameter("threshold", 80),
+							new Parameter("fillTarget", true)),
+							
+					new PipelineStep(TextModificationStep.class, 
+							new Parameter("type", 0),
+							new Parameter("addPrefix", true),
+							new Parameter("prefix", "{START_"),
+							new Parameter("addSuffix", true),
+							new Parameter("suffix", "_END}"),
+							new Parameter("applyToExistingTarget", false),
+							new Parameter("addName", false),
+							new Parameter("addID", true),
+							new Parameter("markSegments", false)),
+							
+					new XLIFFKitWriterStep());
+		
+		// DEBUG
 //		p1.execute();
 //		p2.execute();
 //		p3.execute();
 //		p4.execute();
 //		p5.execute();
+//		p6.execute();
 		
 		// Tests of PipelineDriver.setPipeline()
 		PipelineDriver pd = new PipelineDriver();
@@ -212,6 +247,10 @@ public class PipelineBuilderTest {
 		pd.setPipeline(p5);
 		assertNotNull(pd.getPipeline());
 		assertEquals(3, pd.getPipeline().getSteps().size());
+		
+		pd.setPipeline(p6);
+		assertNotNull(pd.getPipeline());
+		assertEquals(4, pd.getPipeline().getSteps().size());
 	}
 		
 }

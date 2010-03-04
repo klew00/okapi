@@ -27,23 +27,50 @@ import java.net.URL;
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 
 public class PipelineStep implements IPipelineStep{
 
 	private IPipelineStep step;
+	private ParametersString parametersString = new ParametersString(); 
 	
 	public PipelineStep(IPipelineStep step, IParameters parameters) {	
 		this.step = step;
 		step.setParameters(parameters);
 	}
 
+	public PipelineStep(IPipelineStep step, Parameter... parameters) {	
+		this.step = step;
+		
+		parametersString.reset();
+		for (Parameter parameter : parameters) {
+			
+			Object value = parameter.getValue();
+			
+			if (value instanceof Integer)
+				parametersString.setParameter(parameter.getName(), Integer.class.cast(value));
+			
+			else if (value instanceof Boolean)
+				parametersString.setParameter(parameter.getName(), Boolean.class.cast(value));
+			
+			else if (value instanceof String)
+				parametersString.setParameter(parameter.getName(), String.class.cast(value));
+		}
+		IParameters params = step.getParameters();
+		params.fromString(parametersString.toString());
+	}
+	
 	public PipelineStep(Class<? extends IPipelineStep> stepClass, IParameters parameters) {		
 		step = instantiateStep(stepClass);
 		step.setParameters(parameters);
 	}
 	
-	private IPipelineStep instantiateStep(Class<? extends IPipelineStep> stepClass) {
+	public PipelineStep(Class<? extends IPipelineStep> stepClass, Parameter... parameters) {		
+		this(instantiateStep(stepClass), parameters);
+	}
+	
+	private static IPipelineStep instantiateStep(Class<? extends IPipelineStep> stepClass) {
 		IPipelineStep res = null;
 		
 		try {
@@ -120,6 +147,10 @@ public class PipelineStep implements IPipelineStep{
 
 	public void setParameters(IParameters params) {		
 		step.setParameters(params);
+	}
+
+	public IPipelineStep getStep() {
+		return step;
 	}
 	
 }
