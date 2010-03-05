@@ -147,7 +147,7 @@ public class PluginsManager {
 	/**
 	 * Gets the list of the class names of all available plug-ins 
 	 * of a given type currently available in this manager.
-	 * The method {@link #discover(File)} must be called once before
+	 * The method {@link #discover(File, boolean)} must be called once before
 	 * calling this method.
 	 * @param type the type of plug-ins to list.
 	 * @return the list of available plug-ins for the given type.
@@ -171,7 +171,7 @@ public class PluginsManager {
 	/**
 	 * Gets the URLClassLoader to use for creating new instance of the
 	 * components listed in this manager. 
-	 * The method {@link #discover(File)} must be called once before
+	 * The method {@link #discover(File, boolean)} must be called once before
 	 * calling this method.
 	 * @return the URLClassLoader for this manager.
 	 */
