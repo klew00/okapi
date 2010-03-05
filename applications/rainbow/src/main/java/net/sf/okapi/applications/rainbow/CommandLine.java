@@ -39,6 +39,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.common.ui.BaseHelp;
 
 public class CommandLine {
@@ -49,7 +50,7 @@ public class CommandLine {
 	private Project prj;
 	private Shell shell;
 	private UtilityDriver ud;
-	private FilterConfigurationMapper mapper;
+	private FilterConfigurationMapper fcMapper;
 	private PluginsAccess plugins;
 	private BatchLog log;
 	private LogHandler logHandler;
@@ -229,8 +230,13 @@ public class CommandLine {
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$
 		
 		// Set up the filter configuration mapper
-		mapper = new FilterConfigurationMapper();
-		DefaultFilters.setMappings(mapper, false, true);
+		fcMapper = new FilterConfigurationMapper();
+		// Get pre-defined configurations
+		DefaultFilters.setMappings(fcMapper, false, true);
+		// Discover and add plug-ins
+		PluginsManager mgt = new PluginsManager();
+		mgt.discover(new File(rootFolder+File.separator+"dropins"), true);
+		fcMapper.addFromPlugins(mgt);
 
 		plugins = new PluginsAccess();
 		plugins.addAllPackages(sharedFolder);
@@ -239,9 +245,9 @@ public class CommandLine {
 	private void launchUtility () {
 		// Create the utility driver if needed
 		if ( ud == null ) {
-			mapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
-			mapper.updateCustomConfigurations();
-			ud = new UtilityDriver(log, mapper, plugins, help, false);
+			fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
+			fcMapper.updateCustomConfigurations();
+			ud = new UtilityDriver(log, fcMapper, plugins, help, false);
 		}
 		
 		// Get default/project data for the utility and instantiate the utility object
@@ -275,9 +281,9 @@ public class CommandLine {
 //		saveSurfaceData();
 //		updateCustomConfigurations();
 
-		mapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
-		mapper.updateCustomConfigurations();
-		PipelineWrapper wrapper = new PipelineWrapper(mapper, rootFolder);
+		fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
+		fcMapper.updateCustomConfigurations();
+		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, rootFolder);
 		
 		IPredefinedPipeline predefinedPipeline = null;
 		

@@ -38,6 +38,13 @@ distribution.</p>
 	<li>Added English-India in the locales list.</li>
 	<li>Fixed bug where steps using 3 input lists for more than 3 input files 
 	were getting null values instead of raw documents.</li>
+	<li>Added support for plugins for steps, filters and parameters editors. 
+	Just drop the JAR in the <code>dropins</code> folder.</li>
+</ul>
+	</li>
+	<li>Tikal:<ul>
+	<li>Added support for plugins for filters and parameters editors. Just drop 
+	the JAR in the <code>dropins</code> folder.</li>
 </ul>
 	</li>
 	<li>Steps:<ul>
@@ -55,6 +62,7 @@ distribution.</p>
 	<li>Added setReferentCopies() to GenericSkeletonWriter to allow correct 
 	output for writers refering more than once to the referents (e.g. when 
 	creating pre-segmented RTF with source and target).</li>
+	<li>Moved lib-plugins to common.</li>
 </ul>
 	</li>
 	<li>Filters:<ul>

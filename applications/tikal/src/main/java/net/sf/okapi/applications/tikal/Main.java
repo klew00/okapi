@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -49,6 +49,7 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
+import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -536,6 +537,7 @@ public class Main {
 		initialize();
 		// Add all the pre-defined configurations
 		DefaultFilters.setMappings(fcMapper, false, true);
+		loadFromPluginsAndUpdate();
 		// Add the custom configurations
 		fcMapper.updateCustomConfigurations();
 		
@@ -615,30 +617,37 @@ public class Main {
 	}
 	
 	private boolean prepareFilter (String configId) {
-		// Is it a default configuration?
-		if ( filtersMap.containsKey(configId) ) {
-			// Configuration ID is a default one:
-			// Add its filter to the configuration mapper
-			fcMapper.addConfigurations(filtersMap.get(configId));
-			// Hard code case: okf_vignette requires okgf_html to be also loaded
-			//TODO: Find a better way to hanlde sub-filter cases
-			if ( configId.equals("okf_vignette") ) {
-				fcMapper.addConfigurations(filtersMap.get("okf_html"));
-			}
-			return true;
-		}
-		
-		// Else: Try to find the filter for that configuration
-		for ( String tmp : filtersMap.keySet() ) {
-			if ( configId.startsWith(tmp) ) {
-				fcMapper.addConfigurations(filtersMap.get(tmp));
-				// If the given configuration is not one of the pre-defined
-				if ( fcMapper.getConfiguration(configId) == null ) {
-					// Assume it is a custom one
-					fcMapper.addCustomConfiguration(configId);
+		boolean pluginsDone = false;
+		while ( true ) {
+			// Is it a default configuration?
+			if ( filtersMap.containsKey(configId) ) {
+				// Configuration ID is a default one:
+				// Add its filter to the configuration mapper
+				fcMapper.addConfigurations(filtersMap.get(configId));
+				// Hard code case: okf_vignette requires okgf_html to be also loaded
+				//TODO: Find a better way to handle sub-filter cases
+				if ( configId.equals("okf_vignette") ) {
+					fcMapper.addConfigurations(filtersMap.get("okf_html"));
 				}
 				return true;
 			}
+			// Else: Try to find the filter for that configuration
+			for ( String tmp : filtersMap.keySet() ) {
+				if ( configId.startsWith(tmp) ) {
+					fcMapper.addConfigurations(filtersMap.get(tmp));
+					// If the given configuration is not one of the pre-defined
+					if ( fcMapper.getConfiguration(configId) == null ) {
+						// Assume it is a custom one
+						fcMapper.addCustomConfiguration(configId);
+					}
+					return true;
+				}
+			}
+			// No success yet?
+			if ( pluginsDone ) break;
+			// Try to load the plug-ins if it was not done yet
+			loadFromPluginsAndUpdate();
+			pluginsDone = true;
 		}
 		
 		// Could not guess
@@ -647,6 +656,21 @@ public class Main {
 		return false;
 	}
 
+	private void loadFromPluginsAndUpdate () {
+		// Discover and add plug-ins
+		PluginsManager mgt = new PluginsManager();
+		mgt.discover(new File(getRootDirectory()+File.separator+"dropins"), true);
+		fcMapper.addFromPlugins(mgt);
+		// Now update the filtersMap with new configurations
+		Iterator<FilterConfiguration> iter = fcMapper.getAllConfigurations();
+		while ( iter.hasNext() ) {
+			FilterConfiguration cfg = iter.next();
+			if ( !filtersMap.containsKey(cfg.configId) ) {
+				filtersMap.put(cfg.configId, cfg.filterClass);
+			}
+		}
+	}
+	
 	private void guessMissingParameters (String inputOfConfig) {
 		if ( specifiedConfigId == null ) {
 			String ext = Util.getExtension(inputOfConfig);

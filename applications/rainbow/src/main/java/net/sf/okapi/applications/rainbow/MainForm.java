@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -68,7 +68,7 @@ import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
-import net.sf.okapi.lib.plugins.PluginsManager;
+import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;
@@ -271,23 +271,10 @@ public class MainForm { //implements IParametersProvider {
 		fcMapper = new FilterConfigurationMapper();
 		// Get pre-defined configurations
 		DefaultFilters.setMappings(fcMapper, false, true);
-//Trying plugin for filters
 		// Discover and add plug-ins
 		PluginsManager mgt = new PluginsManager();
 		mgt.discover(new File(rootFolder+File.separator+"dropins"), true);
-		java.util.List<net.sf.okapi.lib.plugins.PluginItem> list = mgt.getList();
-		for ( net.sf.okapi.lib.plugins.PluginItem item : list ) {
-			if ( item.getType() == net.sf.okapi.lib.plugins.PluginItem.TYPE_IFILTER ) {
-				String paramsClassName = fcMapper.addConfigurations(item.getClassName(), mgt.getClassLoader());
-				if ( item.getEditorDescriptionProvider() != null ) {
-					fcMapper.addDescriptionProvider(item.getEditorDescriptionProvider(), paramsClassName);
-				}
-				if ( item.getParamsEditor() != null ) {
-					fcMapper.addEditor(item.getParamsEditor(), paramsClassName);
-				}
-			}
-		}
-//End trying plugins
+		fcMapper.addFromPlugins(mgt);
 		customFilterConfigsNeedUpdate = true;
 		
 		// Toolbar

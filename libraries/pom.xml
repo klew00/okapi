@@ -18,6 +18,5 @@
         <module>lib-translation-ui</module>
         <module>lib-search</module>
         <module>lib-extra</module>
-        <module>lib-plugins</module>
     </modules>
 </project>

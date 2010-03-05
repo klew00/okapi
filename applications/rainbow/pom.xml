@@ -30,11 +30,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.okapi.lib</groupId>
-			<artifactId>okapi-lib-plugins</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>net.sf.okapi.connectors</groupId>
 			<artifactId>okapi-connector-globalsight</artifactId>
 			<version>${project.version}</version>

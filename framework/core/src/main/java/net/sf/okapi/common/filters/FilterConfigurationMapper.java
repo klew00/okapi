@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -38,6 +38,8 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ParametersEditorMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiFilterCreationException;
+import net.sf.okapi.common.plugins.PluginItem;
+import net.sf.okapi.common.plugins.PluginsManager;
 
 /**
  * Default implementation of the {@link IFilterConfigurationMapper} interface.
@@ -111,136 +113,37 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		setCustomConfigurationsDirectory(Util.getDirectoryName((new File(".")).getAbsolutePath()));
 	}
 
-	// Trying method for plugin
-	public String addConfigurations (String filterClass, URLClassLoader classLoader) {
-		// Instantiate the filter to get the available configurations
-		IFilter filter = null;
-		try {
-			if ( classLoader == null ) {
-				filter = (IFilter)Class.forName(filterClass).newInstance();
-			}
-			else {
-				filter = (IFilter)Class.forName(filterClass, true, classLoader).newInstance();
-			}
-			filter.setFilterConfigurationMapper(this);
-		}
-		catch ( InstantiationException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
-			return null;
-		}
-		catch ( IllegalAccessException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
-			return null;
-		}
-		catch ( ClassNotFoundException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
-			return null;
-		}
-		
-		// Add the filter to the list
-		FilterInfo info = new FilterInfo();
-		info.className = filterClass;
-		info.name = filter.getName();
-		info.displayName = filter.getDisplayName();
-		filters.add(info);
-		
-		// Get the available configurations for this filter
-		List<FilterConfiguration> list = filter.getConfigurations();
-		if (( list == null ) || ( list.size() == 0 )) {
-			LOGGER.warning(String.format("No configuration provided for '%s'", filterClass));
-			return null;
-		}
-		// Add the configurations to the mapper
-		for ( FilterConfiguration config : list ) {
-			if ( config.filterClass == null ) {
-				LOGGER.warning(String.format("Configuration without filter class name in '%s'", config.toString()));
-				config.filterClass = filterClass;
-			}
-			if ( config.name == null ) {
-				LOGGER.warning(String.format("Configuration without name in '%s'", config.toString()));
-				config.name = config.toString();
-			}
-			if ( config.description == null ) {
-				if ( config.description == null ) {
-					LOGGER.warning(String.format("Configuration without description in '%s'", config.toString()));
-					config.description = config.toString();
+	public void addFromPlugins (PluginsManager pm) {
+		java.util.List<PluginItem> list = pm.getList();
+		for ( PluginItem item : list ) {
+			if ( item.getType() == PluginItem.TYPE_IFILTER ) {
+				String paramsClassName = addConfigurations(item.getClassName(), pm.getClassLoader());
+				if ( item.getEditorDescriptionProvider() != null ) {
+					addDescriptionProvider(item.getEditorDescriptionProvider(), paramsClassName);
+				}
+				if ( item.getParamsEditor() != null ) {
+					addEditor(item.getParamsEditor(), paramsClassName);
 				}
 			}
-			config.classLoader = classLoader;
-			configMap.put(config.configId, config);
-
-			// Get the class name of the parameters if any is available
-			// this is returned as information
-			IParameters params = filter.getParameters();
-			if ( params == null ) {
-				return null; // This filter does not have parameters
-			}
-			return params.getClass().getName();
 		}
-		return null;
 	}
-	
+
+	@Override
 	public void addConfigurations (String filterClass) {
-		// Instantiate the filter to get the available configurations
-		IFilter filter = null;
-		try {
-			filter = (IFilter)Class.forName(filterClass).newInstance();
-			filter.setFilterConfigurationMapper(this);
-		}
-		catch ( InstantiationException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
-			return;
-		}
-		catch ( IllegalAccessException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
-			return;
-		}
-		catch ( ClassNotFoundException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
-			return;
-		}
-		
-		// Add the filter to the list
-		FilterInfo info = new FilterInfo();
-		info.className = filterClass;
-		info.name = filter.getName();
-		info.displayName = filter.getDisplayName();
-		filters.add(info);
-		
-		// Get the available configurations for this filter
-		List<FilterConfiguration> list = filter.getConfigurations();
-		if (( list == null ) || ( list.size() == 0 )) {
-			LOGGER.warning(String.format("No configuration provided for '%s'", filterClass));
-			return;
-		}
-		// Add the configurations to the mapper
-		for ( FilterConfiguration config : list ) {
-			if ( config.filterClass == null ) {
-				LOGGER.warning(String.format("Configuration without filter class name in '%s'", config.toString()));
-				config.filterClass = filterClass;
-			}
-			if ( config.name == null ) {
-				LOGGER.warning(String.format("Configuration without name in '%s'", config.toString()));
-				config.name = config.toString();
-			}
-			if ( config.description == null ) {
-				if ( config.description == null ) {
-					LOGGER.warning(String.format("Configuration without description in '%s'", config.toString()));
-					config.description = config.toString();
-				}
-			}
-			configMap.put(config.configId, config);
-		}
+		addConfigurations(filterClass, null);
 	}
 
+	@Override
 	public void addConfiguration (FilterConfiguration config) {
 		configMap.put(config.configId, config);
 	}
 
+	@Override
 	public IFilter createFilter (String configId) {
 		return createFilter(configId, null);
 	}
 	
+	@Override
 	public IFilter createFilter (String configId,
 		IFilter existingFilter)
 	{
@@ -286,10 +189,12 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return filter;
 	}
 
+	@Override
 	public IParameters getParameters (FilterConfiguration config) {
 		return getParameters(config, null);
 	}
 	
+	@Override
 	public IParameters getParameters (FilterConfiguration config,
 		IFilter existingFilter)
 	{
@@ -322,10 +227,12 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return params;
 	}
 	
+	@Override
 	public IParametersEditor createConfigurationEditor (String configId) {
 		return createConfigurationEditor(configId, null);
 	}
 	
+	@Override
 	public IParametersEditor createConfigurationEditor (String configId,
 		IFilter existingFilter)
 	{
@@ -343,14 +250,17 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return createParametersEditor(params.getClass().getName());
 	}
 
+	@Override
 	public FilterConfiguration getConfiguration (String configId) {
 		return configMap.get(configId);
 	}
 
+	@Override
 	public Iterator<FilterConfiguration> getAllConfigurations () {
 		return configMap.values().iterator();
 	}
 	
+	@Override
 	public List<FilterConfiguration> getMimeConfigurations (String mimeType) {
 		ArrayList<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		for ( FilterConfiguration config : configMap.values() ) {
@@ -363,6 +273,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return list;
 	}
 
+	@Override
 	public List<FilterConfiguration> getFilterConfigurations(String filterClass) {
 		ArrayList<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		for ( FilterConfiguration config : configMap.values() ) {
@@ -375,6 +286,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return list;
 	}
 
+	@Override
 	public FilterConfiguration getDefaultConfiguration (String mimeType) {
 		for ( FilterConfiguration config : configMap.values() ) {
 			if ( config.mimeType != null ) {
@@ -386,10 +298,12 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return null;
 	}
 
+	@Override
 	public void removeConfiguration (String configId) {
 		configMap.remove(configId);
 	}
 
+	@Override
 	public void removeConfigurations (String filterClass) {
 		Entry<String, FilterConfiguration> entry;
 		Iterator<Entry<String, FilterConfiguration>> iter = configMap.entrySet().iterator();
@@ -401,6 +315,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		}
 	}
 
+	@Override
 	public IParameters getCustomParameters (FilterConfiguration config) {
 		return getCustomParameters(config, null);
 	}
@@ -410,6 +325,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 	 * default implementation gets the custom data from a file located
 	 * in the current directory at the time the method is called. 
 	 */
+	@Override
 	public IParameters getCustomParameters (FilterConfiguration config,
 		IFilter existingFilter)
 	{
@@ -429,12 +345,14 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return params;
 	}
 
+	@Override
 	public void deleteCustomParameters (FilterConfiguration config) {
 		// In this implementation the file is stored in a given directory
 		File file = new File(customParmsDir + config.parametersLocation);
 		file.delete();
 	}
 
+	@Override
 	public void saveCustomParameters (FilterConfiguration config,
 		IParameters params)
 	{
@@ -443,6 +361,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		params.save(file.getAbsolutePath());
 	}
 
+	@Override
 	public FilterConfiguration createCustomConfiguration (FilterConfiguration baseConfig) {
 		// Create the new configuration and set its members as a copy of the base
 		FilterConfiguration newConfig = new FilterConfiguration();
@@ -476,6 +395,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return newConfig;
 	}	
 
+	@Override
 	public void clearConfigurations (boolean customOnly) {
 		if ( customOnly ) {
 			Entry<String, FilterConfiguration> entry;
@@ -595,9 +515,77 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		return filter;
 	}
 
-	public List<FilterInfo> getFiltersInfo() {
+	@Override
+	public List<FilterInfo> getFiltersInfo () {
 		Collections.sort(filters); // Sort before returning
 		return filters;
+	}
+
+	private String addConfigurations (String filterClass, URLClassLoader classLoader) {
+		// Instantiate the filter to get the available configurations
+		IFilter filter = null;
+		try {
+			if ( classLoader == null ) {
+				filter = (IFilter)Class.forName(filterClass).newInstance();
+			}
+			else {
+				filter = (IFilter)Class.forName(filterClass, true, classLoader).newInstance();
+			}
+			filter.setFilterConfigurationMapper(this);
+		}
+		catch ( InstantiationException e ) {
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
+			return null;
+		}
+		catch ( IllegalAccessException e ) {
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
+			return null;
+		}
+		catch ( ClassNotFoundException e ) {
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
+			return null;
+		}
+		
+		// Add the filter to the list
+		FilterInfo info = new FilterInfo();
+		info.className = filterClass;
+		info.name = filter.getName();
+		info.displayName = filter.getDisplayName();
+		filters.add(info);
+		
+		// Get the available configurations for this filter
+		List<FilterConfiguration> list = filter.getConfigurations();
+		if (( list == null ) || ( list.size() == 0 )) {
+			LOGGER.warning(String.format("No configuration provided for '%s'", filterClass));
+			return null;
+		}
+		// Add the configurations to the mapper
+		for ( FilterConfiguration config : list ) {
+			if ( config.filterClass == null ) {
+				LOGGER.warning(String.format("Configuration without filter class name in '%s'", config.toString()));
+				config.filterClass = filterClass;
+			}
+			if ( config.name == null ) {
+				LOGGER.warning(String.format("Configuration without name in '%s'", config.toString()));
+				config.name = config.toString();
+			}
+			if ( config.description == null ) {
+				if ( config.description == null ) {
+					LOGGER.warning(String.format("Configuration without description in '%s'", config.toString()));
+					config.description = config.toString();
+				}
+			}
+			config.classLoader = classLoader;
+			configMap.put(config.configId, config);
+		}
+
+		// Get the class name of the parameters if any is available
+		// this is returned as information
+		IParameters params = filter.getParameters();
+		if ( params == null ) {
+			return null; // This filter does not have parameters
+		}
+		return params.getClass().getName();
 	}
 
 }

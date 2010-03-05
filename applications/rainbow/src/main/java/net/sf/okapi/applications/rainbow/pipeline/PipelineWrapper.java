@@ -42,8 +42,8 @@ import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.lib.plugins.PluginItem;
-import net.sf.okapi.lib.plugins.PluginsManager;
+import net.sf.okapi.common.plugins.PluginItem;
+import net.sf.okapi.common.plugins.PluginsManager;
 
 public class PipelineWrapper {
 	
@@ -54,10 +54,11 @@ public class PipelineWrapper {
 	private IFilterConfigurationMapper fcMapper;
 	private IParametersEditorMapper peMapper;
 
-	public void addPlugins (List<PluginItem> plugins,
-		URLClassLoader classLoader)
+	public void addFromPlugins (PluginsManager pm)
 	{
 		try {
+			List<PluginItem> plugins = pm.getList();
+			URLClassLoader classLoader = pm.getClassLoader();
 			for ( PluginItem item : plugins ) {
 				if ( item.getType() != PluginItem.TYPE_IPIPELINESTEP ) continue;
 				
@@ -422,7 +423,7 @@ public class PipelineWrapper {
 		// Discover and add plug-ins
 		PluginsManager mgt = new PluginsManager();
 		mgt.discover(new File(rootFolder+File.separator+"dropins"), true);
-		addPlugins(mgt.getList(), mgt.getClassLoader());
+		addFromPlugins(mgt);
 	}
 	
 	public void clear () {
