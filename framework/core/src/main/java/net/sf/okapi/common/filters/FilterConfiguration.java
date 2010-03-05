@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.filters;
 
+import java.net.URLClassLoader;
+
 /**
  * Data set defining a filter configuration.
  */
@@ -29,10 +31,12 @@ public class FilterConfiguration {
 	 * Unique identifier for this configuration.
 	 */
 	public String configId;
+	
 	/**
 	 * The full name of the class that implement the filter for this configuration. 
 	 */
 	public String filterClass;
+	
 	/**
 	 * The location of the parameters for this configuration. This should be the
 	 * name of the file where the configuration is stored in the package resource
@@ -40,23 +44,32 @@ public class FilterConfiguration {
 	 * the default one, and it can be anything for a custom configuration.
 	 */
 	public String parametersLocation;
+	
 	/**
 	 * Short localizable name for this configuration.
 	 */
 	public String name;
+	
 	/**
 	 * Longer localizable description of for this configuration.
 	 */
 	public String description;
+	
 	/**
 	 * Flag indicating if this configuration is custom or pre-defined.
 	 */
 	public boolean custom;
+	
 	/**
 	 * MIME type for this configuration.
 	 */
 	public String mimeType;
 
+	/**
+	 * Class loader to use for this filter (null to use the default).
+	 */
+	public URLClassLoader classLoader;
+	
 	/**
 	 * Creates an empty FilterConfiguration object.
 	 */
@@ -107,6 +120,7 @@ public class FilterConfiguration {
 	 * @param name the localizable name of this configuration.
 	 * @param description the localizable description of this configuration. 
 	 * @param parametersLocation the location where the parameters for this configuration are stored.
+	 * (use null if there are no parameters).
 	 */
 	private void create (String configId,
 		String mimeType,

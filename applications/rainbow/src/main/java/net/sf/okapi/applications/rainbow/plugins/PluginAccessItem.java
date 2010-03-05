@@ -20,7 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.plugins;
 
-public class PluginItem {
+public class PluginAccessItem {
 	
 	public String id;
 	public int type;

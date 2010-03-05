@@ -47,12 +47,6 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
  */
 public class PluginsManager {
 
-	public static final int PLUGINTYPE_IFILTER = 0;
-	public static final int PLUGINTYPE_IPIPELINESTEP = 1;
-	public static final int PLUGINTYPE_IPARAMETERSEDITOR = 2;
-	public static final int PLUGINTYPE_IEMBEDDABLEPARAMETERSEDITOR = 3;
-	public static final int PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER = 4;
-	
 	private ArrayList<URL> urls;
 	private List<PluginItem> plugins;
 	private URLClassLoader loader;
@@ -107,8 +101,8 @@ public class PluginsManager {
 			for ( PluginItem item1 : plugins ) {
 				Class<?> cls1 = Class.forName(item1.className, false, loader);
 				switch ( item1.type ) {
-				case PLUGINTYPE_IFILTER:
-				case PLUGINTYPE_IPIPELINESTEP:
+				case PluginItem.TYPE_IFILTER:
+				case PluginItem.TYPE_IPIPELINESTEP:
 					// Get the getParameters() method
 					UsingParameters usingParams = cls1.getAnnotation(UsingParameters.class);
 					if ( usingParams == null ) continue;
@@ -117,9 +111,9 @@ public class PluginsManager {
 					// Look at all plug-ins to see if any can be associated with that type
 					for ( PluginItem item2 : plugins ) {
 						switch ( item2.type ) {
-						case PLUGINTYPE_IPARAMETERSEDITOR:
-						case PLUGINTYPE_IEMBEDDABLEPARAMETERSEDITOR:
-						case PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER:
+						case PluginItem.TYPE_IPARAMETERSEDITOR:
+						case PluginItem.TYPE_IEMBEDDABLEPARAMETERSEDITOR:
+						case PluginItem.TYPE_IEDITORDESCRIPTIONPROVIDER:
 							Class<?> cls2 = Class.forName(item2.className, false, loader);
 							// Get the type of parameters for which this editor works  
 							EditorFor editorFor = cls2.getAnnotation(EditorFor.class);
@@ -215,31 +209,31 @@ public class PluginsManager {
 							// Skip IFilter classes that should not be use directly
 							if ( cls.getAnnotation(UsingParameters.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
-							plugins.add(new PluginItem(PLUGINTYPE_IFILTER, name));
+							plugins.add(new PluginItem(PluginItem.TYPE_IFILTER, name));
 						}
 						else if ( IPipelineStep.class.isAssignableFrom(cls) ) {
 							// Skip IPipelineStep classes that should not be use directly
 							if ( cls.getAnnotation(UsingParameters.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
-							plugins.add(new PluginItem(PLUGINTYPE_IPIPELINESTEP, name));
+							plugins.add(new PluginItem(PluginItem.TYPE_IPIPELINESTEP, name));
 						}
 						else if ( IParametersEditor.class.isAssignableFrom(cls) ) {
 							// Skip IParametersEditor classes that should not be use directly
 							if ( cls.getAnnotation(EditorFor.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
-							plugins.add(new PluginItem(PLUGINTYPE_IPARAMETERSEDITOR, name));
+							plugins.add(new PluginItem(PluginItem.TYPE_IPARAMETERSEDITOR, name));
 						}
 						else if ( IEmbeddableParametersEditor.class.isAssignableFrom(cls) ) {
 							// Skip IEmbeddableParametersEditor classes that should not be use directly
 							if ( cls.getAnnotation(EditorFor.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
-							plugins.add(new PluginItem(PLUGINTYPE_IEMBEDDABLEPARAMETERSEDITOR, name));
+							plugins.add(new PluginItem(PluginItem.TYPE_IEMBEDDABLEPARAMETERSEDITOR, name));
 						}
 						else if ( IEditorDescriptionProvider.class.isAssignableFrom(cls) ) {
 							// Skip IEditorDescriptionProvider classes that should not be use directly
 							if ( cls.getAnnotation(EditorFor.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
-							plugins.add(new PluginItem(PLUGINTYPE_IEDITORDESCRIPTIONPROVIDER, name));
+							plugins.add(new PluginItem(PluginItem.TYPE_IEDITORDESCRIPTIONPROVIDER, name));
 						}
 					}
 					catch ( Throwable e ) {

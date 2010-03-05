@@ -40,11 +40,20 @@ public class FilterInfo implements Comparable<FilterInfo> {
 	 */
 	public String className;
 	
+	/**
+	 * Returns the display name of this filter.
+	 */
 	@Override
 	public String toString () {
 		return displayName;
 	}
 
+	/**
+	 * Compares the display names of the two filters.
+	 * @param obj the other filter info object to compare.
+	 * @return the comparison result between the two filters display name, 0 if they are the same.
+	 */
+	@Override
 	public int compareTo(FilterInfo obj) {
 		return displayName.compareTo(obj.displayName);
 	}

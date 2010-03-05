@@ -42,10 +42,10 @@ public class PluginsAccess {
 	public static final int TYPE_FILTER          = 1;
 	public static final int TYPE_PARAMEDITOR     = 2;
 	
-	private LinkedHashMap<String, PluginItem> items;
+	private LinkedHashMap<String, PluginAccessItem> items;
 	
 	public PluginsAccess () {
-		items = new LinkedHashMap<String, PluginItem>();
+		items = new LinkedHashMap<String, PluginAccessItem>();
 	}
 	
 	public boolean containsID (String id) {
@@ -97,7 +97,7 @@ public class PluginsAccess {
 			NodeList nl = rootElem.getElementsByTagName("plugin");
 			for ( int i=0; i<nl.getLength(); i++ ) {
 				Element elem = (Element)nl.item(i);
-				PluginItem item = new PluginItem();
+				PluginAccessItem item = new PluginAccessItem();
 
 				String type = elem.getAttribute("type");
 				if ( type.equals("separator") ) {
@@ -154,7 +154,7 @@ public class PluginsAccess {
 		}
 	}
 
-	public PluginItem getItem (String id) {
+	public PluginAccessItem getItem (String id) {
 		return items.get(id);
 	}
 

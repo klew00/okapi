@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.lib.ILog;
-import net.sf.okapi.applications.rainbow.plugins.PluginItem;
+import net.sf.okapi.applications.rainbow.plugins.PluginAccessItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.applications.rainbow.utilities.CancelEvent;
 import net.sf.okapi.applications.rainbow.utilities.CancelListener;
@@ -55,7 +55,7 @@ public class UtilityDriver implements CancelListener {
 	private IFilter filter;
 	private IUtility utility;
 	private IParametersEditor editor;
-	private PluginItem pluginItem;
+	private PluginAccessItem pluginItem;
 	private PluginsAccess plugins;
 	private String outputFolder;
 	private boolean stopProcess;

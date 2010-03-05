@@ -24,6 +24,15 @@ import net.sf.okapi.common.ClassInfo;
 
 public class PluginItem {
 
+	public static final int TYPE_IFILTER = 0x0001;
+	public static final int TYPE_IPIPELINESTEP = 0x0002;
+	
+	public static final int TYPE_MAIN = 0x0003;
+	
+	public static final int TYPE_IPARAMETERSEDITOR = 0x0004;
+	public static final int TYPE_IEMBEDDABLEPARAMETERSEDITOR = 0x0008;
+	public static final int TYPE_IEDITORDESCRIPTIONPROVIDER = 0x0010;
+
 	protected int type;
 	protected String className;
 	protected ClassInfo paramsEditor;

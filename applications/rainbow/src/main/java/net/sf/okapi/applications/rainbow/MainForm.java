@@ -52,7 +52,7 @@ import net.sf.okapi.applications.rainbow.pipeline.TextRewritingPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TranslationComparisonPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XSLTransformPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithoutFilterPipeline;
-import net.sf.okapi.applications.rainbow.plugins.PluginItem;
+import net.sf.okapi.applications.rainbow.plugins.PluginAccessItem;
 import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
@@ -68,6 +68,7 @@ import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
+import net.sf.okapi.lib.plugins.PluginsManager;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 
 import org.eclipse.swt.SWT;
@@ -156,7 +157,7 @@ public class MainForm { //implements IParametersProvider {
 	private boolean inTargetEncSelection;
 	private Button chkUseCustomParametersFolder;
 	private Text edParamsFolder;
-	private boolean mapperNeedsUpdate;
+	private boolean customFilterConfigsNeedUpdate;
 	private Button btGetParamsFolder; 
 	private TabItem tiInputList1;
 	private TabItem tiInputList2;
@@ -270,8 +271,24 @@ public class MainForm { //implements IParametersProvider {
 		fcMapper = new FilterConfigurationMapper();
 		// Get pre-defined configurations
 		DefaultFilters.setMappings(fcMapper, false, true);
-//fc		fcMapper.loadList(sharedFolder + File.separator + "filters.xml"); //$NON-NLS-1$
-		mapperNeedsUpdate = true;
+//Trying plugin for filters
+		// Discover and add plug-ins
+		PluginsManager mgt = new PluginsManager();
+		mgt.discover(new File(rootFolder+File.separator+"dropins"), true);
+		java.util.List<net.sf.okapi.lib.plugins.PluginItem> list = mgt.getList();
+		for ( net.sf.okapi.lib.plugins.PluginItem item : list ) {
+			if ( item.getType() == net.sf.okapi.lib.plugins.PluginItem.TYPE_IFILTER ) {
+				String paramsClassName = fcMapper.addConfigurations(item.getClassName(), mgt.getClassLoader());
+				if ( item.getEditorDescriptionProvider() != null ) {
+					fcMapper.addDescriptionProvider(item.getEditorDescriptionProvider(), paramsClassName);
+				}
+				if ( item.getParamsEditor() != null ) {
+					fcMapper.addEditor(item.getParamsEditor(), paramsClassName);
+				}
+			}
+		}
+//End trying plugins
+		customFilterConfigsNeedUpdate = true;
 		
 		// Toolbar
 		createToolbar();
@@ -1006,7 +1023,7 @@ public class MainForm { //implements IParametersProvider {
 				btGetParamsFolder.setEnabled(chkUseCustomParametersFolder.getSelection());
 				edParamsFolder.setEditable(chkUseCustomParametersFolder.getSelection());
 				edParamsFolder.setText(prj.getParametersFolder(chkUseCustomParametersFolder.getSelection(), true));
-				mapperNeedsUpdate = true;
+				customFilterConfigsNeedUpdate = true;
             }
 		});
 	
@@ -1174,7 +1191,7 @@ public class MainForm { //implements IParametersProvider {
 			edParamsFolder.setText(dir);
 			edParamsFolder.selectAll();
 			edParamsFolder.setFocus();
-			mapperNeedsUpdate = true;
+			customFilterConfigsNeedUpdate = true;
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -1245,10 +1262,10 @@ public class MainForm { //implements IParametersProvider {
 	}
 
 	private void updateCustomConfigurations () {
-		if ( mapperNeedsUpdate ) {
+		if ( customFilterConfigsNeedUpdate ) {
 			fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 			fcMapper.updateCustomConfigurations();
-			mapperNeedsUpdate = false;
+			customFilterConfigsNeedUpdate = false;
 		}
 	}
 	
@@ -1365,7 +1382,7 @@ public class MainForm { //implements IParametersProvider {
 		// Add the plug-in utilities
 		Iterator<String> iter = plugins.getIterator();
 		while ( iter.hasNext() ) {
-			PluginItem item = plugins.getItem(iter.next());
+			PluginAccessItem item = plugins.getItem(iter.next());
 			if ( item.type == -1 ) {
 				new MenuItem(dropMenu, SWT.SEPARATOR);
 			}
@@ -1836,7 +1853,7 @@ public class MainForm { //implements IParametersProvider {
 		}
 		
 		prj = new Project(lm);
-		mapperNeedsUpdate = true;
+		customFilterConfigsNeedUpdate = true;
 		wrapper = null;
 		currentInput = 0;
 		resetDisplay(-1);
@@ -1863,7 +1880,7 @@ public class MainForm { //implements IParametersProvider {
 			// Load it and update the UI
 			prj = new Project(lm);
 			prj.load(path);
-			mapperNeedsUpdate = true;
+			customFilterConfigsNeedUpdate = true;
 
 			mruList.add(path);
 			updateMRU();
@@ -2005,7 +2022,7 @@ public class MainForm { //implements IParametersProvider {
 					edParamsFolder.setText(root);
 					prj.setCustomParametersFolder(root);
 					prj.setUseCustomParametersFolder(true);
-					mapperNeedsUpdate = true;
+					customFilterConfigsNeedUpdate = true;
 					resetDisplay(currentInput);
 				}
 				
