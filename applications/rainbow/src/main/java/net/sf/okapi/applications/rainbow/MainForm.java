@@ -169,7 +169,7 @@ public class MainForm { //implements IParametersProvider {
 	private FormatManager fm;
 	private FilterConfigurationMapper fcMapper;
 	private EncodingManager em;
-	private UtilitiesAccess plugins;
+	private UtilitiesAccess utilitiesAccess;
 	private UtilityDriver ud;
 	private MenuItem miInput;
 	private MenuItem miUtilities;
@@ -1365,9 +1365,9 @@ public class MainForm { //implements IParametersProvider {
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		// Add the plug-in utilities
-		Iterator<String> iter = plugins.getIterator();
+		Iterator<String> iter = utilitiesAccess.getIterator();
 		while ( iter.hasNext() ) {
-			UtilitiesAccessItem item = plugins.getItem(iter.next());
+			UtilitiesAccessItem item = utilitiesAccess.getItem(iter.next());
 			if ( item.type == -1 ) {
 				new MenuItem(dropMenu, SWT.SEPARATOR);
 			}
@@ -1483,7 +1483,7 @@ public class MainForm { //implements IParametersProvider {
 			updateCustomConfigurations();
 			// Create the utility driver if needed
 			if ( ud == null ) {
-				ud = new UtilityDriver(log, fcMapper, plugins, help, true);
+				ud = new UtilityDriver(log, fcMapper, utilitiesAccess, help, true);
 			}
 			// Get the data for the utility and instantiate it
 			ud.setData(prj, utilityID);
@@ -1644,9 +1644,8 @@ public class MainForm { //implements IParametersProvider {
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$
 		em = new EncodingManager();
 		em.loadList(sharedFolder + File.separator + "encodings.xml"); //$NON-NLS-1$
-		plugins = new UtilitiesAccess();
-		//TODO: Choose a better location 
-		plugins.addAllPackages(sharedFolder);
+		utilitiesAccess = new UtilitiesAccess();
+		utilitiesAccess.loadMenu(sharedFolder + File.separator + "rainbowUtilities.xml"); //$NON-NLS-1$
 	}
 	
 	private void editUserPreferences () {

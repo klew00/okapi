@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow;
 
 import java.io.File;
-import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -35,8 +34,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class UtilitiesAccess {
-
-	private static final String PLUGIN_FILENAME  = "plugin.xml";
 
 	public static final int TYPE_UTILITY         = 0;
 	public static final int TYPE_FILTER          = 1;
@@ -52,26 +49,6 @@ public class UtilitiesAccess {
 		return items.containsKey(id);
 	}
 	
-	/**
-	 * Add all the plug-ins in a given folder.
-	 * @param folder Folder where to look for plug-ins.
-	 */
-	public void addAllPackages (String folder)
-		throws Exception 
-	{
-		// Look in all sub-folder (one level) and see if there
-		// is a manifest to read.
-		File[] dirs = (new File(folder)).listFiles();
-		for ( File dir : dirs ) {
-			if ( !dir.isDirectory() ) continue;
-			String tmp = dir.getAbsolutePath() + File.separator + PLUGIN_FILENAME;
-			File file = new File(tmp);
-			if ( !file.exists() ) continue;
-			// Add the package
-			addPackage(URLDecoder.decode(file.getAbsolutePath(),"utf-8"));
-		}
-	}
-	
 	//TODO: Maybe this needs to be an helper static method somewhere
 	private Element getFirstElement (Element parent,
 		String name)
@@ -85,7 +62,7 @@ public class UtilitiesAccess {
 		return items.keySet().iterator();
 	}
 	
-	public void addPackage (String path) {
+	public void loadMenu (String path) {
 		try {
 			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
 			Fact.setValidating(false);

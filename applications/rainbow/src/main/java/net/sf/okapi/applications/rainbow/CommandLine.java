@@ -50,7 +50,7 @@ public class CommandLine {
 	private Shell shell;
 	private UtilityDriver ud;
 	private FilterConfigurationMapper fcMapper;
-	private UtilitiesAccess plugins;
+	private UtilitiesAccess utilitiesAccess;
 	private BatchLog log;
 	private LogHandler logHandler;
 	private String utilityId;
@@ -237,8 +237,8 @@ public class CommandLine {
 		mgt.discover(new File(rootFolder+File.separator+"dropins"), true);
 		fcMapper.addFromPlugins(mgt);
 
-		plugins = new UtilitiesAccess();
-		plugins.addAllPackages(sharedFolder);
+		utilitiesAccess = new UtilitiesAccess();
+		utilitiesAccess.loadMenu(sharedFolder+File.separator+"rainbowUtilities.xml");
 	}
 	
 	private void launchUtility () {
@@ -246,7 +246,7 @@ public class CommandLine {
 		if ( ud == null ) {
 			fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 			fcMapper.updateCustomConfigurations();
-			ud = new UtilityDriver(log, fcMapper, plugins, help, false);
+			ud = new UtilityDriver(log, fcMapper, utilitiesAccess, help, false);
 		}
 		
 		// Get default/project data for the utility and instantiate the utility object
