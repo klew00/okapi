@@ -52,8 +52,6 @@ import net.sf.okapi.applications.rainbow.pipeline.TextRewritingPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TranslationComparisonPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XSLTransformPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithoutFilterPipeline;
-import net.sf.okapi.applications.rainbow.plugins.PluginAccessItem;
-import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -171,7 +169,7 @@ public class MainForm { //implements IParametersProvider {
 	private FormatManager fm;
 	private FilterConfigurationMapper fcMapper;
 	private EncodingManager em;
-	private PluginsAccess plugins;
+	private UtilitiesAccess plugins;
 	private UtilityDriver ud;
 	private MenuItem miInput;
 	private MenuItem miUtilities;
@@ -1369,7 +1367,7 @@ public class MainForm { //implements IParametersProvider {
 		// Add the plug-in utilities
 		Iterator<String> iter = plugins.getIterator();
 		while ( iter.hasNext() ) {
-			PluginAccessItem item = plugins.getItem(iter.next());
+			UtilitiesAccessItem item = plugins.getItem(iter.next());
 			if ( item.type == -1 ) {
 				new MenuItem(dropMenu, SWT.SEPARATOR);
 			}
@@ -1646,7 +1644,7 @@ public class MainForm { //implements IParametersProvider {
 		lm.loadList(sharedFolder + File.separator + "languages.xml"); //$NON-NLS-1$
 		em = new EncodingManager();
 		em.loadList(sharedFolder + File.separator + "encodings.xml"); //$NON-NLS-1$
-		plugins = new PluginsAccess();
+		plugins = new UtilitiesAccess();
 		//TODO: Choose a better location 
 		plugins.addAllPackages(sharedFolder);
 	}

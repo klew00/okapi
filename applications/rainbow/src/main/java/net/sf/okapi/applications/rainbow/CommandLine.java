@@ -33,7 +33,6 @@ import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
-import net.sf.okapi.applications.rainbow.plugins.PluginsAccess;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
@@ -51,7 +50,7 @@ public class CommandLine {
 	private Shell shell;
 	private UtilityDriver ud;
 	private FilterConfigurationMapper fcMapper;
-	private PluginsAccess plugins;
+	private UtilitiesAccess plugins;
 	private BatchLog log;
 	private LogHandler logHandler;
 	private String utilityId;
@@ -238,7 +237,7 @@ public class CommandLine {
 		mgt.discover(new File(rootFolder+File.separator+"dropins"), true);
 		fcMapper.addFromPlugins(mgt);
 
-		plugins = new PluginsAccess();
+		plugins = new UtilitiesAccess();
 		plugins.addAllPackages(sharedFolder);
 	}
 	
