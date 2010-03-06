@@ -20,16 +20,37 @@
 
 package net.sf.okapi.steps.xliffkit.writer;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.net.URI;
+
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackageAccess;
+import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.openxml4j.opc.PackagePartName;
+import org.apache.poi.openxml4j.opc.PackageRelationshipTypes;
+import org.apache.poi.openxml4j.opc.PackagingURIHelper;
+import org.apache.poi.openxml4j.opc.StreamHelper;
+import org.apache.poi.openxml4j.opc.TargetMode;
+import org.apache.poi.openxml4j.opc.ZipPackage;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
@@ -43,7 +64,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
 @UsingParameters()
-public class XLIFFKitWriterStep extends BasePipelineStep implements IFilterWriter {
+public class XLIFFKitWriterStep extends BasePipelineStep {
 
 	private static final String RESTYPEVALUES = 
 		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
@@ -64,13 +85,27 @@ public class XLIFFKitWriterStep extends BasePipelineStep implements IFilterWrite
 	private boolean inFile;
 	private String docMimeType;
 	private String docName;
-	private String outputPath;
+	//private String outputPath;
 	private String inputEncoding;
 	private String configId;
+	private Parameters params;
+	private URI outputURI;
+	
+	private String originalFileName;
+	private String xliffFileName;
+	private String skeletonFileName;
+	private String tmxFileName;
+	private String tbxFileName;
+	private String srxFileName;
+	private String annotationsFileName;
 
+	private OPCPackage pack;
+	private File tempXliff;
+	
 	public XLIFFKitWriterStep() {
 		super();
 		xliffCont = new XLIFFContent();
+		params = new Parameters();
 	}
 	
 	public String getDescription () {
@@ -91,24 +126,16 @@ public class XLIFFKitWriterStep extends BasePipelineStep implements IFilterWrite
 		return null;
 	}
 
-	public void setOptions(LocaleId locale, String defaultEncoding) {
-		setTargetLocale(locale);
-		// ignore encoding: always use UTF-8		
-	}
-	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.trgLang = targetLocale;
 	}
 
-	public void setOutput(String path) {
-		outputPath = path;		
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
 	}
-
-	public void setOutput(OutputStream output) {
-		// TODO: implement stream		
-	}
-
+	
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
@@ -139,19 +166,48 @@ public class XLIFFKitWriterStep extends BasePipelineStep implements IFilterWrite
 	
 	private void processStartDocument (StartDocument resource) {
 		if ( writer != null ) writer.close();
-		writer = new XMLWriter(outputPath);
 
-		srcLang = resource.getLocale();
-		writer.writeStartDocument();
-		writer.writeStartElement("xliff");
-		writer.writeAttributeString("version", "1.2");
-		writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
+		srcLang = resource.getLocale();						
 		docMimeType = resource.getMimeType();
 		docName = resource.getName();
 		inputEncoding = resource.getEncoding();
+		
 		IParameters params = resource.getFilterParameters();
 		if ( params == null ) configId = null;
 		else configId = params.getPath();
+		
+		originalFileName = Util.getFilename(docName, true);
+		xliffFileName = originalFileName + ".xlf";
+		skeletonFileName = originalFileName + ".skeleton";
+		tmxFileName = originalFileName + ".tmx";
+		tbxFileName = originalFileName + ".tbx";
+		srxFileName = originalFileName + ".srx";
+		annotationsFileName = originalFileName + ".annotations";
+		
+		try {
+			tempXliff = File.createTempFile(xliffFileName, null);
+			tempXliff.deleteOnExit();
+		
+			writer = new XMLWriter(new PrintWriter(tempXliff)); // XLIFF file writer
+			writer.writeStartDocument();
+			writer.writeStartElement("xliff");
+			writer.writeAttributeString("version", "1.2");
+			writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
+		} catch (IOException e) {
+			// TODO Handle exception
+		}
+		
+		File outFile = new File(outputURI);
+		if (outFile.exists()) 
+			outFile.delete();
+		
+		Util.createDirectories(outFile.getAbsolutePath());
+		try {
+			pack = OPCPackage.openOrCreate(outFile);
+		} catch (InvalidFormatException e1) {
+			// TODO Handle exception
+		}
+				
 	}
 	
 	private void processEndDocument () {
@@ -159,6 +215,38 @@ public class XLIFFKitWriterStep extends BasePipelineStep implements IFilterWrite
 		writer.writeEndElementLineBreak(); // xliff
 		writer.writeEndDocument();
 		close();
+		
+		// Save to package
+		try {
+			PackagePartName xliffPartName = PackagingURIHelper.createPartName("/" + xliffFileName);
+			PackagePart xliffPart = pack.createPart(xliffPartName, MimeTypeMapper.XLIFF_MIME_TYPE);
+			pack.addRelationship(xliffPartName, TargetMode.INTERNAL, PackageRelationshipTypes.CORE_DOCUMENT);
+			
+			try {
+				InputStream is = new FileInputStream(tempXliff);
+				OutputStream os = xliffPart.getOutputStream(); 
+				StreamHelper.copyStream(is, os);
+				try {
+					is.close();
+					os.close();
+				} catch (IOException e) {
+					// TODO Handle exception
+				}
+				
+			} catch (FileNotFoundException e) {
+				// TODO Handle exception
+			}
+			
+		} catch (InvalidFormatException e) {
+			// TODO Handle exception
+		}
+						
+		try {
+			pack.close();
+			
+		} catch (IOException e) {
+			// TODO Handle exception
+		}
 	}
 
 	private void processStartSubDocument (StartSubDocument resource) {
@@ -322,5 +410,10 @@ public class XLIFFKitWriterStep extends BasePipelineStep implements IFilterWrite
 		}
 
 		writer.writeEndElementLineBreak(); // trans-unit
+	}
+
+	@Override
+	public IParameters getParameters() {
+		return params;
 	}
 }

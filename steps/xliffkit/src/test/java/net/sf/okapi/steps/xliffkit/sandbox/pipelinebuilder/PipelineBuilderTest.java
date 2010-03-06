@@ -106,10 +106,10 @@ public class PipelineBuilderTest {
 			new Pipeline(
 					"Pipeline initialized to process nested batches.",
 					new Batch(
-							// bic 1 with 2 documents
+							// bic 1 and bic 2
 							p2.getBatch(),
 							
-							// bic 2 with 1 document
+							// bic 3 with 1 document
 							new BatchItem(									
 									(new File("input3.html")).toURI(),
 									"UTF-8",
@@ -119,9 +119,9 @@ public class PipelineBuilderTest {
 									LocaleId.ENGLISH,
 									LocaleId.FRENCH),
 							
-							// bic 3 with 2 documents	
-							new Batch(
-									new BatchItem(
+							// bic 4 with 2 documents	
+							new BatchItem(
+									new Document(
 											(new File("input4.html")).toURI(),
 											"UTF-8",
 											"okf_html",
@@ -129,7 +129,7 @@ public class PipelineBuilderTest {
 											"UTF-8",
 											LocaleId.ENGLISH,
 											LocaleId.FRENCH),
-									new BatchItem(
+									new Document(
 											(new File("input5.html")).toURI(),
 											"UTF-8",
 											"okf_html",
@@ -137,7 +137,7 @@ public class PipelineBuilderTest {
 											"UTF-8",
 											LocaleId.ENGLISH,
 											LocaleId.FRENCH)),
-							// bic 4 with 2 documents
+							// bic 5
 							new BatchItem(
 									(new File("input6.html")).toURI(),
 									"UTF-8",
@@ -147,6 +147,7 @@ public class PipelineBuilderTest {
 									LocaleId.ENGLISH,
 									LocaleId.CHINA_CHINESE),
 							
+							// bic 6
 							new BatchItem(
 									(new File("input7.html")).toURI(),
 									"UTF-8",
@@ -168,6 +169,7 @@ public class PipelineBuilderTest {
 					new Pipeline(
 							"Parallel pipeline for parrallel handling of source and target documents.",
 							PipelineType.PARALLEL,
+							
 							new Pipeline(
 									"Source document translatable text extraction",
 									new Batch(
@@ -176,6 +178,7 @@ public class PipelineBuilderTest {
 													 "UTF-8",
 													 LocaleId.ENGLISH)),
 									new RawDocumentToFilterEventsStep()),
+									
 							new Pipeline(
 									"Target document translatable text extraction",
 									new Batch(
@@ -183,11 +186,11 @@ public class PipelineBuilderTest {
 													(new File("target.doc")).toURI(),
 													 "UTF-16",
 													 LocaleId.CHINA_CHINESE)),
-									new RawDocumentToFilterEventsStep())
-					),					
+									new RawDocumentToFilterEventsStep())),
+									
 					new SentenceAlignerStep(),
-					new FilterEventsWriterStep()
-			);
+					
+					new FilterEventsWriterStep());
 					
 		//----------------------------------------------------------------
 		Pipeline p6 =

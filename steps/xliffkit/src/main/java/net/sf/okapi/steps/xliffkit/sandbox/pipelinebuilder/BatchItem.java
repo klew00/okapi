@@ -22,135 +22,100 @@ package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.MimeTypeMapper;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterConfiguration;
-import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.DocumentData;
+import net.sf.okapi.common.pipelinedriver.IBatchItemContext;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class BatchItem  {
 
-	private DocumentData documentData;
-	private FilterConfigurationMapper fcMapper;
-		
-	{
-		fcMapper = new FilterConfigurationMapper();
-	
-		// TODO Registration of filter configs in the FilterConfigurationMapper, not here
-		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");
-		fcMapper.addConfigurations(net.sf.okapi.filters.plaintext.PlainTextFilter.class.getName());
+	private BatchItemContext bic = new BatchItemContext();
+//	private List<Document> documents = new ArrayList<Document>();
+
+	public BatchItem(Document... documents) {
+		for (Document document : documents)
+			addDocument(document);
+	}
+
+	private void addDocument(Document document) {
+		if (document == null) return;		
+		bic.add(document.getDocumentData());
 	}
 	
 	public BatchItem(URI inputURI, String defaultEncoding, String filterConfigId,
 			URI outputURI, String outputEncoding, LocaleId sourceLocale, LocaleId targetLocale) {
-		this(new RawDocument(inputURI, defaultEncoding, sourceLocale,	targetLocale), outputURI, outputEncoding);
-		getRawDocument().setFilterConfigId(filterConfigId);
+		addDocument(new Document(inputURI, defaultEncoding, filterConfigId,
+			outputURI, outputEncoding, sourceLocale, targetLocale));		
 	}
 	
 	public BatchItem(RawDocument rawDocument) {
-		setRawDocument(rawDocument);
+		addDocument(new Document(rawDocument));
 	}
 	
 	public BatchItem(DocumentData documentData) {
-		setDocumentData(documentData);
+		addDocument(new Document(documentData));
 	}
 	
 	public BatchItem(RawDocument rawDoc,
 			URI outputURI,
 			String outputEncoding) {
-		setRawDocument(rawDoc);
-		documentData.outputURI = outputURI;
-		documentData.outputEncoding = outputEncoding;
+		addDocument(new Document(rawDoc, outputURI, outputEncoding));
 	}
 	
 	public BatchItem(CharSequence inputCharSequence, LocaleId sourceLocale) {
-		setRawDocument(new RawDocument(inputCharSequence, sourceLocale));
+		addDocument(new Document(inputCharSequence, sourceLocale));
 	}
 	
 	public BatchItem(URI inputURI, String defaultEncoding, LocaleId sourceLocale) {
-		setRawDocument(new RawDocument(inputURI, defaultEncoding, sourceLocale));
+		addDocument(new Document(inputURI, defaultEncoding, sourceLocale));
 	}
 
+	public BatchItem(URI inputURI, String defaultEncoding, URI outputURI, String outputEncoding, LocaleId sourceLocale,
+			LocaleId targetLocale) {
+		addDocument(new Document(inputURI, defaultEncoding, outputURI, outputEncoding, sourceLocale,
+				targetLocale));
+	}
+	
 	public BatchItem(URI inputURI, String defaultEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
-		setRawDocument(new RawDocument(inputURI, defaultEncoding, sourceLocale,	targetLocale));
+		addDocument(new Document(inputURI, defaultEncoding, sourceLocale, targetLocale));
 	}
 	
 	public BatchItem(URL inputURL, String defaultEncoding, LocaleId sourceLocale) {
-		try {
-			setRawDocument(new RawDocument(inputURL.toURI(), defaultEncoding, sourceLocale));
-		} catch (URISyntaxException e) {
-			// TODO Handle exception
-		}
+		addDocument(new Document(inputURL, defaultEncoding, sourceLocale));
 	}
 
 	public BatchItem(URL inputURL, String defaultEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
-		try {
-			setRawDocument(new RawDocument(inputURL.toURI(), defaultEncoding, sourceLocale,	targetLocale));
-		} catch (URISyntaxException e) {
-			// TODO Handle exception
-		}
+		addDocument(new Document(inputURL, defaultEncoding, sourceLocale, targetLocale));
+	}
+	
+	public BatchItem(URL inputURL, String defaultEncoding, URL outputURL, String outputEncoding, LocaleId sourceLocale,
+			LocaleId targetLocale) {
+		addDocument(new Document(inputURL, defaultEncoding, outputURL, outputEncoding, sourceLocale,
+				targetLocale));
+	}
+	
+	public BatchItem(URL inputURL, String defaultEncoding, String outputPath, String outputEncoding, LocaleId sourceLocale,
+			LocaleId targetLocale) {
+		addDocument(new Document(inputURL, defaultEncoding, outputPath, outputEncoding, sourceLocale,
+				targetLocale));
 	}
 	
 	public BatchItem(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale) {
-		setRawDocument(new RawDocument(inputStream, defaultEncoding, sourceLocale));
+		addDocument(new Document(inputStream, defaultEncoding, sourceLocale));
 	}
 	
 	public BatchItem(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
-		setRawDocument(new RawDocument(inputStream, defaultEncoding, sourceLocale, targetLocale));
+		addDocument(new Document(inputStream, defaultEncoding, sourceLocale,
+				targetLocale));
 	}
 	
-	protected BatchItem() {
-		super();
+	public IBatchItemContext getContext() {
+		return bic;
 	}
-
-	public DocumentData getDocumentData() {
-		return documentData;
-	}
-
-	public void setDocumentData(DocumentData documentData) {
-		this.documentData = documentData;
-		validateFilterConfigId();
-	}
-
-	public RawDocument getRawDocument() {
-		return (documentData != null) ? documentData.rawDocument : null;
-	}
-
-	public void setRawDocument(RawDocument rawDocument) {
-		if (documentData == null)
-			documentData = new DocumentData();
-		
-		documentData.rawDocument = rawDocument;
-		validateFilterConfigId();
-	}
-	
-	private void validateFilterConfigId() {
-		RawDocument rd = getRawDocument();
-		if (rd == null) return;
-		if (!Util.isEmpty(rd.getFilterConfigId())) return; // Already set
-		
-		String ext = Util.getExtension(rd.getInputURI().toString());
-		if (Util.isEmpty(ext)) return;
-		
-		ext = ext.substring(1); // Exclude leading dot
-		String mimeType = MimeTypeMapper.getMimeType(ext);
-		
-		FilterConfiguration cfg = fcMapper.getDefaultConfiguration(mimeType);
-		if (cfg == null) return;
-		
-		rd.setFilterConfigId(cfg.configId);
-	}
-	
 }

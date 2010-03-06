@@ -23,8 +23,6 @@ package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.okapi.common.pipelinedriver.BatchItemContext;
-import net.sf.okapi.common.pipelinedriver.DocumentData;
 import net.sf.okapi.common.pipelinedriver.IBatchItemContext;
 
 public class Batch extends BatchItem {
@@ -37,10 +35,8 @@ public class Batch extends BatchItem {
 		for (BatchItem item : items)
 			if (item instanceof Batch) 
 				this.items.addAll(((Batch)item).getItems());
-			else {
-				DocumentData ddi = item.getDocumentData();
-				this.items.add(new BatchItemContext(ddi.rawDocument, ddi.outputURI, ddi.outputEncoding));
-			}			
+			else
+				this.items.add(item.getContext());
 	}
 
 	public void setItems(List<IBatchItemContext> items) {

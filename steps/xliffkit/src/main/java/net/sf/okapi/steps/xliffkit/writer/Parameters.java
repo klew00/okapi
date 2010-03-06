@@ -31,11 +31,15 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	static final String INCLUDENOTRANSLATE = "includeNoTranslate"; //$NON-NLS-1$
 	static final String SETAPPROVEDASNOTRANSLATE = "setApprovedAsNoTranslate"; //$NON-NLS-1$
 	static final String MESSAGE = "message"; //$NON-NLS-1$
+	static final String OUTFILENAME = "outFileName"; //$NON-NLS-1$
+	static final String OUTPATH = "outPath"; //$NON-NLS-1$ 
 	
 	private boolean gMode;
 	private boolean includeNoTranslate;
 	private boolean setApprovedAsNoTranslate;
 	private String message;
+	private String outFileName;
+	private String outPath;
 	
 	public Parameters () {
 		reset();
@@ -46,6 +50,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		includeNoTranslate = true;
 		setApprovedAsNoTranslate = false;
 		message = "";
+		outFileName = "";
+		outPath = "";
 	}
 
 	public void fromString (String data) {
@@ -56,6 +62,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		includeNoTranslate = buffer.getBoolean(INCLUDENOTRANSLATE, includeNoTranslate);
 		setApprovedAsNoTranslate = buffer.getBoolean(SETAPPROVEDASNOTRANSLATE, setApprovedAsNoTranslate);
 		message = buffer.getString(MESSAGE, message);
+		outFileName = buffer.getString(OUTFILENAME, outFileName);
+		outPath = buffer.getString(OUTPATH, outPath);
 		
 		// Make sure the we can merge later
 		if ( !includeNoTranslate ) {
@@ -70,6 +78,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(INCLUDENOTRANSLATE, includeNoTranslate);
 		buffer.setBoolean(SETAPPROVEDASNOTRANSLATE, setApprovedAsNoTranslate);
 		buffer.setParameter(MESSAGE, message);
+		buffer.setParameter(OUTFILENAME, outFileName);
+		buffer.setParameter(OUTPATH, outPath);
 		
 		return buffer.toString();
 	}
@@ -82,6 +92,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(INCLUDENOTRANSLATE, "Include non-translatable text units", "Include non-translatables");
 		desc.add(SETAPPROVEDASNOTRANSLATE, "Set approved entries as non-translatable", "Approved as non-translatable");
 		desc.add(MESSAGE, "Description of the XLIFF file", "Description");
+		desc.add(OUTFILENAME, "Short name of the T-kit file", "T-kit Name");
+		desc.add(OUTPATH, "Directory of the T-kit file", "T-kit Path");
 		
 		return desc;
 	}
@@ -94,6 +106,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addCheckboxPart(parametersDescription.get(INCLUDENOTRANSLATE));
 		desc.addCheckboxPart(parametersDescription.get(SETAPPROVEDASNOTRANSLATE));
 		desc.addTextInputPart(parametersDescription.get(MESSAGE));
+		desc.addTextInputPart(parametersDescription.get(OUTFILENAME));
+		desc.addTextInputPart(parametersDescription.get(OUTPATH));
 		
 		return desc;
 	}
@@ -128,6 +142,22 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public String getOutFileName() {
+		return outFileName;
+	}
+
+	public void setOutFileName(String outFileName) {
+		this.outFileName = outFileName;
+	}
+
+	public String getOutPath() {
+		return outPath;
+	}
+
+	public void setOutPath(String outPath) {
+		this.outPath = outPath;
 	}
 	
 }

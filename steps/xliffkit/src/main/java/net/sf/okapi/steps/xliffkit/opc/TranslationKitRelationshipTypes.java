@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.xliffkit.opc;
 
-public class OPCPackage {
+
+public class TranslationKitRelationshipTypes {
 
 }

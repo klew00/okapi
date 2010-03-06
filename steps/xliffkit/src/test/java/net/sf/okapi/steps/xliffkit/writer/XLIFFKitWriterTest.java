@@ -20,6 +20,10 @@
 
 package net.sf.okapi.steps.xliffkit.writer;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
@@ -41,11 +45,11 @@ public class XLIFFKitWriterTest {
 	
 	private Pipeline buildPipeline(String inPath) {
 		
-		XLIFFKitWriterStep step1 = new XLIFFKitWriterStep();
-		// TODO Create outPath parameter, move to constructor
-		// Output files are created in /target/test-classes/net/sf/okapi/steps/xliffkit/writer
-		String outPath = Util.getDirectoryName(this.getClass().getResource(inPath).getPath()) + "/" + inPath + ".xlf";
-		step1.setOutput(outPath);
+//		XLIFFKitWriterStep step1 = new XLIFFKitWriterStep();
+//		// TODO Create outPath parameter, move to constructor
+//		// Output files are created in /target/test-classes/net/sf/okapi/steps/xliffkit/writer
+//		String outPath = Util.getDirectoryName(this.getClass().getResource(inPath).getPath()) + "/" + inPath + ".xlf";
+//		step1.setOutput(outPath);
 		//step1.setOptions(LocaleId.FRENCH, "UTF-8");
 		
 //		LeveragingStep step2 = new LeveragingStep();
@@ -62,10 +66,21 @@ public class XLIFFKitWriterTest {
 							new BatchItem(
 									this.getClass().getResource(inPath),
 									"UTF-8",
+									Util.getDirectoryName(this.getClass().getResource(inPath).getPath()) + 
+											"/" + inPath + ".en.fr.xliff.kit",
+									"UTF-8",
 									LocaleId.ENGLISH,
-									LocaleId.FRENCH
-							)
-					),
+									LocaleId.FRENCH),
+									
+							new BatchItem(
+									this.getClass().getResource(inPath),
+									"UTF-8",
+									Util.getDirectoryName(this.getClass().getResource(inPath).getPath()) + 
+										"/" + inPath + ".en.zh-cn.xliff.kit",
+									"UTF-16",
+									LocaleId.ENGLISH,
+									LocaleId.CHINA_CHINESE)),
+									
 					new RawDocumentToFilterEventsStep(),
 					
 					new PipelineStep(new LeveragingStep(), 
@@ -85,7 +100,9 @@ public class XLIFFKitWriterTest {
 //							new Parameter("addID", true),
 //							new Parameter("markSegments", false)
 //					),
-					step1
+					new PipelineStep(
+							new XLIFFKitWriterStep(),								
+							new Parameter("gMode", true))
 			);
 	}
 	
@@ -97,5 +114,20 @@ public class XLIFFKitWriterTest {
 		//buildPipeline(IN_NAME2).execute();
 		//buildPipeline(IN_NAME3).execute();
 	}
+
+	@Test
+	public void testTempFile() {
 		
+		// DEBUG
+//		try {
+//			File temp = File.createTempFile("pattern", null);
+//			temp.deleteOnExit();
+//			System.out.println(temp.toString());
+//			
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}  
+	}
+	
 }
