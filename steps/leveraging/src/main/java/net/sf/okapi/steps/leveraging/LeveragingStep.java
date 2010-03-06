@@ -86,7 +86,6 @@ public class LeveragingStep extends BasePipelineStep {
 		
 		// Else: initialize the global variables
 		qm = new QueryManager();
-		qm.setLanguages(sourceLocale, targetLocale);
 		qm.setThreshold(params.getThreshold());
 		int id = qm.addAndInitializeResource(params.getResourceClassName(), null,
 			params.getResourceParameters());
@@ -113,6 +112,7 @@ public class LeveragingStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartDocument (Event event) {
 		if ( !params.getLeverage() ) return event;
+		qm.setLanguages(sourceLocale, targetLocale);
 		qm.resetCounters();
 		return event;
 	}
