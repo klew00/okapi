@@ -20,8 +20,6 @@
 
 package net.sf.okapi.steps.xliffkit.writer;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,19 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.net.URI;
-
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackageAccess;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.openxml4j.opc.PackagePartName;
-import org.apache.poi.openxml4j.opc.PackageRelationshipTypes;
-import org.apache.poi.openxml4j.opc.PackagingURIHelper;
-import org.apache.poi.openxml4j.opc.StreamHelper;
-import org.apache.poi.openxml4j.opc.TargetMode;
-import org.apache.poi.openxml4j.opc.ZipPackage;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -62,6 +48,15 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.steps.xliffkit.opc.TKitRelationshipTypes;
+
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.openxml4j.opc.PackagePartName;
+import org.apache.poi.openxml4j.opc.PackagingURIHelper;
+import org.apache.poi.openxml4j.opc.StreamHelper;
+import org.apache.poi.openxml4j.opc.TargetMode;
 
 @UsingParameters()
 public class XLIFFKitWriterStep extends BasePipelineStep {
@@ -220,7 +215,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		try {
 			PackagePartName xliffPartName = PackagingURIHelper.createPartName("/" + xliffFileName);
 			PackagePart xliffPart = pack.createPart(xliffPartName, MimeTypeMapper.XLIFF_MIME_TYPE);
-			pack.addRelationship(xliffPartName, TargetMode.INTERNAL, PackageRelationshipTypes.CORE_DOCUMENT);
+			pack.addRelationship(xliffPartName, TargetMode.INTERNAL, TKitRelationshipTypes.CORE_DOCUMENT);
 			
 			try {
 				InputStream is = new FileInputStream(tempXliff);

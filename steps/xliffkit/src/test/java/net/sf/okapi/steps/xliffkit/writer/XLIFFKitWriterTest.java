@@ -43,7 +43,7 @@ public class XLIFFKitWriterTest {
 	private final String IN_NAME2 = "TestDocument01.odt";
 	private final String IN_NAME3 = "test.txt";
 	
-	private Pipeline buildPipeline(String inPath) {
+	private Pipeline buildPipeline(String inPath1, String inPath2) {
 		
 //		XLIFFKitWriterStep step1 = new XLIFFKitWriterStep();
 //		// TODO Create outPath parameter, move to constructor
@@ -64,19 +64,28 @@ public class XLIFFKitWriterTest {
 					"Test pipeline for XLIFFKitWriterStep",
 					new Batch(
 							new BatchItem(
-									this.getClass().getResource(inPath),
+									this.getClass().getResource(inPath1),
 									"UTF-8",
-									Util.getDirectoryName(this.getClass().getResource(inPath).getPath()) + 
-											"/" + inPath + ".en.fr.xliff.kit",
+									Util.getDirectoryName(this.getClass().getResource(inPath1).getPath()) + 
+											"/" + inPath1 + ".en.fr.xliff.kit",
 									"UTF-8",
 									LocaleId.ENGLISH,
 									LocaleId.FRENCH),
 									
 							new BatchItem(
-									this.getClass().getResource(inPath),
+									this.getClass().getResource(inPath2),
 									"UTF-8",
-									Util.getDirectoryName(this.getClass().getResource(inPath).getPath()) + 
-										"/" + inPath + ".en.zh-cn.xliff.kit",
+									Util.getDirectoryName(this.getClass().getResource(inPath2).getPath()) + 
+											"/" + inPath2 + ".en.fr.xliff.kit",
+									"UTF-8",
+									LocaleId.ENGLISH,
+									LocaleId.FRENCH),
+									
+							new BatchItem(
+									this.getClass().getResource(inPath1),
+									"UTF-8",
+									Util.getDirectoryName(this.getClass().getResource(inPath1).getPath()) + 
+										"/" + inPath1 + ".en.zh-cn.xliff.kit",
 									"UTF-16",
 									LocaleId.ENGLISH,
 									LocaleId.CHINA_CHINESE)),
@@ -110,9 +119,7 @@ public class XLIFFKitWriterTest {
 	public void testOutputFile() {
 		
 		// DEBUG
-		//buildPipeline(IN_NAME1).execute();
-		//buildPipeline(IN_NAME2).execute();
-		//buildPipeline(IN_NAME3).execute();
+		//buildPipeline(IN_NAME3, IN_NAME2).execute();
 	}
 
 	@Test
