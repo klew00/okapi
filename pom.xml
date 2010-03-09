@@ -26,12 +26,13 @@
 			<layout>default</layout>
 		</repository>
 
+		<!-- snakeyaml should be in main maven repo now
 		<repository>
 			<id>snakeyaml</id>
 			<name>SnakeYAML repository</name>
 			<url>http://snakeyamlrepo.appspot.com/repository</url>
-		</repository>
-
+		</repository>-->
+		
 	</repositories>
 
 	<properties>
