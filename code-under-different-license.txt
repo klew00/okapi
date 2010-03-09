@@ -1,0 +1,19 @@
+# Source files that use a different license than the standard Okapi LGPL
+
+maven module:  license_name
+Java Package or Path.File	
+
+okapi-core:  BSD
+net.sf.okapi.common.observer.BaseObservable					
+net.sf.okapi.common.observer.IObservable
+net.sf.okapi.common.observer.IObserver
+net.sf.okapi.common.observer.WeakReferenceObservable
+
+okpai-step-sentence-aligner:  Apache 2.0
+net.sf.okapi.steps.gcaligner.DpFunction							
+net.sf.okapi.steps.gcaligner.DpMatrix						
+net.sf.okapi.steps.gcaligner.DpMatrixCell					
+nett.sf.okapi.steps.gcaligner.GaleAndChurch					
+net.sf.okapi.steps.gcaligner.SegmentAlignmentFunction		
+net.sf.okapi.steps.gcaligner.SegmentAlignmentScorer			
+net.sf.okapi.steps.gcaligner.SentenceAligner				
