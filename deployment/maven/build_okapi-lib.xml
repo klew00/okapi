@@ -207,6 +207,9 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../steps/xsltransform/target/classes"
 			 excludes="**/META-INF/**"/>
+
+<!--			<fileset dir="../../steps/xliffkit/target/classes"
+			 excludes="**/META-INF/**"/>-->
 		</copy>
 		
 		<!-- Copy lib dependencies -->
@@ -373,6 +376,38 @@
 		<copy todir="${distLicenses}">
 		   <fileset dir="../shared/licenses" includes="**/trove-*"/>
 		</copy>
+		
+<!--For xliff-tkit later
+		<property name="dep022" value="${mavenStore}/org/apache/poi/poi-ooxml/3.6"/>
+		<fileset id="list.contents" dir="${dep022}"
+		 includes="**/poi-ooxml-3.6.jar"/>
+		<property name="jar022" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar022}</echo>
+		<copy todir="${distLib}" file="${dep022}/${jar022}"/>
+		<copy todir="${distLicenses}">
+		   <fileset dir="../shared/licenses" includes="**/poi-ooxml-*"/>
+		</copy>
+
+		<property name="dep023" value="${mavenStore}/org/apache/poi/poi/3.6"/>
+		<fileset id="list.contents" dir="${dep023}"
+		 includes="**/poi-3.6.jar"/>
+		<property name="jar023" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar023}</echo>
+		<copy todir="${distLib}" file="${dep023}/${jar023}"/>
+		<copy todir="${distLicenses}">
+		   <fileset dir="../shared/licenses" includes="**/poi-*"/>
+		</copy>
+
+		<property name="dep024" value="${mavenStore}/dom4j/dom4j/1.6.1"/>
+		<fileset id="list.contents" dir="${dep024}"
+		 includes="**/dom4j-1.6.1.jar"/>
+		<property name="jar024" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar024}</echo>
+		<copy todir="${distLib}" file="${dep024}/${jar024}"/>
+		<copy todir="${distLicenses}">
+		   <fileset dir="../shared/licenses" includes="**/dom4j-*"/>
+		</copy>
+-->
 
 		<!-- Create the manifest file -->
 		<property file="tmpJars"/>

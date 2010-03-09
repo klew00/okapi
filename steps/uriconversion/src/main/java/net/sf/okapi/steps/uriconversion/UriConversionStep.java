@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.uriconversion;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.logging.Level;
@@ -33,6 +34,7 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -40,11 +42,10 @@ import net.sf.okapi.common.resource.TextUnit;
 @UsingParameters(Parameters.class)
 public class UriConversionStep extends BasePipelineStep {
 
-	static final int UNESCAPE  = 0;
-	static final int ESCAPE    = 1;
+	private static final String FORCEESCAPE = " * -,.";
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
-	
+
 	private Parameters params;
 	private LocaleId trgLang;
 	
@@ -56,11 +57,13 @@ public class UriConversionStep extends BasePipelineStep {
 	public void setTargetLanguage (LocaleId targetLanguage) {
 		trgLang = targetLanguage;
 	}
-	
+
+	@Override
 	public String getDescription () {
-		return "Encode/Decode URI content.";
+		return "Encode or Decode URI escape sequences.";
 	}
 
+	@Override
 	public String getName () {
 		return "URI Conversion";
 	}
@@ -79,97 +82,122 @@ public class UriConversionStep extends BasePipelineStep {
 	protected Event handleTextUnit (Event event) {
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
-		if ( !tu.isTranslatable()) 
+		if ( !tu.isTranslatable() ) {
 			return event;
-
-		String forceEscape = " * -,.";
-		String tmp = null;
-		StringBuilder sb = new StringBuilder();
-		StringBuilder sbTemp = new StringBuilder();
-
+		}
 		// Else: do the requested modifications
+		
 		// Make sure we have a target where to set data
 		tu.createTarget(trgLang, false, IResource.COPY_ALL);
+		TextContainer cont = tu.getTarget(trgLang);
+		String res;
 
 		try {
-			String result = tu.getTarget(trgLang).getCodedText();
-			
-			if ( params.conversionType == UNESCAPE ){
-				//--do unescape
-				
-				//--loop all characters--
-				for ( int i=0; i<result.length(); i++ ) {
-					switch ( result.charAt(i) ) {
-					case TextFragment.MARKER_OPENING:
-					case TextFragment.MARKER_CLOSING:
-					case TextFragment.MARKER_ISOLATED:
-					case TextFragment.MARKER_SEGMENT:
-						sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
-						sb.append(result.charAt(i));
-						i++;
-						sb.append(result.charAt(i));
-						sbTemp = new StringBuilder();
-						break;
-
-					case '+':
-						sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
-						sb.append(result.charAt(i));
-						sbTemp = new StringBuilder();
-						break;
-						
-					default:
-						sbTemp.append(result.charAt(i));
-						break;
-					}
-				}				
-				sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
-
-			}else{
-				//--do escape
-			
-				//--loop all characters--
-				for ( int i=0; i<result.length(); i++ ) {
-			
-					String subStr = result.substring(i, i+1);
-					
-					//--process if extended character if selected--
-					if (( result.charAt(i) > '\u007f' ) && (params.updateAll )){
-					
-						switch ( result.charAt(i) ) {
-						case TextFragment.MARKER_OPENING:
-						case TextFragment.MARKER_CLOSING:
-						case TextFragment.MARKER_ISOLATED:
-						case TextFragment.MARKER_SEGMENT:
-							sb.append(result.charAt(i));
-							i++;
-							sb.append(result.charAt(i));
-							break;
-						default:
-							sb.append(URLEncoder.encode(subStr,"UTF-8"));
-							break;
-						}
-					}else if (params.escapeList.contains(subStr)){
-						
-						if(forceEscape.contains(subStr)){
-							byte bytes[] = subStr.getBytes();
-							sb.append("%"+Integer.toHexString(bytes[0]));
-						}else{
-							sb.append(URLEncoder.encode(subStr,"UTF-8"));							
-						}
-
-					}else{
-						sb.append(result.charAt(i));
-					}
-				}	
+			// Process the main content (segmented or not)
+			if ( params.conversionType == Parameters.UNESCAPE ) {
+				res = unescape(cont.getCodedText());
 			}
-			
-			TextContainer cnt = tu.getTarget(trgLang);
-			cnt.setCodedText(sb.toString(), tu.getSourceContent().getCodes(), false);
+			else {
+				res = escape(cont.getCodedText());
+			}
+			cont.setCodedText(res); // No change of the inline codes
+
+			// Then, for segmented content
+			if ( cont.isSegmented() ) {
+				// Process each of the segments
+				for ( Segment seg : cont.getSegments() ) {
+					if ( params.conversionType == Parameters.UNESCAPE ) {
+						res = unescape(seg.text.getCodedText());
+					}
+					else {
+						res = escape(seg.text.getCodedText());
+					}
+					seg.text.setCodedText(res); // No change of the inline codes
+				}
+			}
 		}
 		catch ( Exception e ) {
-			logger.log(Level.WARNING, "Error when updating content: '"+tmp+"'", e);
+			logger.log(Level.SEVERE, String.format("Error when updating content: '%s'", cont.toString()), e);
 		}
 		
 		return event;
 	}		
+
+	private String unescape (String text) {
+		StringBuilder sb = new StringBuilder();
+		StringBuilder sbTemp = new StringBuilder();
+		try {
+			for ( int i=0; i<text.length(); i++ ) {
+				switch ( text.charAt(i) ) {
+				case TextFragment.MARKER_OPENING:
+				case TextFragment.MARKER_CLOSING:
+				case TextFragment.MARKER_ISOLATED:
+				case TextFragment.MARKER_SEGMENT:
+					sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
+					sb.append(text.charAt(i));
+					i++;
+					sb.append(text.charAt(i));
+					sbTemp = new StringBuilder();
+					break;
+	
+				case '+':
+					sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
+					sb.append(text.charAt(i));
+					sbTemp = new StringBuilder();
+					break;
+					
+				default:
+					sbTemp.append(text.charAt(i));
+					break;
+				}
+			}
+			sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
+		}
+		catch (UnsupportedEncodingException e) {
+			logger.log(Level.SEVERE, String.format("Error when unescaping: '%s'", text), e);
+		}
+		return sb.toString();
+	}
+
+	private String escape (String text) {
+		StringBuilder sb = new StringBuilder();
+		try {
+			for ( int i=0; i<text.length(); i++ ) {
+				String subStr = text.substring(i, i+1);
+				// Process if extended character if selected
+				if (( text.charAt(i) > '\u007f' ) && ( params.updateAll )) {
+					switch ( text.charAt(i) ) {
+					case TextFragment.MARKER_OPENING:
+					case TextFragment.MARKER_CLOSING:
+					case TextFragment.MARKER_ISOLATED:
+					case TextFragment.MARKER_SEGMENT:
+						sb.append(text.charAt(i));
+						i++;
+						sb.append(text.charAt(i));
+						break;
+					default:
+						sb.append(URLEncoder.encode(subStr,"UTF-8"));
+						break;
+					}
+				}
+				else if ( params.escapeList.contains(subStr) ) {
+					if ( FORCEESCAPE.contains(subStr) ) {
+						byte bytes[] = subStr.getBytes();
+						sb.append("%"+Integer.toHexString(bytes[0]));
+					}
+					else {
+						sb.append(URLEncoder.encode(subStr,"UTF-8"));							
+					}
+				}
+				else {
+					sb.append(text.charAt(i));
+				}
+			}
+		}
+		catch (UnsupportedEncodingException e) {
+			logger.log(Level.SEVERE, String.format("Error when escaping: '%s'", text), e);
+		}
+		return sb.toString();
+	}
+
 }

@@ -142,7 +142,7 @@ public class GoogleMTConnector implements IQuery {
 			current = 0;
 		}
 		catch ( Throwable e ) {
-			throw new RuntimeException("Error querying the server.", e);
+			throw new RuntimeException("Error querying the server." + e.getMessage(), e);
 		}
 		return ((current==0) ? 1 : 0);
 	}

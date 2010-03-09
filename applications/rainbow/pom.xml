@@ -325,6 +325,11 @@
 			<artifactId>okapi-step-tokenization</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-uriconversion</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 <!-- Plugin
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>

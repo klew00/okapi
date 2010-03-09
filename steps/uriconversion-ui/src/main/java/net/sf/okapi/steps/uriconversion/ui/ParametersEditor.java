@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -162,7 +162,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		mainComposite.setLayout(new GridLayout(2, false));
 		
 		chkUnescape = new Button (mainComposite, SWT.RADIO);
-		chkUnescape.setText("Un-escape the URI escape sequence");
+		chkUnescape.setText("Un-escape the URI escape sequences");
 		chkUnescape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 		chkUnescape.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -176,7 +176,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});		
 	
 		chkEscape = new Button (mainComposite, SWT.RADIO);
-		chkEscape.setText("Escape content to URI escape sequence");
+		chkEscape.setText("Escape content to URI escape sequences");
 		chkEscape.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
 		chkEscape.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -219,7 +219,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		int buttonWidth = 170;
 		btnFirstOption = new Button(mainComposite, SWT.PUSH);
-		btnFirstOption.setText("All But URI-Marks");
+		btnFirstOption.setText("All But Marks");
 		gdTmp = new GridData();
 		gdTmp.horizontalIndent = indent;
 		btnFirstOption.setLayoutData(gdTmp);

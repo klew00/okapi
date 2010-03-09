@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,6 +24,7 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
+	public final static int UNESCAPE = 0;
 	public int conversionType;
 	public boolean updateAll;
 	public String escapeList;
@@ -33,30 +34,26 @@ public class Parameters extends BaseParameters {
 	}
 
 	public void reset () {
-		conversionType = 0;
+		conversionType = UNESCAPE;
 		updateAll = false;
 		escapeList = "%{}[]()&";
 	}
 
 	public void fromString (String data) {
-
 		reset();
-		
 		// Read the file content as a set of fields
 		buffer.fromString(data);
-		
 		conversionType = buffer.getInteger("conversionType", conversionType);
 		updateAll = buffer.getBoolean("updateAll", updateAll);
 		escapeList = buffer.getString("escapeList", escapeList);
 	}
 	
 	public String toString() {
-
 		buffer.reset();
 		buffer.setInteger("conversionType", conversionType);
 		buffer.setBoolean("updateAll", updateAll);		
 		buffer.setString("escapeList", escapeList);
-
 		return buffer.toString();
 	}
+
 }

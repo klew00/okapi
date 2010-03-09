@@ -50,6 +50,7 @@ import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithFilterPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TextRewritingPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TranslationComparisonPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.URIConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XSLTransformPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithoutFilterPipeline;
 import net.sf.okapi.common.Util;
@@ -1424,6 +1425,14 @@ public class MainForm { //implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				executePipeline(new XSLTransformPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.uriconversion"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new URIConversionPipeline());
 			}
 		});
 		

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.Project;
@@ -47,6 +48,8 @@ import net.sf.okapi.common.plugins.PluginsManager;
 
 public class PipelineWrapper {
 	
+	private final Logger LOGGER = Logger.getLogger(getClass().getName());
+
 	private Map<String, StepInfo> availableSteps;
 	private String path;
 	private ArrayList<StepInfo> steps;
@@ -54,33 +57,43 @@ public class PipelineWrapper {
 	private IFilterConfigurationMapper fcMapper;
 	private IParametersEditorMapper peMapper;
 
-	public void addFromPlugins (PluginsManager pm)
-	{
+	public void addFromPlugins (PluginsManager pm) {
 		try {
 			List<PluginItem> plugins = pm.getList();
 			URLClassLoader classLoader = pm.getClassLoader();
 			for ( PluginItem item : plugins ) {
+				// Skip plug-ins that are not steps
 				if ( item.getType() != PluginItem.TYPE_IPIPELINESTEP ) continue;
-				
-				IPipelineStep ps = (IPipelineStep)Class.forName(item.getClassName(), true, classLoader).newInstance();
-				IParameters params = ps.getParameters();
-				StepInfo stepInfo = new StepInfo(ps.getClass().getSimpleName(),
-					ps.getName(), ps.getDescription(), ps.getClass().getName(), classLoader,
-					(params==null) ? null : params.getClass().getName());
-				if ( params != null ) {
-					stepInfo.paramsData = params.toString();
-					if ( item.getEditorDescriptionProvider() != null ) {
-						peMapper.addDescriptionProvider(item.getEditorDescriptionProvider(), stepInfo.paramsClass);
+				try {
+					// Instantiate the step and get its info
+					IPipelineStep ps = (IPipelineStep)Class.forName(item.getClassName(), true, classLoader).newInstance();
+					IParameters params = ps.getParameters();
+					StepInfo stepInfo = new StepInfo(ps.getClass().getSimpleName(),
+						ps.getName(), ps.getDescription(), ps.getClass().getName(), classLoader,
+						(params==null) ? null : params.getClass().getName());
+					
+					// Try to get the editor info if needed
+					if ( params != null ) {
+						stepInfo.paramsData = params.toString();
+						if ( item.getEditorDescriptionProvider() != null ) {
+							peMapper.addDescriptionProvider(item.getEditorDescriptionProvider(), stepInfo.paramsClass);
+						}
+						if ( item.getParamsEditor() != null ) {
+							peMapper.addEditor(item.getParamsEditor(), stepInfo.paramsClass);
+						}
 					}
-					if ( item.getParamsEditor() != null ) {
-						peMapper.addEditor(item.getParamsEditor(), stepInfo.paramsClass);
-					}
+					
+					// Add the step
+					availableSteps.put(stepInfo.id, stepInfo);
 				}
-				availableSteps.put(stepInfo.id, stepInfo);
+				catch ( Throwable e ) {
+					LOGGER.warning(String.format("Could not instantiate step '%s' because of error.\n"
+						+e.getMessage(), item.getClassName()));
+				}
 			}
 		}
 		catch ( Throwable e ) {
-			throw new RuntimeException("Error when creating the plug-ins lists.", e);
+			throw new RuntimeException("Error when creating the plug-ins lists.\n"+e.getMessage(), e);
 		}
 	}
 
@@ -361,18 +374,17 @@ public class PipelineWrapper {
 			}
 			availableSteps.put(step.id, step);
 
-// Not ready
-//			ps = (IPipelineStep)Class.forName(
-//				"net.sf.okapi.steps.uriconversion.UriConversionStep").newInstance();
-//			params = ps.getParameters();
-//			step = new StepInfo(ps.getClass().getSimpleName(),
-//				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
-//				params.getClass().getName());
-//			if ( params != null ) {
-//				step.paramsData = params.toString();
-//				peMapper.addEditor("net.sf.okapi.steps.uriconversion.ui.ParametersEditor", step.paramsClass);
-//			}
-//			availableSteps.put(step.id, step);
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.uriconversion.UriConversionStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addEditor("net.sf.okapi.steps.uriconversion.ui.ParametersEditor", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.wordcount.WordCountStep").newInstance();
@@ -397,6 +409,19 @@ public class PipelineWrapper {
 				peMapper.addEditor("net.sf.okapi.steps.xsltransform.ui.ParametersEditor", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
+
+// not ready
+//			ps = (IPipelineStep)Class.forName(
+//				"net.sf.okapi.steps.xliffkit.writer.XLIFFKitWriterStep").newInstance();
+//			params = ps.getParameters();
+//			step = new StepInfo(ps.getClass().getSimpleName(),
+//				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+//				params.getClass().getName());
+//			if ( params != null ) {
+//				step.paramsData = params.toString();
+//				peMapper.addDescriptionProvider("net.sf.okapi.steps.xliffkit.writer.Parameters", step.paramsClass);
+//			}
+//			availableSteps.put(step.id, step);
 		}
 		catch ( InstantiationException e ) {
 			e.printStackTrace();

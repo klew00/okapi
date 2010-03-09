@@ -122,7 +122,7 @@
   </info>
  </plugin>
 
- <plugin type="utility"
+<!-- <plugin type="utility"
   id="oku_uriconversion"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Utility"
@@ -133,7 +133,7 @@
    <description>Performs a URI conversion on the input file.</description>
    <provider>Okapi Framework</provider>
   </info>
- </plugin>
+ </plugin> -->
 
  <plugin type="utility"
    id="oku_rtfconversion"
