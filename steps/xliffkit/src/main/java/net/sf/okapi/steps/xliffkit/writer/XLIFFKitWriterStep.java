@@ -58,7 +58,7 @@ import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.openxml4j.opc.StreamHelper;
 import org.apache.poi.openxml4j.opc.TargetMode;
 
-@UsingParameters()
+@UsingParameters(Parameters.class)
 public class XLIFFKitWriterStep extends BasePipelineStep {
 
 	private static final String RESTYPEVALUES = 

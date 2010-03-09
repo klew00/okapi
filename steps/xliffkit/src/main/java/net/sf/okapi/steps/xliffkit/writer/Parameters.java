@@ -21,10 +21,12 @@
 package net.sf.okapi.steps.xliffkit.writer;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
+@EditorFor(XLIFFKitWriterStep.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	static final String GMODE = "gMode"; //$NON-NLS-1$
