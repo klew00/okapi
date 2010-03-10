@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.translation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -175,6 +176,23 @@ public class QueryUtil {
 			entities.ensureInitialization(false);
 		}
 
+		// Create a lists to verify the codes
+		ArrayList<String> newCodes = new ArrayList<String>();
+		ArrayList<String> oriCodes = new ArrayList<String>(); 
+		for ( Code code: fragment.getCodes() ) {
+			switch ( code.getTagType() ) {
+			case OPENING:
+				oriCodes.add(String.format("o%d", code.getId()));
+				break;
+			case CLOSING:
+				oriCodes.add(String.format("c%d", code.getId()));
+				break;
+			case PLACEHOLDER:
+				oriCodes.add(String.format("i%d", code.getId()));
+				break;
+			}
+		}
+
 		// Un-escape character entity references
 		Matcher m;
 		while ( true ) {
@@ -223,9 +241,11 @@ public class QueryUtil {
             		TextFragment.toChar(fragment.getIndex(id)));
             	sb.replace(m.start(), m.end(), markers);
             	stack.push(id);
+            	newCodes.add(String.format("o%d", id));
         	}
         	else {
         		// It's a closing tag
+        		newCodes.add(String.format("c%d", stack.peek()));
             	markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
                		TextFragment.toChar(fragment.getIndexForClosing(stack.pop())));
             	sb.replace(m.start(), m.end(), markers);
@@ -241,6 +261,7 @@ public class QueryUtil {
         		TextFragment.toChar(fragment.getIndex(id)));
         	sb.replace(m.start(), m.end(), markers);
         	m = HTML_ISOLATED.matcher(sb.toString());
+    		newCodes.add(String.format("i%d", id));
         }
 
         // Remove any span elements that may have been added
@@ -250,8 +271,39 @@ public class QueryUtil {
         	sb.replace(m.start(), m.end(), "");
         	m = HTML_SPAN.matcher(sb.toString());
         }
-        
-		return sb.toString();
+
+        // Tries to correct missing codes
+        if ( newCodes.size() < oriCodes.size() ) {
+        	for ( String tmp : oriCodes ) {
+        		if ( !newCodes.contains(tmp) ) {
+        			switch ( tmp.charAt(0) ) {
+        			case 'o':
+                    	sb.append(String.format("%c%c", TextFragment.MARKER_OPENING,
+                       		TextFragment.toChar(
+                       			fragment.getIndex(
+                       				Integer.parseInt(
+                       					tmp.substring(1))))));
+        				break;
+        			case 'c':
+                    	sb.append(String.format("%c%c", TextFragment.MARKER_CLOSING,
+                       		TextFragment.toChar(
+                       			fragment.getIndexForClosing(
+                       				Integer.parseInt(
+                       					tmp.substring(1))))));
+        				break;
+        			case 'i':
+                    	sb.append(String.format("%c%c", TextFragment.MARKER_ISOLATED,
+                       		TextFragment.toChar(
+                       			fragment.getIndex(
+                       				Integer.parseInt(
+                       					tmp.substring(1))))));
+        				break;
+        			}
+        		}
+        	}
+        }
+	
+        return sb.toString();
 	}
 
 	/**

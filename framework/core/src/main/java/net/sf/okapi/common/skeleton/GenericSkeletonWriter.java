@@ -23,6 +23,7 @@ package net.sf.okapi.common.skeleton;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
@@ -56,6 +57,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	protected EncoderManager encoderManager;
 	protected Stack<StorageList> storageStack;
 	
+	private final Logger logger = Logger.getLogger(getClass().getName());
+
 	private LinkedHashMap<String, Referent> referents;
 	private String outputEncoding;
 	private boolean isMultilingual;
@@ -248,6 +251,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Else this is a true reference to a referent
 		IReferenceable ref = getReference((String)marker[0]);
 		if ( ref == null ) {
+			logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));
 			return "-ERR:REF-NOT-FOUND-";
 		}
 		if ( ref instanceof TextUnit ) {
@@ -269,6 +273,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		int context)
 	{
 		if ( ref == null ) {
+			logger.warning(String.format("Null reference for '%s'.", propName));
 			return "-ERR:NULL-REF-";
 		}
 		if ( propName != null ) {
@@ -283,6 +288,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( ref instanceof StorageList ) {
 			return getString((StorageList)ref, locToUse, context);
 		}
+		logger.warning(String.format("Invalid reference type for '%s'.", propName));
 		return "-ERR:INVALID-REFTYPE-";
 	}
 
@@ -646,6 +652,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			String propName = (String)marker[3];
 			IReferenceable ref = getReference((String)marker[0]);
 			if ( ref == null ) {
+				logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));				
 				tmp.replace(start, end, "-ERR:REF-NOT-FOUND-");
 			}
 			else if ( propName != null ) {
@@ -720,10 +727,16 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			}
 		}
 		// Check the property we got
-		if ( prop == null ) return "-ERR:PROP-NOT-FOUND-";
+		if ( prop == null ) {
+			logger.warning(String.format("Property '%s' not found.", name));
+			return "-ERR:PROP-NOT-FOUND-";
+		}
 		// Else process the value
 		String value = prop.getValue();
-		if ( value == null ) return "-ERR:PROP-VALUE-NULL-";
+		if ( value == null ) {
+			logger.warning(String.format("Property value for '%s' is null.", name));
+			return "-ERR:PROP-VALUE-NULL-";
+		}
 		
 		// Else: We got the property value
 		// Check if it needs to be auto-modified

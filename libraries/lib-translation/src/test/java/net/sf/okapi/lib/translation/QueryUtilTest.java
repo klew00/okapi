@@ -89,6 +89,19 @@ public class QueryUtilTest {
 	}
 	
 	@Test
+	public void testSimpleHTMLWithCorrection () {
+		TextFragment tf = makeFragment();
+		String htmlText = qu.toCodedHTML(tf);
+		assertEquals("a &amp; &lt; > \" \' <s id='1'>bold</s> t <br id='2'/> z", htmlText);
+		// Send something with missing codes (faking translation results)
+		htmlText = "a <s id='1'>b</s> c";
+		String codedText = qu.fromCodedHTML(htmlText, tf);
+		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
+		assertEquals("a <1>b</1> c<2/>", fmt.setContent(resFrag).toString());
+		assertEquals("a <b>b</b> c<br/>", resFrag.toString());
+	}
+	
+	@Test
 	public void testFromSameHTMLComplex () {
 		TextFragment tf = makeComplexFragment();
 		String htmlText = qu.toCodedHTML(tf);
@@ -109,6 +122,20 @@ public class QueryUtilTest {
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("t1<2><3><1>t2</1></3>t3</2>", fmt.setContent(resFrag).toString());
 		assertEquals("t1<s><b><b>t2</b></b>t3</s>", resFrag.toString());
+	}
+	
+	@Test
+	public void testFromHTMLComplexWithMovedCodesWithCorrection () {
+		TextFragment tf = makeComplexFragment();
+		String htmlText = qu.toCodedHTML(tf);
+		// What we send:
+		assertEquals("t1<s id='1'><s id='2'>bs1</s></s>t2<s id='3'>b1</s>", htmlText);
+		// What we get back from the translation:
+		htmlText = "t1<s id='2'><s id='1'>t2</s>t3</s>";
+		String codedText = qu.fromCodedHTML(htmlText, tf);
+		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
+		assertEquals("t1<2><1>t2</1>t3</2><3></3>", fmt.setContent(resFrag).toString());
+		assertEquals("t1<s><b>t2</b>t3</s><b></b>", resFrag.toString());
 	}
 	
 	@Test
