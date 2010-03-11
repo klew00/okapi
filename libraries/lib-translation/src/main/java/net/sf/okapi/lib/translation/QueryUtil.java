@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -272,7 +272,7 @@ public class QueryUtil {
         	m = HTML_SPAN.matcher(sb.toString());
         }
 
-        // Tries to correct missing codes
+        // Try to correct missing codes
         if ( newCodes.size() < oriCodes.size() ) {
         	for ( String tmp : oriCodes ) {
         		if ( !newCodes.contains(tmp) ) {

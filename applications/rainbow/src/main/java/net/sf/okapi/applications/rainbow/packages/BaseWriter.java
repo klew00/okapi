@@ -156,11 +156,6 @@ public abstract class BaseWriter implements IWriter {
 			if ( manifest != null ) {
 				manifest.Save();
 			}
-			if ( createZip ) {
-				// Zip the package if needed
-                //TODO: What if manifest is null?
-				Compression.zipDirectory(manifest.getRoot(), manifest.getRoot() + ".zip");
-			}
 	
 			tmxWriterApproved.writeEndDocument();
 			tmxWriterApproved.close();
@@ -188,6 +183,11 @@ public abstract class BaseWriter implements IWriter {
 			if ( tmxWriterLeverage.getItemCount() == 0 ) {
 				File file = new File(tmxPathLeverage);
 				file.delete();
+			}
+
+			// Zip the package if needed
+			if ( createZip && ( manifest != null )) {
+				Compression.zipDirectory(manifest.getRoot(), manifest.getRoot() + ".zip");
 			}
 		}
 		catch ( IOException e ) {
