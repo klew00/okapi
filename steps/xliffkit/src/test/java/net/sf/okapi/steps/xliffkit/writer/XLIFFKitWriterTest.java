@@ -26,9 +26,11 @@ import java.io.InputStream;
 import java.net.URL;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.plaintext.ParaPlainTextFilterTest;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
@@ -147,17 +149,19 @@ public class XLIFFKitWriterTest {
 	public void testXLIFFFilterEvents() {
 		
 		XLIFFFilter filter = new XLIFFFilter();
-		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/TestDocument01.odt.xlf");
-		filter.open(new RawDocument(input, "UTF-8", LocaleId.ENGLISH));
+		InputStream input = this.getClass().getResourceAsStream("TestDocument01.odt.xlf");
+		filter.open(new RawDocument(input, "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH));
 		
-		Event event;
+		Event event = null;
+		TextUnit tu = null;
+
+		while (filter.hasNext()) {
+			event = filter.next();
+			if (event.getEventType() != EventType.TEXT_UNIT) continue;
 		
-		event = filter.next();
-		event = filter.next();
-		event = filter.next();
-		event = filter.next();
-		event = filter.next();
-		event = filter.next();
+			tu = event.getTextUnit();
+			if ("2".equals(tu.getId())) break;
+		}
 		
 		filter.close();
 	}
