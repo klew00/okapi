@@ -22,10 +22,15 @@ package net.sf.okapi.steps.xliffkit.writer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.filters.plaintext.ParaPlainTextFilterTest;
+import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.textmodification.TextModificationStep;
@@ -63,14 +68,14 @@ public class XLIFFKitWriterTest {
 			new Pipeline(
 					"Test pipeline for XLIFFKitWriterStep",
 					new Batch(
-							new BatchItem(
-									this.getClass().getResource(inPath1),
-									"UTF-8",
-									Util.getDirectoryName(this.getClass().getResource(inPath1).getPath()) + 
-											"/" + inPath1 + ".en.fr.xliff.kit",
-									"UTF-8",
-									LocaleId.ENGLISH,
-									LocaleId.FRENCH),
+//							new BatchItem(
+//									this.getClass().getResource(inPath1),
+//									"UTF-8",
+//									Util.getDirectoryName(this.getClass().getResource(inPath1).getPath()) + 
+//											"/" + inPath1 + ".en.fr.xliff.kit",
+//									"UTF-8",
+//									LocaleId.ENGLISH,
+//									LocaleId.FRENCH),
 									
 							new BatchItem(
 									this.getClass().getResource(inPath2),
@@ -79,16 +84,17 @@ public class XLIFFKitWriterTest {
 											"/" + inPath2 + ".en.fr.xliff.kit",
 									"UTF-8",
 									LocaleId.ENGLISH,
-									LocaleId.FRENCH),
+									LocaleId.FRENCH) //,
 									
-							new BatchItem(
-									this.getClass().getResource(inPath1),
-									"UTF-8",
-									Util.getDirectoryName(this.getClass().getResource(inPath1).getPath()) + 
-										"/" + inPath1 + ".en.zh-cn.xliff.kit",
-									"UTF-16",
-									LocaleId.ENGLISH,
-									LocaleId.CHINA_CHINESE)),
+//							new BatchItem(
+//									this.getClass().getResource(inPath1),
+//									"UTF-8",
+//									Util.getDirectoryName(this.getClass().getResource(inPath1).getPath()) + 
+//										"/" + inPath1 + ".en.zh-cn.xliff.kit",
+//									"UTF-16",
+//									LocaleId.ENGLISH,
+//									LocaleId.CHINA_CHINESE)
+							),
 									
 					new RawDocumentToFilterEventsStep(),
 					
@@ -135,6 +141,25 @@ public class XLIFFKitWriterTest {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}  
+	}
+	
+	@Test
+	public void testXLIFFFilterEvents() {
+		
+		XLIFFFilter filter = new XLIFFFilter();
+		InputStream input = ParaPlainTextFilterTest.class.getResourceAsStream("/TestDocument01.odt.xlf");
+		filter.open(new RawDocument(input, "UTF-8", LocaleId.ENGLISH));
+		
+		Event event;
+		
+		event = filter.next();
+		event = filter.next();
+		event = filter.next();
+		event = filter.next();
+		event = filter.next();
+		event = filter.next();
+		
+		filter.close();
 	}
 	
 }
