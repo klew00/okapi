@@ -41,6 +41,7 @@ import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
@@ -155,10 +156,13 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		case TEXT_UNIT:
 			processTextUnit((TextUnit)event.getResource());
 			break;
+		case DOCUMENT_PART:
+			processDocumentPart((DocumentPart)event.getResource());
+			break;
 		}
 		return event;
 	}
-	
+		
 	private void processStartDocument (StartDocument resource) {
 		if ( writer != null ) writer.close();
 
@@ -407,6 +411,10 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
 
+	private void processDocumentPart(DocumentPart resource) {
+		
+	}
+	
 	@Override
 	public IParameters getParameters() {
 		return params;
