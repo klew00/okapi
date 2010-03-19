@@ -46,6 +46,7 @@
         <module>sentence-aligner</module>
         <module>xliffkit</module>
         <module>diffleverage</module>
+        <module>external-command</module>
     </modules>
 
     <build>
