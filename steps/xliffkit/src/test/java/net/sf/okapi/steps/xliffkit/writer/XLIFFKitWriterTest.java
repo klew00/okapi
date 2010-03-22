@@ -20,10 +20,7 @@
 
 package net.sf.okapi.steps.xliffkit.writer;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -34,20 +31,19 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
-import net.sf.okapi.steps.textmodification.TextModificationStep;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
+import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Pipeline;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.PipelineStep;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
 
 import org.junit.Test;
 
 public class XLIFFKitWriterTest {
 
-	private final String IN_NAME1 = "Gate Openerss.htm";
+//	private final String IN_NAME1 = "Gate Openerss.htm";
 	private final String IN_NAME2 = "TestDocument01.odt";
-	private final String IN_NAME3 = "test.txt";
+	private final String IN_NAME3 = "test4.txt";
 	
 	private Pipeline buildPipeline(String inPath1, String inPath2) {
 		
@@ -85,8 +81,9 @@ public class XLIFFKitWriterTest {
 											"/" + inPath2 + ".en.fr.xliff.kit",
 									"UTF-8",
 									LocaleId.ENGLISH,
-									LocaleId.FRENCH) //,
-									
+									LocaleId.FRENCH)
+//							,
+//									
 //							new BatchItem(
 //									this.getClass().getResource(inPath1),
 //									"UTF-8",
@@ -122,11 +119,10 @@ public class XLIFFKitWriterTest {
 			);
 	}
 	
-	@Test
-	public void testOutputFile() {
-		
-		// DEBUG
+	// DEBUG @Test
+	public void testOutputFile() {		
 		//buildPipeline(IN_NAME3, IN_NAME2).execute();
+		buildPipeline(IN_NAME2, IN_NAME3).execute();
 	}
 
 	@Test
@@ -144,7 +140,7 @@ public class XLIFFKitWriterTest {
 //		}  
 	}
 	
-	@Test
+	// DEBUG @Test
 	public void testXLIFFFilterEvents() {
 		
 		XLIFFFilter filter = new XLIFFFilter();

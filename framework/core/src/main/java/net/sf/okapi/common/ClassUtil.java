@@ -26,6 +26,18 @@ import java.lang.reflect.InvocationTargetException;
 public class ClassUtil {
 	
 	/**
+	 * Gets the runtime class of the given object.
+	 * @param obj The object.
+	 * @return The object's runtime class.
+	 */
+	public static Class<?> getClass(Object obj) {
+		
+		if (obj == null) return null;
+	
+		return obj.getClass();
+	}
+	
+	/**
 	 * Gets non-qualified (w/o package name prefix) class name for the given object.
 	 * @param obj The object
 	 * @return The object's class name (w/o package name prefix)

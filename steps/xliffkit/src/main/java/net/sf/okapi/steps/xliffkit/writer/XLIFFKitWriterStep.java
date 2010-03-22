@@ -23,6 +23,7 @@ package net.sf.okapi.steps.xliffkit.writer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,6 +50,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.steps.xliffkit.common.persistence.JSONPersistenceSession;
 import net.sf.okapi.steps.xliffkit.opc.TKitRelationshipTypes;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -76,8 +78,8 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 
 	private XMLWriter writer;
 	private XLIFFContent xliffCont;
-	private LocaleId srcLang;
-	private LocaleId trgLang;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	private boolean inFile;
 	private String docMimeType;
 	private String docName;
@@ -94,14 +96,18 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	private String tbxFileName;
 	private String srxFileName;
 	private String annotationsFileName;
+	private String filterWriterClassName;
 
 	private OPCPackage pack;
 	private File tempXliff;
+	private File tempSkeleton;
+	private JSONPersistenceSession skelSession;
 	
 	public XLIFFKitWriterStep() {
 		super();
 		xliffCont = new XLIFFContent();
 		params = new Parameters();
+		skelSession = new JSONPersistenceSession(Event.class);
 	}
 	
 	public String getDescription () {
@@ -124,7 +130,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
-		this.trgLang = targetLocale;
+		this.trgLoc = targetLocale;
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
@@ -133,12 +139,15 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	}
 	
 	public Event handleEvent (Event event) {
+		
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			processStartDocument((StartDocument)event.getResource());
 			break;
 		case END_DOCUMENT:
-			processEndDocument();
+			if (skelSession.isActive())
+				skelSession.serialize(event);
+			processEndDocument(); // Closes persistence session
 			close();
 			break;
 		case START_SUBDOCUMENT:
@@ -160,20 +169,23 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 			processDocumentPart((DocumentPart)event.getResource());
 			break;
 		}
+		if (skelSession.isActive())
+			skelSession.serialize(event);
+		
 		return event;
 	}
 		
 	private void processStartDocument (StartDocument resource) {
-		if ( writer != null ) writer.close();
+		close();
 
-		srcLang = resource.getLocale();						
+		srcLoc = resource.getLocale();						
 		docMimeType = resource.getMimeType();
 		docName = resource.getName();
 		inputEncoding = resource.getEncoding();
 		
-		IParameters params = resource.getFilterParameters();
-		if ( params == null ) configId = null;
-		else configId = params.getPath();
+		IParameters fparams = resource.getFilterParameters();
+		if ( fparams == null ) configId = null;
+		else configId = fparams.getPath();
 		
 		originalFileName = Util.getFilename(docName, true);
 		xliffFileName = originalFileName + ".xlf";
@@ -182,10 +194,14 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		tbxFileName = originalFileName + ".tbx";
 		srxFileName = originalFileName + ".srx";
 		annotationsFileName = originalFileName + ".annotations";
+		filterWriterClassName = resource.getFilterWriter().getClass().getName();
 		
 		try {
 			tempXliff = File.createTempFile(xliffFileName, null);
 			tempXliff.deleteOnExit();
+			
+			tempSkeleton = File.createTempFile(skeletonFileName, null);
+			tempSkeleton.deleteOnExit();
 		
 			writer = new XMLWriter(new PrintWriter(tempXliff)); // XLIFF file writer
 			writer.writeStartDocument();
@@ -206,24 +222,24 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		} catch (InvalidFormatException e1) {
 			// TODO Handle exception
 		}
-				
+		
+		// Skeleton
+		try {
+			skelSession.start(new FileOutputStream(tempSkeleton));
+		} catch (FileNotFoundException e) {
+			// TODO Handle exception
+		}
 	}
 	
-	private void processEndDocument () {
-		if ( inFile ) writeEndFile();
-		writer.writeEndElementLineBreak(); // xliff
-		writer.writeEndDocument();
-		close();
-		
-		// Save to package
+	private void createInternalPart(OPCPackage pack, String name, File file, String contentType, String relationshipType) {		
 		try {
-			PackagePartName xliffPartName = PackagingURIHelper.createPartName("/" + xliffFileName);
-			PackagePart xliffPart = pack.createPart(xliffPartName, MimeTypeMapper.XLIFF_MIME_TYPE);
-			pack.addRelationship(xliffPartName, TargetMode.INTERNAL, TKitRelationshipTypes.CORE_DOCUMENT);
+			PackagePartName partName = PackagingURIHelper.createPartName("/" + name);
+			PackagePart part = pack.createPart(partName, contentType);
+			pack.addRelationship(partName, TargetMode.INTERNAL, relationshipType);
 			
 			try {
-				InputStream is = new FileInputStream(tempXliff);
-				OutputStream os = xliffPart.getOutputStream(); 
+				InputStream is = new FileInputStream(file);
+				OutputStream os = part.getOutputStream(); 
 				StreamHelper.copyStream(is, os);
 				try {
 					is.close();
@@ -239,6 +255,21 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		} catch (InvalidFormatException e) {
 			// TODO Handle exception
 		}
+	}
+	
+	private void processEndDocument () {		
+		// Skeleton
+		skelSession.end();
+		
+		// XLIFF
+		if ( inFile ) writeEndFile();
+		writer.writeEndElementLineBreak(); // xliff
+		writer.writeEndDocument();
+		writer.close();
+		
+		// Save to package
+		createInternalPart(pack, xliffFileName, tempXliff, MimeTypeMapper.XLIFF_MIME_TYPE, TKitRelationshipTypes.CORE_DOCUMENT);
+		createInternalPart(pack, skeletonFileName, tempSkeleton, JSONPersistenceSession.MIME_TYPE, TKitRelationshipTypes.CORE_SKELETON);		
 						
 		try {
 			pack.close();
@@ -261,9 +292,9 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		writer.writeStartElement("file");
 		writer.writeAttributeString("original",
 			(original!=null) ? original : "unknown");
-		writer.writeAttributeString("source-language", srcLang.toBCP47());
-		if ( trgLang != null ) {
-			writer.writeAttributeString("target-language", trgLang.toBCP47());
+		writer.writeAttributeString("source-language", srcLoc.toBCP47());
+		if ( trgLoc != null ) {
+			writer.writeAttributeString("target-language", trgLoc.toBCP47());
 		}
 		
 		if ( contentType == null ) contentType = "x-undefined";
@@ -282,6 +313,14 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		
 		inFile = true;
 
+		writer.writeStartElement("header");
+		writer.writeStartElement("skl");
+		writer.writeStartElement("external-file");
+		writer.writeAttributeString("href", skeletonFileName);
+		writer.writeEndElement(); // external-file
+		writer.writeEndElementLineBreak(); // skl
+		writer.writeEndElementLineBreak(); // header
+		
 		writer.writeStartElement("body");
 		writer.writeLineBreak();
 	}
@@ -322,16 +361,16 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	
 	private void processTextUnit (TextUnit tu) {
 		// Check if we need to set the entry as non-translatable
-//		if ( options.setApprovedAsNoTranslate ) {
-//			Property prop = tu.getTargetProperty(trgLang, Property.APPROVED);
-//			if (( prop != null ) && prop.getValue().equals("yes") ) {
-//				tu.setIsTranslatable(false);
-//			}
-//		}
+		if ( params.isSetApprovedAsNoTranslate()) {
+			Property prop = tu.getTargetProperty(trgLoc, Property.APPROVED);
+			if (( prop != null ) && prop.getValue().equals("yes") ) {
+				tu.setIsTranslatable(false);
+			}
+		}
 		// Check if we need to skip non-translatable entries
-//		if ( !options.includeNoTranslate && !tu.isTranslatable() ) {
-//			return;
-//		}
+		if ( !params.isIncludeNoTranslate() && !tu.isTranslatable() ) {
+			return;
+		}
 
 		if ( !inFile ) writeStartFile(docName, docMimeType, configId, inputEncoding);
 
@@ -350,17 +389,14 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 				writer.writeAttributeString("restype", "x-"+tmp);
 			}
 		}
-		if ( !tu.isTranslatable() ) {
+		if ( !tu.isTranslatable() )
 			writer.writeAttributeString("translate", "no");
-		}
 
-		if ( trgLang != null ) {
-			if ( tu.hasTargetProperty(trgLang, Property.APPROVED) ) {
-				if ( tu.getTargetProperty(trgLang, Property.APPROVED).getValue().equals("yes") ) {
-					writer.writeAttributeString(Property.APPROVED, "yes");
-				}
-				// "no" is the default
+		if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
+			if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
+				writer.writeAttributeString(Property.APPROVED, "yes");
 			}
+			// "no" is the default
 		}
 		
 		if ( tu.preserveWhitespaces() )
@@ -371,35 +407,38 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		TextContainer tc = tu.getSource();
 		boolean srcHasText = tc.hasText(false);
 
-		// Write the source
+		//--- Write the source
+		
 		writer.writeStartElement("source");
-		writer.writeAttributeString("xml:lang", srcLang.toBCP47());
+		writer.writeAttributeString("xml:lang", srcLoc.toBCP47());
 		// Write full source content (always without segments markers
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false, true));
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false,
+			params.isgMode()));
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.isSegmented() ) {
 			writer.writeStartElement("seg-source");
-			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true, true));
+			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true,
+				params.isgMode()));
 			writer.writeEndElementLineBreak(); // seg-source
 		}
 
-		// Write the target
-		if ( trgLang != null ) {
-			writer.writeStartElement("target");
-			writer.writeAttributeString("xml:lang", trgLang.toBCP47());
+		//--- Write the target
 		
-			// At this point tc contains the source
-			// Do we have an available target to use instead?
-			tc = tu.getTarget(trgLang);
-			if (( tc == null ) || ( tc.isEmpty() ) || ( srcHasText && !tc.hasText(false) )) {
-				tc = tu.getSource(); // Go back to the source
-			}
-
-			// Now tc hold the content to write. Write it with or without marks
-		   writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented(), true));
-		   writer.writeEndElementLineBreak(); // target
+		writer.writeStartElement("target");
+		writer.writeAttributeString("xml:lang", trgLoc.toBCP47());
+		
+		// At this point tc contains the source
+		// Do we have an available target to use instead?
+		tc = tu.getTarget(trgLoc);
+		if (( tc == null ) || ( tc.isEmpty() ) || ( srcHasText && !tc.hasText(false) )) {
+			tc = tu.getSource(); // Go back to the source
 		}
+		
+		// Now tc hold the content to write. Write it with or without marks
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented(),
+			params.isgMode()));
+		writer.writeEndElementLineBreak(); // target
 		
 		// Note
 		if ( tu.hasProperty(Property.NOTE) ) {
@@ -410,7 +449,6 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
-
 	private void processDocumentPart(DocumentPart resource) {
 		
 	}

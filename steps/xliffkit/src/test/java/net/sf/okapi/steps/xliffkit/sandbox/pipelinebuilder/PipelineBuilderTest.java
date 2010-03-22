@@ -37,11 +37,9 @@ import net.sf.okapi.steps.textmodification.TextModificationStep;
 import net.sf.okapi.steps.wordcount.WordCountStep;
 import net.sf.okapi.steps.xliffkit.writer.XLIFFKitWriterStep;
 
-import org.junit.Test;
-
 public class PipelineBuilderTest {
 	
-	@Test
+	// DEBUG @Test
 	public void testPipeline() {
 		
 		//----------------------------------------------------------------

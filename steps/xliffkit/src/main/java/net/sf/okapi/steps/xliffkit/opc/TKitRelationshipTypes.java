@@ -27,6 +27,11 @@ public interface TKitRelationshipTypes {
 	 * Core document relationship type.
 	 */
 	String CORE_DOCUMENT = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
+
+	/**
+	 * Core document skeleton relationship type.
+	 */
+	String CORE_SKELETON = "http://schemas.okapi.org/2010/relationships/core-skeleton";
 	
 	/**
 	 * Core properties relationship type.
@@ -54,12 +59,12 @@ public interface TKitRelationshipTypes {
 	String THUMBNAIL = "http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail";
 	
 	/**
-	 * Image type.
+	 * Image part relationship type.
 	 */
 	String IMAGE_PART = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image";
 
 	/**
-	 * Style type.
+	 * Style part relationship type.
 	 */
 	String STYLE_PART = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles";
 	
