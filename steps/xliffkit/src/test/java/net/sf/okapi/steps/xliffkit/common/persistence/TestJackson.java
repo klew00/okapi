@@ -45,6 +45,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.junit.Before;
+import org.junit.Test;
 
 public class TestJackson {
 
@@ -58,6 +59,11 @@ public class TestJackson {
 		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true); 
 		mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
 		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
+	
+	@Test
+	public void test() {
+		
 	}
 	
 	// DEBUG @Test

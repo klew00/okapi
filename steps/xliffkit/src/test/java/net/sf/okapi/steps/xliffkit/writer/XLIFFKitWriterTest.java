@@ -44,6 +44,11 @@ public class XLIFFKitWriterTest {
 //	private final String IN_NAME1 = "Gate Openerss.htm";
 	private final String IN_NAME2 = "TestDocument01.odt";
 	private final String IN_NAME3 = "test4.txt";
+
+	@Test
+	public void test() {
+		
+	}
 	
 	private Pipeline buildPipeline(String inPath1, String inPath2) {
 		

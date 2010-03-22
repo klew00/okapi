@@ -27,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import org.junit.Test;
+
 import net.sf.okapi.steps.xliffkit.common.persistence.AddressBookProtos.AddressBook;
 import net.sf.okapi.steps.xliffkit.common.persistence.AddressBookProtos.Person;
 
@@ -34,6 +36,11 @@ import net.sf.okapi.steps.xliffkit.common.persistence.AddressBookProtos.Person;
 public class TestProtocolBuffers {
 
 	private static final String fileName = "test2.txt";
+	
+	@Test
+	public void test() {
+		
+	}
 	
 	// DEBUG @Test
 	public void testWrite() throws IOException, URISyntaxException {

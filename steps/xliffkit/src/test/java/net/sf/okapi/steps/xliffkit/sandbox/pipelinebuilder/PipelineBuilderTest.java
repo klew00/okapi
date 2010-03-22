@@ -26,6 +26,8 @@ import static org.junit.Assert.assertNull;
 
 import java.io.File;
 
+import org.junit.Test;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
@@ -38,6 +40,11 @@ import net.sf.okapi.steps.wordcount.WordCountStep;
 import net.sf.okapi.steps.xliffkit.writer.XLIFFKitWriterStep;
 
 public class PipelineBuilderTest {
+	
+	@Test
+	public void test() {
+		
+	}
 	
 	// DEBUG @Test
 	public void testPipeline() {
