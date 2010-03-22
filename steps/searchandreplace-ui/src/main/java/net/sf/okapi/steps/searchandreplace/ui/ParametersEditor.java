@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.searchandreplace.ui;
 
+import java.io.File;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.EditorFor;
@@ -43,6 +44,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -67,6 +69,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Table table;
 	private Text searchText;
 	private Text replacementText;
+	private Button btnImport;
+	private Button btnExport;
 	private Button btMoveUp;
 	private Button btMoveDown;
 	private Button chkRegEx;
@@ -310,6 +314,41 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		});			
 		
+		btnImport = new Button(cmpTmp, SWT.PUSH);
+		btnImport.setText("Import");
+		btnImport.setEnabled(true);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		btnImport.setLayoutData(gdTmp);
+		btnImport.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fd = new FileDialog(shell, SWT.OPEN);
+				fd.setText("Import");
+				String selected = fd.open();
+				if(selected!=null){
+					params.load(new File(selected).toURI(),false);
+					setData();
+				}
+			}
+		});			
+		
+		btnExport = new Button(cmpTmp, SWT.PUSH);
+		btnExport.setText("Export");
+		btnExport.setEnabled(true);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		btnExport.setLayoutData(gdTmp);
+		btnExport.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fd = new FileDialog(shell, SWT.SAVE);
+				fd.setText("Export");
+				fd.setOverwrite(true);
+				String selected = fd.open();
+				if(selected!=null){
+					saveData();
+					params.save(selected);
+				}
+			}
+		});			
+
 		chkRegEx = new Button(mainComposite, SWT.CHECK);
 		chkRegEx.setText("Use regular expression");
 		chkRegEx.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
@@ -503,7 +542,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkMultiLine.setEnabled(chkRegEx.getSelection());
 		chkIgnoreCase.setEnabled(chkRegEx.getSelection());		
 		
-		table.clearAll();
+		table.removeAll();
         for ( String[] s : params.rules ) {
         	TableItem item = new TableItem (table, SWT.NONE);
 			String [] strs ={"",s[1],s[2]};
