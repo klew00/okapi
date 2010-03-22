@@ -213,7 +213,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
         	}else{
     	        for ( String[] s : params.rules ) {
     	        	if ( s[0].equals("true") ) {
-   		        		result = result.replace(s[1],s[2]);
+    	        		result = result.replace(s[1],s[2]);
     	        	}
     	        }
         	}
