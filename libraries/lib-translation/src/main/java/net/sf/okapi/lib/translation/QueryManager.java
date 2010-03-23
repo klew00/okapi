@@ -486,19 +486,19 @@ public class QueryManager {
 						}
 						// If we do: Use the first one and lower the score to 99%
 						scores.add(99, qr.origin);
-						segment.text = adjustNewFragment(segment.text, qr.source, qr.target, tu); 
+						segment.text = adjustNewFragment(segment.text, qr.source, qr.target, qr.score, tu); 
 						leveraged++;
 						continue;
 					}
 					// Else: First is 100%, possibly several that have the same translations
 					scores.add(qr.score, qr.origin); // That's 100% then
-					segment.text = adjustNewFragment(segment.text, qr.source, qr.target, tu);
+					segment.text = adjustNewFragment(segment.text, qr.source, qr.target, qr.score, tu);
 					leveraged++;
 					continue;
 				}
 				// First is not 100%: use it and move on
 				scores.add(qr.score, qr.origin);
-				segment.text = adjustNewFragment(segment.text, qr.source, qr.target, tu);
+				segment.text = adjustNewFragment(segment.text, qr.source, qr.target, qr.score, tu);
 				leveraged++;
 			}
 		}
@@ -519,7 +519,7 @@ public class QueryManager {
 				// First is not 100%: use it and move on
 				if ( qr.score < 100 ) {
 					scores.add(qr.score, qr.origin);
-					tc.setContent(adjustNewFragment(tc, qr.source, qr.target, tu));
+					tc.setContent(adjustNewFragment(tc, qr.source, qr.target, qr.score, tu));
 					makeSS = true;
 				}
 				// Else: one or more matches, first is 100%
@@ -531,14 +531,14 @@ public class QueryManager {
 					else {
 						// If we do: Use the first one and lower the score to 99%
 						scores.add(99, qr.origin);
-						tc.setContent(adjustNewFragment(tc, qr.source, qr.target, tu));
+						tc.setContent(adjustNewFragment(tc, qr.source, qr.target, qr.score, tu));
 						makeSS = true;
 					}
 				}
 				// Else: Only one 100% or several that have the same translations
 				else {
 					scores.add(qr.score, qr.origin); // That's 100% then
-					tc.setContent(adjustNewFragment(tc, qr.source, qr.target, tu));
+					tc.setContent(adjustNewFragment(tc, qr.source, qr.target, qr.score, tu));
 					makeSS = true;
 				}
 			}
@@ -603,8 +603,14 @@ public class QueryManager {
 	public TextFragment  adjustNewFragment (TextFragment oriSrc,
 		TextFragment newSrc,
 		TextFragment newTrg,
+		int score,
 		TextUnit parent)
 	{
+		// If score is 100 or more: no reason to adjust anything: use the target as-it
+		// This allows targets with only code differences to be used as-it
+		if ( score >= 100 ) {
+			return newTrg;
+		}
 		// If both new and original have no code, return the new fragment
 		if ( !newTrg.hasCode() && !oriSrc.hasCode() ) {
 			return newTrg;

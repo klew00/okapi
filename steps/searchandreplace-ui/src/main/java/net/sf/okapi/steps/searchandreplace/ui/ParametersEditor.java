@@ -122,12 +122,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params = (Parameters)paramsObject; 
 		shell = (Shell)context.getObject("shell");
 		createComposite(parent);
-		setData();
+		setData(params);
 	}
 
 	@Override
 	public String validateAndSaveParameters () {
-		if ( !saveData() ) return null;
+		if ( !saveData(params) ) return null;
 		return params.toString();
 	}
 	
@@ -315,36 +315,42 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});			
 		
 		btnImport = new Button(cmpTmp, SWT.PUSH);
-		btnImport.setText("Import");
-		btnImport.setEnabled(true);
+		btnImport.setText("Import...");
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btnImport.setLayoutData(gdTmp);
 		btnImport.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(shell, SWT.OPEN);
-				fd.setText("Import");
+				fd.setText("Import Search and Replace Options");
 				String selected = fd.open();
-				if(selected!=null){
-					params.load(new File(selected).toURI(),false);
-					setData();
+				if ( selected != null ) {
+					try {
+						Parameters tmpParams = new Parameters(); 
+						tmpParams.load(new File(selected).toURI(),false);
+						setData(tmpParams);
+					}
+					catch ( Throwable err ) {
+						Dialogs.showError(shell, err.getMessage(), null);
+					}
 				}
 			}
 		});			
 		
 		btnExport = new Button(cmpTmp, SWT.PUSH);
-		btnExport.setText("Export");
-		btnExport.setEnabled(true);
+		btnExport.setText("Export...");
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btnExport.setLayoutData(gdTmp);
 		btnExport.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fd = new FileDialog(shell, SWT.SAVE);
-				fd.setText("Export");
+				fd.setText("Export Search and Replace Options");
 				fd.setOverwrite(true);
 				String selected = fd.open();
-				if(selected!=null){
-					saveData();
-					params.save(selected);
+				if ( selected != null ) {
+					Parameters tmpParams = new Parameters();
+					if ( saveData(tmpParams) ) {
+						tmpParams.save(selected);
+					}
 				}
 			}
 		});			
@@ -398,7 +404,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 					return;
 				}
 				if ( e.widget.getData().equals("o") ){
-					if(!saveData()){
+					if ( !saveData(params) ) {
 						return;
 					}
 				}
@@ -412,7 +418,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			shell.setDefaultButton(pnlActions.btOK);
 		}
 
-		setData();
+		setData(params);
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(600, 400);
@@ -531,19 +537,19 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		return result;
 	}
 	
-	private void setData () {
+	private void setData (Parameters fromParams) {
 		
-		chkRegEx.setSelection(params.regEx);
-		chkDotAll.setSelection(params.dotAll);
-		chkIgnoreCase.setSelection(params.ignoreCase);
-		chkMultiLine.setSelection(params.multiLine);
+		chkRegEx.setSelection(fromParams.regEx);
+		chkDotAll.setSelection(fromParams.dotAll);
+		chkIgnoreCase.setSelection(fromParams.ignoreCase);
+		chkMultiLine.setSelection(fromParams.multiLine);
 
 		chkDotAll.setEnabled(chkRegEx.getSelection());
 		chkMultiLine.setEnabled(chkRegEx.getSelection());
 		chkIgnoreCase.setEnabled(chkRegEx.getSelection());		
 		
 		table.removeAll();
-        for ( String[] s : params.rules ) {
+        for ( String[] s : fromParams.rules ) {
         	TableItem item = new TableItem (table, SWT.NONE);
 			String [] strs ={"",s[1],s[2]};
 			item.setText(strs);
@@ -555,7 +561,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
         updateUpDownBtnState();
 	}
 
-	private boolean saveData () {
+	private boolean saveData (Parameters destParams) {
 		
 		// validate regular expressions
 		if(chkRegEx.getSelection() && !validRegEx()) return false;
@@ -566,20 +572,20 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			return false;
 		}
 		
-		params.reset();
+		destParams.reset();
 		for ( int i=0; i<table.getItemCount(); i++ ) {
 			TableItem ti = table.getItem(i);
 			String s[]=new String[3];
 			s[0]=Boolean.toString(ti.getChecked());
 			s[1]=ti.getText(1);
 			s[2]=ti.getText(2);
-        	params.addRule(s);
+			destParams.addRule(s);
 		};
 	
-		params.regEx = chkRegEx.getSelection();
-		params.dotAll = chkDotAll.getSelection();		
-		params.ignoreCase = chkIgnoreCase.getSelection();
-		params.multiLine = chkMultiLine.getSelection();
+		destParams.regEx = chkRegEx.getSelection();
+		destParams.dotAll = chkDotAll.getSelection();		
+		destParams.ignoreCase = chkIgnoreCase.getSelection();
+		destParams.multiLine = chkMultiLine.getSelection();
 
 		result = true;
 		return result;

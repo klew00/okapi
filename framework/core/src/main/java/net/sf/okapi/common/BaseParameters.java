@@ -64,7 +64,7 @@ public abstract class BaseParameters implements IParameters {
 	}
 	
 	public void load (URI inputURI,
-		boolean p_bIgnoreErrors)
+		boolean ignoreErrors)
 	{
 		char[] aBuf;
 		try {
@@ -92,7 +92,7 @@ public abstract class BaseParameters implements IParameters {
 			path = inputURI.getPath();
 		}
 		catch ( IOException e ) {
-			if ( !p_bIgnoreErrors ) throw new RuntimeException(e);
+			if ( !ignoreErrors ) throw new RuntimeException(e);
 		}
 		finally {
 			aBuf = null;

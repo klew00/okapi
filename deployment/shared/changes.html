@@ -57,13 +57,20 @@ distribution.</p>
 	properly in tab-delimited format.</li>
 </ul>
 	</li>
-	<li>Added the Desegmentation step.</li>
-	<li>Added the URI Conversion step.</li>
+	<li>Added the &quot;Desegmentation&quot; step.</li>
+	<li>Added the &quot;URI Conversion&quot; step.</li>
+	<li>Added Import/Export functions to the dialog box of the &quot;Search and 
+	Replace&quot; step</li>
 </ul>
 	</li>
 	<li>Libraries:<ul>
-	<li>Changed QueryManager to allow code changes in target for the 
+	<li>Changed QueryManager:<ul>
+	<li>Allow code changes in target for the 
 	non-segmented queries.</li>
+	<li>Prevents exact matches to have the target codes &quot;adjusted&quot; from the 
+	source.</li>
+</ul>
+	</li>
 	<li>Added setReferentCopies() to GenericSkeletonWriter to allow correct 
 	output for writers refering more than once to the referents (e.g. when 
 	creating pre-segmented RTF with source and target).</li>
