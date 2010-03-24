@@ -20,7 +20,7 @@ mvn -PWIN_SWT -PCOCOA_SWT -PCOCOA_64_SWT -PLinux_x86_swt -PLinux_x86_64_swt depe
 
 - All the POM.XML files
 - trunk/deployment/shared/release.properties
-
+- The Change Log has it's titles set with the proper versions
 
 --- 4) Make also sure the readme files are up-to-date:
 
@@ -52,8 +52,8 @@ The file _tests_results.txt shows any differences between the expected results a
 //TODO: Port those tests to applications integration tests
 
 
---- 7) Post each packge (.zip or .gz) of the distributions to the GoogleCode download area.
-Use the following summary, in this order:
+--- 7) Post each package (.zip or .gz) of the distributions to the GoogleCode download area.
+Use the following summary, in this order (one by one to ensure the order!):
 Okapi Libraries for all platforms (GZIP)
 Okapi Libraries for all platforms (ZIP)
 Okapi Applications for Macintosh Cocoa 64-bit (Includes Libraries)
@@ -62,8 +62,11 @@ Okapi Applications for Linux 64-bit (Includes Libraries)
 Okapi Applications for Linux (Includes Libraries)
 Okapi Applications for Windows (Includes Libraries)
 
---- 8) Update the Web site with any files that was modified in trunk/website.
-Usually at least the JavaDoc, the updates.html and the downloads.html should be updated.
+--- 8) Make sure all files of the Web site are modified if needed (trunk/website).
+e.g. the update.html file needs the latest version info
+Build the Web site: 
+/trunk/deployment/website> ant
+And update the actual Web site with the result of the build (which is in: trunk/deployment/website/dist) 
 
 Host: ftp.opentag.com
 Username: same as for the shared documents
@@ -77,7 +80,7 @@ The structure in the okapi directory is the same as in trunk/website
 This revision is the one for this release.
 
 
---- 10) Post notifications that a new release is available.
+--- 10) Post notification that a new release is available.
 At least here: http://tech.groups.yahoo.com/group/okapitools/
 
 
