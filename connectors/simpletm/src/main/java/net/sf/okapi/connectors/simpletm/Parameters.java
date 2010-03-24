@@ -27,6 +27,7 @@ public class Parameters extends BaseParameters {
 
 	static final String DBPATH = "dbPath";
 	static final String PENALIZETARGETWITHDIFFERENTCODES = "penalizeTargetWithDifferentCodes";
+	static final String PENALIZESOURCEWITHDIFFERENTCODES = "penalizeSourceWithDifferentCodes";
 	
 	 /** 
 	  * The full path of the database name to open.
@@ -34,6 +35,7 @@ public class Parameters extends BaseParameters {
 	  */
 	private String dbPath;
 	private boolean penalizeTargetWithDifferentCodes;
+	private boolean penalizeSourceWithDifferentCodes;
 
 	public Parameters () {
 		reset();
@@ -52,11 +54,13 @@ public class Parameters extends BaseParameters {
 		this.dbPath = dbPath;
 	}
 
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		dbPath = buffer.getString(DBPATH, dbPath);
 		penalizeTargetWithDifferentCodes = buffer.getBoolean(PENALIZETARGETWITHDIFFERENTCODES, penalizeTargetWithDifferentCodes);
+		penalizeSourceWithDifferentCodes = buffer.getBoolean(PENALIZESOURCEWITHDIFFERENTCODES, penalizeSourceWithDifferentCodes);
 	}
 	
 	public boolean getPenalizeTargetWithDifferentCodes () {
@@ -67,9 +71,19 @@ public class Parameters extends BaseParameters {
 		this.penalizeTargetWithDifferentCodes = penalizeTargetWithDifferentCodes;
 	}
 	
+	public boolean getPenalizeSourceWithDifferentCodes () {
+		return penalizeSourceWithDifferentCodes;
+	}
+	
+	public void setPenalizeSourceWithDifferentCodes (boolean penalizeSourceWithDifferentCodes) {
+		this.penalizeSourceWithDifferentCodes = penalizeSourceWithDifferentCodes;
+	}
+	
+	@Override
 	public void reset () {
 		dbPath = "";
 		penalizeTargetWithDifferentCodes = true;
+		penalizeSourceWithDifferentCodes = true;
 	}
 
 	@Override
@@ -77,6 +91,7 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setString(DBPATH, dbPath);
 		buffer.setBoolean(PENALIZETARGETWITHDIFFERENTCODES, penalizeTargetWithDifferentCodes);
+		buffer.setBoolean(PENALIZESOURCEWITHDIFFERENTCODES, penalizeSourceWithDifferentCodes);
 		return buffer.toString();
 	}
 
@@ -85,6 +100,8 @@ public class Parameters extends BaseParameters {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(DBPATH,
 			"Path of the Database file", "Full path of the database file (.data.db)");
+		desc.add(PENALIZESOURCEWITHDIFFERENTCODES,
+			"Penalize exact matches when the source has different codes than the query", null);
 		desc.add(PENALIZETARGETWITHDIFFERENTCODES,
 			"Penalize exact matches when the target has different codes than the query", null);
 		return desc;

@@ -66,7 +66,8 @@ public class TTXFilter implements IFilter {
 	public final static String MATCHPERCENT = "MatchPercent";
 	public final static String ORIGIN = "Origin";
 	public final static String TTXNOTEXTCHARS = "\u00a0~`!@#$%^&*()_+=-{[}]|\\:;\"'<,>.?/";
-
+	
+	private final static String TARGETLANGUAGE_ATTR = "TargetLanguage";
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private boolean hasNext;
@@ -662,8 +663,19 @@ public class TTXFilter implements IFilter {
 			attrName = String.format("%s%s",
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 				reader.getAttributeLocalName(i));
-			tmp.append(String.format(" %s=\"%s\"", attrName,
-				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, true, null)));
+			// Test for target language place-holder
+			if ( TARGETLANGUAGE_ATTR.equals(attrName) ) {
+				tmp.append(" "+TARGETLANGUAGE_ATTR+"=\"");
+				skel.append(tmp.toString());
+				//TODO: replace direct write by property: skel.addValuePlaceholder(referent, TARGETLANGUAGE_ATTR, locId);
+				skel.append(trgLangCode);
+				tmp.setLength(0);
+				tmp.append("\"");
+			}
+			else {
+				tmp.append(String.format(" %s=\"%s\"", attrName,
+					Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, true, null)));
+			}
 		}
 		tmp.append(">");
 		if ( store ) skel.append(tmp.toString());
@@ -684,6 +696,9 @@ public class TTXFilter implements IFilter {
 	}
 
 	private void processUserSettings () {
+		 if ( skelWriter == null ) {
+			 skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+		 }
 		// Check source language
 		String tmp = reader.getAttributeValue(null, "SourceLanguage");
 		if ( !Util.isEmpty(tmp) ) {
@@ -692,23 +707,23 @@ public class TTXFilter implements IFilter {
 					srcLoc.toString(), tmp, tmp));
 				 srcLoc = LocaleId.fromString(tmp);
 				 srcLangCode = tmp;
+				 skelWriter.setSourceLanguageCode(srcLangCode);
 			 }
 		}
 
 		// Check target language
-		tmp = reader.getAttributeValue(null, "TargetLanguage");
+		tmp = reader.getAttributeValue(null, TARGETLANGUAGE_ATTR);
 		if ( !Util.isEmpty(tmp) ) {
 			 if ( !trgLoc.equals(tmp) ) {
 				 logger.warning(String.format("Specified target was '%s' but target language in the file is '%s'.\nUsing '%s'.",
 					trgLoc.toString(), tmp, tmp));
 				 trgLoc = LocaleId.fromString(tmp);
 				 trgLangCode = tmp;
-				 // Update skeleton writer value
-				 if ( skelWriter == null ) {
-					 skelWriter = new TTXSkeletonWriter(params.getForceSegments());
-				 }
-				 skelWriter.setSourceLanguageCode(srcLangCode);
+				 skelWriter.setTargetLanguageCode(trgLangCode);
 			 }
+		}
+		if ( tmp != null ) {
+			//TODO: set property for TargetLanguage
 		}
 
 		trgDefFont = reader.getAttributeValue(null, "TargetDefaultFont");

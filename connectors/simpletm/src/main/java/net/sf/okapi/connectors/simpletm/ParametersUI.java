@@ -33,6 +33,7 @@ public class ParametersUI implements IEditorDescriptionProvider {
 		PathInputPart part = desc.addPathInputPart(paramDesc.get(Parameters.DBPATH), "Database File", false);
 		part.setBrowseFilters("Database Files (*.data.db)\tAll Files (*.*)", "*.data.db\t*.*");
 		
+		desc.addCheckboxPart(paramDesc.get(Parameters.PENALIZESOURCEWITHDIFFERENTCODES));
 		desc.addCheckboxPart(paramDesc.get(Parameters.PENALIZETARGETWITHDIFFERENTCODES));
 		
 		return desc;

@@ -597,6 +597,7 @@ public class QueryManager {
 	 * @param oriSrc the original source text fragment.
 	 * @param newSrc the new source text fragment.
 	 * @param newTrg the new target text fragment (this is the fragment that will be adjusted).
+	 * @param score the score for the match: >=100 means no adjustment is made.
 	 * @param parent the parent text unit (used for error information only)
 	 * @return the newTrg parameter adjusted
 	 */
@@ -616,12 +617,12 @@ public class QueryManager {
 			return newTrg;
 		}
 		
-//		TextFragment workOri = oriSrc.clone();
-//		workOri.renumberCodes();
-//		TextFragment workNew = newTrg.clone();
-//		workNew.renumberCodes();
-
 		List<Code> oriCodes = oriSrc.getCodes();
+		// If the codes of the original sources and the matched one are the same: no need to adjust
+		if ( oriCodes.toString().equals(newSrc.getCodes().toString()) ) {
+			return newTrg;
+		}
+		// Else: try to adjust
 		List<Code> newCodes = newTrg.getCodes();
 		
 		int[] oriIndices = new int[oriCodes.size()];

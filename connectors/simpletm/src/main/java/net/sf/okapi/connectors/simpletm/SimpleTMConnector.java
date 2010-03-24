@@ -54,8 +54,9 @@ public class SimpleTMConnector implements ITMQuery {
 	}
 
 	public String getSettingsDisplay () {
-		return String.format("Database: %s\nPenalize exact matches with different codes in target: %s",
+		return String.format("Database: %s\nPenalize exact matches with different codes in source: %s, in target: %s",
 			(Util.isEmpty(params.getDbPath()) ? "<To be specified>" : params.getDbPath()),
+			(params.getPenalizeSourceWithDifferentCodes() ? "Yes" : "No"),
 			(params.getPenalizeTargetWithDifferentCodes() ? "Yes" : "No"));
 	}
 	
@@ -92,6 +93,7 @@ public class SimpleTMConnector implements ITMQuery {
 
 	public void open () {
 		db.open(params.getDbPath());
+		db.setPenalizeSourceWithDifferentCodes(params.getPenalizeSourceWithDifferentCodes());
 		db.setPenalizeTargetWithDifferentCodes(params.getPenalizeTargetWithDifferentCodes());
 	}
 

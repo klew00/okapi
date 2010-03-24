@@ -49,7 +49,7 @@ public class TTXFilterTest {
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 	private LocaleId locESEM = LocaleId.fromString("es-em");
 	private LocaleId locFRFR = LocaleId.fromString("fr-fr");
-	private LocaleId locKOKR = LocaleId.fromString("ko-kr");
+//	private LocaleId locKOKR = LocaleId.fromString("ko-kr");
 	
 	private static final String STARTFILE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		+ "<TRADOStag Version=\"2.0\"><FrontMatter>\n"
@@ -63,11 +63,17 @@ public class TTXFilterTest {
 		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"ES-EM\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"
 		+ "</FrontMatter><Body><Raw>";
 
-	private static final String STARTFILEKO = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+//	private static final String STARTFILEKO = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+//		+ "<TRADOStag Version=\"2.0\"><FrontMatter>\n"
+//		+ "<ToolSettings CreationDate=\"20070508T094743Z\" CreationTool=\"TRADOS TagEditor\" CreationToolVersion=\"7.0.0.615\"></ToolSettings>\n"
+//		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"KO-KR\" TargetDefaultFont=\"\ubd7e\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"
+//		+ "</FrontMatter><Body><Raw>\n";
+
+	private static final String STARTFILEEMPTYTRGNOLB = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		+ "<TRADOStag Version=\"2.0\"><FrontMatter>\n"
 		+ "<ToolSettings CreationDate=\"20070508T094743Z\" CreationTool=\"TRADOS TagEditor\" CreationToolVersion=\"7.0.0.615\"></ToolSettings>\n"
-		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"KO-KR\" TargetDefaultFont=\"\ubd7e\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"
-		+ "</FrontMatter><Body><Raw>\n";
+		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"
+		+ "</FrontMatter><Body><Raw>";
 
 	@Before
 	public void setUp() {
@@ -145,6 +151,28 @@ public class TTXFilterTest {
 			+ "<Tuv Lang=\"ES-EM\">es1</Tuv>"
 			+ "</Tu>"
 			+ "</df>"
+			+ "<ut Type=\"end\" Style=\"external\">ec</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM),
+			locESEM, filter2.createSkeletonWriter(), filter2.getEncoderManager()));
+	}
+
+	@Test
+	public void testOutputUpdatedTragetLanguage () {
+		String snippet = STARTFILEEMPTYTRGNOLB
+			+ "<ut Type=\"start\" Style=\"external\">bc</ut>"
+			+ "<Tu MatchPercent=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">en1</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">es1</Tuv>"
+			+ "</Tu>"
+			+ "<ut Type=\"end\" Style=\"external\">ec</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">bc</ut>"
+			+ "<Tu MatchPercent=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">en1</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">es1</Tuv>"
+			+ "</Tu>"
 			+ "<ut Type=\"end\" Style=\"external\">ec</ut>"
 			+ "</Raw></Body></TRADOStag>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM),

@@ -112,6 +112,21 @@ public class QueryManagerTest {
 		assertEquals("T <b1/>BOLD T <2/><3/>", fmt.toString());
 	}
 
+	@Test
+	public void testAdjustDifferentTextSameMarkers () {
+		TextUnit tu = createTextUnit1();
+		TextFragment tf = new TextFragment("U ");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("BOLD");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(" U ");
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		// Fuzzy match but codes are the same
+		qm.adjustNewFragment(tu.getSourceContent(), tf, tf, 88, tu);
+		assertEquals("U <b>BOLD</b> U <br/>", tf.toString());
+		assertEquals("U <1>BOLD</1> U <2/>", fmt.setContent(tf).toString());
+	}
+
 	private TextUnit createTextUnit1 () {
 		TextUnit tu = new TextUnit("1", "t ");
 		TextFragment tf = tu.getSourceContent();

@@ -106,7 +106,11 @@ and use attributes. It also allows multiple translations of the same source
 text. When the attributes are not used, you may get several exact matches, if at 
 least of of them has a different translation, the segment is matched at 99% 
 only. Segments that have the exact same text but inline codes that have 
-different content or are in different order are matched at 99%. The only types of matches SimpleTM can generate are: 100%, 99%, and 0%.</p>
+different content or are in different order are matched at 99%. Optionally an 
+additional 1% penality can be taken out of the score if the inline codes of the 
+source and/or of the target have different content or are in a different order as the ones of the 
+source text queried. The only types of matches SimpleTM can generate are: 100%, 99%, 
+98%, and 0%.</p>
 <p>Using the attributes with a SimpleTM memory filters out any candidate that 
 does not have matching values for the given attributes:</p>
 <p>For example, given an segment to leverage that is:<br>

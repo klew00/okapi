@@ -75,6 +75,7 @@ public class Database {
 	private Connection  conn = null;
 	private PreparedStatement qstm = null;
 	private LocaleId trgLoc;
+	private boolean penalizeSourceWithDifferentCodes = true;
 	private boolean penalizeTargetWithDifferentCodes = true;
 
 	public Database () {
@@ -103,6 +104,10 @@ public class Database {
 		}
 	}
 
+	public void setPenalizeSourceWithDifferentCodes (boolean penalizeSourceWithDifferentCodes) {
+		this.penalizeSourceWithDifferentCodes = penalizeSourceWithDifferentCodes;
+	}
+	
 	public void setPenalizeTargetWithDifferentCodes (boolean penalizeTargetWithDifferentCodes) {
 		this.penalizeTargetWithDifferentCodes = penalizeTargetWithDifferentCodes;
 	}
@@ -333,15 +338,19 @@ public class Database {
 				qr.target = new TextFragment();
 				qr.target.setCodedText(result.getString(3),
 					Code.stringToCodes(result.getString(4)), false);
-				
-				// Tune-down the score if the content or order of the codes are different
-				if ( penalizeTargetWithDifferentCodes ) {
-					String trgCodes = qr.target.getCodes().toString();
-					if ( queryCodes.equals(trgCodes) ) qr.score = 100;
-					else qr.score = 99;
+				// Non-code text is exactly the same
+				qr.score = 100;
+				// Check the codes between query source and found source, if requested
+				if ( penalizeSourceWithDifferentCodes ) {
+					if ( !queryCodes.equals(qr.source.getCodes().toString()) ) {
+						qr.score--; // 99 if there are code difference between codes in query and codes in source
+					}
 				}
-				else {
-					qr.score = 100;
+				// Check the codes between query source and found target, if requested
+				if ( penalizeTargetWithDifferentCodes ) {
+					if ( !queryCodes.equals(qr.target.getCodes().toString()) ) {
+						qr.score--;
+					}
 				}
 				
 				if ( qr.score >= threshold ) {
