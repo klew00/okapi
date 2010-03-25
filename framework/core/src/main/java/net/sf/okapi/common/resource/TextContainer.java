@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,40 +22,699 @@ package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * Extension of the TextFragment class that provides methods for
- * handling properties, annotations and segmentation of the text.
+ * Provides methods for storing the content of a paragraph-type unit, to handling its properties,
+ * annotations and segmentation.
+ * <p>The TextContainer is made of a collection of parts: Some are simple {@link TextPart} objects,
+ * others are special {@link TextPart} objects called {@link Segment}.
+ * <p>A TextContainer has always at least one {@link Segment} part.
  */
-public class TextContainer extends TextFragment {
+public class TextContainer implements Iterable<Segment> {
 
 	private Hashtable<String, Property> properties;
 	private Annotations annotations;
-	private List<Segment> segments;
+	private List<TextPart> parts;
+	private boolean segApplied;
 
 	/**
 	 * Creates a new empty TextContainer object.
 	 */
 	public TextContainer () {
-		super();
+		createSingleSegment(null);
 	}
 
 	/**
 	 * Creates a new TextContainer object with some initial text.
-	 * @param text
+	 * @param text the initial text.
 	 */
 	public TextContainer (String text) {
-		super(text);
+		createSingleSegment(text);
+	}
+
+	/**
+	 * Creates a new TextContainer object with an initial TextFragment.
+	 * @param fragment the initial TextFragment.
+	 */
+	public TextContainer (TextFragment fragment) {
+		setContent(fragment);
 	}
 	
 	/**
-	 * Clones this TextContainer.
+	 * Creates a new TextConatiner object with an initial segment.
+	 * If the id of the segment is null it will be set automatically.
+	 * @param segment the initial segment.
+	 */
+	public TextContainer (Segment segment) {
+		if ( segment.text == null ) {
+			segment.text = new TextFragment();
+		}
+		parts = new ArrayList<TextPart>();
+		parts.add(segment);
+		validateSegmentId(segment);
+	}
+
+	/**
+	 * Creates a new TextContainer object with optional text.
+	 * @param text the text, or null for not text.
+	 */
+	private void createSingleSegment (String text) {
+		parts = new ArrayList<TextPart>();
+		// Note: don't use appendSegment() as it uses createSingleSegment().
+		Segment seg = new Segment("0", new TextFragment(text));
+		parts.add(seg);
+		segApplied = false;
+	}
+	
+	/**
+	 * Gets the string representation of this container.
+	 * If the container is segmented, the representation shows the merged
+	 * segments.
+	 * @return the string representation of this container.
+	 */
+	@Override
+	public String toString () {
+		if ( parts.size() == 1 ) {
+			return parts.get(0).getContent().toString();
+		}
+		// Else: merge to a temporary content
+		return createJoinedContent(null).toString();
+	}
+	
+	/**
+	 * Gets an iterator for the segments of this container.
+	 * This iterator does not iterate through non-segment parts of the content.
+	 * Use {@link #partIterator()} for accessing both segments and non-segments parts.
+	 * @return an iterator for the segments of this container.
+	 */
+	@Override
+	public Iterator<Segment> iterator () {
+		return new Iterator<Segment>() {
+			int current = foundNext(-1);
+			private int foundNext (int start) {
+				for ( int i=start+1; i<parts.size(); i++ ) {
+					if ( parts.get(i).isSegment() ) {
+						return i;
+					}
+				}
+				return -1;
+			}
+			
+			@Override
+			public void remove () {
+				throw new UnsupportedOperationException("The method remove() not supported.");
+			}
+			
+			@Override
+			public Segment next () {
+				if ( current == -1 ) {
+					throw new NoSuchElementException("No more content parts.");
+				}
+				int n = current;
+				// Get next here because hasNext() could be called several times
+				current = foundNext(current);
+				// Return 'previous' current
+				return (Segment)parts.get(n);
+			}
+			
+			@Override
+			public boolean hasNext () {
+				return (current != -1);
+			}
+		};
+	}
+
+	/**
+	 * Creates an iterator to loop through the parts (segments and non-segments) of this container.
+	 * @return a new iterator all for the parts of this container.
+	 */
+	public Iterator<TextPart> partIterator () {
+		return new Iterator<TextPart>() {
+			int current = 0;
+			
+			@Override
+			public void remove () {
+				throw new UnsupportedOperationException("The method remove() not supported.");
+			}
+			
+			@Override
+			public TextPart next () {
+				if ( current >= parts.size() ) {
+					throw new NoSuchElementException("No more content parts.");
+				}
+				return parts.get(current++);
+			}
+			
+			@Override
+			public boolean hasNext () {
+				return (current<parts.size());
+			}
+		};
+	}
+
+	/**
+	 * Compares this container with another one. Note: This is a costly operation if
+	 * the two containers have segments and no text differences.
+	 * @param cont the other container to compare this one with.
+	 * @param codeSensitive true if the codes need to be compared as well.
+	 * @return a value 0 if the objects are equals.
+	 */
+	public int compareTo (TextContainer cont,
+		boolean codeSensitive)
+	{
+		int res = 0;
+		if ( cont.contentIsOneSegment() ) {
+			if ( contentIsOneSegment() ) {
+				// No ranges to compare
+				return getFirstPartContent().compareTo(cont.getFirstPartContent(), codeSensitive);
+			}
+			else {
+				res = getUnSegmentedContentCopy().compareTo(cont.getFirstPartContent(), codeSensitive);
+			}
+		}
+		else {
+			if ( contentIsOneSegment() ) {
+				res = getFirstPartContent().compareTo(cont.getUnSegmentedContentCopy(), codeSensitive);
+			}
+			else {
+				res = getUnSegmentedContentCopy().compareTo(cont.getUnSegmentedContentCopy(), codeSensitive);
+			}
+		}
+		if ( res != 0 ) return res;
+		
+		// If the content is the same, check the segment boundaries
+		StringBuilder tmp1 = new StringBuilder();
+		for ( Range range : getCurrentSegmentationRanges() ) {
+			tmp1.append(range.toString());
+		}
+		StringBuilder tmp2 = new StringBuilder();
+		for ( Range range : cont.getCurrentSegmentationRanges() ) {
+			tmp2.append(range.toString());
+		}
+		return tmp1.toString().compareTo(tmp2.toString());
+	}
+	
+	/**
+	 * Indicates if a segmentation has been applied to this container, or if it contains
+	 * more than one part.
+	 * <p>This method return true if any method that may cause the content to be segmented
+	 * has been called, and no operation has resulted in un-segmenting the content since that call,
+	 * or if the content has more than one part.
+	 * @return true if a segmentation has been applied to this container, or if it contains
+	 * more than one part.
+	 * @see #setHasBeenSegmented(boolean)
+	 */
+	public boolean hasBeenSegmented () {
+		return ( segApplied || ( parts.size() > 1 ));
+	}
+	
+	/**
+	 * Sets the flag indicating if the content of this container has been segmented.
+	 * @param hasBeenSegmented true to flag the content has having been segmented, false to set it
+	 * has not having been segmented.
+	 * @see #hasBeenSegmented()
+	 */
+	public void setHasBeenSegmentedFlag (boolean hasBeenSegmented) {
+		segApplied = hasBeenSegmented;
+	}
+	
+	/**
+	 * Indicates if this container is made of a single segment that holds the
+	 * whole content (i.e. there is no other parts).
+	 * @return true if the whole content of this container is in a single segment.
+	 */
+	public boolean contentIsOneSegment () {
+		return (( parts.size() == 1 ) && parts.get(0).isSegment() );
+	}
+	
+	/**
+	 * Changes the type of a given part.
+	 * If the part was a segment this makes it a non-segment (except if this is the only part
+	 * in the content. In that case the part remains unchanged). If this part was not a segment
+	 * this makes it a segment (with its identifier automatically set).
+	 * @param partIndex the index of the part to change. Note that even if the part is a segment
+	 * this index must be the part index not the segment index.
+	 */
+	public void changePart (int partIndex) {
+		if ( parts.get(partIndex).isSegment() ) {
+			// If it's a segment, make it a non-segment
+			if ( hasOnlyOneSegment() ) {
+				// Except if it's the only segment, to ensure at-least-1-segment
+				return; 
+			}
+			parts.set(partIndex, new TextPart(parts.get(partIndex).text));
+		}
+		else {
+			// If it's a non-segment, make it a segment (with auto-id)
+			Segment seg = new Segment(null, parts.get(partIndex).text);
+			validateSegmentId(seg);
+			parts.set(partIndex, seg);
+			segApplied = true;
+		}
+	}
+	
+	/**
+	 * Inserts a given part (segment or non-segment) at a given position.
+	 * If the position is already occupied that part and all the parts to
+	 * it right are shifted to the right.
+	 * <p>If the part to insert is a segment, its id is validated.
+	 * @param partIndex the position where to insert the new part.
+	 * @param part the part to insert.
+	 */
+	public void insertPart (int partIndex, TextPart part) {
+		parts.add(partIndex, part);
+		if ( part.isSegment() ) {
+			validateSegmentId((Segment)part);
+		}
+		segApplied = true;
+	}
+	
+	/**
+	 * Removes the part at s given position.
+	 * <p>If the selected part is the last segment in the content, the part
+	 * is only cleared, not removed.
+	 * @param partIndex the position of the part to remove. 
+	 */
+	public void removePart (int partIndex) {
+		if ( parts.get(partIndex).isSegment() && hasOnlyOneSegment() ){
+			// If it's the last segment, just clear it, don't remove it.
+			parts.get(partIndex).text.clear();
+		}
+		else {
+			parts.remove(partIndex);
+		}
+	}
+	
+	/**
+	 * Gets the list of the boundaries for the current segments in this container. 
+	 * @return the list of the current segment boundaries. 
+	 */
+	public List<Range> getCurrentSegmentationRanges () {
+		List<Range> ranges = new ArrayList<Range>();
+		createJoinedContent(ranges);
+		return ranges;
+	}
+
+	/**
+	 * Appends a part at the end of this container.
+	 * If there the last part (segment or non-segment) is empty,
+	 * the TextFragment is appended to that part. Otherwise the
+	 * TextFragment is appended to the content as a new non-segment part.
+	 * @param fragment the text fragment to append.
+	 */
+	public void appendPart (TextFragment fragment) {
+		// If the last part is empty we append to it
+		if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
+			parts.get(parts.size()-1).text.append(fragment);
+		}
+		else {
+			parts.add(new TextPart(fragment));
+		}
+	}
+	
+	/**
+	 * Appends a part with a given text at the end of this container.
+	 * If there the last part (segment or non-segment) is empty,
+	 * the text is appended to that part. Otherwise the
+	 * text is appended to the content as a new non-segment part.
+	 * @param text the text to append.
+	 */
+	public void appendPart (String text) {
+		appendPart(new TextFragment(text));
+	}
+	
+	/**
+	 * Appends a segment at the end of this container.
+	 * If there is no content after the last segment, and the last segment is empty,
+	 * the new segment replaces the last one (including its id, and the new id is validated).
+	 * Otherwise the new segment is appended to the content as a new segment part and its
+	 * id is validated.
+	 * @param segment the segment to append.
+	 */
+	public void appendSegment (Segment segment) {
+		appendSegment(segment, null);
+	}
+	
+	/**
+	 * Appends a segment at the end of this container, with an optional non-segment part just before.
+	 * If there is no content after the last segment, and the last segment is empty,
+	 * the new segment replaces the last one (including its id, and the new id is validated).
+	 * Otherwise the new segment is appended to the content as a new segment part and its
+	 * id is validated.
+	 * @param segment the segment to append.
+	 * @param partBefore the text of the non-segment part before the segment (can be null).
+	 */
+	public void appendSegment (Segment segment,
+		String textBefore)
+	{
+		// Add the text before if needed
+		if ( !Util.isEmpty(textBefore) ) {
+			if (( parts.get(parts.size()-1).getContent().isEmpty() )
+				&& !parts.get(parts.size()-1).isSegment() )
+			{
+				parts.set(parts.size()-1, new TextPart(textBefore));
+			}
+			else {
+				parts.add(new TextPart(textBefore));
+			}
+		}
+		
+		// If the last segment is empty and at the end of the content: re-use it
+		if (( parts.get(parts.size()-1).getContent().isEmpty() )
+			&& parts.get(parts.size()-1).isSegment() )
+		{
+			parts.set(parts.size()-1, segment);
+		}
+		else {
+			parts.add(segment);
+		}
+		validateSegmentId(segment);
+		segApplied = true;
+	}
+	
+	/**
+	 * Appends a TextFragment as a segment at the end of this container.
+	 * If there is content after the last segment, and the last segment is empty,
+	 * the new segment replaces the last one.
+	 * Otherwise the new segment is appended to the content as a new segment part.
+	 * In all case the id of the new segment is set automatically.
+	 * @param fragment the fragment to append as a segment.
+	 */
+	public void appendSegment (TextFragment fragment) {
+		appendSegment(new Segment(null, fragment));
+	}
+	
+	/**
+	 * Gets the coded text of the whole content (segmented or not).
+	 * Use this method to compute segment boundaries that will be applied using
+	 * {@link #createSegment(int, int)} or {@link #createSegments(List)} or other methods.
+	 * @return the coded text of the whole content to use for segmentation template.
+	 * @see #createSegment(int, int)
+	 * @see #createSegments(List)
+	 */
+	public String getCodedText () {
+		if ( parts.size() == 1 ) {
+			return parts.get(0).getContent().getCodedText();
+		}
+		else {
+			return createJoinedContent(null).getCodedText();
+		}
+	}
+
+	/**
+	 * Creates a set of segments in this container. Use {@link #getCodedText()}
+	 * to get the coded text to use for the segment boundaries.
+	 * If the content is already segmented, it is automatically un-segmented before the new
+	 * segmentation is applied.
+	 * @param ranges the ranges of the segments to create. The ranges must be ordered from the lesser
+	 * position to the higher one (i.e. from left to right). If this parameter is empty or null, no
+	 * modification is done.
+	 * @return the number of parts (segments and non-segments) created during the operation.
+	 */
+	public int createSegments (List<Range> ranges) {
+		// Do nothing if null or empty
+		if (( ranges == null ) || ranges.isEmpty() ) return 0;
+
+		// If the current content is a single segment we start from it
+		TextFragment holder; 
+		if ( parts.size() == 1  ) {
+			holder = parts.get(0).getContent();
+		}
+		else {
+			holder = createJoinedContent(null);
+		}
+		
+		// Reset the segments
+		parts = new ArrayList<TextPart>();
+
+		// Extract the segments using the ranges
+		int start = 0;
+		int id = 0;
+		for ( Range range : ranges ) {
+			if ( range.end == -1 ) {
+				range.end = holder.text.length();
+			}
+			// Check boundaries
+			if ( range.end < range.start ) {
+				throw new InvalidPositionException(String.format(
+					"Invalid segment boundaries: start=%d, end=%d.", range.start, range.end));
+			}
+			if ( start > range.start ) {
+				throw new InvalidPositionException("Invalid range order.");
+			}
+			if ( range.end == range.start ) {
+				// Empty range, skip it
+				continue;
+			}
+			// If there is an interstice: creates the corresponding part
+			if ( start < range.start ) {
+				parts.add(new TextPart(holder.subSequence(start, range.start)));
+			}
+			// Create the part for the segment
+			parts.add(new Segment(String.valueOf(id++),
+				holder.subSequence(range.start, range.end)));
+			start = range.end;
+			segApplied = true;
+		}
+
+		// Check if we have remaining text after the last segment
+		if ( start < holder.text.length() ) {
+			if ( start == 0 ) { // If the remain is the whole content: make it a segment
+				parts.add(new Segment(String.valueOf(id), holder));
+			}
+			else { // Otherwise: make it an interstice
+				parts.add(new TextPart(holder.subSequence(start, -1)));
+			}
+		}
+
+		return parts.size();
+	}
+
+	/**
+	 * Creates a set of segments in this container. Use {@link #getCodedText()}
+	 * to get the coded text to use for the segment boundaries.
+	 * If the content is already segmented, it is automatically un-segmented before the new
+	 * segmentation is applied.
+	 * If start and end position are the same, no segment is created for those boundaries.
+	 * <p>For example:
+	 * <ul>
+	 * <li>calling createSegment(2,3) on "a b c" will result in: "a [b] c".
+	 * <li>calling createSegment(2,3) on "[a b] [c]" will result in: "a [b] c".
+	 * </ul>
+	 * @param start the start of the segment.
+	 * @param end the position just after the last character of the the segment.
+	 * @return the number of parts (segments and non-segments) created during the operation.
+	 */
+	public int createSegment (int start,
+		int end)
+	{
+		ArrayList<Range> range = new ArrayList<Range>();
+		range.add(new Range(start, end));
+		return createSegments(range); 
+	}
+
+	/**
+	 * Splits a given part into two or three parts.
+	 * <ul>
+	 * <li>If end == start or end or -1 : A new part is created on the right side of the position.
+	 * It has the same type as the original part.
+	 * <li>If start == 0: A new part is created on the left side of the original part.
+	 * <li>If the specified span is empty at at either end of the part, or if it is equals to the
+	 * whole length of the part: No change (it would result in an empty part).
+	 * It has the type specified by spannedPartIsSegment.
+	 * </ul>
+	 * @param partIndex index of the part to split.
+	 * @param start start of the middle part to create.
+	 * @param end position just after the last character of the middle part to create.
+	 * @param spannedPartIsSegment true if the new middle part should be a segment,
+	 * false if it should be a non-segment.
+	 */
+	public void splitPart (int partIndex,
+		int start,
+		int end,
+		boolean spannedPartIsSegment)
+	{
+		// Get the part and adjust the end==-1 if needed
+		TextPart part = parts.get(partIndex);
+		if ( end == -1 ) {
+			end = part.text.text.length();
+		}
+		if ( end < start ) {
+			throw new InvalidPositionException(String.format(
+				"Invalid segment boundaries: start=%d, end=%d.", start, end));
+		}
+		// If span is empty and at either ends
+		if (( end-start == 0 ) && (( start == 0 ) || ( end == part.text.text.length() ))) {
+			return; // Nothing to do
+		}
+		// If span is the same as the part
+		if ( end-start >= part.text.text.length() ) {
+			return; // Nothing to do
+		}
+
+		// Determine the index where to insert the new part
+		int newPartIndex = partIndex+1;
+		if ( start == 0 ) {
+			newPartIndex = partIndex;
+		}
+		// Determine the type of the new part
+		boolean newPartIsSegment = spannedPartIsSegment;
+		if ( start == end ) {
+			newPartIsSegment = part.isSegment();
+			// And it's like inserting on the right
+			end = part.text.text.length();
+		}
+		
+		// If span starts at 0, or ends at fragment ends:
+		// We need only to split in two parts
+		if (( start == 0 ) || ( end == part.text.text.length() )) { 
+			// Create the new part and copy the relevant content
+			if ( newPartIsSegment ) {
+				parts.add(newPartIndex, new Segment(null, part.text.subSequence(start, end)));
+				validateSegmentId((Segment)parts.get(newPartIndex));
+			}
+			else {
+				parts.add(newPartIndex, new TextPart(part.text.subSequence(start, end)));
+			}
+			// Removes from the given part the content that was copied into the new part
+			part.text.remove(start, end);
+		}
+		// Else: Span with content: A middle part (the new part) and a right part are to be created 
+		else {
+			// Create the middle part and copy the relevant content
+			if ( newPartIsSegment ) {
+				parts.add(newPartIndex, new Segment(null, part.text.subSequence(start, end)));
+				validateSegmentId((Segment)parts.get(newPartIndex));
+			}
+			else {
+				parts.add(newPartIndex, new TextPart(part.text.subSequence(start, end)));
+			}
+			// Then create the additional new part:
+			// On the right of the new part, and of the type of the old part
+			if ( part.isSegment() ) {
+				parts.add(newPartIndex+1, new Segment(null, part.text.subSequence(end, -1)));
+				validateSegmentId((Segment)parts.get(newPartIndex+1));
+			}
+			else {
+				parts.add(newPartIndex+1, new TextPart(part.text.subSequence(end, -1)));
+			}
+			// Removes from the given part the content that was copied into the two new parts
+			part.text.remove(start, -1);
+		}
+		segApplied = true;
+	}
+
+	/**
+	 * Unwraps the content of this container.
+	 * <p>This method replaces any sequences of white-spaces by a single space character.
+	 * If also remove leading and trailing white-spaces if the parameter
+	 * trimEnds is set to true.
+	 * Empty non-segment parts are removed. Empty segments are left. 
+	 * @param trimEnds true to remove leading and trailing white-spaces.
+	 */
+	public void unwrap (boolean trimEnds) {
+		boolean wasWS = trimEnds; // Removes leading white-spaces
+		for ( int i=0; i<parts.size(); i++ ) {
+			StringBuilder text = parts.get(i).text.text;
+			
+			// Normalize the part
+			for ( int j=0; j<text.length(); j++ ) {
+				switch ( text.charAt(j) ) {
+				case TextFragment.MARKER_OPENING:
+				case TextFragment.MARKER_CLOSING:
+				case TextFragment.MARKER_ISOLATED:
+					j++;
+					wasWS = false;
+					//TODO: Do we need to do something for inline between WS?
+					break;
+				case ' ':
+				case '\t':
+				case '\r':
+				case '\n':
+					if ( wasWS ) {
+						text.deleteCharAt(j);
+						j--; // Adjust
+					}
+					else {
+						text.setCharAt(j, ' ');
+						wasWS = true;
+					}
+					break;
+				default:
+					wasWS = false;
+					break;
+				}
+			}
+			
+			// Remove the part if it's empty and not a segment
+			if ( text.length() == 0 ) {
+				if ( !parts.get(i).isSegment() ) {
+					parts.remove(i);
+					i--; // Adjust
+				}
+			}
+		}
+
+		// Trim the tail parts
+		if ( trimEnds ) {
+			for ( int i=parts.size()-1; i>=0; i-- ) {
+				TextPart part = parts.get(i);
+				if ( part.text.getCodedText().endsWith(" ") ) {
+					// Remove the trailing space
+					part.text.text.deleteCharAt(part.text.text.length()-1);
+					// Stop if not empty, or remove empty non-segment
+					if ( part.text.text.length() == 0 ) {
+						if ( !parts.get(i).isSegment() ) {
+							parts.remove(i);
+							i++; // Adjust
+						}
+					}
+					else break;
+				}
+				else break;
+			}
+		}
+	}
+	
+	public TextFragment getFirstSegmentContent () {
+		for ( TextPart part : parts ) {
+			if ( part.isSegment() ) {
+				return part.getContent();
+			}
+		}
+		// Should never occur
+		return null;
+	}
+	
+	public TextFragment getLastSegmentContent () {
+		for ( int i=parts.size()-1; i>=0; i-- ) {
+			if ( parts.get(i).isSegment() ) {
+				return parts.get(i).getContent();
+			}
+		}
+		// Should never occur
+		return null;
+	}
+	
+	public TextFragment getLastPartContent () {
+		return parts.get(parts.size()-1).text;
+	}
+	
+	public TextFragment getFirstPartContent () {
+		return parts.get(parts.size()-1).text;
+	}
+	
+	/**
+	 * Clones this TextContainer, including the properties.
 	 * @return A new TextContainer object that is a copy of this one. 
 	 */
 	@Override
@@ -65,13 +724,16 @@ public class TextContainer extends TextFragment {
 
 	/**
 	 * Clones this container, with or without its properties. 
-	 * @param cloneProperties Indicates if the properties should be cloned.
+	 * @param cloneProperties indicates if the properties should be cloned.
 	 * @return A new TextContainer object that is a copy of this one.
 	 */
 	public TextContainer clone (boolean cloneProperties) {
 		TextContainer newCont = new TextContainer();
-		// Clone the content
-		newCont.setContent(super.clone());
+		// Clone segments
+		newCont.parts = new ArrayList<TextPart>();
+		for ( TextPart part : parts ) {
+			newCont.parts.add(part.clone());
+		}
 		// Clone the properties
 		if ( cloneProperties && ( properties != null )) {
 			newCont.properties = new Hashtable<String, Property>();
@@ -79,101 +741,95 @@ public class TextContainer extends TextFragment {
 				newCont.properties.put(prop.getName(), prop.clone()); 
 			}
 		}
-		// Clone the segments
-		if ( segments != null ) {
-			newCont.segments = new ArrayList<Segment>();
-			for ( Segment seg : segments ) {
-				newCont.segments.add(seg.clone());
-			}
-		}
-		
-		// Clone the annotations
-		//TODO: Clone the annotations
+//TODO: Clone annotations		
+		// Returns the new container
 		return newCont;
 	}
 	
 	/**
-	 * Gets the TextFragment for this TextContainer. Because TextContainer is an extension of
-	 * TextFragment this methods returns this object itself, but typed as a TextFragment.
-	 * @return this object itself, but typed as a TextFragment.
+	 * Gets a new TextFragment representing the un-segmented content of this container. 
+	 * @return the un-segmented content of this container.
 	 */
-	public TextFragment getContent () {
-		return this;
+	public TextFragment getUnSegmentedContentCopy () {
+		return createJoinedContent(null);
 	}
-	
+
 	/**
-	 * Sets the content of this TextContainer. the new content must not have segment markers.
+	 * Sets the content of this TextContainer.
+	 * Any existing segmentation is removed.
+	 * The content becomes a single segment content.
 	 * @param content the new content to set.
 	 */
 	public void setContent (TextFragment content) {
-		text = new StringBuilder();
-		codes = null;
-		// We don't change the current annotations or properties
-		// But we reset the segments
-		if ( segments != null ) {
-			segments.clear();
-			segments = null;
-		}
-
-		insert(-1, content);
-		this.lastCodeID = content.lastCodeID;
+		createSingleSegment(null);
+		((Segment)parts.get(0)).text = content;
 	}
 
 	/**
-	 * Clears this TextContainer, removes an existing segments.
+	 * Clears this TextContainer, removes any existing segments.
+	 * The content becomes a single empty segment content.
+	 * Keeps annotations.
 	 */
-	@Override
 	public void clear () {
-		super.clear();
-		if ( segments != null ) {
-			segments.clear();
-			segments = null;
-		}
+		createSingleSegment(null);
 	}
-
+	
 	/**
-	 * Indicates if this container contains at least one character
-	 * Inline codes and annotation markers do not count as characters. If the text contain segment markers,
-	 * if the option lookInSegments is set each segment is looked up, otherwise the segment is
-	 * treated as a marker and not considered text.
+	 * Indicates if this container contains at least one character.
+	 * Inline codes and annotation markers do not count as characters.
+	 * <ul>
+	 * <li>If the whole content is a single segment the check is performed on that
+	 * content and the option lookInSegments is ignored.
+	 * <li>If the content has several segments or if the single segment is not
+	 * the whole content, each segment is checked only if lookInSegment is set.
+	 * <li>The holder is always checked if no text is found in the segments.
+	 * </ul>
 	 * @param lookInSegments indicates if the possible segments in this containers should be
 	 * looked at. If this parameter is set to false, the segment marker are treated as codes.
 	 * @param whiteSpacesAreText indicates if whitespaces should be considered 
-	 * characters or not for the purpose of checking if this fragment is empty.
-	 * @return true if this container contains at least one character (that character could
-	 * be a whitespace if whiteSpacesAreText is set to true, and could be in a segment if
-	 * lookInSegments is set to true).
+	 * text characters or not.
+	 * @return true if this container contains at least one character according the
+	 * given options.
 	 */
 	public boolean hasText (boolean lookInSegments,
 		boolean whiteSpacesAreText)
 	{
-		for ( int i=0; i<text.length(); i++ ) {
-			switch (text.charAt(i)) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-				i++; // Skip over the marker, they are not text
-				continue;
-			case MARKER_SEGMENT:
+		for ( TextPart part : parts ) {
+			if ( part.isSegment() ) {
 				if ( lookInSegments ) {
-					int n = TextFragment.toIndex(text.charAt(++i));
-					n = Integer.parseInt(codes.get(n).data);
-					if ( segments.get(n).text.hasText(whiteSpacesAreText) ) {
-						return true;
-					}
+					if ( part.getContent().hasText(whiteSpacesAreText) ) return true;
 				}
-				else {
-					i++; // Skip over the marker, they are not text
-				}
-				continue;
 			}
-			// Not a marker
-			// If we count whitespaces as text, then we have text
-			if ( whiteSpacesAreText ) return true;
-			// Otherwise we have text if it's not a whitespace
-			if ( !Character.isWhitespace(text.charAt(i)) ) return true;
+			else {
+				if ( part.getContent().hasText(whiteSpacesAreText) ) return true;
+			}
+		}
+		return false; // No text
+	}
+
+	/**
+	 * Indicates if this container contains at least one character that is not a whitespace.
+	 * This method has the same result as calling {@link #hasText(boolean, boolean)} with the parameters true and false.
+	 * @param whiteSpacesAreText indicates if whitespaces should be considered 
+	 * text characters or not.
+	 * @return true if this container contains at least one character that is not a whitespace.
+	 */
+	public boolean hasText (boolean whiteSpacesAreText) {
+		for ( TextPart part : parts ) {
+			if ( part.getContent().hasText(whiteSpacesAreText) ) return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Indicates if this container is empty (no text and no codes).
+	 * @return true if this container is empty.
+	 */
+	public boolean isEmpty () {
+		for ( TextPart part : parts ) {
+			if ( !part.getContent().isEmpty() ) return false;
+		}
+		return true;
 	}
 	
 	public boolean hasProperty (String name) {
@@ -213,389 +869,258 @@ public class TextContainer extends TextFragment {
 	}
 
 	/**
-	 * Indicates if this TextContainer is segmented.
-	 * @return True if the this TextContainer is segmented.
+	 * Gets the segment for a given identifier.
+	 * @param id the identifier of the segment to retrieve.
+	 * @return the segment for the given identifier or null if no segment is found.
 	 */
-	public boolean isSegmented () {
-		return (segments != null);
+	public Segment getSegment (String id) {
+		for ( TextPart part : parts ) {
+			if ( part.isSegment() ) {
+				if ( ((Segment)part).id.equals(id) ) return (Segment)part;
+			}
+		}
+		// Should never occur
+		return null;
 	}
 	
 	/**
-	 * Gets the list of all current segments, or null if this object is not segmented.
-	 * @return The list of all current segments, or null. 
+	 * Gets the segment for a given index.
+	 * @param index the index of the segment to retrieve. The first
+	 * segment has the index 0, the second has the index 1, etc.
+	 * Note that the index value used here is not necessarily the same index as the part. 
+	 * @return the segment for the given index.
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
-	public List<Segment> getSegments () {
-		return segments;
+	public Segment getSegment (int index) {
+		int tmp = -1;
+		for ( TextPart part : parts ) {
+			if ( part.isSegment() ) {
+				if ( ++tmp == index ) {
+					return (Segment)part;
+				}
+			}
+		}
+		// Should never occur
+		return null;
+	}
+	
+	public TextPart getPart (int index) {
+		return parts.get(index);
 	}
 	
 	/**
-	 * Gets the number of segments in this object. If the object is not segmented it returns 0.
-	 * @return The number of segments or 0 if it is not segmented.
+	 * Gets the number of segments in this container.
+	 * This method should always return at least 1.
+	 * Use {@link #hasText(boolean, boolean)} to check for text presence.
+	 * Use {@link #isEmpty()} to verify if the content is empty of not.
+	 * @return the number of segments in the container.
 	 */
 	public int getSegmentCount () {
-		if ( segments == null ) return 0;
-		return segments.size();
-	}
-
-	/**
-	 * Segments this object into one or more segments corresponding to given ranges in 
-	 * the coded text. If the object is already segmented, it will be automatically
-	 * un-segmented first.
-	 * <p>The segments are accessible with {@link #getSegments()}. The coded text
-	 * of the main object, becomes a place-holder string for the inter-segment content. 
-	 * @param ranges List of the ranges corresponding to the segments. They must be
-	 * expressed in coded text units, never overlap, and be ordered from the left-most
-	 * to the right-most.
-	 * @return The number of segments.
-	 */
-	public int createSegments (List<Range> ranges) {
-		// Do nothing if null
-		if( ranges == null ) return 0;
-
-		// Extract the segments using the ranges
-		segments = new ArrayList<Segment>();
-		if (( codes == null ) && (ranges.size() > 0 )) {
-			codes = new ArrayList<Code>();
-		}
-		int oriLength = text.length();
-		int diff = 0;
-		for ( int i=0; i<ranges.size(); i++ ) {
-			// Add the new segment in the list
-			segments.add(new Segment(String.valueOf(i),
-				subSequence(ranges.get(i).start+diff, ranges.get(i).end+diff)));
-			// Remove it from the main content
-			int width = ranges.get(i).end-ranges.get(i).start;
-			// For chunks < 2 there is no codes so we can just add the needed room for the segment marker
-			if ( width == 1 ) insert(ranges.get(i).start+diff, new TextFragment("Z"));
-			else if ( width == 0 ) insert(ranges.get(i).start+diff, new TextFragment("ZZ"));
-			else { // Otherwise: we need to remove the chunk of coded text and its codes
-				remove(ranges.get(i).start+diff, ranges.get(i).end+diff);
-				// then re-insert room for the segment marker
-				insert(ranges.get(i).start+diff, new TextFragment("ZZ"));
-			}
-			
-			// Set the segment marker and its corresponding code
-			if ( codes == null ) codes = new ArrayList<Code>();
-			codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT, String.valueOf(i)));
-			text.setCharAt(ranges.get(i).start+diff, (char)MARKER_SEGMENT);
-			text.setCharAt(ranges.get(i).start+diff+1,
-				toChar(codes.size()-1));
-			// Compute the adjustment to take in account
-			diff = (text.length()-oriLength);
-		}
-		// Return the number of segments
-		if ( segments.size() == 0 ) {
-			segments = null;
-			return 0;
-		}
-		else {
-			return segments.size();
-		}
-	}
-
-	/**
-	 * Creates a new segment from a section of the container text.
-	 * Any existing segmentation remains in place, but the section 
-	 * must not contain existing segment markers.
-	 * @param start The position of the first character or marker of the section
-	 * (in the coded text representation).
-	 * @param end The position just after the last character or marker of the section
-	 * (in the coded text representation). You can use -1 to indicate the end of the
-	 * text.
-	 * @return The TextFragment of the segment just created, or null if no segment 
-	 * was created (for example when the width provided was 0).
-	 */
-	public TextFragment createSegment (int start,
-		int end)
-	{
-		// Compute end for -1
-		if ( end == -1 ) end = text.length();
-		// Check if the segment is empty
-		if ( start == end ) return null;
-
-		// Create lists and codes if needed
-		if ( segments == null ) {
-			segments = new ArrayList<Segment>();
-		}
-		if ( codes == null ) {
-			codes = new ArrayList<Code>();
-		}
-
-		// Get the segment index value for the first segment to create
-		// (where it goes in the list of existing segments)
-		int segIndex = 0;
-		String segId;
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-				i++; // Skip
-				break;
-			case MARKER_SEGMENT:
-				// Are we after the start of the segment to insert?
-				if ( i >= start ) i = text.length(); // Then stop here
-				else segIndex++; // Else wait for next marker or end of text
-				break;
+		int count = 0;
+		for ( TextPart part : parts ) {
+			if ( part.isSegment() ) {
+				count++;
 			}
 		}
-
-		// Add the new segment in the list
-		Segment seg = new Segment(null, subSequence(start, end));
-		boolean inserted = true;
-		if ( segIndex > segments.size()-1 ) {
-			segments.add(seg);
-			segIndex = segments.size()-1;
-			inserted = false; // new segment was added
-		}
-		else {
-			segments.add(segIndex, seg);
-		}
-		segId = String.valueOf(segIndex);
-		seg.id = segId;
-		
-		// Remove it from the main content
-		int width = end-start;
-		if ( width >= 2 ) {
-			// Remove the text (and codes) to take out
-			remove(start, end);
-			// Insert room for the segment marker
-			insert(start, new TextFragment("ZZ"));
-		}
-		else if ( width == 1 ) {
-			insert(start, new TextFragment("Z"));
-		}
-		else if ( width == 0 ) {
-			insert(start, new TextFragment("ZZ"));
-		}
-			
-		// Set the segment marker and its corresponding code
-		text.setCharAt(start, (char)MARKER_SEGMENT);
-		// Add the segment marker
-		codes.add(new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT, segId));
-		// Index of the marker is independent of its location
-		text.setCharAt(start+1, toChar(codes.size()-1));
-
-		// If required: update the indices of the segment markers after the new one
-		if ( inserted ) renumberSegmentMarkers(start+2, segIndex+1);
-		// Return the created segment
-		return segments.get(segIndex).text;
-	}
-
-	public void appendSegment (TextFragment fragment) {
-		// Create lists and codes if needed
-		if ( segments == null ) {
-			segments = new ArrayList<Segment>();
-		}
-		String segId = String.valueOf(segments.size());
-		// Add the segment to the list of segments
-		segments.add(new Segment(segId, fragment));
-		// Append the segment maker. Note segment Id and index are the same here
-		Code code = new Code(TagType.SEGMENTHOLDER, CODETYPE_SEGMENT, segId);
-		append(code);
+		return count;
 	}
 	
 	/**
-	 * Merges back together all segments of this TextContainer object, and clear the 
-	 * list of segments. Convenience method that calls <code>mergeAllSegments(null)</code>.
-	 * @see #mergeAllSegments(List)
+	 * Gets the number of parts (segments and non-segments) in this container.
+	 * This method should always return at least 1.
+	 * @return the number of parts (segments and non-segments) in this container.
 	 */
-	public void mergeAllSegments () {
-		// Merge but don't remember the ranges
-		mergeAllSegments(null);
-//		if ( !isSegmented() ) return;
-//		Code code;
-//		for ( int i=0; i<text.length(); i++ ) {
-//			switch ( text.charAt(i) ) {
-//			case MARKER_OPENING:
-//			case MARKER_CLOSING:
-//			case MARKER_ISOLATED:
-//				i++; // Skip
-//				break;
-//			case MARKER_SEGMENT:
-//				code = getCode(text.charAt(++i));
-//				int index = Integer.parseInt(code.data);
-//				int add = segments.get(index).text.getCodedText().length();
-//				// Remove the segment marker
-//				remove(i-1, i+1);
-//				// Insert the segment
-//				insert(i-1, segments.get(index).text);
-//				// Adjust the value of i so it is at the end of the new segment
-//				i += (add-2); // -2 = size of code marker
-//				break;
-//			}
-//		}
-//		
-//		// Re-initialize the list of segments
-//		segments.clear();
-//		segments = null;
+	public int getPartCount () {
+		return parts.size();
 	}
-	
+
 	/**
 	 * Merges back together all segments of this TextContainer object, and clear the 
 	 * list of segments.
-	 * @param ranges a list of Ranges where to save the segments ranges, use null to 
-	 * not save the ranges.
-	 * Note that the merging is driven by the coded text of the object, so any 
-	 * segments without a corresponding marker in the coded text will not be merge 
-	 * and will be lost.
+	 * The content becomes a single segment content.
+	 * @see #joinAllSegments(List)
 	 */
-	public void mergeAllSegments (List<Range> ranges) {
-		if ( ranges != null ) ranges.clear();
-		if ( !isSegmented() ) return;
-		Code code;
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-				i++; // Skip
-				break;
-			case MARKER_SEGMENT:
-				int start = i; // Start of the range
-				code = getCode(text.charAt(++i));
-				int index = Integer.parseInt(code.data);
-				int add = segments.get(index).text.getCodedText().length();
-				// Remove the segment marker
-				remove(i-1, i+1);
-				// Insert the segment
-				insert(i-1, segments.get(index).text);
-				// Adjust the value of i so it is at the end of the new segment
-				i += (add-2); // -2 = size of code marker
-				// Add the range if requested
-				if ( ranges != null ) {
-					ranges.add(new Range(start, start+add));
-				}
-				break;
-			}
-		}
-		
-		// Re-initialize the list of segments
-		segments.clear();
-		segments = null;
-	}
-
-	/**
-	 * Merges a given segment back into the main coded text.
-	 * @param segmentIndex Index of the segment to merge.
-	 * @return The position (in the coded text) of the start of the merged
-	 * segment, or -1 if the segment index was not found.
-	 */
-	public int mergeSegment (int segmentIndex) {
-		Code code;
-		int pos = -1;
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-				i++; // Skip
-				break;
-			case MARKER_SEGMENT:
-				code = getCode(text.charAt(++i));
-				if ( segmentIndex == Integer.parseInt(code.data) ) {
-					pos = i-1;
-					// Remove the segment marker
-					remove(pos, i+1);
-					// Insert the segment
-					insert(pos, segments.get(segmentIndex).text);
-					// Remove the segment from the segment list
-					segments.remove(segmentIndex);
-					// Renumber the remaining segment
-					renumberSegmentMarkers(pos, segmentIndex);
-					// Check if it was the last segment to merge
-					if ( segments.size() == 0 ) {
-						// This make the container not segmented anymore
-						segments = null;
-					}
-					return pos;
-				}
-			}
-		}
-		return -1; // Segment index not found
+	public void joinAllSegments () {
+		// Merge but don't remember the ranges
+		setContent(createJoinedContent(null));
 	}
 	
 	/**
-	 * Renumbers, from a given value, the segment indices associated to the 
-	 * segment markers located after a given position. 
-	 * @param start start position (in coded text) where the renumbering should start.
-	 * @param indexValue value to use as first index value of the renumbering.
+	 * Merges back together all segments of this TextContainer object, and clear the 
+	 * list of segments. If required, the existing segment boundaries are saved in a given
+	 * list of ranges.
+	 * The content becomes a single segment content.
+	 * @param ranges a list of Ranges where to save the segments ranges, use null to 
+	 * not save the ranges.
 	 */
-	private void renumberSegmentMarkers (int start,
-		int indexValue)
-	{
-		Code code;
-		for ( int i=start; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-				i++; // Skip
-				break;
-			case MARKER_SEGMENT:
-				code = getCode(text.charAt(++i));
-				code.data = String.valueOf(indexValue++);
-				break;
-			}
-		}
+	public void joinAllSegments (List<Range> ranges) {
+		setContent(createJoinedContent(ranges));
 	}
 
+	private boolean hasOnlyOneSegment () {
+		return (getSegmentCount() == 1);
+	}
+	
+	private TextFragment createJoinedContent (List<Range> ranges) {
+		// Clear the ranges if needed
+		if ( ranges != null ) {
+			ranges.clear();
+		}
+		// Join all segment into a new TextFragment
+		int start = 0;
+		TextFragment tf = new TextFragment();
+		for ( TextPart part : parts ) {
+			if (( ranges != null ) && part.isSegment() ) {
+				ranges.add(new Range(start, start+part.text.text.length()));
+			}
+			start += part.text.text.length();
+			tf.append(part.getContent());
+		}
+		return tf;
+	}
+	
 	/**
-	 * Joins a given segment with the closest to it on the right side. The content
-	 * between the given segment and the next, as well as the content of the next
-	 * segment are moved to the end of the content of the given segment.
-	 * @param segmentIndex index of the first segment to join.
+	 * Joins to a given segments all the parts between that segment and the next, as well as
+	 * the next segment.
+	 * <p>For example for the content: " [seg1] [seg2] ", the call joinSegmentWithNextSegment(0)
+	 * will give the result: " [seg1 seg2] ". And the call joinSegmentWithNextSegment(1)
+	 * will give the result: " [seg1] [seg2] " (no change because there is no segment after
+	 * the segment 1.
+	 * @param segmentIndex index of the segment (not the part) where to append the next segment. 
+	 * @return the number of parts joined to the given segment (and removed from the list of parts).
 	 */
-	public void joinSegmentWithNext (int segmentIndex) {
-		Code code;
-		int pos1 = -1;
-		int pos2 = -1;
-		int seg2Index = -1;
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case MARKER_OPENING:
-			case MARKER_CLOSING:
-			case MARKER_ISOLATED:
-				i++; // Skip
-				break;
-			case MARKER_SEGMENT:
-				code = getCode(text.charAt(++i));
-				if ( pos1 == -1 ) { // Search for left segment
-					if ( segmentIndex == Integer.parseInt(code.data) ) {
-						pos1 = i-1;
-					}
-				}
-				else { // Search for right segment
-					seg2Index = Integer.parseInt(code.data);
-					pos2 = i-1;
-					i = text.length(); // Stop the loop
+	public int joinSegmentWithNextSegment (int segmentIndex) {
+		// Check if we have something to join to
+		if ( parts.size() == 1 ) {
+			return 0; // Nothing to do
+		}
+		
+		// Find the segment to join
+		int start = -1;
+		int tmp = -1;
+		for ( TextPart part : parts ) {
+			if ( part.isSegment() ) {
+				if ( ++tmp == segmentIndex ) {
+					start = tmp;
 					break;
 				}
 			}
 		}
 		
-		if ( seg2Index == -1 ) return;
+		// Check if we have a segment at such index
+		if ( start == -1 ) {
+			//TODO: some kind of error???
+			return 0; // Not found
+		}
 		
-		// Assumes pos1 and pos2 are > -1 now
-		// Get the inter-segment part and add it to first segment
-		segments.get(segmentIndex).text.append(subSequence(pos1+2, pos2));
-		// Remove inter-segment part and marker for second segment
-		remove(pos1+2, pos2+2);
-		// Update the indices of the remaining segments
-		renumberSegmentMarkers(pos1+2, segmentIndex+1);
-		// Add second segment to first one
-		segments.get(segmentIndex).text.append(segments.get(seg2Index).text);
-		// Remove second segment
-		segments.remove(seg2Index);
+		// Find the next segment
+		int end = -1;
+		for ( int i=start+1; i<parts.size(); i++ ) {
+			if ( parts.get(i).isSegment() ) {
+				end = i;
+				break;
+			}
+		}
+		
+		// Check if we have a next segment
+		if ( end == -1 ) {
+			// No more segment to join
+			return 0;
+		}
+		
+		TextFragment tf = parts.get(start).getContent();
+		int count = (end-start);
+		int i = 0;
+		while ( i < count ) {
+			tf.append(parts.get(start+1).getContent());
+			parts.remove(start+1);
+			i++;
+		}
+
+		// Do not reset segApplied if one part only: keep the info that is was segmented
+		return count;
 	}
 
 	/**
-	 * Sets the list of segments for this object. No change is made to the
-	 * place-holder itself, so it must already match the given list.
-	 * @param segments The new list of segments.
+	 * Joins a given part with a specified number of its following parts.
+	 * <p>If the resulting part is the only part in the container and is not a segment,
+	 * it is set automatically changed into a segment. 
+	 * <p>joinPartWithNextParts(0, -1) has the same effect as joinAllSegments();
+	 * @param partIndex the index of the part where to append the following parts.
+	 * @param partCount the number of parts to join. You can use -1 to indicate all the parts
+	 * after the initial one. 
+	 * @return the number of parts joined to the given part (and removed from the list of parts). 
 	 */
-	public void setSegments (List<Segment> segments) {
-		this.segments = segments;
+	public int joinPartWithNextParts (int partIndex,
+		int partCount)
+	{
+		if ( parts.size() == 1 ) {
+			return 0; // Nothing to do
+		}
+		
+		TextFragment tf = parts.get(partIndex).getContent();
+		int max = (parts.size()-partIndex)-1;
+		if (( partCount == -1 ) || ( partCount > max )) {
+			partCount = max;
+		}
+		int i = 0;
+		while ( i < partCount ) {
+			tf.append(parts.get(partIndex+1).getContent());
+			parts.remove(partIndex+1);
+			i++;
+		}
+
+		// Check single part case
+		if ( parts.size() == 1 ) {
+			if ( !parts.get(0).isSegment() ) {
+				// Ensure we have always at least one segment
+				parts.set(0, new Segment(null, parts.get(0).text));
+			}
+			// Do not reset segApplied if one part only: keep the info that is was segmented
+		}
+		return i;
+	}
+
+	/**
+	 * Checks if the id of a given segment is empty, null or a duplicate. If it is, the id
+	 * is automatically set to a new value auto-generated.
+	 * @param seg the segment to verify.
+	 */
+	private void validateSegmentId (Segment seg) {
+		if ( !Util.isEmpty(seg.id) ) {
+			// If not null or empty: check if it is a duplicate
+			boolean duplicate = false;
+			for ( TextPart tmp : parts ) {
+				if ( !tmp.isSegment() ) continue;
+				if ( seg == tmp ) continue;
+				if ( seg.id.equals(((Segment)tmp).id) ) {
+					duplicate = true;
+					break;
+				}
+			}
+			if ( !duplicate ) return; // Not a duplicate, nothing to do
+		}
+		
+		// If duplicate or empty or null: assign a default id
+		int value = 0;
+		for ( TextPart tmp : parts ) {
+			if ( tmp == seg ) continue; // Skip over the actual segment
+			if ( !tmp.isSegment() ) continue; // Skip over non-segment
+			// If it starts with a digit, it's probably a number
+			if ( Character.isDigit(((Segment)tmp).id.charAt(0)) ) {
+				// try to convert the id to a integer
+				try {
+					int val = Integer.parseInt(((Segment)tmp).id);
+					// Make the new id the same +1
+					if ( value <= val ) value = val+1;
+				}
+				catch ( NumberFormatException ignore ) {
+					// Not really an error, just a non-numeric id
+				}
+			}
+		}
+		// Set the auto-value
+		seg.id = String.valueOf(value);
 	}
 
 }

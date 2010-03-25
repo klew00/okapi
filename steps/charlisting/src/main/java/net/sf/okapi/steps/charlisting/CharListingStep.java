@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +35,7 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 
 @UsingParameters(Parameters.class)
@@ -135,18 +137,21 @@ public class CharListingStep extends BasePipelineStep {
 		TextUnit tu = (TextUnit)event.getResource();
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return event;
-		// Get the coded text and detect the used characters
-		String text = tu.getSourceContent().getCodedText();
-		for ( int i=0; i<text.length(); i++ ) {
-			if ( TextFragment.isMarker(text.charAt(i))) {
-				i++; // Skip the second character of the marker
-			}
-			else {
-				if ( charList.containsKey(text.charAt(i)) ) {
-					charList.put(text.charAt(i), charList.get(text.charAt(i))+1);
+		// Get the coded text of each parts and detect the used characters
+		Iterator<TextPart> iter = tu.getSource().partIterator();
+		while ( iter.hasNext() ) {
+			String text = iter.next().text.getCodedText();
+			for ( int i=0; i<text.length(); i++ ) {
+				if ( TextFragment.isMarker(text.charAt(i))) {
+					i++; // Skip the second character of the marker
 				}
 				else {
-					charList.put(text.charAt(i), 1);
+					if ( charList.containsKey(text.charAt(i)) ) {
+						charList.put(text.charAt(i), charList.get(text.charAt(i))+1);
+					}
+					else {
+						charList.put(text.charAt(i), 1);
+					}
 				}
 			}
 		}

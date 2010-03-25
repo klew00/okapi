@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,6 +21,7 @@
 package net.okapi.steps.codesremoval;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -35,6 +36,7 @@ public class CodesRemoverTest {
 
 	private CodesRemover remover;
 	private Parameters params;
+	private GenericContent fmt = new GenericContent();
 	
 	@Test
 	public void testSimple () {
@@ -61,9 +63,9 @@ public class CodesRemoverTest {
 		
 		remover.processTextUnit(tu);
 		assertEquals("t1<br/>t2<b>t3</b>", tu.toString());
-		assertEquals(3, tu.getSource().getCodes().size());
+		assertEquals(3, tu.getSource().getFirstPartContent().getCodes().size());
 		assertEquals("t1<br/>t2<b>t3</b>", tu.getTarget(LocaleId.SPANISH).toString());
-		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getCodes().size());
+		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getFirstPartContent().getCodes().size());
 	}
 	
 	@Test
@@ -77,7 +79,7 @@ public class CodesRemoverTest {
 		
 		remover.processTextUnit(tu);
 		assertEquals("t1<br/>t2<b>t3</b>", tu.toString());
-		assertEquals(3, tu.getSource().getCodes().size());
+		assertEquals(3, tu.getSource().getFirstPartContent().getCodes().size());
 		assertEquals("t1t2t3", tu.getTarget(LocaleId.SPANISH).toString());
 	}
 	
@@ -93,7 +95,7 @@ public class CodesRemoverTest {
 		remover.processTextUnit(tu);
 		assertEquals("t1t2t3", tu.toString());
 		assertEquals("t1<br/>t2<b>t3</b>", tu.getTarget(LocaleId.SPANISH).toString());
-		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getCodes().size());
+		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getFirstPartContent().getCodes().size());
 	}
 
 	@Test
@@ -101,16 +103,16 @@ public class CodesRemoverTest {
 		params = new Parameters();
 		remover = new CodesRemover(params, LocaleId.SPANISH);
 		TextContainer tc = new TextContainer();
-		tc.append("C1");
+		tc.appendPart("C1"); // Becomes segment
 		tc.appendSegment(createSimpleFragment());
-		tc.append("C2");
+		tc.appendPart("C2");
 		tc.appendSegment(createSimpleFragment());
 		
 		remover.processContainer(tc);
-		assertEquals("C10C21", tc.toString());
-		assertEquals("t1t2t3", tc.getSegments().get(0).text.toString());
-		assertEquals("t1t2t3", tc.getSegments().get(1).text.toString());
-		tc.mergeAllSegments();
+		assertEquals("[C1][t1t2t3]C2[t1t2t3]", fmt.printSegmentedContent(tc, true));
+		assertEquals("t1t2t3", tc.getSegment(1).text.toString());
+		assertEquals("t1t2t3", tc.getSegment(2).text.toString());
+		tc.joinAllSegments();
 		assertEquals("C1t1t2t3C2t1t2t3", tc.toString());
 	}
 

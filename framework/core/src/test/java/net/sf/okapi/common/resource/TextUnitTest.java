@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -200,27 +200,27 @@ public class TextUnitTest {
 		tu1.setTargetProperty(locFR, p1);
         assertSame("Properties should be the same", p1, tu1.getTargetProperty(locFR, "name"));
 	}
-	
-	@Test
-	public void testGetSetSourceContent () {
-		TextFragment tf1 = new TextFragment("source text");
-		tu1.setSourceContent(tf1);
-		TextFragment tf2 = ((TextContainer)tu1.getSourceContent()).getContent();
-		//TODO: the tc is actually not the same!, because it uses insert()
-		// Do we need to 'fix' this? Probably.
-		//assertSame(tf1, tf2);
-        assertEquals("source content", tf1, tf2);
-    }
-
-	@Test
-	public void testGetSetTargetContent () {
-		TextFragment tf1 = new TextFragment("fr text");
-		tu1.setTargetContent(locFR, tf1);
-		TextFragment tf2 = tu1.getTargetContent(locFR);
-		//TODO: the tc is actually not the same!, because it uses insert()
-		// Do we need to 'fix' this? Probably.
-		//assertSame(tf1, tf2);
-        assertEquals("target content", tf1, tf2);
-	}
+    
+//	@Test
+//	public void testGetSetSourceContent () {
+//		TextFragment tf1 = new TextFragment("source text");
+//		tu1.setSourceContent(tf1);
+//		TextFragment tf2 = ((TextContainer)tu1.getSourceContent()).getContent();
+//		//TODO: the tc is actually not the same!, because it uses insert()
+//		// Do we need to 'fix' this? Probably.
+//		//assertSame(tf1, tf2);
+//        assertEquals("source content", tf1, tf2);
+//    }
+//
+//	@Test
+//	public void testGetSetTargetContent () {
+//		TextFragment tf1 = new TextFragment("fr text");
+//		tu1.setTargetContent(locFR, tf1);
+//		TextFragment tf2 = tu1.getTargetContent(locFR);
+//		//TODO: the tc is actually not the same!, because it uses insert()
+//		// Do we need to 'fix' this? Probably.
+//		//assertSame(tf1, tf2);
+//        assertEquals("target content", tf1, tf2);
+//	}
 
 }

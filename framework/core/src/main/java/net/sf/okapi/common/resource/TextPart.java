@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,49 +20,41 @@
 
 package net.sf.okapi.common.resource;
 
-/**
- * Convenience class to group together the text fragment of a segment
- * and its identifier.
- */
-public class Segment extends TextPart {
-	
+public class TextPart {
+
 	/**
-	 * Identifier of this segment.
+	 * Text fragment of this part.
 	 */
-	public String id;
+	public TextFragment text;
 	
-	/**
-	 * Creates an empty Segment object with a null identifier.
-	 */
-	public Segment () {
-		super(new TextFragment());
+	public TextPart (TextFragment text) {
+		if ( text == null ) {
+			text = new TextFragment();
+		}
+		this.text = text;
 	}
 	
-	/**
-	 * Creates a Segment object with a given identifier and a given
-	 * text fragment.
-	 * @param id identifier for the new segment (Can be null).
-	 * @param text text fragment for the new segment.
-	 */
-	public Segment (String id,
-		TextFragment text)
-	{
-		super(text);
-		this.id = id;
+	public TextPart (String text) {
+		this.text = new TextFragment(text);
 	}
 
 	@Override
-	public Segment clone () {
-		return new Segment(id, text.clone());
+	public TextPart clone () {
+		return new TextPart(text.clone());
+	}
+
+	@Override
+	public String toString () {
+		if ( text == null ) return null;
+		return text.toString();
+	}
+
+	public TextFragment getContent () {
+		return text;
 	}
 	
-	@Override
 	public boolean isSegment () {
-		return true;
-	}
-
-	public String getId () {
-		return id;
+		return false;
 	}
 
 }

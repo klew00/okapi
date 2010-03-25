@@ -431,8 +431,7 @@ public class PropertiesFilter implements IFilter {
 				}
 
 				if ( extract ) {
-					tuRes = new TextUnit(String.valueOf(++tuId),
-						unescape(value));
+					tuRes = new TextUnit(String.valueOf(++tuId), unescape(value));
 					tuRes.setName(key);
 					tuRes.setMimeType(MimeTypeMapper.PROPERTIES_MIME_TYPE);
 					tuRes.setPreserveWhitespaces(true);
@@ -461,7 +460,7 @@ public class PropertiesFilter implements IFilter {
 				}
 
 				if ( params.useCodeFinder ) {
-					params.codeFinder.process(tuRes.getSourceContent());
+					params.codeFinder.process(tuRes.getSource().getFirstPartContent());
 				}
 				
 				tuRes.setSkeleton(skel);

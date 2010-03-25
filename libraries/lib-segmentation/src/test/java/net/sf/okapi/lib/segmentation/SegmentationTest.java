@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,14 +25,19 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -46,6 +51,9 @@ public class SegmentationTest {
 	private ISegmenter segmenter;
 	private ISegmenter segmenterTrim;
 	private LocaleId locEN = LocaleId.fromString("en");
+	private GenericContent fmt = new GenericContent();
+	private LocaleId locFR = LocaleId.FRENCH;
+	private LocaleId locAR = LocaleId.ARABIC;
 	
 	@Before
 	public void setUp() {
@@ -79,57 +87,62 @@ public class SegmentationTest {
 	@Test
 	public void testGetSegments () {
 		TextContainer tc = createSegmentedContainer();
-		List<Segment> list = tc.getSegments();
-		assertNotNull(list);
-		assertEquals("<s>Part 1.</s>", list.get(0).toString());
-		assertEquals(" Part 2.", list.get(1).toString());
-		assertEquals("0Outside1", tc.toString());
+		assertEquals("<s>Part 1.</s>", tc.getSegment(0).toString());
+		assertEquals(" Part 2.", tc.getSegment(1).toString());
+		assertEquals("[<1>Part 1.</1>] Outside[ Part 2.]", fmt.printSegmentedContent(tc, true));
 	}
 	
 	@Test
 	public void testMergeOneSegment () {
 		TextContainer tc = createSegmentedContainer();
-		tc.mergeSegment(1);
+		assertEquals("[<1>Part 1.</1>] Outside[ Part 2.]", fmt.printSegmentedContent(tc, true));
+		tc.changePart(2);
 		assertEquals(1, tc.getSegmentCount());
-		assertEquals("<s>Part 1.</s>", tc.getSegments().get(0).toString());
-		assertEquals("0Outside Part 2.", tc.toString());
+		assertEquals("<s>Part 1.</s>", tc.getSegment(0).toString());
+		assertEquals("[<1>Part 1.</1>] Outside Part 2.", fmt.printSegmentedContent(tc, true));
 	}
+
+	@Test
+	public void testChangeTwoSegmentsToParts () {
+		TextContainer tc = createSegmentedContainer();
+		tc.changePart(2); // Segment to non-segment
+		tc.changePart(0); // try segment to non-segment (but here it's the last segment, so no change)
+		assertEquals(1, tc.getSegmentCount());
+		assertFalse(tc.contentIsOneSegment());
+		assertEquals("[<1>Part 1.</1>] Outside Part 2.", fmt.printSegmentedContent(tc, true));
+		assertEquals("<s>Part 1.</s> Outside Part 2.", tc.toString());
+	}
+
 	
 	@Test
-	public void testMergeTwoSegments () {
+	public void testJoinTwoSegmentsIntoOne () {
 		TextContainer tc = createSegmentedContainer();
-		tc.mergeSegment(1);
-		tc.mergeSegment(0);
-		assertEquals(0, tc.getSegmentCount());
-		assertEquals("<s>Part 1.</s>Outside Part 2.", tc.toString());
+		tc.joinSegmentWithNextSegment(0);
+		assertEquals(1, tc.getSegmentCount());
+		assertTrue(tc.contentIsOneSegment());
+		assertEquals("[<1>Part 1.</1> Outside Part 2.]", fmt.printSegmentedContent(tc, true));
+		assertEquals("<s>Part 1.</s> Outside Part 2.", tc.toString());
 	}
-	
+
 	@Test
 	public void testMergeAllSegments () {
 		TextContainer tc = createSegmentedContainer();
-		tc.mergeAllSegments();
-		assertEquals(0, tc.getSegmentCount());
-		assertEquals("<s>Part 1.</s>Outside Part 2.", tc.toString());
-	}
-	
-	@Test
-	public void testJoinWithNext () {
-		TextContainer tc = createSegmentedContainer();
-		tc.joinSegmentWithNext(0);
+		tc.joinAllSegments();
 		assertEquals(1, tc.getSegmentCount());
-		assertEquals("0", tc.toString());
-		assertEquals("<s>Part 1.</s>Outside Part 2.", tc.getSegments().get(0).toString());
+		assertTrue(tc.contentIsOneSegment());
+		assertEquals("[<1>Part 1.</1> Outside Part 2.]", fmt.printSegmentedContent(tc, true));
+		assertEquals("<s>Part 1.</s> Outside Part 2.", tc.toString());
 	}
 	
 	@Test
 	public void testCreateSegment () {
 		TextContainer tc = createSegmentedContainer();
-		// "..Outside.."
-		tc.createSegment(2, 9);
-		assertEquals(3, tc.getSegmentCount());
-		assertEquals("<s>Part 1.</s>", tc.getSegments().get(0).toString());
-		assertEquals("Outside", tc.getSegments().get(1).toString());
-		assertEquals(" Part 2.", tc.getSegments().get(2).toString());
+		// "**Part 1.** Outside Part2."
+		//  01234567890123456789012345"
+		tc.createSegment(11, 19);
+		assertEquals(1, tc.getSegmentCount());
+		assertEquals(3, tc.getPartCount());
+		assertEquals(" Outside", tc.getSegment(0).toString());
 	}
 	
 	@Test
@@ -137,46 +150,46 @@ public class SegmentationTest {
 		TextContainer tc = createSegmentedContainer();
 		tc.appendSegment(new TextFragment(" Added Part."));
 		assertEquals(3, tc.getSegmentCount());
-		assertEquals(" Added Part.", tc.getSegments().get(2).toString());
+		assertEquals(" Added Part.", tc.getSegment(2).toString());
 	}
-	
+
 	@Test
 	public void testSegmentationSimple1 () {
 		TextContainer tc = createSegmentedContainer("a. z", segmenter);
 		assertEquals(2, tc.getSegmentCount());
-		assertEquals("a.", tc.getSegments().get(0).toString());
-		assertEquals(" z", tc.getSegments().get(1).toString());
+		assertEquals("a.", tc.getSegment(0).toString());
+		assertEquals(" z", tc.getSegment(1).toString());
 		tc = createSegmentedContainer("a. z", segmenterTrim);
 		assertEquals(2, tc.getSegmentCount());
-		assertEquals("a.", tc.getSegments().get(0).toString());
-		assertEquals("z", tc.getSegments().get(1).toString());
+		assertEquals("a.", tc.getSegment(0).toString());
+		assertEquals("z", tc.getSegment(1).toString());
 	}
 	
 	@Test
 	public void testSegmentationSimpleWithLeadingTrainlingWS () {
 		TextContainer tc = createSegmentedContainer(" a.  ", segmenter);
 		assertEquals(2, tc.getSegmentCount());
-		assertEquals(" a.", tc.getSegments().get(0).toString());
-		assertEquals("  ", tc.getSegments().get(1).toString());
+		assertEquals(" a.", tc.getSegment(0).toString());
+		assertEquals("  ", tc.getSegment(1).toString());
 		// 1 segment only because the last one is only made of whitespaces
 		tc = createSegmentedContainer("a. ", segmenterTrim);
 		assertEquals(1, tc.getSegmentCount());
-		assertEquals("a.", tc.getSegments().get(0).toString());
+		assertEquals("a.", tc.getSegment(0).toString());
 	}
 	
 	@Test
 	public void testSegmentationWithEmpty () {
 		TextContainer tc = createSegmentedContainer(" a. | b.", segmenter);
 		assertEquals(3, tc.getSegmentCount());
-		assertEquals(" a.", tc.getSegments().get(0).toString());
-		assertEquals(" |", tc.getSegments().get(1).toString());
-		assertEquals(" b.", tc.getSegments().get(2).toString());
+		assertEquals(" a.", tc.getSegment(0).toString());
+		assertEquals(" |", tc.getSegment(1).toString());
+		assertEquals(" b.", tc.getSegment(2).toString());
 		// 1 segment only because the last one is only made of whitespaces
 		tc = createSegmentedContainer(" a. |  b.", segmenterTrim);
 		assertEquals(3, tc.getSegmentCount());
-		assertEquals("a.", tc.getSegments().get(0).toString());
-		assertEquals("|", tc.getSegments().get(1).toString());
-		assertEquals("b.", tc.getSegments().get(2).toString());
+		assertEquals("a.", tc.getSegment(0).toString());
+		assertEquals("|", tc.getSegment(1).toString());
+		assertEquals("b.", tc.getSegment(2).toString());
 	}
 
 	@Test
@@ -189,9 +202,10 @@ public class SegmentationTest {
 		List<Range> list = segter.getRanges();
 		assertEquals(1, list.get(0).start);
 		assertEquals(2, list.get(0).end);
-		
-		URL url = SegmentationTest.class.getResource("/Test01.srx");
-		String tmpPath = Util.getDirectoryName(url.getPath())+File.separator+"tmp.srx";
+
+		// Use the Test01.srx at the root level (not in the package tree)
+		String root = TestUtil.getParentDir(getClass(), "/Test01.srx");
+		String tmpPath = Util.getDirectoryName(root)+File.separator+"tmp.srx";
 		srxDoc.saveRules(tmpPath, true, true);
 
 		srxDoc.resetAll();
@@ -223,15 +237,90 @@ public class SegmentationTest {
 		assertEquals(2, list.get(0).end);
 	}
 	
+	@Test
+	public void testTUCreateSourceSegmentation () {
+		TextUnit tu = new TextUnit("tuid");
+		tu.setSource(createSimpleContent());
+		tu.createSourceSegmentation(segmenter);
+		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
+	}
+	
+	@Test
+	public void testTUCreateSourceSegmentationOverwrite () {
+		TextUnit tu = new TextUnit("tuid");
+		tu.setSource(createSegmentedContainer()); // hard-coded
+		assertEquals("[<1>Part 1.</1>] Outside[ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
+		tu.createSourceSegmentation(segmenter); // From the segmenter
+		assertEquals("[<1>Part 1.</1>][ Outside Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
+	}
+	
+	@Test
+	public void testTUSourceSegmentationInTarget () {
+		TextUnit tu = new TextUnit("tuid");
+		tu.setSource(createSimpleContent());
+		tu.createSourceSegmentation(segmenter);
+		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
+		// Creates the target and translate it
+		TextContainer tc = tu.createTarget(locFR, true, IResource.COPY_ALL);
+		for ( Segment seg : tc ) {
+			seg.text.setCodedText(seg.text.getCodedText().toUpperCase() + " FR");
+		}
+		assertEquals("[<1>PART 1.</1> FR][ PART 2. FR]", fmt.printSegmentedContent(tc, true));
+	}
+	
+	@Test
+	public void testTUSynchronizeSourceSegmentationForTarget () {
+		TextUnit tu = new TextUnit("tuid");
+		tu.setSource(createSimpleContent());
+		tu.createSourceSegmentation(segmenter);
+		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
+		// No changes for FR
+		TextContainer tc1 = tu.createTarget(locFR, true, IResource.COPY_ALL);
+		// One segment for AR
+		TextContainer tc2 = tu.createTarget(locAR, true, IResource.COPY_ALL);
+		tc2.joinSegmentWithNextSegment(0); // Make it one segment for AR
+		List<Range> ranges = new ArrayList<Range>();
+		// "**Part 1.** Part 2."
+		//  0123456789012345678
+		ranges.add(new Range(0, 19));
+		tu.setSourceSegmentationForTarget(locAR, ranges);
+		// Check the FR against the source
+		Segment srcSeg;
+		tu.synchronizeSourceSegmentation(locFR);
+		for ( Segment seg : tc1 ) {
+			srcSeg = tu.getSource().getSegment(seg.id);
+			assertNotNull(srcSeg);
+			assertEquals(seg.text, srcSeg.text);
+		}
+		// Test AR against the source
+		tu.synchronizeSourceSegmentation(locAR);
+		for ( Segment seg : tc2 ) {
+			srcSeg = tu.getSource().getSegment(seg.id);
+			assertNotNull(srcSeg);
+			assertEquals(seg.text, srcSeg.text);
+		}
+	}
+	
+	private TextContainer createSimpleContent () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "s", "<s>");
+		tf.append("Part 1.");
+		tf.append(TagType.CLOSING, "s", "</s>");
+		tf.append(" Part 2.");
+		return new TextContainer(tf);
+	}
+
 	private TextContainer createSegmentedContainer () {
-		TextContainer tc = new TextContainer();
-		tc.append(TagType.OPENING, "s", "<s>");
-		tc.append("Part 1.");
-		tc.append(TagType.CLOSING, "s", "</s>");
-		tc.append(" Part 2.");
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "s", "<s>");
+		tf.append("Part 1.");
+		tf.append(TagType.CLOSING, "s", "</s>");
+		tf.append(" Part 2.");
+		TextContainer tc = new TextContainer(tf);
 		segmenter.computeSegments(tc);
 		tc.createSegments(segmenter.getRanges());
-		tc.insert(2, new TextFragment("Outside"));
+		// Insert in holder between the two segments
+		tc.insertPart(1, new TextPart(new TextFragment(" Outside")));
 		return tc;
 	}
 

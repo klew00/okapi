@@ -133,7 +133,7 @@ public class TMXWriterTest {
     		"<tu tuid=\"" + tu.getName() + "\">" +
     		properties +
     		"<tuv xml:lang=\"en\">" +
-    		"<seg>" + tu.getSourceContent().toString() + "</seg>" +
+    		"<seg>" + tu.getSource().getFirstSegmentContent().toString() + "</seg>" +
     		"</tuv>" +
     		targetTuvs +
     		"</tu>";
@@ -151,7 +151,8 @@ public class TMXWriterTest {
     private String getTargetTuvs(TextUnit tu) {
     	String targetTuvs = "";
     	for (LocaleId langName : tu.getTargetLocales()) {
-    		targetTuvs += "<tuv xml:lang=\"" + langName + "\">" + "<seg>" + tu.getTargetContent(langName).toString() + "</seg>" + "</tuv>";
+    		targetTuvs += "<tuv xml:lang=\"" + langName + "\">" + "<seg>" + 
+    			tu.getTarget(langName).getFirstSegmentContent().toString() + "</seg>" + "</tuv>";
     	}
     	return targetTuvs;
     }

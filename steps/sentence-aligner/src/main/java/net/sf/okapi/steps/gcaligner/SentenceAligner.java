@@ -14,9 +14,8 @@
  *  limitations under the License.
  *  
  */
-
 /*===========================================================================
- Additional changes Copyright (C) 2009 by the Okapi Framework contributors
+ Additional changes Copyright (C) 2009-2010 by the Okapi Framework contributors
  ===========================================================================*/
 
 package net.sf.okapi.steps.gcaligner;

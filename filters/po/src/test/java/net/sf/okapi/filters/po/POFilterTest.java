@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -191,7 +191,7 @@ public class POFilterTest {
 			filter.getEncoderManager(), locFR);
 		assertEquals(result, snippet);
 	}
-		
+
 	@Test
 	public void testInlines () {
 		String snippet = "msgid \"Text %s and %d and %f\"\n"
@@ -199,8 +199,8 @@ public class POFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
 		assertTrue(tu.hasTarget(locFR));
-		TextFragment src = tu.getSourceContent();
-		TextFragment trg = tu.getTargetContent(locFR);
+		TextFragment src = tu.getSource().getFirstPartContent();
+		TextFragment trg = tu.getTarget(locFR).getFirstPartContent();
 		assertEquals(3, src.getCodes().size());
 		assertEquals(src.getCodes().size(), trg.getCodes().size());
 		FilterTestDriver.checkCodeData(src, trg);

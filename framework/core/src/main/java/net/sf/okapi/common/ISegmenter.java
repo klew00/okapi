@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.segmentation;
+package net.sf.okapi.common;
 
 import java.util.List;
 
@@ -40,7 +40,8 @@ public interface ISegmenter {
 	
 	/**
 	 * Calculates the segmentation of a given TextContainer object.
-	 * The assumption is that the container is not segmented yet.
+	 * If the content is already segmented, itis un-segmented automatically before
+	 * being processed.
 	 * @param container the object to segment.
 	 * @return the number of segments calculated.
 	 */

@@ -62,7 +62,7 @@ public class QueryManagerTest {
 		TextUnit tu = new TextUnit("1", "src");
 		TextFragment newSrc = new TextFragment("src");
 		TextFragment newTrg = new TextFragment("trg");
-		qm.adjustNewFragment(tu.getSourceContent(), newSrc, newTrg, 99, tu);
+		qm.adjustNewFragment(tu.getSource().getFirstSegmentContent(), newSrc, newTrg, 99, tu);
 		assertEquals(locTrg, newTrg.toString());
 	}
 
@@ -75,7 +75,7 @@ public class QueryManagerTest {
 		tf.append(TagType.CLOSING, "b", "</T>");
 		tf.append(" T ");
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
-		qm.adjustNewFragment(tu.getSourceContent(), tf, tf, 99, tu);
+		qm.adjustNewFragment(tu.getSource().getFirstSegmentContent(), tf, tf, 99, tu);
 		assertEquals("T <b>BOLD</b> T <br/>", tf.toString());
 		fmt.setContent(tf);
 		assertEquals("T <1>BOLD</1> T <2/>", fmt.toString());
@@ -91,7 +91,7 @@ public class QueryManagerTest {
 		tf.append(" T ");
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
 		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
-		qm.adjustNewFragment(tu.getSourceContent(), tf, tf, 99, tu);
+		qm.adjustNewFragment(tu.getSource().getFirstSegmentContent(), tf, tf, 99, tu);
 		assertEquals("T <b>BOLD</b> T <br/><EXTRA/>", tf.toString());
 		fmt.setContent(tf);
 		assertEquals("T <1>BOLD</1> T <2/><3/>", fmt.toString());
@@ -106,7 +106,7 @@ public class QueryManagerTest {
 		tf.append(" T ");
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
 		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
-		qm.adjustNewFragment(tu.getSourceContent(), tf, tf, 99, tu);
+		qm.adjustNewFragment(tu.getSource().getFirstSegmentContent(), tf, tf, 99, tu);
 		assertEquals("T <b>BOLD T <br/><EXTRA/>", tf.toString());
 		fmt.setContent(tf);
 		assertEquals("T <b1/>BOLD T <2/><3/>", fmt.toString());
@@ -122,14 +122,14 @@ public class QueryManagerTest {
 		tf.append(" U ");
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		// Fuzzy match but codes are the same
-		qm.adjustNewFragment(tu.getSourceContent(), tf, tf, 88, tu);
+		qm.adjustNewFragment(tu.getSource().getFirstPartContent(), tf, tf, 88, tu);
 		assertEquals("U <b>BOLD</b> U <br/>", tf.toString());
 		assertEquals("U <1>BOLD</1> U <2/>", fmt.setContent(tf).toString());
 	}
 
 	private TextUnit createTextUnit1 () {
 		TextUnit tu = new TextUnit("1", "t ");
-		TextFragment tf = tu.getSourceContent();
+		TextFragment tf = tu.getSource().getFirstSegmentContent();
 		tf.append(TagType.OPENING, "b", "<b>");
 		tf.append("bold");
 		tf.append(TagType.CLOSING, "b", "</b>");

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.skeleton;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
@@ -44,6 +45,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -63,6 +65,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private String outputEncoding;
 	private boolean isMultilingual;
 	private int referentCopies = 1; // Number of copies to have for the referents (min=1)
+
+//	private boolean segmentReferents = false;
 	
 	private IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
@@ -75,6 +79,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return ref.ref;
 	}
 
+	@Override
 	public void close () {
 		if ( referents != null ) {
 			referents.clear();
@@ -97,6 +102,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		else this.referentCopies = referentCopies;
 	}
 
+	@Override
 	public String processStartDocument (LocaleId outputLocale,
 		String outputEncoding,
 		ILayerProvider layer,
@@ -121,10 +127,12 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
+	@Override
 	public String processEndDocument (Ending resource) {
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
+	@Override
 	public String processStartSubDocument (StartSubDocument resource) {
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
@@ -133,6 +141,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 
+	@Override
 	public String processEndSubDocument (Ending resource) {
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
@@ -141,6 +150,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
+	@Override
 	public String processStartGroup (StartGroup resource) {
 		if ( resource.isReferent() ) {
 			StorageList sl = new StorageList(resource);
@@ -157,6 +167,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
+	@Override
 	public String processEndGroup (Ending resource) {
 		if ( storageStack.size() > 0 ) {
 			storageStack.peek().add(resource);
@@ -166,6 +177,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
+	@Override
 	public String processTextUnit (TextUnit resource) {
 		if ( resource.isReferent() ) {
 			referents.put(resource.getId(), new Referent(resource, referentCopies));
@@ -178,6 +190,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return getString(resource, outputLoc, 1);
 	}
 
+	@Override
 	public String processDocumentPart (DocumentPart resource) {
 		if ( resource.isReferent() ) {
 			referents.put(resource.getId(), new Referent(resource, referentCopies));
@@ -337,196 +350,348 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// Get the right text container
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = null;
-		if ( locToUse != null ) {
+		if ( locToUse != null ) { // Expects a target output
 			if ( (trgCont = tu.getTarget(locToUse)) == null ) {
-				if ( !srcCont.isSegmented() ) {
-					// Fall back to source, except when the source is segmented
-					trgCont = tu.getSource();
-				}
+				// If there is no target available
+				// We fall back to source
+				trgCont = srcCont;
 			}
 		}
-		// Now trgCont is null only if we have segments and no target is available
-		// Otherwise trgCont is either the available target or the source (fall-back case)
-
-//TODO: Case of unsegmented with target!!!		
+		else { // Use the source
+			// Set trgCont to it because that's the one driving the output
+			trgCont = srcCont;
+		}
+		// Now trgCont is either the available target or the source (fall-back case)
 
 		if ( !tu.isTranslatable() ) {
 			context = 0; // Keep skeleton context
 		}
-		// Check for segmentation
-		if ( srcCont.isSegmented() ) {
-			// Special case of segmented entry: source + target
-			return getSegmentedText(tu.getSource(), trgCont, locToUse, context);
+		
+		if ( srcCont.hasBeenSegmented() || !srcCont.contentIsOneSegment() ) {
+			return getSegmentedText(srcCont, trgCont, locToUse, context, tu.isReferent());
 		}
-		else { // Normal case: use the calculated target
-			TextContainer cont;
-			if ( locToUse == null ) cont = srcCont;
-			else cont = trgCont;
-			
-			// Apply the layer if there is one
-			if ( layer == null ) {
-				return getContent(cont, locToUse, context);
-			}
-			else {
-				switch ( context ) {
-				case 1:
-					return layer.endCode()
-						+ getContent(cont, locToUse, 0)
-						+ layer.startCode();
-				case 2:
-					return layer.endInline()
-						+ getContent(cont, locToUse, 0)
-						+ layer.startInline();
-				default:
-					return getContent(cont, locToUse, context);
-				}
+		
+		// Else: We have only one segment
+		// Use trgCont, even if locToUse == null because then it's the source
+		TextFragment tf = trgCont.getFirstPartContent();
+
+		// Apply the layer if there is one
+		if ( layer == null ) {
+			return getContent(tf, locToUse, context);
+		}
+		else {
+			switch ( context ) {
+			case 1:
+				return layer.endCode()
+					+ getContent(tf, locToUse, 0)
+					+ layer.startCode();
+			case 2:
+				return layer.endInline()
+					+ getContent(tf, locToUse, 0)
+					+ layer.startInline();
+			default:
+				return getContent(tf, locToUse, context);
 			}
 		}
 	}
-	
+
+	// This method assumes bi-lingual pairs are 1-1 and in the same order
 	private String getSegmentedText (TextContainer srcCont,
 		TextContainer trgCont,
 		LocaleId locToUse,
-		int context)
+		int context,
+		boolean isReferent)
 	{
 		StringBuilder tmp = new StringBuilder();
-		List<Segment> srcSegs = srcCont.getSegments();
-		List<Segment> trgSegs = null;
+
+		// Get the scores if they are available
 		ScoresAnnotation scores = null;
 		if ( trgCont != null ) {
-			trgSegs = trgCont.getSegments();
 			scores = trgCont.getAnnotation(ScoresAnnotation.class);
 		}
-		String text = srcCont.getCodedText();
-		Code code;
-		char ch;
-		for ( int i=0; i<text.length(); i++ ) {
-			ch = text.charAt(i);
-			switch ( ch ) {
-			case TextFragment.MARKER_OPENING:
-			case TextFragment.MARKER_CLOSING:
-			case TextFragment.MARKER_ISOLATED:
-				//TODO: Handle codes outside the segments!!!
-				code = srcCont.getCode(text.charAt(++i));
-				tmp.append(expandCodeContent(code, locToUse, context));
-				break;
-			case TextFragment.MARKER_SEGMENT:
-				code = srcCont.getCode(text.charAt(++i));
-				int n = Integer.valueOf(code.getData());
-				// Check segment source/target
-				TextFragment trgFrag = null;
-				int lev = 0;
-				if (( trgSegs != null ) && ( n < trgSegs.size() )) {
-					trgFrag = trgSegs.get(n).text;
-					if ( scores != null ) lev = scores.getScore(n);
+		
+		// The output is driven by the target, not the source, so the interstices parts
+		// are the ones of the target, no the one of the source
+		Iterator<TextPart> iter = trgCont.partIterator();
+		int i = -1;
+		
+		while ( iter.hasNext() ) {
+			TextPart part = iter.next();
+			i++;
+			if ( part.isSegment() ) {
+				int lev = (( scores != null ) ? scores.getScore(i) : 0 );
+				Segment trgSeg = (Segment)part;
+				Segment srcSeg = srcCont.getSegment(trgSeg.id);
+				if ( srcSeg == null ) {
+					// A target segment without a corresponding source: give warning
+					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",
+						trgSeg.id, trgSeg.text.toString()));
 				}
-				if ( trgFrag == null ) { // No target available: use the source
-					trgFrag = srcSegs.get(n).text;
-				}
-				// Write it
+
+				// Write the segment (note: srcSeg can be null)
 				if ( layer == null ) {
-//TODO: deal with not-in segment leading text
-//TODO: deal with not-in-segment codes
-					// Get the inter-segment characters at the end of the segment
-					// So derived writers can treat all chars in getContent()
-					// i currently points to the index of the segment marker
-					int j; // Move forward until we found a marker or the end of the text
-					for ( j=1; i+j<text.length(); j++ ) {
-						if ( TextFragment.isMarker(text.charAt(i+j)) ) {
-							break;
-						}
-					} // Now j-1 should be the number of characters to add
-					if ( j > 1 ) {
-						trgFrag = trgFrag.clone(); // Make sure we don't change the original
-						trgFrag.append(text.substring(i+1, i+j));
-						i += (j-1); // Move the pointer at the last char we put in the segment
-					}
-					// Now get the content for the segment
-					tmp.append(getContent(trgFrag, locToUse, context));
+					// If no layer: just write the target
+					tmp.append(getContent(trgSeg.text, locToUse, context));
 				}
-				else {
+				else { // If layer: write the bilingual entry
 					switch ( context ) {
 					case 1:
 						tmp.append(layer.endCode()
 							+ layer.startSegment()
-							+ getContent(srcSegs.get(n).text, null, 0)
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
 							+ layer.midSegment(lev)
-							+ ((trgFrag==null) ? "" : getContent(trgFrag, locToUse, 0))
+							+ getContent(srcSeg.text, locToUse, 0)
 							+ layer.endSegment()
 							+ layer.startCode());
 						break;
 					case 2:
 						tmp.append(layer.endInline()
 							+ layer.startSegment()
-							+ getContent(srcSegs.get(n).text, null, 0)
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
 							+ layer.midSegment(lev)
-							+ ((trgFrag==null) ? "" : getContent(trgFrag, locToUse, 0))
+							+ getContent(trgSeg.text, locToUse, 0)
 							+ layer.endSegment()
 							+ layer.startInline());
 						break;
 					default:
 						tmp.append(layer.startSegment()
-							+ getContent(srcSegs.get(n).text, null, context)
+							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
 							+ layer.midSegment(lev)
-							+ ((trgFrag==null) ? "" : getContent(trgFrag, locToUse, context))
+							+ getContent(trgSeg.text, locToUse, 0)
 							+ layer.endSegment());
 						break;
 					}
 				}
-				break;
-			default:
-				if ( Character.isHighSurrogate(ch) ) {
-					int cp = text.codePointAt(i);
-					i++; // Skip low-surrogate
-					if ( encoderManager == null ) {
-						if ( layer == null ) {
-							tmp.append(new String(Character.toChars(cp)));
-						}
-						else {
-							tmp.append(layer.encode(cp, context));
-						}
-					}
-					else {
-						if ( layer == null ) {
-							tmp.append(encoderManager.encode(cp, context));
-						}
-						else {
-							tmp.append(layer.encode(
-								encoderManager.encode(cp, context),
-								context));
-						}
-					}
-				}
-				else { // Non-supplemental case
-					if ( encoderManager == null ) {
-						if ( layer == null ) {
-							tmp.append(ch);
-						}
-						else {
-							tmp.append(layer.encode(ch, context));
-						}
-					}
-					else {
-						if ( layer == null ) {
-							tmp.append(encoderManager.encode(ch, context));
-						}
-						else {
-							tmp.append(layer.encode(
-								encoderManager.encode(ch, context),
-								context));
-						}
-					}
-				}
-				break;
+			}
+			else { // Normal text fragment
+				// Target fragment is used
+				tmp.append(getContent(part.text, locToUse, context));
 			}
 		}
+
 		return tmp.toString();
 	}
 
+//	/**
+//	 * Gets the original content of a given text unit.
+//	 * @param tu The text unit to process.
+//	 * @param locToUse locale to output. Use null for the source, or the locale
+//	 * for the target locales.
+//	 * @param context Context flag: 0=text, 1=skeleton, 2=inline.
+//	 * @return The string representation of the text unit content.
+//	 */
+//	protected String getContent (TextUnit tu,
+//		LocaleId locToUse,
+//		int context) // protected for OpenXML
+//	{
+//		// Update the encoder from the TU's MIME type
+//		if ( encoderManager != null ) {
+//			encoderManager.updateEncoder(tu.getMimeType());
+//		}
+//		
+//		// Get the right text container
+//		TextContainer srcCont = tu.getSource();
+//		TextContainer trgCont = null;
+//		if ( locToUse != null ) {
+//			if ( (trgCont = tu.getTarget(locToUse)) == null ) {
+//				if ( !srcCont.isSegmented() ) {
+//					// Fall back to source, except when the source is segmented
+//					trgCont = tu.getSource();
+//				}
+//			}
+//		}
+//		// Now trgCont is null only if we have segments and no target is available
+//		// Otherwise trgCont is either the available target or the source (fall-back case)
+//
+//		if ( !tu.isTranslatable() ) {
+//			context = 0; // Keep skeleton context
+//		}
+//		// Check for segmentation
+//		if ( srcCont.isSegmented() ) {
+//			// Special case of segmented entry: source + target
+//			return getSegmentedText(tu.getSource(), trgCont, locToUse, context, tu.isReferent());
+//		}
+//		else { // Normal case: use the calculated target
+//			TextContainer cont;
+//			if ( locToUse == null ) cont = srcCont;
+//			else cont = trgCont;
+//			
+//			// Apply the layer if there is one
+//			if ( layer == null ) {
+//				return getContent(cont, locToUse, context);
+//			}
+//			else {
+//				switch ( context ) {
+//				case 1:
+//					return layer.endCode()
+//						+ getContent(cont, locToUse, 0)
+//						+ layer.startCode();
+//				case 2:
+//					return layer.endInline()
+//						+ getContent(cont, locToUse, 0)
+//						+ layer.startInline();
+//				default:
+//					return getContent(cont, locToUse, context);
+//				}
+//			}
+//		}
+//	}
+	
+//	private String getSegmentedText (TextContainer srcCont,
+//		TextContainer trgCont,
+//		LocaleId locToUse,
+//		int context,
+//		boolean isReferent)
+//	{
+//		StringBuilder tmp = new StringBuilder();
+//		List<Segment> srcSegs = srcCont.getSegments();
+//		List<Segment> trgSegs = null;
+//		ScoresAnnotation scores = null;
+//		if ( trgCont != null ) {
+//			trgSegs = trgCont.getSegments();
+//			scores = trgCont.getAnnotation(ScoresAnnotation.class);
+//		}
+//		
+//		boolean markSegments = ( segmentReferents || !isReferent );
+//		
+//		String text = srcCont.getCodedText();
+//		Code code;
+//		char ch;
+//		for ( int i=0; i<text.length(); i++ ) {
+//			ch = text.charAt(i);
+//			switch ( ch ) {
+//			case TextFragment.MARKER_OPENING:
+//			case TextFragment.MARKER_CLOSING:
+//			case TextFragment.MARKER_ISOLATED:
+//				//TODO: Handle codes outside the segments!!!
+//				code = srcCont.getCode(text.charAt(++i));
+//				tmp.append(expandCodeContent(code, locToUse, context));
+//				break;
+//			case TextFragment.MARKER_SEGMENT:
+//				code = srcCont.getCode(text.charAt(++i));
+//				int n = Integer.valueOf(code.getData());
+//				// Check segment source/target
+//				TextFragment trgFrag = null;
+//				int lev = 0;
+//				if (( trgSegs != null ) && ( n < trgSegs.size() )) {
+//					trgFrag = trgSegs.get(n).text;
+//					if ( scores != null ) lev = scores.getScore(n);
+//				}
+//				if ( trgFrag == null ) { // No target available: use the source
+//					trgFrag = srcSegs.get(n).text;
+//				}
+//				// Write it
+//				if ( layer == null ) {
+////TODO: deal with not-in segment leading text
+////TODO: deal with not-in-segment codes
+//					// Get the inter-segment characters at the end of the segment
+//					// So derived writers can treat all chars in getContent()
+//					// i currently points to the index of the segment marker
+//					int j; // Move forward until we found a marker or the end of the text
+//					for ( j=1; i+j<text.length(); j++ ) {
+//						if ( TextFragment.isMarker(text.charAt(i+j)) ) {
+//							break;
+//						}
+//					} // Now j-1 should be the number of characters to add
+//					if ( j > 1 ) {
+//						trgFrag = trgFrag.clone(); // Make sure we don't change the original
+//						trgFrag.append(text.substring(i+1, i+j));
+//						i += (j-1); // Move the pointer at the last char we put in the segment
+//					}
+//					// Now get the content for the segment
+//					tmp.append(getContent(trgFrag, locToUse, context));
+//				}
+//				else {
+//					switch ( context ) {
+//					case 1:
+//						tmp.append(layer.endCode()
+//							+ layer.startSegment()
+//							+ getContent(srcSegs.get(n).text, null, 0)
+//							+ layer.midSegment(lev)
+//							+ ((trgFrag==null) ? "" : getContent(trgFrag, locToUse, 0))
+//							+ layer.endSegment()
+//							+ layer.startCode());
+//						break;
+//					case 2:
+//						tmp.append(layer.endInline()
+//							+ layer.startSegment()
+//							+ getContent(srcSegs.get(n).text, null, 0)
+//							+ layer.midSegment(lev)
+//							+ ((trgFrag==null) ? "" : getContent(trgFrag, locToUse, 0))
+//							+ layer.endSegment()
+//							+ layer.startInline());
+//						break;
+//					default:
+//						tmp.append(layer.startSegment()
+//							+ getContent(srcSegs.get(n).text, null, context)
+//							+ layer.midSegment(lev)
+//							+ ((trgFrag==null) ? "" : getContent(trgFrag, locToUse, context))
+//							+ layer.endSegment());
+//						break;
+//					}
+//				}
+//				break;
+//			default:
+//				if ( Character.isHighSurrogate(ch) ) {
+//					int cp = text.codePointAt(i);
+//					i++; // Skip low-surrogate
+//					if ( encoderManager == null ) {
+//						if ( layer == null ) {
+//							tmp.append(new String(Character.toChars(cp)));
+//						}
+//						else {
+//							tmp.append(layer.encode(cp, context));
+//						}
+//					}
+//					else {
+//						if ( layer == null ) {
+//							tmp.append(encoderManager.encode(cp, context));
+//						}
+//						else {
+//							tmp.append(layer.encode(
+//								encoderManager.encode(cp, context),
+//								context));
+//						}
+//					}
+//				}
+//				else { // Non-supplemental case
+//					if ( encoderManager == null ) {
+//						if ( layer == null ) {
+//							tmp.append(ch);
+//						}
+//						else {
+//							tmp.append(layer.encode(ch, context));
+//						}
+//					}
+//					else {
+//						if ( layer == null ) {
+//							tmp.append(encoderManager.encode(ch, context));
+//						}
+//						else {
+//							tmp.append(layer.encode(
+//								encoderManager.encode(ch, context),
+//								context));
+//						}
+//					}
+//				}
+//				break;
+//			}
+//		}
+//		return tmp.toString();
+//	}
+
+	/**
+	 * Gets the original content of a TextFragment.
+	 * @param tf the TextFragment to process.
+	 * @param locToUse locale to output. Use null for the source, or the locale
+	 * for the target locales. This is used for referenced content in inline codes.
+	 * @param context Context flag: 0=text, 1=skeleton, 2=inline.
+	 * @return The string representation of the text unit content.
+	 */
 	public String getContent (TextFragment tf,
 		LocaleId locToUse,
 		int context)
-	{ // this needs to be public for an override in OpenXML
+	{
 		// Output simple text
 		if ( !tf.hasCode() ) {
 			if ( encoderManager == null ) {
@@ -566,7 +731,6 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				tmp.append(expandCodeContent(code, locToUse, context));
 				break;
 			case TextFragment.MARKER_ISOLATED:
-			case TextFragment.MARKER_SEGMENT:
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				tmp.append(expandCodeContent(code, locToUse, context));
 				break;

@@ -45,4 +45,11 @@ public class Range {
 		this.end = end;
 	}
 	
+	/**
+	 * Gets the string representation of the range (its start and end position between parenthesis).
+	 * @return the string representation of the range.
+	 */
+	public String toString () {
+		return String.format("(%d,%d)", start, end);
+	}
 }

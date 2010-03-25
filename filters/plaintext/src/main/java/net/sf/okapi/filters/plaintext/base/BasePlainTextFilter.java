@@ -320,7 +320,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		if (!checkTU(source)) return false;
 		if (source.isEmpty()) return false;
 		
-		if (params.unescapeSource) _unescape(source);
+		// We can use getFirstPartContent() because nothing is segmented yet
+		if (params.unescapeSource) _unescape(source.getFirstPartContent());
 		
 		//------------------------------
 		// The cell can already have something in the skeleton (for instance, a gap after the source)
@@ -366,7 +367,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		
 		if (!params.preserveWS ) {
 			// Unwrap the content
-			TextFragment.unwrap(source);
+			source.unwrap(true);
 			
 //			for (String lng : languages)
 //				TextFragment.unwrap(textUnit.getTargetContent(lng));				
@@ -374,8 +375,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		
 		// Automatically replace text fragments with in-line codes (based on regex rules of codeFinder)
 		if (params.useCodeFinder && codeFinder != null) {
-			
-			codeFinder.process(source);
+			// We can use getFirstPartContent() because nothing is segmented yet
+			codeFinder.process(source.getFirstPartContent());
 			
 //			for (String lng : languages)
 //				codeFinder.process(textUnit.getTargetContent(lng));
@@ -404,14 +405,14 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 	 * @param text The string to convert.
 	 * @return The converted string.
 	 */
-	private void _unescape (TextContainer textContainer) {
+	private void _unescape (TextFragment textFrag) {
 		// Cannot be static because of the logger
 		
 		final String INVALID_UESCAPE = "Invalid Unicode escape sequence '%s'";
 		
-		if (textContainer == null) return;
+		if (textFrag == null) return;
 		
-		String text = textContainer.getCodedText(); 
+		String text = textFrag.getCodedText(); 
 		if (Util.isEmpty(text)) return;
 		
 		if ( text.indexOf('\\') == -1 ) return; // Nothing to unescape
@@ -457,7 +458,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 			else tmpText.append(text.charAt(i));
 		}
 		
-		textContainer.setCodedText(tmpText.toString());
+		textFrag.setCodedText(tmpText.toString());
 	}
 
 	@Override

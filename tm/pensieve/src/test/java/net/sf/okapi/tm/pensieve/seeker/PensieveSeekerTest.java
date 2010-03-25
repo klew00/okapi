@@ -70,21 +70,22 @@ public class PensieveSeekerTest {
         seeker.close();
     }
 
-    //@Test
-    public void shortEntries () throws Exception {
-        PensieveWriter writer = getWriter();
-        writer.indexTranslationUnit(new TranslationUnit(
-           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abcd")), TARGET));
-        writer.indexTranslationUnit(new TranslationUnit(
-           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abc")), TARGET));
-        writer.close();
-
-        List<TmHit> list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, null);
-        assertEquals("number of docs found", 1, list.size());
-        
-        list = seeker.searchFuzzy(new TextFragment("abc"), 100, 1, null);
-        assertEquals("number of docs found", 1, list.size());
-    }
+    //TODO: This test does not pass (even before TextContainer refectoring)
+//    @Test
+//    public void shortEntries () throws Exception {
+//        PensieveWriter writer = getWriter();
+//        writer.indexTranslationUnit(new TranslationUnit(
+//           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abcd")), TARGET));
+//        writer.indexTranslationUnit(new TranslationUnit(
+//           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abc")), TARGET));
+//        writer.close();
+//
+//        List<TmHit> list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, null);
+//        assertEquals("number of docs found", 1, list.size());
+//        
+//        list = seeker.searchFuzzy(new TextFragment("abc"), 100, 1, null);
+//        assertEquals("number of docs found", 1, list.size());
+//    }
 
     @Test
     public void penaltyDifferentSpaces () throws Exception {
@@ -128,7 +129,6 @@ public class PensieveSeekerTest {
         assertNull(tuIterator.next());
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     @Test(expected = OkapiIOException.class)
     public void iteratorInstantiationHandleIOException() throws IOException {
         PensieveSeeker spy = spy(seeker);
@@ -136,7 +136,6 @@ public class PensieveSeekerTest {
         spy.iterator();
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     @Test(expected = OkapiIOException.class)
     public void iteratorInstantiationHandleCorruptedIndexException() throws IOException {
         PensieveSeeker spy = spy(seeker);
@@ -144,7 +143,6 @@ public class PensieveSeekerTest {
         spy.iterator();
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     @Test(expected = OkapiIOException.class)
     public void iteratorNextIOException() throws Exception {
         PensieveWriter writer = getWriter();
@@ -160,7 +158,6 @@ public class PensieveSeekerTest {
         iterator.next();
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
     @Test(expected = OkapiIOException.class)
     public void iteratorNextCorruptedIndexException() throws Exception {
         PensieveWriter writer = getWriter();

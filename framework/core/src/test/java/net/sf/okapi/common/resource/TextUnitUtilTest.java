@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,6 +31,7 @@ import java.util.List;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -41,9 +42,10 @@ import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 
 import org.junit.Test;
 
-
 public class TextUnitUtilTest {
 
+	private GenericContent fmt = new GenericContent();
+	
 	@Test
 	public void testUtils() {
 		String st = "12345678";
@@ -86,7 +88,7 @@ public class TextUnitUtilTest {
 		
 		//--------------------
 		//TextContainer tcc = new TextContainer("    123456  ");
-		TextContainer tcc = new TextContainer();
+		TextFragment tcc = new TextFragment();
 		Code c2 = new Code(TagType.PLACEHOLDER, "code");
 		tcc.append(c2);
 		tcc.append("    123456  ");
@@ -98,7 +100,7 @@ public class TextUnitUtilTest {
 		assertEquals("    ", skel.toString());
 		
 		//--------------------
-		TextContainer tcc2 = new TextContainer("    123456  ");
+		TextFragment tcc2 = new TextFragment("    123456  ");
 		Code c3 = new Code(TagType.PLACEHOLDER, "code");
 		tcc2.append(c3);
 		
@@ -109,7 +111,7 @@ public class TextUnitUtilTest {
 		assertEquals("  ", skel2.toString());
 		
 		//--------------------
-		TextContainer tcc4 = new TextContainer("    123456  ");
+		TextFragment tcc4 = new TextFragment("    123456  ");
 		Code c4 = new Code(TagType.PLACEHOLDER, "code");
 		tcc4.append(c4);
 		
@@ -117,23 +119,22 @@ public class TextUnitUtilTest {
 		assertEquals('6', ch);
 		
 		//--------------------
-		TextContainer tcc5 = new TextContainer("    123456  ");
+		TextFragment tcc5 = new TextFragment("    123456  ");
 		
 		TextUnitUtil.deleteLastChar(tcc5);
 		assertEquals("    12345  ", tcc5.getCodedText());
 		
 		//--------------------
-		TextContainer tcc6 = new TextContainer("123456_    ");
+		TextFragment tcc6 = new TextFragment("123456_    ");
 		
 		assertTrue(TextUnitUtil.endsWith(tcc6, "_"));
 		assertTrue(TextUnitUtil.endsWith(tcc6, "6_"));
 		assertFalse(TextUnitUtil.endsWith(tcc6, "  "));
 		
-		TextContainer tcc7 = new TextContainer("123456<splicer>    ");
+		TextFragment tcc7 = new TextFragment("123456<splicer>    ");
 		assertTrue(TextUnitUtil.endsWith(tcc7, "<splicer>"));
 		assertTrue(TextUnitUtil.endsWith(tcc7, "6<splicer>"));
 		assertFalse(TextUnitUtil.endsWith(tcc7, "  "));
-		
 	}
 	
 	@Test
@@ -148,7 +149,7 @@ public class TextUnitUtilTest {
 		sb.append((char) TextFragment.MARKER_ISOLATED);
 		sb.append((char) (TextFragment.CHARBASE + 2));
 		sb.append("fgh");
-		sb.append((char) TextFragment.MARKER_SEGMENT);
+		sb.append((char) TextFragment.MARKER_ISOLATED);
 		sb.append((char) (TextFragment.CHARBASE + 3));
 		sb.append("ijklm");
 		sb.append((char) TextFragment.MARKER_CLOSING);
@@ -177,7 +178,7 @@ public class TextUnitUtilTest {
 		sb.append((char) TextFragment.MARKER_ISOLATED);
 		sb.append((char) (TextFragment.CHARBASE + 2));
 		sb.append("fgh");
-		sb.append((char) TextFragment.MARKER_SEGMENT);
+		sb.append((char) TextFragment.MARKER_ISOLATED);
 		sb.append((char) (TextFragment.CHARBASE + 3));
 		sb.append("ijklm");
 		sb.append((char) TextFragment.MARKER_CLOSING);
@@ -207,12 +208,12 @@ public class TextUnitUtilTest {
 		
 		TextUnit tu = TextUnitUtil.buildTU("\"qualified text\"");
 		TextUnitUtil.removeQualifiers(tu, "\"");
-		assertEquals("qualified text", TextUnitUtil.getSourceText(tu));
+		assertEquals("qualified text", tu.getSource().toString());
 		
-		TextUnitUtil.setSourceText(tu, "((({[qualified text]})))");
-		assertEquals("((({[qualified text]})))", TextUnitUtil.getSourceText(tu));
+		tu.setSourceContent(new TextFragment("((({[qualified text]})))"));
+		assertEquals("((({[qualified text]})))", tu.getSource().toString());
 		TextUnitUtil.removeQualifiers(tu, "((({", "})))");
-		assertEquals("[qualified text]", TextUnitUtil.getSourceText(tu));
+		assertEquals("[qualified text]", tu.getSource().toString());
 		
 		GenericSkeleton tuSkel = (GenericSkeleton) tu.getSkeleton();
 		assertNotNull(tuSkel);
@@ -240,8 +241,8 @@ public class TextUnitUtilTest {
 		tc.createSegment(0, 5);
 		
 		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori,
-			ori.getSource().getSegments().get(0),
-			ori.getTarget(LocaleId.ITALIAN).getSegments().get(0),
+			ori.getSource().getSegment(0),
+			ori.getTarget(LocaleId.ITALIAN).getSegment(0),
 			LocaleId.ITALIAN);
 		assertEquals(ori.getId(), res.getId());
 		assertEquals("Seg1.", res.getSource().toString());
@@ -261,17 +262,17 @@ public class TextUnitUtilTest {
 		ori.createTarget(LocaleId.ARABIC, true, IResource.COPY_ALL);
 		
 		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori,
-			srcSegs, trgSegs, LocaleId.ITALIAN, "  ");
+			srcSegs, trgSegs, LocaleId.ITALIAN, "__");
 		
 		assertEquals(ori.getId(), res.getId());
-		assertEquals("1  2", res.getSource().toString());
-		assertEquals("2  1  3", res.getTarget(LocaleId.ITALIAN).toString());
+		assertEquals("[sSeg1.]__[sSeg2.]", fmt.printSegmentedContent(res.getSource(), true));
+		assertEquals("[tSeg2.]__[tSeg1.]__[tSeg3.]", fmt.printSegmentedContent(res.getTarget(LocaleId.ITALIAN), true));
 		
 		assertEquals(2, res.getSource().getSegmentCount());
-		assertEquals("sSeg1.", res.getSource().getSegments().get(0).toString());
+		assertEquals("sSeg1.", res.getSource().getSegment(0).toString());
 		
 		assertEquals(3, res.getTarget(LocaleId.ITALIAN).getSegmentCount());
-		Segment seg = res.getTarget(LocaleId.ITALIAN).getSegments().get(0);
+		Segment seg = res.getTarget(LocaleId.ITALIAN).getSegment(0);
 		assertEquals("tSeg2.", seg.toString());
 		assertEquals("2", seg.id);
 	}

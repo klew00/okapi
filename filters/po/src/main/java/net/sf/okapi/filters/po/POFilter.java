@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -615,7 +615,8 @@ public class POFilter implements IFilter {
 					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", true));
 				}
 				// Synchronizes source and target codes as much as possible
-				tc.synchronizeCodes(tu.getSourceContent());
+				TextFragment tf = tc.getFirstPartContent();
+				tf.synchronizeCodes(tu.getSource().getFirstPartContent());
 			}
 			//else { // Correct the approved property
 			//	tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");

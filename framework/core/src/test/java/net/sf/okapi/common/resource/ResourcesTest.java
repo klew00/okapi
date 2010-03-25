@@ -187,8 +187,7 @@ public class ResourcesTest {
 		list.add(new Event(EventType.DOCUMENT_PART, dp1));
 		
 		skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "Before ");
-		TextFragment tf = tu1.getSourceContent();
+		TextFragment tf = new TextFragment("Before ");
 		tf.append(TagType.OPENING, "b", "<b>");
 		tf.append("bold");
 		tf.append(TagType.CLOSING, "b", "</b>");
@@ -197,6 +196,8 @@ public class ResourcesTest {
 		code.appendReference("dp1");
 		tf.append(code);
 		tf.append(" after.");
+		TextUnit tu1 = new TextUnit("tu1");
+		tu1.setSourceContent(tf);
 		skel.add("<p>");
 		skel.addContentPlaceholder(tu1);
 		skel.append("</p>");
@@ -251,7 +252,7 @@ public class ResourcesTest {
 		skel.add("<tu><tuv xml:lang='EN'><seg>");
 		
 		// Store the tuv content of the source
-		TextFragment src = tu.getSourceContent();
+		TextFragment src = tu.getSource().getFirstSegmentContent();
 		src.append("T1-en");
 		
 		// Add the <sub> element of the source

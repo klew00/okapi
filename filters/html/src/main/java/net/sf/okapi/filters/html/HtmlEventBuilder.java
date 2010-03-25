@@ -78,7 +78,8 @@ public class HtmlEventBuilder extends EventBuilder {
 
 	@Override
 	protected TextUnit postProcessTextUnit(TextUnit textUnit) {
-		TextFragment text = textUnit.getSourceContent();
+		// We can use getFirstPartContent() because nothing is segmented
+		TextFragment text = textUnit.getSource().getFirstPartContent();
 		// Treat the white spaces
 		text.setCodedText(normalizeHtmlText(text.getCodedText(), false, isCollapseWhitespace()));
 		// Apply the in-line codes rules if needed

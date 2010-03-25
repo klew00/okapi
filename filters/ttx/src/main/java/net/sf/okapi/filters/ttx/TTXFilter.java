@@ -83,7 +83,7 @@ public class TTXFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private boolean canceled;
 	private GenericSkeleton skel;
-	private TextUnit tu;
+	//private TextUnit tu;
 	private Parameters params;
 	//private boolean sourceDone;
 	//private boolean targetDone;
@@ -410,7 +410,7 @@ public class TTXFilter implements IFilter {
 			TextContainer srcCont = tu.getSource();
 			TextFragment srcSegFrag = null;
 			TextFragment trgSegFrag = null;
-			TextFragment current = srcCont.getContent();
+			TextFragment current = new TextFragment();
 			ArrayList<Segment> trgSegments = new ArrayList<Segment>();
 			boolean returnValueAfterTextUnitDone = true;
 			ScoresAnnotation scores = null;
@@ -446,12 +446,16 @@ public class TTXFilter implements IFilter {
 						}
 					}
 					else if ( name.equals("Tu") ) { // New segment
+						// End non-segment part
+						if ( !current.isEmpty() ) {
+							srcCont.appendPart(current);
+						}
+						// Start new segment
 						inTU = true;
 						inTarget = false;
 						srcSegFrag = new TextFragment();
-						trgSegFrag = new TextFragment();
-						current = srcSegFrag;
 						trgSegFrag = null;
+						current = srcSegFrag;
 						// Get Tu info
 						tmp = reader.getAttributeValue(null, MATCHPERCENT);
 						String origin = reader.getAttributeValue(null, ORIGIN);
@@ -482,6 +486,7 @@ public class TTXFilter implements IFilter {
 							inTarget = !inTarget;
 						}
 						if ( inTarget ) {
+							srcCont.appendPart(current);
 							trgSegFrag = new TextFragment();
 							current = trgSegFrag;
 						}

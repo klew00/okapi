@@ -185,14 +185,15 @@ public class FilterTestDriver {
 				return false;
 			}
 			
-			if ( mtu.getSource().getCodes().size() != gtu.getSource().getCodes().size() ) {
+			if ( mtu.getSource().getUnSegmentedContentCopy().getCodes().size()
+				!= gtu.getSource().getUnSegmentedContentCopy().getCodes().size() ) {
 				return false;
 			}
 			int i = -1;
-			for (Code c : mtu.getSource().getCodes()) {
+			for (Code c : mtu.getSource().getUnSegmentedContentCopy().getCodes()) {
 				i++;
 				if (c.getType() != null) {
-					if (!c.getType().equals(gtu.getSource().getCode(i).getType())) {
+					if (!c.getType().equals(gtu.getSource().getUnSegmentedContentCopy().getCode(i).getType())) {
 						return false;
 					}
 				}
@@ -1038,34 +1039,26 @@ public class FilterTestDriver {
 			return false;
 		}
 		
-		if ( !compareTextFragment(t1.getContent(), t2.getContent()) ) {
+		if ( !compareTextFragment(t1.getUnSegmentedContentCopy(), t2.getUnSegmentedContentCopy()) ) {
 			System.err.println("Fragment difference");
 			return false;
 		}
 		
-		if ( t1.isSegmented() ) {
-			if ( !t2.isSegmented() ) {
+		if ( t1.hasBeenSegmented() ) {
+			if ( !t2.hasBeenSegmented() ) {
 				System.err.println("isSegmented difference");
 				return false;
 			}
-			List<Segment> segs1 = t1.getSegments();
-			List<Segment> segs2 = t2.getSegments();
-			if ( segs1.size() != segs2.size() ) {
+			if ( t1.getSegmentCount() != t2.getSegmentCount() ) {
 				System.err.println("Number of segments difference");
 				return false;
 			}
-			for ( int i=0; i<segs1.size(); i++ ) {
-				Segment seg1 = segs1.get(i);
-				Segment seg2 = segs1.get(i);
-				if ( seg1.id == null ) {
-					if ( seg2.id != null ) 
-						return false;
-				}
-				else {
-					if ( seg2.id == null ) 
-						return false;
-					if ( !seg1.id.equals(seg2.id) ) 
-						return false;
+			
+			for ( Segment seg1 : t1 ) {
+				Segment seg2 = t2.getSegment(seg1.id);
+				if ( seg2 == null ) {
+					System.err.println("Segment in t2 not found.");
+					return false;
 				}
 				if ( !compareTextFragment(seg1.text, seg2.text) ) {
 					System.err.println("Text fragment difference");
@@ -1074,7 +1067,7 @@ public class FilterTestDriver {
 			}
 		}
 		else {
-			if ( t2.isSegmented() ) {
+			if ( t2.hasBeenSegmented() ) {
 				System.err.println("Segmentation difference");
 				return false;
 			}

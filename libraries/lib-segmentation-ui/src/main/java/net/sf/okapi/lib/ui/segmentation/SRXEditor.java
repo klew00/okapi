@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
@@ -37,7 +38,6 @@ import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
-import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -137,7 +137,7 @@ public class SRXEditor {
 		help = helpParam;
 		srxDoc = new SRXDocument();
 		srxPath = null;
-		sampleText = new TextContainer(null);
+		sampleText = new TextContainer();
 		sampleOutput = new GenericContent();
 		fileProc = new FileProcessor();
 

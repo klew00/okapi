@@ -50,6 +50,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -69,7 +70,7 @@ public class MIFFilter implements IFilter {
 	private int tuId;
 	private int otherId;
 	private int level;
-	private TextContainer cont;
+	private TextFragment cont;
 	private boolean canceled;
 	private LinkedList<Event> queue;
 	private LocaleId srcLang;
@@ -264,7 +265,7 @@ public class MIFFilter implements IFilter {
 					String tag = readTag();
 					if ( "Para".equals(tag) ) {
 						inPara = level;
-						cont = new TextContainer();
+						cont = new TextFragment();
 					}
 					else if ( "String".equals(tag) ) {
 						inString = level;
@@ -279,7 +280,7 @@ public class MIFFilter implements IFilter {
 						inPara = -1;
 						if ( !cont.isEmpty() ) {
 							TextUnit tu = new TextUnit(String.valueOf(++tuId));
-							tu.setSource(cont);
+							tu.setSource(new TextContainer(cont));
 							tu.setMimeType("text/x-mif");
 							skel.addContentPlaceholder(tu);
 							tu.setSkeleton(skel);

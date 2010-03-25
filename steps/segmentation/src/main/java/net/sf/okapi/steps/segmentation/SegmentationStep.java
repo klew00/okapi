@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -32,7 +33,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 @UsingParameters(Parameters.class)
@@ -121,7 +121,7 @@ public class SegmentationStep extends BasePipelineStep {
 		if ( tu.hasTarget(targetLocale) ) {
 			if ( params.segmentTarget ) {
 				cont = tu.getTarget(targetLocale);
-				if ( !cont.isSegmented() ) {
+				if ( !cont.hasBeenSegmented() ) {
 					trgSeg.computeSegments(cont);
 					cont.createSegments(trgSeg.getRanges());
 				}
@@ -129,7 +129,7 @@ public class SegmentationStep extends BasePipelineStep {
 		}
 		else if ( params.segmentSource ) {
 			cont = tu.getSource();
-			if ( !cont.isSegmented() ) {
+			if ( !cont.hasBeenSegmented() ) {
 				srcSeg.computeSegments(cont);
 				cont.createSegments(srcSeg.getRanges());
 			}

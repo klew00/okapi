@@ -52,7 +52,8 @@ public class Main {
 				Event event = filter.next();
 				if ( event.getEventType() == EventType.TEXT_UNIT ) {
 					// Format and print out each text unit
-					fmt.setContent(((TextUnit)event.getResource()).getSourceContent());
+					// We can use getFirstPartContent() because nothing is segmented
+					fmt.setContent(((TextUnit)event.getResource()).getSource().getFirstPartContent());
 					System.out.println(fmt.toString());
 				}
 			}

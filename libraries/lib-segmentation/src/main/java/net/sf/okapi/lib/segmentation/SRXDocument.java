@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.segmentation;
 
 import net.sf.okapi.common.DefaultEntityResolver;
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.NSContextManager;
 import net.sf.okapi.common.Util;

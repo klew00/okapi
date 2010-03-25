@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,13 +21,14 @@
 package net.sf.okapi.steps.codesremoval;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class CodesRemover {
@@ -62,14 +63,9 @@ public class CodesRemover {
 	}
 
 	public void processContainer (TextContainer tc) {
-		if ( tc.isSegmented() ) {
-			List<Segment> segments = tc.getSegments();
-			for ( Segment seg :segments ) {
-				processFragment(seg.text);
-			}
-		}
-		else {
-			processFragment(tc.getContent());
+		Iterator<TextPart> iter = tc.partIterator();
+		while ( iter.hasNext() ) {
+			processFragment(iter.next().text);
 		}
 	}
 	
@@ -105,12 +101,6 @@ public class CodesRemover {
 					i++; // Skip over index
 					break;
 				}
-				break;
-			case TextFragment.MARKER_SEGMENT:
-				// Always preserve segments
-				remaining.add(codes.get(TextFragment.toIndex(text.charAt(++i))));
-				tmp.append(text.charAt(i-1));
-				tmp.append(TextFragment.toChar(remaining.size()-1));
 				break;
 			default:
 				// Always preserve other characters

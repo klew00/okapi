@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,12 +21,15 @@
 package net.sf.okapi.common.resource;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.LocaleId;
@@ -57,6 +60,9 @@ public class TextUnit implements INameable, IReferenceable {
 	private TextContainer source;
 	private String mimeType;
 	private ConcurrentHashMap<LocaleId, TextContainer> targets;
+	
+	private List<Range> srcSegRanges;
+	private ConcurrentHashMap<LocaleId, List<Range>> trgSegRanges;
 
 	/**
 	 * Creates a new TextUnit object with its identifier.
@@ -117,10 +123,7 @@ public class TextUnit implements INameable, IReferenceable {
 		this.id = id;
 		refCount = (isReferent ? 1 : 0); 
 		this.mimeType = mimeType;
-		source = new TextContainer();
-		if ( sourceText != null ) {
-			source.text.append(sourceText);
-		}
+		source = new TextContainer(sourceText);
 	}
 
 	/**
@@ -455,39 +458,36 @@ public class TextUnit implements INameable, IReferenceable {
 		return trgCont;
 	}
 
-    /**
-	 * Gets the content of the source for this TextUnit (a {@link TextFragment} object).
-	 * @return the content of the source for this TextUnit.
-	 */
-	public TextFragment getSourceContent () {
-        //How is this different from getSource()?
-		return source;
-	}
+//    /**
+//	 * Gets the content of the source for this TextUnit (a {@link TextFragment} object).
+//	 * @return the content of the source for this TextUnit.
+//	 */
+//	public TextFragment getSourceContent () {
+//		return source;
+//	}
 
 	/**
-	 * Sets the content of the source for thsi TextUnit.
+	 * Sets the content of the source for this TextUnit.
 	 * @param content the new content to set.
 	 * @return the new content of the source for this TextUnit. 
 	 */
 	public TextFragment setSourceContent (TextFragment content) {
-		//set methods should generally not return anything
-        //In this case it seems non-intuitive to be returning the TextContainer when setting the text fragment on the
-        //textcontainer
-        //Also, doesn't setting the content actually end up appending the content?
         source.setContent(content);
-		return source;
+        // We can use getFirstSegmentContent() because the setContent() removed any segmentation
+		return source.getFirstSegmentContent();
 	}
 
-	/**
-	 * Gets the content of the target for a given locale for this TextUnit.
-	 * @param locId the locale to query.
-	 * @return the content of the target for the given locale for this TextUnit.
-	 */
-	public TextFragment getTargetContent (LocaleId locId) {
-		TextContainer tc = getTarget(locId);
-		if ( tc == null ) return null;
-		return tc.getContent();
-	}
+//	/**
+//	 * Gets the content of the target for a given locale for this TextUnit.
+//	 * @param locId the locale to query.
+//	 * @return the content of the target for the given locale for this TextUnit,
+//	 * or null if the locale is not found.
+//	 */
+//	public TextFragment getTargetContent (LocaleId locId) {
+//		TextContainer tc = getTarget(locId);
+//		if ( tc == null ) return null;
+//		return tc.getContent();
+//	}
 	
 	/**
 	 * Sets the content of the target for a given locale for this TextUnit.
@@ -500,7 +500,8 @@ public class TextUnit implements INameable, IReferenceable {
 	{
 		TextContainer tc = createTarget(locId, false, CREATE_EMPTY);
 		tc.setContent(content);
-		return tc;
+        // We can use getFirstSegmentContent() because the setContent() removed any segmentation
+		return tc.getFirstSegmentContent();
 	}
 
 	public String getMimeType () {
@@ -516,7 +517,7 @@ public class TextUnit implements INameable, IReferenceable {
 	 * @return true if the source text of this TextUnit is empty, false otherwise.
 	 */
 	public boolean isEmpty () {
-		return (( source.text == null ) || ( source.text.length() == 0 ));
+		return source.isEmpty();
 	}
 
 	public boolean preserveWhitespaces () {
@@ -527,4 +528,60 @@ public class TextUnit implements INameable, IReferenceable {
 		preserveWS = value;
 	}
 
+	/**
+	 * Segment the source content based on the rules provided by a given ISegmenter.
+	 * <p>This methods also stores the boundaries for the segments so they can be re-applied later.
+	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
+	 * @param segmenter the segmenter to use to create the segments.
+	 */
+	public void createSourceSegmentation (ISegmenter segmenter) {
+		segmenter.computeSegments(source);
+		srcSegRanges = segmenter.getRanges();
+		source.createSegments(srcSegRanges);
+	}
+	
+	/**
+	 * Saves the current segment boundaries for the source.
+	 * <p>This methods stores the boundaries for the segments so they can be re-applied later,
+	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
+	 * @return the boundaries that have been saved.
+	 * @see #createSourceSegmentation(ISegmenter)
+	 * @see #synchronizeSourceSegmentation(LocaleId)
+	 */
+	public List<Range> saveCurrentSourceSegmentation () {
+		srcSegRanges = source.getCurrentSegmentationRanges();
+		return srcSegRanges;
+	}
+
+	/**
+	 * Sets the segments ranges for the source container so it matches the segmentation of a given target content.
+	 * @param locId the locale to match.
+	 * @param ranges the source segment ranges for matching the segments of that locale. 
+	 */
+	public void setSourceSegmentationForTarget (LocaleId locId, List<Range> ranges) {
+		if ( trgSegRanges == null ) {
+			trgSegRanges = new ConcurrentHashMap<LocaleId, List<Range>>();
+		}
+		trgSegRanges.put(locId, ranges);
+	}
+	
+	/**
+	 * Sets the segmentation in the source content, in a way it matches the segmentation for a given locale.
+	 * You must have called {@link #setSourceSegmentationForTarget(LocaleId, List)} or
+	 * {@link #saveCurrentSourceSegmentation()} before.
+	 * If the given locale has no corresponding segment ranges, the default source segmentation (defined
+	 * when calling {@link #createSourceSegmentation(ISegmenter)}) is used.
+	 * @param locId the locale to synchronize with.
+	 */
+	public void synchronizeSourceSegmentation (LocaleId locId) {
+		List<Range> ranges = null;
+		if ( trgSegRanges != null ) {
+			ranges = trgSegRanges.get(locId);
+		}
+		if ( ranges == null ) {
+			// No target-specific ranges available: use the source
+			ranges = srcSegRanges;
+		}
+		source.createSegments(ranges);
+	}
 }

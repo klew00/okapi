@@ -32,6 +32,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -133,11 +134,11 @@ public class SRXDocumentTest {
 		seg.computeSegments("MR. Holmes. The detective.");
 		assertEquals(seg.getRanges().size(), 3);
 		
-		TextContainer tc = new TextContainer();
-		tc.append("One.");
-		tc.append(TagType.OPENING, "b", "<b>");
-		tc.append(" Two.");
-		tc.append(TagType.CLOSING, "b", "</b>");
+		TextFragment tf = new TextFragment("One.");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(" Two.");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		TextContainer tc = new TextContainer(tf);
 		seg.setOptions(true, true, true, false, false, false, false);
 		seg.computeSegments(tc);
 		// "One.XX Two.YY" --> "[One.XX][ Two.YY]"

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,7 +37,6 @@ import java.util.Map;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -218,10 +217,10 @@ public class OpenTranTMConnector implements ITMQuery {
 				for ( Object obj2 : projects ) {
 					Map<String, Object> map2 = (Map<String, Object>)obj2;
 					qr = new QueryResult();
-					qr.target = new TextContainer();
+					qr.target = new TextFragment();
 					qr.target.append(trgText);
 					String tmp = (String)map2.get("orig_phrase");
-					qr.source = new TextContainer();
+					qr.source = new TextFragment();
 					qr.source.append(tmp);
 					tmp = (String)map2.get("path");
 					if ( !Util.isEmpty(tmp) ) {

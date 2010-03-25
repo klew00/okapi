@@ -1,5 +1,5 @@
 /*===========================================================================
-Copyright (C) 2008-2009 by the Okapi Framework contributors
+Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
 This library is free software; you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License as published by
@@ -21,6 +21,7 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 package net.sf.okapi.tm.pensieve.common;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.Property;
 
@@ -32,18 +33,21 @@ public final class PensieveUtil {
     private PensieveUtil(){}
 
     /**
-     * converts a TextUnit into a TranslationUnit
-     * @param sourceLoc The source locale to transform
-     * @param targetLoc The target locale to transform
-     * @param textUnit The text unit to convert
-     * @return A TranslationUnit that represents the TextUnit
+     * Converts an un-segmented TextUnit into a TranslationUnit. The target may not exist, in that case
+     * its content is stored as a null.
+     * @param sourceLoc the source locale to transform.
+     * @param targetLoc the target locale to transform.
+     * @param textUnit the text unit to convert.
+     * @return a TranslationUnit that represents the TextUnit
      */
     public static TranslationUnit convertToTranslationUnit (LocaleId sourceLoc,
     	LocaleId targetLoc,
     	TextUnit textUnit)
     {
-        TranslationUnitVariant source = new TranslationUnitVariant(sourceLoc, textUnit.getSourceContent());
-        TranslationUnitVariant target = new TranslationUnitVariant(targetLoc, textUnit.getTargetContent(targetLoc));
+    	// TODO: Check they are both un-segmented
+        TranslationUnitVariant source = new TranslationUnitVariant(sourceLoc, textUnit.getSource().getFirstPartContent());
+        TextContainer tc = textUnit.getTarget(targetLoc); // Allow null target content
+        TranslationUnitVariant target = new TranslationUnitVariant(targetLoc, (( tc==null ) ? null : tc.getFirstPartContent()));
         TranslationUnit tu = new TranslationUnit(source, target);
         populateMetaDataFromProperties(textUnit, tu);
         return tu;

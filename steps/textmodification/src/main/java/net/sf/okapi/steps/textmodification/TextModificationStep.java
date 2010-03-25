@@ -89,22 +89,6 @@ public class TextModificationStep extends BasePipelineStep {
 		// Skip if already translate (only if required)
 		if ( !params.applyToExistingTarget && tu.hasTarget(targetLocale) ) return event;
 		
-		// Apply the segmentation and/or segment marks if requested
-//		if ( params.segment || params.markSegments ) {
-//			if ( tu.hasTarget(targetLocale) ) {
-//				if ( params.segment ) {
-//					trgSeg.computeSegments(tu.getTarget(targetLocale));
-//					tu.getTarget(targetLocale).createSegments(trgSeg.getRanges());
-//				}
-//			}
-//			else {
-//				if ( params.segment ) {
-//					srcSeg.computeSegments(tu.getSource());
-//					tu.getSource().createSegments(srcSeg.getRanges());
-//				}
-//			}
-//		}
-		
 		// Else: do the requested modifications
 		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 		// If the target is empty we use the source
@@ -152,7 +136,6 @@ public class TextModificationStep extends BasePipelineStep {
 			    case TextFragment.MARKER_OPENING:
 				case TextFragment.MARKER_CLOSING:
 				case TextFragment.MARKER_ISOLATED:
-				case TextFragment.MARKER_SEGMENT:
 					sb.append(result.charAt(i));
 					sb.append(result.charAt(++i));
 					break;

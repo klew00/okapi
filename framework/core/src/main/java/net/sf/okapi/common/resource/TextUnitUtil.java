@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,7 +25,6 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
@@ -137,8 +136,7 @@ public class TextUnitUtil {
 	 * @return true if the given text unit resource is null, or its source part is null or empty.
 	 */
 	public static boolean isEmpty(TextUnit textUnit) {
-		
-		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit)));
+		return ((textUnit == null) || textUnit.getSource().isEmpty() );
 	}
 	
 	/**
@@ -147,8 +145,7 @@ public class TextUnitUtil {
 	 * @param textUnit the text unit to check.
 	 * @return true if the given text unit resource is null, or its source part is null or empty. 
 	 */
-	public static boolean hasSource(TextUnit textUnit) {
-		
+	public static boolean hasSource (TextUnit textUnit) {
 		return !isEmpty(textUnit, true);
 	}
 	
@@ -161,37 +158,38 @@ public class TextUnitUtil {
 	 * @return true if the given text unit resource is null, or its source part is null or empty. 
 	 */	
 	public static boolean isEmpty(TextUnit textUnit, boolean ignoreWS) {
-		
 		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit), ignoreWS));
 	}
 	
 	/**
-	 * Gets text of the source part of a given text unit resource.
+	 * Gets the coded text of the source part of a given text unit resource.
 	 * @param textUnit the text unit resource which source text should be returned.
 	 * @return the source part of the given text unit resource.
 	 */
-	public static String getSourceText(TextUnit textUnit) {
-		
-		if (textUnit == null) return "";
-		
-		return getCodedText(textUnit.getSourceContent());
+	public static String getSourceText (TextUnit textUnit) {
+//		if ( textUnit == null ) return "";
+//		return getCodedText(textUnit.getSourceContent());
+		return textUnit.getSource().getFirstPartContent().getCodedText();
 	}
 	
 	/**
-	 * Gets text of the source part of a given text unit resource. If removeCodes = false, and the text contains inline codes,
+	 * Gets the coded text of the source part of a given text unit resource.
+	 * If removeCodes = false, and the text contains inline codes,
 	 * then the codes will be removed. 
 	 * @param textUnit the text unit resource which source text should be returned.
 	 * @param removeCodes true if possible inline codes should be removed.  
 	 * @return the source part of the given text unit resource.
 	 */
-	public static String getSourceText(TextUnit textUnit, boolean removeCodes) {
-		
-		if (textUnit == null) return "";
-		
-		if (removeCodes)
-			return getText(textUnit.getSourceContent());
-		else
-			return getCodedText(textUnit.getSourceContent());
+	public static String getSourceText (TextUnit textUnit,
+		boolean removeCodes)
+	{
+		if ( textUnit == null ) return "";
+		if ( removeCodes ) {
+			return getText(textUnit.getSource().getFirstPartContent());
+		}
+		else {
+			return textUnit.getSource().getFirstPartContent().getCodedText();
+		}
 	}
 	
 	/**
@@ -201,12 +199,13 @@ public class TextUnitUtil {
 	 * @return the target part of the given text unit resource in the given loacle, or an empty string if the 
 	 * text unit doesn't contain one.
 	 */
-	public static String getTargetText(TextUnit textUnit, LocaleId locId) {
+	public static String getTargetText (TextUnit textUnit,
+		LocaleId locId)
+	{
+		if ( textUnit == null ) return "";
+		if ( Util.isNullOrEmpty(locId)) return "";
 		
-		if (textUnit == null) return "";
-		if (Util.isNullOrEmpty(locId)) return "";
-		
-		return getCodedText(textUnit.getTargetContent(locId));
+		return getCodedText(textUnit.getTarget(locId).getFirstPartContent());
 	}
 	
 	/**
@@ -214,57 +213,51 @@ public class TextUnitUtil {
 	 * @param textFragment the given text fragment object.
 	 * @return the text of the given text fragment object possibly containing inline codes.
 	 */
-	public static String getCodedText(TextFragment textFragment) {
-		
+	public static String getCodedText (TextFragment textFragment) {
 		if (textFragment == null) return "";
-		
 		return textFragment.getCodedText();
 	}
 	
 	/**
-	 * Extracts text from the given text fragment. Used to create a copy of the original string but without code markers.
+	 * Extracts text from the given text fragment.
+	 * Used to create a copy of the original string but without code markers.
 	 * The original string is not stripped of code markers, and remains intact.
 	 * @param textFragment TextFragment object with possible codes inside
-	 * @param markerPositions List to store initial positions of removed code markers 
-	 * @return The copy of the string, contained in TextFragment, but w/o code markers
+	 * @param markerPositions List to store initial positions of removed code markers. use null to not store the markers. 
+	 * @return The copy of the string, contained in TextFragment, but without code markers
 	 */
-	public static String getText(TextFragment textFragment, List<Integer> markerPositions) {		
-		
-		if (textFragment == null) return "";
+	public static String getText (TextFragment textFragment,
+		List<Integer> markerPositions)
+	{		
+		if ( textFragment == null ) return "";
 				
 		String res = textFragment.getCodedText();
-		
 		StringBuilder sb = new StringBuilder();
-		
-		if (markerPositions != null) 			
+		if ( markerPositions != null ) { 			
 			markerPositions.clear();
-			
-			// Collect marker positions & remove markers			
-			int startPos = 0;
-			
-			for (int i = 0; i < res.length(); i++) {
-				
-				switch (res.charAt(i) ) {
-				
-				case TextFragment.MARKER_OPENING:
-				case TextFragment.MARKER_CLOSING:
-				case TextFragment.MARKER_ISOLATED:
-				case TextFragment.MARKER_SEGMENT:
-				
-					if (markerPositions != null)
-						markerPositions.add(i);
-				
-					if (i > startPos)
-						sb.append(res.substring(startPos, i));
-					
-					startPos = i + 2;
-					i = startPos;
+		}
+
+		// Collect marker positions & remove markers			
+		int startPos = 0;
+		for (int i = 0; i < res.length(); i++) {
+			switch (res.charAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+			case TextFragment.MARKER_CLOSING:
+			case TextFragment.MARKER_ISOLATED:
+				if ( markerPositions != null ) {
+					markerPositions.add(i);
 				}
-			
+				if ( i > startPos ) {
+					sb.append(res.substring(startPos, i));
+				}
+				startPos = i + 2;
+				i = startPos;
 			}
+		}
 			
-			if (startPos < res.length())
-				sb.append(res.substring(startPos));
+		if ( startPos < res.length() ) {
+			sb.append(res.substring(startPos));
+		}
 				
 		return sb.toString();
 	}
@@ -275,8 +268,7 @@ public class TextUnitUtil {
 	 * @param textFragment TextFragment object with possible codes inside
 	 * @return The copy of the string, contained in TextFragment, but w/o code markers
 	 */
-	public static String getText(TextFragment textFragment) {
-		
+	public static String getText (TextFragment textFragment) {
 		return getText(textFragment, null);
 	}
 	
@@ -390,14 +382,14 @@ public class TextUnitUtil {
 	 * @param comment the optional comment becoming a NOTE property of the text unit. 
 	 * @return a reference to the original or newly created text unit. 
 	 */
-	public static TextUnit buildTU(
-			TextUnit textUnit, 
-			String name, 
-			TextContainer source, 
-			TextContainer target, 
-			LocaleId locId, 
-			String comment) {
-		
+	public static TextUnit buildTU (
+		TextUnit textUnit, 
+		String name, 
+		TextContainer source, 
+		TextContainer target, 
+		LocaleId locId, 
+		String comment)
+	{
 		if (textUnit == null) {
 			textUnit = new TextUnit("");			
 		}
@@ -423,7 +415,8 @@ public class TextUnitUtil {
 	}
 
 	/**
-	 * Makes sure that a given text unit contains a skeleton. If there's no skeleton already attached to the text unit,
+	 * Makes sure that a given text unit contains a skeleton.
+	 * If there's no skeleton already attached to the text unit,
 	 * a new skeleton object is created and attached to the text unit.    
 	 * @param tu the given text unit to have a skeleton. 
 	 * @return the skeleton of the text unit.
@@ -554,17 +547,16 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * Sets the coded text of the the source part of a given text unit resource.
+	 * Sets the coded text of the un-segmented source of a given text unit resource.
 	 * @param textUnit the given text unit resource.
 	 * @param text the text to be set.
 	 */
-	public static void setSourceText(TextUnit textUnit, String text) {
-		
-		if (textUnit == null) return;
-		
-		TextFragment source = textUnit.getSource(); 
-		if (source == null) return;
-		
+	public static void setSourceText (TextUnit textUnit,
+		String text)
+	{
+//fail fast		if ( textUnit == null ) return;
+		TextFragment source = textUnit.getSource().getFirstPartContent(); 
+//fail fast		if ( source == null ) return;
 		source.setCodedText(text);
 	}
 	
@@ -574,14 +566,14 @@ public class TextUnitUtil {
 	 * @param locId the locale of the target part being set.
 	 * @param text the text to be set.
 	 */
-	public static void setTargetText(TextUnit textUnit, LocaleId locId, String text) {
-		
-		if (textUnit == null) return;
-		if (Util.isNullOrEmpty(locId)) return;
-		
-		TextFragment target = textUnit.getTargetContent(locId); 
-		if (target == null) return;
-		
+	public static void setTargetText (TextUnit textUnit,
+		LocaleId locId,
+		String text)
+	{
+//fail fast		if ( textUnit == null ) return;
+//fail fast		if ( Util.isNullOrEmpty(locId) ) return;
+		TextFragment target = textUnit.getTarget(locId).getFirstPartContent(); 
+//fail fast		if ( target == null ) return;
 		target.setCodedText(text);
 	}
 
@@ -591,38 +583,44 @@ public class TextUnitUtil {
 	 * @param trimLeading true to remove leading whitespaces if there are any.
 	 * @param trimTrailing true to remove trailing whitespaces if there are any.
 	 */
-	public static void trimTU(TextUnit textUnit, boolean trimLeading, boolean trimTrailing) {
-		
-		if (textUnit == null) return;
-		if (!trimLeading && !trimTrailing) return;
+	public static void trimTU (TextUnit textUnit,
+		boolean trimLeading,
+		boolean trimTrailing)
+	{
+		if ( textUnit == null ) return;
+		if ( !trimLeading && !trimTrailing ) return;
 		
 		TextContainer source = textUnit.getSource();
 		GenericSkeleton tuSkel = TextUnitUtil.forceSkeleton(textUnit);
 		GenericSkeleton skel = new GenericSkeleton();
 		
-		if (trimLeading)						
-			trimLeading(source, skel);
-
+		if ( trimLeading ) {						
+			trimLeading(source.getFirstPartContent(), skel);
+		}
 		skel.addContentPlaceholder(textUnit);
 
-		if (trimTrailing) 
-			trimTrailing(source, skel);
+		if ( trimTrailing ) { 
+			trimTrailing(source.getFirstPartContent(), skel);
+		}
 		
 		int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
-		if (index != -1)
+		if ( index != -1 ) {
 			SkeletonUtil.replaceSkeletonPart(tuSkel, index, skel);
-		else
+		}
+		else {
 			tuSkel.add(skel);
+		}
 	}
 	
 	/**
-	 * Removes from the source part of a given text unit resource qualifiers (parenthesis, quotation marks etc.) around text.
+	 * Removes from the source part of a given un-segmented text unit resource qualifiers (parenthesis, 
+	 * quotation marks etc.) around text.
 	 * This method is useful when the starting and ending qualifiers are different.
 	 * @param textUnit the given text unit resource.
 	 * @param startQualifier the qualifier to be removed before source text.
 	 * @param endQualifier the qualifier to be removed after source text.
 	 */
-	public static void removeQualifiers(TextUnit textUnit, String startQualifier, String endQualifier) {
+	public static void removeQualifiers (TextUnit textUnit, String startQualifier, String endQualifier) {
 		
 		if (textUnit == null) return;		
 		if (Util.isEmpty(startQualifier)) return;
@@ -643,7 +641,7 @@ public class TextUnitUtil {
 			skel.addContentPlaceholder(textUnit);
 			skel.add(endQualifier);
 			
-			setSourceText(textUnit, st.substring(startQualifierLen, Util.getLength(st) - endQualifierLen));
+			setSourceText(textUnit, st.substring(startQualifierLen, Util.getLength(st)-endQualifierLen));
 			
 			int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
 			if (index != -1)
@@ -724,35 +722,27 @@ public class TextUnitUtil {
 		// Add by building the markers so we can preserve the segment ids
 		TextContainer tc = tu.getSource();
 		tc.clear();
+		int i = 0;
 		for ( Segment seg : srcSegments ) {
-			// Add 'space' between segments
-			if ( !tc.isEmpty() ) {
-				tc.append(interSegmentSpace);
-			}
-			// Add marker
-			tc.append(TagType.SEGMENTHOLDER, TextFragment.CODETYPE_SEGMENT, seg.id);
+			// No part before for the first segment
+			tc.appendSegment(seg, ((i==0) ? null : interSegmentSpace));
+			i++;
 		}
-		// Now set the corresponding list of segments
-		tc.setSegments(srcSegments);
 
 		// Removes all targets
 		for (LocaleId locId : tu.getTargetLocales()) {
 			tu.removeTarget(locId);
 		}
+		
 		// Create a new target with all the source data
 		tc = tu.createTarget(trgLocaleId, true, TextUnit.COPY_ALL);
 		tc.clear();
 		// Add by building the markers so we can preserve the segment ids
+		i = 0;
 		for ( Segment seg : trgSegments ) {
-			// Add 'space' between segments
-			if ( !tc.isEmpty() ) {
-				tc.append(interSegmentSpace);
-			}
-			// Add marker
-			tc.append(TagType.SEGMENTHOLDER, TextFragment.CODETYPE_SEGMENT, seg.id);
+			tc.appendSegment(seg, ((i==0) ? null : interSegmentSpace));
+			i++;
 		}
-		// Now set the corresponding list of segments
-		tc.setSegments(trgSegments);
 
 		// Return the result
 		return tu;

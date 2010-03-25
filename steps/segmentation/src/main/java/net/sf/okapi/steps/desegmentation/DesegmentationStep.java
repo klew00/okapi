@@ -74,16 +74,16 @@ public class DesegmentationStep extends BasePipelineStep {
 		if ( !tu.isTranslatable() ) return event;
 		
 		// Desegment source if needed
-		if ( params.getDesegmentSource() && tu.getSource().isSegmented() ) {
-			tu.getSource().mergeAllSegments();
+		if ( params.getDesegmentSource() && tu.getSource().hasBeenSegmented() ) {
+			tu.getSource().joinAllSegments();
 		}
 		
 		// Desegment target if needed
 		if ( params.getDesegmentTarget() ) {
 			TextContainer cont = tu.getTarget(targetLocale);
 			if ( cont != null ) {
-				if ( cont.isSegmented() ) {
-					cont.mergeAllSegments();
+				if ( cont.hasBeenSegmented() ) {
+					cont.joinAllSegments();
 				}
 			}
 		}

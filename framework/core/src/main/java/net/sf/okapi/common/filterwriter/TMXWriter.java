@@ -1,5 +1,5 @@
 /*===========================================================================
-Copyright (C) 2008-2009 by the Okapi Framework contributors
+Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
 This library is free software; you can redistribute it and/or modify it 
 under the terms of the GNU Lesser General Public License as published by 
@@ -22,7 +22,6 @@ package net.sf.okapi.common.filterwriter;
 
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -257,75 +256,49 @@ public class TMXWriter {
     	}
 
     	//TODO: Output only the items with real match or translations (not copy of source)		
-
     	ScoresAnnotation scores = null;
     	if ( trgTC != null ) {
     		scores = trgTC.getAnnotation(ScoresAnnotation.class);
     	}
 
-    	if ( !srcTC.isSegmented() ) { // Source is not segmented
-    		if ( scores != null ) {
-    			// Skip segments not leveraged
-    			if ( scores.getScore(0) > 0 ) {
-    				writeTU(srcTC, trgTC, tuid, attributes);
-    			}
-    		} 
-    		else {
-    			writeTU(srcTC, trgTC, tuid, attributes);
+    	int i = -1;
+    	for ( Segment srcSeg : srcTC ) {
+    		i++;
+    		TextFragment tf = srcSeg.text;
+			Segment trgSeg = trgTC.getSegment(srcSeg.id);
+			if ( trgSeg == null ) {
+				// No corresponding target: skip it
+				continue;
+			}
+    		if ( scores != null ) { // If the TU is scored
+    			ScoreInfo si = scores.get(i); // Try to get the score for this segment
+				if ( si.score == 0 ) {
+					// Not score: in a scored-TU: skip this segment
+					continue;
+				}
+				// Scored properly. Now see if we need to alter the source text
+				if (( si.origin != null ) && si.origin.equals(Util.ORIGIN_MT) ) {
+					// Set the MT flag attribute
+		        	if ( attributes != null ) {
+		        		if ( !attributes.containsKey(CREATIONID) ) {
+		        			attributes.put(CREATIONID, Util.ORIGIN_MT);
+		        		}
+		        	}
+		        	else {
+		        		attributes = MTattribute;
+		        	}
+		        	
+		        	// Add the flag prefix if requested (that's why we clone)
+		        	if ( useMTPrefix ) {
+		        		tf = srcSeg.text.clone();
+		        		tf.setCodedText(Util.ORIGIN_MT+" "+tf.getCodedText());
+		        	}
+				}
     		}
+    		// Write out the segment
+       		writeTU(tf, trgSeg.text,
+   				String.format("%s_s%s", tuid, srcSeg.id), attributes);
     	}
-    	else if ( trgTC.isSegmented() ) { // Source AND target are segmented
-    		// Write the segments
-    		List<Segment> srcList = srcTC.getSegments();
-    		List<Segment> trgList = trgTC.getSegments();
-    		ScoreInfo si;
-    		for ( int i = 0; i < srcList.size(); i++ ) {
-    			if ( scores != null ) {
-    				// Skip segments not leveraged
-    				si = scores.get(i);
-    				if ( si.score == 0 ) {
-    					continue;
-    				}
-    				if (( si.origin != null ) && si.origin.equals(Util.ORIGIN_MT) ) {
-    					// Set the MT flag attribute
-    		        	if ( attributes != null ) {
-    		        		if ( !attributes.containsKey(CREATIONID) ) {
-    		        			attributes.put(CREATIONID, Util.ORIGIN_MT);
-    		        		}
-    		        	}
-    		        	else {
-    		        		attributes = MTattribute;
-    		        	}
-    		        	TextFragment tf;
-    		        	// Add the flag prefix if requested (that's why we clone)
-    		        	if ( useMTPrefix ) {
-    		        		tf = srcList.get(i).text.clone();
-    		        		tf.setCodedText(Util.ORIGIN_MT+" "+tf.getCodedText());
-    		        	}
-    		        	else {
-    		        		tf = srcList.get(i).text;
-    		        	}
-            			writeTU(tf,
-               				(i > trgList.size() - 1) ? null : trgList.get(i).text,
-               				String.format("%s_s%02d", tuid, i + 1),
-               				attributes);
-    				}
-    				else {
-    					writeTU(srcList.get(i).text,
-    						(i > trgList.size() - 1) ? null : trgList.get(i).text,
-    						String.format("%s_s%02d", tuid, i + 1),
-    						attributes);
-    				}
-    			}
-    			else {
-    				writeTU(srcList.get(i).text,
-    					(i > trgList.size() - 1) ? null : trgList.get(i).text,
-    					String.format("%s_s%02d", tuid, i + 1),
-    					attributes);
-    			}
-    		}
-    	}
-    	// Else no TMX output needed for source segmented but not target
     }
 
     /**
@@ -405,6 +378,9 @@ public class TMXWriter {
     	}
     	itemCount++;
 
+    	// In a TU, each target may have a different source-corresponding segmentation
+    	// The way TMX is written here, we assume that all targets match the current source segmentation
+
     	String tuid = item.getName();
     	if ( Util.isEmpty(tuid) ) {
     		tuid = String.format("autoID%d", itemCount);
@@ -412,50 +388,49 @@ public class TMXWriter {
 
     	TextContainer srcCont = item.getSource();
     	Set<LocaleId> locales = item.getTargetLocales();
-
-    	// If the source is segmented, un-segment it
-    	//TODO: Support output of segmented text unit
-    	if ( srcCont.isSegmented() ) {
-    		srcCont = srcCont.clone();
-    		srcCont.mergeAllSegments();
-    	}
-    	
-    	// Assumes source is not segmented at this point
-    	
-		// Write start TU
-		writer.writeStartElement("tu");
-		writer.writeAttributeString("tuid", tuid);
-		writer.writeLineBreak();
-
-		// Write any resource-level properties
 		Set<String> names = item.getPropertyNames();
-		for ( String name : names ) {
-			// Filter out attributes (temporary solution)
-			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
-			// Write out the property
-			writer.writeStartElement("prop");
-			writer.writeAttributeString("type", name);
-			writer.writeString(item.getProperty(name).getValue());
-			writer.writeEndElementLineBreak(); // prop
-		}
 
-		// Write source TUV
-		writeTUV(srcCont, srcLoc, srcCont);
+		// For each segment: write a separate TU
+    	for ( Segment srcSeg : srcCont ) {
+    		// Write start TU
+    		writer.writeStartElement("tu");
+    		if ( srcCont.contentIsOneSegment() ) {
+    			writer.writeAttributeString("tuid", tuid);
+    		}
+    		else {
+    			writer.writeAttributeString("tuid", String.format("%s_%s", tuid, srcSeg.id));
+    		}
+    		writer.writeLineBreak();
 
-		TextContainer trgCont;
-		// Write each target TUV
-		for ( LocaleId loc : locales ) {
-			trgCont = item.getTarget(loc);
-			// For now we support only un-segmented output
-			if ( trgCont.isSegmented() ) {
-				trgCont = trgCont.clone();
-				trgCont.mergeAllSegments();
-			}
-			writeTUV(trgCont, loc, trgCont);
-		}
+    		// Write any resource-level properties
+    		for ( String name : names ) {
+    			// Filter out attributes (temporary solution)
+    			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
+    			// Write out the property
+    			writer.writeStartElement("prop");
+    			writer.writeAttributeString("type", name);
+    			writer.writeString(item.getProperty(name).getValue());
+    			writer.writeEndElementLineBreak(); // prop
+    		}
 
-		// Write end TU
-		writer.writeEndElementLineBreak(); // tu
+    		// Write the source TUV
+    		writeTUV(srcSeg.text, srcLoc, srcCont);
+		
+    		// Write each target TUV
+    		for ( LocaleId loc : locales ) {
+        		TextContainer trgCont = item.getTarget(loc);
+        		Segment trgSeg = trgCont.getSegment(srcSeg.id);
+        		// Write target only if we have one corresponding to the source segment
+        		if ( trgSeg != null ) {
+        			writeTUV(trgSeg.text, loc, trgCont);
+        		}
+    		}
+
+    		// Write end TU
+    		writer.writeEndElementLineBreak(); // tu
+
+    	} // End of the segments loop
+    	
     }
 
     /**

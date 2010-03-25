@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -761,7 +761,8 @@ public class EventBuilder {
 		}
 
 		TextUnit tu = peekMostRecentTextUnit();
-		tu.getSource().append(text);
+		// We can use the first part as nothing is segment at this point
+		tu.getSource().getFirstPartContent().append(text);
 	}
 
 	/**
@@ -997,7 +998,8 @@ public class EventBuilder {
 		}
 
 		TextUnit tu = peekMostRecentTextUnit();
-		tu.getSourceContent().append(currentCode);
+		// We can use the first part as nothing is segment at this point
+		tu.getSource().getFirstPartContent().append(currentCode);
 		currentCode = null;
 	}
 

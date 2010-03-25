@@ -170,7 +170,6 @@ public class OpenXMLContentSkeletonWriter extends GenericSkeletonWriter {
 				nSurroundingCodes--;
 				break;
 			case TextFragment.MARKER_ISOLATED:
-			case TextFragment.MARKER_SEGMENT:
 				tmp = blankEnd(context,nSurroundingCodes,tmp);
 				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
 				if (code.getTagType()==TextFragment.TagType.OPENING)

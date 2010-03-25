@@ -285,7 +285,7 @@ public class HtmlEventTest {
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
 		tu1.setType("paragraph");
-		TextFragment tf = tu1.getSourceContent();
+		TextFragment tf = tu1.getSource().getFirstPartContent();
 		Code code = new Code(TagType.OPENING, "b", "<b>");
 		code.setType(Code.TYPE_BOLD);
 		tf.append(code);
@@ -321,7 +321,7 @@ public class HtmlEventTest {
 		
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
 		tu1.setType("paragraph");
-		TextFragment tf = tu1.getSourceContent();
+		TextFragment tf = tu1.getSource().getFirstPartContent();
 		Code code = new Code(TagType.PLACEHOLDER, Code.TYPE_COMMENT, "<!--comment-->");
 		tf.append(code);
 		tf.append(" after.");
@@ -350,7 +350,7 @@ public class HtmlEventTest {
 		
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
 		tu1.setType("paragraph");
-		TextFragment tf = tu1.getSourceContent();
+		TextFragment tf = tu1.getSource().getFirstPartContent();
 		Code code = new Code(TagType.PLACEHOLDER, Code.TYPE_XML_PROCESSING_INSTRUCTION, "<?PI?>");		
 		tf.append(code);
 		tf.append(" after.");
@@ -441,7 +441,7 @@ public class HtmlEventTest {
 		skel = new GenericSkeleton();
 		TextUnit tu1 = new TextUnit("tu1", "Before ");
 		tu1.setType("paragraph");
-		TextFragment tf = tu1.getSourceContent();
+		TextFragment tf = tu1.getSource().getFirstPartContent();
 		Code code = new Code(TagType.OPENING, "b", "<b>");
 		code.setType(Code.TYPE_BOLD);
 		tf.append(code);
@@ -527,7 +527,7 @@ public class HtmlEventTest {
 		g1.setIsReferent(true);
 		g1.setSkeleton(new GenericSkeleton("<ul>"));		
 
-		TextFragment tf = tu3.getSourceContent();
+		TextFragment tf = tu3.getSource().getFirstPartContent();
 		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker("sg1"));
 		c.setReferenceFlag(true);
 		tf.append(c);		

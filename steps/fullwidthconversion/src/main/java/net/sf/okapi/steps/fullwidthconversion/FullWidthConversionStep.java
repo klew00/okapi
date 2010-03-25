@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.fullwidthconversion;
 
+import java.util.Iterator;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
@@ -30,6 +32,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 
 @UsingParameters(Parameters.class)
@@ -73,7 +76,15 @@ public class FullWidthConversionStep extends BasePipelineStep {
 		if ( !tu.isTranslatable() ) return event;
 
 		TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
-		String text = tc.getCodedText();
+		Iterator<TextPart> iter = tc.partIterator();
+		while ( iter.hasNext() ) {
+			processFragment(iter.next().getContent());
+		}
+		return event;
+	}
+	
+	private void processFragment (TextFragment frag) {
+		String text = frag.getCodedText();
 		StringBuilder sb = new StringBuilder(text);
 
 		int ch;
@@ -279,9 +290,7 @@ public class FullWidthConversionStep extends BasePipelineStep {
 		}
 
 		// Set back the modified text
-		tc.setCodedText(sb.toString());
-		
-		return event;
+		frag.setCodedText(sb.toString());
 	}
 
 }

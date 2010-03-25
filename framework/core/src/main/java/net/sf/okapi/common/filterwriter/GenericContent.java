@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,14 +20,17 @@
 
 package net.sf.okapi.common.filterwriter;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.InvalidPositionException;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -75,36 +78,43 @@ public class GenericContent {
 	/**
 	 * Prints a string representation of a given segmented text, with optional
 	 * markers to indicate the segments boundaries.
-	 * @param container The container to output.
-	 * @param showSegments True if segment boundaries should be shown.
-	 * @param normalText True to show in-line real data instead of generic codes.
-	 * @return A string with the segmented text output.
+	 * @param container the container to output.
+	 * @param showSegments true if segment boundaries should be shown.
+	 * @param normalText true to show in-line real data instead of generic codes.
+	 * @return a string with the segmented text output.
 	 */
 	public String printSegmentedContent (TextContainer container,
 		boolean showSegments,
 		boolean normalText)
 	{
-		if ( !container.isSegmented() ) {
-			return setContent(container).toString();
-		}
-		//TODO: the getCodedText get the codes from the wrong textFragment.
-		Code code;
-		String text = container.getCodedText();
 		StringBuilder tmp = new StringBuilder();
+		Iterator<TextPart> iter = container.partIterator();
+		while ( iter.hasNext() ) {
+			TextPart part = iter.next();
+			if ( part instanceof Segment ) {
+				if ( showSegments ) tmp.append("[");
+				tmp.append(setContent(part.text).toString(normalText));
+				if ( showSegments ) tmp.append("]");
+			}
+			else {
+				tmp.append(setContent(part.text).toString(normalText));
+			}
+		}
+/*		
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
 			case TextFragment.MARKER_OPENING:
-				code = container.getCode(text.charAt(++i));
+				code = tf.getCode(text.charAt(++i));
 				if ( normalText ) tmp.append(code.toString());
 				else tmp.append(String.format("<%d>", code.getId()));
 				break;
 			case TextFragment.MARKER_CLOSING:
-				code = container.getCode(text.charAt(++i));
+				code = tf.getCode(text.charAt(++i));
 				if ( normalText ) tmp.append(code.toString());
 				else tmp.append(String.format("</%d>", code.getId()));
 				break;
 			case TextFragment.MARKER_ISOLATED:
-				code = container.getCode(text.charAt(++i));
+				code = tf.getCode(text.charAt(++i));
 				if ( normalText ) tmp.append(code.toString());
 				else {
 					if ( code.getTagType() == TagType.OPENING ) {
@@ -119,10 +129,9 @@ public class GenericContent {
 				}
 				break;
 			case TextFragment.MARKER_SEGMENT:
-				code = container.getCode(text.charAt(++i));
-				int index = Integer.parseInt(code.getData());
+				int index = TextFragment.toIndex(text.charAt(++i));
 				if ( showSegments ) tmp.append("[");
-				tmp.append(setContent(container.getSegments().get(index).text).toString(normalText));
+				tmp.append(setContent(container.getSegment(index).text).toString(normalText));
 				if ( showSegments ) tmp.append("]");
 				break;
 			default:
@@ -130,6 +139,7 @@ public class GenericContent {
 				break;
 			}
 		}
+*/		
 		return tmp.toString();
 	}
 	
@@ -147,8 +157,7 @@ public class GenericContent {
 	 * @param normalText True to show in-line real data instead of generic codes.
 	 * @return The output string.
 	 */
-	public String toString (boolean normalText)
-	{
+	public String toString (boolean normalText) {
 		StringBuilder tmp = new StringBuilder();
 		int index;
 		for ( int i=0; i<codedText.length(); i++ ) {
@@ -164,7 +173,7 @@ public class GenericContent {
 				else tmp.append(String.format("</%d>", codes.get(index).getId()));
 				break;
 			case TextFragment.MARKER_ISOLATED:
-			case TextFragment.MARKER_SEGMENT:
+//			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				if ( normalText ) tmp.append(codes.get(index).toString());
 				else {
@@ -211,7 +220,7 @@ public class GenericContent {
 				codedPos += 2;
 				break;
 			case TextFragment.MARKER_ISOLATED:
-			case TextFragment.MARKER_SEGMENT:
+//			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				if ( codes.get(index).getTagType() == TagType.OPENING ) {
 					genericPos += String.format("<b%d/>", codes.get(index).getId()).length();

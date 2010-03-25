@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -306,7 +306,7 @@ public class XMLFilterTest {
 			+ "<doc><p><![CDATA[&=amp, <=lt, &#xaaa;=not-a-ncr]]></p></doc>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals(tu.getSourceContent().toString(), "&=amp, <=lt, &#xaaa;=not-a-ncr");
+		assertEquals(tu.getSource().getFirstPartContent().toString(), "&=amp, <=lt, &#xaaa;=not-a-ncr");
 	}
 
 	@Test
@@ -325,7 +325,7 @@ public class XMLFilterTest {
 			+ "<doc><p>t1 <!--comment--> t2</p></doc>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals(fmt.setContent(tu.getSourceContent()).toString(), "t1 <1/> t2");
+		assertEquals(fmt.setContent(tu.getSource().getFirstPartContent()).toString(), "t1 <1/> t2");
 	}
 
 	@Test
@@ -344,7 +344,7 @@ public class XMLFilterTest {
 			+ "<doc><p>t1 <?abc attr=\"value\"?> t2</p></doc>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals(fmt.setContent(tu.getSourceContent()).toString(), "t1 <1/> t2");
+		assertEquals(fmt.setContent(tu.getSource().getFirstPartContent()).toString(), "t1 <1/> t2");
 	}
 	
 	@Test

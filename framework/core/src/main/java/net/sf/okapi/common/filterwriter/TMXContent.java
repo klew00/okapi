@@ -235,7 +235,6 @@ public class TMXContent {
 				}
 				break;
 			case TextFragment.MARKER_ISOLATED:
-			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
 				id = code.getId();

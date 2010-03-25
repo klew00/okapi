@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -62,7 +62,7 @@ import net.sf.okapi.lib.translation.QueryUtil;
 public class ProMTConnector implements IQuery {
 
 	private static final String PTS8_SERVICE = "pts8/services/ptservice.asmx/";
-	private static final String TRANSLATETEXT = "TranslateText";
+//	private static final String TRANSLATETEXT = "TranslateText";
 	private static final String GETPTSERVICEDATASET = "GetPTServiceDataSet";
 
 	private static final String PTSXLIFF_SERVICE = "ptsxliff/PTSXLIFFTranslator.asmx/";

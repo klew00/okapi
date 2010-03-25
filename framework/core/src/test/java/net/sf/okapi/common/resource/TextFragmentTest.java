@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,6 @@ import net.sf.okapi.common.resource.AnnotatedSpan;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.InvalidPositionException;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.filters.FilterTestDriver;
@@ -431,7 +430,7 @@ public class TextFragmentTest {
 		assertEquals(fmt.setContent(tf1).toString(false), "<1>New file:</1> %s");
 		
 		// Check annotate behavior
-		tf1 = new TextContainer("w1 ");
+		tf1 = new TextFragment("w1 ");
 		tf1.append(TagType.OPENING, "b", "<b>");
 		tf1.append("w2 w3");
 		tf1.append(TagType.CLOSING, "b", "</b>");

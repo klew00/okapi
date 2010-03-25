@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -283,34 +282,28 @@ public class TableFilterWriter implements IFilterWriter {
 		}
 
 		// If not segmented: index the whole entry
-		if ( !srcCont.isSegmented() ) {
-			writeRow(srcCont.getContent(), trgCont.getContent());
+		if ( !srcCont.contentIsOneSegment() ) {
+			writeRow(srcCont.getFirstPartContent(), trgCont.getFirstPartContent());
 			return;
 		}
 
-		// Else: check we have a target
-		List<Segment> trgList = trgCont.getSegments();
-		if ( trgList == null ) {
-			// If not: output all source segments, and empty targets
-			for ( Segment segment : srcCont.getSegments() ) {
-				writeRow(segment.text, null);
-			}
-			return;
-		}
-		
 		// Else: check if we have the same number of segments
-		if ( trgList.size() != srcCont.getSegmentCount() ) { 
+		if ( trgCont.getSegmentCount() != srcCont.getSegmentCount() ) { 
 			// If not: Fall back to full entry
-			writeRow(srcCont.getContent(), trgCont.getContent());
+			writeRow(srcCont.getUnSegmentedContentCopy(), trgCont.getUnSegmentedContentCopy());
 			//TODO: Log a warning
 			return;
 		}
 		// If we do have the same number of segments:
 		// Output each of them
-		int i = 0;
-		for ( Segment segment : srcCont.getSegments() ) {
-			writeRow(segment.text, trgList.get(i).text);
-			i++;
+		for ( Segment srcSeg : srcCont ) {
+			Segment trgSeg = trgCont.getSegment(srcSeg.id);
+			if ( trgSeg == null ) {
+				//TODO: warning
+			}
+			else {
+				writeRow(srcSeg.text, trgSeg.text);
+			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*===========================================================================
-Copyright (C) 2008-2009 by the Okapi Framework contributors
+Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
 This library is free software; you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License as published by
@@ -17,6 +17,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filterwriter.TMXWriter;
@@ -54,10 +55,12 @@ public class OkapiTmxExporterTest {
     
     ArgumentCaptor<TextUnit> tuCapture;
 
-    @Before
+    
+    @SuppressWarnings("unchecked")
+	@Before
     public void setUp() throws URISyntaxException, IOException {
         tuCapture = ArgumentCaptor.forClass(TextUnit.class);
-
+        
         mockIterator = mock(Iterator.class);
         mockTmxWriter = mock(TMXWriter.class);
 
@@ -101,11 +104,11 @@ public class OkapiTmxExporterTest {
         handler.exportTmx(locEN, locFR, mockSeeker, mockTmxWriter);
 
         verify(mockTmxWriter, times(2)).writeTUFull(tuCapture.capture());
-        assertEquals("source of first tu written", "source", tuCapture.getAllValues().get(0).getSourceContent().toString());
-        assertEquals("target of first tu written", "target", tuCapture.getAllValues().get(0).getTargetContent(locFR).toString());
+        assertEquals("source of first tu written", "source", tuCapture.getAllValues().get(0).getSource().getFirstPartContent().toString());
+        assertEquals("target of first tu written", "target", tuCapture.getAllValues().get(0).getTarget(locFR).getFirstPartContent().toString());
         assertEquals("target of first tu written", "sourceid", tuCapture.getAllValues().get(0).getName());
-        assertEquals("source of second tu written", "source2", tuCapture.getAllValues().get(1).getSourceContent().toString());
-        assertEquals("target of second tu written", "target2", tuCapture.getAllValues().get(1).getTargetContent(locFR).toString());
+        assertEquals("source of second tu written", "source2", tuCapture.getAllValues().get(1).getSource().getFirstPartContent().toString());
+        assertEquals("target of second tu written", "target2", tuCapture.getAllValues().get(1).getTarget(locFR).getFirstPartContent().toString());
         assertEquals("target of second tu written", "sourceid2", tuCapture.getAllValues().get(1).getName());
     }
 
@@ -115,8 +118,8 @@ public class OkapiTmxExporterTest {
 
         verify(mockTmxWriter, times(1)).writeTUFull(tuCapture.capture());
         TextUnit capturedTU = tuCapture.getValue();
-        assertEquals("source of first tu written", "props_source", capturedTU.getSourceContent().toString());
-        assertEquals("target of first tu written", "props_target", capturedTU.getTargetContent(locProps).toString());
+        assertEquals("source of first tu written", "props_source", capturedTU.getSource().getFirstPartContent().toString());
+        assertEquals("target of first tu written", "props_target", capturedTU.getTarget(locProps).getFirstPartContent().toString());
         assertEquals("target of first tu written", "props_sourceid", capturedTU.getName());
         assertEquals("groupname metadata", "PropsGroupName", capturedTU.getProperty("Txt::GroupName").getValue());
         assertEquals("filename metadata", "PropsFileName", capturedTU.getProperty("Txt::FileName").getValue());

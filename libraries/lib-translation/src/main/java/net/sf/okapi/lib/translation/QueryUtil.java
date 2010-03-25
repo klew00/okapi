@@ -91,7 +91,6 @@ public class QueryUtil {
 			case TextFragment.MARKER_OPENING:
 			case TextFragment.MARKER_CLOSING:
 			case TextFragment.MARKER_ISOLATED:
-			case TextFragment.MARKER_SEGMENT:
 				codesMarkers.append(text.charAt(i));
 				codesMarkers.append(text.charAt(++i));
 				break;
@@ -139,9 +138,6 @@ public class QueryUtil {
 				code = fragment.getCode(text.charAt(++i));
 				sb.append(String.format("<br id='%d'/>", code.getId()));
 				break;
-			case TextFragment.MARKER_SEGMENT:
-				// Segment-holder text not supported
-				throw new RuntimeException("Fragment with segment markers are not supported. Use the segments instead.");
 			case '&':
 				sb.append("&amp;");
 				break;

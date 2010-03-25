@@ -34,7 +34,6 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -80,7 +79,7 @@ public class GenericFilterWriterTest {
 		sg1.setSkeleton(skel_sg1);
 		sg1.setIsReferent(true);
 
-		TextFragment tf_tu3 = tu3.getSourceContent();
+		TextFragment tf_tu3 = tu3.getSource().getFirstSegmentContent(); // Assume un-segmented content
 		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker(sg1.getId()));
 		c.setReferenceFlag(true);
 		tf_tu3.append(c);
@@ -128,7 +127,7 @@ public class GenericFilterWriterTest {
 	public void testSourceTargetSkeleton () {
 		TextUnit tu = new TextUnit("tu1");
 		tu.setSourceContent(new TextFragment("src"));
-		tu.setTargetContent(locFR, new TextContainer("trg"));
+		tu.setTargetContent(locFR, new TextFragment("trg"));
 		Event textUnitEvent = new Event(EventType.TEXT_UNIT, tu);
 			
 		GenericSkeleton skel = new GenericSkeleton();

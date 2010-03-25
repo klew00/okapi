@@ -23,6 +23,7 @@ package net.sf.okapi.steps.uriconversion;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,9 +35,9 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 
 @UsingParameters(Parameters.class)
@@ -93,27 +94,16 @@ public class UriConversionStep extends BasePipelineStep {
 		String res;
 
 		try {
-			// Process the main content (segmented or not)
-			if ( params.conversionType == Parameters.UNESCAPE ) {
-				res = unescape(cont.getCodedText());
-			}
-			else {
-				res = escape(cont.getCodedText());
-			}
-			cont.setCodedText(res); // No change of the inline codes
-
-			// Then, for segmented content
-			if ( cont.isSegmented() ) {
-				// Process each of the segments
-				for ( Segment seg : cont.getSegments() ) {
-					if ( params.conversionType == Parameters.UNESCAPE ) {
-						res = unescape(seg.text.getCodedText());
-					}
-					else {
-						res = escape(seg.text.getCodedText());
-					}
-					seg.text.setCodedText(res); // No change of the inline codes
+			Iterator<TextPart> iter = cont.partIterator();
+			while ( iter.hasNext() ) {
+				TextPart part = iter.next();
+				if ( params.conversionType == Parameters.UNESCAPE ) {
+					res = unescape(part.text.getCodedText());
 				}
+				else {
+					res = escape(part.text.getCodedText());
+				}
+				part.text.setCodedText(res); // No change of the inline codes
 			}
 		}
 		catch ( Exception e ) {
@@ -132,7 +122,6 @@ public class UriConversionStep extends BasePipelineStep {
 				case TextFragment.MARKER_OPENING:
 				case TextFragment.MARKER_CLOSING:
 				case TextFragment.MARKER_ISOLATED:
-				case TextFragment.MARKER_SEGMENT:
 					sb.append(URLDecoder.decode(sbTemp.toString(),"UTF-8"));
 					sb.append(text.charAt(i));
 					i++;
@@ -170,7 +159,6 @@ public class UriConversionStep extends BasePipelineStep {
 					case TextFragment.MARKER_OPENING:
 					case TextFragment.MARKER_CLOSING:
 					case TextFragment.MARKER_ISOLATED:
-					case TextFragment.MARKER_SEGMENT:
 						sb.append(text.charAt(i));
 						i++;
 						sb.append(text.charAt(i));

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -507,13 +507,14 @@ public class RegexFilter implements IFilter {
 			tuRes.setPreserveWhitespaces(true);
 		}
 		else { // Unwrap the content
-			TextFragment.unwrap(tuRes.getSourceContent());
-			if ( hasTarget ) TextFragment.unwrap(tuRes.getTargetContent(trgLang));
+			tuRes.getSource().unwrap(true);
+			if ( hasTarget ) tuRes.getTarget(trgLang).unwrap(true);
 		}
 
 		if ( rule.useCodeFinder ) {
-			rule.codeFinder.process(tuRes.getSourceContent());
-			if ( hasTarget ) rule.codeFinder.process(tuRes.getTargetContent(trgLang));
+			// We can use getFirstPartContent() because nothing is segmented yet
+			rule.codeFinder.process(tuRes.getSource().getFirstPartContent());
+			if ( hasTarget ) rule.codeFinder.process(tuRes.getTarget(trgLang).getFirstPartContent());
 		}
 
 		if ( rule.nameGroup != -1 ) {
@@ -604,11 +605,12 @@ public class RegexFilter implements IFilter {
 					tuRes.setPreserveWhitespaces(true);
 				}
 				else { // Unwrap the string
-					TextFragment.unwrap(tuRes.getSourceContent());
+					tuRes.getSource().unwrap(true);
 				}
 				
 				if ( rule.useCodeFinder ) {
-					rule.codeFinder.process(tuRes.getSourceContent());
+					// We can use getFirstPartContent() because nothing is segmented yet
+					rule.codeFinder.process(tuRes.getSource().getFirstPartContent());
 				}
 
 				if ( rule.nameGroup != -1 ) {

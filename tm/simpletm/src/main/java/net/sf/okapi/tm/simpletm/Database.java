@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -227,36 +227,37 @@ public class Database {
 			// Store the data
 			TextContainer srcCont = tu.getSource();
 			TextContainer trgCont = tu.getTarget(trgLoc);
-
+			
 			// Store the segments if possible
-			if ( srcCont.isSegmented() && trgCont.isSegmented() ) {
+			if ( srcCont.hasBeenSegmented() && trgCont.hasBeenSegmented() ) {
 				pstm = conn.prepareStatement(String.format("INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s) VALUES(?,?,?,?,?,?,?);",
 					TBLNAME, NTYPE, NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, NGRPNAME, NFILENAME));
 				pstm.setString(1, tu.getType());
 				pstm.setString(6, grpName);
 				pstm.setString(7, fileName);
-				TextFragment trgFrag;
 				int segIndex = 0;
-				for ( Segment srcSeg : srcCont.getSegments() ) {
+				for ( Segment srcSeg : srcCont ) {
 					pstm.setString(2, srcSeg.text.getCodedText());
 					pstm.setString(3, Code.codesToString(srcSeg.text.getCodes()));
-					trgFrag = trgCont.getSegments().get(segIndex).text;
-					pstm.setString(4, trgFrag.getCodedText());
-					pstm.setString(5, Code.codesToString(trgFrag.getCodes()));
-					pstm.execute();
-					count++;
-					segIndex++;
+					Segment trgSeg = trgCont.getSegment(srcSeg.id);
+					if ( trgSeg != null ) { // Skip source without target
+						pstm.setString(4, trgSeg.text.getCodedText());
+						pstm.setString(5, Code.codesToString(trgSeg.text.getCodes()));
+						pstm.execute();
+						count++;
+						segIndex++;
+					}
 				}
 			}
-			else {
+			else { // Save the whole TU
 				pstm = conn.prepareStatement(String.format("INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s) VALUES(?,?,?,?,?,?,?,?);",
 					TBLNAME, NNAME, NTYPE, NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, NGRPNAME, NFILENAME));
 				pstm.setString(1, tu.getName());
 				pstm.setString(2, tu.getType());
 				pstm.setString(3, srcCont.getCodedText());
-				pstm.setString(4, Code.codesToString(srcCont.getCodes()));
+				pstm.setString(4, Code.codesToString(srcCont.getFirstPartContent().getCodes()));
 				pstm.setString(5, trgCont.getCodedText());
-				pstm.setString(6, Code.codesToString(trgCont.getCodes()));
+				pstm.setString(6, Code.codesToString(trgCont.getFirstPartContent().getCodes()));
 				pstm.setString(7, grpName);
 				pstm.setString(8, fileName);
 				pstm.execute();
@@ -380,18 +381,18 @@ public class Database {
 				NNAME, NGRPNAME, NFILENAME, NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES));
 			if ( result.first() ) {
 				TextUnit tu;
-				TextContainer tc;
+				TextFragment tf;
 				LinkedHashMap<String, String> attributes = new LinkedHashMap<String, String>();
 				do {
 					tu = new TextUnit("0");
-					tc = new TextContainer();
-					tc.setCodedText(result.getString(4),
+					tf = new TextFragment();
+					tf.setCodedText(result.getString(4),
 						Code.stringToCodes(result.getString(5)), false);
-					tu.setSourceContent(tc);
-					tc = new TextContainer();
-					tc.setCodedText(result.getString(6),
+					tu.setSourceContent(tf);
+					tf = new TextFragment();
+					tf.setCodedText(result.getString(6),
 						Code.stringToCodes(result.getString(7)), false);
-					tu.setTarget(targetLocale, tc);
+					tu.setTargetContent(targetLocale, tf);
 					tu.setName(result.getString(1));
 					attributes.put(NGRPNAME, result.getString(2));
 					attributes.put(NFILENAME, result.getString(3));

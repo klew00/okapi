@@ -21,14 +21,11 @@
 package org.w3c.its;
 
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.LocaleId;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 

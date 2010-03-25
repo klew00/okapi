@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
@@ -458,106 +457,56 @@ public class QueryManager {
 		QueryResult qr;
 		int count;
 		int leveraged = 0;
-		boolean makeSS = false;
 		
-		if ( tc.isSegmented() ) {
-			List<Segment> segList = tc.getSegments();
-			for (Segment segment : segList) {
-				// Query if needed
-				if ( segment.text.hasText(false) ) {
-					totalSegments++;
-					count = query(segment.text);
-				}
-				else count = 0;
-				
-				// Process results
-				if ( count == 0 ) {
-					scores.add(0, null);
-					continue;
-				}
-				qr = next();
-				// It's a 100% match
-				if ( qr.score == 100 ) {
-					// Check if they are several and if they have the same translation
-					if ( !exactsHaveSameTranslation() ) {
-						if ( threshold == 100 ) {
-							scores.add(0, null);
-							continue;
-						}
-						// If we do: Use the first one and lower the score to 99%
-						scores.add(99, qr.origin);
-						segment.text = adjustNewFragment(segment.text, qr.source, qr.target, qr.score, tu); 
-						leveraged++;
-						continue;
-					}
-					// Else: First is 100%, possibly several that have the same translations
-					scores.add(qr.score, qr.origin); // That's 100% then
-					segment.text = adjustNewFragment(segment.text, qr.source, qr.target, qr.score, tu);
-					leveraged++;
-					continue;
-				}
-				// First is not 100%: use it and move on
-				scores.add(qr.score, qr.origin);
-				segment.text = adjustNewFragment(segment.text, qr.source, qr.target, qr.score, tu);
-				leveraged++;
-			}
-		}
-		else { // Case of un-segmented entries
+		// For each segment
+		for ( Segment seg : tc ) {
 			// Query if needed
-			if ( tc.hasText(false) ) {
+			if ( seg.text.hasText(false) ) {
 				totalSegments++;
-				count = query(tc);
+				count = query(seg.text);
 			}
 			else count = 0;
 			
 			// Process results
 			if ( count == 0 ) {
 				scores.add(0, null);
+				continue;
 			}
-			else {
-				qr = next();
-				// First is not 100%: use it and move on
-				if ( qr.score < 100 ) {
-					scores.add(qr.score, qr.origin);
-					tc.setContent(adjustNewFragment(tc, qr.source, qr.target, qr.score, tu));
-					makeSS = true;
-				}
-				// Else: one or more matches, first is 100%
+			
+			qr = next();
+			// It's a 100% match
+			if ( qr.score == 100 ) {
 				// Check if they are several and if they have the same translation
-				else if ( !exactsHaveSameTranslation() ) {
-					if ( threshold >= 100 ) {
+				if ( !exactsHaveSameTranslation() ) {
+					if ( threshold == 100 ) {
 						scores.add(0, null);
+						continue;
 					}
-					else {
-						// If we do: Use the first one and lower the score to 99%
-						scores.add(99, qr.origin);
-						tc.setContent(adjustNewFragment(tc, qr.source, qr.target, qr.score, tu));
-						makeSS = true;
-					}
+					// If we do: Use the first one and lower the score to 99%
+					scores.add(99, qr.origin);
+					seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu); 
+					leveraged++;
+					continue;
 				}
-				// Else: Only one 100% or several that have the same translations
-				else {
-					scores.add(qr.score, qr.origin); // That's 100% then
-					tc.setContent(adjustNewFragment(tc, qr.source, qr.target, qr.score, tu));
-					makeSS = true;
-				}
+				// Else: First is 100%, possibly several that have the same translations
+				scores.add(qr.score, qr.origin); // That's 100% then
+				seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
+				leveraged++;
+				continue;
 			}
+			// First is not 100%: use it and move on
+			scores.add(qr.score, qr.origin);
+			seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
+			leveraged++;
 		}
-
+		
 		// Set the scores only if there is something to report
-		if (( leveraged > 0 ) || makeSS ) {
+		if ( leveraged > 0 ) {
 			rewind();
 			// Set the target and attach the score
 			tc.setAnnotation(scores);
 			tu.setTarget(trgLoc, tc);
-			if ( makeSS ) {
-				// Un-segmented entries that we have leveraged should be like
-				// a text unit with a single segment
-				makeSingleSegment(tu);
-				leveraged++;
-			}
 			leveragedSegments += leveraged;
-
 			if ( tmxWriter != null ) {
 				tmxWriter.writeItem(tu, null);
 			}
@@ -579,17 +528,6 @@ public class QueryManager {
 			if ( qr.target.compareTo(firstFrag, true) != 0 ) return false;
 		}
 		return true;
-	}
-
-	private void makeSingleSegment (TextUnit tu) {
-		TextContainer srcTc = tu.getSource();
-		// Leave it alone if it's just whitespaces
-		if ( !srcTc.hasText(false) ) return;
-		// Else create a single segment that is the whole content
-		srcTc.createSegment(0, -1);
-		TextContainer tc = tu.getTarget(trgLoc);
-		if ( tc == null ) tc = tu.createTarget(trgLoc, false, IResource.CREATE_EMPTY);
-		tc.createSegment(0, -1);
 	}
 
 	/**

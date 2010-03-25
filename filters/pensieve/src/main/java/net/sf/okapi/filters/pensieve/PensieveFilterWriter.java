@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,7 +22,6 @@ package net.sf.okapi.filters.pensieve;
 
 import java.io.File;
 import java.io.OutputStream;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -35,7 +34,6 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
@@ -136,31 +134,33 @@ public class PensieveFilterWriter implements IFilterWriter {
 		if ( !tu.hasTarget(trgLoc) ) return;
 
 		TextContainer srcCont = tu.getSource();
-		// If not segmented: index the whole entry
-		if ( !srcCont.isSegmented() ) {
-			writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLoc, trgLoc, tu));
-			return;
-		}
-
-		// Else: check if we have the same number of segments
-		List<Segment> trgList = tu.getTarget(trgLoc).getSegments();
-		if ( trgList.size() != srcCont.getSegmentCount() ) {
-			// Fall back to full entry
-			writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLoc, trgLoc, tu));
+		TextContainer trgCont = tu.getTarget(trgLoc);
+		
+		// Check if we have the same number of segments
+		if ( trgCont.getSegmentCount() != srcCont.getSegmentCount() ) {
+			// Make sure we have at least the full full entry
+			TranslationUnitVariant source = new TranslationUnitVariant(srcLoc, srcCont.getUnSegmentedContentCopy());
+			TranslationUnitVariant target = new TranslationUnitVariant(trgLoc, trgCont.getUnSegmentedContentCopy());
+			TranslationUnit trUnit = new TranslationUnit(source, target);
+			// TODO: what do we do with properties? e.g. tuid should not be used as it
+			// PensieveUtil.populateMetaDataFromProperties(tu, trUnit);
+			writer.indexTranslationUnit(trUnit);
 			// TODO: Log a warning
 			return;
 		}
 
 		// Index each segment
-		int i = 0;
-		for ( Segment segment : srcCont.getSegments() ) {
-			TranslationUnitVariant source = new TranslationUnitVariant(srcLoc, segment.text);
-			TranslationUnitVariant target = new TranslationUnitVariant(trgLoc, trgList.get(i).text);
-			TranslationUnit trUnit = new TranslationUnit(source, target);
-			// TODO: what do we do with properties? e.g. tuid should not be used as it
-			// PensieveUtil.populateMetaDataFromProperties(tu, trUnit);
-			writer.indexTranslationUnit(trUnit);
-			i++;
+		for ( Segment srcSeg : srcCont ) {
+			Segment trgSeg = trgCont.getSegment(srcSeg.id);
+			// Skip entries with no target match
+			if ( trgSeg != null ) {
+				TranslationUnitVariant source = new TranslationUnitVariant(srcLoc, srcSeg.text);
+				TranslationUnitVariant target = new TranslationUnitVariant(trgLoc, trgSeg.text);
+				TranslationUnit trUnit = new TranslationUnit(source, target);
+				// TODO: what do we do with properties? e.g. tuid should not be used as it
+				// PensieveUtil.populateMetaDataFromProperties(tu, trUnit);
+				writer.indexTranslationUnit(trUnit);
+			}
 		}
 	}
 

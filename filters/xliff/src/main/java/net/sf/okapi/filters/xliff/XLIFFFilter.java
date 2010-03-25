@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -54,6 +54,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -649,12 +650,7 @@ public class XLIFFFilter implements IFilter {
 			tc = processContent(isSegSource ? "seg-source" : "source", true);
 			// Put the source in the alt-trans annotation
 			if ( !preserveSpaces.peek() ) {
-				TextFragment.unwrap(tc.getContent());
-				if ( isSegSource && tc.isSegmented() ) { // Un-wrap segments content as well
-					for ( int i=0; i<tc.getSegmentCount(); i++ ) {
-						TextFragment.unwrap(tc.getSegments().get(i).text);
-					}
-				}
+				tc.unwrap(true);
 			}
 			// Store in altTrans only when we are within alt-trans
 			if ( altTrans != null ) {
@@ -670,8 +666,8 @@ public class XLIFFFilter implements IFilter {
 			}
 			else { // It's seg-source just after a <source> (not in alt-trans)
 				TextContainer cont = tc.clone();
-				cont.mergeAllSegments();
-				if ( cont.compareTo(tu.getSourceContent(), true) != 0 ) {
+				cont.joinAllSegments();
+				if ( cont.compareTo(tu.getSource(), true) != 0 ) {
 					logger.warning(String.format("The <seg-source> content for the entry id='%s' is different from its <source>. The un-segmented content of <source> will be used.", tu.getId()));
 				}
 				else { // Same content: use the segmented one
@@ -687,7 +683,9 @@ public class XLIFFFilter implements IFilter {
 			}
 			skel.addContentPlaceholder(tu);
 			tc = processContent(isSegSource ? "seg-source" : "source", false);
-			if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+			if ( !preserveSpaces.peek() ) {
+				tc.unwrap(true);
+			}
 			tu.setPreserveWhitespaces(preserveSpaces.peek());
 			tu.setSource(tc);
 			sourceDone = true;
@@ -705,7 +703,9 @@ public class XLIFFFilter implements IFilter {
 			// Get the text content
 			tc = processContent("target", true);
 			// Put the target in the alt-trans annotation
-			if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+			if ( !preserveSpaces.peek() ) {
+				tc.unwrap(true);
+			}
 			altTrans.setTarget(lang, tc);
 			altTrans.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 		}
@@ -720,8 +720,7 @@ public class XLIFFFilter implements IFilter {
 			skel.addContentPlaceholder(tu, trgLang);
 			tc = processContent("target", false);
 			if ( !tc.isEmpty() ) {
-				//resource.needTargetElement = false;
-				if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+				//TODO: Solve the unwarp!!! if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
 				tu.setPreserveWhitespaces(preserveSpaces.peek());
 				tu.setTarget(trgLang, tc);
 			}
@@ -783,12 +782,12 @@ public class XLIFFFilter implements IFilter {
 			String name;
 			String tmp;
 			Code code;
-			TextFragment segment = null;
+			Segment segment = null;
 			int segIdStack = -1;
 			// The current variable points either to content or segment depending on where
 			// we are currently storing the parsed data, the segments are part of the content
 			// at the end, so all can use the same code/skeleton
-			TextFragment current = content;
+			TextFragment current = new TextFragment();
 			
 			while ( reader.hasNext() ) {
 				eventType = reader.next();
@@ -805,15 +804,18 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.END_ELEMENT:
 					name = reader.getLocalName();
 					if ( name.equals(tagName) ) {
+						if ( !current.isEmpty() ) {
+							content.appendPart(current);
+						}
 						return content;
 					}
 					if ( name.equals("mrk") ) { // Check of end of segment
 						if ( idStack.peek() == segIdStack ) {
-							current = content; // Point back to content
+							current = new TextFragment(); // Point back to content
 							idStack.pop(); // Pop only after test is true
 							segIdStack = -1; // Reset to not trigger segment ending again
 							// Add the segment to the content
-							content.appendSegment(segment); //TODO: mid should be the segid
+							content.appendSegment(segment);
 							if ( store ) storeEndElement();
 							continue;
 						}
@@ -840,10 +842,14 @@ public class XLIFFFilter implements IFilter {
 					if ( name.equals("mrk") ) { // Check for start of segment
 						String type = reader.getAttributeValue(null, "mtype");
 						if (( type != null ) && ( type.equals("seg") )) {
+							if ( !current.isEmpty() ) { // Append non-segment part
+								content.appendPart(current);
+							}
 							idStack.push(++id);
 							segIdStack = id;
-							segment = new TextFragment();
-							current = segment; // Segment is now being built
+							segment = new Segment();
+							segment.id = reader.getAttributeValue(null, "mid");
+							current = segment.text; // Segment is now being built
 							continue;
 						}
 					}

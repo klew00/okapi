@@ -28,6 +28,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -38,6 +39,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -173,23 +175,25 @@ public class DummyFilter implements IFilter {
 		queue.add(new Event(EventType.START_DOCUMENT, sd));
 		
 		TextUnit tu = new TextUnit("id1", parts[0]);
-		String text = tu.getSourceContent().getCodedText();
+		// Use getFirstSegmentContent fine because there is nothing segmented
+		String text = tu.getSource().getFirstSegmentContent().getCodedText();
 		int n = text.indexOf("@#$");
 		while ( n > -1 ) {
-			tu.getSourceContent().changeToCode(n, n+4, TagType.PLACEHOLDER, "z");
-			text = tu.getSourceContent().getCodedText();
+			tu.getSource().getFirstSegmentContent().changeToCode(n, n+4, TagType.PLACEHOLDER, "z");
+			text = tu.getSource().getFirstSegmentContent().getCodedText();
 			n = text.indexOf("@#$");
 		}
 		
 		if ( parts.length > 1 ) {
-			TextContainer tc = new TextContainer(parts[1]);
-			text = tc.getCodedText();
+			TextFragment tf = new TextFragment(parts[1]);
+			text = tf.getCodedText();
 			n = text.indexOf("@#$");
 			while ( n > -1 ) {
-				tc.changeToCode(n, n+4, TagType.PLACEHOLDER, "z");
-				text = tc.getCodedText();
+				tf.changeToCode(n, n+4, TagType.PLACEHOLDER, "z");
+				text = tf.getCodedText();
 				n = text.indexOf("@#$");
 			}
+			TextContainer tc = new TextContainer(tf);
 			tu.setTarget(trgLang, tc);
 		}
 		
@@ -211,16 +215,15 @@ public class DummyFilter implements IFilter {
 		sd.setSkeleton(skel);
 		queue.add(new Event(EventType.START_DOCUMENT, sd));
 		
-		TextUnit tu = new TextUnit("tu1");
+		TextUnit tu = new TextUnit("tu1", "First segment for SRC. Second segment for SRC");
 		TextContainer tc = tu.getSource();
-		tc.append("First segment for SRC. Second segment for SRC");
-		tc.createSegment(23, -1);
-		tc.createSegment(0, 22);
+		List<Range> ranges = new ArrayList<Range>();
+		ranges.add(new Range(0, 22));
+		ranges.add(new Range(23, -1));
+		tc.createSegments(ranges);
 		
-		tc = tu.setTarget(trgLang, new TextContainer());
-		tc.append("First segment for TRG. Second segment for TRG");
-		tc.createSegment(23, -1);
-		tc.createSegment(0, 22);
+		tc = tu.setTarget(trgLang, new TextContainer("First segment for TRG. Second segment for TRG"));
+		tc.createSegments(ranges);
 
 		skel = new GenericSkeleton("<text>\n<s>First segment for SRC. Second segment for SRC</s>\n<t>");
 		skel.addContentPlaceholder(tu, trgLang);
@@ -246,20 +249,15 @@ public class DummyFilter implements IFilter {
 		sd.setSkeleton(skel);
 		queue.add(new Event(EventType.START_DOCUMENT, sd));
 		
-		TextUnit tu = new TextUnit("tu1");
-		TextContainer tc = tu.getSource();
-		tc.append("Source text");
-		tc = tu.setTarget(trgLang, new TextContainer());
-		tc.append("Target text");
+		TextUnit tu = new TextUnit("tu1", "Source text");
+		tu.setTarget(trgLang, new TextContainer("Target text"));
 		skel = new GenericSkeleton("<text>\n<s>Source text</s>\n<t>");
 		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("<t>\n</text>\n");
 		tu.setSkeleton(skel);
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		
-		tu = new TextUnit("tu2");
-		tc = tu.getSource();
-		tc.append("Source text 2");
+		tu = new TextUnit("tu2", "Source text 2");
 		skel = new GenericSkeleton("<text>\n<s>Source text 2</s>\n<t>");
 		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("<t>\n</text>\n");

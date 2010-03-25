@@ -168,10 +168,6 @@ public class GlobalSightTMConnector implements ITMQuery {
 						code = frag.getCode(text.charAt(++i));
 						tmp.append(String.format("<ph i=\"%d\" type=\"text\"/>", code.getId()));
 						break;
-					case TextFragment.MARKER_SEGMENT:
-						++i; // Skip
-						// Do nothing: we should get segment only
-						break;
 					default:
 						tmp.append(text.charAt(i));
 						break;

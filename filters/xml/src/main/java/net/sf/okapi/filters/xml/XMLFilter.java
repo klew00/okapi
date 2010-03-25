@@ -739,7 +739,7 @@ public class XMLFilter implements IFilter {
 		}
 		else {
 			tu.setPreserveWhitespaces(false);
-			TextFragment.unwrap(tu.getSourceContent());
+			tu.getSource().unwrap(true);
 		}
 		
 		skel.addContentPlaceholder(tu);

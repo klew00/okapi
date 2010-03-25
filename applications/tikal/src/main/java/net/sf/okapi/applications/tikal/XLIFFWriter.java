@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -291,7 +291,7 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false, true));
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
-		if ( tc.isSegmented() ) {
+		if ( tc.hasBeenSegmented() ) {
 			writer.writeStartElement("seg-source");
 			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true, true));
 			writer.writeEndElementLineBreak(); // seg-source
@@ -310,7 +310,7 @@ public class XLIFFWriter implements IFilterWriter {
 			}
 
 			// Now tc hold the content to write. Write it with or without marks
-		   writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented(), true));
+		   writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.hasBeenSegmented(), true));
 		   writer.writeEndElementLineBreak(); // target
 		}
 		

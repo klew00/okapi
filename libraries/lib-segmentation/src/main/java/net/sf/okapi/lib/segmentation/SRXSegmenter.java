@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.TextContainer;
@@ -177,20 +178,24 @@ public class SRXSegmenter implements ISegmenter {
 		return includeIsolatedCodes;
 	}
 	
+	@Override
 	public int computeSegments (String text) {
 		TextContainer tmp = new TextContainer(text);
 		return computeSegments(tmp);
 	}
 	
+	@Override
 	public int computeSegments (TextContainer container) {
 		if ( currentLanguageCode == null ) {
 			// Need to call selectLanguageRule()
 			throw new SegmentationRuleException("No language defined for the segmenter.");
 		}
-		if ( container.isSegmented() ) {
-			// Assumes the text is not already segmented
-			throw new SegmentationRuleException("Text already segmented.");
-		}
+		
+		// Do we have codes?
+		// Avoid to create an un-segmented copy if we can
+		boolean hasCode;
+		if ( container.contentIsOneSegment() ) hasCode = container.getFirstSegmentContent().hasCode();
+		else hasCode = container.getUnSegmentedContentCopy().hasCode();
 		
 		// Set the flag for trimming or not the in-line codes
 		boolean isSCWS = (trimCodes ? !includeStartCodes : false); 
@@ -198,6 +203,7 @@ public class SRXSegmenter implements ISegmenter {
 		boolean isICWS = (trimCodes ? !includeIsolatedCodes : false); 
 
 		// Build the list of split positions
+		// Get the coded text for the whole content
 		String codedText = container.getCodedText();
 		splits = new TreeMap<Integer, Boolean>();
 		Matcher m;
@@ -233,7 +239,7 @@ public class SRXSegmenter implements ISegmenter {
 		// Adjust the split positions for in-line codes inclusion/exclusion options
 		// And create the list of final splits at the same time
 		finalSplits = new ArrayList<Integer>();
-		if ( container.hasCode() ) { // Do this only if we have in-line codes
+		if ( hasCode ) { // Do this only if we have in-line codes
 			int finalPos;
 			boolean done;
 			for ( int pos : splits.keySet() ) {
@@ -284,7 +290,6 @@ public class SRXSegmenter implements ISegmenter {
 				if ( splits.get(pos) ) finalSplits.add(pos);
 			}
 		}
-		
 		
 		// Now build the lists of start and end of each segment
 		// but trim them of any white-spaces.
@@ -355,68 +360,72 @@ public class SRXSegmenter implements ISegmenter {
 		return starts.size();
 	}
 	
+	@Override
 	public Range getNextSegmentRange (TextContainer container) {
-		String text = container.getCodedText();
-		int start = 0;
-		if ( container.isSegmented() ) {
-			// Find the last segment marker in the main coded text
-			for ( int i=text.length()-1; i>=0; i-- ) {
-				if ( text.charAt(i) == TextContainer.MARKER_SEGMENT ) {
-					start = i+2; // Just after the marker
-					break;
-				}
-			}
-		}
-
-		// Do we have reach the end?
-		if ( start >= text.length() ) return null;
-
-		//TODO: implement same trimming at computeSegments()		
-		
-		// Else: search for next segment
-		Matcher m;
-		CompiledRule rule;
-		int end = -1;
-		int pos = start;
-		for ( int i=0; i<rules.size(); i++ ) {
-			rule = rules.get(i);
-			m = rule.pattern.matcher(text.substring(pos));
-			if ( m.find() ) {
-				if ( !rule.isBreak ) {
-					pos = pos+m.start()+m.group(1).length()+1;
-					if ( pos == text.length() ) break;
-					i = 0; // Look at all rules again
-				}
-				else {
-					end = pos+m.start()+m.group(1).length();
-					break;
-				}
-			}
-		}
-
-		// If not found: take all the remainder as the fragment
-		if ( end < 0 ) end = text.length()-1;
-//TODO: implement same trimming at computeSegments()		
-		// Trim the white-spaces at the front of the segment
-		while ( true ) {
-			if ( start > end ) break;
-			if ( Character.isWhitespace(text.charAt(start)) ) start++;
-			else break;
-		}
-
-		// Trim the white-spaces and required codes at the end of the segment
-		end = TextFragment.indexOfLastNonWhitespace(text, end, start,
-			!includeStartCodes, !includeEndCodes, !includeIsolatedCodes, trimTrailingWS);
-		
-		// Adjust for +1 position (it's a range)
-		if ( end == -1 ) return null;
-		else end++;
-
-		// Return the range
-		if ( start == end ) return null;
-		return new Range(start, end);
+//TODO: Is this method really needed now that we assume no-incremental segmentation?		
+return null;		
+//		String text = container.getCodedText();
+//		int start = 0;
+//		if ( container.isSegmented() ) {
+//			// Find the last segment marker in the main coded text
+//			for ( int i=text.length()-1; i>=0; i-- ) {
+//				if ( text.charAt(i) == TextFragment.MARKER_SEGMENT ) {
+//					start = i+2; // Just after the marker
+//					break;
+//				}
+//			}
+//		}
+//
+//		// Do we have reach the end?
+//		if ( start >= text.length() ) return null;
+//
+//		//TODO: implement same trimming at computeSegments()		
+//		
+//		// Else: search for next segment
+//		Matcher m;
+//		CompiledRule rule;
+//		int end = -1;
+//		int pos = start;
+//		for ( int i=0; i<rules.size(); i++ ) {
+//			rule = rules.get(i);
+//			m = rule.pattern.matcher(text.substring(pos));
+//			if ( m.find() ) {
+//				if ( !rule.isBreak ) {
+//					pos = pos+m.start()+m.group(1).length()+1;
+//					if ( pos == text.length() ) break;
+//					i = 0; // Look at all rules again
+//				}
+//				else {
+//					end = pos+m.start()+m.group(1).length();
+//					break;
+//				}
+//			}
+//		}
+//
+//		// If not found: take all the remainder as the fragment
+//		if ( end < 0 ) end = text.length()-1;
+////TODO: implement same trimming at computeSegments()		
+//		// Trim the white-spaces at the front of the segment
+//		while ( true ) {
+//			if ( start > end ) break;
+//			if ( Character.isWhitespace(text.charAt(start)) ) start++;
+//			else break;
+//		}
+//
+//		// Trim the white-spaces and required codes at the end of the segment
+//		end = TextFragment.indexOfLastNonWhitespace(text, end, start,
+//			!includeStartCodes, !includeEndCodes, !includeIsolatedCodes, trimTrailingWS);
+//		
+//		// Adjust for +1 position (it's a range)
+//		if ( end == -1 ) return null;
+//		else end++;
+//
+//		// Return the range
+//		if ( start == end ) return null;
+//		return new Range(start, end);
 	}
 
+	@Override
 	public List<Integer> getSplitPositions () {
 		
 		if ( finalSplits == null ) {
@@ -425,6 +434,7 @@ public class SRXSegmenter implements ISegmenter {
 		return finalSplits;
 	}
 
+	@Override
 	public List<Range> getRanges () {
 		ArrayList<Range> list = new ArrayList<Range>();
 		if ( starts == null ) return null;
@@ -434,10 +444,11 @@ public class SRXSegmenter implements ISegmenter {
 		return list;
 	}
 	
+	@Override
 	public LocaleId getLanguage () {
 		return currentLanguageCode;
 	}
-	
+
 	/**
 	 * Sets the language used to apply the rules.
 	 * @param languageCode Code of the language to use to apply the rules.

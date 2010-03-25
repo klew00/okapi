@@ -25,7 +25,7 @@ import java.net.URL;
 
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 
@@ -65,7 +65,7 @@ public class InlineCodeFinderPanel extends Composite {
 	private Button chkTestAllRules;
 	private boolean editMode;
 	private boolean wasNew;
-	private TextContainer textCont;
+	private TextFragment textFrag;
 	private GenericContent genericCont;
 	private boolean canUpdateTest = true;
 
@@ -74,7 +74,7 @@ public class InlineCodeFinderPanel extends Composite {
 	{
 		super(parent, flags);
 		codeFinder = new InlineCodeFinder();
-		textCont = new TextContainer();
+		textFrag = new TextFragment();
 		genericCont = new GenericContent();
 		createContent();
 	}
@@ -360,10 +360,10 @@ public class InlineCodeFinderPanel extends Composite {
 				codeFinder.addRule(edExpression.getText());
 			}
 			codeFinder.compile();
-			textCont.clear();
-			textCont.setCodedText(getSampleText());
-			codeFinder.process(textCont);
-			genericCont.setContent(textCont);
+			textFrag.clear();
+			textFrag.setCodedText(getSampleText());
+			codeFinder.process(textFrag);
+			genericCont.setContent(textFrag);
 			edResults.setText(genericCont.toString());
 		}
 		catch ( Throwable e ) {

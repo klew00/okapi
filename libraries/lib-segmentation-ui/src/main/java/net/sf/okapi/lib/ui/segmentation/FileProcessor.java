@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,16 +28,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.lib.segmentation.ISegmenter;
 
 public class FileProcessor {
 
@@ -63,40 +63,41 @@ public class FileProcessor {
 	public void populateTextContainer (String text,
 		TextContainer textCont)
 	{
-		assert(textCont!=null);
-		textCont.clear();
-		textCont.setCodedText(text);
 		int n;
 		int start = 0;
 		int diff = 0;
-		
+
+		TextFragment tf = new TextFragment(text);
 		Matcher m = patternOpening.matcher(text);
 		while ( m.find(start) ) {
 			n = m.start();
-			diff += textCont.changeToCode(n+diff, (n+diff)+m.group().length(),
+			diff += tf.changeToCode(n+diff, (n+diff)+m.group().length(),
 				TagType.OPENING, m.group(1));
 			start = (n+m.group().length());
 		}
 		
-		text = textCont.getCodedText();
+		text = tf.getCodedText();
 		start = diff = 0;
 		m = patternClosing.matcher(text);
 		while ( m.find(start) ) {
 			n = m.start();
-			diff += textCont.changeToCode(n+diff, (n+diff)+m.group().length(),
+			diff += tf.changeToCode(n+diff, (n+diff)+m.group().length(),
 				TagType.CLOSING, m.group(1));
 			start = (n+m.group().length());
 		}
 		
-		text = textCont.getCodedText();
+		text = tf.getCodedText();
 		start = diff = 0;
 		m = patternPlaceholder.matcher(text);
 		while ( m.find(start) ) {
 			n = m.start();
-			diff += textCont.changeToCode(n+diff, (n+diff)+m.group().length(),
+			diff += tf.changeToCode(n+diff, (n+diff)+m.group().length(),
 				TagType.PLACEHOLDER, null);
 			start = (n+m.group().length());
 		}
+
+		textCont.clear();
+		textCont.setContent(tf);
 	}
 	
 	public void process (String inputPath,
@@ -134,8 +135,7 @@ public class FileProcessor {
 			segmenter.computeSegments(textCont);
 			textCont.createSegments(segmenter.getRanges());
 			if ( htmlOutput ) {
-				List<Segment> list = textCont.getSegments();
-				for ( Segment seg : list ) {
+				for ( Segment seg : textCont ) {
 					writer.write("<p>"); //$NON-NLS-1$
 					writer.write(Util.escapeToXML(sampleOutput.setContent(seg.text).toString(true), 0, false, null));
 					writer.write("</p>"); //$NON-NLS-1$
