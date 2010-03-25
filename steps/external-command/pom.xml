@@ -7,17 +7,24 @@
       <version>0.7-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
+
 	<artifactId>okapi-step-external-command</artifactId>
-   <!--Used for display purposes only-->
+	<!--Used for display purposes only-->
 	<name>Okapi Step for Executing External Command Line Tools</name>
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-exec</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>net.sf.okapi</groupId>
 			<artifactId>okapi-core</artifactId>
 			<version>${project.version}</version>
-		</dependency>        
-		
-				
+		</dependency>
+
+
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-common</artifactId>
