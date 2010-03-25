@@ -54,6 +54,15 @@ import java.util.regex.Pattern;
  * Collection of various all-purpose helper functions.
  */
 public class Util {
+		
+	/**
+	 * Enumeration of supported OS's	 	 
+	 */
+	public static enum SUPPORTED_OS {
+		WINDOWS,
+		MAC,
+		LINUX		
+	}
 
 	public static final String LINEBREAK_DOS = "\r\n";
 	public static final String LINEBREAK_UNIX = "\n";
@@ -1042,7 +1051,22 @@ public class Util {
 	public static boolean checkFlag (int value, int flag) {
 		return (value & flag) == flag;
 	}
-
+	
+	/**
+	 * Get the operating system
+	 * @return one of WINDOWS, MAC or LINUX
+	 */
+	public static SUPPORTED_OS getOS() {
+		String osName = System.getProperty("os.name");
+		if (osName.startsWith("Mac OS")) { // Macintosh case
+			return SUPPORTED_OS.MAC;
+		}
+		else if (osName.startsWith("Windows")) { // Windows case
+			return SUPPORTED_OS.WINDOWS;
+		}		
+		return SUPPORTED_OS.LINUX;
+	}
+		
    /**
     * Opens the specified page in a web browser (Java 1.5 compatible).
     * <p>This is based on the public domain class BareBonesBrowserLaunch from Dem Pilafian at
