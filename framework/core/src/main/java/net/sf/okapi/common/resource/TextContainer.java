@@ -809,7 +809,7 @@ public class TextContainer implements Iterable<Segment> {
 
 	/**
 	 * Indicates if this container contains at least one character that is not a whitespace.
-	 * This method has the same result as calling {@link #hasText(boolean, boolean)} with the parameters true and false.
+	 * All parts (segments and non-segments) are checed.
 	 * @param whiteSpacesAreText indicates if whitespaces should be considered 
 	 * text characters or not.
 	 * @return true if this container contains at least one character that is not a whitespace.
@@ -819,6 +819,15 @@ public class TextContainer implements Iterable<Segment> {
 			if ( part.getContent().hasText(whiteSpacesAreText) ) return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Indicates if this container contains at least one character that is not a whitespace.
+	 * This method has the same result as calling {@link #hasText(boolean, boolean)} with the parameters true and false.
+	 * @return true if this container contains at least one character that is not a whitespace.
+	 */
+	public boolean hasText () {
+		return hasText(false);
 	}
 	
 	/**

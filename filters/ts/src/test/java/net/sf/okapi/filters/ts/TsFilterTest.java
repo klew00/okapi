@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -127,7 +127,8 @@ public class TsFilterTest {
 		assertEquals(
 				"<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>\r", 
 				sd.getSkeleton().toString());
-	}	
+	}
+	
 	@Test
 	public void DocumentPartTsPart() {
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(completeTs, locENUS, locFRFR), 1);
@@ -145,7 +146,8 @@ public class TsFilterTest {
 				dp.getSkeleton().toString());
 
 		//q. should all iresources have mimetype set, or only the ones with text?		
-	}	
+	}
+	
 	@Test
 	public void StartGroupContextPart() {
 		StartGroup sg = FilterTestDriver.getGroup(getEvents(completeTs, locENUS, locFRFR), 1);
@@ -160,7 +162,6 @@ public class TsFilterTest {
 				"<name>context name 1</name>\r" +
 				"<comment>context comment 1</comment>\r", 
 				sg.getSkeleton().toString());
-
 		
 		sg = FilterTestDriver.getGroup(getEvents(completeTs, locENUS, locFRFR), 2);
 
@@ -173,7 +174,8 @@ public class TsFilterTest {
 				"<name>context name 2</name>\r" +
 				"<comment>context comment 2</comment>\r", 
 				sg.getSkeleton().toString());
-	}	
+	}
+	
 	@Test
 	public void TextUnitMessageUnfinished() {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, locENUS, locFRFR), 1);
@@ -204,6 +206,7 @@ public class TsFilterTest {
 				"</message>", 
 				tu.getSkeleton().toString());
 	}
+	
 	@Test
 	public void TestDecodeByteFalse() {
 		
@@ -212,9 +215,10 @@ public class TsFilterTest {
 		
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, locENUS, locFRFR), 1);
 
-		assertEquals("hello <byte value=\"79\"/>world", tu.getSourceContent().toString());
-		assertEquals("hejsan <byte value=\"79\"/>varlden", tu.getTargetContent(locFRFR).toString());
+		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstPartContent().toString());
+		assertEquals("hejsan <byte value=\"79\"/>varlden", tu.getTarget(locFRFR).getFirstPartContent().toString());
 	}
+	
 	@Test
 	public void TestDecodeByteTrueDec() {
 		
@@ -235,9 +239,10 @@ public class TsFilterTest {
 		
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 
-		assertEquals("hello 0world", tu.getSourceContent().toString());
-		assertEquals("hejsan 0varlden", tu.getTargetContent(locFRFR).toString());
+		assertEquals("hello 0world", tu.getSource().getFirstPartContent().toString());
+		assertEquals("hejsan 0varlden", tu.getTarget(locFRFR).getFirstPartContent().toString());
 	}
+	
 	@Test
 	public void TestDecodeByteTrueHex() {
 		
@@ -258,9 +263,10 @@ public class TsFilterTest {
 		
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 
-		assertEquals("hello 1world", tu.getSourceContent().toString());
-		assertEquals("hejsan 1varlden", tu.getTargetContent(locFRFR).toString());
+		assertEquals("hello 1world", tu.getSource().getFirstPartContent().toString());
+		assertEquals("hejsan 1varlden", tu.getTarget(locFRFR).getFirstPartContent().toString());
 	}
+	
 	@Test
 	public void TestDecodeByteTrueHex2() {
 		
@@ -301,8 +307,9 @@ public class TsFilterTest {
 		"\ufffd" +
 		"world"; 
 		
-		assertEquals(srcCheck, tu.getSourceContent().toString());
+		assertEquals(srcCheck, tu.getSource().getFirstPartContent().toString());
 	}
+	
 	@Test
 	public void TestEncodeIncludedChars() {
 		
@@ -366,7 +373,8 @@ public class TsFilterTest {
 		
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR),
 			filter.getEncoderManager(), locFR));
-	}	
+	}
+	
 	@Test
 	public void TestEncodeExcludedChars() {
 		
@@ -437,7 +445,8 @@ public class TsFilterTest {
 
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR),
 			filter.getEncoderManager(), locFR));
-	}	
+	}
+	
 	@Test
 	public void AllEvents () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>\r" +
@@ -800,27 +809,23 @@ public class TsFilterTest {
 		assertEquals("5", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
 		assertFalse(tu.isEmpty());
-		assertEquals("hello <byte value=\"79\"/>world", tu.getSourceContent().toString());
-		assertEquals("Numerus<byte value=\"79\"/> 1", tu.getTargetContent(locFRFR).toString());
+		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstPartContent().toString());
+		assertEquals("Numerus<byte value=\"79\"/> 1", tu.getTarget(locFRFR).getFirstPartContent().toString());
 		assertEquals( 
 				"<numerusform variants=\"no\">[#$$self$]</numerusform>", 
 				tu.getSkeleton().toString());
 		
-
 		tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 6);
 		
 		assertEquals("6", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
 		assertFalse(tu.isEmpty());
-		assertEquals("hello <byte value=\"79\"/>world", tu.getSourceContent().toString());
-		assertEquals("Numerus<byte value=\"79\"/> 2", tu.getTargetContent(locFRFR).toString());
+		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstPartContent().toString());
+		assertEquals("Numerus<byte value=\"79\"/> 2", tu.getTarget(locFRFR).getFirstPartContent().toString());
 		assertEquals( 
 				"\r\n<numerusform variants=\"no\">[#$$self$]</numerusform>", 
 				tu.getSkeleton().toString());
-				
-		
 	}	
-	
 	
 /*	@Test
 	public void testDoubleExtraction () {
@@ -829,7 +834,6 @@ public class TsFilterTest {
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locFRFR));
 	}*/
-	
 	
 	//--methods--
 	@Test
@@ -888,8 +892,8 @@ public class TsFilterTest {
 	public void testTu() {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, locENUS, locFRFR), 1);
 		assertNotNull(tu);
-		assertEquals("Add Entry To System Log", tu.getSourceContent().getCodedText());
-		assertEquals("Lagg till i system Loggen", tu.getTargetContent(locFRFR).getCodedText());
+		assertEquals("Add Entry To System Log", tu.getSource().getFirstPartContent().getCodedText());
+		assertEquals("Lagg till i system Loggen", tu.getTarget(locFRFR).getFirstPartContent().getCodedText());
 		
 		/*System.out.println(tu.getId());
 		System.out.println(tu.getMimeType());
@@ -905,7 +909,6 @@ public class TsFilterTest {
 		assertNotNull(prop);
 		assertEquals("UTF-8", prop.getValue());
 		assertFalse(prop.isReadOnly());*/
-		
 	}	
 	
 	@Test

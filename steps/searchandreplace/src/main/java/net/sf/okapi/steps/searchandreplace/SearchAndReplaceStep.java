@@ -271,9 +271,15 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		try {
 			// Else: do the requested modifications
 			// Make sure we have a target where to set data
-			tu.createTarget(targetLocale, false, IResource.COPY_ALL);
-
-			String result = tu.getTargetContent(targetLocale).getCodedText();
+			TextContainer trgCont = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
+			
+			// Temporary fix for compile and test: remove segmentation
+			//TODO: Implement case for segmented SnR
+			if ( trgCont.contentIsOneSegment() ) {
+				trgCont.joinAllSegments();
+			}
+			
+			String result = trgCont.getFirstPartContent().getCodedText();
 
         	if ( params.regEx ){
         		for(int i=0; i<params.rules.size();i++){
@@ -292,8 +298,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
     	        }
         	}
 			
-			TextContainer cnt = tu.getTarget(targetLocale); 
-			cnt.setCodedText(result);
+			trgCont.getFirstPartContent().setCodedText(result);
 		}
 		catch ( Exception e ) {
 			logger.log(Level.WARNING,

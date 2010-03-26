@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -891,14 +891,14 @@ public class TsFilter implements IFilter {
 			}
 		}
 
-		if ( params.useCodeFinder )
-			params.codeFinder.process(tu.getSourceContent());
-		if ( params.useCodeFinder )
-			params.codeFinder.process(tu.getTargetContent(trgLang));
+		if ( params.useCodeFinder ) {
+			params.codeFinder.process(tu.getSource().getFirstPartContent());
+			params.codeFinder.process(tu.getTarget(trgLang).getFirstPartContent());
+		}
 		
 		tu.setSkeleton(skel);
 		tu.setMimeType(MimeTypeMapper.TS_MIME_TYPE);
-		if(ts.messageId != null){
+		if (ts.messageId != null ) {
 			tu.setName(ts.messageId);
 		}
 		return tu;
@@ -1016,48 +1016,47 @@ public class TsFilter implements IFilter {
 					//TODO: Put empty placeholder if the numerusform elem is empty
 					procEndElem(endElem);
 
-					if ( params.useCodeFinder )
-						params.codeFinder.process(tf_target.getSourceContent());
-					if ( params.useCodeFinder )
-						params.codeFinder.process(tf_target.getTargetContent(trgLang));
+					if ( params.useCodeFinder ) {
+						// We can use getFirstPartContent() because nothing is segmented
+						params.codeFinder.process(tf_target.getSource().getFirstPartContent());
+						params.codeFinder.process(tf_target.getTarget(trgLang).getFirstPartContent());
+					}
 					
 					tf_target.setSkeleton(skel);
 					tf_target.setMimeType(MimeTypeMapper.TS_MIME_TYPE);
-					
 					queue.add(new Event(EventType.TEXT_UNIT, tf_target));
 					skel = new GenericSkeleton();
 
-				}else if( endElemName.equals("lengthvariant") ){
+				}
+				else if ( endElemName.equals("lengthvariant") ) {
 					//TODO Handle lengthvariant
-					if(ts.currentMessageLocation == MessageLocation.RESOURCE){
+					if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
 						procEndElem(endElem);
-					}else if (ts.currentMessageLocation == MessageLocation.TARGET){
+					}
+					else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 						procEndElemAddToTuContent(endElem, tf_target);
 					}
-				}else{
+				}
+				else {
 					procEndElem(endElem);
 				}
-				
-			}else if(event.getEventType() == XMLEvent.CHARACTERS){
-				
+			}
+			else if ( event.getEventType() == XMLEvent.CHARACTERS ) {
 				Characters chars = event.asCharacters();
-			
-				if(ts.currentMessageLocation == MessageLocation.RESOURCE){
-					
+				if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
 					procCharacters(chars);
-				
-				}else if(ts.currentMessageLocation == MessageLocation.SOURCE){
-
+				}
+				else if ( ts.currentMessageLocation == MessageLocation.SOURCE ) {
 					source.append(chars.getData());
 					procCharacters(chars);
-					
-				}else if(ts.currentMessageLocation == MessageLocation.TARGET){
-
+				}
+				else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 					TextContainer tc = tf_target.getTarget(trgLang);
-					if( !tc.hasText() ){
+					if ( !tc.hasText() ) {
 						skel.addContentPlaceholder(tf_target, trgLang);	
 					}
-					tc.append(chars.getData());
+					// We can use getFirstPartContent() because nothing is segmented
+					tc.getFirstPartContent().append(chars.getData());
 				}
 			}
 		}
@@ -1135,31 +1134,30 @@ public class TsFilter implements IFilter {
 		dp.setSkeleton(skel);
 		return dp;
 	}
-	
 
-	private void procCharacters(Characters chars, TextUnit tu) {
-
-		if(ts.currentMessageLocation == MessageLocation.RESOURCE){
-			
+	private void procCharacters (Characters chars,
+		TextUnit tu)
+	{
+		if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
 			procCharacters(chars);
-		
-		}else if(ts.currentMessageLocation == MessageLocation.SOURCE){
+		}
+		else if ( ts.currentMessageLocation == MessageLocation.SOURCE ) {
 			TextContainer tc = tu.getSource();
-			if( !tc.hasText() ){
+			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu);	
 			}
-			tc.append(chars.getData());
-
-		}else if(ts.currentMessageLocation == MessageLocation.TARGET){
-
+			// We can use getFirstPartContent() because nothing is segmented
+			tc.getFirstPartContent().append(chars.getData());
+		}
+		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 			TextContainer tc = tu.getTarget(trgLang);
-			if( !tc.hasText() ){
+			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
-			tc.append(chars.getData());
+			// We can use getFirstPartContent() because nothing is segmented
+			tc.getFirstPartContent().append(chars.getData());
 		}
 	}
-	
 	
 	private void procCharacters(Characters chars) {
 
@@ -1266,7 +1264,8 @@ public class TsFilter implements IFilter {
 			}
 		}
 		skel.append(">");
-	}	
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void addStartElemToSkel( StartElement startElement ) {
 
@@ -1280,52 +1279,56 @@ public class TsFilter implements IFilter {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void procStartElemAddToTuContent(StartElement startElement, TextUnit tu) {
-
+	private void procStartElemAddToTuContent (StartElement startElement,
+		TextUnit tu)
+	{
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("<"+startElement.getName().getLocalPart());	
 		Iterator<Attribute> attributes = startElement.getAttributes();
-		while ( attributes.hasNext() ){
+		while ( attributes.hasNext() ) {
 			Attribute attribute = attributes.next();
 			sb.append(String.format(" %s=\"%s\"", attribute.getName().getLocalPart(), attribute.getValue()));
 		}
 		sb.append(">");
 		
-		if(ts.currentMessageLocation == MessageLocation.SOURCE){
+		if ( ts.currentMessageLocation == MessageLocation.SOURCE ) {
 			TextContainer tc = tu.getSource();
-			if( !tc.hasText() ){
+			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu);	
 			}
-			tc.append(sb.toString());
-		}else if(ts.currentMessageLocation == MessageLocation.TARGET){
-
+			// We can use getFirstPartContent() because nothing is segmented
+			tc.getFirstPartContent().append(sb.toString());
+		}
+		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 			TextContainer tc = tu.getTarget(trgLang);
-			if( !tc.hasText() ){
+			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
-			tc.append(sb.toString());
+			// We can use getFirstPartContent() because nothing is segmented
+			tc.getFirstPartContent().append(sb.toString());
 		}
 	}
-	private void procEndElemAddToTuContent(EndElement endElement, TextUnit tu) {
-		
+	
+	private void procEndElemAddToTuContent(EndElement endElement,
+		TextUnit tu)
+	{
 		StringBuilder sb = new StringBuilder();
-		
 		sb.append("</"+endElement.getName().getLocalPart()+">");
 		
-		if(ts.currentMessageLocation == MessageLocation.SOURCE){
+		if ( ts.currentMessageLocation == MessageLocation.SOURCE ) {
 			TextContainer tc = tu.getSource();
-			if( !tc.hasText() ){
+			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu);	
 			}
-			tc.append(sb.toString());
-		}else if(ts.currentMessageLocation == MessageLocation.TARGET){
-
+			tc.getFirstPartContent().append(sb.toString());
+		}
+		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 			TextContainer tc = tu.getTarget(trgLang);
-			if( !tc.hasText() ){
+			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
-			tc.append(sb.toString());
+			tc.getFirstPartContent().append(sb.toString());
 		}
 	}
 	
@@ -1358,42 +1361,46 @@ public class TsFilter implements IFilter {
 	 * @param elem StartElement to append
 	 * @param tu The tu whose TextContainer to populate if needed.
 	 */
-	private void procStartElemByte(StartElement elem, TextUnit tu) {
-		
-		if(ts.currentMessageLocation == MessageLocation.RESOURCE){
+	private void procStartElemByte (StartElement elem,
+		TextUnit tu)
+	{
+		if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
 			procStartElemByte(elem);
-		}else if(ts.currentMessageLocation == MessageLocation.SOURCE){
-			
+		}
+		else if ( ts.currentMessageLocation == MessageLocation.SOURCE ) {
 			TextContainer tc = tu.getSource();
-			
 			//--This segment adds a tu placeholder assuming this is the first content that is added to the container  
-			if( !tc.hasText() ){
+			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu);	
 			}
 			
-			if(params.decodeByteValues){
+			if ( params.decodeByteValues ) {
 				Attribute attr = elem.getAttributeByName(new QName("value"));
-				tc.append(decodeByteValue(attr.getValue()));
-			}else{
-				tc.append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
+				// We can use getFirstPartContent() because nothing is segmented
+				tc.getFirstPartContent().append(decodeByteValue(attr.getValue()));
+			}
+			else {
+				// We can use getFirstPartContent() because nothing is segmented
+				tc.getFirstPartContent().append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
 				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
 				//TODO: should it be text or code?
 			}
-
-		}else if(ts.currentMessageLocation == MessageLocation.TARGET){
-			
+		}
+		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 			TextContainer tc = tu.getTarget(trgLang);
-			
 			//--This segment adds a tu placeholder assuming this is the first content that is added to the container
-			if( !tc.hasText() ){
+			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu,trgLang);	
 			}
 			
-			if(params.decodeByteValues){
+			if (params.decodeByteValues ) {
 				Attribute attr = elem.getAttributeByName(new QName("value"));
-				tc.append(decodeByteValue(attr.getValue()));
-			}else{
-				tc.append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
+				// We can use getFirstPartContent() because nothing is segmented
+				tc.getFirstPartContent().append(decodeByteValue(attr.getValue()));
+			}
+			else {
+				// We can use getFirstPartContent() because nothing is segmented
+				tc.getFirstPartContent().append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
 				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
 				//TODO: should it be text or code?
 			}
