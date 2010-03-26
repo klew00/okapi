@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.ttx;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -51,10 +52,10 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -410,10 +411,10 @@ public class TTXFilter implements IFilter {
 			boolean inTarget = false;
 			tu = new TextUnit(null); // No id yet
 			TextContainer srcCont = tu.getSource();
+			TextContainer trgCont = new TextContainer();
 			TextFragment srcSegFrag = null;
 			TextFragment trgSegFrag = null;
 			TextFragment current = new TextFragment();
-			ArrayList<Segment> trgSegments = new ArrayList<Segment>();
 			boolean returnValueAfterTextUnitDone = true;
 			ScoresAnnotation scores = null;
 
@@ -448,9 +449,10 @@ public class TTXFilter implements IFilter {
 						}
 					}
 					else if ( name.equals("Tu") ) { // New segment
-						// End non-segment part
+						// End non-segment part (on both source and target)
 						if ( !current.isEmpty() ) {
 							srcCont.appendPart(current);
+							trgCont.appendPart(current);
 						}
 						// Start new segment
 						inTU = true;
@@ -464,6 +466,7 @@ public class TTXFilter implements IFilter {
 						if (( tmp != null ) || ( origin != null )) {
 							if ( scores == null ) {
 								scores = new ScoresAnnotation();
+								trgCont.setAnnotation(scores);
 							}
 							int value = 0;
 							if ( tmp != null ) {
@@ -488,7 +491,10 @@ public class TTXFilter implements IFilter {
 							inTarget = !inTarget;
 						}
 						if ( inTarget ) {
+							// Save current to source
 							srcCont.appendPart(current);
+							trgCont.appendPart(current);
+							// Get start on target
 							trgSegFrag = new TextFragment();
 							current = trgSegFrag;
 						}
@@ -541,10 +547,10 @@ public class TTXFilter implements IFilter {
 					if ( done || name.equals("Tu") ) {
 						if ( srcSegFrag != null ) { // Add the segment if we have one
 							srcCont.appendSegment(srcSegFrag);
-							trgSegments.add(new Segment(String.valueOf(srcCont.getSegmentCount()-1), trgSegFrag));
+							trgCont.appendSegment(trgSegFrag==null ? new TextFragment() : trgSegFrag);
 							srcSegFrag = null;
 							trgSegFrag = null;
-							current = srcCont.getContent();
+							current = new TextFragment(); // Start storing inter-segment part
 							// A Tu stops the current segment, but not the text unit
 						}
 						inTU = false;
@@ -555,28 +561,26 @@ public class TTXFilter implements IFilter {
 			}
 
 			// Check if this it is worth sending as text unit
-			if ( !hasText(tu.getSource()) ) {
-				 if ( skelWriter == null ) {
-					 skelWriter = new TTXSkeletonWriter(params.getForceSegments());
-				 }
-				 skelWriter.checkForFilterInternalUse(lineBreak);
+			if ( !hasText(srcCont) ) { // Use special hasText()
+				// No text-type characters
+				if ( skelWriter == null ) {
+					skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+				}
+				skelWriter.checkForFilterInternalUse(lineBreak);
 				// Not really a text unit: convert to skeleton
 				// Use the skeleton writer processFragment() to get the output
 				// so any outer data is generated.
-				skel.append(skelWriter.processFragment(tu.getSourceContent()));
+				if ( srcCont.contentIsOneSegment() ) {
+					skel.append(skelWriter.processFragment(srcCont.getFirstPartContent()));
+				}
+				else { // Merge all if there is more than one segment
+					skel.append(skelWriter.processFragment(srcCont.getUnSegmentedContentCopy()));
+				}
 				tu = null;
 				return false; // No return from filter
 			}
 			
 			// Else genuine text unit, finalize and send
-			TextContainer cont = tu.getSource().clone();
-			if ( cont.isSegmented() ) {
-				cont.setSegments(trgSegments);
-				tu.setTarget(trgLoc, cont);
-				if ( scores != null ) {
-					cont.setAnnotation(scores);
-				}
-			}
 			tu.setId(String.valueOf(++tuId));
 			skel.addContentPlaceholder(tu); // Used by the TTXFilterWriter
 			tu.setSkeleton(skel);
@@ -595,55 +599,27 @@ public class TTXFilter implements IFilter {
 	}
 	
 	private boolean hasText (TextContainer tc) {
-		String text = tc.getCodedText();
-		for ( int i=0; i<text.length(); i++ ) {
-			switch (text.charAt(i)) {
-			case TextFragment.MARKER_OPENING:
-			case TextFragment.MARKER_CLOSING:
-			case TextFragment.MARKER_ISOLATED:
-				i++; // Skip over the marker, they are not text
-				continue;
-			case TextFragment.MARKER_SEGMENT:
-				int n = Integer.parseInt(tc.getCode(text.charAt(++i)).getData());
-				Segment seg = tc.getSegments().get(n);
-				if ( hasText(seg.text) ) return true;
-				continue; // Else: move to next character
-			}
-			// Not a marker: test the type of character
-			if ( !Character.isWhitespace(text.charAt(i)) ) {
-				// Extra TTX-no-text specific checks
-				if ( TTXNOTEXTCHARS.indexOf(text.charAt(i)) == -1 ) {
-					// Not a non-white-space that is not a TTX-no-text: that's text
-					return true;
+		Iterator<TextPart> iter = tc.partIterator();
+		while ( iter.hasNext() ) {
+			String text = iter.next().getContent().getCodedText();
+			for ( int i=0; i<text.length(); i++ ) {
+				if ( TextFragment.isMarker(text.charAt(i)) ) {
+					i++; // Skip index
+					continue;
+				}
+				// Not a marker: test the type of character
+				if ( !Character.isWhitespace(text.charAt(i)) ) {
+					// Extra TTX-no-text specific checks
+					if ( TTXNOTEXTCHARS.indexOf(text.charAt(i)) == -1 ) {
+						// Not a non-white-space that is not a TTX-no-text: that's text
+						return true;
+					}
 				}
 			}
 		}
 		return false;
 	}
 
-	private boolean hasText (TextFragment frag) {
-		String text = frag.getCodedText();
-		for ( int i=0; i<text.length(); i++ ) {
-			switch (text.charAt(i)) {
-			case TextFragment.MARKER_OPENING:
-			case TextFragment.MARKER_CLOSING:
-			case TextFragment.MARKER_ISOLATED:
-			case TextFragment.MARKER_SEGMENT:
-				i++; // Skip over the marker, they are not text
-				continue;
-			}
-			// Not a marker: test the type of character
-			if ( !Character.isWhitespace(text.charAt(i)) ) {
-				// Extra TTX-no-text specific checks
-				if ( TTXNOTEXTCHARS.indexOf(text.charAt(i)) == -1 ) {
-					// Not a non-white-space that is not a TTX-no-text: that's text
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
 	private String buildStartElement (boolean store) {
 		StringBuilder tmp = new StringBuilder();
 		String prefix = reader.getPrefix();

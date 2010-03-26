@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,7 +20,7 @@
 
 package net.sf.okapi.filters.ttx;
 
-import java.util.List;
+import java.util.Iterator;
 
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
@@ -31,6 +31,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
@@ -61,60 +62,107 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		}
 
 		StringBuilder tmp = new StringBuilder();
-		
+
 		TextContainer srcCont = tu.getSource();
-		TextFragment srcFrag;
-		if ( forceSegmentedOutput && !srcCont.isSegmented() ) {
+		if ( forceSegmentedOutput && !srcCont.hasBeenSegmented() ) {
+			// Work from a clone if we need to change the segmentation
 			srcCont = srcCont.clone();
-			srcCont.createSegment(0, -1);
+			srcCont.setHasBeenSegmentedFlag(true);
 		}
-		List<Segment> srcSegments = srcCont.getSegments();
-		String text = srcCont.getCodedText();
-
+		
+		TextContainer trgCont;
 		ScoresAnnotation scores = null;
-		TextFragment trgFrag;
-		List<Segment> trgSegments = null;
 		if ( tu.hasTarget(outputLoc) ) {
-			TextContainer trgCont = tu.getTarget(outputLoc);
+			trgCont = tu.getTarget(outputLoc);
 			scores = trgCont.getAnnotation(ScoresAnnotation.class);
-			if ( !trgCont.isSegmented() ) {
+			if ( forceSegmentedOutput && !trgCont.hasBeenSegmented() ) {
 				trgCont = trgCont.clone();
-				trgCont.createSegment(0, -1);
+				trgCont.setHasBeenSegmentedFlag(true);
 			}
-			trgSegments = trgCont.getSegments();
 		}
-		else {
-			trgSegments = srcSegments;
+		else { // Fall back to source if we have no target
+			trgCont = srcCont;
 		}
-
-		Code code;
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case TextFragment.MARKER_ISOLATED:
-			case TextFragment.MARKER_OPENING:
-			case TextFragment.MARKER_CLOSING:
-				tmp.append(expandCode(srcCont.getCode(text.charAt(++i))));
-				break;
-				
-			case TextFragment.MARKER_SEGMENT:
-				code = srcCont.getCode(text.charAt(++i));
-				int n = Integer.valueOf(code.getData());
-				// Get segments source/target
-				srcFrag = srcSegments.get(n).text;
-				trgFrag = trgSegments.get(n).text;
-				// Get score info if possible
+		
+		// Drive from target
+		int i = 0;
+		Iterator<TextPart> iter = trgCont.partIterator();
+		while ( iter.hasNext() ) {
+			TextPart part = iter.next();
+			if ( part.isSegment() ) {
+				Segment trgSeg = (Segment)part;
+				Segment srcSeg = srcCont.getSegment(trgSeg.id);
+				if ( srcSeg == null ) {
+					//TODO: Warning
+					// Fall back to the target
+					srcSeg = trgSeg;
+				}
 				ScoreInfo si = null;
 				if ( scores != null ) {
-					si = scores.get(n);
+					si = scores.get(i);
 				}
-				tmp.append(processSegment(srcFrag, trgFrag, si));
-				break;
-
-			default:
-				tmp.append(encoderManager.encode(text.charAt(i), 0));
-				break;
+				tmp.append(processSegment(srcSeg.text, trgSeg.text, si)); 
 			}
+			else {
+				tmp.append(processFragment(part.getContent()));
+			}
+			i++;
 		}
+		
+//		//==================
+//		TextContainer srcCont = tu.getSource();
+//		TextFragment srcFrag;
+//		if ( forceSegmentedOutput && !srcCont.isSegmented() ) {
+//			srcCont = srcCont.clone();
+//			srcCont.createSegment(0, -1);
+//		}
+//		List<Segment> srcSegments = srcCont.getSegments();
+//		String text = srcCont.getCodedText();
+//
+//		ScoresAnnotation scores = null;
+//		TextFragment trgFrag;
+//		List<Segment> trgSegments = null;
+//		if ( tu.hasTarget(outputLoc) ) {
+//			TextContainer trgCont = tu.getTarget(outputLoc);
+//			scores = trgCont.getAnnotation(ScoresAnnotation.class);
+//			if ( !trgCont.isSegmented() ) {
+//				trgCont = trgCont.clone();
+//				trgCont.createSegment(0, -1);
+//			}
+//			trgSegments = trgCont.getSegments();
+//		}
+//		else {
+//			trgSegments = srcSegments;
+//		}
+//
+//		Code code;
+//		for ( int i=0; i<text.length(); i++ ) {
+//			switch ( text.charAt(i) ) {
+//			case TextFragment.MARKER_ISOLATED:
+//			case TextFragment.MARKER_OPENING:
+//			case TextFragment.MARKER_CLOSING:
+//				tmp.append(expandCode(srcCont.getCode(text.charAt(++i))));
+//				break;
+//				
+//			case TextFragment.MARKER_SEGMENT:
+//				code = srcCont.getCode(text.charAt(++i));
+//				int n = Integer.valueOf(code.getData());
+//				// Get segments source/target
+//				srcFrag = srcSegments.get(n).text;
+//				trgFrag = trgSegments.get(n).text;
+//				// Get score info if possible
+//				ScoreInfo si = null;
+//				if ( scores != null ) {
+//					si = scores.get(n);
+//				}
+//				tmp.append(processSegment(srcFrag, trgFrag, si));
+//				break;
+//
+//			default:
+//				tmp.append(encoderManager.encode(text.charAt(i), 0));
+//				break;
+//			}
+//		}
 
 		return tmp.toString();
 	}
