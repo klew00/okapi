@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,6 +26,7 @@ import java.util.List;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
@@ -152,9 +153,12 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 		if (Util.isEmpty(params.splicer)) return false;
 						
 		TextContainer mergedLine = new TextContainer();
+		TextFragment mergedTF = mergedLine.getFirstPartContent();
 		int len = params.splicer.length();
 		
 		for (TextContainer curLine : splicedLines) {
+			// We can use getFirstPartContent() because nothing is segmented
+			TextFragment curTF = curLine.getFirstPartContent();
 			
 			//TextContainer curLine = splicedLines.poll();
 					
@@ -165,17 +169,17 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 			int pos = TextUnitUtil.lastIndexOf(curLine.getFirstPartContent(), params.splicer);
 			if (pos > -1)
 				if (params.createPlaceholders) 
-					curLine.changeToCode(pos, pos + len, TagType.PLACEHOLDER, "line splicer");
+					curTF.changeToCode(pos, pos + len, TagType.PLACEHOLDER, "line splicer");
 				else
-					curLine.remove(pos, pos + len);
+					curTF.remove(pos, pos + len);
 			
 			if (mergedLine.isEmpty())  // Paragraph's first line
 				mergedLine.setProperty(curLine.getProperty(AbstractLineFilter.LINE_NUMBER));
 			else 
 				if (params.createPlaceholders)
-					mergedLine.append(new Code(TagType.PLACEHOLDER, "line break", getLineBreak()));
+					mergedTF.append(new Code(TagType.PLACEHOLDER, "line break", getLineBreak()));
 			
-			mergedLine.append(curLine);
+			mergedTF.append(curTF);
 		}
 		
 		sendAsSource(mergedLine);

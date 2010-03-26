@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,7 +24,7 @@ import java.util.LinkedList;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
@@ -91,8 +91,9 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 	protected TextProcessingResult component_exec(TextContainer lineContainer) {
 		
 		if (bufferedLines == null || !params.extractParagraphs) return super.component_exec(lineContainer);
-						
-		if (!TextUnitUtil.isEmpty(lineContainer)) {
+
+		if ( !lineContainer.isEmpty() ) {
+//ys		if (!TextUnitUtil.isEmpty(lineContainer)) {
 			
 			merging = true;
 			
@@ -141,32 +142,36 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 		if (bufferedLines.isEmpty()) return false;
 						
 		TextContainer mergedLine = new TextContainer();
+		// We can use getFirstPartContent() because nothing is segmented
+		TextFragment tf = mergedLine.getFirstPartContent();
 		
 		while (bufferedLines.size() > 0) {
 			
 			TextContainer curLine = bufferedLines.poll();
 					
-			if (mergedLine.isEmpty()) // Paragraph's first line
+			if ( mergedLine.isEmpty() ) { // Paragraph's first line
 				mergedLine.setProperty(curLine.getProperty(AbstractLineFilter.LINE_NUMBER));
+			}
 			else {
 		
 				switch (params.wrapMode) {
 				
 				case PLACEHOLDERS:
-					mergedLine.append(new Code(TagType.PLACEHOLDER, "line break", getLineBreak()));
+					tf.append(new Code(TagType.PLACEHOLDER, "line break", getLineBreak()));
 					break;
 					
 				case SPACES:
-					mergedLine.append(' ');
+					tf.append(' ');
 					break;
 					
 				case NONE:
 				default:
-					mergedLine.append('\n');
+					tf.append('\n');
 				}				
 			}
-							
-			mergedLine.append(curLine);
+			
+			// We can use getFirstPartContent() because nothing is segmented
+			tf.append(curLine.getFirstPartContent());
 		}
 		
 		sendAsSource(mergedLine);
