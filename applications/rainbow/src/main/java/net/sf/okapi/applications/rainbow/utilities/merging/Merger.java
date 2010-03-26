@@ -279,7 +279,7 @@ public class Merger {
 		//TODO: handle case of empty or non-existent target
 		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
 		if ( fromTrans == null ) {
-			if ( tuFromTrans.getSourceContent().isEmpty() ) return;
+			if ( tuFromTrans.getSource().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
 			logger.log(Level.WARNING,
 				String.format("Item id='%s': No target in XLIFF; using source instead.", tu.getId()));
@@ -294,15 +294,15 @@ public class Merger {
 		// Merging the segments allow to check/transfer the codes at the text unit level
 		ArrayList<Range> ranges = null;
 		if ( mergeAsSegments ) ranges = new ArrayList<Range>();
-		if ( fromTrans.isSegmented() ) {
-			fromTrans.mergeAllSegments(ranges);
+		if ( !fromTrans.contentIsOneSegment() ) {
+			fromTrans.joinAllSegments(ranges);
 		}
 		
 		// Get the source (as a clone if we need to change the segments)
 		TextContainer srcCont;
-		if ( tu.getSource().isSegmented() ) {
+		if ( !tu.getSource().contentIsOneSegment() ) {
 			srcCont  = tu.getSource().clone();
-			srcCont.mergeAllSegments();
+			srcCont.joinAllSegments();
 		}
 		else {
 			srcCont = tu.getSource();
@@ -325,7 +325,8 @@ public class Merger {
 
 		// Now set the target coded text and the target codes
 		try {
-			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
+			// trgCont is un-segmented at this point and will be re-segmented if needed
+			trgCont.getFirstPartContent().setCodedText(fromTrans.getCodedText(), transCodes, false);
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
 				trgCont.createSegments(ranges);
@@ -476,8 +477,8 @@ public class Merger {
 		TextContainer srcCont, // Can be a clone of the original content
 		TextUnit tu)
 	{
-		List<Code> transCodes = fromTrans.getCodes();
-		List<Code> oriCodes = srcCont.getCodes();
+		List<Code> transCodes = fromTrans.getFirstPartContent().getCodes();
+		List<Code> oriCodes = srcCont.getFirstPartContent().getCodes();
 		
 		// Check if we have at least one code
 		if ( transCodes.size() == 0 ) {

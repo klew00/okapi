@@ -63,9 +63,11 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 @UsingParameters(Parameters.class)
 public class TTXFilter implements IFilter {
 
-	public final static String MATCHPERCENT = "MatchPercent";
-	public final static String ORIGIN = "Origin";
-	public final static String TTXNOTEXTCHARS = "\u00a0~`!@#$%^&*()_+=-{[}]|\\:;\"'<,>.?/";
+	private final static String MATCHPERCENT = "MatchPercent";
+	private final static String ORIGIN = "Origin";
+	
+	// Characters no considered as 'text' in TTX (for un-segmented entries)
+	private final static String TTXNOTEXTCHARS = "\u00a0~`!@#$%^&*()_+=-{[}]|\\:;\"'<,>.?/";
 	
 	private final static String TARGETLANGUAGE_ATTR = "TargetLanguage";
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -83,7 +85,7 @@ public class TTXFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private boolean canceled;
 	private GenericSkeleton skel;
-	//private TextUnit tu;
+	private TextUnit tu;
 	private Parameters params;
 	//private boolean sourceDone;
 	//private boolean targetDone;

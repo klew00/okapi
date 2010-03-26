@@ -56,7 +56,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -550,15 +550,15 @@ public class TmxFilter implements IFilter {
 		String curLocalName;
 		
 		//--determine which container to use--
-		TextContainer tc;
+		TextFragment tf;
 		if(tuvTrgType == TuvXmlLang.SOURCE){
 			//tc = pTu.getSource();
-			tc = tmxTu.curTuv.tc;
+			tf = tmxTu.curTuv.tc.getFirstPartContent();
 		}else if(tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
 			//tc = pTu.setTarget(currentLang, new TextContainer());
-			tc = tmxTu.curTuv.tc;
+			tf = tmxTu.curTuv.tc.getFirstPartContent();
 		}else{
-			tc=null;
+			tf=null;
 		}
 		
 		//storeTuStartElement();							//store the <seg> element with it's properties
@@ -574,7 +574,7 @@ public class TmxFilter implements IFilter {
 				case XMLStreamConstants.SPACE:
 					if(tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
 						//TODO: Check if it's ok to not check for unsupported chars
-						tc.append(reader.getText());	//add to source or target container
+						tf.append(reader.getText());	//add to source or target container
 					}else{ 			
 						//TODO: Check if it's ok to not check for unsupported chars
 						tmxTu.curTuv.appendToSkel(Util.escapeToXML(reader.getText(), 0, params.escapeGT, null));
@@ -597,13 +597,13 @@ public class TmxFilter implements IFilter {
 					if(tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
 						if(curLocalName.equals("hi")){
 							String typeAttr = getTypeAttribute();
-							tc.append(TagType.OPENING, ((typeAttr!=null) ? typeAttr : "hi"),"<hi>");	
+							tf.append(TagType.OPENING, ((typeAttr!=null) ? typeAttr : "hi"),"<hi>");	
 						}else if(curLocalName.equals("ph") || curLocalName.equals("it") || curLocalName.equals("ut")){
-							appendCode(TagType.PLACEHOLDER, ++id, curLocalName, curLocalName, tc);
+							appendCode(TagType.PLACEHOLDER, ++id, curLocalName, curLocalName, tf);
 						}else if(curLocalName.equals("bpt")){
-							appendCode(TagType.OPENING, ++id, curLocalName,"Xpt", tc);
+							appendCode(TagType.OPENING, ++id, curLocalName,"Xpt", tf);
 						}else if(curLocalName.equals("ept")){
-							appendCode(TagType.CLOSING, -1, curLocalName,"Xpt", tc);
+							appendCode(TagType.CLOSING, -1, curLocalName,"Xpt", tf);
 						}
 						break;
 					}else{
@@ -625,7 +625,7 @@ public class TmxFilter implements IFilter {
 					}else{
 						if(tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
 							if(curLocalName.equals("hi")){
-								tc.append(TagType.CLOSING, "hi","</hi>");	
+								tf.append(TagType.CLOSING, "hi","</hi>");	
 							}						
 						}else{
 							tmxTu.curTuv.parseEndElement(reader, true);
@@ -725,14 +725,14 @@ public class TmxFilter implements IFilter {
 	 * @param id The id of the code to add.
 	 * @param tagName The tag name of the in-line element to process.
 	 * @param type The tag name of the in-line element to process. 
-	 * @param content The object where to put the code.
+	 * @param fragment The object where to put the code.
 	 * Do not save if this parameter is null.
 	 */
 	private void appendCode (TagType tagType,
 		int id,
 		String tagName,
 		String type,
-		TextContainer content)
+		TextFragment fragment)
 	{
 		
 		String localName;
@@ -814,7 +814,7 @@ public class TmxFilter implements IFilter {
 					//--completed the original placeholder/code and back up to the <seg> level--
 					if ( tagName.equals(reader.getLocalName()) && ((elemStack.peek().equals("seg"))|| (elemStack.peek().equals("hi")) )) {
 
-						Code code = content.append(tagType, type, innerCode.toString(), id);
+						Code code = fragment.append(tagType, type, innerCode.toString(), id);
 						outerCode.append("</"+tagName+">");
 						code.setOuterData(outerCode.toString());
 						return;							

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -69,12 +69,6 @@ public class TTXFilterTest {
 //		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"KO-KR\" TargetDefaultFont=\"\ubd7e\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"
 //		+ "</FrontMatter><Body><Raw>\n";
 
-	private static final String STARTFILEEMPTYTRGNOLB = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-		+ "<TRADOStag Version=\"2.0\"><FrontMatter>\n"
-		+ "<ToolSettings CreationDate=\"20070508T094743Z\" CreationTool=\"TRADOS TagEditor\" CreationToolVersion=\"7.0.0.615\"></ToolSettings>\n"
-		+ "<UserSettings DataType=\"STF\" O-Encoding=\"UTF-8\" SettingsName=\"\" SettingsPath=\"\" SourceLanguage=\"EN-US\" TargetLanguage=\"\" SourceDocumentPath=\"abc.rtf\" SettingsRelativePath=\"\" PlugInInfo=\"\"></UserSettings>\n"
-		+ "</FrontMatter><Body><Raw>";
-
 	@Before
 	public void setUp() {
 		filter1 = new TTXFilter();
@@ -100,10 +94,10 @@ public class TTXFilterTest {
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals(1, cont.getSegmentCount());
-		assertEquals("en1", cont.getSegments().get(0).toString());
+		assertEquals("en1", cont.getSegment(0).toString());
 		cont = tu.getTarget(locESEM);
 		assertEquals(1, cont.getSegmentCount());
-		assertEquals("es1", cont.getSegments().get(0).toString());
+		assertEquals("es1", cont.getSegment(0).toString());
 	}
 
 	@Test
@@ -122,10 +116,10 @@ public class TTXFilterTest {
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals(1, cont.getSegmentCount());
-		assertEquals("en1", cont.getSegments().get(0).toString());
+		assertEquals("en1", cont.getSegment(0).toString());
 		cont = tu.getTarget(locESEM);
 		assertEquals(1, cont.getSegmentCount());
-		assertEquals("es1", cont.getSegments().get(0).toString());
+		assertEquals("es1", cont.getSegment(0).toString());
 		// Check that last DF is not included in TU
 		// We should have only one marker, for the segment
 //TOFIX: isolated df in TU		assertEquals(1, cont.getCodes().size());
@@ -151,28 +145,6 @@ public class TTXFilterTest {
 			+ "<Tuv Lang=\"ES-EM\">es1</Tuv>"
 			+ "</Tu>"
 			+ "</df>"
-			+ "<ut Type=\"end\" Style=\"external\">ec</ut>"
-			+ "</Raw></Body></TRADOStag>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM),
-			locESEM, filter2.createSkeletonWriter(), filter2.getEncoderManager()));
-	}
-
-	@Test
-	public void testOutputUpdatedTragetLanguage () {
-		String snippet = STARTFILEEMPTYTRGNOLB
-			+ "<ut Type=\"start\" Style=\"external\">bc</ut>"
-			+ "<Tu MatchPercent=\"0\">"
-			+ "<Tuv Lang=\"EN-US\">en1</Tuv>"
-			+ "<Tuv Lang=\"ES-EM\">es1</Tuv>"
-			+ "</Tu>"
-			+ "<ut Type=\"end\" Style=\"external\">ec</ut>"
-			+ "</Raw></Body></TRADOStag>";
-		String expected = STARTFILENOLB
-			+ "<ut Type=\"start\" Style=\"external\">bc</ut>"
-			+ "<Tu MatchPercent=\"0\">"
-			+ "<Tuv Lang=\"EN-US\">en1</Tuv>"
-			+ "<Tuv Lang=\"ES-EM\">es1</Tuv>"
-			+ "</Tu>"
 			+ "<ut Type=\"end\" Style=\"external\">ec</ut>"
 			+ "</Raw></Body></TRADOStag>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM),
@@ -307,7 +279,7 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter2, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals("paragraph <1/><2>text<3/></2>", fmt.setContent(cont).toString());
+		assertEquals("paragraph <1/><2>text<3/></2>", fmt.printSegmentedContent(cont, false));
 	}
 	
 	@Test
@@ -362,7 +334,7 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals("Before <1/><b2/>After", fmt.setContent(cont).toString());
+		assertEquals("[Before <1/><b2/>After]", fmt.printSegmentedContent(cont, true));
 		tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 2);
 		assertNotNull(tu);
 		cont = tu.getSource();
@@ -602,11 +574,11 @@ public class TTXFilterTest {
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals(1, cont.getSegmentCount());
-		cont.mergeAllSegments();
+		cont.joinAllSegments();
 		assertEquals("text en", cont.toString());
 		cont = tu.getTarget(locESEM);
 		assertEquals(1, cont.getSegmentCount());
-		cont.mergeAllSegments();
+		cont.joinAllSegments();
 		assertEquals("text es", cont.toString());
 	}
 
@@ -620,13 +592,13 @@ public class TTXFilterTest {
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals(2, cont.getSegmentCount());
-		assertEquals("text1 en", cont.getSegments().get(0).text.toString());
-		assertEquals("text2 en", cont.getSegments().get(1).text.toString());
+		assertEquals("text1 en", cont.getSegment(0).text.toString());
+		assertEquals("text2 en", cont.getSegment(1).text.toString());
 		assertEquals("0  1", cont.toString());
 		cont = tu.getTarget(locESEM);
 		assertEquals(2, cont.getSegmentCount());
-		assertEquals("text1 es", cont.getSegments().get(0).text.toString());
-		assertEquals("text2 es", cont.getSegments().get(1).text.toString());
+		assertEquals("text1 es", cont.getSegment(0).text.toString());
+		assertEquals("text2 es", cont.getSegment(1).text.toString());
 		assertEquals("0  1", cont.toString());
 
 		tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 2);
@@ -655,12 +627,12 @@ public class TTXFilterTest {
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals(1, cont.getSegmentCount());
-		assertEquals("text <br/>en <b>bold</b>.", cont.getSegments().get(0).text.toString());
-		assertEquals("text <1/>en <2>bold</2>.", fmt.setContent(cont.getSegments().get(0).text).toString());
+		assertEquals("text <br/>en <b>bold</b>.", cont.getSegment(0).text.toString());
+		assertEquals("text <1/>en <2>bold</2>.", fmt.setContent(cont.getSegment(0).text).toString());
 		cont = tu.getTarget(locESEM);
 		assertEquals(1, cont.getSegmentCount());
-		assertEquals("TEXT <br/>ES <b>BOLD</b>.", cont.getSegments().get(0).text.toString());
-		assertEquals("TEXT <1/>ES <2>BOLD</2>.", fmt.setContent(cont.getSegments().get(0).text).toString());
+		assertEquals("TEXT <br/>ES <b>BOLD</b>.", cont.getSegment(0).text.toString());
+		assertEquals("TEXT <1/>ES <2>BOLD</2>.", fmt.setContent(cont.getSegment(0).text).toString());
 	}
 
 	@Test

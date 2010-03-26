@@ -24,6 +24,8 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -52,20 +54,24 @@ public class PseudoTranslateStep extends BasePipelineStep {
 		TextUnit tu = (TextUnit)event.getResource();
 		if ( !tu.isTranslatable() ) return event;
 
-		TextFragment tf = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
-		StringBuilder text = new StringBuilder(tf.getCodedText());
-		int n;
-		for ( int i=0; i<text.length(); i++ ) {
-			if ( TextFragment.isMarker(text.charAt(i)) ) {
-				i++; // Skip the pair
-			}
-			else {
-				if ( (n = OLDCHARS.indexOf(text.charAt(i))) > -1 ) {
-					text.setCharAt(i, NEWCHARS.charAt(n));
+		TextContainer tc = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
+		// Process each segment content
+		for ( Segment seg : tc ) {
+			TextFragment tf = seg.getContent();
+			StringBuilder text = new StringBuilder(tf.getCodedText());
+			int n;
+			for ( int i=0; i<text.length(); i++ ) {
+				if ( TextFragment.isMarker(text.charAt(i)) ) {
+					i++; // Skip the pair
+				}
+				else {
+					if ( (n = OLDCHARS.indexOf(text.charAt(i))) > -1 ) {
+						text.setCharAt(i, NEWCHARS.charAt(n));
+					}
 				}
 			}
+			tf.setCodedText(text.toString());
 		}
-		tf.setCodedText(text.toString());
 		
 		return event;
 	}

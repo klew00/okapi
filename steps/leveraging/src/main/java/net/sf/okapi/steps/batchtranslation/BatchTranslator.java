@@ -256,59 +256,87 @@ public class BatchTranslator {
 					
 					// Write out to source input
 					boolean atLeastOne = false;
-					if ( tc.isSegmented() ) {
-						List<Segment> segments = tc.getSegments();
-						for ( Segment seg : segments ) {
-							// If needed, check if the entry is in the existing TM
-							if ( currentTm != null ) {
-								if ( currentTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
-									// If we have a hit, no need to query the MT
-									docInternalMatches++;
-									continue;
-								}
-							}
-							if ( existingTm != null ) {
-								if ( existingTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
-									// If we have a hit, no need to query the MT
-									docExternalMatches++;
-									continue;
-								}
-							}
-							// Store
-							store.write(seg.text);
-							htmlWriter.writeStartElement("p");
-							htmlWriter.writeAttributeString("id", String.format("%d:%s:%s", currentSubDocId, tu.getId(), seg.id));
-							htmlWriter.writeRawXML(qutil.toCodedHTML(seg.text));
-							htmlWriter.writeEndElementLineBreak(); // p
-							atLeastOne = true;
-							docEntries++;
-						}
-					}
-					else { // Not segmented
+					
+					for ( Segment seg : tc ) {
 						// If needed, check if the entry is in the existing TM
 						if ( currentTm != null ) {
-							if ( currentTm.searchFuzzy(tc.getContent(), 95, 1, null).size() > 0 ) {
+							if ( currentTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
 								// If we have a hit, no need to query the MT
 								docInternalMatches++;
 								continue;
 							}
 						}
 						if ( existingTm != null ) {
-							if ( existingTm.searchFuzzy(tc.getContent(), 95, 1, null).size() > 0 ) {
+							if ( existingTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
 								// If we have a hit, no need to query the MT
 								docExternalMatches++;
 								continue;
 							}
 						}
 						// Store
-						store.write(tc.getContent());
+						store.write(seg.text);
 						htmlWriter.writeStartElement("p");
-						htmlWriter.writeAttributeString("id", String.format("%d:%s:", currentSubDocId, tu.getId()));
-						htmlWriter.writeRawXML(qutil.toCodedHTML(tc.getContent()));
+						htmlWriter.writeAttributeString("id", String.format("%d:%s:%s", currentSubDocId, tu.getId(), seg.id));
+						htmlWriter.writeRawXML(qutil.toCodedHTML(seg.text));
 						htmlWriter.writeEndElementLineBreak(); // p
 						atLeastOne = true;
 						docEntries++;
 					}
+					
+//					if ( tc.isSegmented() ) {
+//						List<Segment> segments = tc.getSegments();
+//						for ( Segment seg : segments ) {
+//							// If needed, check if the entry is in the existing TM
+//							if ( currentTm != null ) {
+//								if ( currentTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
+//									// If we have a hit, no need to query the MT
+//									docInternalMatches++;
+//									continue;
+//								}
+//							}
+//							if ( existingTm != null ) {
+//								if ( existingTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
+//									// If we have a hit, no need to query the MT
+//									docExternalMatches++;
+//									continue;
+//								}
+//							}
+//							// Store
+//							store.write(seg.text);
+//							htmlWriter.writeStartElement("p");
+//							htmlWriter.writeAttributeString("id", String.format("%d:%s:%s", currentSubDocId, tu.getId(), seg.id));
+//							htmlWriter.writeRawXML(qutil.toCodedHTML(seg.text));
+//							htmlWriter.writeEndElementLineBreak(); // p
+//							atLeastOne = true;
+//							docEntries++;
+//						}
+//					}
+//					else { // Not segmented
+//						// If needed, check if the entry is in the existing TM
+//						if ( currentTm != null ) {
+//							if ( currentTm.searchFuzzy(tc.getContent(), 95, 1, null).size() > 0 ) {
+//								// If we have a hit, no need to query the MT
+//								docInternalMatches++;
+//								continue;
+//							}
+//						}
+//						if ( existingTm != null ) {
+//							if ( existingTm.searchFuzzy(tc.getContent(), 95, 1, null).size() > 0 ) {
+//								// If we have a hit, no need to query the MT
+//								docExternalMatches++;
+//								continue;
+//							}
+//						}
+//						// Store
+//						store.write(tc.getContent());
+//						htmlWriter.writeStartElement("p");
+//						htmlWriter.writeAttributeString("id", String.format("%d:%s:", currentSubDocId, tu.getId()));
+//						htmlWriter.writeRawXML(qutil.toCodedHTML(tc.getContent()));
+//						htmlWriter.writeEndElementLineBreak(); // p
+//						atLeastOne = true;
+//						docEntries++;
+//					}
+
 					if ( atLeastOne ) count++;
 				}
 				
