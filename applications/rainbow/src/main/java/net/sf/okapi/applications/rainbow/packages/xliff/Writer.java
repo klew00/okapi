@@ -332,7 +332,7 @@ public class Writer extends BaseWriter {
 			options.gMode));
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
-		if ( tc.isSegmented() ) {
+		if ( tc.hasBeenSegmented() ) {
 			writer.writeStartElement("seg-source");
 			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true,
 				options.gMode));
@@ -356,7 +356,7 @@ public class Writer extends BaseWriter {
 		super.writeTMXEntries(tu);
 		
 		// Now tc hold the content to write. Write it with or without marks
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.isSegmented(),
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.hasBeenSegmented(),
 			options.gMode));
 		writer.writeEndElementLineBreak(); // target
 		

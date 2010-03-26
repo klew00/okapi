@@ -125,16 +125,17 @@ public class TagPeekTranslator extends AbstractTranslator {
 									ss += sss;
 							}
 							break;
-						case TextFragment.MARKER_SEGMENT:
-							sss = s.substring(i,i+2);
-							codenum = TextFragment.toIndex(s.charAt(++i));
-							code = codes.get(codenum);
-							if (code.getTagType()==TextFragment.TagType.OPENING)
-								nSurroundingCodes++;
-							else if (code.getTagType()==TextFragment.TagType.CLOSING)
-								nSurroundingCodes--;
-							ss += sss /* + lbrac + "y" + codenum + rbrac */;
-							break;
+//TODO: Does it need to be implemented with new TextContainer?
+//						case TextFragment.MARKER_SEGMENT:
+//							sss = s.substring(i,i+2);
+//							codenum = TextFragment.toIndex(s.charAt(++i));
+//							code = codes.get(codenum);
+//							if (code.getTagType()==TextFragment.TagType.OPENING)
+//								nSurroundingCodes++;
+//							else if (code.getTagType()==TextFragment.TagType.CLOSING)
+//								nSurroundingCodes--;
+//							ss += sss /* + lbrac + "y" + codenum + rbrac */;
+//							break;
 					}
 					if (code!=null)
 						continue;

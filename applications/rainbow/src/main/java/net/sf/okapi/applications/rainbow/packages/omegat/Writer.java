@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,14 +21,12 @@
 package net.sf.okapi.applications.rainbow.packages.omegat;
 
 import java.io.File;
-import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Writer {
@@ -97,38 +95,24 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		TextContainer srcTC = item.getSource();
 		TextContainer trgTC = item.getTarget(trgLoc);
 
-		if ( !srcTC.isSegmented() ) { // Source is not segmented
-			if ( scores.getScore(0) == 100 ) {
-				tmxWriterApproved.writeTU(srcTC, trgTC, tuid, null);
-			}
-			else if ( scores.getScore(0) > 0 ) {
-				tmxWriterLeverage.writeTU(srcTC, trgTC, tuid, null);
-			}
-			// Else: skip score of 0
-		}
-		else if ( trgTC.isSegmented() ) { // Source AND target are segmented
-			// Write the segments
-			List<Segment> srcList = srcTC.getSegments();
-			List<Segment> trgList = trgTC.getSegments();
-			for ( int i=0; i<srcList.size(); i++ ) {
-				if ( scores.getScore(i) >= 100 ) {
-					tmxWriterApproved.writeTU(srcList.get(i).text,
-						(i>trgList.size()-1) ? null : trgList.get(i).text,
-						((tuid==null) ? null : String.format("%s_s%02d", tuid, i+1)),
-						null);
+		int i = 0;
+		for ( Segment srcSeg : srcTC ) {
+			Segment trgSeg = trgTC.getSegment(srcSeg.id);
+			if ( trgSeg != null ) {
+				if ( scores.getScore(0) == 100 ) {
+					tmxWriterApproved.writeTU(srcSeg.getContent(),
+						trgSeg.getContent(),
+						((tuid==null) ? null : String.format("%s_s%02d", tuid, i+1)), null);
 				}
-				else if ( scores.getScore(i) > 0 ) {
-					TextFragment tf = srcList.get(i).text.clone();
-					tf.setCodedText(Util.ORIGIN_MT+" "+tf.getCodedText());
-					tmxWriterLeverage.writeTU(tf,
-						(i>trgList.size()-1) ? null : trgList.get(i).text,
-						((tuid==null) ? null : String.format("%s_s%02d", tuid, i+1)),
-						null);
+				else if ( scores.getScore(0) > 0 ) {
+					tmxWriterLeverage.writeTU(srcSeg.getContent(),
+						trgSeg.getContent(),
+						((tuid==null) ? null : String.format("%s_s%02d", tuid, i+1)), null);
 				}
+				// Else: skip score of 0
 			}
-			// Else: skip score of 0
+			// Else: skip source without target
 		}
-		// Else no TMX output needed for source segmented but not target
 	}
 	
 	private void createOmegaTProject () {

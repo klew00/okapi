@@ -66,9 +66,13 @@ public class TMXFilterWriterTest {
 		String result = rewrite(getEvents("##seg##", locEN, locFR), locFR);
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<tmx version=\"1.4\"><header creationtool=\"unknown\" creationtoolversion=\"unknown\" segtype=\"paragraph\" o-tmf=\"unknown\" adminlang=\"en\" srclang=\"en\" datatype=\"text\"></header><body>"
-			+ "<tu tuid=\"autoID1\">"
-			+ "<tuv xml:lang=\"en\"><seg>First segment for SRC. Second segment for SRC</seg></tuv>"
-			+ "<tuv xml:lang=\"fr\"><seg>First segment for TRG. Second segment for TRG</seg></tuv>"
+			+ "<tu tuid=\"autoID1_0\">"
+			+ "<tuv xml:lang=\"en\"><seg>First segment for SRC.</seg></tuv>"
+			+ "<tuv xml:lang=\"fr\"><seg>First segment for TRG.</seg></tuv>"
+			+ "</tu>"
+			+ "<tu tuid=\"autoID1_1\">"
+			+ "<tuv xml:lang=\"en\"><seg>Second segment for SRC</seg></tuv>"
+			+ "<tuv xml:lang=\"fr\"><seg>Second segment for TRG</seg></tuv>"
 			+ "</tu>"
 			+ "</body>"
 			+ "</tmx>";

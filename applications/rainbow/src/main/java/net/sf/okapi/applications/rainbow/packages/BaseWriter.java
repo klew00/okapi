@@ -284,8 +284,8 @@ public abstract class BaseWriter implements IWriter {
 		// Write the items in the TM if needed
 		TextContainer tc = tu.getTarget(trgLoc);
 		if (( tc != null ) && ( !tc.isEmpty() )) {
-			if ( tu.getSourceContent().isEmpty() ||
-				( tu.getSourceContent().hasText(false) && !tc.hasText(false) )) {
+			if ( tu.getSource().isEmpty() ||
+				( tu.getSource().hasText(false) && !tc.hasText(false) )) {
 				return; // Target has code and/or spaces only
 			}
 			boolean done = false;

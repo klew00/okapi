@@ -24,6 +24,7 @@ import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.ConfigurationString;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
@@ -31,7 +32,6 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.tm.simpletm.Database;
 
@@ -275,7 +275,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( params.segment ) {
 			srcSeg.computeSegments(tu.getSource());
 			tu.getSource().createSegments(srcSeg.getRanges());
-			if ( !tu.getSource().isSegmented() ) {
+			if ( !tu.getSource().hasBeenSegmented() ) {
 				if ( !tu.getSource().hasText(false) ) {
 					noText++;
 					return;
@@ -288,8 +288,8 @@ public class Utility extends BaseFilterDrivenUtility {
 			// Check alignment and fix it if needed
 			tu.setTarget(trgLang, trgTC);
 			// If source has no segment, merge all the one of the target ("#" -> "Num." case)
-			if ( !tu.getSource().isSegmented() && ( trgTC.getSegmentCount() > 0 )) {
-				trgTC.mergeAllSegments();
+			if ( !tu.getSource().hasBeenSegmented() && ( trgTC.getPartCount() > 0 )) {
+				trgTC.joinAllSegments();
 			}
 			
 			switch ( aligner.align(tu, count, targetCount) ) {

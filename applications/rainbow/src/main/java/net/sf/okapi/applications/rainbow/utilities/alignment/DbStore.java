@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -216,14 +216,14 @@ public class DbStore {
 			pstm.setString(5, tuName);
 			pstm.setString(6, tuType);
 			pstm.setString(7, tc.getCodedText());
-			pstm.setString(8, Code.codesToString(tc.getCodes()));
+			pstm.setString(8, Code.codesToString(tc.getUnSegmentedContentCopy().getCodes()));
 			pstm.execute();
 			count++;
 			
 			// Store the segments if needed
-			if ( tc.isSegmented() ) {
+			if ( tc.hasBeenSegmented() ) {
 				int i = 1;
-				for ( Segment seg : tc.getSegments() ) {
+				for ( Segment seg : tc ) {
 					pstm.setInt(1, 0);
 					pstm.setInt(2, gKey);
 					pstm.setString(3, tuId);

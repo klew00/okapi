@@ -26,6 +26,7 @@ import net.sf.okapi.applications.rainbow.packages.IWriter;
 import net.sf.okapi.applications.rainbow.utilities.BaseFilterDrivenUtility;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoreInfo;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
@@ -35,7 +36,6 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.segmentation.ISegmenter;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryManager;
 
@@ -95,8 +95,6 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 		else if ( params.pkgType.equals("omegat") )
 			writer = new net.sf.okapi.applications.rainbow.packages.omegat.Writer();
-		else if ( params.pkgType.equals("ttx") )
-			writer = new net.sf.okapi.applications.rainbow.packages.ttx.Writer();
 		else if ( params.pkgType.equals("rtf") )
 			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer();
 		else
@@ -224,13 +222,13 @@ public class Utility extends BaseFilterDrivenUtility {
 		if ( params.preSegment && !approved ) {
 			try {
 				cont = tu.getSource();
-				if ( !cont.isSegmented() ) {
+				if ( !cont.hasBeenSegmented() ) {
 					sourceSeg.computeSegments(cont);
 					cont.createSegments(sourceSeg.getRanges());
 				}
 				if ( tu.hasTarget(trgLang) ) {
 					cont = tu.getTarget(trgLang);
-					if ( !cont.isSegmented() ) {
+					if ( !cont.hasBeenSegmented() ) {
 						targetSeg.computeSegments(cont);
 						cont.createSegments(targetSeg.getRanges());
 					}

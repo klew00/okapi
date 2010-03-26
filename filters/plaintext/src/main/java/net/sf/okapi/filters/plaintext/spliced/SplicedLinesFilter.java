@@ -104,7 +104,8 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 		if (splicedLines == null) return super.component_exec(lineContainer);
 		
 		//if (TextUnitUtil.getLastChar(lineContainer) == params.splicer) {
-		if (TextUnitUtil.endsWith(lineContainer, params.splicer)) {
+		// We can use getFirstPartContent() because nothing is segmented
+		if (TextUnitUtil.endsWith(lineContainer.getFirstPartContent(), params.splicer)) {
 			
 			merging = true;
 			splicedLines.add(lineContainer);
@@ -160,7 +161,8 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 //			String s = "";
 						
 //			int pos = TextUnitUtil.lastIndexOf(curLine, s+= params.splicer);
-			int pos = TextUnitUtil.lastIndexOf(curLine, params.splicer);
+			// We can use getFirstPartContent() because it is not segmented
+			int pos = TextUnitUtil.lastIndexOf(curLine.getFirstPartContent(), params.splicer);
 			if (pos > -1)
 				if (params.createPlaceholders) 
 					curLine.changeToCode(pos, pos + len, TagType.PLACEHOLDER, "line splicer");

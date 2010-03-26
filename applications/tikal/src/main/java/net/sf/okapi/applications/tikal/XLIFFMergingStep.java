@@ -192,7 +192,7 @@ public class XLIFFMergingStep {
 		// Get the translated target
 		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
 		if ( fromTrans == null ) {
-			if ( tuFromTrans.getSourceContent().isEmpty() ) return;
+			if ( tuFromTrans.getSource().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
 			logger.log(Level.WARNING,
 				String.format("Item id='%s': No target in XLIFF; using source instead.", tu.getId()));
@@ -207,15 +207,15 @@ public class XLIFFMergingStep {
 		// Merging the segments allow to check/transfer the codes at the text unit level
 		ArrayList<Range> ranges = null;
 		if ( mergeAsSegments ) ranges = new ArrayList<Range>();
-		if ( fromTrans.isSegmented() ) {
-			fromTrans.mergeAllSegments(ranges);
+		if ( !fromTrans.contentIsOneSegment() ) {
+			fromTrans.joinAllSegments(ranges);
 		}
 		
 		// Get the source (as a clone if we need to change the segments)
 		TextContainer srcCont;
-		if ( tu.getSource().isSegmented() ) {
+		if ( !tu.getSource().contentIsOneSegment() ) {
 			srcCont  = tu.getSource().clone();
-			srcCont.mergeAllSegments();
+			srcCont.joinAllSegments();
 		}
 		else {
 			srcCont = tu.getSource();
@@ -229,7 +229,8 @@ public class XLIFFMergingStep {
 		
 		// Now set the target coded text and the target codes
 		try {
-			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
+			// Use first part because it not segmented here
+			trgCont.getFirstPartContent().setCodedText(fromTrans.getCodedText(), transCodes, false);
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
 				trgCont.createSegments(ranges);
@@ -247,14 +248,15 @@ public class XLIFFMergingStep {
 	/*
 	 * Checks the codes in the translated entry, uses the original data if there is
 	 * none in the code coming from XLIFF, and generates a non-stopping error if
-	 * a non-deletable code is missing.
+	 * a non-deletable code is missing. Assumes the containers are NOT segmented.
 	 */
 	private List<Code> transferCodes (TextContainer fromTrans,
 		TextContainer srcCont, // Can be a clone of the original content
 		TextUnit tu)
 	{
-		List<Code> transCodes = fromTrans.getCodes();
-		List<Code> oriCodes = srcCont.getCodes();
+		// We assume the container are NOT segmented
+		List<Code> transCodes = fromTrans.getFirstPartContent().getCodes();
+		List<Code> oriCodes = srcCont.getFirstPartContent().getCodes();
 		
 		// Check if we have at least one code
 		if ( transCodes.size() == 0 ) {
