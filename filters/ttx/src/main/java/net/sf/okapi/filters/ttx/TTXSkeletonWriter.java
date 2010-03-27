@@ -101,7 +101,12 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 				if ( scores != null ) {
 					si = scores.get(i);
 				}
-				tmp.append(processSegment(srcSeg.text, trgSeg.text, si)); 
+				if ( trgCont.hasBeenSegmented() ) {
+					tmp.append(processSegment(srcSeg.text, trgSeg.text, si));
+				}
+				else {
+					tmp.append(processFragment(part.getContent()));
+				}
 			}
 			else {
 				tmp.append(processFragment(part.getContent()));

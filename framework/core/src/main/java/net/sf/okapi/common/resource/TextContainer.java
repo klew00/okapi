@@ -224,17 +224,18 @@ public class TextContainer implements Iterable<Segment> {
 	}
 	
 	/**
-	 * Indicates if a segmentation has been applied to this container, or if it contains
-	 * more than one part.
+	 * Indicates if a segmentation has been applied to this container. Note that it does not
+	 * mean there is more than one segment or one part. Use {@link #contentIsOneSegment()} to
+	 * check if the container counts only one segment (whether is is the result of a segmentation
+	 * or simply the default single segment).
 	 * <p>This method return true if any method that may cause the content to be segmented
 	 * has been called, and no operation has resulted in un-segmenting the content since that call,
 	 * or if the content has more than one part.
-	 * @return true if a segmentation has been applied to this container, or if it contains
-	 * more than one part.
+	 * @return true if a segmentation has been applied to this container.
 	 * @see #setHasBeenSegmented(boolean)
 	 */
 	public boolean hasBeenSegmented () {
-		return ( segApplied || ( parts.size() > 1 ));
+		return segApplied;
 	}
 	
 	/**
@@ -329,6 +330,8 @@ public class TextContainer implements Iterable<Segment> {
 	 * If there the last part (segment or non-segment) is empty,
 	 * the TextFragment is appended to that part. Otherwise the
 	 * TextFragment is appended to the content as a new non-segment part.
+	 * <p>Important: If the container is empty, the appended part becomes
+	 * a segment, as the container has always at least one segment.
 	 * @param fragment the text fragment to append.
 	 */
 	public void appendPart (TextFragment fragment) {
@@ -734,6 +737,7 @@ public class TextContainer implements Iterable<Segment> {
 		for ( TextPart part : parts ) {
 			newCont.parts.add(part.clone());
 		}
+		newCont.segApplied = segApplied; 
 		// Clone the properties
 		if ( cloneProperties && ( properties != null )) {
 			newCont.properties = new Hashtable<String, Property>();

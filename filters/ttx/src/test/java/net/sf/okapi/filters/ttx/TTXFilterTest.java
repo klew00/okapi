@@ -280,6 +280,7 @@ public class TTXFilterTest {
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
 		assertEquals("paragraph <1/><2>text<3/></2>", fmt.printSegmentedContent(cont, false));
+		assertEquals("[paragraph <1/><2>text<3/></2>]", fmt.printSegmentedContent(cont, true));
 	}
 	
 	@Test
@@ -344,16 +345,16 @@ public class TTXFilterTest {
 	@Test
 	public void testWithMixedSegmentation () {
 		String snippet = STARTFILENOLB
-			+ "<Tu Matchpercent=\"50\"><Tuv Lang=\"EN-US\">text</Tuv></Tu>"
+			+ "<Tu MatchPercent=\"50\"><Tuv Lang=\"EN-US\">text</Tuv></Tu>"
 			+ " more text"
 			+ "</Raw></Body></TRADOStag>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals("0 more text", cont.toString());
+		assertEquals("[text] more text", fmt.printSegmentedContent(cont, true));
 		cont = tu.getTarget(locESEM);
 		assertNotNull(cont);
-		assertEquals("0 more text", cont.toString());
+		assertEquals("[text] more text", fmt.printSegmentedContent(cont, true));
 	}
 
 	@Test
@@ -594,12 +595,12 @@ public class TTXFilterTest {
 		assertEquals(2, cont.getSegmentCount());
 		assertEquals("text1 en", cont.getSegment(0).text.toString());
 		assertEquals("text2 en", cont.getSegment(1).text.toString());
-		assertEquals("0  1", cont.toString());
+		assertEquals("[text1 en]  [text2 en]", fmt.printSegmentedContent(cont, true));
 		cont = tu.getTarget(locESEM);
 		assertEquals(2, cont.getSegmentCount());
 		assertEquals("text1 es", cont.getSegment(0).text.toString());
 		assertEquals("text2 es", cont.getSegment(1).text.toString());
-		assertEquals("0  1", cont.toString());
+		assertEquals("[text1 es]  [text2 es]", fmt.printSegmentedContent(cont, true));
 
 		tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 2);
 		assertNull(tu);

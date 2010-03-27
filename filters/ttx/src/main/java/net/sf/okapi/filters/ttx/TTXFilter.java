@@ -52,6 +52,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -411,10 +412,11 @@ public class TTXFilter implements IFilter {
 			boolean inTarget = false;
 			tu = new TextUnit(null); // No id yet
 			TextContainer srcCont = tu.getSource();
-			TextContainer trgCont = new TextContainer();
+			ArrayList<TextFragment> trgFragments = new ArrayList<TextFragment>();
 			TextFragment srcSegFrag = null;
 			TextFragment trgSegFrag = null;
-			TextFragment current = new TextFragment();
+			TextFragment inter = new TextFragment();
+			TextFragment current = inter;
 			boolean returnValueAfterTextUnitDone = true;
 			ScoresAnnotation scores = null;
 
@@ -422,6 +424,7 @@ public class TTXFilter implements IFilter {
 			String name;
 			boolean moveToNext = false;
 			int dfCount = 0;
+			boolean changeFirst = false;
 			boolean done = false;
 			boolean inTU = false;
 			
@@ -449,16 +452,16 @@ public class TTXFilter implements IFilter {
 						}
 					}
 					else if ( name.equals("Tu") ) { // New segment
-						// End non-segment part (on both source and target)
-						if ( !current.isEmpty() ) {
-							srcCont.appendPart(current);
-							trgCont.appendPart(current);
-						}
 						// Start new segment
 						inTU = true;
 						inTarget = false;
 						srcSegFrag = new TextFragment();
 						trgSegFrag = null;
+						if ( !inter.isEmpty() ) {
+							changeFirst = srcCont.isEmpty();
+							srcCont.appendPart(inter);
+							inter = null;
+						}
 						current = srcSegFrag;
 						// Get Tu info
 						tmp = reader.getAttributeValue(null, MATCHPERCENT);
@@ -466,7 +469,6 @@ public class TTXFilter implements IFilter {
 						if (( tmp != null ) || ( origin != null )) {
 							if ( scores == null ) {
 								scores = new ScoresAnnotation();
-								trgCont.setAnnotation(scores);
 							}
 							int value = 0;
 							if ( tmp != null ) {
@@ -491,9 +493,6 @@ public class TTXFilter implements IFilter {
 							inTarget = !inTarget;
 						}
 						if ( inTarget ) {
-							// Save current to source
-							srcCont.appendPart(current);
-							trgCont.appendPart(current);
 							// Get start on target
 							trgSegFrag = new TextFragment();
 							current = trgSegFrag;
@@ -547,11 +546,26 @@ public class TTXFilter implements IFilter {
 					if ( done || name.equals("Tu") ) {
 						if ( srcSegFrag != null ) { // Add the segment if we have one
 							srcCont.appendSegment(srcSegFrag);
-							trgCont.appendSegment(trgSegFrag==null ? new TextFragment() : trgSegFrag);
+							// Change first part to non-segment if needed
+							if ( changeFirst ) {
+								srcCont.changePart(0);
+								changeFirst = false;
+							}
+							// If the target is not there, we copy the source instead
+							// TTX should not have source-only TU
+							trgFragments.add((trgSegFrag==null) ? srcSegFrag.clone() : trgSegFrag);
 							srcSegFrag = null;
 							trgSegFrag = null;
-							current = new TextFragment(); // Start storing inter-segment part
+							inter = new TextFragment();
+							current = inter; // Start storing inter-segment part
 							// A Tu stops the current segment, but not the text unit
+						}
+						else if (( inter != null ) && !inter.isEmpty() ) { // If no source segment: only content
+							srcCont.appendPart(current);
+							srcSegFrag = null;
+							trgSegFrag = null;
+							inter = new TextFragment();
+							current = inter; // Start storing inter-segment part
 						}
 						inTU = false;
 						continue; // Stop here
@@ -560,6 +574,11 @@ public class TTXFilter implements IFilter {
 				}
 			}
 
+			// Check if we had only non-segmented text
+			if (( inter != null) && !inter.isEmpty() ) {
+				srcCont.appendPart(inter);
+			}
+			
 			// Check if this it is worth sending as text unit
 			if ( !hasText(srcCont) ) { // Use special hasText()
 				// No text-type characters
@@ -581,6 +600,20 @@ public class TTXFilter implements IFilter {
 			}
 			
 			// Else genuine text unit, finalize and send
+			
+			if ( srcCont.hasBeenSegmented() ) {
+				TextContainer cont = srcCont.clone();
+				int i = 0;
+				for ( Segment seg : cont ) {
+					seg.text = trgFragments.get(i);
+					i++;
+				}
+				tu.setTarget(trgLoc, cont);
+				if ( scores != null ) {
+					cont.setAnnotation(scores);
+				}
+			}
+			
 			tu.setId(String.valueOf(++tuId));
 			skel.addContentPlaceholder(tu); // Used by the TTXFilterWriter
 			tu.setSkeleton(skel);
