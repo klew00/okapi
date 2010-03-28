@@ -157,6 +157,12 @@ public class XMLFilter implements IFilter {
 			"DITA (without namespace)",
 			"Configuration for DITA documents.",
 			"DITAwithoutNS.fprm"));
+		list.add(new FilterConfiguration(getName()+"-WixLocalization",
+			MimeTypeMapper.XML_MIME_TYPE,
+			getClass().getName(),
+			"WiX Localization",
+			"Configuration for WiX (Windows Installer XML) Localization files.",
+			"WixLocalization.fprm"));
 		return list;
 	}
 	

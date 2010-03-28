@@ -61,9 +61,12 @@ abstract public class BaseCounter {
 		else if (text instanceof TextContainer) {
 			
 			TextContainer tc = (TextContainer) text;
-			
-			return getCount(classRef, tc.getContent(), language);
-			
+			if ( tc.contentIsOneSegment() ) {
+				return getCount(classRef, tc.getFirstPartContent(), language);
+			}
+			else {
+				return getCount(classRef, tc.getUnSegmentedContentCopy(), language);
+			}
 		}
 		else if (text instanceof TextFragment) {
 			

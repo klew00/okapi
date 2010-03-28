@@ -370,7 +370,7 @@ public class TikalTest {
     	// test local TM
     	assertEquals(0, runTikal("-q \"Close the <b>application</b>.\" -sl EN-US -tl FR-FR -pen pensieveTM"));
     	// Query several services
-    	int res = runTikal("-q \"Close the <b>application</b>.\" -sl EN-US -tl FR-FR -pen pensieveTM -mm mmDemo123 -opentran");
+    	int res = runTikal("-q \"Close the <b>application</b>.\" -sl EN-US -tl FR-FR -pen pensieveTM -mm mmDemo123");
     	if ( res != 0 ) {
     		System.err.println("\n=============== WARNING ===============");
     		System.err.println("The test of querying several translation resources failed.");

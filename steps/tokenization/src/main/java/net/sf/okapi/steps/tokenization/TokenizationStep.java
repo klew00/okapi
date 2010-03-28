@@ -324,7 +324,13 @@ public class TokenizationStep extends AbstractPipelineStep {
 		rawtextLexems.clear();
 		
 		// Remove codes, store to positions
-		String text = TextUnitUtil.getText(tc.getContent(), positions);
+		String text;
+		if ( tc.contentIsOneSegment() ) {
+			text = TextUnitUtil.getText(tc.getFirstPartContent(), positions);
+		}
+		else {
+			text = TextUnitUtil.getText(tc.getUnSegmentedContentCopy(), positions);
+		}
 		
 		allowNewRawText = true;
 		runLexers(lexers, text, language, tokens, textShift);

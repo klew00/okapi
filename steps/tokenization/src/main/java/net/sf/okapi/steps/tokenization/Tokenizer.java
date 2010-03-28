@@ -101,7 +101,12 @@ public class Tokenizer {
 		}
 		else if (text instanceof TextContainer) {
 			TextContainer tc = (TextContainer) text;
-			return doTokenize(tc.getContent(), language, tokenNames);
+			if ( tc.contentIsOneSegment() ) {
+				return doTokenize(tc.getFirstPartContent(), language, tokenNames);
+			}
+			else {
+				return doTokenize(tc.getUnSegmentedContentCopy(), language, tokenNames);
+			}
 		}
 		else if (text instanceof TextFragment) {
 			TextFragment tf = (TextFragment) text;
