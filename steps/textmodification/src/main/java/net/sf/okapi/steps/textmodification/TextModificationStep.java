@@ -20,8 +20,7 @@
 
 package net.sf.okapi.steps.textmodification;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Iterator;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -31,17 +30,14 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 
 @UsingParameters(Parameters.class)
 public class TextModificationStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
-
-	private static final char TMPSTARTSEG = '\u0002';
-	private static final char TMPENDSEG = '\u0003';
 	private static final char STARTSEG = '[';
 	private static final char ENDSEG = ']';
 	private static final String OLDCHARS = "AaEeIiOoUuYyCcDdNn";
@@ -89,21 +85,14 @@ public class TextModificationStep extends BasePipelineStep {
 		// Skip if already translate (only if required)
 		if ( !params.applyToExistingTarget && tu.hasTarget(targetLocale) ) return event;
 		
-		// Else: do the requested modifications
+		// Create the target if needed
 		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 		// If the target is empty we use the source
 		if ( tu.getTarget(targetLocale).isEmpty() ) {
 			tu.createTarget(targetLocale, true, IResource.COPY_ALL);
 		}
 
-		// Merge all segments if needed
-		if ( params.markSegments ) {
-			mergeSegments(tu.getTarget(targetLocale));
-			// Merge also the source to be in synch.
-			tu.getSource().mergeAllSegments();
-		}
-
-		// Other text modification are done after merging all segments
+		// Perform the main modification
 		switch ( params.type ) {
 		case Parameters.TYPE_XNREPLACE:
 			replaceWithXN(tu);
@@ -115,7 +104,13 @@ public class TextModificationStep extends BasePipelineStep {
 			removeText(tu);
 			break;
 		}
-	
+		
+		// Add segment marks if needed
+		if ( params.markSegments ) {
+			addSegmentMarks(tu);
+		}
+
+		// Add prefixes and suffixes to the paragraph if needed
 		if ( params.addPrefix || params.addSuffix || params.addName || params.addID ) {
 			addText(tu);
 		}
@@ -128,126 +123,63 @@ public class TextModificationStep extends BasePipelineStep {
 	 * @param tu the text unit to process.
 	 */
 	private void removeText (TextUnit tu) {
-		String result = tu.getTarget(targetLocale).getCodedText();
-		StringBuilder sb = new StringBuilder();
-		
-		for ( int i=0; i<result.length(); i++ ) {
-			switch ( result.charAt(i) ) {
-			    case TextFragment.MARKER_OPENING:
-				case TextFragment.MARKER_CLOSING:
-				case TextFragment.MARKER_ISOLATED:
-					sb.append(result.charAt(i));
-					sb.append(result.charAt(++i));
-					break;
-				case TMPSTARTSEG: // Keep segment marks if needed
-					if ( params.markSegments ) sb.append(STARTSEG);
-					break;
-				case TMPENDSEG: // Keep segment marks if needed
-					if ( params.markSegments ) sb.append(ENDSEG);
-					break;					
-				default: // Do not keep other characters
-					break;
+		Iterator<TextPart> iter = tu.getTarget(targetLocale).partIterator();
+		while ( iter.hasNext() ) {
+			TextPart part = iter.next();
+			StringBuilder sb = new StringBuilder();
+			// Remove the text inside the part
+			String text = part.text.getCodedText();
+			for ( int i=0; i<text.length(); i++ ) {
+				if ( TextFragment.isMarker(text.charAt(i)) ) {
+					// Add the code markers
+					sb.append(text.charAt(i));
+					sb.append(text.charAt(++i));
+				}
+				// Else: text, so do nothing
 			}
+			part.text.setCodedText(sb.toString());
 		}
-		TextContainer cnt = tu.getTarget(targetLocale);
-		cnt.setCodedText(sb.toString());
 	}	
 	
-	/**
-	 * Merges back segments into a single content, while optionally adding
-	 * brackets to denote the segments. If the unit is not segmented, brackets
-	 * are added if required. 
-	 * @param container The TextContainer object to un-segment.
-	 */
-	private void mergeSegments (TextContainer container) {
-		// Set variables
-		StringBuilder text = new StringBuilder(container.getCodedText());
-		char start = STARTSEG;
-		char end = ENDSEG;
-		if ( params.type == Parameters.TYPE_KEEPINLINE ) {
-			// Use temporary marks if we need to remove the text after
-			// This way '[' and ']' is real text get removed too
-			start = TMPSTARTSEG;
-			end = TMPENDSEG;
-		}
-		
-		if ( !container.isSegmented() ) {
-			if ( params.markSegments ) {
-				container.setCodedText(start+text.toString()+end);
-			}
-			return;
-		}
-		
-		// Add the markers if needed
-		if ( params.markSegments ) {
-			// Insert the segment marks if requested
-			for ( int i=0; i<text.length(); i++ ) {
-				switch ( text.charAt(i) ) {
-				case TextContainer.MARKER_OPENING:
-				case TextContainer.MARKER_CLOSING:
-				case TextContainer.MARKER_ISOLATED:
-					i++; // Normal skip
-					break;
-				case TextContainer.MARKER_SEGMENT:
-					text.insert(i, start);
-					i += 3; // The bracket, the marker, the code index
-					text.insert(i, end);
-					// Next i increment will skip over the closing mark
-					break;
-				}
-			}
-			// Replace the original coded text by the one with markers
-			container.setCodedText(text.toString());
-		}
-		// Merge all segments
-		container.mergeAllSegments();
-	}
-
 	/**
 	 * Replaces letters with Xs and digits with Ns.
 	 * @param tu the text unit to process.
 	 */
 	private void replaceWithXN (TextUnit tu) {
 		String tmp = null;
-		try {
-			tmp = tu.getTarget(targetLocale).getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
+		Iterator<TextPart> iter = tu.getTarget(targetLocale).partIterator();
+		while ( iter.hasNext() ) {
+			TextPart part = iter.next();
+			tmp = part.text.getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
 			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
-			TextContainer cnt = tu.getTarget(targetLocale); 
-			cnt.setCodedText(tmp, tu.getTargetContent(targetLocale).getCodes(), false);
-		}
-		catch ( Throwable e ) {
-			logger.log(Level.WARNING,
-				String.format("Error when updating content: '%s'", tmp.toString()), e);
+			part.text.setCodedText(tmp);
 		}
 	}
 	
 	private void replaceWithExtendedChars (TextUnit tu) {
-		StringBuilder tmp = new StringBuilder();
-		try {
-			tmp.append(tu.getTarget(targetLocale).getCodedText());
-			int n;
-			for ( int i=0; i<tmp.length(); i++ ) {
-				switch ( tmp.charAt(i) ) {
-				case TextContainer.MARKER_OPENING:
-				case TextContainer.MARKER_CLOSING:
-				case TextContainer.MARKER_ISOLATED:
-				case TextContainer.MARKER_SEGMENT:
-					i++; // Normal skip
-					break;
-				default:
-					if ( (n = OLDCHARS.indexOf(tmp.charAt(i))) > -1 ) {
-						tmp.setCharAt(i, NEWCHARS.charAt(n));
+		Iterator<TextPart> iter = tu.getTarget(targetLocale).partIterator();
+		int n;
+		while ( iter.hasNext() ) {
+			TextPart part = iter.next();
+			StringBuilder sb = new StringBuilder(part.text.getCodedText());
+			for ( int i=0; i<sb.length(); i++ ) {
+				if ( TextFragment.isMarker(sb.charAt(i)) ) {
+					i++; // Skip codes
+				}
+				else {
+					if ( (n = OLDCHARS.indexOf(sb.charAt(i))) > -1 ) {
+						sb.setCharAt(i, NEWCHARS.charAt(n));
 					}
-					break;
 				}
 			}
-			TextContainer cnt = tu.getTarget(targetLocale); 
-			cnt.setCodedText(tmp.toString(), tu.getTargetContent(targetLocale).getCodes(), false);
+			part.text.setCodedText(sb.toString());
 		}
-		catch ( Throwable e ) {
-			logger.log(Level.WARNING,
-				String.format("Error when updating content: '%s'", tmp.toString()), e);
+	}
+
+	private void addSegmentMarks (TextUnit tu) {
+		for ( Segment seg : tu.getTarget(targetLocale) ) {
+			seg.text.setCodedText(STARTSEG+seg.text.getCodedText()+ENDSEG);
 		}
 	}
 	
@@ -257,30 +189,25 @@ public class TextModificationStep extends BasePipelineStep {
 	 * @param tu The text unit to process.
 	 */
 	private void addText (TextUnit tu) {
-		String tmp = null;
-		try {
-			// Use the target as the text to change.
-			tmp = tu.getTarget(targetLocale).getCodedText();
-			if ( params.addPrefix ) {
-				tmp = params.prefix + tmp;
-			}
-			if ( params.addName ) {
-				String name = tu.getName();
-				if (( name != null ) && ( name.length() > 0 )) tmp += "_"+name;
-				else tmp += "_"+tu.getId();
-			}
-			if ( params.addID ) {
-				tmp += "_"+tu.getId();
-			}
-			if ( params.addSuffix ) {
-				tmp += params.suffix;
-			}
-			TextContainer cnt = tu.getTarget(targetLocale); 
-			cnt.setCodedText(tmp, tu.getTargetContent(targetLocale).getCodes(), false);
+		TextFragment firstFrag = tu.getTarget(targetLocale).getFirstPartContent();
+		TextFragment lastFrag = tu.getTarget(targetLocale).getLastPartContent();
+		if ( params.addPrefix ) {
+			firstFrag.setCodedText(params.prefix + firstFrag.getCodedText());
 		}
-		catch ( Throwable e ) {
-			logger.log(Level.WARNING,
-				String.format("Error when adding text to '%s'", tmp), e);
+		if ( params.addName ) {
+			String name = tu.getName();
+			if (( name != null ) && ( name.length() > 0 )) {
+				lastFrag.setCodedText(lastFrag.getCodedText() + "_"+name);
+			}
+			else {
+				lastFrag.setCodedText(lastFrag.getCodedText() + "_"+tu.getId());
+			}
+		}
+		if ( params.addID ) {
+			lastFrag.setCodedText(lastFrag.getCodedText() + "_"+tu.getId());
+		}
+		if ( params.addSuffix ) {
+			lastFrag.setCodedText(lastFrag.getCodedText() + params.suffix);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -52,7 +52,7 @@ public class TextModificationStepTest {
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(original, res.getTargetContent(locFR).toString());
+		assertEquals(original, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public class TextModificationStepTest {
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(original, res.getTargetContent(locFR).toString());
+		assertEquals(original, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class TextModificationStepTest {
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTargetContent(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class TextModificationStepTest {
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTargetContent(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class TextModificationStepTest {
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTargetContent(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class TextModificationStepTest {
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTargetContent(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -147,7 +147,7 @@ public class TextModificationStepTest {
 		TextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTargetContent(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 }
