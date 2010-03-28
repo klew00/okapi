@@ -34,6 +34,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
@@ -135,6 +136,12 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = tu.getTarget(trgLoc);
+		
+		// Un-segmented entry get their metadata
+		if ( srcCont.contentIsOneSegment() && trgCont.contentIsOneSegment() ) {
+			writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLoc, trgLoc, tu));
+			return;
+		}
 		
 		// Check if we have the same number of segments
 		if ( trgCont.getSegmentCount() != srcCont.getSegmentCount() ) {

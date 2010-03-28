@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -59,14 +60,13 @@ abstract public class BaseCounter {
 				return getCount(classRef, tu.getSource(), language);
 		} 
 		else if (text instanceof TextContainer) {
-			
-			TextContainer tc = (TextContainer) text;
-			if ( tc.contentIsOneSegment() ) {
-				return getCount(classRef, tc.getFirstPartContent(), language);
+			// This work on segments' content (vs. parts' content)
+			TextContainer tc = (TextContainer)text;
+			long res = 0;
+			for ( Segment seg : tc ) {
+				res += getCount(classRef, seg.getContent(), language);
 			}
-			else {
-				return getCount(classRef, tc.getUnSegmentedContentCopy(), language);
-			}
+			return res;
 		}
 		else if (text instanceof TextFragment) {
 			

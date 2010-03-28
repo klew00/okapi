@@ -44,7 +44,6 @@ public final class PensieveUtil {
     	LocaleId targetLoc,
     	TextUnit textUnit)
     {
-    	// TODO: Check they are both un-segmented
         TranslationUnitVariant source = new TranslationUnitVariant(sourceLoc, textUnit.getSource().getFirstPartContent());
         TextContainer tc = textUnit.getTarget(targetLoc); // Allow null target content
         TranslationUnitVariant target = new TranslationUnitVariant(targetLoc, (( tc==null ) ? null : tc.getFirstPartContent()));
