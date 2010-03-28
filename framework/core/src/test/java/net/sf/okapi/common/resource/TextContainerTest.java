@@ -1065,6 +1065,26 @@ public class TextContainerTest {
 		assertEquals(originalText, tc.toString());
 	}
 
+	@Test
+	public void testStorage_WithoutCodes () {
+		TextContainer tc1 = createMultiSegmentContent();
+		String data = TextContainer.contentToString(tc1);
+		TextContainer tc2 = TextContainer.stringToContent(data);
+		assertEquals("[text1] [text2]", fmt.printSegmentedContent(tc2, true));
+		assertTrue(tc2.hasBeenSegmented());
+		assertEquals("text1 text2", tc2.toString());
+	}
+	
+	@Test
+	public void testStorage_WithCodes () {
+		TextContainer tc1 = createMultiSegmentContentWithCodes();
+		String data = TextContainer.contentToString(tc1);
+		TextContainer tc2 = TextContainer.stringToContent(data);
+		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc2, true));
+		assertTrue(tc2.hasBeenSegmented());
+		assertEquals("text1<br/> text2<br/>", tc2.toString());
+	}
+	
 	private TextContainer createMultiSegmentContent () {
 		TextFragment tf = new TextFragment("text1");
 		TextContainer tc = new TextContainer(tf);

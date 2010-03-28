@@ -41,11 +41,65 @@ import net.sf.okapi.common.annotation.IAnnotation;
  */
 public class TextContainer implements Iterable<Segment> {
 
+	private static final String PARTSEP1 = "\u0091";
+	private static final String PARTSEP2 = "\u0092";
+	private static final char PARTSEP1CHAR = 0x0091;
+
 	private Hashtable<String, Property> properties;
 	private Annotations annotations;
 	private List<TextPart> parts;
 	private boolean segApplied;
 
+	/**
+	 * Creates a string that stores the content of a given container. Only the content is saved (not
+	 * the properties, annotations, etc.). Use {@link #stringToContent(String)} to create the container
+	 * back from the string.
+	 * @param tc the container holding the content to store. 
+	 * @return a string representing the content of the given container.
+	 */
+	public static String contentToString (TextContainer tc) {
+		StringBuilder tmp = new StringBuilder();
+		tmp.append(tc.hasBeenSegmented() ? '1' : '0');
+		Iterator<TextPart> iter = tc.partIterator();
+		while ( iter.hasNext() ) {
+			TextPart part = iter.next();
+			// part to string
+			tmp.append(part.isSegment() ? '1' : '0');
+			tmp.append(part.text.getCodedText());
+			tmp.append(PARTSEP1);
+			tmp.append(Code.codesToString(part.text.getCodes()));
+			tmp.append(PARTSEP1);
+			if ( part.isSegment() ) {
+				tmp.append(((Segment)part).id);
+			}
+			// end of part to string: next part
+			tmp.append(PARTSEP2);
+		}
+		return tmp.toString();
+	}
+	
+	/**
+	 * Converts a string created by {@link #contentToString(TextContainer)} back into a TextContainer.
+	 * @param data the string to process.
+	 * @return a new TextConatiner with the stored content re-created.
+	 */
+	public static TextContainer stringToContent (String data) {
+		TextContainer tc = new TextContainer();
+		tc.setHasBeenSegmentedFlag((data.charAt(0)=='1'));
+		String[] chunks = data.substring(1).split(PARTSEP2, 0);
+		tc.parts.clear();
+		for ( String chunk : chunks ) {
+			int n1 = chunk.indexOf(PARTSEP1CHAR);
+			int n2 = chunk.indexOf(PARTSEP1CHAR, n1+1);
+			TextFragment tf = new TextFragment(chunk.substring(1, n1),
+				Code.stringToCodes(chunk.substring(n1+1, n2)));
+			tc.parts.add((chunk.charAt(0)=='1')
+				? new Segment(chunk.substring(n2+1), tf)
+				: new TextPart(tf));
+		}
+		return tc;
+	}
+	
 	/**
 	 * Creates a new empty TextContainer object.
 	 */

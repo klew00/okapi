@@ -240,32 +240,89 @@ public class TranslationComparisonStep extends BasePipelineStep {
 
 		TextFragment srcFrag = null;
 		if ( isBaseMultilingual ) {
-			srcFrag = tu1.getSourceContent();
+			if ( tu1.getSource().contentIsOneSegment() ) {
+				srcFrag = tu1.getSource().getFirstPartContent();
+			}
+			else {
+				srcFrag = tu1.getSource().getUnSegmentedContentCopy();
+			}
 		}
 		else {
 			if ( isInput2Multilingual ) {
-				srcFrag = tu2.getSourceContent();
+				if ( tu2.getSource().contentIsOneSegment() ) {
+					srcFrag = tu2.getSource().getFirstPartContent();
+				}
+				else {
+					srcFrag = tu2.getSource().getUnSegmentedContentCopy();
+				}
 			}
 			else if (( tu3 != null ) && isInput3Multilingual ) {
-				srcFrag = tu3.getSourceContent();
+				if ( tu3.getSource().contentIsOneSegment() ) {
+					srcFrag = tu3.getSource().getFirstPartContent();
+				}
+				else {
+					srcFrag = tu3.getSource().getUnSegmentedContentCopy();
+				}
 			}
 		}
 		
 		// Get the text for the base translation
 		TextFragment trgFrag1;
-		if ( isBaseMultilingual ) trgFrag1 = tu1.getTargetContent(targetLocale);
-		else trgFrag1 = tu1.getSourceContent();
+		if ( isBaseMultilingual ) {
+			if ( tu1.getTarget(targetLocale).contentIsOneSegment() ) {
+				trgFrag1 = tu1.getTarget(targetLocale).getFirstPartContent();
+			}
+			else {
+				trgFrag1 = tu1.getTarget(targetLocale).getUnSegmentedContentCopy();
+			}
+		}
+		else {
+			if ( tu1.getSource().contentIsOneSegment() ) {
+				trgFrag1 = tu1.getSource().getFirstPartContent();
+			}
+			else {
+				trgFrag1 = tu1.getSource().getUnSegmentedContentCopy();
+			}
+		}
 
 		// Get the text for the to-compare translation 1
 		TextFragment trgFrag2;
-		if ( isInput2Multilingual ) trgFrag2 = tu2.getTargetContent(targetLocale);
-		else trgFrag2 = tu2.getSourceContent();
+		if ( isInput2Multilingual ) {
+			if ( tu2.getTarget(targetLocale).contentIsOneSegment() ) {
+				trgFrag2 = tu2.getTarget(targetLocale).getFirstPartContent();
+			}
+			else {
+				trgFrag2 = tu2.getTarget(targetLocale).getUnSegmentedContentCopy();
+			}
+		}
+		else {
+			if ( tu2.getSource().contentIsOneSegment() ) {
+				trgFrag2 = tu2.getSource().getFirstPartContent();
+			}
+			else {
+				trgFrag2 = tu2.getSource().getUnSegmentedContentCopy();
+			}
+		}
 		
 		// Get the text for the to-compare translation 2
 		TextFragment trgFrag3 = null;
 		if ( tu3 != null ) {
-			if ( isInput3Multilingual ) trgFrag3 = tu3.getTargetContent(targetLocale);
-			else trgFrag3 = tu3.getSourceContent();
+			if ( isInput3Multilingual ) {
+				if ( tu3.getTarget(targetLocale).contentIsOneSegment() ) {
+					trgFrag3 = tu3.getTarget(targetLocale).getFirstPartContent();
+				}
+				else {
+					trgFrag3 = tu3.getTarget(targetLocale).getUnSegmentedContentCopy();
+				}
+			}
+			else {
+				if ( tu3.getSource().contentIsOneSegment() ) {
+					trgFrag3 = tu3.getSource().getFirstPartContent();
+				}
+				else {
+					trgFrag3 = tu3.getSource().getUnSegmentedContentCopy();
+				}
+			}
 		}
 		
 		// Do we have a base translation?

@@ -27,13 +27,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 
 public class DbStore {
 
@@ -163,17 +159,12 @@ public class DbStore {
 		}
 	}
 	
-	public int getTextUnitCount (boolean nonSegmentsOnly) {
+	public int getTextUnitCount () {
 		Statement stm = null;
 		try {
 			stm = conn.createStatement();
 			String query;
-			if ( nonSegmentsOnly ) { // Main entries have SegKey set to 0
-				query = String.format("SELECT COUNT(%s) FROM %s WHERE %s=0", SOURCE_NKEY, TBLNAME_SOURCE, SOURCE_NSEGKEY);
-			}
-			else {
-				query = "SELECT COUNT(" + SOURCE_NKEY + ") FROM " + TBLNAME_SOURCE;
-			}
+			query = "SELECT COUNT(" + SOURCE_NKEY + ") FROM " + TBLNAME_SOURCE;
 			ResultSet result = stm.executeQuery(query);
 			if ( !result.first() ) return 0;
 			return result.getInt(1);
@@ -194,13 +185,12 @@ public class DbStore {
 		}
 	}
 	
-	public int addSourceEntry (TextContainer tc,
+	public void addSourceEntry (TextContainer tc,
 		int gKey,
 		String tuId,
 		String tuName,
 		String tuType)
 	{
-		int count = 0;
 		PreparedStatement pstm = null;
 		try {
 			//TODO: make this pstm class-level
@@ -215,29 +205,9 @@ public class DbStore {
 			pstm.setInt(4, 0); // SegKey is 0 for the main entry
 			pstm.setString(5, tuName);
 			pstm.setString(6, tuType);
-			pstm.setString(7, tc.getCodedText());
-			pstm.setString(8, Code.codesToString(tc.getUnSegmentedContentCopy().getCodes()));
+			pstm.setString(7, TextContainer.contentToString(tc));
+			pstm.setString(8, ""); // Not used any more
 			pstm.execute();
-			count++;
-			
-			// Store the segments if needed
-			if ( tc.hasBeenSegmented() ) {
-				int i = 1;
-				for ( Segment seg : tc ) {
-					pstm.setInt(1, 0);
-					pstm.setInt(2, gKey);
-					pstm.setString(3, tuId);
-					pstm.setInt(4, i); // SegKey is >0 for the segments
-					pstm.setString(5, tuName);
-					pstm.setString(6, tuType);
-					pstm.setString(7, seg.text.getCodedText());
-					pstm.setString(8, Code.codesToString(seg.text.getCodes()));
-					pstm.execute();
-					count++;
-					i++;
-				}
-			}
-			return count;
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -254,39 +224,18 @@ public class DbStore {
 			}
 		}
 	}
-	
-	public TextContainer findEntry (String name,
-		boolean includeSegments)
-	{
+
+	public TextContainer findEntry (String name) {
 		PreparedStatement pstm = null;
 		try {
-			//TODO: make pstm class-level objects, reset for each connection
 			pstm = conn.prepareStatement(String.format("SELECT %s,%s FROM %s WHERE %s=? ORDER BY %s",
 				SOURCE_NTEXT, SOURCE_NCODES, TBLNAME_SOURCE, SOURCE_NNAME, SOURCE_NSEGKEY));
 			pstm.setString(1, name);
 			ResultSet result = pstm.executeQuery();
 			if ( !result.first() ) return null;
-			TextContainer tc = new TextContainer();
-			tc.setCodedText(result.getString(1),
-				Code.stringToCodes(result.getString(2)), false);
-			// Return now if the segments are not requested
-			if ( !includeSegments ) return tc;
 			
-			// Build the segments
-			if ( !tc.hasCode() || !result.next() ) return tc; // No segments
-			// Create the new list
-			ArrayList<Segment> list = new ArrayList<Segment>();
-			tc.setSegments(list);
-
-			// Add the first segment to it
-			int segIndex = 0;
-			list.add(new Segment(String.valueOf(segIndex),
-				new TextFragment(result.getString(1), Code.stringToCodes(result.getString(2)))));
-			// Add the other segments
-			while ( result.next() ) {
-				list.add(new Segment(String.valueOf(++segIndex),
-					new TextFragment(result.getString(1), Code.stringToCodes(result.getString(2)))));
-			}
+			// Build the segment
+			TextContainer tc = TextContainer.stringToContent(result.getString(1));
 			return tc;
 		}
 		catch ( SQLException e ) {

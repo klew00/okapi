@@ -223,7 +223,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		readTargetToDb();
 		
 		dbStore = dbStoreBuilder.getDbStore();
-		targetCount = dbStore.getTextUnitCount(true);
+		targetCount = dbStore.getTextUnitCount();
 		aligned = 0;
 		noText = 0;
 		count = 0;
@@ -283,7 +283,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			}
 		}
 		// Retrieve the corresponding target(s)
-		TextContainer trgTC = dbStore.findEntry(tu.getName(), true);
+		TextContainer trgTC = dbStore.findEntry(tu.getName());
 		if ( trgTC != null ) {
 			// Check alignment and fix it if needed
 			tu.setTarget(trgLang, trgTC);

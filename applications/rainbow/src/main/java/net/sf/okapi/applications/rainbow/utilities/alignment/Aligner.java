@@ -657,40 +657,41 @@ public class Aligner {
 	 * @param direction Use 1 to move up, -1 to move down.
 	 */
 	private void moveSegment (int direction) {
-		try {
-			int n = trgList.getSelectionIndex();
-			// Sanity checks
-			if (( direction != 1 ) && ( direction != -1 )) return;
-			if ( direction == 1 ) {
-				if ( n+1 > trgList.getItemCount() ) return;
-			}
-			else {
-				if ( n < 1 ) return;
-			}
-			// Swap current segment with the previous/next one
-			java.util.List<Segment> segs = target.getSegments();
-			Segment tmpSeg = segs.get(n+direction);
-			segs.set(n+direction, segs.get(n));
-			segs.set(n, tmpSeg);
-			// Update
-			updateTargetDisplay();
-			fillTargetList(n+direction);
-			trgList.setFocus();
-			// Re-check for issues, but don't select one
-			hasIssue(true, true, false);
-			synchronizeFromTarget();
-			manualCorrection = true;
-		}
-		catch ( Throwable e) {
-			Dialogs.showError(shell, e.getMessage(), null);
-		}
+		return; //
+//		try {
+//			int n = trgList.getSelectionIndex();
+//			// Sanity checks
+//			if (( direction != 1 ) && ( direction != -1 )) return;
+//			if ( direction == 1 ) {
+//				if ( n+1 > trgList.getItemCount() ) return;
+//			}
+//			else {
+//				if ( n < 1 ) return;
+//			}
+//			// Swap current segment with the previous/next one
+////TODO: port			java.util.List<Segment> segs = target.getSegments();
+////			Segment tmpSeg = segs.get(n+direction);
+////			segs.set(n+direction, segs.get(n));
+////			segs.set(n, tmpSeg);
+//			// Update
+//			updateTargetDisplay();
+//			fillTargetList(n+direction);
+//			trgList.setFocus();
+//			// Re-check for issues, but don't select one
+//			hasIssue(true, true, false);
+//			synchronizeFromTarget();
+//			manualCorrection = true;
+//		}
+//		catch ( Throwable e) {
+//			Dialogs.showError(shell, e.getMessage(), null);
+//		}
 	}
 
 	private void mergeWithNext () {
 		try {
 			int n = trgList.getSelectionIndex();
 			if ( n < 0  ) return;
-			target.joinSegmentWithNext(n);
+			target.joinSegmentWithNextSegment(n);
 			updateTargetDisplay();
 			fillTargetList(n);
 			trgList.setFocus();
@@ -707,15 +708,16 @@ public class Aligner {
 		int start,
 		int end)
 	{
+//REDO this method using splitPart()		
 		// No split if location is not a range and is not inside text
 		if (( start == end ) && ( start == 0 )) return;
 		// Get the length of the segment to re-split
-		int len = target.getSegments().get(segIndex).text.getCodedText().length();
+		int len = target.getSegment(segIndex).text.getCodedText().length();
 		//TODO: case for if (( start == 0 ) && ( end == len ))
 
 		// Merge the segment to re-split into the main content
 		// All the other segments are still place-holders there
-		int pos = target.mergeSegment(segIndex);
+		int pos = -1; //TODO: target.mergeSegment(segIndex);
 		// Now pos value is the position 0 of the segment character indices
 		if ( pos == -1 ) return; // Segment index not found
 		
@@ -794,8 +796,8 @@ public class Aligner {
 		source = tu.getSource();
 		target = tu.getTarget(trgLang);
 		btToReview.setSelection(false);
-		// Check if both are segmented
-		if ( !source.isSegmented() || !target.isSegmented() ) return 1;
+		// If none is segmented, no need to check
+		if ( source.contentIsOneSegment() && target.contentIsOneSegment() ) return 1;
 		// Check for issues
 		if ( hasIssue(false, true, true) ) {
 			setData();
@@ -821,7 +823,7 @@ public class Aligner {
 	private void fillTargetList (int selection) {
 		trgList.removeAll();
 		boolean useGeneric = chkShowInlineCodes.getSelection();
-		for ( Segment seg : target.getSegments() ) {
+		for ( Segment seg : target ) {
 			if ( useGeneric ) trgList.add(genericCont.setContent(seg.text).toString());
 			else trgList.add(seg.text.toString());
 		}
@@ -836,7 +838,7 @@ public class Aligner {
 	private void fillSourceList (int selection) {
 		srcList.removeAll();
 		boolean useGeneric = chkShowInlineCodes.getSelection();
-		for ( Segment seg : source.getSegments() ) {
+		for ( Segment seg : source ) {
 			if ( useGeneric ) srcList.add(genericCont.setContent(seg.text).toString());
 			else srcList.add(seg.toString());
 		}
@@ -925,7 +927,7 @@ public class Aligner {
 				try {
 					// genericCont is already set with the proper text
 					genericCont.updateFragment(edTrgSeg.getText(),
-						target.getSegments().get(indexActiveSegment).text, true);
+						target.getSegment(indexActiveSegment).text, true);
 				}
 				catch ( InvalidContentException e ) {
 					Dialogs.showError(shell, e.getMessage(), null);
@@ -957,7 +959,7 @@ public class Aligner {
 
 	private void toggleFields (boolean specialMode) {
 		if ( specialMode ) {
-			genericCont.setContent(target.getSegments().get(indexActiveSegment).text);
+			genericCont.setContent(target.getSegment(indexActiveSegment).text);
 			edTrgSeg.setText(genericCont.toString());
 			edTrgSeg.setFocus();
 			btAccept.setEnabled(true);
@@ -1011,8 +1013,10 @@ public class Aligner {
 		try {
 			if ( resetList ) resetIssues();
 			
+			int srcSegCount = source.getSegmentCount();
+			int trgSegCount = target.getSegmentCount();
 			// Check the number of segments
-			if ( source.getSegments().size() != target.getSegments().size() ) {
+			if ( srcSegCount != trgSegCount ) {
 				// Optional visual alignment to fix the problems
 				addIssue(2, "Error- Different number of segments in source and target.");
 				return updateIssueStatus(gotoIssue);
@@ -1020,20 +1024,24 @@ public class Aligner {
 			// Assumes the list have same number of segments now
 			
 			// Check if we do further verification for single-segment unit
-			if (( source.getSegments().size() == 1 ) && !chkCheckSingleSegUnit.getSelection() ) {
+			if (( srcSegCount == 1 ) && !chkCheckSingleSegUnit.getSelection() ) {
 				// We assume it's ok to align
 				if ( forceIssueDisplay ) addIssue(0, null);
 				return updateIssueStatus(gotoIssue);
 			}
 			
 			// Sanity check using common anchors
-			java.util.List<Segment> srcList = source.getSegments();
-			java.util.List<Segment> trgList = target.getSegments();
-			for ( int i=0; i<srcList.size(); i++ ) {
-				if ( srcList.get(i).text.getCodes().size() != trgList.get(i).text.getCodes().size() ) {
+			int i = 0;
+			for ( Segment srcSeg : source ) {
+				Segment trgSeg = target.getSegment(i);
+				if ( trgSeg == null ) {
+					addIssue(1, String.format("%d: Warning- No target segment for the source segment.", i+1));
+				}
+				if ( srcSeg.text.getCodes().size() != trgSeg.text.getCodes().size() ) {
 					addIssue(1, String.format("%d: Warning- Different number of inline codes in source and target.", i+1));
 				}
-				checkAnchors(srcList.get(i).text, trgList.get(i).text, i);
+				checkAnchors(srcSeg.text, trgSeg.text, i);
+				i++;
 			}
 			if ( forceIssueDisplay ) addIssue(0, null);
 			return updateIssueStatus(gotoIssue);
@@ -1110,123 +1118,126 @@ public class Aligner {
 	 * have not been modified.
 	 */
 	private boolean autoCorrect () {
-		boolean modified = false;
-		int n = trgList.getSelectionIndex();
-		if ( n == -1 ) n = 0;
-		try {
-			java.util.List<Segment> srcCol = source.getSegments();
-			java.util.List<Segment> trgCol = target.getSegments();
-			
-			int lastMatch = -1;
-			int trgStart = 0;
-			int srcNoMatchCount = 0;
-			boolean matchFound;
-			String srcText;
-			int toJoin;
-
-			for ( int i=0; i<srcCol.size(); i++ ) {
-				matchFound = false;
-				srcText = srcCol.get(i).toString();
-				for ( int j=trgStart; j<trgCol.size(); j++ ) {
-					String s2 = trgCol.get(j).toString(); //TODO: replace by direct call after debug
-					if ( srcText.equals(s2) ) {
-						// We have a match
-						if ( srcNoMatchCount == 1 ) {
-							if ( lastMatch == -1 ) {
-								toJoin = (j-1);
-								// lastMatch=-1 is ok with following calculations
-							}
-							else {
-								// We have only one source segment between this match and last
-								// Compute the number of target segments between matches
-								toJoin = ((j-1) - lastMatch)-1;
-							}
-							if ( toJoin > 0 ) {
-								// We have more than one, so we can join them
-								// The target segment just after the last match is the base
-								for ( int k=0; k<toJoin; k++ ) {
-									target.joinSegmentWithNext(lastMatch+1);
-								}
-								if ( !modified ) {
-									resetIssues();
-									modified = true;
-								}
-								addIssue(1, String.format("%d: Warning- Segment auto-corrected by joining two or more.",
-									lastMatch+1+1)); // Show 1 for 0
-								// Correct the target position since we joined one or more segments
-								j -= toJoin;
-							}
-							// Then we reset the position for the next try
-							lastMatch = j;
-							trgStart = j+1;
-							srcNoMatchCount = 0;
-							matchFound = true;
-							break;
-						}
-						else {
-							// Can't auto-fix more than single source between two match.
-							// So we move on to the next case.
-							lastMatch = j;
-							trgStart = j+1;
-							srcNoMatchCount = 0;
-							matchFound = true;
-							break;
-						}
-					}
-				}
-				if ( !matchFound ) srcNoMatchCount++;
-			}
-			
-			// Case of one source with no match left
-			if ( srcNoMatchCount == 1 ) {
-				// If there was no match at all: we group all targets into one
-				if ( lastMatch == -1 ) {
-					if ( trgCol.size() > 1 ) {
-						// Several target for one source: merge them
-						while ( target.getSegments().size() > 1 ) {
-							target.joinSegmentWithNext(0);
-						}
-						if ( !modified ) {
-							resetIssues();
-							modified = true;
-						}
-						addIssue(1, "Warning- All target segments have been merged into one by auto-correction.");
-					}
-				}
-				else { // There was at least one match, we group everything after it
-					toJoin = ((trgCol.size()-1) - lastMatch)-1;
-					if ( toJoin > 0 ) {
-						// We have more than one, so we can join them
-						// The target segment just after the last match is the base
-						for ( int k=0; k<toJoin; k++ ) {
-							target.joinSegmentWithNext(lastMatch+1);
-						}
-						if ( !modified ) {
-							resetIssues();
-							modified = true;
-						}
-						addIssue(1, String.format("%d: Warning- Segment auto-corrected by joining two or more.",
-							lastMatch+1+1)); // Show 1 for 0
-					}
-				}
-				
-			}
-			// Case of one source with many target but no matches
-			
-			updateTargetDisplay();
-			if ( modified ) {
-				fillTargetList(0);
-				if ( chkSyncScrolling.getSelection() ) synchronizeFromTarget();
-				trgList.setFocus();
-				// Re-check for issues
-				hasIssue(true, false, true);
-			}
-		}
-		catch ( Throwable e ) {
-			addIssue(2, "Error- Auto-correction error occured.");
-			Dialogs.showError(shell, e.getMessage(), null);
-		}
-		return modified;
+		return true;
+		//TODO: port
+//		boolean modified = false;
+//		int n = trgList.getSelectionIndex();
+//		if ( n == -1 ) n = 0;
+//		try {
+//			java.util.List<Segment> srcCol = source.getSegments();
+//			java.util.List<Segment> trgCol = target.getSegments();
+//			
+//			int lastMatch = -1;
+//			int trgStart = 0;
+//			int srcNoMatchCount = 0;
+//			boolean matchFound;
+//			String srcText;
+//			int toJoin;
+//
+//			for ( int i=0; i<srcCol.size(); i++ ) {
+//				matchFound = false;
+//				srcText = srcCol.get(i).toString();
+//				for ( int j=trgStart; j<trgCol.size(); j++ ) {
+//					String s2 = trgCol.get(j).toString(); //TODO: replace by direct call after debug
+//					if ( srcText.equals(s2) ) {
+//						// We have a match
+//						if ( srcNoMatchCount == 1 ) {
+//							if ( lastMatch == -1 ) {
+//								toJoin = (j-1);
+//								// lastMatch=-1 is ok with following calculations
+//							}
+//							else {
+//								// We have only one source segment between this match and last
+//								// Compute the number of target segments between matches
+//								toJoin = ((j-1) - lastMatch)-1;
+//							}
+//							if ( toJoin > 0 ) {
+//								// We have more than one, so we can join them
+//								// The target segment just after the last match is the base
+//								for ( int k=0; k<toJoin; k++ ) {
+//									target.joinSegmentWithNextSegment(lastMatch+1);
+//								}
+//								if ( !modified ) {
+//									resetIssues();
+//									modified = true;
+//								}
+//								addIssue(1, String.format("%d: Warning- Segment auto-corrected by joining two or more.",
+//									lastMatch+1+1)); // Show 1 for 0
+//								// Correct the target position since we joined one or more segments
+//								j -= toJoin;
+//							}
+//							// Then we reset the position for the next try
+//							lastMatch = j;
+//							trgStart = j+1;
+//							srcNoMatchCount = 0;
+//							matchFound = true;
+//							break;
+//						}
+//						else {
+//							// Can't auto-fix more than single source between two match.
+//							// So we move on to the next case.
+//							lastMatch = j;
+//							trgStart = j+1;
+//							srcNoMatchCount = 0;
+//							matchFound = true;
+//							break;
+//						}
+//					}
+//				}
+//				if ( !matchFound ) srcNoMatchCount++;
+//			}
+//			
+//			// Case of one source with no match left
+//			if ( srcNoMatchCount == 1 ) {
+//				// If there was no match at all: we group all targets into one
+//				if ( lastMatch == -1 ) {
+//					if ( trgCol.size() > 1 ) {
+//						// Several target for one source: merge them
+////						while ( target.getSegments().size() > 1 ) {
+////							target.joinSegmentWithNext(0);
+////						}
+//						target.joinAllSegments();
+//						if ( !modified ) {
+//							resetIssues();
+//							modified = true;
+//						}
+//						addIssue(1, "Warning- All target segments have been merged into one by auto-correction.");
+//					}
+//				}
+//				else { // There was at least one match, we group everything after it
+//					toJoin = ((trgCol.size()-1) - lastMatch)-1;
+//					if ( toJoin > 0 ) {
+//						// We have more than one, so we can join them
+//						// The target segment just after the last match is the base
+//						for ( int k=0; k<toJoin; k++ ) {
+//							target.joinSegmentWithNextSegment(lastMatch+1);
+//						}
+//						if ( !modified ) {
+//							resetIssues();
+//							modified = true;
+//						}
+//						addIssue(1, String.format("%d: Warning- Segment auto-corrected by joining two or more.",
+//							lastMatch+1+1)); // Show 1 for 0
+//					}
+//				}
+//				
+//			}
+//			// Case of one source with many target but no matches
+//			
+//			updateTargetDisplay();
+//			if ( modified ) {
+//				fillTargetList(0);
+//				if ( chkSyncScrolling.getSelection() ) synchronizeFromTarget();
+//				trgList.setFocus();
+//				// Re-check for issues
+//				hasIssue(true, false, true);
+//			}
+//		}
+//		catch ( Throwable e ) {
+//			addIssue(2, "Error- Auto-correction error occured.");
+//			Dialogs.showError(shell, e.getMessage(), null);
+//		}
+//		return modified;
 	}
 	
 	private void addIssue (int type,
@@ -1275,12 +1286,12 @@ public class Aligner {
 			if ( targetToSource ) {
 				if ( (n = trgList.getSelectionIndex()) == -1 ) return;
 				mtQuery.setLanguages(trgLang, srcLang);
-				oriFrag = target.getSegments().get(n).text;
+				oriFrag = target.getSegment(n).text;
 			}
 			else {
 				if ( (n = srcList.getSelectionIndex()) == -1 ) return;
 				mtQuery.setLanguages(srcLang, trgLang);
-				oriFrag = source.getSegments().get(n).text;
+				oriFrag = source.getSegment(n).text;
 			}
 			
 			mtQuery.query(oriFrag);
