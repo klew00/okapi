@@ -131,6 +131,7 @@ public class Main {
 	protected String tmOptions;
 	protected boolean levOptFillTarget = true;
 	protected String levOptTMXPath;
+	protected boolean extOptNoCopy = false; // Copy source in empty target by default
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -263,6 +264,9 @@ public class Main {
 				}
 				else if ( arg.equals("-nofill") ) {
 					prog.levOptFillTarget = false;
+				}
+				else if ( arg.equals("-nocopy") ) {
+					prog.extOptNoCopy = true;
 				}
 				else if ( arg.equals("-maketmx") ) {
 					prog.levOptTMXPath = "pretrans.tmx";
@@ -856,7 +860,7 @@ public class Main {
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]-mm key");
 		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
-		ps.println("      |-ms configFile] [-maketmx [tmxFile]] [-opt threshold]");
+		ps.println("      |-ms configFile] [-maketmx [tmxFile]] [-opt threshold] [-nocopy]");
 		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
@@ -1179,7 +1183,9 @@ public class Main {
 		
 		// Filter events to raw document final step (using the XLIFF writer)
 		FilterEventsWriterStep fewStep = new FilterEventsWriterStep();
-		fewStep.setFilterWriter(new XLIFFWriter());
+		XLIFFWriter writer= new XLIFFWriter();
+		writer.setCopySource(!extOptNoCopy);
+		fewStep.setFilterWriter(writer);
 		fewStep.setDocumentRoots(System.getProperty("user.dir"));
 		driver.addStep(fewStep);
 

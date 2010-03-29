@@ -63,17 +63,16 @@ public class XLIFFWriter implements IFilterWriter {
 	private String outputPath;
 	private String inputEncoding;
 	private String configId;
+	private boolean copySource = true;
 
 	public XLIFFWriter () {
 		xliffCont = new XLIFFContent();
 	}
 	
 	public void cancel () {
-		// TODO Auto-generated method stub
 	}
 
 	public void close () {
-		// TODO Auto-generated method stub
 		if ( writer != null ) {
 			writer.close();
 		}
@@ -137,6 +136,10 @@ public class XLIFFWriter implements IFilterWriter {
 	public void setParameters (IParameters params) {
 	}
 
+	public void setCopySource (boolean copySource) {
+		this.copySource = copySource;
+	}
+	
 	private void processStartDocument (StartDocument resource) {
 		if ( writer != null ) writer.close();
 		writer = new XMLWriter(outputPath);
@@ -306,7 +309,8 @@ public class XLIFFWriter implements IFilterWriter {
 			// Do we have an available target to use instead?
 			tc = tu.getTarget(trgLang);
 			if (( tc == null ) || ( tc.isEmpty() ) || ( srcHasText && !tc.hasText(false) )) {
-				tc = tu.getSource(); // Go back to the source
+				tc = tu.getSource(); // Fall back to the source
+				if ( !copySource ) tc.clear(); // Empty content if requested
 			}
 
 			// Now tc hold the content to write. Write it with or without marks
