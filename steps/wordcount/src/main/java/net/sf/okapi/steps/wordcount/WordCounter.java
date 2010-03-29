@@ -46,7 +46,7 @@ public class WordCounter extends BaseCounter {
 		params = new StructureParameters();
 		if (params == null) return;
 		
-		params.loadFromResource("/word_counter.tprm");
+		params.loadFromResource("word_counter.tprm");
 	}
 	
 	@Override
