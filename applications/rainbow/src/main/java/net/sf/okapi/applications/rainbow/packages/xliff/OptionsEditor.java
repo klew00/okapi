@@ -46,6 +46,7 @@ public class OptionsEditor implements IParametersEditor {
 	private Button chkGMode;
 	private Button chkIncludeNoTranslate;
 	private Button chkSetApprovedAsNoTranslate;
+	private Button chkCopySource;
 	private Options params;
 	private IHelp help;
 
@@ -113,6 +114,9 @@ public class OptionsEditor implements IParametersEditor {
 		chkGMode = new Button(cmpTmp, SWT.CHECK);
 		chkGMode.setText("Use <g></g> and <x/> notation");
 
+		chkCopySource = new Button(cmpTmp, SWT.CHECK);
+		chkCopySource.setText("Copy source text in target if no target is available");
+
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -161,6 +165,7 @@ public class OptionsEditor implements IParametersEditor {
 		chkGMode.setSelection(params.gMode);
 		chkIncludeNoTranslate.setSelection(params.includeNoTranslate);
 		chkSetApprovedAsNoTranslate.setSelection(params.setApprovedAsNoTranslate);
+		chkCopySource.setSelection(params.copySource);
 		updateNoTranslateCases();
 	}
 	
@@ -168,6 +173,7 @@ public class OptionsEditor implements IParametersEditor {
 		params.gMode = chkGMode.getSelection();
 		params.includeNoTranslate = chkIncludeNoTranslate.getSelection();
 		params.setApprovedAsNoTranslate = chkSetApprovedAsNoTranslate.getSelection();
+		params.copySource = chkCopySource.getSelection();
 		return true;
 	}
 	

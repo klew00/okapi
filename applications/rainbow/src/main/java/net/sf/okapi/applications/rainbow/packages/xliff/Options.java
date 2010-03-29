@@ -28,6 +28,7 @@ public class Options extends BaseParameters {
 	public boolean includeNoTranslate;
 	public boolean setApprovedAsNoTranslate;
 	public String message;
+	public boolean copySource;
 	
 	public Options () {
 		reset();
@@ -38,6 +39,7 @@ public class Options extends BaseParameters {
 		includeNoTranslate = true;
 		setApprovedAsNoTranslate = false;
 		message = "";
+		copySource = true;
 	}
 
 	public void fromString (String data) {
@@ -47,6 +49,7 @@ public class Options extends BaseParameters {
 		includeNoTranslate = buffer.getBoolean("includeNoTranslate", includeNoTranslate);
 		setApprovedAsNoTranslate = buffer.getBoolean("setApprovedAsNoTranslate", setApprovedAsNoTranslate);
 		message = buffer.getString("message", message);
+		copySource = buffer.getBoolean("copySource", copySource);
 		
 		// Make sure the we can merge later
 		if ( !includeNoTranslate ) {
@@ -60,6 +63,7 @@ public class Options extends BaseParameters {
 		buffer.setBoolean("includeNoTranslate", includeNoTranslate);
 		buffer.setBoolean("setApprovedAsNoTranslate", setApprovedAsNoTranslate);
 		buffer.setParameter("message", message);
+		buffer.setBoolean("copySource", copySource);
 		return buffer.toString();
 	}
 	

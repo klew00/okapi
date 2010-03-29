@@ -121,6 +121,9 @@ public class Writer extends BaseWriter {
 			// Do not export items with translate='no'
 			options.includeNoTranslate = false;
 			
+			// Make sure to copy the source on empty target
+			options.copySource = true;
+			
 			// If translated found: replace the target text by the source.
 			// Trusting the target will be gotten from the TMX from original
 			// This to allow editing of pre-translated items in XLIFF editors
@@ -349,7 +352,8 @@ public class Writer extends BaseWriter {
 		tc = tu.getTarget(trgLoc);
 		if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )
 			|| ( srcHasText && !tc.hasText(false) )) {
-			tc = tu.getSource(); // Go back to the source
+			tc = tu.getSource(); // Fall back to source
+			if ( !options.copySource ) tc.clear(); // Clear target if requested
 		}
 		
 		// Write out TMX entries
