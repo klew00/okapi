@@ -38,8 +38,8 @@ public class TextPart {
 	}
 	
 	/**
-	 * Creates a new TextPart with a given TextFragment.
-	 * @param text the TextFragment text for this new part.
+	 * Creates a new TextPart with a given {@link TextFragment}.
+	 * @param text the {@link TextFragment} for this new part.
 	 */
 	public TextPart (TextFragment text) {
 		if ( text == null ) {
@@ -76,17 +76,17 @@ public class TextPart {
 	}
 	
 	/**
-	 * Sets the text fragment for this part.
-	 * @param fragment the new text fragment associated with this part.
-	 * It should not be null.
+	 * Sets the {@link TextFragment} for this part.
+	 * @param fragment the {@link TextFragment} to assign to this part.
+	 * It must not be null.
 	 */
 	public void setContent (TextFragment fragment) {
 		this.text = fragment;
 	}
 	
 	/**
-	 * Indicates if this part is a segment.
-	 * @return true if the part is a segment, false if it is not.
+	 * Indicates if this part is a {@link Segment}.
+	 * @return true if the part is a {@link Segment}, false if it is not.
 	 */
 	public boolean isSegment () {
 		return false;

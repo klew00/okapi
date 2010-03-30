@@ -22,14 +22,29 @@ distribution.</p>
 </ul>
 <h2>Changes from M6 to SNAPSHOT</h2>
 <ul>
+	<li>Rainbow:<ul>
+	<li>Translation package Creation:<ul>
+	<li>Fixed issue #132 where we generated segment &lt;mrk&gt; in XLIFF if the text 
+	was pre-translated but not segmented.</li>
+</ul>
+	</li>
+</ul>
+	</li>
 	<li>Libraries:<ul>
 		<li>Changed the TextContainer class and refactor all dependencies. Note 
 		modification is a major code change.</li>
 	</ul>
 	</li>
 	<li>Filters:<ul>
+	<li>XML filter:<ul>
 	<li>Added pre-defined configuration for WiX (Windows Installer XML) 
 	Localization files.</li>
+</ul></li>
+	<li>XLIFF filter:<ul>
+	<li>Improved the reading of pre-segmented content, so the segment Ids are 
+	now preserved instead of re-generated.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Steps:<ul>

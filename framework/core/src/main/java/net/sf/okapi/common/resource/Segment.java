@@ -22,7 +22,7 @@ package net.sf.okapi.common.resource;
 
 /**
  * Implement a special content part that is a segment.
- * A segment is a {@link #TextPart} with an identifier.
+ * A segment is a {@link TextPart} with an identifier.
  */
 public class Segment extends TextPart {
 	
