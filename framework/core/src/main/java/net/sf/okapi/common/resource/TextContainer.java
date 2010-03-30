@@ -1044,6 +1044,20 @@ public class TextContainer implements Iterable<Segment> {
 	}
 	
 	/**
+	 * Get all segments. Excludes intersegment parts.
+	 * @return List of segments.
+	 */
+	public List<Segment> getSegments () {
+		ArrayList<Segment> segments = new ArrayList<Segment>();
+		for ( TextPart part : parts ) {
+			if ( part.isSegment() ) {
+				segments.add((Segment)part);
+			}
+		}
+		return segments;
+	}
+	
+	/**
 	 * Gets the number of parts (segments and non-segments) in this container.
 	 * This method always returns at least 1.
 	 * @return the number of parts (segments and non-segments) in this container.
