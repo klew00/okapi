@@ -386,7 +386,7 @@ public class TextContainer implements Iterable<Segment> {
 
 	/**
 	 * Appends a part at the end of this container.
-	 * If there the last part (segment or non-segment) is empty,
+	 * If the current last part (segment or non-segment) is empty,
 	 * the TextFragment is appended to that part. Otherwise the
 	 * TextFragment is appended to the content as a new non-segment part.
 	 * <p>Important: If the container is empty, the appended part becomes
@@ -394,24 +394,41 @@ public class TextContainer implements Iterable<Segment> {
 	 * @param fragment the text fragment to append.
 	 */
 	public void appendPart (TextFragment fragment) {
-		// If the last part is empty we append to it
-		if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
-			parts.get(parts.size()-1).text.append(fragment);
-		}
-		else {
-			parts.add(new TextPart(fragment));
-		}
+		appendPart(new TextPart(fragment));
 	}
 	
 	/**
 	 * Appends a part with a given text at the end of this container.
-	 * If there the last part (segment or non-segment) is empty,
+	 * If the current last part (segment or non-segment) is empty,
 	 * the text is appended to that part. Otherwise the
 	 * text is appended to the content as a new non-segment part.
 	 * @param text the text to append.
 	 */
 	public void appendPart (String text) {
-		appendPart(new TextFragment(text));
+		appendPart(new TextPart(text));
+	}
+	
+	/**
+	 * Appends a TextPart at the end of this container.
+	 * If the current last part (segment or non-segment) is empty,
+	 * the part replaces the last part, otherwise the part is
+	 * appended to the content as it.
+	 * If the result of the operation would result in a container without segment, the
+	 * first part is automatically converted to a fragment.
+	 * @param part the TextPart to append.
+	 */
+	public void appendPart (TextPart part) {
+		// If the last part is empty we append to it
+		if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
+			parts.set(parts.size()-1, part);
+		}
+		else {
+			parts.add(part);
+		}
+		if ( getSegmentCount() == 0 ) {
+			// We need to ensure there is at least one segment
+			changePart(0);
+		}
 	}
 	
 	/**

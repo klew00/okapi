@@ -1006,7 +1006,7 @@ public class TextContainerTest {
 		tc2.unwrap(false);
 		assertEquals("[ t1 ][t2] [t3 ]", fmt.printSegmentedContent(tc2, true));
 	}
-		
+	
 	@Test
 	public void testSegments () {
 		String originalText = "[seg1][seg2] [seg3]";
@@ -1084,7 +1084,25 @@ public class TextContainerTest {
 		assertTrue(tc2.hasBeenSegmented());
 		assertEquals("text1<br/> text2<br/>", tc2.toString());
 	}
-	
+
+	@Test
+	public void testAppendPart_AsPart () {
+		TextContainer tc = new TextContainer();
+		tc.appendPart(new TextPart("n0"));
+		tc.appendPart(new Segment(null, new TextFragment("s1")));
+		tc.changePart(0);
+		assertEquals("n0[s1]", fmt.printSegmentedContent(tc, true));
+	}
+
+	@Test
+	public void testAppendPart_AsStringAndTextFragment () {
+		TextContainer tc = new TextContainer();
+		tc.appendPart("p0");
+		tc.appendPart(new TextFragment("p1"));
+		tc.changePart(0);
+		assertEquals("[p0]p1", fmt.printSegmentedContent(tc, true));
+	}
+
 	private TextContainer createMultiSegmentContent () {
 		TextFragment tf = new TextFragment("text1");
 		TextContainer tc = new TextContainer(tf);
