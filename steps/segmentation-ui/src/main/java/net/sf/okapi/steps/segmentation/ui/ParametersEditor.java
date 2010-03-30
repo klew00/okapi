@@ -40,6 +40,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -56,6 +58,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkSegmentTarget;
 	private Button btGetTargetSRX;
 	private Button btEditTargetSRX;
+	private Button chkCopySource;
+	private Button chkCheckSegments;
 	private Text edSourceSRX;
 	private Text edTargetSRX;
 	private IHelp help;
@@ -218,6 +222,18 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		});
 		
+		Group grpOptions = new Group(mainComposite, SWT.NONE);
+		grpOptions.setText("Options");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 3;
+		grpOptions.setLayoutData(gdTmp);
+		grpOptions.setLayout(new GridLayout(1, false));
+		
+		chkCopySource = new Button(grpOptions, SWT.CHECK);
+		chkCopySource.setText("Copy source into target if no  target exists");
+
+		chkCheckSegments = new Button(grpOptions, SWT.CHECK);
+		chkCheckSegments.setText("Verify that a target segment matches each source segment when a target content exists");
 	}
 		
 	private boolean showDialog () {
@@ -274,6 +290,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edSourceSRX.setText(params.sourceSrxPath);
 		chkSegmentTarget.setSelection(params.segmentTarget);
 		edTargetSRX.setText(params.targetSrxPath);
+		chkCopySource.setSelection(params.copySource);
+		chkCheckSegments.setSelection(params.checkSegments);
 		updateSourceDisplay();
 		updateTargetDisplay();
 	}
@@ -287,6 +305,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		if ( params.segmentTarget ) {
 			params.targetSrxPath = edTargetSRX.getText();
 		}
+		params.copySource = chkCopySource.getSelection();
+		params.checkSegments = chkCheckSegments.getSelection();
 		result = true;
 		return true;
 	}

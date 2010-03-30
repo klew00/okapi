@@ -28,6 +28,8 @@ public class Parameters extends BaseParameters {
 	public boolean segmentTarget;
 	public String sourceSrxPath;
 	public String targetSrxPath;
+	public boolean copySource;
+	public boolean checkSegments;
 	
 	public Parameters () {
 		reset();
@@ -38,6 +40,8 @@ public class Parameters extends BaseParameters {
 		segmentTarget = false;
 		sourceSrxPath = "";
 		targetSrxPath = "";
+		copySource = true;
+		checkSegments = false;
 	}
 
 	public void fromString (String data) {
@@ -47,6 +51,8 @@ public class Parameters extends BaseParameters {
 		segmentTarget = buffer.getBoolean("segmentTarget", segmentTarget);
 		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
+		copySource = buffer.getBoolean("copySource", copySource);
+		checkSegments = buffer.getBoolean("checkSegments", checkSegments);
 	}
 
 	@Override
@@ -56,6 +62,8 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("segmentTarget", segmentTarget);
 		buffer.setString("sourceSrxPath", sourceSrxPath);
 		buffer.setString("targetSrxPath", targetSrxPath);
+		buffer.setBoolean("copySource", copySource);
+		buffer.setBoolean("checkSegments", checkSegments);
 		return buffer.toString();
 	}
 	

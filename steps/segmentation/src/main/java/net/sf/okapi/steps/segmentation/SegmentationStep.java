@@ -28,9 +28,11 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -96,13 +98,19 @@ public class SegmentationStep extends BasePipelineStep {
 		if ( params.segmentSource ) {
 			src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
 			srxDoc.loadRules(src);
-			if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
+			if ( srxDoc.hasWarning() ) {
+				logger.warning(srxDoc.getWarning());
+			}
 			srcSeg = srxDoc.compileLanguageRules(sourceLocale, null);
 		}
 		if ( params.segmentTarget ) {
 			String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
-			if ( !src.equals(trg) ) {
+			// Load target SRX only if different from sources
+			if ( Util.isEmpty(src) || !src.equals(trg) ) {
 				srxDoc.loadRules(trg);
+				if ( srxDoc.hasWarning() ) {
+					logger.warning(srxDoc.getWarning());
+				}
 				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			}
 		}
@@ -117,27 +125,46 @@ public class SegmentationStep extends BasePipelineStep {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return event;
 
-		TextContainer cont;
-		if ( tu.hasTarget(targetLocale) ) {
-			if ( params.segmentTarget ) {
-				cont = tu.getTarget(targetLocale);
-				if ( !cont.hasBeenSegmented() ) {
-					trgSeg.computeSegments(cont);
-					cont.createSegments(trgSeg.getRanges());
-				}
+		// Segment source if requested
+		if ( params.segmentSource ) {
+			if ( !tu.getSource().hasBeenSegmented() ) {
+				tu.createSourceSegmentation(srcSeg);
 			}
 		}
-		else if ( params.segmentSource ) {
-			cont = tu.getSource();
-			if ( !cont.hasBeenSegmented() ) {
-				srcSeg.computeSegments(cont);
-				cont.createSegments(srcSeg.getRanges());
+		
+		TextContainer trgCont = tu.getTarget(targetLocale);
+
+		// Segment target if requested
+		if ( params.segmentTarget && ( trgCont != null )) {
+			if ( !trgCont.hasBeenSegmented() ) {
+				trgSeg.computeSegments(trgCont);
+				trgCont.createSegments(trgSeg.getRanges());
 			}
 		}
 		
 		// Make sure we have target content if needed
-		if ( tu.hasTarget(targetLocale) ) {
-			tu.createTarget(targetLocale, false, IResource.COPY_ALL);
+		if ( params.copySource ) {
+			trgCont = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
+		}
+
+		// If requested, verify that we have one-to-one match
+		// This is needed only if we do have a target
+		if ( params.checkSegments && ( trgCont != null)) {
+			if ( trgCont.getSegmentCount() != tu.getSource().getSegmentCount() ) {
+				// Not the same number of segments
+				logger.warning(String.format("Text unit id='%s': Source and target do not have the same number of segments.",
+					tu.getId()));
+			}
+			// Otherwise make sure we have matches
+			else {
+				for ( Segment seg : tu.getSource() ) {
+					if ( trgCont.getSegment(seg.id) == null ) {
+						// No target segment matching source segment seg.id
+						logger.warning(String.format("Text unit id='%s': No target match found for source segment id='%s'",
+							tu.getId(), seg.id));
+					}
+				}
+			}
 		}
 		
 		return event;
