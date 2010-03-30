@@ -20,13 +20,27 @@
 
 package net.sf.okapi.common.resource;
 
+/**
+ * Implements the base object for the parts that make up a content.
+ */
 public class TextPart {
 
 	/**
 	 * Text fragment of this part.
 	 */
 	public TextFragment text;
+
+	/**
+	 * Creates an empty part.
+	 */
+	public TextPart () {
+		text = new TextFragment();
+	}
 	
+	/**
+	 * Creates a new TextPart with a given TextFragment.
+	 * @param text the TextFragment text for this new part.
+	 */
 	public TextPart (TextFragment text) {
 		if ( text == null ) {
 			text = new TextFragment();
@@ -34,6 +48,10 @@ public class TextPart {
 		this.text = text;
 	}
 	
+	/**
+	 * Creates a new TextPart with a given text string.
+	 * @param text the text for this new part.
+	 */
 	public TextPart (String text) {
 		this.text = new TextFragment(text);
 	}
@@ -49,10 +67,27 @@ public class TextPart {
 		return text.toString();
 	}
 
+	/**
+	 * Gets the text fragment for this part.
+	 * @return the text fragment for this part.
+	 */
 	public TextFragment getContent () {
 		return text;
 	}
 	
+	/**
+	 * Sets the text fragment for this part.
+	 * @param fragment the new text fragment associated with this part.
+	 * It should not be null.
+	 */
+	public void setContent (TextFragment fragment) {
+		this.text = fragment;
+	}
+	
+	/**
+	 * Indicates if this part is a segment.
+	 * @return true if the part is a segment, false if it is not.
+	 */
 	public boolean isSegment () {
 		return false;
 	}

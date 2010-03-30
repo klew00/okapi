@@ -21,8 +21,8 @@
 package net.sf.okapi.common.resource;
 
 /**
- * Convenience class to group together the text fragment of a segment
- * and its identifier.
+ * Implement a special content part that is a segment.
+ * A segment is a {@link #TextPart} with an identifier.
  */
 public class Segment extends TextPart {
 	
@@ -61,6 +61,10 @@ public class Segment extends TextPart {
 		return true;
 	}
 
+	/**
+	 * Gets the identifier for this segment.
+	 * @return the identifier for this segment.
+	 */
 	public String getId () {
 		return id;
 	}

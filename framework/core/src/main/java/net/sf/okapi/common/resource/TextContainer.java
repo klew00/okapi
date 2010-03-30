@@ -286,7 +286,7 @@ public class TextContainer implements Iterable<Segment> {
 	 * has been called, and no operation has resulted in un-segmenting the content since that call,
 	 * or if the content has more than one part.
 	 * @return true if a segmentation has been applied to this container.
-	 * @see #setHasBeenSegmented(boolean)
+	 * @see #setHasBeenSegmentedFlag(boolean)
 	 */
 	public boolean hasBeenSegmented () {
 		return segApplied;
@@ -305,7 +305,12 @@ public class TextContainer implements Iterable<Segment> {
 	/**
 	 * Indicates if this container is made of a single segment that holds the
 	 * whole content (i.e. there is no other parts).
+	 * <p>When this method returns true, the methods {@link #getFirstPartContent()},
+	 * {@link #getFirstSegmentContent()}, {@link #getLastPartContent()} and
+	 * {@link #getLastSegmentContent()} return the same result.
 	 * @return true if the whole content of this container is in a single segment.
+	 * @see #getPartCount()
+	 * @see #getSegmentCount()
 	 */
 	public boolean contentIsOneSegment () {
 		return (( parts.size() == 1 ) && parts.get(0).isSegment() );
@@ -428,7 +433,7 @@ public class TextContainer implements Iterable<Segment> {
 	 * Otherwise the new segment is appended to the content as a new segment part and its
 	 * id is validated.
 	 * @param segment the segment to append.
-	 * @param partBefore the text of the non-segment part before the segment (can be null).
+	 * @param textBefore the text of the non-segment part before the segment (can be null).
 	 */
 	public void appendSegment (Segment segment,
 		String textBefore)
@@ -742,6 +747,13 @@ public class TextContainer implements Iterable<Segment> {
 		}
 	}
 	
+	/**
+	 * Gets the content of the first segment of this container.
+	 * @return the content of the first segment of this container.
+	 * @see #getFirstPartContent()
+	 * @see #getLastSegmentContent()
+	 * @see #getLastPartContent()
+	 */
 	public TextFragment getFirstSegmentContent () {
 		for ( TextPart part : parts ) {
 			if ( part.isSegment() ) {
@@ -752,6 +764,13 @@ public class TextContainer implements Iterable<Segment> {
 		return null;
 	}
 	
+	/**
+	 * Gets the content of last segment of this container.
+	 * @return the content of the last segment of this container.
+	 * @see #getLastPartContent()
+	 * @see #getFirstSegmentContent()
+	 * @see #getFirstPartContent()
+	 */
 	public TextFragment getLastSegmentContent () {
 		for ( int i=parts.size()-1; i>=0; i-- ) {
 			if ( parts.get(i).isSegment() ) {
@@ -761,12 +780,28 @@ public class TextContainer implements Iterable<Segment> {
 		// Should never occur
 		return null;
 	}
-	
-	public TextFragment getLastPartContent () {
+
+	/**
+	 * Gets the content of the first part (segment or non-segment) of this container.
+	 * <p>This method always returns the same result as {@link #getFirstSegmentContent()} if {@link #contentIsOneSegment()}.
+	 * @return the content of the first part (segment or non-segment) of this container.
+	 * @see #getFirstSegmentContent()
+	 * @see #getLastPartContent()
+	 * @see #getLastSegmentContent()
+	 */
+	public TextFragment getFirstPartContent () {
 		return parts.get(parts.size()-1).text;
 	}
 	
-	public TextFragment getFirstPartContent () {
+	/**
+	 * Gets the content of the last part (segment or non-segment) of this container. 
+	 * <p>This method always returns the same result as {@link #getLastSegmentContent()} if {@link #contentIsOneSegment()}.
+	 * @return the content of the last part (segment or non-segment) of this container.
+	 * @see #getLastSegmentContent()
+	 * @see #getFirstPartContent()
+	 * @see #getFirstSegmentContent()
+	 */
+	public TextFragment getLastPartContent () {
 		return parts.get(parts.size()-1).text;
 	}
 	
@@ -951,12 +986,18 @@ public class TextContainer implements Iterable<Segment> {
 	}
 	
 	/**
-	 * Gets the segment for a given index.
+	 * Gets the segment for a given segment index.
 	 * @param index the index of the segment to retrieve. The first
 	 * segment has the index 0, the second has the index 1, etc.
-	 * Note that the index value used here is not necessarily the same index as the part. 
+	 * Note that the index value used here is not necessarily the same index as for a part.
+	 * That is: <code>getSegment(0)</code> returns the same segment as <code>getPart(0)</code> only if
+	 * the first part of the container is a segment. 
 	 * @return the segment for the given index.
+	 * <p>Use {@link #getSegment(String)} to retrieve by segment identifier.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @see #getSegment(String)
+	 * @see #getPart(int)
+	 * #see {@link #iterator()}
 	 */
 	public Segment getSegment (int index) {
 		int tmp = -1;
@@ -971,16 +1012,26 @@ public class TextContainer implements Iterable<Segment> {
 		return null;
 	}
 	
+	/**
+	 * Gets the part (segment or non-segment) for a given part index.
+	 * @param index the index of the part to retrieve. the first part has the index 0,
+	 * the second has the index 1, etc.
+	 * @return the part (segment or non-segment) for the given index.
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 * @see #getSegment(int)
+	 * @see #partIterator()
+	 */
 	public TextPart getPart (int index) {
 		return parts.get(index);
 	}
 	
 	/**
 	 * Gets the number of segments in this container.
-	 * This method should always return at least 1.
+	 * This method always returns at least 1.
 	 * Use {@link #hasText(boolean, boolean)} to check for text presence.
 	 * Use {@link #isEmpty()} to verify if the content is empty of not.
 	 * @return the number of segments in the container.
+	 * @see #getPartCount()
 	 */
 	public int getSegmentCount () {
 		int count = 0;
@@ -994,8 +1045,9 @@ public class TextContainer implements Iterable<Segment> {
 	
 	/**
 	 * Gets the number of parts (segments and non-segments) in this container.
-	 * This method should always return at least 1.
+	 * This method always returns at least 1.
 	 * @return the number of parts (segments and non-segments) in this container.
+	 * @see #getSegmentCount()
 	 */
 	public int getPartCount () {
 		return parts.size();
@@ -1024,6 +1076,13 @@ public class TextContainer implements Iterable<Segment> {
 		setContent(createJoinedContent(ranges));
 	}
 
+	/**
+	 * Indicates if this container has a single segment. Note that it may have also non-segment parts.
+	 * Use {@link #contentIsOneSegment()} to check if the container is made of a asingle segment without
+	 * any additional non-segment parts. 
+	 * @return true if this container has a single segment.
+	 * @see #contentIsOneSegment()
+	 */
 	private boolean hasOnlyOneSegment () {
 		return (getSegmentCount() == 1);
 	}
