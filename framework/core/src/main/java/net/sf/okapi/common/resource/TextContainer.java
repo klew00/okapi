@@ -394,7 +394,14 @@ public class TextContainer implements Iterable<Segment> {
 	 * @param fragment the text fragment to append.
 	 */
 	public void appendPart (TextFragment fragment) {
-		appendPart(new TextPart(fragment));
+		//If the last part is empty we append to it
+		if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
+			// Append the fragment to the segment or non-segment part
+			parts.get(parts.size()-1).text.append(fragment);
+		}
+		else { // Else: like appending a TextPart
+			appendPart(new TextPart(fragment));
+		} 
 	}
 	
 	/**
@@ -409,7 +416,7 @@ public class TextContainer implements Iterable<Segment> {
 	}
 	
 	/**
-	 * Appends a TextPart at the end of this container.
+	 * Appends a {@link TextPart} (segment or non-segment) at the end of this container.
 	 * If the current last part (segment or non-segment) is empty,
 	 * the part replaces the last part, otherwise the part is
 	 * appended to the content as it.
