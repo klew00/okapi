@@ -804,6 +804,20 @@ public class TextContainer implements Iterable<Segment> {
 		// Should never occur
 		return null;
 	}
+	
+	/**
+	 * Gets the last {@link Segment} of the container. 
+	 * @return the last Segment or null if no segment is found.
+	 */
+	public Segment getLastSegment() {
+		for ( int i=parts.size()-1; i>=0; i-- ) {
+			if ( parts.get(i).isSegment() ) {
+				return (Segment)parts.get(i);
+			}
+		}
+		// Should never occur
+		return null;
+	}
 
 	/**
 	 * Gets the content of the first part (segment or non-segment) of this container.
