@@ -48,6 +48,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 /**
@@ -1130,4 +1131,20 @@ public class Util {
 		return res;
 	}
 	
+	
+	/**
+	 * Generate a random string consisting only of numbers 
+	 * @param length - specifies the number of integers used to build the string
+	 * @return a random String
+	 */
+	public static String generateRandomId(int length) {
+		Random rnd = new Random();
+
+		StringBuilder sb = new StringBuilder( length );
+		  for( int i = 0; i < length; i++ ) { 
+			  sb.append(rnd.nextInt(length));
+		  }
+		  return sb.toString();
+
+	}
 }
