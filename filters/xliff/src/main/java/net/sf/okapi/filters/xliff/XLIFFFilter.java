@@ -720,11 +720,13 @@ public class XLIFFFilter implements IFilter {
 			skel.addContentPlaceholder(tu, trgLang);
 			tc = processContent("target", false);
 			if ( !tc.isEmpty() ) {
-				//TODO: Solve the unwarp!!! if ( !preserveSpaces.peek() ) TextFragment.unwrap(tc.getContent());
+				if ( !preserveSpaces.peek() ) {
+					tc.unwrap(true);
+				}
 				tu.setPreserveWhitespaces(preserveSpaces.peek());
 				tu.setTarget(trgLang, tc);
 			}
-
+			
 			// Set the target properties (after the target container has been set
 			if ( stateValue != null ) {
 				tu.setTargetProperty(trgLang, new Property("state", stateValue, false));

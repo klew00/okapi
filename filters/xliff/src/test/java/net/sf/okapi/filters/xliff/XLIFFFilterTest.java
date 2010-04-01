@@ -346,12 +346,30 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
-	public void testWrapSpaces () {
+	public void testUnwrapSpaces () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithSpaces(), 2);
 		assertNotNull(tu);
 		fmt.setContent(tu.getSource().getFirstPartContent());
 		assertFalse(tu.preserveWhitespaces());
 		assertEquals("t1 t2 t3 <1/> t4", fmt.toString());
+	}
+
+	@Test
+	public void testPreserveSpacesInSegmentedTU () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createSegmentedTUWithSpaces(), 1);
+		assertNotNull(tu);
+		assertEquals("[t1  t2]  [t3  t4]", fmt.printSegmentedContent(tu.getSource(), true));
+		//TODO: XLIFF filter needs to get segmented targets too
+		assertEquals("[tt1  tt2  tt3  tt4]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+	}
+
+	@Test
+	public void testUnwrapSpacesInSegmentedTU () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createSegmentedTUWithSpaces(), 2);
+		assertNotNull(tu);
+		assertEquals("[t1 t2] [t3 t4]", fmt.printSegmentedContent(tu.getSource(), true));
+		//TODO: XLIFF filter needs to get segmented targets too
+		assertEquals("[tt1 tt2 tt3 tt4]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
 	}
 
 	@Test
@@ -500,6 +518,24 @@ public class XLIFFFilterTest {
 		return getEvents(snippet);
 	}
 	
+	private ArrayList<Event> createSegmentedTUWithSpaces () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\" xml:space='preserve'><source>t1  t2  t3  t4</source>"
+			+ "<seg-source><mrk mid='1' mtype='seg'>t1  t2</mrk>  <mrk mid='2' mtype='seg'>t3  t4</mrk></seg-source>"
+			+ "<target xml:lang='fr'>tt1  tt2  tt3  tt4</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"2\"><source>t1  t2  t3  t4</source>"
+			+ "<seg-source><mrk mid='1' mtype='seg'>t1  t2</mrk>  <mrk mid='2' mtype='seg'>t3  t4</mrk></seg-source>"
+			+ "<target xml:lang='fr'>tt1  tt2  tt3  tt4</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		return getEvents(snippet);
+	}
+
 	private ArrayList<Event> createApprovedTU () {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<xliff version=\"1.2\">\r"
