@@ -1118,6 +1118,18 @@ public class TextContainerTest {
 		assertEquals(-1, tc.getPartIndex(3));
 	}
 	
+	@Test
+	public void testSwapSegments () {
+		TextContainer tc = createMultiSegmentContentWithCodes();
+		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
+		assertEquals("0", tc.getSegment(0).id);
+		assertEquals("1", tc.getSegment(1).id);
+		tc.swapSegments(0, 1);
+		assertEquals("[text2<2/>] [text1<1/>]", fmt.printSegmentedContent(tc, true));
+		assertEquals("1", tc.getSegment(0).id);
+		assertEquals("0", tc.getSegment(1).id);
+	}
+	
 	private TextContainer createMultiSegmentContent () {
 		TextFragment tf = new TextFragment("text1");
 		TextContainer tc = new TextContainer(tf);

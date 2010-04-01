@@ -1264,6 +1264,27 @@ public class TextContainer implements Iterable<Segment> {
 	}
 	
 	/**
+	 * Swaps two segments in this container.
+	 * <p>For example, if you have a container "[segment1] [segment2]" and call
+	 * <code>swap(0,1)</code> the resulting container becomes: "[segment2] [segment1]".
+	 * <p>Note that the segments identifiers stay with their segment.
+	 * @param segIndex1 the segment index of the first segment to swap.
+	 * @param segIndex2 the segment index of the second segment to swap.
+	 */
+	public void swapSegments (int segIndex1,
+		int segIndex2)
+	{
+		int partIndex1 = getPartIndex(segIndex1);
+		int partIndex2 = getPartIndex(segIndex2);
+		if (( partIndex1 == -1 ) || ( partIndex2 == -1 )) {
+			return; // At least one index is wrong: do nothing
+		}
+		TextPart tmp = parts.get(partIndex1);
+		parts.set(partIndex1, parts.get(partIndex2));
+		parts.set(partIndex2, tmp);
+	}
+	
+	/**
 	 * Checks if the id of a given segment is empty, null or a duplicate. If it is, the id
 	 * is automatically set to a new value auto-generated.
 	 * @param seg the segment to verify.

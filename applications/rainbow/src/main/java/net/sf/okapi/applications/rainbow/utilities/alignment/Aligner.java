@@ -657,34 +657,30 @@ public class Aligner {
 	 * @param direction Use 1 to move up, -1 to move down.
 	 */
 	private void moveSegment (int direction) {
-		return; //
-//		try {
-//			int n = trgList.getSelectionIndex();
-//			// Sanity checks
-//			if (( direction != 1 ) && ( direction != -1 )) return;
-//			if ( direction == 1 ) {
-//				if ( n+1 > trgList.getItemCount() ) return;
-//			}
-//			else {
-//				if ( n < 1 ) return;
-//			}
-//			// Swap current segment with the previous/next one
-////TODO: port			java.util.List<Segment> segs = target.getSegments();
-////			Segment tmpSeg = segs.get(n+direction);
-////			segs.set(n+direction, segs.get(n));
-////			segs.set(n, tmpSeg);
-//			// Update
-//			updateTargetDisplay();
-//			fillTargetList(n+direction);
-//			trgList.setFocus();
-//			// Re-check for issues, but don't select one
-//			hasIssue(true, true, false);
-//			synchronizeFromTarget();
-//			manualCorrection = true;
-//		}
-//		catch ( Throwable e) {
-//			Dialogs.showError(shell, e.getMessage(), null);
-//		}
+		try {
+			int n = trgList.getSelectionIndex();
+			// Sanity checks
+			if (( direction != 1 ) && ( direction != -1 )) return;
+			if ( direction == 1 ) {
+				if ( n+1 > trgList.getItemCount() ) return;
+			}
+			else {
+				if ( n < 1 ) return;
+			}
+			// Swap current segment with the previous/next one
+			target.swapSegments(n+direction, n);
+			// Update
+			updateTargetDisplay();
+			fillTargetList(n+direction);
+			trgList.setFocus();
+			// Re-check for issues, but don't select one
+			hasIssue(true, true, false);
+			synchronizeFromTarget();
+			manualCorrection = true;
+		}
+		catch ( Throwable e) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
 	}
 
 	private void mergeWithNext () {
