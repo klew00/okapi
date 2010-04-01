@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class SentenceAlignPipelineStepTest {	
+public class SentenceAlignPipelineStepTest {
 	private Pipeline pipeline;
 	private SentenceAlignerStep aligner;
 	private EventObserver eventObserver;
@@ -30,62 +30,54 @@ public class SentenceAlignPipelineStepTest {
 		pipeline = new Pipeline();
 		eventObserver = new EventObserver();
 		pipeline.addObserver(eventObserver);
-		
+
 		// add filter step
 		IFilter filter = new PlainTextFilter();
 		pipeline.addStep(new RawDocumentToFilterEventsStep(filter));
-		
+
 		// add aligner step
 		aligner = new SentenceAlignerStep();
-		
+
 		Parameters p = new Parameters();
 		p.setGenerateTMX(false);
-		aligner.setParameters(p);		
+		aligner.setParameters(p);
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.plaintext.PlainTextFilter");
-		aligner.setFilterConfigurationMapper(fcMapper);		
+		aligner.setFilterConfigurationMapper(fcMapper);
 		pipeline.addStep(aligner);
-	
+
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		pipeline.destroy();
 	}
-	
+
 	@Test
 	public void sentenceEnglishEnglishAlign() throws URISyntaxException {
 		URL url = SentenceAlignPipelineStepTest.class.getResource("/src.txt");
 		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH);
-		t.setFilterConfigId("okf_plaintext");		
-		aligner.setSecondInput(t);		
+		t.setFilterConfigId("okf_plaintext");
+		aligner.setSecondInput(t);
 		aligner.setSourceLocale(LocaleId.ENGLISH);
 		aligner.setTargetLocale(LocaleId.ENGLISH);
-		
-		pipeline.startBatch();		
-		
-		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/src.txt"), "UTF-8", LocaleId.ENGLISH));
 
-		pipeline.endBatch();			
-		
+		pipeline.startBatch();
+
+		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/src.txt"), "UTF-8",
+				LocaleId.ENGLISH));
+
+		pipeline.endBatch();
+
 		// test we observed the correct events
-		List<Event> el = eventObserver.getResult();  
-		for (Event event : el) {	
-			switch (event.getEventType()) {
-			case TEXT_UNIT:
-				System.out.println(event.getResource().toString());
-				break;
-			default:
-				break;			
-			}			
-		}
-		
+		List<Event> el = eventObserver.getResult();
 		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
 		Event tue = el.remove(0);
-		assertEquals("Mr. Holmes is from the U.K. not the U.S. Is Dr. Watson from there too?", tue.getResource().toString());
-		assertEquals(EventType.TEXT_UNIT, tue.getEventType());		
+		assertEquals("Mr. Holmes is from the U.K. not the U.S. Is Dr. Watson from there too?", tue
+				.getResource().toString());
+		assertEquals(EventType.TEXT_UNIT, tue.getEventType());
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
@@ -96,39 +88,32 @@ public class SentenceAlignPipelineStepTest {
 		URL url = SentenceAlignPipelineStepTest.class.getResource("/trgMultimatch.txt");
 		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.fromString("pt"));
 		t.setFilterConfigId("okf_plaintext");
-		
-		aligner.setSecondInput(t);		
+
+		aligner.setSecondInput(t);
 		aligner.setSourceLocale(LocaleId.ENGLISH);
 		aligner.setTargetLocale(LocaleId.PORTUGUESE);
-		
-		pipeline.startBatch();				
-		
-		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/srcMultimatch.txt"), "UTF-8", LocaleId.ENGLISH));
+
+		pipeline.startBatch();
+
+		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/srcMultimatch.txt"),
+				"UTF-8", LocaleId.ENGLISH));
 
 		pipeline.endBatch();
-		
+
 		// test we observed the correct events
 		List<Event> el = eventObserver.getResult();
-		
-		for (Event event : el) {	
-			switch (event.getEventType()) {
-			case TEXT_UNIT:
-				System.out.println(event.getResource().toString());
-				break;
-			default:
-				break;			
-			}			
-		}
 		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
 		Event tue = el.remove(0);
-		assertEquals("The First Darlek Empire has written: \"The simplest statement we know of is the statement of Davross himself, namely, that the members of the empire should destroy 'all life forms,' which is understood to mean universal destruction.", tue.getResource().toString());
+		assertEquals(
+				"The First Darlek Empire has written: \"The simplest statement we know of is the " +
+				"statement of Davross himself, namely, that the members of the empire should destroy " +
+				"'all life forms,' which is understood to mean universal destruction. No one is justified " +
+				"in making any other statement than this\" (First Darlek Empire letter, Mar. 12, 3035; see " +
+				"also DE 11:4).",
+				tue.getResource().toString());
 		assertEquals(EventType.TEXT_UNIT, tue.getEventType());
-		
-		tue = el.remove(0);
-		assertEquals("No one is justified in making any other statement than this\" (First Darlek Empire letter, Mar. 12, 3035; see also DE 11:4).", tue.getResource().toString());
-		assertEquals(EventType.TEXT_UNIT, tue.getEventType());				
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());

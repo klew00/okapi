@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.gcaligner;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -39,7 +38,6 @@ import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -158,8 +156,8 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
-		TextUnit sourceTu = Utils.segmentSource((TextUnit) sourceEvent.getResource(),
-				sourceSegmenter);
+		TextUnit sourceTu = (TextUnit)sourceEvent.getResource();
+		sourceTu.createSourceSegmentation(sourceSegmenter);
 
 		// Move to the next target TU
 		Event targetEvent = synchronize(EventType.TEXT_UNIT);
@@ -168,29 +166,22 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		if (!sourceTu.isTranslatable())
 			return sourceEvent;
 
-		TextUnit targetTu = Utils.segmentSource((TextUnit) targetEvent.getResource(),
-				targetSegmenter);
+		TextUnit targetTu = (TextUnit)targetEvent.getResource();
+		targetTu.createSourceSegmentation(targetSegmenter);
 
-		if (!sourceTu.getSource().isSegmented() || !targetTu.getSource().isSegmented()) {
+		if (!sourceTu.getSource().hasBeenSegmented() || !targetTu.getSource().hasBeenSegmented()) {
 			// we must have hit some empty content that did not segment
 			LOGGER.warning("Found unsegmented TextUnit. Possibly a TextUnit with empty content.");
 			return sourceEvent;
 		}
 
-		List<TextUnit> alignedTextUnits = sentenceAligner.align(sourceTu, targetTu, sourceLocale,
-				targetLocale);
+		TextUnit alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale, targetLocale);
 
 		// send the aligned TU to the TMX file
-		if (params.isGenerateTMX()) {
-			for (TextUnit alignedTextUnit : alignedTextUnits) {
-				tmx.writeTUFull(alignedTextUnit);
-			}
-		} else { // otherwise send each aligned TextUnit downstream as a multi event
-			MultiEvent me = new MultiEvent();
-			for (TextUnit tu : alignedTextUnits) {
-				me.addEvent(new Event(EventType.TEXT_UNIT, tu));				
-			}			
-			Event e = new Event(EventType.MULTI_EVENT, me);
+		if (params.isGenerateTMX()) {			
+			tmx.writeTUFull(alignedTextUnit);			
+		} else { // otherwise send each aligned TextUnit downstream as a multi event						
+			Event e = new Event(EventType.TEXT_UNIT, alignedTextUnit);
 			return e;
 		}
 		

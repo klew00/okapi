@@ -23,12 +23,14 @@ package net.sf.okapi.steps.gcaligner;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-//import java.util.logging.Logger;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
+import net.sf.okapi.common.resource.AlignedPair;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 
 /**
  * SentenceAligner aligns source and target (paragraph) {@link TextUnit}s and returns a list of aligned sentence-based
@@ -36,18 +38,15 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 
 public class SentenceAligner {
-//	private static final Logger LOGGER = Logger.getLogger(SentenceAligner.class.getName());
 	private static final long MAX_CELL_SIZE = 80000L;
 
-	public List<TextUnit> align(TextUnit sourceParagraph, TextUnit targetParagraph,
+	public TextUnit align(TextUnit sourceParagraph, TextUnit targetParagraph,
 			LocaleId srcLocale, LocaleId trgLocale) {
-		List<TextUnit> alignedTextUnits = null;
-		alignedTextUnits = alignWithoutSkeletonAlignment(sourceParagraph, targetParagraph,
-				srcLocale, trgLocale);
-		return alignedTextUnits;
+		return alignWithoutSkeletonAlignment(sourceParagraph, targetParagraph,
+					srcLocale, trgLocale);
 	}
 
-	private List<TextUnit> alignWithoutSkeletonAlignment(TextUnit sourceParagraph,
+	private TextUnit alignWithoutSkeletonAlignment(TextUnit sourceParagraph,
 			TextUnit targetParagraph, LocaleId srcLocale, LocaleId trgLocale) {
 		SegmentAlignmentFunction alignmentFunction = new SegmentAlignmentFunction(srcLocale,
 				trgLocale);
@@ -55,12 +54,12 @@ public class SentenceAligner {
 				alignmentFunction);
 	}
 
-	private List<TextUnit> alignSegments(TextUnit sourceParagraph, TextUnit targetParagraph,
+	private TextUnit alignSegments(TextUnit sourceParagraph, TextUnit targetParagraph,
 			LocaleId srcLocale, LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction) {
 
 		// make sure the paragraphs have been segmented
-		if (!(sourceParagraph.getSource().isSegmented() || targetParagraph.getSource()
-				.isSegmented())) {
+		if (!(sourceParagraph.getSource().hasBeenSegmented() || targetParagraph.getSource()
+				.hasBeenSegmented())) {
 			throw new OkapiBadStepInputException("Source and target TextUnits must be segmented.");
 		}
 
@@ -77,35 +76,33 @@ public class SentenceAligner {
 				.getSource().getSegments(), alignmentFunction);
 
 		List<DpMatrixCell> result = matrix.align();
-
-		// record the result in a list of TextUnit objects
-		List<TextUnit> alignedTextUnits = new LinkedList<TextUnit>();
+				
+		// record the result in a list of AlignedPairs
+		List<AlignedPair> alignedPairs = new LinkedList<AlignedPair>();
 		
 		Iterator<DpMatrixCell> it = result.iterator();
 		while (it.hasNext()) {
 			DpMatrixCell cell = it.next();
 			if (cell.getState() == DpMatrixCell.DELETED) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
-				alignedTextUnits.add(Utils.makeBilingualTextUnit(sourceParagraph, sourceSegment));
+				alignedPairs.add(new AlignedPair(sourceSegment, null, trgLocale));
 			} else if (cell.getState() == DpMatrixCell.INSERTED) {
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
-				alignedTextUnits.add(Utils.makeBilingualTextUnit(sourceParagraph, targetSegment,
-						trgLocale));
+				alignedPairs.add(new AlignedPair(null, targetSegment, trgLocale));
 			} else if (cell.getState() == DpMatrixCell.MATCH) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
-				alignedTextUnits.add(Utils.makeBilingualTextUnit(sourceParagraph, sourceSegment,
-						targetSegment, trgLocale));
+				alignedPairs.add(new AlignedPair(sourceSegment, targetSegment, trgLocale));				
 			} else if (cell.getState() == DpMatrixCell.MULTI_MATCH) {
 				List<Segment> sourceSegments = matrix.getAlignmentElementsX(cell
 						.getMultiMatchXIndexBegin(), cell.getMultiMatchXIndexEnd());
 				List<Segment> targetSegments = matrix.getAlignmentElementsY(cell
 						.getMultiMatchYIndexBegin(), cell.getMultiMatchYIndexEnd());
-				alignedTextUnits.add(Utils.makeBilingualTextUnit(sourceParagraph, sourceSegments,
-						targetSegments, trgLocale));
+				alignedPairs.add(new AlignedPair(new LinkedList<TextPart>(sourceSegments),
+						new LinkedList<TextPart>(targetSegments), trgLocale));
 			}
 		}
 
-		return alignedTextUnits;
+		return TextUnitUtil.createMultilingualTextUnit(sourceParagraph, alignedPairs, trgLocale);
 	}
 }
