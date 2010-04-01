@@ -1134,7 +1134,7 @@ public class Util {
 	
 	/**
 	 * Generate a random string consisting only of numbers 
-	 * @param length - specifies the number of integers used to build the string
+	 * @param length - specifies length of the string
 	 * @return a random String
 	 */
 	public static String generateRandomId(int length) {
@@ -1142,7 +1142,7 @@ public class Util {
 
 		StringBuilder sb = new StringBuilder( length );
 		  for( int i = 0; i < length; i++ ) { 
-			  sb.append(rnd.nextInt(length));
+			  sb.append(rnd.nextInt(9));
 		  }
 		  return sb.toString();
 

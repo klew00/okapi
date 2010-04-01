@@ -278,6 +278,20 @@ public class UtilTest {
 		assertEquals("", Util.getTextContent(elem));
 	}
 	
+	@Test
+	public void generateRandomId() {
+		String one = Util.generateRandomId(5);
+		String two = Util.generateRandomId(10);
+		assertTrue(one.length() == 5);
+		assertTrue(two.length() == 10);
+		assertNotNull(one);
+		assertNotNull(two);
+		
+		one = Util.generateRandomId(5);
+		two = Util.generateRandomId(5);
+		assertFalse(one.equals(two));
+	}
+	
 	private Document createXMLdocument (String data) {
 		InputSource input = new InputSource(new StringReader(data));
 		Document doc = null;
