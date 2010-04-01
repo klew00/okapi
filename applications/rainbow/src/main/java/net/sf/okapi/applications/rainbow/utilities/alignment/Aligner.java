@@ -691,6 +691,7 @@ public class Aligner {
 		try {
 			int n = trgList.getSelectionIndex();
 			if ( n < 0  ) return;
+			// n is segment index not part, don't use getPartIndex()
 			target.joinSegmentWithNextSegment(n);
 			updateTargetDisplay();
 			fillTargetList(n);
@@ -708,41 +709,13 @@ public class Aligner {
 		int start,
 		int end)
 	{
-//REDO this method using splitPart()		
 		// No split if location is not a range and is not inside text
 		if (( start == end ) && ( start == 0 )) return;
-		// Get the length of the segment to re-split
-		int len = target.getSegment(segIndex).text.getCodedText().length();
-		//TODO: case for if (( start == 0 ) && ( end == len ))
-
-		// Merge the segment to re-split into the main content
-		// All the other segments are still place-holders there
-		int pos = -1; //TODO: target.mergeSegment(segIndex);
-		// Now pos value is the position 0 of the segment character indices
-		if ( pos == -1 ) return; // Segment index not found
-		
-		if ( trimCodes || trimWS ) {
-			//TODO
-		}
-		
-		// Create the new segment(s)
-		if ( start == 0 ) {
-			// Only one new segment: From the end of selection
-			// up to the end of the original segment.
-			target.createSegment(pos+end, pos+len);
-		}
-		else if ( end == len ) {
-			// Only one new segment: From the start of the original segment
-			// up to the start of the selection 
-			target.createSegment(pos, pos+start);
-		}
-		else { 
-			// First new segment goes from start of original to start selection
-			target.createSegment(pos, pos+start);
-			// Second new segment goes from end of previous segment marker
-			// plus the length of the selection to end of original segment minus length of first segment
-			target.createSegment(pos+2+(end-start), pos+(len-(start-2)));
-		}
+		// Convert segment index to part index
+		int partIndex = target.getPartIndex(segIndex);
+		// Do the split
+		target.splitPart(partIndex, start, end, false);
+		// Indicates we made a manual change
 		manualCorrection = true;
 	}
 	
@@ -856,6 +829,21 @@ public class Aligner {
 	
 	private boolean saveData () {
 		if ( splitMode ) return false;
+		
+		// the class works based on index, so we need to make sure
+		// that we have id matching in source and target
+		// On accept both container should have the same number of segments
+		int i = 0;
+		for ( Segment seg : source ) {
+			seg.id = String.valueOf(i);
+			i++;
+		}
+		i = 0;
+		for ( Segment seg : target ) {
+			seg.id = String.valueOf(i);
+			i++;
+		}
+		
 		return true;
 	}
 	
@@ -1033,6 +1021,7 @@ public class Aligner {
 			// Sanity check using common anchors
 			int i = 0;
 			for ( Segment srcSeg : source ) {
+				// Normally we would use srcSeg.id, but the class works based on segment index not id
 				Segment trgSeg = target.getSegment(i);
 				if ( trgSeg == null ) {
 					addIssue(1, String.format("%d: Warning- No target segment for the source segment.", i+1));

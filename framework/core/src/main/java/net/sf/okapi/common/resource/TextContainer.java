@@ -518,7 +518,7 @@ public class TextContainer implements Iterable<Segment> {
 
 	/**
 	 * Creates a set of segments in this container. Use {@link #getCodedText()}
-	 * to get the coded text to use for the segment boundaries.
+	 * to get the coded text to use as athe base for the segment boundaries.
 	 * If the content is already segmented, it is automatically un-segmented before the new
 	 * segmentation is applied.
 	 * @param ranges the ranges of the segments to create. The ranges must be ordered from the lesser
@@ -586,8 +586,8 @@ public class TextContainer implements Iterable<Segment> {
 	}
 
 	/**
-	 * Creates a set of segments in this container. Use {@link #getCodedText()}
-	 * to get the coded text to use for the segment boundaries.
+	 * Creates a segment in this container. Use {@link #getCodedText()}
+	 * to get the coded text to use as the base for the segment boundaries.
 	 * If the content is already segmented, it is automatically un-segmented before the new
 	 * segmentation is applied.
 	 * If start and end position are the same, no segment is created for those boundaries.
@@ -1245,6 +1245,24 @@ public class TextContainer implements Iterable<Segment> {
 		return i;
 	}
 
+	/**
+	 * Gets the part index for a given segment index.
+	 * <p>For example in the container "[segment1] [segment2] [segment3]" the sgment index for "[segment2]" is
+	 * 1 and its part index is 2 because there is one non-segment part before.
+	 * @param segIndex the segment index to convert to part index.
+	 * @return the index of the part for the given segment index.
+	 */
+	public int getPartIndex (int segIndex) {
+		int n = -1;
+		for ( int i=0; i<parts.size(); i++ ) {
+			if ( parts.get(i).isSegment() ) {
+				n++;
+				if ( n == segIndex ) return i;
+			}
+		}
+		return -1; // Not found
+	}
+	
 	/**
 	 * Checks if the id of a given segment is empty, null or a duplicate. If it is, the id
 	 * is automatically set to a new value auto-generated.

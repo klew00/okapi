@@ -1103,6 +1103,21 @@ public class TextContainerTest {
 		assertEquals("[p0]p1", fmt.printSegmentedContent(tc, true));
 	}
 
+	@Test
+	public void testGetPartIndex_Found () {
+		TextContainer tc = createMultiSegmentContentWithCodes();
+		assertEquals(2, tc.getSegmentCount());
+		// Segment index 1 is part 2
+		assertEquals(2, tc.getPartIndex(1));
+	}
+	
+	@Test
+	public void testGetPartIndex_NotFound () {
+		TextContainer tc = createMultiSegmentContentWithCodes();
+		// No segment index 3
+		assertEquals(-1, tc.getPartIndex(3));
+	}
+	
 	private TextContainer createMultiSegmentContent () {
 		TextFragment tf = new TextFragment("text1");
 		TextContainer tc = new TextContainer(tf);
