@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,10 @@ import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
  * Annotates an object with a list of scores. For example, use it to
- * indicate the TM leveraging score of each segment in a TextContainer. 
+ * indicate the TM leveraging score of each segment in a TextContainer.
+ * When such annotation is in place, it is expected to have one score for each segment
+ * in the container, with the index of the each score corresponding to the segment index
+ * (not the part index) of the segment. 
  */
 public class ScoresAnnotation implements IAnnotation {
 

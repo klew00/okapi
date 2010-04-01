@@ -413,13 +413,13 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// The output is driven by the target, not the source, so the interstices parts
 		// are the ones of the target, no the one of the source
 		Iterator<TextPart> iter = trgCont.partIterator();
-		int i = -1;
+		int scoreIndex = -1;
 		
 		while ( iter.hasNext() ) {
 			TextPart part = iter.next();
-			i++;
 			if ( part.isSegment() ) {
-				int lev = (( scores != null ) ? scores.getScore(i) : 0 );
+				scoreIndex++;
+				int lev = (( scores != null ) ? scores.getScore(scoreIndex) : 0 );
 				Segment trgSeg = (Segment)part;
 				Segment srcSeg = srcCont.getSegment(trgSeg.id);
 				if ( srcSeg == null ) {

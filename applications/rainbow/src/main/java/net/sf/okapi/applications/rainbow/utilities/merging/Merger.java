@@ -255,7 +255,7 @@ public class Merger {
 
 		if ( !tuFromTrans.hasTarget(trgLoc) ) {
 			// No translation in package
-			if ( !tu.isEmpty() ) {
+			if ( !tu.getSource().isEmpty() ) {
 				logger.log(Level.WARNING,
 					String.format("Item id=\"%s\": No translation provided; using source instead.", tu.getId()));
 				return; // Use the source

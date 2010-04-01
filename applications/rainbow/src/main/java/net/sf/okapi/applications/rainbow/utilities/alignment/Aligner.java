@@ -69,8 +69,8 @@ import org.eclipse.swt.widgets.Text;
 
 public class Aligner {
 	
-	protected static final String ALIGNSTATUS_KEY       = "Att::AlignStatus";
-	protected static final String ALIGNSTATUS_TOREVIEW  = "TO-REVIEW";
+	protected static final String ALIGNSTATUS_KEY = "Att::AlignStatus";
+	protected static final String ALIGNSTATUS_TOREVIEW = "TO-REVIEW";
 	
 	private Shell shell;
 	private int result = 0;
@@ -116,8 +116,6 @@ public class Aligner {
 	private boolean warnOnClosing;
 	private Pattern anchors;
 	private ArrayList<String> anchorList = new ArrayList<String>();
-	private boolean trimCodes = false;//TODO: take from SRX rules
-	private boolean trimWS = true;//TODO: take from SRX rules
 	private boolean manualCorrection;
 	private LocaleId srcLang;
 	private LocaleId trgLang;
