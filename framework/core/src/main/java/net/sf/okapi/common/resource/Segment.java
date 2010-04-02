@@ -68,9 +68,4 @@ public class Segment extends TextPart {
 	public String getId () {
 		return id;
 	}
-
-	@Override
-	public String toString() {
-		return "Segment [id=" + id + " Text=" + text + "]";
-	}
 }
