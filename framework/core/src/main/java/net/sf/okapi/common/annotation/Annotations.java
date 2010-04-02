@@ -20,12 +20,13 @@
 
 package net.sf.okapi.common.annotation;
 
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Provides annotation mechanism to the resources.
  */
-public class Annotations {
+public class Annotations implements Iterable<IAnnotation> {
 	
 	private ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation> annotations;
 
@@ -84,4 +85,10 @@ public class Annotations {
 	protected void setAnnotations(ConcurrentHashMap<Class<? extends IAnnotation>, IAnnotation> annotations) {
 		this.annotations = annotations;
 	}
+
+	@Override
+	public Iterator<IAnnotation> iterator() {
+		return annotations.values().iterator();
+	}
+	
 }

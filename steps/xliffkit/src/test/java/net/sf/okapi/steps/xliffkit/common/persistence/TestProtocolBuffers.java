@@ -20,6 +20,9 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,8 +32,10 @@ import java.net.URISyntaxException;
 
 import org.junit.Test;
 
+import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.steps.xliffkit.common.persistence.AddressBookProtos.AddressBook;
 import net.sf.okapi.steps.xliffkit.common.persistence.AddressBookProtos.Person;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.BaseNameableBean;
 
 
 public class TestProtocolBuffers {
@@ -38,8 +43,17 @@ public class TestProtocolBuffers {
 	private static final String fileName = "test2.txt";
 	
 	@Test
-	public void test() {
+	public void test1234() {
 		
+	}
+	
+	@Test
+	public void testBean() {
+		
+		BaseNameableBean bean = new BaseNameableBean();
+		bean.set(new BaseNameable());
+		bean.set(null);
+		assertNotNull(bean);
 	}
 	
 	// DEBUG @Test

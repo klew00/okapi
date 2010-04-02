@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,16 +20,17 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
-import java.io.InputStream;
-import java.io.Reader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class RawDocumentBean implements IPersistenceBean {
 
@@ -38,30 +39,83 @@ public class RawDocumentBean implements IPersistenceBean {
 	private String id;
 	private String encoding;
 	private String srcLoc;
-	private LocaleId trgLoc;
-	private URI inputURI;
-	private CharSequence inputCharSequence;
-	private boolean hasReaderBeenCalled;
-	private Reader reader;
-	private InputStream inputStream;
-	private FactoryBean skeleton;
+	private String trgLoc;
+	private String inputURI;
+	private String inputCharSequence;
+	// TODO Handle inputStream if possible at all
+	// private InputStreamBean inputStream; 
 	
 	@Override
-	public void init(IPersistenceSession session) {
-		// TODO Auto-generated method stub
-
+	public <T> T get(T obj) {
+		if (obj instanceof RawDocument) {
+			RawDocument rd = (RawDocument) obj;
+		
+			for (FactoryBean annotationBean : annotations)
+				rd.setAnnotation(annotationBean.get(IAnnotation.class));
+							
+			rd.setFilterConfigId(filterConfigId);
+			rd.setId(id);
+			rd.setEncoding(encoding);			
+		}		
+		return obj;
 	}
-
+	
 	@Override
 	public <T> T get(Class<T> classRef) {
-		// TODO Auto-generated method stub
-		return null;
+		RawDocument rd = null;
+		
+		if (!Util.isEmpty(inputURI))
+			try {
+				rd = new RawDocument(new URI(inputURI), encoding, new LocaleId(srcLoc), new LocaleId(trgLoc));
+			} catch (URISyntaxException e) {
+				// TODO Handle exception
+				e.printStackTrace();
+			}
+		else if (!Util.isEmpty(inputCharSequence))
+			rd = new RawDocument(inputCharSequence, new LocaleId(srcLoc), new LocaleId(trgLoc));		
+		else
+			// TODO Handle inputStream or empty input params
+			rd = new RawDocument("", new LocaleId(srcLoc), new LocaleId(trgLoc));
+		
+		return classRef.cast(get(rd));
 	}
 
 	@Override
 	public IPersistenceBean set(Object obj) {
-		// TODO Auto-generated method stub
-		return null;
+		if (obj instanceof RawDocument) {
+			RawDocument rd = (RawDocument) obj;
+			
+			for (IAnnotation annotation : rd.getAnnotations()) {
+				FactoryBean annotationBean = new FactoryBean();
+				annotations.add(annotationBean);
+				annotationBean.set(annotation);
+			}
+			
+			filterConfigId = rd.getFilterConfigId();
+			id = rd.getId();
+			encoding = rd.getEncoding();
+			
+			if (rd.getSourceLocale() != null)
+				srcLoc = rd.getSourceLocale().toString();
+			
+			if (rd.getTargetLocale() != null)
+				trgLoc = rd.getTargetLocale().toString();
+
+			if (rd.getInputURI() != null)
+				inputURI = rd.getInputURI().toString();
+			
+			if (rd.getInputCharSequence() != null)
+				inputCharSequence = rd.getInputCharSequence().toString();
+		}
+		return this;
+	}
+
+	public List<FactoryBean> getAnnotations() {
+		return annotations;
+	}
+
+	public void setAnnotations(List<FactoryBean> annotations) {
+		this.annotations = annotations;
 	}
 
 	public String getFilterConfigId() {
@@ -96,68 +150,27 @@ public class RawDocumentBean implements IPersistenceBean {
 		this.srcLoc = srcLoc;
 	}
 
-	public LocaleId getTrgLoc() {
+	public String getTrgLoc() {
 		return trgLoc;
 	}
 
-	public void setTrgLoc(LocaleId trgLoc) {
+	public void setTrgLoc(String trgLoc) {
 		this.trgLoc = trgLoc;
 	}
 
-	public URI getInputURI() {
+	public String getInputURI() {
 		return inputURI;
 	}
 
-	public void setInputURI(URI inputURI) {
+	public void setInputURI(String inputURI) {
 		this.inputURI = inputURI;
 	}
 
-	public CharSequence getInputCharSequence() {
+	public String getInputCharSequence() {
 		return inputCharSequence;
 	}
 
-	public void setInputCharSequence(CharSequence inputCharSequence) {
+	public void setInputCharSequence(String inputCharSequence) {
 		this.inputCharSequence = inputCharSequence;
 	}
-
-	public boolean isHasReaderBeenCalled() {
-		return hasReaderBeenCalled;
-	}
-
-	public void setHasReaderBeenCalled(boolean hasReaderBeenCalled) {
-		this.hasReaderBeenCalled = hasReaderBeenCalled;
-	}
-
-	public Reader getReader() {
-		return reader;
-	}
-
-	public void setReader(Reader reader) {
-		this.reader = reader;
-	}
-
-	public InputStream getInputStream() {
-		return inputStream;
-	}
-
-	public void setInputStream(InputStream inputStream) {
-		this.inputStream = inputStream;
-	}
-
-	public FactoryBean getSkeleton() {
-		return skeleton;
-	}
-
-	public void setSkeleton(FactoryBean skeleton) {
-		this.skeleton = skeleton;
-	}
-
-	public void setAnnotations(List<FactoryBean> annotations) {
-		this.annotations = annotations;
-	}
-
-	public List<FactoryBean> getAnnotations() {
-		return annotations;
-	}
-
 }

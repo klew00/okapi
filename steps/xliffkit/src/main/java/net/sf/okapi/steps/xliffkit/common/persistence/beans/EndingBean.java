@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,7 +28,6 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class EndingBean implements IPersistenceBean {
 
@@ -37,19 +36,22 @@ public class EndingBean implements IPersistenceBean {
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(T obj) {
+		if (obj instanceof Ending) {
+			Ending en = (Ending) obj;
+		
+			en.setId(id);
+			en.setSkeleton(skeleton.get(ISkeleton.class));
+			
+			for (FactoryBean annotationBean : annotations)
+				en.setAnnotation(annotationBean.get(IAnnotation.class));
+		}		
+		return obj;
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		Ending en = new Ending(id);
-		
-		en.setSkeleton(skeleton.get(ISkeleton.class));
-		
-		for (FactoryBean annotationBean : annotations)
-			en.setAnnotation(annotationBean.get(IAnnotation.class));
-		
-		return classRef.cast(en);
+	public <T> T get(Class<T> classRef) {		
+		return classRef.cast(get(new Ending(id)));
 	}
 
 	@Override
@@ -60,8 +62,11 @@ public class EndingBean implements IPersistenceBean {
 			id = en.getId();
 			skeleton.set(en.getSkeleton());
 			
-			// TODO Ending.getAnnotations()
-			//annotations.set(en.getAnnotations());
+			for (IAnnotation annotation : en.getAnnotations()) {
+				FactoryBean annotationBean = new FactoryBean();
+				annotations.add(annotationBean);
+				annotationBean.set(annotation);
+			}
 		}
 		return this;
 	}

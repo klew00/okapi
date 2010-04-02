@@ -584,4 +584,8 @@ public class TextUnit implements INameable, IReferenceable {
 		}
 		source.createSegments(ranges);
 	}
+
+	public Annotations getAnnotations() {
+		return (annotations == null) ? new Annotations() : annotations;
+	}
 }

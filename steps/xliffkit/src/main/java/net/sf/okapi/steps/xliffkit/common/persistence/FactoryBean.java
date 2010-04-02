@@ -22,15 +22,23 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import net.sf.okapi.common.ClassUtil;
 
-public class FactoryBean implements IPersistenceBean {
-
+public class FactoryBean implements IPersistenceBean {	
 	private String className;
-	private Object content;
-	private IPersistenceSession session;
+	private Object content;		
+	
+	@Override
+	public <T> T get(T obj) {
+		return obj;
+	}
+	
+	@Override
+	public <T> T get(Class<T> classRef) {
+		return classRef.cast(validateContent() ? ((IPersistenceBean) content).get(content.getClass()) : null);
+	}
 	
 	@Override
 	public IPersistenceBean set(Object obj) {		
-		className = ClassUtil.getQualifiedName(obj);
+		className = ClassUtil.getQualifiedClassName(obj);
 		//System.out.println(className);
 		
 		IPersistenceBean bean = PersistenceMapper.getBean(ClassUtil.getClass(obj));
@@ -38,20 +46,15 @@ public class FactoryBean implements IPersistenceBean {
 		
 		return (bean instanceof FactoryBean) ? this : bean.set(obj); 
 	}
-
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return (validateContent()) ? ((IPersistenceBean) content).get(classRef) : null;
-	}
 	
 	private boolean validateContent() {
 		if (content == null) return false;
 		if (className == null) return false;
-		if (session == null) return false;
 		
-		String cname = ClassUtil.getQualifiedName(content);
+		String cname = ClassUtil.getQualifiedClassName(content);
 		if (!className.equals(cname))			
-			content = session.convert(content, PersistenceMapper.getBeanClass(className));
+			content = JSONObjectConverter.convert(content, PersistenceMapper.getBeanClass(className));
+		if (content == null) return false;
 		
 		return className.equals(cname);
 	}
@@ -72,8 +75,4 @@ public class FactoryBean implements IPersistenceBean {
 		return content;
 	}
 
-	@Override
-	public void init(IPersistenceSession session) {		
-		this.session = session;
-	}
 }

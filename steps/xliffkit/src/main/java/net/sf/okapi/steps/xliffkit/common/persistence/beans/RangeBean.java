@@ -18,14 +18,48 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.common.persistence;
+package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
-public interface IPersistenceBean {
+import net.sf.okapi.common.Range;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 
-	<T> T get(T obj);
+public class RangeBean implements IPersistenceBean {
+	private int start;
+	private int end;
 	
-	<T> T get(Class<T> classRef);
+	@Override
+	public <T> T get(T obj) {
+		return obj;
+	}
+
+	@Override
+	public <T> T get(Class<T> classRef) {
+		return classRef.cast(get(new Range(start, end)));
+	}
 	
-	IPersistenceBean set(Object obj); // Returns self to allow chaining
-	
+	@Override
+	public IPersistenceBean set(Object obj) {		
+		if (obj instanceof Range) {
+			Range r = (Range) obj;
+			start = r.start;
+			end = r.end;
+		}
+		return this;
+	}
+
+	public int getStart() {
+		return start;
+	}
+
+	public void setStart(int start) {
+		this.start = start;
+	}
+
+	public int getEnd() {
+		return end;
+	}
+
+	public void setEnd(int end) {
+		this.end = end;
+	}
 }

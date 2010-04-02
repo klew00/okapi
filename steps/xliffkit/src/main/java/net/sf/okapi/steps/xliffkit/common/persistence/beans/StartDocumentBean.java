@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,11 +26,9 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class StartDocumentBean extends BaseNameableBean {
 
-	private String id;
 	private String locale;
 	private String encoding;
 	private boolean isMultilingual;
@@ -40,22 +38,25 @@ public class StartDocumentBean extends BaseNameableBean {
 	private String lineBreak;
 	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(T obj) {
+		obj = super.get(obj);
+		
+		if (obj instanceof StartDocument) {
+			StartDocument sd = (StartDocument) obj;
+			
+			sd.setLocale(new LocaleId(locale));
+			sd.setEncoding(encoding, hasUTF8BOM);
+			sd.setMultilingual(isMultilingual);
+			sd.setFilterParameters(filterParameters.get(IParameters.class));
+			sd.setFilterWriter(filterWriter.get(IFilterWriter.class));
+			sd.setLineBreak(lineBreak);
+		}		
+		return obj;
 	}
-
+	
 	@Override
 	public <T> T get(Class<T> classRef) {
-		StartDocument sd = new StartDocument(id);
-		
-		sd.setId(id);
-		sd.setLocale(new LocaleId(locale));
-		sd.setEncoding(encoding, hasUTF8BOM);
-		sd.setMultilingual(isMultilingual);
-		sd.setFilterParameters(filterParameters.get(IParameters.class));
-		sd.setFilterWriter(filterWriter.get(IFilterWriter.class));
-		sd.setLineBreak(lineBreak);
-		
-		return classRef.cast(sd);
+		return classRef.cast(get(new StartDocument(getId())));
 	}
 
 	@Override
@@ -65,8 +66,6 @@ public class StartDocumentBean extends BaseNameableBean {
 		if (obj instanceof StartDocument) {
 			StartDocument sd = (StartDocument) obj;
 	
-			id = sd.getId();
-			
 			LocaleId loc = sd.getLocale(); 
 			if (loc != null)
 				locale = loc.toString();
@@ -79,14 +78,6 @@ public class StartDocumentBean extends BaseNameableBean {
 			lineBreak = sd.getLineBreak();
 		}
 		return this;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String getLocale() {
@@ -144,5 +135,4 @@ public class StartDocumentBean extends BaseNameableBean {
 	public FactoryBean getFilterParameters() {
 		return filterParameters;
 	}
-
 }

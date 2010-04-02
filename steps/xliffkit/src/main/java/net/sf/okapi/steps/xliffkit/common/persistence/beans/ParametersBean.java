@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,31 +23,31 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class ParametersBean implements IPersistenceBean {
 
 	private String data;
 	
 	@Override
+	public <T> T get(T obj) {
+		if (obj instanceof IParameters) {
+			IParameters params = (IParameters) obj;			
+			params.fromString(data);
+		}
+		return obj;
+	}
+	
+	@Override
 	public <T> T get(Class<T> classRef) {
 		IParameters params = null;
 		try {
-			params = (IParameters) ClassUtil.instantiateClass(classRef);
-			params.fromString(data);
-		} catch (InstantiationException e) {
-			// TODO Handle exception
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Handle exception
-			e.printStackTrace();
-		}
+			params = (IParameters) ClassUtil.instantiateClass(classRef);			
+		} catch (Exception e) {
+			throw new RuntimeException(String.format("ParametersBean: cannot instantiate %s", ClassUtil.getClassName(classRef)), e);
+		}		
+		params.fromString(data);
 		
-		return classRef.cast(params);
-	}
-
-	@Override
-	public void init(IPersistenceSession session) {
+		return classRef.cast(get(params));
 	}
 
 	@Override
@@ -66,5 +66,4 @@ public class ParametersBean implements IPersistenceBean {
 	public void setData(String data) {
 		this.data = data;
 	}
-
 }

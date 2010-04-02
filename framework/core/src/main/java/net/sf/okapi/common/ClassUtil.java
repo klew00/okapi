@@ -62,15 +62,15 @@ public class ClassUtil {
 	}
 
 	/**
-	 * Gets a qualified name of the given object.
+	 * Gets a qualified class name of the given object.
 	 * @param obj The object
 	 * @return Qualified class name
 	 */
-	public static String getQualifiedName(Object obj) {
+	public static String getQualifiedClassName(Object obj) {
 		
 		if (obj == null) return "";
 		
-		return getQualifiedName(obj.getClass());
+		return getQualifiedClassName(obj.getClass());
 	}
 	
 	/**
@@ -78,7 +78,7 @@ public class ClassUtil {
 	 * @param classRef Class reference
 	 * @return Qualified class name
 	 */
-	public static String getQualifiedName(Class<?> classRef) {
+	public static String getQualifiedClassName(Class<?> classRef) {
 		
 		if (classRef == null) return "";
 		

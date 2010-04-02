@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,16 +27,16 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class BaseNameableBean implements IPersistenceBean{
 
 	private String id;
-	private FactoryBean skeleton = new FactoryBean();
 	private String name;
 	private String type;
+	private FactoryBean skeleton = new FactoryBean();	
 	private String mimeType;
 	private boolean isTranslatable;
 	private boolean preserveWS;
@@ -45,31 +45,34 @@ public class BaseNameableBean implements IPersistenceBean{
 	private List<PropertyBean> sourceProperties = new ArrayList<PropertyBean>();
 	
 	@Override
-	public <T> T get(Class<T> classRef) {
-		BaseNameable bn = new BaseNameable();
-		
-		bn.setId(id);
-		bn.setSkeleton(skeleton.get(ISkeleton.class));
-		bn.setName(name);
-		bn.setType(type);
-		bn.setMimeType(mimeType);
-		bn.setIsTranslatable(isTranslatable);
-		bn.setPreserveWhitespaces(preserveWS);
-		
-		for (PropertyBean prop : properties)
-			bn.setProperty(prop.get(Property.class));
-		
-		for (FactoryBean annotationBean : annotations)
-			bn.setAnnotation(annotationBean.get(IAnnotation.class));
-		
-		for (PropertyBean prop : sourceProperties)
-			bn.setSourceProperty(prop.get(Property.class));
-		
-		return classRef.cast(bn);
+	public <T> T get(T obj) {
+		if (obj instanceof BaseNameable) {
+			BaseNameable bn = (BaseNameable) obj;
+			
+			bn.setId(id);		
+			bn.setName(name);
+			bn.setType(type);
+			
+			bn.setSkeleton(skeleton.get(ISkeleton.class));
+			bn.setMimeType(mimeType);
+			bn.setIsTranslatable(isTranslatable);
+			bn.setPreserveWhitespaces(preserveWS);
+			
+			for (PropertyBean prop : properties)
+				bn.setProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly())));
+			
+			for (FactoryBean annotationBean : annotations)
+				bn.setAnnotation(annotationBean.get(IAnnotation.class));
+			
+			for (PropertyBean prop : sourceProperties)
+				bn.setSourceProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly())));
+		}
+		return obj;
 	}
-
+	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(Class<T> classRef) {		
+		return classRef.cast(get(new BaseNameable()));
 	}
 
 	@Override
@@ -77,10 +80,11 @@ public class BaseNameableBean implements IPersistenceBean{
 		if (obj instanceof BaseNameable) {
 			BaseNameable bn = (BaseNameable) obj;
 			
-			id = bn.getId();
-			skeleton.set(bn.getSkeleton());
+			id = bn.getId();			
 			name = bn.getName();
 			type = bn.getType();
+			bn.setSkeleton(new GenericSkeleton());
+			skeleton.set(bn.getSkeleton());
 			mimeType = bn.getMimeType();
 			isTranslatable = bn.isTranslatable();
 			preserveWS = bn.preserveWhitespaces();
@@ -91,8 +95,11 @@ public class BaseNameableBean implements IPersistenceBean{
 				properties.add(propBean);
 			}
 			
-			// TODO BaseNamable.getAnnotations()
-			//annotations.set(bn.getAnnotations());
+			for (IAnnotation annotation : bn.getAnnotations()) {
+				FactoryBean annotationBean = new FactoryBean();
+				annotations.add(annotationBean);
+				annotationBean.set(annotation);
+			}
 			
 			for (String propName : bn.getSourcePropertyNames()) {
 				PropertyBean propBean = new PropertyBean();

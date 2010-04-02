@@ -278,4 +278,8 @@ public class BaseNameable implements INameable {
 		preserveWS = value;
 	}
 
+	public Annotations getAnnotations() {
+		return (annotations == null) ? new Annotations() : annotations;
+	}
+
 }

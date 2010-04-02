@@ -65,11 +65,15 @@ public class Document implements IResource, Iterable<IResource> {
 	 */
 	@Override	
 	public void setSkeleton(ISkeleton skeleton) {
-		throw new OkapiNotImplementedException("Dcoument has no skeleton");
+		throw new OkapiNotImplementedException("Document has no skeleton");
 	}
 
 	@Override
 	public Iterator<IResource> iterator() {
 		return documentResources.iterator();
+	}
+
+	public Annotations getAnnotations() {
+		return (annotations == null) ? new Annotations() : annotations;
 	}	
 }

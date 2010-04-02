@@ -20,75 +20,41 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class CodeBean implements IPersistenceBean {
 
-	private TagType tagType;
-	private int id;
-	private String type;
 	private String data;
-	private String outerData;
-	private int flag;
-	private LinkedHashMap<String, InlineAnnotationBean> annotations = new LinkedHashMap<String, InlineAnnotationBean>();
 	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(T obj) {
+		return obj;
 	}
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		Code code = new Code(tagType, type, data);
-		code.setId(id);
-		code.setOuterData(outerData);
-		// TODO flag handling in Code
-		// code.setFlag
+		List<Code> codes = Code.stringToCodes(data);
+		if (Util.isEmpty(codes))
+			return null;
 		
-		return classRef.cast(code);
+		return classRef.cast(codes.get(0));
 	}
-
+	
 	@Override
 	public IPersistenceBean set(Object obj) {
 		if (obj instanceof Code) {
 			Code code = (Code) obj;
-			tagType = code.getTagType();
-			id = code.getId();
-			type = code.getType();
-			data = code.getData();
-			outerData = code.getOuterData();
-			// TODO flag handling in Code
-			//flag = code.get;
+
+			List<Code> codes = new ArrayList<Code>();
+			codes.add(code);
+			data = Code.codesToString(codes);
 		}
 		return this;
-	}
-
-	public TagType getTagType() {
-		return tagType;
-	}
-
-	public void setTagType(TagType tagType) {
-		this.tagType = tagType;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public String getData() {
@@ -98,30 +64,4 @@ public class CodeBean implements IPersistenceBean {
 	public void setData(String data) {
 		this.data = data;
 	}
-
-	public String getOuterData() {
-		return outerData;
-	}
-
-	public void setOuterData(String outerData) {
-		this.outerData = outerData;
-	}
-
-	public int getFlag() {
-		return flag;
-	}
-
-	public void setFlag(int flag) {
-		this.flag = flag;
-	}
-
-	public LinkedHashMap<String, InlineAnnotationBean> getAnnotations() {
-		return annotations;
-	}
-
-	public void setAnnotations(
-			LinkedHashMap<String, InlineAnnotationBean> annotations) {
-		this.annotations = annotations;
-	}
-
 }

@@ -18,14 +18,41 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.common.persistence;
+package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
-public interface IPersistenceBean {
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 
-	<T> T get(T obj);
+public class TextPartBean implements IPersistenceBean {
+	private TextFragmentBean text = new TextFragmentBean(); 
 	
-	<T> T get(Class<T> classRef);
+	@Override
+	public <T> T get(T obj) {		
+		return obj;
+	}
 	
-	IPersistenceBean set(Object obj); // Returns self to allow chaining
-	
+	@Override
+	public <T> T get(Class<T> classRef) {
+		return classRef.cast(get(new TextPart(text.get(TextFragment.class))));
+	}
+
+	@Override
+	public IPersistenceBean set(Object obj) {
+		if (obj instanceof TextPart) {
+			TextPart tp = (TextPart) obj;
+			
+			text.set(tp.getContent());
+		}
+			
+		return this;
+	}
+
+	public void setText(TextFragmentBean text) {
+		this.text = text;
+	}
+
+	public TextFragmentBean getText() {
+		return text;
+	}
 }

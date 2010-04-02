@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,6 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class PropertyBean implements IPersistenceBean {
 
@@ -37,19 +36,21 @@ public class PropertyBean implements IPersistenceBean {
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(T obj) {
+		if (obj instanceof Property) {
+			Property prop = (Property) obj;
+		
+			for (FactoryBean annotationBean : annotations)
+				prop.setAnnotation(annotationBean.get(IAnnotation.class));
+		}
+		return obj;
 	}
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		Property prop = new Property(name, value, isReadOnly);
-		
-		for (FactoryBean annotationBean : annotations)
-			prop.setAnnotation(annotationBean.get(IAnnotation.class));
-		
-		return classRef.cast(prop);
+		return classRef.cast(get(new Property(name, value, isReadOnly)));
 	}
-
+	
 	@Override
 	public IPersistenceBean set(Object obj) {
 		if (obj instanceof Property) {
@@ -58,8 +59,11 @@ public class PropertyBean implements IPersistenceBean {
 			value = prop.getValue();
 			isReadOnly = prop.isReadOnly();
 			
-			// TODO Property.getAnnotations()
-			//annotations.write(tu.ge)
+			for (IAnnotation annotation : prop.getAnnotations()) {
+				FactoryBean annotationBean = new FactoryBean();
+				annotations.add(annotationBean);
+				annotationBean.set(annotation);
+			}
 		}
 		return this;
 	}
@@ -87,5 +91,4 @@ public class PropertyBean implements IPersistenceBean {
 	public boolean isReadOnly() {
 		return isReadOnly;
 	}
-
 }

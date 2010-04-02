@@ -20,22 +20,62 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 
-public class StartGroupBean extends BaseReferenceableBean {
+public class ZipFileBean implements IPersistenceBean {
 
+	private String name;  // ZIP file name
+	private List<ZipEntryBean> entries = new ArrayList<ZipEntryBean>(); // enumeration of the ZIP file entries 
+	
 	@Override
 	public <T> T get(T obj) {
-		return super.get(obj);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		return super.get(classRef);
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
+
 	@Override
 	public IPersistenceBean set(Object obj) {
-		return super.set(obj);
+		if (obj instanceof ZipFile) {
+			ZipFile zf = (ZipFile) obj;
+			
+			name = zf.getName();
+			
+			for (Enumeration<? extends ZipEntry> e = zf.entries(); e.hasMoreElements();) {
+				ZipEntry entry = e.nextElement();
+				ZipEntryBean entryBean = new ZipEntryBean();
+				entryBean.set(entry);
+				entries.add(entryBean);
+			}
+		}
+		return this;
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public List<ZipEntryBean> getEntries() {
+		return entries;
+	}
+
+	public void setEntries(List<ZipEntryBean> entries) {
+		this.entries = entries;
+	}
+
 }

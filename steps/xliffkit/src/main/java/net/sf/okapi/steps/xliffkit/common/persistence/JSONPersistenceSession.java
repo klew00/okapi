@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -62,18 +62,12 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	}
 	
 	@Override
-	public <T> T convert(Object object, Class<T> expectedClass) {		
-		return mapper.convertValue(object, expectedClass);
-	}
-
-	@Override
 	public Object deserialize() {
 		if (!isActive) return null;
 		
 		IPersistenceBean bean = null;
 		try {
 			bean = mapper.readValue(inStream, beanClass);
-			bean.init(this);
 						
 		} catch (JsonParseException e) {
 			// TODO Handle exception
@@ -114,12 +108,11 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		if (!rootClass.isInstance(obj))
 			throw new IllegalArgumentException(String.format("JSONPersistenceSession: " +
 					"unable to serialize %s, this session handles only %s", 
-					ClassUtil.getQualifiedName(obj),
-					ClassUtil.getQualifiedName(rootClass)));
+					ClassUtil.getQualifiedClassName(obj),
+					ClassUtil.getQualifiedClassName(rootClass)));
 		
 		IPersistenceBean bean = PersistenceMapper.getBean(rootClass);
 		
-		bean.init(this);
 		bean.set(obj);
 		
 //		Event ev = bean.read(Event.class);

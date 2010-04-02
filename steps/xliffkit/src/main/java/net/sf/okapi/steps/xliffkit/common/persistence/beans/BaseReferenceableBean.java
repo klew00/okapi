@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,31 +22,28 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.resource.BaseReferenceable;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class BaseReferenceableBean extends BaseNameableBean {
 
 	private int refCount;
 	private String parentId;
-	private IPersistenceSession session;
+	
+	@Override
+	public <T> T get(T obj) {		
+		obj = super.get(obj);
+		
+		if (obj instanceof BaseReferenceable) {						
+			
+			BaseReferenceable br = (BaseReferenceable) obj;
+			br.setReferenceCount(refCount);
+			br.setParentId(parentId);			
+		}
+		return obj;
+	}
 	
 	@Override
 	public <T> T get(Class<T> classRef) {		
-		BaseReferenceable br = null;
-		
-		if (session == null)
-			br = new BaseReferenceable();
-		else
-			br = session.convert(this, BaseReferenceable.class); // Get an object with superclass fields set
-		
-		// TODO Check if convert() sets br with this class fields
-		
-		return classRef.cast(br);
-	}
-
-	@Override
-	public void init(IPersistenceSession session) {
-		this.session = session;
+		return classRef.cast(get(new BaseReferenceable()));
 	}
 
 	@Override
@@ -78,5 +75,4 @@ public class BaseReferenceableBean extends BaseNameableBean {
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
 	}
-
 }

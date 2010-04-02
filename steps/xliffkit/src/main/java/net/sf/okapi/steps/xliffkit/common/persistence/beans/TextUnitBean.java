@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,47 +31,66 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class TextUnitBean implements IPersistenceBean {
 	private String id;
+	private int refCount;
 	private String name;
 	private String type;
 	private boolean isTranslatable;
-	private boolean preserveWS;
-	private String mimeType;
-	private TextContainerBean source = new TextContainerBean();
-	private Map<String, TextContainerBean> targets = new ConcurrentHashMap<String, TextContainerBean>();
+	private boolean preserveWS;	
 	private FactoryBean skeleton = new FactoryBean();
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	private TextContainerBean source = new TextContainerBean();
+	private String mimeType;
+	private Map<String, TextContainerBean> targets = new ConcurrentHashMap<String, TextContainerBean>();
 	
-	public <T> T get(Class<T> classRef) {
-		TextUnit tu = TextUnitUtil.buildTU(source.get(TextContainer.class));
+//	private List<RangeBean> srcSegRanges = new ArrayList<RangeBean>();
+//	private ConcurrentHashMap<String, List<RangeBean>> trgSegRanges = new ConcurrentHashMap<String, List<RangeBean>>();
+	
+	public <T> T get(T obj) {
+		if (obj instanceof TextUnit) {
+			TextUnit tu = (TextUnit) obj;
 		
-		tu.setId(id);
-		tu.setName(name);
-		tu.setType(type);
-		tu.setIsTranslatable(isTranslatable);
-		tu.setPreserveWhitespaces(preserveWS);
-		tu.setMimeType(mimeType);		
-		tu.setSource(source.get(TextContainer.class));
+			tu.setId(id);
+			tu.setReferenceCount(refCount);
+			tu.setName(name);
+			tu.setType(type);
+			tu.setIsTranslatable(isTranslatable);
+			tu.setPreserveWhitespaces(preserveWS);
+			tu.setSkeleton(skeleton.get(ISkeleton.class));
+			
+			for (PropertyBean propBean : properties)
+				tu.setProperty(propBean.get(Property.class));
+			
+			for (FactoryBean annotationBean : annotations)
+				tu.setAnnotation(annotationBean.get(IAnnotation.class));
+			
+			tu.setSource(source.get(TextContainer.class));
+			tu.setMimeType(mimeType);		
+						
+			for (String locTag : targets.keySet())
+				tu.setTarget(new LocaleId(locTag), targets.get(locTag).get(TextContainer.class));						
+	
+//			// srcSegRanges
+//			List<Range> ranges = new ArrayList<Range>();
+//			for (RangeBean rangeBean : srcSegRanges)
+//				ranges.add(rangeBean.get(Range.class));
+//			
+//			tu.getSource().createSegments(ranges);
+//			
+//			// trgSegRanges
+		}
 		
-		for (String locTag : targets.keySet())
-			tu.setTarget(new LocaleId(locTag), targets.get(locTag).get(TextContainer.class));
-		
-		tu.setSkeleton(skeleton.get(ISkeleton.class));
-		
-		for (PropertyBean prop : properties)
-			tu.setProperty(prop.get(Property.class));
-		
-		for (FactoryBean annotationBean : annotations)
-			tu.setAnnotation(annotationBean.get(IAnnotation.class));
-		
-		return classRef.cast(tu);
+		return obj;
+	}
+	
+	@Override
+	public <T> T get(Class<T> classRef) {		
+		return classRef.cast(get(new TextUnit(getId())));
 	}
 	
 	public IPersistenceBean set(Object obj) {
@@ -79,12 +98,27 @@ public class TextUnitBean implements IPersistenceBean {
 			TextUnit tu = (TextUnit) obj;
 			
 			id = tu.getId();
+			refCount = tu.getReferenceCount();
 			name = tu.getName();
 			type = tu.getType();
 			isTranslatable = tu.isTranslatable();
 			preserveWS = tu.preserveWhitespaces();
-			mimeType = tu.getMimeType();			
+			skeleton.set(tu.getSkeleton());
+
+			for (String propName : tu.getPropertyNames()) {
+				PropertyBean propBean = new PropertyBean();
+				propBean.set(tu.getProperty(propName));
+				properties.add(propBean);
+			}
+			
+			for (IAnnotation annotation : tu.getAnnotations()) {
+				FactoryBean annotationBean = new FactoryBean();
+				annotations.add(annotationBean);
+				annotationBean.set(annotation);
+			}
+									
 			source.set(tu.getSource());
+			mimeType = tu.getMimeType();
 			
 			for (LocaleId locId : tu.getTargetLocales()) {
 				TextContainerBean targetBean = new TextContainerBean();
@@ -92,16 +126,16 @@ public class TextUnitBean implements IPersistenceBean {
 				targetBean.set(tu.getTarget(locId));
 			}
 			
-			skeleton.set(tu.getSkeleton());
+//			// srcSegRanges
+//			List<Range> ranges = tu.saveCurrentSourceSegmentation();
+//			for (Range range : ranges) {
+//				RangeBean rangeBean = new RangeBean(); 
+//				rangeBean.set(range);
+//				srcSegRanges.add(rangeBean);
+//			}
+//			
+//			// trgSegRanges
 			
-			for (String propName : tu.getPropertyNames()) {
-				PropertyBean propBean = new PropertyBean();
-				propBean.set(tu.getProperty(propName));
-				properties.add(propBean);
-			}
-			
-			// TODO TextUnit.getAnnotations()
-			//annotations.set(tu.getAnnotations());
 		}
 		return this;
 	}
@@ -165,10 +199,6 @@ public class TextUnitBean implements IPersistenceBean {
 		this.targets = targets;
 	}
 
-	@Override
-	public void init(IPersistenceSession session) {		
-	}
-
 	public List<FactoryBean> getAnnotations() {
 		return annotations;
 	}
@@ -184,5 +214,30 @@ public class TextUnitBean implements IPersistenceBean {
 	public void setProperties(List<PropertyBean> properties) {
 		this.properties = properties;
 	}
+
+	public void setRefCount(int refCount) {
+		this.refCount = refCount;
+	}
+
+	public int getRefCount() {
+		return refCount;
+	}
+
+//	public List<RangeBean> getSrcSegRanges() {
+//		return srcSegRanges;
+//	}
+//
+//	public void setSrcSegRanges(List<RangeBean> srcSegRanges) {
+//		this.srcSegRanges = srcSegRanges;
+//	}
+//
+//	public ConcurrentHashMap<String, List<RangeBean>> getTrgSegRanges() {
+//		return trgSegRanges;
+//	}
+//
+//	public void setTrgSegRanges(
+//			ConcurrentHashMap<String, List<RangeBean>> trgSegRanges) {
+//		this.trgSegRanges = trgSegRanges;
+//	}
 
 }

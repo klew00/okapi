@@ -21,10 +21,13 @@
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import java.util.LinkedHashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.BaseReferenceable;
@@ -43,6 +46,7 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TargetPropertiesAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
@@ -61,6 +65,7 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.InlineAnnotationBean
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.MultiEventBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ParametersBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.PropertyBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.RangeBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.RawDocumentBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.SegmentBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.StartDocumentBean;
@@ -69,7 +74,10 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.StartSubDocumentBean
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TargetPropertiesAnnotationBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextContainerBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextFragmentBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextPartBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextUnitBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipEntryBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipFileBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipSkeletonBean;
 
 public class PersistenceMapper {
@@ -156,6 +164,16 @@ public class PersistenceMapper {
 		return bean;		
 	}
 	
+	public static <T> T getObject(Class<T> classRef) {
+		T res = null;
+		try {
+			res = ClassUtil.instantiateClass(classRef);
+		} catch (Exception e) {
+			throw new RuntimeException(String.format(MSG4, ClassUtil.getClassName(classRef)), e);
+		}
+		return res;
+	}
+	
 	private static void registerBeans() {
 		// General purpose beans
 		registerBean(IParameters.class, ParametersBean.class);
@@ -174,7 +192,9 @@ public class PersistenceMapper {
 		registerBean(DocumentPart.class, DocumentPartBean.class);
 		registerBean(Ending.class, EndingBean.class);
 		registerBean(MultiEvent.class, MultiEventBean.class);
+		registerBean(TextPart.class, TextPartBean.class);
 		registerBean(Segment.class, SegmentBean.class);
+		registerBean(Range.class, RangeBean.class);
 		registerBean(BaseNameable.class, BaseNameableBean.class);
 		registerBean(BaseReferenceable.class, BaseReferenceableBean.class);
 		registerBean(StartDocument.class, StartDocumentBean.class);
@@ -183,7 +203,9 @@ public class PersistenceMapper {
 		registerBean(TargetPropertiesAnnotation.class, TargetPropertiesAnnotationBean.class);
 		registerBean(GenericSkeleton.class, GenericSkeletonBean.class);
 		registerBean(GenericSkeletonPart.class, GenericSkeletonPartBean.class);
-		registerBean(ZipSkeleton.class, ZipSkeletonBean.class);		
+		registerBean(ZipSkeleton.class, ZipSkeletonBean.class);
+		registerBean(ZipFile.class, ZipFileBean.class);
+		registerBean(ZipEntry.class, ZipEntryBean.class);		
 		registerBean(InlineAnnotation.class, InlineAnnotationBean.class);		
 	}
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,21 +22,19 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class GenericSkeletonPartBean implements IPersistenceBean {
 
 	private String data;
 	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(T obj) {
+		return obj;
 	}
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		GenericSkeletonPart part = new GenericSkeletonPart(data);  
-
-		return classRef.cast(part);
+		return classRef.cast(get(new GenericSkeletonPart(data)));
 	}
 
 	@Override
@@ -56,5 +54,4 @@ public class GenericSkeletonPartBean implements IPersistenceBean {
 	public void setData(String data) {
 		this.data = data;
 	}
-
 }

@@ -473,4 +473,8 @@ public class RawDocument implements IResource {
 			}
 		}		
 	}
+
+	public Annotations getAnnotations() {
+		return (annotations == null) ? new Annotations() : annotations;
+	}
 }

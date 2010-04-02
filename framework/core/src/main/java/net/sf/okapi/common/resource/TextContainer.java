@@ -518,7 +518,7 @@ public class TextContainer implements Iterable<Segment> {
 
 	/**
 	 * Creates a set of segments in this container. Use {@link #getCodedText()}
-	 * to get the coded text to use as athe base for the segment boundaries.
+	 * to get the coded text to use as the base for the segment boundaries.
 	 * If the content is already segmented, it is automatically un-segmented before the new
 	 * segmentation is applied.
 	 * @param ranges the ranges of the segments to create. The ranges must be ordered from the lesser
@@ -1338,6 +1338,10 @@ public class TextContainer implements Iterable<Segment> {
 		}
 		// Set the auto-value
 		seg.id = String.valueOf(value);
+	}
+
+	public Annotations getAnnotations() {
+		return (annotations == null) ? new Annotations() : annotations;
 	}
 
 }

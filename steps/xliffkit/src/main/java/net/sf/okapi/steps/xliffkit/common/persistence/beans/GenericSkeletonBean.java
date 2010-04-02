@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,24 +26,25 @@ import java.util.List;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class GenericSkeletonBean implements IPersistenceBean {
 
 	private List<GenericSkeletonPartBean> parts = new ArrayList<GenericSkeletonPartBean>();
 	
 	@Override
-	public <T> T get(Class<T> classRef) {
-		GenericSkeleton skel = new GenericSkeleton();
-		
-		for (GenericSkeletonPartBean partBean : parts)
-			skel.add(partBean.getData());
-
-		return classRef.cast(skel);
+	public <T> T get(T obj) {
+		if (obj instanceof GenericSkeleton) {
+			GenericSkeleton skel = (GenericSkeleton) obj;
+			
+			for (GenericSkeletonPartBean partBean : parts)
+				skel.add(partBean.getData());
+		}
+		return obj;
 	}
-
+	
 	@Override
-	public void init(IPersistenceSession session) {		
+	public <T> T get(Class<T> classRef) {
+		return classRef.cast(get(new GenericSkeleton()));
 	}
 
 	@Override
@@ -67,5 +68,4 @@ public class GenericSkeletonBean implements IPersistenceBean {
 	public void setParts(List<GenericSkeletonPartBean> parts) {
 		this.parts = parts;
 	}
-
 }

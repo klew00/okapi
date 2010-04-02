@@ -95,4 +95,8 @@ public class MultiEvent implements IResource, Iterable<Event> {
 	public boolean isPropagateAsSingleEvent() {
 		return propagateAsSingleEvent;
 	}
+
+	public Annotations getAnnotations() {
+		return (annotations == null) ? new Annotations() : annotations;
+	}
 }

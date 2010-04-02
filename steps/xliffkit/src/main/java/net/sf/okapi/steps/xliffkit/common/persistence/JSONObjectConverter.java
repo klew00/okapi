@@ -20,12 +20,21 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
-public interface IPersistenceBean {
+import org.codehaus.jackson.map.ObjectMapper;
 
-	<T> T get(T obj);
+public class JSONObjectConverter {
+
+	private static ObjectMapper converter = new ObjectMapper();
 	
-	<T> T get(Class<T> classRef);
-	
-	IPersistenceBean set(Object obj); // Returns self to allow chaining
-	
+	/**
+	 * Converts a given object to an expected type.
+	 * The given object is serialized as is, and then deserialized as 
+	 * an expected class instance. This helps if the object was initially deserialized incorrectly.
+	 * @param obj the given object to be converted.
+	 * @param expectedClass new class of the given object.
+	 * @return the converted object.
+	 */
+	public static <T extends IPersistenceBean> T convert(Object object, Class<T> expectedClass) {		
+		return converter.convertValue(object, expectedClass);
+	}
 }

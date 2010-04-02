@@ -60,11 +60,7 @@ public class TestJackson {
 		mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
 		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
-	
-	@Test
-	public void test() {
 		
-	}
 	
 	// DEBUG @Test
 	public void testTextUnit() throws JsonGenerationException, JsonMappingException, IOException, URISyntaxException {
@@ -103,9 +99,9 @@ public class TestJackson {
 		
 		st = mapper.writeValueAsString(tub);
 		tub = mapper.readValue(st, TextUnitBean.class);
-		tu = tub.get(TextUnit.class);
+		tu = tub.get(new TextUnit(""));
 //		System.out.println(tu.getSource().getCodedText());
-		System.out.println(((TextContainer)tub.getSource().get(TextContainer.class)).getCodedText());
+		System.out.println(((TextContainer)tub.getSource().get(new TextContainer())).getCodedText());
 //		ISkeleton skel = tub.getSkeleton().read(ISkeleton.class);
 //		if (skel != null)
 //			System.out.println(skel.getClass());
@@ -118,7 +114,8 @@ public class TestJackson {
 		//ZipSkeletonBean zsb = mapper.readValue(st, ZipSkeletonBean.class);
 	}
 	
-	// DEBUG @Test
+	// DEBUG 
+	@Test
 	public void testTextUnitWrite() {
 	
 		Event event = new Event(EventType.TEXT_UNIT);

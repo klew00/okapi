@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,23 +21,22 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class DocumentPartBean extends BaseReferenceableBean {
 
 	@Override
-	public void init(IPersistenceSession session) {
-		super.init(session);
-	}
-
-	@Override
-	public <T> T get(Class<T> classRef) {	
-		return super.get(classRef);
+	public <T> T get(T obj) {	
+		return super.get(obj);
 	}
 
 	@Override
 	public IPersistenceBean set(Object obj) {		
 		return super.set(obj);
+	}
+
+	@Override
+	public <T> T get(Class<T> classRef) {
+		return super.get(classRef);
 	}
 
 }

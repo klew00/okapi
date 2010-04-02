@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,21 +21,24 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class FilterWriterBean implements IPersistenceBean {
 
 	@Override
-	public <T> T get(Class<T> classRef) {
+	public <T> T get(T obj) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void init(IPersistenceSession session) {
+	public IPersistenceBean set(Object obj) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
+	public <T> T get(Class<T> classRef) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,27 +20,63 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
+import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
+
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TargetPropertiesAnnotation;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class TargetPropertiesAnnotationBean implements IPersistenceBean {
 
+	private ConcurrentHashMap<String, Hashtable<String, PropertyBean>> targets = 
+		new ConcurrentHashMap<String, Hashtable<String, PropertyBean>>();
+	
 	@Override
-	public void init(IPersistenceSession session) {
-		// TODO Auto-generated method stub
-
+	public <T> T get(T obj) {
+		if (obj instanceof TargetPropertiesAnnotation) {
+			TargetPropertiesAnnotation annot = (TargetPropertiesAnnotation) obj;
+		
+			for (String locTag : targets.keySet()) {
+				Hashtable<String, PropertyBean> propBeans = targets.get(locTag);
+				Hashtable<String, Property> props = new Hashtable<String, Property>();
+				
+				for (String key : propBeans.keySet()) {
+					PropertyBean propBean = propBeans.get(key);
+					Property prop = propBean.get(Property.class);
+					props.put(key, prop);
+				}
+				
+				annot.set(new LocaleId(locTag), props);
+			}
+		}
+		return obj;
 	}
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		// TODO Auto-generated method stub
-		return null;
+		return classRef.cast(get(new TargetPropertiesAnnotation()));
 	}
-
+	
 	@Override
 	public IPersistenceBean set(Object obj) {
-		// TODO Auto-generated method stub
-		return null;
+		if (obj instanceof TargetPropertiesAnnotation) {
+			TargetPropertiesAnnotation annot = (TargetPropertiesAnnotation) obj;
+			
+			for (LocaleId locId : annot) {
+				Hashtable<String, PropertyBean> propBeans = new Hashtable<String, PropertyBean>();
+				Hashtable<String, Property> props = annot.get(locId);
+				
+				for (String key : props.keySet()) {
+					Property prop = props.get(key);
+					PropertyBean propBean = new PropertyBean();
+					propBean.set(prop);
+					propBeans.put(key, propBean);
+				}								
+				targets.put(locId.toString(), propBeans);
+			}
+		}
+		return this;
 	}
-
 }

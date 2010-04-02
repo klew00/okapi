@@ -20,57 +20,70 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
+import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
-public class ZipSkeletonBean implements IPersistenceBean {
+public class ZipSkeletonBean extends GenericSkeletonBean {
 
-	private String zipFileName;
-	private byte[] bytes = new byte[] {3, 5, 120, 127};
-	private TextContainerBean testBean = new TextContainerBean();
+	private ZipFileBean original = new ZipFileBean();
+	private ZipEntryBean entry = new ZipEntryBean();
 	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(T obj) {
+		return super.get(obj);
 	}
 	
 	@Override
+	public <T> T get(Class<T> classRef) {		
+		ZipSkeleton skel = null;
+	
+		ZipFile zf = original.get(ZipFile.class);
+		ZipEntry ze = entry.get(ZipEntry.class);
+		List<GenericSkeletonPartBean> parts = super.getParts(); 
+		
+		if (!Util.isEmpty(parts) && ze != null)
+			skel = new ZipSkeleton(super.get(GenericSkeleton.class), ze);
+		else if (zf != null)
+			skel = new ZipSkeleton(zf);
+		else if (ze != null)
+			skel = new ZipSkeleton(ze);
+		
+		return classRef.cast(get(skel));
+	}	
+
+	@Override
 	public IPersistenceBean set(Object obj) {
-		// TODO Auto-generated method stub
+		super.set(obj);
+		
+		if (obj instanceof ZipSkeleton) {
+			ZipSkeleton zs = (ZipSkeleton) obj;
+			
+			original.set(zs.getOriginal());
+			entry.set(zs.getEntry());
+		}
 		return this;
 	}
 
-	@Override
-	public <T> T get(Class<T> classRef) {
-		ZipSkeleton skel = new ZipSkeleton(new ZipEntry(""));
-		
-		return classRef.cast(skel);
+	public ZipFileBean getOriginal() {
+		return original;
 	}
 
-	public void setZipFileName(String zipFileName) {
-		this.zipFileName = zipFileName;
+	public void setOriginal(ZipFileBean original) {
+		this.original = original;
 	}
 
-	public String getZipFileName() {
-		return zipFileName;
+	public ZipEntryBean getEntry() {
+		return entry;
 	}
 
-	public byte[] getBytes() {
-		return bytes;
+	public void setEntry(ZipEntryBean entry) {
+		this.entry = entry;
 	}
-
-	public void setBytes(byte[] bytes) {
-		this.bytes = bytes;
-	}
-
-	public void setTestBean(TextContainerBean testBean) {
-		this.testBean = testBean;
-	}
-
-	public TextContainerBean getTestBean() {
-		return testBean;
-	}	
-
+	
 }

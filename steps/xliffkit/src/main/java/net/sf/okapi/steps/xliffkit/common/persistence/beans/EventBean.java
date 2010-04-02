@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,7 +25,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class EventBean implements IPersistenceBean {
 
@@ -33,16 +32,15 @@ public class EventBean implements IPersistenceBean {
 	private FactoryBean resource = new FactoryBean();
 	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(T obj) {
+		return obj;
 	}
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		Event event = new Event(type);		
-		event.setResource(resource.get(IResource.class));
-		return classRef.cast(event);
+		return classRef.cast(get(new Event(type, resource.get(IResource.class))));
 	}
-
+	
 	@Override
 	public IPersistenceBean set(Object obj) {
 		if (obj instanceof Event) {

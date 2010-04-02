@@ -59,15 +59,4 @@ public interface IPersistenceSession {
 	 * @return the deserialized object.
 	 */
 	Object deserialize();
-
-	/**
-	 * Converts a given object to an expected type.
-	 * The given object can be serialized as is, and then deserialized as 
-	 * an expected class instance. This helps if the object was initially deserialized incorrectly.
-	 * Implementers can use different strategies to achieve the goal. 	
-	 * @param obj the given object to be converted.
-	 * @param expectedClass new class of the given object.
-	 * @return the converted object.
-	 */
-	<T> T convert(Object obj, Class<T> expectedClass);
 }

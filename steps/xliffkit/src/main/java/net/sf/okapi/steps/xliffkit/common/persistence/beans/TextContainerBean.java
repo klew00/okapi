@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,51 +25,44 @@ import java.util.List;
 
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
-public class TextContainerBean extends TextFragmentBean {
+public class TextContainerBean implements IPersistenceBean {
 	
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
-	private List<SegmentBean> segments = new ArrayList<SegmentBean>();
-	private IPersistenceSession session;
-
+	private List<TextPartBean> parts = new ArrayList<TextPartBean>();
+	private boolean segApplied;
+	
 	@Override
-	public void init(IPersistenceSession session) {		
-		this.session = session;
+	public <T> T get(T obj) {				
+		if (obj instanceof TextContainer) {
+			TextContainer tc = (TextContainer) obj;
+		
+			for (PropertyBean prop : properties)
+				tc.setProperty(prop.get(Property.class));
+			
+			for (FactoryBean annotationBean : annotations)
+				tc.setAnnotation(annotationBean.get(IAnnotation.class));
+			
+			for (TextPartBean partBean : parts)
+				tc.insertPart(tc.getPartCount(), partBean.get(TextPart.class));
+			
+			tc.setHasBeenSegmentedFlag(segApplied);
+		}		
+		return obj;
 	}
 	
 	@Override
-	public <T> T get(Class<T> classRef) {		
-		
-		TextContainer tc = null;
-		
-		if (session == null)
-			tc = new TextContainer();
-		else
-			tc = session.convert(this, TextContainer.class); // Get an object with superclass fields set		
-		
-		for (PropertyBean prop : properties)
-			tc.setProperty(prop.get(Property.class));
-		
-		for (FactoryBean annotationBean : annotations)
-			tc.setAnnotation(annotationBean.get(IAnnotation.class));
-		
-		// TODO get segments
-//		for (SegmentBean segment : segments)
-//			tc.getSegments().add(segment.get(Segment.class));
-		
-		return classRef.cast(tc);
+	public <T> T get(Class<T> classRef) {
+		return classRef.cast(get(new TextContainer()));
 	}
 	
 	@Override
 	public IPersistenceBean set(Object obj) {
-		super.set(obj);
-		
 		if (obj instanceof TextContainer) {
 			TextContainer tc = (TextContainer) obj;
 						
@@ -79,28 +72,21 @@ public class TextContainerBean extends TextFragmentBean {
 				properties.add(propBean);
 			}
 			
-			// TODO TextUnit.getAnnotations()
-			//annotations.write(tu.ge)
+			for (IAnnotation annotation : tc.getAnnotations()) {
+				FactoryBean annotationBean = new FactoryBean();
+				annotations.add(annotationBean);
+				annotationBean.set(annotation);
+			}
 			
-			// TODO set segments
-//			List<Segment> segs = tc.getSegments();
-//			if (segs != null)
-//				for (Segment segment : segs) {
-//					SegmentBean segBean = new SegmentBean();
-//					segments.add(segBean);
-//					segBean.set(segment);
-//				}
+			for (int i = 0; i < tc.getPartCount(); i++) {
+				TextPartBean partBean = new TextPartBean();
+				parts.add(partBean);
+				partBean.set(tc.getPart(i));
+			}
 			
+			segApplied = tc.hasBeenSegmented();
 		}		
 		return this;
-	}
-
-	public List<SegmentBean> getSegments() {
-		return segments;
-	}
-
-	public void setSegments(List<SegmentBean> segments) {
-		this.segments = segments;
 	}
 
 	public void setAnnotations(List<FactoryBean> annotations) {
@@ -118,5 +104,20 @@ public class TextContainerBean extends TextFragmentBean {
 	public void setProperties(List<PropertyBean> properties) {
 		this.properties = properties;
 	}
-	
+
+	public List<TextPartBean> getParts() {
+		return parts;
+	}
+
+	public void setParts(List<TextPartBean> parts) {
+		this.parts = parts;
+	}
+
+	public boolean isSegApplied() {
+		return segApplied;
+	}
+
+	public void setSegApplied(boolean segApplied) {
+		this.segApplied = segApplied;
+	}
 }

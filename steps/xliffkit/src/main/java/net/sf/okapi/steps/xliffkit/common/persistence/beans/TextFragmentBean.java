@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,7 +26,6 @@ import java.util.List;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class TextFragmentBean implements IPersistenceBean {
 
@@ -34,22 +33,23 @@ public class TextFragmentBean implements IPersistenceBean {
 	private List<CodeBean> codes = new ArrayList<CodeBean>();
 	
 	@Override
-	public void init(IPersistenceSession session) {
-	}
+	public <T> T get(T obj) {
+		if (obj instanceof TextFragment) {
+			TextFragment tf = (TextFragment) obj; 
 		
+			for (CodeBean code : codes)
+				tf.getCodes().add(code.get(Code.class));
+		}		
+		return obj;
+	}
+	
 	@Override
 	public <T> T get(Class<T> classRef) {
-		TextFragment tf = new TextFragment(text); 
-		
-		for (CodeBean code : codes)
-			tf.getCodes().add(code.get(Code.class));
-		
-		return classRef.cast(tf);
+		return classRef.cast(get(new TextFragment(text)));
 	}
 
 	@Override
 	public IPersistenceBean set(Object obj) {
-
 		if (obj instanceof TextFragment) {
 			TextFragment tc = (TextFragment) obj;
 			text = tc.getCodedText();
@@ -78,5 +78,4 @@ public class TextFragmentBean implements IPersistenceBean {
 	public void setCodes(List<CodeBean> codes) {
 		this.codes = codes;
 	}
-
 }

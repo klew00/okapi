@@ -70,4 +70,8 @@ public class Ending implements IResource {
 		annotations.set(annotation);
 	}
 
+	public Annotations getAnnotations() {
+		return (annotations == null) ? new Annotations() : annotations;
+	}
+
 }

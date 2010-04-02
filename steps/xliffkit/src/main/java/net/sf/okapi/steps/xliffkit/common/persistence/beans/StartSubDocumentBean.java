@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,27 +20,59 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
-public class StartSubDocumentBean implements IPersistenceBean {
+public class StartSubDocumentBean extends BaseNameableBean {
 
+	private String parentId;
+	private ParametersBean filterParams = new ParametersBean();
+	
 	@Override
-	public void init(IPersistenceSession session) {
-		// TODO Auto-generated method stub
-
+	public <T> T get(T obj) {
+		obj = super.get(obj);
+		
+		if (obj instanceof StartSubDocument) {
+			StartSubDocument ssd = (StartSubDocument) obj;
+			
+			ssd.setParentId(parentId);
+			ssd.setFilterParameters(filterParams.get(IParameters.class));
+		}			
+		return obj;
 	}
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		// TODO Auto-generated method stub
-		return null;
+		return classRef.cast(get(new StartSubDocument(parentId)));
 	}
 
 	@Override
 	public IPersistenceBean set(Object obj) {
-		// TODO Auto-generated method stub
+		super.set(obj);
+		
+		if (obj instanceof StartSubDocument) {
+			StartSubDocument ssd = (StartSubDocument) obj;
+			
+			parentId = ssd.getParentId();
+			filterParams.set(ssd.getFilterParameters());
+		}
 		return null;
 	}
 
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
+	}
+
+	public ParametersBean getFilterParams() {
+		return filterParams;
+	}
+
+	public void setFilterParams(ParametersBean filterParams) {
+		this.filterParams = filterParams;
+	}
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,21 +22,23 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class InlineAnnotationBean implements IPersistenceBean {
 
 	private String data;
 	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(T obj) {
+		if (obj instanceof InlineAnnotation) {
+			InlineAnnotation ann = (InlineAnnotation) obj;
+			ann.setData(data);
+		}
+		return obj;
 	}
-
+	
 	@Override
 	public <T> T get(Class<T> classRef) {
-		InlineAnnotation ann = new InlineAnnotation();
-		ann.setData(data);
-		return classRef.cast(ann);
+		return classRef.cast(get(new InlineAnnotation(data)));
 	}
 
 	@Override
@@ -55,5 +57,4 @@ public class InlineAnnotationBean implements IPersistenceBean {
 	public String getData() {
 		return data;
 	}
-
 }

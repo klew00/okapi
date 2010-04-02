@@ -23,19 +23,21 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 public class TypeInfoBean implements IPersistenceBean {
 
 	@Override
+	public <T> T get(T obj) {
+		// TODO Logging
+		return obj;
+	}
+
+	@Override
 	public <T> T get(Class<T> classRef) {
 		// TODO Logging
 		return null;
 	}
 
 	@Override
-	public void init(IPersistenceSession session) {
-	}
-
-	@Override
 	public IPersistenceBean set(Object obj) {
 		// TODO Logging
-		return null;
+		return this;
 	}
 
 }

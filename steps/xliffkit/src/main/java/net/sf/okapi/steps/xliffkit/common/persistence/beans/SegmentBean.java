@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,29 +23,36 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
-public class SegmentBean implements IPersistenceBean {
-
+public class SegmentBean extends TextPartBean {
+	
 	private String id;
-	private TextFragmentBean text = new TextFragmentBean();
 	
 	@Override
-	public void init(IPersistenceSession session) {
+	public <T> T get(T obj) {
+		return obj;
 	}
-
+	
 	@Override
 	public <T> T get(Class<T> classRef) {
-		Segment seg = new Segment(id, text.get(TextFragment.class));		
-		return classRef.cast(seg);
+		TextFragmentBean textBean = super.getText();
+		TextFragment text = null;
+		
+		if (textBean != null)
+			text = textBean.get(TextFragment.class);
+		else
+			text = new TextFragment();
+		
+		return classRef.cast(get(new Segment(id, text)));
 	}
 
 	@Override
 	public IPersistenceBean set(Object obj) {
-		if (obj instanceof Segment) {
+		super.set(obj);
+		
+		if (obj instanceof Segment) {			
 			Segment seg = (Segment) obj;
-			id = seg.id;
-			text.set(seg.text);
+			id = seg.getId();
 		}
 		return this;
 	}
@@ -57,13 +64,4 @@ public class SegmentBean implements IPersistenceBean {
 	public void setId(String id) {
 		this.id = id;
 	}
-
-	public TextFragmentBean getText() {
-		return text;
-	}
-
-	public void setText(TextFragmentBean text) {
-		this.text = text;
-	}
-
 }
