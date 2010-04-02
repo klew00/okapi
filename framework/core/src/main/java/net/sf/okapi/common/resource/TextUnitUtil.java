@@ -879,10 +879,24 @@ public class TextUnitUtil {
 		return createBilingualTextUnit(srcTextUnit, srcSegments, trgSegments, trgLocaleId, " ");
 	}
 
-	public static TextUnit createMultilingualTextUnit(final TextUnit srcTextUnit,
+	/**
+	 * Create a new multilingual {@link TextUnit} based on the existing TextUnit. The parameter
+	 * {@link #alignedSegmentPairs} hold lists of aligned source/target {@link TextPart}s (i.e., inter-segment content
+	 * and segments). The created TextUnit is an exact copy of the TextUnit passed in, but without the original source
+	 * and target content, which is removed before adding the AlignedPairs.
+	 * 
+	 * @param textUnit
+	 *            - {@link TextUnit} used to make the copy
+	 * @param alignedSegmentPairs
+	 *            - aligned source/target pairs
+	 * @param trgLocaleId
+	 *            - {@link LocaleId} of the target {@link Segment}s
+	 * @return
+	 */
+	public static TextUnit createMultilingualTextUnit(final TextUnit textUnit,
 			final List<AlignedPair> alignedSegmentPairs, final LocaleId trgLocaleId) {
 		// Clone the original
-		TextUnit tu = srcTextUnit.clone();
+		TextUnit tu = textUnit.clone();
 		// Empty the source content
 		tu.getSource().clear();
 
@@ -898,18 +912,18 @@ public class TextUnitUtil {
 			// make a shallow copy because we may modify the list elements
 			List<TextPart> sourceParts = new LinkedList<TextPart>(alignedPair.getSourceParts());
 			List<TextPart> targetParts = new LinkedList<TextPart>(alignedPair.getTargetParts());
-			
+
 			// +++ source +++
-			
+
 			// calculate indexes of the source before and after inter-segment TextParts
 			int beforeIndex = 0;
 			int afterIndex = sourceParts.size();
 			for (TextPart part : sourceParts) {
 				if (part.isSegment()) {
 					break;
-				}			
-				beforeIndex++;			
-			}						
+				}
+				beforeIndex++;
+			}
 			ReversedIterator<TextPart> ri = new ReversedIterator<TextPart>(sourceParts);
 			for (TextPart part : ri) {
 				if (part.isSegment()) {
@@ -930,22 +944,22 @@ public class TextUnitUtil {
 			}
 			tu.getSource().appendSegment(new Segment(null, src));
 
-			// append the after inter-segment TextParts			
+			// append the after inter-segment TextParts
 			for (TextPart part : sourceParts.subList(afterIndex, sourceParts.size())) {
 				tu.getSource().appendPart(part);
-			}						
-			
-			//+++ target +++
-			
+			}
+
+			// +++ target +++
+
 			// calculate indexes of the target before and after inter-segment TextParts
 			beforeIndex = 0;
 			afterIndex = targetParts.size();
 			for (TextPart part : targetParts) {
 				if (part.isSegment()) {
 					break;
-				}			
-				beforeIndex++;			
-			}						
+				}
+				beforeIndex++;
+			}
 			ri = new ReversedIterator<TextPart>(targetParts);
 			for (TextPart part : ri) {
 				if (part.isSegment()) {
@@ -964,16 +978,17 @@ public class TextUnitUtil {
 			for (TextPart part : targetParts.subList(beforeIndex, afterIndex)) {
 				trg.append(part.getContent());
 			}
-			tu.getTarget(trgLocaleId).appendSegment(new Segment(tu.getSource().getLastSegment().getId(), trg));
+			tu.getTarget(trgLocaleId).appendSegment(
+					new Segment(tu.getSource().getLastSegment().getId(), trg));
 
-			// append the after inter-segment TextParts			
+			// append the after inter-segment TextParts
 			for (TextPart part : targetParts.subList(afterIndex, targetParts.size())) {
 				tu.getTarget(trgLocaleId).appendPart(part);
-			}			
+			}
 		}
 
 		// We now consider the source and target content to be segmented
-		// if nothing else we need to prevent re-segmentation as that 
+		// if nothing else we need to prevent re-segmentation as that
 		// will break the alignments
 		tu.getSource().setHasBeenSegmentedFlag(true);
 		tu.getTarget(trgLocaleId).setHasBeenSegmentedFlag(true);
