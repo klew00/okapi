@@ -43,12 +43,12 @@ public class ExternalCommandStepTest {
 			p.setCommand("sort ${inputPath} /O ${outputPath}");
 			break;
 		case MAC:
-			p.setCommand("sort ${inputPath} > ${outputPath}");
+			p.setCommand("sort ${inputPath} -o ${outputPath}");
 			break;
 		case LINUX:
-			p.setCommand("sort ${inputPath} > ${outputPath}");
+			p.setCommand("sort ${inputPath} -o ${outputPath}");
 			break;
-		}		
+		}
 		p.setTimeout(60);
 		externalCommand.setParameters(p);
 
