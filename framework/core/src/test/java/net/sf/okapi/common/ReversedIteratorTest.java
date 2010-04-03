@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import static net.sf.okapi.common.ReversedIterator.reverse;
+
 
 public class ReversedIteratorTest {
 
@@ -20,6 +22,22 @@ public class ReversedIteratorTest {
 		ReversedIterator<String> ri = new ReversedIterator<String>(l);
 		List<String> rl = new LinkedList<String>();
 		for (String s : ri) {
+			rl.add(s);
+		}
+		assertEquals("C", rl.remove(0));
+		assertEquals("B", rl.remove(0));
+		assertEquals("A", rl.remove(0));
+	}
+	
+	@Test
+	public void reversedListWithStatic() {
+		List<String> l = new LinkedList<String>();		
+		l.add("A");
+		l.add("B");
+		l.add("C");
+		
+		List<String> rl = new LinkedList<String>();
+		for (String s : reverse(l)) {
 			rl.add(s);
 		}
 		assertEquals("C", rl.remove(0));

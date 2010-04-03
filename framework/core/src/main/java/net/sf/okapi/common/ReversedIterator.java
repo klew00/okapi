@@ -57,4 +57,9 @@ public class ReversedIterator<T> implements Iterable<T> {
 			}
 		};
 	}
+	
+	public static <T> ReversedIterator<T> reverse(List<T> original) {
+        return new ReversedIterator<T>(original);
+    }
+
 }
