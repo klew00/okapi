@@ -33,18 +33,14 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 
-public class ApertiumMTConnector implements IQuery {
+public class ApertiumMTConnector extends BaseConnector {
 
 	private Parameters params;
-	private String srcLang;
-	private String trgLang;
 	private String pair;
-	private boolean hasNext;
-	private QueryResult result;
 	private QueryUtil store;
 	
 	public ApertiumMTConnector () {
@@ -65,33 +61,6 @@ public class ApertiumMTConnector implements IQuery {
 	@Override
 	public void close () {
 		// Nothing to do
-		hasNext = false;
-	}
-
-	@Override
-	public LocaleId getSourceLanguage () {
-		return LocaleId.fromString(srcLang);
-	}
-
-	@Override
-	public LocaleId getTargetLanguage () {
-		return LocaleId.fromString(trgLang);
-	}
-
-	@Override
-	public boolean hasNext () {
-		return hasNext;
-	}
-
-	@Override
-	public QueryResult next () {
-		if ( hasNext ) {
-			hasNext = false;
-			return result;
-		}
-		// Else: next was already called.
-		result = null;
-		return result;
 	}
 
 	@Override
@@ -107,7 +76,7 @@ public class ApertiumMTConnector implements IQuery {
 	@Override
 	public int query (TextFragment frag) {
 		result = null;
-		hasNext = false;
+		current = -1;
 		String plainText;
 		if ( frag.hasCode() ) {
 			plainText = store.toCodedHTML(frag);
@@ -151,8 +120,8 @@ public class ApertiumMTConnector implements IQuery {
 			else {
 				result.target = new TextFragment(store.fromCodedHTML(transText, frag));
 			}
-			hasNext = (result != null);
-			return (hasNext ? 1 : 0);
+			current = ((result==null) ? -1 : 0);
+			return ((current==0) ? 1 : 0);
 		}
 		catch ( MalformedURLException e ) {
 			throw new RuntimeException("Error when querying.", e);
@@ -169,12 +138,13 @@ public class ApertiumMTConnector implements IQuery {
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
-		srcLang = toInternalCode(sourceLocale);
-		trgLang = toInternalCode(targetLocale);
-		pair = String.format("%s-%s", srcLang, trgLang);
+		srcCode = toInternalCode(sourceLocale);
+		trgCode = toInternalCode(targetLocale);
+		pair = String.format("%s-%s", srcCode, trgCode);
 	}
 
-	private String toInternalCode (LocaleId standardCode) {
+	@Override
+	protected String toInternalCode (LocaleId standardCode) {
 		String lang = standardCode.getLanguage();
 		String reg = standardCode.getRegion();
 		if ( reg != null ) {
@@ -196,25 +166,4 @@ public class ApertiumMTConnector implements IQuery {
 		this.params = (Parameters)params;
 	}
 
-	@Override
-	public void clearAttributes () {
-		// Nothing to do
-	}
-
-	@Override
-	public void removeAttribute (String name) {
-		// Nothing to do
-	}
-
-	@Override
-	public void setAttribute (String name,
-		String value)
-	{
-		// Nothing to do
-	}
-
-	@Override
-	public void setRootDirectory (String rootDir) {
-		// Not used
-	}
 }

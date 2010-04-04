@@ -31,23 +31,18 @@ import java.util.Map;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 
-public class GoogleMTConnector implements IQuery {
+public class GoogleMTConnector extends BaseConnector {
 
 	private static final String addressAjax = "http://ajax.googleapis.com/ajax/services/language/translate";
 	private static final String baseQueryAjax = "?v=1.0&q=%s&langpair=%s|%s";
 
-	private String srcLang;
-	private String trgLang;
-	private QueryResult result;
-	private int current = -1;
 	private String hostId;
 	private JSONParser parser;
 	private QueryUtil util;
@@ -72,20 +67,6 @@ public class GoogleMTConnector implements IQuery {
 	}
 
 	@Override
-	public boolean hasNext () {
-		return (current>-1);
-	}
-	
-	@Override
-	public QueryResult next() {
-		if ( current > -1 ) { // Only one result
-			current = -1;
-			return result;
-		}
-		return null;
-	}
-
-	@Override
 	public void open () {
 		try {
 			InetAddress thisIp = InetAddress.getLocalHost();
@@ -99,8 +80,7 @@ public class GoogleMTConnector implements IQuery {
 
 	@Override
 	public int query (String plainText) {
-		TextFragment tf = new TextFragment(plainText);
-		return query(tf);
+		return query(new TextFragment(plainText));
 	}
 	
 	@Override
@@ -121,7 +101,7 @@ public class GoogleMTConnector implements IQuery {
 			}
 			// Create the connection and query
 			URL url = new URL(addressAjax + String.format(baseQueryAjax,
-				URLEncoder.encode(qtext, "UTF-8"), srcLang, trgLang));
+				URLEncoder.encode(qtext, "UTF-8"), srcCode, trgCode));
 			URLConnection conn = url.openConnection();
 			// To comply with Google TOS: Make sure we send a user-agent property
 			conn.setRequestProperty("User-Agent", getClass().getName());
@@ -156,41 +136,7 @@ public class GoogleMTConnector implements IQuery {
 	}
 
 	@Override
-	public void setAttribute (String name,
-		String value)
-	{
-		// Not used with this MT engine
-	}
-	
-	@Override
-	public void removeAttribute (String name) {
-		// Not used with this MT engine
-	}
-	
-	@Override
-	public void clearAttributes () {
-		// Not used with this MT engine
-	}
-
-	@Override
-	public void setLanguages (LocaleId sourceLocale,
-		LocaleId targetLocale)
-	{
-		srcLang = toInternalCode(sourceLocale);
-		trgLang = toInternalCode(targetLocale);
-	}
-	
-	@Override
-	public LocaleId getSourceLanguage () {
-		return LocaleId.fromString(srcLang);
-	}
-	
-	@Override
-	public LocaleId getTargetLanguage () {
-		return LocaleId.fromString(trgLang);
-	}
-
-	private String toInternalCode (LocaleId locale) {
+	protected String toInternalCode (LocaleId locale) {
 		String code = locale.toBCP47();
 		if ( !code.startsWith("zh") && ( code.length() > 2 )) {
 			code = code.substring(0, 2);
@@ -198,19 +144,4 @@ public class GoogleMTConnector implements IQuery {
 		return code;
 	}
 
-	@Override
-	public IParameters getParameters () {
-		// No parameters are used with this connector
-		return null;
-	}
-
-	@Override
-	public void setParameters (IParameters params) {
-		// No parameters are used with this connector
-	}
-
-	@Override
-	public void setRootDirectory (String rootDir) {
-		// Not used
-	}
 }

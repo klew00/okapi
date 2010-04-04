@@ -28,17 +28,13 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 
 @UsingParameters(Parameters.class)
-public class MicrosoftMTConnector implements IQuery {
+public class MicrosoftMTConnector extends BaseConnector {
 
-	private String srcLang;
-	private String trgLang;
-	private QueryResult result;
-	private int current = -1;
 	private QueryUtil util;
 	LanguageService service;
 	Parameters params;
@@ -64,20 +60,6 @@ public class MicrosoftMTConnector implements IQuery {
 	}
 
 	@Override
-	public boolean hasNext () {
-		return (current>-1);
-	}
-	
-	@Override
-	public QueryResult next() {
-		if ( current > -1 ) { // Only one result
-			current = -1;
-			return result;
-		}
-		return null;
-	}
-
-	@Override
 	public void open () {
 		Soap soap = new Soap();
 		service = soap.getBasicHttpBindingLanguageService();
@@ -88,7 +70,7 @@ public class MicrosoftMTConnector implements IQuery {
 		current = -1;
 		result = null;
 		if ( Util.isEmpty(plainText) ) return 0;
-		String res = service.translate(params.getAppId(), plainText, srcLang, trgLang);
+		String res = service.translate(params.getAppId(), plainText, srcCode, trgCode);
 		if ( Util.isEmpty(res) ) return 0;
 		result = new QueryResult();
 		result.source = new TextFragment(plainText);
@@ -104,7 +86,7 @@ public class MicrosoftMTConnector implements IQuery {
 		current = -1;
 		result = null;
 		if ( !text.hasText(false) ) return 0;
-		String res = service.translate(params.getAppId(), util.separateCodesFromText(text), srcLang, trgLang);
+		String res = service.translate(params.getAppId(), util.separateCodesFromText(text), srcCode, trgCode);
 		if ( Util.isEmpty(res) ) return 0;
 		result = new QueryResult();
 		result.source = text;
@@ -116,41 +98,7 @@ public class MicrosoftMTConnector implements IQuery {
 	}
 
 	@Override
-	public void setAttribute (String name,
-		String value)
-	{
-		// Not used with this MT engine
-	}
-	
-	@Override
-	public void removeAttribute (String name) {
-		// Not used with this MT engine
-	}
-	
-	@Override
-	public void clearAttributes () {
-		// Not used with this MT engine
-	}
-
-	@Override
-	public void setLanguages (LocaleId sourceLocale,
-		LocaleId targetLocale)
-	{
-		srcLang = toInternalCode(sourceLocale);
-		trgLang = toInternalCode(targetLocale);
-	}
-	
-	@Override
-	public LocaleId getSourceLanguage () {
-		return LocaleId.fromString(srcLang);
-	}
-	
-	@Override
-	public LocaleId getTargetLanguage () {
-		return LocaleId.fromString(trgLang);
-	}
-
-	private String toInternalCode (LocaleId locale) {
+	protected String toInternalCode (LocaleId locale) {
 		String code = locale.toBCP47();
 		if ( code.equals("zh-tw") || code.equals("zh-hant") || code.equals("zh-cht") ) {
 			code = "zh-CHT";
@@ -174,8 +122,4 @@ public class MicrosoftMTConnector implements IQuery {
 		this.params = (Parameters)params;
 	}
 
-	@Override
-	public void setRootDirectory (String rootDir) {
-		// Not used
-	}
 }

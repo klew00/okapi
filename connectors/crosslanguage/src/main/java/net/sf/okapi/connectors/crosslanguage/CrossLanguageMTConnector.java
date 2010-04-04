@@ -32,24 +32,19 @@ import com.crosslang.ws.IGateway;
 
 import net.sf.okapi.common.Base64;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 
 /**
  * Connector for the CrossLanguage MT Gateway Web services.
  */
-public class CrossLanguageMTConnector implements IQuery {
+public class CrossLanguageMTConnector extends BaseConnector {
 
 	private Parameters params;
 	private IGateway gateway;
-	private LocaleId srcLoc;
-	private LocaleId trgLoc;
-	private QueryResult result;
-	private int current = -1;
 	private QueryUtil util;
 	private ArrayOfstring options;
 
@@ -71,20 +66,6 @@ public class CrossLanguageMTConnector implements IQuery {
 	@Override
 	public String getSettingsDisplay () {
 		return "Server: " + params.getServerURL();
-	}
-
-	@Override
-	public boolean hasNext () {
-		return (current>-1);
-	}
-	
-	@Override
-	public QueryResult next () {
-		if ( current > -1 ) { // Only one result
-			current = -1;
-			return result;
-		}
-		return null;
 	}
 
 	@Override
@@ -178,42 +159,6 @@ public class CrossLanguageMTConnector implements IQuery {
 	}
 
 	@Override
-	public void setAttribute (String name,
-		String value)
-	{
-		// Not used with this MT engine
-	}
-	
-	@Override
-	public void removeAttribute (String name) {
-		// Not used with this MT engine
-	}
-	
-	@Override
-	public void clearAttributes () {
-		// Not used with this MT engine
-	}
-
-	@Override
-	public void setLanguages (LocaleId sourceLocale,
-		LocaleId targetLocale)
-	{
-		// Just used for get methods in this MT engine
-		srcLoc = sourceLocale;
-		trgLoc = targetLocale;
-	}
-	
-	@Override
-	public LocaleId getSourceLanguage () {
-		return srcLoc;
-	}
-	
-	@Override
-	public LocaleId getTargetLanguage () {
-		return trgLoc;
-	}
-
-	@Override
 	public IParameters getParameters () {
 		return params;
 	}
@@ -223,8 +168,4 @@ public class CrossLanguageMTConnector implements IQuery {
 		params = (Parameters)params;
 	}
 
-	@Override
-	public void setRootDirectory (String rootDir) {
-		// Not used
-	}
 }
