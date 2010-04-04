@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,7 @@ package net.sf.okapi.steps.tmimport;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -36,6 +37,7 @@ public class TMImportStep extends BasePipelineStep {
 	private Parameters params;
 	private IFilterWriter writer;
 	private LocaleId targetLocale;
+	private String rootDir;
 
 	public TMImportStep () {
 		params = new Parameters();
@@ -44,6 +46,11 @@ public class TMImportStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
 	}
 	
 	@Override
@@ -85,7 +92,7 @@ public class TMImportStep extends BasePipelineStep {
 		case START_DOCUMENT:
 			if ( writer == null ) {
 				writer = new PensieveFilterWriter();
-				writer.setOutput(params.getTmDirectory());
+				writer.setOutput(Util.fillRootDirectoryVariable(params.getTmDirectory(), rootDir));
 				writer.setOptions(targetLocale, "UTF-8");
 				writer.handleEvent(event);
 			}

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -34,7 +34,6 @@ import org.tempuri.Query;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -60,30 +59,32 @@ public class MyMemoryTMConnector implements ITMQuery {
 		qutil = new QueryUtil();
 	}
 
+	@Override
 	public String getName () {
 		return "MyMemory-TM";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		return String.format("Server: %s\nAllow MT: %s", SERVER_URL,
 			((params.getUseMT()==1) ? "Yes" : "No"));
 	}
 	
+	@Override
 	public void close () {
 	}
 
-	public void export (String outputPath) {
-		throw new OkapiNotImplementedException("The export() method is not supported.");
-	}
-
+	@Override
 	public LocaleId getSourceLanguage () {
 		return LocaleId.fromString(srcLang);
 	}
 
+	@Override
 	public LocaleId getTargetLanguage () {
 		return LocaleId.fromString(trgLang);
 	}
 
+	@Override
 	public boolean hasNext () {
 		if ( results == null ) return false;
 		if ( current >= results.size() ) {
@@ -92,6 +93,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 		return (current > -1);
 	}
 
+	@Override
 	public QueryResult next () {
 		if ( results == null ) return null;
 		if (( current > -1 ) && ( current < results.size() )) {
@@ -102,6 +104,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 		return null;
 	}
 
+	@Override
 	public void open () {
 		try {
 			results = new ArrayList<QueryResult>();
@@ -116,6 +119,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 		}
 	}
 
+	@Override
 	public int query (TextFragment frag) {
 		results.clear();
 		current = -1;
@@ -161,24 +165,29 @@ public class MyMemoryTMConnector implements ITMQuery {
 	}
 
 
+	@Override
 	public int query (String plainText) {
 		return query(new TextFragment(plainText));
 	}
 
+	@Override
 	public void removeAttribute (String name) {
 		//TODO: use domain
 	}
 
+	@Override
 	public void clearAttributes () {
 		//TODO: use domain
 	}
 
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
 		//TODO: use domain
 	}
 
+	@Override
 	public void setLanguages (LocaleId sourceLang,
 		LocaleId targetLang)
 	{
@@ -213,29 +222,39 @@ public class MyMemoryTMConnector implements ITMQuery {
 	/**
 	 * Sets the maximum number of hits to return.
 	 */
+	@Override
 	public void setMaximumHits (int max) {
 		if ( max < 1 ) maxHits = 1;
 		else maxHits = max;
 	}
 
+	@Override
 	public void setThreshold (int threshold) {
 		this.threshold = threshold;
 	}
 
+	@Override
 	public int getMaximumHits () {
 		return maxHits;
 	}
 
+	@Override
 	public int getThreshold () {
 		return threshold;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
 
+	@Override
+	public void setRootDirectory (String rootDir) {
+		// Not used
+	}
 }

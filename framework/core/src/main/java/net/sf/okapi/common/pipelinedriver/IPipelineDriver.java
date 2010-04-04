@@ -48,6 +48,13 @@ public interface IPipelineDriver {
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper);
 	
 	/**
+	 * Sets the root directory corresponding to the ${rootDir} variable for steps.
+	 * @param rootDir the root directory. If it is null, the fall-back is expected to be the
+	 * user home directory.
+	 */
+	public void setRootDirectory (String rootDir);
+	
+	/**
 	 * Gets the {@link IPipeline} currently associated with this driver.
 	 * @return the {@link IPipeline} currently associated with this driver.
 	 */

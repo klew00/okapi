@@ -91,7 +91,10 @@ arguments of the command-line can be the following:</p>
 		<td>Sets the parameters directory (the location where the filter 
 		parameters files are stored). You can use <code>.</code> (dot) to 
 		specify the current directory. By default, if not project is loaded, the 
-		default parameters directory is the user home directory.</td>
+		default parameters directory is the user home directory.<br>
+		When the <code>-pd</code> option is set it is also utilized as the root 
+		directory to substitute for the <code>${{rootDir}</code> variable that 
+		can be used in some path parameters.</td>
 	</tr>
 	<tr>
 		<td nowrap align="left" valign="top"><code>-?</code> or <code>-h</code></td>

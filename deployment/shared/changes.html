@@ -33,7 +33,15 @@ distribution.</p>
 	<li>Libraries:<ul>
 		<li>Changed the TextContainer class and refactor all dependencies. Note 
 		modification is a major code change.</li>
+		<li>Added the setRootDirectory() method to the IQuery interface.</li>
+		<li>Updated QueryManager to handle empty inline codes and inline codes 
+		with references when leveraging fuzzy matches</li>
 	</ul>
+	</li>
+	<li>Translation resources:<ul>
+	<li>Updated all the connectors for the IQuery change and Implemented 
+	${rootDir} for all the connectors using locale files: SimpleTM and Pensieve.</li>
+</ul>
 	</li>
 	<li>Filters:<ul>
 	<li>XML filter:<ul>
@@ -48,6 +56,8 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Steps:<ul>
+	<li>Implemented ${rootDir} for the follwoing steps: Format Conversion, 
+	Generate SimpleTM, Segmentation, TM Import, Leveraging.</li>
 	<li>Segmentation step:<ul>
 	<li>Made copy of source into empty target an option.</li>
 	<li>Added the option of verifying source and target segments match after 

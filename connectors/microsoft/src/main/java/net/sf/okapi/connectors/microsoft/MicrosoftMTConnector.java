@@ -174,4 +174,8 @@ public class MicrosoftMTConnector implements IQuery {
 		this.params = (Parameters)params;
 	}
 
+	@Override
+	public void setRootDirectory (String rootDir) {
+		// Not used
+	}
 }

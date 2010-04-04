@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -42,6 +42,7 @@ public class SimpleTMConnector implements ITMQuery {
 	private LocaleId trgLoc;
 	private LinkedHashMap<String, String> attributes;
 	private Parameters params;
+	private String rootDir;
 
 	public SimpleTMConnector () {
 		params = new Parameters();
@@ -49,10 +50,12 @@ public class SimpleTMConnector implements ITMQuery {
 		attributes = new LinkedHashMap<String, String>();
 	}
 	
+	@Override
 	public String getName () {
 		return "SimpleTM";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		return String.format("Database: %s\nPenalize exact matches with different codes in source: %s, in target: %s",
 			(Util.isEmpty(params.getDbPath()) ? "<To be specified>" : params.getDbPath()),
@@ -60,19 +63,23 @@ public class SimpleTMConnector implements ITMQuery {
 			(params.getPenalizeTargetWithDifferentCodes() ? "Yes" : "No"));
 	}
 	
+	@Override
 	public void setMaximumHits (int max) {
 		if ( max < 1 ) maxHits = 1;
 		else maxHits = max;
 	}
 
+	@Override
 	public void setThreshold (int threshold) {
 		this.threshold = threshold;
 	}
 
+	@Override
 	public void close() {
 		db.close();
 	}
 
+	@Override
 	public boolean hasNext () {
 		if ( results == null ) return false;
 		if ( current >= results.size() ) {
@@ -81,6 +88,7 @@ public class SimpleTMConnector implements ITMQuery {
 		return (current > -1);
 	}
 	
+	@Override
 	public QueryResult next () {
 		if ( results == null ) return null;
 		if (( current > -1 ) && ( current < results.size() )) {
@@ -91,17 +99,20 @@ public class SimpleTMConnector implements ITMQuery {
 		return null;
 	}
 
+	@Override
 	public void open () {
-		db.open(params.getDbPath());
+		db.open(Util.fillRootDirectoryVariable(params.getDbPath(), rootDir));
 		db.setPenalizeSourceWithDifferentCodes(params.getPenalizeSourceWithDifferentCodes());
 		db.setPenalizeTargetWithDifferentCodes(params.getPenalizeTargetWithDifferentCodes());
 	}
 
+	@Override
 	public int query (String plainText) {
 		TextFragment tf = new TextFragment(plainText);
 		return query(tf);
 	}
 	
+	@Override
 	public int query (TextFragment text) {
 		current = -1;
 		results = db.query(text, attributes, maxHits, threshold);
@@ -110,6 +121,7 @@ public class SimpleTMConnector implements ITMQuery {
 		return results.size();
 	}
 	
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
@@ -122,11 +134,13 @@ public class SimpleTMConnector implements ITMQuery {
 		}
 	}
 	
+	@Override
 	public void clearAttributes () {
 		attributes.clear();
 		db.clearAttributes();
 	}
 
+	@Override
 	public void removeAttribute (String name) {
 		if ( attributes.containsKey(name) ) {
 			attributes.remove(name);
@@ -134,6 +148,7 @@ public class SimpleTMConnector implements ITMQuery {
 		}
 	}
 
+	@Override
 	public void setLanguages (LocaleId sourceLang,
 		LocaleId targetLang)
 	{
@@ -141,32 +156,38 @@ public class SimpleTMConnector implements ITMQuery {
 		trgLoc = targetLang;
 	}
 
+	@Override
 	public LocaleId getSourceLanguage () {
 		return srcLoc;
 	}
 	
+	@Override
 	public LocaleId getTargetLanguage () {
 		return trgLoc;
 	}
 
-	public void export (String outputPath) {
-		db.exportToTMX(outputPath, srcLoc, trgLoc);
-	}
-
+	@Override
 	public int getMaximumHits () {
 		return maxHits;
 	}
 
+	@Override
 	public int getThreshold () {
 		return threshold;
 	}
 
+	@Override
 	public IParameters getParameters() {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
 
+	@Override
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
+	}
 }

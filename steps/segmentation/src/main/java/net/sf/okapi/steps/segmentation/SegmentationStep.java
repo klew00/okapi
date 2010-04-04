@@ -48,6 +48,7 @@ public class SegmentationStep extends BasePipelineStep {
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
 	private boolean initDone;
+	private String rootDir;
 
 	public SegmentationStep () {
 		params = new Parameters();
@@ -62,6 +63,11 @@ public class SegmentationStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
 	}
 	
 	public String getName () {
@@ -92,11 +98,10 @@ public class SegmentationStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartBatchItem (Event event) {
 		if ( initDone ) return event; // Initialize once per batch
-		//TODO: implement projDir
 		SRXDocument srxDoc = new SRXDocument();
 		String src = null;
 		if ( params.segmentSource ) {
-			src = params.sourceSrxPath; //.replace(VAR_PROJDIR, projectDir);
+			src = Util.fillRootDirectoryVariable(params.sourceSrxPath, rootDir);
 			srxDoc.loadRules(src);
 			if ( srxDoc.hasWarning() ) {
 				logger.warning(srxDoc.getWarning());
@@ -104,7 +109,7 @@ public class SegmentationStep extends BasePipelineStep {
 			srcSeg = srxDoc.compileLanguageRules(sourceLocale, null);
 		}
 		if ( params.segmentTarget ) {
-			String trg = params.targetSrxPath; //.replace(VAR_PROJDIR, projectDir);
+			String trg = Util.fillRootDirectoryVariable(params.targetSrxPath, rootDir);
 			// Load target SRX only if different from sources
 			if ( Util.isEmpty(src) || !src.equals(trg) ) {
 				srxDoc.loadRules(trg);

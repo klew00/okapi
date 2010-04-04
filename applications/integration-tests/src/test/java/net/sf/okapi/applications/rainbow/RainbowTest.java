@@ -80,6 +80,41 @@ public class RainbowTest {
 			compareWithGoldFile("pipelines/vignettePack1/done/vignetteTest01.out.xml", "pipelines/vignetteTest01.out.xml"));
 	}
 
+	@Test
+	public void testTMs () throws IOException, InterruptedException {
+		// Delete for all passes
+		// Delete output of pass 1
+		assertTrue(deleteOutputFile("pipelines/tm/out1.tmx"));
+		assertTrue(deleteOutputFile("pipelines/tm/test01.out1.html"));
+		// Delete output of pass 2
+		assertTrue(deleteOutputDir("pipelines/tm/out2.pentm", true));
+		// Delete output of pass 3
+		assertTrue(deleteOutputFile("pipelines/tm/test01.out3.html"));
+		// Delete output of pass 4
+		assertTrue(deleteOutputFile("pipelines/tm/out4.data.db"));
+		assertTrue(deleteOutputFile("pipelines/tm/out4.index.db"));
+		// Delete output of pass 5
+		assertTrue(deleteOutputFile("pipelines/tm/test01.out5.html"));
+		
+		// Pseudo translate and create TMX and pseudo-translated base output
+		assertEquals(0, runRainbow("-np -p pipelines/tm/pass1.rnb -pln pipelines/tm/pass1.pln -pd pipelines/tm"));
+		// Create Pensieve TM
+		assertEquals(0, runRainbow("-np -p pipelines/tm/pass2.rnb -pln pipelines/tm/pass2.pln -pd pipelines/tm"));
+		// Leverage from the Pensieve TM
+		assertEquals(0, runRainbow("-np -p pipelines/tm/pass3.rnb -pln pipelines/tm/pass3.pln -pd pipelines/tm"));
+		// Create SimpleTM TM
+		assertEquals(0, runRainbow("-np -p pipelines/tm/pass4.rnb -pln pipelines/tm/pass4.pln -pd pipelines/tm"));
+		// Leverage from SimpleTM TM
+		assertEquals(0, runRainbow("-np -p pipelines/tm/pass5.rnb -pln pipelines/tm/pass5.pln -pd pipelines/tm"));
+
+		// Compare leveraged results with base output
+		String basePath = root + File.separator + "pipelines/tm/Test01.out1.html";
+		String outputPath = root + File.separator + "pipelines/tm/Test01.out3.html";
+		assertTrue("Pensive leveraged output is different", fc.filesExactlyTheSame(outputPath, basePath));
+		outputPath = root + File.separator + "pipelines/tm/Test01.out5.html";
+		assertTrue("Pensive leveraged output is different", fc.filesExactlyTheSame(outputPath, basePath));
+	}
+	
     private boolean compareWithGoldFile (String outputBase) {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 

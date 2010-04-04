@@ -73,6 +73,11 @@ public enum StepParameterType {
 	/**
 	 * Output encoding of the main output document.
 	 */
-	OUTPUT_ENCODING
+	OUTPUT_ENCODING,
+	
+	/**
+	 * Root directory for the batch.
+	 */
+	ROOT_DIRECTORY
 
 }

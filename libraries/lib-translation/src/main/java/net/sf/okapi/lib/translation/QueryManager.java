@@ -57,6 +57,7 @@ public class QueryManager {
 	private int totalSegments;
 	private int leveragedSegments;
 	private boolean reorder = true;
+	private String rootDir;
 	
 	/**
 	 * Creates a new QueryManager object.
@@ -122,6 +123,7 @@ public class QueryManager {
 		// Add the resource
 		int id = addResource(connector, resourceName);
 		// Set the parameters and open 
+		connector.setRootDirectory(rootDir); // Before open()
 		connector.setParameters(params);
 		connector.open();
 		if (( srcLoc != null ) && ( trgLoc != null )) {
@@ -440,6 +442,18 @@ public class QueryManager {
 	}
 
 	/**
+	 * Sets the root directory for this query manager
+	 * and all translation resources it holds.
+	 * @param rootDir the root directory.
+	 */
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
+		for ( ResourceItem ri : resList.values() ) {
+			ri.query.setRootDirectory(this.rootDir);
+		}
+	}
+	
+	/**
 	 * Leverages a text unit (segmented or not) based on the current settings.
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu the text unit to leverage.
@@ -545,24 +559,46 @@ public class QueryManager {
 		int score,
 		TextUnit parent)
 	{
+		List<Code> newCodes = newTrg.getCodes();
+		List<Code> oriCodes = oriSrc.getCodes();
+		
 		// If score is 100 or more: no reason to adjust anything: use the target as-it
 		// This allows targets with only code differences to be used as-it
+		boolean needAdjustment = false;
 		if ( score >= 100 ) {
-			return newTrg;
+			// Check if we need to adjust even if it's ann exact match
+			// when we have empty codes in the new target
+			for ( Code code : newCodes ) {
+				if ( !code.hasData() ) {
+					needAdjustment = true;
+					break;
+				}
+			}
+			// Or reference in the original
+			if ( !needAdjustment ) {
+				for ( Code code : oriCodes ) {
+					if ( code.hasReference() ) {
+						needAdjustment = true;
+						break;
+					}
+				}
+			}
+			if ( !needAdjustment ) {
+				return newTrg;
+			}
 		}
 		// If both new and original have no code, return the new fragment
 		if ( !newTrg.hasCode() && !oriSrc.hasCode() ) {
 			return newTrg;
 		}
 		
-		List<Code> oriCodes = oriSrc.getCodes();
+		
 		// If the codes of the original sources and the matched one are the same: no need to adjust
-		if ( oriCodes.toString().equals(newSrc.getCodes().toString()) ) {
+		if ( !needAdjustment && oriCodes.toString().equals(newSrc.getCodes().toString()) ) {
 			return newTrg;
 		}
+
 		// Else: try to adjust
-		List<Code> newCodes = newTrg.getCodes();
-		
 		int[] oriIndices = new int[oriCodes.size()];
 		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
 		
@@ -603,7 +639,6 @@ public class QueryManager {
 				newCode.setData(oriCode.getData());
 				newCode.setOuterData(oriCode.getOuterData());
 				newCode.setReferenceFlag(oriCode.hasReference());
-				
 			}
 		}
 		

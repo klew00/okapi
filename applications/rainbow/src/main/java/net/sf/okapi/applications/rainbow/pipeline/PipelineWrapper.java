@@ -435,19 +435,21 @@ public class PipelineWrapper {
 	}
 	
 	public PipelineWrapper (IFilterConfigurationMapper fcMapper,
-		String rootFolder)
+		String appFolder,
+		String rootDir)
 	{
 		this.fcMapper = fcMapper;
 		steps = new ArrayList<StepInfo>();
 		driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(this.fcMapper);
+		driver.setRootDirectory(rootDir);
 		
 		// Hard-wired steps
 		buildStepList();
 
 		// Discover and add plug-ins
 		PluginsManager mgt = new PluginsManager();
-		mgt.discover(new File(rootFolder+File.separator+"dropins"), true);
+		mgt.discover(new File(appFolder+File.separator+"dropins"), true);
 		addFromPlugins(mgt);
 	}
 	

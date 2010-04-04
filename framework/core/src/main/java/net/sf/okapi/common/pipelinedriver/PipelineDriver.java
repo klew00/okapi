@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -55,6 +55,7 @@ public class PipelineDriver implements IPipelineDriver {
 	private IPipelineStep lastOutputStep;
 	private int maxInputCount;
 	private IFilterConfigurationMapper fcMapper;
+	private String rootDir;
 	
 	/**
 	 * Creates an new PipelineDriver object with an empty pipeline.
@@ -66,10 +67,17 @@ public class PipelineDriver implements IPipelineDriver {
 		maxInputCount = 1;
 	}
 
+	@Override
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
 	}
+	
+	@Override
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
+	}
 
+	@Override
 	public void setPipeline (IPipeline pipeline) {
 		if (this.pipeline != null)
 			this.pipeline.cancel();	// Cancel processing of the current pipeline
@@ -89,10 +97,12 @@ public class PipelineDriver implements IPipelineDriver {
 									// Also observers of the given pipeline are in place.
 	}
 
+	@Override
 	public IPipeline getPipeline () {
 		return pipeline;
 	}
 
+	@Override
 	public void addStep (IPipelineStep step) {
 		pipeline.addStep(step);
 		List<ConfigurationParameter> pList = StepIntrospector.getStepParameters(step);
@@ -115,11 +125,13 @@ public class PipelineDriver implements IPipelineDriver {
 		}
 	}
 
+	@Override
 	public void processBatch (List<IBatchItemContext> batchItems) {
 		this.batchItems = batchItems;
 		processBatch();
 	}
 	
+	@Override
 	public void processBatch () {
 		// Set the runtime parameters for the START_BATCH events
 		// Especially source and target languages
@@ -138,12 +150,13 @@ public class PipelineDriver implements IPipelineDriver {
 		pipeline.endBatch();
 	}
 	
+	@Override
 	public void addBatchItem (IBatchItemContext item) {
 		batchItems.add(item);
 	}
 
-	public void addBatchItem (RawDocument... rawDocs)
-	{
+	@Override
+	public void addBatchItem (RawDocument... rawDocs) {
 		BatchItemContext item = new BatchItemContext();
 		for ( RawDocument rawDoc : rawDocs ) {
 			DocumentData ddi = new DocumentData();
@@ -153,6 +166,7 @@ public class PipelineDriver implements IPipelineDriver {
 		batchItems.add(item);
 	}
 	
+	@Override
 	public void addBatchItem (RawDocument rawDoc,
 		URI outputURI,
 		String outputEncoding)
@@ -166,6 +180,7 @@ public class PipelineDriver implements IPipelineDriver {
 		batchItems.add(item);
 	}
 	
+	@Override
 	public void addBatchItem (URI inputURI,
 		String defaultEncoding,
 		String filterConfigId,
@@ -180,6 +195,7 @@ public class PipelineDriver implements IPipelineDriver {
 		batchItems.add(item);
 	}
 	
+	@Override
 	public void clearItems () {
 		batchItems.clear();
 	}
@@ -199,6 +215,7 @@ public class PipelineDriver implements IPipelineDriver {
 		}
 	}
 
+	@Override
 	public void clearSteps () {
 		pipeline.clearSteps();		
 		paramList.clear();
@@ -206,6 +223,7 @@ public class PipelineDriver implements IPipelineDriver {
 		maxInputCount = 1;
 	}
 
+	@Override
 	public int getRequestedInputCount () {
 		return maxInputCount;
 	}
@@ -252,6 +270,9 @@ public class PipelineDriver implements IPipelineDriver {
 						break;
 					case THIRD_INPUT_RAWDOC:
 						method.invoke(p.getStep(), item.getRawDocument(2));
+						break;
+					case ROOT_DIRECTORY:
+						method.invoke(p.getStep(), (rootDir==null) ? "" : rootDir);
 						break;
 					default:
 						throw new OkapiBadStepInputException(String.format(

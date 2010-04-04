@@ -130,7 +130,7 @@ public class MainForm { //implements IParametersProvider {
 	private LogHandler logHandler;
 	private UserConfiguration config;
 	private MRUList mruList;
-	private String rootFolder;
+	private String appRootFolder;
 	private String sharedFolder;
 	private BaseHelp help;
 	private Project prj;
@@ -272,7 +272,7 @@ public class MainForm { //implements IParametersProvider {
 		DefaultFilters.setMappings(fcMapper, false, true);
 		// Discover and add plug-ins
 		PluginsManager mgt = new PluginsManager();
-		mgt.discover(new File(rootFolder+File.separator+"dropins"), true);
+		mgt.discover(new File(appRootFolder+File.separator+"dropins"), true);
 		fcMapper.addFromPlugins(mgt);
 		customFilterConfigsNeedUpdate = true;
 		
@@ -1194,7 +1194,7 @@ public class MainForm { //implements IParametersProvider {
 			saveSurfaceData();
 			updateCustomConfigurations();
 			if ( wrapper == null ) {
-				wrapper = new PipelineWrapper(fcMapper, rootFolder);
+				wrapper = new PipelineWrapper(fcMapper, appRootFolder, prj.getProjectFolder());
 			}
 
 			if ( predefinedPipeline == null ) {
@@ -1568,14 +1568,14 @@ public class MainForm { //implements IParametersProvider {
 	private void setDirectories () throws UnsupportedEncodingException {
     	// Get the location of the main class source
     	File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
-    	rootFolder = URLDecoder.decode(file.getAbsolutePath(),"utf-8"); //$NON-NLS-1$
+    	appRootFolder = URLDecoder.decode(file.getAbsolutePath(),"utf-8"); //$NON-NLS-1$
     	// Remove the JAR file if running an installed version
-    	boolean fromJar = rootFolder.endsWith(".jar");
-    	if ( fromJar ) rootFolder = Util.getDirectoryName(rootFolder); //$NON-NLS-1$
+    	boolean fromJar = appRootFolder.endsWith(".jar");
+    	if ( fromJar ) appRootFolder = Util.getDirectoryName(appRootFolder); //$NON-NLS-1$
     	// Remove the application folder in all cases
-    	rootFolder = Util.getDirectoryName(rootFolder);
-		sharedFolder = Utils.getOkapiSharedFolder(rootFolder, fromJar);
-		help = new BaseHelp(rootFolder+File.separator+"help"); //$NON-NLS-1$
+    	appRootFolder = Util.getDirectoryName(appRootFolder);
+		sharedFolder = Utils.getOkapiSharedFolder(appRootFolder, fromJar);
+		help = new BaseHelp(appRootFolder+File.separator+"help"); //$NON-NLS-1$
 	}
 	
 	private void startWaiting (String text,

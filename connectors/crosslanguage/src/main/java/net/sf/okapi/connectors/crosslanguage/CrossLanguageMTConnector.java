@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -58,22 +58,27 @@ public class CrossLanguageMTConnector implements IQuery {
 		util = new QueryUtil();
 	}
 	
+	@Override
 	public void close () {
 		gateway = null;
 	}
 
+	@Override
 	public String getName () {
 		return "CrossLanguage-MT";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		return "Server: " + params.getServerURL();
 	}
 
+	@Override
 	public boolean hasNext () {
 		return (current>-1);
 	}
 	
+	@Override
 	public QueryResult next () {
 		if ( current > -1 ) { // Only one result
 			current = -1;
@@ -82,6 +87,7 @@ public class CrossLanguageMTConnector implements IQuery {
 		return null;
 	}
 
+	@Override
 	public void open () {
 		URL url;
 		try {
@@ -103,15 +109,17 @@ public class CrossLanguageMTConnector implements IQuery {
 		}
 	}
 
+	@Override
 	public int query (String plainText) {
 		return queryString(plainText);
 	}
 	
+	@Override
 	public int query (TextFragment text) {
 		return queryFile(text);
 	}
 	
-	public int queryString (String text) {
+	private int queryString (String text) {
 		current = -1;
 		try {
 			// Call the service
@@ -169,20 +177,24 @@ public class CrossLanguageMTConnector implements IQuery {
 		return ((current==0) ? 1 : 0);
 	}
 
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
 		// Not used with this MT engine
 	}
 	
+	@Override
 	public void removeAttribute (String name) {
 		// Not used with this MT engine
 	}
 	
+	@Override
 	public void clearAttributes () {
 		// Not used with this MT engine
 	}
 
+	@Override
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
@@ -191,20 +203,28 @@ public class CrossLanguageMTConnector implements IQuery {
 		trgLoc = targetLocale;
 	}
 	
+	@Override
 	public LocaleId getSourceLanguage () {
 		return srcLoc;
 	}
 	
+	@Override
 	public LocaleId getTargetLanguage () {
 		return trgLoc;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
 
+	@Override
+	public void setRootDirectory (String rootDir) {
+		// Not used
+	}
 }

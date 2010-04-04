@@ -52,35 +52,38 @@ public class ApertiumMTConnector implements IQuery {
 		store = new QueryUtil();
 	}
 	
+	@Override
 	public String getName () {
 		return "Apertium MT";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		return "Server: "+params.getServer();
 	}
 	
+	@Override
 	public void close () {
 		// Nothing to do
 		hasNext = false;
 	}
 
-	public void export (String outputPath) {
-		throw new UnsupportedOperationException();
-	}
-
+	@Override
 	public LocaleId getSourceLanguage () {
 		return LocaleId.fromString(srcLang);
 	}
 
+	@Override
 	public LocaleId getTargetLanguage () {
 		return LocaleId.fromString(trgLang);
 	}
 
+	@Override
 	public boolean hasNext () {
 		return hasNext;
 	}
 
+	@Override
 	public QueryResult next () {
 		if ( hasNext ) {
 			hasNext = false;
@@ -91,14 +94,17 @@ public class ApertiumMTConnector implements IQuery {
 		return result;
 	}
 
+	@Override
 	public void open () {
 		// Nothing to do
 	}
 
+	@Override
 	public int query (String plainText) {
 		return query(new TextFragment(plainText));
 	}
 
+	@Override
 	public int query (TextFragment frag) {
 		result = null;
 		hasNext = false;
@@ -159,6 +165,7 @@ public class ApertiumMTConnector implements IQuery {
 		}
 	}
 
+	@Override
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
@@ -179,26 +186,35 @@ public class ApertiumMTConnector implements IQuery {
 		return lang;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
 
+	@Override
 	public void clearAttributes () {
 		// Nothing to do
 	}
 
+	@Override
 	public void removeAttribute (String name) {
 		// Nothing to do
 	}
 
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
 		// Nothing to do
 	}
 
+	@Override
+	public void setRootDirectory (String rootDir) {
+		// Not used
+	}
 }

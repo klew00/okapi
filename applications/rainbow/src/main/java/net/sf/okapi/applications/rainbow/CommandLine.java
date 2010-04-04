@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -43,7 +43,7 @@ import net.sf.okapi.common.ui.BaseHelp;
 
 public class CommandLine {
 
-	private String rootFolder;
+	private String appRootFolder;
 	private String sharedFolder;
 	private LanguageManager lm;
 	private Project prj;
@@ -97,9 +97,9 @@ public class CommandLine {
 		FormatManager fm = new FormatManager();
 		fm.load(null); // TODO: implement real external file, for now it's hard-coded
 		prj = new Project(lm);
-		prj.setInputRoot(0, rootFolder, true);
-		prj.setInputRoot(1, rootFolder, true);
-		prj.setInputRoot(2, rootFolder, true);
+		prj.setInputRoot(0, appRootFolder, true);
+		prj.setInputRoot(1, appRootFolder, true);
+		prj.setInputRoot(2, appRootFolder, true);
 		boolean setOutSearch = false;
 		int inpList = -1;
 		optionsFile = null;
@@ -211,14 +211,14 @@ public class CommandLine {
 	private void initialize () throws Exception {
     	// Get the location of the main class source
     	File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
-    	rootFolder = URLDecoder.decode(file.getAbsolutePath(),"utf-8"); //$NON-NLS-1$
-    	boolean fromJar = rootFolder.endsWith(".jar");
+    	appRootFolder = URLDecoder.decode(file.getAbsolutePath(),"utf-8"); //$NON-NLS-1$
+    	boolean fromJar = appRootFolder.endsWith(".jar");
     	// Remove the JAR file if running an installed version
-    	if ( fromJar ) rootFolder = Util.getDirectoryName(rootFolder); //$NON-NLS-1$
+    	if ( fromJar ) appRootFolder = Util.getDirectoryName(appRootFolder); //$NON-NLS-1$
     	// Remove the application folder in all cases
-    	rootFolder = Util.getDirectoryName(rootFolder);
-		sharedFolder = Utils.getOkapiSharedFolder(rootFolder, fromJar);
-		help = new BaseHelp(rootFolder+File.separator+"help"); //$NON-NLS-1$
+    	appRootFolder = Util.getDirectoryName(appRootFolder);
+		sharedFolder = Utils.getOkapiSharedFolder(appRootFolder, fromJar);
+		help = new BaseHelp(appRootFolder+File.separator+"help"); //$NON-NLS-1$
 
 		log = new BatchLog();
 		logHandler = new LogHandler(log);
@@ -234,7 +234,7 @@ public class CommandLine {
 		DefaultFilters.setMappings(fcMapper, false, true);
 		// Discover and add plug-ins
 		PluginsManager mgt = new PluginsManager();
-		mgt.discover(new File(rootFolder+File.separator+"dropins"), true);
+		mgt.discover(new File(appRootFolder+File.separator+"dropins"), true);
 		fcMapper.addFromPlugins(mgt);
 
 		utilitiesAccess = new UtilitiesAccess();
@@ -282,8 +282,8 @@ public class CommandLine {
 
 		fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 		fcMapper.updateCustomConfigurations();
-		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, rootFolder);
-		
+		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, appRootFolder, prj.getParametersFolder());
+
 		IPredefinedPipeline predefinedPipeline = null;
 		
 //		// If we have a predefined pipeline: set it

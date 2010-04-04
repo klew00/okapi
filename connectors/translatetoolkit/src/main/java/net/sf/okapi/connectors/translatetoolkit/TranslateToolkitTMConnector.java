@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -58,31 +58,33 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		params = new Parameters();
 	}
 	
+	@Override
 	public String getName () {
 		return "Translate Toolkit TM";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		return "Server: "+String.format("http://%s:%d/tmserver/",
 			params.getHost(), params.getPort());
 	}
 	
+	@Override
 	public void close () {
 		// Nothing to do
 	}
 
-	public void export (String outputPath) {
-		throw new UnsupportedOperationException();
-	}
-
+	@Override
 	public LocaleId getSourceLanguage () {
 		return LocaleId.fromString(srcLang);
 	}
 
+	@Override
 	public LocaleId getTargetLanguage () {
 		return LocaleId.fromString(trgLang);
 	}
 
+	@Override
 	public boolean hasNext () {
 		if ( results == null ) return false;
 		if ( current >= results.size() ) {
@@ -91,6 +93,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		return (current > -1);
 	}
 
+	@Override
 	public QueryResult next () {
 		if ( results == null ) return null;
 		if (( current > -1 ) && ( current < results.size() )) {
@@ -101,12 +104,14 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		return null;
 	}
 
+	@Override
 	public void open () {
 		baseURL = String.format("http://%s:%d/tmserver/",
 			params.getHost(), params.getPort());
 		parser = new JSONParser();
 	}
 
+	@Override
 	public int query (String plainText) {
 		results = new ArrayList<QueryResult>();
 		current = -1;
@@ -149,26 +154,31 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		}
 	}
 
+	@Override
 	public int query (TextFragment text) {
 		//TODO: Deal with inline codes, maybe using generic codes
 		String tmp = text.getCodedText();
 		return query(tmp);
 	}
 
+	@Override
 	public void clearAttributes () {
 		// Not used with this connector
 	}
 
+	@Override
 	public void removeAttribute (String name) {
 		// Not used with this connector
 	}
 
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
 		// Not used with this connector
 	}
 
+	@Override
 	public void setLanguages (LocaleId sourceLang,
 		LocaleId targetLang)
 	{
@@ -176,18 +186,22 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		trgLang = toInternalCode(targetLang);
 	}
 
+	@Override
 	public void setMaximumHits (int max) {
 		maxHits = max;
 	}
 
+	@Override
 	public void setThreshold (int threshold) {
 		this.threshold = threshold;
 	}
 
+	@Override
 	public int getMaximumHits () {
 		return maxHits;
 	}
 
+	@Override
 	public int getThreshold () {
 		return threshold;
 	}
@@ -196,12 +210,18 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		return standardCode.toPOSIXLocaleId();
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
 
+	@Override
+	public void setRootDirectory (String rootDir) {
+		// Not used
+	}
 }

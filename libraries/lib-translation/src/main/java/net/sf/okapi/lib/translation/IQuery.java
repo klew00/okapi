@@ -133,4 +133,11 @@ public interface IQuery {
 	 */
 	public QueryResult next ();
 
+	/**
+	 * Sets the root directory that may be used to replace the valiable ${rootDir} in the
+	 * parameters of this object.
+	 * @param rootDir the root directory.
+	 */
+	public void setRootDirectory (String rootDir);
+	
 }

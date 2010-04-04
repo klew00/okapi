@@ -48,7 +48,6 @@ import com.globalsight.www.webservices.AmbassadorWebServiceSoapBindingStub;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
@@ -82,30 +81,32 @@ public class GlobalSightTMConnector implements ITMQuery {
 		}
 	}
 
+	@Override
 	public String getName () {
 		return "GlobalSight-TM";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		return String.format("URL: %s\nTM profile: %s",
 			params.getServerURL(), params.getTmProfile());
 	}
 	
+	@Override
 	public void close () {
 	}
 
-	public void export (String outputPath) {
-		throw new OkapiNotImplementedException("The export() method is not supported.");
-	}
-
+	@Override
 	public LocaleId getSourceLanguage () {
 		return LocaleId.fromPOSIXLocale(srcLang);
 	}
 
+	@Override
 	public LocaleId getTargetLanguage () {
 		return LocaleId.fromPOSIXLocale(trgLang);
 	}
 
+	@Override
 	public boolean hasNext () {
 		if ( results == null ) return false;
 		if ( current >= results.size() ) {
@@ -114,6 +115,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 		return (current > -1);
 	}
 
+	@Override
 	public QueryResult next () {
 		if ( results == null ) return null;
 		if (( current > -1 ) && ( current < results.size() )) {
@@ -124,6 +126,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 		return null;
 	}
 
+	@Override
 	public void open () {
 		try {
 			URL url = new URL(params.getServerURL());
@@ -146,6 +149,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 		}
 	}
 
+	@Override
 	public int query (TextFragment frag) {
 		results.clear();
 		if ( !frag.hasText() ) return 0;
@@ -301,6 +305,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 //		return results.size();
 //	}
 
+	@Override
 	public int query (String plainText) {
 		try {
 			results.clear();
@@ -427,17 +432,21 @@ public class GlobalSightTMConnector implements ITMQuery {
 		return Integer.valueOf(attr.getNodeValue());
 	}
 	
+	@Override
 	public void removeAttribute (String name) {
 	}
 	
+	@Override
 	public void clearAttributes () {
 	}
 
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
 	}
 
+	@Override
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
@@ -456,6 +465,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 	 * connector this method can only reduce the maximum number of hits from
 	 * the one defined in the active TM profile.
 	 */
+	@Override
 	public void setMaximumHits (int max) {
 		maxHits = max;
 	}
@@ -465,24 +475,33 @@ public class GlobalSightTMConnector implements ITMQuery {
 	 * with this connector this method can only reduce the threshold from the
 	 * one defined in the active TM profile. 
 	 */
+	@Override
 	public void setThreshold (int threshold) {
 		this.threshold = threshold; 
 	}
 
+	@Override
 	public int getMaximumHits () {
 		return maxHits;
 	}
 
+	@Override
 	public int getThreshold () {
 		return threshold;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
 
+	@Override
+	public void setRootDirectory (String rootDir) {
+		// Not used
+	}
 }

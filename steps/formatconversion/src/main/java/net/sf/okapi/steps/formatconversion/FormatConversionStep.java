@@ -28,6 +28,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -54,6 +55,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	private URI inputURI;
 	private URI outputURI;
 	private LocaleId targetLocale;
+	private String rootDir;
 
 	public FormatConversionStep () {
 		params = new Parameters();
@@ -72,6 +74,11 @@ public class FormatConversionStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
 	}
 	
 	public String getDescription () {
@@ -203,7 +210,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	
 	private void startPOOutput () {
 		if ( params.getSingleOutput() ) {
-			writer.setOutput(params.getOutputPath());
+			writer.setOutput(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
 		}
 		else {
 			if ( params.getAutoExtensions() ) {
@@ -227,7 +234,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	private void startTMXOutput () {
 		File outFile;
 		if ( params.getSingleOutput() ) {
-			outFile = new File(params.getOutputPath());
+			outFile = new File(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
 		}
 		else {
 			if ( params.getAutoExtensions() ) {
@@ -251,7 +258,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	private void startTableOutput () {
 		File outFile;
 		if ( params.getSingleOutput() ) {
-			outFile = new File(params.getOutputPath());
+			outFile = new File(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
 		}
 		else {
 			if ( params.getAutoExtensions() ) {
@@ -273,7 +280,7 @@ public class FormatConversionStep extends BasePipelineStep {
 
 	private void startPensieveOutput () {
 		if ( params.getSingleOutput() ) {
-			writer.setOutput(params.getOutputPath());
+			writer.setOutput(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
 		}
 		else {
 			if ( params.getAutoExtensions() ) {

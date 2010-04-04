@@ -509,6 +509,12 @@ public class Project {
 	}
 	
 	public void setCustomParametersFolder (String newParametersFolder) {
+		// If the directory is not rooted, we root it to the current working directory
+		File file = new File(newParametersFolder);
+		if ( !file.isAbsolute() ) {
+			newParametersFolder = file.getAbsolutePath();
+		}
+		// Set if needed
 		if ( !customParamsFolder.equals(newParametersFolder) ) {
 			customParamsFolder = newParametersFolder;
 			isModified = true;

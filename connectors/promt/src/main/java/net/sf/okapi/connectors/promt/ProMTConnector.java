@@ -52,9 +52,7 @@ import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
@@ -96,34 +94,37 @@ public class ProMTConnector implements IQuery {
 		}
 	}
 
+	@Override
 	public String getName () {
 		return "ProMT";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		return String.format("Server: %s", params.getHost());
 	}
 	
+	@Override
 	public void close () {
 		// Nothing to do
 	}
 
-	public void export (String outputPath) {
-		throw new OkapiNotImplementedException("The export() method is not supported.");
-	}
-
+	@Override
 	public LocaleId getSourceLanguage () {
 		return LocaleId.fromString(srcLang);
 	}
 	
+	@Override
 	public LocaleId getTargetLanguage () {
 		return LocaleId.fromString(trgLang);
 	}
 
+	@Override
 	public boolean hasNext () {
 		return (current>-1);
 	}
 	
+	@Override
 	public QueryResult next() {
 		if ( current > -1 ) { // Only one result
 			current = -1;
@@ -148,6 +149,7 @@ public class ProMTConnector implements IQuery {
 		return tmp;
 	}
 	
+	@Override
 	public void open () {
 		// Try to authenticate if needed
 		if ( !Util.isEmpty(params.getUsername()) ) {
@@ -170,11 +172,13 @@ public class ProMTConnector implements IQuery {
 		}
 	}
 
+	@Override
 	public int query (String text) {
 		if ( Util.isEmpty(text) ) return 0;
 		return queryUsingPOST(null, text);
 	}
 
+	@Override
 	public int query (TextFragment frag) {
 		if ( !frag.hasText(false) ) return 0;
 		return queryUsingPOST(frag, null);
@@ -251,7 +255,6 @@ public class ProMTConnector implements IQuery {
 			throw new RuntimeException("Error during the query.", e);
 		}
 		catch ( IOException e ) {
-e.printStackTrace();
 			throw new RuntimeException("Error during the query.", e);
 		}
 		finally {
@@ -285,14 +288,17 @@ e.printStackTrace();
 		}
 	}
 	
+	@Override
 	public void removeAttribute (String name) {
 		//TODO: use domain
 	}
 
+	@Override
 	public void clearAttributes () {
 		//TODO: use domain
 	}
 
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
@@ -322,6 +328,7 @@ e.printStackTrace();
 		}
 	}
 	
+	@Override
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
@@ -339,10 +346,12 @@ e.printStackTrace();
 		return locale.getLanguage();
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		params = (Parameters)params;
 	}
@@ -454,22 +463,27 @@ e.printStackTrace();
 		}
 	}
 
-	public static void main (String args[]) {
-		ProMTConnector con = new ProMTConnector();
-		con.setLanguages(LocaleId.fromString("en"), LocaleId.fromString("fr"));
-		con.open();
-		
-		TextFragment frag = new TextFragment("This is an <b>example</b>.");
-		frag.changeToCode(21, 25, TagType.CLOSING, "b");
-		frag.changeToCode(11, 14, TagType.OPENING, "b");
-		
-//		TextFragment frag = new TextFragment("This is an example.");
-		
-		con.query(frag);
-		if ( con.hasNext() ) {
-			System.out.println(con.next().target.toString());
-		}
-		
+	@Override
+	public void setRootDirectory (String rootDir) {
+		// Not used
 	}
+
+//	public static void main (String args[]) {
+//		ProMTConnector con = new ProMTConnector();
+//		con.setLanguages(LocaleId.fromString("en"), LocaleId.fromString("fr"));
+//		con.open();
+//		
+//		TextFragment frag = new TextFragment("This is an <b>example</b>.");
+//		frag.changeToCode(21, 25, TagType.CLOSING, "b");
+//		frag.changeToCode(11, 14, TagType.OPENING, "b");
+//		
+////		TextFragment frag = new TextFragment("This is an example.");
+//		
+//		con.query(frag);
+//		if ( con.hasNext() ) {
+//			System.out.println(con.next().target.toString());
+//		}
+//		
+//	}
 }
 

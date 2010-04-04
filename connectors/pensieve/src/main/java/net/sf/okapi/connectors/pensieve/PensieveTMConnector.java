@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -46,22 +46,26 @@ public class PensieveTMConnector implements ITMQuery {
 	private Parameters params;
 	private ITmSeeker seeker;
 	private Metadata attrs;
+	private String rootDir;
 	
 	public PensieveTMConnector () {
 		params = new Parameters();
 		attrs = new Metadata();
 	}
 
+	@Override
 	public String getName() {
 		return "Pensieve TM";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		return "Database: " + (Util.isEmpty(params.getDbDirectory())
 			? "<To be specified>"
 			: params.getDbDirectory());
 	}
 
+	@Override
 	public void setMaximumHits (int max) {
 		if ( max < 1 ) {
 			maxHits = 1;
@@ -71,14 +75,17 @@ public class PensieveTMConnector implements ITMQuery {
 		}
 	}
 
+	@Override
 	public void setThreshold (int threshold) {
 		this.threshold = threshold;
 	}
 
+	@Override
 	public void close () {
 		seeker.close();
 	}
 
+	@Override
 	public boolean hasNext () {
 		if ( results == null ) {
 			return false;
@@ -89,6 +96,7 @@ public class PensieveTMConnector implements ITMQuery {
 		return (current > -1);
 	}
 
+	@Override
 	public QueryResult next () {
 		if ( results == null ) {
 			return null;
@@ -101,16 +109,20 @@ public class PensieveTMConnector implements ITMQuery {
 		return null;
 	}
 
+	@Override
 	public void open () {
 		// Create a seeker (the TM must exist: we are just querying)
-		seeker = TmSeekerFactory.createFileBasedTmSeeker(params.getDbDirectory());
+		seeker = TmSeekerFactory.createFileBasedTmSeeker(
+			Util.fillRootDirectoryVariable(params.getDbDirectory(), rootDir));
 	}
 
+	@Override
 	public int query (String plainText) {
 		TextFragment tf = new TextFragment(plainText);
 		return query(tf);
 	}
 
+	@Override
 	public int query (TextFragment text) {
 		results = new ArrayList<QueryResult>();
 		current = -1;
@@ -137,6 +149,7 @@ public class PensieveTMConnector implements ITMQuery {
 		return results.size();
 	}
 
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
@@ -154,10 +167,12 @@ public class PensieveTMConnector implements ITMQuery {
 		}
 	}
 
+	@Override
 	public void clearAttributes () {
 		attrs.clear();
 	}
 
+	@Override
 	public void removeAttribute (String name) {
 		if ( "resname".equals(name) ) {
 			attrs.remove(MetadataType.ID);
@@ -173,6 +188,7 @@ public class PensieveTMConnector implements ITMQuery {
 		}
 	}
 
+	@Override
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
@@ -180,32 +196,38 @@ public class PensieveTMConnector implements ITMQuery {
 		trgLoc = targetLocale;
 	}
 
+	@Override
 	public LocaleId getSourceLanguage () {
 		return srcLoc;
 	}
 
+	@Override
 	public LocaleId getTargetLanguage () {
 		return trgLoc;
 	}
 
-	public void export (String outputPath) {
-		throw new UnsupportedOperationException("This method is not implemented yet " + outputPath);
-	}
-
+	@Override
 	public int getMaximumHits () {
 		return maxHits;
 	}
 
+	@Override
 	public int getThreshold () {
 		return threshold;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return params;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
 
+	@Override
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
+	}
 }

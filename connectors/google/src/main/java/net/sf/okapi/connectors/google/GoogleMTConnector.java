@@ -56,22 +56,27 @@ public class GoogleMTConnector implements IQuery {
 		util = new QueryUtil();
 	}
 	
+	@Override
 	public void close () {
 		// Nothing to do
 	}
 
+	@Override
 	public String getName () {
 		return "Google-MT";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		return "Server: " + addressAjax;
 	}
 
+	@Override
 	public boolean hasNext () {
 		return (current>-1);
 	}
 	
+	@Override
 	public QueryResult next() {
 		if ( current > -1 ) { // Only one result
 			current = -1;
@@ -80,6 +85,7 @@ public class GoogleMTConnector implements IQuery {
 		return null;
 	}
 
+	@Override
 	public void open () {
 		try {
 			InetAddress thisIp = InetAddress.getLocalHost();
@@ -91,11 +97,13 @@ public class GoogleMTConnector implements IQuery {
 		}
 	}
 
+	@Override
 	public int query (String plainText) {
 		TextFragment tf = new TextFragment(plainText);
 		return query(tf);
 	}
 	
+	@Override
 	public int query (TextFragment text) {
 		current = -1;
 		return queryAjax(text);
@@ -147,20 +155,24 @@ public class GoogleMTConnector implements IQuery {
 		return ((current==0) ? 1 : 0);
 	}
 
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
 		// Not used with this MT engine
 	}
 	
+	@Override
 	public void removeAttribute (String name) {
 		// Not used with this MT engine
 	}
 	
+	@Override
 	public void clearAttributes () {
 		// Not used with this MT engine
 	}
 
+	@Override
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
@@ -168,10 +180,12 @@ public class GoogleMTConnector implements IQuery {
 		trgLang = toInternalCode(targetLocale);
 	}
 	
+	@Override
 	public LocaleId getSourceLanguage () {
 		return LocaleId.fromString(srcLang);
 	}
 	
+	@Override
 	public LocaleId getTargetLanguage () {
 		return LocaleId.fromString(trgLang);
 	}
@@ -184,13 +198,19 @@ public class GoogleMTConnector implements IQuery {
 		return code;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		// No parameters are used with this connector
 		return null;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		// No parameters are used with this connector
 	}
 
+	@Override
+	public void setRootDirectory (String rootDir) {
+		// Not used
+	}
 }

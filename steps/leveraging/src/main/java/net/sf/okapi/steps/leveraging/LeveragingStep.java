@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
@@ -45,6 +46,7 @@ public class LeveragingStep extends BasePipelineStep {
 	private LocaleId targetLocale;
 	private QueryManager qm;
 	private TMXWriter tmxWriter;
+	private String rootDir;
 
 	public LeveragingStep () {
 		params = new Parameters();
@@ -58,6 +60,11 @@ public class LeveragingStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
 	}
 	
 	public String getName () {
@@ -87,6 +94,7 @@ public class LeveragingStep extends BasePipelineStep {
 		// Else: initialize the global variables
 		qm = new QueryManager();
 		qm.setThreshold(params.getThreshold());
+		qm.setRootDirectory(rootDir);
 		int id = qm.addAndInitializeResource(params.getResourceClassName(), null,
 			params.getResourceParameters());
 		ResourceItem res = qm.getResource(id);
@@ -94,7 +102,7 @@ public class LeveragingStep extends BasePipelineStep {
 		logger.info(res.query.getSettingsDisplay());
 			
 		if ( params.getMakeTMX() ) {
-			tmxWriter = new TMXWriter(params.getTMXPath());
+			tmxWriter = new TMXWriter(Util.fillRootDirectoryVariable(params.getTMXPath(), rootDir));
 			tmxWriter.setUseMTPrefix(params.getUseMTPrefix());
 			tmxWriter.writeStartDocument(sourceLocale, targetLocale,
 				getClass().getName(), "", "sentence", "undefined", "undefined");

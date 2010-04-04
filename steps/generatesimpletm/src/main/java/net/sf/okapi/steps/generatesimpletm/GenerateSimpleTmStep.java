@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -50,6 +50,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	private int countTusAdded;
 	private int countSegsAdded;
 	private boolean isMultilingual;
+	private String rootDir;
 
 	public GenerateSimpleTmStep () {
 		params = new Parameters();
@@ -58,6 +59,11 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
 	}
 	
 	public String getName () {
@@ -91,14 +97,15 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 	protected Event handleStartBatchItem (Event event) {
 		if(simpleTm == null){
 			simpleTm = new Database();
-			simpleTm.create(params.getTmPath(), true, targetLocale);
+			simpleTm.create(Util.fillRootDirectoryVariable(params.getTmPath(), rootDir),
+				true, targetLocale);
 		}		
 		return event;
 	}
 	
 	@Override
 	protected Event handleEndBatchItem (Event event) {
-		logger.info(String.format("\nSIMPLE TM GENERATION FILE: %s", fileName ));
+		logger.info(String.format("\nSimpleTM output: %s", fileName ));
 		logger.info(String.format("Untranslatable text units = %d",countIsNotTranslatable));
 		logger.info(String.format("Translatable text units but failed to add = %d", countTuNotAdded));
 		logger.info(String.format("Text units added = %d", countTusAdded));
@@ -108,12 +115,11 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleEndBatch (Event event) {
-		logger.info(String.format("\nSIMPLE TM GENERATION: "));
 		logger.info(String.format("Total untranslatable text units = %d",countIsNotTranslatable));
 		logger.info(String.format("Total text units (Translatable) that failed to add = %d", countTuNotAdded));
 		logger.info(String.format("Total text units added = %d", countTusAdded));
 		logger.info(String.format("Total segments added = %d",countSegsAdded));
-		logger.info(String.format("Total entries in generated simpleTm = %d",simpleTm.getEntryCount()));
+		logger.info(String.format("Total entries in generated simpleTm = %d", simpleTm.getEntryCount()));
 		simpleTm.close();
 		return event;		
 	}

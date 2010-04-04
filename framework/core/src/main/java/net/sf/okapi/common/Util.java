@@ -1147,4 +1147,21 @@ public class Util {
 		  return sb.toString();
 
 	}
+
+	/**
+	 * Replaces in a given original string, a potential variable ${rootDir} by a given root directory.
+	 * @param original the original string where to perform the replacement.
+	 * @param rootDir the root directory. If null it will be automatically set to the
+	 * user home directory.
+	 * @return the original string with ${rootDir} replaced if it was there.
+	 */
+	public static String fillRootDirectoryVariable (String original,
+		String rootDir)
+	{
+		if ( rootDir == null ) {
+			rootDir = System.getProperty("user.dir");
+		}
+		return original.replace("${rootDir}", rootDir);
+	}
+	
 }

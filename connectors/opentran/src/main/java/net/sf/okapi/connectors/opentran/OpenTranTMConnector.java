@@ -69,10 +69,12 @@ public class OpenTranTMConnector implements ITMQuery {
 		}
 	}
 	
+	@Override
 	public String getName () {
 		return "OpenTran";
 	}
 
+	@Override
 	public String getSettingsDisplay () {
 		if ( useREST ) {
 			return "REST services at http://open-tran.eu";
@@ -82,6 +84,7 @@ public class OpenTranTMConnector implements ITMQuery {
 		}
 	}
 	
+	@Override
 	public void close () {
 		if ( !useREST ) {
 			if ( client != null ) {
@@ -90,18 +93,17 @@ public class OpenTranTMConnector implements ITMQuery {
 		}
 	}
 
-	public void export (String outputPath) {
-		throw new UnsupportedOperationException();
-	}
-
+	@Override
 	public LocaleId getSourceLanguage () {
 		return LocaleId.fromPOSIXLocale(srcCode);
 	}
 
+	@Override
 	public LocaleId getTargetLanguage () {
 		return LocaleId.fromPOSIXLocale(trgCode);
 	}
 
+	@Override
 	public boolean hasNext () {
 		if ( results == null ) return false;
 		if ( current >= results.size() ) {
@@ -110,6 +112,7 @@ public class OpenTranTMConnector implements ITMQuery {
 		return (current > -1);
 	}
 
+	@Override
 	public QueryResult next () {
 		if ( results == null ) return null;
 		if (( current > -1 ) && ( current < results.size() )) {
@@ -120,6 +123,7 @@ public class OpenTranTMConnector implements ITMQuery {
 		return null;
 	}
 
+	@Override
 	public void open () {
 		if ( useREST ) return;
 		// Else:
@@ -135,6 +139,7 @@ public class OpenTranTMConnector implements ITMQuery {
 		}
 	}
 	
+	@Override
 	public int query (String plainText) {
 		if ( useREST ) return restQuery(plainText);
 		else return rpcQuery(plainText);
@@ -245,24 +250,29 @@ public class OpenTranTMConnector implements ITMQuery {
 		}
 	}
 
+	@Override
 	public int query (TextFragment text) {
 		return query(text.getCodedText());
 	}
 
+	@Override
 	public void removeAttribute (String name) {
 		// Not used with this connector
 	}
 
+	@Override
 	public void clearAttributes () {
 		//TODO: use platform, etc.
 	}
 
+	@Override
 	public void setAttribute (String name,
 		String value)
 	{
 		// Not used with this connector
 	}
 
+	@Override
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
@@ -271,18 +281,22 @@ public class OpenTranTMConnector implements ITMQuery {
 		trgCode = toInternalCode(targetLocale);
 	}
 
+	@Override
 	public void setMaximumHits (int max) {
 		maxHits = max;
 	}
 
+	@Override
 	public void setThreshold (int threshold) {
 		this.threshold = threshold;
 	}
 
+	@Override
 	public int getMaximumHits () {
 		return maxHits;
 	}
 
+	@Override
 	public int getThreshold () {
 		return threshold;
 	}
@@ -295,13 +309,20 @@ public class OpenTranTMConnector implements ITMQuery {
 		return code;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		// Not used with this connector
 		return null;
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		// Not used with this connector
+	}
+
+	@Override
+	public void setRootDirectory (String rootDir) {
+		// Not used
 	}
 
 	/**

@@ -663,7 +663,7 @@ public class Main {
 	private void loadFromPluginsAndUpdate () {
 		// Discover and add plug-ins
 		PluginsManager mgt = new PluginsManager();
-		mgt.discover(new File(getRootDirectory()+File.separator+"dropins"), true);
+		mgt.discover(new File(getAppRootDirectory()+File.separator+"dropins"), true);
 		fcMapper.addFromPlugins(mgt);
 		// Now update the filtersMap with new configurations
 		Iterator<FilterConfiguration> iter = fcMapper.getAllConfigurations();
@@ -835,14 +835,14 @@ public class Main {
 		ps.println("-------------------------------------------------------------------------------"); //$NON-NLS-1$
 	}
 	
-	private String getRootDirectory () {
+	private String getAppRootDirectory () {
 		URL url = getClass().getProtectionDomain().getCodeSource().getLocation();
 		return Util.getDirectoryName(Util.getDirectoryName(url.getPath()));
 	}
 	
 	private void showHelp () throws MalformedURLException {
 		// Get the path/URL of the help file 
-		String path = getRootDirectory();
+		String path = getAppRootDirectory();
 		path += "/help/applications/tikal/index.html"; //$NON-NLS-1$
 		// Opens the file
 		ps.println("Help: "+path);
@@ -1060,6 +1060,7 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
+		driver.setRootDirectory(System.getProperty("user.dir"));
 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
 		driver.addStep(rd2feStep);
@@ -1100,7 +1101,7 @@ public class Main {
 
 	private IPipelineStep addSegmentationStep () {
 		if ( segRules.equals(DEFAULT_SEGRULES) ) { // Defaults
-			segRules = getRootDirectory();
+			segRules = getAppRootDirectory();
 			segRules += File.separator + "config" + File.separator + "defaultSegmentation.srx";
 		}
 		else {
@@ -1165,6 +1166,7 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
+		driver.setRootDirectory(System.getProperty("user.dir"));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
@@ -1212,6 +1214,7 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
+		driver.setRootDirectory(System.getProperty("user.dir"));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
