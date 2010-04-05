@@ -29,12 +29,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -229,52 +227,52 @@ public class TextUnitUtilTest {
 		assertEquals("\"", parts.get(4).toString());
 	}
 
-	@Test
-	public void testCreateBilingualTextUnit() {
-		TextUnit ori = new TextUnit("id", "Seg1. Seg2");
-		ori.createTarget(LocaleId.ITALIAN, true, IResource.COPY_ALL);
-		TextContainer tc = ori.getSource();
-		tc.createSegment(6, 10);
-		tc.createSegment(0, 5);
-		tc = ori.getTarget(LocaleId.ITALIAN);
-		tc.createSegment(6, 10);
-		tc.createSegment(0, 5);
+//	@Test
+//	public void testCreateBilingualTextUnit() {
+//		TextUnit ori = new TextUnit("id", "Seg1. Seg2");
+//		ori.createTarget(LocaleId.ITALIAN, true, IResource.COPY_ALL);
+//		TextContainer tc = ori.getSource();
+//		tc.createSegment(6, 10);
+//		tc.createSegment(0, 5);
+//		tc = ori.getTarget(LocaleId.ITALIAN);
+//		tc.createSegment(6, 10);
+//		tc.createSegment(0, 5);
+//
+//		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori, ori.getSource().getSegment(0), ori
+//				.getTarget(LocaleId.ITALIAN).getSegment(0), LocaleId.ITALIAN);
+//		assertEquals(ori.getId(), res.getId());
+//		assertEquals("Seg1.", res.getSource().toString());
+//		assertEquals("Seg1.", res.getTarget(LocaleId.ITALIAN).toString());
+//	}
 
-		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori, ori.getSource().getSegment(0), ori
-				.getTarget(LocaleId.ITALIAN).getSegment(0), LocaleId.ITALIAN);
-		assertEquals(ori.getId(), res.getId());
-		assertEquals("Seg1.", res.getSource().toString());
-		assertEquals("Seg1.", res.getTarget(LocaleId.ITALIAN).toString());
-	}
-
-	@Test
-	public void testCreateBilingualTextUnitNM() {
-		ArrayList<Segment> srcSegs = new ArrayList<Segment>();
-		srcSegs.add(new Segment("1", new TextFragment("sSeg1.")));
-		srcSegs.add(new Segment("2", new TextFragment("sSeg2.")));
-		ArrayList<Segment> trgSegs = new ArrayList<Segment>();
-		trgSegs.add(new Segment("2", new TextFragment("tSeg2.")));
-		trgSegs.add(new Segment("1", new TextFragment("tSeg1.")));
-		trgSegs.add(new Segment("3", new TextFragment("tSeg3.")));
-		TextUnit ori = new TextUnit("id", "text");
-		ori.createTarget(LocaleId.ARABIC, true, IResource.COPY_ALL);
-
-		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori, srcSegs, trgSegs,
-				LocaleId.ITALIAN, "__");
-
-		assertEquals(ori.getId(), res.getId());
-		assertEquals("[sSeg1.]__[sSeg2.]", fmt.printSegmentedContent(res.getSource(), true));
-		assertEquals("[tSeg2.]__[tSeg1.]__[tSeg3.]", fmt.printSegmentedContent(res
-				.getTarget(LocaleId.ITALIAN), true));
-
-		assertEquals(2, res.getSource().getSegmentCount());
-		assertEquals("sSeg1.", res.getSource().getSegment(0).toString());
-
-		assertEquals(3, res.getTarget(LocaleId.ITALIAN).getSegmentCount());
-		Segment seg = res.getTarget(LocaleId.ITALIAN).getSegment(0);
-		assertEquals("tSeg2.", seg.toString());
-		assertEquals("2", seg.id);
-	}
+//	@Test
+//	public void testCreateBilingualTextUnitNM() {
+//		ArrayList<Segment> srcSegs = new ArrayList<Segment>();
+//		srcSegs.add(new Segment("1", new TextFragment("sSeg1.")));
+//		srcSegs.add(new Segment("2", new TextFragment("sSeg2.")));
+//		ArrayList<Segment> trgSegs = new ArrayList<Segment>();
+//		trgSegs.add(new Segment("2", new TextFragment("tSeg2.")));
+//		trgSegs.add(new Segment("1", new TextFragment("tSeg1.")));
+//		trgSegs.add(new Segment("3", new TextFragment("tSeg3.")));
+//		TextUnit ori = new TextUnit("id", "text");
+//		ori.createTarget(LocaleId.ARABIC, true, IResource.COPY_ALL);
+//
+//		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori, srcSegs, trgSegs,
+//				LocaleId.ITALIAN, "__");
+//
+//		assertEquals(ori.getId(), res.getId());
+//		assertEquals("[sSeg1.]__[sSeg2.]", fmt.printSegmentedContent(res.getSource(), true));
+//		assertEquals("[tSeg2.]__[tSeg1.]__[tSeg3.]", fmt.printSegmentedContent(res
+//				.getTarget(LocaleId.ITALIAN), true));
+//
+//		assertEquals(2, res.getSource().getSegmentCount());
+//		assertEquals("sSeg1.", res.getSource().getSegment(0).toString());
+//
+//		assertEquals(3, res.getTarget(LocaleId.ITALIAN).getSegmentCount());
+//		Segment seg = res.getTarget(LocaleId.ITALIAN).getSegment(0);
+//		assertEquals("tSeg2.", seg.toString());
+//		assertEquals("2", seg.id);
+//	}
 
 	@Test
 	public void createMultilingualTextUnit() {

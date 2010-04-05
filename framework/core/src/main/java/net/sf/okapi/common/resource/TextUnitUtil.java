@@ -772,116 +772,116 @@ public class TextUnitUtil {
 		removeQualifiers(textUnit, qualifier, qualifier);
 	}
 
-	/**
-	 * Creates a new text unit based on an existing text unit, with its content set to the content of a source and a
-	 * target segment. All other targets are removed.
-	 * 
-	 * @param srcTextUnit
-	 *            text unit to use for origin.
-	 * @param srcSegment
-	 *            source segment.
-	 * @param trgSegment
-	 *            target segment.
-	 * @param trgLocaleId
-	 *            target locale.
-	 * @return a new text unit with its content set to the given source and target segment.
-	 */
-	public static TextUnit createBilingualTextUnit(final TextUnit srcTextUnit, Segment srcSegment,
-			Segment trgSegment, LocaleId trgLocaleId) {
-		// Clone the original
-		TextUnit tu = srcTextUnit.clone();
-		// Empty the source content
-		tu.getSource().clear();
-		// Set the new source content: the given source segment
-		tu.setSourceContent(srcSegment.getContent());
-		// Removes all targets
-		for (LocaleId locId : tu.getTargetLocales()) {
-			tu.removeTarget(locId);
-		}
-		// Create a new target with all the source data
-		tu.createTarget(trgLocaleId, true, TextUnit.COPY_ALL);
-		// Set the new target content: the given target segment
-		tu.setTargetContent(trgLocaleId, trgSegment.getContent());
-		// Return the result
-		return tu;
-	}
+//	/**
+//	 * Creates a new text unit based on an existing text unit, with its content set to the content of a source and a
+//	 * target segment. All other targets are removed.
+//	 * 
+//	 * @param srcTextUnit
+//	 *            text unit to use for origin.
+//	 * @param srcSegment
+//	 *            source segment.
+//	 * @param trgSegment
+//	 *            target segment.
+//	 * @param trgLocaleId
+//	 *            target locale.
+//	 * @return a new text unit with its content set to the given source and target segment.
+//	 */
+//	public static TextUnit createBilingualTextUnit(final TextUnit srcTextUnit, Segment srcSegment,
+//			Segment trgSegment, LocaleId trgLocaleId) {
+//		// Clone the original
+//		TextUnit tu = srcTextUnit.clone();
+//		// Empty the source content
+//		tu.getSource().clear();
+//		// Set the new source content: the given source segment
+//		tu.setSourceContent(srcSegment.getContent());
+//		// Removes all targets
+//		for (LocaleId locId : tu.getTargetLocales()) {
+//			tu.removeTarget(locId);
+//		}
+//		// Create a new target with all the source data
+//		tu.createTarget(trgLocaleId, true, TextUnit.COPY_ALL);
+//		// Set the new target content: the given target segment
+//		tu.setTargetContent(trgLocaleId, trgSegment.getContent());
+//		// Return the result
+//		return tu;
+//	}
+//
+//	/**
+//	 * Creates a new text unit based on an existing text unit, with its content set to the content of a list of source
+//	 * and a list of target segments. All other targets are removed. The segments Ids are preserved, so they must be
+//	 * valid, and matching between source and target, when appropriate.
+//	 * 
+//	 * @param srcTextUnit
+//	 *            text unit to use for origin.
+//	 * @param srcSegments
+//	 *            list of source segments.
+//	 * @param trgSegments
+//	 *            list of target segments.
+//	 * @param trgLocaleId
+//	 *            target locale.
+//	 * @param interSegmentSpace
+//	 *            the string to add between each segments (use null or empty for nothing between segments).
+//	 * @return a new text unit with its content set to the given source and target segments.
+//	 */
+//	public static TextUnit createBilingualTextUnit(final TextUnit srcTextUnit,
+//			List<Segment> srcSegments, List<Segment> trgSegments, LocaleId trgLocaleId,
+//			String interSegmentSpace) {
+//		// Clone the original
+//		TextUnit tu = srcTextUnit.clone();
+//		if (interSegmentSpace == null)
+//			interSegmentSpace = "";
+//
+//		// Add by building the markers so we can preserve the segment ids
+//		TextContainer tc = tu.getSource();
+//		tc.clear();
+//		int i = 0;
+//		for (Segment seg : srcSegments) {
+//			// No part before for the first segment
+//			tc.appendSegment(seg, ((i == 0) ? null : interSegmentSpace));
+//			i++;
+//		}
+//
+//		// Removes all targets
+//		for (LocaleId locId : tu.getTargetLocales()) {
+//			tu.removeTarget(locId);
+//		}
+//
+//		// Create a new target with all the source data
+//		tc = tu.createTarget(trgLocaleId, true, TextUnit.COPY_ALL);
+//		tc.clear();
+//		// Add by building the markers so we can preserve the segment ids
+//		i = 0;
+//		for (Segment seg : trgSegments) {
+//			tc.appendSegment(seg, ((i == 0) ? null : interSegmentSpace));
+//			i++;
+//		}
+//
+//		// Return the result
+//		return tu;
+//	}
+//
+//	/**
+//	 * Convenience method that calls {@link #createBilingualTextUnit(TextUnit, List, List, LocaleId, String)} with
+//	 * <code>" "</code> as the space between segments.
+//	 * 
+//	 * @param srcTextUnit
+//	 *            text unit to use for origin.
+//	 * @param srcSegments
+//	 *            list of source segments.
+//	 * @param trgSegments
+//	 *            list of target segments.
+//	 * @param trgLocaleId
+//	 *            target locale.
+//	 * @return a new text unit with its content set to the given source and target segments.
+//	 */
+//	public static TextUnit createBilingualTextUnit(final TextUnit srcTextUnit,
+//			List<Segment> srcSegments, List<Segment> trgSegments, LocaleId trgLocaleId) {
+//		return createBilingualTextUnit(srcTextUnit, srcSegments, trgSegments, trgLocaleId, " ");
+//	}
 
 	/**
-	 * Creates a new text unit based on an existing text unit, with its content set to the content of a list of source
-	 * and a list of target segments. All other targets are removed. The segments Ids are preserved, so they must be
-	 * valid, and matching between source and target, when appropriate.
-	 * 
-	 * @param srcTextUnit
-	 *            text unit to use for origin.
-	 * @param srcSegments
-	 *            list of source segments.
-	 * @param trgSegments
-	 *            list of target segments.
-	 * @param trgLocaleId
-	 *            target locale.
-	 * @param interSegmentSpace
-	 *            the string to add between each segments (use null or empty for nothing between segments).
-	 * @return a new text unit with its content set to the given source and target segments.
-	 */
-	public static TextUnit createBilingualTextUnit(final TextUnit srcTextUnit,
-			List<Segment> srcSegments, List<Segment> trgSegments, LocaleId trgLocaleId,
-			String interSegmentSpace) {
-		// Clone the original
-		TextUnit tu = srcTextUnit.clone();
-		if (interSegmentSpace == null)
-			interSegmentSpace = "";
-
-		// Add by building the markers so we can preserve the segment ids
-		TextContainer tc = tu.getSource();
-		tc.clear();
-		int i = 0;
-		for (Segment seg : srcSegments) {
-			// No part before for the first segment
-			tc.appendSegment(seg, ((i == 0) ? null : interSegmentSpace));
-			i++;
-		}
-
-		// Removes all targets
-		for (LocaleId locId : tu.getTargetLocales()) {
-			tu.removeTarget(locId);
-		}
-
-		// Create a new target with all the source data
-		tc = tu.createTarget(trgLocaleId, true, TextUnit.COPY_ALL);
-		tc.clear();
-		// Add by building the markers so we can preserve the segment ids
-		i = 0;
-		for (Segment seg : trgSegments) {
-			tc.appendSegment(seg, ((i == 0) ? null : interSegmentSpace));
-			i++;
-		}
-
-		// Return the result
-		return tu;
-	}
-
-	/**
-	 * Convenience method that calls {@link #createBilingualTextUnit(TextUnit, List, List, LocaleId, String)} with
-	 * <code>" "</code> as the space between segments.
-	 * 
-	 * @param srcTextUnit
-	 *            text unit to use for origin.
-	 * @param srcSegments
-	 *            list of source segments.
-	 * @param trgSegments
-	 *            list of target segments.
-	 * @param trgLocaleId
-	 *            target locale.
-	 * @return a new text unit with its content set to the given source and target segments.
-	 */
-	public static TextUnit createBilingualTextUnit(final TextUnit srcTextUnit,
-			List<Segment> srcSegments, List<Segment> trgSegments, LocaleId trgLocaleId) {
-		return createBilingualTextUnit(srcTextUnit, srcSegments, trgSegments, trgLocaleId, " ");
-	}
-
-	/**
-	 * Create a new multilingual {@link TextUnit} based on the existing TextUnit. The parameter
-	 * {@link #alignedSegmentPairs} hold lists of aligned source/target {@link TextPart}s (i.e., inter-segment content
+	 * Create a new multilingual {@link TextUnit} based on the existing TextUnit. The <code>alignedSegmentPairs</code>
+	 * argument hold lists of aligned source/target {@link TextPart}s (i.e., inter-segment content
 	 * and segments). The created TextUnit is an exact copy of the TextUnit passed in, but without the original source
 	 * and target content, which is removed before adding the AlignedPairs.
 	 * 
@@ -891,10 +891,12 @@ public class TextUnitUtil {
 	 *            - aligned source/target pairs
 	 * @param trgLocaleId
 	 *            - {@link LocaleId} of the target {@link Segment}s
-	 * @return
+	 * @return the new text unit that has been created.
 	 */
-	public static TextUnit createMultilingualTextUnit(final TextUnit textUnit,
-			final List<AlignedPair> alignedSegmentPairs, final LocaleId trgLocaleId) {
+	public static TextUnit createMultilingualTextUnit (final TextUnit textUnit,
+		final List<AlignedPair> alignedSegmentPairs,
+		final LocaleId trgLocaleId)
+	{
 		// Clone the original
 		TextUnit tu = textUnit.clone();
 		// Empty the source content
