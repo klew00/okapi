@@ -20,9 +20,6 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,6 +34,7 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -129,72 +127,7 @@ public class TestJackson {
 		//ZipSkeletonBean zsb = mapper.readValue(st, ZipSkeletonBean.class);
 	}
 	
-	// DEBUG @Test
-	public void testTextUnitWrite() throws IOException {
 	
-		Event event1 = new Event(EventType.TEXT_UNIT);
-		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
-				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
-		String zipName = this.getClass().getResource("sample1.en.fr.zip").getFile();
-		tu1.setSkeleton(new ZipSkeleton(new ZipFile(new File(zipName))));
-		event1.setResource(tu1);
-		tu1.setTarget(LocaleId.FRENCH, new TextContainer("french-text1"));
-		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
-				
-		Event event2 = new Event(EventType.TEXT_UNIT);
-		TextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
-				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
-		//tu2.setSkeleton(new ZipSkeleton(new ZipEntry("aa1/content/content.gmx")));
-		event2.setResource(tu2);
-		tu2.setTarget(LocaleId.FRENCH, new TextContainer("french-text2"));
-		tu2.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text2"));
-		
-		tu1.getSource().appendPart("part1");
-		tu1.getSource().appendSegment(new Segment("segId1", new TextFragment("seg1")));
-		tu1.getSource().appendPart("part2");
-		tu1.getSource().appendSegment(new Segment("segId2", new TextFragment("seg2")));
-				
-		//JSONPersistenceSession skelSession = new JSONPersistenceSession(Event.class);		
-		JSONPersistenceSession skelSession = new JSONPersistenceSession(Events.class);
-		
-		File tempSkeleton = null;
-		tempSkeleton = File.createTempFile("~aaa", ".txt");
-		tempSkeleton.deleteOnExit();
-		
-		skelSession.start(new FileOutputStream(tempSkeleton));
-		
-		Events events = new Events();
-		events.add(event1);
-		events.add(event2);
-		
-//		skelSession.serialize(event1);
-//		skelSession.serialize(event2);
-		skelSession.serialize(events);
-		skelSession.end();
-		
-		FileInputStream fis = new FileInputStream(tempSkeleton);
-		skelSession.start(fis);
-		
-		assertTrue(events instanceof Events);
-		assertTrue(events instanceof Object);
-		assertTrue(events instanceof ArrayList<?>);
-		
-		ArrayList.class.cast(new ArrayList<Event>()); 
-		
-		Events events2 = skelSession.deserialize(Events.class);
-		
-//		System.out.println(fis.available());
-//		Event event11 = (Event) skelSession.deserialize();
-//		System.out.println(fis.available());
-//		Event event22 = (Event) skelSession.deserialize();
-		skelSession.end();
-		
-		Event event11 = events2.get(0);
-		Event event22 = events2.get(1);
-		
-		assertEquals(event1.getEventType(), event11.getEventType());
-		assertEquals(event2.getEventType(), event22.getEventType());
-	}
 	
 	// DEBUG @Test
 	public void testRawDocument() throws JsonGenerationException, JsonMappingException, IOException {
@@ -209,8 +142,7 @@ public class TestJackson {
 		System.out.println(st);
 	}
 	
-	// DEBUG 
-	@Test
+	// DEBUG @Test
 	public void testMultipleRead1() throws IOException {
 		JSONPersistenceSession skelSession = new JSONPersistenceSession(String.class);
 		
@@ -228,15 +160,14 @@ public class TestJackson {
 		FileInputStream fis = new FileInputStream(tempSkeleton);
 		skelSession.start(fis);
 		
-		System.out.println(fis.available());
-		String st3 = skelSession.deserialize(String.class);
-		System.out.println(fis.available());
-		String st4 = skelSession.deserialize(String.class);
+//		System.out.println(fis.available());
+//		String st3 = skelSession.deserialize(String.class);
+//		System.out.println(fis.available());
+//		String st4 = skelSession.deserialize(String.class);
 		skelSession.end();
 	}
 	
-	// DEBUG 
-	@Test
+	// DEBUG @Test
 	public void testMultipleRead2() throws IOException {
 		JSONPersistenceSession skelSession = new JSONPersistenceSession(Object.class);
 		
@@ -260,10 +191,10 @@ public class TestJackson {
 		CountingInputStream fis = new CountingInputStream(new FileInputStream(tempSkeleton));
 		skelSession.start(fis);
 		
-		System.out.println(fis.available());
-		Object st3 = (Object) skelSession.deserialize(Object.class);
-		System.out.println(fis.available());
-		Object st4 = (Object) skelSession.deserialize(Object.class);
+//		System.out.println(fis.available());
+//		Object st3 = (Object) skelSession.deserialize(Object.class);
+//		System.out.println(fis.available());
+//		Object st4 = (Object) skelSession.deserialize(Object.class);
 		skelSession.end();
 	}
 	
@@ -293,7 +224,7 @@ public class TestJackson {
 	}
 	
 	
-	@Test
+	// DEBUG @Test
 	public void testZipSkeleton() throws URISyntaxException, IOException {
 		ZipFile zf = null;
 			//String name = this.getClass().getResource("sample1.en.fr.zip").toString();
@@ -310,7 +241,7 @@ public class TestJackson {
 		zf.close();
 	}
 
-	@Test
+	// DEBUG @Test
 	public void testInputStreamBean() throws URISyntaxException, JsonGenerationException, JsonMappingException, IOException {
 		FileInputStream fis = new FileInputStream(new File(this.getClass().getResource("test3.txt").toURI()));
 		InputStreamBean isb = new InputStreamBean();
@@ -318,4 +249,54 @@ public class TestJackson {
 		String st = mapper.writeValueAsString(isb);
 		System.out.println(st);
 	}
+	
+	// DEBUG 
+	@Test
+	public void testPersistenceRoundtrip() throws IOException {
+	
+		Event event1 = new Event(EventType.TEXT_UNIT);
+		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		String zipName = this.getClass().getResource("sample1.en.fr.zip").getFile();
+		tu1.setSkeleton(new ZipSkeleton(new ZipFile(new File(zipName))));
+		event1.setResource(tu1);
+		tu1.setTarget(LocaleId.FRENCH, new TextContainer("french-text1"));
+		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
+				
+		Event event2 = new Event(EventType.TEXT_UNIT);
+		TextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		tu2.setSkeleton(new ZipSkeleton(new ZipEntry("aa1/content/content.gmx")));
+		event2.setResource(tu2);
+		tu2.setTarget(LocaleId.FRENCH, new TextContainer("french-text2"));
+		tu2.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text2"));
+		
+		tu1.getSource().appendPart("part1");
+		tu1.getSource().appendSegment(new Segment("segId1", new TextFragment("seg1")));
+		tu1.getSource().appendPart("part2");
+		tu1.getSource().appendSegment(new Segment("segId2", new TextFragment("seg2")));
+				
+		JSONPersistenceSession skelSession = new JSONPersistenceSession(List.class);
+		
+		File tempSkeleton = null;
+		tempSkeleton = File.createTempFile("~aaa", ".txt");
+		tempSkeleton.deleteOnExit();
+		
+		skelSession.start(new FileOutputStream(tempSkeleton));
+		
+		Events events = new Events();
+		events.add(event1);
+		events.add(event2);
+		
+		skelSession.serialize(events);
+		skelSession.end();
+		
+		FileInputStream fis = new FileInputStream(tempSkeleton);
+		skelSession.start(fis);		
+		Events events2 = skelSession.deserialize(Events.class);
+		skelSession.end();
+		
+		FilterTestDriver.compareEvents(events, events2);
+		FilterTestDriver.laxCompareEvents(events, events2);
+	}	
 }

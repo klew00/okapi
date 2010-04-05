@@ -87,7 +87,7 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		}
 		
 		if (bean == null) return null;
-		return classRef.cast(bean.get(classRef));
+		return bean.get(classRef);
 	}
 
 	@Override

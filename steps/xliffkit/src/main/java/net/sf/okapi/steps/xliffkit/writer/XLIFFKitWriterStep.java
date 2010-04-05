@@ -61,6 +61,7 @@ import org.apache.poi.openxml4j.opc.PackagingURIHelper;
 import org.apache.poi.openxml4j.opc.StreamHelper;
 import org.apache.poi.openxml4j.opc.TargetMode;
 
+@SuppressWarnings("unused")
 @UsingParameters(Parameters.class)
 public class XLIFFKitWriterStep extends BasePipelineStep {
 
@@ -91,7 +92,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	
 	private String originalFileName;
 	private String xliffFileName;
-	private String skeletonFileName;
+	private String skeletonFileName;	
 	private String tmxFileName;
 	private String tbxFileName;
 	private String srxFileName;

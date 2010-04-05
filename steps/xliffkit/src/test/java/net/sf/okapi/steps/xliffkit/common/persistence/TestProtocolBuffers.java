@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,12 +29,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.junit.Test;
-
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.steps.xliffkit.common.persistence.AddressBookProtos.AddressBook;
 import net.sf.okapi.steps.xliffkit.common.persistence.AddressBookProtos.Person;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.BaseNameableBean;
+
+import org.junit.Test;
 
 
 public class TestProtocolBuffers {

@@ -30,38 +30,36 @@ public class ListBean implements IPersistenceBean {
 	private String className;
 	List<FactoryBean> items = new ArrayList<FactoryBean>();
 	
-	//@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(T obj) {
-//		if (obj instanceof List<?>) {
-//			List<Object> list = (List<Object>) obj;
-//			for (IPersistenceBean itemBean : items) {
-//				Object item = itemBean.get(Object.class);
-//				list.add(item);
-//			}
-//		}
+		if (obj instanceof List<?>) {
+			List<Object> list = (List<Object>) obj;
+			for (IPersistenceBean itemBean : items) {
+				Object item = itemBean.get(Object.class);
+				list.add(item);
+			}
+		}
 		return obj;
 	}
 
-	//@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(Class<T> classRef) {
-//		Object inst = null;
-//		try {
-//			inst = ClassUtil.instantiateClass(className);
-//		} catch (InstantiationException e) {
-//			// TODO Handle exception
-//			e.printStackTrace();
-//		} catch (IllegalAccessException e) {
-//			// TODO Handle exception
-//			e.printStackTrace();
-//		} catch (ClassNotFoundException e) {
-//			// TODO Handle exception
-//			e.printStackTrace();
-//		}
+		Object inst = null;
+		try {
+			inst = ClassUtil.instantiateClass(className);
+		} catch (InstantiationException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		}
 
-		return classRef.cast(get(new ArrayList<Object>()));
-//		return (T) get(inst);
+		return classRef.cast(get(inst));
 	}
 
 	@Override
