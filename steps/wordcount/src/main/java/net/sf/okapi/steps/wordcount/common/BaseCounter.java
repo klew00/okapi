@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.wordcount.common;
 
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,7 +64,8 @@ abstract public class BaseCounter {
 			// This work on segments' content (vs. parts' content)
 			TextContainer tc = (TextContainer)text;
 			long res = 0;
-			for ( Segment seg : tc ) {
+			for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+	    		Segment seg = iter.next();
 				res += getCount(classRef, seg.getContent(), language);
 			}
 			return res;

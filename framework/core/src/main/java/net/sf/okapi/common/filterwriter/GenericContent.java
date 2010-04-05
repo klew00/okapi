@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common.filterwriter;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,9 +87,7 @@ public class GenericContent {
 		boolean normalText)
 	{
 		StringBuilder tmp = new StringBuilder();
-		Iterator<TextPart> iter = container.partIterator();
-		while ( iter.hasNext() ) {
-			TextPart part = iter.next();
+		for ( TextPart part : container ) {
 			if ( part instanceof Segment ) {
 				if ( showSegments ) tmp.append("[");
 				tmp.append(setContent(part.text).toString(normalText));

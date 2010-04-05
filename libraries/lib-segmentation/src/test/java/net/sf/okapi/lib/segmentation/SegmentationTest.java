@@ -23,6 +23,7 @@ package net.sf.okapi.lib.segmentation;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.IResource;
@@ -262,7 +263,8 @@ public class SegmentationTest {
 		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
 		// Creates the target and translate it
 		TextContainer tc = tu.createTarget(locFR, true, IResource.COPY_ALL);
-		for ( Segment seg : tc ) {
+		for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+    		Segment seg = iter.next();
 			seg.text.setCodedText(seg.text.getCodedText().toUpperCase() + " FR");
 		}
 		assertEquals("[<1>PART 1.</1> FR][ PART 2. FR]", fmt.printSegmentedContent(tc, true));
@@ -287,14 +289,16 @@ public class SegmentationTest {
 		// Check the FR against the source
 		Segment srcSeg;
 		tu.synchronizeSourceSegmentation(locFR);
-		for ( Segment seg : tc1 ) {
+		for ( Iterator<Segment> iter = tc1.segmentIterator(); iter.hasNext(); ) {
+    		Segment seg = iter.next();
 			srcSeg = tu.getSource().getSegment(seg.id);
 			assertNotNull(srcSeg);
 			assertEquals(seg.text, srcSeg.text);
 		}
 		// Test AR against the source
 		tu.synchronizeSourceSegmentation(locAR);
-		for ( Segment seg : tc2 ) {
+		for ( Iterator<Segment> iter = tc2.segmentIterator(); iter.hasNext(); ) {
+    		Segment seg = iter.next();
 			srcSeg = tu.getSource().getSegment(seg.id);
 			assertNotNull(srcSeg);
 			assertEquals(seg.text, srcSeg.text);

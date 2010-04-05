@@ -39,7 +39,7 @@ import net.sf.okapi.common.annotation.IAnnotation;
  * others are special {@link TextPart} objects called {@link Segment}.
  * <p>A TextContainer has always at least one {@link Segment} part.
  */
-public class TextContainer implements Iterable<Segment> {
+public class TextContainer implements Iterable<TextPart> {
 
 	private static final String PARTSEP1 = "\u0091";
 	private static final String PARTSEP2 = "\u0092";
@@ -60,9 +60,7 @@ public class TextContainer implements Iterable<Segment> {
 	public static String contentToString (TextContainer tc) {
 		StringBuilder tmp = new StringBuilder();
 		tmp.append(tc.hasBeenSegmented() ? '1' : '0');
-		Iterator<TextPart> iter = tc.partIterator();
-		while ( iter.hasNext() ) {
-			TextPart part = iter.next();
+		for ( TextPart part : tc ) {
 			// part to string
 			tmp.append(part.isSegment() ? '1' : '0');
 			tmp.append(part.text.getCodedText());
@@ -167,11 +165,10 @@ public class TextContainer implements Iterable<Segment> {
 	/**
 	 * Gets an iterator for the segments of this container.
 	 * This iterator does not iterate through non-segment parts of the content.
-	 * Use {@link #partIterator()} for accessing both segments and non-segments parts.
+	 * Use {@link #iterator()} for accessing both segments and non-segments parts.
 	 * @return an iterator for the segments of this container.
 	 */
-	@Override
-	public Iterator<Segment> iterator () {
+	public Iterator<Segment> segmentIterator () {
 		return new Iterator<Segment>() {
 			int current = foundNext(-1);
 			private int foundNext (int start) {
@@ -211,7 +208,7 @@ public class TextContainer implements Iterable<Segment> {
 	 * Creates an iterator to loop through the parts (segments and non-segments) of this container.
 	 * @return a new iterator all for the parts of this container.
 	 */
-	public Iterator<TextPart> partIterator () {
+	public Iterator<TextPart> iterator () {
 		return new Iterator<TextPart>() {
 			int current = 0;
 			

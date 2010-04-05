@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.codesremoval;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
@@ -63,9 +62,8 @@ public class CodesRemover {
 	}
 
 	public void processContainer (TextContainer tc) {
-		Iterator<TextPart> iter = tc.partIterator();
-		while ( iter.hasNext() ) {
-			processFragment(iter.next().text);
+		for ( TextPart part : tc ) {
+			processFragment(part.text);
 		}
 	}
 	

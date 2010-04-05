@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common.skeleton;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
@@ -414,11 +413,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		
 		// The output is driven by the target, not the source, so the interstices parts
 		// are the ones of the target, no the one of the source
-		Iterator<TextPart> iter = trgCont.partIterator();
 		int scoreIndex = -1;
-		
-		while ( iter.hasNext() ) {
-			TextPart part = iter.next();
+		for ( TextPart part : trgCont ) {
 			if ( part.isSegment() ) {
 				scoreIndex++;
 				int lev = (( scores != null ) ? scores.getScore(scoreIndex) : 0 );

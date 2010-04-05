@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -138,9 +137,8 @@ public class CharListingStep extends BasePipelineStep {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return event;
 		// Get the coded text of each parts and detect the used characters
-		Iterator<TextPart> iter = tu.getSource().partIterator();
-		while ( iter.hasNext() ) {
-			String text = iter.next().text.getCodedText();
+		for ( TextPart part : tu.getSource() ) {
+			String text = part.text.getCodedText();
 			for ( int i=0; i<text.length(); i++ ) {
 				if ( TextFragment.isMarker(text.charAt(i))) {
 					i++; // Skip the second character of the marker

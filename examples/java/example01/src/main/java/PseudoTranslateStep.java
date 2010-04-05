@@ -18,6 +18,8 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
+import java.util.Iterator;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
@@ -56,7 +58,8 @@ public class PseudoTranslateStep extends BasePipelineStep {
 
 		TextContainer tc = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
 		// Process each segment content
-		for ( Segment seg : tc ) {
+		for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+    		Segment seg = iter.next();
 			TextFragment tf = seg.getContent();
 			StringBuilder text = new StringBuilder(tf.getCodedText());
 			int n;

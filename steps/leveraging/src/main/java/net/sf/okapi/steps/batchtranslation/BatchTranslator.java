@@ -23,6 +23,7 @@ package net.sf.okapi.steps.batchtranslation;
 import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -257,7 +258,8 @@ public class BatchTranslator {
 					// Write out to source input
 					boolean atLeastOne = false;
 					
-					for ( Segment seg : tc ) {
+					for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+			    		Segment seg = iter.next();
 						// If needed, check if the entry is in the existing TM
 						if ( currentTm != null ) {
 							if ( currentTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {

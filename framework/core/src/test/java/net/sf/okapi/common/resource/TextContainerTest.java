@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -111,16 +112,41 @@ public class TextContainerTest {
 	}
 
 	@Test
-	public void testIterator () {
+	public void testTextPartIterator () {
+		TextContainer tc = createMultiSegmentContent();
+		int i = -1;
+		for ( TextPart part : tc ) {
+			i++;
+			switch ( i ) {
+			case 0:
+				assertEquals("text1", part.text.toString());
+				assertTrue(part.isSegment());
+				break;
+			case 1:
+				assertEquals(" ", part.text.toString());
+				assertFalse(part.isSegment());
+				break;
+			case 2:
+				assertEquals("text2", part.text.toString());
+				assertTrue(part.isSegment());
+				break;
+			}
+		}
+	}
+	
+	@Test
+	public void testSegmentIterator () {
 		TextContainer tc = new TextContainer("[s1]");
-		for ( Segment seg : tc ) {
+		for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+			Segment seg = iter.next();
 			assertEquals("[s1]", seg.text.toString());
 		}
 		tc.appendSegment(new TextFragment("[s2]"));
 		tc.appendSegment(new TextFragment("[s3]"));
 		tc.appendSegment(new TextFragment("[s4]"));
 		StringBuilder tmp = new StringBuilder();
-		for ( Segment seg : tc ) {
+		for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+			Segment seg = iter.next();
 			tmp.append(seg.text.toString());
 		}
 		assertEquals("[s1][s2][s3][s4]", tmp.toString());

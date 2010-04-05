@@ -22,6 +22,7 @@ package net.sf.okapi.lib.translation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -473,7 +474,8 @@ public class QueryManager {
 		int leveraged = 0;
 		
 		// For each segment
-		for ( Segment seg : tc ) {
+		for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+    		Segment seg = iter.next();
 			// Query if needed
 			if ( seg.text.hasText(false) ) {
 				totalSegments++;

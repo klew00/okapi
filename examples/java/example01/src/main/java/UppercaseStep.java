@@ -18,6 +18,8 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
+import java.util.Iterator;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
@@ -51,7 +53,8 @@ public class UppercaseStep extends BasePipelineStep {
 		TextUnit tu = (TextUnit)event.getResource();
 		if ( tu.isTranslatable() ) {
 			TextContainer tc = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
-			for ( Segment seg : tc ) {
+			for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+	    		Segment seg = iter.next();
 				TextFragment tf = seg.getContent();
 				tf.setCodedText(tf.getCodedText().toUpperCase());
 			}

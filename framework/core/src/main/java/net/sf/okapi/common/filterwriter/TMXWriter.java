@@ -262,7 +262,8 @@ public class TMXWriter {
     	}
 
     	int i = -1;
-    	for ( Segment srcSeg : srcTC ) {
+		for ( Iterator<Segment> iter = srcTC.segmentIterator(); iter.hasNext(); ) {
+    		Segment srcSeg = iter.next();
     		i++;
     		TextFragment tf = srcSeg.text;
 			Segment trgSeg = trgTC.getSegment(srcSeg.id);
@@ -391,7 +392,8 @@ public class TMXWriter {
 		Set<String> names = item.getPropertyNames();
 
 		// For each segment: write a separate TU
-    	for ( Segment srcSeg : srcCont ) {
+		for ( Iterator<Segment> iter = srcCont.segmentIterator(); iter.hasNext(); ) {
+    		Segment srcSeg = iter.next();
     		// Write start TU
     		writer.writeStartElement("tu");
     		if ( srcCont.contentIsOneSegment() ) {

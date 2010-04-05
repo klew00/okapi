@@ -392,6 +392,16 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testSegmentationWithEmptyTarget () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createSegmentedTUEmptyTarget(), 1);
+		assertNotNull(tu);
+		
+//TODO: fix segment 0		assertEquals("<1/>[t1]", fmt.printSegmentedContent(tu.getSource(), true));
+		TextContainer trgCont = tu.getTarget(locFR);
+//		assertNotNull(trgCont);
+	}
+	
+	@Test
 	public void testNotes () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createDecoratedXLIFF(), 1);
 		assertNotNull(tu);
@@ -530,6 +540,20 @@ public class XLIFFFilterTest {
 			+ "<trans-unit id=\"2\"><source>t1  t2  t3  t4</source>"
 			+ "<seg-source><mrk mid='1' mtype='seg'>t1  t2</mrk>  <mrk mid='2' mtype='seg'>t3  t4</mrk></seg-source>"
 			+ "<target xml:lang='fr'>tt1  tt2  tt3  tt4</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		return getEvents(snippet);
+	}
+
+	private ArrayList<Event> createSegmentedTUEmptyTarget () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\" xml:space='preserve'><source><ph id='1'>code</ph>t1</source>"
+			+ "<seg-source><ph id='1'>code</ph><mrk mid='s1' mtype='seg'>t1</mrk></seg-source>"
+			+ "<target xml:lang='fr'><ph id='1'>code</ph><mrk mid='s1' mtype='seg'></mrk></target>"
 			+ "</trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";

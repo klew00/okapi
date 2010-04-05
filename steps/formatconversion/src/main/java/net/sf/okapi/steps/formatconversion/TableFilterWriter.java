@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -296,7 +297,8 @@ public class TableFilterWriter implements IFilterWriter {
 		}
 		// If we do have the same number of segments:
 		// Output each of them
-		for ( Segment srcSeg : srcCont ) {
+		for ( Iterator<Segment> iter = srcCont.segmentIterator(); iter.hasNext(); ) {
+    		Segment srcSeg = iter.next();
 			Segment trgSeg = trgCont.getSegment(srcSeg.id);
 			if ( trgSeg == null ) {
 				//TODO: warning

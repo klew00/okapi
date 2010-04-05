@@ -1054,7 +1054,8 @@ public class FilterTestDriver {
 				return false;
 			}
 			
-			for ( Segment seg1 : t1 ) {
+			for ( Iterator<Segment> iter = t1.segmentIterator(); iter.hasNext(); ) {
+	    		Segment seg1 = iter.next();
 				Segment seg2 = t2.getSegment(seg1.id);
 				if ( seg2 == null ) {
 					System.err.println("Segment in t2 not found.");

@@ -22,6 +22,7 @@ package net.sf.okapi.filters.pensieve;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.util.Iterator;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -157,7 +158,8 @@ public class PensieveFilterWriter implements IFilterWriter {
 		}
 
 		// Index each segment
-		for ( Segment srcSeg : srcCont ) {
+		for ( Iterator<Segment> iter = srcCont.segmentIterator(); iter.hasNext(); ) {
+    		Segment srcSeg = iter.next();
 			Segment trgSeg = trgCont.getSegment(srcSeg.id);
 			// Skip entries with no target match
 			if ( trgSeg != null ) {

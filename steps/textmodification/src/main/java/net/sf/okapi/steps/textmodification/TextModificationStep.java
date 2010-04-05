@@ -123,9 +123,7 @@ public class TextModificationStep extends BasePipelineStep {
 	 * @param tu the text unit to process.
 	 */
 	private void removeText (TextUnit tu) {
-		Iterator<TextPart> iter = tu.getTarget(targetLocale).partIterator();
-		while ( iter.hasNext() ) {
-			TextPart part = iter.next();
+		for ( TextPart part : tu.getTarget(targetLocale) ) {
 			StringBuilder sb = new StringBuilder();
 			// Remove the text inside the part
 			String text = part.text.getCodedText();
@@ -147,9 +145,7 @@ public class TextModificationStep extends BasePipelineStep {
 	 */
 	private void replaceWithXN (TextUnit tu) {
 		String tmp = null;
-		Iterator<TextPart> iter = tu.getTarget(targetLocale).partIterator();
-		while ( iter.hasNext() ) {
-			TextPart part = iter.next();
+		for ( TextPart part : tu.getTarget(targetLocale) ) {
 			tmp = part.text.getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
 			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
@@ -158,10 +154,8 @@ public class TextModificationStep extends BasePipelineStep {
 	}
 	
 	private void replaceWithExtendedChars (TextUnit tu) {
-		Iterator<TextPart> iter = tu.getTarget(targetLocale).partIterator();
 		int n;
-		while ( iter.hasNext() ) {
-			TextPart part = iter.next();
+		for ( TextPart part : tu.getTarget(targetLocale) ) {
 			StringBuilder sb = new StringBuilder(part.text.getCodedText());
 			for ( int i=0; i<sb.length(); i++ ) {
 				if ( TextFragment.isMarker(sb.charAt(i)) ) {
@@ -178,7 +172,8 @@ public class TextModificationStep extends BasePipelineStep {
 	}
 
 	private void addSegmentMarks (TextUnit tu) {
-		for ( Segment seg : tu.getTarget(targetLocale) ) {
+		for ( Iterator<Segment> iter = tu.getTarget(targetLocale).segmentIterator(); iter.hasNext(); ) {
+    		Segment seg = iter.next();
 			seg.text.setCodedText(STARTSEG+seg.text.getCodedText()+ENDSEG);
 		}
 	}

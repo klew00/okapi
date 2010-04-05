@@ -20,8 +20,6 @@
 
 package net.sf.okapi.filters.ttx;
 
-import java.util.Iterator;
-
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoreInfo;
@@ -86,9 +84,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		
 		// Drive from target
 		int i = 0;
-		Iterator<TextPart> iter = trgCont.partIterator();
-		while ( iter.hasNext() ) {
-			TextPart part = iter.next();
+		for ( TextPart part : trgCont ) {
 			if ( part.isSegment() ) {
 				Segment trgSeg = (Segment)part;
 				Segment srcSeg = srcCont.getSegment(trgSeg.id);

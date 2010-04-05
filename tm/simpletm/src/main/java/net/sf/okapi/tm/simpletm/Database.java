@@ -39,6 +39,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -236,7 +237,8 @@ public class Database {
 				pstm.setString(6, grpName);
 				pstm.setString(7, fileName);
 				int segIndex = 0;
-				for ( Segment srcSeg : srcCont ) {
+				for ( Iterator<Segment> iter = srcCont.segmentIterator(); iter.hasNext(); ) {
+		    		Segment srcSeg = iter.next();
 					pstm.setString(2, srcSeg.text.getCodedText());
 					pstm.setString(3, Code.codesToString(srcSeg.text.getCodes()));
 					Segment trgSeg = trgCont.getSegment(srcSeg.id);

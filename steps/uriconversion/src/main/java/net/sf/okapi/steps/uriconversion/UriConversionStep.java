@@ -23,7 +23,6 @@ package net.sf.okapi.steps.uriconversion;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,9 +93,7 @@ public class UriConversionStep extends BasePipelineStep {
 		String res;
 
 		try {
-			Iterator<TextPart> iter = cont.partIterator();
-			while ( iter.hasNext() ) {
-				TextPart part = iter.next();
+			for ( TextPart part : cont ) {
 				if ( params.conversionType == Parameters.UNESCAPE ) {
 					res = unescape(part.text.getCodedText());
 				}

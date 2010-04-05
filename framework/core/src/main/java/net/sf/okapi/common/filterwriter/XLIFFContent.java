@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common.filterwriter;
 
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
@@ -247,9 +246,7 @@ public class XLIFFContent {
 			innerContent = new XLIFFContent();
 		}
 
-		Iterator<TextPart> iter = container.partIterator();
-		while ( iter.hasNext() ) {
-			TextPart part = iter.next();
+		for ( TextPart part : container ) {
 			// Segment marker if needed
 			if ( withMarkers && part.isSegment() && container.hasBeenSegmented() ) {
 				tmp.append(String.format("<mrk mid=\"%s\" mtype=\"seg\">", ((Segment)part).id));

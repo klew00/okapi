@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -135,7 +136,8 @@ public class FileProcessor {
 			segmenter.computeSegments(textCont);
 			textCont.createSegments(segmenter.getRanges());
 			if ( htmlOutput ) {
-				for ( Segment seg : textCont ) {
+				for ( Iterator<Segment> iter = textCont.segmentIterator(); iter.hasNext(); ) {
+		    		Segment seg = iter.next();
 					writer.write("<p>"); //$NON-NLS-1$
 					writer.write(Util.escapeToXML(sampleOutput.setContent(seg.text).toString(true), 0, false, null));
 					writer.write("</p>"); //$NON-NLS-1$

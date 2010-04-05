@@ -604,7 +604,8 @@ public class TTXFilter implements IFilter {
 			if ( srcCont.hasBeenSegmented() ) {
 				TextContainer cont = srcCont.clone();
 				int i = 0;
-				for ( Segment seg : cont ) {
+				for ( Iterator<Segment> iter = cont.segmentIterator(); iter.hasNext(); ) {
+		    		Segment seg = iter.next();
 					seg.text = trgFragments.get(i);
 					i++;
 				}
@@ -632,9 +633,8 @@ public class TTXFilter implements IFilter {
 	}
 	
 	private boolean hasText (TextContainer tc) {
-		Iterator<TextPart> iter = tc.partIterator();
-		while ( iter.hasNext() ) {
-			String text = iter.next().getContent().getCodedText();
+		for ( TextPart part : tc ) {
+			String text = part.getContent().getCodedText();
 			for ( int i=0; i<text.length(); i++ ) {
 				if ( TextFragment.isMarker(text.charAt(i)) ) {
 					i++; // Skip index

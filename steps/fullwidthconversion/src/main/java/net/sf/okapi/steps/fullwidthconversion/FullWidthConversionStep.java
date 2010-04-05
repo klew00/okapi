@@ -20,8 +20,6 @@
 
 package net.sf.okapi.steps.fullwidthconversion;
 
-import java.util.Iterator;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
@@ -76,9 +74,8 @@ public class FullWidthConversionStep extends BasePipelineStep {
 		if ( !tu.isTranslatable() ) return event;
 
 		TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
-		Iterator<TextPart> iter = tc.partIterator();
-		while ( iter.hasNext() ) {
-			processFragment(iter.next().getContent());
+		for ( TextPart part : tc ) {
+			processFragment(part.getContent());
 		}
 		return event;
 	}

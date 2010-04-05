@@ -19,6 +19,7 @@
 ===========================================================================*/
 
 import java.io.File;
+import java.util.Iterator;
 
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
@@ -60,7 +61,8 @@ public class Main {
 			TextContainer tc = new TextContainer(tf);
 			segmenter.computeSegments(tc);
 			tc.createSegments(segmenter.getRanges());
-			for ( Segment seg : tc ) {
+			for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+	    		Segment seg = iter.next();
 				System.out.println("segment=[" + seg.toString() + "]");
 			}
 		}
