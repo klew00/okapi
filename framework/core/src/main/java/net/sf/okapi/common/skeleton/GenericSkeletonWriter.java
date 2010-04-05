@@ -367,7 +367,9 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			context = 0; // Keep skeleton context
 		}
 		
-		if ( srcCont.hasBeenSegmented() || !srcCont.contentIsOneSegment() ) {
+		if ( srcCont.hasBeenSegmented() || !srcCont.contentIsOneSegment()
+			|| ( trgCont.getAnnotation(ScoresAnnotation.class) != null ))
+		{
 			return getSegmentedText(srcCont, trgCont, locToUse, context, tu.isReferent());
 		}
 		
@@ -440,7 +442,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 							+ layer.startSegment()
 							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
 							+ layer.midSegment(lev)
-							+ getContent(srcSeg.text, locToUse, 0)
+							+ getContent(trgSeg.text, locToUse, 0)
 							+ layer.endSegment()
 							+ layer.startCode());
 						break;

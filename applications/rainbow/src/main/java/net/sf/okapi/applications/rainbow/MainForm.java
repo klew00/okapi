@@ -2222,6 +2222,7 @@ public class MainForm { //implements IParametersProvider {
 		finally {
 			if ( refresh ) {
 				inputTableMods.get(currentInput).updateTable(null, index);
+				updatePathBuilderSampleData();
 				updateCommands();
 				stopWaiting();
 			}
