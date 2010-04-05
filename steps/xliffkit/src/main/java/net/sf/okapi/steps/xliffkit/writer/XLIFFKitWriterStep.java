@@ -210,6 +210,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 			writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
 		} catch (IOException e) {
 			// TODO Handle exception
+			e.printStackTrace();
 		}
 		
 		File outFile = new File(outputURI);

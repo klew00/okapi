@@ -22,9 +22,12 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import net.sf.okapi.common.ClassUtil;
 
-public class FactoryBean implements IPersistenceBean {	
+public class FactoryBean implements IPersistenceBean {
+	
 	private String className;
-	private Object content;		
+	private Object content;	// Bean for the className
+	
+	private IPersistenceSession session = SessionMapper.getSession();
 	
 	@Override
 	public <T> T get(T obj) {
@@ -33,7 +36,27 @@ public class FactoryBean implements IPersistenceBean {
 	
 	@Override
 	public <T> T get(Class<T> classRef) {
-		return classRef.cast(validateContent() ? ((IPersistenceBean) content).get(content.getClass()) : null);
+		return classRef.cast(validateContent() ? ((IPersistenceBean) content).get(classRef) : null);
+	}
+	
+	private boolean validateContent() {
+		if (content == null) return false;
+		if (className == null) return false;
+		
+//		String cname = ClassUtil.getQualifiedClassName(content);
+//		if (!className.equals(cname))			
+//			content = JSONObjectConverter.convert(content, PersistenceMapper.getBeanClass(className));
+//		if (content == null) return false;
+//		cname = ClassUtil.getQualifiedClassName(content);
+//		
+//		return className.equals(cname);
+		boolean res = content instanceof IPersistenceBean; 
+		if (!res) {
+			if (session == null) return false;
+			content = session.convert(content, BeanMapper.getBeanClass(className));
+			res = content instanceof IPersistenceBean;
+		}
+		return res;
 	}
 	
 	@Override
@@ -41,24 +64,12 @@ public class FactoryBean implements IPersistenceBean {
 		className = ClassUtil.getQualifiedClassName(obj);
 		//System.out.println(className);
 		
-		IPersistenceBean bean = PersistenceMapper.getBean(ClassUtil.getClass(obj));
+		IPersistenceBean bean = BeanMapper.getBean(ClassUtil.getClass(obj));
 		content = bean;
 		
 		return (bean instanceof FactoryBean) ? this : bean.set(obj); 
 	}
 	
-	private boolean validateContent() {
-		if (content == null) return false;
-		if (className == null) return false;
-		
-		String cname = ClassUtil.getQualifiedClassName(content);
-		if (!className.equals(cname))			
-			content = JSONObjectConverter.convert(content, PersistenceMapper.getBeanClass(className));
-		if (content == null) return false;
-		
-		return className.equals(cname);
-	}
-
 	public void setClassName(String className) {
 		this.className = className;
 	}

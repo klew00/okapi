@@ -58,5 +58,17 @@ public interface IPersistenceSession {
 	 * Deserializes an object from the session input stream.
 	 * @return the deserialized object.
 	 */
-	Object deserialize();
+	<T> T deserialize(Class<T> classRef);
+
+	/**
+	 * Converts a given object to an expected type.
+	 * The given object can be serialized as is, and then deserialized as 
+	 * an expected class instance. This helps if the object was initially deserialized incorrectly.
+	 * Implementers can use different strategies to achieve the goal. 	
+	 * @param obj the given object to be converted.
+	 * @param expectedClass new class of the given object.
+	 * @return the converted object.
+	 */
+	<T extends IPersistenceBean> T convert(Object obj, Class<T> expectedClass);
+	
 }

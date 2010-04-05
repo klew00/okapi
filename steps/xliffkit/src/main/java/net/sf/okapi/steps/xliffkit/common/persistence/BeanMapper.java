@@ -20,7 +20,9 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
+import java.io.InputStream;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -62,6 +64,7 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.FilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.GenericSkeletonBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.GenericSkeletonPartBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.InlineAnnotationBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.InputStreamBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.MultiEventBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ParametersBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.PropertyBean;
@@ -80,7 +83,7 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipEntryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipFileBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipSkeletonBean;
 
-public class PersistenceMapper {
+public class BeanMapper {
 	
 	private static final String MSG1 = "PersistenceFactory: bean mapping is not initialized";
 	private static final String MSG2 = "PersistenceFactory: unknown class: %s";
@@ -108,6 +111,8 @@ public class PersistenceMapper {
 		if (beanMapping == null)
 			throw(new RuntimeException(MSG1));
 		
+		// TODO Make sure if a bean for already registered class was registered later, the later bean takes precedence
+		// HashMap.put(): "If the map previously contained a mapping for the key, the old value is replaced". Test
 		beanMapping.put(classRef, beanClassRef);		
 	}
 	
@@ -176,12 +181,13 @@ public class PersistenceMapper {
 	
 	private static void registerBeans() {
 		// General purpose beans
+		registerBean(List.class, ListBean.class);
 		registerBean(IParameters.class, ParametersBean.class);
 		registerBean(IFilterWriter.class, FilterWriterBean.class);
 		registerBean(Object.class, TypeInfoBean.class); // If no bean was found, use just this one to store class info
 		
 		// Specific class beans
-		registerBean(Event.class, EventBean.class);
+		registerBean(Event.class, EventBean.class);		
 		registerBean(TextUnit.class, TextUnitBean.class);
 		registerBean(RawDocument.class, RawDocumentBean.class);
 		registerBean(Property.class, PropertyBean.class);
@@ -205,7 +211,8 @@ public class PersistenceMapper {
 		registerBean(GenericSkeletonPart.class, GenericSkeletonPartBean.class);
 		registerBean(ZipSkeleton.class, ZipSkeletonBean.class);
 		registerBean(ZipFile.class, ZipFileBean.class);
-		registerBean(ZipEntry.class, ZipEntryBean.class);		
+		registerBean(ZipEntry.class, ZipEntryBean.class);
+		registerBean(InputStream.class, InputStreamBean.class);
 		registerBean(InlineAnnotation.class, InlineAnnotationBean.class);		
 	}
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,29 +20,70 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.okapi.common.ClassUtil;
 
-public class TypeInfoBean implements IPersistenceBean {
+public class ListBean implements IPersistenceBean {
 
 	private String className;
+	List<FactoryBean> items = new ArrayList<FactoryBean>();
 	
+	//@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(T obj) {
-		// TODO Logging
+//		if (obj instanceof List<?>) {
+//			List<Object> list = (List<Object>) obj;
+//			for (IPersistenceBean itemBean : items) {
+//				Object item = itemBean.get(Object.class);
+//				list.add(item);
+//			}
+//		}
 		return obj;
 	}
 
+	//@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(Class<T> classRef) {
-		// TODO Logging
-		return null;
+//		Object inst = null;
+//		try {
+//			inst = ClassUtil.instantiateClass(className);
+//		} catch (InstantiationException e) {
+//			// TODO Handle exception
+//			e.printStackTrace();
+//		} catch (IllegalAccessException e) {
+//			// TODO Handle exception
+//			e.printStackTrace();
+//		} catch (ClassNotFoundException e) {
+//			// TODO Handle exception
+//			e.printStackTrace();
+//		}
+
+		return classRef.cast(get(new ArrayList<Object>()));
+//		return (T) get(inst);
 	}
 
 	@Override
 	public IPersistenceBean set(Object obj) {
-		
-		className = ClassUtil.getQualifiedClassName(obj);
+		if (obj instanceof List<?>) {
+			className = ClassUtil.getQualifiedClassName(obj);
+			List<?> list = (List<?>) obj;
+			for (Object item : list) {
+				FactoryBean itemBean = new FactoryBean();
+				itemBean.set(item);
+				items.add(itemBean);
+			}
+		}
 		return this;
+	}
+
+	public List<FactoryBean> getList() {
+		return items;
+	}
+
+	public void setList(List<FactoryBean> items) {
+		this.items = items;
 	}
 
 	public void setClassName(String className) {

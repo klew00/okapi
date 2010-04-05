@@ -20,67 +20,61 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
-import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextFragment;
+import java.io.IOException;
+import java.io.InputStream;
+
+import net.sf.okapi.common.StreamUtil;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 
-public class SegmentBean extends TextPartBean {
-	
-	private String id;
+public class InputStreamBean implements IPersistenceBean {
+
+	private byte[] data;
 	
 	@Override
 	public <T> T get(T obj) {
-		return obj;
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
+
 	@Override
 	public <T> T get(Class<T> classRef) {
-		TextFragmentBean textBean = super.getPart();
-		TextFragment text = null;
-		
-		if (textBean != null)
-			text = textBean.get(TextFragment.class);
-		else
-			text = new TextFragment();
-		
-		return classRef.cast(get(new Segment(id, text)));
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public IPersistenceBean set(Object obj) {
-		super.set(obj);
-		
-		if (obj instanceof Segment) {			
-			Segment seg = (Segment) obj;
-			id = seg.getId();
+		if (obj instanceof InputStream) {
+			InputStream is = (InputStream) obj;
+			boolean markSupported = is.markSupported();
+			if (markSupported)
+				is.mark(Integer.MAX_VALUE);
+			
+			try {
+				data = StreamUtil.inputStreamToBytes(is); // data.length
+				
+			} catch (IOException e1) {
+				// TODO Handle exception
+				e1.printStackTrace();
+			}
+
+			if (markSupported)
+				try {
+					is.reset();
+				} catch (IOException e) {
+					// TODO Handle exception
+					e.printStackTrace();
+				}
 		}
 		return this;
 	}
 
-	public String getSegment() {
-		return id;
+	public void setData(byte[] data) {
+		this.data = data;
 	}
 
-	public void setSegment(String id) {
-		this.id = id;
+	public byte[] getData() {
+		return data;
 	}
 
-//	public void setSegment(TextFragmentBean text) {
-//		super.setPart(text);
-//	}
-//
-//	public TextFragmentBean getSegment() {
-//		return super.getPart();
-//	}
-//	
-//	@Override
-//	@Deprecated
-//	public void setPart(TextFragmentBean text) {
-//	}
-//
-//	@Override
-//	@Deprecated
-//	public TextFragmentBean getPart() {
-//		return super.getPart();
-//	}
 }

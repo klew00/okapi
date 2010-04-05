@@ -16,7 +16,11 @@
 
 package net.sf.okapi.common;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+
+import net.sf.okapi.common.exceptions.OkapiIOException;
 
 /**
 * Base64 Encoder/Decoder for all VM.
@@ -154,7 +158,28 @@ public class Base64 {
 		}
 		return out;
 	}
-
+	
+	
+	public static String encode (InputStream is) {
+		if (is == null)
+			throw new IllegalArgumentException("Input stream for Base64 encoding cannot be null.");
+		
+		StringBuilder sb = new StringBuilder();
+		byte[] buffer = new byte[2048];
+		int bytesRead = 0;
+		 
+		try {
+			while ((bytesRead = is.read(buffer)) > 0) {
+				char[] chunk = encode(buffer, bytesRead);
+				sb.append(chunk);
+			 }
+		} catch (IOException e) {
+			throw new OkapiIOException ("I/O exception while reading data for Base64 encoding.", e);
+		}
+			 		
+		return sb.toString();		
+	}
+	
 }
 
 

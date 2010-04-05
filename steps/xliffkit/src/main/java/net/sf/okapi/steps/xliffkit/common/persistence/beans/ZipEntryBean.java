@@ -34,6 +34,7 @@ public class ZipEntryBean implements IPersistenceBean {
 	private int method = -1;	// compression method
 	private byte[] extra;       // optional extra field data for entry
 	private String comment;     // optional comment string for entry
+	private InputStreamBean inputStream = new InputStreamBean();
 	
 	@Override
 	public <T> T get(T obj) {
@@ -41,10 +42,10 @@ public class ZipEntryBean implements IPersistenceBean {
 			ZipEntry ze = (ZipEntry) obj;
 			
 			ze.setComment(comment);
-			ze.setCompressedSize(csize);
+			//ze.setCompressedSize(csize); // !!! Do not uncomment, new compression size can be different, and an exception is thrown 
 			ze.setCrc(crc);
 			ze.setExtra(extra);
-			ze.setMethod(method);
+			//ze.setMethod(method); // !!! Do not uncomment, let the code decide
 			ze.setSize(size);
 			ze.setTime(time);
 		}
@@ -135,6 +136,14 @@ public class ZipEntryBean implements IPersistenceBean {
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public void setInputStream(InputStreamBean inputStream) {
+		this.inputStream = inputStream;
+	}
+
+	public InputStreamBean getInputStream() {
+		return inputStream;
 	}
 
 }

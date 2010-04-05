@@ -1,0 +1,7 @@
+1. TextUnit.addBilingualPair(List<TextPart>  sourceParts, List<TextPart>
+targetParts, LocaleId localid) 
+
+2. TextUnit.addBilingualPair(List<TextPart>  sourceParts, List<TextPart>
+targetParts, LocaleId localid) 
+
+3. EOF

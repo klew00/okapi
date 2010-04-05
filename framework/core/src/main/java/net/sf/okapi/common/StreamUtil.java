@@ -18,41 +18,29 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.common.persistence.beans;
+package net.sf.okapi.common;
 
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-public class TextPartBean implements IPersistenceBean {
-	private TextFragmentBean text = new TextFragmentBean();
-	
-	@Override
-	public <T> T get(T obj) {		
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new TextPart(text.get(TextFragment.class))));
-	}
+public class StreamUtil {
+	/**
+	 * 
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 * @author adrian.ajb at http://forums.sun.com/thread.jspa?threadID=606890
+	 */
+	public static byte[] inputStreamToBytes(InputStream in) throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+		byte[] buffer = new byte[1024];
+		int len;
 
-	@Override
-	public IPersistenceBean set(Object obj) {
-		if (obj instanceof TextPart) {
-			TextPart tp = (TextPart) obj;
-			
-			text.set(tp.getContent());
-		}
-			
-		return this;
-	}
+		while((len = in.read(buffer)) >= 0)
+			out.write(buffer, 0, len);
 
-	public void setPart(TextFragmentBean text) {
-		this.text = text;
-	}
-
-	public TextFragmentBean getPart() {
-		return text;
-	}
+		out.close();
+		return out.toByteArray();
+	} 
 }

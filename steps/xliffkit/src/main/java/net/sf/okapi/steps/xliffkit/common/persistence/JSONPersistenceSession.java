@@ -29,6 +29,7 @@ import net.sf.okapi.common.ClassUtil;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser.Feature;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -48,7 +49,7 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	public JSONPersistenceSession(Class<?> rootClass) {
 		super();
 		this.rootClass = rootClass;
-		this.beanClass = PersistenceMapper.getBeanClass(rootClass);
+		this.beanClass = BeanMapper.getBeanClass(rootClass);
 	}
 	
 	public JSONPersistenceSession(Class<?> rootClass, OutputStream outStream) {
@@ -62,22 +63,31 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	}
 	
 	@Override
-	public Object deserialize() {
+	public <T extends IPersistenceBean> T convert(Object object, Class<T> expectedClass) {		
+		return mapper.convertValue(object, expectedClass);
+	}
+
+	@Override
+	public <T> T deserialize(Class<T> classRef) {
 		if (!isActive) return null;
 		
 		IPersistenceBean bean = null;
 		try {
-			bean = mapper.readValue(inStream, beanClass);
+			bean = mapper.readValue(inStream, beanClass);			
 						
 		} catch (JsonParseException e) {
 			// TODO Handle exception
+			e.printStackTrace();
 		} catch (JsonMappingException e) {
 			// TODO Handle exception
+			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Handle exception
+			e.printStackTrace();
 		}
 		
-		return bean.get(rootClass);
+		if (bean == null) return null;
+		return classRef.cast(bean.get(classRef));
 	}
 
 	@Override
@@ -99,7 +109,8 @@ public class JSONPersistenceSession implements IPersistenceSession {
 			}
 		inStream = null;
 		outStream = null;
-		mapper = null;		
+		mapper = null;	
+		SessionMapper.endSession();
 	}
 
 	@Override
@@ -111,7 +122,7 @@ public class JSONPersistenceSession implements IPersistenceSession {
 					ClassUtil.getQualifiedClassName(obj),
 					ClassUtil.getQualifiedClassName(rootClass)));
 		
-		IPersistenceBean bean = PersistenceMapper.getBean(rootClass);
+		IPersistenceBean bean = BeanMapper.getBean(rootClass);
 		
 		bean.set(obj);
 		
@@ -152,8 +163,11 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true); 
 		mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
 		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.configure(DeserializationConfig.Feature.USE_ANNOTATIONS, true);
+		mapper.configure(Feature.AUTO_CLOSE_SOURCE, false);
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 		
+		SessionMapper.startSession(this);
 		isActive = true;
 	}
 
