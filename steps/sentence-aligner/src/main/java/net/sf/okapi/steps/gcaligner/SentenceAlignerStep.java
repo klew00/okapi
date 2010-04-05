@@ -36,6 +36,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
@@ -44,6 +45,7 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
 
 /**
  * Align sentences between two source and target paragraphs (TextUnits) and produce a TMX file with aligned sentences.
+ * This {@link IPipelineStep} (via configuration) can also output aligned (multilingual {@link TextUnit}s)
  * 
  * @author HARGRAVEJE
  * 
@@ -126,7 +128,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			tmx.writeStartDocument(sourceLocale, targetLocale, getClass().getName(), null,
 					"sentence", null, "text/plain");
 		}
-		
+
 		return event;
 	}
 
@@ -136,7 +138,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			tmx.close();
 			tmx = null;
 		}
-		
+
 		return event;
 	}
 
@@ -156,7 +158,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
-		TextUnit sourceTu = (TextUnit)sourceEvent.getResource();
+		TextUnit sourceTu = (TextUnit) sourceEvent.getResource();
 		sourceTu.createSourceSegmentation(sourceSegmenter);
 
 		// Move to the next target TU
@@ -166,7 +168,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		if (!sourceTu.isTranslatable())
 			return sourceEvent;
 
-		TextUnit targetTu = (TextUnit)targetEvent.getResource();
+		TextUnit targetTu = (TextUnit) targetEvent.getResource();
 		targetTu.createSourceSegmentation(targetSegmenter);
 
 		if (!sourceTu.getSource().hasBeenSegmented() || !targetTu.getSource().hasBeenSegmented()) {
@@ -175,16 +177,17 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			return sourceEvent;
 		}
 
-		TextUnit alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale, targetLocale);
+		TextUnit alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale,
+				targetLocale);
 
 		// send the aligned TU to the TMX file
-		if (params.isGenerateTMX()) {			
-			tmx.writeTUFull(alignedTextUnit);			
-		} else { // otherwise send each aligned TextUnit downstream as a multi event						
+		if (params.isGenerateTMX()) {
+			tmx.writeTUFull(alignedTextUnit);
+		} else { // otherwise send each aligned TextUnit downstream as a multi event
 			Event e = new Event(EventType.TEXT_UNIT, alignedTextUnit);
 			return e;
 		}
-		
+
 		return sourceEvent;
 	}
 
@@ -218,15 +221,6 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 		return event;
 	}
-
-//	private String getParentDir(String filepath) {
-//		URL url = SentenceAlignerStep.class.getResource(filepath);
-//		String parentDir = null;
-//		if (url != null) {
-//			parentDir = Util.getDirectoryName(url.getPath()) + "/";
-//		}
-//		return parentDir;
-//	}
 
 	@Override
 	public void update(IObservable o, Object event) {
