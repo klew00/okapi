@@ -75,6 +75,7 @@ public class OkapiGUITester {
 			net.sf.okapi.filters.regex.ui.Editor.class.getName(),
 			net.sf.okapi.filters.table.ui.Editor.class.getName(),
 			net.sf.okapi.filters.ts.ui.Editor.class.getName(),
+			net.sf.okapi.filters.json.ui.Editor.class.getName(),
 
 			// steps
 			net.sf.okapi.steps.tokenization.ui.ParametersEditor.class.getName(),
@@ -151,7 +152,7 @@ public class OkapiGUITester {
 		shell.setSize(576, 534);
 		shell.setText("Okapi GUI Tester");
 
-		URL url = OkapiGUITester.class.getResource("/Rainbow.png");
+		URL url = this.getClass().getResource("Rainbow.png");
 		if (url == null)
 			return;
 
