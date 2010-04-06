@@ -250,8 +250,7 @@ public class TestJackson {
 		System.out.println(st);
 	}
 	
-	// DEBUG 
-	@Test
+	// DEBUG @Test
 	public void testPersistenceRoundtrip() throws IOException {
 	
 		Event event1 = new Event(EventType.TEXT_UNIT);
@@ -298,5 +297,63 @@ public class TestJackson {
 		
 		FilterTestDriver.compareEvents(events, events2);
 		FilterTestDriver.laxCompareEvents(events, events2);
-	}	
+	}
+	
+	// DEBUG 
+	@Test
+	public void testMultipleObject() throws IOException {
+	
+		Event event1 = new Event(EventType.TEXT_UNIT);
+		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		String zipName = this.getClass().getResource("sample1.en.fr.zip").getFile();
+		tu1.setSkeleton(new ZipSkeleton(new ZipFile(new File(zipName))));
+		event1.setResource(tu1);
+		tu1.setTarget(LocaleId.FRENCH, new TextContainer("french-text1"));
+		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
+				
+		Event event2 = new Event(EventType.TEXT_UNIT);
+		TextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		tu2.setSkeleton(new ZipSkeleton(new ZipEntry("aa1/content/content.gmx")));
+		event2.setResource(tu2);
+		tu2.setTarget(LocaleId.FRENCH, new TextContainer("french-text2"));
+		tu2.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text2"));
+		
+		tu1.getSource().appendPart("part1");
+		tu1.getSource().appendSegment(new Segment("segId1", new TextFragment("seg1")));
+		tu1.getSource().appendPart("part2");
+		tu1.getSource().appendSegment(new Segment("segId2", new TextFragment("seg2")));
+				
+		JSONPersistenceSession skelSession = new JSONPersistenceSession(Event.class);
+		
+		File tempSkeleton = null;
+		tempSkeleton = File.createTempFile("~aaa", ".txt");
+		tempSkeleton.deleteOnExit();
+		
+		skelSession.start(new FileOutputStream(tempSkeleton));
+		
+		Events events = new Events();
+		events.add(event1);
+		events.add(event2);
+		
+		skelSession.serialize(event1);
+		skelSession.serialize(event2);
+		skelSession.end();
+		
+		FileInputStream fis = new FileInputStream(tempSkeleton);
+		skelSession.start(fis);		
+		
+		Event event11 = skelSession.deserialize(Event.class);
+		Event event22 = skelSession.deserialize(Event.class);
+		
+		skelSession.end();
+				
+		Events events2 = new Events();
+		events2.add(event11);
+		events2.add(event22);
+		
+		FilterTestDriver.compareEvents(events, events2);
+		FilterTestDriver.laxCompareEvents(events, events2);
+	}
 }

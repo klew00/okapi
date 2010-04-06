@@ -26,9 +26,11 @@ import java.io.OutputStream;
 
 import net.sf.okapi.common.ClassUtil;
 
+import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonParser.Feature;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -38,8 +40,11 @@ import org.codehaus.jackson.map.SerializationConfig;
 public class JSONPersistenceSession implements IPersistenceSession {
 
 	public static final String MIME_TYPE = "application/json";
+	// RFC http://www.ietf.org/rfc/rfc4627.txt
 	
 	private ObjectMapper mapper;
+	private JsonFactory jsonFactory;
+	private JsonParser parser;	
 	private OutputStream outStream;
 	private InputStream inStream;
 	private boolean isActive;
@@ -50,6 +55,16 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		super();
 		this.rootClass = rootClass;
 		this.beanClass = BeanMapper.getBeanClass(rootClass);
+		
+		mapper = new ObjectMapper();		
+		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true); 
+		mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
+		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.configure(DeserializationConfig.Feature.USE_ANNOTATIONS, true);
+		mapper.configure(Feature.AUTO_CLOSE_SOURCE, false);
+		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
+		
+		jsonFactory = mapper.getJsonFactory();
 	}
 	
 	public JSONPersistenceSession(Class<?> rootClass, OutputStream outStream) {
@@ -73,7 +88,8 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		
 		IPersistenceBean bean = null;
 		try {
-			bean = mapper.readValue(inStream, beanClass);			
+			//bean = mapper.readValue(inStream, beanClass);
+			bean = mapper.readValue(parser, beanClass);
 						
 		} catch (JsonParseException e) {
 			// TODO Handle exception
@@ -109,7 +125,6 @@ public class JSONPersistenceSession implements IPersistenceSession {
 			}
 		inStream = null;
 		outStream = null;
-		mapper = null;	
 		SessionMapper.endSession();
 	}
 
@@ -158,15 +173,6 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	}
 
 	private void startSession() {		
-		mapper = new ObjectMapper();
-		
-		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true); 
-		mapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
-		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		mapper.configure(DeserializationConfig.Feature.USE_ANNOTATIONS, true);
-		mapper.configure(Feature.AUTO_CLOSE_SOURCE, false);
-		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
-		
 		SessionMapper.startSession(this);
 		isActive = true;
 	}
@@ -175,7 +181,16 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	public void start(InputStream inStream) {
 		end();
 		
-		this.inStream = inStream;
+		this.inStream = inStream;				
+		try {
+			parser = jsonFactory.createJsonParser(inStream);
+		} catch (JsonParseException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		}
 		startSession();
 	}
 
