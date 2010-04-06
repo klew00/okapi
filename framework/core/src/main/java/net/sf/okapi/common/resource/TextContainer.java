@@ -869,7 +869,10 @@ public class TextContainer implements Iterable<TextPart> {
 				newCont.properties.put(prop.getName(), prop.clone()); 
 			}
 		}
-//TODO: Clone annotations		
+		// Clone the annotations
+		if ( annotations != null ) {
+			newCont.annotations = annotations.clone();
+		}
 		// Returns the new container
 		return newCont;
 	}
@@ -993,6 +996,10 @@ public class TextContainer implements Iterable<TextPart> {
 	public Set<String> getPropertyNames () {
 		if ( properties == null ) properties = new Hashtable<String, Property>();
 		return properties.keySet();
+	}
+
+	public Annotations getAnnotations() {
+		return (annotations == null) ? new Annotations() : annotations;
 	}
 
 	public <A extends IAnnotation> A getAnnotation (Class<A> type) {
@@ -1335,10 +1342,6 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 		// Set the auto-value
 		seg.id = String.valueOf(value);
-	}
-
-	public Annotations getAnnotations() {
-		return (annotations == null) ? new Annotations() : annotations;
 	}
 
 }

@@ -21,6 +21,7 @@
 package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import static org.junit.Assert.*;
@@ -189,15 +190,24 @@ public class TextContainerTest {
 		assertEquals("0", tc.getSegment(0).id);
 	}
 
-	// Test segmenting from an array
     @Test
-    public void cloneDeepCopy(){
-    	TextContainer tc = new TextContainer();
+    public void testCloneDeepCopy(){
+    	TextContainer tc = new TextContainer("text");
         Property p1 = new Property("name", "value", true);
         tc.setProperty(p1);
+        ScoresAnnotation ann1 = new ScoresAnnotation();
+        ann1.add(99, "abc");
+        tc.setAnnotation(ann1);
 		TextContainer tc2 = tc.clone();
+		assertEquals(tc.getFirstPartContent().toString(), tc2.getFirstPartContent().toString());
+		assertNotSame(tc.getFirstPartContent(), tc2.getFirstPartContent());
         assertEquals("name property", p1.getValue(), tc2.getProperty("name").getValue());
         assertNotSame("properties should not be the same reference due to clone", p1, tc2.getProperty("name"));
+        ScoresAnnotation ann2 = tc2.getAnnotation(ScoresAnnotation.class); 
+        assertNotNull(ann2);
+        assertEquals(99, ann2.get(0).score);
+        assertEquals("abc", ann2.get(0).origin);
+//TODO: check this with everyone        assertNotSame(ann2, ann1);
     }
 
     @Test
