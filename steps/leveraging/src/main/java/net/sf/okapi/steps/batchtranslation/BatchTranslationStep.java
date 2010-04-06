@@ -36,6 +36,7 @@ public class BatchTranslationStep extends BasePipelineStep {
 	private boolean isDone;
 	private BatchTranslator trans;
 	private IFilterConfigurationMapper fcMapper;
+	private String rootDir;
 
 	public BatchTranslationStep () {
 		params = new Parameters();
@@ -44,6 +45,11 @@ public class BatchTranslationStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
 	}
 	
 	public String getName () {
@@ -63,7 +69,7 @@ public class BatchTranslationStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartBatch (Event event) {
 		isDone = true;
-		trans = new BatchTranslator(fcMapper, params);
+		trans = new BatchTranslator(fcMapper, params, rootDir);
 		return event;
 	}
 	

@@ -84,12 +84,15 @@ public class BatchTranslator {
 	private int docEntries;
 	private int totalEntries;
 	private ISegmenter segmenter;
+	private String rootDir;
 
 	public BatchTranslator (IFilterConfigurationMapper fcMapper,
-		Parameters params)
+		Parameters params,
+		String rootDir)
 	{
 		this.fcMapper = fcMapper;
 		this.params = params;
+		this.rootDir = rootDir;
 		
 		if ( this.params == null ) {
 			this.params = new Parameters();
@@ -100,6 +103,7 @@ public class BatchTranslator {
 		attributes.put("creationid", Util.ORIGIN_MT);
 	}
 	
+	@Override
 	protected void finalize () {
 		closeAll();
 	}
@@ -136,7 +140,7 @@ public class BatchTranslator {
 	// Call this method at the first document
 	private void initialize () {
 		if ( params.getMakeTMX() ) {
-			tmxWriter = new TMXWriter(params.getTmxPath());
+			tmxWriter = new TMXWriter(Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir));
 			tmxWriter.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", "sentence", "MT-based", "unknown");
 		}
 		if ( !Util.isEmpty(params.getOrigin()) ) {
@@ -150,13 +154,14 @@ public class BatchTranslator {
 
 		// Initialize existing TM if needed
 		if ( params.getCheckExistingTm() ) {
-			existingTm = TmSeekerFactory.createFileBasedTmSeeker(params.getExistingTm());
+			existingTm = TmSeekerFactory.createFileBasedTmSeeker(
+				Util.fillRootDirectoryVariable(params.getExistingTm(), rootDir));
 		}
 		
 		segmenter = null;
 		if ( params.getSegment() ) {
 			SRXDocument srxDoc = new SRXDocument();
-			srxDoc.loadRules(params.getSrxPath());
+			srxDoc.loadRules(Util.fillRootDirectoryVariable(params.getSrxPath(), rootDir));
 			//if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			segmenter = srxDoc.compileLanguageRules(srcLoc, null);
 		}
@@ -199,7 +204,7 @@ public class BatchTranslator {
 				tmWriter = null;
 			}
 			if ( params.getMakeTM() ) {
-				String tmDir = params.getTmDirectory();
+				String tmDir = Util.fillRootDirectoryVariable(params.getTmDirectory(), rootDir);
 				Util.createDirectories(tmDir+File.separator);
 				//TODO: Move this check at the pensieve package level
 				File file = new File(tmDir+File.separator+"segments.gen");
@@ -285,60 +290,6 @@ public class BatchTranslator {
 						docEntries++;
 					}
 					
-//					if ( tc.isSegmented() ) {
-//						List<Segment> segments = tc.getSegments();
-//						for ( Segment seg : segments ) {
-//							// If needed, check if the entry is in the existing TM
-//							if ( currentTm != null ) {
-//								if ( currentTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
-//									// If we have a hit, no need to query the MT
-//									docInternalMatches++;
-//									continue;
-//								}
-//							}
-//							if ( existingTm != null ) {
-//								if ( existingTm.searchFuzzy(seg.text, 95, 1, null).size() > 0 ) {
-//									// If we have a hit, no need to query the MT
-//									docExternalMatches++;
-//									continue;
-//								}
-//							}
-//							// Store
-//							store.write(seg.text);
-//							htmlWriter.writeStartElement("p");
-//							htmlWriter.writeAttributeString("id", String.format("%d:%s:%s", currentSubDocId, tu.getId(), seg.id));
-//							htmlWriter.writeRawXML(qutil.toCodedHTML(seg.text));
-//							htmlWriter.writeEndElementLineBreak(); // p
-//							atLeastOne = true;
-//							docEntries++;
-//						}
-//					}
-//					else { // Not segmented
-//						// If needed, check if the entry is in the existing TM
-//						if ( currentTm != null ) {
-//							if ( currentTm.searchFuzzy(tc.getContent(), 95, 1, null).size() > 0 ) {
-//								// If we have a hit, no need to query the MT
-//								docInternalMatches++;
-//								continue;
-//							}
-//						}
-//						if ( existingTm != null ) {
-//							if ( existingTm.searchFuzzy(tc.getContent(), 95, 1, null).size() > 0 ) {
-//								// If we have a hit, no need to query the MT
-//								docExternalMatches++;
-//								continue;
-//							}
-//						}
-//						// Store
-//						store.write(tc.getContent());
-//						htmlWriter.writeStartElement("p");
-//						htmlWriter.writeAttributeString("id", String.format("%d:%s:", currentSubDocId, tu.getId()));
-//						htmlWriter.writeRawXML(qutil.toCodedHTML(tc.getContent()));
-//						htmlWriter.writeEndElementLineBreak(); // p
-//						atLeastOne = true;
-//						docEntries++;
-//					}
-
 					if ( atLeastOne ) count++;
 				}
 				
@@ -449,6 +400,7 @@ public class BatchTranslator {
 			cmd = cmd.replace("${inputURI}", htmlSourceFile.toString());
 			cmd = cmd.replace("${inputPath}", htmlSourceFile.getPath());
 			cmd = cmd.replace("${outputPath}", htmlTargetFile.getPath());
+			cmd = cmd.replace("${rootDir}", rootDir);
 			
 			Locale loc = rawDoc.getSourceLocale().toJavaLocale();
 			cmd = cmd.replace("${srcLangName}", loc.getDisplayLanguage(Locale.ENGLISH));

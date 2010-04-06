@@ -97,13 +97,18 @@ the following variables in the command line:</p>
 		<td>Code of the language part of the target locale identifier.</td>
 		<td>For &quot;<code>ja-jp</code>&quot; this returns &quot;<code>ja</code>&quot;</td>
 	</tr>
+	<tr>
+		<td><code>${rootDir}</code></td>
+		<td>The root directory for this project/batch</td>
+		<td>In Rainbow: the parameters folder.</td>
+	</tr>
 </table>
 <p>Example 1: The following command-line uses the open-source Apertium program 
 under Linux to translate the temporary HTML document.</p>
 <pre>apertium -f html ${srcLang}-${trgLang} ${inputPath} ${outputPath}</pre>
 <p>Example 2: The following command-line uses the commercial ProMT application 
 under Windows to translate the temporary HTML document.</p>
-<pre>&quot;C:\Program Files\PRMT8\FILETRANS\FileTranslator.exe&quot; ${inputPath} /as /ac /o:${outputPath} /d:${srcLangName}-${trgLangName}</pre>
+<pre>&quot;C:\Program Files\PRMT9\FILETRANS\FileTranslator.exe&quot; ${inputPath} /as /ac /d:${srcLangName}-${trgLangName} /o:${outputPath}</pre>
 <p><cite>Block size</cite> -- Enter the maximum number of text units that should 
 be passed at the same time to the external tool. This allows you to process a 
 very large input document even with external tools that can only process small 
@@ -120,7 +125,8 @@ option is not set, each paragraph of the HTML document will be an un-segmented
 paragraph.</p>
 <p><cite>SRX path</cite> -- Enter the full path to the segmentation rules file 
 in SRX that should be used to segment the text units. This option is enabled 
-only if the option <cite>Segment the text units</cite> is set.</p>
+only if the option <cite>Segment the text units</cite> is set. You can use the 
+variable <code>${rootDir}</code> in the path.</p>
 <p><cite>Import into a TM</cite> -- Set this option to import the translated 
 entries into a given Pensieve TM. The entries added to the TM are indexed at the 
 end of each input document (and therefore other steps down the pipeline can only 
@@ -129,14 +135,16 @@ documents).</p>
 <p><cite>Directory of the TM where to import</cite> -- Enter the directory of 
 the Pensive TM where to import the entries. If the TM does not exist it will be 
 created. If the TM exists already, the entries will be added to the existing TM. 
-This option is enabled only if the option <cite>Import into a TM</cite> is set.</p>
+This option is enabled only if the option <cite>Import into a TM</cite> is set. 
+You can use the variable <code>${rootDir}</code> in the path.</p>
 <p><cite>Create a TMX document</cite> -- Set this option to create a TMX 
 document with the translated entries. A single TMX file is created for all input 
 document. The file is not generated until end of the last document (and 
 therefore cannot be used by other steps down the pipeline).</p>
 <p><cite>TMX path</cite> -- Enter the full path of the TMX document to generate. 
 If the file exists alreadys it will be overwritten. This option is enabled only 
-if the option <cite>Create a TMX document</cite> is set.</p>
+if the option <cite>Create a TMX document</cite> is set. You can use the 
+variable <code>${rootDir}</code> in the path.</p>
 <p><cite>Check for existing entries in an existing TM</cite> -- Set this option 
 to lookup in an existing Pensieve TM each entry that may be send for 
 translation. This allows to send only the entries for which you don&#39;t have an 
@@ -144,7 +152,8 @@ existing translation.</p>
 
 <p><cite>Directory of the existing TM</cite> -- Enter the directory of the 
 Pensive TM to lookup for existing entries. This option is enabled only if the 
-option <cite>Check for existing entries in an existing TM</cite> is set.</p>
+option <cite>Check for existing entries in an existing TM</cite> is set. You can 
+use the variable <code>${rootDir}</code> in the path.</p>
 <p>&nbsp;</p>
 
 </body>
