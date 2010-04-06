@@ -63,7 +63,7 @@ public class XLIFFFilterTest {
 		root = TestUtil.getParentDir(this.getClass(), "/JMP-11-Test01.xlf");
 	}
 
-//TODO	@Test
+//	@Test
 //	public void testMisOrderedCodes () {
 //		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 //			+ "<xliff version=\"1.2\">"
@@ -76,8 +76,7 @@ public class XLIFFFilterTest {
 //			+ "</file></xliff>";
 //		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 //		assertNotNull(tu);
-//		assertEquals("<1><2></2></1><b3/><4/><b5/><e3/><b6/>",
-//			fmt.setContent(tu.getSourceContent()).toString());
+//		assertEquals("[<1><2></2></1><b3/><4/><b5/><e3/><b6/>]", fmt.printSegmentedContent(tu.getSource(), true));
 //	}
 
 	@Test
@@ -395,10 +394,35 @@ public class XLIFFFilterTest {
 	public void testSegmentationWithEmptyTarget () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createSegmentedTUEmptyTarget(), 1);
 		assertNotNull(tu);
-		
-//TODO: fix segment 0		assertEquals("<1/>[t1]", fmt.printSegmentedContent(tu.getSource(), true));
+		assertEquals("<1/>[t1]", fmt.printSegmentedContent(tu.getSource(), true));
 		TextContainer trgCont = tu.getTarget(locFR);
-//		assertNotNull(trgCont);
+		assertNotNull(trgCont);
+		assertEquals("<1/>[]", fmt.printSegmentedContent(trgCont, true));
+	}
+
+	@Test
+	public void testOutputSegmentationWithEmptyTarget () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\" target-language=\"fr\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\" xml:space=\"preserve\"><source><ph id=\"1\">code</ph>t1</source>"
+			+ "<seg-source><ph id=\"1\">code</ph><mrk mid=\"s1\" mtype=\"seg\">t1</mrk></seg-source>"
+			+ "<target xml:lang=\"fr\"><ph id=\"1\">code</ph><mrk mid=\"s1\" mtype=\"seg\"></mrk></target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\" target-language=\"fr\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\" xml:space=\"preserve\"><source><ph id=\"1\">code</ph>t1</source>"
+			+ "<seg-source><ph id=\"1\">code</ph><mrk mid=\"s1\" mtype=\"seg\">t1</mrk></seg-source>"
+			+ "<target xml:lang=\"fr\"><ph id=\"1\">code</ph></target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+//TODO: segmented target in output		
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
