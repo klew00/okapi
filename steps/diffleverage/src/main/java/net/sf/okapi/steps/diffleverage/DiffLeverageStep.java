@@ -20,20 +20,47 @@
 
 package net.sf.okapi.steps.diffleverage;
 
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.RawDocument;
 
 public class DiffLeverageStep extends BasePipelineStep {
+	private IFilterConfigurationMapper fcMapper;
+	private LocaleId targetLocale;
+	private LocaleId sourceLocale;
+	private RawDocument targetInput;
 
+	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
+	public void setFilterConfigurationMapper(IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
+	}
+
+	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
+	public void setSourceLocale(LocaleId sourceLocale) {
+		this.sourceLocale = sourceLocale;
+	}
+
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+	public void setTargetLocale(LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
+	}
+
+	@StepParameterMapping(parameterType = StepParameterType.SECOND_INPUT_RAWDOC)
+	public void setSecondInput(RawDocument secondInput) {
+		this.targetInput = secondInput;
+	}
+	
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Diff (i.e. compare) two bi-lingual document's segments (old and new) " +
+				"and copy the target segment into the old document TextUnit";
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Diff Leverage Step";
 	}
-
 }
