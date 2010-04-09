@@ -11,9 +11,6 @@
 		<module>okapi</module>
 		<module>okapi-ui/swt</module>
 		<module>applications</module>
-		<module>osgi-third-party</module>
-        <!-- aggregate-libraries Needs to always be the last module built --> 
-        <module>aggregate-libraries</module>
 	</modules>
 	
 </project>
