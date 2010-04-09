@@ -15,49 +15,24 @@
         <module>abstractmarkup</module>
         <module>dtd</module>
         <module>html</module>
-        <module>html-ui</module>
         <module>idml</module>
         <module>mif</module>
         <module>openoffice</module>
-        <module>openoffice-ui</module>
         <module>openxml</module>
-        <module>openxml-ui</module>
         <module>pensieve</module>
         <module>plaintext</module>
-        <module>plaintext-ui</module>
         <module>po</module>
-        <module>po-ui</module>
         <module>php</module>
         <module>properties</module>
-        <module>properties-ui</module>
         <module>regex</module>
-        <module>regex-ui</module>
         <module>rtf</module>
         <module>table</module>
-        <module>table-ui</module>
         <module>tmx</module>
         <module>ts</module>
-        <module>ts-ui</module>
         <module>xliff</module>
         <module>xml</module>
         <module>json</module>
-        <module>json-ui</module>
         <module>ttx</module>
         <module>vignette</module>
     </modules>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <archive>
-                        <manifestFile>${basedir}/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    
 </project>

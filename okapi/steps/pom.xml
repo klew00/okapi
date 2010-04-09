@@ -13,53 +13,27 @@
     <name>Okapi Steps Build</name>
     <modules>
         <module>bomconversion</module>
-        <module>bomconversion-ui</module>
 		<module>charlisting</module>
 		<module>common</module>
 		<module>copysourcetotarget</module>
 		<module>encodingconversion</module>
-        <module>encodingconversion-ui</module>
 		<module>fullwidthconversion</module>
-		<module>fullwidthconversion-ui</module>
 		<module>generatesimpletm</module>
 		<module>leveraging</module>
-		<module>leveraging-ui</module>
 		<module>linebreakconversion</module>
-        <module>linebreakconversion-ui</module>
 		<module>searchandreplace</module>
-		<module>searchandreplace-ui</module>
 		<module>segmentation</module>
-		<module>segmentation-ui</module>
 		<module>textmodification</module>
-		<module>textmodification-ui</module>
         <module>tokenization</module>
-        <module>tokenization-ui</module>
         <module>translationcomparison</module>
 		<module>uriconversion</module>
-		<module>uriconversion-ui</module>
         <module>formatconversion</module>
 		<module>wordcount</module>
-        <module>wordcount-ui</module>
         <module>xsltransform</module>
-        <module>xsltransform-ui</module>
         <module>codeshandling</module>
         <module>sentence-aligner</module>
         <module>xliffkit</module>
         <module>diffleverage</module>
         <module>external-command</module>
     </modules>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <archive>
-                        <manifestFile>${basedir}/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

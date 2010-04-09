@@ -16,19 +16,4 @@
         <module>pensieve</module>
         <module>pensieve-integration-tests</module>
     </modules>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <archive>
-                        <manifestFile>${basedir}/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>

@@ -2,7 +2,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>build-okapi</artifactId>
+        <artifactId>build-okapi-ui</artifactId>
         <groupId>net.sf.okapi</groupId>
         <version>0.7-SNAPSHOT</version>
     </parent>
@@ -14,19 +14,4 @@
     <modules>
         <module>ui-harness</module>
     </modules>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <archive>
-                        <manifestFile>${basedir}/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    
 </project>

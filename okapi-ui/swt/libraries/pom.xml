@@ -2,19 +2,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>build-okapi</artifactId>
+        <artifactId>build-okapi-ui</artifactId>
         <groupId>net.sf.okapi</groupId>
         <version>0.7-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>build-libraries</artifactId>
+    <artifactId>build-libraries-ui</artifactId>
     <groupId>net.sf.okapi.lib</groupId>
     <packaging>pom</packaging>
-    <name>Okapi Libraries Build</name>
+    <name>Okapi Libraries UI Build</name>
     <modules>
-        <module>lib-segmentation</module>
-        <module>lib-translation</module>
-        <module>lib-search</module>
-        <module>lib-extra</module>
+        <module>lib-segmentation-ui</module>
+        <module>lib-translation-ui</module>
     </modules>
+    
+    <dependencies>
+        <dependency>
+            <groupId>net.sf.okapi</groupId>
+            <artifactId>okapi-core-ui</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+    
 </project>

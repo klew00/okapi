@@ -2,7 +2,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>build-libraries</artifactId>
+        <artifactId>build-libraries-ui</artifactId>
         <groupId>net.sf.okapi.lib</groupId>
         <version>0.7-SNAPSHOT</version>
     </parent>
@@ -10,16 +10,6 @@
     <artifactId>okapi-lib-translation-ui</artifactId>
     <name>Okapi Library for Translation Resources - UI</name>
     <dependencies>
-        <dependency>
-            <groupId>net.sf.okapi</groupId>
-            <artifactId>okapi-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.okapi</groupId>
-            <artifactId>okapi-core-ui</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>net.sf.okapi.lib</groupId>
             <artifactId>okapi-lib-translation</artifactId>
