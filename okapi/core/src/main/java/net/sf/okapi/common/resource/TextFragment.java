@@ -423,9 +423,8 @@ public class TextFragment implements Comparable<Object> {
 	 * @param fragment the content to use.
 	 */
 	public TextFragment (TextFragment fragment) {
-		text = new StringBuilder();
-		isBalanced = true;
-		insert(-1, fragment);
+		this.setCodedText(fragment.getCodedText(), fragment.getCodes(), false);
+		this.lastCodeID = fragment.lastCodeID;
 	}
 	
 	/**
@@ -446,10 +445,7 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	@Override
 	public TextFragment clone () {
-		TextFragment newFrag = new TextFragment();
-		newFrag.setCodedText(getCodedText(), getCodes(), false);
-		newFrag.lastCodeID = lastCodeID;
-		return newFrag;
+		return new TextFragment(this);
 	}
 	
 	/**
