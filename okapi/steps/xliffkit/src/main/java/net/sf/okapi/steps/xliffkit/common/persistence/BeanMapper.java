@@ -30,7 +30,10 @@ import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.filterwriter.TMXFilterWriter;
+import net.sf.okapi.common.filterwriter.ZipFilterWriter;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.BaseReferenceable;
 import net.sf.okapi.common.resource.Code;
@@ -53,6 +56,10 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
+import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
+import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
+import net.sf.okapi.filters.po.POFilterWriter;
+import net.sf.okapi.steps.formatconversion.TableFilterWriter;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.BaseNameableBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.BaseReferenceableBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.CodeBean;
@@ -61,12 +68,15 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.DocumentPartBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.EndingBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.EventBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.FilterWriterBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.GenericFilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.GenericSkeletonBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.GenericSkeletonPartBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.InlineAnnotationBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.InputStreamBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.MultiEventBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.OpenXMLZipFilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ParametersBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.PensieveFilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.PropertyBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.RangeBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.RawDocumentBean;
@@ -74,6 +84,7 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.SegmentBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.StartDocumentBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.StartGroupBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.StartSubDocumentBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.TMXFilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TargetPropertiesAnnotationBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextContainerBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextFragmentBean;
@@ -81,6 +92,7 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextPartBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextUnitBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipEntryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipFileBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipFilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipSkeletonBean;
 
 public class BeanMapper {
@@ -101,7 +113,7 @@ public class BeanMapper {
 		
 		registerBeans();
 	}
-	
+
 	public static void registerBean(
 			Class<?> classRef, 
 			Class<? extends IPersistenceBean> beanClassRef) {
@@ -112,13 +124,14 @@ public class BeanMapper {
 			throw(new RuntimeException(MSG1));
 		
 		// TODO Make sure if a bean for already registered class was registered later, the later bean takes precedence
-		// HashMap.put(): "If the map previously contained a mapping for the key, the old value is replaced". Test
+		// HashMap.put(): "If the map previously contained a mapping for the key, the old value is replaced". Test it.
 		beanMapping.put(classRef, beanClassRef);		
 	}
 	
 	public static Class<? extends IPersistenceBean> getBeanClass(Class<?> classRef) {
 		if (classRef == null)
 			throw(new IllegalArgumentException(MSG5));
+		//if (classRef == null) return null;
 	
 		if (beanMapping == null)
 			throw(new RuntimeException(MSG1));
@@ -183,10 +196,11 @@ public class BeanMapper {
 		// General purpose beans
 		registerBean(List.class, ListBean.class);
 		registerBean(IParameters.class, ParametersBean.class);
-		registerBean(IFilterWriter.class, FilterWriterBean.class);
+		//registerBean(IFilterWriter.class, FilterWriterBean.class);
+		registerBean(IPersistenceSession.class, SessionInfo.class);
 		registerBean(Object.class, TypeInfoBean.class); // If no bean was found, use just this one to store class info
 		
-		// Specific class beans
+		// Specific class beans				
 		registerBean(Event.class, EventBean.class);		
 		registerBean(TextUnit.class, TextUnitBean.class);
 		registerBean(RawDocument.class, RawDocumentBean.class);
@@ -213,6 +227,15 @@ public class BeanMapper {
 		registerBean(ZipFile.class, ZipFileBean.class);
 		registerBean(ZipEntry.class, ZipEntryBean.class);
 		registerBean(InputStream.class, InputStreamBean.class);
-		registerBean(InlineAnnotation.class, InlineAnnotationBean.class);		
+		registerBean(InlineAnnotation.class, InlineAnnotationBean.class);
+		registerBean(SessionInfo.class, SessionInfo.class);
+		registerBean(GenericFilterWriter.class, GenericFilterWriterBean.class);
+		//registerBean(OpenXMLZipFilterWriter.class, OpenXMLZipFilterWriterBean.class);		
+		//registerBean(PensieveFilterWriter.class, PensieveFilterWriterBean.class);
+		//registerBean(POFilterWriter.class, POFilterWriterBean.class);
+		//registerBean(TableFilterWriter.class, TableFilterWriterBean.class);
+		registerBean(TMXFilterWriter.class, TMXFilterWriterBean.class);
+		registerBean(ZipFilterWriter.class, ZipFilterWriterBean.class);
+		//registerBean(.class, Bean.class);
 	}
 }

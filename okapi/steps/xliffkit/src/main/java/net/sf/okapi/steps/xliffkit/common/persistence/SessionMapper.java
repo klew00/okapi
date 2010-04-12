@@ -19,8 +19,6 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-
-
 // TODO Concurrency
 public class SessionMapper {
 
@@ -38,5 +36,16 @@ public class SessionMapper {
 		
 	public static void endSession() {
 		session = null;
+	}
+
+	public static void configureSession(IPersistenceSession session, SessionInfo inputSessionInfo) {
+		if (session == null) return;
+		if (inputSessionInfo == null) return;		
+		if (session.getVersion() == null) return;
+		
+		// Version control
+		if (!session.getVersion().equalsIgnoreCase(inputSessionInfo.getVersion())) {
+			
+		}
 	}
 }

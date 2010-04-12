@@ -70,5 +70,12 @@ public interface IPersistenceSession {
 	 * @return the converted object.
 	 */
 	<T extends IPersistenceBean> T convert(Object obj, Class<T> expectedClass);
+
+	String getVersion();
 	
+	String getMimeType();
+	
+	String getRootClass();
+	
+	String getDescription();
 }

@@ -62,7 +62,12 @@
             <artifactId>okapi-step-xsltransform</artifactId>
             <version>${project.version}</version>
         </dependency>
-                <dependency>
+        <dependency>
+            <groupId>net.sf.okapi.steps</groupId>
+            <artifactId>okapi-step-formatconversion</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>net.sf.okapi.filters</groupId>
             <artifactId>okapi-filter-openxml</artifactId>
             <version>${project.version}</version>
@@ -70,6 +75,16 @@
         <dependency>
             <groupId>net.sf.okapi.filters</groupId>
             <artifactId>okapi-filter-properties</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.okapi.filters</groupId>
+            <artifactId>okapi-filter-po</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.okapi.filters</groupId>
+            <artifactId>okapi-filter-pensieve</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -60,7 +60,9 @@ public class FactoryBean implements IPersistenceBean {
 	}
 	
 	@Override
-	public IPersistenceBean set(Object obj) {		
+	public IPersistenceBean set(Object obj) {
+		if (obj == null) return this;
+		
 		className = ClassUtil.getQualifiedClassName(obj);
 		//System.out.println(className);
 		

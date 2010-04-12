@@ -42,7 +42,8 @@ public class Annotations implements Iterable<IAnnotation> {
 	 * @param annotation The annotation object to set.
 	 */
 	public <T extends IAnnotation> void set (T annotation) {
-		annotations.put(annotation.getClass(), annotation);
+		if (annotation != null)
+			annotations.put(annotation.getClass(), annotation);
 	}
 	
 	/**

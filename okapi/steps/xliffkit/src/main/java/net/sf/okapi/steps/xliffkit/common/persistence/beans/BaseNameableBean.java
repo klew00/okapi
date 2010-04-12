@@ -83,7 +83,7 @@ public class BaseNameableBean implements IPersistenceBean{
 			id = bn.getId();			
 			name = bn.getName();
 			type = bn.getType();
-			bn.setSkeleton(new GenericSkeleton());
+			//bn.setSkeleton(new GenericSkeleton());
 			skeleton.set(bn.getSkeleton());
 			mimeType = bn.getMimeType();
 			isTranslatable = bn.isTranslatable();

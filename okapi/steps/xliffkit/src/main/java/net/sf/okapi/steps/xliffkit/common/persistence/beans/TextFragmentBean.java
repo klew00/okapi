@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.okapi.common.resource.Code;
@@ -37,15 +38,21 @@ public class TextFragmentBean implements IPersistenceBean {
 		if (obj instanceof TextFragment) {
 			TextFragment tf = (TextFragment) obj; 
 		
+//			for (CodeBean code : codes)
+//				tf.getCodes().add(code.get(Code.class)); // tf.getCodes() returns Collections.unmodifiableList, no way to add
+			
+			List<Code> newCodes = new ArrayList<Code>();
 			for (CodeBean code : codes)
-				tf.getCodes().add(code.get(Code.class));
+				newCodes.add(code.get(Code.class));
+			
+			tf.setCodedText(text, newCodes);
 		}		
 		return obj;
 	}
 	
 	@Override
 	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new TextFragment(text)));
+		return classRef.cast(get(new TextFragment()));
 	}
 
 	@Override

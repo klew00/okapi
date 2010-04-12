@@ -29,6 +29,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -91,24 +94,37 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	private URI outputURI;
 	
 	private String originalFileName;
+	private String sourceFileName;
 	private String xliffFileName;
 	private String skeletonFileName;	
-	private String tmxFileName;
-	private String tbxFileName;
-	private String srxFileName;
-	private String annotationsFileName;
+	private String resourcesFileName;
+//	private String tmxFileName;
+//	private String tbxFileName;
+//	private String srxFileName;
+//	private String annotationsFileName;
+	
+	private String originalPartName;
+	private String sourcePartName;
+	private String altOriginalPartName;
+	private String altSourcePartName;
+	private String xliffPartName;
+	private String skeletonPartName;	
+	private String resourcesPartName;
+	
 	private String filterWriterClassName;
 
 	private OPCPackage pack;
 	private File tempXliff;
-	private File tempSkeleton;
-	private JSONPersistenceSession skelSession;
+	private File tempResources;
+	private JSONPersistenceSession session;
+	private List<String> sources = new ArrayList<String> ();
+	private List<String> originals = new ArrayList<String> ();
 	
 	public XLIFFKitWriterStep() {
 		super();
 		xliffCont = new XLIFFContent();
-		params = new Parameters();
-		skelSession = new JSONPersistenceSession(Event.class);
+		params = new Parameters();		
+		session = new JSONPersistenceSession();
 	}
 	
 	public String getDescription () {
@@ -141,13 +157,19 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	
 	public Event handleEvent (Event event) {
 		
+		//System.out.println(event.getEventType());
 		switch ( event.getEventType() ) {
-		case START_DOCUMENT:
+		case START_BATCH:			
+			processStartBatch();
+			break;
+		case END_BATCH:
+			processEndBatch();
+			break;
+		case START_DOCUMENT:			
 			processStartDocument((StartDocument)event.getResource());
 			break;
 		case END_DOCUMENT:
-			if (skelSession.isActive())
-				skelSession.serialize(event);
+			session.serialize(event);
 			processEndDocument(); // Closes persistence session
 			close();
 			break;
@@ -170,46 +192,16 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 			processDocumentPart((DocumentPart)event.getResource());
 			break;
 		}
-		if (skelSession.isActive())
-			skelSession.serialize(event);
+		session.serialize(event); // won't serialize END_DOCUMENT
 		
 		return event;
 	}
 		
-	private void processStartDocument (StartDocument resource) {
-		close();
-
-		srcLoc = resource.getLocale();						
-		docMimeType = resource.getMimeType();
-		docName = resource.getName();
-		inputEncoding = resource.getEncoding();
-		
-		IParameters fparams = resource.getFilterParameters();
-		if ( fparams == null ) configId = null;
-		else configId = fparams.getPath();
-		
-		originalFileName = Util.getFilename(docName, true);
-		xliffFileName = originalFileName + ".xlf";
-		skeletonFileName = originalFileName + ".skeleton";
-		tmxFileName = originalFileName + ".tmx";
-		tbxFileName = originalFileName + ".tbx";
-		srxFileName = originalFileName + ".srx";
-		annotationsFileName = originalFileName + ".annotations";
-		filterWriterClassName = resource.getFilterWriter().getClass().getName();
-		
+	private void processStartBatch() {		
 		try {
-			tempXliff = File.createTempFile(xliffFileName, null);
-			tempXliff.deleteOnExit();
-			
-			tempSkeleton = File.createTempFile(skeletonFileName, null);
-			tempSkeleton.deleteOnExit();
-		
-			writer = new XMLWriter(new PrintWriter(tempXliff)); // XLIFF file writer
-			writer.writeStartDocument();
-			writer.writeStartElement("xliff");
-			writer.writeAttributeString("version", "1.2");
-			writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
-		} catch (IOException e) {
+			if (outputURI == null && params != null)
+				outputURI = new URI(params.getOutputURI());
+		} catch (URISyntaxException e) {
 			// TODO Handle exception
 			e.printStackTrace();
 		}
@@ -225,19 +217,81 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 			// TODO Handle exception
 		}
 		
+		session.setDescription(params.getMessage());
+	}
+	
+	private void processEndBatch() {
+		sources.clear();
+		originals.clear();
+		try {
+			pack.close();
+			
+		} catch (IOException e) {
+			// TODO Handle exception
+		}
+	}
+	
+	private void processStartDocument (StartDocument resource) {
+		close();
+
+		srcLoc = resource.getLocale();						
+		docMimeType = resource.getMimeType();
+		docName = resource.getName();
+		inputEncoding = resource.getEncoding();
+		
+		IParameters fparams = resource.getFilterParameters();
+		if ( fparams == null ) configId = null;
+		else configId = fparams.getPath();
+		
+		originalFileName = Util.getFilename(docName, true);
+		sourceFileName = Util.getFilename(docName, true);
+		xliffFileName = originalFileName + ".xlf";
+		//skeletonFileName = originalFileName + ".skeleton";
+		resourcesFileName = originalFileName + ".json";
+		skeletonFileName = String.format("resources/%s/%s", sourceFileName, resourcesFileName);
+//		tmxFileName = originalFileName + ".tmx";
+//		tbxFileName = originalFileName + ".tbx";
+//		srxFileName = originalFileName + ".srx";
+//		annotationsFileName = originalFileName + ".annotations";
+		
+		filterWriterClassName = resource.getFilterWriter().getClass().getName();
+		
+		try {
+			tempXliff = File.createTempFile(xliffFileName, null);
+			tempXliff.deleteOnExit();
+			
+			tempResources = File.createTempFile(resourcesFileName, null);
+			tempResources.deleteOnExit();
+		
+			writer = new XMLWriter(new PrintWriter(tempXliff)); // XLIFF file writer
+			writer.writeStartDocument();
+			writer.writeStartElement("xliff");
+			writer.writeAttributeString("version", "1.2");
+			writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
+		} catch (IOException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		}
+		
 		// Skeleton
 		try {
-			skelSession.start(new FileOutputStream(tempSkeleton));
+			session.start(new FileOutputStream(tempResources));
 		} catch (FileNotFoundException e) {
 			// TODO Handle exception
 		}
 	}
 	
-	private void createInternalPart(OPCPackage pack, String name, File file, String contentType, String relationshipType) {		
-		try {
+	private PackagePart createPart(OPCPackage pack, PackagePart corePart, String name, File file, String contentType, String relationshipType) {		
+		PackagePart part = null;
+		try {			
 			PackagePartName partName = PackagingURIHelper.createPartName("/" + name);
-			PackagePart part = pack.createPart(partName, contentType);
-			pack.addRelationship(partName, TargetMode.INTERNAL, relationshipType);
+			if (pack.containPart(partName))	return null;
+			
+			part = pack.createPart(partName, contentType);
+			if (corePart != null)
+				corePart.addRelationship(partName, TargetMode.INTERNAL, relationshipType);
+			else 
+				pack.addRelationship(partName, TargetMode.INTERNAL, relationshipType);				
 			
 			try {
 				InputStream is = new FileInputStream(file);
@@ -248,20 +302,24 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 					os.close();
 				} catch (IOException e) {
 					// TODO Handle exception
+					e.printStackTrace();
 				}
 				
 			} catch (FileNotFoundException e) {
 				// TODO Handle exception
+				e.printStackTrace();
 			}
 			
 		} catch (InvalidFormatException e) {
 			// TODO Handle exception
+			e.printStackTrace();
 		}
+		return part;
 	}
 	
 	private void processEndDocument () {		
 		// Skeleton
-		skelSession.end();
+		session.end();
 		
 		// XLIFF
 		if ( inFile ) writeEndFile();
@@ -269,16 +327,33 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		writer.writeEndDocument();
 		writer.close();
 		
-		// Save to package
-		createInternalPart(pack, xliffFileName, tempXliff, MimeTypeMapper.XLIFF_MIME_TYPE, TKitRelationshipTypes.CORE_DOCUMENT);
-		createInternalPart(pack, skeletonFileName, tempSkeleton, JSONPersistenceSession.MIME_TYPE, TKitRelationshipTypes.CORE_SKELETON);		
-						
-		try {
-			pack.close();
-			
-		} catch (IOException e) {
-			// TODO Handle exception
-		}
+		// Save to package		
+		originalPartName = String.format("content/original/%s/%s", srcLoc.toString(), originalFileName);
+		sourcePartName = String.format("content/source/%s/%s", srcLoc.toString(), sourceFileName);
+		xliffPartName = String.format("content/target/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), xliffFileName);
+		resourcesPartName = String.format("content/target/%s.%s/resources/%s/%s", srcLoc.toString(), trgLoc.toString(), sourceFileName, resourcesFileName);
+		altOriginalPartName = String.format("content/original/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), originalFileName);
+		altSourcePartName = String.format("content/source/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), sourceFileName);
+		
+		PackagePart corePart =
+			createPart(pack, null, xliffPartName, tempXliff, MimeTypeMapper.XLIFF_MIME_TYPE, TKitRelationshipTypes.CORE_DOCUMENT);
+		
+		createPart(pack, corePart, resourcesPartName, tempResources, session.getMimeType(), TKitRelationshipTypes.RESOURCES);
+		
+		if (params.isIncludeSource())
+			if (!sources.contains(docName)) {
+				
+				if (createPart(pack, corePart, sourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE) == null)
+					createPart(pack, corePart, altSourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE);
+				sources.add(docName);
+			}
+		
+		if (params.isIncludeOriginal())
+			if (!originals.contains(docName)) {
+				if (createPart(pack, corePart, originalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL) == null)
+					createPart(pack, corePart, altOriginalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL);
+				originals.add(docName);
+			}
 	}
 
 	private void processStartSubDocument (StartSubDocument resource) {

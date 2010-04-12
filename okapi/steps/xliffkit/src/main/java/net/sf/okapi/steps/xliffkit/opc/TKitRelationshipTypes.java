@@ -29,9 +29,24 @@ public interface TKitRelationshipTypes {
 	String CORE_DOCUMENT = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
 
 	/**
-	 * Core document skeleton relationship type.
+	 * Skeleton relationship type.
 	 */
-	String CORE_SKELETON = "http://schemas.okapi.org/2010/relationships/core-skeleton";
+	String SKELETON = "http://schemas.okapi.org/2010/relationships/skeleton";
+	
+	/**
+	 * Resources relationship type.
+	 */
+	String RESOURCES = "http://schemas.okapi.org/2010/relationships/resources";
+	
+	/**
+	 * Source document relationship type.
+	 */
+	String SOURCE = "http://schemas.okapi.org/2010/relationships/source";
+	
+	/**
+	 * Document original relationship type.
+	 */
+	String ORIGINAL = "http://schemas.okapi.org/2010/relationships/original";
 	
 	/**
 	 * Core properties relationship type.

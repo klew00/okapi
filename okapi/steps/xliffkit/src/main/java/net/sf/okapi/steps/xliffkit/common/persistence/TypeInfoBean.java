@@ -28,19 +28,22 @@ public class TypeInfoBean implements IPersistenceBean {
 	
 	@Override
 	public <T> T get(T obj) {
-		// TODO Logging
 		return obj;
 	}
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		// TODO Logging
-		return null;
+		Object res = null;
+		try {
+			res = ClassUtil.instantiateClass(className);
+		} catch (Exception e) {
+			res = null; // At least we tried
+		}
+		return classRef.cast(get(res));
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
-		
+	public IPersistenceBean set(Object obj) {		
 		className = ClassUtil.getQualifiedClassName(obj);
 		return this;
 	}

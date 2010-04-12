@@ -91,4 +91,12 @@ public class PropertyBean implements IPersistenceBean {
 	public boolean isReadOnly() {
 		return isReadOnly;
 	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setReadOnly(boolean isReadOnly) {
+		this.isReadOnly = isReadOnly;
+	}
 }

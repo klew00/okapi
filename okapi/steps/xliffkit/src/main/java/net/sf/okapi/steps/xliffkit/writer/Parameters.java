@@ -30,18 +30,20 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	static final String GMODE = "gMode"; //$NON-NLS-1$
-	static final String INCLUDENOTRANSLATE = "includeNoTranslate"; //$NON-NLS-1$
-	static final String SETAPPROVEDASNOTRANSLATE = "setApprovedAsNoTranslate"; //$NON-NLS-1$
+	static final String INCLUDE_NO_TRANSLATE = "includeNoTranslate"; //$NON-NLS-1$
+	static final String SET_APPROVED_AS_NO_TRANSLATE = "setApprovedAsNoTranslate"; //$NON-NLS-1$
 	static final String MESSAGE = "message"; //$NON-NLS-1$
-	static final String OUTFILENAME = "outFileName"; //$NON-NLS-1$
-	static final String OUTPATH = "outPath"; //$NON-NLS-1$ 
+	static final String OUTPUT_URI = "outputURI"; //$NON-NLS-1$
+	static final String INCLUDE_SOURCE = "includeSource"; //$NON-NLS-1$
+	static final String INCLUDE_ORIGINAL = "includeOriginal"; //$NON-NLS-1$
 	
 	private boolean gMode;
 	private boolean includeNoTranslate;
 	private boolean setApprovedAsNoTranslate;
 	private String message;
-	private String outFileName;
-	private String outPath;
+	private String outputURI;
+	private boolean includeSource;
+	private boolean includeOriginal;
 	
 	public Parameters () {
 		reset();
@@ -52,8 +54,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		includeNoTranslate = true;
 		setApprovedAsNoTranslate = false;
 		message = "";
-		outFileName = "";
-		outPath = "";
+		outputURI = "";
+		includeSource = true;
+		includeOriginal = false;
 	}
 
 	public void fromString (String data) {
@@ -61,11 +64,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		
 		gMode = buffer.getBoolean(GMODE, gMode);
-		includeNoTranslate = buffer.getBoolean(INCLUDENOTRANSLATE, includeNoTranslate);
-		setApprovedAsNoTranslate = buffer.getBoolean(SETAPPROVEDASNOTRANSLATE, setApprovedAsNoTranslate);
+		includeNoTranslate = buffer.getBoolean(INCLUDE_NO_TRANSLATE, includeNoTranslate);
+		setApprovedAsNoTranslate = buffer.getBoolean(SET_APPROVED_AS_NO_TRANSLATE, setApprovedAsNoTranslate);
 		message = buffer.getString(MESSAGE, message);
-		outFileName = buffer.getString(OUTFILENAME, outFileName);
-		outPath = buffer.getString(OUTPATH, outPath);
+		outputURI = buffer.getString(OUTPUT_URI, outputURI);
+		includeSource = buffer.getBoolean(INCLUDE_SOURCE, includeSource);
+		includeOriginal = buffer.getBoolean(INCLUDE_ORIGINAL, includeOriginal);
 		
 		// Make sure the we can merge later
 		if ( !includeNoTranslate ) {
@@ -77,11 +81,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		
 		buffer.setParameter(GMODE, gMode);
-		buffer.setBoolean(INCLUDENOTRANSLATE, includeNoTranslate);
-		buffer.setBoolean(SETAPPROVEDASNOTRANSLATE, setApprovedAsNoTranslate);
+		buffer.setBoolean(INCLUDE_NO_TRANSLATE, includeNoTranslate);
+		buffer.setBoolean(SET_APPROVED_AS_NO_TRANSLATE, setApprovedAsNoTranslate);
 		buffer.setParameter(MESSAGE, message);
-		buffer.setParameter(OUTFILENAME, outFileName);
-		buffer.setParameter(OUTPATH, outPath);
+		buffer.setParameter(OUTPUT_URI, outputURI);
+		buffer.setParameter(INCLUDE_SOURCE, includeSource);
+		buffer.setParameter(INCLUDE_ORIGINAL, includeOriginal);
 		
 		return buffer.toString();
 	}
@@ -91,11 +96,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ParametersDescription desc = new ParametersDescription(this);
 		
 		desc.add(GMODE, "Use <g></g> and <x/> notation", "G-mode");
-		desc.add(INCLUDENOTRANSLATE, "Include non-translatable text units", "Include non-translatables");
-		desc.add(SETAPPROVEDASNOTRANSLATE, "Set approved entries as non-translatable", "Approved as non-translatable");
+		desc.add(INCLUDE_NO_TRANSLATE, "Include non-translatable text units", "Include non-translatables");
+		desc.add(SET_APPROVED_AS_NO_TRANSLATE, "Set approved entries as non-translatable", "Approved as non-translatable");
 		desc.add(MESSAGE, "Description of the XLIFF file", "Description");
-		desc.add(OUTFILENAME, "Short name of the T-kit file", "T-kit Name");
-		desc.add(OUTPATH, "Directory of the T-kit file", "T-kit Path");
+		desc.add(OUTPUT_URI, "Directory of the T-kit file", "T-kit Path");
+		desc.add(INCLUDE_SOURCE, "Include source files in the T-kit file", "Include source");
+		desc.add(INCLUDE_ORIGINAL, "Include original files in the T-kit file", "Include originals");
 		
 		return desc;
 	}
@@ -105,11 +111,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("XLIFF Kit Writer Options", true, false);
 		
 		desc.addCheckboxPart(parametersDescription.get(GMODE));
-		desc.addCheckboxPart(parametersDescription.get(INCLUDENOTRANSLATE));
-		desc.addCheckboxPart(parametersDescription.get(SETAPPROVEDASNOTRANSLATE));
+		desc.addCheckboxPart(parametersDescription.get(INCLUDE_NO_TRANSLATE));
+		desc.addCheckboxPart(parametersDescription.get(SET_APPROVED_AS_NO_TRANSLATE));
 		desc.addTextInputPart(parametersDescription.get(MESSAGE));
-		desc.addTextInputPart(parametersDescription.get(OUTFILENAME));
-		desc.addTextInputPart(parametersDescription.get(OUTPATH));
+		desc.addTextInputPart(parametersDescription.get(OUTPUT_URI));
+		desc.addCheckboxPart(parametersDescription.get(INCLUDE_SOURCE));
+		desc.addCheckboxPart(parametersDescription.get(INCLUDE_ORIGINAL));
 		
 		return desc;
 	}
@@ -146,20 +153,27 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.message = message;
 	}
 
-	public String getOutFileName() {
-		return outFileName;
+	public String getOutputURI() {
+		return outputURI;
 	}
 
-	public void setOutFileName(String outFileName) {
-		this.outFileName = outFileName;
+	public void setOutputURI(String outputURI) {
+		this.outputURI = outputURI;
 	}
 
-	public String getOutPath() {
-		return outPath;
+	public boolean isIncludeSource() {
+		return includeSource;
 	}
 
-	public void setOutPath(String outPath) {
-		this.outPath = outPath;
+	public void setIncludeSource(boolean includeSource) {
+		this.includeSource = includeSource;
 	}
-	
+
+	public boolean isIncludeOriginal() {
+		return includeOriginal;
+	}
+
+	public void setIncludeOriginal(boolean includeOriginal) {
+		this.includeOriginal = includeOriginal;
+	}	
 }

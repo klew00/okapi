@@ -26,6 +26,7 @@ import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 
 public class ParametersBean implements IPersistenceBean {
 
+	private String className;
 	private String data;
 	
 	@Override
@@ -41,11 +42,12 @@ public class ParametersBean implements IPersistenceBean {
 	public <T> T get(Class<T> classRef) {
 		IParameters params = null;
 		try {
-			params = (IParameters) ClassUtil.instantiateClass(classRef);			
+			params = (IParameters) ClassUtil.instantiateClass(className);			
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("ParametersBean: cannot instantiate %s", ClassUtil.getClassName(classRef)), e);
 		}		
-		params.fromString(data);
+		if (params != null)
+			params.fromString(data);
 		
 		return classRef.cast(get(params));
 	}
@@ -54,6 +56,7 @@ public class ParametersBean implements IPersistenceBean {
 	public IPersistenceBean set(Object obj) {
 		if (obj instanceof IParameters) {
 			IParameters params = (IParameters) obj;
+			className = ClassUtil.getQualifiedClassName(obj);
 			data = params.toString();
 		}
 		return this;
@@ -65,5 +68,13 @@ public class ParametersBean implements IPersistenceBean {
 
 	public void setData(String data) {
 		this.data = data;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
 	}
 }

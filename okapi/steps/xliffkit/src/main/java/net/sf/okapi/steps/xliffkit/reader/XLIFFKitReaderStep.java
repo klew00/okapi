@@ -20,18 +20,65 @@
 
 package net.sf.okapi.steps.xliffkit.reader;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.steps.xliffkit.opc.OPCPackageReader;
 
 @UsingParameters()
 public class XLIFFKitReaderStep extends BasePipelineStep {
 
+	private IFilter reader = new OPCPackageReader();
+	private boolean isDone = true;
+	
 	public String getDescription () {
-		return "Generate an XLIFF translation kit. Expects: Raw document. Sends back: filter events.";
+		return "Reads XLIFF translation kit. Expects: Raw document for T-kit. Sends back: filter events.";
 	}
 
 	public String getName () {
 		return "XLIFF Kit Reader";
 	}
 
+	@Override
+	public Event handleEvent(Event event) {
+		switch (event.getEventType()) {
+		case START_BATCH:
+			isDone = true;
+			break;
+
+		case START_BATCH_ITEM:
+			isDone = false;
+			return event;
+
+		case RAW_DOCUMENT:
+			isDone = false;
+			reader.open((RawDocument)event.getResource());
+			return reader.next();
+		}
+
+		if (isDone) {
+			return event;
+		} else {
+			Event e = reader.next();
+			isDone = !reader.hasNext();
+			return e;
+		}
+	}
+	
+	@Override
+	public boolean isDone() {
+		return isDone;
+	}
+
+	@Override
+	public void destroy() {
+		reader.close();
+	}
+
+	@Override
+	public void cancel() {
+		reader.cancel();
+	}
 }

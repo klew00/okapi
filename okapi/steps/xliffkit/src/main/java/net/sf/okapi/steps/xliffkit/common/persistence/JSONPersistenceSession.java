@@ -20,12 +20,10 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import net.sf.okapi.common.ClassUtil;
-
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
@@ -39,7 +37,9 @@ import org.codehaus.jackson.map.SerializationConfig;
 
 public class JSONPersistenceSession implements IPersistenceSession {
 
-	public static final String MIME_TYPE = "application/json";
+	private static final String VERSION = "1.0";
+	private static final Class<?> rootClass = net.sf.okapi.common.Event.class;
+	private static final String MIME_TYPE = "application/json";
 	// RFC http://www.ietf.org/rfc/rfc4627.txt
 	
 	private ObjectMapper mapper;
@@ -47,14 +47,13 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	private JsonParser parser;	
 	private OutputStream outStream;
 	private InputStream inStream;
-	private boolean isActive;
-	private Class<?> rootClass;
-	private Class<? extends IPersistenceBean> beanClass;
+	private boolean isActive;	
+	private String description;
+	//private Class<? extends IPersistenceBean> beanClass;
 
-	public JSONPersistenceSession(Class<?> rootClass) {
+	public JSONPersistenceSession() {
 		super();
-		this.rootClass = rootClass;
-		this.beanClass = BeanMapper.getBeanClass(rootClass);
+		//this.beanClass = BeanMapper.getBeanClass(rootClass);
 		
 		mapper = new ObjectMapper();		
 		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true); 
@@ -67,13 +66,11 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		jsonFactory = mapper.getJsonFactory();
 	}
 	
-	public JSONPersistenceSession(Class<?> rootClass, OutputStream outStream) {
-		this(rootClass);
+	public JSONPersistenceSession(OutputStream outStream) {
 		start(outStream);
 	}
 	
-	public JSONPersistenceSession(Class<?> rootClass, InputStream inStream) {
-		this(rootClass);
+	public JSONPersistenceSession(InputStream inStream) {
 		start(inStream);
 	}
 	
@@ -88,8 +85,10 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		
 		IPersistenceBean bean = null;
 		try {
-			//bean = mapper.readValue(inStream, beanClass);
+			Class<? extends IPersistenceBean> beanClass = BeanMapper.getBeanClass(classRef);
+				//this.beanClass = BeanMapper.getBeanClass(rootClass);
 			bean = mapper.readValue(parser, beanClass);
+			//bean = mapper.readValue(parser, IPersistenceBean.class);
 						
 		} catch (JsonParseException e) {
 			// TODO Handle exception
@@ -97,6 +96,10 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		} catch (JsonMappingException e) {
 			// TODO Handle exception
 			e.printStackTrace();
+		} catch (EOFException e) {
+			// Normal situation, reached EOF, close session, return null
+			end();
+			return null;
 		} catch (IOException e) {
 			// TODO Handle exception
 			e.printStackTrace();
@@ -131,13 +134,13 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	@Override
 	public void serialize(Object obj) {
 		if (!isActive) return;
-		if (!rootClass.isInstance(obj))
-			throw new IllegalArgumentException(String.format("JSONPersistenceSession: " +
-					"unable to serialize %s, this session handles only %s", 
-					ClassUtil.getQualifiedClassName(obj),
-					ClassUtil.getQualifiedClassName(rootClass)));
+//		if (!rootClass.isInstance(obj))
+//			throw new IllegalArgumentException(String.format("JSONPersistenceSession: " +
+//					"unable to serialize %s, this session handles only %s", 
+//					ClassUtil.getQualifiedClassName(obj),
+//					ClassUtil.getQualifiedClassName(rootClass)));
 		
-		IPersistenceBean bean = BeanMapper.getBean(rootClass);
+		IPersistenceBean bean = BeanMapper.getBean(obj.getClass());
 		
 		bean.set(obj);
 		
@@ -166,19 +169,24 @@ public class JSONPersistenceSession implements IPersistenceSession {
 
 	@Override
 	public void start(OutputStream outStream) {
+		if (outStream == null)
+			throw(new IllegalArgumentException("JSONPersistenceSession: output stream cannot be null"));
 		end();
 		
 		this.outStream = outStream;
 		startSession();
+		serialize(this); // Write out the header
 	}
 
 	private void startSession() {		
 		SessionMapper.startSession(this);
-		isActive = true;
+		isActive = true;		
 	}
 
 	@Override
 	public void start(InputStream inStream) {
+		if (inStream == null)
+			throw(new IllegalArgumentException("JSONPersistenceSession: input stream cannot be null"));
 		end();
 		
 		this.inStream = inStream;				
@@ -192,11 +200,37 @@ public class JSONPersistenceSession implements IPersistenceSession {
 			e.printStackTrace();
 		}
 		startSession();
+		SessionInfo inputSessionInfo = deserialize(SessionInfo.class);
+		SessionMapper.configureSession(this, inputSessionInfo);
 	}
 
 	@Override
 	public boolean isActive() {
 		return isActive;
+	}
+
+	@Override
+	public String getMimeType() {
+		return MIME_TYPE;
+	}
+
+	@Override
+	public String getVersion() {
+		return VERSION;
+	}
+
+	@Override
+	public String getRootClass() {
+		return (rootClass == null) ? "" : rootClass.getName();
+	}
+
+	@Override
+	public String getDescription() {		
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

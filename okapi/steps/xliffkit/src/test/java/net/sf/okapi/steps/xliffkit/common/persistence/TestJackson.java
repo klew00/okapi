@@ -144,7 +144,7 @@ public class TestJackson {
 	
 	// DEBUG @Test
 	public void testMultipleRead1() throws IOException {
-		JSONPersistenceSession skelSession = new JSONPersistenceSession(String.class);
+		JSONPersistenceSession skelSession = new JSONPersistenceSession();
 		
 		File tempSkeleton = null;
 		tempSkeleton = File.createTempFile("~aaa", ".txt");
@@ -169,7 +169,7 @@ public class TestJackson {
 	
 	// DEBUG @Test
 	public void testMultipleRead2() throws IOException {
-		JSONPersistenceSession skelSession = new JSONPersistenceSession(Object.class);
+		JSONPersistenceSession skelSession = new JSONPersistenceSession();
 		
 		File tempSkeleton = null;
 		tempSkeleton = File.createTempFile("~aaa", ".txt");
@@ -275,7 +275,7 @@ public class TestJackson {
 		tu1.getSource().appendPart("part2");
 		tu1.getSource().appendSegment(new Segment("segId2", new TextFragment("seg2")));
 				
-		JSONPersistenceSession skelSession = new JSONPersistenceSession(List.class);
+		JSONPersistenceSession skelSession = new JSONPersistenceSession();
 		
 		File tempSkeleton = null;
 		tempSkeleton = File.createTempFile("~aaa", ".txt");
@@ -325,7 +325,7 @@ public class TestJackson {
 		tu1.getSource().appendPart("part2");
 		tu1.getSource().appendSegment(new Segment("segId2", new TextFragment("seg2")));
 				
-		JSONPersistenceSession skelSession = new JSONPersistenceSession(Event.class);
+		JSONPersistenceSession skelSession = new JSONPersistenceSession();
 		
 		File tempSkeleton = null;
 		tempSkeleton = File.createTempFile("~aaa", ".txt");
@@ -346,6 +346,7 @@ public class TestJackson {
 		
 		Event event11 = skelSession.deserialize(Event.class);
 		Event event22 = skelSession.deserialize(Event.class);
+		Event event33 = skelSession.deserialize(Event.class);
 		
 		skelSession.end();
 				
@@ -355,5 +356,34 @@ public class TestJackson {
 		
 		FilterTestDriver.compareEvents(events, events2);
 		FilterTestDriver.laxCompareEvents(events, events2);
+	}
+	
+	@Test
+	public void testDeserialization() {
+		
+		// test1.txt -- created by old beans from new core, reading to new core
+		JSONPersistenceSession skelSession = new JSONPersistenceSession();
+		skelSession.start(this.getClass().getResourceAsStream("test1.txt"));		
+		
+		Event event11 = skelSession.deserialize(Event.class);
+		Event event12 = skelSession.deserialize(Event.class);
+		
+		skelSession.end();
+		
+		// test2.txt -- created by new beans from new core, reading to new core
+		skelSession.start(this.getClass().getResourceAsStream("test2.txt"));		
+		
+		Event event21 = skelSession.deserialize(Event.class);
+		Event event22 = skelSession.deserialize(Event.class);
+		
+		skelSession.end();
+		
+		// test4.txt -- created by old beans from old core, reading to new core  
+		skelSession.start(this.getClass().getResourceAsStream("test4.txt"));		
+		
+		Event event41 = skelSession.deserialize(Event.class);
+		Event event42 = skelSession.deserialize(Event.class);
+		
+		skelSession.end();
 	}
 }

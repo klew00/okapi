@@ -45,7 +45,8 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLContentFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");				
 		fcMapper.addConfigurations(net.sf.okapi.filters.plaintext.PlainTextFilter.class.getName());
 	}
 	
