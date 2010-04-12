@@ -53,9 +53,6 @@ import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.ui.InputDialog;
-import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
-import net.sf.okapi.common.ui.genericeditor.GenericEditor;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -538,69 +535,71 @@ public class Main {
 	}
 	
 	private void editAllConfigurations () {
-		initialize();
-		// Add all the pre-defined configurations
-		DefaultFilters.setMappings(fcMapper, false, true);
-		loadFromPluginsAndUpdate();
-		// Add the custom configurations
-		fcMapper.updateCustomConfigurations();
-		
-		// Edit
-		FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(null, false, fcMapper, null);
-		dlg.showDialog(specifiedConfigId);
+		throw new UnsupportedOperationException("The -e command is temporarily unsupported");
+//		initialize();
+//		// Add all the pre-defined configurations
+//		DefaultFilters.setMappings(fcMapper, false, true);
+//		loadFromPluginsAndUpdate();
+//		// Add the custom configurations
+//		fcMapper.updateCustomConfigurations();
+//		
+//		// Edit
+//		FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(null, false, fcMapper, null);
+//		dlg.showDialog(specifiedConfigId);
 	}
 	
 	private void editConfiguration () {
-		initialize();
-		
-		if ( specifiedConfigId == null ) {
-			throw new RuntimeException("You must specified the configuration to edit.");
-		}
-		configId = specifiedConfigId;
-		if ( !prepareFilter(configId) ) return; // Next input
-
-		FilterConfiguration config = fcMapper.getConfiguration(configId);
-		if ( config == null ) {
-			throw new RuntimeException(String.format(
-				"Cannot find the configuration for '%s'.", configId));
-		}
-		IParameters params = fcMapper.getParameters(config);
-		if ( params == null ) {
-			throw new RuntimeException(String.format(
-				"Cannot load parameters for '%s'.", config.configId));
-		}
-		
-		IParametersEditor editor = fcMapper.createConfigurationEditor(configId);
-		if ( editor != null ) {
-			if ( !editor.edit(params, !config.custom, new BaseContext()) ) return; // Cancel
-		}
-		else {
-			// Try to see if we can edit with the generic editor
-			IEditorDescriptionProvider descProv = fcMapper.getDescriptionProvider(params.getClass().getCanonicalName());
-			if ( descProv != null ) {
-				// Edit the data
-				GenericEditor genEditor = new GenericEditor();
-				if ( !genEditor.edit(params, descProv, !config.custom, new BaseContext()) ) return; // Cancel
-				// The params object gets updated if edit not canceled.
-			}
-			else { // Else: fall back to the plain text editor
-				InputDialog dlg  = new InputDialog(null,
-					String.format("Filter Parameters (%s)", config.configId), "Parameters:",
-					params.toString(), null, 0, 200, 600);
-				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
-				String data = dlg.showDialog();
-				if ( data == null ) return; // Cancel
-				if ( !config.custom ) return; // Don't save pre-defined parameters
-				data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-		}
-		
-		// If not canceled and if custom configuration: save the changes
-		if ( config.custom ) {
-			// Save the configuration filefcMapper
-			fcMapper.saveCustomParameters(config, params);
-		}
+		throw new UnsupportedOperationException("The -e command is temporarily unsupported");
+//		initialize();
+//		
+//		if ( specifiedConfigId == null ) {
+//			throw new RuntimeException("You must specified the configuration to edit.");
+//		}
+//		configId = specifiedConfigId;
+//		if ( !prepareFilter(configId) ) return; // Next input
+//
+//		FilterConfiguration config = fcMapper.getConfiguration(configId);
+//		if ( config == null ) {
+//			throw new RuntimeException(String.format(
+//				"Cannot find the configuration for '%s'.", configId));
+//		}
+//		IParameters params = fcMapper.getParameters(config);
+//		if ( params == null ) {
+//			throw new RuntimeException(String.format(
+//				"Cannot load parameters for '%s'.", config.configId));
+//		}
+//		
+//		IParametersEditor editor = fcMapper.createConfigurationEditor(configId);
+//		if ( editor != null ) {
+//			if ( !editor.edit(params, !config.custom, new BaseContext()) ) return; // Cancel
+//		}
+//		else {
+//			// Try to see if we can edit with the generic editor
+//			IEditorDescriptionProvider descProv = fcMapper.getDescriptionProvider(params.getClass().getCanonicalName());
+//			if ( descProv != null ) {
+//				// Edit the data
+//				GenericEditor genEditor = new GenericEditor();
+//				if ( !genEditor.edit(params, descProv, !config.custom, new BaseContext()) ) return; // Cancel
+//				// The params object gets updated if edit not canceled.
+//			}
+//			else { // Else: fall back to the plain text editor
+//				InputDialog dlg  = new InputDialog(null,
+//					String.format("Filter Parameters (%s)", config.configId), "Parameters:",
+//					params.toString(), null, 0, 200, 600);
+//				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
+//				String data = dlg.showDialog();
+//				if ( data == null ) return; // Cancel
+//				if ( !config.custom ) return; // Don't save pre-defined parameters
+//				data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+//				params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
+//			}
+//		}
+//		
+//		// If not canceled and if custom configuration: save the changes
+//		if ( config.custom ) {
+//			// Save the configuration filefcMapper
+//			fcMapper.saveCustomParameters(config, params);
+//		}
 	}
 	
 	private void showAllConfigurations () {
