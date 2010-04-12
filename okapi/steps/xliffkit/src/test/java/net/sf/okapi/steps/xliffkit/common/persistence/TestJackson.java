@@ -358,7 +358,7 @@ public class TestJackson {
 		FilterTestDriver.laxCompareEvents(events, events2);
 	}
 	
-	@Test
+	// DEBUG @Test
 	public void testDeserialization() {
 		
 		// test1.txt -- created by old beans from new core, reading to new core

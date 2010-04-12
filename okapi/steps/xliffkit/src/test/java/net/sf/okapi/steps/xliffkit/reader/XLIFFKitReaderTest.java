@@ -40,9 +40,10 @@ public class XLIFFKitReaderTest {
 								null,
 								null)
 						),
-				new XLIFFKitReaderStep(),
+				new XLIFFKitReaderStep()
+//				,
 				
-				new EventLogger()
+//				new EventLogger()
 //				,
 //				
 //				new FilterEventsToRawDocumentStep()

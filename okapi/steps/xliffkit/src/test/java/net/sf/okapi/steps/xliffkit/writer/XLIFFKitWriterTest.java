@@ -175,8 +175,7 @@ public class XLIFFKitWriterTest {
 	private static final LocaleId DEDE = new LocaleId("de", "de");
 	private static final LocaleId ITIT = new LocaleId("it", "it");
 	
-	// DEBUG 
-	@Test
+	// DEBUG @Test
 	public void testPackageFormat() throws URISyntaxException, MalformedURLException {
 
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
