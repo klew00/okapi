@@ -141,6 +141,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	private boolean bIgnoredPreRun = false; // DWH 4-10-09
 	private boolean bBeforeFirstTextRun = true; // DWH 4-15-09
 	private boolean bInMainFile = false; // DWH 4-15-09
+	private boolean bInSettingsFile = false; // DWH 4-12-10
 	private boolean bExcludeTextInRun = false; // DWH 5-27-09
 	private boolean bExcludeTextInUnit = false; // DWH 5-29-09
 	private String sCurrentCharacterStyle = ""; // DWH 5-27-09
@@ -1069,7 +1070,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			}
 			break;
 		case GROUP_ELEMENT:
-			if (bInMainFile) // DWH 4-12-10 else is for <v:textbox ...> in settings.xml file
+			if (!bInSettingsFile) // DWH 4-12-10 else is for <v:textbox ...> in settings.xml file
 			{
 				if (!canStartNewTextUnit()) // DWH 6-29-09 for text box: embedded text unit
 				{
@@ -1293,7 +1294,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 				addToNonTextRun(endTag); // DWH 5-5-09
 			break;
 		case GROUP_ELEMENT:
-			if (bInMainFile)  // DWH 4-12-10 else is for <v:textbox in settings.xml
+			if (!bInSettingsFile)  // DWH 4-12-10 else is for <v:textbox in settings.xml
 			{
 				if (sInsideTextBox.length()>0)
 				{
@@ -1795,6 +1796,14 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	protected boolean getBInMainFile() // DWH 4-15-09
 	{
 		return bInMainFile;
+	}
+	protected void setBInSettingsFile(boolean bInSettingsFile) // DWH 4-12-10 for <v:textbox
+	{
+		this.bInSettingsFile = bInSettingsFile;
+	}
+	protected boolean getBInSettingsFile() // DWH 4-12-10 for <v:textbox
+	{
+		return bInSettingsFile;
 	}
 	public void setLogger(Logger lgr)
 	{

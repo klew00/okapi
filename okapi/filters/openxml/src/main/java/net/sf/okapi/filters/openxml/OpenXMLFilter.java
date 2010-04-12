@@ -592,6 +592,7 @@ public class OpenXMLFilter implements IFilter {
 		String sDocType; // DWH 2-26-09
 		int iCute; // DWH 2-26-09
 		boolean bInMainFile; // DWH 4-15-09
+		boolean bInSettingsFile; // DWH 4-15-09
 		while( entries.hasMoreElements() ) { // note that [Content_Types].xml is always first
 			entry = entries.nextElement();
 			sEntryName = entry.getName();
@@ -663,6 +664,8 @@ public class OpenXMLFilter implements IFilter {
 			    		   nZipType==MSPOWERPOINT && sDocType.equals("slide+xml")));
 		                    // DWH 5-26-09 translate if translating Powerpoint master slides
 			openXMLContentFilter.setBInMainFile(bInMainFile); // DWH 4-15-09 only allow blank text in main files
+			bInSettingsFile = sDocType.equals("settings+xml"); // DWH 4-12-10 for <v:textbox
+			openXMLContentFilter.setBInSettingsFile(bInSettingsFile); // DWH 4-12-10 for <v:textbox in settings file
 			if (bInMainFile && bSquishable)
 			{
 				LOGGER.log(Level.FINER,"\n\n<<<<<<< "+sEntryName+" : "+sDocType+" >>>>>>>");
