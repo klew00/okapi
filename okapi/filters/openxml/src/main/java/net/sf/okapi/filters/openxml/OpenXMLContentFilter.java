@@ -1069,14 +1069,19 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			}
 			break;
 		case GROUP_ELEMENT:
-			if (!canStartNewTextUnit()) // DWH 6-29-09 for text box: embedded text unit
+			if (bInMainFile) // DWH 4-12-10 else is for <v:textbox ...> in settings.xml file
 			{
-				bInTextBox = true; // DWH 7-23-09 textbox
-				sInsideTextBox = ""; // DWH 7-23-09 textbox
-				addTextRunToCurrentTextUnit(true); // DWH 7-29-09 add text run stuff as a placeholder
+				if (!canStartNewTextUnit()) // DWH 6-29-09 for text box: embedded text unit
+				{
+					bInTextBox = true; // DWH 7-23-09 textbox
+					sInsideTextBox = ""; // DWH 7-23-09 textbox
+					addTextRunToCurrentTextUnit(true); // DWH 7-29-09 add text run stuff as a placeholder
+				}
+				getRuleState().pushGroupRule(sTagName);
+				startGroup(new GenericSkeleton(sTagString),"textbox");
 			}
-			getRuleState().pushGroupRule(sTagName);
-			startGroup(new GenericSkeleton(sTagString),"textbox");
+			else
+				addToDocumentPart(sTagString); // DWH 4-12-10 for <v:textbox ...> in settings.xml file			
 			break;
 		case EXCLUDED_ELEMENT:
 			getRuleState().pushExcludedRule(sTagName);
@@ -1288,50 +1293,57 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 				addToNonTextRun(endTag); // DWH 5-5-09
 			break;
 		case GROUP_ELEMENT:
-			if (sInsideTextBox.length()>0)
+			if (bInMainFile)  // DWH 4-12-10 else is for <v:textbox in settings.xml
 			{
-				wtb = new WordTextBox();
-				tboxcf = wtb.getTextBoxOpenXMLContentFilter();
-				wtb.open(sInsideTextBox, getSrcLoc());
-				tboxcf.setUpConfig(MSWORD);
-				tboxcf.setTextUnitId(getTextUnitId());  // set min textUnitId so no overlap				
-				tboxcf.setDocumentPartId(getDocumentPartId()); // set min documentPartId so no overlap
-				textBoxEventList = wtb.doEvents();
-				for(Iterator<Event> it=textBoxEventList.iterator() ; it.hasNext();)
+				if (sInsideTextBox.length()>0)
 				{
-					event = it.next();
-					if (event.getEventType()==EventType.TEXT_UNIT) // DWH 10-27-09 property for being in text box
+					wtb = new WordTextBox();
+					tboxcf = wtb.getTextBoxOpenXMLContentFilter();
+					wtb.open(sInsideTextBox, getSrcLoc());
+					tboxcf.setUpConfig(MSWORD);
+					tboxcf.setTextUnitId(getTextUnitId());  // set min textUnitId so no overlap				
+					tboxcf.setDocumentPartId(getDocumentPartId()); // set min documentPartId so no overlap
+					textBoxEventList = wtb.doEvents();
+					for(Iterator<Event> it=textBoxEventList.iterator() ; it.hasNext();)
 					{
-						TextUnit txu = (TextUnit) event.getResource();
-						Property prop = txu.getProperty("TextBoxLevel");
-						if (prop==null)
-							txu.setProperty(new Property("TextBoxLevel","1",false));
-						else
+						event = it.next();
+						if (event.getEventType()==EventType.TEXT_UNIT) // DWH 10-27-09 property for being in text box
 						{
-							nTextBoxLevel = 0;
-							try
+							TextUnit txu = (TextUnit) event.getResource();
+							Property prop = txu.getProperty("TextBoxLevel");
+							if (prop==null)
+								txu.setProperty(new Property("TextBoxLevel","1",false));
+							else
 							{
-								nTextBoxLevel = Integer.parseInt(prop.getValue());
+								nTextBoxLevel = 0;
+								try
+								{
+									nTextBoxLevel = Integer.parseInt(prop.getValue());
+								}
+								catch(Exception e) {}
+								nTextBoxLevel++; // if it was already in a text box, increase the level by 1
+								prop.setValue((new Integer(nTextBoxLevel)).toString());						
 							}
-							catch(Exception e) {}
-							nTextBoxLevel++; // if it was already in a text box, increase the level by 1
-							prop.setValue((new Integer(nTextBoxLevel)).toString());						
 						}
+						addFilterEvent(event); // add events from WordTextBox before EndGroup event
 					}
-					addFilterEvent(event); // add events from WordTextBox before EndGroup event
+					setTextUnitId(tboxcf.getTextUnitId());
+					  // set current TextUnitId to next one not used inside textbox
+					setDocumentPartId(tboxcf.getDocumentPartId());
+					  // set current DocumentPartId to next one not used inside textbox
+					// Note: if this class ever uses startGroupId, endGroupId, subDocumentId or documentId
+					// they will need to be set as textUnitId and documentPartId above and here
 				}
-				setTextUnitId(tboxcf.getTextUnitId());
-				  // set current TextUnitId to next one not used inside textbox
-				setDocumentPartId(tboxcf.getDocumentPartId());
-				  // set current DocumentPartId to next one not used inside textbox
-				// Note: if this class ever uses startGroupId, endGroupId, subDocumentId or documentId
-				// they will need to be set as textUnitId and documentPartId above and here
+				bInTextBox = false;
+				sInsideTextBox = "";
+				getRuleState().popGroupRule();
+				endGroup(new GenericSkeleton(sEndTxbxContent+sTagString)); // DWH 10-23-09 added sEndTxbxContent
+				sEndTxbxContent = ""; // DWH 10-23-09
 			}
-			bInTextBox = false;
-			sInsideTextBox = "";
-			getRuleState().popGroupRule();
-			endGroup(new GenericSkeleton(sEndTxbxContent+sTagString)); // DWH 10-23-09 added sEndTxbxContent
-			sEndTxbxContent = ""; // DWH 10-23-09
+			else
+			{
+				addToDocumentPart(sTagString);  // DWH 4-12-10 for <v:textbox in settings.xml
+			}
 			break;
 		case EXCLUDED_ELEMENT:
 			getRuleState().popExcludedIncludedRule();
