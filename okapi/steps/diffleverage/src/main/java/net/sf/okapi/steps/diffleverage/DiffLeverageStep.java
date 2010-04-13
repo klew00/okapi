@@ -27,6 +27,15 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
+/**
+ * Contextually match source segments between two documents using a standard diff algorithm
+ * (http://en.wikipedia.org/wiki/Diff). The result is a new document with the translations 
+ * from the first document merged into it. This allows translations between different document 
+ * versions to be preserved while still maintaining the newer source document modifications.      
+ * 
+ * @author HARGRAVEJE
+ * 
+ */
 public class DiffLeverageStep extends BasePipelineStep {
 	private IFilterConfigurationMapper fcMapper;
 	private LocaleId targetLocale;
@@ -52,11 +61,12 @@ public class DiffLeverageStep extends BasePipelineStep {
 	public void setSecondInput(RawDocument secondInput) {
 		this.targetInput = secondInput;
 	}
-	
+
 	@Override
 	public String getDescription() {
-		return "Diff (i.e. compare) two bi-lingual document's segments (old and new) " +
-				"and copy the target segment into the old document TextUnit";
+		return "Diff (i.e. compare) two bi-lingual documents."
+				+ "Copy the old target segments into the new document's "
+				+ "TextUnits based on contextual matching of the source segments";
 	}
 
 	@Override

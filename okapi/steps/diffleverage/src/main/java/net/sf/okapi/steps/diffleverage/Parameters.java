@@ -22,18 +22,45 @@ package net.sf.okapi.steps.diffleverage;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.resource.TextPart;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
-public class Parameters extends BaseParameters {
-
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+	private int fuzzyThreshold;
+	
 	@Override
 	public void fromString(String data) {
-		// TODO Auto-generated method stub
-		
+		reset();
+		buffer.fromString(data);
+		fuzzyThreshold = buffer.getInteger("fuzzyThreshold", fuzzyThreshold);
 	}
 
 	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-		
+	public void reset() {	
+		fuzzyThreshold = 100;
+	}
+	
+	@Override
+	public String toString() {
+		buffer.reset();
+		buffer.setParameter("fuzzyThreshold", fuzzyThreshold);		
+		return buffer.toString();
+	}
+
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add("fuzzyThreshold",	"Fuzy Threshold", "Fuzzy Threshold between 0 and 100");		
+		return desc;
+	}
+	
+	@Override
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Diff Leverager", true, false);	
+		TextInputPart tp = desc.addTextInputPart(paramsDesc.get("fuzzyThreshold"));
+		tp.setRange(0, 100);
+		return desc;
 	}
 }
