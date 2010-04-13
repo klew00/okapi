@@ -143,9 +143,9 @@ outputRoot = rootDir;
 	@Override
 	protected Event handleStartDocument (Event event) {
 		StartDocument sd = (StartDocument)event.getResource();
-		String tmpIn = inputURI.getPath().substring(1); // Don't include initial '/' of URI getPath()
+		String tmpIn = Util.makePathFromURI(inputURI);
 		String relativeInput = tmpIn.substring(inputRoot.length()+1);
-		String tmpOut = outputURI.getPath().substring(1); // Don't include initial '/' of URI getPath()
+		String tmpOut = Util.makePathFromURI(outputURI);
 		String relativeOutput = tmpOut.substring(outputRoot.length()+1);
 		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(filterConfigId);
 		

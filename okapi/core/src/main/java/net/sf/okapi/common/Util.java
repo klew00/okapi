@@ -160,7 +160,7 @@ public class Util {
 	 */
 	static public String getDirectoryName (String path) {
 		String tmp = path.replace('\\', '/'); // Normalize separators (some path are mixed)
-		int n = tmp.lastIndexOf('/'); // Try generic first
+		int n = tmp.lastIndexOf('/');
 		if ( n > 0 ) {
 			return path.substring(0, n);
 		}
@@ -179,7 +179,7 @@ public class Util {
 	 */
 	static public void createDirectories (String path) {
 		String tmp = path.replace('\\', '/'); // Normalize separators (some path are mixed)
-		int n = tmp.lastIndexOf('/'); // Try generic first
+		int n = tmp.lastIndexOf('/');
 		if ( n == -1 ) return; // Nothing to do
 		// Else, use the directory part and create the tree
 		String dir = path.substring(0, n);
@@ -674,6 +674,27 @@ public class Util {
 			// anyway
 		}
 	}
+	
+	/**
+	 * Gets a normal path string from a URI.
+	 * <p>For example, Windows URI are returned as "C:\abc\def" not "/C:/abc/def"
+	 * @param uri the URI to convert
+	 * @return the normal path for the given URI.
+	 */
+	static public String makePathFromURI (URI uri) {
+		String tmp = uri.getPath();
+		if ( Util.getOS() == SUPPORTED_OS.WINDOWS ) {
+			tmp = tmp.replace('/', '\\');
+		}
+		// Windows URI paths are like this: /C:/root/tmp...
+		// Unix are like this: /root/etc...
+		if ( tmp.length() > 3 ) {
+			if (( tmp.charAt(0) == '\\' ) && ( tmp.charAt(2) == ':' )) {
+				return tmp.substring(1);
+			}
+		}
+		return tmp;
+	}
 
 	/**
 	 * Creates a new URI object from a path or a URI string.
@@ -1059,12 +1080,12 @@ public class Util {
 	 */
 	public static SUPPORTED_OS getOS() {
 		String osName = System.getProperty("os.name");
-		if (osName.startsWith("Mac OS")) { // Macintosh case
-			return SUPPORTED_OS.MAC;
-		}
-		else if (osName.startsWith("Windows")) { // Windows case
+		if (osName.startsWith("Windows")) { // Windows case
 			return SUPPORTED_OS.WINDOWS;
 		}		
+		else if (osName.startsWith("Mac OS")) { // Macintosh case
+			return SUPPORTED_OS.MAC;
+		}
 		return SUPPORTED_OS.LINUX;
 	}
 		
