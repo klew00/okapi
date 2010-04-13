@@ -14,26 +14,27 @@
     <modules>
         <module>bomconversion</module>
 		<module>charlisting</module>
+        <module>codeshandling</module>
 		<module>common</module>
 		<module>copysourcetotarget</module>
+        <module>diffleverage</module>
 		<module>encodingconversion</module>
+        <module>external-command</module>
+        <module>formatconversion</module>
 		<module>fullwidthconversion</module>
 		<module>generatesimpletm</module>
 		<module>leveraging</module>
 		<module>linebreakconversion</module>
 		<module>searchandreplace</module>
 		<module>segmentation</module>
+        <module>sentence-aligner</module>
+        <module>simplekit</module>
 		<module>textmodification</module>
         <module>tokenization</module>
         <module>translationcomparison</module>
 		<module>uriconversion</module>
-        <module>formatconversion</module>
 		<module>wordcount</module>
         <module>xsltransform</module>
-        <module>codeshandling</module>
-        <module>sentence-aligner</module>
         <module>xliffkit</module>
-        <module>diffleverage</module>
-        <module>external-command</module>
     </modules>
 </project>

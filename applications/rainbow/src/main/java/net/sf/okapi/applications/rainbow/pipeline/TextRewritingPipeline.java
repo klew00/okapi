@@ -36,6 +36,7 @@ public class TextRewritingPipeline extends PredefinedPipeline {
 		SegmentationStep stepSeg = new SegmentationStep();
 		((net.sf.okapi.steps.segmentation.Parameters)stepSeg.getParameters()).segmentSource = false;
 		((net.sf.okapi.steps.segmentation.Parameters)stepSeg.getParameters()).segmentTarget = false;
+		((net.sf.okapi.steps.segmentation.Parameters)stepSeg.getParameters()).copySource = false;
 		addStep(stepSeg);
 
 		LeveragingStep stepLev = new LeveragingStep();
