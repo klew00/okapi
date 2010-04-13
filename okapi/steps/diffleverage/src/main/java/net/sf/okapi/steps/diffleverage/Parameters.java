@@ -22,7 +22,6 @@ package net.sf.okapi.steps.diffleverage;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
-import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.TextInputPart;
@@ -39,6 +38,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	@Override
 	public void reset() {	
+		// default is exact match
 		fuzzyThreshold = 100;
 	}
 	
@@ -52,7 +52,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("fuzzyThreshold",	"Fuzy Threshold", "Fuzzy Threshold between 0 and 100");		
+		desc.add("fuzzyThreshold", "Fuzy Threshold", "Fuzzy Threshold between 0 and 100");		
 		return desc;
 	}
 	
