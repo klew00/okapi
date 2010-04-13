@@ -60,8 +60,7 @@ public class SimpleKitWriterStepTest {
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations(PropertiesFilter.class.getName());
 		pdriver.setFilterConfigurationMapper(fcMapper);
-		pdriver.setRootDirectory(root.substring(1, root.length()-1)); // Don't include initial '/' of URI
-		
+		pdriver.setRootDirectory(root.substring(0, root.length()-1)); // Don't include final separator
 		pdriver.addStep(new RawDocumentToFilterEventsStep());
 		pdriver.addStep(new SimpleKitWriterStep());
 		

@@ -676,27 +676,6 @@ public class Util {
 	}
 	
 	/**
-	 * Gets a normal path string from a URI.
-	 * <p>For example, Windows URI are returned as "C:\abc\def" not "/C:/abc/def"
-	 * @param uri the URI to convert
-	 * @return the normal path for the given URI.
-	 */
-	static public String makePathFromURI (URI uri) {
-		String tmp = uri.getPath();
-		if ( Util.getOS() == SUPPORTED_OS.WINDOWS ) {
-			tmp = tmp.replace('/', '\\');
-		}
-		// Windows URI paths are like this: /C:/root/tmp...
-		// Unix are like this: /root/etc...
-		if ( tmp.length() > 3 ) {
-			if (( tmp.charAt(0) == '\\' ) && ( tmp.charAt(2) == ':' )) {
-				return tmp.substring(1);
-			}
-		}
-		return tmp;
-	}
-
-	/**
 	 * Creates a new URI object from a path or a URI string.
 	 * 
 	 * @param pathOrUri
