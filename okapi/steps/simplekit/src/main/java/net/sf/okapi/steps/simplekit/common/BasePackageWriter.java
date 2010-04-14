@@ -239,18 +239,18 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		String subFolder = manifest.getSkeletonLocation();
 		if ( Util.isEmpty(subFolder) ) return;
 				
-		String inputPath = inputRoot + File.separator + relativeSourcePath;
-		String docPrefix = String.format("%d.", docID);
-			
-		String destination = manifest.getRoot() + File.separator + subFolder
-			+ File.separator + docPrefix + "ori"; // docPrefix has a dot
-		Util.copyFile(inputPath, destination, false);
-			
-		String paramsCopy = manifest.getRoot() + File.separator + subFolder
-			+ File.separator + docPrefix + "fprm";
-		if ( filterParams != null ) {
-			filterParams.save(paramsCopy);
-		}
+//		String inputPath = inputRoot + File.separator + relativeSourcePath;
+//		String docPrefix = String.format("%d.", docID);
+//			
+//		String destination = manifest.getRoot() + File.separator + subFolder
+//			+ File.separator + docPrefix + "ori"; // docPrefix has a dot
+//		Util.copyFile(inputPath, destination, false);
+//			
+//		String paramsCopy = manifest.getRoot() + File.separator + subFolder
+//			+ File.separator + docPrefix + "fprm";
+//		if ( filterParams != null ) {
+//			filterParams.save(paramsCopy);
+//		}
 		
 		// Set the options for the actual writer
 		String outputPath = manifest.getRoot() + File.separator
