@@ -22,6 +22,11 @@ public class MultiEvent implements IResource, Iterable<Event> {
 		propagateAsSingleEvent = false;
 		events = new ArrayList<Event>(100);
 	}
+	
+	public MultiEvent(List<Event> events) {
+		propagateAsSingleEvent = false;
+		this.events = events;;
+	}
 
 	public void addEvent(Event event) {
 		events.add(event);
