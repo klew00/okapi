@@ -14,9 +14,9 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class FuzzyTextUnitComparator implements Comparator<TextUnit> {
 	private boolean codeSensitive;
-	private float threshold;
+	private int threshold;
 
-	public FuzzyTextUnitComparator(boolean codeSensitive, float threshold) {
+	public FuzzyTextUnitComparator(boolean codeSensitive, int threshold) {
 		this.codeSensitive = codeSensitive;
 		this.setThreshold(threshold);
 	}
@@ -29,7 +29,7 @@ public class FuzzyTextUnitComparator implements Comparator<TextUnit> {
 		return codeSensitive;
 	}
 
-	public void setThreshold(float threshold) {
+	public void setThreshold(int threshold) {
 		this.threshold = threshold;
 	}
 

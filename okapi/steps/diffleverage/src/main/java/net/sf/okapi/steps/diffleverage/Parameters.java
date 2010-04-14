@@ -28,31 +28,36 @@ import net.sf.okapi.common.uidescription.TextInputPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 	private int fuzzyThreshold;
+	private boolean codesensitive;
 	
+	@Override
+	public void reset() {	
+		// default is exact match
+		fuzzyThreshold = 100;
+		codesensitive = true;
+	}
+
 	@Override
 	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
 		fuzzyThreshold = buffer.getInteger("fuzzyThreshold", fuzzyThreshold);
-	}
-
-	@Override
-	public void reset() {	
-		// default is exact match
-		fuzzyThreshold = 100;
+		codesensitive = buffer.getBoolean("codesensitive", codesensitive);
 	}
 	
 	@Override
 	public String toString() {
 		buffer.reset();
 		buffer.setParameter("fuzzyThreshold", fuzzyThreshold);		
+		buffer.setParameter("codesensitive", codesensitive);
 		return buffer.toString();
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("fuzzyThreshold", "Fuzy Threshold", "Fuzzy Threshold between 0 and 100");		
+		desc.add("fuzzyThreshold", "Fuzzy Threshold", "Fuzzy Threshold between 0 and 100.");		
+		desc.add("codesensitive", "Compare Codes", "Use codes to compare TextUnits?");
 		return desc;
 	}
 	
@@ -61,6 +66,15 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("Diff Leverager", true, false);	
 		TextInputPart tp = desc.addTextInputPart(paramsDesc.get("fuzzyThreshold"));
 		tp.setRange(0, 100);
+		desc.addCheckboxPart(paramsDesc.get("codesensitive"));
 		return desc;
+	}
+	
+	public int getFuzyThreshold() {
+		return fuzzyThreshold;
+	}
+	
+	public boolean isCodeSensitive() {
+		return codesensitive;
 	}
 }
