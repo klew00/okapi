@@ -365,7 +365,8 @@ public class XLIFFFilter implements IFilter {
 			queue.add(new Event(EventType.DOCUMENT_PART, dp));
 		}
 		
-		StartSubDocument startSubDoc = new StartSubDocument(String.valueOf(++otherId));
+		//TODO: First value must be the parent ID
+		StartSubDocument startSubDoc = new StartSubDocument(null, String.valueOf(++otherId));
 		storeStartElementFile(startSubDoc);
 		
 		String tmp = reader.getAttributeValue(null, "original");
@@ -389,6 +390,12 @@ public class XLIFFFilter implements IFilter {
 					prop.getValue(), trgLang, prop.getValue()));
 				trgLang = tmpLang;
 			}
+		}
+		
+		// Get build-num as read-only property
+		tmp = reader.getAttributeValue(null, "build-num");
+		if ( tmp != null ) {
+			startSubDoc.setProperty(new Property("build-num", tmp, true));
 		}
 		
 		startSubDoc.setSkeleton(skel);

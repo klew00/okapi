@@ -791,6 +791,23 @@ public class FilterTestDriver {
 	}
 
 	/**
+	 * Gets the Nth start sub-document event in a given list of events.
+	 * @param list the list of events.
+	 * @param subDocNumber the number of the sub-document to return 1 for first, 2 for second, etc.
+	 * @return the sub-document found or null.
+	 */
+	public static StartSubDocument getStartSubDocument (ArrayList<Event> list, int subDocNumber) {
+		int n = 0;
+		for (Event event : list) {
+			if (event.getEventType() == EventType.START_SUBDOCUMENT) {
+				if (++n == subDocNumber) {
+					return (StartSubDocument)event.getResource();
+				}
+			}
+		}
+		return null;
+	}
+	/**
 	 * Gets the Nth document part found in the given list of events.
 	 * 
 	 * @param list

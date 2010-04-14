@@ -33,6 +33,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -267,6 +268,17 @@ public class XLIFFFilterTest {
 	}
 	
 	@Test
+	public void testStartSubDocumentFromList () {
+		StartSubDocument subd = FilterTestDriver.getStartSubDocument(createSimpleXLIFF(), 1);
+		assertNotNull(subd);
+		assertNotNull(subd.getId());
+		assertEquals("file.ext", subd.getName());
+		Property prop = subd.getProperty("build-num");
+		assertNotNull(prop);
+		assertEquals("13", prop.getValue());
+	}
+	
+	@Test
 	public void testSimpleTransUnit () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createSimpleXLIFF(), 1);
 		assertNotNull(tu);
@@ -478,7 +490,7 @@ public class XLIFFFilterTest {
 	private ArrayList<Event> createSimpleXLIFF () {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<xliff version=\"1.2\">\r"
-			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\">"
+			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\" build-num=\"13\">"
 			+ "<body><trans-unit id=\"1\" resname=\"13\"><source>Hello World!</source></trans-unit></body>"
 			+ "</file></xliff>";
 		return getEvents(snippet);
