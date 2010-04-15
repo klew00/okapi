@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -47,13 +46,13 @@ import net.sf.okapi.lib.extra.diff.incava.DiffLists;
  * (http://en.wikipedia.org/wiki/Diff). The result is a new document with the translations from the first document
  * merged into it. This allows translations between different document versions to be preserved while still maintaining
  * the newer source document modifications.
+ * <p>
+ * 
  * 
  * @author HARGRAVEJE
  * 
  */
 public class DiffLeverageStep extends BasePipelineStep {
-	private static final Logger LOGGER = Logger.getLogger(DiffLeverageStep.class.getName());
-
 	private final Parameters params;
 	private IFilter filter;
 	private IFilterConfigurationMapper fcMapper;
@@ -109,14 +108,12 @@ public class DiffLeverageStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleStartBatch(final Event event) {
-		done = false;
+	protected Event handleStartBatch(final Event event) {		
 		return event;
 	}
 
 	@Override
 	protected Event handleEndBatch(final Event event) {
-		done = true;
 		return event;
 	}
 
@@ -135,7 +132,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 			oldTextUnits = new ArrayList<TextUnit>();
 			newDocumentEvents = new LinkedList<Event>();
 
-			// open of the secondary input file (this will be our old documents)
+			// open of the secondary input file (this is our old document)
 			getOldDocumentTextUnits();
 		}
 		return event;
@@ -157,9 +154,9 @@ public class DiffLeverageStep extends BasePipelineStep {
 					newDocumentEvents));
 
 			// help java gc
-			newTextUnits = null;
-			oldTextUnits = null;
-			newDocumentEvents = null;
+			//newTextUnits = null;
+			//oldTextUnits = null;
+			//newDocumentEvents = null;
 			return multi_event;
 		} else {
 			return event;
@@ -250,7 +247,6 @@ public class DiffLeverageStep extends BasePipelineStep {
 				filter.close();
 			}
 		}
-
 	}
 
 	private void diffLeverage() {
@@ -280,6 +276,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 				TextContainer t = oldTu.getTarget(targetLocale);
 				if (t != null) {
 					newTu.setTarget(targetLocale, t);
+					newTu.setAnnotation(new DiffLeverageAnnotation(
+							params.isCodeSensitive()));
 				}
 			} else {
 				// copy the old translation as a strong fuzzy match
@@ -288,6 +286,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 				TextContainer t = oldTu.getTarget(targetLocale);
 				if (t != null) {
 					newTu.setTarget(targetLocale, t);
+					newTu.setAnnotation(new DiffLeverageAnnotation(
+							params.isCodeSensitive()));
 				}
 			}
 		}

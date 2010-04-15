@@ -30,6 +30,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private int fuzzyThreshold;
 	private boolean codesensitive;
 	
+	public Parameters() {
+		reset();
+	}
+	
 	@Override
 	public void reset() {	
 		// default is exact match
