@@ -38,9 +38,9 @@
 		<mkdir dir="${dist}/javadoc"/>
 		<!-- javadoc files -->
 		<javadoc destdir="${dist}/javadoc" Encoding="UTF-8">
-			<packageset dir="../../framework/core/src/main/java" defaultexcludes="yes"/>
-			<packageset dir="../../libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>			
-			<packageset dir="../../libraries/lib-translation/src/main/java" defaultexcludes="yes"/>			
+			<packageset dir="../../okapi/core/src/main/java" defaultexcludes="yes"/>
+			<packageset dir="../../okapi/libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>			
+			<packageset dir="../../okapi/libraries/lib-translation/src/main/java" defaultexcludes="yes"/>			
 		</javadoc>
 
 	</target>

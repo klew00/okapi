@@ -1061,7 +1061,6 @@ public class TextContainer implements Iterable<TextPart> {
 	 * @return the part (segment or non-segment) for the given index.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 * @see #getSegment(int)
-	 * @see #partIterator()
 	 */
 	public TextPart getPart (int index) {
 		return parts.get(index);

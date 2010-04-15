@@ -24,23 +24,39 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Implements a helper method to read an InputStream into an array of bytes.
+ * Adapted from http://forums.sun.com/thread.jspa?threadID=606890
+ * @author adrian.ajb
+ */
 public class StreamUtil {
+
 	/**
-	 * 
-	 * @param in
-	 * @return
-	 * @throws IOException
-	 * @author adrian.ajb at http://forums.sun.com/thread.jspa?threadID=606890
+	 * Reads an InputStream into an array of bytes.
+	 * @param in the input stream to read.
+	 * @return the array of bytes read.
+	 * @throws IOException if an error occurs.
 	 */
-	public static byte[] inputStreamToBytes(InputStream in) throws IOException {
-		ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
-		byte[] buffer = new byte[1024];
-		int len;
+	public static byte[] inputStreamToBytes (InputStream in)
+		throws IOException
+	{
+		ByteArrayOutputStream out = null;
+		try {
+			out = new ByteArrayOutputStream(1024);
+			byte[] buffer = new byte[1024];
+			int len;
 
-		while((len = in.read(buffer)) >= 0)
-			out.write(buffer, 0, len);
+			while((len = in.read(buffer)) >= 0) {
+				out.write(buffer, 0, len);
+			}
+		}
+		finally {
+			if ( out != null ) {
+				out.close();
+			}
+		}
 
-		out.close();
 		return out.toByteArray();
 	} 
+
 }
