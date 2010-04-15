@@ -1118,54 +1118,35 @@ public class TextFragment implements Comparable<Object> {
 	}
 
 	/**
-	 * Compares a TextFragment with this one. The method returns the comparison between
-	 * the text parts of both text fragments, and if specified, between their 
-	 * inline codes.
-	 * @param frag the TextFragment to compare with this one.
-	 * @param codeSensitive true if the codes need to be compared as well.
+	 * Compares a TextFragment with this one. The method returns the comparison between the text parts of both text
+	 * fragments, and if specified, between their inline codes.
+	 * 
+	 * @param frag
+	 *            the TextFragment to compare with this one.
+	 * @param codeSensitive
+	 *            true if the codes need to be compared as well.
 	 * @return a value 0 if the objects are equals.
 	 */
-	public int compareTo (TextFragment frag,
-		boolean codeSensitive)
-	{
-		if ( frag == null ) return -1;
-		String fragText = frag.getCodedText();
-		if ( !isBalanced ) balanceMarkers();
-		
-		// Compare char by char avoiding codes
-		char ch1, ch2;
-		for ( int i=0, j=0; i<text.length(); i++ ) {
-			ch1 = text.charAt(i);
-			if ( TextFragment.isMarker(ch1) ) {
-				++i; // Skip index
-			}
-			else { // Get the next character, skip codes, check length
-				while ( true ) {
-					if ( j >= fragText.length() ) return -1;
-					ch2 = fragText.charAt(j);
-					j++; // For next time
-					if ( !TextFragment.isMarker(ch2) ) {
-						break;
-					}
-					j++; // Skip index
-				}
-				// Compare the characters
-				if ( ch1 != ch2 ) return (ch1-ch2); 
-			}
+	public int compareTo(TextFragment frag, boolean codeSensitive) {
+		if (frag == null) {
+			return -1;
 		}
-		
-		// Compare codes if requested
-		if ( codeSensitive ) {
-			if ( hasCode() ) {
-				if ( !frag.hasCode() ) return 1;
+
+		int textOnlyCompare = getText().compareTo(frag.getText());
+		if (codeSensitive) {
+			if (hasCode() && textOnlyCompare == 0) {
+				if (!frag.hasCode()) {
+					return 1;
+				}
 				String otherCodes = frag.getCodes().toString();
 				return otherCodes.compareTo(codes.toString());
-			}
-			else {
-				if ( frag.hasCode() ) return -1;
+			} else {
+				if (frag.hasCode()) {
+					return -1;
+				}
 			}
 		}
-		return 0;
+		return textOnlyCompare;
 	}
 
 	@Override

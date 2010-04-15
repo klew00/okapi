@@ -534,6 +534,14 @@ public class TextFragmentTest {
 		assertTrue(0==tf1.compareTo(tf2, false));
 		assertFalse(0==tf1.compareTo(tf2, true));
     }
+
+	@Test
+    public void testCompareWithSamePrefix() {
+		TextFragment tf1 = new TextFragment("Message for ID name200");
+		TextFragment tf2 = new TextFragment("Message for ID name200 (a nonmatch during diff)");
+		assertFalse(0==tf1.compareTo(tf2));
+		assertFalse(0==tf1.compareTo(tf2, true));
+    }
 	
 	@Test
     public void testSynchronizeCodeIdentifiers () {
