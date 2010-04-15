@@ -108,7 +108,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleStartBatch(final Event event) {		
+	protected Event handleStartBatch(final Event event) {
+		done = true;
 		return event;
 	}
 
@@ -124,9 +125,10 @@ public class DiffLeverageStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleStartDocument(final Event event) {
+	protected Event handleStartDocument(final Event event) {		
 		// test if we have an alignment at the document level
-		if (targetInput != null) {
+		if (targetInput != null) {			
+			done = false;
 			// intialize buffers for a new document
 			newTextUnits = new ArrayList<TextUnit>();
 			oldTextUnits = new ArrayList<TextUnit>();
@@ -140,6 +142,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleEndDocument(final Event event) {
+		done = true;
 		if (targetInput != null) {
 			// diff and leverage (copy target segments) the old and new lists of TextUnits
 			diffLeverage();
@@ -147,16 +150,16 @@ public class DiffLeverageStep extends BasePipelineStep {
 			// the diff leverage is over now send the cached events down the
 			// pipeline as a MULTI_EVENT
 			// add the end document event so its not eaten
-			newDocumentEvents.add(0, event);
+			newDocumentEvents.add(event);
 
 			// create a multi event and pass it on to the other steps
 			final Event multi_event = new Event(EventType.MULTI_EVENT, new MultiEvent(
 					newDocumentEvents));
 
 			// help java gc
-			//newTextUnits = null;
-			//oldTextUnits = null;
-			//newDocumentEvents = null;
+			newTextUnits = null;
+			oldTextUnits = null;
+			newDocumentEvents = null;
 			return multi_event;
 		} else {
 			return event;

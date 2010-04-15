@@ -6,7 +6,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
@@ -66,7 +69,32 @@ public class DiffLeverageStepTest {
 		pipeline.endBatch();
 
 		// test we observed the correct events
-		List<Event> el = eventObserver.getResult();	
-		el.get(0);
+		List<Event> el = eventObserver.getResult();			
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
+		
+		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
+		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
+		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
+		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
+		
+		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
+		
+		Event tue1 = el.remove(0);
+		assertEquals(EventType.TEXT_UNIT, tue1.getEventType());
+		Assert.assertNotNull(tue1.getTextUnit().getAnnotation(DiffLeverageAnnotation.class));
+		
+		Event tue2 = el.remove(0);
+		assertEquals(EventType.TEXT_UNIT, tue2.getEventType());
+		Assert.assertNull(tue2.getTextUnit().getAnnotation(DiffLeverageAnnotation.class));
+		
+		Event tue3 = el.remove(0);
+		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
+		Assert.assertNotNull(tue3.getTextUnit().getAnnotation(DiffLeverageAnnotation.class));
+		
+		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
 	}
 }
