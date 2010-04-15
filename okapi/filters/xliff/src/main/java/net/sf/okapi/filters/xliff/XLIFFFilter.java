@@ -71,12 +71,16 @@ public class XLIFFFilter implements IFilter {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
+	public final String PROP_BUILDNUM = "build-num";
+	public final String PROP_EXTRADATA = "extradata";
+	
 	private boolean hasNext;
 	private XMLStreamReader reader;
 	private String docName;
 	private int tuId;
 	private int otherId;
 	private int groupId;
+	private String startDocId;
 	private LocaleId srcLang;
 	private LocaleId trgLang;
 	private LinkedList<Event> queue;
@@ -239,7 +243,8 @@ public class XLIFFFilter implements IFilter {
 			hasNext = true;
 			queue = new LinkedList<Event>();
 			
-			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			startDocId = String.valueOf(++otherId);
+			StartDocument startDoc = new StartDocument(startDocId);
 			startDoc.setName(docName);
 			startDoc.setEncoding(encoding, hasUTF8BOM);
 			startDoc.setLocale(srcLang);
@@ -365,8 +370,7 @@ public class XLIFFFilter implements IFilter {
 			queue.add(new Event(EventType.DOCUMENT_PART, dp));
 		}
 		
-		//TODO: First value must be the parent ID
-		StartSubDocument startSubDoc = new StartSubDocument(null, String.valueOf(++otherId));
+		StartSubDocument startSubDoc = new StartSubDocument(startDocId, String.valueOf(++otherId));
 		storeStartElementFile(startSubDoc);
 		
 		String tmp = reader.getAttributeValue(null, "original");
@@ -393,9 +397,9 @@ public class XLIFFFilter implements IFilter {
 		}
 		
 		// Get build-num as read-only property
-		tmp = reader.getAttributeValue(null, "build-num");
+		tmp = reader.getAttributeValue(null, PROP_BUILDNUM);
 		if ( tmp != null ) {
-			startSubDoc.setProperty(new Property("build-num", tmp, true));
+			startSubDoc.setProperty(new Property(PROP_BUILDNUM, tmp, true));
 		}
 		
 		startSubDoc.setSkeleton(skel);
@@ -543,6 +547,11 @@ public class XLIFFFilter implements IFilter {
 			if ( tmp != null ) tu.setName(tmp);
 			else if ( params.getFallbackToID() ) {
 				tu.setName(tu.getId());
+			}
+			
+			tmp = reader.getAttributeValue(null, PROP_EXTRADATA);
+			if ( tmp != null ) {
+				tu.setProperty(new Property(PROP_EXTRADATA, tmp, true));
 			}
 
 			approved = false;
@@ -761,6 +770,9 @@ public class XLIFFFilter implements IFilter {
 	}
 	
 	private void addTargetIfNeeded () {
+		if ( !sourceDone ) {
+			logger.severe("Element <source> missing or not placed properly.");
+		}
 		if ( targetDone ) return; // Nothing to add
 		// If the target language is the same as the source, we should not create new <target>
 		if ( srcLang.equals(trgLang) ) return; 

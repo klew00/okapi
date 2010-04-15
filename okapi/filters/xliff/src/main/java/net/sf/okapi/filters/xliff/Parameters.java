@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,9 +21,13 @@
 package net.sf.okapi.filters.xliff;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+@EditorFor(Parameters.class)
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private boolean fallbackToID;
 	private boolean escapeGT;
@@ -139,4 +143,13 @@ public class Parameters extends BaseParameters {
 		desc.add("addTargetLanguage", "Add the target-language attribute if not present", null);
 		return desc;
 	}
+
+	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("XLIFF Filter Parameters", true, false);
+		desc.addCheckboxPart(paramDesc.get("fallbackToID"));
+		desc.addCheckboxPart(paramDesc.get("escapeGT"));
+		desc.addCheckboxPart(paramDesc.get("addTargetLanguage"));
+		return desc;
+	}
+
 }

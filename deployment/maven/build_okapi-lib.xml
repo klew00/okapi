@@ -76,139 +76,139 @@
 		<!-- Copy classes -->
 		<copy todir="${tmp}">
 			<!-- core -->
-			<fileset dir="../../framework/core/target/classes"
+			<fileset dir="../../okapi/core/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 			<!-- filters -->
-			<fileset dir="../../filters/abstractmarkup/target/classes"
+			<fileset dir="../../okapi/filters/abstractmarkup/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/dtd/target/classes"
+			<fileset dir="../../okapi/filters/dtd/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/html/target/classes"
+			<fileset dir="../../okapi/filters/html/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/idml/target/classes"
+			<fileset dir="../../okapi/filters/idml/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/json/target/classes"
+			<fileset dir="../../okapi/filters/json/target/classes"
 			 excludes="**/META-INF/**"/>
-<!--			<fileset dir="../../filters/mif/target/classes"
+<!--			<fileset dir="../../okapi/filters/mif/target/classes"
 			 excludes="**/META-INF/**"/>-->
-			<fileset dir="../../filters/openoffice/target/classes"
+			<fileset dir="../../okapi/filters/openoffice/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/openxml/target/classes"
+			<fileset dir="../../okapi/filters/openxml/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/pensieve/target/classes"
+			<fileset dir="../../okapi/filters/pensieve/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/plaintext/target/classes"
+			<fileset dir="../../okapi/filters/plaintext/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/po/target/classes"
+			<fileset dir="../../okapi/filters/po/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/php/target/classes"
+			<fileset dir="../../okapi/filters/php/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/properties/target/classes"
+			<fileset dir="../../okapi/filters/properties/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/regex/target/classes"
+			<fileset dir="../../okapi/filters/regex/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/rtf/target/classes"
+			<fileset dir="../../okapi/filters/rtf/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/table/target/classes"
+			<fileset dir="../../okapi/filters/table/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/tmx/target/classes"
+			<fileset dir="../../okapi/filters/tmx/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/ttx/target/classes"
+			<fileset dir="../../okapi/filters/ttx/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/ts/target/classes"
+			<fileset dir="../../okapi/filters/ts/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/vignette/target/classes"
+			<fileset dir="../../okapi/filters/vignette/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/xliff/target/classes"
+			<fileset dir="../../okapi/filters/xliff/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/xml/target/classes"
+			<fileset dir="../../okapi/filters/xml/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 			<!-- lib -->
-			<fileset dir="../../libraries/lib-segmentation/target/classes"
+			<fileset dir="../../okapi/libraries/lib-segmentation/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../libraries/lib-translation/target/classes"
+			<fileset dir="../../okapi/libraries/lib-translation/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../libraries/lib-extra/target/classes"
+			<fileset dir="../../okapi/libraries/lib-extra/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../libraries/lib-search/target/classes"
+			<fileset dir="../../okapi/libraries/lib-search/target/classes"
 			 excludes="**/META-INF/**"/>
 			
 			<!-- tm -->
-			<fileset dir="../../tm/simpletm/target/classes"
+			<fileset dir="../../okapi/tm/simpletm/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../tm/pensieve/target/classes"
+			<fileset dir="../../okapi/tm/pensieve/target/classes"
 			 excludes="**/META-INF/**"/>
 
 			<!-- connectors -->
-			<fileset dir="../../connectors/opentran/target/classes"
+			<fileset dir="../../okapi/connectors/opentran/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../connectors/simpletm/target/classes"
+			<fileset dir="../../okapi/connectors/simpletm/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../connectors/pensieve/target/classes"
+			<fileset dir="../../okapi/connectors/pensieve/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../connectors/translatetoolkit/target/classes"
+			<fileset dir="../../okapi/connectors/translatetoolkit/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../connectors/globalsight/target/classes"
+			<fileset dir="../../okapi/connectors/globalsight/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../connectors/mymemory/target/classes"
+			<fileset dir="../../okapi/connectors/mymemory/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../connectors/google/target/classes"
+			<fileset dir="../../okapi/connectors/google/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../connectors/apertium/target/classes"
+			<fileset dir="../../okapi/connectors/apertium/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../connectors/microsoft/target/classes"
+			<fileset dir="../../okapi/connectors/microsoft/target/classes"
 			 excludes="**/META-INF/**"/>
 <!--not ready yet
-			<fileset dir="../../connectors/promt/target/classes"
+			<fileset dir="../../okapi/connectors/promt/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../connectors/crosslanguage/target/classes"
+			<fileset dir="../../okapi/connectors/crosslanguage/target/classes"
 			 excludes="**/META-INF/**"/>
 -->
 			 <!-- steps -->
-			<fileset dir="../../steps/bomconversion/target/classes"
+			<fileset dir="../../okapi/steps/bomconversion/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/charlisting/target/classes"
+			<fileset dir="../../okapi/steps/charlisting/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/codeshandling/target/classes"
+			<fileset dir="../../okapi/steps/codeshandling/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/common/target/classes"
+			<fileset dir="../../okapi/steps/common/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/copysourcetotarget/target/classes"
+			<fileset dir="../../okapi/steps/copysourcetotarget/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/encodingconversion/target/classes"
+			<fileset dir="../../okapi/steps/encodingconversion/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/fullwidthconversion/target/classes"
+			<fileset dir="../../okapi/steps/fullwidthconversion/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/formatconversion/target/classes"
+			<fileset dir="../../okapi/steps/formatconversion/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/generatesimpletm/target/classes"
+			<fileset dir="../../okapi/steps/generatesimpletm/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/linebreakconversion/target/classes"
+			<fileset dir="../../okapi/steps/linebreakconversion/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/searchandreplace/target/classes"
+			<fileset dir="../../okapi/steps/searchandreplace/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/sentence-aligner/target/classes"
+			<fileset dir="../../okapi/steps/sentence-aligner/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/segmentation/target/classes"
+			<fileset dir="../../okapi/steps/segmentation/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/leveraging/target/classes"
+			<fileset dir="../../okapi/steps/leveraging/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/textmodification/target/classes"
+			<fileset dir="../../okapi/steps/textmodification/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/tokenization/target/classes"
+			<fileset dir="../../okapi/steps/tokenization/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/translationcomparison/target/classes"
+			<fileset dir="../../okapi/steps/translationcomparison/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/uriconversion/target/classes"
+			<fileset dir="../../okapi/steps/uriconversion/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/wordcount/target/classes"
+			<fileset dir="../../okapi/steps/wordcount/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/xsltransform/target/classes"
+			<fileset dir="../../okapi/steps/xsltransform/target/classes"
 			 excludes="**/META-INF/**"/>
 
-<!--			<fileset dir="../../steps/xliffkit/target/classes"
+<!--			<fileset dir="../../okapi/steps/xliffkit/target/classes"
 			 excludes="**/META-INF/**"/>-->
 		</copy>
 		
@@ -235,9 +235,9 @@
 		   <fileset dir="../shared/licenses" includes="**/jericho-*"/>
 		</copy>
 
-		<property name="dep003" value="${mavenStore}/org/yaml/snakeyaml/1.5"/>
+		<property name="dep003" value="${mavenStore}/org/yaml/snakeyaml/1.6"/>
 		<fileset id="list.contents" dir="${dep003}"
-		 includes="**/snakeyaml-1.5.jar"/>
+		 includes="**/snakeyaml-1.6.jar"/>
 		<property name="jar003" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar003}</echo>
 		<copy todir="${distLib}" file="${dep003}/${jar003}"/>
@@ -347,7 +347,7 @@
 		<echo file="tmpJars" append="yes"> ${jar018}</echo>
 		<copy todir="${distLib}" file="${dep018}/${jar018}"/>
 		<!-- + -->
-		<property name="dep019" value="${mavenStore}/org/apache/lucene/lucene-spellchecker/3.0.0"/>
+<!--		<property name="dep019" value="${mavenStore}/org/apache/lucene/lucene-spellchecker/3.0.0"/>
 		<fileset id="list.contents" dir="${dep019}"
 		 includes="**/lucene-spellchecker-3.0.0.jar"/>
 		<property name="jar019" refid="list.contents"/>
@@ -355,7 +355,7 @@
 		<copy todir="${distLib}" file="${dep019}/${jar019}"/>
 		<copy todir="${distLicenses}">
 		   <fileset dir="../shared/licenses" includes="**/lucene-*"/>
-		</copy>
+		</copy>-->
 
 		<property name="dep020" value="${mavenStore}/com/ibm/icu/icu4j/4.0.1"/>
 		<fileset id="list.contents" dir="${dep020}"
@@ -430,7 +430,7 @@
 
 		<!-- Copy examples -->
 		<copy todir="${dist}/examples">
-			<fileset dir="../../examples/java">
+			<fileset dir="../../okapi/examples/java">
 				<exclude name="**/.*"/>
 				<exclude name="**/.*/**"/>
 				<exclude name="**/target/classes/**"/>
@@ -473,9 +473,9 @@
 		<copy todir="${dist}/localweb" file="../../website/okapi.css"/>
 		<!-- javadoc files -->
 		<javadoc destdir="${dist}/localweb/javadoc" Encoding="UTF-8">
-			<packageset dir="../../framework/core/src/main/java" defaultexcludes="yes"/>
-			<packageset dir="../../libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>			
-			<packageset dir="../../libraries/lib-translation/src/main/java" defaultexcludes="yes"/>			
+			<packageset dir="../../okapi/core/src/main/java" defaultexcludes="yes"/>
+			<packageset dir="../../okapi/libraries/lib-segmentation/src/main/java" defaultexcludes="yes"/>			
+			<packageset dir="../../okapi/libraries/lib-translation/src/main/java" defaultexcludes="yes"/>			
 		</javadoc>
 
 	</target>

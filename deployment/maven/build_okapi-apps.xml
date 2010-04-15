@@ -106,63 +106,63 @@
 		<!-- Copy classes -->
 		<copy todir="${tmp}">
 			<!-- core -->
-			<fileset dir="../../framework/core-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/core-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 			<!-- filters -->
-			<fileset dir="../../filters/html-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/html-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/openoffice-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/openoffice-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/openxml-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/openxml-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/plaintext-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/plaintext-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/po-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/po-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/properties-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/properties-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/regex-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/regex-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/table-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/table-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/ts-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/ts-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../filters/json-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/filters/json-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 
 			<!-- Libraries -->
-			<fileset dir="../../libraries/lib-segmentation-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/libraries/lib-segmentation-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../libraries/lib-translation-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/libraries/lib-translation-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 			 <!-- Steps -->
-			<fileset dir="../../steps/bomconversion-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/bomconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/encodingconversion-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/encodingconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/fullwidthconversion-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/fullwidthconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/leveraging-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/leveraging-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/linebreakconversion-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/linebreakconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/searchandreplace-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/searchandreplace-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/segmentation-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/segmentation-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/textmodification-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/textmodification-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/tokenization-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/tokenization-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/uriconversion-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/uriconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/wordcount-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/wordcount-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/uriconversion-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/uriconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../steps/xsltransform-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/xsltransform-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 		</copy>

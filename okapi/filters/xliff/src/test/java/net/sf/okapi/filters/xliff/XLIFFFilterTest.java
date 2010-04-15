@@ -269,9 +269,11 @@ public class XLIFFFilterTest {
 	
 	@Test
 	public void testStartSubDocumentFromList () {
+		StartDocument sd = FilterTestDriver.getStartDocument(createSimpleXLIFF());
 		StartSubDocument subd = FilterTestDriver.getStartSubDocument(createSimpleXLIFF(), 1);
 		assertNotNull(subd);
 		assertNotNull(subd.getId());
+		assertEquals(sd.getId(), subd.getParentId());
 		assertEquals("file.ext", subd.getName());
 		Property prop = subd.getProperty("build-num");
 		assertNotNull(prop);
@@ -284,6 +286,9 @@ public class XLIFFFilterTest {
 		assertNotNull(tu);
 		assertEquals("Hello World!", tu.getSource().toString());
 		assertEquals("13", tu.getName());
+		Property prop = tu.getProperty("extradata");
+		assertNotNull(prop);
+		assertEquals("xd", prop.getValue());
 	}
 
 	@Test
@@ -491,7 +496,7 @@ public class XLIFFFilterTest {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<xliff version=\"1.2\">\r"
 			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\" build-num=\"13\">"
-			+ "<body><trans-unit id=\"1\" resname=\"13\"><source>Hello World!</source></trans-unit></body>"
+			+ "<body><trans-unit id=\"1\" resname=\"13\" extradata=\"xd\"><source>Hello World!</source></trans-unit></body>"
 			+ "</file></xliff>";
 		return getEvents(snippet);
 	}
