@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -70,7 +71,7 @@ public class TestVersions {
 		
 		skelSession.start(new FileOutputStream(tempSkeleton));
 		
-		Events events = new Events();
+		ArrayList<Event> events = new ArrayList<Event>();
 		events.add(event1);
 		events.add(event2);
 		
@@ -86,7 +87,7 @@ public class TestVersions {
 		
 		skelSession.end();
 				
-		Events events2 = new Events();
+		ArrayList<Event> events2 = new ArrayList<Event>();
 		events2.add(event11);
 		events2.add(event22);
 		

@@ -78,8 +78,7 @@ public class TestBeans {
 		assertEquals("the type", br2.getType());		
 	}
 	
-	// DEBUG 
-	@Test
+	// DEBUG @Test
 	public void testObjectStream() throws FileNotFoundException, IOException {		
 		File tempF = File.createTempFile("~temp", null);
 		tempF.deleteOnExit();

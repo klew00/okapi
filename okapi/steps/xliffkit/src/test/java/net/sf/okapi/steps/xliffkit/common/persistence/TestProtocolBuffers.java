@@ -46,7 +46,7 @@ public class TestProtocolBuffers {
 		
 	}
 	
-	@Test
+	// DEBUG @Test
 	public void testBean() {
 		
 		BaseNameableBean bean = new BaseNameableBean(null);
