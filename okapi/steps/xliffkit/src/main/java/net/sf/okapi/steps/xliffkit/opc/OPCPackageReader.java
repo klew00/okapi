@@ -25,10 +25,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.JSONPersistenceSession;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -39,9 +42,9 @@ public class OPCPackageReader extends AbstractFilter {
 	private OPCPackage pack;
 	private JSONPersistenceSession session = new JSONPersistenceSession();
 	private Event event;
-	//private LinkedHashMap<PackagePartName, PackagePart> parts = new LinkedHashMap<PackagePartName, PackagePart>();
-	private LinkedList<PackagePart> parts = new LinkedList<PackagePart>();
+	private LinkedList<PackagePart> coreParts = new LinkedList<PackagePart>();
 	private PackagePart activePart;
+	private PackagePart resourcesPart;
 	
 	@Override
 	protected boolean isUtf8Bom() {
@@ -55,14 +58,19 @@ public class OPCPackageReader extends AbstractFilter {
 
 	@Override
 	public void close() {
-		parts.clear();
-		activePart = null;
+		clearParts();
 		session.end();
 		try {
 			pack.close();
 		} catch (IOException e) {
 			throw new OkapiIOException("OPCPackageReader: cannot close package");
 		}
+	}
+
+	private void clearParts() {
+		coreParts.clear();
+		activePart = null;
+		resourcesPart = null;		
 	}
 
 	@Override
@@ -89,12 +97,14 @@ public class OPCPackageReader extends AbstractFilter {
 	private Event deserializeEvent() {
 		Event event = null;
 		if (activePart == null) {
-			activePart = parts.poll();
+			activePart = coreParts.poll();
 			if (activePart == null) 
 				return null;
 			else
+				resourcesPart = OPCPackageUtil.getResourcesPart(activePart);
 				try {
-					session.start(activePart.getInputStream());
+					if (resourcesPart != null)
+						session.start(resourcesPart.getInputStream());
 				} catch (IOException e) {
 					throw new OkapiIOException("OPCPackageReader: cannot get resources from package", e);
 				}
@@ -104,7 +114,14 @@ public class OPCPackageReader extends AbstractFilter {
 			session.end();
 			activePart = null;
 			return deserializeEvent(); // Recursion until all parts are tried
+		} else if (event.getEventType() == EventType.START_DOCUMENT){
+			// Translate src doc name for writers
+			StartDocument startDoc = (StartDocument)event.getResource();
+			String srcName = startDoc.getName();
+			String partName = activePart.getPartName().toString();
+			startDoc.setName(Util.getDirectoryName(partName) + "/" + Util.getFilename(srcName, true));
 		}
+			
 		return event;
 	}
 
@@ -121,17 +138,8 @@ public class OPCPackageReader extends AbstractFilter {
 			throw new OkapiIOException("OPCPackageReader: cannot open package", e);
 		}
 		
-		List<PackagePart> coreParts = OPCPackageUtil.getCoreParts(pack);
-		
-		for (PackagePart part : coreParts) {
-			//PackagePart sourcePart = OPCPackageUtil.getSourcePart(part); 
-			PackagePart resourcesPart = OPCPackageUtil.getResourcesPart(part);
-//			if (sourcePart != null && resourcesPart != null)
-//				parts.put(sourcePart.getPartName(), resourcesPart);
-			if (resourcesPart != null)
-				parts.add(resourcesPart);
-		}
-				
+		clearParts();
+		coreParts.addAll(OPCPackageUtil.getCoreParts(pack));		
 		event = deserializeEvent();
 	}
 

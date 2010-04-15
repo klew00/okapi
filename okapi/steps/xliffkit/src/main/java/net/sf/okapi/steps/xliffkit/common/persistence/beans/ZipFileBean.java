@@ -34,14 +34,20 @@ import java.util.zip.ZipOutputStream;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class ZipFileBean implements IPersistenceBean {
+public class ZipFileBean extends PersistenceBean {
 
 	private String name;  // ZIP file short name
 	private List<ZipEntryBean> entries = new ArrayList<ZipEntryBean>(); // enumeration of the ZIP file entries
 	boolean empty;
 	
 	private static ZipFile zipFile;
+	
+	public ZipFileBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -107,7 +113,7 @@ public class ZipFileBean implements IPersistenceBean {
 				ZipEntry entry = e.nextElement();
 				//System.out.println(entry.getName());
 				
-				ZipEntryBean entryBean = new ZipEntryBean();
+				ZipEntryBean entryBean = new ZipEntryBean(getSession());
 				entryBean.set(entry);
 				InputStreamBean isBean = entryBean.getInputStream();
 				try {

@@ -27,12 +27,18 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TargetPropertiesAnnotation;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class TargetPropertiesAnnotationBean implements IPersistenceBean {
+public class TargetPropertiesAnnotationBean extends PersistenceBean {
 
 	private ConcurrentHashMap<String, Hashtable<String, PropertyBean>> targets = 
 		new ConcurrentHashMap<String, Hashtable<String, PropertyBean>>();
 	
+	public TargetPropertiesAnnotationBean(IPersistenceSession session) {
+		super(session);
+	}
+
 	@Override
 	public <T> T get(T obj) {
 		if (obj instanceof TargetPropertiesAnnotation) {
@@ -70,7 +76,7 @@ public class TargetPropertiesAnnotationBean implements IPersistenceBean {
 				
 				for (String key : props.keySet()) {
 					Property prop = props.get(key);
-					PropertyBean propBean = new PropertyBean();
+					PropertyBean propBean = new PropertyBean(getSession());
 					propBean.set(prop);
 					propBeans.put(key, propBean);
 				}								

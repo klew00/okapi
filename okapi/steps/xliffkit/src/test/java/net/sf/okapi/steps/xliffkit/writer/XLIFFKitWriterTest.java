@@ -20,9 +20,14 @@
 
 package net.sf.okapi.steps.xliffkit.writer;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -190,8 +195,8 @@ public class XLIFFKitWriterTest {
 								new URL("file", null, src1Path + "test5.txt"),
 								"UTF-8",
 								ENUS,
-								FRFR),
-								
+								FRFR)
+						,								
 						new BatchItem(
 								new URL("file", null, src1Path + "test6.txt"),
 								"UTF-8",
@@ -252,8 +257,103 @@ public class XLIFFKitWriterTest {
 
 						),
 								
-				new RawDocumentToFilterEventsStep(),
+				new RawDocumentToFilterEventsStep()
+				,				
+				new PipelineStep(new LeveragingStep(), 
+						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new Parameter("threshold", 80),
+						new Parameter("fillTarget", true)
+				),
 				
+				new PipelineStep(
+						new XLIFFKitWriterStep(),								
+						new Parameter("gMode", true),
+						new Parameter("includeOriginal", true),
+						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "draft4.xliff.kit").toURI().toString()))
+		).execute();
+	}
+	
+	// DEBUG 	@Test
+	public void testPackageFormat2() throws URISyntaxException, MalformedURLException {
+
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		String src1Path = pathBase + "src1/";
+		String src2Path = pathBase + "src2/";
+		//System.out.println(pathBase);
+		
+		new Pipeline(
+				"Test pipeline for XLIFFKitWriterStep",
+				new Batch(
+						new BatchItem(
+								new URL("file", null, src1Path + "test5.txt"),
+								"UTF-8",
+								ENUS,
+								FRFR)
+						,								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test6.txt"),
+//								"UTF-8",
+//								ITIT,
+//								LocaleId.CHINA_CHINESE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test7.txt"),
+//								"UTF-8",
+//								ENUS,
+//								FRFR),
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test8.txt"),
+//								"UTF-8",
+//								ITIT,
+//								LocaleId.CHINA_CHINESE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test5.txt"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE),
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test8.txt"),
+//								"UTF-8",
+//								ITIT,
+//								DEDE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test9.odt"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE)
+//						,
+//								
+						new BatchItem(
+								new URL("file", null, src1Path + "test12.html"),
+								"UTF-8",
+								ENUS,
+								DEDE)
+						,
+// TODO DOCX is not mapped to any default filter configuration								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test11.docx"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE)
+//						
+						new BatchItem(
+								(new URL("file", null, src2Path + "CSVTest_97.txt")).toURI(),
+								"UTF-8",
+								"okf_table@copy-of-csv_97.fprm",
+								null,
+								"UTF-8",
+								ENUS,
+								DEDE)
+						),
+								
+				new RawDocumentToFilterEventsStep()
+				,				
 				new PipelineStep(new LeveragingStep(), 
 						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
 						new Parameter("threshold", 80),

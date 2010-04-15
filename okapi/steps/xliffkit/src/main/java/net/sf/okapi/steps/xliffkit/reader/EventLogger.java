@@ -25,6 +25,9 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 
 public class EventLogger extends BasePipelineStep {
 
+	private int indent = 0;
+	private boolean increasing = true;
+	
 	@Override
 	public String getDescription() {
 		return "Logs events going through a pipeline.";
@@ -35,9 +38,46 @@ public class EventLogger extends BasePipelineStep {
 		return "Event logger";
 	}
 
+	private void printEvent(Event event) {
+		String indentStr = "";
+		for (int i = 0; i < indent; i++) 
+			indentStr += "  ";
+		
+		System.out.print(indentStr);
+		System.out.print(event.getEventType());
+		System.out.println();
+	}
+	
 	@Override
 	public Event handleEvent(Event event) {
-		System.out.println(event.getEventType());
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+		case START_SUBDOCUMENT:
+		case START_GROUP:
+		case START_BATCH:
+		case START_BATCH_ITEM:
+			if (!increasing) System.out.println();
+			printEvent(event);
+			indent++; 
+			increasing = true;
+			break;
+
+		case END_DOCUMENT:
+		case END_SUBDOCUMENT:
+		case END_GROUP:
+		case END_BATCH:
+		case END_BATCH_ITEM:
+			if (indent > 0) indent--;
+			increasing = false;
+			printEvent(event);
+			break;
+			
+		default:
+			if (!increasing) System.out.println();
+				printEvent(event);
+		}
+		
+		
 		return super.handleEvent(event);
 	}
 

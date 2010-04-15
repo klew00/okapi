@@ -23,10 +23,16 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class TextPartBean implements IPersistenceBean {
-	private TextFragmentBean text = new TextFragmentBean();
+public class TextPartBean extends PersistenceBean {
+	private TextFragmentBean text = new TextFragmentBean(getSession());
 	
+	public TextPartBean(IPersistenceSession session) {
+		super(session);
+	}
+
 	@Override
 	public <T> T get(T obj) {		
 		return obj;

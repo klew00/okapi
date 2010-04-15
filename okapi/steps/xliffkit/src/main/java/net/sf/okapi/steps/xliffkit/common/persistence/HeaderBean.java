@@ -20,14 +20,21 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
+import java.util.Map;
+import java.util.Set;
 
-public class SessionInfo implements IPersistenceBean {
-	
+public class HeaderBean extends PersistenceBean {
+		
 	private String mimeType;
 	private String rootClass;
 	private String version;
 	private String description;
+	private Map<Integer, Set<Integer>> references;
 	
+	public HeaderBean(IPersistenceSession session) {
+		super(session);
+	}
+
 	@Override
 	public <T> T get(T obj) {
 		return obj;
@@ -46,6 +53,7 @@ public class SessionInfo implements IPersistenceBean {
 			mimeType = session.getMimeType();
 			rootClass = session.getRootClass();
 			description = session.getDescription();
+			references = session.getReferences();
 		}
 		return this;
 	}
@@ -80,5 +88,13 @@ public class SessionInfo implements IPersistenceBean {
 
 	public String getDescription() {
 		return description;
+	}
+
+	public void setReferences(Map<Integer, Set<Integer>> references) {
+		this.references = references;
+	}
+
+	public Map<Integer, Set<Integer>> getReferences() {
+		return references;
 	}
 }

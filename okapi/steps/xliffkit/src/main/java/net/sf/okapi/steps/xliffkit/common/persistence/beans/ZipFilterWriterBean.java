@@ -24,9 +24,15 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class ZipFilterWriterBean implements IPersistenceBean {
+public class ZipFilterWriterBean extends PersistenceBean {
 
+	public ZipFilterWriterBean(IPersistenceSession session) {
+		super(session);
+	}
+	
 	@Override
 	public <T> T get(T obj) {
 		return obj;

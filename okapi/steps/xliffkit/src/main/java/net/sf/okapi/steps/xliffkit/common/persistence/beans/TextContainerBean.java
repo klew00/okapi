@@ -30,14 +30,20 @@ import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class TextContainerBean implements IPersistenceBean {
+public class TextContainerBean extends PersistenceBean {
 	
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	private List<TextPartBean> parts = new ArrayList<TextPartBean>();
 	private boolean segApplied;
 	
+	public TextContainerBean(IPersistenceSession session) {
+		super(session);
+	}
+
 	@Override
 	public <T> T get(T obj) {				
 		if (obj instanceof TextContainer) {
@@ -68,20 +74,20 @@ public class TextContainerBean implements IPersistenceBean {
 			TextContainer tc = (TextContainer) obj;
 						
 			for (String propName : tc.getPropertyNames()) {
-				PropertyBean propBean = new PropertyBean();
+				PropertyBean propBean = new PropertyBean(getSession());
 				propBean.set(tc.getProperty(propName));
 				properties.add(propBean);
 			}
 			
 			for (IAnnotation annotation : tc.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean();
+				FactoryBean annotationBean = new FactoryBean(getSession());
 				annotations.add(annotationBean);
 				annotationBean.set(annotation);
 			}
 			
 			for (int i = 0; i < tc.getPartCount(); i++) {
 				//TextPartBean partBean = new TextPartBean();
-				TextPartBean partBean = (TextPartBean) BeanMapper.getBean(tc.getPart(i).getClass());
+				TextPartBean partBean = (TextPartBean) BeanMapper.getBean(tc.getPart(i).getClass(), getSession());
 				parts.add(partBean);
 				partBean.set(tc.getPart(i));
 			}

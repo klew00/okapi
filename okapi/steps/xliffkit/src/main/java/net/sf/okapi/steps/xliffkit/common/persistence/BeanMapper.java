@@ -31,7 +31,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
 import net.sf.okapi.common.resource.BaseNameable;
@@ -67,16 +66,13 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.DocumentBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.DocumentPartBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.EndingBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.EventBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.FilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.GenericFilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.GenericSkeletonBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.GenericSkeletonPartBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.InlineAnnotationBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.InputStreamBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.MultiEventBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.OpenXMLZipFilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.ParametersBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.PensieveFilterWriterBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.PropertyBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.RangeBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.RawDocumentBean;
@@ -128,6 +124,7 @@ public class BeanMapper {
 		beanMapping.put(classRef, beanClassRef);		
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static Class<? extends IPersistenceBean> getBeanClass(Class<?> classRef) {
 		if (classRef == null)
 			throw(new IllegalArgumentException(MSG5));
@@ -140,12 +137,14 @@ public class BeanMapper {
 		
 		// If not found explicitly, try to find a matching bean
 		if (beanClass == null)
+			if (IPersistenceBean.class.isAssignableFrom(classRef))
+				beanClass = (Class<? extends IPersistenceBean>) classRef;
+			else
 			for (Class<?> cls : beanMapping.keySet())
 				if (cls.isAssignableFrom(classRef)) {
 					beanClass = beanMapping.get(cls);
 					break;
-				}
-		
+				}		
 		return beanClass;		
 	}
 	
@@ -160,7 +159,7 @@ public class BeanMapper {
 		return res;		
 	}
 	
-	public static IPersistenceBean getBean(Class<?> classRef) {
+	public static IPersistenceBean getBean(Class<?> classRef, IPersistenceSession session) {
 		Class<? extends IPersistenceBean> beanClass = 
 			getBeanClass(classRef); // Checks for skelClass == null, beanMapping == null
 		
@@ -173,7 +172,7 @@ public class BeanMapper {
 		IPersistenceBean bean = null; //persistenceCache.get(beanClass); 
 		//if (bean == null) {
 			try {
-				bean = ClassUtil.instantiateClass(beanClass);
+				bean = ClassUtil.instantiateClass(beanClass, session);
 				//persistenceCache.put(beanClass, bean);
 			} catch (Exception e) {
 				throw new RuntimeException(String.format(MSG4, beanClass.getName()), e);
@@ -182,10 +181,10 @@ public class BeanMapper {
 		return bean;		
 	}
 	
-	public static <T> T getObject(Class<T> classRef) {
+	public static <T> T getObject(Class<T> classRef, IPersistenceSession session) {
 		T res = null;
 		try {
-			res = ClassUtil.instantiateClass(classRef);
+			res = ClassUtil.instantiateClass(classRef, session);
 		} catch (Exception e) {
 			throw new RuntimeException(String.format(MSG4, ClassUtil.getClassName(classRef)), e);
 		}
@@ -197,7 +196,7 @@ public class BeanMapper {
 		registerBean(List.class, ListBean.class);
 		registerBean(IParameters.class, ParametersBean.class);
 		//registerBean(IFilterWriter.class, FilterWriterBean.class);
-		registerBean(IPersistenceSession.class, SessionInfo.class);
+		registerBean(IPersistenceSession.class, HeaderBean.class);
 		registerBean(Object.class, TypeInfoBean.class); // If no bean was found, use just this one to store class info
 		
 		// Specific class beans				
@@ -228,14 +227,14 @@ public class BeanMapper {
 		registerBean(ZipEntry.class, ZipEntryBean.class);
 		registerBean(InputStream.class, InputStreamBean.class);
 		registerBean(InlineAnnotation.class, InlineAnnotationBean.class);
-		registerBean(SessionInfo.class, SessionInfo.class);
 		registerBean(GenericFilterWriter.class, GenericFilterWriterBean.class);
-		//registerBean(OpenXMLZipFilterWriter.class, OpenXMLZipFilterWriterBean.class);		
-		//registerBean(PensieveFilterWriter.class, PensieveFilterWriterBean.class);
-		//registerBean(POFilterWriter.class, POFilterWriterBean.class);
-		//registerBean(TableFilterWriter.class, TableFilterWriterBean.class);
 		registerBean(TMXFilterWriter.class, TMXFilterWriterBean.class);
 		registerBean(ZipFilterWriter.class, ZipFilterWriterBean.class);
+		// Registered here to require dependencies at development-time
+		registerBean(OpenXMLZipFilterWriter.class, TypeInfoBean.class); 		
+		registerBean(PensieveFilterWriter.class, TypeInfoBean.class);
+		registerBean(POFilterWriter.class, TypeInfoBean.class);
+		registerBean(TableFilterWriter.class, TypeInfoBean.class);		
 		//registerBean(.class, Bean.class);
 	}
 }

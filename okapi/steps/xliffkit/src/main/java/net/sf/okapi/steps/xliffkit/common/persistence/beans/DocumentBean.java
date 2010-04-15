@@ -28,12 +28,18 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class DocumentBean implements IPersistenceBean {
+public class DocumentBean extends PersistenceBean {
 
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	private String id;
 	private List<FactoryBean> documentResources = new ArrayList<FactoryBean>();
+	
+	public DocumentBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {		
@@ -62,7 +68,7 @@ public class DocumentBean implements IPersistenceBean {
 			Document doc = (Document) obj;
 			
 			for (IAnnotation annotation : doc.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean();
+				FactoryBean annotationBean = new FactoryBean(getSession());
 				annotations.add(annotationBean);
 				annotationBean.set(annotation);
 			}
@@ -70,7 +76,7 @@ public class DocumentBean implements IPersistenceBean {
 			id = doc.getId();
 			
 			for (IResource res : doc) {
-				FactoryBean resBean = new FactoryBean();
+				FactoryBean resBean = new FactoryBean(getSession());
 				resBean.set(res);
 				documentResources.add(resBean);
 			}						

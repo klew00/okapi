@@ -23,8 +23,10 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import java.util.zip.ZipEntry;
 
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class ZipEntryBean implements IPersistenceBean {
+public class ZipEntryBean extends PersistenceBean {
 
 	private String name;	// entry name
 	private long time = -1;	// modification time (in DOS time)
@@ -34,7 +36,11 @@ public class ZipEntryBean implements IPersistenceBean {
 	private int method = -1;	// compression method
 	private byte[] extra;       // optional extra field data for entry
 	private String comment;     // optional comment string for entry
-	private InputStreamBean inputStream = new InputStreamBean();
+	private InputStreamBean inputStream = new InputStreamBean(getSession());
+	
+	public ZipEntryBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {

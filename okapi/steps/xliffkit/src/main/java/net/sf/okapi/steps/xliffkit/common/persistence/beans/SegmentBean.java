@@ -23,10 +23,15 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class SegmentBean extends TextPartBean {
 	
 	private String id;
+	
+	public SegmentBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {

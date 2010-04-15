@@ -49,7 +49,7 @@ public class TestProtocolBuffers {
 	@Test
 	public void testBean() {
 		
-		BaseNameableBean bean = new BaseNameableBean();
+		BaseNameableBean bean = new BaseNameableBean(null);
 		bean.set(new BaseNameable());
 		bean.set(null);
 		assertNotNull(bean);

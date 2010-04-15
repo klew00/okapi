@@ -21,8 +21,13 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class StartGroupBean extends BaseReferenceableBean {
+
+	public StartGroupBean(IPersistenceSession session) {
+		super(session);
+	}
 
 	@Override
 	public <T> T get(T obj) {

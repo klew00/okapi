@@ -28,11 +28,16 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class ZipSkeletonBean extends GenericSkeletonBean {
 
-	private ZipFileBean original = new ZipFileBean();
+	private ZipFileBean original = new ZipFileBean(getSession());
 	private String entry;
+	
+	public ZipSkeletonBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {

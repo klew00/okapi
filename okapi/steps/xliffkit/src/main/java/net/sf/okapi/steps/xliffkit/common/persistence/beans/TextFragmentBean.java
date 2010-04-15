@@ -21,18 +21,23 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class TextFragmentBean implements IPersistenceBean {
+public class TextFragmentBean extends PersistenceBean {
 
 	private String text;
 	private List<CodeBean> codes = new ArrayList<CodeBean>();
 	
+	public TextFragmentBean(IPersistenceSession session) {
+		super(session);
+	}
+
 	@Override
 	public <T> T get(T obj) {
 		if (obj instanceof TextFragment) {
@@ -62,7 +67,7 @@ public class TextFragmentBean implements IPersistenceBean {
 			text = tc.getCodedText();
 			
 			for (Code code : tc.getCodes()) {
-				CodeBean codeBean = new CodeBean();
+				CodeBean codeBean = new CodeBean(getSession());
 				codeBean.set(code);
 				codes.add(codeBean);
 			}			

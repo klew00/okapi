@@ -22,10 +22,14 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import net.sf.okapi.common.ClassUtil;
 
-public class TypeInfoBean implements IPersistenceBean {
+public class TypeInfoBean extends PersistenceBean {
 
 	private String className;
 	
+	public TypeInfoBean(IPersistenceSession session) {
+		super(session);
+	}
+
 	@Override
 	public <T> T get(T obj) {
 		return obj;

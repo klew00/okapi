@@ -22,6 +22,8 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
+import java.util.Set;
 
 public interface IPersistenceSession {
 
@@ -55,6 +57,13 @@ public interface IPersistenceSession {
 	void serialize(Object obj);
 	
 	/**
+	 * Serializes to the session output stream a given object, labeling it with a given field label if implementation allows.
+	 * @param obj the given object to be serialized.
+	 * @param name field name of the object.
+	 */
+	void serialize(Object obj, String name);
+	
+	/**
 	 * Deserializes an object from the session input stream.
 	 * @return the deserialized object.
 	 */
@@ -78,4 +87,14 @@ public interface IPersistenceSession {
 	String getRootClass();
 	
 	String getDescription();
+		
+	int generateRefId();
+	
+	int getRefIdForObject(Object obj);
+	
+	void setRefIdForObject(Object obj, int refId);
+
+	void setReference(int parentRefId, int childRefId);
+
+	Map<Integer, Set<Integer>> getReferences();
 }

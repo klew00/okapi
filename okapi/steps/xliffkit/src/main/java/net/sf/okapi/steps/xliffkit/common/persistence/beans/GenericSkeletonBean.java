@@ -26,10 +26,16 @@ import java.util.List;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class GenericSkeletonBean implements IPersistenceBean {
+public class GenericSkeletonBean extends PersistenceBean {
 
 	private List<GenericSkeletonPartBean> parts = new ArrayList<GenericSkeletonPartBean>();
+	
+	public GenericSkeletonBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {
@@ -53,7 +59,7 @@ public class GenericSkeletonBean implements IPersistenceBean {
 			GenericSkeleton skel = (GenericSkeleton) obj;
 			
 			for (GenericSkeletonPart part : skel.getParts()) {
-				GenericSkeletonPartBean partBean = new GenericSkeletonPartBean();
+				GenericSkeletonPartBean partBean = new GenericSkeletonPartBean(getSession());
 				parts.add(partBean);
 				partBean.set(part);
 			}

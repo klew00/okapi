@@ -23,11 +23,17 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class ParametersBean implements IPersistenceBean {
+public class ParametersBean extends PersistenceBean {
 
 	private String className;
 	private String data;
+	
+	public ParametersBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {

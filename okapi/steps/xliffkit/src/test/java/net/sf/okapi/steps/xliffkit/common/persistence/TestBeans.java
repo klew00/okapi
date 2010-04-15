@@ -21,10 +21,26 @@
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.zip.ZipFile;
+
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.BaseReferenceable;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.ZipSkeleton;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.BaseNameableBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.BaseReferenceableBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextUnitBean;
 
 import org.junit.Test;
 
@@ -33,7 +49,8 @@ public class TestBeans {
 
 	@Test
 	public void test1() {
-		BaseNameableBean bean = new BaseNameableBean();
+		JSONPersistenceSession session = new JSONPersistenceSession();
+		BaseNameableBean bean = new BaseNameableBean(session);
 		BaseNameable bn = new BaseNameable();
 		bn.setId("the id");
 		bn.setName("the name");
@@ -45,7 +62,7 @@ public class TestBeans {
 		assertEquals("the name", bn2.getName());
 		assertEquals("the type", bn2.getType());
 		
-		BaseReferenceableBean bean2 = new BaseReferenceableBean();		
+		BaseReferenceableBean bean2 = new BaseReferenceableBean(session);		
 		BaseReferenceable br = new BaseReferenceable();
 		br.setId("the id");
 		br.setName("the name");
@@ -60,4 +77,32 @@ public class TestBeans {
 		assertEquals("the name", br2.getName());
 		assertEquals("the type", br2.getType());		
 	}
+	
+	// DEBUG 
+	@Test
+	public void testObjectStream() throws FileNotFoundException, IOException {		
+		File tempF = File.createTempFile("~temp", null);
+		tempF.deleteOnExit();
+		ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(tempF));
+		
+		File outF = File.createTempFile("~temp", null);
+		outF.deleteOnExit();
+		OutputStream outStream = new FileOutputStream(outF);
+				
+		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		tu1.setSkeleton(new GenericSkeleton());
+		tu1.setTarget(LocaleId.FRENCH, new TextContainer("french-text1"));
+		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
+		
+		JSONPersistenceSession session = new JSONPersistenceSession();		
+		TextUnitBean tuBean = new TextUnitBean(session);
+		
+		os.writeObject(tuBean);
+		
+		session.start(outStream);
+		session.end();
+	}
+	
+
 }

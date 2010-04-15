@@ -27,22 +27,27 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class BaseNameableBean implements IPersistenceBean{
+public class BaseNameableBean extends PersistenceBean {
 
 	private String id;
 	private String name;
 	private String type;
-	private FactoryBean skeleton = new FactoryBean();	
+	private FactoryBean skeleton = new FactoryBean(getSession());	
 	private String mimeType;
 	private boolean isTranslatable;
 	private boolean preserveWS;
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	private List<PropertyBean> sourceProperties = new ArrayList<PropertyBean>();
+	
+	public BaseNameableBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {
@@ -90,19 +95,19 @@ public class BaseNameableBean implements IPersistenceBean{
 			preserveWS = bn.preserveWhitespaces();
 			
 			for (String propName : bn.getPropertyNames()) {
-				PropertyBean propBean = new PropertyBean();
+				PropertyBean propBean = new PropertyBean(getSession());
 				propBean.set(bn.getProperty(propName));
 				properties.add(propBean);
 			}
 			
 			for (IAnnotation annotation : bn.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean();
+				FactoryBean annotationBean = new FactoryBean(getSession());
 				annotations.add(annotationBean);
 				annotationBean.set(annotation);
 			}
 			
 			for (String propName : bn.getSourcePropertyNames()) {
-				PropertyBean propBean = new PropertyBean();
+				PropertyBean propBean = new PropertyBean(getSession());
 				propBean.set(bn.getSourceProperty(propName));
 				sourceProperties.add(propBean);
 			}

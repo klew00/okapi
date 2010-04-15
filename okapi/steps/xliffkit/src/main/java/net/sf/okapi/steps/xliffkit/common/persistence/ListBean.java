@@ -25,11 +25,15 @@ import java.util.List;
 
 import net.sf.okapi.common.ClassUtil;
 
-public class ListBean implements IPersistenceBean {
+public class ListBean extends PersistenceBean {
 
 	private String className;
 	List<FactoryBean> items = new ArrayList<FactoryBean>();
 	
+	public ListBean(IPersistenceSession session) {
+		super(session);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(T obj) {
@@ -68,7 +72,7 @@ public class ListBean implements IPersistenceBean {
 			className = ClassUtil.getQualifiedClassName(obj);
 			List<?> list = (List<?>) obj;
 			for (Object item : list) {
-				FactoryBean itemBean = new FactoryBean();
+				FactoryBean itemBean = new FactoryBean(getSession());
 				itemBean.set(item);
 				items.add(itemBean);
 			}
@@ -91,5 +95,4 @@ public class ListBean implements IPersistenceBean {
 	public String getClassName() {
 		return className;
 	}
-
 }

@@ -20,12 +20,23 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
+import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class GenericSkeletonPartBean implements IPersistenceBean {
+public class GenericSkeletonPartBean extends PersistenceBean {
 
 	private String data;
+	private FactoryBean parent = new FactoryBean(getSession());
+	private String locId;
+	
+	public GenericSkeletonPartBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {
@@ -34,7 +45,9 @@ public class GenericSkeletonPartBean implements IPersistenceBean {
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new GenericSkeletonPart(data)));
+		// IResource res = RefResolver.resolve(IResource.class, parent);
+		return classRef.cast(get(new GenericSkeletonPart(data, parent.get(IResource.class), 
+				new LocaleId(locId))));
 	}
 
 	@Override
@@ -43,6 +56,15 @@ public class GenericSkeletonPartBean implements IPersistenceBean {
 			GenericSkeletonPart part = (GenericSkeletonPart) obj;
 			
 			data = part.toString();
+//			IResource res = part.getParent();
+//			if (res != null) {
+//				parent = res.getId();
+//				parentClass = ClassUtil.getQualifiedClassName(res);
+//			}
+			parent.set(part.getParent());
+			LocaleId loc = part.getLocale();
+			if (loc != null)
+				locId = loc.toString();			
 		}
 		return this;
 	}
@@ -53,5 +75,21 @@ public class GenericSkeletonPartBean implements IPersistenceBean {
 
 	public void setData(String data) {
 		this.data = data;
+	}
+
+	public void setLocId(String locId) {
+		this.locId = locId;
+	}
+
+	public String getLocId() {
+		return locId;
+	}
+
+	public FactoryBean getParent() {
+		return parent;
+	}
+
+	public void setParent(FactoryBean parent) {
+		this.parent = parent;
 	}
 }

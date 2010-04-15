@@ -21,9 +21,22 @@
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
+import java.util.Set;
+
+import net.sf.okapi.common.StreamUtil;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
+
+import org.codehaus.jackson.JsonEncoding;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
@@ -37,23 +50,31 @@ import org.codehaus.jackson.map.SerializationConfig;
 
 public class JSONPersistenceSession implements IPersistenceSession {
 
+	private static final String JSON_HEADER = "header";
+	private static final String JSON_BODY = "body";
+	private static final String JSON_ITEM = "item";
 	private static final String VERSION = "1.0";
 	private static final Class<?> rootClass = net.sf.okapi.common.Event.class;
-	private static final String MIME_TYPE = "application/json";
-	// RFC http://www.ietf.org/rfc/rfc4627.txt
+	private static final String MIME_TYPE = "application/json"; // RFC http://www.ietf.org/rfc/rfc4627.txt	
 	
 	private ObjectMapper mapper;
 	private JsonFactory jsonFactory;
-	private JsonParser parser;	
+	private JsonParser parser;
+	private JsonGenerator headerGen;
+	private JsonGenerator bodyGen;
 	private OutputStream outStream;
+	private OutputStream bodyOut;
+	private File headerTemp;
+	private File bodyTemp;
 	private InputStream inStream;
 	private boolean isActive;	
 	private String description;
-	//private Class<? extends IPersistenceBean> beanClass;
+	private ReferenceResolver refResolver = new ReferenceResolver();
+	private String itemLabel = JSON_ITEM;
+	private int itemCounter = 0;
 
 	public JSONPersistenceSession() {
 		super();
-		//this.beanClass = BeanMapper.getBeanClass(rootClass);
 		
 		mapper = new ObjectMapper();		
 		mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true); 
@@ -68,6 +89,10 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	
 	public JSONPersistenceSession(OutputStream outStream) {
 		start(outStream);
+	}
+	
+	public JSONPersistenceSession(OutputStream outStream, String itemLabel) {
+		start(outStream, itemLabel);
 	}
 	
 	public JSONPersistenceSession(InputStream inStream) {
@@ -86,7 +111,6 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		IPersistenceBean bean = null;
 		try {
 			Class<? extends IPersistenceBean> beanClass = BeanMapper.getBeanClass(classRef);
-				//this.beanClass = BeanMapper.getBeanClass(rootClass);
 			bean = mapper.readValue(parser, beanClass);
 			//bean = mapper.readValue(parser, IPersistenceBean.class);
 						
@@ -101,8 +125,7 @@ public class JSONPersistenceSession implements IPersistenceSession {
 			end();
 			return null;
 		} catch (IOException e) {
-			// TODO Handle exception
-			e.printStackTrace();
+			throw new OkapiIOException(e);
 		}
 		
 		if (bean == null) return null;
@@ -111,49 +134,139 @@ public class JSONPersistenceSession implements IPersistenceSession {
 
 	@Override
 	public void end() {
-		if (!isActive) return;
-		isActive = false;
+		if (!isActive) return;		
 		
 		if (inStream != null)
 			try {
+				parser.close();
 				inStream.close();
 			} catch (IOException e) {
-				// TODO Handle exception
+				throw new OkapiIOException(e);
 			}
-		if (outStream != null)
+		if (outStream != null) {			
+			// Finalize body
 			try {
-				outStream.close();
-			} catch (IOException e) {
+				//generator.writeEndObject();				
+				bodyGen.writeRaw('}'); // writeEndObject() counts levels and throws exception instead
+				
+				bodyGen.close();
+				bodyOut.close();
+			} catch (JsonGenerationException e) {
 				// TODO Handle exception
+				e.printStackTrace();
+			} catch (IOException e) {
+				throw new OkapiIOException(e);
 			}
+			
+			// Write header and references
+			OutputStream headerOut;
+			try {
+				headerTemp = File.createTempFile("~temp", null);
+				headerTemp.deleteOnExit();
+				headerOut = new FileOutputStream(headerTemp);
+				
+				headerGen = jsonFactory.createJsonGenerator(headerOut, JsonEncoding.UTF8);
+				headerGen.useDefaultPrettyPrinter();
+
+				headerGen.writeStartObject();
+				// All this, because references are built during body serialization, but need to be in header
+				serialize(headerGen, this, JSON_HEADER);
+				headerGen.writeFieldName(JSON_BODY);
+				headerGen.writeRaw(" : ");
+				
+				headerGen.flush(); // !!!
+				headerOut.close();
+			} catch (JsonGenerationException e) {
+				// TODO Handle exception
+				e.printStackTrace();
+			} catch (IOException e) {
+				throw new OkapiIOException(e);
+			}
+			
+			// Write out stream
+			try {
+				InputStream headerIn = new FileInputStream(headerTemp);
+				InputStream bodyIn = new FileInputStream(bodyTemp);
+				
+				StreamUtil.copy(headerIn, outStream);
+				StreamUtil.copy(bodyIn, outStream);
+			
+				// !!! Do not close external outStream
+				
+			} catch (FileNotFoundException e) {
+				throw new OkapiFileNotFoundException(e);
+			} 			
+		}
+		isActive = false;
 		inStream = null;
 		outStream = null;
-		SessionMapper.endSession();
+		refResolver.reset();		
 	}
 
+	private void serialize(JsonGenerator generator, Object obj) {
+		if (!isActive) return;
+////		if (!rootClass.isInstance(obj))
+////			throw new IllegalArgumentException(String.format("JSONPersistenceSession: " +
+////					"unable to serialize %s, this session handles only %s", 
+////					ClassUtil.getQualifiedClassName(obj),
+////					ClassUtil.getQualifiedClassName(rootClass)));
+//		
+//		IPersistenceBean bean = BeanMapper.getBean(obj.getClass(), this);
+//		
+//		bean.set(obj);
+//		
+////		Event ev = bean.read(Event.class);
+////		if (ev != null) {
+////			IResource r = ev.getResource();
+////			if (r != null) {
+////				System.out.println(r.getClass().getName());
+////			}
+////		}
+//		
+//		try {
+//			mapper.writeValue(generator, bean);
+//			
+//		} catch (JsonGenerationException e) {
+//			// TODO Handle exception
+//			e.printStackTrace();
+//		} catch (JsonMappingException e) {
+//			// TODO Handle exception
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Handle exception
+//			e.printStackTrace();
+//		}
+		serialize(obj, String.format("%s%d", itemLabel, ++itemCounter));
+	}
+	
 	@Override
 	public void serialize(Object obj) {
+		serialize(bodyGen, obj);
+	}
+	
+	@Override
+	public void serialize(Object obj, String name) {
+		serialize(bodyGen, obj, name);
+	}
+	
+	private void serialize(JsonGenerator generator, Object obj, String name) {
 		if (!isActive) return;
-//		if (!rootClass.isInstance(obj))
-//			throw new IllegalArgumentException(String.format("JSONPersistenceSession: " +
-//					"unable to serialize %s, this session handles only %s", 
-//					ClassUtil.getQualifiedClassName(obj),
-//					ClassUtil.getQualifiedClassName(rootClass)));
+		try {
+			generator.writeFieldName(name);
+		} catch (JsonGenerationException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		} catch (IOException e) {
+			throw new OkapiIOException(e);
+		}
+		IPersistenceBean bean = BeanMapper.getBean(obj.getClass(), this);
+		if (bean == null) return;
 		
-		IPersistenceBean bean = BeanMapper.getBean(obj.getClass());
-		
+		refResolver.setRootId(bean.getRefId());
 		bean.set(obj);
 		
-//		Event ev = bean.read(Event.class);
-//		if (ev != null) {
-//			IResource r = ev.getResource();
-//			if (r != null) {
-//				System.out.println(r.getClass().getName());
-//			}
-//		}
-		
 		try {
-			mapper.writeValue(outStream, bean);
+			mapper.writeValue(generator, bean);
 			
 		} catch (JsonGenerationException e) {
 			// TODO Handle exception
@@ -162,27 +275,46 @@ public class JSONPersistenceSession implements IPersistenceSession {
 			// TODO Handle exception
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Handle exception
-			e.printStackTrace();
+			throw new OkapiIOException(e);
 		}
 	}
 
 	@Override
 	public void start(OutputStream outStream) {
+		start(outStream, null);
+	}
+	
+	public void start(OutputStream outStream, String itemLabel) {
 		if (outStream == null)
 			throw(new IllegalArgumentException("JSONPersistenceSession: output stream cannot be null"));
 		end();
 		
+		if (Util.isEmpty(itemLabel))
+			this.itemLabel = JSON_ITEM;
+		else
+			this.itemLabel = itemLabel;
+				
+		itemCounter = 0;
 		this.outStream = outStream;
+		try {
+			bodyTemp = File.createTempFile("~temp", null);
+			bodyTemp.deleteOnExit();
+			bodyOut = new FileOutputStream(bodyTemp);
+			
+			bodyGen = jsonFactory.createJsonGenerator(bodyOut, JsonEncoding.UTF8);
+			bodyGen.useDefaultPrettyPrinter();
+			bodyGen.writeStartObject();
+		} catch (IOException e) {
+			throw new OkapiIOException(e);
+		}
 		startSession();
-		serialize(this); // Write out the header
 	}
 
 	private void startSession() {		
-		SessionMapper.startSession(this);
+		refResolver.reset();
 		isActive = true;		
 	}
-
+	
 	@Override
 	public void start(InputStream inStream) {
 		if (inStream == null)
@@ -196,12 +328,11 @@ public class JSONPersistenceSession implements IPersistenceSession {
 			// TODO Handle exception
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Handle exception
-			e.printStackTrace();
+			throw new OkapiIOException(e);
 		}
 		startSession();
-		SessionInfo inputSessionInfo = deserialize(SessionInfo.class);
-		SessionMapper.configureSession(this, inputSessionInfo);
+		//HeaderBean headerBean = deserialize(HeaderBean.class);
+		deserialize(HeaderBean.class);
 	}
 
 	@Override
@@ -233,4 +364,28 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		this.description = description;
 	}
 
+	@Override
+	public int generateRefId() {
+		return refResolver.generateRefId();
+	}
+
+	@Override
+	public int getRefIdForObject(Object obj) {
+		return refResolver.getRefIdForObject(obj);
+	}
+
+	@Override
+	public void setRefIdForObject(Object obj, int refId) {
+		refResolver.setRefIdForObject(obj, refId);
+	}
+
+	@Override
+	public void setReference(int parentRefId, int childRefId) {
+		refResolver.addReference(parentRefId, childRefId);
+	}
+
+	@Override
+	public Map<Integer, Set<Integer>> getReferences() {		
+		return refResolver.getReferences();
+	}
 }

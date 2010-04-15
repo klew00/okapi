@@ -25,10 +25,16 @@ import java.io.InputStream;
 
 import net.sf.okapi.common.StreamUtil;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class InputStreamBean implements IPersistenceBean {
+public class InputStreamBean extends PersistenceBean {
 
 	private byte[] data;
+	
+	public InputStreamBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {

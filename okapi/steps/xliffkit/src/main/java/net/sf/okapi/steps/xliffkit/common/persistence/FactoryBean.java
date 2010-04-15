@@ -22,13 +22,16 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import net.sf.okapi.common.ClassUtil;
 
-public class FactoryBean implements IPersistenceBean {
+public class FactoryBean extends PersistenceBean {
 	
+	private int reference;
 	private String className;
 	private Object content;	// Bean for the className
 	
-	private IPersistenceSession session = SessionMapper.getSession();
-	
+	public FactoryBean(IPersistenceSession session) {
+		super(session);
+	}
+
 	@Override
 	public <T> T get(T obj) {
 		return obj;
@@ -52,8 +55,8 @@ public class FactoryBean implements IPersistenceBean {
 //		return className.equals(cname);
 		boolean res = content instanceof IPersistenceBean; 
 		if (!res) {
-			if (session == null) return false;
-			content = session.convert(content, BeanMapper.getBeanClass(className));
+			if (getSession() == null) return false;
+			content = getSession().convert(content, BeanMapper.getBeanClass(className));
 			res = content instanceof IPersistenceBean;
 		}
 		return res;
@@ -66,10 +69,23 @@ public class FactoryBean implements IPersistenceBean {
 		className = ClassUtil.getQualifiedClassName(obj);
 		//System.out.println(className);
 		
-		IPersistenceBean bean = BeanMapper.getBean(ClassUtil.getClass(obj));
+		//int rid = beenLookup.get(obj);
+		int refId = this.getRefId(); 
+		int rid = getSession().getRefIdForObject(obj);
+		if (rid != 0) {
+			reference = rid;
+			getSession().setRefIdForObject(this, refId); // To find the ref parent's root
+			getSession().setReference(refId, rid);
+			content = null;			
+			return this;
+		}
+		
+		IPersistenceBean bean = BeanMapper.getBean(ClassUtil.getClass(obj), getSession());
+		getSession().setRefIdForObject(obj, refId);
+		reference = 0;
 		content = bean;
 		
-		return (bean instanceof FactoryBean) ? this : bean.set(obj); 
+		return (bean instanceof FactoryBean) ? this : bean.set(obj);		
 	}
 	
 	public void setClassName(String className) {
@@ -88,4 +104,11 @@ public class FactoryBean implements IPersistenceBean {
 		return content;
 	}
 
+	public void setReference(int reference) {
+		this.reference = reference;
+	}
+
+	public int getReference() {
+		return reference;
+	}
 }

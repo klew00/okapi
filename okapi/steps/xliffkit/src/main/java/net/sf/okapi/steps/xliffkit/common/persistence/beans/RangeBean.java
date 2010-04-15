@@ -22,10 +22,16 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.Range;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class RangeBean implements IPersistenceBean {
+public class RangeBean extends PersistenceBean {
 	private int start;
 	private int end;
+	
+	public RangeBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {

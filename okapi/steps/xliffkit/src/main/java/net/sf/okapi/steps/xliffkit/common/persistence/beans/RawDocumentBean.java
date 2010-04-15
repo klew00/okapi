@@ -31,8 +31,10 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class RawDocumentBean implements IPersistenceBean {
+public class RawDocumentBean extends PersistenceBean {
 
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	private String filterConfigId;
@@ -44,6 +46,10 @@ public class RawDocumentBean implements IPersistenceBean {
 	private String inputCharSequence;
 	// TODO Handle inputStream if possible at all
 	// private InputStreamBean inputStream; 
+	
+	public RawDocumentBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {
@@ -86,7 +92,7 @@ public class RawDocumentBean implements IPersistenceBean {
 			RawDocument rd = (RawDocument) obj;
 			
 			for (IAnnotation annotation : rd.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean();
+				FactoryBean annotationBean = new FactoryBean(getSession());
 				annotations.add(annotationBean);
 				annotationBean.set(annotation);
 			}

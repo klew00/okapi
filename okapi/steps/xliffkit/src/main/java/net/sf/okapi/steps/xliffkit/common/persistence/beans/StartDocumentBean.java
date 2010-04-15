@@ -26,16 +26,21 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class StartDocumentBean extends BaseNameableBean {
 
 	private String locale;
 	private String encoding;
 	private boolean isMultilingual;
-	private FactoryBean filterParameters = new FactoryBean();
-	private FactoryBean filterWriter = new FactoryBean();
+	private FactoryBean filterParameters = new FactoryBean(getSession());
+	private FactoryBean filterWriter = new FactoryBean(getSession());
 	private boolean hasUTF8BOM;
 	private String lineBreak;
+	
+	public StartDocumentBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {

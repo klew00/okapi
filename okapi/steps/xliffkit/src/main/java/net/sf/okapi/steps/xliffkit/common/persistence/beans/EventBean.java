@@ -25,11 +25,17 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class EventBean implements IPersistenceBean {
+public class EventBean extends PersistenceBean {
 
 	private EventType type;
-	private FactoryBean resource = new FactoryBean();
+	private FactoryBean resource = new FactoryBean(getSession());
+	
+	public EventBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {

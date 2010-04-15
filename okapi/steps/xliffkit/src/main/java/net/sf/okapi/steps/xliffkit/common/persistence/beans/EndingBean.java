@@ -28,12 +28,18 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class EndingBean implements IPersistenceBean {
+public class EndingBean extends PersistenceBean {
 
 	private String id;
-	private FactoryBean skeleton = new FactoryBean();
+	private FactoryBean skeleton = new FactoryBean(getSession());
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	
+	public EndingBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {
@@ -63,7 +69,7 @@ public class EndingBean implements IPersistenceBean {
 			skeleton.set(en.getSkeleton());
 			
 			for (IAnnotation annotation : en.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean();
+				FactoryBean annotationBean = new FactoryBean(getSession());
 				annotations.add(annotationBean);
 				annotationBean.set(annotation);
 			}

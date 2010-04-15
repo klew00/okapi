@@ -25,9 +25,15 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class TMXFilterWriterBean implements IPersistenceBean {
+public class TMXFilterWriterBean extends PersistenceBean {
 
+	public TMXFilterWriterBean(IPersistenceSession session) {
+		super(session);
+	}
+	
 	@Override
 	public <T> T get(T obj) {
 		return obj;

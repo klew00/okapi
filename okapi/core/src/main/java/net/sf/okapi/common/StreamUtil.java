@@ -21,8 +21,16 @@
 package net.sf.okapi.common;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+
+import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 
 /**
  * Implements a helper method to read an InputStream into an array of bytes.
@@ -57,6 +65,43 @@ public class StreamUtil {
 		}
 
 		return out.toByteArray();
-	} 
+	}
 
+	private static final int IO_BUFFER_SIZE = 8 * 1024;
+	
+	public static void copy(InputStream in, OutputStream out) {		
+		byte[] b = new byte[IO_BUFFER_SIZE];  
+		int read;  
+		try {
+			while ((read = in.read(b)) != -1) {  
+			out.write(b, 0, read);  
+			}
+		} catch (IOException e) {
+			throw new OkapiIOException(e);
+		}
+	} 
+	
+	public static void copy(File in, OutputStream out) {
+		try {
+			copy(new FileInputStream(in), out);
+		} catch (FileNotFoundException e) {
+			throw new OkapiFileNotFoundException(e);
+		}
+	}
+	
+	public static void copy(InputStream in, File out) {
+		try {
+			copy(in, new FileOutputStream(out));
+		} catch (FileNotFoundException e) {
+			throw new OkapiFileNotFoundException(e);
+		}
+	}
+	
+	public static void copy(File in, File out) {
+		try {
+			copy(new FileInputStream(in), new FileOutputStream(out));
+		} catch (FileNotFoundException e) {
+			throw new OkapiFileNotFoundException(e);
+		}
+	}
 }

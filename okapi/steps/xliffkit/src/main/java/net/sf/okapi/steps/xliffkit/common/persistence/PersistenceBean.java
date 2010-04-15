@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,12 +20,23 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
-import java.util.ArrayList;
+public abstract class PersistenceBean implements IPersistenceBean {
+	
+	private int refId;
+	transient private IPersistenceSession session;
 
-import net.sf.okapi.common.Event;
+	public PersistenceBean(IPersistenceSession session) {
+		super();		
+		this.session = session;
+		refId = session.generateRefId();
+	}
+	
+	@Override
+	public int getRefId() {
+		return refId;
+	}
 
-public class Events extends ArrayList<Event> {
-
-	private static final long serialVersionUID = -6247590782754986357L;
-
+	protected IPersistenceSession getSession() {
+		return session;
+	}
 }

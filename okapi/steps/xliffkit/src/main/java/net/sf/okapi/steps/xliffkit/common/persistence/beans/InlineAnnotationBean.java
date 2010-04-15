@@ -22,10 +22,16 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class InlineAnnotationBean implements IPersistenceBean {
+public class InlineAnnotationBean extends PersistenceBean {
 
 	private String data;
+	
+	public InlineAnnotationBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {

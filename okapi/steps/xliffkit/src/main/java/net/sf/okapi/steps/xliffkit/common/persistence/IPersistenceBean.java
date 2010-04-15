@@ -27,5 +27,6 @@ public interface IPersistenceBean {
 	<T> T get(Class<T> classRef);
 	
 	IPersistenceBean set(Object obj); // Returns self to allow chaining
-	
+
+	int getRefId();
 }

@@ -28,12 +28,18 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class MultiEventBean implements IPersistenceBean {
+public class MultiEventBean extends PersistenceBean {
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	private String id;
 	private boolean propagateAsSingleEvent = false;
 	private List<EventBean> events = new ArrayList<EventBean>();
+	
+	public MultiEventBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {
@@ -63,7 +69,7 @@ public class MultiEventBean implements IPersistenceBean {
 			MultiEvent mev = (MultiEvent) obj;
 			
 			for (IAnnotation annotation : mev.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean();
+				FactoryBean annotationBean = new FactoryBean(getSession());
 				annotations.add(annotationBean);
 				annotationBean.set(annotation);
 			}
@@ -72,7 +78,7 @@ public class MultiEventBean implements IPersistenceBean {
 			propagateAsSingleEvent = mev.isPropagateAsSingleEvent();
 			
 			for (Event event : mev) {
-				EventBean eventBean = new EventBean();
+				EventBean eventBean = new EventBean(getSession());
 				events.add(eventBean);
 				eventBean.set(event);
 			}

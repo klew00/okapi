@@ -23,12 +23,17 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class StartSubDocumentBean extends BaseNameableBean {
 
 	private String parentId;
-	private ParametersBean filterParams = new ParametersBean();
+	private ParametersBean filterParams = new ParametersBean(getSession());
 	
+	public StartSubDocumentBean(IPersistenceSession session) {
+		super(session);
+	}
+
 	@Override
 	public <T> T get(T obj) {
 		obj = super.get(obj);

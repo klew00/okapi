@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.xliffkit.reader;
 
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
@@ -28,6 +30,12 @@ import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Pipeline;
 import org.junit.Test;
 
 public class XLIFFKitReaderTest {
+	
+	private static final LocaleId ENUS = new LocaleId("en", "us");
+	private static final LocaleId FRFR = new LocaleId("fr", "fr");
+	private static final LocaleId DEDE = new LocaleId("de", "de");
+	private static final LocaleId ITIT = new LocaleId("it", "it");
+	
 	// DEBUG 
 	@Test
 	public void testReader() {
@@ -37,13 +45,15 @@ public class XLIFFKitReaderTest {
 				new Batch(
 						new BatchItem(
 								this.getClass().getResource("draft4.xliff.kit"),
-								null,
-								null)
+								"UTF-8",
+								Util.getTempDirectory() + "/draft4",
+								"UTF-8",
+								ENUS,
+								ENUS)
 						),
 				new XLIFFKitReaderStep()
-//				,
-				
-//				new EventLogger()
+				,				
+				new EventLogger()
 //				,
 //				
 //				new FilterEventsToRawDocumentStep()

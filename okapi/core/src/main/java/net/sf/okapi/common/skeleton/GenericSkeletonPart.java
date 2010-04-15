@@ -40,6 +40,22 @@ public class GenericSkeletonPart { // public for OpenXML
 		this.data = new StringBuilder();
 		this.data.append(data);
 	}
+	
+	public GenericSkeletonPart(String data, IResource parent,
+			LocaleId locId) {
+		super();
+		this.data = new StringBuilder(data);
+		this.parent = parent;
+		this.locId = locId;
+	}
+	
+	public GenericSkeletonPart(char data, IResource parent,
+			LocaleId locId) {
+		super();
+		this.data = new StringBuilder(data);
+		this.parent = parent;
+		this.locId = locId;
+	}
 
 	@Override
 	public String toString () {
@@ -52,6 +68,10 @@ public class GenericSkeletonPart { // public for OpenXML
 
 	public LocaleId getLocale () {
 		return locId;
+	}
+
+	public IResource getParent() {
+		return parent;
 	}
 
 }

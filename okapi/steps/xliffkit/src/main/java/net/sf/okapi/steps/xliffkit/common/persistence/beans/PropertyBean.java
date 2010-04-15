@@ -27,13 +27,19 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class PropertyBean implements IPersistenceBean {
+public class PropertyBean extends PersistenceBean {
 
 	private String name;
 	private String value;
 	private boolean isReadOnly;
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	
+	public PropertyBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 	@Override
 	public <T> T get(T obj) {
@@ -60,7 +66,7 @@ public class PropertyBean implements IPersistenceBean {
 			isReadOnly = prop.isReadOnly();
 			
 			for (IAnnotation annotation : prop.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean();
+				FactoryBean annotationBean = new FactoryBean(getSession());
 				annotations.add(annotationBean);
 				annotationBean.set(annotation);
 			}

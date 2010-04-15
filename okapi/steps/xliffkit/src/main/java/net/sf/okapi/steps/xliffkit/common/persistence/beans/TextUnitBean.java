@@ -33,20 +33,26 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
-public class TextUnitBean implements IPersistenceBean {
+public class TextUnitBean extends PersistenceBean {
 	private String id;
 	private int refCount;
 	private String name;
 	private String type;
 	private boolean isTranslatable;
 	private boolean preserveWS;	
-	private FactoryBean skeleton = new FactoryBean();
+	private FactoryBean skeleton = new FactoryBean(getSession());
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
-	private TextContainerBean source = new TextContainerBean();
+	private TextContainerBean source = new TextContainerBean(getSession());
 	private String mimeType;
 	private Map<String, TextContainerBean> targets = new ConcurrentHashMap<String, TextContainerBean>();
+	
+	public TextUnitBean(IPersistenceSession session) {
+		super(session);
+	}
 	
 //	private List<RangeBean> srcSegRanges = new ArrayList<RangeBean>();
 //	private ConcurrentHashMap<String, List<RangeBean>> trgSegRanges = new ConcurrentHashMap<String, List<RangeBean>>();
@@ -106,13 +112,13 @@ public class TextUnitBean implements IPersistenceBean {
 			skeleton.set(tu.getSkeleton());
 
 			for (String propName : tu.getPropertyNames()) {
-				PropertyBean propBean = new PropertyBean();
+				PropertyBean propBean = new PropertyBean(getSession());
 				propBean.set(tu.getProperty(propName));
 				properties.add(propBean);
 			}
 			
 			for (IAnnotation annotation : tu.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean();
+				FactoryBean annotationBean = new FactoryBean(getSession());
 				annotations.add(annotationBean);
 				annotationBean.set(annotation);
 			}
@@ -121,7 +127,7 @@ public class TextUnitBean implements IPersistenceBean {
 			mimeType = tu.getMimeType();
 			
 			for (LocaleId locId : tu.getTargetLocales()) {
-				TextContainerBean targetBean = new TextContainerBean();
+				TextContainerBean targetBean = new TextContainerBean(getSession());
 				targets.put(locId.toString(), targetBean);
 				targetBean.set(tu.getTarget(locId));
 			}
