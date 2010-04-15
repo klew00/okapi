@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-
 import junit.framework.Assert;
 
 import net.sf.okapi.common.Event;
@@ -58,41 +57,50 @@ public class DiffLeverageStepTest {
 		URL url = DiffLeverageStepTest.class.getResource("/Test_en_fr_old.po");
 		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH);
 		t.setFilterConfigId("okf_po");
-		diffLeverage.setSecondInput(t);		
+		diffLeverage.setSecondInput(t);
 		diffLeverage.setTargetLocale(LocaleId.FRENCH);
 
 		pipeline.startBatch();
 
-		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/Test_en_fr_new.po"), "UTF-8",
-				LocaleId.ENGLISH, LocaleId.FRENCH));
+		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/Test_en_fr_new.po"),
+				"UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH));
 
 		pipeline.endBatch();
 
 		// test we observed the correct events
-		List<Event> el = eventObserver.getResult();			
+		List<Event> el = eventObserver.getResult();
 		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
-		
+
 		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
 		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
 		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
 		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		
+
 		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
-		
+
 		Event tue1 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue1.getEventType());
+		// TU target copied from old TU
 		Assert.assertNotNull(tue1.getTextUnit().getAnnotation(DiffLeverageAnnotation.class));
-		
+		Assert.assertEquals("Message pour l'identificateur name100 (old)", tue1.getTextUnit()
+				.getTarget(LocaleId.FRENCH).toString());
+
 		Event tue2 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue2.getEventType());
+		// TU target was *not* copied from the old TU
 		Assert.assertNull(tue2.getTextUnit().getAnnotation(DiffLeverageAnnotation.class));
-		
+		Assert.assertEquals("Message pour l'identificateur name200", tue2.getTextUnit().getTarget(
+				LocaleId.FRENCH).toString());
+
 		Event tue3 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
+		// TU target copied from old TU
 		Assert.assertNotNull(tue3.getTextUnit().getAnnotation(DiffLeverageAnnotation.class));
-		
+		Assert.assertEquals("Message pour l'identificateur name300 (old)", tue3.getTextUnit()
+				.getTarget(LocaleId.FRENCH).toString());
+
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
