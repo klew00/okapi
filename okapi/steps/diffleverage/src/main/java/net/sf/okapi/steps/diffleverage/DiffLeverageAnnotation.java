@@ -11,9 +11,11 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class DiffLeverageAnnotation implements IAnnotation {
 	private boolean codesensitive;
+	private int threshold;
 
-	public DiffLeverageAnnotation(boolean codesensitive) {
+	public DiffLeverageAnnotation(boolean codesensitive, int threshold) {
 		this.codesensitive = codesensitive;
+		this.setThreshold(threshold);
 	}
 
 	/**
@@ -31,5 +33,13 @@ public class DiffLeverageAnnotation implements IAnnotation {
 	 */
 	public boolean isCodesensitive() {
 		return codesensitive;
+	}
+
+	public void setThreshold(int threshold) {
+		this.threshold = threshold;
+	}
+
+	public int getThreshold() {
+		return threshold;
 	}
 }

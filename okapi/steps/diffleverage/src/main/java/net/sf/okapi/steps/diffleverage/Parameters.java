@@ -74,7 +74,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return desc;
 	}
 	
-	public int getFuzyThreshold() {
+	public int getFuzzyThreshold() {
 		return fuzzyThreshold;
 	}
 	

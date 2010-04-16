@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -125,9 +124,9 @@ public class DiffLeverageStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleStartDocument(final Event event) {		
+	protected Event handleStartDocument(final Event event) {
 		// test if we have an alignment at the document level
-		if (targetInput != null) {			
+		if (targetInput != null) {
 			done = false;
 			// intialize buffers for a new document
 			newTextUnits = new ArrayList<TextUnit>();
@@ -255,16 +254,15 @@ public class DiffLeverageStep extends BasePipelineStep {
 	private void diffLeverage() {
 		DiffLists<TextUnit> diffTextUnits;
 
-		if (params.getFuzyThreshold() >= 100) {
+		if (params.getFuzzyThreshold() >= 100) {
 			// exact match
 			diffTextUnits = new DiffLists<TextUnit>(oldTextUnits, newTextUnits,
 					new TextUnitComparator(params.isCodeSensitive()));
 		} else {
 			// fuzzy match
-			diffTextUnits = new DiffLists<TextUnit>(
-					oldTextUnits,
-					newTextUnits,
-					new FuzzyTextUnitComparator(params.isCodeSensitive(), params.getFuzyThreshold()));
+			diffTextUnits = new DiffLists<TextUnit>(oldTextUnits, newTextUnits,
+					new FuzzyTextUnitComparator(params.isCodeSensitive(), params
+							.getFuzzyThreshold()));
 		}
 
 		// diff the two TextUnit lists based on the provided Comparator
@@ -274,13 +272,13 @@ public class DiffLeverageStep extends BasePipelineStep {
 		for (Map.Entry<Integer, Integer> m : diffTextUnits.getMatches().entrySet()) {
 			TextUnit oldTu = oldTextUnits.get(m.getKey());
 			TextUnit newTu = newTextUnits.get(m.getValue());
-			if (params.getFuzyThreshold() >= 100) {
+			if (params.getFuzzyThreshold() >= 100) {
 				// copy the old translation to the new TextUnit
 				TextContainer t = oldTu.getTarget(targetLocale);
 				if (t != null) {
 					newTu.setTarget(targetLocale, t);
-					newTu.setAnnotation(new DiffLeverageAnnotation(
-							params.isCodeSensitive()));
+					newTu.setAnnotation(new DiffLeverageAnnotation(params.isCodeSensitive(), params
+							.getFuzzyThreshold()));
 				}
 			} else {
 				// copy the old translation as a strong fuzzy match
@@ -289,8 +287,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 				TextContainer t = oldTu.getTarget(targetLocale);
 				if (t != null) {
 					newTu.setTarget(targetLocale, t);
-					newTu.setAnnotation(new DiffLeverageAnnotation(
-							params.isCodeSensitive()));
+					newTu.setAnnotation(new DiffLeverageAnnotation(params.isCodeSensitive(), params
+							.getFuzzyThreshold()));
 				}
 			}
 		}
