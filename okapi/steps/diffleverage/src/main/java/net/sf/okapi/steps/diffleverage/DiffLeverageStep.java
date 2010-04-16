@@ -44,12 +44,10 @@ import net.sf.okapi.lib.extra.diff.incava.DiffLists;
 
 /**
  * Contextually match source segments between two documents using a standard diff algorithm
- * (http://en.wikipedia.org/wiki/Diff). The result is a new document with the translations from the first document
- * merged into it. This allows translations between different document versions to be preserved while still maintaining
+ * (http://en.wikipedia.org/wiki/Diff). The result is a new document with the translations from the old document
+ * copied into it. This allows translations between different document versions to be preserved while still maintaining
  * the newer source document modifications.
- * <p>
- * 
- * 
+ *
  * @author HARGRAVEJE
  * 
  */

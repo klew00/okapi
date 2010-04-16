@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.search.lucene.analysis.AlphabeticNgramTokenizer;
 import net.sf.okapi.lib.search.lucene.scorer.Util;
