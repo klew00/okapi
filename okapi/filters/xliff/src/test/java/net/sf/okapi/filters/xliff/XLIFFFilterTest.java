@@ -201,6 +201,29 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testSpecialattributeValues () {
+		// Test even on invalid attributes
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body><trans-unit id=\"13\">"
+			+ "<source>S1<ph ts=\"&lt;&quot;&gt;&apos;\" id=\"1\" x=\"&lt;&quot;&gt;&apos;\">code</ph></source>"
+			+ "<target>T1<ph ts=\"&lt;&quot;&gt;&apos;\" id=\"1\" x=\"&lt;&quot;&gt;&apos;\">code</ph></target>"
+			+ "</trans-unit></body>"
+			+ "</file></xliff>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body><trans-unit id=\"13\">"
+			+ "<source>S1<ph ts=\"&lt;&quot;>'\" id=\"1\" x=\"&lt;&quot;>'\">code</ph></source>"
+			+ "<target>T1<ph ts=\"&lt;&quot;>'\" id=\"1\" x=\"&lt;&quot;>'\">code</ph></target>"
+			+ "</trans-unit></body>"
+			+ "</file></xliff>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locFR));
+	}
+
+	@Test
 	public void testAlTrans () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithAltTrans(), 1);
 		assertNotNull(tu);
@@ -520,7 +543,7 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		return getEvents(snippet);
 	}
-	
+
 	private ArrayList<Event> createDecoratedXLIFF () {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<xliff version=\"1.2\">\r"

@@ -912,7 +912,7 @@ public class XLIFFFilter implements IFilter {
 							tmpg.append(String.format(" %s%s=\"%s\"",
 								(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 								reader.getAttributeLocalName(i),
-								reader.getAttributeValue(i)));
+								Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
 						}
 						tmpg.append(">");
 						code.setOuterData(tmpg.toString());
@@ -1020,7 +1020,7 @@ public class XLIFFFilter implements IFilter {
 				outerCode.append(String.format(" %s%s=\"%s\"",
 					(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 					reader.getAttributeLocalName(i),
-					reader.getAttributeValue(i)));
+					Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
 			}
 			outerCode.append(">");
 			
@@ -1058,7 +1058,7 @@ public class XLIFFFilter implements IFilter {
 						tmpg.append(String.format(" %s%s=\"%s\"",
 							(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 							reader.getAttributeLocalName(i),
-							reader.getAttributeValue(i)));
+							Util.escapeToXML(reader.getAttributeValue(i), 3, params.getEscapeGT(), null)));
 					}
 					tmpg.append(">");
 					innerCode.append(tmpg.toString());
