@@ -771,7 +771,7 @@ public class XLIFFFilter implements IFilter {
 	
 	private void addTargetIfNeeded () {
 		if ( !sourceDone ) {
-			logger.severe("Element <source> missing or not placed properly.");
+			throw new OkapiIllegalFilterOperationException("Element <source> missing or not placed properly.");
 		}
 		if ( targetDone ) return; // Nothing to add
 		// If the target language is the same as the source, we should not create new <target>
@@ -1216,7 +1216,9 @@ public class XLIFFFilter implements IFilter {
 		storeStartElement();
 
 		String tmp = reader.getAttributeValue(null, "id");
-		if ( tmp == null ) throw new OkapiIllegalFilterOperationException("Missing attribute 'id'.");
+		if ( tmp == null ) {
+			throw new OkapiIllegalFilterOperationException("Missing attribute 'id'.");
+		}
 
 		StartGroup group = new StartGroup(parentIds.peek().toString(),
 			String.valueOf(++groupId));

@@ -23,18 +23,16 @@ package net.sf.okapi.applications.rainbow.lib;
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.FilterInfo;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationEditor;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.filters.FilterConfigurationEditor;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.common.ui.filters.IFilterConfigurationInfoEditor;
-import net.sf.okapi.common.ui.genericeditor.GenericEditor;
-import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -68,7 +66,6 @@ public class FilterConfigSelectionPanel extends Composite {
 	private java.util.List<FilterInfo> filters;
 	private IFilter cachedFilter;
 	private IHelp help;
-	private GenericEditor genEditor;
 	
 	public FilterConfigSelectionPanel (Composite p_Parent,
 		IHelp helpParam,
@@ -299,39 +296,44 @@ public class FilterConfigSelectionPanel extends Composite {
 			FilterConfiguration config = mapper.getConfiguration(configId);
 			if ( config == null ) return;
 			cachedFilter = mapper.createFilter(config.configId, cachedFilter);
-			IParametersEditor editor = mapper.createConfigurationEditor(config.configId, cachedFilter);
-			IParameters params = mapper.getParameters(config, cachedFilter);
 			
-			// Call the editor
-			if ( editor == null ) {
-				// Try to see if we can edit with the generic editor
-				IEditorDescriptionProvider descProv = mapper.getDescriptionProvider(params.getClass().getCanonicalName());
-				if ( descProv != null ) {
-					if ( genEditor == null ) genEditor = new GenericEditor();
-					// Edit the data
-					if ( !genEditor.edit(params, descProv, !config.custom, context) ) return; // Cancel
-					// The params object gets updated if edit not canceled.
-				}
-				else { // Else: fall back to the plain text editor
-					InputDialog dlg  = new InputDialog(getShell(),
-						String.format(Res.getString("FilterConfigSelectionPanel.parametersCaption"), config.configId), //$NON-NLS-1$
-						Res.getString("FilterConfigSelectionPanel.parametersLabel"), //$NON-NLS-1$
-						params.toString(), null, 0, 200, 600);
-					dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
-					String data = dlg.showDialog();
-					if ( data == null ) return;
-					if ( !config.custom ) return; // Don't save pre-defined parameters
-					data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-					params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			}
-			else {
-				if ( !editor.edit(params, !config.custom, context) ) return;
-			}
-			// Don't try to save pre-defined parameters
-			if ( !config.custom ) return;
-			// Else save the modified parameters to custom storage
-			mapper.saveCustomParameters(config, params);
+			IFilterConfigurationEditor editor = new FilterConfigurationEditor();
+			editor.editConfiguration(configId, mapper, cachedFilter, getShell());
+
+// Replaced by IFilterConfigurationEditor
+//			IParametersEditor editor = mapper.createConfigurationEditor(config.configId, cachedFilter);
+//			IParameters params = mapper.getParameters(config, cachedFilter);
+//			
+//			// Call the editor
+//			if ( editor == null ) {
+//				// Try to see if we can edit with the generic editor
+//				IEditorDescriptionProvider descProv = mapper.getDescriptionProvider(params.getClass().getCanonicalName());
+//				if ( descProv != null ) {
+//					if ( genEditor == null ) genEditor = new GenericEditor();
+//					// Edit the data
+//					if ( !genEditor.edit(params, descProv, !config.custom, context) ) return; // Cancel
+//					// The params object gets updated if edit not canceled.
+//				}
+//				else { // Else: fall back to the plain text editor
+//					InputDialog dlg  = new InputDialog(getShell(),
+//						String.format(Res.getString("FilterConfigSelectionPanel.parametersCaption"), config.configId), //$NON-NLS-1$
+//						Res.getString("FilterConfigSelectionPanel.parametersLabel"), //$NON-NLS-1$
+//						params.toString(), null, 0, 200, 600);
+//					dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
+//					String data = dlg.showDialog();
+//					if ( data == null ) return;
+//					if ( !config.custom ) return; // Don't save pre-defined parameters
+//					data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+//					params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
+//				}
+//			}
+//			else {
+//				if ( !editor.edit(params, !config.custom, context) ) return;
+//			}
+//			// Don't try to save pre-defined parameters
+//			if ( !config.custom ) return;
+//			// Else save the modified parameters to custom storage
+//			mapper.saveCustomParameters(config, params);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);

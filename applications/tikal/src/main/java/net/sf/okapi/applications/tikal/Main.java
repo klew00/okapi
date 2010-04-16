@@ -39,13 +39,12 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.filters.IFilterConfigurationEditor;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
@@ -53,7 +52,6 @@ import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -535,7 +533,7 @@ public class Main {
 	}
 	
 	private void editAllConfigurations () {
-		throw new UnsupportedOperationException("The -e command is temporarily unsupported");
+		throw new UnsupportedOperationException("The -e command without parameter is temporarily unsupported. use -e configId");
 //		initialize();
 //		// Add all the pre-defined configurations
 //		DefaultFilters.setMappings(fcMapper, false, true);
@@ -549,57 +547,30 @@ public class Main {
 	}
 	
 	private void editConfiguration () {
-		throw new UnsupportedOperationException("The -e command is temporarily unsupported");
-//		initialize();
-//		
-//		if ( specifiedConfigId == null ) {
-//			throw new RuntimeException("You must specified the configuration to edit.");
-//		}
-//		configId = specifiedConfigId;
-//		if ( !prepareFilter(configId) ) return; // Next input
-//
-//		FilterConfiguration config = fcMapper.getConfiguration(configId);
-//		if ( config == null ) {
-//			throw new RuntimeException(String.format(
-//				"Cannot find the configuration for '%s'.", configId));
-//		}
-//		IParameters params = fcMapper.getParameters(config);
-//		if ( params == null ) {
-//			throw new RuntimeException(String.format(
-//				"Cannot load parameters for '%s'.", config.configId));
-//		}
-//		
-//		IParametersEditor editor = fcMapper.createConfigurationEditor(configId);
-//		if ( editor != null ) {
-//			if ( !editor.edit(params, !config.custom, new BaseContext()) ) return; // Cancel
-//		}
-//		else {
-//			// Try to see if we can edit with the generic editor
-//			IEditorDescriptionProvider descProv = fcMapper.getDescriptionProvider(params.getClass().getCanonicalName());
-//			if ( descProv != null ) {
-//				// Edit the data
-//				GenericEditor genEditor = new GenericEditor();
-//				if ( !genEditor.edit(params, descProv, !config.custom, new BaseContext()) ) return; // Cancel
-//				// The params object gets updated if edit not canceled.
-//			}
-//			else { // Else: fall back to the plain text editor
-//				InputDialog dlg  = new InputDialog(null,
-//					String.format("Filter Parameters (%s)", config.configId), "Parameters:",
-//					params.toString(), null, 0, 200, 600);
-//				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
-//				String data = dlg.showDialog();
-//				if ( data == null ) return; // Cancel
-//				if ( !config.custom ) return; // Don't save pre-defined parameters
-//				data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-//				params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
-//			}
-//		}
-//		
-//		// If not canceled and if custom configuration: save the changes
-//		if ( config.custom ) {
-//			// Save the configuration filefcMapper
-//			fcMapper.saveCustomParameters(config, params);
-//		}
+		initialize();
+		
+		if ( specifiedConfigId == null ) {
+			throw new RuntimeException("You must specified the configuration to edit.");
+		}
+		configId = specifiedConfigId;
+		if ( !prepareFilter(configId) ) return; // Next input
+		
+		try {
+			// Invoke the editor using dynamic instantiation so we can compile non-UI distributions 
+			IFilterConfigurationEditor editor =
+				(IFilterConfigurationEditor)Class.forName("net.sf.okapi.common.ui.filters.FilterConfigurationEditor").newInstance();
+			// Call the editor
+			editor.editConfiguration(configId, fcMapper);
+		}
+		catch ( InstantiationException e ) {
+			throw new RuntimeException("UI-based commands are available only in the distributions with UI components.");
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException("UI-based commands are available only in the distributions with UI components.");
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new RuntimeException("UI-based commands are available only in the distributions with UI components.");
+		}
 	}
 	
 	private void showAllConfigurations () {
