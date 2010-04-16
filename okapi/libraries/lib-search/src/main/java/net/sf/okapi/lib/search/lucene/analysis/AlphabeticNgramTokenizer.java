@@ -82,6 +82,10 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
 	public int getNgramLength() {
 		return ngramLength;
 	}
+	
+	public TermAttribute getTermAttribute() {
+		return termAttribute;		
+	}
 
 	private Reader getReader() {
 		return input;
