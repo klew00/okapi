@@ -28,6 +28,7 @@ import java.util.Map;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilter;
@@ -53,7 +54,7 @@ import net.sf.okapi.lib.extra.diff.incava.DiffLists;
  * 
  */
 public class DiffLeverageStep extends BasePipelineStep {
-	private final Parameters params;
+	private Parameters params;
 	private IFilter filter;
 	private IFilterConfigurationMapper fcMapper;
 	private RawDocument targetInput;
@@ -116,6 +117,16 @@ public class DiffLeverageStep extends BasePipelineStep {
 	@Override
 	public String getName() {
 		return "Diff Leverage Step";
+	}
+	
+	@Override
+	public IParameters getParameters () {
+		return params;
+	}
+	
+	@Override
+	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
 	}
 
 	@Override

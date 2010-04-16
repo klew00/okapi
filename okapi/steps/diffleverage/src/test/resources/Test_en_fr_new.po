@@ -11,7 +11,7 @@ msgstr "Project-Id-Version: MyApplication 1.0\n"
 msgid "Message for ID name100"
 msgstr "Message pour l'identificateur name100"
 
-msgid "Message for ID name200 (a nonmatch during diff)"
+msgid "Message for ID name200 (diff)"
 msgstr "Message pour l'identificateur name200"
 
 msgid "Message for ID name300"
