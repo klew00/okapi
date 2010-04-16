@@ -257,11 +257,11 @@ public class DiffLeverageStep extends BasePipelineStep {
 		if (params.getFuzzyThreshold() >= 100) {
 			// exact match
 			diffTextUnits = new DiffLists<TextUnit>(oldTextUnits, newTextUnits,
-					new TextUnitComparator(params.isCodeSensitive()));
+					new TextUnitComparator(params.isCodesensitive()));
 		} else {
 			// fuzzy match
 			diffTextUnits = new DiffLists<TextUnit>(oldTextUnits, newTextUnits,
-					new FuzzyTextUnitComparator(params.isCodeSensitive(), params
+					new FuzzyTextUnitComparator(params.isCodesensitive(), params
 							.getFuzzyThreshold()));
 		}
 
@@ -272,24 +272,17 @@ public class DiffLeverageStep extends BasePipelineStep {
 		for (Map.Entry<Integer, Integer> m : diffTextUnits.getMatches().entrySet()) {
 			TextUnit oldTu = oldTextUnits.get(m.getKey());
 			TextUnit newTu = newTextUnits.get(m.getValue());
-			if (params.getFuzzyThreshold() >= 100) {
-				// copy the old translation to the new TextUnit
-				TextContainer t = oldTu.getTarget(targetLocale);
-				if (t != null) {
+
+			// copy the old translation to the new TextUnit
+			TextContainer t = null;
+			if ((t = oldTu.getTarget(targetLocale)) != null) {
+				// only copy the old target if wdiffOnly is false
+				if (!params.isDiffOnly()) {
 					newTu.setTarget(targetLocale, t);
-					newTu.setAnnotation(new DiffLeverageAnnotation(params.isCodeSensitive(), params
-							.getFuzzyThreshold()));
 				}
-			} else {
-				// copy the old translation as a strong fuzzy match
-				// FIXME: Need a leverage annotation, type and other classes
-				// assume this is not working fully.
-				TextContainer t = oldTu.getTarget(targetLocale);
-				if (t != null) {
-					newTu.setTarget(targetLocale, t);
-					newTu.setAnnotation(new DiffLeverageAnnotation(params.isCodeSensitive(), params
-							.getFuzzyThreshold()));
-				}
+				// set the DiffLeverageAnnotation which marks the new TextUnit as a match with the old TextUnit
+				newTu.setAnnotation(new DiffLeverageAnnotation(params.isCodesensitive(), params
+						.getFuzzyThreshold()));
 			}
 		}
 	}

@@ -29,6 +29,7 @@ import net.sf.okapi.common.uidescription.TextInputPart;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 	private int fuzzyThreshold;
 	private boolean codesensitive;
+	private boolean diffOnly;
 	
 	public Parameters() {
 		reset();
@@ -39,6 +40,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		// default is exact match
 		fuzzyThreshold = 100;
 		codesensitive = true;
+		diffOnly = false;
 	}
 
 	@Override
@@ -47,6 +49,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		fuzzyThreshold = buffer.getInteger("fuzzyThreshold", fuzzyThreshold);
 		codesensitive = buffer.getBoolean("codesensitive", codesensitive);
+		diffOnly = buffer.getBoolean("diffOnly", diffOnly);
 	}
 	
 	@Override
@@ -54,6 +57,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setParameter("fuzzyThreshold", fuzzyThreshold);		
 		buffer.setParameter("codesensitive", codesensitive);
+		buffer.setParameter("diffOnly", diffOnly);
 		return buffer.toString();
 	}
 
@@ -61,7 +65,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add("fuzzyThreshold", "Fuzzy Threshold", "Fuzzy Threshold between 0 and 100.");		
-		desc.add("codesensitive", "Compare Codes", "Use codes to compare TextUnits?");
+		desc.add("codesensitive", "Compare Codes?", "Use codes to compare TextUnits?");
+		desc.add("diffOnly", "Diff Only?", "Diff only (do not copy translation)?");
 		return desc;
 	}
 	
@@ -71,6 +76,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		TextInputPart tp = desc.addTextInputPart(paramsDesc.get("fuzzyThreshold"));
 		tp.setRange(0, 100);
 		desc.addCheckboxPart(paramsDesc.get("codesensitive"));
+		desc.addCheckboxPart(paramsDesc.get("diffOnly"));
 		return desc;
 	}
 	
@@ -78,7 +84,23 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return fuzzyThreshold;
 	}
 	
-	public boolean isCodeSensitive() {
+	public void setFuzzyThreshold(int fuzzyThreshold) {
+		this.fuzzyThreshold = fuzzyThreshold;
+	}
+
+	public boolean isCodesensitive() {
 		return codesensitive;
+	}
+
+	public void setCodesensitive(boolean codesensitive) {
+		this.codesensitive = codesensitive;
+	}
+
+	public boolean isDiffOnly() {
+		return diffOnly;
+	}
+
+	public void setDiffOnly(boolean diffOnly) {
+		this.diffOnly = diffOnly;
 	}
 }
