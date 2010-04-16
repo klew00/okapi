@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.diffleverage;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +60,10 @@ public class DiffLeverageStep extends BasePipelineStep {
 	private List<TextUnit> newTextUnits;
 	private List<TextUnit> oldTextUnits;
 	private List<Event> newDocumentEvents;
+	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
 	private boolean done = true;
+	private Comparator<TextUnit> sourceComparator;
 
 	public DiffLeverageStep() {
 		params = new Parameters();
@@ -73,6 +76,15 @@ public class DiffLeverageStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
 	public void setFilterConfigurationMapper(final IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
+	}
+
+	/**
+	 * 
+	 * @param sourceLocale
+	 */
+	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
+	public void setSourceLocale(final LocaleId sourceLocale) {
+		this.sourceLocale = sourceLocale;
 	}
 
 	/**
@@ -109,6 +121,16 @@ public class DiffLeverageStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartBatch(final Event event) {
 		done = true;
+		if (params.getFuzzyThreshold() >= 100) {
+			// exact match
+			sourceComparator = new TextUnitComparator(params.isCodesensitive());
+		} else {
+			// fuzzy match
+			sourceComparator = new FuzzyTextUnitComparator(
+					params.isCodesensitive(), 
+					params.getFuzzyThreshold(), 
+					sourceLocale);
+		}
 		return event;
 	}
 
@@ -152,8 +174,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 			newDocumentEvents.add(event);
 
 			// create a multi event and pass it on to the other steps
-			final Event multi_event = new Event(EventType.MULTI_EVENT, new MultiEvent(
-					newDocumentEvents));
+			Event multi_event = new Event(EventType.MULTI_EVENT, new MultiEvent(newDocumentEvents));
 
 			// help java gc
 			newTextUnits = null;
@@ -254,16 +275,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 	private void diffLeverage() {
 		DiffLists<TextUnit> diffTextUnits;
 
-		if (params.getFuzzyThreshold() >= 100) {
-			// exact match
-			diffTextUnits = new DiffLists<TextUnit>(oldTextUnits, newTextUnits,
-					new TextUnitComparator(params.isCodesensitive()));
-		} else {
-			// fuzzy match
-			diffTextUnits = new DiffLists<TextUnit>(oldTextUnits, newTextUnits,
-					new FuzzyTextUnitComparator(params.isCodesensitive(), params
-							.getFuzzyThreshold()));
-		}
+		diffTextUnits = new DiffLists<TextUnit>(oldTextUnits, newTextUnits, sourceComparator);
 
 		// diff the two TextUnit lists based on the provided Comparator
 		diffTextUnits.diff();

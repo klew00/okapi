@@ -1,8 +1,18 @@
 package net.sf.okapi.steps.diffleverage;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.search.lucene.analysis.AlphabeticNgramTokenizer;
+import net.sf.okapi.lib.search.lucene.scorer.Util;
 
 /**
  * Fuzzily Compare two source {@link TextUnit}s. Text, isReferent() and (optionally) codes must all be same in order to
@@ -13,15 +23,25 @@ import net.sf.okapi.common.resource.TextUnit;
  * 
  */
 public class FuzzyTextUnitComparator implements Comparator<TextUnit> {
+	private static final int NGRAM_SIZE = 3;
+
 	private boolean codeSensitive;
 	private int threshold;
+	private final AlphabeticNgramTokenizer tokenizer;
+	private Set<String> oldSourceTokens;
+	private Set<String> newSourceTokens;
 
-	public FuzzyTextUnitComparator(boolean codeSensitive, int threshold) {
+	public FuzzyTextUnitComparator(final boolean codeSensitive, final int threshold,
+			final LocaleId localeid) {
 		this.codeSensitive = codeSensitive;
-		this.setThreshold(threshold);
+		setThreshold(threshold);
+		tokenizer = new AlphabeticNgramTokenizer(new StringReader(""), NGRAM_SIZE, localeid
+				.toJavaLocale());
+		oldSourceTokens = new HashSet<String>();
+		newSourceTokens = new HashSet<String>();
 	}
 
-	public void setCodeSensitive(boolean codeSensitive) {
+	public void setCodeSensitive(final boolean codeSensitive) {
 		this.codeSensitive = codeSensitive;
 	}
 
@@ -29,7 +49,7 @@ public class FuzzyTextUnitComparator implements Comparator<TextUnit> {
 		return codeSensitive;
 	}
 
-	public void setThreshold(int threshold) {
+	public void setThreshold(final int threshold) {
 		this.threshold = threshold;
 	}
 
@@ -47,13 +67,49 @@ public class FuzzyTextUnitComparator implements Comparator<TextUnit> {
 			// (not sure what greater means in this case but we have to return something)
 		} else {
 			// both are either referents or not
-			int result = oldTextUnit.getSource().compareTo(newTextUnit.getSource(), codeSensitive);
+			final int result = oldTextUnit.getSource().compareTo(newTextUnit.getSource(),
+					codeSensitive);
 			if (result == 0) {
 				return result;
 			} else {
 				// do fuzzy compare
-				return 0;
+				return fuzzyCompare(oldTextUnit, newTextUnit, result);
 			}
 		}
+	}
+
+	private int fuzzyCompare(final TextUnit oldSource, final TextUnit newSource,
+			int exactCompareResult) {
+		oldSourceTokens.clear();
+		newSourceTokens.clear();
+
+		try {
+			// get old source string tokens
+			tokenizer.reset(new StringReader(oldSource.getSource().getUnSegmentedContentCopy()
+					.getText()));
+			while (tokenizer.incrementToken()) {
+				oldSourceTokens.add(tokenizer.getTermAttribute().term());
+			}
+			// get the new source tokens
+			tokenizer.reset(new StringReader(newSource.getSource().getUnSegmentedContentCopy()
+					.getText()));
+			while (tokenizer.incrementToken()) {
+				newSourceTokens.add(tokenizer.getTermAttribute().term());
+			}
+		} catch (IOException e) {
+			throw new OkapiBadStepInputException("Error tokenizing source TextUnits", e);
+		}
+
+		// now calculate dice coefficient to get fuzzy score
+		int oldSize = oldSourceTokens.size();
+		int newSize = newSourceTokens.size();
+		oldSourceTokens.retainAll(newSourceTokens);
+		int intersectionSize = oldSourceTokens.size();
+		float score = Util.calculateDiceCoefficient(intersectionSize, oldSize, newSize);
+		if (score >= threshold) {
+			return 0;
+		}
+
+		return exactCompareResult;
 	}
 }

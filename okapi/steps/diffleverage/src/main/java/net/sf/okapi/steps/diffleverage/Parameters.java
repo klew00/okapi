@@ -74,7 +74,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Diff Leverager", true, false);	
 		TextInputPart tp = desc.addTextInputPart(paramsDesc.get("fuzzyThreshold"));
-		tp.setRange(0, 100);
+		tp.setRange(1, 100);
 		desc.addCheckboxPart(paramsDesc.get("codesensitive"));
 		desc.addCheckboxPart(paramsDesc.get("diffOnly"));
 		return desc;

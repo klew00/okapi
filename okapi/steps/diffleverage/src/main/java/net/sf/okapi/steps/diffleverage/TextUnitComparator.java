@@ -18,7 +18,7 @@ public class TextUnitComparator implements Comparator<TextUnit> {
 		this.codeSensitive = codeSensitive;
 	}
 
-	public void setCodeSensitive(boolean codeSensitive) {
+	public void setCodeSensitive(final boolean codeSensitive) {
 		this.codeSensitive = codeSensitive;
 	}
 
@@ -29,11 +29,11 @@ public class TextUnitComparator implements Comparator<TextUnit> {
 	@Override
 	public int compare(final TextUnit oldTextUnit, final TextUnit newTextUnit) {
 		if (oldTextUnit.isReferent() && !newTextUnit.isReferent()) {
-			return -1; // old is greater than new 
-					   // (not sure what greater means in this case but we have to return something)
+			return -1; // old is greater than new
+			// (not sure what greater means in this case but we have to return something)
 		} else if (!oldTextUnit.isReferent() && newTextUnit.isReferent()) {
-			return 1; // new is greater than old 
-					  // (not sure what greater means in this case but we have to return something)
+			return 1; // new is greater than old
+			// (not sure what greater means in this case but we have to return something)
 		} else {
 			// both are either referents or not
 			return oldTextUnit.getSource().compareTo(newTextUnit.getSource(), codeSensitive);

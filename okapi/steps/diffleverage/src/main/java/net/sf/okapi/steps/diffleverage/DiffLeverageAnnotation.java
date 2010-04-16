@@ -13,9 +13,9 @@ public class DiffLeverageAnnotation implements IAnnotation {
 	private boolean codesensitive;
 	private int threshold;
 
-	public DiffLeverageAnnotation(boolean codesensitive, int threshold) {
+	public DiffLeverageAnnotation(final boolean codesensitive, final int threshold) {
 		this.codesensitive = codesensitive;
-		this.setThreshold(threshold);
+		setThreshold(threshold);
 	}
 
 	/**
@@ -23,7 +23,7 @@ public class DiffLeverageAnnotation implements IAnnotation {
 	 * 
 	 * @param codesensitive
 	 */
-	public void setCodesensitive(boolean codesensitive) {
+	public void setCodesensitive(final boolean codesensitive) {
 		this.codesensitive = codesensitive;
 	}
 
@@ -35,7 +35,7 @@ public class DiffLeverageAnnotation implements IAnnotation {
 		return codesensitive;
 	}
 
-	public void setThreshold(int threshold) {
+	public void setThreshold(final int threshold) {
 		this.threshold = threshold;
 	}
 
