@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Range;
@@ -93,11 +92,9 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipSkeletonBean;
 
 public class BeanMapper {
 	
-	private static final String MSG1 = "PersistenceFactory: bean mapping is not initialized";
-	private static final String MSG2 = "PersistenceFactory: unknown class: %s";
-	private static final String MSG3 = "PersistenceFactory: class %s is not registered";
-	private static final String MSG4 = "PersistenceFactory: cannot instantiate %s";	
-	private static final String MSG5 = "PersistenceFactory: Class reference cannot be empty";
+	private static final String MSG1 = "BeanMapper: bean mapping is not initialized";
+	private static final String MSG2 = "BeanMapper: unknown class: %s";		
+	private static final String MSG5 = "BeanMapper: Class reference cannot be empty";
 	
 	// !!! LinkedHashMap to preserve registration order
 	private static LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> beanMapping;
@@ -159,37 +156,37 @@ public class BeanMapper {
 		return res;		
 	}
 	
-	public static IPersistenceBean getBean(Class<?> classRef, IPersistenceSession session) {
-		Class<? extends IPersistenceBean> beanClass = 
-			getBeanClass(classRef); // Checks for skelClass == null, beanMapping == null
-		
-		if (beanClass == null)
-			throw(new RuntimeException(String.format(MSG3, classRef.getName())));
-		
-//		if (persistenceCache == null)
-//			throw(new RuntimeException(MSG2));
-		
-		IPersistenceBean bean = null; //persistenceCache.get(beanClass); 
-		//if (bean == null) {
-			try {
-				bean = ClassUtil.instantiateClass(beanClass, session);
-				//persistenceCache.put(beanClass, bean);
-			} catch (Exception e) {
-				throw new RuntimeException(String.format(MSG4, beanClass.getName()), e);
-			}
-		//}		
-		return bean;		
-	}
-	
-	public static <T> T getObject(Class<T> classRef, IPersistenceSession session) {
-		T res = null;
-		try {
-			res = ClassUtil.instantiateClass(classRef, session);
-		} catch (Exception e) {
-			throw new RuntimeException(String.format(MSG4, ClassUtil.getClassName(classRef)), e);
-		}
-		return res;
-	}
+//	public static IPersistenceBean createBean(Class<?> classRef, IPersistenceSession session) {
+//		Class<? extends IPersistenceBean> beanClass = 
+//			getBeanClass(classRef); // Checks for skelClass == null, beanMapping == null
+//		
+//		if (beanClass == null)
+//			throw(new RuntimeException(String.format(MSG3, classRef.getName())));
+//		
+////		if (persistenceCache == null)
+////			throw(new RuntimeException(MSG2));
+//		
+//		IPersistenceBean bean = null; //persistenceCache.get(beanClass); 
+//		//if (bean == null) {
+//			try {
+//				bean = ClassUtil.instantiateClass(beanClass, session);
+//				//persistenceCache.put(beanClass, bean);
+//			} catch (Exception e) {
+//				throw new RuntimeException(String.format(MSG4, beanClass.getName()), e);
+//			}
+//		//}		
+//		return bean;		
+//	}
+//	
+//	public static <T> T getObject(Class<T> classRef, IPersistenceSession session) {
+//		T res = null;
+//		try {
+//			res = ClassUtil.instantiateClass(classRef, session);
+//		} catch (Exception e) {
+//			throw new RuntimeException(String.format(MSG4, ClassUtil.getClassName(classRef)), e);
+//		}
+//		return res;
+//	}
 	
 	private static void registerBeans() {
 		// General purpose beans

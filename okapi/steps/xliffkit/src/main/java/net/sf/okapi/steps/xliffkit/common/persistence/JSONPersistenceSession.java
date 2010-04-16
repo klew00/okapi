@@ -69,7 +69,7 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	private InputStream inStream;
 	private boolean isActive;	
 	private String description;
-	private ReferenceResolver refResolver = new ReferenceResolver();
+	private ReferenceResolver refResolver = new ReferenceResolver(this);
 	private String itemLabel = JSON_ITEM;
 	private int itemCounter = 0;
 
@@ -204,38 +204,6 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	}
 
 	private void serialize(JsonGenerator generator, Object obj) {
-		if (!isActive) return;
-////		if (!rootClass.isInstance(obj))
-////			throw new IllegalArgumentException(String.format("JSONPersistenceSession: " +
-////					"unable to serialize %s, this session handles only %s", 
-////					ClassUtil.getQualifiedClassName(obj),
-////					ClassUtil.getQualifiedClassName(rootClass)));
-//		
-//		IPersistenceBean bean = BeanMapper.getBean(obj.getClass(), this);
-//		
-//		bean.set(obj);
-//		
-////		Event ev = bean.read(Event.class);
-////		if (ev != null) {
-////			IResource r = ev.getResource();
-////			if (r != null) {
-////				System.out.println(r.getClass().getName());
-////			}
-////		}
-//		
-//		try {
-//			mapper.writeValue(generator, bean);
-//			
-//		} catch (JsonGenerationException e) {
-//			// TODO Handle exception
-//			e.printStackTrace();
-//		} catch (JsonMappingException e) {
-//			// TODO Handle exception
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Handle exception
-//			e.printStackTrace();
-//		}
 		serialize(obj, String.format("%s%d", itemLabel, ++itemCounter));
 	}
 	
@@ -259,7 +227,7 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		} catch (IOException e) {
 			throw new OkapiIOException(e);
 		}
-		IPersistenceBean bean = BeanMapper.getBean(obj.getClass(), this);
+		IPersistenceBean bean = refResolver.createBean(obj.getClass());
 		if (bean == null) return;
 		
 		refResolver.setRootId(bean.getRefId());
@@ -351,7 +319,7 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	}
 
 	@Override
-	public String getRootClass() {
+	public String getItemClass() {
 		return (rootClass == null) ? "" : rootClass.getName();
 	}
 
@@ -387,5 +355,20 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	@Override
 	public Map<Integer, Set<Integer>> getReferences() {		
 		return refResolver.getReferences();
+	}
+
+	@Override
+	public IPersistenceBean createBean(Class<?> classRef) {
+		return refResolver.createBean(classRef);
+	}
+
+	@Override
+	public void cacheBean(Object obj, IPersistenceBean bean) {
+		refResolver.cacheBean(obj, bean);
+	}
+
+	@Override
+	public IPersistenceBean uncacheBean(Object obj) {
+		return refResolver.uncacheBean(obj);
 	}
 }

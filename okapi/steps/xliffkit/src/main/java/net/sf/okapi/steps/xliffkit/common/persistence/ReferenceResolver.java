@@ -26,12 +26,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.sf.okapi.common.ClassUtil;
+
 public class ReferenceResolver {
+	private final String MSG1 = "ReferenceResolver: class %s is not registered";
+	private final String MSG2 = "ReferenceResolver: cannot instantiate %s";
+	
+	private IPersistenceSession session;
 	private int idCounter = 0;
 	private int rootId = 0;
 	private static ConcurrentHashMap<Object, Integer> refIdLookup = new ConcurrentHashMap<Object, Integer>();
 	private static ConcurrentHashMap<Integer, Integer> rootLookup = new ConcurrentHashMap<Integer, Integer>();
-	private Map<Integer, Set<Integer>> references = new LinkedHashMap<Integer, Set<Integer>>();
+	private static ConcurrentHashMap<Object, IPersistenceBean> beanCache = new ConcurrentHashMap<Object, IPersistenceBean>();
+	private Map<Integer, Set<Integer>> references = new LinkedHashMap<Integer, Set<Integer>>();	
+
+	public ReferenceResolver(IPersistenceSession session) {
+		super();
+		this.session = session;
+	}
 	
 	public void reset() {
 		idCounter = 0;
@@ -54,7 +66,7 @@ public class ReferenceResolver {
 	}
 
 	public void setRefIdForObject(Object obj, int refId) {
-		refIdLookup.put(obj, refId);
+		refIdLookup.put(obj, refId);  // refIdLookup.get(obj)
 		rootLookup.put(refId, rootId);
 	}
 	
@@ -78,5 +90,31 @@ public class ReferenceResolver {
 
 	public void setRootId(int rootId) {
 		this.rootId = rootId;		
+	}
+	
+	public IPersistenceBean createBean(Class<?> classRef) {
+		Class<? extends IPersistenceBean> beanClass = 
+			BeanMapper.getBeanClass(classRef);
+		
+		if (beanClass == null)
+			throw(new RuntimeException(String.format(MSG1, classRef.getName())));
+		
+		IPersistenceBean bean = null; 
+		try {
+			bean = ClassUtil.instantiateClass(beanClass, session);
+		} catch (Exception e) {
+			throw new RuntimeException(String.format(MSG2, beanClass.getName()), e);
+		}
+		return bean;
+	}
+
+	public void cacheBean(Object obj, IPersistenceBean bean) {		
+		beanCache.put(obj, bean);
+	}
+
+	public IPersistenceBean uncacheBean(Object obj) {
+		IPersistenceBean bean = beanCache.get(obj);
+		beanCache.remove(obj); // The caller takes ownership of the object ref
+		return bean;
 	}
 }

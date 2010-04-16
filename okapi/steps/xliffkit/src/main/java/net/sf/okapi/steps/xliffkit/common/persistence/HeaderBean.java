@@ -26,7 +26,7 @@ import java.util.Set;
 public class HeaderBean extends PersistenceBean {
 		
 	private String mimeType;
-	private String rootClass;
+	private String itemClass;
 	private String version;
 	private String description;
 	private Map<Integer, Set<Integer>> references;
@@ -51,7 +51,7 @@ public class HeaderBean extends PersistenceBean {
 			IPersistenceSession session = (IPersistenceSession) obj;
 			version = session.getVersion();
 			mimeType = session.getMimeType();
-			rootClass = session.getRootClass();
+			itemClass = session.getItemClass();
 			description = session.getDescription();
 			references = session.getReferences();
 		}
@@ -66,12 +66,12 @@ public class HeaderBean extends PersistenceBean {
 		return mimeType;
 	}
 
-	public void setRootClass(String rootClass) {
-		this.rootClass = rootClass;
+	public void setItemClass(String itemClass) {
+		this.itemClass = itemClass;
 	}
 
-	public String getRootClass() {
-		return rootClass;
+	public String getItemClass() {
+		return itemClass;
 	}
 	
 	public void setVersion(String version) {

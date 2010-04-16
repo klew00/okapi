@@ -20,23 +20,26 @@
 
 package net.sf.okapi.steps.xliffkit.writer;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.filters.table.TableFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
@@ -275,7 +278,7 @@ public class XLIFFKitWriterTest {
 		).execute();
 	}
 	
-	// DEBUG 	@Test
+	// DEBUG @Test
 	public void testPackageFormat2() throws URISyntaxException, MalformedURLException {
 
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
@@ -334,7 +337,7 @@ public class XLIFFKitWriterTest {
 								"UTF-8",
 								ENUS,
 								DEDE)
-						,
+//						,
 // TODO DOCX is not mapped to any default filter configuration								
 //						new BatchItem(
 //								new URL("file", null, src1Path + "test11.docx"),
@@ -342,17 +345,9 @@ public class XLIFFKitWriterTest {
 //								ENUS,
 //								DEDE)
 //						
-						new BatchItem(
-								(new URL("file", null, src2Path + "CSVTest_97.txt")).toURI(),
-								"UTF-8",
-								"okf_table@copy-of-csv_97.fprm",
-								null,
-								"UTF-8",
-								ENUS,
-								DEDE)
 						),
 								
-				new RawDocumentToFilterEventsStep()
+						new RawDocumentToFilterEventsStep()
 				,				
 				new PipelineStep(new LeveragingStep(), 
 						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
@@ -368,5 +363,243 @@ public class XLIFFKitWriterTest {
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
 						new Parameter("outputURI", new URL("file", null, pathBase + "draft4.xliff.kit").toURI().toString()))
 		).execute();
+	}
+	
+	// DEBUG @Test
+	public void testPackageFormat3() throws URISyntaxException, MalformedURLException {
+
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		String src1Path = pathBase + "src1/";
+		String src2Path = pathBase + "src2/";
+		//System.out.println(pathBase);
+		
+		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
+		IFilter filter = new TableFilter();
+		rd2fe.setFilter(filter);
+		filter.getParameters().load((new URL("file", null, src1Path + "okf_table@copy-of-csv_97.fprm")).toURI(), true);
+		
+		new Pipeline(
+				"Test pipeline for XLIFFKitWriterStep",
+				new Batch(
+						new BatchItem(
+								(new URL("file", null, src2Path + "CSVTest_97.txt")).toURI(),
+								"UTF-8",
+								ENUS,
+								DEDE)
+						),
+								
+				rd2fe
+				,				
+				new PipelineStep(new LeveragingStep(), 
+						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new Parameter("threshold", 80),
+						new Parameter("fillTarget", true)
+				),
+				
+				new PipelineStep(
+						new XLIFFKitWriterStep(),								
+						new Parameter("gMode", true),
+						new Parameter("includeOriginal", true),
+						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "draft4.xliff.kit").toURI().toString()))
+		).execute();
+	}
+	
+	// DEBUG 	
+	@Test
+	public void testReferences() throws MalformedURLException, URISyntaxException {
+		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		writerStep.setOutputURI(new URL("file", null, pathBase + "draft4.xliff.kit").toURI());
+		writerStep.setTargetLocale(DEDE);
+		net.sf.okapi.steps.xliffkit.writer.Parameters params = 
+			(net.sf.okapi.steps.xliffkit.writer.Parameters) writerStep.getParameters();
+		
+		params.setIncludeSource(false);
+		params.setIncludeOriginal(false);
+		
+		List<Event> events = new ArrayList<Event>();
+		
+		Event e = new Event(EventType.START_BATCH);
+		events.add(e);
+		
+		StartDocument sd = new StartDocument("sd1");
+		sd.setName("test_refs.txt");
+		sd.setLocale(ENUS);
+		sd.setFilterWriter(new GenericFilterWriter(null, null));
+		
+		e = new Event(EventType.START_DOCUMENT, sd);
+		events.add(e);
+//------------------------
+	
+		
+		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+			'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		
+		TextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		
+		TextUnit tu3 = TextUnitUtil.buildTU("source-text3" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		
+		TextUnit tu4 = TextUnitUtil.buildTU("source-text4" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		
+		TextUnit tu5 = TextUnitUtil.buildTU("source-text5" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		
+		TextUnit tu6 = TextUnitUtil.buildTU("source-text6" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		
+		TextUnit tu7 = TextUnitUtil.buildTU("source-text7" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+
+		tu1.setTarget(FRFR, new TextContainer("french-text1"));
+		tu1.setTarget(DEDE, new TextContainer("german-text1"));
+		
+		GenericSkeleton skel1 = new GenericSkeleton();
+		GenericSkeleton skel2 = new GenericSkeleton();
+		GenericSkeleton skel3 = new GenericSkeleton();
+		GenericSkeleton skel4 = new GenericSkeleton();
+		GenericSkeleton skel5 = new GenericSkeleton();
+		GenericSkeleton skel6 = new GenericSkeleton();
+		GenericSkeleton skel7 = new GenericSkeleton();
+		
+		tu1.setId("tu1");
+		tu1.setSkeleton(skel1);
+		
+		tu2.setId("tu2");
+		tu2.setSkeleton(skel2);
+		
+		tu3.setId("tu3");
+		tu3.setSkeleton(skel3);
+		
+		tu4.setId("tu4");
+		tu4.setSkeleton(skel4);
+		
+		tu5.setId("tu5");
+		tu5.setSkeleton(skel5);
+		
+		tu6.setId("tu6");
+		tu6.setSkeleton(skel6);
+		
+		tu7.setId("tu7");
+		tu7.setSkeleton(skel7);
+		
+		// 1 -> 3
+		// 3 -> 4
+		// 5 -> 2
+		// 5 -> 7
+		// 7 -> 6
+		// 2 -> 6 (recursion)
+				
+		skel1.addContentPlaceholder(tu3);
+		skel3.addContentPlaceholder(tu4);
+		skel5.addContentPlaceholder(tu2);
+		skel5.addContentPlaceholder(tu7);
+		skel7.addContentPlaceholder(tu6);
+		skel2.addContentPlaceholder(tu6);
+
+		e = new Event(EventType.TEXT_UNIT, tu1);
+		events.add(e);
+		
+		e = new Event(EventType.TEXT_UNIT, tu2);
+		events.add(e);
+		
+		e = new Event(EventType.TEXT_UNIT, tu3);
+		events.add(e);
+		
+		e = new Event(EventType.TEXT_UNIT, tu4);
+		events.add(e);
+		
+		e = new Event(EventType.TEXT_UNIT, tu5);
+		events.add(e);
+		
+		e = new Event(EventType.TEXT_UNIT, tu6);
+		events.add(e);
+		
+		e = new Event(EventType.TEXT_UNIT, tu7);
+		events.add(e);
+
+//------------------------		
+		e = new Event(EventType.END_DOCUMENT);
+		events.add(e);
+		
+		e = new Event(EventType.END_BATCH);
+		events.add(e);
+		
+		for (Event event : events) {
+			writerStep.handleEvent(event);
+		}
+	}		
+	
+	// DEBUG 	
+	@Test
+	public void testReferences2() throws MalformedURLException, URISyntaxException {
+		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		writerStep.setOutputURI(new URL("file", null, pathBase + "draft4.xliff.kit").toURI());
+		writerStep.setTargetLocale(DEDE);
+		net.sf.okapi.steps.xliffkit.writer.Parameters params = 
+			(net.sf.okapi.steps.xliffkit.writer.Parameters) writerStep.getParameters();
+		
+		params.setIncludeSource(false);
+		params.setIncludeOriginal(false);
+		
+		List<Event> events = new ArrayList<Event>();
+		
+		Event e = new Event(EventType.START_BATCH);
+		events.add(e);
+		
+		StartDocument sd = new StartDocument("sd1");
+		sd.setName("test_refs.txt");
+		sd.setLocale(ENUS);
+		sd.setFilterWriter(new GenericFilterWriter(null, null));
+		
+		e = new Event(EventType.START_DOCUMENT, sd);
+		events.add(e);
+//------------------------
+	
+		
+		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+			'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		
+		TextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
+				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
+		
+		GenericSkeleton skel1 = new GenericSkeleton();
+		GenericSkeleton skel2 = new GenericSkeleton();
+		
+		tu1.setId("tu1");
+		tu1.setSkeleton(skel1);
+		
+		tu2.setId("tu2");
+		tu2.setSkeleton(skel2);
+		
+		// 1 -> 2
+		// 2 -> 1
+
+		skel1.addContentPlaceholder(tu2);
+		skel2.addContentPlaceholder(tu1);
+		
+		e = new Event(EventType.TEXT_UNIT, tu1);
+		events.add(e);
+		
+		e = new Event(EventType.TEXT_UNIT, tu2);
+		events.add(e);
+		
+//------------------------		
+		e = new Event(EventType.END_DOCUMENT);
+		events.add(e);
+		
+		e = new Event(EventType.END_BATCH);
+		events.add(e);
+		
+		for (Event event : events) {
+			writerStep.handleEvent(event);
+		}
 	}
 }

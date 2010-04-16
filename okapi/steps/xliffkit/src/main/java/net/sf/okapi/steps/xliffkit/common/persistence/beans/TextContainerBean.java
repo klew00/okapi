@@ -27,7 +27,6 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
@@ -86,8 +85,7 @@ public class TextContainerBean extends PersistenceBean {
 			}
 			
 			for (int i = 0; i < tc.getPartCount(); i++) {
-				//TextPartBean partBean = new TextPartBean();
-				TextPartBean partBean = (TextPartBean) BeanMapper.getBean(tc.getPart(i).getClass(), getSession());
+				TextPartBean partBean = (TextPartBean) getSession().createBean(tc.getPart(i).getClass());
 				parts.add(partBean);
 				partBean.set(tc.getPart(i));
 			}

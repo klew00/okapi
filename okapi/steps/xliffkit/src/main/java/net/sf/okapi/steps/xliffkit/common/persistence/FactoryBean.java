@@ -70,18 +70,21 @@ public class FactoryBean extends PersistenceBean {
 		//System.out.println(className);
 		
 		//int rid = beenLookup.get(obj);
-		int refId = this.getRefId(); 
-		int rid = getSession().getRefIdForObject(obj);
-		if (rid != 0) {
-			reference = rid;
-			getSession().setRefIdForObject(this, refId); // To find the ref parent's root
-			getSession().setReference(refId, rid);
-			content = null;			
-			return this;
-		}
+//		int rid = getSession().getRefIdForObject(obj);
+//		if (rid != 0) {
+//			reference = rid;
+//			getSession().setRefIdForObject(this, refId); // To find the ref parent's root
+//			getSession().setReference(refId, rid);
+//			content = null;			
+//			return this;
+//		}
 		
-		IPersistenceBean bean = BeanMapper.getBean(ClassUtil.getClass(obj), getSession());
-		getSession().setRefIdForObject(obj, refId);
+		IPersistenceBean bean = getSession().uncacheBean(obj);
+		if (bean == null) {
+			bean = getSession().createBean(ClassUtil.getClass(obj));
+			getSession().cacheBean(obj, bean);
+		}
+		getSession().setRefIdForObject(obj, bean.getRefId());
 		reference = 0;
 		content = bean;
 		

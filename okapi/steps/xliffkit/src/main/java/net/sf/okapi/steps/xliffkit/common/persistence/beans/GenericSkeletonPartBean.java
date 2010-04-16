@@ -23,15 +23,15 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
-import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.ReferenceBean;
 
 public class GenericSkeletonPartBean extends PersistenceBean {
 
 	private String data;
-	private FactoryBean parent = new FactoryBean(getSession());
+	private ReferenceBean parent = new ReferenceBean(getSession());
 	private String locId;
 	
 	public GenericSkeletonPartBean(IPersistenceSession session) {
@@ -85,11 +85,11 @@ public class GenericSkeletonPartBean extends PersistenceBean {
 		return locId;
 	}
 
-	public FactoryBean getParent() {
+	public ReferenceBean getParent() {
 		return parent;
 	}
 
-	public void setParent(FactoryBean parent) {
+	public void setParent(ReferenceBean parent) {
 		this.parent = parent;
 	}
 }

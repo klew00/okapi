@@ -47,8 +47,9 @@ public class Document  {
 		fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLContentFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");				
+		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");						
 		fcMapper.addConfigurations(net.sf.okapi.filters.plaintext.PlainTextFilter.class.getName());
+		fcMapper.addConfigurations(net.sf.okapi.filters.table.TableFilter.class.getName());
 	}
 	
 	public Document(URI inputURI, String defaultEncoding, String filterConfigId,

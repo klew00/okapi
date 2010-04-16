@@ -69,6 +69,13 @@ public interface IPersistenceSession {
 	 */
 	<T> T deserialize(Class<T> classRef);
 
+	
+	IPersistenceBean createBean(Class<?> classRef);
+	
+	void cacheBean(Object obj, IPersistenceBean bean);
+	
+	IPersistenceBean uncacheBean(Object obj);
+	
 	/**
 	 * Converts a given object to an expected type.
 	 * The given object can be serialized as is, and then deserialized as 
@@ -84,7 +91,7 @@ public interface IPersistenceSession {
 	
 	String getMimeType();
 	
-	String getRootClass();
+	String getItemClass();
 	
 	String getDescription();
 		

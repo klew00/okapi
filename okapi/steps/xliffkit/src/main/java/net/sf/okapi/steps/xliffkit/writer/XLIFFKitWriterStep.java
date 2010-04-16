@@ -105,8 +105,8 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	
 	private String originalPartName;
 	private String sourcePartName;
-	private String altOriginalPartName;
-	private String altSourcePartName;
+	//private String altOriginalPartName;
+	//private String altSourcePartName;
 	private String xliffPartName;
 	private String skeletonPartName;	
 	private String resourcesPartName;
@@ -332,8 +332,8 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		sourcePartName = String.format("content/source/%s/%s", srcLoc.toString(), sourceFileName);
 		xliffPartName = String.format("content/target/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), xliffFileName);
 		resourcesPartName = String.format("content/target/%s.%s/resources/%s/%s", srcLoc.toString(), trgLoc.toString(), sourceFileName, resourcesFileName);
-		altOriginalPartName = String.format("content/original/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), originalFileName);
-		altSourcePartName = String.format("content/source/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), sourceFileName);
+//		altOriginalPartName = String.format("content/original/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), originalFileName);
+//		altSourcePartName = String.format("content/source/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), sourceFileName);
 		
 		PackagePart corePart =
 			createPart(pack, null, xliffPartName, tempXliff, MimeTypeMapper.XLIFF_MIME_TYPE, TKitRelationshipTypes.CORE_DOCUMENT);
@@ -343,15 +343,17 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		if (params.isIncludeSource())
 			if (!sources.contains(docName)) {
 				
-				if (createPart(pack, corePart, sourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE) == null)
-					createPart(pack, corePart, altSourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE);
+//				if (createPart(pack, corePart, sourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE) == null)
+//					createPart(pack, corePart, altSourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE);
+				createPart(pack, corePart, sourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE);
 				sources.add(docName);
 			}
 		
 		if (params.isIncludeOriginal())
 			if (!originals.contains(docName)) {
-				if (createPart(pack, corePart, originalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL) == null)
-					createPart(pack, corePart, altOriginalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL);
+//				if (createPart(pack, corePart, originalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL) == null)
+//					createPart(pack, corePart, altOriginalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL);
+				createPart(pack, corePart, originalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL);
 				originals.add(docName);
 			}
 	}

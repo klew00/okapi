@@ -42,8 +42,7 @@ import org.junit.Test;
 
 public class TestVersions {
 
-	// DEBUG 
-	@Test
+	// DEBUG @Test
 	public void testOldPersistenceRoundtrip() throws IOException{
 		Event event1 = new Event(EventType.TEXT_UNIT);
 		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
