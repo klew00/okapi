@@ -118,7 +118,9 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
 		srxDocument.loadRules(is);
 		srxDocument.setTrimLeadingWhitespaces(false);
-		sourceSegmenter = srxDocument.compileLanguageRules(sourceLocale, null);
+		if (!params.isSourceAlreadySegmented()) {
+			sourceSegmenter = srxDocument.compileLanguageRules(sourceLocale, null);
+		}
 		targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
 
 		// Start TMX writer (one for all input documents)
@@ -159,7 +161,9 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
 		TextUnit sourceTu = (TextUnit) sourceEvent.getResource();
-		sourceTu.createSourceSegmentation(sourceSegmenter);
+		if (!params.isSourceAlreadySegmented()) {
+			sourceTu.createSourceSegmentation(sourceSegmenter);
+		}
 
 		// Move to the next target TU
 		Event targetEvent = synchronize(EventType.TEXT_UNIT);

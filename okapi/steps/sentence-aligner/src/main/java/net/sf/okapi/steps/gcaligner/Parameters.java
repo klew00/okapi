@@ -32,7 +32,8 @@ import net.sf.okapi.common.uidescription.PathInputPart;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private String tmxOutputPath;
-	private boolean generateTMX = true;	
+	private boolean generateTMX;	
+	private boolean sourceAlreadySegmented;
 
 	public Parameters () {
 		reset();
@@ -50,6 +51,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void reset() {
 		tmxOutputPath = "aligned.tmx";
 		generateTMX = true;
+		sourceAlreadySegmented = false;
 	}
 
 	@Override
@@ -58,6 +60,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		tmxOutputPath = buffer.getString("tmxPath", tmxOutputPath);
 		generateTMX = buffer.getBoolean("generateTMX");
+		sourceAlreadySegmented = buffer.getBoolean("sourceAlreadySegmented");
 	}
 
 	@Override
@@ -65,6 +68,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setParameter("tmxPath", tmxOutputPath);
 		buffer.setBoolean("generateTMX", generateTMX);
+		buffer.setBoolean("alreadySourceSegmented", sourceAlreadySegmented);
 		return buffer.toString();
 	}
 
@@ -73,6 +77,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add("tmxPath",	"TMX output path", "Full path of the output TMX file");
 		desc.add("generateTMX",	"Generate TMX?", "If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");		
+		desc.add("sourceAlreadySegmented","Source Already Segmented?", "Have the source input files arelady been segmented?");
 		return desc;
 	}
 	
@@ -80,6 +85,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Gale and Church Sentence Aligner", true, false);	
 		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get("generateTMX"));
+		desc.addCheckboxPart(paramsDesc.get("sourceAlreadySegmented"));
 		PathInputPart pip = desc.addPathInputPart(paramsDesc.get("tmxPath"), "TMX Document", true);
 		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setWithLabel(false);
@@ -93,5 +99,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	public void setGenerateTMX (boolean generateTMX) {
 		this.generateTMX = generateTMX;
+	}
+
+	public boolean isSourceAlreadySegmented() {
+		return sourceAlreadySegmented;
+	}
+
+	public void setSourceAlreadySegmented(boolean sourceAlreadySegmented) {
+		this.sourceAlreadySegmented = sourceAlreadySegmented;
 	}
 }
