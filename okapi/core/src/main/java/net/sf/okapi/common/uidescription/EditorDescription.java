@@ -190,4 +190,17 @@ public class EditorDescription {
 		return desc;
 	}
 	
+	/**
+	 * Adds a spin part to this editor description.
+	 * @param paramDescriptor the parameter descriptor for this UI part.
+	 * @return the UI part created by this call.
+	 */
+	public SpinInputPart addSpinInputPart (ParameterDescriptor paramDescriptor) {
+		SpinInputPart desc = new SpinInputPart(paramDescriptor);
+		desc.setVertical(defaultVertical);
+		desc.setLabelFlushed(defaultLabelFlushed);
+		descriptors.put(desc.getName(), desc);
+		return desc;
+	}
+	
 }

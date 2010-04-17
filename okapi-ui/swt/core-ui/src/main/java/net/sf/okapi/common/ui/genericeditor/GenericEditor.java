@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
 import net.sf.okapi.common.IContext;
@@ -53,6 +54,7 @@ import net.sf.okapi.common.uidescription.IContainerPart;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.ListSelectionPart;
 import net.sf.okapi.common.uidescription.PathInputPart;
+import net.sf.okapi.common.uidescription.SpinInputPart;
 import net.sf.okapi.common.uidescription.TextInputPart;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -294,6 +296,23 @@ public class GenericEditor {
 					panel.setLayoutData(gdTmp);
 				}
 				panel.setEnabled(d.getWriteMethod()!=null);
+			}
+			else if ( part instanceof SpinInputPart ) {
+				SpinInputPart d = (SpinInputPart)part;
+				cmp = lookupParent(d.getContainer());
+				if ( d.isWithLabel() ) setLabel(cmp, d, 0);
+				Spinner spinner = new Spinner(cmp, SWT.BORDER);
+				spinner.setMinimum(d.getMinimumValue());
+				spinner.setMaximum(d.getMaximumValue());
+				spinner.setIncrement(1);
+				spinner.setPageIncrement(10);
+				controls.put(d.getName(), spinner);
+				if ( part.isVertical() || !part.isWithLabel() ) {
+					gdTmp = new GridData();
+					gdTmp.horizontalSpan = 2;
+					spinner.setLayoutData(gdTmp);
+				}
+				spinner.setEnabled(d.getWriteMethod()!=null);
 			}
 
 			// Update the list of observers if needed
@@ -608,6 +627,10 @@ public class GenericEditor {
 				CodeFinderPart d = (CodeFinderPart)part;
 				setCodeFinderControl((InlineCodeFinderPanel)controls.get(d.getName()), d);
 			}
+			else if ( part instanceof SpinInputPart ) {
+				SpinInputPart d = (SpinInputPart)part;
+				setSpinnerControl((Spinner)controls.get(d.getName()), d);
+			}
 			
 			if ( part.getMasterPart() != null ) list.add(part);
 		}
@@ -674,6 +697,13 @@ public class GenericEditor {
 			else if ( ctrl instanceof InlineCodeFinderPanel ) {
 				if ( description.getDescriptor(name) instanceof CodeFinderPart ) {
 					if ( !saveCodeFinderControl((InlineCodeFinderPanel)ctrl, (CodeFinderPart)description.getDescriptor(name)) ) {
+						return false;
+					}
+				}
+			}
+			else if ( ctrl instanceof Spinner ) {
+				if ( description.getDescriptor(name) instanceof SpinInputPart ) {
+					if ( !saveSpinnerControl((Spinner)ctrl, (SpinInputPart)description.getDescriptor(name)) ) {
 						return false;
 					}
 				}
@@ -980,6 +1010,31 @@ public class GenericEditor {
 		}
 	}
 	
+	private boolean saveSpinnerControl (Spinner ctrl, SpinInputPart desc) {
+		try {
+			if ( !ctrl.isEnabled() ) return true; // Don't save disabled input
+			if ( desc.getType().equals(int.class) ) {
+				desc.getWriteMethod().invoke(desc.getParent(), ctrl.getSelection());
+			}
+			else {
+				throw new OkapiEditorCreationException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		return true;
+	}
 
 	private void setListControl (List list, ListSelectionPart desc) {
 		try {
@@ -1132,6 +1187,28 @@ public class GenericEditor {
 			if ( desc.getType().equals(String.class) ) {
 				String tmp = (String)desc.getReadMethod().invoke(desc.getParent());
 				ctrl.setText((tmp==null) ? "" : tmp);
+			}
+			else {
+				throw new OkapiEditorCreationException(String.format(
+					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void setSpinnerControl (Spinner spinner, SpinInputPart desc) {
+		try {
+			if ( desc.getType().equals(int.class) ) {
+				int n = (Integer)desc.getReadMethod().invoke(desc.getParent());
+				spinner.setSelection(n);
 			}
 			else {
 				throw new OkapiEditorCreationException(String.format(

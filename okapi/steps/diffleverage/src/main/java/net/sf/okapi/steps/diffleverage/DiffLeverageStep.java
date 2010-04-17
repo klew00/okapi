@@ -107,14 +107,14 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription() {
-		return "Diff (i.e. compare) two bi-lingual documents."
+		return "Compare two bilingual documents. "
 				+ "Copy the old target segments into the new document's "
-				+ "TextUnits based on contextual matching of the source segments";
+				+ "text units based on contextual matching of the source segments";
 	}
 
 	@Override
 	public String getName() {
-		return "Diff Leverage Step";
+		return "Diff Leverage";
 	}
 	
 	@Override

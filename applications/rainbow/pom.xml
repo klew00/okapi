@@ -330,6 +330,11 @@
 			<artifactId>okapi-step-uriconversion</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-diffleverage</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 <!-- Plugin
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>

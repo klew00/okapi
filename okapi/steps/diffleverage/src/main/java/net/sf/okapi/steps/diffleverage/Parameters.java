@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,9 +24,10 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
-import net.sf.okapi.common.uidescription.TextInputPart;
+import net.sf.okapi.common.uidescription.SpinInputPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+	
 	private int fuzzyThreshold;
 	private boolean codesensitive;
 	private boolean diffOnly;
@@ -64,17 +65,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("fuzzyThreshold", "Fuzzy Threshold", "Fuzzy Threshold between 0 and 100.");		
-		desc.add("codesensitive", "Compare Codes?", "Use codes to compare TextUnits?");
-		desc.add("diffOnly", "Diff Only?", "Diff only (do not copy translation)?");
+		desc.add("fuzzyThreshold", "Leverage only if the match is equal or above this score", "Fuzzy Threshold between 1 and 100.");		
+		desc.add("codesensitive", "Include inline codes in the comparison", "Use codes to compare contents");
+		desc.add("diffOnly", "Do not fill the target with the leveraged translation", "Diff only (do not copy translation)?");
 		return desc;
 	}
 	
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Diff Leverager", true, false);	
-		TextInputPart tp = desc.addTextInputPart(paramsDesc.get("fuzzyThreshold"));
-		tp.setRange(1, 100);
+		EditorDescription desc = new EditorDescription("Diff Leverage", true, false);	
+		SpinInputPart sip = desc.addSpinInputPart(paramsDesc.get("fuzzyThreshold"));
+		sip.setRange(1, 100);
+		sip.setVertical(false);
 		desc.addCheckboxPart(paramsDesc.get("codesensitive"));
 		desc.addCheckboxPart(paramsDesc.get("diffOnly"));
 		return desc;
