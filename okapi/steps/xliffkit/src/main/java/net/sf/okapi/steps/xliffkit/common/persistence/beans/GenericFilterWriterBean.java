@@ -23,29 +23,21 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class GenericFilterWriterBean extends PersistenceBean {
 
-	public GenericFilterWriterBean(IPersistenceSession session) {
-		super(session);
+	@Override
+	protected Object createObject(IPersistenceSession session) {
+		return new GenericFilterWriter(new GenericSkeletonWriter(), new EncoderManager());
 	}
 
 	@Override
-	public <T> T get(T obj) {
-		return obj;
+	protected void fromObject(Object obj, IPersistenceSession session) {
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new GenericFilterWriter(new GenericSkeletonWriter(), new EncoderManager())));
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
-		return this;
-	}
-
+	protected void setObject(Object obj, IPersistenceSession session) {
+	}	
 }

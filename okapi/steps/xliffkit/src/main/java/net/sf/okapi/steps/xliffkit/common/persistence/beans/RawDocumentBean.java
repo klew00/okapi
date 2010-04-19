@@ -30,7 +30,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -46,28 +45,9 @@ public class RawDocumentBean extends PersistenceBean {
 	private String inputCharSequence;
 	// TODO Handle inputStream if possible at all
 	// private InputStreamBean inputStream; 
-	
-	public RawDocumentBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof RawDocument) {
-			RawDocument rd = (RawDocument) obj;
-		
-			for (FactoryBean annotationBean : annotations)
-				rd.setAnnotation(annotationBean.get(IAnnotation.class));
-							
-			rd.setFilterConfigId(filterConfigId);
-			rd.setId(id);
-			rd.setEncoding(encoding);			
-		}		
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
+	protected Object createObject(IPersistenceSession session) {
 		RawDocument rd = null;
 		
 		if (!Util.isEmpty(inputURI))
@@ -83,18 +63,18 @@ public class RawDocumentBean extends PersistenceBean {
 			// TODO Handle inputStream or empty input params
 			rd = new RawDocument("", new LocaleId(srcLoc), new LocaleId(trgLoc));
 		
-		return classRef.cast(get(rd));
+		return rd;
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof RawDocument) {
 			RawDocument rd = (RawDocument) obj;
 			
 			for (IAnnotation annotation : rd.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean(getSession());
+				FactoryBean annotationBean = new FactoryBean();
 				annotations.add(annotationBean);
-				annotationBean.set(annotation);
+				annotationBean.set(annotation, session);
 			}
 			
 			filterConfigId = rd.getFilterConfigId();
@@ -113,9 +93,22 @@ public class RawDocumentBean extends PersistenceBean {
 			if (rd.getInputCharSequence() != null)
 				inputCharSequence = rd.getInputCharSequence().toString();
 		}
-		return this;
 	}
 
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof RawDocument) {
+			RawDocument rd = (RawDocument) obj;
+		
+			for (FactoryBean annotationBean : annotations)
+				rd.setAnnotation(annotationBean.get(IAnnotation.class, session));
+							
+			rd.setFilterConfigId(filterConfigId);
+			rd.setId(id);
+			rd.setEncoding(encoding);			
+		}
+	}
+	
 	public List<FactoryBean> getAnnotations() {
 		return annotations;
 	}

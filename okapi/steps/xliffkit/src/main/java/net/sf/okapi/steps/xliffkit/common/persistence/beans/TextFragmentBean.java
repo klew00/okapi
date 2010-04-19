@@ -25,7 +25,6 @@ import java.util.List;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -33,13 +32,28 @@ public class TextFragmentBean extends PersistenceBean {
 
 	private String text;
 	private List<CodeBean> codes = new ArrayList<CodeBean>();
-	
-	public TextFragmentBean(IPersistenceSession session) {
-		super(session);
+
+	@Override
+	protected Object createObject(IPersistenceSession session) {
+		return new TextFragment();
 	}
 
 	@Override
-	public <T> T get(T obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof TextFragment) {
+			TextFragment tc = (TextFragment) obj;
+			text = tc.getCodedText();
+			
+			for (Code code : tc.getCodes()) {
+				CodeBean codeBean = new CodeBean();
+				codeBean.set(code, session);
+				codes.add(codeBean);
+			}			
+		}
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof TextFragment) {
 			TextFragment tf = (TextFragment) obj; 
 		
@@ -48,31 +62,10 @@ public class TextFragmentBean extends PersistenceBean {
 			
 			List<Code> newCodes = new ArrayList<Code>();
 			for (CodeBean code : codes)
-				newCodes.add(code.get(Code.class));
+				newCodes.add(code.get(Code.class, session));
 			
 			tf.setCodedText(text, newCodes);
-		}		
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new TextFragment()));
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
-		if (obj instanceof TextFragment) {
-			TextFragment tc = (TextFragment) obj;
-			text = tc.getCodedText();
-			
-			for (Code code : tc.getCodes()) {
-				CodeBean codeBean = new CodeBean(getSession());
-				codeBean.set(code);
-				codes.add(codeBean);
-			}			
-		}		
-		return this;
+		}
 	}
 
 	public String getText() {

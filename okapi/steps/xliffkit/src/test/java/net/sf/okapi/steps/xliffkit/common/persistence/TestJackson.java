@@ -34,7 +34,6 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -56,7 +55,6 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.junit.Before;
-import org.junit.Test;
 
 public class TestJackson {
 
@@ -98,11 +96,11 @@ public class TestJackson {
 //		
 //		GenericSkeleton skel = (GenericSkeleton) tu.getSkeleton();
 //		System.out.println(mapper.writeValueAsString(skel));
-		TextUnitBean tub = new TextUnitBean(session);
-		tub.set(tu);
+		TextUnitBean tub = new TextUnitBean();
+		tub.set(tu, session);
 		
-		EventBean evb = new EventBean(session);
-		evb.set(event);
+		EventBean evb = new EventBean();
+		evb.set(event, session);
 		//mapper.getDeserializationConfig().addHandler(new TestResolver());
 		
 		//String st = mapper.writeValueAsString(tub);
@@ -114,9 +112,9 @@ public class TestJackson {
 		
 		st = mapper.writeValueAsString(tub);
 		tub = mapper.readValue(st, TextUnitBean.class);
-		tu = tub.get(new TextUnit(""));
+		tu = tub.get(new TextUnit(""), session);
 //		System.out.println(tu.getSource().getCodedText());
-		System.out.println(((TextContainer)tub.getSource().get(new TextContainer())).getCodedText());
+		System.out.println(((TextContainer)tub.getSource().get(new TextContainer(), session)).getCodedText());
 //		ISkeleton skel = tub.getSkeleton().read(ISkeleton.class);
 //		if (skel != null)
 //			System.out.println(skel.getClass());
@@ -135,8 +133,8 @@ public class TestJackson {
 	public void testRawDocument() throws JsonGenerationException, JsonMappingException, IOException {
 		Event event = new Event(EventType.RAW_DOCUMENT);
 		event.setResource(new RawDocument("raw doc", LocaleId.ENGLISH));
-		EventBean evb = new EventBean(session);
-		evb.set(event);
+		EventBean evb = new EventBean();
+		evb.set(event, session);
 		//mapper.getDeserializationConfig().addHandler(new TestResolver());
 		
 		//String st = mapper.writeValueAsString(tub);
@@ -236,8 +234,8 @@ public class TestJackson {
 			//name = Util.getFilename(name, true);
 				zf = new ZipFile(new File(this.getClass().getResource("sample1.en.fr.zip").toURI()));
 		ZipSkeleton zs = new ZipSkeleton(zf);
-		ZipSkeletonBean zsb = new ZipSkeletonBean(session);
-		zsb.set(zs);
+		ZipSkeletonBean zsb = new ZipSkeletonBean();
+		zsb.set(zs, session);
 		String st = mapper.writeValueAsString(zsb);
 		System.out.println(st);
 		zf.close();
@@ -246,8 +244,8 @@ public class TestJackson {
 	// DEBUG @Test
 	public void testInputStreamBean() throws URISyntaxException, JsonGenerationException, JsonMappingException, IOException {
 		FileInputStream fis = new FileInputStream(new File(this.getClass().getResource("test3.txt").toURI()));
-		InputStreamBean isb = new InputStreamBean(session);
-		isb.set(fis);
+		InputStreamBean isb = new InputStreamBean();
+		isb.set(fis, session);
 		String st = mapper.writeValueAsString(isb);
 		System.out.println(st);
 	}
@@ -347,7 +345,7 @@ public class TestJackson {
 		
 		Event event11 = skelSession.deserialize(Event.class);
 		Event event22 = skelSession.deserialize(Event.class);
-		Event event33 = skelSession.deserialize(Event.class);
+//		Event event33 = skelSession.deserialize(Event.class);
 		
 		skelSession.end();
 				
@@ -366,24 +364,24 @@ public class TestJackson {
 		JSONPersistenceSession skelSession = new JSONPersistenceSession();
 		skelSession.start(this.getClass().getResourceAsStream("test1.txt"));		
 		
-		Event event11 = skelSession.deserialize(Event.class);
-		Event event12 = skelSession.deserialize(Event.class);
+//		Event event11 = skelSession.deserialize(Event.class);
+//		Event event12 = skelSession.deserialize(Event.class);
 		
 		skelSession.end();
 		
 		// test2.txt -- created by new beans from new core, reading to new core
 		skelSession.start(this.getClass().getResourceAsStream("test2.txt"));		
 		
-		Event event21 = skelSession.deserialize(Event.class);
-		Event event22 = skelSession.deserialize(Event.class);
+//		Event event21 = skelSession.deserialize(Event.class);
+//		Event event22 = skelSession.deserialize(Event.class);
 		
 		skelSession.end();
 		
 		// test4.txt -- created by old beans from old core, reading to new core  
 		skelSession.start(this.getClass().getResourceAsStream("test4.txt"));		
 		
-		Event event41 = skelSession.deserialize(Event.class);
-		Event event42 = skelSession.deserialize(Event.class);
+//		Event event41 = skelSession.deserialize(Event.class);
+//		Event event42 = skelSession.deserialize(Event.class);
 		
 		skelSession.end();
 	}

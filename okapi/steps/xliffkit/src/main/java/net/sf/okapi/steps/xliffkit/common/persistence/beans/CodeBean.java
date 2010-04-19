@@ -25,34 +25,23 @@ import java.util.List;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class CodeBean extends PersistenceBean {
 
 	private String data;
-	
-	public CodeBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		return obj;
+	protected Object createObject(IPersistenceSession session) {
+		List<Code> codes = Code.stringToCodes(data);
+		if (Util.isEmpty(codes)) return null;
+		
+		return codes.get(0);
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		List<Code> codes = Code.stringToCodes(data);
-		if (Util.isEmpty(codes))
-			return null;
-		
-		return classRef.cast(codes.get(0));
-	}
-	
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof Code) {
 			Code code = (Code) obj;
 
@@ -60,7 +49,10 @@ public class CodeBean extends PersistenceBean {
 			codes.add(code);
 			data = Code.codesToString(codes);
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object destObj, IPersistenceSession session) {
 	}
 
 	public String getData() {

@@ -22,49 +22,42 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class StartSubDocumentBean extends BaseNameableBean {
 
 	private String parentId;
-	private ParametersBean filterParams = new ParametersBean(getSession());
-	
-	public StartSubDocumentBean(IPersistenceSession session) {
-		super(session);
+	private ParametersBean filterParams = new ParametersBean();
+
+	@Override
+	protected Object createObject(IPersistenceSession session) {
+		return new StartSubDocument(parentId);
 	}
 
 	@Override
-	public <T> T get(T obj) {
-		obj = super.get(obj);
-		
-		if (obj instanceof StartSubDocument) {
-			StartSubDocument ssd = (StartSubDocument) obj;
-			
-			ssd.setParentId(parentId);
-			ssd.setFilterParameters(filterParams.get(IParameters.class));
-		}			
-		return obj;
-	}
-
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new StartSubDocument(parentId)));
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
-		super.set(obj);
+	protected void fromObject(Object obj, IPersistenceSession session) {
+		super.fromObject(obj, session);
 		
 		if (obj instanceof StartSubDocument) {
 			StartSubDocument ssd = (StartSubDocument) obj;
 			
 			parentId = ssd.getParentId();
-			filterParams.set(ssd.getFilterParameters());
+			filterParams.set(ssd.getFilterParameters(), session);
 		}
-		return null;
 	}
 
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		super.setObject(obj, session);
+		
+		if (obj instanceof StartSubDocument) {
+			StartSubDocument ssd = (StartSubDocument) obj;
+			
+			ssd.setParentId(parentId);
+			ssd.setFilterParameters(filterParams.get(IParameters.class, session));
+		}
+	}
+	
 	public String getParentId() {
 		return parentId;
 	}

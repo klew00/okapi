@@ -26,7 +26,6 @@ import java.util.List;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -36,29 +35,14 @@ public class PropertyBean extends PersistenceBean {
 	private String value;
 	private boolean isReadOnly;
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
-	
-	public PropertyBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof Property) {
-			Property prop = (Property) obj;
-		
-			for (FactoryBean annotationBean : annotations)
-				prop.setAnnotation(annotationBean.get(IAnnotation.class));
-		}
-		return obj;
+	protected Object createObject(IPersistenceSession session) {
+		return new Property(name, value, isReadOnly);
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new Property(name, value, isReadOnly)));
-	}
-	
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof Property) {
 			Property prop = (Property) obj;
 			name = prop.getName();
@@ -66,12 +50,21 @@ public class PropertyBean extends PersistenceBean {
 			isReadOnly = prop.isReadOnly();
 			
 			for (IAnnotation annotation : prop.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean(getSession());
+				FactoryBean annotationBean = new FactoryBean();
 				annotations.add(annotationBean);
-				annotationBean.set(annotation);
+				annotationBean.set(annotation, session);
 			}
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof Property) {
+			Property prop = (Property) obj;
+		
+			for (FactoryBean annotationBean : annotations)
+				prop.setAnnotation(annotationBean.get(IAnnotation.class, session));
+		}
 	}
 
 	public String getValue() {

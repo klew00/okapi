@@ -37,8 +37,6 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
 
-import org.junit.Test;
-
 
 public class TestVersions {
 

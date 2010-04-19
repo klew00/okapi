@@ -49,9 +49,10 @@ public class TestProtocolBuffers {
 	// DEBUG @Test
 	public void testBean() {
 		
-		BaseNameableBean bean = new BaseNameableBean(null);
-		bean.set(new BaseNameable());
-		bean.set(null);
+		IPersistenceSession session = null;
+		BaseNameableBean bean = new BaseNameableBean();
+		bean.set(new BaseNameable(), session);
+		bean.set(null, session);
 		assertNotNull(bean);
 	}
 	

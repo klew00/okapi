@@ -32,26 +32,22 @@ import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class ZipSkeletonBean extends GenericSkeletonBean {
 
-	private ZipFileBean original = new ZipFileBean(getSession());
+	private ZipFileBean original = new ZipFileBean();
 	private String entry;
 	
-	public ZipSkeletonBean(IPersistenceSession session) {
-		super(session);
+	@Override
+	public <T> T get(T obj, IPersistenceSession session) {
+		return super.get(obj, session);
 	}
 	
 	@Override
-	public <T> T get(T obj) {
-		return super.get(obj);
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {		
+	public <T> T get(Class<T> classRef, IPersistenceSession session) {		
 		ZipSkeleton skel = null;
 		ZipFile zf = null;
 		ZipEntry ze = null;
 		List<GenericSkeletonPartBean> parts = super.getParts();
 		
-		zf = original.get(ZipFile.class);		
+		zf = original.get(ZipFile.class, session);		
 		if (zf != null && entry != null)
 			ze = zf.getEntry(entry);
 		
@@ -65,23 +61,23 @@ public class ZipSkeletonBean extends GenericSkeletonBean {
 			}
 						
 		if (!Util.isEmpty(parts))
-			skel = new ZipSkeleton(super.get(GenericSkeleton.class), ze);
+			skel = new ZipSkeleton(super.get(GenericSkeleton.class, session), ze);
 		else if (zf != null)
 			skel = new ZipSkeleton(zf);
 		else //if (ze != null)
 			skel = new ZipSkeleton(ze);
 						
-		return classRef.cast(get(skel));
+		return classRef.cast(get(skel, session));
 	}	
 
 	@Override
-	public IPersistenceBean set(Object obj) {
-		super.set(obj);
+	public IPersistenceBean set(Object obj, IPersistenceSession session) {
+		super.set(obj, session);
 		
 		if (obj instanceof ZipSkeleton) {
 			ZipSkeleton zs = (ZipSkeleton) obj;
 			
-			original.set(zs.getOriginal());
+			original.set(zs.getOriginal(), session);
 			//entry.set(zs.getEntry());
 			ZipEntry ze = zs.getEntry();
 			if (ze != null)
@@ -105,13 +101,4 @@ public class ZipSkeletonBean extends GenericSkeletonBean {
 	public void setEntry(String entry) {
 		this.entry = entry;
 	}
-
-//	public ZipEntryBean getEntry() {
-//		return entry;
-//	}
-//
-//	public void setEntry(ZipEntryBean entry) {
-//		this.entry = entry;
-//	}
-	
 }

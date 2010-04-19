@@ -20,28 +20,23 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class DocumentPartBean extends BaseReferenceableBean {
 
-	public DocumentPartBean(IPersistenceSession session) {
-		super(session);
+	@Override
+	protected Object createObject(IPersistenceSession session) {
+		return new DocumentPart(getId(), isReferent());
 	}
 
 	@Override
-	public <T> T get(T obj) {	
-		return super.get(obj);
+	protected void fromObject(Object obj, IPersistenceSession session) {
+		super.fromObject(obj, session);
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {		
-		return super.set(obj);
-	}
-
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return super.get(classRef);
-	}
-
+	protected void setObject(Object obj, IPersistenceSession session) {
+		super.setObject(obj, session);
+	}	
 }

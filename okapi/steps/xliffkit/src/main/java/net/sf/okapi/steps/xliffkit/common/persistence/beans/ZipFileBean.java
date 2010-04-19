@@ -33,7 +33,6 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import net.sf.okapi.common.Util;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -44,16 +43,9 @@ public class ZipFileBean extends PersistenceBean {
 	boolean empty;
 	
 	private static ZipFile zipFile;
-	
-	public ZipFileBean(IPersistenceSession session) {
-		super(session);
-	}
-	
-	@SuppressWarnings("unchecked")
+
 	@Override
-	public <T> T get(T obj) {
-		if (empty) return obj;
-		
+	protected Object createObject(IPersistenceSession session) {
 		File tempZip = null;
 		try {
 			tempZip = File.createTempFile("~temp", ".zip");
@@ -67,7 +59,7 @@ public class ZipFileBean extends PersistenceBean {
 		try {
 			ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(tempZip.getAbsolutePath()));
 			for (ZipEntryBean entryBean : entries) {
-				ZipEntry entry = entryBean.get(ZipEntry.class);
+				ZipEntry entry = entryBean.get(ZipEntry.class, session);
 				//System.out.println(entry.getName());
 				zipOut.putNextEntry(entry);
 				if (entryBean.getInputStream() != null)
@@ -92,16 +84,11 @@ public class ZipFileBean extends PersistenceBean {
 			// TODO Handle exception
 			e.printStackTrace();
 		}
-		return (T) zipFile;
+		return zipFile;
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		return get((T) null);
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		empty = true;
 		
 		if (obj instanceof ZipFile) {
@@ -113,11 +100,11 @@ public class ZipFileBean extends PersistenceBean {
 				ZipEntry entry = e.nextElement();
 				//System.out.println(entry.getName());
 				
-				ZipEntryBean entryBean = new ZipEntryBean(getSession());
-				entryBean.set(entry);
+				ZipEntryBean entryBean = new ZipEntryBean();
+				entryBean.set(entry, session);
 				InputStreamBean isBean = entryBean.getInputStream();
 				try {
-					isBean.set(zf.getInputStream(entry));
+					isBean.set(zf.getInputStream(entry), session);
 				} catch (IOException e1) {
 					// TODO Handle exception
 					e1.printStackTrace();
@@ -126,7 +113,10 @@ public class ZipFileBean extends PersistenceBean {
 			}
 			empty = Util.isEmpty(name) || Util.isEmpty(entries);
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {		
 	}
 
 	public String getName() {

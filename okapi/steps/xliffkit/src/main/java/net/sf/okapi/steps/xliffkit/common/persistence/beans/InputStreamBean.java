@@ -24,32 +24,21 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.sf.okapi.common.StreamUtil;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class InputStreamBean extends PersistenceBean {
 
 	private byte[] data;
-	
-	public InputStreamBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
+	protected Object createObject(IPersistenceSession session) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof InputStream) {
 			InputStream is = (InputStream) obj;
 			boolean markSupported = is.markSupported();
@@ -72,7 +61,12 @@ public class InputStreamBean extends PersistenceBean {
 					e.printStackTrace();
 				}
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public void setData(byte[] data) {
@@ -82,5 +76,4 @@ public class InputStreamBean extends PersistenceBean {
 	public byte[] getData() {
 		return data;
 	}
-
 }

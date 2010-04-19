@@ -24,71 +24,71 @@ import net.sf.okapi.common.ClassUtil;
 
 public class FactoryBean extends PersistenceBean {
 	
-	private int reference;
+	private long reference;
 	private String className;
 	private Object content;	// Bean for the className
 	
-	public FactoryBean(IPersistenceSession session) {
-		super(session);
+	@Override
+	protected Object createObject(IPersistenceSession session) {
+		return null;
 	}
 
 	@Override
-	public <T> T get(T obj) {
-		return obj;
+	protected void fromObject(Object obj, IPersistenceSession session) {
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+	}
+
+	@Override
+	public <T> T get(T obj, IPersistenceSession session) {
+		return super.get(obj, session); // To handle refId
 	}
 	
 	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(validateContent() ? ((IPersistenceBean) content).get(classRef) : null);
+	public <T> T get(Class<T> classRef, IPersistenceSession session) {
+		return classRef.cast(validateContent(session) ? ((IPersistenceBean) content).get(classRef, session) : null);
 	}
 	
-	private boolean validateContent() {
+	private boolean validateContent(IPersistenceSession session) {
 		if (content == null) return false;
 		if (className == null) return false;
 		
-//		String cname = ClassUtil.getQualifiedClassName(content);
-//		if (!className.equals(cname))			
-//			content = JSONObjectConverter.convert(content, PersistenceMapper.getBeanClass(className));
-//		if (content == null) return false;
-//		cname = ClassUtil.getQualifiedClassName(content);
-//		
-//		return className.equals(cname);
 		boolean res = content instanceof IPersistenceBean; 
 		if (!res) {
-			if (getSession() == null) return false;
-			content = getSession().convert(content, BeanMapper.getBeanClass(className));
+			if (session == null) return false;
+			content = session.convert(content, BeanMapper.getBeanClass(className));
 			res = content instanceof IPersistenceBean;
 		}
 		return res;
 	}
 	
 	@Override
-	public IPersistenceBean set(Object obj) {
+	public IPersistenceBean set(Object obj, IPersistenceSession session) {
 		if (obj == null) return this;
 		
-		className = ClassUtil.getQualifiedClassName(obj);
-		//System.out.println(className);
+		className = ClassUtil.getQualifiedClassName(obj); // stored for get()
 		
-		//int rid = beenLookup.get(obj);
-//		int rid = getSession().getRefIdForObject(obj);
+//		long rid = session.getRefIdForObject(obj);
 //		if (rid != 0) {
 //			reference = rid;
-//			getSession().setRefIdForObject(this, refId); // To find the ref parent's root
-//			getSession().setReference(refId, rid);
-//			content = null;			
+//			session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
+//			session.setReference(this.getRefId(), rid);
 //			return this;
 //		}
 		
-		IPersistenceBean bean = getSession().uncacheBean(obj);
+		IPersistenceBean bean = session.uncacheBean(obj); // get a bin created earlier here or in a ReferenceBean
 		if (bean == null) {
-			bean = getSession().createBean(ClassUtil.getClass(obj));
-			getSession().cacheBean(obj, bean);
+			bean = session.createBean(ClassUtil.getClass(obj));
+			// session.cacheBean(obj, bean);
 		}
-		getSession().setRefIdForObject(obj, bean.getRefId());
+		session.setRefIdForObject(obj, bean.getRefId());
+		//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
 		reference = 0;
 		content = bean;
 		
-		return (bean instanceof FactoryBean) ? this : bean.set(obj);		
+		return (bean instanceof FactoryBean) ? this : bean.set(obj, session);		
 	}
 	
 	public void setClassName(String className) {
@@ -107,11 +107,11 @@ public class FactoryBean extends PersistenceBean {
 		return content;
 	}
 
-	public void setReference(int reference) {
+	public void setReference(long reference) {
 		this.reference = reference;
 	}
 
-	public int getReference() {
+	public long getReference() {
 		return reference;
 	}
 }

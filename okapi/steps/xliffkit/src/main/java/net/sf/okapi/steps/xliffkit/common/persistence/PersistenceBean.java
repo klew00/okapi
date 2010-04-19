@@ -22,21 +22,41 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 
 public abstract class PersistenceBean implements IPersistenceBean {
 	
-	private int refId;
-	transient private IPersistenceSession session;
+	private long refId = 0;
 
-	public PersistenceBean(IPersistenceSession session) {
-		super();		
-		this.session = session;
-		refId = session.generateRefId();
-	}
+	protected abstract Object createObject(IPersistenceSession session);
+	protected abstract void setObject(Object obj, IPersistenceSession session);
+	protected abstract void fromObject(Object obj, IPersistenceSession session);
 	
 	@Override
-	public int getRefId() {
+	public long getRefId() {
+		if (refId == 0)
+			refId = ReferenceResolver.generateRefId();
+		
 		return refId;
 	}
 
-	protected IPersistenceSession getSession() {
-		return session;
+	@Override
+	public void setRefId(long refId) {
+		this.refId = refId;
 	}
+
+	@Override
+	public <T> T get(T obj, IPersistenceSession session) {
+		if (obj != null)
+			session.setRefIdForObject(obj, refId);		
+		setObject(obj, session);
+		return obj;
+	}
+	
+	@Override
+	public <T> T get(Class<T> classRef, IPersistenceSession session) {
+		return classRef.cast(get(createObject(session), session));
+	}
+	
+	@Override
+	public IPersistenceBean set(Object obj, IPersistenceSession session) {
+		fromObject(obj, session);		
+		return this;
+	}		
 }

@@ -22,8 +22,8 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.ReferenceBean;
@@ -31,42 +31,34 @@ import net.sf.okapi.steps.xliffkit.common.persistence.ReferenceBean;
 public class GenericSkeletonPartBean extends PersistenceBean {
 
 	private String data;
-	private ReferenceBean parent = new ReferenceBean(getSession());
+	private ReferenceBean parent = new ReferenceBean();
+	//private FactoryBean parent = new FactoryBean();
 	private String locId;
-	
-	public GenericSkeletonPartBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		return obj;
+	protected Object createObject(IPersistenceSession session) {
+		LocaleId localeId = null;
+		if (!Util.isEmpty(locId))
+			localeId = new LocaleId(locId);
+		
+		return new GenericSkeletonPart(data, parent.get(IResource.class, session), localeId);
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		// IResource res = RefResolver.resolve(IResource.class, parent);
-		return classRef.cast(get(new GenericSkeletonPart(data, parent.get(IResource.class), 
-				new LocaleId(locId))));
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof GenericSkeletonPart) {
 			GenericSkeletonPart part = (GenericSkeletonPart) obj;
 			
 			data = part.toString();
-//			IResource res = part.getParent();
-//			if (res != null) {
-//				parent = res.getId();
-//				parentClass = ClassUtil.getQualifiedClassName(res);
-//			}
-			parent.set(part.getParent());
+			parent.set(part.getParent(), session);
 			LocaleId loc = part.getLocale();
 			if (loc != null)
 				locId = loc.toString();			
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
 	}
 
 	public String getData() {
@@ -84,6 +76,14 @@ public class GenericSkeletonPartBean extends PersistenceBean {
 	public String getLocId() {
 		return locId;
 	}
+
+//	public FactoryBean getParent() {
+//		return parent;
+//	}
+//
+//	public void setParent(FactoryBean parent) {
+//		this.parent = parent;
+//	}
 
 	public ReferenceBean getParent() {
 		return parent;

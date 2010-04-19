@@ -25,6 +25,12 @@ import java.lang.reflect.InvocationTargetException;
 
 public class ClassUtil {
 	
+	private static String MSG_CANT_INSTANTIATE = "ClassUtil: cannot instantiate %s";
+	private static String MSG_EMPTY_CLASSNAME = "ClassUtil: class name cannot be empty";
+	private static String MSG_NULL_REF = "ClassUtil: class reference cannot be null";
+	private static String MSG_NULL_LOADER = "ClassUtil: class loader cannot be null";
+	private static String MSG_NONRESOLVABLE = "ClassUtil: cannot resolve class name %s";
+	
 	/**
 	 * Gets the runtime class of the given object.
 	 * @param obj The object.
@@ -198,7 +204,9 @@ public class ClassUtil {
 	public static <T> T instantiateClass(Class<T> classRef) 
 		throws InstantiationException, IllegalAccessException {
 
-		if (classRef == null) return null;
+		if (classRef == null)
+			throw new IllegalArgumentException(MSG_NULL_REF);
+		
 		return classRef.cast(classRef.newInstance());
 	}
 	
@@ -213,7 +221,9 @@ public class ClassUtil {
 	public static Object instantiateClass(String className)
 		throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 
-		if (Util.isEmpty(className)) return null;		
+		if (Util.isEmpty(className))
+			throw new IllegalArgumentException(MSG_EMPTY_CLASSNAME);
+		
 		return instantiateClass(Class.forName(className));
 	}
 	
@@ -229,10 +239,16 @@ public class ClassUtil {
 	public static Object instantiateClass(String className, ClassLoader classLoader) 
 		throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 
-		if (Util.isEmpty(className)) return null;
-		if (classLoader == null) return null;
+		if (Util.isEmpty(className))
+			throw new IllegalArgumentException(MSG_EMPTY_CLASSNAME);
+		
+		if (classLoader == null)
+			throw new IllegalArgumentException(MSG_NULL_LOADER);
 		
 		Class<?> ref = Class.forName(className, true, classLoader);
+		if (ref == null)
+			throw new RuntimeException(String.format(MSG_NONRESOLVABLE, className));
+			
 		return ref.cast(ref.newInstance());
 	}
 	
@@ -252,8 +268,11 @@ public class ClassUtil {
 		throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
 			InstantiationException, IllegalAccessException, InvocationTargetException { 
 
-		if (classRef == null) return null;
-		if (constructorParameters == null) return null;
+		if (classRef == null)
+			throw new IllegalArgumentException(MSG_NULL_REF);
+		
+		if (constructorParameters == null) 
+			return instantiateClass(classRef);
 				
 		// Find a constructor matching the given parameters (constructors' ambiguity is impossible)
 		Constructor<?>[] constructors = classRef.getConstructors();
@@ -281,8 +300,7 @@ public class ClassUtil {
 			if (matches)
 				return classRef.cast(constructor.newInstance(constructorParameters));
 		}
-		
-		return null;
+		throw new RuntimeException(String.format(MSG_CANT_INSTANTIATE, classRef.getName()));
 	}
 	
 	/**
@@ -302,7 +320,8 @@ public class ClassUtil {
 		throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
 			InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
 		
-		if (Util.isEmpty(className)) return null;
+		if (Util.isEmpty(className))
+			throw new IllegalArgumentException(MSG_EMPTY_CLASSNAME);
 		
 		Class<?> ref = Class.forName(className);		
 		return ref.cast(instantiateClass(ref, constructorParameters));
@@ -326,8 +345,11 @@ public class ClassUtil {
 	throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
 		InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
 	
-	if (Util.isEmpty(className)) return null;
-	if (classLoader == null) return null;
+	if (Util.isEmpty(className))
+		throw new IllegalArgumentException(MSG_EMPTY_CLASSNAME);
+	
+	if (classLoader == null)
+		throw new IllegalArgumentException(MSG_NULL_LOADER);
 	
 	Class<?> ref = classLoader.loadClass(className); 		
 	return ref.cast(instantiateClass(ref, constructorParameters));

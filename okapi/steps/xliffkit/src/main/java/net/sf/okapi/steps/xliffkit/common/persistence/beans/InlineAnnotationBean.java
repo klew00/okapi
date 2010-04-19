@@ -21,41 +21,34 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.resource.InlineAnnotation;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class InlineAnnotationBean extends PersistenceBean {
 
 	private String data;
-	
-	public InlineAnnotationBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof InlineAnnotation) {
-			InlineAnnotation ann = (InlineAnnotation) obj;
-			ann.setData(data);
-		}
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new InlineAnnotation(data)));
+	protected Object createObject(IPersistenceSession session) {
+		return new InlineAnnotation(data);
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof InlineAnnotation) {
 			InlineAnnotation ann = (InlineAnnotation) obj;
 			data = ann.getData();
 		}
-		return this;
 	}
 
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof InlineAnnotation) {
+			InlineAnnotation ann = (InlineAnnotation) obj;
+			ann.setData(data);
+		}
+	}
+	
 	public void setData(String data) {
 		this.data = data;
 	}

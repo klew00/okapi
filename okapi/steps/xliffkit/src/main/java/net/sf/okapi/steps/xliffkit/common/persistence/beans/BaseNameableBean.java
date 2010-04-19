@@ -28,7 +28,6 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -37,51 +36,21 @@ public class BaseNameableBean extends PersistenceBean {
 	private String id;
 	private String name;
 	private String type;
-	private FactoryBean skeleton = new FactoryBean(getSession());	
+	private FactoryBean skeleton = new FactoryBean();	
 	private String mimeType;
 	private boolean isTranslatable;
 	private boolean preserveWS;
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	private List<PropertyBean> sourceProperties = new ArrayList<PropertyBean>();
-	
-	public BaseNameableBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof BaseNameable) {
-			BaseNameable bn = (BaseNameable) obj;
-			
-			bn.setId(id);		
-			bn.setName(name);
-			bn.setType(type);
-			
-			bn.setSkeleton(skeleton.get(ISkeleton.class));
-			bn.setMimeType(mimeType);
-			bn.setIsTranslatable(isTranslatable);
-			bn.setPreserveWhitespaces(preserveWS);
-			
-			for (PropertyBean prop : properties)
-				bn.setProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly())));
-			
-			for (FactoryBean annotationBean : annotations)
-				bn.setAnnotation(annotationBean.get(IAnnotation.class));
-			
-			for (PropertyBean prop : sourceProperties)
-				bn.setSourceProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly())));
-		}
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {		
-		return classRef.cast(get(new BaseNameable()));
+	protected Object createObject(IPersistenceSession session) {
+		return new BaseNameable();
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof BaseNameable) {
 			BaseNameable bn = (BaseNameable) obj;
 			
@@ -89,30 +58,54 @@ public class BaseNameableBean extends PersistenceBean {
 			name = bn.getName();
 			type = bn.getType();
 			//bn.setSkeleton(new GenericSkeleton());
-			skeleton.set(bn.getSkeleton());
+			skeleton.set(bn.getSkeleton(), session);
 			mimeType = bn.getMimeType();
 			isTranslatable = bn.isTranslatable();
 			preserveWS = bn.preserveWhitespaces();
 			
 			for (String propName : bn.getPropertyNames()) {
-				PropertyBean propBean = new PropertyBean(getSession());
-				propBean.set(bn.getProperty(propName));
+				PropertyBean propBean = new PropertyBean();
+				propBean.set(bn.getProperty(propName), session);
 				properties.add(propBean);
 			}
 			
 			for (IAnnotation annotation : bn.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean(getSession());
+				FactoryBean annotationBean = new FactoryBean();
 				annotations.add(annotationBean);
-				annotationBean.set(annotation);
+				annotationBean.set(annotation, session);
 			}
 			
 			for (String propName : bn.getSourcePropertyNames()) {
-				PropertyBean propBean = new PropertyBean(getSession());
-				propBean.set(bn.getSourceProperty(propName));
+				PropertyBean propBean = new PropertyBean();
+				propBean.set(bn.getSourceProperty(propName), session);
 				sourceProperties.add(propBean);
 			}
-		}		
-		return this;
+		}
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof BaseNameable) {
+			BaseNameable bn = (BaseNameable) obj;
+			
+			bn.setId(id);		
+			bn.setName(name);
+			bn.setType(type);
+			
+			bn.setSkeleton(skeleton.get(ISkeleton.class, session));
+			bn.setMimeType(mimeType);
+			bn.setIsTranslatable(isTranslatable);
+			bn.setPreserveWhitespaces(preserveWS);
+			
+			for (PropertyBean prop : properties)
+				bn.setProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly()), session));
+			
+			for (FactoryBean annotationBean : annotations)
+				bn.setAnnotation(annotationBean.get(IAnnotation.class, session));
+			
+			for (PropertyBean prop : sourceProperties)
+				bn.setSourceProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly()), session));
+		}
 	}
 
 	public String getId() {
@@ -194,5 +187,4 @@ public class BaseNameableBean extends PersistenceBean {
 	public void setSkeleton(FactoryBean skeleton) {
 		this.skeleton = skeleton;
 	}
-
 }

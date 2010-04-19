@@ -22,7 +22,6 @@ package net.sf.okapi.steps.xliffkit.opc;
 
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;

@@ -21,36 +21,29 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.Range;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class RangeBean extends PersistenceBean {
 	private int start;
 	private int end;
-	
-	public RangeBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		return obj;
+	protected Object createObject(IPersistenceSession session) {
+		return new Range(start, end);
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new Range(start, end)));
-	}
-	
-	@Override
-	public IPersistenceBean set(Object obj) {		
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof Range) {
 			Range r = (Range) obj;
 			start = r.start;
 			end = r.end;
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
 	}
 
 	public int getStart() {

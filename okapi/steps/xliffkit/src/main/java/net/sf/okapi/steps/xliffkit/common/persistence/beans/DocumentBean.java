@@ -27,7 +27,6 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -36,54 +35,48 @@ public class DocumentBean extends PersistenceBean {
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	private String id;
 	private List<FactoryBean> documentResources = new ArrayList<FactoryBean>();
-	
-	public DocumentBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {		
-		if (obj instanceof Document) {
-			Document doc = (Document) obj;
-			
-			for (FactoryBean annotationBean : annotations)
-				doc.setAnnotation(annotationBean.get(IAnnotation.class));
-			
-			doc.setId(id);
-			
-			for (FactoryBean docPropBean : documentResources)
-				doc.addResource(docPropBean.get(IResource.class));
-		}
-		return obj;
+	protected Object createObject(IPersistenceSession session) {
+		return new Document();
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new Document()));
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof Document) {
 			Document doc = (Document) obj;
 			
 			for (IAnnotation annotation : doc.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean(getSession());
+				FactoryBean annotationBean = new FactoryBean();
 				annotations.add(annotationBean);
-				annotationBean.set(annotation);
+				annotationBean.set(annotation, session);
 			}
 			
 			id = doc.getId();
 			
 			for (IResource res : doc) {
-				FactoryBean resBean = new FactoryBean(getSession());
-				resBean.set(res);
+				FactoryBean resBean = new FactoryBean();
+				resBean.set(res, session);
 				documentResources.add(resBean);
 			}						
 		}
-		return this;
 	}
 
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof Document) {
+			Document doc = (Document) obj;
+			
+			for (FactoryBean annotationBean : annotations)
+				doc.setAnnotation(annotationBean.get(IAnnotation.class, session));
+			
+			doc.setId(id);
+			
+			for (FactoryBean docPropBean : documentResources)
+				doc.addResource(docPropBean.get(IResource.class, session));
+		}
+	}
+	
 	public List<FactoryBean> getAnnotations() {
 		return annotations;
 	}

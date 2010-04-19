@@ -21,48 +21,43 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.resource.BaseReferenceable;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class BaseReferenceableBean extends BaseNameableBean {
 
 	private int refCount;
 	private String parentId;
-	
-	public BaseReferenceableBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+	private boolean isReferent;
+
 	@Override
-	public <T> T get(T obj) {		
-		obj = super.get(obj);
-		
-		if (obj instanceof BaseReferenceable) {						
-			
-			BaseReferenceable br = (BaseReferenceable) obj;
-			br.setReferenceCount(refCount);
-			br.setParentId(parentId);			
-		}
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {		
-		return classRef.cast(get(new BaseReferenceable()));
+	protected Object createObject(IPersistenceSession session) {
+		return new BaseReferenceable();
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
-		super.set(obj);
+	protected void fromObject(Object obj, IPersistenceSession session) {
+		super.fromObject(obj, session);
 		
 		if (obj instanceof BaseReferenceable) {
 			BaseReferenceable br = (BaseReferenceable) obj;
 			
 			refCount = br.getReferenceCount();
 			parentId = br.getParentId();
+			isReferent = br.isReferent();
 		}
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		super.setObject(obj, session);
 		
-		return this;
+		if (obj instanceof BaseReferenceable) {						
+			
+			BaseReferenceable br = (BaseReferenceable) obj;
+			br.setReferenceCount(refCount);
+			br.setParentId(parentId);
+			br.setIsReferent(isReferent);
+		}
 	}
 
 	public int getRefCount() {
@@ -79,5 +74,13 @@ public class BaseReferenceableBean extends BaseNameableBean {
 
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
+	}
+
+	public void setReferent(boolean isReferent) {
+		this.isReferent = isReferent;
+	}
+
+	public boolean isReferent() {
+		return isReferent;
 	}
 }

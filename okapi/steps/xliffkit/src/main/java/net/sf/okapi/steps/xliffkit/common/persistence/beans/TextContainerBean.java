@@ -28,7 +28,6 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -38,61 +37,55 @@ public class TextContainerBean extends PersistenceBean {
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	private List<TextPartBean> parts = new ArrayList<TextPartBean>();
 	private boolean segApplied;
-	
-	public TextContainerBean(IPersistenceSession session) {
-		super(session);
+
+	@Override
+	protected Object createObject(IPersistenceSession session) {
+		return new TextContainer();
 	}
 
 	@Override
-	public <T> T get(T obj) {				
-		if (obj instanceof TextContainer) {
-			TextContainer tc = (TextContainer) obj;
-		
-			for (PropertyBean prop : properties)
-				tc.setProperty(prop.get(Property.class));
-			
-			for (FactoryBean annotationBean : annotations)
-				tc.setAnnotation(annotationBean.get(IAnnotation.class));
-			
-			for (TextPartBean partBean : parts)
-				tc.insertPart(tc.getPartCount(), partBean.get(TextPart.class));
-			
-			tc.setHasBeenSegmentedFlag(segApplied);
-		}		
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new TextContainer()));
-	}
-	
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof TextContainer) {
 			TextContainer tc = (TextContainer) obj;
 						
 			for (String propName : tc.getPropertyNames()) {
-				PropertyBean propBean = new PropertyBean(getSession());
-				propBean.set(tc.getProperty(propName));
+				PropertyBean propBean = new PropertyBean();
+				propBean.set(tc.getProperty(propName), session);
 				properties.add(propBean);
 			}
 			
 			for (IAnnotation annotation : tc.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean(getSession());
+				FactoryBean annotationBean = new FactoryBean();
 				annotations.add(annotationBean);
-				annotationBean.set(annotation);
+				annotationBean.set(annotation, session);
 			}
 			
 			for (int i = 0; i < tc.getPartCount(); i++) {
-				TextPartBean partBean = (TextPartBean) getSession().createBean(tc.getPart(i).getClass());
+				TextPartBean partBean = (TextPartBean) session.createBean(tc.getPart(i).getClass());
 				parts.add(partBean);
-				partBean.set(tc.getPart(i));
+				partBean.set(tc.getPart(i), session);
 			}
 			
 			segApplied = tc.hasBeenSegmented();
-		}		
-		return this;
+		}
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof TextContainer) {
+			TextContainer tc = (TextContainer) obj;
+		
+			for (PropertyBean prop : properties)
+				tc.setProperty(prop.get(Property.class, session));
+			
+			for (FactoryBean annotationBean : annotations)
+				tc.setAnnotation(annotationBean.get(IAnnotation.class, session));
+			
+			for (TextPartBean partBean : parts)
+				tc.insertPart(tc.getPartCount(), partBean.get(TextPart.class, session));
+			
+			tc.setHasBeenSegmentedFlag(segApplied);
+		}
 	}
 
 	public void setAnnotations(List<FactoryBean> annotations) {

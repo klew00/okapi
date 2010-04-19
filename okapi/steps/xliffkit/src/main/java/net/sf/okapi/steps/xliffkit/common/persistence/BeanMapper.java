@@ -92,18 +92,16 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipSkeletonBean;
 
 public class BeanMapper {
 	
-	private static final String MSG1 = "BeanMapper: bean mapping is not initialized";
-	private static final String MSG2 = "BeanMapper: unknown class: %s";		
-	private static final String MSG5 = "BeanMapper: Class reference cannot be empty";
+	private static final String MAPPER_NOT_INIT = "BeanMapper: bean mapping is not initialized";
+	private static final String MAPPER_UNK_CLASS = "BeanMapper: unknown class: %s";		
+	private static final String MAPPER_EMPTY_REF = "BeanMapper: Class reference cannot be empty";
 	
 	// !!! LinkedHashMap to preserve registration order
 	private static LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> beanMapping;
 	//private static ConcurrentHashMap<Class<? extends IPersistenceBean>, IPersistenceBean> persistenceCache;
 	
 	static {
-		beanMapping = new LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> ();
-		//persistenceCache = new ConcurrentHashMap<Class<? extends IPersistenceBean>, IPersistenceBean> ();
-		
+		beanMapping = new LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> ();		
 		registerBeans();
 	}
 
@@ -114,7 +112,7 @@ public class BeanMapper {
 			throw(new IllegalArgumentException());
 		
 		if (beanMapping == null)
-			throw(new RuntimeException(MSG1));
+			throw(new RuntimeException(MAPPER_NOT_INIT));
 		
 		// TODO Make sure if a bean for already registered class was registered later, the later bean takes precedence
 		// HashMap.put(): "If the map previously contained a mapping for the key, the old value is replaced". Test it.
@@ -124,11 +122,10 @@ public class BeanMapper {
 	@SuppressWarnings("unchecked")
 	public static Class<? extends IPersistenceBean> getBeanClass(Class<?> classRef) {
 		if (classRef == null)
-			throw(new IllegalArgumentException(MSG5));
-		//if (classRef == null) return null;
+			throw(new IllegalArgumentException(MAPPER_EMPTY_REF));
 	
 		if (beanMapping == null)
-			throw(new RuntimeException(MSG1));
+			throw(new RuntimeException(MAPPER_NOT_INIT));
 		
 		Class<? extends IPersistenceBean> beanClass = beanMapping.get(classRef);
 		
@@ -151,49 +148,15 @@ public class BeanMapper {
 		try {
 			res = getBeanClass(Class.forName(className));
 		} catch (ClassNotFoundException e) {
-			throw(new RuntimeException(String.format(MSG2, className)));
+			throw(new RuntimeException(String.format(MAPPER_UNK_CLASS, className)));
 		}
 		return res;		
 	}
-	
-//	public static IPersistenceBean createBean(Class<?> classRef, IPersistenceSession session) {
-//		Class<? extends IPersistenceBean> beanClass = 
-//			getBeanClass(classRef); // Checks for skelClass == null, beanMapping == null
-//		
-//		if (beanClass == null)
-//			throw(new RuntimeException(String.format(MSG3, classRef.getName())));
-//		
-////		if (persistenceCache == null)
-////			throw(new RuntimeException(MSG2));
-//		
-//		IPersistenceBean bean = null; //persistenceCache.get(beanClass); 
-//		//if (bean == null) {
-//			try {
-//				bean = ClassUtil.instantiateClass(beanClass, session);
-//				//persistenceCache.put(beanClass, bean);
-//			} catch (Exception e) {
-//				throw new RuntimeException(String.format(MSG4, beanClass.getName()), e);
-//			}
-//		//}		
-//		return bean;		
-//	}
-//	
-//	public static <T> T getObject(Class<T> classRef, IPersistenceSession session) {
-//		T res = null;
-//		try {
-//			res = ClassUtil.instantiateClass(classRef, session);
-//		} catch (Exception e) {
-//			throw new RuntimeException(String.format(MSG4, ClassUtil.getClassName(classRef)), e);
-//		}
-//		return res;
-//	}
-	
+		
 	private static void registerBeans() {
 		// General purpose beans
 		registerBean(List.class, ListBean.class);
 		registerBean(IParameters.class, ParametersBean.class);
-		//registerBean(IFilterWriter.class, FilterWriterBean.class);
-		registerBean(IPersistenceSession.class, HeaderBean.class);
 		registerBean(Object.class, TypeInfoBean.class); // If no bean was found, use just this one to store class info
 		
 		// Specific class beans				

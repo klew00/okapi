@@ -28,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.zip.ZipFile;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.BaseNameable;
@@ -37,10 +36,6 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.ZipSkeleton;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.BaseNameableBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.BaseReferenceableBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextUnitBean;
 
 import org.junit.Test;
 
@@ -50,28 +45,28 @@ public class TestBeans {
 	@Test
 	public void test1() {
 		JSONPersistenceSession session = new JSONPersistenceSession();
-		BaseNameableBean bean = new BaseNameableBean(session);
+		IPersistenceBean bean = session.createBean(BaseNameable.class);
 		BaseNameable bn = new BaseNameable();
 		bn.setId("the id");
 		bn.setName("the name");
 		bn.setType("the type");
-		bean.set(bn);
+		bean.set(bn, session);
 		
-		BaseNameable bn2 = bean.get(new BaseNameable());
+		BaseNameable bn2 = bean.get(new BaseNameable(), session);
 		assertEquals("the id", bn2.getId());
 		assertEquals("the name", bn2.getName());
 		assertEquals("the type", bn2.getType());
 		
-		BaseReferenceableBean bean2 = new BaseReferenceableBean(session);		
+		IPersistenceBean bean2 = session.createBean(BaseReferenceable.class);
 		BaseReferenceable br = new BaseReferenceable();
 		br.setId("the id");
 		br.setName("the name");
 		br.setType("the type");
-		bean2.set(bn);
+		bean2.set(bn, session);
 		
 //		JSONPersistenceSession session = new JSONPersistenceSession(BaseReferenceableBean.class);
 //		session.start((InputStream) null);
-		BaseReferenceable br2 = bean2.get(new BaseReferenceable());
+		BaseReferenceable br2 = bean2.get(new BaseReferenceable(), session);
 
 		assertEquals("the id", br2.getId());
 		assertEquals("the name", br2.getName());
@@ -95,7 +90,7 @@ public class TestBeans {
 		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
 		
 		JSONPersistenceSession session = new JSONPersistenceSession();		
-		TextUnitBean tuBean = new TextUnitBean(session);
+		IPersistenceBean tuBean = session.createBean(TextUnit.class);
 		
 		os.writeObject(tuBean);
 		

@@ -22,20 +22,24 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
-import java.util.Set;
 
 public interface IPersistenceSession {
 
 	/**
+	 * Gets the current session state.
+	 * @return session state
+	 */
+	SessionState getState();
+	
+	/**
 	 * Starts serialization.
-	 * @param outStream output stream to serialize to.
+	 * @param outStream output stream to serialize to
 	 */
 	void start(OutputStream outStream);
 	
 	/**
 	 * Starts deserialization.
-	 * @param inStream input stream to deserialize from.
+	 * @param inStream input stream to deserialize from
 	 */
 	void start(InputStream inStream);
 	
@@ -45,27 +49,21 @@ public interface IPersistenceSession {
 	void end();
 	
 	/**
-	 * Returns the current session status.
-	 * @return true if serialization or deserialization is happening.
-	 */
-	boolean isActive();
-	
-	/**
 	 * Serializes a given object to the session output stream. 
-	 * @param obj the given object to be serialized.
+	 * @param obj the given object to be serialized
 	 */
 	void serialize(Object obj);
 	
 	/**
 	 * Serializes to the session output stream a given object, labeling it with a given field label if implementation allows.
-	 * @param obj the given object to be serialized.
-	 * @param name field name of the object.
+	 * @param obj the given object to be serialized
+	 * @param name field name of the object
 	 */
 	void serialize(Object obj, String name);
 	
 	/**
 	 * Deserializes an object from the session input stream.
-	 * @return the deserialized object.
+	 * @return the deserialized object
 	 */
 	<T> T deserialize(Class<T> classRef);
 
@@ -81,9 +79,9 @@ public interface IPersistenceSession {
 	 * The given object can be serialized as is, and then deserialized as 
 	 * an expected class instance. This helps if the object was initially deserialized incorrectly.
 	 * Implementers can use different strategies to achieve the goal. 	
-	 * @param obj the given object to be converted.
-	 * @param expectedClass new class of the given object.
-	 * @return the converted object.
+	 * @param obj the given object to be converted
+	 * @param expectedClass new class of the given object
+	 * @return the converted object
 	 */
 	<T extends IPersistenceBean> T convert(Object obj, Class<T> expectedClass);
 
@@ -95,13 +93,9 @@ public interface IPersistenceSession {
 	
 	String getDescription();
 		
-	int generateRefId();
+	long getRefIdForObject(Object obj);
 	
-	int getRefIdForObject(Object obj);
-	
-	void setRefIdForObject(Object obj, int refId);
+	void setRefIdForObject(Object obj, long refId);
 
-	void setReference(int parentRefId, int childRefId);
-
-	Map<Integer, Set<Integer>> getReferences();
+	void setReference(long parentRefId, long childRefId);
 }

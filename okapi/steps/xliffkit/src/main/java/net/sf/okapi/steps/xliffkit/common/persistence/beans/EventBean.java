@@ -24,38 +24,35 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class EventBean extends PersistenceBean {
 
 	private EventType type;
-	private FactoryBean resource = new FactoryBean(getSession());
-	
-	public EventBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+	private FactoryBean resource = new FactoryBean();
+
 	@Override
-	public <T> T get(T obj) {
-		return obj;
+	protected Object createObject(IPersistenceSession session) {
+		return new Event(type);
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new Event(type, resource.get(IResource.class))));
-	}
-	
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof Event) {
 			Event e = (Event) obj;
 			
 			type = e.getEventType();
-			resource.set(e.getResource());
+			resource.set(e.getResource(), session);
+		}
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof Event) {
+			Event e = (Event) obj;
+			e.setResource(resource.get(IResource.class, session));		
 		}		
-		return this;
 	}
 
 	public void setType(EventType type) {
@@ -73,5 +70,4 @@ public class EventBean extends PersistenceBean {
 	public FactoryBean getResource() {
 		return resource;
 	}
-
 }

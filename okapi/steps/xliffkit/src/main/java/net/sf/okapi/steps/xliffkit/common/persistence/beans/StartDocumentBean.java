@@ -25,7 +25,6 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class StartDocumentBean extends BaseNameableBean {
@@ -33,40 +32,19 @@ public class StartDocumentBean extends BaseNameableBean {
 	private String locale;
 	private String encoding;
 	private boolean isMultilingual;
-	private FactoryBean filterParameters = new FactoryBean(getSession());
-	private FactoryBean filterWriter = new FactoryBean(getSession());
+	private FactoryBean filterParameters = new FactoryBean();
+	private FactoryBean filterWriter = new FactoryBean();
 	private boolean hasUTF8BOM;
 	private String lineBreak;
-	
-	public StartDocumentBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		obj = super.get(obj);
-		
-		if (obj instanceof StartDocument) {
-			StartDocument sd = (StartDocument) obj;
-			
-			sd.setLocale(new LocaleId(locale));
-			sd.setEncoding(encoding, hasUTF8BOM);
-			sd.setMultilingual(isMultilingual);
-			sd.setFilterParameters(filterParameters.get(IParameters.class));
-			sd.setFilterWriter(filterWriter.get(IFilterWriter.class));
-			sd.setLineBreak(lineBreak);
-		}		
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new StartDocument(getId())));
+	protected Object createObject(IPersistenceSession session) {
+		return new StartDocument(super.getId());
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
-		super.set(obj);
+	protected void fromObject(Object obj, IPersistenceSession session) {
+		super.fromObject(obj, session);
 		
 		if (obj instanceof StartDocument) {
 			StartDocument sd = (StartDocument) obj;
@@ -77,14 +55,29 @@ public class StartDocumentBean extends BaseNameableBean {
 			
 			encoding = sd.getEncoding();
 			isMultilingual = sd.isMultilingual();
-			filterParameters.set(sd.getFilterParameters());
-			filterWriter.set(sd.getFilterWriter());
+			filterParameters.set(sd.getFilterParameters(), session);
+			filterWriter.set(sd.getFilterWriter(), session);
 			hasUTF8BOM = sd.hasUTF8BOM();
 			lineBreak = sd.getLineBreak();
 		}
-		return this;
 	}
 
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		super.setObject(obj, session);
+		
+		if (obj instanceof StartDocument) {
+			StartDocument sd = (StartDocument) obj;
+			
+			sd.setLocale(new LocaleId(locale));
+			sd.setEncoding(encoding, hasUTF8BOM);
+			sd.setMultilingual(isMultilingual);
+			sd.setFilterParameters(filterParameters.get(IParameters.class, session));
+			sd.setFilterWriter(filterWriter.get(IFilterWriter.class, session));
+			sd.setLineBreak(lineBreak);
+		}
+	}
+	
 	public String getLocale() {
 		return locale;
 	}

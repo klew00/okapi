@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,25 +18,22 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.common.persistence.beans;
+package net.sf.okapi.steps.xliffkit.common.persistence;
 
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+public enum SessionState {
 
-public class StartGroupBean extends BaseReferenceableBean {
-
-	@Override
-	protected Object createObject(IPersistenceSession session) {
-		return new StartGroup(super.getParentId());
-	}
-
-	@Override
-	protected void fromObject(Object obj, IPersistenceSession session) {
-		super.fromObject(obj, session);
-	}
-
-	@Override
-	protected void setObject(Object obj, IPersistenceSession session) {
-		super.setObject(obj, session);
-	}
+	/**
+	 * Persistence session is idle.
+	 */
+	IDLE,	
+	
+	/**
+	 * Persistence session is deserializing.
+	 */
+	READING,
+	
+	/**
+	 * Persistence session is serializing. 
+	 */
+	WRITING
 }

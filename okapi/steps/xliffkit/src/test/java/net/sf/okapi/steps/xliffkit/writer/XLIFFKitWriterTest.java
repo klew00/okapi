@@ -274,7 +274,7 @@ public class XLIFFKitWriterTest {
 						new Parameter("includeOriginal", true),
 						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "draft4.xliff.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat.xliff.kit").toURI().toString()))
 		).execute();
 	}
 	
@@ -290,7 +290,7 @@ public class XLIFFKitWriterTest {
 				"Test pipeline for XLIFFKitWriterStep",
 				new Batch(
 						new BatchItem(
-								new URL("file", null, src1Path + "test5.txt"),
+								new URL("file", null, src2Path + "test5.txt"),
 								"UTF-8",
 								ENUS,
 								FRFR)
@@ -361,7 +361,7 @@ public class XLIFFKitWriterTest {
 						new Parameter("includeOriginal", true),
 						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "draft4.xliff.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat2.xliff.kit").toURI().toString()))
 		).execute();
 	}
 	
@@ -402,17 +402,16 @@ public class XLIFFKitWriterTest {
 						new Parameter("includeOriginal", true),
 						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "draft4.xliff.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat3.xliff.kit").toURI().toString()))
 		).execute();
 	}
 	
-	// DEBUG 	
-	@Test
+	// DEBUG @Test
 	public void testReferences() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
-		writerStep.setOutputURI(new URL("file", null, pathBase + "draft4.xliff.kit").toURI());
+		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences.xliff.kit").toURI());
 		writerStep.setTargetLocale(DEDE);
 		net.sf.okapi.steps.xliffkit.writer.Parameters params = 
 			(net.sf.okapi.steps.xliffkit.writer.Parameters) writerStep.getParameters();
@@ -535,13 +534,12 @@ public class XLIFFKitWriterTest {
 		}
 	}		
 	
-	// DEBUG 	
-	@Test
+	// DEBUG @Test
 	public void testReferences2() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
-		writerStep.setOutputURI(new URL("file", null, pathBase + "draft4.xliff.kit").toURI());
+		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences2.xliff.kit").toURI());
 		writerStep.setTargetLocale(DEDE);
 		net.sf.okapi.steps.xliffkit.writer.Parameters params = 
 			(net.sf.okapi.steps.xliffkit.writer.Parameters) writerStep.getParameters();

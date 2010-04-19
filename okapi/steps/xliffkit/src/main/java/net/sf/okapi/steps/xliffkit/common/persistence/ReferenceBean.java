@@ -24,49 +24,45 @@ import net.sf.okapi.common.ClassUtil;
 
 public class ReferenceBean extends PersistenceBean {
 
-	private int reference;
-	
-	public ReferenceBean(IPersistenceSession session) {
-		super(session);
-	}
+	private long reference;
 
 	@Override
-	public <T> T get(T obj) {
-		return obj;
-	}
-
-	@Override
-	public <T> T get(Class<T> classRef) {
+	protected Object createObject(IPersistenceSession session) {
 		return null;
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
-		if (obj == null) return this;
+	protected void fromObject(Object obj, IPersistenceSession session) {
+		if (obj == null) return;
 		
-		int rid = getSession().getRefIdForObject(obj);
+		session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
+		
+		long rid = session.getRefIdForObject(obj);
 		if (rid != 0) {
-			setReference(rid);
-			getSession().setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
-			getSession().setReference(this.getRefId(), rid);
-			return this;
+			reference = rid;
+			//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
+			session.setReference(this.getRefId(), rid);
+			return;
 		}
 		
-		IPersistenceBean bean = getSession().createBean(ClassUtil.getClass(obj));
-		getSession().cacheBean(obj, bean);
-		setReference(bean.getRefId());
-		getSession().setRefIdForObject(obj, bean.getRefId());
-		getSession().setReference(this.getRefId(), bean.getRefId());
-		
-		return this;
+		IPersistenceBean bean = session.createBean(ClassUtil.getClass(obj));
+		session.cacheBean(obj, bean); // for a FactoryBean to hook up later
+		reference = bean.getRefId();
+		// session.setRefIdForObject(obj, bean.getRefId());
+		session.setReference(this.getRefId(), bean.getRefId());		
 	}
 
-	public void setReference(int reference) {
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setReference(long reference) {
 		this.reference = reference;
 	}
 
-	public int getReference() {
+	public long getReference() {
 		return reference;
 	}
-
 }

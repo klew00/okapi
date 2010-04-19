@@ -22,36 +22,28 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class TextPartBean extends PersistenceBean {
-	private TextFragmentBean text = new TextFragmentBean(getSession());
+	private TextFragmentBean text = new TextFragmentBean();
 	
-	public TextPartBean(IPersistenceSession session) {
-		super(session);
+	@Override
+	protected Object createObject(IPersistenceSession session) {
+		return new TextPart(text.get(TextFragment.class, session));
 	}
 
 	@Override
-	public <T> T get(T obj) {		
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new TextPart(text.get(TextFragment.class))));
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof TextPart) {
 			TextPart tp = (TextPart) obj;
 			
-			text.set(tp.getContent());
+			text.set(tp.getContent(), session);
 		}
-			
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
 	}
 
 	public void setPart(TextFragmentBean text) {

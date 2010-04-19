@@ -25,33 +25,27 @@ import net.sf.okapi.common.ClassUtil;
 public class TypeInfoBean extends PersistenceBean {
 
 	private String className;
-	
-	public TypeInfoBean(IPersistenceSession session) {
-		super(session);
-	}
 
 	@Override
-	public <T> T get(T obj) {
-		return obj;
-	}
-
-	@Override
-	public <T> T get(Class<T> classRef) {
+	protected Object createObject(IPersistenceSession session) {
 		Object res = null;
 		try {
 			res = ClassUtil.instantiateClass(className);
 		} catch (Exception e) {
 			res = null; // At least we tried
 		}
-		return classRef.cast(get(res));
+		return res;
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {		
-		className = ClassUtil.getQualifiedClassName(obj);
-		return this;
+	protected void fromObject(Object srcObj, IPersistenceSession session) {
+		className = ClassUtil.getQualifiedClassName(srcObj);		
 	}
 
+	@Override
+	protected void setObject(Object destObj, IPersistenceSession session) {
+	}
+	
 	public void setClassName(String className) {
 		this.className = className;
 	}
@@ -59,5 +53,4 @@ public class TypeInfoBean extends PersistenceBean {
 	public String getClassName() {
 		return className;
 	}
-
 }

@@ -22,7 +22,6 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -30,42 +29,33 @@ public class ParametersBean extends PersistenceBean {
 
 	private String className;
 	private String data;
-	
-	public ParametersBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof IParameters) {
-			IParameters params = (IParameters) obj;			
-			params.fromString(data);
-		}
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
+	protected Object createObject(IPersistenceSession session) {
 		IParameters params = null;
 		try {
 			params = (IParameters) ClassUtil.instantiateClass(className);			
 		} catch (Exception e) {
-			throw new RuntimeException(String.format("ParametersBean: cannot instantiate %s", ClassUtil.getClassName(classRef)), e);
-		}		
-		if (params != null)
-			params.fromString(data);
-		
-		return classRef.cast(get(params));
+			throw new RuntimeException(String.format("ParametersBean: cannot instantiate %s", className), e);
+		}
+		return params;
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof IParameters) {
 			IParameters params = (IParameters) obj;
 			className = ClassUtil.getQualifiedClassName(obj);
 			data = params.toString();
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof IParameters) {
+			IParameters params = (IParameters) obj;			
+			params.fromString(data);
+		}
 	}
 
 	public String getData() {

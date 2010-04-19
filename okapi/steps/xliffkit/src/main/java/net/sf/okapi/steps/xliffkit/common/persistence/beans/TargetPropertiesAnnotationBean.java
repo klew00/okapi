@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TargetPropertiesAnnotation;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -34,39 +33,14 @@ public class TargetPropertiesAnnotationBean extends PersistenceBean {
 
 	private ConcurrentHashMap<String, Hashtable<String, PropertyBean>> targets = 
 		new ConcurrentHashMap<String, Hashtable<String, PropertyBean>>();
-	
-	public TargetPropertiesAnnotationBean(IPersistenceSession session) {
-		super(session);
+
+	@Override
+	protected Object createObject(IPersistenceSession session) {
+		return new TargetPropertiesAnnotation();
 	}
 
 	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof TargetPropertiesAnnotation) {
-			TargetPropertiesAnnotation annot = (TargetPropertiesAnnotation) obj;
-		
-			for (String locTag : targets.keySet()) {
-				Hashtable<String, PropertyBean> propBeans = targets.get(locTag);
-				Hashtable<String, Property> props = new Hashtable<String, Property>();
-				
-				for (String key : propBeans.keySet()) {
-					PropertyBean propBean = propBeans.get(key);
-					Property prop = propBean.get(Property.class);
-					props.put(key, prop);
-				}
-				
-				annot.set(new LocaleId(locTag), props);
-			}
-		}
-		return obj;
-	}
-
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new TargetPropertiesAnnotation()));
-	}
-	
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof TargetPropertiesAnnotation) {
 			TargetPropertiesAnnotation annot = (TargetPropertiesAnnotation) obj;
 			
@@ -76,13 +50,32 @@ public class TargetPropertiesAnnotationBean extends PersistenceBean {
 				
 				for (String key : props.keySet()) {
 					Property prop = props.get(key);
-					PropertyBean propBean = new PropertyBean(getSession());
-					propBean.set(prop);
+					PropertyBean propBean = new PropertyBean();
+					propBean.set(prop, session);
 					propBeans.put(key, propBean);
 				}								
 				targets.put(locId.toString(), propBeans);
 			}
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof TargetPropertiesAnnotation) {
+			TargetPropertiesAnnotation annot = (TargetPropertiesAnnotation) obj;
+		
+			for (String locTag : targets.keySet()) {
+				Hashtable<String, PropertyBean> propBeans = targets.get(locTag);
+				Hashtable<String, Property> props = new Hashtable<String, Property>();
+				
+				for (String key : propBeans.keySet()) {
+					PropertyBean propBean = propBeans.get(key);
+					Property prop = propBean.get(Property.class, session);
+					props.put(key, prop);
+				}
+				
+				annot.set(new LocaleId(locTag), props);
+			}
+		}
 	}
 }

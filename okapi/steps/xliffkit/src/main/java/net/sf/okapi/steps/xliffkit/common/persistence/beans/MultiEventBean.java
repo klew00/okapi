@@ -27,7 +27,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -36,54 +35,48 @@ public class MultiEventBean extends PersistenceBean {
 	private String id;
 	private boolean propagateAsSingleEvent = false;
 	private List<EventBean> events = new ArrayList<EventBean>();
-	
-	public MultiEventBean(IPersistenceSession session) {
-		super(session);
-	}
-	
-	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof MultiEvent) {
-			MultiEvent mev = (MultiEvent) obj; 
 
-			for (FactoryBean annotationBean : annotations)
-				mev.setAnnotation(annotationBean.get(IAnnotation.class));
-	
-			mev.setId(id);
-			mev.setPropagateAsSingleEvent(propagateAsSingleEvent);
-			
-			for (EventBean eventBean : events)
-				mev.addEvent(eventBean.get(Event.class));
-		}
-		return obj;
+	@Override
+	protected Object createObject(IPersistenceSession session) {
+		return new MultiEvent();
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new MultiEvent()));
-	}
-	
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof MultiEvent) {
 			MultiEvent mev = (MultiEvent) obj;
 			
 			for (IAnnotation annotation : mev.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean(getSession());
+				FactoryBean annotationBean = new FactoryBean();
 				annotations.add(annotationBean);
-				annotationBean.set(annotation);
+				annotationBean.set(annotation, session);
 			}
 			
 			id = mev.getId();
 			propagateAsSingleEvent = mev.isPropagateAsSingleEvent();
 			
 			for (Event event : mev) {
-				EventBean eventBean = new EventBean(getSession());
+				EventBean eventBean = new EventBean();
 				events.add(eventBean);
-				eventBean.set(event);
+				eventBean.set(event, session);
 			}
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof MultiEvent) {
+			MultiEvent mev = (MultiEvent) obj; 
+
+			for (FactoryBean annotationBean : annotations)
+				mev.setAnnotation(annotationBean.get(IAnnotation.class, session));
+	
+			mev.setId(id);
+			mev.setPropagateAsSingleEvent(propagateAsSingleEvent);
+			
+			for (EventBean eventBean : events)
+				mev.addEvent(eventBean.get(Event.class, session));
+		}
 	}
 
 	public List<FactoryBean> getAnnotations() {

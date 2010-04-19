@@ -27,54 +27,47 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class EndingBean extends PersistenceBean {
 
 	private String id;
-	private FactoryBean skeleton = new FactoryBean(getSession());
+	private FactoryBean skeleton = new FactoryBean();
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
-	
-	public EndingBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof Ending) {
-			Ending en = (Ending) obj;
-		
-			en.setId(id);
-			en.setSkeleton(skeleton.get(ISkeleton.class));
-			
-			for (FactoryBean annotationBean : annotations)
-				en.setAnnotation(annotationBean.get(IAnnotation.class));
-		}		
-		return obj;
+	protected Object createObject(IPersistenceSession session) {
+		return new Ending(id);
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {		
-		return classRef.cast(get(new Ending(id)));
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof Ending) {
 			Ending en = (Ending) obj;
 			
 			id = en.getId();
-			skeleton.set(en.getSkeleton());
+			skeleton.set(en.getSkeleton(), session);
 			
 			for (IAnnotation annotation : en.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean(getSession());
+				FactoryBean annotationBean = new FactoryBean();
 				annotations.add(annotationBean);
-				annotationBean.set(annotation);
+				annotationBean.set(annotation, session);
 			}
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof Ending) {
+			Ending en = (Ending) obj;
+		
+			en.setId(id);
+			en.setSkeleton(skeleton.get(ISkeleton.class, session));
+			
+			for (FactoryBean annotationBean : annotations)
+				en.setAnnotation(annotationBean.get(IAnnotation.class, session));
+		}
 	}
 
 	public String getId() {

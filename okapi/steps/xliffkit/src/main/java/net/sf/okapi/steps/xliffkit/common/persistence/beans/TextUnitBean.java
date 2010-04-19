@@ -32,7 +32,6 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.xliffkit.common.persistence.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -43,63 +42,23 @@ public class TextUnitBean extends PersistenceBean {
 	private String type;
 	private boolean isTranslatable;
 	private boolean preserveWS;	
-	private FactoryBean skeleton = new FactoryBean(getSession());
+	private FactoryBean skeleton = new FactoryBean();
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
-	private TextContainerBean source = new TextContainerBean(getSession());
+	private TextContainerBean source = new TextContainerBean();
 	private String mimeType;
 	private Map<String, TextContainerBean> targets = new ConcurrentHashMap<String, TextContainerBean>();
 	
-	public TextUnitBean(IPersistenceSession session) {
-		super(session);
-	}
-	
 //	private List<RangeBean> srcSegRanges = new ArrayList<RangeBean>();
 //	private ConcurrentHashMap<String, List<RangeBean>> trgSegRanges = new ConcurrentHashMap<String, List<RangeBean>>();
-	
-	public <T> T get(T obj) {
-		if (obj instanceof TextUnit) {
-			TextUnit tu = (TextUnit) obj;
-		
-			tu.setId(id);
-			tu.setReferenceCount(refCount);
-			tu.setName(name);
-			tu.setType(type);
-			tu.setIsTranslatable(isTranslatable);
-			tu.setPreserveWhitespaces(preserveWS);
-			tu.setSkeleton(skeleton.get(ISkeleton.class));
-			
-			for (PropertyBean propBean : properties)
-				tu.setProperty(propBean.get(Property.class));
-			
-			for (FactoryBean annotationBean : annotations)
-				tu.setAnnotation(annotationBean.get(IAnnotation.class));
-			
-			tu.setSource(source.get(TextContainer.class));
-			tu.setMimeType(mimeType);		
-						
-			for (String locTag : targets.keySet())
-				tu.setTarget(new LocaleId(locTag), targets.get(locTag).get(TextContainer.class));						
-	
-//			// srcSegRanges
-//			List<Range> ranges = new ArrayList<Range>();
-//			for (RangeBean rangeBean : srcSegRanges)
-//				ranges.add(rangeBean.get(Range.class));
-//			
-//			tu.getSource().createSegments(ranges);
-//			
-//			// trgSegRanges
-		}
-		
-		return obj;
-	}
-	
+
 	@Override
-	public <T> T get(Class<T> classRef) {		
-		return classRef.cast(get(new TextUnit(getId())));
+	protected Object createObject(IPersistenceSession session) {
+		return new TextUnit(getId());
 	}
-	
-	public IPersistenceBean set(Object obj) {
+
+	@Override
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof TextUnit) {
 			TextUnit tu = (TextUnit) obj;
 			
@@ -109,27 +68,27 @@ public class TextUnitBean extends PersistenceBean {
 			type = tu.getType();
 			isTranslatable = tu.isTranslatable();
 			preserveWS = tu.preserveWhitespaces();
-			skeleton.set(tu.getSkeleton());
+			skeleton.set(tu.getSkeleton(), session);
 
 			for (String propName : tu.getPropertyNames()) {
-				PropertyBean propBean = new PropertyBean(getSession());
-				propBean.set(tu.getProperty(propName));
+				PropertyBean propBean = new PropertyBean();
+				propBean.set(tu.getProperty(propName), session);
 				properties.add(propBean);
 			}
 			
 			for (IAnnotation annotation : tu.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean(getSession());
+				FactoryBean annotationBean = new FactoryBean();
 				annotations.add(annotationBean);
-				annotationBean.set(annotation);
+				annotationBean.set(annotation, session);
 			}
 									
-			source.set(tu.getSource());
+			source.set(tu.getSource(), session);
 			mimeType = tu.getMimeType();
 			
 			for (LocaleId locId : tu.getTargetLocales()) {
-				TextContainerBean targetBean = new TextContainerBean(getSession());
+				TextContainerBean targetBean = new TextContainerBean();
 				targets.put(locId.toString(), targetBean);
-				targetBean.set(tu.getTarget(locId));
+				targetBean.set(tu.getTarget(locId), session);
 			}
 			
 //			// srcSegRanges
@@ -143,7 +102,42 @@ public class TextUnitBean extends PersistenceBean {
 //			// trgSegRanges
 			
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof TextUnit) {
+			TextUnit tu = (TextUnit) obj;
+		
+			tu.setId(id);
+			tu.setReferenceCount(refCount);
+			tu.setName(name);
+			tu.setType(type);
+			tu.setIsTranslatable(isTranslatable);
+			tu.setPreserveWhitespaces(preserveWS);
+			tu.setSkeleton(skeleton.get(ISkeleton.class, session));
+			
+			for (PropertyBean propBean : properties)
+				tu.setProperty(propBean.get(Property.class, session));
+			
+			for (FactoryBean annotationBean : annotations)
+				tu.setAnnotation(annotationBean.get(IAnnotation.class, session));
+			
+			tu.setSource(source.get(TextContainer.class, session));
+			tu.setMimeType(mimeType);		
+						
+			for (String locTag : targets.keySet())
+				tu.setTarget(new LocaleId(locTag), targets.get(locTag).get(TextContainer.class, session));						
+	
+//			// srcSegRanges
+//			List<Range> ranges = new ArrayList<Range>();
+//			for (RangeBean rangeBean : srcSegRanges)
+//				ranges.add(rangeBean.get(Range.class));
+//			
+//			tu.getSource().createSegments(ranges);
+//			
+//			// trgSegRanges
+		}
 	}
 	
 	public String getId() {

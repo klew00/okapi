@@ -28,6 +28,7 @@ public class FactoryBean implements IPersistenceBean {
 
 	private String className;
 	private Object content;
+	@SuppressWarnings("unused")
 	private IPersistenceSession session;
 	
 	@Override

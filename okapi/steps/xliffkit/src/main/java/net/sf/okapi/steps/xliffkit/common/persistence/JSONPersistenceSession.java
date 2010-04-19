@@ -28,8 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
 import net.sf.okapi.common.StreamUtil;
 import net.sf.okapi.common.Util;
@@ -42,6 +41,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.JsonParser.Feature;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -50,12 +50,20 @@ import org.codehaus.jackson.map.SerializationConfig;
 
 public class JSONPersistenceSession implements IPersistenceSession {
 
-	private static final String JSON_HEADER = "header";
-	private static final String JSON_BODY = "body";
-	private static final String JSON_ITEM = "item";
-	private static final String VERSION = "1.0";
+	private static final String JSON_HEADER = "header"; //$NON-NLS-1$
+	private static final String JSON_BODY = "body"; //$NON-NLS-1$
+	private static final String JSON_ITEM = "item"; //$NON-NLS-1$
+	private static final String JSON_VER = "version"; //$NON-NLS-1$
+	private static final String JSON_DESCR = "description"; //$NON-NLS-1$
+	private static final String JSON_CLASS = "itemClass"; //$NON-NLS-1$
+	private static final String JSON_MIME = "mimeType"; //$NON-NLS-1$
+	//private static final String JSON_REFS = "references"; //$NON-NLS-1$
+	private static final String JSON_FRAMES = "frames"; //$NON-NLS-1$
+		
+	private static final String VERSION = "1.0"; //$NON-NLS-1$
 	private static final Class<?> rootClass = net.sf.okapi.common.Event.class;
-	private static final String MIME_TYPE = "application/json"; // RFC http://www.ietf.org/rfc/rfc4627.txt	
+	// JSON RFC http://www.ietf.org/rfc/rfc4627.txt
+	private static final String MIME_TYPE = "application/json";  //$NON-NLS-1$ 	
 	
 	private ObjectMapper mapper;
 	private JsonFactory jsonFactory;
@@ -67,11 +75,14 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	private File headerTemp;
 	private File bodyTemp;
 	private InputStream inStream;
-	private boolean isActive;	
+	//private boolean isActive;	
 	private String description;
-	private ReferenceResolver refResolver = new ReferenceResolver(this);
+	private ReferenceResolver refResolver = new ReferenceResolver();
 	private String itemLabel = JSON_ITEM;
 	private int itemCounter = 0;
+	private Class<?> prevClass;
+	private Class<? extends IPersistenceBean> beanClass;
+	private SessionState state = SessionState.IDLE;
 
 	public JSONPersistenceSession() {
 		super();
@@ -104,14 +115,26 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		return mapper.convertValue(object, expectedClass);
 	}
 
-	@Override
-	public <T> T deserialize(Class<T> classRef) {
-		if (!isActive) return null;
+	private <T> T deserialize(Class<T> classRef, String name) {
+		if (state != SessionState.READING) return null;
+		
+		// Update bean class if core class has changed
+		if (classRef != prevClass) { 
+			beanClass = BeanMapper.getBeanClass(classRef);
+			prevClass = classRef;
+		}
 		
 		IPersistenceBean bean = null;
 		try {
-			Class<? extends IPersistenceBean> beanClass = BeanMapper.getBeanClass(classRef);
+			String fieldName = parser.getCurrentName();
+			if (fieldName != null && name != null && !fieldName.startsWith(name))
+				throw(new OkapiIOException("JSONPersistenceSession: input stream is broken"));			
+			parser.nextToken();
+			
 			bean = mapper.readValue(parser, beanClass);
+			JsonToken token = parser.nextToken();
+			if (token == JsonToken.END_OBJECT)
+				end();
 			//bean = mapper.readValue(parser, IPersistenceBean.class);
 						
 		} catch (JsonParseException e) {
@@ -121,20 +144,27 @@ public class JSONPersistenceSession implements IPersistenceSession {
 			// TODO Handle exception
 			e.printStackTrace();
 		} catch (EOFException e) {
-			// Normal situation, reached EOF, close session, return null
-			end();
+//			// Normal situation, reached EOF, close session, return null
+//			end();
+			// TODO Handle exception
+			e.printStackTrace();
 			return null;
 		} catch (IOException e) {
 			throw new OkapiIOException(e);
 		}
 		
 		if (bean == null) return null;
-		return bean.get(classRef);
+		return bean.get(classRef, this);
+	}
+	
+	@Override
+	public <T> T deserialize(Class<T> classRef) {
+		return deserialize(classRef, itemLabel);
 	}
 
 	@Override
 	public void end() {
-		if (!isActive) return;		
+		if (state == SessionState.IDLE) return;		
 		
 		if (inStream != null)
 			try {
@@ -170,7 +200,19 @@ public class JSONPersistenceSession implements IPersistenceSession {
 
 				headerGen.writeStartObject();
 				// All this, because references are built during body serialization, but need to be in header
-				serialize(headerGen, this, JSON_HEADER);
+				//serialize(headerGen, this, JSON_HEADER);
+				headerGen.writeFieldName(JSON_HEADER);
+				headerGen.writeStartObject();
+				headerGen.writeStringField(JSON_VER, this.getVersion());
+				headerGen.writeStringField(JSON_DESCR, this.getDescription());
+				headerGen.writeStringField(JSON_CLASS, this.getItemClass());
+				headerGen.writeStringField(JSON_MIME, this.getMimeType());
+				
+				refResolver.updateFrames();
+				headerGen.writeObjectField(JSON_FRAMES, refResolver.getFrames());
+				
+				headerGen.writeEndObject();
+				
 				headerGen.writeFieldName(JSON_BODY);
 				headerGen.writeRaw(" : ");
 				
@@ -197,10 +239,12 @@ public class JSONPersistenceSession implements IPersistenceSession {
 				throw new OkapiFileNotFoundException(e);
 			} 			
 		}
-		isActive = false;
 		inStream = null;
 		outStream = null;
-		refResolver.reset();		
+		prevClass = null;
+		beanClass = null;
+		refResolver.reset();	
+		state = SessionState.IDLE;
 	}
 
 	private void serialize(JsonGenerator generator, Object obj) {
@@ -218,7 +262,7 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	}
 	
 	private void serialize(JsonGenerator generator, Object obj, String name) {
-		if (!isActive) return;
+		if (state != SessionState.WRITING) return;
 		try {
 			generator.writeFieldName(name);
 		} catch (JsonGenerationException e) {
@@ -231,7 +275,7 @@ public class JSONPersistenceSession implements IPersistenceSession {
 		if (bean == null) return;
 		
 		refResolver.setRootId(bean.getRefId());
-		bean.set(obj);
+		bean.set(obj, this);
 		
 		try {
 			mapper.writeValue(generator, bean);
@@ -257,6 +301,8 @@ public class JSONPersistenceSession implements IPersistenceSession {
 			throw(new IllegalArgumentException("JSONPersistenceSession: output stream cannot be null"));
 		end();
 		
+		state = SessionState.WRITING;
+		refResolver.reset();
 		if (Util.isEmpty(itemLabel))
 			this.itemLabel = JSON_ITEM;
 		else
@@ -274,38 +320,87 @@ public class JSONPersistenceSession implements IPersistenceSession {
 			bodyGen.writeStartObject();
 		} catch (IOException e) {
 			throw new OkapiIOException(e);
-		}
-		startSession();
+		}		
 	}
 
-	private void startSession() {		
-		refResolver.reset();
-		isActive = true;		
+	private String readFieldValue(String fieldName) {
+		String res = ""; 
+		try {
+			parser.nextToken();
+			if (!Util.isEmpty(fieldName))
+				if (!fieldName.equalsIgnoreCase(parser.getCurrentName()))
+					throw(new OkapiIOException("JSONPersistenceSession: input stream is broken"));
+			
+			parser.nextToken();
+			res = parser.getText();
+		} catch (JsonParseException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Handle exception
+			e.printStackTrace();
+		}
+		return res;
 	}
 	
 	@Override
+	@SuppressWarnings({ "unused", "unchecked" })
 	public void start(InputStream inStream) {
 		if (inStream == null)
 			throw(new IllegalArgumentException("JSONPersistenceSession: input stream cannot be null"));
 		end();
 		
 		this.inStream = inStream;				
-		try {
+		try {			
+			state = SessionState.READING;
+			refResolver.reset();
 			parser = jsonFactory.createJsonParser(inStream);
+			
+			JsonToken token = parser.nextToken(); 
+			if (token != JsonToken.START_OBJECT)
+				throw(new OkapiIOException("JSONPersistenceSession: input stream is broken"));
+			
+			parser.nextToken();						
+			if (!JSON_HEADER.equalsIgnoreCase(parser.getCurrentName()))
+				throw(new OkapiIOException("JSONPersistenceSession: input stream is broken"));
+			
+			token = parser.nextToken(); 
+			if (token != JsonToken.START_OBJECT)
+				throw(new OkapiIOException("JSONPersistenceSession: input stream is broken"));
+			
+			// Header
+			String version = readFieldValue(JSON_VER);
+			if (!VERSION.equalsIgnoreCase(version)) {
+				// Version control
+			}									
+			String description = readFieldValue(JSON_DESCR);
+			String itemClass = readFieldValue(JSON_CLASS);
+			String mimeType = readFieldValue(JSON_MIME);
+			
+			// Frames
+			parser.nextToken();
+			if (!JSON_FRAMES.equalsIgnoreCase(parser.getCurrentName()))
+				throw(new OkapiIOException("JSONPersistenceSession: input stream is broken"));
+			
+			parser.nextToken();
+						
+			refResolver.setFrames(mapper.readValue(parser, List.class));
+			parser.nextToken();
+			parser.nextToken();
+			
+			// Prepare the stream for items deserialization
+			if (!JSON_BODY.equalsIgnoreCase(parser.getCurrentName()))
+				throw(new OkapiIOException("JSONPersistenceSession: input stream is broken"));
+			parser.nextToken();
+			if (token != JsonToken.START_OBJECT)
+				throw(new OkapiIOException("JSONPersistenceSession: input stream is broken"));
+			parser.nextToken();
+			
 		} catch (JsonParseException e) {
-			// TODO Handle exception
-			e.printStackTrace();
+			throw(new OkapiIOException("JSONPersistenceSession: input stream is broken. ", e));
 		} catch (IOException e) {
 			throw new OkapiIOException(e);
-		}
-		startSession();
-		//HeaderBean headerBean = deserialize(HeaderBean.class);
-		deserialize(HeaderBean.class);
-	}
-
-	@Override
-	public boolean isActive() {
-		return isActive;
+		}		
 	}
 
 	@Override
@@ -333,28 +428,18 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	}
 
 	@Override
-	public int generateRefId() {
-		return refResolver.generateRefId();
-	}
-
-	@Override
-	public int getRefIdForObject(Object obj) {
+	public long getRefIdForObject(Object obj) {
 		return refResolver.getRefIdForObject(obj);
 	}
 
 	@Override
-	public void setRefIdForObject(Object obj, int refId) {
+	public void setRefIdForObject(Object obj, long refId) {
 		refResolver.setRefIdForObject(obj, refId);
 	}
 
 	@Override
-	public void setReference(int parentRefId, int childRefId) {
+	public void setReference(long parentRefId, long childRefId) {
 		refResolver.addReference(parentRefId, childRefId);
-	}
-
-	@Override
-	public Map<Integer, Set<Integer>> getReferences() {		
-		return refResolver.getReferences();
 	}
 
 	@Override
@@ -370,5 +455,10 @@ public class JSONPersistenceSession implements IPersistenceSession {
 	@Override
 	public IPersistenceBean uncacheBean(Object obj) {
 		return refResolver.uncacheBean(obj);
+	}
+
+	@Override
+	public SessionState getState() {		
+		return state;
 	}
 }

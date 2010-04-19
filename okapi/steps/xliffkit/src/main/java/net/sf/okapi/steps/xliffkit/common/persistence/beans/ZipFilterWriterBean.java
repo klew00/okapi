@@ -23,31 +23,23 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class ZipFilterWriterBean extends PersistenceBean {
 
-	public ZipFilterWriterBean(IPersistenceSession session) {
-		super(session);
-	}
-	
 	@Override
-	public <T> T get(T obj) {
-		return obj;
-	}
-
-	@Override
-	public <T> T get(Class<T> classRef) {
+	protected Object createObject(IPersistenceSession session) {
 		EncoderManager encoderManager = new EncoderManager();
 		encoderManager.setMapping(MimeTypeMapper.ODF_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-		return classRef.cast(get(new ZipFilterWriter(encoderManager)));
+		return new ZipFilterWriter(encoderManager);
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
-		return this;
+	protected void fromObject(Object obj, IPersistenceSession session) {
 	}
 
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+	}
 }

@@ -22,7 +22,6 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import java.util.zip.ZipEntry;
 
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
@@ -36,35 +35,15 @@ public class ZipEntryBean extends PersistenceBean {
 	private int method = -1;	// compression method
 	private byte[] extra;       // optional extra field data for entry
 	private String comment;     // optional comment string for entry
-	private InputStreamBean inputStream = new InputStreamBean(getSession());
-	
-	public ZipEntryBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+	private InputStreamBean inputStream = new InputStreamBean();
+
 	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof ZipEntry) {
-			ZipEntry ze = (ZipEntry) obj;
-			
-			ze.setComment(comment);
-			//ze.setCompressedSize(csize); // !!! Do not uncomment, new compression size can be different, and an exception is thrown 
-			ze.setCrc(crc);
-			ze.setExtra(extra);
-			//ze.setMethod(method); // !!! Do not uncomment, let the code decide
-			ze.setSize(size);
-			ze.setTime(time);
-		}
-		return obj;
+	protected Object createObject(IPersistenceSession session) {
+		return new ZipEntry(name);
 	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new ZipEntry(name)));
-	}
-
-	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof ZipEntry) {
 			ZipEntry ze = (ZipEntry) obj;
 			
@@ -77,7 +56,21 @@ public class ZipEntryBean extends PersistenceBean {
 			extra = ze.getExtra();
 			comment = ze.getComment();
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof ZipEntry) {
+			ZipEntry ze = (ZipEntry) obj;
+			
+			ze.setComment(comment);
+			//ze.setCompressedSize(csize); // !!! Do not uncomment, new compression size can be different, and an exception is thrown 
+			ze.setCrc(crc);
+			ze.setExtra(extra);
+			//ze.setMethod(method); // !!! Do not uncomment, let the code decide
+			ze.setSize(size);
+			ze.setTime(time);
+		}
 	}
 
 	public String getName() {
@@ -151,5 +144,4 @@ public class ZipEntryBean extends PersistenceBean {
 	public InputStreamBean getInputStream() {
 		return inputStream;
 	}
-
 }

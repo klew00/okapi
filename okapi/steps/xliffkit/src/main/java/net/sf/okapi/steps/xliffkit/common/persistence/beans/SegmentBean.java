@@ -22,46 +22,41 @@ package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 
 public class SegmentBean extends TextPartBean {
 	
 	private String id;
-	
-	public SegmentBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
+	protected Object createObject(IPersistenceSession session) {
 		TextFragmentBean textBean = super.getPart();
 		TextFragment text = null;
 		
 		if (textBean != null)
-			text = textBean.get(TextFragment.class);
+			text = textBean.get(TextFragment.class, session);
 		else
 			text = new TextFragment();
 		
-		return classRef.cast(get(new Segment(id, text)));
+		return new Segment(id, text);
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
-		super.set(obj);
+	protected void fromObject(Object obj, IPersistenceSession session) {
+		super.fromObject(obj, session);
 		
 		if (obj instanceof Segment) {			
 			Segment seg = (Segment) obj;
 			id = seg.getId();
 		}
-		return this;
 	}
 
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		super.setObject(obj, session);
+	}
+
+	
 	public String getSegment() {
 		return id;
 	}
@@ -69,23 +64,4 @@ public class SegmentBean extends TextPartBean {
 	public void setSegment(String id) {
 		this.id = id;
 	}
-
-//	public void setSegment(TextFragmentBean text) {
-//		super.setPart(text);
-//	}
-//
-//	public TextFragmentBean getSegment() {
-//		return super.getPart();
-//	}
-//	
-//	@Override
-//	@Deprecated
-//	public void setPart(TextFragmentBean text) {
-//	}
-//
-//	@Override
-//	@Deprecated
-//	public TextFragmentBean getPart() {
-//		return super.getPart();
-//	}
 }

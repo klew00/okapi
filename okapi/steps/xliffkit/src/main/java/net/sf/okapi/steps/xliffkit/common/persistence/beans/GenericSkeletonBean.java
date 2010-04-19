@@ -25,46 +25,39 @@ import java.util.List;
 
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
-import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class GenericSkeletonBean extends PersistenceBean {
 
 	private List<GenericSkeletonPartBean> parts = new ArrayList<GenericSkeletonPartBean>();
-	
-	public GenericSkeletonBean(IPersistenceSession session) {
-		super(session);
-	}
-	
+
 	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof GenericSkeleton) {
-			GenericSkeleton skel = (GenericSkeleton) obj;
-			
-			for (GenericSkeletonPartBean partBean : parts)
-				skel.add(partBean.getData());
-		}
-		return obj;
-	}
-	
-	@Override
-	public <T> T get(Class<T> classRef) {
-		return classRef.cast(get(new GenericSkeleton()));
+	protected Object createObject(IPersistenceSession session) {
+		return new GenericSkeleton();
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof GenericSkeleton) {
 			GenericSkeleton skel = (GenericSkeleton) obj;
 			
 			for (GenericSkeletonPart part : skel.getParts()) {
-				GenericSkeletonPartBean partBean = new GenericSkeletonPartBean(getSession());
+				GenericSkeletonPartBean partBean = new GenericSkeletonPartBean();
 				parts.add(partBean);
-				partBean.set(part);
+				partBean.set(part, session);
 			}
 		}
-		return this;
+	}
+
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof GenericSkeleton) {
+			GenericSkeleton skel = (GenericSkeleton) obj;
+			
+			for (GenericSkeletonPartBean partBean : parts)
+				skel.getParts().add(partBean.get(GenericSkeletonPart.class, session));
+		}
 	}
 
 	public List<GenericSkeletonPartBean> getParts() {

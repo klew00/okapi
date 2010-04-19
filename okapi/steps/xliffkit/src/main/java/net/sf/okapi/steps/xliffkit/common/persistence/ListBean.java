@@ -29,29 +29,12 @@ public class ListBean extends PersistenceBean {
 
 	private String className;
 	List<FactoryBean> items = new ArrayList<FactoryBean>();
-	
-	public ListBean(IPersistenceSession session) {
-		super(session);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T get(T obj) {
-		if (obj instanceof List<?>) {
-			List<Object> list = (List<Object>) obj;
-			for (IPersistenceBean itemBean : items) {
-				Object item = itemBean.get(Object.class);
-				list.add(item);
-			}
-		}
-		return obj;
-	}
 
 	@Override
-	public <T> T get(Class<T> classRef) {
-		Object inst = null;
+	protected Object createObject(IPersistenceSession session) {
+		Object res = null;
 		try {
-			inst = ClassUtil.instantiateClass(className);
+			res = ClassUtil.instantiateClass(className);
 		} catch (InstantiationException e) {
 			// TODO Handle exception
 			e.printStackTrace();
@@ -62,22 +45,33 @@ public class ListBean extends PersistenceBean {
 			// TODO Handle exception
 			e.printStackTrace();
 		}
-
-		return classRef.cast(get(inst));
+		
+		return res;
 	}
 
 	@Override
-	public IPersistenceBean set(Object obj) {
+	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj instanceof List<?>) {
 			className = ClassUtil.getQualifiedClassName(obj);
 			List<?> list = (List<?>) obj;
 			for (Object item : list) {
-				FactoryBean itemBean = new FactoryBean(getSession());
-				itemBean.set(item);
+				FactoryBean itemBean = new FactoryBean();
+				itemBean.set(item, session);
 				items.add(itemBean);
 			}
-		}
-		return this;
+		}		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void setObject(Object obj, IPersistenceSession session) {
+		if (obj instanceof List<?>) {
+			List<Object> list = (List<Object>) obj;
+			for (IPersistenceBean itemBean : items) {
+				Object item = itemBean.get(Object.class, session);
+				list.add(item);
+			}
+		}		
 	}
 
 	public List<FactoryBean> getList() {
