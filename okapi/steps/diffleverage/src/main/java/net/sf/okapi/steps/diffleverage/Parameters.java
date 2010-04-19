@@ -31,6 +31,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private int fuzzyThreshold;
 	private boolean codesensitive;
 	private boolean diffOnly;
+	private boolean copyToTarget;
 	
 	public Parameters() {
 		reset();
@@ -42,6 +43,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fuzzyThreshold = 100;
 		codesensitive = true;
 		diffOnly = false;
+		copyToTarget = true;
 	}
 
 	@Override
@@ -51,6 +53,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fuzzyThreshold = buffer.getInteger("fuzzyThreshold", fuzzyThreshold);
 		codesensitive = buffer.getBoolean("codesensitive", codesensitive);
 		diffOnly = buffer.getBoolean("diffOnly", diffOnly);
+		copyToTarget = buffer.getBoolean("copyToTarget", copyToTarget);
 	}
 	
 	@Override
@@ -59,6 +62,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setParameter("fuzzyThreshold", fuzzyThreshold);		
 		buffer.setParameter("codesensitive", codesensitive);
 		buffer.setParameter("diffOnly", diffOnly);
+		buffer.setParameter("copyToTarget", copyToTarget);
 		return buffer.toString();
 	}
 
@@ -68,6 +72,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add("fuzzyThreshold", "Leverage only if the match is equal or above this score", "Fuzzy Threshold between 1 and 100.");		
 		desc.add("codesensitive", "Include inline codes in the comparison", "Use codes to compare contents");
 		desc.add("diffOnly", "Do not fill the target with the leveraged translation", "Diff only (do not copy translation)?");
+		desc.add("copyToTarget", "Copy to/over the target?", "Copy to/over the target or copy to the leverage annotation?");
 		return desc;
 	}
 	
@@ -79,6 +84,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		sip.setVertical(false);
 		desc.addCheckboxPart(paramsDesc.get("codesensitive"));
 		desc.addCheckboxPart(paramsDesc.get("diffOnly"));
+		desc.addCheckboxPart(paramsDesc.get("copyToTarget"));
 		return desc;
 	}
 	
@@ -104,5 +110,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void setDiffOnly(boolean diffOnly) {
 		this.diffOnly = diffOnly;
+	}
+
+	public void setCopyToTarget(boolean copyToTarget) {
+		this.copyToTarget = copyToTarget;
+	}
+
+	public boolean isCopyToTarget() {
+		return copyToTarget;
 	}
 }
