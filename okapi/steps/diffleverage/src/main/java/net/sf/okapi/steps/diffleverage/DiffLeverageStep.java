@@ -302,8 +302,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 					newTu.setTarget(targetLocale, t);
 				}
 				// set the DiffLeverageAnnotation which marks the new TextUnit as a match with the old TextUnit
-				newTu.setAnnotation(new DiffLeverageAnnotation(params.isCodesensitive(), params
-						.getFuzzyThreshold()));
+				newTu.setAnnotation(new DiffMatchAnnotation());
 			}
 		}
 	}
