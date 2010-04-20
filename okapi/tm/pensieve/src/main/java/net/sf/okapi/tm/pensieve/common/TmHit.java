@@ -144,7 +144,7 @@ public class TmHit implements Comparable<TmHit> {
 	 * source string. TmMatchType is the primary key, score secondary and source
 	 * string tertiary.
 	 * 
-	 * @param other - the TmHot we are comparing against.
+	 * @param other - the TmHit we are comparing against.
 	 */
 	public int compareTo(TmHit other) {
 		final int EQUAL = 0;
@@ -163,7 +163,7 @@ public class TmHit implements Comparable<TmHit> {
 		// compare score
 		comparison = Float.compare(this.score, other.getScore());
 		if (comparison != EQUAL)
-			return comparison * -1;;  // we want to reverse the normal score sort
+			return comparison * -1;  // we want to reverse the normal score sort
 
 		// compare source strings with codes
 		comparison = thisSource.compareTo(otherSource);
