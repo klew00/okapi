@@ -32,7 +32,7 @@ import java.net.URISyntaxException;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.steps.xliffkit.common.persistence.AddressBookProtos.AddressBook;
 import net.sf.okapi.steps.xliffkit.common.persistence.AddressBookProtos.Person;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.BaseNameableBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.BaseNameableBean;
 
 import org.junit.Test;
 

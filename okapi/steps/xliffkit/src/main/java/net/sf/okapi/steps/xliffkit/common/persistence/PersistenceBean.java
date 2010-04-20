@@ -20,13 +20,13 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
-public abstract class PersistenceBean implements IPersistenceBean {
+public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceBean {
 	
 	private long refId = 0;
 
-	protected abstract Object createObject(IPersistenceSession session);
-	protected abstract void setObject(Object obj, IPersistenceSession session);
-	protected abstract void fromObject(Object obj, IPersistenceSession session);
+	protected abstract PutCoreClassHere createObject(IPersistenceSession session);
+	protected abstract void setObject(PutCoreClassHere obj, IPersistenceSession session);
+	protected abstract void fromObject(PutCoreClassHere obj, IPersistenceSession session);
 	
 	@Override
 	public long getRefId() {
@@ -41,11 +41,13 @@ public abstract class PersistenceBean implements IPersistenceBean {
 		this.refId = refId;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(T obj, IPersistenceSession session) {
-		if (obj != null)
+		if (obj != null) {
 			session.setRefIdForObject(obj, refId);		
-		setObject(obj, session);
+			setObject((PutCoreClassHere) obj, session);
+		}
 		return obj;
 	}
 	
@@ -54,9 +56,11 @@ public abstract class PersistenceBean implements IPersistenceBean {
 		return classRef.cast(get(createObject(session), session));
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public IPersistenceBean set(Object obj, IPersistenceSession session) {
-		fromObject(obj, session);		
+		if (obj != null)
+			fromObject((PutCoreClassHere) obj, session);
 		return this;
 	}		
 }

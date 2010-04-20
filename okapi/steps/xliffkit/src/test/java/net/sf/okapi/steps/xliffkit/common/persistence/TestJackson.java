@@ -41,10 +41,10 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.EventBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.InputStreamBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.TextUnitBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.ZipSkeletonBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.EventBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.InputStreamBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.TextUnitBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.ZipSkeletonBean;
 
 import org.apache.commons.io.input.CountingInputStream;
 import org.codehaus.jackson.JsonGenerationException;
