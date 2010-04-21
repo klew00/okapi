@@ -24,12 +24,15 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String SERVER = "server";
+	private static final String APIKEY = "apiKey";
 	
 	private String server;
+	private String apiKey;
 	
 	public Parameters () {
 		reset();
@@ -40,6 +43,29 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fromString(initialData);
 	}
 
+	@Override
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		server = buffer.getString(SERVER, server);
+		apiKey = buffer.getString(APIKEY, apiKey);
+	}
+
+	@Override
+	public void reset () {
+		// Default
+		server = "http://api.apertium.org/json/translate";
+		apiKey = "";
+	}
+
+	@Override
+	public String toString () {
+		buffer.reset();
+		buffer.setString(SERVER, server);
+		buffer.setString(APIKEY, apiKey);
+		return buffer.toString();
+	}
+
 	public String getServer () {
 		return server;
 	}
@@ -48,30 +74,19 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.server = server;
 	}
 
-	@Override
-	public void fromString (String data) {
-		reset();
-		buffer.fromString(data);
-		server = buffer.getString(SERVER, server);
+	public String getApiKey () {
+		return apiKey;
 	}
 
-	@Override
-	public void reset () {
-		// Default
-		server = "http://api.apertium.org/json/translate";
-	}
-
-	@Override
-	public String toString () {
-		buffer.reset();
-		buffer.setString(SERVER, server);
-		return buffer.toString();
+	public void setApiKey (String apiKey) {
+		this.apiKey = apiKey;
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(SERVER, "Server URL:", "Full URL of the server");
+		desc.add(APIKEY, "API Key:", "Recommended key (See http://api.apertium.org/register.jsp)");
 		return desc;
 	}
 
@@ -79,6 +94,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Apertium MT Connector Settings");
 		desc.addTextInputPart(paramsDesc.get(SERVER));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(APIKEY));
+		tip.setPassword(true);
+		tip.setAllowEmpty(true); // API key is optional
 		return desc;
 	}
 

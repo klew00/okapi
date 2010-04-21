@@ -90,8 +90,15 @@ public class ApertiumMTConnector extends BaseConnector {
 			// Convert the fragment to coded HTML
 			String qtext = util.toCodedHTML(fragment);
 			// Create the connection and query
-			URL url = new URL(params.getServer() + String.format("?format=html&q=%s&langpair=%s|%s",
-				URLEncoder.encode(qtext, "UTF-8"), srcCode, trgCode));
+			URL url;
+			if ( Util.isEmpty(params.getApiKey()) ) {
+				url = new URL(params.getServer() + String.format("?format=html&markUnknown=no&q=%s&langpair=%s|%s",
+					URLEncoder.encode(qtext, "UTF-8"), srcCode, trgCode));
+			}
+			else {
+				url = new URL(params.getServer() + String.format("?key=%s&format=html&markUnknown=no&q=%s&langpair=%s|%s",
+					URLEncoder.encode(params.getApiKey(), "UTF-8"), URLEncoder.encode(qtext, "UTF-8"), srcCode, trgCode));
+			}
 			URLConnection conn = url.openConnection();
 
 			// Get the response
