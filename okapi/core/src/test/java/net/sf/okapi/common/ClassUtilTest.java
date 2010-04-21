@@ -28,6 +28,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 import org.junit.Test;
@@ -90,12 +91,16 @@ public class ClassUtilTest {
 		}
 		
 		// 2 Class reference, empty constructor parameters
-		try {
-			assertNull(ClassUtil.instantiateClass(BOMAwareInputStream.class, (Object[]) null));
-			
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+			try {
+				assertNull(ClassUtil.instantiateClass(BOMAwareInputStream.class, (Object[]) null));
+				fail("InstantiationException should've been trown");			
+			} catch (InstantiationException e) {
+				// OK, expected
+			} catch (IllegalAccessException e) {
+				fail("IllegalAccessException shouldn't have been trown");
+			} catch (Exception e) {
+				fail(e.getMessage());
+			}
 		
 		// 3 Class reference, correct constructor parameters
 		InputStream input = null;
@@ -117,9 +122,13 @@ public class ClassUtilTest {
 			input = new FileInputStream(new File(url.toURI()));
 					
 			assertNull(ClassUtil.instantiateClass(BOMAwareInputStream.class, input, 3));
-		
+			fail("RuntimeException should've been trown");
+		} catch (IllegalAccessException e) {
+			fail("IllegalAccessException shouldn't have been trown");
+		} catch (RuntimeException e) {
+			// OK, expected
 		} catch (Exception e) {
-			fail(e.getMessage());
+			// OK, expected
 		}
 		
 		// 5 Class name, null
@@ -160,7 +169,9 @@ public class ClassUtilTest {
 		// 10 Class name, wrong loader
 		try {
 			assertNull(ClassUtil.instantiateClass("net.sf.okapi.common.ClassUtilTest2", String.class.getClassLoader()));			
-			
+			fail("IllegalArgumentException should've been trown");
+		} catch (IllegalArgumentException e) {
+			// OK, expected
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
@@ -201,7 +212,9 @@ public class ClassUtilTest {
 			input = new FileInputStream(new File(url.toURI()));
 					
 			assertNull(ClassUtil.instantiateClass("net.sf.okapi.common.BOMAwareInputStream", input, 3));
-		
+			fail("RuntimeException should've been trown");
+		} catch (RuntimeException e) {
+			// OK, expected
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
@@ -229,6 +242,8 @@ public class ClassUtilTest {
 			assertNull(ClassUtil.instantiateClass("net.sf.okapi.common.BOMAwareInputStream", 
 					this.getClass().getClassLoader(), input, 10));
 			
+		} catch (RuntimeException e) {	
+			// OK, expected
 		} catch (Exception e) {	
 			fail(e.getMessage());
 		}
@@ -243,7 +258,9 @@ public class ClassUtilTest {
 			assertNull(ClassUtil.instantiateClass("net.sf.okapi.common.BOMAwareInputStream", 
 					String.class.getClassLoader(), input, defaultEncoding));
 			
-		} catch (Exception e) {				
+		} catch (RuntimeException e) {	
+			// OK, expected
+		} catch (Exception e) {	
 			fail(e.getMessage());
 		}
 		
