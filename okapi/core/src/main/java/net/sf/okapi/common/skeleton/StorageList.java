@@ -25,6 +25,7 @@ import java.util.Set;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.INameable;
@@ -206,4 +207,7 @@ class StorageList extends ArrayList<IResource>
 		startGroup.removeTargetProperty(language, name);
 	}
 
+	public Annotations getAnnotations () {
+		return startGroup.getAnnotations();
+	}
 }

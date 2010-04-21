@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common;
 
+import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
@@ -70,9 +71,15 @@ public interface IResource {
 	public <A extends IAnnotation> A getAnnotation(Class<A> annotationType);
 
 	/**
-	 * Sets an annotation object or this resource.
+	 * Sets an annotation object for this resource.
 	 * @param annotation the annotation object to set.
 	 */
 	public void setAnnotation (IAnnotation annotation);
-	
+
+	/**
+	 * Gets the annotations for this resource.
+	 * @return the annotations for this resource.
+	 */
+	public Annotations getAnnotations ();
+
 }
