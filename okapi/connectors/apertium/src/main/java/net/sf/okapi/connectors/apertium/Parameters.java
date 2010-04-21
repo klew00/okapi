@@ -58,7 +58,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public void reset () {
 		// Default
-		server = "http://xixona.dlsi.ua.es:80/webservice/ws.php";
+		server = "http://api.apertium.org/json/translate";
 	}
 
 	@Override
