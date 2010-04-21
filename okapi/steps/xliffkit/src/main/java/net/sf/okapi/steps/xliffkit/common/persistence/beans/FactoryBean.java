@@ -45,10 +45,10 @@ public class FactoryBean extends PersistenceBean<Object> {
 	protected void setObject(Object obj, IPersistenceSession session) {
 	}
 
-	@Override
-	public <T> T get(T obj, IPersistenceSession session) {
-		return super.get(obj, session); // To handle refId
-	}
+//	@Override
+//	public <T> T get(T obj, IPersistenceSession session) {
+//		return super.get(obj, session); // To handle refId
+//	}
 	
 	@Override
 	public <T> T get(Class<T> classRef, IPersistenceSession session) {

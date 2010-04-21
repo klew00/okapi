@@ -41,19 +41,14 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 		this.refId = refId;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T get(T obj, IPersistenceSession session) {
-		if (obj != null) {
-			session.setRefIdForObject(obj, refId);		
-			setObject((PutCoreClassHere) obj, session);
-		}
-		return obj;
-	}
-	
 	@Override
 	public <T> T get(Class<T> classRef, IPersistenceSession session) {
-		return classRef.cast(get(createObject(session), session));
+		PutCoreClassHere obj = createObject(session);
+		if (obj != null) {
+			session.setRefIdForObject(obj, refId);		
+			setObject(obj, session);
+		}		
+		return classRef.cast(obj);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -61,6 +56,7 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 	public IPersistenceBean set(Object obj, IPersistenceSession session) {
 		if (obj != null)
 			fromObject((PutCoreClassHere) obj, session);
+		
 		return this;
 	}		
 }

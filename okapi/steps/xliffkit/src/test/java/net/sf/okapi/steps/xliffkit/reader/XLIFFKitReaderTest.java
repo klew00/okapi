@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.xliffkit.reader;
 
+import org.junit.Test;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
@@ -33,7 +35,7 @@ public class XLIFFKitReaderTest {
 //	private static final LocaleId DEDE = new LocaleId("de", "de");
 //	private static final LocaleId ITIT = new LocaleId("it", "it");
 	
-	// DEBUG @Test
+	// DEBUG 	@Test
 	public void testReader() {
 		
 		new Pipeline(
@@ -56,7 +58,7 @@ public class XLIFFKitReaderTest {
 		).execute();
 	}
 	
-	// DEBUG @Test
+	// DEBUG 	@Test
 	public void testReader2() {
 		
 		new Pipeline(
@@ -79,7 +81,7 @@ public class XLIFFKitReaderTest {
 		).execute();
 	}
 
-	// DEBUG @Test
+	// DEBUG 	@Test
 	public void testReferences() {
 		
 		new Pipeline(
@@ -102,7 +104,7 @@ public class XLIFFKitReaderTest {
 		).execute();
 	}
 
-// DEBUG @Test
+// DEBUG 	@Test
 	public void testReferences2() {
 		
 		new Pipeline(

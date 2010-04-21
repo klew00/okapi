@@ -45,6 +45,7 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.EventBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.InputStreamBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.TextUnitBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.ZipSkeletonBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.json.jackson.JSONPersistenceSession;
 
 import org.apache.commons.io.input.CountingInputStream;
 import org.codehaus.jackson.JsonGenerationException;
@@ -112,9 +113,9 @@ public class TestJackson {
 		
 		st = mapper.writeValueAsString(tub);
 		tub = mapper.readValue(st, TextUnitBean.class);
-		tu = tub.get(new TextUnit(""), session);
+		tu = tub.get(TextUnit.class, session);
 //		System.out.println(tu.getSource().getCodedText());
-		System.out.println(((TextContainer)tub.getSource().get(new TextContainer(), session)).getCodedText());
+		System.out.println(((TextContainer)tub.getSource().get(TextContainer.class, session)).getCodedText());
 //		ISkeleton skel = tub.getSkeleton().read(ISkeleton.class);
 //		if (skel != null)
 //			System.out.println(skel.getClass());

@@ -22,11 +22,11 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 
 public interface IPersistenceBean {
 
-	<T> T get(T obj, IPersistenceSession session);
+	//<T> T get(T obj, IPersistenceSession session);
 	
 	<T> T get(Class<T> classRef, IPersistenceSession session);
 	
-	IPersistenceBean set(Object obj, IPersistenceSession session); // Returns self to allow chaining
+	<T> IPersistenceBean set(T obj, IPersistenceSession session); // Returns self to allow chaining
 
 	long getRefId();
 	

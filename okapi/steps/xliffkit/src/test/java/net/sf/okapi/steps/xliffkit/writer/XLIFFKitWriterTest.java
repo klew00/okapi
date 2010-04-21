@@ -183,7 +183,7 @@ public class XLIFFKitWriterTest {
 	private static final LocaleId DEDE = new LocaleId("de", "de");
 	private static final LocaleId ITIT = new LocaleId("it", "it");
 	
-	// DEBUG @Test
+	// DEBUG 	@Test
 	public void testPackageFormat() throws URISyntaxException, MalformedURLException {
 
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
@@ -278,7 +278,7 @@ public class XLIFFKitWriterTest {
 		).execute();
 	}
 	
-	// DEBUG @Test
+	// DEBUG 	@Test
 	public void testPackageFormat2() throws URISyntaxException, MalformedURLException {
 
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
@@ -406,7 +406,7 @@ public class XLIFFKitWriterTest {
 		).execute();
 	}
 	
-	// DEBUG @Test
+	// DEBUG 	@Test
 	public void testReferences() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		
@@ -534,7 +534,7 @@ public class XLIFFKitWriterTest {
 		}
 	}		
 	
-	// DEBUG @Test
+	// DEBUG 	@Test
 	public void testReferences2() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		

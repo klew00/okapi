@@ -36,6 +36,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.steps.xliffkit.common.persistence.json.jackson.JSONPersistenceSession;
 
 import org.junit.Test;
 
@@ -52,7 +53,7 @@ public class TestBeans {
 		bn.setType("the type");
 		bean.set(bn, session);
 		
-		BaseNameable bn2 = bean.get(new BaseNameable(), session);
+		BaseNameable bn2 = bean.get(BaseNameable.class, session);
 		assertEquals("the id", bn2.getId());
 		assertEquals("the name", bn2.getName());
 		assertEquals("the type", bn2.getType());
@@ -66,7 +67,7 @@ public class TestBeans {
 		
 //		JSONPersistenceSession session = new JSONPersistenceSession(BaseReferenceableBean.class);
 //		session.start((InputStream) null);
-		BaseReferenceable br2 = bean2.get(new BaseReferenceable(), session);
+		BaseReferenceable br2 = bean2.get(BaseReferenceable.class, session);
 
 		assertEquals("the id", br2.getId());
 		assertEquals("the name", br2.getName());

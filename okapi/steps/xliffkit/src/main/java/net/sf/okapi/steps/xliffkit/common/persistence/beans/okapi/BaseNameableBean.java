@@ -91,13 +91,15 @@ public class BaseNameableBean extends PersistenceBean<BaseNameable> {
 			obj.setPreserveWhitespaces(preserveWS);
 			
 			for (PropertyBean prop : properties)
-				obj.setProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly()), session));
+				//obj.setProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly()), session));
+				obj.setProperty(prop.get(Property.class, session));
 			
 			for (FactoryBean annotationBean : annotations)
 				obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 			
 			for (PropertyBean prop : sourceProperties)
-				obj.setSourceProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly()), session));
+				//obj.setSourceProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly()), session));
+				obj.setProperty(prop.get(Property.class, session));
 	}
 
 	public String getId() {
