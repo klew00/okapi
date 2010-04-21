@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class SentenceAlignPipelineStepTest {
+public class SentenceAlignStepTest {
 	private Pipeline pipeline;
 	private SentenceAlignerStep aligner;
 	private EventObserver eventObserver;
@@ -55,7 +55,7 @@ public class SentenceAlignPipelineStepTest {
 
 	@Test
 	public void sentenceEnglishEnglishAlign() throws URISyntaxException {
-		URL url = SentenceAlignPipelineStepTest.class.getResource("/src.txt");
+		URL url = SentenceAlignStepTest.class.getResource("/src.txt");
 		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH);
 		t.setFilterConfigId("okf_plaintext");
 		aligner.setSecondInput(t);
@@ -85,7 +85,7 @@ public class SentenceAlignPipelineStepTest {
 
 	@Test
 	public void sentenceAlignMultimatch() throws URISyntaxException {
-		URL url = SentenceAlignPipelineStepTest.class.getResource("/trgMultimatch.txt");
+		URL url = SentenceAlignStepTest.class.getResource("/trgMultimatch.txt");
 		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.fromString("pt"));
 		t.setFilterConfigId("okf_plaintext");
 
