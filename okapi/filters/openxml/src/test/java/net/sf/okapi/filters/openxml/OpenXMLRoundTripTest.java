@@ -95,17 +95,18 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("MissingPara.docx");
 		themfiles.add("EndGroup.docx");
 		themfiles.add("Practice2.docx");
-
+		
+//		themfiles.add("Test_Hangs.docx");
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
 
 		for(String s : themfiles)
 		{
-//		runOneTest(s,false,false); // English
+// 		runOneTest(s,false,false); // English
 			runOneTest(s,true,false);  // PigLatin
-//		runOneTest(s,false,true);  // Tags
-//		runOneTest(s,true,true);   // Codes
+// 		runOneTest(s,false,true);  // Tags
+// 		runOneTest(s,true,true);   // Codes
 		}
 		assertTrue("Some Roundtrip files failed.",allGood);
 	}

@@ -1072,14 +1072,23 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		case GROUP_ELEMENT:
 			if (!bInSettingsFile) // DWH 4-12-10 else is for <v:textbox ...> in settings.xml file
 			{
-				if (!canStartNewTextUnit()) // DWH 6-29-09 for text box: embedded text unit
+				if (!startTag.isSyntacticalEmptyElementTag()) // DWH 4-21-10 for <v:textbox .../>
 				{
-					bInTextBox = true; // DWH 7-23-09 textbox
-					sInsideTextBox = ""; // DWH 7-23-09 textbox
-					addTextRunToCurrentTextUnit(true); // DWH 7-29-09 add text run stuff as a placeholder
+				  if (!canStartNewTextUnit()) // DWH 6-29-09 for text box: embedded text unit
+					{
+						bInTextBox = true; // DWH 7-23-09 textbox
+						sInsideTextBox = ""; // DWH 7-23-09 textbox
+						addTextRunToCurrentTextUnit(true); // DWH 7-29-09 add text run stuff as a placeholder
+					}
+					getRuleState().pushGroupRule(sTagName);
+					startGroup(new GenericSkeleton(sTagString),"textbox");
 				}
-				getRuleState().pushGroupRule(sTagName);
-				startGroup(new GenericSkeleton(sTagString),"textbox");
+				else if (canStartNewTextUnit()) // DWH 6-29-09
+					addToDocumentPart(sTagString); // DWH 6-29-09
+				else if (bInTextRun) // DWH 6-29-09
+					addToTextRun(sTagString); // DWH 6-29-09
+				else // DWH 6-29-09
+					addToNonTextRun(sTagString); // DWH 6-29-09
 			}
 			else
 				addToDocumentPart(sTagString); // DWH 4-12-10 for <v:textbox ...> in settings.xml file			
