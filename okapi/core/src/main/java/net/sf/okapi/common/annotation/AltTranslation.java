@@ -120,19 +120,36 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	public int getScore () {
 		return score;
 	}
-	
+
+	/**
+	 * Gets the origin for this entry (can be null).
+	 * @return the origin for this entry, or null if none is defined.
+	 */
 	public String getOrigin () {
 		return origin;
 	}
 
+	/**
+	 * Gets the text unit for this entry.
+	 * @return the text unit for this entry.
+	 */
 	public TextUnit getEntry () {
 		return tu;
 	}
 
+	/**
+	 * Gets the type of this alternate translation.
+	 * The value is on of the {@link AltTranslationType} values.
+	 * @return the type of this alternate translation.
+	 */
 	public AltTranslationType getType () {
 		return type;
 	}
 
+	/**
+	 * Compares this AltTranslation with another one.
+	 * @return 0 if both object at the same, non-zero otherwise.
+	 */
 	@Override
 	public int compareTo (AltTranslation arg) {
 		// TODO Auto-generated method stub

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -46,110 +47,133 @@ public class BaseNameable implements INameable {
 	protected Annotations annotations;
 	protected Hashtable<String, Property> sourceProperties;
 	
+	@Override
 	public String getId () {
 		return id;
 	}
 	
+	@Override
 	public void setId (String id) {
 		this.id = id;
 	}
 
+	@Override
 	public ISkeleton getSkeleton () {
 		return skeleton;
 	}
 	
+	@Override
 	public void setSkeleton (ISkeleton skeleton) {
 		this.skeleton = skeleton;
 	}
 
+	@Override
 	public String getName () {
 		return name;
 	}
 	
+	@Override
 	public void setName (String value) {
 		name = value;
 	}
 	
+	@Override
 	public String getType () {
 		return type;
 	}
 	
+	@Override
 	public void setType (String value) {
 		type = value;
 	}
 	
+	@Override
 	public String getMimeType () {
 		return mimeType;
 	}
 	
+	@Override
 	public void setMimeType (String value) {
 		mimeType = value;
 	}
 	
+	@Override
 	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
 		if ( annotations == null ) return null;
 		return annotationType.cast(annotations.get(annotationType) );
 	}
 
+	@Override
 	public void setAnnotation (IAnnotation annotation) {
 		if ( annotations == null ) annotations = new Annotations();
 		annotations.set(annotation);
 	}
 
+	@Override
 	public Property getProperty (String name) {
 		if ( properties == null ) return null;
 		return properties.get(name);
 	}
 
+	@Override
 	public Property setProperty (Property property) {
 		if ( properties == null ) properties = new Hashtable<String, Property>();
 		properties.put(property.getName(), property);
 		return property;
 	}
 	
+	@Override
 	public void removeProperty (String name) {
 		if ( properties != null ) {
 			properties.remove(name);
 		}
 	}
 	
+	@Override
 	public Set<String> getPropertyNames () {
 		if ( properties == null ) properties = new Hashtable<String, Property>();
 		return properties.keySet();
 	}
 
+	@Override
 	public boolean hasProperty (String name) {
 		if ( properties == null ) return false;
 		return properties.containsKey(name);
 	}
 
+	@Override
 	public Property getSourceProperty (String name) {
 		if ( sourceProperties == null ) return null;
 		return sourceProperties.get(name);
 	}
 
+	@Override
 	public Property setSourceProperty (Property property) {
 		if ( sourceProperties == null ) sourceProperties = new Hashtable<String, Property>();
 		sourceProperties.put(property.getName(), property);
 		return property;
 	}
 	
+	@Override
 	public void removeSourceProperty (String name) {
 		if ( sourceProperties != null ) {
 			sourceProperties.remove(name);
 		}
 	}
 	
+	@Override
 	public Set<String> getSourcePropertyNames () {
 		if ( sourceProperties == null ) sourceProperties = new Hashtable<String, Property>();
 		return sourceProperties.keySet();
 	}
 
+	@Override
 	public boolean hasSourceProperty (String name) {
 		if ( sourceProperties == null ) return false;
 		return sourceProperties.containsKey(name);
 	}
 
+	@Override
 	public Property getTargetProperty (LocaleId locId,
 		String name)
 	{
@@ -161,6 +185,7 @@ public class BaseNameable implements INameable {
 		return trgProps.get(name);
 	}
 
+	@Override
 	public Property setTargetProperty (LocaleId locId,
 		Property property)
 	{
@@ -179,6 +204,7 @@ public class BaseNameable implements INameable {
 		return property;
 	}
 
+	@Override
 	public Set<String> getTargetPropertyNames (LocaleId locId) {
 		if ( annotations == null ) annotations = new Annotations();
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
@@ -194,6 +220,7 @@ public class BaseNameable implements INameable {
 		return trgProps.keySet();
 	}
 
+	@Override
 	public void removeTargetProperty (LocaleId locId,
 		String name)
 	{
@@ -206,6 +233,7 @@ public class BaseNameable implements INameable {
 		}
 	}
 	
+	@Override
 	public boolean hasTargetProperty (LocaleId locId,
 		String name)
 	{
@@ -217,6 +245,7 @@ public class BaseNameable implements INameable {
 		return (trgProps.get(name) != null);
 	}
 		
+	@Override
 	public Set<LocaleId> getTargetLocales () {
 		if ( annotations == null ) annotations = new Annotations();
 		TargetPropertiesAnnotation tpa = annotations.get(TargetPropertiesAnnotation.class);
@@ -227,6 +256,7 @@ public class BaseNameable implements INameable {
 		return tpa.getLocales();
 	}
 
+	@Override
 	public Property createTargetProperty (LocaleId locId,
 		String name,
 		boolean overwriteExisting,
@@ -262,24 +292,32 @@ public class BaseNameable implements INameable {
 		return trgProp;
 	}
 	
+	@Override
 	public boolean isTranslatable () {
 		return isTranslatable;
 	}
 	
+	@Override
 	public void setIsTranslatable (boolean value) {
 		isTranslatable = value;
 	}
 
+	@Override
 	public boolean preserveWhitespaces () {
 		return preserveWS;
 	}
 	
+	@Override
 	public void setPreserveWhitespaces (boolean value) {
 		preserveWS = value;
 	}
 
-	public Annotations getAnnotations() {
-		return (annotations == null) ? new Annotations() : annotations;
+	@Override
+	public Iterable<IAnnotation> getAnnotations () {
+		if ( annotations == null ) {
+			return Collections.emptyList();
+		}
+		return annotations;
 	}
 
 }

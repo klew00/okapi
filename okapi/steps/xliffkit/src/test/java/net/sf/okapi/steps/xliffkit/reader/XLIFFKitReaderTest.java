@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.xliffkit.reader;
 
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 import net.sf.okapi.common.LocaleId;
@@ -34,6 +35,13 @@ public class XLIFFKitReaderTest {
 //	private static final LocaleId FRFR = new LocaleId("fr", "fr");
 //	private static final LocaleId DEDE = new LocaleId("de", "de");
 //	private static final LocaleId ITIT = new LocaleId("it", "it");
+	
+	@Test // Make sure we have at least one test to avoid build errors
+	public void testStepInfo () {
+		XLIFFKitReaderStep s = new XLIFFKitReaderStep();
+		assertNotNull(s.getDescription());
+		assertNotNull(s.getName());
+	}
 	
 	// DEBUG 	@Test
 	public void testReader() {

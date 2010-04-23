@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,6 +29,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.junit.Test;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -37,9 +41,15 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
 
-
 public class TestVersions {
 
+	@Test // Make sure we have at least one test to avoid build errors
+	public void testDescription () {
+		net.sf.okapi.steps.xliffkit.common.persistence.versioning.JSONPersistenceSession skelSession = 
+			new net.sf.okapi.steps.xliffkit.common.persistence.versioning.JSONPersistenceSession(Event.class);
+		assertFalse(skelSession.isActive());
+	}
+	
 	// DEBUG @Test
 	public void testOldPersistenceRoundtrip() throws IOException{
 		Event event1 = new Event(EventType.TEXT_UNIT);

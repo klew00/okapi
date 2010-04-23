@@ -20,12 +20,19 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.Collections;
+
+import net.sf.okapi.common.annotation.Annotations;
+import net.sf.okapi.common.annotation.IAnnotation;
+
 /**
  * Implement a special content part that is a segment.
  * A segment is a {@link TextPart} with an identifier.
  */
 public class Segment extends TextPart {
 	
+	protected Annotations annotations;
+
 	/**
 	 * Identifier of this segment.
 	 */
@@ -68,4 +75,36 @@ public class Segment extends TextPart {
 	public String getId () {
 		return id;
 	}
+
+	/**
+	 * Gets the annotation object for a given class for this segment.
+	 * @param annotationType the class of the annotation object to retrieve.
+	 * @return the annotation for the given class for this segment. 
+	 */
+	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
+		if ( annotations == null ) return null;
+		return annotationType.cast(annotations.get(annotationType) );
+	}
+
+	/**
+	 * Sets an annotation object for this segment.
+	 * <p>If an annotation of the same type exists already it is overridden.
+	 * @param annotation the annotation object to set.
+	 */
+	public void setAnnotation (IAnnotation annotation) {
+		if ( annotations == null ) annotations = new Annotations();
+		annotations.set(annotation);
+	}
+
+	/**
+	 * Gets the iterable list for the annotations of this segment.
+	 * @return the iterable list for the annotations of this segment.
+	 */
+	public Iterable<IAnnotation> getAnnotations () {
+		if ( annotations == null ) {
+			return Collections.emptyList();
+		}
+		return annotations;
+	}
+	
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common;
 
-import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
@@ -77,9 +76,9 @@ public interface IResource {
 	public void setAnnotation (IAnnotation annotation);
 
 	/**
-	 * Gets the annotations for this resource.
-	 * @return the annotations for this resource.
+	 * Gets the iterable list of the annotations for this resource.
+	 * @return the iterable list of the annotations for this resource.
 	 */
-	public Annotations getAnnotations ();
+	public Iterable<IAnnotation> getAnnotations ();
 
 }

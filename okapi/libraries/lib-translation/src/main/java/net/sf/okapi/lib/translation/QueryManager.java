@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;

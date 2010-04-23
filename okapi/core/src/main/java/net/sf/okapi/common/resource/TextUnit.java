@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
@@ -585,7 +586,11 @@ public class TextUnit implements INameable, IReferenceable {
 		source.createSegments(ranges);
 	}
 
-	public Annotations getAnnotations() {
-		return (annotations == null) ? new Annotations() : annotations;
+	@Override
+	public Iterable<IAnnotation> getAnnotations () {
+		if ( annotations == null ) {
+			return Collections.emptyList();
+		}
+		return annotations;
 	}
 }

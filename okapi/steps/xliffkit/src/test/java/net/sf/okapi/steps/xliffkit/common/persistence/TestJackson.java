@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -46,6 +48,7 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.InputStreamBea
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.TextUnitBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.ZipSkeletonBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.json.jackson.JSONPersistenceSession;
+import net.sf.okapi.steps.xliffkit.reader.XLIFFKitReaderStep;
 
 import org.apache.commons.io.input.CountingInputStream;
 import org.codehaus.jackson.JsonGenerationException;
@@ -56,6 +59,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.junit.Before;
+import org.junit.Test;
 
 public class TestJackson {
 
@@ -75,7 +79,13 @@ public class TestJackson {
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 		session = new JSONPersistenceSession();
 	}
-			
+
+	@Test // Make sure we have at least one test to avoid build errors
+	public void testDescription () {
+		session.setDescription("abc");
+		assertEquals("abc", session.getDescription());
+	}
+	
 	// DEBUG @Test
 	public void testTextUnit() throws JsonGenerationException, JsonMappingException, IOException, URISyntaxException {
 		Event event = new Event(EventType.TEXT_UNIT);
