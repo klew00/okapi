@@ -109,7 +109,7 @@ public class Main {
 	protected boolean useMyMemory;
 	protected String myMemoryParams;
 	protected boolean useApertium;
-	protected String apertiumServer;
+	protected String apertiumParams;
 	protected boolean usePensieve;
 	protected String pensieveDir;
 	protected boolean useMicrosoft;
@@ -340,7 +340,7 @@ public class Main {
 					prog.useApertium = true;
 					if ( args.size() > i+1 ) {
 						if ( !args.get(i+1).startsWith("-") ) {
-							prog.apertiumServer = args.get(++i);
+							prog.apertiumParams = args.get(++i);
 						}
 					}
 				}
@@ -1290,8 +1290,9 @@ public class Main {
 		if ( connectorClassName.equals(ApertiumMTConnector.class.getName()) ) {
 			net.sf.okapi.connectors.apertium.Parameters params
 				= new net.sf.okapi.connectors.apertium.Parameters();
-			if ( apertiumServer != null ) {
-				params.setServer(apertiumServer);
+			if ( apertiumParams != null ) {
+				URI paramURI = (new File(apertiumParams).toURI());
+				params.load(paramURI, false);
 			} // Use default otherwise
 			return params;
 		}

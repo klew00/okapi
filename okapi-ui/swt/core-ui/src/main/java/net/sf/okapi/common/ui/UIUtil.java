@@ -89,7 +89,7 @@ public class UIUtil {
 	public static int getPlatformType () {
 		if ( "win32".equals(SWT.getPlatform()) ) return PFTYPE_WIN;
 		if ( "gtk".equals(SWT.getPlatform()) ) return PFTYPE_UNIX;
-		if ( "carbon".equals(SWT.getPlatform()) ) return PFTYPE_MAC;
+		if ( "cocoa".equals(SWT.getPlatform()) || "carbon".equals(SWT.getPlatform()) ) return PFTYPE_MAC;
 		if ( "motif".equals(SWT.getPlatform()) ) return PFTYPE_UNIX;
 		return -1; // Unknown
 	}

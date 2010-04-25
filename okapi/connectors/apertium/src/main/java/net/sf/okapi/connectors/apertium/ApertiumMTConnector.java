@@ -56,7 +56,8 @@ public class ApertiumMTConnector extends BaseConnector {
 
 	@Override
 	public String getSettingsDisplay () {
-		return "Server: "+params.getServer();
+		return String.format("Server: %s\n%s", params.getServer(),
+			(Util.isEmpty(params.getApiKey()) ? "Without API key" : "With API key"));
 	}
 	
 	@Override
@@ -108,9 +109,12 @@ public class ApertiumMTConnector extends BaseConnector {
 	    	@SuppressWarnings("unchecked")
 	    	Map<String, Object> data = (Map<String, Object>)map.get("responseData");
 	    	String res = (String)data.get("translatedText");
+	    	if ( res == null ) { // Probably an unsupported pair
+	    		return 0;
+	    	}
 	    	// Remove extra \n if needed
 	    	if ( res.endsWith("\n") && !qtext.endsWith("\n")) {
-	    		res = res.substring(0, res.length()-2);
+	    		res = res.substring(0, res.length()-1);
 	    	}
 
 	    	result = new QueryResult();

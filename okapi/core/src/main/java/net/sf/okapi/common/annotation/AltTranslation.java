@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -59,9 +60,9 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 */
 	public AltTranslation (LocaleId sourceLocId,
 		LocaleId targetLocId,
-		TextContainer originalSource,
-		TextContainer alternateSource,
-		TextContainer alternateTarget,
+		TextFragment originalSource,
+		TextFragment alternateSource,
+		TextFragment alternateTarget,
 		AltTranslationType type,
 		int score,
 		String origin)
@@ -69,13 +70,13 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		this.srcLocId = sourceLocId;
 		tu = new TextUnit(UUID.randomUUID().toString());
 		if ( alternateSource != null ) {
-			tu.setSource(alternateSource);
+			tu.setSourceContent(alternateSource);
 		}
 
 //TODO: copy code-content from original source to alternate target if necessary
 //TODO: the magic should go here
 		
-		tu.setTarget(trgLocId, alternateTarget);
+		tu.setTargetContent(targetLocId, alternateTarget);
 		this.type = type;
 		this.score = score;
 		this.origin = origin;

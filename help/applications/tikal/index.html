@@ -96,7 +96,7 @@ XLIFF 1.2 specifications</a>.</p>
 		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
-		-apertium&nbsp;[serverURL]<br>
+		-apertium&nbsp;[configFile]<br>
 		-ms configFile</code></td>
 		<td align="left" valign="top">A translation resource to use to 
 		translate the document: <a href="#pensieve"><code>-pen</code> for a 
@@ -253,7 +253,7 @@ file must be in SRX format.</p>
 		-gs configFile|<br>
 		-mm key|<br>
 		-google|<br>
-		-apertium&nbsp;[serverURL]<br>
+		-apertium&nbsp;[configFile]<br>
 		-ms configFile</code></td>
 		<td align="left" valign="top">A translation resource to use to 
 		translate the document: <a href="#pensieve"><code>-pen</code> for a 
@@ -347,7 +347,7 @@ per resource, not sorted by best score as a whole.</p>
 		specified, this is used by default. This requires Internet access.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top" nowrap><code>-apertium [serverURL]</code></td>
+		<td align="left" valign="top" nowrap><code>-apertium [configFile]</code></td>
 		<td align="left" valign="top">
 		<p dir="ltr">Queries the specified <a href="#apertium">Apertium MT server</a> (local or remote). A 
 		default remote server is provided.</td>
@@ -768,14 +768,22 @@ http://code.google.com/apis/ajaxlanguage/</a>.</p>
 <p>Apertium is an open-source Rule-based MT project. It provides translation for 
 many language pairs, including for less-common languages such as Catalan, 
 Galician, Welsh, Esperanto, Occitan, etc. You can find more information about 
-Apertium here: <a href="http://wiki.apertium.org/">http://wiki.apertium.org/</a>.</p>
+Apertium here: <a href="http://wiki.apertium.org/">http://wiki.apertium.org/</a>. 
+The connector uses the JSONP REST API described here:
+<a href="http://wiki.apertium.org/wiki/Apertium_web_service">
+http://wiki.apertium.org/wiki/Apertium_web_service</a></p>
 <p>This resource is indicated by the option <code>-apertium</code> and takes one 
-optional argument: the URL of the server.</p>
-<p>If the argument is omitted, the 
-default server is set to use the main public apertium.org server. Note that you 
-may need to have your IP address registered with the team running the server to 
-be able to access it.</p>
-<pre>tikal -q &quot;text to translate&quot; -apertium</pre>
+optional argument: a configuration file that contains the information about the 
+server to connect to. The configuration file looks something like this:</p>
+<pre>#v1
+server=http://api.apertium.org/json/translate
+apiKey=myApiKey</pre>
+<p>Note that the apiKey parameter is optional. However using an API key is 
+highly recommended. See <a href="http://api.apertium.org/register.jsp">
+http://api.apertium.org/register.jsp</a> for details and to register one.</p>
+<p>If the configuration file is omitted, the default main public apertium.org server 
+is used, without API key.</p>
+<pre>tikal -q &quot;text to translate&quot; -apertium myApertium.cfg</pre>
 <h3><a name="microsoft"></a>Microsoft MT</h3>
 <p>The Microsoft MT engine is freely available from Microsoft (<a href="http://www.microsofttranslator.com/">http://www.microsofttranslator.com/</a>). 
 Okapi provides a connector for the SOAP API. You can get more information about 

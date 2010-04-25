@@ -128,10 +128,10 @@ public class BatchTranslator {
 	public void endBatch () {
 		LOGGER.info("");
 		if ( currentTm != null ) {
-			LOGGER.info(String.format("Total matches from TM being built = %d", docInternalMatches));
-			LOGGER.info(String.format("Total matches from existing TM = %d", docExternalMatches));
+			LOGGER.info(String.format("Total matches from TM being built = %d", totalInternalMatches));
+			LOGGER.info(String.format("Total matches from existing TM = %d", totalExternalMatches));
 		}
-		LOGGER.info(String.format("Total entries sent to translation = %d", docEntries));
+		LOGGER.info(String.format("Total entries sent to translation = %d", totalEntries));
 		
 		// Then close all files/TMs
 		closeAll();

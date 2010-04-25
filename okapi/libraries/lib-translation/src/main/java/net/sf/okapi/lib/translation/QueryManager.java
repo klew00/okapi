@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
@@ -501,20 +502,32 @@ public class QueryManager {
 					}
 					// If we do: Use the first one and lower the score to 99%
 					scores.add(99, qr.origin);
-					seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu); 
+					seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 					leveraged++;
+					// temporary code for alt-trans annotation
+					AltTranslationsAnnotation alt = new AltTranslationsAnnotation();
+					alt.add(srcLoc, trgLoc, seg.text, qr.source, qr.target, AltTranslationType.MT, qr.score, qr.origin);
+					seg.setAnnotation(alt);
 					continue;
 				}
 				// Else: First is 100%, possibly several that have the same translations
 				scores.add(qr.score, qr.origin); // That's 100% then
 				seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 				leveraged++;
+				// temporary code for alt-trans annotation
+				AltTranslationsAnnotation alt = new AltTranslationsAnnotation();
+				alt.add(srcLoc, trgLoc, seg.text, qr.source, qr.target, AltTranslationType.MT, qr.score, qr.origin);
+				seg.setAnnotation(alt);
 				continue;
 			}
 			// First is not 100%: use it and move on
 			scores.add(qr.score, qr.origin);
 			seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 			leveraged++;
+			// temporary code for alt-trans annotation
+			AltTranslationsAnnotation alt = new AltTranslationsAnnotation();
+			alt.add(srcLoc, trgLoc, seg.text, qr.source, qr.target, AltTranslationType.MT, qr.score, qr.origin);
+			seg.setAnnotation(alt);
 		}
 		
 		// Set the scores only if there is something to report
@@ -530,7 +543,7 @@ public class QueryManager {
 			if ( !fillTarget ) {
 				tu.removeTarget(trgLoc);
 			}
-		}	
+		}
 	}
 	
 	private boolean exactsHaveSameTranslation () {

@@ -10,7 +10,7 @@ pause
 goto End
 
 :Start
-set PATH=%PATH%;%1
+set PATH=%1;%PATH%
 tikal -info
 
 :End

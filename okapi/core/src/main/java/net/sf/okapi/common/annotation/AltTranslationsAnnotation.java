@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 
 /**
  * Annotation for storing one or more alternate translations for a target content.
@@ -54,9 +54,9 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 */
 	public void add (LocaleId sourceLocId,
 		LocaleId targetLocId,
-		TextContainer originalSource,
-		TextContainer alternateSource,
-		TextContainer alternateTarget,
+		TextFragment originalSource,
+		TextFragment alternateSource,
+		TextFragment alternateTarget,
 		AltTranslationType type,
 		int score,
 		String origin)
