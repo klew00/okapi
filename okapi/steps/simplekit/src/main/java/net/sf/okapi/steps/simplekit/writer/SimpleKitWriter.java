@@ -55,7 +55,7 @@ public class SimpleKitWriter extends BasePackageWriter {
 
 	@Override
 	public String getReaderClass () {
-		return "net.sf.okapi.applications.rainbow.packages.xliff.Reader";
+		return "net.sf.okapi.steps.simplekit.reader.SimpleKitReader";
 	}
 	
 	@Override

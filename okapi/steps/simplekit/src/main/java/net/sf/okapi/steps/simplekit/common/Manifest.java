@@ -45,6 +45,8 @@ import org.xml.sax.SAXException;
  */
 public class Manifest {
 
+	public static final String MANIFEST_FILENAME = "manifest.xml";
+	
 	private LinkedHashMap<Integer, ManifestItem> docs;
 	private String rootFolder;
 	private String packageID;
@@ -241,7 +243,7 @@ public class Manifest {
 	public void Save () {
 		XMLWriter writer = null;
 		try {
-			writer = new XMLWriter(rootFolder + File.separator + "manifest.xml");
+			writer = new XMLWriter(rootFolder + File.separator + MANIFEST_FILENAME);
 
 			writer.writeStartDocument();
 			writer.writeComment("=================================================================");
