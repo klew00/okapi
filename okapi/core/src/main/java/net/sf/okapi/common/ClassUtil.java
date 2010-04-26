@@ -33,14 +33,31 @@ public class ClassUtil {
 	
 	/**
 	 * Gets the runtime class of the given object.
-	 * @param obj The object.
-	 * @return The object's runtime class.
+	 * @param obj The object
+	 * @return The object's runtime class
 	 */
 	public static Class<?> getClass(Object obj) {
-		
 		if (obj == null) return null;
 	
 		return obj.getClass();
+	}
+
+	/**
+	 * Gets a class reference for a qualified class name. 
+	 * @param className the given class name
+	 * @return class reference
+	 */
+	public static Class<?> getClass(String className) {
+		if (Util.isEmpty(className))
+			throw new IllegalArgumentException(MSG_EMPTY_CLASSNAME);
+
+		Class<?> ref;
+		try {
+			ref = Class.forName(className);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(String.format(MSG_NONRESOLVABLE, className));
+		}
+		return ref;
 	}
 	
 	/**
@@ -49,7 +66,6 @@ public class ClassUtil {
 	 * @return The object's class name (w/o package name prefix)
 	 */
 	public static String getClassName(Object obj) {
-		
 		if (obj == null) return "";
 	
 		return getClassName(obj.getClass());
@@ -61,7 +77,6 @@ public class ClassUtil {
 	 * @return The name of the class (w/o package name prefix)
 	 */
 	public static String getClassName(Class<?> classRef) {
-		
 		if (classRef == null) return "";
 	
 		return classRef.getSimpleName();
@@ -73,7 +88,6 @@ public class ClassUtil {
 	 * @return Qualified class name
 	 */
 	public static String getQualifiedClassName(Object obj) {
-		
 		if (obj == null) return "";
 		
 		return getQualifiedClassName(obj.getClass());
@@ -85,7 +99,6 @@ public class ClassUtil {
 	 * @return Qualified class name
 	 */
 	public static String getQualifiedClassName(Class<?> classRef) {
-		
 		if (classRef == null) return "";
 		
 		return classRef.getName();
@@ -97,7 +110,6 @@ public class ClassUtil {
 	 * @return Package name of the object's class (without the trailing dot), or an empty string
 	 */
 	public static String getPackageName(Object obj) {
-
 		if (obj == null) return "";
 		
 		return getPackageName(obj.getClass());
@@ -109,7 +121,6 @@ public class ClassUtil {
 	 * @return Package name of the class (without the trailing dot), or an empty string 
 	 */
 	public static String getPackageName(Class<?> classRef) {
-		
 		if (classRef == null) return "";
 		
 		Package pkg = classRef.getPackage();
@@ -138,7 +149,6 @@ public class ClassUtil {
 	 * @return Package name (without the trailing dot)
 	 */
 	public static String extractPackageName(String className) {
-		
 		if (Util.isEmpty(className)) return "";
 		
 		int index = className.lastIndexOf(".");
@@ -155,7 +165,6 @@ public class ClassUtil {
 	 * @return Qualified class name
 	 */
 	public static String qualifyName(String packageName, String shortClassName) {
-		
 		if (Util.isEmpty(packageName)) return "";
 		if (Util.isEmpty(shortClassName)) return "";
 		
@@ -175,8 +184,7 @@ public class ClassUtil {
 	 * @param shortClassName Non-qualified name of the class to get a qualified name for
 	 * @return Qualified class name
 	 */
-	public static String qualifyName(Class<?> siblingClassRef, String shortClassName) {
-		
+	public static String qualifyName(Class<?> siblingClassRef, String shortClassName) {		
 		return qualifyName(getPackageName(siblingClassRef), shortClassName);
 	}
 	
@@ -187,8 +195,7 @@ public class ClassUtil {
 	 * @param shortClassName Non-qualified name of the class to get a qualified name for
 	 * @return Qualified class name
 	 */
-	public static String qualifyName(Object sibling, String shortClassName) {
-		
+	public static String qualifyName(Object sibling, String shortClassName) {		
 		if (sibling == null) return ""; 
 		
 		return qualifyName(sibling.getClass(), shortClassName);
@@ -196,14 +203,13 @@ public class ClassUtil {
 	
 	/**
 	 * Creates a new instance of a given class.
-	 * @param classRef The given class.
-	 * @return a newly created instance of the given class. 
+	 * @param classRef The given class
+	 * @return a newly created instance of the given class
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
 	public static <T> T instantiateClass(Class<T> classRef) 
 		throws InstantiationException, IllegalAccessException {
-
 		if (classRef == null)
 			throw new IllegalArgumentException(MSG_NULL_REF);
 		
@@ -212,15 +218,14 @@ public class ClassUtil {
 	
 	/**
 	 * Creates a new instance of the class with a given class name.
-	 * @param className The given class name.
-	 * @return a newly created instance of the class with the given class name.
+	 * @param className The given class name
+	 * @return a newly created instance of the class with the given class name
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
 	 */
 	public static Object instantiateClass(String className)
 		throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-
 		if (Util.isEmpty(className))
 			throw new IllegalArgumentException(MSG_EMPTY_CLASSNAME);
 		
@@ -229,8 +234,8 @@ public class ClassUtil {
 	
 	/**
 	 * Creates a new instance of the class with a given class name using a given class loader.
-	 * @param className The given class name.
-	 * @param classLoader The class loader from which the class must be loaded.
+	 * @param className The given class name
+	 * @param classLoader The class loader from which the class must be loaded
 	 * @return A newly created instance of the desired class.
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
@@ -238,7 +243,6 @@ public class ClassUtil {
 	 */
 	public static Object instantiateClass(String className, ClassLoader classLoader) 
 		throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-
 		if (Util.isEmpty(className))
 			throw new IllegalArgumentException(MSG_EMPTY_CLASSNAME);
 		
@@ -254,9 +258,9 @@ public class ClassUtil {
 	
 	/**
 	 * Creates a new instance of the class using a given class loader and initialization parameters.
-	 * @param classRef The given class.
-	 * @param constructorParameters The initialization parameters for the class constructor.
-	 * @return A newly created instance of the desired class.
+	 * @param classRef The given class
+	 * @param constructorParameters The initialization parameters for the class constructor
+	 * @return A newly created instance of the desired class
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 * @throws IllegalArgumentException
@@ -267,7 +271,6 @@ public class ClassUtil {
 	public static <T> T instantiateClass(Class<T> classRef, Object... constructorParameters) 
 		throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
 			InstantiationException, IllegalAccessException, InvocationTargetException { 
-
 		if (classRef == null)
 			throw new IllegalArgumentException(MSG_NULL_REF);
 		
@@ -305,9 +308,9 @@ public class ClassUtil {
 	
 	/**
 	 * Creates a new instance of the class with a given class name and initialization parameters.
-	 * @param className The given class name.
-	 * @param constructorParameters The initialization parameters for the class constructor.
-	 * @return A newly created instance of the desired class.
+	 * @param className The given class name
+	 * @param constructorParameters The initialization parameters for the class constructor
+	 * @return A newly created instance of the desired class
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 * @throws IllegalArgumentException
@@ -329,10 +332,10 @@ public class ClassUtil {
 
 	/**
 	 * Creates a new instance of the class with a given class name and initialization parameters using a given class loader.
-	 * @param className The given class name.
-	 * @param classLoader The given class loader.
-	 * @param constructorParameters The initialization parameters for the class constructor.
-	 * @return A newly created instance of the desired class.
+	 * @param className The given class name
+	 * @param classLoader The given class loader
+	 * @param constructorParameters The initialization parameters for the class constructor
+	 * @return A newly created instance of the desired class
 	 * @throws SecurityException
 	 * @throws NoSuchMethodException
 	 * @throws IllegalArgumentException
