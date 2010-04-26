@@ -433,7 +433,7 @@ public class TextContainerTest {
 		TextContainer tc = new TextContainer("text");
 		Segments segments = tc.getSegments();
 		assertEquals("text", segments.getFirstContent().toString());
-		assertSame(segments.getFirstContent(), tc.getLastSegmentContent());
+		assertSame(segments.getFirstContent(), segments.getLastContent());
 		assertFalse(tc.hasBeenSegmented());
 	}
 	
@@ -448,8 +448,9 @@ public class TextContainerTest {
 	@Test
 	public void testGetLastSegment () {
 		TextContainer tc = createMultiSegmentContent();
-		assertEquals("text2", tc.getLastSegmentContent().toString());
-		assertSame(tc.getLastSegmentContent(), tc.getSegment(1).text);
+		Segments segments = tc.getSegments();
+		assertEquals("text2", segments.getLastContent().toString());
+		assertSame(segments.getLastContent(), tc.getSegment(1).text);
 	}
 
 	@Test

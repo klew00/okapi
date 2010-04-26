@@ -156,6 +156,15 @@ public class TextContainer implements Iterable<TextPart> {
 		 */
 		public TextFragment getFirstContent ();
 		
+		/**
+		 * Gets the content of last segment of this container.
+		 * @return the content of the last segment of this container.
+		 * @see #getLastPartContent()
+		 * @see #getFirstSegmentContent()
+		 * @see #getFirstPartContent()
+		 */
+		public TextFragment getLastContent ();
+		
 	}
 	
 	private final Segments segments = new Segments() {
@@ -340,6 +349,17 @@ public class TextContainer implements Iterable<TextPart> {
 			for ( TextPart part : parts ) {
 				if ( part.isSegment() ) {
 					return part.getContent();
+				}
+			}
+			// Should never occur
+			return null;
+		}
+
+		@Override
+		public TextFragment getLastContent () {
+			for ( int i=parts.size()-1; i>=0; i-- ) {
+				if ( parts.get(i).isSegment() ) {
+					return parts.get(i).getContent();
 				}
 			}
 			// Should never occur
@@ -874,23 +894,6 @@ public class TextContainer implements Iterable<TextPart> {
 				else break;
 			}
 		}
-	}
-	
-	/**
-	 * Gets the content of last segment of this container.
-	 * @return the content of the last segment of this container.
-	 * @see #getLastPartContent()
-	 * @see #getFirstSegmentContent()
-	 * @see #getFirstPartContent()
-	 */
-	public TextFragment getLastSegmentContent () {
-		for ( int i=parts.size()-1; i>=0; i-- ) {
-			if ( parts.get(i).isSegment() ) {
-				return parts.get(i).getContent();
-			}
-		}
-		// Should never occur
-		return null;
 	}
 	
 	/**
