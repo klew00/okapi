@@ -981,7 +981,7 @@ public class TextUnitUtil {
 				trg.append(part.getContent());
 			}
 			tu.getTarget(trgLocaleId).getSegments().append(
-					new Segment(tu.getSource().getLastSegment().getId(), trg));
+					new Segment(tu.getSource().getSegments().getLast().getId(), trg));
 
 			// append the after inter-segment TextParts
 			for (TextPart part : targetParts.subList(afterIndex, targetParts.size())) {

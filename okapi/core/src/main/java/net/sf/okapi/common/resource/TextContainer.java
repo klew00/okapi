@@ -165,6 +165,12 @@ public class TextContainer implements Iterable<TextPart> {
 		 */
 		public TextFragment getLastContent ();
 		
+		/**
+		 * Gets the last {@link Segment} of the container. 
+		 * @return the last Segment or null if no segment is found.
+		 */
+		public Segment getLast();
+		
 	}
 	
 	private final Segments segments = new Segments() {
@@ -360,6 +366,17 @@ public class TextContainer implements Iterable<TextPart> {
 			for ( int i=parts.size()-1; i>=0; i-- ) {
 				if ( parts.get(i).isSegment() ) {
 					return parts.get(i).getContent();
+				}
+			}
+			// Should never occur
+			return null;
+		}
+
+		@Override
+		public Segment getLast() {
+			for ( int i=parts.size()-1; i>=0; i-- ) {
+				if ( parts.get(i).isSegment() ) {
+					return (Segment)parts.get(i);
 				}
 			}
 			// Should never occur
@@ -896,20 +913,6 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 	}
 	
-	/**
-	 * Gets the last {@link Segment} of the container. 
-	 * @return the last Segment or null if no segment is found.
-	 */
-	public Segment getLastSegment() {
-		for ( int i=parts.size()-1; i>=0; i-- ) {
-			if ( parts.get(i).isSegment() ) {
-				return (Segment)parts.get(i);
-			}
-		}
-		// Should never occur
-		return null;
-	}
-
 	/**
 	 * Gets the content of the first part (segment or non-segment) of this container.
 	 * <p>This method always returns the same result as {@link #getFirstSegmentContent()} if {@link #contentIsOneSegment()}.
