@@ -37,6 +37,7 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -95,8 +96,9 @@ public class XLIFFFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getTarget(locFR);
+		Segments segments = cont.getSegments();
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
-		assertEquals(2, cont.getSegmentCount());
+		assertEquals(2, segments.count());
 		assertEquals("t1.", cont.getSegment(0).text.toString());
 		assertEquals("i2", cont.getSegment(1).id);
 		assertEquals("t2", cont.getSegment(1).text.toString());
@@ -117,11 +119,13 @@ public class XLIFFFilterTest {
 			+ "</body>"
 			+ "</file></xliff>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		TextContainer cont = tu.getSource();
+		Segments segments = cont.getSegments();
 		assertNotNull(tu);
-		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(tu.getSource(), true));
-		assertEquals(2, tu.getSource().getSegmentCount());
-		assertEquals("t1.", tu.getSource().getSegment(0).text.toString());
-		assertEquals("t2", tu.getSource().getSegment(1).text.toString());
+		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
+		assertEquals(2, segments.count());
+		assertEquals("t1.", cont.getSegment(0).text.toString());
+		assertEquals("t2", cont.getSegment(1).text.toString());
 	}
 
 	@Test
@@ -139,7 +143,7 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals(1, tu.getSource().getSegmentCount());
+		assertEquals(1, tu.getSource().getSegments().count());
 		assertEquals("[t1. x t2]", fmt.printSegmentedContent(tu.getSource(), true));
 	}
 

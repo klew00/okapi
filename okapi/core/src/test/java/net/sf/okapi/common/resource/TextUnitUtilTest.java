@@ -299,10 +299,10 @@ public class TextUnitUtilTest {
 		assertEquals("[sSentence one. sSentence two.] ", fmt.printSegmentedContent(mtu.getSource(), true));
 		assertEquals("[tSentence one. tSentence two.] ", fmt.printSegmentedContent(mtu.getTarget(LocaleId.SPANISH), true));
 
-		assertEquals(1, mtu.getSource().getSegmentCount());
+		assertEquals(1, mtu.getSource().getSegments().count());
 		assertEquals("sSentence one. sSentence two.", mtu.getSource().getSegment(0).toString());
 
-		assertEquals(1, mtu.getTarget(LocaleId.SPANISH).getSegmentCount());
+		assertEquals(1, mtu.getTarget(LocaleId.SPANISH).getSegments().count());
 		Segment tseg = mtu.getTarget(LocaleId.SPANISH).getSegment(0);
 		Segment sseg = mtu.getSource().getSegment(0);
 		assertEquals("tSentence one. tSentence two.", tseg.toString());

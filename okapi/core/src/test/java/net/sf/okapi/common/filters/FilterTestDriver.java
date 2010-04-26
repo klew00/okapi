@@ -52,6 +52,7 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -1066,12 +1067,14 @@ public class FilterTestDriver {
 				System.err.println("isSegmented difference");
 				return false;
 			}
-			if ( t1.getSegmentCount() != t2.getSegmentCount() ) {
+			Segments t1Segments = t1.getSegments();
+			Segments t2Segments = t2.getSegments(); 
+			if ( t1Segments.count() != t2Segments.count() ) {
 				System.err.println("Number of segments difference");
 				return false;
 			}
 			
-			for ( Segment seg1 : t1.getSegments() ) {
+			for ( Segment seg1 : t1Segments ) {
 				Segment seg2 = t2.getSegment(seg1.id);
 				if ( seg2 == null ) {
 					System.err.println("Segment in t2 not found.");

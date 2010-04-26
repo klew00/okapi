@@ -156,7 +156,7 @@ public class SegmentationStep extends BasePipelineStep {
 		// If requested, verify that we have one-to-one match
 		// This is needed only if we do have a target
 		if ( params.checkSegments && ( trgCont != null)) {
-			if ( trgCont.getSegmentCount() != tu.getSource().getSegmentCount() ) {
+			if ( trgCont.getSegments().count() != tu.getSource().getSegments().count() ) {
 				// Not the same number of segments
 				logger.warning(String.format("Text unit id='%s': Source and target do not have the same number of segments.",
 					tu.getId()));

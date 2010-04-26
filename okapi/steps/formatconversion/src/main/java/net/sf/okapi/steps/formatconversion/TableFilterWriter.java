@@ -289,7 +289,7 @@ public class TableFilterWriter implements IFilterWriter {
 		}
 
 		// Else: check if we have the same number of segments
-		if ( trgCont.getSegmentCount() != srcCont.getSegmentCount() ) { 
+		if ( trgCont.getSegments().count() != srcCont.getSegments().count() ) { 
 			// If not: Fall back to full entry
 			writeRow(srcCont.getUnSegmentedContentCopy(), trgCont.getUnSegmentedContentCopy());
 			//TODO: Log a warning

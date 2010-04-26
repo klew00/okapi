@@ -36,6 +36,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
@@ -996,8 +997,8 @@ public class Aligner {
 		try {
 			if ( resetList ) resetIssues();
 			
-			int srcSegCount = source.getSegmentCount();
-			int trgSegCount = target.getSegmentCount();
+			int srcSegCount = source.getSegments().count();
+			int trgSegCount = target.getSegments().count();
 			// Check the number of segments
 			if ( srcSegCount != trgSegCount ) {
 				// Optional visual alignment to fix the problems
@@ -1106,8 +1107,8 @@ public class Aligner {
 		int n = trgList.getSelectionIndex();
 		if ( n == -1 ) n = 0;
 		try {
-//			java.util.List<Segment> srcCol = source.getSegments();
-//			java.util.List<Segment> trgCol = target.getSegments();
+			Segments sourceSegments = source.getSegments();
+			Segments targetSegments = target.getSegments();
 			
 			int lastMatch = -1;
 			int trgStart = 0;
@@ -1117,12 +1118,12 @@ public class Aligner {
 			int toJoin;
 
 			int i = -1;
-			for ( Segment srcSeg : source.getSegments() ) {
+			for ( Segment srcSeg : sourceSegments ) {
 	    		
 				i++;
 				matchFound = false;
 				srcText = srcSeg.toString();
-				for ( int j=trgStart; j<target.getSegmentCount(); j++ ) {
+				for ( int j=trgStart; j<targetSegments.count(); j++ ) {
 					String s2 = target.getSegment(j).toString(); //TODO: replace by direct call after debug
 					if ( srcText.equals(s2) ) {
 						// We have a match
@@ -1176,7 +1177,7 @@ public class Aligner {
 			if ( srcNoMatchCount == 1 ) {
 				// If there was no match at all: we group all targets into one
 				if ( lastMatch == -1 ) {
-					if ( target.getSegmentCount() > 1 ) {
+					if ( targetSegments.count() > 1 ) {
 						// Several target for one source: merge them
 						target.joinAllSegments();
 						if ( !modified ) {
@@ -1187,7 +1188,7 @@ public class Aligner {
 					}
 				}
 				else { // There was at least one match, we group everything after it
-					toJoin = ((target.getSegmentCount()-1) - lastMatch)-1;
+					toJoin = ((targetSegments.count()-1) - lastMatch)-1;
 					if ( toJoin > 0 ) {
 						// We have more than one, so we can join them
 						// The target segment just after the last match is the base

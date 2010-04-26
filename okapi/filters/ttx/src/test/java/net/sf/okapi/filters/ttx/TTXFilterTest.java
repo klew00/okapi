@@ -29,6 +29,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InputDocument;
@@ -93,10 +94,11 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals(1, cont.getSegmentCount());
+		Segments segments = cont.getSegments();
+		assertEquals(1, segments.count());
 		assertEquals("en1", cont.getSegment(0).toString());
 		cont = tu.getTarget(locESEM);
-		assertEquals(1, cont.getSegmentCount());
+		assertEquals(1, segments.count());
 		assertEquals("es1", cont.getSegment(0).toString());
 	}
 
@@ -115,10 +117,11 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals(1, cont.getSegmentCount());
+		Segments segments = cont.getSegments();
+		assertEquals(1, segments.count());
 		assertEquals("en1", cont.getSegment(0).toString());
 		cont = tu.getTarget(locESEM);
-		assertEquals(1, cont.getSegmentCount());
+		assertEquals(1, segments.count());
 		assertEquals("es1", cont.getSegment(0).toString());
 		// Check that last DF is not included in TU
 		// We should have only one marker, for the segment
@@ -574,11 +577,12 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals(1, cont.getSegmentCount());
+		Segments segments = cont.getSegments();
+		assertEquals(1, segments.count());
 		cont.joinAllSegments();
 		assertEquals("text en", cont.toString());
 		cont = tu.getTarget(locESEM);
-		assertEquals(1, cont.getSegmentCount());
+		assertEquals(1, segments.count());
 		cont.joinAllSegments();
 		assertEquals("text es", cont.toString());
 	}
@@ -592,12 +596,13 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals(2, cont.getSegmentCount());
+		Segments segments = cont.getSegments();
+		assertEquals(2, segments.count());
 		assertEquals("text1 en", cont.getSegment(0).text.toString());
 		assertEquals("text2 en", cont.getSegment(1).text.toString());
 		assertEquals("[text1 en]  [text2 en]", fmt.printSegmentedContent(cont, true));
 		cont = tu.getTarget(locESEM);
-		assertEquals(2, cont.getSegmentCount());
+		assertEquals(2, segments.count());
 		assertEquals("text1 es", cont.getSegment(0).text.toString());
 		assertEquals("text2 es", cont.getSegment(1).text.toString());
 		assertEquals("[text1 es]  [text2 es]", fmt.printSegmentedContent(cont, true));
@@ -627,11 +632,12 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals(1, cont.getSegmentCount());
+		Segments segments = cont.getSegments();
+		assertEquals(1, segments.count());
 		assertEquals("text <br/>en <b>bold</b>.", cont.getSegment(0).text.toString());
 		assertEquals("text <1/>en <2>bold</2>.", fmt.setContent(cont.getSegment(0).text).toString());
 		cont = tu.getTarget(locESEM);
-		assertEquals(1, cont.getSegmentCount());
+		assertEquals(1, segments.count());
 		assertEquals("TEXT <br/>ES <b>BOLD</b>.", cont.getSegment(0).text.toString());
 		assertEquals("TEXT <1/>ES <2>BOLD</2>.", fmt.setContent(cont.getSegment(0).text).toString());
 	}

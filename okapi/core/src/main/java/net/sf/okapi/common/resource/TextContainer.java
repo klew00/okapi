@@ -136,6 +136,16 @@ public class TextContainer implements Iterable<TextPart> {
 		 * @return the number of parts (segments and non-segments) created during the operation.
 		 */
 		public int create (int start, int end);
+	
+		/**
+		 * Gets the number of segments in this container.
+		 * This method always returns at least 1.
+		 * Use {@link #hasText(boolean, boolean)} to check for text presence.
+		 * Use {@link #isEmpty()} to verify if the content is empty of not.
+		 * @return the number of segments in the container.
+		 * @see #getPartCount()
+		 */
+		public int count ();
 		
 	}
 	
@@ -304,6 +314,18 @@ public class TextContainer implements Iterable<TextPart> {
 			range.add(new Range(start, end));
 			return create(range); 
 		}
+		
+		@Override
+		public int count () {
+			int count = 0;
+			for ( TextPart part : parts ) {
+				if ( part.isSegment() ) {
+					count++;
+				}
+			}
+			return count;
+		}
+		
 		
 	};
 	
@@ -648,7 +670,7 @@ public class TextContainer implements Iterable<TextPart> {
 		else {
 			parts.add(part);
 		}
-		if ( getSegmentCount() == 0 ) {
+		if ( segments.count() == 0 ) {
 			// We need to ensure there is at least one segment
 			changePart(0);
 		}
@@ -1134,24 +1156,6 @@ public class TextContainer implements Iterable<TextPart> {
 	}
 	
 	/**
-	 * Gets the number of segments in this container.
-	 * This method always returns at least 1.
-	 * Use {@link #hasText(boolean, boolean)} to check for text presence.
-	 * Use {@link #isEmpty()} to verify if the content is empty of not.
-	 * @return the number of segments in the container.
-	 * @see #getPartCount()
-	 */
-	public int getSegmentCount () {
-		int count = 0;
-		for ( TextPart part : parts ) {
-			if ( part.isSegment() ) {
-				count++;
-			}
-		}
-		return count;
-	}
-	
-	/**
 	 * Gets the number of parts (segments and non-segments) in this container.
 	 * This method always returns at least 1.
 	 * @return the number of parts (segments and non-segments) in this container.
@@ -1192,7 +1196,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * @see #contentIsOneSegment()
 	 */
 	private boolean hasOnlyOneSegment () {
-		return (getSegmentCount() == 1);
+		return (segments.count() == 1);
 	}
 	
 	private TextFragment createJoinedContent (List<Range> ranges) {

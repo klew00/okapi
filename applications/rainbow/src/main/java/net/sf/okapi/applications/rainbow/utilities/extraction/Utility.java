@@ -241,7 +241,7 @@ public class Utility extends BaseFilterDrivenUtility {
 		}
 		
 		// Compute the statistics
-		int n = tu.getSource().getSegmentCount();
+		int n = tu.getSource().getSegments().count();
 		//TODO: Redo the report based on leveraging counts
 		htmlRpt.addSegmentCount(n==0 ? 1 : n);
 

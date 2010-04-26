@@ -65,8 +65,8 @@ public class SentenceAligner {
 
 		// To prevent OutOfMemory exception, simply don't perform the
 		// alignment for a block with a lot of segments. TEMPORARY FIX
-		if (sourceParagraph.getSource().getSegmentCount()
-				* targetParagraph.getSource().getSegmentCount() > MAX_CELL_SIZE) {
+		if (sourceParagraph.getSource().getSegments().count()
+				* targetParagraph.getSource().getSegments().count() > MAX_CELL_SIZE) {
 			throw new IllegalArgumentException("Too many segments. Can only align "
 					+ Long.toString(MAX_CELL_SIZE)
 					+ ". Where the number equals the source segments times the target segments.");

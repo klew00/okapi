@@ -83,7 +83,7 @@ public class SegmentationTest {
 	@Test
 	public void testGetSegmentCount () {
 		TextContainer tc = createSegmentedContainer();
-		assertEquals(2, tc.getSegmentCount());
+		assertEquals(2, tc.getSegments().count());
 	}
 	
 	@Test
@@ -97,9 +97,10 @@ public class SegmentationTest {
 	@Test
 	public void testMergeOneSegment () {
 		TextContainer tc = createSegmentedContainer();
+		Segments segments = tc.getSegments();
 		assertEquals("[<1>Part 1.</1>] Outside[ Part 2.]", fmt.printSegmentedContent(tc, true));
 		tc.changePart(2);
-		assertEquals(1, tc.getSegmentCount());
+		assertEquals(1, segments.count());
 		assertEquals("<s>Part 1.</s>", tc.getSegment(0).toString());
 		assertEquals("[<1>Part 1.</1>] Outside Part 2.", fmt.printSegmentedContent(tc, true));
 	}
@@ -109,7 +110,7 @@ public class SegmentationTest {
 		TextContainer tc = createSegmentedContainer();
 		tc.changePart(2); // Segment to non-segment
 		tc.changePart(0); // try segment to non-segment (but here it's the last segment, so no change)
-		assertEquals(1, tc.getSegmentCount());
+		assertEquals(1, tc.getSegments().count());
 		assertFalse(tc.contentIsOneSegment());
 		assertEquals("[<1>Part 1.</1>] Outside Part 2.", fmt.printSegmentedContent(tc, true));
 		assertEquals("<s>Part 1.</s> Outside Part 2.", tc.toString());
@@ -119,8 +120,9 @@ public class SegmentationTest {
 	@Test
 	public void testJoinTwoSegmentsIntoOne () {
 		TextContainer tc = createSegmentedContainer();
+		Segments segments = tc.getSegments();
 		tc.joinSegmentWithNextSegment(0);
-		assertEquals(1, tc.getSegmentCount());
+		assertEquals(1, segments.count());
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("[<1>Part 1.</1> Outside Part 2.]", fmt.printSegmentedContent(tc, true));
 		assertEquals("<s>Part 1.</s> Outside Part 2.", tc.toString());
@@ -129,8 +131,9 @@ public class SegmentationTest {
 	@Test
 	public void testMergeAllSegments () {
 		TextContainer tc = createSegmentedContainer();
+		Segments segments = tc.getSegments();
 		tc.joinAllSegments();
-		assertEquals(1, tc.getSegmentCount());
+		assertEquals(1, segments.count());
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("[<1>Part 1.</1> Outside Part 2.]", fmt.printSegmentedContent(tc, true));
 		assertEquals("<s>Part 1.</s> Outside Part 2.", tc.toString());
@@ -143,7 +146,7 @@ public class SegmentationTest {
 		// "**Part 1.** Outside Part2."
 		//  01234567890123456789012345"
 		segments.create(11, 19);
-		assertEquals(1, tc.getSegmentCount());
+		assertEquals(1, segments.count());
 		assertEquals(3, tc.getPartCount());
 		assertEquals(" Outside", tc.getSegment(0).toString());
 	}
@@ -153,18 +156,20 @@ public class SegmentationTest {
 		TextContainer tc = createSegmentedContainer();
 		Segments segments = tc.getSegments();
 		segments.append(new TextFragment(" Added Part."));
-		assertEquals(3, tc.getSegmentCount());
+		assertEquals(3, segments.count());
 		assertEquals(" Added Part.", tc.getSegment(2).toString());
 	}
 
 	@Test
 	public void testSegmentationSimple1 () {
 		TextContainer tc = createSegmentedContainer("a. z", segmenter);
-		assertEquals(2, tc.getSegmentCount());
+		Segments segments = tc.getSegments();
+		assertEquals(2, segments.count());
 		assertEquals("a.", tc.getSegment(0).toString());
 		assertEquals(" z", tc.getSegment(1).toString());
 		tc = createSegmentedContainer("a. z", segmenterTrim);
-		assertEquals(2, tc.getSegmentCount());
+		segments = tc.getSegments();
+		assertEquals(2, segments.count());
 		assertEquals("a.", tc.getSegment(0).toString());
 		assertEquals("z", tc.getSegment(1).toString());
 	}
@@ -172,25 +177,29 @@ public class SegmentationTest {
 	@Test
 	public void testSegmentationSimpleWithLeadingTrainlingWS () {
 		TextContainer tc = createSegmentedContainer(" a.  ", segmenter);
-		assertEquals(2, tc.getSegmentCount());
+		Segments segments = tc.getSegments();
+		assertEquals(2, segments.count());
 		assertEquals(" a.", tc.getSegment(0).toString());
 		assertEquals("  ", tc.getSegment(1).toString());
 		// 1 segment only because the last one is only made of whitespaces
 		tc = createSegmentedContainer("a. ", segmenterTrim);
-		assertEquals(1, tc.getSegmentCount());
+		segments = tc.getSegments();
+		assertEquals(1, segments.count());
 		assertEquals("a.", tc.getSegment(0).toString());
 	}
 	
 	@Test
 	public void testSegmentationWithEmpty () {
 		TextContainer tc = createSegmentedContainer(" a. | b.", segmenter);
-		assertEquals(3, tc.getSegmentCount());
+		Segments segments = tc.getSegments();
+		assertEquals(3, segments.count());
 		assertEquals(" a.", tc.getSegment(0).toString());
 		assertEquals(" |", tc.getSegment(1).toString());
 		assertEquals(" b.", tc.getSegment(2).toString());
 		// 1 segment only because the last one is only made of whitespaces
 		tc = createSegmentedContainer(" a. |  b.", segmenterTrim);
-		assertEquals(3, tc.getSegmentCount());
+		segments = tc.getSegments();
+		assertEquals(3, segments.count());
 		assertEquals("a.", tc.getSegment(0).toString());
 		assertEquals("|", tc.getSegment(1).toString());
 		assertEquals("b.", tc.getSegment(2).toString());

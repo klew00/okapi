@@ -145,7 +145,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 		}
 		
 		// Check if we have the same number of segments
-		if ( trgCont.getSegmentCount() != srcCont.getSegmentCount() ) {
+		if ( trgCont.getSegments().count() != srcCont.getSegments().count() ) {
 			// Make sure we have at least the full full entry
 			TranslationUnitVariant source = new TranslationUnitVariant(srcLoc, srcCont.getUnSegmentedContentCopy());
 			TranslationUnitVariant target = new TranslationUnitVariant(trgLoc, trgCont.getUnSegmentedContentCopy());
