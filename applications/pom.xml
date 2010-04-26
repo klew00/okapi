@@ -12,7 +12,6 @@
     <packaging>pom</packaging>
     <name>Okapi Applications Build</name>
     <modules>
-        <module>tikal</module>
         <module>rainbow</module>
         <module>ratel</module>
         <module>serval</module> <!-- For TM debug -->

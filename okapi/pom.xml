@@ -39,8 +39,9 @@
 		<module>connectors</module>
 		<module>steps</module>
 		<module>examples/java</module>
-        <module>integration-tests</module>
-        <module>deployment/okapi-lib</module>
+		<module>tikal</module>
+		<module>integration-tests</module>
+		<module>deployment/okapi-lib</module>
 	</modules>
 	<dependencies>
 		<dependency>
