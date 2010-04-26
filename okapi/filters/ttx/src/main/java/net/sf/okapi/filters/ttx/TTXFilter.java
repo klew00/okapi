@@ -545,7 +545,7 @@ public class TTXFilter implements IFilter {
 					// Possible end of segment
 					if ( done || name.equals("Tu") ) {
 						if ( srcSegFrag != null ) { // Add the segment if we have one
-							srcCont.appendSegment(srcSegFrag);
+							srcCont.getSegments().append(srcSegFrag);
 							// Change first part to non-segment if needed
 							if ( changeFirst ) {
 								srcCont.changePart(0);

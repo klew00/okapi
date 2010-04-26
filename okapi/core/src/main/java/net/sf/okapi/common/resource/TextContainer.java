@@ -76,6 +76,38 @@ public class TextContainer implements Iterable<TextPart> {
 		 * @param segIndex2 the segment index of the second segment to swap.
 		 */
 		public void swap (int segIndex1, int segIndex2);
+		
+		/**
+		 * Appends a segment at the end of this container.
+		 * If there is no content after the last segment, and the last segment is empty,
+		 * the new segment replaces the last one (including its id, and the new id is validated).
+		 * Otherwise the new segment is appended to the content as a new segment part and its
+		 * id is validated.
+		 * @param segment the segment to append.
+		 */
+		public void append (Segment segment);
+		
+		/**
+		 * Appends a segment at the end of this container, with an optional non-segment part just before.
+		 * If there is no content after the last segment, and the last segment is empty,
+		 * the new segment replaces the last one (including its id, and the new id is validated).
+		 * Otherwise the new segment is appended to the content as a new segment part and its
+		 * id is validated.
+		 * @param segment the segment to append.
+		 * @param textBefore the text of the non-segment part before the segment (can be null).
+		 */
+		public void append (Segment segment, String textBefore);
+		
+		/**
+		 * Appends a TextFragment as a segment at the end of this container.
+		 * If there is content after the last segment, and the last segment is empty,
+		 * the new segment replaces the last one.
+		 * Otherwise the new segment is appended to the content as a new segment part.
+		 * In all case the id of the new segment is set automatically.
+		 * @param fragment the fragment to append as a segment.
+		 */
+		public void append (TextFragment fragment);
+		
 	
 	}
 	
@@ -128,14 +160,6 @@ public class TextContainer implements Iterable<TextPart> {
 			return segments;
 		}
 
-		/**
-		 * Swaps two segments in this container.
-		 * <p>For example, if you have a container "[segment1] [segment2]" and call
-		 * <code>swap(0,1)</code> the resulting container becomes: "[segment2] [segment1]".
-		 * <p>Note that the segments identifiers stay with their segment.
-		 * @param segIndex1 the segment index of the first segment to swap.
-		 * @param segIndex2 the segment index of the second segment to swap.
-		 */
 		@Override
 		public void swap (int segIndex1, int segIndex2) {
 			int partIndex1 = getPartIndex(segIndex1);
@@ -148,6 +172,43 @@ public class TextContainer implements Iterable<TextPart> {
 			parts.set(partIndex2, tmp);
 		}
 		
+
+		@Override
+		public void append (Segment segment) {
+			append(segment, null);
+		}
+		
+		@Override
+		public void append (Segment segment, String textBefore) {
+			// Add the text before if needed
+			if ( !Util.isEmpty(textBefore) ) {
+				if (( parts.get(parts.size()-1).getContent().isEmpty() )
+					&& !parts.get(parts.size()-1).isSegment() )
+				{
+					parts.set(parts.size()-1, new TextPart(textBefore));
+				}
+				else {
+					parts.add(new TextPart(textBefore));
+				}
+			}
+			
+			// If the last segment is empty and at the end of the content: re-use it
+			if (( parts.get(parts.size()-1).getContent().isEmpty() )
+				&& parts.get(parts.size()-1).isSegment() )
+			{
+				parts.set(parts.size()-1, segment);
+			}
+			else {
+				parts.add(segment);
+			}
+			validateSegmentId(segment);
+			segApplied = true;
+		}
+		
+		@Override
+		public void append (TextFragment fragment) {
+			append(new Segment(null, fragment));
+		}
 		
 	};
 	
@@ -498,66 +559,6 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 	}
 	
-	/**
-	 * Appends a segment at the end of this container.
-	 * If there is no content after the last segment, and the last segment is empty,
-	 * the new segment replaces the last one (including its id, and the new id is validated).
-	 * Otherwise the new segment is appended to the content as a new segment part and its
-	 * id is validated.
-	 * @param segment the segment to append.
-	 */
-	public void appendSegment (Segment segment) {
-		appendSegment(segment, null);
-	}
-	
-	/**
-	 * Appends a segment at the end of this container, with an optional non-segment part just before.
-	 * If there is no content after the last segment, and the last segment is empty,
-	 * the new segment replaces the last one (including its id, and the new id is validated).
-	 * Otherwise the new segment is appended to the content as a new segment part and its
-	 * id is validated.
-	 * @param segment the segment to append.
-	 * @param textBefore the text of the non-segment part before the segment (can be null).
-	 */
-	public void appendSegment (Segment segment,
-		String textBefore)
-	{
-		// Add the text before if needed
-		if ( !Util.isEmpty(textBefore) ) {
-			if (( parts.get(parts.size()-1).getContent().isEmpty() )
-				&& !parts.get(parts.size()-1).isSegment() )
-			{
-				parts.set(parts.size()-1, new TextPart(textBefore));
-			}
-			else {
-				parts.add(new TextPart(textBefore));
-			}
-		}
-		
-		// If the last segment is empty and at the end of the content: re-use it
-		if (( parts.get(parts.size()-1).getContent().isEmpty() )
-			&& parts.get(parts.size()-1).isSegment() )
-		{
-			parts.set(parts.size()-1, segment);
-		}
-		else {
-			parts.add(segment);
-		}
-		validateSegmentId(segment);
-		segApplied = true;
-	}
-	
-	/**
-	 * Appends a TextFragment as a segment at the end of this container.
-	 * If there is content after the last segment, and the last segment is empty,
-	 * the new segment replaces the last one.
-	 * Otherwise the new segment is appended to the content as a new segment part.
-	 * In all case the id of the new segment is set automatically.
-	 * @param fragment the fragment to append as a segment.
-	 */
-	public void appendSegment (TextFragment fragment) {
-		appendSegment(new Segment(null, fragment));
-	}
 	
 	/**
 	 * Gets the coded text of the whole content (segmented or not).

@@ -38,6 +38,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -149,7 +150,8 @@ public class SegmentationTest {
 	@Test
 	public void testAppendSegment () {
 		TextContainer tc = createSegmentedContainer();
-		tc.appendSegment(new TextFragment(" Added Part."));
+		Segments segments = tc.getSegments();
+		segments.append(new TextFragment(" Added Part."));
 		assertEquals(3, tc.getSegmentCount());
 		assertEquals(" Added Part.", tc.getSegment(2).toString());
 	}

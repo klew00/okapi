@@ -25,6 +25,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.steps.codesremoval.CodesRemover;
 import net.sf.okapi.steps.codesremoval.Parameters;
@@ -103,10 +104,11 @@ public class CodesRemoverTest {
 		params = new Parameters();
 		remover = new CodesRemover(params, LocaleId.SPANISH);
 		TextContainer tc = new TextContainer();
+		Segments segments = tc.getSegments();
 		tc.appendPart("C1"); // Becomes segment
-		tc.appendSegment(createSimpleFragment());
+		segments.append(createSimpleFragment());
 		tc.appendPart("C2");
-		tc.appendSegment(createSimpleFragment());
+		segments.append(createSimpleFragment());
 		
 		remover.processContainer(tc);
 		assertEquals("[C1][t1t2t3]C2[t1t2t3]", fmt.printSegmentedContent(tc, true));

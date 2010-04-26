@@ -61,6 +61,7 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -797,6 +798,7 @@ public class XLIFFFilter implements IFilter {
 		try {
 			boolean changeFirstPart = false;
 			content = new TextContainer();
+			Segments segments = content.getSegments();
 			int id = 0;
 			Stack<Integer> idStack = new Stack<Integer>();
 			idStack.push(id);
@@ -837,7 +839,7 @@ public class XLIFFFilter implements IFilter {
 							idStack.pop(); // Pop only after test is true
 							segIdStack = -1; // Reset to not trigger segment ending again
 							// Add the segment to the content
-							content.appendSegment(segment);
+							segments.append(segment);
 							if ( changeFirstPart && ( content.getPartCount()==2 )) {
 								// Change the initial part into a non-segment
 								changeFirstPart = false;
