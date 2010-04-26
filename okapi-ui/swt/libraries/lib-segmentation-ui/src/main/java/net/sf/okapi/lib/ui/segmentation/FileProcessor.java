@@ -134,7 +134,7 @@ public class FileProcessor {
 			populateTextContainer(tmp.toString(), textCont);
 			// Segment
 			segmenter.computeSegments(textCont);
-			textCont.createSegments(segmenter.getRanges());
+			textCont.getSegments().create(segmenter.getRanges());
 			if ( htmlOutput ) {
 				for ( Segment seg : textCont.getSegments() ) {
 					writer.write("<p>"); //$NON-NLS-1$

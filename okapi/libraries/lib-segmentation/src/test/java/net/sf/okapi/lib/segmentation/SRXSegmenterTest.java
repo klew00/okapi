@@ -27,6 +27,7 @@ import org.junit.Before;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -73,9 +74,10 @@ public class SRXSegmenterTest {
 	public void testSimpleSegmentation () {
 		ISegmenter seg = createSegmenterWithRules(LocaleId.fromString("en"));
 		TextContainer tc = new TextContainer("Part 1. Part 2.");
+		Segments segments = tc.getSegments();
 		int n = seg.computeSegments(tc);
 		assertEquals(2, n);
-		tc.createSegments(seg.getRanges());
+		segments.create(seg.getRanges());
 		assertEquals(2, tc.getSegmentCount());
 		assertEquals("Part 1.", tc.getSegment(0).toString());
 		assertEquals(" Part 2.", tc.getSegment(1).toString());

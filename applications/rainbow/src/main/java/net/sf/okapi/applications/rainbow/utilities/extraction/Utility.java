@@ -224,13 +224,13 @@ public class Utility extends BaseFilterDrivenUtility {
 				cont = tu.getSource();
 				if ( !cont.hasBeenSegmented() ) {
 					sourceSeg.computeSegments(cont);
-					cont.createSegments(sourceSeg.getRanges());
+					cont.getSegments().create(sourceSeg.getRanges());
 				}
 				if ( tu.hasTarget(trgLang) ) {
 					cont = tu.getTarget(trgLang);
 					if ( !cont.hasBeenSegmented() ) {
 						targetSeg.computeSegments(cont);
-						cont.createSegments(targetSeg.getRanges());
+						cont.getSegments().create(targetSeg.getRanges());
 					}
 				}
 			}

@@ -108,7 +108,35 @@ public class TextContainer implements Iterable<TextPart> {
 		 */
 		public void append (TextFragment fragment);
 		
+		/**
+		 * Creates a set of segments in this container. Use {@link #getCodedText()}
+		 * to get the coded text to use as the base for the segment boundaries.
+		 * If the content is already segmented, it is automatically un-segmented before the new
+		 * segmentation is applied.
+		 * @param ranges the ranges of the segments to create. The ranges must be ordered from the lesser
+		 * position to the higher one (i.e. from left to right). If this parameter is empty or null, no
+		 * modification is done.
+		 * @return the number of parts (segments and non-segments) created during the operation.
+		 */
+		public int create (List<Range> ranges);
 	
+		/**
+		 * Creates a segment in this container. Use {@link #getCodedText()}
+		 * to get the coded text to use as the base for the segment boundaries.
+		 * If the content is already segmented, it is automatically un-segmented before the new
+		 * segmentation is applied.
+		 * If start and end position are the same, no segment is created for those boundaries.
+		 * <p>For example:
+		 * <ul>
+		 * <li>calling createSegment(2,3) on "a b c" will result in: "a [b] c".
+		 * <li>calling createSegment(2,3) on "[a b] [c]" will result in: "a [b] c".
+		 * </ul>
+		 * @param start the start of the segment.
+		 * @param end the position just after the last character of the the segment.
+		 * @return the number of parts (segments and non-segments) created during the operation.
+		 */
+		public int create (int start, int end);
+		
 	}
 	
 	private final Segments segments = new Segments() {
@@ -208,6 +236,73 @@ public class TextContainer implements Iterable<TextPart> {
 		@Override
 		public void append (TextFragment fragment) {
 			append(new Segment(null, fragment));
+		}
+		
+		@Override
+		public int create (List<Range> ranges) {
+			// Do nothing if null or empty
+			if (( ranges == null ) || ranges.isEmpty() ) return 0;
+
+			// If the current content is a single segment we start from it
+			TextFragment holder; 
+			if ( parts.size() == 1  ) {
+				holder = parts.get(0).getContent();
+			}
+			else {
+				holder = createJoinedContent(null);
+			}
+			
+			// Reset the segments
+			parts = new ArrayList<TextPart>();
+
+			// Extract the segments using the ranges
+			int start = 0;
+			int id = 0;
+			for ( Range range : ranges ) {
+				if ( range.end == -1 ) {
+					range.end = holder.text.length();
+				}
+				// Check boundaries
+				if ( range.end < range.start ) {
+					throw new InvalidPositionException(String.format(
+						"Invalid segment boundaries: start=%d, end=%d.", range.start, range.end));
+				}
+				if ( start > range.start ) {
+					throw new InvalidPositionException("Invalid range order.");
+				}
+				if ( range.end == range.start ) {
+					// Empty range, skip it
+					continue;
+				}
+				// If there is an interstice: creates the corresponding part
+				if ( start < range.start ) {
+					parts.add(new TextPart(holder.subSequence(start, range.start)));
+				}
+				// Create the part for the segment
+				parts.add(new Segment(String.valueOf(id++),
+					holder.subSequence(range.start, range.end)));
+				start = range.end;
+				segApplied = true;
+			}
+
+			// Check if we have remaining text after the last segment
+			if ( start < holder.text.length() ) {
+				if ( start == 0 ) { // If the remain is the whole content: make it a segment
+					parts.add(new Segment(String.valueOf(id), holder));
+				}
+				else { // Otherwise: make it an interstice
+					parts.add(new TextPart(holder.subSequence(start, -1)));
+				}
+			}
+
+			return parts.size();
+		}
+	
+		@Override
+		public int create (int start, int end) {
+			ArrayList<Range> range = new ArrayList<Range>();
+			range.add(new Range(start, end));
+			return create(range); 
 		}
 		
 	};
@@ -575,98 +670,6 @@ public class TextContainer implements Iterable<TextPart> {
 		else {
 			return createJoinedContent(null).getCodedText();
 		}
-	}
-
-	/**
-	 * Creates a set of segments in this container. Use {@link #getCodedText()}
-	 * to get the coded text to use as the base for the segment boundaries.
-	 * If the content is already segmented, it is automatically un-segmented before the new
-	 * segmentation is applied.
-	 * @param ranges the ranges of the segments to create. The ranges must be ordered from the lesser
-	 * position to the higher one (i.e. from left to right). If this parameter is empty or null, no
-	 * modification is done.
-	 * @return the number of parts (segments and non-segments) created during the operation.
-	 */
-	public int createSegments (List<Range> ranges) {
-		// Do nothing if null or empty
-		if (( ranges == null ) || ranges.isEmpty() ) return 0;
-
-		// If the current content is a single segment we start from it
-		TextFragment holder; 
-		if ( parts.size() == 1  ) {
-			holder = parts.get(0).getContent();
-		}
-		else {
-			holder = createJoinedContent(null);
-		}
-		
-		// Reset the segments
-		parts = new ArrayList<TextPart>();
-
-		// Extract the segments using the ranges
-		int start = 0;
-		int id = 0;
-		for ( Range range : ranges ) {
-			if ( range.end == -1 ) {
-				range.end = holder.text.length();
-			}
-			// Check boundaries
-			if ( range.end < range.start ) {
-				throw new InvalidPositionException(String.format(
-					"Invalid segment boundaries: start=%d, end=%d.", range.start, range.end));
-			}
-			if ( start > range.start ) {
-				throw new InvalidPositionException("Invalid range order.");
-			}
-			if ( range.end == range.start ) {
-				// Empty range, skip it
-				continue;
-			}
-			// If there is an interstice: creates the corresponding part
-			if ( start < range.start ) {
-				parts.add(new TextPart(holder.subSequence(start, range.start)));
-			}
-			// Create the part for the segment
-			parts.add(new Segment(String.valueOf(id++),
-				holder.subSequence(range.start, range.end)));
-			start = range.end;
-			segApplied = true;
-		}
-
-		// Check if we have remaining text after the last segment
-		if ( start < holder.text.length() ) {
-			if ( start == 0 ) { // If the remain is the whole content: make it a segment
-				parts.add(new Segment(String.valueOf(id), holder));
-			}
-			else { // Otherwise: make it an interstice
-				parts.add(new TextPart(holder.subSequence(start, -1)));
-			}
-		}
-
-		return parts.size();
-	}
-
-	/**
-	 * Creates a segment in this container. Use {@link #getCodedText()}
-	 * to get the coded text to use as the base for the segment boundaries.
-	 * If the content is already segmented, it is automatically un-segmented before the new
-	 * segmentation is applied.
-	 * If start and end position are the same, no segment is created for those boundaries.
-	 * <p>For example:
-	 * <ul>
-	 * <li>calling createSegment(2,3) on "a b c" will result in: "a [b] c".
-	 * <li>calling createSegment(2,3) on "[a b] [c]" will result in: "a [b] c".
-	 * </ul>
-	 * @param start the start of the segment.
-	 * @param end the position just after the last character of the the segment.
-	 * @return the number of parts (segments and non-segments) created during the operation.
-	 */
-	public int createSegment (int start,
-		int end)
-	{
-		ArrayList<Range> range = new ArrayList<Range>();
-		range.add(new Range(start, end));
-		return createSegments(range); 
 	}
 
 	/**

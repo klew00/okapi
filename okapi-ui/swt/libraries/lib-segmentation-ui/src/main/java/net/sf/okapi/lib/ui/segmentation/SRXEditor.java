@@ -690,7 +690,7 @@ public class SRXEditor {
 					edSampleText.getText().replace("\r", ""), sampleText);  //$NON-NLS-1$  //$NON-NLS-2$
 				// Segment
 				segmenter.computeSegments(sampleText);
-				sampleText.createSegments(segmenter.getRanges());
+				sampleText.getSegments().create(segmenter.getRanges());
 				// Create the output in generic format
 				edResults.setText(sampleOutput.printSegmentedContent(sampleText, true, true));
 			}

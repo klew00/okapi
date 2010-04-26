@@ -538,7 +538,7 @@ public class TextUnit implements INameable, IReferenceable {
 	public void createSourceSegmentation (ISegmenter segmenter) {
 		segmenter.computeSegments(source);
 		srcSegRanges = segmenter.getRanges();
-		source.createSegments(srcSegRanges);
+		source.getSegments().create(srcSegRanges);
 	}
 	
 	/**
@@ -583,7 +583,7 @@ public class TextUnit implements INameable, IReferenceable {
 			// No target-specific ranges available: use the source
 			ranges = srcSegRanges;
 		}
-		source.createSegments(ranges);
+		source.getSegments().create(ranges);
 	}
 
 	@Override

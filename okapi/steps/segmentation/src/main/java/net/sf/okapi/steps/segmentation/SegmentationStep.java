@@ -144,7 +144,7 @@ public class SegmentationStep extends BasePipelineStep {
 		if ( params.segmentTarget && ( trgCont != null )) {
 			if ( !trgCont.hasBeenSegmented() ) {
 				trgSeg.computeSegments(trgCont);
-				trgCont.createSegments(trgSeg.getRanges());
+				trgCont.getSegments().create(trgSeg.getRanges());
 			}
 		}
 		

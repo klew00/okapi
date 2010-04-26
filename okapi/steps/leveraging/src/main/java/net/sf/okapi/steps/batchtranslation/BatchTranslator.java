@@ -251,7 +251,7 @@ public class BatchTranslator {
 					// Segment if needed
 					if ( segmenter != null ) {
 						if ( segmenter.computeSegments(tc) > 1 ) {
-							tc.createSegments(segmenter.getRanges());
+							tc.getSegments().create(segmenter.getRanges());
 						}
 					}
 

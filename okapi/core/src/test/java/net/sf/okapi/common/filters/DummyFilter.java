@@ -220,10 +220,10 @@ public class DummyFilter implements IFilter {
 		List<Range> ranges = new ArrayList<Range>();
 		ranges.add(new Range(0, 22));
 		ranges.add(new Range(23, -1));
-		tc.createSegments(ranges);
+		tc.getSegments().create(ranges);
 		
 		tc = tu.setTarget(trgLang, new TextContainer("First segment for TRG. Second segment for TRG"));
-		tc.createSegments(ranges);
+		tc.getSegments().create(ranges);
 
 		skel = new GenericSkeleton("<text>\n<s>First segment for SRC. Second segment for SRC</s>\n<t>");
 		skel.addContentPlaceholder(tu, trgLang);

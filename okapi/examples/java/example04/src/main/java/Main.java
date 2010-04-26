@@ -60,7 +60,7 @@ public class Main {
 			tf.append(" Part 3.");
 			TextContainer tc = new TextContainer(tf);
 			segmenter.computeSegments(tc);
-			tc.createSegments(segmenter.getRanges());
+			tc.getSegments().create(segmenter.getRanges());
 			for ( Segment seg : tc.getSegments() ) {
 				System.out.println("segment=[" + seg.toString() + "]");
 			}

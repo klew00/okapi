@@ -139,9 +139,10 @@ public class SegmentationTest {
 	@Test
 	public void testCreateSegment () {
 		TextContainer tc = createSegmentedContainer();
+		Segments segments = tc.getSegments();
 		// "**Part 1.** Outside Part2."
 		//  01234567890123456789012345"
-		tc.createSegment(11, 19);
+		segments.create(11, 19);
 		assertEquals(1, tc.getSegmentCount());
 		assertEquals(3, tc.getPartCount());
 		assertEquals(" Outside", tc.getSegment(0).toString());
@@ -321,7 +322,7 @@ public class SegmentationTest {
 		tf.append(" Part 2.");
 		TextContainer tc = new TextContainer(tf);
 		segmenter.computeSegments(tc);
-		tc.createSegments(segmenter.getRanges());
+		tc.getSegments().create(segmenter.getRanges());
 		// Insert in holder between the two segments
 		tc.insertPart(1, new TextPart(new TextFragment(" Outside")));
 		return tc;
@@ -332,7 +333,7 @@ public class SegmentationTest {
 	{
 		TextContainer tc = new TextContainer(text);
 		segmenter.computeSegments(tc);
-		tc.createSegments(segmenter.getRanges());
+		tc.getSegments().create(segmenter.getRanges());
 		return tc;
 	}
 

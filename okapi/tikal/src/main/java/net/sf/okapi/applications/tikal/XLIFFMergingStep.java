@@ -233,7 +233,7 @@ public class XLIFFMergingStep {
 			trgCont.getFirstPartContent().setCodedText(fromTrans.getCodedText(), transCodes, false);
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
-				trgCont.createSegments(ranges);
+				trgCont.getSegments().create(ranges);
 			}
 		}
 		catch ( RuntimeException e ) {

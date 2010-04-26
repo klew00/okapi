@@ -126,7 +126,7 @@ class DbStoreBuilder implements IFilterWriter {
 		// Segment if requested
 		if ( segmenter != null ) {
 			segmenter.computeSegments(tc);
-			tc.createSegments(segmenter.getRanges());
+			tc.getSegments().create(segmenter.getRanges());
 		}
 		// Add the tu to the db store
 		dbs.addSourceEntry(tc, groupStack.peek(), tu.getId(), tu.getName(), tu.getType());
