@@ -194,7 +194,7 @@ public class SRXSegmenter implements ISegmenter {
 		// Do we have codes?
 		// Avoid to create an un-segmented copy if we can
 		boolean hasCode;
-		if ( container.contentIsOneSegment() ) hasCode = container.getFirstSegmentContent().hasCode();
+		if ( container.contentIsOneSegment() ) hasCode = container.getSegments().getFirstContent().hasCode();
 		else hasCode = container.getUnSegmentedContentCopy().hasCode();
 		
 		// Set the flag for trimming or not the in-line codes

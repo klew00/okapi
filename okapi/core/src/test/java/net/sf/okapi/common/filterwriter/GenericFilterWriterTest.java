@@ -79,7 +79,7 @@ public class GenericFilterWriterTest {
 		sg1.setSkeleton(skel_sg1);
 		sg1.setIsReferent(true);
 
-		TextFragment tf_tu3 = tu3.getSource().getFirstSegmentContent(); // Assume un-segmented content
+		TextFragment tf_tu3 = tu3.getSource().getSegments().getFirstContent(); // Assume un-segmented content
 		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker(sg1.getId()));
 		c.setReferenceFlag(true);
 		tf_tu3.append(c);

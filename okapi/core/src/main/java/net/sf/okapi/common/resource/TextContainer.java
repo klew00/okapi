@@ -147,6 +147,15 @@ public class TextContainer implements Iterable<TextPart> {
 		 */
 		public int count ();
 		
+		/**
+		 * Gets the content of the first segment of this container.
+		 * @return the content of the first segment of this container.
+		 * @see #getFirstPartContent()
+		 * @see #getLastSegmentContent()
+		 * @see #getLastPartContent()
+		 */
+		public TextFragment getFirstContent ();
+		
 	}
 	
 	private final Segments segments = new Segments() {
@@ -326,6 +335,16 @@ public class TextContainer implements Iterable<TextPart> {
 			return count;
 		}
 		
+		@Override
+		public TextFragment getFirstContent () {
+			for ( TextPart part : parts ) {
+				if ( part.isSegment() ) {
+					return part.getContent();
+				}
+			}
+			// Should never occur
+			return null;
+		}
 		
 	};
 	
@@ -855,23 +874,6 @@ public class TextContainer implements Iterable<TextPart> {
 				else break;
 			}
 		}
-	}
-	
-	/**
-	 * Gets the content of the first segment of this container.
-	 * @return the content of the first segment of this container.
-	 * @see #getFirstPartContent()
-	 * @see #getLastSegmentContent()
-	 * @see #getLastPartContent()
-	 */
-	public TextFragment getFirstSegmentContent () {
-		for ( TextPart part : parts ) {
-			if ( part.isSegment() ) {
-				return part.getContent();
-			}
-		}
-		// Should never occur
-		return null;
 	}
 	
 	/**

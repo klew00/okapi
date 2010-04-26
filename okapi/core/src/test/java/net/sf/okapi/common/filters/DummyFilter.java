@@ -175,12 +175,12 @@ public class DummyFilter implements IFilter {
 		queue.add(new Event(EventType.START_DOCUMENT, sd));
 		
 		TextUnit tu = new TextUnit("id1", parts[0]);
-		// Use getFirstSegmentContent fine because there is nothing segmented
-		String text = tu.getSource().getFirstSegmentContent().getCodedText();
+		// Use getFirstContent fine because there is nothing segmented
+		String text = tu.getSource().getSegments().getFirstContent().getCodedText();
 		int n = text.indexOf("@#$");
 		while ( n > -1 ) {
-			tu.getSource().getFirstSegmentContent().changeToCode(n, n+4, TagType.PLACEHOLDER, "z");
-			text = tu.getSource().getFirstSegmentContent().getCodedText();
+			tu.getSource().getSegments().getFirstContent().changeToCode(n, n+4, TagType.PLACEHOLDER, "z");
+			text = tu.getSource().getSegments().getFirstContent().getCodedText();
 			n = text.indexOf("@#$");
 		}
 		

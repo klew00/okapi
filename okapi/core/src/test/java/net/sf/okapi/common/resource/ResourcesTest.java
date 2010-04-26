@@ -252,7 +252,7 @@ public class ResourcesTest {
 		skel.add("<tu><tuv xml:lang='EN'><seg>");
 		
 		// Store the tuv content of the source
-		TextFragment src = tu.getSource().getFirstSegmentContent();
+		TextFragment src = tu.getSource().getSegments().getFirstContent();
 		src.append("T1-en");
 		
 		// Add the <sub> element of the source

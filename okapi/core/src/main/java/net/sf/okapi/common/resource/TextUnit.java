@@ -474,8 +474,8 @@ public class TextUnit implements INameable, IReferenceable {
 	 */
 	public TextFragment setSourceContent (TextFragment content) {
         source.setContent(content);
-        // We can use getFirstSegmentContent() because the setContent() removed any segmentation
-		return source.getFirstSegmentContent();
+        // We can use this because the setContent() removed any segmentation
+		return source.getSegments().getFirstContent();
 	}
 
 //	/**
@@ -501,8 +501,8 @@ public class TextUnit implements INameable, IReferenceable {
 	{
 		TextContainer tc = createTarget(locId, false, CREATE_EMPTY);
 		tc.setContent(content);
-        // We can use getFirstSegmentContent() because the setContent() removed any segmentation
-		return tc.getFirstSegmentContent();
+        // We can use this because the setContent() removed any segmentation
+		return tc.getSegments().getFirstContent();
 	}
 
 	public String getMimeType () {

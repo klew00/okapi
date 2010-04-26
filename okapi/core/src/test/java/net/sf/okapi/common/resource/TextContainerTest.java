@@ -68,18 +68,19 @@ public class TextContainerTest {
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("abc", tc.getCodedText());
 		assertEquals("0", tc.getSegment(0).id);
-		assertSame(tf, tc.getFirstSegmentContent());
+		assertSame(tf, tc.getSegments().getFirstContent());
     }
     
     @Test
     public void testTextSegmentConstructor () {
     	Segment seg = new Segment("qwerty", new TextFragment("xyz"));
 		TextContainer tc = new TextContainer(seg);
+		Segments segments = tc.getSegments();
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("xyz", tc.getFirstPartContent().toString());
 		assertEquals("qwerty", tc.getSegment(0).id);
-		assertSame(seg.text, tc.getFirstSegmentContent());
+		assertSame(seg.text, segments.getFirstContent());
     }
     
     @Test
@@ -87,11 +88,12 @@ public class TextContainerTest {
     	Segment seg = new Segment(null, null);
     	seg.text = null;
 		TextContainer tc = new TextContainer(seg);
+		Segments segments = tc.getSegments();
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("", tc.getFirstPartContent().toString());
 		assertEquals("0", tc.getSegment(0).id);
-		assertSame(seg.text, tc.getFirstSegmentContent());
+		assertSame(seg.text, segments.getFirstContent());
     }
     
 	@Test
@@ -233,7 +235,7 @@ public class TextContainerTest {
 	@Test
 	public void testGetFirstSegmentContent () {
 		TextContainer tc = new TextContainer("text");
-		assertEquals("text", tc.getFirstSegmentContent().toString());
+		assertEquals("text", tc.getSegments().getFirstContent().toString());
 	}
 	
 	@Test
@@ -241,7 +243,7 @@ public class TextContainerTest {
 		TextContainer tc = new TextContainer("text");
 		TextContainer tc2 = tc.clone();
 		assertNotSame(tc, tc2);
-		assertNotSame(tc.getFirstSegmentContent(), tc2.getFirstSegmentContent());
+		assertNotSame(tc.getSegments().getFirstContent(), tc2.getSegments().getFirstContent());
 		assertEquals(tc.toString(), tc2.toString());
 	}
 
@@ -429,16 +431,18 @@ public class TextContainerTest {
 	@Test
 	public void testSameFirstAndLastSegments () {
 		TextContainer tc = new TextContainer("text");
-		assertEquals("text", tc.getFirstSegmentContent().toString());
-		assertSame(tc.getFirstSegmentContent(), tc.getLastSegmentContent());
+		Segments segments = tc.getSegments();
+		assertEquals("text", segments.getFirstContent().toString());
+		assertSame(segments.getFirstContent(), tc.getLastSegmentContent());
 		assertFalse(tc.hasBeenSegmented());
 	}
 	
 	@Test
 	public void testGetSameSegment () {
 		TextContainer tc = createMultiSegmentContent();
-		assertEquals("text1", tc.getFirstSegmentContent().toString());
-		assertSame(tc.getFirstSegmentContent(), tc.getSegment(0).text);
+		Segments segments = tc.getSegments();
+		assertEquals("text1", segments.getFirstContent().toString());
+		assertSame(segments.getFirstContent(), tc.getSegment(0).text);
 	}
 	
 	@Test
@@ -816,7 +820,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		tc.joinAllSegments();
 		assertEquals(1, segments.count());
-		TextFragment tf = tc.getFirstSegmentContent();
+		TextFragment tf = segments.getFirstContent();
 		assertEquals("text1<br/> text2<br/>", tc.toString());
 		assertEquals("text1<br/> text2<br/>", tf.toString());
 		List<Code> codes = tf.getCodes();
@@ -835,7 +839,7 @@ public class TextContainerTest {
 		tc.joinAllSegments(ranges);
 		assertEquals(1, segments.count());
 		assertEquals("[text1<1/> text2<2/>]", fmt.printSegmentedContent(tc, true));
-		List<Code> codes = tc.getFirstSegmentContent().getCodes();
+		List<Code> codes = segments.getFirstContent().getCodes();
 		assertEquals(2, codes.size());
 		assertEquals(1, codes.get(0).id);
 		assertEquals(2, codes.get(1).id);
