@@ -1160,7 +1160,7 @@ public class TextContainerTest {
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
 		assertEquals("0", tc.getSegment(0).id);
 		assertEquals("1", tc.getSegment(1).id);
-		tc.swapSegments(0, 1);
+		tc.getSegments().swap(0, 1);
 		assertEquals("[text2<2/>] [text1<1/>]", fmt.printSegmentedContent(tc, true));
 		assertEquals("1", tc.getSegment(0).id);
 		assertEquals("0", tc.getSegment(1).id);

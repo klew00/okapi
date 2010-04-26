@@ -66,6 +66,17 @@ public class TextContainer implements Iterable<TextPart> {
 		 * @return List of segments.
 		 */
 		public List<Segment> asList();
+
+		/**
+		 * Swaps two segments in this container.
+		 * <p>For example, if you have a container "[segment1] [segment2]" and call
+		 * <code>swap(0,1)</code> the resulting container becomes: "[segment2] [segment1]".
+		 * <p>Note that the segments identifiers stay with their segment.
+		 * @param segIndex1 the segment index of the first segment to swap.
+		 * @param segIndex2 the segment index of the second segment to swap.
+		 */
+		public void swap (int segIndex1, int segIndex2);
+	
 	}
 	
 	private final Segments segments = new Segments() {
@@ -116,6 +127,27 @@ public class TextContainer implements Iterable<TextPart> {
 			}
 			return segments;
 		}
+
+		/**
+		 * Swaps two segments in this container.
+		 * <p>For example, if you have a container "[segment1] [segment2]" and call
+		 * <code>swap(0,1)</code> the resulting container becomes: "[segment2] [segment1]".
+		 * <p>Note that the segments identifiers stay with their segment.
+		 * @param segIndex1 the segment index of the first segment to swap.
+		 * @param segIndex2 the segment index of the second segment to swap.
+		 */
+		@Override
+		public void swap (int segIndex1, int segIndex2) {
+			int partIndex1 = getPartIndex(segIndex1);
+			int partIndex2 = getPartIndex(segIndex2);
+			if (( partIndex1 == -1 ) || ( partIndex2 == -1 )) {
+				return; // At least one index is wrong: do nothing
+			}
+			TextPart tmp = parts.get(partIndex1);
+			parts.set(partIndex1, parts.get(partIndex2));
+			parts.set(partIndex2, tmp);
+		}
+		
 		
 	};
 	
@@ -1295,27 +1327,6 @@ public class TextContainer implements Iterable<TextPart> {
 			}
 		}
 		return -1; // Not found
-	}
-	
-	/**
-	 * Swaps two segments in this container.
-	 * <p>For example, if you have a container "[segment1] [segment2]" and call
-	 * <code>swap(0,1)</code> the resulting container becomes: "[segment2] [segment1]".
-	 * <p>Note that the segments identifiers stay with their segment.
-	 * @param segIndex1 the segment index of the first segment to swap.
-	 * @param segIndex2 the segment index of the second segment to swap.
-	 */
-	public void swapSegments (int segIndex1,
-		int segIndex2)
-	{
-		int partIndex1 = getPartIndex(segIndex1);
-		int partIndex2 = getPartIndex(segIndex2);
-		if (( partIndex1 == -1 ) || ( partIndex2 == -1 )) {
-			return; // At least one index is wrong: do nothing
-		}
-		TextPart tmp = parts.get(partIndex1);
-		parts.set(partIndex1, parts.get(partIndex2));
-		parts.set(partIndex2, tmp);
 	}
 	
 	/**

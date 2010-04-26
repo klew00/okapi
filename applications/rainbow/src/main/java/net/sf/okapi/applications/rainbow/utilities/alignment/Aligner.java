@@ -667,7 +667,7 @@ public class Aligner {
 				if ( n < 1 ) return;
 			}
 			// Swap current segment with the previous/next one
-			target.swapSegments(n+direction, n);
+			target.getSegments().swap(n+direction, n);
 			// Update
 			updateTargetDisplay();
 			fillTargetList(n+direction);
