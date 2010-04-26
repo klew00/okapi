@@ -491,7 +491,7 @@
 
 		<!-- Copy classes -->
 		<copy todir="${tmp}">
-			<fileset dir="../../applications/tikal/target/classes"/>
+			<fileset dir="../../okapi/tikal/target/classes"/>
 		</copy>
 		
 		<!-- Create the manifest file -->
