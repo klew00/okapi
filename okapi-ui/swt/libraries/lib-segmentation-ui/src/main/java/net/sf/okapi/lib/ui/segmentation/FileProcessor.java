@@ -136,8 +136,7 @@ public class FileProcessor {
 			segmenter.computeSegments(textCont);
 			textCont.createSegments(segmenter.getRanges());
 			if ( htmlOutput ) {
-				for ( Iterator<Segment> iter = textCont.segmentIterator(); iter.hasNext(); ) {
-		    		Segment seg = iter.next();
+				for ( Segment seg : textCont.getSegments() ) {
 					writer.write("<p>"); //$NON-NLS-1$
 					writer.write(Util.escapeToXML(sampleOutput.setContent(seg.text).toString(true), 0, false, null));
 					writer.write("</p>"); //$NON-NLS-1$

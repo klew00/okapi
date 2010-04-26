@@ -64,8 +64,7 @@ abstract public class BaseCounter {
 			// This work on segments' content (vs. parts' content)
 			TextContainer tc = (TextContainer)text;
 			long res = 0;
-			for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
-	    		Segment seg = iter.next();
+			for ( Segment seg : tc.getSegments() ) {
 				res += getCount(classRef, seg.getContent(), language);
 			}
 			return res;

@@ -138,7 +138,7 @@ public class TextContainerTest {
 	@Test
 	public void testSegmentIterator () {
 		TextContainer tc = new TextContainer("[s1]");
-		for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+		for ( Iterator<Segment> iter = tc.getSegments().iterator(); iter.hasNext(); ) {
 			Segment seg = iter.next();
 			assertEquals("[s1]", seg.text.toString());
 		}
@@ -146,7 +146,7 @@ public class TextContainerTest {
 		tc.appendSegment(new TextFragment("[s3]"));
 		tc.appendSegment(new TextFragment("[s4]"));
 		StringBuilder tmp = new StringBuilder();
-		for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
+		for ( Iterator<Segment> iter = tc.getSegments().iterator(); iter.hasNext(); ) {
 			Segment seg = iter.next();
 			tmp.append(seg.text.toString());
 		}

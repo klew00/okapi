@@ -72,8 +72,8 @@ public class SentenceAligner {
 					+ ". Where the number equals the source segments times the target segments.");
 		}
 
-		DpMatrix matrix = new DpMatrix(sourceParagraph.getSource().getSegments(), targetParagraph
-				.getSource().getSegments(), alignmentFunction);
+		DpMatrix matrix = new DpMatrix(sourceParagraph.getSource().getSegments().asList(), targetParagraph
+				.getSource().getSegments().asList(), alignmentFunction);
 
 		List<DpMatrixCell> result = matrix.align();
 				

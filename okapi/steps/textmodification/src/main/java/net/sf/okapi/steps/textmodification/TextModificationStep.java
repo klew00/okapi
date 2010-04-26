@@ -172,8 +172,7 @@ public class TextModificationStep extends BasePipelineStep {
 	}
 
 	private void addSegmentMarks (TextUnit tu) {
-		for ( Iterator<Segment> iter = tu.getTarget(targetLocale).segmentIterator(); iter.hasNext(); ) {
-    		Segment seg = iter.next();
+		for ( Segment seg : tu.getTarget(targetLocale).getSegments() ) {
 			seg.text.setCodedText(STARTSEG+seg.text.getCodedText()+ENDSEG);
 		}
 	}

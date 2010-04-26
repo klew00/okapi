@@ -53,8 +53,7 @@ public class UppercaseStep extends BasePipelineStep {
 		TextUnit tu = (TextUnit)event.getResource();
 		if ( tu.isTranslatable() ) {
 			TextContainer tc = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
-			for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
-	    		Segment seg = iter.next();
+			for ( Segment seg : tc.getSegments() ) {
 				TextFragment tf = seg.getContent();
 				tf.setCodedText(tf.getCodedText().toUpperCase());
 			}

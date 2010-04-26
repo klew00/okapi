@@ -604,8 +604,8 @@ public class TTXFilter implements IFilter {
 			if ( srcCont.hasBeenSegmented() ) {
 				TextContainer cont = srcCont.clone();
 				int i = 0;
-				for ( Iterator<Segment> iter = cont.segmentIterator(); iter.hasNext(); ) {
-		    		Segment seg = iter.next();
+				for ( Segment seg : cont.getSegments() ) {
+		    		
 					seg.text = trgFragments.get(i);
 					i++;
 				}

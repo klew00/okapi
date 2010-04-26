@@ -163,8 +163,8 @@ public class SegmentationStep extends BasePipelineStep {
 			}
 			// Otherwise make sure we have matches
 			else {
-				for ( Iterator<Segment> iter = tu.getSource().segmentIterator(); iter.hasNext(); ) {
-		    		Segment seg = iter.next();
+				for ( Segment seg : tu.getSource().getSegments() ) {
+		    		
 					if ( trgCont.getSegment(seg.id) == null ) {
 						// No target segment matching source segment seg.id
 						logger.warning(String.format("Text unit id='%s': No target match found for source segment id='%s'",

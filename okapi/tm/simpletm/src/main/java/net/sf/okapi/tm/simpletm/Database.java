@@ -237,8 +237,7 @@ public class Database {
 				pstm.setString(6, grpName);
 				pstm.setString(7, fileName);
 				int segIndex = 0;
-				for ( Iterator<Segment> iter = srcCont.segmentIterator(); iter.hasNext(); ) {
-		    		Segment srcSeg = iter.next();
+				for ( Segment srcSeg : srcCont.getSegments() ) {
 					pstm.setString(2, srcSeg.text.getCodedText());
 					pstm.setString(3, Code.codesToString(srcSeg.text.getCodes()));
 					Segment trgSeg = trgCont.getSegment(srcSeg.id);

@@ -791,8 +791,7 @@ public class Aligner {
 	private void fillTargetList (int selection) {
 		trgList.removeAll();
 		boolean useGeneric = chkShowInlineCodes.getSelection();
-		for ( Iterator<Segment> iter = target.segmentIterator(); iter.hasNext(); ) {
-    		Segment seg = iter.next();
+		for ( Segment seg : target.getSegments() ) {
 			if ( useGeneric ) trgList.add(genericCont.setContent(seg.text).toString());
 			else trgList.add(seg.text.toString());
 		}
@@ -807,8 +806,7 @@ public class Aligner {
 	private void fillSourceList (int selection) {
 		srcList.removeAll();
 		boolean useGeneric = chkShowInlineCodes.getSelection();
-		for ( Iterator<Segment> iter = source.segmentIterator(); iter.hasNext(); ) {
-    		Segment seg = iter.next();
+		for ( Segment seg : source.getSegments() ) {
 			if ( useGeneric ) srcList.add(genericCont.setContent(seg.text).toString());
 			else srcList.add(seg.toString());
 		}
@@ -831,12 +829,12 @@ public class Aligner {
 		// that we have id matching in source and target
 		// On accept both container should have the same number of segments
 		int i = 0;
-		for ( Iterator<Segment> iter = source.segmentIterator(); iter.hasNext(); ) {
+		for ( Iterator<Segment> iter = source.getSegments().iterator(); iter.hasNext(); ) {
 			iter.next().id = String.valueOf(i);
 			i++;
 		}
 		i = 0;
-		for ( Iterator<Segment> iter = target.segmentIterator(); iter.hasNext(); ) {
+		for ( Iterator<Segment> iter = target.getSegments().iterator(); iter.hasNext(); ) {
 			iter.next().id = String.valueOf(i);
 			i++;
 		}
@@ -1017,8 +1015,7 @@ public class Aligner {
 			
 			// Sanity check using common anchors
 			int i = 0;
-			for ( Iterator<Segment> iter = source.segmentIterator(); iter.hasNext(); ) {
-	    		Segment srcSeg = iter.next();
+			for ( Segment srcSeg : source.getSegments() ) {
 				// Normally we would use srcSeg.id, but the class works based on segment index not id
 				Segment trgSeg = target.getSegment(i);
 				if ( trgSeg == null ) {
@@ -1120,8 +1117,8 @@ public class Aligner {
 			int toJoin;
 
 			int i = -1;
-			for ( Iterator<Segment> iter = source.segmentIterator(); iter.hasNext(); ) {
-	    		Segment srcSeg = iter.next();
+			for ( Segment srcSeg : source.getSegments() ) {
+	    		
 				i++;
 				matchFound = false;
 				srcText = srcSeg.toString();

@@ -97,8 +97,8 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		TextContainer trgTC = item.getTarget(trgLoc);
 
 		int i = 0;
-		for ( Iterator<Segment> iter = srcTC.segmentIterator(); iter.hasNext(); ) {
-    		Segment srcSeg = iter.next();
+		for ( Segment srcSeg : srcTC.getSegments() ) {
+    		
 			Segment trgSeg = trgTC.getSegment(srcSeg.id);
 			if ( trgSeg != null ) {
 				if ( scores.getScore(0) == 100 ) {

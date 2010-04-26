@@ -61,8 +61,7 @@ public class Main {
 			TextContainer tc = new TextContainer(tf);
 			segmenter.computeSegments(tc);
 			tc.createSegments(segmenter.getRanges());
-			for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
-	    		Segment seg = iter.next();
+			for ( Segment seg : tc.getSegments() ) {
 				System.out.println("segment=[" + seg.toString() + "]");
 			}
 		}

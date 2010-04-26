@@ -50,6 +50,79 @@ public class TextContainer implements Iterable<TextPart> {
 	private List<TextPart> parts;
 	private boolean segApplied;
 
+	public interface Segments extends Iterable<Segment> {
+		
+		/**
+		 * Gets an iterator for the segments of this container.
+		 * This iterator does not iterate through non-segment parts of the content.
+		 * Use {@link #iterator()} for accessing both segments and non-segments parts.
+		 * @return an iterator for the segments of this container.
+		 */
+		@Override
+		public Iterator<Segment> iterator();
+		
+		/**
+		 * Get all segments. Excludes intersegment parts.
+		 * @return List of segments.
+		 */
+		public List<Segment> asList();
+	}
+	
+	private final Segments segments = new Segments() {
+		
+		public Iterator<Segment> iterator() {
+			return new Iterator<Segment>() {
+				int current = foundNext(-1);
+				private int foundNext (int start) {
+					for ( int i=start+1; i<parts.size(); i++ ) {
+						if ( parts.get(i).isSegment() ) {
+							return i;
+						}
+					}
+					return -1;
+				}
+				
+				@Override
+				public void remove () {
+					throw new UnsupportedOperationException("The method remove() not supported.");
+				}
+				
+				@Override
+				public Segment next () {
+					if ( current == -1 ) {
+						throw new NoSuchElementException("No more content parts.");
+					}
+					int n = current;
+					// Get next here because hasNext() could be called several times
+					current = foundNext(current);
+					// Return 'previous' current
+					return (Segment)parts.get(n);
+				}
+				
+				@Override
+				public boolean hasNext () {
+					return (current != -1);
+				}
+			};
+		};
+		
+		@Override
+		public List<Segment> asList() {
+			ArrayList<Segment> segments = new ArrayList<Segment>();
+			for ( TextPart part : parts ) {
+				if ( part.isSegment() ) {
+					segments.add((Segment)part);
+				}
+			}
+			return segments;
+		}
+		
+	};
+	
+	public Segments getSegments() {
+		return segments;
+	}
+	
 	/**
 	 * Creates a string that stores the content of a given container. Only the content is saved (not
 	 * the properties, annotations, etc.). Use {@link #stringToContent(String)} to create the container
@@ -162,48 +235,6 @@ public class TextContainer implements Iterable<TextPart> {
 		return createJoinedContent(null).toString();
 	}
 	
-	/**
-	 * Gets an iterator for the segments of this container.
-	 * This iterator does not iterate through non-segment parts of the content.
-	 * Use {@link #iterator()} for accessing both segments and non-segments parts.
-	 * @return an iterator for the segments of this container.
-	 */
-	public Iterator<Segment> segmentIterator () {
-		return new Iterator<Segment>() {
-			int current = foundNext(-1);
-			private int foundNext (int start) {
-				for ( int i=start+1; i<parts.size(); i++ ) {
-					if ( parts.get(i).isSegment() ) {
-						return i;
-					}
-				}
-				return -1;
-			}
-			
-			@Override
-			public void remove () {
-				throw new UnsupportedOperationException("The method remove() not supported.");
-			}
-			
-			@Override
-			public Segment next () {
-				if ( current == -1 ) {
-					throw new NoSuchElementException("No more content parts.");
-				}
-				int n = current;
-				// Get next here because hasNext() could be called several times
-				current = foundNext(current);
-				// Return 'previous' current
-				return (Segment)parts.get(n);
-			}
-			
-			@Override
-			public boolean hasNext () {
-				return (current != -1);
-			}
-		};
-	}
-
 	/**
 	 * Creates an iterator to loop through the parts (segments and non-segments) of this container.
 	 * @return a new iterator all for the parts of this container.
@@ -1082,20 +1113,6 @@ public class TextContainer implements Iterable<TextPart> {
 			}
 		}
 		return count;
-	}
-	
-	/**
-	 * Get all segments. Excludes intersegment parts.
-	 * @return List of segments.
-	 */
-	public List<Segment> getSegments () {
-		ArrayList<Segment> segments = new ArrayList<Segment>();
-		for ( TextPart part : parts ) {
-			if ( part.isSegment() ) {
-				segments.add((Segment)part);
-			}
-		}
-		return segments;
 	}
 	
 	/**

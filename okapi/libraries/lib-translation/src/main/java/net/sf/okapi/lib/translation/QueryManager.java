@@ -476,8 +476,7 @@ public class QueryManager {
 		int leveraged = 0;
 		
 		// For each segment
-		for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
-    		Segment seg = iter.next();
+		for ( Segment seg : tc.getSegments() ) {
 			// Query if needed
 			if ( seg.text.hasText(false) ) {
 				totalSegments++;

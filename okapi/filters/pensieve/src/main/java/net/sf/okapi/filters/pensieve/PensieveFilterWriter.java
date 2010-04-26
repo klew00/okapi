@@ -158,8 +158,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 		}
 
 		// Index each segment
-		for ( Iterator<Segment> iter = srcCont.segmentIterator(); iter.hasNext(); ) {
-    		Segment srcSeg = iter.next();
+		for ( Segment srcSeg :srcCont.getSegments() ) {
 			Segment trgSeg = trgCont.getSegment(srcSeg.id);
 			// Skip entries with no target match
 			if ( trgSeg != null ) {

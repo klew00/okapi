@@ -55,7 +55,7 @@ public class TextContainerBean extends TextFragmentBean {
 			tc.setAnnotation(annotationBean.get(IAnnotation.class));
 		
 		for (SegmentBean segment : segments)
-			tc.getSegments().add(segment.get(Segment.class));
+			tc.getSegments().asList().add(segment.get(Segment.class));
 		
 		return classRef.cast(tc);
 	}
@@ -79,7 +79,7 @@ public class TextContainerBean extends TextFragmentBean {
 				annotationBean.set(annotation);
 			}
 			
-			List<Segment> segs = tc.getSegments();
+			List<Segment> segs = tc.getSegments().asList();
 			if (segs != null)
 				for (Segment segment : segs) {
 					SegmentBean segBean = new SegmentBean();

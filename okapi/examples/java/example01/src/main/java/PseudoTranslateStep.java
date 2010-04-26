@@ -58,8 +58,7 @@ public class PseudoTranslateStep extends BasePipelineStep {
 
 		TextContainer tc = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
 		// Process each segment content
-		for ( Iterator<Segment> iter = tc.segmentIterator(); iter.hasNext(); ) {
-    		Segment seg = iter.next();
+		for ( Segment seg : tc.getSegments() ) {
 			TextFragment tf = seg.getContent();
 			StringBuilder text = new StringBuilder(tf.getCodedText());
 			int n;
