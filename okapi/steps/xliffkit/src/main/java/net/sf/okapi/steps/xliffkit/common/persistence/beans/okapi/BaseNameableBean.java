@@ -99,7 +99,7 @@ public class BaseNameableBean extends PersistenceBean<BaseNameable> {
 			
 			for (PropertyBean prop : sourceProperties)
 				//obj.setSourceProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly()), session));
-				obj.setProperty(prop.get(Property.class, session));
+				obj.setSourceProperty(prop.get(Property.class, session));
 	}
 
 	public String getId() {

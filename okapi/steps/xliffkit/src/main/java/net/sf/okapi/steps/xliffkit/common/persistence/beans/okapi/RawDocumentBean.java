@@ -60,7 +60,7 @@ public class RawDocumentBean extends PersistenceBean<RawDocument> {
 		else if (!Util.isEmpty(inputCharSequence))
 			obj = new RawDocument(inputCharSequence, new LocaleId(srcLoc), new LocaleId(trgLoc));		
 		else
-			// TODO Handle inputStream or empty input params
+			// TODO Handle inputStream or empty input params (Okapi-B 19)
 			obj = new RawDocument("", new LocaleId(srcLoc), new LocaleId(trgLoc));
 		
 		return obj;

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,56 +18,58 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi;
+package net.sf.okapi.steps.xliffkit.common.persistence.versioning;
 
-import net.sf.okapi.common.ClassUtil;
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.ReferenceBean;
 
-public class ParametersBean extends PersistenceBean<IParameters> {
-
-	private String className;
-	private String data;
-
+public class TestEventBean extends PersistenceBean<TestEvent> {
+	private String id;
+	private EventType type;
+	private ReferenceBean parent = new ReferenceBean();
+	
 	@Override
-	protected IParameters createObject(IPersistenceSession session) {
-		if (Util.isEmpty(className)) return null;
-			
-		IParameters obj = null;
-		try {
-			obj = (IParameters) ClassUtil.instantiateClass(className);			
-		} catch (Exception e) {
-			throw new RuntimeException(String.format("ParametersBean: cannot instantiate %s", className), e);
-		}
-		return obj;
+	protected TestEvent createObject(IPersistenceSession session) {
+		return new TestEvent(id);
 	}
 
 	@Override
-	protected void fromObject(IParameters obj, IPersistenceSession session) {
-		className = ClassUtil.getQualifiedClassName(obj);
-		data = obj.toString();
+	protected void fromObject(TestEvent obj, IPersistenceSession session) {		
+		id = obj.getId();
+		parent.set(obj.getParent(), session);
 	}
 
 	@Override
-	protected void setObject(IParameters obj, IPersistenceSession session) {
-		obj.fromString(data);
+	protected void setObject(TestEvent obj, IPersistenceSession session) {
+		super.set(obj, session);
+		obj.setId(id);
+		obj.setParent(parent.get(TestEvent.class, session));
 	}
 
-	public String getData() {
-		return data;
+	public String getId() {
+		return id;
 	}
 
-	public void setData(String data) {
-		this.data = data;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public String getClassName() {
-		return className;
+	public ReferenceBean getParent() {
+		return parent;
 	}
 
-	public void setClassName(String className) {
-		this.className = className;
+	public void setParent(ReferenceBean parent) {
+		this.parent = parent;
 	}
+
+	public void setType(EventType type) {
+		this.type = type;
+	}
+
+	public EventType getType() {
+		return type;
+	}
+
 }

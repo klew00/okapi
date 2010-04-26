@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans;
 
 import net.sf.okapi.common.ClassUtil;
+import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
@@ -28,16 +29,25 @@ import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 public class ReferenceBean extends PersistenceBean<Object> {
 
 	private long reference;
+	private String className;
 
 	@Override
 	protected Object createObject(IPersistenceSession session) {
-		return null;
+		Object obj = session.getObject(reference);
+		if (obj == null) {
+			IPersistenceBean proxy = BeanMapper.getProxy(className);
+			if (proxy != null)
+				// Create an object and put to cache so getObject() can find it from PersistenceBean.get()
+				obj = proxy.get(ClassUtil.getClass(className), session); 
+		}
+		return obj;
 	}
 
 	@Override
 	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj == null) return;
 		
+		className = ClassUtil.getQualifiedClassName(obj);
 		session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
 		
 		long rid = session.getRefIdForObject(obj);
@@ -57,8 +67,6 @@ public class ReferenceBean extends PersistenceBean<Object> {
 
 	@Override
 	protected void setObject(Object obj, IPersistenceSession session) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void setReference(long reference) {
@@ -67,5 +75,13 @@ public class ReferenceBean extends PersistenceBean<Object> {
 
 	public long getReference() {
 		return reference;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
+
+	public String getClassName() {
+		return className;
 	}
 }

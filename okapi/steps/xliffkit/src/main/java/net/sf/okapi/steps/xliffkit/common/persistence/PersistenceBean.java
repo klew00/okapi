@@ -20,19 +20,24 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
+import net.sf.okapi.common.ClassUtil;
+
 public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceBean {
 	
 	private long refId = 0;
+	private boolean busy = false;
 
 	protected abstract PutCoreClassHere createObject(IPersistenceSession session);
 	protected abstract void setObject(PutCoreClassHere obj, IPersistenceSession session);
 	protected abstract void fromObject(PutCoreClassHere obj, IPersistenceSession session);
 	
+	public PersistenceBean() {
+		super();
+		refId = ReferenceResolver.generateRefId();
+	}
+	
 	@Override
 	public long getRefId() {
-		if (refId == 0)
-			refId = ReferenceResolver.generateRefId();
-		
 		return refId;
 	}
 
@@ -41,9 +46,34 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 		this.refId = refId;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(Class<T> classRef, IPersistenceSession session) {
-		PutCoreClassHere obj = createObject(session);
+		// Try to get one created by ReferenceBean.createObject()
+		PutCoreClassHere obj = (PutCoreClassHere) session.getObject(refId); 
+		if (obj == null) {			
+			if (busy) {
+				Class<?> objRef = BeanMapper.getObjectClass(this.getClass());
+				if (objRef == classRef)
+					throw new RuntimeException(String.format("PersistenceBean: recursive object creation in %s.%s", 
+						ClassUtil.getQualifiedClassName(this.getClass()),
+						"createObject()"));
+				else {
+					IPersistenceBean proxy = BeanMapper.getProxy(classRef);
+					if (proxy != null)
+						obj = (PutCoreClassHere) proxy.get(classRef, session);
+				}
+			}
+			else {
+				busy = true; // recursion protection
+				try {
+					obj = createObject(session);
+				}
+				finally {
+					busy = false;
+				}
+			}			
+		}					
 		if (obj != null) {
 			session.setRefIdForObject(obj, refId);		
 			setObject(obj, session);

@@ -43,6 +43,9 @@ import net.sf.okapi.filters.table.TableFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
+import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
+import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEvent;
+import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEventBean;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
@@ -183,7 +186,7 @@ public class XLIFFKitWriterTest {
 	private static final LocaleId DEDE = new LocaleId("de", "de");
 	private static final LocaleId ITIT = new LocaleId("it", "it");
 	
-	// DEBUG 	@Test
+	// DEBUG 		@Test
 	public void testPackageFormat() throws URISyntaxException, MalformedURLException {
 
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
@@ -194,42 +197,42 @@ public class XLIFFKitWriterTest {
 		new Pipeline(
 				"Test pipeline for XLIFFKitWriterStep",
 				new Batch(
-						new BatchItem(
-								new URL("file", null, src1Path + "test5.txt"),
-								"UTF-8",
-								ENUS,
-								FRFR)
-						,								
-						new BatchItem(
-								new URL("file", null, src1Path + "test6.txt"),
-								"UTF-8",
-								ITIT,
-								LocaleId.CHINA_CHINESE)
-						,
-						new BatchItem(
-								new URL("file", null, src2Path + "test7.txt"),
-								"UTF-8",
-								ENUS,
-								FRFR),
-								
-						new BatchItem(
-								new URL("file", null, src1Path + "test8.txt"),
-								"UTF-8",
-								ITIT,
-								LocaleId.CHINA_CHINESE)
-						,
-						new BatchItem(
-								new URL("file", null, src2Path + "test5.txt"),
-								"UTF-8",
-								ENUS,
-								DEDE),
-								
-						new BatchItem(
-								new URL("file", null, src1Path + "test8.txt"),
-								"UTF-8",
-								ITIT,
-								DEDE)
-						,
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test5.txt"),
+//								"UTF-8",
+//								ENUS,
+//								FRFR)
+//						,								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test6.txt"),
+//								"UTF-8",
+//								ITIT,
+//								LocaleId.CHINA_CHINESE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test7.txt"),
+//								"UTF-8",
+//								ENUS,
+//								FRFR),
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test8.txt"),
+//								"UTF-8",
+//								ITIT,
+//								LocaleId.CHINA_CHINESE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test5.txt"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE),
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test8.txt"),
+//								"UTF-8",
+//								ITIT,
+//								DEDE)
+//						,
 						new BatchItem(
 								new URL("file", null, src2Path + "test9.odt"),
 								"UTF-8",
@@ -278,7 +281,7 @@ public class XLIFFKitWriterTest {
 		).execute();
 	}
 	
-	// DEBUG 	@Test
+	// DEBUG @Test
 	public void testPackageFormat2() throws URISyntaxException, MalformedURLException {
 
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
@@ -406,7 +409,102 @@ public class XLIFFKitWriterTest {
 		).execute();
 	}
 	
-	// DEBUG 	@Test
+	// DEBUG 		@Test
+	public void testPackageFormat4() throws URISyntaxException, MalformedURLException {
+
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		String src1Path = pathBase + "src1/";
+		String src2Path = pathBase + "src2/";
+		//System.out.println(pathBase);
+		
+		new Pipeline(
+				"Test pipeline for XLIFFKitWriterStep",
+				new Batch(
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test5.txt"),
+//								"UTF-8",
+//								ENUS,
+//								FRFR)
+//						,								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test6.txt"),
+//								"UTF-8",
+//								ITIT,
+//								LocaleId.CHINA_CHINESE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test7.txt"),
+//								"UTF-8",
+//								ENUS,
+//								FRFR),
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test8.txt"),
+//								"UTF-8",
+//								ITIT,
+//								LocaleId.CHINA_CHINESE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test5.txt"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE),
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test8.txt"),
+//								"UTF-8",
+//								ITIT,
+//								DEDE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test9.odt"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE)
+//						,
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test10.html"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE),
+// TODO DOCX is not mapped to any default filter configuration								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test11.docx"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE)
+//						
+						new BatchItem(
+								(new URL("file", null, src1Path + "BoldWorld.docx")).toURI(),
+								"UTF-8",
+								"okf_openxml",
+								null,
+								"UTF-8",
+								ENUS,
+								DEDE)
+
+						),
+								
+				new RawDocumentToFilterEventsStep()
+				,				
+				new PipelineStep(new LeveragingStep(), 
+						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new Parameter("threshold", 80),
+						new Parameter("fillTarget", true)
+				),
+				
+				new PipelineStep(
+						new XLIFFKitWriterStep(),								
+						new Parameter("gMode", true),
+						new Parameter("includeOriginal", true),
+						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xliff.kit").toURI().toString()))
+		).execute();
+	}
+	
+	// DEBUG 		@Test
 	public void testReferences() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		
@@ -534,7 +632,7 @@ public class XLIFFKitWriterTest {
 		}
 	}		
 	
-	// DEBUG 	@Test
+	// DEBUG 		@Test
 	public void testReferences2() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		
@@ -600,4 +698,38 @@ public class XLIFFKitWriterTest {
 			writerStep.handleEvent(event);
 		}
 	}
+	
+	// DEBUG 		@Test
+	public void testReferences3() throws MalformedURLException, URISyntaxException {
+		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences3.xliff.kit").toURI());
+		writerStep.setTargetLocale(DEDE);
+		net.sf.okapi.steps.xliffkit.writer.Parameters params = 
+			(net.sf.okapi.steps.xliffkit.writer.Parameters) writerStep.getParameters();
+		
+		params.setIncludeSource(false);
+		params.setIncludeOriginal(false);
+		
+		BeanMapper.registerBean(TestEvent.class, TestEventBean.class);
+		
+		TestEvent e1 = new TestEvent("e1");
+		TestEvent e2 = new TestEvent("e2");
+		e2.setParent(e1);
+		e1.setParent(e2);
+
+		writerStep.handleEvent(new Event(EventType.START_BATCH));
+		StartDocument sd = new StartDocument("sd1");
+		sd.setName("test_refs3.txt");
+		sd.setLocale(ENUS);
+		sd.setFilterWriter(new GenericFilterWriter(null, null));
+		
+		writerStep.handleEvent(new Event(EventType.START_DOCUMENT, sd));
+		writerStep.handleEvent(e1);
+		writerStep.handleEvent(e2);
+		writerStep.handleEvent(new Event(EventType.END_DOCUMENT));
+		writerStep.handleEvent(new Event(EventType.END_BATCH));
+	}
+
 }

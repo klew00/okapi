@@ -55,7 +55,7 @@ public class ZipSkeletonBean extends GenericSkeletonBean {
 			}
 						
 		if (!Util.isEmpty(parts))
-			skel = new ZipSkeleton(super.get(GenericSkeleton.class, session), ze);
+			skel = new ZipSkeleton(super.createObject(session), ze);
 		else if (zf != null)
 			skel = new ZipSkeleton(zf);
 		else //if (ze != null)

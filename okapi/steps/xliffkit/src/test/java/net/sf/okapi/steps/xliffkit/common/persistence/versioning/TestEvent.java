@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,15 +18,43 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.common.persistence;
+package net.sf.okapi.steps.xliffkit.common.persistence.versioning;
 
-public interface IPersistenceBean {
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 
-	<T> T get(Class<T> classRef, IPersistenceSession session);
+public class TestEvent extends Event{
+
+	private String id;
+	private TestEvent parent;
+	private EventType type;
 	
-	<T> IPersistenceBean set(T obj, IPersistenceSession session); // Returns self to allow chaining
+	public TestEvent(String id) {
+		super(EventType.NO_OP);
+		this.setId(id);
+	}
 
-	long getRefId();
-	
-	void setRefId(long refId);
+	public void setParent(TestEvent parent) {
+		this.parent = parent;
+	}
+
+	public TestEvent getParent() {
+		return parent;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setType(EventType type) {
+		this.type = type;
+	}
+
+	public EventType getType() {
+		return type;
+	}
 }

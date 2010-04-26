@@ -22,6 +22,8 @@ package net.sf.okapi.steps.xliffkit.reader;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.StartDocument;
 
 public class EventLogger extends BasePipelineStep {
 
@@ -38,13 +40,26 @@ public class EventLogger extends BasePipelineStep {
 		return "Event logger";
 	}
 
+	private String getEventDescr(Event event) {
+		String res = ""; 
+		if (event.getResource() != null)
+			res = String.format("  [%s]", event.getResource().getId());
+		
+		switch ( event.getEventType() ) {
+			case START_DOCUMENT:
+				res +=  "  " + ((StartDocument) event.getResource()).getName();
+				break;
+		}
+		return res;
+	}
+	
 	private void printEvent(Event event) {
 		String indentStr = "";
 		for (int i = 0; i < indent; i++) 
 			indentStr += "  ";
 		
 		System.out.print(indentStr);
-		System.out.print(event.getEventType());
+		System.out.print(event.getEventType() + getEventDescr(event));
 		System.out.println();
 	}
 	
@@ -74,7 +89,7 @@ public class EventLogger extends BasePipelineStep {
 			
 		default:
 			if (!increasing) System.out.println();
-				printEvent(event);
+			printEvent(event);
 		}
 		
 		

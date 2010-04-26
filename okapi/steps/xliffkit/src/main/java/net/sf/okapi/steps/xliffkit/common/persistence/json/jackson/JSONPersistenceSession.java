@@ -106,6 +106,10 @@ public class JSONPersistenceSession extends PersistenceSession {
 		
 		IPersistenceBean bean = null;
 		try {
+			JsonToken token = parser.nextToken();
+			if (token == JsonToken.END_OBJECT)
+				return null;
+
 			String fieldName = parser.getCurrentName();
 			if (fieldName != null && name != null && !fieldName.startsWith(name))
 				throw(new OkapiIOException(String.format("JSONPersistenceSession: input stream " +
@@ -113,9 +117,9 @@ public class JSONPersistenceSession extends PersistenceSession {
 			parser.nextToken();
 			
 			bean = mapper.readValue(parser, beanClass);
-			JsonToken token = parser.nextToken();
-			if (token == JsonToken.END_OBJECT)
-				end();
+//			JsonToken token = parser.nextToken();
+//			if (token == JsonToken.END_OBJECT)
+//				end();
 						
 		} catch (JsonParseException e) {			
 			throw new RuntimeException(MSG_JSON_READ_EX, e);
@@ -216,7 +220,7 @@ public class JSONPersistenceSession extends PersistenceSession {
 			parser.nextToken();
 			if (token != JsonToken.START_OBJECT)
 				throw(new OkapiIOException("JSONPersistenceSession: input stream is broken"));
-			parser.nextToken();
+			//parser.nextToken();
 			
 		} catch (JsonParseException e) {
 			throw(new OkapiIOException("JSONPersistenceSession: input stream is broken. ", e));

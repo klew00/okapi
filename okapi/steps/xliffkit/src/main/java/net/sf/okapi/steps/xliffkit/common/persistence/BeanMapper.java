@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,12 +23,16 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
@@ -96,14 +100,24 @@ public class BeanMapper {
 	
 	private static final String MAPPER_NOT_INIT = "BeanMapper: bean mapping is not initialized";
 	private static final String MAPPER_UNK_CLASS = "BeanMapper: unknown class: %s";		
-	private static final String MAPPER_EMPTY_REF = "BeanMapper: Class reference cannot be empty";
+	private static final String MAPPER_EMPTY_REF = "BeanMapper: class reference cannot be empty";
+	
+	private static final String OBJ_MAPPER_NOT_INIT = "BeanMapper: obhect mapping is not initialized";
+	private static final String OBJ_MAPPER_EMPTY_REF = "BeanMapper: bean class reference cannot be empty";
+	
+	private static final String PROXIES_CANT_INST = "BeanMapper: cannot instantiate a proxy for %s";
+	private static final String PROXIES_NOT_INIT = "BeanMapper: proxy mapping is not initialized";
 	
 	// !!! LinkedHashMap to preserve registration order
-	private static LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> beanMapping;
-	//private static ConcurrentHashMap<Class<? extends IPersistenceBean>, IPersistenceBean> persistenceCache;
+	private static LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> beanClassMapping;
+	private static LinkedHashMap<Class<? extends IPersistenceBean>, Class<?>> objectClassMapping;
+	private static ConcurrentHashMap<String, IPersistenceBean> proxies; // used in ref resolution
+	private static final Logger LOGGER = Logger.getLogger(BeanMapper.class.getName());
 	
 	static {
-		beanMapping = new LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> ();		
+		beanClassMapping = new LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> ();
+		objectClassMapping = new LinkedHashMap<Class<? extends IPersistenceBean>, Class<?>> ();
+		proxies = new ConcurrentHashMap<String, IPersistenceBean>();
 		registerBeans();
 	}
 
@@ -113,12 +127,35 @@ public class BeanMapper {
 		if (classRef == null || beanClassRef == null)
 			throw(new IllegalArgumentException());
 		
-		if (beanMapping == null)
+		if (beanClassMapping == null)
 			throw(new RuntimeException(MAPPER_NOT_INIT));
 		
 		// TODO Make sure if a bean for already registered class was registered later, the later bean takes precedence
 		// HashMap.put(): "If the map previously contained a mapping for the key, the old value is replaced". Test it.
-		beanMapping.put(classRef, beanClassRef);		
+		beanClassMapping.put(classRef, beanClassRef);
+				
+		if (objectClassMapping == null)
+			throw(new RuntimeException(OBJ_MAPPER_NOT_INIT));
+		
+		objectClassMapping.put(beanClassRef, classRef);
+		
+		if (proxies == null)
+			throw(new RuntimeException(PROXIES_NOT_INIT));
+		
+//		String beanClassName = ClassUtil.getQualifiedClassName(beanClassRef);
+//		try {
+//			proxies.put(beanClassName, ClassUtil.instantiateClass(beanClassRef));
+//		} catch (Exception e) {
+//			throw new RuntimeException(String.format(PROXIES_CANT_INST, beanClassName), e);
+//		}
+		
+		String objClassName = ClassUtil.getQualifiedClassName(classRef);
+		String beanClassName = ClassUtil.getQualifiedClassName(classRef);
+		try {
+			proxies.put(objClassName, ClassUtil.instantiateClass(beanClassRef));
+		} catch (Exception e) {
+			throw new RuntimeException(String.format(PROXIES_CANT_INST, beanClassName), e);
+		}		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -126,22 +163,49 @@ public class BeanMapper {
 		if (classRef == null)
 			throw(new IllegalArgumentException(MAPPER_EMPTY_REF));
 	
-		if (beanMapping == null)
+		if (beanClassMapping == null)
 			throw(new RuntimeException(MAPPER_NOT_INIT));
 		
-		Class<? extends IPersistenceBean> beanClass = beanMapping.get(classRef);
-		
+		Class<? extends IPersistenceBean> beanClass = beanClassMapping.get(classRef);
+				
 		// If not found explicitly, try to find a matching bean
-		if (beanClass == null)
-			if (IPersistenceBean.class.isAssignableFrom(classRef))
+		if (beanClass == null) {
+			LOGGER.warning(String.format("No bean class registered for %s", ClassUtil.getQualifiedClassName(classRef)));
+			if (IPersistenceBean.class.isAssignableFrom(classRef)) // A bean is a bean for itself 
 				beanClass = (Class<? extends IPersistenceBean>) classRef;
 			else
-			for (Class<?> cls : beanMapping.keySet())
+			for (Class<?> cls : beanClassMapping.keySet())
 				if (cls.isAssignableFrom(classRef)) {
-					beanClass = beanMapping.get(cls);
+					beanClass = beanClassMapping.get(cls);
 					break;
 				}		
+		}
 		return beanClass;		
+	}
+	
+	public static Class<?> getObjectClass(Class<? extends IPersistenceBean> beanClassRef) {
+		if (beanClassRef == null)
+			throw(new IllegalArgumentException(OBJ_MAPPER_EMPTY_REF));
+	
+		if (objectClassMapping == null)
+			throw(new RuntimeException(OBJ_MAPPER_NOT_INIT));
+		
+		return objectClassMapping.get(beanClassRef);		
+	}
+	
+	public static IPersistenceBean getProxy(String objClassName) {
+		if (Util.isEmpty(objClassName)) return null;
+		
+		return proxies.get(objClassName);
+	}
+	
+	public static IPersistenceBean getProxy(Class<?> objClassRef) {
+		if (objClassRef == null) return null;
+				
+//		Class<? extends IPersistenceBean> beanClassRef = getBeanClass(objClassRef);
+//		if (beanClassRef == null) return null;
+//		return getProxy(beanClassRef.getName());
+		return getProxy(objClassRef.getName());
 	}
 	
 	public static Class<? extends IPersistenceBean> getBeanClass(String className) {

@@ -95,6 +95,8 @@ public interface IPersistenceSession {
 		
 	long getRefIdForObject(Object obj);
 	
+	public Object getObject(long refId);
+	
 	void setRefIdForObject(Object obj, long refId);
 
 	void setReference(long parentRefId, long childRefId);

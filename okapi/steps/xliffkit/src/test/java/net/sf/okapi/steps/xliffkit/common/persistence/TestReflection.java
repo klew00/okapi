@@ -23,7 +23,10 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +39,7 @@ import java.util.TreeSet;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.PropertyBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.TextUnitBean;
 
 import org.junit.Test;
 
@@ -51,12 +55,12 @@ public class TestReflection {
 		List<PropertyBean> list;
 		Map<Long, PropertyBean> map;
 			
-		private void initBean1() {
+		public void initBean1() {
 			bean1 = new PropertyBean();
 			bean1.setRefId(111111);
 		}
 		
-		private void initBeans() {
+		public void initBeans() {
 			list = new ArrayList<PropertyBean>();
 			PropertyBean b = new PropertyBean();
 			b.setRefId(1);
@@ -68,6 +72,15 @@ public class TestReflection {
 		}
 	}
 	
+	private class TestClass2 extends TestClass {
+		PropertyBean bean3;
+		
+		public void initBean3() {
+			bean3 = new PropertyBean();
+			bean3.setRefId(33333);
+		}
+	}
+	
 	private class BaseClasses {
 		Map<Object, Object> map;
 		Collection<Object> coll;
@@ -76,11 +89,62 @@ public class TestReflection {
 		Map<IPersistenceBean, IPersistenceBean> map4;
 	}
 		
-	// DEBUG
-	@Test
+	// DEBUG	@Test
+	public void testMethods() {
+//		TestClass testClass1 = new TestClass();
+//		TestClass testClass2 = new TestClass2();
+//		
+		Method[] methods = null;
+//		methods = TestClass2.class.getDeclaredMethods();
+//		System.out.println(methods.length);
+//		
+//		methods = TestClass.class.getDeclaredMethods();
+//		System.out.println(methods.length);
+//		
+//		methods = TestClass.class.getMethods();
+//		System.out.println(methods.length);
+		
+		methods = TextUnitBean.class.getMethods();
+		System.out.println(methods.length);
+		
+//		for (Method method : methods) {
+//			String name = method.getName();
+//			if (!name.startsWith("get")) continue;
+//			
+//			Class<?> retClass = method.getReturnType();
+//						
+//			if (IPersistenceBean.class.isAssignableFrom(retClass) ||
+//					Collection.class.isAssignableFrom(retClass) ||
+//					Map.class.isAssignableFrom(retClass) ||
+//					Array.class.isAssignableFrom(retClass)) 
+//				System.out.println(name);
+//		}
+		
+//		System.out.println("-----------");
+//		List<Method> getters = BeanMapper.getBeanGetters(TextUnitBean.class);
+//		System.out.println(getters.size());
+//		for (Method method : getters) {
+//			System.out.println(method.getName());
+//		}
+//		
+//		System.out.println("-----------");
+//		List<Method> setters = BeanMapper.getBeanSetters(TextUnitBean.class);
+//		System.out.println(setters.size());
+//		for (Method method : setters) {
+//			System.out.println(method.getName());
+//		}
+	}
+	
+	// DEBUG	@Test
 	public void testFields() throws IllegalArgumentException, IllegalAccessException {
 		TestClass testClass1 = new TestClass();
+		TestClass testClass2 = new TestClass2();
+		
 		Field[] fields = null;
+		fields = TestClass2.class.getDeclaredFields();
+		System.out.println(fields.length);
+		fields = TestClass2.class.getFields();
+		System.out.println(fields.length);
 		
 //		Field[] fields = TestClass.class.getFields();
 //		System.out.println(fields.length);
@@ -132,19 +196,20 @@ public class TestReflection {
 		System.out.println(bb0);
 	}
 
-	// DEBUG
-	@Test
-	public void testSpeed() throws IllegalArgumentException, IllegalAccessException {
+	// DEBUG	@Test
+	public void testSpeed() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		TestClass testClass1 = new TestClass();
 		Field[] fields = TestClass.class.getDeclaredFields();
+		int loops = 0;
+		long start = 0;
 		
 		//---------------------------
-		int loops = 100000000;
+		loops = 100000000;
 
 		testClass1.initBean1();
 		
 		PropertyBean b0 = testClass1.bean1;
-		long start = System.currentTimeMillis();
+		start = System.currentTimeMillis();
 		for(int i = 0; i < loops; i++) {			
 			long refId = b0.getRefId();
 		}
@@ -158,7 +223,8 @@ public class TestReflection {
 			long refId = b0.getRefId();
 		}
 		System.out.println(loops + " reflection: " + (System.currentTimeMillis() - start) + " milliseconds.");
-
+		System.out.println();
+		
 		//---------------------------
 		loops = 1000000;
 		
@@ -176,22 +242,45 @@ public class TestReflection {
 			long refId = b0.getRefId();
 		}
 		System.out.println(loops + " reflection: " + (System.currentTimeMillis() - start) + " milliseconds.");
+		System.out.println();
 		
 		start = System.currentTimeMillis();
 		for(int i = 0; i < loops; i++) {
 			TextUnit tu = new TextUnit("tu1");
 		}
-		System.out.println(loops + " TextUnit creation: " + (System.currentTimeMillis() - start) + " milliseconds.");
+		System.out.println("----" + loops + " TextUnit creation: " + (System.currentTimeMillis() - start) + " milliseconds.");
 		
 		start = System.currentTimeMillis();
 		for(int i = 0; i < loops; i++) {
 			Property tu = new Property("name", "value");
 		}
 		System.out.println(loops + " Property creation: " + (System.currentTimeMillis() - start) + " milliseconds.");
+		System.out.println();
+		
+		//---------------------------
+		loops = 10000;
+		
+		start = System.currentTimeMillis();
+		for(int i = 0; i < loops; i++) {
+			BeanMapper.registerBean(TextUnit.class, TextUnitBean.class);
+		}
+		System.out.println(loops + " registerBean(): " + (System.currentTimeMillis() - start) + " milliseconds.");
+		
+//		//---------------------------
+//		loops = 1000000;
+//		List<Method> getters = BeanMapper.getBeanGetters(TextUnitBean.class);
+//		TextUnit tu = new TextUnit("tu1");
+//		TextUnitBean tub = new TextUnitBean();
+//		start = System.currentTimeMillis();		
+//		for(int i = 0; i < loops; i++) {
+//			for (Method method : getters) {
+//				Object res = method.invoke(tub, (Object[]) null);
+//			}
+//		}
+//		System.out.println("----" + loops + " TextUnit reflection: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
 
-	// DEBUG
-	@Test
+	// DEBUG	@Test
 	public void testClasses() {
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		Collection<Object> collection = new ArrayList<Object>();

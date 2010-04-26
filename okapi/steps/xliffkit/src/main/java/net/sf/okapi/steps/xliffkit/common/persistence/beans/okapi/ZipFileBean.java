@@ -40,12 +40,14 @@ public class ZipFileBean extends PersistenceBean<ZipFile> {
 
 	private String name;  // ZIP file short name
 	private List<ZipEntryBean> entries = new ArrayList<ZipEntryBean>(); // enumeration of the ZIP file entries
-	boolean empty;
+	boolean empty = true;
 	
 	private static ZipFile zipFile;
 
 	@Override
 	protected ZipFile createObject(IPersistenceSession session) {
+		if (Util.isEmpty(name) || empty) return null;
+		
 		File tempZip = null;
 		try {
 			tempZip = File.createTempFile("~temp", ".zip");
@@ -90,8 +92,6 @@ public class ZipFileBean extends PersistenceBean<ZipFile> {
 	@Override
 	protected void fromObject(ZipFile obj, IPersistenceSession session) {
 		if (obj == null) return;
-		
-		empty = true;
 		
 		name = Util.getFilename(obj.getName(), true);
 		

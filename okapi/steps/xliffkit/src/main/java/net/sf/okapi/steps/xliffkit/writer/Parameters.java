@@ -77,6 +77,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		}
 	}
 
+	@Override
 	public String toString () {
 		buffer.reset();
 		

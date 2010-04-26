@@ -39,17 +39,39 @@ public class ReferenceResolver {
 	private static long idCounter = 0;
 	private long rootId = 0;
 	private static Map<Object, Long> refIdLookup = new ConcurrentHashMap<Object, Long>();
+	private static Map<Long, Object> objectLookup = new ConcurrentHashMap<Long, Object>();
 	private static Map<Long, Long> rootLookup = new ConcurrentHashMap<Long, Long>();
 	private static Map<Object, IPersistenceBean> beanCache = new ConcurrentHashMap<Object, IPersistenceBean>();
+	private static Map<Long, IPersistenceBean> beanCache2 = new ConcurrentHashMap<Long, IPersistenceBean>();
 	private Map<Long, Set<Long>> references = new LinkedHashMap<Long, Set<Long>>();
-	private List<List<Long>> frames = new ArrayList<List<Long>>();	
+	private Set<Set<Long>> frames = new TreeSet<Set<Long>>(new Comparator<Set<Long>>() {
+		@Override
+		public int compare(Set<Long> frame1, Set<Long> frame2) {
+			if (frame1 == null || frame2 == null) return 0;
+			if (frame1.size() < 1 || frame2.size() < 1) return 0;
+			
+			// Frames are sorted by the first element
+			long e1 = frame1.iterator().next();
+			long e2 = frame2.iterator().next();
+			
+			if (e1 < e2) 
+				return -1;
+			else 
+				if (e1 > e2) return 1;
+			else
+				return 0;
+		}
+	});	
 	private Map<Long, Set<Long>> frameLookup = new ConcurrentHashMap<Long, Set<Long>>();
 	
 	public void reset() {
 		//idCounter = 0; //!!! Sessions are not allowed to reset the counter
 		rootId = 0;
 		refIdLookup.clear();
+		objectLookup.clear();
 		rootLookup.clear();
+		beanCache.clear();
+		beanCache2.clear();
 		references.clear();
 		frames.clear();
 		frameLookup.clear();
@@ -63,16 +85,24 @@ public class ReferenceResolver {
 		return (refIdLookup.containsKey(obj)) ? refIdLookup.get(obj) : 0;
 	}
 	
+	public Object getObject(long refId) {
+		return objectLookup.get(refId);
+	}
+	
 	public long getRootId(long refId) {
 		return (rootLookup.containsKey(refId)) ? rootLookup.get(refId) : 0;
 	}
 
 	public void setRefIdForObject(Object obj, long refId) {
+		if (obj == null) return;
+		if (refId == 0) return;
+		
 		refIdLookup.put(obj, refId);  // refIdLookup.get(obj)
 		rootLookup.put(refId, rootId);
+		objectLookup.put(refId, obj);
 	}
 	
-	public void addReference(long parentRefId, long childRefId) {
+	public void setReference(long parentRefId, long childRefId) {
 		Set<Long> list = references.get(parentRefId);
 		if (list == null) {
 			list = new HashSet<Long>();
@@ -85,32 +115,35 @@ public class ReferenceResolver {
 		return references;
 	}
 	
-	private Set<Long> getFrame(long refId) {
-		return (frameLookup.containsKey(refId)) ? frameLookup.get(refId) : null;
+	public Set<Long> getFrame(long refId) {
+		return frameLookup.get(refId);
 	}
 	
 	public void updateFrames() {
 		
 		// TODO Handle idCounter overflow, when it wraps to negatives
 		
-		Set<Set<Long>> frameSet = new TreeSet<Set<Long>>(new Comparator<Set<Long>>() {
-			@Override
-			public int compare(Set<Long> frame1, Set<Long> frame2) {
-				if (frame1 == null || frame2 == null) return 0;
-				if (frame1.size() < 1 || frame2.size() < 1) return 0;
-				
-				// Frames are sorted by the first element
-				long e1 = frame1.iterator().next();
-				long e2 = frame2.iterator().next();
-				
-				if (e1 < e2) 
-					return -1;
-				else 
-					if (e1 > e2) return 1;
-				else
-					return 0;
-			}
-		});
+//		Set<Set<Long>> frameSet = new TreeSet<Set<Long>>(new Comparator<Set<Long>>() {
+//			@Override
+//			public int compare(Set<Long> frame1, Set<Long> frame2) {
+//				if (frame1 == null || frame2 == null) return 0;
+//				if (frame1.size() < 1 || frame2.size() < 1) return 0;
+//				
+//				// Frames are sorted by the first element
+//				long e1 = frame1.iterator().next();
+//				long e2 = frame2.iterator().next();
+//				
+//				if (e1 < e2) 
+//					return -1;
+//				else 
+//					if (e1 > e2) return 1;
+//				else
+//					return 0;
+//			}
+//		});
+		
+		frames.clear();
+		frameLookup.clear();
 		
 		for (Long parentRefId : references.keySet()) {
 			Set<Long> childRefs = references.get(parentRefId);
@@ -132,7 +165,7 @@ public class ReferenceResolver {
 					Set<Long> frame = new TreeSet<Long>(); // default Long comparator is used
 					frame.add(parentRoot);
 					frame.add(childRoot);
-					frameSet.add(frame);
+					frames.add(frame);
 					frameLookup.put(parentRoot, frame);
 					frameLookup.put(childRoot, frame);
 				} else 
@@ -149,16 +182,11 @@ public class ReferenceResolver {
 				if (parentFrame != null && childFrame != null) { // 11
 					// Merge frames
 					parentFrame.addAll(childFrame);
-					frameSet.remove(childFrame);
+					frames.remove(childFrame);
 					frameLookup.remove(childRoot);
 				}
 			}
-		}			
-		for (Set<Long> frame : frameSet) {
-			List<Long> frameList = new ArrayList<Long>();
-			((ArrayList<List<Long>>)frames).add(frameList);
-			frameList.addAll(frame);
-		}
+		}					
 	}
 
 	public void setRootId(long rootId) {
@@ -185,19 +213,88 @@ public class ReferenceResolver {
 	public void cacheBean(Object obj, IPersistenceBean bean) {		
 		beanCache.put(obj, bean);
 	}
+	
+	public void cacheBean(IPersistenceBean bean) {
+		if (bean == null) return;
+		beanCache2.put(bean.getRefId(), bean);
+	}
 
 	public IPersistenceBean uncacheBean(Object obj) {
 		IPersistenceBean bean = beanCache.get(obj);
 		beanCache.remove(obj); // The caller takes ownership of the object ref
 		return bean;
 	}
-
-	public List<List<Long>> getFrames() {
-		return frames;
+	
+	public IPersistenceBean uncacheBean(Long refId) {
+		IPersistenceBean bean = beanCache2.get(refId);
+		beanCache2.remove(refId);
+		return bean;
 	}
 
-	public void setFrames(List<List<Long>> frames) {
+	public List<List<Long>> getFrames() {
+		List<List<Long>> frames = new ArrayList<List<Long>>();
+		
+		for (Set<Long> frame : this.frames) {
+			List<Long> frameList = new ArrayList<Long>(frame);
+			frames.add(frameList);
+		}
+		return (List<List<Long>>) frames;
+	}
+
+	public void setFrames(List<List<?>> frames) {
 		frameLookup.clear();
-		this.frames = frames;
+		
+		for (List<?> frame : frames) {
+			Set<Long> newFrame = new TreeSet<Long>();
+			this.frames.add(newFrame);
+			Long rid = null;
+			
+			// The actual framework can read the frames as list of int of long 
+			for (Object refId : frame) {
+				if (refId instanceof Long) 
+					rid = (Long) refId;
+				else if (refId instanceof Integer)
+					rid = new Long((Integer) refId);
+				newFrame.add(rid);
+				frameLookup.put(rid, newFrame);
+			}				
+		}
+				
+//		this.frames = frames;
+//		if (frames == null) return;		
+//		if (frames.size() == 0) return;
+//		
+//		// Check the actual element type
+//		List<?> frame = frames.get(0);
+//		if (frame.size() == 0) return;
+//		Object refId = frame.get(0);
+//		if (refId instanceof Integer)
+//			System.out.println("int");
+//		else
+//			if (refId instanceof Long)
+//				System.out.println("long");
+//			else
+//				System.out.println("something else");
+		
+//		if (frames instanceof List<List<Integer>>)
+//		Class<List<List<Integer>>> intListClass;
+//		if (intListClass.isInstance(frames));
+		
+//		for (List<?> frame : frames) {
+//			for (Object refId : frame)
+//				frameLookup.put(refId, new HashSet<Long>(frame));
+//		}
+	}
+
+	/**
+	 * Checks if all beans in a given frame have been processed and their core objects are found in the cache. 
+	 * @param frame the given frame
+	 * @return true if all beans of the frame are processed
+	 */
+	public boolean isFrameAvailable(Set<Long> frame) {
+		for (Long refId : frame)
+			if (!beanCache2.containsKey(refId)) return false;
+		
+		return true;
 	}
 }

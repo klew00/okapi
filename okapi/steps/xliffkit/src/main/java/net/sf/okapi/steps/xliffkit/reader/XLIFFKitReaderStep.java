@@ -24,6 +24,8 @@ import java.io.File;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -39,13 +41,20 @@ import net.sf.okapi.steps.xliffkit.opc.OPCPackageReader;
 @UsingParameters()
 public class XLIFFKitReaderStep extends BasePipelineStep {
 
-	private IFilter reader = new OPCPackageReader();
+	private IFilter reader;
 	private boolean isDone = true;
 	private String outputPath;
 	private boolean writeTargets = false;
 	private LocaleId targetLocale; 
 	private IFilterWriter filterWriter;
 	private String outputEncoding;
+	private Parameters params;
+
+	public XLIFFKitReaderStep() {
+		super();
+		params = new Parameters();
+		reader = new OPCPackageReader();
+	}
 	
 	public String getDescription () {
 		return "Reads XLIFF translation kit. Expects: Raw document for T-kit. Sends back: filter events.";
@@ -108,13 +117,18 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 				case END_GROUP:
 				case DOCUMENT_PART:
 				case TEXT_UNIT:
-					filterWriter.handleEvent(event);
+					if (params.isGenerateTargets())
+						filterWriter.handleEvent(event);
 				}
-			}			
-			Event e = reader.next();			
-			isDone = !reader.hasNext();
+			}
+			
+			Event e = reader.next(); 
+			isDone = !reader.hasNext();			
+			if (isDone && e.getEventType() == EventType.END_DOCUMENT)
+				processEndDocument(e);
+			
 			return e;
-		}
+		}			
 	}
 	
 	@Override
@@ -136,8 +150,10 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 		StartDocument startDoc = (StartDocument)event.getResource();
 		if ( outputEncoding == null ) outputEncoding = startDoc.getEncoding();
 		
-		filterWriter = startDoc.getFilterWriter();
-		filterWriter.setOptions(targetLocale, outputEncoding);
+		if (params.isGenerateTargets()) {
+			filterWriter = startDoc.getFilterWriter();
+			filterWriter.setOptions(targetLocale, outputEncoding);
+		}		
 		
 		String srcName = startDoc.getName();
 		String outFileName = outputPath + srcName;
@@ -145,12 +161,22 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 		File outputFile = new File(outFileName);
 		Util.createDirectories(outputFile.getAbsolutePath());
 		
-		filterWriter.setOutput(outputFile.getAbsolutePath());
-		filterWriter.handleEvent(event);
+		if (params.isGenerateTargets()) {
+			filterWriter.setOutput(outputFile.getAbsolutePath());
+			filterWriter.handleEvent(event);
+		}
 	}
 	
 	private void processEndDocument (Event event) {
-		filterWriter.handleEvent(event);
-		filterWriter.close();
+		if (params.isGenerateTargets()) {
+			filterWriter.handleEvent(event);
+			filterWriter.close();
+		}
+		//isDone = !reader.hasNext();
+	}
+	
+	@Override
+	public IParameters getParameters() {
+		return params;
 	}
 }
