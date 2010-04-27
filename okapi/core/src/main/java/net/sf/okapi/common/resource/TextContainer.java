@@ -585,11 +585,11 @@ public class TextContainer implements Iterable<TextPart> {
 	 * Indicates if this container is made of a single segment that holds the
 	 * whole content (i.e. there is no other parts).
 	 * <p>When this method returns true, the methods {@link #getFirstContent()},
-	 * {@link #getFirstSegmentContent()}, {@link #getLastContent()} and
-	 * {@link #getLastSegmentContent()} return the same result.
+	 * {@link #Segments.getFirstContent()}, {@link #getLastContent()} and
+	 * {@link #Segments.getLastContent()} return the same result.
 	 * @return true if the whole content of this container is in a single segment.
 	 * @see #count()
-	 * @see #getSegmentCount()
+	 * @see #Segments.count()
 	 */
 	public boolean contentIsOneSegment () {
 		return (( parts.size() == 1 ) && parts.get(0).isSegment() );
@@ -1090,7 +1090,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * the second has the index 1, etc.
 	 * @return the part (segment or non-segment) for the given index.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
-	 * @see #getSegment(int)
+	 * @see #Segments.get(int)
 	 */
 	public TextPart get (int index) {
 		return parts.get(index);
@@ -1100,7 +1100,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * Gets the number of parts (segments and non-segments) in this container.
 	 * This method always returns at least 1.
 	 * @return the number of parts (segments and non-segments) in this container.
-	 * @see #getSegmentCount()
+	 * @see #Segments.count()
 	 */
 	public int count () {
 		return parts.size();
@@ -1139,7 +1139,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * Joins a given part with a specified number of its following parts.
 	 * <p>If the resulting part is the only part in the container and is not a segment,
 	 * it is set automatically changed into a segment. 
-	 * <p>joinPartWithNextParts(0, -1) has the same effect as joinAllSegments();
+	 * <p>joinWithNext(0, -1) has the same effect as joinAll();
 	 * @param partIndex the index of the part where to append the following parts.
 	 * @param partCount the number of parts to join. You can use -1 to indicate all the parts
 	 * after the initial one. 

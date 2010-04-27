@@ -67,7 +67,7 @@ public interface Segments extends Iterable<Segment> {
 	public void append (TextFragment fragment);
 	
 	/**
-	 * Creates a set of segments in this container. Use {@link #getCodedText()}
+	 * Creates a set of segments in this container. Use {@link #TextContainer.getCodedText()}
 	 * to get the coded text to use as the base for the segment boundaries.
 	 * If the content is already segmented, it is automatically un-segmented before the new
 	 * segmentation is applied.
@@ -79,7 +79,7 @@ public interface Segments extends Iterable<Segment> {
 	public int create (List<Range> ranges);
 
 	/**
-	 * Creates a segment in this container. Use {@link #getCodedText()}
+	 * Creates a segment in this container. Use {@link #TextContainer.getCodedText()}
 	 * to get the coded text to use as the base for the segment boundaries.
 	 * If the content is already segmented, it is automatically un-segmented before the new
 	 * segmentation is applied.
@@ -101,16 +101,16 @@ public interface Segments extends Iterable<Segment> {
 	 * Use {@link #hasText(boolean, boolean)} to check for text presence.
 	 * Use {@link #isEmpty()} to verify if the content is empty of not.
 	 * @return the number of segments in the container.
-	 * @see #count()
+	 * @see #TextContainer.count()
 	 */
 	public int count ();
 	
 	/**
 	 * Gets the content of the first segment of this container.
 	 * @return the content of the first segment of this container.
-	 * @see #getFirstContent()
-	 * @see #getLastSegmentContent()
+	 * @see #TextContainer.getFirstContent()
 	 * @see #getLastContent()
+	 * @see #TextContainer.getLastContent()
 	 */
 	public TextFragment getFirstContent ();
 	
@@ -118,8 +118,8 @@ public interface Segments extends Iterable<Segment> {
 	 * Gets the content of last segment of this container.
 	 * @return the content of the last segment of this container.
 	 * @see #getLastContent()
-	 * @see #getFirstSegmentContent()
-	 * @see #getFirstContent()
+	 * @see #TextContainer.getFirstContent()
+	 * @see #TextContainer.getFirstContent()
 	 */
 	public TextFragment getLastContent ();
 	
@@ -144,10 +144,10 @@ public interface Segments extends Iterable<Segment> {
 	 * That is: <code>getSegment(0)</code> returns the same segment as <code>getPart(0)</code> only if
 	 * the first part of the container is a segment. 
 	 * @return the segment for the given index.
-	 * <p>Use {@link #getSegment(String)} to retrieve by segment identifier.
+	 * <p>Use {@link #get(String)} to retrieve by segment identifier.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
-	 * @see #getSegment(String)
-	 * @see #get(int)
+	 * @see #get(String)
+	 * @see #TextContainer.get(int)
 	 * #see {@link #iterator()}
 	 */
 	public Segment get (int index);
@@ -156,7 +156,7 @@ public interface Segments extends Iterable<Segment> {
 	 * Merges back together all segments of this TextContainer object, and clear the 
 	 * list of segments.
 	 * The content becomes a single segment content.
-	 * @see #joinAllSegments(List)
+	 * @see #joinAll(List)
 	 */
 	public void joinAll ();
 	
@@ -179,8 +179,8 @@ public interface Segments extends Iterable<Segment> {
 	/**
 	 * Joins to a given segments all the parts between that segment and the next, as well as
 	 * the next segment.
-	 * <p>For example for the content: " [seg1] [seg2] ", the call joinSegmentWithNextSegment(0)
-	 * will give the result: " [seg1 seg2] ". And the call joinSegmentWithNextSegment(1)
+	 * <p>For example for the content: " [seg1] [seg2] ", the call joinWithNext(0)
+	 * will give the result: " [seg1 seg2] ". And the call joinWithNext(1)
 	 * will give the result: " [seg1] [seg2] " (no change because there is no segment after
 	 * the segment 1.
 	 * @param segmentIndex index of the segment (not the part) where to append the next segment. 
