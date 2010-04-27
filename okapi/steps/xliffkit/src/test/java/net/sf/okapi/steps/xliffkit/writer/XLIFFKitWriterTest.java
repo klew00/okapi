@@ -699,7 +699,8 @@ public class XLIFFKitWriterTest {
 		}
 	}
 	
-	// DEBUG 		@Test
+	// DEBUG 		
+	@Test
 	public void testReferences3() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		
@@ -732,4 +733,51 @@ public class XLIFFKitWriterTest {
 		writerStep.handleEvent(new Event(EventType.END_BATCH));
 	}
 
+	// DEBUG 		
+	@Test
+	public void testReferences4() throws MalformedURLException, URISyntaxException {
+		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences4.xliff.kit").toURI());
+		writerStep.setTargetLocale(DEDE);
+		net.sf.okapi.steps.xliffkit.writer.Parameters params = 
+			(net.sf.okapi.steps.xliffkit.writer.Parameters) writerStep.getParameters();
+		
+		params.setIncludeSource(false);
+		params.setIncludeOriginal(false);
+		
+		BeanMapper.registerBean(TestEvent.class, TestEventBean.class);
+		
+		TestEvent e1 = new TestEvent("e1");
+		TestEvent e2 = new TestEvent("e2");
+		TestEvent e3 = new TestEvent("e3");
+		TestEvent e4 = new TestEvent("e4");
+		TestEvent e5 = new TestEvent("e5");
+		TestEvent e6 = new TestEvent("e6");
+		TestEvent e7 = new TestEvent("e7");
+		
+		e1.setParent(e3);
+		e3.setParent(e4);
+		e2.setParent(e6);
+		e7.setParent(e6);
+		e5.setParent(e2);
+
+		writerStep.handleEvent(new Event(EventType.START_BATCH));
+		StartDocument sd = new StartDocument("sd1");
+		sd.setName("test_refs4.txt");
+		sd.setLocale(ENUS);
+		sd.setFilterWriter(new GenericFilterWriter(null, null));
+		
+		writerStep.handleEvent(new Event(EventType.START_DOCUMENT, sd));
+		writerStep.handleEvent(e1);
+		writerStep.handleEvent(e2);
+		writerStep.handleEvent(e3);
+		writerStep.handleEvent(e4);
+		writerStep.handleEvent(e5);
+		writerStep.handleEvent(e6);
+		writerStep.handleEvent(e7);
+		writerStep.handleEvent(new Event(EventType.END_DOCUMENT));
+		writerStep.handleEvent(new Event(EventType.END_BATCH));
+	}
 }

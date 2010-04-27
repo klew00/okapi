@@ -68,13 +68,14 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 				busy = true; // recursion protection
 				try {
 					obj = createObject(session);
+					// System.out.println(refId + ":  " + obj);
 				}
 				finally {
 					busy = false;
 				}
 			}			
 		}					
-		if (obj != null) {
+		if (obj != null && refId != 0) { // not for proxies
 			session.setRefIdForObject(obj, refId);		
 			setObject(obj, session);
 		}		
@@ -83,7 +84,7 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public IPersistenceBean set(Object obj, IPersistenceSession session) {
+	public <T> IPersistenceBean set(T obj, IPersistenceSession session) {
 		if (obj != null)
 			fromObject((PutCoreClassHere) obj, session);
 		

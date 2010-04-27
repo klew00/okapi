@@ -152,7 +152,11 @@ public class BeanMapper {
 		String objClassName = ClassUtil.getQualifiedClassName(classRef);
 		String beanClassName = ClassUtil.getQualifiedClassName(classRef);
 		try {
-			proxies.put(objClassName, ClassUtil.instantiateClass(beanClassRef));
+			IPersistenceBean proxy = ClassUtil.instantiateClass(beanClassRef);
+			if (proxy != null)
+				proxy.setRefId(0); // to distinguish from regular beans 
+			
+			proxies.put(objClassName, proxy);
 		} catch (Exception e) {
 			throw new RuntimeException(String.format(PROXIES_CANT_INST, beanClassName), e);
 		}		

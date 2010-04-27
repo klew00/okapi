@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.xliffkit.reader;
 
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -115,7 +116,7 @@ public class XLIFFKitReaderTest {
 		).execute();
 	}
 
-	// DEBUG 		@Test
+	// DEBUG 	@Test
 	public void testReferences() {
 		
 		new Pipeline(
@@ -140,7 +141,7 @@ public class XLIFFKitReaderTest {
 		).execute();
 	}
 
-// DEBUG 		@Test
+// DEBUG @Test
 	public void testReferences2() {
 		
 		new Pipeline(
@@ -182,6 +183,12 @@ public class XLIFFKitReaderTest {
 		TestEvent e1 = session.deserialize(TestEvent.class);
 		TestEvent e2 = session.deserialize(TestEvent.class);
 		
+		assertTrue("e1".equals(e1.getId()));
+		assertTrue("e2".equals(e2.getId()));
+		
+		assertTrue("e2".equals(e1.getParent().getId()));
+		assertTrue("e1".equals(e2.getParent().getId()));
+		
 		TestEvent ed = session.deserialize(TestEvent.class); // Ending
 		TestEvent e4 = session.deserialize(TestEvent.class);
 		assertNull(e4);
@@ -189,6 +196,51 @@ public class XLIFFKitReaderTest {
 		assertNull(e5);
 		TestEvent e6 = session.deserialize(TestEvent.class);
 		assertNull(e6);
+		session.end();
+	}
+	
+	@SuppressWarnings("unused")
+	@Test
+	public void testReferences4() {
+		
+		JSONPersistenceSession session = new JSONPersistenceSession();
+		session.setItemClass(TestEvent.class);
+		session.setItemLabel("event");
+		
+		BeanMapper.registerBean(TestEvent.class, TestEventBean.class);
+		InputStream inStream = this.getClass().getResourceAsStream("test_refs4.txt.json"); 
+		session.start(inStream);		
+		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
+		
+		TestEvent e1 = session.deserialize(TestEvent.class);
+		TestEvent e2 = session.deserialize(TestEvent.class);
+		TestEvent e3 = session.deserialize(TestEvent.class);
+		TestEvent e4 = session.deserialize(TestEvent.class);
+		TestEvent e5 = session.deserialize(TestEvent.class);
+		TestEvent e6 = session.deserialize(TestEvent.class);
+		TestEvent e7 = session.deserialize(TestEvent.class);
+		
+		assertTrue("e1".equals(e1.getId()));
+		assertTrue("e2".equals(e2.getId()));
+		assertTrue("e3".equals(e3.getId()));
+		assertTrue("e4".equals(e4.getId()));
+		assertTrue("e5".equals(e5.getId()));
+		assertTrue("e6".equals(e6.getId()));
+		assertTrue("e7".equals(e7.getId()));
+		
+		assertTrue("e3".equals(e1.getParent().getId()));
+		assertTrue("e4".equals(e3.getParent().getId()));
+		assertTrue("e6".equals(e2.getParent().getId()));
+		assertTrue("e6".equals(e7.getParent().getId()));
+		assertTrue("e2".equals(e5.getParent().getId()));
+		
+		TestEvent ed = session.deserialize(TestEvent.class); // Ending
+		TestEvent e8 = session.deserialize(TestEvent.class);
+		assertNull(e8);
+		TestEvent e9 = session.deserialize(TestEvent.class);
+		assertNull(e9);
+		TestEvent e10 = session.deserialize(TestEvent.class);
+		assertNull(e10);
 		session.end();
 	}
 }

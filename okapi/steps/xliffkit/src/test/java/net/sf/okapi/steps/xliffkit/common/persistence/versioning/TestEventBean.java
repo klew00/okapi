@@ -43,7 +43,6 @@ public class TestEventBean extends PersistenceBean<TestEvent> {
 
 	@Override
 	protected void setObject(TestEvent obj, IPersistenceSession session) {
-		super.set(obj, session);
 		obj.setId(id);
 		obj.setParent(parent.get(TestEvent.class, session));
 	}
