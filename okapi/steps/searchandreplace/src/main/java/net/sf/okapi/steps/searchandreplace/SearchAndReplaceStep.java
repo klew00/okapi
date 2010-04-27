@@ -276,7 +276,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			// Temporary fix for compile and test: remove segmentation
 			//TODO: Implement case for segmented SnR
 			if ( trgCont.contentIsOneSegment() ) {
-				trgCont.joinAllSegments();
+				trgCont.getSegments().joinAll();
 			}
 			
 			String result = trgCont.getFirstPartContent().getCodedText();

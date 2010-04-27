@@ -208,14 +208,14 @@ public class XLIFFMergingStep {
 		ArrayList<Range> ranges = null;
 		if ( mergeAsSegments ) ranges = new ArrayList<Range>();
 		if ( !fromTrans.contentIsOneSegment() ) {
-			fromTrans.joinAllSegments(ranges);
+			fromTrans.getSegments().joinAll(ranges);
 		}
 		
 		// Get the source (as a clone if we need to change the segments)
 		TextContainer srcCont;
 		if ( !tu.getSource().contentIsOneSegment() ) {
 			srcCont  = tu.getSource().clone();
-			srcCont.joinAllSegments();
+			srcCont.getSegments().joinAll();
 		}
 		else {
 			srcCont = tu.getSource();

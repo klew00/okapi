@@ -683,7 +683,7 @@ public class XLIFFFilter implements IFilter {
 			}
 			else { // It's seg-source just after a <source> (not in alt-trans)
 				TextContainer cont = tc.clone();
-				cont.joinAllSegments();
+				cont.getSegments().joinAll();
 				if ( cont.compareTo(tu.getSource(), true) != 0 ) {
 					logger.warning(String.format("The <seg-source> content for the entry id='%s' is different from its <source>. The un-segmented content of <source> will be used.", tu.getId()));
 				}

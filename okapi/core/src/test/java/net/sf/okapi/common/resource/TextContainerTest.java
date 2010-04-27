@@ -177,7 +177,7 @@ public class TextContainerTest {
 		assertFalse(tc.hasBeenSegmented());
 		segments.append(new Segment("1", new TextFragment("seg2")));
 		assertTrue(tc.hasBeenSegmented());
-		tc.joinAllSegments();
+		segments.joinAll();
 		assertFalse(tc.hasBeenSegmented());
 		segments.append(new TextFragment("seg3"));
 		assertTrue(tc.hasBeenSegmented());
@@ -664,7 +664,7 @@ public class TextContainerTest {
 	@Test
 	public void testMergingSegments () {
 		TextContainer tc = createMultiSegmentContent();
-		tc.joinAllSegments();
+		tc.getSegments().joinAll();
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("[text1 text2]", fmt.printSegmentedContent(tc, true));
 	}
@@ -676,7 +676,7 @@ public class TextContainerTest {
 		//  01234567890 ranges=(0,5),(6,11)
 		assertEquals("[text1] [text2]", fmt.printSegmentedContent(tc, true));
 		ArrayList<Range> ranges = new ArrayList<Range>();
-		tc.joinAllSegments(ranges);
+		tc.getSegments().joinAll(ranges);
 		assertNotNull(ranges);
 		assertEquals(2, ranges.size());
 		assertEquals(0, ranges.get(0).start);
@@ -691,7 +691,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		assertEquals("[text1] [text2]", fmt.printSegmentedContent(tc, true));
 		ArrayList<Range> ranges = new ArrayList<Range>();
-		tc.joinAllSegments(ranges);
+		tc.getSegments().joinAll(ranges);
 		assertEquals(1, segments.count());
 		assertEquals("[text1 text2]", fmt.printSegmentedContent(tc, true));
 		segments.create(ranges);
@@ -824,7 +824,7 @@ public class TextContainerTest {
 	public void testMergingSegmentsWithCodes () {
 		TextContainer tc = createMultiSegmentContentWithCodes();
 		Segments segments = tc.getSegments();
-		tc.joinAllSegments();
+		segments.joinAll();
 		assertEquals(1, segments.count());
 		TextFragment tf = segments.getFirstContent();
 		assertEquals("text1<br/> text2<br/>", tc.toString());
@@ -842,7 +842,7 @@ public class TextContainerTest {
 		
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
 		ArrayList<Range> ranges = new ArrayList<Range>();
-		tc.joinAllSegments(ranges);
+		segments.joinAll(ranges);
 		assertEquals(1, segments.count());
 		assertEquals("[text1<1/> text2<2/>]", fmt.printSegmentedContent(tc, true));
 		List<Code> codes = segments.getFirstContent().getCodes();
@@ -1117,7 +1117,7 @@ public class TextContainerTest {
 		assertEquals("[seg2]", segments.get(1).toString());
 		assertEquals("[seg3]", segments.get(2).toString());
 		// Test merge all
-		tc.joinAllSegments();
+		segments.joinAll();
 		assertFalse(tc.hasBeenSegmented());
 		assertEquals(originalText, tc.toString());
 	}

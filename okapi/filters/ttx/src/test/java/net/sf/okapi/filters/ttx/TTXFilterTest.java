@@ -579,11 +579,12 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		Segments segments = cont.getSegments();
 		assertEquals(1, segments.count());
-		cont.joinAllSegments();
+		segments.joinAll();
 		assertEquals("text en", cont.toString());
 		cont = tu.getTarget(locESEM);
+		segments = cont.getSegments();
 		assertEquals(1, segments.count());
-		cont.joinAllSegments();
+		segments.joinAll();
 		assertEquals("text es", cont.toString());
 	}
 

@@ -194,6 +194,24 @@ public class TextContainer implements Iterable<TextPart> {
 		 */
 		public Segment get (int index);
 		
+		/**
+		 * Merges back together all segments of this TextContainer object, and clear the 
+		 * list of segments.
+		 * The content becomes a single segment content.
+		 * @see #joinAllSegments(List)
+		 */
+		public void joinAll ();
+		
+		/**
+		 * Merges back together all segments of this TextContainer object, and clear the 
+		 * list of segments. If required, the existing segment boundaries are saved in a given
+		 * list of ranges.
+		 * The content becomes a single segment content.
+		 * @param ranges a list of Ranges where to save the segments ranges, use null to 
+		 * not save the ranges.
+		 */
+		public void joinAll (List<Range> ranges);
+		
 	}
 	
 	private final Segments segments = new Segments() {
@@ -430,7 +448,18 @@ public class TextContainer implements Iterable<TextPart> {
 			// Should never occur
 			return null;
 		}
-		
+
+		@Override
+		public void joinAll () {
+			// Merge but don't remember the ranges
+			setContent(createJoinedContent(null));
+		}
+
+		@Override
+		public void joinAll (List<Range> ranges) {
+			setContent(createJoinedContent(ranges));
+		}
+
 	};
 	
 	public Segments getSegments() {
@@ -1178,30 +1207,7 @@ public class TextContainer implements Iterable<TextPart> {
 	public int getPartCount () {
 		return parts.size();
 	}
-
-	/**
-	 * Merges back together all segments of this TextContainer object, and clear the 
-	 * list of segments.
-	 * The content becomes a single segment content.
-	 * @see #joinAllSegments(List)
-	 */
-	public void joinAllSegments () {
-		// Merge but don't remember the ranges
-		setContent(createJoinedContent(null));
-	}
 	
-	/**
-	 * Merges back together all segments of this TextContainer object, and clear the 
-	 * list of segments. If required, the existing segment boundaries are saved in a given
-	 * list of ranges.
-	 * The content becomes a single segment content.
-	 * @param ranges a list of Ranges where to save the segments ranges, use null to 
-	 * not save the ranges.
-	 */
-	public void joinAllSegments (List<Range> ranges) {
-		setContent(createJoinedContent(ranges));
-	}
-
 	/**
 	 * Indicates if this container has a single segment. Note that it may have also non-segment parts.
 	 * Use {@link #contentIsOneSegment()} to check if the container is made of a asingle segment without

@@ -1179,7 +1179,7 @@ public class Aligner {
 				if ( lastMatch == -1 ) {
 					if ( targetSegments.count() > 1 ) {
 						// Several target for one source: merge them
-						target.joinAllSegments();
+						targetSegments.joinAll();
 						if ( !modified ) {
 							resetIssues();
 							modified = true;

@@ -133,7 +133,7 @@ public class SegmentationTest {
 	public void testMergeAllSegments () {
 		TextContainer tc = createSegmentedContainer();
 		Segments segments = tc.getSegments();
-		tc.joinAllSegments();
+		segments.joinAll();
 		assertEquals(1, segments.count());
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("[<1>Part 1.</1> Outside Part 2.]", fmt.printSegmentedContent(tc, true));

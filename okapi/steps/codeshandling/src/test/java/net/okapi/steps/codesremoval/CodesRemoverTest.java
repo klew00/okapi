@@ -114,7 +114,7 @@ public class CodesRemoverTest {
 		assertEquals("[C1][t1t2t3]C2[t1t2t3]", fmt.printSegmentedContent(tc, true));
 		assertEquals("t1t2t3", segments.get(1).text.toString());
 		assertEquals("t1t2t3", segments.get(2).text.toString());
-		tc.joinAllSegments();
+		segments.joinAll();
 		assertEquals("C1t1t2t3C2t1t2t3", tc.toString());
 	}
 
