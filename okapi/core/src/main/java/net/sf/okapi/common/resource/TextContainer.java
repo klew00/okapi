@@ -890,11 +890,11 @@ public class TextContainer implements Iterable<TextPart> {
 	
 	/**
 	 * Gets the content of the first part (segment or non-segment) of this container.
-	 * <p>This method always returns the same result as {@link #getFirstSegmentContent()} if {@link #contentIsOneSegment()}.
+	 * <p>This method always returns the same result as {@link #Segments.getFirstContent()} if {@link #contentIsOneSegment()}.
 	 * @return the content of the first part (segment or non-segment) of this container.
-	 * @see #getFirstSegmentContent()
+	 * @see #Segments.getFirstContent()
 	 * @see #getLastContent()
-	 * @see #getLastSegmentContent()
+	 * @see #Segments.getLastContent()
 	 */
 	public TextFragment getFirstContent () {
 		return parts.get(0).text;
@@ -902,11 +902,11 @@ public class TextContainer implements Iterable<TextPart> {
 	
 	/**
 	 * Gets the content of the last part (segment or non-segment) of this container. 
-	 * <p>This method always returns the same result as {@link #getLastSegmentContent()} if {@link #contentIsOneSegment()}.
+	 * <p>This method always returns the same result as {@link #Segments.getLastContent()} if {@link #contentIsOneSegment()}.
 	 * @return the content of the last part (segment or non-segment) of this container.
-	 * @see #getLastSegmentContent()
+	 * @see #Segments.getLastContent()
 	 * @see #getFirstContent()
-	 * @see #getFirstSegmentContent()
+	 * @see #Segments.getFirstContent()
 	 */
 	public TextFragment getLastContent () {
 		return parts.get(parts.size()-1).text;
