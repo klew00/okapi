@@ -75,7 +75,7 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 		
 		for (TextPartBean partBean : parts)
-			obj.insertPart(obj.count(), partBean.get(TextPart.class, session));
+			obj.insert(obj.count(), partBean.get(TextPart.class, session));
 		
 		obj.setHasBeenSegmentedFlag(segApplied);
 	}

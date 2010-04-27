@@ -334,7 +334,7 @@ public class SegmentationTest {
 		segmenter.computeSegments(tc);
 		tc.getSegments().create(segmenter.getRanges());
 		// Insert in holder between the two segments
-		tc.insertPart(1, new TextPart(new TextFragment(" Outside")));
+		tc.insert(1, new TextPart(new TextFragment(" Outside")));
 		return tc;
 	}
 

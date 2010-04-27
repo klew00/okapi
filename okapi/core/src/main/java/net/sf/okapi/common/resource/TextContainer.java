@@ -820,7 +820,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * @param partIndex the position where to insert the new part.
 	 * @param part the part to insert.
 	 */
-	public void insertPart (int partIndex, TextPart part) {
+	public void insert (int partIndex, TextPart part) {
 		parts.add(partIndex, part);
 		if ( part.isSegment() ) {
 			validateSegmentId((Segment)part);
