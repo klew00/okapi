@@ -1336,7 +1336,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * after the initial one. 
 	 * @return the number of parts joined to the given part (and removed from the list of parts). 
 	 */
-	public int joinPartWithNextParts (int partIndex,
+	public int joinWithNext (int partIndex,
 		int partCount)
 	{
 		if ( parts.size() == 1 ) {

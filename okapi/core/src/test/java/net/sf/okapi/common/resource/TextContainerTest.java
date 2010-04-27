@@ -763,7 +763,7 @@ public class TextContainerTest {
 	public void testJoinPartWithNextPartsSimple () {
 		TextContainer tc = createMultiSegmentContentWithCodes();
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
-		tc.joinPartWithNextParts(1, 1);
+		tc.joinWithNext(1, 1);
 		assertEquals("[text1<1/>] text2<2/>", fmt.printSegmentedContent(tc, true));
 	}
 
@@ -771,11 +771,11 @@ public class TextContainerTest {
 	public void testJoinPartWithNextPartsTwoParts () {
 		TextContainer tc = createMultiSegmentContentWithCodes();
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
-		tc.joinPartWithNextParts(0, 2);
+		tc.joinWithNext(0, 2);
 		assertEquals("[text1<1/> text2<2/>]", fmt.printSegmentedContent(tc, true));
 		tc = createMultiSegmentContentWithCodes();
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
-		tc.joinPartWithNextParts(0, -1); // Same, using -1
+		tc.joinWithNext(0, -1); // Same, using -1
 		assertEquals("[text1<1/> text2<2/>]", fmt.printSegmentedContent(tc, true));
 	}
 
@@ -785,7 +785,7 @@ public class TextContainerTest {
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
 		tc.changePart(0); // Change segment 0 into a non-segment
 		assertEquals("text1<1/> [text2<2/>]", fmt.printSegmentedContent(tc, true));
-		tc.joinPartWithNextParts(0, 2); // Join non-segment with all parts
+		tc.joinWithNext(0, 2); // Join non-segment with all parts
 		assertTrue(tc.contentIsOneSegment()); // Non-segment turned to segment because single
 		assertEquals("[text1<1/> text2<2/>]", fmt.printSegmentedContent(tc, true));
 	}
