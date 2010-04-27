@@ -97,7 +97,7 @@ public class TTXFilterTest {
 		Segments segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("en1", segments.get(0).toString());
-		cont = tu.getTarget(locESEM);
+		segments = tu.getTarget(locESEM).getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("es1", segments.get(0).toString());
 	}
@@ -120,7 +120,7 @@ public class TTXFilterTest {
 		Segments segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("en1", segments.get(0).toString());
-		cont = tu.getTarget(locESEM);
+		segments = tu.getTarget(locESEM).getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("es1", segments.get(0).toString());
 		// Check that last DF is not included in TU
