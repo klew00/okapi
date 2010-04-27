@@ -459,7 +459,7 @@ public class TTXFilter implements IFilter {
 						trgSegFrag = null;
 						if ( !inter.isEmpty() ) {
 							changeFirst = srcCont.isEmpty();
-							srcCont.appendPart(inter);
+							srcCont.append(inter);
 							inter = null;
 						}
 						current = srcSegFrag;
@@ -561,7 +561,7 @@ public class TTXFilter implements IFilter {
 							// A Tu stops the current segment, but not the text unit
 						}
 						else if (( inter != null ) && !inter.isEmpty() ) { // If no source segment: only content
-							srcCont.appendPart(current);
+							srcCont.append(current);
 							srcSegFrag = null;
 							trgSegFrag = null;
 							inter = new TextFragment();
@@ -576,7 +576,7 @@ public class TTXFilter implements IFilter {
 
 			// Check if we had only non-segmented text
 			if (( inter != null) && !inter.isEmpty() ) {
-				srcCont.appendPart(inter);
+				srcCont.append(inter);
 			}
 			
 			// Check if this it is worth sending as text unit

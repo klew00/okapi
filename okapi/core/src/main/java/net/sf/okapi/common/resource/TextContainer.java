@@ -853,7 +853,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * a segment, as the container has always at least one segment.
 	 * @param fragment the text fragment to append.
 	 */
-	public void appendPart (TextFragment fragment) {
+	public void append (TextFragment fragment) {
 		//If the last part is empty we append to it
 		if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
 			// Append the fragment to the segment or non-segment part

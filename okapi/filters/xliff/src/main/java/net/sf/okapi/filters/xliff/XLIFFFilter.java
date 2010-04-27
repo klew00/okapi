@@ -829,7 +829,7 @@ public class XLIFFFilter implements IFilter {
 					name = reader.getLocalName();
 					if ( name.equals(tagName) ) {
 						if ( !current.isEmpty() ) {
-							content.appendPart(current);
+							content.append(current);
 						}
 						return content;
 					}
@@ -872,7 +872,7 @@ public class XLIFFFilter implements IFilter {
 						String type = reader.getAttributeValue(null, "mtype");
 						if (( type != null ) && ( type.equals("seg") )) {
 							if ( !current.isEmpty() ) { // Append non-segment part
-								content.appendPart(current);
+								content.append(current);
 								// If this is have a first part that was not a segment, appending it
 								// will make it a segment because a container has always one segment.
 								// So we need to fix later when closing this first segment. 

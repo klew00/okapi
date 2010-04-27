@@ -1068,10 +1068,10 @@ public class TextContainerTest {
 	@Test
 	public void testUnwrap_Parts1SegNoText () {
 		TextContainer tc1 = new TextContainer();
-		tc1.appendPart(new TextFragment(" \t "));
-		tc1.appendPart(new TextFragment(" "));
-		tc1.appendPart(new TextFragment("  "));
-		tc1.appendPart(new TextFragment(" \n"));
+		tc1.append(new TextFragment(" \t "));
+		tc1.append(new TextFragment(" "));
+		tc1.append(new TextFragment("  "));
+		tc1.append(new TextFragment(" \n"));
 		TextContainer tc2 = tc1.clone();
 		assertEquals("[ \t ]    \n", fmt.printSegmentedContent(tc1, true));
 		tc1.unwrap(true);
@@ -1084,10 +1084,10 @@ public class TextContainerTest {
 	public void testUnwrap_MixedPartsWithText () {
 		TextContainer tc1 = new TextContainer();
 		Segments segments = tc1.getSegments();		
-		tc1.appendPart(new TextFragment(" \tt1 "));
-		tc1.appendPart(new TextFragment("   "));
+		tc1.append(new TextFragment(" \tt1 "));
+		tc1.append(new TextFragment("   "));
 		segments.append(new TextFragment("t2"));
-		tc1.appendPart(new TextFragment("  "));
+		tc1.append(new TextFragment("  "));
 		segments.append(new TextFragment(" t3\n\n"));
 		TextContainer tc2 = tc1.clone();
 		assertEquals("[ \tt1 ]   [t2]  [ t3\n\n]", fmt.printSegmentedContent(tc1, true));
@@ -1191,7 +1191,7 @@ public class TextContainerTest {
 	public void testAppendPart_AsStringAndTextFragment () {
 		TextContainer tc = new TextContainer();
 		tc.appendPart("p0");
-		tc.appendPart(new TextFragment("p1"));
+		tc.append(new TextFragment("p1"));
 		tc.changePart(0);
 		assertEquals("[p0]p1", fmt.printSegmentedContent(tc, true));
 	}
@@ -1228,7 +1228,7 @@ public class TextContainerTest {
 	private TextContainer createMultiSegmentContent () {
 		TextFragment tf = new TextFragment("text1");
 		TextContainer tc = new TextContainer(tf);
-		tc.appendPart(new TextFragment(" "));
+		tc.append(new TextFragment(" "));
 		tc.getSegments().append(new TextFragment("text2"));
 		return tc;
 	}
@@ -1237,7 +1237,7 @@ public class TextContainerTest {
 		TextFragment tf = new TextFragment("text1");
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		TextContainer tc = new TextContainer(tf);
-		tc.appendPart(new TextFragment(" "));
+		tc.append(new TextFragment(" "));
 		tf = new TextFragment("text2");
 		Code code = tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		// Segmented text have continuous code IDs sequence across segments
