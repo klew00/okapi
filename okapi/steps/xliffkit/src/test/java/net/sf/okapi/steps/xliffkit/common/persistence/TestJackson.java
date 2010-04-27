@@ -281,9 +281,9 @@ public class TestJackson {
 		tu2.setTarget(LocaleId.FRENCH, new TextContainer("french-text2"));
 		tu2.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text2"));
 		
-		tu1.getSource().appendPart("part1");
+		tu1.getSource().append("part1");
 		tu1.getSource().getSegments().append(new Segment("segId1", new TextFragment("seg1")));
-		tu1.getSource().appendPart("part2");
+		tu1.getSource().append("part2");
 		tu1.getSource().getSegments().append(new Segment("segId2", new TextFragment("seg2")));
 				
 		JSONPersistenceSession skelSession = new JSONPersistenceSession();
@@ -330,9 +330,9 @@ public class TestJackson {
 		tu2.setTarget(LocaleId.FRENCH, new TextContainer("french-text2"));
 		tu2.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text2"));
 		
-		tu1.getSource().appendPart("part1");
+		tu1.getSource().append("part1");
 		tu1.getSource().getSegments().append(new Segment("segId1", new TextFragment("seg1")));
-		tu1.getSource().appendPart("part2");
+		tu1.getSource().append("part2");
 		tu1.getSource().getSegments().append(new Segment("segId2", new TextFragment("seg2")));
 				
 		JSONPersistenceSession skelSession = new JSONPersistenceSession();

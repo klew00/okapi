@@ -936,7 +936,7 @@ public class TextUnitUtil {
 
 			// append the before inter-segment TextParts
 			for (TextPart part : sourceParts.subList(0, beforeIndex)) {
-				tu.getSource().appendPart(part);
+				tu.getSource().append(part);
 			}
 
 			// append segment parts
@@ -948,7 +948,7 @@ public class TextUnitUtil {
 
 			// append the after inter-segment TextParts
 			for (TextPart part : sourceParts.subList(afterIndex, sourceParts.size())) {
-				tu.getSource().appendPart(part);
+				tu.getSource().append(part);
 			}
 
 			// +++ target +++
@@ -972,7 +972,7 @@ public class TextUnitUtil {
 
 			// append the before inter-segment TextParts
 			for (TextPart part : targetParts.subList(0, beforeIndex)) {
-				tu.getTarget(trgLocaleId).appendPart(part);
+				tu.getTarget(trgLocaleId).append(part);
 			}
 
 			// append segment parts
@@ -985,7 +985,7 @@ public class TextUnitUtil {
 
 			// append the after inter-segment TextParts
 			for (TextPart part : targetParts.subList(afterIndex, targetParts.size())) {
-				tu.getTarget(trgLocaleId).appendPart(part);
+				tu.getTarget(trgLocaleId).append(part);
 			}
 		}
 

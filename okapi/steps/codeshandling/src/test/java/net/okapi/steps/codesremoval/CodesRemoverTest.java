@@ -105,9 +105,9 @@ public class CodesRemoverTest {
 		remover = new CodesRemover(params, LocaleId.SPANISH);
 		TextContainer tc = new TextContainer();
 		Segments segments = tc.getSegments();
-		tc.appendPart("C1"); // Becomes segment
+		tc.append("C1"); // Becomes segment
 		segments.append(createSimpleFragment());
-		tc.appendPart("C2");
+		tc.append("C2");
 		segments.append(createSimpleFragment());
 		
 		remover.processContainer(tc);

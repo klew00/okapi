@@ -1181,8 +1181,8 @@ public class TextContainerTest {
 	@Test
 	public void testAppendPart_AsPart () {
 		TextContainer tc = new TextContainer();
-		tc.appendPart(new TextPart("n0"));
-		tc.appendPart(new Segment(null, new TextFragment("s1")));
+		tc.append(new TextPart("n0"));
+		tc.append(new Segment(null, new TextFragment("s1")));
 		tc.changePart(0);
 		assertEquals("n0[s1]", fmt.printSegmentedContent(tc, true));
 	}
@@ -1190,7 +1190,7 @@ public class TextContainerTest {
 	@Test
 	public void testAppendPart_AsStringAndTextFragment () {
 		TextContainer tc = new TextContainer();
-		tc.appendPart("p0");
+		tc.append("p0");
 		tc.append(new TextFragment("p1"));
 		tc.changePart(0);
 		assertEquals("[p0]p1", fmt.printSegmentedContent(tc, true));

@@ -860,7 +860,7 @@ public class TextContainer implements Iterable<TextPart> {
 			parts.get(parts.size()-1).text.append(fragment);
 		}
 		else { // Else: like appending a TextPart
-			appendPart(new TextPart(fragment));
+			append(new TextPart(fragment));
 		} 
 	}
 	
@@ -871,8 +871,8 @@ public class TextContainer implements Iterable<TextPart> {
 	 * text is appended to the content as a new non-segment part.
 	 * @param text the text to append.
 	 */
-	public void appendPart (String text) {
-		appendPart(new TextPart(text));
+	public void append (String text) {
+		append(new TextPart(text));
 	}
 	
 	/**
@@ -884,7 +884,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * first part is automatically converted to a fragment.
 	 * @param part the TextPart to append.
 	 */
-	public void appendPart (TextPart part) {
+	public void append (TextPart part) {
 		// If the last part is empty we append to it
 		if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
 			parts.set(parts.size()-1, part);
