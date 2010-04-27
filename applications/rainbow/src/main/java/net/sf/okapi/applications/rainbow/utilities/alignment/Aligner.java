@@ -688,7 +688,7 @@ public class Aligner {
 			int n = trgList.getSelectionIndex();
 			if ( n < 0  ) return;
 			// n is segment index not part, don't use getPartIndex()
-			target.joinSegmentWithNextSegment(n);
+			target.getSegments().joinWithNext(n);
 			updateTargetDisplay();
 			fillTargetList(n);
 			trgList.setFocus();
@@ -1141,7 +1141,7 @@ public class Aligner {
 								// We have more than one, so we can join them
 								// The target segment just after the last match is the base
 								for ( int k=0; k<toJoin; k++ ) {
-									target.joinSegmentWithNextSegment(lastMatch+1);
+									target.getSegments().joinWithNext(lastMatch+1);
 								}
 								if ( !modified ) {
 									resetIssues();
@@ -1193,7 +1193,7 @@ public class Aligner {
 						// We have more than one, so we can join them
 						// The target segment just after the last match is the base
 						for ( int k=0; k<toJoin; k++ ) {
-							target.joinSegmentWithNextSegment(lastMatch+1);
+							target.getSegments().joinWithNext(lastMatch+1);
 						}
 						if ( !modified ) {
 							resetIssues();

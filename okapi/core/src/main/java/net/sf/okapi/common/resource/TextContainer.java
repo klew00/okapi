@@ -218,6 +218,18 @@ public class TextContainer implements Iterable<TextPart> {
 		 */
 		public List<Range> getRanges ();
 		
+		/**
+		 * Joins to a given segments all the parts between that segment and the next, as well as
+		 * the next segment.
+		 * <p>For example for the content: " [seg1] [seg2] ", the call joinSegmentWithNextSegment(0)
+		 * will give the result: " [seg1 seg2] ". And the call joinSegmentWithNextSegment(1)
+		 * will give the result: " [seg1] [seg2] " (no change because there is no segment after
+		 * the segment 1.
+		 * @param segmentIndex index of the segment (not the part) where to append the next segment. 
+		 * @return the number of parts joined to the given segment (and removed from the list of parts).
+		 */
+		public int joinWithNext (int segmentIndex);
+		
 	}
 	
 	private final Segments segments = new Segments() {
@@ -471,6 +483,59 @@ public class TextContainer implements Iterable<TextPart> {
 			List<Range> ranges = new ArrayList<Range>();
 			createJoinedContent(ranges);
 			return ranges;
+		}
+
+		@Override
+		public int joinWithNext (int segmentIndex) {
+			// Check if we have something to join to
+			if ( parts.size() == 1 ) {
+				return 0; // Nothing to do
+			}
+			
+			// Find the segment to join
+			int start = -1;
+			int tmp = -1;
+			for ( TextPart part : parts ) {
+				if ( part.isSegment() ) {
+					if ( ++tmp == segmentIndex ) {
+						start = tmp;
+						break;
+					}
+				}
+			}
+			
+			// Check if we have a segment at such index
+			if ( start == -1 ) {
+				//TODO: some kind of error???
+				return 0; // Not found
+			}
+			
+			// Find the next segment
+			int end = -1;
+			for ( int i=start+1; i<parts.size(); i++ ) {
+				if ( parts.get(i).isSegment() ) {
+					end = i;
+					break;
+				}
+			}
+			
+			// Check if we have a next segment
+			if ( end == -1 ) {
+				// No more segment to join
+				return 0;
+			}
+			
+			TextFragment tf = parts.get(start).getContent();
+			int count = (end-start);
+			int i = 0;
+			while ( i < count ) {
+				tf.append(parts.get(start+1).getContent());
+				parts.remove(start+1);
+				i++;
+			}
+
+			// Do not reset segApplied if one part only: keep the info that is was segmented
+			return count;
 		}
 		
 	};
@@ -1238,68 +1303,6 @@ public class TextContainer implements Iterable<TextPart> {
 			tf.append(part.getContent());
 		}
 		return tf;
-	}
-	
-	/**
-	 * Joins to a given segments all the parts between that segment and the next, as well as
-	 * the next segment.
-	 * <p>For example for the content: " [seg1] [seg2] ", the call joinSegmentWithNextSegment(0)
-	 * will give the result: " [seg1 seg2] ". And the call joinSegmentWithNextSegment(1)
-	 * will give the result: " [seg1] [seg2] " (no change because there is no segment after
-	 * the segment 1.
-	 * @param segmentIndex index of the segment (not the part) where to append the next segment. 
-	 * @return the number of parts joined to the given segment (and removed from the list of parts).
-	 */
-	public int joinSegmentWithNextSegment (int segmentIndex) {
-		// Check if we have something to join to
-		if ( parts.size() == 1 ) {
-			return 0; // Nothing to do
-		}
-		
-		// Find the segment to join
-		int start = -1;
-		int tmp = -1;
-		for ( TextPart part : parts ) {
-			if ( part.isSegment() ) {
-				if ( ++tmp == segmentIndex ) {
-					start = tmp;
-					break;
-				}
-			}
-		}
-		
-		// Check if we have a segment at such index
-		if ( start == -1 ) {
-			//TODO: some kind of error???
-			return 0; // Not found
-		}
-		
-		// Find the next segment
-		int end = -1;
-		for ( int i=start+1; i<parts.size(); i++ ) {
-			if ( parts.get(i).isSegment() ) {
-				end = i;
-				break;
-			}
-		}
-		
-		// Check if we have a next segment
-		if ( end == -1 ) {
-			// No more segment to join
-			return 0;
-		}
-		
-		TextFragment tf = parts.get(start).getContent();
-		int count = (end-start);
-		int i = 0;
-		while ( i < count ) {
-			tf.append(parts.get(start+1).getContent());
-			parts.remove(start+1);
-			i++;
-		}
-
-		// Do not reset segApplied if one part only: keep the info that is was segmented
-		return count;
 	}
 
 	/**

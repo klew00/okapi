@@ -730,7 +730,7 @@ public class TextContainerTest {
 		TextContainer tc = new TextContainer("text");
 		Segments segments = tc.getSegments();
 		segments.get(0).id = "id1"; // Set the ID to non-default
-		tc.joinSegmentWithNextSegment(0);
+		segments.joinWithNext(0);
 		assertEquals("id1", segments.get(0).id);
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());
@@ -746,13 +746,13 @@ public class TextContainerTest {
 		assertEquals(3, segments.count());
 		assertEquals("[text1] [text2][seg3]", fmt.printSegmentedContent(tc, true));
 		// First join
-		tc.joinSegmentWithNextSegment(0);
+		segments.joinWithNext(0);
 		assertEquals("[text1 text2][seg3]", fmt.printSegmentedContent(tc, true));
 		assertEquals("id1", segments.get(0).id);
 		assertFalse(tc.contentIsOneSegment());
 		assertTrue(tc.hasBeenSegmented());
 		// Second join
-		tc.joinSegmentWithNextSegment(0);
+		segments.joinWithNext(0);
 		assertEquals("[text1 text2seg3]", fmt.printSegmentedContent(tc, true));
 		assertEquals("id1", segments.get(0).id);
 		assertTrue(tc.contentIsOneSegment());
@@ -968,7 +968,7 @@ public class TextContainerTest {
 		assertEquals("[text1][<1/>] te[xt2<2/>]", fmt.printSegmentedContent(tc, true));
 		assertEquals("2", segments.get(1).id);
 		// Join all in one segment after "text1"
-		tc.joinSegmentWithNextSegment(1);
+		segments.joinWithNext(1);
 		assertEquals("[text1][<1/> text2<2/>]", fmt.printSegmentedContent(tc, true));
 		assertEquals("0", segments.get(0).id);
 		assertEquals("2", segments.get(1).id);
@@ -1141,9 +1141,9 @@ public class TextContainerTest {
 		assertEquals("[seg3]", segments.get(2).toString());
 		// Test Merge one-by-one
 		assertEquals(3, segments.count());
-		tc.joinSegmentWithNextSegment(0);
+		segments.joinWithNext(0);
 		assertEquals(2, segments.count());
-		tc.joinSegmentWithNextSegment(0);
+		segments.joinWithNext(0);
 		assertEquals(1, segments.count());
 		assertTrue(tc.contentIsOneSegment());
 		assertTrue(tc.hasBeenSegmented()); // "manual" segmentation changes
@@ -1153,8 +1153,8 @@ public class TextContainerTest {
 		segments.create(ranges);
 		assertEquals(3, segments.count());
 		assertEquals(3, segments.count());
-		tc.joinSegmentWithNextSegment(0); // ([seg1])+[seg2]
-		tc.joinSegmentWithNextSegment(0); // ([seg1]+[seg2])+[seg3]
+		segments.joinWithNext(0); // ([seg1])+[seg2]
+		segments.joinWithNext(0); // ([seg1]+[seg2])+[seg3]
 		assertEquals(originalText, tc.toString());
 	}
 

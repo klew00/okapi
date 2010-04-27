@@ -122,7 +122,7 @@ public class SegmentationTest {
 	public void testJoinTwoSegmentsIntoOne () {
 		TextContainer tc = createSegmentedContainer();
 		Segments segments = tc.getSegments();
-		tc.joinSegmentWithNextSegment(0);
+		segments.joinWithNext(0);
 		assertEquals(1, segments.count());
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("[<1>Part 1.</1> Outside Part 2.]", fmt.printSegmentedContent(tc, true));
@@ -292,7 +292,7 @@ public class SegmentationTest {
 		TextContainer tc1 = tu.createTarget(locFR, true, IResource.COPY_ALL);
 		// One segment for AR
 		TextContainer tc2 = tu.createTarget(locAR, true, IResource.COPY_ALL);
-		tc2.joinSegmentWithNextSegment(0); // Make it one segment for AR
+		tc2.getSegments().joinWithNext(0); // Make it one segment for AR
 		List<Range> ranges = new ArrayList<Range>();
 		// "**Part 1.** Part 2."
 		//  0123456789012345678
