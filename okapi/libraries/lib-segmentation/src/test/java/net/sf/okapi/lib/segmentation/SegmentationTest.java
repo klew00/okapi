@@ -148,7 +148,7 @@ public class SegmentationTest {
 		//  01234567890123456789012345"
 		segments.create(11, 19);
 		assertEquals(1, segments.count());
-		assertEquals(3, tc.getPartCount());
+		assertEquals(3, tc.count());
 		assertEquals(" Outside", segments.get(0).toString());
 	}
 	

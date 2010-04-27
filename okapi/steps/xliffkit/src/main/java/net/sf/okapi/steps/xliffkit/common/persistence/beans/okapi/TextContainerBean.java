@@ -57,7 +57,7 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 			annotationBean.set(annotation, session);
 		}
 		
-		for (int i = 0; i < obj.getPartCount(); i++) {
+		for (int i = 0; i < obj.count(); i++) {
 			TextPartBean partBean = (TextPartBean) session.createBean(obj.getPart(i).getClass());
 			parts.add(partBean);
 			partBean.set(obj.getPart(i), session);
@@ -75,7 +75,7 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 		
 		for (TextPartBean partBean : parts)
-			obj.insertPart(obj.getPartCount(), partBean.get(TextPart.class, session));
+			obj.insertPart(obj.count(), partBean.get(TextPart.class, session));
 		
 		obj.setHasBeenSegmentedFlag(segApplied);
 	}

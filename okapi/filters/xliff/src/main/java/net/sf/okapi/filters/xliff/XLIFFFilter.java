@@ -840,7 +840,7 @@ public class XLIFFFilter implements IFilter {
 							segIdStack = -1; // Reset to not trigger segment ending again
 							// Add the segment to the content
 							segments.append(segment);
-							if ( changeFirstPart && ( content.getPartCount()==2 )) {
+							if ( changeFirstPart && ( content.count()==2 )) {
 								// Change the initial part into a non-segment
 								changeFirstPart = false;
 								content.changePart(0);
@@ -876,7 +876,7 @@ public class XLIFFFilter implements IFilter {
 								// If this is have a first part that was not a segment, appending it
 								// will make it a segment because a container has always one segment.
 								// So we need to fix later when closing this first segment. 
-								changeFirstPart = (content.getPartCount() == 1); 
+								changeFirstPart = (content.count() == 1); 
 							}
 							idStack.push(++id);
 							segIdStack = id;

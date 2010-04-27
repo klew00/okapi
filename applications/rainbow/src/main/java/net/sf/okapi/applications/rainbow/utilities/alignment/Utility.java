@@ -288,7 +288,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			// Check alignment and fix it if needed
 			tu.setTarget(trgLang, trgTC);
 			// If source has no segment, merge all the one of the target ("#" -> "Num." case)
-			if ( !tu.getSource().hasBeenSegmented() && ( trgTC.getPartCount() > 0 )) {
+			if ( !tu.getSource().hasBeenSegmented() && ( trgTC.count() > 0 )) {
 				trgTC.getSegments().joinAll();
 			}
 			

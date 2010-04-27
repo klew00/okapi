@@ -1111,7 +1111,7 @@ public class TextContainerTest {
 		ranges.add(new Range(6, 12));
 		ranges.add(new Range(13, -1));
 		segments.create(ranges);
-		assertEquals(4, tc.getPartCount());
+		assertEquals(4, tc.count());
 		assertEquals(3, segments.count());
 		assertEquals("[seg1]", segments.get(0).toString());
 		assertEquals("[seg2]", segments.get(1).toString());

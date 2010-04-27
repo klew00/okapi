@@ -143,7 +143,7 @@ public class TextContainer implements Iterable<TextPart> {
 		 * Use {@link #hasText(boolean, boolean)} to check for text presence.
 		 * Use {@link #isEmpty()} to verify if the content is empty of not.
 		 * @return the number of segments in the container.
-		 * @see #getPartCount()
+		 * @see #count()
 		 */
 		public int count ();
 		
@@ -779,7 +779,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * {@link #getFirstSegmentContent()}, {@link #getLastPartContent()} and
 	 * {@link #getLastSegmentContent()} return the same result.
 	 * @return true if the whole content of this container is in a single segment.
-	 * @see #getPartCount()
+	 * @see #count()
 	 * @see #getSegmentCount()
 	 */
 	public boolean contentIsOneSegment () {
@@ -1293,7 +1293,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * @return the number of parts (segments and non-segments) in this container.
 	 * @see #getSegmentCount()
 	 */
-	public int getPartCount () {
+	public int count () {
 		return parts.size();
 	}
 	
