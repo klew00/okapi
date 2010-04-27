@@ -211,6 +211,12 @@ public class TextContainer implements Iterable<TextPart> {
 		 * not save the ranges.
 		 */
 		public void joinAll (List<Range> ranges);
+
+		/**
+		 * Gets the list of the boundaries for the current segments in this container. 
+		 * @return the list of the current segment boundaries. 
+		 */
+		public List<Range> getRanges ();
 		
 	}
 	
@@ -460,6 +466,13 @@ public class TextContainer implements Iterable<TextPart> {
 			setContent(createJoinedContent(ranges));
 		}
 
+		@Override
+		public List<Range> getRanges () {
+			List<Range> ranges = new ArrayList<Range>();
+			createJoinedContent(ranges);
+			return ranges;
+		}
+		
 	};
 	
 	public Segments getSegments() {
@@ -638,11 +651,11 @@ public class TextContainer implements Iterable<TextPart> {
 		
 		// If the content is the same, check the segment boundaries
 		StringBuilder tmp1 = new StringBuilder();
-		for ( Range range : getCurrentSegmentationRanges() ) {
+		for ( Range range : segments.getRanges() ) {
 			tmp1.append(range.toString());
 		}
 		StringBuilder tmp2 = new StringBuilder();
-		for ( Range range : cont.getCurrentSegmentationRanges() ) {
+		for ( Range range : cont.getSegments().getRanges() ) {
 			tmp2.append(range.toString());
 		}
 		return tmp1.toString().compareTo(tmp2.toString());
@@ -745,16 +758,6 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 	}
 	
-	/**
-	 * Gets the list of the boundaries for the current segments in this container. 
-	 * @return the list of the current segment boundaries. 
-	 */
-	public List<Range> getCurrentSegmentationRanges () {
-		List<Range> ranges = new ArrayList<Range>();
-		createJoinedContent(ranges);
-		return ranges;
-	}
-
 	/**
 	 * Appends a part at the end of this container.
 	 * If the current last part (segment or non-segment) is empty,

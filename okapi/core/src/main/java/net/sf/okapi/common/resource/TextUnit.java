@@ -550,7 +550,7 @@ public class TextUnit implements INameable, IReferenceable {
 	 * @see #synchronizeSourceSegmentation(LocaleId)
 	 */
 	public List<Range> saveCurrentSourceSegmentation () {
-		srcSegRanges = source.getCurrentSegmentationRanges();
+		srcSegRanges = source.getSegments().getRanges();
 		return srcSegRanges;
 	}
 
