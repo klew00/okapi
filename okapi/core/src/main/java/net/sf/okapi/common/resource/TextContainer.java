@@ -932,7 +932,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * @param spannedPartIsSegment true if the new middle part should be a segment,
 	 * false if it should be a non-segment.
 	 */
-	public void splitPart (int partIndex,
+	public void split (int partIndex,
 		int start,
 		int end,
 		boolean spannedPartIsSegment)

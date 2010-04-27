@@ -224,7 +224,7 @@ public class TextContainerTest {
     public void testIsEmpty () {
 		TextContainer tc = new TextContainer();
 		assertTrue(tc.isEmpty());
-		tc.getLastPartContent().append('z');
+		tc.getLastContent().append('z');
 		assertFalse(tc.isEmpty());
 		tc.setContent(new TextFragment());
 		assertTrue(tc.isEmpty());
@@ -861,7 +861,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
-		tc.splitPart(0, 0, 5, true);
+		tc.split(0, 0, 5, true);
 		assertEquals("[part1][part2]", fmt.printSegmentedContent(tc, true));
 		assertTrue(tc.hasBeenSegmented());
 		assertFalse(tc.contentIsOneSegment());
@@ -875,7 +875,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
-		tc.splitPart(0, 0, 5, false); // Create non-segment
+		tc.split(0, 0, 5, false); // Create non-segment
 		assertEquals("part1[part2]", fmt.printSegmentedContent(tc, true));
 		assertTrue(tc.hasBeenSegmented());
 		assertFalse(tc.contentIsOneSegment());
@@ -888,7 +888,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
-		tc.splitPart(0, 5, -1, true);
+		tc.split(0, 5, -1, true);
 		assertEquals("[part1][part2]", fmt.printSegmentedContent(tc, true));
 		assertTrue(tc.hasBeenSegmented());
 		assertFalse(tc.contentIsOneSegment());
@@ -902,7 +902,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
-		tc.splitPart(0, 5, -1, false); // Create non-segment part
+		tc.split(0, 5, -1, false); // Create non-segment part
 		assertEquals("[part1]part2", fmt.printSegmentedContent(tc, true));
 		assertTrue(tc.hasBeenSegmented());
 		assertFalse(tc.contentIsOneSegment());
@@ -915,7 +915,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
-		tc.splitPart(0, 5, 5, false); // Ask for non-segment, but that should be ignored
+		tc.split(0, 5, 5, false); // Ask for non-segment, but that should be ignored
 		assertEquals("[part1][part2]", fmt.printSegmentedContent(tc, true));
 		assertTrue(tc.hasBeenSegmented());
 		assertFalse(tc.contentIsOneSegment());
@@ -929,7 +929,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		
 		assertEquals("[part1part2part3]", fmt.printSegmentedContent(tc, true));
-		tc.splitPart(0, 5, 10, true);
+		tc.split(0, 5, 10, true);
 		assertEquals("[part1][part2][part3]", fmt.printSegmentedContent(tc, true));
 		assertTrue(tc.hasBeenSegmented());
 		assertFalse(tc.contentIsOneSegment());
@@ -944,7 +944,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		
 		assertEquals("[part1part2part3]", fmt.printSegmentedContent(tc, true));
-		tc.splitPart(0, 5, 10, false); // Create non-segment
+		tc.split(0, 5, 10, false); // Create non-segment
 		assertEquals("[part1]part2[part3]", fmt.printSegmentedContent(tc, true));
 		assertTrue(tc.hasBeenSegmented());
 		assertFalse(tc.contentIsOneSegment());
@@ -960,11 +960,11 @@ public class TextContainerTest {
 
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
 		// Make "te" an non-segment
-		tc.splitPart(2, 0, 2, false);
+		tc.split(2, 0, 2, false);
 		assertEquals("[text1<1/>] te[xt2<2/>]", fmt.printSegmentedContent(tc, true));
 		assertEquals("te", tc.get(2).toString());
 		// Make <1/> a segment
-		tc.splitPart(0, 5, -1, true);
+		tc.split(0, 5, -1, true);
 		assertEquals("[text1][<1/>] te[xt2<2/>]", fmt.printSegmentedContent(tc, true));
 		assertEquals("2", segments.get(1).id);
 		// Join all in one segment after "text1"
@@ -980,11 +980,11 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		
 		assertEquals("[text]", fmt.printSegmentedContent(tc, true));
-		tc.splitPart(0, 0, 0, true); // Span is empty and at the front
-		tc.splitPart(0, 4, 4, true); // Span is empty and at the back
-		tc.splitPart(0, 4, -1, true); // Span is empty and at the back
-		tc.splitPart(0, 0, -1, true); // Span is the whole part
-		tc.splitPart(0, 0, 4, true); // Span is the whole part
+		tc.split(0, 0, 0, true); // Span is empty and at the front
+		tc.split(0, 4, 4, true); // Span is empty and at the back
+		tc.split(0, 4, -1, true); // Span is empty and at the back
+		tc.split(0, 0, -1, true); // Span is the whole part
+		tc.split(0, 0, 4, true); // Span is the whole part
 		assertEquals("[text]", fmt.printSegmentedContent(tc, true));
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());

@@ -710,7 +710,7 @@ public class Aligner {
 		// Convert segment index to part index
 		int partIndex = target.getSegments().getPartIndex(segIndex);
 		// Do the split
-		target.splitPart(partIndex, start, end, false);
+		target.split(partIndex, start, end, false);
 		// Indicates we made a manual change
 		manualCorrection = true;
 	}
