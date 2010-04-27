@@ -165,7 +165,7 @@ public class SegmentationStep extends BasePipelineStep {
 			else {
 				for ( Segment seg : tu.getSource().getSegments() ) {
 		    		
-					if ( trgCont.getSegment(seg.id) == null ) {
+					if ( trgCont.getSegments().get(seg.id) == null ) {
 						// No target segment matching source segment seg.id
 						logger.warning(String.format("Text unit id='%s': No target match found for source segment id='%s'",
 							tu.getId(), seg.id));

@@ -1075,7 +1075,7 @@ public class FilterTestDriver {
 			}
 			
 			for ( Segment seg1 : t1Segments ) {
-				Segment seg2 = t2.getSegment(seg1.id);
+				Segment seg2 = t2Segments.get(seg1.id);
 				if ( seg2 == null ) {
 					System.err.println("Segment in t2 not found.");
 					return false;

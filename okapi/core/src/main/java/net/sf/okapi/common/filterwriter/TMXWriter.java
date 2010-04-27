@@ -265,7 +265,7 @@ public class TMXWriter {
 		for ( Segment srcSeg : srcTC.getSegments() ) {
     		i++;
     		TextFragment tf = srcSeg.text;
-			Segment trgSeg = trgTC.getSegment(srcSeg.id);
+			Segment trgSeg = trgTC.getSegments().get(srcSeg.id);
 			if ( trgSeg == null ) {
 				// No corresponding target: skip it
 				continue;
@@ -420,7 +420,7 @@ public class TMXWriter {
     		// Write each target TUV
     		for ( LocaleId loc : locales ) {
         		TextContainer trgCont = item.getTarget(loc);
-        		Segment trgSeg = trgCont.getSegment(srcSeg.id);
+        		Segment trgSeg = trgCont.getSegments().get(srcSeg.id);
         		// Write target only if we have one corresponding to the source segment
         		if ( trgSeg != null ) {
         			writeTUV(trgSeg.text, loc, trgCont);

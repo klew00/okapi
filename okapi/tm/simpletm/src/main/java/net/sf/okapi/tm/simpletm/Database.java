@@ -240,7 +240,7 @@ public class Database {
 				for ( Segment srcSeg : srcCont.getSegments() ) {
 					pstm.setString(2, srcSeg.text.getCodedText());
 					pstm.setString(3, Code.codesToString(srcSeg.text.getCodes()));
-					Segment trgSeg = trgCont.getSegment(srcSeg.id);
+					Segment trgSeg = trgCont.getSegments().get(srcSeg.id);
 					if ( trgSeg != null ) { // Skip source without target
 						pstm.setString(4, trgSeg.text.getCodedText());
 						pstm.setString(5, Code.codesToString(trgSeg.text.getCodes()));

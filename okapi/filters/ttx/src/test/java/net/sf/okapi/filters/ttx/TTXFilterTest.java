@@ -96,10 +96,10 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		Segments segments = cont.getSegments();
 		assertEquals(1, segments.count());
-		assertEquals("en1", cont.getSegment(0).toString());
+		assertEquals("en1", segments.get(0).toString());
 		cont = tu.getTarget(locESEM);
 		assertEquals(1, segments.count());
-		assertEquals("es1", cont.getSegment(0).toString());
+		assertEquals("es1", segments.get(0).toString());
 	}
 
 	@Test
@@ -119,10 +119,10 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		Segments segments = cont.getSegments();
 		assertEquals(1, segments.count());
-		assertEquals("en1", cont.getSegment(0).toString());
+		assertEquals("en1", segments.get(0).toString());
 		cont = tu.getTarget(locESEM);
 		assertEquals(1, segments.count());
-		assertEquals("es1", cont.getSegment(0).toString());
+		assertEquals("es1", segments.get(0).toString());
 		// Check that last DF is not included in TU
 		// We should have only one marker, for the segment
 //TOFIX: isolated df in TU		assertEquals(1, cont.getCodes().size());
@@ -598,13 +598,14 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		Segments segments = cont.getSegments();
 		assertEquals(2, segments.count());
-		assertEquals("text1 en", cont.getSegment(0).text.toString());
-		assertEquals("text2 en", cont.getSegment(1).text.toString());
+		assertEquals("text1 en", segments.get(0).text.toString());
+		assertEquals("text2 en", segments.get(1).text.toString());
 		assertEquals("[text1 en]  [text2 en]", fmt.printSegmentedContent(cont, true));
 		cont = tu.getTarget(locESEM);
+		segments = cont.getSegments();
 		assertEquals(2, segments.count());
-		assertEquals("text1 es", cont.getSegment(0).text.toString());
-		assertEquals("text2 es", cont.getSegment(1).text.toString());
+		assertEquals("text1 es", segments.get(0).text.toString());
+		assertEquals("text2 es", segments.get(1).text.toString());
 		assertEquals("[text1 es]  [text2 es]", fmt.printSegmentedContent(cont, true));
 
 		tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 2);
@@ -634,12 +635,13 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		Segments segments = cont.getSegments();
 		assertEquals(1, segments.count());
-		assertEquals("text <br/>en <b>bold</b>.", cont.getSegment(0).text.toString());
-		assertEquals("text <1/>en <2>bold</2>.", fmt.setContent(cont.getSegment(0).text).toString());
+		assertEquals("text <br/>en <b>bold</b>.", segments.get(0).text.toString());
+		assertEquals("text <1/>en <2>bold</2>.", fmt.setContent(segments.get(0).text).toString());
 		cont = tu.getTarget(locESEM);
+		segments = cont.getSegments();
 		assertEquals(1, segments.count());
-		assertEquals("TEXT <br/>ES <b>BOLD</b>.", cont.getSegment(0).text.toString());
-		assertEquals("TEXT <1/>ES <2>BOLD</2>.", fmt.setContent(cont.getSegment(0).text).toString());
+		assertEquals("TEXT <br/>ES <b>BOLD</b>.", segments.get(0).text.toString());
+		assertEquals("TEXT <1/>ES <2>BOLD</2>.", fmt.setContent(segments.get(0).text).toString());
 	}
 
 	@Test

@@ -79,8 +79,8 @@ public class SRXSegmenterTest {
 		assertEquals(2, n);
 		segments.create(seg.getRanges());
 		assertEquals(2, segments.count());
-		assertEquals("Part 1.", tc.getSegment(0).toString());
-		assertEquals(" Part 2.", tc.getSegment(1).toString());
+		assertEquals("Part 1.", segments.get(0).toString());
+		assertEquals(" Part 2.", segments.get(1).toString());
 	}
 	
 	private ISegmenter createSegmenterWithRules (LocaleId locId) {

@@ -419,7 +419,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				scoreIndex++;
 				int lev = (( scores != null ) ? scores.getScore(scoreIndex) : 0 );
 				Segment trgSeg = (Segment)part;
-				Segment srcSeg = srcCont.getSegment(trgSeg.id);
+				Segment srcSeg = srcCont.getSegments().get(trgSeg.id);
 				if ( srcSeg == null ) {
 					// A target segment without a corresponding source: give warning
 					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",

@@ -298,7 +298,7 @@ public class TableFilterWriter implements IFilterWriter {
 		// If we do have the same number of segments:
 		// Output each of them
 		for ( Segment srcSeg : srcCont.getSegments() ) {
-			Segment trgSeg = trgCont.getSegment(srcSeg.id);
+			Segment trgSeg = trgCont.getSegments().get(srcSeg.id);
 			if ( trgSeg == null ) {
 				//TODO: warning
 			}

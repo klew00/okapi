@@ -89,8 +89,9 @@ public class SegmentationTest {
 	@Test
 	public void testGetSegments () {
 		TextContainer tc = createSegmentedContainer();
-		assertEquals("<s>Part 1.</s>", tc.getSegment(0).toString());
-		assertEquals(" Part 2.", tc.getSegment(1).toString());
+		Segments segments = tc.getSegments();
+		assertEquals("<s>Part 1.</s>", segments.get(0).toString());
+		assertEquals(" Part 2.", segments.get(1).toString());
 		assertEquals("[<1>Part 1.</1>] Outside[ Part 2.]", fmt.printSegmentedContent(tc, true));
 	}
 	
@@ -101,7 +102,7 @@ public class SegmentationTest {
 		assertEquals("[<1>Part 1.</1>] Outside[ Part 2.]", fmt.printSegmentedContent(tc, true));
 		tc.changePart(2);
 		assertEquals(1, segments.count());
-		assertEquals("<s>Part 1.</s>", tc.getSegment(0).toString());
+		assertEquals("<s>Part 1.</s>", segments.get(0).toString());
 		assertEquals("[<1>Part 1.</1>] Outside Part 2.", fmt.printSegmentedContent(tc, true));
 	}
 
@@ -148,7 +149,7 @@ public class SegmentationTest {
 		segments.create(11, 19);
 		assertEquals(1, segments.count());
 		assertEquals(3, tc.getPartCount());
-		assertEquals(" Outside", tc.getSegment(0).toString());
+		assertEquals(" Outside", segments.get(0).toString());
 	}
 	
 	@Test
@@ -157,7 +158,7 @@ public class SegmentationTest {
 		Segments segments = tc.getSegments();
 		segments.append(new TextFragment(" Added Part."));
 		assertEquals(3, segments.count());
-		assertEquals(" Added Part.", tc.getSegment(2).toString());
+		assertEquals(" Added Part.", segments.get(2).toString());
 	}
 
 	@Test
@@ -165,13 +166,13 @@ public class SegmentationTest {
 		TextContainer tc = createSegmentedContainer("a. z", segmenter);
 		Segments segments = tc.getSegments();
 		assertEquals(2, segments.count());
-		assertEquals("a.", tc.getSegment(0).toString());
-		assertEquals(" z", tc.getSegment(1).toString());
+		assertEquals("a.", segments.get(0).toString());
+		assertEquals(" z", segments.get(1).toString());
 		tc = createSegmentedContainer("a. z", segmenterTrim);
 		segments = tc.getSegments();
 		assertEquals(2, segments.count());
-		assertEquals("a.", tc.getSegment(0).toString());
-		assertEquals("z", tc.getSegment(1).toString());
+		assertEquals("a.", segments.get(0).toString());
+		assertEquals("z", segments.get(1).toString());
 	}
 	
 	@Test
@@ -179,13 +180,13 @@ public class SegmentationTest {
 		TextContainer tc = createSegmentedContainer(" a.  ", segmenter);
 		Segments segments = tc.getSegments();
 		assertEquals(2, segments.count());
-		assertEquals(" a.", tc.getSegment(0).toString());
-		assertEquals("  ", tc.getSegment(1).toString());
+		assertEquals(" a.", segments.get(0).toString());
+		assertEquals("  ", segments.get(1).toString());
 		// 1 segment only because the last one is only made of whitespaces
 		tc = createSegmentedContainer("a. ", segmenterTrim);
 		segments = tc.getSegments();
 		assertEquals(1, segments.count());
-		assertEquals("a.", tc.getSegment(0).toString());
+		assertEquals("a.", segments.get(0).toString());
 	}
 	
 	@Test
@@ -193,16 +194,16 @@ public class SegmentationTest {
 		TextContainer tc = createSegmentedContainer(" a. | b.", segmenter);
 		Segments segments = tc.getSegments();
 		assertEquals(3, segments.count());
-		assertEquals(" a.", tc.getSegment(0).toString());
-		assertEquals(" |", tc.getSegment(1).toString());
-		assertEquals(" b.", tc.getSegment(2).toString());
+		assertEquals(" a.", segments.get(0).toString());
+		assertEquals(" |", segments.get(1).toString());
+		assertEquals(" b.", segments.get(2).toString());
 		// 1 segment only because the last one is only made of whitespaces
 		tc = createSegmentedContainer(" a. |  b.", segmenterTrim);
 		segments = tc.getSegments();
 		assertEquals(3, segments.count());
-		assertEquals("a.", tc.getSegment(0).toString());
-		assertEquals("|", tc.getSegment(1).toString());
-		assertEquals("b.", tc.getSegment(2).toString());
+		assertEquals("a.", segments.get(0).toString());
+		assertEquals("|", segments.get(1).toString());
+		assertEquals("b.", segments.get(2).toString());
 	}
 
 	@Test
@@ -301,14 +302,14 @@ public class SegmentationTest {
 		Segment srcSeg;
 		tu.synchronizeSourceSegmentation(locFR);
 		for ( Segment seg : tc1.getSegments() ) {
-			srcSeg = tu.getSource().getSegment(seg.id);
+			srcSeg = tu.getSource().getSegments().get(seg.id);
 			assertNotNull(srcSeg);
 			assertEquals(seg.text, srcSeg.text);
 		}
 		// Test AR against the source
 		tu.synchronizeSourceSegmentation(locAR);
 		for ( Segment seg : tc2.getSegments() ) {
-			srcSeg = tu.getSource().getSegment(seg.id);
+			srcSeg = tu.getSource().getSegments().get(seg.id);
 			assertNotNull(srcSeg);
 			assertEquals(seg.text, srcSeg.text);
 		}

@@ -99,10 +99,10 @@ public class XLIFFFilterTest {
 		Segments segments = cont.getSegments();
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(2, segments.count());
-		assertEquals("t1.", cont.getSegment(0).text.toString());
-		assertEquals("i2", cont.getSegment(1).id);
-		assertEquals("t2", cont.getSegment(1).text.toString());
-		assertEquals("i2", cont.getSegment(1).id);
+		assertEquals("t1.", segments.get(0).text.toString());
+		assertEquals("i2", segments.get(1).id);
+		assertEquals("t2", segments.get(1).text.toString());
+		assertEquals("i2", segments.get(1).id);
 	}
 
 	@Test
@@ -124,8 +124,8 @@ public class XLIFFFilterTest {
 		assertNotNull(tu);
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(2, segments.count());
-		assertEquals("t1.", cont.getSegment(0).text.toString());
-		assertEquals("t2", cont.getSegment(1).text.toString());
+		assertEquals("t1.", segments.get(0).text.toString());
+		assertEquals("t2", segments.get(1).text.toString());
 	}
 
 	@Test

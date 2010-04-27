@@ -87,7 +87,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		for ( TextPart part : trgCont ) {
 			if ( part.isSegment() ) {
 				Segment trgSeg = (Segment)part;
-				Segment srcSeg = srcCont.getSegment(trgSeg.id);
+				Segment srcSeg = srcCont.getSegments().get(trgSeg.id);
 				if ( srcSeg == null ) {
 					//TODO: Warning
 					// Fall back to the target

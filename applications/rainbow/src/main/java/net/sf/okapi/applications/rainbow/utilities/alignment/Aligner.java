@@ -911,7 +911,7 @@ public class Aligner {
 				try {
 					// genericCont is already set with the proper text
 					genericCont.updateFragment(edTrgSeg.getText(),
-						target.getSegment(indexActiveSegment).text, true);
+						target.getSegments().get(indexActiveSegment).text, true);
 				}
 				catch ( InvalidContentException e ) {
 					Dialogs.showError(shell, e.getMessage(), null);
@@ -943,7 +943,7 @@ public class Aligner {
 
 	private void toggleFields (boolean specialMode) {
 		if ( specialMode ) {
-			genericCont.setContent(target.getSegment(indexActiveSegment).text);
+			genericCont.setContent(target.getSegments().get(indexActiveSegment).text);
 			edTrgSeg.setText(genericCont.toString());
 			edTrgSeg.setFocus();
 			btAccept.setEnabled(true);
@@ -1018,7 +1018,7 @@ public class Aligner {
 			int i = 0;
 			for ( Segment srcSeg : source.getSegments() ) {
 				// Normally we would use srcSeg.id, but the class works based on segment index not id
-				Segment trgSeg = target.getSegment(i);
+				Segment trgSeg = target.getSegments().get(i);
 				if ( trgSeg == null ) {
 					addIssue(1, String.format("%d: Warning- No target segment for the source segment.", i+1));
 				}
@@ -1124,7 +1124,7 @@ public class Aligner {
 				matchFound = false;
 				srcText = srcSeg.toString();
 				for ( int j=trgStart; j<targetSegments.count(); j++ ) {
-					String s2 = target.getSegment(j).toString(); //TODO: replace by direct call after debug
+					String s2 = target.getSegments().get(j).toString(); //TODO: replace by direct call after debug
 					if ( srcText.equals(s2) ) {
 						// We have a match
 						if ( srcNoMatchCount == 1 ) {
@@ -1269,12 +1269,12 @@ public class Aligner {
 			if ( targetToSource ) {
 				if ( (n = trgList.getSelectionIndex()) == -1 ) return;
 				mtQuery.setLanguages(trgLang, srcLang);
-				oriFrag = target.getSegment(n).text;
+				oriFrag = target.getSegments().get(n).text;
 			}
 			else {
 				if ( (n = srcList.getSelectionIndex()) == -1 ) return;
 				mtQuery.setLanguages(srcLang, trgLang);
-				oriFrag = source.getSegment(n).text;
+				oriFrag = source.getSegments().get(n).text;
 			}
 			
 			mtQuery.query(oriFrag);

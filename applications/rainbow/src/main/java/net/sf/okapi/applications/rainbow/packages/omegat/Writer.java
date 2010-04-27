@@ -99,7 +99,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		int i = 0;
 		for ( Segment srcSeg : srcTC.getSegments() ) {
     		
-			Segment trgSeg = trgTC.getSegment(srcSeg.id);
+			Segment trgSeg = trgTC.getSegments().get(srcSeg.id);
 			if ( trgSeg != null ) {
 				if ( scores.getScore(0) == 100 ) {
 					tmxWriterApproved.writeTU(srcSeg.getContent(),

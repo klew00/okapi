@@ -171,6 +171,29 @@ public class TextContainer implements Iterable<TextPart> {
 		 */
 		public Segment getLast();
 		
+		/**
+		 * Gets the segment for a given identifier.
+		 * @param id the identifier of the segment to retrieve.
+		 * @return the segment for the given identifier or null if no segment is found.
+		 */
+		public Segment get (String id);
+		
+		/**
+		 * Gets the segment for a given segment index.
+		 * @param index the index of the segment to retrieve. The first
+		 * segment has the index 0, the second has the index 1, etc.
+		 * Note that the index value used here is not necessarily the same index as for a part.
+		 * That is: <code>getSegment(0)</code> returns the same segment as <code>getPart(0)</code> only if
+		 * the first part of the container is a segment. 
+		 * @return the segment for the given index.
+		 * <p>Use {@link #getSegment(String)} to retrieve by segment identifier.
+		 * @throws IndexOutOfBoundsException if the index is out of bounds.
+		 * @see #getSegment(String)
+		 * @see #getPart(int)
+		 * #see {@link #iterator()}
+		 */
+		public Segment get (int index);
+		
 	}
 	
 	private final Segments segments = new Segments() {
@@ -377,6 +400,31 @@ public class TextContainer implements Iterable<TextPart> {
 			for ( int i=parts.size()-1; i>=0; i-- ) {
 				if ( parts.get(i).isSegment() ) {
 					return (Segment)parts.get(i);
+				}
+			}
+			// Should never occur
+			return null;
+		}
+
+		@Override
+		public Segment get (String id) {
+			for ( TextPart part : parts ) {
+				if ( part.isSegment() ) {
+					if ( ((Segment)part).id.equals(id) ) return (Segment)part;
+				}
+			}
+			// Should never occur
+			return null;
+		}
+
+		@Override
+		public Segment get (int index) {
+			int tmp = -1;
+			for ( TextPart part : parts ) {
+				if ( part.isSegment() ) {
+					if ( ++tmp == index ) {
+						return (Segment)part;
+					}
 				}
 			}
 			// Should never occur
@@ -1107,48 +1155,6 @@ public class TextContainer implements Iterable<TextPart> {
 	public void setAnnotation (IAnnotation annotation) {
 		if ( annotations == null ) annotations = new Annotations();
 		annotations.set(annotation);
-	}
-
-	/**
-	 * Gets the segment for a given identifier.
-	 * @param id the identifier of the segment to retrieve.
-	 * @return the segment for the given identifier or null if no segment is found.
-	 */
-	public Segment getSegment (String id) {
-		for ( TextPart part : parts ) {
-			if ( part.isSegment() ) {
-				if ( ((Segment)part).id.equals(id) ) return (Segment)part;
-			}
-		}
-		// Should never occur
-		return null;
-	}
-	
-	/**
-	 * Gets the segment for a given segment index.
-	 * @param index the index of the segment to retrieve. The first
-	 * segment has the index 0, the second has the index 1, etc.
-	 * Note that the index value used here is not necessarily the same index as for a part.
-	 * That is: <code>getSegment(0)</code> returns the same segment as <code>getPart(0)</code> only if
-	 * the first part of the container is a segment. 
-	 * @return the segment for the given index.
-	 * <p>Use {@link #getSegment(String)} to retrieve by segment identifier.
-	 * @throws IndexOutOfBoundsException if the index is out of bounds.
-	 * @see #getSegment(String)
-	 * @see #getPart(int)
-	 * #see {@link #iterator()}
-	 */
-	public Segment getSegment (int index) {
-		int tmp = -1;
-		for ( TextPart part : parts ) {
-			if ( part.isSegment() ) {
-				if ( ++tmp == index ) {
-					return (Segment)part;
-				}
-			}
-		}
-		// Should never occur
-		return null;
 	}
 	
 	/**
