@@ -229,6 +229,15 @@ public class TextContainer implements Iterable<TextPart> {
 		 * @return the number of parts joined to the given segment (and removed from the list of parts).
 		 */
 		public int joinWithNext (int segmentIndex);
+
+		/**
+		 * Gets the part index for a given segment index.
+		 * <p>For example in the container "[segment1] [segment2] [segment3]" the sgment index for "[segment2]" is
+		 * 1 and its part index is 2 because there is one non-segment part before.
+		 * @param segIndex the segment index to convert to part index.
+		 * @return the index of the part for the given segment index.
+		 */
+		public int getPartIndex (int segIndex);
 		
 	}
 	
@@ -536,6 +545,18 @@ public class TextContainer implements Iterable<TextPart> {
 
 			// Do not reset segApplied if one part only: keep the info that is was segmented
 			return count;
+		}
+
+		@Override
+		public int getPartIndex (int segIndex) {
+			int n = -1;
+			for ( int i=0; i<parts.size(); i++ ) {
+				if ( parts.get(i).isSegment() ) {
+					n++;
+					if ( n == segIndex ) return i;
+				}
+			}
+			return -1; // Not found
 		}
 		
 	};
@@ -1345,24 +1366,6 @@ public class TextContainer implements Iterable<TextPart> {
 		return i;
 	}
 
-	/**
-	 * Gets the part index for a given segment index.
-	 * <p>For example in the container "[segment1] [segment2] [segment3]" the sgment index for "[segment2]" is
-	 * 1 and its part index is 2 because there is one non-segment part before.
-	 * @param segIndex the segment index to convert to part index.
-	 * @return the index of the part for the given segment index.
-	 */
-	public int getPartIndex (int segIndex) {
-		int n = -1;
-		for ( int i=0; i<parts.size(); i++ ) {
-			if ( parts.get(i).isSegment() ) {
-				n++;
-				if ( n == segIndex ) return i;
-			}
-		}
-		return -1; // Not found
-	}
-	
 	/**
 	 * Checks if the id of a given segment is empty, null or a duplicate. If it is, the id
 	 * is automatically set to a new value auto-generated.

@@ -1201,14 +1201,14 @@ public class TextContainerTest {
 		TextContainer tc = createMultiSegmentContentWithCodes();
 		assertEquals(2, tc.getSegments().count());
 		// Segment index 1 is part 2
-		assertEquals(2, tc.getPartIndex(1));
+		assertEquals(2, tc.getSegments().getPartIndex(1));
 	}
 	
 	@Test
 	public void testGetPartIndex_NotFound () {
 		TextContainer tc = createMultiSegmentContentWithCodes();
 		// No segment index 3
-		assertEquals(-1, tc.getPartIndex(3));
+		assertEquals(-1, tc.getSegments().getPartIndex(3));
 	}
 	
 	@Test

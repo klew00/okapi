@@ -708,7 +708,7 @@ public class Aligner {
 		// No split if location is not a range and is not inside text
 		if (( start == end ) && ( start == 0 )) return;
 		// Convert segment index to part index
-		int partIndex = target.getPartIndex(segIndex);
+		int partIndex = target.getSegments().getPartIndex(segIndex);
 		// Do the split
 		target.splitPart(partIndex, start, end, false);
 		// Indicates we made a manual change
