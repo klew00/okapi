@@ -26,8 +26,8 @@ import org.junit.Before;
 
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Segments;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;

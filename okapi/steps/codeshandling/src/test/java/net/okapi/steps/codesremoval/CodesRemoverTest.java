@@ -22,10 +22,10 @@ package net.okapi.steps.codesremoval;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.resource.Segments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.steps.codesremoval.CodesRemover;
 import net.sf.okapi.steps.codesremoval.Parameters;

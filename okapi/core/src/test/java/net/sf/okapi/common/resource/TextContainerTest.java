@@ -23,7 +23,6 @@ package net.sf.okapi.common.resource;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.resource.TextContainer.Segments;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import static org.junit.Assert.*;
 import org.junit.Test;
