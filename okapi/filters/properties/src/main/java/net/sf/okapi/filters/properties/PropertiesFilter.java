@@ -460,7 +460,7 @@ public class PropertiesFilter implements IFilter {
 				}
 
 				if ( params.useCodeFinder ) {
-					params.codeFinder.process(tuRes.getSource().getFirstPartContent());
+					params.codeFinder.process(tuRes.getSource().getFirstContent());
 				}
 				
 				tuRes.setSkeleton(skel);

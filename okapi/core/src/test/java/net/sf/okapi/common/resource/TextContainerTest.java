@@ -78,7 +78,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());
-		assertEquals("xyz", tc.getFirstPartContent().toString());
+		assertEquals("xyz", tc.getFirstContent().toString());
 		assertEquals("qwerty", segments.get(0).id);
 		assertSame(seg.text, segments.getFirstContent());
     }
@@ -91,7 +91,7 @@ public class TextContainerTest {
 		Segments segments = tc.getSegments();
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());
-		assertEquals("", tc.getFirstPartContent().toString());
+		assertEquals("", tc.getFirstContent().toString());
 		assertEquals("0", segments.get(0).id);
 		assertSame(seg.text, segments.getFirstContent());
     }
@@ -209,8 +209,8 @@ public class TextContainerTest {
         ann1.add(99, "abc");
         tc.setAnnotation(ann1);
 		TextContainer tc2 = tc.clone();
-		assertEquals(tc.getFirstPartContent().toString(), tc2.getFirstPartContent().toString());
-		assertNotSame(tc.getFirstPartContent(), tc2.getFirstPartContent());
+		assertEquals(tc.getFirstContent().toString(), tc2.getFirstContent().toString());
+		assertNotSame(tc.getFirstContent(), tc2.getFirstContent());
         assertEquals("name property", p1.getValue(), tc2.getProperty("name").getValue());
         assertNotSame("properties should not be the same reference due to clone", p1, tc2.getProperty("name"));
         ScoresAnnotation ann2 = tc2.getAnnotation(ScoresAnnotation.class); 

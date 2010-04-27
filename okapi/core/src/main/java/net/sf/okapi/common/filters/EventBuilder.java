@@ -762,7 +762,7 @@ public class EventBuilder {
 
 		TextUnit tu = peekMostRecentTextUnit();
 		// We can use the first part as nothing is segment at this point
-		tu.getSource().getFirstPartContent().append(text);
+		tu.getSource().getFirstContent().append(text);
 	}
 
 	/**
@@ -999,7 +999,7 @@ public class EventBuilder {
 
 		TextUnit tu = peekMostRecentTextUnit();
 		// We can use the first part as nothing is segment at this point
-		tu.getSource().getFirstPartContent().append(currentCode);
+		tu.getSource().getFirstContent().append(currentCode);
 		currentCode = null;
 	}
 

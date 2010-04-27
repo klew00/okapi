@@ -122,7 +122,7 @@ public class QueryManagerTest {
 		tf.append(" U ");
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		// Fuzzy match but codes are the same
-		qm.adjustNewFragment(tu.getSource().getFirstPartContent(), tf, tf, 88, tu);
+		qm.adjustNewFragment(tu.getSource().getFirstContent(), tf, tf, 88, tu);
 		assertEquals("U <b>BOLD</b> U <br/>", tf.toString());
 		assertEquals("U <1>BOLD</1> U <2/>", fmt.setContent(tf).toString());
 	}

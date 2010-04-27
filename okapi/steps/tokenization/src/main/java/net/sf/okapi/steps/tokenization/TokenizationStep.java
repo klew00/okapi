@@ -326,7 +326,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 		// Remove codes, store to positions
 		String text;
 		if ( tc.contentIsOneSegment() ) {
-			text = TextUnitUtil.getText(tc.getFirstPartContent(), positions);
+			text = TextUnitUtil.getText(tc.getFirstContent(), positions);
 		}
 		else {
 			text = TextUnitUtil.getText(tc.getUnSegmentedContentCopy(), positions);

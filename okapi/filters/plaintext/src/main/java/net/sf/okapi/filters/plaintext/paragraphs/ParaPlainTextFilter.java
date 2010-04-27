@@ -143,7 +143,7 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 						
 		TextContainer mergedLine = new TextContainer();
 		// We can use getFirstPartContent() because nothing is segmented
-		TextFragment tf = mergedLine.getFirstPartContent();
+		TextFragment tf = mergedLine.getFirstContent();
 		
 		while (bufferedLines.size() > 0) {
 			
@@ -171,7 +171,7 @@ public class ParaPlainTextFilter extends BasePlainTextFilter{
 			}
 			
 			// We can use getFirstPartContent() because nothing is segmented
-			tf.append(curLine.getFirstPartContent());
+			tf.append(curLine.getFirstContent());
 		}
 		
 		sendAsSource(mergedLine);

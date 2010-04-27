@@ -106,7 +106,7 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 		
 		//if (TextUnitUtil.getLastChar(lineContainer) == params.splicer) {
 		// We can use getFirstPartContent() because nothing is segmented
-		if (TextUnitUtil.endsWith(lineContainer.getFirstPartContent(), params.splicer)) {
+		if (TextUnitUtil.endsWith(lineContainer.getFirstContent(), params.splicer)) {
 			
 			merging = true;
 			splicedLines.add(lineContainer);
@@ -153,12 +153,12 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 		if (Util.isEmpty(params.splicer)) return false;
 						
 		TextContainer mergedLine = new TextContainer();
-		TextFragment mergedTF = mergedLine.getFirstPartContent();
+		TextFragment mergedTF = mergedLine.getFirstContent();
 		int len = params.splicer.length();
 		
 		for (TextContainer curLine : splicedLines) {
 			// We can use getFirstPartContent() because nothing is segmented
-			TextFragment curTF = curLine.getFirstPartContent();
+			TextFragment curTF = curLine.getFirstContent();
 			
 			//TextContainer curLine = splicedLines.poll();
 					
@@ -166,7 +166,7 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 						
 //			int pos = TextUnitUtil.lastIndexOf(curLine, s+= params.splicer);
 			// We can use getFirstPartContent() because it is not segmented
-			int pos = TextUnitUtil.lastIndexOf(curLine.getFirstPartContent(), params.splicer);
+			int pos = TextUnitUtil.lastIndexOf(curLine.getFirstContent(), params.splicer);
 			if (pos > -1)
 				if (params.createPlaceholders) 
 					curTF.changeToCode(pos, pos + len, TagType.PLACEHOLDER, "line splicer");

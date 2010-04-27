@@ -75,7 +75,7 @@ public class HtmlSnippetsTest {
 		assertEquals("Text2", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu);
-		assertEquals("Text1<1/>.", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("Text1<1/>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class HtmlSnippetsTest {
 		ArrayList<Event> events = getEventsDefault(snippet);
 		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
-		assertEquals("<1/>.", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("<1/>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 
 	@Test
@@ -96,7 +96,7 @@ public class HtmlSnippetsTest {
 		assertEquals("Text", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu);
-		assertEquals("<1/>.", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("<1/>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 
 	@Test
@@ -119,7 +119,7 @@ public class HtmlSnippetsTest {
 		String snippet = "<br>text<br/>";
 		ArrayList<Event> events = getEvents(snippet);
 		TextUnit tu = (TextUnit)events.get(1).getResource();
-		List<Code> codes = tu.getSource().getFirstPartContent().getCodes();
+		List<Code> codes = tu.getSource().getFirstContent().getCodes();
 		for (Code code : codes) {			
 			assertEquals(TagType.PLACEHOLDER, code.getTagType());
 		}
@@ -258,7 +258,7 @@ public class HtmlSnippetsTest {
 		parameters = HtmlSnippetsTest.class.getResource("/withCodeFinderRules.yml");
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		List<Code> list = tu.getSource().getFirstPartContent().getCodes();
+		List<Code> list = tu.getSource().getFirstContent().getCodes();
 		assertEquals(2, list.size());
 		assertEquals("e", list.get(0).getData());
 		assertEquals("VAR2", list.get(1).getData());

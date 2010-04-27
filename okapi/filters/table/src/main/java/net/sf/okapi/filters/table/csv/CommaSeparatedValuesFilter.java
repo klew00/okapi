@@ -295,7 +295,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 		// Process wrapped lines
 		// We can use getFirstPartContent() because nothing is segmented
-		TextFragment src = textUnit.getSource().getFirstPartContent();
+		TextFragment src = textUnit.getSource().getFirstContent();
 		String cell = src.getCodedText();
 		
 		List<String> list = ListUtil.stringAsList(cell, LINE_WRAP_TAG);

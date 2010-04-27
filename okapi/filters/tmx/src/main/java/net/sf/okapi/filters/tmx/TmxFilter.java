@@ -553,10 +553,10 @@ public class TmxFilter implements IFilter {
 		TextFragment tf;
 		if(tuvTrgType == TuvXmlLang.SOURCE){
 			//tc = pTu.getSource();
-			tf = tmxTu.curTuv.tc.getFirstPartContent();
+			tf = tmxTu.curTuv.tc.getFirstContent();
 		}else if(tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
 			//tc = pTu.setTarget(currentLang, new TextContainer());
-			tf = tmxTu.curTuv.tc.getFirstPartContent();
+			tf = tmxTu.curTuv.tc.getFirstContent();
 		}else{
 			tf=null;
 		}

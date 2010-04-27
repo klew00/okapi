@@ -374,7 +374,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		
 		// Else: We have only one segment
 		// Use trgCont, even if locToUse == null because then it's the source
-		TextFragment tf = trgCont.getFirstPartContent();
+		TextFragment tf = trgCont.getFirstContent();
 
 		// Apply the layer if there is one
 		if ( layer == null ) {

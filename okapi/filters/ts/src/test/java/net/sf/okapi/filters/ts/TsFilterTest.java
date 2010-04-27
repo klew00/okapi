@@ -215,8 +215,8 @@ public class TsFilterTest {
 		
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, locENUS, locFRFR), 1);
 
-		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstPartContent().toString());
-		assertEquals("hejsan <byte value=\"79\"/>varlden", tu.getTarget(locFRFR).getFirstPartContent().toString());
+		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstContent().toString());
+		assertEquals("hejsan <byte value=\"79\"/>varlden", tu.getTarget(locFRFR).getFirstContent().toString());
 	}
 	
 	@Test
@@ -239,8 +239,8 @@ public class TsFilterTest {
 		
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 
-		assertEquals("hello 0world", tu.getSource().getFirstPartContent().toString());
-		assertEquals("hejsan 0varlden", tu.getTarget(locFRFR).getFirstPartContent().toString());
+		assertEquals("hello 0world", tu.getSource().getFirstContent().toString());
+		assertEquals("hejsan 0varlden", tu.getTarget(locFRFR).getFirstContent().toString());
 	}
 	
 	@Test
@@ -263,8 +263,8 @@ public class TsFilterTest {
 		
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 
-		assertEquals("hello 1world", tu.getSource().getFirstPartContent().toString());
-		assertEquals("hejsan 1varlden", tu.getTarget(locFRFR).getFirstPartContent().toString());
+		assertEquals("hello 1world", tu.getSource().getFirstContent().toString());
+		assertEquals("hejsan 1varlden", tu.getTarget(locFRFR).getFirstContent().toString());
 	}
 	
 	@Test
@@ -307,7 +307,7 @@ public class TsFilterTest {
 		"\ufffd" +
 		"world"; 
 		
-		assertEquals(srcCheck, tu.getSource().getFirstPartContent().toString());
+		assertEquals(srcCheck, tu.getSource().getFirstContent().toString());
 	}
 	
 	@Test
@@ -809,8 +809,8 @@ public class TsFilterTest {
 		assertEquals("5", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
 		assertFalse(tu.isEmpty());
-		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstPartContent().toString());
-		assertEquals("Numerus<byte value=\"79\"/> 1", tu.getTarget(locFRFR).getFirstPartContent().toString());
+		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstContent().toString());
+		assertEquals("Numerus<byte value=\"79\"/> 1", tu.getTarget(locFRFR).getFirstContent().toString());
 		assertEquals( 
 				"<numerusform variants=\"no\">[#$$self$]</numerusform>", 
 				tu.getSkeleton().toString());
@@ -820,8 +820,8 @@ public class TsFilterTest {
 		assertEquals("6", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
 		assertFalse(tu.isEmpty());
-		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstPartContent().toString());
-		assertEquals("Numerus<byte value=\"79\"/> 2", tu.getTarget(locFRFR).getFirstPartContent().toString());
+		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstContent().toString());
+		assertEquals("Numerus<byte value=\"79\"/> 2", tu.getTarget(locFRFR).getFirstContent().toString());
 		assertEquals( 
 				"\r\n<numerusform variants=\"no\">[#$$self$]</numerusform>", 
 				tu.getSkeleton().toString());
@@ -892,8 +892,8 @@ public class TsFilterTest {
 	public void testTu() {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, locENUS, locFRFR), 1);
 		assertNotNull(tu);
-		assertEquals("Add Entry To System Log", tu.getSource().getFirstPartContent().getCodedText());
-		assertEquals("Lagg till i system Loggen", tu.getTarget(locFRFR).getFirstPartContent().getCodedText());
+		assertEquals("Add Entry To System Log", tu.getSource().getFirstContent().getCodedText());
+		assertEquals("Lagg till i system Loggen", tu.getTarget(locFRFR).getFirstContent().getCodedText());
 		
 		/*System.out.println(tu.getId());
 		System.out.println(tu.getMimeType());

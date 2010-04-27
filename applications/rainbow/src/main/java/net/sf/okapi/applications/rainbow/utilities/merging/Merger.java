@@ -326,7 +326,7 @@ public class Merger {
 		// Now set the target coded text and the target codes
 		try {
 			// trgCont is un-segmented at this point and will be re-segmented if needed
-			trgCont.getFirstPartContent().setCodedText(fromTrans.getCodedText(), transCodes, false);
+			trgCont.getFirstContent().setCodedText(fromTrans.getCodedText(), transCodes, false);
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
 				trgCont.getSegments().create(ranges);
@@ -477,8 +477,8 @@ public class Merger {
 		TextContainer srcCont, // Can be a clone of the original content
 		TextUnit tu)
 	{
-		List<Code> transCodes = fromTrans.getFirstPartContent().getCodes();
-		List<Code> oriCodes = srcCont.getFirstPartContent().getCodes();
+		List<Code> transCodes = fromTrans.getFirstContent().getCodes();
+		List<Code> oriCodes = srcCont.getFirstContent().getCodes();
 		
 		// Check if we have at least one code
 		if ( transCodes.size() == 0 ) {

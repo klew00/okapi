@@ -96,7 +96,7 @@ public class DTDFilterTest {
 		String snippet = "<!ENTITY entry1 \"&ent1;=ent1, %pent1;=pent1\">";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		List<Code> codes = tu.getSource().getFirstPartContent().getCodes();
+		List<Code> codes = tu.getSource().getFirstContent().getCodes();
 		assertEquals(2, codes.size());
 		assertEquals("&ent1;", codes.get(0).getData());
 		assertEquals("%pent1;", codes.get(1).getData());

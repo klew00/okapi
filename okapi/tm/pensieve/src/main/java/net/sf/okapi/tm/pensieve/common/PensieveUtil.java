@@ -44,9 +44,9 @@ public final class PensieveUtil {
     	LocaleId targetLoc,
     	TextUnit textUnit)
     {
-        TranslationUnitVariant source = new TranslationUnitVariant(sourceLoc, textUnit.getSource().getFirstPartContent());
+        TranslationUnitVariant source = new TranslationUnitVariant(sourceLoc, textUnit.getSource().getFirstContent());
         TextContainer tc = textUnit.getTarget(targetLoc); // Allow null target content
-        TranslationUnitVariant target = new TranslationUnitVariant(targetLoc, (( tc==null ) ? null : tc.getFirstPartContent()));
+        TranslationUnitVariant target = new TranslationUnitVariant(targetLoc, (( tc==null ) ? null : tc.getFirstContent()));
         TranslationUnit tu = new TranslationUnit(source, target);
         populateMetaDataFromProperties(textUnit, tu);
         return tu;

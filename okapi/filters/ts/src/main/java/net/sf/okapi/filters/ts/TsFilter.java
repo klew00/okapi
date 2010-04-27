@@ -892,8 +892,8 @@ public class TsFilter implements IFilter {
 		}
 
 		if ( params.useCodeFinder ) {
-			params.codeFinder.process(tu.getSource().getFirstPartContent());
-			params.codeFinder.process(tu.getTarget(trgLang).getFirstPartContent());
+			params.codeFinder.process(tu.getSource().getFirstContent());
+			params.codeFinder.process(tu.getTarget(trgLang).getFirstContent());
 		}
 		
 		tu.setSkeleton(skel);
@@ -1018,8 +1018,8 @@ public class TsFilter implements IFilter {
 
 					if ( params.useCodeFinder ) {
 						// We can use getFirstPartContent() because nothing is segmented
-						params.codeFinder.process(tf_target.getSource().getFirstPartContent());
-						params.codeFinder.process(tf_target.getTarget(trgLang).getFirstPartContent());
+						params.codeFinder.process(tf_target.getSource().getFirstContent());
+						params.codeFinder.process(tf_target.getTarget(trgLang).getFirstContent());
 					}
 					
 					tf_target.setSkeleton(skel);
@@ -1056,7 +1056,7 @@ public class TsFilter implements IFilter {
 						skel.addContentPlaceholder(tf_target, trgLang);	
 					}
 					// We can use getFirstPartContent() because nothing is segmented
-					tc.getFirstPartContent().append(chars.getData());
+					tc.getFirstContent().append(chars.getData());
 				}
 			}
 		}
@@ -1147,7 +1147,7 @@ public class TsFilter implements IFilter {
 				skel.addContentPlaceholder(tu);	
 			}
 			// We can use getFirstPartContent() because nothing is segmented
-			tc.getFirstPartContent().append(chars.getData());
+			tc.getFirstContent().append(chars.getData());
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 			TextContainer tc = tu.getTarget(trgLang);
@@ -1155,7 +1155,7 @@ public class TsFilter implements IFilter {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
 			// We can use getFirstPartContent() because nothing is segmented
-			tc.getFirstPartContent().append(chars.getData());
+			tc.getFirstContent().append(chars.getData());
 		}
 	}
 	
@@ -1298,7 +1298,7 @@ public class TsFilter implements IFilter {
 				skel.addContentPlaceholder(tu);	
 			}
 			// We can use getFirstPartContent() because nothing is segmented
-			tc.getFirstPartContent().append(sb.toString());
+			tc.getFirstContent().append(sb.toString());
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 			TextContainer tc = tu.getTarget(trgLang);
@@ -1306,7 +1306,7 @@ public class TsFilter implements IFilter {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
 			// We can use getFirstPartContent() because nothing is segmented
-			tc.getFirstPartContent().append(sb.toString());
+			tc.getFirstContent().append(sb.toString());
 		}
 	}
 	
@@ -1321,14 +1321,14 @@ public class TsFilter implements IFilter {
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu);	
 			}
-			tc.getFirstPartContent().append(sb.toString());
+			tc.getFirstContent().append(sb.toString());
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 			TextContainer tc = tu.getTarget(trgLang);
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
-			tc.getFirstPartContent().append(sb.toString());
+			tc.getFirstContent().append(sb.toString());
 		}
 	}
 	
@@ -1377,11 +1377,11 @@ public class TsFilter implements IFilter {
 			if ( params.decodeByteValues ) {
 				Attribute attr = elem.getAttributeByName(new QName("value"));
 				// We can use getFirstPartContent() because nothing is segmented
-				tc.getFirstPartContent().append(decodeByteValue(attr.getValue()));
+				tc.getFirstContent().append(decodeByteValue(attr.getValue()));
 			}
 			else {
 				// We can use getFirstPartContent() because nothing is segmented
-				tc.getFirstPartContent().append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
+				tc.getFirstContent().append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
 				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
 				//TODO: should it be text or code?
 			}
@@ -1396,11 +1396,11 @@ public class TsFilter implements IFilter {
 			if (params.decodeByteValues ) {
 				Attribute attr = elem.getAttributeByName(new QName("value"));
 				// We can use getFirstPartContent() because nothing is segmented
-				tc.getFirstPartContent().append(decodeByteValue(attr.getValue()));
+				tc.getFirstContent().append(decodeByteValue(attr.getValue()));
 			}
 			else {
 				// We can use getFirstPartContent() because nothing is segmented
-				tc.getFirstPartContent().append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
+				tc.getFirstContent().append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
 				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
 				//TODO: should it be text or code?
 			}

@@ -321,7 +321,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		if (source.isEmpty()) return false;
 		
 		// We can use getFirstPartContent() because nothing is segmented yet
-		if (params.unescapeSource) _unescape(source.getFirstPartContent());
+		if (params.unescapeSource) _unescape(source.getFirstContent());
 		
 		//------------------------------
 		// The cell can already have something in the skeleton (for instance, a gap after the source)
@@ -376,7 +376,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		// Automatically replace text fragments with in-line codes (based on regex rules of codeFinder)
 		if (params.useCodeFinder && codeFinder != null) {
 			// We can use getFirstPartContent() because nothing is segmented yet
-			codeFinder.process(source.getFirstPartContent());
+			codeFinder.process(source.getFirstContent());
 			
 //			for (String lng : languages)
 //				codeFinder.process(textUnit.getTargetContent(lng));

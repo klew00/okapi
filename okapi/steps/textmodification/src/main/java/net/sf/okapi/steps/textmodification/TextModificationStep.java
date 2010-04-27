@@ -183,7 +183,7 @@ public class TextModificationStep extends BasePipelineStep {
 	 * @param tu The text unit to process.
 	 */
 	private void addText (TextUnit tu) {
-		TextFragment firstFrag = tu.getTarget(targetLocale).getFirstPartContent();
+		TextFragment firstFrag = tu.getTarget(targetLocale).getFirstContent();
 		TextFragment lastFrag = tu.getTarget(targetLocale).getLastPartContent();
 		if ( params.addPrefix ) {
 			firstFrag.setCodedText(params.prefix + firstFrag.getCodedText());

@@ -256,9 +256,9 @@ public class Database {
 				pstm.setString(1, tu.getName());
 				pstm.setString(2, tu.getType());
 				pstm.setString(3, srcCont.getCodedText());
-				pstm.setString(4, Code.codesToString(srcCont.getFirstPartContent().getCodes()));
+				pstm.setString(4, Code.codesToString(srcCont.getFirstContent().getCodes()));
 				pstm.setString(5, trgCont.getCodedText());
-				pstm.setString(6, Code.codesToString(trgCont.getFirstPartContent().getCodes()));
+				pstm.setString(6, Code.codesToString(trgCont.getFirstContent().getCodes()));
 				pstm.setString(7, grpName);
 				pstm.setString(8, fileName);
 				pstm.execute();

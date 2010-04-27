@@ -513,8 +513,8 @@ public class RegexFilter implements IFilter {
 
 		if ( rule.useCodeFinder ) {
 			// We can use getFirstPartContent() because nothing is segmented yet
-			rule.codeFinder.process(tuRes.getSource().getFirstPartContent());
-			if ( hasTarget ) rule.codeFinder.process(tuRes.getTarget(trgLang).getFirstPartContent());
+			rule.codeFinder.process(tuRes.getSource().getFirstContent());
+			if ( hasTarget ) rule.codeFinder.process(tuRes.getTarget(trgLang).getFirstContent());
 		}
 
 		if ( rule.nameGroup != -1 ) {
@@ -610,7 +610,7 @@ public class RegexFilter implements IFilter {
 				
 				if ( rule.useCodeFinder ) {
 					// We can use getFirstPartContent() because nothing is segmented yet
-					rule.codeFinder.process(tuRes.getSource().getFirstPartContent());
+					rule.codeFinder.process(tuRes.getSource().getFirstContent());
 				}
 
 				if ( rule.nameGroup != -1 ) {

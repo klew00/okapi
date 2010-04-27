@@ -260,8 +260,8 @@ public class XLIFFFilterTest {
 	public void testApprovedTU () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createApprovedTU(), 1);
 		assertNotNull(tu);
-		assertEquals("t1", tu.getSource().getFirstPartContent().toString());
-		assertEquals("translated t1", tu.getTarget(locFR).getFirstPartContent().toString());
+		assertEquals("t1", tu.getSource().getFirstContent().toString());
+		assertEquals("translated t1", tu.getTarget(locFR).getFirstContent().toString());
 		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("yes", prop.getValue());
@@ -331,11 +331,11 @@ public class XLIFFFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(createBilingualXLIFF(), 1);
 		assertNotNull(tu);
 		assertEquals("S1, S2", tu.getSource().toString());
-		fmt.setContent(tu.getSource().getFirstPartContent());
+		fmt.setContent(tu.getSource().getFirstContent());
 		assertEquals("<1>S1</1>, <2>S2</2>", fmt.toString());
 		assertTrue(tu.hasTarget(locFR));
 		assertEquals("T2, T1", tu.getTarget(locFR).toString());
-		fmt.setContent(tu.getTarget(locFR).getFirstPartContent());
+		fmt.setContent(tu.getTarget(locFR).getFirstContent());
 		assertEquals("<2>T2</2>, <1>T1</1>", fmt.toString());
 	}
 
@@ -344,8 +344,8 @@ public class XLIFFFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(createBilingualXLIFF(), 1);
 		assertNotNull(tu);
 		assertTrue(tu.hasTarget(locFR));
-		TextFragment src = tu.getSource().getFirstPartContent();
-		TextFragment trg = tu.getTarget(locFR).getFirstPartContent();
+		TextFragment src = tu.getSource().getFirstContent();
+		TextFragment trg = tu.getTarget(locFR).getFirstContent();
 		assertEquals(4, src.getCodes().size());
 		assertEquals(src.getCodes().size(), trg.getCodes().size());
 		FilterTestDriver.checkCodeData(src, trg);
@@ -355,10 +355,10 @@ public class XLIFFFilterTest {
 	public void testBPTTypeTransUnit () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createBPTTypeXLIFF(), 1);
 		assertNotNull(tu);
-		fmt.setContent(tu.getSource().getFirstPartContent());
+		fmt.setContent(tu.getSource().getFirstContent());
 		assertEquals("<1>S1</1>, <2>S2</2>", fmt.toString());
 		assertTrue(tu.hasTarget(locFR));
-		fmt.setContent(tu.getTarget(locFR).getFirstPartContent());
+		fmt.setContent(tu.getTarget(locFR).getFirstContent());
 		assertEquals("<2>T2</2>, <1>T1</1>", fmt.toString());
 	}
 
@@ -366,7 +366,7 @@ public class XLIFFFilterTest {
 	public void testBPTAndSUBTypeTransUnit () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createBPTAndSUBTypeXLIFF(), 1);
 		assertNotNull(tu);
-		fmt.setContent(tu.getSource().getFirstPartContent());
+		fmt.setContent(tu.getSource().getFirstContent());
 		assertEquals("<1>S1</1>, <2>S2</2>", fmt.toString());
 	}
 
@@ -374,7 +374,7 @@ public class XLIFFFilterTest {
 	public void testBPTWithSUB () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createBPTAndSUBTypeXLIFF(), 1);
 		assertNotNull(tu);
-		Code code = tu.getSource().getFirstPartContent().getCode(0);
+		Code code = tu.getSource().getFirstContent().getCode(0);
 		assertEquals(code.getData(), "a<sub>text</sub>");
 		assertEquals(code.getOuterData(), "<bpt id=\"1\">a<sub>text</sub></bpt>");
 	}
@@ -383,7 +383,7 @@ public class XLIFFFilterTest {
 	public void testPreserveSpaces () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithSpaces(), 1);
 		assertNotNull(tu);
-		fmt.setContent(tu.getSource().getFirstPartContent());
+		fmt.setContent(tu.getSource().getFirstContent());
 		assertTrue(tu.preserveWhitespaces());
 		assertEquals("t1  t2 t3\t\t<1/>  t4", fmt.toString());
 	}
@@ -392,7 +392,7 @@ public class XLIFFFilterTest {
 	public void testUnwrapSpaces () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithSpaces(), 2);
 		assertNotNull(tu);
-		fmt.setContent(tu.getSource().getFirstPartContent());
+		fmt.setContent(tu.getSource().getFirstContent());
 		assertFalse(tu.preserveWhitespaces());
 		assertEquals("t1 t2 t3 <1/> t4", fmt.toString());
 	}
@@ -419,7 +419,7 @@ public class XLIFFFilterTest {
 	public void testComplexSUB () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createComplexSUBTypeXLIFF(), 1);
 		assertNotNull(tu);
-		Code code = tu.getSource().getFirstPartContent().getCode(0);
+		Code code = tu.getSource().getFirstContent().getCode(0);
 		assertEquals(code.getData(), "startCode<sub>[nested<ph id=\"2\">ph-in-sub</ph>still in sub]</sub>endCode");
 		assertEquals(code.getOuterData(), "<ph id=\"1\">startCode<sub>[nested<ph id=\"2\">ph-in-sub</ph>still in sub]</sub>endCode</ph>");
 	}
@@ -429,7 +429,7 @@ public class XLIFFFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(createComplexSUBTypeXLIFF(), 1);
 		assertNotNull(tu);
 		tu.createTarget(locFR, true, IResource.COPY_ALL);
-		Code code = tu.getTarget(locFR).getFirstPartContent().getCode(0);
+		Code code = tu.getTarget(locFR).getFirstContent().getCode(0);
 		assertEquals(code.getData(), "startCode<sub>[nested<ph id=\"2\">ph-in-sub</ph>still in sub]</sub>endCode");
 		assertEquals(code.getOuterData(), "<ph id=\"1\">startCode<sub>[nested<ph id=\"2\">ph-in-sub</ph>still in sub]</sub>endCode</ph>");
 	}

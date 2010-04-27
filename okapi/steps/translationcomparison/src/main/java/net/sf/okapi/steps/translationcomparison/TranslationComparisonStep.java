@@ -241,7 +241,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		TextFragment srcFrag = null;
 		if ( isBaseMultilingual ) {
 			if ( tu1.getSource().contentIsOneSegment() ) {
-				srcFrag = tu1.getSource().getFirstPartContent();
+				srcFrag = tu1.getSource().getFirstContent();
 			}
 			else {
 				srcFrag = tu1.getSource().getUnSegmentedContentCopy();
@@ -250,7 +250,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		else {
 			if ( isInput2Multilingual ) {
 				if ( tu2.getSource().contentIsOneSegment() ) {
-					srcFrag = tu2.getSource().getFirstPartContent();
+					srcFrag = tu2.getSource().getFirstContent();
 				}
 				else {
 					srcFrag = tu2.getSource().getUnSegmentedContentCopy();
@@ -258,7 +258,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			}
 			else if (( tu3 != null ) && isInput3Multilingual ) {
 				if ( tu3.getSource().contentIsOneSegment() ) {
-					srcFrag = tu3.getSource().getFirstPartContent();
+					srcFrag = tu3.getSource().getFirstContent();
 				}
 				else {
 					srcFrag = tu3.getSource().getUnSegmentedContentCopy();
@@ -270,7 +270,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		TextFragment trgFrag1;
 		if ( isBaseMultilingual ) {
 			if ( tu1.getTarget(targetLocale).contentIsOneSegment() ) {
-				trgFrag1 = tu1.getTarget(targetLocale).getFirstPartContent();
+				trgFrag1 = tu1.getTarget(targetLocale).getFirstContent();
 			}
 			else {
 				trgFrag1 = tu1.getTarget(targetLocale).getUnSegmentedContentCopy();
@@ -278,7 +278,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		}
 		else {
 			if ( tu1.getSource().contentIsOneSegment() ) {
-				trgFrag1 = tu1.getSource().getFirstPartContent();
+				trgFrag1 = tu1.getSource().getFirstContent();
 			}
 			else {
 				trgFrag1 = tu1.getSource().getUnSegmentedContentCopy();
@@ -289,7 +289,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		TextFragment trgFrag2;
 		if ( isInput2Multilingual ) {
 			if ( tu2.getTarget(targetLocale).contentIsOneSegment() ) {
-				trgFrag2 = tu2.getTarget(targetLocale).getFirstPartContent();
+				trgFrag2 = tu2.getTarget(targetLocale).getFirstContent();
 			}
 			else {
 				trgFrag2 = tu2.getTarget(targetLocale).getUnSegmentedContentCopy();
@@ -297,7 +297,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		}
 		else {
 			if ( tu2.getSource().contentIsOneSegment() ) {
-				trgFrag2 = tu2.getSource().getFirstPartContent();
+				trgFrag2 = tu2.getSource().getFirstContent();
 			}
 			else {
 				trgFrag2 = tu2.getSource().getUnSegmentedContentCopy();
@@ -309,7 +309,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		if ( tu3 != null ) {
 			if ( isInput3Multilingual ) {
 				if ( tu3.getTarget(targetLocale).contentIsOneSegment() ) {
-					trgFrag3 = tu3.getTarget(targetLocale).getFirstPartContent();
+					trgFrag3 = tu3.getTarget(targetLocale).getFirstContent();
 				}
 				else {
 					trgFrag3 = tu3.getTarget(targetLocale).getUnSegmentedContentCopy();
@@ -317,7 +317,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			}
 			else {
 				if ( tu3.getSource().contentIsOneSegment() ) {
-					trgFrag3 = tu3.getSource().getFirstPartContent();
+					trgFrag3 = tu3.getSource().getFirstContent();
 				}
 				else {
 					trgFrag3 = tu3.getSource().getUnSegmentedContentCopy();

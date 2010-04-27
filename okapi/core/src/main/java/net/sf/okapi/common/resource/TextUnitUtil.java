@@ -198,7 +198,7 @@ public class TextUnitUtil {
 	public static String getSourceText(TextUnit textUnit) {
 		// if ( textUnit == null ) return "";
 		// return getCodedText(textUnit.getSourceContent());
-		return textUnit.getSource().getFirstPartContent().getCodedText();
+		return textUnit.getSource().getFirstContent().getCodedText();
 	}
 
 	/**
@@ -215,9 +215,9 @@ public class TextUnitUtil {
 		if (textUnit == null)
 			return "";
 		if (removeCodes) {
-			return getText(textUnit.getSource().getFirstPartContent());
+			return getText(textUnit.getSource().getFirstContent());
 		} else {
-			return textUnit.getSource().getFirstPartContent().getCodedText();
+			return textUnit.getSource().getFirstContent().getCodedText();
 		}
 	}
 
@@ -237,7 +237,7 @@ public class TextUnitUtil {
 		if (Util.isNullOrEmpty(locId))
 			return "";
 
-		return getCodedText(textUnit.getTarget(locId).getFirstPartContent());
+		return getCodedText(textUnit.getTarget(locId).getFirstContent());
 	}
 
 	/**
@@ -652,7 +652,7 @@ public class TextUnitUtil {
 	 */
 	public static void setSourceText(TextUnit textUnit, String text) {
 		// fail fast if ( textUnit == null ) return;
-		TextFragment source = textUnit.getSource().getFirstPartContent();
+		TextFragment source = textUnit.getSource().getFirstContent();
 		// fail fast if ( source == null ) return;
 		source.setCodedText(text);
 	}
@@ -670,7 +670,7 @@ public class TextUnitUtil {
 	public static void setTargetText(TextUnit textUnit, LocaleId locId, String text) {
 		// fail fast if ( textUnit == null ) return;
 		// fail fast if ( Util.isNullOrEmpty(locId) ) return;
-		TextFragment target = textUnit.getTarget(locId).getFirstPartContent();
+		TextFragment target = textUnit.getTarget(locId).getFirstContent();
 		// fail fast if ( target == null ) return;
 		target.setCodedText(text);
 	}
@@ -696,12 +696,12 @@ public class TextUnitUtil {
 		GenericSkeleton skel = new GenericSkeleton();
 
 		if (trimLeading) {
-			trimLeading(source.getFirstPartContent(), skel);
+			trimLeading(source.getFirstContent(), skel);
 		}
 		skel.addContentPlaceholder(textUnit);
 
 		if (trimTrailing) {
-			trimTrailing(source.getFirstPartContent(), skel);
+			trimTrailing(source.getFirstContent(), skel);
 		}
 
 		int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);

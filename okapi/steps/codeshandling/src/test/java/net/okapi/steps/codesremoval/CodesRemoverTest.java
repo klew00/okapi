@@ -64,9 +64,9 @@ public class CodesRemoverTest {
 		
 		remover.processTextUnit(tu);
 		assertEquals("t1<br/>t2<b>t3</b>", tu.toString());
-		assertEquals(3, tu.getSource().getFirstPartContent().getCodes().size());
+		assertEquals(3, tu.getSource().getFirstContent().getCodes().size());
 		assertEquals("t1<br/>t2<b>t3</b>", tu.getTarget(LocaleId.SPANISH).toString());
-		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getFirstPartContent().getCodes().size());
+		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getFirstContent().getCodes().size());
 	}
 	
 	@Test
@@ -80,7 +80,7 @@ public class CodesRemoverTest {
 		
 		remover.processTextUnit(tu);
 		assertEquals("t1<br/>t2<b>t3</b>", tu.toString());
-		assertEquals(3, tu.getSource().getFirstPartContent().getCodes().size());
+		assertEquals(3, tu.getSource().getFirstContent().getCodes().size());
 		assertEquals("t1t2t3", tu.getTarget(LocaleId.SPANISH).toString());
 	}
 	
@@ -96,7 +96,7 @@ public class CodesRemoverTest {
 		remover.processTextUnit(tu);
 		assertEquals("t1t2t3", tu.toString());
 		assertEquals("t1<br/>t2<b>t3</b>", tu.getTarget(LocaleId.SPANISH).toString());
-		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getFirstPartContent().getCodes().size());
+		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getFirstContent().getCodes().size());
 	}
 
 	@Test

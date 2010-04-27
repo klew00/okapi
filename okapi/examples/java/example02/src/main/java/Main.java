@@ -53,7 +53,7 @@ public class Main {
 				if ( event.getEventType() == EventType.TEXT_UNIT ) {
 					// Format and print out each text unit
 					// We can use getFirstPartContent() because nothing is segmented
-					fmt.setContent(((TextUnit)event.getResource()).getSource().getFirstPartContent());
+					fmt.setContent(((TextUnit)event.getResource()).getSource().getFirstContent());
 					System.out.println(fmt.toString());
 				}
 			}

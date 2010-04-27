@@ -833,7 +833,7 @@ public class OpenXMLFilter implements IFilter {
 						translator.addToReferents(event);
 						TextUnit tu = (TextUnit)event.getResource();
 						// We can use getFirstPartContent() because nothing is segmented yet
-						TextFragment tfSource = tu.getSource().getFirstPartContent();
+						TextFragment tfSource = tu.getSource().getFirstContent();
 						String torg = translator.translate(tfSource,LOGGER,nFileType); // DWH 5-7-09 nFileType
 						TextFragment tfTarget = tfSource.clone();
 						tfTarget.setCodedText(torg);

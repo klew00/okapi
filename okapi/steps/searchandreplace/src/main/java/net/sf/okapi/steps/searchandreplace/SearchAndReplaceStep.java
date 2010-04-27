@@ -279,7 +279,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				trgCont.getSegments().joinAll();
 			}
 			
-			String result = trgCont.getFirstPartContent().getCodedText();
+			String result = trgCont.getFirstContent().getCodedText();
 
         	if ( params.regEx ){
         		for(int i=0; i<params.rules.size();i++){
@@ -298,7 +298,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
     	        }
         	}
 			
-			trgCont.getFirstPartContent().setCodedText(result);
+			trgCont.getFirstContent().setCodedText(result);
 		}
 		catch ( Exception e ) {
 			logger.log(Level.WARNING,

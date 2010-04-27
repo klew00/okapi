@@ -199,8 +199,8 @@ public class POFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
 		assertTrue(tu.hasTarget(locFR));
-		TextFragment src = tu.getSource().getFirstPartContent();
-		TextFragment trg = tu.getTarget(locFR).getFirstPartContent();
+		TextFragment src = tu.getSource().getFirstContent();
+		TextFragment trg = tu.getTarget(locFR).getFirstContent();
 		assertEquals(3, src.getCodes().size());
 		assertEquals(src.getCodes().size(), trg.getCodes().size());
 		FilterTestDriver.checkCodeData(src, trg);

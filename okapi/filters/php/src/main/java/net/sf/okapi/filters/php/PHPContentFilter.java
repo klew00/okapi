@@ -634,7 +634,7 @@ public class PHPContentFilter implements IFilter {
 		}
 		srcSkel.addContentPlaceholder(textUnit);
 		textUnit.setMimeType(MimeTypeMapper.PHP_MIME_TYPE);
-		textUnit.getSource().getFirstPartContent().append(srcFrag);
+		textUnit.getSource().getFirstContent().append(srcFrag);
 		if ( !srcSkel.isEmpty() ) textUnit.setSkeleton(srcSkel);
 		
 		// Any dangling skeleton?

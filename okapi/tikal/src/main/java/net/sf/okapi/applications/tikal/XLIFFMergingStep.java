@@ -230,7 +230,7 @@ public class XLIFFMergingStep {
 		// Now set the target coded text and the target codes
 		try {
 			// Use first part because it not segmented here
-			trgCont.getFirstPartContent().setCodedText(fromTrans.getCodedText(), transCodes, false);
+			trgCont.getFirstContent().setCodedText(fromTrans.getCodedText(), transCodes, false);
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
 				trgCont.getSegments().create(ranges);
@@ -255,8 +255,8 @@ public class XLIFFMergingStep {
 		TextUnit tu)
 	{
 		// We assume the container are NOT segmented
-		List<Code> transCodes = fromTrans.getFirstPartContent().getCodes();
-		List<Code> oriCodes = srcCont.getFirstPartContent().getCodes();
+		List<Code> transCodes = fromTrans.getFirstContent().getCodes();
+		List<Code> oriCodes = srcCont.getFirstContent().getCodes();
 		
 		// Check if we have at least one code
 		if ( transCodes.size() == 0 ) {

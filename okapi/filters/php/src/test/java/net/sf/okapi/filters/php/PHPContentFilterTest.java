@@ -149,7 +149,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' \r. 't2", tu.getSource().toString());
-		List<Code> codes = tu.getSource().getFirstPartContent().getCodes();
+		List<Code> codes = tu.getSource().getFirstContent().getCodes();
 		assertEquals(1, codes.size());
 		assertEquals("' \r. '", codes.get(0).toString());
 		assertEquals("x-singlequoted", tu.getType());
@@ -164,7 +164,7 @@ public class PHPContentFilterTest {
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertTrue(tu!=null);
 		assertEquals("t2 '.\"and t3", tu.getSource().toString());
-		assertEquals("t2 <1/>and t3", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("t2 <1/>and t3", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		assertEquals("x-mixed", tu.getType());
 	}
 	
@@ -174,7 +174,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' \r.$b.' t2", tu.getSource().toString());
-		List<Code> codes = tu.getSource().getFirstPartContent().getCodes();
+		List<Code> codes = tu.getSource().getFirstContent().getCodes();
 		assertEquals(1, codes.size());
 		assertEquals("' \r.$b.'", codes.get(0).toString());
 	}
@@ -185,7 +185,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' \r.$b.' t2' . $c.\" t3 ", tu.getSource().toString());
-		assertEquals("t1<1/> t2<2/> t3 ", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("t1<1/> t2<2/> t3 ", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		assertEquals("x-mixed", tu.getType());
 	}
 	
@@ -195,7 +195,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' \r.$b.' t2' . $c.\" t3 ", tu.getSource().toString());
-		assertEquals("t1<1/> t2<2/> t3 ", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("t1<1/> t2<2/> t3 ", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test
@@ -213,7 +213,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("{$abc}=text", tu.getSource().toString());
-		List<Code> codes = tu.getSource().getFirstPartContent().getCodes();
+		List<Code> codes = tu.getSource().getFirstContent().getCodes();
 		assertNotNull(codes);
 		assertEquals(1, codes.size());
 		assertEquals("{$abc}", codes.get(0).toString());
@@ -225,7 +225,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t<a>t</a>t<a attr=\"val\"/>t", tu.getSource().toString());
-		assertEquals("t<1/>t<2/>t<3/>t", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("t<1/>t<2/>t<3/>t", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test
@@ -234,7 +234,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("c attr=\"val\"> text <br/>", tu.getSource().toString());
-		assertEquals("<1/> text <2/>", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("<1/> text <2/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test
@@ -243,7 +243,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("<br/> text <a href=\"...", tu.getSource().toString());
-		assertEquals("<1/> text <2/>", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("<1/> text <2/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test
@@ -252,7 +252,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("<!DOCTYPE...> t <?pi attr=\"val\"?> t", tu.getSource().toString());
-		assertEquals("<1/> t <2/> t", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("<1/> t <2/> t", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test
@@ -261,7 +261,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("\\n t \\r t \\n\\r t \\v t \\a", tu.getSource().toString());
-		assertEquals("<1/> t <2/> t <3/><4/> t <5/> t <6/>", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("<1/> t <2/> t <3/><4/> t <5/> t <6/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test
@@ -285,7 +285,7 @@ public class PHPContentFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t [var1] t {var2} t {$var3} t", tu.getSource().toString());
-		assertEquals("t <1/> t <2/> t <3/> t", fmt.setContent(tu.getSource().getFirstPartContent()).toString());
+		assertEquals("t <1/> t <2/> t <3/> t", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test

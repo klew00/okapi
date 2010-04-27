@@ -615,8 +615,8 @@ public class POFilter implements IFilter {
 					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", true));
 				}
 				// Synchronizes source and target codes as much as possible
-				TextFragment tf = tc.getFirstPartContent();
-				tf.synchronizeCodes(tu.getSource().getFirstPartContent());
+				TextFragment tf = tc.getFirstContent();
+				tf.synchronizeCodes(tu.getSource().getFirstContent());
 			}
 			//else { // Correct the approved property
 			//	tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");
