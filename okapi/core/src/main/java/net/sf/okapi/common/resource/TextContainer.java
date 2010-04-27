@@ -897,7 +897,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * @see #getLastSegmentContent()
 	 */
 	public TextFragment getFirstContent () {
-		return parts.get(parts.size()-1).text;
+		return parts.get(0).text;
 	}
 	
 	/**
