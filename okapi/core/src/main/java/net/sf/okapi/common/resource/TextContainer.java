@@ -834,7 +834,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * is only cleared, not removed.
 	 * @param partIndex the position of the part to remove. 
 	 */
-	public void removePart (int partIndex) {
+	public void remove (int partIndex) {
 		if ( parts.get(partIndex).isSegment() && hasOnlyOneSegment() ){
 			// If it's the last segment, just clear it, don't remove it.
 			parts.get(partIndex).text.clear();

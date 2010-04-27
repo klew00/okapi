@@ -457,9 +457,9 @@ public class TextContainerTest {
 	public void testRemovePart () {
 		TextContainer tc = createMultiSegmentContent();
 		assertEquals("[text1] [text2]", fmt.printSegmentedContent(tc, true));
-		tc.removePart(2);
+		tc.remove(2);
 		assertEquals("[text1] ", fmt.printSegmentedContent(tc, true));
-		tc.removePart(0); // last segment: clear only
+		tc.remove(0); // last segment: clear only
 		assertEquals("[] ", fmt.printSegmentedContent(tc, true));
 	}
 	
