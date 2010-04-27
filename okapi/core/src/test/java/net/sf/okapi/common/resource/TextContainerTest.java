@@ -949,7 +949,7 @@ public class TextContainerTest {
 		assertTrue(tc.hasBeenSegmented());
 		assertFalse(tc.contentIsOneSegment());
 		assertEquals("0", segments.get(0).id); // old segment 0
-		assertFalse(tc.getPart(1).isSegment());
+		assertFalse(tc.get(1).isSegment());
 		assertEquals("1", segments.get(1).id); // last part (right of segment 0)
 	}
 	
@@ -962,7 +962,7 @@ public class TextContainerTest {
 		// Make "te" an non-segment
 		tc.splitPart(2, 0, 2, false);
 		assertEquals("[text1<1/>] te[xt2<2/>]", fmt.printSegmentedContent(tc, true));
-		assertEquals("te", tc.getPart(2).toString());
+		assertEquals("te", tc.get(2).toString());
 		// Make <1/> a segment
 		tc.splitPart(0, 5, -1, true);
 		assertEquals("[text1][<1/>] te[xt2<2/>]", fmt.printSegmentedContent(tc, true));
@@ -1032,7 +1032,7 @@ public class TextContainerTest {
 	public void testCompareTo_TwoOnTwoDifferenceInCodes () {
 		TextContainer tc1 = createMultiSegmentContentWithCodes();
 		TextContainer tc2 = createMultiSegmentContentWithCodes();
-		tc2.getPart(0).getContent().getCode(0).data = "<XYZ/>";
+		tc2.get(0).getContent().getCode(0).data = "<XYZ/>";
 		assertFalse(0==tc1.compareTo(tc2, true)); // Code sensitive
 		assertTrue(0==tc1.compareTo(tc2, false));
 	}

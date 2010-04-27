@@ -189,7 +189,7 @@ public class TextContainer implements Iterable<TextPart> {
 		 * <p>Use {@link #getSegment(String)} to retrieve by segment identifier.
 		 * @throws IndexOutOfBoundsException if the index is out of bounds.
 		 * @see #getSegment(String)
-		 * @see #getPart(int)
+		 * @see #get(int)
 		 * #see {@link #iterator()}
 		 */
 		public Segment get (int index);
@@ -1283,7 +1283,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 * @see #getSegment(int)
 	 */
-	public TextPart getPart (int index) {
+	public TextPart get (int index) {
 		return parts.get(index);
 	}
 	
