@@ -150,10 +150,10 @@ public class XLIFFFilterTest {
 	@Test
 	public void testSegmentedEntryOutput () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-			+ "<xliff version=\"1.2\">"
+			+ "<xliff version=\"1.2\">\r"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "<body>"
-			+ "<trans-unit id=\"1\">"
+			+ "<trans-unit id=\"1\"><!--comment-->"
 			+ "<source>t1. t2</source>"
 			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
 			+ "<target xml:lang=\"fr\"><mrk mid=\"1\" mtype=\"seg\">tt1.</mrk> <mrk mid=\"2\" mtype=\"seg\">tt2</mrk></target>"
@@ -161,14 +161,13 @@ public class XLIFFFilterTest {
 			+ "</body>"
 			+ "</file></xliff>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-			+ "<xliff version=\"1.2\">"
+			+ "<xliff version=\"1.2\">\r"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "<body>"
-			+ "<trans-unit id=\"1\">"
+			+ "<trans-unit id=\"1\"><!--comment-->"
 			+ "<source>t1. t2</source>"
-			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
-//TODO: implement this ->			+ "<target xml:lang=\"fr\"><mrk mid=\"1\" mtype=\"seg\">tt1.</mrk> <mrk mid=\"2\" mtype=\"seg\">tt2</mrk></target>"
-			+ "<target xml:lang=\"fr\">tt1. tt2</target>"
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>\r"
+			+ "<target xml:lang=\"fr\"><mrk mid=\"1\" mtype=\"seg\">tt1.</mrk> <mrk mid=\"2\" mtype=\"seg\">tt2</mrk></target>"
 			+ "</trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";
@@ -178,13 +177,13 @@ public class XLIFFFilterTest {
 		assertEquals("[tt1.] [tt2]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
 		
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
-			filter.getEncoderManager(), locFR));
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
 	}
 
 	@Test
 	public void testSegmentedNoTargetEntryOutput () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-			+ "<xliff version=\"1.2\">"
+			+ "<xliff version=\"1.2\">\r"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "\r<body>"
 			+ "<trans-unit id=\"1\" xml:space=\"preserve\">"
@@ -192,16 +191,16 @@ public class XLIFFFilterTest {
 			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
 			+ "</trans-unit></body></file></xliff>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-			+ "<xliff version=\"1.2\">"
+			+ "<xliff version=\"1.2\">\r"
 			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "\r<body>"
 			+ "<trans-unit id=\"1\" xml:space=\"preserve\">"
 			+ "<source>t1.   t2</source>"
-			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
-			+ "<target xml:lang=\"fr\">t1.   t2</target>"
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>\r"
+			+ "<target xml:lang=\"fr\"><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></target>"
 			+ "\r</trans-unit></body></file></xliff>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
-			filter.getEncoderManager(), locFR));
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
 	}
 
 	@Test
@@ -224,7 +223,7 @@ public class XLIFFFilterTest {
 			+ "</trans-unit></body>"
 			+ "</file></xliff>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
-			filter.getEncoderManager(), locFR));
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
 	}
 
 	@Test
@@ -253,7 +252,8 @@ public class XLIFFFilterTest {
 			+ "<target><g id=\"2\">T2</g>, <g id=\"1\">T1</g></target></trans-unit></body>"
 			+ "</file></xliff>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
-			filter.getEncoderManager(), locEN));
+			locEN, filter.createSkeletonWriter(), filter.getEncoderManager()));
+		
 	}
 
 	@Test
@@ -459,16 +459,15 @@ public class XLIFFFilterTest {
 			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\" target-language=\"fr\">"
 			+ "<body>"
 			+ "<trans-unit id=\"1\" xml:space=\"preserve\"><source><ph id=\"1\">code</ph>t1</source>"
-			+ "<seg-source><ph id=\"1\">code</ph><mrk mid=\"s1\" mtype=\"seg\">t1</mrk></seg-source>"
-			+ "<target xml:lang=\"fr\"><ph id=\"1\">code</ph></target>"
+			+ "<seg-source><ph id=\"1\">code</ph><mrk mid=\"s1\" mtype=\"seg\">t1</mrk></seg-source>\r"
+			+ "<target xml:lang=\"fr\"><ph id=\"1\">code</ph><mrk mid=\"s1\" mtype=\"seg\"></mrk></target>"
 			+ "</trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";
-//TODO: segmented target in output		
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
-			filter.getEncoderManager(), locEN));
+			locEN, filter.createSkeletonWriter(), filter.getEncoderManager()));
 	}
-	
+
 	@Test
 	public void testNotes () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createDecoratedXLIFF(), 1);
@@ -500,7 +499,7 @@ public class XLIFFFilterTest {
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
-	
+
 	@Test
 	public void testDoubelextractionDE () {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();

@@ -174,4 +174,9 @@ public class JSONEncoder implements IEncoder {
 		return value;
 	}
 
+	@Override
+	public String getLineBreak () {
+		return "\n";
+	}
+
 }

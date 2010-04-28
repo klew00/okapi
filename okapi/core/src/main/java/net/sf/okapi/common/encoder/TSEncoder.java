@@ -28,15 +28,17 @@ import net.sf.okapi.common.resource.Property;
  */
 public class TSEncoder implements IEncoder {
 	
-//	private String lineBreak;
+	private String lineBreak;
 	
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
 	{
-		//this.lineBreak = lineBreak;
+		this.lineBreak = lineBreak;
 	}
 
+	@Override
 	public String encode (String text,
 		int context)
 	{
@@ -53,16 +55,19 @@ public class TSEncoder implements IEncoder {
 		return escaped.toString();
 	}
 
+	@Override
 	public String encode(int codePoint, int context) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public String encode(char value, int context) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
 	public String toNative(String propertyName, String value) {
 		// PROP_LANGUAGE: Not applicable
 		// PROP_ENCODING: No change
@@ -77,4 +82,10 @@ public class TSEncoder implements IEncoder {
 		}
 		return value;		
 	}
+
+	@Override
+	public String getLineBreak () {
+		return lineBreak;
+	}
+
 }

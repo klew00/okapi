@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -40,6 +40,7 @@ public class DTDEncoder implements IEncoder {
 	 * @param encoding the name of the charset encoding to use.
 	 * @param lineBreak the type of line break to use.
 	 */
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
@@ -55,6 +56,7 @@ public class DTDEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String encode (String text, 
 		int context)
 	{
@@ -108,6 +110,7 @@ public class DTDEncoder implements IEncoder {
 		return sbTmp.toString();
 	}
 
+	@Override
 	public String encode (char value,
 		int context)
 	{
@@ -137,6 +140,7 @@ public class DTDEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String encode (int value,
 		int context)
 	{
@@ -176,12 +180,18 @@ public class DTDEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
 		// PROP_ENCODING: Same value in native
 		// PROP_LANGUGE: Same value in native
 		return value;
+	}
+
+	@Override
+	public String getLineBreak () {
+		return this.lineBreak;
 	}
 
 }

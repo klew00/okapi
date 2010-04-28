@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,6 +29,7 @@ public class DefaultEncoder implements IEncoder {
 	
 	private String lineBreak;
 	
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
@@ -36,18 +37,21 @@ public class DefaultEncoder implements IEncoder {
 		this.lineBreak = lineBreak;
 	}
 
+	@Override
 	public String encode (String text,
 		int context)
 	{
 		return text.replace("\n", lineBreak);
 	}
 
+	@Override
 	public String encode (char value,
 		int context)
 	{
 		return String.valueOf(value).replace("\n", lineBreak);
 	}
 
+	@Override
 	public String encode (int value,
 		int context)
 	{
@@ -57,10 +61,16 @@ public class DefaultEncoder implements IEncoder {
 		return String.valueOf((char)value).replace("\n", lineBreak); 
 	}
 
+	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
 		return value;
+	}
+
+	@Override
+	public String getLineBreak () {
+		return this.lineBreak;
 	}
 
 }

@@ -32,6 +32,7 @@ public class PropertiesEncoder implements IEncoder {
 	
 	private CharsetEncoder chsEnc;
 	private boolean escapeExtendedChars;
+	private String lineBreak;
 	
 	/**
 	 * Creates a new PropertiesEncoder object, with US-ASCII as the encoding.
@@ -41,19 +42,21 @@ public class PropertiesEncoder implements IEncoder {
 		chsEnc = Charset.forName("us-ascii").newEncoder();
 	}
 	
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
 	{
 		// lineBreak: They are converted to \n in this format
 		chsEnc = Charset.forName(encoding).newEncoder();
-		
+		this.lineBreak = lineBreak;
 		// Get the output options
 		if ( params != null ) {
 			escapeExtendedChars = params.getBoolean("escapeExtendedChars");
 		}
 	}
 
+	@Override
 	public String encode (String text,
 		int context)
 	{
@@ -106,6 +109,7 @@ public class PropertiesEncoder implements IEncoder {
 		return escaped.toString();
 	}
 
+	@Override
 	public String encode (char value,
 		int context)
 	{
@@ -129,6 +133,7 @@ public class PropertiesEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String encode (int value,
 		int context)
 	{
@@ -165,6 +170,7 @@ public class PropertiesEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
@@ -173,6 +179,11 @@ public class PropertiesEncoder implements IEncoder {
 		
 		// No changes for the other values
 		return value;
+	}
+
+	@Override
+	public String getLineBreak () {
+		return lineBreak;
 	}
 
 }

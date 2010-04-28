@@ -166,6 +166,7 @@ public class EncoderManager implements IEncoder {
 	 * @param context The context of the text: 0=text, 1=skeleton, 2=inline.
 	 * @return The encoded text.
 	 */
+	@Override
 	public String encode (String text,
 		int context)
 	{
@@ -181,6 +182,7 @@ public class EncoderManager implements IEncoder {
 	 * @return The encoded character 9as a string since it can be now made up of
 	 * more than one character).
 	 */
+	@Override
 	public String encode (char value,
 		int context)
 	{
@@ -196,6 +198,7 @@ public class EncoderManager implements IEncoder {
 	 * @return The encoded character 9as a string since it can be now made up of
 	 * more than one character).
 	 */
+	@Override
 	public String encode (int codePoint,
 		int context)
 	{
@@ -224,6 +227,7 @@ public class EncoderManager implements IEncoder {
 	 * @param encoding The name of the charset encoding to use.
 	 * @param lineBreak Type of line-break to use in the output.
 	 */
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
@@ -233,6 +237,7 @@ public class EncoderManager implements IEncoder {
 		}
 	}
 
+	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
@@ -260,6 +265,14 @@ public class EncoderManager implements IEncoder {
 			throw new InvalidParameterException("lineBreak parameter is null");
 		}
 		defLineBreak = lineBreak;
+	}
+
+	@Override
+	public String getLineBreak () {
+		if ( encoder != null ) {
+			return encoder.getLineBreak();
+		}
+		return this.defLineBreak;
 	}
 
 }

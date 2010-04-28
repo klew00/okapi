@@ -28,8 +28,7 @@ import net.sf.okapi.common.resource.Property;
  */
 public class POEncoder implements IEncoder {
 	
-//	private String lineBreak;
-	
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
@@ -37,18 +36,21 @@ public class POEncoder implements IEncoder {
 		//this.lineBreak = lineBreak;
 	}
 
+	@Override
 	public String encode (String text,
 		int context)
 	{
 		return text;
 	}
 
+	@Override
 	public String encode (char value,
 		int context)
 	{
 		return String.valueOf(value);
 	}
 
+	@Override
 	public String encode (int value,
 		int context)
 	{
@@ -58,6 +60,7 @@ public class POEncoder implements IEncoder {
 		return String.valueOf((char)value); 
 	}
 
+	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
@@ -74,4 +77,11 @@ public class POEncoder implements IEncoder {
 		return value;
 	}
 
+
+	@Override
+	public String getLineBreak () {
+		return "\n";
+	}
+
+	
 }

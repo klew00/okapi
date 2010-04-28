@@ -57,17 +57,17 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	protected ILayerProvider layer;
 	protected EncoderManager encoderManager;
 	protected Stack<StorageList> storageStack;
+	protected boolean isMultilingual;
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private LinkedHashMap<String, Referent> referents;
 	private String outputEncoding;
-	private boolean isMultilingual;
 	private int referentCopies = 1; // Number of copies to have for the referents (min=1)
 
 //	private boolean segmentReferents = false;
 	
-	private IReferenceable getReference (String id) {
+	protected IReferenceable getReference (String id) {
 		if ( referents == null ) return null;
 		Referent ref = referents.get(id);
 		if ( ref == null ) return null;
@@ -202,7 +202,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
 	}
 	
-	private String getString (ISkeleton skeleton,
+	protected String getString (ISkeleton skeleton,
 		int context)
 	{
 		if ( skeleton == null ) return "";
@@ -213,7 +213,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private String getString (GenericSkeletonPart part,
+	protected String getString (GenericSkeletonPart part,
 		int context)
 	{
 		// If it is not a reference marker, just use the data
@@ -279,7 +279,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return getString((GenericSkeleton)((IResource)ref).getSkeleton(), context);
 	}
 
-	private String getString (INameable ref,
+	protected String getString (INameable ref,
 		String propName,
 		LocaleId locToUse,
 		int context)
@@ -312,7 +312,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 * @param content Context flag: 0=text, 1=skeleton, 2=in-line.
 	 * @return The string representation of the text unit. 
 	 */
-	private String getString (TextUnit tu,
+	protected String getString (TextUnit tu,
 		LocaleId locToUse,
 		int context)
 	{
@@ -339,7 +339,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 */
 	protected String getContent (TextUnit tu,
 		LocaleId locToUse,
-		int context) // protected for OpenXML
+		int context)
 	{
 		// Update the encoder from the TU's MIME type
 		if ( encoderManager != null ) {
@@ -837,7 +837,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private String getString (StorageList list,
+	protected String getString (StorageList list,
 		LocaleId locToUse,
 		int context)
 	{

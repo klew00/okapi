@@ -64,7 +64,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 @UsingParameters(Parameters.class)
@@ -72,8 +71,10 @@ public class XLIFFFilter implements IFilter {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
-	public final String PROP_BUILDNUM = "build-num";
-	public final String PROP_EXTRADATA = "extradata";
+	public static final String PROP_BUILDNUM = "build-num";
+	public static final String PROP_EXTRADATA = "extradata";
+	
+	public static final String PROP_WASSEGMENTED = "wassegmented";
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
@@ -281,7 +282,7 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {
-		return new GenericSkeletonWriter();
+		return new XLIFFSkeletonWriter(params);
 	}
 
 	public IFilterWriter createFilterWriter () {
@@ -534,6 +535,7 @@ public class XLIFFFilter implements IFilter {
 			sourceDone = false;
 			targetDone = false;
 			altTrans = null;
+			boolean hasSegSource = false;
 			tu = new TextUnit(String.valueOf(++tuId));
 			storeStartElement();
 
@@ -583,23 +585,31 @@ public class XLIFFFilter implements IFilter {
 						storeEndElement();
 					}
 					else if ( "seg-source".equals(name) ) {
+						// Store the seg-source skeleton in a isolated part
+						skel.add(XLIFFSkeletonWriter.SEGSOURCEMARKER);
+						skel.attachParent(tu);
 						storeStartElement();
 						processSource(true);
 						storeEndElement();
+						skel.flushPart(); // Close the part for the seg-source
+						hasSegSource = true;
+						if ( tu.getSource().hasBeenSegmented() ) {
+							tu.setProperty(new Property(PROP_WASSEGMENTED, "true", true));
+						}
 					}
 					else if ( "note".equals(name) ) {
-						addTargetIfNeeded();
+						addTargetIfNeeded(!hasSegSource);
 						storeStartElement();
 						processNote();
 						storeEndElement();
 					}
 					else if ( "alt-trans".equals(name) ) {
-						addTargetIfNeeded();
+						addTargetIfNeeded(!hasSegSource);
 						storeStartElement();
 						processStartAltTrans();
 					}
 					else {
-						addTargetIfNeeded();
+						addTargetIfNeeded(!hasSegSource);
 						storeStartElement();
 					}
 					break;
@@ -608,7 +618,7 @@ public class XLIFFFilter implements IFilter {
 					name = reader.getLocalName();
 					//addTargetIfNeeded();
 					if ( "trans-unit".equals(name) ) {
-						addTargetIfNeeded();
+						addTargetIfNeeded(!hasSegSource);
 						storeEndElement();
 						tu.setSkeleton(skel);
 						tu.setMimeType(MimeTypeMapper.XLIFF_MIME_TYPE);
@@ -628,7 +638,7 @@ public class XLIFFFilter implements IFilter {
 						tmp = reader.getText();
 						for ( int i=0; i<tmp.length(); i++ ) {
 							if ( !Character.isWhitespace(tmp.charAt(i)) ) {
-								addTargetIfNeeded();
+								addTargetIfNeeded(!hasSegSource);
 								break;
 							}
 						}
@@ -770,13 +780,22 @@ public class XLIFFFilter implements IFilter {
 		}
 	}
 	
-	private void addTargetIfNeeded () {
+	private void addTargetIfNeeded (boolean addSegSource) {
 		if ( !sourceDone ) {
 			throw new OkapiIllegalFilterOperationException("Element <source> missing or not placed properly.");
 		}
 		if ( targetDone ) return; // Nothing to add
+		
+		// Add skeleton part for the seg-source if it's was not there
+		if ( addSegSource ) {
+			// Add an empty part of the potential seg-source to add
+			skel.add(XLIFFSkeletonWriter.SEGSOURCEMARKER);
+			skel.attachParent(tu);
+			skel.flushPart(); // Close the part for the seg-source
+		}
+		
 		// If the target language is the same as the source, we should not create new <target>
-		if ( srcLang.equals(trgLang) ) return; 
+		if ( srcLang.equals(trgLang) ) return;
 		//Else: this trans-unit has no target, we add it here in the skeleton
 		// so we can merge target data in it when writing out the skeleton
 		skel.append(String.format("<target xml:lang=\"%s\">", trgLang));

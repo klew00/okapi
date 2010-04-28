@@ -25,55 +25,66 @@ import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.ListSelectionPart;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
+	public static final int SEGMENTATIONTYPE_ORIGINAL = 0;
+	public static final int SEGMENTATIONTYPE_SEGMENTED = 1;
+	public static final int SEGMENTATIONTYPE_NOTSEGMENTED = 2;
+
+	public static final String FALLBACKTOID = "fallbackToID";
+	public static final String ESCAPEGT = "escapeGT";
+	public static final String ADDTARGETLANGUAGE = "addTargetLanguage";
+	public static final String SEGMENTATIONTYPE = "segmentationType";
+	
 	private boolean fallbackToID;
 	private boolean escapeGT;
 	private boolean addTargetLanguage;
+	private int segmentationType;
 	// Not used for now
-	private boolean useStateValues;
-	private boolean extractOnlyMatchingValues;
-	private String stateValues;
-	private boolean extractNoState;
+//	private boolean useStateValues;
+//	private boolean extractOnlyMatchingValues;
+//	private String stateValues;
+//	private boolean extractNoState;
 
 	public Parameters () {
 		reset();
 		toString(); // fill the list
 	}
 	
-	public boolean getUseStateValues () {
-		return useStateValues;
-	}
-
-	public void setUseStateValues (boolean useStateValues) {
-		this.useStateValues = useStateValues;
-	}
-
-	public boolean getExtractOnlyMatchingValues () {
-		return extractOnlyMatchingValues;
-	}
-
-	public void setExtractOnlyMatchingValues (boolean extractOnlyMatchingValues) {
-		this.extractOnlyMatchingValues = extractOnlyMatchingValues;
-	}
-
-	public String getStateValues () {
-		return stateValues;
-	}
-
-	public void setStateValues (String stateValues) {
-		this.stateValues = stateValues;
-	}
-
-	public boolean getExtractNoState () {
-		return extractNoState;
-	}
-
-	public void setExtractNoState (boolean extractNoState) {
-		this.extractNoState = extractNoState;
-	}
+//	public boolean getUseStateValues () {
+//		return useStateValues;
+//	}
+//
+//	public void setUseStateValues (boolean useStateValues) {
+//		this.useStateValues = useStateValues;
+//	}
+//
+//	public boolean getExtractOnlyMatchingValues () {
+//		return extractOnlyMatchingValues;
+//	}
+//
+//	public void setExtractOnlyMatchingValues (boolean extractOnlyMatchingValues) {
+//		this.extractOnlyMatchingValues = extractOnlyMatchingValues;
+//	}
+//
+//	public String getStateValues () {
+//		return stateValues;
+//	}
+//
+//	public void setStateValues (String stateValues) {
+//		this.stateValues = stateValues;
+//	}
+//
+//	public boolean getExtractNoState () {
+//		return extractNoState;
+//	}
+//
+//	public void setExtractNoState (boolean extractNoState) {
+//		this.extractNoState = extractNoState;
+//	}
 
 	public boolean getEscapeGT () {
 		return escapeGT;
@@ -98,57 +109,81 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setAddTargetLanguage (boolean addTargetLanguage) {
 		this.addTargetLanguage = addTargetLanguage;
 	}
+	
+	public int getSegmentationType () {
+		return this.segmentationType;
+	}
+	
+	public void setSegmentationType (int segmentationType) {
+		this.segmentationType = segmentationType;
+	}
 
 	public void reset () {
-		useStateValues = true;
-		stateValues = "new|needs-translation";
-		extractOnlyMatchingValues = true;
-		extractNoState = true;
+//		useStateValues = true;
+//		stateValues = "new|needs-translation";
+//		extractOnlyMatchingValues = true;
+//		extractNoState = true;
 		fallbackToID = false;
 		escapeGT = false;
 		addTargetLanguage = true;
+		segmentationType = SEGMENTATIONTYPE_ORIGINAL;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		useStateValues = buffer.getBoolean("useStateValues", useStateValues);
-		extractOnlyMatchingValues = buffer.getBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		stateValues = buffer.getString("stateValues", stateValues);
-		extractNoState = buffer.getBoolean("extractNoState", extractNoState);
-		fallbackToID = buffer.getBoolean("fallbackToID", fallbackToID);
-		escapeGT = buffer.getBoolean("escapeGT", escapeGT);
-		addTargetLanguage = buffer.getBoolean("addTargetLanguage", addTargetLanguage);
+//		useStateValues = buffer.getBoolean("useStateValues", useStateValues);
+//		extractOnlyMatchingValues = buffer.getBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
+//		stateValues = buffer.getString("stateValues", stateValues);
+//		extractNoState = buffer.getBoolean("extractNoState", extractNoState);
+		fallbackToID = buffer.getBoolean(FALLBACKTOID, fallbackToID);
+		escapeGT = buffer.getBoolean(ESCAPEGT, escapeGT);
+		addTargetLanguage = buffer.getBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
+		segmentationType = buffer.getInteger(SEGMENTATIONTYPE, segmentationType);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean("useStateValues", useStateValues);
-		buffer.setBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
-		buffer.setString("stateValues", stateValues);
-		buffer.setBoolean("extractNoState", extractNoState);
-		
-		buffer.setBoolean("fallbackToID", fallbackToID);
-		buffer.setBoolean("escapeGT", escapeGT);
-		buffer.setBoolean("addTargetLanguage", addTargetLanguage);
+//		buffer.setBoolean("useStateValues", useStateValues);
+//		buffer.setBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
+//		buffer.setString("stateValues", stateValues);
+//		buffer.setBoolean("extractNoState", extractNoState);
+		buffer.setBoolean(FALLBACKTOID, fallbackToID);
+		buffer.setBoolean(ESCAPEGT, escapeGT);
+		buffer.setBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
+		buffer.setInteger(SEGMENTATIONTYPE, segmentationType);
 		return buffer.toString();
 	}
 	
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("fallbackToID", "Use the trans-unit id attribute for the text unit name if there is no resname", null);
-		desc.add("escapeGT", "Escape the greater-than characters", null);
-		desc.add("addTargetLanguage", "Add the target-language attribute if not present", null);
+		desc.add(FALLBACKTOID, "Use the trans-unit id attribute for the text unit name if there is no resname", null);
+		desc.add(ESCAPEGT, "Escape the greater-than characters", null);
+		desc.add(ADDTARGETLANGUAGE, "Add the target-language attribute if not present", null);
+		desc.add(SEGMENTATIONTYPE, "Type of segmentation", "Indicates wether to segment or not the text content");
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Filter Parameters", true, false);
-		desc.addCheckboxPart(paramDesc.get("fallbackToID"));
-		desc.addCheckboxPart(paramDesc.get("escapeGT"));
-		desc.addCheckboxPart(paramDesc.get("addTargetLanguage"));
+		desc.addCheckboxPart(paramDesc.get(FALLBACKTOID));
+		desc.addCheckboxPart(paramDesc.get(ESCAPEGT));
+		desc.addCheckboxPart(paramDesc.get(ADDTARGETLANGUAGE));
+
+		String[] values = {
+			String.valueOf(SEGMENTATIONTYPE_ORIGINAL),
+			String.valueOf(SEGMENTATIONTYPE_SEGMENTED),
+			String.valueOf(SEGMENTATIONTYPE_NOTSEGMENTED)};
+		String[] labels = {
+			"Segment only if the input is segmented",
+			"Always segment (even if the input is not segmented)",
+			"Never segment (even if the input is segmented)",
+		};
+		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(SEGMENTATIONTYPE), values);
+		lsp.setChoicesLabels(labels);
+		
 		return desc;
 	}
 

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -79,4 +79,10 @@ public interface IEncoder {
 	public String toNative (String propertyName,
 		String value);
 
+	/**
+	 * Gets the line-break to use for this encoder.
+	 * @return the line-break to use for this encoder.
+	 */
+	public String getLineBreak ();
+	
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -40,6 +40,7 @@ public class HtmlEncoder implements IEncoder {
 	private String lineBreak;
 	private int quoteMode = 1;
 
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
@@ -63,6 +64,7 @@ public class HtmlEncoder implements IEncoder {
 		
 	}
 
+	@Override
 	public String encode (String text,
 		int context)
 	{
@@ -168,6 +170,7 @@ public class HtmlEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String encode (int value,
 		int context)
 	{
@@ -207,9 +210,16 @@ public class HtmlEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
 		return value;
 	}
+
+	@Override
+	public String getLineBreak () {
+		return this.lineBreak;
+	}
+
 }

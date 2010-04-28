@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,6 +28,7 @@ import net.sf.okapi.common.resource.Property;
  */
 public class MIFEncoder implements IEncoder {
 
+	@Override
 	public String encode (String text,
 		int context)
 	{
@@ -63,6 +64,7 @@ public class MIFEncoder implements IEncoder {
 		return escaped.toString();
 	}
 
+	@Override
 	public String encode (char value,
 		int context)
 	{
@@ -88,6 +90,7 @@ public class MIFEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String encode (int value,
 		int context)
 	{
@@ -114,6 +117,7 @@ public class MIFEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
@@ -121,6 +125,7 @@ public class MIFEncoder implements IEncoder {
 		// Nothing to do
 	}
 
+	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
@@ -133,6 +138,11 @@ public class MIFEncoder implements IEncoder {
 
 		// No changes for the other values
 		return value;
+	}
+
+	@Override
+	public String getLineBreak () {
+		return "\n";
 	}
 
 }

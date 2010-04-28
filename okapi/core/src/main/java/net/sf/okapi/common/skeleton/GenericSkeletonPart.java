@@ -74,4 +74,8 @@ public class GenericSkeletonPart { // public for OpenXML
 		return parent;
 	}
 
+	public StringBuilder getData () {
+		return data;
+	}
+
 }

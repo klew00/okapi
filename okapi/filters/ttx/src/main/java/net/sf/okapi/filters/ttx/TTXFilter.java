@@ -21,7 +21,6 @@
 package net.sf.okapi.filters.ttx;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -95,7 +94,7 @@ public class TTXFilter implements IFilter {
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	private StringBuilder buffer;
-	private boolean useDF;
+//	private boolean useDF;
 	private boolean insideContent;
 	private TTXSkeletonWriter skelWriter;
 	private EncoderManager encoderManager;
@@ -257,13 +256,13 @@ public class TTXFilter implements IFilter {
 			buffer = new StringBuilder();
 			trgDefFont = null;
 			
-			useDF = false;
-			// By default, for now, use DF for CJK only
-			if ( trgLoc.sameLanguageAs("ko")
-				|| trgLoc.sameLanguageAs("zh")
-				|| trgLoc.sameLanguageAs("ja") ) {
-				useDF = true;
-			}
+//			useDF = false;
+//			// By default, for now, use DF for CJK only
+//			if ( trgLoc.sameLanguageAs("ko")
+//				|| trgLoc.sameLanguageAs("zh")
+//				|| trgLoc.sameLanguageAs("ja") ) {
+//				useDF = true;
+//			}
 			
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);

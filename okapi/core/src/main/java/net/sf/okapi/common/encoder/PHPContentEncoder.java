@@ -36,6 +36,7 @@ public class PHPContentEncoder implements IEncoder {
 //		chsEnc = Charset.forName("us-ascii").newEncoder();
 	}
 	
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
@@ -43,6 +44,7 @@ public class PHPContentEncoder implements IEncoder {
 //		chsEnc = Charset.forName(encoding).newEncoder();
 	}
 
+	@Override
 	public String encode (String text,
 		int context)
 	{
@@ -78,6 +80,7 @@ public class PHPContentEncoder implements IEncoder {
 		return escaped.toString();
 	}
 
+	@Override
 	public String encode (char value,
 		int context)
 	{
@@ -96,6 +99,7 @@ public class PHPContentEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String encode (int value,
 		int context)
 	{
@@ -120,11 +124,17 @@ public class PHPContentEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
 		// No changes
 		return value;
+	}
+
+	@Override
+	public String getLineBreak () {
+		return "\n";
 	}
 
 }

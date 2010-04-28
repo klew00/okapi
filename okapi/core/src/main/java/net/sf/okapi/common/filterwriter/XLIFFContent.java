@@ -229,7 +229,7 @@ public class XLIFFContent {
 	 * @param container The container to write out.
 	 * @param quoteMode 0=no quote escaped, 1=apos and quot, 2=#39 and quot,
 	 * and 3=quot only.
-	 * @param escapeGT True to always escape '>' to gt
+	 * @param escapeGT True to always escape '>' to &amp;gt;
 	 * @param withMarkers True to output mrk elements, false to output only 
 	 * the content of mrk element.
 	 * @param gMode True to use g/x markup, false to use bpt/ept/ph

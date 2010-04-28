@@ -49,6 +49,7 @@ public class XMLEncoder implements IEncoder {
 	 * @param encoding the name of the character set encoding to use.
 	 * @param lineBreak the type of line break to use.
 	 */
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
@@ -73,6 +74,7 @@ public class XMLEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String encode (String text, 
 		int context)
 	{
@@ -156,6 +158,7 @@ public class XMLEncoder implements IEncoder {
 		return sbTmp.toString();
 	}
 
+	@Override
 	public String encode (char value,
 		int context)
 	{
@@ -194,6 +197,7 @@ public class XMLEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String encode (int value,
 		int context)
 	{
@@ -240,12 +244,18 @@ public class XMLEncoder implements IEncoder {
 		}
 	}
 
+	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
 		// PROP_ENCODING: Same value in native
 		// PROP_LANGUGE: Same value in native
 		return value;
+	}
+
+	@Override
+	public String getLineBreak () {
+		return lineBreak;
 	}
 
 }

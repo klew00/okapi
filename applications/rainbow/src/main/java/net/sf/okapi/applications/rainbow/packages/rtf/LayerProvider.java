@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,36 +30,45 @@ import net.sf.okapi.common.filterwriter.ILayerProvider;
 public class LayerProvider implements ILayerProvider {
 
 	private CharsetEncoder outputEncoder;
+	private String lineBreak;
 
+	@Override
 	public String endCode () {
 		return "}";
 	}
 
+	@Override
 	public String endInline () {
 		return "}";
 	}
 
+	@Override
 	public String startCode () {
 		return "{\\cs5\\f1\\cf15\\lang1024 ";
 	}
 
+	@Override
 	public String startInline () {
 		return "{\\cs6\\f1\\cf6\\lang1024 ";
 	}
 	
+	@Override
 	public String startSegment () {
 		return "{\\cs15\\v\\cf12\\sub\\f2 \\{0>}{\\v\\f1 ";
 	}
 	
+	@Override
 	public String endSegment () {
 		return "{\\cs15\\v\\cf12\\sub\\f2 <0\\}}";
 	}
 	
+	@Override
 	public String midSegment (int leverage) {
 		return String.format("%s%d%s", "}{\\cs15\\v\\cf12\\sub\\f2 <\\}", leverage, "\\{>}");
 	}
 	
 	// Context: 0=in text, 1=in skeleton, 2=in inline
+	@Override
 	public String encode (String text,
 		int context)
 	{
@@ -67,6 +76,7 @@ public class LayerProvider implements ILayerProvider {
 		return Util.escapeToRTF(text, true, context, outputEncoder);
 	}
 
+	@Override
 	public String encode (char value,
 		int context)
 	{
@@ -74,6 +84,7 @@ public class LayerProvider implements ILayerProvider {
 		return Util.escapeToRTF(String.valueOf(value), true, context, outputEncoder);
 	}
 
+	@Override
 	public String encode (int value,
 		int context)
 	{
@@ -86,18 +97,26 @@ public class LayerProvider implements ILayerProvider {
 			true, context, outputEncoder);
 	}
 
+	@Override
 	public void setOptions (IParameters params,
 		String encoding,
 		String lineBreak)
 	{
 		outputEncoder = Charset.forName(encoding).newEncoder();
+		this.lineBreak = lineBreak;
 	}
 
+	@Override
 	public String toNative(String propertyName,
 		String value)
 	{
 		// No modification: The layer provider does not change the value
 		return value;
+	}
+
+	@Override
+	public String getLineBreak () {
+		return lineBreak;
 	}
 
 }

@@ -114,6 +114,13 @@ public class GenericSkeleton implements ISkeleton {
 	}
 	
 	/**
+	 * Forces the current part to be completed, so the next call to append data will start a new part.
+	 */
+	public void flushPart () {
+		createNew = true;
+	}
+	
+	/**
 	 * Adds a new part to this skeleton, and set a character data to it.
 	 * @param data the data to add.
 	 */
@@ -259,7 +266,19 @@ public class GenericSkeleton implements ISkeleton {
 			list.add(part);
 			// Flag that the next append() should start a new part
 			createNew = true;
-		
+	}
+	
+	/**
+	 * Attaches a parent resource to a skeleton part.
+	 * @param parent the parent resource to attach.
+	 */
+	public void attachParent (INameable parent) {
+		if ( createNew || list.isEmpty() ) {
+			GenericSkeletonPart part = new GenericSkeletonPart("");
+			list.add(part);
+			createNew = false;
+		}
+		list.get(list.size()-1).parent = parent;
 	}
 	
 	/**

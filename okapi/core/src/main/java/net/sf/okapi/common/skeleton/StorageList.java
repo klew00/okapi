@@ -32,7 +32,7 @@ import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 
-class StorageList extends ArrayList<IResource>
+public class StorageList extends ArrayList<IResource>
 	implements IResource, INameable, IReferenceable {
 
 	private static final long serialVersionUID = 1L;
