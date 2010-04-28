@@ -46,6 +46,7 @@ import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
 import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEvent;
 import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEventBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEventBean2;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
@@ -54,6 +55,7 @@ import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.PipelineStep;
 
 import org.junit.Test;
 
+@SuppressWarnings("unused")
 public class XLIFFKitWriterTest {
 
 //	private final String IN_NAME1 = "Gate Openerss.htm";
@@ -183,7 +185,7 @@ public class XLIFFKitWriterTest {
 
 	private static final LocaleId ENUS = new LocaleId("en", "us");
 	private static final LocaleId FRFR = new LocaleId("fr", "fr");
-	private static final LocaleId DEDE = new LocaleId("de", "de");
+	private static final LocaleId DEDE = new LocaleId("de", "de");	
 	private static final LocaleId ITIT = new LocaleId("it", "it");
 	
 	// DEBUG 		@Test
@@ -409,7 +411,8 @@ public class XLIFFKitWriterTest {
 		).execute();
 	}
 	
-	// DEBUG 		@Test
+	// DEBUG 		
+	@Test
 	public void testPackageFormat4() throws URISyntaxException, MalformedURLException {
 
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
@@ -488,11 +491,11 @@ public class XLIFFKitWriterTest {
 								
 				new RawDocumentToFilterEventsStep()
 				,				
-				new PipelineStep(new LeveragingStep(), 
-						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-						new Parameter("threshold", 80),
-						new Parameter("fillTarget", true)
-				),
+//				new PipelineStep(new LeveragingStep(), 
+//						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+//						new Parameter("threshold", 80),
+//						new Parameter("fillTarget", true)
+//				),
 				
 				new PipelineStep(
 						new XLIFFKitWriterStep(),								
@@ -777,6 +780,39 @@ public class XLIFFKitWriterTest {
 		writerStep.handleEvent(e5);
 		writerStep.handleEvent(e6);
 		writerStep.handleEvent(e7);
+		writerStep.handleEvent(new Event(EventType.END_DOCUMENT));
+		writerStep.handleEvent(new Event(EventType.END_BATCH));
+	}
+	
+	// DEBUG 	@Test
+	public void testReferences5() throws MalformedURLException, URISyntaxException {
+		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences5.xliff.kit").toURI());
+		writerStep.setTargetLocale(DEDE);
+		net.sf.okapi.steps.xliffkit.writer.Parameters params = 
+			(net.sf.okapi.steps.xliffkit.writer.Parameters) writerStep.getParameters();
+		
+		params.setIncludeSource(false);
+		params.setIncludeOriginal(false);
+		
+		BeanMapper.registerBean(TestEvent.class, TestEventBean2.class);
+		
+		TestEvent e1 = new TestEvent("e1");
+		TestEvent e2 = new TestEvent("e2");
+		e2.setParent(e1);
+		e1.setParent(e2);
+
+		writerStep.handleEvent(new Event(EventType.START_BATCH));
+		StartDocument sd = new StartDocument("sd1");
+		sd.setName("test_refs5.txt");
+		sd.setLocale(ENUS);
+		sd.setFilterWriter(new GenericFilterWriter(null, null));
+		
+		writerStep.handleEvent(new Event(EventType.START_DOCUMENT, sd));
+		writerStep.handleEvent(e1);
+		writerStep.handleEvent(e2);
 		writerStep.handleEvent(new Event(EventType.END_DOCUMENT));
 		writerStep.handleEvent(new Event(EventType.END_BATCH));
 	}

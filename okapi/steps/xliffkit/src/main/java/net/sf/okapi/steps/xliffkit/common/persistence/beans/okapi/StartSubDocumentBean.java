@@ -24,11 +24,12 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.FactoryBean;
 
 public class StartSubDocumentBean extends BaseNameableBean {
 
 	private String parentId;
-	private ParametersBean filterParams = new ParametersBean();
+	private FactoryBean filterParams = new FactoryBean();
 
 	@Override
 	protected BaseNameable createObject(IPersistenceSession session) {
@@ -67,11 +68,11 @@ public class StartSubDocumentBean extends BaseNameableBean {
 		this.parentId = parentId;
 	}
 
-	public ParametersBean getFilterParams() {
+	public FactoryBean getFilterParams() {
 		return filterParams;
 	}
 
-	public void setFilterParams(ParametersBean filterParams) {
+	public void setFilterParams(FactoryBean filterParams) {
 		this.filterParams = filterParams;
 	}
 }

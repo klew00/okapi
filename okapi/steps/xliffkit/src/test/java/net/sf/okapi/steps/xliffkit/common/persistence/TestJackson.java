@@ -20,7 +20,7 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +48,6 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.InputStreamBea
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.TextUnitBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.ZipSkeletonBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.json.jackson.JSONPersistenceSession;
-import net.sf.okapi.steps.xliffkit.reader.XLIFFKitReaderStep;
 
 import org.apache.commons.io.input.CountingInputStream;
 import org.codehaus.jackson.JsonGenerationException;

@@ -31,6 +31,7 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.OkapiBeans;
 import net.sf.okapi.steps.xliffkit.common.persistence.json.jackson.JSONPersistenceSession;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -45,6 +46,11 @@ public class OPCPackageReader extends AbstractFilter {
 	private PackagePart activePart;
 	private PackagePart resourcesPart;
 	
+	public OPCPackageReader() {
+		super();
+		OkapiBeans.register();
+	}
+
 	@Override
 	protected boolean isUtf8Bom() {
 		return false;

@@ -23,10 +23,7 @@ package net.sf.okapi.steps.xliffkit.reader;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
-
-import org.junit.Test;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -40,6 +37,9 @@ import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Pipeline;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.PipelineStep;
 
+import org.junit.Test;
+
+@SuppressWarnings("unused")
 public class XLIFFKitReaderTest {
 	
 	private static final LocaleId ENUS = new LocaleId("en", "us");
@@ -93,7 +93,8 @@ public class XLIFFKitReaderTest {
 		).execute();
 	}
 
-	// DEBUG 		@Test
+	// DEBUG 		
+	@Test
 	public void testReader4() {
 		
 		new Pipeline(
@@ -115,7 +116,7 @@ public class XLIFFKitReaderTest {
 //				new FilterEventsToRawDocumentStep()
 		).execute();
 	}
-
+	
 	// DEBUG 	@Test
 	public void testReferences() {
 		
@@ -166,7 +167,6 @@ public class XLIFFKitReaderTest {
 		).execute();
 	}
 	
-	@SuppressWarnings("unused")
 	// DEBUG 		
 	@Test
 	public void testReferences3() {
@@ -199,7 +199,6 @@ public class XLIFFKitReaderTest {
 		session.end();
 	}
 	
-	@SuppressWarnings("unused")
 	@Test
 	public void testReferences4() {
 		

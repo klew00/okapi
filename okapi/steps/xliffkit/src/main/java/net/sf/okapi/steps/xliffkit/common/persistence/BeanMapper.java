@@ -58,6 +58,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
+import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POFilterWriter;
@@ -67,6 +68,7 @@ import net.sf.okapi.steps.xliffkit.common.persistence.beans.TypeInfoBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.BaseNameableBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.BaseReferenceableBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.CodeBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.ConditionalParametersBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.DocumentBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.DocumentPartBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.EndingBean;
@@ -118,7 +120,6 @@ public class BeanMapper {
 		beanClassMapping = new LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> ();
 		objectClassMapping = new LinkedHashMap<Class<? extends IPersistenceBean>, Class<?>> ();
 		proxies = new ConcurrentHashMap<String, IPersistenceBean>();
-		registerBeans();
 	}
 
 	public static void registerBean(
@@ -174,15 +175,20 @@ public class BeanMapper {
 				
 		// If not found explicitly, try to find a matching bean
 		if (beanClass == null) {
-			LOGGER.warning(String.format("No bean class registered for %s", ClassUtil.getQualifiedClassName(classRef)));
 			if (IPersistenceBean.class.isAssignableFrom(classRef)) // A bean is a bean for itself 
 				beanClass = (Class<? extends IPersistenceBean>) classRef;
 			else
 			for (Class<?> cls : beanClassMapping.keySet())
 				if (cls.isAssignableFrom(classRef)) {
 					beanClass = beanClassMapping.get(cls);
+					LOGGER.warning(String.format("No bean class registered for %s, using %s for %s instead.", 
+							ClassUtil.getQualifiedClassName(classRef),
+							ClassUtil.getQualifiedClassName(beanClass),
+							ClassUtil.getQualifiedClassName(cls)));
 					break;
-				}		
+				}	
+			if (beanClass == null)
+				LOGGER.warning(String.format("No bean class registered for %s", ClassUtil.getQualifiedClassName(classRef)));
 		}
 		return beanClass;		
 	}
@@ -221,50 +227,5 @@ public class BeanMapper {
 			throw(new RuntimeException(String.format(MAPPER_UNK_CLASS, className)));
 		}
 		return res;		
-	}
-		
-	private static void registerBeans() {
-		// General purpose beans
-		registerBean(List.class, ListBean.class);
-		registerBean(IParameters.class, ParametersBean.class);
-		registerBean(Object.class, TypeInfoBean.class); // If no bean was found, use just this one to store class info
-		
-		// Specific class beans				
-		registerBean(Event.class, EventBean.class);		
-		registerBean(TextUnit.class, TextUnitBean.class);
-		registerBean(RawDocument.class, RawDocumentBean.class);
-		registerBean(Property.class, PropertyBean.class);
-		registerBean(TextFragment.class, TextFragmentBean.class);
-		registerBean(TextContainer.class, TextContainerBean.class);
-		registerBean(Code.class, CodeBean.class);
-		registerBean(Document.class, DocumentBean.class);
-		registerBean(DocumentPart.class, DocumentPartBean.class);
-		registerBean(Ending.class, EndingBean.class);
-		registerBean(MultiEvent.class, MultiEventBean.class);
-		registerBean(TextPart.class, TextPartBean.class);
-		registerBean(Segment.class, SegmentBean.class);
-		registerBean(Range.class, RangeBean.class);
-		registerBean(BaseNameable.class, BaseNameableBean.class);
-		registerBean(BaseReferenceable.class, BaseReferenceableBean.class);
-		registerBean(StartDocument.class, StartDocumentBean.class);
-		registerBean(StartGroup.class, StartGroupBean.class);
-		registerBean(StartSubDocument.class, StartSubDocumentBean.class);
-		registerBean(TargetPropertiesAnnotation.class, TargetPropertiesAnnotationBean.class);
-		registerBean(GenericSkeleton.class, GenericSkeletonBean.class);
-		registerBean(GenericSkeletonPart.class, GenericSkeletonPartBean.class);
-		registerBean(ZipSkeleton.class, ZipSkeletonBean.class);
-		registerBean(ZipFile.class, ZipFileBean.class);
-		registerBean(ZipEntry.class, ZipEntryBean.class);
-		registerBean(InputStream.class, InputStreamBean.class);
-		registerBean(InlineAnnotation.class, InlineAnnotationBean.class);
-		registerBean(GenericFilterWriter.class, GenericFilterWriterBean.class);
-		registerBean(TMXFilterWriter.class, TMXFilterWriterBean.class);
-		registerBean(ZipFilterWriter.class, ZipFilterWriterBean.class);
-		// Registered here to require dependencies at development-time
-		registerBean(OpenXMLZipFilterWriter.class, TypeInfoBean.class); 		
-		registerBean(PensieveFilterWriter.class, TypeInfoBean.class);
-		registerBean(POFilterWriter.class, TypeInfoBean.class);
-		registerBean(TableFilterWriter.class, TypeInfoBean.class);		
-		//registerBean(.class, Bean.class);
-	}
+	}			
 }

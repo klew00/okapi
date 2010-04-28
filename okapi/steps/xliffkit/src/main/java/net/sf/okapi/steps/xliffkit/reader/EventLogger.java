@@ -22,8 +22,8 @@ package net.sf.okapi.steps.xliffkit.reader;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartSubDocument;
 
 public class EventLogger extends BasePipelineStep {
 
@@ -48,6 +48,9 @@ public class EventLogger extends BasePipelineStep {
 		switch ( event.getEventType() ) {
 			case START_DOCUMENT:
 				res +=  "  " + ((StartDocument) event.getResource()).getName();
+				break;
+			case START_SUBDOCUMENT:
+				res +=  "  " + ((StartSubDocument) event.getResource()).getName();
 				break;
 		}
 		return res;

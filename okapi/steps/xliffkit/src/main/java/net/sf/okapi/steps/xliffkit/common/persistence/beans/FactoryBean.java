@@ -85,13 +85,30 @@ public class FactoryBean extends PersistenceBean<Object> {
 		IPersistenceBean bean = session.uncacheBean(obj); // get a bin created earlier here or in a ReferenceBean
 		if (bean == null) {
 			bean = session.createBean(ClassUtil.getClass(obj));
+//			session.cacheBean(obj, bean);
+//			reference = 0;
+//			content = bean;
+//			//session.setRefIdForObject(obj, bean.getRefId());			
+//
+//			return this;
+//		}
+//		else {
+//			content = null;
+//			reference = bean.getRefId();
+//			
+//			session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
+//			session.setReference(this.getRefId(), bean.getRefId());
+//		}
+//		session.setRefIdForObject(obj, bean.getRefId());
+//		//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root		
 			// session.cacheBean(obj, bean);
 		}
 		session.setRefIdForObject(obj, bean.getRefId());
 		//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
 		reference = 0;
 		content = bean;
-		
+
+			
 		return (bean instanceof FactoryBean) ? this : bean.set(obj, session);		
 	}
 	
