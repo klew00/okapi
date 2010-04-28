@@ -22,9 +22,12 @@ package net.sf.okapi.steps.simplekit.writer;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -337,6 +340,35 @@ public class XLIFFWriter {
 				writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.hasBeenSegmented(), placeholderMode));
 				writer.writeEndElementLineBreak(); // target
 			}
+
+			// Alternate Translations
+			for ( Segment seg : tc.getSegments() ) {
+				AltTranslationsAnnotation ann = seg.getAnnotation(AltTranslationsAnnotation.class);
+				if ( ann == null ) continue; // Move to next segment
+				
+				for ( AltTranslation alt : ann ) {
+					writer.writeStartElement("alt-trans");
+					writer.writeAttributeString("mid", seg.getId());
+					writer.writeAttributeString("match-quality", String.format("%d", alt.getScore()));
+					if ( Util.isEmpty(alt.getOrigin()) ) {
+						writer.writeAttributeString("origin", alt.getOrigin());
+					}
+					TextUnit altTu = alt.getEntry();
+					if ( !altTu.isEmpty() ) {
+						writer.writeStartElement("source");
+						writer.writeAttributeString("xml:lang", alt.getSourceLocale().toBCP47());
+						// Write full source content (always without segments markers
+						writer.writeRawXML(xliffCont.toSegmentedString(alt.getSource(), 0, false, false, placeholderMode));
+						writer.writeEndElementLineBreak(); // source
+					}
+					writer.writeStartElement("target");
+					writer.writeAttributeString("xml:lang", alt.getTargetLocale().toBCP47());
+					writer.writeRawXML(xliffCont.toSegmentedString(alt.getTarget(), 0, false, false, placeholderMode));
+					writer.writeEndElementLineBreak(); // target
+					writer.writeEndElementLineBreak(); // alt-trans
+				}
+			}
+
 		}
 		
 		// Note

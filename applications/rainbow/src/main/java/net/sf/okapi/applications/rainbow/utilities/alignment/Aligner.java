@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.utilities.alignment;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -830,13 +829,13 @@ public class Aligner {
 		// that we have id matching in source and target
 		// On accept both container should have the same number of segments
 		int i = 0;
-		for ( Iterator<Segment> iter = source.getSegments().iterator(); iter.hasNext(); ) {
-			iter.next().id = String.valueOf(i);
+		for ( Segment seg : source.getSegments() ) {
+			seg.id = String.valueOf(i);
 			i++;
 		}
 		i = 0;
-		for ( Iterator<Segment> iter = target.getSegments().iterator(); iter.hasNext(); ) {
-			iter.next().id = String.valueOf(i);
+		for ( Segment seg : target.getSegments() ) {
+			seg.id = String.valueOf(i);
 			i++;
 		}
 		
@@ -1016,9 +1015,10 @@ public class Aligner {
 			
 			// Sanity check using common anchors
 			int i = 0;
+			Segments trgSegs = target.getSegments();
 			for ( Segment srcSeg : source.getSegments() ) {
 				// Normally we would use srcSeg.id, but the class works based on segment index not id
-				Segment trgSeg = target.getSegments().get(i);
+				Segment trgSeg = trgSegs.get(i);
 				if ( trgSeg == null ) {
 					addIssue(1, String.format("%d: Warning- No target segment for the source segment.", i+1));
 				}
@@ -1124,7 +1124,7 @@ public class Aligner {
 				matchFound = false;
 				srcText = srcSeg.toString();
 				for ( int j=trgStart; j<targetSegments.count(); j++ ) {
-					String s2 = target.getSegments().get(j).toString(); //TODO: replace by direct call after debug
+					String s2 = targetSegments.get(j).toString(); //TODO: replace by direct call after debug
 					if ( srcText.equals(s2) ) {
 						// We have a match
 						if ( srcNoMatchCount == 1 ) {
@@ -1141,7 +1141,7 @@ public class Aligner {
 								// We have more than one, so we can join them
 								// The target segment just after the last match is the base
 								for ( int k=0; k<toJoin; k++ ) {
-									target.getSegments().joinWithNext(lastMatch+1);
+									targetSegments.joinWithNext(lastMatch+1);
 								}
 								if ( !modified ) {
 									resetIssues();
@@ -1193,7 +1193,7 @@ public class Aligner {
 						// We have more than one, so we can join them
 						// The target segment just after the last match is the base
 						for ( int k=0; k<toJoin; k++ ) {
-							target.getSegments().joinWithNext(lastMatch+1);
+							targetSegments.joinWithNext(lastMatch+1);
 						}
 						if ( !modified ) {
 							resetIssues();

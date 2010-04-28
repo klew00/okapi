@@ -370,6 +370,10 @@ public class TextContainer implements Iterable<TextPart> {
 		
 	};
 	
+	/**
+	 * Creates a new {@link Segments} object to access the segments of this container.
+	 * @return a new {@link Segments} object.
+	 */
 	public Segments getSegments() {
 		return segments;
 	}

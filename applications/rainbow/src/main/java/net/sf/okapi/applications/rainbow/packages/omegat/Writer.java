@@ -27,6 +27,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.Segments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -97,9 +98,10 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		TextContainer trgTC = item.getTarget(trgLoc);
 
 		int i = 0;
+		Segments trgSegs = trgTC.getSegments();
 		for ( Segment srcSeg : srcTC.getSegments() ) {
     		
-			Segment trgSeg = trgTC.getSegments().get(srcSeg.id);
+			Segment trgSeg = trgSegs.get(srcSeg.id);
 			if ( trgSeg != null ) {
 				if ( scores.getScore(0) == 100 ) {
 					tmxWriterApproved.writeTU(srcSeg.getContent(),

@@ -35,6 +35,6 @@
 		<module>uriconversion</module>
 		<module>wordcount</module>
         <module>xsltransform</module>
-        <module>xliffkit</module>
+<!--        <module>xliffkit</module>-->
     </modules>
 </project>
