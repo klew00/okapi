@@ -53,13 +53,7 @@ will not be extracted (but will be listed as warning). Conversely, entries that
 have no <code>importContentInstance</code> for the source will not be extracted, 
 and will be listed as warning.</p>
 <p>The relationship between the source and the target <code>importContentInstance</code> 
-blocks is done with the source ID: both block must have the same.</p>
-<h3>Known Issues</h3>
-<p>Currently an XLIFF document generated using this filter is likely to be 
-technically invalid because it contains duplicated values for <code>&lt;trans-unit&gt;</code>
-<code>id</code> attributes. This will be fixed in upcoming update, and does not 
-prevent opening the document in most XLIFF editors, or merging bcak the data 
-into Vignette&#39;s export/import file format.</p>
+blocks is done with the <a href="#sourceID">source ID</a>: both block must have the same.</p>
 <h2><a name="parameters"></a>Parameters</h2>
 <p><cite>Names of the &lt;attribute&gt; elements to extract</cite> -- Enter the list of the values 
 for the <code>name</code> attribute of the <code>&lt;attribute&gt;</code> elements to extract. The list must be comma-separated.</p>
@@ -67,7 +61,7 @@ for the <code>name</code> attribute of the <code>&lt;attribute&gt;</code> elemen
 filter configurations to use for each extractable part. This list must be 
 comma-separated, and must contains the same number of entries as the list of 
 the elements to extract, and be in the same order. Use &#39;<code>default</code>&#39; to indicate no specific filter.</p>
-<p><cite>Name for source ID element</cite> -- Enter the value for the <code>name</code> 
+<p><cite><a name="sourceID"></a>Name for source ID element</cite> -- Enter the value for the <code>name</code> 
 attribute of the <code>&lt;attribute&gt;</code> element that contains the source ID for a 
 given block.</p>
 <p><cite>Name for locale ID element</cite> -- Enter the value for the <code>name</code> 

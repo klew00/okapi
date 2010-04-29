@@ -67,7 +67,7 @@ public interface Segments extends Iterable<Segment> {
 	public void append (TextFragment fragment);
 	
 	/**
-	 * Creates a set of segments in this container. Use {@link #TextContainer.getCodedText()}
+	 * Creates a set of segments in this container. Use {@link TextContainer#getCodedText()}
 	 * to get the coded text to use as the base for the segment boundaries.
 	 * If the content is already segmented, it is automatically un-segmented before the new
 	 * segmentation is applied.
@@ -79,7 +79,7 @@ public interface Segments extends Iterable<Segment> {
 	public int create (List<Range> ranges);
 
 	/**
-	 * Creates a segment in this container. Use {@link #TextContainer.getCodedText()}
+	 * Creates a segment in this container. Use {@link TextContainer#getCodedText()}
 	 * to get the coded text to use as the base for the segment boundaries.
 	 * If the content is already segmented, it is automatically un-segmented before the new
 	 * segmentation is applied.
@@ -101,16 +101,16 @@ public interface Segments extends Iterable<Segment> {
 	 * Use {@link #hasText(boolean, boolean)} to check for text presence.
 	 * Use {@link #isEmpty()} to verify if the content is empty of not.
 	 * @return the number of segments in the container.
-	 * @see #TextContainer.count()
+	 * @see TextContainer#count()
 	 */
 	public int count ();
 	
 	/**
 	 * Gets the content of the first segment of this container.
 	 * @return the content of the first segment of this container.
-	 * @see #TextContainer.getFirstContent()
+	 * @see TextContainer#getFirstContent()
 	 * @see #getLastContent()
-	 * @see #TextContainer.getLastContent()
+	 * @see TextContainer#getLastContent()
 	 */
 	public TextFragment getFirstContent ();
 	
@@ -118,8 +118,8 @@ public interface Segments extends Iterable<Segment> {
 	 * Gets the content of last segment of this container.
 	 * @return the content of the last segment of this container.
 	 * @see #getLastContent()
-	 * @see #TextContainer.getFirstContent()
-	 * @see #TextContainer.getFirstContent()
+	 * @see TextContainer#getFirstContent()
+	 * @see TextContainer#getFirstContent()
 	 */
 	public TextFragment getLastContent ();
 	
@@ -147,7 +147,7 @@ public interface Segments extends Iterable<Segment> {
 	 * <p>Use {@link #get(String)} to retrieve by segment identifier.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 * @see #get(String)
-	 * @see #TextContainer.get(int)
+	 * @see TextContainer#get(int)
 	 * #see {@link #iterator()}
 	 */
 	public Segment get (int index);

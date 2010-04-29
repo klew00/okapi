@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Property;
@@ -46,7 +45,6 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private Parameters params;
-	private XLIFFContent fmt;
 
 	public XLIFFSkeletonWriter (Parameters params) {
 		this.params = params;
@@ -175,10 +173,6 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		TextContainer srcCont = tu.getSource();
 		if ( srcCont.isEmpty() ) return ""; // No segmented entry if it's empty
-		
-		if ( fmt == null ) {
-			fmt = new XLIFFContent();
-		}
 		
 		// Else: output new seg-source
 		StringBuilder tmp = new StringBuilder("<seg-source>");

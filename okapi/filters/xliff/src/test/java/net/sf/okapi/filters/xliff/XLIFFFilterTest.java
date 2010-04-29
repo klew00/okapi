@@ -51,6 +51,8 @@ import static org.junit.Assert.*;
 public class XLIFFFilterTest {
 
 	private XLIFFFilter filter;
+	private XLIFFFilter segFilter;
+	private XLIFFFilter noSegFilter;
 	private GenericContent fmt;
 	private String root;
 	private LocaleId locEN = LocaleId.fromString("en");
@@ -63,6 +65,12 @@ public class XLIFFFilterTest {
 		filter = new XLIFFFilter();
 		fmt = new GenericContent();
 		root = TestUtil.getParentDir(this.getClass(), "/JMP-11-Test01.xlf");
+		segFilter = new XLIFFFilter();
+		Parameters params = (Parameters)segFilter.getParameters();
+		params.setSegmentationType(Parameters.SEGMENTATIONTYPE_SEGMENTED);
+		noSegFilter = new XLIFFFilter();
+		params = (Parameters)noSegFilter.getParameters();
+		params.setSegmentationType(Parameters.SEGMENTATIONTYPE_NOTSEGMENTED);
 	}
 
 //	@Test
@@ -201,10 +209,21 @@ public class XLIFFFilterTest {
 			+ "\r</trans-unit></body></file></xliff>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
 			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
+
+		expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "\r<body>"
+			+ "<trans-unit id=\"1\" xml:space=\"preserve\">"
+			+ "<source>t1.   t2</source>"
+			+ "<target xml:lang=\"fr\">t1.   t2</target>"
+			+ "\r</trans-unit></body></file></xliff>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			locFR, noSegFilter.createSkeletonWriter(), noSegFilter.getEncoderManager()));
 	}
 
 	@Test
-	public void testSpecialattributeValues () {
+	public void testSpecialAttributeValues () {
 		// Test even on invalid attributes
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">\r"
@@ -224,6 +243,18 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
 			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
+
+		expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body><trans-unit id=\"13\">"
+			+ "<source>S1<ph ts=\"&lt;&quot;>'\" id=\"1\" x=\"&lt;&quot;>'\">code</ph></source>"
+			+ "<seg-source><mrk mid=\"0\" mtype=\"seg\">S1<ph ts=\"&lt;&quot;>'\" id=\"1\" x=\"&lt;&quot;>'\">code</ph></mrk></seg-source>\r"
+			+ "<target><mrk mid=\"0\" mtype=\"seg\">T1<ph ts=\"&lt;&quot;>'\" id=\"1\" x=\"&lt;&quot;>'\">code</ph></mrk></target>"
+			+ "</trans-unit></body>"
+			+ "</file></xliff>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			locFR, segFilter.createSkeletonWriter(), segFilter.getEncoderManager()));
 	}
 
 	@Test

@@ -93,6 +93,7 @@ public class XLIFFFilter implements IFilter {
 	private Parameters params;
 	private boolean sourceDone;
 	private boolean targetDone;
+	private boolean segSourceDone;
 	private TextContainer content;
 	private String encoding;
 	private Stack<Integer> parentIds;
@@ -534,8 +535,9 @@ public class XLIFFFilter implements IFilter {
 			// Process trans-unit
 			sourceDone = false;
 			targetDone = false;
+			segSourceDone = false;
 			altTrans = null;
-			boolean hasSegSource = false;
+			segSourceDone = false;
 			tu = new TextUnit(String.valueOf(++tuId));
 			storeStartElement();
 
@@ -580,6 +582,7 @@ public class XLIFFFilter implements IFilter {
 						storeEndElement();
 					}
 					else if ( "target".equals(name) ) {
+						addSegSourceIfNeeded();
 						storeStartElement();
 						processTarget();
 						storeEndElement();
@@ -592,24 +595,24 @@ public class XLIFFFilter implements IFilter {
 						processSource(true);
 						storeEndElement();
 						skel.flushPart(); // Close the part for the seg-source
-						hasSegSource = true;
+						segSourceDone = true;
 						if ( tu.getSource().hasBeenSegmented() ) {
 							tu.setProperty(new Property(PROP_WASSEGMENTED, "true", true));
 						}
 					}
 					else if ( "note".equals(name) ) {
-						addTargetIfNeeded(!hasSegSource);
+						addTargetIfNeeded();
 						storeStartElement();
 						processNote();
 						storeEndElement();
 					}
 					else if ( "alt-trans".equals(name) ) {
-						addTargetIfNeeded(!hasSegSource);
+						addTargetIfNeeded();
 						storeStartElement();
 						processStartAltTrans();
 					}
 					else {
-						addTargetIfNeeded(!hasSegSource);
+						addTargetIfNeeded();
 						storeStartElement();
 					}
 					break;
@@ -618,7 +621,7 @@ public class XLIFFFilter implements IFilter {
 					name = reader.getLocalName();
 					//addTargetIfNeeded();
 					if ( "trans-unit".equals(name) ) {
-						addTargetIfNeeded(!hasSegSource);
+						addTargetIfNeeded();
 						storeEndElement();
 						tu.setSkeleton(skel);
 						tu.setMimeType(MimeTypeMapper.XLIFF_MIME_TYPE);
@@ -638,7 +641,7 @@ public class XLIFFFilter implements IFilter {
 						tmp = reader.getText();
 						for ( int i=0; i<tmp.length(); i++ ) {
 							if ( !Character.isWhitespace(tmp.charAt(i)) ) {
-								addTargetIfNeeded(!hasSegSource);
+								addTargetIfNeeded();
 								break;
 							}
 						}
@@ -780,19 +783,25 @@ public class XLIFFFilter implements IFilter {
 		}
 	}
 	
-	private void addTargetIfNeeded (boolean addSegSource) {
-		if ( !sourceDone ) {
-			throw new OkapiIllegalFilterOperationException("Element <source> missing or not placed properly.");
-		}
-		if ( targetDone ) return; // Nothing to add
-		
+	private void addSegSourceIfNeeded () {
 		// Add skeleton part for the seg-source if it's was not there
-		if ( addSegSource ) {
+		if ( !segSourceDone ) {
 			// Add an empty part of the potential seg-source to add
 			skel.add(XLIFFSkeletonWriter.SEGSOURCEMARKER);
 			skel.attachParent(tu);
 			skel.flushPart(); // Close the part for the seg-source
+			segSourceDone = true;
 		}
+	}
+	
+	private void addTargetIfNeeded () {
+		if ( !sourceDone ) {
+			throw new OkapiIllegalFilterOperationException("Element <source> missing or not placed properly.");
+		}
+		if ( targetDone ) return; // Nothing to add
+
+		// Add the seg-source part if needed
+		addSegSourceIfNeeded();
 		
 		// If the target language is the same as the source, we should not create new <target>
 		if ( srcLang.equals(trgLang) ) return;

@@ -70,6 +70,13 @@ distribution.</p>
 	<li>Fixed parent-id for StartSubDocument event/resource.</li>
 	<li>Implemented read-only property for build-num in &lt;file&gt; and extradata in 
 	&lt;trans-unit&gt;.</li>
+	<li>Improved support for segmentation choices in output. Now the filter can 
+	remove, add or keep the segmentation for each trans-unit.</li>
+</ul>
+	</li>
+	<li>Vignette filter:<ul>
+	<li>Fixed issue of 64K limit of blocks (due to Java DataOutputStream 
+	writeUTF() limitation): added multi-chunks write/read function.</li>
 </ul>
 	</li>
 </ul>
