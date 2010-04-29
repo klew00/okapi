@@ -20,6 +20,11 @@
 
 package net.sf.okapi.steps.xliffkit.writer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -33,6 +38,8 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
+import net.sf.okapi.common.observer.IObservable;
+import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -44,6 +51,9 @@ import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
+import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.FactoryBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.EventBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEvent;
 import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEventBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEventBean2;
@@ -62,6 +72,17 @@ public class XLIFFKitWriterTest {
 	private final String IN_NAME2 = "TestDocument01.odt";
 	private final String IN_NAME3 = "test4.txt";
 
+	private class WriteObserver implements IObserver {
+		@Override
+		public void update(IObservable o, Object arg) {
+			if (arg instanceof IPersistenceBean)
+				beans.add((IPersistenceBean) arg);
+		}		
+	};
+	
+	WriteObserver writeObserver = new WriteObserver();
+	List<IPersistenceBean> beans = new ArrayList<IPersistenceBean>(); 
+		
 	@Test
 	public void test() {
 		
@@ -507,7 +528,7 @@ public class XLIFFKitWriterTest {
 		).execute();
 	}
 	
-	// DEBUG 		@Test
+	// DEBUG 	@Test
 	public void testReferences() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		
@@ -784,7 +805,8 @@ public class XLIFFKitWriterTest {
 		writerStep.handleEvent(new Event(EventType.END_BATCH));
 	}
 	
-	// DEBUG 	@Test
+	// DEBUG 	
+	@Test
 	public void testReferences5() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		
@@ -815,5 +837,156 @@ public class XLIFFKitWriterTest {
 		writerStep.handleEvent(e2);
 		writerStep.handleEvent(new Event(EventType.END_DOCUMENT));
 		writerStep.handleEvent(new Event(EventType.END_BATCH));
+	}
+	
+	@Test
+	public void testReferences6() throws MalformedURLException, URISyntaxException {
+		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		beans.clear();
+		writerStep.getSession().addObserver(writeObserver);
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences6.xliff.kit").toURI());
+		writerStep.setTargetLocale(DEDE);
+		net.sf.okapi.steps.xliffkit.writer.Parameters params = 
+			(net.sf.okapi.steps.xliffkit.writer.Parameters) writerStep.getParameters();
+		
+		params.setIncludeSource(false);
+		params.setIncludeOriginal(false);
+		
+		BeanMapper.registerBean(TestEvent.class, TestEventBean2.class);
+		
+		TestEvent e1 = new TestEvent("e1");
+		TestEvent e2 = new TestEvent("e2");
+		TestEvent e3 = new TestEvent("e3");
+		TestEvent e4 = new TestEvent("e4");
+		TestEvent e5 = new TestEvent("e5");
+		TestEvent e6 = new TestEvent("e6");
+		TestEvent e7 = new TestEvent("e7");
+		
+		e1.setParent(e3);
+		e3.setParent(e4);
+		e2.setParent(e6);
+		e7.setParent(e6);
+		e5.setParent(e2);
+
+		writerStep.handleEvent(new Event(EventType.START_BATCH));
+		StartDocument sd = new StartDocument("sd1");
+		sd.setName("test_refs6.txt");
+		sd.setLocale(ENUS);
+		sd.setFilterWriter(new GenericFilterWriter(null, null));
+		
+		writerStep.handleEvent(new Event(EventType.START_DOCUMENT, sd));
+		writerStep.handleEvent(e1);
+		writerStep.handleEvent(e2);
+		writerStep.handleEvent(e3);
+		writerStep.handleEvent(e4);
+		writerStep.handleEvent(e5);
+		writerStep.handleEvent(e6);
+		writerStep.handleEvent(e7);
+		writerStep.handleEvent(new Event(EventType.END_DOCUMENT));
+		writerStep.handleEvent(new Event(EventType.END_BATCH));
+		
+		assertEquals(9, beans.size());
+		assertTrue(beans.get(0) instanceof EventBean);
+		assertTrue(beans.get(1) instanceof TestEventBean2);
+		assertTrue(beans.get(2) instanceof TestEventBean2);
+		assertTrue(beans.get(3) instanceof TestEventBean2);
+		assertTrue(beans.get(4) instanceof TestEventBean2);
+		assertTrue(beans.get(5) instanceof TestEventBean2);
+		assertTrue(beans.get(6) instanceof TestEventBean2);
+		assertTrue(beans.get(7) instanceof TestEventBean2);
+		assertTrue(beans.get(8) instanceof EventBean);
+		
+		TestEventBean2 bean = null;
+		FactoryBean parent = null;
+		
+		// event2
+		bean = (TestEventBean2) beans.get(1);
+		assertEquals("e1", bean.getId());
+		parent = bean.getParent();		
+		assertEquals(parent.getClassName(), TestEvent.class.getName());
+		assertEquals(0, parent.getReference());
+		assertNotNull(parent.getContent());		
+		assertTrue(parent.getContent() instanceof TestEventBean2);
+		TestEventBean2 c1 = (TestEventBean2) parent.getContent();
+		
+		bean = (TestEventBean2) parent.getContent();
+		assertEquals("e3", bean.getId());
+		parent = bean.getParent();
+		assertEquals(TestEvent.class.getName(), parent.getClassName());
+		assertEquals(0, parent.getReference());
+		assertNotNull(parent.getContent());		
+		assertTrue(parent.getContent() instanceof TestEventBean2);
+		TestEventBean2 c2 = (TestEventBean2) parent.getContent();
+		
+		bean = (TestEventBean2) parent.getContent();
+		assertEquals("e4", bean.getId());
+		parent = bean.getParent();
+		assertEquals(null, parent.getClassName());
+		assertEquals(0, parent.getReference());
+		
+		// event3
+		bean = (TestEventBean2) beans.get(2);
+		assertEquals("e2", bean.getId());
+		long rid2 = bean.getRefId();
+		parent = bean.getParent();
+		assertEquals(parent.getClassName(), TestEvent.class.getName());
+		assertEquals(0, parent.getReference());
+		assertNotNull(parent.getContent());		
+		assertTrue(parent.getContent() instanceof TestEventBean2);
+		
+		bean = (TestEventBean2) parent.getContent();
+		assertEquals("e6", bean.getId());
+		parent = bean.getParent();
+		assertEquals(null, parent.getClassName());
+		assertEquals(0, parent.getReference());
+		long rid6 = bean.getRefId();
+		
+		// event4
+		bean = (TestEventBean2) beans.get(3);
+		assertNull(bean.getId());
+		parent = bean.getParent();
+		assertEquals(null, parent.getClassName());
+		assertEquals(0, parent.getReference());
+		assertNull(parent.getContent());
+		assertTrue(bean.getRefId() < 0);
+		assertTrue(bean.getRefId() == -c1.getRefId());
+		
+		// event5
+		bean = (TestEventBean2) beans.get(4);
+		assertNull(bean.getId());
+		parent = bean.getParent();
+		assertEquals(null, parent.getClassName());
+		assertEquals(0, parent.getReference());
+		assertNull(parent.getContent());
+		assertTrue(bean.getRefId() < 0);
+		assertTrue(bean.getRefId() == -c2.getRefId());
+		
+		// event6
+		bean = (TestEventBean2) beans.get(5);
+		assertEquals("e5", bean.getId());
+		parent = bean.getParent();
+		assertEquals(parent.getClassName(), TestEvent.class.getName());
+		assertEquals(rid2, parent.getReference());
+		assertNull(parent.getContent());		
+		
+		// event7
+		bean = (TestEventBean2) beans.get(6);
+		assertNull(bean.getId());
+		parent = bean.getParent();
+		assertEquals(null, parent.getClassName());
+		assertEquals(0, parent.getReference());
+		assertNull(parent.getContent());
+		assertTrue(bean.getRefId() < 0);
+		assertTrue(bean.getRefId() == -rid6);
+		
+		// event8
+		bean = (TestEventBean2) beans.get(7);
+		assertEquals("e7", bean.getId());
+		parent = bean.getParent();
+		assertEquals(parent.getClassName(), TestEvent.class.getName());
+		assertEquals(rid6, parent.getReference());
+		assertNull(parent.getContent());
 	}
 }

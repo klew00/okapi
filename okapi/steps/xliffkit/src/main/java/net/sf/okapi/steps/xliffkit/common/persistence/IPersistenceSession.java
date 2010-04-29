@@ -100,4 +100,6 @@ public interface IPersistenceSession {
 	void setRefIdForObject(Object obj, long refId);
 
 	void setReference(long parentRefId, long childRefId);
+
+	void setSerialized(Object obj);
 }

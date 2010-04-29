@@ -28,6 +28,7 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
@@ -75,6 +76,7 @@ public class OkapiBeans {
 		BeanMapper.registerBean(TextUnit.class, TextUnitBean.class);
 		BeanMapper.registerBean(RawDocument.class, RawDocumentBean.class);
 		BeanMapper.registerBean(Property.class, PropertyBean.class);
+		BeanMapper.registerBean(ScoresAnnotation.class, ScoresAnnotationBean.class);
 		BeanMapper.registerBean(ConditionalParameters.class, ConditionalParametersBean.class);
 		BeanMapper.registerBean(TextFragment.class, TextFragmentBean.class);
 		BeanMapper.registerBean(TextContainer.class, TextContainerBean.class);

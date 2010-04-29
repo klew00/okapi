@@ -35,6 +35,10 @@ import net.sf.okapi.common.ClassUtil;
 public class ReferenceResolver {
 	private final String MSG1 = "ReferenceResolver: class %s is not registered";
 	private final String MSG2 = "ReferenceResolver: cannot instantiate %s";
+//	private final String MSG3 = "ReferenceResolver.createAntiBean: anti-bean class mismatch (actual: %s, expected: %s)";
+	private final String MSG4 = "ReferenceResolver.createAntiBean: objClassRef cannot be null";
+	private final String MSG5 = "ReferenceResolver.createAntiBean: refId cannot be 0";
+	private final static String MSG6 = "ReferenceResolver: idCounter overflow";
 	
 	private static long idCounter = 0;
 	private long rootId = 0;
@@ -63,6 +67,7 @@ public class ReferenceResolver {
 		}
 	});	
 	private Map<Long, Set<Long>> frameLookup = new ConcurrentHashMap<Long, Set<Long>>();
+	private List<Object> serialized = new ArrayList<Object>();
 	
 	public void reset() {
 		//idCounter = 0; //!!! Sessions are not allowed to reset the counter
@@ -75,10 +80,13 @@ public class ReferenceResolver {
 		references.clear();
 		frames.clear();
 		frameLookup.clear();
+		serialized.clear();
 	}
 	
 	public static long generateRefId() {
-		return ++idCounter; // Long.MAX_VALUE
+		if (idCounter == Long.MAX_VALUE)
+			throw new RuntimeException(MSG6);
+		return ++idCounter;
 	}
 
 	public long getRefIdForObject(Object obj) {
@@ -90,6 +98,7 @@ public class ReferenceResolver {
 	}
 	
 	public long getRootId(long refId) {
+		if (refId < 0) return refId; // anti-bean is the root for itself 
 		return (rootLookup.containsKey(refId)) ? rootLookup.get(refId) : 0;
 	}
 
@@ -120,8 +129,6 @@ public class ReferenceResolver {
 	}
 	
 	public void updateFrames() {
-		
-		// TODO Handle idCounter overflow, when it wraps to negatives
 		
 //		Set<Set<Long>> frameSet = new TreeSet<Set<Long>>(new Comparator<Set<Long>>() {
 //			@Override
@@ -296,5 +303,38 @@ public class ReferenceResolver {
 			if (!beanCache2.containsKey(refId)) return false;
 		
 		return true;
+	}
+
+	/**
+	 * Anti-beans are used to serialize a reference to a root object that has already been serialized as part of another bean.
+	 * The anti-beans are instances of the right bean class corresponding to the given object, which refId is the inverted value
+	 * of the given bean. Fields or the resulting anti-bean contain default values. 
+	 * @param objClassRef
+	 * @param refId
+	 * @return
+	 */
+	public IPersistenceBean createAntiBean(Class<?> objClassRef, long refId) {
+		if (objClassRef == null)
+			throw new IllegalArgumentException(MSG4);
+		if (refId == 0)
+			throw new IllegalArgumentException(MSG5);
+		
+		IPersistenceBean res = createBean(objClassRef);
+//		if (!res.getClass().equals(bean.getClass()))
+//			throw new RuntimeException(String.format(MSG3, ClassUtil.getQualifiedClassName(res.getClass()),
+//				ClassUtil.getQualifiedClassName(bean.getClass())));		
+		if (refId > 0) refId = -refId;
+		
+		res.setRefId(refId);
+		setReference(refId, -refId);
+		return res;
+	}
+
+	public boolean isSerialized(Object obj) {
+		return serialized.contains(obj);
+	}
+
+	public void setSerialized(Object obj) {
+		serialized.add(obj);
 	}
 }

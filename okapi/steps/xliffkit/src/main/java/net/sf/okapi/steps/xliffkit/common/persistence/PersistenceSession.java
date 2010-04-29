@@ -27,8 +27,11 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.observer.BaseObservable;
+import net.sf.okapi.common.observer.IObservable;
+import net.sf.okapi.common.observer.IObserver;
 
-public abstract class PersistenceSession implements IPersistenceSession {
+public abstract class PersistenceSession implements IPersistenceSession, IObservable {
 
 	private static final String ITEM_LABEL = "item"; //$NON-NLS-1$
 	
@@ -75,7 +78,8 @@ public abstract class PersistenceSession implements IPersistenceSession {
 			beanClass = BeanMapper.getBeanClass(classRef);
 			prevClass = classRef;
 		}
-		IPersistenceBean bean = readBean(beanClass, name);		
+		IPersistenceBean bean = readBean(beanClass, name);
+		notifyObservers(bean);
 		return bean;		
 	}
 	
@@ -124,7 +128,7 @@ public abstract class PersistenceSession implements IPersistenceSession {
 						for (Long rid : frame) {
 							bean = refResolver.uncacheBean(rid); // removes from bean cache
 							if (bean == null)
-								throw(new RuntimeException(String.format("PersistenceSession: bean %d not found in cache", rid)));
+								throw new RuntimeException(String.format("PersistenceSession: bean %d not found in cache", rid));
 							
 							refResolver.setRootId(rid);
 							obj = classRef.cast(bean.get(classRef, this));
@@ -224,32 +228,50 @@ public abstract class PersistenceSession implements IPersistenceSession {
 
 	@Override
 	public void serialize(Object obj) {
+		if (obj == null)
+			throw new IllegalArgumentException("PersistenceSession: cannot serialize a null object");
 		serialize(obj, String.format("%s%d", itemLabel, ++itemCounter));
 	}
 
 	@Override
 	public void serialize(Object obj, String name) {
 		if (state != SessionState.WRITING) return;
+		if (obj == null)
+			throw new IllegalArgumentException("PersistenceSession: cannot serialize a null object");
 
-		IPersistenceBean bean = refResolver.uncacheBean(obj); // get a bin created earlier by FactoryBean or ReferenceBean
-		if (bean == null) {
-			bean = refResolver.createBean(obj.getClass());
-			if (bean == null) return;
-			
-			refResolver.cacheBean(obj, bean);			
-		}				
-				
-		refResolver.setRootId(bean.getRefId());
-		refResolver.setRefIdForObject(obj, bean.getRefId());
-		bean.set(obj, this);
+		long rid = refResolver.getRefIdForObject(obj);
+		IPersistenceBean bean = null;
 		
+		if (refResolver.isSerialized(obj)) { // The object has been serialized by another bean (as a FactoryBean field)
+			//if (bean != null)
+				bean = refResolver.createAntiBean(obj.getClass(), rid);
+				//refResolver.uncacheBean(obj); // to not leave in cache 
+//			else
+//				throw new RuntimeException(String.format("PersistenceSession: bean for %s (%s) not found in cache, " +
+//						"though marked as already serialized", name, obj.getClass()));
+		}
+		else {
+			bean = refResolver.uncacheBean(obj); // get a bean created earlier by ReferenceBean
+			if (bean == null) {
+				bean = refResolver.createBean(obj.getClass());
+				if (bean == null) return;
+				
+				//refResolver.cacheBean(obj, bean);			
+			}
+					
+			refResolver.setRootId(bean.getRefId());
+			refResolver.setRefIdForObject(obj, bean.getRefId());
+			bean.set(obj, this);
+		}
+		
+		notifyObservers(bean);
 		writeBean(bean, name);
 	}
 
 	@Override
 	public void start(OutputStream outStream) {
 		if (outStream == null)
-			throw(new IllegalArgumentException("PersistenceSession: output stream cannot be null"));
+			throw new IllegalArgumentException("PersistenceSession: output stream cannot be null");
 		
 		end();
 		refResolver.reset();
@@ -266,7 +288,7 @@ public abstract class PersistenceSession implements IPersistenceSession {
 	@Override
 	public void start(InputStream inStream) {
 		if (inStream == null)
-			throw(new IllegalArgumentException("PersistenceSession: input stream cannot be null"));
+			throw new IllegalArgumentException("PersistenceSession: input stream cannot be null");
 		
 		end();
 		refResolver.reset();
@@ -308,5 +330,50 @@ public abstract class PersistenceSession implements IPersistenceSession {
 	@Override
 	public Object getObject(long refId) {		
 		return refResolver.getObject(refId);
-	}	
+	}
+	
+	@Override
+	public void setSerialized(Object obj) {
+		refResolver.setSerialized(obj);
+	}
+	
+	//
+	// implements IObservable interface
+	//
+
+	/**
+	 * Implements multiple inheritance via delegate pattern to an inner class
+	 * 
+	 * @see IObservable
+	 * @see BaseObservable
+	 */
+	private IObservable delegatedObservable = new BaseObservable(this);
+
+	public void addObserver(IObserver observer) {
+		delegatedObservable.addObserver(observer);
+	}
+
+	public int countObservers() {
+		return delegatedObservable.countObservers();
+	}
+
+	public void deleteObserver(IObserver observer) {
+		delegatedObservable.deleteObserver(observer);
+	}
+
+	public void notifyObservers() {
+		delegatedObservable.notifyObservers();
+	}
+
+	public void notifyObservers(Object arg) {
+		delegatedObservable.notifyObservers(arg);
+	}
+
+	public void deleteObservers() {
+		delegatedObservable.deleteObservers();
+	}
+
+	public List<IObserver> getObservers() {
+		return delegatedObservable.getObservers();
+	}
 }

@@ -18,55 +18,46 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.common.persistence.versioning;
+package net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi;
 
+import net.sf.okapi.common.annotation.ScoreInfo;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.FactoryBean;
 
-public class TestEventBean2 extends PersistenceBean<TestEvent> {
-	private String id;
-	//private EventType type;
-	private FactoryBean parent = new FactoryBean();
+public class ScoreInfoBean extends PersistenceBean<ScoreInfo> {
+
+	public int score;
+	public String origin;
 	
 	@Override
-	protected TestEvent createObject(IPersistenceSession session) {
-		return new TestEvent(id);
+	protected ScoreInfo createObject(IPersistenceSession session) {
+		return new ScoreInfo(score, origin);
 	}
 
 	@Override
-	protected void fromObject(TestEvent obj, IPersistenceSession session) {		
-		id = obj.getId();
-		parent.set(obj.getParent(), session);
+	protected void fromObject(ScoreInfo obj, IPersistenceSession session) {
+		score = obj.score;
+		origin = obj.origin;
 	}
 
 	@Override
-	protected void setObject(TestEvent obj, IPersistenceSession session) {
-		obj.setId(id);
-		obj.setParent(parent.get(TestEvent.class, session));
+	protected void setObject(ScoreInfo obj, IPersistenceSession session) {
 	}
 
-	public String getId() {
-		return id;
+	public int getScore() {
+		return score;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setScore(int score) {
+		this.score = score;
 	}
 
-	public FactoryBean getParent() {
-		return parent;
+	public String getOrigin() {
+		return origin;
 	}
 
-	public void setParent(FactoryBean parent) {
-		this.parent = parent;
+	public void setOrigin(String origin) {
+		this.origin = origin;
 	}
 
-//	public void setType(EventType type) {
-//		this.type = type;
-//	}
-//
-//	public EventType getType() {
-//		return type;
-//	}
 }

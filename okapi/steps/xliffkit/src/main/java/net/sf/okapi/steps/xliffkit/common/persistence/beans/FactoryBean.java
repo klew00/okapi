@@ -28,8 +28,8 @@ import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
 
 public class FactoryBean extends PersistenceBean<Object> {
 	
-	private long reference;
 	private String className;
+	private long reference;	
 	private Object content;	// Bean for the className
 	
 	@Override
@@ -82,15 +82,17 @@ public class FactoryBean extends PersistenceBean<Object> {
 //			return this;
 //		}
 		
-		IPersistenceBean bean = session.uncacheBean(obj); // get a bin created earlier here or in a ReferenceBean
-		if (bean == null) {
-			bean = session.createBean(ClassUtil.getClass(obj));
+// 2.		
+//		IPersistenceBean bean = session.uncacheBean(obj); // get a bean created earlier here or in a ReferenceBean
+//		if (bean == null) {
+//			bean = session.createBean(ClassUtil.getClass(obj));
 //			session.cacheBean(obj, bean);
 //			reference = 0;
 //			content = bean;
-//			//session.setRefIdForObject(obj, bean.getRefId());			
+//			session.setRefIdForObject(obj, bean.getRefId());
+//			session.setSerialized(obj); // The obj is serialized as part of this bean
 //
-//			return this;
+//			return (bean instanceof FactoryBean) ? this : bean.set(obj, session);
 //		}
 //		else {
 //			content = null;
@@ -98,18 +100,60 @@ public class FactoryBean extends PersistenceBean<Object> {
 //			
 //			session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
 //			session.setReference(this.getRefId(), bean.getRefId());
+//		
+//			session.setRefIdForObject(obj, bean.getRefId());
+//			//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root		
+//			// session.cacheBean(obj, bean);
+//			return this;
+//		}
+		
+		
+		long rid = session.getRefIdForObject(obj);
+		IPersistenceBean bean = session.uncacheBean(obj); // get a bean created earlier in a ReferenceBean
+		
+		if (bean == null && rid != 0) {
+			content = null;
+			reference = rid;
+			
+			session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
+			session.setReference(this.getRefId(), rid);
+		
+			//session.setRefIdForObject(obj, bean.getRefId());
+			//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root		
+			// session.cacheBean(obj, bean);
+			return this;
+		}
+		else {
+			if (bean == null)
+				bean = session.createBean(ClassUtil.getClass(obj));
+			
+			//session.cacheBean(obj, bean);
+			reference = 0;
+			content = bean;
+			session.setRefIdForObject(obj, bean.getRefId());
+			session.setSerialized(obj); // The obj is serialized as part of this bean
+
+			return (bean instanceof FactoryBean) ? this : bean.set(obj, session);
+		}
+				
+// 1.		
+//		session.setRefIdForObject(obj, bean.getRefId());
+//		//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
+//		reference = 0;
+//		content = bean;
+//			
+//		return (bean instanceof FactoryBean) ? this : bean.set(obj, session);
+		
+//		IPersistenceBean bean = session.uncacheBean(obj); // get a bean created earlier here or in a ReferenceBean
+//		if (bean == null) {
+//			bean = session.createBean(ClassUtil.getClass(obj));
 //		}
 //		session.setRefIdForObject(obj, bean.getRefId());
-//		//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root		
-			// session.cacheBean(obj, bean);
-		}
-		session.setRefIdForObject(obj, bean.getRefId());
-		//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
-		reference = 0;
-		content = bean;
-
-			
-		return (bean instanceof FactoryBean) ? this : bean.set(obj, session);		
+//		//session.setRefIdForObject(this, this.getRefId()); // To find the ref parent's root
+//		reference = 0;
+//		content = bean;
+//			
+//		return (bean instanceof FactoryBean) ? this : bean.set(obj, session);		
 	}
 	
 	public void setClassName(String className) {

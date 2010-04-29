@@ -538,4 +538,8 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	public IParameters getParameters() {
 		return params;
 	}
+
+	public JSONPersistenceSession getSession() {
+		return session;
+	}
 }

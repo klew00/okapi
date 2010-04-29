@@ -18,55 +18,46 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.common.persistence.versioning;
+package net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.okapi.common.annotation.ScoreInfo;
+import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.steps.xliffkit.common.persistence.IPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.PersistenceBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.FactoryBean;
 
-public class TestEventBean2 extends PersistenceBean<TestEvent> {
-	private String id;
-	//private EventType type;
-	private FactoryBean parent = new FactoryBean();
+public class ScoresAnnotationBean extends PersistenceBean<ScoresAnnotation> {
+
+	private List<ScoreInfoBean> list = new ArrayList<ScoreInfoBean>();
 	
 	@Override
-	protected TestEvent createObject(IPersistenceSession session) {
-		return new TestEvent(id);
+	protected ScoresAnnotation createObject(IPersistenceSession session) {
+		return new ScoresAnnotation();
 	}
 
 	@Override
-	protected void fromObject(TestEvent obj, IPersistenceSession session) {		
-		id = obj.getId();
-		parent.set(obj.getParent(), session);
+	protected void fromObject(ScoresAnnotation obj, IPersistenceSession session) {
+		for (ScoreInfo scoreInfo : obj.getList()) {
+			ScoreInfoBean bean = new ScoreInfoBean();
+			list.add(bean);
+			bean.set(scoreInfo, session);
+		}
 	}
 
 	@Override
-	protected void setObject(TestEvent obj, IPersistenceSession session) {
-		obj.setId(id);
-		obj.setParent(parent.get(TestEvent.class, session));
+	protected void setObject(ScoresAnnotation obj, IPersistenceSession session) {
+		for (ScoreInfoBean bean : list)
+			obj.getList().add(bean.get(ScoreInfo.class, session));
 	}
 
-	public String getId() {
-		return id;
+	public void setList(List<ScoreInfoBean> list) {
+		this.list = list;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public List<ScoreInfoBean> getList() {
+		return list;
 	}
 
-	public FactoryBean getParent() {
-		return parent;
-	}
-
-	public void setParent(FactoryBean parent) {
-		this.parent = parent;
-	}
-
-//	public void setType(EventType type) {
-//		this.type = type;
-//	}
-//
-//	public EventType getType() {
-//		return type;
-//	}
 }
