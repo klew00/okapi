@@ -33,6 +33,8 @@ import java.io.IOException;
  */
 class TemporaryStore {
 
+	private static int MAXBLOCKLEN = 65000;
+	
 	DataOutputStream dos = null;
 	DataInputStream dis = null;
 
@@ -71,13 +73,46 @@ class TemporaryStore {
 			throw new RuntimeException("Error opening.", e);
 		}
 	}
+
+	private void writeLongString (String data)
+		throws IOException
+	{
+		int r = (data.length() % MAXBLOCKLEN);
+		int n = (data.length() / MAXBLOCKLEN);
+		int count = n + ((r > 0) ? 1 : 0);
+		
+		dos.writeInt(count); // Number of blocks
+		int pos = 0;
+
+		// Write the full blocks
+		for ( int i=0; i<n; i++ ) {
+			dos.writeUTF(data.substring(pos, pos+MAXBLOCKLEN));
+			pos += MAXBLOCKLEN;
+		}
+		// Write the remaining text
+		if ( r > 0 ) {
+			dos.writeUTF(data.substring(pos));
+		}
+	}
+	
+	private String readLongString ()
+		throws IOException
+	{
+		StringBuilder tmp = new StringBuilder();
+		int count = dis.readInt();
+		for ( int i=0; i<count; i++ ) {
+			tmp.append(dis.readUTF());
+		}
+		return tmp.toString();
+	}
 	
 	public void writeBlock (String contentId,
 		String data)
 	{
 		try {
 			dos.writeUTF(contentId);
-			dos.writeUTF(data);
+			//dos.writeUTF(data);
+			writeLongString(data);
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException("Error while writing.", e);
@@ -89,7 +124,8 @@ class TemporaryStore {
 		try {
 			String[] res = new String[2];
 			res[0] = dis.readUTF();
-			res[1] = dis.readUTF();
+			//res[1] = dis.readUTF();
+			res[1] = readLongString();
 			return res;
 		}
 		catch ( EOFException e ) {
