@@ -309,7 +309,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 * @param tu The text unit to process.
 	 * @param locToUse locale to output. Use null for the source, or a LocaleId
 	 * object for the target locales.
-	 * @param content Context flag: 0=text, 1=skeleton, 2=in-line.
+	 * @param context Context flag: 0=text, 1=skeleton, 2=in-line.
 	 * @return The string representation of the text unit. 
 	 */
 	protected String getString (TextUnit tu,

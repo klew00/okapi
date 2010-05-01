@@ -36,11 +36,14 @@ Sends: Raw document</p>
 filter.</li>
 	<li>The result of the extraction is put in a temporary HTML document where 
 each paragraph corresponds to a source segment (or a source text unit if the 
-	text units are not segmented).</li>
+	text units are not segmented). That temporary HTML document corresponds to 
+	the <code>${inputPath}</code> and <code>${inputURI}</code> variables.</li>
 	<li>The external tool is then 
 invoked using a user-defined command-line. This allows the external tool to take 
 the temporary HTML document, translate it, and creates a translated output for 
-it.</li>
+it. The external tool must create the trnsated HTML and that output must 
+	correspond to the <code>${outputPath}</code> and <code>${outputURI}</code> 
+	variables.</li>
 	<li>Once the command-line is excuted, the step takes the translated output and 
 build a set of aligned entries with the source of each extracted segment and the 
 translation provided by the external tool.</li>
@@ -122,7 +125,9 @@ string.</p>
 extracted text unit before sending them to the temporary HTML document. If this 
 option is set each paragraph of the HTML document will be a sentence, if this 
 option is not set, each paragraph of the HTML document will be an un-segmented 
-paragraph.</p>
+paragraph. Note that only entries processed by the external tool are placed in 
+the TMX output. Entries that already exist in the TM being populated or in the 
+existing TM are not copied into the TMX output.</p>
 <p><cite>SRX path</cite> -- Enter the full path to the segmentation rules file 
 in SRX that should be used to segment the text units. This option is enabled 
 only if the option <cite>Segment the text units</cite> is set. You can use the 
@@ -148,7 +153,8 @@ variable <code>${rootDir}</code> in the path.</p>
 <p><cite>Check for existing entries in an existing TM</cite> -- Set this option 
 to lookup in an existing Pensieve TM each entry that may be send for 
 translation. This allows to send only the entries for which you don&#39;t have an 
-existing translation.</p>
+existing translation. Existing entries are not re-processed and are not placed 
+in the optional TMX output.</p>
 
 <p><cite>Directory of the existing TM</cite> -- Enter the directory of the 
 Pensive TM to lookup for existing entries. This option is enabled only if the 

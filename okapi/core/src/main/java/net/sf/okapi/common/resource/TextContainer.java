@@ -715,10 +715,10 @@ public class TextContainer implements Iterable<TextPart> {
 	/**
 	 * Gets the coded text of the whole content (segmented or not).
 	 * Use this method to compute segment boundaries that will be applied using
-	 * {@link #createSegment(int, int)} or {@link #createSegments(List)} or other methods.
+	 * {@link Segments#create(int, int)} or {@link Segments#create(List)} or other methods.
 	 * @return the coded text of the whole content to use for segmentation template.
-	 * @see #createSegment(int, int)
-	 * @see #createSegments(List)
+	 * @see Segments#create(int, int)
+	 * @see Segments#create(List)
 	 */
 	public String getCodedText () {
 		if ( parts.size() == 1 ) {

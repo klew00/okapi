@@ -98,8 +98,6 @@ public interface Segments extends Iterable<Segment> {
 	/**
 	 * Gets the number of segments in this container.
 	 * This method always returns at least 1.
-	 * Use {@link #hasText(boolean, boolean)} to check for text presence.
-	 * Use {@link #isEmpty()} to verify if the content is empty of not.
 	 * @return the number of segments in the container.
 	 * @see TextContainer#count()
 	 */
