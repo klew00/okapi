@@ -348,9 +348,11 @@ public class XLIFFWriter {
 				
 				for ( AltTranslation alt : ann ) {
 					writer.writeStartElement("alt-trans");
-					writer.writeAttributeString("mid", seg.getId());
+					if ( tc.hasBeenSegmented() ) {
+						writer.writeAttributeString("mid", seg.getId());
+					}
 					writer.writeAttributeString("match-quality", String.format("%d", alt.getScore()));
-					if ( Util.isEmpty(alt.getOrigin()) ) {
+					if ( !Util.isEmpty(alt.getOrigin()) ) {
 						writer.writeAttributeString("origin", alt.getOrigin());
 					}
 					TextUnit altTu = alt.getEntry();

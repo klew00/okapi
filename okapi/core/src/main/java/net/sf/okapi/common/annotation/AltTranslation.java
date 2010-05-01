@@ -68,6 +68,11 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		String origin)
 	{
 		this.srcLocId = sourceLocId;
+		this.trgLocId = targetLocId;
+		this.type = type;
+		this.score = score;
+		this.origin = origin;
+
 		tu = new TextUnit(UUID.randomUUID().toString());
 		if ( alternateSource != null ) {
 			tu.setSourceContent(alternateSource);
@@ -75,11 +80,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 
 //TODO: copy code-content from original source to alternate target if necessary
 //TODO: the magic should go here
-		
 		tu.setTargetContent(targetLocId, alternateTarget);
-		this.type = type;
-		this.score = score;
-		this.origin = origin;
 	}
 
 	/**

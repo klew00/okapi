@@ -23,7 +23,6 @@ package net.sf.okapi.steps.batchtranslation;
 import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
