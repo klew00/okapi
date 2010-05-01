@@ -23,7 +23,6 @@ package net.sf.okapi.lib.segmentation;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.IResource;
@@ -301,15 +300,17 @@ public class SegmentationTest {
 		// Check the FR against the source
 		Segment srcSeg;
 		tu.synchronizeSourceSegmentation(locFR);
+		Segments segs = tu.getSource().getSegments();
 		for ( Segment seg : tc1.getSegments() ) {
-			srcSeg = tu.getSource().getSegments().get(seg.id);
+			srcSeg = segs.get(seg.id);
 			assertNotNull(srcSeg);
 			assertEquals(seg.text, srcSeg.text);
 		}
 		// Test AR against the source
 		tu.synchronizeSourceSegmentation(locAR);
+		segs = tu.getSource().getSegments();
 		for ( Segment seg : tc2.getSegments() ) {
-			srcSeg = tu.getSource().getSegments().get(seg.id);
+			srcSeg = segs.get(seg.id);
 			assertNotNull(srcSeg);
 			assertEquals(seg.text, srcSeg.text);
 		}

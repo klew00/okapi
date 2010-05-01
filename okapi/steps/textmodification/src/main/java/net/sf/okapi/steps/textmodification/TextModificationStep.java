@@ -20,8 +20,6 @@
 
 package net.sf.okapi.steps.textmodification;
 
-import java.util.Iterator;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;

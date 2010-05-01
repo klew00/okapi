@@ -20,7 +20,6 @@
 
 package net.sf.okapi.steps.segmentation;
 
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -34,6 +33,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.Segments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -163,9 +163,9 @@ public class SegmentationStep extends BasePipelineStep {
 			}
 			// Otherwise make sure we have matches
 			else {
+				Segments trgSegs = trgCont.getSegments();
 				for ( Segment seg : tu.getSource().getSegments() ) {
-		    		
-					if ( trgCont.getSegments().get(seg.id) == null ) {
+					if ( trgSegs.get(seg.id) == null ) {
 						// No target segment matching source segment seg.id
 						logger.warning(String.format("Text unit id='%s': No target match found for source segment id='%s'",
 							tu.getId(), seg.id));

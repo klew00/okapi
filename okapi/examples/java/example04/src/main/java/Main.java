@@ -19,7 +19,6 @@
 ===========================================================================*/
 
 import java.io.File;
-import java.util.Iterator;
 
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;

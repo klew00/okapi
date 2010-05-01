@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.Iterator;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -43,6 +42,7 @@ import net.sf.okapi.common.filterwriter.TMXContent;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.Segments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -297,10 +297,11 @@ public class TableFilterWriter implements IFilterWriter {
 		}
 		// If we do have the same number of segments:
 		// Output each of them
+		Segments trgSegs = trgCont.getSegments();
 		for ( Segment srcSeg : srcCont.getSegments() ) {
-			Segment trgSeg = trgCont.getSegments().get(srcSeg.id);
+			Segment trgSeg = trgSegs.get(srcSeg.id);
 			if ( trgSeg == null ) {
-				//TODO: warning
+				writeRow(srcSeg.text, null);
 			}
 			else {
 				writeRow(srcSeg.text, trgSeg.text);

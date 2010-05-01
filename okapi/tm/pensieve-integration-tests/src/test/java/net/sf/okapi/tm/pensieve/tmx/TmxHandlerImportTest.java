@@ -11,7 +11,6 @@ import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
 import net.sf.okapi.tm.pensieve.writer.PensieveWriter;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
-import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;

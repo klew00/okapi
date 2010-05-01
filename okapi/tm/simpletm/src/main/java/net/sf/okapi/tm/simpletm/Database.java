@@ -25,6 +25,7 @@ import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.Segments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -39,7 +40,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -237,10 +237,11 @@ public class Database {
 				pstm.setString(6, grpName);
 				pstm.setString(7, fileName);
 				int segIndex = 0;
+				Segments trgSegs = trgCont.getSegments();
 				for ( Segment srcSeg : srcCont.getSegments() ) {
 					pstm.setString(2, srcSeg.text.getCodedText());
 					pstm.setString(3, Code.codesToString(srcSeg.text.getCodes()));
-					Segment trgSeg = trgCont.getSegments().get(srcSeg.id);
+					Segment trgSeg = trgSegs.get(srcSeg.id);
 					if ( trgSeg != null ) { // Skip source without target
 						pstm.setString(4, trgSeg.text.getCodedText());
 						pstm.setString(5, Code.codesToString(trgSeg.text.getCodes()));

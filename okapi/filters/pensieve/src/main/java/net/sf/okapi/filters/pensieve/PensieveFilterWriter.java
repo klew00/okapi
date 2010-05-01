@@ -22,7 +22,6 @@ package net.sf.okapi.filters.pensieve;
 
 import java.io.File;
 import java.io.OutputStream;
-import java.util.Iterator;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -32,6 +31,7 @@ import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.Segments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -158,8 +158,9 @@ public class PensieveFilterWriter implements IFilterWriter {
 		}
 
 		// Index each segment
+		Segments trgSegs = trgCont.getSegments();
 		for ( Segment srcSeg :srcCont.getSegments() ) {
-			Segment trgSeg = trgCont.getSegments().get(srcSeg.id);
+			Segment trgSeg = trgSegs.get(srcSeg.id);
 			// Skip entries with no target match
 			if ( trgSeg != null ) {
 				TranslationUnitVariant source = new TranslationUnitVariant(srcLoc, srcSeg.text);

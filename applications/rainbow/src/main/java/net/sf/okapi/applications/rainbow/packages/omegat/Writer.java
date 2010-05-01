@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.packages.omegat;
 
 import java.io.File;
-import java.util.Iterator;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
@@ -100,7 +99,6 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		int i = 0;
 		Segments trgSegs = trgTC.getSegments();
 		for ( Segment srcSeg : srcTC.getSegments() ) {
-    		
 			Segment trgSeg = trgSegs.get(srcSeg.id);
 			if ( trgSeg != null ) {
 				if ( scores.getScore(0) == 100 ) {
