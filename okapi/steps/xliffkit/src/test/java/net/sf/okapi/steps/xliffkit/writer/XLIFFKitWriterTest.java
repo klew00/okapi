@@ -168,10 +168,8 @@ public class XLIFFKitWriterTest {
 		buildPipeline(IN_NAME2, IN_NAME3).execute();
 	}
 
-	@Test
-	public void testTempFile() {
-		
-		// DEBUG
+	// DEBUG @Test
+	public void testTempFile() {				
 //		try {
 //			File temp = File.createTempFile("pattern", null);
 //			temp.deleteOnExit();

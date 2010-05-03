@@ -52,10 +52,13 @@ public class FactoryBean extends PersistenceBean<Object> {
 	
 	@Override
 	public <T> T get(Class<T> classRef, IPersistenceSession session) {
-		return classRef.cast(validateContent(session) ? ((IPersistenceBean) content).get(classRef, session) : null);
+		if (reference != 0)
+			return classRef.cast(session.getObject(reference));
+		else
+			return classRef.cast(validateContent(session) ? ((IPersistenceBean) content).get(classRef, session) : null);
 	}
 	
-	private boolean validateContent(IPersistenceSession session) {
+	private boolean validateContent(IPersistenceSession session) {		
 		if (content == null) return false;
 		if (className == null) return false;
 		

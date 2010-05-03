@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.xliffkit.reader;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -28,9 +29,11 @@ import java.io.InputStream;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
+import net.sf.okapi.steps.xliffkit.common.persistence.beans.FactoryBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.json.jackson.JSONPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEvent;
 import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEventBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEventBean2;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
@@ -232,6 +235,94 @@ public class XLIFFKitReaderTest {
 		assertTrue("e6".equals(e2.getParent().getId()));
 		assertTrue("e6".equals(e7.getParent().getId()));
 		assertTrue("e2".equals(e5.getParent().getId()));
+		
+		TestEvent ed = session.deserialize(TestEvent.class); // Ending
+		TestEvent e8 = session.deserialize(TestEvent.class);
+		assertNull(e8);
+		TestEvent e9 = session.deserialize(TestEvent.class);
+		assertNull(e9);
+		TestEvent e10 = session.deserialize(TestEvent.class);
+		assertNull(e10);
+		session.end();
+	}
+		
+	@Test
+	public void testReferences5() {
+		
+		JSONPersistenceSession session = new JSONPersistenceSession();
+		session.setItemClass(TestEvent.class);
+		session.setItemLabel("event");
+		
+		BeanMapper.registerBean(TestEvent.class, TestEventBean2.class);
+		InputStream inStream = this.getClass().getResourceAsStream("test_refs5.txt.json"); 
+		session.start(inStream);		
+		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
+		
+		TestEvent e1 = session.deserialize(TestEvent.class);
+		TestEvent e2 = session.deserialize(TestEvent.class);
+		
+		assertEquals("e1", e1.getId());
+		assertEquals("e2", e2.getId());
+		
+		TestEvent p1 = e1.getParent();
+		TestEvent p2 = e2.getParent();
+		
+		assertEquals(e2, p1);
+		assertEquals(e1, p2);
+		
+		TestEvent ed = session.deserialize(TestEvent.class); // Ending
+		TestEvent e8 = session.deserialize(TestEvent.class);
+		assertNull(e8);
+		TestEvent e9 = session.deserialize(TestEvent.class);
+		assertNull(e9);
+		TestEvent e10 = session.deserialize(TestEvent.class);
+		assertNull(e10);
+		session.end();
+	}
+	
+	@Test
+	public void testReferences6() {
+		
+		JSONPersistenceSession session = new JSONPersistenceSession();
+		session.setItemClass(TestEvent.class);
+		session.setItemLabel("event");
+		
+		BeanMapper.registerBean(TestEvent.class, TestEventBean2.class);
+		InputStream inStream = this.getClass().getResourceAsStream("test_refs6.txt.json"); 
+		session.start(inStream);		
+		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
+		
+		TestEvent e1 = session.deserialize(TestEvent.class);
+		TestEvent e2 = session.deserialize(TestEvent.class);
+		TestEvent e3 = session.deserialize(TestEvent.class);
+		TestEvent e4 = session.deserialize(TestEvent.class);
+		TestEvent e5 = session.deserialize(TestEvent.class);
+		TestEvent e6 = session.deserialize(TestEvent.class);
+		TestEvent e7 = session.deserialize(TestEvent.class);
+		
+		assertEquals("e1", e1.getId());
+		assertEquals("e2", e2.getId());
+		assertEquals("e3", e3.getId());
+		assertEquals("e4", e4.getId());
+		assertEquals("e5", e5.getId());
+		assertEquals("e6", e6.getId());
+		assertEquals("e7", e7.getId());
+		
+		TestEvent p1 = e1.getParent();
+		TestEvent p2 = e2.getParent();
+		TestEvent p3 = e3.getParent();
+		TestEvent p4 = e4.getParent();
+		TestEvent p5 = e5.getParent();
+		TestEvent p6 = e6.getParent();
+		TestEvent p7 = e7.getParent();
+		
+		assertEquals(e3, p1);
+		assertEquals(e6, p2);
+		assertEquals(e4, p3);
+		assertEquals(null, p4);
+		assertEquals(e2, p5);
+		assertEquals(null, p6);
+		assertEquals(e6, p7);
 		
 		TestEvent ed = session.deserialize(TestEvent.class); // Ending
 		TestEvent e8 = session.deserialize(TestEvent.class);

@@ -73,6 +73,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	}
 
 	private IPersistenceBean nextBean(Class<?> classRef, String name) {
+		if (readingDone) return null;
 		// Update bean class if core class has changed
 		if (classRef != prevClass) { 
 			beanClass = BeanMapper.getBeanClass(classRef);
@@ -80,6 +81,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		}
 		IPersistenceBean bean = readBean(beanClass, name);
 		notifyObservers(bean);
+		readingDone = bean == null;
 		return bean;		
 	}
 	
@@ -94,13 +96,11 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 					return null;
 				}
 				else { // Read one bean from the stream
-					IPersistenceBean bean = nextBean(classRef, name);					
-					readingDone = bean == null;
-					if (!readingDone) {
-						refResolver.cacheBean(bean);
-						queue.add(bean);
-					}
-					continue;
+					IPersistenceBean bean = nextBean(classRef, name);										
+					if (readingDone) continue;
+					
+					refResolver.cacheBean(bean);
+					queue.add(bean);
 				}
 			}
 			else { // Something in the queue
@@ -108,6 +108,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 				// We are interested in the head bean
 				IPersistenceBean bean = queue.peek();
 				long refId = bean.getRefId();
+				if (refId < 0) refId = -refId; // anti-bean
 				Object obj = getObject(refId);
 				
 				if (obj != null) { // The bean has been resolved, its object found in the cache
@@ -119,8 +120,9 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 					if (frame != null) { // The bean is part of a frame
 						do {
 							bean = nextBean(classRef, name);
-							if (bean == null) break;
-							refResolver.cacheBean(bean);
+							if (readingDone) break;
+							
+							refResolver.cacheBean(bean);							
 							queue.add(bean);
 						} while (!refResolver.isFrameAvailable(frame));
 						
@@ -128,7 +130,8 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 						for (Long rid : frame) {
 							bean = refResolver.uncacheBean(rid); // removes from bean cache
 							if (bean == null)
-								throw new RuntimeException(String.format("PersistenceSession: bean %d not found in cache", rid));
+								throw new RuntimeException(String.format("PersistenceSession: bean %d not found in cache", rid));							
+							if (rid < 0) continue;
 							
 							refResolver.setRootId(rid);
 							obj = classRef.cast(bean.get(classRef, this));
