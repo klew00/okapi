@@ -102,10 +102,9 @@ public class JSONPersistenceSession extends PersistenceSession {
 	}
 
 	@Override
-	protected IPersistenceBean<?> readBean(
-			Class<? extends IPersistenceBean<?>> beanClass, String name) {
+	protected <T extends IPersistenceBean<?>> T readBean(Class<T> beanClass, String name) {
 		
-		IPersistenceBean<?> bean = null;
+		T bean = null;
 		try {
 			JsonToken token = parser.nextToken();
 			if (token == JsonToken.END_OBJECT)

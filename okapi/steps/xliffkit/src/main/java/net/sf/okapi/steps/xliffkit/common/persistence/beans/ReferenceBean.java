@@ -44,6 +44,7 @@ public class ReferenceBean extends PersistenceBean<Object> {
 		return obj;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void fromObject(Object obj, IPersistenceSession session) {
 		if (obj == null) return;
@@ -59,7 +60,7 @@ public class ReferenceBean extends PersistenceBean<Object> {
 			return;
 		}
 		
-		IPersistenceBean<?> bean = session.createBean(ClassUtil.getClass(obj));
+		IPersistenceBean<Object> bean = (IPersistenceBean<Object>) session.createBean(ClassUtil.getClass(obj));
 		session.cacheBean(obj, bean); // for a FactoryBean or PersistenceSession.serialize() to hook up later
 		reference = bean.getRefId();
 		// session.setRefIdForObject(obj, bean.getRefId());

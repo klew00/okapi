@@ -72,7 +72,7 @@ public interface IPersistenceSession {
 	
 	void cacheBean(Object obj, IPersistenceBean<?> bean);
 	
-	IPersistenceBean<?> uncacheBean(Object obj);
+	<T> IPersistenceBean<T> uncacheBean(T obj);
 	
 	/**
 	 * Converts a given object to an expected type.

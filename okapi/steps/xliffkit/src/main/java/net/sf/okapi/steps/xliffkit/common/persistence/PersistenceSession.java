@@ -36,7 +36,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	private static final String ITEM_LABEL = "item"; //$NON-NLS-1$
 	
 	protected abstract void writeBean(IPersistenceBean<?> bean, String name);	
-	protected abstract IPersistenceBean<?> readBean(Class<? extends IPersistenceBean<?>> beanClass, String name);
+	protected abstract <T extends IPersistenceBean<?>> T readBean(Class<T> beanClass, String name);
 	
 	protected abstract void startWriting(OutputStream outStream);
 	protected abstract void endWriting(OutputStream outStream);
@@ -72,14 +72,15 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		return deserialize(classRef, itemLabel);
 	}
 
-	private IPersistenceBean<?> nextBean(Class<?> classRef, String name) {
+	@SuppressWarnings("unchecked")
+	private <T> IPersistenceBean<T> nextBean(Class<T> classRef, String name) {
 		if (readingDone) return null;
 		// Update bean class if core class has changed
 		if (classRef != prevClass) { 
 			beanClass = BeanMapper.getBeanClass(classRef);
 			prevClass = classRef;
 		}
-		IPersistenceBean<?> bean = readBean(beanClass, name);
+		IPersistenceBean<T> bean = (IPersistenceBean<T>) readBean(beanClass, name);
 		notifyObservers(bean);
 		readingDone = bean == null;
 		return bean;		
