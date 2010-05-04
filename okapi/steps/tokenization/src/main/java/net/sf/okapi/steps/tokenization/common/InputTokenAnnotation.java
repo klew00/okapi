@@ -36,9 +36,4 @@ public class InputTokenAnnotation implements IAnnotation {
 		
 		return inputToken;
 	}
-
-	public void setInputToken(Token inputToken) {
-		
-		this.inputToken = inputToken;
-	}	
 }

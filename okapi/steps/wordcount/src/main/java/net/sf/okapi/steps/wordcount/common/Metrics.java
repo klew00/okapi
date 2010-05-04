@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.wordcount.common;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import net.sf.okapi.common.Util;
 
@@ -30,26 +31,21 @@ import net.sf.okapi.common.Util;
  * @version 0.1 07.07.2009
  */
 
-public class Metrics {
+public class Metrics implements Iterable<String> {
 
 	private Hashtable <String, Long> metrics;
 	
-	public Metrics() {
-		
-		super();
-		
+	public Metrics() {		
+		super();		
 		metrics = new Hashtable <String, Long> ();				
 	}
 
-	public void resetMetrics() {
-		
+	public void resetMetrics() {		
 		if (metrics == null) return;
-
 		metrics.clear(); // removes all metrics from the hash table, getMetric() returns 0 for not found 
 	}
 	
-	public boolean resetMetric(String name) {
-		
+	public boolean resetMetric(String name) {		
 		return setMetric(name, 0L);
 	}
 
@@ -58,8 +54,7 @@ public class Metrics {
 	 * @param name symbolic name of the metric
 	 * @return value of the metric specified by the given symbolic name 
 	 */
-	public long getMetric(String name) {
-		
+	public long getMetric(String name) {		
 		if (Util.isEmpty(name)) return 0L;
 		if (metrics == null) return 0L;
 		
@@ -69,38 +64,34 @@ public class Metrics {
 		return res;
 	}
 	
-	public boolean setMetric(String name, long value) {
-		
+	public boolean setMetric(String name, long value) {		
 		if (Util.isEmpty(name)) return false;
 		if (metrics == null) return false;
 		
-		metrics.put(name, value);
-		
+		metrics.put(name, value);		
 		return true;
 	}
 	
 	public boolean registerMetric(String name) {
-	
 		if (Util.isEmpty(name)) return false;
 		if (metrics == null) return false;
 		
 		if (metrics.containsKey(name)) return false;
-		
 		metrics.put(name, 0L);
-		
 		return true;
 	}
 	
 	public boolean unregisterMetric(String name) {
-		
 		if (Util.isEmpty(name)) return false;
 		if (metrics == null) return false;
-		
 		if (!metrics.containsKey(name)) return false;
 		
 		metrics.remove(name);
-		
 		return true;
 	}
-	
+
+	@Override
+	public Iterator<String> iterator() {
+		return metrics.keySet().iterator();
+	}	
 }

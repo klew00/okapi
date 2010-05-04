@@ -157,5 +157,8 @@ public class Lexem {
 		
 		this.immutable = immutable;
 	}
-	
+
+	public Annotations getAnnotations() {
+		return annotations;
+	}
 }
