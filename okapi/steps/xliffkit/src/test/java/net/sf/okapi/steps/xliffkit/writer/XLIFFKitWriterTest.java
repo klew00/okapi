@@ -83,11 +83,6 @@ public class XLIFFKitWriterTest {
 	WriteObserver writeObserver = new WriteObserver();
 	List<IPersistenceBean<?>> beans = new ArrayList<IPersistenceBean<?>>(); 
 		
-	@Test
-	public void test() {
-		
-	}
-	
 	private Pipeline buildPipeline(String inPath1, String inPath2) {
 		
 //		XLIFFKitWriterStep step1 = new XLIFFKitWriterStep();

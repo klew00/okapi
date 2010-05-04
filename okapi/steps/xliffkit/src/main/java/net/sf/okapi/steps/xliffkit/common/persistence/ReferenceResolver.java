@@ -93,7 +93,7 @@ public class ReferenceResolver {
 		}
 	}
 	
-	public void releaseFrame(Set<Long> frame) {
+	public void removeFrame(Set<Long> frame) {
 		frames.remove(frame);
 		for (Long rid : frame)
 			frameLookup.remove(rid);

@@ -27,6 +27,8 @@ import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
@@ -58,7 +60,13 @@ import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POFilterWriter;
+import net.sf.okapi.filters.vignette.SubFilterAnnotation;
 import net.sf.okapi.steps.formatconversion.TableFilterWriter;
+import net.sf.okapi.steps.tokenization.common.InputTokenAnnotation;
+import net.sf.okapi.steps.tokenization.common.Lexem;
+import net.sf.okapi.steps.tokenization.common.Token;
+import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
+import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TypeInfoBean;
 
@@ -73,9 +81,7 @@ public class OkapiBeans {
 		BeanMapper.registerBean(Event.class, EventBean.class);		
 		BeanMapper.registerBean(TextUnit.class, TextUnitBean.class);
 		BeanMapper.registerBean(RawDocument.class, RawDocumentBean.class);
-		BeanMapper.registerBean(Property.class, PropertyBean.class);
-		BeanMapper.registerBean(ScoresAnnotation.class, ScoresAnnotationBean.class);
-		BeanMapper.registerBean(AltTransAnnotation.class, AltTransAnnotationBean.class);
+		BeanMapper.registerBean(Property.class, PropertyBean.class);		
 		BeanMapper.registerBean(ConditionalParameters.class, ConditionalParametersBean.class);
 		BeanMapper.registerBean(TextFragment.class, TextFragmentBean.class);
 		BeanMapper.registerBean(TextContainer.class, TextContainerBean.class);
@@ -91,23 +97,34 @@ public class OkapiBeans {
 		BeanMapper.registerBean(BaseReferenceable.class, BaseReferenceableBean.class);
 		BeanMapper.registerBean(StartDocument.class, StartDocumentBean.class);
 		BeanMapper.registerBean(StartGroup.class, StartGroupBean.class);
-		BeanMapper.registerBean(StartSubDocument.class, StartSubDocumentBean.class);
-		BeanMapper.registerBean(TargetPropertiesAnnotation.class, TargetPropertiesAnnotationBean.class);
+		BeanMapper.registerBean(StartSubDocument.class, StartSubDocumentBean.class);		
 		BeanMapper.registerBean(GenericSkeleton.class, GenericSkeletonBean.class);
 		BeanMapper.registerBean(GenericSkeletonPart.class, GenericSkeletonPartBean.class);
 		BeanMapper.registerBean(ZipSkeleton.class, ZipSkeletonBean.class);
 		BeanMapper.registerBean(ZipFile.class, ZipFileBean.class);
 		BeanMapper.registerBean(ZipEntry.class, ZipEntryBean.class);
-		BeanMapper.registerBean(InputStream.class, InputStreamBean.class);
-		BeanMapper.registerBean(InlineAnnotation.class, InlineAnnotationBean.class);
+		BeanMapper.registerBean(InputStream.class, InputStreamBean.class);		
 		BeanMapper.registerBean(GenericFilterWriter.class, GenericFilterWriterBean.class);
 		BeanMapper.registerBean(TMXFilterWriter.class, TMXFilterWriterBean.class);
 		BeanMapper.registerBean(ZipFilterWriter.class, ZipFilterWriterBean.class);
-		// Registered here to require dependencies at development-time
+		BeanMapper.registerBean(Token.class, TokenBean.class);
+		BeanMapper.registerBean(Lexem.class, LexemBean.class);
+		BeanMapper.registerBean(AltTranslation.class, AltTranslationBean.class);
+		// Registered here to require dependencies at compile-time
 		BeanMapper.registerBean(OpenXMLZipFilterWriter.class, TypeInfoBean.class); 		
 		BeanMapper.registerBean(PensieveFilterWriter.class, TypeInfoBean.class);
 		BeanMapper.registerBean(POFilterWriter.class, TypeInfoBean.class);
-		BeanMapper.registerBean(TableFilterWriter.class, TypeInfoBean.class);		
-		//registerBean(.class, Bean.class);
+		BeanMapper.registerBean(TableFilterWriter.class, TypeInfoBean.class);
+		// Annotations		
+		BeanMapper.registerBean(AltTransAnnotation.class, AltTransAnnotationBean.class);
+		BeanMapper.registerBean(AltTranslationsAnnotation.class, AltTranslationsAnnotationBean.class);		
+		BeanMapper.registerBean(InlineAnnotation.class, InlineAnnotationBean.class);
+		BeanMapper.registerBean(InputTokenAnnotation.class, InputTokenAnnotationBean.class);
+		BeanMapper.registerBean(MetricsAnnotation.class, MetricsAnnotationBean.class);
+		BeanMapper.registerBean(ScoresAnnotation.class, ScoresAnnotationBean.class);
+		BeanMapper.registerBean(SubFilterAnnotation.class, SubFilterAnnotationBean.class);
+		BeanMapper.registerBean(TargetPropertiesAnnotation.class, TargetPropertiesAnnotationBean.class);
+		BeanMapper.registerBean(TokensAnnotation.class, TokensAnnotationBean.class);
+		//BeanMapper.registerBean(.class, Bean.class);
 	}
 }

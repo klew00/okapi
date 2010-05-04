@@ -139,7 +139,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 							obj = classRef.cast(bean.get(classRef, this));
 							refResolver.setRefIdForObject(obj, rid); // for getObject()
 						}
-						refResolver.releaseFrame(frame);
+						refResolver.removeFrame(frame);
 						continue;
 					}
 					else { // The bean is stand-alone
