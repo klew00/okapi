@@ -617,7 +617,6 @@ public class TextContainerTest {
 	public void testAppendSeveralSegments () {
 		TextContainer tc = createMultiSegmentContent();
 		Segments segments = tc.getSegments();
-
 		assertEquals(2, segments.count());
 		assertEquals("text1", segments.get(0).toString());
 		assertEquals("text2", segments.get(1).toString());
@@ -625,7 +624,7 @@ public class TextContainerTest {
 		segments.append(new TextFragment("add1"));
 		segments.append(new Segment("segid", new TextFragment("add2")));
 		assertEquals("[text1] [text2][add1][add2]", fmt.printSegmentedContent(tc, true));
-		assertEquals("2", segments.get(2).id);
+		assertEquals("0", segments.get(2).id);
 		assertEquals("segid", segments.get(3).id);
 	}
 
@@ -704,8 +703,8 @@ public class TextContainerTest {
 	public void testGetSegmentFromId () {
 		TextContainer tc = createMultiSegmentContent();
 		Segments segments = tc.getSegments();
-		assertSame(segments.get(0), segments.get("0"));
-		assertSame(segments.get(1), segments.get("1"));
+		assertSame(segments.get(0), segments.get("s1"));
+		assertSame(segments.get(1), segments.get("s2"));
 		segments.get(1).id = "newId";
 		assertSame(segments.get(1), segments.get("newId"));
 	}
@@ -714,14 +713,14 @@ public class TextContainerTest {
 	public void testGetSegmentFromIdAfterReindex () {
 		TextContainer tc = createMultiSegmentContent();
 		Segments segments = tc.getSegments();
-		assertSame(segments.get(0), segments.get("0"));
-		assertSame(segments.get(1), segments.get("1"));
+		assertSame(segments.get(0), segments.get("s1"));
+		assertSame(segments.get(1), segments.get("s2"));
 		tc.changePart(1); // Change non-segment to a segment
-		assertSame(segments.get(0), segments.get("0"));
-		assertSame(segments.get(1), segments.get("2")); // Inserted
-		assertSame(segments.get(2), segments.get("1"));
-		assertEquals("text2", segments.get("1").text.toString());
-		assertEquals(" ", segments.get("2").text.toString());
+		assertSame(segments.get(0), segments.get("s1"));
+		assertSame(segments.get(1), segments.get("0")); // Inserted
+		assertSame(segments.get(2), segments.get("s2"));
+		assertEquals("text2", segments.get("s2").text.toString());
+		assertEquals(" ", segments.get("0").text.toString());
 	}
 
 	@Test
@@ -1225,10 +1224,16 @@ public class TextContainerTest {
 	}
 	
 	private TextContainer createMultiSegmentContent () {
-		TextFragment tf = new TextFragment("text1");
+//		TextFragment tf = new TextFragment("text1");
+//		TextContainer tc = new TextContainer(tf);
+//		tc.append(new TextFragment(" "));
+//		tc.getSegments().append(new TextFragment("text2"));
+		TextFragment tf = new TextFragment("text1 text2");
 		TextContainer tc = new TextContainer(tf);
-		tc.append(new TextFragment(" "));
-		tc.getSegments().append(new TextFragment("text2"));
+		List<Range> ranges = new ArrayList<Range>();
+		ranges.add(new Range(0, 5, "s1"));
+		ranges.add(new Range(6, 11, "s2"));
+		tc.getSegments().create(ranges);
 		return tc;
 	}
 

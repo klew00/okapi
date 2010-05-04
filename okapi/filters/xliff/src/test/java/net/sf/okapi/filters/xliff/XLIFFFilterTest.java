@@ -163,7 +163,7 @@ public class XLIFFFilterTest {
 			+ "<body>"
 			+ "<trans-unit id=\"1\"><!--comment-->"
 			+ "<source>t1. t2</source>"
-			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>\r"
 			+ "<target xml:lang=\"fr\"><mrk mid=\"1\" mtype=\"seg\">tt1.</mrk> <mrk mid=\"2\" mtype=\"seg\">tt2</mrk></target>"
 			+ "</trans-unit>"
 			+ "</body>"
@@ -204,7 +204,7 @@ public class XLIFFFilterTest {
 			+ "\r<body>"
 			+ "<trans-unit id=\"1\" xml:space=\"preserve\">"
 			+ "<source>t1.   t2</source>"
-			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>\r"
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
 			+ "<target xml:lang=\"fr\"><mrk mid=\"1\" mtype=\"seg\">t1.</mrk>   <mrk mid=\"2\" mtype=\"seg\">t2</mrk></target>"
 			+ "\r</trans-unit></body></file></xliff>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
@@ -481,7 +481,7 @@ public class XLIFFFilterTest {
 			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\" target-language=\"fr\">"
 			+ "<body>"
 			+ "<trans-unit id=\"1\" xml:space=\"preserve\"><source><ph id=\"1\">code</ph>t1</source>"
-			+ "<seg-source><ph id=\"1\">code</ph><mrk mid=\"s1\" mtype=\"seg\">t1</mrk></seg-source>"
+			+ "<seg-source><ph id=\"1\">code</ph><mrk mid=\"s1\" mtype=\"seg\">t1</mrk></seg-source>\r"
 			+ "<target xml:lang=\"fr\"><ph id=\"1\">code</ph><mrk mid=\"s1\" mtype=\"seg\"></mrk></target>"
 			+ "</trans-unit>"
 			+ "</body>"

@@ -1155,7 +1155,7 @@ public class Main {
 		
 		// Filter events to raw document final step (using the XLIFF writer)
 		FilterEventsWriterStep fewStep = new FilterEventsWriterStep();
-		XLIFFWriter writer= new XLIFFWriter();
+		XLIFFWriter writer = new XLIFFWriter();
 		writer.setCopySource(!extOptNoCopy);
 		fewStep.setFilterWriter(writer);
 		fewStep.setDocumentRoots(System.getProperty("user.dir"));

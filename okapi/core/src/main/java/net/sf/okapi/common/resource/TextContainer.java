@@ -190,8 +190,11 @@ public class TextContainer implements Iterable<TextPart> {
 					parts.add(new TextPart(holder.subSequence(start, range.start)));
 				}
 				// Create the part for the segment
-				parts.add(new Segment(String.valueOf(id++),
-					holder.subSequence(range.start, range.end)));
+				// Use existing id if possible, otherwise use local counter
+				Segment seg = new Segment(((range.id == null) ? String.valueOf(id++) : range.id),
+					holder.subSequence(range.start, range.end));
+				parts.add(seg);
+				validateSegmentId(seg);
 				start = range.end;
 				segApplied = true;
 			}
@@ -200,6 +203,7 @@ public class TextContainer implements Iterable<TextPart> {
 			if ( start < holder.text.length() ) {
 				if ( start == 0 ) { // If the remain is the whole content: make it a segment
 					parts.add(new Segment(String.valueOf(id), holder));
+					// That is the only segment: no need to validate the id
 				}
 				else { // Otherwise: make it an interstice
 					parts.add(new TextPart(holder.subSequence(start, -1)));
@@ -548,7 +552,7 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 		if ( res != 0 ) return res;
 		
-		// If the content is the same, check the segment boundaries
+		// If the content is the same, check the segment boundaries and ids
 		StringBuilder tmp1 = new StringBuilder();
 		for ( Range range : segments.getRanges() ) {
 			tmp1.append(range.toString());
@@ -1131,7 +1135,7 @@ public class TextContainer implements Iterable<TextPart> {
 		TextFragment tf = new TextFragment();
 		for ( TextPart part : parts ) {
 			if (( ranges != null ) && part.isSegment() ) {
-				ranges.add(new Range(start, start+part.text.text.length()));
+				ranges.add(new Range(start, start+part.text.text.length(), ((Segment)part).id));
 			}
 			start += part.text.text.length();
 			tf.append(part.getContent());

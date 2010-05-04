@@ -64,6 +64,8 @@ public class TextUnit implements INameable, IReferenceable {
 	
 	private List<Range> srcSegRanges;
 	private ConcurrentHashMap<LocaleId, List<Range>> trgSegRanges;
+	// Do not serialize. This variable is used internally for efficiency
+	private LocaleId syncLoc;
 
 	/**
 	 * Creates a new TextUnit object with its identifier.
@@ -539,6 +541,7 @@ public class TextUnit implements INameable, IReferenceable {
 		segmenter.computeSegments(source);
 		srcSegRanges = segmenter.getRanges();
 		source.getSegments().create(srcSegRanges);
+		syncLoc = null;
 	}
 	
 	/**
@@ -556,6 +559,8 @@ public class TextUnit implements INameable, IReferenceable {
 
 	/**
 	 * Sets the segments ranges for the source container so it matches the segmentation of a given target content.
+	 * <p>This method does not synchronize the current segmentation of the source with that target.
+	 * Use {@link #synchronizeSourceSegmentation(LocaleId)} for that.
 	 * @param locId the locale to match.
 	 * @param ranges the source segment ranges for matching the segments of that locale. 
 	 */
@@ -564,6 +569,9 @@ public class TextUnit implements INameable, IReferenceable {
 			trgSegRanges = new ConcurrentHashMap<LocaleId, List<Range>>();
 		}
 		trgSegRanges.put(locId, ranges);
+		if ( syncLoc != null ) {
+			if ( syncLoc.equals(locId) ) syncLoc = null;
+		}
 	}
 	
 	/**
@@ -573,10 +581,17 @@ public class TextUnit implements INameable, IReferenceable {
 	 * If the given locale has no corresponding segment ranges, the default source segmentation (defined
 	 * when calling {@link #createSourceSegmentation(ISegmenter)}) is used.
 	 * @param locId the locale to synchronize with.
+	 * @see #createSourceSegmentation(ISegmenter)
+	 * @see #setSourceSegmentationForTarget(LocaleId, List)
 	 */
 	public void synchronizeSourceSegmentation (LocaleId locId) {
+		if ( syncLoc != null ) {
+			// Avoid re-segmentation if possible
+			if ( syncLoc.equals(locId) ) return;
+		}
 		List<Range> ranges = null;
 		if ( trgSegRanges != null ) {
+			// Try to get target-corresponding segmentation
 			ranges = trgSegRanges.get(locId);
 		}
 		if ( ranges == null ) {
@@ -584,6 +599,7 @@ public class TextUnit implements INameable, IReferenceable {
 			ranges = srcSegRanges;
 		}
 		source.getSegments().create(ranges);
+		syncLoc = locId;
 	}
 
 	@Override
@@ -593,4 +609,5 @@ public class TextUnit implements INameable, IReferenceable {
 		}
 		return annotations;
 	}
+
 }

@@ -137,7 +137,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		if ( !tu.isTranslatable() ) {
 			context = 0; // Keep skeleton context
 		}
-
+		
 		// Get the source container
 		TextContainer srcCont = tu.getSource();
 		
@@ -194,7 +194,12 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			}
 		}
 		
-		tmp.append("</seg-source>"+encoderManager.getLineBreak());
+		tmp.append("</seg-source>");
+		// Add line-break only if the seg-source was not in the original
+		if ( tu.getProperty(XLIFFFilter.PROP_WASSEGMENTED) == null ) {
+			tmp.append(encoderManager.getLineBreak());
+		}
+		
 		return tmp.toString();
 	}
 	

@@ -276,7 +276,6 @@ public class Merger {
 		}
 
 		// Get the translated target
-		//TODO: handle case of empty or non-existent target
 		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSource().isEmpty() ) return;
@@ -287,13 +286,22 @@ public class Merger {
 		}
 
 		// Do we need to preserve the segmentation for merging (e.g. TTX case)
-		boolean mergeAsSegments = (( tu.getMimeType() != null ) 
-			&& ( tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE) ));
+		boolean mergeAsSegments = false;
+		if ( tu.getMimeType() != null ) { 
+			if ( tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE)
+				|| tu.getMimeType().equals(MimeTypeMapper.XLIFF_MIME_TYPE) ) {
+				mergeAsSegments = true;
+			}
+		}
 		
 		// Un-segment if needed (and remember the ranges if we will need to re-split after)
 		// Merging the segments allow to check/transfer the codes at the text unit level
-		ArrayList<Range> ranges = null;
-		if ( mergeAsSegments ) ranges = new ArrayList<Range>();
+		List<Range> ranges = null;
+		List<Range> srcRanges = null;
+		if ( mergeAsSegments ) {
+			ranges = new ArrayList<Range>();
+			srcRanges = tuFromTrans.saveCurrentSourceSegmentation();
+		}
 		if ( !fromTrans.contentIsOneSegment() ) {
 			fromTrans.getSegments().joinAll(ranges);
 		}
@@ -313,6 +321,10 @@ public class Merger {
 		
 		// We create a new target if needed
 		TextContainer trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
+		if ( !trgCont.contentIsOneSegment() ) {
+			trgCont.getSegments().joinAll();
+		}
+
 		// Update 'approved' flag is requested
 		if ( manifest.updateApprovedFlag() ) {
 			prop = trgCont.getProperty(Property.APPROVED);
@@ -330,6 +342,8 @@ public class Merger {
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
 				trgCont.getSegments().create(ranges);
+				tu.setSourceSegmentationForTarget(trgLoc, srcRanges);
+				tu.synchronizeSourceSegmentation(trgLoc);
 			}
 		}
 		catch ( RuntimeException e ) {
@@ -338,41 +352,6 @@ public class Merger {
 			// Use the source instead, continue the merge
 			tu.setTarget(trgLoc, tu.getSource());
 		}
-		
-		
-////TODO: handle case of empty or non-existent target		
-//		if ( fromTrans.isSegmented() ) {
-//			fromTrans.mergeAllSegments();
-//		}
-//
-//		// We create a new target if needed
-//		TextContainer trgCont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
-//		
-//		// Update 'approved' flag is requested
-//		if ( manifest.updateApprovedFlag() ) {
-//			prop = trgCont.getProperty(Property.APPROVED);
-//			if ( prop == null ) {
-//				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
-//			}
-//			//TODO: Option to set the flag based on isTransApproved
-//			prop.setValue("yes");
-//		}
-//
-//		// Adjust the codes to use the appropriate ones
-//		List<Code> transCodes = fromTrans.getCodes();
-//		// Use the ones in translated target, but if empty, take it from source
-//		transCodes = transferCodes(transCodes, tu.getSourceContent().getCodes(), tu);
-//		
-//		// Now set the target coded text and the target codes
-//		try {
-//			trgCont.setCodedText(fromTrans.getCodedText(), transCodes, false);
-//		}
-//		catch ( RuntimeException e ) {
-//			logger.log(Level.SEVERE,
-//				String.format("Inline code error with item id=\"%s\".\n" + e.getLocalizedMessage(), tu.getId()));
-//			// Use the source instead, continue the merge
-//			tu.setTarget(trgLang, tu.getSource());
-//		}
 	}
 
 //	private void mergeAsTextUnit (TextContainer fromTrans,

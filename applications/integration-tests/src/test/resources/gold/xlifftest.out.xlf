@@ -61,7 +61,7 @@
 <source xml:lang="en">Sentence 1. Sentence 2</source>
 <!-- Segmented data --> <?abc def ?>
 <seg-source><mrk mid="seg1" mtype="seg">Sentence 1.</mrk> <mrk mid="seg2" mtype="seg">Sentence 2</mrk></seg-source>
-<target xml:lang="fr">Sentence 1. Sentence 1. Sentence 2</target>
+<target xml:lang="fr"><mrk mid="seg1" mtype="seg">Sentence 1.</mrk> <mrk mid="seg2" mtype="seg">Sentence 2</mrk></target>
 </trans-unit>
 
 <trans-unit id="12">

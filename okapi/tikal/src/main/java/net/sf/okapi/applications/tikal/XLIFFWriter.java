@@ -290,7 +290,7 @@ public class XLIFFWriter implements IFilterWriter {
 		// Write the source
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", srcLang.toBCP47());
-		// Write full source content (always without segments markers
+		// Write full source content (always without segments markers)
 		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false, true));
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed

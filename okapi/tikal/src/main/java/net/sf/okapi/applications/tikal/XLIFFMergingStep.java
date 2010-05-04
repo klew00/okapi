@@ -200,15 +200,24 @@ public class XLIFFMergingStep {
 		}
 		
 		// Do we need to preserve the segmentation for merging (e.g. TTX case)
-		boolean mergeAsSegments = (( tu.getMimeType() != null ) 
-			&& ( tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE) ));
+		boolean mergeAsSegments = false;
+		if ( tu.getMimeType() != null ) { 
+			if ( tu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE)
+				|| tu.getMimeType().equals(MimeTypeMapper.XLIFF_MIME_TYPE) ) {
+				mergeAsSegments = true;
+			}
+		}
 		
 		// Un-segment if needed (and remember the ranges if we will need to re-split after)
 		// Merging the segments allow to check/transfer the codes at the text unit level
-		ArrayList<Range> ranges = null;
-		if ( mergeAsSegments ) ranges = new ArrayList<Range>();
+		List<Range> trgRanges = null;
+		List<Range> srcRanges = null;
+		if ( mergeAsSegments ) {
+			trgRanges = new ArrayList<Range>();
+			srcRanges = tuFromTrans.saveCurrentSourceSegmentation();
+		}
 		if ( !fromTrans.contentIsOneSegment() ) {
-			fromTrans.getSegments().joinAll(ranges);
+			fromTrans.getSegments().joinAll(trgRanges);
 		}
 		
 		// Get the source (as a clone if we need to change the segments)
@@ -226,14 +235,29 @@ public class XLIFFMergingStep {
 
 		// We create a new target if needed
 		TextContainer trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
+		if ( !trgCont.contentIsOneSegment() ) {
+			trgCont.getSegments().joinAll();
+		}
 		
+//		// Update 'approved' flag is requested
+//		if ( manifest.updateApprovedFlag() ) {
+//			prop = trgCont.getProperty(Property.APPROVED);
+//			if ( prop == null ) {
+//				prop = trgCont.setProperty(new Property(Property.APPROVED, "no"));
+//			}
+//			//TODO: Option to set the flag based on isTransApproved
+//			prop.setValue("yes");
+//		}
+
 		// Now set the target coded text and the target codes
 		try {
-			// Use first part because it not segmented here
+			// trgCont is un-segmented at this point and will be re-segmented if needed
 			trgCont.getFirstContent().setCodedText(fromTrans.getCodedText(), transCodes, false);
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
-				trgCont.getSegments().create(ranges);
+				trgCont.getSegments().create(trgRanges);
+				tu.setSourceSegmentationForTarget(trgLoc, srcRanges);
+				tu.synchronizeSourceSegmentation(trgLoc);
 			}
 		}
 		catch ( RuntimeException e ) {

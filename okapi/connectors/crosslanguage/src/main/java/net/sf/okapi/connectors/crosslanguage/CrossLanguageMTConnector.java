@@ -22,8 +22,14 @@ package net.sf.okapi.connectors.crosslanguage;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 
 import com.crosslang.ws.ArrayOfstring;
@@ -42,6 +48,8 @@ import net.sf.okapi.lib.translation.QueryUtil;
  * Connector for the CrossLanguage MT Gateway Web services.
  */
 public class CrossLanguageMTConnector extends BaseConnector {
+
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
 
 	private Parameters params;
 	private IGateway gateway;
@@ -168,4 +176,21 @@ public class CrossLanguageMTConnector extends BaseConnector {
 		params = (Parameters)params;
 	}
 
+	private String generateRequestDate () {
+		return DATE_FORMAT.format(new Date());
+	}
+		
+	private String generateSecret (String username,
+		String timestamp,
+		String password)
+		throws NoSuchAlgorithmException, InvalidKeyException
+	{
+		StringBuilder sb = new StringBuilder(username).append("#").append(timestamp);
+		SecretKeySpec signingKey = new SecretKeySpec(password.getBytes(), "HmacSHA1");
+		Mac mac = Mac.getInstance("HmacSHA1");
+		mac.init(signingKey);
+		byte[] rawHmac = mac.doFinal(sb.toString().getBytes());
+		return (new String(Base64.encode(rawHmac))).trim();
+	}
+	
 }
