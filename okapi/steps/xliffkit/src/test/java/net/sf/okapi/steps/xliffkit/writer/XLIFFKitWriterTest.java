@@ -75,13 +75,13 @@ public class XLIFFKitWriterTest {
 	private class WriteObserver implements IObserver {
 		@Override
 		public void update(IObservable o, Object arg) {
-			if (arg instanceof IPersistenceBean)
-				beans.add((IPersistenceBean) arg);
+			if (arg instanceof IPersistenceBean<?>)
+				beans.add((IPersistenceBean<?>) arg);
 		}		
 	};
 	
 	WriteObserver writeObserver = new WriteObserver();
-	List<IPersistenceBean> beans = new ArrayList<IPersistenceBean>(); 
+	List<IPersistenceBean<?>> beans = new ArrayList<IPersistenceBean<?>>(); 
 		
 	@Test
 	public void test() {

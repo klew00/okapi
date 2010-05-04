@@ -35,7 +35,7 @@ public class ReferenceBean extends PersistenceBean<Object> {
 	protected Object createObject(IPersistenceSession session) {
 		Object obj = session.getObject(reference);
 		if (obj == null) {
-			IPersistenceBean proxy = BeanMapper.getProxy(className);
+			IPersistenceBean<?> proxy = BeanMapper.getProxy(className);
 			if (proxy != null) {
 				// Create an object and put to cache so getObject() can find it from PersistenceBean.get()
 				obj = proxy.get(ClassUtil.getClass(className), session);				
@@ -59,7 +59,7 @@ public class ReferenceBean extends PersistenceBean<Object> {
 			return;
 		}
 		
-		IPersistenceBean bean = session.createBean(ClassUtil.getClass(obj));
+		IPersistenceBean<?> bean = session.createBean(ClassUtil.getClass(obj));
 		session.cacheBean(obj, bean); // for a FactoryBean or PersistenceSession.serialize() to hook up later
 		reference = bean.getRefId();
 		// session.setRefIdForObject(obj, bean.getRefId());

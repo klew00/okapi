@@ -22,7 +22,7 @@ package net.sf.okapi.steps.xliffkit.common.persistence;
 
 import net.sf.okapi.common.ClassUtil;
 
-public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceBean {
+public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceBean<PutCoreClassHere> {
 	
 	private long refId = 0;
 	private boolean busy = false;
@@ -53,13 +53,13 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 		PutCoreClassHere obj = (PutCoreClassHere) session.getObject(refId); 
 		if (obj == null) {			
 			if (busy) {
-				Class<?> objRef = BeanMapper.getObjectClass(this.getClass());
+				Class<?> objRef = BeanMapper.getObjectClass((Class<? extends IPersistenceBean<?>>) this.getClass());
 				if (objRef == classRef)
 					throw new RuntimeException(String.format("PersistenceBean: recursive object creation in %s.%s", 
 						ClassUtil.getQualifiedClassName(this.getClass()),
 						"createObject()"));
 				else {
-					IPersistenceBean proxy = BeanMapper.getProxy(classRef);
+					IPersistenceBean<?> proxy = BeanMapper.getProxy(classRef);
 					if (proxy != null)
 						obj = (PutCoreClassHere) proxy.get(classRef, session);
 				}
@@ -82,11 +82,10 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 		return classRef.cast(obj);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public IPersistenceBean set(Object obj, IPersistenceSession session) {
+	public IPersistenceBean<PutCoreClassHere> set(PutCoreClassHere obj, IPersistenceSession session) {
 		if (obj != null)
-			fromObject((PutCoreClassHere) obj, session);
+			fromObject(obj, session);
 		
 		return this;
 	}		

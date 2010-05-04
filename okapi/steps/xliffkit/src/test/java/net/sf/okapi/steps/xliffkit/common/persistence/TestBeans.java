@@ -46,7 +46,7 @@ public class TestBeans {
 	@Test
 	public void test1() {
 		JSONPersistenceSession session = new JSONPersistenceSession();
-		IPersistenceBean bean = session.createBean(BaseNameable.class);
+		IPersistenceBean<BaseNameable> bean = session.createBean(BaseNameable.class);
 		BaseNameable bn = new BaseNameable();
 		bn.setId("the id");
 		bn.setName("the name");
@@ -58,12 +58,12 @@ public class TestBeans {
 		assertEquals("the name", bn2.getName());
 		assertEquals("the type", bn2.getType());
 		
-		IPersistenceBean bean2 = session.createBean(BaseReferenceable.class);
+		IPersistenceBean<BaseReferenceable> bean2 = session.createBean(BaseReferenceable.class);
 		BaseReferenceable br = new BaseReferenceable();
 		br.setId("the id");
 		br.setName("the name");
 		br.setType("the type");
-		bean2.set(bn, session);
+		bean2.set(br, session);
 		
 //		JSONPersistenceSession session = new JSONPersistenceSession(BaseReferenceableBean.class);
 //		session.start((InputStream) null);
@@ -91,7 +91,7 @@ public class TestBeans {
 		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
 		
 		JSONPersistenceSession session = new JSONPersistenceSession();		
-		IPersistenceBean tuBean = session.createBean(TextUnit.class);
+		IPersistenceBean<TextUnit> tuBean = session.createBean(TextUnit.class);
 		
 		os.writeObject(tuBean);
 		

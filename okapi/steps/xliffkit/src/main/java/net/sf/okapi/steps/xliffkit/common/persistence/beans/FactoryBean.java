@@ -55,24 +55,25 @@ public class FactoryBean extends PersistenceBean<Object> {
 		if (reference != 0)
 			return classRef.cast(session.getObject(reference));
 		else
-			return classRef.cast(validateContent(session) ? ((IPersistenceBean) content).get(classRef, session) : null);
+			return classRef.cast(validateContent(session) ? ((IPersistenceBean<?>) content).get(classRef, session) : null);
 	}
 	
 	private boolean validateContent(IPersistenceSession session) {		
 		if (content == null) return false;
 		if (className == null) return false;
 		
-		boolean res = content instanceof IPersistenceBean; 
+		boolean res = content instanceof IPersistenceBean<?>; 
 		if (!res) {
 			if (session == null) return false;
 			content = session.convert(content, BeanMapper.getBeanClass(className));
-			res = content instanceof IPersistenceBean;
+			res = content instanceof IPersistenceBean<?>;
 		}
 		return res;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public IPersistenceBean set(Object obj, IPersistenceSession session) {
+	public IPersistenceBean<Object> set(Object obj, IPersistenceSession session) {
 		if (obj == null) return this;
 		
 		className = ClassUtil.getQualifiedClassName(obj); // stored for get()
@@ -112,7 +113,7 @@ public class FactoryBean extends PersistenceBean<Object> {
 		
 		
 		long rid = session.getRefIdForObject(obj);
-		IPersistenceBean bean = session.uncacheBean(obj); // get a bean created earlier in a ReferenceBean
+		IPersistenceBean<Object> bean = (IPersistenceBean<Object>) session.uncacheBean(obj); // get a bean created earlier in a ReferenceBean
 		
 		if (bean == null && rid != 0) {
 			content = null;
@@ -128,7 +129,7 @@ public class FactoryBean extends PersistenceBean<Object> {
 		}
 		else {
 			if (bean == null)
-				bean = session.createBean(ClassUtil.getClass(obj));
+				bean = (IPersistenceBean<Object>) session.createBean(ClassUtil.getClass(obj));
 			
 			//session.cacheBean(obj, bean);
 			reference = 0;

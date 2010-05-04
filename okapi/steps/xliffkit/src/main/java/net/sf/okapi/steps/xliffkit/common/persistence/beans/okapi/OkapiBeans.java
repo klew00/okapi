@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -61,14 +60,12 @@ import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POFilterWriter;
 import net.sf.okapi.steps.formatconversion.TableFilterWriter;
 import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.ListBean;
 import net.sf.okapi.steps.xliffkit.common.persistence.beans.TypeInfoBean;
 
 public class OkapiBeans {
 
 	public static void register() {
 		// General purpose beans
-		BeanMapper.registerBean(List.class, ListBean.class);
 		BeanMapper.registerBean(IParameters.class, ParametersBean.class);
 		BeanMapper.registerBean(Object.class, TypeInfoBean.class); // If no bean was found, use just this one to store class info
 		

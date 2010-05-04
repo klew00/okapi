@@ -50,6 +50,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 
+@SuppressWarnings("unchecked")
 public class JSONPersistenceSession extends PersistenceSession {
 	public static final String MSG_JSON_READ_EX = "JSONPersistenceSession: error reading.";
 	public static final String MSG_JSON_WRITE_EX = "JSONPersistenceSession: error writing.";
@@ -96,15 +97,15 @@ public class JSONPersistenceSession extends PersistenceSession {
 	}
 	
 	@Override
-	public <T extends IPersistenceBean> T convert(Object object, Class<T> expectedClass) {		
+	public <T extends IPersistenceBean<?>> T convert(Object object, Class<T> expectedClass) {		
 		return mapper.convertValue(object, expectedClass);
 	}
 
 	@Override
-	protected IPersistenceBean readBean(
-			Class<? extends IPersistenceBean> beanClass, String name) {
+	protected IPersistenceBean<?> readBean(
+			Class<? extends IPersistenceBean<?>> beanClass, String name) {
 		
-		IPersistenceBean bean = null;
+		IPersistenceBean<?> bean = null;
 		try {
 			JsonToken token = parser.nextToken();
 			if (token == JsonToken.END_OBJECT)
@@ -135,7 +136,7 @@ public class JSONPersistenceSession extends PersistenceSession {
 	}
 	
 	@Override
-	protected void writeBean(IPersistenceBean bean, String name) {
+	protected void writeBean(IPersistenceBean<?> bean, String name) {
 		try {
 			bodyGen.writeFieldName(name);
 			mapper.writeValue(bodyGen, bean);
@@ -175,7 +176,7 @@ public class JSONPersistenceSession extends PersistenceSession {
 	}
 	
 	@Override
-	@SuppressWarnings({ "unused", "unchecked" })
+	@SuppressWarnings("unused")
 	protected void startReading(InputStream inStream) {
 		try {
 			parser = jsonFactory.createJsonParser(inStream);

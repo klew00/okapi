@@ -35,8 +35,8 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 
 	private static final String ITEM_LABEL = "item"; //$NON-NLS-1$
 	
-	protected abstract void writeBean(IPersistenceBean bean, String name);	
-	protected abstract IPersistenceBean readBean(Class<? extends IPersistenceBean> beanClass, String name);
+	protected abstract void writeBean(IPersistenceBean<?> bean, String name);	
+	protected abstract IPersistenceBean<?> readBean(Class<? extends IPersistenceBean<?>> beanClass, String name);
 	
 	protected abstract void startWriting(OutputStream outStream);
 	protected abstract void endWriting(OutputStream outStream);
@@ -49,21 +49,21 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	private ReferenceResolver refResolver = new ReferenceResolver();	
 	private int itemCounter = 0;
 	private Class<?> prevClass;
-	private Class<? extends IPersistenceBean> beanClass;
+	private Class<? extends IPersistenceBean<?>> beanClass;
 	private OutputStream outStream;
 	private InputStream inStream;
 	private String description;
 	private Class<?> itemClass;
-	private LinkedList<IPersistenceBean> queue = new LinkedList<IPersistenceBean>();
+	private LinkedList<IPersistenceBean<?>> queue = new LinkedList<IPersistenceBean<?>>();
 	private boolean readingDone = false;
 	
 	@Override
-	public void cacheBean(Object obj, IPersistenceBean bean) {
+	public void cacheBean(Object obj, IPersistenceBean<?> bean) {
 		refResolver.cacheBean(obj, bean);
 	}
 
 	@Override
-	public IPersistenceBean createBean(Class<?> classRef) {
+	public <T> IPersistenceBean<T> createBean(Class<T> classRef) {
 		return refResolver.createBean(classRef);
 	}
 
@@ -72,14 +72,14 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		return deserialize(classRef, itemLabel);
 	}
 
-	private IPersistenceBean nextBean(Class<?> classRef, String name) {
+	private IPersistenceBean<?> nextBean(Class<?> classRef, String name) {
 		if (readingDone) return null;
 		// Update bean class if core class has changed
 		if (classRef != prevClass) { 
 			beanClass = BeanMapper.getBeanClass(classRef);
 			prevClass = classRef;
 		}
-		IPersistenceBean bean = readBean(beanClass, name);
+		IPersistenceBean<?> bean = readBean(beanClass, name);
 		notifyObservers(bean);
 		readingDone = bean == null;
 		return bean;		
@@ -96,7 +96,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 					return null;
 				}
 				else { // Read one bean from the stream
-					IPersistenceBean bean = nextBean(classRef, name);										
+					IPersistenceBean<?> bean = nextBean(classRef, name);										
 					if (readingDone) continue;
 					
 					refResolver.cacheBean(bean);
@@ -106,7 +106,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 			else { // Something in the queue
 				
 				// We are interested in the head bean
-				IPersistenceBean bean = queue.peek();
+				IPersistenceBean<?> bean = queue.peek();
 				long refId = bean.getRefId();
 				if (refId < 0) refId = -refId; // anti-bean
 				Object obj = getObject(refId);
@@ -240,6 +240,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		serialize(obj, String.format("%s%d", itemLabel, ++itemCounter));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void serialize(Object obj, String name) {
 		if (state != SessionState.WRITING) return;
@@ -247,20 +248,20 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 			throw new IllegalArgumentException("PersistenceSession: cannot serialize a null object");
 
 		long rid = refResolver.getRefIdForObject(obj);
-		IPersistenceBean bean = null;
+		IPersistenceBean<Object> bean = null;
 		
 		if (refResolver.isSerialized(obj)) { // The object has been serialized by another bean (as a FactoryBean field)
 			//if (bean != null)
-				bean = refResolver.createAntiBean(obj.getClass(), rid);
+				bean = (IPersistenceBean<Object>) refResolver.createAntiBean(obj.getClass(), rid);
 				//refResolver.uncacheBean(obj); // to not leave in cache 
 //			else
 //				throw new RuntimeException(String.format("PersistenceSession: bean for %s (%s) not found in cache, " +
 //						"though marked as already serialized", name, obj.getClass()));
 		}
 		else {
-			bean = refResolver.uncacheBean(obj); // get a bean created earlier by ReferenceBean
+			bean = (IPersistenceBean<Object>) refResolver.uncacheBean(obj); // get a bean created earlier by ReferenceBean
 			if (bean == null) {
-				bean = refResolver.createBean(obj.getClass());
+				bean = (IPersistenceBean<Object>) refResolver.createBean(obj.getClass());
 				if (bean == null) return;
 				
 				//refResolver.cacheBean(obj, bean);			
@@ -307,7 +308,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	}
 
 	@Override
-	public IPersistenceBean uncacheBean(Object obj) {
+	public IPersistenceBean<?> uncacheBean(Object obj) {
 		return refResolver.uncacheBean(obj);
 	}
 

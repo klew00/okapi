@@ -20,13 +20,13 @@
 
 package net.sf.okapi.steps.xliffkit.common.persistence;
 
-public interface IPersistenceBean {
+public interface IPersistenceBean<CoreClass> {
 
 	<T> T get(Class<T> classRef, IPersistenceSession session);
 	
-	IPersistenceBean set(Object obj, IPersistenceSession session); // Returns self to allow chaining
+	IPersistenceBean<CoreClass> set(CoreClass obj, IPersistenceSession session); // Returns self to allow chaining
 
 	long getRefId();
-	
+	 
 	void setRefId(long refId);
 }

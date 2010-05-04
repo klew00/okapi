@@ -45,8 +45,8 @@ public class ReferenceResolver {
 	private static Map<Object, Long> refIdLookup = new ConcurrentHashMap<Object, Long>();
 	private static Map<Long, Object> objectLookup = new ConcurrentHashMap<Long, Object>();
 	private static Map<Long, Long> rootLookup = new ConcurrentHashMap<Long, Long>();
-	private static Map<Object, IPersistenceBean> beanCache = new ConcurrentHashMap<Object, IPersistenceBean>();
-	private static Map<Long, IPersistenceBean> beanCache2 = new ConcurrentHashMap<Long, IPersistenceBean>();
+	private static Map<Object, IPersistenceBean<?>> beanCache = new ConcurrentHashMap<Object, IPersistenceBean<?>>();
+	private static Map<Long, IPersistenceBean<?>> beanCache2 = new ConcurrentHashMap<Long, IPersistenceBean<?>>();
 	private Map<Long, Set<Long>> references = new LinkedHashMap<Long, Set<Long>>();
 	private Set<Set<Long>> frames = new TreeSet<Set<Long>>(new Comparator<Set<Long>>() {
 		@Override
@@ -216,14 +216,14 @@ public class ReferenceResolver {
 		this.rootId = rootId;		
 	}
 	
-	public IPersistenceBean createBean(Class<?> classRef) {
-		Class<? extends IPersistenceBean> beanClass = 
+	public <T> IPersistenceBean<T> createBean(Class<T> classRef) {
+		Class<IPersistenceBean<T>> beanClass = 
 			BeanMapper.getBeanClass(classRef);
 		
 		if (beanClass == null)
 			throw(new RuntimeException(String.format(MSG1, classRef.getName())));
 		
-		IPersistenceBean bean = null; 
+		IPersistenceBean<T> bean = null; 
 		try {
 			bean = ClassUtil.instantiateClass(beanClass);
 		} catch (Exception e) {
@@ -233,23 +233,23 @@ public class ReferenceResolver {
 		return bean;
 	}
 
-	public void cacheBean(Object obj, IPersistenceBean bean) {		
+	public void cacheBean(Object obj, IPersistenceBean<?> bean) {		
 		beanCache.put(obj, bean);
 	}
 	
-	public void cacheBean(IPersistenceBean bean) {
+	public void cacheBean(IPersistenceBean<?> bean) {
 		if (bean == null) return;
 		beanCache2.put(bean.getRefId(), bean);
 	}
 
-	public IPersistenceBean uncacheBean(Object obj) {
-		IPersistenceBean bean = beanCache.get(obj);
+	public IPersistenceBean<?> uncacheBean(Object obj) {
+		IPersistenceBean<?> bean = beanCache.get(obj);
 		beanCache.remove(obj); // The caller takes ownership of the object ref
 		return bean;
 	}
 	
-	public IPersistenceBean uncacheBean(Long refId) {
-		IPersistenceBean bean = beanCache2.get(refId);
+	public IPersistenceBean<?> uncacheBean(Long refId) {
+		IPersistenceBean<?> bean = beanCache2.get(refId);
 		beanCache2.remove(refId);
 		return bean;
 	}
@@ -329,13 +329,13 @@ public class ReferenceResolver {
 	 * @param refId
 	 * @return
 	 */
-	public IPersistenceBean createAntiBean(Class<?> objClassRef, long refId) {
+	public <T> IPersistenceBean<T> createAntiBean(Class<T> objClassRef, long refId) {
 		if (objClassRef == null)
 			throw new IllegalArgumentException(MSG4);
 		if (refId == 0)
 			throw new IllegalArgumentException(MSG5);
 		
-		IPersistenceBean res = createBean(objClassRef);
+		IPersistenceBean<T> res = createBean(objClassRef);
 //		if (!res.getClass().equals(bean.getClass()))
 //			throw new RuntimeException(String.format(MSG3, ClassUtil.getQualifiedClassName(res.getClass()),
 //				ClassUtil.getQualifiedClassName(bean.getClass())));		

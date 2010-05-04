@@ -84,9 +84,9 @@ public class TestReflection {
 	private class BaseClasses {
 		Map<Object, Object> map;
 		Collection<Object> coll;
-		Map<IPersistenceBean, Object> map2;
-		Map<Object, IPersistenceBean> map3;
-		Map<IPersistenceBean, IPersistenceBean> map4;
+		Map<IPersistenceBean<?>, Object> map2;
+		Map<Object, IPersistenceBean<?>> map3;
+		Map<IPersistenceBean<?>, IPersistenceBean<?>> map4;
 	}
 		
 	// DEBUG	@Test
@@ -285,8 +285,8 @@ public class TestReflection {
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		Collection<Object> collection = new ArrayList<Object>();
 		
-		Map<Integer, IPersistenceBean> map1 = new HashMap<Integer, IPersistenceBean>(); 
-		List<IPersistenceBean> list1 = new ArrayList<IPersistenceBean>();
+		Map<Integer, IPersistenceBean<?>> map1 = new HashMap<Integer, IPersistenceBean<?>>(); 
+		List<IPersistenceBean<?>> list1 = new ArrayList<IPersistenceBean<?>>();
 		
 		assertTrue(map1.getClass().isAssignableFrom(map.getClass()));
 		assertTrue(map.getClass().isAssignableFrom(map1.getClass()));

@@ -68,11 +68,11 @@ public interface IPersistenceSession {
 	<T> T deserialize(Class<T> classRef);
 
 	
-	IPersistenceBean createBean(Class<?> classRef);
+	<T> IPersistenceBean<T> createBean(Class<T> classRef);
 	
-	void cacheBean(Object obj, IPersistenceBean bean);
+	void cacheBean(Object obj, IPersistenceBean<?> bean);
 	
-	IPersistenceBean uncacheBean(Object obj);
+	IPersistenceBean<?> uncacheBean(Object obj);
 	
 	/**
 	 * Converts a given object to an expected type.
@@ -83,7 +83,7 @@ public interface IPersistenceSession {
 	 * @param expectedClass new class of the given object
 	 * @return the converted object
 	 */
-	<T extends IPersistenceBean> T convert(Object obj, Class<T> expectedClass);
+	<T extends IPersistenceBean<?>> T convert(Object obj, Class<T> expectedClass);
 
 	String getVersion();
 	
