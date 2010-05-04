@@ -32,6 +32,7 @@ import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
+import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.BaseReferenceable;
 import net.sf.okapi.common.resource.Code;
@@ -77,6 +78,7 @@ public class OkapiBeans {
 		BeanMapper.registerBean(RawDocument.class, RawDocumentBean.class);
 		BeanMapper.registerBean(Property.class, PropertyBean.class);
 		BeanMapper.registerBean(ScoresAnnotation.class, ScoresAnnotationBean.class);
+		BeanMapper.registerBean(AltTransAnnotation.class, AltTransAnnotationBean.class);
 		BeanMapper.registerBean(ConditionalParameters.class, ConditionalParametersBean.class);
 		BeanMapper.registerBean(TextFragment.class, TextFragmentBean.class);
 		BeanMapper.registerBean(TextContainer.class, TextContainerBean.class);

@@ -84,7 +84,7 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> IPersistenceBean set(T obj, IPersistenceSession session) {
+	public IPersistenceBean set(Object obj, IPersistenceSession session) {
 		if (obj != null)
 			fromObject((PutCoreClassHere) obj, session);
 		

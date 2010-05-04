@@ -83,6 +83,22 @@ public class ReferenceResolver {
 		serialized.clear();
 	}
 	
+	public void releaseObject(Object obj) {
+		long refId = refIdLookup.remove(obj);
+		beanCache.remove(obj);
+		if (refId != 0) {
+			objectLookup.remove(refId);
+			rootLookup.remove(refId);
+			beanCache2.remove(refId);
+		}
+	}
+	
+	public void releaseFrame(Set<Long> frame) {
+		frames.remove(frame);
+		for (Long rid : frame)
+			frameLookup.remove(rid);
+	}
+	
 	public static long generateRefId() {
 		if (idCounter == Long.MAX_VALUE)
 			throw new RuntimeException(MSG6);

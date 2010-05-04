@@ -24,7 +24,7 @@ public interface IPersistenceBean {
 
 	<T> T get(Class<T> classRef, IPersistenceSession session);
 	
-	<T> IPersistenceBean set(T obj, IPersistenceSession session); // Returns self to allow chaining
+	IPersistenceBean set(Object obj, IPersistenceSession session); // Returns self to allow chaining
 
 	long getRefId();
 	

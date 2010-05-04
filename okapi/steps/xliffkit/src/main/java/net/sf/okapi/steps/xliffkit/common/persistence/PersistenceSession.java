@@ -113,6 +113,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 				
 				if (obj != null) { // The bean has been resolved, its object found in the cache
 					queue.poll();
+					refResolver.releaseObject(obj);
 					return classRef.cast(obj);
 				}
 				else { // The bean is not yet resolved, which means more beans are required to be read, the frame is resolved all at once
@@ -137,11 +138,14 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 							obj = classRef.cast(bean.get(classRef, this));
 							refResolver.setRefIdForObject(obj, rid); // for getObject()
 						}
+						refResolver.releaseFrame(frame);
 						continue;
 					}
 					else { // The bean is stand-alone
 						bean = queue.poll();
-						return classRef.cast(bean.get(classRef, this)); 
+						obj = bean.get(classRef, this);
+						refResolver.releaseObject(obj);
+						return classRef.cast(obj); 
 					}
 					// TODO clean caches of weak refs to the went-away objects
 				}
