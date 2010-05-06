@@ -28,12 +28,13 @@ import java.io.InputStream;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.steps.xliffkit.common.persistence.BeanMapper;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.FactoryBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.json.jackson.JSONPersistenceSession;
-import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEvent;
-import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEventBean;
-import net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEventBean2;
+import net.sf.okapi.persistence.BeanMapper;
+import net.sf.okapi.persistence.NamespaceMapper;
+import net.sf.okapi.persistence.beans.FactoryBean;
+import net.sf.okapi.persistence.beans.v0.TestEvent;
+import net.sf.okapi.persistence.beans.v0.TestEventBean;
+import net.sf.okapi.persistence.beans.v0.TestEventBean2;
+import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
@@ -179,6 +180,9 @@ public class XLIFFKitReaderTest {
 		session.setItemLabel("event");
 		
 		BeanMapper.registerBean(TestEvent.class, TestEventBean.class);
+		NamespaceMapper.mapName("net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEvent", 
+				net.sf.okapi.persistence.beans.v0.TestEvent.class);
+		
 		InputStream inStream = this.getClass().getResourceAsStream("test_refs3.txt.json"); 
 		session.start(inStream);		
 		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument

@@ -53,8 +53,8 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.steps.xliffkit.common.persistence.beans.okapi.OkapiBeans;
-import net.sf.okapi.steps.xliffkit.common.persistence.json.jackson.JSONPersistenceSession;
+import net.sf.okapi.persistence.beans.v1.OkapiBeans;
+import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
 import net.sf.okapi.steps.xliffkit.opc.TKitRelationshipTypes;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
