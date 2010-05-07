@@ -73,12 +73,11 @@ public class DefaultConnectors implements IConnectorList {
 //		trc.descriptionProviderClass = "net.sf.okapi.connectors.promt.Parameters";
 //		list.add(trc);
 //
-//Not ready yet
-//		trc = new ConnectorInfo();
-//		trc.description = "CrossLanguage MT Server (Beta connector)";
-//		trc.connectorClass = "net.sf.okapi.connectors.crosslanguage.CrossLanguageMTConnector";
-//		trc.descriptionProviderClass = "net.sf.okapi.connectors.crosslanguage.Parameters";
-//		list.add(trc);
+		trc = new ConnectorInfo();
+		trc.description = "CrossLanguage MT Server (Beta connector)";
+		trc.connectorClass = "net.sf.okapi.connectors.crosslanguage.CrossLanguageMTConnector";
+		trc.descriptionProviderClass = "net.sf.okapi.connectors.crosslanguage.Parameters";
+		list.add(trc);
 	}
 
 	public List<ConnectorInfo> getList () {
