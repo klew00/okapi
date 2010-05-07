@@ -24,6 +24,12 @@ package net.sf.okapi.common.annotation;
  * Enumeration of the different types possible for an alternate translation entry.
  */
 public enum AltTranslationType {
+
+	/**
+	 * Indicates an alternate translation coming from the DiffLeverageStep.
+	 */
+	DIFF_LEVERAGE,
+	
 	/**
 	 * Indicates an alternate translation coming from a TM engine.
 	 */
@@ -33,15 +39,10 @@ public enum AltTranslationType {
 	 * Indicates an alternate translation coming from an MT engine.
 	 */
 	MT,
-	
+
 	/**
 	 * Indicates an alternate translation coming from the source document.
-	 * For example from an <code>&lt;alt-trans></code> element in an XLIFF source.
+	 * For example from an old translation in a PO file.
 	 */
-	FROM_DOCUMENT,
-	
-	/**
-	 * Indicates an alternate translation coming from the DiffLeverageStep.
-	 */
-	DIFF_LEVERAGE
+	FROM_DOCUMENT
 }

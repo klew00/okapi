@@ -36,9 +36,13 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationType;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -48,7 +52,6 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -73,8 +76,9 @@ public class XLIFFFilter implements IFilter {
 	
 	public static final String PROP_BUILDNUM = "build-num";
 	public static final String PROP_EXTRADATA = "extradata";
-	
 	public static final String PROP_WASSEGMENTED = "wassegmented";
+	
+	private static final String ALTTRANSTYPE_PROPOSAL = "proposal";
 	
 	private boolean hasNext;
 	private XMLStreamReader reader;
@@ -97,7 +101,11 @@ public class XLIFFFilter implements IFilter {
 	private TextContainer content;
 	private String encoding;
 	private Stack<Integer> parentIds;
-	private AltTransAnnotation altTrans;
+	private AltTranslationsAnnotation altTrans;
+	private int altTransQuality;
+//	private String altTransMid;
+	private boolean inAltTrans;
+	private boolean processAltTrans;
 	private Stack<Boolean> preserveSpaces;
 	private String lineBreak;
 	private boolean hasUTF8BOM;
@@ -537,6 +545,8 @@ public class XLIFFFilter implements IFilter {
 			targetDone = false;
 			segSourceDone = false;
 			altTrans = null;
+			processAltTrans = false;
+			inAltTrans = false;
 			segSourceDone = false;
 			tu = new TextUnit(String.valueOf(++tuId));
 			storeStartElement();
@@ -628,7 +638,10 @@ public class XLIFFFilter implements IFilter {
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
 						return true;
 					}
-					// Else: just store the end
+					else if ( "alt-trans".equals(name) ) {
+						inAltTrans = false;
+					}
+					// just store the end
 					storeEndElement();
 					break;
 				
@@ -683,15 +696,18 @@ public class XLIFFFilter implements IFilter {
 				tc.unwrap(true);
 			}
 			// Store in altTrans only when we are within alt-trans
-			if ( altTrans != null ) {
-				if ( isSegSource ) {
-					//TODO: handle seg-source
-					//TODO: content of seg-source should be the one to use???
-					//TODO: what if they are different?
-				}
-				else {
-					altTrans.addNew(lang, tc);
-					altTrans.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+			if ( inAltTrans ) {
+				if ( processAltTrans ) {
+					if ( isSegSource ) {
+						//TODO: handle seg-source
+						//TODO: content of seg-source should be the one to use???
+						//TODO: what if they are different?
+					}
+					else {
+						// Add the source, no target yet
+						altTrans.add(lang, null, null, tc.getFirstContent(), null, AltTranslationType.FROM_DOCUMENT, 0, null);
+						altTrans.getLast().getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+					}
 				}
 			}
 			else { // It's seg-source just after a <source> (not in alt-trans)
@@ -736,8 +752,20 @@ public class XLIFFFilter implements IFilter {
 			if ( !preserveSpaces.peek() ) {
 				tc.unwrap(true);
 			}
-			altTrans.setTarget(lang, tc);
-			altTrans.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+			if ( processAltTrans ) {
+				// Set the target alternate entry
+				AltTranslation alt = altTrans.getLast();
+				if ( alt == null ) {
+					altTrans.add(srcLang, null, null, null, null, AltTranslationType.FROM_DOCUMENT, 0, null);
+				}
+				if ( tc.contentIsOneSegment() ) {
+					altTrans.getLast().setTarget(lang, tc.getFirstContent());
+				}
+				else {
+					altTrans.getLast().setTarget(lang, tc.getUnSegmentedContentCopy());
+				}
+				altTrans.getLast().getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+			}
 		}
 		else {
 			// Get the state attribute if available
@@ -776,10 +804,44 @@ public class XLIFFFilter implements IFilter {
 	}
 	
 	private void processStartAltTrans () {
+		inAltTrans = true;
+		processAltTrans = true;
+		// Check if this is a proposal-type alt-trans element
+		String tmp = reader.getAttributeValue(null, "alttranstype");
+		if ( tmp != null ) { // If null, it's a proposal (default)
+			if ( !tmp.equals(ALTTRANSTYPE_PROPOSAL) ) {
+				// Read only the proposals
+				processAltTrans = false;
+				return;
+			}
+		}
+		
+		// Get possible mid for segment
+//		altTransMid = reader.getAttributeValue(null, "mid");
+		// Get possible score
+		tmp = reader.getAttributeValue(null, "match-quality");
+		if ( !Util.isEmpty(tmp) ) {
+			if ( Character.isDigit(tmp.charAt(0)) ) {
+				if ( tmp.endsWith("%") ) tmp = tmp.substring(0, tmp.length()-1);
+				try {
+					altTransQuality = Integer.valueOf(tmp);
+					if ( altTransQuality < 1 ) altTransQuality = -1;
+				}
+				catch ( NumberFormatException e ) {
+					// Do nothing
+				}
+			}
+		}
+		
 		// Creates an annotation for the alt-trans if there is none yet.
 		if ( altTrans == null ) {
-			altTrans = new AltTransAnnotation();
-			tu.setAnnotation(altTrans);
+			altTrans = new AltTranslationsAnnotation();
+//TODO: How about segmented entries???
+			// Create an empty target if there was no target
+			if ( !tu.hasTarget(trgLang) ) {
+				tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
+			}
+			tu.getTarget(trgLang).setAnnotation(altTrans);
 		}
 	}
 	

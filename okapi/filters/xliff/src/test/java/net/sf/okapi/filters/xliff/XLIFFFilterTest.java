@@ -26,9 +26,9 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -262,10 +262,10 @@ public class XLIFFFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithAltTrans(), 1);
 		assertNotNull(tu);
 		assertEquals("t1", tu.getSource().toString());
-		AltTransAnnotation annot = tu.getAnnotation(AltTransAnnotation.class);
+		AltTranslationsAnnotation annot = tu.getTarget(locFR).getAnnotation(AltTranslationsAnnotation.class);
 		assertNotNull(annot);
-		assertEquals("alt source {t1}", annot.getEntry().getSource().toString());
-		assertEquals("alt target {t1}", annot.getEntry().getTarget(locFR).toString());
+		assertEquals("alt source {t1}", annot.getFirst().getEntry().getSource().toString());
+		assertEquals("alt target {t1}", annot.getFirst().getEntry().getTarget(locFR).toString());
 	}
 
 	@Test

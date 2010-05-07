@@ -29,6 +29,7 @@ import net.sf.okapi.common.resource.TextFragment;
 
 /**
  * Annotation for storing one or more alternate translations for a target content.
+ * <p>When used, this annotation is designed to be attached to the segment of the targets.
  */
 public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTranslation> {
 	
@@ -103,6 +104,17 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 			return null;
 		}
 		return list.get(0);
+	}
+	
+	/**
+	 * Gets the last entry in the list of alternate translations.
+	 * @return the last alternate translation entry or null if the list is empty.
+	 */
+	public AltTranslation getLast () {
+		if ( list.isEmpty() ) {
+			return null;
+		}
+		return list.getLast();
 	}
 
 	/**

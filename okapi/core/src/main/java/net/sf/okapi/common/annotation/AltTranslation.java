@@ -80,7 +80,9 @@ public class AltTranslation implements Comparable<AltTranslation> {
 
 //TODO: copy code-content from original source to alternate target if necessary
 //TODO: the magic should go here
-		tu.setTargetContent(targetLocId, alternateTarget);
+		if ( alternateTarget != null ) {
+			tu.setTargetContent(targetLocId, alternateTarget);
+		}
 	}
 
 	/**
@@ -91,6 +93,18 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		return tu.getTarget(trgLocId);
 	}
 
+	/**
+	 * Sets the target parts of this alternate translation.
+	 * @param targetLocId the target locale.
+	 * @param alternateTarget the content of the alternate translation.
+	 */
+	public void setTarget (LocaleId targetLocId,
+		TextFragment alternateTarget)
+	{
+		this.trgLocId = targetLocId;
+		tu.setTargetContent(targetLocId, alternateTarget);
+	}
+	
 	/**
 	 * Gets the source locale for this entry.
 	 * @return the source locale for this entry.
