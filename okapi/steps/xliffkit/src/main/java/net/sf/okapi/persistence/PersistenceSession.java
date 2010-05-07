@@ -383,8 +383,34 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		return delegatedObservable.getObservers();
 	}
 	
-	public BeanMapper getBeanMapper() {
-		return beanMapper;
+	public Class<?> getClass(String objClassName) {
+		return beanMapper.getClass(objClassName);
+	}
+	
+	public Class<?> getObjectClass(Class<? extends IPersistenceBean<?>> beanClassRef) {
+		return beanMapper.getObjectClass(beanClassRef);
+	}
+	
+	public <T> Class<IPersistenceBean<T>> getBeanClass(Class<T> classRef) {
+		return beanMapper.getBeanClass(classRef);
+	}
+	
+	public Class<? extends IPersistenceBean<?>> getBeanClass(String className) {
+		return beanMapper.getBeanClass(className);
+	}
+	
+	public IPersistenceBean<?> getProxy(String objClassName) {
+		return beanMapper.getProxy(objClassName);
+	}
+	
+	public IPersistenceBean<?> getProxy(Class<?> objClassRef) {
+		return beanMapper.getProxy(objClassRef);
+	}
+	
+	public void registerBean(
+			Class<?> classRef, 
+			Class<? extends IPersistenceBean<?>> beanClassRef) {
+		beanMapper.registerBean(classRef, beanClassRef);
 	}
 	
 	@Override

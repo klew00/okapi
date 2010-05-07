@@ -182,7 +182,7 @@ public class XLIFFKitReaderTest {
 				
 		InputStream inStream = this.getClass().getResourceAsStream("test_refs3.txt.json"); 
 		session.start(inStream);
-		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean.class);
+		session.registerBean(TestEvent.class, TestEventBean.class);
 		
 		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
 		
@@ -214,7 +214,7 @@ public class XLIFFKitReaderTest {
 				
 		InputStream inStream = this.getClass().getResourceAsStream("test_refs4.txt.json"); 
 		session.start(inStream);
-		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean.class);
+		session.registerBean(TestEvent.class, TestEventBean.class);
 		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
 		
 		TestEvent e1 = session.deserialize(TestEvent.class);
@@ -258,7 +258,7 @@ public class XLIFFKitReaderTest {
 				
 		InputStream inStream = this.getClass().getResourceAsStream("test_refs5.txt.json"); 
 		session.start(inStream);
-		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean2.class);
+		session.registerBean(TestEvent.class, TestEventBean2.class);
 		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
 		
 		TestEvent e1 = session.deserialize(TestEvent.class);
@@ -292,7 +292,7 @@ public class XLIFFKitReaderTest {
 				
 		InputStream inStream = this.getClass().getResourceAsStream("test_refs6.txt.json"); 
 		session.start(inStream);
-		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean2.class);
+		session.registerBean(TestEvent.class, TestEventBean2.class);
 		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
 		
 		TestEvent e1 = session.deserialize(TestEvent.class);

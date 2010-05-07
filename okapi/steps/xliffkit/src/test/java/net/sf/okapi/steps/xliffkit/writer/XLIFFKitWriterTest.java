@@ -733,7 +733,7 @@ public class XLIFFKitWriterTest {
 		params.setIncludeOriginal(false);
 		
 		
-		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean.class);
+		session.registerBean(TestEvent.class, TestEventBean.class);
 		
 		TestEvent e1 = new TestEvent("e1");
 		TestEvent e2 = new TestEvent("e2");
@@ -768,7 +768,7 @@ public class XLIFFKitWriterTest {
 		params.setIncludeSource(false);
 		params.setIncludeOriginal(false);
 		
-		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean.class);
+		session.registerBean(TestEvent.class, TestEventBean.class);
 		
 		TestEvent e1 = new TestEvent("e1");
 		TestEvent e2 = new TestEvent("e2");
@@ -817,7 +817,7 @@ public class XLIFFKitWriterTest {
 		params.setIncludeSource(false);
 		params.setIncludeOriginal(false);
 		
-		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean2.class);
+		session.registerBean(TestEvent.class, TestEventBean2.class);
 		
 		TestEvent e1 = new TestEvent("e1");
 		TestEvent e2 = new TestEvent("e2");
@@ -853,7 +853,7 @@ public class XLIFFKitWriterTest {
 		params.setIncludeSource(false);
 		params.setIncludeOriginal(false);
 		
-		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean2.class);
+		session.registerBean(TestEvent.class, TestEventBean2.class);
 		
 		TestEvent e1 = new TestEvent("e1");
 		TestEvent e2 = new TestEvent("e2");

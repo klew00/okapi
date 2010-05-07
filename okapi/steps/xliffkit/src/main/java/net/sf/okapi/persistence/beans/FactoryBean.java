@@ -64,7 +64,7 @@ public class FactoryBean extends PersistenceBean<Object> {
 		boolean res = content instanceof IPersistenceBean<?>; 
 		if (!res) {
 			if (session == null) return false;
-			content = session.convert(content, session.getBeanMapper().getBeanClass(className));
+			content = session.convert(content, session.getBeanClass(className));
 			res = content instanceof IPersistenceBean<?>;
 		}
 		return res;

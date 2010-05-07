@@ -266,7 +266,7 @@ public class TestReflection {
 		
 		start = System.currentTimeMillis();
 		for(int i = 0; i < loops; i++) {
-			session.getBeanMapper().registerBean(TextUnit.class, TextUnitBean.class);
+			session.registerBean(TextUnit.class, TextUnitBean.class);
 		}
 		System.out.println(loops + " registerBean(): " + (System.currentTimeMillis() - start) + " milliseconds.");
 		

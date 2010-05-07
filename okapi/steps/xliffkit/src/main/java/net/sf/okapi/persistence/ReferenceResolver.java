@@ -225,7 +225,7 @@ public class ReferenceResolver {
 	
 	public <T> IPersistenceBean<T> createBean(Class<T> classRef) {
 		Class<IPersistenceBean<T>> beanClass = 
-			session.getBeanMapper().getBeanClass(classRef);
+			session.getBeanClass(classRef);
 		
 		if (beanClass == null)
 			throw(new RuntimeException(String.format(MSG1, classRef.getName())));

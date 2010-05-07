@@ -34,10 +34,10 @@ public class ReferenceBean extends PersistenceBean<Object> {
 	protected Object createObject(IPersistenceSession session) {
 		Object obj = session.getObject(reference);
 		if (obj == null) {
-			IPersistenceBean<?> proxy = session.getBeanMapper().getProxy(className);
+			IPersistenceBean<?> proxy = session.getProxy(className);
 			if (proxy != null) {
 				// Create an object and put to cache so getObject() can find it from PersistenceBean.get()
-				obj = proxy.get(session.getBeanMapper().getClass(className), session);				
+				obj = proxy.get(session.getClass(className), session);				
 			}		
 		}
 		return obj;

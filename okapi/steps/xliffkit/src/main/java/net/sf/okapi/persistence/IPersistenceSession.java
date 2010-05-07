@@ -105,5 +105,19 @@ public interface IPersistenceSession {
 
 	void setSerialized(Object obj);
 	
-	BeanMapper getBeanMapper();
+	Class<?> getClass(String objClassName);
+	
+	Class<?> getObjectClass(Class<? extends IPersistenceBean<?>> beanClassRef);
+	
+	<T> Class<IPersistenceBean<T>> getBeanClass(Class<T> classRef);
+	
+	Class<? extends IPersistenceBean<?>> getBeanClass(String className);
+	
+	IPersistenceBean<?> getProxy(String objClassName);
+	
+	IPersistenceBean<?> getProxy(Class<?> objClassRef);
+	
+	void registerBean(
+			Class<?> classRef, 
+			Class<? extends IPersistenceBean<?>> beanClassRef);
 }
