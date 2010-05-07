@@ -20,21 +20,17 @@
 
 package net.sf.okapi.connectors.crosslanguage;
 
-import java.net.MalformedURLException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.namespace.QName;
 
-import com.crosslang.ws.ArrayOfstring;
-import com.crosslang.ws.Gateway;
-import com.crosslang.ws.IGateway;
+import com.crosslang.clgateway.ws.gateway.impl.ClGatewayPortBindingStub;
 
 import net.sf.okapi.common.Base64;
 import net.sf.okapi.common.IParameters;
@@ -46,15 +42,18 @@ import net.sf.okapi.lib.translation.QueryUtil;
 
 /**
  * Connector for the CrossLanguage MT Gateway Web services.
+ * <p>Note that the language pair is determined by the apiKey, not anything else.
+ * So the <code>setLanguages</code> method has no effect with this connector. 
  */
 public class CrossLanguageMTConnector extends BaseConnector {
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
 
 	private Parameters params;
-	private IGateway gateway;
 	private QueryUtil util;
-	private ArrayOfstring options;
+	private ClGatewayPortBindingStub clGateway;
+	private String requestTime;
+	private String secret;
 
 	public CrossLanguageMTConnector () {
 		params = new Parameters();
@@ -63,7 +62,7 @@ public class CrossLanguageMTConnector extends BaseConnector {
 	
 	@Override
 	public void close () {
-		gateway = null;
+		clGateway = null;
 	}
 
 	@Override
@@ -78,23 +77,20 @@ public class CrossLanguageMTConnector extends BaseConnector {
 
 	@Override
 	public void open () {
-		URL url;
 		try {
-			url = new URL(params.getServerURL());
-			Gateway gatewayService = new Gateway(url, new QName("http://tempuri.org/", "Gateway"));
-			gateway = gatewayService.getDefaultBinding();
-			
-			options = new ArrayOfstring();
-			List<String> list = options.getString();
-			if ( !Util.isEmpty(params.getDictionary()) ) {
-				list.add("Dictionary");
-				list.add(params.getDictionary());
-			}
-			list.add("Formality");
-			list.add(params.getPoliteForm() ? "FormalOrPolite" : "Informal");
+			URL url = new URL(params.getServerURL());
+			clGateway = new ClGatewayPortBindingStub(url, null);
+			requestTime = generateTimeStamp();
+			secret = generateSecret(params.getUser(), requestTime, params.getPassword());
 		}
-		catch ( MalformedURLException e ) {
-			throw new RuntimeException("URL error when creating service.", e);
+		catch ( InvalidKeyException e ) {
+			throw new RuntimeException("Invalid key.", e);
+		}
+		catch ( NoSuchAlgorithmException e ) {
+			throw new RuntimeException("Encryption error.", e);
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error when initializing the MT engine.", e);
 		}
 	}
 
@@ -112,8 +108,8 @@ public class CrossLanguageMTConnector extends BaseConnector {
 		current = -1;
 		try {
 			// Call the service
-			String res = gateway.getTranslatedStringWithOptions(params.getUser(), params.getApiKey(),
-				params.getDepartmentId(), text, options);
+			String res = clGateway.translateSentence(params.getApiKey(), params.getUser(),
+				requestTime, secret, text);
 			if ( res == null ) return 0;
 			
 			// Process the result
@@ -136,11 +132,13 @@ public class CrossLanguageMTConnector extends BaseConnector {
 			// Check if there is actually text to translate
 			if ( !text.hasText(false) ) return 0;
 			// Convert the fragment to coded HTML
-			String qtext = "<html>"+util.toCodedHTML(text)+"</html>";
-			String data = Base64.encodeString(qtext);
+			// The charset must be set or the return will be in something else than UTF-8
+			String qtext = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"><p>"+util.toCodedHTML(text)+"</p>";
+			//String qtext = "<p>"+util.toCodedHTML(text)+"<p>";
 			// Call the service
-			String res = gateway.getTranslatedFileWithOptions(params.getUser(), params.getApiKey(),
-				params.getDepartmentId(), data, "HTML", options);
+			String res = clGateway.translateFile(params.getApiKey(), params.getUser(),
+				requestTime, secret, Base64.encodeString(qtext), "html"); 
+			
 			if ( res == null ) return 0;
 			if ( res.startsWith("TransError") ) {
 				throw new RuntimeException("Error querying the server: " + res);
@@ -149,12 +147,16 @@ public class CrossLanguageMTConnector extends BaseConnector {
 			// Process the result
 			result = new QueryResult();
 			result.source = text;
+			// Remove the extra header info
+			String data = Base64.decodeString(res);
+			int pos = data.indexOf("<p>");
+			if ( pos > -1 ) data = data.substring(pos+3, data.length()-4);
+			// Convert back to internal codes
 			if ( text.hasCode() ) {
-				result.target = new TextFragment(util.fromCodedHTML(Base64.decodeString(res), text),
-					text.getCodes());
+				result.target = new TextFragment(util.fromCodedHTML(data, text), text.getCodes());
 			}
 			else {
-				result.target = new TextFragment(util.fromCodedHTML(res, text));
+				result.target = new TextFragment(util.fromCodedHTML(data, text));
 			}
 			result.score = 95; // Arbitrary score for MT
 			result.origin = Util.ORIGIN_MT;
@@ -176,21 +178,21 @@ public class CrossLanguageMTConnector extends BaseConnector {
 		params = (Parameters)params;
 	}
 
-	private String generateRequestDate () {
+	private String generateTimeStamp () {
 		return DATE_FORMAT.format(new Date());
 	}
 		
 	private String generateSecret (String username,
 		String timestamp,
 		String password)
-		throws NoSuchAlgorithmException, InvalidKeyException
+		throws NoSuchAlgorithmException, InvalidKeyException, IllegalStateException, UnsupportedEncodingException
 	{
 		StringBuilder sb = new StringBuilder(username).append("#").append(timestamp);
 		SecretKeySpec signingKey = new SecretKeySpec(password.getBytes(), "HmacSHA1");
 		Mac mac = Mac.getInstance("HmacSHA1");
 		mac.init(signingKey);
-		byte[] rawHmac = mac.doFinal(sb.toString().getBytes());
+		byte[] rawHmac = mac.doFinal(sb.toString().getBytes("UTF-8"));
 		return (new String(Base64.encode(rawHmac))).trim();
 	}
-	
+
 }

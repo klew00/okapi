@@ -22,7 +22,6 @@ package net.sf.okapi.connectors.crosslanguage;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
-import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.TextInputPart;
@@ -32,16 +31,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	protected static final String SERVERURL = "serverURL";
 	protected static final String USER = "user";
 	protected static final String APIKEY = "apiKey";
-	protected static final String DEPATMENTID = "departmentId";
-	protected static final String DICTIONARY = "dictionary";
-	protected static final String POLITEFORM = "politeForm";
+	protected static final String PASSWORD = "password";
 	
 	private String serverURL;
 	private String user;
 	private String apiKey;
-	private String departmentId;
-	private String dictionary;
-	private boolean politeForm;
+	private String password;
 	
 	public Parameters () {
 		reset();
@@ -76,28 +71,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.serverURL = serverURL;
 	}
 
-	public String getDepartmentId () {
-		return departmentId;
+	public String getPassword () {
+		return password;
 	}
 
-	public void setDepartmentId (String departmentId) {
-		this.departmentId = departmentId;
-	}
-
-	public String getDictionary () {
-		return dictionary;
-	}
-
-	public void setDictionary (String dictionary) {
-		this.dictionary = dictionary;
-	}
-
-	public boolean getPoliteForm () {
-		return politeForm;
-	}
-
-	public void setPoliteForm (boolean politeForm) {
-		this.politeForm = politeForm;
+	public void setPassword (String password) {
+		this.password = password;
 	}
 
 	public void fromString (String data) {
@@ -106,18 +85,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		user = buffer.getString(USER, user);
 		apiKey = buffer.getString(APIKEY, apiKey);
 		serverURL = buffer.getString(SERVERURL, serverURL);
-		departmentId = buffer.getString(DEPATMENTID, departmentId);
-		dictionary = buffer.getString(DICTIONARY, dictionary);
-		politeForm = buffer.getBoolean(POLITEFORM, politeForm);
+		password = buffer.getString(PASSWORD, password);
 	}
 
 	public void reset () {
 		user = "myUsername";
 		apiKey = "myApiKey";
-		serverURL = "http://77.241.87.220/Gateway.svc?wsdl";
-		departmentId = "myDeptId";
-		dictionary = "General";
-		politeForm = true;
+		serverURL = "http://gateway.crosslang.com:8080/services/clGateway?wsdl";
+		password = "";
 	}
 
 	@Override
@@ -126,9 +101,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(USER, user);
 		buffer.setString(APIKEY, apiKey);
 		buffer.setString(SERVERURL, serverURL);
-		buffer.setString(DEPATMENTID, departmentId);
-		buffer.setString(DICTIONARY, dictionary);
-		buffer.setBoolean(POLITEFORM, politeForm);
+		buffer.setString(PASSWORD, password);
 		return buffer.toString();
 	}
 
@@ -136,17 +109,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(Parameters.SERVERURL,
-			"Server URL", "The full URL of the Gateway server (e.g. http://www.crosslang.com/Gateway.svc?wsdl");
+			"Server URL", "The full URL of the server (e.g. http://gateway.crosslang.com:8080/services/clGateway?wsdl");
 		desc.add(Parameters.USER,
 			"User name", "The login name to use");
 		desc.add(Parameters.APIKEY,
 			"API key", "The API key for the given user, engine and language pair");
-		desc.add(Parameters.DEPATMENTID,
-			"Department ID", "The customer identifier to use");
-		desc.add(Parameters.DICTIONARY,
-			"Dictionary", "The domain-specific dictionary to use (e.g. General)");
-		desc.add(Parameters.POLITEFORM,
-			"Use the polite form (vs. informal form)", null);
+		desc.add(Parameters.PASSWORD,
+			"Password", "The login passowrd");
 		return desc;
 	}
 
@@ -158,21 +127,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		
 		desc.addTextInputPart(paramsDesc.get(USER));
 		
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(APIKEY));
+		desc.addTextInputPart(paramsDesc.get(APIKEY));
+		
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(PASSWORD));
 		tip.setPassword(true);
 		
-		tip = desc.addTextInputPart(paramsDesc.get(DEPATMENTID));
-		tip.setPassword(true);
-		
-		String[] choices = {"Automotive", "Aviation/Space", "Chemistry", "Colloquial",
-			"ComAdder/Data processing", "Earth sciences", "Economics/Business Electronics",
-			"Food science", "General", "Legal", "Life sciences", "Mathematics",
-			"Mechanical engineering", "Medicine", "Metallurgy", "Military science",
-			"Naval/Maritime", "Photography/Optics", "Physics/AtomicEnergy", "Political science"};
-		desc.addListSelectionPart(paramsDesc.get(DICTIONARY), choices);
-		
-		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(POLITEFORM));
-		cbp.setVertical(true);
 		return desc;
 	}
 
