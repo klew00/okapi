@@ -42,6 +42,8 @@ public class ReferenceResolver {
 	
 	private static long idCounter = 0;
 	private long rootId = 0;
+	private IPersistenceSession session;
+
 	private static Map<Object, Long> refIdLookup = new ConcurrentHashMap<Object, Long>();
 	private static Map<Long, Object> objectLookup = new ConcurrentHashMap<Long, Object>();
 	private static Map<Long, Long> rootLookup = new ConcurrentHashMap<Long, Long>();
@@ -68,6 +70,11 @@ public class ReferenceResolver {
 	});	
 	private Map<Long, Set<Long>> frameLookup = new ConcurrentHashMap<Long, Set<Long>>();
 	private List<Object> serialized = new ArrayList<Object>();
+
+	public ReferenceResolver(IPersistenceSession session) {
+		super();
+		this.session = session;
+	}
 	
 	public void reset() {
 		//idCounter = 0; //!!! Sessions are not allowed to reset the counter
@@ -218,7 +225,7 @@ public class ReferenceResolver {
 	
 	public <T> IPersistenceBean<T> createBean(Class<T> classRef) {
 		Class<IPersistenceBean<T>> beanClass = 
-			BeanMapper.getBeanClass(classRef);
+			session.getBeanMapper().getBeanClass(classRef);
 		
 		if (beanClass == null)
 			throw(new RuntimeException(String.format(MSG1, classRef.getName())));

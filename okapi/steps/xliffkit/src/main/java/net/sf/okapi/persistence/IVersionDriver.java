@@ -20,19 +20,9 @@
 
 package net.sf.okapi.persistence;
 
-import java.util.HashMap;
-
-public class NamespaceMapper {
-
-	private static HashMap<String, Class<?>> classNameMap = 
-		new HashMap<String, Class<?>>();
+public interface IVersionDriver {
 	
-	public static String getMapping(String className) {
-		Class<?> classRef = classNameMap.get(className); 
-		return classRef == null ? className : classRef.getName(); // if no mapping is set, return the original name
-	}
-
-	public static void mapName(String name, Class<?> classRef) {
-		classNameMap.put(name, classRef);
-	}
+	String getVersionId();
+	
+	void registerBeans(BeanMapper beanMapper);
 }

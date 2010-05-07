@@ -21,7 +21,6 @@
 package net.sf.okapi.persistence.beans;
 
 import net.sf.okapi.common.ClassUtil;
-import net.sf.okapi.persistence.BeanMapper;
 import net.sf.okapi.persistence.IPersistenceBean;
 import net.sf.okapi.persistence.IPersistenceSession;
 import net.sf.okapi.persistence.PersistenceBean;
@@ -65,7 +64,7 @@ public class FactoryBean extends PersistenceBean<Object> {
 		boolean res = content instanceof IPersistenceBean<?>; 
 		if (!res) {
 			if (session == null) return false;
-			content = session.convert(content, BeanMapper.getBeanClass(className));
+			content = session.convert(content, session.getBeanMapper().getBeanClass(className));
 			res = content instanceof IPersistenceBean<?>;
 		}
 		return res;

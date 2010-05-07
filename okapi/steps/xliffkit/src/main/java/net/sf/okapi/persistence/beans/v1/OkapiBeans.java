@@ -62,6 +62,9 @@ import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POFilterWriter;
 import net.sf.okapi.filters.vignette.SubFilterAnnotation;
 import net.sf.okapi.persistence.BeanMapper;
+import net.sf.okapi.persistence.IVersionDriver;
+import net.sf.okapi.persistence.NamespaceMapper;
+import net.sf.okapi.persistence.VersionMapper;
 import net.sf.okapi.persistence.beans.TypeInfoBean;
 import net.sf.okapi.steps.formatconversion.TableFilterWriter;
 import net.sf.okapi.steps.tokenization.common.InputTokenAnnotation;
@@ -70,61 +73,73 @@ import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 
-public class OkapiBeans {
+public class OkapiBeans implements IVersionDriver {
 
-	public static void register() {
+	public static final String VERSION = "OKAPI 1.0";
+	
+	@Override
+	public void registerBeans(BeanMapper beanMapper) {
 		// General purpose beans
-		BeanMapper.registerBean(IParameters.class, ParametersBean.class);
-		BeanMapper.registerBean(Object.class, TypeInfoBean.class); // If no bean was found, use just this one to store class info
+		beanMapper.registerBean(IParameters.class, ParametersBean.class);
+		beanMapper.registerBean(Object.class, TypeInfoBean.class); // If no bean was found, use just this one to store class info
 		
 		// Specific class beans				
-		BeanMapper.registerBean(Event.class, EventBean.class);		
-		BeanMapper.registerBean(TextUnit.class, TextUnitBean.class);
-		BeanMapper.registerBean(RawDocument.class, RawDocumentBean.class);
-		BeanMapper.registerBean(Property.class, PropertyBean.class);		
-		BeanMapper.registerBean(ConditionalParameters.class, ConditionalParametersBean.class);
-		BeanMapper.registerBean(TextFragment.class, TextFragmentBean.class);
-		BeanMapper.registerBean(TextContainer.class, TextContainerBean.class);
-		BeanMapper.registerBean(Code.class, CodeBean.class);
-		BeanMapper.registerBean(Document.class, DocumentBean.class);
-		BeanMapper.registerBean(DocumentPart.class, DocumentPartBean.class);
-		BeanMapper.registerBean(Ending.class, EndingBean.class);
-		BeanMapper.registerBean(MultiEvent.class, MultiEventBean.class);
-		BeanMapper.registerBean(TextPart.class, TextPartBean.class);
-		BeanMapper.registerBean(Segment.class, SegmentBean.class);
-		BeanMapper.registerBean(Range.class, RangeBean.class);
-		BeanMapper.registerBean(BaseNameable.class, BaseNameableBean.class);
-		BeanMapper.registerBean(BaseReferenceable.class, BaseReferenceableBean.class);
-		BeanMapper.registerBean(StartDocument.class, StartDocumentBean.class);
-		BeanMapper.registerBean(StartGroup.class, StartGroupBean.class);
-		BeanMapper.registerBean(StartSubDocument.class, StartSubDocumentBean.class);		
-		BeanMapper.registerBean(GenericSkeleton.class, GenericSkeletonBean.class);
-		BeanMapper.registerBean(GenericSkeletonPart.class, GenericSkeletonPartBean.class);
-		BeanMapper.registerBean(ZipSkeleton.class, ZipSkeletonBean.class);
-		BeanMapper.registerBean(ZipFile.class, ZipFileBean.class);
-		BeanMapper.registerBean(ZipEntry.class, ZipEntryBean.class);
-		BeanMapper.registerBean(InputStream.class, InputStreamBean.class);		
-		BeanMapper.registerBean(GenericFilterWriter.class, GenericFilterWriterBean.class);
-		BeanMapper.registerBean(TMXFilterWriter.class, TMXFilterWriterBean.class);
-		BeanMapper.registerBean(ZipFilterWriter.class, ZipFilterWriterBean.class);
-		BeanMapper.registerBean(Token.class, TokenBean.class);
-		BeanMapper.registerBean(Lexem.class, LexemBean.class);
-		BeanMapper.registerBean(AltTranslation.class, AltTranslationBean.class);
+		beanMapper.registerBean(Event.class, EventBean.class);		
+		beanMapper.registerBean(TextUnit.class, TextUnitBean.class);
+		beanMapper.registerBean(RawDocument.class, RawDocumentBean.class);
+		beanMapper.registerBean(Property.class, PropertyBean.class);		
+		beanMapper.registerBean(ConditionalParameters.class, ConditionalParametersBean.class);
+		beanMapper.registerBean(TextFragment.class, TextFragmentBean.class);
+		beanMapper.registerBean(TextContainer.class, TextContainerBean.class);
+		beanMapper.registerBean(Code.class, CodeBean.class);
+		beanMapper.registerBean(Document.class, DocumentBean.class);
+		beanMapper.registerBean(DocumentPart.class, DocumentPartBean.class);
+		beanMapper.registerBean(Ending.class, EndingBean.class);
+		beanMapper.registerBean(MultiEvent.class, MultiEventBean.class);
+		beanMapper.registerBean(TextPart.class, TextPartBean.class);
+		beanMapper.registerBean(Segment.class, SegmentBean.class);
+		beanMapper.registerBean(Range.class, RangeBean.class);
+		beanMapper.registerBean(BaseNameable.class, BaseNameableBean.class);
+		beanMapper.registerBean(BaseReferenceable.class, BaseReferenceableBean.class);
+		beanMapper.registerBean(StartDocument.class, StartDocumentBean.class);
+		beanMapper.registerBean(StartGroup.class, StartGroupBean.class);
+		beanMapper.registerBean(StartSubDocument.class, StartSubDocumentBean.class);		
+		beanMapper.registerBean(GenericSkeleton.class, GenericSkeletonBean.class);
+		beanMapper.registerBean(GenericSkeletonPart.class, GenericSkeletonPartBean.class);
+		beanMapper.registerBean(ZipSkeleton.class, ZipSkeletonBean.class);
+		beanMapper.registerBean(ZipFile.class, ZipFileBean.class);
+		beanMapper.registerBean(ZipEntry.class, ZipEntryBean.class);
+		beanMapper.registerBean(InputStream.class, InputStreamBean.class);		
+		beanMapper.registerBean(GenericFilterWriter.class, GenericFilterWriterBean.class);
+		beanMapper.registerBean(TMXFilterWriter.class, TMXFilterWriterBean.class);
+		beanMapper.registerBean(ZipFilterWriter.class, ZipFilterWriterBean.class);
+		beanMapper.registerBean(Token.class, TokenBean.class);
+		beanMapper.registerBean(Lexem.class, LexemBean.class);
+		beanMapper.registerBean(AltTranslation.class, AltTranslationBean.class);
 		// Registered here to require dependencies at compile-time
-		BeanMapper.registerBean(OpenXMLZipFilterWriter.class, TypeInfoBean.class); 		
-		BeanMapper.registerBean(PensieveFilterWriter.class, TypeInfoBean.class);
-		BeanMapper.registerBean(POFilterWriter.class, TypeInfoBean.class);
-		BeanMapper.registerBean(TableFilterWriter.class, TypeInfoBean.class);
+		beanMapper.registerBean(OpenXMLZipFilterWriter.class, TypeInfoBean.class); 		
+		beanMapper.registerBean(PensieveFilterWriter.class, TypeInfoBean.class);
+		beanMapper.registerBean(POFilterWriter.class, TypeInfoBean.class);
+		beanMapper.registerBean(TableFilterWriter.class, TypeInfoBean.class);
 		// Annotations		
-		BeanMapper.registerBean(AltTransAnnotation.class, AltTransAnnotationBean.class);
-		BeanMapper.registerBean(AltTranslationsAnnotation.class, AltTranslationsAnnotationBean.class);		
-		BeanMapper.registerBean(InlineAnnotation.class, InlineAnnotationBean.class);
-		BeanMapper.registerBean(InputTokenAnnotation.class, InputTokenAnnotationBean.class);
-		BeanMapper.registerBean(MetricsAnnotation.class, MetricsAnnotationBean.class);
-		BeanMapper.registerBean(ScoresAnnotation.class, ScoresAnnotationBean.class);
-		BeanMapper.registerBean(SubFilterAnnotation.class, SubFilterAnnotationBean.class);
-		BeanMapper.registerBean(TargetPropertiesAnnotation.class, TargetPropertiesAnnotationBean.class);
-		BeanMapper.registerBean(TokensAnnotation.class, TokensAnnotationBean.class);
-		//BeanMapper.registerBean(.class, Bean.class);
+		beanMapper.registerBean(AltTransAnnotation.class, AltTransAnnotationBean.class);
+		beanMapper.registerBean(AltTranslationsAnnotation.class, AltTranslationsAnnotationBean.class);		
+		beanMapper.registerBean(InlineAnnotation.class, InlineAnnotationBean.class);
+		beanMapper.registerBean(InputTokenAnnotation.class, InputTokenAnnotationBean.class);
+		beanMapper.registerBean(MetricsAnnotation.class, MetricsAnnotationBean.class);
+		beanMapper.registerBean(ScoresAnnotation.class, ScoresAnnotationBean.class);
+		beanMapper.registerBean(SubFilterAnnotation.class, SubFilterAnnotationBean.class);
+		beanMapper.registerBean(TargetPropertiesAnnotation.class, TargetPropertiesAnnotationBean.class);
+		beanMapper.registerBean(TokensAnnotation.class, TokensAnnotationBean.class);
+		//beanMapper.registerBean(.class, Bean.class);
+		
+		VersionMapper.mapVersionId("1.0", VERSION);
+		NamespaceMapper.mapName("net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEvent", 
+			net.sf.okapi.persistence.beans.v0.TestEvent.class);
+	}
+
+	@Override
+	public String getVersionId() {
+		return VERSION;
 	}
 }

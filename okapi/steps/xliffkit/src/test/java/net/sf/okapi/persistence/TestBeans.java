@@ -36,8 +36,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.persistence.IPersistenceBean;
-import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
 
 import org.junit.Test;
 
@@ -46,7 +45,7 @@ public class TestBeans {
 
 	@Test
 	public void test1() {
-		JSONPersistenceSession session = new JSONPersistenceSession();
+		OkapiJsonSession session = new OkapiJsonSession();
 		IPersistenceBean<BaseNameable> bean = session.createBean(BaseNameable.class);
 		BaseNameable bn = new BaseNameable();
 		bn.setId("the id");
@@ -91,7 +90,7 @@ public class TestBeans {
 		tu1.setTarget(LocaleId.FRENCH, new TextContainer("french-text1"));
 		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
 		
-		JSONPersistenceSession session = new JSONPersistenceSession();		
+		OkapiJsonSession session = new OkapiJsonSession();		
 		IPersistenceBean<TextUnit> tuBean = session.createBean(TextUnit.class);
 		
 		os.writeObject(tuBean);

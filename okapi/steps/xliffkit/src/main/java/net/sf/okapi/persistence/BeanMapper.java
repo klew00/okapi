@@ -42,14 +42,14 @@ public class BeanMapper {
 	private static final String PROXIES_NOT_INIT = "BeanMapper: proxy mapping is not initialized";
 	
 	// !!! LinkedHashMap to preserve registration order
-	private static LinkedHashMap<Class<?>, Class<? extends IPersistenceBean<?>>> beanClassMapping;
-	private static HashMap<Class<? extends IPersistenceBean<?>>, Class<?>> objectClassMapping;
-	private static ArrayList<Class<?>> loggedClasses; 
-	private static ArrayList<String> loggedClassNames;
-	private static ConcurrentHashMap<String, IPersistenceBean<?>> proxies; // used in ref resolution
-	private static final Logger LOGGER = Logger.getLogger(BeanMapper.class.getName());
+	private LinkedHashMap<Class<?>, Class<? extends IPersistenceBean<?>>> beanClassMapping;
+	private HashMap<Class<? extends IPersistenceBean<?>>, Class<?>> objectClassMapping;
+	private ArrayList<Class<?>> loggedClasses; 
+	private ArrayList<String> loggedClassNames;
+	private ConcurrentHashMap<String, IPersistenceBean<?>> proxies; // used in ref resolution
+	private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
 	
-	static {
+	public BeanMapper() {
 		beanClassMapping = new LinkedHashMap<Class<?>, Class<? extends IPersistenceBean<?>>> ();
 		objectClassMapping = new HashMap<Class<? extends IPersistenceBean<?>>, Class<?>> ();
 		proxies = new ConcurrentHashMap<String, IPersistenceBean<?>>();
@@ -57,7 +57,15 @@ public class BeanMapper {
 		loggedClassNames = new ArrayList<String>();
 	}
 
-	public static void registerBean(
+	public void reset() {
+		beanClassMapping.clear();
+		objectClassMapping.clear();
+		proxies.clear();
+		loggedClasses.clear(); 
+		loggedClassNames.clear();		
+	}
+	
+	public void registerBean(
 			Class<?> classRef, 
 			Class<? extends IPersistenceBean<?>> beanClassRef) {
 		if (classRef == null || beanClassRef == null)
@@ -99,7 +107,7 @@ public class BeanMapper {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T> Class<IPersistenceBean<T>> getBeanClass(Class<T> classRef) {
+	public <T> Class<IPersistenceBean<T>> getBeanClass(Class<T> classRef) {
 		if (classRef == null)
 			throw(new IllegalArgumentException(MAPPER_EMPTY_REF));
 	
@@ -133,7 +141,7 @@ public class BeanMapper {
 		return beanClass;		
 	}
 	
-	public static Class<?> getObjectClass(Class<? extends IPersistenceBean<?>> beanClassRef) {
+	public Class<?> getObjectClass(Class<? extends IPersistenceBean<?>> beanClassRef) {
 		if (beanClassRef == null)
 			throw(new IllegalArgumentException(OBJ_MAPPER_EMPTY_REF));
 	
@@ -143,14 +151,14 @@ public class BeanMapper {
 		return objectClassMapping.get(beanClassRef);		
 	}
 	
-	public static Class<?> getClass(String objClassName) {
-		return ClassUtil.getClass(NamespaceMapper.getName(objClassName));
+	public Class<?> getClass(String objClassName) {
+		return ClassUtil.getClass(NamespaceMapper.getMapping(objClassName));
 	}
 	
-	public static IPersistenceBean<?> getProxy(String objClassName) {
+	public IPersistenceBean<?> getProxy(String objClassName) {
 		if (Util.isEmpty(objClassName)) return null;
 		
-		IPersistenceBean<?> proxy = proxies.get(NamespaceMapper.getName(objClassName)); 
+		IPersistenceBean<?> proxy = proxies.get(NamespaceMapper.getMapping(objClassName)); 
 		if (proxy == null && !loggedClassNames.contains(objClassName)) {
 			loggedClassNames.add(objClassName);
 			LOGGER.warning(String.format("No proxy found for %s", objClassName));
@@ -159,7 +167,7 @@ public class BeanMapper {
 		return proxy;
 	}
 	
-	public static IPersistenceBean<?> getProxy(Class<?> objClassRef) {
+	public IPersistenceBean<?> getProxy(Class<?> objClassRef) {
 		if (objClassRef == null) return null;
 				
 //		Class<? extends IPersistenceBean> beanClassRef = getBeanClass(objClassRef);
@@ -168,11 +176,11 @@ public class BeanMapper {
 		return getProxy(objClassRef.getName());
 	}
 	
-	public static Class<? extends IPersistenceBean<?>> getBeanClass(String className) {
+	public Class<? extends IPersistenceBean<?>> getBeanClass(String className) {
 			
 		Class<? extends IPersistenceBean<?>> res = null;
 		try {
-			res = getBeanClass(Class.forName(NamespaceMapper.getName(className)));
+			res = getBeanClass(Class.forName(NamespaceMapper.getMapping(className)));
 		} catch (ClassNotFoundException e) {
 			throw(new RuntimeException(String.format(MAPPER_UNK_CLASS, className)));
 		}

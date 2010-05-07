@@ -50,6 +50,7 @@ import net.sf.okapi.filters.table.TableFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.persistence.BeanMapper;
 import net.sf.okapi.persistence.IPersistenceBean;
+import net.sf.okapi.persistence.IPersistenceSession;
 import net.sf.okapi.persistence.beans.FactoryBean;
 import net.sf.okapi.persistence.beans.v0.TestEvent;
 import net.sf.okapi.persistence.beans.v0.TestEventBean;
@@ -720,6 +721,7 @@ public class XLIFFKitWriterTest {
 	@Test
 	public void testReferences3() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		IPersistenceSession session = writerStep.getSession();
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
 		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences3.xliff.kit").toURI());
@@ -730,7 +732,8 @@ public class XLIFFKitWriterTest {
 		params.setIncludeSource(false);
 		params.setIncludeOriginal(false);
 		
-		BeanMapper.registerBean(TestEvent.class, TestEventBean.class);
+		
+		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean.class);
 		
 		TestEvent e1 = new TestEvent("e1");
 		TestEvent e2 = new TestEvent("e2");
@@ -754,6 +757,7 @@ public class XLIFFKitWriterTest {
 	@Test
 	public void testReferences4() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		IPersistenceSession session = writerStep.getSession();
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
 		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences4.xliff.kit").toURI());
@@ -764,7 +768,7 @@ public class XLIFFKitWriterTest {
 		params.setIncludeSource(false);
 		params.setIncludeOriginal(false);
 		
-		BeanMapper.registerBean(TestEvent.class, TestEventBean.class);
+		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean.class);
 		
 		TestEvent e1 = new TestEvent("e1");
 		TestEvent e2 = new TestEvent("e2");
@@ -802,6 +806,7 @@ public class XLIFFKitWriterTest {
 	@Test
 	public void testReferences5() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		IPersistenceSession session = writerStep.getSession();
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
 		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences5.xliff.kit").toURI());
@@ -812,7 +817,7 @@ public class XLIFFKitWriterTest {
 		params.setIncludeSource(false);
 		params.setIncludeOriginal(false);
 		
-		BeanMapper.registerBean(TestEvent.class, TestEventBean2.class);
+		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean2.class);
 		
 		TestEvent e1 = new TestEvent("e1");
 		TestEvent e2 = new TestEvent("e2");
@@ -835,6 +840,7 @@ public class XLIFFKitWriterTest {
 	@Test
 	public void testReferences6() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		IPersistenceSession session = writerStep.getSession();
 		beans.clear();
 		writerStep.getSession().addObserver(writeObserver);
 		
@@ -847,7 +853,7 @@ public class XLIFFKitWriterTest {
 		params.setIncludeSource(false);
 		params.setIncludeOriginal(false);
 		
-		BeanMapper.registerBean(TestEvent.class, TestEventBean2.class);
+		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean2.class);
 		
 		TestEvent e1 = new TestEvent("e1");
 		TestEvent e2 = new TestEvent("e2");

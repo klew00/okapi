@@ -47,6 +47,8 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
+import net.sf.okapi.persistence.BeanMapper;
+import net.sf.okapi.persistence.IVersionDriver;
 import net.sf.okapi.persistence.beans.v0.BaseNameableBean;
 import net.sf.okapi.persistence.beans.v0.BaseReferenceableBean;
 import net.sf.okapi.persistence.beans.v0.CodeBean;
@@ -72,7 +74,7 @@ import net.sf.okapi.persistence.beans.v0.TextFragmentBean;
 import net.sf.okapi.persistence.beans.v0.TextUnitBean;
 import net.sf.okapi.persistence.beans.v0.ZipSkeletonBean;
 
-public class PersistenceMapper {
+public class PersistenceMapper implements IVersionDriver {
 	
 	private static final String MSG1 = "PersistenceFactory: bean mapping is not initialized";
 	private static final String MSG2 = "PersistenceFactory: unknown class: %s";
@@ -87,8 +89,6 @@ public class PersistenceMapper {
 	static {
 		beanMapping = new LinkedHashMap<Class<?>, Class<? extends IPersistenceBean>> ();
 		//persistenceCache = new ConcurrentHashMap<Class<? extends IPersistenceBean>, IPersistenceBean> ();
-		
-		registerBeans();
 	}
 	
 	public static void registerBean(
@@ -156,7 +156,8 @@ public class PersistenceMapper {
 		return bean;		
 	}
 	
-	private static void registerBeans() {
+	@Override
+	public void registerBeans(BeanMapper beanMapper) {
 		// General purpose beans
 		registerBean(IParameters.class, ParametersBean.class);
 		registerBean(IFilterWriter.class, FilterWriterBean.class);
@@ -185,5 +186,10 @@ public class PersistenceMapper {
 		registerBean(GenericSkeletonPart.class, GenericSkeletonPartBean.class);
 		registerBean(ZipSkeleton.class, ZipSkeletonBean.class);		
 		registerBean(InlineAnnotation.class, InlineAnnotationBean.class);		
+	}
+
+	@Override
+	public String getVersionId() {		
+		return "OKAPI 0.0";
 	}
 }

@@ -47,7 +47,7 @@ import net.sf.okapi.persistence.beans.v1.EventBean;
 import net.sf.okapi.persistence.beans.v1.InputStreamBean;
 import net.sf.okapi.persistence.beans.v1.TextUnitBean;
 import net.sf.okapi.persistence.beans.v1.ZipSkeletonBean;
-import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
 
 import org.apache.commons.io.input.CountingInputStream;
 import org.codehaus.jackson.JsonGenerationException;
@@ -64,7 +64,7 @@ public class TestJackson {
 
 //	private static final String fileName = "test3.txt";
 	private ObjectMapper mapper;
-	private JSONPersistenceSession session;
+	private OkapiJsonSession session;
 	
 	@Before
 	public void setUp() {
@@ -76,7 +76,7 @@ public class TestJackson {
 		//mapper.configure(DeserializationConfig.Feature.USE_ANNOTATIONS, false);
 		mapper.configure(Feature.AUTO_CLOSE_SOURCE, false);
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
-		session = new JSONPersistenceSession();
+		session = new OkapiJsonSession();
 	}
 
 	@Test // Make sure we have at least one test to avoid build errors
@@ -154,7 +154,7 @@ public class TestJackson {
 	
 	// DEBUG @Test
 	public void testMultipleRead1() throws IOException {
-		JSONPersistenceSession skelSession = new JSONPersistenceSession();
+		OkapiJsonSession skelSession = new OkapiJsonSession();
 		
 		File tempSkeleton = null;
 		tempSkeleton = File.createTempFile("~aaa", ".txt");
@@ -179,7 +179,7 @@ public class TestJackson {
 	
 	// DEBUG @Test
 	public void testMultipleRead2() throws IOException {
-		JSONPersistenceSession skelSession = new JSONPersistenceSession();
+		OkapiJsonSession skelSession = new OkapiJsonSession();
 		
 		File tempSkeleton = null;
 		tempSkeleton = File.createTempFile("~aaa", ".txt");
@@ -285,7 +285,7 @@ public class TestJackson {
 		tu1.getSource().append("part2");
 		tu1.getSource().getSegments().append(new Segment("segId2", new TextFragment("seg2")));
 				
-		JSONPersistenceSession skelSession = new JSONPersistenceSession();
+		OkapiJsonSession skelSession = new OkapiJsonSession();
 		
 		File tempSkeleton = null;
 		tempSkeleton = File.createTempFile("~aaa", ".txt");
@@ -334,7 +334,7 @@ public class TestJackson {
 		tu1.getSource().append("part2");
 		tu1.getSource().getSegments().append(new Segment("segId2", new TextFragment("seg2")));
 				
-		JSONPersistenceSession skelSession = new JSONPersistenceSession();
+		OkapiJsonSession skelSession = new OkapiJsonSession();
 		
 		File tempSkeleton = null;
 		tempSkeleton = File.createTempFile("~aaa", ".txt");
@@ -371,7 +371,7 @@ public class TestJackson {
 	public void testDeserialization() {
 		
 		// test1.txt -- created by old beans from new core, reading to new core
-		JSONPersistenceSession skelSession = new JSONPersistenceSession();
+		OkapiJsonSession skelSession = new OkapiJsonSession();
 		skelSession.start(this.getClass().getResourceAsStream("test1.txt"));		
 		
 //		Event event11 = skelSession.deserialize(Event.class);

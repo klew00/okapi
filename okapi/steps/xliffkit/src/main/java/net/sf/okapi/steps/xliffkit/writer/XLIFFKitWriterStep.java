@@ -53,8 +53,11 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.persistence.IPersistenceSession;
+import net.sf.okapi.persistence.PersistenceSession;
 import net.sf.okapi.persistence.beans.v1.OkapiBeans;
 import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
 import net.sf.okapi.steps.xliffkit.opc.TKitRelationshipTypes;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -117,7 +120,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	private OPCPackage pack;
 	private File tempXliff;
 	private File tempResources;
-	private JSONPersistenceSession session;
+	private OkapiJsonSession session;
 	private List<String> sources = new ArrayList<String> ();
 	private List<String> originals = new ArrayList<String> ();
 	
@@ -125,8 +128,8 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		super();
 		xliffCont = new XLIFFContent();
 		params = new Parameters();		
-		session = new JSONPersistenceSession("event", Event.class);
-		OkapiBeans.register();
+		session = new OkapiJsonSession();
+		//OkapiBeans.register();
 	}
 	
 	public String getDescription () {
@@ -539,7 +542,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		return params;
 	}
 
-	public JSONPersistenceSession getSession() {
+	public PersistenceSession getSession() {
 		return session;
 	}
 }

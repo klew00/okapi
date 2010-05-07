@@ -31,8 +31,7 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.persistence.beans.v1.OkapiBeans;
-import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;
@@ -40,7 +39,7 @@ import org.apache.poi.openxml4j.opc.PackagePart;
 public class OPCPackageReader extends AbstractFilter {
 
 	private OPCPackage pack;
-	private JSONPersistenceSession session = new JSONPersistenceSession("event", Event.class);
+	private OkapiJsonSession session = new OkapiJsonSession();
 	private Event event;
 	private LinkedList<PackagePart> coreParts = new LinkedList<PackagePart>();
 	private PackagePart activePart;
@@ -48,7 +47,7 @@ public class OPCPackageReader extends AbstractFilter {
 	
 	public OPCPackageReader() {
 		super();
-		OkapiBeans.register();
+		//OkapiBeans.register();
 	}
 
 	@Override

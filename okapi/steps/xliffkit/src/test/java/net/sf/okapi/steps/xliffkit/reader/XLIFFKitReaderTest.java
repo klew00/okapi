@@ -35,6 +35,7 @@ import net.sf.okapi.persistence.beans.v0.TestEvent;
 import net.sf.okapi.persistence.beans.v0.TestEventBean;
 import net.sf.okapi.persistence.beans.v0.TestEventBean2;
 import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
+import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
@@ -175,16 +176,14 @@ public class XLIFFKitReaderTest {
 	@Test
 	public void testReferences3() {
 		
-		JSONPersistenceSession session = new JSONPersistenceSession();
+		OkapiJsonSession session = new OkapiJsonSession();
 		session.setItemClass(TestEvent.class);
 		session.setItemLabel("event");
-		
-		BeanMapper.registerBean(TestEvent.class, TestEventBean.class);
-		NamespaceMapper.mapName("net.sf.okapi.steps.xliffkit.common.persistence.versioning.TestEvent", 
-				net.sf.okapi.persistence.beans.v0.TestEvent.class);
-		
+				
 		InputStream inStream = this.getClass().getResourceAsStream("test_refs3.txt.json"); 
-		session.start(inStream);		
+		session.start(inStream);
+		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean.class);
+		
 		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
 		
 		TestEvent e1 = session.deserialize(TestEvent.class);
@@ -209,13 +208,13 @@ public class XLIFFKitReaderTest {
 	@Test
 	public void testReferences4() {
 		
-		JSONPersistenceSession session = new JSONPersistenceSession();
+		OkapiJsonSession session = new OkapiJsonSession();
 		session.setItemClass(TestEvent.class);
 		session.setItemLabel("event");
-		
-		BeanMapper.registerBean(TestEvent.class, TestEventBean.class);
+				
 		InputStream inStream = this.getClass().getResourceAsStream("test_refs4.txt.json"); 
-		session.start(inStream);		
+		session.start(inStream);
+		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean.class);
 		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
 		
 		TestEvent e1 = session.deserialize(TestEvent.class);
@@ -253,13 +252,13 @@ public class XLIFFKitReaderTest {
 	@Test
 	public void testReferences5() {
 		
-		JSONPersistenceSession session = new JSONPersistenceSession();
+		OkapiJsonSession session = new OkapiJsonSession();
 		session.setItemClass(TestEvent.class);
 		session.setItemLabel("event");
-		
-		BeanMapper.registerBean(TestEvent.class, TestEventBean2.class);
+				
 		InputStream inStream = this.getClass().getResourceAsStream("test_refs5.txt.json"); 
-		session.start(inStream);		
+		session.start(inStream);
+		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean2.class);
 		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
 		
 		TestEvent e1 = session.deserialize(TestEvent.class);
@@ -287,13 +286,13 @@ public class XLIFFKitReaderTest {
 	@Test
 	public void testReferences6() {
 		
-		JSONPersistenceSession session = new JSONPersistenceSession();
+		OkapiJsonSession session = new OkapiJsonSession();
 		session.setItemClass(TestEvent.class);
 		session.setItemLabel("event");
-		
-		BeanMapper.registerBean(TestEvent.class, TestEventBean2.class);
+				
 		InputStream inStream = this.getClass().getResourceAsStream("test_refs6.txt.json"); 
-		session.start(inStream);		
+		session.start(inStream);
+		session.getBeanMapper().registerBean(TestEvent.class, TestEventBean2.class);
 		TestEvent sd = session.deserialize(TestEvent.class); // StartDocument
 		
 		TestEvent e1 = session.deserialize(TestEvent.class);

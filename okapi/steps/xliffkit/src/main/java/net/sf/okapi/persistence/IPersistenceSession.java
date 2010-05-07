@@ -25,6 +25,8 @@ import java.io.OutputStream;
 
 public interface IPersistenceSession {
 
+	void registerVersions();
+	
 	/**
 	 * Gets the current session state.
 	 * @return session state
@@ -102,4 +104,6 @@ public interface IPersistenceSession {
 	void setReference(long parentRefId, long childRefId);
 
 	void setSerialized(Object obj);
+	
+	BeanMapper getBeanMapper();
 }

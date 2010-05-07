@@ -18,21 +18,34 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.persistence;
+package net.sf.okapi.steps.xliffkit.common.persistence.sessions;
 
-import java.util.HashMap;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.persistence.VersionMapper;
+import net.sf.okapi.persistence.beans.v0.PersistenceMapper;
+import net.sf.okapi.persistence.beans.v1.OkapiBeans;
+import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
 
-public class NamespaceMapper {
+public class OkapiJsonSession extends JSONPersistenceSession {
 
-	private static HashMap<String, Class<?>> classNameMap = 
-		new HashMap<String, Class<?>>();
-	
-	public static String getMapping(String className) {
-		Class<?> classRef = classNameMap.get(className); 
-		return classRef == null ? className : classRef.getName(); // if no mapping is set, return the original name
+	@Override
+	public void registerVersions() {
+		VersionMapper.registerVersion(PersistenceMapper.class); // v0
+		VersionMapper.registerVersion(OkapiBeans.class);		// v1
 	}
 
-	public static void mapName(String name, Class<?> classRef) {
-		classNameMap.put(name, classRef);
+	@Override
+	protected Class<?> getDefItemClass() {
+		return Event.class;
+	}
+
+	@Override
+	protected String getDefItemLabel() {
+		return "event";
+	}
+
+	@Override
+	protected String getDefVersionId() {
+		return OkapiBeans.VERSION;
 	}
 }

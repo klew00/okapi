@@ -42,6 +42,7 @@ import net.sf.okapi.persistence.BeanMapper;
 import net.sf.okapi.persistence.IPersistenceBean;
 import net.sf.okapi.persistence.beans.v1.PropertyBean;
 import net.sf.okapi.persistence.beans.v1.TextUnitBean;
+import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
 
 import org.junit.Test;
 
@@ -202,6 +203,7 @@ public class TestReflection {
 	public void testSpeed() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		TestClass testClass1 = new TestClass();
 		Field[] fields = TestClass.class.getDeclaredFields();
+		OkapiJsonSession session = new OkapiJsonSession();
 		int loops = 0;
 		long start = 0;
 		
@@ -264,7 +266,7 @@ public class TestReflection {
 		
 		start = System.currentTimeMillis();
 		for(int i = 0; i < loops; i++) {
-			BeanMapper.registerBean(TextUnit.class, TextUnitBean.class);
+			session.getBeanMapper().registerBean(TextUnit.class, TextUnitBean.class);
 		}
 		System.out.println(loops + " registerBean(): " + (System.currentTimeMillis() - start) + " milliseconds.");
 		

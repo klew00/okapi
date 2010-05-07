@@ -21,7 +21,6 @@
 package net.sf.okapi.persistence.beans;
 
 import net.sf.okapi.common.ClassUtil;
-import net.sf.okapi.persistence.BeanMapper;
 import net.sf.okapi.persistence.IPersistenceBean;
 import net.sf.okapi.persistence.IPersistenceSession;
 import net.sf.okapi.persistence.PersistenceBean;
@@ -35,10 +34,10 @@ public class ReferenceBean extends PersistenceBean<Object> {
 	protected Object createObject(IPersistenceSession session) {
 		Object obj = session.getObject(reference);
 		if (obj == null) {
-			IPersistenceBean<?> proxy = BeanMapper.getProxy(className);
+			IPersistenceBean<?> proxy = session.getBeanMapper().getProxy(className);
 			if (proxy != null) {
 				// Create an object and put to cache so getObject() can find it from PersistenceBean.get()
-				obj = proxy.get(BeanMapper.getClass(className), session);				
+				obj = proxy.get(session.getBeanMapper().getClass(className), session);				
 			}		
 		}
 		return obj;

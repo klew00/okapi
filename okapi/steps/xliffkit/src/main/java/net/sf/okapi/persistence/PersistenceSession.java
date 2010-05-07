@@ -43,10 +43,15 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	
 	protected abstract void startReading(InputStream inStream);
 	protected abstract void endReading(InputStream inStream);
-
+	
+	protected abstract String getDefItemLabel();
+	protected abstract Class<?> getDefItemClass();
+	protected abstract String getDefVersionId();
+	
 	private String itemLabel = ITEM_LABEL;
 	private SessionState state = SessionState.IDLE;
-	private ReferenceResolver refResolver = new ReferenceResolver();	
+	private ReferenceResolver refResolver = new ReferenceResolver(this);
+	private BeanMapper beanMapper = new BeanMapper(); 
 	private int itemCounter = 0;
 	private Class<?> prevClass;
 	private Class<? extends IPersistenceBean<?>> beanClass;
@@ -56,12 +61,21 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	private Class<?> itemClass;
 	private LinkedList<IPersistenceBean<?>> queue = new LinkedList<IPersistenceBean<?>>();
 	private boolean readingDone = false;
+	private IVersionDriver versionDriver = null;
+
+	public PersistenceSession() {
+		super();
+		registerVersions();
+		setItemLabel(getDefItemLabel());
+		setItemClass(getDefItemClass());
+		setVersion(getDefVersionId()); // sets versionDriver
+	}
 	
 	@Override
 	public void cacheBean(Object obj, IPersistenceBean<?> bean) {
 		refResolver.cacheBean(obj, bean);
 	}
-
+	
 	@Override
 	public <T> IPersistenceBean<T> createBean(Class<T> classRef) {
 		return refResolver.createBean(classRef);
@@ -77,7 +91,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		if (readingDone) return null;
 		// Update bean class if core class has changed
 		if (classRef != prevClass) { 
-			beanClass = BeanMapper.getBeanClass(classRef);
+			beanClass = beanMapper.getBeanClass(classRef);
 			prevClass = classRef;
 		}
 		IPersistenceBean<T> bean = (IPersistenceBean<T>) readBean(beanClass, name);
@@ -148,33 +162,9 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 						refResolver.releaseObject(obj);
 						return classRef.cast(obj); 
 					}
-					// TODO clean caches of weak refs to the went-away objects
 				}
 			}			
 		}
-//		if (queue.size() > 0) 
-//		return classRef.cast(queue.poll());
-
-//		Object[] objects = new Object[beanQueue.size()];
-//		queue.addAll(Arrays.asList(objects));
-//		if (beanQueue.size() == 0)
-//			queue.a
-		
-		// Update bean class if core class has changed
-//		if (classRef != prevClass) { 
-//			beanClass = BeanMapper.getBeanClass(classRef);
-//			prevClass = classRef;
-//		}
-//		IPersistenceBean bean = readBean(beanClass, name);
-//				
-//		if (bean == null) {
-//			readingDone = true;
-//			//end();
-//			return null;
-//		}
-//		refResolver.setRootId(bean.getRefId());
-//		
-//		return bean.get(classRef, this);
 	}
 	
 	@Override
@@ -203,6 +193,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		beanClass = null;
 		refResolver.reset();	
 		state = SessionState.IDLE;
+		setVersion(getDefVersionId());
 	}
 	
 	@Override
@@ -284,6 +275,8 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		
 		end();
 		refResolver.reset();
+		setVersion(getDefVersionId());
+		
 		this.outStream = outStream;		
 		itemCounter = 0;
 		
@@ -301,8 +294,9 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		
 		end();
 		refResolver.reset();
-		this.inStream = inStream;
-				
+		setVersion(getDefVersionId());
+		
+		this.inStream = inStream;				
 		readingDone = false;
 		state = SessionState.READING;
 		startReading(inStream);
@@ -317,9 +311,11 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	public SessionState getState() {
 		return state;
 	}
+	
 	public String getItemLabel() {
 		return itemLabel;
 	}
+	
 	public void setItemLabel(String itemLabel) {
 		this.itemLabel = itemLabel;
 	}
@@ -358,6 +354,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	 */
 	private IObservable delegatedObservable = new BaseObservable(this);
 
+	@Override
 	public void addObserver(IObserver observer) {
 		delegatedObservable.addObserver(observer);
 	}
@@ -384,5 +381,25 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 
 	public List<IObserver> getObservers() {
 		return delegatedObservable.getObservers();
+	}
+	
+	public BeanMapper getBeanMapper() {
+		return beanMapper;
+	}
+	
+	@Override
+	public String getVersion() {
+		return versionDriver == null ? "" : versionDriver.getVersionId();
+	}
+	
+	protected void setVersion(String versionId) {
+		if (versionDriver != null && 
+				versionId.equalsIgnoreCase(versionDriver.getVersionId())) return; // already set
+		
+		versionDriver = VersionMapper.getDriver(versionId);
+		if (versionDriver == null)
+			throw new RuntimeException(String.format("PersistenceSession: the version %s is not supported", versionId));
+		beanMapper.reset();
+		versionDriver.registerBeans(beanMapper);
 	}
 }

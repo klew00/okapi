@@ -51,7 +51,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 
 @SuppressWarnings("unchecked")
-public class JSONPersistenceSession extends PersistenceSession {
+public abstract class JSONPersistenceSession extends PersistenceSession {
 	public static final String MSG_JSON_READ_EX = "JSONPersistenceSession: error reading.";
 	public static final String MSG_JSON_WRITE_EX = "JSONPersistenceSession: error writing.";
 	
@@ -62,8 +62,8 @@ public class JSONPersistenceSession extends PersistenceSession {
 	private static final String JSON_CLASS = "itemClass"; //$NON-NLS-1$
 	private static final String JSON_MIME = "mimeType"; //$NON-NLS-1$
 	private static final String JSON_FRAMES = "frames"; //$NON-NLS-1$
-		
-	private static final String VERSION = "1.0"; //$NON-NLS-1$	
+
+	//private static final String VERSION = "1.0"; //$NON-NLS-1$	
 	// JSON RFC http://www.ietf.org/rfc/rfc4627.txt
 	private static final String MIME_TYPE = "application/json";  //$NON-NLS-1$ 	
 	
@@ -88,12 +88,6 @@ public class JSONPersistenceSession extends PersistenceSession {
 		mapper.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
 		
 		jsonFactory = mapper.getJsonFactory();
-	}
-	
-	public JSONPersistenceSession(String itemLabel, Class<?> itemClass) {
-		this();
-		setItemLabel(itemLabel);
-		setItemClass(itemClass);
 	}
 	
 	@Override
@@ -151,11 +145,6 @@ public class JSONPersistenceSession extends PersistenceSession {
 		return MIME_TYPE;
 	}
 
-	@Override
-	public String getVersion() {
-		return VERSION;
-	}
-
 	private String readFieldValue(String fieldName) {
 		String res = ""; 
 		try {
@@ -194,11 +183,8 @@ public class JSONPersistenceSession extends PersistenceSession {
 			
 			// Header
 			String version = readFieldValue(JSON_VER);
-			if (!VERSION.equalsIgnoreCase(version)) {
-				// Version control
-				// TODO Move to PersistenceSession				
-			}									
-			
+			setVersion(version);
+															
 			String description = readFieldValue(JSON_DESCR);
 			String itemClass = readFieldValue(JSON_CLASS);
 			String mimeType = readFieldValue(JSON_MIME);
