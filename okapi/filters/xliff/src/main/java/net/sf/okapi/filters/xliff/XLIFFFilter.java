@@ -752,19 +752,26 @@ public class XLIFFFilter implements IFilter {
 			if ( !preserveSpaces.peek() ) {
 				tc.unwrap(true);
 			}
-			if ( processAltTrans ) {
-				// Set the target alternate entry
-				AltTranslation alt = altTrans.getLast();
-				if ( alt == null ) {
-					altTrans.add(srcLang, null, null, null, null, AltTranslationType.FROM_DOCUMENT, 0, null);
+			if ( inAltTrans ) {
+				if ( processAltTrans ) {
+					// Set the target alternate entry
+					AltTranslation alt = altTrans.getLast();
+					// If we have a target locale already set, it means that entry was used already
+					// and we are in an entry without source, so we need to create a new entry
+					if (( alt != null ) && ( alt.getTargetLocale() != null )) {
+						alt = null; // Behave like it's a first entry
+					}
+					if ( alt == null ) {
+						altTrans.add(srcLang, null, null, null, null, AltTranslationType.FROM_DOCUMENT, 0, null);
+					}
+					if ( tc.contentIsOneSegment() ) {
+						altTrans.getLast().setTarget(lang, tc.getFirstContent());
+					}
+					else {
+						altTrans.getLast().setTarget(lang, tc.getUnSegmentedContentCopy());
+					}
+					altTrans.getLast().getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 				}
-				if ( tc.contentIsOneSegment() ) {
-					altTrans.getLast().setTarget(lang, tc.getFirstContent());
-				}
-				else {
-					altTrans.getLast().setTarget(lang, tc.getUnSegmentedContentCopy());
-				}
-				altTrans.getLast().getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 			}
 		}
 		else {

@@ -29,6 +29,7 @@ import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Stores the data representing an alternate translation.
+ * <p>This object is used with the {@link AltTranslationsAnnotation} annotation.
  */
 public class AltTranslation implements Comparable<AltTranslation> {
 	

@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.ScoreInfo;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.LocaleId;
@@ -222,6 +223,7 @@ public class TMXWriter {
     public void writeItem (TextUnit item,
     	Map<String, String> attributes)
     {
+    	//TODO: re-implement writeItem without alternates option
     	writeItem(item, attributes, false);
     }
 
@@ -232,6 +234,8 @@ public class TMXWriter {
      * @param alternate indicates if this item is an 'alternate'. If it is an alternate, if the
      * target locale does not have any entry in this item, the first found entry is used
      * instead. This is to allow getting for example FR-CA translations for an FR project.
+     * @deprecated This method will be removed soon, to write alternates use
+     * {@link #writeAlternate(AltTranslation, TextFragment)}.
      */
     public void writeItem (TextUnit item,
    		Map<String, String> attributes,
@@ -302,6 +306,25 @@ public class TMXWriter {
     }
 
     /**
+     * Writes the data of an {@link AltTranslation} to this TMX output.
+     * @param alt the alternate translation.
+     * @param srcOriginal the default source (coming from the segment or container where
+     * the annotation was attached to).
+     */
+    public void writeAlternate (AltTranslation alt,
+    	TextFragment srcOriginal)
+    {
+    	// Alternates are expected to be un-segmented
+    	TextFragment srcFrag = alt.getSource().getFirstContent();
+    	if ( srcFrag.isEmpty() ) {
+   			srcFrag = srcOriginal;
+    	}
+    	TextFragment trgFrag = alt.getTarget().getFirstContent();
+		// Write out the segment
+   		writeTU(srcFrag, trgFrag, null, null, alt.getTargetLocale());
+    }
+    
+    /**
      * Writes a TMX TU element.
      * @param source the fragment for the source text.
      * @param target the fragment for the target text.
@@ -312,6 +335,24 @@ public class TMXWriter {
    		TextFragment target,
    		String tuid,
    		Map<String, String> attributes)
+    {
+    	writeTU(source, target, tuid, attributes, null);
+    }
+    
+    /**
+     * Writes a TMX TU element.
+     * @param source the fragment for the source text.
+     * @param target the fragment for the target text.
+     * @param tuid the TUID attribute (can be null).
+     * @param attributes the optional set of attribute to put along with the entry.
+     * @param altTrgLoc the target locale id to use (in case it is different from
+     * the default one, use null to get the default).
+     */
+    public void writeTU (TextFragment source,
+   		TextFragment target,
+   		String tuid,
+   		Map<String, String> attributes,
+   		LocaleId altTrgLoc)
     {
     	// Check if this source entry should be excluded from the output
     	if ( exclusionPattern != null ) {
@@ -352,7 +393,8 @@ public class TMXWriter {
 
     	if ( target != null ) {
     		writer.writeStartElement("tuv");
-    		writer.writeAttributeString("xml:lang", trgLoc.toBCP47());
+   			writer.writeAttributeString("xml:lang",
+   				((altTrgLoc != null) ? altTrgLoc.toBCP47() : trgLoc.toBCP47()));
         	// Write creationid if available
         	if ( attributes != null ) {
         		if ( attributes.containsKey(CREATIONID) ) {

@@ -20,8 +20,8 @@
 
 package net.sf.okapi.common.annotation;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 import net.sf.okapi.common.LocaleId;
@@ -29,17 +29,17 @@ import net.sf.okapi.common.resource.TextFragment;
 
 /**
  * Annotation for storing one or more alternate translations for a target content.
- * <p>When used, this annotation is designed to be attached to the segment of the targets.
+ * <p>When used, this annotation is designed to be attached to the segments or the container of the targets.
  */
 public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTranslation> {
 	
-	private LinkedList<AltTranslation> list;
+	private ArrayList<AltTranslation> list;
 
 	/**
 	 * Creates a new empty AltTranslationsAnnotation object.
 	 */
 	public AltTranslationsAnnotation () {
-		list = new LinkedList<AltTranslation>();
+		list = new ArrayList<AltTranslation>(2);
 	}
 	
 	/**
@@ -114,7 +114,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 		if ( list.isEmpty() ) {
 			return null;
 		}
-		return list.getLast();
+		return list.get(list.size()-1);
 	}
 
 	/**

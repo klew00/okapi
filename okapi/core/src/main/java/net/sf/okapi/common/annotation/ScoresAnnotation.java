@@ -30,7 +30,8 @@ import net.sf.okapi.common.annotation.IAnnotation;
  * indicate the TM leveraging score of each segment in a TextContainer.
  * When such annotation is in place, it is expected to have one score for each segment
  * in the container, with the index of the each score corresponding to the segment index
- * (not the part index) of the segment. 
+ * (not the part index) of the segment.
+ * @deprecated This class will be removed soon. Use {@link AltTranslationsAnnotation} for storing matches. 
  */
 public class ScoresAnnotation implements IAnnotation {
 

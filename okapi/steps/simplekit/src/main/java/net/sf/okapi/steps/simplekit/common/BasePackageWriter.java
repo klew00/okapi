@@ -22,14 +22,18 @@ package net.sf.okapi.steps.simplekit.common;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.Segments;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 import java.io.File;
@@ -336,13 +340,35 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		}
 
 		// Check for alternates
-		AltTransAnnotation alt = tu.getAnnotation(AltTransAnnotation.class);
-		if ( alt != null ) {
-			alt.startIteration();
-			while ( alt.moveToNext() ) {
-				TextUnit altTu = alt.getEntry();
-				tmxWriterAlternate.writeItem(altTu, null, true);
+		TextContainer altCont = tu.getTarget(trgLoc);
+		if ( altCont != null ) {
+			// From the segments
+			Segments srcSegs = tu.getSource().getSegments();
+			for ( Segment seg : altCont.getSegments() ) {
+				Segment srcSeg = srcSegs.get(seg.id);
+				if ( srcSeg == null ) continue;
+				writeAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class), srcSeg.text);
 			}
+			// From the target container
+			TextFragment srcOriginal;
+			if ( tu.getSource().contentIsOneSegment() ) {
+				srcOriginal = tu.getSource().getFirstContent();
+			}
+			else {
+				srcOriginal = tu.getSource().getUnSegmentedContentCopy();
+			}
+			writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), srcOriginal);
+		}
+	}
+	
+	private void writeAltTranslations (AltTranslationsAnnotation ann,
+		TextFragment srcOriginal)
+	{
+		if ( ann == null ) {
+			return;
+		}
+		for ( AltTranslation alt : ann ) {
+			tmxWriterAlternate.writeAlternate(alt, srcOriginal);
 		}
 	}
 

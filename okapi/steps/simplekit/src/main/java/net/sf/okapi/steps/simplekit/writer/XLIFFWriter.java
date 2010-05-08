@@ -341,36 +341,18 @@ public class XLIFFWriter {
 				writer.writeEndElementLineBreak(); // target
 			}
 
-			// Alternate Translations
-			for ( Segment seg : tc.getSegments() ) {
-				AltTranslationsAnnotation ann = seg.getAnnotation(AltTranslationsAnnotation.class);
-				if ( ann == null ) continue; // Move to next segment
-				
-				for ( AltTranslation alt : ann ) {
-					writer.writeStartElement("alt-trans");
-					if ( tc.hasBeenSegmented() ) {
-						writer.writeAttributeString("mid", seg.getId());
-					}
-					writer.writeAttributeString("match-quality", String.format("%d", alt.getScore()));
-					if ( !Util.isEmpty(alt.getOrigin()) ) {
-						writer.writeAttributeString("origin", alt.getOrigin());
-					}
-					TextUnit altTu = alt.getEntry();
-					if ( !altTu.isEmpty() ) {
-						writer.writeStartElement("source");
-						writer.writeAttributeString("xml:lang", alt.getSourceLocale().toBCP47());
-						// Write full source content (always without segments markers
-						writer.writeRawXML(xliffCont.toSegmentedString(alt.getSource(), 0, false, false, placeholderMode));
-						writer.writeEndElementLineBreak(); // source
-					}
-					writer.writeStartElement("target");
-					writer.writeAttributeString("xml:lang", alt.getTargetLocale().toBCP47());
-					writer.writeRawXML(xliffCont.toSegmentedString(alt.getTarget(), 0, false, false, placeholderMode));
-					writer.writeEndElementLineBreak(); // target
-					writer.writeEndElementLineBreak(); // alt-trans
+			// Possible alternate translations
+			// We re-get the target because tc could be coming from the source
+			TextContainer altCont = tu.getTarget(trgLoc);
+			if ( altCont != null ) {
+				// From the segments
+				for ( Segment seg : altCont.getSegments() ) {
+					writeAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class),
+						altCont.hasBeenSegmented(), seg);
 				}
+				// From the target container
+				writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), false, null);
 			}
-
 		}
 		
 		// Note
@@ -381,6 +363,48 @@ public class XLIFFWriter {
 		}
 
 		writer.writeEndElementLineBreak(); // trans-unit
+	}
+
+	/**
+	 * Writes possible alternate translations
+	 * @param ann the annotation with the alternate translations (can be null)
+	 * @param hasBeenSegmented indicates if the annotation comes from a segmented container
+	 * (this is needed because a non-segmented container is still  with a Segment). 
+	 * @param segment the segment where the annotation comes from, or null  if the
+	 * annotation comes from the container.
+	 */
+	private void writeAltTranslations (AltTranslationsAnnotation ann,
+		boolean hasBeenSegmented,
+		Segment segment)
+	{
+		if ( ann == null ) {
+			return;
+		}
+		for ( AltTranslation alt : ann ) {
+			writer.writeStartElement("alt-trans");
+			if (( segment != null ) && hasBeenSegmented ) {
+				writer.writeAttributeString("mid", segment.getId());
+			}
+			if ( alt.getScore() > 0 ) {
+				writer.writeAttributeString("match-quality", String.format("%d", alt.getScore()));
+			}
+			if ( !Util.isEmpty(alt.getOrigin()) ) {
+				writer.writeAttributeString("origin", alt.getOrigin());
+			}
+			TextUnit altTu = alt.getEntry();
+			if ( !altTu.isEmpty() ) {
+				writer.writeStartElement("source");
+				writer.writeAttributeString("xml:lang", alt.getSourceLocale().toBCP47());
+				// Write full source content (always without segments markers
+				writer.writeRawXML(xliffCont.toSegmentedString(alt.getSource(), 0, false, false, placeholderMode));
+				writer.writeEndElementLineBreak(); // source
+			}
+			writer.writeStartElement("target");
+			writer.writeAttributeString("xml:lang", alt.getTargetLocale().toBCP47());
+			writer.writeRawXML(xliffCont.toSegmentedString(alt.getTarget(), 0, false, false, placeholderMode));
+			writer.writeEndElementLineBreak(); // target
+			writer.writeEndElementLineBreak(); // alt-trans
+		}
 	}
 
 }
