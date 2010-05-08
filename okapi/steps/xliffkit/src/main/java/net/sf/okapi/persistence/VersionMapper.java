@@ -48,8 +48,13 @@ public class VersionMapper {
 		return versionMap.get(getMapping(versionId));
 	}
 	
-	public static void mapVersionId(String oldName, String newName) {
-		versionIdMap.put(oldName, newName);
+	/**
+	 * Maps a VersionId to another VersionId. Used for backwards compatibility with older formats if the VersionId has changed.   
+	 * @param previousVersionId old VersionId
+	 * @param versionId new VersionId
+	 */
+	public static void mapVersionId(String previousVersionId, String versionId) {
+		versionIdMap.put(previousVersionId, versionId);
 	}
 	
 	public static String getMapping(String versionId) {
