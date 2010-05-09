@@ -22,13 +22,20 @@ package net.sf.okapi.connectors.pensieve;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.FolderInputPart;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
+	private static final String USESERVER = "useServer";
+	private static final String HOST = "host";
 	private static final String DBDIRECTORY = "dbDirectory";
 
+	private boolean useServer;
+	private String host;
 	private String dbDirectory;
 	
 	public Parameters () {
@@ -40,6 +47,22 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fromString(initialData);
 	}
 	
+	public boolean getUseServer () {
+		return useServer;
+	}
+
+	public void setUseServer (boolean useServer) {
+		this.useServer = useServer;
+	}
+
+	public String getHost () {
+		return host;
+	}
+
+	public void setHost (String host) {
+		this.host = host;
+	}
+
 	public String getDbDirectory () {
 		return dbDirectory;
 	}
@@ -52,17 +75,23 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
+		useServer = buffer.getBoolean(USESERVER, useServer);
+		host = buffer.getString(HOST, host);
 		dbDirectory = buffer.getString(DBDIRECTORY, dbDirectory);
 	}
 
 	@Override
 	public void reset () {
 		dbDirectory = "";
+		host = "http://localhost:8080/";
+		useServer = false;
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
+		buffer.setBoolean(USESERVER, useServer);
+		buffer.setString(HOST, host);
 		buffer.setString(DBDIRECTORY, dbDirectory);
 		return buffer.toString();
 	}
@@ -70,6 +99,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(USESERVER, "Use a server instead of a file", null);
+		desc.add(HOST, "Server URL", "URL of the server to use (e.g. http://localhost:8080/");
 		desc.add(DBDIRECTORY, "TM Directory", "Directory of the TM database");
 		return desc;
 	}
@@ -77,7 +108,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Pensieve TM Connector Settings", true, false);
-		desc.addFolderInputPart(paramsDesc.get(Parameters.DBDIRECTORY), "TM Directory");
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(Parameters.USESERVER));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.HOST));
+		tip.setMasterPart(cbp, true);
+		FolderInputPart fip = desc.addFolderInputPart(paramsDesc.get(Parameters.DBDIRECTORY), "TM Directory");
+		fip.setMasterPart(cbp, false);
 		return desc;
 	}
 

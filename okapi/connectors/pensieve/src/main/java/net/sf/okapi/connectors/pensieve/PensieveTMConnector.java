@@ -32,8 +32,18 @@ import net.sf.okapi.tm.pensieve.common.TmHit;
 import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
 
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 public class PensieveTMConnector implements ITMQuery {
 
@@ -47,6 +57,8 @@ public class PensieveTMConnector implements ITMQuery {
 	private ITmSeeker seeker;
 	private Metadata attrs;
 	private String rootDir;
+	private JSONParser parser;
+	private String basePart;
 	
 	public PensieveTMConnector () {
 		params = new Parameters();
@@ -60,9 +72,16 @@ public class PensieveTMConnector implements ITMQuery {
 
 	@Override
 	public String getSettingsDisplay () {
-		return "Database: " + (Util.isEmpty(params.getDbDirectory())
-			? "<To be specified>"
-			: params.getDbDirectory());
+		if ( params.getUseServer() ) {
+			return "Server: " + (Util.isEmpty(params.getHost())
+				? "<To be specified>"
+				: params.getHost());
+		}
+		else {
+			return "Database: " + (Util.isEmpty(params.getDbDirectory())
+				? "<To be specified>"
+				: params.getDbDirectory());
+		}
 	}
 
 	@Override
@@ -111,15 +130,24 @@ public class PensieveTMConnector implements ITMQuery {
 
 	@Override
 	public void open () {
-		// Create a seeker (the TM must exist: we are just querying)
-		seeker = TmSeekerFactory.createFileBasedTmSeeker(
-			Util.fillRootDirectoryVariable(params.getDbDirectory(), rootDir));
+		if ( params.getUseServer() ) {
+			parser = new JSONParser();
+		}
+		else {
+			// Create a seeker (the TM must exist: we are just querying)
+			seeker = TmSeekerFactory.createFileBasedTmSeeker(
+				Util.fillRootDirectoryVariable(params.getDbDirectory(), rootDir));
+		}
 	}
 
 	@Override
 	public int query (String plainText) {
-		TextFragment tf = new TextFragment(plainText);
-		return query(tf);
+		if ( params.getUseServer() ) {
+			return queryServer(new TextFragment(plainText));
+		}
+		else {
+			return query(new TextFragment(plainText));
+		}
 	}
 
 	@Override
@@ -147,6 +175,30 @@ public class PensieveTMConnector implements ITMQuery {
 			current = 0;
 		}
 		return results.size();
+	}
+	
+	private int queryServer (TextFragment fragment) {
+		results = new ArrayList<QueryResult>();
+		current = -1;
+		try {
+			// Check if there is actually text to translate
+			if ( !fragment.hasText(false) ) return 0;
+
+			//TODO: deal with inline codes
+			String qtext = fragment.toString();
+			
+			// Create the connection and query
+			URL url = new URL(basePart + String.format("?q=%s", URLEncoder.encode(qtext, "UTF-8")));
+			URLConnection conn = url.openConnection();
+			
+			// Get the response
+			JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error querying the server." + e.getMessage(), e);
+		}
+		return ((current==0) ? 1 : 0);
 	}
 
 	@Override
@@ -194,6 +246,12 @@ public class PensieveTMConnector implements ITMQuery {
 	{
 		srcLoc = sourceLocale;
 		trgLoc = targetLocale;
+		
+		String host = params.getHost();
+		if ( host.endsWith("/") || host.endsWith("\\") ) {
+			host = host.substring(0, host.length()-1);
+		}
+		basePart = String.format("%s/search/%s/%s/", host, srcLoc.toBCP47(), trgLoc.toBCP47());
 	}
 
 	@Override
