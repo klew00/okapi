@@ -375,11 +375,14 @@
 			<groupId>net.sf.okapi.steps</groupId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 
+		Can't have this one here when it's commented out in okapi/steps/pom.xml 
 		<dependency>
 			<artifactId>okapi-step-xliffkit</artifactId>
 			<groupId>net.sf.okapi.steps</groupId>
 			<version>${project.version}</version>
 		</dependency>
+		 -->
 		<dependency>
 			<artifactId>okapi-step-xsltransform	</artifactId>
 			<groupId>net.sf.okapi.steps</groupId>
