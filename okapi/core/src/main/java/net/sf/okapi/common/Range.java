@@ -62,21 +62,20 @@ public class Range {
 		this.id = id;
 	}
 	
-	/**
-	 * Gets the string representation of the range without id 
-	 * (its start and end position between parenthesis, the id is not represented).
-	 * @return the string representation of the range.
-	 * @see #toStringWithId()
-	 */
-	public String toStringWithoutId () {
-		return String.format("(%d,%d)", start, end);
-	}
+//	/**
+//	 * Gets the string representation of the range without id 
+//	 * (its start and end position between parenthesis, the id is not represented).
+//	 * @return the string representation of the range.
+//	 * @see #toString()
+//	 */
+//	public String toStringWithoutId () {
+//		return String.format("(%d,%d)", start, end);
+//	}
 	
 	/**
 	 * Gets the string representation of the range with its id (its start and end position, and the id
 	 * between parenthesis).
 	 * @return the string representation of the range and its id.
-	 * @see #toString()
 	 */
 	public String toString () {
 		return String.format("(%d,%d,%s)", start, end, id);

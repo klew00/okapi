@@ -76,7 +76,8 @@ public class MicrosoftMTConnector extends BaseConnector {
 		result.source = new TextFragment(plainText);
 		result.target = new TextFragment(res);
 		result.score = 95; // Arbitrary score for MT
-		result.origin = Util.ORIGIN_MT;
+		result.origin = getName();
+		result.fromMT = true;
 		current = 0;
 		return 1;
 	}
@@ -92,7 +93,8 @@ public class MicrosoftMTConnector extends BaseConnector {
 		result.source = text;
 		result.target = util.createNewFragmentWithCodes(res);
 		result.score = 95; // Arbitrary score for MT
-		result.origin = Util.ORIGIN_MT;
+		result.origin = getName();
+		result.fromMT = true;
 		current = 0;
 		return 1;
 	}

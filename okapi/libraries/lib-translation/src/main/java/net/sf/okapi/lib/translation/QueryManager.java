@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
@@ -488,7 +490,7 @@ public class QueryManager {
 				scores.add(0, null);
 				continue;
 			}
-			
+
 			qr = next();
 			// It's a 100% match
 			if ( qr.score == 100 ) {
@@ -499,33 +501,33 @@ public class QueryManager {
 						continue;
 					}
 					// If we do: Use the first one and lower the score to 99%
-					scores.add(99, qr.origin);
+					scores.add(99, (qr.fromMT ? Util.MTFLAG : qr.origin));
 					seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 					leveraged++;
 					// temporary code for alt-trans annotation
-					AltTranslationsAnnotation alt = new AltTranslationsAnnotation();
-					alt.add(srcLoc, trgLoc, seg.text, qr.source, qr.target, AltTranslationType.MT, qr.score, qr.origin);
-					seg.setAnnotation(alt);
+					addAltTranslation(seg, new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
+						qr.target, (qr.fromMT ? AltTranslationType.MT : AltTranslationType.TM),
+						qr.score, qr.origin));
 					continue;
 				}
 				// Else: First is 100%, possibly several that have the same translations
-				scores.add(qr.score, qr.origin); // That's 100% then
+				scores.add(qr.score, (qr.fromMT ? Util.MTFLAG : qr.origin)); // That's 100% then
 				seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 				leveraged++;
 				// temporary code for alt-trans annotation
-				AltTranslationsAnnotation alt = new AltTranslationsAnnotation();
-				alt.add(srcLoc, trgLoc, seg.text, qr.source, qr.target, AltTranslationType.MT, qr.score, qr.origin);
-				seg.setAnnotation(alt);
+				addAltTranslation(seg, new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
+					qr.target, (qr.fromMT ? AltTranslationType.MT : AltTranslationType.TM),
+					qr.score, qr.origin));
 				continue;
 			}
 			// First is not 100%: use it and move on
-			scores.add(qr.score, qr.origin);
+			scores.add(qr.score, (qr.fromMT ? Util.MTFLAG : qr.origin));
 			seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 			leveraged++;
 			// temporary code for alt-trans annotation
-			AltTranslationsAnnotation alt = new AltTranslationsAnnotation();
-			alt.add(srcLoc, trgLoc, seg.text, qr.source, qr.target, AltTranslationType.MT, qr.score, qr.origin);
-			seg.setAnnotation(alt);
+			addAltTranslation(seg, new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
+				qr.target, (qr.fromMT ? AltTranslationType.MT : AltTranslationType.TM),
+				qr.score, qr.origin));
 		}
 		
 		// Set the scores only if there is something to report
@@ -542,6 +544,15 @@ public class QueryManager {
 				tu.removeTarget(trgLoc);
 			}
 		}
+	}
+	
+	private void addAltTranslation (Segment seg, AltTranslation alt) {
+		AltTranslationsAnnotation altTrans = seg.getAnnotation(AltTranslationsAnnotation.class);
+		if ( altTrans == null ) {
+			altTrans = new AltTranslationsAnnotation();
+			seg.setAnnotation(altTrans);
+		}
+		altTrans.add(alt);
 	}
 	
 	private boolean exactsHaveSameTranslation () {

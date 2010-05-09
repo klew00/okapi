@@ -60,6 +60,11 @@ public class QueryResult implements Comparable<QueryResult> {
 	public String origin;
 	
 	/**
+	 * Indicator telling if the result is coming from a machine translation engine or not.
+	 */
+	public boolean fromMT;
+	
+	/**
 	 * Compares this QueryResult with another one.
 	 * The weight is used for the comparison.
 	 * @param other The other QueryResult to compare this one with.

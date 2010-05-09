@@ -146,6 +146,7 @@ public class LeveragingStep extends BasePipelineStep {
     	}
     	if ( approved ) return event; // Do not leverage pre-approved entries
     	
+//TODO To be deleted (multi-matches allowed with the new annotation
     	// Check if this entry has been leveraged once already
     	// (this allows to have several Leveraging steps in the same pipeline)
     	TextContainer tc = tu.getTarget(targetLocale);
@@ -153,7 +154,7 @@ public class LeveragingStep extends BasePipelineStep {
     		ScoresAnnotation scores = tc.getAnnotation(ScoresAnnotation.class);
     		if ( scores != null ) return event; // Don't overwrite existing leverage
     	}
-
+//end of to be deleted 
     	// Leverage
 		qm.leverage(tu, tmxWriter, params.getFillTarget());
 		

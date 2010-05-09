@@ -103,7 +103,6 @@ public class XLIFFFilter implements IFilter {
 	private Stack<Integer> parentIds;
 	private AltTranslationsAnnotation altTrans;
 	private int altTransQuality;
-//	private String altTransMid;
 	private boolean inAltTrans;
 	private boolean processAltTrans;
 	private Stack<Boolean> preserveSpaces;
@@ -824,7 +823,7 @@ public class XLIFFFilter implements IFilter {
 		}
 		
 		// Get possible mid for segment
-//		altTransMid = reader.getAttributeValue(null, "mid");
+		String mid = reader.getAttributeValue(null, "mid");
 		// Get possible score
 		tmp = reader.getAttributeValue(null, "match-quality");
 		if ( !Util.isEmpty(tmp) ) {
@@ -840,15 +839,42 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		
-		// Creates an annotation for the alt-trans if there is none yet.
-		if ( altTrans == null ) {
-			altTrans = new AltTranslationsAnnotation();
-//TODO: How about segmented entries???
-			// Create an empty target if there was no target
-			if ( !tu.hasTarget(trgLang) ) {
-				tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
+		// Look where the annotation needs to go: segment or container?
+		// Get the target (and possibly creates it if needed)
+		TextContainer tc = tu.getTarget(trgLang);
+		if ( tc == null ) {
+			// Create a target from the source if needed
+			tc = tu.createTarget(trgLang, false, IResource.COPY_CONTENT);
+			// Make sure it's empty, but that segments are preserved
+			for ( Segment seg : tc.getSegments() ) {
+				seg.text.clear();
 			}
-			tu.getTarget(trgLang).setAnnotation(altTrans);
+		}
+		
+		if ( mid == null ) { // Annotation should be Attached on the container
+			altTrans = tc.getAnnotation(AltTranslationsAnnotation.class);
+			if ( altTrans == null ) {
+				// If none exists: create one
+				altTrans = new AltTranslationsAnnotation();
+				tc.setAnnotation(altTrans);
+			}
+		}
+		else { // Annotation should be attached to its corresponding segment 
+			//TODO: No optimal to re-create segments every single time...
+			Segment seg = tc.getSegments().get(mid);
+			if ( seg == null ) {
+				// No corresponding segment found. We drop that entry
+				logger.warning(String.format("An <alt-trans> element for an unknown segment '%s' was detected. It will be ignored.", mid));
+				processAltTrans = false;
+				return;
+			}
+			// Else: get possible existing annotation
+			altTrans = seg.getAnnotation(AltTranslationsAnnotation.class);
+			if ( altTrans == null ) {
+				// If none exists: create one
+				altTrans = new AltTranslationsAnnotation();
+				seg.setAnnotation(altTrans);
+			}
 		}
 	}
 	

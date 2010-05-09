@@ -43,6 +43,14 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	}
 	
 	/**
+	 * Adds an existing {@link AltTranslation} object to this annotation.
+	 * @param alt the {@link AltTranslation} object to add.
+	 */
+	public void add (AltTranslation alt) {
+		list.add(alt);
+	}
+	
+	/**
 	 * Adds a new entry to the list of alternate translations.
 	 * @param sourceLocId the locale of the source.
 	 * @param targetLocId the locale of the target.

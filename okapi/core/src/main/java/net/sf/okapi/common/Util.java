@@ -84,7 +84,7 @@ public class Util {
 	/**
 	 * Shared flag indicating a translation that was generated using machine translation.
 	 */
-	public static final String ORIGIN_MT = "MT!";
+	public static final String MTFLAG = "MT!";
 	
 
 	// Used by openURL()

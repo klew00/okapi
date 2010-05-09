@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
@@ -367,7 +368,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 		
 		if ( srcCont.hasBeenSegmented() || !srcCont.contentIsOneSegment()
-			|| ( trgCont.getAnnotation(ScoresAnnotation.class) != null ))
+			|| ( trgCont.getAnnotation(ScoresAnnotation.class) != null )
+			|| ( trgCont.getAnnotation(AltTranslationsAnnotation.class) != null ))
 		{
 			return getSegmentedText(srcCont, trgCont, locToUse, context, tu.isReferent());
 		}

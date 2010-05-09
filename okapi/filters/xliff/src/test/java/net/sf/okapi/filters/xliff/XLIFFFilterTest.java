@@ -269,6 +269,26 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testMixedAlTrans () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithMixedAltTrans(), 1);
+		assertNotNull(tu);
+		assertEquals("t1 inter t2", tu.getSource().toString());
+		assertEquals("[t1] inter [t2]", fmt.printSegmentedContent(tu.getSource(), true));
+		assertEquals("[] inter []", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+		AltTranslationsAnnotation annot = tu.getTarget(locFR).getAnnotation(AltTranslationsAnnotation.class);
+		assertNotNull(annot);
+		assertEquals("", annot.getFirst().getEntry().getSource().toString()); // No source
+		assertEquals("TRG for t1 inter t2", annot.getFirst().getEntry().getTarget(locFR).toString());
+		Segments segs = tu.getTarget(locFR).getSegments();
+		annot = segs.get(0).getAnnotation(AltTranslationsAnnotation.class);
+		assertNull(annot);
+		annot = segs.get(1).getAnnotation(AltTranslationsAnnotation.class);
+		assertEquals("", annot.getFirst().getEntry().getSource().toString()); // No source
+		assertEquals("TRG for t2", annot.getFirst().getEntry().getTarget(locFR).toString());
+		assertNotNull(annot);
+	}
+
+	@Test
 	public void testOutputBPTTypeTransUnit () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">"
@@ -693,6 +713,26 @@ public class XLIFFFilterTest {
 			+ "<alt-trans>"
 			+ "<source>alt source <bpt id=\"1\">{</bpt>t1<ept id=\"1\">}</ept></source>"
 			+ "<target>alt target <mrk mtype=\"term\"><bpt id=\"1\">{</bpt>t1<ept id=\"1\">}</ept></mrk></target>"
+			+ "</alt-trans>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		return getEvents(snippet);
+	}
+	
+	private ArrayList<Event> createTUWithMixedAltTrans () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1 inter t2</source>"
+			+ "<seg-source><mrk mid=\"s1\" mtype=\"seg\">t1</mrk> inter <mrk mid=\"s2\" mtype=\"seg\">t2</mrk></seg-source>"
+			+ "<alt-trans>"
+			+ "<target>TRG for t1 inter t2</target>"
+			+ "</alt-trans>"
+			+ "<alt-trans mid=\"s2\">"
+			+ "<target>TRG for t2</target>"
 			+ "</alt-trans>"
 			+ "</trans-unit>"
 			+ "</body>"

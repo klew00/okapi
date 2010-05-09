@@ -69,7 +69,7 @@ public class TMXWriter {
     	}
     	writer = new XMLWriter(path);
     	MTattribute = new Hashtable<String, String>();
-    	MTattribute.put(CREATIONID, Util.ORIGIN_MT);
+    	MTattribute.put(CREATIONID, Util.MTFLAG);
     }
 
     /**
@@ -144,7 +144,7 @@ public class TMXWriter {
     /**
      * Sets the flag indicating if entries originating from MT should be written with a special
      * prefix in the source text (forcing a fuzzy match). An entry is deemed originating from
-     * MT when its <code>creationid</code> attribute is set to <code>{@link Util#ORIGIN_MT}</code>. 
+     * MT when its <code>creationid</code> attribute is set to <code>{@link Util#MTFLAG}</code>. 
      * @param useMTPrefix true to use a prefix for entries originating from MT.
      */
     public void setUseMTPrefix (boolean useMTPrefix) {
@@ -281,11 +281,11 @@ public class TMXWriter {
 					continue;
 				}
 				// Scored properly. Now see if we need to alter the source text
-				if (( si.origin != null ) && si.origin.equals(Util.ORIGIN_MT) ) {
+				if (( si.origin != null ) && si.origin.equals(Util.MTFLAG) ) {
 					// Set the MT flag attribute
 		        	if ( attributes != null ) {
 		        		if ( !attributes.containsKey(CREATIONID) ) {
-		        			attributes.put(CREATIONID, Util.ORIGIN_MT);
+		        			attributes.put(CREATIONID, Util.MTFLAG);
 		        		}
 		        	}
 		        	else {
@@ -295,7 +295,7 @@ public class TMXWriter {
 		        	// Add the flag prefix if requested (that's why we clone)
 		        	if ( useMTPrefix ) {
 		        		tf = srcSeg.text.clone();
-		        		tf.setCodedText(Util.ORIGIN_MT+" "+tf.getCodedText());
+		        		tf.setCodedText(Util.MTFLAG+" "+tf.getCodedText());
 		        	}
 				}
     		}

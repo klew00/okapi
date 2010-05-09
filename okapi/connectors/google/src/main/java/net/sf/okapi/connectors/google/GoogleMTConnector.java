@@ -32,7 +32,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -126,7 +125,8 @@ public class GoogleMTConnector extends BaseConnector {
 				result.target = new TextFragment(util.fromCodedHTML(res, fragment));
 			}
 			result.score = 95; // Arbitrary score for MT
-			result.origin = Util.ORIGIN_MT;
+			result.origin = getName();
+			result.fromMT = true;
 			current = 0;
 		}
 		catch ( Throwable e ) {

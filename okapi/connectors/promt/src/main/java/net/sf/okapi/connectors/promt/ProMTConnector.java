@@ -246,7 +246,8 @@ public class ProMTConnector implements IQuery {
 	        		}
 	        		
 	        		result.score = 95; // Arbitrary score for MT
-	        		result.origin = Util.ORIGIN_MT;
+	        		result.origin = getName();
+	        		result.fromMT = true;
 	    			current = 0;
 	        	}
 	        }

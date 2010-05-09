@@ -33,7 +33,6 @@ import org.tempuri.OtmsSoapStub;
 import org.tempuri.Query;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -61,7 +60,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 
 	@Override
 	public String getName () {
-		return "MyMemory-TM";
+		return "MyMemory.net";
 	}
 
 	@Override
@@ -136,7 +135,8 @@ public class MyMemoryTMConnector implements ITMQuery {
 					if ( ++i > maxHits ) break; // Maximum reached
 					res = new QueryResult();
 					if ( match.getTranslator().equals("MT!") ) {
-						res.origin = Util.ORIGIN_MT;
+						res.origin = getName();
+						res.fromMT = true;
 						res.score = 95; // Standard score for MT
 					}
 					else res.score = match.getScore();

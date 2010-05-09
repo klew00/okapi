@@ -99,7 +99,7 @@ public class BatchTranslator {
 		qutil = new QueryUtil();
 		initDone = false;
 		attributes = new Hashtable<String, String>();
-		attributes.put("creationid", Util.ORIGIN_MT);
+		attributes.put("creationid", Util.MTFLAG);
 	}
 	
 	@Override

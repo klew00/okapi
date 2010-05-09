@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,6 +22,7 @@ package net.sf.okapi.common.annotation;
 
 /**
  * Stores the information for a score used in a {@link ScoresAnnotation}.
+ * @deprecated This class will be deleted soon. Use {@link AltTranslation} instead.
  */
 public class ScoreInfo {
 

@@ -37,6 +37,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -418,6 +419,7 @@ public class TTXFilter implements IFilter {
 			TextFragment current = inter;
 			boolean returnValueAfterTextUnitDone = true;
 			ScoresAnnotation scores = null;
+			AltTranslationsAnnotation altTrans = null;
 
 			String tmp;
 			String name;
@@ -604,7 +606,6 @@ public class TTXFilter implements IFilter {
 				TextContainer cont = srcCont.clone();
 				int i = 0;
 				for ( Segment seg : cont.getSegments() ) {
-		    		
 					seg.text = trgFragments.get(i);
 					i++;
 				}
