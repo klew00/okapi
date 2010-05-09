@@ -117,7 +117,7 @@ public class GMX {
 	final public static String DateAutoTextWordCount = "DateAutoTextWordCount";
 
 	/**
-	 * An accumulation of the word count for identifiable trade marks, e.g. "Weapons of Mass Destruction™".
+	 * An accumulation of the word count for identifiable trade marks, e.g. "Weapons of Mass Destruction...".
 	 */
 	final public static String TMAutoTextWordCount = "TMAutoTextWordCount";
 
@@ -223,7 +223,7 @@ public class GMX {
 	final public static String DateAutoTextCharacterCount = "DateAutoTextCharacterCount";
 
 	/**
-	 * An accumulation of the character count for identifiable trade marks, e.g. "Weapons of Mass Destruction�". 
+	 * An accumulation of the character count for identifiable trade marks, e.g. "Weapons of Mass Destruction...". 
 	 */
 	final public static String TMAutoTextCharacterCount = "TMAutoTextCharacterCount";
 
