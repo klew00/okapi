@@ -33,8 +33,6 @@ import net.sf.okapi.tm.pensieve.seeker.ITmSeeker;
 import net.sf.okapi.tm.pensieve.seeker.TmSeekerFactory;
 
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -142,11 +140,13 @@ public class PensieveTMConnector implements ITMQuery {
 
 	@Override
 	public int query (String plainText) {
+		results = new ArrayList<QueryResult>();
+		current = -1;
 		if ( params.getUseServer() ) {
 			return queryServer(new TextFragment(plainText));
 		}
 		else {
-			return query(new TextFragment(plainText));
+			return queryDirectory(new TextFragment(plainText));
 		}
 	}
 
@@ -154,6 +154,16 @@ public class PensieveTMConnector implements ITMQuery {
 	public int query (TextFragment text) {
 		results = new ArrayList<QueryResult>();
 		current = -1;
+		if ( params.getUseServer() ) {
+			return queryServer(text);
+		}
+		else {
+			return queryDirectory(text);
+		}
+	}
+	
+	// Direct query, using the seeker
+	private int queryDirectory (TextFragment text) {
 		List<TmHit> list;
 		if ( threshold >= 100 ) { 
 			list = seeker.searchExact(text, attrs);
@@ -177,9 +187,8 @@ public class PensieveTMConnector implements ITMQuery {
 		return results.size();
 	}
 	
+	// Indirect query, using the pensieve-server API
 	private int queryServer (TextFragment fragment) {
-		results = new ArrayList<QueryResult>();
-		current = -1;
 		try {
 			// Check if there is actually text to translate
 			if ( !fragment.hasText(false) ) return 0;
@@ -193,7 +202,15 @@ public class PensieveTMConnector implements ITMQuery {
 			
 			// Get the response
 			JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-			
+			@SuppressWarnings("unchecked")
+			List<Map<String, Object>> list = (List<Map<String, Object>>)object;
+			for ( Map<String, Object> map : list ) {
+				QueryResult result = new QueryResult();
+				result.source = new TextFragment((String)map.get("source"));
+				result.target = new TextFragment((String)map.get("target"));
+				result.score = ((Float)map.get("score")).intValue();
+				result.origin = getName();
+			}
 		}
 		catch ( Throwable e ) {
 			throw new RuntimeException("Error querying the server." + e.getMessage(), e);
