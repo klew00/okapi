@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -96,49 +96,38 @@ public class GenericEditor {
 	 */
 	private class CtrlSelectionListener implements Listener {
 		
-		private boolean enabledOnSelection;
 		private Button masterCtrl;
 
-		public CtrlSelectionListener (Control masterCtrl,
-			boolean enabledOnSelection)
-		{
+		public CtrlSelectionListener (Control masterCtrl) {
 			this.masterCtrl = (Button)masterCtrl;
-			this.enabledOnSelection = enabledOnSelection;
 		}
 		
 		public void handleEvent (Event event) {
-			if ( enabledOnSelection ) {
-				propagate(masterCtrl, masterCtrl.getSelection());
-			}
-			else {
-				propagate(masterCtrl, !masterCtrl.getSelection());
-			}
+			propagate(masterCtrl, masterCtrl.getSelection());
 		}
 		
-		private void propagate (Control ctrl, boolean enabled) {
+		private void propagate (Control ctrl,
+			boolean checked)
+		{
 			Button button = (Button)ctrl;
 			MasterItem mi = masters.get(button);
 			for ( AbstractPart part : mi.slaves ) {
 				Control slaveCtrl = controls.get(part.getName());
 				if ( masters.containsKey(slaveCtrl) ) {
-					slaveCtrl.setEnabled(enabled);
-					if ( part.isEnabledOnSelection() ) {
-						if ( enabled ) propagate(slaveCtrl, button.getSelection());
-						else propagate(slaveCtrl, false);
+					slaveCtrl.setEnabled(checked);
+					if ( checked ) {
+						propagate(slaveCtrl, part.isEnabledOnSelection());
 					}
 					else {
-						if ( enabled ) propagate(slaveCtrl, !button.getSelection());
-						else propagate(slaveCtrl, false);
+						propagate(slaveCtrl, !part.isEnabledOnSelection());
 					}
 				}
 				else {
-					if ( part.isEnabledOnSelection() ) {
-						if ( enabled ) slaveCtrl.setEnabled(button.getSelection());
-						else slaveCtrl.setEnabled(false);
+					if ( checked ) {
+						slaveCtrl.setEnabled(part.isEnabledOnSelection());
 					}
 					else {
-						if ( enabled ) slaveCtrl.setEnabled(!button.getSelection());
-						else slaveCtrl.setEnabled(false);
+						slaveCtrl.setEnabled(!part.isEnabledOnSelection());
 					}
 				}
 			}
@@ -377,183 +366,6 @@ public class GenericEditor {
 		setData();
 	}
 		
-//	private void create (Shell parent,
-//		IEditorDescriptionProvider descProv,
-//		boolean readOnly)
-//	{
-//		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
-//		GridLayout layTmp = new GridLayout(1, false);
-//		layTmp.marginBottom = 0;
-//		layTmp.verticalSpacing = 0;
-//		shell.setLayout(layTmp);
-//
-//		// Get the UI description
-//		ParametersDescription pd = params.getParametersDescription();
-//		if ( pd == null ) {
-//			throw new OkapiEditorCreationException(
-//				"This configuration cannot be edited with the generic editor because it does not provide a description of its parameters.");
-//		}
-//		description = descProv.createEditorDescription(pd);
-//		if ( description == null ) {
-//			throw new OkapiEditorCreationException(
-//				"This configuration cannot be edited with the generic editor because the UI description could not be created.");
-//		}
-//	
-//		controls = new Hashtable<String, Control>();
-//		masters = new Hashtable<Control, MasterItem>();
-//		
-//		// Set caption is it is provided
-//		if ( description.getCaption() != null ) {
-//			shell.setText(description.getCaption());
-//		}
-//		else { // Default caption
-//			shell.setText("Parameters");
-//		}
-//		
-//		// Set a frame if there is no tab(s)
-//		boolean hasTab = false;
-////		for ( IUIDescriptor desc : description.getDescriptors().values() ) {
-////			if ( desc instanceof TabDescriptor ) {
-////				hasTab = true;
-////				break;
-////			}
-////		}
-//		if ( hasTab ) {
-//			mainCmp = shell;
-//		}
-//		else {
-//			mainCmp = new Composite(shell, SWT.BORDER);
-//			mainCmp.setLayoutData(new GridData(GridData.FILL_BOTH));
-//			layTmp = new GridLayout(2, false);
-//			mainCmp.setLayout(layTmp);
-//		}
-//
-//		// Create the UI parts
-//		boolean hasPathInput = false;
-//		Composite cmp;
-//		GridData gdTmp;
-//		
-//		for ( AbstractPart part : description.getDescriptors().values() ) {
-//			// Create the control for the given part
-//			if ( part instanceof TextInputPart ) {
-//				TextInputPart d = (TextInputPart)part;
-//				cmp = lookupParent(d.getContainer());
-//				if ( d.isWithLabel() ) setLabel(cmp, d, 0);
-//				Text text = new Text(cmp, SWT.BORDER);
-//				controls.put(d.getName(), text);
-//				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-//				if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
-//				text.setLayoutData(gdTmp);
-//				text.setEditable(d.getWriteMethod()!=null);
-//				if ( d.isPassword() ) text.setEchoChar('*');
-//			}
-//			else if ( part instanceof CheckboxPart ) {
-//				CheckboxPart d = (CheckboxPart)part;
-//				cmp = lookupParent(d.getContainer());
-//				if ( !part.isVertical() ) new Label(cmp, SWT.NONE);
-//				Button button = new Button(cmp, SWT.CHECK);
-//				button.setToolTipText(d.getShortDescription());
-//				controls.put(d.getName(), button);
-//				if ( part.isVertical() || !part.isWithLabel() ) {
-//					gdTmp = new GridData();
-//					gdTmp.horizontalSpan = 2;
-//					button.setLayoutData(gdTmp);
-//				}
-//				button.setText(d.getDisplayName());
-//				button.setEnabled(d.getWriteMethod()!=null);
-//			}
-//			else if ( part instanceof PathInputPart ) {
-//				PathInputPart d = (PathInputPart)part;
-//				cmp = lookupParent(d.getContainer());
-//				if ( d.isWithLabel() ) setLabel(cmp, d, 0);
-//				TextAndBrowsePanel ctrl = new TextAndBrowsePanel(cmp, SWT.NONE, false);
-//				ctrl.setSaveAs(d.isForSaveAs());
-//				ctrl.setTitle(d.getBrowseTitle());
-//				ctrl.setBrowseFilters(d.getFilterNames(), d.getFilterExtensions());
-//				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-//				if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
-//				ctrl.setLayoutData(gdTmp);
-//				controls.put(d.getName(), ctrl);
-//				ctrl.setEditable(d.getWriteMethod()!=null);
-//				hasPathInput = true;
-//			}
-//			else if ( part instanceof ListSelectionPart ) {
-//				ListSelectionPart d = (ListSelectionPart)part;
-//				cmp = lookupParent(d.getContainer());
-//				if ( d.getListType() == ListSelectionPart.LISTTYPE_DROPDOWN ) {
-//					if ( d.isWithLabel() ) setLabel(cmp, d, 0);
-//					Combo combo = new Combo(cmp, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
-//					controls.put(d.getName(), combo);
-//					gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-//					if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
-//					combo.setLayoutData(gdTmp);
-//					combo.setEnabled(d.getWriteMethod()!=null);
-//				}
-//				else {
-//					if ( d.isWithLabel() ) setLabel(cmp, d, GridData.VERTICAL_ALIGN_BEGINNING);
-//					List list = new List(cmp, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-//					controls.put(d.getName(), list);
-//					gdTmp = new GridData(GridData.FILL_BOTH);
-//					if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
-//					list.setLayoutData(gdTmp);
-//					list.setEnabled(d.getWriteMethod()!=null);
-//				}
-//			}
-//			else if ( part instanceof CodeFinderPart ) {
-//				CodeFinderPart d = (CodeFinderPart)part;
-//				cmp = lookupParent(d.getContainer());
-//				if ( !part.isVertical() ) new Label(cmp, SWT.NONE);
-//				InlineCodeFinderPanel panel = new InlineCodeFinderPanel(cmp, SWT.NONE);
-//				controls.put(d.getName(), panel);
-//				if ( part.isVertical() || !part.isWithLabel() ) {
-//					gdTmp = new GridData();
-//					gdTmp.horizontalSpan = 2;
-//					panel.setLayoutData(gdTmp);
-//				}
-//				panel.setEnabled(d.getWriteMethod()!=null);
-//			}
-//
-//			// Update the list of observers if needed
-//			if ( part.getMasterPart() != null ) {
-//				addObserver(part);
-//			}
-//		}
-//		
-//		//--- Dialog-level buttons
-//
-//		SelectionAdapter okCancelActions = new SelectionAdapter() {
-//			public void widgetSelected(SelectionEvent e) {
-//				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-//					//if ( help != null ) help.showTopic(this, "index");
-//					return;
-//				}
-//				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
-//					if ( !saveData() ) return;
-//					result = true;
-//				}
-//				shell.close();
-//			};
-//		};
-//		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, okCancelActions, false);
-//		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-//		pnlActions.setLayoutData(gdTmp);
-//		pnlActions.btOK.setEnabled(!readOnly);
-//		if ( !readOnly ) {
-//			shell.setDefaultButton(pnlActions.btOK);
-//		}
-//
-//		shell.pack();
-//		shell.setMinimumSize(shell.getSize());
-//		if ( hasPathInput ) {
-//			Point startSize = shell.getMinimumSize();
-//			if ( startSize.x < 600 ) startSize.x = 600; 
-////			if ( startSize.y < 450 ) startSize.y = 450; 
-//			shell.setSize(startSize);
-//		}
-//		Dialogs.centerWindow(shell, parent);
-//		setData();
-//	}
-	
 	private void addObserver (AbstractPart part) {
 		// Add a listener to the master control
 		AbstractPart masterPart = part.getMasterPart();
@@ -562,8 +374,7 @@ public class GenericEditor {
 			throw new OkapiEditorCreationException(String.format(
 				"The master UI part for the part '%s' cannot be used as a toggle switch.", part.getName()));
 		}
-		masterCtrl.addListener(SWT.Selection,
-			new CtrlSelectionListener(masterCtrl, part.isEnabledOnSelection()));
+		masterCtrl.addListener(SWT.Selection, new CtrlSelectionListener(masterCtrl));
 		
 		// Add the master control to the list of masters
 		// This will be used later to cascade setEnabled()
