@@ -496,12 +496,27 @@ public class QueryManager {
 			if ( qr.score == 100 ) {
 				// Check if they are several and if they have the same translation
 				if ( !exactsHaveSameTranslation() ) {
-					if ( threshold == 100 ) {
+					if ( threshold >= 100 ) {
+						// several hits without same translation is like fuzzy matches
+						// So if the threshold is 100: don't leverage
 						scores.add(0, null);
 						continue;
 					}
-					// If we do: Use the first one and lower the score to 99%
-					scores.add(99, (qr.fromMT ? Util.MTFLAG : qr.origin));
+					else {
+						// If threshold is below 100: Use the first one and lower the score to 99%
+						scores.add(99, (qr.fromMT ? Util.MTFLAG : qr.origin));
+						seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
+						leveraged++;
+						// Temporary code for alt-trans annotation
+						addAltTranslation(seg, new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
+							qr.target, (qr.fromMT ? AltTranslationType.MT : AltTranslationType.TM),
+							qr.score, qr.origin));
+						continue;
+					}
+				}
+				else {
+					// Else: First is 100%, possibly several that have the same translations
+					scores.add(qr.score, (qr.fromMT ? Util.MTFLAG : qr.origin)); // That's 100% then
 					seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 					leveraged++;
 					// temporary code for alt-trans annotation
@@ -510,24 +525,17 @@ public class QueryManager {
 						qr.score, qr.origin));
 					continue;
 				}
-				// Else: First is 100%, possibly several that have the same translations
-				scores.add(qr.score, (qr.fromMT ? Util.MTFLAG : qr.origin)); // That's 100% then
+			}
+			else {
+				// First is not 100%: use it and move on
+				scores.add(qr.score, (qr.fromMT ? Util.MTFLAG : qr.origin));
 				seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 				leveraged++;
 				// temporary code for alt-trans annotation
 				addAltTranslation(seg, new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
 					qr.target, (qr.fromMT ? AltTranslationType.MT : AltTranslationType.TM),
 					qr.score, qr.origin));
-				continue;
 			}
-			// First is not 100%: use it and move on
-			scores.add(qr.score, (qr.fromMT ? Util.MTFLAG : qr.origin));
-			seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
-			leveraged++;
-			// temporary code for alt-trans annotation
-			addAltTranslation(seg, new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-				qr.target, (qr.fromMT ? AltTranslationType.MT : AltTranslationType.TM),
-				qr.score, qr.origin));
 		}
 		
 		// Set the scores only if there is something to report
@@ -540,6 +548,8 @@ public class QueryManager {
 			if ( tmxWriter != null ) {
 				tmxWriter.writeItem(tu, null);
 			}
+			// If the option to fill the target is not set, we clear the text
+			// But we keep the annotations: TODO
 			if ( !fillTarget ) {
 				tu.removeTarget(trgLoc);
 			}

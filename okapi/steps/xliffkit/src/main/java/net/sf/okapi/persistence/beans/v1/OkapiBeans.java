@@ -122,7 +122,6 @@ public class OkapiBeans implements IVersionDriver {
 		beanMapper.registerBean(POFilterWriter.class, TypeInfoBean.class);
 		beanMapper.registerBean(TableFilterWriter.class, TypeInfoBean.class);
 		// Annotations		
-		beanMapper.registerBean(AltTransAnnotation.class, AltTransAnnotationBean.class);
 		beanMapper.registerBean(AltTranslationsAnnotation.class, AltTranslationsAnnotationBean.class);		
 		beanMapper.registerBean(InlineAnnotation.class, InlineAnnotationBean.class);
 		beanMapper.registerBean(InputTokenAnnotation.class, InputTokenAnnotationBean.class);
