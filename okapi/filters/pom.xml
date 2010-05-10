@@ -34,5 +34,6 @@
         <module>json</module>
         <module>ttx</module>
         <module>vignette</module>
+        <module>railsyaml</module>
     </modules>
 </project>
