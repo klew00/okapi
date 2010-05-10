@@ -24,8 +24,8 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>net.sf.okapi.connectors</groupId>
-			<artifactId>okapi-connector-pensieve</artifactId>
+			<groupId>net.sf.okapi.tm</groupId>
+			<artifactId>okapi-tm-pensieve</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
