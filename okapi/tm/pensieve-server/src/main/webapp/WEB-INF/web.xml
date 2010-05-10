@@ -23,7 +23,12 @@
 
     <context-param>
         <param-name>resteasy.scan</param-name>
-        <param-value>true</param-value>
+        <param-value>false</param-value>
+    </context-param>
+
+    <context-param>
+    	<param-name>javax.ws.rs.Application</param-name>
+    	<param-value>net.sf.okapi.tm.pensieve.server.PensieveApplication</param-value>
     </context-param>
 
     <listener>
@@ -39,6 +44,4 @@
         <servlet-name>Resteasy</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
-
-
 </web-app>
