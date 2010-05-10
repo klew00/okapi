@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -99,7 +100,9 @@ public class PensieveTMConnector implements ITMQuery {
 
 	@Override
 	public void close () {
-		seeker.close();
+		if ( seeker != null ) {
+			seeker.close();
+		}
 	}
 
 	@Override
@@ -133,6 +136,7 @@ public class PensieveTMConnector implements ITMQuery {
 		}
 		else {
 			// Create a seeker (the TM must exist: we are just querying)
+			if ( seeker != null ) seeker.close();
 			seeker = TmSeekerFactory.createFileBasedTmSeeker(
 				Util.fillRootDirectoryVariable(params.getDbDirectory(), rootDir));
 		}
@@ -201,21 +205,23 @@ public class PensieveTMConnector implements ITMQuery {
 			URLConnection conn = url.openConnection();
 			
 			// Get the response
-			JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			JSONArray array = (JSONArray)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 			@SuppressWarnings("unchecked")
-			List<Map<String, Object>> list = (List<Map<String, Object>>)object;
+			List<Map<String, Object>> list = (List<Map<String, Object>>)array;
 			for ( Map<String, Object> map : list ) {
 				QueryResult result = new QueryResult();
 				result.source = new TextFragment((String)map.get("source"));
 				result.target = new TextFragment((String)map.get("target"));
-				result.score = ((Float)map.get("score")).intValue();
+				result.score = ((Double)map.get("score")).intValue();
 				result.origin = getName();
+				results.add(result);
 			}
+			if ( !Util.isEmpty(list) ) current = 0;
 		}
 		catch ( Throwable e ) {
 			throw new RuntimeException("Error querying the server." + e.getMessage(), e);
 		}
-		return ((current==0) ? 1 : 0);
+		return ((current==0) ? results.size() : 0);
 	}
 
 	@Override

@@ -111,7 +111,7 @@ public class Main {
 	protected boolean useApertium;
 	protected String apertiumParams;
 	protected boolean usePensieve;
-	protected String pensieveDir;
+	protected String pensieveData;
 	protected boolean useMicrosoft;
 	protected String microsoftParams;
 //	protected boolean useProMT;
@@ -279,9 +279,7 @@ public class Main {
 				}
 				else if ( arg.equals("-imp") ) {
 					prog.command = CMD_CONV2PEN;
-					prog.pensieveDir = prog.getArgument(args, ++i);
-					String ext = Util.getExtension(prog.pensieveDir);
-					if ( Util.isEmpty(ext) ) prog.pensieveDir += ".pentm";
+					prog.pensieveData = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-exp") ) {
 					prog.command = CMD_CONV2TMX;
@@ -350,9 +348,12 @@ public class Main {
 				}
 				else if ( arg.equals("-pen") ) {
 					prog.usePensieve = true;
-					prog.pensieveDir = prog.getArgument(args, ++i);
-					String ext = Util.getExtension(prog.pensieveDir);
-					if ( Util.isEmpty(ext) ) prog.pensieveDir += ".pentm";
+					prog.pensieveData = "http://localhost:8080";
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							prog.pensieveData = args.get(++i);
+						}
+					}
 				}
 				else if ( arg.endsWith("-listconf") || arg.equals("-lfc") ) {
 					prog.showAllConfigurations();
@@ -762,7 +763,7 @@ public class Main {
 				output += ".txt";
 			}
 			else { // Pensieve
-				output = pensieveDir;
+				output = checkPensieveDirExtension();
 			}
 			URI outputURI = new File(output).toURI();
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc);
@@ -1054,7 +1055,7 @@ public class Main {
 		}
 		else if ( command == CMD_CONV2PEN ) {
 			params.setOutputFormat(Parameters.FORMAT_PENSIEVE);
-			params.setOutputPath(pensieveDir);
+			params.setOutputPath(checkPensieveDirExtension());
 		}
 		
 		params.setSingleOutput(command==CMD_CONV2PEN);
@@ -1227,11 +1228,23 @@ public class Main {
 		driver.processBatch();
 	}
 
+	private String checkPensieveDirExtension () {
+		String ext = Util.getExtension(pensieveData);
+		if ( Util.isEmpty(ext) ) pensieveData += ".pentm";
+		return pensieveData;
+	}
+	
 	private IParameters prepareConnectorParameters (String connectorClassName) {
 		if ( connectorClassName.equals(PensieveTMConnector.class.getName()) ) {
 			net.sf.okapi.connectors.pensieve.Parameters params
 				= new net.sf.okapi.connectors.pensieve.Parameters();
-			params.setDbDirectory(pensieveDir);
+			if ( pensieveData.startsWith("http:") ) {
+				params.setHost(pensieveData);
+				params.setUseServer(true);
+			}
+			else {
+				params.setDbDirectory(checkPensieveDirExtension());
+			}
 			return params;
 		}
 

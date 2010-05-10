@@ -114,7 +114,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		//Note: MESSAGE is for internal use, and not exposed
 		//Note: USEMANIFEST is for internal use, and not exposed
 	}
-	
+
+	@Override
 	public EditorDescription createEditorDescription (ParametersDescription parametersDescription) {
 		EditorDescription desc = new EditorDescription("Generic XLIFF Translation Package Options", true, false);
 		desc.addCheckboxPart(parametersDescription.get(PLACEHOLDERMODE));
