@@ -31,12 +31,12 @@ import net.sf.okapi.persistence.PersistenceBean;
 
 public class AltTranslationBean extends PersistenceBean<AltTranslation> {
 
-	String srcLocId;
-	String trgLocId;
-	TextUnitBean tu = new TextUnitBean();
-	AltTranslationType type;
-	int score;
-	String origin;
+	private String srcLocId;
+	private String trgLocId;
+	private TextUnitBean tu = new TextUnitBean();
+	private AltTranslationType type;
+	private int score;
+	private String origin;
 	
 	@Override
 	protected AltTranslation createObject(IPersistenceSession session) {

@@ -331,7 +331,7 @@ public class ReferenceResolver {
 	/**
 	 * Anti-beans are used to serialize a reference to a root object that has already been serialized as part of another bean.
 	 * The anti-beans are instances of the right bean class corresponding to the given object, which refId is the inverted value
-	 * of the given bean. Fields or the resulting anti-bean contain default values. 
+	 * of the given bean's refId. Fields or the resulting anti-bean contain default values. 
 	 * @param objClassRef
 	 * @param refId
 	 * @return

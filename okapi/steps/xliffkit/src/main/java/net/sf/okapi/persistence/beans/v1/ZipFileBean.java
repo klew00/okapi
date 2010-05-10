@@ -40,7 +40,7 @@ public class ZipFileBean extends PersistenceBean<ZipFile> {
 
 	private String name;  // ZIP file short name
 	private List<ZipEntryBean> entries = new ArrayList<ZipEntryBean>(); // enumeration of the ZIP file entries
-	boolean empty = true;
+	private boolean empty = true;
 	
 	private static ZipFile zipFile;
 

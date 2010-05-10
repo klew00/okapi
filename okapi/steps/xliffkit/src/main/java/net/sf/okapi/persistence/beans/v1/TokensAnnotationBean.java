@@ -31,7 +31,7 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class TokensAnnotationBean extends PersistenceBean<TokensAnnotation> {
 
-	List<TokenBean> tokens = new ArrayList<TokenBean>();
+	private List<TokenBean> tokens = new ArrayList<TokenBean>();
 	
 	@Override
 	protected TokensAnnotation createObject(IPersistenceSession session) {
