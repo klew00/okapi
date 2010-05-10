@@ -192,8 +192,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		PathInputPart pip = desc.addPathInputPart(paramDesc.get(OUTPUTPATH), "Output File", true);
 		pip.setMasterPart(cbp1, true);
 		
-//		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(AUTOEXTENSIONS));
-//		cbp2.setMasterPart(cbp1, false);
+		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(AUTOEXTENSIONS));
+		cbp2.setMasterPart(cbp1, false);
 
 		return desc;
 	}

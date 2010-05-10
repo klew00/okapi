@@ -57,6 +57,13 @@ output document is created for each input document.</p>
 generate. Note that for a Pensieve TM the output must be a directory. This field 
 is enabled only if the option <cite>Create a single output document</cite> is 
 set. You can use the variable <code>${rootDir}</code> in the path.</p>
+<p><cite>Output paths are the input paths plus the new format extension</cite> 
+-- Set this option to create output file that are the same as the input file 
+with and additional extension denoting the format o fthe output: <code>.po</code>,
+<code>.tmx</code>, etc. If this option is not set, the outputs will be the ones 
+specified by the calling application. Note that this option is only available if 
+the option <cite>Create a single output document</cite> is not set, that is when 
+each input corresponds to an output.</p>
 <p>&nbsp;</p>
 </body>
 </html>
