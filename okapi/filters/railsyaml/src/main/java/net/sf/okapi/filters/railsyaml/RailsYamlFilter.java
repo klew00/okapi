@@ -46,7 +46,6 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
  * @author PerkinsGW
- *
  */
 public class RailsYamlFilter extends AbstractFilter {
 
@@ -74,7 +73,6 @@ public class RailsYamlFilter extends AbstractFilter {
 
 	private static final Logger LOGGER = Logger.getLogger(RailsYamlFilter.class.getName());
 	
-	private Parameters params;
 	private YamlEventBuilder eventBuilder;
 	private String encoding;
 
@@ -96,48 +94,37 @@ public class RailsYamlFilter extends AbstractFilter {
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	public RailsYamlFilter() {
+	public RailsYamlFilter () {
 		eventBuilder = new YamlEventBuilder();
 		setMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
-		setParameters(new Parameters());
+		
 		setName("okf_railsyaml");
-		setDisplayName("Ruby on Rails Yaml Filter");
+		setDisplayName("Ruby on Rails YAML Filter");
 		addConfiguration(new FilterConfiguration(getName(), 
-				MimeTypeMapper.PLAIN_TEXT_MIME_TYPE, 
-				getClass().getName(),
-				"Ruby on Rails Yaml Filter", "Ruby on Rails YAML files"));
+			MimeTypeMapper.PLAIN_TEXT_MIME_TYPE, 
+			getClass().getName(),
+			"Ruby on Rails YAML", "Ruby on Rails YAML files"));
 		
 		parseState = PARSE_STOP;
 		indentation = 0;
 		keyStack = new Stack<KeyPair>();
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.AbstractFilter#isUtf8Bom()
-	 */
 	@Override
 	protected boolean isUtf8Bom() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.AbstractFilter#isUtf8Encoding()
-	 */
 	@Override
 	protected boolean isUtf8Encoding() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#close()
-	 */
-	public void close() {
+	@Override
+	public void close () {
 		try {
 			if(reader != null) {
 				reader.close();
@@ -150,25 +137,18 @@ public class RailsYamlFilter extends AbstractFilter {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
-	 */
+	@Override
 	public IParameters getParameters() {
-		return params;
+		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#hasNext()
-	 */
+	@Override
 	public boolean hasNext() {
 		return (parseState  != PARSE_STOP);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#next()
-	 */
-	public Event next() {
-		
+	@Override
+	public Event next () {
 		while (getEventBuilder().hasQueuedEvents()) {
 			return getEventBuilder().next();
 		}
@@ -260,7 +240,7 @@ public class RailsYamlFilter extends AbstractFilter {
 			return ITEM_COMMENT;
 		}
 		
-		int prevIndentation = indentation;
+//Not used		int prevIndentation = indentation;
 		indentation = getIndentation(line);
 
 		int colonIndex = trimLine.indexOf(':');
@@ -323,18 +303,14 @@ public class RailsYamlFilter extends AbstractFilter {
 		return key;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#open(net.sf.okapi.common.resource.RawDocument)
-	 */
-	public void open(RawDocument input) {
+	@Override
+	public void open (RawDocument input) {
 		open(input, true);
 		LOGGER.log(Level.FINE, getName() + ": opened an input document");
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#open(net.sf.okapi.common.resource.RawDocument, boolean)
-	 */
-	public void open(RawDocument input, boolean generateSkeleton) {
+	@Override
+	public void open (RawDocument input, boolean generateSkeleton) {
 		close();
 		
 		// Set the parseState to 
@@ -363,11 +339,9 @@ public class RailsYamlFilter extends AbstractFilter {
 		getEventBuilder().addFilterEvent(createStartDocumentEvent());
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common.IParameters)
-	 */
-	public void setParameters(IParameters params) {
-		this.params = (Parameters) params;
+	@Override
+	public void setParameters (IParameters params) {
+		// Not used
 	}
 	
 	private YamlEventBuilder getEventBuilder() {
