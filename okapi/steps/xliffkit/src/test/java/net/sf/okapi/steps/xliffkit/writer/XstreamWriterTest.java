@@ -57,8 +57,9 @@ public class XstreamWriterTest {
 		
 	}
 	
-	// DEBUG @Test
-	public void testPackageFormat4xml() throws URISyntaxException, MalformedURLException {
+	// DEBUG 
+	@Test
+	public void testPackageFormat4xstream() throws URISyntaxException, MalformedURLException {
 
 		int loops = 1;
 		long start = System.currentTimeMillis();
@@ -155,13 +156,14 @@ public class XstreamWriterTest {
 						new Parameter("includeOriginal", true),
 						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xml.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xstream.kit").toURI().toString()))
 		).execute();
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
 	
-	// DEBUG @Test
-	public void testPackageFormat5xml() throws URISyntaxException, MalformedURLException {
+	// DEBUG 
+	@Test
+	public void testPackageFormat5xstream() throws URISyntaxException, MalformedURLException {
 
 		int loops = 10;
 		long start = System.currentTimeMillis();
@@ -258,22 +260,23 @@ public class XstreamWriterTest {
 						new Parameter("includeOriginal", true),
 						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xml.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat5.xstream.kit").toURI().toString()))
 		).execute();
 		}
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
 
 	
-	// DEBUG @Test
-	public void testReferences3xml() throws MalformedURLException, URISyntaxException {
+	// DEBUG 
+	@Test
+	public void testReferences3xstream() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		PersistenceSession session = new OkapiXstreamSession();
 		writerStep.setSession(session);
 		writerStep.setResourcesFileExt(".xml");
 		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
-		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences3.xml.kit").toURI());
+		writerStep.setOutputURI(new URL("file", null, pathBase + "testReferences3.xstream.kit").toURI());
 		writerStep.setTargetLocale(DEDE);
 		net.sf.okapi.steps.xliffkit.writer.Parameters params = 
 			(net.sf.okapi.steps.xliffkit.writer.Parameters) writerStep.getParameters();

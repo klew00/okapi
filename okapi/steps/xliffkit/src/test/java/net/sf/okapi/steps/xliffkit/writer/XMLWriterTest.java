@@ -254,7 +254,7 @@ public class XMLWriterTest {
 						new Parameter("includeOriginal", true),
 						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xml.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat5.xml.kit").toURI().toString()))
 		).execute();
 		}
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");

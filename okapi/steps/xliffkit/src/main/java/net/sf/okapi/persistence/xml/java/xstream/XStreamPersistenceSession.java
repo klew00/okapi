@@ -22,17 +22,21 @@ package net.sf.okapi.persistence.xml.java.xstream;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 
 import com.thoughtworks.xstream.XStream;
 
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.persistence.IPersistenceBean;
 import net.sf.okapi.persistence.PersistenceSession;
 
 public abstract class XStreamPersistenceSession extends PersistenceSession {
 
-	private XStream xstream;
-	private OutputStream outStream;
+	private XStream xstream = new XStream();
+	private XMLWriter writer; 
+	private PrintWriter prWriter;
+	//private OutputStream outStream;
 	
 	@Override
 	protected void endReading(InputStream inStream) {
@@ -42,6 +46,9 @@ public abstract class XStreamPersistenceSession extends PersistenceSession {
 
 	@Override
 	protected void endWriting(OutputStream outStream) {
+		writer.writeEndElementLineBreak(); // body
+		writer.writeEndDocument();
+		writer.close();
 	}
 
 	@Override
@@ -58,14 +65,18 @@ public abstract class XStreamPersistenceSession extends PersistenceSession {
 	}
 
 	@Override
-	protected void startWriting(OutputStream outStream) {
-		xstream = new XStream();
-		this.outStream = outStream;
+	protected void startWriting(OutputStream outStream) {		
+		//this.outStream = outStream;
+		prWriter = new PrintWriter(outStream);
+		writer = new XMLWriter(prWriter);
+		writer.writeStartDocument();
+		writer.writeStartElement("body");
+		writer.writeLineBreak();
 	}
 
 	@Override
 	protected void writeBean(IPersistenceBean<?> bean, String name) {
-		xstream.toXML(bean, outStream);
+		xstream.toXML(bean, prWriter);
 	}
 
 	@Override
