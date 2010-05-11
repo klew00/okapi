@@ -154,6 +154,111 @@ public class XMLWriterTest {
 		).execute();
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
+	
+	// DEBUG 		
+	@Test
+	public void testPackageFormat5xml() throws URISyntaxException, MalformedURLException {
+
+		int loops = 10;
+		long start = System.currentTimeMillis();
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		String src1Path = pathBase + "src1/";		
+		String src2Path = pathBase + "src2/";
+		//System.out.println(pathBase);
+		
+		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
+		PersistenceSession session = new OkapiXmlSession();
+		writerStep.setSession(session);
+		writerStep.setResourcesFileExt(".xml");
+		for(int i = 0; i < loops; i++) {
+		new Pipeline(
+				"Test pipeline for XLIFFKitWriterStep",
+				new Batch(
+						new BatchItem(
+								new URL("file", null, src1Path + "test5.txt"),
+								"UTF-8",
+								ENUS,
+								FRFR)
+//						,								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test6.txt"),
+//								"UTF-8",
+//								ITIT,
+//								LocaleId.CHINA_CHINESE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test7.txt"),
+//								"UTF-8",
+//								ENUS,
+//								FRFR),
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test8.txt"),
+//								"UTF-8",
+//								ITIT,
+//								LocaleId.CHINA_CHINESE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test5.txt"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE),
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test8.txt"),
+//								"UTF-8",
+//								ITIT,
+//								DEDE)
+//						,
+//						new BatchItem(
+//								new URL("file", null, src2Path + "test9.odt"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE)
+//						,
+//								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test10.html"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE),
+// TODO DOCX is not mapped to any default filter configuration								
+//						new BatchItem(
+//								new URL("file", null, src1Path + "test11.docx"),
+//								"UTF-8",
+//								ENUS,
+//								DEDE)
+//						
+//						new BatchItem(
+//								(new URL("file", null, src1Path + "BoldWorld.docx")).toURI(),
+//								"UTF-8",
+//								"okf_openxml",
+//								null,
+//								"UTF-8",
+//								ENUS,
+//								DEDE)
+						),
+								
+				new RawDocumentToFilterEventsStep()
+				,				
+//				new PipelineStep(new LeveragingStep(), 
+//						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+//						new Parameter("threshold", 80),
+//						new Parameter("fillTarget", true)
+//				),
+				
+				new PipelineStep(
+						writerStep,								
+						new Parameter("gMode", true),
+						new Parameter("includeOriginal", true),
+						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xml.kit").toURI().toString()))
+		).execute();
+		}
+		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
+	}
 
 	
 	// DEBUG 		
