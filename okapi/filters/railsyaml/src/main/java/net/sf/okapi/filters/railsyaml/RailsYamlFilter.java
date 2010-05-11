@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -34,7 +34,6 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.AbstractFilter;
@@ -73,17 +72,20 @@ public class RailsYamlFilter extends AbstractFilter {
 
 	private static final Logger LOGGER = Logger.getLogger(RailsYamlFilter.class.getName());
 	
+	private static final String YAML_MIME_TYPE = "text/x-yaml";
+	
 	private YamlEventBuilder eventBuilder;
-	private String encoding;
 
 	private int parseState;
 	private BufferedReader reader;
 	private int tuid;
 	private TextUnit tuEntry;
-	GenericSkeleton skel;
+	private GenericSkeleton skel;
 	private String key = "";
 	private int indentation;
 	private Stack<KeyPair> keyStack;
+	private boolean isUtf8Encoding = false;
+	private boolean isUtf8Bom = false;
 	
 	private class KeyPair {
 		public int indent;
@@ -96,13 +98,13 @@ public class RailsYamlFilter extends AbstractFilter {
 	
 	public RailsYamlFilter () {
 		eventBuilder = new YamlEventBuilder();
-		setMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);
+		setMimeType(YAML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
 		
 		setName("okf_railsyaml");
 		setDisplayName("Ruby on Rails YAML Filter");
 		addConfiguration(new FilterConfiguration(getName(), 
-			MimeTypeMapper.PLAIN_TEXT_MIME_TYPE, 
+			YAML_MIME_TYPE, 
 			getClass().getName(),
 			"Ruby on Rails YAML", "Ruby on Rails YAML files"));
 		
@@ -113,14 +115,12 @@ public class RailsYamlFilter extends AbstractFilter {
 
 	@Override
 	protected boolean isUtf8Bom() {
-		// TODO Auto-generated method stub
-		return false;
+		return isUtf8Bom;
 	}
 
 	@Override
 	protected boolean isUtf8Encoding() {
-		// TODO Auto-generated method stub
-		return false;
+		return isUtf8Encoding;
 	}
 
 	@Override
@@ -315,16 +315,17 @@ public class RailsYamlFilter extends AbstractFilter {
 		
 		// Set the parseState to 
 		parseState = PARSE_CONTINUE;
-		
 		tuid = 0;
 		
 		// Handle the encoding
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
-		encoding = input.getEncoding();
+		String encoding = input.getEncoding();
+		isUtf8Bom = detector.hasUtf8Bom();
+		isUtf8Encoding = detector.hasUtf8Encoding();
 		
-//		setOptions(input.getSourceLocale(), input.getTargetLocale(), encoding, generateSkeleton);
+		setOptions(input.getSourceLocale(), input.getTargetLocale(), encoding, generateSkeleton);
 		
 		// Get a Reader on the RawDocument
 		try {

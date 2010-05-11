@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,24 +20,18 @@
 
 package net.sf.okapi.filters.railsyaml;
 
-//import java.util.regex.Pattern;
-
 import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * @author PerkinsGW
- *
  */
 public class YamlEventBuilder extends EventBuilder {
 
 //	private static final String YAML_WHITESPACE_REGEX = "[ ]+";
 //	private static final Pattern YAML_WHITESPACE_PATTERN = Pattern.compile(YAML_WHITESPACE_REGEX);
 
-	/**
-	 * 
-	 */
 	public YamlEventBuilder() {
 		// TODO Auto-generated constructor stub
 	}

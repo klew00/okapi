@@ -97,11 +97,6 @@
 
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
-			<artifactId>okapi-filter-vignette</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-xliff</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -217,6 +212,16 @@
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-pensieve</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-vignette</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-railsyaml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
