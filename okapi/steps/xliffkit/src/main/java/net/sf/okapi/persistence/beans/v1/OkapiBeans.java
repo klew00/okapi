@@ -33,7 +33,6 @@ import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
-import net.sf.okapi.common.resource.AltTransAnnotation;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.BaseReferenceable;
 import net.sf.okapi.common.resource.Code;
