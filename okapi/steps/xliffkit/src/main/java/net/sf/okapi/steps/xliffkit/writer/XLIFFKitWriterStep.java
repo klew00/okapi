@@ -97,6 +97,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	private Parameters params;
 	private URI outputURI;
 	
+	private String resourcesFileExt = ".json";
 	private String originalFileName;
 	private String sourceFileName;
 	private String xliffFileName;
@@ -120,7 +121,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	private OPCPackage pack;
 	private File tempXliff;
 	private File tempResources;
-	private OkapiJsonSession session;
+	private PersistenceSession session;
 	private List<String> sources = new ArrayList<String> ();
 	private List<String> originals = new ArrayList<String> ();
 	
@@ -252,7 +253,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		sourceFileName = Util.getFilename(docName, true);
 		xliffFileName = originalFileName + ".xlf";
 		//skeletonFileName = originalFileName + ".skeleton";
-		resourcesFileName = originalFileName + ".json";
+		resourcesFileName = originalFileName + resourcesFileExt;
 		skeletonFileName = String.format("resources/%s/%s", sourceFileName, resourcesFileName);
 //		tmxFileName = originalFileName + ".tmx";
 //		tbxFileName = originalFileName + ".tbx";
@@ -544,5 +545,17 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 
 	public PersistenceSession getSession() {
 		return session;
+	}
+
+	public void setSession(PersistenceSession session) {
+		this.session = session;
+	}
+
+	public String getResourcesFileExt() {
+		return resourcesFileExt;
+	}
+
+	public void setResourcesFileExt(String resourcesFileExt) {
+		this.resourcesFileExt = resourcesFileExt;
 	}
 }

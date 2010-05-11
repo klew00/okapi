@@ -430,6 +430,9 @@ public class XLIFFKitWriterTest {
 	@Test
 	public void testPackageFormat4() throws URISyntaxException, MalformedURLException {
 
+		int loops = 1;
+		long start = System.currentTimeMillis();
+		
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
@@ -520,6 +523,7 @@ public class XLIFFKitWriterTest {
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
 						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xliff.kit").toURI().toString()))
 		).execute();
+		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
 	
 	// DEBUG 	@Test
