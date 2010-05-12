@@ -120,6 +120,10 @@ public class RTFFilter implements IFilter {
 	public static final int CW_MAC               = 49;
 	public static final int CW_PC                = 50;
 	public static final int CW_PCA               = 51;
+	public static final int CW_FTNSEP            = 52;
+	public static final int CW_FTNSEPC           = 53;
+	public static final int CW_AFTNSEP           = 54;
+	public static final int CW_AFTNSEPC          = 55;
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -277,6 +281,10 @@ public class RTFFilter implements IFilter {
 		controlWords.put("mac", CW_MAC);
 		controlWords.put("pc", CW_PC);
 		controlWords.put("pca", CW_PCA);
+		controlWords.put("ftnsep", CW_FTNSEP);
+		controlWords.put("ftnsepc", CW_FTNSEPC);
+		controlWords.put("aftnsep", CW_AFTNSEP);
+		controlWords.put("aftnsepc", CW_AFTNSEPC);
 	}
 	
 	public void cancel () {
@@ -760,7 +768,7 @@ public class RTFFilter implements IFilter {
 				if ( cwCode == -1 ) {
 					if (( code == CW_PAR ) || ( code == CW_LINE )) {
 						//bParOrLine = true;
-						return 0;
+						if ( ctxStack.peek().inText ) return 0;
 					}
 				}
 				else if ( code == cwCode ) {
@@ -1289,6 +1297,13 @@ public class RTFFilter implements IFilter {
 		case CW_STYLESHEET:
 		case CW_COLORTBL:
 		case CW_INFO:
+			ctxStack.peek().inText = false;
+			break;
+		case CW_FTNSEP:
+		case CW_FTNSEPC:
+		case CW_AFTNSEP:
+		case CW_AFTNSEPC:
+			noReset = 1;
 			ctxStack.peek().inText = false;
 			break;
 
